@@ -31,14 +31,14 @@ public final class GravityPanelGameTests {
     /** 電力が足りないと、受電器に近い順に払える枚数だけ働く。種類のちがうパネルも伝う。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void receiverPowersNearestPanelsFirst(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos receiver = new BlockPos(1, 1, 1);
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         // 受電器から東へ5枚（3枚目だけ高重力）
         for (int x = 2; x <= 6; x++) {
             helper.setBlock(new BlockPos(x, 1, 1), x == 4 ? SinguloBlocks.HIGH_GRAVITY_PANEL.get() : SinguloBlocks.LOW_GRAVITY_PANEL.get());
         }
-        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
+        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, receiver);
         int per = GravityReceiverBlockEntity.perPanel();
         helper.onEachTick(() -> be.energy().receiveLong(3L * per, false));
         helper.runAtTickTime(30, () -> {
@@ -54,12 +54,12 @@ public final class GravityPanelGameTests {
     /** 受電器が壊されると、パネルは止まる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void panelsStopWhenReceiverIsRemoved(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos receiver = new BlockPos(1, 1, 1);
         BlockPos panel = new BlockPos(2, 1, 1);
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(panel, SinguloBlocks.LOW_GRAVITY_PANEL.get());
-        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
+        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, receiver);
         helper.onEachTick(() -> {
             if (!be.isRemoved()) {
                 be.energy().receiveLong(1_000, false);
@@ -79,12 +79,12 @@ public final class GravityPanelGameTests {
     // 引き寄せる物（マイクロブラックホールなど）のテストと同時に動くと落下距離が消えるので、別の組で動かす
     @GameTest(setupTicks = 20, template = "tall", batch = "impact_generator", timeoutTicks = 100)
     public static void impactGeneratorAbsorbsFallAndPowersPanels(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos gen = new BlockPos(2, 1, 2);
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
-        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, gen);
+        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, gen);
         // 防具立て（AI がなく、まっすぐ落ちる）
         var pig = helper.spawn(EntityType.ARMOR_STAND, new BlockPos(2, 10, 2));
         float health = pig.getHealth();
@@ -105,13 +105,13 @@ public final class GravityPanelGameTests {
         for (int x = 1; x <= 6; x++) {
             helper.setBlock(new BlockPos(x, 1, 1), SinguloBlocks.LOW_GRAVITY_PANEL.get());
         }
-        return new GravityReceiverBlockEntity[] {io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, new BlockPos(0, 1, 1)), io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, new BlockPos(7, 1, 1))};
+        return new GravityReceiverBlockEntity[] {io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, new BlockPos(0, 1, 1)), io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, new BlockPos(7, 1, 1))};
     }
 
     /** 受電器が複数あっても、どれか1台だけで集まり全体を働かせられる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void oneOfSeveralReceiversPowersAllPanels(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
         helper.onEachTick(() -> r[1].energy().receiveLong(6L * per, false));
@@ -132,7 +132,7 @@ public final class GravityPanelGameTests {
      */
     @GameTest(template = EMPTY, timeoutTicks = 60)
     public static void nearestReceiverPaysForEachPanel(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
         helper.onEachTick(() -> {
@@ -149,7 +149,7 @@ public final class GravityPanelGameTests {
     /** 近い受電器の電力が弱いときは、払えない分を遠い受電器が払う。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void fartherReceiverCoversWeakSupply(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
         helper.onEachTick(() -> {
@@ -169,17 +169,17 @@ public final class GravityPanelGameTests {
     /** 衝撃発電パネルは、ためた電力をケーブルへ送り出す（ケーブルから受け取りはしない）。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void impactGeneratorFeedsCables(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos gen = new BlockPos(1, 1, 3);
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
-        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, gen);
+        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, gen);
         be.absorb(5);
         for (int z = 2; z >= 1; z--) {
             helper.setBlock(new BlockPos(1, 1, z), SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         }
         BlockPos kilnPos = new BlockPos(1, 1, 0);
         helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.KILN).get());
-        io.github.genichimaruo.singulo.machine.MachineBlockEntity kiln = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, kilnPos);
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, kilnPos);
         var cap = io.github.genichimaruo.singulo.compat.Capabilities.get(helper.getLevel(), io.github.genichimaruo.singulo.compat.Capabilities.EnergyStorage.BLOCK,
                 helper.absolutePos(gen), Direction.NORTH);
         helper.assertTrue(cap != null && cap.canExtract() && !cap.canReceive(), "ケーブル用の口が取り出し専用でない");
@@ -191,15 +191,15 @@ public final class GravityPanelGameTests {
     /** 衝撃発電パネルが外へ出せるのは、何面につないでも、取り出される分と合わせて1 tick に PUSH_PER_TICK まで。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void impactGeneratorOutputIsSharedAcrossFaces(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos gen = new BlockPos(3, 3, 3);
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
-        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, gen);
+        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, gen);
         be.absorb(10);
         java.util.List<io.github.genichimaruo.singulo.machine.MachineBlockEntity> sinks = new java.util.ArrayList<>();
         for (Direction d : Direction.values()) {
             helper.setBlock(gen.relative(d), SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.KILN).get());
-            sinks.add(io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, gen.relative(d)));
+            sinks.add(io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, gen.relative(d)));
         }
         long before = be.stored();
         GravityReceiverBlockEntity.serverTick(helper.getLevel(), helper.absolutePos(gen), helper.getBlockState(gen), be);
@@ -221,7 +221,7 @@ public final class GravityPanelGameTests {
     /** 同じ種類のパネルどうしは見た目がつながり、ちがう種類とはつながらない。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void panelsJoinOnlyTheSameKind(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(2, 1, 3), SinguloBlocks.HIGH_GRAVITY_PANEL.get());
@@ -235,13 +235,13 @@ public final class GravityPanelGameTests {
     /** 働いている低重力パネルに乗ると重力が変わり、パネル以外の地面に降りると元に戻る。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 80)
     public static void standingOnPoweredPanelChangesGravityUntilLanding(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos receiver = new BlockPos(1, 1, 2);
         BlockPos panel = new BlockPos(2, 1, 2);
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(panel, SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(5, 1, 2), Blocks.STONE);
-        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
+        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, receiver);
         helper.onEachTick(() -> be.energy().receiveLong(1_000, false));
         // 防具立て（AI を持たず、重力で動く生き物）
         var stand = helper.spawn(EntityType.ARMOR_STAND, panel.above());

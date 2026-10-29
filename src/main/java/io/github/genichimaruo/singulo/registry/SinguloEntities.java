@@ -59,6 +59,13 @@ public final class SinguloEntities {
                     io.github.genichimaruo.singulo.ruin.GravityDebris::new, MobCategory.MISC)
                     .sized(0.6F, 0.6F).clientTrackingRange(6).updateInterval(2).build(Singulo.id("gravity_debris").toString()));
 
+    /** リアクターの炉心に崩されて吸い込まれていくブロック（見た目だけ）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.reactor.InfallingBlock>> INFALLING_BLOCK = REGISTER.register(
+            "infalling_block", () -> EntityType.Builder.<io.github.genichimaruo.singulo.reactor.InfallingBlock>of(
+                    io.github.genichimaruo.singulo.reactor.InfallingBlock::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1).noSave().noSummon()
+                    .build(Singulo.id("infalling_block").toString()));
+
     /** 沈んだ炉心区画のボス（体は部位 LeviathanSegment に分かれる）。 */
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan>> ERGOSPHERE_LEVIATHAN = REGISTER.register(
             "ergosphere_leviathan", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan::new, MobCategory.MONSTER)

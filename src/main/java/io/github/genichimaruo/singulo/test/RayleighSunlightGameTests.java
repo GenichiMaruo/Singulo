@@ -25,7 +25,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void lightWorkerNotificationsNeverWaitForSunlightRebuild(GameTestHelper h) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         h.assertTrue(sunlight(h, SAMPLE) == 15, "Missing sunlight fixture");
         var fields = RayleighSky.class.getDeclaredField("FIELDS"); fields.setAccessible(true);
@@ -43,7 +43,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty", timeoutTicks = 400)
     public static void actualSkyAndRawLightEqualClearNoonEvenWithNightDarkening(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         h.succeedWhen(() -> {
             var level = h.getLevel(); var p = h.absolutePos(SAMPLE);
@@ -57,7 +57,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void skylightUsesVanillaGlassWaterAndOpaqueOcclusion(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         BlockPos filter = new BlockPos(2, 3, 2);
         h.setBlock(filter, Blocks.GLASS);
@@ -71,7 +71,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void partialBlockShapesOccludeSunlightLikeVanilla(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         for (int x = 1; x <= 3; x++) for (int z = 1; z <= 3; z++) h.setBlock(new BlockPos(x, 3, z), Blocks.STONE_SLAB.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE, net.minecraft.world.level.block.state.properties.SlabType.TOP));
@@ -83,7 +83,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void lightDiffusesAroundShadowsRatherThanPassingThroughBlocks(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         h.assertTrue(sunlight(h, SAMPLE.east()) == 14, "Sideways sky diffusion does not attenuate by one");
         h.setBlock(new BlockPos(2, 3, 2), Blocks.STONE);
@@ -96,7 +96,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void panelPowerRemovalAndReloadDiscardOldSunlight(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         BlockPos panel = new BlockPos(2, 6, 2);
         h.assertTrue(sunlight(h, SAMPLE) == 15, "Missing source");
@@ -111,7 +111,7 @@ public final class RayleighSunlightGameTests {
         h.assertTrue(RayleighSky.snapshot(h.getLevel()).light(sample.getX(), sample.getY(), sample.getZ()) == 0,
                 "A new renderer snapshot retained disabled sunlight");
         h.setBlock(panel, SinguloBlocks.LAB_RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, true));
-        var be = (RayleighPanelBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, panel);
+        var be = (RayleighPanelBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, panel);
         be.onChunkUnloaded();
         h.assertTrue(sunlight(h, SAMPLE) == 0, "Unloaded panel retains its sunlight field");
         be.onLoad();
@@ -123,7 +123,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void unobstructedSunlightIsNotLimitedToThirtyTwoBlocks(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 40);
         try { h.assertTrue(sunlight(h, SAMPLE) == 15, "Artificial sunlight stops after 32 blocks"); }
         finally {
@@ -135,7 +135,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void detectorUsesAttenuatedNoonLightAndCorrectInversion(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         h.setBlock(SAMPLE.east(), Blocks.DAYLIGHT_DETECTOR);
         h.setBlock(SAMPLE.west(), Blocks.DAYLIGHT_DETECTOR.defaultBlockState().setValue(DaylightDetectorBlock.INVERTED, true));
@@ -148,7 +148,7 @@ public final class RayleighSunlightGameTests {
 
     @GameTest(template = "empty")
     public static void artificialSunBurnsUndeadAtNightWithoutChangingWorldTimeOrWeather(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         room(h, 6);
         var level = h.getLevel();
         long time = level.getDayTime();

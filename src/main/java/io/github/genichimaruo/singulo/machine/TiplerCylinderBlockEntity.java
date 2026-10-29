@@ -8,7 +8,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -62,6 +62,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         }
     };
     private final IItemHandler automation = new CombinedInvWrapper(slot, fuel);
+    private final IItemHandler pipes = new CombinedInvWrapper(slot, fuel, spentOut());
     private int burn;
     private boolean formed;
     /** 円柱の軸の根元（格納筒の底の内側の中心）。形成したときに決まる。 */
@@ -253,7 +254,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
 
     @Override
     public IItemHandler automationItems() {
-        return automation;
+        return pipes;
     }
 
     /** 燃料（エキゾチック物質）は手に持って右クリックでも入れられる。 */

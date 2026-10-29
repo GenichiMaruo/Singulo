@@ -3048,8 +3048,8 @@
     "translation": "반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과, 기록뿐이었다."
   },
   "ending.singulo.line.3": {
-    "source": "You read those records and lit the same fire. And you never let go of the hand that stops the feed.",
-    "translation": "당신은 그 기록을 읽고, 같은 불을 지폈다. 그리고 투입을 멈추는 손을 끝내 놓지 않았다."
+    "source": "You read those records and lit the same fire. And you never forgot to stop when it was time to stop.",
+    "translation": "당신은 그 기록을 읽고, 같은 불을 지폈다. 그리고 멈춰야 할 때 멈추는 것을 잊지 않았다."
   },
   "ending.singulo.line.4": {
     "source": "And now the energy has become mass again, then stars, then a galaxy.",
@@ -3115,6 +3115,10 @@
     "source": "Awakened Ergosphere Leviathan",
     "translation": "각성한 에르고구의 거대 뱀"
   },
+  "entity.singulo.ergosphere_leviathan.hatchling": {
+    "source": "Ergosphere Serpent",
+    "translation": "에르고구의 뱀"
+  },
   "entity.singulo.ergosphere_leviathan.wyrm": {
     "source": "Ergosphere Wyrm",
     "translation": "에르고구의 용"
@@ -3134,6 +3138,10 @@
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
     "translation": "잔해"
+  },
+  "entity.singulo.infalling_block": {
+    "source": "Infalling Block",
+    "translation": "빨려드는 블록"
   },
   "entity.singulo.gravity_remnant": {
     "source": "Gravity Remnant",
@@ -3928,8 +3936,8 @@
     "translation": "기록은 읽는 이가 있어야 비로소 기록이 된다."
   },
   "gui.singulo.archivist.death_3": {
-    "source": "Thank you. Never let go of the hand that stops the feed.",
-    "translation": "고맙다. 투입을 멈추는 손을, 결코 놓지 마라."
+    "source": "Thank you. Please be someone who can stop when it is time to.",
+    "translation": "고마워. 부디, 멈춰야 할 때 멈출 수 있는 사람이 되어 줘."
   },
   "gui.singulo.archivist.emerge_1": {
     "source": "...Someone has read the records.",
@@ -4763,10 +4771,6 @@
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "거대 뱀이 노심의 소용돌이로 잠수합니다. 소용돌이가 넓어지며 빛을 빨아들입니다……"
   },
-  "gui.singulo.leviathan.swallow": {
-    "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
-    "translation": "――바닥이 갈라지고 거대한 턱이 그것을 통째로 삼켰습니다. 에르고구의 거대 뱀이 모습을 드러냈습니다"
-  },
   "gui.singulo.leviathan.tide": {
     "source": "The core vortex opens and drags everything in... Run against the pull!",
     "translation": "노심의 소용돌이가 열려 모든 것을 끌어들입니다…… 흐름을 거슬러 바깥으로 달리세요!"
@@ -5038,6 +5042,10 @@
   "gui.singulo.reason.need_item": {
     "source": "- %s: %s more needed",
     "translation": "・%s: %s개 더 필요"
+  },
+  "gui.singulo.reason.need_lifetime": {
+    "source": "- %s with at least %s of lifetime left",
+    "translation": "・%s 필요 (남은 수명 %s 이상)"
   },
   "gui.singulo.reason.need_uses": {
     "source": "- %s with at least %s uses left",
@@ -5427,6 +5435,10 @@
     "source": "- %s x%s",
     "translation": "・%s ×%s"
   },
+  "gui.singulo.select.lifetime": {
+    "source": "- %s (%s of lifetime)",
+    "translation": "・%s (수명 %s)"
+  },
   "gui.singulo.select.restore": {
     "source": "- Restores: %s",
     "translation": "・복원할 물건: %s"
@@ -5655,6 +5667,30 @@
     "source": "Side %s",
     "translation": "한 변 %s"
   },
+  "gui.singulo.supply_port.entry": {
+    "source": "Priority item",
+    "translation": "우선 아이템"
+  },
+  "gui.singulo.supply_port.entry.hint": {
+    "source": "Click with an item to register it (click empty-handed to clear)",
+    "translation": "아이템을 들고 클릭하면 등록 (빈손으로 클릭하면 해제)"
+  },
+  "gui.singulo.supply_port.mode.0": {
+    "source": "Priority for taking and returning",
+    "translation": "꺼내기와 반납에서 우선"
+  },
+  "gui.singulo.supply_port.mode.1": {
+    "source": "Priority for taking",
+    "translation": "꺼내기에서 우선"
+  },
+  "gui.singulo.supply_port.mode.2": {
+    "source": "Priority for returning",
+    "translation": "반납에서 우선"
+  },
+  "gui.singulo.supply_port.rank": {
+    "source": "Priority %s (1 goes first)",
+    "translation": "우선순위 %s (1이 가장 먼저)"
+  },
   "gui.singulo.supporters.count": {
     "source": "Supporters: %s / 100",
     "translation": "후원자: %s / 100"
@@ -5882,6 +5918,10 @@
   "gui.singulo.work_console.error.capacity": {
     "source": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
     "translation": "%s 의 재료를 한 번에 나를 수 있는 안드로이드가 없습니다(백팩이, 유체라면 탱크 업그레이드가 필요)"
+  },
+  "gui.singulo.work_console.error.limit": {
+    "source": "Order too complex. Stock intermediates and split the order",
+    "translation": "주문이 너무 복잡합니다. 중간 재료를 준비하고 주문을 나누세요"
   },
   "gui.singulo.work_console.error.loop": {
     "source": "The recipes loop",
@@ -6384,8 +6424,8 @@
     "translation": "스테이션 업그레이드"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
-    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n- \"새로\": 켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\").\n- 주문 목록에서는 만드는 중인 아이템에 주황색 테두리가 붙습니다. 진행 중인 주문의 \"↻\"로 같은 아이템을 다시 주문할 수 있습니다. 재료를 기다리는 주문에는 부족한 아이템과 수가 나옵니다(행에 커서를 올리면 전부).\n- 화면에서 낸 주문은 끝났을 때, 재료를 기다리며 1분 이상 멈췄을 때, 취소되었을 때 주문한 사람에게 채팅으로 알립니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n- Supply port priorities: right-click a supply port to register up to 8 items, each with a priority (1 goes first) for taking, returning or both. Registered items are taken from and returned to the highest-priority port first (the next one when it is full). Sneak-right-click shows the linked console.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n- \"새로\": 켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\").\n- 주문 목록에서는 만드는 중인 아이템에 주황색 테두리가 붙습니다. 진행 중인 주문의 \"↻\"로 같은 아이템을 다시 주문할 수 있습니다. 재료를 기다리는 주문에는 부족한 아이템과 수가 나옵니다(행에 커서를 올리면 전부).\n- 화면에서 낸 주문은 끝났을 때, 재료를 기다리며 1분 이상 멈췄을 때, 취소되었을 때 주문한 사람에게 채팅으로 알립니다.\n・자재구 우선: 자재구를 우클릭하면 아이템마다 우선순위(1이 가장 먼저)와 꺼내기·반납 중 어디에 적용할지를 최대 8개까지 등록할 수 있습니다. 등록한 아이템은 순위가 높은 자재구에서 먼저 꺼내고 먼저 반납합니다(가득 차면 다음 장소로). 웅크리고 우클릭하면 연결된 지령대를 표시합니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -6395,17 +6435,25 @@
     "source": "Catalysts",
     "translation": "촉매"
   },
+  "guide.singulo.catalysts.keys.body": {
+    "source": "Higher-stage machines use one fresh catalyst of the previous stage when you build them (put it in the Precision Assembler's catalyst slot; a higher-tier catalyst uses less).\n- Stage 3 machines (Entanglement Synthesizer, Laser Cooler, Quantum Heat Engine and more): muon catalyst\n- Stage 4 machines (Time Crystal Incubator, Autonomous Probe Station, Void Collector, multiblock controllers and more): BE condensate catalyst\n- Stage 5 machines: time crystal catalyst (mostly as Time Crystal Modules)\nThe machines that make the next tier's catalyst also need a guardian's spoils: the Laser Cooler (BE condensate) needs a Sentinel Projection Core from the Echo Sentinel, the Time Crystal Incubator (time crystal) needs a Degenerate Nucleus from the Gravity Remnant, and the Singularity Core starts from the Dormant Singularity Seed.",
+    "translation": "상위 단계의 장치는 만들 때 이전 단계의 촉매를 새 촉매 1개분의 수명만큼 씁니다(정밀 조립기의 촉매 슬롯에 넣습니다. 상위 촉매라면 덜 씁니다).\n- 3단계 장치(양자 얽힘 합성기, 레이저 냉각기, 양자 열기관 등): 뮤온 촉매\n- 4단계 장치(시간 결정 배양기, 자동 탐사기 기지, 공허 수집기, 멀티블록 제어 장치 등): BE 응축 촉매\n- 5단계 장치: 시간 결정 촉매(대부분 시간 결정 모듈로)\n다음 티어의 촉매를 만드는 장치에는 파수꾼의 전리품도 필요합니다. 레이저 냉각기(BE 응축)에는 메아리 파수꾼의 파수꾼 투영 핵, 시간 결정 배양기(시간 결정)에는 중력 잔재의 축퇴 핵이 필요하고, 특이점 코어는 휴면 특이점 씨앗에서 시작합니다."
+  },
+  "guide.singulo.catalysts.keys.title": {
+    "source": "Catalysts as machine keys",
+    "translation": "장치의 열쇠가 되는 촉매"
+  },
   "guide.singulo.catalysts.slots.body": {
-    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.",
-    "translation": "촉매를 쓰는 장치에는 촉매만 들어가는 전용 슬롯(화면에서 촉매 표시가 있는 칸)이 있습니다. 다른 아이템은 들어가지 않습니다.\n다 쓴 촉매는 소모된 촉매가 됩니다. 촉매 반응기에서 약 25%를 한 티어 아래 촉매의 재료로 회수할 수 있습니다."
+    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
+    "translation": "촉매를 쓰는 장치에는 촉매만 들어가는 전용 슬롯(화면에서 촉매 표시가 있는 칸)이 있습니다. 같은 촉매를 16개까지 예비로 쌓을 수 있습니다.\n장치는 하나를 안에 장전해서 쓰며, 슬롯 아래 게이지에 남은 양이 표시됩니다. 다 쓰면 소모된 촉매를 내보내고(기계는 출력 슬롯, 촉매 장치는 왼쪽 출구) 예비에서 다음 촉매를 바로 장전하므로 멈추지 않습니다.\n쓰다 남은 같은 종류의 촉매를 넣으면 남은 수명이 장전 중인 촉매로 합쳐지고, 빈 껍데기는 소모된 촉매로 나옵니다. 다른 종류를 넣으면 장전 중인 촉매를 출구로 돌려보내고 교체합니다. 예비가 비어 있을 때 슬롯을 클릭하면 장전 중인 촉매를 꺼낼 수 있습니다.\n소모된 촉매는 촉매 반응기에서 약 25%를 한 티어 아래 촉매의 재료로 회수할 수 있습니다."
   },
   "guide.singulo.catalysts.slots.title": {
     "source": "Catalyst slots and recycling",
     "translation": "촉매 슬롯 및 재활용"
   },
   "guide.singulo.catalysts.tiers.body": {
-    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE condensate catalyst takes one muon catalyst and 40 seconds).",
-    "translation": "뮤온(2), BE 응축(3), 시간 결정(4), 특이점 코어(5).\n- 장치와 같은 티어: 표준\n- 한 티어 높음: 속도 +25%, 소모 −20%(두 티어 높은 것까지 겹침)\n- 한 티어 낮음: 속도 ×0.5, 소모 ×2(발전기는 정격 출력의 25%)\n- 두 티어 낮음: 사용 불가\n남은 양이 줄수록 필요 전력이 늘고(최대 ×1.6), 전력이 80% 아래로 떨어지면 불완전 반응으로 소모가 ×1.5가 됩니다.\n이 규칙은 촉매 슬롯으로 가동하는 장치(앵커, 안정기, 발전기, 보호막 등)에 적용됩니다. 가공 레시피에 재료로 적힌 촉매는 정해진 개수나 수명만큼만 쓰며 속도는 변하지 않습니다(예: BE 응축 촉매 가공에는 뮤온 촉매 1개와 40초가 듭니다)."
+    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed amount of life (a whole catalyst means one fresh catalyst's worth). Any catalyst of that tier or higher can pay: each tier higher wears 20% less and works 25% quicker (up to two tiers). Lower tiers cannot pay.",
+    "translation": "뮤온(2), BE 응축(3), 시간 결정(4), 특이점 코어(5).\n- 장치와 같은 티어: 표준\n- 한 티어 높음: 속도 +25%, 소모 −20%(두 티어 높은 것까지 겹침)\n- 한 티어 낮음: 속도 ×0.5, 소모 ×2(발전기는 정격 출력의 25%)\n- 두 티어 낮음: 사용 불가\n남은 양이 줄수록 필요 전력이 늘고(최대 ×1.6), 전력이 80% 아래로 떨어지면 불완전 반응으로 소모가 ×1.5가 됩니다.\n이 규칙은 촉매 슬롯으로 가동하는 장치(앵커, 안정기, 발전기, 보호막 등)에 적용됩니다. 가공 레시피에 재료로 적힌 촉매는 정해진 수명만큼 씁니다(통째로 1개라면 새 촉매 1개분). 그 티어 이상의 촉매로 낼 수 있으며, 한 단계 위마다 소모 −20%, 속도 +25%입니다(두 단계까지). 하위 촉매로는 낼 수 없습니다."
   },
   "guide.singulo.catalysts.tiers.title": {
     "source": "Tiers and effects",
@@ -6756,8 +6804,8 @@
     "translation": "3단계: 양자"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler.\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다.\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재을 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 씨앗과 배양 데이터가 갖춰지면 4단계의 시간 결정 배양기로 넘어갑니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다(3단계 장치는 뮤온 촉매를 1개씩 씁니다. 레이저 냉각기에는 연구동의 메아리 파수꾼이 떨어뜨리는 파수꾼 투영 핵도 필요합니다).\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재을 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 씨앗, 배양 데이터, 축퇴 핵(중력 잔재가 떨어뜨림)이 갖춰지면 4단계의 시간 결정 배양기로 넘어갑니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -6808,8 +6856,8 @@
     "translation": "대형 발전과 자동화"
   },
   "guide.singulo.stage4.time.body": {
-    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "배양기는 실제 가동 시간 12분 동안 시간 결정을 키웁니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮았던 시간만큼 순도와 수명이 줄어듭니다.\n설비(노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등)에는 시간 결정 모듈을 씁니다. 정밀 조립기가 촉매 슬롯의 결정에서 새 결정 수명의 2/3(기본 설정에서 30분)를 잘라 내고, 나머지(기본 15분)는 특이 물질 가공이나 코어 재료에 쓸 수 있습니다. 남은 수명이 그보다 적은 결정(쓰던 것·순도가 낮은 것)은 자를 수 없고, 수명 설정과 프리셋에 따라 필요량이 비례해서 바뀝니다. 배양기를 2대 두면 설비용과 가동용이 겹치지 않습니다.\n카시미르 공동(5×5×5, 윗면과 아랫면이 거울)은 특이 물질을 만듭니다."
+    "source": "The incubator grows time crystals over 8 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) into four modules from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "배양기는 실제 가동 시간 8분 동안 시간 결정을 기릅니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮은 시간의 비율만큼 순도와 수명이 줄어듭니다.\n노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등은 시간 결정 모듈을 사용합니다. 정밀 조립기는 촉매 슬롯의 결정에서 새 결정 수명의 2/3(기본 30분)를 잘라 모듈 4개를 만들고, 남은 기본 15분은 이종 물질 가공이나 코어에 쓸 수 있습니다. 수명이 부족한 결정은 가공할 수 없으며 수명 설정과 프리셋에 따라 요구량도 비례합니다. 건설용과 운전용이 촉매를 함께 쓰므로 배양기 두 대가 편리합니다.\nC 공동은 위아래 안쪽이 거울인 5×5×5 진공 용기로, 시간 결정 촉매를 써서 이종 물질과 액시온 응축체를 만듭니다."
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -7896,8 +7944,8 @@
     "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.smes_module": {
-    "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "제작: 정밀 조립기(4단계)"
+    "source": "Made in: Crafting Table (stage 4)",
+    "translation": "제작: 작업대(4단계)"
   },
   "howto.singulo.steel_blend": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -9003,6 +9051,10 @@
     "source": "Found in",
     "translation": "입수"
   },
+  "jei.singulo.lifetime": {
+    "source": "Uses %s of lifetime",
+    "translation": "수명 %s 사용"
+  },
   "jei.singulo.mass": {
     "source": "Mass %s",
     "translation": "질량 %s"
@@ -9066,6 +9118,10 @@
   "jei.singulo.uses": {
     "source": "Uses %s",
     "translation": "사용 횟수 %s 소모"
+  },
+  "jei.singulo.higher_tier": {
+    "source": "A higher-tier catalyst also works (each tier: −20%% wear, +25%% speed)",
+    "translation": "상위 티어 촉매도 사용 가능 (한 단계마다 소모 −20%%, 속도 +25%%)"
   },
   "key.categories.singulo": {
     "source": "Singulo",
@@ -9688,8 +9744,8 @@
     "translation": "점화 기록(조각)"
   },
   "record.singulo.r20.body": {
-    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
-    "translation": "우리는 모든 질량을 에너지로 바꾸려 했다. 반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과 감시자, 그리고 이 기록뿐이다. 이 글을 읽는 이에게. 투입을 멈추는 손을, 결코 놓지 마라."
+    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: if you feed the reactor, stop when it is time to stop. We could not.",
+    "translation": "우리는 모든 질량을 에너지로 바꾸려 했다. 반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과 감시자, 그리고 이 기록뿐이다. 이 글을 읽는 이에게. 반응로에 무언가를 쏟아붓는다면, 멈춰야 할 때 반드시 멈춰라. 우리는 그러지 못했다."
   },
   "record.singulo.r20.title": {
     "source": "The Last Record",
@@ -9704,8 +9760,8 @@
     "translation": "마지막 페이지"
   },
   "record.singulo.x02.body": {
-    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they know the hand that stops the feed.",
-    "translation": "모든 질량은 에너지가 되었다. 그 같은 불로, 우리는 다시 한번 우주를 하나 만들었다. 별이 켜지고, 은하가 소용돌이친다. 언젠가 그곳에서도 기록을 남길 누군가가 태어나겠지. 그 누군가가, 투입을 멈추는 손을 알게 되기를."
+    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they, too, know when to stop.",
+    "translation": "모든 질량은 에너지가 되었다. 그 같은 불로, 우리는 다시 한번 우주를 하나 만들었다. 별이 켜지고, 은하가 소용돌이친다. 언젠가 그곳에서도 기록을 남길 누군가가 태어나겠지. 그 누군가도, 멈춰야 할 때 멈출 수 있기를."
   },
   "record.singulo.x02.title": {
     "source": "The First Page",
@@ -10855,6 +10911,14 @@
     "source": "Works from your inventory · Use to switch mode",
     "translation": "인벤토리에 있기만 해도 작동 · 우클릭으로 모드 전환"
   },
+  "tooltip.singulo.min_sec": {
+    "source": "%s min %s s",
+    "translation": "%s분 %s초"
+  },
+  "tooltip.singulo.minutes": {
+    "source": "%s min",
+    "translation": "%s분"
+  },
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "혼합: 8개로 Lv2가 됨"
@@ -10967,6 +11031,10 @@
     "source": "Sealed",
     "translation": "봉인됨"
   },
+  "tooltip.singulo.seconds": {
+    "source": "%s s",
+    "translation": "%s초"
+  },
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",
     "translation": "%s단계: %s"
@@ -11052,8 +11120,8 @@
     "translation": "사용 대상: 개량형 안드로이드 작업대"
   },
   "uses.singulo.anomaly_sample": {
-    "source": "Used in: Singularity Core",
-    "translation": "사용 제품: 특이점 코어"
+    "source": "Used in: Singularity Core, Primordial Seed",
+    "translation": "용도: 특이점 코어, 원초의 씨앗"
   },
   "uses.singulo.artificial_star_core": {
     "source": "Used in: Genesis Core, Primordial Seed",
@@ -11120,8 +11188,8 @@
     "translation": "사용 대상: 폐허 패널, 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널 외 2개"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Time Crystal Catalyst",
-    "translation": "사용 제품: 시간 결정 촉매"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 시간 결정 촉매, 축퇴 열로 제어기 외 3개"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11300,8 +11368,8 @@
     "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 1개"
   },
   "uses.singulo.degenerate_nucleus": {
-    "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
-    "translation": "사용 대상: 특이점 캡슐화기, 특이점 씨앗, 중력자 조작기, 각성의 중력핵"
+    "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
+    "translation": "사용 대상: 시간 결정 배양기, 특이점 캡슐화기, 특이점 씨앗, 중력자 조작기, 각성의 중력핵"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
@@ -11428,8 +11496,8 @@
     "translation": "사용 제품: 뮤온 촉매"
   },
   "uses.singulo.muon_catalyst": {
-    "source": "Used in: Muon-Catalyzed Fusion Reactor, BE Condensate Catalyst",
-    "translation": "사용 대상: 뮤온 촉매 핵융합로, BE 응축 촉매"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, Entanglement Synthesizer, Laser Cooler, BE Condensate Catalyst, Quantum Heat Engine and 6 more",
+    "translation": "사용 대상: 뮤온 촉매 핵융합로, 양자 얽힘 합성기, 레이저 냉각기, BE 응축 촉매, 양자 열기관 외 6개"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
@@ -11524,8 +11592,8 @@
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.sentinel_core": {
-    "source": "Used in: Echo Resonator, Time Crystal Incubator, Autonomous Probe Station, Awakened Echo Core",
-    "translation": "사용 대상: 메아리 공명기, 시간 결정 배양기, 자동 탐사기 기지, 각성의 메아리핵"
+    "source": "Used in: Laser Cooler, Echo Resonator, Autonomous Probe Station, Awakened Echo Core",
+    "translation": "사용 대상: 레이저 냉각기, 메아리 공명기, 자동 탐사기 기지, 각성의 메아리핵"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
@@ -11580,12 +11648,12 @@
     "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
-    "translation": "사용 대상: 특이 물질, 특이점 코어, 시간 결정 모듈"
+    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
+    "translation": "사용 대상: 특이 물질, 특이점 코어, 헤일로 수집기, 시간 결정 모듈"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",
-    "translation": "사용 대상: 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 중력자 조작기, 티플러 코어 외 2개"
+    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
+    "translation": "용도: SMES 모듈, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 그래비톤 조작기 외 3종"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11682,5 +11750,125 @@
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",
     "translation": "사용 대상: 니호늄"
+  },
+  "subtitles.singulo.ergosphere_leviathan.burst": {
+    "source": "Something bursts from the floor",
+    "translation": "바닥이 갈라지며 무언가가 솟구친다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.rise": {
+    "source": "The Leviathan spirals upward",
+    "translation": "거대 뱀이 소용돌이치며 솟아오른다"
+  },
+  "subtitles.singulo.foundry.online": {
+    "source": "Foundry comes online",
+    "translation": "파운드리가 가동된다"
+  },
+  "subtitles.singulo.foundry.dying": {
+    "source": "Motors wind down",
+    "translation": "모터가 멈춰 간다"
+  },
+  "subtitles.singulo.echo_sentinel.awake": {
+    "source": "Echo Sentinel awakens",
+    "translation": "메아리 파수꾼이 깨어난다"
+  },
+  "subtitles.singulo.gravity_remnant.pulse": {
+    "source": "Core throbs",
+    "translation": "핵이 맥동한다"
+  },
+  "subtitles.singulo.last_archivist.dissolve": {
+    "source": "Body dissolves into light",
+    "translation": "몸이 빛의 먼지가 된다"
+  },
+  "subtitles.singulo.last_archivist.inhale": {
+    "source": "The singularity draws in",
+    "translation": "특이점이 빨아들인다"
+  },
+  "subtitles.singulo.horizon_warden.hurt": {
+    "source": "Horizon Warden hurts",
+    "translation": "지평선 감시자가 상처 입는다"
+  },
+  "subtitles.singulo.android.blade_cast": {
+    "source": "Light pillars summoned",
+    "translation": "빛기둥을 부른다"
+  },
+  "subtitles.singulo.android.tend": {
+    "source": "Android tends a plant",
+    "translation": "안드로이드가 식물을 돌본다"
+  },
+  "subtitles.singulo.android.sweep": {
+    "source": "Android sweeps",
+    "translation": "안드로이드가 바닥을 쓴다"
+  },
+  "subtitles.singulo.android.chatter": {
+    "source": "Androids chatter",
+    "translation": "안드로이드가 수다를 떤다"
+  },
+  "subtitles.singulo.horizon_warden.bolt_hit": {
+    "source": "Light bolt bursts",
+    "translation": "광탄이 터진다"
+  },
+  "subtitles.singulo.last_archivist.floor_fade": {
+    "source": "Hologram floor fades",
+    "translation": "홀로그램 바닥이 사라진다"
+  },
+  "subtitles.singulo.security_drone.sputter": {
+    "source": "Drone sparks",
+    "translation": "드론이 불꽃을 튀긴다"
+  },
+  "subtitles.singulo.black_hole.devour": {
+    "source": "Blocks get pulled into the core",
+    "translation": "블록이 노심으로 빨려 들어간다"
+  },
+  "gui.singulo.catalyst.loaded": {
+    "source": "Loaded: %s (%s%% left)",
+    "translation": "장전 중: %s (남은 양 %s%%)"
+  },
+  "gui.singulo.catalyst.loaded_hint": {
+    "source": "When it runs out, the spent catalyst comes out and the next one loads from the reserve. Partly used catalysts you add are merged in.",
+    "translation": "다 쓰면 소모된 촉매를 내보내고 예비에서 다음 촉매를 장전합니다. 쓰다 남은 촉매를 넣으면 남은 양을 합칩니다"
+  },
+  "gui.singulo.catalyst.eject_hint": {
+    "source": "Click to take out the loaded catalyst",
+    "translation": "클릭하면 장전 중인 촉매를 꺼냅니다"
+  },
+  "gui.singulo.catalyst.spent_slot": {
+    "source": "Spent catalyst output",
+    "translation": "소모된 촉매 출구"
+  },
+  "gui.singulo.probe.waiting": {
+    "source": "Waiting to revisit",
+    "translation": "유적 재방문 대기 중"
+  },
+  "gui.singulo.probe.upgrade": {
+    "source": "Research needs a Singularity Core",
+    "translation": "연구동에는 특이점 코어 필요"
+  },
+  "guide.singulo.factory_expansion": {
+    "source": "Factory Expansion",
+    "translation": "공장 확장"
+  },
+  "guide.singulo.factory_expansion.upgrades.title": {
+    "source": "Production and storage after unlocking",
+    "translation": "해금 후 생산과 저장"
+  },
+  "guide.singulo.factory_expansion.upgrades.body": {
+    "source": "After producing a BE catalyst, reconstruct projection cores with quantum modules, optical lattices, meteoric iron and catalyst life. Once you have time catalysts, degenerate nuclei can also be reconstructed. The first research and culture bosses are still required, but factory expansion no longer requires repeated fights.\nThirty minutes of catalyst life makes four Time Crystal Modules. Large SMES units need this part. A shaped upgrade uses an old SMES Cell at the centre and preserves its stored energy. Existing cables can also be upgraded from copper to superconducting, topological and horizon wiring.",
+    "translation": "BE 촉매를 생산하면 양자 연산 모듈, 광학 격자 기판, 운철과 촉매 수명으로 파수꾼 투영 핵를 재구성할 수 있습니다. 시간 촉매를 얻은 뒤에는 축퇴 핵도 재구성할 수 있습니다. 연구동과 배양 시설의 첫 보스는 여전히 필수지만, 공장 확장을 위해 같은 전투를 반복할 필요는 없습니다.\n촉매 수명 30분으로 시간 결정 모듈 4개를 만듭니다. 대형 SMES에는 이 부품이 필요합니다. 정형 강화 조합에서 기존 SMES 셀을 중앙에 놓으면 저장된 전력도 이어받습니다. 기존 배선도 구리 전선에서 초전도 케이블, 위상 전선, 지평선 버스로 차례로 전환할 수 있습니다."
+  },
+  "guide.singulo.factory_expansion.probes.title": {
+    "source": "Probes and the final unlock",
+    "translation": "탐사기와 최종 해금"
+  },
+  "guide.singulo.factory_expansion.probes.body": {
+    "source": "With a same-tier catalyst, a probe visits one ruin in five minutes and returns half the manual loot. Destinations are visited in turn. Waiting for regeneration or output space consumes no power or catalyst. Overflow cargo is saved and must be unloaded before another mission.\nA loaded Singularity Core also permits research-building collection; time catalysts only permit observation posts. Culture facilities, final labs, sunken reactors and android facilities remain manual.\nA Primordial Seed also requires one use of a restored anomaly sample from the final lab. Sunken loot alone can no longer bypass the final lab.",
+    "translation": "동일 단계 촉매를 사용할 때 탐사기는 5분마다 유적 한 곳을 방문하고 수동 회수량의 절반을 가져옵니다. 등록 지점을 차례로 방문하며, 재생이나 출력 공간을 기다릴 때는 전력과 촉매를 쓰지 않습니다. 넘친 화물은 저장하고 하역 전까지 다음 임무를 시작하지 않습니다.\n특이점 코어를 촉매로 장전하면 연구동도 회수할 수 있습니다. 시간 촉매로는 관측 거점까지만 가능합니다. 배양 시설, 최종 실험 시설, 수몰 노심, 안드로이드 시설은 계속 수동 탐사가 필요합니다.\n원초의 씨앗에는 최종 실험 시설에서 복원한 이상 샘플의 사용 횟수 1회도 필요합니다. 해저 전리품만으로 최종 실험 시설을 건너뛸 수 없습니다."
+  },
+  "guide.singulo.factory_expansion.limits.title": {
+    "source": "Mass, output and ignition",
+    "translation": "질량, 출력과 점화"
+  },
+  "guide.singulo.factory_expansion.limits.body": {
+    "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
+    "translation": "금속 압축 Lv2의 질량은 81입니다. 철이나 구리 블록은 하나당 질량 3이므로 Lv1은 3블록, Lv2는 27블록, 즉 주괴 243개를 씁니다. 철 대신 구리도 가능합니다. 열전대와 열교환 코어는 용도가 한정되어 처음부터 많이 비축할 필요는 없습니다.\nP 리액터 점화에는 10초 안에 50 GFE를 공급해야 합니다. SMES 모듈 하나당 2 GFE이므로 용량만으로는 최소 25개가 필요합니다. 모듈 하나의 출력 한도는 100 MFE/t이므로 적어도 3개를 병렬로 연결하고 합계 250 MFE/t 이상의 전송량을 확보해야 합니다.\n점화 직후 질량 500, 스핀 0에서 연료를 유지하면 지속 출력은 약 28.6 MFE/t입니다. 2.1 GFE/t는 전송 상한이며 초기 발전량이 아닙니다. 질량, 스핀과 저장 시설을 갖춘 후 창세로에 전력을 공급하세요."
   }
 }

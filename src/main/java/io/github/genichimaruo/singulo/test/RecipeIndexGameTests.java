@@ -41,7 +41,7 @@ public final class RecipeIndexGameTests {
 
     @GameTest(template = "empty")
     public static void indexedOrderAndValuesMatchExistingSelection(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         for (MachineType type : MachineType.values()) {
             var actual = MachineBlockEntity.stationRecipes(h.getLevel(), type);
             var expected = legacy(h, type);
@@ -50,22 +50,27 @@ public final class RecipeIndexGameTests {
                     .filter(r -> r.value().isMassRecipe()).sorted(Comparator.comparing(r -> r.id().toString())).toList()),
                     "Mass recipe order changed for " + type);
         }
-        // Record query time; correctness never depends on a noisy wall-clock threshold.
-        var type = MachineType.PRECISION_ASSEMBLER;
-        var cached = MachineBlockEntity.stationRecipes(h.getLevel(), type);
-        long start = System.nanoTime();
-        for (int i = 0; i < 10_000; i++)
-            h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), type) == cached, "Repeated queries rebuild lists");
-        long indexed = System.nanoTime() - start;
-        start = System.nanoTime();
-        for (int i = 0; i < 10_000; i++) legacy(h, type);
-        Singulo.LOGGER.info("SINGULO_RECIPE_INDEX_BENCH queries=10000 indexedNs={} previousNs={}", indexed, System.nanoTime() - start);
+        // Reuse is a correctness invariant; expensive timing comparisons are opt-in.
+        var stable = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER);
+        for (int i = 0; i < 3; i++) h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER) == stable,
+                "Repeated queries rebuild lists");
+        if (Boolean.getBoolean("singulo.testBenchmarks")) {
+            var type = MachineType.PRECISION_ASSEMBLER;
+            var cached = MachineBlockEntity.stationRecipes(h.getLevel(), type);
+            long start = System.nanoTime();
+            for (int i = 0; i < 10_000; i++)
+                h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), type) == cached, "Repeated queries rebuild lists");
+            long indexed = System.nanoTime() - start;
+            start = System.nanoTime();
+            for (int i = 0; i < 10_000; i++) legacy(h, type);
+            Singulo.LOGGER.info("SINGULO_RECIPE_INDEX_BENCH queries=10000 indexedNs={} previousNs={}", indexed, System.nanoTime() - start);
+        }
         h.succeed();
     }
 
     @GameTest(template = "empty", batch = "recipe_reload")
     public static void indexedListsFollowReplacementAndRestoration(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var manager = h.getLevel().getRecipeManager();
         var original = List.copyOf(manager.getRecipes());
         var before = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN);
@@ -80,7 +85,7 @@ public final class RecipeIndexGameTests {
 
     @GameTest(template = "empty", batch = "recipe_index_config")
     public static void indexedValuesFollowConfigurationChanges(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         int old = ServerConfig.TIME_CRYSTAL_GROWTH_TICKS.get();
         try {
             var before = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.TIME_CRYSTAL_INCUBATOR);

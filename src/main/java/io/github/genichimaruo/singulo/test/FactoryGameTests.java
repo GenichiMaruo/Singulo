@@ -56,7 +56,7 @@ public final class FactoryGameTests {
     /** 中央管制ホールを小さく再現する: 封鎖された保管庫・封印核・4つの製造ライン・床のコンベアの列。 */
     private static GuardianCoreBlockEntity hall(GameTestHelper helper) {
         helper.setBlock(VAULT, SinguloBlocks.RUIN_CACHE.get().defaultBlockState().setValue(RuinCacheBlock.SEALED, true));
-        ((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).setRuin("android_lab");
+        ((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).setRuin("android_lab");
         for (int i = 0; i < LINES.size(); i++) {
             helper.setBlock(LINES.get(i), SinguloBlocks.FACTORY_LINE.get().defaultBlockState().setValue(FactoryLineBlock.FACING, FACING.get(i)));
         }
@@ -65,7 +65,7 @@ public final class FactoryGameTests {
                     .setValue(FactoryConveyorBlock.FACING, Direction.EAST));
         }
         helper.setBlock(CORE, SinguloBlocks.GUARDIAN_CORE.get());
-        GuardianCoreBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CORE);
+        GuardianCoreBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CORE);
         be.scan(helper.getLevel());
         // ほかの組のテストが残した仕掛けを数えないように、このテストの場所の中のものだけにする
         AABB bounds = new AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(64, 24, 64)));
@@ -106,7 +106,7 @@ public final class FactoryGameTests {
     /** 封印核はファウンドリを起こし、4つの製造ラインを数える。ラインが動いている間は受けるダメージが小さく、壊すと大きくなる。 */
     @GameTest(template = HUGE, batch = BATCH + "_1", timeoutTicks = 80)
     public static void linesShieldTheFoundry(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         helper.assertTrue(f.lineCount() == 4, "製造ラインを4つ数えない: " + f.lineCount());
@@ -134,7 +134,7 @@ public final class FactoryGameTests {
     /** 倒すと保管庫の封鎖が解け、精密アクチュエーターを落とし、コンベアは止まる。 */
     @GameTest(template = HUGE, batch = BATCH + "_2", timeoutTicks = 120)
     public static void foundryDefeatUnsealsVault(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         f.setConveyors(true);
@@ -147,7 +147,7 @@ public final class FactoryGameTests {
                 helper.absolutePos(new BlockPos(14, 14, 14))));
         f.kill();
         helper.runAtTickTime(FoundryOverseer.DEATH_TICKS + 10, () -> {
-            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
             int n = dropped(helper, item("precision_actuator"));
             helper.assertTrue(n >= 3 && n <= 4, "精密アクチュエーターを3〜4個落とさない: " + n);
             // 部屋に挑戦者がいないときは、試作機の設計メモリをどちらか1つ
@@ -165,7 +165,7 @@ public final class FactoryGameTests {
     /** 動いているコンベアは上に乗ったものを流し、決まった間ごとに（その前に警告して）向きを変える。 */
     @GameTest(template = HUGE, batch = BATCH + "_3", timeoutTicks = FoundryOverseer.CONVEYOR_PERIOD + 60)
     public static void conveyorsCarryAndReverse(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         f.setConveyors(true);
@@ -192,7 +192,7 @@ public final class FactoryGameTests {
     /** 溶接レーザーは床すれすれをなぞる: 床に立つ相手には当たり、高い所の相手には当たらない。 */
     @GameTest(template = HUGE, batch = BATCH + "_4", timeoutTicks = FoundryOverseer.LASER_AIM + FoundryOverseer.LASER_SWEEP + 30)
     public static void laserSkimsTheFloor(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         Zombie low = dummy(helper, new BlockPos(11, 1, 7));
@@ -213,7 +213,7 @@ public final class FactoryGameTests {
     /** プレスは影の丸の中の相手を叩き、動きを鈍らせる。外にいれば当たらない。 */
     @GameTest(template = HUGE, batch = BATCH + "_5", timeoutTicks = FoundryOverseer.PRESS_WINDUP + 40)
     public static void pressSlamsAndSlows(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         Zombie in = dummy(helper, new BlockPos(3, 1, 3));
@@ -232,7 +232,7 @@ public final class FactoryGameTests {
     /** ロボットアームは、狙いが止まったあと降りてきて、印の中の相手をつかんで投げる。 */
     @GameTest(template = HUGE, batch = BATCH + "_6", timeoutTicks = FoundryOverseer.ARM_AIM + 40)
     public static void armGrabsAndThrows(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         Zombie z = dummy(helper, new BlockPos(4, 1, 10));
@@ -253,7 +253,7 @@ public final class FactoryGameTests {
     /** ラインは量産型（体力半分・何も落とさない）を、同時に4体まで印刷する。本気になると試作機を2体呼ぶ。 */
     @GameTest(template = HUGE, batch = BATCH + "_7", timeoutTicks = 60)
     public static void linesPrintMassAndPrototypes(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
         FoundryOverseer f = foundry(helper, core);
         for (int i = 0; i < 6; i++) {
@@ -288,9 +288,9 @@ public final class FactoryGameTests {
     /** 覚醒の製造核で、保管庫が開いていても覚醒したファウンドリ（体力×2.5）が現れる。ほかの覚醒核では現れない。 */
     @GameTest(template = HUGE, batch = BATCH + "_8", timeoutTicks = 40)
     public static void foundryCoreSummonsAwakened(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = hall(helper);
-        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT);
         vault.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
         vault.setSealed(false);
         helper.assertTrue(core.awaken(helper.getLevel()) == null, "保管庫が開いているのに普通の番人が現れた");
@@ -310,7 +310,7 @@ public final class FactoryGameTests {
     /** 研究棟で調整したコンパス（封鎖培養施設まで探せる）は、分かれ道の廃アンドロイド工場も探せる。その前は探せない。 */
     @GameTest(template = "empty")
     public static void compassFindsFactoryAfterResearchBuilding(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         ItemStack compass = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get());
         io.github.genichimaruo.singulo.item.ExplorerCompassItem.upgrade(compass);
         helper.assertFalse(io.github.genichimaruo.singulo.item.ExplorerCompassItem.targets(compass).contains("android_lab"),

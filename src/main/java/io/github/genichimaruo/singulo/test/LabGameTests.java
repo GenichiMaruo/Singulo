@@ -50,15 +50,16 @@ public final class LabGameTests {
      */
     @GameTest(template = EMPTY)
     public static void layoutConnectsEveryRoom(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (long seed = 0; seed < 120; seed++) {
             LabLayout l = layout(helper, seed);
             List<String> names = l.rooms.stream().map(LabLayout.Placed::name).toList();
             for (String need : List.of(LabLayout.ENTRANCE, LabLayout.REACTOR, LabLayout.BOSS, LabLayout.SUBSTATION, "control", "loading_dock", LabLayout.FREIGHT_LIFT)) {
                 helper.assertTrue(names.contains(need), "種 " + seed + ": " + need + " がない");
             }
-            helper.assertTrue(names.stream().distinct().count() == names.size() || names.stream().filter(n -> n.startsWith("annex_")).count() > 1,
-                    "種 " + seed + ": 同じ部屋が2つある: " + names);
+            var uniqueRooms = names.stream().filter(n -> !n.startsWith("annex_")).toList();
+            helper.assertTrue(uniqueRooms.stream().distinct().count() == uniqueRooms.size(),
+                    "種 " + seed + ": 同じ主要な部屋が2つある: " + names);
             helper.assertTrue(names.size() >= 12, "種 " + seed + ": 部屋が少ない: " + names.size());
             for (int i = 0; i < l.rooms.size(); i++) {
                 BoundingBox bi = l.rooms.get(i).box();
@@ -116,7 +117,7 @@ public final class LabGameTests {
     /** 部品: 耐圧殻がいちばん先、主立坑がいちばん後。部屋の部品の数は並びの部屋の数、廊下の部品は廊下の数。 */
     @GameTest(template = EMPTY)
     public static void piecesFollowTheLayout(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var templates = helper.getLevel().getStructureManager();
         for (long seed = 0; seed < 20; seed++) {
             StructurePiecesBuilder b = new StructurePiecesBuilder();
@@ -158,7 +159,7 @@ public final class LabGameTests {
     /** 型紙: すべての部屋があり、幅・奥行きは奇数。ボス部屋に保管庫・封印核・製造ライン4つ、動力炉に制御盤と炉心と導管、エントランスに端末。 */
     @GameTest(template = EMPTY)
     public static void templatesHaveTheirFixtures(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         List<String> all = new ArrayList<>(List.of(LabLayout.ENTRANCE, LabLayout.REACTOR, LabLayout.BOSS, LabLayout.SUBSTATION));
         all.addAll(List.of(LabLayout.REQUIRED));
         all.addAll(List.of(LabLayout.OPTIONAL));
@@ -197,7 +198,7 @@ public final class LabGameTests {
     /** 動力炉を起動すると: 施設灯が光り、非常灯が消え、隔壁が開いて通れるようになり、制御盤も動いている形になる。範囲の外は変わらない。 */
     @GameTest(template = EMPTY, timeoutTicks = ReactorConsoleBlockEntity.STARTUP + 40)
     public static void reactorRestoresPower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos console = new BlockPos(1, 1, 1), lamp = new BlockPos(3, 3, 3), alarm = new BlockPos(4, 3, 3), door = new BlockPos(5, 1, 3);
         helper.setBlock(console, SinguloBlocks.REACTOR_CONSOLE.get());
         helper.setBlock(lamp, SinguloBlocks.FACILITY_LIGHT.get());
@@ -205,7 +206,7 @@ public final class LabGameTests {
         helper.setBlock(door, SinguloBlocks.BULKHEAD.get());
         BlockPos outside = new BlockPos(6, 1, 6);
         helper.setBlock(outside, SinguloBlocks.FACILITY_LIGHT.get());
-        ReactorConsoleBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, console);
+        ReactorConsoleBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, console);
         be.setFacility(BoundingBox.fromCorners(helper.absolutePos(new BlockPos(0, 0, 0)), helper.absolutePos(new BlockPos(5, 4, 5))));
         helper.assertTrue(helper.getLevel().getLightEmission(helper.absolutePos(alarm)) > 0, "電力がないのに非常灯が消えている");
         helper.assertTrue(helper.getLevel().getLightEmission(helper.absolutePos(lamp)) == 0, "電力がないのに施設灯が光っている");
@@ -226,14 +227,14 @@ public final class LabGameTests {
     /** 部品を、テストの場所の絶対座標の範囲（チャンクの区切りの代わりに全体）で描く。 */
     private static void draw(GameTestHelper helper, net.minecraft.world.level.levelgen.structure.StructurePiece piece) {
         var level = helper.getLevel();
-        piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
+        piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), net.minecraft.util.RandomSource.create(0),
                 piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
     }
 
     /** 耐圧殻は部屋の箱から2マス以内だけ（部屋の中と、3マス以上離れた所は描かない）。 */
     @GameTest(template = "huge")
     public static void hullWrapsRoomsTwoThick(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos o = helper.absolutePos(new BlockPos(2, 1, 2));
         var room = new net.minecraft.world.level.levelgen.structure.BoundingBox(o.getX() + 6, o.getY() + 4, o.getZ() + 6,
                 o.getX() + 10, o.getY() + 8, o.getZ() + 10);
@@ -258,7 +259,7 @@ public final class LabGameTests {
      */
     @GameTest(template = "huge")
     public static void accessShaftIsWeldedAtBothEnds(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos o = helper.absolutePos(new BlockPos(6, 1, 6));
         var box = new net.minecraft.world.level.levelgen.structure.BoundingBox(o.getX() - 2, o.getY(), o.getZ() - 2,
                 o.getX() + 2, o.getY() + 14, o.getZ() + 2);
@@ -286,7 +287,7 @@ public final class LabGameTests {
     /** 地表の建物: 床・昇降路の扉の枠・入場ゲートの柱・受付のカウンター・出入口・屋根。 */
     @GameTest(template = "huge")
     public static void entranceBuildingStandsOverTheShaft(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos o = helper.absolutePos(new BlockPos(8, 2, 6));
         draw(helper, new LabPieces.Entrance(o.getX(), o.getZ(), o.getY(), 7));
         var level = helper.getLevel();
@@ -307,7 +308,7 @@ public final class LabGameTests {
     /** 封じられた耐圧殻は掘れず（壊す速さ 0）、封じが解けると、黒曜石よりは遅いが掘れる。 */
     @GameTest(template = EMPTY)
     public static void sealedHullCannotBeMined(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos at = new BlockPos(2, 1, 2);
         helper.setBlock(at, SinguloBlocks.PRESSURE_HULL.get().defaultBlockState().setValue(PressureHullBlock.SEALED, true));
         var player = helper.makeMockPlayer();
@@ -328,7 +329,7 @@ public final class LabGameTests {
      */
     @GameTest(template = EMPTY)
     public static void labIsPlacedAfterSculk(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var lab = helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).get(Singulo.id("android_lab"));
         helper.assertTrue(lab != null, "研究所の構造物がない");
         var step = lab.step();
@@ -344,7 +345,7 @@ public final class LabGameTests {
      */
     @GameTest(template = EMPTY)
     public static void labContainersHoldFittingLoot(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         for (String name : List.of("lab_supplies", "lab_research", "lab_office", "lab_quarters", "lab_locker", "lab_kitchen", "lab_medical")) {
             var table = level.getServer().getLootData().getLootTable(Singulo.id("chests/" + name));
@@ -390,7 +391,7 @@ public final class LabGameTests {
      */
     @GameTest(template = EMPTY)
     public static void vendingMachineSellsForEmeralds(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         BlockPos at = new BlockPos(2, 1, 2);
         var lower = SinguloBlocks.VENDING_MACHINE.get().defaultBlockState().setValue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.FACING, net.minecraft.core.Direction.NORTH)
@@ -425,7 +426,7 @@ public final class LabGameTests {
     /** コーヒーメーカー: カカオ豆で淹れ（少しして3杯分）、ガラス瓶でくむとコーヒーになり、杯数が減る。空のときは瓶でくめない。 */
     @GameTest(template = EMPTY, timeoutTicks = io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.BREW_TIME + 40)
     public static void coffeeMakerBrewsAndFillsBottles(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         BlockPos at = new BlockPos(2, 1, 2);
         helper.setBlock(at, SinguloBlocks.COFFEE_MAKER.get().defaultBlockState());
@@ -455,9 +456,9 @@ public final class LabGameTests {
     /** 飲み物: 飲むと効果がつく（エナジードリンクは採掘速度上昇 II）。コーヒーは眠気を覚まし（最後に眠ってからの時間が 0）、瓶が残る。 */
     @GameTest(template = EMPTY)
     public static void drinksGiveTheirEffects(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);           // クリエイティブでは飲んでも減らない（瓶も残らない）
         new net.minecraft.world.item.ItemStack(item("energy_drink")).finishUsingItem(level, player);
         var haste = player.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED);
@@ -497,7 +498,7 @@ public final class LabGameTests {
     /** 右クリックで上下とも開いて通れるようになり、誰もいなければ少しして自分で閉まる。 */
     @GameTest(template = EMPTY, timeoutTicks = SlidingDoorBlock.CLOSE_DELAY + 40)
     public static void slidingDoorClosesByItself(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos at = new BlockPos(2, 1, 2);
         placeDoor(helper, at, SinguloBlocks.LAB_DOOR.get());
         helper.assertFalse(passable(helper, at) || passable(helper, at.above()), "閉じたドアを通れる");
@@ -513,7 +514,7 @@ public final class LabGameTests {
     /** ドアの中に誰かいる間と、レッドストーンの信号が入っている間は閉まらない。 */
     @GameTest(template = EMPTY, timeoutTicks = SlidingDoorBlock.CLOSE_DELAY * 2 + 60)
     public static void slidingDoorWaitsForPassersAndRedstone(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos at = new BlockPos(2, 1, 2), wired = new BlockPos(5, 1, 2);
         placeDoor(helper, at, SinguloBlocks.WHITE_SLIDING_DOOR.get());
         placeDoor(helper, wired, SinguloBlocks.WHITE_SLIDING_DOOR.get());
@@ -537,7 +538,7 @@ public final class LabGameTests {
     /** 研究所のドアはレシピがなく、似せたホワイトスライドドアは作業台で作れる。どちらも下半分だけが落とす（壊すと1つ）。 */
     @GameTest(template = EMPTY)
     public static void onlyTheWhiteSlidingDoorIsCraftable(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         java.util.function.Predicate<net.minecraft.world.item.Item> craftable = item -> level.getRecipeManager().getRecipes().stream()
                 .anyMatch(r -> r.getResultItem(level.registryAccess()).is(item));
@@ -553,7 +554,7 @@ public final class LabGameTests {
     /** 個室区画には個室のドアが8つ（16ブロック）、食堂には厨房のドアが1つ。どのドアも前後が空いている（家具でふさがれていない）。 */
     @GameTest(template = EMPTY)
     public static void privateRoomsAndKitchenHaveDoors(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (var room : List.of(java.util.Map.entry("private_rooms", 16), java.util.Map.entry("cafeteria", 2))) {
             StructureTemplate t = template(helper, room.getKey()).orElseThrow();
             helper.assertTrue(count(t, SinguloBlocks.LAB_DOOR.get()) == room.getValue(),
@@ -575,7 +576,7 @@ public final class LabGameTests {
     /** 記録端末は、番号ごとに題と本文の記録を持つ（番号は記録の数で回る）。 */
     @GameTest(template = EMPTY)
     public static void terminalsHoldRecords(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (int i = 0; i < LabTerminalBlock.LOGS + 2; i++) {
             var lines = LabTerminalBlock.lines(i);
             helper.assertTrue(lines.length == 2, "記録の行が2つでない");
@@ -586,7 +587,7 @@ public final class LabGameTests {
     }
     @GameTest(template = EMPTY)
     public static void bothShaftsRemainPresentOnSlopingTerrain(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var templates = helper.getLevel().getStructureManager();
         for (int height : new int[]{-20, 0, 20, 45, 70}) {
             int floor = LabStructure.floorForShafts(-30, 70, height, 11);

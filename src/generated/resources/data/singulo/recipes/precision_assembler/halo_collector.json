@@ -28,6 +28,13 @@
         "item": "singulo:optical_lattice_substrate"
       },
       "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_catalyst"
+      },
+      "tier": 4,
+      "uses": 54000
     }
   ],
   "result": {

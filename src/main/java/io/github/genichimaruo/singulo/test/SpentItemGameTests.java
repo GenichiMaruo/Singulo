@@ -27,7 +27,7 @@ public final class SpentItemGameTests {
     private static MachineBlockEntity archive(GameTestHelper h) {
         BlockPos pos = new BlockPos(2,2,2);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         ItemStack log = item("observation_log",1);
         be.items().setStackInSlot(0, UsesHelper.consume(log, UsesHelper.remaining(log)-1));
         be.items().setStackInSlot(1, item("blank_data_card",1));
@@ -42,7 +42,7 @@ public final class SpentItemGameTests {
 
     @GameTest(template="empty", timeoutTicks=350)
     public static void pipesCanPullSpentOriginalWhileProductBlocksOutput(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var be = archive(h);
         var cap = io.github.genichimaruo.singulo.compat.Capabilities.get(h.getLevel(), Capabilities.ItemHandler.BLOCK, be.getBlockPos(), Direction.DOWN);
         h.assertTrue(cap != null && cap.extractItem(0,1,false).isEmpty(), "Automation removed a still usable original");
@@ -59,7 +59,7 @@ public final class SpentItemGameTests {
 
     @GameTest(template="empty", timeoutTicks=350)
     public static void pendingOriginalSurvivesSaveAndMovesAfterOutputIsTaken(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var be = archive(h);
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenExecute(() -> {
             var registries = h.getLevel().registryAccess();
@@ -75,12 +75,12 @@ public final class SpentItemGameTests {
 
     @GameTest(template="empty", timeoutTicks=350)
     public static void hopperCollectsProductAndSpentOriginalWithAutoEjectOff(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var be = archive(h);
         BlockPos below = new BlockPos(2,1,2);
         h.setBlock(below,Blocks.HOPPER);
         h.setBlock(new BlockPos(1,1,2),Blocks.REDSTONE_BLOCK);
-        HopperBlockEntity hopper = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, below);
+        HopperBlockEntity hopper = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, below);
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenExecute(() -> {
             h.assertFalse(be.itemSides().ejectEnabled(), "Test requires auto-eject off");
             h.setBlock(new BlockPos(1,1,2),Blocks.AIR);
@@ -98,7 +98,7 @@ public final class SpentItemGameTests {
 
     @GameTest(template="empty", timeoutTicks=350)
     public static void automaticEjectionMovesBothOutputsOnlyAfterEnabled(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var be = archive(h);
         BlockPos target = new BlockPos(3,2,2);
         h.setBlock(target,Blocks.CHEST);
@@ -119,12 +119,12 @@ public final class SpentItemGameTests {
 
     @GameTest(template="tall", timeoutTicks=750)
     public static void controlUnitReturnsThroughPortWithRepairHistory(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var kind=Blueprints.Kind.COOLING_TOWER;
         var pos=new BlockPos(2,1,0);
         TestBuild.build(h,kind,pos,Direction.SOUTH,7);
         var port=TestBuild.port(h,kind,pos,Direction.SOUTH,7,1,1,0);
-        MachineBlockEntity be=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
+        MachineBlockEntity be=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         var unit=UsesHelper.restore(UsesHelper.consume(item("control_unit",1),16),item("control_unit",1));
         be.items().setStackInSlot(0,new ItemStack(Items.COPPER_INGOT,8));
         be.items().setStackInSlot(1,new ItemStack(Items.REDSTONE,4));
@@ -146,10 +146,10 @@ public final class SpentItemGameTests {
 
     @GameTest(template="empty", timeoutTicks=500)
     public static void insertedRepairInputStaysUntilRestored(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity be=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
+        MachineBlockEntity be=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         be.items().setStackInSlot(0,UsesHelper.consume(item("observation_log",1),16));
         h.startSequence().thenIdle(20).thenExecute(() -> {
             h.assertTrue(!be.items().getStackInSlot(0).isEmpty() && be.items().getStackInSlot(be.type().outputSlot()).isEmpty(),"Repair ingredient auto-ejected");

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "T T",
+    "CQC",
+    " M "
+  ],
+  "key": {
+    "T": {
+      "item": "singulo:toroidal_magnetic_coil"
+    },
+    "C": {
+      "item": "singulo:coolant_cartridge"
+    },
+    "Q": {
+      "item": "singulo:entangled_element"
+    },
+    "M": {
+      "item": "singulo:time_crystal_module"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:smes_module"
+  }
+}

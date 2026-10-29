@@ -133,7 +133,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
 
     @Override
     protected void apply(ServerLevel world, CatalystHelper.Effect effect, boolean active) {
-        int now = active ? Math.min(5, CatalystHelper.tierOf(slot.getStackInSlot(0))) : 0;
+        int now = active ? Math.min(5, CatalystHelper.tierOf(catalyst())) : 0;
         if (now != protection) {
             protection = now;
             world.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);

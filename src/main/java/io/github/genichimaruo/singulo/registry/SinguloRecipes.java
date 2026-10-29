@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.registry;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
+import io.github.genichimaruo.singulo.recipe.SmesUpgradeRecipe;
 import java.util.function.Supplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -17,6 +18,8 @@ public final class SinguloRecipes {
             () -> RecipeType.simple(Singulo.id("machine")));
     public static final Supplier<RecipeSerializer<MachineRecipe>> MACHINE_SERIALIZER = SERIALIZERS.register("machine",
             MachineRecipe.Serializer::new);
+
+    public static final Supplier<RecipeSerializer<SmesUpgradeRecipe>> SMES_UPGRADE = SERIALIZERS.register("smes_upgrade", SmesUpgradeRecipe.Serializer::new);
 
     private SinguloRecipes() {}
 }

@@ -18,7 +18,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class LegacyRecipeGameTests {
     @GameTest(template = "empty", batch = "legacy_recipe_roundtrip")
     public static void byproductSurvivesJsonAndNetwork(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var serializer = new MachineRecipe.Serializer();
         var json = com.google.gson.JsonParser.parseString("""
                 {"station":"catalytic_reactor","time":100,"energy":80,
@@ -46,7 +46,7 @@ public final class LegacyRecipeGameTests {
 
     @GameTest(template = "empty", batch = "legacy_canister_roundtrip")
     public static void canisterSurvivesSaveAndNetwork(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var fluid = new net.minecraftforge.fluids.FluidStack(SinguloFluids.get("hydrogen"), 731);
         var canister = FluidCanisterItem.filled(new ItemStack(SinguloItems.FLUID_CANISTER.get()), fluid);
         var loaded = ItemStack.of(canister.save(new net.minecraft.nbt.CompoundTag()));

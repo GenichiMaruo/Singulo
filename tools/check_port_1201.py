@@ -60,7 +60,7 @@ def validate_jar(path):
         assert suffix in ('F', 'N') and loader_version in dependencies['forge']['versionRange'], 'Wrong loader version or filename'
         assert 'META-INF/accesstransformer.cfg' in names, 'Missing access transformer'
         assert 'assets/singulo/supporters.json' in names, 'Missing supporter roster'
-        assert not any(name.startswith(('data/singulo_port_checks/', 'data/singulo_reload_check/')) for name in names), 'Diagnostic resources shipped'
+        assert not any(name.startswith(('data/singulo_', 'data/singulo/structures/empty.nbt', 'data/singulo/structures/huge.nbt', 'data/singulo/structures/tall.nbt')) for name in names), 'Diagnostic resources shipped'
         for feature in ('android/AndroidStationBlockEntity', 'genesis/GenesisCoreBlockEntity',
                         'client/SupporterPlaque', 'network/RenameAndroidPayload',
                         'android/AndroidWorkGoal', 'android/work/WorkConsoleBlockEntity',
@@ -77,7 +77,7 @@ def validate_jar(path):
             if name.endswith('.class'):
                 header = archive.read(name)[:8]
                 assert header[:4] == b'\xca\xfe\xba\xbe' and struct.unpack('>H', header[6:8])[0] <= 61, f'Not Java 17: {name}'
-                assert 'GuiReviewHarness' not in name and 'Stage6ReviewHarness' not in name and 'PreviewHarness' not in name and 'ReviewTests' not in name and 'PortDiagnosticTests' not in name and 'DiagnosticTests' not in name, f'Preview code shipped: {name}'
+                assert 'GameTests' not in name and '/test/harness/' not in name and not name.endswith('/TestBuild.class') and 'GuiReviewHarness' not in name and 'Stage6ReviewHarness' not in name and 'PreviewHarness' not in name and 'ReviewTests' not in name and 'PortDiagnosticTests' not in name and 'DiagnosticTests' not in name, f'Preview code shipped: {name}'
                 count += 1
             if name.endswith('pack.mcmeta'):
                 assert json.loads(archive.read(name))['pack']['pack_format'] == 15, f'Wrong pack format: {name}'

@@ -22,7 +22,7 @@ public final class UsesStackGameTests {
 
     @GameTest(template="empty")
     public static void unusedOriginalsAndPartsStackButUsedOnesDoNot(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         for (String id : new String[]{"observation_log", "quantum_data_fragment", "culture_data", "control_unit",
                 "cold_atom_trap", "time_crystal_seed", "anomaly_sample"}) {
             ItemStack fresh = item(id,64);
@@ -42,10 +42,10 @@ public final class UsesStackGameTests {
 
     @GameTest(template="empty", timeoutTicks=500)
     public static void archiveTakesOneOriginalAndUsesOnlyThatOne(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity archive=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
+        MachineBlockEntity archive=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         ItemStack originals=item("observation_log",64);
         ItemStack simulated=archive.automationItems().insertItem(0,originals,true);
         h.assertTrue(simulated.getCount()==63 && archive.items().getStackInSlot(0).isEmpty(),"Simulation consumed originals");
@@ -65,11 +65,11 @@ public final class UsesStackGameTests {
 
     @GameTest(template="empty")
     public static void menuShiftClickInsertsOnlyOneOriginalAndNormalMaterialsStillStack(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity archive=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
-        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        MachineBlockEntity archive=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             player.getInventory().setItem(9,item("quantum_data_fragment",64));
             MachineMenu menu=new MachineMenu(1,player.getInventory(),archive);

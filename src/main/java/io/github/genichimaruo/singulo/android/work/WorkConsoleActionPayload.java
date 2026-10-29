@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import net.minecraft.core.HolderLookup;
+
 import io.github.genichimaruo.singulo.Singulo;
 import java.util.ArrayList;
 import java.util.List;

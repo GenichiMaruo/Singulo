@@ -17,7 +17,7 @@ public final class PanelReceiverRegressionGameTests {
 
     private static GravityReceiverBlockEntity receiver(GameTestHelper helper) {
         helper.setBlock(RECEIVER, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
-        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RECEIVER);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, RECEIVER);
     }
 
     private static void tick(GameTestHelper helper, GravityReceiverBlockEntity receiver) {
@@ -27,7 +27,7 @@ public final class PanelReceiverRegressionGameTests {
 
     @GameTest(template = "empty")
     public static void savedPoweredPanelsStopWithoutEnergy(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(PANEL, SinguloBlocks.LOW_GRAVITY_PANEL.get().defaultBlockState().setValue(GravityPanelBlock.POWERED, true));
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
@@ -37,7 +37,7 @@ public final class PanelReceiverRegressionGameTests {
 
     @GameTest(template = "empty")
     public static void savedRayleighPanelsStopWithoutEnergy(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(PANEL, SinguloBlocks.RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, true));
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
@@ -47,7 +47,7 @@ public final class PanelReceiverRegressionGameTests {
 
     @GameTest(template = "empty")
     public static void unloadingReceiverStopsItsLoadedPanels(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
@@ -63,13 +63,13 @@ public final class PanelReceiverRegressionGameTests {
 
     @GameTest(template = "empty")
     public static void impactGeneratorReservesActualPanelDemand(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos control = PANEL.south();
         helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, control)).setHeight(8);
+        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, control)).setHeight(8);
         helper.setBlock(RECEIVER, SinguloBlocks.IMPACT_GENERATOR.get());
-        ImpactGeneratorBlockEntity receiver = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RECEIVER);
+        ImpactGeneratorBlockEntity receiver = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, RECEIVER);
         receiver.absorb(20);
         tick(helper, receiver);
         long expected = receiver.stored() - ZeroGravity.costPerBlock(8) * ImpactGeneratorBlockEntity.RESERVE_TICKS;
@@ -79,11 +79,11 @@ public final class PanelReceiverRegressionGameTests {
 
     @GameTest(template = "empty")
     public static void fastLandingInsideWeightlessZoneDoesNotHurt(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos control = PANEL.south();
         helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, control)).setHeight(1);
+        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, control)).setHeight(1);
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
         receiver.energy().receiveLong(ZeroGravity.costPerBlock(1), false);
@@ -114,13 +114,13 @@ public final class PanelReceiverRegressionGameTests {
 
     @GameTest(template = "empty")
     public static void saturatedDemandDoesNotCreateFreePower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos second = PANEL.east();
         helper.setBlock(second, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos control = PANEL.south();
         helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, control)).setHeight(10_000);
+        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, control)).setHeight(10_000);
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
         receiver.energy().receiveLong(Long.MAX_VALUE, false);

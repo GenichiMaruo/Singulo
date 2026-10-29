@@ -16,6 +16,8 @@ public class MachineMenu extends AbstractContainerMenu {
     public static final int BUTTON_CYCLE_MODE = 0, BUTTON_POWER = 1, BUTTON_MAKE_FREE = 2;
     /** 作るものの指定を外す。BUTTON_SELECT + n は {@link RecipeSelection#selectable} の n 番を指定する。 */
     public static final int BUTTON_CLEAR_SELECTION = 3, BUTTON_SELECT = 100;
+    /** 装填中の触媒を取り出す。 */
+    public static final int BUTTON_EJECT_CATALYST = 4;
 
     private final MachineType type;
     private final BlockPos pos;
@@ -118,6 +120,7 @@ public class MachineMenu extends AbstractContainerMenu {
             case BUTTON_POWER -> machine.togglePower();
             case BUTTON_MAKE_FREE -> machine.toggleMakeFree();
             case BUTTON_CLEAR_SELECTION -> machine.selectRecipe(-1);
+            case BUTTON_EJECT_CATALYST -> machine.ejectLoaded(player);
             default -> {
                 if (id < BUTTON_SELECT) {
                     return false;

@@ -35,10 +35,10 @@ public final class MachineSlotGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void catalystsOnlyGoIntoCatalystSlot(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         MachineType t = m.type();
         ItemStack catalyst = new ItemStack(item("time_crystal_catalyst"));
         helper.assertTrue(!m.items().insertItem(0, catalyst.copy(), true).isEmpty(), "触媒が普通の入力スロットに入る");
@@ -58,13 +58,13 @@ public final class MachineSlotGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void monopoleUpgradeDoublesSpeed(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos a = new BlockPos(1, 1, 3);
         BlockPos b = new BlockPos(5, 1, 3);
         helper.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
         helper.setBlock(b, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
-        MachineBlockEntity plain = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, a);
-        MachineBlockEntity boosted = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, b);
+        MachineBlockEntity plain = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, a);
+        MachineBlockEntity boosted = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, b);
         boosted.items().setStackInSlot(boosted.type().upgradeSlot(), new ItemStack(item("monopole_upgrade")));
         helper.onEachTick(() -> {
             plain.energy().setEnergy(plain.energy().getMaxEnergyStored());
@@ -82,11 +82,11 @@ public final class MachineSlotGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void sideConfigAndAutoEject(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get()
                 .defaultBlockState().setValue(AbstractMachineBlock.FACING, Direction.NORTH));
-        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         BlockPos abs = helper.absolutePos(pos);
         // 上の面を「入力だけ」に、後ろ（南）の面を「出力・自動排出」に
         m.setSide(0, SideConfig.Face.TOP, SideConfig.INPUT, false);
@@ -101,7 +101,7 @@ public final class MachineSlotGameTests {
         helper.assertTrue(top.extractItem(m.type().outputSlot(), 1, true).isEmpty(), "入力だけの面から取り出せる");
         helper.setBlock(pos.south(), Blocks.CHEST);
         helper.succeedWhen(() -> {
-            ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos.south());
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos.south());
             helper.assertTrue(chest.getItem(0).getCount() == 5, "後ろのチェストへ自動排出されない");
         });
     }

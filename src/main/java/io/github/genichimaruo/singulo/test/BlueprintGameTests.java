@@ -30,68 +30,68 @@ public final class BlueprintGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintCoolingTower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.COOLING_TOWER, 10, new BlockPos(5, 1, 5), Direction.EAST, 10);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintAccelerator(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.PARTICLE_ACCELERATOR, 8, new BlockPos(7, 1, 2), Direction.SOUTH, 8);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintCompactor(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.DEGENERATE_COMPACTOR, 5, new BlockPos(5, 2, 5), Direction.WEST, 5);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintCavity(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.CASIMIR_CAVITY, 5, new BlockPos(2, 3, 7), Direction.EAST, 5);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintFurnace(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.DEGENERATE_FURNACE, 7, new BlockPos(4, 2, 2), Direction.NORTH.getOpposite(), 7);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintReactor(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.PENROSE_REACTOR, 13, new BlockPos(7, 1, 7), Direction.NORTH, 13);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintShieldTower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.SHIELD_TOWER, 9, new BlockPos(7, 1, 7), Direction.NORTH, 9);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintTipler(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.TIPLER_CYLINDER, 9, new BlockPos(7, 1, 7), Direction.NORTH, 9);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintWormholeGenerator(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.WORMHOLE_GENERATOR, 5, new BlockPos(7, 1, 7), Direction.NORTH, 5);
     }
 
     @GameTest(setupTicks = 20, template = HUGE)
     public static void blueprintGenesisEngine(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         check(helper, Blueprints.Kind.GENESIS_ENGINE, 7, new BlockPos(7, 1, 7), Direction.NORTH, 7);
     }
 
     /** 創世炉には画面がないので、枠や柱は「コントローラーの画面を開く部品」にはならない（右クリックをふさがない）。 */
     @GameTest(setupTicks = 20, template = HUGE)
     public static void genesisPartsKeepTheirClicks(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos c = helper.absolutePos(new BlockPos(7, 1, 7));
         SinguloCommands.place(helper.getLevel(), Blueprints.Kind.GENESIS_ENGINE, c, Direction.NORTH, 7);
         helper.assertTrue(Blueprints.formedSize(helper.getLevel(), c, Blueprints.Kind.GENESIS_ENGINE) == 7, "形成されない");
@@ -103,7 +103,7 @@ public final class BlueprintGameTests {
     /** 形成済みなら部品からコントローラーが見つかり、1つ欠けると見つからない（コントローラーの画面を開くのに使う）。 */
     @GameTest(setupTicks = 20, template = HUGE)
     public static void partsFindTheirFormedController(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos c = helper.absolutePos(new BlockPos(5, 2, 5));
         SinguloCommands.place(helper.getLevel(), Blueprints.Kind.DEGENERATE_COMPACTOR, c, Direction.WEST, 5);
         BlockPos part = null;
@@ -132,7 +132,7 @@ public final class BlueprintGameTests {
     /** 搬入出ポートは外装板の位置に置け、右クリックでコントローラーが見つかる。枠の位置に置くと形成されない。 */
     @GameTest(setupTicks = 20, template = HUGE)
     public static void multiblockPortOnPanelsOnly(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos rel = new BlockPos(7, 2, 3);
         TestBuild.build(helper, Blueprints.Kind.CASIMIR_CAVITY, rel, Direction.SOUTH, 5);
         BlockPos port = TestBuild.port(helper, Blueprints.Kind.CASIMIR_CAVITY, rel, Direction.SOUTH, 5, 1, 3, 0);
@@ -149,7 +149,7 @@ public final class BlueprintGameTests {
     /** 冷却塔は高さ7〜15のどれでも形成でき、高さがわかる。 */
     @GameTest(setupTicks = 20, template = HUGE)
     public static void coolingTowerHeights(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos rel = new BlockPos(2, 1, 2);
         TestBuild.build(helper, Blueprints.Kind.COOLING_TOWER, rel, Direction.SOUTH, 7);
         helper.assertTrue(Blueprints.formedSize(helper.getLevel(), helper.absolutePos(rel), Blueprints.Kind.COOLING_TOWER) == 7, "高さ7で形成されない");

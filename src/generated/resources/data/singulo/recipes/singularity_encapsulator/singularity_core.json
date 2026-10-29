@@ -27,7 +27,8 @@
       "ingredient": {
         "item": "singulo:time_crystal_catalyst"
       },
-      "count": 1
+      "tier": 4,
+      "uses": 54000
     },
     {
       "ingredient": {

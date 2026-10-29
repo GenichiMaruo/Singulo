@@ -3,18 +3,23 @@ package io.github.genichimaruo.singulo.reactor;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
 import io.github.genichimaruo.singulo.machine.TimeFields;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.multiblock.PortBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
+import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
+
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -23,6 +28,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,8 +39,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import io.github.genichimaruo.singulo.compat.Capabilities;
@@ -182,9 +191,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     /** 点火を始めてからの tick と、点火の電力が満ちたか。 */
     private int ignitionElapsed;
     private boolean ignitionCharged;
-    /** 点火の演出の長さ（16秒）。最後の IGNITION_SOUND_TICKS（点火の音の長さ、10秒）のあいだ点火の音が鳴り、鳴り終わる瞬間に炉心ができる。 */
+    /** 点火の演出の長さ（16秒）。点火の音も同じ長さで、演出の最初の tick に鳴り始め、鳴り終わる瞬間に炉心ができる。 */
     public static final int IGNITION_SEQUENCE_TICKS = 320;
-    public static final int IGNITION_SOUND_TICKS = 200;
     private double pelletCarry;
     private int jetTimer;
     private int hawkingTimer;
@@ -272,7 +280,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         lastOutput = 0;
         if (!formed) {
             if (state == State.IGNITING) {
-                state = State.DORMANT;
+                abortIgnition(level);                     // 点火の途中で形が崩れた
             }
             if (state != State.RUNNING) {
                 state = State.UNFORMED;
@@ -382,6 +390,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         return true;
     }
 
+    /** 点火をやめて止まった状態に戻す（形が崩れた・時間切れ・制御装置が壊された）。鳴り始めた点火の音も止める。 */
+    private void abortIgnition(ServerLevel level) {
+        state = State.DORMANT;
+        stopIgnitionSound(level);
+    }
+
     private void stopIgnitionSound(ServerLevel level) {
         Vec3 core = coreCenter();
         var id = Singulo.id("penrose_reactor_ignition");
@@ -421,7 +435,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         ignitionPeak = Math.max(ignitionPeak, receivedThisTick);
         receivedThisTick = 0;
         ignitionReachable = ignitionStored + ignitionBandwidth * Math.max(0, ignitionTicks);
-        if (ignitionElapsed == IGNITION_SEQUENCE_TICKS - IGNITION_SOUND_TICKS) {
+        if (ignitionElapsed == 1) {
             // 点火の音（鳴り終わる瞬間に炉心ができる）
             Vec3 core = coreCenter();
             level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("penrose_reactor_ignition"),
@@ -451,8 +465,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             return;
         }
         if (!ignitionCharged && --ignitionTicks <= 0) {
-            // 時間切れ。注いだ電力は失われるが、種は残る（重いが詰まない）。鳴り始めた点火の音も止める
-            state = State.DORMANT;
+            // 時間切れ。注いだ電力は失われるが、種は残る（重いが詰まない）
+            abortIgnition(level);
             int window = ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_WINDOW_SECONDS.get() : 10;
             long needPerTick = ignitionEnergy() / Math.max(1, window * 20L);
             // 何が足りなかったか（届いた量・いちばん速かった受電・必要な受電）を知らせる
@@ -461,7 +475,6 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                     String.format("%.1f", ignitionStored / 1e9), String.format("%.1f", ignitionEnergy() / 1e9),
                     String.format("%,d", ignitionPeak / 1_000_000L), String.format("%,d", needPerTick / 1_000_000L));
             ignitionStored = 0;
-            stopIgnitionSound(level);
             setChanged();
         }
     }
@@ -655,6 +668,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 }
             }
         }
+        if (kill && formed) {
+            devourBlocks(level, c, horizon);
+        }
         int interval = ServerConfig.SPEC.isLoaded() ? ServerConfig.PULL_CHECK_INTERVAL_TICKS.get() : 5;
         int tidal = ServerConfig.SPEC.isLoaded() ? ServerConfig.TIDAL_DAMAGE_RADIUS.get() : 4;
         if (tidal > 0 && level.getGameTime() % 10 < interval && level.getGameTime() % interval == 0) {
@@ -662,6 +678,75 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                     e -> e.position().distanceTo(c) <= tidal && EventHorizonTargets.affected(e))) {
                 e.hurt(SinguloDamageTypes.tidal(level, null), 4.0F);
             }
+        }
+    }
+
+    /** 炉心がブロックを崩して吸い込む範囲（中心からのブロック数。リングの内側）と、間隔・一度に崩す数。 */
+    private static final double DEVOUR_RADIUS = Structures.REACTOR_RADIUS - 1.5;
+    private static final int DEVOUR_INTERVAL = 4, DEVOUR_PER_STEP = 2;
+    /** 何も崩すものがなかったとき、次に探すまで休む tick（空の炉心で毎回範囲じゅうを見ないように）。 */
+    private static final int DEVOUR_IDLE = 40;
+    /** 吸い込む範囲の中の位置（中心からのずれ）を、近い順に並べたもの。 */
+    private static final List<BlockPos> DEVOUR_OFFSETS = devourOffsets();
+    /** 次に吸い込むブロックを探す時刻。 */
+    private long nextDevourAt;
+
+    private static List<BlockPos> devourOffsets() {
+        int r = (int) Math.ceil(DEVOUR_RADIUS);
+        List<BlockPos> out = new ArrayList<>();
+        for (BlockPos p : BlockPos.betweenClosed(-r, -r, -r, r, r, r)) {
+            if (p.distSqr(BlockPos.ZERO) <= DEVOUR_RADIUS * DEVOUR_RADIUS) {
+                out.add(p.immutable());
+            }
+        }
+        out.sort(Comparator.comparingDouble(p -> p.distSqr(BlockPos.ZERO)));
+        return List.copyOf(out);
+    }
+
+    /**
+     * リングの内側に置かれたブロックを、中心に近いものから崩して吸い込む（落とし物は出ない）。液体は消す。
+     * 崩すのは {@link EventHorizonTargets#edibleBlock} が認めたものだけで、シールドタワーに守られた所も崩さない。
+     * 制御装置は中心から5ブロック下（範囲の外）にあり、中身を持つので崩れない。
+     */
+    private void devourBlocks(ServerLevel level, Vec3 c, double horizon) {
+        long now = level.getGameTime();
+        if (now < nextDevourAt) {
+            return;
+        }
+        BlockPos at = BlockPos.containing(c);
+        List<BlockPos> picked = new ArrayList<>(DEVOUR_PER_STEP);
+        List<BlockState> states = new ArrayList<>(DEVOUR_PER_STEP);
+        BlockPos.MutableBlockPos q = new BlockPos.MutableBlockPos();
+        for (BlockPos o : DEVOUR_OFFSETS) {
+            q.setWithOffset(at, o);
+            BlockState s = level.getBlockState(q);
+            if (!EventHorizonTargets.edibleBlock(level, q, s, true) || ShieldTowerBlockEntity.shielded(level, Vec3.atCenterOf(q), 4)) {
+                continue;
+            }
+            picked.add(q.immutable());
+            states.add(s);
+            if (picked.size() >= DEVOUR_PER_STEP) {
+                break;
+            }
+        }
+        nextDevourAt = now + (picked.isEmpty() ? DEVOUR_IDLE : DEVOUR_INTERVAL);
+        for (int k = 0; k < picked.size(); k++) {
+            BlockPos p = picked.get(k);
+            BlockState s = states.get(k);
+            boolean liquid = s.getBlock() instanceof LiquidBlock;
+            if (s.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                s = s.setValue(BlockStateProperties.WATERLOGGED, false);
+            }
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            Vec3 from = Vec3.atCenterOf(p);
+            if (liquid) {
+                level.sendParticles(ParticleTypes.SPLASH, from.x, from.y, from.z, 6, 0.3, 0.3, 0.3, 0.1);
+                continue;
+            }
+            // 崩れる粒と、引きはがされた塊が渦を巻いて炉心へ落ちていく
+            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, s), from.x, from.y, from.z, 10, 0.3, 0.3, 0.3, 0.05);
+            level.addFreshEntity(new InfallingBlock(level, from, s, c, horizon));
+            level.playSound(null, p, SinguloSounds.get("black_hole.devour"), SoundSource.BLOCKS, 1.4F, 0.85F + level.random.nextFloat() * 0.3F);
         }
     }
 
@@ -838,11 +923,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         // まわりの物も巻き込む（壊せない物と、入れ物などのブロックエンティティは残す）
         int r = COLLAPSE_RADIUS;
         for (BlockPos p : BlockPos.betweenClosed(c.offset(-r, -r, -r), c.offset(r, r, r))) {
-            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)) {
-                continue;
-            }
-            BlockState s = level.getBlockState(p);
-            if (s.isAir() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null || !s.getFluidState().isEmpty()) {
+            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)
+                    || !EventHorizonTargets.edibleBlock(level, p, level.getBlockState(p), false)) {
                 continue;
             }
             picked.add(p.immutable());
@@ -1294,6 +1376,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public void setRemoved() {
         if (level != null && !chunkUnloading) {
             link(level, ports, null);
+            if (state == State.IGNITING && level instanceof ServerLevel server) {
+                abortIgnition(server);                    // 点火中に制御装置が壊された
+            }
         }
         CLIENT_LOADED.remove(this);
         if (level != null) {

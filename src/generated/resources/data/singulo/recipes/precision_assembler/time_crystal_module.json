@@ -9,6 +9,7 @@
       "ingredient": {
         "item": "singulo:time_crystal_catalyst"
       },
+      "tier": 4,
       "uses": 36000
     },
     {
@@ -26,6 +27,6 @@
   ],
   "result": {
     "id": "singulo:time_crystal_module",
-    "count": 1
+    "count": 4
   }
 }

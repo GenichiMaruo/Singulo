@@ -28,6 +28,13 @@
         "item": "singulo:optical_lattice_substrate"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "tier": 3,
+      "uses": 36000
     }
   ],
   "result": {

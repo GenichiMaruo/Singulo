@@ -51,7 +51,7 @@ public final class GunnerGameTests {
     /** 射撃型は遺構の印刷台にも研究所にも出ない。スポーンエッグと設計メモリはあるが、クリエイティブタブには並べない。 */
     @GameTest(setupTicks = 20, template = "empty")
     public static void gunnerIsCreativeOnly(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.assertTrue(AndroidKind.GUNNER.origin == AndroidKind.Origin.HIDDEN, "射撃型が隠し型でない");
         helper.assertFalse(Set.of(AndroidKind.ruinKinds()).contains(AndroidKind.GUNNER), "射撃型が遺構の印刷台の型に入っている");
         helper.assertFalse(Set.of(AndroidKind.prototypes()).contains(AndroidKind.GUNNER), "射撃型が研究所の試作機の型に入っている");
@@ -69,7 +69,7 @@ public final class GunnerGameTests {
      */
     @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_foundry", timeoutTicks = 60)
     public static void awakenedFoundryDropsGunnerMemory(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var memory = BuiltInRegistries.ITEM.get(Singulo.id(AndroidKind.GUNNER.memoryId()));
         helper.assertTrue(new net.minecraft.world.item.ItemStack(memory).getRarity() == net.minecraft.world.item.Rarity.EPIC,
                 "射撃型の設計メモリの名前が紫（エピック）でない");
@@ -100,7 +100,7 @@ public final class GunnerGameTests {
      */
     @GameTest(setupTicks = 20, template = "empty")
     public static void gunnerHasPerksAndCostsMore(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel());
         var blade = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         helper.assertTrue(g.packOpen() && !blade.packOpen(), "射撃型だけがバックパックを内蔵していない");
@@ -112,7 +112,7 @@ public final class GunnerGameTests {
         helper.assertTrue(g.workTicks(40) == 27 && blade.workTicks(40) == 40, "射撃型の作業が速くない: " + g.workTicks(40));
         BlockPos at = new BlockPos(1, 1, 1);
         helper.setBlock(at, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_STATION.get());
-        io.github.genichimaruo.singulo.android.AndroidStationBlockEntity s = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, at);
+        io.github.genichimaruo.singulo.android.AndroidStationBlockEntity s = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         int fe = io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.PRINT_FE;
         s.items().setStackInSlot(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.SLOT_MEMORY,
                 new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(AndroidKind.BLADE.memoryId()))));
@@ -131,7 +131,7 @@ public final class GunnerGameTests {
     /** レールガン: 狙いの線の上に並んだ相手をまとめて貫き、線から外れた相手には当たらない。 */
     @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_pierce", timeoutTicks = 40)
     public static void railgunPiercesLine(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GunnerAndroid g = gunner(helper, new BlockPos(7, 1, 2));
         Zombie first = dummy(helper, new BlockPos(7, 1, 6));
         Zombie second = dummy(helper, new BlockPos(7, 1, 10));
@@ -149,7 +149,7 @@ public final class GunnerGameTests {
     /** レールガンの光線は壁で止まる（壁の向こうの相手には当たらない）。 */
     @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_wall", timeoutTicks = 40)
     public static void railgunStopsAtWall(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GunnerAndroid g = gunner(helper, new BlockPos(7, 1, 2));
         Zombie first = dummy(helper, new BlockPos(7, 1, 6));
         Zombie behind = dummy(helper, new BlockPos(7, 1, 11));
@@ -169,7 +169,7 @@ public final class GunnerGameTests {
     /** 戦いの動き（AI つき）: 護衛の射撃型が敵を見つけると、小型銃で撃ち、レールガンを組み上げて撃ち、しまうところまで進む。 */
     @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_fight", timeoutTicks = 600)
     public static void gunnerFightsWithPistolAndRailgun(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 15, 0, 15)) {
             helper.setBlock(p, Blocks.STONE);
         }
@@ -197,7 +197,7 @@ public final class GunnerGameTests {
     /** 小型銃の3連射（5 tick おき）は、受けたあとの無敵時間に消されず、3発とも当たる。 */
     @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_burst", timeoutTicks = 60)
     public static void pistolBurstHitsEveryShot(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GunnerAndroid g = gunner(helper, new BlockPos(7, 1, 2));
         Zombie target = dummy(helper, new BlockPos(7, 1, 7));
         float[] health = new float[4];
@@ -216,7 +216,7 @@ public final class GunnerGameTests {
     /** 小型銃: 見通しがあれば撃って当て、壁があれば撃たない。 */
     @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_pistol", timeoutTicks = 40)
     public static void pistolNeedsLineOfSight(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GunnerAndroid g = gunner(helper, new BlockPos(7, 1, 2));
         Zombie target = dummy(helper, new BlockPos(7, 1, 7));
         helper.runAtTickTime(10, () -> {

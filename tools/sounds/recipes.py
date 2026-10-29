@@ -35,11 +35,25 @@ def machine(path, level=MACHINE):
 
 # =================================================================== ブラックホール
 
-@machine('black_hole/ambient_loop', level=-22)
+@machine('black_hole/ambient_loop', level=-13)
 def black_hole_ambient(d, seed):
+    # 重い脈動（小さなスピーカーでも聞こえるよう、同じ高さの倍音を重ねる）と、渦を巻く風、ホーキング放射のかすかな雑音
     swirl = bandpass(pink(d, seed), 180 + 120 * lfo(1 / 3, d), 2) * (0.6 + 0.4 * lfo(1 / 3, d))
     hawking = highpass(white(d, seed + 1), 6000) * 0.05 * (1 + lfo(0.5, d))
-    return throb(d, 1 / 3, 32, 0.6) * 1.2 + sine(21, d) * 0.6 + swirl * 0.7 + hawking
+    beat = 1 - 0.6 * 0.5 * (1 + np.cos(2 * np.pi / 3 * t_axis(d)))
+    body = hum(32, d, (1, 2, 3, 4), (1, 0.7, 0.45, 0.25), 0.004, seed) * beat
+    return throb(d, 1 / 3, 32, 0.6) * 1.2 + sine(21, d) * 0.6 + body * 0.6 + swirl * 0.8 + hawking
+
+
+@recipe('black_hole/devour', level=BOSS, variants=3)
+def black_hole_devour(d, seed):
+    # 炉心がブロックを崩して吸い込む: 石が砕けてきしみ、渦へ引き込まれる風が高まって、低く落ちる
+    r = rng(seed)
+    crack = mix(lowpass(white(0.25, seed), 3000) * perc(0.25, 0.002, 0.07), (lowpass(white(0.2, seed + 1), 2000) * perc(0.2, 0.002, 0.05) * 0.6, 0.05),
+                lowpass(crackle(0.5, 50, seed, 0.008), 1800) * 1.2)
+    pull = whoosh(0.9, 2500, 150, 2, seed + 2, 0.6)[::-1] * 0.8
+    sink = sine(glide(180 + 60 * r.random(), 35, 0.9, 0.5)) * env([(0, 0), (0.5, 0.5), (0.9, 0)], 0.9) * 0.6
+    return reverb(mix(crack, (pull, 0.05), (sink, 0.1)), 0.8, 0.3, 2500, 0.6)
 
 
 @recipe('black_hole/formation', level=BIG)
@@ -341,8 +355,36 @@ def wormhole_open(d, seed):
 
 @recipe('machine/penrose_reactor_ignition', level=BOSS)
 def penrose_ignition(d, seed):
-    ignite = mix(riser(2.0, 40, 400, seed), (boom(2.5, 30, seed, 0.5), 1.9), (lowpass(brown(3.0, seed), 600) * env([(0, 0), (0.3, 1), (3, 0.3)], 3.0) * 0.8, 2.0))
-    return reverb(ignite, 0.8, 0.3)
+    # 点火の演出（16 秒）に合わせる。鳴り終わる瞬間に炉心ができる（そこで形成の音が鳴る）
+    # 目覚め 0〜6 秒: リングを光が巡り始め、抽出ポートが 0.5 秒ごとに 1 つずつ灯る
+    # 注入 6〜13.6 秒: 12 のポートから光が流れ込み、種が脈打ちながら膨らむ
+    # 崩壊 13.6〜16 秒: すべてが中心へ絞り込まれ、吸い込まれる
+    D = 16.0
+    t = t_axis(D)
+    wake = np.clip(t / 6, 0, 1)
+    inject = np.clip((t - 6) / 7.6, 0, 1)
+    collapse = np.clip((t - 13.6) / 2.4, 0, 1)
+    power = 0.25 * wake + 0.75 * inject
+    # リングを巡る光: 回転の速さが上がっていくうなりと、巡る風
+    spin_rate = 0.4 + 3.5 * power ** 2 + 14 * collapse ** 2
+    whirl = (bandpass(pink(D, seed), 300 + 1500 * power + 2500 * collapse, 2) * (0.6 + 0.4 * sine(spin_rate))
+             * (0.15 + 0.6 * power + 0.5 * collapse))
+    f = 30 + 40 * power + 120 * collapse ** 2
+    drone = (sine(f * (1 + 0.003 * lfo(0.3, D))) * 0.7 + saw(f * 2) * 0.12) * (0.25 + 0.5 * power + 0.3 * collapse)
+    # ポートが灯る音（12 個、少しずつ高く）
+    ports = mix(*[(mix(chime(330 * 2 ** (i / 12), 1.4, seed + i, 0.8) * 0.18, tick(2500, 0.03, seed + i) * 0.3), 0.5 * i) for i in range(12)])
+    # 注入: 流れ込む電流と、速まる種の鼓動、高まる唸り
+    current = buzz(55, D, 1800, seed) * inject * 0.18 * (1 - 0.6 * collapse)
+    beat_rate = 0.8 + 3.5 * inject + 6 * collapse
+    beat = sine(beat_rate / 2) ** 8
+    pulse = sine(48, D) * beat * (0.2 + 0.6 * inject) * (inject > 0)
+    rise = riser(7.6, 60, 700, seed + 1, 0.4) * 0.5
+    sing = whine(glide(180, 900, 7.6, 1.4), 7.6, 0.005, 6) * env([(0, 0), (7.6, 0.18)], 7.6)
+    # 崩壊: 吸い込みの風が高まり、音程が一気に落ちる
+    suck = whoosh(2.4, 6000, 150, 2, seed + 2, 0.5)[::-1] * 1.1
+    dive = sine(glide(400, 40, 2.4, 0.6)) * env([(0, 0), (2.0, 0.6), (2.4, 0)], 2.4)
+    out = mix(whirl, drone, ports, current, pulse, (rise, 6.0), (sing, 6.0), (suck, 13.6), (dive, 13.6))
+    return fade(fit(reverb(out, 0.85, 0.3, 3000, 0.0), D), 0, 0.03)
 
 
 @recipe('machine/probe_station_launch')
@@ -485,9 +527,15 @@ def wall_jump(d, seed):
     return mix(thump(110, 0.12, 0.4, seed) * 0.6, spring, whoosh(0.35, 400, 2500, 1.5, seed, 0.6) * 0.5)
 
 
-@recipe('item/dimensional_pocket_open')
+@recipe('item/dimensional_pocket_open', level=-14)
 def pocket_open(d, seed):
-    return reverb(mix(whoosh(0.5, 300, 4000, 2, seed, 1.5) * 0.5, (shimmer(0.6, 15, 1500, 2.5, 0.35, seed) * 0.3, 0.2)), 0.6, 0.3)
+    # 開く: 短く空間がめくれる音と、下から上へ澄んだ2音。最後にほんの少しのきらめき
+    fwip = bandpass(pink(0.22, seed), glide(600, 3500, 0.22), 2) * env([(0, 0), (0.12, 1), (0.22, 0)], 0.22) * 0.5
+    tone = mix(sine(660, 0.3) * perc(0.3, 0.005, 0.18) * 0.35, (sine(990, 0.45) * perc(0.45, 0.005, 0.28) * 0.35, 0.08),
+               (sine(1980, 0.3) * perc(0.3, 0.005, 0.12) * 0.08, 0.08))
+    body = mix(sine(glide(160, 240, 0.15)) * perc(0.15, 0.005, 0.08) * 0.45, lowpass(pink(0.2, seed + 1), 500) * perc(0.2, 0.01, 0.1) * 0.3)
+    sparkle = shimmer(0.3, 10, 2400, 2, 0.25, seed) * 0.12
+    return drive(reverb(mix(fwip, body, (tone, 0.06), (sparkle, 0.14)), 0.4, 0.18, 6000, 0.3) * 2.2, 1.6)
 
 
 @recipe('item/dimensional_pocket_close')
@@ -505,10 +553,15 @@ def foundry_emerge(d, seed):
     return reverb(mix(startup, clanks, (alarm(1.2, 660, 440, 3) * 0.2, 1.8), (impact(1.0, 45, seed, 0.6), 3.0)), 0.9, 0.3)
 
 
-@recipe('boss/foundry_hurt', level=BOSS)
+@recipe('boss/foundry_hurt', level=BOSS, variants=3)
 def foundry_hurt(d, seed):
-    grind = bandpass(saw(glide(160, 110, 0.5)) + white(0.5, seed) * 0.4, 900, 2) * perc(0.5, 0.005, 0.3)
-    return mix(clank(330, 0.5, seed) * 0.7, grind * 0.5)
+    # 装甲が殴られて鳴り、怒った機械が低くうなる（うなりは歪んで落ちていく）
+    r = rng(seed)
+    clang = _metal_hit(seed, 90 + 30 * r.random(), 1.2, 0.8)
+    snarl = (drive(lowpass(saw(glide(95 + 20 * r.random(), 55, 0.7, 0.8)) + 0.5 * square(glide(48, 30, 0.7)), 900), 3.0)
+             * env([(0, 0), (0.02, 1), (0.5, 0.6), (0.7, 0)], 0.7) * 0.6)
+    burst = bandpass(white(0.25, seed), 2500, 1.5) * perc(0.25, 0.002, 0.08) * 0.5
+    return reverb(mix(clang, snarl, burst), 0.8, 0.3, 2500, 0.6)
 
 
 @recipe('boss/foundry_arm_aim')
@@ -602,9 +655,16 @@ def echo_ambient(d, seed):
     return fit(echo(mix(whisper * 0.5, chime(600 * 1.5 ** rng(seed).integers(0, 3), 1.2, seed) * 0.2), 0.28, 0.5, 4), 2.5)
 
 
-@recipe('boss/echo_sentinel_hurt', level=BOSS)
+@recipe('boss/echo_sentinel_hurt', level=BOSS, variants=3)
 def echo_hurt(d, seed):
-    return _glitch(mix(chime(700, 0.4, seed) * 0.6, zap(0.25, 3000, 500, seed) * 0.6), seed)
+    # 像が乱れる: 引き裂かれた声のような高い叫びが、崩れたデジタルの音になって落ちる
+    r = rng(seed)
+    f0 = 520 + 120 * r.random()
+    shriek = voices(0.55, (f0, f0 * 1.06, f0 * 1.5), 'i', seed, 0.3, 0.02) * 0.05
+    shriek = sum(bandpass(shriek, f, 3) for f in (1200, 2600)) * env([(0, 0), (0.02, 1), (0.55, 0)], 0.55)
+    tear = sine(glide(1400, 120, 0.5, 0.5)) * perc(0.5, 0.005, 0.2) * 0.4
+    under = sub_drop(0.6, 90, 30) * 0.5
+    return reverb(mix(_glitch(mix(shriek, tear), seed), under, zap(0.15, 4000, 300, seed) * 0.4), 0.85, 0.35, 4000, 0.6)
 
 
 @recipe('boss/echo_sentinel_bolt')
@@ -705,10 +765,14 @@ def remnant_ambient(d, seed):
     return groan * 0.8 + throb(2.5, 1.5, 33, 0.7) * 0.6
 
 
-@recipe('boss/gravity_remnant_hurt', level=BOSS)
+@recipe('boss/gravity_remnant_hurt', level=BOSS, variants=3)
 def remnant_hurt(d, seed):
+    # 殻の瓦礫が砕け、奥の核が低くうめく（重力に引かれて音程が沈む）
+    r = rng(seed)
     rock = lowpass(white(0.4, seed), 2500) * perc(0.4, 0.002, 0.1)
-    return mix(rock, thump(65, 0.35, 0.2, seed) * 0.7, (rock * 0.5, 0.06))
+    groan = drive(roar(0.8, 48 + 10 * r.random(), seed, 0.9, (300, 650, 1800), env([(0, 1.1), (0.8, 0.6)], 0.8)), 2.0) * 0.6
+    return reverb(mix(rock, (rock * 0.5, 0.06), thump(45, 0.4, 0.2, seed) * 0.9, (groan, 0.03), sub_drop(0.8, 70, 22) * 0.7),
+                  0.85, 0.3, 1800, 0.7)
 
 
 @recipe('boss/gravity_remnant_debris_launch', level=BOSS)
@@ -760,8 +824,26 @@ def remnant_implode(d, seed):
 
 @recipe('boss/horizon_warden_emerge', level=BIG)
 def warden_emerge(d, seed):
-    dark = voices(4.0, (55, 82.5, 110), 'o', seed, 0.1) * 0.05 * env([(0, 0), (3.5, 1), (4, 0.5)], 4.0)
-    return reverb(mix(riser(4.0, 25, 300, seed, 0.3) * 0.7, dark, (boom(2.0, 28, seed, 0.4), 3.8)), 0.95, 0.3, 2000, 1.5)
+    # 6 秒（出現 120 tick）に合わせる: 0〜1.8 秒 特異点が開いて光を吸い込む → 1.8〜4.5 秒 重い装甲が次々に組み上がる
+    # → 4.5〜6 秒 力がみなぎり、目覚めの衝撃波（別の音）へつながる
+    r = rng(seed)
+    suck = mix(whoosh(1.9, 4000, 120, 2, seed, 0.6)[::-1] * 0.9, riser(1.9, 22, 200, seed + 1, 0.4) * 0.6)
+    hits, at = [], 1.8
+    while at < 4.5:
+        k = (at - 1.8) / 2.7
+        hits.append(((_gachakon(seed + len(hits), 0.9 + 0.5 * r.random()) if r.random() < 0.6
+                      else _metal_hit(seed + 50 + len(hits), 90 + 60 * r.random(), 1.1, 0.9)), at))
+        if r.random() < 0.45:
+            hits.append((servo(0.35, 120 + 60 * r.random(), 260 + 80 * r.random(), seed + 90 + len(hits)) * 0.35, at + 0.05))
+        if r.random() < 0.35:
+            hits.append((zap(0.08, 5000, 1500, seed + 130 + len(hits)) * 0.25, at + 0.02))
+        at += r.uniform(0.28, 0.42) * (1 - 0.45 * k)
+    frame = groove(2.7, {'tick': 'x.x.x?x.x.x?x.x.', 'deep': 'X.......x.......'}, None, seed) * 0.35
+    power = mix(riser(1.8, 40, 600, seed + 2, 0.5) * 0.8,
+                voices(1.8, (55, 82.5, 110, 164.8), 'o', seed + 3, 0.1) * 0.05 * env([(0, 0), (1.6, 1), (1.8, 0.7)], 1.8),
+                hum(55, 1.8, (1, 2, 3), (1, 0.5, 0.3)) * 0.4 * env([(0, 0), (1.8, 1)], 1.8))
+    under = lowpass(brown(6.2, seed + 4), 160) * 1.2 * env([(0, 0), (1, 0.6), (4.5, 1), (6.2, 0.4)], 6.2)
+    return reverb(mix(suck, under, (frame, 1.8), *hits, (power, 4.4)), 0.9, 0.3, 2500, 1.2)
 
 
 @recipe('boss/horizon_warden_phase', level=BIG)
@@ -806,8 +888,25 @@ def warden_shockwave(d, seed):
 
 @recipe('boss/horizon_warden_death', level=BIG)
 def warden_death(d, seed):
-    fall = voices(5.0, (110, 82.5, 55), 'u', seed, 0.1) * 0.04 * env([(0, 1), (5, 0)], 5.0)
-    return reverb(mix(boom(3.0, 30, seed, 0.6), fall, (boom(3.0, 24, seed + 1, 0.3) * 0.8, 1.6), (sub_drop(3.0, 70, 18), 2.0)), 0.95, 0.35, 1800, 2.0)
+    # 倒されたときの演出（5 秒）に合わせる: 0〜2.75 秒 外装が 0.45 秒ごとに爆ぜて剥がれ、火花が散る
+    # → 2.75〜4.5 秒 胸の特異点がふくらんで光を吸い込む → 4.5 秒 一点へつぶれて閃光と衝撃波
+    pops = [(mix(impact(0.6, 55 + 10 * (i % 3), seed + i, 0.6), _metal_hit(seed + 20 + i, 110 + 30 * (i % 4), 0.7, 0.8)), 0.05 + 0.45 * i)
+            for i in range(7)]
+    sparks = scatter(2.8, [lambda s: zap(0.1, 5000, 1200, s) * 0.4], 18, seed) * 0.6
+    fall = voices(4.5, (110, 82.5, 55), 'u', seed, 0.1) * 0.04 * env([(0, 1), (4.5, 0.2)], 4.5)
+    suck = mix(whoosh(1.75, 5000, 120, 2, seed + 1, 0.6)[::-1] * 1.0, throb(1.75, 4, 45, 0.9) * env([(0, 0), (1.75, 1)], 1.75) * 0.6)
+    collapse = mix(boom(3.0, 26, seed + 2, 0.7) * 1.3, sub_drop(2.5, 90, 18) * 1.1, whoosh(1.8, 3000, 200, 1.5, seed + 3, 0.5) * 0.7)
+    return reverb(mix(fall, sparks, *pops, (suck, 2.75), (collapse, 4.5)), 0.95, 0.35, 1800, 2.0)
+
+
+@recipe('boss/horizon_warden_hurt', level=BOSS, variants=3)
+def warden_hurt(d, seed):
+    # 巨体の装甲が鈍く鳴り、胸の炉心が歪んだ低い咆哮を上げる
+    r = rng(seed)
+    clang = _metal_hit(seed, 60 + 25 * r.random(), 1.4, 1.0)
+    growl = drive(roar(0.8, 40 + 10 * r.random(), seed, 0.7, (300, 600, 1500)), 2.5) * 0.7
+    warp = sine(glide(160, 35, 0.6, 0.5)) * perc(0.6, 0.005, 0.3) * 0.5
+    return reverb(mix(clang, (growl, 0.02), warp), 0.9, 0.35, 1800, 0.9)
 
 
 @recipe('boss/horizon_warden_ambient', level=BOSS - 3, variants=3)
@@ -841,8 +940,12 @@ def _song(dur, f0, f1, seed, vowel='u'):
 
 @recipe('boss/ergosphere_leviathan_emerge', level=BIG)
 def lev_emerge(d, seed):
-    vortex = whoosh(3.0, 100, 1500, 2, seed, 1.2) * 0.8
-    return reverb(mix(vortex, (roar(2.5, 70, seed) * 0.9, 1.6), (sub_drop(2.0, 90, 30) * 0.7, 1.6)), 0.95, 0.35, 2000, 1.5)
+    # 渦が開く（1.5 秒）→ 小さな蛇を吐き出す → 渦が吸い込むように閉じる（2.1 秒で閉じ切る）
+    vortex = mix(whoosh(1.5, 80, 900, 2, seed, 1.4) * 0.9, _song(1.6, 70, 52, seed, 'o') * 0.5)
+    spit = mix(ring_burst(0.6, 220, seed) * 0.6, whoosh(0.5, 400, 3000, 2, seed + 1, 0.5) * 0.7)
+    close = whoosh(0.6, 120, 1500, 2, seed + 2, 0.7)[::-1] * 0.8
+    shut = mix(thump(40, 0.5, 0.1, seed) * 1.2, sub_drop(0.8, 70, 25) * 0.7)
+    return reverb(mix(vortex, (spit, 1.45), (close, 1.5), (shut, 2.05)), 0.9, 0.3, 2000, 1.0)
 
 
 @recipe('boss/ergosphere_leviathan_ambient', level=BOSS - 3, variants=3)
@@ -852,10 +955,17 @@ def lev_ambient(d, seed):
     return reverb(a, 0.95, 0.4, 2000, 1.2)
 
 
-@recipe('boss/ergosphere_leviathan_hurt', level=BOSS)
+@recipe('boss/ergosphere_leviathan_hurt', level=BOSS, variants=3)
 def lev_hurt(d, seed):
-    screech = bandpass(saw(glide(700, 400, 0.6)) + white(0.6, seed) * 0.5, 1500, 2) * perc(0.6, 0.01, 0.3)
-    return mix(screech * 0.8, clank(500, 0.4, seed) * 0.3)
+    # 怒った巨大な獣の唸り: 喉の奥の低いうなりに、引きつった高い叫びが重なり、鱗がきしむ
+    r = rng(seed)
+    f0 = 52 + 14 * r.random()
+    growl = roar(0.9, f0, seed, 1.0, (380, 760, 2000), env([(0, 0.85), (0.15, 1.15), (0.9, 0.7)], 0.9))
+    shriek = (bandpass(saw(glide(f0 * 9, f0 * 6, 0.7, 0.6)) + pink(0.7, seed) * 0.6, 1800, 3)
+              * env([(0, 0), (0.05, 1), (0.7, 0)], 0.7) * 0.35)
+    scales = lowpass(crackle(0.5, 60, seed, 0.01), 1500) * 1.5
+    hit = mix(thump(40, 0.45, 0.3, seed) * 1.1, sub_drop(0.7, 80, 25) * 0.6)
+    return reverb(mix(drive(growl, 2.2) * 0.9, shriek, scales, hit), 0.92, 0.35, 2000, 0.9)
 
 
 @recipe('boss/ergosphere_leviathan_roar', level=BIG)
@@ -969,11 +1079,16 @@ def arch_ambient(d, seed):
     return reverb(voices(2.8, (root, root * 1.5), 'u', seed, 0.25) * 0.05 * env([(0, 0), (1, 1), (2.8, 0)], 2.8), 0.95, 0.5, 2500, 1.0)
 
 
-@recipe('boss/last_archivist_hurt', level=BOSS)
+@recipe('boss/last_archivist_hurt', level=BOSS, variants=3)
 def arch_hurt(d, seed):
-    wobble = chime(880, 0.8, seed) * (1 + 0.5 * lfo(12, 0.8))
-    gasp = voices(0.6, (440, 466), 'e', seed) * 0.03 * perc(0.6, 0.02, 0.3, 2)
-    return rich(mix(wobble * 0.5, chime(932, 0.8, seed + 1) * 0.4, gasp, glass(0.5, seed, 8) * 0.3), seed, 0.1, 0.4)
+    # 不協和の合唱がひきつって叫び、光の結晶がひび割れる。最後に低い響きが残る
+    r = rng(seed)
+    f = 220 + 40 * r.random()
+    cry = (voices(0.8, (f, f * 1.06, f * 1.41, f * 2.12), 'a', seed, 0.2, 0.012) * 0.04
+           * env([(0, 0), (0.03, 1), (0.25, 0.7), (0.8, 0)], 0.8))
+    crack = mix(glass(0.5, seed, 10) * 0.5, zap(0.12, 6000, 900, seed) * 0.3)
+    swell = whoosh(0.35, 3000, 300, 2, seed, 0.6)[::-1] * 0.5
+    return reverb(mix(swell, (cry, 0.3), (crack, 0.3), (sub_drop(0.9, 70, 25) * 0.7, 0.3)), 0.95, 0.4, 4000, 1.0)
 
 
 @recipe('boss/last_archivist_phase', level=BIG)
@@ -1236,3 +1351,206 @@ def ui_click(d, seed):
     body = resonator(white(0.002, seed) * 1.0, 1150, 0.035) * 3
     blip = sine(glide(1900, 1500, 0.06)) * perc(0.06, 0.001, 0.02) * 0.25
     return mix(snap, body, (blip, 0.004))
+
+
+# =================================================================== ボスのうなり（出現から倒されるまで鳴り続ける、炉のような低い音）
+
+def _dread(d, seed, f=34.0, interval=1.414, rumble=(30, 220), choir=None, vowel='u', metal=0, swirl=0.0, grit=0.0, pulse=0.0):
+    """不気味な低いうなり: 炉が回るような重い基音（わずかにずれてうねる）と不安な音程、ゴーッという空気の流れ。
+    ボスごとに、遠い合唱・きしむ金属・渦の風・ざらつき・脈動を重ねる。"""
+    t = t_axis(d)
+    swell = 0.8 + 0.2 * np.sin(2 * np.pi * 2 * t / d)
+    core = (hum(f, d, (1, 2, 3, 5), (1, 0.55, 0.3, 0.12), 0.005, seed) + hum(f * 1.008, d, (1, 2), (0.7, 0.3), 0.004, seed + 1)) * 0.5
+    tension = hum(f * interval, d, (1, 2), (0.35, 0.12), 0.006, seed + 2)
+    flow = highpass(lowpass(brown(d, seed + 3), rumble[1] * (1 + 0.5 * np.sin(2 * np.pi * 3 * t / d))), rumble[0]) * 1.6
+    layers = [core * swell, tension * swell, flow]
+    if choir:
+        layers.append(voices(d, choir, vowel, seed + 4, 0.1) * 0.03 * (0.6 + 0.4 * np.sin(2 * np.pi * t / d)))
+    if metal:
+        layers.append(scatter(d, [lambda s: _metal_hit(s, 70 + 30 * (s % 3), 0.5, 1.4)], metal, seed + 5) * 0.2)
+    if swirl:
+        layers.append(bandpass(pink(d, seed + 6), 300 + 220 * np.sin(2 * np.pi * 2 * t / d), 2) * swirl)
+    if grit:
+        layers.append(lowpass(crackle(d, 25, seed + 7, 0.01), 900) * grit)
+    if pulse:
+        layers.append(throb(d, pulse, f * 2, 0.9) * 0.4)
+    return reverb(mix(*layers), 0.9, 0.35, 1500, 0.0)
+
+
+@machine('boss/ergosphere_leviathan_drone', level=-17)
+def lev_drone(d, seed):
+    # リアクターが回り続けるようなゴーッという低音に、遠くの鯨の歌と、渦を巻く風
+    song = _song(d * 0.7, 62, 48, seed, 'o') * 0.25
+    return mix(_dread(d, seed, 30.0, 1.414, (25, 200), swirl=0.35), (song, d * 0.15))
+
+
+@machine('boss/horizon_warden_drone', level=-17)
+def warden_drone(d, seed):
+    return _dread(d, seed, 36.7, 1.5, (30, 260), choir=(55, 77.8, 110), vowel='o', metal=4, pulse=0.5)
+
+
+@machine('boss/echo_sentinel_drone', level=-19)
+def echo_drone(d, seed):
+    glassy = shimmer(d, 3, 900, 2, 1.2, seed) * 0.15
+    return mix(_dread(d, seed, 41.2, 1.414, (60, 400), choir=(164.8, 233.1), vowel='i'), glassy)
+
+
+@machine('boss/gravity_remnant_drone', level=-18)
+def remnant_drone(d, seed):
+    return _dread(d, seed, 27.5, 1.414, (20, 180), metal=3, grit=0.8, pulse=0.75)
+
+
+@machine('boss/foundry_drone', level=-18)
+def foundry_drone(d, seed):
+    press = groove(d, {'deep': 'X.......x.......', 'clank': '....x.......?...'}, None, seed) * 0.3
+    return mix(_dread(d, seed, 32.7, 1.5, (40, 320), metal=5, grit=0.4), press)
+
+
+@machine('boss/last_archivist_drone', level=-17)
+def archivist_drone(d, seed):
+    return _dread(d, seed, 29.1, 1.414, (25, 240), choir=(58.3, 87.3, 116.5, 174.6), vowel='u', swirl=0.25, pulse=0.33)
+
+
+@recipe('boss/ergosphere_leviathan_burst', level=BIG)
+def lev_burst(d, seed):
+    # 前ぶれなく床が裂け、渦が一気に開いて、下から巨大なものが噴き上がる
+    tear = mix(zap(0.25, 3000, 150, seed) * 0.8, highpass(white(0.3, seed), 800) * perc(0.3, 0.002, 0.08) * 1.2,
+               _metal_hit(seed, 60, 1.2, 1.0) * 0.5)
+    rush = whoosh(1.2, 60, 2500, 1.5, seed + 1, 0.35) * 1.3
+    return reverb(mix(tear, (rush, 0.03), (boom(2.0, 30, seed + 2, 0.6), 0.12), (sub_drop(1.5, 90, 22) * 1.1, 0.12)),
+                  0.95, 0.3, 2000, 1.2)
+
+
+@recipe('boss/ergosphere_leviathan_rise', level=BOSS)
+def lev_rise(d, seed):
+    # 丸呑みにしたあと、螺旋を描いて昇る（4.8 秒）: 渦巻く風、崩れる床、高まっていく低い声
+    D = 4.8
+    t = t_axis(D)
+    swirl = bandpass(pink(D, seed), (250 + 900 * (0.5 + 0.5 * np.sin(2 * np.pi * 1.2 * t))) * (0.5 + t / D), 1.5) * 1.4
+    rumble = lowpass(brown(D, seed + 1), 200) * 1.5
+    fade = env([(0, 0.7), (0.3, 1), (4.2, 0.9), (D, 0)], D)
+    debris = scatter(D, [lambda s: impact(0.4, 50 + 20 * (s % 3), s, 0.3)], 10, seed + 2) * 0.35
+    moan = _song(4.2, 55, 105, seed, 'o') * 0.7
+    return reverb(mix((swirl + rumble) * fade, debris * fade, moan), 0.95, 0.35, 1800, 1.0)
+
+
+# =================================================================== ボスの演出の切れ目を埋める音
+
+@recipe('boss/foundry_online', level=BIG)
+def foundry_online(d, seed):
+    # 目覚め: 重いリレーが入り、電力が一気に流れ込み、単眼が灯る
+    relay = mix(_metal_hit(seed, 80, 1.3, 1.0), thump(45, 0.5, 0.3, seed) * 1.2)
+    surge = mix(riser(0.6, 60, 900, seed, 0.3) * 0.7, hum(55, 1.8, (1, 2, 3, 4), (1, 0.6, 0.4, 0.2)) * env([(0, 0), (0.15, 1), (1.8, 0)], 1.8) * 0.6)
+    eye = beep(1320, 0.25, 'square') * 0.25
+    return reverb(mix(surge, (relay, 0.55), (eye, 0.75), (zap(0.2, 5000, 800, seed) * 0.3, 0.6)), 0.85, 0.3, 3000, 1.0)
+
+
+@recipe('boss/foundry_dying', level=BOSS)
+def foundry_dying(d, seed):
+    # 倒れていく: モーターが回転を落とし、火花が途切れ途切れに散り、装甲がきしむ
+    D = 2.7
+    motor = lowpass(saw(glide(140, 25, D, 0.7)) * 0.5 + square(glide(280, 50, D, 0.7)) * 0.15, 1200) * env([(0, 1), (D, 0)], D)
+    sparks = scatter(D, [lambda s: zap(0.12, 4500, 900, s) * 0.5, lambda s: tick(3000, 0.03, s)], 14, seed) * 0.6
+    groan = mix(*[(_metal_hit(seed + i, 60 + 15 * i, 0.6, 1.0), 0.4 + 0.7 * i) for i in range(3)])
+    return reverb(mix(motor, sparks, groan), 0.85, 0.3, 2500, 0.8)
+
+
+@recipe('boss/echo_sentinel_awake', level=BOSS)
+def echo_awake(d, seed):
+    # 姿を結び終える: 澄んだ光がはじけ、結晶の和音が広がる
+    bloom = mix(ring_burst(1.0, 330, seed) * 0.8, chime(660, 1.8, seed, 1.2) * 0.4, (chime(990, 1.6, seed + 1) * 0.3, 0.05))
+    return reverb(mix(bloom, shimmer(1.6, 30, 1500, 3, 0.5, seed) * 0.3, sub_drop(1.0, 80, 30) * 0.5), 0.9, 0.35, 5000, 1.0)
+
+
+@recipe('boss/gravity_remnant_pulse', level=BOSS)
+def remnant_pulse(d, seed):
+    # 核の不安定な鼓動: 低い鼓動と、まわりを一瞬吸い込むうねり
+    return reverb(mix(thump(36, 0.45, 0.15, seed) * 1.2, (sine(glide(70, 30, 0.5), 0.5) * perc(0.5, 0.01, 0.25) * 0.6),
+                      whoosh(0.4, 900, 150, 2, seed, 0.6)[::-1] * 0.3), 0.7, 0.25, 1500, 0.4)
+
+
+@recipe('boss/last_archivist_dissolve', level=BOSS)
+def archivist_dissolve(d, seed):
+    # 体が足元から金の塵になって昇る: きらめきが高く昇り、合唱がほどけていく
+    D = 3.0
+    dust = shimmer(D, 40, 1800, 3, 0.4, seed) * env([(0, 0), (0.4, 1), (D, 0.3)], D) * 0.6
+    rise = bandpass(pink(D, seed), glide(600, 4000, D), 2) * env([(0, 0), (0.5, 1), (D, 0)], D) * 0.6
+    choir = voices(D, (233.1, 349.2, 466.2), 'a', seed, 0.1) * 0.025 * env([(0, 1), (D, 0)], D)
+    return reverb(mix(dust, rise, choir), 0.95, 0.4, 5000, 1.2)
+
+
+@recipe('boss/last_archivist_inhale', level=BIG)
+def archivist_inhale(d, seed):
+    # 頭の特異点が光と塵を吸い込み、ふくらんでいく
+    D = 2.9
+    suck = whoosh(D, 5000, 120, 2, seed, 0.6)[::-1] * 1.0
+    swell = mix(riser(D, 30, 400, seed, 0.3) * 0.7, throb(D, 3, 48, 0.8) * 0.5 * env([(0, 0), (D, 1)], D))
+    return reverb(mix(suck, swell), 0.9, 0.3, 2000, 0.6)
+
+
+# =================================================================== 見た目だけで音がなかった所
+
+@recipe('android/blade_cast', level=-18)
+def android_blade_cast(d, seed):
+    # 光刃型が光柱を呼ぶ: 澄んだ光が足元から立ち上がる
+    return reverb(mix(riser(0.5, 300, 2500, seed, 0.3) * 0.5, chime(1320, 0.9, seed, 1.2) * 0.4, (chime(1980, 0.8, seed + 1) * 0.3, 0.06),
+                      zap(0.15, 5000, 1500, seed) * 0.25), 0.8, 0.3, 5000, 0.6)
+
+
+@recipe('android/tend', level=-24)
+def android_tend(d, seed):
+    # 植木に手をかざす: 小さなきらめき
+    return reverb(mix(shimmer(0.7, 25, 2200, 2, 0.4, seed) * 0.6, chime(1760, 0.6, seed, 0.8) * 0.2), 0.6, 0.3, 6000, 0.4)
+
+
+@recipe('android/sweep', level=-24)
+def android_sweep(d, seed):
+    # ほうきで床を掃く: さっと擦れる音
+    swish = bandpass(pink(0.35, seed), glide(1800, 3500, 0.35), 1.5) * env([(0, 0), (0.08, 1), (0.35, 0)], 0.35)
+    return mix(swish, highpass(white(0.25, seed + 1), 4000) * perc(0.25, 0.01, 0.1) * 0.3)
+
+
+@recipe('android/chatter', level=-22, variants=3)
+def android_chatter(d, seed):
+    # 仲間と話す: 小さな電子音のおしゃべり（音程の上下する短いさえずり）
+    r = rng(seed)
+    parts = []
+    at = 0.0
+    for k in range(int(r.integers(3, 6))):
+        f0 = 900 + 700 * r.random()
+        f1 = f0 * r.uniform(0.7, 1.5)
+        dur = r.uniform(0.05, 0.11)
+        parts.append((sine(glide(f0, f1, dur)) * perc(dur, 0.005, dur * 0.6) * 0.5 + square(glide(f0, f1, dur)) * perc(dur, 0.005, dur * 0.4) * 0.08, at))
+        at += dur + r.uniform(0.02, 0.06)
+    return reverb(mix(*parts), 0.4, 0.2, 6000, 0.2)
+
+
+@machine('android/thruster', level=-24)
+def android_thruster(d, seed):
+    # スラスターの噴射: 細い炎のゴーッという音と、小刻みな揺らぎ
+    t = t_axis(d)
+    jet = bandpass(pink(d, seed), 900 + 300 * np.sin(2 * np.pi * 0.5 * t), 1.2) * (0.85 + 0.15 * lfo(13, d))
+    roar_ = lowpass(brown(d, seed + 1), 400) * 0.8
+    return mix(jet, roar_, highpass(white(d, seed + 2), 5000) * 0.08)
+
+
+@recipe('boss/horizon_warden_bolt_hit', level=BOSS)
+def warden_bolt_hit(d, seed):
+    # 光弾が当たってはじける
+    return reverb(mix(zap(0.25, 4000, 300, seed) * 0.7, impact(0.5, 70, seed, 0.3) * 0.7, ring_burst(0.5, 500, seed) * 0.4), 0.7, 0.25, 4000, 0.4)
+
+
+@recipe('boss/last_archivist_floor_fade', level=BOSS)
+def archivist_floor_fade(d, seed):
+    # 戦いが終わり、ホログラムの床がほどけて消える
+    D = 2.5
+    fade = shimmer(D, 50, 1500, 3, 0.3, seed) * env([(0, 1), (D, 0)], D) * 0.6
+    down = sine(glide(880, 220, D, 0.6)) * env([(0, 0), (0.1, 0.4), (D, 0)], D) * 0.4
+    return reverb(mix(fade, down, crackle(1.2, 40, seed, 0.004) * 0.8), 0.9, 0.4, 5000, 1.0)
+
+
+@recipe('ruin/security_drone_sputter', level=-20)
+def drone_sputter(d, seed):
+    # 壊れかけたドローン: ぱちっと火花が散り、回路がじりじり言う
+    return mix(zap(0.12, 5000, 900, seed) * 0.7, lowpass(crackle(0.4, 80, seed, 0.005), 3000) * 1.2,
+               (buzz(120, 0.2, 2000, seed) * perc(0.2, 0.005, 0.1) * 0.3, 0.05))

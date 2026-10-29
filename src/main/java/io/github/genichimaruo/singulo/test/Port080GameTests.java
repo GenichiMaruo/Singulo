@@ -23,7 +23,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class Port080GameTests {
     @GameTest(template = "empty", batch = "port_080_saves")
     public static void patrolAndFoundryPositionsSurviveReload(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var level = h.getLevel();
         var a = SinguloEntities.BIT_ANDROID.get().create(level);
         a.makeGuard(null, h.absolutePos(new BlockPos(1, 1, 1)), RuinAndroid.MODE_PATROL, 30);
@@ -53,7 +53,7 @@ public final class Port080GameTests {
 
     @GameTest(template = "empty", batch = "port_080_cards")
     public static void areaAndChemicalCardsKeepNbtAndStackRules(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var card = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("area_card")));
         h.assertTrue(card.getMaxStackSize() == 64, "Blank area cards do not stack");
         AreaCardItem.record(card, h.getLevel(), new BlockPos(1, 2, 3), new BlockPos(5, 6, 7));

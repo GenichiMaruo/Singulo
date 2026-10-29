@@ -24,7 +24,7 @@ public final class RayleighGameTests {
     /** 天井（y 5）のパネル2枚を、上の受電器1台で点ける。真下の日照センサーは15（反転は0）。電力が切れると空の値に戻る。 */
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void poweredPanelMakesNoonBelow(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos panel = new BlockPos(2, 5, 2), receiver = new BlockPos(2, 6, 2), source = new BlockPos(2, 7, 2);
         BlockPos sensor = new BlockPos(2, 1, 2), inverted = new BlockPos(3, 1, 2), panel2 = new BlockPos(3, 5, 2);
         // 屋根と壁で囲んで日を遮る（パネル以外は不透明。中に空の光が入らない）
@@ -79,7 +79,7 @@ public final class RayleighGameTests {
     /** 研究所のパネル: 研究所の電力で点き、FE は受けず、壊しても何も落とさない。 */
     @GameTest(template = EMPTY)
     public static void labPanelFollowsFacilityPowerAndDropsNothing(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 3, 2);
         helper.setBlock(pos, SinguloBlocks.LAB_RAYLEIGH_PANEL.get());
         BlockPos abs = helper.absolutePos(pos);
@@ -97,7 +97,7 @@ public final class RayleighGameTests {
     /** The End and Nether lack vanilla detector tickers; panel light must still update automatically. */
     @GameTest(template = EMPTY)
     public static void skylessDetectorTickerFollowsPanelPower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel().getServer().getLevel(net.minecraft.world.level.Level.NETHER);
         helper.assertTrue(level != null && !level.dimensionType().hasSkyLight(), "Missing skyless dimension fixture");
         var block = (DaylightDetectorBlock) Blocks.DAYLIGHT_DETECTOR;

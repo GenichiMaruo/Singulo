@@ -31,7 +31,7 @@ public final class ZeroGravityGameTests {
     /** 上の5ブロックの中にいる生き物は重力が0、その外は元のまま。電力が切れると戻る。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void zeroGravityBlockLiftsWeightAbove(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos block = new BlockPos(2, 1, 2), receiver = new BlockPos(3, 1, 2), source = new BlockPos(4, 1, 2);
         helper.setBlock(block, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
@@ -56,7 +56,7 @@ public final class ZeroGravityGameTests {
     /** コントロールボックスで高さを8にすると、7ブロック上も無重力になり、電力は1つあたり costPerBlock(8)。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void controllerRaisesHeightAtExponentialCost(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos a = new BlockPos(1, 1, 2), b = new BlockPos(2, 1, 2), controller = new BlockPos(1, 1, 3);
         BlockPos receiver = new BlockPos(3, 1, 2), source = new BlockPos(4, 1, 2);
         helper.setBlock(a, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
@@ -64,13 +64,13 @@ public final class ZeroGravityGameTests {
         helper.setBlock(controller, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(source, SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        ZeroGravityControllerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controller);
+        ZeroGravityControllerBlockEntity box = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, controller);
         box.setHeight(8);
         Zombie high = zombie(helper, new BlockPos(1, 8, 2));
         helper.assertTrue(Math.abs(ZeroGravity.costPerBlock(15) / (double) ZeroGravity.costPerBlock(14) - 1.4) < 0.02, "高さ1ブロックで電力が1.4倍にならない");
         helper.assertTrue(ZeroGravity.costPerBlock(10_000) == Long.MAX_VALUE, "とても高いときに電力が飽和しない");
         helper.runAtTickTime(40, () -> {
-            GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
+            GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, receiver);
             helper.assertTrue(r.demand() == 2 * ZeroGravity.costPerBlock(8), "集まりの電力が高さ8の2つ分でない: " + r.demand());
             helper.assertTrue(ZeroGravity.weightless(high), "高さ8の中（7ブロック上）が無重力にならない");
             high.discard();
@@ -83,7 +83,7 @@ public final class ZeroGravityGameTests {
     public static void largePanelGroupIsFullyPowered(GameTestHelper helper) {
         // The 17-cube and its north-side power source exceed the empty
         // template. All their chunks must tick before the timed assertion.
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper, 17);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper, 17);
         var level = helper.getLevel();
         BlockPos origin = helper.absolutePos(new BlockPos(0, 2, 0));
         int side = 17;

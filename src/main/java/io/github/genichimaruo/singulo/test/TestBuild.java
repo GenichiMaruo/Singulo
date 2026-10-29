@@ -9,11 +9,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 
 /** テスト用: マルチブロックを設計図どおりに建てる。 */
-final class TestBuild {
+public final class TestBuild {
     private TestBuild() {}
 
     /** Forge 1.20.1's vanilla mock uses a connection without a Netty channel. */
-    static net.minecraft.server.level.ServerPlayer mockPlayer(GameTestHelper helper) {
+    public static net.minecraft.server.level.ServerPlayer mockPlayer(GameTestHelper helper) {
         var level = helper.getLevel();
         var player = new net.minecraftforge.common.util.FakePlayer(level,
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-mock-player")) {

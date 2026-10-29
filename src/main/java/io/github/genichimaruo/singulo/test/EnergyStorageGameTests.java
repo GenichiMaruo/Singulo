@@ -12,7 +12,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class EnergyStorageGameTests {
     @GameTest(template = "empty")
     public static void highGenerationSaturatesWithoutOverflowOrExtraNotifications(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         int[] changes = {0};
         // Degenerate furnace capacity; high configured output is clamped to Integer.MAX_VALUE.
         var energy = new SinguloEnergyStorage(200_000_000, 0, 0, () -> changes[0]++);

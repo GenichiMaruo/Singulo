@@ -20,6 +20,35 @@ group = mod_group_id
 sourceSets.main.resources.srcDir('src/generated/resources')
 sourceSets.main.java.srcDir('src/generated/java')
 
+// Compile integration fixtures separately: never ship test classes in the mod JAR.
+sourceSets {
+    gameTest {
+        java.srcDir('src/main/java')
+        java.srcDir('src/gameTest/java')
+        // Narrow local reruns compile/register only these classes; full CI uses no filter.
+        def selected = providers.gradleProperty('testClasses').getOrElse('').split(',').findAll { !it.isBlank() }
+        if (selected.any { !(it ==~ /[A-Za-z][A-Za-z0-9]*GameTests/) }) {
+            throw new GradleException('testClasses expects comma-separated GameTests class names')
+        }
+        for (name in selected) {
+            if (fileTree('src/main/java').matching { include "**/${name}.java" }.isEmpty()
+                    && fileTree('src/gameTest/java').matching { include "**/${name}.java" }.isEmpty()) {
+                throw new GradleException("Unknown GameTest class: ${name}")
+            }
+        }
+        java.include(selected.isEmpty() ? ['**/*GameTests.java'] : selected.collect { "**/${it}.java" })
+        java.include('**/test/TestBuild.java', '**/test/harness/**')
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java')
+configurations {
+    gameTestImplementation.extendsFrom implementation
+    gameTestCompileOnly.extendsFrom compileOnly
+    gameTestRuntimeOnly.extendsFrom runtimeOnly, localRuntime
+}
+
 base {
     archivesName = mod_name
 }
@@ -38,6 +67,8 @@ legacyForge {
     } else {
         enable { neoForgeVersion = "${minecraft_version}-${selectedLoaderVersion}" }
     }
+
+    addModdingDependenciesTo(sourceSets.gameTest)
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -59,10 +90,12 @@ legacyForge {
         }
         gameTestServer {
             type = "gameTestServer"
+            systemProperty 'singulo.testReport', layout.buildDirectory.file('reports/gametest/results.json').get().asFile.absolutePath
+            systemProperty 'singulo.testBenchmarks', providers.gradleProperty('testBenchmarks').getOrElse('false')
             // Keep tests separate from development worlds and local server settings.
             gameDirectory = layout.buildDirectory.dir('gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
-            systemProperty 'forge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review')
+            systemProperty 'forge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review,singulo_scaling')
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -73,6 +106,7 @@ legacyForge {
     mods {
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gameTest)
         }
     }
 }
@@ -144,6 +178,7 @@ tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs'
 var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
     delete layout.buildDirectory.dir('gametest/world')
     delete layout.buildDirectory.file('gametest/logs/latest.log')
+    delete layout.buildDirectory.file('reports/gametest/results.json')
 }
 // Flat, structure-free terrain keeps fixture setup deterministic and avoids noise-world generation.
 // Only the disposable GameTest directory is changed; development and player worlds are untouched.
@@ -162,24 +197,12 @@ generator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":
 }
 tasks.named('runGameTestServer') { dependsOn prepareGameTestEnvironment }
 
-// Minecraft's bootstrap can exit with status 0 before running any tests. Require the completion report.
-var selectedGameTestNamespace = providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review')
-var gameTestResultLog = layout.buildDirectory.file('gametest/logs/latest.log')
-var verifyGameTestResults = tasks.register('verifyGameTestResults') {
+// Validate exact registered and completed membership; bootstrap success alone proves nothing.
+var verifyGameTestResults = tasks.register('verifyGameTestResults', Exec) {
     group = 'verification'
-    doLast {
-        def log = gameTestResultLog.get().asFile
-        def result = log.isFile() ? (log.getText('UTF-8') =~ /All ([1-9][0-9]*) required tests passed/) : null
-        if (result == null || !result.find()) {
-            throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/<loader>/gametest/logs/latest.log')
-        }
-        def namespace = selectedGameTestNamespace
-        def expected = ['singulo': 358, 'singulo_automation': 80, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 28, 'singulo_cable': 16, 'singulo_rayleigh': 9, 'singulo_panel_review': 6, 'singulo_mekanism': 2][namespace]
-        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review') expected = 541
-        if (expected != null && result.group(1).toInteger() != expected) {
-            throw new GradleException("Expected ${expected} required tests for ${namespace}, found ${result.group(1)}")
-        }
-    }
+    commandLine 'python3', 'tools/check_gametests.py', '--build-dir', layout.buildDirectory.get().asFile.absolutePath,
+            '--namespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review,singulo_scaling'),
+            '--classes', providers.gradleProperty('testClasses').getOrElse('')
 }
 tasks.named('runGameTestServer') { finalizedBy verifyGameTestResults }
 

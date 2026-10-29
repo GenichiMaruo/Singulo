@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import net.minecraft.core.HolderLookup;
+
 import net.minecraft.nbt.CompoundTag;
 import java.util.List;
 import java.util.UUID;

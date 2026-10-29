@@ -32,7 +32,7 @@ public final class RecipeSelectionGameTests {
 
     private static MachineBlockEntity assembler(GameTestHelper helper, BlockPos pos) {
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
         return m;
     }
@@ -50,7 +50,7 @@ public final class RecipeSelectionGameTests {
     /** Chunk loading must not bypass the automatic input settling period. */
     @GameTest(template = EMPTY, timeoutTicks = 120)
     public static void restoredInputsWaitBeforeCrafting(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(1, 1, 1);
         MachineBlockEntity source = assembler(helper, pos);
         helper.runAtTickTime(70, () -> {
@@ -75,7 +75,7 @@ public final class RecipeSelectionGameTests {
     /** 超伝導コイルと鋼板だけ（Tシリンダー軸受の材料）は、ほかの設備の途中でもあるので、入れ終わって少し待ってから自動で作る。指定すればすぐ作る。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void partialLoadWaitsBeforeCraftingAmbiguousRecipe(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity auto = assembler(helper, new BlockPos(1, 1, 1));
         MachineBlockEntity fixed = assembler(helper, new BlockPos(4, 1, 1));
         for (MachineBlockEntity m : new MachineBlockEntity[]{auto, fixed}) {
@@ -101,7 +101,7 @@ public final class RecipeSelectionGameTests {
     /** 自動: ほかのレシピの途中になりえない組み合わせはそのまま作る。使わない物が混ざっていたら作らない。 */
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void autoNeedsExactInputs(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity exact = assembler(helper, new BlockPos(1, 1, 1));
         MachineBlockEntity extra = assembler(helper, new BlockPos(4, 1, 1));
         MachineBlockEntity fixed = assembler(helper, new BlockPos(7, 1, 1));
@@ -125,7 +125,7 @@ public final class RecipeSelectionGameTests {
     /** 指定は保存され、指定を外すと自動に戻る。 */
     @GameTest(template = EMPTY)
     public static void selectionIsSavedAndCleared(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
         m.selectRecipe(indexOf(helper, "tipler_bearing"));
         var tag = m.saveWithoutMetadata();
@@ -139,7 +139,7 @@ public final class RecipeSelectionGameTests {
     /** /reload replaces recipes in the same RecipeManager, rather than replacing the manager itself. */
     @GameTest(template = EMPTY, batch = "recipe_reload")
     public static void ambiguityCacheFollowsRecipeReload(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var manager = helper.getLevel().getRecipeManager();
         var original = java.util.List.copyOf(manager.getRecipes());
         var bearing = RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "tipler_bearing"));
@@ -166,14 +166,14 @@ public final class RecipeSelectionGameTests {
 
     @GameTest(template = EMPTY, batch = "recipe_reload")
     public static void selectedIndexFollowsRecipeReload(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var manager = helper.getLevel().getRecipeManager();
         var original = java.util.List.copyOf(manager.getRecipes());
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
         int before = indexOf(helper, "quantum_computing_module");
         var selected = RecipeSelection.byIndex(helper.getLevel(), m.type(), before);
         m.selectRecipe(before);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.machine.MachineMenu(1, player.getInventory(), m);
         helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == before + 1, "Initial choice not synchronized");
         try {

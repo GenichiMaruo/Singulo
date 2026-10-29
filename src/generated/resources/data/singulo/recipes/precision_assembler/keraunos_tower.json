@@ -40,6 +40,13 @@
         "tag": "forge:plates/steel"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:muon_catalyst"
+      },
+      "tier": 2,
+      "uses": 24000
     }
   ],
   "result": {

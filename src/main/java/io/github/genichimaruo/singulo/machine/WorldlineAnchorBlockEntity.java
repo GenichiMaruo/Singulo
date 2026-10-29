@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -183,7 +183,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
 
     /** 動いているときの半径。 */
     protected int activeRadius() {
-        return radiusFor(slot.getStackInSlot(0));
+        return radiusFor(catalyst());
     }
 
     @Override

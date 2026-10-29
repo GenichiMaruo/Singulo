@@ -343,6 +343,7 @@ public class FoundryOverseer extends RuinBoss {
     @Override
     protected void onEmerged(ServerLevel level) {
         level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
+        playSound(SinguloSounds.get("foundry.online"), 3.0F, 1.0F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.2, getZ(), 40, 0.8, 0.8, 0.8, 0.3);
         setConveyors(true);
     }
@@ -772,6 +773,10 @@ public class FoundryOverseer extends RuinBoss {
     /** 倒されたときの演出: 単眼がちらついて消え、火花と煙を噴きながらコアが沈み、最後に弾ける。 */
     @Override
     protected void onDeathTick(ServerLevel level, int t) {
+        if (t == 20) {
+            // 製造ラインの止まる音のあと: 火花を散らしながら、モーターが力尽きていく
+            level.playSound(null, blockPosition(), SinguloSounds.get("foundry.dying"), SoundSource.HOSTILE, 2.5F, 1.0F);
+        }
         if (t % 3 == 0) {
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.2, getZ(), 8, 0.8, 0.8, 0.8, 0.25);
             level.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1.6, getZ(), 2, 0.5, 0.3, 0.5, 0.02);

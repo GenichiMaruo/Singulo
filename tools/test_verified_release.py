@@ -11,9 +11,8 @@ class UnifiedReleaseTests(unittest.TestCase):
         self.sha = 'a' * 40
         self.tree = 'b' * 40
         self.repo = 'owner/repo'
-        jobs = [f'build-and-gametest ({loader}, {ns})'
-                for loader in ('forge', 'neoforge') for ns in release.GROUPS]
-        jobs += ['optional-mekanism (forge)', 'optional-mekanism (neoforge)', 'renderer-lighting (forge)', 'renderer-lighting (neoforge)']
+        jobs = ['build-and-gametest (forge)', 'build-and-gametest (neoforge)',
+                'optional-mekanism', 'renderer-lighting']
         self.responses = {
             'actions/runs/1': {'conclusion': 'success', 'status': 'completed',
                               'event': 'pull_request', 'path': '.github/workflows/pr-validation.yml',
@@ -26,7 +25,7 @@ class UnifiedReleaseTests(unittest.TestCase):
             'actions/runs/1/artifacts?per_page=100': {'artifacts': [
                 {'id': i, 'name': f'pr-validation-{self.sha}-{loader}-{ns}', 'expired': False}
                 for i, (loader, ns) in enumerate((loader, ns)
-                    for loader in ('forge', 'neoforge') for ns in release.GROUPS)]},
+                    for loader in ('forge', 'neoforge') for ns in ("full",))]},
         }
 
     def inspect(self, loader='forge'):
@@ -38,7 +37,7 @@ class UnifiedReleaseTests(unittest.TestCase):
         for loader in ('forge', 'neoforge'):
             result = self.inspect(loader)
             self.assertEqual(result['loader'], loader)
-            self.assertEqual(set(result['artifacts']), set(release.GROUPS))
+            self.assertEqual(set(result['artifacts']), {"full"})
             self.assertTrue(all(f'-{loader}-' in value['name'] for value in result['artifacts'].values()))
 
     def test_missing_loader_cannot_use_other_loader_artifacts(self):
@@ -67,35 +66,42 @@ class UnifiedReleaseTests(unittest.TestCase):
 
 
 class ArtifactPromotionTests(unittest.TestCase):
-    def test_requires_identical_jars_and_complete_gui_evidence(self):
+    def test_requires_complete_test_and_gui_evidence(self):
         import json
         import tempfile
         import zipfile
-        for defect in (None, 'jar', 'handbook', 'pixels', 'machine_marker', 'machine_pixels'):
+        for defect in (None, 'report', 'handbook', 'pixels', 'machine_marker', 'machine_pixels'):
             with self.subTest(defect=defect), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder)
                 name = 'Singulo-0.10.0-1.20.1F.jar'
-                metadata = {'artifacts': {ns: {'name': ns} for ns in release.GROUPS}}
-                for index, (ns, count) in enumerate(release.GROUPS.items()):
+                metadata = {'artifacts': {'full': {'name': 'full'}}}
+                for index, (ns, count) in enumerate({"full": sum(release.GROUPS.values())}.items()):
                     build = root / ns
                     (build / 'libs').mkdir(parents=True)
                     with zipfile.ZipFile(build / 'libs' / name, 'w') as jar:
-                        jar.writestr('payload', 'changed' if defect == 'jar' and index == 1 else 'same')
+                        jar.writestr('payload', 'same')
                     logs = build / 'gametest/logs'
                     logs.mkdir(parents=True)
                     (logs / 'latest.log').write_text(f'All {count} required tests passed')
-                gui = root / 'singulo/gui-review'
+                from check_gametests import inventory, DEFAULT_NAMESPACES
+                names = [e['name'] for e in inventory() if e['namespace'] in DEFAULT_NAMESPACES]
+                report = {'schema': 1, 'complete': True, 'expected': names, 'results': [
+                    {'name': n, 'status': 'passed', 'required': True, 'millis': 0} for n in names]}
+                if defect == 'report': report['results'].pop()
+                (root / 'full/reports/gametest').mkdir(parents=True)
+                (root / 'full/reports/gametest/results.json').write_text(json.dumps(report))
+                gui = root / 'full/gui-review'
                 (gui / 'screenshots').mkdir(parents=True)
-                for index in range(212):
+                for index in range(242):
                     (gui / 'screenshots' / f'{index}.png').touch()
                 (gui / 'logs').mkdir()
                 markers = ['SINGULO_GUI_COMPLETE 22', 'SINGULO_SEARCH_COMPLETE', 'SINGULO_JEI_SYNC_COMPLETE']
                 if defect != 'handbook':
                     markers.append('SINGULO_HANDBOOK_SEARCH_COMPLETE')
                 if defect != 'machine_marker':
-                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 190')
+                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 220')
                 (gui / 'machine-pixels.json').write_text(json.dumps({'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'],
-                    'machine_captures': 190, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5}))
+                    'machine_captures': 220, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5, 'supply_port_inventory_slots': 350, 'supply_port_tooltips': 5}))
                 (gui / 'logs/latest.log').write_text('\n'.join(markers))
                 (gui / 'inventory-pixels.json').write_text(json.dumps([
                     {'checked_empty_slot_centers': 35}, {'checked_empty_slot_centers': 35},
@@ -103,7 +109,7 @@ class ArtifactPromotionTests(unittest.TestCase):
                 output = root / 'release' / name
                 if defect is None:
                     release.promote(metadata, root, output, name)
-                    self.assertEqual(output.read_bytes(), (root / 'singulo/libs' / name).read_bytes())
+                    self.assertEqual(output.read_bytes(), (root / 'full/libs' / name).read_bytes())
                     self.assertEqual(len(metadata['jar_sha256']), 64)
                 else:
                     with self.assertRaises(RuntimeError):

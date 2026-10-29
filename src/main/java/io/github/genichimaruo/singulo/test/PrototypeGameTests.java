@@ -41,7 +41,7 @@ public final class PrototypeGameTests {
     /** 試作機の型は遺構の印刷台では印刷しない（試作機の型だけが研究所の型）。 */
     @GameTest(template = "empty")
     public static void prototypesAreLabOnly(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (AndroidKind k : AndroidKind.ruinKinds()) {
             helper.assertTrue(k != AndroidKind.AXE && k != AndroidKind.BIT, "印刷台の型に試作機が入っている: " + k);
         }
@@ -53,8 +53,7 @@ public final class PrototypeGameTests {
     @GameTest(template = "empty")
     @SuppressWarnings("removal")
     public static void prototypeMemoriesMissingFirst(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         Set<AndroidKind> got = new HashSet<>();
         got.add(PrototypeMemories.next(player, player.getRandom()));
         got.add(PrototypeMemories.next(player, player.getRandom()));
@@ -70,7 +69,7 @@ public final class PrototypeGameTests {
     /** 斧型の叩きつけ: 体の前へまっすぐ走る衝撃波が、線の上の相手にだけ当たる。 */
     @GameTest(template = HUGE, batch = BATCH + "_1", timeoutTicks = 40)
     public static void axeShockwaveRunsStraight(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         AxeAndroid axe = SinguloEntities.AXE_ANDROID.get().create(helper.getLevel());
         axe.setNoAi(true);
         axe.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
@@ -96,7 +95,7 @@ public final class PrototypeGameTests {
     /** ビット型のビット: 見通しがあれば光線で撃ち、壁があれば撃たない。 */
     @GameTest(template = HUGE, batch = BATCH + "_2", timeoutTicks = 40)
     public static void bitBeamNeedsLineOfSight(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel());
         bit.setNoAi(true);
         bit.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
@@ -138,7 +137,7 @@ public final class PrototypeGameTests {
     /** 突進は予告後に一度だけ当たり、帰還では再度当てない。別エンティティも増やさない。 */
     @GameTest(template = HUGE, batch = BATCH + "_slash", timeoutTicks = 60)
     public static void bitSlashTravelsAndReturns(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = bit(helper);
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         target.setNoGravity(true);
@@ -162,7 +161,7 @@ public final class PrototypeGameTests {
     /** 発射後の壁の追加にも止まり、護衛の味方には当てない。 */
     @GameTest(template = HUGE, batch = BATCH + "_wall", timeoutTicks = 50)
     public static void bitSlashStopsAtNewWall(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = bit(helper);
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         target.setNoGravity(true);
@@ -184,7 +183,7 @@ public final class PrototypeGameTests {
 
     @GameTest(template = HUGE, batch = BATCH + "_ally", timeoutTicks = 50)
     public static void bitSlashProtectsAlliesAndTracksSeparately(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = bit(helper);
         BitAndroid ally = bit(helper);
         ally.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 7))));
@@ -208,7 +207,7 @@ public final class PrototypeGameTests {
 
     @GameTest(template = HUGE, batch = BATCH + "_cancel", timeoutTicks = 30)
     public static void bitSlashCancelsWhenStowed(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = bit(helper);
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         target.setNoGravity(true);
@@ -225,7 +224,7 @@ public final class PrototypeGameTests {
     /** 半減後の速い射撃でも、突進直後の光線を相手の無敵時間で無駄にしない。実際の戦闘Goalで検査する。 */
     @GameTest(template = HUGE, batch = BATCH + "_cadence", timeoutTicks = 160)
     public static void enragedBitLungeLeavesRoomForNextBeam(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = bit(helper);
         bit.setHealth(bit.getMaxHealth() / 2);
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
@@ -255,7 +254,7 @@ public final class PrototypeGameTests {
     /** GameTestの遠い座標でも、同期した狙いの小数部分を丸めて失わない。 */
     @GameTest(template = HUGE, batch = BATCH + "_precision", timeoutTicks = 40)
     public static void bitAimKeepsFractionalCoordinates(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BitAndroid bit = bit(helper);
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         target.setNoGravity(true);

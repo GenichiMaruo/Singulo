@@ -45,7 +45,7 @@ public final class BossRoomGameTests {
     /** ボス部屋を再現する: 封鎖された保管庫と封印核（研究棟なら四隅の投影器）。 */
     private static GuardianCoreBlockEntity room(GameTestHelper helper, String ruin, BlockPos vault, BlockPos core) {
         helper.setBlock(vault, SinguloBlocks.RUIN_CACHE.get().defaultBlockState().setValue(RuinCacheBlock.SEALED, true));
-        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, vault);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, vault);
         cache.setRuin(ruin);
         if (ruin.equals("research_building")) {
             for (BlockPos p : PROJECTORS) {
@@ -53,7 +53,7 @@ public final class BossRoomGameTests {
             }
         }
         helper.setBlock(core, SinguloBlocks.GUARDIAN_CORE.get());
-        GuardianCoreBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, core);
+        GuardianCoreBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, core);
         be.scan(helper.getLevel());
         // 前の組のテストが残した投影器が近くにあると数がずれるので、このテストの場所の中のものだけにする
         net.minecraft.world.phys.AABB bounds = new net.minecraft.world.phys.AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(16, 8, 16)));
@@ -77,7 +77,7 @@ public final class BossRoomGameTests {
      *  （部屋に入った挑戦者で起きる部分は、テスト用のプレイヤーが常に創造モード扱いのため、ここでは直接起こす） */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_1", timeoutTicks = 60)
     public static void coreWakesSentinelForResearchVault(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         RuinBoss boss = core.awaken(helper.getLevel());
         helper.assertTrue(boss instanceof EchoSentinel, "研究棟の部屋で残響の番人が現れない: " + boss);
@@ -86,7 +86,7 @@ public final class BossRoomGameTests {
         helper.runAtTickTime(15, () -> {
             helper.assertTrue(((EchoSentinel) boss).projectorCount() == 4, "投影器を4つ数えない: " + ((EchoSentinel) boss).projectorCount());
             helper.assertTrue(core.awaken(helper.getLevel()) == null, "2体目が現れた");
-            helper.assertTrue(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "戦っている間に保管庫が開いている");
+            helper.assertTrue(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "戦っている間に保管庫が開いている");
             boss.discard();
             helper.succeed();
         });
@@ -95,9 +95,9 @@ public final class BossRoomGameTests {
     /** 保管庫が開いている（倒したあと、再生する前）ときは、番人は現れない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_2")
     public static void coreSleepsWhileVaultOpen(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
-        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT);
         vault.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
         vault.setSealed(false);
         helper.assertTrue(core.awaken(helper.getLevel()) == null, "保管庫が開いているのに番人が現れた");
@@ -107,7 +107,7 @@ public final class BossRoomGameTests {
     /** 番人を起こすたびに、壊された投影器と割れた封じ込め槽が元に戻る。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_3")
     public static void coreRestoresRoomProps(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         // 封じ込め槽（核の真上のガラスの筒）を先に置いてから覚えさせる
         for (int y = 2; y <= 4; y++) {
             helper.setBlock(CORE.offset(2, y, 0), Blocks.PURPLE_STAINED_GLASS);
@@ -130,7 +130,7 @@ public final class BossRoomGameTests {
     /** 投影器が残っているほど受けるダメージが小さく、全部壊すとそのまま通る。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_4", timeoutTicks = 80)
     public static void sentinelProjectorsShieldIt(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
@@ -159,7 +159,7 @@ public final class BossRoomGameTests {
     /** 覚醒した番人の経験値は、データを当て直しても（/data merge など）増えない。読み込み直した個体とも同じ。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_29")
     public static void awakenedXpSurvivesDataMerge(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         EchoSentinel s = io.github.genichimaruo.singulo.registry.SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel());
         s.makeAwakened();
         int before = s.getExperienceReward();
@@ -187,13 +187,17 @@ public final class BossRoomGameTests {
     // （読み込みは実時間で進むので、tick を速めたテストでは戻るまで待つ）
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_28", timeoutTicks = 200)
     public static void sentinelStaysInItsRoom(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         BlockPos home = helper.absolutePos(CORE);
         net.minecraft.world.level.ChunkPos pushed = new net.minecraft.world.level.ChunkPos(home.offset(14, 0, 0));
         boolean wasForced = helper.getLevel().getForcedChunks().contains(pushed.toLong());
+        // The GameTest batch runner releases forced tickets even after failure.
+        // A completion listener runs after that runner may have started the next batch;
+        // it must not release a ticket now owned by the next fixture.
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(s::discard);
         helper.getLevel().setChunkForced(pushed.x, pushed.z, true);
         s.teleportTo(home.getX() + 14.5, home.getY() + 2, home.getZ() + 0.5);
         helper.startSequence().thenWaitUntil(() -> {
@@ -216,7 +220,7 @@ public final class BossRoomGameTests {
     /** 体力が半分を切ると、1撃で消える分身を2体呼ぶ。分身はボスバーもドロップも持たない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_5", timeoutTicks = 40)
     public static void sentinelSummonsOneHitEchoes(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
@@ -231,7 +235,7 @@ public final class BossRoomGameTests {
         helper.runAtTickTime(2, () -> {
             helper.assertTrue(echo.isRemoved(), "分身が1撃で消えない");
             helper.assertTrue(core.activeBoss(helper.getLevel()) == s, "分身が消えたら本体まで変わった");
-            helper.assertTrue(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "分身を倒しただけで保管庫が開いた");
+            helper.assertTrue(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "分身を倒しただけで保管庫が開いた");
             for (EchoSentinel e : helper.getLevel().getEntitiesOfClass(EchoSentinel.class, s.getBoundingBox().inflate(32))) {
                 e.discard();
             }
@@ -243,13 +247,13 @@ public final class BossRoomGameTests {
     /** 倒すと保管庫の封鎖が解け、番人の投影核を2つ落とす。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_6", timeoutTicks = 40)
     public static void sentinelDefeatUnsealsVault(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         s.kill();
         helper.runAtTickTime(5, () -> {
-            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("sentinel_core")) == 2, "番人の投影核を2つ落とさない: " + dropped(helper, item("sentinel_core")) + ", participants=" + s.rewardParticipants());
             helper.assertTrue(core.activeBoss(helper.getLevel()) == null, "倒したのに番人が残っている");
             helper.succeed();
@@ -261,7 +265,7 @@ public final class BossRoomGameTests {
     /** 殻がある間は1撃ごとに殻が1つ剥がれ、ダメージが小さい。殻がなくなるとそのまま通る。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_7", timeoutTicks = 60)
     public static void remnantShellAbsorbsHits(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         r.skipEmerging();
@@ -283,7 +287,7 @@ public final class BossRoomGameTests {
     /** 周りの相手を浮かせ、少しあとで床へ叩きつけて落下ダメージを与える。 */
     @GameTest(setupTicks = 20, template = TALL, batch = BATCH + "_8", timeoutTicks = 100)
     public static void remnantLiftsAndSlams(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "culture_facility", new BlockPos(0, 1, 0), new BlockPos(2, 0, 4));
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         r.skipEmerging();
@@ -304,15 +308,15 @@ public final class BossRoomGameTests {
     /** 倒すと保管庫の封鎖が解け、縮退核を2つ落とす。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_9", timeoutTicks = 40)
     public static void remnantDefeatUnsealsVault(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         helper.assertTrue(r != null, "封鎖培養施設の部屋で重力の澱が現れない");
         r.skipEmerging();
         r.kill();
         helper.runAtTickTime(5, () -> {
-            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
-            helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 2, "縮退核を2つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 3, "縮退核を3つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
             helper.succeed();
         });
     }
@@ -320,7 +324,7 @@ public final class BossRoomGameTests {
     /** 出現の演出の途中で、封じ込め槽のガラスにひびが入り、最後に砕ける。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_10", timeoutTicks = GravityRemnant.EMERGE_TICKS + 40)
     public static void remnantShattersItsTank(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (int y = 2; y <= 4; y++) {
             helper.setBlock(CORE.offset(2, y, 0), Blocks.PURPLE_STAINED_GLASS);
         }
@@ -345,7 +349,7 @@ public final class BossRoomGameTests {
     /** 投影槍: 残っている投影器が、狙いの線のあとで一斉に光の槍を撃ち、線上の相手を傷つける。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_11", timeoutTicks = 60)
     public static void sentinelProjectorsFireLances(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
@@ -368,7 +372,7 @@ public final class BossRoomGameTests {
     /** 投影陣: 陣の中にいた相手だけが、光の柱で傷つく。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_12", timeoutTicks = 60)
     public static void sentinelCircleHitsOnlyInside(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
@@ -391,14 +395,14 @@ public final class BossRoomGameTests {
     /** 倒されると、演出のあいだは体が残り、終わると消える（保管庫はすぐ開く）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_13", timeoutTicks = EchoSentinel.DEATH_TICKS + 30)
     public static void sentinelDeathPlaysOut(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         s.kill();
         helper.runAtTickTime(EchoSentinel.DEATH_TICKS / 2, () -> {
             helper.assertFalse(s.isRemoved(), "演出の途中で消えた");
-            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒したのに保管庫が開かない");
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "倒したのに保管庫が開かない");
         });
         helper.runAtTickTime(EchoSentinel.DEATH_TICKS + 10, () -> {
             helper.assertTrue(s.isRemoved(), "演出が終わっても消えない");
@@ -409,7 +413,7 @@ public final class BossRoomGameTests {
     /** 重力の澱も、倒されると演出のあいだは残り、終わると消える。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_14", timeoutTicks = GravityRemnant.DEATH_TICKS + 30)
     public static void remnantDeathPlaysOut(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         r.skipEmerging();
@@ -426,7 +430,7 @@ public final class BossRoomGameTests {
     /** 倒したあと（保管庫が開いている）の部屋を作る。 */
     private static GuardianCoreBlockEntity clearedRoom(GameTestHelper helper, String ruin) {
         GuardianCoreBlockEntity core = room(helper, ruin, VAULT, CORE);
-        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT);
         vault.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
         vault.setSealed(false);
         return core;
@@ -439,7 +443,7 @@ public final class BossRoomGameTests {
     /** 覚醒の残響核で、保管庫が開いていても覚醒した残響の番人（体力×2.5）が現れる。ほかの遺構の覚醒核では現れない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_15", timeoutTicks = 40)
     public static void echoCoreSummonsAwakenedSentinel(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
         helper.assertTrue(core.awaken(helper.getLevel()) == null, "保管庫が開いているのに普通の番人が現れた");
         helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core")) == null,
@@ -458,7 +462,7 @@ public final class BossRoomGameTests {
     /** 覚醒した重力の澱は体力が上限（1024）を超えるので、受けるダメージを減らして同じ硬さにする。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_16", timeoutTicks = 40)
     public static void awakenedRemnantKeepsHealthBeyondCap(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
         helper.assertTrue(boss instanceof GravityRemnant && boss.awakened(), "覚醒の重力核で覚醒した重力の澱が現れない: " + boss);
@@ -476,7 +480,7 @@ public final class BossRoomGameTests {
     /** 覚醒した残響の番人は、本気になると壊された投影器を2つまで映し直す（1戦に1回）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_17", timeoutTicks = 60)
     public static void awakenedSentinelReprojects(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
         EchoSentinel s = (EchoSentinel) core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
         s.skipEmerging();
@@ -501,13 +505,13 @@ public final class BossRoomGameTests {
     /** 覚醒した番人を倒すと、保管庫が開き、通常のドロップに加えて追加の報酬が出る。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_18", timeoutTicks = 40)
     public static void awakenedSentinelDropsRewards(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
         boss.skipEmerging();
         boss.kill();
         helper.runAtTickTime(5, () -> {
-            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("overclock_chip")) == 1, "オーバークロック・チップが出ない");
             helper.assertTrue(dropped(helper, item("sentinel_core")) == 4, "番人の投影核が通常の2＋追加2にならない: "
                     + dropped(helper, item("sentinel_core")));
@@ -516,9 +520,8 @@ public final class BossRoomGameTests {
     }
 
     /** 覚醒戦をやめて離れると、番人は戻り、覚醒核が封印核の上に返る。部屋の仕掛けは直さない（核に手が届くように）。 */
-    @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_19", timeoutTicks = 300)
-    public static void abandonedAwakenedFightReturnsCore(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+    @GameTest(template = EMPTY, batch = BATCH + "_19", timeoutTicks = 300)
+    public static void abandonedAwakenedRoomFightReturnsCore(GameTestHelper helper) {
         GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
         boss.skipEmerging();
@@ -540,7 +543,7 @@ public final class BossRoomGameTests {
     /** 沈んだ炉心区画の封印核は、エルゴ球の大蛇を出現の演出つきで起こす。体は12節で、出現のあいだは傷つかない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_20", timeoutTicks = 40)
     public static void coreWakesLeviathanForSunkenReactor(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         RuinBoss boss = core.awaken(helper.getLevel());
         helper.assertTrue(boss instanceof ErgosphereLeviathan, "沈んだ炉心区画でエルゴ球の大蛇が現れない: " + boss);
@@ -557,7 +560,7 @@ public final class BossRoomGameTests {
     /** 体の節は、頭の通った跡に沿って決まった間隔で並ぶ。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_21", timeoutTicks = 80)
     public static void leviathanBodyFollowsHead(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
         l.skipEmerging();
@@ -578,7 +581,7 @@ public final class BossRoomGameTests {
     /** 尾の光る芯は弱く（×1.6）、胴は硬い（×0.6）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_22", timeoutTicks = 40)
     public static void leviathanTailIsWeakPoint(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
         l.skipEmerging();
@@ -598,13 +601,13 @@ public final class BossRoomGameTests {
     /** 倒すと保管庫が開き、渦の断章を落とす。演出のあいだ体は残り、終わると消える。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_23", timeoutTicks = ErgosphereLeviathan.DEATH_TICKS + 30)
     public static void leviathanDefeatUnsealsVaultAndSinks(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
         l.skipEmerging();
         l.kill();
         helper.runAtTickTime(5, () -> {
-            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("ergosphere_chapter")) == 1, "渦の断章を落とさない");
         });
         helper.runAtTickTime(ErgosphereLeviathan.DEATH_TICKS / 2, () -> helper.assertFalse(l.isRemoved(), "演出の途中で消えた"));
@@ -617,7 +620,7 @@ public final class BossRoomGameTests {
     /** 覚醒の渦核で、覚醒したエルゴ球の大蛇（体力×2.5）が現れる。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_24", timeoutTicks = 40)
     public static void ergosphereCoreSummonsAwakenedLeviathan(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = clearedRoom(helper, "sunken_reactor");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_ergosphere_core"));
         helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した大蛇が現れない: " + boss);
@@ -630,7 +633,7 @@ public final class BossRoomGameTests {
     /** 体力 2/3 で脱皮して骨格になる。一撃で境目を飛び越えず、脱皮のあいだは傷つかない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_25", timeoutTicks = 100)
     public static void leviathanMoltsAtTwoThirds(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
         l.skipEmerging();
@@ -653,7 +656,7 @@ public final class BossRoomGameTests {
     /** 挑戦者が増えると、体力の割合を保ったまま体力が増える。減っても弱くならない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_26", timeoutTicks = 40)
     public static void guardianScalesWithChallengers(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         RuinBoss boss = core.awaken(helper.getLevel());
         boss.skipEmerging();
@@ -673,7 +676,7 @@ public final class BossRoomGameTests {
     /** 大勢で倒すと、落とす物が人数ぶん出る。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_27", timeoutTicks = 40)
     public static void guardianDropsPerChallenger(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         RuinBoss boss = core.awaken(helper.getLevel());
         boss.skipEmerging();

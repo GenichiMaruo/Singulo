@@ -19,7 +19,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class ForgeCompatibilityGameTests {
     @GameTest(setupTicks = 20, template = "empty")
     public static void capabilitySurvivesInvalidationAndRevival(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, io.github.genichimaruo.singulo.registry.SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         var blockEntity = helper.getLevel().getBlockEntity(helper.absolutePos(pos));
@@ -35,7 +35,7 @@ public final class ForgeCompatibilityGameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void flightIsGrantedAndRevokedWithoutRemovingOtherFlight(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var player = TestBuild.mockPlayer(helper);
         try {
             player.setGameMode(GameType.SURVIVAL);
@@ -59,7 +59,7 @@ public final class ForgeCompatibilityGameTests {
 
     @GameTest(setupTicks = 20, template = "empty", timeoutTicks = 20)
     public static void explosionResistanceSuppressesImpulse(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 3, 3));
         zombie.setNoAi(true);
         zombie.setNoGravity(true);

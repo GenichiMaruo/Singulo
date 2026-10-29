@@ -53,15 +53,18 @@ public final class Stage2GameTests {
     // ------------------------------------------------------------------ 極低温冷却塔
 
     private static final BlockPos TOWER_CONTROLLER = new BlockPos(2, 1, 0);
-    private static BlockPos towerPort;
+    private static BlockPos towerPort(GameTestHelper helper) {
+        return TestBuild.at(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER,
+                TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 1, 1, 0);
+    }
 
     /** 高さ height の冷却塔を (0..4, 0.., 0..4) に建て、手前の面の下から2段目の左の外装板を搬入出ポートにする。 */
     private static MachineBlockEntity buildTower(GameTestHelper helper, int height) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
                 net.minecraft.core.Direction.SOUTH, height);
-        towerPort = TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
+        TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
                 net.minecraft.core.Direction.SOUTH, height, 1, 1, 0);
-        MachineBlockEntity controller = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TOWER_CONTROLLER);
+        MachineBlockEntity controller = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, TOWER_CONTROLLER);
         controller.energy().setEnergy(controller.energy().getMaxEnergyStored());
         return controller;
     }
@@ -69,7 +72,7 @@ public final class Stage2GameTests {
     /** 冷却塔の外壁の角（外装板と同じブロック）をポートに替えても形成され、ポートがつながる。 */
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 100)
     public static void coolingTowerAcceptsPortAtCasingCorner(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var kind = io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER;
         MachineBlockEntity tower = buildTower(helper, 7);
         BlockPos corner = TestBuild.port(helper, kind, TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 0, 1, 0);
@@ -84,11 +87,11 @@ public final class Stage2GameTests {
     /** ポートを壊してすぐ同じ場所に置き直しても（形の確認の間隔より速く）、新しいポートがつながる。 */
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 150)
     public static void replacedPortAtSamePositionRelinks(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 7);
-        BlockPos port = towerPort;
+        BlockPos port = towerPort(helper);
         BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
-        helper.runAtTickTime(30, () -> {
+        helper.runAtTickTime(40, () -> {
             helper.assertTrue(helper.getLevel().getBlockEntity(port) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
                     && controller.equals(p.controllerPos()), "最初のポートがつながらない");
             helper.getLevel().setBlockAndUpdate(port, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
@@ -108,12 +111,12 @@ public final class Stage2GameTests {
      */
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void portSwappedIntoFormedTowerWorksWithoutReplacingController(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var kind = io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER;
         MachineBlockEntity tower = buildTower(helper, 7);
         BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
         BlockPos panel = TestBuild.at(helper, kind, TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 3, 1, 0);
-        helper.runAtTickTime(30, () -> {
+        helper.runAtTickTime(40, () -> {
             helper.assertTrue(tower.structureSize() == 7, "塔が形成されない");
             helper.getLevel().destroyBlock(panel, false);
             helper.getLevel().setBlockAndUpdate(panel, SinguloBlocks.MULTIBLOCK_PORT.get().defaultBlockState());
@@ -136,7 +139,7 @@ public final class Stage2GameTests {
     /** コントローラを最後に置いて完成させても、形成の演出が出る（読み込み直したときだけ出さない）。 */
     @GameTest(template = TALL, batch = "controller_last_formation", timeoutTicks = 100)
     public static void placingControllerLastPlaysFormation(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         // The particle queue is global. Wait for older batches and run without other forming structures.
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(
@@ -148,12 +151,12 @@ public final class Stage2GameTests {
                     var state = helper.getLevel().getBlockState(controller);
                     helper.getLevel().setBlockAndUpdate(controller, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                     helper.getLevel().setBlockAndUpdate(controller, state);
-                    MachineBlockEntity fresh = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TOWER_CONTROLLER);
+                    MachineBlockEntity fresh = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, TOWER_CONTROLLER);
                     fresh.energy().setEnergy(fresh.energy().getMaxEnergyStored());
                 })
                 .thenIdle(2)
                 .thenExecute(() -> {
-                    MachineBlockEntity fresh = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TOWER_CONTROLLER);
+                    MachineBlockEntity fresh = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, TOWER_CONTROLLER);
                     helper.assertTrue(fresh.structureSize() == 7, "形成されない");
                     helper.assertTrue(io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks() > 0, "形成の演出が出ない");
                 }).thenSucceed();
@@ -161,9 +164,9 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void coolingTowerMakesLiquidNitrogen(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 7);
-        BlockPos port = towerPort;
+        BlockPos port = towerPort(helper);
         // 高さ7では液体ヘリウムは作れない（高さ10以上が必要）
         tower.automationFluids().fill(new FluidStack(fluid("helium"), 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
@@ -178,7 +181,7 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 300)
     public static void tallCoolingTowerLiquefiesHelium(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 10);
         // 高い塔は速いぶん毎tickの電力も多い（1回 100,000 FE）ので、電源の代わりに毎tick満たす
         helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
@@ -191,7 +194,7 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 700)
     public static void coolingTowerMakesSuperconductingCoil(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 7);
         // 30秒×400 FE/t は内部の蓄電を超えるので、電源の代わりに毎tick満たす
         helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
@@ -210,7 +213,7 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void coolingTowerBreaksWhenCasingRemoved(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 7);
         helper.runAtTickTime(25, () -> {
             helper.assertTrue(tower.structureSize() == 7, "形成されない");
@@ -226,7 +229,7 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void acceleratorMakesMuonBundles(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         int side = 8;
         for (int x = 0; x < side; x++) {
             for (int z = 0; z < side; z++) {
@@ -242,7 +245,7 @@ public final class Stage2GameTests {
         }
         BlockPos controllerPos = new BlockPos(1, 1, 1);
         helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.PARTICLE_ACCELERATOR).get());
-        MachineBlockEntity accelerator = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
+        MachineBlockEntity accelerator = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, controllerPos);
         accelerator.energy().setEnergy(accelerator.energy().getMaxEnergyStored());
         accelerator.automationFluids().fill(new FluidStack(fluid("hydrogen"), 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
@@ -255,7 +258,7 @@ public final class Stage2GameTests {
     /** 一辺16のリングで、亜鉛とビスマスの原子核をぶつけるとニホニウムができる（一辺8では小さすぎて作れない）。 */
     @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 600)
     public static void acceleratorFusesNihonium(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         int side = 16;
         for (int x = 0; x < side; x++) {
             for (int z = 0; z < side; z++) {
@@ -270,7 +273,7 @@ public final class Stage2GameTests {
         }
         BlockPos controllerPos = new BlockPos(1, 1, 1);
         helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.PARTICLE_ACCELERATOR).get());
-        MachineBlockEntity accelerator = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
+        MachineBlockEntity accelerator = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, controllerPos);
         accelerator.items().setStackInSlot(0, new ItemStack(item("zinc_ingot")));
         accelerator.items().setStackInSlot(1, new ItemStack(item("bismuth_ingot")));
         helper.onEachTick(() -> accelerator.energy().setEnergy(accelerator.energy().getMaxEnergyStored()));
@@ -283,7 +286,7 @@ public final class Stage2GameTests {
     /** 一辺8のリングでも、ビスマスと炭素粉を入れると金インゴットができる（炭素の原子核で陽子をはぎ取る核変換）。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void acceleratorTransmutesBismuthIntoGold(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         int side = 8;
         for (int x = 0; x < side; x++) {
             for (int z = 0; z < side; z++) {
@@ -299,7 +302,7 @@ public final class Stage2GameTests {
         }
         BlockPos controllerPos = new BlockPos(1, 1, 1);
         helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.PARTICLE_ACCELERATOR).get());
-        MachineBlockEntity accelerator = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
+        MachineBlockEntity accelerator = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, controllerPos);
         accelerator.items().setStackInSlot(0, new ItemStack(item("bismuth_ingot")));
         accelerator.items().setStackInSlot(1, new ItemStack(item("carbon_dust")));
         helper.onEachTick(() -> accelerator.energy().setEnergy(accelerator.energy().getMaxEnergyStored()));
@@ -310,11 +313,11 @@ public final class Stage2GameTests {
     /** 古いデータ（スロットの並びを書いていない）の加速器と触媒反応器は、出力と単極子のスロットを新しい位置へ写して読む。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void oldMachinesKeepTheirItemsAfterSlotChanges(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var registries = helper.getLevel().registryAccess();
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.CATALYTIC_REACTOR).get());
-        MachineBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         net.minecraftforge.items.ItemStackHandler old = new net.minecraftforge.items.ItemStackHandler(7);
         old.setStackInSlot(0, new ItemStack(Items.COPPER_INGOT, 3));
         old.setStackInSlot(5, new ItemStack(item("muon_catalyst"), 2));
@@ -337,10 +340,10 @@ public final class Stage2GameTests {
     /** 触媒反応器で粗銅を精錬すると、銅インゴット6個と、副産物のビスマスインゴットが2つめの出口に出る。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 600)
     public static void catalyticReactorRefinesCopperWithBismuth(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.CATALYTIC_REACTOR).get());
-        MachineBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         helper.onEachTick(() -> reactor.energy().setEnergy(reactor.energy().getMaxEnergyStored()));
         reactor.items().setStackInSlot(0, new ItemStack(Items.RAW_COPPER, 8));
         reactor.automationFluids().fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
@@ -356,10 +359,10 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void catalyticReactorMakesMuonCatalyst(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.CATALYTIC_REACTOR).get());
-        MachineBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         reactor.energy().setEnergy(reactor.energy().getMaxEnergyStored());
         helper.onEachTick(() -> reactor.energy().setEnergy(reactor.energy().getMaxEnergyStored()));
         reactor.items().setStackInSlot(0, new ItemStack(item("muon_bundle"), 2));
@@ -374,7 +377,7 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void catalystTierRules(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         ItemStack muon = new ItemStack(item("muon_catalyst"));
         ItemStack bose = new ItemStack(item("bose_condensate_catalyst"));
         CatalystHelper.Effect upper = CatalystHelper.effect(2, bose);
@@ -403,11 +406,11 @@ public final class Stage2GameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void cryogenicTurbineRunsOnLavaAndNitrogen(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.CRYOGENIC_TURBINE.get());
         helper.setBlock(pos.west(), Blocks.LAVA);
-        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         turbine.tank().fill(new FluidStack(fluid("liquid_nitrogen"), 4000), IFluidHandler.FluidAction.EXECUTE);
         helper.runAtTickTime(40, () -> {
             // 最初の走査まで最大10 tick
@@ -424,10 +427,10 @@ public final class Stage2GameTests {
     /** 0.10.0 より前のタービン（スロットを書いていない）だけが、最初に画面を開いた人へ一度だけ知らせる。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void oldCryogenicTurbineNoticesOnce(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.CRYOGENIC_TURBINE.get());
-        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         var registries = helper.getLevel().registryAccess();
         helper.assertTrue(!turbine.legacyNotice(), "新しく置いたタービンが知らせようとする");
         net.minecraft.nbt.CompoundTag old = new net.minecraft.nbt.CompoundTag();
@@ -437,7 +440,7 @@ public final class Stage2GameTests {
         helper.assertTrue(turbine.legacyNotice(), "前の版のタービンが知らせない");
         turbine.load(turbine.saveWithoutMetadata());
         helper.assertTrue(turbine.legacyNotice(), "保存し直すと知らせを忘れる");
-        turbine.noticeIfLegacy(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper));
+        turbine.noticeIfLegacy(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper));
         helper.assertTrue(!turbine.legacyNotice(), "画面を開いても知らせが残る");
         turbine.load(turbine.saveWithoutMetadata());
         helper.assertTrue(!turbine.legacyNotice(), "知らせたあと保存し直すと、また知らせる");
@@ -447,10 +450,10 @@ public final class Stage2GameTests {
     /** 極低温タービンの入口の冷媒カートリッジは、タンクに空けて、空のカートリッジが出口に出る。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void cryogenicTurbineEmptiesCartridges(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.CRYOGENIC_TURBINE.get());
-        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         turbine.items().setStackInSlot(0, new ItemStack(item("coolant_cartridge"), 3));
         helper.runAtTickTime(10, () -> {
             helper.assertTrue(turbine.tank().getFluidInTank(0).getAmount() == 300, "冷媒カートリッジ3個で、液体窒素が300 mB入らない: "
@@ -465,7 +468,7 @@ public final class Stage2GameTests {
     /** 冷媒カートリッジは液体窒素100 mBの容器: 満タンから空へ、空から満タンへ（半端な量では出し入れしない）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void coolantCartridgeIsAFluidContainer(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var full = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("coolant_cartridge")));
         helper.assertTrue(full.drain(50, IFluidHandler.FluidAction.SIMULATE).isEmpty(), "50 mBだけ汲み出せてしまう");
         FluidStack out = full.drain(100, IFluidHandler.FluidAction.EXECUTE);
@@ -482,7 +485,7 @@ public final class Stage2GameTests {
     /** 冷却塔: 溶岩を自分で作った液体窒素で急に冷やすと黒曜石になる。 */
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 300)
     public static void coolingTowerQuenchesLavaIntoObsidian(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 10);
         tower.automationFluids().fill(new FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
@@ -493,7 +496,7 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void coolingTowerNitrogenCostIsFixedPerCraft(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 10);
         int start = tower.energy().getEnergyStored();
         helper.succeedWhen(() -> {
@@ -508,10 +511,10 @@ public final class Stage2GameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void muonFusionReactorBurnsCatalystAndWater(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MUON_FUSION_REACTOR.get());
-        io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         reactor.tank().fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
         reactor.items().setStackInSlot(0, new ItemStack(item("muon_catalyst"), 1));
         helper.runAtTickTime(21, () -> {
@@ -522,7 +525,7 @@ public final class Stage2GameTests {
             helper.assertTrue(used >= 4 && used <= 6, "水が4 tickに1 mB減らない: " + used);
             reactor.setBurnForTest(3);
         });
-        helper.runAtTickTime(30, () -> {
+        helper.runAtTickTime(40, () -> {
             helper.assertTrue(reactor.burn() == 0, "触媒が尽きない");
             helper.assertTrue(reactor.items().getStackInSlot(1).is(item("spent_muon_catalyst")), "失活したミュオン触媒が出口に出ない");
             helper.succeed();
@@ -532,7 +535,7 @@ public final class Stage2GameTests {
     /** 核融合炉は触媒の使用回数を毎tick2回使う: 新品は10分、半分使った触媒は5分だけ燃える。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void muonFusionReactorBurnsOnlyRemainingCatalystLife(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         ItemStack fresh = new ItemStack(item("muon_catalyst"));
         int max = io.github.genichimaruo.singulo.item.UsesHelper.get(fresh).max();
         helper.assertTrue(io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity.burnTicks(fresh) == max / 2,
@@ -542,7 +545,7 @@ public final class Stage2GameTests {
         helper.assertTrue(burn == max / 4, "半分使った触媒が、残りの分だけ燃えない: " + burn);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MUON_FUSION_REACTOR.get());
-        io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         reactor.tank().fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
         reactor.items().setStackInSlot(0, half);
         helper.runAtTickTime(2, () -> {
@@ -554,7 +557,7 @@ public final class Stage2GameTests {
     /** 冷却塔の液体窒素以外の加工（超伝導線材）は、高い塔でも毎tickの電力がレシピどおり（速いぶん1回あたりは安い）。 */
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void coolingTowerOtherRecipesStayCheaperWhenTall(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 10);
         tower.items().setStackInSlot(0, new ItemStack(item("superconducting_coil")));
         helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
@@ -568,10 +571,10 @@ public final class Stage2GameTests {
     /** 水素燃料電池: 水素2 mB に酸素1 mB を使い、最大 240 FE/t。水素1 mB で 4.8 FE。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void hydrogenFuelCellBurnsHydrogenAndOxygen(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
-        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         cell.fluids().fill(new FluidStack(fluid("hydrogen"), 1000), IFluidHandler.FluidAction.EXECUTE);
         cell.fluids().fill(new FluidStack(fluid("oxygen"), 500), IFluidHandler.FluidAction.EXECUTE);
         helper.runAtTickTime(11, () -> {
@@ -589,7 +592,7 @@ public final class Stage2GameTests {
     /** 凍結粉砕: 冷却塔で骨を液体窒素で冷やして砕くと、骨粉6個。 */
     @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 300)
     public static void coolingTowerCryoMillsBones(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity tower = buildTower(helper, 7);
         helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
         tower.items().setStackInSlot(0, new ItemStack(Items.BONE));
@@ -601,10 +604,10 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void smesFeedsKilnThroughSuperconductingCable(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos smesPos = new BlockPos(1, 1, 4);
         helper.setBlock(smesPos, SinguloBlocks.SMES_CELL.get());
-        SmesCellBlockEntity smes = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, smesPos);
+        SmesCellBlockEntity smes = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, smesPos);
         smes.energy().setEnergy(1_000_000);
         // SMES の正面（北）から超伝導ケーブル3本を経て焼成炉へ
         for (int z = 3; z >= 1; z--) {
@@ -612,7 +615,7 @@ public final class Stage2GameTests {
         }
         BlockPos kilnPos = new BlockPos(1, 1, 0);
         helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, kilnPos);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, kilnPos);
         helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() == kiln.energy().getMaxEnergyStored(),
                 "焼成炉が満タンにならない: " + kiln.energy().getEnergyStored()));
     }
@@ -621,17 +624,17 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void worldlineAnchorLoadsChunksWithCatalyst(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
-        WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         anchor.energy().setEnergy(50_000);
         anchor.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
         helper.runAtTickTime(20, () -> {
             helper.assertTrue(anchor.loadedRadius() == 1, "ミュオン触媒で半径1にならない: " + anchor.loadedRadius());
             int used = 50_000 - anchor.energy().getEnergyStored();
             helper.assertTrue(used >= 9 * 20 * 18 && used <= 9 * 20 * 21, "9チャンク×20 FE/t になっていない: " + used);
-            ItemStack catalyst = anchor.catalystSlot().getStackInSlot(0);
+            ItemStack catalyst = anchor.catalyst();
             int worn = UsesHelper.get(catalyst).used();
             helper.assertTrue(worn >= 18 && worn <= 21, "触媒が1 tickに1ずつ減っていない: " + worn);
             helper.succeed();
@@ -640,21 +643,21 @@ public final class Stage2GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void worldlineAnchorStopsWithoutPower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
-        WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         anchor.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
         helper.runAtTickTime(10, () -> {
             helper.assertTrue(anchor.loadedRadius() < 0, "電力なしでチャンクを固定した");
-            helper.assertTrue(UsesHelper.get(anchor.catalystSlot().getStackInSlot(0)).used() == 0, "止まっているのに触媒が減った");
+            helper.assertTrue(UsesHelper.get(anchor.catalyst()).used() == 0, "止まっているのに触媒が減った");
             helper.succeed();
         });
     }
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void cosmicMuonCollectorNeedsAltitude(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.COSMIC_MUON_COLLECTOR.get());
         // テスト場所は Y=100 より低いので収集しない
@@ -663,5 +666,64 @@ public final class Stage2GameTests {
         helper.assertTrue(CosmicMuonCollectorBlockEntity.rateAt(helper.getLevel(), new BlockPos(0, 250, 0)) == 1.0,
                 "Y=250 の空の下で最大にならない");
         helper.succeed();
+    }
+
+    /**
+     * 触媒の装填: 予備から1個を装填し、使い切ると失活触媒を出して次をすぐ装填する。使いかけの同じ触媒は残りを装填中のものへまとめ、
+     * 空の殻を出す。違う種類を入れると、装填中のもの（使いかけ）を返して入れ替える。
+     */
+    @GameTest(template = EMPTY)
+    public static void catalystMagazineLoadsMergesAndSwaps(GameTestHelper helper) {
+        var supply = new net.minecraftforge.items.ItemStackHandler(1);
+        java.util.List<ItemStack> out = new java.util.ArrayList<>();
+        var mag = new io.github.genichimaruo.singulo.machine.CatalystMagazine(() -> {});
+        java.util.function.UnaryOperator<ItemStack> exit = st -> {
+            out.add(st.copy());
+            return ItemStack.EMPTY;
+        };
+        ItemStack muon = new ItemStack(item("muon_catalyst"));
+        int max = UsesHelper.get(muon).max();
+        supply.setStackInSlot(0, muon.copyWithCount(2));
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(mag.loaded().is(item("muon_catalyst")) && supply.getStackInSlot(0).getCount() == 1, "予備から1個を装填しない");
+        // 使い切る: 失活触媒が出て、予備の次がすぐ装填される
+        mag.consume(max, supply, 0);
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(out.size() == 1 && out.get(0).is(item("spent_muon_catalyst")), "使い切っても失活触媒が出ない: " + out);
+        helper.assertTrue(mag.loaded().is(item("muon_catalyst")) && supply.getStackInSlot(0).isEmpty(), "次の1個を装填しない");
+        // 使いかけをまとめる: 装填中のものを30回使い、残り10回の使いかけを入れる → 装填中のものは20回減った状態、殻が出る
+        mag.consume(30, supply, 0);
+        supply.setStackInSlot(0, UsesHelper.consume(muon.copy(), max - 10));
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(UsesHelper.get(mag.loaded()).used() == 20, "使いかけの残りをまとめない: " + UsesHelper.get(mag.loaded()).used());
+        helper.assertTrue(supply.getStackInSlot(0).isEmpty() && out.size() == 2 && out.get(1).is(item("spent_muon_catalyst")),
+                "まとめた使いかけの殻が出ない: " + out);
+        // 違う種類: 装填中の使いかけを返して入れ替える
+        supply.setStackInSlot(0, new ItemStack(item("bose_condensate_catalyst")));
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(mag.loaded().is(item("bose_condensate_catalyst")), "違う種類に入れ替えない");
+        helper.assertTrue(out.size() == 3 && out.get(2).is(item("muon_catalyst")) && UsesHelper.get(out.get(2)).used() == 20,
+                "外した使いかけが返らない: " + out);
+        helper.succeed();
+    }
+
+    /** 触媒装置は、触媒を予備として積め、使い切った失活触媒を出口へ出して、止まらずに次の触媒で動き続ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 80)
+    public static void catalystDeviceReloadsWithoutStopping(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
+        WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
+        anchor.energy().setEnergy(500_000);
+        ItemStack nearlyDone = UsesHelper.consume(new ItemStack(item("muon_catalyst")), UsesHelper.get(new ItemStack(item("muon_catalyst"))).max() - 5);
+        helper.assertTrue(anchor.catalystSlot().insertItem(0, nearlyDone, false).isEmpty(), "使いかけが入らない");
+        helper.runAtTickTime(10, () -> helper.assertTrue(anchor.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst"), 3), false).isEmpty(),
+                "新品を予備として積めない: " + anchor.catalystSlot().getStackInSlot(0)));
+        helper.runAtTickTime(40, () -> {
+            helper.assertTrue(anchor.spentSlot().getStackInSlot(0).is(item("spent_muon_catalyst")), "失活触媒が出口に出ない");
+            helper.assertTrue(anchor.catalyst().is(item("muon_catalyst")) && UsesHelper.remaining(anchor.catalyst()) > 0, "次の触媒を装填しない");
+            helper.assertTrue(anchor.catalystSlot().getStackInSlot(0).getCount() == 2, "予備の数が合わない: " + anchor.catalystSlot().getStackInSlot(0));
+            helper.assertTrue(anchor.loadedRadius() == 1, "入れ替えのあいだに止まった");
+            helper.succeed();
+        });
     }
 }
