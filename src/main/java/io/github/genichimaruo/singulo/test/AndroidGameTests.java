@@ -88,6 +88,10 @@ public final class AndroidGameTests {
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity s = helper.getBlockEntity(STATION);
         s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
+        // 持ち主のいないステーションは、24ブロック以内の持ち主のいない身寄りのない護衛を見つけると、リンクを待って印刷しない。
+        // となりで並んで動くテストが置いていった護衛で止まらないよう、テストの場所から決まる持ち主にする（置き直しても同じ）。
+        s.setOwner(java.util.UUID.nameUUIDFromBytes(("android-station-test" + helper.absolutePos(BlockPos.ZERO))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_MEMORY, new ItemStack(item(AndroidKind.BLADE.memoryId())));
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_KIT, new ItemStack(item("android_kit"), kits));
         return s;
@@ -1183,8 +1187,7 @@ public final class AndroidGameTests {
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
         helper.onEachTick(() -> {
-            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                    new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(12))) {
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, helper.getBounds())) {
                 dropped.merge(e.getItem().getHoverName().getString(), e.getItem().getCount(), Integer::sum);
                 e.discard();
             }
@@ -1228,8 +1231,7 @@ public final class AndroidGameTests {
                 }
             }
             used[0] |= !wb.bufferEmpty();
-            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                    new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(12))) {
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, helper.getBounds())) {
                 dropped.merge(e.getItem().getHoverName().getString(), e.getItem().getCount(), Integer::sum);
                 e.discard();
             }
@@ -1382,6 +1384,9 @@ public final class AndroidGameTests {
         floor(helper);
         var console = workshop(helper, 4);
         AndroidStationBlockEntity s = station(helper, 1);
+        // 注文する人をステーションの持ち主にする（印刷された護衛は、持ち主の注文を受ける）
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        s.setOwner(player.getUUID());
         int[] lowPower = {0};
         int[] last = {-1};
         boolean[] ordered = {false}, charged = {false};
@@ -1397,7 +1402,7 @@ public final class AndroidGameTests {
                 CompoundTag saved = a.saveWithoutId(new CompoundTag());
                 saved.putInt("charge", 25);                        // 2回作ると切れる
                 a.load(saved);
-                var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 16,
                         List.of(a.getUUID()), helper.absolutePos(DELIVERY));
                 helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
             }
@@ -1499,15 +1504,20 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
-    /** 「預ける」: 近くのチェストまで行って、持ち物を入れる。近くに箱がなければ行かない。 */
+    /**
+     * 「預ける」: 近くのチェストまで行って、持ち物を入れる。近くに箱がなければ行かない。
+     * 箱を探す範囲（横12・縦4）には、となりのテストの場所のチェストも入りうるので、「箱がない」場合は、どのテストの場所の
+     * 高さよりも上（30ブロック上の宙）で確かめてから、テストの場所に戻して、置いたチェストへ預けに行かせる。
+     */
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void androidStashesIntoNearbyChest(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         a.makeGuard(null, helper.absolutePos(new BlockPos(1, 1, 1)), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 30, 2))));
         helper.getLevel().addFreshEntity(a);
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 12));
         helper.assertTrue(a.requestStash() != null, "近くに箱がないのに、預けに行くことになった");
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.setBlock(new BlockPos(5, 1, 2), net.minecraft.world.level.block.Blocks.CHEST);
         helper.assertTrue(a.requestStash() == null, "近くのチェストへ預けに行かない");
         helper.succeedWhen(() -> {
@@ -2410,7 +2420,7 @@ public final class AndroidGameTests {
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         boolean[] dropped = {false};
         helper.onEachTick(() -> dropped[0] |= !level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(10)).isEmpty());
+                helper.getBounds()).isEmpty());
         helper.succeedWhen(() -> {
             helper.assertFalse(dropped[0], "持ち物からあふれた物が足元に落ちた");
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");

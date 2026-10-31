@@ -246,7 +246,7 @@ public final class DroneGameTests {
             int left = DroneCrateItem.contents(crate).get(0).getCount();
             h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.STONE) == 9 * 64 && left == 64 - 36,
                     "Overflow mishandled: left " + left);
-            h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(h.absolutePos(BlockPos.ZERO)).inflate(10)).isEmpty(),
+            h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class, h.getBounds()).isEmpty(),
                     "Something was dropped");
             h.succeed();
         });

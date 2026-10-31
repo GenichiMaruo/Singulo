@@ -100,9 +100,11 @@ neoForge {
 
 // GameTest は毎回まっさらなワールドで走らせる。テストは実行ごとに新しい場所に組まれ、前の回の場所はワールドに残る
 // （世界線アンカーが読み込み続けるチャンクの反応炉・ワームホールなどが動き続け、回を重ねるほど遅く・不安定になる）。
+// サーバー設定もワールドの外（config/）に残るので消す。古い版の設定（前の既定値）が残ると、CI（まっさらな状態）と違う値で走る。
 var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
     delete layout.projectDirectory.dir('build/gametest/world')
     delete layout.projectDirectory.dir('build/reports/gametest')
+    delete layout.projectDirectory.file('build/gametest/config/singulo-server.toml')
 }
 tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     dependsOn cleanGameTestWorld
