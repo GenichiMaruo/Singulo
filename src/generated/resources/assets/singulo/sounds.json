@@ -1481,6 +1481,122 @@
       }
     ]
   },
+  "drone.rotor": {
+    "subtitle": "subtitles.singulo.drone.rotor",
+    "sounds": [
+      {
+        "name": "singulo:drone/rotor",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "drone.print": {
+    "subtitle": "subtitles.singulo.drone.print",
+    "sounds": [
+      {
+        "name": "singulo:drone/print_1",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "singulo:drone/print_2",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "singulo:drone/print_3",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "drone.print_start": {
+    "subtitle": "subtitles.singulo.drone.print_start",
+    "sounds": [
+      {
+        "name": "singulo:drone/print_start",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "drone.printed": {
+    "subtitle": "subtitles.singulo.drone.printed",
+    "sounds": [
+      {
+        "name": "singulo:drone/printed",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "drone.arm_retract": {
+    "subtitle": "subtitles.singulo.drone.arm_retract",
+    "sounds": [
+      {
+        "name": "singulo:drone/arm_retract",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "drone.dismantle": {
+    "subtitle": "subtitles.singulo.drone.dismantle",
+    "sounds": [
+      {
+        "name": "singulo:drone/dismantle",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "drone_port.hatch_open": {
+    "subtitle": "subtitles.singulo.drone_port.hatch_open",
+    "sounds": [
+      {
+        "name": "singulo:drone_port/hatch_open",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "drone_port.hatch_close": {
+    "subtitle": "subtitles.singulo.drone_port.hatch_close",
+    "sounds": [
+      {
+        "name": "singulo:drone_port/hatch_close",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "drone_port.lift": {
+    "subtitle": "subtitles.singulo.drone_port.lift",
+    "sounds": [
+      {
+        "name": "singulo:drone_port/lift",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "drone_port.clamp": {
+    "subtitle": "subtitles.singulo.drone_port.clamp",
+    "sounds": [
+      {
+        "name": "singulo:drone_port/clamp",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "drone_port.pack": {
+    "subtitle": "subtitles.singulo.drone_port.pack",
+    "sounds": [
+      {
+        "name": "singulo:drone_port/pack",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "drone_port.arrive": {
+    "subtitle": "subtitles.singulo.drone_port.arrive",
+    "sounds": [
+      {
+        "name": "singulo:drone_port/arrive",
+        "attenuation_distance": 16
+      }
+    ]
+  },
   "ergosphere_leviathan.drone": {
     "sounds": [
       {

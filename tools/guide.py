@@ -1123,12 +1123,12 @@ CHAPTERS = [
         ('start', 'ドローンを用意する',
          '遺構の警備機ドックが出した警備ドローンの一波を全部倒すと、ときどき（40%）ドックの上にドローン用クリスタルメモリが出ます。'
          '段階2の作業台でドローン・ステーションを、精密組立台でドローンキットを作ります。ステーションにメモリ（減らない）とキット（印刷ごとに1つ）を入れて'
-         '電力を送ると、上に輸送ドローンを1機印刷します（20,000 FE）。生産アップグレードを入れると3機まで。ドローンはステーションの上空で待機します。\n'
+         '電力を送ると、上に輸送ドローンを1機印刷します（20,000 FE）。生産アップグレード1枚につき1機増え、2枚で3機まで。ドローンはステーションの上空で待機します。\n'
          'ドローンはプレイヤーやモブの攻撃では傷つきません。ステーションを壊すと、待機中のドローンはキットに戻ります。',
          'Getting drones',
          'Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. '
          'Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) '
-         'in the station and give it power: it prints a cargo drone on top (20,000 FE). A Production Upgrade allows up to 3. Drones wait in the air above the station.\n'
+         'in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\n'
          'Drones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.'),
         ('send', '荷物を送る',
          'ドローン発着ポートを置くと、置いた人の輸送網に入ります（同じディメンションの、同じ持ち主のポートが行き先に並ぶ）。ヘッダーの名前をクリックすると名前を付けられます。\n'

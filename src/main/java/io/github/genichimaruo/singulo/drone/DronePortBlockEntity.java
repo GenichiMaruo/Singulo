@@ -62,7 +62,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     public static final double WAIT_LIFT = 0.5;
 
     /** GUI に送る値。 */
-    public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_COST = 3, D_PROBLEM = 4, D_SIDES = 5, D_AUTO = 6, COUNT = 7;
+    public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_COST = 3, D_PROBLEM = 4, D_SIDES = 5, D_AUTO = 6, D_CRATE_SIDES = 7, COUNT = 8;
+    /** 面の設定の種類: 荷物（入出力と自動排出）と、空き箱の搬入（空き箱の欄だけ。入れるか入れないか）。 */
+    public static final int CHANNEL_ITEMS = 0, CHANNEL_CRATES = 1;
     /**
      * 状態: 待機・ドローン待ち・ドローンが向かっている・積み込み中・荷降ろし中・電力不足・空き箱なし・射程外・行き先なし・荷物なし・
      * 近くに呼べるドローンがいない。
@@ -124,6 +126,14 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     private boolean handed;
     /** 面ごとの搬入出と自動排出（受け取りの欄と、空き箱の欄に入りきらなかった空の箱を押し出す）。 */
     private final SideConfig sides = new SideConfig();
+    /** 面ごとの空き箱の搬入（既定はどの面からも入れられる。荷物の面を「無効」にして、ここを「入力」にすると、空き箱専用の面になる）。 */
+    private final SideConfig crateSides = new SideConfig();
+
+    {
+        for (SideConfig.Face f : SideConfig.Face.values()) {
+            crateSides.set(f, SideConfig.INPUT, false);
+        }
+    }
     /** 発送できない理由（PROBLEM_TICKS ごとに計り直す）。 */
     private int cachedProblem = S_IDLE;
     private long problemAt;
@@ -143,6 +153,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         case D_PROBLEM -> currentProblem();
         case D_SIDES -> sides.packed();
         case D_AUTO -> autoMode;
+        case D_CRATE_SIDES -> crateSides.packed();
         default -> 0;
     });
 
@@ -340,7 +351,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         stagedCost = cost;
         flightId = 0;
         if (level != null) {
-            level.playSound(null, worldPosition, SoundEvents.BARREL_CLOSE, SoundSource.BLOCKS, 0.8F, 1.2F);
+            level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.pack"), SoundSource.BLOCKS, 0.8F, 1.0F);
         }
         changedVisible();
         return true;
@@ -479,7 +490,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         animTier = tier;
         animFlight = f.id;
         handed = false;
-        level.playSound(null, worldPosition, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.8F, 0.8F);
+        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.hatch_open"), SoundSource.BLOCKS, 0.8F, 1.0F);
         changedVisible();
     }
 
@@ -531,12 +542,15 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     @Override
     public boolean validChannel(int channel) {
-        return channel == 0;
+        return channel == CHANNEL_ITEMS || channel == CHANNEL_CRATES;
     }
 
     /** 自動排出の全体スイッチ（加工装置と同じく、どの面も排出しない設定なら、出せる面をみな排出にする）。 */
     @Override
     public void setEjectEnabled(int channel, boolean on) {
+        if (channel != CHANNEL_ITEMS) {
+            return;                                     // 空き箱の搬入に自動排出はない
+        }
         if (on && java.util.Arrays.stream(SideConfig.Face.values()).noneMatch(f -> sides.canExtract(f) && sides.eject(f))) {
             for (SideConfig.Face face : SideConfig.Face.values()) {
                 if (sides.canExtract(face)) {
@@ -550,7 +564,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     @Override
     public void setSide(int channel, SideConfig.Face face, int mode, boolean eject) {
-        sides.set(face, mode, eject);
+        if (channel == CHANNEL_CRATES) {
+            crateSides.set(face, mode & SideConfig.INPUT, false);
+        } else {
+            sides.set(face, mode, eject);
+        }
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);
@@ -580,9 +598,14 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 return items.getStackInSlot(slot);
             }
 
+            /** 空き箱の欄へは「空き箱の搬入」の面から、荷物の欄へは荷物の「入力」の面から。 */
+            private boolean mayInsert(int slot) {
+                return slot == SLOT_CRATES ? crateSides.canInsert(face) : sides.canInsert(face);
+            }
+
             @Override
             public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                return sides.canInsert(face) ? all.insertItem(slot, stack, simulate) : stack;
+                return mayInsert(slot) ? all.insertItem(slot, stack, simulate) : stack;
             }
 
             @Override
@@ -597,7 +620,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
-                return sides.canInsert(face) && all.isItemValid(slot, stack);
+                return mayInsert(slot) && all.isItemValid(slot, stack);
             }
         };
     }
@@ -698,8 +721,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             changedVisible();
             return;
         }
-        if (t == ANIM_RAISED) {
-            level.playSound(null, worldPosition, SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, 0.5F, 1.4F);
+        if (t == ANIM_OPEN || t == ANIM_HANDOFF + 1) {
+            level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.lift"), SoundSource.BLOCKS, 0.6F, t == ANIM_OPEN ? 1.1F : 0.9F);
+        }
+        if (t == ANIM_LOWERED) {
+            level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.hatch_close"), SoundSource.BLOCKS, 0.8F, 1.0F);
         }
         if (!handed && t >= ANIM_HANDOFF) {
             handed = true;
@@ -715,7 +741,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 f.crate = ItemStack.EMPTY;
             }
             net.changed();
-            level.playSound(null, worldPosition, SoundEvents.CHAIN_PLACE, SoundSource.BLOCKS, 1.0F, 1.6F);
+            level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.clamp"), SoundSource.BLOCKS, 0.9F, anim == ANIM_LOAD ? 1.0F : 0.85F);
             changedVisible();
         }
         if (t >= ANIM_TICKS) {
@@ -725,9 +751,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 net.advance(f, next, now);
             }
             if (next == DroneNetwork.RETURN) {
-                level.playSound(null, worldPosition, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.BLOCKS, 0.8F, 1.5F);
+                level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.arrive"), SoundSource.BLOCKS, 0.8F, 1.0F);
             }
-            level.playSound(null, worldPosition, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.8F, 0.9F);
             changedVisible();
         }
     }
@@ -930,6 +955,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             tag.put("destination", NbtUtils.writeBlockPos(destination));
         }
         tag.putInt("sides", sides.packed());
+        tag.putInt("crate_sides", crateSides.packed());
         tag.putInt("auto", autoMode);
         if (autoTo != null) {
             tag.put("auto_to", NbtUtils.writeBlockPos(autoTo));
@@ -977,6 +1003,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             destination = NbtUtils.readBlockPos(tag, "destination").orElse(null);
             autoMode = Math.floorMod(tag.getInt("auto"), AUTO_THRESHOLDS.length);
             autoTo = NbtUtils.readBlockPos(tag, "auto_to").orElse(null);
+            if (tag.contains("crate_sides")) {
+                crateSides.setPacked(tag.getInt("crate_sides"));
+            }
             if (tag.contains("sides")) {
                 sides.setPacked(tag.getInt("sides"));
             }

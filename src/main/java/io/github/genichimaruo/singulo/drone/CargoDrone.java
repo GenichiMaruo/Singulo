@@ -30,6 +30,11 @@ import net.minecraft.world.phys.Vec3;
  */
 public class CargoDrone extends Mob {
     public static final int PRINT_TICKS = 50;
+    /**
+     * 印刷し終えてから、印刷の腕がステーションの中へしまわれるまで（PRINT はこの分まで数え続ける。解体のときは、ここから数え下ろして
+     * まず腕が伸び、それから上から消えていく）。
+     */
+    public static final int RETRACT_TICKS = 20;
     /** 巡航の高さの余裕（途中の地形と発着点より上）。 */
     static final int CLEARANCE = 4;
     static final double ACCEL = 0.05;
@@ -51,6 +56,9 @@ public class CargoDrone extends Mob {
     @Nullable
     private Vec3 legGoal;
     private double cruiseY;
+    /** クライアント: 印刷の腕を描く場所（印刷していた上面。ドローンが飛び立っても、腕はここでしまわれる）。 */
+    @Nullable
+    public Vec3 armOrigin;
 
     public CargoDrone(EntityType<? extends CargoDrone> type, Level level) {
         super(type, level);
@@ -66,7 +74,7 @@ public class CargoDrone extends Mob {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(PRINT, PRINT_TICKS);
+        builder.define(PRINT, PRINT_TICKS + RETRACT_TICKS);
         builder.define(CRATE, 0);
         builder.define(DOCKED, false);
         builder.define(DISMANTLE, false);
@@ -137,6 +145,11 @@ public class CargoDrone extends Mob {
         return entityData.get(PRINT) >= PRINT_TICKS;
     }
 
+    /** 印刷の数え（0〜PRINT_TICKS が印刷、そのあと RETRACT_TICKS が腕の格納）。 */
+    public int printTicks() {
+        return entityData.get(PRINT);
+    }
+
     /** 印刷の進み（0〜1）。 */
     public float printProgress(float partialTick) {
         int p = entityData.get(PRINT);
@@ -164,7 +177,8 @@ public class CargoDrone extends Mob {
     public void startDismantle() {
         if (printed() && !dismantling()) {
             entityData.set(DISMANTLE, true);
-            playSound(SoundEvents.BEACON_DEACTIVATE, 0.5F, 1.9F);
+            entityData.set(PRINT, PRINT_TICKS + RETRACT_TICKS);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.dismantle"), 0.8F, 1.0F);
         }
     }
 
@@ -232,8 +246,8 @@ public class CargoDrone extends Mob {
             // ステーションの上に降りてから、印刷を逆にたどって上から消える
             if (flyTo(level, Vec3.atBottomCenterOf(station.above()))) {
                 entityData.set(PRINT, print - 1);
-                if (print % 4 == 0) {
-                    playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.3F, 2.0F - print / (float) PRINT_TICKS);
+                if (print < PRINT_TICKS && print % 4 == 0) {
+                    playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.print"), 0.5F, 0.9F + print / (float) PRINT_TICKS * 0.3F);
                 }
                 if (print - 1 <= 0) {
                     if (level.getBlockEntity(station) instanceof DroneStationBlockEntity s) {
@@ -248,12 +262,19 @@ public class CargoDrone extends Mob {
             entityData.set(PRINT, print + 1);
             setDeltaMovement(Vec3.ZERO);
             if (print % 4 == 0) {
-                playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.3F, 1.2F + print / (float) PRINT_TICKS);
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.print"), 0.5F, 0.9F + print / (float) PRINT_TICKS * 0.3F);
             }
             if (print + 1 == PRINT_TICKS) {
-                playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.8F);
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.printed"), 0.8F, 1.0F);
             }
             return;
+        }
+        if (print < PRINT_TICKS + RETRACT_TICKS) {
+            // 印刷の腕がしまわれていく（ドローンはもう飛び立てる）
+            entityData.set(PRINT, print + 1);
+            if (print == PRINT_TICKS) {
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.arm_retract"), 0.6F, 1.0F);
+            }
         }
         DroneNetwork net = DroneNetwork.get(level);
         DroneNetwork.Flight f = flight(net);
@@ -445,7 +466,7 @@ public class CargoDrone extends Mob {
         super.readAdditionalSaveData(tag);
         station = NbtUtils.readBlockPos(tag, "station").orElse(null);
         unit = Mth.clamp(tag.getInt("unit"), 0, DroneStationBlockEntity.MAX_UNITS - 1);
-        entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS) : PRINT_TICKS);
+        entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
         flightId = tag.getLong("flight");
     }
 }

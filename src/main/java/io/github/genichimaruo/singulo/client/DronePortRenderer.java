@@ -73,7 +73,17 @@ public class DronePortRenderer implements BlockEntityRenderer<DronePortBlockEnti
                 : t < DronePortBlockEntity.ANIM_HANDOFF
                 ? ease((t - DronePortBlockEntity.ANIM_OPEN) / (DronePortBlockEntity.ANIM_RAISED - DronePortBlockEntity.ANIM_OPEN))
                 : 1 - ease((t - DronePortBlockEntity.ANIM_HANDOFF) / (DronePortBlockEntity.ANIM_LOWERED - DronePortBlockEntity.ANIM_HANDOFF));
+        // 扉の向きは置いた装置の向きに合わせる（正面から見て左右の縁を軸に開く）
+        pose.pushPose();
+        var state = be.getBlockState();
+        if (state.hasProperty(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING)) {
+            float yaw = 180 - state.getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING).toYRot();
+            pose.translate(0.5, 0, 0.5);
+            pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yaw));
+            pose.translate(-0.5, 0, -0.5);
+        }
         drawDoors(pose, buffers, hinge, sink, lit);
+        pose.popPose();
         float top = FLOOR + (TOP - FLOOR) * rise;
         if (hinge > 0) {
             drawPlatform(pose, buffers, top, lit);

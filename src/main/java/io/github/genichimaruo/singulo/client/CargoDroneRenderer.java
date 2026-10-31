@@ -61,6 +61,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     @Override
     public void render(CargoDrone drone, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float print = drone.printProgress(partialTick);
+        renderArmAtPad(drone, print, partialTick, pose, buffers, light);
         if (print < 1) {
             float plane = pose.last().pose().m31() + print * (drone.getBbHeight() + 0.1F);
             super.render(drone, yaw, partialTick, pose, ClipBuffers.below(buffers, plane), light);
@@ -89,6 +90,66 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
         double dz = drone.getZ() - drone.zo;
         float speed = (float) Math.sqrt(dx * dx + dz * dz);
         pose.mulPose(Axis.XP.rotationDegrees(Math.min(18, speed * 40)));
+    }
+
+    /**
+     * 印刷の腕: ステーションの上面の四隅の1つ（北西）から鋼の棒が伸び、印刷している高さで止まる。先端には寝かせた小さな L 字の
+     * 印刷ヘッドがあり、ドローンの上を左右に振れながら、先のノズルから下の層へ橙の光を当てる。解体のときは逆に下がっていく。
+     */
+    /**
+     * 印刷の腕は、印刷した場所（ステーションの上面）に置いたまま描く。印刷中は印刷している高さ、印刷し終えたら RETRACT_TICKS で
+     * ステーションの中へ沈む（ドローンが飛び立っても腕は残る）。解体のときは逆に、まず中から伸びてきて、それから印刷の高さを下りる。
+     */
+    private void renderArmAtPad(CargoDrone drone, float print, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        int ticks = drone.printTicks();
+        int end = CargoDrone.PRINT_TICKS + CargoDrone.RETRACT_TICKS;
+        if (ticks >= end) {
+            return;
+        }
+        double x = Mth.lerp(partialTick, drone.xo, drone.getX());
+        double y = Mth.lerp(partialTick, drone.yo, drone.getY());
+        double z = Mth.lerp(partialTick, drone.zo, drone.getZ());
+        if (ticks < CargoDrone.PRINT_TICKS || drone.dismantling()) {
+            drone.armOrigin = new net.minecraft.world.phys.Vec3(x, y, z);   // 上面にいる間の場所を覚える
+        }
+        if (drone.armOrigin == null) {
+            return;                                                   // 腕をしまう途中から見え始めた
+        }
+        float full = drone.getBbHeight() + 0.2F;
+        float top;
+        if (ticks < CargoDrone.PRINT_TICKS) {
+            top = print * (drone.getBbHeight() + 0.1F) + 0.1F;
+        } else {
+            float k = (ticks - CargoDrone.PRINT_TICKS + (drone.dismantling() ? -partialTick : partialTick)) / CargoDrone.RETRACT_TICKS;
+            top = Mth.lerp(Mth.clamp(k, 0, 1), full, -0.35F);
+        }
+        pose.pushPose();
+        pose.translate(drone.armOrigin.x - x, drone.armOrigin.y - y, drone.armOrigin.z - z);
+        renderPrintArm(drone, top, partialTick, pose, buffers, light);
+        pose.popPose();
+    }
+
+    private void renderPrintArm(CargoDrone drone, float top, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        float t = drone.tickCount + partialTick;
+        float cx = -0.44F, cz = -0.44F, rod = 0.03F;
+        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        // 上面の隅の受け口と、伸びる棒
+        FxDraw.box(pose, solid, cx - 0.06F, 0, cz - 0.06F, cx + 0.06F, 0.03F, cz + 0.06F, light, 0x4E5560);
+        if (top + 0.02F > 0) {
+            FxDraw.box(pose, solid, cx - rod, 0, cz - rod, cx + rod, top + 0.02F, cz + rod, light, 0xAEB6C0);
+        }
+        // 寝かせた L 字のヘッド（棒を軸に、ドローンの真上を中心に振れる）
+        pose.pushPose();
+        pose.translate(cx, top, cz);
+        pose.mulPose(Axis.YP.rotationDegrees(-45 + 35 * Mth.sin(t * 0.3F)));
+        FxDraw.box(pose, solid, -0.04F, -0.02F, -0.03F, 0.46F, 0.03F, 0.03F, light, 0x58606C);
+        FxDraw.box(pose, solid, 0.40F, -0.02F, -0.03F, 0.46F, 0.03F, 0.18F, light, 0x58606C);
+        FxDraw.box(pose, solid, 0.39F, -0.06F, 0.12F, 0.47F, -0.02F, 0.20F, light, 0x2E333A);
+        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        int pulse = 180 + (int) (60 * Mth.sin(t * 1.3F));
+        FxDraw.box(pose, glow, 0.41F, -0.07F, 0.14F, 0.45F, -0.06F, 0.18F, FxDraw.FULL_BRIGHT, DroneStationScreen.ACCENT, pulse);
+        FxDraw.box(pose, glow, 0.425F, -0.1F, 0.155F, 0.435F, -0.07F, 0.165F, FxDraw.FULL_BRIGHT, 0xFFE2B0, 200);
+        pose.popPose();
     }
 
     /** 印刷の走査面: 橙の光る薄い板が下から上がる。 */

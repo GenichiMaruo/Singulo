@@ -79,7 +79,8 @@ final class BossSounds {
         PLAYING.values().removeIf(loop -> loop.isStopped() || !mc.getSoundManager().isActive(loop));
         AABB box = mc.player.getBoundingBox().inflate(RANGE);
         for (Entity e : mc.level.getEntitiesOfClass(Entity.class, box,
-                e -> e instanceof RuinBoss || e instanceof HorizonWarden || e instanceof WardenSingularity || e instanceof RuinAndroid)) {
+                e -> e instanceof RuinBoss || e instanceof HorizonWarden || e instanceof WardenSingularity || e instanceof RuinAndroid
+                        || e instanceof io.github.genichimaruo.singulo.drone.CargoDrone)) {
             Voice v = voice(e);
             if (v != null) {
                 if (!(e instanceof RuinBoss b && b.isMinion())) {
@@ -94,6 +95,10 @@ final class BossSounds {
                         keep(mc, g, "gravity_remnant.well_loop", 1.6F, true, x -> x instanceof GravityRemnant r && r.wellOpen() && !r.isDeadOrDying());
                 // 特異点が引き込んでいる間の重いうなり
                 case WardenSingularity s -> keep(mc, s, "gravity_remnant.well_loop", 1.4F, true, x -> !x.isRemoved());
+                // 輸送ドローンのローター（印刷し終えてから、解体を始めるまで）
+                case io.github.genichimaruo.singulo.drone.CargoDrone d when d.printed() && !d.dismantling() ->
+                        keep(mc, d, "drone.rotor", 0.55F, true, x -> x instanceof io.github.genichimaruo.singulo.drone.CargoDrone c
+                                && c.printed() && !c.dismantling());
                 // スラスターを開いて飛んで・泳いでいる間の噴射音
                 case RuinAndroid a when a.thrusterOpen(1) > 0.5F ->
                         keep(mc, a, "android.thruster", 0.5F, true, x -> x instanceof RuinAndroid r && r.thrusterOpen(1) > 0.3F && r.isAlive());

@@ -1554,3 +1554,105 @@ def drone_sputter(d, seed):
     # 壊れかけたドローン: ぱちっと火花が散り、回路がじりじり言う
     return mix(zap(0.12, 5000, 900, seed) * 0.7, lowpass(crackle(0.4, 80, seed, 0.005), 3000) * 1.2,
                (buzz(120, 0.2, 2000, seed) * perc(0.2, 0.005, 0.1) * 0.3, 0.05))
+
+
+# =================================================================== ドローン輸送（0.14.0。バニラの音の代わり）
+
+@machine('drone/rotor', level=-27)
+def drone_rotor(d, seed):
+    # 4つの小さなローター: 羽根が空気を切る細かい脈（少しずつ違う速さで、うなりが揺れる）と、やわらかい風
+    t = t_axis(d)
+    blades = mix(*[bandpass(pink(d, seed + i), 700 + 120 * i, 3) * (0.6 + 0.4 * np.abs(np.sin(2 * np.pi * (52 + 3 * i) * t)))
+                   for i in range(4)])
+    motor = hum(210, d, (1, 2, 3), (0.5, 0.25, 0.1), 0.003, seed) * 0.25
+    wind = lowpass(pink(d, seed + 9), 600) * 0.5
+    return mix(blades * 0.6, motor, wind)
+
+
+@recipe('drone/print', level=-26, variants=3)
+def drone_print(d, seed):
+    # 印刷ヘッドが一層を描く: 細いノズルのジジッという音と、小さなサーボ
+    r = rng(seed)
+    f = 2400 + 500 * r.random()
+    hiss = bandpass(white(0.12, seed), f, 4) * perc(0.12, 0.004, 0.08) * 0.6
+    step = servo(0.1, 500, 700 + 200 * r.random(), seed) * env([(0, 0), (0.02, 0.4), (0.1, 0)], 0.1) * 0.5
+    return mix(hiss, (step, 0.02), (tick(3500, 0.015, seed) * 0.3, 0.0))
+
+
+@recipe('drone/print_start', level=-22)
+def drone_print_start(d, seed):
+    # 印刷の始まり: 起動の2音と、腕がせり上がるサーボ
+    beeps = mix(beep(784, 0.08) * 0.5, (beep(1175, 0.1) * 0.5, 0.09))
+    arm = servo(0.5, 220, 520, seed) * env([(0, 0), (0.1, 0.5), (0.5, 0)], 0.5) * 0.5
+    return rich(mix(beeps, (arm, 0.12), (riser(0.5, 150, 600, seed, 0.2) * 0.2, 0.12)), seed, 0.06, 0.2)
+
+
+@recipe('drone/printed', level=-20)
+def drone_printed(d, seed):
+    # 印刷し終えた: 明るい和音と、ローターが回り始める高まり
+    bells = mix((chime(1047, 0.5, 1) * 0.35, 0), (chime(1568, 0.7, 2) * 0.4, 0.08))
+    spin = (lowpass(saw(glide(60, 180, 0.8)), 1500) + bandpass(pink(0.8, seed), 700, 2) * 0.5) * env([(0, 0), (0.6, 0.6), (0.8, 0)], 0.8) * 0.6
+    return rich(mix(spin, (bells, 0.1)), seed, 0.06, 0.25)
+
+
+@recipe('drone/arm_retract', level=-24)
+def drone_arm_retract(d, seed):
+    # 印刷の腕がステーションの中へ下がる: 下がっていくサーボと、しまったときの小さな音
+    down = servo(0.5, 520, 200, seed) * env([(0, 0), (0.05, 0.5), (0.5, 0.2)], 0.5) * 0.6
+    return mix(down, (clank(900, 0.12, seed) * 0.4, 0.48))
+
+
+@recipe('drone/dismantle', level=-20)
+def drone_dismantle(d, seed):
+    # 解体: ローターが止まっていき、部品がほどけて消える
+    wind_down = (lowpass(saw(glide(180, 40, 1.0)), 1500) + bandpass(pink(1.0, seed), 600, 2) * 0.5) * env([(0, 0.6), (1.0, 0)], 1.0) * 0.6
+    sigh = sine(glide(1000, 250, 0.8, 0.7)) * env([(0, 0), (0.05, 0.4), (0.8, 0)], 0.8) * 0.4
+    return rich(mix(wind_down, (sigh, 0.1), (shimmer(0.8, 12, 1800, 2, 0.4, seed) * 0.2, 0.3)), seed, 0.06, 0.25)
+
+
+@recipe('drone_port/hatch_open', level=-20)
+def drone_port_hatch_open(d, seed):
+    # 天井の扉: ロックが外れて空気が抜け、2枚が跳ね上がって、壁ぎわへ引っ込む
+    unlock = clank(1200, 0.1, seed) * 0.5
+    vent = bandpass(white(0.35, seed + 1), 3500, 1.5) * env([(0, 0), (0.02, 0.5), (0.35, 0)], 0.35) * 0.4
+    lift = servo(0.45, 260, 480, seed + 2) * env([(0, 0), (0.05, 0.5), (0.45, 0.1)], 0.45) * 0.5
+    stow = thump(90, 0.12, 0.3, seed + 3) * 0.5
+    return reverb(mix(unlock, (vent, 0.04), (lift, 0.1), (stow, 0.62)), 0.3, 0.2, 4000, 0.3)
+
+
+@recipe('drone_port/hatch_close', level=-20)
+def drone_port_hatch_close(d, seed):
+    # 扉が壁ぎわからせり上がって倒れ、閉じてロックがかかる
+    rise = servo(0.4, 300, 520, seed) * env([(0, 0), (0.05, 0.5), (0.4, 0.1)], 0.4) * 0.5
+    shut = mix(thump(80, 0.15, 0.4, seed + 1) * 0.6, (clank(1000, 0.1, seed + 2) * 0.4, 0.05))
+    return reverb(mix(rise, (shut, 0.55)), 0.3, 0.2, 4000, 0.3)
+
+
+@recipe('drone_port/lift', level=-23)
+def drone_port_lift(d, seed):
+    # 昇降台が動く: 低いモーターのうなりと、ガイドを滑る音
+    motor = servo(0.6, 140, 220, seed) * env([(0, 0), (0.08, 0.6), (0.5, 0.6), (0.6, 0)], 0.6) * 0.6
+    slide = bandpass(pink(0.6, seed + 1), 1500, 2) * env([(0, 0), (0.1, 0.3), (0.6, 0)], 0.6) * 0.3
+    return mix(motor, slide, (thump(70, 0.1, 0.2, seed) * 0.3, 0.55))
+
+
+@recipe('drone_port/clamp', level=-19)
+def drone_port_clamp(d, seed):
+    # 爪が箱をつかむ・はなす: 金属のカチッという音と、短いサーボ
+    snap = mix(clank(1500, 0.08, seed) * 0.6, (tick(4000, 0.02, seed) * 0.4, 0.01))
+    grip = servo(0.15, 600, 900, seed + 1) * env([(0, 0), (0.02, 0.4), (0.15, 0)], 0.15) * 0.4
+    return reverb(mix(grip, (snap, 0.1)), 0.2, 0.15, 5000, 0.2)
+
+
+@recipe('drone_port/pack', level=-20)
+def drone_port_pack(d, seed):
+    # 梱包: ふたを閉めて、留め具を2つかける
+    lid = thump(110, 0.15, 0.5, seed) * 0.6
+    latches = mix((clank(1300, 0.08, seed + 1) * 0.4, 0.18), (clank(1450, 0.08, seed + 2) * 0.4, 0.3))
+    return reverb(mix(lid, latches), 0.25, 0.15, 4000, 0.25)
+
+
+@recipe('drone_port/arrive', level=-19)
+def drone_port_arrive(d, seed):
+    # 荷物が届いた: やわらかい2音の知らせ
+    return rich(mix(chime(880, 0.6, 1) * 0.45, (chime(1319, 0.8, 2) * 0.45, 0.14)), seed, 0.06, 0.3)

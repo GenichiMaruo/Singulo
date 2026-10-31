@@ -11996,16 +11996,16 @@
     "translation": "无人机套件（每次打印用 1 个）"
   },
   "gui.singulo.drone_station.production": {
-    "source": "Production Upgrade (up to 3 drones)",
-    "translation": "生产升级（最多 3 架）"
+    "source": "Production Upgrade (1 for 2 drones, 2 for 3)",
+    "translation": "生产升级（1 张 2 架，2 张 3 架）"
   },
   "gui.singulo.drone_station.permit": {
     "source": "Shield Permit (limits who can use it)",
     "translation": "护盾通行证（限制可使用的人）"
   },
   "gui.singulo.drone_station.more_units": {
-    "source": "With a Production Upgrade, up to 3 drones are printed",
-    "translation": "放入生产升级后，最多打印 3 架"
+    "source": "Each Production Upgrade adds one drone (2 for 3 drones)",
+    "translation": "每张生产升级增加 1 架（2 张即 3 架）"
   },
   "gui.singulo.drone_port.status.0": {
     "source": "Idle",
@@ -12116,8 +12116,8 @@
     "translation": "制造地：精密组装台（第 2 阶段）"
   },
   "desc.singulo.drone_station": {
-    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; up to 3 with a Production Upgrade). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
-    "translation": "用无人机水晶存储器、无人机套件和电力打印运输无人机（每架 20,000 FE；装上生产升级最多 3 架）。无人机在上空待命，为 64 格内的无人机起降港运送货物。"
+    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
+    "translation": "用无人机水晶存储器、无人机套件和电力打印运输无人机（每架 20,000 FE；每张生产升级增加 1 架，最多 3 架）。无人机在上空待命，为 64 格内的无人机起降港运送货物。"
   },
   "summary.singulo.drone_station": {
     "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
@@ -12180,8 +12180,8 @@
     "translation": "准备无人机"
   },
   "guide.singulo.drones.start.body": {
-    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). A Production Upgrade allows up to 3. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
-    "translation": "把遗迹警卫机坞站放出的一波警卫无人机全部击败后，有时（40%）坞站上方会出现无人机水晶存储器。在第 2 阶段的工作台制作无人机站，在精密组装台制作无人机套件。把存储器（不会消耗）和套件（每次打印用 1 个）放入无人机站并供电，它就会在上方打印一架运输无人机（20,000 FE）。装上生产升级最多 3 架。无人机在站的上空待命。\n无人机不会受到玩家或生物的伤害。破坏无人机站时，待命中的无人机会变回套件。"
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "把遗迹警卫机坞站放出的一波警卫无人机全部击败后，有时（40%）坞站上方会出现无人机水晶存储器。在第 2 阶段的工作台制作无人机站，在精密组装台制作无人机套件。把存储器（不会消耗）和套件（每次打印用 1 个）放入无人机站并供电，它就会在上方打印一架运输无人机（20,000 FE）。每张生产升级增加 1 架，2 张最多 3 架。无人机在站的上空待命。\n无人机不会受到玩家或生物的伤害。破坏无人机站时，待命中的无人机会变回套件。"
   },
   "guide.singulo.drones.send.title": {
     "source": "Sending cargo",
@@ -12326,5 +12326,65 @@
   "guide.singulo.drones.auto.body": {
     "source": "The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.",
     "translation": "在发送标签页的下方一行可以使用自动发送。每按一次阈值按钮，就会在关闭、1 个、64 个、256 个、装满（货物的 9 栏全满）之间切换。在列表中选择目的地后按“登记”，即可设为自动发送的目的地（与手动发送的目的地分开保存）。\n当货物栏达到阈值且 2 秒内没有再增加时（装满则立即），起降港会自动发送到登记的目的地。空箱、航程、电力与无人机的条件与手动发送相同。用漏斗或管道持续放入货物，就能自动把矿场等处的物品不断运回基地。"
+  },
+  "subtitles.singulo.drone.rotor": {
+    "source": "Cargo drone hums",
+    "translation": "运输无人机嗡嗡作响"
+  },
+  "subtitles.singulo.drone.print": {
+    "source": "Print head draws a layer",
+    "translation": "打印头绘制一层"
+  },
+  "subtitles.singulo.drone.print_start": {
+    "source": "Drone printing starts",
+    "translation": "无人机开始打印"
+  },
+  "subtitles.singulo.drone.printed": {
+    "source": "Drone printed",
+    "translation": "无人机打印完成"
+  },
+  "subtitles.singulo.drone.arm_retract": {
+    "source": "Print arm retracts",
+    "translation": "打印臂收回"
+  },
+  "subtitles.singulo.drone.dismantle": {
+    "source": "Drone is dismantled",
+    "translation": "无人机被拆解"
+  },
+  "subtitles.singulo.drone_port.hatch_open": {
+    "source": "Drone port hatch opens",
+    "translation": "起降港舱门打开"
+  },
+  "subtitles.singulo.drone_port.hatch_close": {
+    "source": "Drone port hatch closes",
+    "translation": "起降港舱门关闭"
+  },
+  "subtitles.singulo.drone_port.lift": {
+    "source": "Lift moves",
+    "translation": "升降台移动"
+  },
+  "subtitles.singulo.drone_port.clamp": {
+    "source": "Drone claws grip a crate",
+    "translation": "无人机的爪子抓住箱子"
+  },
+  "subtitles.singulo.drone_port.pack": {
+    "source": "Cargo is packed",
+    "translation": "货物被打包"
+  },
+  "subtitles.singulo.drone_port.arrive": {
+    "source": "Cargo arrives",
+    "translation": "货物送达"
+  },
+  "gui.singulo.drone_port.sides.items": {
+    "source": "Cargo in and out",
+    "translation": "货物的进出"
+  },
+  "gui.singulo.drone_port.sides.crates": {
+    "source": "Empty crate input (crate slot only; disable the face for cargo to make it crate-only)",
+    "translation": "空箱的搬入（仅限空箱栏。把货物的面设为无效，即成为空箱专用面）"
+  },
+  "gui.singulo.drone_port.sides.crate_input": {
+    "source": "Accepts empty crates",
+    "translation": "可放入空箱"
   }
 }

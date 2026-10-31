@@ -11996,16 +11996,16 @@
     "translation": "드론 키트(출력할 때마다 1개)"
   },
   "gui.singulo.drone_station.production": {
-    "source": "Production Upgrade (up to 3 drones)",
-    "translation": "생산 업그레이드(최대 3대)"
+    "source": "Production Upgrade (1 for 2 drones, 2 for 3)",
+    "translation": "생산 업그레이드(1장이면 2대, 2장이면 3대)"
   },
   "gui.singulo.drone_station.permit": {
     "source": "Shield Permit (limits who can use it)",
     "translation": "보호막 허가증(사용할 수 있는 사람을 제한)"
   },
   "gui.singulo.drone_station.more_units": {
-    "source": "With a Production Upgrade, up to 3 drones are printed",
-    "translation": "생산 업그레이드를 넣으면 최대 3대까지 출력합니다"
+    "source": "Each Production Upgrade adds one drone (2 for 3 drones)",
+    "translation": "생산 업그레이드 1장마다 1대 늘어난다(2장이면 3대)"
   },
   "gui.singulo.drone_port.status.0": {
     "source": "Idle",
@@ -12116,8 +12116,8 @@
     "translation": "제작: 정밀 조립기(2단계)"
   },
   "desc.singulo.drone_station": {
-    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; up to 3 with a Production Upgrade). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
-    "translation": "드론 크리스털 메모리, 드론 키트, 전력으로 수송 드론을 출력한다(1대 20,000 FE, 생산 업그레이드로 최대 3대). 드론은 위에서 대기하다가 64블록 안의 드론 포트에 불려 화물을 나른다."
+    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
+    "translation": "드론 크리스털 메모리, 드론 키트, 전력으로 수송 드론을 출력한다(1대 20,000 FE, 생산 업그레이드 1장마다 1대 늘어 최대 3대). 드론은 위에서 대기하다가 64블록 안의 드론 포트에 불려 화물을 나른다."
   },
   "summary.singulo.drone_station": {
     "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
@@ -12180,8 +12180,8 @@
     "translation": "드론 준비하기"
   },
   "guide.singulo.drones.start.body": {
-    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). A Production Upgrade allows up to 3. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
-    "translation": "유적의 가드 독이 내보낸 경비 드론 한 무리를 모두 쓰러뜨리면, 가끔(40%) 독 위에 드론 크리스털 메모리가 나타난다. 2단계 제작대에서 드론 스테이션을, 정밀 조립기에서 드론 키트를 만든다. 스테이션에 메모리(소모되지 않음)와 키트(출력할 때마다 1개)를 넣고 전력을 보내면 위에 수송 드론을 1대 출력한다(20,000 FE). 생산 업그레이드를 넣으면 최대 3대. 드론은 스테이션 위 하늘에서 대기한다.\n드론은 플레이어나 몹의 공격으로 다치지 않는다. 스테이션을 부수면 대기 중인 드론은 키트로 돌아간다."
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "유적의 가드 독이 내보낸 경비 드론 한 무리를 모두 쓰러뜨리면, 가끔(40%) 독 위에 드론 크리스털 메모리가 나타난다. 2단계 제작대에서 드론 스테이션을, 정밀 조립기에서 드론 키트를 만든다. 스테이션에 메모리(소모되지 않음)와 키트(출력할 때마다 1개)를 넣고 전력을 보내면 위에 수송 드론을 1대 출력한다(20,000 FE). 생산 업그레이드 1장마다 1대 늘어, 2장이면 최대 3대. 드론은 스테이션 위 하늘에서 대기한다.\n드론은 플레이어나 몹의 공격으로 다치지 않는다. 스테이션을 부수면 대기 중인 드론은 키트로 돌아간다."
   },
   "guide.singulo.drones.send.title": {
     "source": "Sending cargo",
@@ -12326,5 +12326,65 @@
   "guide.singulo.drones.auto.body": {
     "source": "The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.",
     "translation": "발송 탭의 아래 줄에서 자동 발송을 쓸 수 있다. 기준 버튼을 누를 때마다 끔·1개·64개·256개·가득(화물 9칸이 모두 가득)으로 바뀐다. 목록에서 목적지를 고르고 「등록」을 누르면 자동 발송의 목적지가 된다(직접 보내는 목적지와 따로 기억한다).\n화물 칸이 기준만큼 쌓이고 2초가 지나도 늘지 않으면(가득이면 바로), 등록한 목적지로 자동 발송한다. 빈 상자·사거리·전력·드론의 조건은 직접 보낼 때와 같다. 호퍼나 파이프로 화물을 계속 넣으면, 채굴장 등에서 거점으로 계속 자동으로 나를 수 있다."
+  },
+  "subtitles.singulo.drone.rotor": {
+    "source": "Cargo drone hums",
+    "translation": "수송 드론이 윙윙거린다"
+  },
+  "subtitles.singulo.drone.print": {
+    "source": "Print head draws a layer",
+    "translation": "출력 헤드가 한 층을 그린다"
+  },
+  "subtitles.singulo.drone.print_start": {
+    "source": "Drone printing starts",
+    "translation": "드론 출력이 시작된다"
+  },
+  "subtitles.singulo.drone.printed": {
+    "source": "Drone printed",
+    "translation": "드론 출력이 끝난다"
+  },
+  "subtitles.singulo.drone.arm_retract": {
+    "source": "Print arm retracts",
+    "translation": "출력 팔이 들어간다"
+  },
+  "subtitles.singulo.drone.dismantle": {
+    "source": "Drone is dismantled",
+    "translation": "드론이 해체된다"
+  },
+  "subtitles.singulo.drone_port.hatch_open": {
+    "source": "Drone port hatch opens",
+    "translation": "드론 포트 해치가 열린다"
+  },
+  "subtitles.singulo.drone_port.hatch_close": {
+    "source": "Drone port hatch closes",
+    "translation": "드론 포트 해치가 닫힌다"
+  },
+  "subtitles.singulo.drone_port.lift": {
+    "source": "Lift moves",
+    "translation": "승강대가 움직인다"
+  },
+  "subtitles.singulo.drone_port.clamp": {
+    "source": "Drone claws grip a crate",
+    "translation": "드론 집게가 상자를 잡는다"
+  },
+  "subtitles.singulo.drone_port.pack": {
+    "source": "Cargo is packed",
+    "translation": "화물이 포장된다"
+  },
+  "subtitles.singulo.drone_port.arrive": {
+    "source": "Cargo arrives",
+    "translation": "화물이 도착한다"
+  },
+  "gui.singulo.drone_port.sides.items": {
+    "source": "Cargo in and out",
+    "translation": "화물 넣고 빼기"
+  },
+  "gui.singulo.drone_port.sides.crates": {
+    "source": "Empty crate input (crate slot only; disable the face for cargo to make it crate-only)",
+    "translation": "빈 상자 반입(빈 상자 칸만. 화물의 면을 무효로 하면 빈 상자 전용 면이 된다)"
+  },
+  "gui.singulo.drone_port.sides.crate_input": {
+    "source": "Accepts empty crates",
+    "translation": "빈 상자를 넣을 수 있음"
   }
 }

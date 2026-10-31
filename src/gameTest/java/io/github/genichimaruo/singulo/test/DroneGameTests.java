@@ -281,6 +281,47 @@ public final class DroneGameTests {
         });
     }
 
+    /** 空き箱専用の面: 荷物を「無効」・空き箱を「入力」にした面からは空き箱の欄にだけ入り、空き箱を「無効」にした面からは空き箱が入らない。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void dronePortCrateOnlyFace(GameTestHelper h) {
+        DronePortBlockEntity port = port(h, new BlockPos(2, 1, 2));
+        var down = net.minecraft.core.Direction.DOWN;
+        var up = net.minecraft.core.Direction.UP;
+        var faceDown = io.github.genichimaruo.singulo.machine.SideConfig.faceOf(net.minecraft.core.Direction.NORTH, down);
+        var faceUp = io.github.genichimaruo.singulo.machine.SideConfig.faceOf(net.minecraft.core.Direction.NORTH, up);
+        port.setSide(DronePortBlockEntity.CHANNEL_ITEMS, faceDown, io.github.genichimaruo.singulo.machine.SideConfig.NONE, false);
+        port.setSide(DronePortBlockEntity.CHANNEL_CRATES, faceUp, io.github.genichimaruo.singulo.machine.SideConfig.NONE, false);
+        var below = port.sidedItems(down);
+        h.assertTrue(below.insertItem(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.PACKING_CRATE.get(), 4), false).isEmpty(),
+                "Crate-only face did not accept crates");
+        h.assertTrue(below.insertItem(DronePortBlockEntity.SLOT_CARGO, new ItemStack(Items.COBBLESTONE, 8), false).getCount() == 8,
+                "Crate-only face accepted cargo");
+        var above = port.sidedItems(up);
+        h.assertTrue(above.insertItem(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.PACKING_CRATE.get()), false).getCount() == 1,
+                "Face without crate input accepted a crate");
+        h.assertTrue(above.insertItem(DronePortBlockEntity.SLOT_CARGO, new ItemStack(Items.COBBLESTONE, 8), false).isEmpty(),
+                "Cargo face refused cargo");
+        h.assertTrue(port.items().getStackInSlot(DronePortBlockEntity.SLOT_CRATES).getCount() == 4, "Crate count differs");
+        h.succeed();
+    }
+
+    /** 生産アップグレードは1枚につき1機増え、2枚で3機（3枚目は入らない）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void productionUpgradesAddOneDroneEach(GameTestHelper h) {
+        h.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.DRONE_STATION.get());
+        DroneStationBlockEntity station = h.getBlockEntity(new BlockPos(2, 1, 2));
+        Item upgrade = item("android_production_upgrade");
+        h.assertTrue(station.units() == 1, "Expected 1 drone without upgrades");
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_PRODUCTION, new ItemStack(upgrade, 1));
+        h.assertTrue(station.units() == 2, "Expected 2 drones with one upgrade");
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_PRODUCTION, new ItemStack(upgrade, 2));
+        h.assertTrue(station.units() == 3, "Expected 3 drones with two upgrades");
+        ItemStack rest = station.items().insertItem(DroneStationBlockEntity.SLOT_PRODUCTION, new ItemStack(upgrade, 1), false);
+        h.assertTrue(rest.getCount() == 1 && station.items().getStackInSlot(DroneStationBlockEntity.SLOT_PRODUCTION).getCount() == 2,
+                "A third upgrade was accepted");
+        h.succeed();
+    }
+
     /** 届け終えたドローンは、ステーションへ戻らずに、待っている次のポートへそのまま向かう（同じ便の記録を使い続ける）。 */
     @GameTest(template = "large", batch = BATCH, timeoutTicks = 2400)
     public static void droneChainsToTheNextWaitingJob(GameTestHelper h) {

@@ -33,7 +33,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * ドローン・ステーション。ドローン用クリスタルメモリ（減らない）とドローンキット（印刷ごとに1つ）を入れて電力を送ると、
- * 上にドローンを印刷する（生産アップグレードで3機まで）。ドローンは上空で待機し、半径 DISPATCH_RANGE の発着ポートに呼ばれて荷物を運ぶ。
+ * 上にドローンを印刷する（生産アップグレード1枚につき1機増え、2枚で3機まで）。ドローンは上空で待機し、半径 DISPATCH_RANGE の発着ポートに呼ばれて荷物を運ぶ。
  */
 public class DroneStationBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, MenuProvider {
@@ -75,7 +75,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
 
         @Override
         public int getSlotLimit(int slot) {
-            return slot == SLOT_KIT ? 64 : 1;
+            return slot == SLOT_KIT ? 64 : slot == SLOT_PRODUCTION ? MAX_UNITS - 1 : 1;
         }
     };
 
@@ -124,10 +124,11 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         setChanged();
     }
 
-    /** 受け持てるドローンの数（生産アップグレードで3）。 */
+    /** 受け持てるドローンの数（生産アップグレード1枚につき1機増え、2枚で3機）。 */
     public int units() {
-        return io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isProductionUpgrade(items.getStackInSlot(SLOT_PRODUCTION))
-                ? MAX_UNITS : 1;
+        ItemStack upgrades = items.getStackInSlot(SLOT_PRODUCTION);
+        int n = io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isProductionUpgrade(upgrades) ? upgrades.getCount() : 0;
+        return Math.min(MAX_UNITS, 1 + n);
     }
 
     /** このステーションが受け持つドローンか。 */
@@ -291,7 +292,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         if (!rest.isEmpty()) {
             Block.popResource(level, worldPosition.above(), rest);
         }
-        level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.6F, 1.8F);
+        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.arm_retract"), SoundSource.BLOCKS, 0.6F, 1.0F);
         setChanged();
     }
 
@@ -382,7 +383,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         items.extractItem(SLOT_KIT, 1, false);
         drones[unit] = d.getUUID();
         statuses[unit] = S_PRINTING;
-        level.playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.7F, 1.9F);
+        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.print_start"), SoundSource.BLOCKS, 0.8F, 1.0F);
         setChanged();
     }
 
