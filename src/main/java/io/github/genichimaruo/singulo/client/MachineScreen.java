@@ -193,7 +193,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     private void layoutPopups() {
         int bottom = io.github.genichimaruo.singulo.machine.GuiFrame.contentBottom(imageHeight);
         int sh = Popup.BAR + 1 + OVERLAY_H;
-        sides.layout(leftPos, topPos, imageWidth - 8, sh, 4, bottom - sh, width, height);
+        sides.layout(leftPos, topPos, SideCube.POPUP_W, sh, 4, bottom - sh, width, height);
         int ph = Popup.BAR + 1 + selectRows() * 18 + 8;
         selector.layout(leftPos, topPos, imageWidth - 8, ph, 4, bottom - ph, width, height);
     }

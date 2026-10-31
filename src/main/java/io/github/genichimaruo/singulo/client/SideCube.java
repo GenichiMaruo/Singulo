@@ -22,6 +22,11 @@ final class SideCube {
     /** 回転（度）。左右と上下。 */
     // Visible faces point toward +Z; turn NORTH (-Z), the machine's front, toward the viewer.
     float yaw = 145;
+    /**
+     * 面の設定の窓の横幅（どの装置でも同じ）。左のタブ（4+13）、回した立方体（半辺13の対角で最大およそ46）、
+     * 右の全体スイッチと凡例（13+4）が重ならない幅。
+     */
+    static final int POPUP_W = 96;
     float pitch = 25;
 
     record Quad(SideConfig.Face face, float[] xs, float[] ys, float depth, float light) {
