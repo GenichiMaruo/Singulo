@@ -53,6 +53,11 @@ public final class SinguloMenus {
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidStationMenu>> ANDROID_STATION = REGISTER.register(
             "android_station", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.AndroidStationMenu::client));
 
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.drone.DroneStationMenu>> DRONE_STATION = REGISTER.register(
+            "drone_station", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.drone.DroneStationMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.drone.DronePortMenu>> DRONE_PORT = REGISTER.register(
+            "drone_port", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.drone.DronePortMenu::client));
+
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.genesis.GenesisCoreMenu>> GENESIS_CORE = REGISTER.register(
             "genesis_core", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.genesis.GenesisCoreMenu::client));
 

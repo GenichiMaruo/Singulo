@@ -9,6 +9,15 @@ import net.minecraft.core.Direction;
 public final class SideConfig {
     public enum Face { FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM }
 
+    /** 面の設定を GUI から変えられるブロックエンティティ（加工装置・ドローン発着ポート）。 */
+    public interface Holder {
+        boolean validChannel(int channel);
+
+        void setEjectEnabled(int channel, boolean on);
+
+        void setSide(int channel, Face face, int mode, boolean eject);
+    }
+
     public static final int NONE = 0, INPUT = 1, OUTPUT = 2, BOTH = 3;
     private static final int EJECT = 4;
     /** 自動排出の全体スイッチ（ビット18）。オフなら面ごとの自動排出は働かない。既定はオフ。 */

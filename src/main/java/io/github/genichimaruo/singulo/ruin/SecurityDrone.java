@@ -268,6 +268,16 @@ public class SecurityDrone extends Monster {
         facilitySpawned = true;
     }
 
+    /** ドックの個体がプレイヤーに倒されたら、ドックに知らせる（一波を全部倒したときだけメモリが出る）。 */
+    @Override
+    public void die(net.minecraft.world.damagesource.DamageSource source) {
+        super.die(source);
+        if (facilitySpawned && source.getEntity() instanceof net.minecraft.world.entity.player.Player && hasRestriction()
+                && level().getBlockEntity(getRestrictCenter()) instanceof GuardDockBlockEntity dock) {
+            dock.recordKill(getUUID());
+        }
+    }
+
     public boolean facilitySpawned() {
         return facilitySpawned;
     }

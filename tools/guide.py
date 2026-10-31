@@ -1119,6 +1119,63 @@ CHAPTERS = [
          'Androids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass '
          'next to them, and four plain panes make the patterned kind.'),
     ]),
+    ('drones', 'singulo:drone_station', 'ドローン輸送', 'Drone Delivery', [
+        ('start', 'ドローンを用意する',
+         '遺構の警備機ドックが出した警備ドローンの一波を全部倒すと、ときどき（40%）ドックの上にドローン用クリスタルメモリが出ます。'
+         '段階2の作業台でドローン・ステーションを、精密組立台でドローンキットを作ります。ステーションにメモリ（減らない）とキット（印刷ごとに1つ）を入れて'
+         '電力を送ると、上に輸送ドローンを1機印刷します（20,000 FE）。生産アップグレードを入れると3機まで。ドローンはステーションの上空で待機します。\n'
+         'ドローンはプレイヤーやモブの攻撃では傷つきません。ステーションを壊すと、待機中のドローンはキットに戻ります。',
+         'Getting drones',
+         'Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. '
+         'Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) '
+         'in the station and give it power: it prints a cargo drone on top (20,000 FE). A Production Upgrade allows up to 3. Drones wait in the air above the station.\n'
+         'Drones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.'),
+        ('send', '荷物を送る',
+         'ドローン発着ポートを置くと、置いた人の輸送網に入ります（同じディメンションの、同じ持ち主のポートが行き先に並ぶ）。ヘッダーの名前をクリックすると名前を付けられます。\n'
+         '左上に空の梱包箱、真ん中に荷物を入れ、右の一覧で行き先を選んで「発送」を押すと、荷物を梱包して電力を払い、半径64ブロックのステーションから待機中のドローンを呼びます。'
+         'ドローンが真上に来ると、天井の扉が開いて昇降台が箱を持ち上げ、ドローンの爪が掴みます。行き先でも扉が開いて箱を降ろし、受け取りの欄へ自動で開梱します。'
+         '空になった箱は空き箱の欄へ戻ります。ドローンが来る前なら「取消」で元に戻せます（電力も戻る）。\n'
+         'ホッパーやパイプで、空き箱と荷物を入れ、受け取りの欄から取り出せます。コンパレーターは受け取りの欄の埋まり具合を出します。',
+         'Sending cargo',
+         'A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\n'
+         'Put an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls '
+         'a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. '
+         'At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. '
+         'Before the drone arrives, Cancel puts everything back (power included).\n'
+         'Hoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.'),
+        ('range', '射程と電力',
+         '発送の電力は 2,000 FE＋直線距離1ブロックにつき 50 FE で、梱包のときにポートが払います。届く距離は梱包箱で決まります: 梱包箱160ブロック、'
+         'バッテリー付き梱包箱760ブロック、大容量バッテリー付き梱包箱3,160ブロック。行き先の一覧で、届かない距離は赤く出ます。\n'
+         'ドローンが読み込まれていない所を飛ぶ間も、荷物は失われません。行き先が読み込まれていれば着陸して降ろし、読み込まれていなければ、そのポートが読み込まれたときに受け取ります。'
+         '行き先のポートが壊されていれば、荷物は発送元へ戻ります。',
+         'Range and power',
+         'Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, '
+         'Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\n'
+         'Cargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. '
+         'If the destination port was broken, the cargo goes back to where it came from.'),
+        ('more', '自動搬出・輸送の様子・解体',
+         '右レールの設定の段で、加工装置と同じ面の設定を開けます。面ごとに入出力を決め、自動排出をオンにすると、受け取った荷物を隣のチェストなどへ'
+         '押し出します（空き箱の欄に入りきらなかった空の箱も）。\n'
+         '画面の真ん中には、輸送中の便が出ます（出る便は橙、来る便は緑）。ドローン待ち・向かっている・積み込み・飛行中・荷降ろしの段階と、'
+         '飛行中の進みのバーが、便ごとに見られます。\n'
+         '発送できるのは、そのポートを受け持つドローン（半径64ブロックのステーションのドローン）がいるときだけです。全機が運んでいる間に発送した箱は'
+         '積み込み待ちになり、近くで荷物を届け終えたドローンが、ステーションへ戻らずにそのまま取りに来ます。\n'
+         'ステーションの画面で、待機中のドローンの行の×を2回押すと解体します。ドローンはステーションに降りて分解され、キットが戻ります。'
+         'その枠は止まり、＋を押すとまた印刷します。',
+         'Auto-export, shipments and dismantling',
+         'The settings tab on the right rail opens the same side settings as processing machines. Choose input and output per face and turn on '
+         'auto-eject to push received items into an adjacent chest or other storage (empty crates that do not fit the crate slot too).\n'
+         'The middle of the screen lists shipments in transit: outgoing in orange, incoming in green. Each shows its stage (waiting, drone coming, '
+         'loading, in flight, unloading) and a progress bar while in flight.\n'
+         'You can only send while a drone serves the port (one from a station within 64 blocks). A crate sent while every drone is busy waits '
+         'to be loaded, and a drone that finishes a delivery nearby flies straight to it instead of returning to its station.\n'
+         'In the station screen, press the × on a waiting drone’s row twice to dismantle it: it lands on the station, comes apart and its kit '
+         'comes back. That slot stops; press + to print again.'),
+        ('auto', '自動発送',
+         '発送のタブの下の段で、自動発送を使えます。しきい値のボタンを押すたびに、しない・1個・64個・256個・満杯（荷物の9欄すべてがいっぱい）と切り替わります。一覧で行き先を選んで「登録」を押すと、それが自動発送の行き先になります（手で送る行き先とは別に覚えます）。\n荷物の欄がしきい値までたまり、2秒たっても増えなければ（満杯ならすぐ）、登録した行き先へ自動で発送します。空き箱・射程・電力・ドローンの条件は手で送るときと同じです。ホッパーやパイプで荷物を入れ続ければ、採掘場などから拠点へ自動で運び続けられます。',
+         'Auto-send',
+         'The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.'),
+    ]),
     ('romance', 'singulo:tipler_core', '特異点技術', 'Singularity Tech', [
         ('shield', 'イベントホライズン・シールド',
          '半径32の中を守る塔（5×5、高さ9）。時間結晶触媒で爆発と荒らしを防ぎ、シンギュラリティ・コアなら敵の湧きと侵入も止める。電力16,384 FE/t。',

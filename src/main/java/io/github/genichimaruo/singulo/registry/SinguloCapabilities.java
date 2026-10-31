@@ -70,6 +70,14 @@ public final class SinguloCapabilities {
         catalystDevice(event, SinguloBlockEntities.QUANTUM_HEAT_ENGINE.get());
         catalystDevice(event, SinguloBlockEntities.DEGENERATE_FURNACE.get());
         catalystDevice(event, SinguloBlockEntities.PROBE_STATION.get());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.DRONE_STATION.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DRONE_STATION.get(),
+                (be, side) -> be.items());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.DRONE_PORT.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DRONE_PORT.get(),
+                (be, side) -> be.sidedItems(side));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),

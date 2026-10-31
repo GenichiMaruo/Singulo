@@ -186,6 +186,13 @@ public final class SinguloBlockEntities {
             REGISTER.register("android_station", () -> build(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity::new,
                     SinguloBlocks.ANDROID_STATION.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.drone.DroneStationBlockEntity>> DRONE_STATION =
+            REGISTER.register("drone_station", () -> build(io.github.genichimaruo.singulo.drone.DroneStationBlockEntity::new,
+                    SinguloBlocks.DRONE_STATION.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.drone.DronePortBlockEntity>> DRONE_PORT =
+            REGISTER.register("drone_port", () -> build(io.github.genichimaruo.singulo.drone.DronePortBlockEntity::new,
+                    SinguloBlocks.DRONE_PORT.get()));
+
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity>> ANDROID_WORK_CONSOLE =
             REGISTER.register("android_work_console", () -> build(io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity::new, SinguloBlocks.ANDROID_WORK_CONSOLE.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT =

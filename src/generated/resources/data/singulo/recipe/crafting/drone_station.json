@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "OGO",
+    "WFW",
+    "KBK"
+  ],
+  "key": {
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "G": {
+      "tag": "c:glass_blocks/colorless"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "id": "singulo:drone_station",
+    "count": 1
+  }
+}

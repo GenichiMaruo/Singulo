@@ -41,7 +41,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
  */
 public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
+        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder {
     public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED, OFF }
 
     /**

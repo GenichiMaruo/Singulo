@@ -77,6 +77,13 @@ public final class SinguloItems {
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
             "builder_wand", () -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties()));
     /** アンドロイド用の無線充電器。 */
+    /** 梱包箱（3段階。段階が上がるほど遠くへ送れる）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> PACKING_CRATE = ITEMS.register(
+            "packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(1, new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> BATTERY_PACKING_CRATE = ITEMS.register(
+            "battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(2, new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> LARGE_BATTERY_PACKING_CRATE = ITEMS.register(
+            "large_battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(3, new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
@@ -217,6 +224,9 @@ public final class SinguloItems {
             Map.entry("magnetic_bottle", 4),
             Map.entry("neutrino_scanner", 3),
             Map.entry("android_charger", 2),
+            Map.entry("packing_crate", 2),
+            Map.entry("battery_packing_crate", 2),
+            Map.entry("large_battery_packing_crate", 3),
             Map.entry("android_armor_plate", 2),
             Map.entry("android_mining_upgrade", 2),
             Map.entry("android_felling_upgrade", 2),
@@ -312,6 +322,11 @@ public final class SinguloItems {
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
         block(SinguloBlocks.PROBE_STATION, 4);
         block(SinguloBlocks.ANDROID_STATION, 2);
+        block(SinguloBlocks.DRONE_STATION, 2);
+        block(SinguloBlocks.DRONE_PORT, 2);
+        TAB_ORDER.add(PACKING_CRATE);
+        TAB_ORDER.add(BATTERY_PACKING_CRATE);
+        TAB_ORDER.add(LARGE_BATTERY_PACKING_CRATE);
         block(SinguloBlocks.ANDROID_WORK_CONSOLE, 2);
         block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
         block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);

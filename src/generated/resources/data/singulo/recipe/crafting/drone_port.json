@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PTP",
+    "KCB",
+    "PXP"
+  ],
+  "key": {
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "T": {
+      "item": "minecraft:iron_trapdoor"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    },
+    "C": {
+      "tag": "c:chests/wooden"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    },
+    "X": {
+      "item": "minecraft:piston"
+    }
+  },
+  "result": {
+    "id": "singulo:drone_port",
+    "count": 1
+  }
+}

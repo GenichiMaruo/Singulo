@@ -11128,12 +11128,12 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 49 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 49개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 26개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 27 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 27개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11216,8 +11216,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
-    "translation": "사용 대상: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 15개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 18 more",
+    "translation": "사용 대상: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 18개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -11404,8 +11404,8 @@
     "translation": "사용 대상: 냉매 카트리지"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
-    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 19개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 20 more",
+    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 20개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11632,16 +11632,16 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 85 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 85개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 88 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 88개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 62 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 62개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 66 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 66개"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
-    "translation": "사용 대상: 초전도 케이블, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브, 위상 전선 외 1개"
+    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 2 more",
+    "translation": "사용 대상: 초전도 케이블, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브, 위상 전선 외 2개"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
@@ -11708,8 +11708,8 @@
     "translation": "사용 대상: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 22 more",
-    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 22개"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 24 more",
+    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 24개"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
@@ -11922,5 +11922,409 @@
   "uses.singulo.capacity_upgrade_2": {
     "source": "Used in: Capacity Upgrade Mk3",
     "translation": "사용처: 용량 업그레이드 Mk3"
+  },
+  "item.singulo.drone_memory": {
+    "source": "Drone Crystal Memory",
+    "translation": "드론 크리스털 메모리"
+  },
+  "item.singulo.drone_kit": {
+    "source": "Drone Kit",
+    "translation": "드론 키트"
+  },
+  "block.singulo.drone_station": {
+    "source": "Drone Station",
+    "translation": "드론 스테이션"
+  },
+  "block.singulo.drone_port": {
+    "source": "Drone Port",
+    "translation": "드론 포트"
+  },
+  "item.singulo.packing_crate": {
+    "source": "Packing Crate",
+    "translation": "포장 상자"
+  },
+  "item.singulo.battery_packing_crate": {
+    "source": "Battery Packing Crate",
+    "translation": "배터리 포장 상자"
+  },
+  "item.singulo.large_battery_packing_crate": {
+    "source": "Large Battery Packing Crate",
+    "translation": "대용량 배터리 포장 상자"
+  },
+  "entity.singulo.cargo_drone": {
+    "source": "Cargo Drone",
+    "translation": "수송 드론"
+  },
+  "gui.singulo.drone_station.status.0": {
+    "source": "Insert a Drone Crystal Memory",
+    "translation": "드론 크리스털 메모리를 넣으세요"
+  },
+  "gui.singulo.drone_station.status.1": {
+    "source": "No drone kit",
+    "translation": "드론 키트가 없습니다"
+  },
+  "gui.singulo.drone_station.status.2": {
+    "source": "Not enough power (20000 FE to print)",
+    "translation": "전력이 부족합니다(출력에 20000 FE)"
+  },
+  "gui.singulo.drone_station.status.3": {
+    "source": "Printing",
+    "translation": "출력 중"
+  },
+  "gui.singulo.drone_station.status.4": {
+    "source": "Standing by",
+    "translation": "대기 중"
+  },
+  "gui.singulo.drone_station.status.5": {
+    "source": "Delivering",
+    "translation": "운반 중"
+  },
+  "gui.singulo.drone_station.status.6": {
+    "source": "Something is blocking the top",
+    "translation": "스테이션 위가 막혀 있습니다"
+  },
+  "gui.singulo.drone_station.status.7": {
+    "source": "Empty",
+    "translation": "비어 있음"
+  },
+  "gui.singulo.drone_station.memory": {
+    "source": "Drone Crystal Memory (not used up)",
+    "translation": "드론 크리스털 메모리(소모되지 않음)"
+  },
+  "gui.singulo.drone_station.kit": {
+    "source": "Drone Kit (one per print)",
+    "translation": "드론 키트(출력할 때마다 1개)"
+  },
+  "gui.singulo.drone_station.production": {
+    "source": "Production Upgrade (up to 3 drones)",
+    "translation": "생산 업그레이드(최대 3대)"
+  },
+  "gui.singulo.drone_station.permit": {
+    "source": "Shield Permit (limits who can use it)",
+    "translation": "보호막 허가증(사용할 수 있는 사람을 제한)"
+  },
+  "gui.singulo.drone_station.more_units": {
+    "source": "With a Production Upgrade, up to 3 drones are printed",
+    "translation": "생산 업그레이드를 넣으면 최대 3대까지 출력합니다"
+  },
+  "gui.singulo.drone_port.status.0": {
+    "source": "Idle",
+    "translation": "대기 중"
+  },
+  "gui.singulo.drone_port.status.1": {
+    "source": "Waiting for a drone (none standing by nearby)",
+    "translation": "드론을 기다리는 중(근처에 대기 중인 드론이 없음)"
+  },
+  "gui.singulo.drone_port.status.2": {
+    "source": "A drone is on its way",
+    "translation": "드론이 오고 있습니다"
+  },
+  "gui.singulo.drone_port.status.3": {
+    "source": "Loading",
+    "translation": "적재 중"
+  },
+  "gui.singulo.drone_port.status.4": {
+    "source": "Unloading",
+    "translation": "하역 중"
+  },
+  "gui.singulo.drone_port.status.5": {
+    "source": "Not enough power",
+    "translation": "전력이 부족합니다"
+  },
+  "gui.singulo.drone_port.status.6": {
+    "source": "No empty packing crate",
+    "translation": "빈 포장 상자가 없습니다"
+  },
+  "gui.singulo.drone_port.status.7": {
+    "source": "Out of range (needs a higher-tier crate)",
+    "translation": "사거리 밖입니다(더 높은 단계의 포장 상자가 필요)"
+  },
+  "gui.singulo.drone_port.status.8": {
+    "source": "Choose a destination",
+    "translation": "목적지를 선택하세요"
+  },
+  "gui.singulo.drone_port.status.9": {
+    "source": "No cargo",
+    "translation": "화물이 없습니다"
+  },
+  "gui.singulo.drone_port.place": {
+    "source": "Drone Port (%s, %s, %s)",
+    "translation": "드론 포트(%s, %s, %s)"
+  },
+  "gui.singulo.drone_port.target": {
+    "source": "At %s, %s, %s",
+    "translation": "위치 %s, %s, %s"
+  },
+  "gui.singulo.drone_port.cost": {
+    "source": "%s FE to send",
+    "translation": "발송에 %s FE"
+  },
+  "gui.singulo.drone_port.send": {
+    "source": "Send",
+    "translation": "발송"
+  },
+  "gui.singulo.drone_port.cancel": {
+    "source": "Cancel",
+    "translation": "취소"
+  },
+  "gui.singulo.drone_port.no_targets": {
+    "source": "No other drone ports",
+    "translation": "다른 드론 포트가 없습니다"
+  },
+  "gui.singulo.drone_port.crates": {
+    "source": "Empty packing crates",
+    "translation": "빈 포장 상자"
+  },
+  "gui.singulo.drone_port.arrived": {
+    "source": "Arrived crates (unpacked into the row below)",
+    "translation": "도착한 상자(아래 수령 칸으로 풀어 넣음)"
+  },
+  "gui.singulo.drone_port.receive": {
+    "source": "Received items",
+    "translation": "수령"
+  },
+  "gui.singulo.drone_port.locked": {
+    "source": "Only the owner can use this",
+    "translation": "소유자만 사용할 수 있습니다"
+  },
+  "tooltip.singulo.drone_crate.range": {
+    "source": "Range: %s blocks",
+    "translation": "사거리 %s블록"
+  },
+  "tooltip.singulo.drone_crate.item": {
+    "source": "%s ×%s",
+    "translation": "%s ×%s"
+  },
+  "tooltip.singulo.drone_crate.more": {
+    "source": "and %s more",
+    "translation": "그 외 %s종"
+  },
+  "tooltip.singulo.drone_crate.unpack": {
+    "source": "Right-click to unpack",
+    "translation": "우클릭으로 상자 풀기"
+  },
+  "desc.singulo.drone_memory": {
+    "source": "A crystal memory smaller than an android’s, holding the design of a cargo drone. Put it in a Drone Station to print drones (it is not used up).",
+    "translation": "수송 드론의 설계를 기록한, 안드로이드용보다 작은 크리스털 메모리. 드론 스테이션에 넣으면 드론을 출력할 수 있다(소모되지 않음)."
+  },
+  "desc.singulo.drone_kit": {
+    "source": "A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.",
+    "translation": "부품과 외장판 한 벌. 드론 스테이션이 수송 드론을 1대 출력할 때마다 1개 사용한다."
+  },
+  "howto.singulo.drone_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "desc.singulo.drone_station": {
+    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; up to 3 with a Production Upgrade). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
+    "translation": "드론 크리스털 메모리, 드론 키트, 전력으로 수송 드론을 출력한다(1대 20,000 FE, 생산 업그레이드로 최대 3대). 드론은 위에서 대기하다가 64블록 안의 드론 포트에 불려 화물을 나른다."
+  },
+  "summary.singulo.drone_station": {
+    "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
+    "translation": "메모리, 키트, 전력으로 수송 드론을 출력하고 위에서 대기시킨다."
+  },
+  "howto.singulo.drone_station": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "desc.singulo.drone_port": {
+    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block.",
+    "translation": "빈 포장 상자와 화물을 넣고 목적지(같은 소유자의 다른 포트)를 골라 발송하면, 화물을 포장하고 전력을 지불한 뒤 근처의 드론을 부른다. 천장 해치가 열리고 상자가 드론에게 건네진다. 도착한 상자는 자동으로 풀린다. 전력: 2,000 FE + 1블록당 50 FE."
+  },
+  "summary.singulo.drone_port": {
+    "source": "Packs cargo into crates and sends or receives it by drone.",
+    "translation": "화물을 포장 상자에 담아 드론으로 보내거나 받는다."
+  },
+  "howto.singulo.drone_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "desc.singulo.packing_crate": {
+    "source": "A crate for cargo sent by drone. Reaches up to 160 blocks. Right-click a packed crate to unpack it.",
+    "translation": "드론으로 보낼 화물을 담는 상자. 160블록까지 닿는다. 포장된 상자를 우클릭하면 풀 수 있다."
+  },
+  "howto.singulo.packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "uses.singulo.packing_crate": {
+    "source": "Used in: Battery Packing Crate",
+    "translation": "사용 대상: 배터리 포장 상자"
+  },
+  "desc.singulo.battery_packing_crate": {
+    "source": "A packing crate with an extra battery. Reaches up to 760 blocks.",
+    "translation": "배터리를 더한 포장 상자. 760블록까지 닿는다."
+  },
+  "howto.singulo.battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "uses.singulo.battery_packing_crate": {
+    "source": "Used in: Large Battery Packing Crate",
+    "translation": "사용 대상: 대용량 배터리 포장 상자"
+  },
+  "desc.singulo.large_battery_packing_crate": {
+    "source": "A packing crate with a large battery. Reaches up to 3,160 blocks.",
+    "translation": "큰 배터리를 실은 포장 상자. 3,160블록까지 닿는다."
+  },
+  "howto.singulo.large_battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "제작: 제작대(3단계)"
+  },
+  "guide.singulo.drones": {
+    "source": "Drone Delivery",
+    "translation": "드론 수송"
+  },
+  "guide.singulo.drones.start.title": {
+    "source": "Getting drones",
+    "translation": "드론 준비하기"
+  },
+  "guide.singulo.drones.start.body": {
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). A Production Upgrade allows up to 3. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "유적의 가드 독이 내보낸 경비 드론 한 무리를 모두 쓰러뜨리면, 가끔(40%) 독 위에 드론 크리스털 메모리가 나타난다. 2단계 제작대에서 드론 스테이션을, 정밀 조립기에서 드론 키트를 만든다. 스테이션에 메모리(소모되지 않음)와 키트(출력할 때마다 1개)를 넣고 전력을 보내면 위에 수송 드론을 1대 출력한다(20,000 FE). 생산 업그레이드를 넣으면 최대 3대. 드론은 스테이션 위 하늘에서 대기한다.\n드론은 플레이어나 몹의 공격으로 다치지 않는다. 스테이션을 부수면 대기 중인 드론은 키트로 돌아간다."
+  },
+  "guide.singulo.drones.send.title": {
+    "source": "Sending cargo",
+    "translation": "화물 보내기"
+  },
+  "guide.singulo.drones.send.body": {
+    "source": "A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\nPut an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. Before the drone arrives, Cancel puts everything back (power included).\nHoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.",
+    "translation": "드론 포트를 놓으면 놓은 사람의 수송망에 들어간다. 같은 차원에 있는 같은 소유자의 포트가 모두 목적지로 나열된다. 헤더의 이름을 클릭하면 이름을 붙일 수 있다.\n왼쪽 위에 빈 포장 상자를, 가운데에 화물을 넣고, 오른쪽 목록에서 목적지를 골라 「발송」을 누르면, 포트가 화물을 포장하고 전력을 지불한 뒤 64블록 안의 스테이션에서 대기 중인 드론을 부른다. 드론이 바로 위에 멈추면 천장 해치가 열리고 승강대가 상자를 들어 올려 드론의 집게가 잡는다. 목적지에서도 해치가 열려 상자를 내리고, 수령 칸으로 자동으로 푼다. 빈 상자는 빈 상자 칸으로 돌아간다. 드론이 오기 전이라면 「취소」로 모두 되돌릴 수 있다(전력도 돌려받는다).\n호퍼나 파이프로 빈 상자와 화물을 넣고, 수령 칸에서 꺼낼 수 있다. 비교기는 수령 칸이 찬 정도를 출력한다."
+  },
+  "guide.singulo.drones.range.title": {
+    "source": "Range and power",
+    "translation": "사거리와 전력"
+  },
+  "guide.singulo.drones.range.body": {
+    "source": "Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\nCargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. If the destination port was broken, the cargo goes back to where it came from.",
+    "translation": "발송 전력은 2,000 FE + 직선거리 1블록당 50 FE이며, 포장할 때 포트가 지불한다. 얼마나 멀리 보낼 수 있는지는 포장 상자가 정한다: 포장 상자 160블록, 배터리 포장 상자 760블록, 대용량 배터리 포장 상자 3,160블록. 목적지 목록에서 닿지 않는 거리는 빨갛게 표시된다.\n드론이 로드되지 않은 곳을 나는 동안에도 화물은 사라지지 않는다. 목적지가 로드되어 있으면 드론이 착륙해 내리고, 로드되어 있지 않으면 그 포트가 로드될 때 상자를 받는다. 목적지 포트가 부서졌다면 화물은 출발지로 돌아간다."
+  },
+  "gui.singulo.drone_port.status.10": {
+    "source": "No drone serves this port",
+    "translation": "이 포트를 맡은 드론이 없습니다"
+  },
+  "gui.singulo.drone_port.elsewhere": {
+    "source": "Another port",
+    "translation": "다른 포트"
+  },
+  "gui.singulo.drone_port.cancel.hint": {
+    "source": "Cancel and get the cargo and power back",
+    "translation": "취소하고 화물과 전력을 돌려받습니다"
+  },
+  "gui.singulo.drone_port.phase.1": {
+    "source": "Waiting",
+    "translation": "드론 대기"
+  },
+  "gui.singulo.drone_port.phase.2": {
+    "source": "Drone coming",
+    "translation": "오는 중"
+  },
+  "gui.singulo.drone_port.phase.3": {
+    "source": "Loading",
+    "translation": "적재"
+  },
+  "gui.singulo.drone_port.phase.4": {
+    "source": "In flight",
+    "translation": "비행 중"
+  },
+  "gui.singulo.drone_port.phase.5": {
+    "source": "Unloading",
+    "translation": "하역"
+  },
+  "gui.singulo.drone_port.ship.out": {
+    "source": "To %s",
+    "translation": "%s(으)로 보냄"
+  },
+  "gui.singulo.drone_port.ship.in": {
+    "source": "From %s",
+    "translation": "%s에서 옴"
+  },
+  "gui.singulo.drone_port.ship.progress": {
+    "source": "%s%% of the way",
+    "translation": "진행 %s%%"
+  },
+  "gui.singulo.drone_port.no_ships": {
+    "source": "Nothing in transit",
+    "translation": "운송 중인 화물이 없습니다"
+  },
+  "gui.singulo.drone_station.status.8": {
+    "source": "Stopped",
+    "translation": "정지됨"
+  },
+  "gui.singulo.drone_station.status.9": {
+    "source": "Dismantling",
+    "translation": "해체 중"
+  },
+  "gui.singulo.drone_station.dismantle": {
+    "source": "Dismantle (press twice; the kit comes back)",
+    "translation": "해체(두 번 누름. 키트가 돌아옴)"
+  },
+  "gui.singulo.drone_station.dismantle.confirm": {
+    "source": "Press again to dismantle",
+    "translation": "한 번 더 누르면 해체합니다"
+  },
+  "gui.singulo.drone_station.resume": {
+    "source": "Print again",
+    "translation": "다시 출력"
+  },
+  "guide.singulo.drones.more.title": {
+    "source": "Auto-export, shipments and dismantling",
+    "translation": "자동 반출, 운송 현황, 해체"
+  },
+  "guide.singulo.drones.more.body": {
+    "source": "The settings tab on the right rail opens the same side settings as processing machines. Choose input and output per face and turn on auto-eject to push received items into an adjacent chest or other storage (empty crates that do not fit the crate slot too).\nThe middle of the screen lists shipments in transit: outgoing in orange, incoming in green. Each shows its stage (waiting, drone coming, loading, in flight, unloading) and a progress bar while in flight.\nYou can only send while a drone serves the port (one from a station within 64 blocks). A crate sent while every drone is busy waits to be loaded, and a drone that finishes a delivery nearby flies straight to it instead of returning to its station.\nIn the station screen, press the × on a waiting drone’s row twice to dismantle it: it lands on the station, comes apart and its kit comes back. That slot stops; press + to print again.",
+    "translation": "오른쪽 레일의 설정 칸에서 가공 장치와 같은 면 설정을 열 수 있다. 면마다 입출력을 정하고 자동 배출을 켜면, 받은 화물을 옆의 상자 등으로 밀어낸다(빈 상자 칸에 들어가지 못한 빈 상자도).\n화면 가운데에는 운송 중인 편이 나온다(보내는 편은 주황, 오는 편은 초록). 편마다 드론 대기·오는 중·적재·비행 중·하역 단계와, 비행 중의 진행 막대를 볼 수 있다.\n그 포트를 맡은 드론(64블록 안의 스테이션의 드론)이 있을 때만 발송할 수 있다. 모든 드론이 운반 중일 때 발송한 상자는 적재 대기가 되고, 근처에서 배송을 마친 드론이 스테이션으로 돌아가지 않고 바로 가지러 온다.\n스테이션 화면에서 대기 중인 드론 줄의 ×를 두 번 누르면 해체한다. 드론은 스테이션에 내려와 분해되고 키트가 돌아온다. 그 칸은 멈추며, +를 누르면 다시 출력한다."
+  },
+  "gui.singulo.drone_port.tab.0": {
+    "source": "Cargo and received items",
+    "translation": "화물과 수령"
+  },
+  "gui.singulo.drone_port.tab.1": {
+    "source": "Destination and sending",
+    "translation": "목적지와 발송"
+  },
+  "gui.singulo.drone_port.tab.2": {
+    "source": "Shipments in transit",
+    "translation": "운송 중인 편"
+  },
+  "gui.singulo.drone_port.auto.off": {
+    "source": "Auto: off",
+    "translation": "자동 끔"
+  },
+  "gui.singulo.drone_port.auto.full": {
+    "source": "Auto: full",
+    "translation": "자동 가득"
+  },
+  "gui.singulo.drone_port.auto.count": {
+    "source": "Auto: %s",
+    "translation": "자동 %s개"
+  },
+  "gui.singulo.drone_port.auto.hint": {
+    "source": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
+    "translation": "자동 발송: 화물이 이 수(가득은 9칸 모두)만큼 쌓이면 등록한 목적지로 보낸다. 화물이 더 늘지 않고 2초 지나면 보낸다. 클릭으로 전환"
+  },
+  "gui.singulo.drone_port.auto.register": {
+    "source": "Set",
+    "translation": "등록"
+  },
+  "gui.singulo.drone_port.auto.register.hint": {
+    "source": "Use the destination selected in the list for auto-send",
+    "translation": "목록에서 고른 목적지를 자동 발송의 목적지로 한다"
+  },
+  "gui.singulo.drone_port.auto.target": {
+    "source": "→ %s",
+    "translation": "→ %s"
+  },
+  "gui.singulo.drone_port.auto.none": {
+    "source": "No auto-send destination",
+    "translation": "자동 발송 목적지 미등록"
+  },
+  "guide.singulo.drones.auto.title": {
+    "source": "Auto-send",
+    "translation": "자동 발송"
+  },
+  "guide.singulo.drones.auto.body": {
+    "source": "The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.",
+    "translation": "발송 탭의 아래 줄에서 자동 발송을 쓸 수 있다. 기준 버튼을 누를 때마다 끔·1개·64개·256개·가득(화물 9칸이 모두 가득)으로 바뀐다. 목록에서 목적지를 고르고 「등록」을 누르면 자동 발송의 목적지가 된다(직접 보내는 목적지와 따로 기억한다).\n화물 칸이 기준만큼 쌓이고 2초가 지나도 늘지 않으면(가득이면 바로), 등록한 목적지로 자동 발송한다. 빈 상자·사거리·전력·드론의 조건은 직접 보낼 때와 같다. 호퍼나 파이프로 화물을 계속 넣으면, 채굴장 등에서 거점으로 계속 자동으로 나를 수 있다."
   }
 }

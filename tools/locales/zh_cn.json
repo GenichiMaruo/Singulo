@@ -11128,12 +11128,12 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 49 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 49 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 52 个"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
-    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 26 个"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 27 more",
+    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 27 个"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11216,8 +11216,8 @@
     "translation": "用于：卡西米尔腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
-    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 15 个"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 18 more",
+    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 18 个"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -11404,8 +11404,8 @@
     "translation": "用于：冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
-    "translation": "用于：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 19 个"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 20 more",
+    "translation": "用于：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 20 个"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11632,16 +11632,16 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 85 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 85 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 88 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 88 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 62 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 62 个"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 66 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 66 个"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
-    "translation": "用于：超导电缆、量子纠缠元件、玻色凝聚态催化剂、简并热炉换热管、拓扑导线 等 1 个"
+    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 2 more",
+    "translation": "用于：超导电缆、量子纠缠元件、玻色凝聚态催化剂、简并热炉换热管、拓扑导线 等 2 个"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
@@ -11708,8 +11708,8 @@
     "translation": "用于：重力场稳定器、虫洞生成器聚焦器、虫洞入口外壳"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 22 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 22 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 24 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 24 个"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
@@ -11922,5 +11922,409 @@
   "uses.singulo.capacity_upgrade_2": {
     "source": "Used in: Capacity Upgrade Mk3",
     "translation": "用途：容量升级 Mk3"
+  },
+  "item.singulo.drone_memory": {
+    "source": "Drone Crystal Memory",
+    "translation": "无人机水晶存储器"
+  },
+  "item.singulo.drone_kit": {
+    "source": "Drone Kit",
+    "translation": "无人机套件"
+  },
+  "block.singulo.drone_station": {
+    "source": "Drone Station",
+    "translation": "无人机站"
+  },
+  "block.singulo.drone_port": {
+    "source": "Drone Port",
+    "translation": "无人机起降港"
+  },
+  "item.singulo.packing_crate": {
+    "source": "Packing Crate",
+    "translation": "包装箱"
+  },
+  "item.singulo.battery_packing_crate": {
+    "source": "Battery Packing Crate",
+    "translation": "附电池包装箱"
+  },
+  "item.singulo.large_battery_packing_crate": {
+    "source": "Large Battery Packing Crate",
+    "translation": "大容量电池包装箱"
+  },
+  "entity.singulo.cargo_drone": {
+    "source": "Cargo Drone",
+    "translation": "运输无人机"
+  },
+  "gui.singulo.drone_station.status.0": {
+    "source": "Insert a Drone Crystal Memory",
+    "translation": "请放入无人机水晶存储器"
+  },
+  "gui.singulo.drone_station.status.1": {
+    "source": "No drone kit",
+    "translation": "没有无人机套件"
+  },
+  "gui.singulo.drone_station.status.2": {
+    "source": "Not enough power (20000 FE to print)",
+    "translation": "电力不足（打印需要 20000 FE）"
+  },
+  "gui.singulo.drone_station.status.3": {
+    "source": "Printing",
+    "translation": "打印中"
+  },
+  "gui.singulo.drone_station.status.4": {
+    "source": "Standing by",
+    "translation": "待命中"
+  },
+  "gui.singulo.drone_station.status.5": {
+    "source": "Delivering",
+    "translation": "运送中"
+  },
+  "gui.singulo.drone_station.status.6": {
+    "source": "Something is blocking the top",
+    "translation": "无人机站上方被挡住了"
+  },
+  "gui.singulo.drone_station.status.7": {
+    "source": "Empty",
+    "translation": "空位"
+  },
+  "gui.singulo.drone_station.memory": {
+    "source": "Drone Crystal Memory (not used up)",
+    "translation": "无人机水晶存储器（不会消耗）"
+  },
+  "gui.singulo.drone_station.kit": {
+    "source": "Drone Kit (one per print)",
+    "translation": "无人机套件（每次打印用 1 个）"
+  },
+  "gui.singulo.drone_station.production": {
+    "source": "Production Upgrade (up to 3 drones)",
+    "translation": "生产升级（最多 3 架）"
+  },
+  "gui.singulo.drone_station.permit": {
+    "source": "Shield Permit (limits who can use it)",
+    "translation": "护盾通行证（限制可使用的人）"
+  },
+  "gui.singulo.drone_station.more_units": {
+    "source": "With a Production Upgrade, up to 3 drones are printed",
+    "translation": "放入生产升级后，最多打印 3 架"
+  },
+  "gui.singulo.drone_port.status.0": {
+    "source": "Idle",
+    "translation": "待机中"
+  },
+  "gui.singulo.drone_port.status.1": {
+    "source": "Waiting for a drone (none standing by nearby)",
+    "translation": "正在等待无人机（附近没有待命的无人机）"
+  },
+  "gui.singulo.drone_port.status.2": {
+    "source": "A drone is on its way",
+    "translation": "无人机正在赶来"
+  },
+  "gui.singulo.drone_port.status.3": {
+    "source": "Loading",
+    "translation": "装货中"
+  },
+  "gui.singulo.drone_port.status.4": {
+    "source": "Unloading",
+    "translation": "卸货中"
+  },
+  "gui.singulo.drone_port.status.5": {
+    "source": "Not enough power",
+    "translation": "电力不足"
+  },
+  "gui.singulo.drone_port.status.6": {
+    "source": "No empty packing crate",
+    "translation": "没有空的包装箱"
+  },
+  "gui.singulo.drone_port.status.7": {
+    "source": "Out of range (needs a higher-tier crate)",
+    "translation": "超出航程（需要更高阶段的包装箱）"
+  },
+  "gui.singulo.drone_port.status.8": {
+    "source": "Choose a destination",
+    "translation": "请选择目的地"
+  },
+  "gui.singulo.drone_port.status.9": {
+    "source": "No cargo",
+    "translation": "没有货物"
+  },
+  "gui.singulo.drone_port.place": {
+    "source": "Drone Port (%s, %s, %s)",
+    "translation": "无人机起降港（%s, %s, %s）"
+  },
+  "gui.singulo.drone_port.target": {
+    "source": "At %s, %s, %s",
+    "translation": "位置 %s, %s, %s"
+  },
+  "gui.singulo.drone_port.cost": {
+    "source": "%s FE to send",
+    "translation": "发送需要 %s FE"
+  },
+  "gui.singulo.drone_port.send": {
+    "source": "Send",
+    "translation": "发送"
+  },
+  "gui.singulo.drone_port.cancel": {
+    "source": "Cancel",
+    "translation": "取消"
+  },
+  "gui.singulo.drone_port.no_targets": {
+    "source": "No other drone ports",
+    "translation": "没有其他无人机起降港"
+  },
+  "gui.singulo.drone_port.crates": {
+    "source": "Empty packing crates",
+    "translation": "空的包装箱"
+  },
+  "gui.singulo.drone_port.arrived": {
+    "source": "Arrived crates (unpacked into the row below)",
+    "translation": "送达的箱子（拆开放入下方的接收栏）"
+  },
+  "gui.singulo.drone_port.receive": {
+    "source": "Received items",
+    "translation": "接收"
+  },
+  "gui.singulo.drone_port.locked": {
+    "source": "Only the owner can use this",
+    "translation": "只有所有者可以使用"
+  },
+  "tooltip.singulo.drone_crate.range": {
+    "source": "Range: %s blocks",
+    "translation": "航程 %s 格"
+  },
+  "tooltip.singulo.drone_crate.item": {
+    "source": "%s ×%s",
+    "translation": "%s ×%s"
+  },
+  "tooltip.singulo.drone_crate.more": {
+    "source": "and %s more",
+    "translation": "另有 %s 种"
+  },
+  "tooltip.singulo.drone_crate.unpack": {
+    "source": "Right-click to unpack",
+    "translation": "右键拆箱"
+  },
+  "desc.singulo.drone_memory": {
+    "source": "A crystal memory smaller than an android’s, holding the design of a cargo drone. Put it in a Drone Station to print drones (it is not used up).",
+    "translation": "记录了运输无人机设计的水晶存储器，比仿生人用的更小。放入无人机站即可打印无人机（不会消耗）。"
+  },
+  "desc.singulo.drone_kit": {
+    "source": "A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.",
+    "translation": "一套零件与外壳板。无人机站每打印一架运输无人机就使用 1 个。"
+  },
+  "howto.singulo.drone_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "desc.singulo.drone_station": {
+    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; up to 3 with a Production Upgrade). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
+    "translation": "用无人机水晶存储器、无人机套件和电力打印运输无人机（每架 20,000 FE；装上生产升级最多 3 架）。无人机在上空待命，为 64 格内的无人机起降港运送货物。"
+  },
+  "summary.singulo.drone_station": {
+    "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
+    "translation": "用存储器、套件和电力打印运输无人机，并让它们在上空待命。"
+  },
+  "howto.singulo.drone_station": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "desc.singulo.drone_port": {
+    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block.",
+    "translation": "放入空的包装箱和货物，选择目的地（同一所有者的其他起降港）并发送：它会打包货物、支付电力并呼叫附近的无人机。顶部舱门打开，把箱子交给无人机。送达的箱子会自动拆开。电力：2,000 FE，每格距离另加 50 FE。"
+  },
+  "summary.singulo.drone_port": {
+    "source": "Packs cargo into crates and sends or receives it by drone.",
+    "translation": "把货物装进包装箱，用无人机发送或接收。"
+  },
+  "howto.singulo.drone_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "desc.singulo.packing_crate": {
+    "source": "A crate for cargo sent by drone. Reaches up to 160 blocks. Right-click a packed crate to unpack it.",
+    "translation": "装入无人机运送货物的箱子。最远可送 160 格。右键已打包的箱子可以拆开。"
+  },
+  "howto.singulo.packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "uses.singulo.packing_crate": {
+    "source": "Used in: Battery Packing Crate",
+    "translation": "用于：附电池包装箱"
+  },
+  "desc.singulo.battery_packing_crate": {
+    "source": "A packing crate with an extra battery. Reaches up to 760 blocks.",
+    "translation": "加装了电池的包装箱。最远可送 760 格。"
+  },
+  "howto.singulo.battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "uses.singulo.battery_packing_crate": {
+    "source": "Used in: Large Battery Packing Crate",
+    "translation": "用于：大容量电池包装箱"
+  },
+  "desc.singulo.large_battery_packing_crate": {
+    "source": "A packing crate with a large battery. Reaches up to 3,160 blocks.",
+    "translation": "装有大电池的包装箱。最远可送 3,160 格。"
+  },
+  "howto.singulo.large_battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "制造地：工作台（第 3 阶段）"
+  },
+  "guide.singulo.drones": {
+    "source": "Drone Delivery",
+    "translation": "无人机运输"
+  },
+  "guide.singulo.drones.start.title": {
+    "source": "Getting drones",
+    "translation": "准备无人机"
+  },
+  "guide.singulo.drones.start.body": {
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). A Production Upgrade allows up to 3. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "把遗迹警卫机坞站放出的一波警卫无人机全部击败后，有时（40%）坞站上方会出现无人机水晶存储器。在第 2 阶段的工作台制作无人机站，在精密组装台制作无人机套件。把存储器（不会消耗）和套件（每次打印用 1 个）放入无人机站并供电，它就会在上方打印一架运输无人机（20,000 FE）。装上生产升级最多 3 架。无人机在站的上空待命。\n无人机不会受到玩家或生物的伤害。破坏无人机站时，待命中的无人机会变回套件。"
+  },
+  "guide.singulo.drones.send.title": {
+    "source": "Sending cargo",
+    "translation": "发送货物"
+  },
+  "guide.singulo.drones.send.body": {
+    "source": "A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\nPut an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. Before the drone arrives, Cancel puts everything back (power included).\nHoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.",
+    "translation": "放置无人机起降港后，它会加入放置者的运输网：同一维度中同一所有者的所有起降港都会列为目的地。点击标题栏的名字可以为它命名。\n在左上放入空的包装箱，中间放入货物，在右侧列表选择目的地并按“发送”。起降港会打包货物、支付电力，并从 64 格内的无人机站呼叫待命的无人机。无人机悬停在正上方时，顶部舱门打开，升降台把箱子举起，无人机的爪子将其抓住。到达目的地后舱门再次打开，箱子被放下并自动拆开到接收栏。空箱会回到空箱栏。在无人机到达之前，按“取消”可以全部恢复原状（电力也会退回）。\n漏斗和管道可以放入空箱和货物，并从接收栏取出物品。比较器输出接收栏的填满程度。"
+  },
+  "guide.singulo.drones.range.title": {
+    "source": "Range and power",
+    "translation": "航程与电力"
+  },
+  "guide.singulo.drones.range.body": {
+    "source": "Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\nCargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. If the destination port was broken, the cargo goes back to where it came from.",
+    "translation": "发送所需电力为 2,000 FE，直线距离每格另加 50 FE，在打包时由起降港支付。能送多远由包装箱决定：包装箱 160 格，附电池包装箱 760 格，大容量电池包装箱 3,160 格。目的地列表中，够不到的距离显示为红色。\n无人机飞过未加载的区域时，货物也不会丢失。目的地已加载时无人机会降落卸货；未加载时，起降港会在加载时接收箱子。如果目的地起降港已被破坏，货物会送回出发地。"
+  },
+  "gui.singulo.drone_port.status.10": {
+    "source": "No drone serves this port",
+    "translation": "没有负责此起降港的无人机"
+  },
+  "gui.singulo.drone_port.elsewhere": {
+    "source": "Another port",
+    "translation": "其他起降港"
+  },
+  "gui.singulo.drone_port.cancel.hint": {
+    "source": "Cancel and get the cargo and power back",
+    "translation": "取消，并退回货物和电力"
+  },
+  "gui.singulo.drone_port.phase.1": {
+    "source": "Waiting",
+    "translation": "等待无人机"
+  },
+  "gui.singulo.drone_port.phase.2": {
+    "source": "Drone coming",
+    "translation": "正在赶来"
+  },
+  "gui.singulo.drone_port.phase.3": {
+    "source": "Loading",
+    "translation": "装货"
+  },
+  "gui.singulo.drone_port.phase.4": {
+    "source": "In flight",
+    "translation": "飞行中"
+  },
+  "gui.singulo.drone_port.phase.5": {
+    "source": "Unloading",
+    "translation": "卸货"
+  },
+  "gui.singulo.drone_port.ship.out": {
+    "source": "To %s",
+    "translation": "送往 %s"
+  },
+  "gui.singulo.drone_port.ship.in": {
+    "source": "From %s",
+    "translation": "来自 %s"
+  },
+  "gui.singulo.drone_port.ship.progress": {
+    "source": "%s%% of the way",
+    "translation": "进度 %s%%"
+  },
+  "gui.singulo.drone_port.no_ships": {
+    "source": "Nothing in transit",
+    "translation": "没有运输中的货物"
+  },
+  "gui.singulo.drone_station.status.8": {
+    "source": "Stopped",
+    "translation": "已停止"
+  },
+  "gui.singulo.drone_station.status.9": {
+    "source": "Dismantling",
+    "translation": "拆解中"
+  },
+  "gui.singulo.drone_station.dismantle": {
+    "source": "Dismantle (press twice; the kit comes back)",
+    "translation": "拆解（按两次；套件会退回）"
+  },
+  "gui.singulo.drone_station.dismantle.confirm": {
+    "source": "Press again to dismantle",
+    "translation": "再按一次即拆解"
+  },
+  "gui.singulo.drone_station.resume": {
+    "source": "Print again",
+    "translation": "重新打印"
+  },
+  "guide.singulo.drones.more.title": {
+    "source": "Auto-export, shipments and dismantling",
+    "translation": "自动输出、运输状况与拆解"
+  },
+  "guide.singulo.drones.more.body": {
+    "source": "The settings tab on the right rail opens the same side settings as processing machines. Choose input and output per face and turn on auto-eject to push received items into an adjacent chest or other storage (empty crates that do not fit the crate slot too).\nThe middle of the screen lists shipments in transit: outgoing in orange, incoming in green. Each shows its stage (waiting, drone coming, loading, in flight, unloading) and a progress bar while in flight.\nYou can only send while a drone serves the port (one from a station within 64 blocks). A crate sent while every drone is busy waits to be loaded, and a drone that finishes a delivery nearby flies straight to it instead of returning to its station.\nIn the station screen, press the × on a waiting drone’s row twice to dismantle it: it lands on the station, comes apart and its kit comes back. That slot stops; press + to print again.",
+    "translation": "在右侧栏的设置格可以打开与加工机器相同的面设置。为每个面设定输入输出，开启自动排出后，收到的货物会被推入相邻的箱子等容器（空箱栏放不下的空箱也会）。\n界面中间会列出运输中的航班（发出的为橙色，送来的为绿色）。每个航班都能看到所处阶段：等待无人机、正在赶来、装货、飞行中、卸货，飞行中还会显示进度条。\n只有当有无人机负责该起降港时（64 格内无人机站的无人机）才能发送。所有无人机都在运送时发送的箱子会进入待装货状态，在附近送完货的无人机会直接前来取货，而不返回无人机站。\n在无人机站界面中，按两次待命无人机所在行的 ×，即可拆解。无人机会降落到站上并被拆开，套件会退回。该栏位随即停止，按 + 可重新打印。"
+  },
+  "gui.singulo.drone_port.tab.0": {
+    "source": "Cargo and received items",
+    "translation": "货物与接收"
+  },
+  "gui.singulo.drone_port.tab.1": {
+    "source": "Destination and sending",
+    "translation": "目的地与发送"
+  },
+  "gui.singulo.drone_port.tab.2": {
+    "source": "Shipments in transit",
+    "translation": "运输中的航班"
+  },
+  "gui.singulo.drone_port.auto.off": {
+    "source": "Auto: off",
+    "translation": "自动 关闭"
+  },
+  "gui.singulo.drone_port.auto.full": {
+    "source": "Auto: full",
+    "translation": "自动 装满"
+  },
+  "gui.singulo.drone_port.auto.count": {
+    "source": "Auto: %s",
+    "translation": "自动 %s 个"
+  },
+  "gui.singulo.drone_port.auto.hint": {
+    "source": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
+    "translation": "自动发送：货物达到此数量（装满指 9 栏全满）时，发送到登记的目的地。货物停止增加 2 秒后发送。点击切换"
+  },
+  "gui.singulo.drone_port.auto.register": {
+    "source": "Set",
+    "translation": "登记"
+  },
+  "gui.singulo.drone_port.auto.register.hint": {
+    "source": "Use the destination selected in the list for auto-send",
+    "translation": "将列表中选中的目的地设为自动发送的目的地"
+  },
+  "gui.singulo.drone_port.auto.target": {
+    "source": "→ %s",
+    "translation": "→ %s"
+  },
+  "gui.singulo.drone_port.auto.none": {
+    "source": "No auto-send destination",
+    "translation": "未登记自动发送目的地"
+  },
+  "guide.singulo.drones.auto.title": {
+    "source": "Auto-send",
+    "translation": "自动发送"
+  },
+  "guide.singulo.drones.auto.body": {
+    "source": "The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.",
+    "translation": "在发送标签页的下方一行可以使用自动发送。每按一次阈值按钮，就会在关闭、1 个、64 个、256 个、装满（货物的 9 栏全满）之间切换。在列表中选择目的地后按“登记”，即可设为自动发送的目的地（与手动发送的目的地分开保存）。\n当货物栏达到阈值且 2 秒内没有再增加时（装满则立即），起降港会自动发送到登记的目的地。空箱、航程、电力与无人机的条件与手动发送相同。用漏斗或管道持续放入货物，就能自动把矿场等处的物品不断运回基地。"
   }
 }

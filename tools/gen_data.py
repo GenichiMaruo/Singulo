@@ -28,6 +28,7 @@ from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAM
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
 import androids  # noqa: E402
+import drones  # noqa: E402
 from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, ALIAS_RECIPE_IDS, BYPRODUCTS, INGREDIENT_TAGS, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
@@ -84,7 +85,7 @@ def stage_of(name):
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
             '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4,
-            '小型クリスタルメモリ（射撃型）': 4}.get(name, 1)
+            '小型クリスタルメモリ（射撃型）': 4, 'ドローン用クリスタルメモリ': 2}.get(name, 1)
 
 
 def max_uses(name):
@@ -849,6 +850,7 @@ UI_LANG = {
     'gui.singulo.wormhole_port.no_partner': ('口の向こう側がつながっていない', 'The mouth is not connected'),
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
+    'entity.singulo.cargo_drone': ('輸送ドローン', 'Cargo Drone'),
     'gui.singulo.android.nickname.blade': ('ルミナ', 'Lumina'),
     'gui.singulo.android.nickname.whip': ('ヴェルナ', 'Verna'),
     'gui.singulo.android.nickname.saber': ('ソレイユ', 'Soleil'),
@@ -1247,6 +1249,72 @@ UI_LANG = {
     'gui.singulo.android_station.status.9': ('遠くにいます', 'Far away'),
     'gui.singulo.android_station.status.10': ('充電切れ', 'Out of charge'),
     'gui.singulo.android_station.status.waiting': ('%s 秒後に印刷し直す', 'Reprinting in %s s'),
+    # ドローン輸送
+    'gui.singulo.drone_station.status.0': ('ドローン用クリスタルメモリを入れてください', 'Insert a Drone Crystal Memory'),
+    'gui.singulo.drone_station.status.1': ('ドローンキットがありません', 'No drone kit'),
+    'gui.singulo.drone_station.status.2': ('電力が足りません（印刷に 20000 FE）', 'Not enough power (20000 FE to print)'),
+    'gui.singulo.drone_station.status.3': ('印刷中', 'Printing'),
+    'gui.singulo.drone_station.status.4': ('待機中', 'Standing by'),
+    'gui.singulo.drone_station.status.5': ('運搬中', 'Delivering'),
+    'gui.singulo.drone_station.status.6': ('ステーションの上がふさがっています', 'Something is blocking the top'),
+    'gui.singulo.drone_station.status.7': ('空き', 'Empty'),
+    'gui.singulo.drone_station.memory': ('ドローン用クリスタルメモリ（減らない）', 'Drone Crystal Memory (not used up)'),
+    'gui.singulo.drone_station.kit': ('ドローンキット（印刷ごとに1つ）', 'Drone Kit (one per print)'),
+    'gui.singulo.drone_station.production': ('生産アップグレード（3機まで）', 'Production Upgrade (up to 3 drones)'),
+    'gui.singulo.drone_station.permit': ('シールド許可証（使える人を限る）', 'Shield Permit (limits who can use it)'),
+    'gui.singulo.drone_station.more_units': ('生産アップグレードを入れると、3機まで印刷する', 'With a Production Upgrade, up to 3 drones are printed'),
+    'gui.singulo.drone_port.status.0': ('待機中', 'Idle'),
+    'gui.singulo.drone_port.status.1': ('ドローンを待っています（近くに待機中のドローンがいない）', 'Waiting for a drone (none standing by nearby)'),
+    'gui.singulo.drone_port.status.2': ('ドローンが向かっています', 'A drone is on its way'),
+    'gui.singulo.drone_port.status.3': ('積み込み中', 'Loading'),
+    'gui.singulo.drone_port.status.4': ('荷降ろし中', 'Unloading'),
+    'gui.singulo.drone_port.status.5': ('電力が足りません', 'Not enough power'),
+    'gui.singulo.drone_port.status.6': ('空の梱包箱がありません', 'No empty packing crate'),
+    'gui.singulo.drone_port.status.7': ('射程外です（上の段階の梱包箱が要る）', 'Out of range (needs a higher-tier crate)'),
+    'gui.singulo.drone_port.status.8': ('行き先を選んでください', 'Choose a destination'),
+    'gui.singulo.drone_port.status.9': ('荷物がありません', 'No cargo'),
+    'gui.singulo.drone_port.place': ('発着ポート（%s, %s, %s）', 'Drone Port (%s, %s, %s)'),
+    'gui.singulo.drone_port.target': ('場所 %s, %s, %s', 'At %s, %s, %s'),
+    'gui.singulo.drone_port.cost': ('発送に %s FE', '%s FE to send'),
+    'gui.singulo.drone_port.send': ('発送', 'Send'),
+    'gui.singulo.drone_port.cancel': ('取消', 'Cancel'),
+    'gui.singulo.drone_port.no_targets': ('ほかの発着ポートがありません', 'No other drone ports'),
+    'gui.singulo.drone_port.crates': ('空の梱包箱', 'Empty packing crates'),
+    'gui.singulo.drone_port.arrived': ('届いた箱（下の受け取りの欄へ開梱する）', 'Arrived crates (unpacked into the row below)'),
+    'gui.singulo.drone_port.receive': ('受け取り', 'Received items'),
+    'gui.singulo.drone_port.locked': ('持ち主しか使えません', 'Only the owner can use this'),
+    'gui.singulo.drone_port.status.10': ('近くに呼べるドローンがいません', 'No drone serves this port'),
+    'gui.singulo.drone_port.tab.0': ('荷物と受け取り', 'Cargo and received items'),
+    'gui.singulo.drone_port.tab.1': ('行き先と発送', 'Destination and sending'),
+    'gui.singulo.drone_port.tab.2': ('輸送中の便', 'Shipments in transit'),
+    'gui.singulo.drone_port.auto.off': ('自動 オフ', 'Auto: off'),
+    'gui.singulo.drone_port.auto.full': ('自動 満杯', 'Auto: full'),
+    'gui.singulo.drone_port.auto.count': ('自動 %s個', 'Auto: %s'),
+    'gui.singulo.drone_port.auto.hint': ('自動発送: 荷物がこの数（満杯は9欄すべて）たまったら、登録した行き先へ送る。荷物が増えなくなってから2秒待つ。クリックで切り替え', 'Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change'),
+    'gui.singulo.drone_port.auto.register': ('登録', 'Set'),
+    'gui.singulo.drone_port.auto.register.hint': ('一覧で選んでいる行き先を、自動発送の行き先にする', 'Use the destination selected in the list for auto-send'),
+    'gui.singulo.drone_port.auto.target': ('→ %s', '→ %s'),
+    'gui.singulo.drone_port.auto.none': ('自動発送の行き先は未登録', 'No auto-send destination'),
+    'gui.singulo.drone_port.elsewhere': ('ほかのポート', 'Another port'),
+    'gui.singulo.drone_port.cancel.hint': ('取り消して、荷物と電力を元に戻す', 'Cancel and get the cargo and power back'),
+    'gui.singulo.drone_port.phase.1': ('ドローン待ち', 'Waiting'),
+    'gui.singulo.drone_port.phase.2': ('向かっている', 'Drone coming'),
+    'gui.singulo.drone_port.phase.3': ('積み込み', 'Loading'),
+    'gui.singulo.drone_port.phase.4': ('飛行中', 'In flight'),
+    'gui.singulo.drone_port.phase.5': ('荷降ろし', 'Unloading'),
+    'gui.singulo.drone_port.ship.out': ('%s へ送る', 'To %s'),
+    'gui.singulo.drone_port.ship.in': ('%s から届く', 'From %s'),
+    'gui.singulo.drone_port.ship.progress': ('進み %s%%', '%s%% of the way'),
+    'gui.singulo.drone_port.no_ships': ('輸送中の荷物はありません', 'Nothing in transit'),
+    'gui.singulo.drone_station.status.8': ('止めています', 'Stopped'),
+    'gui.singulo.drone_station.status.9': ('解体中', 'Dismantling'),
+    'gui.singulo.drone_station.dismantle': ('解体する（2回押す。キットが戻る）', 'Dismantle (press twice; the kit comes back)'),
+    'gui.singulo.drone_station.dismantle.confirm': ('もう一度押すと解体します', 'Press again to dismantle'),
+    'gui.singulo.drone_station.resume': ('また印刷する', 'Print again'),
+    'tooltip.singulo.drone_crate.range': ('射程 %s ブロック', 'Range: %s blocks'),
+    'tooltip.singulo.drone_crate.item': ('%s ×%s', '%s ×%s'),
+    'tooltip.singulo.drone_crate.more': ('ほか %s 種類', 'and %s more'),
+    'tooltip.singulo.drone_crate.unpack': ('右クリックで開梱', 'Right-click to unpack'),
     'gui.singulo.android_station.hp': ('体力', 'HP'),
     'gui.singulo.android_station.charge': ('充電', 'Charge'),
     'gui.singulo.android_station.memory': ('設計', 'Design'),
@@ -1647,6 +1715,9 @@ def models():
                 if iid == 'android_station':
                     # 上面は印刷床（光の走査線が往復する。blocks_extra3.station_top）
                     model['textures']['top'] = f'{MODID}:block/android_station_top'
+                if iid in ('drone_station', 'drone_port'):
+                    # 上面は着陸パッド（光の輪が広がる）と、縞の縁の昇降口（tools/drones.py）
+                    model['textures']['top'] = f'{MODID}:block/{iid}_top'
                 if iid.endswith('android_workbench'):
                     # 上面は 3×3 のマスの作業面（blocks_extra3.workbench_top。段階ごとに格子の色が違う）
                     model['textures']['top'] = f'{MODID}:block/{iid}_top'
@@ -1686,7 +1757,9 @@ def models():
                 write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
         else:
             if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'meteor_compass', 'graviton_manipulator'):
-                continue                                       # 立体のモデル・針のモデルは別に作る
+                continue
+            if iid in drones.CRATES:
+                continue                                       # 梱包箱は立体のモデル（drones.models）                                       # 立体のモデル・針のモデルは別に作る
             model = {'parent': 'minecraft:item/handheld' if iid == 'relocation_wrench' else 'minecraft:item/generated',
                      'textures': {'layer0': f'{MODID}:item/{iid}'}}
             if iid == 'relocation_wrench':
@@ -1698,6 +1771,7 @@ def models():
     blocks_extra.models(write_json, ASSETS)
     import blocks_extra3
     blocks_extra3.models(write_json, ASSETS)
+    drones.models(write_json, ASSETS)
     import blocks_extra4
     blocks_extra4.models(write_json, ASSETS)
     import blocks_extra5
@@ -1881,6 +1955,7 @@ def textures():
                {'parent': 'minecraft:item/template_spawn_egg'})
     # 遺構のアンドロイド（128×64。tools/androids.py）
     androids.textures(te, save)
+    drones.entity_textures(te, save)
     for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
@@ -2095,7 +2170,7 @@ def art_textures():
                 sheet, frames = art16.machine_front(iid, stage_of(name), on)
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
                 art16.save(sheet, path)
-                if iid in art16.ANDROID_FACES:
+                if iid in art16.ANDROID_FACES or iid in art16.DRONE_FACES:
                     # 顔のバイザーは16pxの絵をそのまま拡大する（細かい表情を描き直さない）。まばたきも同じ動き
                     hd = hb / f'{iid}_front{"_on" if on else ""}.png'
                     art.save(sheet.resize((32, 32 * frames), __import__('PIL').Image.NEAREST), hd)
@@ -2148,6 +2223,8 @@ def art_textures():
     # アンドロイドの設計メモリ・キット・無線充電器（tools/androids.py）
     androids.item_textures(ti, art16.save)
     androids.glass_textures(tb, art16.save)
+    # ドローン輸送の装置の上面・昇降口・梱包箱・メモリ・キット（tools/drones.py）
+    drones.textures(tb, ti, art16.save, write_json)
     # 探索コンパス・隕石コンパスの針（16コマ）
     for k in range(16):
         art16.save(art16.compass_frame(k / 16), ti / f'explorer_compass_{k:02d}.png')
@@ -3613,6 +3690,9 @@ TAB_GROUPS = [
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
+    # ドローン輸送: ステーションと材料 → 発着ポート → 梱包箱
+    ('ドローン', ['drone_station', 'drone_kit', 'drone_memory', 'drone_port', 'packing_crate', 'battery_packing_crate',
+               'large_battery_packing_crate']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core', 'catalyst_stabilizer']),

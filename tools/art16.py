@@ -434,6 +434,8 @@ def creative_front(on, frame=0, frames=CREATIVE_FRAMES):
 # どの装置も同じ顔（色だけ段階で変わる）
 ANDROID_FACES = ('android_station', 'android_work_console', 'android_supply_port', 'android_delivery_port',
                  'android_recipe_rack', 'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench')
+# ドローン輸送の装置（同じバイザーに、橙の単眼。tools/drones.py）
+DRONE_FACES = ('drone_station', 'drone_port')
 # 動いている間のまばたき: コマ0が開いた目、コマ1が閉じた目。ふだんは開けていて、ときどき1回か2回つぶる（time は tick）
 ANDROID_BLINK = {'animation': {'interpolate': False, 'frames': [
     {'index': 0, 'time': 90}, {'index': 1, 'time': 3},
@@ -490,11 +492,13 @@ def android_front(iid, stage, on, blink=False):
 
 def machine_front(iid, stage, on):
     """正面のテクスチャと、動く場合のコマ数を返す。段階3以上の稼働中は8コマ（アンドロイドの装置は、まばたきの2コマ）。"""
-    if iid in ANDROID_FACES:
+    if iid in ANDROID_FACES or iid in DRONE_FACES:
+        import drones
+        draw = drones.front if iid in DRONE_FACES else android_front
         frames = 2 if on else 1
         sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
         for f in range(frames):
-            sheet.paste(android_front(iid, stage, on, f == 1), (0, S * f))
+            sheet.paste(draw(iid, stage, on, f == 1), (0, S * f))
         return sheet, frames
     frames = 8 if on and stage >= 3 or iid == 'creative_energy_source' else 1
     sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))

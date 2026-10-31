@@ -126,6 +126,17 @@
       ]
     },
     {
+      "id": "drones",
+      "icon": "singulo:drone_station",
+      "pages": [
+        "drones.start",
+        "drones.send",
+        "drones.range",
+        "drones.more",
+        "drones.auto"
+      ]
+    },
+    {
       "id": "romance",
       "icon": "singulo:tipler_core",
       "pages": [
