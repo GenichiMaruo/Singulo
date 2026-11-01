@@ -12380,11 +12380,19 @@
     "translation": "화물 넣고 빼기"
   },
   "gui.singulo.drone_port.sides.crates": {
-    "source": "Empty crate input (crate slot only; disable the face for cargo to make it crate-only)",
-    "translation": "빈 상자 반입(빈 상자 칸만. 화물의 면을 무효로 하면 빈 상자 전용 면이 된다)"
+    "source": "Empty crates (reserve slot input/output)",
+    "translation": "빈 상자 (예비 상자 슬롯 입출력)"
   },
   "gui.singulo.drone_port.sides.crate_input": {
     "source": "Accepts empty crates",
     "translation": "빈 상자를 넣을 수 있음"
+  },
+  "guide.singulo.drones.android.title": {
+    "source": "Working with androids",
+    "translation": "안드로이드와 연결"
+  },
+  "guide.singulo.drones.android.body": {
+    "source": "Place a Drone Port beside an Android Supply Port and allow cargo output on that face to use arrivals as materials. Outbound cargo and sealed crates are not counted as available stock. Beside a Delivery Port, allow cargo input to accept finished products and use auto-send to ship them to another base. Full cargo slots leave products waiting in the Delivery Port.\nThe empty-crate tab controls reserve-crate input/output and auto-eject separately. Defaults remain input-only with auto-eject off. Androids and pipes can collect crates through an output face. On a return-shipment port, disable empty-crate input and allow cargo input on the receiving face to accept empty crates as cargo rather than reserves. Supply transport crates through another face and configure auto-send.",
+    "translation": "안드로이드 자재구 옆에 드론 포트를 놓고 해당 면의 화물 출력을 허용하면 도착한 물품을 제작 재료로 사용할 수 있습니다. 발송 대기 화물과 개봉하지 않은 상자는 가용 재고에 포함되지 않습니다. 납품구 옆에서 화물 입력을 허용하면 완성품을 받고 자동 발송으로 다른 거점에 보낼 수 있습니다. 화물 슬롯이 가득 차면 완성품은 납품구에서 기다립니다.\n빈 상자 탭에서는 예비 상자의 입출력과 자동 배출을 별도로 설정합니다. 기본값은 입력 전용이며 자동 배출은 꺼져 있습니다. 출력 면에서 안드로이드나 파이프로 상자를 회수할 수 있습니다. 반송용 포트는 받는 면의 빈 상자 입력을 끄고 화물 입력을 허용하면 빈 상자를 예비분이 아닌 화물로 받습니다. 다른 면에서 운송용 상자를 공급하고 자동 발송을 설정하세요."
   }
 }

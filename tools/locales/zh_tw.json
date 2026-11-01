@@ -12380,11 +12380,19 @@
     "translation": "貨物的進出"
   },
   "gui.singulo.drone_port.sides.crates": {
-    "source": "Empty crate input (crate slot only; disable the face for cargo to make it crate-only)",
-    "translation": "空箱的搬入（僅限空箱欄。把貨物的面設為無效，即成為空箱專用面）"
+    "source": "Empty crates (reserve slot input/output)",
+    "translation": "空箱（備用箱槽的輸入和輸出）"
   },
   "gui.singulo.drone_port.sides.crate_input": {
     "source": "Accepts empty crates",
     "translation": "可放入空箱"
+  },
+  "guide.singulo.drones.android.title": {
+    "source": "Working with androids",
+    "translation": "與仿生人協作"
+  },
+  "guide.singulo.drones.android.body": {
+    "source": "Place a Drone Port beside an Android Supply Port and allow cargo output on that face to use arrivals as materials. Outbound cargo and sealed crates are not counted as available stock. Beside a Delivery Port, allow cargo input to accept finished products and use auto-send to ship them to another base. Full cargo slots leave products waiting in the Delivery Port.\nThe empty-crate tab controls reserve-crate input/output and auto-eject separately. Defaults remain input-only with auto-eject off. Androids and pipes can collect crates through an output face. On a return-shipment port, disable empty-crate input and allow cargo input on the receiving face to accept empty crates as cargo rather than reserves. Supply transport crates through another face and configure auto-send.",
+    "translation": "將無人機起降港放在仿生人資材口旁，並允許該面的貨物輸出，仿生人即可使用到貨材料。待發貨物和未拆封箱不會計入可用庫存。將起降港放在交付口旁並允許貨物輸入，即可接收成品，再用自動發貨運往其他基地。貨物槽滿時，成品留在交付口等待。\n空箱分頁可單獨設定備用箱的輸入、輸出與自動排出，預設僅輸入且不自動排出。仿生人和管道可從輸出面回收空箱。返程起降港的接收面應停用空箱輸入並啟用貨物輸入，使空箱作為貨物而非備用箱進入。從另一面補充運輸用箱，並設定自動發貨。"
   }
 }

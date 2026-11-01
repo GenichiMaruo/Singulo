@@ -133,7 +133,8 @@
         "drones.send",
         "drones.range",
         "drones.more",
-        "drones.auto"
+        "drones.auto",
+        "drones.android"
       ]
     },
     {

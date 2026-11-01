@@ -1288,7 +1288,7 @@ UI_LANG = {
     'gui.singulo.drone_port.tab.1': ('行き先と発送', 'Destination and sending'),
     'gui.singulo.drone_port.tab.2': ('輸送中の便', 'Shipments in transit'),
     'gui.singulo.drone_port.sides.items': ('荷物の出し入れ', 'Cargo in and out'),
-    'gui.singulo.drone_port.sides.crates': ('空き箱の搬入（空き箱の欄だけ。荷物の面を無効にすると、空き箱専用の面になる）', 'Empty crate input (crate slot only; disable the face for cargo to make it crate-only)'),
+    'gui.singulo.drone_port.sides.crates': ('空き箱（予備の欄の搬入出）', 'Empty crates (reserve slot input/output)'),
     'gui.singulo.drone_port.sides.crate_input': ('空き箱を入れられる', 'Accepts empty crates'),
     'gui.singulo.drone_port.auto.off': ('自動 オフ', 'Auto: off'),
     'gui.singulo.drone_port.auto.full': ('自動 満杯', 'Auto: full'),
