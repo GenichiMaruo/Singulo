@@ -2989,4 +2989,25 @@ public final class AndroidGameTests {
         helper.assertTrue(job.fetch().size() == 1 && job.fetch().getFirst().count == 320, "Material pickup exceeds carry capacity");
         a.discard(); helper.succeed();
     }
+    @GameTest(template = EMPTY, timeoutTicks = 1200, batch = "android_drone_crafting")
+    public static void androidCraftsFromDroneArrivalsWithoutStealingCargo(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        helper.setBlock(CHEST, SinguloBlocks.DRONE_PORT.get());
+        io.github.genichimaruo.singulo.drone.DronePortBlockEntity port = helper.getBlockEntity(CHEST);
+        port.items().setStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_RECEIVE,
+                new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 2));
+        port.items().setStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_CARGO,
+                new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper),
+                new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "Could not plan crafting from drone arrivals");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_PLANKS) == 8, "Arrivals did not become delivered products");
+            helper.assertTrue(port.items().getStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_CARGO).getCount() == 64,
+                    "Android consumed outbound cargo");
+            a.discard();
+        });
+    }
+
 }

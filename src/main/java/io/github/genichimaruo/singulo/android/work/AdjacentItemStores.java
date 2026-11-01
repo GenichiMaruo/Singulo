@@ -37,6 +37,11 @@ final class AdjacentItemStores {
                     () -> !owner.isRemoved() && owner.getLevel() == level, () -> {});
             caches.put(direction, cache);
         }
-        return cache.getCapability();
+        IItemHandler handler = cache.getCapability();
+        if (handler != null && level.getBlockEntity(owner.getBlockPos().relative(direction))
+                instanceof io.github.genichimaruo.singulo.drone.DronePortBlockEntity port) {
+            return port.androidItems(direction.getOpposite());
+        }
+        return handler;
     }
 }

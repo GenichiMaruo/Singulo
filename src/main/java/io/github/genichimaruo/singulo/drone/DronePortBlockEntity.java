@@ -63,7 +63,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     /** GUI に送る値。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_COST = 3, D_PROBLEM = 4, D_SIDES = 5, D_AUTO = 6, D_CRATE_SIDES = 7, COUNT = 8;
-    /** 面の設定の種類: 荷物（入出力と自動排出）と、空き箱の搬入（空き箱の欄だけ。入れるか入れないか）。 */
+    /** 面の設定の種類: 荷物（入出力と自動排出）と、空き箱の搬入出（空き箱の欄だけ）。 */
     public static final int CHANNEL_ITEMS = 0, CHANNEL_CRATES = 1;
     /**
      * 状態: 待機・ドローン待ち・ドローンが向かっている・積み込み中・荷降ろし中・電力不足・空き箱なし・射程外・行き先なし・荷物なし・
@@ -526,7 +526,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (now % 5 == 0) {
             unpack();
         }
-        if (now % 10 == 0 && sides.ejectEnabled()) {
+        if (now % 10 == 0 && (sides.ejectEnabled() || crateSides.ejectEnabled())) {
             autoEject(level);
         }
         if (now % 20 == 0) {
@@ -548,24 +548,21 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     /** 自動排出の全体スイッチ（加工装置と同じく、どの面も排出しない設定なら、出せる面をみな排出にする）。 */
     @Override
     public void setEjectEnabled(int channel, boolean on) {
-        if (channel != CHANNEL_ITEMS) {
-            return;                                     // 空き箱の搬入に自動排出はない
-        }
-        if (on && java.util.Arrays.stream(SideConfig.Face.values()).noneMatch(f -> sides.canExtract(f) && sides.eject(f))) {
+        if (!validChannel(channel)) return;
+        SideConfig config = channel == CHANNEL_CRATES ? crateSides : sides;
+        if (on && java.util.Arrays.stream(SideConfig.Face.values()).noneMatch(f -> config.canExtract(f) && config.eject(f))) {
             for (SideConfig.Face face : SideConfig.Face.values()) {
-                if (sides.canExtract(face)) {
-                    sides.set(face, sides.mode(face), true);
-                }
+                if (config.canExtract(face)) config.set(face, config.mode(face), true);
             }
         }
-        sides.setEjectEnabled(on);
+        config.setEjectEnabled(on);
         setChanged();
     }
 
     @Override
     public void setSide(int channel, SideConfig.Face face, int mode, boolean eject) {
         if (channel == CHANNEL_CRATES) {
-            crateSides.set(face, mode & SideConfig.INPUT, false);
+            crateSides.set(face, mode, eject);
         } else {
             sides.set(face, mode, eject);
         }
@@ -610,6 +607,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
             @Override
             public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                if (slot == SLOT_CRATES) {
+                    return crateSides.canExtract(face) ? items.extractItem(slot, amount, simulate) : ItemStack.EMPTY;
+                }
                 return sides.canExtract(face) ? all.extractItem(slot, amount, simulate) : ItemStack.EMPTY;
             }
 
@@ -625,11 +625,36 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         };
     }
 
+    /** Android stock must contain only removable goods; cargo and sealed crates are not raw materials. */
+    private final IItemHandler[] androidViews = new IItemHandler[7];
+
+    public IItemHandler androidItems(@Nullable Direction side) {
+        int index = side == null ? 6 : side.ordinal();
+        if (androidViews[index] != null) return androidViews[index];
+        IItemHandler delegate = sidedItems(side);
+        return androidViews[index] = new IItemHandler() {
+            @Override public int getSlots() { return delegate.getSlots(); }
+            @Override public ItemStack getStackInSlot(int slot) { return extractItem(slot, Integer.MAX_VALUE, true); }
+            @Override public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                return delegate.insertItem(slot, stack, simulate);
+            }
+            @Override public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                if (slot >= SLOT_ARRIVED && slot < SLOT_RECEIVE && DroneCrateItem.packed(items.getStackInSlot(slot)))
+                    return ItemStack.EMPTY;
+                return delegate.extractItem(slot, amount, simulate);
+            }
+            @Override public int getSlotLimit(int slot) { return delegate.getSlotLimit(slot); }
+            @Override public boolean isItemValid(int slot, ItemStack stack) { return delegate.isItemValid(slot, stack); }
+        };
+    }
+
     /** 自動排出: 「出力」を含み自動排出がオンの面の隣へ、受け取りの欄と、着荷箱の欄に残った空の箱を押し出す。 */
     private void autoEject(ServerLevel level) {
         Direction facing = facing();
         for (SideConfig.Face f : SideConfig.Face.values()) {
-            if (!sides.eject(f) || !sides.canExtract(f)) {
+            boolean cargo = sides.ejectEnabled() && sides.eject(f) && sides.canExtract(f);
+            boolean crates = crateSides.ejectEnabled() && crateSides.eject(f) && crateSides.canExtract(f);
+            if (!cargo && !crates) {
                 continue;
             }
             Direction dir = SideConfig.directionOf(facing, f);
@@ -638,6 +663,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             if (dest == null) {
                 continue;
             }
+            if (crates) eject(dest, SLOT_CRATES);
+            if (!cargo) continue;
             for (int i = 0; i < RECEIVE; i++) {
                 eject(dest, SLOT_RECEIVE + i);
             }

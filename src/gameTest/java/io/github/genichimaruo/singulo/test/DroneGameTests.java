@@ -455,4 +455,26 @@ public final class DroneGameTests {
             h.succeed();
         });
     }
+    @GameTest(template = "empty", batch = BATCH, timeoutTicks = 200)
+    public static void emptyCratesCanReturnAsCargoWithoutUsingTheReserve(GameTestHelper h) {
+        var a = port(h, new BlockPos(1, 1, 1));
+        port(h, new BlockPos(6, 1, 1));
+        load(a, 1);
+        a.setSide(DronePortBlockEntity.CHANNEL_CRATES, io.github.genichimaruo.singulo.machine.SideConfig.Face.TOP,
+                io.github.genichimaruo.singulo.machine.SideConfig.NONE, false);
+        var input = a.androidItems(net.minecraft.core.Direction.UP);
+        h.assertTrue(net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(input,
+                new ItemStack(SinguloItems.PACKING_CRATE.get(), 5), false).isEmpty(), "Return port refused empty crates as cargo");
+        a.select(h.absolutePos(new BlockPos(6, 1, 1)));
+        station(h, new BlockPos(4, 1, 5), 1);
+        h.runAtTickTime(100, () -> {
+            h.assertTrue(a.send(), "Empty crate shipment could not be sent");
+            h.assertTrue(DroneCrateItem.contents(a.staged()).get(0).getCount() == 5
+                    && a.items().getStackInSlot(0).getCount() == 1, "Return shipment consumed or duplicated crates");
+            h.assertTrue(a.cancel() && a.items().getStackInSlot(0).getCount() == 2, "Cancellation lost the transport crate");
+            ours(h, new BlockPos(4, 1, 5)).forEach(CargoDrone::discard);
+            h.succeed();
+        });
+    }
+
 }

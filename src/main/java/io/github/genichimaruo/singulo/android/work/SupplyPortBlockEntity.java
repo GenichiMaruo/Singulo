@@ -243,6 +243,9 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
             if (h == null) {
                 continue;
             }
+            if (level.getBlockEntity(p) instanceof io.github.genichimaruo.singulo.drone.DronePortBlockEntity port) {
+                h = port.androidItems(d.getOpposite());
+            }
             BlockPos key = p;
             BlockState s = level.getBlockState(p);
             if (s.getBlock() instanceof ChestBlock && s.getValue(ChestBlock.TYPE) != ChestType.SINGLE) {

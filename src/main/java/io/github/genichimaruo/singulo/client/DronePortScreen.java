@@ -239,12 +239,12 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     private int faceColor(int mode) {
-        return cratesChannel() ? (mode != 0 ? CRATE_COLOR : modeColor(0)) : modeColor(mode);
+        return modeColor(mode);
     }
 
-    /** 今のタブで選べるモード（荷物は4つ、空き箱は無効と入力）。 */
+    /** 荷物・空き箱それぞれの入出力モード。 */
     private int[] legendModes() {
-        return cratesChannel() ? new int[]{0, SideConfig.INPUT} : new int[]{0, 1, 2, 3};
+        return new int[]{0, 1, 2, 3};
     }
 
     private static int modeColor(int mode) {
@@ -286,16 +286,13 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 g.fill(t[0] + 4, t[1] + 6 + td, t[0] + 9, t[1] + 7 + td, col);
             }
         }
-        boolean crates = cratesChannel();
-        cube.draw(g, font, quads, f -> faceColor(SideConfig.mode(packed, f)), f -> !crates && SideConfig.eject(packed, f),
+        cube.draw(g, font, quads, f -> faceColor(SideConfig.mode(packed, f)), f -> SideConfig.eject(packed, f),
                 f -> Component.translatable("gui.singulo.sides.face." + f.name().toLowerCase()).getString().substring(0, 1), hovered);
         boolean master = SideConfig.ejectEnabled(packed);
         int[] mp = masterPos();
-        boolean mh = !crates && Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3]);
-        if (!crates) {
-            int d = Panel.button(g, skin, mp[0], mp[1], mp[2], mp[3], master ? Panel.Press.ON : mh ? Panel.Press.HOVER : Panel.Press.NORMAL);
-            Panel.ejectIcon(g, mp[0] + 2, mp[1] + 2 + d, master ? skin.onAccent() : skin.text());
-        }
+        boolean mh = Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3]);
+        int d = Panel.button(g, skin, mp[0], mp[1], mp[2], mp[3], master ? Panel.Press.ON : mh ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        Panel.ejectIcon(g, mp[0] + 2, mp[1] + 2 + d, master ? skin.onAccent() : skin.text());
         int[] modes = legendModes();
         for (int i = 0; i < modes.length; i++) {
             int[] r = legendRect(i);
@@ -315,7 +312,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         for (int i = 0; i < modes.length; i++) {
             int[] r = legendRect(i);
             if (Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
-                tip.add(Component.translatable(crates && modes[i] != 0 ? "gui.singulo.drone_port.sides.crate_input" : "gui.singulo.sides.mode." + modes[i]));
+                tip.add(Component.translatable("gui.singulo.sides.mode." + modes[i]));
             }
         }
         if (hovered != null) {
@@ -329,11 +326,9 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 tip.add(Component.translatable("gui.singulo.sides.adjacent", level.getBlockState(adjacent).getBlock().getName()));
             }
             int mode = SideConfig.mode(packed, hovered);
-            tip.add(Component.translatable(crates && mode != 0 ? "gui.singulo.drone_port.sides.crate_input" : "gui.singulo.sides.mode." + mode));
-            if (!crates) {
-                tip.add(Component.translatable(SideConfig.eject(packed, hovered) ? "gui.singulo.sides.eject_on" : "gui.singulo.sides.eject_off"));
-                tip.add(Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"));
-            }
+            tip.add(Component.translatable("gui.singulo.sides.mode." + mode));
+            tip.add(Component.translatable(SideConfig.eject(packed, hovered) ? "gui.singulo.sides.eject_on" : "gui.singulo.sides.eject_off"));
+            tip.add(Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"));
             tip.add(Component.translatable("gui.singulo.sides.hint").withStyle(s -> s.withColor(0xFF8A949E)));
         }
         if (!tip.isEmpty()) {
@@ -352,8 +347,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         }
         int packed = sidesPacked();
         int[] mp = masterPos();
-        if (!cratesChannel() && Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
-            PacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), 0, SideConfigPayload.MASTER_FACE,
+        if (Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
+            PacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), sidesChannel, SideConfigPayload.MASTER_FACE,
                     SideConfig.ejectEnabled(packed) ? 0 : 4));
             return true;
         }
@@ -372,17 +367,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         int packed = sidesPacked();
         int mode = SideConfig.mode(packed, f);
         boolean eject = SideConfig.eject(packed, f);
-        if (cratesChannel()) {
-            if (button == 1) {
-                return;                                    // 空き箱の搬入に自動排出はない
-            }
-            mode = mode == 0 ? SideConfig.INPUT : 0;
-            eject = false;
-        } else if (button == 1) {
-            eject = !eject;
-        } else {
-            mode = (mode + 1) % 4;
-        }
+        if (button == 1) eject = !eject;
+        else mode = (mode + 1) % 4;
         PacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
     }
 
