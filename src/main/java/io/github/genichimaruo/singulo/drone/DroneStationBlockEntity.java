@@ -108,7 +108,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     }
 
     public static boolean isPhaseUpgrade(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("drone_phase_upgrade");
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("drone_phase_upgrade"));
     }
 
     /** このステーションのドローンが、壁を抜けて飛べるか（位相透過アップグレード）。 */
@@ -117,11 +117,51 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     }
 
     public static boolean isKit(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("drone_kit");
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
     }
 
     public ItemStackHandler items() {
         return items;
+    }
+
+    /**
+     * ホッパーやパイプから見た中身: ドローンキットを入れられるだけ。ほかの欄（メモリ・アップグレード・許可証）は画面からだけ
+     * 出し入れする（自動で取り出せると、他人のステーションから許可証やメモリを抜けてしまう）。
+     */
+    private final net.neoforged.neoforge.items.IItemHandler automationItems = new net.neoforged.neoforge.items.IItemHandler() {
+        @Override
+        public int getSlots() {
+            return items.getSlots();
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return items.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return slot == SLOT_KIT ? items.insertItem(slot, stack, simulate) : stack;
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return items.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return slot == SLOT_KIT && items.isItemValid(slot, stack);
+        }
+    };
+
+    public net.neoforged.neoforge.items.IItemHandler automationItems() {
+        return automationItems;
     }
 
     public SinguloEnergyStorage energy() {

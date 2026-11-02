@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /** Shared client preview/server validation. Planning only touches copies; commit is atomic. */
@@ -58,13 +59,11 @@ public final class MachineRecipeTransfer {
         Plan best = null;
         // One search budget for every batch count, so a max transfer costs at most a few thousand steps per packet
         int[] budget = {8192};
+        List<ItemStack> pool = new ArrayList<>();
+        for (int slot : slots) pool.add(menu.getSlot(slot).getItem().copy());
+        for (int i = 0; i < 36; i++) pool.add(menu.getSlot(menu.type().itemSlots() + i).getItem().copy());
         for (int batches = 1; batches <= (maxTransfer ? 64 : 1) && budget[0] > 0; batches++) {
-            List<ItemStack> pool = new ArrayList<>();
-            for (int slot : slots) pool.add(menu.getSlot(slot).getItem().copy());
-            for (int i = 0; i < 36; i++) pool.add(menu.getSlot(menu.type().itemSlots() + i).getItem().copy());
-            List<ItemStack> placed = new ArrayList<>();
-            for (int ignored : slots) placed.add(ItemStack.EMPTY);
-            Plan next = allocate(menu, slots, needs, 0, batches, pool, placed, budget);
+            Plan next = allocate(menu, slots, needs, 0, batches, pool, new int[pool.size()], new ItemStack[slots.size()], budget);
             // A small count can fail where a larger one fits (moving a whole stack frees inventory space),
             // but once a count fits, a larger count that fails means the materials or the slot ran out.
             if (next == null && best != null) break;
@@ -73,48 +72,57 @@ public final class MachineRecipeTransfer {
         return best;
     }
 
+    /**
+     * Assigns needs[index..] from the pool. {@code used} counts what each pool stack has given so far, so a step
+     * costs no copies; it is undone on backtracking. Slot limits come from MachineMenu#stackLimit, never from
+     * Slot#getMaxStackSize(ItemStack), which empties and refills item-handler slots and looks like a contents change.
+     */
     @Nullable
     private static Plan allocate(MachineMenu menu, List<Integer> slots, List<Need> needs, int index, int batches,
-                                 List<ItemStack> pool, List<ItemStack> placed, int[] budget) {
+                                 List<ItemStack> pool, int[] used, ItemStack[] placed, int[] budget) {
         if (--budget[0] < 0) return null;
         if (index == needs.size()) {
-            List<ItemStack> inventory = copy(pool.subList(slots.size(), pool.size()));
-            for (ItemStack stack : pool.subList(0, slots.size())) {
-                if (!returnToInventory(stack.copy(), inventory)) return null;
+            List<ItemStack> inventory = new ArrayList<>();
+            for (int i = slots.size(); i < pool.size(); i++) inventory.add(pool.get(i).copyWithCount(pool.get(i).getCount() - used[i]));
+            for (int i = 0; i < slots.size(); i++) {
+                ItemStack left = pool.get(i).copyWithCount(pool.get(i).getCount() - used[i]);
+                if (!returnToInventory(left, inventory)) return null;
             }
-            return new Plan(List.copyOf(slots), placed, inventory);
+            List<ItemStack> items = new ArrayList<>();
+            for (ItemStack stack : placed) items.add(stack == null ? ItemStack.EMPTY : stack.copy());
+            return new Plan(List.copyOf(slots), items, inventory);
         }
         Need need = needs.get(index);
+        Slot target = menu.getSlot(need.slot());
+        int at = slots.indexOf(need.slot());
         List<ItemStack> tried = new ArrayList<>();
         for (int candidate = 0; candidate < pool.size(); candidate++) {
             ItemStack sample = pool.get(candidate);
-            if (sample.isEmpty() || !need.matches().test(sample) || !menu.getSlot(need.slot()).mayPlace(sample)) continue;
+            if (sample.getCount() - used[candidate] <= 0 || !need.matches().test(sample) || !target.mayPlace(sample)) continue;
             if (tried.stream().anyMatch(s -> ItemStack.isSameItemSameComponents(s, sample))) continue;
             tried.add(sample);
             long requested = (long) need.count() * (need.reusable() ? 1 : batches);
-            if (requested > menu.getSlot(need.slot()).getMaxStackSize(sample)) continue;
+            if (requested > menu.stackLimit(need.slot(), sample)) continue;
             int count = (int) requested;
             // Reusable templates/catalysts are placed once, regardless of shift-click batch count.
-            List<ItemStack> remaining = copy(pool);
+            int[] taken = new int[pool.size()];
             int missing = count;
-            for (ItemStack stack : remaining) {
-                if (ItemStack.isSameItemSameComponents(stack, sample)) {
-                    int taken = Math.min(missing, stack.getCount());
-                    stack.shrink(taken);
-                    missing -= taken;
+            for (int i = 0; i < pool.size() && missing > 0; i++) {
+                if (ItemStack.isSameItemSameComponents(pool.get(i), sample)) {
+                    taken[i] = Math.min(missing, pool.get(i).getCount() - used[i]);
+                    used[i] += taken[i];
+                    missing -= taken[i];
                 }
             }
-            if (missing > 0) continue;
-            List<ItemStack> nextPlaced = copy(placed);
-            nextPlaced.set(slots.indexOf(need.slot()), sample.copyWithCount(count));
-            Plan result = allocate(menu, slots, needs, index + 1, batches, remaining, nextPlaced, budget);
-            if (result != null) return result;
+            if (missing == 0) {
+                placed[at] = sample.copyWithCount(count);
+                Plan result = allocate(menu, slots, needs, index + 1, batches, pool, used, placed, budget);
+                if (result != null) return result;
+                placed[at] = null;
+            }
+            for (int i = 0; i < pool.size(); i++) used[i] -= taken[i];
         }
         return null;
-    }
-
-    private static List<ItemStack> copy(List<ItemStack> stacks) {
-        return new ArrayList<>(stacks.stream().map(ItemStack::copy).toList());
     }
 
     private static boolean returnToInventory(ItemStack stack, List<ItemStack> inventory) {

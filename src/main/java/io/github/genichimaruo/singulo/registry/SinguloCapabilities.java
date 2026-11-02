@@ -73,7 +73,7 @@ public final class SinguloCapabilities {
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.DRONE_STATION.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DRONE_STATION.get(),
-                (be, side) -> be.items());
+                (be, side) -> be.automationItems());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.DRONE_PORT.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DRONE_PORT.get(),

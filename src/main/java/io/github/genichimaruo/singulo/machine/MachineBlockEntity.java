@@ -50,7 +50,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
             D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_SELECTED = 11,
-            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_TANKS = 14;
+            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_LOADED_USES = 14, D_TANKS = 15;
     /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
@@ -1064,7 +1064,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         boolean enabled = !ServerConfig.SPEC.isLoaded() || ServerConfig.MIXED_BONUS_ENABLED.get();
         int minKinds = ServerConfig.SPEC.isLoaded() ? ServerConfig.MIXED_BONUS_MIN_KINDS.get() : 3;
         if (enabled && massSources.size() >= minKinds
-                && BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().equals("compressed_block_1")) {
+                && BuiltInRegistries.ITEM.getKey(out.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("compressed_block_1"))) {
             out.set(SinguloComponents.MIXED_SOURCE.get(), true);
         }
     }
@@ -1113,6 +1113,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_SELECTED -> selectedIndex() + 1;
             case D_LOADED_ITEM -> magazine.loadedItemId();
             case D_LOADED_FILL -> Math.round(magazine.fill() * 1000);
+            // JEI の搬入の見積もりがサーバーと同じになるよう、装填中の触媒の残りの使用回数はそのまま送る
+            case D_LOADED_USES -> magazine.loaded().isEmpty() ? 0 : io.github.genichimaruo.singulo.item.UsesHelper.remaining(magazine.loaded());
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
                 if (index >= sidesIndex(type)) {

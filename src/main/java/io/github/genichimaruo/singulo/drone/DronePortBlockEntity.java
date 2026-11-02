@@ -41,7 +41,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 積み込み・荷降ろしの時間はポートが進める（ドローンは真上で止まって待つ）。時刻は ANIM_* と同じで、描くのは DronePortRenderer。
  */
 public class DronePortBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
-        MenuProvider, SideConfig.Holder {
+        MenuProvider, SideConfig.Holder, io.github.genichimaruo.singulo.android.work.AndroidStorageView {
     public static final int CAPACITY = 400_000;
     public static final int MAX_RECEIVE = 8_000;
 
@@ -73,6 +73,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             S_NO_CRATE = 6, S_OUT_OF_RANGE = 7, S_NO_DESTINATION = 8, S_NO_CARGO = 9, S_NO_DRONE = 10;
     /** 発送できない理由を計り直す間隔（呼べるドローンを探すのは重いので）。 */
     static final int PROBLEM_TICKS = 10;
+    /** 積み込み待ちの間、ドローンを呼び直す間隔（tick）。 */
+    static final int CALL_TICKS = 20;
     /** ボタン: 発送、取り消し、行き先を選ぶ（BUTTON_SELECT + 一覧の番号）。 */
     public static final int BUTTON_SEND = 0, BUTTON_CANCEL = 1, BUTTON_AUTO = 2, BUTTON_AUTO_REGISTER = 3, BUTTON_SELECT = 100;
     /**
@@ -211,7 +213,19 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     }
 
     /** 外（ホッパー・パイプ）から見た中身: 空き箱と荷物へ入れられ、着荷箱と受け取りから取り出せる。 */
+    /** ホッパーやパイプは毎 tick 問い合わせるので、窓口は作ったものを使い回す（面ごとの窓口は、回されたら作り直す）。 */
+    @Nullable
+    private IItemHandler automationView;
+    private final IItemHandler[] sidedViews = new IItemHandler[6];
+
     public IItemHandler automationItems() {
+        if (automationView == null) {
+            automationView = createAutomationItems();
+        }
+        return automationView;
+    }
+
+    private IItemHandler createAutomationItems() {
         return new IItemHandler() {
             @Override
             public int getSlots() {
@@ -603,6 +617,23 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (side == null) {
             return automationItems();
         }
+        refreshViews();
+        if (sidedViews[side.ordinal()] == null) {
+            sidedViews[side.ordinal()] = createSidedItems(side);
+        }
+        return sidedViews[side.ordinal()];
+    }
+
+    /** 向きが変わっていたら、面ごとの窓口を作り直す（面の設定は向きからの相対で決まる）。 */
+    private void refreshViews() {
+        if (viewsFacing != facing()) {
+            java.util.Arrays.fill(sidedViews, null);
+            java.util.Arrays.fill(androidViews, null);
+            viewsFacing = facing();
+        }
+    }
+
+    private IItemHandler createSidedItems(Direction side) {
         SideConfig.Face face = SideConfig.faceOf(facing(), side);
         IItemHandler all = automationItems();
         return new IItemHandler() {
@@ -648,16 +679,14 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     /** Android stock must contain only removable goods; cargo and sealed crates are not raw materials. */
     private final IItemHandler[] androidViews = new IItemHandler[7];
-    /** 面の見え方を作ったときの向き（回されたら作り直す。面の設定は向きからの相対で決まる）。 */
+    /** 面の窓口を作ったときの向き（回されたら作り直す。面の設定は向きからの相対で決まる）。 */
     @Nullable
-    private Direction androidViewsFacing;
+    private Direction viewsFacing;
 
+    @Override
     public IItemHandler androidItems(@Nullable Direction side) {
         int index = side == null ? 6 : side.ordinal();
-        if (androidViewsFacing != facing()) {
-            java.util.Arrays.fill(androidViews, null);
-            androidViewsFacing = facing();
-        }
+        refreshViews();
         if (androidViews[index] != null) return androidViews[index];
         IItemHandler delegate = sidedItems(side);
         return androidViews[index] = new IItemHandler() {
@@ -823,7 +852,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 flightId = 0;
                 changedVisible();
             }
-            if (now % 5 == 0 && stagedTo != null) {
+            // ドローンを呼ぶのは周りのステーションを調べるので重い。全機が運んでいる間も続くので、1秒に1回にする
+            if (now % CALL_TICKS == 0 && stagedTo != null) {
                 f = DroneStationBlockEntity.call(level, worldPosition, owner, stagedTo);
                 if (f != null) {
                     flightId = f.id;
@@ -966,8 +996,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                         f.from = f.to;
                         f.to = back;
                         if (f.virtual) {
-                            f.last = Vec3.atCenterOf(f.from);
-                            f.arriveAt = now + (long) Math.ceil(Math.sqrt(f.from.distSqr(back)) / DroneNetwork.SPEED) + 20;
+                            net.redirectVirtual(f, Vec3.atCenterOf(f.from), now);
                         }
                         net.changed();
                     } else {

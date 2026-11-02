@@ -200,6 +200,18 @@ public class DroneNetwork extends SavedData {
         setDirty();
     }
 
+    /** 見えない便を、at から今の目的地へ向け直す（進みは0から。着く時刻はドローンの型の速さで決める）。 */
+    public void redirectVirtual(Flight f, Vec3 at, long now) {
+        f.progress = 0;
+        f.virtualFrom = 0;
+        f.virtualAt = now;
+        f.last = at;
+        BlockPos t = f.target();
+        double d = t == null ? 0 : Math.sqrt(at.distanceToSqr(Vec3.atCenterOf(t)));
+        f.arriveAt = now + (long) Math.ceil(d / (SPEED * f.kind.speed)) + 20;
+        setDirty();
+    }
+
     /** 便を次の段階へ。帰る先のステーションがなくなっていれば、帰らずに記録を消す（ドローンの実体も消える）。 */
     public void advance(Flight f, int stage, long now) {
         if (stage == RETURN && f.station == null) {

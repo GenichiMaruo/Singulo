@@ -239,12 +239,10 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
-            IItemHandler h = cache == null ? level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite()) : cache.get(d);
+            IItemHandler h = cache != null ? cache.get(d)
+                    : AdjacentItemStores.androidView(level, p, d.getOpposite(), level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite()));
             if (h == null) {
                 continue;
-            }
-            if (level.getBlockEntity(p) instanceof io.github.genichimaruo.singulo.drone.DronePortBlockEntity port) {
-                h = port.androidItems(d.getOpposite());
             }
             BlockPos key = p;
             BlockState s = level.getBlockState(p);

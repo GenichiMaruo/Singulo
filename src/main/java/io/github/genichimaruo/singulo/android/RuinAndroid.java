@@ -365,7 +365,7 @@ public abstract class RuinAndroid extends Monster {
     }
 
     private static boolean isItem(net.minecraft.world.item.ItemStack stack, String id) {
-        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals(id);
+        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id(id));
     }
 
     public static boolean isBatteryUpgrade(net.minecraft.world.item.ItemStack stack) {

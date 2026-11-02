@@ -336,6 +336,48 @@ public final class DroneGameTests {
         h.succeed();
     }
 
+    /** ホッパーやパイプは、ステーションにキットを入れられるだけ（許可証・メモリ・アップグレードは入れられず、何も取り出せない）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void stationAutomationOnlyAcceptsKits(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        DroneStationBlockEntity station = station(h, at, 1);
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_PERMIT, new ItemStack(SinguloItems.SHIELD_PERMIT.get()));
+        var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, h.absolutePos(at),
+                net.minecraft.core.Direction.DOWN);
+        h.assertTrue(handler != null, "No item capability");
+        for (int slot = 0; slot < DroneStationBlockEntity.SLOTS; slot++) {
+            h.assertTrue(handler.extractItem(slot, 64, true).isEmpty(), "Automation can extract from slot " + slot);
+        }
+        h.assertTrue(handler.insertItem(DroneStationBlockEntity.SLOT_KIT, new ItemStack(item("drone_kit"), 3), true).isEmpty(),
+                "Kits cannot be inserted");
+        h.assertTrue(handler.insertItem(DroneStationBlockEntity.SLOT_PHASE, new ItemStack(item("drone_phase_upgrade")), true).getCount() == 1,
+                "Upgrades can be inserted by automation");
+        h.succeed();
+    }
+
+    /** 行き先がなくなって見えない便を折り返すと、進みは0からになり、帰りもドローンの型の速さで飛ぶ。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void redirectedVirtualFlightUsesItsKindSpeed(GameTestHelper h) {
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        BlockPos home = h.absolutePos(new BlockPos(1, 1, 1));
+        DroneNetwork.Flight f = net.create(home.offset(40, 0, 0), 2, null, home, home.offset(300, 0, 0));
+        f.stage = DroneNetwork.DELIVER;
+        f.kind = DroneKind.JET;
+        long now = h.getLevel().getGameTime();
+        net.virtualize(f, Vec3.atCenterOf(home).add(200, 0, 0), now - 100);
+        f.progress = 0.7F;
+        BlockPos back = f.from;
+        f.from = f.to;
+        f.to = back;
+        net.redirectVirtual(f, Vec3.atCenterOf(f.from), now);
+        long expect = (long) Math.ceil(Math.sqrt(Vec3.atCenterOf(f.from).distanceToSqr(Vec3.atCenterOf(back)))
+                / (DroneNetwork.SPEED * DroneKind.JET.speed)) + 20;
+        h.assertTrue(f.arriveAt - now == expect, "Return leg ignores the drone's speed: " + (f.arriveAt - now) + " vs " + expect);
+        h.assertTrue(f.progress == 0 && f.progress(now) < 0.01F, "Return leg did not restart its progress: " + f.progress(now));
+        net.remove(f);
+        h.succeed();
+    }
+
     /** このテストのステーションのドローン（並んで動くほかのテストのものは数えない・消さない）。 */
     private static List<CargoDrone> ours(GameTestHelper h, BlockPos at) {
         BlockPos station = h.absolutePos(at);

@@ -37,10 +37,13 @@ final class AdjacentItemStores {
                     () -> !owner.isRemoved() && owner.getLevel() == level, () -> {});
             caches.put(direction, cache);
         }
-        IItemHandler handler = cache.getCapability();
-        if (handler != null && level.getBlockEntity(owner.getBlockPos().relative(direction))
-                instanceof io.github.genichimaruo.singulo.drone.DronePortBlockEntity port) {
-            return port.androidItems(direction.getOpposite());
+        return androidView(level, owner.getBlockPos().relative(direction), direction.getOpposite(), cache.getCapability());
+    }
+
+    /** pos の入れ物を、アンドロイドの素材置き場として見たもの（AndroidStorageView なら専用の見え方、ほかは handler のまま）。 */
+    static IItemHandler androidView(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, Direction side, IItemHandler handler) {
+        if (handler != null && level.getBlockEntity(pos) instanceof AndroidStorageView view) {
+            return view.androidItems(side);
         }
         return handler;
     }

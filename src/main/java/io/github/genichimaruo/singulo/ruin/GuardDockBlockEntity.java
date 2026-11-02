@@ -107,7 +107,6 @@ public class GuardDockBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    /** テスト用: メモリが出る確率を決め打ちにする（1 で必ず、0 で出ない）。 */
     /** ドックのドローンがプレイヤーに倒された。 */
     public void recordKill(UUID id) {
         if (drones.contains(id) && killed.add(id)) {
@@ -115,6 +114,7 @@ public class GuardDockBlockEntity extends BlockEntity {
         }
     }
 
+    /** テスト用: メモリが出る確率を決め打ちにする（1 で必ず、0 で出ない）。 */
     public void setMemoryChanceForTest(float chance) {
         memoryChance = chance;
     }

@@ -23,12 +23,20 @@ public record MachineRecipeTransferPayload(int containerId, ResourceLocation rec
             ByteBufCodecs.BOOL, MachineRecipeTransferPayload::maxTransfer,
             MachineRecipeTransferPayload::new);
 
+    /** Ticks a player must wait between transfers; JEI clicks are far slower, a flood of packets is dropped. */
+    static final int MIN_INTERVAL = 4;
+    private static final java.util.Map<java.util.UUID, Long> LAST = new java.util.HashMap<>();
+
     @Override
     public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     static void handle(MachineRecipeTransferPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             var player = context.player();
+            long now = player.level().getGameTime();
+            Long last = LAST.get(player.getUUID());
+            if (last != null && now - last < MIN_INTERVAL && now >= last) return;
+            LAST.put(player.getUUID(), now);
             if (!(player.containerMenu instanceof MachineMenu menu) || menu.containerId != payload.containerId()
                     || !menu.stillValid(player)) return;
             if (!(player.level().getBlockEntity(menu.pos()) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine)

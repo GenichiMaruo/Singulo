@@ -42,9 +42,9 @@ public enum DroneKind {
         if (stack.isEmpty()) {
             return null;
         }
-        String path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+        net.minecraft.resources.ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         for (DroneKind k : values()) {
-            if (k.memoryId.equals(path)) {
+            if (id.equals(io.github.genichimaruo.singulo.Singulo.id(k.memoryId))) {
                 return k;
             }
         }

@@ -103,6 +103,16 @@ public class MachineMenu extends AbstractContainerMenu {
         return type;
     }
 
+    /**
+     * How many of {@code stack} the machine slot holds, by the same rules as the machine's item handler. Unlike
+     * SlotItemHandler#getMaxStackSize(ItemStack), it never empties and refills the slot to find out.
+     */
+    public int stackLimit(int slot, ItemStack stack) {
+        int limit = Math.min(getSlot(slot).getMaxStackSize(), stack.getMaxStackSize());
+        if (slot == type.catalystSlot() && type.hasCatalystSlot()) return Math.min(CatalystMagazine.SUPPLY_LIMIT, limit);
+        return slot < type.inputSlots() && io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack) ? 1 : limit;
+    }
+
     public BlockPos pos() {
         return pos;
     }
@@ -117,10 +127,10 @@ public class MachineMenu extends AbstractContainerMenu {
         int item = value(MachineBlockEntity.D_LOADED_ITEM);
         if (!type.hasCatalystSlot() || item < 0) return ItemStack.EMPTY;
         ItemStack stack = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.byId(item));
-        int max = io.github.genichimaruo.singulo.item.UsesHelper.baseMax(stack);
-        int remaining = (int) Math.ceil(max * (value(MachineBlockEntity.D_LOADED_FILL) + 0.5) / 1000.0);
+        int remaining = Math.max(0, value(MachineBlockEntity.D_LOADED_USES));
+        int max = Math.max(io.github.genichimaruo.singulo.item.UsesHelper.baseMax(stack), remaining);
         stack.set(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
-                new io.github.genichimaruo.singulo.item.UsesData(Math.max(0, max - remaining), max, 0));
+                new io.github.genichimaruo.singulo.item.UsesData(max - remaining, max, 0));
         return stack;
     }
 

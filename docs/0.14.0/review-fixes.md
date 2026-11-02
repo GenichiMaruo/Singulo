@@ -25,3 +25,18 @@ Validation: all 623 required GameTests passed (`build/fix014-full.log`), includi
 - Capacity upgrade items are looked up once. The NO_POWER tooltip and the JEI rail say when even Mk3 cannot hold a recipe's demand, instead of suggesting Mk3.
 
 New tests: `packedCratesStayOutOfContainerItems`, `brokenStationReturnsKitsOfFlyingDrones`, `cancelRefundsEvenWhenStorageIsFull`, `guardDroneRemembersItsDockAfterReload`, `rotatedPortUpdatesAndroidFaces`, `jeiTransferKeepsReserveCatalysts`, `capacityHintNeverPointsAtAnUpgradeThatCannotHelp`. Validation: 630 GameTests, 37 Python tests, release check.
+
+## PR #51 second review
+
+- Drone Station automation only accepts Drone Kits and extracts nothing, so hoppers cannot pull the permit, memory or upgrades out of someone else's station (same idea as the Android Assembly Station).
+- Drone, android and machine item checks compare the full `singulo:` id, so another mod's `drone_kit` or `drone_memory` is not accepted.
+- JEI transfer planning reads slot limits from `MachineMenu#stackLimit` instead of `SlotItemHandler#getMaxStackSize(ItemStack)`, which emptied and refilled machine slots and reset the recipe-selection wait even when nothing moved.
+- The search tracks how much each pool stack has given instead of copying the pool at every step, and the server drops transfer packets that arrive within 4 ticks of the previous one from the same player.
+- The machine syncs the loaded catalyst's exact remaining uses (`D_LOADED_USES`), so the JEI preview and the server agree when a catalyst is one use short.
+- A virtual delivery turned back by a broken destination restarts its progress and returns at the drone type's speed (`DroneNetwork.redirectVirtual`).
+- Staged crates call for a drone once a second instead of every 5 ticks.
+- Drone Port item views are cached per side and rebuilt on rotation, together with the android views.
+- `AndroidStorageView` replaces the duplicated drone-port special case in the supply port and adjacent-storage lookup.
+- Guard Dock Javadoc moved to the method it describes.
+
+New tests: `stationAutomationOnlyAcceptsKits`, `redirectedVirtualFlightUsesItsKindSpeed`, `jeiTransferPlanningDoesNotTouchMachineSlots`, `loadedCatalystEstimateMatchesTheServer`. Validation: 634 GameTests, 37 Python tests, release check.

@@ -119,6 +119,50 @@ public final class MachineRecipeTransferGameTests {
         h.succeed();
     }
 
+    /** 搬入を試すだけでは、装置の中身が変わったことにならない（材料の判定を待っている装置の待ち時間を崩さない）。 */
+    @GameTest(template = "empty", batch = "jei_transfer", timeoutTicks = 60)
+    public static void jeiTransferPlanningDoesNotTouchMachineSlots(GameTestHelper h) {
+        var menu = menu(h);
+        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        machine.items().setStackInSlot(0, new ItemStack(Items.IRON_INGOT, 3));
+        menu.getSlot(menu.type().itemSlots()).set(new ItemStack(Items.IRON_INGOT, 2));
+        var registries = h.getLevel().registryAccess();
+        h.runAtTickTime(10, () -> {
+            long before = machine.saveWithoutMetadata(registries).getLong("inputs_changed_at");
+            h.assertTrue(MachineRecipeTransfer.plan(menu, recipe(iron(64)), true) == null, "Impossible transfer planned");
+            h.assertTrue(MachineRecipeTransfer.plan(menu, recipe(iron(4)), true) != null, "Possible transfer failed");
+            long after = machine.saveWithoutMetadata(registries).getLong("inputs_changed_at");
+            h.assertTrue(before == after && machine.items().getStackInSlot(0).getCount() == 3,
+                    "Planning changed the machine: " + before + " -> " + after);
+            h.succeed();
+        });
+    }
+
+    /** JEI の見積もりは、装填中の触媒の残りをサーバーと同じ値で数える（1回分足りないときに搬入できると見せない）。 */
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void loadedCatalystEstimateMatchesTheServer(GameTestHelper h) {
+        var menu = menu(h);
+        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        int max = io.github.genichimaruo.singulo.item.UsesHelper.get(catalyst).max();
+        ItemStack worn = catalyst.copy();
+        io.github.genichimaruo.singulo.item.UsesHelper.consume(worn, max - 7);
+        machine.items().setStackInSlot(menu.type().catalystSlot(), worn);
+        h.runAtTickTime(5, () -> {
+            int remaining = io.github.genichimaruo.singulo.item.UsesHelper.remaining(machine.magazine().loaded());
+            h.assertTrue(remaining > 0, "Catalyst was not loaded");
+            var buf = new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), h.getLevel().registryAccess());
+            buf.writeBlockPos(menu.pos());
+            buf.writeVarInt(menu.type().ordinal());
+            var client = MachineMenu.client(2, TestScope.player(h).getInventory(), buf);
+            var server = machine.syncData();
+            for (int slot = 0; slot < server.getCount(); slot++) client.setData(slot, server.get(slot));
+            int estimated = io.github.genichimaruo.singulo.item.UsesHelper.remaining(client.loadedCatalyst());
+            h.assertTrue(estimated == remaining, "Client estimate " + estimated + " differs from the server's " + remaining);
+            h.succeed();
+        });
+    }
+
     /** 容量アップグレードの案内: 足りる段階を示し、Mk3 でも足りなければ段階を示さない。 */
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void capacityHintNeverPointsAtAnUpgradeThatCannotHelp(GameTestHelper h) {
