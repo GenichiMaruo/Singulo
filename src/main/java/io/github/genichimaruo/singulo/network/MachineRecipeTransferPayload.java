@@ -25,7 +25,8 @@ public record MachineRecipeTransferPayload(int containerId, ResourceLocation rec
 
     /** Ticks a player must wait between transfers; JEI clicks are far slower, a flood of packets is dropped. */
     static final int MIN_INTERVAL = 4;
-    private static final java.util.Map<java.util.UUID, Long> LAST = new java.util.HashMap<>();
+    /** Keyed by the player entity, so an entry goes away with the player (logout, leaving a world). Server thread only. */
+    private static final java.util.Map<net.minecraft.world.entity.player.Player, Long> LAST = new java.util.WeakHashMap<>();
 
     @Override
     public Type<? extends CustomPacketPayload> type() { return TYPE; }
@@ -34,9 +35,9 @@ public record MachineRecipeTransferPayload(int containerId, ResourceLocation rec
         context.enqueueWork(() -> {
             var player = context.player();
             long now = player.level().getGameTime();
-            Long last = LAST.get(player.getUUID());
+            Long last = LAST.get(player);
             if (last != null && now - last < MIN_INTERVAL && now >= last) return;
-            LAST.put(player.getUUID(), now);
+            LAST.put(player, now);
             if (!(player.containerMenu instanceof MachineMenu menu) || menu.containerId != payload.containerId()
                     || !menu.stillValid(player)) return;
             if (!(player.level().getBlockEntity(menu.pos()) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine)

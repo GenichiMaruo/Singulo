@@ -103,6 +103,26 @@ public class DroneNetwork extends SavedData {
 
     private final Map<Long, Port> ports = new LinkedHashMap<>();
     private final Map<Long, Flight> flights = new LinkedHashMap<>();
+    /**
+     * 便を探す手間を減らす控え（便を足す・消すたびに作り直す）: 便の一覧の写しと、ステーションの枠ごとの便。
+     * ステーションが壊されて便の station が null になっても、控えから引いたあとで確かめるので、取り違えない。
+     */
+    @Nullable
+    private List<Flight> flightList;
+    @Nullable
+    private Map<Long, Flight> byUnit;
+    /**
+     * 1 tick ごとに作り直す控え（便の行き先・段階は tick の途中でも変わるので、その tick の間だけ使う）: ポートごとの便
+     * （そこで積む・そこへ届ける）と、持ち主ごとの帰りかけの便。ポートやステーションが毎 tick すべての便を回さずに済む。
+     */
+    private long tickIndexAt = Long.MIN_VALUE;
+    @Nullable
+    private Map<Long, List<Flight>> byPort;
+    @Nullable
+    private Map<UUID, List<Flight>> returningByOwner;
+    /** 読み込まれているステーション（持ち主ごと。保存しない。ステーションが読み込まれる・外れるたびに出し入れする）。 */
+    private final Map<UUID, Map<Long, DroneStationBlockEntity>> stations = new java.util.HashMap<>();
+    private static final UUID NO_OWNER = new UUID(0, 0);
     private long nextId = 1;
 
     public static DroneNetwork get(ServerLevel level) {
@@ -151,6 +171,7 @@ public class DroneNetwork extends SavedData {
         f.to = to;
         f.stage = PICKUP;
         flights.put(f.id, f);
+        forgetIndex();
         setDirty();
         return f;
     }
@@ -163,20 +184,96 @@ public class DroneNetwork extends SavedData {
     /** そのステーションの枠が飛んでいる便（なければ null）。 */
     @Nullable
     public Flight flightOf(BlockPos station, int unit) {
-        for (Flight f : flights.values()) {
-            if (f.unit == unit && station.equals(f.station)) {
-                return f;
+        if (byUnit == null) {
+            Map<Long, Flight> index = new java.util.HashMap<>();
+            for (Flight f : flights.values()) {
+                if (f.station != null) {
+                    index.put(unitKey(f.station, f.unit), f);
+                }
             }
+            byUnit = index;
         }
-        return null;
+        Flight f = byUnit.get(unitKey(station, unit));
+        return f != null && f.unit == unit && station.equals(f.station) ? f : null;
     }
 
+    private static long unitKey(BlockPos station, int unit) {
+        return station.asLong() * 31 + unit;
+    }
+
+    /** 便の一覧（便を足す・消すまで同じ写しを使い回す。回しながら便を消してもよい）。 */
     public List<Flight> flights() {
-        return List.copyOf(flights.values());
+        if (flightList == null) {
+            flightList = List.copyOf(flights.values());
+        }
+        return flightList;
+    }
+
+    private void forgetIndex() {
+        flightList = null;
+        byUnit = null;
+        byPort = null;
+        returningByOwner = null;
+    }
+
+    /** port で積む・port へ届ける便（その tick の控え。使う側で段階と場所を確かめること）。 */
+    public List<Flight> flightsAt(BlockPos port, long now) {
+        tickIndex(now);
+        return byPort.getOrDefault(port.asLong(), List.of());
+    }
+
+    /** owner の帰りかけの便（その tick の控え。使う側で段階を確かめること）。 */
+    public List<Flight> returning(@Nullable UUID owner, long now) {
+        tickIndex(now);
+        return returningByOwner.getOrDefault(owner == null ? NO_OWNER : owner, List.of());
+    }
+
+    private void tickIndex(long now) {
+        if (byPort != null && returningByOwner != null && tickIndexAt == now) {
+            return;
+        }
+        Map<Long, List<Flight>> ports = new java.util.HashMap<>();
+        Map<UUID, List<Flight>> returning = new java.util.HashMap<>();
+        for (Flight f : flights.values()) {
+            if (f.from != null) {
+                ports.computeIfAbsent(f.from.asLong(), k -> new ArrayList<>()).add(f);
+            }
+            if (f.to != null && !f.to.equals(f.from)) {
+                ports.computeIfAbsent(f.to.asLong(), k -> new ArrayList<>()).add(f);
+            }
+            if (f.stage == RETURN) {
+                returning.computeIfAbsent(f.owner == null ? NO_OWNER : f.owner, k -> new ArrayList<>()).add(f);
+            }
+        }
+        byPort = ports;
+        returningByOwner = returning;
+        tickIndexAt = now;
+    }
+
+    // ------------------------------------------------------------------ ステーション
+
+    void addStation(DroneStationBlockEntity station) {
+        stations.computeIfAbsent(ownerKey(station.owner()), k -> new java.util.HashMap<>()).put(station.getBlockPos().asLong(), station);
+    }
+
+    void removeStation(DroneStationBlockEntity station) {
+        for (Map<Long, DroneStationBlockEntity> m : stations.values()) {
+            m.remove(station.getBlockPos().asLong(), station);
+        }
+    }
+
+    /** owner の、読み込まれているステーション。 */
+    java.util.Collection<DroneStationBlockEntity> stationsOf(@Nullable UUID owner) {
+        return stations.getOrDefault(ownerKey(owner), Map.of()).values();
+    }
+
+    private static UUID ownerKey(@Nullable UUID owner) {
+        return owner == null ? NO_OWNER : owner;
     }
 
     public void remove(Flight f) {
         if (flights.remove(f.id) != null) {
+            forgetIndex();
             setDirty();
         }
     }
@@ -330,6 +427,7 @@ public class DroneNetwork extends SavedData {
             f.virtualFrom = c.getFloat("virtual_from");
             f.virtualAt = c.getLong("virtual_at");
             net.flights.put(f.id, f);
+            net.forgetIndex();
         }
         net.nextId = Math.max(tag.getLong("next_id"), 1);
         for (long id : net.flights.keySet()) {

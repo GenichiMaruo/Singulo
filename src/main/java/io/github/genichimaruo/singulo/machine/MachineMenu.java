@@ -171,7 +171,11 @@ public class MachineMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else if (CapacityUpgrades.tier(stack) > 0) {
-            if (!moveItemStackTo(stack, type.capacitySlot(), type.capacitySlot() + 1, false)) return ItemStack.EMPTY;
+            // 容量の専用枠が空いていれば装着し、埋まっていれば材料の欄へ（Mk1・Mk2 は上の段階の材料にもなる）
+            if (!moveItemStackTo(stack, type.capacitySlot(), type.capacitySlot() + 1, false)
+                    && !moveItemStackTo(stack, 0, type.inputSlots(), false)) {
+                return ItemStack.EMPTY;
+            }
         } else if (MachineBlockEntity.isUpgrade(stack)) {
             if (!moveItemStackTo(stack, upgradeIndex, upgradeIndex + 1, false)) {
                 return ItemStack.EMPTY;

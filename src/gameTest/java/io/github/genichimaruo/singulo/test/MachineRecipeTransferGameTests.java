@@ -200,6 +200,22 @@ public final class MachineRecipeTransferGameTests {
         h.succeed();
     }
 
+    /** 容量アップグレードの Shift クリック: 専用枠が空いていれば装着、埋まっていれば材料の欄へ（Mk2・Mk3 の材料になる）。 */
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void capacityUpgradeShiftClickFallsBackToInputs(GameTestHelper h) {
+        var menu = menu(h);
+        var player = TestScope.player(h);
+        int inventory = menu.type().itemSlots();
+        menu.getSlot(inventory).set(CapacityUpgrades.item(1));
+        menu.quickMoveStack(player, inventory);
+        h.assertTrue(menu.getSlot(menu.type().capacitySlot()).getItem().getCount() == 1, "Empty capacity slot was not filled");
+        menu.getSlot(inventory).set(CapacityUpgrades.item(1));
+        menu.quickMoveStack(player, inventory);
+        h.assertTrue(CapacityUpgrades.tier(menu.getSlot(0).getItem()) == 1 && menu.getSlot(inventory).getItem().isEmpty(),
+                "Second upgrade did not go to the input slots: " + menu.getSlot(0).getItem());
+        h.succeed();
+    }
+
     /** 容量アップグレードの案内: 足りる段階を示し、Mk3 でも足りなければ段階を示さない。 */
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void capacityHintNeverPointsAtAnUpgradeThatCannotHelp(GameTestHelper h) {

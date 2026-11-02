@@ -395,6 +395,72 @@ public final class DroneGameTests {
         h.succeed();
     }
 
+    /** 行き先のポートが壊されたら、発送元は積む前の箱を取り消して荷物を戻す（ない行き先へ荷物を送らない）。 */
+    @GameTest(template = "empty", batch = BATCH, timeoutTicks = 300)
+    public static void brokenDestinationCancelsStagedShipment(GameTestHelper h) {
+        DronePortBlockEntity a = port(h, new BlockPos(1, 1, 1));
+        BlockPos toPos = new BlockPos(6, 1, 1);
+        DronePortBlockEntity b = port(h, toPos);
+        a.select(h.absolutePos(toPos));
+        load(a, 1, new ItemStack(Items.IRON_INGOT, 9));
+        station(h, new BlockPos(4, 1, 5), 1);
+        h.runAtTickTime(100, () -> {
+            h.assertTrue(a.send(), "Could not send: " + a.status());
+            b.onBroken(h.getLevel());
+            h.setBlock(toPos, net.minecraft.world.level.block.Blocks.AIR);
+        });
+        h.runAtTickTime(110, () -> {
+            h.assertTrue(a.staged().isEmpty(), "Shipment to a broken port is still staged");
+            h.assertTrue(count(a, DronePortBlockEntity.SLOT_CARGO, DronePortBlockEntity.CARGO, Items.IRON_INGOT) == 9, "Cargo not returned");
+            ours(h, new BlockPos(4, 1, 5)).forEach(CargoDrone::discard);
+            h.succeed();
+        });
+    }
+
+    /** 見えないまま積み込みに着いた便は、見える所ならドローンを出して積ませる（箱が演出なしで消えない）。 */
+    @GameTest(template = "large", batch = BATCH, timeoutTicks = 200)
+    public static void virtualPickupMaterializesAtALoadedPort(GameTestHelper h) {
+        BlockPos at = new BlockPos(4, 1, 4);
+        DronePortBlockEntity a = port(h, at);
+        // このテストだけの持ち主（積み込み待ちの箱が残っても、同じ持ち主のほかのテストのドローンを呼ばないように）
+        UUID alone = UUID.randomUUID();
+        a.setOwner(alone);
+        BlockPos toPos = new BlockPos(8, 1, 8);
+        port(h, toPos).setOwner(alone);
+        BlockPos stationPos = h.absolutePos(new BlockPos(1, 1, 1));
+        h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.DRONE_STATION.get());
+        a.select(h.absolutePos(toPos));
+        load(a, 1, new ItemStack(Items.IRON_INGOT, 3));
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        h.runAtTickTime(2, () -> {
+            DroneNetwork.Flight f = net.create(stationPos, 0, alone, h.absolutePos(at), h.absolutePos(toPos));
+            a.stageForTest(h.absolutePos(toPos), f.id);
+            net.virtualize(f, Vec3.atCenterOf(stationPos).add(0, 30, 0), h.getLevel().getGameTime() - 10_000);
+        });
+        h.runAtTickTime(6, () -> {
+            h.assertFalse(a.staged().isEmpty(), "Crate vanished without a drone");
+            // このテストのステーションのドローンだけを見る・消す（並んで動くほかのテストのドローンに触れない）
+            h.assertFalse(ours(h, new BlockPos(1, 1, 1)).isEmpty(), "No drone appeared for the pickup");
+            ours(h, new BlockPos(1, 1, 1)).forEach(CargoDrone::discard);
+            net.flights().stream().filter(x -> stationPos.equals(x.station)).forEach(net::remove);
+            h.succeed();
+        });
+    }
+
+    /** 便の控え: 足す・消す・ステーションが外れたときに、枠の便を取り違えない。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void flightIndexFollowsChanges(GameTestHelper h) {
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        BlockPos s = h.absolutePos(new BlockPos(2, 1, 2));
+        DroneNetwork.Flight f = net.create(s, 1, null, s, s.east(4));
+        h.assertTrue(net.flightOf(s, 1) == f && net.flightOf(s, 0) == null && net.flights().contains(f), "Index missed a new flight");
+        f.station = null;
+        h.assertTrue(net.flightOf(s, 1) == null, "Index kept a detached flight");
+        net.remove(f);
+        h.assertTrue(!net.flights().contains(f), "List kept a removed flight");
+        h.succeed();
+    }
+
     /** このテストのステーションのドローン（並んで動くほかのテストのものは数えない・消さない）。 */
     private static List<CargoDrone> ours(GameTestHelper h, BlockPos at) {
         BlockPos station = h.absolutePos(at);

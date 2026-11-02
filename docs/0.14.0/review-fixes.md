@@ -52,3 +52,18 @@ New tests: `stationAutomationOnlyAcceptsKits`, `redirectedVirtualFlightUsesItsKi
 Deferred to a later release: JEI preview against slots waiting for returns on the server, an owner check on the `SideConfig.Holder` interface instead of the drone-port special case, caching the `AndroidStorageView` lookup, and clearing the transfer rate-limit map on logout.
 
 New tests: `unpackingInCreativeKeepsOverflow`, `jeiMaxTransferPlansCatalystsPerBatch`, `timeFieldStepsStayWithinTheBuffer`. Validation: 637 GameTests, 37 Python tests, release check.
+
+## PR #51 fourth review and scaling
+
+- A Drone Port that is broken sends home drones on their way to pick up for it, and the origin port cancels a staged shipment to a missing destination (cargo and power come back). If the cargo slots are full, the crate stays staged and no drone is called until the player cancels.
+- A virtual pickup that arrives at a loaded port spawns its drone and runs the normal hatch animation, like deliveries do.
+- A returning virtual flight is removed only after its drone spawns, so a failed spawn cannot cost a second kit.
+- Shift-clicking a capacity upgrade fills the empty capacity slot, otherwise it goes to the input slots (Mk1/Mk2 are ingredients of Mk2/Mk3).
+- `SideConfig.Holder#mayConfigure` holds the side-config permission check; the payload no longer special-cases the drone port. Machine and drone port auto-eject share `SideConfig.pushOut`.
+- The transfer rate limit is a `WeakHashMap` keyed by the player entity, so entries go away with the player. JEI refuses recipes the machine cannot select instead of reporting a silent success.
+- Scaling: per-tick work no longer grows with the number of flights or the blocks around a port.
+  - `DroneNetwork` keeps the loaded Drone Stations per owner (registered on load, removed on unload or removal), so calling drones and checking availability visit only that owner's stations instead of every block entity in about 121 chunks.
+  - Flights are indexed by station unit (`flightOf`), by port and by returning owner. The port and owner indexes are rebuilt at most once per tick, and the flight list is copied only when flights are added or removed. Ports read only their own flights instead of every flight every 10 ticks.
+  - The `AndroidStorageView` used by supply ports and work consoles is reused until the neighbour's capability object changes.
+
+New tests: `brokenDestinationCancelsStagedShipment`, `virtualPickupMaterializesAtALoadedPort`, `flightIndexFollowsChanges`, `capacityUpgradeShiftClickFallsBackToInputs`. The pickup test uses its own owner and only touches its own drones; an earlier version discarded every drone within 30 blocks and broke neighbouring drone tests in the full run. Validation: 641 GameTests, 37 Python tests, release check.

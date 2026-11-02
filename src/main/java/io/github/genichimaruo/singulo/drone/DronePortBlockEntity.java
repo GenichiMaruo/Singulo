@@ -208,6 +208,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     }
 
     /** ほかの人も使えるか: 持ち主がいなければだれでも、いれば持ち主だけ（網は持ち主ごと）。 */
+    @Override
+    public boolean mayConfigure(Player player) {
+        return mayOperate(player);
+    }
+
     public boolean mayOperate(Player player) {
         return owner == null || owner.equals(player.getUUID());
     }
@@ -355,6 +360,13 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             dronesKnown = true;
         }
         return dronesOk;
+    }
+
+    /** テスト用: 今の荷物を to 行きに梱包して積み込み待ちにし、便 flight を受け持たせる（ドローンの呼び出しを省く）。 */
+    public void stageForTest(BlockPos to, long flight) {
+        if (pack(to)) {
+            flightId = flight;
+        }
     }
 
     /** 発送: 荷物と空き箱1つを梱包し、電力を払って、積み込み待ちにする。できたら true。 */
@@ -734,14 +746,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     }
 
     private void eject(IItemHandler dest, int slot) {
-        ItemStack stack = items.getStackInSlot(slot);
-        if (stack.isEmpty()) {
-            return;
-        }
-        ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
-        if (rest.getCount() != stack.getCount()) {
-            items.setStackInSlot(slot, rest);
-        }
+        SideConfig.pushOut(items, slot, dest);
     }
 
     /** 画面に出す便: このポートから出る便と、ここへ来る便（荷物を積む前・積んだあと）。 */
@@ -750,7 +755,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return List.of();
         }
         List<DroneNetwork.Flight> out = new ArrayList<>();
-        for (DroneNetwork.Flight f : DroneNetwork.get(server).flights()) {
+        for (DroneNetwork.Flight f : DroneNetwork.get(server).flightsAt(worldPosition, server.getGameTime())) {
             boolean mine = f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.from) && f.id == flightId
                     || f.stage == DroneNetwork.DELIVER && (worldPosition.equals(f.from) || worldPosition.equals(f.to));
             if (mine) {
@@ -847,6 +852,20 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return;
         }
         DroneNetwork.Flight f = flightId == 0 ? null : net.flight(flightId);
+        if (stagedTo != null && net.port(stagedTo) == null && anim != ANIM_LOAD) {
+            // 行き先のポートが壊された: 積む前なら取り消して荷物と電力を戻す。入りきらなければ、ドローンを帰して箱をここに
+            // 置いておく（取消を押せば、空けたあとで戻せる。積んで、ない行き先へ飛ばすことはしない）
+            if (!cancel()) {
+                if (f != null && f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.from)) {
+                    goHome(net, f, now);
+                }
+                if (flightId != 0) {
+                    flightId = 0;
+                    changedVisible();
+                }
+            }
+            return;
+        }
         if (f == null || f.stage != DroneNetwork.PICKUP || !worldPosition.equals(f.from)) {
             if (flightId != 0) {
                 flightId = 0;
@@ -863,6 +882,10 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return;
         }
         if (f.arrived(now) && anim == ANIM_NONE) {
+            // 見えないまま着いた: 見える所なら、届けるときと同じくドローンを出して、扉を開けて積ませる
+            if (level.isPositionEntityTicking(worldPosition.above()) && CargoDrone.materialize(level, net, f)) {
+                return;
+            }
             f.crate = staged;
             staged = ItemStack.EMPTY;
             stagedTo = null;
@@ -875,7 +898,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     /** 見えないまま着いた便: 見える所ならドローンを出して降ろさせ、見えない所ならそのまま受け取る。 */
     private void tickIncoming(ServerLevel level, DroneNetwork net, long now) {
-        for (DroneNetwork.Flight f : net.flights()) {
+        for (DroneNetwork.Flight f : net.flightsAt(worldPosition, now)) {
             if (f.stage != DroneNetwork.DELIVER || !worldPosition.equals(f.to) || !f.arrived(now)) {
                 continue;
             }
@@ -988,7 +1011,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             }
             anim = ANIM_NONE;
             for (DroneNetwork.Flight f : net.flights()) {
-                if (f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.from)) {
+                if (f.stage == DroneNetwork.PICKUP && (worldPosition.equals(f.from) || worldPosition.equals(f.to))) {
+                    // ここで積む便も、ここへ届けるために取りに行く便も帰す（発送元の箱は、発送元が取り消して荷物を戻す）
                     goHome(net, f, now);
                 } else if (f.stage == DroneNetwork.DELIVER && worldPosition.equals(f.to)) {
                     if (net.port(f.from) != null && !f.from.equals(worldPosition)) {

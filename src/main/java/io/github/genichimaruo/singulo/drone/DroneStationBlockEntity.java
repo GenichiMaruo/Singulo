@@ -174,6 +174,11 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     }
 
     public void setOwner(UUID owner) {
+        if (level instanceof ServerLevel server && !isRemoved()) {
+            DroneNetwork.get(server).removeStation(this);
+            this.owner = owner;
+            DroneNetwork.get(server).addStation(this);
+        }
         this.owner = owner;
         setChanged();
     }
@@ -213,33 +218,27 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     /** 呼べるドローン: 待機中のドローン（ステーションの枠）か、荷物を届け終えて帰りかけのドローン（その便）。 */
     private record Candidate(@Nullable DroneStationBlockEntity station, int unit, @Nullable DroneNetwork.Flight returning, double distSqr) {}
 
-    /** port に呼べるドローン（port に近い順）。読み込まれているものだけ。 */
+    /**
+     * port に呼べるドローン（port に近い順）。読み込まれているものだけ。調べるのは、持ち主の読み込まれたステーションと、
+     * 持ち主の帰りかけの便だけ（周りのブロックやすべての便を回さないので、拠点が大きくなっても重くならない）。
+     */
     private static List<Candidate> candidates(ServerLevel level, BlockPos port, @Nullable UUID owner) {
         List<Candidate> found = new ArrayList<>();
         double range = (double) DISPATCH_RANGE * DISPATCH_RANGE;
-        int c = (DISPATCH_RANGE >> 4) + 1;
         DroneNetwork net = DroneNetwork.get(level);
-        for (int cx = (port.getX() >> 4) - c; cx <= (port.getX() >> 4) + c; cx++) {
-            for (int cz = (port.getZ() >> 4) - c; cz <= (port.getZ() >> 4) + c; cz++) {
-                if (!level.hasChunk(cx, cz)) {
-                    continue;
-                }
-                for (var be : level.getChunk(cx, cz).getBlockEntities().values()) {
-                    if (!(be instanceof DroneStationBlockEntity s) || s.getBlockPos().distSqr(port) > range
-                            || !java.util.Objects.equals(s.owner, owner)) {
-                        continue;
-                    }
-                    for (int i = 0; i < MAX_UNITS; i++) {
-                        if (s.drones[i] != null && net.flightOf(s.worldPosition, i) == null && !s.stopped[i]
-                                && level.getEntity(s.drones[i]) instanceof CargoDrone d && d.isAlive() && d.idle()) {
-                            found.add(new Candidate(s, i, null, d.position().distanceToSqr(Vec3.atCenterOf(port))));
-                        }
-                    }
+        for (DroneStationBlockEntity s : net.stationsOf(owner)) {
+            if (s.isRemoved() || s.getBlockPos().distSqr(port) > range) {
+                continue;
+            }
+            for (int i = 0; i < MAX_UNITS; i++) {
+                if (s.drones[i] != null && net.flightOf(s.worldPosition, i) == null && !s.stopped[i]
+                        && level.getEntity(s.drones[i]) instanceof CargoDrone d && d.isAlive() && d.idle()) {
+                    found.add(new Candidate(s, i, null, d.position().distanceToSqr(Vec3.atCenterOf(port))));
                 }
             }
         }
         // 届け終えて帰りかけのドローン（ステーションへ戻らずに、そのまま次の仕事へ）
-        for (DroneNetwork.Flight f : net.flights()) {
+        for (DroneNetwork.Flight f : net.returning(owner, level.getGameTime())) {
             if (f.stage != DroneNetwork.RETURN || f.virtual || f.drone == null || f.station == null || !f.crate.isEmpty()
                     || !java.util.Objects.equals(f.owner, owner)) {
                 continue;
@@ -264,25 +263,16 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         // 範囲の外のステーションの、範囲の中で帰りかけのドローンも数える
         DroneNetwork net = DroneNetwork.get(level);
         double range = (double) DISPATCH_RANGE * DISPATCH_RANGE;
-        for (DroneNetwork.Flight f : net.flights()) {
+        for (DroneNetwork.Flight f : net.returning(owner, level.getGameTime())) {
             if (f.stage == DroneNetwork.RETURN && !f.virtual && f.drone != null && f.station != null && f.crate.isEmpty()
                     && java.util.Objects.equals(f.owner, owner) && level.getEntity(f.drone) instanceof CargoDrone d && d.isAlive()
                     && !d.dismantling() && d.position().distanceToSqr(Vec3.atCenterOf(port)) <= range) {
                 return true;
             }
         }
-        int c = (DISPATCH_RANGE >> 4) + 1;
-        for (int cx = (port.getX() >> 4) - c; cx <= (port.getX() >> 4) + c; cx++) {
-            for (int cz = (port.getZ() >> 4) - c; cz <= (port.getZ() >> 4) + c; cz++) {
-                if (!level.hasChunk(cx, cz)) {
-                    continue;
-                }
-                for (var be : level.getChunk(cx, cz).getBlockEntities().values()) {
-                    if (be instanceof DroneStationBlockEntity s && s.getBlockPos().distSqr(port) <= range
-                            && java.util.Objects.equals(s.owner, owner) && s.hasFleet(net)) {
-                        return true;
-                    }
-                }
+        for (DroneStationBlockEntity s : net.stationsOf(owner)) {
+            if (!s.isRemoved() && s.getBlockPos().distSqr(port) <= range && s.hasFleet(net)) {
+                return true;
             }
         }
         return false;
@@ -382,11 +372,15 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
             DroneNetwork.Flight f = net.flightOf(worldPosition, i);
             if (f != null) {
                 if (f.stage == DroneNetwork.RETURN && f.arrived(now) && f.crate.isEmpty()) {
-                    // 見えないまま帰ってきた: 空から待機位置へ降りてくる
-                    net.remove(f);
-                    kinds[i] = f.kind;
+                    // 見えないまま帰ってきた: 空から待機位置へ降りてくる（出せなければ便を残して次の tick にやり直す。
+                    // 便を先に消すと、この枠は印刷し直しになり、キットをもう1つ使ってしまう）
                     CargoDrone d = CargoDrone.spawn(level, worldPosition, i, f.kind, hover(worldPosition, i).add(0, 6, 0), false);
-                    drones[i] = d == null ? null : d.getUUID();
+                    if (d != null) {
+                        net.remove(f);
+                        kinds[i] = f.kind;
+                        drones[i] = d.getUUID();
+                        setChanged();
+                    }
                 } else if (f.drone != null && !f.drone.equals(drones[i])) {
                     drones[i] = f.drone;                  // 読み込み直しで実体が変わった
                     setChanged();
@@ -513,6 +507,32 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
                 Block.popResource(level, worldPosition, new ItemStack(kit));
             }
         }
+    }
+
+    // ------------------------------------------------------------------ 読み込み
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level instanceof ServerLevel server) {
+            DroneNetwork.get(server).addStation(this);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level instanceof ServerLevel server) {
+            DroneNetwork.get(server).removeStation(this);
+        }
+        super.setRemoved();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        if (level instanceof ServerLevel server) {
+            DroneNetwork.get(server).removeStation(this);
+        }
+        super.onChunkUnloaded();
     }
 
     // ------------------------------------------------------------------ 保存

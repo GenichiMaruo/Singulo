@@ -52,6 +52,10 @@ final class MachineTransferHandler implements IRecipeTransferHandler<MachineMenu
         var id = SinguloJeiPlugin.RECIPE_IDS.get(recipe);
         if (menu.type() != type || id == null || recipe.mass().isPresent()
                 || (recipe.ingredients().isEmpty() && recipe.restore().isEmpty())) return helper.createInternalError();
+        // The server selects the recipe before moving items; one the machine cannot select would silently do nothing
+        if (menu.type().selectsRecipe() && io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(player.level(), menu.type(), id) < 0) {
+            return helper.createInternalError();
+        }
         if (MachineRecipeTransfer.plan(menu, recipe, maxTransfer) == null) {
             return helper.createUserErrorWithTooltip(Component.translatable("jei.tooltip.error.recipe.transfer.missing")
                     .append(" / ").append(Component.translatable("jei.tooltip.error.recipe.transfer.inventory.full")));

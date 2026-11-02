@@ -427,12 +427,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void ejectItem(IItemHandler dest, int slot) {
-        ItemStack stack = items.getStackInSlot(slot);
-        if (stack.isEmpty()) return;
-        ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
-        if (rest.getCount() != stack.getCount()) {
-            items.setStackInSlot(slot, rest);
-        }
+        SideConfig.pushOut(items, slot, dest);
     }
 
     /** Keep a blocked return visible in its original slot; never discard or consume it again. */
@@ -537,15 +532,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 // 時間の場の中では1 tick に進む量が変わる（加速なら2 tick ぶん進み、電力も2倍使う）
                 timeCarry += TimeFields.speed(level, pos);
                 int steps = (int) timeCarry;
+                // 蓄電容量で1回に払える分だけ進む（加速の場でも、容量アップグレードが1 tick 分に足りていれば止まらない）
+                int done = affordableSteps(steps);
                 if (!canOutput(recipe)) {
                     status = Status.OUTPUT_FULL;
                     timeCarry = 0;
                 } else if (steps == 0) {
                     active = true;
                     status = Status.RUNNING;
-                } else if (energy.consume(usage * affordableSteps(steps)) || runsUnderpowered(recipe) && drawPartial()) {
-                    // 蓄電容量で1回に払える分だけ進む（加速の場でも、容量アップグレードが1 tick 分に足りていれば止まらない）
-                    int done = affordableSteps(steps);
+                } else if (energy.consume(usage * done) || runsUnderpowered(recipe) && drawPartial()) {
                     timeCarry -= steps;
                     active = true;
                     status = Status.RUNNING;
