@@ -1490,6 +1490,24 @@
       }
     ]
   },
+  "drone.jet": {
+    "subtitle": "subtitles.singulo.drone.jet",
+    "sounds": [
+      {
+        "name": "singulo:drone/jet",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "drone.hover": {
+    "subtitle": "subtitles.singulo.drone.hover",
+    "sounds": [
+      {
+        "name": "singulo:drone/hover",
+        "attenuation_distance": 16
+      }
+    ]
+  },
   "drone.print": {
     "subtitle": "subtitles.singulo.drone.print",
     "sounds": [
@@ -1531,6 +1549,15 @@
       {
         "name": "singulo:drone/arm_retract",
         "attenuation_distance": 12
+      }
+    ]
+  },
+  "drone.phase": {
+    "subtitle": "subtitles.singulo.drone.phase",
+    "sounds": [
+      {
+        "name": "singulo:drone/phase",
+        "attenuation_distance": 16
       }
     ]
   },

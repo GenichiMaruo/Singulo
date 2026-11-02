@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.drone.CargoDrone;
 import io.github.genichimaruo.singulo.drone.DroneCrateItem;
+import io.github.genichimaruo.singulo.drone.DroneKind;
 import io.github.genichimaruo.singulo.drone.DroneNetwork;
 import io.github.genichimaruo.singulo.drone.DronePortBlockEntity;
 import io.github.genichimaruo.singulo.drone.DroneStationBlockEntity;
@@ -156,6 +157,22 @@ public final class DroneGameTests {
         DronePortBlockEntity b = port(h, TO);
         load(a, 1, new ItemStack(Items.IRON_INGOT, 64), new ItemStack(Items.GOLD_INGOT, 7));
         a.select(h.absolutePos(TO));
+        double[] highest = {0};
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        h.onEachTick(() -> {
+            DroneNetwork.Flight f = net.flightOf(h.absolutePos(STATION), 0);
+            for (CargoDrone d : ours(h, STATION)) {
+                if (f != null && f.stage == DroneNetwork.DELIVER) {
+                    // 真下の床までの高さ（テストの場所は防壁の天井で囲まれるので、高さマップは使えない）
+                    BlockPos.MutableBlockPos below = d.blockPosition().mutable();
+                    while (below.getY() > h.getLevel().getMinBuildHeight()
+                            && h.getLevel().getBlockState(below).getCollisionShape(h.getLevel(), below).isEmpty()) {
+                        below.move(0, -1, 0);
+                    }
+                    highest[0] = Math.max(highest[0], d.getY() - (below.getY() + 1));
+                }
+            }
+        });
         boolean[] sent = {false};
         h.succeedWhen(() -> {
             if (!sent[0]) {
@@ -166,13 +183,68 @@ public final class DroneGameTests {
                     && count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.GOLD_INGOT) == 7, "Cargo not received yet: station "
                     + station.status(0) + " port " + a.status() + "/" + b.status() + " flight " + describe(h) + " drones "
                     + ours(h, STATION).stream()
-                    .map(d -> d.position().subtract(net.minecraft.world.phys.Vec3.atLowerCornerOf(h.absolutePos(BlockPos.ZERO))).toString()).toList());
+                    .map(d -> d.position().subtract(Vec3.atLowerCornerOf(h.absolutePos(BlockPos.ZERO))).toString()).toList());
             h.assertTrue(b.items().getStackInSlot(DronePortBlockEntity.SLOT_CRATES).is(SinguloItems.PACKING_CRATE.get()),
                     "Empty crate did not move to the crate slot");
             h.assertTrue(DroneNetwork.get(h.getLevel()).flightOf(h.absolutePos(STATION), 0) == null, "Drone has not returned");
             List<CargoDrone> drones = ours(h, STATION);
             h.assertTrue(drones.size() == 1 && drones.get(0).idle(), "Expected one idle drone, got " + drones.size());
             h.assertTrue(station.items().getStackInSlot(DroneStationBlockEntity.SLOT_KIT).getCount() == 1, "Printed more than one drone");
+            h.assertTrue(highest[0] >= 2.0, "Drone skimmed the ground instead of flying a few blocks up: " + highest[0]);
+            drones.forEach(CargoDrone::discard);
+        });
+    }
+
+    /** ジェット型のメモリなら、ジェット型を印刷して、ローター型より速く運ぶ。 */
+    @GameTest(template = "large", batch = BATCH, timeoutTicks = 1200)
+    public static void jetDroneDeliversFaster(GameTestHelper h) {
+        DroneStationBlockEntity station = station(h, STATION, 1);
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(item("drone_memory_jet")));
+        DronePortBlockEntity a = port(h, FROM);
+        DronePortBlockEntity b = port(h, TO);
+        load(a, 1, new ItemStack(Items.IRON_INGOT, 5));
+        a.select(h.absolutePos(TO));
+        // 見えない飛行の着く時刻も、型の速さで決まる（記録だけの便で比べて、すぐ消す）
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        long now = h.getLevel().getGameTime();
+        long[] arrive = new long[2];
+        for (DroneKind kind : new DroneKind[]{DroneKind.ROTOR, DroneKind.JET}) {
+            DroneNetwork.Flight f = net.create(h.absolutePos(new BlockPos(30, 1, 30)), 0, null, h.absolutePos(FROM), h.absolutePos(TO));
+            f.kind = kind;
+            net.virtualize(f, Vec3.atCenterOf(h.absolutePos(FROM)).add(300, 0, 0), now);
+            arrive[kind.ordinal()] = f.arriveAt - now;
+            net.remove(f);
+        }
+        h.assertTrue(arrive[1] < arrive[0] * 0.7, "Jet virtual flight is not faster: " + arrive[1] + " vs " + arrive[0]);
+        boolean[] sent = {false};
+        h.succeedWhen(() -> {
+            if (!sent[0]) {
+                sent[0] = a.send();
+                h.assertTrue(sent[0], "Waiting for the drone to be printed");
+                DroneNetwork.Flight f = DroneNetwork.get(h.getLevel()).flightOf(h.absolutePos(STATION), 0);
+                h.assertTrue(f != null && f.kind == DroneKind.JET, "Flight did not take the drone's kind");
+            }
+            h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.IRON_INGOT) == 5, "Cargo not received yet");
+            List<CargoDrone> drones = ours(h, STATION);
+            h.assertTrue(drones.size() == 1 && drones.get(0).kind() == DroneKind.JET, "Expected one jet drone");
+            drones.forEach(CargoDrone::discard);
+        });
+    }
+
+    /** 印刷するドローンの型はメモリの型。メモリを替えても、印刷済みのドローンの型は変わらない。 */
+    @GameTest(template = "empty", batch = BATCH, timeoutTicks = 400)
+    public static void stationPrintsTheKindOfItsMemory(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        DroneStationBlockEntity station = station(h, at, 1);
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(item("drone_memory_gravity")));
+        h.succeedWhen(() -> {
+            List<CargoDrone> drones = ours(h, at);
+            h.assertTrue(drones.size() == 1 && drones.get(0).printed(), "Waiting for the drone to be printed");
+            h.assertTrue(drones.get(0).kind() == DroneKind.GRAVITY, "Printed " + drones.get(0).kind() + " from an anti-gravity memory");
+            station.items().setStackInSlot(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(item("drone_memory_jet")));
+            h.assertTrue(drones.get(0).kind() == DroneKind.GRAVITY, "Swapping the memory changed a printed drone");
+            h.assertTrue(DroneStationBlockEntity.isMemory(new ItemStack(item("drone_memory_jet")))
+                    && station.items().isItemValid(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(item("drone_memory"))), "Memory slot rejects a kind");
             drones.forEach(CargoDrone::discard);
         });
     }
@@ -279,6 +351,126 @@ public final class DroneGameTests {
                     "Extracted through a disabled face");
             h.succeed();
         });
+    }
+
+    /** 行き先のポートを石の部屋で囲む（西の壁の真ん中に、高さ2の戸口。door が false なら開いた所のない部屋）。ポートは (6, 1, 5)。 */
+    private static BlockPos room(GameTestHelper h, boolean door) {
+        for (int x = 4; x <= 8; x++) {
+            for (int z = 3; z <= 7; z++) {
+                for (int y = 0; y <= 4; y++) {
+                    // 床（y=0）も張る（テストの場所の下は空いているので、壁の下をくぐれてしまう）
+                    boolean wall = x == 4 || x == 8 || z == 3 || z == 7 || y == 4 || y == 0;
+                    boolean doorway = door && x == 4 && z == 5 && (y == 2 || y == 3);
+                    if (wall && !doorway) {
+                        h.setBlock(new BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.STONE);
+                    }
+                }
+            }
+        }
+        return new BlockPos(6, 1, 5);
+    }
+
+    /** ドローンは壁を抜けずに、戸口から部屋の中のポートへ入って降ろす（どの tick でもブロックにめり込まない）。 */
+    @GameTest(template = "large", batch = BATCH, timeoutTicks = 2000)
+    public static void droneEntersRoomThroughDoorway(GameTestHelper h) {
+        station(h, STATION, 1);
+        DronePortBlockEntity a = port(h, FROM);
+        DronePortBlockEntity b = port(h, room(h, true));
+        load(a, 1, new ItemStack(Items.REDSTONE, 20));
+        a.select(h.absolutePos(new BlockPos(6, 1, 5)));
+        List<String> clipped = new java.util.ArrayList<>();
+        h.onEachTick(() -> {
+            for (CargoDrone d : ours(h, STATION)) {
+                if (d.printed() && !h.getLevel().noCollision(d.getBoundingBox().deflate(0.1)) && clipped.size() < 5) {
+                    clipped.add(d.position().subtract(Vec3.atLowerCornerOf(h.absolutePos(BlockPos.ZERO))).toString());
+                }
+            }
+        });
+        boolean[] sent = {false};
+        h.succeedWhen(() -> {
+            if (!sent[0]) {
+                sent[0] = a.send();
+                h.assertTrue(sent[0], "Waiting for the drone to be printed");
+            }
+            h.assertTrue(clipped.isEmpty(), "Drone flew into blocks at " + clipped);
+            h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.REDSTONE) == 20, "Not delivered yet");
+            ours(h, STATION).forEach(CargoDrone::discard);
+        });
+    }
+
+    /** 開いた所のない部屋のポートには「経路なし」で届かない。位相透過アップグレードを入れると、壁を抜けて（光りながら）届ける。 */
+    @GameTest(template = "large", batch = BATCH, timeoutTicks = 2400)
+    public static void phaseUpgradeReachesSealedRoom(GameTestHelper h) {
+        DroneStationBlockEntity station = station(h, STATION, 1);
+        DronePortBlockEntity a = port(h, FROM);
+        DronePortBlockEntity b = port(h, room(h, false));
+        load(a, 1, new ItemStack(Items.LAPIS_LAZULI, 12));
+        a.select(h.absolutePos(new BlockPos(6, 1, 5)));
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        boolean[] sent = {false}, blocked = {false}, upgraded = {false}, phased = {false}, glowWhileLoading = {false};
+        h.onEachTick(() -> {
+            DroneNetwork.Flight f = net.flightOf(h.absolutePos(STATION), 0);
+            if (!upgraded[0] && f != null && f.stage == DroneNetwork.DELIVER && f.blocked) {
+                blocked[0] = true;
+                h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.LAPIS_LAZULI) == 0,
+                        "Delivered into a sealed room without the upgrade");
+                station.items().setStackInSlot(DroneStationBlockEntity.SLOT_PHASE, new ItemStack(item("drone_phase_upgrade")));
+                upgraded[0] = true;
+            }
+            for (CargoDrone d : ours(h, STATION)) {
+                phased[0] |= d.phasing();
+                // 外のポートで積み込む間は、壁を抜けていないので光らない
+                if (f != null && f.stage == DroneNetwork.PICKUP && d.docked() && d.phasing()) {
+                    glowWhileLoading[0] = true;
+                }
+            }
+        });
+        h.succeedWhen(() -> {
+            if (!sent[0]) {
+                sent[0] = a.send();
+                h.assertTrue(sent[0], "Waiting for the drone to be printed");
+            }
+            h.assertTrue(blocked[0], "The sealed room was not reported as unreachable");
+            h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.LAPIS_LAZULI) == 12, "Not delivered yet");
+            h.assertTrue(phased[0], "No phase effect while passing the walls");
+            h.assertFalse(glowWhileLoading[0], "Phase effect shown while loading at an open port");
+            ours(h, STATION).forEach(CargoDrone::discard);
+        });
+    }
+
+    /**
+     * 届いた箱は、空になったら空き箱の欄の同じ箱と重なる。空き箱の欄に入らない（別の段階の箱や満杯）ときも、着荷箱の欄で
+     * 同じ空の箱どうし重なり、次の荷物のための欄を空ける。
+     */
+    @GameTest(template = "empty", batch = BATCH, timeoutTicks = 100)
+    public static void arrivedCratesStack(GameTestHelper h) {
+        DronePortBlockEntity a = port(h, new BlockPos(1, 1, 1));
+        DronePortBlockEntity b = port(h, new BlockPos(4, 1, 1));
+        a.items().setStackInSlot(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.PACKING_CRATE.get(), 3));
+        b.items().setStackInSlot(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.BATTERY_PACKING_CRATE.get(), 1));
+        for (int i = 0; i < 2; i++) {
+            ItemStack packed = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.COAL, 4)));
+            a.items().setStackInSlot(DronePortBlockEntity.SLOT_ARRIVED + i, roundTrip(h, packed));
+            b.items().setStackInSlot(DronePortBlockEntity.SLOT_ARRIVED + i, roundTrip(h, packed.copy()));
+        }
+        h.runAtTickTime(40, () -> {
+            h.assertTrue(a.items().getStackInSlot(DronePortBlockEntity.SLOT_CRATES).getCount() == 5, "Arrived crates did not join the crate slot: "
+                    + a.items().getStackInSlot(DronePortBlockEntity.SLOT_CRATES) + " / " + a.items().getStackInSlot(DronePortBlockEntity.SLOT_ARRIVED));
+            int stacks = 0, total = 0;
+            for (int i = 0; i < DronePortBlockEntity.ARRIVED; i++) {
+                ItemStack s = b.items().getStackInSlot(DronePortBlockEntity.SLOT_ARRIVED + i);
+                stacks += s.isEmpty() ? 0 : 1;
+                total += s.is(SinguloItems.PACKING_CRATE.get()) ? s.getCount() : 0;
+            }
+            h.assertTrue(stacks == 1 && total == 2, "Empty crates in the arrival slots did not stack: " + stacks + " stacks, " + total);
+            h.succeed();
+        });
+    }
+
+    /** 保存して読み込み直した箱（便の記録を通ったのと同じ）。 */
+    private static ItemStack roundTrip(GameTestHelper h, ItemStack stack) {
+        var registries = h.getLevel().registryAccess();
+        return ItemStack.parse(registries, stack.save(registries)).orElseThrow();
     }
 
     /** 空き箱専用の面: 荷物を「無効」・空き箱を「入力」にした面からは空き箱の欄にだけ入り、空き箱を「無効」にした面からは空き箱が入らない。 */
@@ -434,6 +626,39 @@ public final class DroneGameTests {
         h.succeedWhen(() -> {
             List<ItemEntity> drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(h.absolutePos(dockPos)).inflate(4),
                     e -> e.getItem().is(item("drone_memory")));
+            h.assertTrue(drops.size() == 1, "Memory not dropped after a cleared wave");
+            drops.forEach(ItemEntity::discard);
+        });
+    }
+
+    /** 上の型のメモリは上位の施設のドックからだけ出る（段階1はローター型だけ、段階2はジェット型まで、段階3は反重力型も）。 */
+    @GameTest(template = "empty", batch = BATCH, timeoutTicks = 200)
+    public static void upperKindsDropOnlyFromUpperFacilities(GameTestHelper h) {
+        BlockPos dockPos = new BlockPos(3, 1, 3);
+        h.setBlock(dockPos, SinguloBlocks.RUIN_GUARD_DOCK.get());
+        GuardDockBlockEntity dock = h.getBlockEntity(dockPos);
+        dock.setTier(3);
+        dock.setMemoryChanceForTest(1);
+        var player = TestScope.player(h);
+        dock.launch(h.getLevel());
+        for (SecurityDrone d : h.getLevel().getEntitiesOfClass(SecurityDrone.class, new AABB(h.absolutePos(dockPos)).inflate(4))) {
+            d.hurt(h.getLevel().damageSources().playerAttack(player), 1000);
+        }
+        var random = net.minecraft.util.RandomSource.create(7);
+        java.util.EnumSet<DroneKind>[] seen = new java.util.EnumSet[4];
+        for (int tier = 1; tier <= 3; tier++) {
+            seen[tier] = java.util.EnumSet.noneOf(DroneKind.class);
+            for (int i = 0; i < 400; i++) {
+                seen[tier].add(DroneKind.rollMemory(tier, random));
+            }
+        }
+        h.assertTrue(seen[1].equals(java.util.EnumSet.of(DroneKind.ROTOR)), "Tier-1 docks rolled " + seen[1]);
+        h.assertTrue(seen[2].equals(java.util.EnumSet.of(DroneKind.ROTOR, DroneKind.JET)), "Tier-2 docks rolled " + seen[2]);
+        h.assertTrue(seen[3].equals(java.util.EnumSet.allOf(DroneKind.class)), "Tier-3 docks rolled " + seen[3]);
+        h.assertTrue(DroneKind.memoryChance(3) < DroneKind.memoryChance(1), "Upper docks should drop memories less often");
+        h.succeedWhen(() -> {
+            AABB around = new AABB(h.absolutePos(dockPos)).inflate(4);
+            List<ItemEntity> drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, around, e -> DroneKind.ofMemory(e.getItem()) != null);
             h.assertTrue(drops.size() == 1, "Memory not dropped after a cleared wave");
             drops.forEach(ItemEntity::discard);
         });

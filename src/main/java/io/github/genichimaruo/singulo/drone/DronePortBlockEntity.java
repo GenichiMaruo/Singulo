@@ -841,6 +841,13 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             if (!DroneCrateItem.packed(crate)) {
                 if (!crate.isEmpty() && DroneCrateItem.tier(crate) > 0) {
                     ItemStack rest = items.insertItem(SLOT_CRATES, crate, false);
+                    // 空き箱の欄に入りきらない（別の段階の箱・満杯）ときは、着荷箱の欄の同じ空の箱に重ねて、次の荷物の欄を空ける
+                    for (int b = 0; b < a && !rest.isEmpty(); b++) {
+                        ItemStack other = items.getStackInSlot(SLOT_ARRIVED + b);
+                        if (!other.isEmpty() && !DroneCrateItem.packed(other)) {
+                            rest = items.insertItem(SLOT_ARRIVED + b, rest, false);
+                        }
+                    }
                     items.setStackInSlot(SLOT_ARRIVED + a, rest);
                 }
                 continue;

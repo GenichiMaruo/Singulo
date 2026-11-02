@@ -80,9 +80,10 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
         drawFrame(g, mouseX, mouseY);
         int x = leftPos;
         int y = topPos;
-        String[] ghosts = {"drone_memory", "drone_kit", "android_production_upgrade", "shield_permit"};
+        // スロットの並び（DroneStationBlockEntity.SLOT_*）: メモリ・キット・生産・許可証（右レール）・位相透過
+        String[] ghosts = {"drone_memory", "drone_kit", "android_production_upgrade", "shield_permit", "drone_phase_upgrade"};
         String[] tips = {"gui.singulo.drone_station.memory", "gui.singulo.drone_station.kit", "gui.singulo.drone_station.production",
-                "gui.singulo.drone_station.permit"};
+                "gui.singulo.drone_station.permit", "gui.singulo.drone_station.phase"};
         for (int i = 0; i < DroneStationBlockEntity.SLOTS; i++) {
             var s = menu.getSlot(i);
             ghostSlot(g, x + s.x, y + s.y, s, ghost(ghosts[i]));
@@ -179,6 +180,26 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
         if (minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
         }
+    }
+
+    // ------------------------------------------------------------------ 右レール（2段目: シールド許可証。スロットは上の並びで描く）
+
+    @Override
+    protected boolean railUsed(int row) {
+        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE;
+    }
+
+    @Override
+    protected boolean railConnected(int row) {
+        return true;
+    }
+
+    @Override
+    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {}
+
+    @Override
+    protected Component railTooltip(int row) {
+        return menu.getSlot(DroneStationBlockEntity.SLOT_PERMIT).hasItem() ? null : Component.translatable("gui.singulo.drone_station.permit");
     }
 
     /** 小さなドローンの印（8×7）: 4つのローターと胴。 */

@@ -48,7 +48,7 @@ public class DronePortMenu extends AbstractContainerMenu {
     /** 輸送中のページ: 便の欄（6行）。 */
     public static final int SHIP_X = 8, SHIP_Y = PAGE_Y, SHIP_W = WIDTH - 16, SHIP_ROW = 13, SHIP_ROWS = 6;
     /** 便の段階: ドローン待ち・ドローンが向かっている・積み込み中・飛行中・荷降ろし中。向き: 出る・来る。 */
-    public static final int PHASE_WAITING = 1, PHASE_COMING = 2, PHASE_LOADING = 3, PHASE_FLYING = 4, PHASE_UNLOADING = 5;
+    public static final int PHASE_WAITING = 1, PHASE_COMING = 2, PHASE_LOADING = 3, PHASE_FLYING = 4, PHASE_UNLOADING = 5, PHASE_NO_ROUTE = 6;
     public static final int DIR_OUT = 1, DIR_IN = 2;
     private static final int SHIP_INTS = 3;
     public static final int INV_X = GuiFrame.inventoryX(WIDTH), INV_Y = GuiFrame.inventoryY(HEIGHT), HOTBAR_Y = GuiFrame.hotbarY(HEIGHT);
@@ -153,7 +153,8 @@ public class DronePortMenu extends AbstractContainerMenu {
                     break;
                 }
                 boolean out1 = pos.equals(f.from);
-                int phase = f.stage == DroneNetwork.PICKUP ? (port.handling(f) ? PHASE_LOADING : PHASE_COMING)
+                int phase = f.blocked && !f.virtual ? PHASE_NO_ROUTE
+                        : f.stage == DroneNetwork.PICKUP ? (port.handling(f) ? PHASE_LOADING : PHASE_COMING)
                         : f.docked || port.handling(f) ? PHASE_UNLOADING : PHASE_FLYING;
                 int tier = f.stage == DroneNetwork.PICKUP ? DroneCrateItem.tier(port.staged()) : DroneCrateItem.tier(f.crate);
                 put(out, row++, phase, out1 ? DIR_OUT : DIR_IN, tier, targets.indexOf(out1 ? f.to : f.from),

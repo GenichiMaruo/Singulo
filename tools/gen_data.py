@@ -85,7 +85,8 @@ def stage_of(name):
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
             '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4,
-            '小型クリスタルメモリ（射撃型）': 4, 'ドローン用クリスタルメモリ': 2}.get(name, 1)
+            '小型クリスタルメモリ（射撃型）': 4, 'ドローン用クリスタルメモリ': 2,
+            'ドローン用クリスタルメモリ（ジェット型）': 3, 'ドローン用クリスタルメモリ（反重力型）': 4}.get(name, 1)
 
 
 def max_uses(name):
@@ -1315,6 +1316,8 @@ UI_LANG = {
     'gui.singulo.drone_station.dismantle': ('解体する（2回押す。キットが戻る）', 'Dismantle (press twice; the kit comes back)'),
     'gui.singulo.drone_station.dismantle.confirm': ('もう一度押すと解体します', 'Press again to dismantle'),
     'gui.singulo.drone_station.resume': ('また印刷する', 'Print again'),
+    'gui.singulo.drone_station.phase': ('位相透過アップグレード（壁を抜けて飛ぶ）', 'Phase Shift Upgrade (fly through walls)'),
+    'gui.singulo.drone_port.phase.6': ('経路なし', 'No route'),
     'tooltip.singulo.drone_crate.range': ('射程 %s ブロック', 'Range: %s blocks'),
     'tooltip.singulo.drone_crate.item': ('%s ×%s', '%s ×%s'),
     'tooltip.singulo.drone_crate.more': ('ほか %s 種類', 'and %s more'),
@@ -2862,10 +2865,13 @@ SOUNDS = {
     'security_drone.sputter': ('ruin/security_drone_sputter', 'ドローンが火花を散らす', 'Drone sparks', 16),
     # ドローン輸送（0.14.0）
     'drone.rotor': ('drone/rotor', '輸送ドローンが飛ぶ', 'Cargo drone hums', 16),
+    'drone.jet': ('drone/jet', 'ジェットのドローンが飛ぶ', 'Jet drone roars', 24),
+    'drone.hover': ('drone/hover', '反重力のドローンが浮かぶ', 'Anti-gravity drone hums', 16),
     'drone.print': ('drone/print', '印刷ヘッドが層を描く', 'Print head draws a layer', 12),
     'drone.print_start': ('drone/print_start', 'ドローンの印刷が始まる', 'Drone printing starts', 16),
     'drone.printed': ('drone/printed', 'ドローンが印刷し終わる', 'Drone printed', 16),
     'drone.arm_retract': ('drone/arm_retract', '印刷の腕がしまわれる', 'Print arm retracts', 12),
+    'drone.phase': ('drone/phase', 'ドローンが壁を抜ける', 'Drone phases through a wall', 16),
     'drone.dismantle': ('drone/dismantle', 'ドローンが解体される', 'Drone is dismantled', 16),
     'drone_port.hatch_open': ('drone_port/hatch_open', '発着ポートの扉が開く', 'Drone port hatch opens', 16),
     'drone_port.hatch_close': ('drone_port/hatch_close', '発着ポートの扉が閉じる', 'Drone port hatch closes', 16),
@@ -3708,7 +3714,7 @@ TAB_GROUPS = [
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     # ドローン輸送: ステーションと材料 → 発着ポート → 梱包箱
-    ('ドローン', ['drone_station', 'drone_kit', 'drone_memory', 'drone_port', 'packing_crate', 'battery_packing_crate',
+    ('ドローン', ['drone_station', 'drone_kit', 'drone_memory', 'drone_memory_jet', 'drone_memory_gravity', 'drone_phase_upgrade', 'drone_port', 'packing_crate', 'battery_packing_crate',
                'large_battery_packing_crate']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),

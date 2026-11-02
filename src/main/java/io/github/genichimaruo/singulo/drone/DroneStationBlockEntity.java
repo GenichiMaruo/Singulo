@@ -46,7 +46,8 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     /** 待機しているはずのドローンが見当たらないとき、印刷し直すまで（tick）。 */
     static final int LOST_TICKS = 100;
 
-    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_PRODUCTION = 2, SLOT_PERMIT = 3, SLOTS = 4;
+    /** スロット: メモリ・キット・生産アップグレード・許可証・位相透過アップグレード（右レールの強化の段。古い保存とずれないよう最後に）。 */
+    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_PRODUCTION = 2, SLOT_PERMIT = 3, SLOT_PHASE = 4, SLOTS = 5;
 
     /** GUI に送る値: 電力・容量・受け持てる数・枠ごとの状態。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_UNITS = 2, D_STATUS = 3, COUNT = D_STATUS + MAX_UNITS;
@@ -69,6 +70,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
                 case SLOT_MEMORY -> isMemory(stack);
                 case SLOT_KIT -> isKit(stack);
                 case SLOT_PRODUCTION -> io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isProductionUpgrade(stack);
+                case SLOT_PHASE -> isPhaseUpgrade(stack);
                 default -> io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isPermit(stack);
             };
         }
@@ -86,6 +88,8 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     private final int[] missing = new int[MAX_UNITS];
     /** 解体して止めた枠（もう一度印刷を押すまで、印刷し直さない）。 */
     private final boolean[] stopped = new boolean[MAX_UNITS];
+    /** 枠ごとのドローンの型（印刷したときのメモリの型。メモリを替えても、印刷済みのドローンはそのまま）。 */
+    private final DroneKind[] kinds = {DroneKind.ROTOR, DroneKind.ROTOR, DroneKind.ROTOR};
 
     private final SyncedInts data = SyncedInts.server(COUNT, i -> switch (i) {
         case D_ENERGY -> energy.getEnergyStored();
@@ -98,8 +102,18 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         super(SinguloBlockEntities.DRONE_STATION.get(), pos, state);
     }
 
+    /** ドローンの設計メモリか（どの型でも）。 */
     public static boolean isMemory(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("drone_memory");
+        return DroneKind.ofMemory(stack) != null;
+    }
+
+    public static boolean isPhaseUpgrade(ItemStack stack) {
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("drone_phase_upgrade");
+    }
+
+    /** このステーションのドローンが、壁を抜けて飛べるか（位相透過アップグレード）。 */
+    public boolean hasPhaseUpgrade() {
+        return isPhaseUpgrade(items.getStackInSlot(SLOT_PHASE));
     }
 
     public static boolean isKit(ItemStack stack) {
@@ -251,6 +265,8 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
             }
             DroneNetwork.Flight f = net.create(c.station().worldPosition, c.unit(), owner, port, to);
             f.drone = c.station().drones[c.unit()];
+            f.phase = c.station().hasPhaseUpgrade();
+            f.kind = c.station().kinds[c.unit()];
             c.station().statuses[c.unit()] = S_FLYING;
             return f;
         }
@@ -322,7 +338,8 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
                 if (f.stage == DroneNetwork.RETURN && f.arrived(now) && f.crate.isEmpty()) {
                     // 見えないまま帰ってきた: 空から待機位置へ降りてくる
                     net.remove(f);
-                    CargoDrone d = CargoDrone.spawn(level, worldPosition, i, hover(worldPosition, i).add(0, 12, 0), false);
+                    kinds[i] = f.kind;
+                    CargoDrone d = CargoDrone.spawn(level, worldPosition, i, f.kind, hover(worldPosition, i).add(0, 6, 0), false);
                     drones[i] = d == null ? null : d.getUUID();
                 } else if (f.drone != null && !f.drone.equals(drones[i])) {
                     drones[i] = f.drone;                  // 読み込み直しで実体が変わった
@@ -375,13 +392,18 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         if (!energy.consume(PRINT_FE)) {
             return;
         }
-        CargoDrone d = CargoDrone.spawn(level, worldPosition, unit, Vec3.atBottomCenterOf(worldPosition.above()), true);
+        DroneKind kind = DroneKind.ofMemory(items.getStackInSlot(SLOT_MEMORY));
+        if (kind == null) {
+            return;
+        }
+        CargoDrone d = CargoDrone.spawn(level, worldPosition, unit, kind, Vec3.atBottomCenterOf(worldPosition.above()), true);
         if (d == null) {
             energy.setEnergy(energy.getEnergyStored() + PRINT_FE);
             return;
         }
         items.extractItem(SLOT_KIT, 1, false);
         drones[unit] = d.getUUID();
+        kinds[unit] = kind;
         statuses[unit] = S_PRINTING;
         level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.print_start"), SoundSource.BLOCKS, 0.8F, 1.0F);
         setChanged();
@@ -457,6 +479,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
                 tag.putUUID("drone" + i, drones[i]);
             }
             tag.putBoolean("stopped" + i, stopped[i]);
+            tag.putInt("kind" + i, kinds[i].ordinal());
         }
     }
 
@@ -471,6 +494,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         for (int i = 0; i < MAX_UNITS; i++) {
             drones[i] = tag.hasUUID("drone" + i) ? tag.getUUID("drone" + i) : null;
             stopped[i] = tag.getBoolean("stopped" + i);
+            kinds[i] = DroneKind.byId(tag.getInt("kind" + i));
         }
     }
 }

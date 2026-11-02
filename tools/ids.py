@@ -156,12 +156,15 @@ MOD = {
     'メガネ': ('android_glasses', 'Glasses', 'tool'),
     # ドローン輸送（0.14.0。tools/drones.py が絵とモデルを作る）
     'ドローン用クリスタルメモリ': ('drone_memory', 'Drone Crystal Memory', 'item'),
+    'ドローン用クリスタルメモリ（ジェット型）': ('drone_memory_jet', 'Drone Crystal Memory (Jet)', 'item'),
+    'ドローン用クリスタルメモリ（反重力型）': ('drone_memory_gravity', 'Drone Crystal Memory (Anti-Gravity)', 'item'),
     'ドローンキット': ('drone_kit', 'Drone Kit', 'item'),
     'ドローン・ステーション': ('drone_station', 'Drone Station', 'machine'),
     'ドローン発着ポート': ('drone_port', 'Drone Port', 'machine'),
     '梱包箱': ('packing_crate', 'Packing Crate', 'tool'),
     'バッテリー付き梱包箱': ('battery_packing_crate', 'Battery Packing Crate', 'tool'),
     '大容量バッテリー付き梱包箱': ('large_battery_packing_crate', 'Large Battery Packing Crate', 'tool'),
+    '位相透過アップグレード': ('drone_phase_upgrade', 'Phase Shift Upgrade', 'item'),
     # 施設の建材の設計図（tools/blueprints.py。作業台で素材と並べると建材ができ、設計図は残る）
     '遺構パネルの設計図': ('blueprint_ruin_panels', 'Ruin Panel Blueprint', 'tool'),
     '無垢の遺構建材の設計図': ('blueprint_pristine_ruin', 'Pristine Ruin Material Blueprint', 'tool'),

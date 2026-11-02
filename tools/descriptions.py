@@ -14,6 +14,12 @@ DESC = {
     # ---------------------------------------------------------------- ドローン輸送
     'ドローン用クリスタルメモリ': ('輸送ドローンの設計を記録した、アンドロイド用より小さいクリスタルメモリ。ドローン・ステーションに入れると、ドローンを印刷できる（減らない）。',
                          'A crystal memory smaller than an android’s, holding the design of a cargo drone. Put it in a Drone Station to print drones (it is not used up).'),
+    'ドローン用クリスタルメモリ（ジェット型）': ('2つのジェットで飛ぶ輸送ドローンの設計。ドローン・ステーションに入れると、いちばん速い（ローター型の1.6倍）ジェット型を印刷する（減らない）。研究棟より上の施設の警備機ドックから出る。',
+                               'The design of a cargo drone with twin jets. Put it in a Drone Station to print the fastest drones (1.6× the rotor type). It is not used up. Dropped by guard docks in the Research Building and higher facilities.'),
+    'ドローン用クリスタルメモリ（反重力型）': ('反重力の場で浮く輸送ドローンの設計。ドローン・ステーションに入れると、4つのビットが牽引の光で箱を運ぶ反重力型（ローター型の1.25倍の速さ）を印刷する（減らない）。封鎖培養施設と地下アンドロイド研究所の警備機ドックから、まれに出る。',
+                              'The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.'),
+    '位相透過アップグレード': ('ドローン・ステーションの右の強化の段に入れると、そのステーションのドローンが壁や天井を抜けて、まっすぐ飛ぶ。抜けるときは紫に光る。',
+                    'Install it in the upgrade slot on a Drone Station’s right rail to let its drones fly straight through walls and roofs. They glow violet while passing through.'),
     'ドローンキット': ('ドローン・ステーションで輸送ドローンを1機印刷するたびに1つ使う、部品と外装の一式。',
                 'A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.'),
     'ドローン・ステーション': ('ドローン用クリスタルメモリとドローンキットと電力で、輸送ドローンを印刷する（1機 20,000 FE。生産アップグレード1枚につき1機増え、2枚で3機）。ドローンは上空で待機し、半径64ブロックの発着ポートに呼ばれて荷物を運ぶ。',

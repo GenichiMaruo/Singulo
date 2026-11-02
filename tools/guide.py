@@ -1121,15 +1121,27 @@ CHAPTERS = [
     ]),
     ('drones', 'singulo:drone_station', 'ドローン輸送', 'Drone Delivery', [
         ('start', 'ドローンを用意する',
-         '遺構の警備機ドックが出した警備ドローンの一波を全部倒すと、ときどき（40%）ドックの上にドローン用クリスタルメモリが出ます。'
+         '遺構の警備機ドックが出した警備ドローンの一波を全部倒すと、ときどきドックの上にドローン用クリスタルメモリが出ます（地表観測拠点で40%）。'
          '段階2の作業台でドローン・ステーションを、精密組立台でドローンキットを作ります。ステーションにメモリ（減らない）とキット（印刷ごとに1つ）を入れて'
          '電力を送ると、上に輸送ドローンを1機印刷します（20,000 FE）。生産アップグレード1枚につき1機増え、2枚で3機まで。ドローンはステーションの上空で待機します。\n'
          'ドローンはプレイヤーやモブの攻撃では傷つきません。ステーションを壊すと、待機中のドローンはキットに戻ります。',
          'Getting drones',
-         'Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. '
+         'Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). '
          'Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) '
          'in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\n'
          'Drones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.'),
+        ('kinds', 'ドローンの型',
+         'メモリの型が、印刷するドローンの型になります。上の型のメモリは、上位の施設の警備機ドックからだけ出ます。\n'
+         '- ローター型（どの施設でも）: 4つのローターで飛ぶ、ふつうの速さの型。\n'
+         '- ジェット型（研究棟より上の施設）: 2つのジェットで飛ぶ、いちばん速い型（ローター型の1.6倍）。曲がるときは機体を傾けます。\n'
+         '- 反重力型（封鎖培養施設と地下アンドロイド研究所。まれ）: 反重力の場で浮く型（1.25倍）。4つのビットが牽引の光で箱を吊るします。\n'
+         'メモリを入れ替えても、印刷済みのドローンはそのままの型で飛びます。替えた型にしたいときは、ドローンを解体して印刷し直してください。',
+         'Drone types',
+         'The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n'
+         '- Rotor (any facility): flies on four rotors at the standard speed.\n'
+         '- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n'
+         '- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\n'
+         'Swapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.'),
         ('send', '荷物を送る',
          'ドローン発着ポートを置くと、置いた人の輸送網に入ります（同じディメンションの、同じ持ち主のポートが行き先に並ぶ）。ヘッダーの名前をクリックすると名前を付けられます。\n'
          '左上に空の梱包箱、真ん中に荷物を入れ、右の一覧で行き先を選んで「発送」を押すと、荷物を梱包して電力を払い、半径64ブロックのステーションから待機中のドローンを呼びます。'
@@ -1171,6 +1183,19 @@ CHAPTERS = [
          'to be loaded, and a drone that finishes a delivery nearby flies straight to it instead of returning to its station.\n'
          'In the station screen, press the × on a waiting drone’s row twice to dismantle it: it lands on the station, comes apart and its kit '
          'comes back. That slot stops; press + to print again.'),
+        ('route', '通り道と位相透過',
+         'ドローンは壁や天井を抜けずに飛びます。近い行き先は、空いている所をたどる道を探し、遠い行き先は、出発点から空の見える所へ出て、'
+         '地形より高い所を巡航し、行き先の上の空から降ります。建物の中のポートにも、扉や窓、天窓から入っていきます。'
+         '開いた所のない部屋のポートには入れず、輸送中のページに「経路なし」と出ます（荷物は失われず、ドローンはその場で待って道を探し直します）。\n'
+         '段階2の精密組立台で作る位相透過アップグレードを、ドローン・ステーションの右レールの強化の段に入れると、そのステーションのドローンは'
+         '壁を抜けてまっすぐ飛びます。壁を抜ける少し前から紫に光り、壁越しにも光る姿が見えます。',
+         'Routes and phase shift',
+         'Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave '
+         'to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through '
+         'doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page '
+         '(the cargo is safe; the drone waits and searches again).\n'
+         'Put a Phase Shift Upgrade (stage 2, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly '
+         'straight through walls. They glow violet from just before a wall, and the glow shows through it.'),
         ('auto', '自動発送',
          '発送のタブの下の段で、自動発送を使えます。しきい値のボタンを押すたびに、しない・1個・64個・256個・満杯（荷物の9欄すべてがいっぱい）と切り替わります。一覧で行き先を選んで「登録」を押すと、それが自動発送の行き先になります（手で送る行き先とは別に覚えます）。\n荷物の欄がしきい値までたまり、2秒たっても増えなければ（満杯ならすぐ）、登録した行き先へ自動で発送します。空き箱・射程・電力・ドローンの条件は手で送るときと同じです。ホッパーやパイプで荷物を入れ続ければ、採掘場などから拠点へ自動で運び続けられます。',
          'Auto-send',

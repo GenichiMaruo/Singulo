@@ -9,23 +9,29 @@
       "ingredient": {
         "tag": "c:plates/steel"
       },
-      "count": 2
+      "count": 4
     },
     {
       "ingredient": {
         "tag": "c:obsidians"
       },
-      "count": 1
+      "count": 2
     },
     {
       "ingredient": {
         "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_module"
       },
       "count": 1
     }
   ],
   "result": {
     "id": "singulo:wormhole_generator_shell",
-    "count": 4
+    "count": 8
   }
 }

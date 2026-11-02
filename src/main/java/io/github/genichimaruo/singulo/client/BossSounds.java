@@ -95,9 +95,9 @@ final class BossSounds {
                         keep(mc, g, "gravity_remnant.well_loop", 1.6F, true, x -> x instanceof GravityRemnant r && r.wellOpen() && !r.isDeadOrDying());
                 // 特異点が引き込んでいる間の重いうなり
                 case WardenSingularity s -> keep(mc, s, "gravity_remnant.well_loop", 1.4F, true, x -> !x.isRemoved());
-                // 輸送ドローンのローター（印刷し終えてから、解体を始めるまで）
+                // 輸送ドローンの飛ぶ音（型ごと。印刷し終えてから、解体を始めるまで）
                 case io.github.genichimaruo.singulo.drone.CargoDrone d when d.printed() && !d.dismantling() ->
-                        keep(mc, d, "drone.rotor", 0.55F, true, x -> x instanceof io.github.genichimaruo.singulo.drone.CargoDrone c
+                        keep(mc, d, d.kind().sound, 0.55F, true, x -> x instanceof io.github.genichimaruo.singulo.drone.CargoDrone c
                                 && c.printed() && !c.dismantling());
                 // スラスターを開いて飛んで・泳いでいる間の噴射音
                 case RuinAndroid a when a.thrusterOpen(1) > 0.5F ->

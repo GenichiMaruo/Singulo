@@ -25,7 +25,9 @@ public class AndroidStationMenu extends AbstractContainerMenu {
     public static final int UPGRADE_X = 8, UPGRADE_Y = 68;
     public static final int PRODUCTION_X = 28, PRODUCTION_Y = 68;
     public static final int STOCK_X = 18, STOCK_Y = 90;
-    public static final int PERMIT_X = 18, PERMIT_Y = 112;
+    /** シールド許可証は右レールの2段目（枠の外のタブ。作業指令台・ドローン・ステーションと同じ）。 */
+    public static final int PERMIT_X = io.github.genichimaruo.singulo.machine.GuiFrame.railSlotX(WIDTH),
+            PERMIT_Y = io.github.genichimaruo.singulo.machine.GuiFrame.railSlotY(io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE);
     /** 巡回路の欄（動き方が巡回のとき、追従の設定の段に8つ並べる）。 */
     public static final int ROUTE_X = 61, ROUTE_Y = 104;
     /** 経路のページ（右レールの設定の段で切り替える）: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */

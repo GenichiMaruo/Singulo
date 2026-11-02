@@ -11128,8 +11128,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 52 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 53 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 27 more",
@@ -11188,8 +11188,8 @@
     "translation": "用於：廢墟面板、破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板 等 2 個"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
-    "translation": "用於：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、時間晶體催化劑、簡併熱爐控制器 等 3 個"
+    "source": "Used in: Degenerate Compactor Controller, Degenerate Compactor Frame, Degenerate Compactor Armor Plate, Degenerate Compactor Ram, Degenerate Compactor Anvil and 21 more",
+    "translation": "用於：簡併壓縮爐控制器、簡併壓縮爐框架、簡併壓縮爐裝甲板、簡併壓縮爐撞錘、簡併壓縮爐砧座 等 21 個"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11404,8 +11404,8 @@
     "translation": "用於：冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 20 more",
-    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 20 個"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
+    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 19 個"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11636,24 +11636,24 @@
     "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 88 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 66 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 66 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 67 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 67 個"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 2 more",
-    "translation": "用於：超導電纜、量子糾纏元件、玻色凝聚態催化劑、簡併熱爐熱交換管、拓撲導線 等 2 個"
+    "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
+    "translation": "用於：超導電纜、加速管、量子糾纏元件、玻色凝聚態催化劑、簡併熱爐熱交換管 等 3 個"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
     "translation": "用於：熱電發電機、衝擊發電面板、珀耳帖冷卻器"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
-    "translation": "用於：奇異物質、奇點核心、暈收集器、時間晶體模組"
+    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 10 more",
+    "translation": "用於：奇異物質、陀螺驅動裝置、奇點核心、暈收集器、護盾塔基座 等 10 個"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 4 more",
-    "translation": "用途：SMES 模組、爐心控制裝置、奇點封裝器、護盾塔核心、引力子操縱器及另外4項"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 8 more",
+    "translation": "用於：SMES 模組、反應爐外殼、爐心控制器、奇點封裝器、護盾塔核心 等 8 個"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -12168,8 +12168,8 @@
     "translation": "裝有大電池的包裝箱。最遠可送 3,160 格。"
   },
   "howto.singulo.large_battery_packing_crate": {
-    "source": "Made in: Crafting Table (stage 3)",
-    "translation": "製造地：工作台（第 3 階段）"
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
   },
   "guide.singulo.drones": {
     "source": "Drone Delivery",
@@ -12180,8 +12180,8 @@
     "translation": "準備無人機"
   },
   "guide.singulo.drones.start.body": {
-    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
-    "translation": "把遺跡警衛無人機塢放出的一波警衛無人機全部擊敗後，有時（40%）塢上方會出現無人機水晶記憶體。在第 2 階段的工作台製作無人機站，在精密組裝台製作無人機套件。把記憶體（不會消耗）和套件（每次列印用 1 個）放入無人機站並供電，它就會在上方列印一架運輸無人機（20,000 FE）。每張生產升級增加 1 架，2 張最多 3 架。無人機在站的上空待命。\n無人機不會受到玩家或生物的傷害。破壞無人機站時，待命中的無人機會變回套件。"
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "把遺跡警衛無人機塢放出的一波警衛無人機全部擊敗後，有時塢上方會出現無人機水晶記憶體（地表觀測站為 40%）。在第 2 階段的工作台製作無人機站，在精密組裝台製作無人機套件。把記憶體（不會消耗）和套件（每次列印用 1 個）放入無人機站並供電，它就會在上方列印一架運輸無人機（20,000 FE）。每張生產升級增加 1 架，2 張最多 3 架。無人機在站的上空待命。\n無人機不會受到玩家或生物的傷害。破壞無人機站時，待命中的無人機會變回套件。"
   },
   "guide.singulo.drones.send.title": {
     "source": "Sending cargo",
@@ -12398,5 +12398,69 @@
   "gui.singulo.drone_port.auto.is_target": {
     "source": "Auto-send destination",
     "translation": "自動發送的目的地"
+  },
+  "item.singulo.drone_phase_upgrade": {
+    "source": "Phase Shift Upgrade",
+    "translation": "相位穿透升級"
+  },
+  "gui.singulo.drone_station.phase": {
+    "source": "Phase Shift Upgrade (fly through walls)",
+    "translation": "相位穿透升級（穿牆飛行）"
+  },
+  "gui.singulo.drone_port.phase.6": {
+    "source": "No route",
+    "translation": "無路線"
+  },
+  "subtitles.singulo.drone.phase": {
+    "source": "Drone phases through a wall",
+    "translation": "無人機穿過牆壁"
+  },
+  "desc.singulo.drone_phase_upgrade": {
+    "source": "Install it in the upgrade slot on a Drone Station’s right rail to let its drones fly straight through walls and roofs. They glow violet while passing through.",
+    "translation": "裝在無人機站右側欄的強化格中，該站的無人機就能直線穿過牆壁和屋頂飛行。穿過時會發出紫光。"
+  },
+  "howto.singulo.drone_phase_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "guide.singulo.drones.route.title": {
+    "source": "Routes and phase shift",
+    "translation": "飛行路線與相位穿透"
+  },
+  "guide.singulo.drones.route.body": {
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 2, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "無人機不會穿過牆壁或屋頂飛行。目的地較近時，會沿著空曠處尋找路線；較遠時，會先從出發點飛到能看見天空的地方，在高於地形處巡航，再從目的地上方的天空降下。也會從門、窗或天窗進入建築內的起降港。沒有開口的房間裡的起降港無法到達，運輸中頁面會顯示「無路線」（貨物不會遺失，無人機會原地等待並重新尋找路線）。\n把第 2 階段在精密組裝台製作的相位穿透升級放入無人機站右側欄的強化格，該站的無人機就會直線穿牆飛行。穿牆前一點就開始發出紫光，隔著牆也能看到發光的身影。"
+  },
+  "item.singulo.drone_memory_jet": {
+    "source": "Drone Crystal Memory (Jet)",
+    "translation": "無人機水晶記憶體（噴射型）"
+  },
+  "item.singulo.drone_memory_gravity": {
+    "source": "Drone Crystal Memory (Anti-Gravity)",
+    "translation": "無人機水晶記憶體（反重力型）"
+  },
+  "subtitles.singulo.drone.jet": {
+    "source": "Jet drone roars",
+    "translation": "噴射無人機呼嘯"
+  },
+  "subtitles.singulo.drone.hover": {
+    "source": "Anti-gravity drone hums",
+    "translation": "反重力無人機嗡鳴"
+  },
+  "desc.singulo.drone_memory_jet": {
+    "source": "The design of a cargo drone with twin jets. Put it in a Drone Station to print the fastest drones (1.6× the rotor type). It is not used up. Dropped by guard docks in the Research Building and higher facilities.",
+    "translation": "記錄了雙噴射運輸無人機設計的記憶體。放入無人機站後，會列印最快的噴射型無人機（旋翼型的 1.6 倍）。不會消耗。由研究棟及更高級設施的警衛無人機塢掉落。"
+  },
+  "desc.singulo.drone_memory_gravity": {
+    "source": "The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.",
+    "translation": "記錄了依靠反重力場漂浮的運輸無人機設計的記憶體。放入無人機站後，會列印由四個浮游砲以牽引光束運送箱子的反重力型無人機（旋翼型速度的 1.25 倍）。不會消耗。封閉培養設施和地下仿生人研究所的警衛無人機塢偶爾會掉落。"
+  },
+  "guide.singulo.drones.kinds.title": {
+    "source": "Drone types",
+    "translation": "無人機的類型"
+  },
+  "guide.singulo.drones.kinds.body": {
+    "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
+    "translation": "記憶體的類型決定無人機站列印的無人機類型。較高級的類型只會從較高級設施的警衛無人機塢掉落。\n- 旋翼型（任何設施）：靠四個旋翼飛行，標準速度。\n- 噴射型（研究棟及更高級設施）：靠雙噴射引擎飛行，最快的類型（旋翼型的 1.6 倍）。轉彎時會傾斜機身。\n- 反重力型（封閉培養設施和地下仿生人研究所，稀有）：靠反重力場漂浮（1.25 倍）。四個浮游砲以牽引光束吊住箱子。\n更換記憶體不會改變已列印的無人機。想換類型時，請拆解無人機後重新列印。"
   }
 }

@@ -29,9 +29,8 @@ public class GuardDockBlockEntity extends BlockEntity {
     public static final int HOME_RADIUS = 20;
     public static final long COOLDOWN = 24_000;
     static final int CHECK_INTERVAL = 20;
-    /** 一波を全滅させたとき、ドローン用クリスタルメモリが出る確率。 */
-    public static final float MEMORY_CHANCE = 0.4F;
-    private float memoryChance = MEMORY_CHANCE;
+    /** 一波を全滅させたとき、ドローン用クリスタルメモリが出る確率（負なら段階ごとの既定: DroneKind.memoryChance）。 */
+    private float memoryChance = -1;
 
     private int tier = 1;
     private final List<UUID> drones = new ArrayList<>();
@@ -120,15 +119,17 @@ public class GuardDockBlockEntity extends BlockEntity {
         memoryChance = chance;
     }
 
-    /** 一波を全滅させたとき: MEMORY_CHANCE の確率で、ドローン用クリスタルメモリがドックの上に出る。 */
+    /** 一波を全滅させたとき: 段階ごとの確率で、ドローン用クリスタルメモリがドックの上に出る（型も段階で選ぶ: DroneKind.rollMemory）。 */
     private void cleared(ServerLevel level) {
         boolean all = launched > 0 && killed.size() >= launched;
         killed.clear();
         launched = 0;
-        if (!all || level.random.nextFloat() >= memoryChance) {
+        float chance = memoryChance >= 0 ? memoryChance : io.github.genichimaruo.singulo.drone.DroneKind.memoryChance(tier);
+        if (!all || level.random.nextFloat() >= chance) {
             return;
         }
-        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_memory"));
+        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(
+                io.github.genichimaruo.singulo.drone.DroneKind.rollMemory(tier, level.random).memoryId));
         var top = net.minecraft.world.phys.Vec3.atBottomCenterOf(worldPosition.above());
         var drop = new net.minecraft.world.entity.item.ItemEntity(level, top.x, top.y + 0.2, top.z,
                 new net.minecraft.world.item.ItemStack(item), 0, 0.2, 0);

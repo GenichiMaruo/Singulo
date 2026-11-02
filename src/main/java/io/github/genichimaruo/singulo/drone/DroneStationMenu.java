@@ -18,10 +18,12 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 public class DroneStationMenu extends AbstractContainerMenu {
     public static final int WIDTH = 176, HEIGHT = 170;
     public static final int MEMORY_X = 8, MEMORY_Y = 24, KIT_X = 8, KIT_Y = 46;
-    public static final int PRODUCTION_X = 30, PRODUCTION_Y = 24, PERMIT_X = 30, PERMIT_Y = 46;
+    public static final int PRODUCTION_X = 30, PRODUCTION_Y = 24, PHASE_X = 30, PHASE_Y = 46;
     /** 3機ぶんの様子（行）と電力のゲージ。 */
     public static final int UNIT_X = 56, UNIT_Y = 22, UNIT_ROW = 16, UNIT_W = 98;
     public static final int ENERGY_X = 160, ENERGY_Y = 22, ENERGY_H = 46;
+    /** シールド許可証のスロット（右レールの2段目。作業指令台と同じく、枠の外のタブ）。 */
+    public static final int PERMIT_X = GuiFrame.railSlotX(WIDTH), PERMIT_Y = GuiFrame.railSlotY(GuiFrame.RAIL_UPGRADE);
     public static final int INV_X = GuiFrame.inventoryX(WIDTH), INV_Y = GuiFrame.inventoryY(HEIGHT), HOTBAR_Y = GuiFrame.hotbarY(HEIGHT);
 
     private final BlockPos pos;
@@ -35,6 +37,7 @@ public class DroneStationMenu extends AbstractContainerMenu {
         addSlot(new SlotItemHandler(items, DroneStationBlockEntity.SLOT_KIT, KIT_X, KIT_Y));
         addSlot(new SlotItemHandler(items, DroneStationBlockEntity.SLOT_PRODUCTION, PRODUCTION_X, PRODUCTION_Y));
         addSlot(new SlotItemHandler(items, DroneStationBlockEntity.SLOT_PERMIT, PERMIT_X, PERMIT_Y));
+        addSlot(new SlotItemHandler(items, DroneStationBlockEntity.SLOT_PHASE, PHASE_X, PHASE_Y));
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));

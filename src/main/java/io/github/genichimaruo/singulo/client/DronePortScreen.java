@@ -595,7 +595,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 Panel.glass(g, barX, ry + 1, filled, 6);
             }
             Component phase = Component.translatable("gui.singulo.drone_port.phase." + s.phase());
-            AndroidStationScreen.fit(g, font, phase, barX + barW + 4, ry, 40, s.phase() == DronePortMenu.PHASE_WAITING ? GuiSkin.WARN : skin.dim());
+            AndroidStationScreen.fit(g, font, phase, barX + barW + 4, ry, 40,
+                    s.phase() == DronePortMenu.PHASE_NO_ROUTE ? GuiSkin.BAD : s.phase() == DronePortMenu.PHASE_WAITING ? GuiSkin.WARN : skin.dim());
             List<Component> tip = new ArrayList<>();
             tip.add(Component.translatable(out ? "gui.singulo.drone_port.ship.out" : "gui.singulo.drone_port.ship.in", name));
             tip.add(Component.translatable("gui.singulo.drone_port.phase." + s.phase()).withStyle(st -> st.withColor(0xFF8A949E)));

@@ -140,8 +140,16 @@ def platform():
 
 # ---------------------------------------------------------------- アイテム
 
-def memory_icon():
-    """ドローン用クリスタルメモリ: アンドロイド用より小さい銀のチップに、橙の結晶と金の端子、角にローターの印。"""
+# 型ごとのメモリの結晶の色と、角の印の色（ローター型・ジェット型・反重力型）
+MEMORY_KINDS = {
+    'drone_memory': (ORANGE, CYAN),
+    'drone_memory_jet': ((84, 170, 255), (230, 244, 255)),
+    'drone_memory_gravity': ((92, 255, 224), (176, 140, 255)),
+}
+
+
+def memory_icon(crystal=ORANGE, mark=CYAN):
+    """ドローン用クリスタルメモリ: アンドロイド用より小さい銀のチップに、型の色の結晶と金の端子、角に型の印。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
     frame, frame_sh, frame_hi = (196, 202, 212), (140, 146, 160), (236, 240, 246)
@@ -154,16 +162,16 @@ def memory_icon():
     for y in range(5, 10):
         for x in range(5, 10):
             k = (y - 5) / 4
-            c = tuple(int(a * (1 - 0.4 * k) + 255 * 0.22 * (1 - k)) for a in ORANGE)
+            c = tuple(int(a * (1 - 0.4 * k) + 255 * 0.22 * (1 - k)) for a in crystal)
             px[x, y] = tuple(min(255, v) for v in c) + (170 if (x + y) % 4 else 205,)
     px[6, 5] = (255, 255, 255, 235)
     for x in (5, 7, 9):
         px[x, 12] = gold + (255,)
         px[x, 13] = mix(gold, (120, 90, 40), 0.3) + (255,)
-    # 角のローターの印
+    # 角の印
     for x, y in ((3, 3), (12, 3)):
-        px[x, y] = ORANGE + (255,)
-    px[10, 10] = CYAN + (255,)
+        px[x, y] = crystal + (255,)
+    px[10, 10] = mark + (255,)
     return im
 
 
@@ -188,6 +196,27 @@ def kit_icon():
     for (x, y) in ((6, 6), (7, 6), (8, 6), (9, 6), (6, 7), (7, 7), (8, 7), (9, 7)):
         px[x, y] = (110, 120, 136, 255)
     px[7, 6] = ORANGE + (255,)
+    return im
+
+
+def phase_icon():
+    """位相透過アップグレード: 濃い板のチップに、灰色の壁の帯と、それを抜ける紫のドローンの印（壁の向こう側は半分透ける）。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    violet, violet_hi = (155, 123, 255), (214, 200, 255)
+    d.rounded_rectangle([1, 2, 14, 13], radius=2, fill=(36, 34, 52, 255), outline=(110, 96, 170, 255))
+    d.rectangle([7, 3, 8, 12], fill=(120, 124, 136, 255))
+    d.line([(7, 3), (7, 12)], fill=(150, 154, 166, 255))
+    # 壁の手前は濃く、向こうは透ける
+    for (x, y) in ((3, 5), (5, 5), (3, 9), (5, 9)):
+        d.point((x, y), fill=rgba(violet))
+    d.rectangle([4, 6, 6, 8], fill=rgba(violet))
+    d.point((4, 6), fill=rgba(violet_hi))
+    for (x, y) in ((10, 5), (12, 5), (10, 9), (12, 9)):
+        d.point((x, y), fill=rgba(violet, 120))
+    d.rectangle([9, 6, 11, 8], fill=rgba(violet, 110))
+    for x in (2, 13):
+        d.point((x, 7), fill=rgba(violet_hi, 160))
     return im
 
 
@@ -237,6 +266,36 @@ PARTS = {
     'pod': (16, 18, 2, 2, 2, 'pod'),
     'claw': (48, 18, 1, 5, 1, 'claw'),
 }
+
+
+# ジェット型（CargoDroneRenderer.createJetLayer と同じ配置）: (u, v, 幅, 高さ, 奥行き, 材質)
+JET_PARTS = {
+    'fuse': (0, 0, 4, 3, 12, 'shell'),
+    'nose': (32, 0, 3, 2, 2, 'shell'),
+    'lens': (44, 0, 1, 1, 1, 'lens'),
+    'canopy': (48, 0, 2, 1, 4, 'glass'),
+    'wing': (0, 16, 7, 1, 3, 'shell'),
+    'nacelle': (20, 16, 3, 3, 6, 'dark'),
+    'nozzle': (40, 16, 4, 4, 1, 'nozzle'),
+    'fin': (0, 26, 1, 4, 3, 'shell'),
+    'bar': (0, 34, 12, 1, 1, 'dark'),
+    'claw': (28, 34, 1, 4, 1, 'claw'),
+}
+
+# 反重力型（CargoDroneRenderer.createGravityLayer と同じ配置）
+GRAVITY_PARTS = {
+    'gem': (0, 0, 5, 5, 5, 'crystal'),
+    'seg': (24, 0, 4, 1, 1, 'pearl'),
+    'emitter': (36, 0, 4, 1, 4, 'dark'),
+    'spine': (54, 0, 1, 2, 1, 'pearl'),
+    'pod': (0, 12, 2, 5, 2, 'pearl'),
+    'tip': (10, 12, 1, 2, 1, 'tip'),
+    'plate': (16, 12, 3, 3, 1, 'crystal'),
+}
+JET_BLUE = (84, 170, 255)
+JET_HOT = (220, 240, 255)
+TEAL = (92, 255, 224)
+TEAL_HI = (210, 255, 246)
 
 
 def _faces(u, v, w, h, dd):
@@ -307,6 +366,173 @@ def entity_textures(te, save):
                 base.putpixel((x0, y1 - 1), ORANGE + (255,))
     save(base, te / 'cargo_drone.png')
     save(glow, te / 'cargo_drone_glow.png')
+    jet_textures(te, save)
+    gravity_textures(te, save)
+
+
+class _Skin:
+    """64×64 のドローンの絵と、光る線の絵（同じ配置）。"""
+
+    def __init__(self, seed):
+        import random as _r
+        self.rng = _r.Random(seed)
+        self.base = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+        self.glow = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+
+    @staticmethod
+    def shade(c, k):
+        return tuple(max(0, min(255, int(x + k))) for x in c)
+
+    def fill(self, rect, col, bevel=True, noise=4):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c = self.shade(col, self.rng.randint(-noise, noise))
+                if bevel and x1 - x0 >= 3 and y1 - y0 >= 3:
+                    if y == y0 or x == x0:
+                        c = self.shade(c, 12)
+                    elif y == y1 - 1 or x == x1 - 1:
+                        c = self.shade(c, -16)
+                self.base.putpixel((x, y), c + (255,))
+
+    def px(self, x, y, col, lit=False):
+        self.base.putpixel((x, y), col + (255,))
+        if lit:
+            self.glow.putpixel((x, y), col + (255,))
+
+    def lit(self, rect, col):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                self.px(x, y, col, lit=True)
+
+
+def jet_textures(te, save):
+    """ジェット型: 黒鉛色の胴に青い線（光る）、暗い操縦席の覆いの縁、白い山形の印、噴射口の奥の青白い光。"""
+    sk = _Skin(23)
+    shell, shell_sh = (76, 82, 94), (56, 60, 70)
+    white = (226, 232, 240)
+    cols = {'shell': shell, 'lens': (16, 22, 34), 'glass': (22, 32, 48), 'dark': (40, 43, 50), 'nozzle': (30, 32, 38), 'claw': (66, 70, 80)}
+    for name, (u, v, w, h, dd, mat) in JET_PARTS.items():
+        f = _faces(u, v, w, h, dd)
+        for k, r in f.items():
+            sk.fill(r, shell_sh if mat == 'shell' and k in ('side_a', 'side_b', 'down') else cols[mat])
+        if name == 'fuse':
+            # 両わきの青い線、上面の継ぎ目と白い山形の印
+            for k in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                sk.lit((x0, y0 + 1, x1, y0 + 2), JET_BLUE)
+            x0, y0, x1, y1 = f['up']
+            for y in range(y0, y1):
+                sk.px(x0 + 1, y, sk.shade(shell, -26))
+                sk.px(x1 - 2, y, sk.shade(shell, -26))
+            for i in range(2):
+                sk.px(x0 + 1 + i, y1 - 4 + i, white)
+                sk.px(x1 - 2 - i, y1 - 4 + i, white)
+        elif name == 'nose':
+            x0, y0, x1, y1 = f['front']
+            sk.px(x0, y0, white)
+            sk.px(x1 - 1, y0, white)
+        elif name == 'lens':
+            sk.lit(f['front'], JET_HOT)
+        elif name == 'canopy':
+            for k in ('up', 'front', 'side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0, x1):
+                    sk.px(x, y0, (60, 140, 220), lit=True)
+        elif name == 'wing':
+            # 翼の先の青い帯と、前の縁の明るい線
+            x0, y0, x1, y1 = f['up']
+            for y in range(y0, y1):
+                sk.px(x0, y, JET_BLUE, lit=True)
+                sk.px(x1 - 1, y, JET_BLUE, lit=True)
+            for x in range(x0, x1):
+                sk.px(x, y0, sk.shade(shell, 30))
+            sk.fill(f['front'], sk.shade(shell, 24), bevel=False)
+        elif name == 'nacelle':
+            # 吸気口（前）は暗く、胴の帯は青
+            sk.fill(f['front'], (18, 20, 24), bevel=False)
+            for k in ('side_a', 'side_b', 'up'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0, x1):
+                    sk.px(x, y1 - 2, JET_BLUE, lit=True)
+        elif name == 'nozzle':
+            x0, y0, x1, y1 = f['back']
+            sk.lit((x0, y0, x1, y1), (150, 200, 255))
+            sk.lit((x0 + 1, y0 + 1, x1 - 1, y1 - 1), JET_HOT)
+        elif name == 'fin':
+            for k in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                for y in range(y0, y1):
+                    sk.px(x1 - 1, y, JET_BLUE, lit=True)
+        elif name == 'claw':
+            for k in ('front', 'back', 'side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                sk.px(x0, y1 - 1, JET_BLUE, lit=True)
+    save(sk.base, te / 'cargo_drone_jet.png')
+    save(sk.glow, te / 'cargo_drone_jet_glow.png')
+
+
+def gravity_textures(te, save):
+    """反重力型: 暗い菫色の結晶（縁と芯が青緑に光る）、真珠色の光輪とビット、光る先、下の放射板の輪。"""
+    sk = _Skin(37)
+    crystal, pearl, pearl_sh = (44, 30, 70), (226, 230, 238), (190, 196, 210)
+    violet = (120, 90, 200)
+    cols = {'crystal': crystal, 'pearl': pearl, 'dark': (34, 30, 46), 'tip': TEAL}
+    for name, (u, v, w, h, dd, mat) in GRAVITY_PARTS.items():
+        f = _faces(u, v, w, h, dd)
+        for k, r in f.items():
+            sk.fill(r, pearl_sh if mat == 'pearl' and k in ('side_a', 'side_b', 'down') else cols[mat], noise=6 if mat == 'crystal' else 4)
+        if name == 'gem':
+            # 面ごとに: 縁は青緑に光り、真ん中に明るい芯と菫の光
+            for x0, y0, x1, y1 in f.values():
+                for x in range(x0, x1):
+                    sk.px(x, y0, TEAL, lit=True)
+                    sk.px(x, y1 - 1, TEAL, lit=True)
+                for y in range(y0, y1):
+                    sk.px(x0, y, TEAL, lit=True)
+                    sk.px(x1 - 1, y, TEAL, lit=True)
+                cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
+                sk.px(cx, cy, TEAL_HI, lit=True)
+                sk.px(cx - 1, cy, violet, lit=True)
+                sk.px(cx, cy + 1, violet, lit=True)
+        elif name == 'seg':
+            for k in ('back', 'up', 'down'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0 + 1, x1 - 1):
+                    sk.px(x, y0, TEAL, lit=True)
+        elif name == 'emitter':
+            x0, y0, x1, y1 = f['down']
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    if x in (x0, x1 - 1) or y in (y0, y1 - 1):
+                        sk.px(x, y, TEAL, lit=True)
+            sk.lit((x0 + 1, y0 + 1, x1 - 1, y1 - 1), TEAL_HI)
+            for k in ('front', 'back', 'side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0, x1):
+                    sk.px(x, y0, TEAL, lit=True)
+        elif name == 'spine':
+            sk.lit(f['up'], TEAL_HI)
+        elif name == 'pod':
+            # 白い殻の胴を回る青緑の帯と、下の縁の影
+            for k in ('front', 'back', 'side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0, x1):
+                    sk.px(x, y0 + 2, TEAL, lit=True)
+                    sk.px(x, y1 - 1, sk.shade(pearl_sh, -30))
+        elif name == 'tip':
+            for r in f.values():
+                sk.lit(r, TEAL)
+            sk.lit(f['down'], TEAL_HI)
+        elif name == 'plate':
+            for k in ('back', 'front'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0, x1):
+                    sk.px(x, y0, TEAL, lit=True)
+                sk.px((x0 + x1) // 2, (y0 + y1) // 2, TEAL_HI, lit=True)
+    save(sk.base, te / 'cargo_drone_gravity.png')
+    save(sk.glow, te / 'cargo_drone_gravity_glow.png')
 
 
 # ---------------------------------------------------------------- まとめ
@@ -317,8 +543,10 @@ def textures(tb, ti, save, write_json):
     save(port_top(), tb / 'drone_port_top.png')
     save(hatch(), tb / 'drone_port_hatch.png')
     save(platform(), tb / 'drone_port_platform.png')
-    save(memory_icon(), ti / 'drone_memory.png')
+    for iid, (crystal, mark) in MEMORY_KINDS.items():
+        save(memory_icon(crystal, mark), ti / f'{iid}.png')
     save(kit_icon(), ti / 'drone_kit.png')
+    save(phase_icon(), ti / 'drone_phase_upgrade.png')
     for tier, iid in enumerate(CRATES, 1):
         save(crate_side(tier), tb / f'{iid}_side.png')
         save(crate_top(tier), tb / f'{iid}_top.png')

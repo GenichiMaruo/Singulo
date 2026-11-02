@@ -58,8 +58,12 @@ public class DroneNetwork extends SavedData {
         public float progress;
         private float virtualFrom;
         private long virtualAt;
-        /** ドローンがポートの真上で受け渡しをしているか（保存しない）。 */
-        public boolean docked;
+        /** ドローンがポートの真上で受け渡しをしているか、道が見つからず待っているか（保存しない）。 */
+        public boolean docked, blocked;
+        /** 壁を抜けて飛べるドローンか（受け持つステーションの位相透過アップグレード）。 */
+        public boolean phase;
+        /** 飛んでいるドローンの型（速さと、見えない飛行から出てくるときの姿）。 */
+        public DroneKind kind = DroneKind.ROTOR;
 
         Flight(long id, @Nullable BlockPos station, int unit) {
             this.id = id;
@@ -192,7 +196,7 @@ public class DroneNetwork extends SavedData {
         f.last = at;
         BlockPos t = f.target();
         double d = t == null ? 0 : Math.sqrt(at.distanceToSqr(Vec3.atCenterOf(t)));
-        f.arriveAt = now + (long) Math.ceil(d / SPEED) + 20;
+        f.arriveAt = now + (long) Math.ceil(d / (SPEED * f.kind.speed)) + 20;
         setDirty();
     }
 
@@ -234,7 +238,7 @@ public class DroneNetwork extends SavedData {
         }
         BlockPos t = f.target();
         double d = t == null || was == null ? 0 : Math.sqrt(was.distSqr(t));
-        f.arriveAt = now + (long) Math.ceil(d / SPEED) + 20;
+        f.arriveAt = now + (long) Math.ceil(d / (SPEED * f.kind.speed)) + 20;
         setDirty();
     }
 
@@ -279,6 +283,8 @@ public class DroneNetwork extends SavedData {
                 t.putUUID("owner", f.owner);
             }
             t.putFloat("progress", f.progress);
+            t.putBoolean("phase", f.phase);
+            t.putInt("kind", f.kind.ordinal());
             t.putFloat("virtual_from", f.virtualFrom);
             t.putLong("virtual_at", f.virtualAt);
             fl.add(t);
@@ -307,6 +313,8 @@ public class DroneNetwork extends SavedData {
             f.arriveAt = c.getLong("arrive_at");
             f.owner = c.hasUUID("owner") ? c.getUUID("owner") : null;
             f.progress = c.getFloat("progress");
+            f.phase = c.getBoolean("phase");
+            f.kind = DroneKind.byId(c.getInt("kind"));
             f.virtualFrom = c.getFloat("virtual_from");
             f.virtualAt = c.getLong("virtual_at");
             net.flights.put(f.id, f);

@@ -22,6 +22,12 @@
         "item": "singulo:superconducting_coil"
       },
       "count": 3
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_module"
+      },
+      "count": 1
     }
   ],
   "result": {

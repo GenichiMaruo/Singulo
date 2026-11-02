@@ -11128,8 +11128,8 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 53개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 27 more",
@@ -11188,8 +11188,8 @@
     "translation": "사용 대상: 폐허 패널, 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널 외 2개"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 시간 결정 촉매, 축퇴 열로 제어기 외 3개"
+    "source": "Used in: Degenerate Compactor Controller, Degenerate Compactor Frame, Degenerate Compactor Armor Plate, Degenerate Compactor Ram, Degenerate Compactor Anvil and 21 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 축퇴 압축로 프레임, 축퇴 압축로 장갑판, 축퇴 압축로 램, 축퇴 압축로 앤빌 외 21개"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11404,8 +11404,8 @@
     "translation": "사용 대상: 냉매 카트리지"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 20 more",
-    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 20개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
+    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 19개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11636,24 +11636,24 @@
     "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 88개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 66 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 66개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 67 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 67개"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 2 more",
-    "translation": "사용 대상: 초전도 케이블, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브, 위상 전선 외 2개"
+    "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
+    "translation": "사용 대상: 초전도 케이블, 가속관, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브 외 3개"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
     "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
-    "translation": "사용 대상: 특이 물질, 특이점 코어, 헤일로 수집기, 시간 결정 모듈"
+    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 10 more",
+    "translation": "사용 대상: 특이 물질, 자이로 구동 장치, 특이점 코어, 헤일로 수집기, 실드 타워 주각 외 10개"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 4 more",
-    "translation": "용도: SMES 모듈, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 그래비톤 조작기 외 4종"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 8 more",
+    "translation": "사용 대상: SMES 모듈, 반응로 외피, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 외 8개"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -12168,8 +12168,8 @@
     "translation": "큰 배터리를 실은 포장 상자. 3,160블록까지 닿는다."
   },
   "howto.singulo.large_battery_packing_crate": {
-    "source": "Made in: Crafting Table (stage 3)",
-    "translation": "제작: 제작대(3단계)"
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
   },
   "guide.singulo.drones": {
     "source": "Drone Delivery",
@@ -12180,8 +12180,8 @@
     "translation": "드론 준비하기"
   },
   "guide.singulo.drones.start.body": {
-    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then (40%), a Drone Crystal Memory appears on the dock. Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
-    "translation": "유적의 가드 독이 내보낸 경비 드론 한 무리를 모두 쓰러뜨리면, 가끔(40%) 독 위에 드론 크리스털 메모리가 나타난다. 2단계 제작대에서 드론 스테이션을, 정밀 조립기에서 드론 키트를 만든다. 스테이션에 메모리(소모되지 않음)와 키트(출력할 때마다 1개)를 넣고 전력을 보내면 위에 수송 드론을 1대 출력한다(20,000 FE). 생산 업그레이드 1장마다 1대 늘어, 2장이면 최대 3대. 드론은 스테이션 위 하늘에서 대기한다.\n드론은 플레이어나 몹의 공격으로 다치지 않는다. 스테이션을 부수면 대기 중인 드론은 키트로 돌아간다."
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "유적의 가드 독이 내보낸 경비 드론 한 무리를 모두 쓰러뜨리면, 가끔 독 위에 드론 크리스털 메모리가 나타난다(지표 관측소에서 40%). 2단계 제작대에서 드론 스테이션을, 정밀 조립기에서 드론 키트를 만든다. 스테이션에 메모리(소모되지 않음)와 키트(출력할 때마다 1개)를 넣고 전력을 보내면 위에 수송 드론을 1대 출력한다(20,000 FE). 생산 업그레이드 1장마다 1대 늘어, 2장이면 최대 3대. 드론은 스테이션 위 하늘에서 대기한다.\n드론은 플레이어나 몹의 공격으로 다치지 않는다. 스테이션을 부수면 대기 중인 드론은 키트로 돌아간다."
   },
   "guide.singulo.drones.send.title": {
     "source": "Sending cargo",
@@ -12398,5 +12398,69 @@
   "gui.singulo.drone_port.auto.is_target": {
     "source": "Auto-send destination",
     "translation": "자동 발송 목적지"
+  },
+  "item.singulo.drone_phase_upgrade": {
+    "source": "Phase Shift Upgrade",
+    "translation": "위상 투과 업그레이드"
+  },
+  "gui.singulo.drone_station.phase": {
+    "source": "Phase Shift Upgrade (fly through walls)",
+    "translation": "위상 투과 업그레이드(벽을 통과해 비행)"
+  },
+  "gui.singulo.drone_port.phase.6": {
+    "source": "No route",
+    "translation": "경로 없음"
+  },
+  "subtitles.singulo.drone.phase": {
+    "source": "Drone phases through a wall",
+    "translation": "드론이 벽을 통과한다"
+  },
+  "desc.singulo.drone_phase_upgrade": {
+    "source": "Install it in the upgrade slot on a Drone Station’s right rail to let its drones fly straight through walls and roofs. They glow violet while passing through.",
+    "translation": "드론 스테이션 오른쪽 레일의 강화 칸에 넣으면, 그 스테이션의 드론이 벽과 지붕을 통과해 곧장 난다. 통과할 때 보라색으로 빛난다."
+  },
+  "howto.singulo.drone_phase_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "guide.singulo.drones.route.title": {
+    "source": "Routes and phase shift",
+    "translation": "경로와 위상 투과"
+  },
+  "guide.singulo.drones.route.body": {
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 2, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "드론은 벽이나 지붕을 통과해 날지 않는다. 가까운 목적지는 빈 곳을 따라 길을 찾고, 먼 목적지는 출발점에서 하늘이 보이는 곳으로 나가 지형보다 높은 곳을 순항한 뒤 목적지 위의 하늘에서 내려온다. 건물 안의 포트에도 문이나 창, 천창으로 들어간다. 열린 곳이 없는 방의 포트에는 들어갈 수 없으며, 운송 중 페이지에 「경로 없음」이 표시된다(화물은 사라지지 않고, 드론은 그 자리에서 기다리며 길을 다시 찾는다).\n2단계 정밀 조립기로 만드는 위상 투과 업그레이드를 드론 스테이션 오른쪽 레일의 강화 칸에 넣으면, 그 스테이션의 드론은 벽을 통과해 곧장 난다. 벽을 지나기 조금 전부터 보라색으로 빛나고, 벽 너머로도 빛나는 모습이 보인다."
+  },
+  "item.singulo.drone_memory_jet": {
+    "source": "Drone Crystal Memory (Jet)",
+    "translation": "드론 크리스털 메모리(제트형)"
+  },
+  "item.singulo.drone_memory_gravity": {
+    "source": "Drone Crystal Memory (Anti-Gravity)",
+    "translation": "드론 크리스털 메모리(반중력형)"
+  },
+  "subtitles.singulo.drone.jet": {
+    "source": "Jet drone roars",
+    "translation": "제트 드론이 굉음을 낸다"
+  },
+  "subtitles.singulo.drone.hover": {
+    "source": "Anti-gravity drone hums",
+    "translation": "반중력 드론이 웅웅거린다"
+  },
+  "desc.singulo.drone_memory_jet": {
+    "source": "The design of a cargo drone with twin jets. Put it in a Drone Station to print the fastest drones (1.6× the rotor type). It is not used up. Dropped by guard docks in the Research Building and higher facilities.",
+    "translation": "쌍발 제트로 나는 운송 드론의 설계. 드론 스테이션에 넣으면 가장 빠른 제트형 드론(로터형의 1.6배)을 프린트한다. 소모되지 않는다. 연구동 이상의 시설의 가드 독에서 나온다."
+  },
+  "desc.singulo.drone_memory_gravity": {
+    "source": "The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.",
+    "translation": "반중력장으로 떠다니는 운송 드론의 설계. 드론 스테이션에 넣으면 네 개의 비트가 견인 광선으로 상자를 나르는 반중력형 드론(로터형 속도의 1.25배)을 프린트한다. 소모되지 않는다. 봉쇄 배양 시설과 지하 안드로이드 연구소의 가드 독에서 드물게 나온다."
+  },
+  "guide.singulo.drones.kinds.title": {
+    "source": "Drone types",
+    "translation": "드론의 종류"
+  },
+  "guide.singulo.drones.kinds.body": {
+    "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
+    "translation": "메모리의 종류가 스테이션이 프린트하는 드론의 종류를 정한다. 상위 종류는 상위 시설의 가드 독에서만 나온다.\n- 로터형(모든 시설): 네 개의 로터로 나는 표준 속도의 종류.\n- 제트형(연구동 이상): 쌍발 제트로 나는 가장 빠른 종류(로터형의 1.6배). 선회할 때 기체를 기울인다.\n- 반중력형(봉쇄 배양 시설과 지하 안드로이드 연구소, 드묾): 반중력장으로 떠다닌다(1.25배). 네 개의 비트가 견인 광선으로 상자를 매단다.\n메모리를 바꿔도 이미 프린트한 드론은 바뀌지 않는다. 종류를 바꾸려면 드론을 해체하고 다시 프린트한다."
   }
 }

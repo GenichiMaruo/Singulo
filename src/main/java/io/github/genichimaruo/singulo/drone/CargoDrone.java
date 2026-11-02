@@ -19,8 +19,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -35,8 +35,6 @@ public class CargoDrone extends Mob {
      * まず腕が伸び、それから上から消えていく）。
      */
     public static final int RETRACT_TICKS = 20;
-    /** 巡航の高さの余裕（途中の地形と発着点より上）。 */
-    static final int CLEARANCE = 4;
     static final double ACCEL = 0.05;
 
     private static final EntityDataAccessor<Integer> PRINT = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.INT);
@@ -46,16 +44,35 @@ public class CargoDrone extends Mob {
     private static final EntityDataAccessor<Boolean> DOCKED = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.BOOLEAN);
     /** 解体中か（ステーションの上に降りて、印刷を逆にたどって消える）。 */
     private static final EntityDataAccessor<Boolean> DISMANTLE = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.BOOLEAN);
+    /** 壁を抜けている（抜ける少し前から、抜けたあと少しまで）。位相透過の光と音を出す。 */
+    private static final EntityDataAccessor<Boolean> PHASING = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.BOOLEAN);
+    /** 型（{@link DroneKind}）。 */
+    private static final EntityDataAccessor<Integer> KIND = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.INT);
+    /** 道がせまい所での速さ（ブロック/tick）と、壁の手前で位相透過の光を出し始める距離（ブロック）。 */
+    static final double TIGHT_SPEED = 0.22, PHASE_LOOKAHEAD = 1.4;
+    /** 道が見つからないとき、探し直すまで（tick）。 */
+    static final int REPLAN_TICKS = 40;
+    /** 壁を抜け終えてから、光を消すまで（tick）。 */
+    static final int PHASE_HOLD = 8;
 
     @Nullable
     private BlockPos station;
     private int unit;
     /** 受け持っている便（0 はなし）。ステーションが壊されても便を最後まで飛ぶため、番号で探す。 */
     private long flightId;
-    /** 今の区間の目的地と巡航の高さ（目的地が変わったら計り直す。保存しない）。 */
+    /** 今の区間の目的地と通り道（目的地が変わったら探し直す。保存しない）。道が見つからなければ route は null。 */
     @Nullable
     private Vec3 legGoal;
-    private double cruiseY;
+    @Nullable
+    private DroneRoute route;
+    private int replanAt;
+    /** 壁を抜けて飛べるか（ステーションの位相透過アップグレード。ステーションが読み込まれている間に覚える）。 */
+    private boolean phase;
+    private int phaseHold;
+    /** クライアント: 位相透過の光の強さ（0〜1。なめらかに変える）。 */
+    private float phaseGlow, phaseGlowO;
+    /** クライアント: 曲がるときの横の傾き（度。ジェット型が曲がる向きへ傾く。なめらかに変える）。 */
+    private float bank, bankO;
     /** クライアント: 印刷の腕を描く場所（印刷していた上面。ドローンが飛び立っても、腕はここでしまわれる）。 */
     @Nullable
     public Vec3 armOrigin;
@@ -78,17 +95,20 @@ public class CargoDrone extends Mob {
         builder.define(CRATE, 0);
         builder.define(DOCKED, false);
         builder.define(DISMANTLE, false);
+        builder.define(PHASING, false);
+        builder.define(KIND, 0);
     }
 
     /** ステーションの枠のドローンを出す。printing なら station の上で印刷から始める。 */
     @Nullable
-    public static CargoDrone spawn(ServerLevel level, BlockPos station, int unit, Vec3 at, boolean printing) {
+    public static CargoDrone spawn(ServerLevel level, BlockPos station, int unit, DroneKind kind, Vec3 at, boolean printing) {
         CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
         if (d == null) {
             return null;
         }
         d.station = station;
         d.unit = unit;
+        d.entityData.set(KIND, kind.ordinal());
         d.moveTo(at.x, at.y, at.z, level.random.nextFloat() * 360, 0);
         if (printing) {
             d.entityData.set(PRINT, 0);
@@ -111,10 +131,13 @@ public class CargoDrone extends Mob {
         Vec3 dir = new Vec3(f.last.x - goal.getX() - 0.5, 0, f.last.z - goal.getZ() - 0.5);
         dir = dir.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : dir.normalize();
         for (int back : new int[]{20, 12, 6, 0}) {
-            Vec3 at = new Vec3(goal.getX() + 0.5 + dir.x * back, goal.getY() + 10, goal.getZ() + 0.5 + dir.z * back);
-            if (!level.isPositionEntityTicking(BlockPos.containing(at))) {
+            double ax = goal.getX() + 0.5 + dir.x * back, az = goal.getZ() + 0.5 + dir.z * back;
+            if (!level.isPositionEntityTicking(BlockPos.containing(ax, goal.getY(), az))) {
                 continue;
             }
+            // 空の見える所（その列のいちばん高いブロックより上）に出して、そこから道を探して降りる
+            int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING, Mth.floor(ax), Mth.floor(az));
+            Vec3 at = new Vec3(ax, Math.max(goal.getY() + 3, ground + DroneRoute.CLEARANCE), az);
             CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
             if (d == null) {
                 return false;
@@ -124,6 +147,8 @@ public class CargoDrone extends Mob {
             d.moveTo(at.x, at.y, at.z, (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG) + 180, 0);
             d.entityData.set(CRATE, DroneCrateItem.tier(f.crate));
             d.flightId = f.id;
+            d.phase = f.phase;
+            d.entityData.set(KIND, f.kind.ordinal());
             level.addFreshEntity(d);
             f.virtual = false;
             f.drone = d.getUUID();
@@ -160,8 +185,27 @@ public class CargoDrone extends Mob {
         return entityData.get(CRATE);
     }
 
+    public DroneKind kind() {
+        return DroneKind.byId(entityData.get(KIND));
+    }
+
     public boolean docked() {
         return entityData.get(DOCKED);
+    }
+
+    /** 壁を抜けているか（位相透過の光）。 */
+    public boolean phasing() {
+        return entityData.get(PHASING);
+    }
+
+    /** クライアント: 位相透過の光の強さ（0〜1）。 */
+    public float phaseGlow(float partialTick) {
+        return Mth.lerp(partialTick, phaseGlowO, phaseGlow);
+    }
+
+    /** クライアント: 曲がるときの横の傾き（度。右へ曲がると正）。 */
+    public float bank(float partialTick) {
+        return Mth.lerp(partialTick, bankO, bank);
     }
 
     /** 便を受け持たずに待機しているか（ステーションが呼び出しに使う）。 */
@@ -233,6 +277,21 @@ public class CargoDrone extends Mob {
         super.tick();
         if (level() instanceof ServerLevel server) {
             serverStep(server);
+        } else {
+            // 位相透過の光: 壁の手前から強まり、抜けたら弱まる。光っている間は、紫の粒が体から散る
+            phaseGlowO = phaseGlow;
+            phaseGlow = Mth.approach(phaseGlow, phasing() ? 1 : 0, 0.15F);
+            if (phaseGlow > 0.25F && random.nextFloat() < 0.7F * phaseGlow) {
+                level().addParticle(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, getX() + (random.nextDouble() - 0.5) * 0.9,
+                        getY() + 0.3 + random.nextDouble() * 0.7, getZ() + (random.nextDouble() - 0.5) * 0.9, 0, 0, 0);
+            }
+            bankO = bank;
+            bank += (Mth.clamp(Mth.wrapDegrees(yBodyRot - yBodyRotO) * 5, -38, 38) - bank) * 0.2F;
+            // 反重力型: 足もとから、浮かせている場の光の粒がゆっくり落ちる
+            if (kind() == DroneKind.GRAVITY && printed() && !dismantling() && random.nextFloat() < 0.25F) {
+                level().addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, getX() + (random.nextDouble() - 0.5) * 0.5,
+                        getY() + (crateTier() > 0 ? 0 : 0.6), getZ() + (random.nextDouble() - 0.5) * 0.5, 0, -0.03, 0);
+            }
         }
     }
 
@@ -278,6 +337,19 @@ public class CargoDrone extends Mob {
         }
         DroneNetwork net = DroneNetwork.get(level);
         DroneNetwork.Flight f = flight(net);
+        if (tickCount % 20 == 0 && level.isLoaded(station) && level.getBlockEntity(station) instanceof DroneStationBlockEntity s) {
+            phase = s.hasPhaseUpgrade();
+        } else if (f != null) {
+            phase = f.phase;
+        }
+        if (f != null && f.phase != phase) {
+            f.phase = phase;
+            net.changed();
+        }
+        if (f != null) {
+            f.blocked = legGoal != null && route == null;
+        }
+        updatePhasing(level);
         if (f != null && !getUUID().equals(f.drone)) {
             if (f.drone == null && f.virtual) {
                 f.virtual = false;                        // 見えない飛行の途中で読み込み直された: そのまま引き継ぐ
@@ -370,39 +442,60 @@ public class CargoDrone extends Mob {
     }
 
     /**
-     * goal へ向かって1 tick 進む。遠ければ巡航の高さまで上がってから水平に進み、近くで降りる。着いたら true（その場で止まる）。
+     * goal へ向かって1 tick 進む。目的地が変わったら通り道を探し直し（壁を抜けない道。位相透過なら抜けてまっすぐ）、
+     * 道の点を順にたどる。せまい所はゆっくり正確に、巡航はなめらかに。着いたら true（その場で止まる）。
+     * 道が見つからなければ、その場で待って、しばらくしてから探し直す。
      */
     private boolean flyTo(ServerLevel level, Vec3 goal) {
         Vec3 p = position();
         if (legGoal == null || legGoal.distanceToSqr(goal) > 0.01) {
             legGoal = goal;
-            cruiseY = cruise(level, p, goal);
+            route = null;
+            replanAt = 0;
         }
-        double hx = goal.x - p.x;
-        double hz = goal.z - p.z;
-        double hd = Math.sqrt(hx * hx + hz * hz);
-        Vec3 aim;
-        if (hd > 2.0) {
-            // 巡航の高さの近くまで上がるまでは、ほぼ真上へ
-            aim = p.y < cruiseY - 1.5 ? new Vec3(p.x + hx / hd * 0.2, cruiseY, p.z + hz / hd * 0.2) : new Vec3(goal.x, cruiseY, goal.z);
-        } else {
-            aim = goal;
+        if (route == null) {
+            if (tickCount < replanAt) {
+                hold();
+                return false;
+            }
+            route = phase ? DroneRoute.straight(level, p, goal) : DroneRoute.plan(level, p, goal);
+            if (route == null) {
+                replanAt = tickCount + REPLAN_TICKS;
+                hold();
+                return false;
+            }
         }
+        Vec3 aim = route.current();
+        boolean tight = route.currentTight();
+        boolean last = route.last();
         Vec3 d = aim.subtract(p);
         double dist = d.length();
-        if (hd <= 2.0 && p.distanceTo(goal) < 0.04) {
+        if (last && dist < 0.04) {
             setPos(goal.x, goal.y, goal.z);
             setDeltaMovement(Vec3.ZERO);
             return true;
         }
-        double speed = Math.min(DroneNetwork.SPEED, Math.max(0.03, dist * 0.15));
-        Vec3 want = dist < 1e-4 ? Vec3.ZERO : d.scale(Math.min(speed, dist) / dist);
-        Vec3 v = getDeltaMovement();
-        Vec3 dv = want.subtract(v);
-        if (dv.length() > ACCEL) {
-            dv = dv.normalize().scale(ACCEL);
+        if (!last && dist < (tight ? 0.12 : 0.8)) {
+            route.advance();                          // 次の点へ（巡航の角は手前で曲がり始める）
+            aim = route.current();
+            d = aim.subtract(p);
+            dist = d.length();
         }
-        v = v.add(dv);
+        Vec3 v;
+        if (tight) {
+            // せまい所: 道の点へまっすぐ（惰性で角の壁にこすらない）
+            double speed = Math.min(TIGHT_SPEED * kind().speed, Math.max(0.03, dist * 0.3));
+            v = dist < 1e-4 ? Vec3.ZERO : d.scale(Math.min(speed, dist) / dist);
+        } else {
+            double speed = Math.min(DroneNetwork.SPEED * kind().speed, Math.max(0.05, route.looseAhead(p) * 0.15));
+            Vec3 want = dist < 1e-4 ? Vec3.ZERO : d.scale(Math.min(speed, dist) / dist);
+            v = getDeltaMovement();
+            Vec3 dv = want.subtract(v);
+            if (dv.length() > ACCEL) {
+                dv = dv.normalize().scale(ACCEL);
+            }
+            v = v.add(dv);
+        }
         setPos(p.x + v.x, p.y + v.y, p.z + v.z);
         setDeltaMovement(v);
         double horizontal = v.horizontalDistance();
@@ -415,20 +508,30 @@ public class CargoDrone extends Mob {
         return false;
     }
 
-    /** 巡航の高さ: 出発点と目的地、途中の（読み込まれている所の）地形より CLEARANCE 上。 */
-    private static double cruise(ServerLevel level, Vec3 from, Vec3 to) {
-        double top = Math.max(from.y, to.y) + CLEARANCE;
-        double len = Math.sqrt((to.x - from.x) * (to.x - from.x) + (to.z - from.z) * (to.z - from.z));
-        int steps = Math.max(1, (int) (len / 6));
-        for (int i = 0; i <= steps; i++) {
-            double k = i / (double) steps;
-            int x = Mth.floor(Mth.lerp(k, from.x, to.x));
-            int z = Mth.floor(Mth.lerp(k, from.z, to.z));
-            if (level.hasChunk(x >> 4, z >> 4)) {
-                top = Math.max(top, level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + CLEARANCE);
+    /** 道が見つからない間は、その場で止まって待つ。 */
+    private void hold() {
+        setDeltaMovement(Vec3.ZERO);
+    }
+
+    /** 壁を抜けているか（今いる所か、少し先がブロックの中）。抜け終えても PHASE_HOLD tick は光を残す。 */
+    private void updatePhasing(ServerLevel level) {
+        boolean inside = false;
+        if (phase) {
+            net.minecraft.world.phys.AABB box = getBoundingBox().deflate(0.05);
+            Vec3 v = getDeltaMovement();
+            // 先を見るのは、今の目的地まで（降りる先のポートを壁と取り違えない）
+            double reach = legGoal == null ? 0 : Math.min(PHASE_LOOKAHEAD, position().distanceTo(legGoal) - 0.05);
+            Vec3 ahead = v.lengthSqr() < 1e-6 || reach <= 0 ? Vec3.ZERO : v.normalize().scale(reach);
+            inside = !level.noCollision(box) || !level.noCollision(box.move(ahead)) || !level.noCollision(box.move(ahead.scale(0.5)));
+        }
+        phaseHold = inside ? PHASE_HOLD : Math.max(0, phaseHold - 1);
+        boolean on = phaseHold > 0;
+        if (on != entityData.get(PHASING)) {
+            entityData.set(PHASING, on);
+            if (on) {
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.phase"), 0.8F, 1.0F);
             }
         }
-        return Math.min(top, level.getMaxBuildHeight() - 2);
     }
 
     /**
@@ -459,6 +562,8 @@ public class CargoDrone extends Mob {
         tag.putInt("unit", unit);
         tag.putInt("print", entityData.get(PRINT));
         tag.putLong("flight", flightId);
+        tag.putBoolean("phase", phase);
+        tag.putInt("kind", entityData.get(KIND));
     }
 
     @Override
@@ -468,5 +573,7 @@ public class CargoDrone extends Mob {
         unit = Mth.clamp(tag.getInt("unit"), 0, DroneStationBlockEntity.MAX_UNITS - 1);
         entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
         flightId = tag.getLong("flight");
+        phase = tag.getBoolean("phase");
+        entityData.set(KIND, DroneKind.byId(tag.getInt("kind")).ordinal());
     }
 }

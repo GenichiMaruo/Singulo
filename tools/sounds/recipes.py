@@ -1569,6 +1569,29 @@ def drone_rotor(d, seed):
     return mix(blades * 0.6, motor, wind)
 
 
+@machine('drone/jet', level=-27)
+def drone_jet(d, seed):
+    # 2つの小さなジェット: 低めのタービンのうなり（2つが少しずれて揺れる。高い鳴きは耳につくので入れない）と、
+    # 噴射のごうっという息、低い燃焼のうなり
+    t = t_axis(d)
+    whine = mix(*[sine(np.full(len(t), f)) * (0.8 + 0.2 * np.sin(2 * np.pi * 0.7 * t + i)) * a
+                  for i, (f, a) in enumerate(((620, 0.5), (628, 0.5), (1240, 0.1)))])
+    roar = lowpass(bandpass(pink(d, seed), 420, 0.7), 1400) * 0.9 + lowpass(brown(d, seed + 3), 220) * 0.7
+    core = hum(70, d, (1, 2, 3), (0.5, 0.3, 0.12), 0.006, seed) * 0.4
+    return mix(whine * 0.14, roar * 0.6, core)
+
+
+@machine('drone/hover', level=-28)
+def drone_hover(d, seed):
+    # 反重力の場: 澄んだ低い和音がゆっくり揺れ（ビートで脈打つ）、きらめきがときどき混じる
+    t = t_axis(d)
+    pad = mix(*[sine(np.full(len(t), f)) * a for f, a in ((110, 0.5), (110.8, 0.4), (165, 0.3), (220.5, 0.2), (330, 0.08))])
+    pulse = 0.75 + 0.25 * np.sin(2 * np.pi * 0.5 * t)
+    air_ = bandpass(pink(d, seed + 1), 2200, 3) * 0.12
+    shine = shimmer(d, 2, 2600, 2, 0.5, seed) * 0.12
+    return chorus(mix(pad * pulse * 0.5, air_, shine), 3, 0.004, 0.3, seed)
+
+
 @recipe('drone/print', level=-26, variants=3)
 def drone_print(d, seed):
     # 印刷ヘッドが一層を描く: 細いノズルのジジッという音と、小さなサーボ
@@ -1656,3 +1679,12 @@ def drone_port_pack(d, seed):
 def drone_port_arrive(d, seed):
     # 荷物が届いた: やわらかい2音の知らせ
     return rich(mix(chime(880, 0.6, 1) * 0.45, (chime(1319, 0.8, 2) * 0.45, 0.14)), seed, 0.06, 0.3)
+
+
+@recipe('drone/phase', level=-19)
+def drone_phase(d, seed):
+    # 位相透過: 澄んだ音が揺らぎながら高まり、すっと抜ける（小さな鈴のきらめきと、ほどける風）
+    rise = sine(glide(400, 1600, 0.6, 0.6)) * env([(0, 0), (0.45, 0.5), (0.6, 0)], 0.6) * 0.4
+    shine = shimmer(0.8, 18, 2400, 2, 0.5, seed) * 0.35
+    air_ = bandpass(pink(0.8, seed + 1), 1800, 2) * env([(0, 0), (0.3, 0.4), (0.8, 0)], 0.8) * 0.4
+    return chorus(reverb(mix(rise, shine, air_), 0.6, 0.35, 5000, 0.6), 3, 0.006, 0.5, seed)

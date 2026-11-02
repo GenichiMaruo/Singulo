@@ -130,9 +130,11 @@
       "icon": "singulo:drone_station",
       "pages": [
         "drones.start",
+        "drones.kinds",
         "drones.send",
         "drones.range",
         "drones.more",
+        "drones.route",
         "drones.auto",
         "drones.android"
       ]
