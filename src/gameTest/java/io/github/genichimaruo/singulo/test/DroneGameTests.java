@@ -272,7 +272,7 @@ public final class DroneGameTests {
         f.stage = DroneNetwork.DELIVER;
         net.virtualize(f, Vec3.atCenterOf(h.absolutePos(FROM)), level.getGameTime() - 1000);
         h.succeedWhen(() -> {
-            h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.EMERALD) == 12, "Not delivered");
+            h.assertTrue(count(b, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.EMERALD) == 12, "Not delivered: " + describe(h) + " entities " + ours(h, STATION).stream().map(d -> d.position().toString()).toList());
             h.assertTrue(f.stage == DroneNetwork.RETURN && f.crate.isEmpty(), "Flight not returning");
             net.remove(f);
             ours(h, STATION).forEach(CargoDrone::discard);

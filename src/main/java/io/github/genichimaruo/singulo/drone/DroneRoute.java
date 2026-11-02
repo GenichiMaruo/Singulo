@@ -91,11 +91,27 @@ final class DroneRoute {
     static DroneRoute plan(ServerLevel level, Vec3 from, Vec3 goal) {
         BlockPos start = startCell(level, from);
         BlockPos end = BlockPos.containing(goal.x, goal.y + 0.05, goal.z);
+        if (start != null && !level.isLoaded(end)) {
+            List<BlockPos> exit = sky(level, start) ? List.of(start) : search(level, start, null);
+            if (exit == null) return null;
+            List<Vec3> points = new ArrayList<>();
+            List<Boolean> tight = new ArrayList<>();
+            addSmoothed(level, from, exit, points, tight, true);
+            Vec3 top = Vec3.atBottomCenterOf(exit.get(exit.size() - 1));
+            for (Vec3 p : terrain(level, top, new Vec3(goal.x, Math.max(top.y, goal.y), goal.z))) {
+                points.add(p); tight.add(false);
+            }
+            return new DroneRoute(points, tight);
+        }
         if (start == null || !free(level, end)) {
             return null;
         }
         List<Vec3> points = new ArrayList<>();
         List<Boolean> tight = new ArrayList<>();
+        // A nearby clear docking approach needs no grid detour toward the floor.
+        if (from.distanceToSqr(goal) <= (double) NEAR * NEAR && clearLine(level, from, goal)) {
+            return new DroneRoute(List.of(goal), List.of(true));
+        }
         double hx = goal.x - from.x, hz = goal.z - from.z;
         if (hx * hx + hz * hz <= (double) NEAR * NEAR) {
             List<BlockPos> direct = search(level, start, end);
@@ -208,13 +224,13 @@ final class DroneRoute {
     }
 
     /** ドローンが pos（足もと）にいて、ぶつからないか。 */
-    private static boolean clearAt(ServerLevel level, Vec3 pos) {
+    static boolean clearAt(ServerLevel level, Vec3 pos) {
         AABB box = new AABB(pos.x - HALF_WIDTH, pos.y + 0.03, pos.z - HALF_WIDTH, pos.x + HALF_WIDTH, pos.y + HEIGHT, pos.z + HALF_WIDTH);
         return level.noCollision(box);
     }
 
     /** a から b へまっすぐ飛んで、ぶつからないか。 */
-    private static boolean clearLine(ServerLevel level, Vec3 a, Vec3 b) {
+    static boolean clearLine(ServerLevel level, Vec3 a, Vec3 b) {
         double len = a.distanceTo(b);
         int steps = Math.max(1, (int) Math.ceil(len / 0.2));
         for (int i = 0; i <= steps; i++) {

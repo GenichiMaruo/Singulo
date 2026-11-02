@@ -35,6 +35,7 @@ public record SideConfigPayload(BlockPos pos, int channel, int face, int value) 
             Player player = context.player();
             if (p.face < 0 || p.face > MASTER_FACE
                     || player.distanceToSqr(p.pos.getX() + 0.5, p.pos.getY() + 0.5, p.pos.getZ() + 0.5) > 64
+                    || (player.level().getBlockEntity(p.pos) instanceof io.github.genichimaruo.singulo.drone.DronePortBlockEntity port && !port.mayOperate(player))
                     || !(player.level().getBlockEntity(p.pos) instanceof SideConfig.Holder m) || !m.validChannel(p.channel)) {
                 return;
             }

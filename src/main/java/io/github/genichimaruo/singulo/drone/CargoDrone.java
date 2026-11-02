@@ -130,7 +130,7 @@ public class CargoDrone extends Mob {
         }
         Vec3 dir = new Vec3(f.last.x - goal.getX() - 0.5, 0, f.last.z - goal.getZ() - 0.5);
         dir = dir.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : dir.normalize();
-        for (int back : new int[]{20, 12, 6, 0}) {
+        for (int back : new int[]{0, 6, 12, 20}) {
             double ax = goal.getX() + 0.5 + dir.x * back, az = goal.getZ() + 0.5 + dir.z * back;
             if (!level.isPositionEntityTicking(BlockPos.containing(ax, goal.getY(), az))) {
                 continue;
@@ -138,6 +138,8 @@ public class CargoDrone extends Mob {
             // 空の見える所（その列のいちばん高いブロックより上）に出して、そこから道を探して降りる
             int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING, Mth.floor(ax), Mth.floor(az));
             Vec3 at = new Vec3(ax, Math.max(goal.getY() + 3, ground + DroneRoute.CLEARANCE), az);
+            Vec3 dock = new Vec3(ax, goal.getY() + 1 + DronePortBlockEntity.WAIT_LIFT, az);
+            if (back == 0 && DroneRoute.clearAt(level, dock)) at = dock;
             CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
             if (d == null) {
                 return false;
@@ -296,7 +298,7 @@ public class CargoDrone extends Mob {
     }
 
     private void serverStep(ServerLevel level) {
-        if (station == null) {
+        if (station == null && flightId == 0) {
             discard();
             return;
         }
@@ -337,7 +339,7 @@ public class CargoDrone extends Mob {
         }
         DroneNetwork net = DroneNetwork.get(level);
         DroneNetwork.Flight f = flight(net);
-        if (tickCount % 20 == 0 && level.isLoaded(station) && level.getBlockEntity(station) instanceof DroneStationBlockEntity s) {
+        if (station != null && tickCount % 20 == 0 && level.isLoaded(station) && level.getBlockEntity(station) instanceof DroneStationBlockEntity s) {
             phase = s.hasPhaseUpgrade();
         } else if (f != null) {
             phase = f.phase;
@@ -361,6 +363,7 @@ public class CargoDrone extends Mob {
             }
         }
         if (f == null) {
+            if (station == null) { discard(); return; }
             entityData.set(CRATE, 0);
             entityData.set(DOCKED, false);
             if (tickCount % 20 == 0 && level.isLoaded(station)) {
@@ -387,7 +390,8 @@ public class CargoDrone extends Mob {
             return;
         }
         Vec3 over = new Vec3(target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5);
-        DronePortBlockEntity port = level.getBlockEntity(target) instanceof DronePortBlockEntity p ? p : null;
+        boolean targetLoaded = level.isLoaded(target);
+        DronePortBlockEntity port = targetLoaded && level.getBlockEntity(target) instanceof DronePortBlockEntity p ? p : null;
         if (port != null && port.handling(f)) {
             // 受け渡しの間は、ポートの時間に合わせて上下する（扉が動く間は高く待ち、台と同じ高さで箱を受け渡す）
             setPos(over.x, over.y + port.dockLift(), over.z);
@@ -413,7 +417,7 @@ public class CargoDrone extends Mob {
             boolean docked = port.dock(f);
             entityData.set(DOCKED, docked);
             f.docked = docked && f.stage == DroneNetwork.DELIVER;
-        } else if (level.isLoaded(target)) {
+        } else if (targetLoaded) {
             // ポートがない（置き換えられた）: 取りに行く途中なら帰り、届ける途中なら発送元へ戻す
             if (f.stage == DroneNetwork.PICKUP || net.port(f.from) == null || f.from.equals(target)) {
                 if (!f.crate.isEmpty()) {
@@ -448,6 +452,10 @@ public class CargoDrone extends Mob {
      */
     private boolean flyTo(ServerLevel level, Vec3 goal) {
         Vec3 p = position();
+        if (p.distanceToSqr(goal) < 0.04 * 0.04 && (phase || DroneRoute.clearAt(level, p))) {
+            setDeltaMovement(Vec3.ZERO);
+            return true;
+        }
         if (legGoal == null || legGoal.distanceToSqr(goal) > 0.01) {
             legGoal = goal;
             route = null;
@@ -496,7 +504,14 @@ public class CargoDrone extends Mob {
             }
             v = v.add(dv);
         }
-        setPos(p.x + v.x, p.y + v.y, p.z + v.z);
+        Vec3 next = p.add(v);
+        if (!phase && !DroneRoute.clearLine(level, p, next)) {
+            route = null;
+            replanAt = tickCount + REPLAN_TICKS;
+            hold();
+            return false;
+        }
+        setPos(next.x, next.y, next.z);
         setDeltaMovement(v);
         double horizontal = v.horizontalDistance();
         if (horizontal > 0.02) {
@@ -541,7 +556,7 @@ public class CargoDrone extends Mob {
     @Override
     public void onRemovedFromLevel() {
         super.onRemovedFromLevel();
-        if (!(level() instanceof ServerLevel server) || station == null) {
+        if (!(level() instanceof ServerLevel server)) {
             return;
         }
         DroneNetwork net = DroneNetwork.get(server);
