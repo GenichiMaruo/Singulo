@@ -486,6 +486,18 @@ CHAPTERS = [
          'casimir_cavity\n- Degenerate Furnace (5×5×7): degenerate_furnace\n- P-Reactor (13×13×13): '
          'penrose_reactor\n- Event Horizon Shield Tower (5×5, 9 high): event_horizon_shield\n- T-Cylinder '
          '(5×5×9): tipler_cylinder\n- Wormhole Generator (5×5×5 sphere): wormhole_generator'),
+        ('parts', '構成ブロックと段階',
+         '構成ブロックも、コントローラと同じ段階まで進まないと作れません。それぞれ鍵の素材を少しだけ使います。\n'
+         '・粒子加速器の加速管: 超伝導線材（2本で1つ）。\n'
+         '・縮退圧縮炉・C空洞・縮退熱炉の部品: 精密組立台の触媒枠に入れたBE凝縮触媒の寿命を少し。\n'
+         '・Pリアクター・シールド発生塔・Tシリンダー・ワームホール生成器・創世炉の部品: 時間結晶触媒の寿命を少し（炉殻ブロックなど一部は時間結晶モジュール）。\n'
+         '触媒は1回ごとに寿命の1/48だけ使い、残りは触媒のまま戻ります。すでに置いた構成ブロックはそのまま使えます。',
+         'Parts and stages',
+         'Structure parts also need you to reach the controller’s stage, and each uses a little of a key material.\n'
+         '- Particle Accelerator tubes: Superconducting Wire (one per two tubes).\n'
+         '- Degenerate Compactor, C-Cavity and Degenerate Furnace parts: a little lifetime of a BE Condensate Catalyst in the Precision Assembler’s catalyst slot.\n'
+         '- P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts: a little lifetime of a Time Crystal Catalyst (a few, such as Reactor Shell, use a Time Crystal Module).\n'
+         'Each craft uses 1/48 of the catalyst’s lifetime and the rest stays in the catalyst. Parts already placed keep working.'),
     ]),
     ('catalysts', 'singulo:muon_catalyst', '触媒', 'Catalysts', [
         ('tiers', 'ティアと効き方',
@@ -568,6 +580,14 @@ CHAPTERS = [
          ' A port within 8 blocks of a mouth links to the port with the same number (0-127, set with the seven circles in its screen) near the twin mouth, joining power, items and fluids.'
          ' Each mouth runs 8, 32 or 128 ports depending on its throat size, nearest first, and active ports glow. Throughput also grows with the throat and is unlimited at 7x7.'
          ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
+        ('capacity', '容量アップグレード',
+         '加工装置の右レールの容量専用枠に1個入れると、蓄電容量が Mk1 で1,000,000、Mk2 で4,000,000、Mk3 で40,000,000 FE になります。'
+         'Mk1 は段階2の作業台で、Mk2・Mk3 は精密組立台で一つ下のアップグレードから作ります。速度アップグレードと一緒に使え、受電の上限は変わりません。\n'
+         '外したときに容量を超えていた電力は消えず、容量より少なくなるまで新しい電力を受け取りません。1回に使う電力が通常の容量を超えるレシピには、容量アップグレードが要ります。',
+         'Capacity upgrades',
+         'One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). '
+         'Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\n'
+         'Removing one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
         ('list', '6つの遺構',

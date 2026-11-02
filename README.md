@@ -41,7 +41,7 @@ Forge support for Minecraft 1.21.1 ended with 0.8.1; from 0.9.0 on, 1.21.1 is Ne
 - [遊び方・開発資料の入口](docs/README.md)
 - [日本語](docs/player/ja.md) · [English](docs/player/en.md) · [简体中文](docs/player/zh-cn.md) · [繁體中文](docs/player/zh-tw.md) · [한국어](docs/player/ko-kr.md)
 - [画像付きレシピ](docs/recipes/README.md)
-- [0.13.0の変更と検証](docs/0.13.0/README.md) · [課題](issue.md)
+- [0.14.0の変更と検証](docs/0.14.0/README.md) · [0.13.0](docs/0.13.0/README.md) · [課題](issue.md)
 
 ## 作者を支援する
 

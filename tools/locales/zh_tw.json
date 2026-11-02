@@ -1724,8 +1724,8 @@
     "translation": "熔化的鉍冷卻後形成的階梯狀彩虹色晶體。建材。"
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "A metal with an iridescent surface.",
-    "translation": "表面泛著虹彩的金屬。"
+    "source": "A metal with an iridescent surface. A quiet touch of color from copper refining.",
+    "translation": "表面泛著虹彩的金屬。銅精煉過程中顯露的一抹虹彩。"
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -2364,8 +2364,8 @@
     "translation": "隕石中的鐵鎳天然合金。用鐵鎬或更好的鎬開採可得到粗隕鐵。只在隕石坑中出現。"
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A naturally magnetic alloy of iron and nickel.",
-    "translation": "具有強磁性的天然鐵鎳合金。"
+    "source": "A naturally magnetic alloy of iron and nickel. Metal from the stars, now resting in your hand.",
+    "translation": "具有強磁性的天然鐵鎳合金。來自星空的金屬，如今靜臥掌心。"
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2428,8 +2428,8 @@
     "translation": "覆有鉨的堅固框架。"
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy, dense ingot of nihonium.",
-    "translation": "沉重緻密的鉨錠。"
+    "source": "A heavy, dense ingot of nihonium. An element born in the accelerator becomes the foundation of your next machine.",
+    "translation": "沉重緻密的鉨錠。誕生於加速器的元素，將成為下一台設備的基石。"
   },
   "desc.singulo.nihonium_plate": {
     "source": "Nihonium pressed into a thin plate.",
@@ -2756,8 +2756,8 @@
     "translation": "鐵與碳混合而成的鋼鐵原料。"
   },
   "desc.singulo.steel_ingot": {
-    "source": "A sturdy structural metal.",
-    "translation": "堅固的結構金屬。"
+    "source": "A sturdy structural metal. Unassuming, but a factory can grow from a single bar.",
+    "translation": "堅固的結構金屬。樸實無華，工廠卻可以從這一錠開始成長。"
   },
   "desc.singulo.steel_plate": {
     "source": "Steel pressed into a thin plate.",
@@ -2996,8 +2996,8 @@
     "translation": "細碎的鋅粉。"
   },
   "desc.singulo.zinc_ingot": {
-    "source": "An ingot of zinc.",
-    "translation": "鋅的金屬錠。"
+    "source": "An ingot of zinc. A small ingot with the promise of a new element.",
+    "translation": "鋅的金屬錠。小小的金屬錠，蘊藏著通往新元素的可能。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -12898,5 +12898,41 @@
   "summary.singulo.dimensional_pocket": {
     "source": "Your own storage you can open anywhere.",
     "translation": "隨時隨地都能打開的個人儲物空間。"
+  },
+  "summary.singulo.bismuth_ingot": {
+    "source": "A metal with an iridescent surface.",
+    "translation": "表面泛著虹彩的金屬。"
+  },
+  "summary.singulo.meteoric_iron_ingot": {
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "具有強磁性的天然鐵鎳合金。"
+  },
+  "summary.singulo.nihonium_ingot": {
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "沉重緻密的鉨錠。"
+  },
+  "summary.singulo.steel_ingot": {
+    "source": "A sturdy structural metal.",
+    "translation": "堅固的結構金屬。"
+  },
+  "summary.singulo.zinc_ingot": {
+    "source": "An ingot of zinc.",
+    "translation": "鋅的金屬錠。"
+  },
+  "guide.singulo.multiblocks.parts.title": {
+    "source": "Parts and stages",
+    "translation": "構成方塊與階段"
+  },
+  "guide.singulo.multiblocks.parts.body": {
+    "source": "Structure parts also need you to reach the controller’s stage, and each uses a little of a key material.\n- Particle Accelerator tubes: Superconducting Wire (one per two tubes).\n- Degenerate Compactor, C-Cavity and Degenerate Furnace parts: a little lifetime of a BE Condensate Catalyst in the Precision Assembler’s catalyst slot.\n- P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts: a little lifetime of a Time Crystal Catalyst (a few, such as Reactor Shell, use a Time Crystal Module).\nEach craft uses 1/48 of the catalyst’s lifetime and the rest stays in the catalyst. Parts already placed keep working.",
+    "translation": "構成方塊也必須推進到與控制器相同的階段才能製作，每種都會少量消耗關鍵材料。\n- 粒子加速器的加速管：超導線材（每 2 根用 1 個）。\n- 簡併壓縮爐、卡西米尔腔、簡併熱爐的零件：精密組裝台催化劑槽中玻色凝聚態催化劑的少量壽命。\n- 彭羅斯反應爐、事件視界護盾塔、蒂普勒圓柱、蟲洞生成器、創世爐的零件：時間晶體催化劑的少量壽命（反應爐外殼等少數零件使用時間晶體模組）。\n每次製作消耗催化劑壽命的 1/48，其餘仍留在催化劑中。已放置的構成方塊可繼續使用。"
+  },
+  "guide.singulo.power.capacity.title": {
+    "source": "Capacity upgrades",
+    "translation": "容量升級"
+  },
+  "guide.singulo.power.capacity.body": {
+    "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
+    "translation": "在加工裝置右側欄的容量專用槽中放入 1 個，蓄電容量會變為 Mk1 1,000,000、Mk2 4,000,000、Mk3 40,000,000 FE。Mk1 在第 2 階段工作台製作，Mk2 和 Mk3 在精密組裝台用低一級的升級製作。可與速度升級同時使用，不改變受電上限。\n取下時超出容量的電力不會消失，在降到容量以下之前不再接收新電力。單次耗電超過通常容量的配方需要容量升級。"
   }
 }

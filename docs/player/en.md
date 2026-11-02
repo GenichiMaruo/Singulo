@@ -95,6 +95,8 @@ Place the controller and **right-click it with a Holo Projector**. Follow the pr
 
 The outer dimensions are only a starting point. Frames, windows, internal components and required air spaces must also match. Shared I/O Ports replace designated panels, not arbitrary components. Accelerator ports sit on either side of its controller. Reactor Extraction Ports replace ring shell blocks: the six ring intersections use Gyro Drives, while the twelve diagonal positions use **Reactor Stabilizer Coils**.
 
+Structure parts also require the controller's stage. Particle Accelerator tubes use Superconducting Wire; Degenerate Compactor, C-Cavity and Degenerate Furnace parts need a BE Condensate Catalyst in the Precision Assembler's catalyst slot; P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts need a Time Crystal Catalyst. Each craft uses 1/48 of the catalyst's lifetime and the rest stays in the catalyst. Parts you have already placed keep working.
+
 ## Exploring ruins
 
 | Ruin | Important salvage and purpose |
@@ -144,6 +146,19 @@ Androids run on charge and run out after about ten big moves. They return to a n
 - Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.
 
 **Android glass:** Barrier Glass (only androids cannot pass) and Gate Glass (only androids can pass), each in a plain kind that joins with its neighbours and a patterned kind.
+
+## Drone delivery
+
+A **Drone Station** prints cargo drones that carry crates between **Drone Ports**. Every port with the same owner in the same dimension appears as a destination automatically.
+
+- **Getting drones**: defeating a whole wave from a ruin Guard Dock sometimes drops a **Drone Crystal Memory**. Put the memory (not used up) and **Drone Kits** (one per drone) in a station and give it power to print a drone for 20,000 FE. Each Production Upgrade adds a drone, up to three.
+- **Drone types**: the memory decides the type. Rotor memories drop from any facility, **jet** memories (1.6× the rotor speed) from the Research Building and higher, and **anti-gravity** memories (1.25×) rarely from the Culture Facility and the Underground Android Laboratory.
+- **Sending**: put an empty **Packing Crate** and cargo in a port, pick a destination and send. It costs 2,000 FE plus 50 FE per block, and the crate decides the range (160, 760 or 3,160 blocks). Arriving crates unpack into the received row and the empty crate comes back. A port can also auto-send once cargo reaches a threshold.
+- **Routes**: drones do not pass through walls. They find a way through open space a few blocks above the ground; a sealed room shows No route. A **Phase Shift Upgrade** (stage 4) in the station lets its drones take shortcuts through walls.
+- **Cargo is never lost**: while a drone flies through unloaded areas the cargo stays in the flight record and arrives when the destination loads.
+- **Androids**: a port next to an Android Supply Port or Delivery Port lets androids use arrivals as materials or ship finished products to another base.
+
+See the in-game handbook chapter "Drone Delivery" for details.
 
 ## Black holes and late-game technology
 

@@ -34,12 +34,12 @@ DESC = {
                       'A packing crate with a large battery. Reaches up to 3,160 blocks.'),
     # ---------------------------------------------------------------- 段階1 起動
     '鋼の素': ('鉄と炭素を混ぜた鋼鉄の原料。', 'A blend of iron and carbon.'),
-    '鋼鉄インゴット': ('丈夫な構造用金属。', 'A sturdy structural metal.'),
+    '鋼鉄インゴット': ('丈夫な構造用金属。地味だが、この一本から工場が育つ。', 'A sturdy structural metal. Unassuming, but a factory can grow from a single bar.'),
     '亜鉛の粉': ('細かく砕かれた亜鉛。', 'Finely powdered zinc.'),
-    '亜鉛インゴット': ('亜鉛の地金。', 'An ingot of zinc.'),
-    'ビスマスインゴット': ('表面が虹色に輝く金属。', 'A metal with an iridescent surface.'),
+    '亜鉛インゴット': ('亜鉛の地金。小さな地金に、新元素への足がかりを秘めている。', 'An ingot of zinc. A small ingot with the promise of a new element.'),
+    'ビスマスインゴット': ('表面が虹色に輝く金属。銅の精錬で見つかる、ささやかな彩り。', 'A metal with an iridescent surface. A quiet touch of color from copper refining.'),
     'ニホニウム': ('安定化された113番元素。', 'Stabilized element 113.'),
-    'ニホニウムインゴット': ('重く緻密なニホニウムの地金。', 'A heavy, dense ingot of nihonium.'),
+    'ニホニウムインゴット': ('重く緻密なニホニウムの地金。加速器で生まれた元素が、次の設備の礎になる。', 'A heavy, dense ingot of nihonium. An element born in the accelerator becomes the foundation of your next machine.'),
     'ニホニウム板': ('薄く押し延ばしたニホニウム。', 'Nihonium pressed into a thin plate.'),
     'ニホニウム筐体': ('ニホニウムで覆われた頑丈な筐体。', 'A sturdy frame clad in nihonium.'),
     '未焼成のティーカップ': ('まだ焼かれていない粘土のカップ。', 'An unfired clay cup.'),
@@ -164,7 +164,7 @@ DESC = {
     '隕石の核': ('隕石の芯に1つだけ埋まっている、隕鉄と星屑が溶け合った塊。掘ると隕鉄の原石と星屑がまとめて出る（鉄以上のツルハシ）。隕石コンパスはこれを指す。',
               'A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.'),
     '隕鉄の原石': ('鉄とニッケルを含む隕石由来の原石。', 'Raw meteoric metal containing iron and nickel.'),
-    '隕鉄インゴット': ('強い磁性を持つ、鉄とニッケルの天然合金。', 'A naturally magnetic alloy of iron and nickel.'),
+    '隕鉄インゴット': ('強い磁性を持つ、鉄とニッケルの天然合金。星空から来た金属が、いまは手の中にある。', 'A naturally magnetic alloy of iron and nickel. Metal from the stars, now resting in your hand.'),
     '星屑': ('宇宙から運ばれた微粒子。地球にない珍しい同位体を含み、冷却原子の原料になる。',
            'Cosmic grains carrying rare isotopes. The raw material for cold atoms.'),
     '雷ガラス塊': ('雷が落ちた砂が、一瞬で溶けて固まったもの。壊すと雷ガラスが出る。', 'Sand fused by a lightning strike. Break it for fulgurite.'),
@@ -647,6 +647,11 @@ DESC.update(_BLUEPRINT_DESC)
 
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)
 SUMMARY = {
+    '鋼鉄インゴット': ('丈夫な構造用金属。', 'A sturdy structural metal.'),
+    '亜鉛インゴット': ('亜鉛の地金。', 'An ingot of zinc.'),
+    'ビスマスインゴット': ('表面が虹色に輝く金属。', 'A metal with an iridescent surface.'),
+    'ニホニウムインゴット': ('重く緻密なニホニウムの地金。', 'A heavy, dense ingot of nihonium.'),
+    '隕鉄インゴット': ('強い磁性を持つ、鉄とニッケルの天然合金。', 'A naturally magnetic alloy of iron and nickel.'),
     'アンドロイド作業台': ('アンドロイドが速く作る作業台。入りきらない物を預かる。', 'A workbench androids craft on quickly. Holds what does not fit.'),
     '改良型アンドロイド作業台': ('アンドロイドが8倍速で作る作業台。預かり箱は54枠。', 'Androids craft 8× as fast here. 54-slot holding box.'),
     '量子アンドロイド作業台': ('アンドロイドが20倍速で作る作業台。預かり箱は81枠。', 'Androids craft 20× as fast here. 81-slot holding box.'),

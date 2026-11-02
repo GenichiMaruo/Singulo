@@ -1724,8 +1724,8 @@
     "translation": "녹인 비스무트를 식혀 만든 계단 모양의 무지갯빛 결정. 건축 재료."
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "A metal with an iridescent surface.",
-    "translation": "표면이 무지갯빛으로 빛나는 금속."
+    "source": "A metal with an iridescent surface. A quiet touch of color from copper refining.",
+    "translation": "표면이 무지갯빛으로 빛나는 금속. 구리 제련 과정에서 만나는 은은한 빛깔."
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -2364,8 +2364,8 @@
     "translation": "운석 속의 철과 니켈의 천연 합금입니다. 철 곡괭이 이상으로 캐면 운철 원석이 나옵니다. 운석 구덩이에만 있습니다."
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A naturally magnetic alloy of iron and nickel.",
-    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금."
+    "source": "A naturally magnetic alloy of iron and nickel. Metal from the stars, now resting in your hand.",
+    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금. 별에서 온 금속이 이제 손안에 놓여 있다."
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2428,8 +2428,8 @@
     "translation": "니호늄으로 덮은 견고한 프레임."
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy, dense ingot of nihonium.",
-    "translation": "무겁고 치밀한 니호늄 주괴."
+    "source": "A heavy, dense ingot of nihonium. An element born in the accelerator becomes the foundation of your next machine.",
+    "translation": "무겁고 치밀한 니호늄 주괴. 가속기에서 태어난 원소가 다음 설비의 초석이 된다."
   },
   "desc.singulo.nihonium_plate": {
     "source": "Nihonium pressed into a thin plate.",
@@ -2756,8 +2756,8 @@
     "translation": "철과 탄소를 섞은 강철 원료."
   },
   "desc.singulo.steel_ingot": {
-    "source": "A sturdy structural metal.",
-    "translation": "튼튼한 구조용 금속."
+    "source": "A sturdy structural metal. Unassuming, but a factory can grow from a single bar.",
+    "translation": "튼튼한 구조용 금속. 수수하지만, 이 주괴 하나에서 공장이 자라난다."
   },
   "desc.singulo.steel_plate": {
     "source": "Steel pressed into a thin plate.",
@@ -2996,8 +2996,8 @@
     "translation": "곱게 빻은 아연."
   },
   "desc.singulo.zinc_ingot": {
-    "source": "An ingot of zinc.",
-    "translation": "아연 금속 주괴."
+    "source": "An ingot of zinc. A small ingot with the promise of a new element.",
+    "translation": "아연 금속 주괴. 작은 주괴가 새 원소의 가능성을 품고 있다."
   },
   "direction.singulo.east": {
     "source": "east",
@@ -12898,5 +12898,41 @@
   "summary.singulo.dimensional_pocket": {
     "source": "Your own storage you can open anywhere.",
     "translation": "어디서든 열 수 있는 나만의 수납공간."
+  },
+  "summary.singulo.bismuth_ingot": {
+    "source": "A metal with an iridescent surface.",
+    "translation": "표면이 무지갯빛으로 빛나는 금속."
+  },
+  "summary.singulo.meteoric_iron_ingot": {
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금."
+  },
+  "summary.singulo.nihonium_ingot": {
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "무겁고 치밀한 니호늄 주괴."
+  },
+  "summary.singulo.steel_ingot": {
+    "source": "A sturdy structural metal.",
+    "translation": "튼튼한 구조용 금속."
+  },
+  "summary.singulo.zinc_ingot": {
+    "source": "An ingot of zinc.",
+    "translation": "아연 금속 주괴."
+  },
+  "guide.singulo.multiblocks.parts.title": {
+    "source": "Parts and stages",
+    "translation": "구성 블록과 단계"
+  },
+  "guide.singulo.multiblocks.parts.body": {
+    "source": "Structure parts also need you to reach the controller’s stage, and each uses a little of a key material.\n- Particle Accelerator tubes: Superconducting Wire (one per two tubes).\n- Degenerate Compactor, C-Cavity and Degenerate Furnace parts: a little lifetime of a BE Condensate Catalyst in the Precision Assembler’s catalyst slot.\n- P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts: a little lifetime of a Time Crystal Catalyst (a few, such as Reactor Shell, use a Time Crystal Module).\nEach craft uses 1/48 of the catalyst’s lifetime and the rest stays in the catalyst. Parts already placed keep working.",
+    "translation": "구성 블록도 컨트롤러와 같은 단계까지 진행해야 만들 수 있으며, 저마다 열쇠가 되는 재료를 조금씩 쓴다.\n- 입자 가속기의 가속관: 초전도 선재(2개당 1개).\n- 축퇴 압축로·카시미르 공동·축퇴 열로의 부품: 정밀 조립기 촉매 칸에 넣은 BE 응축 촉매의 수명을 조금.\n- 펜로즈 반응로·사건의 지평선 실드 타워·티플러 원통·웜홀 생성기·창세로의 부품: 시간 결정 촉매의 수명을 조금(반응로 외피 등 일부는 시간 결정 모듈).\n한 번 만들 때마다 촉매 수명의 1/48을 쓰고, 나머지는 촉매에 그대로 남는다. 이미 놓은 구성 블록은 그대로 쓸 수 있다."
+  },
+  "guide.singulo.power.capacity.title": {
+    "source": "Capacity upgrades",
+    "translation": "용량 업그레이드"
+  },
+  "guide.singulo.power.capacity.body": {
+    "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
+    "translation": "가공 장치 오른쪽 레일의 용량 전용 칸에 1개 넣으면 축전 용량이 Mk1은 1,000,000, Mk2는 4,000,000, Mk3는 40,000,000 FE가 된다. Mk1은 2단계 제작대에서, Mk2와 Mk3는 정밀 조립기에서 한 단계 아래 업그레이드로 만든다. 속도 업그레이드와 함께 쓸 수 있고 수전 상한은 바뀌지 않는다.\n뺐을 때 용량을 넘던 전력은 사라지지 않으며, 용량보다 적어질 때까지 새 전력을 받지 않는다. 한 번에 쓰는 전력이 보통 용량을 넘는 레시피에는 용량 업그레이드가 필요하다."
   }
 }
