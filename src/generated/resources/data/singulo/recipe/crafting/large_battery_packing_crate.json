@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "WDW",
+    "WEW",
     "OXO"
   ],
   "key": {
     "W": {
       "item": "singulo:superconducting_wire"
     },
-    "D": {
-      "tag": "c:gems/diamond"
+    "E": {
+      "item": "singulo:entangled_element"
     },
     "O": {
       "item": "singulo:superconducting_coil"

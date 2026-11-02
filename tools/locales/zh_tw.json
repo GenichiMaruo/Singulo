@@ -11128,8 +11128,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 53 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 52 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 27 more",
@@ -11404,8 +11404,8 @@
     "translation": "用於：冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
-    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 19 個"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 21 more",
+    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 21 個"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11416,8 +11416,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 29 more",
-    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 29 個"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 30 more",
+    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 30 個"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -12168,8 +12168,8 @@
     "translation": "裝有大電池的包裝箱。最遠可送 3,160 格。"
   },
   "howto.singulo.large_battery_packing_crate": {
-    "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製造地：工作台（第 3 階段）"
   },
   "guide.singulo.drones": {
     "source": "Drone Delivery",
@@ -12420,16 +12420,16 @@
     "translation": "裝在無人機站右側欄的強化格中，該站的無人機就能直線穿過牆壁和屋頂飛行。穿過時會發出紫光。"
   },
   "howto.singulo.drone_phase_upgrade": {
-    "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製造地：精密組裝台（第 4 階段）"
   },
   "guide.singulo.drones.route.title": {
     "source": "Routes and phase shift",
     "translation": "飛行路線與相位穿透"
   },
   "guide.singulo.drones.route.body": {
-    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 2, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly straight through walls. They glow violet from just before a wall, and the glow shows through it.",
-    "translation": "無人機不會穿過牆壁或屋頂飛行。目的地較近時，會沿著空曠處尋找路線；較遠時，會先從出發點飛到能看見天空的地方，在高於地形處巡航，再從目的地上方的天空降下。也會從門、窗或天窗進入建築內的起降港。沒有開口的房間裡的起降港無法到達，運輸中頁面會顯示「無路線」（貨物不會遺失，無人機會原地等待並重新尋找路線）。\n把第 2 階段在精密組裝台製作的相位穿透升級放入無人機站右側欄的強化格，該站的無人機就會直線穿牆飛行。穿牆前一點就開始發出紫光，隔著牆也能看到發光的身影。"
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "無人機不會穿過牆壁或屋頂飛行。目的地較近時，會沿著空曠處尋找路線；較遠時，會先從出發點飛到能看見天空的地方，在高於地形處巡航，再從目的地上方的天空降下。也會從門、窗或天窗進入建築內的起降港。沒有開口的房間裡的起降港無法到達，運輸中頁面會顯示「無路線」（貨物不會遺失，無人機會原地等待並重新尋找路線）。\n把第 4 階段在精密組裝台製作的相位穿透升級放入無人機站右側欄的強化格，該站的無人機就會直線穿牆飛行。穿牆前一點就開始發出紫光，隔著牆也能看到發光的身影。"
   },
   "item.singulo.drone_memory_jet": {
     "source": "Drone Crystal Memory (Jet)",

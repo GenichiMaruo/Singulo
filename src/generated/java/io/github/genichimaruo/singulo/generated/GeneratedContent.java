@@ -73,7 +73,7 @@ public final class GeneratedContent {
             new ItemDef("drone_memory_jet", "item", 3, 0),
             new ItemDef("drone_memory_gravity", "item", 4, 0),
             new ItemDef("drone_kit", "item", 2, 0),
-            new ItemDef("drone_phase_upgrade", "item", 2, 0),
+            new ItemDef("drone_phase_upgrade", "item", 4, 0),
             new ItemDef("degenerate_matter_shell", "item", 4, 0),
             new ItemDef("data_card_culture_data", "item", 4, 0),
             new ItemDef("phase_sync_plate", "item", 4, 0),

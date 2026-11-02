@@ -1,7 +1,7 @@
 {
   "type": "singulo:machine",
   "station": "precision_assembler",
-  "stage": 2,
+  "stage": 4,
   "time": 200,
   "energy": 200,
   "ingredients": [
@@ -13,21 +13,21 @@
     },
     {
       "ingredient": {
-        "item": "minecraft:amethyst_shard"
+        "item": "singulo:exotic_matter"
       },
-      "count": 4
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
     },
     {
       "ingredient": {
         "item": "singulo:superconducting_coil"
       },
       "count": 2
-    },
-    {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
-      "count": 1
     }
   ],
   "result": {
