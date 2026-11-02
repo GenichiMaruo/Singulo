@@ -38,9 +38,10 @@ public final class MachineRecipeTransfer {
                 if (ingredient.uses() > 0 && ingredient.usesFrom(menu.loadedCatalyst()) > 0) {
                     continue;
                 }
+                // A stocked reserve that can pay by uses already serves every batch. Whole-item catalysts are planned
+                // per batch; allocate() keeps at least the stocked reserve in the slot.
                 ItemStack reserve = menu.getSlot(target).getItem();
-                if (!reserve.isEmpty() && reserve.getCount() >= Math.max(1, ingredient.count()) && (ingredient.uses() > 0
-                        ? ingredient.usesFrom(reserve.copyWithCount(1)) > 0 : ingredient.ingredient().test(reserve))) {
+                if (ingredient.uses() > 0 && !reserve.isEmpty() && ingredient.usesFrom(reserve.copyWithCount(1)) > 0) {
                     continue;
                 }
                 slots.add(target);
@@ -48,7 +49,8 @@ public final class MachineRecipeTransfer {
                 if (input >= menu.type().inputSlots()) return null;
                 target = input++;
             }
-            needs.add(new Need(target, Math.max(1, ingredient.count()), ingredient.uses() > 0, stack -> ingredient.uses() > 0
+            // Machines pay a uses ingredient from a single item with enough uses left, whatever its count says
+            needs.add(new Need(target, ingredient.uses() > 0 ? 1 : Math.max(1, ingredient.count()), ingredient.uses() > 0, stack -> ingredient.uses() > 0
                     ? ingredient.usesFrom(stack.copyWithCount(1)) > 0 : ingredient.ingredient().test(stack)));
         }
         if (recipe.restore().isPresent()) {
@@ -102,6 +104,11 @@ public final class MachineRecipeTransfer {
             if (tried.stream().anyMatch(s -> ItemStack.isSameItemSameComponents(s, sample))) continue;
             tried.add(sample);
             long requested = (long) need.count() * (need.reusable() ? 1 : batches);
+            ItemStack stocked = pool.get(at);
+            if (need.slot() == menu.type().catalystSlot() && menu.type().hasCatalystSlot()
+                    && ItemStack.isSameItemSameComponents(stocked, sample)) {
+                requested = Math.max(requested, stocked.getCount());   // keep the stocked reserve in the machine
+            }
             if (requested > menu.stackLimit(need.slot(), sample)) continue;
             int count = (int) requested;
             // Reusable templates/catalysts are placed once, regardless of shift-click batch count.

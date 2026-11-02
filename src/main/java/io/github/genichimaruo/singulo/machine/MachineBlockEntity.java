@@ -543,11 +543,13 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 } else if (steps == 0) {
                     active = true;
                     status = Status.RUNNING;
-                } else if (energy.consume(usage * steps) || runsUnderpowered(recipe) && drawPartial()) {
+                } else if (energy.consume(usage * affordableSteps(steps)) || runsUnderpowered(recipe) && drawPartial()) {
+                    // 蓄電容量で1回に払える分だけ進む（加速の場でも、容量アップグレードが1 tick 分に足りていれば止まらない）
+                    int done = affordableSteps(steps);
                     timeCarry -= steps;
                     active = true;
                     status = Status.RUNNING;
-                    progress += steps;
+                    progress += done;
                     if (progress >= maxProgress) {
                         progress = 0;
                         craft(level, recipe);
@@ -1127,6 +1129,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                         : fluid.getAmount();
             }
         };
+    }
+
+    private int affordableSteps(int steps) {
+        return affordableSteps(steps, usage, energy.getMaxEnergyStored());
+    }
+
+    /** 時間の場で進みたい steps のうち、蓄電容量で1回に払える分（1 tick 分も払えなければ 1。そのときは電力不足と容量の案内になる）。 */
+    public static int affordableSteps(int steps, int usage, int capacity) {
+        if (usage <= 0) {
+            return steps;
+        }
+        return (int) Math.max(1, Math.min(steps, (long) capacity / usage));
     }
 
     private boolean massTargetIsMetal() {

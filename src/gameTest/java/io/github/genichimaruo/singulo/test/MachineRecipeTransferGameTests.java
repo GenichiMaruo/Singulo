@@ -163,6 +163,43 @@ public final class MachineRecipeTransferGameTests {
         });
     }
 
+    /** 最大搬入でも、触媒枠の予備はそのまま残り、まるごと使う触媒は回数分そろえる。使用回数で払う材料は1個だけ置く。 */
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void jeiMaxTransferPlansCatalystsPerBatch(GameTestHelper h) {
+        var menu = menu(h);
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        int slot = menu.type().catalystSlot();
+        int inventory = menu.type().itemSlots();
+        menu.getSlot(slot).set(catalyst.copyWithCount(1));
+        menu.getSlot(inventory).set(catalyst.copyWithCount(8));
+        menu.getSlot(inventory + 1).set(new ItemStack(Items.IRON_INGOT, 16));
+        var whole = new MachineRecipe.ItemInput(Ingredient.of(catalyst.getItem()), 1, 0);
+        var plan = MachineRecipeTransfer.plan(menu, recipe(iron(4), whole), true);
+        h.assertTrue(plan != null, "Max transfer with a whole-item catalyst failed");
+        MachineRecipeTransfer.apply(menu, plan);
+        h.assertTrue(menu.getSlot(0).getItem().getCount() == 16 && menu.getSlot(slot).getItem().getCount() == 4,
+                "Catalysts not planned per batch: inputs " + menu.getSlot(0).getItem() + ", catalyst " + menu.getSlot(slot).getItem());
+        var data = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("control_unit")));
+        h.assertTrue(io.github.genichimaruo.singulo.item.UsesHelper.hasUses(data), "Control unit fixture has no uses");
+        for (int i = 0; i < menu.type().inputSlots(); i++) menu.getSlot(i).set(ItemStack.EMPTY);
+        menu.getSlot(inventory + 2).set(data.copyWithCount(1));
+        menu.getSlot(inventory + 3).set(new ItemStack(Items.IRON_INGOT, 2));
+        var uses = new MachineRecipe.ItemInput(Ingredient.of(data.getItem()), 2, 1);
+        h.assertTrue(MachineRecipeTransfer.plan(menu, recipe(iron(1), uses), false) != null,
+                "A uses ingredient with count 2 cannot be planned from one item");
+        h.succeed();
+    }
+
+    /** 時間の場で加速しても、1回に払う電力は蓄電容量まで（容量アップグレードが1 tick 分に足りていれば止まらない）。 */
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void timeFieldStepsStayWithinTheBuffer(GameTestHelper h) {
+        h.assertTrue(MachineBlockEntity.affordableSteps(2, 3_500_000, 4_000_000) == 1, "Accelerated step exceeds the Mk2 buffer");
+        h.assertTrue(MachineBlockEntity.affordableSteps(2, 1_000_000, 4_000_000) == 2, "Affordable acceleration was cut");
+        h.assertTrue(MachineBlockEntity.affordableSteps(3, 0, 100) == 3 && MachineBlockEntity.affordableSteps(2, 500, 100) == 1,
+                "Edge cases of the buffer limit");
+        h.succeed();
+    }
+
     /** 容量アップグレードの案内: 足りる段階を示し、Mk3 でも足りなければ段階を示さない。 */
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void capacityHintNeverPointsAtAnUpgradeThatCannotHelp(GameTestHelper h) {

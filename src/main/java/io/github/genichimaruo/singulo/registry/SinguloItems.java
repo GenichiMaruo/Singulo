@@ -76,7 +76,6 @@ public final class SinguloItems {
             "creative_catalyst", () -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
             "builder_wand", () -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties()));
-    /** アンドロイド用の無線充電器。 */
     /** 梱包箱（3段階。段階が上がるほど遠くへ送れる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> PACKING_CRATE = ITEMS.register(
             "packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(1, new Item.Properties()));
@@ -84,6 +83,7 @@ public final class SinguloItems {
             "battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(2, new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> LARGE_BATTERY_PACKING_CRATE = ITEMS.register(
             "large_battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(3, new Item.Properties()));
+    /** アンドロイド用の無線充電器。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */

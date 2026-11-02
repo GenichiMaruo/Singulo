@@ -378,6 +378,23 @@ public final class DroneGameTests {
         h.succeed();
     }
 
+    /** クリエイティブで持ち物が満杯でも、箱を開けて入りきらない荷物は箱に残る（消えない）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void unpackingInCreativeKeepsOverflow(GameTestHelper h) {
+        var player = TestScope.player(h);
+        player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+        for (int i = 0; i < player.getInventory().items.size(); i++) {
+            player.getInventory().items.set(i, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        ItemStack packed = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.DIAMOND, 5)));
+        player.getInventory().items.set(player.getInventory().selected, packed);
+        packed.getItem().use(h.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND);
+        ItemStack crate = player.getMainHandItem();
+        int left = DroneCrateItem.contents(crate).stream().filter(s -> s.is(Items.DIAMOND)).mapToInt(ItemStack::getCount).sum();
+        h.assertTrue(left == 5, "Overflow lost while unpacking in creative: " + left + " diamonds left in the crate");
+        h.succeed();
+    }
+
     /** このテストのステーションのドローン（並んで動くほかのテストのものは数えない・消さない）。 */
     private static List<CargoDrone> ours(GameTestHelper h, BlockPos at) {
         BlockPos station = h.absolutePos(at);

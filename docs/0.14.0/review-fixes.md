@@ -40,3 +40,15 @@ New tests: `packedCratesStayOutOfContainerItems`, `brokenStationReturnsKitsOfFly
 - Guard Dock Javadoc moved to the method it describes.
 
 New tests: `stationAutomationOnlyAcceptsKits`, `redirectedVirtualFlightUsesItsKindSpeed`, `jeiTransferPlanningDoesNotTouchMachineSlots`, `loadedCatalystEstimateMatchesTheServer`. Validation: 634 GameTests, 37 Python tests, release check.
+
+## PR #51 third review
+
+- Unpacking a crate inserts through `ItemHandlerHelper.insertItemStacked` on the player's main inventory. Vanilla `Inventory#add` deleted overflow for creative players with a full inventory; the rest now stays in the crate.
+- Inside an accelerated time field a machine pays at most what its buffer holds in one go (`MachineBlockEntity.affordableSteps`). A capacity upgrade that covers one tick of usage keeps the machine running instead of leaving it stuck on NO_POWER.
+- JEI max transfer plans whole-item catalysts per batch and keeps at least the stocked reserve in the catalyst slot. Only reserves that pay by uses are left untouched.
+- Uses ingredients are planned as one item, matching how machines pay them, so a uses ingredient with a count above one can be transferred.
+- The Android charger Javadoc moved back above `ANDROID_CHARGER`.
+
+Deferred to a later release: JEI preview against slots waiting for returns on the server, an owner check on the `SideConfig.Holder` interface instead of the drone-port special case, caching the `AndroidStorageView` lookup, and clearing the transfer rate-limit map on logout.
+
+New tests: `unpackingInCreativeKeepsOverflow`, `jeiMaxTransferPlansCatalystsPerBatch`, `timeFieldStepsStayWithinTheBuffer`. Validation: 637 GameTests, 37 Python tests, release check.

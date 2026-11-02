@@ -113,9 +113,11 @@ public class DroneCrateItem extends Item {
         if (!level.isClientSide) {
             NonNullList<ItemStack> items = contents(stack);
             ItemStack crate = stack.copyWithCount(1);
+            // Inventory#add は、クリエイティブで入りきらないと残りを消してしまう。入った分だけ減らし、残りは箱に残す
+            var inventory = new net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper(player.getInventory());
             for (int i = 0; i < items.size(); i++) {
                 if (!items.get(i).isEmpty()) {
-                    player.getInventory().add(items.get(i));         // 入った分だけ減る
+                    items.set(i, net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(inventory, items.get(i), false));
                 }
             }
             setContents(crate, items);
