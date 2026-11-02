@@ -12,20 +12,20 @@ DESC = {
     '容量アップグレード（Mk3）': ('Mk2から作る容量アップグレード。加工装置の蓄電容量が最低40,000,000 FEになる。専用枠に1個だけ装着し、受電上限は変えない。',
                                   'Made from Mk2. Raises a processing machine’s buffer to at least 40,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.'),
     # ---------------------------------------------------------------- ドローン輸送
-    'ドローン用クリスタルメモリ': ('輸送ドローンの設計を記録した、アンドロイド用より小さいクリスタルメモリ。ドローン・ステーションに入れると、ドローンを印刷できる（減らない）。',
-                         'A crystal memory smaller than an android’s, holding the design of a cargo drone. Put it in a Drone Station to print drones (it is not used up).'),
+    'ドローン用クリスタルメモリ': ('4つのローターで飛ぶ輸送ドローン（ローター型）の設計を記録した、アンドロイド用より小さいクリスタルメモリ。ドローン・ステーションに入れると、ローター型を印刷できる（減らない）。どの施設の警備機ドックからも出る。',
+                         'A crystal memory smaller than an android’s, holding the design of a four-rotor cargo drone (rotor type). Put it in a Drone Station to print rotor drones (it is not used up). Dropped by guard docks in any facility.'),
     'ドローン用クリスタルメモリ（ジェット型）': ('2つのジェットで飛ぶ輸送ドローンの設計。ドローン・ステーションに入れると、いちばん速い（ローター型の1.6倍）ジェット型を印刷する（減らない）。研究棟より上の施設の警備機ドックから出る。',
                                'The design of a cargo drone with twin jets. Put it in a Drone Station to print the fastest drones (1.6× the rotor type). It is not used up. Dropped by guard docks in the Research Building and higher facilities.'),
     'ドローン用クリスタルメモリ（反重力型）': ('反重力の場で浮く輸送ドローンの設計。ドローン・ステーションに入れると、4つのビットが牽引の光で箱を運ぶ反重力型（ローター型の1.25倍の速さ）を印刷する（減らない）。封鎖培養施設と地下アンドロイド研究所の警備機ドックから、まれに出る。',
                               'The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.'),
-    '位相透過アップグレード': ('ドローン・ステーションの右の強化の段に入れると、そのステーションのドローンが壁や天井を抜けて、まっすぐ飛ぶ。抜けるときは紫に光る。',
-                    'Install it in the upgrade slot on a Drone Station’s right rail to let its drones fly straight through walls and roofs. They glow violet while passing through.'),
+    '位相透過アップグレード': ('ドローン・ステーションの枠の中の欄（生産アップグレードの下）に入れると、そのステーションのドローンが壁や天井を抜けて、まっすぐ近道する。抜けるときは紫に光る。',
+                    'Put it in the slot inside a Drone Station’s frame (below the Production Upgrades) to let its drones take shortcuts straight through walls and roofs. They glow violet while passing through.'),
     'ドローンキット': ('ドローン・ステーションで輸送ドローンを1機印刷するたびに1つ使う、部品と外装の一式。',
                 'A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.'),
-    'ドローン・ステーション': ('ドローン用クリスタルメモリとドローンキットと電力で、輸送ドローンを印刷する（1機 20,000 FE。生産アップグレード1枚につき1機増え、2枚で3機）。ドローンは上空で待機し、半径64ブロックの発着ポートに呼ばれて荷物を運ぶ。',
-                    'Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks.'),
-    'ドローン発着ポート': ('空の梱包箱と荷物を入れ、行き先（同じ持ち主のほかのポート）を選んで発送すると、梱包して電力を払い、近くのドローンを呼ぶ。天井の扉が開いて箱がドローンへ渡る。届いた箱は自動で開梱される。電力は 2,000 FE＋距離1ブロックにつき 50 FE。',
-                  'Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block.'),
+    'ドローン・ステーション': ('ドローン用クリスタルメモリとドローンキットと電力で、メモリの型（ローター・ジェット・反重力）の輸送ドローンを印刷する（1機 20,000 FE。生産アップグレード1枚につき1機増え、2枚で3機）。ドローンは上空で待機し、半径64ブロックの発着ポートに呼ばれて荷物を運ぶ。位相透過アップグレードで壁を抜けて飛び、右レールのシールド許可証で使える人を限る。',
+                    'Prints cargo drones of its memory’s type (rotor, jet or anti-gravity) from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks. A Phase Shift Upgrade lets them fly through walls, and a Shield Permit on the right rail limits who can use it.'),
+    'ドローン発着ポート': ('空の梱包箱と荷物を入れ、行き先（同じ持ち主のほかのポート）を選んで発送すると、梱包して電力を払い、近くのドローンを呼ぶ。天井の扉が開いて箱がドローンへ渡る。届いた箱は自動で開梱される。電力は 2,000 FE＋距離1ブロックにつき 50 FE。荷物が決めた量までたまったら、登録した行き先へ自動で発送することもできる。ドローンは壁を避けて、空いている所を通ってくる。',
+                  'Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block. It can also auto-send to a set destination once cargo reaches a threshold. Drones find their way around walls through open space.'),
     '梱包箱': ('ドローンで送る荷物を詰める箱。160ブロックまで届く。梱包済みの箱は右クリックで開梱できる。',
             'A crate for cargo sent by drone. Reaches up to 160 blocks. Right-click a packed crate to unpack it.'),
     'バッテリー付き梱包箱': ('電池を足した梱包箱。760ブロックまで届く。',
@@ -357,9 +357,10 @@ DESC = {
     'ニュートリノ観測所': ('電力で広い範囲を調べ続け、鉱石と遺構を近くの人に見せ続ける。右クリックで表示を切り替える。',
                    'Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.'),
     'シールド許可証': ('シールド発生塔に入れると、登録した人だけが守りの中で作業できる。アンドロイド組立ステーションに入れると、登録した人もアンドロイドを操作でき、登録していない人はアンドロイドに攻撃される。'
-                '右クリックで自分を、ほかのプレイヤーに右クリックでその人と自分を登録する。放射冠だけはだれでも壊せる。',
+                'ドローン・ステーションに入れると、登録した人だけが画面を開ける。右クリックで自分を、ほかのプレイヤーに右クリックでその人と自分を登録する。放射冠だけはだれでも壊せる。',
                 'Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, '
-                'registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; '
+                'registered players may also control the android, and the android attacks anyone not registered. In a Drone Station, only '
+                'registered players may open its screen. Use to register yourself; '
                 'use on a player to register them and you. Anyone can break the emitter crown.'),
     'シールド発生塔コア': ('イベントホライズン・シールド発生塔の頭脳。基壇の2段目の手前の中央に置く。', 'The brain of the Event Horizon Shield Tower. Goes in the front middle of the second plinth layer.'),
     'イベントホライズン・シールド発生塔': ('半径32の中を爆発・荒らし・敵の湧きから守る塔。', 'Protects a 32-block radius from explosions, griefing and hostile spawns.'),

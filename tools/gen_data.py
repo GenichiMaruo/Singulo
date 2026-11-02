@@ -1259,6 +1259,11 @@ UI_LANG = {
     'gui.singulo.drone_station.status.5': ('運搬中', 'Delivering'),
     'gui.singulo.drone_station.status.6': ('ステーションの上がふさがっています', 'Something is blocking the top'),
     'gui.singulo.drone_station.status.7': ('空き', 'Empty'),
+    # 枠の行に出す短い言葉（長い状態だけ。行に乗せると、くわしい文は指したときに出す）
+    'gui.singulo.drone_station.row.0': ('メモリなし', 'No memory'),
+    'gui.singulo.drone_station.row.1': ('キットなし', 'No kit'),
+    'gui.singulo.drone_station.row.2': ('電力不足', 'Low power'),
+    'gui.singulo.drone_station.row.6': ('上がふさがり', 'Top blocked'),
     'gui.singulo.drone_station.memory': ('ドローン用クリスタルメモリ（減らない）', 'Drone Crystal Memory (not used up)'),
     'gui.singulo.drone_station.kit': ('ドローンキット（印刷ごとに1つ）', 'Drone Kit (one per print)'),
     'gui.singulo.drone_station.production': ('生産アップグレード（1枚で2機、2枚で3機）', 'Production Upgrade (1 for 2 drones, 2 for 3)'),

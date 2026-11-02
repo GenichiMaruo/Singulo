@@ -2672,8 +2672,8 @@
     "translation": "複製並貼上機器各面與自動排出的設定。同種機器之間也會複製配方選擇。用於彭羅斯反應爐時，複製目標自旋與投料間隔。"
   },
   "desc.singulo.shield_permit": {
-    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
-    "translation": "放入護盾塔：只有已登記的玩家能在範圍內建造、破壞或拿取物品。放入仿生人組裝站後，已登記的人也能操作仿生人，未登記的人會遭到仿生人攻擊。使用可登記自己；對玩家使用可登記對方與自己。任何人都能破壞發射冠。"
+    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. In a Drone Station, only registered players may open its screen. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
+    "translation": "放入護盾塔：只有已登記的玩家能在範圍內建造、破壞或拿取物品。放入仿生人組裝站後，已登記的人也能操作仿生人，未登記的人會遭到仿生人攻擊。放入無人機站後，只有已登記的人能打開其介面。使用可登記自己；對玩家使用可登記對方與自己。任何人都能破壞發射冠。"
   },
   "desc.singulo.shield_tower_body": {
     "source": "Corners of the 3×3 body and the base of the spire.",
@@ -12104,8 +12104,8 @@
     "translation": "右鍵拆箱"
   },
   "desc.singulo.drone_memory": {
-    "source": "A crystal memory smaller than an android’s, holding the design of a cargo drone. Put it in a Drone Station to print drones (it is not used up).",
-    "translation": "記錄了運輸無人機設計的水晶記憶體，比仿生人用的更小。放入無人機站即可列印無人機（不會消耗）。"
+    "source": "A crystal memory smaller than an android’s, holding the design of a four-rotor cargo drone (rotor type). Put it in a Drone Station to print rotor drones (it is not used up). Dropped by guard docks in any facility.",
+    "translation": "記錄了靠四個旋翼飛行的運輸無人機（旋翼型）設計的水晶記憶體，比仿生人用的更小。放入無人機站即可列印旋翼型無人機（不會消耗）。任何設施的警衛無人機塢都會掉落。"
   },
   "desc.singulo.drone_kit": {
     "source": "A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.",
@@ -12116,8 +12116,8 @@
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
   "desc.singulo.drone_station": {
-    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
-    "translation": "用無人機水晶記憶體、無人機套件和電力列印運輸無人機（每架 20,000 FE；每張生產升級增加 1 架，最多 3 架）。無人機在上空待命，為 64 格內的無人機起降港運送貨物。"
+    "source": "Prints cargo drones of its memory’s type (rotor, jet or anti-gravity) from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks. A Phase Shift Upgrade lets them fly through walls, and a Shield Permit on the right rail limits who can use it.",
+    "translation": "用無人機水晶記憶體、無人機套件和電力列印記憶體類型（旋翼、噴射、反重力）的運輸無人機（每架 20,000 FE；每張生產升級增加 1 架，最多 3 架）。無人機在上空待命，為 64 格內的無人機起降港運送貨物。相位穿透升級可讓無人機穿牆飛行，右側欄的護盾通行證可限制使用者。"
   },
   "summary.singulo.drone_station": {
     "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
@@ -12128,8 +12128,8 @@
     "translation": "製造地：工作台（第 2 階段）"
   },
   "desc.singulo.drone_port": {
-    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block.",
-    "translation": "放入空的包裝箱和貨物，選擇目的地（同一擁有者的其他起降港）並發送：它會打包貨物、支付電力並呼叫附近的無人機。頂部艙門打開，把箱子交給無人機。送達的箱子會自動拆開。電力：2,000 FE，每格距離另加 50 FE。"
+    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block. It can also auto-send to a set destination once cargo reaches a threshold. Drones find their way around walls through open space.",
+    "translation": "放入空的包裝箱和貨物，選擇目的地（同一擁有者的其他起降港）並發送：它會打包貨物、支付電力並呼叫附近的無人機。頂部艙門打開，把箱子交給無人機。送達的箱子會自動拆開。電力：2,000 FE，每格距離另加 50 FE。貨物達到設定數量後，也可以自動發往登記的目的地。無人機會避開牆壁，從空曠處飛來。"
   },
   "summary.singulo.drone_port": {
     "source": "Packs cargo into crates and sends or receives it by drone.",
@@ -12416,8 +12416,8 @@
     "translation": "無人機穿過牆壁"
   },
   "desc.singulo.drone_phase_upgrade": {
-    "source": "Install it in the upgrade slot on a Drone Station’s right rail to let its drones fly straight through walls and roofs. They glow violet while passing through.",
-    "translation": "裝在無人機站右側欄的強化格中，該站的無人機就能直線穿過牆壁和屋頂飛行。穿過時會發出紫光。"
+    "source": "Put it in the slot inside a Drone Station’s frame (below the Production Upgrades) to let its drones take shortcuts straight through walls and roofs. They glow violet while passing through.",
+    "translation": "裝在無人機站框內的格子（生產升級下方）中，該站的無人機就能直線穿過牆壁和屋頂抄近路。穿過時會發出紫光。"
   },
   "howto.singulo.drone_phase_upgrade": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -12428,8 +12428,8 @@
     "translation": "飛行路線與相位穿透"
   },
   "guide.singulo.drones.route.body": {
-    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly straight through walls. They glow violet from just before a wall, and the glow shows through it.",
-    "translation": "無人機不會穿過牆壁或屋頂飛行。目的地較近時，會沿著空曠處尋找路線；較遠時，會先從出發點飛到能看見天空的地方，在高於地形處巡航，再從目的地上方的天空降下。也會從門、窗或天窗進入建築內的起降港。沒有開口的房間裡的起降港無法到達，運輸中頁面會顯示「無路線」（貨物不會遺失，無人機會原地等待並重新尋找路線）。\n把第 4 階段在精密組裝台製作的相位穿透升級放入無人機站右側欄的強化格，該站的無人機就會直線穿牆飛行。穿牆前一點就開始發出紫光，隔著牆也能看到發光的身影。"
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the slot inside a Drone Station’s frame (below the Production Upgrades) and its drones take shortcuts straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "無人機不會穿過牆壁或屋頂飛行。目的地較近時，會沿著空曠處尋找路線；較遠時，會先從出發點飛到能看見天空的地方，在高於地形處巡航，再從目的地上方的天空降下。也會從門、窗或天窗進入建築內的起降港。沒有開口的房間裡的起降港無法到達，運輸中頁面會顯示「無路線」（貨物不會遺失，無人機會原地等待並重新尋找路線）。\n把第 4 階段在精密組裝台製作的相位穿透升級放入無人機站框內的格子（生產升級下方），該站的無人機就會直線穿牆抄近路。穿牆前一點就開始發出紫光，隔著牆也能看到發光的身影。"
   },
   "item.singulo.drone_memory_jet": {
     "source": "Drone Crystal Memory (Jet)",
@@ -12462,5 +12462,21 @@
   "guide.singulo.drones.kinds.body": {
     "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
     "translation": "記憶體的類型決定無人機站列印的無人機類型。較高級的類型只會從較高級設施的警衛無人機塢掉落。\n- 旋翼型（任何設施）：靠四個旋翼飛行，標準速度。\n- 噴射型（研究棟及更高級設施）：靠雙噴射引擎飛行，最快的類型（旋翼型的 1.6 倍）。轉彎時會傾斜機身。\n- 反重力型（封閉培養設施和地下仿生人研究所，稀有）：靠反重力場漂浮（1.25 倍）。四個浮游砲以牽引光束吊住箱子。\n更換記憶體不會改變已列印的無人機。想換類型時，請拆解無人機後重新列印。"
+  },
+  "gui.singulo.drone_station.row.0": {
+    "source": "No memory",
+    "translation": "無記憶體"
+  },
+  "gui.singulo.drone_station.row.1": {
+    "source": "No kit",
+    "translation": "無套件"
+  },
+  "gui.singulo.drone_station.row.2": {
+    "source": "Low power",
+    "translation": "電力不足"
+  },
+  "gui.singulo.drone_station.row.6": {
+    "source": "Top blocked",
+    "translation": "上方被擋住"
   }
 }

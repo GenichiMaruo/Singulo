@@ -288,7 +288,7 @@ public class CargoDrone extends Mob {
             bankO = bank;
             bank += (Mth.clamp(Mth.wrapDegrees(yBodyRot - yBodyRotO) * 5, -38, 38) - bank) * 0.2F;
             // 反重力型: 足もとから、浮かせている場の光の粒がゆっくり落ちる
-            if (kind() == DroneKind.GRAVITY && printed() && !dismantling() && random.nextFloat() < 0.25F) {
+            if (kind() == DroneKind.GRAVITY && printed() && !dismantling() && random.nextFloat() < 0.08F) {
                 level().addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, getX() + (random.nextDouble() - 0.5) * 0.5,
                         getY() + (crateTier() > 0 ? 0 : 0.6), getZ() + (random.nextDouble() - 0.5) * 0.5, 0, -0.03, 0);
             }

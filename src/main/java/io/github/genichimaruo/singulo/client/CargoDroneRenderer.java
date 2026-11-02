@@ -314,10 +314,10 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
 
     /**
      * 反重力の場: 箱を持っている間は、4つのビットの先から箱の上の四隅へ牽引の光を当て、箱を青緑の場で包む（ゆっくり明滅）。
-     * 空のときは、足もとに浮かせる場の輪が2つ、広がりながら下りて消える。
+     * 空のときは、足もとに浮かせる場のうすい輪が、広がりながら下りて消える。核・ビットの先・放射板のまわりは、外へぼんやりと光る。
      */
     static final class GravityField extends RenderLayer<CargoDrone, Model> {
-        static final int TEAL = 0x5CFFE0, TEAL_DEEP = 0x1FB5A8;
+        static final int TEAL = 0x5CFFE0, TEAL_DEEP = 0x1FB5A8, TEAL_HI = 0xD2FFF6;
 
         GravityField(RenderLayerParent<CargoDrone, Model> parent) {
             super(parent);
@@ -340,25 +340,62 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
                     float a = Mth.PI / 4 + i * Mth.HALF_PI;
                     Vec3 corner = new Vec3(Mth.sin(a) * 5.2F * u, 14.2F * u, Mth.cos(a) * 5.2F * u);
                     Vec3 from = new Vec3(tip.x(), tip.y(), tip.z());
-                    FxDraw.beam(pose.last(), fx, from, corner, 0.7F * u, TEAL, (int) (150 * pulse));
-                    FxDraw.beam(pose.last(), fx, from, corner, 0.25F * u, 0xEFFFFB, (int) (200 * pulse));
+                    FxDraw.beam(pose.last(), fx, from, corner, 0.35F * u, TEAL, (int) (110 * pulse));
                 }
                 // 箱を包む場（箱より少し大きい）
                 float r = 5.5F * u;
-                FxDraw.box(pose, fx, -r, 13.6F * u, -r, r, 24.3F * u, r, FxDraw.FULL_BRIGHT, TEAL_DEEP, (int) (55 * pulse));
+                FxDraw.box(pose, fx, -r, 13.6F * u, -r, r, 24.3F * u, r, FxDraw.FULL_BRIGHT, TEAL_DEEP, (int) (28 * pulse));
             } else {
                 pose.pushPose();
                 pose.translate(0, 14.5F * u, 0);
-                for (int j = 0; j < 2; j++) {
-                    float k = ((ageInTicks + j * 14) / 28) % 1;
-                    pose.pushPose();
-                    pose.translate(0, k * 7 * u, 0);                        // モデルの座標は下が +Y
-                    float inner = (2.5F + k * 5) * u;
-                    FxDraw.ring(pose.last(), fx, inner, inner + (1.2F - k * 0.6F) * u, TEAL, (int) (150 * (1 - k)), (int) (40 * (1 - k)));
-                    pose.popPose();
-                }
+                float k = (ageInTicks / 32) % 1;
+                pose.translate(0, k * 7 * u, 0);                            // モデルの座標は下が +Y
+                float inner = (2.5F + k * 5) * u;
+                FxDraw.ring(pose.last(), fx, inner, inner + (1.2F - k * 0.6F) * u, TEAL, (int) (90 * (1 - k)), (int) (20 * (1 - k)));
                 pose.popPose();
             }
+            // 外側へぼんやり広がる光（カメラを向いた、中心から外へ薄くなる円）: 核は大きく、ビットの先と放射板は小さく
+            org.joml.Matrix4f m = pose.last().pose();
+            float breathe = 0.85F + 0.15F * Mth.sin(ageInTicks * 0.18F);
+            PoseStack local = new PoseStack();
+            g.coreSpace(local);
+            halo(fx, m.transformPosition(local.last().pose().transformPosition(new Vector3f())), 0.62F * breathe, TEAL, (int) (75 * pulse));
+            halo(fx, m.transformPosition(local.last().pose().transformPosition(new Vector3f())), 0.3F, TEAL_HI, (int) (60 * pulse));
+            halo(fx, m.transformPosition(new Vector3f(0, (g.bodyY() + 5.8F) * u, 0)), 0.22F, TEAL, (int) (55 * pulse));
+            for (int i = 0; i < 4; i++) {
+                PoseStack bit = new PoseStack();
+                g.tipSpace(i, bit);
+                Vector3f tip = bit.last().pose().transformPosition(new Vector3f(0, 4.6F * u, 0));
+                halo(fx, m.transformPosition(tip), 0.16F, TEAL, (int) (70 * pulse));
+            }
+        }
+
+        /**
+         * カメラを向いた、ぼんやりした光の円（中心が濃く、外へ向かって消える）。at はカメラから見た位置（ポーズを掛けたあと）。
+         * 光を足す描き方なので、重なるほど明るくなる。
+         */
+        private static void halo(VertexConsumer vc, Vector3f at, float radius, int rgb, int alpha) {
+            org.joml.Quaternionf facing = net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
+            org.joml.Matrix4f id = new org.joml.Matrix4f();
+            int red = (rgb >> 16) & 0xFF, green = (rgb >> 8) & 0xFF, blue = rgb & 0xFF;
+            float[] rs = {0.02F, radius * 0.35F, radius};
+            int[] as = {alpha, (int) (alpha * 0.55F), 0};
+            int sides = 16;
+            for (int ring = 0; ring < 2; ring++) {
+                for (int i = 0; i < sides; i++) {
+                    float a0 = Mth.TWO_PI * i / sides, a1 = Mth.TWO_PI * (i + 1) / sides;
+                    Vector3f p0 = point(facing, at, rs[ring], a0), p1 = point(facing, at, rs[ring], a1);
+                    Vector3f q1 = point(facing, at, rs[ring + 1], a1), q0 = point(facing, at, rs[ring + 1], a0);
+                    vc.addVertex(id, p0.x, p0.y, p0.z).setColor(red, green, blue, as[ring]);
+                    vc.addVertex(id, p1.x, p1.y, p1.z).setColor(red, green, blue, as[ring]);
+                    vc.addVertex(id, q1.x, q1.y, q1.z).setColor(red, green, blue, as[ring + 1]);
+                    vc.addVertex(id, q0.x, q0.y, q0.z).setColor(red, green, blue, as[ring + 1]);
+                }
+            }
+        }
+
+        private static Vector3f point(org.joml.Quaternionf facing, Vector3f at, float r, float a) {
+            return facing.transform(new Vector3f(Mth.cos(a) * r, Mth.sin(a) * r, 0)).add(at);
         }
     }
 
@@ -679,6 +716,18 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
                 bits[i] = body.getChild("bit_" + i);
                 pods[i] = bits[i].getChild("pod_" + i);
             }
+        }
+
+        /** 核の中心の座標へ。 */
+        void coreSpace(PoseStack pose) {
+            root.translateAndRotate(pose);
+            body.translateAndRotate(pose);
+            core.translateAndRotate(pose);
+        }
+
+        /** 胴の高さ（モデルの座標。待機中は揺れる）。 */
+        float bodyY() {
+            return body.y;
         }
 
         /** ビット i の座標へ（先は (0, 4.5, 0) の向き）。 */

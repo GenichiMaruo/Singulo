@@ -2672,8 +2672,8 @@
     "translation": "기계의 입출력 면과 자동 배출 설정을 복사해 붙여 넣습니다. 같은 종류의 기계에는 레시피 선택도 복사합니다. 펜로즈 반응로에서는 목표 스핀과 투입 간격을 복사합니다."
   },
   "desc.singulo.shield_permit": {
-    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
-    "translation": "실드 타워에 넣으면 등록된 플레이어만 그 안에서 블록을 설치하거나 부수거나 아이템을 가져갈 수 있습니다. 안드로이드 조립 스테이션에 넣으면 등록된 사람도 안드로이드를 조작할 수 있고, 등록되지 않은 사람은 안드로이드에게 공격받습니다. 사용하면 자신을, 다른 플레이어에게 사용하면 그 플레이어와 자신을 등록합니다. 이미터 크라운은 누구나 부술 수 있습니다."
+    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. In a Drone Station, only registered players may open its screen. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
+    "translation": "실드 타워에 넣으면 등록된 플레이어만 그 안에서 블록을 설치하거나 부수거나 아이템을 가져갈 수 있습니다. 안드로이드 조립 스테이션에 넣으면 등록된 사람도 안드로이드를 조작할 수 있고, 등록되지 않은 사람은 안드로이드에게 공격받습니다. 드론 스테이션에 넣으면 등록된 사람만 화면을 열 수 있습니다. 사용하면 자신을, 다른 플레이어에게 사용하면 그 플레이어와 자신을 등록합니다. 이미터 크라운은 누구나 부술 수 있습니다."
   },
   "desc.singulo.shield_tower_body": {
     "source": "Corners of the 3×3 body and the base of the spire.",
@@ -12104,8 +12104,8 @@
     "translation": "우클릭으로 상자 풀기"
   },
   "desc.singulo.drone_memory": {
-    "source": "A crystal memory smaller than an android’s, holding the design of a cargo drone. Put it in a Drone Station to print drones (it is not used up).",
-    "translation": "수송 드론의 설계를 기록한, 안드로이드용보다 작은 크리스털 메모리. 드론 스테이션에 넣으면 드론을 출력할 수 있다(소모되지 않음)."
+    "source": "A crystal memory smaller than an android’s, holding the design of a four-rotor cargo drone (rotor type). Put it in a Drone Station to print rotor drones (it is not used up). Dropped by guard docks in any facility.",
+    "translation": "네 개의 로터로 나는 수송 드론(로터형)의 설계를 기록한, 안드로이드용보다 작은 크리스털 메모리. 드론 스테이션에 넣으면 로터형 드론을 출력할 수 있다(소모되지 않음). 모든 시설의 가드 독에서 나온다."
   },
   "desc.singulo.drone_kit": {
     "source": "A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.",
@@ -12116,8 +12116,8 @@
     "translation": "제작: 정밀 조립기(2단계)"
   },
   "desc.singulo.drone_station": {
-    "source": "Prints cargo drones from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks.",
-    "translation": "드론 크리스털 메모리, 드론 키트, 전력으로 수송 드론을 출력한다(1대 20,000 FE, 생산 업그레이드 1장마다 1대 늘어 최대 3대). 드론은 위에서 대기하다가 64블록 안의 드론 포트에 불려 화물을 나른다."
+    "source": "Prints cargo drones of its memory’s type (rotor, jet or anti-gravity) from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks. A Phase Shift Upgrade lets them fly through walls, and a Shield Permit on the right rail limits who can use it.",
+    "translation": "드론 크리스털 메모리, 드론 키트, 전력으로 메모리 종류(로터·제트·반중력)의 수송 드론을 출력한다(1대 20,000 FE, 생산 업그레이드 1장마다 1대 늘어 최대 3대). 드론은 위에서 대기하다가 64블록 안의 드론 포트에 불려 화물을 나른다. 위상 투과 업그레이드로 벽을 통과해 날고, 오른쪽 레일의 보호막 허가증으로 사용할 수 있는 사람을 제한한다."
   },
   "summary.singulo.drone_station": {
     "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
@@ -12128,8 +12128,8 @@
     "translation": "제작: 제작대(2단계)"
   },
   "desc.singulo.drone_port": {
-    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block.",
-    "translation": "빈 포장 상자와 화물을 넣고 목적지(같은 소유자의 다른 포트)를 골라 발송하면, 화물을 포장하고 전력을 지불한 뒤 근처의 드론을 부른다. 천장 해치가 열리고 상자가 드론에게 건네진다. 도착한 상자는 자동으로 풀린다. 전력: 2,000 FE + 1블록당 50 FE."
+    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block. It can also auto-send to a set destination once cargo reaches a threshold. Drones find their way around walls through open space.",
+    "translation": "빈 포장 상자와 화물을 넣고 목적지(같은 소유자의 다른 포트)를 골라 발송하면, 화물을 포장하고 전력을 지불한 뒤 근처의 드론을 부른다. 천장 해치가 열리고 상자가 드론에게 건네진다. 도착한 상자는 자동으로 풀린다. 전력: 2,000 FE + 1블록당 50 FE. 화물이 정한 양만큼 쌓이면 등록한 목적지로 자동 발송할 수도 있다. 드론은 벽을 피해 빈 곳으로 날아온다."
   },
   "summary.singulo.drone_port": {
     "source": "Packs cargo into crates and sends or receives it by drone.",
@@ -12416,8 +12416,8 @@
     "translation": "드론이 벽을 통과한다"
   },
   "desc.singulo.drone_phase_upgrade": {
-    "source": "Install it in the upgrade slot on a Drone Station’s right rail to let its drones fly straight through walls and roofs. They glow violet while passing through.",
-    "translation": "드론 스테이션 오른쪽 레일의 강화 칸에 넣으면, 그 스테이션의 드론이 벽과 지붕을 통과해 곧장 난다. 통과할 때 보라색으로 빛난다."
+    "source": "Put it in the slot inside a Drone Station’s frame (below the Production Upgrades) to let its drones take shortcuts straight through walls and roofs. They glow violet while passing through.",
+    "translation": "드론 스테이션 틀 안의 칸(생산 업그레이드 아래)에 넣으면, 그 스테이션의 드론이 벽과 지붕을 통과해 곧장 지름길로 난다. 통과할 때 보라색으로 빛난다."
   },
   "howto.singulo.drone_phase_upgrade": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -12428,8 +12428,8 @@
     "translation": "경로와 위상 투과"
   },
   "guide.singulo.drones.route.body": {
-    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly straight through walls. They glow violet from just before a wall, and the glow shows through it.",
-    "translation": "드론은 벽이나 지붕을 통과해 날지 않는다. 가까운 목적지는 빈 곳을 따라 길을 찾고, 먼 목적지는 출발점에서 하늘이 보이는 곳으로 나가 지형보다 높은 곳을 순항한 뒤 목적지 위의 하늘에서 내려온다. 건물 안의 포트에도 문이나 창, 천창으로 들어간다. 열린 곳이 없는 방의 포트에는 들어갈 수 없으며, 운송 중 페이지에 「경로 없음」이 표시된다(화물은 사라지지 않고, 드론은 그 자리에서 기다리며 길을 다시 찾는다).\n4단계 정밀 조립기로 만드는 위상 투과 업그레이드를 드론 스테이션 오른쪽 레일의 강화 칸에 넣으면, 그 스테이션의 드론은 벽을 통과해 곧장 난다. 벽을 지나기 조금 전부터 보라색으로 빛나고, 벽 너머로도 빛나는 모습이 보인다."
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the slot inside a Drone Station’s frame (below the Production Upgrades) and its drones take shortcuts straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "드론은 벽이나 지붕을 통과해 날지 않는다. 가까운 목적지는 빈 곳을 따라 길을 찾고, 먼 목적지는 출발점에서 하늘이 보이는 곳으로 나가 지형보다 높은 곳을 순항한 뒤 목적지 위의 하늘에서 내려온다. 건물 안의 포트에도 문이나 창, 천창으로 들어간다. 열린 곳이 없는 방의 포트에는 들어갈 수 없으며, 운송 중 페이지에 「경로 없음」이 표시된다(화물은 사라지지 않고, 드론은 그 자리에서 기다리며 길을 다시 찾는다).\n4단계 정밀 조립기로 만드는 위상 투과 업그레이드를 드론 스테이션 틀 안의 칸(생산 업그레이드 아래)에 넣으면, 그 스테이션의 드론은 벽을 통과해 곧장 지름길로 난다. 벽을 지나기 조금 전부터 보라색으로 빛나고, 벽 너머로도 빛나는 모습이 보인다."
   },
   "item.singulo.drone_memory_jet": {
     "source": "Drone Crystal Memory (Jet)",
@@ -12462,5 +12462,21 @@
   "guide.singulo.drones.kinds.body": {
     "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
     "translation": "메모리의 종류가 스테이션이 프린트하는 드론의 종류를 정한다. 상위 종류는 상위 시설의 가드 독에서만 나온다.\n- 로터형(모든 시설): 네 개의 로터로 나는 표준 속도의 종류.\n- 제트형(연구동 이상): 쌍발 제트로 나는 가장 빠른 종류(로터형의 1.6배). 선회할 때 기체를 기울인다.\n- 반중력형(봉쇄 배양 시설과 지하 안드로이드 연구소, 드묾): 반중력장으로 떠다닌다(1.25배). 네 개의 비트가 견인 광선으로 상자를 매단다.\n메모리를 바꿔도 이미 프린트한 드론은 바뀌지 않는다. 종류를 바꾸려면 드론을 해체하고 다시 프린트한다."
+  },
+  "gui.singulo.drone_station.row.0": {
+    "source": "No memory",
+    "translation": "메모리 없음"
+  },
+  "gui.singulo.drone_station.row.1": {
+    "source": "No kit",
+    "translation": "키트 없음"
+  },
+  "gui.singulo.drone_station.row.2": {
+    "source": "Low power",
+    "translation": "전력 부족"
+  },
+  "gui.singulo.drone_station.row.6": {
+    "source": "Top blocked",
+    "translation": "위가 막힘"
   }
 }

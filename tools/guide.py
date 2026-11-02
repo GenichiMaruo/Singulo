@@ -1187,15 +1187,15 @@ CHAPTERS = [
          'ドローンは壁や天井を抜けずに飛びます。近い行き先は、空いている所をたどる道を探し、遠い行き先は、出発点から空の見える所へ出て、'
          '地形より高い所を巡航し、行き先の上の空から降ります。建物の中のポートにも、扉や窓、天窓から入っていきます。'
          '開いた所のない部屋のポートには入れず、輸送中のページに「経路なし」と出ます（荷物は失われず、ドローンはその場で待って道を探し直します）。\n'
-         '段階4の精密組立台で作る位相透過アップグレードを、ドローン・ステーションの右レールの強化の段に入れると、そのステーションのドローンは'
-         '壁を抜けてまっすぐ飛びます。壁を抜ける少し前から紫に光り、壁越しにも光る姿が見えます。',
+         '段階4の精密組立台で作る位相透過アップグレードを、ドローン・ステーションの枠の中の欄（生産アップグレードの下）に入れると、そのステーションのドローンは'
+         '壁を抜けてまっすぐ近道します。壁を抜ける少し前から紫に光り、壁越しにも光る姿が見えます。',
          'Routes and phase shift',
          'Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave '
          'to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through '
          'doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page '
          '(the cargo is safe; the drone waits and searches again).\n'
-         'Put a Phase Shift Upgrade (stage 4, Precision Assembler) in the upgrade slot on a Drone Station’s right rail and its drones fly '
-         'straight through walls. They glow violet from just before a wall, and the glow shows through it.'),
+         'Put a Phase Shift Upgrade (stage 4, Precision Assembler) in the slot inside a Drone Station’s frame (below the Production Upgrades) '
+         'and its drones take shortcuts straight through walls. They glow violet from just before a wall, and the glow shows through it.'),
         ('auto', '自動発送',
          '発送のタブの下の段で、自動発送を使えます。しきい値のボタンを押すたびに、しない・1個・64個・256個・満杯（荷物の9欄すべてがいっぱい）と切り替わります。一覧で行き先を選んで「登録」を押すと、それが自動発送の行き先になります（手で送る行き先とは別に覚えます）。\n荷物の欄がしきい値までたまり、2秒たっても増えなければ（満杯ならすぐ）、登録した行き先へ自動で発送します。空き箱・射程・電力・ドローンの条件は手で送るときと同じです。ホッパーやパイプで荷物を入れ続ければ、採掘場などから拠点へ自動で運び続けられます。',
          'Auto-send',

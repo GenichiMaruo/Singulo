@@ -296,6 +296,7 @@ JET_BLUE = (84, 170, 255)
 JET_HOT = (220, 240, 255)
 TEAL = (92, 255, 224)
 TEAL_HI = (210, 255, 246)
+TEAL_DIM = (40, 128, 120)
 
 
 def _faces(u, v, w, h, dd):
@@ -474,7 +475,7 @@ def jet_textures(te, save):
 
 
 def gravity_textures(te, save):
-    """反重力型: 暗い菫色の結晶（縁と芯が青緑に光る）、真珠色の光輪とビット、光る先、下の放射板の輪。"""
+    """反重力型: 暗い菫色の結晶（芯だけ光る）、真珠色の光輪とビット。光るのは芯・光輪の外側・ビットの先・放射板の真ん中だけ。"""
     sk = _Skin(37)
     crystal, pearl, pearl_sh = (44, 30, 70), (226, 230, 238), (190, 196, 210)
     violet = (120, 90, 200)
@@ -484,53 +485,48 @@ def gravity_textures(te, save):
         for k, r in f.items():
             sk.fill(r, pearl_sh if mat == 'pearl' and k in ('side_a', 'side_b', 'down') else cols[mat], noise=6 if mat == 'crystal' else 4)
         if name == 'gem':
-            # 面ごとに: 縁は青緑に光り、真ん中に明るい芯と菫の光
+            # 面ごとに: 縁は少し明るい菫の線（光らない）、真ん中の芯だけが青緑に光る
             for x0, y0, x1, y1 in f.values():
                 for x in range(x0, x1):
-                    sk.px(x, y0, TEAL, lit=True)
-                    sk.px(x, y1 - 1, TEAL, lit=True)
+                    sk.px(x, y0, violet)
+                    sk.px(x, y1 - 1, violet)
                 for y in range(y0, y1):
-                    sk.px(x0, y, TEAL, lit=True)
-                    sk.px(x1 - 1, y, TEAL, lit=True)
+                    sk.px(x0, y, violet)
+                    sk.px(x1 - 1, y, violet)
                 cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
                 sk.px(cx, cy, TEAL_HI, lit=True)
-                sk.px(cx - 1, cy, violet, lit=True)
-                sk.px(cx, cy + 1, violet, lit=True)
         elif name == 'seg':
-            for k in ('back', 'up', 'down'):
-                x0, y0, x1, y1 = f[k]
-                for x in range(x0 + 1, x1 - 1):
-                    sk.px(x, y0, TEAL, lit=True)
+            # 光輪は外側の面の真ん中だけ光る
+            x0, y0, x1, y1 = f['back']
+            for x in range(x0 + 1, x1 - 1):
+                sk.px(x, y0, TEAL, lit=True)
         elif name == 'emitter':
+            # 放射板は下の面の真ん中だけ光り、縁は暗い青緑
             x0, y0, x1, y1 = f['down']
             for y in range(y0, y1):
                 for x in range(x0, x1):
                     if x in (x0, x1 - 1) or y in (y0, y1 - 1):
-                        sk.px(x, y, TEAL, lit=True)
-            sk.lit((x0 + 1, y0 + 1, x1 - 1, y1 - 1), TEAL_HI)
-            for k in ('front', 'back', 'side_a', 'side_b'):
-                x0, y0, x1, y1 = f[k]
-                for x in range(x0, x1):
-                    sk.px(x, y0, TEAL, lit=True)
+                        sk.px(x, y, TEAL_DIM)
+            sk.lit((x0 + 1, y0 + 1, x1 - 1, y1 - 1), TEAL)
         elif name == 'spine':
-            sk.lit(f['up'], TEAL_HI)
+            sk.lit(f['up'], TEAL)
         elif name == 'pod':
-            # 白い殻の胴を回る青緑の帯と、下の縁の影
+            # 白い殻の胴を回る暗い青緑の帯（光らない）と、下の縁の影
             for k in ('front', 'back', 'side_a', 'side_b'):
                 x0, y0, x1, y1 = f[k]
                 for x in range(x0, x1):
-                    sk.px(x, y0 + 2, TEAL, lit=True)
+                    sk.px(x, y0 + 2, TEAL_DIM)
                     sk.px(x, y1 - 1, sk.shade(pearl_sh, -30))
         elif name == 'tip':
+            # 先は下の面だけ光る（横は光らない青緑）
             for r in f.values():
-                sk.lit(r, TEAL)
-            sk.lit(f['down'], TEAL_HI)
+                sk.fill(r, TEAL_DIM, bevel=False, noise=2)
+            sk.lit(f['down'], TEAL)
         elif name == 'plate':
             for k in ('back', 'front'):
                 x0, y0, x1, y1 = f[k]
                 for x in range(x0, x1):
-                    sk.px(x, y0, TEAL, lit=True)
-                sk.px((x0 + x1) // 2, (y0 + y1) // 2, TEAL_HI, lit=True)
+                    sk.px(x, y0, violet)
     save(sk.base, te / 'cargo_drone_gravity.png')
     save(sk.glow, te / 'cargo_drone_gravity_glow.png')
 

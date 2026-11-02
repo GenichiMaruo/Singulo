@@ -14,6 +14,10 @@ import net.minecraft.world.item.ItemStack;
  * 右に3機ぶんの様子（受け持てない枠は暗く）、右端に蓄電のゲージ。
  */
 public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
+    /** 枠の行では短い言葉にする状態（メモリなし・キットなし・電力不足・上がふさがり）。 */
+    private static final java.util.Set<Integer> SHORT = java.util.Set.of(DroneStationBlockEntity.S_NO_MEMORY, DroneStationBlockEntity.S_NO_KIT,
+            DroneStationBlockEntity.S_NO_ENERGY, DroneStationBlockEntity.S_BLOCKED);
+
     /** ドローンの光の色（ステーションの顔・ドローンの灯と同じ橙）。 */
     public static final int ACCENT = 0xF0A040;
     /** 行の右端のボタン（解体・また印刷する）の大きさ。 */
@@ -102,8 +106,15 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
             int c = !used || s == DroneStationBlockEntity.S_STOPPED ? skin.dim() : s == DroneStationBlockEntity.S_IDLE || s == DroneStationBlockEntity.S_FLYING
                     ? 0xFF000000 | ACCENT : s == DroneStationBlockEntity.S_PRINTING ? GuiSkin.OK : GuiSkin.WARN;
             droneGlyph(g, rx + 3, ry + 3, c);
-            Component text = Component.translatable(used ? "gui.singulo.drone_station.status." + s : "gui.singulo.drone_station.status.7");
+            // 長い状態は短い言葉にして（縮めると読めないほど小さくなる）、くわしい文は行を指したときに出す
+            boolean brief = used && SHORT.contains(s);
+            Component text = Component.translatable(!used ? "gui.singulo.drone_station.status.7"
+                    : brief ? "gui.singulo.drone_station.row." + s : "gui.singulo.drone_station.status." + s);
             AndroidStationScreen.fit(g, font, text, rx + 16, ry + 3, DroneStationMenu.UNIT_W - 19 - ROW_BUTTON, used ? skin.text() : skin.dim());
+            if (brief) {
+                area(DroneStationMenu.UNIT_X, DroneStationMenu.UNIT_Y + i * DroneStationMenu.UNIT_ROW, DroneStationMenu.UNIT_W - ROW_BUTTON - 3,
+                        DroneStationMenu.UNIT_ROW - 2, List.of(Component.translatable("gui.singulo.drone_station.status." + s)));
+            }
             int action = action(i);
             if (action != 0) {
                 int[] b = rowButton(i);
