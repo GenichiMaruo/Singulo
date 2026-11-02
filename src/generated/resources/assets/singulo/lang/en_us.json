@@ -1343,6 +1343,7 @@
   "gui.singulo.reactor.state.unformed": "Not formed",
   "gui.singulo.reason.ambiguous": "The materials for %s are in, but the same mix appears while loading other recipes, so it starts 3 seconds after you stop adding items.",
   "gui.singulo.reason.arrange": "- The amounts are there. Try putting each material in its own slot.",
+  "gui.singulo.reason.capacity_exceeded": "Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold",
   "gui.singulo.reason.capacity_upgrade": "Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot",
   "gui.singulo.reason.empty": "Put in materials to start",
   "gui.singulo.reason.extra": "The materials for %s are in, but so are items it does not use, so it is not made automatically.",

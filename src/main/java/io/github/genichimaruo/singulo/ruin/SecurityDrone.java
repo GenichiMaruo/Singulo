@@ -292,6 +292,11 @@ public class SecurityDrone extends Monster {
         super.addAdditionalSaveData(tag);
         tag.putInt("tier", tier());
         tag.putBoolean("facility_spawned", facilitySpawned);
+        // 出撃したドックと行動範囲（バニラは保存しないので、読み込み直すとドックに撃破を知らせられなくなる）
+        if (hasRestriction()) {
+            tag.put("home", net.minecraft.nbt.NbtUtils.writeBlockPos(getRestrictCenter()));
+            tag.putFloat("home_radius", getRestrictRadius());
+        }
     }
 
     @Override
@@ -301,6 +306,7 @@ public class SecurityDrone extends Monster {
         if (tag.contains("tier")) {
             entityData.set(TIER, Mth.clamp(tag.getInt("tier"), 1, 3));
         }
+        net.minecraft.nbt.NbtUtils.readBlockPos(tag, "home").ifPresent(home -> restrictTo(home, (int) tag.getFloat("home_radius")));
     }
 
     /**

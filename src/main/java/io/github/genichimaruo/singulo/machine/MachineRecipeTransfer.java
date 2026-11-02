@@ -21,7 +21,8 @@ public final class MachineRecipeTransfer {
         if (!menu.type().id().equals(recipe.station()) || recipe.mass().isPresent()) return null;
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < menu.type().inputSlots(); i++) slots.add(i);
-        if (menu.type().hasCatalystSlot()) slots.add(menu.type().catalystSlot());
+        // The catalyst reserve is only rewritten when the recipe needs a catalyst that is not already there,
+        // so reserves stocked for later recipes stay in the machine.
         List<Need> needs = new ArrayList<>();
         int input = 0;
         boolean catalystUsed = false;
@@ -34,9 +35,14 @@ public final class MachineRecipeTransfer {
                 catalystUsed = true;
                 target = menu.type().catalystSlot();
                 if (ingredient.uses() > 0 && ingredient.usesFrom(menu.loadedCatalyst()) > 0) {
-                    slots.remove(Integer.valueOf(target));
                     continue;
                 }
+                ItemStack reserve = menu.getSlot(target).getItem();
+                if (!reserve.isEmpty() && reserve.getCount() >= Math.max(1, ingredient.count()) && (ingredient.uses() > 0
+                        ? ingredient.usesFrom(reserve.copyWithCount(1)) > 0 : ingredient.ingredient().test(reserve))) {
+                    continue;
+                }
+                slots.add(target);
             } else {
                 if (input >= menu.type().inputSlots()) return null;
                 target = input++;
@@ -50,13 +56,18 @@ public final class MachineRecipeTransfer {
         }
         if (needs.isEmpty()) return null; // Fluid-only recipes have no items to transfer.
         Plan best = null;
-        for (int batches = 1; batches <= (maxTransfer ? 64 : 1); batches++) {
+        // One search budget for every batch count, so a max transfer costs at most a few thousand steps per packet
+        int[] budget = {8192};
+        for (int batches = 1; batches <= (maxTransfer ? 64 : 1) && budget[0] > 0; batches++) {
             List<ItemStack> pool = new ArrayList<>();
             for (int slot : slots) pool.add(menu.getSlot(slot).getItem().copy());
             for (int i = 0; i < 36; i++) pool.add(menu.getSlot(menu.type().itemSlots() + i).getItem().copy());
             List<ItemStack> placed = new ArrayList<>();
             for (int ignored : slots) placed.add(ItemStack.EMPTY);
-            Plan next = allocate(menu, slots, needs, 0, batches, pool, placed, new int[]{4096});
+            Plan next = allocate(menu, slots, needs, 0, batches, pool, placed, budget);
+            // A small count can fail where a larger one fits (moving a whole stack frees inventory space),
+            // but once a count fits, a larger count that fails means the materials or the slot ran out.
+            if (next == null && best != null) break;
             if (next != null) best = next;
         }
         return best;

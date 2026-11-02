@@ -111,15 +111,21 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         };
     }
 
+    /** 1 tick の消費が蓄電容量を超えるとき: 足りる容量アップグレード（Mk3 でも足りなければ、そのこと）。 */
+    public static Component capacityReason(int demand) {
+        int tier = io.github.genichimaruo.singulo.machine.CapacityUpgrades.requiredTier(demand);
+        var energy = io.github.genichimaruo.singulo.energy.EnergyText.of(demand);
+        return tier == 0 ? Component.translatable("gui.singulo.reason.capacity_exceeded", energy)
+                : Component.translatable("gui.singulo.reason.capacity_upgrade", energy, tier);
+    }
+
     /** 状態に重ねたときの説明（どうすれば動くか）。 */
     @Override
     protected List<Component> statusTooltip() {
         return switch (machineStatus()) {
             case IDLE -> idleReason == null ? List.of() : idleReason.lines();
             case NO_POWER -> menu.value(MachineBlockEntity.D_USAGE) > menu.value(MachineBlockEntity.D_CAPACITY)
-                    ? List.of(Component.translatable("gui.singulo.reason.capacity_upgrade",
-                            io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_USAGE)),
-                            io.github.genichimaruo.singulo.machine.CapacityUpgrades.requiredTier(menu.value(MachineBlockEntity.D_USAGE))))
+                    ? List.of(capacityReason(menu.value(MachineBlockEntity.D_USAGE)))
                     : List.of(Component.translatable("gui.singulo.reason.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_USAGE)),
                     io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_ENERGY))));
             case OUTPUT_FULL -> List.of(Component.translatable("gui.singulo.reason.output_full"));

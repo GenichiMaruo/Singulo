@@ -598,6 +598,8 @@ UI_LANG = {
     'gui.singulo.slot.capacity_upgrade': ('容量アップグレード専用枠（Mk1〜Mk3）', 'Capacity upgrade slot (Mk1–Mk3)'),
     'gui.singulo.reason.capacity_upgrade': ('1 tick に %s FE 必要です。容量アップグレードMk%s以上を専用枠に装着してください',
                                             'Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot'),
+    'gui.singulo.reason.capacity_exceeded': ('1 tick に %s FE 必要です。容量アップグレードMk3でも蓄電容量が足りません',
+                                             'Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold'),
     'gui.singulo.sides.button': ('面の設定', 'Sides'),
     'gui.singulo.sides.items': ('アイテム', 'Items'),
     'gui.singulo.handbook.supporters': ('サポーター', 'Supporters'),

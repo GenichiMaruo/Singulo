@@ -1343,6 +1343,7 @@
   "gui.singulo.reactor.state.unformed": "未形成",
   "gui.singulo.reason.ambiguous": "%s 的材料已齐，但与其他配方中途的组合相同，因此会在停止放入3秒后开始制作",
   "gui.singulo.reason.arrange": "・数量已经足够。请试着把每种材料分别放进不同的槽位。",
+  "gui.singulo.reason.capacity_exceeded": "每刻需要 %s FE。即使安装容量升级 Mk3，蓄电容量也不够",
   "gui.singulo.reason.capacity_upgrade": "每刻需要 %s FE。请在专用槽中安装容量升级 Mk%s 或更高版本",
   "gui.singulo.reason.empty": "放入材料即可开始运作",
   "gui.singulo.reason.extra": "%s 的材料已齐，但还放有用不到的物品，因此不会自动制作",

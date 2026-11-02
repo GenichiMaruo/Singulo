@@ -211,9 +211,12 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
             int required = io.github.genichimaruo.singulo.machine.CapacityUpgrades.requiredTier(shownDemand);
             var upgrade = builder.addSlot(RecipeIngredientRole.CATALYST, RAIL_X + 3, RAIL_TAB_Y + 3)
                     .setBackground(slot, -1, -1);
-            for (int tier = required; tier <= 3; tier++) upgrade.addItemStack(io.github.genichimaruo.singulo.machine.CapacityUpgrades.item(tier));
-            upgrade.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("gui.singulo.reason.capacity_upgrade",
-                    io.github.genichimaruo.singulo.energy.EnergyText.of(shownDemand), required)));
+            // Mk3 でも足りないときは、どの容量アップグレードも並べない（説明だけ出す）
+            for (int tier = Math.max(required, 1); required > 0 && tier <= 3; tier++) {
+                upgrade.addItemStack(io.github.genichimaruo.singulo.machine.CapacityUpgrades.item(tier));
+            }
+            upgrade.addRichTooltipCallback((view, tooltip) -> tooltip.add(
+                    io.github.genichimaruo.singulo.client.MachineScreen.capacityReason(shownDemand)));
         }
         if (!r.byproduct().isEmpty()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, outputX, outputY + 18).setBackground(slot, -1, -1).addItemStack(r.byproduct());

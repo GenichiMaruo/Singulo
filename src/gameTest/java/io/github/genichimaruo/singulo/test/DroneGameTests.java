@@ -249,6 +249,93 @@ public final class DroneGameTests {
         });
     }
 
+    /** 梱包済みの箱はシュルカーボックスやバンドルに入らない（入れ物をまた梱包して、入れ子が際限なく深くならないように）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void packedCratesStayOutOfContainerItems(GameTestHelper h) {
+        ItemStack empty = new ItemStack(SinguloItems.PACKING_CRATE.get());
+        ItemStack packed = DroneCrateItem.pack(empty.copy(), List.of(new ItemStack(Items.IRON_INGOT, 3)));
+        h.assertTrue(empty.canFitInsideContainerItems(), "Empty crates should still fit in shulker boxes");
+        h.assertFalse(packed.canFitInsideContainerItems(), "A packed crate fits inside container items");
+        var shulker = new net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity(h.absolutePos(BlockPos.ZERO),
+                net.minecraft.world.level.block.Blocks.SHULKER_BOX.defaultBlockState());
+        h.assertFalse(shulker.canPlaceItemThroughFace(0, packed, null), "A hopper can put a packed crate into a shulker box");
+        h.succeed();
+    }
+
+    /** ステーションを壊すと、運搬中・帰りかけのドローンのぶんもキットが戻る（ドローンは帰る先がなくなって消える）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void brokenStationReturnsKitsOfFlyingDrones(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        h.setBlock(at, SinguloBlocks.DRONE_STATION.get());
+        DroneStationBlockEntity station = h.getBlockEntity(at);
+        DroneNetwork net = DroneNetwork.get(h.getLevel());
+        BlockPos abs = h.absolutePos(at);
+        DroneNetwork.Flight back = net.create(abs, 0, null, abs, abs.east(3));
+        back.stage = DroneNetwork.RETURN;
+        DroneNetwork.Flight out = net.create(abs, 1, null, abs, abs.east(3));
+        out.stage = DroneNetwork.DELIVER;
+        out.crate = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.DIRT)));
+        station.onBroken(h.getLevel());
+        int kits = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(abs).inflate(2), e -> e.getItem().is(item("drone_kit")))
+                .stream().mapToInt(e -> e.getItem().getCount()).sum();
+        h.assertTrue(kits == 2, "Expected a kit for each flying drone, got " + kits);
+        h.assertTrue(net.flight(back.id) == null && out.station == null, "Flights not detached");
+        net.remove(out);
+        h.succeed();
+    }
+
+    /** 取り消しの電力は、蓄電が満杯近くでも全部戻る（容量を超えた分は、使い切るまで受電しない）。 */
+    @GameTest(template = "empty", batch = BATCH, timeoutTicks = 200)
+    public static void cancelRefundsEvenWhenStorageIsFull(GameTestHelper h) {
+        DronePortBlockEntity a = port(h, new BlockPos(1, 1, 1));
+        port(h, new BlockPos(6, 1, 1));
+        a.select(h.absolutePos(new BlockPos(6, 1, 1)));
+        load(a, 1, new ItemStack(Items.IRON_INGOT, 5));
+        station(h, new BlockPos(4, 1, 5), 1);
+        h.runAtTickTime(100, () -> {
+            h.assertTrue(a.send(), "Could not send: " + a.status());
+            int max = a.energy().getMaxEnergyStored();
+            a.energy().setEnergy(max);                        // 待っている間に電線から満杯まで入った
+            h.assertTrue(a.cancel(), "Cancel failed");
+            h.assertTrue(a.energy().getEnergyStored() == max + DroneCrateItem.cost(5),
+                    "Refund lost: " + a.energy().getEnergyStored() + " of " + (max + DroneCrateItem.cost(5)));
+            h.assertTrue(a.energy().receiveEnergy(1000, false) == 0, "Accepted power above capacity");
+            ours(h, new BlockPos(4, 1, 5)).forEach(CargoDrone::discard);
+            h.succeed();
+        });
+    }
+
+    /** 警備ドローンは、読み込み直してもドックを覚えている（撃破がドックに数えられ、一波を全部倒すとメモリが出る）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void guardDroneRemembersItsDockAfterReload(GameTestHelper h) {
+        BlockPos dock = h.absolutePos(new BlockPos(3, 1, 3));
+        SecurityDrone drone = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel());
+        drone.restrictTo(dock, GuardDockBlockEntity.HOME_RADIUS);
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        drone.saveWithoutId(tag);
+        SecurityDrone loaded = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel());
+        loaded.load(tag);
+        h.assertTrue(loaded.hasRestriction() && loaded.getRestrictCenter().equals(dock)
+                && loaded.getRestrictRadius() == GuardDockBlockEntity.HOME_RADIUS, "Dock forgotten after reload");
+        h.succeed();
+    }
+
+    /** 回したポートは、アンドロイドから見た面も向きに合わせて作り直す（古い面のまま出し入れしない）。 */
+    @GameTest(template = "empty", batch = BATCH)
+    public static void rotatedPortUpdatesAndroidFaces(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        DronePortBlockEntity port = port(h, at);
+        var before = port.androidItems(net.minecraft.core.Direction.EAST);
+        h.assertTrue(before == port.androidItems(net.minecraft.core.Direction.EAST), "Views are not reused while the facing stays");
+        var state = h.getBlockState(at);
+        var facing = state.getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING);
+        h.getLevel().setBlock(h.absolutePos(at), state.setValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING,
+                facing.getClockWise()), 3);
+        h.assertTrue(h.getBlockEntity(at) == port, "Fixture replaced the block entity");
+        h.assertTrue(before != port.androidItems(net.minecraft.core.Direction.EAST), "Rotated port kept the old face mapping");
+        h.succeed();
+    }
+
     /** このテストのステーションのドローン（並んで動くほかのテストのものは数えない・消さない）。 */
     private static List<CargoDrone> ours(GameTestHelper h, BlockPos at) {
         BlockPos station = h.absolutePos(at);

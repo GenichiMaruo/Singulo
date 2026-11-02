@@ -1343,6 +1343,7 @@
   "gui.singulo.reactor.state.unformed": "未形成",
   "gui.singulo.reason.ambiguous": "%s の材料は揃っていますが、ほかのレシピの途中と同じ組み合わせなので、入れ終わって3秒たってから作り始めます",
   "gui.singulo.reason.arrange": "・数は足りています。同じ材料を別々のスロットに分けて入れてみてください",
+  "gui.singulo.reason.capacity_exceeded": "1 tick に %s FE 必要です。容量アップグレードMk3でも蓄電容量が足りません",
   "gui.singulo.reason.capacity_upgrade": "1 tick に %s FE 必要です。容量アップグレードMk%s以上を専用枠に装着してください",
   "gui.singulo.reason.empty": "材料を入れると動きます",
   "gui.singulo.reason.extra": "%s の材料は揃っていますが、使わない物も入っているので、自動では作りません",

@@ -12934,5 +12934,9 @@
   "guide.singulo.power.capacity.body": {
     "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
     "translation": "가공 장치 오른쪽 레일의 용량 전용 칸에 1개 넣으면 축전 용량이 Mk1은 1,000,000, Mk2는 4,000,000, Mk3는 40,000,000 FE가 된다. Mk1은 2단계 제작대에서, Mk2와 Mk3는 정밀 조립기에서 한 단계 아래 업그레이드로 만든다. 속도 업그레이드와 함께 쓸 수 있고 수전 상한은 바뀌지 않는다.\n뺐을 때 용량을 넘던 전력은 사라지지 않으며, 용량보다 적어질 때까지 새 전력을 받지 않는다. 한 번에 쓰는 전력이 보통 용량을 넘는 레시피에는 용량 업그레이드가 필요하다."
+  },
+  "gui.singulo.reason.capacity_exceeded": {
+    "source": "Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold",
+    "translation": "틱당 %s FE가 필요합니다. 용량 업그레이드 Mk3로도 축전 용량이 부족합니다"
   }
 }

@@ -220,11 +220,17 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
      * （発送した箱は積み込み待ちになり、近くで荷物を届け終えたドローンがそのまま取りに来る）。
      */
     public static boolean available(ServerLevel level, BlockPos port, @Nullable UUID owner) {
-        if (!candidates(level, port, owner).isEmpty()) {
-            return true;
-        }
+        // 周りのステーションは1回だけ調べる（待機中のドローンがいるステーションは、働けるドローンもいる）。
+        // 範囲の外のステーションの、範囲の中で帰りかけのドローンも数える
         DroneNetwork net = DroneNetwork.get(level);
         double range = (double) DISPATCH_RANGE * DISPATCH_RANGE;
+        for (DroneNetwork.Flight f : net.flights()) {
+            if (f.stage == DroneNetwork.RETURN && !f.virtual && f.drone != null && f.station != null && f.crate.isEmpty()
+                    && java.util.Objects.equals(f.owner, owner) && level.getEntity(f.drone) instanceof CargoDrone d && d.isAlive()
+                    && !d.dismantling() && d.position().distanceToSqr(Vec3.atCenterOf(port)) <= range) {
+                return true;
+            }
+        }
         int c = (DISPATCH_RANGE >> 4) + 1;
         for (int cx = (port.getX() >> 4) - c; cx <= (port.getX() >> 4) + c; cx++) {
             for (int cz = (port.getZ() >> 4) - c; cz <= (port.getZ() >> 4) + c; cz++) {
@@ -446,19 +452,24 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         }
         DroneNetwork net = DroneNetwork.get(server);
         var kit = BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
+        // ドローンは1機ごとにキットを1つ返す（帰りかけ・運搬中のものも。運搬中のドローンは届け終えたら消える）
         for (int i = 0; i < MAX_UNITS; i++) {
             DroneNetwork.Flight f = net.flightOf(worldPosition, i);
             if (f != null) {
                 if (f.stage == DroneNetwork.RETURN && f.crate.isEmpty()) {
-                    net.remove(f);
+                    net.remove(f);                        // 実体は、帰る先も便もないので自分で消える
                 } else {
-                    f.station = null;                     // 届け終えたら消える
+                    f.station = null;
                     net.changed();
                 }
+                Block.popResource(level, worldPosition, new ItemStack(kit));
                 continue;
             }
-            if (drones[i] != null && server.getEntity(drones[i]) instanceof CargoDrone d) {
-                d.discard();
+            if (drones[i] != null) {
+                // 読み込まれていない待機中のドローンも、あとで読み込まれたときに自分で消える
+                if (server.getEntity(drones[i]) instanceof CargoDrone d) {
+                    d.discard();
+                }
                 Block.popResource(level, worldPosition, new ItemStack(kit));
             }
         }

@@ -139,6 +139,12 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     private long problemAt;
     /** 計り直しが要る（行き先や中身が変わった）。 */
     private boolean problemStale = true;
+    /**
+     * 受け持つドローンがいるか（周りのステーションを調べるのは重いので、PROBLEM_TICKS ごとにだけ調べ直す。
+     * 中身が変わって理由を計り直すときも、これは使い回す）。
+     */
+    private boolean dronesOk, dronesKnown;
+    private long dronesAt;
     /** 自動発送: しきい値（AUTO_THRESHOLDS の番号）と、登録した行き先。荷物が最後に変わった時刻。 */
     private int autoMode;
     @Nullable
@@ -320,16 +326,30 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (energy.getEnergyStored() < DroneCrateItem.cost(distance)) {
             return S_NO_ENERGY;
         }
-        if (!DroneStationBlockEntity.available(server, worldPosition, owner)) {
+        if (!dronesAvailable(server, false)) {
             return S_NO_DRONE;
         }
         return S_IDLE;
+    }
+
+    /** 受け持つドローンがいるか（fresh でなければ、PROBLEM_TICKS 以内に調べた結果を使う）。 */
+    private boolean dronesAvailable(ServerLevel server, boolean fresh) {
+        long now = server.getGameTime();
+        if (fresh || !dronesKnown || now - dronesAt >= PROBLEM_TICKS || now < dronesAt) {
+            dronesOk = DroneStationBlockEntity.available(server, worldPosition, owner);
+            dronesAt = now;
+            dronesKnown = true;
+        }
+        return dronesOk;
     }
 
     /** 発送: 荷物と空き箱1つを梱包し、電力を払って、積み込み待ちにする。できたら true。 */
     public boolean send() {
         if (!staged.isEmpty()) {
             return false;
+        }
+        if (level instanceof ServerLevel server) {
+            dronesAvailable(server, true);                // 押したときは、ドローンの有無を調べ直す
         }
         cachedProblem = problem();
         problemAt = level == null ? 0 : level.getGameTime();
@@ -444,7 +464,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             items.setStackInSlot(slot, s);
         }
         items.insertItem(SLOT_CRATES, crate, false);
-        energy.setEnergy(Math.min(energy.getMaxEnergyStored(), energy.getEnergyStored() + stagedCost));
+        // 払った電力をそのまま戻す（蓄電が満杯近くでも捨てない。容量を超えた分を使い切るまで受電しない）
+        energy.restoreEnergy(energy.getEnergyStored() + stagedCost);
         DroneNetwork net = DroneNetwork.get(server);
         DroneNetwork.Flight f = flightId == 0 ? null : net.flight(flightId);
         if (f != null && f.stage == DroneNetwork.PICKUP) {
@@ -627,9 +648,16 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     /** Android stock must contain only removable goods; cargo and sealed crates are not raw materials. */
     private final IItemHandler[] androidViews = new IItemHandler[7];
+    /** 面の見え方を作ったときの向き（回されたら作り直す。面の設定は向きからの相対で決まる）。 */
+    @Nullable
+    private Direction androidViewsFacing;
 
     public IItemHandler androidItems(@Nullable Direction side) {
         int index = side == null ? 6 : side.ordinal();
+        if (androidViewsFacing != facing()) {
+            java.util.Arrays.fill(androidViews, null);
+            androidViewsFacing = facing();
+        }
         if (androidViews[index] != null) return androidViews[index];
         IItemHandler delegate = sidedItems(side);
         return androidViews[index] = new IItemHandler() {
@@ -1026,7 +1054,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("items")) {
-            energy.setEnergy(tag.getInt("energy"));
+            energy.restoreEnergy(tag.getInt("energy"));
             CompoundTag inv = tag.getCompound("items");
             inv.putInt("Size", SLOTS);
             items.deserializeNBT(registries, inv);

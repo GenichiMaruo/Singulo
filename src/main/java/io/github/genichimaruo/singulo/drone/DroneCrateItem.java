@@ -94,9 +94,13 @@ public class DroneCrateItem extends Item {
         return !packed(stack);
     }
 
+    /**
+     * 空の箱はシュルカーボックスやバンドルに入れられるが、梱包済みの箱は入れられない（入れた入れ物をまた梱包できると、
+     * 入れ子が際限なく深くなり、アイテムのデータが保存・送信できないほど大きくなる）。
+     */
     @Override
-    public boolean canFitInsideContainerItems() {
-        return true;
+    public boolean canFitInsideContainerItems(ItemStack stack) {
+        return !packed(stack);
     }
 
     /** 梱包済みの箱を右クリック: 中身を持ち物へ移す（入りきらない分は箱に残す）。 */

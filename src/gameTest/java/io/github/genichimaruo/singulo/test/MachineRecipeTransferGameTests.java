@@ -99,6 +99,37 @@ public final class MachineRecipeTransferGameTests {
         h.succeed();
     }
 
+    /** 触媒の要らないレシピ・予備で足りるレシピを搬入しても、触媒枠の予備は装置に残る。 */
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void jeiTransferKeepsReserveCatalysts(GameTestHelper h) {
+        var menu = menu(h);
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        int slot = menu.type().catalystSlot();
+        menu.getSlot(slot).set(catalyst.copyWithCount(16));
+        menu.getSlot(menu.type().itemSlots()).set(new ItemStack(Items.IRON_INGOT, 12));
+        var plain = MachineRecipeTransfer.plan(menu, recipe(iron(4)), false);
+        h.assertTrue(plain != null, "Transfer without a catalyst failed");
+        MachineRecipeTransfer.apply(menu, plain);
+        h.assertTrue(menu.getSlot(slot).getItem().getCount() == 16, "Reserve catalysts moved out: " + menu.getSlot(slot).getItem());
+        var input = new MachineRecipe.ItemInput(Ingredient.of(catalyst.getItem()), 1, 20, 1);
+        var served = MachineRecipeTransfer.plan(menu, recipe(iron(4), input), false);
+        h.assertTrue(served != null, "Transfer served by the reserve failed");
+        MachineRecipeTransfer.apply(menu, served);
+        h.assertTrue(menu.getSlot(slot).getItem().getCount() == 16, "Reserve catalysts rewritten: " + menu.getSlot(slot).getItem());
+        h.succeed();
+    }
+
+    /** 容量アップグレードの案内: 足りる段階を示し、Mk3 でも足りなければ段階を示さない。 */
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void capacityHintNeverPointsAtAnUpgradeThatCannotHelp(GameTestHelper h) {
+        h.assertTrue(CapacityUpgrades.requiredTier(500_000) == 1 && CapacityUpgrades.requiredTier(2_000_000) == 2
+                && CapacityUpgrades.requiredTier(40_000_000) == 3, "Wrong capacity tier");
+        h.assertTrue(CapacityUpgrades.requiredTier(60_000_000) == 0, "Mk3 suggested for a demand above its buffer");
+        h.assertTrue(CapacityUpgrades.tier(CapacityUpgrades.item(2)) == 2 && CapacityUpgrades.tier(new ItemStack(Items.DIRT)) == 0,
+                "Cached upgrade items do not match");
+        h.succeed();
+    }
+
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void jeiTransferCatalystUsesDedicatedSlotAndPreservesLifetime(GameTestHelper h) {
         var menu = menu(h);
