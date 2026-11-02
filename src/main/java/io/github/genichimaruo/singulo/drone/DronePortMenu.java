@@ -18,32 +18,35 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 /**
- * ドローン発着ポートの画面。中身の上のタブで3つのページを切り替える（タブはクライアントだけの状態）。
+ * ドローン発着ポートの画面。右レールのタブ（面の設定の下の3段）で3つのページを切り替える（タブはクライアントだけの状態）。
  * <ul>
  *   <li>荷物: 左に空き箱と荷物（3×3）、真ん中に蓄電、右に着荷箱（縦に3つ）→ 受け取り（3×3）。</li>
- *   <li>発送: 行き先の一覧（同じ持ち主のポート。近い順）と、発送・取り消しのボタン。</li>
+ *   <li>発送: 行き先の一覧（同じ持ち主のポート。近い順。自動発送の行き先には印）と、その下の1段に発送・取り消し・自動発送のしきい値・登録のボタン。</li>
  *   <li>輸送中: 出る便・来る便の段階と進み（SHIP_ROWS まで）。</li>
  * </ul>
  * 行き先の一覧は開いたときに作り、選んでいる行き先の番号と、輸送中の便を同期する。
  */
 public class DronePortMenu extends AbstractContainerMenu {
     public static final int WIDTH = 212, HEIGHT = 218;
-    /** ページ: 荷物・発送・輸送中。タブはヘッダーのすぐ下に左から並ぶ。 */
+    /** ページ: 荷物・発送・輸送中（枠の中は、ヘッダーのすぐ下からページに使う）。 */
     public static final int PAGE_CARGO = 0, PAGE_SEND = 1, PAGE_SHIPS = 2, PAGES = 3;
-    public static final int TAB_X = 8, TAB_Y = 22, TAB_W = 24, TAB_H = 14, TAB_GAP = 2;
     /** ページの中身の上端。 */
-    public static final int PAGE_Y = 42;
-    public static final int CRATE_X = 8, CRATE_Y = PAGE_Y;
-    public static final int CARGO_X = 30, CARGO_Y = PAGE_Y;
-    public static final int ENERGY_X = 97, ENERGY_Y = PAGE_Y, ENERGY_H = 52;
+    public static final int PAGE_Y = 22;
+    /**
+     * 荷物のページのスロットの上端。3段のスロット（枠を含めて高さ54）を、ヘッダーの下から溝の上までの上下中央に置く
+     * （FramedScreen.centeredY と同じ決め方。スロットの枠はスロットの1ドット上から）。
+     */
+    public static final int CARGO_PAGE_Y = GuiFrame.HEADER - 1 + (GuiFrame.grooveY(HEIGHT) - (GuiFrame.HEADER - 1) - 3 * 18 + 1) / 2 + 1;
+    public static final int CRATE_X = 8, CRATE_Y = CARGO_PAGE_Y;
+    public static final int CARGO_X = 30, CARGO_Y = CARGO_PAGE_Y;
+    public static final int ENERGY_X = 97, ENERGY_Y = CARGO_PAGE_Y, ENERGY_H = 52;
     /** 着荷箱（縦に3つ）と受け取り（3×3）。間に開梱の向きの矢印を、どちらの枠からも離して置く。 */
-    public static final int ARRIVED_X = 116, ARRIVED_Y = PAGE_Y, ARROW_X = 138, RECEIVE_X = 150, RECEIVE_Y = PAGE_Y;
-    /** 発送のページ: 行き先の一覧（3行）、発送・取り消しのボタン、自動発送の段（しきい値・登録・登録した行き先）。 */
-    public static final int LIST_X = 8, LIST_Y = PAGE_Y, LIST_W = WIDTH - 16, ROW_H = 13, ROWS = 3;
-    public static final int BUTTON_Y = LIST_Y + ROWS * ROW_H + 4, BUTTON_H = 14, BUTTON_W = (LIST_W - 4) / 2;
-    public static final int AUTO_Y = BUTTON_Y + BUTTON_H + 6, AUTO_W = 62, REGISTER_W = 40;
-    /** 輸送中のページ: 便の欄（4行）。 */
-    public static final int SHIP_X = 8, SHIP_Y = PAGE_Y, SHIP_W = WIDTH - 16, SHIP_ROW = 13, SHIP_ROWS = 4;
+    public static final int ARRIVED_X = 116, ARRIVED_Y = CARGO_PAGE_Y, ARROW_X = 138, RECEIVE_X = 150, RECEIVE_Y = CARGO_PAGE_Y;
+    /** 発送のページ: 行き先の一覧（6行）と、その下の1段のボタン（発送・取り消し・自動発送のしきい値・登録。間は2ドット）。 */
+    public static final int LIST_X = 8, LIST_Y = PAGE_Y, LIST_W = WIDTH - 16, ROW_H = 13, ROWS = 6;
+    public static final int BUTTON_Y = LIST_Y + ROWS * ROW_H + 3, BUTTON_H = 14, BUTTON_W = 48, AUTO_W = 58, REGISTER_W = 36, BUTTON_GAP = 2;
+    /** 輸送中のページ: 便の欄（6行）。 */
+    public static final int SHIP_X = 8, SHIP_Y = PAGE_Y, SHIP_W = WIDTH - 16, SHIP_ROW = 13, SHIP_ROWS = 6;
     /** 便の段階: ドローン待ち・ドローンが向かっている・積み込み中・飛行中・荷降ろし中。向き: 出る・来る。 */
     public static final int PHASE_WAITING = 1, PHASE_COMING = 2, PHASE_LOADING = 3, PHASE_FLYING = 4, PHASE_UNLOADING = 5;
     public static final int DIR_OUT = 1, DIR_IN = 2;

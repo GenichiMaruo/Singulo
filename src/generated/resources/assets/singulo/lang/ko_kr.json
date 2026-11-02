@@ -1096,6 +1096,7 @@
   "gui.singulo.drone_port.auto.count": "자동 %s개",
   "gui.singulo.drone_port.auto.full": "자동 가득",
   "gui.singulo.drone_port.auto.hint": "자동 발송: 화물이 이 수(가득은 9칸 모두)만큼 쌓이면 등록한 목적지로 보낸다. 화물이 더 늘지 않고 2초 지나면 보낸다. 클릭으로 전환",
+  "gui.singulo.drone_port.auto.is_target": "자동 발송 목적지",
   "gui.singulo.drone_port.auto.none": "자동 발송 목적지 미등록",
   "gui.singulo.drone_port.auto.off": "자동 끔",
   "gui.singulo.drone_port.auto.register": "등록",

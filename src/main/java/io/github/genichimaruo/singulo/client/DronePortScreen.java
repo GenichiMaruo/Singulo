@@ -20,8 +20,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * ドローン発着ポートの画面。ヘッダーの名前をクリックすると変えられる（行き先の一覧に出る名前）。
- * 中身の上のタブ（記号だけ。重ねると名前）で、荷物・発送・輸送中のページを切り替える（DronePortMenu を参照）。
- * 右レールの設定の段で、加工装置と同じ面の設定（入出力と自動排出）の窓を開く。
+ * 右レールの、いちばん上の段で加工装置と同じ面の設定（入出力と自動排出）の窓を開き、その下の3段で荷物・発送・輸送中の
+ * ページを切り替える（記号だけ。重ねると名前。DronePortMenu を参照）。
  */
 public class DronePortScreen extends FramedScreen<DronePortMenu> {
     private final NameEditor names = new NameEditor();
@@ -51,11 +51,6 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         menu.setPage(lastPage);
     }
 
-    private int[] tabRect(int page) {
-        return new int[]{leftPos + DronePortMenu.TAB_X + page * (DronePortMenu.TAB_W + DronePortMenu.TAB_GAP), topPos + DronePortMenu.TAB_Y,
-                DronePortMenu.TAB_W, DronePortMenu.TAB_H};
-    }
-
     private boolean anyShipment() {
         for (int row = 0; row < DronePortMenu.SHIP_ROWS; row++) {
             if (menu.ship(row).phase() != 0) {
@@ -63,21 +58,6 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             }
         }
         return false;
-    }
-
-    /** ページのタブ。輸送中の便があれば、輸送中のタブの角に橙の点。 */
-    private void drawTabs(GuiGraphics g, int mouseX, int mouseY) {
-        for (int p = 0; p < DronePortMenu.PAGES; p++) {
-            int[] r = tabRect(p);
-            boolean on = menu.page() == p;
-            boolean hover = !overPopup(mouseX, mouseY) && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3]);
-            int d = Panel.button(g, skin, r[0], r[1], r[2], r[3], on ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
-            Panel.icon(g, r[0] + (r[2] - 7) / 2, r[1] + 3 + d, TAB_ICONS[p], on ? skin.onAccent() : skin.text());
-            if (p == DronePortMenu.PAGE_SHIPS && anyShipment()) {
-                g.fill(r[0] + r[2] - 5, r[1] + 2 + d, r[0] + r[2] - 3, r[1] + 4 + d, 0xFF000000 | DroneStationScreen.ACCENT);
-            }
-            area(r[0] - leftPos, r[1] - topPos, r[2], r[3], List.of(Component.translatable("gui.singulo.drone_port.tab." + p)));
-        }
     }
 
     private String portName() {
@@ -170,36 +150,55 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     private int[] cancelRect() {
-        return new int[]{leftPos + DronePortMenu.LIST_X + DronePortMenu.LIST_W - DronePortMenu.BUTTON_W, topPos + DronePortMenu.BUTTON_Y,
+        return new int[]{leftPos + DronePortMenu.LIST_X + DronePortMenu.BUTTON_W + DronePortMenu.BUTTON_GAP, topPos + DronePortMenu.BUTTON_Y,
                 DronePortMenu.BUTTON_W, DronePortMenu.BUTTON_H};
     }
 
     // ------------------------------------------------------------------ 右レール（面の設定）
 
+    /** 右レール: いちばん上は面の設定、その下に荷物・発送・輸送中のページ（選んでいるページは枠とつながる）。 */
+    private static int pageOfRow(int row) {
+        return row - GuiFrame.RAIL_UPGRADE;
+    }
+
     @Override
     protected boolean railUsed(int row) {
-        return row == GuiFrame.RAIL_SETTINGS;
+        return row == GuiFrame.RAIL_SETTINGS || pageOfRow(row) >= 0 && pageOfRow(row) < DronePortMenu.PAGES;
     }
 
     @Override
     protected boolean railConnected(int row) {
-        return sides.open;
+        return row == GuiFrame.RAIL_SETTINGS ? sides.open : pageOfRow(row) == menu.page();
     }
 
     @Override
     protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {
-        Panel.sidesIcon(g, x, y);
+        if (row == GuiFrame.RAIL_SETTINGS) {
+            Panel.sidesIcon(g, x, y);
+            return;
+        }
+        int p = pageOfRow(row);
+        Panel.icon(g, x + 4, y + 4, TAB_ICONS[p], p == menu.page() ? skin.accent() : skin.text());
+        if (p == DronePortMenu.PAGE_SHIPS && anyShipment()) {
+            g.fill(x + 13, y + 1, x + 15, y + 3, 0xFF000000 | DroneStationScreen.ACCENT);   // 輸送中の便がある
+        }
     }
 
     @Override
     protected boolean clickRail(int row, int button) {
-        sides.open = !sides.open;
+        if (row == GuiFrame.RAIL_SETTINGS) {
+            sides.open = !sides.open;
+            return true;
+        }
+        menu.setPage(pageOfRow(row));
+        lastPage = pageOfRow(row);
         return true;
     }
 
     @Override
     protected Component railTooltip(int row) {
-        return Component.translatable("gui.singulo.sides.button");
+        return row == GuiFrame.RAIL_SETTINGS ? Component.translatable("gui.singulo.sides.button")
+                : Component.translatable("gui.singulo.drone_port.tab." + pageOfRow(row));
     }
 
     @Override
@@ -403,7 +402,6 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         drawFrame(g, mouseX, mouseY);
         int x = leftPos;
         int y = topPos;
-        drawTabs(g, mouseX, mouseY);
         switch (menu.page()) {
             case DronePortMenu.PAGE_SEND -> {
                 drawList(g, mouseX, mouseY);
@@ -481,12 +479,22 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             String dist = d + "m";
             boolean reach = range > 0 && d <= range;
             int dw = font.width(dist);
-            AndroidStationScreen.fit(g, font, placeName(menu.names().get(i), to), x + 3, ry + 3, textW - dw - 8, text);
+            boolean auto = i == menu.autoTarget();
+            int nx = x + 3;
+            if (auto) {
+                // 自動発送の行き先の印
+                Panel.autoIconSmall(g, nx, ry + 3, selected ? skin.onAccent() : 0xFF000000 | DroneStationScreen.ACCENT);
+                nx += 9;
+            }
+            AndroidStationScreen.fit(g, font, placeName(menu.names().get(i), to), nx, ry + 3, x + textW - dw - 6 - nx, text);
             g.drawString(font, dist, x + textW - dw - 2, ry + 3, reach ? text : GuiSkin.BAD, false);
             List<Component> tip = new ArrayList<>();
             tip.add(placeName(menu.names().get(i), to));
             tip.add(Component.translatable("gui.singulo.drone_port.target", to.getX(), to.getY(), to.getZ()).withStyle(st -> st.withColor(0xFF8A949E)));
             tip.add(Component.translatable("gui.singulo.drone_port.cost", DroneCrateItem.cost(Math.sqrt(to.distSqr(menu.pos())))));
+            if (auto) {
+                tip.add(Component.translatable("gui.singulo.drone_port.auto.is_target").withStyle(st -> st.withColor(0xFF000000 | DroneStationScreen.ACCENT)));
+            }
             if (!reach) {
                 tip.add(Component.translatable(range == 0 ? "gui.singulo.drone_port.status.6" : "gui.singulo.drone_port.status.7")
                         .withStyle(st -> st.withColor(GuiSkin.BAD)));
@@ -525,15 +533,16 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     private int[] autoRect() {
-        return new int[]{leftPos + DronePortMenu.LIST_X, topPos + DronePortMenu.AUTO_Y, DronePortMenu.AUTO_W, DronePortMenu.BUTTON_H};
+        return new int[]{leftPos + DronePortMenu.LIST_X + 2 * (DronePortMenu.BUTTON_W + DronePortMenu.BUTTON_GAP), topPos + DronePortMenu.BUTTON_Y,
+                DronePortMenu.AUTO_W, DronePortMenu.BUTTON_H};
     }
 
     private int[] registerRect() {
-        return new int[]{leftPos + DronePortMenu.LIST_X + DronePortMenu.AUTO_W + 4, topPos + DronePortMenu.AUTO_Y,
-                DronePortMenu.REGISTER_W, DronePortMenu.BUTTON_H};
+        int[] a = autoRect();
+        return new int[]{a[0] + a[2] + DronePortMenu.BUTTON_GAP, topPos + DronePortMenu.BUTTON_Y, DronePortMenu.REGISTER_W, DronePortMenu.BUTTON_H};
     }
 
-    /** 自動発送の段: しきい値のボタン（押すたびに次へ）・登録のボタン・登録した行き先。 */
+    /** 自動発送: しきい値のボタン（押すたびに次へ）と登録のボタン。登録した行き先は、一覧の行の印とボタンの説明に出す。 */
     private void drawAuto(GuiGraphics g, int mouseX, int mouseY) {
         boolean free = !overPopup(mouseX, mouseY);
         int mode = Mth.clamp(menu.value(DronePortBlockEntity.D_AUTO), 0, DronePortBlockEntity.AUTO_THRESHOLDS.length - 1);
@@ -544,20 +553,17 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         int[] a = autoRect();
         boolean ah = free && Panel.inside(mouseX, mouseY, a[0], a[1], a[2], a[3]);
         Panel.labelButton(g, font, skin, a[0], a[1], a[2], a[3], label, threshold != 0 ? Panel.Press.ON : ah ? Panel.Press.HOVER : Panel.Press.NORMAL);
-        area(a[0] - leftPos, a[1] - topPos, a[2], a[3], List.of(Component.translatable("gui.singulo.drone_port.auto.hint")));
+        int target = menu.autoTarget();
+        Component name = target >= 0 ? Component.translatable("gui.singulo.drone_port.auto.target", partnerName(target))
+                : Component.translatable("gui.singulo.drone_port.auto.none");
+        area(a[0] - leftPos, a[1] - topPos, a[2], a[3], List.of(Component.translatable("gui.singulo.drone_port.auto.hint"),
+                name.copy().withStyle(st -> st.withColor(target >= 0 ? 0xFF000000 | DroneStationScreen.ACCENT : 0xFF8A949E))));
         int[] r = registerRect();
         boolean canRegister = menu.selected() >= 0;
         boolean rh = free && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3]);
         Panel.labelButton(g, font, skin, r[0], r[1], r[2], r[3], Component.translatable("gui.singulo.drone_port.auto.register"),
                 !canRegister ? Panel.Press.DISABLED : rh ? Panel.Press.HOVER : Panel.Press.NORMAL);
-        area(r[0] - leftPos, r[1] - topPos, r[2], r[3], List.of(Component.translatable("gui.singulo.drone_port.auto.register.hint")));
-        int tx = r[0] + r[2] + 4;
-        int tw = leftPos + DronePortMenu.LIST_X + DronePortMenu.LIST_W - tx;
-        int target = menu.autoTarget();
-        Component name = target >= 0 ? Component.translatable("gui.singulo.drone_port.auto.target", partnerName(target))
-                : Component.translatable("gui.singulo.drone_port.auto.none");
-        AndroidStationScreen.fit(g, font, name, tx, a[1] + 3, tw, target >= 0 ? skin.text() : skin.dim());
-        area(tx - leftPos, a[1] - topPos, tw, a[3], List.of(name));
+        area(r[0] - leftPos, r[1] - topPos, r[2], r[3], List.of(Component.translatable("gui.singulo.drone_port.auto.register.hint"), name));
     }
 
     /** 輸送中の便: 向きの印・相手の名前・進みのバー（荷降ろしが済むまで）・段階の短い言葉。 */
@@ -717,14 +723,6 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             addRenderableWidget(box);
             setFocused(box);
             return true;
-        }
-        for (int p = 0; p < DronePortMenu.PAGES; p++) {
-            int[] t = tabRect(p);
-            if (Panel.inside(mouseX, mouseY, t[0], t[1], t[2], t[3])) {
-                menu.setPage(p);
-                lastPage = p;
-                return true;
-            }
         }
         if (menu.page() != DronePortMenu.PAGE_SEND) {
             return super.mouseClicked(mouseX, mouseY, button);

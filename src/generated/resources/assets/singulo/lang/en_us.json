@@ -1096,6 +1096,7 @@
   "gui.singulo.drone_port.auto.count": "Auto: %s",
   "gui.singulo.drone_port.auto.full": "Auto: full",
   "gui.singulo.drone_port.auto.hint": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
+  "gui.singulo.drone_port.auto.is_target": "Auto-send destination",
   "gui.singulo.drone_port.auto.none": "No auto-send destination",
   "gui.singulo.drone_port.auto.off": "Auto: off",
   "gui.singulo.drone_port.auto.register": "Set",

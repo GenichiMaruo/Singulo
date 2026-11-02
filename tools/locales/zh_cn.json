@@ -12394,5 +12394,9 @@
   "guide.singulo.drones.android.body": {
     "source": "Place a Drone Port beside an Android Supply Port and allow cargo output on that face to use arrivals as materials. Outbound cargo and sealed crates are not counted as available stock. Beside a Delivery Port, allow cargo input to accept finished products and use auto-send to ship them to another base. Full cargo slots leave products waiting in the Delivery Port.\nThe empty-crate tab controls reserve-crate input/output and auto-eject separately. Defaults remain input-only with auto-eject off. Androids and pipes can collect crates through an output face. On a return-shipment port, disable empty-crate input and allow cargo input on the receiving face to accept empty crates as cargo rather than reserves. Supply transport crates through another face and configure auto-send.",
     "translation": "将无人机起降港放在仿生人资材口旁，并允许该面的货物输出，仿生人即可使用到货材料。待发货物和未拆封箱不会计入可用库存。将起降港放在交付口旁并允许货物输入，即可接收成品，再用自动发货运往其他基地。货物槽满时，成品留在交付口等待。\n空箱选项卡可单独设置备用箱的输入、输出与自动排出，默认仅输入且不自动排出。仿生人和管道可从输出面回收空箱。返程起降港的接收面应禁用空箱输入并启用货物输入，使空箱作为货物而非备用箱进入。从另一面补充运输用箱，并设置自动发货。"
+  },
+  "gui.singulo.drone_port.auto.is_target": {
+    "source": "Auto-send destination",
+    "translation": "自动发送的目的地"
   }
 }

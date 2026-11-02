@@ -1096,6 +1096,7 @@
   "gui.singulo.drone_port.auto.count": "自動 %s個",
   "gui.singulo.drone_port.auto.full": "自動 満杯",
   "gui.singulo.drone_port.auto.hint": "自動発送: 荷物がこの数（満杯は9欄すべて）たまったら、登録した行き先へ送る。荷物が増えなくなってから2秒待つ。クリックで切り替え",
+  "gui.singulo.drone_port.auto.is_target": "自動発送の行き先",
   "gui.singulo.drone_port.auto.none": "自動発送の行き先は未登録",
   "gui.singulo.drone_port.auto.off": "自動 オフ",
   "gui.singulo.drone_port.auto.register": "登録",

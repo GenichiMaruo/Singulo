@@ -1096,6 +1096,7 @@
   "gui.singulo.drone_port.auto.count": "自动 %s 个",
   "gui.singulo.drone_port.auto.full": "自动 装满",
   "gui.singulo.drone_port.auto.hint": "自动发送：货物达到此数量（装满指 9 栏全满）时，发送到登记的目的地。货物停止增加 2 秒后发送。点击切换",
+  "gui.singulo.drone_port.auto.is_target": "自动发送的目的地",
   "gui.singulo.drone_port.auto.none": "未登记自动发送目的地",
   "gui.singulo.drone_port.auto.off": "自动 关闭",
   "gui.singulo.drone_port.auto.register": "登记",

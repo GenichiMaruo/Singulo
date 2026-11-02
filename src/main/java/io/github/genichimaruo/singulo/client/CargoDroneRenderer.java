@@ -217,7 +217,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
                 pose.popPose();
             }
             // 残像の円盤は、羽根を描き終えてから（別の描画先を取ると、羽根の描画先が閉じられる）
-            VertexConsumer blur = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
+            VertexConsumer blur = buffers.getBuffer(RotorBlur.TYPE);
             for (int i = 0; i < 4; i++) {
                 pose.pushPose();
                 getParentModel().rotorSpace(i, pose);
@@ -225,6 +225,26 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
                 FxDraw.ring(pose.last(), blur, 0.6F * u, 3.7F * u, 0xC8CCD4, 40, 18);
                 pose.popPose();
             }
+        }
+    }
+
+    /**
+     * 回転の残像の描き方: うすく透けて重ねるが、奥行きを書かない（書くと、あとから描かれる奥のエンティティが、
+     * 残像の円盤の向こうにあるとして消えてしまう。下から見上げたときに目立つ）。両面を描く。
+     */
+    private static final class RotorBlur extends RenderType {
+        static final RenderType TYPE = create("singulo_rotor_blur", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
+                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
+                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
+                        .setWriteMaskState(COLOR_WRITE)
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(NO_CULL)
+                        .setOutputState(ITEM_ENTITY_TARGET)
+                        .createCompositeState(false));
+
+        private RotorBlur(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
+                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, format, mode, size, crumbling, sort, setup, clear);
         }
     }
 

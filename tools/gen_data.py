@@ -1297,6 +1297,7 @@ UI_LANG = {
     'gui.singulo.drone_port.auto.register': ('登録', 'Set'),
     'gui.singulo.drone_port.auto.register.hint': ('一覧で選んでいる行き先を、自動発送の行き先にする', 'Use the destination selected in the list for auto-send'),
     'gui.singulo.drone_port.auto.target': ('→ %s', '→ %s'),
+    'gui.singulo.drone_port.auto.is_target': ('自動発送の行き先', 'Auto-send destination'),
     'gui.singulo.drone_port.auto.none': ('自動発送の行き先は未登録', 'No auto-send destination'),
     'gui.singulo.drone_port.elsewhere': ('ほかのポート', 'Another port'),
     'gui.singulo.drone_port.cancel.hint': ('取り消して、荷物と電力を元に戻す', 'Cancel and get the cargo and power back'),
