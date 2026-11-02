@@ -3,8 +3,8 @@
   "category": "misc",
   "pattern": [
     "PTP",
-    "KCB",
-    "PXP"
+    "CFB",
+    "KXK"
   ],
   "key": {
     "P": {
@@ -13,14 +13,17 @@
     "T": {
       "item": "minecraft:iron_trapdoor"
     },
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    },
     "C": {
       "tag": "c:chests/wooden"
     },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
     "B": {
       "item": "singulo:basic_circuit"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
     },
     "X": {
       "item": "minecraft:piston"

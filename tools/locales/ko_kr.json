@@ -11132,8 +11132,8 @@
     "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 27 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 27개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 28 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 28개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
