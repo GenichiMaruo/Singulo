@@ -15,6 +15,9 @@ import net.neoforged.neoforge.items.IItemHandler;
 final class AdjacentItemStores {
     private final BlockEntity owner;
     private final EnumMap<Direction, BlockCapabilityCache<IItemHandler, Direction>> caches = new EnumMap<>(Direction.class);
+    /** アンドロイド用の見え方（入れ物の窓口が同じ間は使い回す。窓口が変わったら見え方を引き直す）。 */
+    private final EnumMap<Direction, IItemHandler> seen = new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, IItemHandler> views = new EnumMap<>(Direction.class);
 
     AdjacentItemStores(BlockEntity owner) {
         this.owner = owner;
@@ -22,6 +25,8 @@ final class AdjacentItemStores {
 
     /** 覚えた入れ物を忘れる（持ち主が外された・戻ったとき）。 */
     void clear() {
+        seen.clear();
+        views.clear();
         caches.clear();
     }
 
@@ -37,6 +42,19 @@ final class AdjacentItemStores {
                     () -> !owner.isRemoved() && owner.getLevel() == level, () -> {});
             caches.put(direction, cache);
         }
-        return cache.getCapability();
+        IItemHandler handler = cache.getCapability();
+        if (handler == null || handler != seen.get(direction)) {
+            seen.put(direction, handler);
+            views.put(direction, androidView(level, owner.getBlockPos().relative(direction), direction.getOpposite(), handler));
+        }
+        return views.get(direction);
+    }
+
+    /** pos の入れ物を、アンドロイドの素材置き場として見たもの（AndroidStorageView なら専用の見え方、ほかは handler のまま）。 */
+    static IItemHandler androidView(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, Direction side, IItemHandler handler) {
+        if (handler != null && level.getBlockEntity(pos) instanceof AndroidStorageView view) {
+            return view.androidItems(side);
+        }
+        return handler;
     }
 }

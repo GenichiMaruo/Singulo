@@ -1724,8 +1724,8 @@
     "translation": "熔化的鉍冷卻後形成的階梯狀彩虹色晶體。建材。"
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "A metal with an iridescent surface.",
-    "translation": "表面泛著虹彩的金屬。"
+    "source": "A metal with an iridescent surface. A quiet touch of color from copper refining.",
+    "translation": "表面泛著虹彩的金屬。銅精煉過程中顯露的一抹虹彩。"
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -2364,8 +2364,8 @@
     "translation": "隕石中的鐵鎳天然合金。用鐵鎬或更好的鎬開採可得到粗隕鐵。只在隕石坑中出現。"
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A naturally magnetic alloy of iron and nickel.",
-    "translation": "具有強磁性的天然鐵鎳合金。"
+    "source": "A naturally magnetic alloy of iron and nickel. Metal from the stars, now resting in your hand.",
+    "translation": "具有強磁性的天然鐵鎳合金。來自星空的金屬，如今靜臥掌心。"
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2428,8 +2428,8 @@
     "translation": "覆有鉨的堅固框架。"
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy, dense ingot of nihonium.",
-    "translation": "沉重緻密的鉨錠。"
+    "source": "A heavy, dense ingot of nihonium. An element born in the accelerator becomes the foundation of your next machine.",
+    "translation": "沉重緻密的鉨錠。誕生於加速器的元素，將成為下一台設備的基石。"
   },
   "desc.singulo.nihonium_plate": {
     "source": "Nihonium pressed into a thin plate.",
@@ -2480,8 +2480,8 @@
     "translation": "組裝 2 級以後的大部分零件與機器。"
   },
   "desc.singulo.pressure_crystal": {
-    "source": "A hard blue crystal formed under high water pressure.",
-    "translation": "在高水壓下形成的堅硬藍色晶體。"
+    "source": "A hard violet crystal that a Deep-Sea Pressure Collector presses from minerals with deep-sea water pressure. The Gravity Remnant drops it too.",
+    "translation": "深海壓力收集器利用海底水壓壓實礦物製成的堅硬紫色晶體。重力殘渣也會掉落。"
   },
   "desc.singulo.pressure_hull": {
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
@@ -2672,8 +2672,8 @@
     "translation": "複製並貼上機器各面與自動排出的設定。同種機器之間也會複製配方選擇。用於彭羅斯反應爐時，複製目標自旋與投料間隔。"
   },
   "desc.singulo.shield_permit": {
-    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
-    "translation": "放入護盾塔：只有已登記的玩家能在範圍內建造、破壞或拿取物品。放入仿生人組裝站後，已登記的人也能操作仿生人，未登記的人會遭到仿生人攻擊。使用可登記自己；對玩家使用可登記對方與自己。任何人都能破壞發射冠。"
+    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. In a Drone Station, only registered players may open its screen. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
+    "translation": "放入護盾塔：只有已登記的玩家能在範圍內建造、破壞或拿取物品。放入仿生人組裝站後，已登記的人也能操作仿生人，未登記的人會遭到仿生人攻擊。放入無人機站後，只有已登記的人能打開其介面。使用可登記自己；對玩家使用可登記對方與自己。任何人都能破壞發射冠。"
   },
   "desc.singulo.shield_tower_body": {
     "source": "Corners of the 3×3 body and the base of the spire.",
@@ -2756,8 +2756,8 @@
     "translation": "鐵與碳混合而成的鋼鐵原料。"
   },
   "desc.singulo.steel_ingot": {
-    "source": "A sturdy structural metal.",
-    "translation": "堅固的結構金屬。"
+    "source": "A sturdy structural metal. Unassuming, but a factory can grow from a single bar.",
+    "translation": "堅固的結構金屬。樸實無華，工廠卻可以從這一錠開始成長。"
   },
   "desc.singulo.steel_plate": {
     "source": "Steel pressed into a thin plate.",
@@ -2996,8 +2996,8 @@
     "translation": "細碎的鋅粉。"
   },
   "desc.singulo.zinc_ingot": {
-    "source": "An ingot of zinc.",
-    "translation": "鋅的金屬錠。"
+    "source": "An ingot of zinc. A small ingot with the promise of a new element.",
+    "translation": "鋅的金屬錠。小小的金屬錠，蘊藏著通往新元素的可能。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -10596,32 +10596,32 @@
     "translation": "隨身攜帶時，為跟隨的仿生人邊走邊充電。"
   },
   "summary.singulo.android_dual_tank_upgrade": {
-    "source": "Two liquid and two chemical tanks (only with Mekanism).",
-    "translation": "裝上液體和化學品儲槽各 2 個（僅限安裝 Mekanism 時）。"
+    "source": "Adds two liquid and two chemical tanks.",
+    "translation": "加裝液體和化學物質儲罐各 2 個。"
   },
   "summary.singulo.android_felling_upgrade": {
     "source": "Lets an android fell whole trees and replant saplings.",
     "translation": "讓仿生人整棵砍樹並重新種下樹苗。"
   },
   "summary.singulo.android_gas_tank_upgrade": {
-    "source": "Two tanks for Mekanism chemicals (only with Mekanism).",
-    "translation": "裝上 2 個運送 Mekanism 化學品的儲槽（僅限安裝 Mekanism 時）。"
+    "source": "Adds tanks for Mekanism chemicals.",
+    "translation": "加裝運送 Mekanism 化學物質的儲罐。"
   },
   "summary.singulo.android_large_backpack_upgrade": {
-    "source": "Adds 24 inventory slots to an android (the largest).",
-    "translation": "仿生人物品欄 +24 格（最大）。"
+    "source": "Adds 24 inventory slots to an android.",
+    "translation": "讓仿生人的物品欄增加 24 格。"
   },
   "summary.singulo.android_memory_axe": {
-    "source": "The Axe Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "斧型仿生人的設計。可在組裝站列印（不會消耗）。"
+    "source": "The design for printing Axe Androids.",
+    "translation": "可列印斧型仿生人的設計。"
   },
   "summary.singulo.android_memory_bit": {
-    "source": "The Bit Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "浮游砲型仿生人的設計。可在組裝站列印（不會消耗）。"
+    "source": "The design for printing Bit Androids.",
+    "translation": "可列印浮游砲型仿生人的設計。"
   },
   "summary.singulo.android_memory_gunner": {
-    "source": "The Gunner Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "射擊型仿生人的設計。可在組裝站列印（不會消耗）。"
+    "source": "The design for printing Gunner Androids.",
+    "translation": "可列印射擊型仿生人的設計。"
   },
   "summary.singulo.android_production_upgrade": {
     "source": "Lets an Android Assembly Station look after up to two androids.",
@@ -10676,8 +10676,8 @@
     "translation": "在封印控制台上使用，可與覺醒的視界守衛戰鬥。"
   },
   "summary.singulo.degenerate_furnace": {
-    "source": "A large generator burning Lv2 blocks (5 MFE/t on time crystals).",
-    "translation": "燃燒壓縮塊Lv2的大型發電機（時間晶體催化劑下 5 MFE/t）。"
+    "source": "A large generator that burns Lv2 compressed blocks.",
+    "translation": "燃燒 Lv2 壓縮方塊的大型發電機。"
   },
   "summary.singulo.factory_line": {
     "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
@@ -10716,8 +10716,8 @@
     "translation": "舊文明的精密驅動部件。"
   },
   "summary.singulo.procedure_card": {
-    "source": "Records up to eight work steps for androids.",
-    "translation": "記錄要讓仿生人執行的作業步驟（最多 8 個）。"
+    "source": "Records work steps for androids.",
+    "translation": "記錄讓仿生人執行的工作步驟。"
   },
   "summary.singulo.quantum_android_workbench": {
     "source": "Androids craft 20× as fast here. 81-slot holding box.",
@@ -11128,12 +11128,12 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 48 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 52 個"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
-    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 26 個"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 28 more",
+    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 28 個"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11188,8 +11188,8 @@
     "translation": "用於：廢墟面板、破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板 等 2 個"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
-    "translation": "用於：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、時間晶體催化劑、簡併熱爐控制器 等 3 個"
+    "source": "Used in: Degenerate Compactor Controller, Degenerate Compactor Frame, Degenerate Compactor Armor Plate, Degenerate Compactor Ram, Degenerate Compactor Anvil and 21 more",
+    "translation": "用於：簡併壓縮爐控制器、簡併壓縮爐框架、簡併壓縮爐裝甲板、簡併壓縮爐撞錘、簡併壓縮爐砧座 等 21 個"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11216,8 +11216,8 @@
     "translation": "用於：卡西米爾腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
-    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 15 個"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 18 more",
+    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 18 個"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -11404,8 +11404,8 @@
     "translation": "用於：冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
-    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 19 個"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 21 more",
+    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 21 個"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11416,8 +11416,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 28 more",
-    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 28 個"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 30 more",
+    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 30 個"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11524,8 +11524,8 @@
     "translation": "用於：資料卡（觀測日誌）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 25 more",
-    "translation": "用於：大型背包升級、簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、相位同步板 等 25 個"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 26 more",
+    "translation": "用於：大型背包升級、簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、相位同步板 等 26 個"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11632,28 +11632,28 @@
     "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 84 more",
-    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 84 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 88 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 88 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 59 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 59 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 67 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 67 個"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
-    "translation": "用於：超導電纜、量子糾纏元件、玻色凝聚態催化劑、簡併熱爐熱交換管、拓撲導線 等 1 個"
+    "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
+    "translation": "用於：超導電纜、加速管、量子糾纏元件、玻色凝聚態催化劑、簡併熱爐熱交換管 等 3 個"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
     "translation": "用於：熱電發電機、衝擊發電面板、珀耳帖冷卻器"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
-    "translation": "用於：奇異物質、奇點核心、暈收集器、時間晶體模組"
+    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 10 more",
+    "translation": "用於：奇異物質、陀螺驅動裝置、奇點核心、暈收集器、護盾塔基座 等 10 個"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
-    "translation": "用途：SMES 模組、爐心控制裝置、奇點封裝器、護盾塔核心、引力子操縱器及另外3項"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 8 more",
+    "translation": "用於：SMES 模組、反應爐外殼、爐心控制器、奇點封裝器、護盾塔核心 等 8 個"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11708,8 +11708,8 @@
     "translation": "用於：重力場穩定器、蟲洞產生器聚焦器、蟲洞入口外殼"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 22 more",
-    "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 22 個"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 24 more",
+    "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 24 個"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
@@ -11870,5 +11870,1073 @@
   "guide.singulo.factory_expansion.limits.body": {
     "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
     "translation": "金屬壓縮Lv2的質量為81。鐵塊或銅塊每個質量為3，因此Lv1需3塊，Lv2需27塊，相當於243個錠。可用銅代替鐵。熱電偶與熱交換核心的用途有限，無須一開始大量囤積。\nP反應爐須在10秒內接收50 GFE才能點火。每個SMES 模組容量為2 GFE，至少需要25個滿足總容量。單個輸出上限為100 MFE/t，須至少3個並聯，總傳輸速率達到250 MFE/t以上。\n點火後初始質量500、自旋0時，維持燃料供給的持續發電量約為28.6 MFE/t。2.1 GFE/t是傳輸上限，並非初始發電量。先發展質量、自旋與儲能，再為創世爐供電。"
+  },
+  "desc.singulo.capacity_upgrade_1": {
+    "source": "Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.",
+    "translation": "在加工機器的容量專用槽安裝一個後，儲能容量至少為1,000,000 FE。可與速度升級同時使用，不改變接收上限。取下時保留多餘電能，降至容量以下前停止接收。"
+  },
+  "desc.singulo.capacity_upgrade_2": {
+    "source": "Made from Mk1. Raises a processing machine’s buffer to at least 4,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "由Mk1製作。加工機器的儲能容量至少為4,000,000 FE。在容量專用槽安裝一個，不改變接收上限。"
+  },
+  "desc.singulo.capacity_upgrade_3": {
+    "source": "Made from Mk2. Raises a processing machine’s buffer to at least 40,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "由Mk2製作。加工機器的儲能容量至少為40,000,000 FE。在容量專用槽安裝一個，不改變接收上限。"
+  },
+  "gui.singulo.reason.capacity_upgrade": {
+    "source": "Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot",
+    "translation": "每刻需要 %s FE。請在專用槽中安裝容量升級 Mk%s 或更高版本"
+  },
+  "gui.singulo.slot.capacity_upgrade": {
+    "source": "Capacity upgrade slot (Mk1–Mk3)",
+    "translation": "容量升級專用槽（Mk1–Mk3）"
+  },
+  "howto.singulo.capacity_upgrade_1": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.capacity_upgrade_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製造地：精密組裝台（第 3 階段）"
+  },
+  "howto.singulo.capacity_upgrade_3": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製造地：精密組裝台（第 4 階段）"
+  },
+  "item.singulo.capacity_upgrade_1": {
+    "source": "Capacity Upgrade Mk1",
+    "translation": "容量升級 Mk1"
+  },
+  "item.singulo.capacity_upgrade_2": {
+    "source": "Capacity Upgrade Mk2",
+    "translation": "容量升級 Mk2"
+  },
+  "item.singulo.capacity_upgrade_3": {
+    "source": "Capacity Upgrade Mk3",
+    "translation": "容量升級 Mk3"
+  },
+  "uses.singulo.capacity_upgrade_1": {
+    "source": "Used in: Capacity Upgrade Mk2",
+    "translation": "用途：容量升級 Mk2"
+  },
+  "uses.singulo.capacity_upgrade_2": {
+    "source": "Used in: Capacity Upgrade Mk3",
+    "translation": "用途：容量升級 Mk3"
+  },
+  "item.singulo.drone_memory": {
+    "source": "Drone Crystal Memory",
+    "translation": "無人機水晶記憶體"
+  },
+  "item.singulo.drone_kit": {
+    "source": "Drone Kit",
+    "translation": "無人機套件"
+  },
+  "block.singulo.drone_station": {
+    "source": "Drone Station",
+    "translation": "無人機站"
+  },
+  "block.singulo.drone_port": {
+    "source": "Drone Port",
+    "translation": "無人機起降港"
+  },
+  "item.singulo.packing_crate": {
+    "source": "Packing Crate",
+    "translation": "包裝箱"
+  },
+  "item.singulo.battery_packing_crate": {
+    "source": "Battery Packing Crate",
+    "translation": "附電池包裝箱"
+  },
+  "item.singulo.large_battery_packing_crate": {
+    "source": "Large Battery Packing Crate",
+    "translation": "大容量電池包裝箱"
+  },
+  "entity.singulo.cargo_drone": {
+    "source": "Cargo Drone",
+    "translation": "運輸無人機"
+  },
+  "gui.singulo.drone_station.status.0": {
+    "source": "Insert a Drone Crystal Memory",
+    "translation": "請放入無人機水晶記憶體"
+  },
+  "gui.singulo.drone_station.status.1": {
+    "source": "No drone kit",
+    "translation": "沒有無人機套件"
+  },
+  "gui.singulo.drone_station.status.2": {
+    "source": "Not enough power (20000 FE to print)",
+    "translation": "電力不足（列印需要 20000 FE）"
+  },
+  "gui.singulo.drone_station.status.3": {
+    "source": "Printing",
+    "translation": "列印中"
+  },
+  "gui.singulo.drone_station.status.4": {
+    "source": "Standing by",
+    "translation": "待命中"
+  },
+  "gui.singulo.drone_station.status.5": {
+    "source": "Delivering",
+    "translation": "運送中"
+  },
+  "gui.singulo.drone_station.status.6": {
+    "source": "Something is blocking the top",
+    "translation": "無人機站上方被擋住了"
+  },
+  "gui.singulo.drone_station.status.7": {
+    "source": "Empty",
+    "translation": "空位"
+  },
+  "gui.singulo.drone_station.memory": {
+    "source": "Drone Crystal Memory (not used up)",
+    "translation": "無人機水晶記憶體（不會消耗）"
+  },
+  "gui.singulo.drone_station.kit": {
+    "source": "Drone Kit (one per print)",
+    "translation": "無人機套件（每次列印用 1 個）"
+  },
+  "gui.singulo.drone_station.production": {
+    "source": "Production Upgrade (1 for 2 drones, 2 for 3)",
+    "translation": "生產升級（1 張 2 架，2 張 3 架）"
+  },
+  "gui.singulo.drone_station.permit": {
+    "source": "Shield Permit (limits who can use it)",
+    "translation": "護盾通行證（限制可使用的人）"
+  },
+  "gui.singulo.drone_station.more_units": {
+    "source": "Each Production Upgrade adds one drone (2 for 3 drones)",
+    "translation": "每張生產升級增加 1 架（2 張即 3 架）"
+  },
+  "gui.singulo.drone_port.status.0": {
+    "source": "Idle",
+    "translation": "待機中"
+  },
+  "gui.singulo.drone_port.status.1": {
+    "source": "Waiting for a drone (none standing by nearby)",
+    "translation": "正在等待無人機（附近沒有待命的無人機）"
+  },
+  "gui.singulo.drone_port.status.2": {
+    "source": "A drone is on its way",
+    "translation": "無人機正在趕來"
+  },
+  "gui.singulo.drone_port.status.3": {
+    "source": "Loading",
+    "translation": "裝貨中"
+  },
+  "gui.singulo.drone_port.status.4": {
+    "source": "Unloading",
+    "translation": "卸貨中"
+  },
+  "gui.singulo.drone_port.status.5": {
+    "source": "Not enough power",
+    "translation": "電力不足"
+  },
+  "gui.singulo.drone_port.status.6": {
+    "source": "No empty packing crate",
+    "translation": "沒有空的包裝箱"
+  },
+  "gui.singulo.drone_port.status.7": {
+    "source": "Out of range (needs a higher-tier crate)",
+    "translation": "超出航程（需要更高階段的包裝箱）"
+  },
+  "gui.singulo.drone_port.status.8": {
+    "source": "Choose a destination",
+    "translation": "請選擇目的地"
+  },
+  "gui.singulo.drone_port.status.9": {
+    "source": "No cargo",
+    "translation": "沒有貨物"
+  },
+  "gui.singulo.drone_port.place": {
+    "source": "Drone Port (%s, %s, %s)",
+    "translation": "無人機起降港（%s, %s, %s）"
+  },
+  "gui.singulo.drone_port.target": {
+    "source": "At %s, %s, %s",
+    "translation": "位置 %s, %s, %s"
+  },
+  "gui.singulo.drone_port.cost": {
+    "source": "%s FE to send",
+    "translation": "發送需要 %s FE"
+  },
+  "gui.singulo.drone_port.send": {
+    "source": "Send",
+    "translation": "發送"
+  },
+  "gui.singulo.drone_port.cancel": {
+    "source": "Cancel",
+    "translation": "取消"
+  },
+  "gui.singulo.drone_port.no_targets": {
+    "source": "No other drone ports",
+    "translation": "沒有其他無人機起降港"
+  },
+  "gui.singulo.drone_port.crates": {
+    "source": "Empty packing crates",
+    "translation": "空的包裝箱"
+  },
+  "gui.singulo.drone_port.arrived": {
+    "source": "Arrived crates (unpacked into the row below)",
+    "translation": "送達的箱子（拆開放入下方的接收欄）"
+  },
+  "gui.singulo.drone_port.receive": {
+    "source": "Received items",
+    "translation": "接收"
+  },
+  "gui.singulo.drone_port.locked": {
+    "source": "Only the owner can use this",
+    "translation": "只有擁有者可以使用"
+  },
+  "tooltip.singulo.drone_crate.range": {
+    "source": "Range: %s blocks",
+    "translation": "航程 %s 格"
+  },
+  "tooltip.singulo.drone_crate.item": {
+    "source": "%s ×%s",
+    "translation": "%s ×%s"
+  },
+  "tooltip.singulo.drone_crate.more": {
+    "source": "and %s more",
+    "translation": "另有 %s 種"
+  },
+  "tooltip.singulo.drone_crate.unpack": {
+    "source": "Right-click to unpack",
+    "translation": "右鍵拆箱"
+  },
+  "desc.singulo.drone_memory": {
+    "source": "A crystal memory smaller than an android’s, holding the design of a four-rotor cargo drone (rotor type). Put it in a Drone Station to print rotor drones (it is not used up). Dropped by guard docks in any facility.",
+    "translation": "記錄了靠四個旋翼飛行的運輸無人機（旋翼型）設計的水晶記憶體，比仿生人用的更小。放入無人機站即可列印旋翼型無人機（不會消耗）。任何設施的警衛無人機塢都會掉落。"
+  },
+  "desc.singulo.drone_kit": {
+    "source": "A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.",
+    "translation": "一套零件與外殼板。無人機站每列印一架運輸無人機就使用 1 個。"
+  },
+  "howto.singulo.drone_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "desc.singulo.drone_station": {
+    "source": "Prints cargo drones of its memory’s type (rotor, jet or anti-gravity) from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks. A Phase Shift Upgrade lets them fly through walls, and a Shield Permit on the right rail limits who can use it.",
+    "translation": "用無人機水晶記憶體、無人機套件和電力列印記憶體類型（旋翼、噴射、反重力）的運輸無人機（每架 20,000 FE；每張生產升級增加 1 架，最多 3 架）。無人機在上空待命，為 64 格內的無人機起降港運送貨物。相位穿透升級可讓無人機穿牆飛行，右側欄的護盾通行證可限制使用者。"
+  },
+  "summary.singulo.drone_station": {
+    "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
+    "translation": "用記憶體、套件和電力列印運輸無人機，並讓它們在上空待命。"
+  },
+  "howto.singulo.drone_station": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "desc.singulo.drone_port": {
+    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block. It can also auto-send to a set destination once cargo reaches a threshold. Drones find their way around walls through open space.",
+    "translation": "放入空的包裝箱和貨物，選擇目的地（同一擁有者的其他起降港）並發送：它會打包貨物、支付電力並呼叫附近的無人機。頂部艙門打開，把箱子交給無人機。送達的箱子會自動拆開。電力：2,000 FE，每格距離另加 50 FE。貨物達到設定數量後，也可以自動發往登記的目的地。無人機會避開牆壁，從空曠處飛來。"
+  },
+  "summary.singulo.drone_port": {
+    "source": "Packs cargo into crates and sends or receives it by drone.",
+    "translation": "把貨物裝進包裝箱，用無人機發送或接收。"
+  },
+  "howto.singulo.drone_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "desc.singulo.packing_crate": {
+    "source": "A crate for cargo sent by drone. Reaches up to 160 blocks. Right-click a packed crate to unpack it.",
+    "translation": "裝入無人機運送貨物的箱子。最遠可送 160 格。右鍵已打包的箱子可以拆開。"
+  },
+  "howto.singulo.packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "uses.singulo.packing_crate": {
+    "source": "Used in: Battery Packing Crate",
+    "translation": "用於：附電池包裝箱"
+  },
+  "desc.singulo.battery_packing_crate": {
+    "source": "A packing crate with an extra battery. Reaches up to 760 blocks.",
+    "translation": "加裝了電池的包裝箱。最遠可送 760 格。"
+  },
+  "howto.singulo.battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "uses.singulo.battery_packing_crate": {
+    "source": "Used in: Large Battery Packing Crate",
+    "translation": "用於：大容量電池包裝箱"
+  },
+  "desc.singulo.large_battery_packing_crate": {
+    "source": "A packing crate with a large battery. Reaches up to 3,160 blocks.",
+    "translation": "裝有大電池的包裝箱。最遠可送 3,160 格。"
+  },
+  "howto.singulo.large_battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製造地：工作台（第 3 階段）"
+  },
+  "guide.singulo.drones": {
+    "source": "Drone Delivery",
+    "translation": "無人機運輸"
+  },
+  "guide.singulo.drones.start.title": {
+    "source": "Getting drones",
+    "translation": "準備無人機"
+  },
+  "guide.singulo.drones.start.body": {
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "把遺跡警衛無人機塢放出的一波警衛無人機全部擊敗後，有時塢上方會出現無人機水晶記憶體（地表觀測站為 40%）。在第 2 階段的工作台製作無人機站，在精密組裝台製作無人機套件。把記憶體（不會消耗）和套件（每次列印用 1 個）放入無人機站並供電，它就會在上方列印一架運輸無人機（20,000 FE）。每張生產升級增加 1 架，2 張最多 3 架。無人機在站的上空待命。\n無人機不會受到玩家或生物的傷害。破壞無人機站時，待命中的無人機會變回套件。"
+  },
+  "guide.singulo.drones.send.title": {
+    "source": "Sending cargo",
+    "translation": "發送貨物"
+  },
+  "guide.singulo.drones.send.body": {
+    "source": "A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\nPut an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. Before the drone arrives, Cancel puts everything back (power included).\nHoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.",
+    "translation": "放置無人機起降港後，它會加入放置者的運輸網：同一維度中同一擁有者的所有起降港都會列為目的地。點擊標題列的名字可以為它命名。\n在左上放入空的包裝箱，中間放入貨物，在右側列表選擇目的地並按「發送」。起降港會打包貨物、支付電力，並從 64 格內的無人機站呼叫待命的無人機。無人機懸停在正上方時，頂部艙門打開，升降台把箱子舉起，無人機的爪子將其抓住。到達目的地後艙門再次打開，箱子被放下並自動拆開到接收欄。空箱會回到空箱欄。在無人機到達之前，按「取消」可以全部恢復原狀（電力也會退回）。\n漏斗和管道可以放入空箱和貨物，並從接收欄取出物品。比較器輸出接收欄的填滿程度。"
+  },
+  "guide.singulo.drones.range.title": {
+    "source": "Range and power",
+    "translation": "航程與電力"
+  },
+  "guide.singulo.drones.range.body": {
+    "source": "Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\nCargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. If the destination port was broken, the cargo goes back to where it came from.",
+    "translation": "發送所需電力為 2,000 FE，直線距離每格另加 50 FE，在打包時由起降港支付。能送多遠由包裝箱決定：包裝箱 160 格，附電池包裝箱 760 格，大容量電池包裝箱 3,160 格。目的地列表中，夠不到的距離顯示為紅色。\n無人機飛過未載入的區域時，貨物也不會遺失。目的地已載入時無人機會降落卸貨；未載入時，起降港會在載入時接收箱子。如果目的地起降港已被破壞，貨物會送回出發地。"
+  },
+  "gui.singulo.drone_port.status.10": {
+    "source": "No drone serves this port",
+    "translation": "沒有負責此起降港的無人機"
+  },
+  "gui.singulo.drone_port.elsewhere": {
+    "source": "Another port",
+    "translation": "其他起降港"
+  },
+  "gui.singulo.drone_port.cancel.hint": {
+    "source": "Cancel and get the cargo and power back",
+    "translation": "取消，並退回貨物和電力"
+  },
+  "gui.singulo.drone_port.phase.1": {
+    "source": "Waiting",
+    "translation": "等待無人機"
+  },
+  "gui.singulo.drone_port.phase.2": {
+    "source": "Drone coming",
+    "translation": "正在趕來"
+  },
+  "gui.singulo.drone_port.phase.3": {
+    "source": "Loading",
+    "translation": "裝貨"
+  },
+  "gui.singulo.drone_port.phase.4": {
+    "source": "In flight",
+    "translation": "飛行中"
+  },
+  "gui.singulo.drone_port.phase.5": {
+    "source": "Unloading",
+    "translation": "卸貨"
+  },
+  "gui.singulo.drone_port.ship.out": {
+    "source": "To %s",
+    "translation": "送往 %s"
+  },
+  "gui.singulo.drone_port.ship.in": {
+    "source": "From %s",
+    "translation": "來自 %s"
+  },
+  "gui.singulo.drone_port.ship.progress": {
+    "source": "%s%% of the way",
+    "translation": "進度 %s%%"
+  },
+  "gui.singulo.drone_port.no_ships": {
+    "source": "Nothing in transit",
+    "translation": "沒有運輸中的貨物"
+  },
+  "gui.singulo.drone_station.status.8": {
+    "source": "Stopped",
+    "translation": "已停止"
+  },
+  "gui.singulo.drone_station.status.9": {
+    "source": "Dismantling",
+    "translation": "拆解中"
+  },
+  "gui.singulo.drone_station.dismantle": {
+    "source": "Dismantle (press twice; the kit comes back)",
+    "translation": "拆解（按兩次；套件會退回）"
+  },
+  "gui.singulo.drone_station.dismantle.confirm": {
+    "source": "Press again to dismantle",
+    "translation": "再按一次即拆解"
+  },
+  "gui.singulo.drone_station.resume": {
+    "source": "Print again",
+    "translation": "重新列印"
+  },
+  "guide.singulo.drones.more.title": {
+    "source": "Auto-export, shipments and dismantling",
+    "translation": "自動輸出、運輸狀況與拆解"
+  },
+  "guide.singulo.drones.more.body": {
+    "source": "The settings tab on the right rail opens the same side settings as processing machines. Choose input and output per face and turn on auto-eject to push received items into an adjacent chest or other storage (empty crates that do not fit the crate slot too).\nThe middle of the screen lists shipments in transit: outgoing in orange, incoming in green. Each shows its stage (waiting, drone coming, loading, in flight, unloading) and a progress bar while in flight.\nYou can only send while a drone serves the port (one from a station within 64 blocks). A crate sent while every drone is busy waits to be loaded, and a drone that finishes a delivery nearby flies straight to it instead of returning to its station.\nIn the station screen, press the × on a waiting drone’s row twice to dismantle it: it lands on the station, comes apart and its kit comes back. That slot stops; press + to print again.",
+    "translation": "在右側欄的設定格可以打開與加工機器相同的面設定。為每個面設定輸入輸出，開啟自動排出後，收到的貨物會被推入相鄰的箱子等容器（空箱欄放不下的空箱也會）。\n介面中間會列出運輸中的航班（發出的為橙色，送來的為綠色）。每個航班都能看到所處階段：等待無人機、正在趕來、裝貨、飛行中、卸貨，飛行中還會顯示進度條。\n只有當有無人機負責該起降港時（64 格內無人機站的無人機）才能發送。所有無人機都在運送時發送的箱子會進入待裝貨狀態，在附近送完貨的無人機會直接前來取貨，而不返回無人機站。\n在無人機站介面中，按兩次待命無人機所在列的 ×，即可拆解。無人機會降落到站上並被拆開，套件會退回。該欄位隨即停止，按 + 可重新列印。"
+  },
+  "gui.singulo.drone_port.tab.0": {
+    "source": "Cargo and received items",
+    "translation": "貨物與接收"
+  },
+  "gui.singulo.drone_port.tab.1": {
+    "source": "Destination and sending",
+    "translation": "目的地與發送"
+  },
+  "gui.singulo.drone_port.tab.2": {
+    "source": "Shipments in transit",
+    "translation": "運輸中的航班"
+  },
+  "gui.singulo.drone_port.auto.off": {
+    "source": "Auto: off",
+    "translation": "自動 關閉"
+  },
+  "gui.singulo.drone_port.auto.full": {
+    "source": "Auto: full",
+    "translation": "自動 裝滿"
+  },
+  "gui.singulo.drone_port.auto.count": {
+    "source": "Auto: %s",
+    "translation": "自動 %s 個"
+  },
+  "gui.singulo.drone_port.auto.hint": {
+    "source": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
+    "translation": "自動發送：貨物達到此數量（裝滿指 9 欄全滿）時，發送到登記的目的地。貨物停止增加 2 秒後發送。點擊切換"
+  },
+  "gui.singulo.drone_port.auto.register": {
+    "source": "Set",
+    "translation": "登記"
+  },
+  "gui.singulo.drone_port.auto.register.hint": {
+    "source": "Use the destination selected in the list for auto-send",
+    "translation": "將列表中選中的目的地設為自動發送的目的地"
+  },
+  "gui.singulo.drone_port.auto.target": {
+    "source": "→ %s",
+    "translation": "→ %s"
+  },
+  "gui.singulo.drone_port.auto.none": {
+    "source": "No auto-send destination",
+    "translation": "未登記自動發送目的地"
+  },
+  "guide.singulo.drones.auto.title": {
+    "source": "Auto-send",
+    "translation": "自動發送"
+  },
+  "guide.singulo.drones.auto.body": {
+    "source": "The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.",
+    "translation": "在發送分頁的下方一列可以使用自動發送。每按一次閾值按鈕，就會在關閉、1 個、64 個、256 個、裝滿（貨物的 9 欄全滿）之間切換。在列表中選擇目的地後按「登記」，即可設為自動發送的目的地（與手動發送的目的地分開保存）。\n當貨物欄達到閾值且 2 秒內沒有再增加時（裝滿則立即），起降港會自動發送到登記的目的地。空箱、航程、電力與無人機的條件與手動發送相同。用漏斗或管道持續放入貨物，就能自動把礦場等處的物品不斷運回基地。"
+  },
+  "subtitles.singulo.drone.rotor": {
+    "source": "Cargo drone hums",
+    "translation": "運輸無人機嗡嗡作響"
+  },
+  "subtitles.singulo.drone.print": {
+    "source": "Print head draws a layer",
+    "translation": "列印頭繪製一層"
+  },
+  "subtitles.singulo.drone.print_start": {
+    "source": "Drone printing starts",
+    "translation": "無人機開始列印"
+  },
+  "subtitles.singulo.drone.printed": {
+    "source": "Drone printed",
+    "translation": "無人機列印完成"
+  },
+  "subtitles.singulo.drone.arm_retract": {
+    "source": "Print arm retracts",
+    "translation": "列印臂收回"
+  },
+  "subtitles.singulo.drone.dismantle": {
+    "source": "Drone is dismantled",
+    "translation": "無人機被拆解"
+  },
+  "subtitles.singulo.drone_port.hatch_open": {
+    "source": "Drone port hatch opens",
+    "translation": "起降港艙門打開"
+  },
+  "subtitles.singulo.drone_port.hatch_close": {
+    "source": "Drone port hatch closes",
+    "translation": "起降港艙門關閉"
+  },
+  "subtitles.singulo.drone_port.lift": {
+    "source": "Lift moves",
+    "translation": "升降台移動"
+  },
+  "subtitles.singulo.drone_port.clamp": {
+    "source": "Drone claws grip a crate",
+    "translation": "無人機的爪子抓住箱子"
+  },
+  "subtitles.singulo.drone_port.pack": {
+    "source": "Cargo is packed",
+    "translation": "貨物被打包"
+  },
+  "subtitles.singulo.drone_port.arrive": {
+    "source": "Cargo arrives",
+    "translation": "貨物送達"
+  },
+  "gui.singulo.drone_port.sides.items": {
+    "source": "Cargo in and out",
+    "translation": "貨物的進出"
+  },
+  "gui.singulo.drone_port.sides.crates": {
+    "source": "Empty crates (reserve slot input/output)",
+    "translation": "空箱（備用箱槽的輸入和輸出）"
+  },
+  "gui.singulo.drone_port.sides.crate_input": {
+    "source": "Accepts empty crates",
+    "translation": "可放入空箱"
+  },
+  "guide.singulo.drones.android.title": {
+    "source": "Working with androids",
+    "translation": "與仿生人協作"
+  },
+  "guide.singulo.drones.android.body": {
+    "source": "Place a Drone Port beside an Android Supply Port and allow cargo output on that face to use arrivals as materials. Outbound cargo and sealed crates are not counted as available stock. Beside a Delivery Port, allow cargo input to accept finished products and use auto-send to ship them to another base. Full cargo slots leave products waiting in the Delivery Port.\nThe empty-crate tab controls reserve-crate input/output and auto-eject separately. Defaults remain input-only with auto-eject off. Androids and pipes can collect crates through an output face. On a return-shipment port, disable empty-crate input and allow cargo input on the receiving face to accept empty crates as cargo rather than reserves. Supply transport crates through another face and configure auto-send.",
+    "translation": "將無人機起降港放在仿生人資材口旁，並允許該面的貨物輸出，仿生人即可使用到貨材料。待發貨物和未拆封箱不會計入可用庫存。將起降港放在交付口旁並允許貨物輸入，即可接收成品，再用自動發貨運往其他基地。貨物槽滿時，成品留在交付口等待。\n空箱分頁可單獨設定備用箱的輸入、輸出與自動排出，預設僅輸入且不自動排出。仿生人和管道可從輸出面回收空箱。返程起降港的接收面應停用空箱輸入並啟用貨物輸入，使空箱作為貨物而非備用箱進入。從另一面補充運輸用箱，並設定自動發貨。"
+  },
+  "gui.singulo.drone_port.auto.is_target": {
+    "source": "Auto-send destination",
+    "translation": "自動發送的目的地"
+  },
+  "item.singulo.drone_phase_upgrade": {
+    "source": "Phase Shift Upgrade",
+    "translation": "相位穿透升級"
+  },
+  "gui.singulo.drone_station.phase": {
+    "source": "Phase Shift Upgrade (fly through walls)",
+    "translation": "相位穿透升級（穿牆飛行）"
+  },
+  "gui.singulo.drone_port.phase.6": {
+    "source": "No route",
+    "translation": "無路線"
+  },
+  "subtitles.singulo.drone.phase": {
+    "source": "Drone phases through a wall",
+    "translation": "無人機穿過牆壁"
+  },
+  "desc.singulo.drone_phase_upgrade": {
+    "source": "Put it in the slot inside a Drone Station’s frame (below the Production Upgrades) to let its drones take shortcuts straight through walls and roofs. They glow violet while passing through.",
+    "translation": "裝在無人機站框內的格子（生產升級下方）中，該站的無人機就能直線穿過牆壁和屋頂抄近路。穿過時會發出紫光。"
+  },
+  "howto.singulo.drone_phase_upgrade": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製造地：精密組裝台（第 4 階段）"
+  },
+  "guide.singulo.drones.route.title": {
+    "source": "Routes and phase shift",
+    "translation": "飛行路線與相位穿透"
+  },
+  "guide.singulo.drones.route.body": {
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the slot inside a Drone Station’s frame (below the Production Upgrades) and its drones take shortcuts straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "無人機不會穿過牆壁或屋頂飛行。目的地較近時，會沿著空曠處尋找路線；較遠時，會先從出發點飛到能看見天空的地方，在高於地形處巡航，再從目的地上方的天空降下。也會從門、窗或天窗進入建築內的起降港。沒有開口的房間裡的起降港無法到達，運輸中頁面會顯示「無路線」（貨物不會遺失，無人機會原地等待並重新尋找路線）。\n把第 4 階段在精密組裝台製作的相位穿透升級放入無人機站框內的格子（生產升級下方），該站的無人機就會直線穿牆抄近路。穿牆前一點就開始發出紫光，隔著牆也能看到發光的身影。"
+  },
+  "item.singulo.drone_memory_jet": {
+    "source": "Drone Crystal Memory (Jet)",
+    "translation": "無人機水晶記憶體（噴射型）"
+  },
+  "item.singulo.drone_memory_gravity": {
+    "source": "Drone Crystal Memory (Anti-Gravity)",
+    "translation": "無人機水晶記憶體（反重力型）"
+  },
+  "subtitles.singulo.drone.jet": {
+    "source": "Jet drone roars",
+    "translation": "噴射無人機呼嘯"
+  },
+  "subtitles.singulo.drone.hover": {
+    "source": "Anti-gravity drone hums",
+    "translation": "反重力無人機嗡鳴"
+  },
+  "desc.singulo.drone_memory_jet": {
+    "source": "The design of a cargo drone with twin jets. Put it in a Drone Station to print the fastest drones (1.6× the rotor type). It is not used up. Dropped by guard docks in the Research Building and higher facilities.",
+    "translation": "記錄了雙噴射運輸無人機設計的記憶體。放入無人機站後，會列印最快的噴射型無人機（旋翼型的 1.6 倍）。不會消耗。由研究棟及更高級設施的警衛無人機塢掉落。"
+  },
+  "desc.singulo.drone_memory_gravity": {
+    "source": "The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.",
+    "translation": "記錄了依靠反重力場漂浮的運輸無人機設計的記憶體。放入無人機站後，會列印由四個浮游砲以牽引光束運送箱子的反重力型無人機（旋翼型速度的 1.25 倍）。不會消耗。封閉培養設施和地下仿生人研究所的警衛無人機塢偶爾會掉落。"
+  },
+  "guide.singulo.drones.kinds.title": {
+    "source": "Drone types",
+    "translation": "無人機的類型"
+  },
+  "guide.singulo.drones.kinds.body": {
+    "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
+    "translation": "記憶體的類型決定無人機站列印的無人機類型。較高級的類型只會從較高級設施的警衛無人機塢掉落。\n- 旋翼型（任何設施）：靠四個旋翼飛行，標準速度。\n- 噴射型（研究棟及更高級設施）：靠雙噴射引擎飛行，最快的類型（旋翼型的 1.6 倍）。轉彎時會傾斜機身。\n- 反重力型（封閉培養設施和地下仿生人研究所，稀有）：靠反重力場漂浮（1.25 倍）。四個浮游砲以牽引光束吊住箱子。\n更換記憶體不會改變已列印的無人機。想換類型時，請拆解無人機後重新列印。"
+  },
+  "gui.singulo.drone_station.row.0": {
+    "source": "No memory",
+    "translation": "無記憶體"
+  },
+  "gui.singulo.drone_station.row.1": {
+    "source": "No kit",
+    "translation": "無套件"
+  },
+  "gui.singulo.drone_station.row.2": {
+    "source": "Low power",
+    "translation": "電力不足"
+  },
+  "gui.singulo.drone_station.row.6": {
+    "source": "Top blocked",
+    "translation": "上方被擋住"
+  },
+  "summary.singulo.unfired_ceramic": {
+    "source": "Fire it in a furnace to make white ceramic.",
+    "translation": "在熔爐中燒製即成白色陶瓷複合材料。"
+  },
+  "summary.singulo.holo_projector": {
+    "source": "Projects a multiblock’s shape and lists missing blocks.",
+    "translation": "投影多方塊結構的搭法，並提示缺少的方塊。"
+  },
+  "summary.singulo.relocation_wrench": {
+    "source": "Picks up machines with their contents and settings.",
+    "translation": "連同內容物和設定一起回收裝置。"
+  },
+  "summary.singulo.settings_card": {
+    "source": "Copies a machine’s settings to another.",
+    "translation": "複製裝置的設定並貼到其他裝置上。"
+  },
+  "summary.singulo.meteor_compass": {
+    "source": "Points to the nearest unmined meteorite core.",
+    "translation": "指向最近的、尚未開採的隕石核心。"
+  },
+  "summary.singulo.fluid_canister": {
+    "source": "Carries 1,000 mB of any liquid or gas.",
+    "translation": "可裝運 1,000 mB 任意液體或氣體的容器。"
+  },
+  "summary.singulo.hydrogen_fuel_cell": {
+    "source": "A generator that makes power from hydrogen and oxygen.",
+    "translation": "用氫和氧發電的發電機。"
+  },
+  "summary.singulo.peltier_cooler": {
+    "source": "Uses power to freeze water into ice.",
+    "translation": "用電力把水凍成冰。"
+  },
+  "summary.singulo.builder_wand": {
+    "source": "Creative only. Builds a multiblock instantly.",
+    "translation": "僅限創造模式。瞬間搭好多方塊結構。"
+  },
+  "summary.singulo.thermoelectric_generator": {
+    "source": "Your first generator: place it between hot and cold.",
+    "translation": "夾在冷熱之間即可發電，最初的電源。"
+  },
+  "summary.singulo.compressor": {
+    "source": "Presses plates, or packs any item into mass in mass mode.",
+    "translation": "製作板材；質量模式下可把任何物品壓成壓縮方塊。"
+  },
+  "summary.singulo.coolant_cartridge": {
+    "source": "A portable canister of 100 mB of liquid nitrogen.",
+    "translation": "裝有 100 mB 液氮的便攜容器。"
+  },
+  "summary.singulo.empty_coolant_cartridge": {
+    "source": "An empty canister, filled with liquid nitrogen at a cooling tower.",
+    "translation": "在冷卻塔裝入液氮的空容器。"
+  },
+  "summary.singulo.meteorite_crust": {
+    "source": "A meteorite’s burnt shell. Grows stardust in its crater.",
+    "translation": "包裹隕石的焦殼，在隕石坑中培育星塵晶體。"
+  },
+  "summary.singulo.meteoric_iron_chunk": {
+    "source": "Iron-nickel in a meteorite. Mine it for raw meteoric iron.",
+    "translation": "隕石中的鐵鎳塊，開採可得隕鐵原礦。"
+  },
+  "summary.singulo.fulgurite": {
+    "source": "Lightning-fused quartz glass for optical lattices.",
+    "translation": "被雷熔化凝固的石英玻璃，光晶格基板的材料。"
+  },
+  "summary.singulo.cryogenic_cooling_tower": {
+    "source": "A multiblock that makes liquid nitrogen and helium.",
+    "translation": "製造液氮和液氦的多方塊結構。"
+  },
+  "summary.singulo.cryogenic_turbine": {
+    "source": "Recovers the power stored in liquid nitrogen.",
+    "translation": "取回儲存在液氮中的電力。"
+  },
+  "summary.singulo.muon_fusion_reactor": {
+    "source": "A stage 2 generator running on muon catalysts and water.",
+    "translation": "用μ子催化劑和水發電的第 2 階段發電機。"
+  },
+  "summary.singulo.capacity_upgrade_1": {
+    "source": "Raises a machine’s buffer to 1,000,000 FE.",
+    "translation": "將加工裝置的蓄電容量提高到 100 萬 FE。"
+  },
+  "summary.singulo.capacity_upgrade_2": {
+    "source": "Raises a machine’s buffer to 4,000,000 FE.",
+    "translation": "將加工裝置的蓄電容量提高到 400 萬 FE。"
+  },
+  "summary.singulo.capacity_upgrade_3": {
+    "source": "Raises a machine’s buffer to 40,000,000 FE.",
+    "translation": "將加工裝置的蓄電容量提高到 4,000 萬 FE。"
+  },
+  "summary.singulo.deep_sea_collector": {
+    "source": "Uses water pressure on the sea floor to make Pressure Crystals.",
+    "translation": "在海底利用水壓製造高壓晶體。"
+  },
+  "summary.singulo.pressure_crystal": {
+    "source": "A hard violet crystal pressed by deep-sea water.",
+    "translation": "在海底水壓下壓實而成的堅硬紫色晶體。"
+  },
+  "summary.singulo.neutrino_scanner": {
+    "source": "Reveals nearby ores and ruins through terrain.",
+    "translation": "透過地形顯示周圍的礦石與遺跡。"
+  },
+  "summary.singulo.android_repair_kit": {
+    "source": "Lets an android repair itself when hurt.",
+    "translation": "仿生人受傷時可自行修復。"
+  },
+  "summary.singulo.android_armor_plate": {
+    "source": "Works as a guard android’s chestplate.",
+    "translation": "作為護衛仿生人的胸甲。"
+  },
+  "summary.singulo.android_factory_print_unit": {
+    "source": "Makes android printing faster and cheaper.",
+    "translation": "讓仿生人列印更快、更省。"
+  },
+  "summary.singulo.android_battery_upgrade": {
+    "source": "Raises a guard android’s charge.",
+    "translation": "增加護衛仿生人的電量。"
+  },
+  "summary.singulo.android_mining_upgrade": {
+    "source": "Lets a guard android mine.",
+    "translation": "讓護衛仿生人能夠採掘。"
+  },
+  "summary.singulo.android_ribbon": {
+    "source": "A ribbon for an android’s head.",
+    "translation": "繫在仿生人頭上的緞帶。"
+  },
+  "summary.singulo.android_hair_flower": {
+    "source": "A flower hair ornament for an android.",
+    "translation": "戴在仿生人頭上的花朵髮飾。"
+  },
+  "summary.singulo.android_beret": {
+    "source": "A beret for an android.",
+    "translation": "給仿生人戴的貝雷帽。"
+  },
+  "summary.singulo.android_glasses": {
+    "source": "Square glasses for an android.",
+    "translation": "給仿生人戴的方框眼鏡。"
+  },
+  "summary.singulo.drone_memory": {
+    "source": "The design for printing rotor cargo drones.",
+    "translation": "可列印旋翼型運輸無人機的設計。"
+  },
+  "summary.singulo.drone_memory_jet": {
+    "source": "The design for the fastest, jet-powered cargo drone.",
+    "translation": "最快的噴射型運輸無人機的設計。"
+  },
+  "summary.singulo.drone_memory_gravity": {
+    "source": "The design for an anti-gravity cargo drone with tractor beams.",
+    "translation": "以牽引光束運箱的反重力型運輸無人機的設計。"
+  },
+  "summary.singulo.drone_kit": {
+    "source": "Parts used for each cargo drone printed.",
+    "translation": "每列印一架無人機消耗的零件組。"
+  },
+  "summary.singulo.packing_crate": {
+    "source": "A crate for drone cargo. Reaches 160 blocks.",
+    "translation": "裝運無人機貨物的箱子，可送達 160 格。"
+  },
+  "summary.singulo.drone_phase_upgrade": {
+    "source": "Lets a station’s drones take shortcuts through walls.",
+    "translation": "讓無人機站的無人機穿牆抄近路。"
+  },
+  "summary.singulo.android_headdress": {
+    "source": "A frilled headdress for an android.",
+    "translation": "戴在仿生人頭上的荷葉邊頭飾。"
+  },
+  "summary.singulo.android_cape": {
+    "source": "A cape that flutters behind an android.",
+    "translation": "在仿生人背後飄動的披風。"
+  },
+  "summary.singulo.android_scarf": {
+    "source": "A scarf for an android’s neck.",
+    "translation": "圍在仿生人脖子上的圍巾。"
+  },
+  "summary.singulo.android_waist_ribbon": {
+    "source": "A large bow for the back of an android’s waist.",
+    "translation": "繫在仿生人腰後的大蝴蝶結。"
+  },
+  "summary.singulo.android_book": {
+    "source": "A book an idle android holds.",
+    "translation": "待命中的仿生人手持的書。"
+  },
+  "summary.singulo.android_bouquet": {
+    "source": "A bouquet an idle android holds.",
+    "translation": "待命中的仿生人手持的花束。"
+  },
+  "summary.singulo.android_teacup": {
+    "source": "A teacup an idle android holds.",
+    "translation": "待命中的仿生人手持的茶杯。"
+  },
+  "summary.singulo.android_umbrella": {
+    "source": "An umbrella an idle android holds up.",
+    "translation": "待命中的仿生人撐的傘。"
+  },
+  "summary.singulo.android_supply_port": {
+    "source": "Turns the storage next to it into a work stockpile.",
+    "translation": "把相鄰的箱子等變成工作的材料存放處。"
+  },
+  "summary.singulo.android_delivery_port": {
+    "source": "A box where androids deliver finished orders.",
+    "translation": "仿生人送來訂單成品的箱子。"
+  },
+  "summary.singulo.android_recipe_rack": {
+    "source": "A rack that makes recipe cards orderable.",
+    "translation": "擺放配方卡、使其可被下單的架子。"
+  },
+  "summary.singulo.recipe_card": {
+    "source": "A card that records a recipe at a work console.",
+    "translation": "在工作指令台記錄配方的卡片。"
+  },
+  "summary.singulo.neutrino_observatory": {
+    "source": "Keeps showing ores and ruins in a wide area.",
+    "translation": "持續向附近的人顯示大範圍內的礦石與遺跡。"
+  },
+  "summary.singulo.scanner_module_2": {
+    "source": "Raises scanner sensitivity to show gold and diamonds.",
+    "translation": "提高掃描儀靈敏度，也能顯示金和鑽石。"
+  },
+  "summary.singulo.scanner_module_3": {
+    "source": "Maxes scanner sensitivity to show ancient debris.",
+    "translation": "將掃描儀靈敏度提到最高，也能顯示遠古殘骸。"
+  },
+  "summary.singulo.low_gravity_panel": {
+    "source": "Cuts your gravity to a fifth until you land.",
+    "translation": "踩上去後，直到下次落地重力變為五分之一。"
+  },
+  "summary.singulo.high_gravity_panel": {
+    "source": "Raises your gravity 2.5× until you land.",
+    "translation": "踩上去後，直到下次落地重力變為 2.5 倍。"
+  },
+  "summary.singulo.degenerate_precursor": {
+    "source": "Pressed around a pressure crystal; saves rock in shells.",
+    "translation": "以高壓晶體為種壓製而成，簡併物質殼的材料。"
+  },
+  "summary.singulo.void_collector": {
+    "source": "Gathers Void Dust above the End void.",
+    "translation": "在終界虛空之上收集虛空塵。"
+  },
+  "summary.singulo.void_dust": {
+    "source": "Condensed space fluctuations for singularity tech.",
+    "translation": "空間漲落凝結成的塵，用於奇點技術。"
+  },
+  "summary.singulo.sentinel_core": {
+    "source": "The Echo Sentinel’s record crystal, built into advanced machines.",
+    "translation": "回聲守衛的記錄水晶，用於高級裝置。"
+  },
+  "summary.singulo.degenerate_nucleus": {
+    "source": "The gravity knot left in the Gravity Remnant’s heart.",
+    "translation": "重力殘渣核心殘留的重力塊。"
+  },
+  "summary.singulo.echo_chapter": {
+    "source": "A passage left by the Awakened Echo Sentinel.",
+    "translation": "覺醒的回聲守衛留下的記錄片段。"
+  },
+  "summary.singulo.gravity_chapter": {
+    "source": "A passage left by the Awakened Gravity Remnant.",
+    "translation": "覺醒的重力殘渣留下的記錄片段。"
+  },
+  "summary.singulo.horizon_chapter": {
+    "source": "A passage left by the Awakened Horizon Warden.",
+    "translation": "覺醒的視界守衛留下的記錄片段。"
+  },
+  "summary.singulo.ergosphere_chapter": {
+    "source": "A passage left by the Ergosphere Leviathan.",
+    "translation": "能層巨蛇留下的記錄片段。"
+  },
+  "summary.singulo.archivist_halo": {
+    "source": "The Last Archivist’s halo, still warm.",
+    "translation": "最後的記錄者所戴、仍帶餘溫的光環。"
+  },
+  "summary.singulo.afterglow_wings": {
+    "source": "Crystal-feather wings for gliding.",
+    "translation": "穿在胸部即可滑翔的晶羽之翼。"
+  },
+  "summary.singulo.magnetic_bottle": {
+    "source": "A bottle that contains leaking strange matter.",
+    "translation": "封存並回收洩漏奇異物質的瓶子。"
+  },
+  "summary.singulo.reactor_mass_alarm": {
+    "source": "Gives a redstone signal when the core hits its mass limit.",
+    "translation": "爐心質量達到上限時發出紅石訊號。"
+  },
+  "summary.singulo.hawking_collector": {
+    "source": "Collects H-Condensate while the reactor core is light.",
+    "translation": "在爐心較輕時收集 H 凝聚體。"
+  },
+  "summary.singulo.gravitational_containment_tank": {
+    "source": "The only tank that can hold dark matter.",
+    "translation": "唯一能保存暗物質的罐子。"
+  },
+  "summary.singulo.wormhole_generator_port": {
+    "source": "A generator shell that takes power and outputs mouths.",
+    "translation": "替換生成器外殼的受電與輸出口。"
+  },
+  "summary.singulo.genesis_frame": {
+    "source": "The octagonal frame around the Genesis Core.",
+    "translation": "以八邊形圍住創世爐核心的框架。"
+  },
+  "summary.singulo.genesis_pylon": {
+    "source": "Pillars on the Genesis frame that focus power.",
+    "translation": "疊在創世爐框架上、向宇宙輸送電力的柱子。"
+  },
+  "summary.singulo.primordial_seed": {
+    "source": "Use it on a Genesis Core to begin a universe.",
+    "translation": "用於創世爐核心，宇宙便開始誕生。"
+  },
+  "summary.singulo.reinforced_ruin_glass": {
+    "source": "A very hard, blast-proof window.",
+    "translation": "能承受反應爐衝擊的極堅硬窗戶。"
+  },
+  "summary.singulo.ruin_cache": {
+    "source": "Holds ruin loot that refills after some days.",
+    "translation": "裝有遺跡回收物的儲藏櫃，數天後會補充。"
+  },
+  "summary.singulo.ruin_android_fabricator": {
+    "source": "A ruin bed that prints androids and sends them out.",
+    "translation": "列印仿生人並派其出擊的遺跡台座。"
+  },
+  "summary.singulo.android_memory_blade": {
+    "source": "The design for printing Blade Androids.",
+    "translation": "可列印光刃型仿生人的設計。"
+  },
+  "summary.singulo.android_memory_whip": {
+    "source": "The design for printing Whip Androids.",
+    "translation": "可列印鞭型仿生人的設計。"
+  },
+  "summary.singulo.android_memory_saber": {
+    "source": "The design for printing Saber Androids.",
+    "translation": "可列印光劍型仿生人的設計。"
+  },
+  "summary.singulo.guardian_core": {
+    "source": "A seal that wakes the ruin’s guardian for a challenger.",
+    "translation": "有挑戰者到來時喚醒遺跡守衛的封印。"
+  },
+  "summary.singulo.echo_projector": {
+    "source": "Projects the Echo Sentinel; more left means a tougher boss.",
+    "translation": "投影回聲守衛的台座，剩得越多守衛越難打。"
+  },
+  "summary.singulo.factory_conveyor": {
+    "source": "An old factory belt that carries what stands on it.",
+    "translation": "運送其上物體的舊文明工廠輸送帶。"
+  },
+  "summary.singulo.lab_panel": {
+    "source": "White wall panelling from the android laboratory.",
+    "translation": "地下仿生人研究所的白色牆材。"
+  },
+  "summary.singulo.pressure_hull": {
+    "source": "The very hard steel shell around the laboratory.",
+    "translation": "包覆研究所的極堅硬鋼殼。"
+  },
+  "summary.singulo.welded_hatch": {
+    "source": "A welded steel lid over the laboratory shaft.",
+    "translation": "封住研究所豎井的焊接鋼蓋。"
+  },
+  "summary.singulo.lab_door": {
+    "source": "Laboratory sliding doors that close by themselves.",
+    "translation": "右鍵打開、會自動關閉的研究所拉門。"
+  },
+  "summary.singulo.coffee_maker": {
+    "source": "Brews coffee from cocoa beans.",
+    "translation": "用可可豆沖煮咖啡。"
+  },
+  "summary.singulo.vending_machine": {
+    "source": "A vending machine that sells drinks for emeralds.",
+    "translation": "可用綠寶石購買飲料的自動販賣機。"
+  },
+  "summary.singulo.coffee": {
+    "source": "Speeds up mining and wakes you up.",
+    "translation": "喝下後採掘加快，並驅散睡意。"
+  },
+  "summary.singulo.room_light": {
+    "source": "A laboratory ceiling light switched by redstone.",
+    "translation": "由紅石訊號點亮的研究所天花板燈。"
+  },
+  "summary.singulo.white_light_panel": {
+    "source": "A brightly glowing white panel.",
+    "translation": "明亮發光的白色面板。"
+  },
+  "summary.singulo.white_sliding_door": {
+    "source": "White sliding doors that close by themselves.",
+    "translation": "右鍵打開、會自動關閉的白色拉門。"
+  },
+  "summary.singulo.android_barrier_glass": {
+    "source": "Glass that only androids cannot pass.",
+    "translation": "只有仿生人無法通過的玻璃。"
+  },
+  "summary.singulo.android_gate_glass": {
+    "source": "Glass that only androids can pass.",
+    "translation": "只有仿生人能通過的玻璃。"
+  },
+  "summary.singulo.sealed_container_1": {
+    "source": "A sealed container opened with a Magnetic Key.",
+    "translation": "用磁力鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.sealed_container_2": {
+    "source": "A sealed container opened with a Quantum Key.",
+    "translation": "用量子鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.sealed_container_3": {
+    "source": "A sealed container opened with a Temporal Key.",
+    "translation": "用時間鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.sealed_container_4": {
+    "source": "A sealed container opened with a Singularity Key.",
+    "translation": "用奇點鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.overclock_chip": {
+    "source": "Triples a machine’s speed for four times the power.",
+    "translation": "讓裝置處理速度變為 3 倍，耗電變為 4 倍。"
+  },
+  "summary.singulo.gravity_boots": {
+    "source": "No fall damage, and you can wall-jump in mid-air.",
+    "translation": "不受摔落傷害，可在空中蹬牆跳躍。"
+  },
+  "summary.singulo.catalyst_stabilizer": {
+    "source": "Doubles a catalyst’s remaining life.",
+    "translation": "讓催化劑的剩餘壽命翻倍。"
+  },
+  "summary.singulo.dimensional_pocket": {
+    "source": "Your own storage you can open anywhere.",
+    "translation": "隨時隨地都能打開的個人儲物空間。"
+  },
+  "summary.singulo.bismuth_ingot": {
+    "source": "A metal with an iridescent surface.",
+    "translation": "表面泛著虹彩的金屬。"
+  },
+  "summary.singulo.meteoric_iron_ingot": {
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "具有強磁性的天然鐵鎳合金。"
+  },
+  "summary.singulo.nihonium_ingot": {
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "沉重緻密的鉨錠。"
+  },
+  "summary.singulo.steel_ingot": {
+    "source": "A sturdy structural metal.",
+    "translation": "堅固的結構金屬。"
+  },
+  "summary.singulo.zinc_ingot": {
+    "source": "An ingot of zinc.",
+    "translation": "鋅的金屬錠。"
+  },
+  "guide.singulo.multiblocks.parts.title": {
+    "source": "Parts and stages",
+    "translation": "構成方塊與階段"
+  },
+  "guide.singulo.multiblocks.parts.body": {
+    "source": "Structure parts also need you to reach the controller’s stage, and each uses a little of a key material.\n- Particle Accelerator tubes: Superconducting Wire (one per two tubes).\n- Degenerate Compactor, C-Cavity and Degenerate Furnace parts: a little lifetime of a BE Condensate Catalyst in the Precision Assembler’s catalyst slot.\n- P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts: a little lifetime of a Time Crystal Catalyst (a few, such as Reactor Shell, use a Time Crystal Module).\nEach craft uses 1/48 of the catalyst’s lifetime and the rest stays in the catalyst. Parts already placed keep working.",
+    "translation": "構成方塊也必須推進到與控制器相同的階段才能製作，每種都會少量消耗關鍵材料。\n- 粒子加速器的加速管：超導線材（每 2 根用 1 個）。\n- 簡併壓縮爐、卡西米尔腔、簡併熱爐的零件：精密組裝台催化劑槽中玻色凝聚態催化劑的少量壽命。\n- 彭羅斯反應爐、事件視界護盾塔、蒂普勒圓柱、蟲洞生成器、創世爐的零件：時間晶體催化劑的少量壽命（反應爐外殼等少數零件使用時間晶體模組）。\n每次製作消耗催化劑壽命的 1/48，其餘仍留在催化劑中。已放置的構成方塊可繼續使用。"
+  },
+  "guide.singulo.power.capacity.title": {
+    "source": "Capacity upgrades",
+    "translation": "容量升級"
+  },
+  "guide.singulo.power.capacity.body": {
+    "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
+    "translation": "在加工裝置右側欄的容量專用槽中放入 1 個，蓄電容量會變為 Mk1 1,000,000、Mk2 4,000,000、Mk3 40,000,000 FE。Mk1 在第 2 階段工作台製作，Mk2 和 Mk3 在精密組裝台用低一級的升級製作。可與速度升級同時使用，不改變受電上限。\n取下時超出容量的電力不會消失，在降到容量以下之前不再接收新電力。單次耗電超過通常容量的配方需要容量升級。"
+  },
+  "gui.singulo.reason.capacity_exceeded": {
+    "source": "Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold",
+    "translation": "每刻需要 %s FE。即使安裝容量升級 Mk3，蓄電容量也不夠"
   }
 }

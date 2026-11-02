@@ -396,12 +396,22 @@ public final class Stage2GameTests {
         helper.setBlock(pos.west(), Blocks.LAVA);
         CryogenicTurbineBlockEntity turbine = helper.getBlockEntity(pos);
         turbine.tank().fill(new FluidStack(fluid("liquid_nitrogen"), 4000), IFluidHandler.FluidAction.EXECUTE);
-        helper.runAtTickTime(40, () -> {
-            // 最初の走査まで最大10 tick
-            int energy = turbine.energy().getEnergyStored();
-            helper.assertTrue(energy >= 4500 * 28 && energy <= 4500 * 43, "出力が設計値から外れている: " + energy);
-            int used = 4000 - turbine.tank().getFluidInTank(0).getAmount();
-            helper.assertTrue(used >= 20 * 28 && used <= 20 * 43, "液体窒素の消費が毎tick 20 mB でない: " + used);
+        // 置いたときからの合計は、テストの時計が動き出す前に回った tick の分だけずれる（加速した実行では数 tick 先に動き出す）。
+        // 最初の走査（最大10 tick）のあと、置いてから20 tickと40 tickの間の増え方で、毎 tick の出力と消費を見る。
+        int[] first = new int[2];
+        helper.runAfterDelay(20, () -> {
+            first[0] = turbine.energy().getEnergyStored();
+            first[1] = turbine.tank().getFluidInTank(0).getAmount();
+            helper.assertTrue(first[0] > 0, "溶岩の横で動き出さない");
+        });
+        helper.runAfterDelay(40, () -> {
+            int energy = turbine.energy().getEnergyStored() - first[0];
+            int used = first[1] - turbine.tank().getFluidInTank(0).getAmount();
+            // 出力の上限（設定 cryoTurbineOutput、既定 4.5 kFE/t）に見合う量を、1 mB 単位で使う
+            double perMbDesign = 250 * io.github.genichimaruo.singulo.generated.ServerConfig.MACHINE_ENERGY_MULTIPLIER.get() * 0.9;
+            int perTick = (int) Math.floor(io.github.genichimaruo.singulo.generated.ServerConfig.CRYO_TURBINE_OUTPUT.get() / perMbDesign);
+            helper.assertTrue(used == perTick * 20, "液体窒素の消費が出力の上限に見合わない: " + used + " (毎tick " + perTick + " mB)");
+            helper.assertTrue(energy == (int) (perTick * perMbDesign) * 20, "20 tick の出力が設計値でない: " + energy);
             double perMb = energy / (double) used;
             helper.assertTrue(perMb <= 250 * 0.9 + 1e-6, "液体窒素1 mBから、詰めた電力の9割より多く取り戻した: " + perMb);
             helper.succeed();

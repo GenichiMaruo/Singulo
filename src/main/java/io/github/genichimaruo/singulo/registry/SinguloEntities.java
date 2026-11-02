@@ -18,6 +18,11 @@ public final class SinguloEntities {
             () -> EntityType.Builder.of(SecurityDrone::new, MobCategory.MONSTER)
                     .sized(0.6F, 0.6F).clientTrackingRange(8).build(Singulo.id("security_drone").toString()));
 
+    /** 輸送ドローン（ドローン・ステーションが印刷する）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.drone.CargoDrone>> CARGO_DRONE = REGISTER.register("cargo_drone",
+            () -> EntityType.Builder.of(io.github.genichimaruo.singulo.drone.CargoDrone::new, MobCategory.MISC)
+                    .sized(0.75F, 1.0F).clientTrackingRange(10).updateInterval(2).fireImmune().build(Singulo.id("cargo_drone").toString()));
+
     public static final Supplier<EntityType<HorizonWarden>> HORIZON_WARDEN = REGISTER.register("horizon_warden",
             () -> EntityType.Builder.of(HorizonWarden::new, MobCategory.MONSTER)
                     .sized(1.4F, 3.2F).clientTrackingRange(10).fireImmune().build(Singulo.id("horizon_warden").toString()));
@@ -122,6 +127,7 @@ public final class SinguloEntities {
         event.put(BIT_ANDROID.get(), io.github.genichimaruo.singulo.android.BitAndroid.createAttributes().build());
         event.put(GUNNER_ANDROID.get(), io.github.genichimaruo.singulo.android.GunnerAndroid.createAttributes().build());
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
+        event.put(CARGO_DRONE.get(), io.github.genichimaruo.singulo.drone.CargoDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
         event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());
         event.put(GRAVITY_REMNANT.get(), io.github.genichimaruo.singulo.ruin.GravityRemnant.createAttributes().build());

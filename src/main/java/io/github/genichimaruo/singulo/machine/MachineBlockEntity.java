@@ -41,7 +41,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
  */
 public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
+        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder {
     public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED, OFF }
 
     /**
@@ -50,7 +50,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
             D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_SELECTED = 11,
-            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_TANKS = 14;
+            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_LOADED_USES = 14, D_TANKS = 15;
     /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
@@ -109,6 +109,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                     inputsChangedAt = level.getGameTime();          // 人・ホッパー・アンドロイドが入れ替えた（装置が使った分は数えない）
                 }
                 markDirty();
+                if (slot == type.capacitySlot() && energy != null) refreshEnergyCapacity();
             }
 
             @Override
@@ -126,7 +127,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
             @Override
             public int getSlotLimit(int slot) {
-                return slot == type.upgradeSlot() ? 1 : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
+                return slot == type.upgradeSlot() || slot == type.capacitySlot() ? 1
+                        : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
             }
         };
         this.tanks = new FluidTank[type.tanks()];
@@ -139,7 +141,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             };
         }
         int capacity = type.energyCapacity();
-        this.energy = new SinguloEnergyStorage(capacity, capacity / 10, 0, this::setChanged);
+        this.energy = new SinguloEnergyStorage(capacity, type.energyReceiveLimit(), 0, this::setChanged);
         this.automationItems = new AutomationItems();
         this.automationFluids = new AutomationFluids();
         this.tankSides = createTankSides(type);
@@ -155,6 +157,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     public SinguloEnergyStorage energy() {
         return energy;
+    }
+
+    private void refreshEnergyCapacity() {
+        energy.resizeCapacity(Math.max(type.energyCapacity(), CapacityUpgrades.capacity(
+                CapacityUpgrades.tier(items.getStackInSlot(type.capacitySlot())))));
     }
 
     public IItemHandler automationItems() {
@@ -210,6 +217,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
     public boolean slotAccepts(int slot, ItemStack stack) {
         if (pendingReturns.get(slot)) return false;
+        if (slot == type.capacitySlot()) return CapacityUpgrades.tier(stack) > 0;
         if (slot == type.upgradeSlot()) {
             return isUpgrade(stack);
         }
@@ -419,12 +427,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void ejectItem(IItemHandler dest, int slot) {
-        ItemStack stack = items.getStackInSlot(slot);
-        if (stack.isEmpty()) return;
-        ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
-        if (rest.getCount() != stack.getCount()) {
-            items.setStackInSlot(slot, rest);
-        }
+        SideConfig.pushOut(items, slot, dest);
     }
 
     /** Keep a blocked return visible in its original slot; never discard or consume it again. */
@@ -529,17 +532,19 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 // 時間の場の中では1 tick に進む量が変わる（加速なら2 tick ぶん進み、電力も2倍使う）
                 timeCarry += TimeFields.speed(level, pos);
                 int steps = (int) timeCarry;
+                // 蓄電容量で1回に払える分だけ進む（加速の場でも、容量アップグレードが1 tick 分に足りていれば止まらない）
+                int done = affordableSteps(steps);
                 if (!canOutput(recipe)) {
                     status = Status.OUTPUT_FULL;
                     timeCarry = 0;
                 } else if (steps == 0) {
                     active = true;
                     status = Status.RUNNING;
-                } else if (energy.consume(usage * steps) || runsUnderpowered(recipe) && drawPartial()) {
+                } else if (energy.consume(usage * done) || runsUnderpowered(recipe) && drawPartial()) {
                     timeCarry -= steps;
                     active = true;
                     status = Status.RUNNING;
-                    progress += steps;
+                    progress += done;
                     if (progress >= maxProgress) {
                         progress = 0;
                         craft(level, recipe);
@@ -1056,7 +1061,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         boolean enabled = !ServerConfig.SPEC.isLoaded() || ServerConfig.MIXED_BONUS_ENABLED.get();
         int minKinds = ServerConfig.SPEC.isLoaded() ? ServerConfig.MIXED_BONUS_MIN_KINDS.get() : 3;
         if (enabled && massSources.size() >= minKinds
-                && BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().equals("compressed_block_1")) {
+                && BuiltInRegistries.ITEM.getKey(out.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("compressed_block_1"))) {
             out.set(SinguloComponents.MIXED_SOURCE.get(), true);
         }
     }
@@ -1105,6 +1110,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_SELECTED -> selectedIndex() + 1;
             case D_LOADED_ITEM -> magazine.loadedItemId();
             case D_LOADED_FILL -> Math.round(magazine.fill() * 1000);
+            // JEI の搬入の見積もりがサーバーと同じになるよう、装填中の触媒の残りの使用回数はそのまま送る
+            case D_LOADED_USES -> magazine.loaded().isEmpty() ? 0 : io.github.genichimaruo.singulo.item.UsesHelper.remaining(magazine.loaded());
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
                 if (index >= sidesIndex(type)) {
@@ -1117,6 +1124,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                         : fluid.getAmount();
             }
         };
+    }
+
+    private int affordableSteps(int steps) {
+        return affordableSteps(steps, usage, energy.getMaxEnergyStored());
+    }
+
+    /** 時間の場で進みたい steps のうち、蓄電容量で1回に払える分（1 tick 分も払えなければ 1。そのときは電力不足と容量の案内になる）。 */
+    public static int affordableSteps(int steps, int usage, int capacity) {
+        if (usage <= 0) {
+            return steps;
+        }
+        return (int) Math.max(1, Math.min(steps, (long) capacity / usage));
     }
 
     private boolean massTargetIsMetal() {
@@ -1306,7 +1325,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         for (int i = 0; i < tanks.length && i < tankList.size(); i++) {
             tanks[i].readFromNBT(registries, tankList.getCompound(i));
         }
-        energy.setEnergy(tag.getInt("energy"));
+        refreshEnergyCapacity();
+        energy.restoreEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
         mode = tag.getInt("mode");
         selectedRecipe = tag.contains("selected_recipe") ? ResourceLocation.tryParse(tag.getString("selected_recipe")) : null;

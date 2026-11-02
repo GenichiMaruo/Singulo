@@ -16,6 +16,13 @@
         "item": "singulo:superconducting_wire"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "tier": 3,
+      "uses": 750
     }
   ],
   "result": {

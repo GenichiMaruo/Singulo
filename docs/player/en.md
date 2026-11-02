@@ -17,6 +17,7 @@ Superconductivity, particle accelerators, the Casimir effect and Hawking radiati
 - **Minecraft 1.21.1**, with a compatible **NeoForge 21.1.256 or later** build for that Minecraft version. Minecraft runs on Java 21.
 - Put the Singulo JAR in `mods/`. Multiplayer needs the mod on both the client and server.
 - JEI is optional. Its integration shows machine recipes and multiblock construction information.
+- With a machine screen open, JEI's + button moves one recipe's item ingredients from your inventory. Shift-click transfers as many sets as fit. Catalysts go into their dedicated slot; the Precision Assembler and Singularity Encapsulator also select that recipe. Supply fluids and compressor mass separately.
 - Singulo supplies energy cables. Compatible transport mods can provide pipes for item and fluid automation.
 
 For building from source, see the [development instructions in the README](../../README.md#開発するには).
@@ -94,6 +95,8 @@ Place the controller and **right-click it with a Holo Projector**. Follow the pr
 
 The outer dimensions are only a starting point. Frames, windows, internal components and required air spaces must also match. Shared I/O Ports replace designated panels, not arbitrary components. Accelerator ports sit on either side of its controller. Reactor Extraction Ports replace ring shell blocks: the six ring intersections use Gyro Drives, while the twelve diagonal positions use **Reactor Stabilizer Coils**.
 
+Structure parts also require the controller's stage. Particle Accelerator tubes use Superconducting Wire; Degenerate Compactor, C-Cavity and Degenerate Furnace parts need a BE Condensate Catalyst in the Precision Assembler's catalyst slot; P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts need a Time Crystal Catalyst. Each craft uses 1/48 of the catalyst's lifetime and the rest stays in the catalyst. Parts you have already placed keep working.
+
 ## Exploring ruins
 
 | Ruin | Important salvage and purpose |
@@ -143,6 +146,19 @@ Androids run on charge and run out after about ten big moves. They return to a n
 - Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.
 
 **Android glass:** Barrier Glass (only androids cannot pass) and Gate Glass (only androids can pass), each in a plain kind that joins with its neighbours and a patterned kind.
+
+## Drone delivery
+
+A **Drone Station** prints cargo drones that carry crates between **Drone Ports**. Every port with the same owner in the same dimension appears as a destination automatically.
+
+- **Getting drones**: defeating a whole wave from a ruin Guard Dock sometimes drops a **Drone Crystal Memory**. Put the memory (not used up) and **Drone Kits** (one per drone) in a station and give it power to print a drone for 20,000 FE. Each Production Upgrade adds a drone, up to three.
+- **Drone types**: the memory decides the type. Rotor memories drop from any facility, **jet** memories (1.6× the rotor speed) from the Research Building and higher, and **anti-gravity** memories (1.25×) rarely from the Culture Facility and the Underground Android Laboratory.
+- **Sending**: put an empty **Packing Crate** and cargo in a port, pick a destination and send. It costs 2,000 FE plus 50 FE per block, and the crate decides the range (160, 760 or 3,160 blocks). Arriving crates unpack into the received row and the empty crate comes back. A port can also auto-send once cargo reaches a threshold.
+- **Routes**: drones do not pass through walls. They find a way through open space a few blocks above the ground; a sealed room shows No route. A **Phase Shift Upgrade** (stage 4) in the station lets its drones take shortcuts through walls.
+- **Cargo is never lost**: while a drone flies through unloaded areas the cargo stays in the flight record and arrives when the destination loads.
+- **Androids**: a port next to an Android Supply Port or Delivery Port lets androids use arrivals as materials or ship finished products to another base.
+
+See the in-game handbook chapter "Drone Delivery" for details.
 
 ## Black holes and late-game technology
 
@@ -202,6 +218,8 @@ Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts
 Restored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.
 
 ## Precision Assembler recipe selection
+
+The Precision Assembler normally stores 100,000 FE and accepts up to 4,000,000 FE per reception. Install one Capacity Upgrade Mk1, Mk2 or Mk3 in the dedicated slot on the right rail for 1,000,000, 4,000,000 or 40,000,000 FE. Craft Mk1 on a stage-2 crafting table; craft Mk2 and Mk3 in the assembler using the previous tier as an ingredient. The separate slot supports speed upgrades at the same time, and intake limits stay unchanged. Removing or replacing an upgrade preserves surplus charge, including charge from older versions, and blocks further reception until the buffer falls below capacity. Recipes whose per-tick cost exceeds the normal buffer, such as the Mk3 sensitivity module, require a capacity upgrade; JEI shows this requirement.
 
 Without a chosen recipe, the Precision Assembler starts crafting when the kinds of items inside exactly match a recipe. A mix that could also be part of another recipe starts only after items have stopped going in for 3 seconds. Choose a recipe with the button below the output slot to craft only that one; the choice is saved, and other items may be present. Androids select their recorded recipe before inserting materials. The Singularity Encapsulator works the same way.
 

@@ -1724,8 +1724,8 @@
     "translation": "녹인 비스무트를 식혀 만든 계단 모양의 무지갯빛 결정. 건축 재료."
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "A metal with an iridescent surface.",
-    "translation": "표면이 무지갯빛으로 빛나는 금속."
+    "source": "A metal with an iridescent surface. A quiet touch of color from copper refining.",
+    "translation": "표면이 무지갯빛으로 빛나는 금속. 구리 제련 과정에서 만나는 은은한 빛깔."
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -2364,8 +2364,8 @@
     "translation": "운석 속의 철과 니켈의 천연 합금입니다. 철 곡괭이 이상으로 캐면 운철 원석이 나옵니다. 운석 구덩이에만 있습니다."
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A naturally magnetic alloy of iron and nickel.",
-    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금."
+    "source": "A naturally magnetic alloy of iron and nickel. Metal from the stars, now resting in your hand.",
+    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금. 별에서 온 금속이 이제 손안에 놓여 있다."
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2428,8 +2428,8 @@
     "translation": "니호늄으로 덮은 견고한 프레임."
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy, dense ingot of nihonium.",
-    "translation": "무겁고 치밀한 니호늄 주괴."
+    "source": "A heavy, dense ingot of nihonium. An element born in the accelerator becomes the foundation of your next machine.",
+    "translation": "무겁고 치밀한 니호늄 주괴. 가속기에서 태어난 원소가 다음 설비의 초석이 된다."
   },
   "desc.singulo.nihonium_plate": {
     "source": "Nihonium pressed into a thin plate.",
@@ -2480,8 +2480,8 @@
     "translation": "티어 2 이후의 부품과 기계 대부분을 조립합니다."
   },
   "desc.singulo.pressure_crystal": {
-    "source": "A hard blue crystal formed under high water pressure.",
-    "translation": "높은 수압으로 형성된 단단한 푸른 결정."
+    "source": "A hard violet crystal that a Deep-Sea Pressure Collector presses from minerals with deep-sea water pressure. The Gravity Remnant drops it too.",
+    "translation": "심해 압력 수집기가 해저의 수압으로 광물을 다져 만드는 단단한 보라색 결정. 중력 잔재도 떨어뜨린다."
   },
   "desc.singulo.pressure_hull": {
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
@@ -2672,8 +2672,8 @@
     "translation": "기계의 입출력 면과 자동 배출 설정을 복사해 붙여 넣습니다. 같은 종류의 기계에는 레시피 선택도 복사합니다. 펜로즈 반응로에서는 목표 스핀과 투입 간격을 복사합니다."
   },
   "desc.singulo.shield_permit": {
-    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
-    "translation": "실드 타워에 넣으면 등록된 플레이어만 그 안에서 블록을 설치하거나 부수거나 아이템을 가져갈 수 있습니다. 안드로이드 조립 스테이션에 넣으면 등록된 사람도 안드로이드를 조작할 수 있고, 등록되지 않은 사람은 안드로이드에게 공격받습니다. 사용하면 자신을, 다른 플레이어에게 사용하면 그 플레이어와 자신을 등록합니다. 이미터 크라운은 누구나 부술 수 있습니다."
+    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. In a Drone Station, only registered players may open its screen. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
+    "translation": "실드 타워에 넣으면 등록된 플레이어만 그 안에서 블록을 설치하거나 부수거나 아이템을 가져갈 수 있습니다. 안드로이드 조립 스테이션에 넣으면 등록된 사람도 안드로이드를 조작할 수 있고, 등록되지 않은 사람은 안드로이드에게 공격받습니다. 드론 스테이션에 넣으면 등록된 사람만 화면을 열 수 있습니다. 사용하면 자신을, 다른 플레이어에게 사용하면 그 플레이어와 자신을 등록합니다. 이미터 크라운은 누구나 부술 수 있습니다."
   },
   "desc.singulo.shield_tower_body": {
     "source": "Corners of the 3×3 body and the base of the spire.",
@@ -2756,8 +2756,8 @@
     "translation": "철과 탄소를 섞은 강철 원료."
   },
   "desc.singulo.steel_ingot": {
-    "source": "A sturdy structural metal.",
-    "translation": "튼튼한 구조용 금속."
+    "source": "A sturdy structural metal. Unassuming, but a factory can grow from a single bar.",
+    "translation": "튼튼한 구조용 금속. 수수하지만, 이 주괴 하나에서 공장이 자라난다."
   },
   "desc.singulo.steel_plate": {
     "source": "Steel pressed into a thin plate.",
@@ -2996,8 +2996,8 @@
     "translation": "곱게 빻은 아연."
   },
   "desc.singulo.zinc_ingot": {
-    "source": "An ingot of zinc.",
-    "translation": "아연 금속 주괴."
+    "source": "An ingot of zinc. A small ingot with the promise of a new element.",
+    "translation": "아연 금속 주괴. 작은 주괴가 새 원소의 가능성을 품고 있다."
   },
   "direction.singulo.east": {
     "source": "east",
@@ -10596,32 +10596,32 @@
     "translation": "들고 다니면 따라오는 안드로이드를 걸으면서 충전합니다."
   },
   "summary.singulo.android_dual_tank_upgrade": {
-    "source": "Two liquid and two chemical tanks (only with Mekanism).",
-    "translation": "액체와 화학 물질 탱크를 2개씩 단다 (Mekanism이 있을 때만)."
+    "source": "Adds two liquid and two chemical tanks.",
+    "translation": "액체와 화학 물질 탱크를 2개씩 단다."
   },
   "summary.singulo.android_felling_upgrade": {
     "source": "Lets an android fell whole trees and replant saplings.",
     "translation": "안드로이드가 나무를 통째로 베고 묘목을 다시 심습니다."
   },
   "summary.singulo.android_gas_tank_upgrade": {
-    "source": "Two tanks for Mekanism chemicals (only with Mekanism).",
-    "translation": "Mekanism 화학 물질을 나르는 탱크를 2개 단다 (Mekanism이 있을 때만)."
+    "source": "Adds tanks for Mekanism chemicals.",
+    "translation": "Mekanism 화학 물질을 나르는 탱크를 단다."
   },
   "summary.singulo.android_large_backpack_upgrade": {
-    "source": "Adds 24 inventory slots to an android (the largest).",
-    "translation": "안드로이드 소지품 +24칸(가장 큼)."
+    "source": "Adds 24 inventory slots to an android.",
+    "translation": "안드로이드의 소지품을 24칸 늘린다."
   },
   "summary.singulo.android_memory_axe": {
-    "source": "The Axe Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "도끼형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있다 (줄어들지 않음)."
+    "source": "The design for printing Axe Androids.",
+    "translation": "도끼형 안드로이드를 출력할 수 있는 설계."
   },
   "summary.singulo.android_memory_bit": {
-    "source": "The Bit Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "비트형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있다 (줄어들지 않음)."
+    "source": "The design for printing Bit Androids.",
+    "translation": "비트형 안드로이드를 출력할 수 있는 설계."
   },
   "summary.singulo.android_memory_gunner": {
-    "source": "The Gunner Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "사격형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있습니다(줄지 않음)."
+    "source": "The design for printing Gunner Androids.",
+    "translation": "사격형 안드로이드를 출력할 수 있는 설계."
   },
   "summary.singulo.android_production_upgrade": {
     "source": "Lets an Android Assembly Station look after up to two androids.",
@@ -10676,8 +10676,8 @@
     "translation": "봉인 콘솔에 사용하면 각성한 지평선 감시자와 싸울 수 있다."
   },
   "summary.singulo.degenerate_furnace": {
-    "source": "A large generator burning Lv2 blocks (5 MFE/t on time crystals).",
-    "translation": "압축 블록 Lv2를 태우는 대형 발전기(시간 결정 촉매로 5 MFE/t)."
+    "source": "A large generator that burns Lv2 compressed blocks.",
+    "translation": "압축 블록 Lv2를 태우는 대형 발전기."
   },
   "summary.singulo.factory_line": {
     "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
@@ -10716,8 +10716,8 @@
     "translation": "옛 문명의 정밀 구동 부품."
   },
   "summary.singulo.procedure_card": {
-    "source": "Records up to eight work steps for androids.",
-    "translation": "안드로이드에게 시킬 작업 순서 (최대 8개)를 기록한다."
+    "source": "Records work steps for androids.",
+    "translation": "안드로이드에게 시킬 작업 순서를 기록한다."
   },
   "summary.singulo.quantum_android_workbench": {
     "source": "Androids craft 20× as fast here. 81-slot holding box.",
@@ -11128,12 +11128,12 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 48개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 26개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 28 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 28개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11188,8 +11188,8 @@
     "translation": "사용 대상: 폐허 패널, 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널 외 2개"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 시간 결정 촉매, 축퇴 열로 제어기 외 3개"
+    "source": "Used in: Degenerate Compactor Controller, Degenerate Compactor Frame, Degenerate Compactor Armor Plate, Degenerate Compactor Ram, Degenerate Compactor Anvil and 21 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 축퇴 압축로 프레임, 축퇴 압축로 장갑판, 축퇴 압축로 램, 축퇴 압축로 앤빌 외 21개"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11216,8 +11216,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
-    "translation": "사용 대상: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 15개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 18 more",
+    "translation": "사용 대상: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 18개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -11404,8 +11404,8 @@
     "translation": "사용 대상: 냉매 카트리지"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
-    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 19개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 21 more",
+    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 21개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11416,8 +11416,8 @@
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 28 more",
-    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 28개"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 30 more",
+    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 30개"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11524,8 +11524,8 @@
     "translation": "사용 제품: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 25 more",
-    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 25개"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 26 more",
+    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 26개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11632,28 +11632,28 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 84 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 84개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 88 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 88개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 59 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 59개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 67 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 67개"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
-    "translation": "사용 대상: 초전도 케이블, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브, 위상 전선 외 1개"
+    "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
+    "translation": "사용 대상: 초전도 케이블, 가속관, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브 외 3개"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
     "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
-    "translation": "사용 대상: 특이 물질, 특이점 코어, 헤일로 수집기, 시간 결정 모듈"
+    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 10 more",
+    "translation": "사용 대상: 특이 물질, 자이로 구동 장치, 특이점 코어, 헤일로 수집기, 실드 타워 주각 외 10개"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
-    "translation": "용도: SMES 모듈, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 그래비톤 조작기 외 3종"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 8 more",
+    "translation": "사용 대상: SMES 모듈, 반응로 외피, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 외 8개"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11708,8 +11708,8 @@
     "translation": "사용 대상: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 22 more",
-    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 22개"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 24 more",
+    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 24개"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
@@ -11870,5 +11870,1073 @@
   "guide.singulo.factory_expansion.limits.body": {
     "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
     "translation": "금속 압축 Lv2의 질량은 81입니다. 철이나 구리 블록은 하나당 질량 3이므로 Lv1은 3블록, Lv2는 27블록, 즉 주괴 243개를 씁니다. 철 대신 구리도 가능합니다. 열전대와 열교환 코어는 용도가 한정되어 처음부터 많이 비축할 필요는 없습니다.\nP 리액터 점화에는 10초 안에 50 GFE를 공급해야 합니다. SMES 모듈 하나당 2 GFE이므로 용량만으로는 최소 25개가 필요합니다. 모듈 하나의 출력 한도는 100 MFE/t이므로 적어도 3개를 병렬로 연결하고 합계 250 MFE/t 이상의 전송량을 확보해야 합니다.\n점화 직후 질량 500, 스핀 0에서 연료를 유지하면 지속 출력은 약 28.6 MFE/t입니다. 2.1 GFE/t는 전송 상한이며 초기 발전량이 아닙니다. 질량, 스핀과 저장 시설을 갖춘 후 창세로에 전력을 공급하세요."
+  },
+  "desc.singulo.capacity_upgrade_1": {
+    "source": "Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.",
+    "translation": "가공 기계의 용량 전용 칸에 하나를 장착하면 저장 용량이 최소 1,000,000 FE가 됩니다. 속도 업그레이드와 함께 사용하며 수전 한도는 바뀌지 않습니다. 제거해도 초과 전력을 보존하며 용량 아래로 줄어들 때까지 전력을 받지 않습니다."
+  },
+  "desc.singulo.capacity_upgrade_2": {
+    "source": "Made from Mk1. Raises a processing machine’s buffer to at least 4,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "Mk1으로 만듭니다. 가공 기계의 저장 용량을 최소 4,000,000 FE로 늘립니다. 용량 전용 칸에 하나만 장착하며 수전 한도는 바뀌지 않습니다."
+  },
+  "desc.singulo.capacity_upgrade_3": {
+    "source": "Made from Mk2. Raises a processing machine’s buffer to at least 40,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "Mk2로 만듭니다. 가공 기계의 저장 용량을 최소 40,000,000 FE로 늘립니다. 용량 전용 칸에 하나만 장착하며 수전 한도는 바뀌지 않습니다."
+  },
+  "gui.singulo.reason.capacity_upgrade": {
+    "source": "Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot",
+    "translation": "틱당 %s FE가 필요합니다. 전용 칸에 용량 업그레이드 Mk%s 이상을 장착하세요"
+  },
+  "gui.singulo.slot.capacity_upgrade": {
+    "source": "Capacity upgrade slot (Mk1–Mk3)",
+    "translation": "용량 업그레이드 전용 칸 (Mk1–Mk3)"
+  },
+  "howto.singulo.capacity_upgrade_1": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작 장소: 제작대 (2단계)"
+  },
+  "howto.singulo.capacity_upgrade_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작 장소: 정밀 조립기 (3단계)"
+  },
+  "howto.singulo.capacity_upgrade_3": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작 장소: 정밀 조립기 (4단계)"
+  },
+  "item.singulo.capacity_upgrade_1": {
+    "source": "Capacity Upgrade Mk1",
+    "translation": "용량 업그레이드 Mk1"
+  },
+  "item.singulo.capacity_upgrade_2": {
+    "source": "Capacity Upgrade Mk2",
+    "translation": "용량 업그레이드 Mk2"
+  },
+  "item.singulo.capacity_upgrade_3": {
+    "source": "Capacity Upgrade Mk3",
+    "translation": "용량 업그레이드 Mk3"
+  },
+  "uses.singulo.capacity_upgrade_1": {
+    "source": "Used in: Capacity Upgrade Mk2",
+    "translation": "사용처: 용량 업그레이드 Mk2"
+  },
+  "uses.singulo.capacity_upgrade_2": {
+    "source": "Used in: Capacity Upgrade Mk3",
+    "translation": "사용처: 용량 업그레이드 Mk3"
+  },
+  "item.singulo.drone_memory": {
+    "source": "Drone Crystal Memory",
+    "translation": "드론 크리스털 메모리"
+  },
+  "item.singulo.drone_kit": {
+    "source": "Drone Kit",
+    "translation": "드론 키트"
+  },
+  "block.singulo.drone_station": {
+    "source": "Drone Station",
+    "translation": "드론 스테이션"
+  },
+  "block.singulo.drone_port": {
+    "source": "Drone Port",
+    "translation": "드론 포트"
+  },
+  "item.singulo.packing_crate": {
+    "source": "Packing Crate",
+    "translation": "포장 상자"
+  },
+  "item.singulo.battery_packing_crate": {
+    "source": "Battery Packing Crate",
+    "translation": "배터리 포장 상자"
+  },
+  "item.singulo.large_battery_packing_crate": {
+    "source": "Large Battery Packing Crate",
+    "translation": "대용량 배터리 포장 상자"
+  },
+  "entity.singulo.cargo_drone": {
+    "source": "Cargo Drone",
+    "translation": "수송 드론"
+  },
+  "gui.singulo.drone_station.status.0": {
+    "source": "Insert a Drone Crystal Memory",
+    "translation": "드론 크리스털 메모리를 넣으세요"
+  },
+  "gui.singulo.drone_station.status.1": {
+    "source": "No drone kit",
+    "translation": "드론 키트가 없습니다"
+  },
+  "gui.singulo.drone_station.status.2": {
+    "source": "Not enough power (20000 FE to print)",
+    "translation": "전력이 부족합니다(출력에 20000 FE)"
+  },
+  "gui.singulo.drone_station.status.3": {
+    "source": "Printing",
+    "translation": "출력 중"
+  },
+  "gui.singulo.drone_station.status.4": {
+    "source": "Standing by",
+    "translation": "대기 중"
+  },
+  "gui.singulo.drone_station.status.5": {
+    "source": "Delivering",
+    "translation": "운반 중"
+  },
+  "gui.singulo.drone_station.status.6": {
+    "source": "Something is blocking the top",
+    "translation": "스테이션 위가 막혀 있습니다"
+  },
+  "gui.singulo.drone_station.status.7": {
+    "source": "Empty",
+    "translation": "비어 있음"
+  },
+  "gui.singulo.drone_station.memory": {
+    "source": "Drone Crystal Memory (not used up)",
+    "translation": "드론 크리스털 메모리(소모되지 않음)"
+  },
+  "gui.singulo.drone_station.kit": {
+    "source": "Drone Kit (one per print)",
+    "translation": "드론 키트(출력할 때마다 1개)"
+  },
+  "gui.singulo.drone_station.production": {
+    "source": "Production Upgrade (1 for 2 drones, 2 for 3)",
+    "translation": "생산 업그레이드(1장이면 2대, 2장이면 3대)"
+  },
+  "gui.singulo.drone_station.permit": {
+    "source": "Shield Permit (limits who can use it)",
+    "translation": "보호막 허가증(사용할 수 있는 사람을 제한)"
+  },
+  "gui.singulo.drone_station.more_units": {
+    "source": "Each Production Upgrade adds one drone (2 for 3 drones)",
+    "translation": "생산 업그레이드 1장마다 1대 늘어난다(2장이면 3대)"
+  },
+  "gui.singulo.drone_port.status.0": {
+    "source": "Idle",
+    "translation": "대기 중"
+  },
+  "gui.singulo.drone_port.status.1": {
+    "source": "Waiting for a drone (none standing by nearby)",
+    "translation": "드론을 기다리는 중(근처에 대기 중인 드론이 없음)"
+  },
+  "gui.singulo.drone_port.status.2": {
+    "source": "A drone is on its way",
+    "translation": "드론이 오고 있습니다"
+  },
+  "gui.singulo.drone_port.status.3": {
+    "source": "Loading",
+    "translation": "적재 중"
+  },
+  "gui.singulo.drone_port.status.4": {
+    "source": "Unloading",
+    "translation": "하역 중"
+  },
+  "gui.singulo.drone_port.status.5": {
+    "source": "Not enough power",
+    "translation": "전력이 부족합니다"
+  },
+  "gui.singulo.drone_port.status.6": {
+    "source": "No empty packing crate",
+    "translation": "빈 포장 상자가 없습니다"
+  },
+  "gui.singulo.drone_port.status.7": {
+    "source": "Out of range (needs a higher-tier crate)",
+    "translation": "사거리 밖입니다(더 높은 단계의 포장 상자가 필요)"
+  },
+  "gui.singulo.drone_port.status.8": {
+    "source": "Choose a destination",
+    "translation": "목적지를 선택하세요"
+  },
+  "gui.singulo.drone_port.status.9": {
+    "source": "No cargo",
+    "translation": "화물이 없습니다"
+  },
+  "gui.singulo.drone_port.place": {
+    "source": "Drone Port (%s, %s, %s)",
+    "translation": "드론 포트(%s, %s, %s)"
+  },
+  "gui.singulo.drone_port.target": {
+    "source": "At %s, %s, %s",
+    "translation": "위치 %s, %s, %s"
+  },
+  "gui.singulo.drone_port.cost": {
+    "source": "%s FE to send",
+    "translation": "발송에 %s FE"
+  },
+  "gui.singulo.drone_port.send": {
+    "source": "Send",
+    "translation": "발송"
+  },
+  "gui.singulo.drone_port.cancel": {
+    "source": "Cancel",
+    "translation": "취소"
+  },
+  "gui.singulo.drone_port.no_targets": {
+    "source": "No other drone ports",
+    "translation": "다른 드론 포트가 없습니다"
+  },
+  "gui.singulo.drone_port.crates": {
+    "source": "Empty packing crates",
+    "translation": "빈 포장 상자"
+  },
+  "gui.singulo.drone_port.arrived": {
+    "source": "Arrived crates (unpacked into the row below)",
+    "translation": "도착한 상자(아래 수령 칸으로 풀어 넣음)"
+  },
+  "gui.singulo.drone_port.receive": {
+    "source": "Received items",
+    "translation": "수령"
+  },
+  "gui.singulo.drone_port.locked": {
+    "source": "Only the owner can use this",
+    "translation": "소유자만 사용할 수 있습니다"
+  },
+  "tooltip.singulo.drone_crate.range": {
+    "source": "Range: %s blocks",
+    "translation": "사거리 %s블록"
+  },
+  "tooltip.singulo.drone_crate.item": {
+    "source": "%s ×%s",
+    "translation": "%s ×%s"
+  },
+  "tooltip.singulo.drone_crate.more": {
+    "source": "and %s more",
+    "translation": "그 외 %s종"
+  },
+  "tooltip.singulo.drone_crate.unpack": {
+    "source": "Right-click to unpack",
+    "translation": "우클릭으로 상자 풀기"
+  },
+  "desc.singulo.drone_memory": {
+    "source": "A crystal memory smaller than an android’s, holding the design of a four-rotor cargo drone (rotor type). Put it in a Drone Station to print rotor drones (it is not used up). Dropped by guard docks in any facility.",
+    "translation": "네 개의 로터로 나는 수송 드론(로터형)의 설계를 기록한, 안드로이드용보다 작은 크리스털 메모리. 드론 스테이션에 넣으면 로터형 드론을 출력할 수 있다(소모되지 않음). 모든 시설의 가드 독에서 나온다."
+  },
+  "desc.singulo.drone_kit": {
+    "source": "A set of parts and shell plates. A Drone Station uses one each time it prints a cargo drone.",
+    "translation": "부품과 외장판 한 벌. 드론 스테이션이 수송 드론을 1대 출력할 때마다 1개 사용한다."
+  },
+  "howto.singulo.drone_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "desc.singulo.drone_station": {
+    "source": "Prints cargo drones of its memory’s type (rotor, jet or anti-gravity) from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks. A Phase Shift Upgrade lets them fly through walls, and a Shield Permit on the right rail limits who can use it.",
+    "translation": "드론 크리스털 메모리, 드론 키트, 전력으로 메모리 종류(로터·제트·반중력)의 수송 드론을 출력한다(1대 20,000 FE, 생산 업그레이드 1장마다 1대 늘어 최대 3대). 드론은 위에서 대기하다가 64블록 안의 드론 포트에 불려 화물을 나른다. 위상 투과 업그레이드로 벽을 통과해 날고, 오른쪽 레일의 보호막 허가증으로 사용할 수 있는 사람을 제한한다."
+  },
+  "summary.singulo.drone_station": {
+    "source": "Prints cargo drones from a memory, kits and power, and keeps them waiting overhead.",
+    "translation": "메모리, 키트, 전력으로 수송 드론을 출력하고 위에서 대기시킨다."
+  },
+  "howto.singulo.drone_station": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "desc.singulo.drone_port": {
+    "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block. It can also auto-send to a set destination once cargo reaches a threshold. Drones find their way around walls through open space.",
+    "translation": "빈 포장 상자와 화물을 넣고 목적지(같은 소유자의 다른 포트)를 골라 발송하면, 화물을 포장하고 전력을 지불한 뒤 근처의 드론을 부른다. 천장 해치가 열리고 상자가 드론에게 건네진다. 도착한 상자는 자동으로 풀린다. 전력: 2,000 FE + 1블록당 50 FE. 화물이 정한 양만큼 쌓이면 등록한 목적지로 자동 발송할 수도 있다. 드론은 벽을 피해 빈 곳으로 날아온다."
+  },
+  "summary.singulo.drone_port": {
+    "source": "Packs cargo into crates and sends or receives it by drone.",
+    "translation": "화물을 포장 상자에 담아 드론으로 보내거나 받는다."
+  },
+  "howto.singulo.drone_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "desc.singulo.packing_crate": {
+    "source": "A crate for cargo sent by drone. Reaches up to 160 blocks. Right-click a packed crate to unpack it.",
+    "translation": "드론으로 보낼 화물을 담는 상자. 160블록까지 닿는다. 포장된 상자를 우클릭하면 풀 수 있다."
+  },
+  "howto.singulo.packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "uses.singulo.packing_crate": {
+    "source": "Used in: Battery Packing Crate",
+    "translation": "사용 대상: 배터리 포장 상자"
+  },
+  "desc.singulo.battery_packing_crate": {
+    "source": "A packing crate with an extra battery. Reaches up to 760 blocks.",
+    "translation": "배터리를 더한 포장 상자. 760블록까지 닿는다."
+  },
+  "howto.singulo.battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "uses.singulo.battery_packing_crate": {
+    "source": "Used in: Large Battery Packing Crate",
+    "translation": "사용 대상: 대용량 배터리 포장 상자"
+  },
+  "desc.singulo.large_battery_packing_crate": {
+    "source": "A packing crate with a large battery. Reaches up to 3,160 blocks.",
+    "translation": "큰 배터리를 실은 포장 상자. 3,160블록까지 닿는다."
+  },
+  "howto.singulo.large_battery_packing_crate": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "제작: 제작대(3단계)"
+  },
+  "guide.singulo.drones": {
+    "source": "Drone Delivery",
+    "translation": "드론 수송"
+  },
+  "guide.singulo.drones.start.title": {
+    "source": "Getting drones",
+    "translation": "드론 준비하기"
+  },
+  "guide.singulo.drones.start.body": {
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "유적의 가드 독이 내보낸 경비 드론 한 무리를 모두 쓰러뜨리면, 가끔 독 위에 드론 크리스털 메모리가 나타난다(지표 관측소에서 40%). 2단계 제작대에서 드론 스테이션을, 정밀 조립기에서 드론 키트를 만든다. 스테이션에 메모리(소모되지 않음)와 키트(출력할 때마다 1개)를 넣고 전력을 보내면 위에 수송 드론을 1대 출력한다(20,000 FE). 생산 업그레이드 1장마다 1대 늘어, 2장이면 최대 3대. 드론은 스테이션 위 하늘에서 대기한다.\n드론은 플레이어나 몹의 공격으로 다치지 않는다. 스테이션을 부수면 대기 중인 드론은 키트로 돌아간다."
+  },
+  "guide.singulo.drones.send.title": {
+    "source": "Sending cargo",
+    "translation": "화물 보내기"
+  },
+  "guide.singulo.drones.send.body": {
+    "source": "A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\nPut an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. Before the drone arrives, Cancel puts everything back (power included).\nHoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.",
+    "translation": "드론 포트를 놓으면 놓은 사람의 수송망에 들어간다. 같은 차원에 있는 같은 소유자의 포트가 모두 목적지로 나열된다. 헤더의 이름을 클릭하면 이름을 붙일 수 있다.\n왼쪽 위에 빈 포장 상자를, 가운데에 화물을 넣고, 오른쪽 목록에서 목적지를 골라 「발송」을 누르면, 포트가 화물을 포장하고 전력을 지불한 뒤 64블록 안의 스테이션에서 대기 중인 드론을 부른다. 드론이 바로 위에 멈추면 천장 해치가 열리고 승강대가 상자를 들어 올려 드론의 집게가 잡는다. 목적지에서도 해치가 열려 상자를 내리고, 수령 칸으로 자동으로 푼다. 빈 상자는 빈 상자 칸으로 돌아간다. 드론이 오기 전이라면 「취소」로 모두 되돌릴 수 있다(전력도 돌려받는다).\n호퍼나 파이프로 빈 상자와 화물을 넣고, 수령 칸에서 꺼낼 수 있다. 비교기는 수령 칸이 찬 정도를 출력한다."
+  },
+  "guide.singulo.drones.range.title": {
+    "source": "Range and power",
+    "translation": "사거리와 전력"
+  },
+  "guide.singulo.drones.range.body": {
+    "source": "Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\nCargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. If the destination port was broken, the cargo goes back to where it came from.",
+    "translation": "발송 전력은 2,000 FE + 직선거리 1블록당 50 FE이며, 포장할 때 포트가 지불한다. 얼마나 멀리 보낼 수 있는지는 포장 상자가 정한다: 포장 상자 160블록, 배터리 포장 상자 760블록, 대용량 배터리 포장 상자 3,160블록. 목적지 목록에서 닿지 않는 거리는 빨갛게 표시된다.\n드론이 로드되지 않은 곳을 나는 동안에도 화물은 사라지지 않는다. 목적지가 로드되어 있으면 드론이 착륙해 내리고, 로드되어 있지 않으면 그 포트가 로드될 때 상자를 받는다. 목적지 포트가 부서졌다면 화물은 출발지로 돌아간다."
+  },
+  "gui.singulo.drone_port.status.10": {
+    "source": "No drone serves this port",
+    "translation": "이 포트를 맡은 드론이 없습니다"
+  },
+  "gui.singulo.drone_port.elsewhere": {
+    "source": "Another port",
+    "translation": "다른 포트"
+  },
+  "gui.singulo.drone_port.cancel.hint": {
+    "source": "Cancel and get the cargo and power back",
+    "translation": "취소하고 화물과 전력을 돌려받습니다"
+  },
+  "gui.singulo.drone_port.phase.1": {
+    "source": "Waiting",
+    "translation": "드론 대기"
+  },
+  "gui.singulo.drone_port.phase.2": {
+    "source": "Drone coming",
+    "translation": "오는 중"
+  },
+  "gui.singulo.drone_port.phase.3": {
+    "source": "Loading",
+    "translation": "적재"
+  },
+  "gui.singulo.drone_port.phase.4": {
+    "source": "In flight",
+    "translation": "비행 중"
+  },
+  "gui.singulo.drone_port.phase.5": {
+    "source": "Unloading",
+    "translation": "하역"
+  },
+  "gui.singulo.drone_port.ship.out": {
+    "source": "To %s",
+    "translation": "%s(으)로 보냄"
+  },
+  "gui.singulo.drone_port.ship.in": {
+    "source": "From %s",
+    "translation": "%s에서 옴"
+  },
+  "gui.singulo.drone_port.ship.progress": {
+    "source": "%s%% of the way",
+    "translation": "진행 %s%%"
+  },
+  "gui.singulo.drone_port.no_ships": {
+    "source": "Nothing in transit",
+    "translation": "운송 중인 화물이 없습니다"
+  },
+  "gui.singulo.drone_station.status.8": {
+    "source": "Stopped",
+    "translation": "정지됨"
+  },
+  "gui.singulo.drone_station.status.9": {
+    "source": "Dismantling",
+    "translation": "해체 중"
+  },
+  "gui.singulo.drone_station.dismantle": {
+    "source": "Dismantle (press twice; the kit comes back)",
+    "translation": "해체(두 번 누름. 키트가 돌아옴)"
+  },
+  "gui.singulo.drone_station.dismantle.confirm": {
+    "source": "Press again to dismantle",
+    "translation": "한 번 더 누르면 해체합니다"
+  },
+  "gui.singulo.drone_station.resume": {
+    "source": "Print again",
+    "translation": "다시 출력"
+  },
+  "guide.singulo.drones.more.title": {
+    "source": "Auto-export, shipments and dismantling",
+    "translation": "자동 반출, 운송 현황, 해체"
+  },
+  "guide.singulo.drones.more.body": {
+    "source": "The settings tab on the right rail opens the same side settings as processing machines. Choose input and output per face and turn on auto-eject to push received items into an adjacent chest or other storage (empty crates that do not fit the crate slot too).\nThe middle of the screen lists shipments in transit: outgoing in orange, incoming in green. Each shows its stage (waiting, drone coming, loading, in flight, unloading) and a progress bar while in flight.\nYou can only send while a drone serves the port (one from a station within 64 blocks). A crate sent while every drone is busy waits to be loaded, and a drone that finishes a delivery nearby flies straight to it instead of returning to its station.\nIn the station screen, press the × on a waiting drone’s row twice to dismantle it: it lands on the station, comes apart and its kit comes back. That slot stops; press + to print again.",
+    "translation": "오른쪽 레일의 설정 칸에서 가공 장치와 같은 면 설정을 열 수 있다. 면마다 입출력을 정하고 자동 배출을 켜면, 받은 화물을 옆의 상자 등으로 밀어낸다(빈 상자 칸에 들어가지 못한 빈 상자도).\n화면 가운데에는 운송 중인 편이 나온다(보내는 편은 주황, 오는 편은 초록). 편마다 드론 대기·오는 중·적재·비행 중·하역 단계와, 비행 중의 진행 막대를 볼 수 있다.\n그 포트를 맡은 드론(64블록 안의 스테이션의 드론)이 있을 때만 발송할 수 있다. 모든 드론이 운반 중일 때 발송한 상자는 적재 대기가 되고, 근처에서 배송을 마친 드론이 스테이션으로 돌아가지 않고 바로 가지러 온다.\n스테이션 화면에서 대기 중인 드론 줄의 ×를 두 번 누르면 해체한다. 드론은 스테이션에 내려와 분해되고 키트가 돌아온다. 그 칸은 멈추며, +를 누르면 다시 출력한다."
+  },
+  "gui.singulo.drone_port.tab.0": {
+    "source": "Cargo and received items",
+    "translation": "화물과 수령"
+  },
+  "gui.singulo.drone_port.tab.1": {
+    "source": "Destination and sending",
+    "translation": "목적지와 발송"
+  },
+  "gui.singulo.drone_port.tab.2": {
+    "source": "Shipments in transit",
+    "translation": "운송 중인 편"
+  },
+  "gui.singulo.drone_port.auto.off": {
+    "source": "Auto: off",
+    "translation": "자동 끔"
+  },
+  "gui.singulo.drone_port.auto.full": {
+    "source": "Auto: full",
+    "translation": "자동 가득"
+  },
+  "gui.singulo.drone_port.auto.count": {
+    "source": "Auto: %s",
+    "translation": "자동 %s개"
+  },
+  "gui.singulo.drone_port.auto.hint": {
+    "source": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
+    "translation": "자동 발송: 화물이 이 수(가득은 9칸 모두)만큼 쌓이면 등록한 목적지로 보낸다. 화물이 더 늘지 않고 2초 지나면 보낸다. 클릭으로 전환"
+  },
+  "gui.singulo.drone_port.auto.register": {
+    "source": "Set",
+    "translation": "등록"
+  },
+  "gui.singulo.drone_port.auto.register.hint": {
+    "source": "Use the destination selected in the list for auto-send",
+    "translation": "목록에서 고른 목적지를 자동 발송의 목적지로 한다"
+  },
+  "gui.singulo.drone_port.auto.target": {
+    "source": "→ %s",
+    "translation": "→ %s"
+  },
+  "gui.singulo.drone_port.auto.none": {
+    "source": "No auto-send destination",
+    "translation": "자동 발송 목적지 미등록"
+  },
+  "guide.singulo.drones.auto.title": {
+    "source": "Auto-send",
+    "translation": "자동 발송"
+  },
+  "guide.singulo.drones.auto.body": {
+    "source": "The bottom row of the Send tab sets up auto-send. Each press of the threshold button cycles through off, 1, 64, 256 and full (all 9 cargo slots filled). Pick a destination in the list and press Set to make it the auto-send destination (kept separately from manual sends).\nWhen the cargo reaches the threshold and has not grown for 2 seconds (or at once when full), the port sends it to that destination. Crates, range, power and drones work as for manual sends. Keep feeding cargo with hoppers or pipes to ship from a mine to your base automatically.",
+    "translation": "발송 탭의 아래 줄에서 자동 발송을 쓸 수 있다. 기준 버튼을 누를 때마다 끔·1개·64개·256개·가득(화물 9칸이 모두 가득)으로 바뀐다. 목록에서 목적지를 고르고 「등록」을 누르면 자동 발송의 목적지가 된다(직접 보내는 목적지와 따로 기억한다).\n화물 칸이 기준만큼 쌓이고 2초가 지나도 늘지 않으면(가득이면 바로), 등록한 목적지로 자동 발송한다. 빈 상자·사거리·전력·드론의 조건은 직접 보낼 때와 같다. 호퍼나 파이프로 화물을 계속 넣으면, 채굴장 등에서 거점으로 계속 자동으로 나를 수 있다."
+  },
+  "subtitles.singulo.drone.rotor": {
+    "source": "Cargo drone hums",
+    "translation": "수송 드론이 윙윙거린다"
+  },
+  "subtitles.singulo.drone.print": {
+    "source": "Print head draws a layer",
+    "translation": "출력 헤드가 한 층을 그린다"
+  },
+  "subtitles.singulo.drone.print_start": {
+    "source": "Drone printing starts",
+    "translation": "드론 출력이 시작된다"
+  },
+  "subtitles.singulo.drone.printed": {
+    "source": "Drone printed",
+    "translation": "드론 출력이 끝난다"
+  },
+  "subtitles.singulo.drone.arm_retract": {
+    "source": "Print arm retracts",
+    "translation": "출력 팔이 들어간다"
+  },
+  "subtitles.singulo.drone.dismantle": {
+    "source": "Drone is dismantled",
+    "translation": "드론이 해체된다"
+  },
+  "subtitles.singulo.drone_port.hatch_open": {
+    "source": "Drone port hatch opens",
+    "translation": "드론 포트 해치가 열린다"
+  },
+  "subtitles.singulo.drone_port.hatch_close": {
+    "source": "Drone port hatch closes",
+    "translation": "드론 포트 해치가 닫힌다"
+  },
+  "subtitles.singulo.drone_port.lift": {
+    "source": "Lift moves",
+    "translation": "승강대가 움직인다"
+  },
+  "subtitles.singulo.drone_port.clamp": {
+    "source": "Drone claws grip a crate",
+    "translation": "드론 집게가 상자를 잡는다"
+  },
+  "subtitles.singulo.drone_port.pack": {
+    "source": "Cargo is packed",
+    "translation": "화물이 포장된다"
+  },
+  "subtitles.singulo.drone_port.arrive": {
+    "source": "Cargo arrives",
+    "translation": "화물이 도착한다"
+  },
+  "gui.singulo.drone_port.sides.items": {
+    "source": "Cargo in and out",
+    "translation": "화물 넣고 빼기"
+  },
+  "gui.singulo.drone_port.sides.crates": {
+    "source": "Empty crates (reserve slot input/output)",
+    "translation": "빈 상자 (예비 상자 슬롯 입출력)"
+  },
+  "gui.singulo.drone_port.sides.crate_input": {
+    "source": "Accepts empty crates",
+    "translation": "빈 상자를 넣을 수 있음"
+  },
+  "guide.singulo.drones.android.title": {
+    "source": "Working with androids",
+    "translation": "안드로이드와 연결"
+  },
+  "guide.singulo.drones.android.body": {
+    "source": "Place a Drone Port beside an Android Supply Port and allow cargo output on that face to use arrivals as materials. Outbound cargo and sealed crates are not counted as available stock. Beside a Delivery Port, allow cargo input to accept finished products and use auto-send to ship them to another base. Full cargo slots leave products waiting in the Delivery Port.\nThe empty-crate tab controls reserve-crate input/output and auto-eject separately. Defaults remain input-only with auto-eject off. Androids and pipes can collect crates through an output face. On a return-shipment port, disable empty-crate input and allow cargo input on the receiving face to accept empty crates as cargo rather than reserves. Supply transport crates through another face and configure auto-send.",
+    "translation": "안드로이드 자재구 옆에 드론 포트를 놓고 해당 면의 화물 출력을 허용하면 도착한 물품을 제작 재료로 사용할 수 있습니다. 발송 대기 화물과 개봉하지 않은 상자는 가용 재고에 포함되지 않습니다. 납품구 옆에서 화물 입력을 허용하면 완성품을 받고 자동 발송으로 다른 거점에 보낼 수 있습니다. 화물 슬롯이 가득 차면 완성품은 납품구에서 기다립니다.\n빈 상자 탭에서는 예비 상자의 입출력과 자동 배출을 별도로 설정합니다. 기본값은 입력 전용이며 자동 배출은 꺼져 있습니다. 출력 면에서 안드로이드나 파이프로 상자를 회수할 수 있습니다. 반송용 포트는 받는 면의 빈 상자 입력을 끄고 화물 입력을 허용하면 빈 상자를 예비분이 아닌 화물로 받습니다. 다른 면에서 운송용 상자를 공급하고 자동 발송을 설정하세요."
+  },
+  "gui.singulo.drone_port.auto.is_target": {
+    "source": "Auto-send destination",
+    "translation": "자동 발송 목적지"
+  },
+  "item.singulo.drone_phase_upgrade": {
+    "source": "Phase Shift Upgrade",
+    "translation": "위상 투과 업그레이드"
+  },
+  "gui.singulo.drone_station.phase": {
+    "source": "Phase Shift Upgrade (fly through walls)",
+    "translation": "위상 투과 업그레이드(벽을 통과해 비행)"
+  },
+  "gui.singulo.drone_port.phase.6": {
+    "source": "No route",
+    "translation": "경로 없음"
+  },
+  "subtitles.singulo.drone.phase": {
+    "source": "Drone phases through a wall",
+    "translation": "드론이 벽을 통과한다"
+  },
+  "desc.singulo.drone_phase_upgrade": {
+    "source": "Put it in the slot inside a Drone Station’s frame (below the Production Upgrades) to let its drones take shortcuts straight through walls and roofs. They glow violet while passing through.",
+    "translation": "드론 스테이션 틀 안의 칸(생산 업그레이드 아래)에 넣으면, 그 스테이션의 드론이 벽과 지붕을 통과해 곧장 지름길로 난다. 통과할 때 보라색으로 빛난다."
+  },
+  "howto.singulo.drone_phase_upgrade": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작: 정밀 조립기(4단계)"
+  },
+  "guide.singulo.drones.route.title": {
+    "source": "Routes and phase shift",
+    "translation": "경로와 위상 투과"
+  },
+  "guide.singulo.drones.route.body": {
+    "source": "Drones do not fly through walls or roofs. For nearby destinations they find a path through open space; for distant ones they leave to open sky, cruise above the terrain and come down from the sky above the destination. They enter ports inside buildings through doors, windows and skylights. A port in a room with no opening cannot be reached and shows No route in the In-transit page (the cargo is safe; the drone waits and searches again).\nPut a Phase Shift Upgrade (stage 4, Precision Assembler) in the slot inside a Drone Station’s frame (below the Production Upgrades) and its drones take shortcuts straight through walls. They glow violet from just before a wall, and the glow shows through it.",
+    "translation": "드론은 벽이나 지붕을 통과해 날지 않는다. 가까운 목적지는 빈 곳을 따라 길을 찾고, 먼 목적지는 출발점에서 하늘이 보이는 곳으로 나가 지형보다 높은 곳을 순항한 뒤 목적지 위의 하늘에서 내려온다. 건물 안의 포트에도 문이나 창, 천창으로 들어간다. 열린 곳이 없는 방의 포트에는 들어갈 수 없으며, 운송 중 페이지에 「경로 없음」이 표시된다(화물은 사라지지 않고, 드론은 그 자리에서 기다리며 길을 다시 찾는다).\n4단계 정밀 조립기로 만드는 위상 투과 업그레이드를 드론 스테이션 틀 안의 칸(생산 업그레이드 아래)에 넣으면, 그 스테이션의 드론은 벽을 통과해 곧장 지름길로 난다. 벽을 지나기 조금 전부터 보라색으로 빛나고, 벽 너머로도 빛나는 모습이 보인다."
+  },
+  "item.singulo.drone_memory_jet": {
+    "source": "Drone Crystal Memory (Jet)",
+    "translation": "드론 크리스털 메모리(제트형)"
+  },
+  "item.singulo.drone_memory_gravity": {
+    "source": "Drone Crystal Memory (Anti-Gravity)",
+    "translation": "드론 크리스털 메모리(반중력형)"
+  },
+  "subtitles.singulo.drone.jet": {
+    "source": "Jet drone roars",
+    "translation": "제트 드론이 굉음을 낸다"
+  },
+  "subtitles.singulo.drone.hover": {
+    "source": "Anti-gravity drone hums",
+    "translation": "반중력 드론이 웅웅거린다"
+  },
+  "desc.singulo.drone_memory_jet": {
+    "source": "The design of a cargo drone with twin jets. Put it in a Drone Station to print the fastest drones (1.6× the rotor type). It is not used up. Dropped by guard docks in the Research Building and higher facilities.",
+    "translation": "쌍발 제트로 나는 운송 드론의 설계. 드론 스테이션에 넣으면 가장 빠른 제트형 드론(로터형의 1.6배)을 프린트한다. 소모되지 않는다. 연구동 이상의 시설의 가드 독에서 나온다."
+  },
+  "desc.singulo.drone_memory_gravity": {
+    "source": "The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.",
+    "translation": "반중력장으로 떠다니는 운송 드론의 설계. 드론 스테이션에 넣으면 네 개의 비트가 견인 광선으로 상자를 나르는 반중력형 드론(로터형 속도의 1.25배)을 프린트한다. 소모되지 않는다. 봉쇄 배양 시설과 지하 안드로이드 연구소의 가드 독에서 드물게 나온다."
+  },
+  "guide.singulo.drones.kinds.title": {
+    "source": "Drone types",
+    "translation": "드론의 종류"
+  },
+  "guide.singulo.drones.kinds.body": {
+    "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
+    "translation": "메모리의 종류가 스테이션이 프린트하는 드론의 종류를 정한다. 상위 종류는 상위 시설의 가드 독에서만 나온다.\n- 로터형(모든 시설): 네 개의 로터로 나는 표준 속도의 종류.\n- 제트형(연구동 이상): 쌍발 제트로 나는 가장 빠른 종류(로터형의 1.6배). 선회할 때 기체를 기울인다.\n- 반중력형(봉쇄 배양 시설과 지하 안드로이드 연구소, 드묾): 반중력장으로 떠다닌다(1.25배). 네 개의 비트가 견인 광선으로 상자를 매단다.\n메모리를 바꿔도 이미 프린트한 드론은 바뀌지 않는다. 종류를 바꾸려면 드론을 해체하고 다시 프린트한다."
+  },
+  "gui.singulo.drone_station.row.0": {
+    "source": "No memory",
+    "translation": "메모리 없음"
+  },
+  "gui.singulo.drone_station.row.1": {
+    "source": "No kit",
+    "translation": "키트 없음"
+  },
+  "gui.singulo.drone_station.row.2": {
+    "source": "Low power",
+    "translation": "전력 부족"
+  },
+  "gui.singulo.drone_station.row.6": {
+    "source": "Top blocked",
+    "translation": "위가 막힘"
+  },
+  "summary.singulo.unfired_ceramic": {
+    "source": "Fire it in a furnace to make white ceramic.",
+    "translation": "화로에서 구우면 화이트 세라믹 복합재가 된다."
+  },
+  "summary.singulo.holo_projector": {
+    "source": "Projects a multiblock’s shape and lists missing blocks.",
+    "translation": "멀티블록의 조립 형태를 투영하고 부족한 블록을 알려 준다."
+  },
+  "summary.singulo.relocation_wrench": {
+    "source": "Picks up machines with their contents and settings.",
+    "translation": "장치를 내용물과 설정째 회수한다."
+  },
+  "summary.singulo.settings_card": {
+    "source": "Copies a machine’s settings to another.",
+    "translation": "장치의 설정을 복사해 다른 장치에 붙인다."
+  },
+  "summary.singulo.meteor_compass": {
+    "source": "Points to the nearest unmined meteorite core.",
+    "translation": "아직 캐지 않은 가장 가까운 운석 핵을 가리킨다."
+  },
+  "summary.singulo.fluid_canister": {
+    "source": "Carries 1,000 mB of any liquid or gas.",
+    "translation": "어떤 액체·가스든 1,000 mB를 옮길 수 있는 용기."
+  },
+  "summary.singulo.hydrogen_fuel_cell": {
+    "source": "A generator that makes power from hydrogen and oxygen.",
+    "translation": "수소와 산소로 전력을 만드는 발전기."
+  },
+  "summary.singulo.peltier_cooler": {
+    "source": "Uses power to freeze water into ice.",
+    "translation": "전력으로 물을 얼려 얼음을 만든다."
+  },
+  "summary.singulo.builder_wand": {
+    "source": "Creative only. Builds a multiblock instantly.",
+    "translation": "크리에이티브 전용. 멀티블록을 순식간에 조립한다."
+  },
+  "summary.singulo.thermoelectric_generator": {
+    "source": "Your first generator: place it between hot and cold.",
+    "translation": "뜨거운 것과 차가운 것 사이에 두면 발전하는 첫 전원."
+  },
+  "summary.singulo.compressor": {
+    "source": "Presses plates, or packs any item into mass in mass mode.",
+    "translation": "판을 만들고, 질량 모드에서는 무엇이든 압축 블록으로 굳힌다."
+  },
+  "summary.singulo.coolant_cartridge": {
+    "source": "A portable canister of 100 mB of liquid nitrogen.",
+    "translation": "액체 질소 100 mB를 담은 운반용 용기."
+  },
+  "summary.singulo.empty_coolant_cartridge": {
+    "source": "An empty canister, filled with liquid nitrogen at a cooling tower.",
+    "translation": "냉각탑에서 액체 질소를 채우는 빈 용기."
+  },
+  "summary.singulo.meteorite_crust": {
+    "source": "A meteorite’s burnt shell. Grows stardust in its crater.",
+    "translation": "운석을 감싼 그을린 껍질. 크레이터에서 별가루 결정을 키운다."
+  },
+  "summary.singulo.meteoric_iron_chunk": {
+    "source": "Iron-nickel in a meteorite. Mine it for raw meteoric iron.",
+    "translation": "운석 속 철·니켈 덩어리. 캐면 운철 원석이 나온다."
+  },
+  "summary.singulo.fulgurite": {
+    "source": "Lightning-fused quartz glass for optical lattices.",
+    "translation": "번개로 녹아 굳은 석영 유리. 광격자 기판의 재료."
+  },
+  "summary.singulo.cryogenic_cooling_tower": {
+    "source": "A multiblock that makes liquid nitrogen and helium.",
+    "translation": "액체 질소와 액체 헬륨을 만드는 멀티블록."
+  },
+  "summary.singulo.cryogenic_turbine": {
+    "source": "Recovers the power stored in liquid nitrogen.",
+    "translation": "액체 질소에 저장한 전력을 되찾는다."
+  },
+  "summary.singulo.muon_fusion_reactor": {
+    "source": "A stage 2 generator running on muon catalysts and water.",
+    "translation": "뮤온 촉매와 물로 발전하는 2단계 발전기."
+  },
+  "summary.singulo.capacity_upgrade_1": {
+    "source": "Raises a machine’s buffer to 1,000,000 FE.",
+    "translation": "가공 장치의 축전 용량을 100만 FE로 늘린다."
+  },
+  "summary.singulo.capacity_upgrade_2": {
+    "source": "Raises a machine’s buffer to 4,000,000 FE.",
+    "translation": "가공 장치의 축전 용량을 400만 FE로 늘린다."
+  },
+  "summary.singulo.capacity_upgrade_3": {
+    "source": "Raises a machine’s buffer to 40,000,000 FE.",
+    "translation": "가공 장치의 축전 용량을 4,000만 FE로 늘린다."
+  },
+  "summary.singulo.deep_sea_collector": {
+    "source": "Uses water pressure on the sea floor to make Pressure Crystals.",
+    "translation": "해저에서 수압을 이용해 고압 결정을 만든다."
+  },
+  "summary.singulo.pressure_crystal": {
+    "source": "A hard violet crystal pressed by deep-sea water.",
+    "translation": "해저의 수압으로 다져진 단단한 보라색 결정."
+  },
+  "summary.singulo.neutrino_scanner": {
+    "source": "Reveals nearby ores and ruins through terrain.",
+    "translation": "주변의 광석과 유적을 지형 너머로 드러낸다."
+  },
+  "summary.singulo.android_repair_kit": {
+    "source": "Lets an android repair itself when hurt.",
+    "translation": "안드로이드가 다쳤을 때 스스로 고친다."
+  },
+  "summary.singulo.android_armor_plate": {
+    "source": "Works as a guard android’s chestplate.",
+    "translation": "호위 안드로이드의 흉갑이 된다."
+  },
+  "summary.singulo.android_factory_print_unit": {
+    "source": "Makes android printing faster and cheaper.",
+    "translation": "안드로이드 출력을 빠르고 싸게 한다."
+  },
+  "summary.singulo.android_battery_upgrade": {
+    "source": "Raises a guard android’s charge.",
+    "translation": "호위 안드로이드의 충전량을 늘린다."
+  },
+  "summary.singulo.android_mining_upgrade": {
+    "source": "Lets a guard android mine.",
+    "translation": "호위 안드로이드가 채굴할 수 있게 된다."
+  },
+  "summary.singulo.android_ribbon": {
+    "source": "A ribbon for an android’s head.",
+    "translation": "안드로이드의 머리에 묶는 리본."
+  },
+  "summary.singulo.android_hair_flower": {
+    "source": "A flower hair ornament for an android.",
+    "translation": "안드로이드의 머리에 다는 꽃 머리 장식."
+  },
+  "summary.singulo.android_beret": {
+    "source": "A beret for an android.",
+    "translation": "안드로이드에게 씌우는 베레모."
+  },
+  "summary.singulo.android_glasses": {
+    "source": "Square glasses for an android.",
+    "translation": "안드로이드에게 씌우는 네모난 안경."
+  },
+  "summary.singulo.drone_memory": {
+    "source": "The design for printing rotor cargo drones.",
+    "translation": "로터형 수송 드론을 출력할 수 있는 설계."
+  },
+  "summary.singulo.drone_memory_jet": {
+    "source": "The design for the fastest, jet-powered cargo drone.",
+    "translation": "가장 빠른 제트형 수송 드론의 설계."
+  },
+  "summary.singulo.drone_memory_gravity": {
+    "source": "The design for an anti-gravity cargo drone with tractor beams.",
+    "translation": "견인 광선으로 상자를 나르는 반중력형 수송 드론의 설계."
+  },
+  "summary.singulo.drone_kit": {
+    "source": "Parts used for each cargo drone printed.",
+    "translation": "드론을 1대 출력할 때마다 쓰는 부품 세트."
+  },
+  "summary.singulo.packing_crate": {
+    "source": "A crate for drone cargo. Reaches 160 blocks.",
+    "translation": "드론으로 보낼 화물을 담는 상자. 160블록까지 간다."
+  },
+  "summary.singulo.drone_phase_upgrade": {
+    "source": "Lets a station’s drones take shortcuts through walls.",
+    "translation": "스테이션의 드론이 벽을 통과해 지름길로 난다."
+  },
+  "summary.singulo.android_headdress": {
+    "source": "A frilled headdress for an android.",
+    "translation": "안드로이드의 머리에 다는 주름 장식 헤드드레스."
+  },
+  "summary.singulo.android_cape": {
+    "source": "A cape that flutters behind an android.",
+    "translation": "안드로이드의 등에서 나부끼는 망토."
+  },
+  "summary.singulo.android_scarf": {
+    "source": "A scarf for an android’s neck.",
+    "translation": "안드로이드의 목에 두르는 머플러."
+  },
+  "summary.singulo.android_waist_ribbon": {
+    "source": "A large bow for the back of an android’s waist.",
+    "translation": "안드로이드의 허리 뒤에 묶는 큰 나비매듭."
+  },
+  "summary.singulo.android_book": {
+    "source": "A book an idle android holds.",
+    "translation": "대기 중인 안드로이드가 손에 드는 책."
+  },
+  "summary.singulo.android_bouquet": {
+    "source": "A bouquet an idle android holds.",
+    "translation": "대기 중인 안드로이드가 손에 드는 꽃다발."
+  },
+  "summary.singulo.android_teacup": {
+    "source": "A teacup an idle android holds.",
+    "translation": "대기 중인 안드로이드가 손에 드는 찻잔."
+  },
+  "summary.singulo.android_umbrella": {
+    "source": "An umbrella an idle android holds up.",
+    "translation": "대기 중인 안드로이드가 쓰는 우산."
+  },
+  "summary.singulo.android_supply_port": {
+    "source": "Turns the storage next to it into a work stockpile.",
+    "translation": "옆의 상자 등을 작업용 재료 보관소로 만든다."
+  },
+  "summary.singulo.android_delivery_port": {
+    "source": "A box where androids deliver finished orders.",
+    "translation": "안드로이드가 주문 완성품을 배달하는 상자."
+  },
+  "summary.singulo.android_recipe_rack": {
+    "source": "A rack that makes recipe cards orderable.",
+    "translation": "레시피 카드를 늘어놓아 주문 가능한 레시피로 만드는 선반."
+  },
+  "summary.singulo.recipe_card": {
+    "source": "A card that records a recipe at a work console.",
+    "translation": "작업 지령대에서 레시피를 기록하는 카드."
+  },
+  "summary.singulo.neutrino_observatory": {
+    "source": "Keeps showing ores and ruins in a wide area.",
+    "translation": "넓은 범위의 광석과 유적을 근처 사람에게 계속 보여 준다."
+  },
+  "summary.singulo.scanner_module_2": {
+    "source": "Raises scanner sensitivity to show gold and diamonds.",
+    "translation": "스캐너 감도를 올려 금과 다이아몬드도 보여 준다."
+  },
+  "summary.singulo.scanner_module_3": {
+    "source": "Maxes scanner sensitivity to show ancient debris.",
+    "translation": "스캐너 감도를 최대로 올려 고대 잔해도 보여 준다."
+  },
+  "summary.singulo.low_gravity_panel": {
+    "source": "Cuts your gravity to a fifth until you land.",
+    "translation": "올라선 이의 중력을 다음 착지까지 5분의 1로 줄인다."
+  },
+  "summary.singulo.high_gravity_panel": {
+    "source": "Raises your gravity 2.5× until you land.",
+    "translation": "올라선 이의 중력을 다음 착지까지 2.5배로 늘린다."
+  },
+  "summary.singulo.degenerate_precursor": {
+    "source": "Pressed around a pressure crystal; saves rock in shells.",
+    "translation": "고압 결정을 씨앗으로 다져 만든 축퇴 물질 껍질의 재료."
+  },
+  "summary.singulo.void_collector": {
+    "source": "Gathers Void Dust above the End void.",
+    "translation": "디 엔드의 공허 위에서 공허의 먼지를 모은다."
+  },
+  "summary.singulo.void_dust": {
+    "source": "Condensed space fluctuations for singularity tech.",
+    "translation": "공간의 요동이 굳은 먼지. 특이점 기술에 쓴다."
+  },
+  "summary.singulo.sentinel_core": {
+    "source": "The Echo Sentinel’s record crystal, built into advanced machines.",
+    "translation": "메아리 파수꾼의 기록 결정. 상위 장치에 넣는다."
+  },
+  "summary.singulo.degenerate_nucleus": {
+    "source": "The gravity knot left in the Gravity Remnant’s heart.",
+    "translation": "중력 잔재 중심에 남은 중력 덩어리."
+  },
+  "summary.singulo.echo_chapter": {
+    "source": "A passage left by the Awakened Echo Sentinel.",
+    "translation": "각성한 메아리 파수꾼이 남긴 기록의 한 구절."
+  },
+  "summary.singulo.gravity_chapter": {
+    "source": "A passage left by the Awakened Gravity Remnant.",
+    "translation": "각성한 중력 잔재이 남긴 기록의 한 구절."
+  },
+  "summary.singulo.horizon_chapter": {
+    "source": "A passage left by the Awakened Horizon Warden.",
+    "translation": "각성한 지평선 감시자이 남긴 기록의 한 구절."
+  },
+  "summary.singulo.ergosphere_chapter": {
+    "source": "A passage left by the Ergosphere Leviathan.",
+    "translation": "에르고구의 거대 뱀이 남긴 기록의 한 구절."
+  },
+  "summary.singulo.archivist_halo": {
+    "source": "The Last Archivist’s halo, still warm.",
+    "translation": "최후의 기록자가 쓰던, 아직 따뜻한 광륜."
+  },
+  "summary.singulo.afterglow_wings": {
+    "source": "Crystal-feather wings for gliding.",
+    "translation": "몸에 착용하면 활공할 수 있는 결정 깃털 날개."
+  },
+  "summary.singulo.magnetic_bottle": {
+    "source": "A bottle that contains leaking strange matter.",
+    "translation": "새어 나온 기묘 물질을 봉해 회수하는 병."
+  },
+  "summary.singulo.reactor_mass_alarm": {
+    "source": "Gives a redstone signal when the core hits its mass limit.",
+    "translation": "노심 질량이 한계에 이르면 레드스톤 신호를 낸다."
+  },
+  "summary.singulo.hawking_collector": {
+    "source": "Collects H-Condensate while the reactor core is light.",
+    "translation": "노심이 가벼운 동안 H 응축체를 모은다."
+  },
+  "summary.singulo.gravitational_containment_tank": {
+    "source": "The only tank that can hold dark matter.",
+    "translation": "암흑 물질을 보관할 수 있는 유일한 탱크."
+  },
+  "summary.singulo.wormhole_generator_port": {
+    "source": "A generator shell that takes power and outputs mouths.",
+    "translation": "생성기 외피 대신 놓는 전력 입력·반출구."
+  },
+  "summary.singulo.genesis_frame": {
+    "source": "The octagonal frame around the Genesis Core.",
+    "translation": "창세로의 핵을 팔각형으로 둘러싸는 틀."
+  },
+  "summary.singulo.genesis_pylon": {
+    "source": "Pillars on the Genesis frame that focus power.",
+    "translation": "창세로 틀 위에 쌓아 우주로 전력을 보내는 기둥."
+  },
+  "summary.singulo.primordial_seed": {
+    "source": "Use it on a Genesis Core to begin a universe.",
+    "translation": "창세로의 핵에 쓰면 우주의 탄생이 시작된다."
+  },
+  "summary.singulo.reinforced_ruin_glass": {
+    "source": "A very hard, blast-proof window.",
+    "translation": "노의 충격을 견디는 매우 단단한 창."
+  },
+  "summary.singulo.ruin_cache": {
+    "source": "Holds ruin loot that refills after some days.",
+    "translation": "유적 회수물이 든 보관함. 며칠 뒤 내용물이 돌아온다."
+  },
+  "summary.singulo.ruin_android_fabricator": {
+    "source": "A ruin bed that prints androids and sends them out.",
+    "translation": "안드로이드를 출력해 출격시키는 유적의 대."
+  },
+  "summary.singulo.android_memory_blade": {
+    "source": "The design for printing Blade Androids.",
+    "translation": "광인형 안드로이드를 출력할 수 있는 설계."
+  },
+  "summary.singulo.android_memory_whip": {
+    "source": "The design for printing Whip Androids.",
+    "translation": "채찍형 안드로이드를 출력할 수 있는 설계."
+  },
+  "summary.singulo.android_memory_saber": {
+    "source": "The design for printing Saber Androids.",
+    "translation": "광검형 안드로이드를 출력할 수 있는 설계."
+  },
+  "summary.singulo.guardian_core": {
+    "source": "A seal that wakes the ruin’s guardian for a challenger.",
+    "translation": "도전자가 오면 유적의 파수꾼을 깨우는 봉인."
+  },
+  "summary.singulo.echo_projector": {
+    "source": "Projects the Echo Sentinel; more left means a tougher boss.",
+    "translation": "메아리 파수꾼을 비추는 받침대. 많이 남을수록 파수꾼이 단단하다."
+  },
+  "summary.singulo.factory_conveyor": {
+    "source": "An old factory belt that carries what stands on it.",
+    "translation": "위에 올라탄 것을 나르는 옛 문명 공장의 벨트."
+  },
+  "summary.singulo.lab_panel": {
+    "source": "White wall panelling from the android laboratory.",
+    "translation": "지하 안드로이드 연구소의 흰 벽재."
+  },
+  "summary.singulo.pressure_hull": {
+    "source": "The very hard steel shell around the laboratory.",
+    "translation": "연구소를 감싼 매우 단단한 강철 껍질."
+  },
+  "summary.singulo.welded_hatch": {
+    "source": "A welded steel lid over the laboratory shaft.",
+    "translation": "연구소 수직 갱도를 막는 용접된 강철 뚜껑."
+  },
+  "summary.singulo.lab_door": {
+    "source": "Laboratory sliding doors that close by themselves.",
+    "translation": "우클릭으로 열리고 스스로 닫히는 연구소 미닫이문."
+  },
+  "summary.singulo.coffee_maker": {
+    "source": "Brews coffee from cocoa beans.",
+    "translation": "카카오 콩으로 커피를 내린다."
+  },
+  "summary.singulo.vending_machine": {
+    "source": "A vending machine that sells drinks for emeralds.",
+    "translation": "에메랄드로 음료를 살 수 있는 자판기."
+  },
+  "summary.singulo.coffee": {
+    "source": "Speeds up mining and wakes you up.",
+    "translation": "마시면 채굴이 빨라지고 졸음이 깬다."
+  },
+  "summary.singulo.room_light": {
+    "source": "A laboratory ceiling light switched by redstone.",
+    "translation": "레드스톤 신호로 켜지는 연구소 천장등."
+  },
+  "summary.singulo.white_light_panel": {
+    "source": "A brightly glowing white panel.",
+    "translation": "밝게 빛나는 흰 패널."
+  },
+  "summary.singulo.white_sliding_door": {
+    "source": "White sliding doors that close by themselves.",
+    "translation": "우클릭으로 열리고 스스로 닫히는 흰 미닫이문."
+  },
+  "summary.singulo.android_barrier_glass": {
+    "source": "Glass that only androids cannot pass.",
+    "translation": "안드로이드만 지나갈 수 없는 유리."
+  },
+  "summary.singulo.android_gate_glass": {
+    "source": "Glass that only androids can pass.",
+    "translation": "안드로이드만 지나갈 수 있는 유리."
+  },
+  "summary.singulo.sealed_container_1": {
+    "source": "A sealed container opened with a Magnetic Key.",
+    "translation": "자기 자물쇠 열쇠로 여는 봉인 컨테이너."
+  },
+  "summary.singulo.sealed_container_2": {
+    "source": "A sealed container opened with a Quantum Key.",
+    "translation": "양자 자물쇠 열쇠로 여는 봉인 컨테이너."
+  },
+  "summary.singulo.sealed_container_3": {
+    "source": "A sealed container opened with a Temporal Key.",
+    "translation": "시간 자물쇠 열쇠로 여는 봉인 컨테이너."
+  },
+  "summary.singulo.sealed_container_4": {
+    "source": "A sealed container opened with a Singularity Key.",
+    "translation": "특이점 자물쇠 열쇠로 여는 봉인 컨테이너."
+  },
+  "summary.singulo.overclock_chip": {
+    "source": "Triples a machine’s speed for four times the power.",
+    "translation": "장치 처리 속도를 3배로 올린다. 전력은 4배."
+  },
+  "summary.singulo.gravity_boots": {
+    "source": "No fall damage, and you can wall-jump in mid-air.",
+    "translation": "낙하 피해를 받지 않고, 공중에서 벽을 차고 뛸 수 있다."
+  },
+  "summary.singulo.catalyst_stabilizer": {
+    "source": "Doubles a catalyst’s remaining life.",
+    "translation": "촉매의 남은 수명을 2배로 늘린다."
+  },
+  "summary.singulo.dimensional_pocket": {
+    "source": "Your own storage you can open anywhere.",
+    "translation": "어디서든 열 수 있는 나만의 수납공간."
+  },
+  "summary.singulo.bismuth_ingot": {
+    "source": "A metal with an iridescent surface.",
+    "translation": "표면이 무지갯빛으로 빛나는 금속."
+  },
+  "summary.singulo.meteoric_iron_ingot": {
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금."
+  },
+  "summary.singulo.nihonium_ingot": {
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "무겁고 치밀한 니호늄 주괴."
+  },
+  "summary.singulo.steel_ingot": {
+    "source": "A sturdy structural metal.",
+    "translation": "튼튼한 구조용 금속."
+  },
+  "summary.singulo.zinc_ingot": {
+    "source": "An ingot of zinc.",
+    "translation": "아연 금속 주괴."
+  },
+  "guide.singulo.multiblocks.parts.title": {
+    "source": "Parts and stages",
+    "translation": "구성 블록과 단계"
+  },
+  "guide.singulo.multiblocks.parts.body": {
+    "source": "Structure parts also need you to reach the controller’s stage, and each uses a little of a key material.\n- Particle Accelerator tubes: Superconducting Wire (one per two tubes).\n- Degenerate Compactor, C-Cavity and Degenerate Furnace parts: a little lifetime of a BE Condensate Catalyst in the Precision Assembler’s catalyst slot.\n- P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts: a little lifetime of a Time Crystal Catalyst (a few, such as Reactor Shell, use a Time Crystal Module).\nEach craft uses 1/48 of the catalyst’s lifetime and the rest stays in the catalyst. Parts already placed keep working.",
+    "translation": "구성 블록도 컨트롤러와 같은 단계까지 진행해야 만들 수 있으며, 저마다 열쇠가 되는 재료를 조금씩 쓴다.\n- 입자 가속기의 가속관: 초전도 선재(2개당 1개).\n- 축퇴 압축로·카시미르 공동·축퇴 열로의 부품: 정밀 조립기 촉매 칸에 넣은 BE 응축 촉매의 수명을 조금.\n- 펜로즈 반응로·사건의 지평선 실드 타워·티플러 원통·웜홀 생성기·창세로의 부품: 시간 결정 촉매의 수명을 조금(반응로 외피 등 일부는 시간 결정 모듈).\n한 번 만들 때마다 촉매 수명의 1/48을 쓰고, 나머지는 촉매에 그대로 남는다. 이미 놓은 구성 블록은 그대로 쓸 수 있다."
+  },
+  "guide.singulo.power.capacity.title": {
+    "source": "Capacity upgrades",
+    "translation": "용량 업그레이드"
+  },
+  "guide.singulo.power.capacity.body": {
+    "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
+    "translation": "가공 장치 오른쪽 레일의 용량 전용 칸에 1개 넣으면 축전 용량이 Mk1은 1,000,000, Mk2는 4,000,000, Mk3는 40,000,000 FE가 된다. Mk1은 2단계 제작대에서, Mk2와 Mk3는 정밀 조립기에서 한 단계 아래 업그레이드로 만든다. 속도 업그레이드와 함께 쓸 수 있고 수전 상한은 바뀌지 않는다.\n뺐을 때 용량을 넘던 전력은 사라지지 않으며, 용량보다 적어질 때까지 새 전력을 받지 않는다. 한 번에 쓰는 전력이 보통 용량을 넘는 레시피에는 용량 업그레이드가 필요하다."
+  },
+  "gui.singulo.reason.capacity_exceeded": {
+    "source": "Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold",
+    "translation": "틱당 %s FE가 필요합니다. 용량 업그레이드 Mk3로도 축전 용량이 부족합니다"
   }
 }

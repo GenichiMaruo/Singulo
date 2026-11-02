@@ -112,6 +112,9 @@ MOD = {
     '精密組立台': ('precision_assembler', 'Precision Assembler', 'machine'),
     'ワールドライン・アンカー（小）': ('worldline_anchor_small', 'Worldline Anchor (Small)', 'machine'),
     '単極子アップグレード': ('monopole_upgrade', 'Monopole Upgrade', 'item'),
+    '容量アップグレード（Mk1）': ('capacity_upgrade_1', 'Capacity Upgrade Mk1', 'item'),
+    '容量アップグレード（Mk2）': ('capacity_upgrade_2', 'Capacity Upgrade Mk2', 'item'),
+    '容量アップグレード（Mk3）': ('capacity_upgrade_3', 'Capacity Upgrade Mk3', 'item'),
 
     # ---- 段階3 ----
     'ヘリウム': ('helium', 'Helium', 'fluid'),
@@ -151,6 +154,17 @@ MOD = {
     '髪飾り': ('android_hair_flower', 'Hair Flower', 'tool'),
     'ベレー帽': ('android_beret', 'Beret', 'tool'),
     'メガネ': ('android_glasses', 'Glasses', 'tool'),
+    # ドローン輸送（0.14.0。tools/drones.py が絵とモデルを作る）
+    'ドローン用クリスタルメモリ': ('drone_memory', 'Drone Crystal Memory', 'item'),
+    'ドローン用クリスタルメモリ（ジェット型）': ('drone_memory_jet', 'Drone Crystal Memory (Jet)', 'item'),
+    'ドローン用クリスタルメモリ（反重力型）': ('drone_memory_gravity', 'Drone Crystal Memory (Anti-Gravity)', 'item'),
+    'ドローンキット': ('drone_kit', 'Drone Kit', 'item'),
+    'ドローン・ステーション': ('drone_station', 'Drone Station', 'machine'),
+    'ドローン発着ポート': ('drone_port', 'Drone Port', 'machine'),
+    '梱包箱': ('packing_crate', 'Packing Crate', 'tool'),
+    'バッテリー付き梱包箱': ('battery_packing_crate', 'Battery Packing Crate', 'tool'),
+    '大容量バッテリー付き梱包箱': ('large_battery_packing_crate', 'Large Battery Packing Crate', 'tool'),
+    '位相透過アップグレード': ('drone_phase_upgrade', 'Phase Shift Upgrade', 'item'),
     # 施設の建材の設計図（tools/blueprints.py。作業台で素材と並べると建材ができ、設計図は残る）
     '遺構パネルの設計図': ('blueprint_ruin_panels', 'Ruin Panel Blueprint', 'tool'),
     '無垢の遺構建材の設計図': ('blueprint_pristine_ruin', 'Pristine Ruin Material Blueprint', 'tool'),
@@ -605,6 +619,9 @@ VANILLA = {
     '棒': '#c:rods/wooden',
     '本': 'minecraft:book',
     'ピストン': 'minecraft:piston',
+    'チェスト': '#c:chests/wooden',
+    '鉄のトラップドア': 'minecraft:iron_trapdoor',
+    '板材': '#minecraft:planks',
     '作業台（ブロック）': 'minecraft:crafting_table',
     'ファントムの皮膜': 'minecraft:phantom_membrane',
     'レッドストーン': '#c:dusts/redstone',

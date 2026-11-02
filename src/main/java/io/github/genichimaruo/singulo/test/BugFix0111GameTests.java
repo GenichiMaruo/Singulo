@@ -206,8 +206,11 @@ public final class BugFix0111GameTests {
         });
     }
 
-    /** アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    /**
+     * アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。
+     * 野良のアンドロイドは近くの生き物を追うので、となりのテスト（ゾンビなど）と同時に動かさない。
+     */
+    @GameTest(template = EMPTY, batch = "android_zero_gravity_alone", timeoutTicks = 200)
     public static void androidsFlyInZeroGravity(GameTestHelper helper) {
         for (int x = 1; x <= 3; x++) {
             for (int z = 1; z <= 3; z++) {
@@ -344,12 +347,15 @@ public final class BugFix0111GameTests {
         android.setPersistenceRequired();
         helper.getLevel().addFreshEntity(android);
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(2, 3, 4));   // 押し合わないよう、別の列に
-        helper.runAtTickTime(40, () -> {
+        // 受電器が動き出す tick は、加速した実行ではチャンクが動き出すまで遅れることがある。決まった tick ではなく、
+        // ゾンビが無重力になるまで待ち、その間アンドロイドが一度も無重力にならないことを毎 tick 確かめる
+        boolean[] androidFloated = {false};
+        helper.onEachTick(() -> androidFloated[0] |= ZeroGravity.weightless(android));
+        helper.succeedWhen(() -> {
             helper.assertTrue(ZeroGravity.weightless(zombie), "ふつうの生き物が無重力にならない");
-            helper.assertFalse(ZeroGravity.weightless(android), "アンドロイドまで無重力になった");
+            helper.assertFalse(androidFloated[0], "アンドロイドまで無重力になった");
             android.discard();
             zombie.discard();
-            helper.succeed();
         });
     }
 

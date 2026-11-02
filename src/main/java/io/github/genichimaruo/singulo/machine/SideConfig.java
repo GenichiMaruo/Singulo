@@ -9,6 +9,31 @@ import net.minecraft.core.Direction;
 public final class SideConfig {
     public enum Face { FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM }
 
+    /** 面の設定を GUI から変えられるブロックエンティティ（加工装置・ドローン発着ポート）。 */
+    public interface Holder {
+        boolean validChannel(int channel);
+
+        /** 面の設定を変えてよい人か（持ち主のある入れ物は、ここで断る）。 */
+        default boolean mayConfigure(net.minecraft.world.entity.player.Player player) {
+            return true;
+        }
+
+        void setEjectEnabled(int channel, boolean on);
+
+        void setSide(int channel, Face face, int mode, boolean eject);
+    }
+
+    /** 自動排出: slot の中身を dest へ入るだけ押し出す（入らなかった分は slot に残す）。 */
+    public static void pushOut(net.neoforged.neoforge.items.IItemHandlerModifiable items, int slot,
+                               net.neoforged.neoforge.items.IItemHandler dest) {
+        net.minecraft.world.item.ItemStack stack = items.getStackInSlot(slot);
+        if (stack.isEmpty()) return;
+        net.minecraft.world.item.ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
+        if (rest.getCount() != stack.getCount()) {
+            items.setStackInSlot(slot, rest);
+        }
+    }
+
     public static final int NONE = 0, INPUT = 1, OUTPUT = 2, BOTH = 3;
     private static final int EJECT = 4;
     /** 自動排出の全体スイッチ（ビット18）。オフなら面ごとの自動排出は働かない。既定はオフ。 */

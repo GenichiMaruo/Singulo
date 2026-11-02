@@ -197,15 +197,15 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     }
 
     public static boolean isTransferUpgrade(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_transfer_upgrade");
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("android_transfer_upgrade"));
     }
 
     public static boolean isProductionUpgrade(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_production_upgrade");
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("android_production_upgrade"));
     }
 
     public static boolean isPrintUnit(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_factory_print_unit");
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("android_factory_print_unit"));
     }
 
     /** 工場式印刷ユニットを積んでいるか。 */
@@ -422,7 +422,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     }
 
     public static boolean isKit(ItemStack stack) {
-        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_kit");
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("android_kit"));
     }
 
     public SinguloEnergyStorage energy() {

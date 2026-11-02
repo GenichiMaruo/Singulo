@@ -1,0 +1,571 @@
+package io.github.genichimaruo.singulo.drone;
+
+import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
+import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import io.github.genichimaruo.singulo.machine.SyncedInts;
+import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
+/**
+ * ドローン・ステーション。ドローン用クリスタルメモリ（減らない）とドローンキット（印刷ごとに1つ）を入れて電力を送ると、
+ * 上にドローンを印刷する（生産アップグレード1枚につき1機増え、2枚で3機まで）。ドローンは上空で待機し、半径 DISPATCH_RANGE の発着ポートに呼ばれて荷物を運ぶ。
+ */
+public class DroneStationBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+        AbstractMachineBlock.BreakListener, MenuProvider {
+    public static final int CAPACITY = 200_000;
+    public static final int MAX_RECEIVE = 4_000;
+    public static final int PRINT_FE = 20_000;
+    public static final int MAX_UNITS = 3;
+    /** ポートに呼ばれる範囲（ブロック）。 */
+    public static final int DISPATCH_RANGE = 64;
+    /** 待機しているはずのドローンが見当たらないとき、印刷し直すまで（tick）。 */
+    static final int LOST_TICKS = 100;
+
+    /** スロット: メモリ・キット・生産アップグレード・許可証・位相透過アップグレード（右レールの強化の段。古い保存とずれないよう最後に）。 */
+    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_PRODUCTION = 2, SLOT_PERMIT = 3, SLOT_PHASE = 4, SLOTS = 5;
+
+    /** GUI に送る値: 電力・容量・受け持てる数・枠ごとの状態。 */
+    public static final int D_ENERGY = 0, D_CAPACITY = 1, D_UNITS = 2, D_STATUS = 3, COUNT = D_STATUS + MAX_UNITS;
+    /** 枠の状態: メモリなし・キットなし・電力不足・印刷中・待機中・運搬中・上がふさがっている・使わない枠・止めた枠・解体中。 */
+    public static final int S_NO_MEMORY = 0, S_NO_KIT = 1, S_NO_ENERGY = 2, S_PRINTING = 3, S_IDLE = 4, S_FLYING = 5,
+            S_BLOCKED = 6, S_UNUSED = 7, S_STOPPED = 8, S_DISMANTLING = 9;
+    /** ボタン: 枠のドローンを解体して止める（BUTTON_DISMANTLE + 枠）、止めた枠をまた印刷する（BUTTON_RESUME + 枠）。 */
+    public static final int BUTTON_DISMANTLE = 0, BUTTON_RESUME = 10;
+
+    private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
+    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return switch (slot) {
+                case SLOT_MEMORY -> isMemory(stack);
+                case SLOT_KIT -> isKit(stack);
+                case SLOT_PRODUCTION -> io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isProductionUpgrade(stack);
+                case SLOT_PHASE -> isPhaseUpgrade(stack);
+                default -> io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isPermit(stack);
+            };
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return slot == SLOT_KIT ? 64 : slot == SLOT_PRODUCTION ? MAX_UNITS - 1 : 1;
+        }
+    };
+
+    @Nullable
+    private UUID owner;
+    private final UUID[] drones = new UUID[MAX_UNITS];
+    private final int[] statuses = new int[MAX_UNITS];
+    private final int[] missing = new int[MAX_UNITS];
+    /** 解体して止めた枠（もう一度印刷を押すまで、印刷し直さない）。 */
+    private final boolean[] stopped = new boolean[MAX_UNITS];
+    /** 枠ごとのドローンの型（印刷したときのメモリの型。メモリを替えても、印刷済みのドローンはそのまま）。 */
+    private final DroneKind[] kinds = {DroneKind.ROTOR, DroneKind.ROTOR, DroneKind.ROTOR};
+
+    private final SyncedInts data = SyncedInts.server(COUNT, i -> switch (i) {
+        case D_ENERGY -> energy.getEnergyStored();
+        case D_CAPACITY -> energy.getMaxEnergyStored();
+        case D_UNITS -> units();
+        default -> statuses[i - D_STATUS];
+    });
+
+    public DroneStationBlockEntity(BlockPos pos, BlockState state) {
+        super(SinguloBlockEntities.DRONE_STATION.get(), pos, state);
+    }
+
+    /** ドローンの設計メモリか（どの型でも）。 */
+    public static boolean isMemory(ItemStack stack) {
+        return DroneKind.ofMemory(stack) != null;
+    }
+
+    public static boolean isPhaseUpgrade(ItemStack stack) {
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("drone_phase_upgrade"));
+    }
+
+    /** このステーションのドローンが、壁を抜けて飛べるか（位相透過アップグレード）。 */
+    public boolean hasPhaseUpgrade() {
+        return isPhaseUpgrade(items.getStackInSlot(SLOT_PHASE));
+    }
+
+    public static boolean isKit(ItemStack stack) {
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
+    }
+
+    public ItemStackHandler items() {
+        return items;
+    }
+
+    /**
+     * ホッパーやパイプから見た中身: ドローンキットを入れられるだけ。ほかの欄（メモリ・アップグレード・許可証）は画面からだけ
+     * 出し入れする（自動で取り出せると、他人のステーションから許可証やメモリを抜けてしまう）。
+     */
+    private final net.neoforged.neoforge.items.IItemHandler automationItems = new net.neoforged.neoforge.items.IItemHandler() {
+        @Override
+        public int getSlots() {
+            return items.getSlots();
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return items.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return slot == SLOT_KIT ? items.insertItem(slot, stack, simulate) : stack;
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return items.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return slot == SLOT_KIT && items.isItemValid(slot, stack);
+        }
+    };
+
+    public net.neoforged.neoforge.items.IItemHandler automationItems() {
+        return automationItems;
+    }
+
+    public SinguloEnergyStorage energy() {
+        return energy;
+    }
+
+    @Nullable
+    public UUID owner() {
+        return owner;
+    }
+
+    public void setOwner(UUID owner) {
+        if (level instanceof ServerLevel server && !isRemoved()) {
+            DroneNetwork.get(server).removeStation(this);
+            this.owner = owner;
+            DroneNetwork.get(server).addStation(this);
+        }
+        this.owner = owner;
+        setChanged();
+    }
+
+    /** 受け持てるドローンの数（生産アップグレード1枚につき1機増え、2枚で3機）。 */
+    public int units() {
+        ItemStack upgrades = items.getStackInSlot(SLOT_PRODUCTION);
+        int n = io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.isProductionUpgrade(upgrades) ? upgrades.getCount() : 0;
+        return Math.min(MAX_UNITS, 1 + n);
+    }
+
+    /** このステーションが受け持つドローンか。 */
+    public boolean manages(UUID id, int unit) {
+        return unit >= 0 && unit < MAX_UNITS && id.equals(drones[unit]);
+    }
+
+    public int status(int unit) {
+        return statuses[unit];
+    }
+
+    /** 許可証に登録された人だけが使える（許可証がなければ、だれでも）。 */
+    public boolean mayOperate(Player player) {
+        List<UUID> members = io.github.genichimaruo.singulo.item.ShieldPermitItem.members(items.getStackInSlot(SLOT_PERMIT)).stream()
+                .map(io.github.genichimaruo.singulo.item.ShieldPermitItem.Member::id).toList();
+        return members.isEmpty() || owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID());
+    }
+
+    /** 枠ごとの待機位置（ステーションの上。2機目と3機目は左右の少し高い所）。 */
+    public static Vec3 hover(BlockPos station, int unit) {
+        double x = unit == 1 ? -1.0 : unit == 2 ? 1.0 : 0;
+        double y = unit == 0 ? 1.6 : 2.1;
+        return new Vec3(station.getX() + 0.5 + x, station.getY() + 1 + y, station.getZ() + 0.5);
+    }
+
+    // ------------------------------------------------------------------ 呼び出し
+
+    /** 呼べるドローン: 待機中のドローン（ステーションの枠）か、荷物を届け終えて帰りかけのドローン（その便）。 */
+    private record Candidate(@Nullable DroneStationBlockEntity station, int unit, @Nullable DroneNetwork.Flight returning, double distSqr) {}
+
+    /**
+     * port に呼べるドローン（port に近い順）。読み込まれているものだけ。調べるのは、持ち主の読み込まれたステーションと、
+     * 持ち主の帰りかけの便だけ（周りのブロックやすべての便を回さないので、拠点が大きくなっても重くならない）。
+     */
+    private static List<Candidate> candidates(ServerLevel level, BlockPos port, @Nullable UUID owner) {
+        List<Candidate> found = new ArrayList<>();
+        double range = (double) DISPATCH_RANGE * DISPATCH_RANGE;
+        DroneNetwork net = DroneNetwork.get(level);
+        for (DroneStationBlockEntity s : net.stationsOf(owner)) {
+            if (s.isRemoved() || s.getBlockPos().distSqr(port) > range) {
+                continue;
+            }
+            for (int i = 0; i < MAX_UNITS; i++) {
+                if (s.drones[i] != null && net.flightOf(s.worldPosition, i) == null && !s.stopped[i]
+                        && level.getEntity(s.drones[i]) instanceof CargoDrone d && d.isAlive() && d.idle()) {
+                    found.add(new Candidate(s, i, null, d.position().distanceToSqr(Vec3.atCenterOf(port))));
+                }
+            }
+        }
+        // 届け終えて帰りかけのドローン（ステーションへ戻らずに、そのまま次の仕事へ）
+        for (DroneNetwork.Flight f : net.returning(owner, level.getGameTime())) {
+            if (f.stage != DroneNetwork.RETURN || f.virtual || f.drone == null || f.station == null || !f.crate.isEmpty()
+                    || !java.util.Objects.equals(f.owner, owner)) {
+                continue;
+            }
+            if (level.getEntity(f.drone) instanceof CargoDrone d && d.isAlive() && !d.dismantling()) {
+                double dist = d.position().distanceToSqr(Vec3.atCenterOf(port));
+                if (dist <= range) {
+                    found.add(new Candidate(null, f.unit, f, dist));
+                }
+            }
+        }
+        found.sort(java.util.Comparator.comparingDouble(Candidate::distSqr));
+        return found;
+    }
+
+    /**
+     * port を受け持つドローンがいるか（いなければ発送できない）。今は運んでいても、手が空けば来るドローンも数える
+     * （発送した箱は積み込み待ちになり、近くで荷物を届け終えたドローンがそのまま取りに来る）。
+     */
+    public static boolean available(ServerLevel level, BlockPos port, @Nullable UUID owner) {
+        // 周りのステーションは1回だけ調べる（待機中のドローンがいるステーションは、働けるドローンもいる）。
+        // 範囲の外のステーションの、範囲の中で帰りかけのドローンも数える
+        DroneNetwork net = DroneNetwork.get(level);
+        double range = (double) DISPATCH_RANGE * DISPATCH_RANGE;
+        for (DroneNetwork.Flight f : net.returning(owner, level.getGameTime())) {
+            if (f.stage == DroneNetwork.RETURN && !f.virtual && f.drone != null && f.station != null && f.crate.isEmpty()
+                    && java.util.Objects.equals(f.owner, owner) && level.getEntity(f.drone) instanceof CargoDrone d && d.isAlive()
+                    && !d.dismantling() && d.position().distanceToSqr(Vec3.atCenterOf(port)) <= range) {
+                return true;
+            }
+        }
+        for (DroneStationBlockEntity s : net.stationsOf(owner)) {
+            if (!s.isRemoved() && s.getBlockPos().distSqr(port) <= range && s.hasFleet(net)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 働けるドローンが1機でもいるか（待機中・運搬中。止めた枠と解体中は数えない）。 */
+    private boolean hasFleet(DroneNetwork net) {
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (net.flightOf(worldPosition, i) != null || drones[i] != null && !stopped[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * port に近い、owner のドローン（待機中か、帰りかけ）を1機呼ぶ。呼べたら便の記録。
+     */
+    @Nullable
+    public static DroneNetwork.Flight call(ServerLevel level, BlockPos port, @Nullable UUID owner, BlockPos to) {
+        DroneNetwork net = DroneNetwork.get(level);
+        for (Candidate c : candidates(level, port, owner)) {
+            if (c.returning() != null) {
+                net.retask(c.returning(), port, to);
+                return c.returning();
+            }
+            DroneNetwork.Flight f = net.create(c.station().worldPosition, c.unit(), owner, port, to);
+            f.drone = c.station().drones[c.unit()];
+            f.phase = c.station().hasPhaseUpgrade();
+            f.kind = c.station().kinds[c.unit()];
+            c.station().statuses[c.unit()] = S_FLYING;
+            return f;
+        }
+        return null;
+    }
+
+    // ------------------------------------------------------------------ 解体
+
+    /** 枠のドローンを解体する（待機中だけ）。ドローンはステーションの上に降りて、印刷を逆にたどって消え、キットが戻る。 */
+    public void dismantle(int unit) {
+        if (unit < 0 || unit >= MAX_UNITS || !(level instanceof ServerLevel server) || drones[unit] == null
+                || DroneNetwork.get(server).flightOf(worldPosition, unit) != null) {
+            return;
+        }
+        if (server.getEntity(drones[unit]) instanceof CargoDrone d && d.idle()) {
+            d.startDismantle();
+            stopped[unit] = true;
+            setChanged();
+        }
+    }
+
+    /** 止めた枠をまた印刷する。 */
+    public void resume(int unit) {
+        if (unit >= 0 && unit < MAX_UNITS && stopped[unit]) {
+            stopped[unit] = false;
+            setChanged();
+        }
+    }
+
+    /** 解体し終えた: キットを欄へ戻す（入りきらなければ、ステーションの上に出す）。 */
+    public void onDismantled(UUID id, int unit) {
+        if (!manages(id, unit) || level == null) {
+            return;
+        }
+        drones[unit] = null;
+        stopped[unit] = true;
+        ItemStack kit = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit")));
+        ItemStack rest = items.insertItem(SLOT_KIT, kit, false);
+        if (!rest.isEmpty()) {
+            Block.popResource(level, worldPosition.above(), rest);
+        }
+        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.arm_retract"), SoundSource.BLOCKS, 0.6F, 1.0F);
+        setChanged();
+    }
+
+    /** GUI のボタン。 */
+    public void press(int id) {
+        if (id >= BUTTON_RESUME && id < BUTTON_RESUME + MAX_UNITS) {
+            resume(id - BUTTON_RESUME);
+        } else if (id >= BUTTON_DISMANTLE && id < BUTTON_DISMANTLE + MAX_UNITS) {
+            dismantle(id - BUTTON_DISMANTLE);
+        }
+    }
+
+    // ------------------------------------------------------------------ 毎 tick
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, DroneStationBlockEntity be) {
+        io.github.genichimaruo.singulo.android.work.AndroidEyes.setLit(level, pos, state, be.energy.getEnergyStored() > 0);
+        be.tick((ServerLevel) level);
+    }
+
+    private void tick(ServerLevel level) {
+        DroneNetwork net = DroneNetwork.get(level);
+        long now = level.getGameTime();
+        boolean printing = false;
+        for (int i = 0; i < MAX_UNITS; i++) {
+            DroneNetwork.Flight f = net.flightOf(worldPosition, i);
+            if (f != null) {
+                if (f.stage == DroneNetwork.RETURN && f.arrived(now) && f.crate.isEmpty()) {
+                    // 見えないまま帰ってきた: 空から待機位置へ降りてくる（出せなければ便を残して次の tick にやり直す。
+                    // 便を先に消すと、この枠は印刷し直しになり、キットをもう1つ使ってしまう）
+                    CargoDrone d = CargoDrone.spawn(level, worldPosition, i, f.kind, hover(worldPosition, i).add(0, 6, 0), false);
+                    if (d != null) {
+                        net.remove(f);
+                        kinds[i] = f.kind;
+                        drones[i] = d.getUUID();
+                        setChanged();
+                    }
+                } else if (f.drone != null && !f.drone.equals(drones[i])) {
+                    drones[i] = f.drone;                  // 読み込み直しで実体が変わった
+                    setChanged();
+                }
+                statuses[i] = S_FLYING;
+                missing[i] = 0;
+                continue;
+            }
+            if (drones[i] != null) {
+                Entity e = level.getEntity(drones[i]);
+                if (e instanceof CargoDrone d && d.isAlive()) {
+                    statuses[i] = d.dismantling() ? S_DISMANTLING : d.printed() ? S_IDLE : S_PRINTING;
+                    missing[i] = 0;
+                } else if (++missing[i] > LOST_TICKS && level.isPositionEntityTicking(BlockPos.containing(hover(worldPosition, i)))) {
+                    drones[i] = null;                     // 待機位置が見えているのにいない: 印刷し直す
+                    setChanged();
+                }
+                continue;
+            }
+            if (i >= units()) {
+                statuses[i] = S_UNUSED;
+                continue;
+            }
+            if (stopped[i]) {
+                statuses[i] = S_STOPPED;
+                continue;
+            }
+            if (!isMemory(items.getStackInSlot(SLOT_MEMORY))) {
+                statuses[i] = S_NO_MEMORY;
+            } else if (!isKit(items.getStackInSlot(SLOT_KIT))) {
+                statuses[i] = S_NO_KIT;
+            } else if (energy.getEnergyStored() < PRINT_FE) {
+                statuses[i] = S_NO_ENERGY;
+            } else if (printing || !topClear(level)) {
+                statuses[i] = S_BLOCKED;
+            } else if (now % 10 == 0) {
+                print(level, i);
+                printing = true;
+            }
+        }
+    }
+
+    private boolean topClear(ServerLevel level) {
+        AABB box = new AABB(worldPosition.above()).deflate(0.05);
+        return level.noCollision(box) && level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator()).isEmpty();
+    }
+
+    private void print(ServerLevel level, int unit) {
+        if (!energy.consume(PRINT_FE)) {
+            return;
+        }
+        DroneKind kind = DroneKind.ofMemory(items.getStackInSlot(SLOT_MEMORY));
+        if (kind == null) {
+            return;
+        }
+        CargoDrone d = CargoDrone.spawn(level, worldPosition, unit, kind, Vec3.atBottomCenterOf(worldPosition.above()), true);
+        if (d == null) {
+            energy.setEnergy(energy.getEnergyStored() + PRINT_FE);
+            return;
+        }
+        items.extractItem(SLOT_KIT, 1, false);
+        drones[unit] = d.getUUID();
+        kinds[unit] = kind;
+        statuses[unit] = S_PRINTING;
+        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.print_start"), SoundSource.BLOCKS, 0.8F, 1.0F);
+        setChanged();
+    }
+
+    // ------------------------------------------------------------------ GUI
+
+    @Override
+    public void openMenu(ServerPlayer player) {
+        if (owner == null) {
+            setOwner(player.getUUID());
+        }
+        if (!mayOperate(player)) {
+            player.displayClientMessage(Component.translatable("gui.singulo.android_station.locked"), true);
+            return;
+        }
+        player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable(getBlockState().getBlock().getDescriptionId());
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new DroneStationMenu(id, inventory, worldPosition, items, data);
+    }
+
+    /**
+     * 壊されたら: 中身を落とす。待機中のドローンは片付けてキットを1つずつ返す。飛んでいる便は荷物を届けてから消える。
+     */
+    @Override
+    public void onBroken(Level level) {
+        for (int i = 0; i < items.getSlots(); i++) {
+            Block.popResource(level, worldPosition, items.getStackInSlot(i));
+        }
+        if (!(level instanceof ServerLevel server)) {
+            return;
+        }
+        DroneNetwork net = DroneNetwork.get(server);
+        var kit = BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
+        // ドローンは1機ごとにキットを1つ返す（帰りかけ・運搬中のものも。運搬中のドローンは届け終えたら消える）
+        for (int i = 0; i < MAX_UNITS; i++) {
+            DroneNetwork.Flight f = net.flightOf(worldPosition, i);
+            if (f != null) {
+                if (f.stage == DroneNetwork.RETURN && f.crate.isEmpty()) {
+                    net.remove(f);                        // 実体は、帰る先も便もないので自分で消える
+                } else {
+                    f.station = null;
+                    net.changed();
+                }
+                Block.popResource(level, worldPosition, new ItemStack(kit));
+                continue;
+            }
+            if (drones[i] != null) {
+                // 読み込まれていない待機中のドローンも、あとで読み込まれたときに自分で消える
+                if (server.getEntity(drones[i]) instanceof CargoDrone d) {
+                    d.discard();
+                }
+                Block.popResource(level, worldPosition, new ItemStack(kit));
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 読み込み
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level instanceof ServerLevel server) {
+            DroneNetwork.get(server).addStation(this);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level instanceof ServerLevel server) {
+            DroneNetwork.get(server).removeStation(this);
+        }
+        super.setRemoved();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        if (level instanceof ServerLevel server) {
+            DroneNetwork.get(server).removeStation(this);
+        }
+        super.onChunkUnloaded();
+    }
+
+    // ------------------------------------------------------------------ 保存
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putInt("energy", energy.getEnergyStored());
+        tag.put("items", items.serializeNBT(registries));
+        if (owner != null) {
+            tag.putUUID("owner", owner);
+        }
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (drones[i] != null) {
+                tag.putUUID("drone" + i, drones[i]);
+            }
+            tag.putBoolean("stopped" + i, stopped[i]);
+            tag.putInt("kind" + i, kinds[i].ordinal());
+        }
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        energy.setEnergy(tag.getInt("energy"));
+        CompoundTag inv = tag.getCompound("items");
+        inv.putInt("Size", SLOTS);
+        items.deserializeNBT(registries, inv);
+        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        for (int i = 0; i < MAX_UNITS; i++) {
+            drones[i] = tag.hasUUID("drone" + i) ? tag.getUUID("drone" + i) : null;
+            stopped[i] = tag.getBoolean("stopped" + i);
+            kinds[i] = DroneKind.byId(tag.getInt("kind" + i));
+        }
+    }
+}

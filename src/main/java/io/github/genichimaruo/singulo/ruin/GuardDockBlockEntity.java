@@ -29,10 +29,15 @@ public class GuardDockBlockEntity extends BlockEntity {
     public static final int HOME_RADIUS = 20;
     public static final long COOLDOWN = 24_000;
     static final int CHECK_INTERVAL = 20;
+    /** 一波を全滅させたとき、ドローン用クリスタルメモリが出る確率（負なら段階ごとの既定: DroneKind.memoryChance）。 */
+    private float memoryChance = -1;
 
     private int tier = 1;
     private final List<UUID> drones = new ArrayList<>();
     private long nextWave;
+    /** 今の波でプレイヤーに倒されたドローンと、出撃させた数（全部倒されたときだけメモリが出る）。 */
+    private final java.util.Set<UUID> killed = new java.util.HashSet<>();
+    private int launched;
 
     public GuardDockBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.GUARD_DOCK.get(), pos, state);
@@ -68,6 +73,7 @@ public class GuardDockBlockEntity extends BlockEntity {
         if (hadDrones && drones.isEmpty()) {
             nextWave = level.getGameTime() + COOLDOWN;
             setChanged();
+            cleared(level);
         }
         if (!drones.isEmpty() || level.getGameTime() < nextWave) {
             return;
@@ -81,6 +87,8 @@ public class GuardDockBlockEntity extends BlockEntity {
 
     /** ドローンを出撃させる。 */
     public void launch(ServerLevel level) {
+        killed.clear();
+        launched = 0;
         for (int i = 0; i < waveSize(); i++) {
             SecurityDrone drone = SinguloEntities.SECURITY_DRONE.get().create(level);
             if (drone == null) {
@@ -94,8 +102,40 @@ public class GuardDockBlockEntity extends BlockEntity {
             drone.restrictTo(worldPosition, HOME_RADIUS);
             level.addFreshEntity(drone);
             drones.add(drone.getUUID());
+            launched++;
         }
         setChanged();
+    }
+
+    /** ドックのドローンがプレイヤーに倒された。 */
+    public void recordKill(UUID id) {
+        if (drones.contains(id) && killed.add(id)) {
+            setChanged();
+        }
+    }
+
+    /** テスト用: メモリが出る確率を決め打ちにする（1 で必ず、0 で出ない）。 */
+    public void setMemoryChanceForTest(float chance) {
+        memoryChance = chance;
+    }
+
+    /** 一波を全滅させたとき: 段階ごとの確率で、ドローン用クリスタルメモリがドックの上に出る（型も段階で選ぶ: DroneKind.rollMemory）。 */
+    private void cleared(ServerLevel level) {
+        boolean all = launched > 0 && killed.size() >= launched;
+        killed.clear();
+        launched = 0;
+        float chance = memoryChance >= 0 ? memoryChance : io.github.genichimaruo.singulo.drone.DroneKind.memoryChance(tier);
+        if (!all || level.random.nextFloat() >= chance) {
+            return;
+        }
+        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(
+                io.github.genichimaruo.singulo.drone.DroneKind.rollMemory(tier, level.random).memoryId));
+        var top = net.minecraft.world.phys.Vec3.atBottomCenterOf(worldPosition.above());
+        var drop = new net.minecraft.world.entity.item.ItemEntity(level, top.x, top.y + 0.2, top.z,
+                new net.minecraft.world.item.ItemStack(item), 0, 0.2, 0);
+        drop.setDefaultPickUpDelay();
+        level.addFreshEntity(drop);
+        level.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_CHIME, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.6F);
     }
 
     public int aliveDrones() {
@@ -112,6 +152,12 @@ public class GuardDockBlockEntity extends BlockEntity {
             list.add(NbtUtils.createUUID(id));
         }
         tag.put("drones", list);
+        ListTag dead = new ListTag();
+        for (UUID id : killed) {
+            dead.add(NbtUtils.createUUID(id));
+        }
+        tag.put("killed", dead);
+        tag.putInt("launched", launched);
     }
 
     @Override
@@ -123,5 +169,10 @@ public class GuardDockBlockEntity extends BlockEntity {
         for (Tag t : tag.getList("drones", Tag.TAG_INT_ARRAY)) {
             drones.add(NbtUtils.loadUUID(t));
         }
+        killed.clear();
+        for (Tag t : tag.getList("killed", Tag.TAG_INT_ARRAY)) {
+            killed.add(NbtUtils.loadUUID(t));
+        }
+        launched = tag.getInt("launched");
     }
 }

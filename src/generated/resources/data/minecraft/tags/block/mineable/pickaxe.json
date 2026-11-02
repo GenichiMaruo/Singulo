@@ -44,6 +44,8 @@
     "singulo:deep_sea_collector",
     "singulo:gravitational_wave_detector",
     "singulo:android_station",
+    "singulo:drone_station",
+    "singulo:drone_port",
     "singulo:android_work_console",
     "singulo:android_supply_port",
     "singulo:android_delivery_port",

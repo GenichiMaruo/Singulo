@@ -1,0 +1,16 @@
+// Standalone JEI render review. Never included in distribution JARs.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/jei-src'))
+        neoForge.runs.client {
+            gameDirectory = file('build/jei-review')
+            systemProperty 'singulo.jeiReviewOutput', file('build/jei-review/screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

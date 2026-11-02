@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CSC",
+    "RBR",
+    "CSC"
+  ],
+  "key": {
+    "C": {
+      "item": "singulo:superconducting_coil"
+    },
+    "S": {
+      "tag": "c:plates/steel"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "id": "singulo:capacity_upgrade_1",
+    "count": 1
+  }
+}

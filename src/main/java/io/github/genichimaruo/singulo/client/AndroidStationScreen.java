@@ -99,27 +99,36 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
 
     @Override
     protected boolean railUsed(int row) {
-        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS;
+        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE;
     }
 
     @Override
     protected boolean railConnected(int row) {
-        return menu.ruleView();
+        // 2段目はシールド許可証のスロット（いつも枠とつなげる。スロットは renderBg の並びで描く）
+        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE || menu.ruleView();
     }
 
     @Override
     protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {
-        Panel.gearIcon(g, x + 2, y + 2, menu.ruleView() ? skin.accent() : skin.text());
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
+            Panel.gearIcon(g, x + 2, y + 2, menu.ruleView() ? skin.accent() : skin.text());
+        }
     }
 
     @Override
     protected boolean clickRail(int row, int button) {
+        if (row != io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
+            return false;
+        }
         menu.setRuleView(!menu.ruleView());          // 様子 ⇔ 経路
         return true;
     }
 
     @Override
     protected Component railTooltip(int row) {
+        if (row != io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
+            return null;
+        }
         return Component.translatable(menu.ruleView() ? "gui.singulo.android_station.rules.back" : "gui.singulo.android_station.rules");
     }
 

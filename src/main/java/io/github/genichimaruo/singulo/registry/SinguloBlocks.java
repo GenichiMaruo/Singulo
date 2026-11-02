@@ -176,6 +176,11 @@ public final class SinguloBlocks {
     /** アンドロイド組立ステーション（護衛のアンドロイドを印刷する）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidStationBlock> ANDROID_STATION = BLOCKS.register(
             "android_station", () -> new io.github.genichimaruo.singulo.android.AndroidStationBlock(machineProperties()));
+    /** ドローン輸送: ドローン・ステーション（印刷して待機させる）と発着ポート（梱包して送る・受け取る）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.drone.DroneBlocks.Station> DRONE_STATION = BLOCKS.register(
+            "drone_station", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Station(machineProperties()));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.drone.DroneBlocks.Port> DRONE_PORT = BLOCKS.register(
+            "drone_port", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Port(machineProperties()));
     /** アンドロイドの作業（自動化）: 作業指令台（資材口とレシピの記録を兼ねる）・資材口・納品口・レシピ棚。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.work.WorkConsoleBlock> ANDROID_WORK_CONSOLE = BLOCKS.register(
             "android_work_console", () -> new io.github.genichimaruo.singulo.android.work.WorkConsoleBlock(machineProperties()));

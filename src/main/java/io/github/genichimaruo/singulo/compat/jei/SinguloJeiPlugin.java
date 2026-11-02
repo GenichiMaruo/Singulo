@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.Block;
 @JeiPlugin
 public class SinguloJeiPlugin implements IModPlugin {
     static final Map<MachineType, RecipeType<MachineRecipe>> TYPES = new EnumMap<>(MachineType.class);
+    static final Map<MachineRecipe, ResourceLocation> RECIPE_IDS = new java.util.IdentityHashMap<>();
 
     static {
         for (MachineType t : MachineType.values()) {
@@ -66,6 +67,9 @@ public class SinguloJeiPlugin implements IModPlugin {
                     @Override
                     public java.util.Collection<mezz.jei.api.gui.handlers.IGuiClickableArea> getGuiClickableAreas(
                             io.github.genichimaruo.singulo.client.MachineScreen screen, double mouseX, double mouseY) {
+                        if (screen.popupBlocksGuiInput(mouseX, mouseY)) {
+                            return List.of();
+                        }
                         net.minecraft.client.renderer.Rect2i a = screen.arrowArea();
                         return List.of(mezz.jei.api.gui.handlers.IGuiClickableArea.createBasic(a.getX(), a.getY(),
                                 a.getWidth(), a.getHeight(), TYPES.get(screen.machineType())));
@@ -73,10 +77,13 @@ public class SinguloJeiPlugin implements IModPlugin {
                 });
     }
 
-    /** 作業指令台の記録のページへ、作業台のレシピを「+」で置く。 */
+    /** 機械には実物の素材を転送し、作業指令台にはレシピの見本を記録する。 */
     @Override
     public void registerRecipeTransferHandlers(mezz.jei.api.registration.IRecipeTransferRegistration registration) {
         registration.addUniversalRecipeTransferHandler(new WorkConsoleTransferHandler(registration.getTransferHelper()));
+        for (MachineType type : MachineType.values()) {
+            registration.addRecipeTransferHandler(new MachineTransferHandler(type, registration.getTransferHelper()), TYPES.get(type));
+        }
     }
 
     @Override
@@ -89,6 +96,7 @@ public class SinguloJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        RECIPE_IDS.clear();
         // マルチブロック装置の組み立てと動かし方
         List<MultiblockInfoCategory.Info> infos = new ArrayList<>();
         for (io.github.genichimaruo.singulo.multiblock.Blueprints.Kind k : io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.values()) {
@@ -102,6 +110,7 @@ public class SinguloJeiPlugin implements IModPlugin {
         // 装置と同じく、サーバー設定（プリセット・殻の材料・育成時間など）を当てはめたレシピを見せる
         for (RecipeHolder<MachineRecipe> h : io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(
                 Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()))) {
+            RECIPE_IDS.put(h.value(), h.id());
             for (MachineType t : MachineType.values()) {
                 if (t.id().equals(h.value().station())) {
                     byType.computeIfAbsent(t, k -> new ArrayList<>()).add(h.value());
