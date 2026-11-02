@@ -2480,8 +2480,8 @@
     "translation": "組裝 2 級以後的大部分零件與機器。"
   },
   "desc.singulo.pressure_crystal": {
-    "source": "A hard blue crystal formed under high water pressure.",
-    "translation": "在高水壓下形成的堅硬藍色晶體。"
+    "source": "A hard violet crystal that a Deep-Sea Pressure Collector presses from minerals with deep-sea water pressure. The Gravity Remnant drops it too.",
+    "translation": "深海壓力收集器利用海底水壓壓實礦物製成的堅硬紫色晶體。重力殘渣也會掉落。"
   },
   "desc.singulo.pressure_hull": {
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
@@ -10596,32 +10596,32 @@
     "translation": "隨身攜帶時，為跟隨的仿生人邊走邊充電。"
   },
   "summary.singulo.android_dual_tank_upgrade": {
-    "source": "Two liquid and two chemical tanks (only with Mekanism).",
-    "translation": "裝上液體和化學品儲槽各 2 個（僅限安裝 Mekanism 時）。"
+    "source": "Adds two liquid and two chemical tanks.",
+    "translation": "加裝液體和化學物質儲罐各 2 個。"
   },
   "summary.singulo.android_felling_upgrade": {
     "source": "Lets an android fell whole trees and replant saplings.",
     "translation": "讓仿生人整棵砍樹並重新種下樹苗。"
   },
   "summary.singulo.android_gas_tank_upgrade": {
-    "source": "Two tanks for Mekanism chemicals (only with Mekanism).",
-    "translation": "裝上 2 個運送 Mekanism 化學品的儲槽（僅限安裝 Mekanism 時）。"
+    "source": "Adds tanks for Mekanism chemicals.",
+    "translation": "加裝運送 Mekanism 化學物質的儲罐。"
   },
   "summary.singulo.android_large_backpack_upgrade": {
-    "source": "Adds 24 inventory slots to an android (the largest).",
-    "translation": "仿生人物品欄 +24 格（最大）。"
+    "source": "Adds 24 inventory slots to an android.",
+    "translation": "讓仿生人的物品欄增加 24 格。"
   },
   "summary.singulo.android_memory_axe": {
-    "source": "The Axe Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "斧型仿生人的設計。可在組裝站列印（不會消耗）。"
+    "source": "The design for printing Axe Androids.",
+    "translation": "可列印斧型仿生人的設計。"
   },
   "summary.singulo.android_memory_bit": {
-    "source": "The Bit Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "浮游砲型仿生人的設計。可在組裝站列印（不會消耗）。"
+    "source": "The design for printing Bit Androids.",
+    "translation": "可列印浮游砲型仿生人的設計。"
   },
   "summary.singulo.android_memory_gunner": {
-    "source": "The Gunner Android design. Prints it in an Android Assembly Station (not used up).",
-    "translation": "射擊型仿生人的設計。可在組裝站列印（不會消耗）。"
+    "source": "The design for printing Gunner Androids.",
+    "translation": "可列印射擊型仿生人的設計。"
   },
   "summary.singulo.android_production_upgrade": {
     "source": "Lets an Android Assembly Station look after up to two androids.",
@@ -10676,8 +10676,8 @@
     "translation": "在封印控制台上使用，可與覺醒的視界守衛戰鬥。"
   },
   "summary.singulo.degenerate_furnace": {
-    "source": "A large generator burning Lv2 blocks (5 MFE/t on time crystals).",
-    "translation": "燃燒壓縮塊Lv2的大型發電機（時間晶體催化劑下 5 MFE/t）。"
+    "source": "A large generator that burns Lv2 compressed blocks.",
+    "translation": "燃燒 Lv2 壓縮方塊的大型發電機。"
   },
   "summary.singulo.factory_line": {
     "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
@@ -10716,8 +10716,8 @@
     "translation": "舊文明的精密驅動部件。"
   },
   "summary.singulo.procedure_card": {
-    "source": "Records up to eight work steps for androids.",
-    "translation": "記錄要讓仿生人執行的作業步驟（最多 8 個）。"
+    "source": "Records work steps for androids.",
+    "translation": "記錄讓仿生人執行的工作步驟。"
   },
   "summary.singulo.quantum_android_workbench": {
     "source": "Androids craft 20× as fast here. 81-slot holding box.",
@@ -12478,5 +12478,425 @@
   "gui.singulo.drone_station.row.6": {
     "source": "Top blocked",
     "translation": "上方被擋住"
+  },
+  "summary.singulo.unfired_ceramic": {
+    "source": "Fire it in a furnace to make white ceramic.",
+    "translation": "在熔爐中燒製即成白色陶瓷複合材料。"
+  },
+  "summary.singulo.holo_projector": {
+    "source": "Projects a multiblock’s shape and lists missing blocks.",
+    "translation": "投影多方塊結構的搭法，並提示缺少的方塊。"
+  },
+  "summary.singulo.relocation_wrench": {
+    "source": "Picks up machines with their contents and settings.",
+    "translation": "連同內容物和設定一起回收裝置。"
+  },
+  "summary.singulo.settings_card": {
+    "source": "Copies a machine’s settings to another.",
+    "translation": "複製裝置的設定並貼到其他裝置上。"
+  },
+  "summary.singulo.meteor_compass": {
+    "source": "Points to the nearest unmined meteorite core.",
+    "translation": "指向最近的、尚未開採的隕石核心。"
+  },
+  "summary.singulo.fluid_canister": {
+    "source": "Carries 1,000 mB of any liquid or gas.",
+    "translation": "可裝運 1,000 mB 任意液體或氣體的容器。"
+  },
+  "summary.singulo.hydrogen_fuel_cell": {
+    "source": "A generator that makes power from hydrogen and oxygen.",
+    "translation": "用氫和氧發電的發電機。"
+  },
+  "summary.singulo.peltier_cooler": {
+    "source": "Uses power to freeze water into ice.",
+    "translation": "用電力把水凍成冰。"
+  },
+  "summary.singulo.builder_wand": {
+    "source": "Creative only. Builds a multiblock instantly.",
+    "translation": "僅限創造模式。瞬間搭好多方塊結構。"
+  },
+  "summary.singulo.thermoelectric_generator": {
+    "source": "Your first generator: place it between hot and cold.",
+    "translation": "夾在冷熱之間即可發電，最初的電源。"
+  },
+  "summary.singulo.compressor": {
+    "source": "Presses plates, or packs any item into mass in mass mode.",
+    "translation": "製作板材；質量模式下可把任何物品壓成壓縮方塊。"
+  },
+  "summary.singulo.coolant_cartridge": {
+    "source": "A portable canister of 100 mB of liquid nitrogen.",
+    "translation": "裝有 100 mB 液氮的便攜容器。"
+  },
+  "summary.singulo.empty_coolant_cartridge": {
+    "source": "An empty canister, filled with liquid nitrogen at a cooling tower.",
+    "translation": "在冷卻塔裝入液氮的空容器。"
+  },
+  "summary.singulo.meteorite_crust": {
+    "source": "A meteorite’s burnt shell. Grows stardust in its crater.",
+    "translation": "包裹隕石的焦殼，在隕石坑中培育星塵晶體。"
+  },
+  "summary.singulo.meteoric_iron_chunk": {
+    "source": "Iron-nickel in a meteorite. Mine it for raw meteoric iron.",
+    "translation": "隕石中的鐵鎳塊，開採可得隕鐵原礦。"
+  },
+  "summary.singulo.fulgurite": {
+    "source": "Lightning-fused quartz glass for optical lattices.",
+    "translation": "被雷熔化凝固的石英玻璃，光晶格基板的材料。"
+  },
+  "summary.singulo.cryogenic_cooling_tower": {
+    "source": "A multiblock that makes liquid nitrogen and helium.",
+    "translation": "製造液氮和液氦的多方塊結構。"
+  },
+  "summary.singulo.cryogenic_turbine": {
+    "source": "Recovers the power stored in liquid nitrogen.",
+    "translation": "取回儲存在液氮中的電力。"
+  },
+  "summary.singulo.muon_fusion_reactor": {
+    "source": "A stage 2 generator running on muon catalysts and water.",
+    "translation": "用μ子催化劑和水發電的第 2 階段發電機。"
+  },
+  "summary.singulo.capacity_upgrade_1": {
+    "source": "Raises a machine’s buffer to 1,000,000 FE.",
+    "translation": "將加工裝置的蓄電容量提高到 100 萬 FE。"
+  },
+  "summary.singulo.capacity_upgrade_2": {
+    "source": "Raises a machine’s buffer to 4,000,000 FE.",
+    "translation": "將加工裝置的蓄電容量提高到 400 萬 FE。"
+  },
+  "summary.singulo.capacity_upgrade_3": {
+    "source": "Raises a machine’s buffer to 40,000,000 FE.",
+    "translation": "將加工裝置的蓄電容量提高到 4,000 萬 FE。"
+  },
+  "summary.singulo.deep_sea_collector": {
+    "source": "Uses water pressure on the sea floor to make Pressure Crystals.",
+    "translation": "在海底利用水壓製造高壓晶體。"
+  },
+  "summary.singulo.pressure_crystal": {
+    "source": "A hard violet crystal pressed by deep-sea water.",
+    "translation": "在海底水壓下壓實而成的堅硬紫色晶體。"
+  },
+  "summary.singulo.neutrino_scanner": {
+    "source": "Reveals nearby ores and ruins through terrain.",
+    "translation": "透過地形顯示周圍的礦石與遺跡。"
+  },
+  "summary.singulo.android_repair_kit": {
+    "source": "Lets an android repair itself when hurt.",
+    "translation": "仿生人受傷時可自行修復。"
+  },
+  "summary.singulo.android_armor_plate": {
+    "source": "Works as a guard android’s chestplate.",
+    "translation": "作為護衛仿生人的胸甲。"
+  },
+  "summary.singulo.android_factory_print_unit": {
+    "source": "Makes android printing faster and cheaper.",
+    "translation": "讓仿生人列印更快、更省。"
+  },
+  "summary.singulo.android_battery_upgrade": {
+    "source": "Raises a guard android’s charge.",
+    "translation": "增加護衛仿生人的電量。"
+  },
+  "summary.singulo.android_mining_upgrade": {
+    "source": "Lets a guard android mine.",
+    "translation": "讓護衛仿生人能夠採掘。"
+  },
+  "summary.singulo.android_ribbon": {
+    "source": "A ribbon for an android’s head.",
+    "translation": "繫在仿生人頭上的緞帶。"
+  },
+  "summary.singulo.android_hair_flower": {
+    "source": "A flower hair ornament for an android.",
+    "translation": "戴在仿生人頭上的花朵髮飾。"
+  },
+  "summary.singulo.android_beret": {
+    "source": "A beret for an android.",
+    "translation": "給仿生人戴的貝雷帽。"
+  },
+  "summary.singulo.android_glasses": {
+    "source": "Square glasses for an android.",
+    "translation": "給仿生人戴的方框眼鏡。"
+  },
+  "summary.singulo.drone_memory": {
+    "source": "The design for printing rotor cargo drones.",
+    "translation": "可列印旋翼型運輸無人機的設計。"
+  },
+  "summary.singulo.drone_memory_jet": {
+    "source": "The design for the fastest, jet-powered cargo drone.",
+    "translation": "最快的噴射型運輸無人機的設計。"
+  },
+  "summary.singulo.drone_memory_gravity": {
+    "source": "The design for an anti-gravity cargo drone with tractor beams.",
+    "translation": "以牽引光束運箱的反重力型運輸無人機的設計。"
+  },
+  "summary.singulo.drone_kit": {
+    "source": "Parts used for each cargo drone printed.",
+    "translation": "每列印一架無人機消耗的零件組。"
+  },
+  "summary.singulo.packing_crate": {
+    "source": "A crate for drone cargo. Reaches 160 blocks.",
+    "translation": "裝運無人機貨物的箱子，可送達 160 格。"
+  },
+  "summary.singulo.drone_phase_upgrade": {
+    "source": "Lets a station’s drones take shortcuts through walls.",
+    "translation": "讓無人機站的無人機穿牆抄近路。"
+  },
+  "summary.singulo.android_headdress": {
+    "source": "A frilled headdress for an android.",
+    "translation": "戴在仿生人頭上的荷葉邊頭飾。"
+  },
+  "summary.singulo.android_cape": {
+    "source": "A cape that flutters behind an android.",
+    "translation": "在仿生人背後飄動的披風。"
+  },
+  "summary.singulo.android_scarf": {
+    "source": "A scarf for an android’s neck.",
+    "translation": "圍在仿生人脖子上的圍巾。"
+  },
+  "summary.singulo.android_waist_ribbon": {
+    "source": "A large bow for the back of an android’s waist.",
+    "translation": "繫在仿生人腰後的大蝴蝶結。"
+  },
+  "summary.singulo.android_book": {
+    "source": "A book an idle android holds.",
+    "translation": "待命中的仿生人手持的書。"
+  },
+  "summary.singulo.android_bouquet": {
+    "source": "A bouquet an idle android holds.",
+    "translation": "待命中的仿生人手持的花束。"
+  },
+  "summary.singulo.android_teacup": {
+    "source": "A teacup an idle android holds.",
+    "translation": "待命中的仿生人手持的茶杯。"
+  },
+  "summary.singulo.android_umbrella": {
+    "source": "An umbrella an idle android holds up.",
+    "translation": "待命中的仿生人撐的傘。"
+  },
+  "summary.singulo.android_supply_port": {
+    "source": "Turns the storage next to it into a work stockpile.",
+    "translation": "把相鄰的箱子等變成工作的材料存放處。"
+  },
+  "summary.singulo.android_delivery_port": {
+    "source": "A box where androids deliver finished orders.",
+    "translation": "仿生人送來訂單成品的箱子。"
+  },
+  "summary.singulo.android_recipe_rack": {
+    "source": "A rack that makes recipe cards orderable.",
+    "translation": "擺放配方卡、使其可被下單的架子。"
+  },
+  "summary.singulo.recipe_card": {
+    "source": "A card that records a recipe at a work console.",
+    "translation": "在工作指令台記錄配方的卡片。"
+  },
+  "summary.singulo.neutrino_observatory": {
+    "source": "Keeps showing ores and ruins in a wide area.",
+    "translation": "持續向附近的人顯示大範圍內的礦石與遺跡。"
+  },
+  "summary.singulo.scanner_module_2": {
+    "source": "Raises scanner sensitivity to show gold and diamonds.",
+    "translation": "提高掃描儀靈敏度，也能顯示金和鑽石。"
+  },
+  "summary.singulo.scanner_module_3": {
+    "source": "Maxes scanner sensitivity to show ancient debris.",
+    "translation": "將掃描儀靈敏度提到最高，也能顯示遠古殘骸。"
+  },
+  "summary.singulo.low_gravity_panel": {
+    "source": "Cuts your gravity to a fifth until you land.",
+    "translation": "踩上去後，直到下次落地重力變為五分之一。"
+  },
+  "summary.singulo.high_gravity_panel": {
+    "source": "Raises your gravity 2.5× until you land.",
+    "translation": "踩上去後，直到下次落地重力變為 2.5 倍。"
+  },
+  "summary.singulo.degenerate_precursor": {
+    "source": "Pressed around a pressure crystal; saves rock in shells.",
+    "translation": "以高壓晶體為種壓製而成，簡併物質殼的材料。"
+  },
+  "summary.singulo.void_collector": {
+    "source": "Gathers Void Dust above the End void.",
+    "translation": "在終界虛空之上收集虛空塵。"
+  },
+  "summary.singulo.void_dust": {
+    "source": "Condensed space fluctuations for singularity tech.",
+    "translation": "空間漲落凝結成的塵，用於奇點技術。"
+  },
+  "summary.singulo.sentinel_core": {
+    "source": "The Echo Sentinel’s record crystal, built into advanced machines.",
+    "translation": "回聲守衛的記錄水晶，用於高級裝置。"
+  },
+  "summary.singulo.degenerate_nucleus": {
+    "source": "The gravity knot left in the Gravity Remnant’s heart.",
+    "translation": "重力殘渣核心殘留的重力塊。"
+  },
+  "summary.singulo.echo_chapter": {
+    "source": "A passage left by the Awakened Echo Sentinel.",
+    "translation": "覺醒的回聲守衛留下的記錄片段。"
+  },
+  "summary.singulo.gravity_chapter": {
+    "source": "A passage left by the Awakened Gravity Remnant.",
+    "translation": "覺醒的重力殘渣留下的記錄片段。"
+  },
+  "summary.singulo.horizon_chapter": {
+    "source": "A passage left by the Awakened Horizon Warden.",
+    "translation": "覺醒的視界守衛留下的記錄片段。"
+  },
+  "summary.singulo.ergosphere_chapter": {
+    "source": "A passage left by the Ergosphere Leviathan.",
+    "translation": "能層巨蛇留下的記錄片段。"
+  },
+  "summary.singulo.archivist_halo": {
+    "source": "The Last Archivist’s halo, still warm.",
+    "translation": "最後的記錄者所戴、仍帶餘溫的光環。"
+  },
+  "summary.singulo.afterglow_wings": {
+    "source": "Crystal-feather wings for gliding.",
+    "translation": "穿在胸部即可滑翔的晶羽之翼。"
+  },
+  "summary.singulo.magnetic_bottle": {
+    "source": "A bottle that contains leaking strange matter.",
+    "translation": "封存並回收洩漏奇異物質的瓶子。"
+  },
+  "summary.singulo.reactor_mass_alarm": {
+    "source": "Gives a redstone signal when the core hits its mass limit.",
+    "translation": "爐心質量達到上限時發出紅石訊號。"
+  },
+  "summary.singulo.hawking_collector": {
+    "source": "Collects H-Condensate while the reactor core is light.",
+    "translation": "在爐心較輕時收集 H 凝聚體。"
+  },
+  "summary.singulo.gravitational_containment_tank": {
+    "source": "The only tank that can hold dark matter.",
+    "translation": "唯一能保存暗物質的罐子。"
+  },
+  "summary.singulo.wormhole_generator_port": {
+    "source": "A generator shell that takes power and outputs mouths.",
+    "translation": "替換生成器外殼的受電與輸出口。"
+  },
+  "summary.singulo.genesis_frame": {
+    "source": "The octagonal frame around the Genesis Core.",
+    "translation": "以八邊形圍住創世爐核心的框架。"
+  },
+  "summary.singulo.genesis_pylon": {
+    "source": "Pillars on the Genesis frame that focus power.",
+    "translation": "疊在創世爐框架上、向宇宙輸送電力的柱子。"
+  },
+  "summary.singulo.primordial_seed": {
+    "source": "Use it on a Genesis Core to begin a universe.",
+    "translation": "用於創世爐核心，宇宙便開始誕生。"
+  },
+  "summary.singulo.reinforced_ruin_glass": {
+    "source": "A very hard, blast-proof window.",
+    "translation": "能承受反應爐衝擊的極堅硬窗戶。"
+  },
+  "summary.singulo.ruin_cache": {
+    "source": "Holds ruin loot that refills after some days.",
+    "translation": "裝有遺跡回收物的儲藏櫃，數天後會補充。"
+  },
+  "summary.singulo.ruin_android_fabricator": {
+    "source": "A ruin bed that prints androids and sends them out.",
+    "translation": "列印仿生人並派其出擊的遺跡台座。"
+  },
+  "summary.singulo.android_memory_blade": {
+    "source": "The design for printing Blade Androids.",
+    "translation": "可列印光刃型仿生人的設計。"
+  },
+  "summary.singulo.android_memory_whip": {
+    "source": "The design for printing Whip Androids.",
+    "translation": "可列印鞭型仿生人的設計。"
+  },
+  "summary.singulo.android_memory_saber": {
+    "source": "The design for printing Saber Androids.",
+    "translation": "可列印光劍型仿生人的設計。"
+  },
+  "summary.singulo.guardian_core": {
+    "source": "A seal that wakes the ruin’s guardian for a challenger.",
+    "translation": "有挑戰者到來時喚醒遺跡守衛的封印。"
+  },
+  "summary.singulo.echo_projector": {
+    "source": "Projects the Echo Sentinel; more left means a tougher boss.",
+    "translation": "投影回聲守衛的台座，剩得越多守衛越難打。"
+  },
+  "summary.singulo.factory_conveyor": {
+    "source": "An old factory belt that carries what stands on it.",
+    "translation": "運送其上物體的舊文明工廠輸送帶。"
+  },
+  "summary.singulo.lab_panel": {
+    "source": "White wall panelling from the android laboratory.",
+    "translation": "地下仿生人研究所的白色牆材。"
+  },
+  "summary.singulo.pressure_hull": {
+    "source": "The very hard steel shell around the laboratory.",
+    "translation": "包覆研究所的極堅硬鋼殼。"
+  },
+  "summary.singulo.welded_hatch": {
+    "source": "A welded steel lid over the laboratory shaft.",
+    "translation": "封住研究所豎井的焊接鋼蓋。"
+  },
+  "summary.singulo.lab_door": {
+    "source": "Laboratory sliding doors that close by themselves.",
+    "translation": "右鍵打開、會自動關閉的研究所拉門。"
+  },
+  "summary.singulo.coffee_maker": {
+    "source": "Brews coffee from cocoa beans.",
+    "translation": "用可可豆沖煮咖啡。"
+  },
+  "summary.singulo.vending_machine": {
+    "source": "A vending machine that sells drinks for emeralds.",
+    "translation": "可用綠寶石購買飲料的自動販賣機。"
+  },
+  "summary.singulo.coffee": {
+    "source": "Speeds up mining and wakes you up.",
+    "translation": "喝下後採掘加快，並驅散睡意。"
+  },
+  "summary.singulo.room_light": {
+    "source": "A laboratory ceiling light switched by redstone.",
+    "translation": "由紅石訊號點亮的研究所天花板燈。"
+  },
+  "summary.singulo.white_light_panel": {
+    "source": "A brightly glowing white panel.",
+    "translation": "明亮發光的白色面板。"
+  },
+  "summary.singulo.white_sliding_door": {
+    "source": "White sliding doors that close by themselves.",
+    "translation": "右鍵打開、會自動關閉的白色拉門。"
+  },
+  "summary.singulo.android_barrier_glass": {
+    "source": "Glass that only androids cannot pass.",
+    "translation": "只有仿生人無法通過的玻璃。"
+  },
+  "summary.singulo.android_gate_glass": {
+    "source": "Glass that only androids can pass.",
+    "translation": "只有仿生人能通過的玻璃。"
+  },
+  "summary.singulo.sealed_container_1": {
+    "source": "A sealed container opened with a Magnetic Key.",
+    "translation": "用磁力鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.sealed_container_2": {
+    "source": "A sealed container opened with a Quantum Key.",
+    "translation": "用量子鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.sealed_container_3": {
+    "source": "A sealed container opened with a Temporal Key.",
+    "translation": "用時間鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.sealed_container_4": {
+    "source": "A sealed container opened with a Singularity Key.",
+    "translation": "用奇點鎖鑰匙打開的封印容器。"
+  },
+  "summary.singulo.overclock_chip": {
+    "source": "Triples a machine’s speed for four times the power.",
+    "translation": "讓裝置處理速度變為 3 倍，耗電變為 4 倍。"
+  },
+  "summary.singulo.gravity_boots": {
+    "source": "No fall damage, and you can wall-jump in mid-air.",
+    "translation": "不受摔落傷害，可在空中蹬牆跳躍。"
+  },
+  "summary.singulo.catalyst_stabilizer": {
+    "source": "Doubles a catalyst’s remaining life.",
+    "translation": "讓催化劑的剩餘壽命翻倍。"
+  },
+  "summary.singulo.dimensional_pocket": {
+    "source": "Your own storage you can open anywhere.",
+    "translation": "隨時隨地都能打開的個人儲物空間。"
   }
 }

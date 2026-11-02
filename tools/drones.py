@@ -200,11 +200,26 @@ def kit_icon():
 
 
 def phase_icon():
-    """位相透過アップグレード: 濃い板のチップに、灰色の壁の帯と、それを抜ける紫のドローンの印（壁の向こう側は半分透ける）。"""
+    """
+    位相透過アップグレード: 濃い板のチップに、灰色の壁の帯と、それを抜ける紫のドローンの印（壁の向こう側は半分透ける）。
+    上の縁から2本の金の電極が突き出て、壁の両側に位相の場を張る（電極から壁へ紫の線）。下の縁には端子が並ぶ。
+    """
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     violet, violet_hi = (155, 123, 255), (214, 200, 255)
+    gold, gold_sh = (226, 186, 92), (150, 112, 48)
+    # 電極（板の上へ突き出る2本の金の棒と、先の丸い頭）と、下の端子
+    for x in (4, 11):
+        d.line([(x, 1), (x, 3)], fill=rgba(gold))
+        d.point((x, 0), fill=rgba(violet_hi))
+        d.point((x + 1, 2), fill=rgba(gold_sh))
+    for x in (4, 6, 9, 11):
+        d.point((x, 14), fill=rgba(gold))
     d.rounded_rectangle([1, 2, 14, 13], radius=2, fill=(36, 34, 52, 255), outline=(110, 96, 170, 255))
+    for x in (4, 11):
+        d.point((x, 2), fill=rgba(gold))
+        d.point((x, 3), fill=rgba(gold_sh))
+        d.line([(x + (1 if x < 7 else -1), 4), (6 if x < 7 else 9, 4)], fill=rgba(mix(violet, (36, 34, 52), 0.45)))
     d.rectangle([7, 3, 8, 12], fill=(120, 124, 136, 255))
     d.line([(7, 3), (7, 12)], fill=(150, 154, 166, 255))
     # 壁の手前は濃く、向こうは透ける

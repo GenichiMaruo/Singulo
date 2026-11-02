@@ -3953,9 +3953,22 @@ STATION_ALIASES = {'Pリアクター（触媒モード）': 'Pリアクター',
                    'Pリアクター（発電モード）': 'Pリアクター'}
 
 
+# 要約なしで説明欄に全文を出してよい長さ（日本語の文字数）
+SUMMARY_LIMIT = 40
+
+
 def validate():
     """recipes.py の整合性を調べ、問題の一覧を返す。"""
     errs = []
+    # 説明欄にふだん出す文は短く、括弧で付け足さない（くわしくは Shift で全文を出す）
+    from descriptions import DESC as _DESC, SUMMARY as _SUMMARY
+    _paren = re.compile(r'（[^）]*）|\([^)]*\)')
+    for n, (ja, _en) in _DESC.items():
+        if n not in _SUMMARY and (len(ja) > SUMMARY_LIMIT or _paren.search(ja)):
+            errs.append(f'要約がない（長い・括弧がある説明）: {n}')
+    for n, (ja, en) in _SUMMARY.items():
+        if _paren.search(ja) or _paren.search(en):
+            errs.append(f'要約に括弧がある: {n}')
     for n, r in RECIPES.items():
         for i in r['inputs']:
             if i in RECIPES and RECIPES[i]['stage'] > r['stage']:
