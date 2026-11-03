@@ -78,7 +78,7 @@ final class BossSounds {
         PLAYING.values().removeIf(loop -> loop.isStopped() || !mc.getSoundManager().isActive(loop));
         AABB box = mc.player.getBoundingBox().inflate(RANGE);
         for (Entity e : mc.level.getEntitiesOfClass(Entity.class, box,
-                e -> e instanceof RuinBoss || e instanceof HorizonWarden || e instanceof WardenSingularity || e instanceof RuinAndroid)) {
+                e -> e instanceof RuinBoss || e instanceof HorizonWarden || e instanceof WardenSingularity || e instanceof RuinAndroid || e instanceof io.github.genichimaruo.singulo.drone.CargoDrone)) {
             Voice v = voice(e);
             if (v != null) {
                 if (!(e instanceof RuinBoss b && b.isMinion())) {
@@ -94,6 +94,8 @@ final class BossSounds {
             } else if (e instanceof WardenSingularity s) {
                 keep(mc, s, "gravity_remnant.well_loop", 1.4F, true, x -> !x.isRemoved());
                 // スラスターを開いて飛んで・泳いでいる間の噴射音
+            } else if (e instanceof io.github.genichimaruo.singulo.drone.CargoDrone d && d.printed() && !d.dismantling()) {
+                keep(mc, d, d.kind().sound, 0.55F, true, x -> x instanceof io.github.genichimaruo.singulo.drone.CargoDrone c && c.printed() && !c.dismantling());
             } else if (e instanceof RuinAndroid a && a.thrusterOpen(1) > 0.5F) {
                 keep(mc, a, "android.thruster", 0.5F, true, x -> x instanceof RuinAndroid r && r.thrusterOpen(1) > 0.3F && r.isAlive());
             } else if (e instanceof HorizonWarden w && w.laserTicks() > 0) {

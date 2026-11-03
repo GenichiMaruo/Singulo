@@ -75,6 +75,21 @@ jobs:
           grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py --loader "$LOADER"
+      - name: Verify JEI 15 transfer, popup input and all capacity tiers
+        if: matrix.loader == 'forge'
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_jei.py --loader "$LOADER"
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 420s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/jei.gradle runClient
+          test "$(find build/$LOADER/jei-review/screenshots -name '*.png' | wc -l)" -eq 21
+          test "$(grep -c 'SINGULO_JEI_LAYOUT_COMPLETE' build/$LOADER/jei-review/logs/latest.log)" -eq 5
+          test "$(grep -c 'SINGULO_CAPACITY_GUI_COMPLETE' build/$LOADER/jei-review/logs/latest.log)" -eq 15
+          grep -q 'SINGULO_JEI_ALL_LAYOUTS_COMPLETE [1-9]' build/$LOADER/jei-review/logs/latest.log
+          grep -q 'SINGULO_JEI_TRANSFER_COMPLETE' build/$LOADER/jei-review/logs/latest.log
+          grep -q 'SINGULO_POPUP_INPUT_COMPLETE' build/$LOADER/jei-review/logs/latest.log
+          grep -q 'SINGULO_DRONE_MODELS_COMPLETE 3' build/$LOADER/jei-review/logs/latest.log
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,6 +105,8 @@ jobs:
             build/${{ matrix.loader }}/gui-review/inventory-pixels.json
             build/${{ matrix.loader }}/gui-review/machine-pixels.json
             build/${{ matrix.loader }}/gui-review/machine-font-metrics.tsv
+            build/${{ matrix.loader }}/jei-review/screenshots/
+            build/${{ matrix.loader }}/jei-review/logs/
 
   optional-mekanism:
     runs-on: ubuntu-latest

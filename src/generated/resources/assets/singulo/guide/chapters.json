@@ -66,7 +66,8 @@
       "icon": "singulo:holo_projector",
       "pages": [
         "multiblocks.projector",
-        "multiblocks.list"
+        "multiblocks.list",
+        "multiblocks.parts"
       ]
     },
     {
@@ -86,7 +87,8 @@
         "power.cables",
         "power.sides",
         "power.relocation",
-        "power.wormhole"
+        "power.wormhole",
+        "power.capacity"
       ]
     },
     {
@@ -123,6 +125,20 @@
         "androids.trouble",
         "androids.decor",
         "androids.glass"
+      ]
+    },
+    {
+      "id": "drones",
+      "icon": "singulo:drone_station",
+      "pages": [
+        "drones.start",
+        "drones.kinds",
+        "drones.send",
+        "drones.range",
+        "drones.more",
+        "drones.route",
+        "drones.auto",
+        "drones.android"
       ]
     },
     {

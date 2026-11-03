@@ -16,6 +16,13 @@
         "tag": "forge:obsidian"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "tier": 3,
+      "uses": 750
     }
   ],
   "result": {

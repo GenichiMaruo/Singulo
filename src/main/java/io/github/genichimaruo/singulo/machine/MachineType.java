@@ -98,8 +98,11 @@ public enum MachineType {
     }
 
     public int itemSlots() {
-        return upgradeSlot() + 1;
+        return capacitySlot() + 1;
     }
+
+    /** Appended after all legacy slots so old inventories keep their slot indices. */
+    public int capacitySlot() { return upgradeSlot() + 1; }
 
     /** レシピの照合に使うスロットの数（入力 + 触媒）。 */
     public int recipeSlots() {
@@ -157,7 +160,7 @@ public enum MachineType {
                 || this == CASIMIR_CAVITY;
     }
 
-    /** 電力の容量。段階が上がるほど消費が大きいので大きくする（受け入れは毎tick 容量の1/10まで）。 */
+    /** 装置の基本容量。容量アップグレードは別枠で増設する。 */
     public int energyCapacity() {
         return switch (stage) {
             case 1 -> ENERGY_CAPACITY;
@@ -166,5 +169,10 @@ public enum MachineType {
             case 4 -> 4_000_000;
             default -> 40_000_000;
         };
+    }
+
+    /** Reception is independent of buffer upgrades; assembling late-game parts needs high throughput. */
+    public int energyReceiveLimit() {
+        return this == PRECISION_ASSEMBLER ? 4_000_000 : energyCapacity() / 10;
     }
 }

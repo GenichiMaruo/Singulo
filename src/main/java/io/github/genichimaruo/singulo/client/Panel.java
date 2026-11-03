@@ -358,6 +358,9 @@ final class Panel {
     private static final String[] AUTO = {
             "...xxxx..", "x.x....x.", "xx......x", "xxxx....x", "........x",
             "x........", "x....xxxx", "x......xx", ".x....x.x", "..xxxx..."};
+    /** 自動の印の小さい版（7×7。一覧の行に収まる大きさ）。 */
+    private static final String[] AUTO_SMALL = {
+            "..xxx.x", ".x...xx", "x...xxx", "x.....x", "xxx...x", "xx...x.", "x.xxx.."};
     private static final String[] BOX = {
             "xxxxxxxxx", "x.......x", "xxxxxxxxx", "x.......x", "x..xxx..x", "x.......x", "xxxxxxxxx"};
     private static final String[] DROP = {
@@ -433,6 +436,11 @@ final class Panel {
     /** 自動（ぐるりと回る矢印、9×10）。 */
     static void autoIcon(GuiGraphics g, int x, int y, int c) {
         sprite(g, x, y, AUTO, c);
+    }
+
+    /** 自動の印の小さい版（7×7）。 */
+    static void autoIconSmall(GuiGraphics g, int x, int y, int c) {
+        sprite(g, x, y, AUTO_SMALL, c);
     }
 
     /** アイテム（箱、9×7）。 */

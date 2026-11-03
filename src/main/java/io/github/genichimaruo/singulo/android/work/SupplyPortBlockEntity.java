@@ -239,7 +239,8 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
-            IItemHandler h = cache == null ? Capabilities.get(level, Capabilities.ItemHandler.BLOCK, p, d.getOpposite()) : cache.get(d);
+            IItemHandler h = cache != null ? cache.get(d)
+                    : AdjacentItemStores.androidView(level, p, d.getOpposite(), Capabilities.get(level, Capabilities.ItemHandler.BLOCK, p, d.getOpposite()));
             if (h == null) {
                 continue;
             }

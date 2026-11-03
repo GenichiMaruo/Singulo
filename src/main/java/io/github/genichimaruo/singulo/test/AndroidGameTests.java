@@ -103,6 +103,10 @@ public final class AndroidGameTests {
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity s = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, STATION);
         s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
+        // 持ち主のいないステーションは、24ブロック以内の持ち主のいない身寄りのない護衛を見つけると、リンクを待って印刷しない。
+        // となりで並んで動くテストが置いていった護衛で止まらないよう、テストの場所から決まる持ち主にする（置き直しても同じ）。
+        s.setOwner(java.util.UUID.nameUUIDFromBytes(("android-station-test" + helper.absolutePos(BlockPos.ZERO))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_MEMORY, new ItemStack(item(AndroidKind.BLADE.memoryId())));
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_KIT, new ItemStack(item("android_kit"), kits));
         return s;
@@ -1447,6 +1451,9 @@ public final class AndroidGameTests {
         floor(helper);
         var console = workshop(helper, 4);
         AndroidStationBlockEntity s = station(helper, 1);
+        // 注文する人をステーションの持ち主にする（印刷された護衛は、持ち主の注文を受ける）
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        s.setOwner(player.getUUID());
         int[] lowPower = {0};
         int[] last = {-1};
         boolean[] ordered = {false}, charged = {false};
@@ -1462,7 +1469,7 @@ public final class AndroidGameTests {
                 CompoundTag saved = a.saveWithoutId(new CompoundTag());
                 saved.putInt("charge", 25);                        // 2回作ると切れる
                 a.load(saved);
-                var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 16,
                         List.of(a.getUUID()), helper.absolutePos(DELIVERY));
                 helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
             }
@@ -3107,4 +3114,25 @@ public final class AndroidGameTests {
         helper.assertTrue(job.fetch().size() == 1 && job.fetch().get(0).count == 320, "Material pickup exceeds carry capacity");
         a.discard(); helper.succeed();
     }
+    @GameTest(template = EMPTY, timeoutTicks = 1200, batch = "android_drone_crafting")
+    public static void androidCraftsFromDroneArrivalsWithoutStealingCargo(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        helper.setBlock(CHEST, SinguloBlocks.DRONE_PORT.get());
+        io.github.genichimaruo.singulo.drone.DronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CHEST);
+        port.items().setStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_RECEIVE,
+                new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 2));
+        port.items().setStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_CARGO,
+                new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper),
+                new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "Could not plan crafting from drone arrivals");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_PLANKS) == 8, "Arrivals did not become delivered products");
+            helper.assertTrue(port.items().getStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_CARGO).getCount() == 64,
+                    "Android consumed outbound cargo");
+            a.discard();
+        });
+    }
+
 }

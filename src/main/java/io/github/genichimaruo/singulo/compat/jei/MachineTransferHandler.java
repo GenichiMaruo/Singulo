@@ -1,0 +1,58 @@
+package io.github.genichimaruo.singulo.compat.jei;
+
+import io.github.genichimaruo.singulo.machine.MachineMenu;
+import io.github.genichimaruo.singulo.machine.MachineRecipeTransfer;
+import io.github.genichimaruo.singulo.machine.MachineType;
+import io.github.genichimaruo.singulo.network.MachineRecipeTransferPayload;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
+import io.github.genichimaruo.singulo.registry.SinguloMenus;
+import java.util.Optional;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.transfer.IRecipeTransferError;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
+
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraftforge.network.PacketDistributor;
+
+final class MachineTransferHandler implements IRecipeTransferHandler<MachineMenu, MachineRecipe> {
+    private final MachineType type;
+    private final IRecipeTransferHandlerHelper helper;
+
+    MachineTransferHandler(MachineType type, IRecipeTransferHandlerHelper helper) {
+        this.type = type;
+        this.helper = helper;
+    }
+
+    @Override
+    public Class<? extends MachineMenu> getContainerClass() { return MachineMenu.class; }
+
+    @Override
+    public Optional<MenuType<MachineMenu>> getMenuType() { return Optional.of(SinguloMenus.MACHINE.get()); }
+
+    @Override
+    public RecipeType<MachineRecipe> getRecipeType() { return SinguloJeiPlugin.TYPES.get(type); }
+
+    @Override
+    @SuppressWarnings("removal")
+    public IRecipeTransferError transferRecipe(MachineMenu menu, MachineRecipe recipe, IRecipeSlotsView slots,
+                                               Player player, boolean maxTransfer, boolean doTransfer) {
+        var id = SinguloJeiPlugin.RECIPE_IDS.get(recipe);
+        if (menu.type() != type || id == null || recipe.mass().isPresent()
+                || (recipe.ingredients().isEmpty() && recipe.restore().isEmpty())) return helper.createInternalError();
+        // The server selects the recipe before moving items; one the machine cannot select would silently do nothing
+        if (menu.type().selectsRecipe() && io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(player.level(), menu.type(), id) < 0) {
+            return helper.createInternalError();
+        }
+        if (MachineRecipeTransfer.plan(menu, recipe, maxTransfer) == null) {
+            return helper.createUserErrorWithTooltip(Component.translatable("jei.tooltip.error.recipe.transfer.missing")
+                    .append(" / ").append(Component.translatable("jei.tooltip.error.recipe.transfer.inventory.full")));
+        }
+        if (doTransfer) io.github.genichimaruo.singulo.network.SinguloNetwork.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, maxTransfer));
+        return null;
+    }
+}

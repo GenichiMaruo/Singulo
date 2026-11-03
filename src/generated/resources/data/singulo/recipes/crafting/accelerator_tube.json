@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "P",
-    "G",
-    "P"
+    "PGP",
+    " W ",
+    "PGP"
   ],
   "key": {
     "P": {
@@ -12,10 +12,13 @@
     },
     "G": {
       "tag": "forge:glass/colorless"
+    },
+    "W": {
+      "item": "singulo:superconducting_wire"
     }
   },
   "result": {
-    "count": 1,
+    "count": 2,
     "item": "singulo:accelerator_tube"
   }
 }

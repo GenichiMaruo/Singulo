@@ -77,7 +77,7 @@ def validate_jar(path):
             if name.endswith('.class'):
                 header = archive.read(name)[:8]
                 assert header[:4] == b'\xca\xfe\xba\xbe' and struct.unpack('>H', header[6:8])[0] <= 61, f'Not Java 17: {name}'
-                assert 'GameTests' not in name and '/test/harness/' not in name and not name.endswith('/TestBuild.class') and 'GuiReviewHarness' not in name and 'Stage6ReviewHarness' not in name and 'PreviewHarness' not in name and 'ReviewTests' not in name and 'PortDiagnosticTests' not in name and 'DiagnosticTests' not in name, f'Preview code shipped: {name}'
+                assert not name.endswith('Review.class') and 'GameTests' not in name and '/test/harness/' not in name and not name.endswith('/TestBuild.class') and 'GuiReviewHarness' not in name and 'Stage6ReviewHarness' not in name and 'PreviewHarness' not in name and 'ReviewTests' not in name and 'PortDiagnosticTests' not in name and 'DiagnosticTests' not in name, f'Preview code shipped: {name}'
                 count += 1
             if name.endswith('pack.mcmeta'):
                 assert json.loads(archive.read(name))['pack']['pack_format'] == 15, f'Wrong pack format: {name}'

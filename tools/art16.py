@@ -434,6 +434,8 @@ def creative_front(on, frame=0, frames=CREATIVE_FRAMES):
 # どの装置も同じ顔（色だけ段階で変わる）
 ANDROID_FACES = ('android_station', 'android_work_console', 'android_supply_port', 'android_delivery_port',
                  'android_recipe_rack', 'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench')
+# ドローン輸送の装置（同じバイザーに、橙の単眼。tools/drones.py）
+DRONE_FACES = ('drone_station', 'drone_port')
 # 動いている間のまばたき: コマ0が開いた目、コマ1が閉じた目。ふだんは開けていて、ときどき1回か2回つぶる（time は tick）
 ANDROID_BLINK = {'animation': {'interpolate': False, 'frames': [
     {'index': 0, 'time': 90}, {'index': 1, 'time': 3},
@@ -490,11 +492,13 @@ def android_front(iid, stage, on, blink=False):
 
 def machine_front(iid, stage, on):
     """正面のテクスチャと、動く場合のコマ数を返す。段階3以上の稼働中は8コマ（アンドロイドの装置は、まばたきの2コマ）。"""
-    if iid in ANDROID_FACES:
+    if iid in ANDROID_FACES or iid in DRONE_FACES:
+        import drones
+        draw = drones.front if iid in DRONE_FACES else android_front
         frames = 2 if on else 1
         sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
         for f in range(frames):
-            sheet.paste(android_front(iid, stage, on, f == 1), (0, S * f))
+            sheet.paste(draw(iid, stage, on, f == 1), (0, S * f))
         return sheet, frames
     frames = 8 if on and stage >= 3 or iid == 'creative_energy_source' else 1
     sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
@@ -2222,6 +2226,9 @@ ITEM_ART = {
     'temporal_key': lambda: seal_key(3),
     'singularity_key': lambda: seal_key(4),
     'overclock_chip': lambda: overclock_chip(),
+    'capacity_upgrade_1': lambda: capacity_upgrade(1),
+    'capacity_upgrade_2': lambda: capacity_upgrade(2),
+    'capacity_upgrade_3': lambda: capacity_upgrade(3),
     'gravity_boots': lambda: gravity_boots(),
     'catalyst_stabilizer': lambda: catalyst_stabilizer(),
     'dimensional_pocket': lambda: dimensional_pocket(),
@@ -2245,6 +2252,18 @@ def seal_key(tier):
     for k in range(tier):
         d.point((13 - k * 2, 10), fill=(120, 126, 140, 255))
     d.point((2, 6), fill=(255, 255, 255, 255))
+    return im
+
+
+def capacity_upgrade(tier):
+    """A capacitor cartridge with one, two or three illuminated charge cells."""
+    im, d = new()
+    color = ((70, 175, 240), (175, 120, 250), (245, 190, 70))[tier - 1]
+    d.rectangle([2, 3, 13, 12], fill=(42, 48, 60, 255), outline=(170, 185, 200, 255))
+    d.rectangle([5, 1, 10, 2], fill=(195, 185, 140, 255))
+    for i in range(3):
+        d.rectangle([4 + i * 3, 5, 5 + i * 3, 10], fill=rgba(color if i < tier else (65, 75, 85)))
+    d.point((3, 4), fill=(255, 255, 255, 255))
     return im
 
 

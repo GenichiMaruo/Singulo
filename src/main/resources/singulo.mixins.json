@@ -11,7 +11,11 @@
     "RayleighSunGoalMixin",
     "RayleighFleeSunMixin",
     "RayleighChunkLightMixin",
-    "RecipeManagerAccess"
+    "RecipeManagerAccess",
+    "DroneCrateSlotMixin",
+    "DroneCrateStorageMixin",
+    "DroneCrateBundleMixin",
+    "DroneCrateInventoryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

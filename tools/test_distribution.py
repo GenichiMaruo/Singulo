@@ -48,7 +48,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_test_or_review_code_never_ships(self):
         for name in ['example/FooGameTests.class', 'example/FooGameTests$1.class',
-                     'example/TestBuild.class', 'example/test/harness/TestReports.class', 'example/GuiReviewHarness.class']:
+                     'example/TestBuild.class', 'example/DroneModelReview.class', 'example/PopupInputReview.class', 'example/test/harness/TestReports.class', 'example/GuiReviewHarness.class']:
             with self.subTest(name=name):
                 self.entries[name] = b'fixture'
                 with self.assertRaisesRegex(RuntimeError, 'development'): self.check()

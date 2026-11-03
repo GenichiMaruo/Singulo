@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 240,
+  "energy": 20000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:capacity_upgrade_2"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_module"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:capacity_upgrade_3",
+    "count": 1
+  }
+}

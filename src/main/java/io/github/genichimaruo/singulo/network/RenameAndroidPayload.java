@@ -25,6 +25,8 @@ public record RenameAndroidPayload(int containerId, String name) {
                 menu.rename(player, payload.name());
             } else if (player.containerMenu instanceof AndroidStationMenu menu && menu.stillValid(player)) {
                 menu.rename(player, payload.name());
+            } else if (player.containerMenu instanceof io.github.genichimaruo.singulo.drone.DronePortMenu menu && menu.stillValid(player)) {
+                menu.rename(player, payload.name());
             } else if (player.containerMenu instanceof io.github.genichimaruo.singulo.android.work.DeliveryPortMenu menu
                     && menu.stillValid(player)) {
                 menu.rename(player, payload.name());
