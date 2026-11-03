@@ -7,7 +7,7 @@ import tomllib
 import zipfile
 from check_gametests import check
 
-COUNTS = {'forge': 589, 'neoforge': 589}
+COUNTS = {'forge': 656, 'neoforge': 656}
 
 
 def validate(root, loader, name=None):
@@ -25,7 +25,7 @@ def validate(root, loader, name=None):
     path = root / 'libs' / name
     with zipfile.ZipFile(path) as jar:
         names = jar.namelist()
-        if len(names) != len(set(names)) or any('ReviewHarness' in n or re.search(r'(?:GameTests(?:\$[^/]*)?|TestBuild)\.class$', n) or '/test/harness/' in n for n in names):
+        if len(names) != len(set(names)) or any('ReviewHarness' in n or re.search(r'(?:GameTests(?:\$[^/]*)?|TestBuild|\w*Review(?:\$[^/]*)?)\.class$', n) or '/test/harness/' in n for n in names):
             raise RuntimeError('Duplicate entries or development GUI code in production JAR')
         for n in names:
             if n.endswith('.class') and struct.unpack('>H', jar.read(n)[6:8])[0] > 61:

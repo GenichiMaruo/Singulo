@@ -34,6 +34,13 @@
         "item": "singulo:entangled_element"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_catalyst"
+      },
+      "tier": 4,
+      "uses": 1125
     }
   ],
   "result": {

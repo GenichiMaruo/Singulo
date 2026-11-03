@@ -87,6 +87,12 @@ public class MachineMenu extends AbstractContainerMenu {
                 return 1;
             }
         });
+        addSlot(new NotifyingItemSlot(handler, type.capacitySlot(), layout.capacityX, layout.capacityY) {
+            @Override
+            public boolean mayPlace(ItemStack stack) { return CapacityUpgrades.tier(stack) > 0; }
+            @Override
+            public int getMaxStackSize() { return 1; }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, layout.inventoryX + col * 18, GuiFrame.inventoryY(MachineLayout.HEIGHT) + row * 18));
@@ -102,12 +108,35 @@ public class MachineMenu extends AbstractContainerMenu {
         return type;
     }
 
+    /**
+     * How many of {@code stack} the machine slot holds, by the same rules as the machine's item handler. Unlike
+     * SlotItemHandler#getMaxStackSize(ItemStack), it never empties and refills the slot to find out.
+     */
+    public int stackLimit(int slot, ItemStack stack) {
+        int limit = Math.min(getSlot(slot).getMaxStackSize(), stack.getMaxStackSize());
+        if (slot == type.catalystSlot() && type.hasCatalystSlot()) return Math.min(CatalystMagazine.SUPPLY_LIMIT, limit);
+        return slot < type.inputSlots() && io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack) ? 1 : limit;
+    }
+
     public BlockPos pos() {
         return pos;
     }
 
     public int value(int index) {
         return data.getInt(index);
+    }
+
+    /** Active catalyst is stored outside the editable reserve slot. Never move it during JEI transfer. */
+    public ItemStack loadedCatalyst() {
+        if (machine != null) return machine.magazine().loaded().copy();
+        int item = value(MachineBlockEntity.D_LOADED_ITEM);
+        if (!type.hasCatalystSlot() || item < 0) return ItemStack.EMPTY;
+        ItemStack stack = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.byId(item));
+        int remaining = Math.max(0, value(MachineBlockEntity.D_LOADED_USES));
+        int max = Math.max(io.github.genichimaruo.singulo.item.UsesHelper.baseMax(stack), remaining);
+        io.github.genichimaruo.singulo.registry.SinguloComponents.set(stack, io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
+                new io.github.genichimaruo.singulo.item.UsesData(max - remaining, max, 0));
+        return stack;
     }
 
     @Override
@@ -140,10 +169,16 @@ public class MachineMenu extends AbstractContainerMenu {
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
         int machineSlots = type.itemSlots();
-        int upgradeIndex = machineSlots - 1;                 // メニュー上の並び: 入力・出力・（触媒）・アップグレード
-        int catalystIndex = type.hasCatalystSlot() ? machineSlots - 2 : -1;
+        int upgradeIndex = type.upgradeSlot();
+        int catalystIndex = type.catalystSlot();
         if (index < machineSlots) {
             if (!moveItemStackTo(stack, machineSlots, slots.size(), true)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (CapacityUpgrades.tier(stack) > 0) {
+            // 容量の専用枠が空いていれば装着し、埋まっていれば材料の欄へ（Mk1・Mk2 は上の段階の材料にもなる）
+            if (!moveItemStackTo(stack, type.capacitySlot(), type.capacitySlot() + 1, false)
+                    && !moveItemStackTo(stack, 0, type.inputSlots(), false)) {
                 return ItemStack.EMPTY;
             }
         } else if (MachineBlockEntity.isUpgrade(stack)) {

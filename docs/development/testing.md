@@ -2,7 +2,7 @@
 
 ## 全体の検証
 
-Minecraft 1.20.1 / Java 17 / Forge・NeoForge。現在は通常のGameTest 589件、Mekanismを入れる専用GameTest 2件、検証ツールの単体テスト25件。GUIは通常22画面と5言語×44画面を同じクライアントで確認する。Embeddium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
+Minecraft 1.20.1 / Java 17 / Forge・NeoForge。現在は通常のGameTest 656件、Mekanismを入れる専用GameTest 2件、検証ツールの単体テスト25件。GUIは通常22画面と5言語×44画面を同じクライアントで確認する。Embeddium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
 
 ```sh
 python3 -m unittest discover -s tools -p 'test_*.py'
@@ -71,3 +71,7 @@ PNGはPillowで読み取る。旧デコーダーとの全RGB値の一致を確�
 詳細な結果と所要時間は`build/reports/gametest/results.json`に出力する。チャンク待ちでは標準のテスト時間切れが始まらないことがあるため、120秒間どのテストも完了しない場合は検査サーバーを異常終了させる。これは成功条件の緩和ではなく、無期限の停止を検出するための監視である。
 
 CIは通常・GUI、描画連携、Mekanismの3ジョブを並列に走らせる。描画連携ジョブの9件は、専用ワールドの作成と独立した実行環境の検証も兼ねるため、通常ジョブとの重複を意図して残している。
+
+## 0.14.0のJEI 15検査
+
+Forgeの既存CIジョブで全レシピ配置・実転送・ポップアップ操作・5言語×容量3段階を確認する。手順と互換性は[移植記録](../0.14.0/port-1.20.1.md)を参照。

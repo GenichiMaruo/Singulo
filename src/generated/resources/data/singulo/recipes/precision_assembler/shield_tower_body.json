@@ -9,17 +9,23 @@
       "ingredient": {
         "tag": "forge:plates/steel"
       },
-      "count": 3
+      "count": 6
     },
     {
       "ingredient": {
         "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_module"
       },
       "count": 1
     }
   ],
   "result": {
     "id": "singulo:shield_tower_body",
-    "count": 4
+    "count": 8
   }
 }

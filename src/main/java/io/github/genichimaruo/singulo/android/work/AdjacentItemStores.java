@@ -14,6 +14,7 @@ final class AdjacentItemStores {
         final BlockEntity target;
         final LazyOptional<IItemHandler> capability;
         boolean valid = true;
+        IItemHandler handler, view;
         Entry(BlockEntity target, Direction side) {
             this.target = target;
             capability = target.getCapability(ForgeCapabilities.ITEM_HANDLER, side);
@@ -35,6 +36,17 @@ final class AdjacentItemStores {
             cached = new Entry(target, direction.getOpposite());
             caches.put(direction, cached);
         }
-        return cached.capability.orElse(null);
+        IItemHandler handler = cached.capability.orElse(null);
+        if (handler != cached.handler) {
+            cached.handler = handler;
+            cached.view = androidView(level, pos, direction.getOpposite(), handler);
+        }
+        return cached.view;
     }
+    static IItemHandler androidView(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, Direction side, IItemHandler handler) {
+        if (handler != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof AndroidStorageView view)
+            return view.androidItems(side);
+        return handler;
+    }
+
 }

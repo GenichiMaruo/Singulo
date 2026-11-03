@@ -103,6 +103,10 @@ public final class AndroidGameTests {
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity s = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, STATION);
         s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
+        // 持ち主のいないステーションは、24ブロック以内の持ち主のいない身寄りのない護衛を見つけると、リンクを待って印刷しない。
+        // となりで並んで動くテストが置いていった護衛で止まらないよう、テストの場所から決まる持ち主にする（置き直しても同じ）。
+        s.setOwner(java.util.UUID.nameUUIDFromBytes(("android-station-test" + helper.absolutePos(BlockPos.ZERO))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_MEMORY, new ItemStack(item(AndroidKind.BLADE.memoryId())));
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_KIT, new ItemStack(item("android_kit"), kits));
         return s;
@@ -978,7 +982,7 @@ public final class AndroidGameTests {
     }
 
     /** 2つ目の資材口（隣にチェスト）。指令台から遠い隅に置き、指令台につなぐ。 */
-    private static final BlockPos SUPPLY2 = new BlockPos(6, 1, 5), CHEST2 = new BlockPos(6, 1, 6);
+    private static final BlockPos SUPPLY2 = p(6, 1, 5), CHEST2 = p(6, 1, 6);
 
     private static io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity secondPort(GameTestHelper helper) {
         var level = helper.getLevel();
@@ -1002,8 +1006,9 @@ public final class AndroidGameTests {
     }
 
     /** 資材口の優先の取り出し: 登録した資材口から先に取る（近くの資材口にも同じ物があっても）。登録は保存しても残る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_supplyPortTakePriority")
     public static void supplyPortTakePriority(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var port = secondPort(helper);
         var planks = net.minecraft.world.item.Items.OAK_PLANKS;
@@ -1035,14 +1040,15 @@ public final class AndroidGameTests {
      * 取り出しの優先は、寿命の短い順より先: 近くの資材口に使いかけの時間結晶触媒、優先を登録した資材口に新品があれば、
      * 優先した資材口の新品を使う（使いかけは残る）。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_supplyPortPriorityBeatsShortLife")
     public static void supplyPortPriorityBeatsShortLife(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var port = secondPort(helper);
         var level = helper.getLevel();
         var catalyst = item("time_crystal_catalyst");
         port.entries().setItem(0, new ItemStack(catalyst));
-        BlockPos at = new BlockPos(0, 1, 3);
+        BlockPos at = p(0, 1, 3);
         helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
@@ -1086,8 +1092,9 @@ public final class AndroidGameTests {
     }
 
     /** 資材口の優先の返却: 余った物は、登録した資材口へ戻す（近くの資材口ではなく）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_supplyPortReturnPriority")
     public static void supplyPortReturnPriority(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var port = secondPort(helper);
         var stick = net.minecraft.world.item.Items.STICK;
@@ -1447,6 +1454,9 @@ public final class AndroidGameTests {
         floor(helper);
         var console = workshop(helper, 4);
         AndroidStationBlockEntity s = station(helper, 1);
+        // 注文する人をステーションの持ち主にする（印刷された護衛は、持ち主の注文を受ける）
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        s.setOwner(player.getUUID());
         int[] lowPower = {0};
         int[] last = {-1};
         boolean[] ordered = {false}, charged = {false};
@@ -1462,7 +1472,7 @@ public final class AndroidGameTests {
                 CompoundTag saved = a.saveWithoutId(new CompoundTag());
                 saved.putInt("charge", 25);                        // 2回作ると切れる
                 a.load(saved);
-                var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 16,
                         List.of(a.getUUID()), helper.absolutePos(DELIVERY));
                 helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
             }
@@ -1766,11 +1776,12 @@ public final class AndroidGameTests {
      * 触媒を使う装置の失活触媒: 記録していなくても持ち帰る。精密組立台は出口が1つなので、残すと次のモジュールが出られない
      * （時間結晶触媒2個からモジュール3個。1個目は2個目の途中で、2個目は3個目で使い切る）。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 3000)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 3000, batch = "automation_androidTakesSpentCatalystsOut")
     public static void androidTakesSpentCatalystsOut(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos at = new BlockPos(0, 1, 3);
+        BlockPos at = p(0, 1, 3);
         helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
@@ -1813,11 +1824,12 @@ public final class AndroidGameTests {
     }
 
     /** 触媒は使いかけでも使い、寿命の短いものから使う（新品の時間結晶触媒は残る）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidUsesShortLivedCatalystFirst")
     public static void androidUsesShortLivedCatalystFirst(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos at = new BlockPos(0, 1, 3);
+        BlockPos at = p(0, 1, 3);
         helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
@@ -3107,4 +3119,25 @@ public final class AndroidGameTests {
         helper.assertTrue(job.fetch().size() == 1 && job.fetch().get(0).count == 320, "Material pickup exceeds carry capacity");
         a.discard(); helper.succeed();
     }
+    @GameTest(template = EMPTY, timeoutTicks = 1200, batch = "android_drone_crafting")
+    public static void androidCraftsFromDroneArrivalsWithoutStealingCargo(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        helper.setBlock(CHEST, SinguloBlocks.DRONE_PORT.get());
+        io.github.genichimaruo.singulo.drone.DronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CHEST);
+        port.items().setStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_RECEIVE,
+                new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 2));
+        port.items().setStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_CARGO,
+                new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper),
+                new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "Could not plan crafting from drone arrivals");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_PLANKS) == 8, "Arrivals did not become delivered products");
+            helper.assertTrue(port.items().getStackInSlot(io.github.genichimaruo.singulo.drone.DronePortBlockEntity.SLOT_CARGO).getCount() == 64,
+                    "Android consumed outbound cargo");
+            a.discard();
+        });
+    }
+
 }

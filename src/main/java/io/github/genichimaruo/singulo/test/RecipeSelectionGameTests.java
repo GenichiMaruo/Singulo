@@ -72,28 +72,28 @@ public final class RecipeSelectionGameTests {
         });
     }
 
-    /** 超伝導コイルと鋼板だけ（Tシリンダー軸受の材料）は、ほかの設備の途中でもあるので、入れ終わって少し待ってから自動で作る。指定すればすぐ作る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    /** トポロジカル導線と鋼板だけ（トロイダル磁気コイルの材料）は、ほかの設備の途中でもあるので、入れ終わって少し待ってから自動で作る。指定すればすぐ作る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void partialLoadWaitsBeforeCraftingAmbiguousRecipe(GameTestHelper helper) {
         io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity auto = assembler(helper, new BlockPos(1, 1, 1));
         MachineBlockEntity fixed = assembler(helper, new BlockPos(4, 1, 1));
         for (MachineBlockEntity m : new MachineBlockEntity[]{auto, fixed}) {
-            m.items().setStackInSlot(0, new ItemStack(item("superconducting_coil"), 16));
+            m.items().setStackInSlot(0, new ItemStack(item("topological_wire"), 16));
             m.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
         }
         helper.assertTrue(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER,
-                RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "tipler_bearing"))),
-                "Tシリンダー軸受がほかのレシピの途中と判定されない");
-        fixed.selectRecipe(indexOf(helper, "tipler_bearing"));
+                RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "toroidal_magnetic_coil"))),
+                "トロイダル磁気コイルがほかのレシピの途中と判定されない");
+        fixed.selectRecipe(indexOf(helper, "toroidal_magnetic_coil"));
         // 入れている途中（入れるのが止まって SETTLE_TICKS 経つまで）は、自動では作り始めない
         helper.runAtTickTime(RecipeSelection.SETTLE_TICKS / 2, () -> {
             helper.assertTrue(auto.status() == MachineBlockEntity.Status.IDLE, "入れている途中で自動が動き出した: " + auto.status());
         });
         // 入れ終わって止まっていれば、自動でも作る（0.11.0 では、いつまでも始まらなかった）
-        helper.runAtTickTime(RecipeSelection.SETTLE_TICKS + 160, () -> {
-            helper.assertTrue(output(auto).is(item("tipler_bearing")), "入れ終わっても自動で作られない: " + output(auto));
-            helper.assertTrue(output(fixed).is(item("tipler_bearing")), "指定したのに作られない: " + output(fixed));
+        helper.runAtTickTime(RecipeSelection.SETTLE_TICKS + 260, () -> {  // トロイダル磁気コイルは10秒
+            helper.assertTrue(output(auto).is(item("toroidal_magnetic_coil")), "入れ終わっても自動で作られない: " + output(auto));
+            helper.assertTrue(output(fixed).is(item("toroidal_magnetic_coil")), "指定したのに作られない: " + output(fixed));
             helper.succeed();
         });
     }
@@ -142,18 +142,18 @@ public final class RecipeSelectionGameTests {
         io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var manager = helper.getLevel().getRecipeManager();
         var original = java.util.List.copyOf(manager.getRecipes());
-        var bearing = RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "tipler_bearing"));
-        helper.assertTrue(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, bearing),
+        var toroid = RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "toroidal_magnetic_coil"));
+        helper.assertTrue(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, toroid),
                 "Fixture recipe must initially be ambiguous");
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
-        m.items().setStackInSlot(0, new ItemStack(item("superconducting_coil"), 16));
+        m.items().setStackInSlot(0, new ItemStack(item("topological_wire"), 16));
         m.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
         m.energy().setEnergy(m.energy().getMaxEnergyStored());
         MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
         helper.assertTrue(m.status() == MachineBlockEntity.Status.IDLE, "Ambiguous fixture should be idle");
         try {
-            manager.replaceRecipes(java.util.List.of(bearing));
-            helper.assertFalse(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, bearing),
+            manager.replaceRecipes(java.util.List.of(toroid));
+            helper.assertFalse(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, toroid),
                     "Removed recipes still prevent automatic crafting after reload");
             MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             helper.assertTrue(m.status() == MachineBlockEntity.Status.RUNNING,

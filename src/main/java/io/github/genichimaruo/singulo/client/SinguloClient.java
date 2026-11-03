@@ -131,6 +131,9 @@ public final class SinguloClient {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SLIDING_DOOR.get(),
                 SlidingDoorRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.CARGO_DRONE.get(), CargoDroneRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DRONE_PORT.get(),
+                DronePortRenderer::new);
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
         event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
         event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
@@ -205,6 +208,9 @@ public final class SinguloClient {
 
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityDroneRenderer.LAYER, SecurityDroneRenderer::createLayer);
+        event.registerLayerDefinition(CargoDroneRenderer.LAYER, CargoDroneRenderer::createLayer);
+        event.registerLayerDefinition(CargoDroneRenderer.JET_LAYER, CargoDroneRenderer::createJetLayer);
+        event.registerLayerDefinition(CargoDroneRenderer.GRAVITY_LAYER, CargoDroneRenderer::createGravityLayer);
         event.registerLayerDefinition(AndroidModel.BLADE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BLADE));
         event.registerLayerDefinition(AndroidModel.WHIP_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.WHIP));
         event.registerLayerDefinition(AndroidModel.SABER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SABER));
@@ -230,6 +236,8 @@ public final class SinguloClient {
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_RECIPE_RACK.get(), RecipeRackScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_DELIVERY_PORT.get(), DeliveryPortScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_SUPPLY_PORT.get(), SupplyPortScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.DRONE_STATION.get(), DroneStationScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.DRONE_PORT.get(), DronePortScreen::new);
     }
 
     /** 作業位置カードとレシピカードは、シフトを押している間、中身の絵を重ねて見せる。 */
