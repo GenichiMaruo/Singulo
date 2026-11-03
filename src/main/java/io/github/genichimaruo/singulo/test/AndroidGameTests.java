@@ -1776,8 +1776,9 @@ public final class AndroidGameTests {
      * 触媒を使う装置の失活触媒: 記録していなくても持ち帰る。精密組立台は出口が1つなので、残すと次のモジュールが出られない
      * （時間結晶触媒2個からモジュール3個。1個目は2個目の途中で、2個目は3個目で使い切る）。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 3000)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 3000, batch = "automation_androidTakesSpentCatalystsOut")
     public static void androidTakesSpentCatalystsOut(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
         BlockPos at = p(0, 1, 3);
@@ -1823,8 +1824,9 @@ public final class AndroidGameTests {
     }
 
     /** 触媒は使いかけでも使い、寿命の短いものから使う（新品の時間結晶触媒は残る）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidUsesShortLivedCatalystFirst")
     public static void androidUsesShortLivedCatalystFirst(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
         BlockPos at = p(0, 1, 3);
