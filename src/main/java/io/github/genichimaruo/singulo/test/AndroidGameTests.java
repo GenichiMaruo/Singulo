@@ -982,7 +982,7 @@ public final class AndroidGameTests {
     }
 
     /** 2つ目の資材口（隣にチェスト）。指令台から遠い隅に置き、指令台につなぐ。 */
-    private static final BlockPos SUPPLY2 = new BlockPos(6, 1, 5), CHEST2 = new BlockPos(6, 1, 6);
+    private static final BlockPos SUPPLY2 = p(6, 1, 5), CHEST2 = p(6, 1, 6);
 
     private static io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity secondPort(GameTestHelper helper) {
         var level = helper.getLevel();
@@ -1046,7 +1046,7 @@ public final class AndroidGameTests {
         var level = helper.getLevel();
         var catalyst = item("time_crystal_catalyst");
         port.entries().setItem(0, new ItemStack(catalyst));
-        BlockPos at = new BlockPos(0, 1, 3);
+        BlockPos at = p(0, 1, 3);
         helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
@@ -1777,7 +1777,7 @@ public final class AndroidGameTests {
     public static void androidTakesSpentCatalystsOut(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos at = new BlockPos(0, 1, 3);
+        BlockPos at = p(0, 1, 3);
         helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
@@ -1824,7 +1824,7 @@ public final class AndroidGameTests {
     public static void androidUsesShortLivedCatalystFirst(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos at = new BlockPos(0, 1, 3);
+        BlockPos at = p(0, 1, 3);
         helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
