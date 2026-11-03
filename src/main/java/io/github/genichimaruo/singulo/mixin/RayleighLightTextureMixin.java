@@ -13,10 +13,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /** Run the same vanilla color calculation for the additional local-noon banks. */
 @Mixin(LightTexture.class)
-public abstract class RayleighLightTextureMixin {
+public abstract class RayleighLightTextureMixin implements io.github.genichimaruo.singulo.client.RayleighLightmapAccess {
     @Shadow @Final private Minecraft minecraft;
     @Shadow private boolean updateLightTexture;
     @Unique private boolean singulo$noonPass, singulo$wasDirty;
+    @Unique private boolean singulo$noonDirty = true;
+    @Override public boolean singulo$isNoonPass() { return singulo$noonPass; }
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void singulo$invalidateNoon(CallbackInfo ci) { singulo$noonDirty = true; }
     @Unique private DynamicTexture singulo$preview;
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -43,11 +47,17 @@ public abstract class RayleighLightTextureMixin {
 
     @Inject(method = "updateLightTexture", at = @At("HEAD"))
     private void singulo$before(float partialTick, CallbackInfo ci) {
-        if (!singulo$noonPass) singulo$wasDirty = updateLightTexture;
+        if (!singulo$noonPass) {
+            singulo$wasDirty = updateLightTexture;
+            if (singulo$wasDirty) singulo$noonDirty = true;
+        }
     }
     @Inject(method = "updateLightTexture", at = @At("RETURN"))
     private void singulo$after(float partialTick, CallbackInfo ci) {
-        if (!singulo$noonPass && singulo$wasDirty && minecraft.level != null) {
+        if (!singulo$noonPass && singulo$wasDirty) singulo$ensureNoon(partialTick);
+    }
+    @Override public void singulo$ensureNoon(float partialTick) {
+        if (!singulo$noonPass && singulo$noonDirty && minecraft.level != null) {
             singulo$noonPass = true;
             try {
                 updateLightTexture = true;
@@ -90,5 +100,6 @@ public abstract class RayleighLightTextureMixin {
             image.setPixelRGBA(block, artificial * 16 + natural, combined);
         }
         texture.upload();
+        singulo$noonDirty = false;
     }
 }
