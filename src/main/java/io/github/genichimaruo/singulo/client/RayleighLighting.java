@@ -19,7 +19,11 @@ public final class RayleighLighting {
         // light engine. Only the vanilla world/region views support our lightmap banks;
         // leave other renderers' packed lighting untouched, without probing their engine.
         if (!(view instanceof Level) && !(view instanceof net.minecraft.client.renderer.chunk.RenderChunkRegion)) return null;
-        return view.getLightEngine() instanceof RayleighLightAccess access ? access.singulo$level() : null;
+        Level owner = view.getLightEngine() instanceof RayleighLightAccess access ? access.singulo$level() : null;
+        // Virtual levels (Ponder/schematic previews) can borrow the real world's light engine.
+        // Its sunlight belongs to the real world, not to blocks at the same preview coordinates.
+        if (view instanceof Level level && owner != level) return null;
+        return owner;
     }
     /** Convert a public combined SKY query back to its two independent render contributions. */
     public static int pack(BlockAndTintGetter view, BlockPos pos, int packed) {
