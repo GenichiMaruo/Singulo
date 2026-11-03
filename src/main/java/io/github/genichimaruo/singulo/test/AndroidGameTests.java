@@ -1006,8 +1006,9 @@ public final class AndroidGameTests {
     }
 
     /** 資材口の優先の取り出し: 登録した資材口から先に取る（近くの資材口にも同じ物があっても）。登録は保存しても残る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_supplyPortTakePriority")
     public static void supplyPortTakePriority(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var port = secondPort(helper);
         var planks = net.minecraft.world.item.Items.OAK_PLANKS;
@@ -1039,8 +1040,9 @@ public final class AndroidGameTests {
      * 取り出しの優先は、寿命の短い順より先: 近くの資材口に使いかけの時間結晶触媒、優先を登録した資材口に新品があれば、
      * 優先した資材口の新品を使う（使いかけは残る）。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_supplyPortPriorityBeatsShortLife")
     public static void supplyPortPriorityBeatsShortLife(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var port = secondPort(helper);
         var level = helper.getLevel();
@@ -1090,8 +1092,9 @@ public final class AndroidGameTests {
     }
 
     /** 資材口の優先の返却: 余った物は、登録した資材口へ戻す（近くの資材口ではなく）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_supplyPortReturnPriority")
     public static void supplyPortReturnPriority(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var console = workshop(helper, 0);
         var port = secondPort(helper);
         var stick = net.minecraft.world.item.Items.STICK;
