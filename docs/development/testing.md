@@ -82,3 +82,9 @@ bash ./gradlew --no-configuration-cache -I tools/review/jei.gradle runClient
 詳細な結果と所要時間は`build/reports/gametest/results.json`に出力する。チャンク待ちでは標準のテスト時間切れが始まらないことがあるため、120秒間どのテストも完了しない場合は検査サーバーを異常終了させる。これは成功条件の緩和ではなく、無期限の停止を検出するための監視である。
 
 CIは通常・GUI、描画連携、Mekanismの3ジョブを並列に走らせる。描画連携ジョブの9件は、専用ワールドの作成と独立した実行環境の検証も兼ねるため、通常ジョブとの重複を意図して残している。
+
+## Create/Ponderの照明互換性（0.14.1）
+
+通常GameTestで保存メタデータを作成した後、`python3 tools/review/prepare_ponder.py`で専用ワールドを用意する。`bash gradlew --no-configuration-cache -I tools/review/ponder.gradle runClient -PwithSodium`で実際のCreate 6.0.10を導入し、機械プレスのPonderを開く。Sodiumなしの確認は`-PwithSodium`を外す。
+
+`SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup`は仮想世界の分離・全256画素一致・入れ子と例外時の復元を示す。`SINGULO_PONDER_CAPTURE_COMPLETE`と`build/ponder-review/screenshots/ponder.png`は実画面の撮影完了を示す。撮影成功だけで黒化の解消を判定せず、画像も確認する。詳しい構成と再現範囲は[調査記録](../0.14.1/issue-52.md)を参照する。

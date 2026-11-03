@@ -79,7 +79,7 @@ jobs:
 
   sodium-lighting:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
@@ -122,6 +122,16 @@ jobs:
         run: |
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithSodium
           grep -q 'SINGULO_REJOIN_COMPLETE 5' build/rayleigh-review/logs/latest.log
+      - name: Verify real Create Ponder preview and lightmap state restoration
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_ponder.py
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/ponder.gradle runClient -PwithSodium
+          grep -q 'SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup' build/ponder-review/logs/latest.log
+          grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE' build/ponder-review/logs/latest.log
+          python3 tools/review/check_ponder_png.py
       - name: Save Sodium lighting evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -130,6 +140,8 @@ jobs:
           path: |
             build/rayleigh-review/logs/
             build/rayleigh-review/screenshots/
+            build/ponder-review/logs/
+            build/ponder-review/screenshots/
 
   optional-mekanism:
     runs-on: ubuntu-latest
