@@ -13,10 +13,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /** Run the same vanilla color calculation for the additional local-noon banks. */
 @Mixin(LightTexture.class)
-public abstract class RayleighLightTextureMixin {
+public abstract class RayleighLightTextureMixin implements io.github.genichimaruo.singulo.client.RayleighLightmapAccess {
     @Shadow @Final private Minecraft minecraft;
     @Shadow private boolean updateLightTexture;
     @Unique private boolean singulo$noonPass, singulo$wasDirty;
+    @Unique private boolean singulo$noonDirty = true;
+    @Override public boolean singulo$isNoonPass() { return singulo$noonPass; }
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void singulo$invalidateNoon(CallbackInfo ci) { singulo$noonDirty = true; }
+    @Unique private DynamicTexture singulo$preview;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void singulo$createPreview(net.minecraft.client.renderer.GameRenderer renderer, Minecraft client, CallbackInfo ci) {
+        singulo$preview = new DynamicTexture(16, 16, false);
+        singulo$preview.getPixels().fillRect(0, 0, 16, 16, -1);
+        singulo$preview.upload();
+        singulo$preview.setFilter(true, false);
+    }
+    @Inject(method = "close", at = @At("HEAD"))
+    private void singulo$closePreview(CallbackInfo ci) { if (singulo$preview != null) singulo$preview.close(); }
+    @Inject(method = "turnOnLightLayer", at = @At("RETURN"))
+    private void singulo$bindPreview(CallbackInfo ci) {
+        if (io.github.genichimaruo.singulo.client.PreviewLighting.active() && singulo$preview != null) {
+            com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(2, singulo$preview.getId());
+            singulo$preview.bind();
+            singulo$preview.setFilter(true, false);
+        }
+    }
     @Unique private final int[] singulo$noonColors = new int[256];
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;<init>(IIZ)V"), index = 1)
@@ -24,11 +47,17 @@ public abstract class RayleighLightTextureMixin {
 
     @Inject(method = "updateLightTexture", at = @At("HEAD"))
     private void singulo$before(float partialTick, CallbackInfo ci) {
-        if (!singulo$noonPass) singulo$wasDirty = updateLightTexture;
+        if (!singulo$noonPass) {
+            singulo$wasDirty = updateLightTexture;
+            if (singulo$wasDirty) singulo$noonDirty = true;
+        }
     }
     @Inject(method = "updateLightTexture", at = @At("RETURN"))
     private void singulo$after(float partialTick, CallbackInfo ci) {
-        if (!singulo$noonPass && singulo$wasDirty && minecraft.level != null) {
+        if (!singulo$noonPass && singulo$wasDirty) singulo$ensureNoon(partialTick);
+    }
+    @Override public void singulo$ensureNoon(float partialTick) {
+        if (!singulo$noonPass && singulo$noonDirty && minecraft.level != null) {
             singulo$noonPass = true;
             try {
                 updateLightTexture = true;
@@ -54,6 +83,10 @@ public abstract class RayleighLightTextureMixin {
     private void singulo$upload(DynamicTexture texture) {
         if (!singulo$noonPass) return;
         NativeImage image = texture.getPixels();
+        // Keep ordinary 16x16 UVs valid for external previews. Copy before combined banks overwrite rows.
+        NativeImage preview = singulo$preview.getPixels();
+        for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) preview.setPixelRGBA(x, y, image.getPixelRGBA(x, y));
+        singulo$preview.upload();
         // Rows 16..31 are temporary: copy before overwriting them with the combined banks.
         int[] noon = singulo$noonColors;
         for (int sky = 0; sky < 16; sky++) for (int block = 0; block < 16; block++) noon[sky * 16 + block] = image.getPixelRGBA(block, sky + 16);
@@ -67,5 +100,6 @@ public abstract class RayleighLightTextureMixin {
             image.setPixelRGBA(block, artificial * 16 + natural, combined);
         }
         texture.upload();
+        singulo$noonDirty = false;
     }
 }

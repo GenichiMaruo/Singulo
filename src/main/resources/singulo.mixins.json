@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.genichimaruo.singulo.mixin",
+  "plugin": "io.github.genichimaruo.singulo.mixin.RayleighMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "DaylightDetectorBlockMixin",
@@ -22,6 +23,8 @@
   },
   "client": [
     "RayleighLightTextureMixin",
+    "RayleighGameRendererMixin",
+    "PonderLightingMixin",
     "RayleighRenderLightMixin",
     "RayleighEntityLightMixin",
     "RayleighAmbientLightMixin",
