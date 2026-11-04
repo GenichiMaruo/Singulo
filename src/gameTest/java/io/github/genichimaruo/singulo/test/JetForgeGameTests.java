@@ -515,4 +515,99 @@ public final class JetForgeGameTests {
             helper.assertTrue(n == 3 && be.items().getStackInSlot(JetForgeBlockEntity.SLOT_OUT).isEmpty(), "完成品が押し出されない: " + n);
         });
     }
+
+    /** A stopped beam must not hurt entities while consuming no power. */
+    @GameTest(template = FORGE, timeoutTicks = 100)
+    public static void jetForgeStoppedBeamDoesNotDamage(GameTestHelper helper) {
+        JetForgeBlockEntity be = build(helper);
+        helper.runAtTickTime(5, () -> {
+            be.forceBlackHole();
+            be.forcePhase(JetForgeBlockEntity.IRRADIATE, 100);
+        });
+        helper.runAtTickTime(10, () -> {
+            helper.assertTrue(be.hold() == JetForgeBlockEntity.NO_POWER, "Beam did not stop without power");
+            BlockPos p = at(helper, 30, JetForgeLayout.AXIS_Y, JetForgeLayout.AXIS_Z);
+            var golem = net.minecraft.world.entity.EntityType.IRON_GOLEM.create(helper.getLevel());
+            golem.moveTo(p.getX() + 0.5, p.getY() - 1.2, p.getZ() + 0.5);
+            golem.setNoAi(true);
+            golem.setNoGravity(true);
+            helper.getLevel().addFreshEntity(golem);
+            float health = golem.getHealth();
+            helper.runAfterDelay(25, () -> {
+                helper.assertTrue(golem.getHealth() == health && !golem.isOnFire(), "Stopped beam still damages entities");
+                helper.succeed();
+            });
+        });
+    }
+
+    /** A save immediately after a non-sync progress tick must include that progress. */
+    @GameTest(template = FORGE, timeoutTicks = 100)
+    public static void jetForgeProgressMarksChunkDirtyBetweenPackets(GameTestHelper helper) {
+        JetForgeBlockEntity be = build(helper);
+        helper.runAtTickTime(5, () -> {
+            be.forceBlackHole();
+            be.forcePhase(JetForgeBlockEntity.PRIME, 1);
+            JetForgeBlockEntity.serverTick(helper.getLevel(), be.getBlockPos(), be.getBlockState(), be);
+            var chunk = helper.getLevel().getChunkAt(be.getBlockPos());
+            chunk.setUnsaved(false);
+            int before = be.phaseTicks();
+            JetForgeBlockEntity.serverTick(helper.getLevel(), be.getBlockPos(), be.getBlockState(), be);
+            helper.assertTrue(be.phaseTicks() == before + 1 && chunk.isUnsaved(), "Progress did not mark the chunk dirty");
+            helper.succeed();
+        });
+    }
+
+    /** An oversized data-pack result must wait instead of overfilling an empty output. */
+    @GameTest(template = FORGE, timeoutTicks = 100)
+    public static void jetForgeOversizedResultWaitsWithoutLoss(GameTestHelper helper) {
+        JetForgeBlockEntity be = build(helper);
+        helper.runAtTickTime(5, () -> {
+            be.forceBlackHole();
+            be.forcePhase(JetForgeBlockEntity.COOL, JetForgeBlockEntity.COOL_TICKS);
+            var registries = helper.getLevel().registryAccess();
+            CompoundTag saved = be.saveWithoutMetadata(registries);
+            saved.put("result", new ItemStack(item("collapsar_ingot"), 65).save(registries));
+            be.loadWithComponents(saved, registries);
+        });
+        helper.runAtTickTime(15, () -> {
+            helper.assertTrue(be.hold() == JetForgeBlockEntity.OUTPUT_FULL && be.phase() == JetForgeBlockEntity.COOL,
+                    "Oversized result did not wait");
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_OUT).isEmpty() && be.result().getCount() == 65,
+                    "Oversized result was lost or overfilled output");
+            helper.succeed();
+        });
+    }
+
+    /** A missing footprint chunk must pause every tick, even across several cell sweeps. */
+    @GameTest(template = FORGE, timeoutTicks = 180)
+    public static void jetForgeMissingChunkStaysPausedAcrossSweeps(GameTestHelper helper) {
+        JetForgeBlockEntity original = build(helper);
+        boolean[] loaded = {true};
+        JetForgeBlockEntity be = new JetForgeBlockEntity(original.getBlockPos(), original.getBlockState()) {
+            @Override protected boolean shapeChunksLoaded(net.minecraft.server.level.ServerLevel level) {
+                return loaded[0] && super.shapeChunksLoaded(level);
+            }
+        };
+        helper.getLevel().setBlockEntity(be);
+        load(be, 1);
+        power(helper, be, new boolean[]{true});
+        int[] frozen = new int[1];
+        long[] consumed = new long[1];
+        helper.runAtTickTime(20, () -> loaded[0] = false);
+        helper.runAtTickTime(22, () -> {
+            helper.assertTrue(be.hold() == JetForgeBlockEntity.UNLOADED, "Missing chunk did not pause processing");
+            frozen[0] = be.phaseTicks();
+            consumed[0] = be.consumedTotal();
+        });
+        helper.runAtTickTime(90, () -> {
+            helper.assertTrue(be.hold() == JetForgeBlockEntity.UNLOADED && be.phase() == JetForgeBlockEntity.PRIME
+                    && be.phaseTicks() == frozen[0] && be.consumedTotal() == consumed[0],
+                    "A later validation slice resumed processing with a missing chunk");
+            loaded[0] = true;
+        });
+        helper.runAtTickTime(100, () -> {
+            helper.assertTrue(be.hold() == JetForgeBlockEntity.OK && be.phaseTicks() > frozen[0], "Reload did not resume processing");
+            helper.succeed();
+        });
+    }
 }

@@ -32,7 +32,7 @@ import org.lwjgl.opengl.GL30;
  * 重力レンズの画面効果。ブラックホール（リアクターの炉心）とワームホールの口の描画がフレームごとに「レンズ」を登録し、
  * ワールドを描き終えたあとで画面をコピーして、シュバルツシルト時空の光の曲がり方で背景をずらして描き直す。
  * 中心は地平線の約2.6倍の影で黒く、その縁に光子リングが光り、外側では背景がアインシュタインリング状に引き伸ばされる。
- * 歪みの範囲はミップマップから読むので、低い解像度でもブロック状のノイズにならない。1フレームに効かせるのはカメラに近い4つまで。
+ * 歪みの範囲はミップマップから読むので、低い解像度でもブロック状のノイズにならない。1フレームに効かせるのは4つまで（影と円盤を受理した分の枠を先に確保し、残りは近い歪みを使う）。
  * クライアント設定 gravitationalLensing で切れる。
  * <p>
  * Iris 系のシェーダーパックを使っているとき（専用の処理）: シェーダーパックは自分の画面と深度で描き、最後に画面へ合成するので、
@@ -94,7 +94,8 @@ public final class GravitationalLensing {
      */
     static boolean addBlackHole(Vec3 pos, float radius, float strength, float region, Vec3 diskNormal, float inner, float outer,
                                 float beaming) {
-        if (shader == null || !enabled() || shaderPackInUse() || SOURCES.size() >= 32) {
+        if (shader == null || !enabled() || shaderPackInUse() || SOURCES.size() >= 32
+                || SOURCES.stream().filter(s -> s.disk != null).count() >= MAX_LENSES) {
             return false;
         }
         SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true,
@@ -105,7 +106,8 @@ public final class GravitationalLensing {
     /** 明るさと渦の筋を変えられる降着円盤つきのブラックホール（降着ジェット鍛造炉）。ほかは {@link #addBlackHole} と同じ。 */
     static boolean addBlackHole(Vec3 pos, float radius, float strength, float region, Vec3 diskNormal, float inner, float outer,
                                 float beaming, float brightness, float swirl) {
-        if (shader == null || !enabled() || shaderPackInUse() || SOURCES.size() >= 32) {
+        if (shader == null || !enabled() || shaderPackInUse() || SOURCES.size() >= 32
+                || SOURCES.stream().filter(s -> s.disk != null).count() >= MAX_LENSES) {
             return false;
         }
         SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true,
@@ -278,7 +280,10 @@ public final class GravitationalLensing {
         float[][] spheres = new float[MAX_LENSES][];
         float[][] disks = new float[MAX_LENSES][];
         int n = 0;
-        SOURCES.sort(Comparator.comparingDouble(s -> s.pos.distanceToSqr(cam)));
+        // Traced sources suppressed their world geometry when accepted. Reserve their
+        // shader slots before adding optional distortions, so none can be evicted.
+        SOURCES.sort(Comparator.comparing((Source s) -> s.disk == null)
+                .thenComparingDouble(s -> s.pos.distanceToSqr(cam)));
         for (Source s : SOURCES) {
             if (n >= MAX_LENSES) {
                 break;

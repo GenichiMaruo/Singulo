@@ -184,6 +184,20 @@ public final class ShapeSpec {
         return cells().length;
     }
 
+    /** Check the small chunk footprint without reading blocks or loading chunks. */
+    public boolean chunksLoaded(Level level, BlockPos controller, Direction back) {
+        BlockPos a = pos(controller, back, 0, 0, 0);
+        BlockPos b = pos(controller, back, width - 1, 0, depth - 1);
+        for (int x = Math.min(a.getX(), b.getX()) >> 4; x <= (Math.max(a.getX(), b.getX()) >> 4); x++) {
+            for (int z = Math.min(a.getZ(), b.getZ()) >> 4; z <= (Math.max(a.getZ(), b.getZ()) >> 4); z++) {
+                if (!level.isLoaded(new BlockPos(x << 4, controller.getY(), z << 4))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * 判定する位置のうち [from, to) だけを確かめる。ports にはその範囲の搬入出ポートを足す。
      * 読み込まれていないチャンクにかかる位置があれば null（読み込んでまで確かめない。形が壊れたとは見なさない）。

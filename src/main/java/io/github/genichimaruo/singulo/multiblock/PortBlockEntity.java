@@ -87,7 +87,7 @@ public class PortBlockEntity extends BlockEntity {
     /** コントローラの能力をそのまま返す（未形成なら null）。 */
     @Nullable
     public <T> T delegate(net.neoforged.neoforge.capabilities.BlockCapability<T, net.minecraft.core.Direction> capability) {
-        if (controller == null || level == null || controller.equals(worldPosition)) {
+        if (controller == null || level == null || controller.equals(worldPosition) || !level.isLoaded(controller)) {
             return null;
         }
         if (level.getBlockEntity(controller) instanceof MachineBlockEntity machine && machine.structureSize() <= 0) {

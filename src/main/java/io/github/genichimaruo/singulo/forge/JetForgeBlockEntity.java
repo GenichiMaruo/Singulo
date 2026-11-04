@@ -478,7 +478,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     /** 描き方の時計と、同期を待たない段階の進み（サーバーと同じく、待っている間は進めない）。 */
     public static void clientTick(Level level, BlockPos pos, BlockState state, JetForgeBlockEntity be) {
         be.clientTicks++;
-        if (be.bh == BH_IGNITING && be.formed) {
+        if (be.bh == BH_IGNITING && be.hold == IGNITING) {
             be.ignitionElapsed++;
         }
         if (be.phase != IDLE && be.hold == OK && be.phaseTicks < be.duration(be.phase)) {
@@ -523,7 +523,10 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         if (bh == BH_IGNITING && !formed) {
             abortIgnition(level, "gui.singulo.jet_forge.ignition_broken");
         }
-        if (dirtySync || phase != IDLE && ++syncTimer >= SYNC_INTERVAL) {
+        if (phase != IDLE || bh == BH_IGNITING) {
+            setChanged(); // Progress must survive a save/unload between synchronization packets.
+        }
+        if (dirtySync || (phase != IDLE || bh == BH_IGNITING) && ++syncTimer >= SYNC_INTERVAL) {
             syncTimer = 0;
             dirtySync = false;
             setChanged();
@@ -552,6 +555,10 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             nextFind = level.getGameTime() + FIND_INTERVAL;
             boolean anyUnloaded = false;
             for (Direction d : Direction.Plane.HORIZONTAL) {
+                // A live black hole stays at its saved location when the frame is rebuilt.
+                if (bh == BH_ACTIVE && back != null && d != back) {
+                    continue;
+                }
                 List<BlockPos> found = new ArrayList<>();
                 Boolean ok = spec.matchesCells(level, worldPosition, d, block, 0, spec.cellCount(), found);
                 if (ok == Boolean.TRUE && !centerClear(level, d)) {
@@ -578,6 +585,15 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             }
             unloaded = anyUnloaded;
             firstCheck = false;
+            return;
+        }
+        // Test every intersecting chunk each tick, independently of the cell sweep.
+        // Otherwise an unloaded cell late in the sweep permits several ticks of processing
+        // each time the cursor restarts at zero. This never requests chunk loading.
+        if (!shapeChunksLoaded(level)) {
+            unloaded = true;
+            sweepPorts.clear();
+            verifyCursor = 0;
             return;
         }
         int to = verifyCursor + VERIFY_PER_TICK;
@@ -610,9 +626,18 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         }
     }
 
+    /** Chunk availability is independent of the incremental block-validation cursor. */
+    protected boolean shapeChunksLoaded(ServerLevel level) {
+        return JetForgeLayout.SPEC.chunksLoaded(level, worldPosition, back);
+    }
+
     /** 炉心の中心が空気か野良ブラックホールか（ほかのブロックが詰まっていたら形ができていない）。 */
     private boolean centerClear(Level level, Direction d) {
-        BlockState s = level.getBlockState(BlockPos.containing(JetForgeLayout.core(worldPosition, d)));
+        BlockPos center = BlockPos.containing(JetForgeLayout.core(worldPosition, d));
+        if (!level.isLoaded(center)) {
+            return false;
+        }
+        BlockState s = level.getBlockState(center);
         return s.isAir() || s.is(io.github.genichimaruo.singulo.registry.SinguloBlocks.ROGUE_BLACK_HOLE.get());
     }
 
@@ -821,12 +846,14 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     }
 
     private boolean fluidsReady(MachineRecipe r) {
+        long total = 0;
         for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
             if (!in.matches(tank.getFluid())) {
                 return false;
             }
+            total += in.amount();
         }
-        return true;
+        return total <= tank.getFluidAmount();
     }
 
     /** 完成品が出力の枠に入るか。 */
@@ -835,8 +862,9 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             return true;
         }
         ItemStack out = items.getStackInSlot(SLOT_OUT);
-        return out.isEmpty() || ItemStack.isSameItemSameComponents(out, stack)
-                && out.getCount() + stack.getCount() <= Math.min(out.getMaxStackSize(), items.getSlotLimit(SLOT_OUT));
+        return stack.getCount() <= Math.min(stack.getMaxStackSize(), items.getSlotLimit(SLOT_OUT))
+                && (out.isEmpty() || ItemStack.isSameItemSameComponents(out, stack)
+                && out.getCount() + stack.getCount() <= Math.min(out.getMaxStackSize(), items.getSlotLimit(SLOT_OUT)));
     }
 
     private void advance(ServerLevel level) {
@@ -935,7 +963,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     static final double BEAM_RADIUS = 0.8;
 
     private void hazards(ServerLevel level) {
-        if (back == null || phase < IGNITE || phase > FINISH) {
+        if (back == null || hold != OK || phase < IGNITE || phase > IRRADIATE) {
             return;
         }
         Vec3 from = JetForgeLayout.at(worldPosition, back, 1, JetForgeLayout.AXIS_Y, JetForgeLayout.AXIS_Z);
@@ -999,7 +1027,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             case DeviceMenu.Forge.DEMAND_MFE -> (int) Math.min(Integer.MAX_VALUE, demand(phase == IDLE ? IRRADIATE : phase) / 1_000_000L);
             case DeviceMenu.Forge.BH -> bh;
             case DeviceMenu.Forge.SEED -> hasSeed() ? 1 : 0;
-            case DeviceMenu.Forge.IGNITION_PCT -> ignitionCharged ? 100 : (int) Math.min(100, ignitionStored * 100 / Math.max(1, ignitionEnergy()));
+            case DeviceMenu.Forge.IGNITION_PCT -> ignitionCharged ? 100 : (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy()));
             case DeviceMenu.Forge.IGNITION_SECS -> bh != BH_IGNITING ? 0 : ignitionCharged
                     ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : Math.max(0, ignitionLeft) / 20;
             case DeviceMenu.Forge.IGNITION_GFE -> (int) Math.min(Integer.MAX_VALUE, ignitionEnergy() / 1_000_000_000L);
@@ -1391,7 +1419,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         result = tag.contains("result") ? ItemStack.parseOptional(registries, tag.getCompound("result")) : ItemStack.EMPTY;
         int was = bh;
         bh = tag.getInt("bh");
-        if (level != null && level.isClientSide && was != BH_ACTIVE && bh == BH_ACTIVE) {
+        if (level != null && level.isClientSide && clientSynchronized && was != BH_ACTIVE && bh == BH_ACTIVE) {
             clientFormedAt = clientTicks;                 // できた瞬間の閃光（描画）
         }
         ignitionElapsed = tag.getInt("ignition_elapsed");
@@ -1400,6 +1428,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         int b = tag.contains("back") ? tag.getInt("back") : -1;
         back = b >= 2 && b < 6 ? Direction.from3DDataValue(b) : null;
         if (tag.contains("sync")) {
+            clientSynchronized = true;
             // クライアントへの同期（形・コアの有無）
             formed = tag.getBoolean("formed");
             clientCore = tag.getBoolean("core");
@@ -1407,6 +1436,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     }
 
     private boolean clientCore;
+    private boolean clientSynchronized;
     private int clientFormedAt = Integer.MIN_VALUE / 2;
 
     /** クライアントで、ブラックホールができてからの tick（できた瞬間の閃光に使う）。 */

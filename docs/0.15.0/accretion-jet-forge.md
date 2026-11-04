@@ -115,9 +115,11 @@ Pリアクターへの機能追加や、創世炉の別レシピにはしてい�
 - 共通タグ: `c:ingots/collapsar`（`c:ingots` にも入る）
 - Singulo からは装備・道具を追加しない。将来の装備 mod へ依存もしない。
 
-## 検証
+## 元実装者が記録した検証（今回未再現）
 
-実行したもの（2026-11-05）:
+以下は元実装時の記録です。今回の修正コミットの成功証跡には使用しません。[今回の記録](review.md)を参照してください。
+
+元記録の日付表記: 2026-11-05（今回の環境日は2026-11-04）。
 
 - `bash ./gradlew build runGameTestServer`: 658件すべて成功（新規 `JetForgeGameTests` 17件を含む）。`tools/check_gametests.py` と `tools/check_release_1211.py --loader neoforge --build-dir build` も成功（製品 JAR にテストコードなし）。
 - `JetForgeGameTests` で確かめたこと:
