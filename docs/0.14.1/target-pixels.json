@@ -1,0 +1,277 @@
+{
+  "note": "Diagnostic ROI averages; animated poses differ. Visual object review is required. Not a universal blackening classifier.",
+  "targets": [
+    {
+      "scene": "press",
+      "version": "0.14.0",
+      "target": "floor",
+      "roi": [
+        500,
+        450,
+        560,
+        475
+      ],
+      "mean_RGB": [
+        125.95,
+        199.92,
+        90.17
+      ],
+      "green_excess_G_minus_RBmean": 91.86
+    },
+    {
+      "scene": "press",
+      "version": "0.14.0",
+      "target": "machine_housing",
+      "roi": [
+        605,
+        248,
+        670,
+        300
+      ],
+      "mean_RGB": [
+        54.05,
+        81.3,
+        33.01
+      ],
+      "green_excess_G_minus_RBmean": 37.77
+    },
+    {
+      "scene": "press",
+      "version": "0.14.1",
+      "target": "floor",
+      "roi": [
+        500,
+        450,
+        560,
+        475
+      ],
+      "mean_RGB": [
+        215.77,
+        219.96,
+        220.27
+      ],
+      "green_excess_G_minus_RBmean": 1.94
+    },
+    {
+      "scene": "press",
+      "version": "0.14.1",
+      "target": "machine_housing",
+      "roi": [
+        605,
+        248,
+        670,
+        300
+      ],
+      "mean_RGB": [
+        97.67,
+        92.28,
+        80.38
+      ],
+      "green_excess_G_minus_RBmean": 3.25
+    },
+    {
+      "scene": "chute",
+      "version": "0.14.0",
+      "target": "floor",
+      "roi": [
+        500,
+        450,
+        560,
+        475
+      ],
+      "mean_RGB": [
+        125.16,
+        199.15,
+        89.74
+      ],
+      "green_excess_G_minus_RBmean": 91.7
+    },
+    {
+      "scene": "chute",
+      "version": "0.14.0",
+      "target": "chute_body",
+      "roi": [
+        620,
+        328,
+        665,
+        357
+      ],
+      "mean_RGB": [
+        43.17,
+        64.72,
+        30.14
+      ],
+      "green_excess_G_minus_RBmean": 28.06
+    },
+    {
+      "scene": "chute",
+      "version": "0.14.0",
+      "target": "chest",
+      "roi": [
+        620,
+        240,
+        660,
+        270
+      ],
+      "mean_RGB": [
+        102.18,
+        77.46,
+        39.32
+      ],
+      "green_excess_G_minus_RBmean": 6.7
+    },
+    {
+      "scene": "chute",
+      "version": "0.14.1",
+      "target": "floor",
+      "roi": [
+        500,
+        450,
+        560,
+        475
+      ],
+      "mean_RGB": [
+        214.2,
+        218.93,
+        219.16
+      ],
+      "green_excess_G_minus_RBmean": 2.25
+    },
+    {
+      "scene": "chute",
+      "version": "0.14.1",
+      "target": "chute_body",
+      "roi": [
+        620,
+        328,
+        665,
+        357
+      ],
+      "mean_RGB": [
+        72.23,
+        70.17,
+        70.74
+      ],
+      "green_excess_G_minus_RBmean": -1.31
+    },
+    {
+      "scene": "chute",
+      "version": "0.14.1",
+      "target": "chest",
+      "roi": [
+        620,
+        240,
+        660,
+        270
+      ],
+      "mean_RGB": [
+        102.18,
+        77.46,
+        39.32
+      ],
+      "green_excess_G_minus_RBmean": 6.7
+    },
+    {
+      "scene": "pump",
+      "version": "0.14.0",
+      "target": "floor",
+      "roi": [
+        650,
+        490,
+        680,
+        510
+      ],
+      "mean_RGB": [
+        119.31,
+        190.96,
+        86.32
+      ],
+      "green_excess_G_minus_RBmean": 88.15
+    },
+    {
+      "scene": "pump",
+      "version": "0.14.0",
+      "target": "pump_housing",
+      "roi": [
+        578,
+        377,
+        617,
+        402
+      ],
+      "mean_RGB": [
+        79.77,
+        120.11,
+        52.47
+      ],
+      "green_excess_G_minus_RBmean": 53.99
+    },
+    {
+      "scene": "pump",
+      "version": "0.14.0",
+      "target": "yellow_fluid",
+      "roi": [
+        558,
+        305,
+        578,
+        322
+      ],
+      "mean_RGB": [
+        108.71,
+        133.23,
+        37.94
+      ],
+      "green_excess_G_minus_RBmean": 59.9
+    },
+    {
+      "scene": "pump",
+      "version": "0.14.1",
+      "target": "floor",
+      "roi": [
+        650,
+        490,
+        680,
+        510
+      ],
+      "mean_RGB": [
+        204.99,
+        210.29,
+        210.97
+      ],
+      "green_excess_G_minus_RBmean": 2.31
+    },
+    {
+      "scene": "pump",
+      "version": "0.14.1",
+      "target": "pump_housing",
+      "roi": [
+        578,
+        377,
+        617,
+        402
+      ],
+      "mean_RGB": [
+        134.66,
+        130.92,
+        126.9
+      ],
+      "green_excess_G_minus_RBmean": 0.14
+    },
+    {
+      "scene": "pump",
+      "version": "0.14.1",
+      "target": "yellow_fluid",
+      "roi": [
+        558,
+        305,
+        578,
+        322
+      ],
+      "mean_RGB": [
+        168.71,
+        136.39,
+        84.3
+      ],
+      "green_excess_G_minus_RBmean": 9.89
+    }
+  ]
+}
