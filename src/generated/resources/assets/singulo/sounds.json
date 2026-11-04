@@ -1929,6 +1929,123 @@
       }
     ]
   },
+  "black_hole.open": {
+    "subtitle": "subtitles.singulo.black_hole.open",
+    "sounds": [
+      {
+        "name": "singulo:black_hole/open",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "jet_forge.formed": {
+    "subtitle": "subtitles.singulo.jet_forge.formed",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/formed",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "jet_forge.warning": {
+    "subtitle": "subtitles.singulo.jet_forge.warning",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/warning",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "jet_forge.spool": {
+    "subtitle": "subtitles.singulo.jet_forge.spool",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/spool",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "jet_forge.focus": {
+    "subtitle": "subtitles.singulo.jet_forge.focus",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/focus",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "jet_forge.beam_start": {
+    "subtitle": "subtitles.singulo.jet_forge.beam_start",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/beam_start",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "jet_forge.beam": {
+    "subtitle": "subtitles.singulo.jet_forge.beam",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/beam",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "jet_forge.jet": {
+    "subtitle": "subtitles.singulo.jet_forge.jet",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/jet",
+        "attenuation_distance": 80
+      }
+    ]
+  },
+  "jet_forge.arc": {
+    "subtitle": "subtitles.singulo.jet_forge.arc",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/arc",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "jet_forge.pulse": {
+    "subtitle": "subtitles.singulo.jet_forge.pulse",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/pulse",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "jet_forge.finish": {
+    "subtitle": "subtitles.singulo.jet_forge.finish",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/finish",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "jet_forge.cool": {
+    "subtitle": "subtitles.singulo.jet_forge.cool",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/cool",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "jet_forge.collect": {
+    "subtitle": "subtitles.singulo.jet_forge.collect",
+    "sounds": [
+      {
+        "name": "singulo:jet_forge/collect",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "android.power_down": {
     "subtitle": "subtitles.singulo.android.power_down",
     "sounds": [

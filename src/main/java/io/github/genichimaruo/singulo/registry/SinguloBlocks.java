@@ -118,6 +118,53 @@ public final class SinguloBlocks {
     public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_COIL = part("wormhole_generator_coil", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_FOCUSER = part("wormhole_generator_focuser", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<GlassPartBlock> WORMHOLE_GENERATOR_WINDOW = glassPart("wormhole_generator_window");
+    public static final RegistryObject<PartBlock> COOLING_TOWER_BASE = part("cooling_tower_base", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> COOLING_TOWER_CASING = part("cooling_tower_casing", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> COOLING_TOWER_GLASS = glassPart("cooling_tower_glass");
+    public static final RegistryObject<PartBlock> COOLING_TOWER_COOLANT_BAND = part("cooling_tower_coolant_band", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> COOLING_TOWER_RIM = part("cooling_tower_rim", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> COOLING_TOWER_GRATE = glassPart("cooling_tower_grate");
+    public static final RegistryObject<PartBlock> HEAT_EXCHANGE_CORE = part("heat_exchange_core", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_FRAME = part("degenerate_compactor_frame", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_PLATE = part("degenerate_compactor_plate", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_RAM = part("degenerate_compactor_ram", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_ANVIL = part("degenerate_compactor_anvil", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_VENT = part("degenerate_compactor_vent", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> DEGENERATE_COMPACTOR_WINDOW = glassPart("degenerate_compactor_window");
+    public static final RegistryObject<PartBlock> CASIMIR_CAVITY_FRAME = part("casimir_cavity_frame", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> CASIMIR_CAVITY_PUMP = part("casimir_cavity_pump", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> MIRROR_PLATE = part("mirror_plate", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> CASIMIR_CAVITY_WALL = part("casimir_cavity_wall", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> CASIMIR_CAVITY_SHIELD = part("casimir_cavity_shield", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> CASIMIR_CAVITY_WINDOW = glassPart("casimir_cavity_window");
+    public static final RegistryObject<PartBlock> DEGENERATE_FURNACE_FRAME = part("degenerate_furnace_frame", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_FURNACE_SHELL = part("degenerate_furnace_shell", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_FURNACE_PISTON = part("degenerate_furnace_piston", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_FURNACE_FIN = part("degenerate_furnace_fin", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> DEGENERATE_FURNACE_TUBE = part("degenerate_furnace_tube", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> DEGENERATE_FURNACE_WINDOW = glassPart("degenerate_furnace_window");
+    public static final RegistryObject<PartBlock> SHIELD_TOWER_PLINTH = part("shield_tower_plinth", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> SHIELD_TOWER_COIL = part("shield_tower_coil", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> SHIELD_TOWER_BODY = part("shield_tower_body", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> SHIELD_TOWER_WAVEGUIDE = glassPart("shield_tower_waveguide");
+    public static final RegistryObject<PartBlock> SHIELD_TOWER_CROWN = part("shield_tower_crown", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> TIPLER_FRAME = part("tipler_frame", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> TIPLER_HOUSING = part("tipler_housing", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> TIPLER_BEARING = part("tipler_bearing", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> TIPLER_WINDOW = glassPart("tipler_window");
+    public static final RegistryObject<PartBlock> TIPLER_HOLDER = part("tipler_holder", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_SHELL = part("wormhole_generator_shell", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_COIL = part("wormhole_generator_coil", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_FOCUSER = part("wormhole_generator_focuser", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<GlassPartBlock> WORMHOLE_GENERATOR_WINDOW = glassPart("wormhole_generator_window");
+    // 降着ジェット鍛造炉（形は forge.JetForgeLayout）
+    public static final RegistryObject<PartBlock> JET_FORGE_FOUNDATION = part("jet_forge_foundation", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_CONFINEMENT_COIL = part("jet_forge_confinement_coil", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_COLLIMATOR = part("jet_forge_collimator", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_HEAT_SINK = part("jet_forge_heat_sink", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_TRUSS = part("jet_forge_truss", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_LEVITATOR = part("jet_forge_levitator", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_COLLECTOR = part("jet_forge_collector", MultiblockPart.Role.STRUCTURE);
     // 粒子加速器・ペンローズ・リアクター
     public static final RegistryObject<PartBlock> ACCELERATOR_TUBE = BLOCKS.register("accelerator_tube", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.ACCELERATOR_TUBE));
     public static final RegistryObject<PartBlock> FOCUSING_MAGNET = BLOCKS.register("focusing_magnet", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.FOCUSING_MAGNET));
@@ -235,6 +282,12 @@ public final class SinguloBlocks {
             BLOCKS.register("gravitational_containment_tank", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.CONTAINMENT_TANK, io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::new,
                     io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::serverTick));
+    /** 降着ジェット鍛造炉の制御核（土台の手前の枝の先に置く）。 */
+    public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.forge.JetForgeBlockEntity>> JET_FORGE_CORE =
+            BLOCKS.register("jet_forge_core", () -> new SimpleMachineBlock<>(machineProperties(),
+                    SinguloBlockEntities.JET_FORGE, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::new,
+                    io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::serverTick,
+                    io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::clientTick));
     /** ワームホール生成器のコア（3×3×3 の底の中央に置く）。 */
     public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity>> WORMHOLE_GENERATOR_CORE =
             BLOCKS.register("wormhole_generator_core", () -> new SimpleMachineBlock<>(machineProperties(),

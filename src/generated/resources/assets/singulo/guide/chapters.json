@@ -161,6 +161,15 @@
       ]
     },
     {
+      "id": "jet_forge",
+      "icon": "singulo:jet_forge_core",
+      "pages": [
+        "jet_forge.build",
+        "jet_forge.run",
+        "jet_forge.ingot"
+      ]
+    },
+    {
       "id": "hazards",
       "icon": "minecraft:tnt",
       "pages": [

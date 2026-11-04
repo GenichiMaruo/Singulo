@@ -1,0 +1,38 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 160,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:nihonium_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:hopper"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:heat_exchange_core"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_catalyst"
+      },
+      "tier": 4,
+      "uses": 1125
+    }
+  ],
+  "result": {
+    "id": "singulo:jet_forge_collector",
+    "count": 1
+  }
+}

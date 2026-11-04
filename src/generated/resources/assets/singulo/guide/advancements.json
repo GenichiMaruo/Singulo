@@ -365,6 +365,16 @@
       "id": "android_factory_print",
       "parent": "ruin_android_lab",
       "stage": 4
+    },
+    {
+      "id": "jet_forge",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "collapsar",
+      "parent": "jet_forge",
+      "stage": 5
     }
   ]
 }

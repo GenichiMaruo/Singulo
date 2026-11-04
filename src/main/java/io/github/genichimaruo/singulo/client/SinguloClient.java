@@ -36,6 +36,8 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(SinguloClient::addWingLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
+        modBus.addListener(JetForgeRenderTypes::registerShaders);
+        modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
@@ -63,6 +65,9 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(UiClick::onMouse);
         MinecraftForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(JetForgeEffects::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(JetForgeEffects::onCameraAngles);
+        MinecraftForge.EVENT_BUS.addListener(JetForgeEffects::onRenderGui);
         MinecraftForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(BossSounds::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
@@ -169,7 +174,7 @@ public final class SinguloClient {
                         float scale = be.anomalyScale(be.getLevel().getGameTime() + pt);
                         if (scale > 0.01F) {
                             net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
-                            GravitationalLensing.add(c, 1.2F * scale, 0.5F * Math.min(1, scale));
+                            GravitationalLensing.add(c, 0.7F * scale, 0.5F * Math.min(1, scale));
                         }
                     }
 
@@ -196,6 +201,7 @@ public final class SinguloClient {
                 CasimirCavityRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.COOLING_TOWER_CONTROLLER.get(),
                 CoolingTowerRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.JET_FORGE.get(), JetForgeRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.WORMHOLE_GENERATOR.get(),
                 WormholeGeneratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ROGUE_BLACK_HOLE.get(),

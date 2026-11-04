@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:jet_forge_core"
+    },
+    "title": {
+      "translate": "advancement.singulo.jet_forge.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.jet_forge.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "formed/accretion_jet_forge"
+      }
+    }
+  },
+  "parent": "singulo:core"
+}

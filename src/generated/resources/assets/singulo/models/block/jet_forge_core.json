@@ -1,0 +1,46 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "top": "singulo:block/jet_forge_foundation",
+    "side": "singulo:block/jet_forge_foundation",
+    "bottom": "singulo:block/jet_forge_foundation",
+    "glass": "singulo:block/machine_glass",
+    "inner": "singulo:block/machine_inner",
+    "front": "singulo:block/jet_forge_core_front",
+    "particle": "singulo:block/jet_forge_foundation"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#bottom"
+        }
+      }
+    }
+  ]
+}

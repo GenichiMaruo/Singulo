@@ -1,127 +1,35 @@
 {
-  "vertex": "singulo:lensing",
-  "fragment": "singulo:lensing",
-  "samplers": [
-    {
-      "name": "Sampler0"
-    },
-    {
-      "name": "Sampler1"
-    }
-  ],
-  "uniforms": [
-    {
-      "name": "Lens0",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Lens1",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Lens2",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Lens3",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Sphere0",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        1.0,
-        1.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Sphere1",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        1.0,
-        1.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Sphere2",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        1.0,
-        1.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Sphere3",
-      "type": "float",
-      "count": 4,
-      "values": [
-        0.0,
-        1.0,
-        1.0,
-        0.0
-      ]
-    },
-    {
-      "name": "DepthParams",
-      "type": "float",
-      "count": 2,
-      "values": [
-        1.0,
-        0.1
-      ]
-    },
-    {
-      "name": "Aspect",
-      "type": "float",
-      "count": 1,
-      "values": [
-        1.0
-      ]
-    },
-    {
-      "name": "UseDepth",
-      "type": "float",
-      "count": 1,
-      "values": [
-        1.0
-      ]
-    }
-  ]
+    "vertex": "singulo:lensing",
+    "fragment": "singulo:lensing",
+    "samplers": [
+        { "name": "Sampler0" },
+        { "name": "Sampler1" }
+    ],
+    "uniforms": [
+        { "name": "Lens0", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Lens1", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Lens2", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Lens3", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Sphere0", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Sphere1", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Sphere2", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Sphere3", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Disk0", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "DiskN0", "type": "float", "count": 4, "values": [ 0.0, 1.0, 0.0, 0.0 ] },
+        { "name": "DiskP0", "type": "float", "count": 4, "values": [ 0.0, 0.0, 1.0, 0.0 ] },
+        { "name": "Disk1", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "DiskN1", "type": "float", "count": 4, "values": [ 0.0, 1.0, 0.0, 0.0 ] },
+        { "name": "DiskP1", "type": "float", "count": 4, "values": [ 0.0, 0.0, 1.0, 0.0 ] },
+        { "name": "Disk2", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "DiskN2", "type": "float", "count": 4, "values": [ 0.0, 1.0, 0.0, 0.0 ] },
+        { "name": "DiskP2", "type": "float", "count": 4, "values": [ 0.0, 0.0, 1.0, 0.0 ] },
+        { "name": "Disk3", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "DiskN3", "type": "float", "count": 4, "values": [ 0.0, 1.0, 0.0, 0.0 ] },
+        { "name": "DiskP3", "type": "float", "count": 4, "values": [ 0.0, 0.0, 1.0, 0.0 ] },
+        { "name": "InvProj", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "DepthParams", "type": "float", "count": 2, "values": [ 1.0, 0.1 ] },
+        { "name": "Aspect", "type": "float", "count": 1, "values": [ 1.0 ] },
+        { "name": "Focal", "type": "float", "count": 1, "values": [ 0.7 ] },
+        { "name": "UseDepth", "type": "float", "count": 1, "values": [ 1.0 ] }
+    ]
 }

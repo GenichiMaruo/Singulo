@@ -7,7 +7,7 @@ import tomllib
 import zipfile
 from check_gametests import check
 
-COUNTS = {'forge': 656, 'neoforge': 656}
+COUNTS = {'forge': 677, 'neoforge': 677}
 
 
 def validate(root, loader, name=None):

@@ -33,6 +33,8 @@ import net.minecraft.world.level.block.Block;
 public class SinguloJeiPlugin implements IModPlugin {
     static final Map<MachineType, RecipeType<MachineRecipe>> TYPES = new EnumMap<>(MachineType.class);
     static final Map<MachineRecipe, ResourceLocation> RECIPE_IDS = new java.util.IdentityHashMap<>();
+    /** 降着ジェット鍛造炉のレシピ（同じ singulo:machine のレシピで、station が accretion_jet_forge のもの）。 */
+    static final RecipeType<MachineRecipe> JET_FORGE = RecipeType.create(Singulo.MODID, "accretion_jet_forge", MachineRecipe.class);
 
     static {
         for (MachineType t : MachineType.values()) {
@@ -92,6 +94,10 @@ public class SinguloJeiPlugin implements IModPlugin {
             registration.addRecipeCategories(new MachineRecipeCategory(registration.getJeiHelpers().getGuiHelper(), t, TYPES.get(t)));
         }
         registration.addRecipeCategories(new MultiblockInfoCategory(registration.getJeiHelpers().getGuiHelper()));
+        // 鍛造炉: 材料3枠と冷媒1つ、完成品1つ。電力は鍛造炉そのものが大きく受け取るので、容量アップグレードの案内は出さない
+        registration.addRecipeCategories(new MachineRecipeCategory(registration.getJeiHelpers().getGuiHelper(),
+                new MachineRecipeCategory.Station(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.INPUTS, 1, 1, 0, false, Long.MAX_VALUE,
+                        SinguloBlocks.JET_FORGE_CORE.get()), JET_FORGE));
     }
 
     @Override
@@ -107,17 +113,22 @@ public class SinguloJeiPlugin implements IModPlugin {
             return;
         }
         Map<MachineType, List<MachineRecipe>> byType = new EnumMap<>(MachineType.class);
+        List<MachineRecipe> forge = new ArrayList<>();
         // 装置と同じく、サーバー設定（プリセット・殻の材料・育成時間など）を当てはめたレシピを見せる
         for (MachineRecipe h : io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(
                 Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()))) {
-            RECIPE_IDS.put(h.value(), h.id());
+            RECIPE_IDS.put(h, h.getId());
             for (MachineType t : MachineType.values()) {
-                if (t.id().equals(h.value().station())) {
-                    byType.computeIfAbsent(t, k -> new ArrayList<>()).add(h.value());
+                if (t.id().equals(h.station())) {
+                    byType.computeIfAbsent(t, k -> new ArrayList<>()).add(h);
                 }
+            }
+            if (io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.STATION.equals(h.station())) {
+                forge.add(h);
             }
         }
         byType.forEach((t, list) -> registration.addRecipes(TYPES.get(t), list));
+        registration.addRecipes(JET_FORGE, forge);
         // JEI のレシピで作れないアイテムには説明と入手方法（遺構の回収物・粒子加速器の副産物・Pリアクターの運転で生まれる物・
         // 専用の処理で作る物・クリエイティブ専用など）
         var registries = Minecraft.getInstance().level.registryAccess();
@@ -171,5 +182,6 @@ public class SinguloJeiPlugin implements IModPlugin {
             registration.addRecipeCatalyst(new ItemStack(machineBlock(t)), TYPES.get(t));
         }
         registration.addRecipeCatalyst(new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.HOLO_PROJECTOR.get()), MultiblockInfoCategory.TYPE);
+        registration.addRecipeCatalyst(new ItemStack(SinguloBlocks.JET_FORGE_CORE.get()), JET_FORGE);
     }
 }
