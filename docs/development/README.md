@@ -1,6 +1,6 @@
 # 開発ガイド
 
-Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.properties`を最初に確認する。`feature/0.14.0`は開発中で、公開版の番号とは一致しない場合がある。1.20.1のForge / NeoForge実装は別ブランチ`1.20.1`で扱う。
+Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.properties`を最初に確認する。`release/0.14.1`ではCreate/Ponderの照明互換性を修正している。1.20.1のForge / NeoForge実装は別ブランチ`1.20.1`で扱う。
 
 ## 最初に読むもの
 
