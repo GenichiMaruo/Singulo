@@ -1,0 +1,98 @@
+name: Publish Modrinth
+
+# Promote the tested JARs; creating a tag alone never rebuilds or uploads.
+on:
+  workflow_dispatch:
+    inputs:
+      verified_run_id:
+        description: 'Successful PR validation with NeoForge, GUI, Mekanism and Sodium lighting'
+        required: true
+        type: string
+      release_tag:
+        description: 'Existing immutable v<mod_version> tag'
+        required: true
+        type: string
+      release_type:
+        description: 'auto: Beta for 0.x; Release for stable versions 1.0.0 and later'
+        type: choice
+        options: [auto, beta, release, alpha]
+        default: auto
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modrinth-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/1.21.1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: modrinth
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      REQUESTED_TYPE: ${{ inputs.release_type }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          path: release-source
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate version and changelog
+        id: version
+        working-directory: release-source
+        shell: bash
+        run: |
+          version=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')
+          mod_name=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')
+          minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
+          [[ "$RELEASE_TAG" == "v$version" && "$minecraft" == 1.21.1 ]] || exit 1
+          test -f "docs/curseforge/changelog-$version.md"
+          type="$REQUESTED_TYPE"
+          if [[ "$type" == auto ]]; then
+            if [[ "$version" =~ ^([0-9]+)\.[0-9]+\.[0-9]+$ ]] && (( BASH_REMATCH[1] >= 1 )); then type=release; else type=beta; fi
+          fi
+          [[ "$type" == beta || "$type" == release || "$type" == alpha ]] || exit 1
+          echo "type=$type" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "neo_name=$mod_name-$version-${minecraft}N" >> "$GITHUB_OUTPUT"
+      - name: Verify CI provenance and exact tagged source
+        id: verified
+        run: python3 tools/verified_release_1211.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.verified_run_id }}
+          name: ${{ steps.verified.outputs.neoforge_artifact }}
+          path: verified-artifacts/${{ steps.verified.outputs.neoforge_artifact }}
+      - name: Promote the validated production JAR without rebuilding
+        run: python3 tools/verified_release_1211.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+      - name: Check publisher safety tests
+        run: python3 -m unittest discover -s tools -p test_publish_modrinth.py
+      - name: Publish verified JAR to Modrinth (skip exact existing file)
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID || vars.MODRINTH_PROJECT_ID }}
+          JAR_NAME: ${{ steps.version.outputs.neo_name }}.jar
+          LOADER: neoforge
+          RELEASE_TYPE: ${{ steps.version.outputs.type }}
+        run: python3 tools/publish_modrinth.py --source release-source --jar "release-artifacts/$JAR_NAME" --loader "$LOADER" --type "$RELEASE_TYPE"
+      - name: Preserve publication receipt and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: modrinth-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            modrinth-receipt.json
+            verified-release.json
+          if-no-files-found: warn
