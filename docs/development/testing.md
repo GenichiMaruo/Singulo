@@ -70,8 +70,16 @@ PNGはPillowで読み取る。旧デコーダーとの全RGB値の一致を確�
 
 詳細な結果と所要時間は`build/reports/gametest/results.json`に出力する。チャンク待ちでは標準のテスト時間切れが始まらないことがあるため、120秒間どのテストも完了しない場合は検査サーバーを異常終了させる。これは成功条件の緩和ではなく、無期限の停止を検出するための監視である。
 
-CIは通常・GUI、描画連携、Mekanismの3ジョブを並列に走らせる。描画連携ジョブの9件は、専用ワールドの作成と独立した実行環境の検証も兼ねるため、通常ジョブとの重複を意図して残している。
+CIはForge・NeoForgeの通常／GUI各1、共通の描画連携1、Mekanism1の計4ジョブを並列に走らせる。描画連携ジョブの9件は、専用ワールドの作成と独立した実行環境の検証も兼ねるため、通常ジョブとの重複を意図して残している。
 
 ## 0.14.0のJEI 15検査
 
 Forgeの既存CIジョブで全レシピ配置・実転送・ポップアップ操作・5言語×容量3段階を確認する。手順と互換性は[移植記録](../0.14.0/port-1.20.1.md)を参照。
+
+## Create/Ponderの照明互換性（0.14.1）
+
+`python3 tools/review/prepare_ponder.py --loader forge`の後、`bash gradlew -Ploader=forge --no-configuration-cache -I tools/review/ponder.gradle -PwithEmbeddium -PwithOculus -PwithAlexsCaves runClient`で実際のCreate 6.0.8 / Ponder 1.0.91を起動する。NeoForgeは`--loader neoforge`と`-Ploader=neoforge`を指定する。Create単体は3つの追加modフラグを外す。
+
+プレスとシュートの各画面について、自然光0・パネル光15の実ワールドを準備してから、通常サイズのライトマップ、全256画素のプレビューとNoonバンクの一致、GPU補間、仮想Levelの分離、入れ子・例外時の状態復元を確認する。`SINGULO_PONDER_LIGHTING_COMPLETE`は2回、`SINGULO_PONDER_CAPTURE_COMPLETE`は各アイテム1回が必要。`check_ponder_png.py`で台座の画素も検査する。CIはForgeの既存ジョブ内でシェーダーパックなしの検査を行い、ジョブ数を増やさない。
+
+Alex’s Cavesの更新置換との競合は、`rayleigh.gradle`の`-PwithEmbeddium -PwithAlexsCaves`でも検査する。このケースではDistant Horizonsを入れない（ACが同modの存在時に独自ライトマップ処理を無効化するため）。夜間・雨天・電源切替の4枚を`check_rayleigh_png.py`で比較する。
