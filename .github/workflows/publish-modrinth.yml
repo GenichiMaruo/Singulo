@@ -1,0 +1,113 @@
+name: Publish Modrinth
+
+# Publish only artifacts from a successful validation of the exact tagged tree.
+# Tag creation alone never uploads a duplicate or triggers another full build.
+on:
+  workflow_dispatch:
+    inputs:
+      verified_run_id:
+        description: 'Successful validation run covering both 1.20.1 loaders'
+        required: true
+        type: string
+      release_tag:
+        description: 'Existing immutable v<version>-1.20.1F or N tag'
+        required: true
+        type: string
+      release_type:
+        description: 'auto: Beta for 0.x; Release for stable versions 1.0.0 and later'
+        type: choice
+        options: [auto, beta, release, alpha]
+        default: auto
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modrinth-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/1.20.1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      GH_TOKEN: ${{ github.token }}
+    environment: modrinth
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          path: release-source
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate version, loader and changelog
+        id: version
+        shell: bash
+        working-directory: release-source
+        run: |
+          version=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')
+          mod_name=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')
+          minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
+          case "$RELEASE_TAG" in
+            *-1.20.1F|*-1.20.1F-r*) loader=forge; suffix=F ;;
+            *-1.20.1N|*-1.20.1N-r*) loader=neoforge; suffix=N ;;
+            *) echo 'Invalid 1.20.1 loader tag'; exit 1 ;;
+          esac
+          # verified_release.py independently enforces the full version/tag match.
+          test "$minecraft" = 1.20.1
+          test -f "docs/curseforge/changelog-$version.md"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
+          echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
+          echo "loader=$loader" >> "$GITHUB_OUTPUT"
+      - name: Validate source and resources
+        working-directory: release-source
+        run: |
+          python tools/localization.py --check
+          python tools/check_models.py
+          python tools/check_supporters.py
+          python tools/check_advancements.py
+          python tools/check_recipe_parity.py
+          python tools/check_port_1201.py
+      - name: Verify CI provenance and immutable tag
+        id: verified
+        run: python3 tools/verified_release.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.verified_run_id }}
+          pattern: ${{ steps.verified.outputs.pattern }}
+          path: verified-artifacts
+      - name: Promote the validated production JAR
+        env:
+          JAR_NAME: ${{ steps.version.outputs.name }}.jar
+        run: |
+          python3 tools/verified_release.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source --output "release-artifacts/$JAR_NAME"
+          python3 release-source/tools/check_port_1201.py --jar "release-artifacts/$JAR_NAME"
+      - name: Check publisher safety tests
+        run: python3 -m unittest discover -s tools -p test_publish_modrinth.py
+      - name: Publish verified JAR to Modrinth (skip exact existing file)
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID || vars.MODRINTH_PROJECT_ID }}
+          JAR_NAME: ${{ steps.version.outputs.name }}.jar
+          LOADER: ${{ steps.version.outputs.loader }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: python3 tools/publish_modrinth.py --source release-source --jar "release-artifacts/$JAR_NAME" --loader "$LOADER" --type "$RELEASE_TYPE"
+      - name: Preserve publication receipt and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: modrinth-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            modrinth-receipt.json
+            verified-release.json
+          if-no-files-found: warn

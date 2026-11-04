@@ -114,7 +114,10 @@ public final class AndroidGameTests {
 
     /** ふつうの拠点と同じく、ステーション・階段の下の段まで床を張る（上の面へ1段で上がれるように）。 */
     private static void floor(GameTestHelper helper) {
-        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 7, 0, 7)) {
+        // p() shifts devices four blocks into the sealed 16x16 template.
+        // The old 8x8 floor left the stair at (9, 1, 6) unsupported, so
+        // normal wandering/pathfinding could fall below the seating fixture.
+        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 15, 0, 15)) {
             helper.setBlock(p, net.minecraft.world.level.block.Blocks.STONE);
         }
     }
@@ -690,6 +693,8 @@ public final class AndroidGameTests {
         station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos stair = p(5, 1, 2);
         helper.setBlock(stair, net.minecraft.world.level.block.Blocks.OAK_STAIRS);
+        helper.assertTrue(helper.getBlockState(stair.below()).is(net.minecraft.world.level.block.Blocks.STONE),
+                "The seating fixture must provide a floor beneath the shifted stair");
         // 作業台（名前に "bench" が入る）は椅子ではない。階段より近くに置く
         BlockPos bench = p(3, 1, 3);
         helper.setBlock(bench, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get());
