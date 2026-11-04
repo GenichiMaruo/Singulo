@@ -282,6 +282,7 @@ public final class Shapes {
             case SHIELD_TOWER -> SHIELD_TOWER;
             case TIPLER_CYLINDER -> TIPLER;
             case WORMHOLE_GENERATOR -> WORMHOLE_GENERATOR;
+            case JET_FORGE -> io.github.genichimaruo.singulo.forge.JetForgeLayout.SPEC;
             case PARTICLE_ACCELERATOR, PENROSE_REACTOR, GENESIS_ENGINE -> null;
         };
     }

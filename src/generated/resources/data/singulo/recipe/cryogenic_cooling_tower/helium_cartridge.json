@@ -1,0 +1,26 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 3,
+  "time": 250,
+  "energy": 2000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:empty_coolant_cartridge"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:helium",
+      "amount": 250
+    }
+  ],
+  "min_size": 10,
+  "result": {
+    "id": "singulo:helium_cartridge",
+    "count": 1
+  }
+}

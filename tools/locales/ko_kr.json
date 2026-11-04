@@ -215,6 +215,14 @@
     "source": "Zero Resistance",
     "translation": "제로 저항"
   },
+  "advancement.singulo.collapsar.description": {
+    "source": "Forge a Collapsar Ingot in a black hole jet",
+    "translation": "블랙홀의 제트로 콜랍사 주괴를 단조한다"
+  },
+  "advancement.singulo.collapsar.title": {
+    "source": "Collapsar",
+    "translation": "콜랍사"
+  },
   "advancement.singulo.compactor.description": {
     "source": "Form a degenerate compactor",
     "translation": "축퇴 압축로를 조립하세요"
@@ -358,6 +366,14 @@
   "advancement.singulo.ignite.title": {
     "source": "Event Horizon",
     "translation": "사건의 지평선"
+  },
+  "advancement.singulo.jet_forge.description": {
+    "source": "Form an Accretion Jet Forge",
+    "translation": "강착 제트 단조로를 조립한다"
+  },
+  "advancement.singulo.jet_forge.title": {
+    "source": "Forging with Light",
+    "translation": "빛을 단조하다"
   },
   "advancement.singulo.lab_power.description": {
     "source": "Be present when power returns to the underground android laboratory",
@@ -951,6 +967,38 @@
     "source": "Ruin Glass",
     "translation": "폐허 유리"
   },
+  "block.singulo.jet_forge_collector": {
+    "source": "Jet Forge Collector",
+    "translation": "제트 단조로 회수구"
+  },
+  "block.singulo.jet_forge_collimator": {
+    "source": "Jet Forge Collimator Ring",
+    "translation": "제트 단조로 수렴 링"
+  },
+  "block.singulo.jet_forge_confinement_coil": {
+    "source": "Jet Forge Confinement Coil",
+    "translation": "제트 단조로 구속 코일"
+  },
+  "block.singulo.jet_forge_core": {
+    "source": "Jet Forge Core",
+    "translation": "제트 단조로 제어 코어"
+  },
+  "block.singulo.jet_forge_foundation": {
+    "source": "Jet Forge Foundation",
+    "translation": "제트 단조로 기초"
+  },
+  "block.singulo.jet_forge_heat_sink": {
+    "source": "Jet Forge Heat Sink",
+    "translation": "제트 단조로 흡열판"
+  },
+  "block.singulo.jet_forge_levitator": {
+    "source": "Jet Forge Levitator",
+    "translation": "제트 단조로 부양기"
+  },
+  "block.singulo.jet_forge_truss": {
+    "source": "Jet Forge Truss",
+    "translation": "제트 단조로 트러스"
+  },
   "block.singulo.keraunos_tower": {
     "source": "Keraunos Discharge Tower",
     "translation": "케라우노스 방전탑"
@@ -1463,6 +1511,10 @@
     "source": "%1$s crossed the event horizon",
     "translation": "%1$s가 사건의 지평선을 넘었습니다"
   },
+  "death.attack.singulo.jet_beam": {
+    "source": "%1$s was vaporized by a black hole jet",
+    "translation": "%1$s은(는) 블랙홀의 제트에 증발했다"
+  },
   "death.attack.singulo.tidal": {
     "source": "%1$s was torn apart by tidal forces",
     "translation": "%1$s는 조석력에 의해 찢겨졌습니다"
@@ -1478,6 +1530,10 @@
   "desc.singulo.accelerator_tube": {
     "source": "Tube segment of the Particle Accelerator ring.",
     "translation": "입자 가속기 링의 튜브 세그먼트."
+  },
+  "desc.singulo.accretion_jet_forge": {
+    "source": "A facility that forges materials with a beam squeezed from the jets of a black hole.",
+    "translation": "블랙홀의 제트를 조여 만든 빔으로 재료를 단조하는 시설."
   },
   "desc.singulo.advanced_android_workbench": {
     "source": "An upgraded Android Workbench. Androids craft eight times as fast as on a vanilla crafting table, and the holding box has 54 slots. Androids use 60% of the usual charge per craft. Used the same way as the Android Workbench.",
@@ -1850,6 +1906,14 @@
   "desc.singulo.cold_atoms": {
     "source": "Atoms cooled close to absolute zero.",
     "translation": "절대 영도 가까이 냉각된 원자."
+  },
+  "desc.singulo.collapsar_billet": {
+    "source": "Netherite wrapped in a degenerate-matter shell and soaked with jet condensate. Forge it in the Accretion Jet Forge to make a Collapsar Ingot.",
+    "translation": "네더라이트를 축퇴 물질 껍질로 감싸고 제트 응축물을 스며들게 한 단조 전 소재. 강착 제트 단조로에서 단조하면 콜랍사 주괴가 된다."
+  },
+  "desc.singulo.collapsar_ingot": {
+    "source": "A light-drinking black metal forged in a black hole jet, a material for the finest gear and tools. Common tag: c:ingots/collapsar.",
+    "translation": "블랙홀의 제트로 단조한, 빛을 삼키는 검은 금속 주괴. 최상급 장비와 도구의 재료가 된다. 공통 태그: c:ingots/collapsar."
   },
   "desc.singulo.compressed_block_1": {
     "source": "Nine units of mass pressed together. The start of the compression chain.",
@@ -2243,6 +2307,10 @@
     "source": "Heat exchangers stacked up the middle of the tower.",
     "translation": "냉각탑 중심에 쌓아 올리는 열교환기."
   },
+  "desc.singulo.helium_cartridge": {
+    "source": "A cartridge holding 250 mB of liquid helium. Right-click a machine to pour it in; the Accretion Jet Forge drains it automatically from its material slots.",
+    "translation": "액체 헬륨 250 mB가 든 카트리지. 기계를 우클릭하면 주입할 수 있고, 강착 제트 단조로는 재료 칸에서 자동으로 주입한다."
+  },
   "desc.singulo.high_gravity_panel": {
     "source": "When powered, standing on it raises your gravity 2.5x until you next land. Joins visually with its neighbours.",
     "translation": "전력이 공급되면 위에 선 동안 다음 착지까지 중력이 2.5배가 됩니다. 이웃한 패널과 외형이 이어집니다."
@@ -2286,6 +2354,38 @@
   "desc.singulo.jet_condensate": {
     "source": "Condensed particles from a relativistic jet.",
     "translation": "상대론적 제트의 입자를 모은 응축체."
+  },
+  "desc.singulo.jet_forge_collector": {
+    "source": "Centre of the irradiation chamber floor. Receives the cooled product.",
+    "translation": "조사실 바닥의 중앙. 식은 완성품을 받는다."
+  },
+  "desc.singulo.jet_forge_collimator": {
+    "source": "Three rings of radius 5, 4 and 3 that squeeze the jet step by step into a thin white beam.",
+    "translation": "반지름 5·4·3으로 가늘어지는 세 개의 고리. 제트를 차례로 조여 가늘고 흰 빔으로 만든다."
+  },
+  "desc.singulo.jet_forge_confinement_coil": {
+    "source": "Two radius-7 rings around the black hole. They twist the magnetic field of the inflow and drive jets out of both poles.",
+    "translation": "블랙홀을 사이에 둔 반지름 7의 고리 두 개. 강착류의 자기장을 비틀어 양극에서 제트를 밀어낸다."
+  },
+  "desc.singulo.jet_forge_core": {
+    "source": "The brain of the Accretion Jet Forge, set into the front edge of the plinth under the core. Insert a Singularity Seed and ignite it to form the forging black hole.",
+    "translation": "강착 제트 단조로의 두뇌. 노심 아래 받침대의 앞쪽 가장자리 중앙에 박아 넣는다. 특이점 씨앗을 넣고 점화하면 노심에 가공용 블랙홀이 생긴다."
+  },
+  "desc.singulo.jet_forge_foundation": {
+    "source": "The foundation under the facility. Any foundation block can be swapped for a multiblock port to feed power, materials and coolant and to send out products.",
+    "translation": "시설 아래를 지나는 토대. 어느 기초든 멀티블록 입출력 포트로 바꿀 수 있으며, 그곳으로 전력·재료·냉각제를 넣고 완성품을 내보낸다."
+  },
+  "desc.singulo.jet_forge_heat_sink": {
+    "source": "Forms the cup that catches the opposite jet and the plate that stops the beam behind the material.",
+    "translation": "반대쪽 제트를 받는 컵과, 재료를 통과한 빔을 막는 판을 이룬다."
+  },
+  "desc.singulo.jet_forge_levitator": {
+    "source": "Centre of the irradiation chamber ceiling. Its gravity field holds the material in the beam path.",
+    "translation": "조사실 천장의 중앙. 중력장으로 재료를 빔의 경로에 띄운다."
+  },
+  "desc.singulo.jet_forge_truss": {
+    "source": "Core beams, ring supports and the irradiation chamber frame.",
+    "translation": "노심의 들보, 링의 지주, 조사실의 틀."
   },
   "desc.singulo.keraunos_tower": {
     "source": "Builds up 1,000,000 FE and hurls artificial lightning at the nearest lightning rod within 16 blocks. Sand under the rod turns into fulgurite. Three firing modes: manual, redstone and auto (sneak-right-click to switch).",
@@ -4107,6 +4207,98 @@
     "source": "Exotic matter: %s",
     "translation": "특이 물질: %s"
   },
+  "gui.singulo.device.forge.active": {
+    "source": "The core black hole is stable",
+    "translation": "노심 블랙홀이 안정되어 있음"
+  },
+  "gui.singulo.device.forge.coolant": {
+    "source": "Coolant %s / %s mB",
+    "translation": "냉각제 %1$s / %2$s mB"
+  },
+  "gui.singulo.device.forge.core": {
+    "source": "Singularity Seed (or Singularity Core): used up on ignition to form the core black hole (locked while igniting)",
+    "translation": "특이점 씨앗(특이점 코어도 가능): 점화하면 소모되어 노심에 블랙홀이 생김(점화 중에는 뺄 수 없음)"
+  },
+  "gui.singulo.device.forge.demand": {
+    "source": "Irradiation needs %s/t (about %s per run)",
+    "translation": "조사 중 필요 %1$s/t (1회 약 %2$s)"
+  },
+  "gui.singulo.device.forge.empties": {
+    "source": "Emptied containers (multiblock ports push them out)",
+    "translation": "비운 용기(멀티블록 입출력 포트가 밀어냄)"
+  },
+  "gui.singulo.device.forge.held": {
+    "source": "Held by redstone",
+    "translation": "레드스톤 신호로 대기 중"
+  },
+  "gui.singulo.device.forge.idle": {
+    "source": "Waiting for materials",
+    "translation": "재료를 기다리는 중"
+  },
+  "gui.singulo.device.forge.ignite": {
+    "source": "Ignite: pour in %s GFE in time (uses the seed)",
+    "translation": "점화: 제한 시간 안에 %s GFE를 주입(씨앗 소모)"
+  },
+  "gui.singulo.device.forge.igniting": {
+    "source": "Igniting %s%% · %s s left",
+    "translation": "점화 중 %1$s%% · 남은 시간 %2$s초"
+  },
+  "gui.singulo.device.forge.inputs": {
+    "source": "Materials: Collapsar Billet and Mass Pellets. Liquid helium containers (cartridges, canisters) are poured into the coolant tank",
+    "translation": "재료: 콜랍사 빌릿과 질량 펠릿. 액체 헬륨 용기(카트리지·유체 캐니스터)를 넣으면 냉각제 탱크에 주입"
+  },
+  "gui.singulo.device.forge.no_core": {
+    "source": "No black hole: insert a Singularity Seed and ignite",
+    "translation": "노심에 블랙홀이 없음: 특이점 씨앗을 넣고 점화"
+  },
+  "gui.singulo.device.forge.no_power": {
+    "source": "Paused: not enough power",
+    "translation": "일시 정지: 전력 부족"
+  },
+  "gui.singulo.device.forge.output": {
+    "source": "Product (multiblock ports push it out)",
+    "translation": "완성품(멀티블록 입출력 포트가 밀어냄)"
+  },
+  "gui.singulo.device.forge.output_full": {
+    "source": "Paused: output is full",
+    "translation": "일시 정지: 완성품 칸이 가득 참"
+  },
+  "gui.singulo.device.forge.phase.1": {
+    "source": "Warning",
+    "translation": "가동 경고"
+  },
+  "gui.singulo.device.forge.phase.2": {
+    "source": "Ignition",
+    "translation": "점화"
+  },
+  "gui.singulo.device.forge.phase.3": {
+    "source": "Focusing",
+    "translation": "수렴"
+  },
+  "gui.singulo.device.forge.phase.4": {
+    "source": "Irradiating",
+    "translation": "조사"
+  },
+  "gui.singulo.device.forge.phase.5": {
+    "source": "Finishing",
+    "translation": "마무리"
+  },
+  "gui.singulo.device.forge.phase.6": {
+    "source": "Cooling",
+    "translation": "냉각"
+  },
+  "gui.singulo.device.forge.power": {
+    "source": "Stored %s / %s · input %s/t",
+    "translation": "저장 %1$s / %2$s · 입력 %3$s/t"
+  },
+  "gui.singulo.device.forge.running": {
+    "source": "%s · %s / %s s",
+    "translation": "%1$s · %2$s / %3$s초"
+  },
+  "gui.singulo.device.forge.unloaded": {
+    "source": "Part of the facility is not loaded",
+    "translation": "시설 일부가 로드되지 않음"
+  },
   "gui.singulo.device.fuel": {
     "source": "Fuel: %s",
     "translation": "연료: %1$s"
@@ -4742,6 +4934,26 @@
   "gui.singulo.handbook.title": {
     "source": "Singulo Handbook",
     "translation": "Singulo 핸드북"
+  },
+  "gui.singulo.jet_forge.absorbed": {
+    "source": "The forge took in the black hole left in its core",
+    "translation": "단조로가 노심에 남아 있던 블랙홀을 흡수했다"
+  },
+  "gui.singulo.jet_forge.ignited": {
+    "source": "A black hole is born in the forge core",
+    "translation": "단조로의 노심에서 블랙홀이 태어났다"
+  },
+  "gui.singulo.jet_forge.ignition_broken": {
+    "source": "The structure broke, so ignition stopped (the seed remains)",
+    "translation": "구조가 무너져 점화를 멈췄다(씨앗은 남아 있음)"
+  },
+  "gui.singulo.jet_forge.ignition_failed": {
+    "source": "Ignition failed: not enough power arrived in time (the seed remains)",
+    "translation": "점화 실패: 제한 시간 안에 전력이 닿지 않았다(씨앗은 남아 있음)"
+  },
+  "gui.singulo.jet_forge.remnant": {
+    "source": "The controller is gone; the black hole stays bound in the core",
+    "translation": "제어 코어를 잃어, 블랙홀이 구속된 채 노심에 남았다"
   },
   "gui.singulo.leviathan.ascend": {
     "source": "The vortex tears open and a black wyrm rises, its wings a spread of accretion-disk light",
@@ -6543,6 +6755,34 @@
     "source": "Welcome to Singulo",
     "translation": "Singulo에 오신 것을 환영합니다."
   },
+  "guide.singulo.jet_forge": {
+    "source": "Accretion Jet Forge",
+    "translation": "강착 제트 단조로"
+  },
+  "guide.singulo.jet_forge.build.body": {
+    "source": "The P-Reactor makes power and the Genesis Engine makes matter; the Accretion Jet Forge reworks existing materials with huge amounts of power. It is a long facility, 44 long, 16 high and 15 deep, supported by the Holo Projector and the builder wand.\n- Exhaust side (left end): a heat-sink cup that catches the opposite jet.\n- Core: a vertical accretion disk and black hole float between two Confinement Coils (radius-7 rings). The eight 45° points of the coils are Reactor Stabilizer Coils, the same part as the P-Reactor. A chamfered plinth lies under the core, and the controller is set into the middle of its front edge.\n- Collimators: three rings of radius 5, 4 and 3 squeeze the jet into a thin white beam.\n- Irradiation chamber: the material floats in the middle of a square frame, with the Levitator above and the Collector below. A heat-sink plate behind it stops the beam.\nKeep the beam path along the axis and the space around the core clear. Any foundation block can be swapped for a multiblock port.",
+    "translation": "펜로즈 반응로가 전력을 만들고 창세로가 물질을 만든다면, 강착 제트 단조로는 지금 있는 재료를 막대한 전력으로 다시 단조하는 시설입니다. 길이 44·높이 16·깊이 15의 가로로 긴 형태이며, 홀로그램 투영기와 건축가의 지팡이를 지원합니다.\n- 배열 쪽(왼쪽 끝): 흡열판으로 된 컵. 반대쪽 제트를 받아 냅니다.\n- 노심: 두 개의 구속 코일(반지름 7의 고리) 사이에 세로로 선 강착 원반과 블랙홀이 떠 있습니다. 구속 코일의 45° 방향 8곳은 펜로즈 반응로와 같은 노심 안정화 코일입니다. 노심 아래는 모서리를 깎은 받침대이며, 제어 코어는 그 앞쪽 가장자리 중앙에 박아 넣습니다.\n- 수렴 링: 반지름 5·4·3으로 가늘어지는 세 개의 고리가 제트를 가늘고 흰 빔으로 조입니다.\n- 조사실: 네모난 틀의 중앙에 재료가 뜹니다. 천장에 부양기, 바닥에 회수구가 있고, 뒤쪽의 흡열판이 빔을 막습니다.\n축을 따라가는 빔의 경로와 노심 주변은 비워 두세요. 어느 기초든 멀티블록 입출력 포트로 바꿀 수 있습니다."
+  },
+  "guide.singulo.jet_forge.build.title": {
+    "source": "Building the forge",
+    "translation": "단조로 짓기"
+  },
+  "guide.singulo.jet_forge.ingot.body": {
+    "source": "A light-drinking black metal forged in a black hole jet. It is meant as a material for the finest gear and tools in other mods (common tag c:ingots/collapsar, ID singulo:collapsar_ingot).\nMake the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).",
+    "translation": "블랙홀의 제트로 단조한, 빛을 삼키는 검은 금속 주괴입니다. 다른 모드에서 최상급 장비와 도구의 재료로 쓸 수 있도록 해 두었습니다(공통 태그 c:ingots/collapsar·ID singulo:collapsar_ingot).\n콜랍사 빌릿은 특이점 캡슐화기에서 네더라이트 주괴·축퇴 물질 껍질·제트 응축물 4개·특이 물질 2개·니호늄 판 2개로 만듭니다. 단조 레시피는 데이터팩(type: singulo:machine, station: accretion_jet_forge)으로 바꾸거나 추가할 수 있습니다."
+  },
+  "guide.singulo.jet_forge.ingot.title": {
+    "source": "Collapsar Ingot",
+    "translation": "콜랍사 주괴"
+  },
+  "guide.singulo.jet_forge.run.body": {
+    "source": "First form the core black hole. As with the P-Reactor, insert a Singularity Seed (or a Singularity Core) into the controller, press Ignite on its screen and pour in 25 GFE within the ignition window (10 s by default): light flows from the eight Reactor Stabilizer Coils into the seed, a ball of light swells and collapses into a black hole (the seed is used up; if time runs out, the seed stays). The black hole pulls in its surroundings and swallows anything that touches the horizon. If the controller is broken, it stays bound in the core as a rogue black hole and is taken back in when you rebuild.\nWhen the materials (1 Collapsar Billet and 16 Mass Pellets) and coolant (1,000 mB of liquid helium) are present, the output has room and one tick of power is stored, the forge takes all the materials and begins.\n1. Warning: beacons spin, a force field closes around the chamber and the material rises.\n2. Ignition and focusing: the disk brightens, jets erupt from both poles and are squeezed tighter as each ring engages.\n3. Irradiation: 250 MFE/t for 60 s (about 300 GFE). The material glows red, cracks and throws off shards and rings of light.\n4. Finish and cooling: after a flash and a shockwave, the cooled ingot descends into the Collector.\nBesides piping it in, you can put liquid helium in Liquid Helium Cartridges (filled from empty coolant cartridges in a cooling tower) or fluid canisters and place them in the material slots; they are poured in and the empties go to the bottom-right slot. Drones can carry them too.\nInput is at most 1 GFE per tick, with a buffer of four times that. If power runs short, the structure breaks, part of the facility is unloaded or the output is full, it pauses where it is (no materials or progress are lost). A redstone signal on the controller stops new runs from starting. Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The flash and screen shake can be reduced in the client config.",
+    "translation": "먼저 노심에 블랙홀을 만듭니다. 펜로즈 반응로와 마찬가지로 제어 코어에 특이점 씨앗(특이점 코어도 가능)을 넣고 화면의 「점화」를 누른 뒤, 점화 시간(기본 10초) 안에 25 GFE를 주입하면 8개의 노심 안정화 코일에서 씨앗으로 빛이 흘러들어 빛의 구가 부풀었다가 한 점으로 무너져 블랙홀이 생깁니다(씨앗은 소모됩니다. 시간이 다 되면 씨앗은 남습니다). 블랙홀은 주변을 끌어당기고, 지평선에 닿은 것을 삼킵니다. 제어 코어를 부숴도 구속된 채 떠돌이 블랙홀로 노심에 남고, 다시 지으면 흡수합니다.\n재료(콜랍사 빌릿 1개·질량 펠릿 16개)와 냉각제(액체 헬륨 1,000 mB)가 갖춰지고, 완성품 칸에 자리가 있으며 1 tick분의 전력이 저장되어 있으면, 재료를 모두 꺼낸 뒤 시작합니다.\n1. 경고: 경고등이 돌고, 조사실 사방에 역장이 펼쳐지며 재료가 떠오릅니다.\n2. 점화·수렴: 강착 원반이 밝아지며 양극에서 제트가 뿜어져 나오고, 세 개의 링이 차례로 들어올 때마다 조여집니다.\n3. 조사: 60초 동안 250 MFE/t(약 300 GFE). 재료가 붉게 달아오르고, 균열이 가며, 파편과 빛의 고리를 흩뿌립니다.\n4. 마무리·냉각: 섬광과 충격파 뒤, 식은 주괴가 회수구로 내려옵니다.\n액체 헬륨은 파이프로 넣는 것 외에도, 액체 헬륨 카트리지(냉각탑에서 빈 냉매 카트리지에 채움)나 유체 캐니스터에 담아 재료 칸에 넣으면 주입됩니다(빈 용기는 오른쪽 아래 칸으로 나옵니다). 드론으로도 운반할 수 있습니다.\n입력은 1 tick에 최대 1 GFE, 저장은 그 4배까지입니다. 전력이 부족하거나, 구조가 무너지거나, 시설 일부가 로드되지 않았거나, 완성품 칸이 가득 차면 그 자리에서 멈추고 기다립니다(재료도 진행도 잃지 않습니다). 제어 코어에 레드스톤 신호를 넣으면 다음 가공을 시작하지 않습니다. 제트와 빔의 경로에 들어가면 방어구를 무시하는 큰 피해를 입습니다(조사 중인 빔은 치명적입니다). 섬광과 화면 흔들림은 클라이언트 설정에서 줄일 수 있습니다."
+  },
+  "guide.singulo.jet_forge.run.title": {
+    "source": "How forging works",
+    "translation": "단조 과정"
+  },
   "guide.singulo.multiblocks": {
     "source": "Multiblocks",
     "translation": "멀티블록"
@@ -6935,6 +7175,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.accretion_jet_forge": {
+    "source": "Made in: Multiblock assembly (stage 5)",
+    "translation": "제작: 멀티블록 조립(5단계)"
+  },
   "howto.singulo.advanced_android_workbench": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "제작: 정밀 조립기(3단계)"
@@ -7222,6 +7466,14 @@
   "howto.singulo.cold_atoms": {
     "source": "Made in: Laser Cooler (stage 3)",
     "translation": "제작: 레이저 냉각기(3단계)"
+  },
+  "howto.singulo.collapsar_billet": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.collapsar_ingot": {
+    "source": "Made in: Accretion Jet Forge (stage 5)",
+    "translation": "제작: 강착 제트 단조로(5단계)"
   },
   "howto.singulo.compressed_block_1": {
     "source": "Made in: Compressor (stage 1)",
@@ -7555,6 +7807,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.helium_cartridge": {
+    "source": "Made in: Cryogenic Cooling Tower (stage 3)",
+    "translation": "제작: 극저온 냉각탑(3단계)"
+  },
   "howto.singulo.high_gravity_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "제작: 정밀 조립기(3단계)"
@@ -7594,6 +7850,38 @@
   "howto.singulo.jet_condensate": {
     "source": "Made in: P-Reactor (stage 5)",
     "translation": "제작: 펜로즈 반응로(발전 모드, 5단계)"
+  },
+  "howto.singulo.jet_forge_collector": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_forge_collimator": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_forge_confinement_coil": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_forge_core": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "제작: 제작대(5단계)"
+  },
+  "howto.singulo.jet_forge_foundation": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_forge_heat_sink": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_forge_levitator": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_forge_truss": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
   },
   "howto.singulo.keraunos_tower": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -8471,6 +8759,14 @@
     "source": "Cold Atoms",
     "translation": "냉각 원자"
   },
+  "item.singulo.collapsar_billet": {
+    "source": "Collapsar Billet",
+    "translation": "콜랍사 빌릿"
+  },
+  "item.singulo.collapsar_ingot": {
+    "source": "Collapsar Ingot",
+    "translation": "콜랍사 주괴"
+  },
   "item.singulo.confinement_ring": {
     "source": "Magnetic Confinement Ring",
     "translation": "자기 가둠 고리"
@@ -8634,6 +8930,10 @@
   "item.singulo.hawking_condensate": {
     "source": "H-Condensate",
     "translation": "호킹 응축물"
+  },
+  "item.singulo.helium_cartridge": {
+    "source": "Liquid Helium Cartridge",
+    "translation": "액체 헬륨 카트리지"
   },
   "item.singulo.holo_projector": {
     "source": "Holo Projector",
@@ -9058,6 +9358,10 @@
   "jei.singulo.mass": {
     "source": "Mass %s",
     "translation": "질량 %s"
+  },
+  "jei.singulo.mb.accretion_jet_forge": {
+    "source": "■ Shape: exhaust cup, core, three collimators and chamber in a line, 44×16×15\n■ Start: ignite a Singularity Seed with 25 GFE\n■ Materials: Collapsar Billet, 16 Mass Pellets, 1,000 mB liquid helium\n■ Power: 250 MFE/t for the 60 s irradiation",
+    "translation": "■ 형태: 배열 쪽 컵·노심·수렴 링 3개·조사실이 일직선으로 늘어섬　44×16×15\n■ 가동: 특이점 씨앗으로 점화하고 25 GFE를 주입\n■ 재료: 콜랍사 빌릿·질량 펠릿 16개·액체 헬륨 1,000 mB\n■ 전력: 60초 조사 동안 250 MFE/t"
   },
   "jei.singulo.mb.casimir_cavity": {
     "source": "■ Shape: 5×5×5 vacuum vessel\n■ Start: power and a catalyst",
@@ -9523,6 +9827,10 @@
     "source": "Metric Drive: no exotic matter",
     "translation": "계량 구동기: 특이 물질 없음"
   },
+  "multiblock.singulo.accretion_jet_forge": {
+    "source": "Accretion Jet Forge",
+    "translation": "강착 제트 단조로"
+  },
   "multiblock.singulo.casimir_cavity": {
     "source": "C-Cavity",
     "translation": "카시미르 공동"
@@ -9819,6 +10127,10 @@
     "source": "Singularity",
     "translation": "특이점"
   },
+  "station.singulo.accretion_jet_forge": {
+    "source": "Accretion Jet Forge",
+    "translation": "강착 제트 단조로"
+  },
   "station.singulo.archive_terminal": {
     "source": "Archive Terminal",
     "translation": "기록 보관 단말기"
@@ -9954,6 +10266,10 @@
   "subtitles.singulo.black_hole.formation": {
     "source": "Black hole forms",
     "translation": "블랙홀이 생긴다"
+  },
+  "subtitles.singulo.black_hole.open": {
+    "source": "Black hole opens",
+    "translation": "블랙홀이 열린다"
   },
   "subtitles.singulo.casimir_cavity_running": {
     "source": "C-Cavity vibrates",
@@ -10395,6 +10711,54 @@
     "source": "Inertial stabilizer hums",
     "translation": "관성 안정기가 장을 펼친다"
   },
+  "subtitles.singulo.jet_forge.arc": {
+    "source": "Collimators hum",
+    "translation": "수렴 링이 웅웅거린다"
+  },
+  "subtitles.singulo.jet_forge.beam": {
+    "source": "Beam roars",
+    "translation": "빔이 울부짖는다"
+  },
+  "subtitles.singulo.jet_forge.beam_start": {
+    "source": "Beam strikes",
+    "translation": "빔이 재료에 닿는다"
+  },
+  "subtitles.singulo.jet_forge.collect": {
+    "source": "Ingot collected",
+    "translation": "완성품이 회수구에 들어간다"
+  },
+  "subtitles.singulo.jet_forge.cool": {
+    "source": "Coolant vents",
+    "translation": "냉각제가 분사된다"
+  },
+  "subtitles.singulo.jet_forge.finish": {
+    "source": "Forging shockwave",
+    "translation": "단조 충격파"
+  },
+  "subtitles.singulo.jet_forge.focus": {
+    "source": "Collimator engages",
+    "translation": "수렴 링이 들어온다"
+  },
+  "subtitles.singulo.jet_forge.formed": {
+    "source": "Jet Forge assembles",
+    "translation": "제트 단조로가 조립된다"
+  },
+  "subtitles.singulo.jet_forge.jet": {
+    "source": "Jets thunder",
+    "translation": "제트가 굉음을 낸다"
+  },
+  "subtitles.singulo.jet_forge.pulse": {
+    "source": "Beam pulses",
+    "translation": "빔이 맥동한다"
+  },
+  "subtitles.singulo.jet_forge.spool": {
+    "source": "Jets ignite",
+    "translation": "제트가 뿜어져 나온다"
+  },
+  "subtitles.singulo.jet_forge.warning": {
+    "source": "Jet Forge warning",
+    "translation": "단조로 가동 경보"
+  },
   "subtitles.singulo.keraunos_tower.charge": {
     "source": "Discharge tower charges",
     "translation": "방전탑이 충전한다"
@@ -10694,6 +11058,18 @@
   "summary.singulo.impact_generator_panel": {
     "source": "Stores power from how far you fall and feeds gravity panels. No fall damage.",
     "translation": "떨어진 높이만큼 전력을 모아 중력 패널에 보냅니다. 낙하 피해를 받지 않습니다."
+  },
+  "summary.singulo.jet_forge_confinement_coil": {
+    "source": "Rings that drive jets out of the black hole.",
+    "translation": "블랙홀을 감싸 양극에서 제트를 밀어내는 고리."
+  },
+  "summary.singulo.jet_forge_core": {
+    "source": "The Jet Forge controller. Ignite a seed to form its black hole.",
+    "translation": "제트 단조로의 컨트롤러. 특이점 씨앗으로 점화해 블랙홀을 만든다."
+  },
+  "summary.singulo.jet_forge_foundation": {
+    "source": "The facility foundation. Swappable for ports.",
+    "translation": "시설의 토대. 입출력 포트로 바꿀 수 있다."
   },
   "summary.singulo.keraunos_tower": {
     "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
@@ -11227,6 +11603,10 @@
     "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Quantum Key",
     "translation": "사용 대상: BE 응축 촉매, 위상 동기판, 양자 잠금 열쇠"
   },
+  "uses.singulo.collapsar_billet": {
+    "source": "Used in: Collapsar Ingot",
+    "translation": "사용 대상: 콜랍사 주괴"
+  },
   "uses.singulo.compressed_block_1": {
     "source": "Used in: Compressed Block Lv2, Compressed Block Lv2 (Mixed)",
     "translation": "사용 대상: 압축 블록 Lv2, 압축 블록 Lv2(혼합)"
@@ -11248,8 +11628,8 @@
     "translation": "사용 대상: 축퇴 물질 껍질, 인공 항성 코어"
   },
   "uses.singulo.confinement_ring": {
-    "source": "Used in: Empty BH Containment Vessel, Singularity Seed",
-    "translation": "사용 대상: 빈 BH 격리 용기, 특이점 씨앗"
+    "source": "Used in: Empty BH Containment Vessel, Singularity Seed, Jet Forge Confinement Coil, Jet Forge Core",
+    "translation": "사용 대상: 빈 BH 격리 용기, 특이점 씨앗, 제트 단조로 구속 코일, 제트 단조로 제어 코어"
   },
   "uses.singulo.control_unit": {
     "source": "Used in: Superconducting Coil",
@@ -11364,8 +11744,8 @@
     "translation": "사용 제품: 축퇴 열로"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 1 more",
-    "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 1개"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 2 more",
+    "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 2개"
   },
   "uses.singulo.degenerate_nucleus": {
     "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
@@ -11400,12 +11780,12 @@
     "translation": "사용 대상: 종언의 기록"
   },
   "uses.singulo.empty_coolant_cartridge": {
-    "source": "Used in: Coolant Cartridge",
-    "translation": "사용 대상: 냉매 카트리지"
+    "source": "Used in: Coolant Cartridge, Liquid Helium Cartridge",
+    "translation": "사용 대상: 냉매 카트리지, 액체 헬륨 카트리지"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 21 more",
-    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 21개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 23 more",
+    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 23개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11416,8 +11796,8 @@
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 30 more",
-    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 30개"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 31 more",
+    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 31개"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11432,8 +11812,8 @@
     "translation": "사용 대상: 종언의 기록"
   },
   "uses.singulo.gravity_field_stabilizer": {
-    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock)",
-    "translation": "사용 대상: 노심 제어기, 중성미자 감도 모듈 Mk3, 특이점 잠금 열쇠, 봉인 컨테이너 (특이점 잠금)"
+    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock), Jet Forge Levitator and 1 more",
+    "translation": "사용 대상: 노심 제어기, 중성미자 감도 모듈 Mk3, 특이점 잠금 열쇠, 봉인 컨테이너 (특이점 잠금), 제트 단조로 부양기 외 1개"
   },
   "uses.singulo.gravity_panel_receiver": {
     "source": "Used in: Impact Generator Panel",
@@ -11448,8 +11828,8 @@
     "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵, 각성의 메아리핵 외 6개"
   },
   "uses.singulo.heat_exchange_core": {
-    "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
-    "translation": "사용 제품: 냉각탑 제어기, 극저온 냉각탑, 냉각탑 확장, 극저온 터빈"
+    "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine, Jet Forge Heat Sink and 1 more",
+    "translation": "사용 대상: 냉각탑 제어기, 극저온 냉각탑, 냉각탑 확장, 극저온 터빈, 제트 단조로 흡열판 외 1개"
   },
   "uses.singulo.horizon_chapter": {
     "source": "Used in: Terminus Record",
@@ -11464,8 +11844,40 @@
     "translation": "사용 대상: 깨진 폐허 유리, 강화 폐허 유리"
   },
   "uses.singulo.jet_condensate": {
-    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon",
-    "translation": "사용 대상: 인공 항성 코어, 각성의 소용돌이핵, 창세로 기둥"
+    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon, Collapsar Billet",
+    "translation": "사용 대상: 인공 항성 코어, 각성의 소용돌이핵, 창세로 기둥, 콜랍사 빌릿"
+  },
+  "uses.singulo.jet_forge_collector": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_collimator": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_confinement_coil": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_core": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_foundation": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_heat_sink": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_levitator": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
+  },
+  "uses.singulo.jet_forge_truss": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "사용 대상: 강착 제트 단조로"
   },
   "uses.singulo.lab_frame": {
     "source": "Used in: Power Conduit, Body Capsule",
@@ -11479,9 +11891,13 @@
     "source": "Used in: Monopole Upgrade",
     "translation": "사용 제품: 홀극 업그레이드"
   },
+  "uses.singulo.mass_pellet": {
+    "source": "Used in: Collapsar Ingot",
+    "translation": "사용 대상: 콜랍사 주괴"
+  },
   "uses.singulo.meteoric_iron_ingot": {
-    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 2 more",
-    "translation": "사용 대상: 집속 자석, 중력파 검출기, 카시미르 공동 자기 차폐, 자기 병, 자이로 구동 장치 외 2개"
+    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 4 more",
+    "translation": "사용 대상: 집속 자석, 중력파 검출기, 카시미르 공동 자기 차폐, 자기 병, 자이로 구동 장치 외 4개"
   },
   "uses.singulo.micro_black_hole": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
@@ -11508,24 +11924,24 @@
     "translation": "사용 대상: 니호늄 주괴"
   },
   "uses.singulo.nihonium_frame": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 10 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 축퇴 열로 제어기, 자동 탐사기 기지 외 10개"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 12 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 축퇴 열로 제어기, 자동 탐사기 기지 외 12개"
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
     "translation": "사용 대상: 니호늄 판"
   },
   "uses.singulo.nihonium_plate": {
-    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame",
-    "translation": "사용 대상: 지평선 버스, 자이로 구동 장치, 호킹 수집기, 제트 콜렉터, 니호늄 프레임"
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 2 more",
+    "translation": "사용 대상: 지평선 버스, 자이로 구동 장치, 호킹 수집기, 제트 콜렉터, 니호늄 프레임 외 2개"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
     "translation": "사용 제품: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 26 more",
-    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 26개"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 28 more",
+    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 28개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11544,8 +11960,8 @@
     "translation": "사용 대상: 온전한 폐허 타일, 온전한 폐허 기둥, 온전한 폐허 도광판"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 20 more",
-    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 20개"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
+    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 21개"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -11556,12 +11972,12 @@
     "translation": "사용 대상: 운철 주괴"
   },
   "uses.singulo.reactor_shell": {
-    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 1 more",
-    "translation": "사용 대상: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기 외 1개"
+    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 2 more",
+    "translation": "사용 대상: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기 외 2개"
   },
   "uses.singulo.reactor_stabilizer": {
-    "source": "Used in: P-Reactor",
-    "translation": "사용 제품: 펜로즈 반응로"
+    "source": "Used in: P-Reactor, Accretion Jet Forge",
+    "translation": "사용 대상: 펜로즈 반응로, 강착 제트 단조로"
   },
   "uses.singulo.record_fragment": {
     "source": "Used in: Decoded Record",
@@ -11632,12 +12048,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 88 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 88개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 91 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 91개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 67 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 67개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 69 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 69개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
@@ -11648,12 +12064,12 @@
     "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 10 more",
-    "translation": "사용 대상: 특이 물질, 자이로 구동 장치, 특이점 코어, 헤일로 수집기, 실드 타워 주각 외 10개"
+    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 13 more",
+    "translation": "사용 대상: 특이 물질, 자이로 구동 장치, 특이점 코어, 헤일로 수집기, 실드 타워 주각 외 13개"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 8 more",
-    "translation": "사용 대상: SMES 모듈, 반응로 외피, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 외 8개"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 9 more",
+    "translation": "사용 대상: SMES 모듈, 반응로 외피, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 외 9개"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11684,8 +12100,8 @@
     "translation": "사용 제품: 티플러 원통"
   },
   "uses.singulo.topological_wire": {
-    "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Magnetic Confinement Ring, Shield Tower Power Coil and 2 more",
-    "translation": "사용 대상: 토로이드 자기 코일, 지평선 버스, 자이로 구동 장치, 자기 가둠 고리, 실드 타워 파워 코일 외 2개"
+    "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Magnetic Confinement Ring, Shield Tower Power Coil and 3 more",
+    "translation": "사용 대상: 토로이드 자기 코일, 지평선 버스, 자이로 구동 장치, 자기 가둠 고리, 실드 타워 파워 코일 외 3개"
   },
   "uses.singulo.toroidal_magnetic_coil": {
     "source": "Used in: SMES Module",
@@ -12763,6 +13179,10 @@
     "source": "Collects H-Condensate while the reactor core is light.",
     "translation": "노심이 가벼운 동안 H 응축체를 모은다."
   },
+  "summary.singulo.helium_cartridge": {
+    "source": "Carries 250 mB of liquid helium as an item.",
+    "translation": "액체 헬륨 250 mB를 아이템으로 운반한다."
+  },
   "summary.singulo.gravitational_containment_tank": {
     "source": "The only tank that can hold dark matter.",
     "translation": "암흑 물질을 보관할 수 있는 유일한 탱크."
@@ -12838,6 +13258,14 @@
   "summary.singulo.coffee_maker": {
     "source": "Brews coffee from cocoa beans.",
     "translation": "카카오 콩으로 커피를 내린다."
+  },
+  "summary.singulo.collapsar_billet": {
+    "source": "Unforged netherite stock for the Jet Forge.",
+    "translation": "단조로에서 단조하기 전의 네더라이트 소재."
+  },
+  "summary.singulo.collapsar_ingot": {
+    "source": "Light-drinking black metal forged in a jet.",
+    "translation": "블랙홀 제트로 단조한, 빛을 삼키는 검은 금속."
   },
   "summary.singulo.vending_machine": {
     "source": "A vending machine that sells drinks for emeralds.",

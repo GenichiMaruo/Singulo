@@ -64,6 +64,26 @@ public class PortBlockEntity extends BlockEntity {
         return controller;
     }
 
+    /** パイプやケーブルに見せる口（いつも同じ物。中でつながっているコントローラの口へ渡す。{@link PortProxies}）。 */
+    private final PortProxies.Energy energyProxy = new PortProxies.Energy(
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK));
+    private final PortProxies.Items itemProxy = new PortProxies.Items(
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK));
+    private final PortProxies.Fluids fluidProxy = new PortProxies.Fluids(
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK));
+
+    public PortProxies.Energy energyProxy() {
+        return energyProxy;
+    }
+
+    public PortProxies.Items itemProxy() {
+        return itemProxy;
+    }
+
+    public PortProxies.Fluids fluidProxy() {
+        return fluidProxy;
+    }
+
     /** コントローラの能力をそのまま返す（未形成なら null）。 */
     @Nullable
     public <T> T delegate(net.neoforged.neoforge.capabilities.BlockCapability<T, net.minecraft.core.Direction> capability) {

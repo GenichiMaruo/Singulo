@@ -22,18 +22,18 @@ public final class SinguloCapabilities {
 
         // 冷却塔の搬入出口は、形成済みのコントローラの入出力をそのまま見せる
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.PORT.get(),
-                (be, side) -> be.delegate(Capabilities.EnergyStorage.BLOCK));
+                (be, side) -> be.energyProxy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.PORT.get(),
-                (be, side) -> be.delegate(Capabilities.ItemHandler.BLOCK));
+                (be, side) -> be.itemProxy());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.PORT.get(),
-                (be, side) -> be.delegate(Capabilities.FluidHandler.BLOCK));
+                (be, side) -> be.fluidProxy());
         // マルチブロック搬入出ポートも同じ（出力の自動搬出はポート自身が行う）
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
-                (be, side) -> be.delegate(Capabilities.EnergyStorage.BLOCK));
+                (be, side) -> be.energyProxy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
-                (be, side) -> be.delegate(Capabilities.ItemHandler.BLOCK));
+                (be, side) -> be.itemProxy());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
-                (be, side) -> be.delegate(Capabilities.FluidHandler.BLOCK));
+                (be, side) -> be.fluidProxy());
 
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.THERMOELECTRIC_GENERATOR.get(),
                 (be, side) -> be.energy());
@@ -55,7 +55,8 @@ public final class SinguloCapabilities {
                 (be, side) -> be.automationItems());
         // 冷媒カートリッジは液体窒素100 mBの容器（バケツと同じく、装置を右クリックして注ぐ・汲む）
         event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(stack),
-                io.github.genichimaruo.singulo.machine.CoolantCartridges.filled(), io.github.genichimaruo.singulo.machine.CoolantCartridges.empty());
+                io.github.genichimaruo.singulo.machine.CoolantCartridges.filled(), io.github.genichimaruo.singulo.machine.CoolantCartridges.empty(),
+                io.github.genichimaruo.singulo.machine.CoolantCartridges.helium());
         // 液体キャニスターは、どの液体でも1,000 mBまでの容器
         event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> io.github.genichimaruo.singulo.item.FluidCanisterItem.handler(stack),
                 SinguloItems.FLUID_CANISTER.get());
@@ -105,6 +106,12 @@ public final class SinguloCapabilities {
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.WORMHOLE_GENERATOR.get(),
                 (be, side) -> be.automationItems());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.JET_FORGE.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.JET_FORGE.get(),
+                (be, side) -> be.automationItems());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.JET_FORGE.get(),
+                (be, side) -> be.coolant());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.WORMHOLE_STABILIZER.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.WORMHOLE_STABILIZER.get(),

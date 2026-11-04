@@ -1204,11 +1204,27 @@ public class LastArchivist extends RuinBoss {
         }
         Vec3 c = shieldCenter(home);
         for (io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb : level.getEntitiesOfClass(
-                io.github.genichimaruo.singulo.reactor.BlackHoleBomb.class, new AABB(c, c).inflate(SHIELD_RADIUS + 6), b -> !b.captured())) {
+                io.github.genichimaruo.singulo.reactor.BlackHoleBomb.class, new AABB(c, c).inflate(SHIELD_RADIUS + 6),
+                b -> !b.captured() && nearestArchivist(level, b) == this)) {
             bomb.capture(this);
             level.playSound(null, bomb.blockPosition(), SinguloSounds.BLACK_HOLE_FORMATION.get(), SoundSource.HOSTILE, 1.5F, 1.9F);
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, bomb.getX(), bomb.getY(), bomb.getZ(), 30, 0.2, 0.2, 0.2, 0.4);
         }
+    }
+
+    /** 爆弾にいちばん近い、生きている最後の記録者（部屋が近くにいくつもあるとき、隣の部屋の記録者が横取りしないように）。 */
+    private static LastArchivist nearestArchivist(ServerLevel level, net.minecraft.world.entity.Entity bomb) {
+        LastArchivist best = null;
+        double bestDist = Double.MAX_VALUE;
+        for (LastArchivist a : level.getEntitiesOfClass(LastArchivist.class, bomb.getBoundingBox().inflate(SHIELD_RADIUS * 2 + 12),
+                a -> a.isAlive() && !a.isDeadOrDying())) {
+            double d = a.distanceToSqr(bomb);
+            if (d < bestDist) {
+                bestDist = d;
+                best = a;
+            }
+        }
+        return best;
     }
 
     /** 捕らえた爆弾を頭の特異点が飲み込み、体力が戻る（言葉ではなく、光と音で分かるように）。 */

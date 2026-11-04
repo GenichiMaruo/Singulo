@@ -1034,7 +1034,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public java.util.Collection<PelletFlight> clientPellets() {
         if (level != null) {
             long now = level.getGameTime();
-            while (!clientPellets.isEmpty() && now - clientPellets.peekFirst().start() > PELLET_FLIGHT_TICKS) {
+            // 飲み込んだあとの光（PELLET_FLIGHT_TICKS の半分ほど）が消えるまで残す
+            while (!clientPellets.isEmpty() && now - clientPellets.peekFirst().start() > PELLET_FLIGHT_TICKS * 3 / 2) {
                 clientPellets.pollFirst();
             }
         }

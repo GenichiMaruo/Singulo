@@ -32,7 +32,8 @@ public final class Blueprints {
         SHIELD_TOWER("event_horizon_shield", new int[]{9}),
         TIPLER_CYLINDER("tipler_cylinder", new int[]{9}),
         WORMHOLE_GENERATOR("wormhole_generator", new int[]{5}),
-        GENESIS_ENGINE("genesis_engine", new int[]{7});
+        GENESIS_ENGINE("genesis_engine", new int[]{7}),
+        JET_FORGE("accretion_jet_forge", new int[]{io.github.genichimaruo.singulo.forge.JetForgeLayout.H});
 
         private final String id;
         private final int[] sizes;
@@ -97,6 +98,7 @@ public final class Blueprints {
             case TIPLER_CYLINDER -> SinguloBlocks.TIPLER_CORE.get();
             case WORMHOLE_GENERATOR -> SinguloBlocks.WORMHOLE_GENERATOR_CORE.get();
             case GENESIS_ENGINE -> SinguloBlocks.GENESIS_CORE.get();
+            case JET_FORGE -> SinguloBlocks.JET_FORGE_CORE.get();
         };
     }
 
@@ -263,6 +265,7 @@ public final class Blueprints {
             case PARTICLE_ACCELERATOR -> Structures.RING_MAX_SIDE + 2;
             case COOLING_TOWER -> Shapes.TOWER_MAX_HEIGHT + 1;
             case PENROSE_REACTOR -> Structures.REACTOR_RADIUS * 2 + 2;
+            case JET_FORGE -> io.github.genichimaruo.singulo.forge.JetForgeLayout.W;
             default -> kind.defaultSize() + 1;
         };
         return 8 + extent;

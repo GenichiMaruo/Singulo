@@ -13,3 +13,4 @@ Start with [docs/README.md](docs/README.md) and [docs/development/README.md](doc
 - Do not change version numbers, merge, tag, or publish without a task authorizing it. Distribution JARs go to CurseForge, not GitHub Releases.
 
 - Current drone/Android integration: `docs/0.14.0/android-drone-integration.md`; drone specifications: `docs/0.14.0/drone-logistics.md`.
+- 0.15.0 (in development on `feature/0.15.0`): [docs/0.15.0/README.md](docs/0.15.0/README.md) — Accretion Jet Forge and the black hole rework.

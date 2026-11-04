@@ -20,7 +20,7 @@ public final class SinguloSounds {
     private static final Map<String, DeferredHolder<SoundEvent, SoundEvent>> BY_NAME = new HashMap<>();
 
     static final String[] NAMES = {
-            "black_hole.ambient", "black_hole.formation",
+            "black_hole.ambient", "black_hole.formation", "black_hole.open",
             "kiln_running", "compressor_running", "electrolyzer_running", "archive_terminal_running",
             "precision_assembler_running", "catalytic_reactor_running", "cooling_tower_running", "particle_accelerator_running",
             "entanglement_synthesizer_running", "laser_cooler_running", "echo_resonator_running",
@@ -69,6 +69,8 @@ public final class SinguloSounds {
             "android.blade_cast", "android.tend", "android.sweep", "android.chatter", "android.thruster", "horizon_warden.bolt_hit", "last_archivist.floor_fade", "security_drone.sputter",
             "drone.rotor", "drone.jet", "drone.hover", "drone.print", "drone.print_start", "drone.printed", "drone.arm_retract", "drone.dismantle", "drone.phase", "drone_port.hatch_open", "drone_port.hatch_close", "drone_port.lift", "drone_port.clamp", "drone_port.pack", "drone_port.arrive",
             "foundry.online", "foundry.dying", "echo_sentinel.awake", "gravity_remnant.pulse", "last_archivist.dissolve", "last_archivist.inhale",
+            "jet_forge.formed", "jet_forge.jet", "jet_forge.arc", "jet_forge.warning", "jet_forge.spool", "jet_forge.focus", "jet_forge.beam_start", "jet_forge.beam",
+            "jet_forge.pulse", "jet_forge.finish", "jet_forge.cool", "jet_forge.collect",
     };
 
     static {

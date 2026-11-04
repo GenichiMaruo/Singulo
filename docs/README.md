@@ -33,3 +33,7 @@
 ## 0.14.1
 
 - [Issue #52の照明互換性調査・修正](0.14.1/issue-52.md)・[変更履歴](curseforge/changelog-0.14.1.md)
+
+## 0.15.0（開発中）
+
+- [0.15.0資料の目次](0.15.0/README.md)・[降着ジェット鍛造炉](0.15.0/accretion-jet-forge.md)

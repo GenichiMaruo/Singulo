@@ -1331,3 +1331,61 @@ for _chapter in CHAPTERS:
             'Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\n'
             'The P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\n'
             'At initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.'))
+
+# 0.15.0: 降着ジェット鍛造炉（創世炉の章のすぐあと）
+CHAPTERS.insert([c[0] for c in CHAPTERS].index('genesis') + 1, ('jet_forge', 'singulo:jet_forge_core', '降着ジェット鍛造炉', 'Accretion Jet Forge', [
+    ('build', '施設を組む',
+     'Pリアクターが電力を生み、創世炉が物質を生むのに対し、降着ジェット鍛造炉は今ある素材を大電力で鍛え直す施設です。'
+     '長さ44・高さ16・奥行き15の横長の形で、ホロ投影機と組み立ての杖に対応しています。\n'
+     '・排熱側（左端）: 吸熱板の杯。反対側のジェットを受け止めます。\n'
+     '・炉心: 2つの拘束コイル（半径7の輪）の間に、縦向きの降着円盤とブラックホールが浮かびます。拘束コイルの斜め45°の8か所はPリアクターと同じ炉心安定化コイルです。炉心の下は角を落とした台座で、制御核はその手前の縁の中央に埋め込みます。\n'
+     '・収束リング: 半径5・4・3と細くなる3つの輪が、ジェットを白く細いビームに絞ります。\n'
+     '・照射室: 四角い枠の中央に素材が浮かびます。天井に浮揚器、床に回収口。後ろの吸熱板がビームを止めます。\n'
+     '軸に沿ったビームの通り道と、炉心のまわりは空けておきます。土台の基礎はマルチブロック搬入出ポートに替えられます。',
+     'Building the forge',
+     'The P-Reactor makes power and the Genesis Engine makes matter; the Accretion Jet Forge reworks existing materials with huge amounts of power. '
+     'It is a long facility, 44 long, 16 high and 15 deep, supported by the Holo Projector and the builder wand.\n'
+     '- Exhaust side (left end): a heat-sink cup that catches the opposite jet.\n'
+     '- Core: a vertical accretion disk and black hole float between two Confinement Coils (radius-7 rings). The eight 45° points of the coils are Reactor Stabilizer Coils, the same part as the P-Reactor. A chamfered plinth lies under the core, and the controller is set into the middle of its front edge.\n'
+     '- Collimators: three rings of radius 5, 4 and 3 squeeze the jet into a thin white beam.\n'
+     '- Irradiation chamber: the material floats in the middle of a square frame, with the Levitator above and the Collector below. A heat-sink plate behind it stops the beam.\n'
+     'Keep the beam path along the axis and the space around the core clear. Any foundation block can be swapped for a multiblock port.'),
+    ('run', '鍛造の流れ',
+     'まず炉心にブラックホールを作ります。Pリアクターと同じく、制御核に特異点の種（シンギュラリティ・コアでもよい）を入れて画面の「点火」を押し、点火の時間（既定10秒）のうちに 25 GFE を注ぐと、'
+     '8つの炉心安定化コイルから種へ光が流れ込んで光の球が膨らみ、一点へ崩れてブラックホールができます（種は使い切ります。時間切れなら種は残ります）。'
+     'ブラックホールはまわりを引き寄せ、地平線に触れたものを飲み込みます。制御核を壊しても、拘束されたまま野良ブラックホールとして炉心に残り、組み直すと取り込みます。\n'
+     '材料（コラプサー・ビレット1・質量ペレット16）と冷媒（液体ヘリウム1,000 mB）がそろい、完成品の置き場と1 tickぶんの電力があると、'
+     '材料をすべて取り出してから始まります。\n'
+     '1. 予告: 警告灯が回り、照射室に力場の膜が張って、素材が浮かび上がります。\n'
+     '2. 点火・収束: 降着円盤が明るくなって両極からジェットが噴き出し、3つのリングが順に入るたびに絞られていきます。\n'
+     '3. 照射: 60秒のあいだ 250 MFE/t（約300 GFE）。素材は赤熱し、亀裂が走り、破片と光の輪を散らします。\n'
+     '4. 仕上げ・冷却: 閃光と衝撃波のあと、冷えたインゴットが回収口へ降ります。\n'
+     '液体ヘリウムは、パイプで入れるほか、液体ヘリウム・カートリッジ（冷却塔で空の冷媒カートリッジに詰める）や液体キャニスターに入れて材料の枠へ入れても注げます（空の容器は右下の枠に出ます）。ドローンでも運べます。\n'
+     '受電は1 tickに最大1 GFE、蓄えはその4倍まで。電力が足りない・形が崩れた・施設の一部が読み込まれていない・完成品の置き場がないときは、'
+     'その場で止まって待ちます（素材も進み具合も失いません）。制御核に赤石信号を入れると、次の加工を始めません。'
+     'ジェットとビームの通り道に入ると、防具を無視する大きなダメージを受けます（照射中のビームは致命的）。閃光と画面の揺れはクライアント設定で弱められます。',
+     'How forging works',
+     'First form the core black hole. As with the P-Reactor, insert a Singularity Seed (or a Singularity Core) into the controller, press Ignite on its screen and pour in 25 GFE within the ignition window (10 s by default): '
+     'light flows from the eight Reactor Stabilizer Coils into the seed, a ball of light swells and collapses into a black hole (the seed is used up; if time runs out, the seed stays). '
+     'The black hole pulls in its surroundings and swallows anything that touches the horizon. If the controller is broken, it stays bound in the core as a rogue black hole and is taken back in when you rebuild.\n'
+     'When the materials (1 Collapsar Billet and 16 Mass Pellets) and coolant (1,000 mB of liquid helium) are present, the output has room '
+     'and one tick of power is stored, the forge takes all the materials and begins.\n'
+     '1. Warning: beacons spin, a force field closes around the chamber and the material rises.\n'
+     '2. Ignition and focusing: the disk brightens, jets erupt from both poles and are squeezed tighter as each ring engages.\n'
+     '3. Irradiation: 250 MFE/t for 60 s (about 300 GFE). The material glows red, cracks and throws off shards and rings of light.\n'
+     '4. Finish and cooling: after a flash and a shockwave, the cooled ingot descends into the Collector.\n'
+     'Besides piping it in, you can put liquid helium in Liquid Helium Cartridges (filled from empty coolant cartridges in a cooling tower) or fluid canisters and place them in the material slots; they are poured in and the empties go to the bottom-right slot. Drones can carry them too.\n'
+     'Input is at most 1 GFE per tick, with a buffer of four times that. If power runs short, the structure breaks, part of the facility is unloaded or the output is full, '
+     'it pauses where it is (no materials or progress are lost). A redstone signal on the controller stops new runs from starting. '
+     'Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The flash and screen shake can be reduced in the client config.'),
+    ('ingot', 'コラプサー・インゴット',
+     'ブラックホールのジェットで鍛えた、光を吸う黒の地金です。最高位の装備や道具の素材として、ほかの mod から使えるようにしてあります'
+     '（共通タグ c:ingots/collapsar・ID singulo:collapsar_ingot）。\n'
+     'コラプサー・ビレットは特異点封入台で、ネザライトインゴット・縮退物質殻・ジェット凝縮体4・エキゾチック物質2・ニホニウム板2から作ります。'
+     '鍛造のレシピはデータパック（type: singulo:machine、station: accretion_jet_forge）で変えたり足したりできます。',
+     'Collapsar Ingot',
+     'A light-drinking black metal forged in a black hole jet. It is meant as a material for the finest gear and tools in other mods '
+     '(common tag c:ingots/collapsar, ID singulo:collapsar_ingot).\n'
+     'Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, '
+     '2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).'),
+]))
