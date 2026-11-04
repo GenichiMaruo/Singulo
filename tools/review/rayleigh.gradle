@@ -5,6 +5,10 @@ allprojects {
         if (providers.gradleProperty('withEmbeddium').isPresent()) {
             dependencies.add('modRuntimeOnly', 'maven.modrinth:embeddium:UTbfe5d1') { transitive = false }
         }
+        if (providers.gradleProperty('withAlexsCaves').isPresent()) {
+            dependencies.add('modRuntimeOnly', 'maven.modrinth:alexs-caves:lC8HHXOF') { transitive = false }
+            dependencies.add('modRuntimeOnly', 'maven.modrinth:citadel:lTAAe4sZ') { transitive = false }
+        }
         if (providers.gradleProperty('withDistantHorizons').isPresent()) {
             dependencies.add('modRuntimeOnly', 'maven.modrinth:distanthorizons:6UnEfsRQ') { transitive = false }
         }

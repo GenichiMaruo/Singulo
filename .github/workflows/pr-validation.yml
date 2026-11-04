@@ -90,6 +90,19 @@ jobs:
           grep -q 'SINGULO_JEI_TRANSFER_COMPLETE' build/$LOADER/jei-review/logs/latest.log
           grep -q 'SINGULO_POPUP_INPUT_COMPLETE' build/$LOADER/jei-review/logs/latest.log
           grep -q 'SINGULO_DRONE_MODELS_COMPLETE 3' build/$LOADER/jei-review/logs/latest.log
+      - name: Verify Create Ponder previews with Embeddium, Oculus and Alexs Caves
+        if: matrix.loader == 'forge'
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_ponder.py --loader "$LOADER"
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 600s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/ponder.gradle -PwithEmbeddium -PwithOculus -PwithAlexsCaves runClient
+          test "$(grep -c 'SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup' build/$LOADER/ponder-review/logs/latest.log)" -eq 2
+          grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE create:mechanical_press' build/$LOADER/ponder-review/logs/latest.log
+          grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE create:chute' build/$LOADER/ponder-review/logs/latest.log
+          python3 tools/review/check_ponder_png.py build/$LOADER/ponder-review/screenshots/ponder.png
+          python3 tools/review/check_ponder_png.py build/$LOADER/ponder-review/screenshots/ponder-chute.png --scene create:chute
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -107,6 +120,8 @@ jobs:
             build/${{ matrix.loader }}/gui-review/machine-font-metrics.tsv
             build/${{ matrix.loader }}/jei-review/screenshots/
             build/${{ matrix.loader }}/jei-review/logs/
+            build/${{ matrix.loader }}/ponder-review/logs/
+            build/${{ matrix.loader }}/ponder-review/screenshots/
 
   optional-mekanism:
     runs-on: ubuntu-latest

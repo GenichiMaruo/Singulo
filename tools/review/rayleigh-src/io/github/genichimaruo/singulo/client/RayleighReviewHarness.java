@@ -44,9 +44,11 @@ public final class RayleighReviewHarness {
     }
     private static NativeImage lightmap(Minecraft mc) throws Exception {
         LightTexture texture = mc.gameRenderer.lightTexture();
+        texture.tick();
         var flicker = LightTexture.class.getDeclaredField("blockLightRedFlicker"); flicker.setAccessible(true); flicker.setFloat(texture, 0);
         var dirty = LightTexture.class.getDeclaredField("updateLightTexture"); dirty.setAccessible(true); dirty.setBoolean(texture, true);
         texture.updateLightTexture(1);
+        ((RayleighLightmapAccess) texture).singulo$ensureNoon(1);
         var field = LightTexture.class.getDeclaredField("lightPixels"); field.setAccessible(true); return (NativeImage) field.get(texture);
     }
     private static void capture(Minecraft mc, String name) throws Exception {
