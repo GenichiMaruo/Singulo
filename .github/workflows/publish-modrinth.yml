@@ -13,6 +13,11 @@ on:
         description: 'Existing immutable v<version>-1.20.1F or N tag'
         required: true
         type: string
+      release_type:
+        description: 'auto: Beta for 0.x; Release for stable versions 1.0.0 and later'
+        type: choice
+        options: [auto, beta, release, alpha]
+        default: auto
 
 permissions:
   contents: read
@@ -95,7 +100,7 @@ jobs:
           MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID || vars.MODRINTH_PROJECT_ID }}
           JAR_NAME: ${{ steps.version.outputs.name }}.jar
           LOADER: ${{ steps.version.outputs.loader }}
-          RELEASE_TYPE: beta
+          RELEASE_TYPE: ${{ inputs.release_type }}
         run: python3 tools/publish_modrinth.py --source release-source --jar "release-artifacts/$JAR_NAME" --loader "$LOADER" --type "$RELEASE_TYPE"
       - name: Preserve publication receipt and provenance
         if: always()

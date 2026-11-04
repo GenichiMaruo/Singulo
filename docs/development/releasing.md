@@ -15,7 +15,7 @@ Modrinth distribution is supported alongside CurseForge. GitHub Releases still c
 - The project must first be approved and publicly readable. The workflow stops while it is under review.
 - Run **Publish Modrinth** manually from this Minecraft branch, using the same successful PR validation `verified_run_id` and immutable `release_tag` as CurseForge. On 1.20.1, use the F or N tag for the corresponding loader and dispatch once for each loader.
 - Existing provenance, exact source-tree, GameTest and GUI checks promote the tested CI JAR without rebuilding. Tags and versions are not changed. CurseForge publication does not automatically trigger Modrinth.
-- Versions use `<mod_version>-<minecraft><F|N>`; both sides are required, JEI and Mekanism are optional. 0.x releases are Beta (1.20.1 follows the existing Beta channel).
+- Versions use `<mod_version>-<minecraft><F|N>`; both sides are required, JEI and Mekanism are optional. `release_type=auto` selects Beta for 0.x and Release for 1.0.0 and later, or select a channel explicitly.
 - All Modrinth publications are serialized across branches. An existing version with exactly matching filename, SHA-512, Minecraft version, loader and channel is skipped. Any collision stops for manual inspection. The already uploaded 0.14.1 files must not be duplicated.
 - A failed/uncertain upload is never automatically retried. Inspect Modrinth and the `modrinth-receipt-*` workflow artifact before rerunning; the receipt records whether a POST began. Do not overwrite existing files. Publication does not create or alter GitHub Releases or submit the project for moderation.
 - Run `python3 -m unittest discover -s tools -p test_publish_modrinth.py` to check upload safety without uploading.
