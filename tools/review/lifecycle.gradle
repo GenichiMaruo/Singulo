@@ -12,6 +12,7 @@ allprojects {
             def role = providers.gradleProperty('reviewRole').getOrElse('A')
             gameDirectory = layout.buildDirectory.dir('lifecycle-client-' + role).get().asFile
             systemProperty 'singulo.lifecycleRole', role
+            systemProperty 'singulo.lifecycleAddress', providers.gradleProperty('reviewAddress').getOrElse('127.0.0.1:25595')
             systemProperty 'singulo.lifecycleOutput', output
             programArgument '--username'
             programArgument 'Review' + role
