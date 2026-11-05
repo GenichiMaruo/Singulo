@@ -1,6 +1,7 @@
 {
     "vertex": "singulo:lensing",
     "fragment": "singulo:lensing",
+    "attributes": [ "Position", "UV0" ],
     "samplers": [
         { "name": "Sampler0" },
         { "name": "Sampler1" }

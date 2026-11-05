@@ -14,6 +14,8 @@
 - Stop beam damage while processing is paused or the structure is broken, while retaining the black hole's independent gravity.
 - Preserve the black hole's location when rebuilding a frame, reject oversized output stacks, and account for repeated coolant requirements.
 - Keep accepted traced black holes from being displaced by other distortion effects.
+- Reload client settings reliably on Windows, including coalesced file notifications and external edits, without racing UI updates.
+- Correct the legacy camera basis and explicitly bind shader attributes so traced black holes and jet beams render correctly on Minecraft 1.20.1.
 
 ## 追加
 

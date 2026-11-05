@@ -86,10 +86,27 @@ public final class LensingReviewHarness {
         checkedFrame = false;
         if (++frames < 30) return;
         Minecraft mc = Minecraft.getInstance();
+        var beamField = JetForgeRenderTypes.class.getDeclaredField("beamShader");
+        beamField.setAccessible(true);
+        var beam = (net.minecraft.client.renderer.ShaderInstance) beamField.get(null);
+        if (beam == null || org.lwjgl.opengl.GL20.glGetAttribLocation(beam.getId(), "Position") != 0
+                || org.lwjgl.opengl.GL20.glGetAttribLocation(beam.getId(), "UV0") != 1
+                || org.lwjgl.opengl.GL20.glGetAttribLocation(beam.getId(), "Color") != 2) {
+            throw new AssertionError("Legacy beam shader attributes do not match POSITION_TEX_COLOR");
+        }
         Path output = Path.of(System.getProperty("singulo.lensingOutput"));
         Files.createDirectories(output);
         try (var png = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             png.writeToFile(output.resolve("five-holes-and-remnant.png"));
+            if (png.getWidth() != 1280 || png.getHeight() != 800) throw new AssertionError("Unexpected lensing viewport");
+            for (int center : new int[]{447, 544, 640, 737, 833}) {
+                int black = 0;
+                for (int y = 390; y < 410; y++) for (int x = center - 10; x < center + 10; x++) {
+                    int pixel = png.getPixelRGBA(x, y);
+                    if ((pixel & 255) < 20 && (pixel >> 8 & 255) < 20 && (pixel >> 16 & 255) < 20) black++;
+                }
+                if (black < 100) throw new AssertionError("Black-hole shadow missing at screen x=" + center);
+            }
         }
         Singulo.LOGGER.info("SINGULO_LENSING_FIVE_COMPLETE traced=4 fallback=1 remnant=1 frames={}", frames);
         complete = true;

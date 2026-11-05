@@ -275,7 +275,10 @@ public final class GravitationalLensing {
         RenderTarget main = mc.getMainRenderTarget();
         int w = main.width;
         int h = main.height;
-        Matrix4f view = new Matrix4f().rotation(cameraRotation.conjugate(new Quaternionf()));
+        // Legacy Camera.rotation looks along local +Z; the projection looks down -Z.
+        // GameRenderer's view is Rx(pitch) * Ry(yaw + PI), not the raw inverse camera.
+        Matrix4f view = new Matrix4f().rotationY((float) Math.PI)
+                .rotate(cameraRotation.conjugate(new Quaternionf()));
         float[][] lenses = new float[MAX_LENSES][];
         float[][] spheres = new float[MAX_LENSES][];
         float[][] disks = new float[MAX_LENSES][];
