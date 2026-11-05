@@ -25,7 +25,7 @@ uniform vec4 Lens;
 uniform vec4 Sphere;
 // 光の経路をたどって描く降着円盤（ブラックホールのレンズだけ）。座標はカメラから見たもの（ブロック、視線は −z）。
 // Disk = (ブラックホールの中心 xyz, 地平線の半径)。地平線の半径が 0 なら円盤なし（影と円盤はワールドに描いてある）
-// DiskN = (円盤の面の向き xyz, 内側の半径)、DiskP = (外側の半径, ドップラーで明るさが変わる幅, 明るさの倍率, 渦の筋の時計（秒、0 で筋なし）)
+// DiskN = (円盤の面の向き xyz, 内側の半径)、DiskP = (外側の半径, ドップラーで明るさが変わる幅, 明るさの倍率, 渦の筋の時計（0 で筋なし）)
 uniform vec4 Disk;
 uniform vec4 DiskN;
 uniform vec4 DiskP;
@@ -288,12 +288,13 @@ vec4 traceDisk(vec3 origin, vec3 dir, vec4 da, vec4 dn, vec4 dp, float here) {
                 vec3 co = vec3(180.0 * br, 110.0 * br, 90.0 * br + 40.0) / 255.0;
                 vec3 col = mix(ci, co, f);
                 if (dp.w > 0.0) {
-                    // 渦の筋: 内側ほど速く回る対数らせんの濃淡（鍛造炉の円盤だけ）
+                    // 渦の筋: 形の変わらない対数らせんの濃淡（鍛造炉の円盤だけ）。半径ごとに回る速さを変えると、
+                    // 時間とともに筋が巻き込まれて画素より細かい同心円の縞になるので、全体を同じ速さで回す
                     vec3 a1 = normalize(cross(n, abs(n.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0)));
                     vec3 a2 = cross(n, a1);
                     float ang = atan(dot(hit, a2), dot(hit, a1));
-                    float streak = sin(ang * 5.0 + log(rh / rin) * 9.0 - dp.w * 3.0 / (0.4 + f));
-                    col *= 0.8 + 0.2 * streak;
+                    float streak = sin(ang * 3.0 + log(rh / rin) * 4.0 - dp.w * 3.0);
+                    col *= 0.9 + 0.1 * streak;
                 }
                 if (dp.z != 1.0) {
                     // 明るさ: 明るいほど白く（中心の色に寄せて）、暗いほど赤く沈む
