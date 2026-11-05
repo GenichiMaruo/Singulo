@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GQG",
+    "RNR",
+    "MQM"
+  ],
+  "key": {
+    "G": {
+      "item": "singulo:gravity_field_stabilizer"
+    },
+    "Q": {
+      "item": "singulo:quantum_computing_module"
+    },
+    "R": {
+      "item": "singulo:confinement_ring"
+    },
+    "N": {
+      "item": "singulo:nihonium_frame"
+    },
+    "M": {
+      "item": "singulo:time_crystal_module"
+    }
+  },
+  "result": {
+    "id": "singulo:jet_forge_core",
+    "count": 1
+  }
+}

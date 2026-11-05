@@ -120,8 +120,9 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
         MicroBlackHole hole = new MicroBlackHole(SinguloEntities.MICRO_BLACK_HOLE.get(), level());
         hole.setPos(at);
         level().addFreshEntity(hole);
-        level().playSound(null, at.x, at.y, at.z, io.github.genichimaruo.singulo.registry.SinguloSounds.BLACK_HOLE_FORMATION.get(),
-                net.minecraft.sounds.SoundSource.PLAYERS, 2.0F, 1.4F);
+        // 開く音は鳴った瞬間に破裂する（形成の音は2秒ほどためてから鳴るので、開いた見た目より遅れていた）
+        level().playSound(null, at.x, at.y, at.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("black_hole.open"),
+                net.minecraft.sounds.SoundSource.PLAYERS, 2.0F, 1.0F);
         discard();
     }
 }

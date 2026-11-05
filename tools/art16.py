@@ -259,6 +259,7 @@ def accent(stage):
 # ---------------------------------------------------------------- 8×8 の絵柄（# 色、+ 明るい、. 透明）
 
 ICONS = {
+    'jet': ["........", "...##...", "..#..#..", "+++..+++", "+++..+++", "..#..#..", "...##...", "........"],
     'flame': ["...#....", "..##....", "..###...", ".####+..", ".##++##.", "##+++##.", "##+++##.", ".######."],
     'press': ["########", "...##...", "...##...", "...##...", ".######.", "..####..", "........", "########"],
     'bubbles': ["....##..", "...#..#.", "#...##..", ".......#", "..##..#.", ".#..#...", "..##...#", "......#."],
@@ -318,6 +319,7 @@ MACHINE_ICONS = {
     'neutrino_observatory': ('dish', (190, 150, 255)),
     'deep_sea_collector': ('bubbles', (90, 150, 255)), 'void_collector': ('halo', (170, 120, 240)),
     'keraunos_tower': ('star', (150, 220, 255)),
+    'jet_forge_core': ('jet', (176, 226, 255)),
 }
 
 
@@ -682,6 +684,8 @@ def furnace_front(on, frame=0, frames=1):
 # ---------------------------------------------------------------- マルチブロックの素材（コントローラと部品で同じ素材・配色）
 
 MATERIALS = {
+    # 降着ジェット鍛造炉: 黒に近い砲金と、青白いジェットの光（tools/jet_forge_assets.py）
+    'jet': __import__('jet_forge_assets').JET,
     # 冷却塔: 白いコンクリートと鋼、氷の青
     'tower': dict(plate=(198, 210, 220), frame=(118, 128, 140), edge=(236, 241, 246), trim=(96, 150, 190), glow=(150, 232, 255),
                   hot=(232, 250, 255), dark=(40, 56, 72)),
@@ -790,6 +794,9 @@ def multiblock_part(iid):
 
 
 def _multiblock_part(iid):
+    if iid.startswith('jet_forge_'):
+        import jet_forge_assets
+        return jet_forge_assets.part(iid)
     T, C, V, SH, TI, W = (MATERIALS[k] for k in ('tower', 'compactor', 'cavity', 'shield', 'tipler', 'wormhole'))
     # ---- 冷却塔
     if iid == 'cooling_tower_base':
@@ -1013,6 +1020,7 @@ CONTROLLER_FRONTS = {
     'shield_tower_core': ('shield_tower_plinth', 'shield', 'dome'),
     'tipler_core': ('tipler_housing', 'tipler', 'cylinder'),
     'wormhole_generator_core': ('wormhole_generator_shell', 'wormhole', 'swirl'),
+    'jet_forge_core': ('jet_forge_foundation', 'jet', 'jet'),
 }
 
 
@@ -1794,6 +1802,23 @@ def unfired_teacup():
     return im
 
 
+def helium_cartridge():
+    """液体ヘリウム・カートリッジ: 冷媒カートリッジと同じ鋼の容器に、淡い菫色の帯と霜。"""
+    steel = (176, 184, 196)
+
+    def f(d):
+        d.rectangle([5, 3, 10, 13], fill=rgba(steel))
+        d.rectangle([5, 3, 6, 13], fill=rgba(lighten(steel, 0.25)))
+        d.rectangle([9, 3, 10, 13], fill=rgba(darken(steel, 0.2)))
+        d.rectangle([5, 7, 10, 9], fill=(200, 168, 255, 255))
+        d.line([(6, 8), (9, 8)], fill=(246, 236, 255, 255))
+        d.rectangle([6, 1, 9, 2], fill=rgba(darken(steel, 0.35)))
+        d.point((6, 2), fill=(200, 168, 255, 255))
+        for x, y in ((6, 11), (8, 5), (9, 12)):
+            d.point((x, y), fill=(244, 238, 255, 255))
+    return outlined(f)
+
+
 def empty_coolant_cartridge():
     """空の冷媒カートリッジ: 冷媒カートリッジと同じ鋼の容器で、窓の帯が暗い（中が空）。"""
     steel = (176, 184, 196)
@@ -2104,6 +2129,7 @@ COPPER = (206, 126, 78)
 STEEL = (172, 178, 188)
 
 ITEM_ART = {
+    'collapsar_billet': lambda: __import__('jet_forge_assets').collapsar_billet(),
     'canned_soda': lambda: drink_can((70, 150, 255), (236, 244, 252), (70, 150, 255)),
     'sports_drink': lambda: drink_can((240, 244, 248), (60, 120, 220), (240, 244, 248)),
     'energy_drink': lambda: drink_can((250, 206, 40), (40, 40, 44), (250, 206, 40)),
@@ -2128,6 +2154,7 @@ ITEM_ART = {
     'void_dust': void_dust,
     'coolant_cartridge': lambda: center(shrink(coolant_cartridge(), 'y')),
     'empty_coolant_cartridge': lambda: center(shrink(empty_coolant_cartridge(), 'y')),
+    'helium_cartridge': lambda: center(shrink(helium_cartridge(), 'y')),
     'fluid_canister': fluid_canister,
     'limestone_powder': lambda: center(shrink(limestone_powder(), 'x')),
     'carbon_dust': lambda: center(shrink(carbon_dust(), 'x')),
@@ -2584,6 +2611,7 @@ ANIMATED_ITEMS = {
     'black_hole_bomb': (anim_bomb, 10, 2),
     'artificial_star_core': (anim_star_core, 12, 2),
     'dimensional_pocket': (anim_pocket, 12, 2),
+    'collapsar_ingot': (lambda t: __import__('jet_forge_assets').collapsar_ingot_frame(t), 12, 4),
 }
 
 

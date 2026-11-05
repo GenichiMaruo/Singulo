@@ -641,7 +641,10 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         }
         pose.popPose();
         float strength = phase == 3 ? 0.9F : 0.55F;
-        GravitationalLensing.add(origin.add(0, LastArchivist.HEAD_Y, 0), r * 2.4F, d > 0.6F ? 0.95F : strength);
+        // 影（地平線の約2.6倍に見える）は描いた黒い球の 1.4 倍（金の光子の環にかかり、淡い環は影の外に見える）
+        GravitationalLensing.add(origin.add(0, LastArchivist.HEAD_Y, 0),
+                r * 1.4F * GravitationalLensing.EINSTEIN_PER_HORIZON / GravitationalLensing.SHADOW_PER_HORIZON,
+                d > 0.6F ? 0.95F : strength);
     }
 
     // ------------------------------------------------------------------ 技

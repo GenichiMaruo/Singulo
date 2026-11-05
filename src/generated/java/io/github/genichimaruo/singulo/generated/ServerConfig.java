@@ -90,6 +90,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.LongValue GENESIS_UPKEEP;
     public static final ModConfigSpec.LongValue GENESIS_BASE_COST;
     public static final ModConfigSpec.BooleanValue GENESIS_ENDING_SCREEN;
+    public static final ModConfigSpec.LongValue JET_FORGE_IGNITION_ENERGY;
+    public static final ModConfigSpec.LongValue JET_FORGE_MAX_INPUT;
     public static final ModConfigSpec.IntValue GAUNTLET_RANGE;
     public static final ModConfigSpec.IntValue MANIPULATOR_RANGE;
     public static final ModConfigSpec.IntValue PULL_CHECK_INTERVAL_TICKS;
@@ -181,6 +183,8 @@ public final class ServerConfig {
         ModConfigSpec.LongValue GENESIS_UPKEEP_;
         ModConfigSpec.LongValue GENESIS_BASE_COST_;
         ModConfigSpec.BooleanValue GENESIS_ENDING_SCREEN_;
+        ModConfigSpec.LongValue JET_FORGE_IGNITION_ENERGY_;
+        ModConfigSpec.LongValue JET_FORGE_MAX_INPUT_;
         ModConfigSpec.IntValue GAUNTLET_RANGE_;
         ModConfigSpec.IntValue MANIPULATOR_RANGE_;
         ModConfigSpec.IntValue PULL_CHECK_INTERVAL_TICKS_;
@@ -371,6 +375,12 @@ public final class ServerConfig {
         b.comment("宇宙が生まれたとき、エピローグの画面を出すか", "範囲: true / false");
         GENESIS_ENDING_SCREEN_ = b.define("genesisEndingScreen", true);
         b.pop();
+        b.push("forge");
+        b.comment("降着ジェット鍛造炉の点火に注ぐ電力（点火の時間は ignitionWindowSeconds。Pリアクターと同じ）", "範囲: 1〜（FE）");
+        JET_FORGE_IGNITION_ENERGY_ = b.defineInRange("jetForgeIgnitionEnergy", 25000000000L, 1L, Long.MAX_VALUE);
+        b.comment("降着ジェット鍛造炉が1 tick に受け取る電力の上限（運転に要る電力はレシピで決まる。既定のコラプサー・インゴットは照射中 250 MFE/t）", "範囲: 1〜（FE/t）");
+        JET_FORGE_MAX_INPUT_ = b.defineInRange("jetForgeMaxInput", 1000000000L, 1L, Long.MAX_VALUE);
+        b.pop();
         b.push("gear");
         b.comment("慣性制御ガントレットの射程", "範囲: 4〜32（ブロック）");
         GAUNTLET_RANGE_ = b.defineInRange("gauntletRange", 12, 4, 32);
@@ -468,6 +478,8 @@ public final class ServerConfig {
         GENESIS_UPKEEP = GENESIS_UPKEEP_;
         GENESIS_BASE_COST = GENESIS_BASE_COST_;
         GENESIS_ENDING_SCREEN = GENESIS_ENDING_SCREEN_;
+        JET_FORGE_IGNITION_ENERGY = JET_FORGE_IGNITION_ENERGY_;
+        JET_FORGE_MAX_INPUT = JET_FORGE_MAX_INPUT_;
         GAUNTLET_RANGE = GAUNTLET_RANGE_;
         MANIPULATOR_RANGE = MANIPULATOR_RANGE_;
         PULL_CHECK_INTERVAL_TICKS = PULL_CHECK_INTERVAL_TICKS_;

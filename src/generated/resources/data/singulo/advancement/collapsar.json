@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:collapsar_ingot"
+    },
+    "title": {
+      "translate": "advancement.singulo.collapsar.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.collapsar.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:collapsar_ingot"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:jet_forge"
+}

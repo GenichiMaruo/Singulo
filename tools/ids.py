@@ -80,6 +80,7 @@ MOD = {
     'マルチブロック搬入出ポート': ('multiblock_port', 'Multiblock I/O Port', 'part_block'),
     '冷却塔コントローラ': ('cooling_tower_controller', 'Cooling Tower Controller', 'machine'),
     '冷媒カートリッジ': ('coolant_cartridge', 'Coolant Cartridge', 'item'),
+    '液体ヘリウム・カートリッジ': ('helium_cartridge', 'Liquid Helium Cartridge', 'item'),
     '空の冷媒カートリッジ': ('empty_coolant_cartridge', 'Empty Coolant Cartridge', 'item'),
     # 隕石クレーター（地表の小さな構造物）で採れるもの
     '隕石の溶融殻': ('meteorite_crust', 'Meteorite Fusion Crust', 'nature'),
@@ -330,6 +331,18 @@ MOD = {
     '創世炉の柱': ('genesis_pylon', 'Genesis Pylon', 'block'),
     '創世炉の核': ('genesis_core', 'Genesis Core', 'genesis'),
     '原初の種': ('primordial_seed', 'Primordial Seed', 'item'),
+    # 降着ジェット鍛造炉（0.15.0）: ブラックホールのジェットを絞ったビームで、素材を鍛える加工専用の施設
+    '降着ジェット鍛造炉': ('accretion_jet_forge', 'Accretion Jet Forge', 'structure'),
+    'ジェット鍛造炉の制御核': ('jet_forge_core', 'Jet Forge Core', 'machine'),
+    'ジェット鍛造炉の基礎': ('jet_forge_foundation', 'Jet Forge Foundation', 'part_block'),
+    'ジェット鍛造炉の拘束コイル': ('jet_forge_confinement_coil', 'Jet Forge Confinement Coil', 'part_block'),
+    'ジェット鍛造炉の収束リング': ('jet_forge_collimator', 'Jet Forge Collimator Ring', 'part_block'),
+    'ジェット鍛造炉の吸熱板': ('jet_forge_heat_sink', 'Jet Forge Heat Sink', 'part_block'),
+    'ジェット鍛造炉の骨組み': ('jet_forge_truss', 'Jet Forge Truss', 'part_block'),
+    'ジェット鍛造炉の浮揚器': ('jet_forge_levitator', 'Jet Forge Levitator', 'part_block'),
+    'ジェット鍛造炉の回収口': ('jet_forge_collector', 'Jet Forge Collector', 'part_block'),
+    'コラプサー・ビレット': ('collapsar_billet', 'Collapsar Billet', 'item'),
+    'コラプサー・インゴット': ('collapsar_ingot', 'Collapsar Ingot', 'item'),
 
     # ---- 遺構回収物・復元品 ----
     '観測ログ': ('observation_log', 'Observation Log', 'uses'),
@@ -608,6 +621,7 @@ VANILLA = {
     'ダイヤモンド': '#c:gems/diamond',
     'ネザースター': '#singulo:star_core',
     'ネザー水晶': '#c:gems/quartz',
+    'ネザライトインゴット': '#c:ingots/netherite',
     'バケツ': 'minecraft:bucket',
     'ホッパー': 'minecraft:hopper',
     'ダイヤモンドのツルハシ': 'minecraft:diamond_pickaxe',
@@ -716,6 +730,8 @@ STATIONS = {
     'ハロー捕集器': 'halo_collector',
     'ワームホール生成器': 'wormhole_generator',
     'ワームホール固定化装置': 'wormhole_stabilizer',
+    # レシピの JSON（type: singulo:machine、station: accretion_jet_forge）を JetForgeBlockEntity が読む
+    '降着ジェット鍛造炉': 'accretion_jet_forge',
 }
 # 専用の処理で動く製作場所（レシピの JSON は作らない）
 CUSTOM_STATIONS = {'ハロー捕集器', 'ワームホール生成器', 'ワームホール固定化装置'}
@@ -739,4 +755,4 @@ SPENT = {
 ACCEPTS_SPENT = {('BE凝縮触媒', 'ミュオン触媒')}
 
 # マルチブロックの大きさの下限（冷却塔の高さなど）があるレシピ
-MIN_SIZE = {'液体ヘリウム': 10, 'ニホニウム': 16}
+MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ': 10, 'ニホニウム': 16}

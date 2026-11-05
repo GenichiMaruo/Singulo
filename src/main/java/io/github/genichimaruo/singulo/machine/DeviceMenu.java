@@ -28,7 +28,8 @@ public class DeviceMenu extends AbstractContainerMenu {
         CONTAINMENT_TANK(0, Tank.COUNT, false),
         HALO_COLLECTOR(0, Halo.COUNT, false),
         MUON_COLLECTOR(1, Muon.COUNT, false),
-        DETECTOR(0, Detector.COUNT, false);
+        DETECTOR(0, Detector.COUNT, false),
+        JET_FORGE(6, Forge.COUNT, true);
 
         public final int slots;
         public final int data;
@@ -80,6 +81,17 @@ public class DeviceMenu extends AbstractContainerMenu {
         public static final int BUTTON_OBSERVE = 0;
     }
 
+    /** 降着ジェット鍛造炉。電力は MFE 単位（int に収まるように）。 */
+    public static final class Forge {
+        public static final int PHASE = 0, ELAPSED = 1, TOTAL = 2, HOLD = 3, FORMED = 4, CORE = 5, COOLANT = 6, BUFFER_MFE = 7,
+                CAPACITY_MFE = 8, INTAKE_MFE = 9, DEMAND_MFE = 10, BH = 11, SEED = 12, IGNITION_PCT = 13, IGNITION_SECS = 14,
+                IGNITION_GFE = 15, COUNT = 16;
+        /** 画面のボタン: 点火。 */
+        public static final int BUTTON_IGNITE = 0;
+        /** スロット: 種・材料3つ・完成品・空の容器（JetForgeBlockEntity と同じ並び）。 */
+        public static final int SLOT_CORE = 0, SLOT_OUT = 4, SLOT_EMPTY = 5;
+    }
+
     /** ボタンを受け取る装置。 */
     public interface Host {
         boolean onButton(ServerPlayer player, int id);
@@ -99,6 +111,9 @@ public class DeviceMenu extends AbstractContainerMenu {
             case WORMHOLE_GENERATOR -> new int[][]{{CONTENT_X + 62, 84}, {CONTENT_X + 122, 84}};
             case WORMHOLE_MOUTH -> new int[][]{{CONTENT_X + 20, 84}};
             case MUON_COLLECTOR -> new int[][]{{CONTENT_X + 150, 60}};
+            // コア（炉心の下）・材料3つ（左）・完成品（右）
+            case JET_FORGE -> new int[][]{{CONTENT_X + 54, 84}, {CONTENT_X + 12, 30}, {CONTENT_X + 12, 50}, {CONTENT_X + 12, 70},
+                    {CONTENT_X + 160, 36}, {CONTENT_X + 160, 68}};
             default -> new int[0][];
         };
     }
@@ -121,7 +136,12 @@ public class DeviceMenu extends AbstractContainerMenu {
             addSlot(new NotifyingItemSlot(items, i, at[i][0], at[i][1]) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
-                    // 燃料を入れられるのは口だけ。生成器とミュオン収集器は取り出すだけ
+                    // 燃料を入れられるのは口だけ。生成器とミュオン収集器は取り出すだけ。鍛造炉はコアと材料を入れ、完成品は取り出すだけ
+                    if (kind == Kind.JET_FORGE) {
+                        // 加工中のコアは、サーバー側の口が取り出しを断る（SlotItemHandler の mayPickup）
+                        return getSlotIndex() == Forge.SLOT_CORE ? io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.isCore(stack)
+                                : getSlotIndex() < Forge.SLOT_OUT && items.isItemValid(getSlotIndex(), stack);
+                    }
                     return kind == Kind.WORMHOLE_MOUTH && ExoticCharge.isExoticMatter(stack);
                 }
             });
@@ -187,6 +207,14 @@ public class DeviceMenu extends AbstractContainerMenu {
             }
         } else if (kind == Kind.WORMHOLE_MOUTH && ExoticCharge.isExoticMatter(stack)) {
             if (!moveItemStackTo(stack, 0, 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (kind == Kind.JET_FORGE && slots.get(Forge.SLOT_CORE).mayPlace(stack)) {
+            if (!moveItemStackTo(stack, Forge.SLOT_CORE, Forge.SLOT_CORE + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (kind == Kind.JET_FORGE && slots.get(1).mayPlace(stack)) {
+            if (!moveItemStackTo(stack, 1, Forge.SLOT_OUT, false)) {
                 return ItemStack.EMPTY;
             }
         } else {

@@ -6,7 +6,9 @@ from pathlib import Path
 
 OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "main" / "resources" / "data" / "singulo" / "structure"
 # 名前 → (幅, 高さ, 奥行き)
-TEMPLATES = {"empty": (8, 8, 8), "tall": (5, 13, 5), "large": (9, 11, 9), "huge": (15, 15, 15)}
+TEMPLATES = {"empty": (8, 8, 8), "tall": (5, 13, 5), "large": (9, 11, 9), "huge": (15, 15, 15),
+             # 降着ジェット鍛造炉（44×16×15）を建てる
+             "forge": (48, 18, 20)}
 DATA_VERSION = 3955  # 1.21.1
 
 

@@ -92,6 +92,7 @@ Place the controller and **right-click it with a Holo Projector**. Follow the pr
 | Event Horizon Shield Tower | 5×5, nine blocks high |
 | T-Cylinder | 5×5×9; its field accelerates supported machine processing |
 | Wormhole Generator | Spherical structure within 5×5×5 |
+| Accretion Jet Forge | Long 44×16×15 facility: exhaust cup, core, three collimator rings and irradiation chamber in a line. Foundation blocks accept common ports |
 
 The outer dimensions are only a starting point. Frames, windows, internal components and required air spaces must also match. Shared I/O Ports replace designated panels, not arbitrary components. Accelerator ports sit on either side of its controller. Reactor Extraction Ports replace ring shell blocks: the six ring intersections use Gyro Drives, while the twelve diagonal positions use **Reactor Stabilizer Coils**.
 
@@ -189,6 +190,18 @@ The old civilization tried to turn all mass into energy and perished. The Genesi
 A born universe performs **mass synthesis**. Put the item you want in the frame on the screen, and the engine makes it from power. One item costs `mass × 1 GFE × 10^rarity`, with rarity 0 (stone, wood) to 4 (nether star, elytra, dragon egg). It makes the plain item: enchantments and names on the sample are not copied. Processing synthesized items and feeding them to the P-Reactor never produces a power surplus.
 
 A broken core keeps the memory of its universe (stage, galaxy, chosen item) when placed again, but stored power and partial progress are lost. The list of items is a datapack (`data/<namespace>/mass_synthesis/`).
+
+## Accretion Jet Forge
+
+The P-Reactor makes power and the Genesis Engine makes matter; the **Accretion Jet Forge** reworks existing materials with huge amounts of power. Three collimator rings squeeze the jets from both poles of its black hole into a thin white beam that strikes the material.
+
+1. **Build:** a long facility, 44 long, 16 high and 15 deep. The exhaust cup, the core (a vertical accretion disk between two Confinement Coils), three collimator rings, the irradiation chamber and a beam stop stand in a line. The eight 45° points of the coils are Reactor Stabilizer Coils, as on the P-Reactor. A chamfered plinth lies under the core, with the controller set into the middle of its front edge. The Holo Projector and the builder wand support it. Keep the beam path and the space around the core clear. Any foundation block can be swapped for a multiblock port.
+2. **Core:** like the P-Reactor, it needs ignition. Insert a Singularity Seed (or a Singularity Core) into the controller, press Ignite on its screen and pour in 25 GFE within the ignition window (10 s by default); light flows from the stabilizer coils into the seed and the core black hole forms (the seed is used up). The black hole pulls in its surroundings and swallows anything that touches the horizon. If the controller is broken, it stays in the core as a rogue black hole and is taken back in when you rebuild.
+3. **Forge:** with 1 Collapsar Billet, 16 Mass Pellets and 1,000 mB of liquid helium, room for the product and power, it starts. Warning beacons and a force field, ignition, focusing, irradiation (250 MFE/t for 60 s, about 300 GFE), a finishing flash and shockwave, then cooling: one Collapsar Ingot in about 78 s. Input is at most 1 GFE per tick.
+4. **Pauses lose nothing:** if power runs short, the structure breaks, part of the facility is unloaded or the output is full, it pauses where it is. A redstone signal on the controller stops new runs from starting.
+   Liquid helium can also come in Liquid Helium Cartridges (filled from empty coolant cartridges in a cooling tower) or fluid canisters placed in the material slots; the empties go to the bottom-right slot.
+
+Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. The Collapsar Ingot is meant as a material for the finest gear and tools in other mods (common tag `c:ingots/collapsar`). Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The finishing flash and screen shake can be reduced or turned off with the client settings `jetForgeFlash` and `jetForgeShake`.
 
 ## Troubleshooting and hazards
 

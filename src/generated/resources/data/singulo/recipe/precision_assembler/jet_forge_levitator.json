@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:gravity_field_stabilizer"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:jet_forge_levitator",
+    "count": 1
+  }
+}

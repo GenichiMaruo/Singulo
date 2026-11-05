@@ -61,7 +61,7 @@ STATION_BLOCKS = {
     '粒子加速器': 'accelerator_controller', '量子もつれ合成器': 'entanglement_synthesizer', 'レーザー冷却器': 'laser_cooler',
     '縮退圧縮炉': 'degenerate_compactor_controller', 'C空洞': 'casimir_cavity_controller', '時間結晶育成槽': 'time_crystal_incubator',
     '特異点封入台': 'singularity_encapsulator', '残響共鳴器': 'echo_resonator', 'ワームホール生成器': 'wormhole_generator_core',
-    'ワームホール固定化装置': 'wormhole_stabilizer', 'ハロー捕集器': 'halo_collector',
+    'ワームホール固定化装置': 'wormhole_stabilizer', 'ハロー捕集器': 'halo_collector', '降着ジェット鍛造炉': 'jet_forge_core',
 }
 
 _jar = None

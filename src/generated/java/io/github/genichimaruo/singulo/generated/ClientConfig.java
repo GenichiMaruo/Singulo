@@ -12,6 +12,8 @@ public final class ClientConfig {
     public static final ModConfigSpec.BooleanValue DOPPLER_BEAMING;
     public static final ModConfigSpec.ConfigValue<String> LENSING_QUALITY;
     public static final ModConfigSpec.BooleanValue FORMATION_EFFECTS;
+    public static final ModConfigSpec.DoubleValue JET_FORGE_FLASH;
+    public static final ModConfigSpec.DoubleValue JET_FORGE_SHAKE;
     public static final ModConfigSpec.BooleanValue ANDROID_WORK_ICONS;
     public static final ModConfigSpec.ConfigValue<String> WORK_ORDER_SORT;
     public static final ModConfigSpec.BooleanValue WORK_ORDER_SORT_REVERSED;
@@ -26,6 +28,8 @@ public final class ClientConfig {
         ModConfigSpec.BooleanValue DOPPLER_BEAMING_;
         ModConfigSpec.ConfigValue<String> LENSING_QUALITY_;
         ModConfigSpec.BooleanValue FORMATION_EFFECTS_;
+        ModConfigSpec.DoubleValue JET_FORGE_FLASH_;
+        ModConfigSpec.DoubleValue JET_FORGE_SHAKE_;
         ModConfigSpec.BooleanValue ANDROID_WORK_ICONS_;
         ModConfigSpec.ConfigValue<String> WORK_ORDER_SORT_;
         ModConfigSpec.BooleanValue WORK_ORDER_SORT_REVERSED_;
@@ -44,6 +48,10 @@ public final class ClientConfig {
         LENSING_QUALITY_ = b.defineInList("lensingQuality", "high", java.util.Arrays.asList("low", "medium", "high"));
         b.comment("マルチブロック形成時の光の演出", "範囲: true / false");
         FORMATION_EFFECTS_ = b.define("formationEffects", true);
+        b.comment("降着ジェット鍛造炉の仕上げの閃光で、画面を白く光らせる強さ（0で画面の閃光なし。光の柱などの描画はそのまま）", "範囲: 0.0〜1.0");
+        JET_FORGE_FLASH_ = b.defineInRange("jetForgeFlash", 1.0, 0.0, 1.0);
+        b.comment("降着ジェット鍛造炉の照射と仕上げで、近くにいるときに画面を揺らす強さ（0で揺れなし）", "範囲: 0.0〜1.0");
+        JET_FORGE_SHAKE_ = b.defineInRange("jetForgeShake", 1.0, 0.0, 1.0);
         b.comment("作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す（測量メガネを掛けているときだけ見える）", "範囲: true / false");
         ANDROID_WORK_ICONS_ = b.define("androidWorkIcons", true);
         b.pop();
@@ -64,6 +72,8 @@ public final class ClientConfig {
         DOPPLER_BEAMING = DOPPLER_BEAMING_;
         LENSING_QUALITY = LENSING_QUALITY_;
         FORMATION_EFFECTS = FORMATION_EFFECTS_;
+        JET_FORGE_FLASH = JET_FORGE_FLASH_;
+        JET_FORGE_SHAKE = JET_FORGE_SHAKE_;
         ANDROID_WORK_ICONS = ANDROID_WORK_ICONS_;
         WORK_ORDER_SORT = WORK_ORDER_SORT_;
         WORK_ORDER_SORT_REVERSED = WORK_ORDER_SORT_REVERSED_;

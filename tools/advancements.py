@@ -228,3 +228,12 @@ def validate_advancements():
             node = by_id[node][1]
         if frame not in ('task', 'goal', 'challenge') or cond[0] not in ('tick', 'item', 'any_item', 'all_items', 'milestone', 'kill'):
             raise ValueError(f'{aid}: invalid frame or criterion')
+
+# 0.15.0: 降着ジェット鍛造炉（シンギュラリティ・コアのあと。ジェットで鍛えた最初のインゴット）
+ADVANCEMENTS += [
+    ('jet_forge', 'core', 'jet_forge_core', 'goal', ('milestone', 'formed/accretion_jet_forge'), 5,
+     '光を鍛える', '降着ジェット鍛造炉を組み上げる', 'Forging with Light', 'Form an Accretion Jet Forge'),
+    ('collapsar', 'jet_forge', 'collapsar_ingot', 'challenge', ('item', 'collapsar_ingot'), 5,
+     'コラプサー', 'ブラックホールのジェットで、コラプサー・インゴットを鍛える', 'Collapsar',
+     'Forge a Collapsar Ingot in a black hole jet'),
+]

@@ -109,6 +109,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                 yield new State(Panel.Status.RUN, GuiSkin.OK, direction(),
                         List.of(Component.translatable("gui.singulo.detector.band." + v(DeviceMenu.Detector.BAND))));
             }
+            case JET_FORGE -> forgeState();
         };
     }
 
@@ -190,6 +191,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             case HALO_COLLECTOR -> drawHalo(g, t);
             case MUON_COLLECTOR -> drawMuon(g, t);
             case DETECTOR -> drawDetector(g, t, mouseX, mouseY);
+            case JET_FORGE -> drawForge(g, t, mouseX, mouseY);
         }
         if (hasEnergyBar()) {
             int[] e = energy();
@@ -244,6 +246,181 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             g.fill(x + i, y, x + i + 1, y + h, lerp(from, to, (float) i / Math.max(1, w - 1)));
         }
         Panel.glass(g, x, y, f, h);
+    }
+
+    // ------------------------------------------------------------------ 降着ジェット鍛造炉
+
+    private static final int F_OK = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.OK;
+    private static final int F_NO_POWER = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.NO_POWER;
+    private static final int F_UNLOADED = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.UNLOADED;
+    private static final int F_HELD = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.HELD;
+
+    private State forgeState() {
+        int phase = v(DeviceMenu.Forge.PHASE);
+        int hold = v(DeviceMenu.Forge.HOLD);
+        if (v(DeviceMenu.Forge.FORMED) == 0 && hold != F_UNLOADED) {
+            return new State(Panel.Status.BROKEN, GuiSkin.BAD, tr("not_formed"), List.of());
+        }
+        Component reason = switch (hold) {
+            case io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.NO_POWER -> tr("forge.no_power");
+            case io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.OUTPUT_FULL -> tr("forge.output_full");
+            case io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.NO_CORE -> tr("forge.no_core");
+            case io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.UNLOADED -> tr("forge.unloaded");
+            case io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.HELD -> tr("forge.held");
+            default -> null;
+        };
+        int bh = v(DeviceMenu.Forge.BH);
+        if (bh == io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.BH_IGNITING) {
+            return new State(Panel.Status.RUN, GuiSkin.WARN, tr("forge.igniting", v(DeviceMenu.Forge.IGNITION_PCT), v(DeviceMenu.Forge.IGNITION_SECS)),
+                    List.of(tr("forge.ignite", v(DeviceMenu.Forge.IGNITION_GFE))));
+        }
+        if (phase == 0) {
+            if (reason != null) {
+                return new State(hold == F_HELD ? Panel.Status.OFF : Panel.Status.WARN, GuiSkin.WARN, reason, List.of());
+            }
+            return new State(Panel.Status.IDLE, GuiSkin.IDLE, tr("forge.idle"), List.of());
+        }
+        Component running = tr("forge.running", tr("forge.phase." + phase), v(DeviceMenu.Forge.ELAPSED) / 20, v(DeviceMenu.Forge.TOTAL) / 20);
+        return reason != null ? new State(Panel.Status.WARN, GuiSkin.WARN, reason, List.of(running))
+                : new State(Panel.Status.RUN, GuiSkin.OK, running, List.of());
+    }
+
+    /** 施設を横から見た図: 排熱側の杯・炉心・3つの収束リング・照射室。段階に合わせてジェットとビームが伸び、素材が熱を帯びる。 */
+    /** 点火のボタン（コアの右）。 */
+    private static final int IGNITE_X = 76, IGNITE_Y = 84, IGNITE_W = 18, IGNITE_H = 16;
+
+    private boolean canIgnite() {
+        return v(DeviceMenu.Forge.BH) == io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.BH_NONE && v(DeviceMenu.Forge.SEED) != 0
+                && v(DeviceMenu.Forge.FORMED) != 0;
+    }
+
+    private void drawForge(GuiGraphics g, float t, int mouseX, int mouseY) {
+        int phase = v(DeviceMenu.Forge.PHASE);
+        int hold = v(DeviceMenu.Forge.HOLD);
+        boolean stalled = hold != F_OK;
+        int total = Math.max(1, v(DeviceMenu.Forge.TOTAL));
+        float k = v(DeviceMenu.Forge.ELAPSED) / (float) total;
+        boolean core = v(DeviceMenu.Forge.CORE) != 0;
+        boolean igniting = v(DeviceMenu.Forge.BH) == io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.BH_IGNITING;
+        int ay = 46;
+        int bh = 54;
+        int sink = 36;
+        int cage0 = 128;
+        int cage1 = 148;
+        int mat = 138;
+        int[] rings = {76, 94, 112};
+        int[] ringH = {12, 9, 6};
+        Panel.well(g, skin, cx(32), cy(22), 122, 48);
+        g.fill(cx(32), cy(22), cx(154), cy(70), 0xFF080A12);
+        // 排熱側の杯とビーム止め
+        int heat = phase >= 2 && phase <= 5 ? 0xFFFF7A30 : 0xFF5A3420;
+        g.fill(cx(sink), cy(ay - 9), cx(sink + 2), cy(ay + 10), heat);
+        g.fill(cx(sink + 2), cy(ay - 9), cx(sink + 6), cy(ay - 8), heat);
+        g.fill(cx(sink + 2), cy(ay + 9), cx(sink + 6), cy(ay + 10), heat);
+        g.fill(cx(cage1 + 3), cy(ay - 3), cx(cage1 + 5), cy(ay + 4), 0xFF5A3420);
+        // 拘束コイル
+        float power = phase == 0 ? 0.15F : phase == 1 ? 0.3F : phase >= 6 ? 0.4F : 1;
+        int coil = lerp(0xFF203040, CYAN, power);
+        g.fill(cx(bh - 5), cy(ay - 14), cx(bh - 4), cy(ay + 15), coil);
+        g.fill(cx(bh + 5), cy(ay - 14), cx(bh + 6), cy(ay + 15), coil);
+        // 収束リング（入ったものは明るい）
+        int focusStart = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS
+                + io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS;
+        int lit = phase == 3 ? Math.min(3, 1 + 3 * (v(DeviceMenu.Forge.ELAPSED) - focusStart)
+                / io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS) : phase == 4 || phase == 5 ? 3 : 0;
+        for (int i = 0; i < 3; i++) {
+            int c = i < lit ? 0xFFA8E4FF : 0xFF2A3448;
+            g.fill(cx(rings[i]), cy(ay - ringH[i]), cx(rings[i] + 2), cy(ay - 2), c);
+            g.fill(cx(rings[i]), cy(ay + 3), cx(rings[i] + 2), cy(ay + ringH[i] + 1), c);
+        }
+        // 照射室の枠
+        g.renderOutline(cx(cage0), cy(ay - 8), cage1 - cage0 + 1, 17, phase >= 1 && phase <= 5 ? 0xFF7FD0FF : 0xFF3A4660);
+        // ジェットとビーム
+        float flicker = stalled ? 0.4F + 0.3F * Mth.sin(t * 2.3F) : 1;
+        if (phase >= 2 && phase <= 5) {
+            int reach = phase == 2 ? bh + 22 : phase == 3 ? rings[Math.max(0, lit - 1)] + 14 : mat;
+            int wide = phase == 2 ? 3 : phase == 3 ? 2 : 1;
+            int col = phase >= 4 ? lerp(0xFFBFE6FF, 0xFFFFFFFF, 0.5F + 0.5F * Mth.sin(t * 0.6F)) : 0xFF7E90FF;
+            g.fill(cx(bh + 2), cy(ay - wide), cx(Math.min(reach, mat)), cy(ay + wide + 1), (col & 0xFFFFFF) | ((int) (255 * flicker) << 24));
+            g.fill(cx(sink + 2), cy(ay - 3), cx(bh - 2), cy(ay + 4), 0x7E70FF | ((int) (160 * flicker) << 24));
+        }
+        // 点火中: 種が光りながら膨らみ、満ちると一点へ崩れる
+        if (igniting) {
+            float pct = v(DeviceMenu.Forge.IGNITION_PCT) / 100F;
+            int r = 1 + Math.round(5 * pct * (0.85F + 0.15F * Mth.sin(t * 0.8F)));
+            for (int dy = -r; dy <= r; dy++) {
+                int half = (int) Math.round(Math.sqrt(Math.max(0, r * r - dy * dy)));
+                g.fill(cx(bh) - half, cy(ay + dy), cx(bh) + half + 1, cy(ay + dy + 1), lerp(0xFFFF9040, 0xFFFFFFFF, pct));
+            }
+        }
+        // ブラックホールと、横から見た縦向きの降着円盤
+        if (core) {
+            int disk = lerp(0xFF803020, 0xFFFFE0B0, power);
+            g.fill(cx(bh), cy(ay - 9), cx(bh + 1), cy(ay + 10), disk);
+            for (int dy = -3; dy <= 3; dy++) {
+                int half = (int) Math.round(Math.sqrt(Math.max(0, 10 - dy * dy)));
+                g.fill(cx(bh) - half + 1, cy(ay + dy), cx(bh) + half + 1, cy(ay + dy + 1), 0xFF000000);
+            }
+            g.renderOutline(cx(bh) - 3, cy(ay - 4), 8, 9, lerp(0xFF402010, 0xFFFFB070, power));
+        }
+        // 素材（熱を帯びる）
+        if (phase != 0) {
+            float h = phase == 4 ? Math.min(1, 0.2F + k * 1.4F) : phase == 5 ? 1 : phase == 6 ? 0.5F : 0.1F;
+            g.fill(cx(mat - 3), cy(ay - 2), cx(mat + 3), cy(ay + 3), lerp(0xFF6A4A78, 0xFFFFF0D0, h));
+        }
+        // 進み具合（段階の区切りの目盛りつき）
+        bar(g, cx(32), cy(74), 122, 4, k, 0xFF7E90FF, 0xFFFFFFFF);
+        int irr = total - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS
+                - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS
+                - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FINISH_TICKS - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.COOL_TICKS;
+        int acc = 0;
+        for (int d : new int[]{io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS,
+                io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS,
+                irr, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FINISH_TICKS}) {
+            acc += d;
+            int x = 32 + Math.round(122F * acc / total);
+            g.fill(cx(x), cy(73), cx(x + 1), cy(79), 0x80FFFFFF);
+        }
+        hint(31, 72, 124, 8, forgeState().text());
+        // スロット: コア（炉心の下）・材料（左）・完成品（右）
+        int[][] at = DeviceMenu.slotPos(kind);
+        for (int[] a : at) {
+            Panel.slot(g, skin, leftPos + a[0], topPos + a[1]);
+        }
+        g.renderOutline(leftPos + at[0][0] - 2, topPos + at[0][1] - 2, 20, 20, core ? 0xFFFFB070 : MAGENTA);
+        g.renderOutline(leftPos + at[4][0] - 2, topPos + at[4][1] - 2, 20, 20, CYAN);
+        // スロットの説明は空のときだけ（物が入っていれば、その物の説明と重ならないように出さない）
+        Component[] slotHints = {tr("forge.core"), tr("forge.inputs"), tr("forge.inputs"), tr("forge.inputs"), tr("forge.output"),
+                tr("forge.empties")};
+        for (int i = 0; i < at.length; i++) {
+            if (!menu.slots.get(i).hasItem() && menu.getCarried().isEmpty()) {
+                hint(at[i][0] - OX, at[i][1], 16, 16, slotHints[i]);
+            }
+        }
+        // 冷媒（完成品の下）と電力（右のゲージ）
+        int coolant = v(DeviceMenu.Forge.COOLANT);
+        int tank = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.TANK_CAPACITY;
+        bar(g, cx(158), cy(58), 20, 4, coolant / (float) tank, 0xFF4A8CC8, 0xFFBFE6FF);
+        hint(157, 56, 22, 8, tr("forge.coolant", coolant, tank));
+        long buf = v(DeviceMenu.Forge.BUFFER_MFE) * 1_000_000L;
+        long cap = Math.max(1, v(DeviceMenu.Forge.CAPACITY_MFE)) * 1_000_000L;
+        long intake = v(DeviceMenu.Forge.INTAKE_MFE) * 1_000_000L;
+        long demand = v(DeviceMenu.Forge.DEMAND_MFE) * 1_000_000L;
+        Component powerLine = tr("forge.power", EnergyText.of(buf), EnergyText.of(cap), EnergyText.of(intake));
+        // 1回の加工の電力のめやす: 照射の電力 × (照射の tick + 点火と収束の分)
+        Component demandLine = tr("forge.demand", EnergyText.of(demand), EnergyText.of(demand * (irr + 65L)));
+        Panel.gauge(g, skin, cx(BAR_X), cy(BAR_Y), BAR_W, BAR_H, buf / (double) cap, Panel.GLOW);
+        hint(BAR_X - 1, BAR_Y - 1, BAR_W + 2, BAR_H + 2, powerLine, demandLine);
+        value(g, 104, 88, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(intake) + "/t", hold == F_NO_POWER ? GuiSkin.WARN : skin.text(),
+                powerLine, demandLine);
+        value(g, 104, 88 + STAT_PITCH, Panel.Icon.DROP, 0xFF7FB8E8, coolant + " mB", skin.text(), tr("forge.coolant", coolant, tank));
+        // 点火のボタン（ブラックホールがなく、コアが入っているときだけ押せる）
+        boolean can = canIgnite();
+        boolean hover = can && Panel.inside(mouseX, mouseY, cx(IGNITE_X), cy(IGNITE_Y), IGNITE_W, IGNITE_H);
+        int d = Panel.button(g, skin, cx(IGNITE_X), cy(IGNITE_Y), IGNITE_W, IGNITE_H,
+                !can ? Panel.Press.DISABLED : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        Panel.icon(g, cx(IGNITE_X + IGNITE_W / 2 - 3), cy(IGNITE_Y + 4) + d, Panel.Icon.STAR, can ? 0xFFFFB070 : skin.dim());
+        hint(IGNITE_X, IGNITE_Y, IGNITE_W, IGNITE_H, core ? tr("forge.active") : tr("forge.ignite", v(DeviceMenu.Forge.IGNITION_GFE)));
     }
 
     // ------------------------------------------------------------------ ワームホール生成器
@@ -588,6 +765,9 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             } else if (kind == Kind.DETECTOR
                     && Panel.inside(mouseX, mouseY, cx(OBSERVE_X), cy(OBSERVE_Y), OBSERVE_W, OBSERVE_H)) {
                 id = DeviceMenu.Detector.BUTTON_OBSERVE;
+            } else if (kind == Kind.JET_FORGE && canIgnite()
+                    && Panel.inside(mouseX, mouseY, cx(IGNITE_X), cy(IGNITE_Y), IGNITE_W, IGNITE_H)) {
+                id = DeviceMenu.Forge.BUTTON_IGNITE;
             }
             if (id >= 0) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);

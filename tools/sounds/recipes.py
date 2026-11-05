@@ -1688,3 +1688,130 @@ def drone_phase(d, seed):
     shine = shimmer(0.8, 18, 2400, 2, 0.5, seed) * 0.35
     air_ = bandpass(pink(0.8, seed + 1), 1800, 2) * env([(0, 0), (0.3, 0.4), (0.8, 0)], 0.8) * 0.4
     return chorus(reverb(mix(rise, shine, air_), 0.6, 0.35, 5000, 0.6), 3, 0.006, 0.5, seed)
+
+
+# =================================================================== 降着ジェット鍛造炉（0.15.0）
+
+@recipe('jet_forge/formed', level=BOSS)
+def jet_forge_formed(d, seed):
+    # 形ができた: 長い施設の端から端へ、留め具がかかっていく連打と、炉心が目を覚ます低い和音
+    locks = mix(*[(clank(380 + 40 * i, 0.3, seed + i) * 0.35, 0.09 * i) for i in range(10)])
+    wake = pad(2.6, (65.4, 98, 130.8, 196), 900, 0.3, seed) * env([(0, 0), (0.8, 1), (2.6, 0)], 2.6) * 0.6
+    sub = sub_drop(1.8, 90, 30) * 0.6
+    return reverb(mix(locks, (wake, 0.6), (sub, 0.9), (chime(523, 1.6, seed) * 0.3, 1.0)), 0.9, 0.35, 2500, 1.2)
+
+
+@recipe('jet_forge/warning', level=-16)
+def jet_forge_warning(d, seed):
+    # 起動の予告: 2音の警報（1秒ごとに鳴らす）。施設の広さに響く
+    tone = alarm(0.9, 740, 554, 2.2) * env([(0, 0), (0.03, 1), (0.8, 0.8), (0.9, 0)], 0.9)
+    return reverb(mix(tone * 0.6, (lowpass(tone, 600) * 0.4, 0.0)), 0.8, 0.35, 3000, 0.9)
+
+
+@recipe('jet_forge/spool', level=BOSS)
+def jet_forge_spool(d, seed):
+    # 点火（4秒）: 拘束コイルに電流が入り、降着円盤が速く回り始め、両極からジェットが噴き出す
+    D = 4.0
+    t = t_axis(D)
+    k = np.clip(t / D, 0, 1)
+    coil = whine(glide(60, 420, D, 1.6), D, 0.003, 4) * (0.2 + 0.5 * k)
+    whirl = bandpass(pink(D, seed), 200 + 1800 * k ** 2, 2) * (0.5 + 0.5 * sine(1 + 9 * k)) * (0.2 + 0.7 * k)
+    drone = (sine(28 + 30 * k) * 0.8 + saw(56 + 60 * k) * 0.1) * (0.3 + 0.6 * k)
+    burst = mix(whoosh(1.4, 400, 5000, 1.4, seed + 1, 0.7) * 0.9, boom(1.6, 40, seed + 2, 0.5) * 0.8)
+    return fade(fit(reverb(mix(coil, whirl, drone, (burst, 1.2)), 0.85, 0.3, 3000, 0.8), D + 1.5), 0, 0.3)
+
+
+@recipe('jet_forge/focus', level=-15)
+def jet_forge_focus(d, seed):
+    # 収束リングが入る: 重い留め具の音と、電磁石が一気に励磁されるうなり、ビームが細く締まる鋭い音
+    lock = mix(thump(50, 0.4, 0.6, seed) * 0.9, (clank(260, 0.5, seed) * 0.5, 0.0))
+    charge = mix(zap(0.35, 3000, 400, seed + 1) * 0.6, arc(0.5, seed + 2, 80) * 0.3)
+    squeeze = sine(glide(220, 1400, 0.6, 0.7)) * env([(0, 0), (0.1, 0.5), (0.6, 0)], 0.6) * 0.35
+    return reverb(mix(lock, (charge, 0.02), (squeeze, 0.05)), 0.7, 0.3, 3500, 0.7)
+
+
+@recipe('jet_forge/beam_start', level=BIG)
+def jet_forge_beam_start(d, seed):
+    # 照射の始まり: ビームが素材に届く瞬間の衝撃と、白い光の鋭い立ち上がり
+    hit = mix(impact(0.8, 60, seed, 0.4) * 1.0, boom(2.2, 34, seed + 1, 0.6) * 0.8)
+    sizzle = highpass(crackle(1.6, 180, seed + 2, 0.003), 2500) * env([(0, 1), (1.6, 0)], 1.6) * 0.5
+    sing = whine(glide(1800, 900, 1.6, 0.5), 1.6, 0.004, 9) * env([(0, 0.4), (1.6, 0)], 1.6) * 0.25
+    return reverb(mix(hit, sizzle, sing), 0.9, 0.35, 3000, 1.2)
+
+
+@machine('jet_forge/beam', level=-14)
+def jet_forge_beam(d, seed):
+    # 照射中のビーム（くり返し）: 太いうなりと、ビームの中を流れる電流の細かいうねり（ジリジリした放電は収束リングの音）
+    core = hum(41, d, (1, 2, 3, 5), (1, 0.6, 0.35, 0.2), 0.003, seed) * (0.85 + 0.15 * lfo(3, d))
+    flow = bandpass(pink(d, seed), 900 + 300 * lfo(1.5, d), 3) * 0.5
+    whine_ = whine(1240, d, 0.003, 7) * 0.08
+    return core + flow + whine_ + throb(d, 1, 36, 0.4) * 0.5
+
+
+@recipe('jet_forge/pulse', level=-17)
+def jet_forge_pulse(d, seed):
+    # 2秒ごとの脈動: ビームが太くなる重い一拍
+    return reverb(mix(thump(38, 0.7, 0.2, seed) * 1.0, (lowpass(white(0.5, seed), 500) * perc(0.5, 0.01, 0.3) * 0.4, 0.0)),
+                  0.7, 0.25, 2000, 0.6)
+
+
+@recipe('jet_forge/finish', level=BIG)
+def jet_forge_finish(d, seed):
+    # 仕上げ: 閃光の鋭い破裂、地の底まで届く重低音、遠くへ抜けていく衝撃波の残響
+    crack = mix(highpass(white(0.15, seed), 1500) * perc(0.15, 0.001, 0.05) * 1.2, impact(1.0, 45, seed + 1, 0.6))
+    low = mix(sub_drop(4.0, 70, 18) * 1.4, boom(5.0, 26, seed + 2, 0.3) * 1.2)
+    wave = whoosh(3.5, 3000, 120, 1.2, seed + 3, 0.6) * env([(0, 0), (0.2, 1), (3.5, 0)], 3.5) * 0.6
+    ring_ = shimmer(4.0, 10, 1800, 3, 1.4, seed + 4) * 0.25
+    return reverb(mix(crack, low, (wave, 0.05), (ring_, 0.2)), 1.0, 0.4, 2200, 2.5)
+
+
+@recipe('jet_forge/cool', level=-15)
+def jet_forge_cool(d, seed):
+    # 冷却: 冷媒が吹きつける長い噴気と、冷えて縮む金属のきしみ・こつこつという音
+    hiss = highpass(white(4.5, seed), 1800) * env([(0, 0), (0.15, 1), (2.5, 0.6), (4.5, 0)], 4.5) * 0.5
+    creak = mix(*[(resonator(white(0.05, seed + i), 700 + 160 * i, 0.25) * 0.35, 0.6 + 0.55 * i) for i in range(6)])
+    ticks = mix(*[(tick(2500 + 300 * (i % 3), 0.02, seed + 10 + i) * 0.35, 1.2 + 0.4 * i) for i in range(7)])
+    return reverb(mix(hiss, creak, ticks), 0.6, 0.3, 4000, 0.8)
+
+
+@recipe('jet_forge/collect', level=-17)
+def jet_forge_collect(d, seed):
+    # 完成品が回収口に収まる: 重い金属の落ち着く音と、澄んだ知らせ
+    return reverb(mix(clank(220, 0.5, seed) * 0.7, (thump(70, 0.3, 0.4, seed) * 0.6, 0.0), (chime(659, 1.2, seed) * 0.35, 0.15),
+                      (chime(988, 1.4, seed + 1) * 0.3, 0.3)), 0.6, 0.3, 4000, 0.8)
+
+
+@recipe('black_hole/open', level=BIG)
+def black_hole_open(d, seed):
+    # ブラックホールが開く瞬間（小型BH爆弾・鍛造炉の炉心）: 鳴った瞬間に空間が裂けて破裂し、
+    # 0.5秒ほどで地平線が広がるあいだ、周りの空気が渦を巻いて吸い込まれ、低い唸りへ落ち着く
+    crack = mix(highpass(white(0.12, seed), 1800) * perc(0.12, 0.001, 0.04) * 1.1, impact(0.9, 50, seed + 1, 0.5) * 0.9)
+    low = mix(boom(2.2, 32, seed + 2, 0.4) * 1.0, sub_drop(1.6, 110, 26) * 0.9)
+    suck = whoosh(0.7, 3500, 180, 2, seed + 3, 0.6)[::-1] * env([(0, 0.6), (0.6, 1), (0.7, 0)], 0.7) * 0.7
+    whirl = bandpass(pink(1.8, seed + 4), 260, 2) * env([(0, 0), (0.3, 0.6), (1.8, 0)], 1.8) * (0.7 + 0.3 * lfo(3, 1.8)) * 0.5
+    return reverb(mix(crack, low, (suck, 0.02), (whirl, 0.15)), 0.85, 0.3, 2400, 1.2)
+
+
+@machine('jet_forge/jet', level=-17)
+def jet_forge_jet(d, seed):
+    # 両極のジェット（くり返し）: 吹き出すプラズマの轟音。割れないよう歪ませず、余裕を残した大きさにする
+    # 低い唸り（重い噴流）・荒れる中域の噴流・ゆっくり脈打つ吹き出し・かすかな噴気と放電
+    rumble = lowpass(brown(d, seed), 140) * (0.85 + 0.15 * lfo(0.5, d))
+    roar = bandpass(pink(d, seed + 1), 380 + 90 * lfo(0.8, d), 1.0) * (0.8 + 0.2 * lfo(1.7, d)) * 0.7
+    blast = lowpass(white(d, seed + 2), 1600) * (0.6 + 0.4 * lfo(3.0, d)) * 0.18
+    hiss = highpass(white(d, seed + 3), 6000) * 0.035
+    sub = sine(32, d) * 0.25 * (0.8 + 0.2 * lfo(1.0, d))
+    return rumble + roar + blast + hiss + sub
+
+
+@machine('jet_forge/arc', level=-21)
+def jet_forge_arc(d, seed):
+    # 収束リング（くり返し）: 磁場で絞り込むときの、励磁されたコイルの澄んだうなり。耳に刺さるバリバリした音にしないよう、
+    # 放電は細かな火花ではなく、こもったやわらかい「シュワッ」という揺らぎにする
+    t = t_axis(d)
+    wob = 1 + 0.004 * lfo(5.5, d)
+    tone = (sine(120 * wob) * 0.5 + sine(240 * wob) * 0.28 + sine(360 * wob) * 0.12 + sine(482 * wob) * 0.05) * (0.85 + 0.15 * lfo(0.6, d))
+    shimmer = lowpass(bandpass(pink(d, seed), 1800 + 500 * lfo(0.35, d), 1.5), 3000) * (0.5 + 0.5 * lfo(1.3, d)) * 0.35
+    air = lowpass(highpass(white(d, seed + 1), 900), 2400) * 0.06
+    swells = lowpass(bandpass(pink(d, seed + 2), 1200, 1.2), 2200) * (np.clip(lfo(0.45, d) * lfo(0.17, d, phase=1.0), 0, 1) ** 2) * 0.5
+    return reverb(tone + shimmer + air + swells, 0.5, 0.25, 2500, 0.0)

@@ -16,7 +16,14 @@ public final class SinguloDamageTypes {
     /** 事象の地平線。無敵・防具・耐性・効果・エンチャント・盾・不死のトーテムをすべて無視する（タグ）。 */
     public static final ResourceKey<DamageType> EVENT_HORIZON = ResourceKey.create(Registries.DAMAGE_TYPE, Singulo.id("event_horizon"));
 
+    /** 降着ジェット鍛造炉のジェットとビーム。防具を無視する（タグ minecraft:bypasses_armor）。 */
+    public static final ResourceKey<DamageType> JET_BEAM = ResourceKey.create(Registries.DAMAGE_TYPE, Singulo.id("jet_beam"));
+
     private SinguloDamageTypes() {}
+
+    public static DamageSource jetBeam(Level level) {
+        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(JET_BEAM));
+    }
 
     public static DamageSource eventHorizon(Level level) {
         return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(EVENT_HORIZON));

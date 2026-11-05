@@ -30,6 +30,11 @@ import net.minecraft.world.phys.Vec3;
 public class RogueBlackHoleBlockEntity extends BlockEntity {
     private double mass = PenroseReactorBlockEntity.MAX_MASS;
     private double spin;
+    /**
+     * 拘束されたまま残ったブラックホール（降着ジェット鍛造炉の制御核を壊したあとに残るもの）。拘束コイルの残留磁場で
+     * 降着が続くので、ホーキング放射で減らない。同じ場所に鍛造炉を組み直すと取り込まれる。
+     */
+    private boolean stable;
 
     public RogueBlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.ROGUE_BLACK_HOLE.get(), pos, state);
@@ -41,6 +46,15 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
 
     public double spin() {
         return spin;
+    }
+
+    public boolean stable() {
+        return stable;
+    }
+
+    public void setStable(boolean stable) {
+        this.stable = stable;
+        setChanged();
     }
 
     public void setCore(double mass, double spin) {
@@ -90,7 +104,7 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
         long now = level.getGameTime();
         long dt = lastTick < 0 ? 1 : Math.max(0, Math.min(now - lastTick, 20L * 3600 * 24));
         lastTick = now;
-        for (long left = dt; left > 0 && mass > VANISH_MASS; ) {
+        for (long left = stable ? 0 : dt; left > 0 && mass > VANISH_MASS; ) {
             long step = Math.min(left, 200);                           // 大きく飛ぶときは少しずつ（最後の加速を飛ばさない）
             mass -= EVAPORATION_K / (mass * mass) * step / 20.0;
             left -= step;
@@ -171,6 +185,7 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
         super.saveAdditional(tag, registries);
         tag.putDouble("mass", mass);
         tag.putDouble("spin", spin);
+        tag.putBoolean("stable", stable);
         tag.putLong("last_tick", lastTick);
     }
 
@@ -181,6 +196,7 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
             mass = tag.getDouble("mass");
             spin = tag.getDouble("spin");
         }
+        stable = tag.getBoolean("stable");
         if (tag.contains("last_tick")) {
             lastTick = tag.getLong("last_tick");
         }

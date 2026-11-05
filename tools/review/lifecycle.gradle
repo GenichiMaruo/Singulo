@@ -1,0 +1,27 @@
+// Dedicated loopback-only lifecycle and real two-client regression.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/lifecycle-src'))
+        def output = file(providers.gradleProperty('lifecycleOutput').get()).absolutePath
+        neoForge.runs.server {
+            gameDirectory = file('build/lifecycle-server-' + providers.gradleProperty('lifecycleRun').getOrElse('v2'))
+            systemProperty 'singulo.lifecycleServer', 'true'
+            systemProperty 'singulo.lifecycleOutput', output
+        }
+        neoForge.runs.client {
+            def role = providers.gradleProperty('reviewRole').getOrElse('A')
+            gameDirectory = file('build/lifecycle-client-' + role)
+            systemProperty 'singulo.lifecycleRole', role
+            systemProperty 'singulo.lifecycleAddress', providers.gradleProperty('reviewAddress').getOrElse('127.0.0.1:25595')
+            systemProperty 'singulo.lifecycleOutput', output
+            programArgument '--username'
+            programArgument 'Review' + role
+            programArgument '--quickPlayMultiplayer'
+            programArgument providers.gradleProperty('reviewAddress').getOrElse('127.0.0.1:25595')
+            programArgument '--width'
+            programArgument '854'
+            programArgument '--height'
+            programArgument '480'
+        }
+    }
+}

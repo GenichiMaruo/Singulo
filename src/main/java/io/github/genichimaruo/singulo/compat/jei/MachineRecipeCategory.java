@@ -53,7 +53,23 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
     /** 触媒の枠の色（装置の画面の触媒スロットと同じ琥珀色）。 */
     private static final int AMBER = 0xFFF0B450;
 
-    private final MachineType type;
+    /**
+     * 枠の並びを決める、装置の形（汎用加工装置は MachineType から。降着ジェット鍛造炉のような専用の装置は自分で作る）。
+     * energyCapacity を超える電力のレシピには、容量アップグレードの案内を出す。
+     */
+    record Station(int inputSlots, int fluidInputs, int outputSlots, int fluidOutputs, boolean hasCatalystSlot, long energyCapacity,
+                   net.minecraft.world.level.block.Block block) {
+        static Station of(MachineType t) {
+            return new Station(t.inputSlots(), t.fluidInputs(), t.outputSlots(), t.fluidOutputs(), t.hasCatalystSlot(), t.energyCapacity(),
+                    SinguloJeiPlugin.machineBlock(t));
+        }
+
+        boolean hasOutput() {
+            return outputSlots > 0;
+        }
+    }
+
+    private final Station type;
     private final RecipeType<MachineRecipe> recipeType;
     private final IDrawable icon;
     private final IDrawable slot;
@@ -66,9 +82,13 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
     private final int width = MIN_WIDTH;
 
     public MachineRecipeCategory(IGuiHelper gui, MachineType type, RecipeType<MachineRecipe> recipeType) {
+        this(gui, Station.of(type), recipeType);
+    }
+
+    MachineRecipeCategory(IGuiHelper gui, Station type, RecipeType<MachineRecipe> recipeType) {
         this.type = type;
         this.recipeType = recipeType;
-        this.icon = gui.createDrawableItemStack(new ItemStack(SinguloJeiPlugin.machineBlock(type)));
+        this.icon = gui.createDrawableItemStack(new ItemStack(type.block()));
         this.slot = gui.getSlotDrawable();
         this.columns = Math.max(1, Math.min(INPUT_COLUMNS, type.inputSlots() + type.fluidInputs()));
         int arrow = columns * 18 + ARROW_GAP;
@@ -89,7 +109,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
 
     @Override
     public Component getTitle() {
-        return Component.translatable(SinguloJeiPlugin.machineBlock(type).getDescriptionId());
+        return Component.translatable(type.block().getDescriptionId());
     }
 
     @Override

@@ -130,6 +130,9 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity>> WORMHOLE_GENERATOR =
             REGISTER.register("wormhole_generator", () -> build(io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity::new,
                     SinguloBlocks.WORMHOLE_GENERATOR_CORE.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.forge.JetForgeBlockEntity>> JET_FORGE =
+            REGISTER.register("jet_forge", () -> build(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::new,
+                    SinguloBlocks.JET_FORGE_CORE.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity>> WORMHOLE_STABILIZER =
             REGISTER.register("wormhole_stabilizer", () -> build(io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity::new,
                     SinguloBlocks.WORMHOLE_STABILIZER.get()));
