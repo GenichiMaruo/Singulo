@@ -4653,7 +4653,7 @@
   },
   "gui.singulo.genesis.phase.0": {
     "source": "Not formed",
-    "translation": "未成形"
+    "translation": "未形成"
   },
   "gui.singulo.genesis.phase.1": {
     "source": "Cradle",
@@ -7177,175 +7177,175 @@
   },
   "howto.singulo.accelerator_controller": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.accelerator_tube": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.accretion_jet_forge": {
     "source": "Made in: Multiblock assembly (stage 5)",
-    "translation": "製造地：多方塊結構組裝（第 5 階段）"
+    "translation": "製作：多方塊組裝（階段5）"
   },
   "howto.singulo.advanced_android_workbench": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.android_armor_plate": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_backpack_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_barrier_glass": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_barrier_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_battery_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_beret": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_book": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_bouquet": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_cape": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_capsule": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_delivery_port": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_dual_tank_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_factory_print_unit": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.android_felling_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_gas_tank_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_gate_glass": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_gate_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_glasses": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_hair_flower": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_headdress": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_kit": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_large_backpack_upgrade": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.android_mining_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_production_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_recipe_rack": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_reinforced_backpack_upgrade": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.android_repair_kit": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_ribbon": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_scarf": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_station": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_supply_port": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.android_tank_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_teacup": {
     "source": "Made in: Furnace (stage 1)",
-    "translation": "製造地：熔爐（第 1 階段）"
+    "translation": "製作：熔爐（階段1）"
   },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_umbrella": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_waist_ribbon": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.android_work_console": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.android_workbench": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.anomaly_sample": {
     "source": "Restore a Degraded Anomaly Sample",
@@ -7353,119 +7353,119 @@
   },
   "howto.singulo.archive_terminal": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.area_card": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.artificial_star_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.awakening_echo_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.awakening_ergosphere_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.awakening_foundry_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.awakening_gravity_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.awakening_record_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.basic_circuit": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.basic_frame": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.bh_container": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.bismuth_crystal_block": {
     "source": "Made in: Kiln (stage 2)",
-    "translation": "製造地：燒製爐（第 2 階段）"
+    "translation": "製作：燒製爐（階段2）"
   },
   "howto.singulo.black_hole_bomb": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.black_reinforced_glass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.black_reinforced_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.black_star_glass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.blank_data_card": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.bose_condensate_catalyst": {
     "source": "Made in: Laser Cooler (stage 3)",
-    "translation": "製造地：雷射冷卻器（第 3 階段）"
+    "translation": "製作：雷射冷卻器（階段3）"
   },
   "howto.singulo.carbon_dust": {
     "source": "Made in: Compressor (stage 1)",
-    "translation": "製造地：壓縮機（第 1 階段）"
+    "translation": "製作：壓縮機（階段1）"
   },
   "howto.singulo.casimir_cavity": {
     "source": "Made in: Multiblock assembly (stage 4)",
-    "translation": "製造地：多方塊結構組裝（第 4 階段）"
+    "translation": "製作：多方塊結構組裝（階段4）"
   },
   "howto.singulo.casimir_cavity_controller": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.casimir_cavity_frame": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.casimir_cavity_pump": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.casimir_cavity_shield": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.casimir_cavity_wall": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.casimir_cavity_window": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.catalytic_reactor": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.ceramic_substrate": {
     "source": "Made in: Kiln (stage 1)",
-    "translation": "製造地：燒製爐（第 1 階段）"
+    "translation": "製作：燒製爐（階段1）"
   },
   "howto.singulo.coffee_maker": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.cold_atom_trap": {
     "source": "Restore a Degraded Cold Atom Trap",
@@ -7473,47 +7473,47 @@
   },
   "howto.singulo.cold_atoms": {
     "source": "Made in: Laser Cooler (stage 3)",
-    "translation": "製造地：雷射冷卻器（第 3 階段）"
+    "translation": "製作：雷射冷卻器（階段3）"
   },
   "howto.singulo.collapsar_billet": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.collapsar_ingot": {
     "source": "Made in: Accretion Jet Forge (stage 5)",
-    "translation": "製造地：吸積噴流鍛造爐（第 5 階段）"
+    "translation": "製作：吸積噴流鍛造爐（階段5）"
   },
   "howto.singulo.compressed_block_1": {
     "source": "Made in: Compressor (stage 1)",
-    "translation": "製造地：壓縮機（第 1 階段）"
+    "translation": "製作：壓縮機（階段1）"
   },
   "howto.singulo.compressed_block_2": {
     "source": "Made in: Compressor (stage 4)",
-    "translation": "製造地：壓縮機（第 4 階段）"
+    "translation": "製作：壓縮機（階段4）"
   },
   "howto.singulo.compressed_block_2_mixed": {
     "source": "Made in: Compressor (stage 4)",
-    "translation": "製造地：壓縮機（第 4 階段）"
+    "translation": "製作：壓縮機（階段4）"
   },
   "howto.singulo.compressed_block_3": {
     "source": "Made in: Compressor (stage 4)",
-    "translation": "製造地：壓縮機（第 4 階段）"
+    "translation": "製作：壓縮機（階段4）"
   },
   "howto.singulo.compressed_metal_block_1": {
     "source": "Made in: Compressor (stage 4)",
-    "translation": "製造地：壓縮機（第 4 階段）"
+    "translation": "製作：壓縮機（階段4）"
   },
   "howto.singulo.compressed_metal_block_2": {
     "source": "Made in: Compressor (stage 4)",
-    "translation": "製造地：壓縮機（第 4 階段）"
+    "translation": "製作：壓縮機（階段4）"
   },
   "howto.singulo.compressor": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.confinement_ring": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.control_unit": {
     "source": "Restore a Degraded Control Unit",
@@ -7521,43 +7521,43 @@
   },
   "howto.singulo.coolant_cartridge": {
     "source": "Made in: Cryogenic Cooling Tower (stage 2)",
-    "translation": "製造地：低溫冷卻塔（第 2 階段）"
+    "translation": "製作：低溫冷卻塔（階段2）"
   },
   "howto.singulo.cooling_tower_base": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cooling_tower_casing": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cooling_tower_controller": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cooling_tower_coolant_band": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cooling_tower_extension": {
     "source": "Made in: Multiblock assembly (stage 3)",
-    "translation": "製造地：多方塊結構組裝（第 3 階段）"
+    "translation": "製作：多方塊結構組裝（階段3）"
   },
   "howto.singulo.cooling_tower_glass": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cooling_tower_grate": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cooling_tower_rim": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.copper_wire": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.fluid_pipe": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7565,683 +7565,683 @@
   },
   "howto.singulo.core_controller": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.cosmic_muon_collector": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.cracked_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.cryogenic_cooling_tower": {
     "source": "Made in: Multiblock assembly (stage 2)",
-    "translation": "製造地：多方塊結構組裝（第 2 階段）"
+    "translation": "製作：多方塊結構組裝（階段2）"
   },
   "howto.singulo.cryogenic_turbine": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.culture_data": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：封閉培養設施的保管庫"
+    "source": "Found in: Culture Facility caches",
+    "translation": "取得：封閉培養設施的保管庫"
   },
   "howto.singulo.data_card_culture_data": {
     "source": "Made in: Archive Terminal (stage 4)",
-    "translation": "製造地：檔案終端（第 4 階段）"
+    "translation": "製作：檔案終端（階段4）"
   },
   "howto.singulo.data_card_observation_log": {
     "source": "Made in: Archive Terminal (stage 1)",
-    "translation": "製造地：檔案終端（第 1 階段）"
+    "translation": "製作：檔案終端（階段1）"
   },
   "howto.singulo.data_card_quantum_fragment": {
     "source": "Made in: Archive Terminal (stage 3)",
-    "translation": "製造地：檔案終端（第 3 階段）"
+    "translation": "製作：檔案終端（階段3）"
   },
   "howto.singulo.decoded_record": {
     "source": "Made in: Archive Terminal (stage 1)",
-    "translation": "製造地：檔案終端（第 1 階段）"
+    "translation": "製作：檔案終端（階段1）"
   },
   "howto.singulo.deep_sea_collector": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.degenerate_compactor": {
     "source": "Made in: Multiblock assembly (stage 4)",
-    "translation": "製造地：多方塊結構組裝（第 4 階段）"
+    "translation": "製作：多方塊結構組裝（階段4）"
   },
   "howto.singulo.degenerate_compactor_anvil": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_compactor_controller": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_compactor_frame": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_compactor_plate": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_compactor_ram": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_compactor_vent": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_compactor_window": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace": {
     "source": "Made in: Multiblock assembly (stage 4)",
-    "translation": "製造地：多方塊結構組裝（第 4 階段）"
+    "translation": "製作：多方塊結構組裝（階段4）"
   },
   "howto.singulo.degenerate_furnace_controller": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace_fin": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace_frame": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace_piston": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace_shell": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace_tube": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_furnace_window": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.degenerate_matter_shell": {
     "source": "Made in: Degenerate Compactor (stage 4)",
-    "translation": "製造地：簡併壓縮爐（第 4 階段）"
+    "translation": "製作：簡併壓縮爐（階段4）"
   },
   "howto.singulo.degenerate_precursor": {
     "source": "Made in: Degenerate Compactor (stage 4)",
-    "translation": "製造地：簡併壓縮爐（第 4 階段）"
+    "translation": "製作：簡併壓縮爐（階段4）"
   },
   "howto.singulo.degraded_anomaly_sample": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：最終實驗室的保管庫"
+    "source": "Found in: Final Lab caches",
+    "translation": "取得：最終實驗室的保管庫"
   },
   "howto.singulo.degraded_cold_atom_trap": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：研究棟的保管庫"
+    "source": "Found in: Research Building caches",
+    "translation": "取得：研究棟的保管庫"
   },
   "howto.singulo.degraded_control_unit": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：地表觀測站的保管庫"
+    "source": "Found in: Observation Post caches",
+    "translation": "取得：地表觀測站的保管庫"
   },
   "howto.singulo.degraded_time_crystal_seed": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：封閉培養設施的保管庫"
+    "source": "Found in: Culture Facility caches",
+    "translation": "取得：封閉培養設施的保管庫"
   },
   "howto.singulo.desk_monitor": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.dormant_singularity_seed": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：最終實驗室的保管庫"
+    "source": "Found in: Final Lab caches",
+    "translation": "取得：最終實驗室的保管庫"
   },
   "howto.singulo.echo_resonator": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.electrolyzer": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.emergency_light": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.empty_coolant_cartridge": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.entangled_element": {
     "source": "Made in: Entanglement Synthesizer (stage 3)",
-    "translation": "製造地：量子糾纏合成器（第 3 階段）"
+    "translation": "製作：量子糾纏合成器（階段3）"
   },
   "howto.singulo.entanglement_synthesizer": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.ergosphere_ring": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.event_horizon_shield": {
     "source": "Made in: Multiblock assembly (stage 5)",
-    "translation": "製造地：多方塊結構組裝（第 5 階段）"
+    "translation": "製作：多方塊組裝（階段5）"
   },
   "howto.singulo.exotic_matter": {
     "source": "Made in: C-Cavity (stage 4)",
-    "translation": "製造地：卡西米爾腔（第 4 階段）"
+    "translation": "製作：卡西米爾腔（階段4）"
   },
   "howto.singulo.explorer_compass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.extraction_port": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.facility_light": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.fluid_canister": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.focusing_magnet": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.genesis_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.genesis_frame": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.genesis_pylon": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.glowing_bismuth_crystal": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.gravitational_containment_tank": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.gravitational_wave_detector": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.graviton_manipulator": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.gravity_field_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.gravity_panel_receiver": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.gyro_drive": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.halo_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.handbook": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.hawking_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.hawking_condensate": {
-    "source": "Made in: P-Reactor (stage 5)",
-    "translation": "製造地：彭羅斯反應爐（第 5 階段）"
+    "source": "Made in: P-Reactor (catalyst mode) (stage 5)",
+    "translation": "製作：彭羅斯反應爐（催化模式）（階段5）"
   },
   "howto.singulo.heat_exchange_core": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.helium_cartridge": {
     "source": "Made in: Cryogenic Cooling Tower (stage 3)",
-    "translation": "製造地：低溫冷卻塔（第 3 階段）"
+    "translation": "製作：低溫冷卻塔（階段3）"
   },
   "howto.singulo.high_gravity_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.holo_projector": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.horizon_bus": {
     "source": "Made in: Degenerate Compactor (stage 5)",
-    "translation": "製造地：簡併壓縮爐（第 5 階段）"
+    "translation": "製作：簡併壓縮爐（階段5）"
   },
   "howto.singulo.hydrogen_fuel_cell": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.impact_generator_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.inertial_control_gauntlet": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.inertial_stabilizer": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.intact_ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.jet_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_condensate": {
-    "source": "Made in: P-Reactor (stage 5)",
-    "translation": "製造地：彭羅斯反應爐（第 5 階段）"
+    "source": "Made in: P-Reactor (generation mode) (stage 5)",
+    "translation": "製作：彭羅斯反應爐（發電模式）（階段5）"
   },
   "howto.singulo.jet_forge_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_forge_collimator": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_forge_confinement_coil": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_forge_core": {
     "source": "Made in: Crafting Table (stage 5)",
-    "translation": "製造地：工作台（第 5 階段）"
+    "translation": "製作：工作台（階段5）"
   },
   "howto.singulo.jet_forge_foundation": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_forge_heat_sink": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_forge_levitator": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.jet_forge_truss": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.keraunos_tower": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.kiln": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.lab_frame": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.lab_glass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.lab_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.lab_panel_lined": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.lab_tiles": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.laser_cooler": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.limestone_powder": {
     "source": "Made in: Compressor (stage 1)",
-    "translation": "製造地：壓縮機（第 1 階段）"
+    "translation": "製作：壓縮機（階段1）"
   },
   "howto.singulo.low_gravity_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.magnetic_bottle": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.magnetic_key": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.mass_pellet": {
     "source": "Made in: Compressor (stage 1)",
-    "translation": "製造地：壓縮機（第 1 階段）"
+    "translation": "製作：壓縮機（階段1）"
   },
   "howto.singulo.meteor_compass": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.meteoric_iron_ingot": {
     "source": "Made in: Blast Furnace (stage 2)",
-    "translation": "製造地：高爐（第 2 階段）"
+    "translation": "製作：高爐（階段2）"
   },
   "howto.singulo.metric_drive": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.micro_black_hole": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.mirror_plate": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.monopole_upgrade": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：製作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.mossy_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.multiblock_port": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：製作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.muon_bundle": {
     "source": "Made in: Particle Accelerator (stage 2)",
-    "translation": "製造地：粒子加速器（第 2 階段）"
+    "translation": "製作：粒子加速器（階段2）"
   },
   "howto.singulo.muon_catalyst": {
     "source": "Made in: Catalytic Reactor (stage 2)",
-    "translation": "製造地：催化反應器（第 2 階段）"
+    "translation": "製作：催化反應器（階段2）"
   },
   "howto.singulo.muon_fusion_reactor": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.neutrino_observatory": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.neutrino_scanner": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.nihonium": {
     "source": "Made in: Particle Accelerator (stage 3)",
-    "translation": "製造地：粒子加速器（第 3 階段）"
+    "translation": "製作：粒子加速器（階段3）"
   },
   "howto.singulo.nihonium_frame": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.nihonium_ingot": {
     "source": "Made in: Kiln (stage 3)",
-    "translation": "製造地：燒製爐（第 3 階段）"
+    "translation": "製作：燒製爐（階段3）"
   },
   "howto.singulo.nihonium_plate": {
     "source": "Made in: Compressor (stage 3)",
-    "translation": "製造地：壓縮機（第 3 階段）"
+    "translation": "製作：壓縮機（階段3）"
   },
   "howto.singulo.observation_log": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：地表觀測站的保管庫"
+    "source": "Found in: Observation Post caches",
+    "translation": "取得：地表觀測站的保管庫"
   },
   "howto.singulo.optical_lattice_substrate": {
     "source": "Made in: Laser Cooler (stage 3)",
-    "translation": "製造地：雷射冷卻器（第 3 階段）"
+    "translation": "製作：雷射冷卻器（階段3）"
   },
   "howto.singulo.paper_stack": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.particle_accelerator": {
     "source": "Made in: Multiblock assembly (stage 2)",
-    "translation": "製造地：多方塊組裝（第 2 階段）"
+    "translation": "製作：多方塊結構組裝（階段2）"
   },
   "howto.singulo.peltier_cooler": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.penrose_reactor": {
     "source": "Made in: Multiblock assembly (stage 5)",
-    "translation": "製造地：多方塊組裝（第 5 階段）"
+    "translation": "製作：多方塊組裝（階段5）"
   },
   "howto.singulo.phase_sync_plate": {
     "source": "Made in: Entanglement Synthesizer (stage 4)",
-    "translation": "製造地：量子糾纏合成器（第 4 階段）"
+    "translation": "製作：量子糾纏合成器（階段4）"
   },
   "howto.singulo.power_conduit": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.precision_assembler": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：製作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.primordial_seed": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.pristine_ruin_light": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.pristine_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.pristine_ruin_pillar": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.pristine_ruin_tiles": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.probe_station": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.procedure_card": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.quantum_android_workbench": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.quantum_computing_module": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.quantum_data_fragment": {
-    "source": "Found in: ruin caches",
-    "translation": "取得方式：研究棟的保管庫"
+    "source": "Found in: Research Building caches",
+    "translation": "取得：研究棟的保管庫"
   },
   "howto.singulo.quantum_heat_engine": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.quantum_key": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.rayleigh_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.reactor_mass_alarm": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.reactor_shell": {
     "source": "Made in: Degenerate Compactor (stage 5)",
-    "translation": "製造地：簡併壓縮爐（第 5 階段）"
+    "translation": "製作：簡併壓縮爐（階段5）"
   },
   "howto.singulo.reactor_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.recipe_card": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.reinforced_ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.relocation_wrench": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製作於：工作台（階段 1）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.room_light": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.ruin_lamp": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.ruin_lamp_amber": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.ruin_lamp_crimson": {
     "source": "Made in: Crafting Table (stage 5)",
-    "translation": "製造地：工作台（第 5 階段）"
+    "translation": "製作：工作台（階段5）"
   },
   "howto.singulo.ruin_lamp_verdant": {
     "source": "Made in: Crafting Table (stage 3)",
-    "translation": "製造地：工作台（第 3 階段）"
+    "translation": "製作：工作台（階段3）"
   },
   "howto.singulo.ruin_lamp_violet": {
     "source": "Made in: Crafting Table (stage 4)",
-    "translation": "製造地：工作台（第 4 階段）"
+    "translation": "製作：工作台（階段4）"
   },
   "howto.singulo.ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.scanner_module_3": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.scorched_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.sealed_container_1": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "howto.singulo.sealed_container_2": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.sealed_container_3": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.sealed_container_4": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.server_rack": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.settings_card": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.shield_permit": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.shield_tower_body": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.shield_tower_coil": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.shield_tower_core": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.shield_tower_crown": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.shield_tower_plinth": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.shield_tower_waveguide": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.singularity_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.singularity_encapsulator": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.singularity_key": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.singularity_seed": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.smes_cell": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：製作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.smes_module": {
     "source": "Made in: Crafting Table (stage 4)",
@@ -8249,67 +8249,67 @@
   },
   "howto.singulo.steel_blend": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.steel_ingot": {
     "source": "Made in: Blast Furnace (stage 1)",
-    "translation": "製造地：高爐（第 1 階段）"
+    "translation": "製作：高爐（階段1）"
   },
   "howto.singulo.steel_plate": {
     "source": "Made in: Compressor (stage 1)",
-    "translation": "製造地：壓縮機（第 1 階段）"
+    "translation": "製作：壓縮機（階段1）"
   },
   "howto.singulo.striped_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.superconducting_cable": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：製作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.superconducting_coil": {
     "source": "Made in: Cryogenic Cooling Tower (stage 2)",
-    "translation": "製造地：低溫冷卻塔（第 2 階段）"
+    "translation": "製作：低溫冷卻塔（階段2）"
   },
   "howto.singulo.superconducting_wire": {
     "source": "Made in: Cryogenic Cooling Tower (stage 2)",
-    "translation": "製造地：低溫冷卻塔（第 2 階段）"
+    "translation": "製作：低溫冷卻塔（階段2）"
   },
   "howto.singulo.survey_glasses": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.temporal_key": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.terminus_record": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "製造地：奇點封裝器（第 5 階段）"
+    "translation": "製作：奇點封裝器（階段5）"
   },
   "howto.singulo.thermocouple_module": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.thermoelectric_generator": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.tiled_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.time_crystal_catalyst": {
     "source": "Made in: Time Crystal Incubator (stage 4)",
-    "translation": "製造地：時間晶體培育槽（第 4 階段）"
+    "translation": "製作：時間晶體培育槽（階段4）"
   },
   "howto.singulo.time_crystal_incubator": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.time_crystal_module": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.time_crystal_seed": {
     "source": "Restore a Degraded Time Crystal Seed",
@@ -8317,167 +8317,167 @@
   },
   "howto.singulo.tipler_bearing": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.tipler_core": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.tipler_cylinder": {
     "source": "Made in: Multiblock assembly (stage 5)",
-    "translation": "製造地：多方塊組裝（第 5 階段）"
+    "translation": "製作：多方塊組裝（階段5）"
   },
   "howto.singulo.tipler_frame": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.tipler_holder": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.tipler_housing": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.tipler_window": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.topological_wire": {
     "source": "Made in: Cryogenic Cooling Tower (stage 4)",
-    "translation": "製造地：低溫冷卻塔（第 4 階段）"
+    "translation": "製作：低溫冷卻塔（階段4）"
   },
   "howto.singulo.toroidal_magnetic_coil": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.trash_bin": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.unfired_ceramic": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.unfired_phosphor": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.unfired_teacup": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
-    "translation": "製造地：蟲洞產生器（第 5 階段）"
+    "translation": "製作：蟲洞產生器（階段5）"
   },
   "howto.singulo.vending_machine": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.vented_ruin_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.void_collector": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "howto.singulo.white_ceramic_composite": {
     "source": "Made in: Furnace (stage 1)",
-    "translation": "製造地：熔爐（第 1 階段）"
+    "translation": "製作：熔爐（階段1）"
   },
   "howto.singulo.white_glass_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.white_light_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.white_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.white_sliding_door": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.white_star_glass_panel": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：製作台（第 1 階段）"
+    "translation": "製作：工作台（階段1）"
   },
   "howto.singulo.work_location_card": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.worldline_anchor_advanced": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.worldline_anchor_small": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：製作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.wormhole_generator": {
     "source": "Made in: Multiblock assembly (stage 5)",
-    "translation": "製造地：多方塊組裝（第 5 階段）"
+    "translation": "製作：多方塊組裝（階段5）"
   },
   "howto.singulo.wormhole_generator_coil": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_generator_core": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_generator_focuser": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_generator_port": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_generator_shell": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_generator_window": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_mouth": {
     "source": "Made in: Wormhole Stabilizer (stage 5)",
-    "translation": "製造地：蟲洞穩定器（第 5 階段）"
+    "translation": "製作：蟲洞穩定器（階段5）"
   },
   "howto.singulo.wormhole_mouth_casing": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_port": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.wormhole_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
-    "translation": "製造地：精密組裝台（第 5 階段）"
+    "translation": "製作：精密組裝台（階段5）"
   },
   "howto.singulo.zero_gravity_block": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.zero_gravity_controller": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.zinc_dust": {
     "source": "Made in: Compressor (stage 1)",
-    "translation": "製造地：壓縮機（第 1 階段）"
+    "translation": "製作：壓縮機（階段1）"
   },
   "howto.singulo.zinc_ingot": {
     "source": "Made in: Kiln (stage 1)",
-    "translation": "製造地：燒製爐（第 1 階段）"
+    "translation": "製作：燒製爐（階段1）"
   },
   "item.singulo.afterglow_wings": {
     "source": "Afterglow Wings",
@@ -10200,12 +10200,12 @@
     "translation": "珀耳帖冷卻器"
   },
   "station.singulo.penrose_reactor_catalyst": {
-    "source": "P-Reactor",
-    "translation": "彭羅斯反應爐"
+    "source": "P-Reactor (catalyst mode)",
+    "translation": "彭羅斯反應爐（催化模式）"
   },
   "station.singulo.penrose_reactor_power": {
-    "source": "P-Reactor",
-    "translation": "彭羅斯反應爐"
+    "source": "P-Reactor (generation mode)",
+    "translation": "彭羅斯反應爐（發電模式）"
   },
   "station.singulo.precision_assembler": {
     "source": "Precision Assembler",
@@ -12325,15 +12325,15 @@
   },
   "howto.singulo.capacity_upgrade_1": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "howto.singulo.capacity_upgrade_2": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "製造地：精密組裝台（第 3 階段）"
+    "translation": "製作：精密組裝台（階段3）"
   },
   "howto.singulo.capacity_upgrade_3": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "item.singulo.capacity_upgrade_1": {
     "source": "Capacity Upgrade Mk1",
@@ -12545,7 +12545,7 @@
   },
   "howto.singulo.drone_kit": {
     "source": "Made in: Precision Assembler (stage 2)",
-    "translation": "製造地：精密組裝台（第 2 階段）"
+    "translation": "製作：精密組裝台（階段2）"
   },
   "desc.singulo.drone_station": {
     "source": "Prints cargo drones of its memory’s type (rotor, jet or anti-gravity) from a Drone Crystal Memory, Drone Kits and power (20,000 FE each; each Production Upgrade adds one, up to 3). Drones wait above it and carry cargo for Drone Ports within 64 blocks. A Phase Shift Upgrade lets them fly through walls, and a Shield Permit on the right rail limits who can use it.",
@@ -12557,7 +12557,7 @@
   },
   "howto.singulo.drone_station": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "desc.singulo.drone_port": {
     "source": "Put in an empty packing crate and cargo, choose a destination (another port with the same owner) and send: it packs the cargo, pays the power and calls a nearby drone. The roof hatch opens and the crate is handed up. Arriving crates are unpacked automatically. Power: 2,000 FE plus 50 FE per block. It can also auto-send to a set destination once cargo reaches a threshold. Drones find their way around walls through open space.",
@@ -12569,7 +12569,7 @@
   },
   "howto.singulo.drone_port": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "desc.singulo.packing_crate": {
     "source": "A crate for cargo sent by drone. Reaches up to 160 blocks. Right-click a packed crate to unpack it.",
@@ -12577,7 +12577,7 @@
   },
   "howto.singulo.packing_crate": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "uses.singulo.packing_crate": {
     "source": "Used in: Battery Packing Crate",
@@ -12589,7 +12589,7 @@
   },
   "howto.singulo.battery_packing_crate": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "製造地：工作台（第 2 階段）"
+    "translation": "製作：工作台（階段2）"
   },
   "uses.singulo.battery_packing_crate": {
     "source": "Used in: Large Battery Packing Crate",
@@ -12601,7 +12601,7 @@
   },
   "howto.singulo.large_battery_packing_crate": {
     "source": "Made in: Crafting Table (stage 3)",
-    "translation": "製造地：工作台（第 3 階段）"
+    "translation": "製作：工作台（階段3）"
   },
   "guide.singulo.drones": {
     "source": "Drone Delivery",
@@ -12853,7 +12853,7 @@
   },
   "howto.singulo.drone_phase_upgrade": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "translation": "製作：精密組裝台（階段4）"
   },
   "guide.singulo.drones.route.title": {
     "source": "Routes and phase shift",

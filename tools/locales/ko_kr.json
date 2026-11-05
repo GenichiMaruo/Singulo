@@ -4653,7 +4653,7 @@
   },
   "gui.singulo.genesis.phase.0": {
     "source": "Not formed",
-    "translation": "미형성"
+    "translation": "구조 미완성"
   },
   "gui.singulo.genesis.phase.1": {
     "source": "Cradle",
@@ -4761,7 +4761,7 @@
   },
   "gui.singulo.genesis.stopped": {
     "source": "Feed stopped",
-    "translation": "투입을 멈췄다"
+    "translation": "투입 정지"
   },
   "gui.singulo.genesis.surge": {
     "source": "Surge warning! Stop the feed (the switch on the core screen, or a redstone signal)",
@@ -5213,7 +5213,7 @@
   },
   "gui.singulo.reactor.state.unformed": {
     "source": "Not formed",
-    "translation": "형성되지 않음"
+    "translation": "구조 미완성"
   },
   "gui.singulo.reason.ambiguous": {
     "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it starts 3 seconds after you stop adding items.",
@@ -5857,7 +5857,7 @@
   },
   "gui.singulo.status.not_formed": {
     "source": "Not formed",
-    "translation": "형성되지 않음"
+    "translation": "구조 미완성"
   },
   "gui.singulo.status.off": {
     "source": "Off",
@@ -7584,7 +7584,7 @@
     "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.culture_data": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Culture Facility caches",
     "translation": "입수: 봉쇄 배양 시설의 보관고"
   },
   "howto.singulo.data_card_culture_data": {
@@ -7680,19 +7680,19 @@
     "translation": "제작: 축퇴 압축로(4단계)"
   },
   "howto.singulo.degraded_anomaly_sample": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Final Lab caches",
     "translation": "입수: 최종 실험 시설의 보관고"
   },
   "howto.singulo.degraded_cold_atom_trap": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Research Building caches",
     "translation": "입수: 연구동의 보관고"
   },
   "howto.singulo.degraded_control_unit": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Observation Post caches",
     "translation": "입수: 지표 관측소의 보관고"
   },
   "howto.singulo.degraded_time_crystal_seed": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Culture Facility caches",
     "translation": "입수: 봉쇄 배양 시설의 보관고"
   },
   "howto.singulo.desk_monitor": {
@@ -7700,7 +7700,7 @@
     "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.dormant_singularity_seed": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Final Lab caches",
     "translation": "입수: 최종 실험 시설의 보관고"
   },
   "howto.singulo.echo_resonator": {
@@ -7812,7 +7812,7 @@
     "translation": "제작: 정밀 조립기(5단계)"
   },
   "howto.singulo.hawking_condensate": {
-    "source": "Made in: P-Reactor (stage 5)",
+    "source": "Made in: P-Reactor (catalyst mode) (stage 5)",
     "translation": "제작: 펜로즈 반응로(촉매 모드)(5단계)"
   },
   "howto.singulo.heat_exchange_core": {
@@ -7860,8 +7860,8 @@
     "translation": "제작: 정밀 조립기(5단계)"
   },
   "howto.singulo.jet_condensate": {
-    "source": "Made in: P-Reactor (stage 5)",
-    "translation": "제작: 펜로즈 반응로(발전 모드, 5단계)"
+    "source": "Made in: P-Reactor (generation mode) (stage 5)",
+    "translation": "제작: 펜로즈 반응로(발전 모드)(5단계)"
   },
   "howto.singulo.jet_forge_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
@@ -8016,7 +8016,7 @@
     "translation": "제작: 압축기(3단계)"
   },
   "howto.singulo.observation_log": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Observation Post caches",
     "translation": "입수: 지표 관측소의 보관고"
   },
   "howto.singulo.optical_lattice_substrate": {
@@ -8088,7 +8088,7 @@
     "translation": "제작: 정밀 조립기(3단계)"
   },
   "howto.singulo.quantum_data_fragment": {
-    "source": "Found in: ruin caches",
+    "source": "Found in: Research Building caches",
     "translation": "입수: 연구동의 보관고"
   },
   "howto.singulo.quantum_heat_engine": {
@@ -8125,7 +8125,7 @@
   },
   "howto.singulo.relocation_wrench": {
     "source": "Made in: Crafting Table (stage 1)",
-    "translation": "제작 장소: 제작대 (단계 1)"
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.room_light": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -8245,7 +8245,7 @@
   },
   "howto.singulo.smes_module": {
     "source": "Made in: Crafting Table (stage 4)",
-    "translation": "제작: 작업대(4단계)"
+    "translation": "제작: 제작대(4단계)"
   },
   "howto.singulo.steel_blend": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -10200,11 +10200,11 @@
     "translation": "펠티에 냉각기"
   },
   "station.singulo.penrose_reactor_catalyst": {
-    "source": "P-Reactor",
+    "source": "P-Reactor (catalyst mode)",
     "translation": "펜로즈 반응로(촉매 모드)"
   },
   "station.singulo.penrose_reactor_power": {
-    "source": "P-Reactor",
+    "source": "P-Reactor (generation mode)",
     "translation": "펜로즈 반응로(발전 모드)"
   },
   "station.singulo.precision_assembler": {
@@ -11469,47 +11469,47 @@
   },
   "uses.singulo.accelerator_controller": {
     "source": "Used in: Particle Accelerator",
-    "translation": "사용 제품: 입자 가속기"
+    "translation": "사용처: 입자 가속기"
   },
   "uses.singulo.accelerator_tube": {
     "source": "Used in: Particle Accelerator",
-    "translation": "사용 제품: 입자 가속기"
+    "translation": "사용처: 입자 가속기"
   },
   "uses.singulo.advanced_android_workbench": {
     "source": "Used in: Quantum Android Workbench",
-    "translation": "사용 대상: 양자 안드로이드 작업대"
+    "translation": "사용처: 양자 안드로이드 작업대"
   },
   "uses.singulo.android_backpack_upgrade": {
     "source": "Used in: Reinforced Backpack Upgrade",
-    "translation": "사용 대상: 강화 백팩 업그레이드"
+    "translation": "사용처: 강화 백팩 업그레이드"
   },
   "uses.singulo.android_barrier_glass": {
     "source": "Used in: Patterned Android Barrier Glass",
-    "translation": "사용 대상: 무늬 안드로이드 차단 유리"
+    "translation": "사용처: 무늬 안드로이드 차단 유리"
   },
   "uses.singulo.android_gas_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
-    "translation": "사용 제품: 가스·액체 업그레이드"
+    "translation": "사용처: 가스·액체 업그레이드"
   },
   "uses.singulo.android_gate_glass": {
     "source": "Used in: Patterned Android Gate Glass",
-    "translation": "사용 대상: 무늬 안드로이드 투과 유리"
+    "translation": "사용처: 무늬 안드로이드 투과 유리"
   },
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
-    "translation": "사용 대상: 생산 업그레이드, 공장식 인쇄 유닛"
+    "translation": "사용처: 생산 업그레이드, 공장식 인쇄 유닛"
   },
   "uses.singulo.android_reinforced_backpack_upgrade": {
     "source": "Used in: Large Backpack Upgrade",
-    "translation": "사용 대상: 대형 백팩 업그레이드"
+    "translation": "사용처: 대형 백팩 업그레이드"
   },
   "uses.singulo.android_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
-    "translation": "사용 제품: 가스·액체 업그레이드"
+    "translation": "사용처: 가스·액체 업그레이드"
   },
   "uses.singulo.android_workbench": {
     "source": "Used in: Advanced Android Workbench",
-    "translation": "사용 대상: 개량형 안드로이드 작업대"
+    "translation": "사용처: 개량형 안드로이드 작업대"
   },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core, Primordial Seed",
@@ -11517,671 +11517,671 @@
   },
   "uses.singulo.artificial_star_core": {
     "source": "Used in: Genesis Core, Primordial Seed",
-    "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
+    "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
     "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 28 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 28개"
+    "translation": "사용처: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 28개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
-    "translation": "사용 제품: 소형 블랙홀 용기"
+    "translation": "사용처: 소형 블랙홀 용기"
   },
   "uses.singulo.bismuth_crystal_block": {
     "source": "Used in: Glowing Bismuth Crystal",
-    "translation": "사용 대상: 빛나는 비스무트 결정"
+    "translation": "사용처: 빛나는 비스무트 결정"
   },
   "uses.singulo.bismuth_ingot": {
     "source": "Used in: Nihonium, Bismuth Crystal Block",
-    "translation": "사용 대상: 니호늄, 비스무트 결정 블록"
+    "translation": "사용처: 니호늄, 비스무트 결정 블록"
   },
   "uses.singulo.black_reinforced_glass": {
     "source": "Used in: Starred Black Reinforced Glass",
-    "translation": "사용 대상: 사방별 검은 강화 유리"
+    "translation": "사용처: 사방별 검은 강화 유리"
   },
   "uses.singulo.black_reinforced_panel": {
     "source": "Used in: High-Gravity Panel",
-    "translation": "사용 대상: 고중력 패널"
+    "translation": "사용처: 고중력 패널"
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
-    "translation": "사용 대상: 데이터 카드(관측 로그), 데이터 카드(양자 데이터 조각), 데이터 카드(배양 데이터)"
+    "translation": "사용처: 데이터 카드(관측 로그), 데이터 카드(양자 데이터 조각), 데이터 카드(배양 데이터)"
   },
   "uses.singulo.blueprint_lab_building": {
     "source": "Used in: Lab Panel, Lined Lab Panel, Lab Floor Tiles, Lab Frame, Lab Glass and 1 more",
-    "translation": "사용 대상: 연구소 흰 패널, 연구소 띠 패널, 연구소 바닥 타일, 연구소 구조재, 연구소 유리 외 1개"
+    "translation": "사용처: 연구소 흰 패널, 연구소 띠 패널, 연구소 바닥 타일, 연구소 구조재, 연구소 유리 외 1개"
   },
   "uses.singulo.blueprint_lab_furniture": {
     "source": "Used in: Desk Monitor, Coffee Maker, Vending Machine, Stack of Papers, Trash Bin and 2 more",
-    "translation": "사용 대상: 책상 모니터, 커피 메이커, 자판기, 서류 더미, 쓰레기통 외 2개"
+    "translation": "사용처: 책상 모니터, 커피 메이커, 자판기, 서류 더미, 쓰레기통 외 2개"
   },
   "uses.singulo.blueprint_lighting": {
     "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 4 more",
-    "translation": "사용 대상: 폐허 램프, 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색) 외 4개"
+    "translation": "사용처: 폐허 램프, 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색) 외 4개"
   },
   "uses.singulo.blueprint_pristine_ruin": {
     "source": "Used in: Pristine Ruin Panel, Pristine Ruin Tiles, Pristine Ruin Pillar",
-    "translation": "사용 대상: 온전한 폐허 패널, 온전한 폐허 타일, 온전한 폐허 기둥"
+    "translation": "사용처: 온전한 폐허 패널, 온전한 폐허 타일, 온전한 폐허 기둥"
   },
   "uses.singulo.blueprint_rayleigh": {
     "source": "Used in: Rayleigh Sky Panel",
-    "translation": "사용 대상: 레일리 산란 패널"
+    "translation": "사용처: 레일리 산란 패널"
   },
   "uses.singulo.blueprint_ruin_glass": {
     "source": "Used in: Ruin Glass, Broken Ruin Glass, Reinforced Ruin Glass",
-    "translation": "사용 대상: 폐허 유리, 깨진 폐허 유리, 강화 폐허 유리"
+    "translation": "사용처: 폐허 유리, 깨진 폐허 유리, 강화 폐허 유리"
   },
   "uses.singulo.blueprint_ruin_panels": {
     "source": "Used in: Ruin Panel, Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel and 2 more",
-    "translation": "사용 대상: 폐허 패널, 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널 외 2개"
+    "translation": "사용처: 폐허 패널, 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널 외 2개"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Degenerate Compactor Controller, Degenerate Compactor Frame, Degenerate Compactor Armor Plate, Degenerate Compactor Ram, Degenerate Compactor Anvil and 21 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 축퇴 압축로 프레임, 축퇴 압축로 장갑판, 축퇴 압축로 램, 축퇴 압축로 앤빌 외 21개"
+    "translation": "사용처: 축퇴 압축로 제어기, 축퇴 압축로 프레임, 축퇴 압축로 장갑판, 축퇴 압축로 램, 축퇴 압축로 앤빌 외 21개"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.casimir_cavity_frame": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.casimir_cavity_pump": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.casimir_cavity_shield": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.casimir_cavity_wall": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.casimir_cavity_window": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
     "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 18 more",
-    "translation": "사용 대상: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 18개"
+    "translation": "사용처: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 18개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
-    "translation": "사용 제품: 냉각 원자"
+    "translation": "사용처: 냉각 원자"
   },
   "uses.singulo.cold_atoms": {
     "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Quantum Key",
-    "translation": "사용 대상: BE 응축 촉매, 위상 동기판, 양자 잠금 열쇠"
+    "translation": "사용처: BE 응축 촉매, 위상 동기판, 양자 잠금 열쇠"
   },
   "uses.singulo.collapsar_billet": {
     "source": "Used in: Collapsar Ingot",
-    "translation": "사용 대상: 콜랍사 주괴"
+    "translation": "사용처: 콜랍사 주괴"
   },
   "uses.singulo.compressed_block_1": {
     "source": "Used in: Compressed Block Lv2, Compressed Block Lv2 (Mixed)",
-    "translation": "사용 대상: 압축 블록 Lv2, 압축 블록 Lv2(혼합)"
+    "translation": "사용처: 압축 블록 Lv2, 압축 블록 Lv2(혼합)"
   },
   "uses.singulo.compressed_block_2": {
     "source": "Used in: Compressed Block Lv3, Degenerate Precursor",
-    "translation": "사용 대상: 압축 블록 Lv3, 축퇴 전구체"
+    "translation": "사용처: 압축 블록 Lv3, 축퇴 전구체"
   },
   "uses.singulo.compressed_block_3": {
     "source": "Used in: Degenerate Matter Shell",
-    "translation": "사용 제품: 축퇴 물질 껍질"
+    "translation": "사용처: 축퇴 물질 껍질"
   },
   "uses.singulo.compressed_metal_block_1": {
     "source": "Used in: Compressed Metal Block Lv2",
-    "translation": "사용 제품: 압축 금속 블록 Lv2"
+    "translation": "사용처: 압축 금속 블록 Lv2"
   },
   "uses.singulo.compressed_metal_block_2": {
     "source": "Used in: Degenerate Matter Shell, Artificial Star Core",
-    "translation": "사용 대상: 축퇴 물질 껍질, 인공 항성 코어"
+    "translation": "사용처: 축퇴 물질 껍질, 인공 항성 코어"
   },
   "uses.singulo.confinement_ring": {
     "source": "Used in: Empty BH Containment Vessel, Singularity Seed, Jet Forge Confinement Coil, Jet Forge Core",
-    "translation": "사용 대상: 빈 BH 격리 용기, 특이점 씨앗, 제트 단조로 구속 코일, 제트 단조로 제어 코어"
+    "translation": "사용처: 빈 BH 격리 용기, 특이점 씨앗, 제트 단조로 구속 코일, 제트 단조로 제어 코어"
   },
   "uses.singulo.control_unit": {
     "source": "Used in: Superconducting Coil",
-    "translation": "사용 제품: 초전도 코일"
+    "translation": "사용처: 초전도 코일"
   },
   "uses.singulo.coolant_cartridge": {
     "source": "Used in: Muon-Catalyzed Fusion Reactor, Quantum Computing Module, SMES Module",
-    "translation": "사용 대상: 뮤온 촉매 핵융합로, 양자 연산 모듈, SMES 모듈"
+    "translation": "사용처: 뮤온 촉매 핵융합로, 양자 연산 모듈, SMES 모듈"
   },
   "uses.singulo.cooling_tower_base": {
     "source": "Used in: Cryogenic Cooling Tower",
-    "translation": "사용 제품: 극저온 냉각탑"
+    "translation": "사용처: 극저온 냉각탑"
   },
   "uses.singulo.cooling_tower_casing": {
     "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
-    "translation": "사용 제품: 극저온 냉각탑, 냉각탑 확장"
+    "translation": "사용처: 극저온 냉각탑, 냉각탑 확장"
   },
   "uses.singulo.cooling_tower_controller": {
     "source": "Used in: Cryogenic Cooling Tower",
-    "translation": "사용 제품: 극저온 냉각탑"
+    "translation": "사용처: 극저온 냉각탑"
   },
   "uses.singulo.cooling_tower_coolant_band": {
     "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
-    "translation": "사용 제품: 극저온 냉각탑, 냉각탑 확장"
+    "translation": "사용처: 극저온 냉각탑, 냉각탑 확장"
   },
   "uses.singulo.cooling_tower_glass": {
     "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
-    "translation": "사용 제품: 극저온 냉각탑, 냉각탑 확장"
+    "translation": "사용처: 극저온 냉각탑, 냉각탑 확장"
   },
   "uses.singulo.cooling_tower_grate": {
     "source": "Used in: Cryogenic Cooling Tower",
-    "translation": "사용 제품: 극저온 냉각탑"
+    "translation": "사용처: 극저온 냉각탑"
   },
   "uses.singulo.cooling_tower_rim": {
     "source": "Used in: Cryogenic Cooling Tower",
-    "translation": "사용 제품: 극저온 냉각탑"
+    "translation": "사용처: 극저온 냉각탑"
   },
   "uses.singulo.core_controller": {
     "source": "Used in: P-Reactor",
-    "translation": "사용 제품: 펜로즈 반응로"
+    "translation": "사용처: 펜로즈 반응로"
   },
   "uses.singulo.culture_data": {
     "source": "Used in: Data Card (Culture Data)",
-    "translation": "사용 제품: 데이터 카드(배양 데이터)"
+    "translation": "사용처: 데이터 카드(배양 데이터)"
   },
   "uses.singulo.data_card_culture_data": {
     "source": "Used in: Exotic Matter, Temporal Key",
-    "translation": "사용 대상: 특이 물질, 시간 잠금 열쇠"
+    "translation": "사용처: 특이 물질, 시간 잠금 열쇠"
   },
   "uses.singulo.data_card_observation_log": {
     "source": "Used in: Muon Catalyst, Magnetic Key",
-    "translation": "사용 대상: 뮤온 촉매, 자기 잠금 열쇠"
+    "translation": "사용처: 뮤온 촉매, 자기 잠금 열쇠"
   },
   "uses.singulo.data_card_quantum_fragment": {
     "source": "Used in: Entangled Element, Quantum Key",
-    "translation": "사용 대상: 양자 얽힘 소자, 양자 잠금 열쇠"
+    "translation": "사용처: 양자 얽힘 소자, 양자 잠금 열쇠"
   },
   "uses.singulo.degenerate_compactor_anvil": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_compactor_controller": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_compactor_frame": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_compactor_plate": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_compactor_ram": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_compactor_vent": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_compactor_window": {
     "source": "Used in: Degenerate Compactor",
-    "translation": "사용 제품: 축퇴 압축로"
+    "translation": "사용처: 축퇴 압축로"
   },
   "uses.singulo.degenerate_furnace_controller": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_furnace_fin": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_furnace_frame": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_furnace_piston": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_furnace_shell": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_furnace_tube": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_furnace_window": {
     "source": "Used in: Degenerate Furnace",
-    "translation": "사용 제품: 축퇴 열로"
+    "translation": "사용처: 축퇴 열로"
   },
   "uses.singulo.degenerate_matter_shell": {
     "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 2 more",
-    "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 2개"
+    "translation": "사용처: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 2개"
   },
   "uses.singulo.degenerate_nucleus": {
     "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
-    "translation": "사용 대상: 시간 결정 배양기, 특이점 캡슐화기, 특이점 씨앗, 중력자 조작기, 각성의 중력핵"
+    "translation": "사용처: 시간 결정 배양기, 특이점 캡슐화기, 특이점 씨앗, 중력자 조작기, 각성의 중력핵"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
-    "translation": "사용 대상: 축퇴 물질 껍질"
+    "translation": "사용처: 축퇴 물질 껍질"
   },
   "uses.singulo.degraded_anomaly_sample": {
     "source": "Used in: Anomaly Sample",
-    "translation": "사용 제품: 이상 샘플"
+    "translation": "사용처: 이상 샘플"
   },
   "uses.singulo.degraded_cold_atom_trap": {
     "source": "Used in: Cold Atom Trap",
-    "translation": "사용 제품: 냉각 원자 트랩"
+    "translation": "사용처: 냉각 원자 트랩"
   },
   "uses.singulo.degraded_control_unit": {
     "source": "Used in: Control Unit",
-    "translation": "사용 제품: 제어 장치"
+    "translation": "사용처: 제어 장치"
   },
   "uses.singulo.degraded_time_crystal_seed": {
     "source": "Used in: Time Crystal Seed",
-    "translation": "사용 제품: 시간 결정 씨앗"
+    "translation": "사용처: 시간 결정 씨앗"
   },
   "uses.singulo.dormant_singularity_seed": {
     "source": "Used in: Singularity Seed",
-    "translation": "사용 제품: 특이점 씨앗"
+    "translation": "사용처: 특이점 씨앗"
   },
   "uses.singulo.echo_chapter": {
     "source": "Used in: Terminus Record",
-    "translation": "사용 대상: 종언의 기록"
+    "translation": "사용처: 종언의 기록"
   },
   "uses.singulo.empty_coolant_cartridge": {
     "source": "Used in: Coolant Cartridge, Liquid Helium Cartridge",
-    "translation": "사용 대상: 냉매 카트리지, 액체 헬륨 카트리지"
+    "translation": "사용처: 냉매 카트리지, 액체 헬륨 카트리지"
   },
   "uses.singulo.entangled_element": {
     "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 23 more",
-    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 23개"
+    "translation": "사용처: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 23개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
-    "translation": "사용 대상: 각성의 소용돌이핵, 종언의 기록, 원초의 씨앗"
+    "translation": "사용처: 각성의 소용돌이핵, 종언의 기록, 원초의 씨앗"
   },
   "uses.singulo.ergosphere_ring": {
     "source": "Used in: Sealed Container (Singularity Lock)",
-    "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
+    "translation": "사용처: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.exotic_matter": {
     "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 31 more",
-    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 31개"
+    "translation": "사용처: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 31개"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
-    "translation": "사용 제품: 입자 가속기"
+    "translation": "사용처: 입자 가속기"
   },
   "uses.singulo.fulgurite": {
     "source": "Used in: Optical Lattice Substrate",
-    "translation": "사용 대상: 광학 격자 기판"
+    "translation": "사용처: 광학 격자 기판"
   },
   "uses.singulo.gravity_chapter": {
     "source": "Used in: Terminus Record",
-    "translation": "사용 대상: 종언의 기록"
+    "translation": "사용처: 종언의 기록"
   },
   "uses.singulo.gravity_field_stabilizer": {
     "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock), Jet Forge Levitator and 1 more",
-    "translation": "사용 대상: 노심 제어기, 중성미자 감도 모듈 Mk3, 특이점 잠금 열쇠, 봉인 컨테이너 (특이점 잠금), 제트 단조로 부양기 외 1개"
+    "translation": "사용처: 노심 제어기, 중성미자 감도 모듈 Mk3, 특이점 잠금 열쇠, 봉인 컨테이너 (특이점 잠금), 제트 단조로 부양기 외 1개"
   },
   "uses.singulo.gravity_panel_receiver": {
     "source": "Used in: Impact Generator Panel",
-    "translation": "사용 대상: 충격 발전 패널"
+    "translation": "사용처: 충격 발전 패널"
   },
   "uses.singulo.gyro_drive": {
     "source": "Used in: P-Reactor",
-    "translation": "사용 제품: 펜로즈 반응로"
+    "translation": "사용처: 펜로즈 반응로"
   },
   "uses.singulo.hawking_condensate": {
     "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 6 more",
-    "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵, 각성의 메아리핵 외 6개"
+    "translation": "사용처: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵, 각성의 메아리핵 외 6개"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine, Jet Forge Heat Sink and 1 more",
-    "translation": "사용 대상: 냉각탑 제어기, 극저온 냉각탑, 냉각탑 확장, 극저온 터빈, 제트 단조로 흡열판 외 1개"
+    "translation": "사용처: 냉각탑 제어기, 극저온 냉각탑, 냉각탑 확장, 극저온 터빈, 제트 단조로 흡열판 외 1개"
   },
   "uses.singulo.horizon_chapter": {
     "source": "Used in: Terminus Record",
-    "translation": "사용 대상: 종언의 기록"
+    "translation": "사용처: 종언의 기록"
   },
   "uses.singulo.inertial_control_gauntlet": {
     "source": "Used in: Graviton Manipulator",
-    "translation": "사용 제품: 중력자 조작기"
+    "translation": "사용처: 중력자 조작기"
   },
   "uses.singulo.intact_ruin_glass": {
     "source": "Used in: Broken Ruin Glass, Reinforced Ruin Glass",
-    "translation": "사용 대상: 깨진 폐허 유리, 강화 폐허 유리"
+    "translation": "사용처: 깨진 폐허 유리, 강화 폐허 유리"
   },
   "uses.singulo.jet_condensate": {
     "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon, Collapsar Billet",
-    "translation": "사용 대상: 인공 항성 코어, 각성의 소용돌이핵, 창세로 기둥, 콜랍사 빌릿"
+    "translation": "사용처: 인공 항성 코어, 각성의 소용돌이핵, 창세로 기둥, 콜랍사 빌릿"
   },
   "uses.singulo.jet_forge_collector": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_collimator": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_confinement_coil": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_core": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_foundation": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_heat_sink": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_levitator": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.jet_forge_truss": {
     "source": "Used in: Accretion Jet Forge",
-    "translation": "사용 대상: 강착 제트 단조로"
+    "translation": "사용처: 강착 제트 단조로"
   },
   "uses.singulo.lab_frame": {
     "source": "Used in: Power Conduit, Body Capsule",
-    "translation": "사용 대상: 동력 도관, 소체 캡슐"
+    "translation": "사용처: 동력 도관, 소체 캡슐"
   },
   "uses.singulo.lab_panel": {
     "source": "Used in: Lined Lab Panel, Lab Floor Tiles",
-    "translation": "사용 대상: 연구소 띠 패널, 연구소 바닥 타일"
+    "translation": "사용처: 연구소 띠 패널, 연구소 바닥 타일"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
-    "translation": "사용 제품: 홀극 업그레이드"
+    "translation": "사용처: 홀극 업그레이드"
   },
   "uses.singulo.mass_pellet": {
     "source": "Used in: Collapsar Ingot",
-    "translation": "사용 대상: 콜랍사 주괴"
+    "translation": "사용처: 콜랍사 주괴"
   },
   "uses.singulo.meteoric_iron_ingot": {
     "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 4 more",
-    "translation": "사용 대상: 집속 자석, 중력파 검출기, 카시미르 공동 자기 차폐, 자기 병, 자이로 구동 장치 외 4개"
+    "translation": "사용처: 집속 자석, 중력파 검출기, 카시미르 공동 자기 차폐, 자기 병, 자이로 구동 장치 외 4개"
   },
   "uses.singulo.micro_black_hole": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
-    "translation": "사용 대상: 블랙홀 폭탄, 중력자 조작기, 특이점 잠금 열쇠"
+    "translation": "사용처: 블랙홀 폭탄, 중력자 조작기, 특이점 잠금 열쇠"
   },
   "uses.singulo.mirror_plate": {
     "source": "Used in: C-Cavity",
-    "translation": "사용 제품: 카시미르 공동"
+    "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.muon_bundle": {
     "source": "Used in: Muon Catalyst",
-    "translation": "사용 제품: 뮤온 촉매"
+    "translation": "사용처: 뮤온 촉매"
   },
   "uses.singulo.muon_catalyst": {
     "source": "Used in: Muon-Catalyzed Fusion Reactor, Entanglement Synthesizer, Laser Cooler, BE Condensate Catalyst, Quantum Heat Engine and 6 more",
-    "translation": "사용 대상: 뮤온 촉매 핵융합로, 양자 얽힘 합성기, 레이저 냉각기, BE 응축 촉매, 양자 열기관 외 6개"
+    "translation": "사용처: 뮤온 촉매 핵융합로, 양자 얽힘 합성기, 레이저 냉각기, BE 응축 촉매, 양자 열기관 외 6개"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
-    "translation": "사용 제품: 중성미자 관측소"
+    "translation": "사용처: 중성미자 관측소"
   },
   "uses.singulo.nihonium": {
     "source": "Used in: Nihonium Ingot",
-    "translation": "사용 대상: 니호늄 주괴"
+    "translation": "사용처: 니호늄 주괴"
   },
   "uses.singulo.nihonium_frame": {
     "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 12 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 축퇴 열로 제어기, 자동 탐사기 기지 외 12개"
+    "translation": "사용처: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 축퇴 열로 제어기, 자동 탐사기 기지 외 12개"
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
-    "translation": "사용 대상: 니호늄 판"
+    "translation": "사용처: 니호늄 판"
   },
   "uses.singulo.nihonium_plate": {
     "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 2 more",
-    "translation": "사용 대상: 지평선 버스, 자이로 구동 장치, 호킹 수집기, 제트 콜렉터, 니호늄 프레임 외 2개"
+    "translation": "사용처: 지평선 버스, 자이로 구동 장치, 호킹 수집기, 제트 콜렉터, 니호늄 프레임 외 2개"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
-    "translation": "사용 제품: 데이터 카드(관측 로그)"
+    "translation": "사용처: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
     "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 28 more",
-    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 28개"
+    "translation": "사용처: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 28개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
-    "translation": "사용 대상: 시간 결정 촉매"
+    "translation": "사용처: 시간 결정 촉매"
   },
   "uses.singulo.precision_actuator": {
     "source": "Used in: Factory Print Unit, Awakened Foundry Core",
-    "translation": "사용 대상: 공장식 인쇄 유닛, 각성의 제조핵"
+    "translation": "사용처: 공장식 인쇄 유닛, 각성의 제조핵"
   },
   "uses.singulo.pressure_crystal": {
     "source": "Used in: Degenerate Compactor Anvil, Degenerate Precursor",
-    "translation": "사용 대상: 축퇴 압축로 앤빌, 축퇴 전구체"
+    "translation": "사용처: 축퇴 압축로 앤빌, 축퇴 전구체"
   },
   "uses.singulo.pristine_ruin_panel": {
     "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip",
-    "translation": "사용 대상: 온전한 폐허 타일, 온전한 폐허 기둥, 온전한 폐허 도광판"
+    "translation": "사용처: 온전한 폐허 타일, 온전한 폐허 기둥, 온전한 폐허 도광판"
   },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
-    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 21개"
+    "translation": "사용처: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 21개"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
-    "translation": "사용 제품: 데이터 카드(양자 데이터 조각)"
+    "translation": "사용처: 데이터 카드(양자 데이터 조각)"
   },
   "uses.singulo.raw_meteoric_iron": {
     "source": "Used in: Meteoric Iron Ingot",
-    "translation": "사용 대상: 운철 주괴"
+    "translation": "사용처: 운철 주괴"
   },
   "uses.singulo.reactor_shell": {
     "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 2 more",
-    "translation": "사용 대상: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기 외 2개"
+    "translation": "사용처: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기 외 2개"
   },
   "uses.singulo.reactor_stabilizer": {
     "source": "Used in: P-Reactor, Accretion Jet Forge",
-    "translation": "사용 대상: 펜로즈 반응로, 강착 제트 단조로"
+    "translation": "사용처: 펜로즈 반응로, 강착 제트 단조로"
   },
   "uses.singulo.record_fragment": {
     "source": "Used in: Decoded Record",
-    "translation": "사용 제품: 디코딩된 기록"
+    "translation": "사용처: 디코딩된 기록"
   },
   "uses.singulo.ruin_lamp": {
     "source": "Used in: Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson)",
-    "translation": "사용 대상: 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색)"
+    "translation": "사용처: 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색)"
   },
   "uses.singulo.ruin_panel": {
     "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
-    "translation": "사용 대상: 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널, 띠 무늬 폐허 패널 외 1개"
+    "translation": "사용처: 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널, 띠 무늬 폐허 패널 외 1개"
   },
   "uses.singulo.scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
-    "translation": "사용 대상: 중성미자 감도 모듈 Mk3"
+    "translation": "사용처: 중성미자 감도 모듈 Mk3"
   },
   "uses.singulo.sealed_container_1": {
     "source": "Used in: Sealed Container (Quantum Lock)",
-    "translation": "사용 대상: 봉인 컨테이너 (양자 잠금)"
+    "translation": "사용처: 봉인 컨테이너 (양자 잠금)"
   },
   "uses.singulo.sealed_container_2": {
     "source": "Used in: Sealed Container (Temporal Lock)",
-    "translation": "사용 대상: 봉인 컨테이너 (시간 잠금)"
+    "translation": "사용처: 봉인 컨테이너 (시간 잠금)"
   },
   "uses.singulo.sealed_container_3": {
     "source": "Used in: Sealed Container (Singularity Lock)",
-    "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
+    "translation": "사용처: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.sentinel_core": {
     "source": "Used in: Laser Cooler, Echo Resonator, Autonomous Probe Station, Awakened Echo Core",
-    "translation": "사용 대상: 레이저 냉각기, 메아리 공명기, 자동 탐사기 기지, 각성의 메아리핵"
+    "translation": "사용처: 레이저 냉각기, 메아리 공명기, 자동 탐사기 기지, 각성의 메아리핵"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
-    "translation": "사용 제품: 사건의 지평선 실드 타워"
+    "translation": "사용처: 사건의 지평선 실드 타워"
   },
   "uses.singulo.shield_tower_coil": {
     "source": "Used in: Event Horizon Shield Tower",
-    "translation": "사용 제품: 사건의 지평선 실드 타워"
+    "translation": "사용처: 사건의 지평선 실드 타워"
   },
   "uses.singulo.shield_tower_core": {
     "source": "Used in: Event Horizon Shield Tower",
-    "translation": "사용 제품: 사건의 지평선 실드 타워"
+    "translation": "사용처: 사건의 지평선 실드 타워"
   },
   "uses.singulo.shield_tower_crown": {
     "source": "Used in: Event Horizon Shield Tower",
-    "translation": "사용 제품: 사건의 지평선 실드 타워"
+    "translation": "사용처: 사건의 지평선 실드 타워"
   },
   "uses.singulo.shield_tower_plinth": {
     "source": "Used in: Event Horizon Shield Tower",
-    "translation": "사용 제품: 사건의 지평선 실드 타워"
+    "translation": "사용처: 사건의 지평선 실드 타워"
   },
   "uses.singulo.shield_tower_waveguide": {
     "source": "Used in: Event Horizon Shield Tower",
-    "translation": "사용 제품: 사건의 지평선 실드 타워"
+    "translation": "사용처: 사건의 지평선 실드 타워"
   },
   "uses.singulo.stardust": {
     "source": "Used in: Cold Atoms, Artificial Star Core",
-    "translation": "사용 대상: 냉각 원자, 인공 항성 코어"
+    "translation": "사용처: 냉각 원자, 인공 항성 코어"
   },
   "uses.singulo.steel_blend": {
     "source": "Used in: Steel Ingot",
-    "translation": "사용 제품: 강철 주괴"
+    "translation": "사용처: 강철 주괴"
   },
   "uses.singulo.steel_ingot": {
     "source": "Used in: Basic Frame, Steel Plate, Compressor, Relocation Wrench, Pristine Ruin Pillar and 1 more",
-    "translation": "사용 대상: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
+    "translation": "사용처: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
     "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 91 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 91개"
+    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 91개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 69 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 69개"
+    "translation": "사용처: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 69개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
-    "translation": "사용 대상: 초전도 케이블, 가속관, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브 외 3개"
+    "translation": "사용처: 초전도 케이블, 가속관, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브 외 3개"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
-    "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
+    "translation": "사용처: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
     "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 13 more",
-    "translation": "사용 대상: 특이 물질, 자이로 구동 장치, 특이점 코어, 헤일로 수집기, 실드 타워 주각 외 13개"
+    "translation": "사용처: 특이 물질, 자이로 구동 장치, 특이점 코어, 헤일로 수집기, 실드 타워 주각 외 13개"
   },
   "uses.singulo.time_crystal_module": {
     "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 9 more",
-    "translation": "사용 대상: SMES 모듈, 반응로 외피, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 외 9개"
+    "translation": "사용처: SMES 모듈, 반응로 외피, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 외 9개"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
-    "translation": "사용 제품: 시간 결정 촉매"
+    "translation": "사용처: 시간 결정 촉매"
   },
   "uses.singulo.tipler_bearing": {
     "source": "Used in: T-Cylinder",
-    "translation": "사용 제품: 티플러 원통"
+    "translation": "사용처: 티플러 원통"
   },
   "uses.singulo.tipler_core": {
     "source": "Used in: T-Cylinder",
-    "translation": "사용 제품: 티플러 원통"
+    "translation": "사용처: 티플러 원통"
   },
   "uses.singulo.tipler_frame": {
     "source": "Used in: T-Cylinder",
-    "translation": "사용 제품: 티플러 원통"
+    "translation": "사용처: 티플러 원통"
   },
   "uses.singulo.tipler_holder": {
     "source": "Used in: T-Cylinder",
-    "translation": "사용 제품: 티플러 원통"
+    "translation": "사용처: 티플러 원통"
   },
   "uses.singulo.tipler_housing": {
     "source": "Used in: T-Cylinder",
-    "translation": "사용 제품: 티플러 원통"
+    "translation": "사용처: 티플러 원통"
   },
   "uses.singulo.tipler_window": {
     "source": "Used in: T-Cylinder",
-    "translation": "사용 제품: 티플러 원통"
+    "translation": "사용처: 티플러 원통"
   },
   "uses.singulo.topological_wire": {
     "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Magnetic Confinement Ring, Shield Tower Power Coil and 3 more",
-    "translation": "사용 대상: 토로이드 자기 코일, 지평선 버스, 자이로 구동 장치, 자기 가둠 고리, 실드 타워 파워 코일 외 3개"
+    "translation": "사용처: 토로이드 자기 코일, 지평선 버스, 자이로 구동 장치, 자기 가둠 고리, 실드 타워 파워 코일 외 3개"
   },
   "uses.singulo.toroidal_magnetic_coil": {
     "source": "Used in: SMES Module",
-    "translation": "사용 대상: SMES 모듈"
+    "translation": "사용처: SMES 모듈"
   },
   "uses.singulo.unfired_ceramic": {
     "source": "Used in: White Ceramic Composite",
-    "translation": "사용 제품: 화이트 세라믹 복합재"
+    "translation": "사용처: 화이트 세라믹 복합재"
   },
   "uses.singulo.unfired_teacup": {
     "source": "Used in: Teacup",
-    "translation": "사용 대상: 찻잔"
+    "translation": "사용처: 찻잔"
   },
   "uses.singulo.unstable_wormhole_mouth": {
     "source": "Used in: Wormhole Mouth",
-    "translation": "사용 제품: 웜홀 입구"
+    "translation": "사용처: 웜홀 입구"
   },
   "uses.singulo.void_dust": {
     "source": "Used in: Gravity Field Stabilizer, Wormhole Generator Focuser, Wormhole Mouth Casing",
-    "translation": "사용 대상: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
+    "translation": "사용처: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
   },
   "uses.singulo.white_ceramic_composite": {
     "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 24 more",
-    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 24개"
+    "translation": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 24개"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
-    "translation": "사용 대상: 사방별 흰색 유리 패널"
+    "translation": "사용처: 사방별 흰색 유리 패널"
   },
   "uses.singulo.white_panel": {
     "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
-    "translation": "사용 대상: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널, 무중력 블록"
+    "translation": "사용처: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널, 무중력 블록"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",
-    "translation": "사용 제품: 웜홀 생성기"
+    "translation": "사용처: 웜홀 생성기"
   },
   "uses.singulo.wormhole_generator_core": {
     "source": "Used in: Wormhole Generator",
-    "translation": "사용 제품: 웜홀 생성기"
+    "translation": "사용처: 웜홀 생성기"
   },
   "uses.singulo.wormhole_generator_focuser": {
     "source": "Used in: Wormhole Generator",
-    "translation": "사용 제품: 웜홀 생성기"
+    "translation": "사용처: 웜홀 생성기"
   },
   "uses.singulo.wormhole_generator_shell": {
     "source": "Used in: Wormhole Generator Port, Wormhole Generator",
-    "translation": "사용 대상: 웜홀 생성기 포트, 웜홀 생성기"
+    "translation": "사용처: 웜홀 생성기 포트, 웜홀 생성기"
   },
   "uses.singulo.wormhole_generator_window": {
     "source": "Used in: Wormhole Generator",
-    "translation": "사용 제품: 웜홀 생성기"
+    "translation": "사용처: 웜홀 생성기"
   },
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
-    "translation": "사용 대상: 웜홀 입구"
+    "translation": "사용처: 웜홀 입구"
   },
   "uses.singulo.zinc_dust": {
     "source": "Used in: Zinc Ingot, Unfired Phosphor",
-    "translation": "사용 대상: 아연 주괴, 소성되지 않은 형광체"
+    "translation": "사용처: 아연 주괴, 소성되지 않은 형광체"
   },
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",
-    "translation": "사용 대상: 니호늄"
+    "translation": "사용처: 니호늄"
   },
   "subtitles.singulo.ergosphere_leviathan.burst": {
     "source": "Something bursts from the floor",
@@ -12325,15 +12325,15 @@
   },
   "howto.singulo.capacity_upgrade_1": {
     "source": "Made in: Crafting Table (stage 2)",
-    "translation": "제작 장소: 제작대 (2단계)"
+    "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.capacity_upgrade_2": {
     "source": "Made in: Precision Assembler (stage 3)",
-    "translation": "제작 장소: 정밀 조립기 (3단계)"
+    "translation": "제작: 정밀 조립기(3단계)"
   },
   "howto.singulo.capacity_upgrade_3": {
     "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "제작 장소: 정밀 조립기 (4단계)"
+    "translation": "제작: 정밀 조립기(4단계)"
   },
   "item.singulo.capacity_upgrade_1": {
     "source": "Capacity Upgrade Mk1",
@@ -12581,7 +12581,7 @@
   },
   "uses.singulo.packing_crate": {
     "source": "Used in: Battery Packing Crate",
-    "translation": "사용 대상: 배터리 포장 상자"
+    "translation": "사용처: 배터리 포장 상자"
   },
   "desc.singulo.battery_packing_crate": {
     "source": "A packing crate with an extra battery. Reaches up to 760 blocks.",
@@ -12593,7 +12593,7 @@
   },
   "uses.singulo.battery_packing_crate": {
     "source": "Used in: Large Battery Packing Crate",
-    "translation": "사용 대상: 대용량 배터리 포장 상자"
+    "translation": "사용처: 대용량 배터리 포장 상자"
   },
   "desc.singulo.large_battery_packing_crate": {
     "source": "A packing crate with a large battery. Reaches up to 3,160 blocks.",
