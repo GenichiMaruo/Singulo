@@ -25,6 +25,7 @@ def descriptions(ctx, ja, en):
     def en_name(n):
         return MOD[n][1] if n in MOD else n
 
+    ruin_names = {value: en[key] for key, value in ja.items() if key.startswith(f'ruin.{MODID}.')}
     for name, (iid, _, kind) in MOD.items():
         if kind == 'fluid':
             continue
@@ -41,7 +42,7 @@ def descriptions(ctx, ja, en):
         if name in ctx['EXPLORE']:
             ruin = ctx['EXPLORE'][name]['ruin']
             ja[f'howto.{MODID}.{iid}'] = f'入手: 遺構「{ruin}」の保管庫'
-            en[f'howto.{MODID}.{iid}'] = f'Found in: {en_name(ruin) if ruin in MOD else "ruin caches"}'
+            en[f'howto.{MODID}.{iid}'] = f'Found in: {ruin_names[ruin]} caches'
         elif name in ctx['RESTORED']:
             ja[f'howto.{MODID}.{iid}'] = f'入手: {ctx["RESTORED"][name]}を復元する'
             en[f'howto.{MODID}.{iid}'] = f'Restore a {en_name(ctx["RESTORED"][name])}'
@@ -50,6 +51,7 @@ def descriptions(ctx, ja, en):
             st_en = en_name(station.split('（')[0]) if station.split('（')[0] in MOD else {
                 '作業台': 'Crafting Table', '溶鉱炉（バニラ）': 'Blast Furnace', 'かまど（バニラ）': 'Furnace',
                 'マルチブロック組み立て': 'Multiblock assembly'}.get(station, station)
+            st_en = en.get(f'station.{MODID}.{ctx["STATIONS"].get(station, "")}', st_en)
             ja[f'howto.{MODID}.{iid}'] = f'作り方: {station}（段階{r["stage"]}）'
             en[f'howto.{MODID}.{iid}'] = f'Made in: {st_en} (stage {r["stage"]})'
         uses = [u for u in used_in.get(name, []) if u in MOD and MOD[u][2] != 'fluid']
