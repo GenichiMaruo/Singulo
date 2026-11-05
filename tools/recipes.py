@@ -1014,3 +1014,10 @@ R('液体パイプ', 1, '作業台', {'銅インゴット': 6, 'ガラス': 3}, 
   note='置くだけでつながり、液体とガスを運ぶ。隣の水源や溶岩源からも汲む')
 # 液体が通るガラスの芯を銅で包む
 RECIPES['液体パイプ']['shape'] = (('CCC', 'GGG', 'CCC'), {'C': _C, 'G': _G})
+
+# 0.16.0 cosmic facilities
+from cosmic_content import recipes as _cosmic_recipes
+_cosmic_recipes(R, SHAPED)
+for _cosmic_name in SHAPED:
+    if _cosmic_name in RECIPES and "shape" not in RECIPES[_cosmic_name]:
+        RECIPES[_cosmic_name]["shape"] = SHAPED[_cosmic_name]

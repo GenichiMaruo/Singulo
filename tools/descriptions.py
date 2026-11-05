@@ -991,3 +991,8 @@ SUMMARY = {
     'コラプサー・インゴット': ('ブラックホールのジェットで鍛えた、光を吸う黒の地金。',
         'Light-drinking black metal forged in a jet.'),
 }
+
+# 0.16.0 cosmic facilities
+from cosmic_content import DESC as _COSMIC_DESC, SUMMARY as _COSMIC_SUMMARY
+DESC.update(_COSMIC_DESC)
+SUMMARY.update(_COSMIC_SUMMARY)

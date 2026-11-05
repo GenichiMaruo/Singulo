@@ -39,6 +39,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         if (size <= 0 || be.getLevel() == null) {
             return;
         }
+        if(be.traversable())seam(be,partialTick,pose,buffers);
         float r = throatRadius(size);
         float time = be.getLevel().getGameTime() + partialTick;
         pose.pushPose();
@@ -51,6 +52,27 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         pose.popPose();
         Vec3 c = Vec3.atBottomCenterOf(be.getBlockPos()).add(0, WormholeMouthBlockEntity.MOUTH_HEIGHT, 0);
         GravitationalLensing.add(c, r * GravitationalLensing.EINSTEIN_PER_HORIZON, 0.6F);
+    }
+
+    private static void seam(WormholeMouthBlockEntity be,float partial,PoseStack pose,MultiBufferSource buffers){
+        pose.pushPose();pose.translate(0.5,2.5,0.5);
+        float yaw=be.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING).toYRot();
+        pose.mulPose(Axis.YP.rotationDegrees(-yaw));
+        VertexConsumer glow=buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+        int colour=be.passageState()==2?0x8ADEEF:0xDAAF6E;
+        FxDraw.box(pose,glow,-1.34F,-1.44F,-0.012F,1.34F,1.44F,0.012F,LightTexture.FULL_BRIGHT,0x07121F,195);
+        for(int side=0;side<2;side++){
+            float x=side==0?-1.4F:1.34F,y=side==0?-1.5F:1.44F;
+            FxDraw.box(pose,glow,x,-1.5F,-0.025F,x+0.06F,1.5F,0.025F,LightTexture.FULL_BRIGHT,colour,210);
+            FxDraw.box(pose,glow,-1.4F,y,-0.025F,1.4F,y+0.06F,0.025F,LightTexture.FULL_BRIGHT,colour,210);
+        }
+        float time=(be.getLevel().getGameTime()%24000+partial)/20F;
+        for(int i=0;i<16;i++){
+            float y=-1.4F+(i+time*0.7F)%16/16*2.8F;
+            FxDraw.box(pose,glow,-1.56F,y,-0.035F,-1.22F,y+0.025F,0.035F,LightTexture.FULL_BRIGHT,colour,170);
+            FxDraw.box(pose,glow,1.22F,-y,-0.035F,1.56F,-y+0.025F,0.035F,LightTexture.FULL_BRIGHT,colour,170);
+        }
+        pose.popPose();
     }
 
     private static void sphere(PoseStack.Pose last, VertexConsumer vc, float r) {

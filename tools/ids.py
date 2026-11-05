@@ -757,3 +757,8 @@ ACCEPTS_SPENT = {('BE凝縮触媒', 'ミュオン触媒')}
 
 # マルチブロックの大きさの下限（冷却塔の高さなど）があるレシピ
 MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ': 10, 'ニホニウム': 16}
+
+# 0.16.0 cosmic facilities
+from cosmic_content import IDS as _COSMIC_IDS
+MOD.update(_COSMIC_IDS)
+STATIONS["潮汐紡糸機"] = "tidal_spindle"

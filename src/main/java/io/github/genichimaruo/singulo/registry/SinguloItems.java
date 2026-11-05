@@ -267,6 +267,11 @@ public final class SinguloItems {
         for (var entry : SinguloBlocks.CONTROLLERS.entrySet()) {
             block(entry.getValue(), entry.getKey().stage());
         }
+        block(SinguloBlocks.COSMIC_FRAME,3);
+        block(SinguloBlocks.PASTA_LAMINATE,5);
+        block(SinguloBlocks.SUSPENSION_RESERVOIR,3);
+        block(SinguloBlocks.PASTA_ACCUMULATOR,5);
+        block(SinguloBlocks.TIDAL_SPINDLE,5);
         TAB_ORDER.add(HANDBOOK);
         TAB_ORDER.add(SETTINGS_CARD);
         TAB_ORDER.add(RELOCATION_WRENCH);

@@ -79,6 +79,53 @@ public final class JetForgeGameTests {
         });
     }
 
+    @GameTest(template = FORGE, timeoutTicks = 500)
+    public static void jetForgeParallelReservesScaledInputsAndPersistsBatch(GameTestHelper helper) {
+        JetForgeBlockEntity be=build(helper);load(be,4);
+        // Vanilla's GameTest mock overrides isCreative() to always return true.
+        // This interaction needs an ordinary, unconnected survival player instead.
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper,
+                new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(),helper.getLevel(),
+                        new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"cassette-test"),net.minecraft.server.level.ClientInformation.createDefault()));
+        helper.assertFalse(player.isCreative(),"Survival interaction fixture is creative");
+        ItemStack cassette=new ItemStack(item("collapsar_parallel_cassette"),2);
+        helper.assertTrue(be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND)&&cassette.getCount()==1&&be.parallelUpgrade(),"Cassette installation not charged once");
+        be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND);helper.assertTrue(cassette.getCount()==1,"Duplicate installation consumed another cassette");
+        power(helper,be,new boolean[]{true});
+        helper.succeedWhen(()->{
+            helper.assertTrue(be.phase()!=JetForgeBlockEntity.IDLE,"Run has not started");
+            helper.assertTrue(be.batchSize()==4&&be.result().getCount()==4,"Parallel count not four");
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN).isEmpty()&&be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN+1).isEmpty()&&be.tank().isEmpty(),"Scaled inputs/coolant not reserved");
+            var saved=be.saveWithFullMetadata(helper.getLevel().registryAccess());
+            var copy=(JetForgeBlockEntity)BlockEntity.loadStatic(be.getBlockPos(),be.getBlockState(),saved,helper.getLevel().registryAccess());
+            helper.assertTrue(copy.parallelUpgrade()&&copy.batchSize()==4&&copy.result().getCount()==4&&copy.charged().stream().mapToInt(ItemStack::getCount).sum()==68,"Reserved batch lost on reload");
+            helper.assertTrue(saved.getInt("energy_per_tick")==1_000_000_000,"Parallel power not scaled");
+        });
+    }
+
+    @GameTest(template = FORGE, timeoutTicks = 500)
+    public static void jetForgeParallelRespectsOutputSpaceAndCoolant(GameTestHelper helper) {
+        JetForgeBlockEntity be=build(helper);load(be,4);
+        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);be.loadWithComponents(tag,helper.getLevel().registryAccess());
+        be.items().setStackInSlot(JetForgeBlockEntity.SLOT_OUT,new ItemStack(item("collapsar_ingot"),62));power(helper,be,new boolean[]{true});
+        helper.succeedWhen(()->{
+            helper.assertTrue(be.phase()!=JetForgeBlockEntity.IDLE,"Run has not started");
+            helper.assertTrue(be.batchSize()==2&&be.result().getCount()==2,"Output capacity did not reduce batch");
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN).getCount()==2&&be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN+1).getCount()==32&&be.tank().getFluidAmount()==2000,"Reduced batch consumed wrong resources");
+        });
+    }
+
+    @GameTest(template=FORGE,timeoutTicks=2200)
+    public static void jetForgeParallelCompletesExactlyFourProducts(GameTestHelper helper){
+        var be=build(helper);load(be,4);
+        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);be.loadWithComponents(tag,helper.getLevel().registryAccess());
+        power(helper,be,new boolean[]{true});
+        helper.runAtTickTime(RUN+100,()->{
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_OUT).getCount()==4&&be.result().isEmpty()&&be.charged().isEmpty(),"Parallel completion duplicated/lost output");
+            helper.assertTrue(be.consumedTotal()>=1_200_000_000_000L,"Four batches did not pay four irradiation costs");helper.succeed();
+        });
+    }
+
     // ------------------------------------------------------------------ 形
 
     /** 部品の個数が tools/jet_forge.py の数（レシピ表と説明に使う）と同じ。 */

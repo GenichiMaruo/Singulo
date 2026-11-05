@@ -312,6 +312,9 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         int[] ringH = {12, 9, 6};
         Panel.well(g, skin, cx(32), cy(22), 122, 48);
         g.fill(cx(32), cy(22), cx(154), cy(70), 0xFF080A12);
+        int batch = Math.max(1, v(DeviceMenu.Forge.BATCH));
+        g.drawString(font, "×" + batch, cx(135), cy(24), 0xFFBFE6FF, false);
+        hint(130, 22, 24, 13, tr("forge.batch", batch));
         // 排熱側の杯とビーム止め
         int heat = phase >= 2 && phase <= 5 ? 0xFFFF7A30 : 0xFF5A3420;
         g.fill(cx(sink), cy(ay - 9), cx(sink + 2), cy(ay + 10), heat);
@@ -455,6 +458,8 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     private static final int BTN = 16;
 
     private void drawMouth(GuiGraphics g, float t, int mouseX, int mouseY) {
+        int passage=v(DeviceMenu.Mouth.PASSAGE);
+        if(passage>0){g.renderOutline(cx(20),cy(20),72,64,passage==2?CYAN:GuiSkin.WARN);hint(20,20,72,64,tr("mouth.passage."+passage));}
         int size = v(DeviceMenu.Mouth.SIZE);
         int target = v(DeviceMenu.Mouth.TARGET);
         // 喉の大きさを入れ子の輪で（今の大きさは明るく、目標は暗く）

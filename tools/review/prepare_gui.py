@@ -2,11 +2,13 @@
 import argparse
 _parser = argparse.ArgumentParser()
 _parser.add_argument('--build-dir', default='build')
-_build = _parser.parse_args().build_dir
+_parser.add_argument('--cosmic', action='store_true')
+_args = _parser.parse_args()
+_build = _args.build_dir
 import pathlib
 import shutil
 
-root = pathlib.Path(_build + "/gui-review")
+root = pathlib.Path(_build) / ('cosmic-gui-review' if _args.cosmic else 'gui-review')
 root.mkdir(parents=True, exist_ok=True)
 source = pathlib.Path(_build + "/gametest/world")
 if not (source / "level.dat").is_file():

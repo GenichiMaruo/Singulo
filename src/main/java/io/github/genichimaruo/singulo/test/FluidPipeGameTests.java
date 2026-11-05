@@ -79,6 +79,27 @@ public final class FluidPipeGameTests {
         }
     }
 
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void fluidPipeSurveyReportsActualDirectionAndBlockedState(GameTestHelper h) {
+        BlockPos a=new BlockPos(1,1,1),b=new BlockPos(6,1,1),p=new BlockPos(3,1,1);
+        MachineBlockEntity giver=machine(h,a,MachineType.ELECTROLYZER),taker=machine(h,b,MachineType.ELECTROLYZER);
+        pipes(h,a.east(),b.west());
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("survey_glasses"))));
+        var at=net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(p.above()));player.setPos(at.x,at.y,at.z);
+        h.onEachTick(()->giver.forceOutputTankForTest(new FluidStack(Fluids.WATER,500)));
+        h.runAtTickTime(25,()->{
+            io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity pipe=h.getBlockEntity(p);
+            h.assertTrue(pipe.visualState()==1&&pipe.visualAmount()>0,"Observed transfer not reported");
+            h.assertTrue((pipe.inMask()&(1<<Direction.WEST.get3DDataValue()))!=0&&(pipe.outMask()&(1<<Direction.EAST.get3DDataValue()))!=0,"Flow arrows reversed");
+            taker.automationFluids().fill(new FluidStack(Fluids.WATER,Integer.MAX_VALUE),IFluidHandler.FluidAction.EXECUTE);
+        });
+        h.runAtTickTime(50,()->{
+            io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity pipe=h.getBlockEntity(p);
+            h.assertTrue(pipe.visualState()==2&&pipe.visualAmount()==0&&pipe.inMask()==0&&pipe.outMask()==0,"Blocked pipe retained flow arrows");h.succeed();
+        });
+    }
+
     /**
      * このmodで扱う液体（水・溶岩と、登録したすべての液体・ガス）は、どれも出口 → パイプ → それを使う口へ届く。
      * 受け手は通常の装置のレシピから探し、なければ液体専用の受け口（燃料電池・閉じ込めタンク）を使う。受け手のない液体があれば失敗する。

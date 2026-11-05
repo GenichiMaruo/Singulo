@@ -13,6 +13,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class SinguloMenus {
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(Registries.MENU, Singulo.MODID);
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.cosmic.CosmicMenu>> COSMIC = REGISTER.register(
+            "cosmic", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.cosmic.CosmicMenu::client));
 
     public static final Supplier<MenuType<MachineMenu>> MACHINE = REGISTER.register("machine",
             () -> IMenuTypeExtension.create(MachineMenu::client));

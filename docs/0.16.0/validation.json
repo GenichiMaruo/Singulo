@@ -1,0 +1,84 @@
+{
+  "version": "0.16.0",
+  "minecraft": "1.21.1",
+  "loader": "NeoForge 21.1.256",
+  "java": 21,
+  "jar": {
+    "name": "Singulo-0.16.0-1.21.1N.jar",
+    "size": 8989068,
+    "sha256": "8df37ad5969043fb1c9c08efb04bc89c6d19b8dabd3a0ecc0940386d2ead3366"
+  },
+  "regular_gametests": {
+    "passed": 694,
+    "complete": true
+  },
+  "mekanism_gametests": 1,
+  "python_tests": 51,
+  "translations_per_language": {
+    "en_us": 3419,
+    "ja_jp": 3419,
+    "ko_kr": 3419,
+    "zh_cn": 3419,
+    "zh_tw": 3419
+  },
+  "existing_gui_pixels": {
+    "languages": [
+      "ja_jp",
+      "en_us",
+      "zh_cn",
+      "zh_tw",
+      "ko_kr"
+    ],
+    "machine_captures": 240,
+    "headers_without_title_status_overlap": 80,
+    "generator_font_probes": 5,
+    "jet_forge_inventory_slots": 700,
+    "supply_port_inventory_slots": 350,
+    "supply_port_tooltips": 5
+  },
+  "existing_gui_captures": 262,
+  "cosmic_gui_captures": 15,
+  "native_world_states": 13,
+  "render_mods": {
+    "sodium": "0.6.13+mc1.21.1",
+    "distant_horizons": "3.3.3"
+  },
+  "lifecycle": {
+    "minecraft": "1.21.1",
+    "footprintChunks": "[[254, 255], [254, 256], [255, 255], [255, 256], [256, 255], [256, 256]]",
+    "controllerChunk": "[255, 255]",
+    "unloadedFootprintChunk": "[254, 256]",
+    "probeMode": "Real FULL-only tickets (level 33), explicit serverTick probe; natural block ticking resumes for multiplayer",
+    "actualFootprintInaccessible": true,
+    "footprintUnloadEvent": false,
+    "probeSuspendedWhileAwaitingEviction": true,
+    "pausedProbeTicks": 100,
+    "actualFootprintReloadResume": true,
+    "actualControllerUnload": true,
+    "diskReloadPreservesState": true,
+    "playerDrivenUnload": true,
+    "playerDrivenReloadPreservesState": true,
+    "twoRealClients": true,
+    "bothServerMenus": true,
+    "clientAConnections": 2,
+    "parallelBatch": 4,
+    "spindleActualDiskReload": true,
+    "spindleTwoClientSynchronization": true,
+    "complete": true
+  },
+  "ordinary_server_restart": {
+    "complete": true,
+    "ordinaryServerRestart": true,
+    "fluid": 7654321,
+    "energy": 7123456789012,
+    "reserved": 4,
+    "progress": 123
+  },
+  "limits": [
+    "Same-recipe parallel batches only, up to four.",
+    "FluidStack gases supported; Mekanism Chemical API is not a reservoir capability.",
+    "No low-end GPU or long-term multiplayer load/balance test.",
+    "Cross-dimension transit tested with ServerPlayer GameTests; native two-client tests cover forge/spindle menus, reconnect and chunk reload.",
+    "No independent human review, PR, remote CI, merge or publication in this task."
+  ]
+}

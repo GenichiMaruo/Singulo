@@ -638,5 +638,14 @@ public final class SinguloBlocks {
                 .lightLevel(state -> state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) ? 7 : 0);
     }
 
+    public static final DeferredBlock<PartBlock> COSMIC_FRAME = part("cosmic_frame", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> PASTA_LAMINATE = part("pasta_laminate", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> SUSPENSION_RESERVOIR =
+            BLOCKS.register("suspension_reservoir", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> PASTA_ACCUMULATOR =
+            BLOCKS.register("pasta_accumulator", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> TIDAL_SPINDLE =
+            BLOCKS.register("tidal_spindle", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
+
     private SinguloBlocks() {}
 }

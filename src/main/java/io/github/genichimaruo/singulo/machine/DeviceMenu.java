@@ -49,7 +49,7 @@ public class DeviceMenu extends AbstractContainerMenu {
 
     public static final class Mouth {
         public static final int SIZE = 0, TARGET = 1, PARTNER = 2, PX = 3, PY = 4, PZ = 5, CROSS = 6, STARVE = 7,
-                TICKS_PER_MATTER = 8, GRACE = 9, PORTS = 10, PORT_LIMIT = 11, COUNT = 12;
+                TICKS_PER_MATTER = 8, GRACE = 9, PORTS = 10, PORT_LIMIT = 11, PASSAGE = 12, COUNT = 13;
         public static final int BUTTON_SMALLER = 0, BUTTON_BIGGER = 1;
     }
 
@@ -85,7 +85,7 @@ public class DeviceMenu extends AbstractContainerMenu {
     public static final class Forge {
         public static final int PHASE = 0, ELAPSED = 1, TOTAL = 2, HOLD = 3, FORMED = 4, CORE = 5, COOLANT = 6, BUFFER_MFE = 7,
                 CAPACITY_MFE = 8, INTAKE_MFE = 9, DEMAND_MFE = 10, BH = 11, SEED = 12, IGNITION_PCT = 13, IGNITION_SECS = 14,
-                IGNITION_GFE = 15, COUNT = 16;
+                IGNITION_GFE = 15, BATCH = 16, COUNT = 17;
         /** 画面のボタン: 点火。 */
         public static final int BUTTON_IGNITE = 0;
         /** スロット: 種・材料3つ・完成品・空の容器（JetForgeBlockEntity と同じ並び）。 */

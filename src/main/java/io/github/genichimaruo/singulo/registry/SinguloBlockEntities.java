@@ -33,6 +33,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class SinguloBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> REGISTER =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Singulo.MODID);
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity>> COSMIC_CHAMBER =
+            REGISTER.register("cosmic_chamber", () -> build(io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity::new,
+                    SinguloBlocks.SUSPENSION_RESERVOIR.get(), SinguloBlocks.PASTA_ACCUMULATOR.get(), SinguloBlocks.TIDAL_SPINDLE.get()));
 
     /** 汎用加工装置すべてで共有する。種類はブロック側の MachineType で決まる。 */
     public static final Supplier<BlockEntityType<MachineBlockEntity>> MACHINE = REGISTER.register("machine",

@@ -16,12 +16,13 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 /** Real font/resource-pack rendering of deterministic menu fixtures, in all shipped languages. Development only. */
 @net.neoforged.fml.common.EventBusSubscriber(modid = Singulo.MODID, value = net.neoforged.api.distmarker.Dist.CLIENT)
 public final class MachineGuiReviewHarness {
+    private static final boolean COSMIC=Boolean.getBoolean("singulo.cosmicGuiReview");
     private static final String[] LANGUAGES = {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"};
     private static final boolean COMBINED = Boolean.getBoolean("singulo.sidesGuiReview")
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 32;
+    private static int SCREENS = COSMIC ? 3 : SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 32;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen;
     private static long renderedFrames, shownFrame;
@@ -93,6 +94,18 @@ public final class MachineGuiReviewHarness {
     }
 
     private static void show(Minecraft mc) throws Exception {
+        if(COSMIC){
+            var data=SyncedInts.client(io.github.genichimaruo.singulo.cosmic.CosmicMenu.COUNT);
+            int[] values={screen,0,screen==1?4_000_000:12_000,screen==1?8_000_000:20_000,500,250,screen==0?8_000_000:8_000,screen==0?16_000_000:16_000,600,1200,1,net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(net.minecraft.world.level.material.Fluids.WATER)+1};
+            for(int i=0;i<values.length;i++)value(data,i,values[i]);
+            var items=new ItemStackHandler(4);
+            String[] ids={"collapsar_billet","exotic_matter","singularity_seed","tidal_filament"};
+            for(int i=0;i<4;i++)items.setStackInSlot(i,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(ids[i]))));
+            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,screen==2,data);
+            String[] blocks={"suspension_reservoir","pasta_accumulator","tidal_spindle"};
+            mc.setScreen(new CosmicScreen(menu,mc.player.getInventory(),Component.translatable("block.singulo."+blocks[screen])));
+            return;
+        }
         hoverX = -1;
         org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
         int extra = screen - MachineType.values().length;
@@ -370,6 +383,7 @@ public final class MachineGuiReviewHarness {
             value(data, DeviceMenu.Forge.CAPACITY_MFE, 4000);
             value(data, DeviceMenu.Forge.INTAKE_MFE, 250);
             value(data, DeviceMenu.Forge.DEMAND_MFE, state == 2 ? 250 : 0);
+              value(data, DeviceMenu.Forge.BATCH, 1);
             value(data, DeviceMenu.Forge.IGNITION_PCT, 75);
             value(data, DeviceMenu.Forge.IGNITION_SECS, 3);
             value(data, DeviceMenu.Forge.IGNITION_GFE, 25);

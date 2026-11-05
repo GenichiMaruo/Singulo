@@ -40,18 +40,21 @@ public final class FluidPipeNetwork {
 
     private record Endpoint(BlockPos pos, Direction side) {}
     /** このパイプの周期で見えている口。 */
-    private record Port(BlockPos pos, IFluidHandler handler, boolean drainable) {}
+    private record Port(BlockPos pos, Direction side, IFluidHandler handler, boolean drainable) {}
 
     private final Level level;
     private final Set<FluidPipeBlockEntity> pipes;
     private final List<Endpoint> endpoints;
     private boolean valid = true;
     private int rotation;
+    private final FluidPipeObservation observation;
+    private boolean visualMoved;
 
     private FluidPipeNetwork(Level level, Set<FluidPipeBlockEntity> pipes, List<Endpoint> endpoints) {
         this.level = level;
         this.pipes = pipes;
         this.endpoints = endpoints;
+        observation=new FluidPipeObservation(level,pipes);
     }
 
     static void schedule(FluidPipeBlockEntity pipe) {
@@ -163,6 +166,7 @@ public final class FluidPipeNetwork {
     }
 
     private void transfer() {
+        observation.begin();visualMoved=false;
         List<Port> ports = new ArrayList<>();
         List<BlockPos> sources = new ArrayList<>();
         for (Endpoint e : endpoints) {
@@ -171,18 +175,20 @@ public final class FluidPipeNetwork {
             }
             IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, e.pos, e.side);
             if (handler != null) {
-                ports.add(new Port(e.pos, handler, !(level.getBlockEntity(e.pos) instanceof PipeInputOnly)));
+                ports.add(new Port(e.pos, e.side, handler, !(level.getBlockEntity(e.pos) instanceof PipeInputOnly)));
             } else if (isSource(level.getBlockState(e.pos))) {
                 sources.add(e.pos);
             }
         }
         rotation++;
-        for (FluidStack fluid : offeredFluids(ports)) {
+        List<FluidStack> offered=offeredFluids(ports);
+        for (FluidStack fluid : offered) {
             moveFluid(fluid, ports);
         }
         for (BlockPos source : sources) {
             pump(source, ports);
         }
+        observation.end(!offered.isEmpty()||!sources.isEmpty(),visualMoved);
     }
 
     /** 口が出せる液体の種類（重複なし）。 */
@@ -249,6 +255,7 @@ public final class FluidPipeNetwork {
                 break;
             }
             int filled = receiver.handler.fill(taken, FluidAction.EXECUTE);
+            if(filled>0){observation.moved(giver.pos,giver.pos.relative(giver.side),receiver.pos.relative(receiver.side),receiver.pos,taken,filled);visualMoved=true;}
             left -= filled;
             if (filled < taken.getAmount()) {
                 // 見積もりより入らなかった分は元へ戻す（消さない）
@@ -282,7 +289,9 @@ public final class FluidPipeNetwork {
         int left = fluid.getAmount();
         for (Port taker : takers) {
             if (left > 0) {
-                left -= taker.handler.fill(fluid.copyWithAmount(left), FluidAction.EXECUTE);
+                int filled=taker.handler.fill(fluid.copyWithAmount(left), FluidAction.EXECUTE);
+                if(filled>0){observation.moved(pos,taker.pos,fluid,filled);visualMoved=true;}
+                left -= filled;
             }
         }
     }

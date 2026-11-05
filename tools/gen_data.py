@@ -1650,6 +1650,8 @@ UI_LANG = {
 
 
 def lang_files():
+    from cosmic_content import UI
+    UI_LANG.update(UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
@@ -4222,6 +4224,8 @@ def main():
     area_card_item_model()
     glasses_item_model()
     opaque_block_textures()
+    import cosmic_content
+    cosmic_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

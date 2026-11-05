@@ -1394,3 +1394,6 @@ CHAPTERS.insert([c[0] for c in CHAPTERS].index('genesis') + 1, ('jet_forge', 'si
      'Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, '
      '2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).'),
 ]))
+
+from cosmic_content import CHAPTER as _COSMIC_CHAPTER
+CHAPTERS.append(_COSMIC_CHAPTER)

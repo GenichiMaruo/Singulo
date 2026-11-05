@@ -9,6 +9,38 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** 液体パイプ1本。液体は溜めない（中身がないので、壊しても液体は失われない）。受け渡しは {@link FluidPipeNetwork} がまとめて行う。 */
 public class FluidPipeBlockEntity extends BlockEntity {
+    private static final java.util.Set<FluidPipeBlockEntity> CLIENT = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+    public static java.util.List<FluidPipeBlockEntity> clientPipes(){return java.util.List.copyOf(CLIENT);}
+    private int visualState,inMask,outMask,visualAmount;
+    private boolean mixed;
+    private net.neoforged.neoforge.fluids.FluidStack visualFluid=net.neoforged.neoforge.fluids.FluidStack.EMPTY;
+    private long published=Long.MIN_VALUE,observed=Long.MIN_VALUE;
+    public int visualState(){return visualState;}
+    public int inMask(){return inMask;}
+    public int outMask(){return outMask;}
+    public int visualAmount(){return visualAmount;}
+    public boolean mixed(){return mixed;}
+    public net.neoforged.neoforge.fluids.FluidStack visualFluid(){return visualFluid;}
+    public boolean fresh(){return level!=null&&observed!=Long.MIN_VALUE&&level.getGameTime()-observed<=40;}
+    boolean publish(int state,int in,int out,int amount,net.neoforged.neoforge.fluids.FluidStack fluid,boolean mixed){
+        boolean changed=visualState!=state||inMask!=in||outMask!=out||visualAmount!=amount||this.mixed!=mixed
+                ||!net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(visualFluid,fluid);
+        visualState=state;inMask=in;outMask=out;visualAmount=amount;visualFluid=fluid;this.mixed=mixed;
+        long now=level.getGameTime();if(published!=Long.MIN_VALUE&&now-published<(changed?10:20))return false;
+        published=now;level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),net.minecraft.world.level.block.Block.UPDATE_CLIENTS);return true;
+    }
+    @Override public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries){
+        var tag=new net.minecraft.nbt.CompoundTag();
+        tag.putBoolean("observed",published!=Long.MIN_VALUE&&level!=null&&level.getGameTime()-published<=40);
+        tag.putInt("state",visualState);tag.putInt("in",inMask);tag.putInt("out",outMask);tag.putInt("amount",visualAmount);tag.putBoolean("mixed",mixed);
+        if(!visualFluid.isEmpty())tag.put("fluid",visualFluid.save(registries));return tag;
+    }
+    @Override protected void loadAdditional(net.minecraft.nbt.CompoundTag tag,net.minecraft.core.HolderLookup.Provider registries){
+        super.loadAdditional(tag,registries);visualState=tag.getInt("state");inMask=tag.getInt("in");outMask=tag.getInt("out");visualAmount=tag.getInt("amount");mixed=tag.getBoolean("mixed");
+        visualFluid=tag.contains("fluid")?net.neoforged.neoforge.fluids.FluidStack.parseOptional(registries,tag.getCompound("fluid")):net.neoforged.neoforge.fluids.FluidStack.EMPTY;
+        observed=tag.getBoolean("observed")&&level!=null?level.getGameTime():Long.MIN_VALUE;
+    }
+    @Override public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}
     @Nullable
     FluidPipeNetwork network;
 
@@ -45,6 +77,7 @@ public class FluidPipeBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
+        if(level!=null&&level.isClientSide)CLIENT.add(this);
         if (level != null && !level.isClientSide) {
             FluidPipeNetwork.schedule(this);
             for (Direction d : Direction.values()) {
@@ -58,12 +91,14 @@ public class FluidPipeBlockEntity extends BlockEntity {
 
     @Override
     public void onChunkUnloaded() {
+        if(level!=null&&level.isClientSide)CLIENT.remove(this);
         leaveNetwork();
         super.onChunkUnloaded();
     }
 
     @Override
     public void setRemoved() {
+        if(level!=null&&level.isClientSide)CLIENT.remove(this);
         leaveNetwork();
         super.setRemoved();
     }

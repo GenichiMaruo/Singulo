@@ -146,7 +146,11 @@ public final class GeneratedContent {
             new ItemDef("spent_time_crystal_catalyst", "item", 4, 0),
             new ItemDef("spent_singularity_core", "item", 5, 0),
             new ItemDef("magnetic_monopole", "item", 2, 0),
-            new ItemDef("record_fragment", "item", 1, 0)
+            new ItemDef("record_fragment", "item", 1, 0),
+            new ItemDef("nuclear_pasta", "item", 5, 0),
+            new ItemDef("tidal_filament", "item", 5, 0),
+            new ItemDef("wormhole_seam_upgrade", "item", 5, 0),
+            new ItemDef("collapsar_parallel_cassette", "item", 5, 0)
     );
 
     public static final List<BlockDef> BLOCKS = List.of(
@@ -428,6 +432,8 @@ public final class GeneratedContent {
             "nihonium",
             "nihonium_frame",
             "helium_cartridge",
+            "cosmic_frame",
+            "suspension_reservoir",
             "compressed_block_2",
             "compressed_block_3",
             "compressed_metal_block_1",
@@ -447,6 +453,13 @@ public final class GeneratedContent {
             "artificial_star_core",
             "hawking_condensate",
             "singularity_seed",
+            "nuclear_pasta",
+            "pasta_laminate",
+            "pasta_accumulator",
+            "tidal_spindle",
+            "tidal_filament",
+            "wormhole_seam_upgrade",
+            "collapsar_parallel_cassette",
             "observation_log",
             "degraded_control_unit",
             "quantum_data_fragment",
@@ -758,6 +771,11 @@ public final class GeneratedContent {
             Map.entry("sealed_container_1", 2),
             Map.entry("sealed_container_2", 3),
             Map.entry("sealed_container_3", 4),
-            Map.entry("sealed_container_4", 5)
+            Map.entry("sealed_container_4", 5),
+            Map.entry("cosmic_frame", 3),
+            Map.entry("pasta_laminate", 5),
+            Map.entry("suspension_reservoir", 3),
+            Map.entry("pasta_accumulator", 5),
+            Map.entry("tidal_spindle", 5)
     );
 }
