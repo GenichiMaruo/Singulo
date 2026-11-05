@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.client;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.generated.ClientConfig;
 import io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.nio.file.Files;
@@ -16,21 +17,31 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.event.TickEvent;
-
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector4f;
 
-/** Real GPU regression: five visible holes plus a competing remnant distortion. */
+/** Real GPU regression: fifteen visible, overlapping holes that must all be traced, plus a competing remnant distortion. */
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class LensingReviewHarness {
+    private static final int[] ROWS = {80, 90, 100};
+    private static final int COLUMNS = 5;
+    private static final int HOLES = ROWS.length * COLUMNS;
     private static int ticks, frames;
-    private static boolean requested, complete, checkedFrame;
+    private static final float[][] screen = new float[HOLES][];
+    private static final int SETTLE = 120, SAMPLE = 300;
+    private static int measured;
+    private static long sampleStart;
+    private static double lensedMs;
+    private static boolean requested, complete, checkedFrame, verified;
     private static volatile boolean prepared;
 
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
-        if (++ticks > 2400) throw new AssertionError("Five-hole rendering review timed out");
+        if (++ticks > 2400) throw new AssertionError("Many-hole rendering review timed out");
         if (mc.level == null || mc.player == null || mc.getOverlay() != null || complete) return;
         if (!requested) {
             requested = true;
@@ -39,8 +50,8 @@ public final class LensingReviewHarness {
                 var level = server.overworld();
                 level.setDayTime(6000);
                 level.setWeatherParameters(6000, 0, false, false);
-                for (int i = 0; i < 5; i++) {
-                    BlockPos p = new BlockPos(i * 10, 80, 0);
+                for (int row : ROWS) for (int i = 0; i < COLUMNS; i++) {
+                    BlockPos p = new BlockPos(i * 10, row, 0);
                     level.getChunkAt(p);
                     level.setBlockAndUpdate(p, SinguloBlocks.ROGUE_BLACK_HOLE.get().defaultBlockState());
                     var hole = (RogueBlackHoleBlockEntity) level.getBlockEntity(p);
@@ -49,7 +60,7 @@ public final class LensingReviewHarness {
                 }
                 var player = server.getPlayerList().getPlayer(mc.player.getUUID());
                 player.setGameMode(GameType.SPECTATOR);
-                player.teleportTo(level, 20.5, 82, 52.5, 180, 3.5F);
+                player.teleportTo(level, 20.5, 88, 62.5, 180, 0);
                 prepared = true;
             });
         }
@@ -57,7 +68,7 @@ public final class LensingReviewHarness {
             mc.setScreen(null);
             mc.options.hideGui = true;
             mc.player.setYRot(180);
-            mc.player.setXRot(3.5F);
+            mc.player.setXRot(0);
         }
     }
 
@@ -73,16 +84,54 @@ public final class LensingReviewHarness {
             disk.setAccessible(true);
             if (disk.invoke(source) != null) traced++;
         }
-        if (traced == 4 && sources.size() >= 5) {
+        if (traced == HOLES) {
             GravitationalLensing.addDistortion(new Vec3(20.5, 80.5, 20), 0.2F, 0.08F, 1.0F);
+            project(event);
             checkedFrame = true;
         }
+    }
+
+    /** Where each hole center lands on the screen this frame (pixels, y down). */
+    private static void project(RenderLevelStageEvent event) {
+        Vec3 cam = event.getCamera().getPosition();
+        Matrix4f view = new Matrix4f().rotationY((float) Math.PI).rotate(event.getCamera().rotation().conjugate(new Quaternionf()));
+        int n = 0;
+        for (int row : ROWS) for (int i = 0; i < COLUMNS; i++) {
+            Vector4f v = new Vector4f((float) (i * 10 + 0.5 - cam.x), (float) (row + 0.5 - cam.y), (float) (0.5 - cam.z), 1);
+            view.transform(v);
+            event.getProjectionMatrix().transform(v);
+            screen[n++] = new float[]{(v.x / v.w * 0.5F + 0.5F) * 1280, (0.5F - v.y / v.w * 0.5F) * 800};
+        }
+    }
+
+    /** Average frame time over SAMPLE frames, after SETTLE frames, with lensing on and then off. */
+    private static boolean measure() {
+        if (++measured <= SETTLE) {
+            sampleStart = System.nanoTime();
+            return false;
+        }
+        if (measured < SETTLE + SAMPLE) return false;
+        double ms = (System.nanoTime() - sampleStart) / 1.0e6 / (SAMPLE - 1);
+        measured = 0;
+        if (lensedMs == 0) {
+            lensedMs = ms;
+            ClientConfig.GRAVITATIONAL_LENSING.set(false);
+            return false;
+        }
+        ClientConfig.GRAVITATIONAL_LENSING.set(true);
+        Singulo.LOGGER.info("SINGULO_LENSING_FRAME_TIME holes={} lensedMs={} unlensedMs={}", HOLES, lensedMs, ms);
+        return true;
     }
 
     @SubscribeEvent
     public static void rendered(TickEvent.RenderTickEvent event) throws Exception {
         if (event.phase != TickEvent.Phase.END) return;
-        if (!checkedFrame || complete) return;
+        if (verified && !complete && measure()) {
+            complete = true;
+            Minecraft.getInstance().stop();
+            return;
+        }
+        if (!checkedFrame || complete || verified) return;
         checkedFrame = false;
         if (++frames < 30) return;
         Minecraft mc = Minecraft.getInstance();
@@ -97,19 +146,21 @@ public final class LensingReviewHarness {
         Path output = Path.of(System.getProperty("singulo.lensingOutput"));
         Files.createDirectories(output);
         try (var png = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
-            png.writeToFile(output.resolve("five-holes-and-remnant.png"));
+            png.writeToFile(output.resolve("many-holes-and-remnant.png"));
             if (png.getWidth() != 1280 || png.getHeight() != 800) throw new AssertionError("Unexpected lensing viewport");
-            for (int center : new int[]{447, 544, 640, 737, 833}) {
+            // Traced holes draw nothing in the world, so a dark center proves the shader drew this hole.
+            for (float[] center : screen) {
                 int black = 0;
-                for (int y = 390; y < 410; y++) for (int x = center - 10; x < center + 10; x++) {
+                int cx = (int) center[0];
+                int cy = (int) center[1];
+                for (int y = cy - 4; y < cy + 4; y++) for (int x = cx - 4; x < cx + 4; x++) {
                     int pixel = png.getPixelRGBA(x, y);
                     if ((pixel & 255) < 20 && (pixel >> 8 & 255) < 20 && (pixel >> 16 & 255) < 20) black++;
                 }
-                if (black < 100) throw new AssertionError("Black-hole shadow missing at screen x=" + center);
+                if (black < 40) throw new AssertionError("Black-hole shadow missing at screen " + cx + "," + cy);
             }
         }
-        Singulo.LOGGER.info("SINGULO_LENSING_FIVE_COMPLETE traced=4 fallback=1 remnant=1 frames={}", frames);
-        complete = true;
-        mc.stop();
+        Singulo.LOGGER.info("SINGULO_LENSING_MANY_COMPLETE traced={} remnant=1 frames={} fps={}", HOLES, frames, mc.getFps());
+        verified = true;
     }
 }
