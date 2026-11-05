@@ -986,8 +986,8 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
 
     private static void uv(VertexConsumer vc, Frame f, Vec3 p, int rgb, float a, float u, float v) {
         vc.vertex(f.pose().pose(), (float) p.x, (float) p.y, (float) p.z)
-                .color(rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, Mth.clamp((int) (255 * a), 0, 255))
-                .uv(u, v).endVertex();
+                .uv(u, v)
+                .color(rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, Mth.clamp((int) (255 * a), 0, 255)).endVertex();
     }
 
     /** 軸 n に直交する2本の単位ベクトル。 */
