@@ -521,6 +521,10 @@ public final class JetForgeGameTests {
     public static void jetForgeStoppedBeamDoesNotDamage(GameTestHelper helper) {
         JetForgeBlockEntity be = build(helper);
         helper.runAtTickTime(5, () -> {
+            var registries = helper.getLevel().registryAccess();
+            CompoundTag saved = be.saveWithoutMetadata(registries);
+            saved.putInt("energy_per_tick", 1_000_000);
+            be.loadWithComponents(saved, registries);
             be.forceBlackHole();
             be.forcePhase(JetForgeBlockEntity.IRRADIATE, 100);
         });
