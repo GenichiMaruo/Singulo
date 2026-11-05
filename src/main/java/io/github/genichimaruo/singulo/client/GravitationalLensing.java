@@ -51,7 +51,7 @@ public final class GravitationalLensing {
 
     /**
      * シェーダーで光の経路をたどって描く降着円盤。normal はワールドでの面の向き、beaming はドップラーで明るさが変わる幅。
-     * brightness は明るさの倍率（1 で従来どおり。大きいほど白く熱い）、swirl は渦の筋の時計（秒。0 なら筋を描かない）。
+     * brightness は明るさの倍率（1 で従来どおり。大きいほど白く熱い）、swirl は渦の筋の時計（0 なら筋を描かない）。
      */
     private record Disk(Vec3 normal, float inner, float outer, float beaming, float brightness, float swirl) {}
 
