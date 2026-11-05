@@ -1,6 +1,9 @@
-# Singulo 0.15.1 — Minecraft 1.21.1 / NeoForge
+# Singulo 0.15.1 — Minecraft 1.20.1 / Forge and NeoForge
 
 ## Fixes
+
+- Correct the Chinese reactor ignition energy/time order, guardian handbook pages, and the English medical record wording.
+- Clarify ruin locations and reactor production modes in crafting hints; standardize Chinese and Korean hint wording.
 
 - Show gravitational lensing on every black hole on screen. Previously only four could be traced at once, so with five or more some holes lost their distortion. There is no longer a limit on the number of holes.
 - Smooth the Accretion Jet Forge disk. Its swirl used to wind into fine concentric stripes as game time passed, and now keeps a steady, soft spiral.
