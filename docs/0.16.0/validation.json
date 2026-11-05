@@ -5,11 +5,11 @@
   "java": 21,
   "jar": {
     "name": "Singulo-0.16.0-1.21.1N.jar",
-    "size": 8989068,
-    "sha256": "8df37ad5969043fb1c9c08efb04bc89c6d19b8dabd3a0ecc0940386d2ead3366"
+    "size": 8990632,
+    "sha256": "dd37657569f81f0ee338cb2c02bb391993b96e4c5517d9ff76d31e2959e12344"
   },
   "regular_gametests": {
-    "passed": 694,
+    "passed": 697,
     "complete": true
   },
   "mekanism_gametests": 1,
@@ -80,5 +80,27 @@
     "No low-end GPU or long-term multiplayer load/balance test.",
     "Cross-dimension transit tested with ServerPlayer GameTests; native two-client tests cover forge/spindle menus, reconnect and chunk reload.",
     "No independent human review, PR, remote CI, merge or publication in this task."
-  ]
+  ],
+  "independent_review_fixes": {
+    "stale_menu_inventory_duplication": {
+      "reproduced_before": {
+        "viewer": 7,
+        "replacement": 7
+      },
+      "survival_mining_and_world_destruction": true,
+      "original_block_entity_identity_required": true,
+      "immediate_viewer_close": true,
+      "stale_pickup_and_quick_move_rejected": true,
+      "fresh_menu_usable_with_total_items": 7
+    },
+    "spindle_direct_automation": {
+      "reproduced_before": "Cable, fluid pipe and item hoppers broke structure",
+      "side_service_openings": 2,
+      "real_power_cable": true,
+      "real_fluid_pipe": true,
+      "vanilla_hopper_input_output": true,
+      "completed_output": 4
+    }
+  },
+  "native_evidence_scope": "Existing GUI/rendering, two-client and restart evidence was recorded before these two review fixes; the review fixes are covered by the current 697-test run and focused 14-test run."
 }

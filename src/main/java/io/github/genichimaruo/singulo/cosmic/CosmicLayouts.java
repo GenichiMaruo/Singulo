@@ -22,6 +22,9 @@ public final class CosmicLayouts {
     });
     public static final ShapeSpec SPINDLE = new ShapeSpec(5, 7, 13, 2, 0, 0, (x,y,z) -> {
         if (x==2 && y==0 && z==0) return ShapeSpec.Slot.CONTROLLER;
+        // Side service openings: power and coolant can approach from the front
+        // without occupying the controller's item-in / item-out faces.
+        if(y==0&&z==0&&(x==1||x==3))return ShapeSpec.Slot.IGNORE;
         boolean ring = (z==2 || z==11) && (Math.abs(x-2)==2 || Math.abs(y-3)==2) && y>=1 && y<=5;
         if (ring || y==0 && (x==0 || x==4 || z==0 || z==12)
                 || (z==2 || z==11) && (x==0 || x==4) && y<=5) return frame();

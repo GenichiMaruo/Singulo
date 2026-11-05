@@ -13520,8 +13520,8 @@
     "translation": "봉합과 병렬 조사"
   },
   "guide.singulo.cosmic.production.body": {
-    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 5×7×13. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.",
-    "translation": "핵 파스타는 기존 Jet Forge에서 만듭니다. 축퇴 물질 껍질 1개, 질량 펠릿 32개, 액체 헬륨 2,000 mB를 125 MFE/t로 90초 조사합니다(조사에만 225 GFE). 새 축전고를 먼저 만들 필요가 없습니다.\n조석 방사기는 5×7×13입니다. 핵 슬롯에 특이점 씨앗을 넣고 10 GFE를 저장해 구속 핵을 형성합니다. 콜랍사 빌릿 1개, 특이 물질 1개, 액체 헬륨 500 mB를 20 MFE/t로 60초 가공해 조석 섬유 4개를 감습니다. 재료·냉각재·생산물·진행은 예약해 저장하며, 출력이 가득 차면 기다립니다."
+    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 5×7×13. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nUse the service openings beside the controller for power and coolant, leaving its front and underside free for item input and output.",
+    "translation": "핵 파스타는 기존 Jet Forge에서 만듭니다. 축퇴 물질 껍질 1개, 질량 펠릿 32개, 액체 헬륨 2,000 mB를 125 MFE/t로 90초 조사합니다(조사에만 225 GFE). 새 축전고를 먼저 만들 필요가 없습니다.\n조석 방사기는 5×7×13입니다. 핵 슬롯에 특이점 씨앗을 넣고 10 GFE를 저장해 구속 핵을 형성합니다. 콜랍사 빌릿 1개, 특이 물질 1개, 액체 헬륨 500 mB를 20 MFE/t로 60초 가공해 조석 섬유 4개를 감습니다. 재료·냉각재·생산물·진행은 예약해 저장하며, 출력이 가득 차면 기다립니다.\n제어대 양옆 아래의 연결 공간으로 전력과 냉각재를 공급하고, 앞면과 아랫면으로 아이템을 넣고 뺄 수 있습니다."
   },
   "guide.singulo.cosmic.production.title": {
     "source": "From tides to thread",

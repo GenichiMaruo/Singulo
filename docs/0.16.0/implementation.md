@@ -66,11 +66,11 @@ python tools/review/prepare_gui.py --cosmic
 
 ## 実施結果
 
-[検証記録とJARのSHA-256](validation.json) に集計を保存している。
+[検証記録とJARのSHA-256](validation.json) に集計を保存している。[独立レビューの2指摘への修正](review-fixes.md) も含む。
 
 | 確認 | 結果 |
 | --- | --- |
-| 通常GameTest | 694件成功。ソースの列挙と実行結果の完全一致を確認。 |
+| 通常GameTest | 697件成功。ソースの列挙と実行結果の完全一致を確認。 |
 | Mekanism連携 / Python | 1件 / 51件成功。 |
 | 翻訳 | 5言語、各3,419キー。欠落・余分・書式引数の整合を確認。 |
 | 既存GUI | 262画面。空スロット、見出しの重なり、字体の検証を通過。 |

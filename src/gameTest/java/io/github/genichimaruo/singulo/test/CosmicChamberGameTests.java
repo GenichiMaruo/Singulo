@@ -33,6 +33,72 @@ public final class CosmicChamberGameTests {
         var tag=be.saveWithoutMetadata(h.getLevel().registryAccess());tag.putLong("stored",amount);tag.putBoolean("core",core);
         be.loadWithComponents(tag,h.getLevel().registryAccess());
     }
+    @GameTest(template="forge",timeoutTicks=1600)
+    public static void cosmicSpindleRunsFromSeparateCablePipeAndHopperConnections(GameTestHelper h){
+        var be=build(h,Blueprints.Kind.TIDAL_SPINDLE);stored(h,be,0,true);
+        h.setBlock(C.west(),io.github.genichimaruo.singulo.registry.SinguloBlocks.HORIZON_BUS.get());
+        h.setBlock(C.west().south(),io.github.genichimaruo.singulo.registry.SinguloBlocks.HORIZON_BUS.get());
+        h.setBlock(C.west().south(2),io.github.genichimaruo.singulo.registry.SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
+        h.setBlock(C.east(),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get());
+        h.setBlock(C.east().south(),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get());
+        BlockPos producer=C.east().south(2);
+        h.setBlock(producer,io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.ELECTROLYZER).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity source=h.getBlockEntity(producer);
+        source.forceOutputTankForTest(new FluidStack(SinguloFluids.get("liquid_helium"),500));
+        h.setBlock(C.south(),Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING,Direction.NORTH));
+        h.setBlock(C.below(),Blocks.HOPPER);
+        net.minecraft.world.level.block.entity.HopperBlockEntity input=h.getBlockEntity(C.south());input.setItem(0,item("collapsar_billet",1));input.setItem(1,item("exotic_matter",1));
+        h.assertTrue(be.ready(),"Separate normal cable, fluid pipe and item hoppers break the spindle structure");
+        h.runAtTickTime(50,()->h.assertTrue(be.stored()>0&&!be.reserved().isEmpty()&&be.tank().isEmpty()&&input.isEmpty(),"Ordinary cable/pipe/hopper did not supply and reserve resources"));
+        h.succeedWhen(()->{
+            net.minecraft.world.level.block.entity.HopperBlockEntity output=h.getBlockEntity(C.below());int count=0;
+            for(int i=0;i<output.getContainerSize();i++)if(output.getItem(i).is(item("tidal_filament",1).getItem()))count+=output.getItem(i).getCount();
+            h.assertTrue(count==4&&be.reserved().isEmpty(),"Four filaments did not exit through a normal hopper");
+            h.assertTrue(input.isEmpty()&&source.automationFluids().drain(500,FluidAction.SIMULATE).isEmpty(),"Ingredients or coolant were not consumed exactly once");
+        });
+    }
+    @GameTest(template="forge")
+    public static void cosmicMiningAndImmediateReplacementCannotReuseOldViewerInventory(GameTestHelper h){
+        checkOldViewerAfterReplacement(h,true);
+    }
+    @GameTest(template="forge")
+    public static void cosmicWorldDestructionAndReplacementCannotReuseOldViewerInventory(GameTestHelper h){
+        checkOldViewerAfterReplacement(h,false);
+    }
+    private static void checkOldViewerAfterReplacement(GameTestHelper h,boolean survivalMining){
+        var be=build(h,Blueprints.Kind.TIDAL_SPINDLE);be.items().setStackInSlot(0,item("collapsar_billet",7));
+        var viewer=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        var at=net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos());viewer.setPos(at.x,at.y+1,at.z+2);
+        var old=(io.github.genichimaruo.singulo.cosmic.CosmicMenu)be.createMenu(4,viewer.getInventory(),viewer);viewer.containerMenu=old;
+        var breaker=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        breaker.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);breaker.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(net.minecraft.world.item.Items.NETHERITE_PICKAXE));
+        h.assertTrue(old.stillValid(viewer)&&!breaker.gameMode.isCreative(),"Mining fixture is not a live survival interaction");
+        h.assertTrue(survivalMining?breaker.gameMode.destroyBlock(be.getBlockPos()):h.getLevel().destroyBlock(be.getBlockPos(),true,breaker),"Controller destruction failed");
+        var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(be.getBlockPos()).inflate(2));
+        h.assertTrue(drops.size()==1,"Expected exactly one normally mined controller, got "+drops.size());
+        ItemStack packed=drops.get(0).getItem().copy();drops.get(0).discard();
+        breaker.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,packed);
+        var hit=new net.minecraft.world.phys.BlockHitResult(at,Direction.UP,be.getBlockPos(),false);
+        ((net.minecraft.world.item.BlockItem)packed.getItem()).place(new net.minecraft.world.item.context.BlockPlaceContext(new net.minecraft.world.item.context.UseOnContext(breaker,net.minecraft.world.InteractionHand.MAIN_HAND,hit)));
+        CosmicChamberBlockEntity replacement=h.getBlockEntity(C);
+        h.assertTrue(replacement!=null&&replacement!=be&&replacement.items().getStackInSlot(0).getCount()==7,"Mined inventory did not survive immediate replacement");
+        boolean accepted=old.stillValid(viewer);
+        // This is the same validity gate and ClickType that the server packet handler uses.
+        if(accepted)old.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        int extracted=0;for(int i=0;i<viewer.getInventory().getContainerSize();i++)if(viewer.getInventory().getItem(i).is(item("collapsar_billet",1).getItem()))extracted+=viewer.getInventory().getItem(i).getCount();
+        h.assertTrue(extracted+replacement.items().getStackInSlot(0).getCount()==7,"Stale menu duplicated mined inventory: player="+extracted+", replacement="+replacement.items().getStackInSlot(0).getCount());
+        h.assertFalse(accepted,"Old viewer menu accepted a replacement block entity");
+        old.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,viewer);
+        old.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        h.assertTrue(old.quickMoveStack(viewer,0).isEmpty()&&old.getCarried().isEmpty()&&replacement.items().getStackInSlot(0).getCount()==7,"Direct stale-menu operations bypassed invalidation");
+        h.assertTrue(viewer.containerMenu==viewer.inventoryMenu,"Destruction did not immediately close the other viewer");
+        var fresh=(io.github.genichimaruo.singulo.cosmic.CosmicMenu)replacement.createMenu(5,viewer.getInventory(),viewer);viewer.containerMenu=fresh;
+        h.assertTrue(fresh.stillValid(viewer),"Replacement inherited a retired menu state");
+        fresh.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        old.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        int total=0;for(int i=0;i<viewer.getInventory().getContainerSize();i++)if(viewer.getInventory().getItem(i).is(item("collapsar_billet",1).getItem()))total+=viewer.getInventory().getItem(i).getCount();
+        h.assertTrue(total==7&&replacement.items().getStackInSlot(0).isEmpty(),"Fresh menu is unusable or stale menu duplicated a second extraction");h.succeed();
+    }
     @GameTest(template="empty")
     public static void cosmicClientMenuPredictsSpindleSlotsBeforeBlockEntityArrives(GameTestHelper h){
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);

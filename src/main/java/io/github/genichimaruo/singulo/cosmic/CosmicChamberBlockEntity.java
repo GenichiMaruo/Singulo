@@ -45,6 +45,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     private long stored, pendingOutput, budgetTick=Long.MIN_VALUE, tickIn, tickOut;
     private int lastIn, lastOut, progress, duration, cost, status=1;
     private boolean core;
+    private boolean retired;
     private ItemStack reserved=ItemStack.EMPTY;
     private final ItemStackHandler items = new ItemStackHandler(4) {
         @Override public int getSlotLimit(int slot) { return slot==2?1:64; }
@@ -85,6 +86,14 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public long rate(){return kind()==ACCUMULATOR?PASTA_RATE:SPINDLE_RATE;}
     public FluidTank tank(){return tank;}
     public ItemStackHandler items(){return items;}
+    public boolean menuActive(){return !retired&&!isRemoved();}
+    /** Retire access before close callbacks run; never serialize this runtime-only state. */
+    public void retireForRemoval(){
+        if(retired)return;
+        retired=true;
+        if(level instanceof ServerLevel server)for(var player:java.util.List.copyOf(server.players()))
+            if(player.containerMenu instanceof CosmicMenu menu&&menu.ownedBy(this))player.closeContainer();
+    }
     public int status(){return status;}
     public boolean core(){return core;}
     public int progress(){return progress;}
@@ -220,7 +229,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             case 0->kind();case 1->status;case 2->(int)(stored/1_000_000);case 3->(int)(capacity()/1_000_000);
             case 4->lastIn;case 5->lastOut;case 6->tank.getFluidAmount();case 7->tankCapacity();case 8->progress;case 9->duration;case 10->core?1:0;
             case 11->tank.isEmpty()?0:BuiltInRegistries.FLUID.getId(tank.getFluid().getFluid())+1;default->0;
-        }));
+        }),this);
     }
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider registries){
         super.saveAdditional(tag,registries);tag.put("items",items.serializeNBT(registries));write(tag,registries);

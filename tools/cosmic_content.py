@@ -65,10 +65,10 @@ CHAPTER = ('cosmic','singulo:nuclear_pasta','拘束と縫合','Confinement and S
   'The 7×7×7 Nuclear Pasta Accumulator has finite capacity: 8 TFE, with 2 GFE/t input and output. It stores only received power and compresses its layers as it charges. The controller front outputs; other faces receive.'),
  ('production','潮汐力から糸へ',
   '核パスタは既存の Jet Forge で作ります。縮退物質殻 1 個、質量ペレット 32 個、液体ヘリウム 2,000 mB を使い、90 秒間 125 MFE/t で照射します（照射だけで 225 GFE）。新しい蓄電庫を先に作る必要はありません。\n'
-  '潮汐紡糸機は 5×7×13。特異点の種を核のスロットに入れ、10 GFE を蓄えると封じ込め核を形成します。コラプサー・ビレット 1 個、エキゾチック物質 1 個、液体ヘリウム 500 mB を 60 秒間 20 MFE/t で加工し、潮汐繊維 4 本を巻き取ります。材料・冷却材・成果物・進行を保存し、出力が満杯なら待ちます。',
+  '潮汐紡糸機は 5×7×13。特異点の種を核のスロットに入れ、10 GFE を蓄えると封じ込め核を形成します。コラプサー・ビレット 1 個、エキゾチック物質 1 個、液体ヘリウム 500 mB を 60 秒間 20 MFE/t で加工し、潮汐繊維 4 本を巻き取ります。材料・冷却材・成果物・進行を保存し、出力が満杯なら待ちます。\n制御卓の左右の足元の開口から電力と冷却材を接続でき、正面と下をアイテムの搬入出に使えます。',
   'From tides to thread',
   'Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\n'
-  'The Tidal Spindle is 5×7×13. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.'),
+  'The Tidal Spindle is 5×7×13. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nUse the service openings beside the controller for power and coolant, leaving its front and underside free for item input and output.'),
  ('links','縫合と並列照射',
   '潮汐繊維とコラプサー材でワームホール縫合拡張を作り、既存の口の両端に右クリックで取り付けます。両端が開いて読み込まれていると、口の上の四角い開口部を歩いて通れます。物流はそのまま使えます。出口に安全な足場と空間がない場合、移動しません。乗り物に乗っている場合も移動しません。移動直後は再転送を防ぐ待ち時間があります。\n'
   'コラプサー並列カセットを Jet Forge の制御卓に右クリックで取り付けると、同じレシピを最大 4 バッチ同時に加工します。開始時に数量を固定し、材料・冷却材・電力を数量分使います。すでに進行中の処理は取り付けても変わりません。\n'

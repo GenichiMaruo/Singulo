@@ -13520,8 +13520,8 @@
     "translation": "縫合與並行照射"
   },
   "guide.singulo.cosmic.production.body": {
-    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 5×7×13. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.",
-    "translation": "核義大利麵在現有 Jet Forge 中製造：簡併物質殼 1 個、質量顆粒 32 個、液態氦 2,000 mB，以 125 MFE/t 照射 90 秒（僅照射就需 225 GFE）。不需要先造新儲能庫。\n潮汐紡絲機為 5×7×13。將奇點種子放入核心槽，並儲存 10 GFE 來形成拘束核心。用塌縮星胚料 1 個、奇異物質 1 個、液態氦 500 mB，以 20 MFE/t 加工 60 秒，可捲繞 4 根潮汐纖維。材料、冷卻劑、成果和進度均會預留並保存。輸出滿時等待。"
+    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 5×7×13. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nUse the service openings beside the controller for power and coolant, leaving its front and underside free for item input and output.",
+    "translation": "核義大利麵在現有 Jet Forge 中製造：簡併物質殼 1 個、質量顆粒 32 個、液態氦 2,000 mB，以 125 MFE/t 照射 90 秒（僅照射就需 225 GFE）。不需要先造新儲能庫。\n潮汐紡絲機為 5×7×13。將奇點種子放入核心槽，並儲存 10 GFE 來形成拘束核心。用塌縮星胚料 1 個、奇異物質 1 個、液態氦 500 mB，以 20 MFE/t 加工 60 秒，可捲繞 4 根潮汐纖維。材料、冷卻劑、成果和進度均會預留並保存。輸出滿時等待。\n控制台左右底部的維修開口可連接電力與冷卻劑，正面與下方可用於物品輸入及輸出。"
   },
   "guide.singulo.cosmic.production.title": {
     "source": "From tides to thread",

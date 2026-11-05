@@ -17,6 +17,12 @@ public final class CosmicChamberBlock extends SimpleMachineBlock<CosmicChamberBl
         super(p, SinguloBlockEntities.COSMIC_CHAMBER, CosmicChamberBlockEntity::new, CosmicChamberBlockEntity::serverTick);
     }
     @Override
+    protected void onRemove(BlockState state,net.minecraft.world.level.Level level,net.minecraft.core.BlockPos pos,BlockState replacement,boolean movedByPiston){
+        if(!state.is(replacement.getBlock())&&!level.isClientSide&&level.getBlockEntity(pos) instanceof CosmicChamberBlockEntity be)
+            be.retireForRemoval();
+        super.onRemove(state,level,pos,replacement,movedByPiston);
+    }
+    @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         ItemStack packed = new ItemStack(this);
         if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof CosmicChamberBlockEntity be) {

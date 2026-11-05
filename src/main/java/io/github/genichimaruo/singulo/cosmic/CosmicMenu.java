@@ -7,6 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -18,13 +19,20 @@ public final class CosmicMenu extends AbstractContainerMenu {
     private final BlockPos pos;
     private final SyncedInts data;
     private final int machineSlots;
+    private final CosmicChamberBlockEntity owner;
+    /** Client and visual-fixture constructor; server menus must bind their inventory owner. */
     public CosmicMenu(int id,Inventory inventory,BlockPos pos,IItemHandler items,boolean spindle,SyncedInts data){
+        this(id,inventory,pos,items,spindle,data,null);
+    }
+    CosmicMenu(int id,Inventory inventory,BlockPos pos,IItemHandler items,boolean spindle,SyncedInts data,CosmicChamberBlockEntity owner){
         super(SinguloMenus.COSMIC.get(),id);this.pos=pos;this.data=data;addDataSlots(data);
+        this.owner=owner;
         machineSlots=spindle?4:0;
         if(spindle)for(int i=0;i<4;i++){
             final int index=i;
             addSlot(new SlotItemHandler(items,i,i==3?154:30+i*28,92){
-                @Override public boolean mayPlace(ItemStack stack){return index!=3&&super.mayPlace(stack);}
+                @Override public boolean mayPlace(ItemStack stack){return index!=3&&(owner==null||stillValid(inventory.player))&&super.mayPlace(stack);}
+                @Override public boolean mayPickup(Player player){return (owner==null||stillValid(player))&&super.mayPickup(player);}
             });
         }
         for(int y=0;y<3;y++)for(int x=0;x<9;x++)addSlot(new Slot(inventory,x+y*9+9,26+x*18,128+y*18));
@@ -38,8 +46,16 @@ public final class CosmicMenu extends AbstractContainerMenu {
     }
     public BlockPos pos(){return pos;}
     public int value(int i){return data.getInt(i);}
-    @Override public boolean stillValid(Player player){return player.level().getBlockEntity(pos) instanceof CosmicChamberBlockEntity&&io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player,pos);}
+    public boolean ownedBy(CosmicChamberBlockEntity be){return owner==be;}
+    @Override public boolean stillValid(Player player){
+        return player.level().isClientSide || owner!=null&&owner.menuActive()&&owner.getLevel()==player.level()
+                &&player.level().getBlockEntity(pos)==owner&&io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player,pos);
+    }
+    @Override public void clicked(int slot,int button,ClickType type,Player player){
+        if(stillValid(player))super.clicked(slot,button,type,player);
+    }
     @Override public ItemStack quickMoveStack(Player player,int index){
+        if(!stillValid(player))return ItemStack.EMPTY;
         if(index<0||index>=slots.size())return ItemStack.EMPTY;
         Slot slot=slots.get(index);if(!slot.hasItem())return ItemStack.EMPTY;
         ItemStack stack=slot.getItem(),copy=stack.copy();
