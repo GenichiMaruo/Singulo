@@ -31,7 +31,8 @@ public final class LifecycleClientReview {
         if(++ticks>4000) throw new AssertionError("Multiplayer client timeout role="+role+" phase="+phase);
         if(phase==2 && mc.screen instanceof TitleScreen) {
             if(++wait<40)return;
-            ConnectScreen.startConnecting(new TitleScreen(),mc,ServerAddress.parseString("127.0.0.1:25595"),new ServerData("Review","127.0.0.1:25595",ServerData.Type.OTHER),false,null);
+            String address=System.getProperty("singulo.lifecycleAddress","127.0.0.1:25595");
+            ConnectScreen.startConnecting(new TitleScreen(),mc,ServerAddress.parseString(address),new ServerData("Review",address,ServerData.Type.OTHER),false,null);
             phase=3;before=-1;menuTicks=0;return;
         }
         if(mc.level==null||mc.player==null||mc.getOverlay()!=null)return;
