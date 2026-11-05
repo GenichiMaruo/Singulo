@@ -1672,6 +1672,8 @@ def lang_files():
     for station, sid in STATIONS.items():
         name = station.split('（')[0]
         en_name = next((v[1] for k, v in MOD.items() if k == name), sid)
+        en_name = {'penrose_reactor_power': 'P-Reactor (generation mode)',
+                   'penrose_reactor_catalyst': 'P-Reactor (catalyst mode)'}.get(sid, en_name)
         ja[f'station.{MODID}.{sid}'] = station
         en[f'station.{MODID}.{sid}'] = en_name
     import gen_docs

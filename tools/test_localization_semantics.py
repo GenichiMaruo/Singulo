@@ -11,6 +11,27 @@ def translated_format(text, values):
     return re.sub(r'%(?:(\d+)\$)?s', lambda m: values[int(m[1]) - 1] if m[1] else next(implicit), text)
 
 class LocalizationSemanticsTests(unittest.TestCase):
+    def test_exploration_hints_name_the_actual_ruin(self):
+        from recipes import EXPLORE
+        from ids import MOD
+        ja = json.loads((LANG / 'ja_jp.json').read_text(encoding='utf-8'))
+        places = {name: key for key, name in ja.items() if key.startswith('ruin.singulo.')}
+        for locale in ('en_us', 'ja_jp', 'zh_cn', 'zh_tw', 'ko_kr'):
+            catalog = json.loads((LANG / f'{locale}.json').read_text(encoding='utf-8'))
+            for item, info in EXPLORE.items():
+                with self.subTest(locale=locale, item=item):
+                    self.assertIn(catalog[places[info['ruin']]], catalog[f'howto.singulo.{MOD[item][0]}'])
+
+    def test_reactor_recipe_hints_keep_the_mode(self):
+        for locale in ('en_us', 'ja_jp', 'zh_cn', 'zh_tw', 'ko_kr'):
+            catalog = json.loads((LANG / f'{locale}.json').read_text(encoding='utf-8'))
+            with self.subTest(locale=locale):
+                power = catalog['station.singulo.penrose_reactor_power']
+                catalyst = catalog['station.singulo.penrose_reactor_catalyst']
+                self.assertNotEqual(power, catalyst)
+                self.assertIn(power, catalog['howto.singulo.jet_condensate'])
+                self.assertIn(catalyst, catalog['howto.singulo.hawking_condensate'])
+
     def test_ignition_values_keep_their_units(self):
         # PenroseReactorScreen.ignitionNeed supplies GFE, seconds, then average MFE/t.
         for locale in ('en_us', 'ja_jp', 'zh_cn', 'zh_tw', 'ko_kr'):
