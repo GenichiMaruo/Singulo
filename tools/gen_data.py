@@ -62,7 +62,7 @@ STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
 BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
                'boss_block', 'genesis', 'lab')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
-          'horizon_bus': (20, 20, 26)}
+          'horizon_bus': (20, 20, 26), 'fluid_pipe': (120, 190, 235)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
 # レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
 CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
@@ -3743,7 +3743,7 @@ def thermal():
 TAB_GROUPS = [
     ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'relocation_wrench', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
-                       'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
+                       'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus', 'fluid_pipe']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
                'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2', 'capacity_upgrade_3']),

@@ -771,6 +771,10 @@
     "source": "Copper Wire",
     "translation": "구리 전선"
   },
+  "block.singulo.fluid_pipe": {
+    "source": "Fluid Pipe",
+    "translation": "유체 파이프"
+  },
   "block.singulo.core_controller": {
     "source": "Core Controller",
     "translation": "노심 제어기"
@@ -1990,6 +1994,10 @@
   "desc.singulo.copper_wire": {
     "source": "Tier 1 power cable. Loses a little energy over distance.",
     "translation": "티어 1 전선. 연결된 장치끼리 전력을 나눕니다. 거리가 멀면 약간 손실됩니다."
+  },
+  "desc.singulo.fluid_pipe": {
+    "source": "Carries any fluid or gas between machines and tanks. It connects on its own and sends outputs to the machines that use them. It also draws from adjacent water and lava sources.",
+    "translation": "장치와 탱크 사이로 모든 액체와 기체를 운반합니다. 설치하면 자동으로 연결되며 출력물을 필요한 장치로 보내고, 인접한 물과 용암 근원에서도 끌어옵니다."
   },
   "desc.singulo.core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
@@ -6724,8 +6732,8 @@
     "translation": "시작하기"
   },
   "guide.singulo.intro.basics.body": {
-    "source": "Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods' pipes. Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
-    "translation": "전력(FE)은 Singulo 케이블로 전달합니다. 아이템과 유체는 면 설정과 다른 모드의 파이프를 사용합니다. 파이프가 없으면 유체 캐니스터(1,000 mB)로 기계를 우클릭해 액체와 기체를 옮길 수 있습니다.\n2단계부터 전용 슬롯에 수명이 있는 소모품인 촉매를 넣습니다. 기계보다 한 등급 높으면 빨라지고, 한 등급 낮으면 느려지며 마모가 늘어납니다. 두 등급 낮으면 사용할 수 없습니다.\n고대 유적에는 제작할 수 없는 기록과 부품이 있습니다. 일찍부터 지표 관측소를 찾아보세요."
+    "source": "Power (FE) travels through Singulo cables, and fluids and gases through Fluid Pipes. Pipes connect on their own, send machine outputs to the machines and tanks that use them, and draw from adjacent water and lava sources. A machine's Sides settings decide which faces take part. You can also right-click machines with a Fluid Canister (1,000 mB) to carry fluids by hand. Items use per-side settings and hoppers.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
+    "translation": "전력(FE)은 Singulo 케이블로, 액체와 기체는 유체 파이프로 운반합니다. 파이프는 설치하면 자동으로 연결되며, 장치의 출력물을 필요한 장치와 탱크로 보내고 인접한 물과 용암 근원에서도 끌어옵니다. 장치의 면 설정이 어느 면을 사용할지 정합니다. 유체 캐니스터(1,000 mB)를 들고 장치를 우클릭해 직접 운반할 수도 있습니다. 아이템은 면 설정과 호퍼 등으로 운반합니다.\n2단계부터 전용 슬롯에 수명이 있는 소모품인 촉매를 넣습니다. 기계보다 한 등급 높으면 빨라지고, 한 등급 낮으면 느려지며 마모가 늘어납니다. 두 등급 낮으면 사용할 수 없습니다.\n고대 유적에는 제작할 수 없는 기록과 부품이 있습니다. 일찍부터 지표 관측소를 찾아보세요."
   },
   "guide.singulo.intro.basics.title": {
     "source": "Power, catalysts and ruins",
@@ -7548,6 +7556,10 @@
     "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.copper_wire": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.fluid_pipe": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
@@ -11046,6 +11058,10 @@
   "summary.singulo.factory_line": {
     "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
     "translation": "파운드리를 지키고 양산형 안드로이드를 내보내는 인쇄 베이."
+  },
+  "summary.singulo.fluid_pipe": {
+    "source": "A pipe that carries fluids and gases.",
+    "translation": "액체와 기체를 운반하는 파이프입니다."
   },
   "summary.singulo.genesis_core": {
     "source": "The heart of an engine that makes a universe from energy.",

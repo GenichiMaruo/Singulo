@@ -41,7 +41,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 電力の元は使い捨てる触媒（銅・レッドストーン・セラミック・観測ログとミュオン）なので、電力だけを回して増やすことはできない。
  */
 public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner {
+        AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner, io.github.genichimaruo.singulo.pipe.PipeInputOnly {
     /** 触媒の使用回数を1 tickに使う回数（核融合炉は触媒を2倍の速さで消耗する）。 */
     public static final int USES_PER_TICK = 2;
     /** 水を 1 mB 使う間隔（tick）。 */

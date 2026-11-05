@@ -59,6 +59,7 @@ MOD = {
     'セラミック基板': ('ceramic_substrate', 'Ceramic Substrate', 'item'),
     '水素': ('hydrogen', 'Hydrogen', 'fluid'),
     '銅導線': ('copper_wire', 'Copper Wire', 'machine'),
+    '液体パイプ': ('fluid_pipe', 'Fluid Pipe', 'machine'),
     '白紙データカード': ('blank_data_card', 'Blank Data Card', 'item'),
     'データカード（観測ログ）': ('data_card_observation_log', 'Data Card (Observation Log)', 'item'),
     '圧縮ブロックLv1': ('compressed_block_1', 'Compressed Block Lv1', 'block'),

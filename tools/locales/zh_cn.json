@@ -771,6 +771,10 @@
     "source": "Copper Wire",
     "translation": "铜导线"
   },
+  "block.singulo.fluid_pipe": {
+    "source": "Fluid Pipe",
+    "translation": "流体管道"
+  },
   "block.singulo.core_controller": {
     "source": "Core Controller",
     "translation": "炉心控制器"
@@ -1990,6 +1994,10 @@
   "desc.singulo.copper_wire": {
     "source": "Tier 1 power cable. Loses a little energy over distance.",
     "translation": "1 级电源线。随着距离的增加会损失一点能量。"
+  },
+  "desc.singulo.fluid_pipe": {
+    "source": "Carries any fluid or gas between machines and tanks. It connects on its own and sends outputs to the machines that use them. It also draws from adjacent water and lava sources.",
+    "translation": "在机器和储罐之间输送任意液体或气体。放置后自动连接，把产物送往需要它的机器，也会从相邻的水源和熔岩源抽取。"
   },
   "desc.singulo.core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
@@ -6724,8 +6732,8 @@
     "translation": "入门"
   },
   "guide.singulo.intro.basics.body": {
-    "source": "Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods' pipes. Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
-    "translation": "电力（FE）通过 Singulo 自带的线缆传输；物品和流体通过装置各个面的设置和其他模组的管道传输。没有管道时，拿着流体罐（1,000 mB）右键机器即可搬运液体和气体。\n从第 2 阶段开始会用到催化剂：一种有寿命的消耗品，放在专用的催化剂槽中。等级比装置高一级则更快；低一级则更慢且消耗更快；低两级无法使用。\n古代废墟中保存着无法合成的记录和零件。尽早开始寻找地表观测站。"
+    "source": "Power (FE) travels through Singulo cables, and fluids and gases through Fluid Pipes. Pipes connect on their own, send machine outputs to the machines and tanks that use them, and draw from adjacent water and lava sources. A machine's Sides settings decide which faces take part. You can also right-click machines with a Fluid Canister (1,000 mB) to carry fluids by hand. Items use per-side settings and hoppers.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
+    "translation": "电力（FE）通过 Singulo 自带的线缆传输，液体和气体通过流体管道传输。管道放置后自动连接，把机器的产物送往需要它的机器和储罐，也会从相邻的水源和熔岩源抽取。机器的“面”设置决定哪些面参与输送。也可以拿着流体罐（1,000 mB）右键机器手动搬运。物品通过各个面的设置和漏斗等传输。\n从第 2 阶段开始会用到催化剂：一种有寿命的消耗品，放在专用的催化剂槽中。等级比装置高一级则更快；低一级则更慢且消耗更快；低两级无法使用。\n古代废墟中保存着无法合成的记录和零件。尽早开始寻找地表观测站。"
   },
   "guide.singulo.intro.basics.title": {
     "source": "Power, catalysts and ruins",
@@ -7548,6 +7556,10 @@
     "translation": "制造地：工作台（第 2 阶段）"
   },
   "howto.singulo.copper_wire": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.fluid_pipe": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制造地：工作台（第 1 阶段）"
   },
@@ -11046,6 +11058,10 @@
   "summary.singulo.factory_line": {
     "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
     "translation": "守护铸造厂并送出量产型仿生人的打印舱。"
+  },
+  "summary.singulo.fluid_pipe": {
+    "source": "A pipe that carries fluids and gases.",
+    "translation": "输送液体和气体的管道。"
   },
   "summary.singulo.genesis_core": {
     "source": "The heart of an engine that makes a universe from energy.",

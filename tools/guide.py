@@ -31,15 +31,17 @@ CHAPTERS = [
          'to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it). Type in the search box above the chapter list to find matching pages.\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
         ('basics', '電力・触媒・遺構',
-         '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。'
-         '液体とガスは、液体キャニスター（1,000 mB）で装置を右クリックすれば、パイプがなくても汲んで運べます。\n'
+         '電力（FE）は自前のケーブルで、液体とガスは液体パイプで運びます。パイプは置くだけでつながり、'
+         '装置の出口の液体を使う装置やタンクへ送り、隣の水源や溶岩源からも汲みます。出し入れする面は装置の面の設定で決まります。'
+         '液体キャニスター（1,000 mB）で装置を右クリックしても汲んで運べます。アイテムは面ごとの設定とホッパーなどで運びます。\n'
          '段階2から「触媒」が登場します。触媒は寿命のある消耗品で、触媒を入れる装置は触媒専用のスロットを持ちます。'
          'ティアが装置より1つ上なら速く、1つ下なら遅く減りも速く、2つ下は使えません。\n'
          'ワールドには旧文明の「遺構」があり、そこでしか手に入らない記録や部品があります。'
          '段階1から地表観測拠点を探しておきましょう。',
          'Power, catalysts and ruins',
-         'Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods\' pipes. '
-         'Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\n'
+         'Power (FE) travels through Singulo cables, and fluids and gases through Fluid Pipes. Pipes connect on their own, '
+         'send machine outputs to the machines and tanks that use them, and draw from adjacent water and lava sources. A machine\'s Sides settings decide which faces take part. '
+         'You can also right-click machines with a Fluid Canister (1,000 mB) to carry fluids by hand. Items use per-side settings and hoppers.\n'
          'From stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. '
          'One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\n'
          'Ancient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.'),

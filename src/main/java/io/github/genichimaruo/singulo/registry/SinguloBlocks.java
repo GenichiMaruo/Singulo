@@ -567,6 +567,10 @@ public final class SinguloBlocks {
     public static final DeferredBlock<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
             () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
 
+    // ---- 液体パイプ
+    public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
+            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER)));
+
     private static DeferredBlock<Block> ruinLamp(String id) {
         return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)
                 .sound(SoundType.GLASS).lightLevel(s -> 12));

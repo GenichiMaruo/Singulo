@@ -2635,7 +2635,7 @@ def item_texture(iid, stage):
 
 # 断面（ケーブルの軸に直交する面の長方形の集まり、0〜16 の座標）。上位ほど凹凸のある断面になる
 # 断面は中心に置いた正方形の一辺（偶数）。Java の CableProfile と同じ値
-CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8}
+CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8, 'fluid_pipe': 6}
 
 
 def cable_bands(iid, core, on, glow):
@@ -2643,6 +2643,8 @@ def cable_bands(iid, core, on, glow):
     jacket = (226, 230, 234)
     c = glow if on and glow else core
     half = CABLE_WIDTHS[iid] // 2
+    if iid == 'fluid_pipe':
+        return [c, lighten(c, 0.35), (176, 112, 78)]                  # 液体の見えるガラスと銅の縁
     if iid == 'copper_wire':
         return [c, darken(c, 0.22)]                                   # 銅むき出しの1本（縁は少し酸化した色）
     if iid == 'superconducting_cable':

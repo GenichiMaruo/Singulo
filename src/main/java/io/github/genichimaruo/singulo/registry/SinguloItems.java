@@ -276,6 +276,7 @@ public final class SinguloItems {
         TAB_ORDER.add(DECODED_RECORD);
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
+        block(SinguloBlocks.FLUID_PIPE, 1);
         block(SinguloBlocks.MULTIBLOCK_PORT, 2);
         block(SinguloBlocks.COOLING_TOWER_BASE, 2);
         block(SinguloBlocks.COOLING_TOWER_CASING, 2);
