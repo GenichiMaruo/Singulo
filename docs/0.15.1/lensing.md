@@ -1,6 +1,6 @@
 # 0.15.1 — 重力レンズの個数上限の撤廃
 
-対象はMinecraft 1.21.1 / NeoForge。1.20.1への移植は未実施。
+Minecraft 1.20.1 / Forge・NeoForge への移植版。カメラの座標変換、頂点属性、ローダー API は 1.20.1 に合わせて維持している。
 
 ## 問題と原因
 
@@ -13,9 +13,11 @@
 - パスは最大16。超えた分も描くが、重なった所だけは手前のレンズが奥のレンズを歪めず上に重なる。
 - 見かけの大きさによる間引きは、固定のしきい値から「歪みの範囲が1画素未満」に変更。
 
-## 検証
+## 1.21.1 原実装時の検証記録
 
-`tools/review/prepare_lensing.py` のあと `./gradlew -I tools/review/lensing.gradle runClient`（`build/gametest/world/level.dat` が必要）。
+以下の数値は 1.21.1 原実装時の記録であり、1.20.1 の測定値ではない。
+
+1.20.1 の再検証は `python tools/review/prepare_lensing.py --build-dir build/forge` のあと `./gradlew -Ploader=forge -I tools/review/lensing.gradle runClient`（`build/forge/gametest/world/level.dat` が必要）。NeoForge は両方の `forge` を `neoforge` に置き換える。各ローダーの CI でも 15 個の影と描画完了ログを要求する。
 
 | 確認 | 結果 |
 |---|---|
