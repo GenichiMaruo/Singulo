@@ -35,6 +35,8 @@ public final class GuiReviewHarness {
     private static int ready;
     private static int lookupChapter, lookupPage;
     private static String bootScreen = "";
+    private static String externalSort;
+    private static int reloadBaseline, reloadWait;
     private static ItemStack item(String name) {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(name)));
     }
@@ -303,12 +305,28 @@ public final class GuiReviewHarness {
                 }
                 capture(mc, "handbook-search-en-1280x800");
                 Singulo.LOGGER.info("SINGULO_HANDBOOK_SEARCH_COMPLETE");
-                if (ConfigReloadReview.reloads == 0) throw new IllegalStateException("Client config watcher never reloaded after UI autosaves");
                 var savedConfig = new com.electronwill.nightconfig.toml.TomlParser().parse(Files.readString(
                         net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get().resolve("singulo-client.toml")));
                 if (!java.util.Objects.equals(savedConfig.get("gui.workOrderSort"),
                         io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT.get())) {
                     throw new IllegalStateException("Persisted sort mode differs from the reloaded setting");
+                }
+                // A full sort cycle restores the original bytes. Watch services may coalesce
+                // those writes, so require a distinct external edit before testing reload.
+                externalSort = "name".equals(savedConfig.get("gui.workOrderSort")) ? "count" : "name";
+                savedConfig.set("gui.workOrderSort", externalSort);
+                reloadBaseline = ConfigReloadReview.reloads;
+                Files.writeString(net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get().resolve("singulo-client.toml"),
+                        new com.electronwill.nightconfig.toml.TomlWriter().writeToString(savedConfig));
+                phase = 30;
+            }
+            case 30 -> {
+                if (ConfigReloadReview.reloads <= reloadBaseline) {
+                    if (++reloadWait > 10) throw new IllegalStateException("Client config watcher did not reload an external edit");
+                    return;
+                }
+                if (!externalSort.equals(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT.get())) {
+                    throw new IllegalStateException("External sort edit was not applied");
                 }
                 Singulo.LOGGER.info("SINGULO_CONFIG_FILE_RELOAD_COMPLETE");
                 Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
