@@ -1,0 +1,16 @@
+// Development-only five-source rendering regression; never ship this harness.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/lensing-src'))
+        legacyForge.runs.client {
+            gameDirectory = layout.buildDirectory.dir('lensing-review').get().asFile
+            systemProperty 'singulo.lensingOutput', layout.buildDirectory.dir('lensing-review/screenshots').get().asFile.absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

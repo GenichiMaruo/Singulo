@@ -521,8 +521,8 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     }
 
     private static void shadowVertex(VertexConsumer vc, PoseStack.Pose last, float x, float y, float nz) {
-        vc.addVertex(last, x, y, 0).setColor(0, 0, 0, 255).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(0).setNormal(last, 0, 0, nz);
+        vc.vertex(last.pose(), x, y, 0).color(0, 0, 0, 255).uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0).normal(last.normal(), 0, 0, nz).endVertex();
     }
 
     private static void sphereVertex(VertexConsumer vc, PoseStack.Pose last, float r, float theta, float phi) {

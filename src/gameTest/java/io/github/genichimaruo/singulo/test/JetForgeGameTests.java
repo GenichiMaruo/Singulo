@@ -55,7 +55,7 @@ public final class JetForgeGameTests {
 
     private static JetForgeBlockEntity build(GameTestHelper helper) {
         TestBuild.build(helper, Blueprints.Kind.JET_FORGE, CONTROLLER, BACK, SIZE);
-        return helper.getBlockEntity(CONTROLLER);
+        return (JetForgeBlockEntity) helper.getBlockEntity(CONTROLLER);
     }
 
     /** 形の (x, y, z) のワールドの位置。 */
@@ -359,7 +359,7 @@ public final class JetForgeGameTests {
             helper.assertTrue(helper.getLevel().getBlockState(center).is(SinguloBlocks.ROGUE_BLACK_HOLE.get()), "組み直しで消えた");
         });
         helper.runAtTickTime(60, () -> {
-            JetForgeBlockEntity again = helper.getBlockEntity(CONTROLLER);
+            JetForgeBlockEntity again = (JetForgeBlockEntity) helper.getBlockEntity(CONTROLLER);
             helper.assertTrue(again.formed() && again.hasCore(), "組み直しても取り込まない");
             helper.assertTrue(helper.getLevel().getBlockState(center).isAir(), "取り込んだのに野良が残っている");
             helper.succeed();
@@ -520,6 +520,9 @@ public final class JetForgeGameTests {
     public static void jetForgeStoppedBeamDoesNotDamage(GameTestHelper helper) {
         JetForgeBlockEntity be = build(helper);
         helper.runAtTickTime(5, () -> {
+            CompoundTag saved = be.saveWithoutMetadata();
+            saved.putInt("energy_per_tick", 1_000_000);
+            be.load(saved);
             be.forceBlackHole();
             be.forcePhase(JetForgeBlockEntity.IRRADIATE, 100);
         });

@@ -980,12 +980,12 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     // ------------------------------------------------------------------ 描画の部品
 
     private static void col(VertexConsumer vc, Frame f, Vec3 p, int rgb, float a) {
-        vc.vertex(f.pose(), (float) p.x, (float) p.y, (float) p.z)
+        vc.vertex(f.pose().pose(), (float) p.x, (float) p.y, (float) p.z)
                 .color(rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, Mth.clamp((int) (255 * a), 0, 255)).endVertex();
     }
 
     private static void uv(VertexConsumer vc, Frame f, Vec3 p, int rgb, float a, float u, float v) {
-        vc.vertex(f.pose(), (float) p.x, (float) p.y, (float) p.z)
+        vc.vertex(f.pose().pose(), (float) p.x, (float) p.y, (float) p.z)
                 .color(rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, Mth.clamp((int) (255 * a), 0, 255))
                 .uv(u, v).endVertex();
     }

@@ -126,8 +126,9 @@ if metrics_path.exists():
             points = [(26 + col * 18 + 8, 124 + row * 18 + 8) for row in range(3) for col in range(9)]
             points += [(26 + col * 18 + 8, 190) for col in range(1, 9)]
             samples = [tuple(pixels[top + y * 2][(left + x * 2) * channels:(left + x * 2) * channels + 3]) for x, y in points]
-            if len(set(samples)) != 1 or not all(60 <= c <= 150 for c in samples[0]):
-                raise SystemExit(f"{locale}: jet forge inventory is missing/overlapped in state {state}")
+            # DeviceScreen uses GuiSkin.COSMIC.fill (0xFF151B31), including its player inventory.
+            if set(samples) != {(0x15, 0x1B, 0x31)}:
+                raise SystemExit(f"{locale}: jet forge inventory is missing/overlapped in state {state}: {sorted(set(samples))}")
             forge_slots += len(samples)
     summary = {"languages": list(locales), "machine_captures": len(rows),
                "headers_without_title_status_overlap": checked_headers, "generator_font_probes": 5, "jet_forge_inventory_slots": forge_slots, "supply_port_inventory_slots": supply_slots, "supply_port_tooltips": 5}
