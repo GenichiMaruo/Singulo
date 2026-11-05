@@ -118,6 +118,14 @@ public final class SinguloBlocks {
     public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_COIL = part("wormhole_generator_coil", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> WORMHOLE_GENERATOR_FOCUSER = part("wormhole_generator_focuser", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<GlassPartBlock> WORMHOLE_GENERATOR_WINDOW = glassPart("wormhole_generator_window");
+    // 降着ジェット鍛造炉（形は forge.JetForgeLayout）
+    public static final RegistryObject<PartBlock> JET_FORGE_FOUNDATION = part("jet_forge_foundation", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_CONFINEMENT_COIL = part("jet_forge_confinement_coil", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_COLLIMATOR = part("jet_forge_collimator", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_HEAT_SINK = part("jet_forge_heat_sink", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_TRUSS = part("jet_forge_truss", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_LEVITATOR = part("jet_forge_levitator", MultiblockPart.Role.STRUCTURE);
+    public static final RegistryObject<PartBlock> JET_FORGE_COLLECTOR = part("jet_forge_collector", MultiblockPart.Role.STRUCTURE);
     // 粒子加速器・ペンローズ・リアクター
     public static final RegistryObject<PartBlock> ACCELERATOR_TUBE = BLOCKS.register("accelerator_tube", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.ACCELERATOR_TUBE));
     public static final RegistryObject<PartBlock> FOCUSING_MAGNET = BLOCKS.register("focusing_magnet", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.FOCUSING_MAGNET));
@@ -235,6 +243,12 @@ public final class SinguloBlocks {
             BLOCKS.register("gravitational_containment_tank", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.CONTAINMENT_TANK, io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::new,
                     io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::serverTick));
+    /** 降着ジェット鍛造炉の制御核（土台の手前の枝の先に置く）。 */
+    public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.forge.JetForgeBlockEntity>> JET_FORGE_CORE =
+            BLOCKS.register("jet_forge_core", () -> new SimpleMachineBlock<>(machineProperties(),
+                    SinguloBlockEntities.JET_FORGE, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::new,
+                    io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::serverTick,
+                    io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::clientTick));
     /** ワームホール生成器のコア（3×3×3 の底の中央に置く）。 */
     public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity>> WORMHOLE_GENERATOR_CORE =
             BLOCKS.register("wormhole_generator_core", () -> new SimpleMachineBlock<>(machineProperties(),

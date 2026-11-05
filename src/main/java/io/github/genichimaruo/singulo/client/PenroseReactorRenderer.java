@@ -26,6 +26,9 @@ import net.minecraft.world.phys.Vec3;
  * 画面空間の重力レンズは GravitationalLensing が掛ける。
  */
 public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReactorBlockEntity> {
+    /** 描くときの地平線の半径: 判定の地平線が最小（0.6）のときの大きさと、判定が 1 増えるごとの増え方（炉心と野良ブラックホールで共通）。 */
+    private static final float VISIBLE_HORIZON_BASE = 0.39F;
+    private static final float VISIBLE_HORIZON_GROWTH = 0.45F;
     private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
     private static final int SPHERE_LAT = 12;
     private static final int SPHERE_LON = 16;
@@ -56,8 +59,9 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         Vec3 center = Vec3.atCenterOf(be.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER));
         pose.pushPose();
         pose.translate(0.5, 0.5 + Structures.CONTROLLER_BELOW_CENTER, 0.5);
-        renderHole(pose, buffers, horizon, (float) be.spin(), time, center, Structures.REACTOR_RADIUS - 0.5F);
-        renderPellets(be, pose, buffers, time, horizon);
+        // ペレットを飲み込むたびに、降着円盤がしばらく明るく燃える
+        float flare = renderPellets(be, pose, buffers, time, horizon);
+        renderHole(pose, buffers, horizon, (float) be.spin(), time, center, Structures.REACTOR_RADIUS - 0.5F, 1 + Math.min(1.6F, 0.7F * flare));
         pose.popPose();
         if (be.collapsing()) {
             renderCollapse(be, pose, buffers, time, center);
@@ -66,63 +70,149 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
 
     /**
      * ブラックホール本体: 黒い地平線、傾いて回る降着円盤、画面の重力レンズ。pose は中心に合わせておく。
-     * region は景色を歪める範囲の半径（リアクターの中ではリングの内側だけ）。
+     * horizonRadius は判定に使う地平線の半径。region は景色を歪める範囲の半径（リアクターの中ではリングの内側だけ）。
      */
-    static void renderHole(PoseStack pose, MultiBufferSource buffers, float horizon, float spin, float time, Vec3 worldCenter,
+    static void renderHole(PoseStack pose, MultiBufferSource buffers, float horizonRadius, float spin, float time, Vec3 worldCenter,
                            float region) {
+        renderHole(pose, buffers, horizonRadius, spin, time, worldCenter, region, 1);
+    }
+
+    /** brightness は降着円盤の明るさの倍率（1 で普段どおり。ペレットを飲み込んだ直後は明るくなる）。 */
+    static void renderHole(PoseStack pose, MultiBufferSource buffers, float horizonRadius, float spin, float time, Vec3 worldCenter,
+                           float region, float brightness) {
+        // 見た目の地平線は判定の地平線より小さく描く（影は地平線の約2.6倍に見えるので、そのままでは大きすぎる）。
+        // 最小 0.6 → 0.39、上限 1.6 → 0.84。質量で大きくなる分も抑える。増え方を判定の 0.45 倍にしているので、
+        // 影（見た目の地平線の約2.6倍）はどの大きさでも判定の地平線より大きく、触れると消える範囲は黒い中に収まる
+        float horizon = VISIBLE_HORIZON_BASE + (horizonRadius - 0.6F) * VISIBLE_HORIZON_GROWTH;
+        float shadow = GravitationalLensing.shadowRadius(horizon, region);
+        // 降着円盤の内側の縁は影のすぐ外（実際の円盤も、安定に回れるいちばん内側の軌道 = 地平線の3倍より外にあり、
+        // 影より大きい）。外側は影の2.2倍まで、ただし歪みの範囲（リアクターなら空洞）に収める
+        float inner = shadow * 1.1F;
+        float outer = Math.max(inner + 0.8F, Math.min(shadow * 2.2F, region * 0.95F));
+        // 円盤は少し傾ける。視線に沿った速さで明るさが変わる幅は、スピンが大きいほど大きい
+        float tilt = 12 * Mth.DEG_TO_RAD;
+        Vec3 normal = new Vec3(0, Mth.cos(tilt), Mth.sin(tilt));
+        float beaming = 0.45F * (0.4F + 0.6F * spin);
+        // 画面の重力レンズ（地平線の大きさを渡す）。ワールドでレンズを掛けるフレームは、シェーダーが光の経路をたどって
+        // 影と円盤を描く（奥側の円盤が重力で影の上下に回り込んで見える）
+        if (GravitationalLensing.addBlackHole(worldCenter, horizon * GravitationalLensing.EINSTEIN_PER_HORIZON, 1.0F, region,
+                normal, inner, outer, beaming, brightness, 0)) {
+            return;
+        }
+        // レンズを掛けない（設定で切っている・シェーダーパック使用時）: 影と円盤をワールドに描く
+        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(WHITE));
+        drawSphere(pose, solid, horizon);
+        // 影: 光子球に捕まる光の範囲（地平線の約2.6倍）を、カメラに向いた黒い円板として中心の面に描く。
+        // 円盤の手前側は影の上に、奥側は影の後ろになる
         pose.pushPose();
-        drawSphere(pose, buffers.getBuffer(RenderType.entitySolid(WHITE)), horizon);
-        // 降着円盤: 少し傾け、スピンに比例した速さで回す
-        pose.mulPose(Axis.XP.rotationDegrees(12));
+        pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        drawShadow(pose, solid, shadow);
+        pose.popPose();
+        // 降着円盤: スピンに比例した速さで回す
         float angle = time * (0.5F + 4.0F * spin);
-        pose.mulPose(Axis.YP.rotationDegrees(angle));
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 toCamera = camera.subtract(worldCenter).normalize();
-        drawDisk(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE)), horizon * 1.6F, horizon * 3.0F,
-                Math.toRadians(angle), toCamera, spin);
+        pose.pushPose();
+        pose.mulPose(Axis.XP.rotation(tilt));
+        pose.mulPose(Axis.YP.rotationDegrees(angle));
+        drawDisk(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE)), inner, outer, Math.toRadians(angle),
+                toCamera, beaming);
         pose.popPose();
-        // 画面の重力レンズ（アインシュタイン半径は地平線の2.2倍。黒い中心はシェーダー側で地平線の大きさに合わせる）
         GravitationalLensing.add(worldCenter, horizon * GravitationalLensing.EINSTEIN_PER_HORIZON, 1.0F, region);
     }
 
+    /** ペレットが落ちて消えたあとも、地平線と円盤の光が残る長さ（飛ぶ長さに対する割合）。 */
+    static final float PELLET_AFTERGLOW = 0.45F;
+
     /**
-     * 飲み込まれていくペレット: 12のポートのどれかから、渦を巻きながら中心へ落ちていく光の粒。地平線に近づくほど
-     * 速く、細長く引き伸ばされ、赤くなっていき、最後に地平線の縁で小さく光って消える。
+     * 飲み込まれていくペレット（加算で重ねる光）。
+     * <ol>
+     *   <li>発射: 抽出ポートの口で閃光が弾け、光の筋が中心へ向かって伸びる</li>
+     *   <li>落下: 白く熱い頭と、渦を巻く道筋に沿って長く尾を引く彗星。地平線に近づくほど速く、赤く、細長く引き伸ばされる（潮汐で裂ける）</li>
+     *   <li>飲み込み: 地平線の縁でまぶしく光り、降着円盤の面に衝撃波の輪が広がる。円盤もしばらく明るく燃える</li>
+     * </ol>
+     *
+     * @return 円盤を明るくする量（飲み込んだばかりのペレットが多いほど大きい）
      */
-    private static void renderPellets(PenroseReactorBlockEntity be, PoseStack pose, MultiBufferSource buffers, float time, float horizon) {
+    private static float renderPellets(PenroseReactorBlockEntity be, PoseStack pose, MultiBufferSource buffers, float time, float horizon) {
         var flights = be.clientPellets();
         if (flights.isEmpty()) {
-            return;
+            return 0;
         }
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+        VertexConsumer glow = buffers.getBuffer(JetForgeRenderTypes.GLOW);
         var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         double c = Structures.REACTOR_RADIUS * Math.sqrt(0.5) - 0.6;
+        float seen = VISIBLE_HORIZON_BASE + (horizon - 0.6F) * VISIBLE_HORIZON_GROWTH;
+        float tilt = 12 * Mth.DEG_TO_RAD;
+        float flare = 0;
         for (PenroseReactorBlockEntity.PelletFlight f : flights) {
             float k = (time - f.start()) / PenroseReactorBlockEntity.PELLET_FLIGHT_TICKS;
-            if (k < 0 || k > 1) {
+            if (k < 0 || k > 1 + PELLET_AFTERGLOW) {
                 continue;
             }
             Vec3 from = portPoint(f.port(), c);
-            Vec3 now = pelletPos(from, k, f.twist(), horizon);
-            Vec3 before = pelletPos(from, Math.max(0, k - 0.06F - 0.12F * k * k), f.twist(), horizon);
-            int rgb = lerpRgb(0xFFD9A0, 0xFF5030, k * k);
-            int a = (int) (230 * Math.min(1, (1 - k) * 4));
-            FxDraw.beam(pose.last(), glow, before, now, 0.12F * (1 - 0.6F * k), rgb, a / 2);
-            pose.pushPose();
-            pose.translate(now.x, now.y, now.z);
-            FxDraw.billboard(pose, glow, camera, 0.35F * (1 - 0.5F * k), 0xFFFFFF, a);
-            FxDraw.billboard(pose, glow, camera, 0.7F * (1 - 0.4F * k), rgb, a / 2);
-            pose.popPose();
-            if (k > 0.85F) {
-                // 地平線の縁での最後の光
-                float f2 = (k - 0.85F) / 0.15F;
-                Vec3 edge = now.normalize().scale(horizon * 1.05);
+            // 発射の閃光
+            if (k < 0.2F) {
+                float m = 1 - k / 0.2F;
+                billboardAt(pose, glow, camera, from, 0.4F + 1.4F * m, 0xFFFFFF, (int) (255 * m));
+                billboardAt(pose, glow, camera, from, 0.8F + 2.6F * m, 0xFFB060, (int) (170 * m));
+                FxDraw.beam(pose.last(), glow, from, from.scale(1 - 0.35 * (1 - m)), 0.25F * m, 0xFFE8C0, (int) (200 * m));
+            }
+            if (k <= 1) {
+                // 尾: 道筋に沿って、頭から遅れた位置を結ぶ。外側のやわらかな光と、細い芯
+                int n = 12;
+                float len = 0.22F + 0.18F * k;
+                Vec3 prev = null;
+                for (int i = 0; i <= n; i++) {
+                    float kk = Math.max(0, k - len * (1 - i / (float) n));
+                    Vec3 p = pelletPos(from, kk, f.twist(), horizon);
+                    if (prev != null) {
+                        float tail = i / (float) n;
+                        int rgb = lerpRgb(0xFF4020, lerpRgb(0xFFE0A0, 0xFF6030, k * k), tail);
+                        int a = (int) (200 * tail * Math.min(1, (1 - k) * 5));
+                        FxDraw.beam(pose.last(), glow, prev, p, (0.55F * tail + 0.1F) * (1 - 0.5F * k), rgb, a / 3);
+                        FxDraw.beam(pose.last(), glow, prev, p, (0.16F * tail + 0.03F) * (1 - 0.4F * k), 0xFFF4E0, a);
+                    }
+                    prev = p;
+                }
+                Vec3 now = pelletPos(from, k, f.twist(), horizon);
+                int hot = lerpRgb(0xFFD9A0, 0xFF5030, k * k);
+                int a = (int) (255 * Math.min(1, (1 - k) * 5));
+                billboardAt(pose, glow, camera, now, 0.5F * (1 - 0.4F * k), 0xFFFFFF, a);
+                billboardAt(pose, glow, camera, now, 1.1F * (1 - 0.3F * k), hot, (int) (a * 0.6F));
+                billboardAt(pose, glow, camera, now, 2.0F, hot, (int) (a * 0.18F));
+                if (k > 0.6F) {
+                    // 潮汐で中心の方へ引き伸ばされる
+                    float s2 = (k - 0.6F) / 0.4F;
+                    Vec3 inward = now.normalize().scale(-(0.6 + 1.6 * s2));
+                    FxDraw.beam(pose.last(), glow, now, now.add(inward), 0.2F * (1 - s2) + 0.05F, 0xFF7040, (int) (180 * (1 - s2 * 0.5F)));
+                }
+            }
+            if (k > 0.88F) {
+                // 飲み込み: 地平線の縁の閃光と、円盤の面に広がる衝撃波の輪
+                float g = Mth.clamp((k - 0.88F) / (0.12F + PELLET_AFTERGLOW), 0, 1);
+                Vec3 edge = pelletPos(from, 1, f.twist(), horizon).normalize().scale(seen * 1.3);
+                billboardAt(pose, glow, camera, edge, 0.6F + 2.2F * g, 0xFFF0D8, (int) (240 * (1 - g)));
+                billboardAt(pose, glow, camera, edge, 1.2F + 3.5F * g, 0xFF8040, (int) (120 * (1 - g)));
                 pose.pushPose();
-                pose.translate(edge.x, edge.y, edge.z);
-                FxDraw.billboard(pose, glow, camera, 0.5F + 0.6F * f2, 0xFFE0C0, (int) (200 * (1 - f2)));
+                pose.mulPose(Axis.XP.rotation(tilt));
+                float r = seen * 1.4F + 3.2F * g;
+                FxDraw.ring(pose.last(), glow, r * 0.8F, r, 0xFFC890, (int) (200 * (1 - g)), 0);
                 pose.popPose();
+                flare += 1 - g;
             }
         }
+        return flare;
+    }
+
+    private static void billboardAt(PoseStack pose, VertexConsumer vc, org.joml.Quaternionf camera, Vec3 at, float size, int rgb, int alpha) {
+        if (alpha <= 2) {
+            return;
+        }
+        pose.pushPose();
+        pose.translate(at.x, at.y, at.z);
+        FxDraw.billboard(pose, vc, camera, size, rgb, alpha);
+        pose.popPose();
     }
 
     private static Vec3 portPoint(int i, double c) {
@@ -411,6 +501,30 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         }
     }
 
+    /** カメラに向けた黒い円板（両面）。pose はカメラの向きに合わせておく。 */
+    private static void drawShadow(PoseStack pose, VertexConsumer vc, float r) {
+        PoseStack.Pose last = pose.last();
+        int seg = 48;
+        for (int k = 0; k < seg; k++) {
+            float a0 = Mth.TWO_PI * k / seg;
+            float a1 = Mth.TWO_PI * (k + 1) / seg;
+            float c0 = Mth.cos(a0) * r, s0 = Mth.sin(a0) * r, c1 = Mth.cos(a1) * r, s1 = Mth.sin(a1) * r;
+            shadowVertex(vc, last, 0, 0, 1);
+            shadowVertex(vc, last, c0, s0, 1);
+            shadowVertex(vc, last, c1, s1, 1);
+            shadowVertex(vc, last, 0, 0, 1);
+            shadowVertex(vc, last, 0, 0, -1);
+            shadowVertex(vc, last, c1, s1, -1);
+            shadowVertex(vc, last, c0, s0, -1);
+            shadowVertex(vc, last, 0, 0, -1);
+        }
+    }
+
+    private static void shadowVertex(VertexConsumer vc, PoseStack.Pose last, float x, float y, float nz) {
+        vc.vertex(last.pose(), x, y, 0).color(0, 0, 0, 255).uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0).normal(last.normal(), 0, 0, nz).endVertex();
+    }
+
     private static void sphereVertex(VertexConsumer vc, PoseStack.Pose last, float r, float theta, float phi) {
         float x = Mth.cos(theta) * Mth.cos(phi);
         float y = Mth.sin(theta);
@@ -420,43 +534,48 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     }
 
     /**
-     * 円盤を両面で描く。各区間の明るさ = 基本の明るさ + 視線方向への速度成分（ドップラー・ビーミング）。
+     * 円盤を描く。明るさ = 基本の明るさ + 視線方向への速度成分（ドップラー・ビーミング）。明るさは頂点ごとに求めて
+     * 区間の中でもなめらかに変える（区間ごとに一色だと、明るい側と暗い側の境目に段がつく）。
      * diskAngle は円盤の回転角（ワールドに対する向きを求めるのに使う）。
      */
     private static void drawDisk(PoseStack pose, VertexConsumer vc, float inner, float outer, double diskAngle,
-                                 Vec3 toCamera, float spin) {
+                                 Vec3 toCamera, float amount) {
         PoseStack.Pose last = pose.last();
+        // カメラの方向の水平成分の長さ。真上・真下から見るほど左右の差は小さい
+        double side = Math.hypot(toCamera.x, toCamera.z);
         for (int s = 0; s < DISK_SEGMENTS; s++) {
             float a0 = Mth.TWO_PI * s / DISK_SEGMENTS;
             float a1 = Mth.TWO_PI * (s + 1) / DISK_SEGMENTS;
-            float mid = (a0 + a1) / 2;
-            // 回転方向の接線（ワールドの向きにおおよそ戻す）
-            double world = mid - diskAngle;
-            double vx = -Math.sin(world);
-            double vz = Math.cos(world);
-            double doppler = vx * toCamera.x + vz * toCamera.z;
-            float bright = (float) Mth.clamp(0.55 + 0.45 * doppler * (0.4 + 0.6 * spin), 0.15, 1.0);
-            int ri = (int) (255 * bright);
-            int gi = (int) (200 * bright + 40);
-            int bi = (int) (150 * bright + 90);
-            int ro = (int) (180 * bright);
-            int go = (int) (110 * bright);
-            int bo = (int) (90 * bright + 40);
+            float b0 = diskBrightness(a0 - diskAngle, toCamera, side, amount);
+            float b1 = diskBrightness(a1 - diskAngle, toCamera, side, amount);
             float c0 = Mth.cos(a0);
             float s0 = Mth.sin(a0);
             float c1 = Mth.cos(a1);
             float s1 = Mth.sin(a1);
-            // 上面
-            diskVertex(vc, last, c0 * inner, s0 * inner, ri, gi, bi, 230, 1);
-            diskVertex(vc, last, c0 * outer, s0 * outer, ro, go, bo, 0, 1);
-            diskVertex(vc, last, c1 * outer, s1 * outer, ro, go, bo, 0, 1);
-            diskVertex(vc, last, c1 * inner, s1 * inner, ri, gi, bi, 230, 1);
-            // 下面
-            diskVertex(vc, last, c1 * inner, s1 * inner, ri, gi, bi, 230, -1);
-            diskVertex(vc, last, c1 * outer, s1 * outer, ro, go, bo, 0, -1);
-            diskVertex(vc, last, c0 * outer, s0 * outer, ro, go, bo, 0, -1);
-            diskVertex(vc, last, c0 * inner, s0 * inner, ri, gi, bi, 230, -1);
+            // 1枚だけ描く（裏面を消さない描き方なので下からも見える）。上下2枚を重ねると、面の向きで明るさが違ううえ
+            // 半透明の並べ替えでどちらが手前になるかが場所で入れ替わり、そこで色がはっきり分かれてしまう
+            diskInner(vc, last, c0 * inner, s0 * inner, b0, 1);
+            diskOuter(vc, last, c0 * outer, s0 * outer, b0, 1);
+            diskOuter(vc, last, c1 * outer, s1 * outer, b1, 1);
+            diskInner(vc, last, c1 * inner, s1 * inner, b1, 1);
         }
+    }
+
+    /** ワールドでの角度 world の所の明るさ（0.15〜1）。視線方向への速度成分（角度に対して正弦波でなめらかに変わる）に比例。 */
+    private static float diskBrightness(double world, Vec3 toCamera, double side, double amount) {
+        // 回転方向の接線（lensing.fsh と同じ向き: 面の向き × 中心からの向き）
+        double vx = Math.sin(world);
+        double vz = -Math.cos(world);
+        double doppler = side < 1e-4 ? 0 : (vx * toCamera.x + vz * toCamera.z) / side;
+        return (float) Mth.clamp(0.55 + amount * Math.min(1, side * 1.5) * doppler, 0.15, 1.0);
+    }
+
+    private static void diskInner(VertexConsumer vc, PoseStack.Pose last, float x, float z, float bright, float ny) {
+        diskVertex(vc, last, x, z, (int) (255 * bright), (int) (200 * bright + 40), (int) (150 * bright + 90), 250, ny);
+    }
+
+    private static void diskOuter(VertexConsumer vc, PoseStack.Pose last, float x, float z, float bright, float ny) {
+        diskVertex(vc, last, x, z, (int) (180 * bright), (int) (110 * bright), (int) (90 * bright + 40), 0, ny);
     }
 
     private static void diskVertex(VertexConsumer vc, PoseStack.Pose last, float x, float z, int r, int g, int b, int a,

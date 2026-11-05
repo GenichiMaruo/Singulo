@@ -50,15 +50,15 @@ print(json.dumps(results))
 metrics_path = pathlib.Path(_build + "/gui-review/machine-font-metrics.tsv")
 if metrics_path.exists():
     rows = [line.split('\t') for line in metrics_path.read_text().splitlines()]
-    if len(rows) != 220:
-        raise SystemExit(f"Expected 220 machine GUI fixtures, got {len(rows)}")
+    if len(rows) != 240:
+        raise SystemExit(f"Expected 240 machine GUI fixtures, got {len(rows)}")
     locales = ('ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr')
     checked_headers = 0
     rate_reference = None
     for locale in locales:
         entries = [r for r in rows if r[0] == locale]
-        if len(entries) != 44:
-            raise SystemExit(f"Expected 44 fixtures for {locale}, got {len(entries)}")
+        if len(entries) != 48:
+            raise SystemExit(f"Expected 48 fixtures for {locale}, got {len(entries)}")
         for index in range(len(entries)):
             capture = root / f"machine-{locale}-{index:02d}.png"
             with Image.open(capture) as png:
@@ -114,7 +114,23 @@ if metrics_path.exists():
             supply_slots += len(samples)
         if captures[1] == captures[2]:
             raise SystemExit(f"{locale}: supply port tooltip was not rendered")
+    forge_slots = 0
+    for locale in locales:
+        entries = [r for r in rows if r[0] == locale]
+        for state in range(4):
+            matches = [i for i, row in enumerate(entries) if row[1] == f"jet-forge-{state}"]
+            if len(matches) != 1:
+                raise SystemExit(f"{locale}: missing/duplicate jet forge fixture {state}")
+            width, height, channels, pixels = rgba(root / f"machine-{locale}-{matches[0]:02d}.png")
+            left, top = (width - 212 * 2) // 2, (height - 206 * 2) // 2
+            points = [(26 + col * 18 + 8, 124 + row * 18 + 8) for row in range(3) for col in range(9)]
+            points += [(26 + col * 18 + 8, 190) for col in range(1, 9)]
+            samples = [tuple(pixels[top + y * 2][(left + x * 2) * channels:(left + x * 2) * channels + 3]) for x, y in points]
+            # DeviceScreen uses GuiSkin.COSMIC.fill (0xFF151B31), including its player inventory.
+            if set(samples) != {(0x15, 0x1B, 0x31)}:
+                raise SystemExit(f"{locale}: jet forge inventory is missing/overlapped in state {state}: {sorted(set(samples))}")
+            forge_slots += len(samples)
     summary = {"languages": list(locales), "machine_captures": len(rows),
-               "headers_without_title_status_overlap": checked_headers, "generator_font_probes": 5, "supply_port_inventory_slots": supply_slots, "supply_port_tooltips": 5}
+               "headers_without_title_status_overlap": checked_headers, "generator_font_probes": 5, "jet_forge_inventory_slots": forge_slots, "supply_port_inventory_slots": supply_slots, "supply_port_tooltips": 5}
     pathlib.Path(_build + "/gui-review/machine-pixels.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary))

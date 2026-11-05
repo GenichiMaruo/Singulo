@@ -151,34 +151,85 @@ public final class ShapeSpec {
     }
 
     public boolean matches(Level level, BlockPos controller, Direction back, Block controllerBlock, List<BlockPos> ports) {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                for (int z = 0; z < depth; z++) {
-                    Slot slot = layout.at(x, y, z);
-                    if (slot.kind() == Kind.IGNORE) {
-                        continue;
-                    }
-                    BlockPos p = pos(controller, back, x, y, z);
-                    BlockState s = level.getBlockState(p);
-                    boolean ok = switch (effectiveKind(slot)) {
-                        case PART -> s.is(slot.block().get());
-                        case PANEL -> {
-                            if (s.is(SinguloBlocks.MULTIBLOCK_PORT.get()) || (s.is(SinguloBlocks.WORMHOLE_GENERATOR_PORT.get())
-                                    && slot.block().get() == SinguloBlocks.WORMHOLE_GENERATOR_SHELL.get())) {
-                                ports.add(p.immutable());
-                                yield true;
-                            }
-                            yield s.is(slot.block().get());
+        if (matchesCells(level, controller, back, controllerBlock, 0, cellCount(), ports) != Boolean.TRUE) {
+            ports.clear();
+            return false;
+        }
+        return true;
+    }
+
+    /** 形の外（IGNORE）でない位置（x, y, z）。判定はこの順に見る。 */
+    @Nullable
+    private int[][] cells;
+
+    private int[][] cells() {
+        if (cells == null) {
+            List<int[]> found = new ArrayList<>();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    for (int z = 0; z < depth; z++) {
+                        if (layout.at(x, y, z).kind() != Kind.IGNORE) {
+                            found.add(new int[]{x, y, z});
                         }
-                        case AIR -> s.isAir();
-                        case CONTROLLER -> s.is(controllerBlock);
-                        case IGNORE -> true;
-                    };
-                    if (!ok) {
-                        ports.clear();
-                        return false;
                     }
                 }
+            }
+            cells = found.toArray(new int[0][]);
+        }
+        return cells;
+    }
+
+    /** 判定する位置の数（大きな形は {@link #matchesCells} で何回かに分けて確かめる）。 */
+    public int cellCount() {
+        return cells().length;
+    }
+
+    /** Check the small chunk footprint without reading blocks or loading chunks. */
+    public boolean chunksLoaded(Level level, BlockPos controller, Direction back) {
+        BlockPos a = pos(controller, back, 0, 0, 0);
+        BlockPos b = pos(controller, back, width - 1, 0, depth - 1);
+        for (int x = Math.min(a.getX(), b.getX()) >> 4; x <= (Math.max(a.getX(), b.getX()) >> 4); x++) {
+            for (int z = Math.min(a.getZ(), b.getZ()) >> 4; z <= (Math.max(a.getZ(), b.getZ()) >> 4); z++) {
+                if (!level.isLoaded(new BlockPos(x << 4, controller.getY(), z << 4))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判定する位置のうち [from, to) だけを確かめる。ports にはその範囲の搬入出ポートを足す。
+     * 読み込まれていないチャンクにかかる位置があれば null（読み込んでまで確かめない。形が壊れたとは見なさない）。
+     */
+    @Nullable
+    public Boolean matchesCells(Level level, BlockPos controller, Direction back, Block controllerBlock, int from, int to,
+                                List<BlockPos> ports) {
+        int[][] all = cells();
+        for (int i = Math.max(0, from); i < Math.min(to, all.length); i++) {
+            int[] c = all[i];
+            Slot slot = layout.at(c[0], c[1], c[2]);
+            BlockPos p = pos(controller, back, c[0], c[1], c[2]);
+            if (!level.isLoaded(p)) {
+                return null;
+            }
+            BlockState s = level.getBlockState(p);
+            boolean ok = switch (effectiveKind(slot)) {
+                case PART -> s.is(slot.block().get());
+                case PANEL -> {
+                    if (s.is(SinguloBlocks.MULTIBLOCK_PORT.get()) || (s.is(SinguloBlocks.WORMHOLE_GENERATOR_PORT.get())
+                            && slot.block().get() == SinguloBlocks.WORMHOLE_GENERATOR_SHELL.get())) {
+                        ports.add(p.immutable());
+                        yield true;
+                    }
+                    yield s.is(slot.block().get());
+                }
+                case AIR -> s.isAir();
+                case CONTROLLER -> s.is(controllerBlock);
+                case IGNORE -> true;
+            };
+            if (!ok) {
+                return false;
             }
         }
         return true;

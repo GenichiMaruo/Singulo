@@ -147,6 +147,7 @@ public final class SinguloCommands {
         return switch (kind) {
             case PENROSE_REACTOR -> 8;
             case GENESIS_ENGINE -> 5;
+            case JET_FORGE -> 3;
             case SHIELD_TOWER, TIPLER_CYLINDER, WORMHOLE_GENERATOR -> 3;
             default -> 2;
         };

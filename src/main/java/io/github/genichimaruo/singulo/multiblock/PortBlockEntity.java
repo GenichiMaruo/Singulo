@@ -63,10 +63,30 @@ public class PortBlockEntity extends BlockEntity {
         return controller;
     }
 
+    /** パイプやケーブルに見せる口（いつも同じ物。中でつながっているコントローラの口へ渡す。{@link PortProxies}）。 */
+    private final PortProxies.Energy energyProxy = new PortProxies.Energy(
+            () -> delegate(io.github.genichimaruo.singulo.compat.Capabilities.EnergyStorage.BLOCK));
+    private final PortProxies.Items itemProxy = new PortProxies.Items(
+            () -> delegate(io.github.genichimaruo.singulo.compat.Capabilities.ItemHandler.BLOCK));
+    private final PortProxies.Fluids fluidProxy = new PortProxies.Fluids(
+            () -> delegate(io.github.genichimaruo.singulo.compat.Capabilities.FluidHandler.BLOCK));
+
+    public PortProxies.Energy energyProxy() {
+        return energyProxy;
+    }
+
+    public PortProxies.Items itemProxy() {
+        return itemProxy;
+    }
+
+    public PortProxies.Fluids fluidProxy() {
+        return fluidProxy;
+    }
+
     /** コントローラの能力をそのまま返す（未形成なら null）。 */
     @Nullable
     public <T> T delegate(net.minecraftforge.common.capabilities.Capability<T> capability) {
-        if (controller == null || level == null || controller.equals(worldPosition)) {
+        if (controller == null || level == null || controller.equals(worldPosition) || !level.isLoaded(controller)) {
             return null;
         }
         if (level.getBlockEntity(controller) instanceof MachineBlockEntity machine && machine.structureSize() <= 0) {

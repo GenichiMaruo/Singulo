@@ -33,3 +33,7 @@ Minecraft 1.20.1向けの差分と検証は[移植記録](0.13.0/port-1.20.1.md)
 ## 0.14.1 / Minecraft 1.20.1
 
 - [Issue #52の照明互換修正と移植記録](0.14.1/port-1.20.1.md)・[変更履歴](curseforge/changelog-0.14.1.md)
+
+## 0.15.0（開発中）
+
+- [降着ジェット鍛造炉](0.15.0/accretion-jet-forge.md)

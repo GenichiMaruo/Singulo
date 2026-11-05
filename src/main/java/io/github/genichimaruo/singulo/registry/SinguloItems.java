@@ -313,6 +313,13 @@ public final class SinguloItems {
         block(SinguloBlocks.WORMHOLE_GENERATOR_FOCUSER, 5);
         block(SinguloBlocks.WORMHOLE_GENERATOR_WINDOW, 5);
         block(SinguloBlocks.WORMHOLE_GENERATOR_PORT, 5);
+        block(SinguloBlocks.JET_FORGE_FOUNDATION, 5);
+        block(SinguloBlocks.JET_FORGE_CONFINEMENT_COIL, 5);
+        block(SinguloBlocks.JET_FORGE_COLLIMATOR, 5);
+        block(SinguloBlocks.JET_FORGE_HEAT_SINK, 5);
+        block(SinguloBlocks.JET_FORGE_TRUSS, 5);
+        block(SinguloBlocks.JET_FORGE_LEVITATOR, 5);
+        block(SinguloBlocks.JET_FORGE_COLLECTOR, 5);
         block(SinguloBlocks.ACCELERATOR_TUBE, 2);
         block(SinguloBlocks.FOCUSING_MAGNET, 2);
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
@@ -364,6 +371,7 @@ public final class SinguloItems {
         TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
                 new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
         block(SinguloBlocks.WORMHOLE_PORT, 5);
+        block(SinguloBlocks.JET_FORGE_CORE, 5);
         block(SinguloBlocks.GENESIS_CORE, 5);
         block(SinguloBlocks.CRYOGENIC_TURBINE, 2);
         block(SinguloBlocks.MUON_FUSION_REACTOR, 2);

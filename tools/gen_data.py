@@ -479,6 +479,7 @@ UI_LANG = {
     'multiblock.singulo.tipler_cylinder': ('Tシリンダー', 'T-Cylinder'),
     'multiblock.singulo.wormhole_generator': ('ワームホール生成器', 'Wormhole Generator'),
     'multiblock.singulo.genesis_engine': ('創世炉', 'Genesis Engine'),
+    'multiblock.singulo.accretion_jet_forge': ('降着ジェット鍛造炉', 'Accretion Jet Forge'),
     'holo.singulo.not_controller': ('マルチブロックのコントローラに使ってください', 'Use it on a multiblock controller'),
     'holo.singulo.header': ('%s（大きさ %s）に必要なブロック:', '%s · size %s · blocks needed:'),
     'holo.singulo.line': ('  %s: %s 個（あと %s 個）', '  %s: %s, %s missing'),
@@ -779,6 +780,8 @@ UI_LANG = {
     'jei.singulo.mb.event_horizon_shield': ('■ 形: 基壇から尖塔へすぼまる塔　高さ9\n■ 起動: 時間結晶触媒かシンギュラリティ・コアと電力\n■ 効果: 半径32を守る', '■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32'),
     'jei.singulo.mb.tipler_cylinder': ('■ 形: 5×5×9 の格納筒\n■ 起動: 時間結晶触媒・燃料・電力\n■ 燃料: エキゾチック物質\n■ 効果: 半径16が2倍速', '■ Shape: 5×5×9 housing\n■ Start: time crystal catalyst, fuel and power\n■ Fuel: exotic matter\n■ Effect: ×2 speed within 16'),
     'jei.singulo.mb.wormhole_generator': ('■ 形: 5×5×5 の球\n■ 起動: 100 MFE/t を10秒\n■ 結果: 一対のワームホールの口', '■ Shape: 5×5×5 sphere\n■ Start: 100 MFE/t for 10 s\n■ Result: a pair of wormhole mouths'),
+    'jei.singulo.mb.accretion_jet_forge': ('■ 形: 一直線に並ぶ排熱側の杯・炉心・3つの収束リング・照射室　44×16×15\n■ 起動: 特異点の種で点火し、25 GFE を注ぐ\n■ 材料: コラプサー・ビレット・質量ペレット16・液体ヘリウム1,000 mB\n■ 電力: 照射60秒のあいだ 250 MFE/t',
+                                           '■ Shape: exhaust cup, core, three collimators and chamber in a line, 44×16×15\n■ Start: ignite a Singularity Seed with 25 GFE\n■ Materials: Collapsar Billet, 16 Mass Pellets, 1,000 mB liquid helium\n■ Power: 250 MFE/t for the 60 s irradiation'),
     'jei.singulo.mb.genesis_engine': ('■ 形: 核を八角形に囲む枠8個と、柱4本×3段　7×4×7\n■ 起動: 原初の種を核に使ってから、電力を注ぐ\n■ 完成後: 画面に登録した物を、電力から生み出す', '■ Shape: 8 frames in an octagon around the core and 4 pylons 3 high, 7×4×7\n■ Start: use a Primordial Seed on the core, then pour in power\n■ Once complete: makes the item chosen on its screen from power'),
     'message.singulo.multiblock.not_formed': ('%s はまだ完成していない', '%s is not complete yet'),
     'message.singulo.welcome': ('Singulo ハンドブックを受け取った。右クリックで開ける', 'You received the Singulo Handbook. Right-click to open it'),
@@ -796,6 +799,32 @@ UI_LANG = {
     'gui.singulo.wormhole.generated': ('一対の口ができた。%s 秒以内に固定化すること', 'A pair of mouths formed. Stabilize within %s s'),
     'gui.singulo.wormhole.generator': ('生成 %s / %s 秒', 'Generating %s / %s s'),
     'gui.singulo.device.not_formed': ('未完成', 'Incomplete'),
+    # 降着ジェット鍛造炉
+    'gui.singulo.device.forge.idle': ('素材を待っている', 'Waiting for materials'),
+    'gui.singulo.device.forge.no_core': ('炉心にブラックホールがない。特異点の種を入れて点火する', 'No black hole: insert a Singularity Seed and ignite'),
+    'gui.singulo.device.forge.igniting': ('点火中 %s%%　残り %s 秒', 'Igniting %s%% · %s s left'),
+    'gui.singulo.device.forge.ignite': ('点火: %s GFE を点火の時間のうちに注ぐ（種を使い切る）', 'Ignite: pour in %s GFE in time (uses the seed)'),
+    'gui.singulo.device.forge.active': ('炉心のブラックホールは安定している', 'The core black hole is stable'),
+    'gui.singulo.device.forge.held': ('赤石信号で待機中', 'Held by redstone'),
+    'gui.singulo.device.forge.no_power': ('電力不足で止まっている', 'Paused: not enough power'),
+    'gui.singulo.device.forge.output_full': ('完成品の置き場がない', 'Paused: output is full'),
+    'gui.singulo.device.forge.unloaded': ('施設の一部が読み込まれていない', 'Part of the facility is not loaded'),
+    'gui.singulo.device.forge.running': ('%s　%s / %s 秒', '%s · %s / %s s'),
+    'gui.singulo.device.forge.phase.1': ('起動の予告', 'Warning'),
+    'gui.singulo.device.forge.phase.2': ('点火', 'Ignition'),
+    'gui.singulo.device.forge.phase.3': ('収束', 'Focusing'),
+    'gui.singulo.device.forge.phase.4': ('照射', 'Irradiating'),
+    'gui.singulo.device.forge.phase.5': ('仕上げ', 'Finishing'),
+    'gui.singulo.device.forge.phase.6': ('冷却', 'Cooling'),
+    'gui.singulo.device.forge.power': ('蓄え %s / %s　受電 %s/t', 'Stored %s / %s · input %s/t'),
+    'gui.singulo.device.forge.demand': ('照射中に必要 %s/t（1回で約 %s）', 'Irradiation needs %s/t (about %s per run)'),
+    'gui.singulo.device.forge.coolant': ('冷媒 %s / %s mB', 'Coolant %s / %s mB'),
+    'gui.singulo.device.forge.core': ('特異点の種（シンギュラリティ・コアでもよい）: 点火で使い切り、炉心にブラックホールができる（点火中は外せない）',
+                                      'Singularity Seed (or Singularity Core): used up on ignition to form the core black hole (locked while igniting)'),
+    'gui.singulo.device.forge.inputs': ('材料: コラプサー・ビレットと質量ペレット。液体ヘリウムの容器（カートリッジ・キャニスター）を入れると冷媒のタンクへ注ぐ',
+                                        'Materials: Collapsar Billet and Mass Pellets. Liquid helium containers (cartridges, canisters) are poured into the coolant tank'),
+    'gui.singulo.device.forge.empties': ('空になった容器（搬入出ポートが押し出す）', 'Emptied containers (multiblock ports push them out)'),
+    'gui.singulo.device.forge.output': ('完成品（搬入出ポートが押し出す）', 'Product (multiblock ports push it out)'),
     'gui.singulo.device.generator.idle': ('電力を10秒注ぐと口ができる', 'Feed power for 10 s'),
     'gui.singulo.device.generator.working': ('生成中 %s / %s 秒', 'Generating %s / %s s'),
     'gui.singulo.device.generator.done': ('口ができた', 'Mouths ready'),
@@ -1492,6 +1521,15 @@ UI_LANG = {
                                                    'No challenger remains. The Gravity Remnant sinks back into its tank'),
     'death.attack.singulo.tidal': ('%1$s は潮汐力で引き裂かれた', '%1$s was torn apart by tidal forces'),
     'death.attack.singulo.event_horizon': ('%1$s は事象の地平線を越えた', '%1$s crossed the event horizon'),
+    'death.attack.singulo.jet_beam': ('%1$s はブラックホールのジェットに焼き尽くされた', '%1$s was vaporized by a black hole jet'),
+    'gui.singulo.jet_forge.ignited': ('鍛造炉の炉心でブラックホールが生まれた', 'A black hole is born in the forge core'),
+    'gui.singulo.jet_forge.ignition_failed': ('点火に失敗した。時間内に電力が届かなかった（種は残っている）',
+                                              'Ignition failed: not enough power arrived in time (the seed remains)'),
+    'gui.singulo.jet_forge.ignition_broken': ('形が崩れたので、点火をやめた（種は残っている）',
+                                              'The structure broke, so ignition stopped (the seed remains)'),
+    'gui.singulo.jet_forge.absorbed': ('炉心に残っていたブラックホールを取り込んだ', 'The forge took in the black hole left in its core'),
+    'gui.singulo.jet_forge.remnant': ('制御核を失い、ブラックホールが拘束されたまま炉心に残った',
+                                      'The controller is gone; the black hole stays bound in the core'),
     'death.attack.singulo.tidal.player': ('%1$s は %2$s の特異点に引き裂かれた', "%1$s was torn apart by %2$s's singularity"),
     'gui.singulo.console.awakened': ('封印が破れ、ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
     'gui.singulo.console.active': ('守護機はすでに起動している', 'The warden is already active'),
@@ -1662,6 +1700,7 @@ CONTROLLER_SKINS = {
     'creative_energy_source': 'creative_energy_casing',
     'tipler_core': 'tipler_housing',
     'wormhole_generator_core': 'wormhole_generator_shell',
+    'jet_forge_core': 'jet_forge_foundation',
 }
 
 
@@ -1798,6 +1837,8 @@ def models():
     lab_blocks.models(write_json, ASSETS)
     import genesis_assets
     genesis_assets.models(write_json, ASSETS)
+    import jet_forge_assets
+    jet_forge_assets.heat_models(write_json, ASSETS)
 
 
 def boost_overlay_model():
@@ -2261,7 +2302,11 @@ def art_textures():
     import lab_blocks
     lab_blocks.textures(tb, art16.save)
     import genesis_assets
+    import jet_forge_assets
     genesis_assets.textures(tb, ti, art16.save)
+    # 降着ジェット鍛造炉で加工中の、赤熱した素材の絵（元の絵から焼く）
+    jet_forge_assets.heat_textures(ti, art16.save, lambda iid: art16.animated_item(iid)[0].crop((0, 0, 16, 16))
+                                   if iid in art16.ANIMATED_ITEMS else art16.item_texture(iid, 5))
     # 遺構の建材など、まだのっぺりしている絵にも汚し（使用感）を入れる
     from PIL import Image
     for name, (iid, _, kind) in MOD.items():
@@ -2920,6 +2965,20 @@ SOUNDS = {
     'genesis.big_bang': ('genesis/big_bang', '宇宙が生まれる', 'A universe is born', 128),
     'genesis.sky': ('genesis/sky', '銀河が空へ昇る', 'A galaxy rises into the sky', 128),
     'genesis.synth': ('genesis/synth', '質量が生まれる', 'Mass is synthesized', 24),
+    # 降着ジェット鍛造炉（0.15.0）
+    'black_hole.open': ('black_hole/open', 'ブラックホールが開く', 'Black hole opens', 32),
+    'jet_forge.formed': ('jet_forge/formed', 'ジェット鍛造炉が組み上がる', 'Jet Forge assembles', 64),
+    'jet_forge.warning': ('jet_forge/warning', '鍛造炉の起動警報', 'Jet Forge warning', 48),
+    'jet_forge.spool': ('jet_forge/spool', 'ジェットが噴き出す', 'Jets ignite', 96),
+    'jet_forge.focus': ('jet_forge/focus', '収束リングが入る', 'Collimator engages', 64),
+    'jet_forge.beam_start': ('jet_forge/beam_start', 'ビームが素材に届く', 'Beam strikes', 96),
+    'jet_forge.beam': ('jet_forge/beam', 'ビームがうなる', 'Beam roars', 48),
+    'jet_forge.jet': ('jet_forge/jet', 'ジェットが轟く', 'Jets thunder', 80),
+    'jet_forge.arc': ('jet_forge/arc', '収束リングがうなる', 'Collimators hum', 32),
+    'jet_forge.pulse': ('jet_forge/pulse', 'ビームが脈打つ', 'Beam pulses', 48),
+    'jet_forge.finish': ('jet_forge/finish', '鍛造の仕上げの衝撃', 'Forging shockwave', 128),
+    'jet_forge.cool': ('jet_forge/cool', '冷媒が吹きつける', 'Coolant vents', 32),
+    'jet_forge.collect': ('jet_forge/collect', '完成品が回収口に収まる', 'Ingot collected', 24),
     # アンドロイド（0.12.0。バニラの音の代わり）
     'android.power_down': ('android/power_down', 'アンドロイドの充電が切れる', 'Android powers down', 16),
     'android.charge_start': ('android/charge_start', 'アンドロイドが充電を始める', 'Android starts charging', 16),
@@ -3259,7 +3318,10 @@ def tags():
     t = RES / 'data'
     write_json(t / 'c' / 'tags' / 'item' / 'ingots' / 'steel.json', {'values': [mid('鋼鉄インゴット')]})
     write_json(t / 'c' / 'tags' / 'item' / 'ingots.json', {'values': [mid(n) for n in ('鋼鉄インゴット', '亜鉛インゴット',
-                                                                                'ビスマスインゴット', 'ニホニウムインゴット')]})
+                                                                                'ビスマスインゴット', 'ニホニウムインゴット',
+                                                                                'コラプサー・インゴット')]})
+    # 降着ジェット鍛造炉の成果物。ほかの mod（装備・道具）から ID を知らずに材料にできる共通のタグ
+    write_json(t / 'c' / 'tags' / 'item' / 'ingots' / 'collapsar.json', {'values': [mid('コラプサー・インゴット')]})
     for n, tag in INGREDIENT_TAGS.items():
         write_json(t / tag.split(':')[0] / 'tags' / 'item' / (tag.split(':')[1] + '.json'), {'values': [mid(n)]})
     write_json(t / 'c' / 'tags' / 'item' / 'ingots' / 'nihonium.json', {'values': [mid('ニホニウムインゴット')]})
@@ -3295,6 +3357,9 @@ def tags():
                                                                             'foundry_overseer')]})
     # 潮汐ダメージ（ウォーデンの特異点、のちにPリアクターの潮汐帯）は防具を無視する
     write_json(DATA / 'damage_type' / 'tidal.json', {'message_id': 'singulo.tidal', 'exhaustion': 0.0, 'scaling': 'never'})
+    # 降着ジェット鍛造炉のジェットとビーム（防具を無視する）
+    write_json(DATA / 'damage_type' / 'jet_beam.json', {'message_id': 'singulo.jet_beam', 'exhaustion': 0.0, 'scaling': 'never',
+                                                        'effects': 'burning'})
     # 事象の地平線: どんな守りも効かない（不死のトーテムも、無敵も、耐性も）
     write_json(DATA / 'damage_type' / 'event_horizon.json',
                {'message_id': 'singulo.event_horizon', 'exhaustion': 0.0, 'scaling': 'never'})
@@ -3305,6 +3370,8 @@ def tags():
         values = [f'{MODID}:event_horizon']
         if tag in ('bypasses_armor', 'bypasses_shield'):
             values.insert(0, f'{MODID}:tidal')
+        if tag == 'bypasses_armor':
+            values.insert(1, f'{MODID}:jet_beam')
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
@@ -3700,7 +3767,9 @@ TAB_GROUPS = [
                    'tipler_core', 'tipler_frame', 'tipler_housing', 'tipler_bearing', 'tipler_window', 'tipler_holder',
                    'wormhole_generator_core', 'wormhole_generator_shell', 'wormhole_generator_coil', 'wormhole_generator_focuser',
                    'wormhole_generator_window', 'wormhole_generator_port',
-                   'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed']),
+                   'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed',
+                   'jet_forge_core', 'jet_forge_foundation', 'jet_forge_confinement_coil', 'jet_forge_collimator',
+                   'jet_forge_heat_sink', 'jet_forge_truss', 'jet_forge_levitator', 'jet_forge_collector']),
     ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector', 'void_collector',
                      'low_gravity_panel',
                      'high_gravity_panel', 'zero_gravity_block', 'zero_gravity_controller', 'gravitational_wave_detector', 'neutrino_observatory',
@@ -3731,7 +3800,8 @@ TAB_GROUPS = [
     ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'stardust',
             'fulgurite_block', 'fulgurite', 'pressure_crystal', 'void_dust']),
     # インゴットは段階順にまとめて、素材の手前に
-    ('インゴット', ['steel_ingot', 'zinc_ingot', 'bismuth_ingot', 'meteoric_iron_ingot', 'nihonium_ingot']),
+    ('インゴット', ['steel_ingot', 'zinc_ingot', 'bismuth_ingot', 'meteoric_iron_ingot', 'nihonium_ingot', 'collapsar_billet',
+                 'collapsar_ingot']),
     # 板と基板（板 → 基板 → 回路とモジュール。それぞれ段階順）
     ('板・基板', ['steel_plate', 'nihonium_plate', 'phase_sync_plate', 'ceramic_substrate', 'optical_lattice_substrate',
                'basic_circuit', 'quantum_computing_module', 'thermocouple_module', 'time_crystal_module']),

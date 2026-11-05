@@ -21,7 +21,7 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 28;
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 32;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen;
     private static long renderedFrames, shownFrame;
@@ -335,7 +335,7 @@ public final class MachineGuiReviewHarness {
                     throw new IllegalStateException("Supply port slot outside panel");
             }
             metrics.add(LANGUAGES[language] + "\tsupply-" + (extra - 22) + "\t0\t0\t176");
-        } else if (extra >= 25) {
+        } else if (extra >= 25 && extra <= 27) {
             var status = new CatalystDeviceBlockEntity.Status[] {CatalystDeviceBlockEntity.Status.WAITING,
                     CatalystDeviceBlockEntity.Status.OUTPUT_FULL, CatalystDeviceBlockEntity.Status.NEEDS_UPGRADE}[extra - 25];
             SyncedInts data = SyncedInts.client(CatalystDeviceBlockEntity.COUNT);
@@ -350,6 +350,34 @@ public final class MachineGuiReviewHarness {
             mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.probe_station")));
             hover(mc, 176, CatalystDeviceMenu.HEIGHT, 146, 9);
             metrics.add(LANGUAGES[language] + "\tprobe-" + status.name().toLowerCase() + "\t0\t0\t176");
+        } else if (extra >= 28 && extra <= 31) {
+            int state = extra - 28;
+            var kind = DeviceMenu.Kind.JET_FORGE;
+            SyncedInts data = SyncedInts.client(kind.data);
+            value(data, DeviceMenu.Forge.FORMED, 1);
+            value(data, DeviceMenu.Forge.CORE, state >= 2 ? 1 : 0);
+            value(data, DeviceMenu.Forge.SEED, state < 2 ? 1 : 0);
+            value(data, DeviceMenu.Forge.BH, state == 1 ? 1 : state >= 2 ? 2 : 0);
+            value(data, DeviceMenu.Forge.HOLD, state == 0 ? 4 : state == 1 ? 7 : state == 3 ? 3 : 0);
+            value(data, DeviceMenu.Forge.PHASE, state == 2 ? 4 : state == 3 ? 6 : 0);
+            value(data, DeviceMenu.Forge.ELAPSED, state == 3 ? 1570 : 800);
+            value(data, DeviceMenu.Forge.TOTAL, 1570);
+            value(data, DeviceMenu.Forge.COOLANT, 8000);
+            value(data, DeviceMenu.Forge.BUFFER_MFE, 3500);
+            value(data, DeviceMenu.Forge.CAPACITY_MFE, 4000);
+            value(data, DeviceMenu.Forge.INTAKE_MFE, 250);
+            value(data, DeviceMenu.Forge.DEMAND_MFE, state == 2 ? 250 : 0);
+            value(data, DeviceMenu.Forge.IGNITION_PCT, 75);
+            value(data, DeviceMenu.Forge.IGNITION_SECS, 3);
+            value(data, DeviceMenu.Forge.IGNITION_GFE, 25);
+            ItemStackHandler items = new ItemStackHandler(kind.slots);
+            if (state < 2) items.setStackInSlot(0, new net.minecraft.world.item.ItemStack(
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("singularity_seed"))));
+            if (state == 3) items.setStackInSlot(4, new net.minecraft.world.item.ItemStack(
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("collapsar_ingot")), 64));
+            var menu = new DeviceMenu(0, mc.player.getInventory(), kind, BlockPos.ZERO, items, data, null);
+            mc.setScreen(new DeviceScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.jet_forge_core")));
+            metrics.add(LANGUAGES[language] + "\tjet-forge-" + state + "\t0\t0\t" + DeviceMenu.WIDTH);
         } else {
             int variant = extra == 7 ? 2 : extra, kind = variant / 2;
             SyncedInts data = SyncedInts.client(GeneratorSlotsMenu.COUNT);

@@ -40,13 +40,25 @@ final class BlackHolePull {
                 player.setDeltaMovement(v);
             }
         }
+        // 降着ジェット鍛造炉の炉心（形が崩れていても、ブラックホールがあれば引く）
+        for (var forge : io.github.genichimaruo.singulo.forge.JetForgeClientIndex.loaded()) {
+            if (forge.getLevel() != mc.level || !forge.shownCore() || forge.core() == null
+                    || player.getBoundingBox().getCenter().distanceTo(forge.core()) > io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PULL_RADIUS) {
+                continue;
+            }
+            Vec3 v = PenroseReactorBlockEntity.pulledVelocity(player.getDeltaMovement(), player.getBoundingBox().getCenter(), forge.core(),
+                    io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PULL_INNER, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PULL_SCALE);
+            if (v != null) {
+                player.setDeltaMovement(v);
+            }
+        }
         for (PenroseReactorBlockEntity r : PenroseReactorBlockEntity.clientRunning(mc.level)) {
             Vec3 c = r.coreCenter();
             Vec3 v = PenroseReactorBlockEntity.pulledVelocity(player.getDeltaMovement(), player.getBoundingBox().getCenter(), c);
             if (v != null) {
                 player.setDeltaMovement(v);
                 if (player.getBoundingBox().getCenter().distanceTo(c) <= PenroseReactorBlockEntity.INNER_RADIUS) {
-                    player.resetFallDistance();
+                    player.fallDistance = 0;
                 }
             }
         }

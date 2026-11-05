@@ -215,6 +215,14 @@
     "source": "Zero Resistance",
     "translation": "零阻力"
   },
+  "advancement.singulo.collapsar.description": {
+    "source": "Forge a Collapsar Ingot in a black hole jet",
+    "translation": "用黑洞噴流鍛造出塌縮星錠"
+  },
+  "advancement.singulo.collapsar.title": {
+    "source": "Collapsar",
+    "translation": "塌縮星"
+  },
   "advancement.singulo.compactor.description": {
     "source": "Form a degenerate compactor",
     "translation": "組建簡併壓縮爐"
@@ -358,6 +366,14 @@
   "advancement.singulo.ignite.title": {
     "source": "Event Horizon",
     "translation": "事件視界"
+  },
+  "advancement.singulo.jet_forge.description": {
+    "source": "Form an Accretion Jet Forge",
+    "translation": "組裝吸積噴流鍛造爐"
+  },
+  "advancement.singulo.jet_forge.title": {
+    "source": "Forging with Light",
+    "translation": "鍛造光芒"
   },
   "advancement.singulo.lab_power.description": {
     "source": "Be present when power returns to the underground android laboratory",
@@ -951,6 +967,38 @@
     "source": "Ruin Glass",
     "translation": "廢墟玻璃"
   },
+  "block.singulo.jet_forge_collector": {
+    "source": "Jet Forge Collector",
+    "translation": "噴流鍛造爐回收口"
+  },
+  "block.singulo.jet_forge_collimator": {
+    "source": "Jet Forge Collimator Ring",
+    "translation": "噴流鍛造爐聚束環"
+  },
+  "block.singulo.jet_forge_confinement_coil": {
+    "source": "Jet Forge Confinement Coil",
+    "translation": "噴流鍛造爐約束線圈"
+  },
+  "block.singulo.jet_forge_core": {
+    "source": "Jet Forge Core",
+    "translation": "噴流鍛造爐控制核"
+  },
+  "block.singulo.jet_forge_foundation": {
+    "source": "Jet Forge Foundation",
+    "translation": "噴流鍛造爐基座"
+  },
+  "block.singulo.jet_forge_heat_sink": {
+    "source": "Jet Forge Heat Sink",
+    "translation": "噴流鍛造爐吸熱板"
+  },
+  "block.singulo.jet_forge_levitator": {
+    "source": "Jet Forge Levitator",
+    "translation": "噴流鍛造爐懸浮器"
+  },
+  "block.singulo.jet_forge_truss": {
+    "source": "Jet Forge Truss",
+    "translation": "噴流鍛造爐桁架"
+  },
   "block.singulo.keraunos_tower": {
     "source": "Keraunos Discharge Tower",
     "translation": "克勞諾斯放電塔"
@@ -1463,6 +1511,10 @@
     "source": "%1$s crossed the event horizon",
     "translation": "%1$s 跨越事件視界"
   },
+  "death.attack.singulo.jet_beam": {
+    "source": "%1$s was vaporized by a black hole jet",
+    "translation": "%1$s 被黑洞噴流蒸發了"
+  },
   "death.attack.singulo.tidal": {
     "source": "%1$s was torn apart by tidal forces",
     "translation": "%1$s 被潮汐力撕裂"
@@ -1478,6 +1530,10 @@
   "desc.singulo.accelerator_tube": {
     "source": "Tube segment of the Particle Accelerator ring.",
     "translation": "粒子加速器環的管段。"
+  },
+  "desc.singulo.accretion_jet_forge": {
+    "source": "A facility that forges materials with a beam squeezed from the jets of a black hole.",
+    "translation": "用從黑洞噴流收束而成的光束鍛造材料的設施。"
   },
   "desc.singulo.advanced_android_workbench": {
     "source": "An upgraded Android Workbench. Androids craft eight times as fast as on a vanilla crafting table, and the holding box has 54 slots. Androids use 60% of the usual charge per craft. Used the same way as the Android Workbench.",
@@ -1850,6 +1906,14 @@
   "desc.singulo.cold_atoms": {
     "source": "Atoms cooled close to absolute zero.",
     "translation": "冷卻到接近絕對零度的原子。"
+  },
+  "desc.singulo.collapsar_billet": {
+    "source": "Netherite wrapped in a degenerate-matter shell and soaked with jet condensate. Forge it in the Accretion Jet Forge to make a Collapsar Ingot.",
+    "translation": "用簡併物質殼包覆獄髓並浸透噴流凝聚體的鍛造前坯料。在吸積噴流鍛造爐中鍛造後成為塌縮星錠。"
+  },
+  "desc.singulo.collapsar_ingot": {
+    "source": "A light-drinking black metal forged in a black hole jet, a material for the finest gear and tools. Common tag: c:ingots/collapsar.",
+    "translation": "以黑洞噴流鍛造、能吞噬光的黑色金屬錠，是最高級裝備與工具的材料。通用標籤：c:ingots/collapsar。"
   },
   "desc.singulo.compressed_block_1": {
     "source": "Nine units of mass pressed together. The start of the compression chain.",
@@ -2243,6 +2307,10 @@
     "source": "Heat exchangers stacked up the middle of the tower.",
     "translation": "沿塔中央向上堆疊的熱交換器。"
   },
+  "desc.singulo.helium_cartridge": {
+    "source": "A cartridge holding 250 mB of liquid helium. Right-click a machine to pour it in; the Accretion Jet Forge drains it automatically from its material slots.",
+    "translation": "裝有 250 mB 液態氦的冷媒罐。右鍵點擊機器即可注入；吸積噴流鍛造爐會自動從材料欄注入。"
+  },
   "desc.singulo.high_gravity_panel": {
     "source": "When powered, standing on it raises your gravity 2.5x until you next land. Joins visually with its neighbours.",
     "translation": "通電時，站在上面會使你的重力變為 2.5 倍，直到下次著地。外觀會與相鄰的面板相連。"
@@ -2286,6 +2354,38 @@
   "desc.singulo.jet_condensate": {
     "source": "Condensed particles from a relativistic jet.",
     "translation": "匯聚相對論性噴流粒子的凝聚體。"
+  },
+  "desc.singulo.jet_forge_collector": {
+    "source": "Centre of the irradiation chamber floor. Receives the cooled product.",
+    "translation": "照射室地板的中央，接收冷卻後的成品。"
+  },
+  "desc.singulo.jet_forge_collimator": {
+    "source": "Three rings of radius 5, 4 and 3 that squeeze the jet step by step into a thin white beam.",
+    "translation": "半徑依次為 5、4、3 的三個環，將噴流逐步收束成細而白的光束。"
+  },
+  "desc.singulo.jet_forge_confinement_coil": {
+    "source": "Two radius-7 rings around the black hole. They twist the magnetic field of the inflow and drive jets out of both poles.",
+    "translation": "夾住黑洞的兩個半徑 7 的環。扭轉吸積流的磁場，把噴流從兩極推出。"
+  },
+  "desc.singulo.jet_forge_core": {
+    "source": "The brain of the Accretion Jet Forge, set into the front edge of the plinth under the core. Insert a Singularity Seed and ignite it to form the forging black hole.",
+    "translation": "吸積噴流鍛造爐的大腦，嵌在爐心下方台座前緣的中央。放入奇點種子並點火後，爐心會形成加工用的黑洞。"
+  },
+  "desc.singulo.jet_forge_foundation": {
+    "source": "The foundation under the facility. Any foundation block can be swapped for a multiblock port to feed power, materials and coolant and to send out products.",
+    "translation": "設施下方的地基。任何基座都可以換成多方塊輸入輸出埠，從那裡輸入電力、材料與冷卻劑，並輸出成品。"
+  },
+  "desc.singulo.jet_forge_heat_sink": {
+    "source": "Forms the cup that catches the opposite jet and the plate that stops the beam behind the material.",
+    "translation": "構成承接另一側噴流的杯體，以及擋住穿過材料的光束的擋板。"
+  },
+  "desc.singulo.jet_forge_levitator": {
+    "source": "Centre of the irradiation chamber ceiling. Its gravity field holds the material in the beam path.",
+    "translation": "照射室天花板的中央。用重力場讓材料懸浮在光束路徑上。"
+  },
+  "desc.singulo.jet_forge_truss": {
+    "source": "Core beams, ring supports and the irradiation chamber frame.",
+    "translation": "爐心的樑、環的支柱與照射室的框架。"
   },
   "desc.singulo.keraunos_tower": {
     "source": "Builds up 1,000,000 FE and hurls artificial lightning at the nearest lightning rod within 16 blocks. Sand under the rod turns into fulgurite. Three firing modes: manual, redstone and auto (sneak-right-click to switch).",
@@ -4107,6 +4207,98 @@
     "source": "Exotic matter: %s",
     "translation": "奇異物質：%1$s"
   },
+  "gui.singulo.device.forge.active": {
+    "source": "The core black hole is stable",
+    "translation": "爐心黑洞處於穩定狀態"
+  },
+  "gui.singulo.device.forge.coolant": {
+    "source": "Coolant %s / %s mB",
+    "translation": "冷卻劑 %1$s / %2$s mB"
+  },
+  "gui.singulo.device.forge.core": {
+    "source": "Singularity Seed (or Singularity Core): used up on ignition to form the core black hole (locked while igniting)",
+    "translation": "奇點種子（也可以用奇點核心）：點火時消耗，在爐心形成黑洞（點火中無法取出）"
+  },
+  "gui.singulo.device.forge.demand": {
+    "source": "Irradiation needs %s/t (about %s per run)",
+    "translation": "照射時需要 %1$s/t（每次約 %2$s）"
+  },
+  "gui.singulo.device.forge.empties": {
+    "source": "Emptied containers (multiblock ports push them out)",
+    "translation": "已清空的容器（由多方塊輸入輸出埠推出）"
+  },
+  "gui.singulo.device.forge.held": {
+    "source": "Held by redstone",
+    "translation": "紅石訊號待機中"
+  },
+  "gui.singulo.device.forge.idle": {
+    "source": "Waiting for materials",
+    "translation": "等待材料"
+  },
+  "gui.singulo.device.forge.ignite": {
+    "source": "Ignite: pour in %s GFE in time (uses the seed)",
+    "translation": "點火：在時限內注入 %s GFE（消耗種子）"
+  },
+  "gui.singulo.device.forge.igniting": {
+    "source": "Igniting %s%% · %s s left",
+    "translation": "點火中 %1$s%% · 剩餘 %2$s 秒"
+  },
+  "gui.singulo.device.forge.inputs": {
+    "source": "Materials: Collapsar Billet and Mass Pellets. Liquid helium containers (cartridges, canisters) are poured into the coolant tank",
+    "translation": "材料：塌縮星坯料與質量顆粒。放入液態氦容器（冷媒罐、流體罐）會注入冷卻劑槽"
+  },
+  "gui.singulo.device.forge.no_core": {
+    "source": "No black hole: insert a Singularity Seed and ignite",
+    "translation": "爐心沒有黑洞：放入奇點種子並點火"
+  },
+  "gui.singulo.device.forge.no_power": {
+    "source": "Paused: not enough power",
+    "translation": "已暫停：電力不足"
+  },
+  "gui.singulo.device.forge.output": {
+    "source": "Product (multiblock ports push it out)",
+    "translation": "成品（由多方塊輸入輸出埠推出）"
+  },
+  "gui.singulo.device.forge.output_full": {
+    "source": "Paused: output is full",
+    "translation": "已暫停：成品已滿"
+  },
+  "gui.singulo.device.forge.phase.1": {
+    "source": "Warning",
+    "translation": "啟動預警"
+  },
+  "gui.singulo.device.forge.phase.2": {
+    "source": "Ignition",
+    "translation": "點火"
+  },
+  "gui.singulo.device.forge.phase.3": {
+    "source": "Focusing",
+    "translation": "收束"
+  },
+  "gui.singulo.device.forge.phase.4": {
+    "source": "Irradiating",
+    "translation": "照射"
+  },
+  "gui.singulo.device.forge.phase.5": {
+    "source": "Finishing",
+    "translation": "收尾"
+  },
+  "gui.singulo.device.forge.phase.6": {
+    "source": "Cooling",
+    "translation": "冷卻"
+  },
+  "gui.singulo.device.forge.power": {
+    "source": "Stored %s / %s · input %s/t",
+    "translation": "儲存 %1$s / %2$s · 輸入 %3$s/t"
+  },
+  "gui.singulo.device.forge.running": {
+    "source": "%s · %s / %s s",
+    "translation": "%1$s · %2$s / %3$s 秒"
+  },
+  "gui.singulo.device.forge.unloaded": {
+    "source": "Part of the facility is not loaded",
+    "translation": "設施的一部分未載入"
+  },
   "gui.singulo.device.fuel": {
     "source": "Fuel: %s",
     "translation": "燃料：%1$s"
@@ -4742,6 +4934,26 @@
   "gui.singulo.handbook.title": {
     "source": "Singulo Handbook",
     "translation": "Singulo 手冊"
+  },
+  "gui.singulo.jet_forge.absorbed": {
+    "source": "The forge took in the black hole left in its core",
+    "translation": "鍛造爐吸收了留在爐心的黑洞"
+  },
+  "gui.singulo.jet_forge.ignited": {
+    "source": "A black hole is born in the forge core",
+    "translation": "鍛造爐的爐心誕生了黑洞"
+  },
+  "gui.singulo.jet_forge.ignition_broken": {
+    "source": "The structure broke, so ignition stopped (the seed remains)",
+    "translation": "結構損壞，點火已中止（種子仍在）"
+  },
+  "gui.singulo.jet_forge.ignition_failed": {
+    "source": "Ignition failed: not enough power arrived in time (the seed remains)",
+    "translation": "點火失敗：電力未能在時限內送達（種子仍在）"
+  },
+  "gui.singulo.jet_forge.remnant": {
+    "source": "The controller is gone; the black hole stays bound in the core",
+    "translation": "失去控制核後，黑洞仍被束縛在爐心"
   },
   "gui.singulo.leviathan.ascend": {
     "source": "The vortex tears open and a black wyrm rises, its wings a spread of accretion-disk light",
@@ -6543,6 +6755,34 @@
     "source": "Welcome to Singulo",
     "translation": "歡迎來到 Singulo"
   },
+  "guide.singulo.jet_forge": {
+    "source": "Accretion Jet Forge",
+    "translation": "吸積噴流鍛造爐"
+  },
+  "guide.singulo.jet_forge.build.body": {
+    "source": "The P-Reactor makes power and the Genesis Engine makes matter; the Accretion Jet Forge reworks existing materials with huge amounts of power. It is a long facility, 44 long, 16 high and 15 deep, supported by the Holo Projector and the builder wand.\n- Exhaust side (left end): a heat-sink cup that catches the opposite jet.\n- Core: a vertical accretion disk and black hole float between two Confinement Coils (radius-7 rings). The eight 45° points of the coils are Reactor Stabilizer Coils, the same part as the P-Reactor. A chamfered plinth lies under the core, and the controller is set into the middle of its front edge.\n- Collimators: three rings of radius 5, 4 and 3 squeeze the jet into a thin white beam.\n- Irradiation chamber: the material floats in the middle of a square frame, with the Levitator above and the Collector below. A heat-sink plate behind it stops the beam.\nKeep the beam path along the axis and the space around the core clear. Any foundation block can be swapped for a multiblock port.",
+    "translation": "彭羅斯反應爐產生電力，創世爐產生物質；吸積噴流鍛造爐則是用巨大的電力重新鍛造現有材料的設施。它是長 44、高 16、深 15 的橫向長形設施，支援全像投影器與建造者魔杖。\n- 排熱側（左端）：吸熱板的杯體，承接另一側的噴流。\n- 爐心：直立的吸積盤與黑洞懸浮在兩個約束線圈（半徑 7 的環）之間。約束線圈斜 45° 的 8 處是與彭羅斯反應爐相同的爐心穩定線圈。爐心下方是切角的台座，控制核嵌在台座前緣的中央。\n- 聚束環：半徑為 5、4、3 的三個環把噴流收束成細而白的光束。\n- 照射室：材料懸浮在方形框架的中央，上方是懸浮器，下方是回收口。後方的吸熱板擋住光束。\n請保持沿軸線的光束路徑與爐心周圍的空間淨空。任何基座都可以換成多方塊輸入輸出埠。"
+  },
+  "guide.singulo.jet_forge.build.title": {
+    "source": "Building the forge",
+    "translation": "建造鍛造爐"
+  },
+  "guide.singulo.jet_forge.ingot.body": {
+    "source": "A light-drinking black metal forged in a black hole jet. It is meant as a material for the finest gear and tools in other mods (common tag c:ingots/collapsar, ID singulo:collapsar_ingot).\nMake the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).",
+    "translation": "以黑洞噴流鍛造、能吞噬光的黑色金屬錠。它被設計為其他模組中最高級裝備與工具的材料（通用標籤 c:ingots/collapsar、ID singulo:collapsar_ingot）。\n塌縮星坯料在奇點封裝器中，由獄髓錠、簡併物質殼、噴流凝聚體 4 個、奇異物質 2 個與鉨板 2 個製成。鍛造配方可以用資料包（type: singulo:machine、station: accretion_jet_forge）修改或新增。"
+  },
+  "guide.singulo.jet_forge.ingot.title": {
+    "source": "Collapsar Ingot",
+    "translation": "塌縮星錠"
+  },
+  "guide.singulo.jet_forge.run.body": {
+    "source": "First form the core black hole. As with the P-Reactor, insert a Singularity Seed (or a Singularity Core) into the controller, press Ignite on its screen and pour in 25 GFE within the ignition window (10 s by default): light flows from the eight Reactor Stabilizer Coils into the seed, a ball of light swells and collapses into a black hole (the seed is used up; if time runs out, the seed stays). The black hole pulls in its surroundings and swallows anything that touches the horizon. If the controller is broken, it stays bound in the core as a rogue black hole and is taken back in when you rebuild.\nWhen the materials (1 Collapsar Billet and 16 Mass Pellets) and coolant (1,000 mB of liquid helium) are present, the output has room and one tick of power is stored, the forge takes all the materials and begins.\n1. Warning: beacons spin, a force field closes around the chamber and the material rises.\n2. Ignition and focusing: the disk brightens, jets erupt from both poles and are squeezed tighter as each ring engages.\n3. Irradiation: 250 MFE/t for 60 s (about 300 GFE). The material glows red, cracks and throws off shards and rings of light.\n4. Finish and cooling: after a flash and a shockwave, the cooled ingot descends into the Collector.\nBesides piping it in, you can put liquid helium in Liquid Helium Cartridges (filled from empty coolant cartridges in a cooling tower) or fluid canisters and place them in the material slots; they are poured in and the empties go to the bottom-right slot. Drones can carry them too.\nInput is at most 1 GFE per tick, with a buffer of four times that. If power runs short, the structure breaks, part of the facility is unloaded or the output is full, it pauses where it is (no materials or progress are lost). A redstone signal on the controller stops new runs from starting. Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The flash and screen shake can be reduced in the client config.",
+    "translation": "首先在爐心形成黑洞。與彭羅斯反應爐相同，向控制核放入奇點種子（也可以用奇點核心），在介面上按下「點火」，並在點火時限（預設 10 秒）內注入 25 GFE：光從 8 個爐心穩定線圈流入種子，光球膨脹後塌縮成一點，形成黑洞（種子會被消耗；逾時則種子保留）。黑洞會吸引周圍的東西，吞噬觸及視界的一切。即使控制核被破壞，黑洞也會被束縛在爐心，成為遊蕩黑洞留下，重新建造後會被吸收。\n當材料（塌縮星坯料 1 個、質量顆粒 16 個）與冷卻劑（液態氦 1,000 mB）齊備、成品有空位且儲存了 1 tick 的電力時，鍛造爐會先取出全部材料再開始。\n1. 預警：警示燈旋轉，照射室周圍展開力場，材料浮起。\n2. 點火與收束：吸積盤變亮，噴流從兩極噴出，每個環接入時都會收得更緊。\n3. 照射：60 秒內 250 MFE/t（約 300 GFE）。材料發紅、出現裂紋，並迸出碎片與光環。\n4. 收尾與冷卻：閃光與衝擊波之後，冷卻的錠降入回收口。\n液態氦除了用管線輸入外，也可以裝入液態氦冷媒罐（在冷卻塔中填充空冷媒罐）或流體罐，放進材料欄即可注入（空容器會放到右下的欄位）。無人機也能運送。\n每 tick 最多輸入 1 GFE，儲存上限為其 4 倍。電力不足、結構損壞、設施部分未載入或成品已滿時，會原地暫停等待（不會遺失材料或進度）。向控制核輸入紅石訊號後，不會開始下一次加工。進入噴流與光束的路徑會受到無視護甲的巨大傷害（照射中的光束是致命的）。閃光與畫面晃動可以在用戶端設定中減弱。"
+  },
+  "guide.singulo.jet_forge.run.title": {
+    "source": "How forging works",
+    "translation": "鍛造流程"
+  },
   "guide.singulo.multiblocks": {
     "source": "Multiblocks",
     "translation": "多方塊結構"
@@ -6935,6 +7175,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.accretion_jet_forge": {
+    "source": "Made in: Multiblock assembly (stage 5)",
+    "translation": "製造地：多方塊結構組裝（第 5 階段）"
+  },
   "howto.singulo.advanced_android_workbench": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
@@ -7222,6 +7466,14 @@
   "howto.singulo.cold_atoms": {
     "source": "Made in: Laser Cooler (stage 3)",
     "translation": "製造地：雷射冷卻器（第 3 階段）"
+  },
+  "howto.singulo.collapsar_billet": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "製造地：奇點封裝器（第 5 階段）"
+  },
+  "howto.singulo.collapsar_ingot": {
+    "source": "Made in: Accretion Jet Forge (stage 5)",
+    "translation": "製造地：吸積噴流鍛造爐（第 5 階段）"
   },
   "howto.singulo.compressed_block_1": {
     "source": "Made in: Compressor (stage 1)",
@@ -7555,6 +7807,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.helium_cartridge": {
+    "source": "Made in: Cryogenic Cooling Tower (stage 3)",
+    "translation": "製造地：低溫冷卻塔（第 3 階段）"
+  },
   "howto.singulo.high_gravity_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
@@ -7594,6 +7850,38 @@
   "howto.singulo.jet_condensate": {
     "source": "Made in: P-Reactor (stage 5)",
     "translation": "製造地：彭羅斯反應爐（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_collector": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_collimator": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_confinement_coil": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_core": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製造地：工作台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_foundation": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_heat_sink": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_levitator": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.jet_forge_truss": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製造地：精密組裝台（第 5 階段）"
   },
   "howto.singulo.keraunos_tower": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -8471,6 +8759,14 @@
     "source": "Cold Atoms",
     "translation": "冷原子"
   },
+  "item.singulo.collapsar_billet": {
+    "source": "Collapsar Billet",
+    "translation": "塌縮星坯料"
+  },
+  "item.singulo.collapsar_ingot": {
+    "source": "Collapsar Ingot",
+    "translation": "塌縮星錠"
+  },
   "item.singulo.confinement_ring": {
     "source": "Magnetic Confinement Ring",
     "translation": "磁約束環"
@@ -8634,6 +8930,10 @@
   "item.singulo.hawking_condensate": {
     "source": "H-Condensate",
     "translation": "霍金凝聚體"
+  },
+  "item.singulo.helium_cartridge": {
+    "source": "Liquid Helium Cartridge",
+    "translation": "液態氦冷媒罐"
   },
   "item.singulo.holo_projector": {
     "source": "Holo Projector",
@@ -9058,6 +9358,10 @@
   "jei.singulo.mass": {
     "source": "Mass %s",
     "translation": "質量 %1$s"
+  },
+  "jei.singulo.mb.accretion_jet_forge": {
+    "source": "■ Shape: exhaust cup, core, three collimators and chamber in a line, 44×16×15\n■ Start: ignite a Singularity Seed with 25 GFE\n■ Materials: Collapsar Billet, 16 Mass Pellets, 1,000 mB liquid helium\n■ Power: 250 MFE/t for the 60 s irradiation",
+    "translation": "■ 形狀：排熱側杯體、爐心、3 個聚束環與照射室排成一條直線　44×16×15\n■ 啟動：用奇點種子點火，注入 25 GFE\n■ 材料：塌縮星坯料、質量顆粒 16 個、液態氦 1,000 mB\n■ 電力：60 秒照射期間 250 MFE/t"
   },
   "jei.singulo.mb.casimir_cavity": {
     "source": "■ Shape: 5×5×5 vacuum vessel\n■ Start: power and a catalyst",
@@ -9523,6 +9827,10 @@
     "source": "Metric Drive: no exotic matter",
     "translation": "度規驅動器：沒有奇異物質"
   },
+  "multiblock.singulo.accretion_jet_forge": {
+    "source": "Accretion Jet Forge",
+    "translation": "吸積噴流鍛造爐"
+  },
   "multiblock.singulo.casimir_cavity": {
     "source": "C-Cavity",
     "translation": "卡西米爾腔"
@@ -9819,6 +10127,10 @@
     "source": "Singularity",
     "translation": "奇點"
   },
+  "station.singulo.accretion_jet_forge": {
+    "source": "Accretion Jet Forge",
+    "translation": "吸積噴流鍛造爐"
+  },
   "station.singulo.archive_terminal": {
     "source": "Archive Terminal",
     "translation": "檔案終端"
@@ -9954,6 +10266,10 @@
   "subtitles.singulo.black_hole.formation": {
     "source": "Black hole forms",
     "translation": "黑洞形成"
+  },
+  "subtitles.singulo.black_hole.open": {
+    "source": "Black hole opens",
+    "translation": "黑洞張開"
   },
   "subtitles.singulo.casimir_cavity_running": {
     "source": "C-Cavity vibrates",
@@ -10395,6 +10711,54 @@
     "source": "Inertial stabilizer hums",
     "translation": "慣性穩定器展開力場"
   },
+  "subtitles.singulo.jet_forge.arc": {
+    "source": "Collimators hum",
+    "translation": "聚束環嗡嗡作響"
+  },
+  "subtitles.singulo.jet_forge.beam": {
+    "source": "Beam roars",
+    "translation": "光束轟鳴"
+  },
+  "subtitles.singulo.jet_forge.beam_start": {
+    "source": "Beam strikes",
+    "translation": "光束擊中材料"
+  },
+  "subtitles.singulo.jet_forge.collect": {
+    "source": "Ingot collected",
+    "translation": "成品落入回收口"
+  },
+  "subtitles.singulo.jet_forge.cool": {
+    "source": "Coolant vents",
+    "translation": "冷卻劑噴出"
+  },
+  "subtitles.singulo.jet_forge.finish": {
+    "source": "Forging shockwave",
+    "translation": "鍛造衝擊波"
+  },
+  "subtitles.singulo.jet_forge.focus": {
+    "source": "Collimator engages",
+    "translation": "聚束環接入"
+  },
+  "subtitles.singulo.jet_forge.formed": {
+    "source": "Jet Forge assembles",
+    "translation": "噴流鍛造爐組裝完成"
+  },
+  "subtitles.singulo.jet_forge.jet": {
+    "source": "Jets thunder",
+    "translation": "噴流轟鳴"
+  },
+  "subtitles.singulo.jet_forge.pulse": {
+    "source": "Beam pulses",
+    "translation": "光束脈動"
+  },
+  "subtitles.singulo.jet_forge.spool": {
+    "source": "Jets ignite",
+    "translation": "噴流噴出"
+  },
+  "subtitles.singulo.jet_forge.warning": {
+    "source": "Jet Forge warning",
+    "translation": "鍛造爐啟動警報"
+  },
   "subtitles.singulo.keraunos_tower.charge": {
     "source": "Discharge tower charges",
     "translation": "放電塔充能"
@@ -10694,6 +11058,18 @@
   "summary.singulo.impact_generator_panel": {
     "source": "Stores power from how far you fall and feeds gravity panels. No fall damage.",
     "translation": "依落下高度儲存電力並分給重力面板。不受摔落傷害。"
+  },
+  "summary.singulo.jet_forge_confinement_coil": {
+    "source": "Rings that drive jets out of the black hole.",
+    "translation": "夾住黑洞、從兩極推出噴流的環。"
+  },
+  "summary.singulo.jet_forge_core": {
+    "source": "The Jet Forge controller. Ignite a seed to form its black hole.",
+    "translation": "噴流鍛造爐的控制器。用奇點種子點火形成黑洞。"
+  },
+  "summary.singulo.jet_forge_foundation": {
+    "source": "The facility foundation. Swappable for ports.",
+    "translation": "設施的地基，可換成輸入輸出埠。"
   },
   "summary.singulo.keraunos_tower": {
     "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
@@ -11227,6 +11603,10 @@
     "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Quantum Key",
     "translation": "用於：玻色凝聚態催化劑、相位同步板、量子鎖鑰匙"
   },
+  "uses.singulo.collapsar_billet": {
+    "source": "Used in: Collapsar Ingot",
+    "translation": "用於：塌縮星錠"
+  },
   "uses.singulo.compressed_block_1": {
     "source": "Used in: Compressed Block Lv2, Compressed Block Lv2 (Mixed)",
     "translation": "用於：壓縮塊Lv2、壓縮塊Lv2（混合）"
@@ -11248,8 +11628,8 @@
     "translation": "用於：簡併物質殼、人造星核"
   },
   "uses.singulo.confinement_ring": {
-    "source": "Used in: Empty BH Containment Vessel, Singularity Seed",
-    "translation": "用於：空 BH 安全殼、奇點種子"
+    "source": "Used in: Empty BH Containment Vessel, Singularity Seed, Jet Forge Confinement Coil, Jet Forge Core",
+    "translation": "用於：空 BH 安全殼、奇點種子、噴流鍛造爐約束線圈、噴流鍛造爐控制核"
   },
   "uses.singulo.control_unit": {
     "source": "Used in: Superconducting Coil",
@@ -11364,8 +11744,8 @@
     "translation": "用於：簡併熱爐"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 1 more",
-    "translation": "用於：反應爐外殼、奇點種子、奇點核心、微中子靈敏度模組 Mk3、封印容器（時間鎖） 等 1 個"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 2 more",
+    "translation": "用於：反應爐外殼、奇點種子、奇點核心、微中子靈敏度模組 Mk3、封印容器（時間鎖） 等 2 個"
   },
   "uses.singulo.degenerate_nucleus": {
     "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
@@ -11400,12 +11780,12 @@
     "translation": "用於：終焉之記錄"
   },
   "uses.singulo.empty_coolant_cartridge": {
-    "source": "Used in: Coolant Cartridge",
-    "translation": "用於：冷媒罐"
+    "source": "Used in: Coolant Cartridge, Liquid Helium Cartridge",
+    "translation": "用於：冷媒罐、液態氦冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 21 more",
-    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 21 個"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 23 more",
+    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 23 個"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11416,8 +11796,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 30 more",
-    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 30 個"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 31 more",
+    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 31 個"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11432,8 +11812,8 @@
     "translation": "用於：終焉之記錄"
   },
   "uses.singulo.gravity_field_stabilizer": {
-    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock)",
-    "translation": "用於：爐心控制器、微中子靈敏度模組 Mk3、奇點鎖鑰匙、封印容器（奇點鎖）"
+    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock), Jet Forge Levitator and 1 more",
+    "translation": "用於：爐心控制器、微中子靈敏度模組 Mk3、奇點鎖鑰匙、封印容器（奇點鎖）、噴流鍛造爐懸浮器 等 1 個"
   },
   "uses.singulo.gravity_panel_receiver": {
     "source": "Used in: Impact Generator Panel",
@@ -11448,8 +11828,8 @@
     "translation": "用於：微型黑洞容器、奇點核心、奇點鎖鑰匙、覺醒記錄核、覺醒回聲核 等 6 個"
   },
   "uses.singulo.heat_exchange_core": {
-    "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
-    "translation": "用於：冷卻塔控制器、低溫冷卻塔、冷卻水塔擴充、低溫渦輪機"
+    "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine, Jet Forge Heat Sink and 1 more",
+    "translation": "用於：冷卻塔控制器、低溫冷卻塔、冷卻水塔擴充、低溫渦輪機、噴流鍛造爐吸熱板 等 1 個"
   },
   "uses.singulo.horizon_chapter": {
     "source": "Used in: Terminus Record",
@@ -11464,8 +11844,40 @@
     "translation": "用於：破碎的廢墟玻璃、強化廢墟玻璃"
   },
   "uses.singulo.jet_condensate": {
-    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon",
-    "translation": "用於：人造星核、覺醒渦核、創世爐支柱"
+    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon, Collapsar Billet",
+    "translation": "用於：人造星核、覺醒渦核、創世爐支柱、塌縮星坯料"
+  },
+  "uses.singulo.jet_forge_collector": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_collimator": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_confinement_coil": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_core": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_foundation": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_heat_sink": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_levitator": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
+  },
+  "uses.singulo.jet_forge_truss": {
+    "source": "Used in: Accretion Jet Forge",
+    "translation": "用於：吸積噴流鍛造爐"
   },
   "uses.singulo.lab_frame": {
     "source": "Used in: Power Conduit, Body Capsule",
@@ -11479,9 +11891,13 @@
     "source": "Used in: Monopole Upgrade",
     "translation": "用於：單極子升級模組"
   },
+  "uses.singulo.mass_pellet": {
+    "source": "Used in: Collapsar Ingot",
+    "translation": "用於：塌縮星錠"
+  },
   "uses.singulo.meteoric_iron_ingot": {
-    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 2 more",
-    "translation": "用於：聚焦磁鐵、重力波探測器、卡西米爾腔磁屏蔽、磁瓶、陀螺驅動裝置 等 2 個"
+    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 4 more",
+    "translation": "用於：聚焦磁鐵、重力波探測器、卡西米爾腔磁屏蔽、磁瓶、陀螺驅動裝置 等 4 個"
   },
   "uses.singulo.micro_black_hole": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
@@ -11508,24 +11924,24 @@
     "translation": "用於：鉨錠"
   },
   "uses.singulo.nihonium_frame": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 10 more",
-    "translation": "用於：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、簡併熱爐控制器、自動探測站 等 10 個"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 12 more",
+    "translation": "用於：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、簡併熱爐控制器、自動探測站 等 12 個"
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
     "translation": "用於：鉨板"
   },
   "uses.singulo.nihonium_plate": {
-    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame",
-    "translation": "用於：視界匯流排、陀螺驅動裝置、霍金收集器、噴流收集器、鉨框架"
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 2 more",
+    "translation": "用於：視界匯流排、陀螺驅動裝置、霍金收集器、噴流收集器、鉨框架 等 2 個"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
     "translation": "用於：資料卡（觀測日誌）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 26 more",
-    "translation": "用於：大型背包升級、簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、相位同步板 等 26 個"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 28 more",
+    "translation": "用於：大型背包升級、簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、相位同步板 等 28 個"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11544,8 +11960,8 @@
     "translation": "用於：無瑕廢墟磁磚、無瑕廢墟柱、無瑕廢墟導光板"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 20 more",
-    "translation": "用於：量子熱機、重力波探測器、微中子觀測站、簡併壓縮爐控制器、卡西米爾腔控制器 等 20 個"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
+    "translation": "用於：量子熱機、重力波探測器、微中子觀測站、簡併壓縮爐控制器、卡西米爾腔控制器 等 21 個"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -11556,12 +11972,12 @@
     "translation": "用於：隕鐵錠"
   },
   "uses.singulo.reactor_shell": {
-    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 1 more",
-    "translation": "用於：提取埠、爐心穩定線圈、爐心質量警報器、彭羅斯反應爐、奇點封裝器 等 1 個"
+    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 2 more",
+    "translation": "用於：提取埠、爐心穩定線圈、爐心質量警報器、彭羅斯反應爐、奇點封裝器 等 2 個"
   },
   "uses.singulo.reactor_stabilizer": {
-    "source": "Used in: P-Reactor",
-    "translation": "用於：彭羅斯反應爐"
+    "source": "Used in: P-Reactor, Accretion Jet Forge",
+    "translation": "用於：彭羅斯反應爐、吸積噴流鍛造爐"
   },
   "uses.singulo.record_fragment": {
     "source": "Used in: Decoded Record",
@@ -11632,12 +12048,12 @@
     "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 88 more",
-    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 88 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 91 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 91 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 67 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 67 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 69 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 69 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
@@ -11648,12 +12064,12 @@
     "translation": "用於：熱電發電機、衝擊發電面板、珀耳帖冷卻器"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 10 more",
-    "translation": "用於：奇異物質、陀螺驅動裝置、奇點核心、暈收集器、護盾塔基座 等 10 個"
+    "source": "Used in: Exotic Matter, Gyro Drive, Singularity Core, Halo Collector, Shield Tower Plinth and 13 more",
+    "translation": "用於：奇異物質、陀螺驅動裝置、奇點核心、暈收集器、護盾塔基座 等 13 個"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 8 more",
-    "translation": "用於：SMES 模組、反應爐外殼、爐心控制器、奇點封裝器、護盾塔核心 等 8 個"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 9 more",
+    "translation": "用於：SMES 模組、反應爐外殼、爐心控制器、奇點封裝器、護盾塔核心 等 9 個"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11684,8 +12100,8 @@
     "translation": "用於：蒂普勒圓柱"
   },
   "uses.singulo.topological_wire": {
-    "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Magnetic Confinement Ring, Shield Tower Power Coil and 2 more",
-    "translation": "用於：環形線圈、視界匯流排、陀螺驅動裝置、磁約束環、護盾塔電力線圈 等 2 個"
+    "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Magnetic Confinement Ring, Shield Tower Power Coil and 3 more",
+    "translation": "用於：環形線圈、視界匯流排、陀螺驅動裝置、磁約束環、護盾塔電力線圈 等 3 個"
   },
   "uses.singulo.toroidal_magnetic_coil": {
     "source": "Used in: SMES Module",
@@ -12763,6 +13179,10 @@
     "source": "Collects H-Condensate while the reactor core is light.",
     "translation": "在爐心較輕時收集 H 凝聚體。"
   },
+  "summary.singulo.helium_cartridge": {
+    "source": "Carries 250 mB of liquid helium as an item.",
+    "translation": "以物品形式運送 250 mB 液態氦。"
+  },
   "summary.singulo.gravitational_containment_tank": {
     "source": "The only tank that can hold dark matter.",
     "translation": "唯一能保存暗物質的罐子。"
@@ -12838,6 +13258,14 @@
   "summary.singulo.coffee_maker": {
     "source": "Brews coffee from cocoa beans.",
     "translation": "用可可豆沖煮咖啡。"
+  },
+  "summary.singulo.collapsar_billet": {
+    "source": "Unforged netherite stock for the Jet Forge.",
+    "translation": "在鍛造爐中鍛造前的獄髓坯料。"
+  },
+  "summary.singulo.collapsar_ingot": {
+    "source": "Light-drinking black metal forged in a jet.",
+    "translation": "以黑洞噴流鍛造、吞噬光的黑色金屬錠。"
   },
   "summary.singulo.vending_machine": {
     "source": "A vending machine that sells drinks for emeralds.",

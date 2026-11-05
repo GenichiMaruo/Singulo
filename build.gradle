@@ -200,7 +200,8 @@ tasks.named('runGameTestServer') { dependsOn prepareGameTestEnvironment }
 // Validate exact registered and completed membership; bootstrap success alone proves nothing.
 var verifyGameTestResults = tasks.register('verifyGameTestResults', Exec) {
     group = 'verification'
-    commandLine 'python3', 'tools/check_gametests.py', '--build-dir', layout.buildDirectory.get().asFile.absolutePath,
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python3'), '-X', 'utf8',
+            'tools/check_gametests.py', '--build-dir', layout.buildDirectory.get().asFile.absolutePath,
             '--namespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review,singulo_scaling'),
             '--classes', providers.gradleProperty('testClasses').getOrElse('')
 }

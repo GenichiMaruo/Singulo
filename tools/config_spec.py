@@ -123,6 +123,10 @@ SERVER = [
     ('genesis', 'genesisBaseCost', '1000000000', '1〜（FE）', '質量生成で、質量1あたりの電力（これに 10^希少度 を掛ける）'),
     ('genesis', 'genesisEndingScreen', 'true', 'true / false', '宇宙が生まれたとき、エピローグの画面を出すか'),
 
+    # 降着ジェット鍛造炉
+    ('forge', 'jetForgeIgnitionEnergy', '25000000000', '1〜（FE）', '降着ジェット鍛造炉の点火に注ぐ電力（点火の時間は ignitionWindowSeconds。Pリアクターと同じ）'),
+    ('forge', 'jetForgeMaxInput', '1000000000', '1〜（FE/t）', '降着ジェット鍛造炉が1 tick に受け取る電力の上限（運転に要る電力はレシピで決まる。既定のコラプサー・インゴットは照射中 250 MFE/t）'),
+
     # 道具
     ('gear', 'gauntletRange', '12', '4〜32（ブロック）', '慣性制御ガントレットの射程'),
     ('gear', 'manipulatorRange', '24', '8〜64（ブロック）', 'グラビトン・マニピュレーターの射程'),
@@ -139,6 +143,8 @@ CLIENT = [
     ('render', 'dopplerBeaming', 'true', 'true / false', '降着円盤のドップラー・ビーミング'),
     ('render', 'lensingQuality', '"high"', '"low" / "medium" / "high"', '歪み処理の解像度'),
     ('render', 'formationEffects', 'true', 'true / false', 'マルチブロック形成時の光の演出'),
+    ('render', 'jetForgeFlash', '1.0', '0.0〜1.0', '降着ジェット鍛造炉の仕上げの閃光で、画面を白く光らせる強さ（0で画面の閃光なし。光の柱などの描画はそのまま）'),
+    ('render', 'jetForgeShake', '1.0', '0.0〜1.0', '降着ジェット鍛造炉の照射と仕上げで、近くにいるときに画面を揺らす強さ（0で揺れなし）'),
     ('render', 'androidWorkIcons', 'true', 'true / false', '作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す（測量メガネを掛けているときだけ見える）'),
     ('gui', 'workOrderSort', '"default"', '"default" / "name" / "count" / "mod" / "craftable"',
      'アンドロイド作業指令台の注文タブの並び（default: 指令台の並びのまま / name: 名前順 / count: 在庫の多い順 / mod: mod ごと / craftable: 作れる物を先に）。画面のボタンでも変えられる'),
