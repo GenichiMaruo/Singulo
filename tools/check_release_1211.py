@@ -5,21 +5,28 @@ import re
 import struct
 import tomllib
 import zipfile
-from check_gametests import check
+from check_gametests import check, inventory, DEFAULT_NAMESPACES
 
 # 0.9.0 以降の 1.21.1 は NeoForge 版のみ（Forge 版は 0.8.1 まで）
 COUNTS = {'neoforge': 701}
 
 
-def validate(root, loader, name=None):
+def validate(root, loader, name=None, source=None):
+    # Parse only the verified tag's Java declarations; never execute its Python
+    # validation code. Ordinary local/PR builds retain the current count guard.
+    expected = COUNTS[loader] if source is None else sum(
+        e['namespace'] in DEFAULT_NAMESPACES for e in inventory(source))
+    source = Path(__file__).resolve().parent.parent if source is None else source
+    if expected <= 0:
+        raise RuntimeError('Empty tagged GameTest inventory')
     log = (root / 'gametest/logs/latest.log').read_text()
     counts = re.findall(r'All ([0-9]+) required tests passed', log)
-    if counts != [str(COUNTS[loader])]:
-        raise RuntimeError(f'{loader}: expected {COUNTS[loader]} successful tests, got {counts}')
-    if check(root) != COUNTS[loader]:
+    if counts != [str(expected)]:
+        raise RuntimeError(f'{loader}: expected {expected} successful tests, got {counts}')
+    if check(root, source=source) != expected:
         raise RuntimeError('Source test inventory differs from release count')
     if name is None:
-        properties = dict(line.split('=', 1) for line in (Path(__file__).resolve().parent.parent / 'gradle.properties').read_text().splitlines()
+        properties = dict(line.split('=', 1) for line in (source / 'gradle.properties').read_text().splitlines()
                           if '=' in line and not line.startswith('#'))
         name = f"{properties['mod_name']}-{properties['mod_version']}-1.21.1N.jar"
     path = root / 'libs' / name
@@ -39,12 +46,13 @@ def validate(root, loader, name=None):
         deps = {d['modId']: d for d in meta['dependencies']['singulo']}
         if loader not in deps or deps['minecraft']['versionRange'] != '[1.21.1]':
             raise RuntimeError('Wrong loader or Minecraft dependency')
-    print(f'{loader}: {COUNTS[loader]} tests and Java 21 distribution validated: {path}')
+    print(f'{loader}: {expected} tests and Java 21 distribution validated: {path}')
 
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--loader', choices=tuple(COUNTS), required=True)
     p.add_argument('--build-dir', type=Path, required=True)
+    p.add_argument('--source', type=Path, help='Verified source checkout used for exact test membership')
     a = p.parse_args()
-    validate(a.build_dir, a.loader)
+    validate(a.build_dir, a.loader, source=a.source)

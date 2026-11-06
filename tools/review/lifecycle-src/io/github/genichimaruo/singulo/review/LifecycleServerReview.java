@@ -233,6 +233,9 @@ public final class LifecycleServerReview {
                     cosmic.energyFor(null).receiveLong(Long.MAX_VALUE,false);
                     if(Files.exists(output().resolve("cosmic-A-complete.txt"))&&Files.exists(output().resolve("cosmic-B-complete.txt"))){
                         require(server.getPlayerList().getPlayers().stream().allMatch(p->p.containerMenu instanceof io.github.genichimaruo.singulo.cosmic.CosmicMenu),"Both spindle menus not server-open");
+                        require(cosmic.portMode(0)==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT
+                                &&cosmic.portMode(1)==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT,"Network port button did not update server mode");
+                        evidence.put("spindleTwoClientPortModeSynchronization",true);
                         evidence.put("spindleTwoClientSynchronization",true);evidence.put("complete",true);
                         write("results.json",new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(evidence));
                         Singulo.LOGGER.info("SINGULO_COSMIC_MULTIPLAYER_COMPLETE clients=2 parallelBatch=4 spindleDiskReload=true");

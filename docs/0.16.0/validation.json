@@ -13,7 +13,7 @@
     "complete": true
   },
   "mekanism_gametests": 1,
-  "python_tests": 51,
+  "python_tests": 63,
   "translations_per_language": {
     "en_us": 3458,
     "ja_jp": 3458,
@@ -63,6 +63,7 @@
     "clientAConnections": 2,
     "parallelBatch": 4,
     "spindleActualDiskReload": true,
+    "spindleTwoClientPortModeSynchronization": true,
     "spindleTwoClientSynchronization": true,
     "complete": true
   },
@@ -72,7 +73,9 @@
     "fluid": 7654321,
     "energy": 7123456789012,
     "reserved": 4,
-    "progress": 123
+    "progress": 123,
+    "portModesPersisted": true,
+    "portsRelinkedAfterRestart": true
   },
   "limits": [
     "Same-recipe parallel batches only, up to four.",
@@ -102,7 +105,7 @@
       "completed_output": 4
     }
   },
-  "native_evidence_scope": "The 0.16.0 visual rebuild is covered by the current 701 GameTests, 262 existing GUI captures, 35 cosmic GUI cases and 18 world states in vanilla and Sodium/DH. Earlier two-client and dedicated-server restart evidence predates the visual rebuild.",
+  "native_evidence_scope": "Current 0.16.0 visual rebuild: 701 GameTests, 262 existing GUI captures, 35 cosmic GUI cases, 18 standard and Sodium/DH world states, real loopback two-client synchronization, reconnect, chunk disk reload, network port-mode changes and an ordinary three-device server restart. Native two-client dimension transit remains untested; ServerPlayer GameTests cover it.",
   "visual_review": {
     "reviewed_head": "8d3eccd248e2fb7cea44848fb2e30e7adc9dc4ab",
     "findings_fixed": [
@@ -120,11 +123,29 @@
     "sodium_dh_world_states": 18,
     "gpu": "NVIDIA GeForce RTX 4070 SUPER",
     "generator_reproducible": true,
-    "native_multiplayer_rerun": false,
+    "native_multiplayer_rerun": true,
     "remote_ci": {
       "initial_run": 42179782810,
       "status": "blocked_before_start",
       "reason": "The job was not started because your account is locked due to a billing issue."
     }
+  },
+  "merge_preparation": {
+    "product_source_commit": "53baef95442540efa5cb2fb8b93a14414cd638ba",
+    "native_client_ports_rendered_after_synchronization": true,
+    "ordinary_restart_port_modes_and_links": true,
+    "workflow_actionlint": "1.7.12",
+    "workflow_bash_blocks_syntax_checked": 14,
+    "python_tests": 63,
+    "old_0151_artifact_tests_accepted_from_its_source": 662,
+    "remote_ci_retry": {
+      "run": 42182540523,
+      "attempt": 2,
+      "jobs_started": 0,
+      "reason": "The job was not started because your account is locked due to a billing issue."
+    },
+    "github_required_status_checks_configured": false,
+    "repository_protection_settings_changed": false,
+    "publication_executed": false
   }
 }

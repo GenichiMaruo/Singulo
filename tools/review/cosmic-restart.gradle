@@ -4,7 +4,7 @@ allprojects {
         sourceSets.main.java.srcDir(file('tools/review/cosmic-restart-src'))
         neoForge.runs.server {
             gameDirectory = file('build/cosmic-restart')
-            systemProperty 'singulo.cosmicRestartOutput', file('../handoff/0160-restart').absolutePath
+            systemProperty 'singulo.cosmicRestartOutput', file(providers.gradleProperty('cosmicRestartOutput').getOrElse('../handoff/0160-restart')).absolutePath
         }
     }
 }

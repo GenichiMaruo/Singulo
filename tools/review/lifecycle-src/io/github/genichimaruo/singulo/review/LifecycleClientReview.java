@@ -24,6 +24,10 @@ public final class LifecycleClientReview {
     private static int ticks,phase,wait,before=-1,visits,menuTicks;
     private static boolean sawA,sawALeave;
     private static int cosmicBefore=-1;
+    private static boolean portRequested;
+    private static long renderedFrames,cosmicShown=-1;
+    @SubscribeEvent
+    public static void rendered(net.neoforged.neoforge.client.event.RenderFrameEvent.Post event){renderedFrames++;}
     @SubscribeEvent
     public static void tick(ClientTickEvent.Post event) throws Exception {
         String role=System.getProperty("singulo.lifecycleRole");if(role==null)return;
@@ -46,8 +50,15 @@ public final class LifecycleClientReview {
             if(cosmicBefore<0){cosmicBefore=menu.value(8);return;}
             if(menu.value(8)<cosmicBefore+8)return;
             if(menu.value(0)!=2||menu.value(10)!=1||menu.slots.size()!=40)throw new AssertionError("Spindle menu layout/data mismatch");
+            if(role.equals("A")&&!portRequested){
+                portRequested=true;mc.gameMode.handleInventoryButtonClick(menu.containerId,0);
+            }
+            if(menu.value(12)!=io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT
+                    ||menu.value(13)!=io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT)return;
+            if(cosmicShown<0){cosmicShown=renderedFrames;return;}
+            if(renderedFrames-cosmicShown<2)return;
             if(!Files.exists(output.resolve("cosmic-"+role+"-complete.txt"))){
-                Files.writeString(output.resolve("cosmic-"+role+"-complete.txt"),"real network menu: 40 slots, core and progress synchronized");
+                Files.writeString(output.resolve("cosmic-"+role+"-complete.txt"),"real network menu: 40 slots, core, progress and both port modes synchronized after A's menu button packet");
                 try(var png=Screenshot.takeScreenshot(mc.getMainRenderTarget())){png.writeToFile(output.resolve("cosmic-client-"+role+".png"));}
             }
             return;
