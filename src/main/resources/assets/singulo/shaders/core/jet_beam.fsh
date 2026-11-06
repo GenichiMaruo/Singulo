@@ -7,9 +7,6 @@
 // 頂点の色の a は明るさ。
 uniform vec4 ColorModulator;
 uniform float GameTime;
-// 0 より大きければ深度だけを書く描き方で、光がこの強さに届かない画素を捨てる（GlowDepth）。
-// 光っている所に深度を入れて、あとから描かれるガラスや水が手前に割り込まないようにする
-uniform float DepthCut;
 
 in vec4 vertexColor;
 in vec2 texCoord0;
@@ -85,7 +82,4 @@ void main() {
     }
     vec4 c = vertexColor * ColorModulator;
     fragColor = vec4(c.rgb * tint, clamp(a * c.a, 0.0, 1.0));
-    if (DepthCut > 0.0 && fragColor.a < DepthCut) {
-        discard;
-    }
 }

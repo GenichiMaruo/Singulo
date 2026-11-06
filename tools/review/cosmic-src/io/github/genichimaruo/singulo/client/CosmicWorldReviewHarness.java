@@ -148,6 +148,10 @@ public final class CosmicWorldReviewHarness {
             var state=y<=1?net.minecraft.world.level.block.Blocks.WATER.defaultBlockState():net.minecraft.world.level.block.Blocks.BLUE_STAINED_GLASS.defaultBlockState();
             BlockPos wall=BlockPos.containing(target.x+x,target.y+y-4,target.z-20);if(level.isEmptyBlock(wall))level.setBlock(wall,state,2|16);
         }
-player.teleportTo(level,(c.getX()+target.x)/2+1,target.y+1,target.z+9,180,4);
+// ジェットの奥のブラックホール（ジェットの下に見えること）
+        BlockPos far=BlockPos.containing((2*c.getX()+target.x)/3+6,target.y,target.z-14);
+        level.setBlockAndUpdate(far,io.github.genichimaruo.singulo.registry.SinguloBlocks.ROGUE_BLACK_HOLE.get().defaultBlockState());
+        var rogue=(io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity)level.getBlockEntity(far);rogue.setStable(true);rogue.setCore(5000,0.8);
+        player.teleportTo(level,(2*c.getX()+target.x)/3+1,target.y+1,target.z+9,180,4);
     }
 }

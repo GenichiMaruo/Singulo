@@ -1,5 +1,9 @@
 package io.github.genichimaruo.singulo.client;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -7,13 +11,19 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import io.github.genichimaruo.singulo.Singulo;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.joml.Matrix4fStack;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 /**
  * ワールドの光（entityTranslucentEmissive の白い絵）の描き方を2つ直す。どちらもブロックエンティティをすべて描き終えた時点にまとめて描く。
@@ -23,6 +33,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
  *   <li>深度も書く: 光は深度を書かないので、あとから描かれる水・窓・雲が光の手前に割り込む。光と同じ形を、明るい所（不透明度 0.6 以上）
  *       だけ深度に書く。ぼんやりした光の縁は書かないので、後ろの景色は隠さない</li>
  * </ul>
+ * 鍛造炉のジェットとビームだけは、ワールドを描き終えたあとで足す（{@link #additive}）。
  * シェーダーパック使用時は深度の扱いが違うので何もしない。
  */
 final class GlowDepth extends RenderType {
@@ -49,45 +60,79 @@ final class GlowDepth extends RenderType {
 
     private static final MultiBufferSource.BufferSource SOURCE = MultiBufferSource.immediate(new ByteBufferBuilder(1 << 18));
     private static final MultiBufferSource.BufferSource COLOR_SOURCE = MultiBufferSource.immediate(new ByteBufferBuilder(1 << 20));
-    @Nullable
-    private static ShaderInstance colorShader;
-    /** ジェットの加算の光は薄い所まで光って見えるので、白い光（0.6）より低い所まで深度に書く。 */
-    private static final float JET_ALPHA_CUT = 0.2F;
-
-    private static RenderType depthType(String name, VertexFormat format, java.util.function.Supplier<ShaderInstance> program) {
-        return create(name, format, VertexFormat.Mode.QUADS, 1536, false, false, CompositeState.builder()
-                .setShaderState(new ShaderStateShard(program))
-                .setWriteMaskState(DEPTH_WRITE)
-                .setCullState(NO_CULL)
-                .createCompositeState(false));
-    }
-
-    private static final RenderType JET_DEPTH = depthType("singulo_jet_glow_depth", DefaultVertexFormat.POSITION_COLOR, () -> colorShader);
-
-    /** 鍛造炉のジェットとビーム（加算の光）。種類ごとに入れ物を分けて、描く順に関係なく最後にまとめて描く。 */
+    /** 鍛造炉のジェットとビーム（加算の光）。種類ごとに入れ物を分けて、水や雲まで描き終えてからまとめて描く。 */
     private static final MultiBufferSource.BufferSource JET_SOURCE = jetSource();
+    /** このフレームに描くジェットがあるか。 */
+    private static boolean jetsPending;
+    /** 固体と白い光だけの奥行き（ジェットはこれと比べる）と、ジェットを描く間に取っておく今の奥行き。 */
+    @Nullable
+    private static TextureTarget solidDepth;
+    @Nullable
+    private static TextureTarget laterDepth;
 
     private static MultiBufferSource.BufferSource jetSource() {
         java.util.SequencedMap<RenderType, ByteBufferBuilder> buffers = new java.util.LinkedHashMap<>();
         buffers.put(JetForgeRenderTypes.GLOW, new ByteBufferBuilder(1 << 20));
         buffers.put(JetForgeRenderTypes.BEAM_TYPE, new ByteBufferBuilder(1 << 20));
-        buffers.put(JET_DEPTH, new ByteBufferBuilder(1 << 18));
-        buffers.put(JetForgeRenderTypes.BEAM_DEPTH, new ByteBufferBuilder(1 << 18));
         return MultiBufferSource.immediateWithBuffers(buffers, new ByteBufferBuilder(1 << 10));
     }
 
     /**
-     * 鍛造炉のジェットとビームの入れ物。固体と白い光のあとに描き、明るい所は深度にも書く。
-     * 加算の光なので、ほかの光との前後はほとんど見た目に出ない（並べ替えなくてよい）。
+     * 鍛造炉のジェットとビームの入れ物。ワールドを描き終えたあと、固体だけの奥行きと比べて足す。重力レンズとの順は
+     * {@link GravitationalLensing} が決める（奥のレンズ → ジェット → 手前のレンズ）。
+     * 深度は書かない（書くと重力レンズがジェットを手前の物と見て、歪みが切れる）。
+     * 加算の光なので、半透明の物やほかの光との前後はほとんど見た目に出ない。
      */
     static MultiBufferSource additive(MultiBufferSource buffers) {
         return type -> {
-            if (!active || shader == null || colorShader == null || !JetForgeRenderTypes.beamDepthReady() || GravitationalLensing.shaderPackInUse()) {
+            if (!active || GravitationalLensing.shaderPackInUse()
+                    || type != JetForgeRenderTypes.GLOW && type != JetForgeRenderTypes.BEAM_TYPE) {
                 return buffers.getBuffer(type);
             }
-            RenderType depth = type == JetForgeRenderTypes.GLOW ? JET_DEPTH : type == JetForgeRenderTypes.BEAM_TYPE ? JetForgeRenderTypes.BEAM_DEPTH : null;
-            return depth == null ? buffers.getBuffer(type) : VertexMultiConsumer.create(JET_SOURCE.getBuffer(depth), JET_SOURCE.getBuffer(type));
+            jetsPending = true;
+            return JET_SOURCE.getBuffer(type);
         };
+    }
+
+    /** ジェットの通り道: 出している炉心と両端。 */
+    private record JetPath(Vec3 core, Vec3 from, Vec3 to) {}
+
+    private static final List<JetPath> JET_PATHS = new ArrayList<>();
+    /** ジェットの太さのめやす（ブロック）。これより離れて見える所は重ならない。 */
+    private static final double JET_REACH = 3;
+
+    /** このフレームのジェットの通り道を覚える（レンズとの前後を決めるのに使う）。 */
+    static void jetPath(Vec3 core, Vec3 from, Vec3 to) {
+        if (active && !GravitationalLensing.shaderPackInUse()) {
+            JET_PATHS.add(new JetPath(core, from, to));
+        }
+    }
+
+    /**
+     * pos にあるレンズが、カメラから見てジェットの奥にあるか。半径 region のレンズと画面で重なる所のジェットが、レンズより手前なら奥。
+     * ジェットを出している本人のレンズは奥に数えない（ジェットごと歪めて見せる）。
+     */
+    static boolean behindJet(Vec3 camera, Vec3 pos, float region) {
+        Vec3 toLens = pos.subtract(camera);
+        double distance = toLens.length();
+        if (distance < 1.0E-3) {
+            return false;
+        }
+        Vec3 view = toLens.scale(1 / distance);
+        double reach = (region + JET_REACH) / distance;
+        for (JetPath jet : JET_PATHS) {
+            if (jet.core.distanceToSqr(pos) < 1) {
+                continue;
+            }
+            for (int i = 0; i <= 32; i++) {
+                Vec3 toPoint = jet.from.lerp(jet.to, i / 32.0).subtract(camera);
+                double along = toPoint.dot(view);
+                if (along > 0.5 && along < distance && toPoint.subtract(view.scale(along)).length() / along <= reach) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** ワールドの中で光を描いている間だけ true（手に持った物や画面の絵は対象にしない）。 */
@@ -110,12 +155,6 @@ final class GlowDepth extends RenderType {
         try {
             event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("glow_depth"), DefaultVertexFormat.NEW_ENTITY),
                     s -> shader = s);
-            // ジェットの光の頂点の形の分（同じシェーダー）
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("glow_depth_color"), DefaultVertexFormat.POSITION_COLOR),
-                    s -> {
-                        colorShader = s;
-                        s.safeGetUniform("AlphaCut").set(JET_ALPHA_CUT);
-                    });
         } catch (IOException e) {
             // 読めなければ深度を書かない（これまでどおりの見た目）で続ける
             Singulo.LOGGER.error("光の深度のシェーダーを読めなかった", e);
@@ -127,11 +166,65 @@ final class GlowDepth extends RenderType {
             active = true;
         } else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
             active = false;
-            // 固体をすべて描いてから、光を奥から順に描き、ジェットを足して、最後に深度を書く
+            // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
             net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
             COLOR_SOURCE.endBatch();
-            JET_SOURCE.endBatch();
             SOURCE.endBatch();
+            if (jetsPending) {
+                RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
+                solidDepth = sized(solidDepth, main);
+                copyDepth(main, solidDepth);
+                main.bindWrite(false);
+            }
         }
+    }
+
+    /** 奥行きを固体だけに戻してジェットを足し、元へ戻す（重力レンズはジェットのない奥行きを読む）。このフレームのジェットがなければ何もしない。 */
+    static void drawJets(RenderLevelStageEvent event) {
+        JET_PATHS.clear();
+        if (!jetsPending) {
+            return;
+        }
+        jetsPending = false;
+        RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
+        if (solidDepth == null) {
+            JET_SOURCE.endBatch();
+            return;
+        }
+        laterDepth = sized(laterDepth, main);
+        copyDepth(main, laterDepth);
+        copyDepth(solidDepth, main);
+        main.bindWrite(false);
+        Matrix4fStack modelView = RenderSystem.getModelViewStack();
+        modelView.pushMatrix();
+        modelView.set(event.getModelViewMatrix());
+        RenderSystem.applyModelViewMatrix();
+        JET_SOURCE.endBatch();
+        modelView.popMatrix();
+        RenderSystem.applyModelViewMatrix();
+        copyDepth(laterDepth, main);
+        main.bindWrite(false);
+    }
+
+    /** main と同じ大きさ・形式の深度の置き場。 */
+    private static TextureTarget sized(@Nullable TextureTarget target, RenderTarget main) {
+        if (target != null && target.width == main.width && target.height == main.height
+                && target.isStencilEnabled() == main.isStencilEnabled()) {
+            return target;
+        }
+        if (target != null) {
+            target.destroyBuffers();
+        }
+        TextureTarget created = new TextureTarget(main.width, main.height, true, net.minecraft.client.Minecraft.ON_OSX);
+        if (main.isStencilEnabled()) {
+            created.enableStencil();
+        }
+        return created;
+    }
+
+    private static void copyDepth(RenderTarget from, RenderTarget to) {
+        GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, from.frameBufferId);
+        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, to.frameBufferId);
+        GlStateManager._glBlitFrameBuffer(0, 0, from.width, from.height, 0, 0, to.width, to.height, GL11.GL_DEPTH_BUFFER_BIT, GL11.GL_NEAREST);
     }
 }

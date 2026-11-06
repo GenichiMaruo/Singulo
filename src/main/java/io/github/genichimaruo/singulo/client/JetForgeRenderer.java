@@ -100,6 +100,10 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         Frame f = new Frame(pose.last(), core, axis, new Vec3(0, 1, 0), cam, time, dist, dist > 96);
         // 2種類の光と素材のアイテムを交互に描くので、頂点ごとに描き込み先を引き直す（共有の描き込み先は、別の描き方を引くと閉じられる）
         // ジェットの光は、固体とほかの光を描いたあとでまとめて描く（奥の物が手前に重ならないように）
+        if (tl.active()) {
+            GlowDepth.jetPath(coreW, coreW.subtract(axis.scale(JetForgeLayout.CORE_X)),
+                    coreW.add(axis.scale(JetForgeLayout.W - JetForgeLayout.CORE_X)));
+        }
         MultiBufferSource jets = GlowDepth.additive(buffers);
         VertexConsumer glow = new Lazy(jets, JetForgeRenderTypes.GLOW);
         RenderType beamType = JetForgeRenderTypes.beam();

@@ -11,15 +11,14 @@ import net.minecraft.world.phys.Vec3;
 final class CosmicGeometryReviewHarness {
     static java.util.List<net.minecraft.client.renderer.ShaderInstance> shaders() throws Exception {
         var shaders=new ArrayList<net.minecraft.client.renderer.ShaderInstance>();
-        for(var entry:java.util.List.of(new Object[]{GlowDepth.class,"shader"},new Object[]{GlowDepth.class,"colorShader"},
-                new Object[]{JetForgeRenderTypes.class,"beamShader"},new Object[]{JetForgeRenderTypes.class,"beamDepthShader"})){
+        for(var entry:java.util.List.of(new Object[]{GlowDepth.class,"shader"},new Object[]{JetForgeRenderTypes.class,"beamShader"})){
             var field=((Class<?>)entry[0]).getDeclaredField((String)entry[1]);field.setAccessible(true);
             var shader=(net.minecraft.client.renderer.ShaderInstance)field.get(null);
             if(shader==null||net.minecraft.client.Minecraft.getInstance().gameRenderer.getShader(shader.getName())!=shader)
                 throw new IllegalStateException("Shader is missing or overwritten: "+entry[1]);
             shaders.add(shader);
         }
-        if(shaders.stream().map(net.minecraft.client.renderer.ShaderInstance::getName).distinct().count()!=4)
+        if(shaders.stream().map(net.minecraft.client.renderer.ShaderInstance::getName).distinct().count()!=2)
             throw new IllegalStateException("Duplicate cosmic shader registry names");
         return shaders;
     }
@@ -30,7 +29,7 @@ final class CosmicGeometryReviewHarness {
             if(current.contains(old)||org.lwjgl.opengl.GL20.glIsProgram(old.getId()))
                 throw new IllegalStateException("Cosmic shader program survived resource reload: "+old.getName());
         }
-        Singulo.LOGGER.info("SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 4 replaced and released programs");
+        Singulo.LOGGER.info("SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs");
     }
 
     static void verify() throws Exception {

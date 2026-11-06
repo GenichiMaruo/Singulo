@@ -20,10 +20,6 @@ import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 final class JetForgeRenderTypes extends RenderType {
     @Nullable
     private static ShaderInstance beamShader;
-    @Nullable
-    private static ShaderInstance beamDepthShader;
-    /** ビームの光がこれより強い画素に深度を書く。これより弱い光の後ろの景色は隠さない。 */
-    private static final float BEAM_DEPTH_CUT = 0.12F;
 
     static final RenderType GLOW = create("singulo_jet_forge_glow", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS,
             4096, false, false, CompositeState.builder()
@@ -41,14 +37,6 @@ final class JetForgeRenderTypes extends RenderType {
                     .setCullState(NO_CULL)
                     .createCompositeState(false));
 
-    /** ビームの深度だけを書く描き方。ビームと同じシェーダーで、光っている画素だけ書く。 */
-    static final RenderType BEAM_DEPTH = create("singulo_jet_beam_depth", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS,
-            4096, false, false, CompositeState.builder()
-                    .setShaderState(new ShaderStateShard(() -> beamDepthShader))
-                    .setWriteMaskState(DEPTH_WRITE)
-                    .setCullState(NO_CULL)
-                    .createCompositeState(false));
-
     private JetForgeRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int size, boolean crumbling, boolean sort,
                                 Runnable setup, Runnable clear) {
         super(name, format, mode, size, crumbling, sort, setup, clear);
@@ -60,19 +48,10 @@ final class JetForgeRenderTypes extends RenderType {
         return beamShader == null || GravitationalLensing.shaderPackInUse() ? null : BEAM_TYPE;
     }
 
-    static boolean beamDepthReady() {
-        return beamDepthShader != null;
-    }
-
     static void registerShaders(RegisterShadersEvent event) {
         try {
             event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("jet_beam"),
                     DefaultVertexFormat.POSITION_TEX_COLOR), s -> beamShader = s);
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("jet_beam_depth"),
-                    DefaultVertexFormat.POSITION_TEX_COLOR), s -> {
-                beamDepthShader = s;
-                s.safeGetUniform("DepthCut").set(BEAM_DEPTH_CUT);
-            });
         } catch (IOException e) {
             Singulo.LOGGER.error("降着ジェット鍛造炉のビームのシェーダーを読めなかった", e);
         }

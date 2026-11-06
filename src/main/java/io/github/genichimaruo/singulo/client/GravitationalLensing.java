@@ -259,9 +259,19 @@ public final class GravitationalLensing {
                     pending = new Pending(List.copyOf(SOURCES), event.getCamera().getPosition(), new Matrix4f(event.getProjectionMatrix()),
                             new Quaternionf(event.getCamera().rotation()));
                 } else {
-                    apply(event.getCamera().getPosition(), event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）
+                    Vec3 cam = event.getCamera().getPosition();
+                    List<Source> front = new ArrayList<>();
+                    SOURCES.removeIf(s -> !GlowDepth.behindJet(cam, s.pos, s.region) && front.add(s));
+                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    GlowDepth.drawJets(event);
+                    SOURCES.clear();
+                    SOURCES.addAll(front);
+                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
                 }
             }
+            // レンズがないフレームや、レンズを切っているときのジェット
+            GlowDepth.drawJets(event);
         } finally {
             SOURCES.clear();
         }
