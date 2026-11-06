@@ -20,7 +20,7 @@ class LocalReleaseTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         self.jar = b'original-tested-jar-bytes'
-        self.plan = {'schema': 1, 'project_id': release.PROJECT,
+        self.plan = {'schema': 1, 'project_id': release.PROJECT, 'upload_protocol_ready': True,
             'inputs': {'tag': 'v0.15.1', 'run': 12, 'source': str(self.root / 'source'),
                        'validator_repo': str(self.root / 'repo'), 'archive_cache': str(self.root / 'cache'), 'channel': 'auto'},
             'target': release.target('v0.15.1'), 'provenance': {'commit': 'a' * 40},
@@ -39,8 +39,15 @@ class LocalReleaseTests(unittest.TestCase):
         self.cf.request.side_effect = lambda path, *args: {'id': 77} if args else []
         self.factory = Mock(return_value=self.cf)
         self.token = Mock(return_value='fake-test-credential')
-        self.gh = Mock(side_effect=lambda endpoint, payload=None, **kw:
-            None if payload is None else {'id': 41, 'draft': True, 'tag_name': 'v0.15.1', 'assets': []})
+        def github(endpoint, payload=None, **kwargs):
+            if endpoint.startswith('actions/workflows/'):
+                return {'workflow_runs': []}
+            if endpoint.startswith('releases?'):
+                return []
+            if endpoint == 'git/refs':
+                return {'ref': payload['ref'], 'object': {'type': 'commit', 'sha': payload['sha']}}
+            return {'id': 41, 'draft': True, 'tag_name': 'v0.15.1', 'assets': []}
+        self.gh = Mock(side_effect=github)
         self.catalog = patch.object(release, 'metadata_for', side_effect=lambda cf, p: dict(p['payload'], gameVersions=[1, 2, 3, 4, 5]))
         self.catalog.start()
         self.addCleanup(self.catalog.stop)
@@ -73,7 +80,35 @@ class LocalReleaseTests(unittest.TestCase):
         self.assertEqual(result['file_id'], 77)
         self.cf.request.assert_called_once()
         self.assertNotIn('fake-test-credential', self.receipt.read_text())
-        self.assertEqual(len([c for c in self.gh.call_args_list if len(c.args) > 1]), 1)
+        self.assertEqual([c.args[0] for c in self.gh.call_args_list if len(c.args) > 1], ['git/refs', 'releases'])
+
+    def test_faithful_draft_visibility_by_id_allows_one_upload(self):
+        self.remote_check_patch.stop()  # Exercise the real final remote check.
+        self.plan['provenance']['run_attempt'] = 1
+        lock_ref = release.guard.ref_name('v0.15.1')
+        draft = {'id': 41, 'draft': True, 'tag_name': 'v0.15.1', 'assets': []}
+        def api(endpoint, payload=None, **kwargs):
+            if endpoint.startswith('actions/workflows/'):
+                return {'workflow_runs': []}
+            if endpoint.startswith('releases?'):
+                return []
+            if endpoint == 'git/refs':
+                return {'ref': lock_ref, 'object': {'type': 'commit', 'sha': 'a' * 40}}
+            if endpoint == 'releases' or endpoint == 'releases/41':
+                return draft
+            if endpoint == 'git/ref/tags/v0.15.1':
+                return {'object': {'type': 'commit', 'sha': 'a' * 40}}
+            if endpoint == 'git/ref/heads/1.21.1':
+                return {'object': {'type': 'commit', 'sha': 'b' * 40}}
+            if endpoint == 'actions/runs/12':
+                return {'status': 'completed', 'conclusion': 'success', 'run_attempt': 1}
+            if endpoint == 'git/ref/' + lock_ref.removeprefix('refs/'):
+                return {'ref': lock_ref, 'object': {'type': 'commit', 'sha': 'a' * 40}}
+            raise AssertionError('Draft by-tag lookup is 404 and must never be used: ' + endpoint)
+        self.gh.side_effect = api
+        result = self.upload()
+        self.assertEqual(result['status'], 'submitted_awaiting_moderation')
+        self.cf.request.assert_called_once()
 
     def test_each_transport_failure_or_interruption_remains_uncertain_and_cannot_resend(self):
         for error in (TimeoutError(), ConnectionResetError(), KeyboardInterrupt(),
@@ -101,41 +136,56 @@ class LocalReleaseTests(unittest.TestCase):
                 self.assertEqual(json.loads((self.state / 'v0.15.1.json').read_text())['status'], 'upload_started_outcome_uncertain')
 
     def test_shared_existing_reservation_blocks_even_with_no_local_receipt(self):
-        self.gh.return_value = {'id': 45, 'draft': True}
-        self.gh.side_effect = None
+        self.gh.side_effect = lambda endpoint, **kw: ({'workflow_runs': []} if endpoint.startswith('actions/workflows/')
+            else [{'id': 45, 'draft': True, 'tag_name': 'v0.15.1'}])
         with self.assertRaisesRegex(release.Stop, 'Shared release reservation'):
             self.upload()
         self.token.assert_not_called()
         self.cf.request.assert_not_called()
 
+    def test_legacy_actions_protocol_blocks_before_any_remote_write_or_token(self):
+        self.plan['upload_protocol_ready'] = False
+        with self.assertRaisesRegex(release.Stop, 'has not adopted'):
+            self.upload()
+        self.gh.assert_not_called()
+        self.token.assert_not_called()
+
     def test_remote_create_conflict_or_uncertainty_never_posts_to_cf(self):
         def request(endpoint, payload=None, **kwargs):
+            if endpoint.startswith('actions/workflows/'):
+                return {'workflow_runs': []}
             if payload:
                 raise release.Stop('Conflict or disconnected reservation response')
-            return None
+            return []
         self.gh.side_effect = request
         with self.assertRaises(release.Stop):
             self.upload()
-        self.assertEqual(json.loads(self.receipt.read_text())['status'], 'reservation_intent')
+        self.assertEqual(json.loads(self.receipt.read_text())['status'], 'atomic_lock_intent')
         self.cf.request.assert_not_called()
 
     def test_cross_machine_race_loser_cannot_upload(self):
-        # Both machines can observe 404. GitHub's atomic unique-tag reservation
-        # allows only one create, independently of their local lock directories.
+        # Drafts are NOT unique. Only create-only Git refs are the mutex.
         created = []
+        drafts = []
         def github(endpoint, payload=None, **kwargs):
+            if endpoint.startswith('actions/workflows/'):
+                return {'workflow_runs': []}
             if payload is None:
-                return None
-            if created:
-                raise release.Stop('GitHub 422 duplicate reservation')
-            created.append(payload)
-            return {'id': 41, 'draft': True, 'tag_name': 'v0.15.1', 'assets': []}
+                return []  # Both machines can observe the same pre-create list.
+            if endpoint == 'git/refs':
+                if created:
+                    raise release.Stop('GitHub 422 reference already exists')
+                created.append(payload)
+                return {'ref': payload['ref'], 'object': {'type': 'commit', 'sha': payload['sha']}}
+            drafts.append(payload)  # GitHub would permit multiple drafts.
+            return {'id': 40 + len(drafts), 'draft': True, 'tag_name': 'v0.15.1', 'assets': []}
         self.gh.side_effect = github
         self.upload()
         self.state = self.root / 'other-machine'
         with self.assertRaises(release.Stop):
             self.upload()
         self.cf.request.assert_called_once()
+        self.assertEqual(len(drafts), 1)
 
     def test_failed_intent_persistence_never_posts(self):
         original = release.save
@@ -365,14 +415,16 @@ class TransportTests(unittest.TestCase):
         data = {'git/ref/tags/v0.15.1': {'object': {'type': 'commit', 'sha': 'a' * 40}},
                 'git/ref/heads/1.21.1': {'object': {'type': 'commit', 'sha': 'b' * 40}},
                 'actions/runs/12': {'status': 'completed', 'conclusion': 'success', 'run_attempt': 1},
-                'releases/tags/v0.15.1': {'id': 41, 'draft': True, 'tag_name': 'v0.15.1', 'assets': []}}
+                'releases/41': {'id': 41, 'draft': True, 'tag_name': 'v0.15.1', 'assets': []},
+                'git/ref/tags/singulo-cf-upload-lock-v1/v0.15.1': {
+                    'ref': release.guard.ref_name('v0.15.1'), 'object': {'type': 'commit', 'sha': 'a' * 40}}}
         with patch.object(release, 'gh', side_effect=lambda endpoint: data[endpoint]):
             release.check_remote_plan(plan, 41)
             for section, key, value in [('git/ref/tags/v0.15.1', 'object', {'type': 'commit', 'sha': 'c' * 40}),
                     ('git/ref/heads/1.21.1', 'object', {'type': 'commit', 'sha': 'c' * 40}),
                     ('actions/runs/12', 'run_attempt', 2), ('actions/runs/12', 'conclusion', 'failure'),
-                    ('releases/tags/v0.15.1', 'id', 99), ('releases/tags/v0.15.1', 'assets', [{'id': 2}]),
-                    ('releases/tags/v0.15.1', 'draft', False)]:
+                    ('releases/41', 'id', 99), ('releases/41', 'assets', [{'id': 2}]),
+                    ('releases/41', 'draft', False)]:
                 original = data[section][key]
                 data[section][key] = value
                 with self.subTest(section=section, key=key), self.assertRaises(release.Stop):

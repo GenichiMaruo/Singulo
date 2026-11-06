@@ -1,4 +1,4 @@
-"""Singulo local CF release: verified CI bytes, shared reservation, one POST.
+"""Singulo local CF release: verified CI bytes, permanent Git-ref lock, one POST.
 
 prepare is read-only remotely. upload requires a fresh human all-status inventory,
 interactive authorization and an in-memory token. Never retries or clears guards.
@@ -22,6 +22,7 @@ import urllib.request
 import uuid
 import warnings
 import zipfile
+import curseforge_guard as guard
 
 REPO = 'GenichiMaruo/Singulo'
 PROJECT = 1734662
@@ -211,6 +212,7 @@ def prepare(inputs, bundle):
                'releaseType': spec['channel'], 'isMarkedForManualRelease': False,
                'relations': {'projects': [{'slug': slug, 'type': 'optionalDependency'} for slug in ('jei', 'mekanism')]}}
     plan = {'schema': 1, 'project_id': PROJECT, 'inputs': inputs, 'target': spec,
+            'upload_protocol_ready': guard.workflow_ready(snapshot),
             'validator_commit': maintained, 'provenance': proof, 'payload': payload,
             'jar_sha256': digest(jar), 'jar_size': len(jar)}
     (bundle / 'validation.log').write_bytes(log)
@@ -356,13 +358,14 @@ def check_remote_plan(plan, reservation_id):
         ref = gh('git/tags/' + ref['sha'])['object']
     run = gh(f"actions/runs/{plan['inputs']['run']}")
     branch = gh('git/ref/heads/' + plan['target']['minecraft'])['object']
-    reservation = gh('releases/tags/' + tag)
+    try:
+        guard.check_owned(gh, tag, proof['commit'], reservation_id)
+    except guard.GuardError:
+        raise Stop('Owned release or permanent lock changed; stop') from None
     if (ref['type'] != 'commit' or ref['sha'] != proof['commit']
             or branch['sha'] != plan['validator_commit']
             or run['status'] != 'completed' or run['conclusion'] != 'success'
-            or run['run_attempt'] != proof['run_attempt']
-            or reservation.get('id') != reservation_id or reservation.get('draft') is not True
-            or reservation.get('tag_name') != tag or reservation.get('assets') != []):
+            or run['run_attempt'] != proof['run_attempt']):
         raise Stop('Tag, CI, maintained validator or shared reservation changed; stop')
 
 
@@ -371,6 +374,8 @@ def upload_verified(plan, jar, inventory, state_dir, confirm, token_prompt, cf_f
     tag, filename = plan['inputs']['tag'], plan['target']['filename']
     if (plan.get('project_id') != PROJECT or validate_inputs(plan['inputs']) != plan['target']):
         raise Stop('Inconsistent publication target')
+    if plan.get('upload_protocol_ready') is not True:
+        raise Stop('Upload disabled: maintained Actions has not adopted the reviewed atomic-lock protocol')
     if digest(jar) != plan['jar_sha256'] or len(jar) != plan['jar_size']:
         raise Stop('Bytes to send differ from promoted CI bytes')
     with lock(state_dir):
@@ -378,7 +383,12 @@ def upload_verified(plan, jar, inventory, state_dir, confirm, token_prompt, cf_f
         if receipt_path.exists():
             raise Stop('Receipt already exists; reconcile it, never automatically resend')
         read_inventory(inventory, filename, plan['jar_sha256'])
-        if gh('releases/tags/' + tag, missing=True) is not None:
+        try:
+            guard.no_active_publishers(gh)
+            existing = guard.releases_for_tag(gh, tag)
+        except guard.GuardError:
+            raise Stop('Shared publication protocol preflight failed; no upload') from None
+        if existing:
             raise Stop('Shared release reservation already exists; inspect before any upload')
         phrase = f'UPLOAD {filename} TO {PROJECT}'
         if confirm(phrase) != phrase:
@@ -390,9 +400,13 @@ def upload_verified(plan, jar, inventory, state_dir, confirm, token_prompt, cf_f
         receipt = {'schema': 1, 'project_id': PROJECT, 'tag': tag, 'filename': filename,
                    'jar_sha256': plan['jar_sha256'], 'plan_sha256': digest(canonical(plan)),
                    'operation': uuid.uuid4().hex, 'created_at': now().isoformat(),
-                   'status': 'reservation_intent', 'metadata': payload}
+                   'status': 'atomic_lock_intent', 'metadata': payload,
+                   'atomic_lock_ref': guard.ref_name(tag)}
         save(receipt_path, receipt)
         try:
+            guard.acquire(gh, tag, plan['provenance']['commit'])
+            receipt.update(status='atomic_lock_acquired')
+            save(receipt_path, receipt)
             reservation = gh('releases', {'tag_name': tag, 'target_commitish': plan['provenance']['commit'],
                 'draft': True, 'prerelease': plan['target']['channel'] != 'release',
                 'name': 'Singulo ' + plan['target']['version'],
@@ -406,7 +420,7 @@ def upload_verified(plan, jar, inventory, state_dir, confirm, token_prompt, cf_f
             check_remote_plan(plan, reservation['id'])
             read_inventory(inventory, filename, plan['jar_sha256'])
             # Once this is durable, every interruption is uncertain, even before
-            # urllib sends its first byte. A remote draft also survives disk loss.
+            # urllib sends its first byte. The permanent server ref survives disk loss.
             receipt.update(status='upload_started_outcome_uncertain', request_sha256=digest(body))
             save(receipt_path, receipt)
             result = cf.request(f'/projects/{PROJECT}/upload-file', body, content_type)
@@ -485,6 +499,7 @@ def main():
         plan, _ = prepare(inputs, args.bundle.resolve())
         print(json.dumps({'plan': str(args.bundle.resolve() / 'plan.json'),
                           'plan_sha256': digest(canonical(plan)), 'target': plan['target'],
+                          'upload_protocol_ready': plan['upload_protocol_ready'],
                           'jar_sha256': plan['jar_sha256'], 'remote_writes': False}, indent=2))
     elif args.mode == 'upload':
         if not sys.stdin.isatty():
