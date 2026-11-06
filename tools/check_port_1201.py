@@ -26,20 +26,20 @@ def check_model(name, model):
         assert not loader.startswith("neoforge:"), f"Unsupported 1.21 model loader: {name}: {loader}"
 
 
-def validate_source():
-    for root in (ROOT / 'src/main/resources', ROOT / 'src/generated/resources'):
+def validate_source(source=ROOT):
+    for root in (source / 'src/main/resources', source / 'src/generated/resources'):
         check_layout([p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()])
         for path in (root / 'assets').rglob('*.json'):
             if 'models' in path.parts:
                 check_model(path.relative_to(root).as_posix(), json.loads(path.read_text()))
-    for path in (ROOT / 'src/main/java').rglob('*.java'):
-        source = path.read_text(encoding='utf-8')
+    for path in (source / 'src/main/java').rglob('*.java'):
+        text = path.read_text(encoding='utf-8')
         for unsupported in ('net.neoforged.', 'RegistryFriendlyByteBuf', 'net.minecraft.core.component.',
                             'SynchedEntityData.Builder', 'ResourceLocation.withDefaultNamespace'):
-            assert unsupported not in source, f'1.21 API {unsupported}: {path.relative_to(ROOT)}'
+            assert unsupported not in text, f'1.21 API {unsupported}: {path.relative_to(source)}'
 
 
-def validate_jar(path):
+def validate_jar(path, source=ROOT):
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         check_layout(names)
@@ -50,7 +50,7 @@ def validate_jar(path):
         assert refmap.get('mappings'), 'Production mixin refmap is empty'
         metadata = tomllib.loads(archive.read('META-INF/mods.toml').decode())
         mod = next(m for m in metadata['mods'] if m['modId'] == 'singulo')
-        version = next(line.split('=', 1)[1].strip() for line in (ROOT / 'gradle.properties').read_text().splitlines() if line.startswith('mod_version='))
+        version = next(line.split('=', 1)[1].strip() for line in (source / 'gradle.properties').read_text().splitlines() if line.startswith('mod_version='))
         assert mod['version'] == version, 'Incorrect mod version'
         dependencies = {d['modId']: d for d in metadata['dependencies']['singulo']}
         assert dependencies['minecraft']['versionRange'] == '[1.20.1]', 'Incorrect Minecraft dependency'
@@ -87,9 +87,10 @@ def validate_jar(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--jar', type=Path)
+    parser.add_argument('--source', type=Path, default=ROOT, help='Verified tagged source to read; its Python is never executed')
     args = parser.parse_args()
-    validate_source()
+    validate_source(args.source)
     if args.jar:
-        validate_jar(args.jar)
+        validate_jar(args.jar, args.source)
     else:
         print('Minecraft 1.20.1 source APIs and resource layout validated')

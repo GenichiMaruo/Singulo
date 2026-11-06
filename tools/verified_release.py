@@ -8,8 +8,42 @@ import re
 import shutil
 import subprocess
 import zipfile
+from collections import Counter
 
 GROUPS = json.loads((Path(__file__).resolve().parent / "gametest_groups.json").read_text())
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def properties(source):
+    return dict(line.split('=', 1) for line in (source / 'gradle.properties').read_text().splitlines()
+                if '=' in line and not line.startswith('#'))
+
+
+def source_identity(source, tag, loader):
+    props = properties(source)
+    if loader not in {'forge', 'neoforge'} or props['minecraft_version'] != '1.20.1' or props['mod_name'] != 'Singulo':
+        raise RuntimeError('Expected Minecraft 1.20.1 and a supported loader')
+    if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', props['mod_version']):
+        raise RuntimeError('Expected semantic release version')
+    suffix = 'F' if loader == 'forge' else 'N'
+    expected = f"v{props['mod_version']}-1.20.1{suffix}"
+    if not re.fullmatch(re.escape(expected) + r'(?:-r[1-9][0-9]*)?', tag):
+        raise RuntimeError('Tag does not match the checked-out version and loader')
+    return props
+
+
+def expected_tests(source):
+    # Read data and Java declarations from the verified tag, never import its code.
+    from check_gametests import inventory, DEFAULT_NAMESPACES, OPTIONAL_NAMESPACES
+    entries = inventory(source)
+    if {e['namespace'] for e in entries} - set(DEFAULT_NAMESPACES) - OPTIONAL_NAMESPACES:
+        raise RuntimeError('Unknown tagged test namespace')
+    regular = [e for e in entries if e['namespace'] in DEFAULT_NAMESPACES]
+    groups = json.loads((source / 'tools/gametest_groups.json').read_text())
+    counts = dict(Counter(e['namespace'] for e in regular))
+    if not regular or counts != groups:
+        raise RuntimeError('Tagged test groups differ from exact tagged source inventory')
+    return [e['name'] for e in regular]
 
 
 def api(repo, endpoint):
@@ -21,6 +55,9 @@ def git(source, *args):
 
 
 def inspect(repo, run_id, tag, source, loader):
+    props = source_identity(source, tag, loader)
+    if git(source, 'status', '--porcelain', '--untracked-files=all', '--ignored=matching'):
+        raise RuntimeError('Verified tagged source checkout must be clean')
     run = api(repo, f"actions/runs/{run_id}")
     if not (run["conclusion"] == "success" and run["status"] == "completed"
             and (run["event"] == "pull_request" or (run["event"] in ("push", "workflow_dispatch") and run["head_branch"] == "1.20.1"))
@@ -37,6 +74,8 @@ def inspect(repo, run_id, tag, source, loader):
         ref = api(repo, f"git/tags/{ref['sha']}")["object"]
     if ref["type"] != "commit" or ref["sha"] != git(source, "rev-parse", "HEAD"):
         raise RuntimeError("Checkout does not match the immutable release tag")
+    if api(repo, f"compare/{ref['sha']}...1.20.1")['status'] not in {'ahead', 'identical'}:
+        raise RuntimeError('Release tag is not on the maintained 1.20.1 branch')
     tree = git(source, "rev-parse", "HEAD^{tree}")
     if api(repo, f"git/commits/{run['head_sha']}")["tree"]["sha"] != tree:
         raise RuntimeError("Reviewed source tree differs from the release tag")
@@ -57,6 +96,7 @@ def inspect(repo, run_id, tag, source, loader):
     if api(repo, f"git/commits/{tested_commit}")["tree"]["sha"] != tree:
         raise RuntimeError("The actual CI merge tree differs from the release tag")
     return {"loader": loader, "repository": repo, "run_id": run_id, "run_attempt": run["run_attempt"],
+            "version": props['mod_version'], "mod_name": props['mod_name'],
             "tag": tag, "commit": ref["sha"], "tree": tree, "tested_commit": tested_commit,
             "artifacts": selected}
 
@@ -81,17 +121,21 @@ def content_hash(path):
     return digest.hexdigest()
 
 
-def promote(metadata, artifact_dir, output, jar_name):
+def promote(metadata, artifact_dir, output, jar_name, source):
+    props = properties(source)
+    suffix = 'F' if metadata['loader'] == 'forge' else 'N'
+    if metadata['loader'] not in {'forge', 'neoforge'} or props['minecraft_version'] != '1.20.1' or props['mod_name'] != 'Singulo':
+        raise RuntimeError('Unsupported publication target')
+    if jar_name != f"{props['mod_name']}-{props['mod_version']}-1.20.1{suffix}.jar" or output.name != jar_name:
+        raise RuntimeError('Output filename differs from verified tagged version/loader')
     root = artifact_dir / metadata["artifacts"]["full"]["name"]
     jar = one(root.rglob(jar_name), "production JAR")
     log = one((p for p in root.rglob("latest.log") if "gametest" in p.parts), "GameTest log")
-    expected_count = sum(GROUPS.values())
+    expected = expected_tests(source)
+    expected_count = len(expected)
     if re.findall(r"All ([0-9]+) required tests passed", log.read_text()) != [str(expected_count)]:
         raise RuntimeError("Missing successful full-suite completion")
-    from check_gametests import inventory, DEFAULT_NAMESPACES, validate_report
-    expected = [e['name'] for e in inventory() if e['namespace'] in DEFAULT_NAMESPACES]
-    if len(expected) != expected_count:
-        raise RuntimeError("Release count differs from source inventory")
+    from check_gametests import validate_report
     report = one(root.rglob("reports/gametest/results.json"), "per-test report")
     validate_report(json.loads(report.read_text()), expected)
     gui_log = one((p for p in root.rglob("latest.log") if "gui-review" in p.parts), "GUI completion log")
@@ -113,6 +157,8 @@ def promote(metadata, artifact_dir, output, jar_name):
             or machine.get("supply_port_inventory_slots") != 350 or machine.get("supply_port_tooltips") != 5
             or machine["headers_without_title_status_overlap"] != 80 or machine["generator_font_probes"] != 5 or machine.get("jet_forge_inventory_slots") != 700):
         raise RuntimeError("Incomplete machine GUI pixel verification")
+    from check_port_1201 import validate_jar
+    validate_jar(jar, source=source)
     output.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(jar, output)
     metadata["jar_sha256"] = hashlib.sha256(output.read_bytes()).hexdigest()
@@ -149,12 +195,12 @@ def main():
             raise RuntimeError("Validation provenance changed during download")
         if args.output is None:
             raise RuntimeError("An output path is required")
-        promote(metadata, args.artifacts, args.output, args.output.name)
+        promote(metadata, args.artifacts, args.output, args.output.name, args.source)
     else:
         if os.environ.get("GITHUB_OUTPUT"):
             with open(os.environ["GITHUB_OUTPUT"], "a") as output:
                 output.write(f"pattern=pr-validation-{metadata['tested_commit']}-{loader}-*\n")
-        print(f"Verified {sum(GROUPS.values())} tests + Mekanism + GUI at tree {metadata['tree']}")
+        print(f"Verified {len(expected_tests(args.source))} tests + Mekanism + GUI at tree {metadata['tree']}")
     args.metadata.write_text(json.dumps(metadata, indent=2) + "\n")
 
 
