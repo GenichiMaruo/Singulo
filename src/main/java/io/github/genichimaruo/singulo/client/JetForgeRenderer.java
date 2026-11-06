@@ -99,9 +99,11 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         JetForgeTimeline tl = JetForgeTimeline.of(be, partialTick);
         Frame f = new Frame(pose.last(), core, axis, new Vec3(0, 1, 0), cam, time, dist, dist > 96);
         // 2種類の光と素材のアイテムを交互に描くので、頂点ごとに描き込み先を引き直す（共有の描き込み先は、別の描き方を引くと閉じられる）
-        VertexConsumer glow = new Lazy(buffers, JetForgeRenderTypes.GLOW);
+        // ジェットの光は、固体とほかの光を描いたあとでまとめて描く（奥の物が手前に重ならないように）
+        MultiBufferSource jets = GlowDepth.additive(buffers);
+        VertexConsumer glow = new Lazy(jets, JetForgeRenderTypes.GLOW);
         RenderType beamType = JetForgeRenderTypes.beam();
-        VertexConsumer beam = beamType == null ? null : new Lazy(buffers, beamType);
+        VertexConsumer beam = beamType == null ? null : new Lazy(jets, beamType);
         boolean fancy = mc.options.graphicsMode().get() != net.minecraft.client.GraphicsStatus.FAST;
 
         if (be.shownCore()) {
@@ -838,6 +840,12 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
                               VertexConsumer glow, Direction back, BlockPos pos, Vec3 corner, float partialTick) {
         int count = be.batchSize();
         Vec3[] plane = basis(f.axis());
+        if (count > 1) {
+            // 並列カセットの受け台: 素材を抱える輪が照射室の中でゆっくり回る
+            Vec3 center = f.origin().add(f.axis().scale(TARGET_S));
+            ringSegments(f, glow, center, f.axis(), 0.72F, 0.86F, f.far() ? 24 : 48, CYAN, 0.55F, f.time() * 1.2F, count);
+            ringSegments(f, glow, center, f.axis(), 1.0F, 1.08F, f.far() ? 24 : 48, WHITE, 0.3F, -f.time() * 0.7F, count);
+        }
         for (int i = 0; i < count; i++) {
             double angle = i * Math.PI * 2 / count;
             Vec3 offset = count == 1 ? Vec3.ZERO : plane[0].scale(Math.cos(angle) * 0.9).add(plane[1].scale(Math.sin(angle) * 0.9));

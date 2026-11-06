@@ -93,7 +93,7 @@ public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
         }
 
         // ---- 光る部分（単眼・守りの光・灯・印・レーザー）
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         pose.pushPose();
         pose.translate(0, CY + lift, 0);
         int lines = e.lineCount();

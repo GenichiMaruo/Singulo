@@ -43,7 +43,7 @@ public class GenesisCoreRenderer implements BlockEntityRenderer<GenesisCoreBlock
     }
 
     private static VertexConsumer glow(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        return GlowDepth.of(buffers, FxDraw.WHITE);
     }
 
     @Override
