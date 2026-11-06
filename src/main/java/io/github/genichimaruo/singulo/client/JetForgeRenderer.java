@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.forge.JetForgeBlockEntity;
 import io.github.genichimaruo.singulo.forge.JetForgeLayout;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -72,6 +74,9 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     }
 
     /** 1回の描画で使う基準（形の向きと、カメラの位置）。 */
+    /** 鍛造炉ごとの渦の筋の時計: (前に見た時刻, 時計)。 */
+    private final Map<JetForgeBlockEntity, float[]> swirlClocks = new WeakHashMap<>();
+
     private record Frame(PoseStack.Pose pose, Vec3 origin, Vec3 axis, Vec3 up, Vec3 cam, float time, float dist, boolean far) {}
 
     @Override
@@ -146,7 +151,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         }
         float beaming = 0.45F;
         boolean traced = GravitationalLensing.addBlackHole(coreW, radius, 1, 5.0F, f.axis(), SHADOW * 1.1F, DISK_OUTER, beaming, bright,
-                f.time() * (0.4F + 1.6F * tl.power()));
+                swirlClock(be, f.time(), tl.power()));
         if (!traced) {
             // 重力レンズを掛けない（設定・シェーダーパック）: 黒い球と、光る円盤をワールドに描く
             VertexConsumer solid = FxDraw.glow(buffers);
@@ -159,6 +164,18 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             disc(f, glow, f.origin(), f.axis(), SHADOW * 1.1F, DISK_OUTER, 48, WARM, (int) (220 * a), 0, 0);
             GravitationalLensing.add(coreW, radius, 1, 5.0F);
         }
+    }
+
+    /**
+     * 円盤の渦の筋の時計。時刻に速さを掛けると出力が変わった瞬間に模様が飛ぶので、速さを積み上げる。
+     * 筋は 2π/3 ごとに同じ形に戻るので、その周期で折り返す（0 は筋なしの意味なので返さない）。
+     */
+    private float swirlClock(JetForgeBlockEntity be, float time, float power) {
+        float[] clock = swirlClocks.computeIfAbsent(be, b -> new float[]{time, 0});
+        float dt = Mth.clamp(time - clock[0], 0, 1);
+        clock[0] = time;
+        clock[1] = (clock[1] + dt * (0.4F + 1.6F * power)) % (Mth.TWO_PI / 3);
+        return Math.max(clock[1], 1.0E-3F);
     }
 
     /** 拘束コイルの輪を巡る電流の光。 */

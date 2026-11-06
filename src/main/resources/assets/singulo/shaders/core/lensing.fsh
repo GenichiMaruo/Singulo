@@ -1,11 +1,12 @@
 #version 150
 
-// 重力レンズ。2種類のレンズを扱う:
-//  - ブラックホール（SphereN.w = k > 0）: シュバルツシルト時空の曲がり方で背景をずらす。光子球に近づくほど偏向角が
+// 重力レンズ。1回の描画で1つのレンズを、影響が及ぶ画面の範囲だけ描く（奥のレンズから順。GravitationalLensing.apply）。
+// 2種類のレンズを扱う:
+//  - ブラックホール（Sphere.w = k > 0）: シュバルツシルト時空の曲がり方で背景をずらす。光子球に近づくほど偏向角が
 //    発散するので、影（地平線の約2.6倍の黒い円）の縁のすぐ外では背景が強く押しつぶされ、周りの景色の平均の色
 //    （何周も回った光の重なり）になって細い光の輪（光子リング）として光る。アインシュタインリングは曲がり方から自然に出る。
-//  - 歪みだけ（SphereN.w = 0）: 点質量レンズの式 β = θ − θE²/θ で景色を少しずらすだけ（黒い中心も輪もなし）。
-// LensN = (中心x, 中心y, 大きさ, 強さ)。座標は画面のUV（縦基準、横は Aspect 倍）。大きさはブラックホールなら影の半径、
+//  - 歪みだけ（Sphere.w = 0）: 点質量レンズの式 β = θ − θE²/θ で景色を少しずらすだけ（黒い中心も輪もなし）。
+// Lens = (中心x, 中心y, 大きさ, 強さ)。座標は画面のUV（縦基準、横は Aspect 倍）。大きさはブラックホールなら影の半径、
 // 歪みだけならアインシュタイン半径。
 //
 // 歪みが及ぶのは、レンズを中心とする球の中だけ:
@@ -18,31 +19,16 @@
 // ノイズ）が出ず、強く縮められる所もちらつかない。
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler1;
-uniform vec4 Lens0;
-uniform vec4 Lens1;
-uniform vec4 Lens2;
-uniform vec4 Lens3;
+uniform vec4 Lens;
 // (中心までの奥行き, 手前の面までの奥行きの差（ブロック）, 歪みが及ぶ球の半径（UV）, k)
 // k は背景までの距離の比 D_ls / D_s（ブラックホール）。0 なら歪みだけのレンズ
-uniform vec4 Sphere0;
-uniform vec4 Sphere1;
-uniform vec4 Sphere2;
-uniform vec4 Sphere3;
+uniform vec4 Sphere;
 // 光の経路をたどって描く降着円盤（ブラックホールのレンズだけ）。座標はカメラから見たもの（ブロック、視線は −z）。
-// DiskN = (ブラックホールの中心 xyz, 地平線の半径)。地平線の半径が 0 なら円盤なし（影と円盤はワールドに描いてある）
-// DiskNN = (円盤の面の向き xyz, 内側の半径)、DiskPN = (外側の半径, ドップラーで明るさが変わる幅, 明るさの倍率, 渦の筋の時計（秒、0 で筋なし）)
-uniform vec4 Disk0;
-uniform vec4 Disk1;
-uniform vec4 Disk2;
-uniform vec4 Disk3;
-uniform vec4 DiskN0;
-uniform vec4 DiskN1;
-uniform vec4 DiskN2;
-uniform vec4 DiskN3;
-uniform vec4 DiskP0;
-uniform vec4 DiskP1;
-uniform vec4 DiskP2;
-uniform vec4 DiskP3;
+// Disk = (ブラックホールの中心 xyz, 地平線の半径)。地平線の半径が 0 なら円盤なし（影と円盤はワールドに描いてある）
+// DiskN = (円盤の面の向き xyz, 内側の半径)、DiskP = (外側の半径, ドップラーで明るさが変わる幅, 明るさの倍率, 渦の筋の時計（0 で筋なし）)
+uniform vec4 Disk;
+uniform vec4 DiskN;
+uniform vec4 DiskP;
 // 投影行列の逆行列。画素ごとの光の出発点と向きを、歩いたときの画面の揺れも含めて正確に求めるのに使う
 uniform mat4 InvProj;
 // 投影行列の (m22, m32)。深度から距離に戻すのに使う
@@ -116,9 +102,9 @@ vec2 insideShadow(vec2 p, inout mat2 J, vec4 l, vec4 sph, vec2 d, float r, vec2 
     return clamp(q, LO, HI);
 }
 
-// 1つのレンズを通す。p は「いま見ている方向」（画面のUV）、J はその p を画面の1画素動かしたときの変化（列が x, y）。
-// 返り値はレンズで曲がったあとの方向。影・光子リングも曲がったあとの p で数えるので、手前のレンズ越しに見た奥のレンズは
-// 丸ごと一緒にずれて見える。far は「周りの景色の平均の色に置き換える割合」、farAt はその色を取るレンズ（中心x, 中心y, 球の半径）
+// レンズを通す。p は「いま見ている方向」（画面のUV）、J はその p を画面の1画素動かしたときの変化（列が x, y）。
+// 返り値はレンズで曲がったあとの方向。奥のレンズは先に画面へ描いてあるので、手前のレンズ越しには丸ごと一緒にずれて見える。
+// far は「周りの景色の平均の色に置き換える割合」、farAt はその色を取るレンズ（中心x, 中心y, 球の半径）
 // clean: ワールドに黒い球や影を描いていない（シェーダーが円盤を描く）。影の真後ろの景色が画面のコピーに残っている
 vec2 lens(vec2 p, inout mat2 J, vec4 l, vec4 sph, bool clean, inout float ring, inout float dark, inout float far,
           inout vec3 farAt) {
@@ -302,12 +288,13 @@ vec4 traceDisk(vec3 origin, vec3 dir, vec4 da, vec4 dn, vec4 dp, float here) {
                 vec3 co = vec3(180.0 * br, 110.0 * br, 90.0 * br + 40.0) / 255.0;
                 vec3 col = mix(ci, co, f);
                 if (dp.w > 0.0) {
-                    // 渦の筋: 内側ほど速く回る対数らせんの濃淡（鍛造炉の円盤だけ）
+                    // 渦の筋: 形の変わらない対数らせんの濃淡（鍛造炉の円盤だけ）。半径ごとに回る速さを変えると、
+                    // 時間とともに筋が巻き込まれて画素より細かい同心円の縞になるので、全体を同じ速さで回す
                     vec3 a1 = normalize(cross(n, abs(n.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0)));
                     vec3 a2 = cross(n, a1);
                     float ang = atan(dot(hit, a2), dot(hit, a1));
-                    float streak = sin(ang * 5.0 + log(rh / rin) * 9.0 - dp.w * 3.0 / (0.4 + f));
-                    col *= 0.8 + 0.2 * streak;
+                    float streak = sin(ang * 3.0 + log(rh / rin) * 4.0 - dp.w * 3.0);
+                    col *= 0.9 + 0.1 * streak;
                 }
                 if (dp.z != 1.0) {
                     // 明るさ: 明るいほど白く（中心の色に寄せて）、暗いほど赤く沈む
@@ -385,22 +372,12 @@ void main() {
     vec3 farAt = vec3(0.5, 0.5, 0.0);
     vec2 size = vec2(textureSize(Sampler0, 0));
     mat2 J = mat2(1.0 / size.x, 0.0, 0.0, 1.0 / size.y);
-    // カメラに近いレンズから順に光をさかのぼる（Lens0 がいちばん近い）
-    vec2 p = texCoord;
-    // 円盤は、手前のレンズを通って曲がったあとの方向（そのレンズに入る前の p）から光をたどる。
-    // 手前のブラックホールの影に入る所には、奥の円盤は届かない（入る前の dark で隠す）
-    vec2 p0 = p;
-    float dark0 = dark;
-    p = lens(p, J, Lens0, Sphere0, Disk0.w > 0.0, ring, dark, far, farAt);
-    vec2 p1 = p;
-    float dark1 = dark;
-    p = lens(p, J, Lens1, Sphere1, Disk1.w > 0.0, ring, dark, far, farAt);
-    vec2 p2 = p;
-    float dark2 = dark;
-    p = lens(p, J, Lens2, Sphere2, Disk2.w > 0.0, ring, dark, far, farAt);
-    vec2 p3 = p;
-    float dark3 = dark;
-    p = lens(p, J, Lens3, Sphere3, Disk3.w > 0.0, ring, dark, far, farAt);
+    vec2 p = lens(texCoord, J, Lens, Sphere, Disk.w > 0.0, ring, dark, far, farAt);
+    vec4 disk = traceDiskAt(texCoord, Disk, DiskN, DiskP);
+    // 何も変えない所は描かない（描く範囲は長方形なので、重なるレンズの結果を四隅で上書きしないように）
+    if (p == texCoord && ring <= 0.0 && dark <= 0.0 && far <= 0.0 && disk.a <= 0.0) {
+        discard;
+    }
     vec3 col;
     if (p == texCoord) {
         // 歪みのない所は元の画素をそのまま読む（画面全体がぼやけないように）
@@ -421,13 +398,7 @@ void main() {
         col += (around * 0.8 + vec3(1.0, 0.9, 0.78) * 0.3) * min(ring, 1.0);
     }
     col = mix(col, vec3(0.0), clamp(dark, 0.0, 1.0));
-    // 降着円盤（カメラに近いブラックホールのものから手前に重ねる）
-    if (Disk0.w > 0.0 || Disk1.w > 0.0 || Disk2.w > 0.0 || Disk3.w > 0.0) {
-        vec4 disk = traceDiskAt(p0, Disk0, DiskN0, DiskP0) * (1.0 - clamp(dark0, 0.0, 1.0));
-        disk += (1.0 - disk.a) * traceDiskAt(p1, Disk1, DiskN1, DiskP1) * (1.0 - clamp(dark1, 0.0, 1.0));
-        disk += (1.0 - disk.a) * traceDiskAt(p2, Disk2, DiskN2, DiskP2) * (1.0 - clamp(dark2, 0.0, 1.0));
-        disk += (1.0 - disk.a) * traceDiskAt(p3, Disk3, DiskN3, DiskP3) * (1.0 - clamp(dark3, 0.0, 1.0));
-        col = col * (1.0 - disk.a) + disk.rgb;
-    }
+    // 降着円盤
+    col = col * (1.0 - disk.a) + disk.rgb;
     fragColor = vec4(col, 1.0);
 }

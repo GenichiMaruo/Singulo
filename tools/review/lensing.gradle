@@ -1,4 +1,4 @@
-// Development-only five-source rendering regression; never ship this harness.
+// Development-only many-source rendering regression; never ship this harness.
 allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/lensing-src'))

@@ -39,6 +39,10 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
     private static final float WALL = 1.5F;
     /** ラムの先の高さ（上がっているとき・塊を打ったとき）。 */
     private static final float UP = 1.2F;
+    /** ラムの大きさ（ドット等倍で貼るので、1/16 ブロック単位）。 */
+    private static final float ROD_HALF = 3F / 16;
+    private static final float HEAD_HALF = 7F / 16;
+    private static final float HEAD_HEIGHT = 6F / 16;
     private static final Map<FixedShapeControllerBlockEntity.Compactor, Long> LAST_SLAM = new WeakHashMap<>();
 
     public DegenerateCompactorRenderer(BlockEntityRendererProvider.Context context) {}
@@ -73,16 +77,21 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         }
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);
-        // ラム（棒と頭）
+        // ラム（棒と頭）。絵はドット等倍で貼る。棒の絵は頭に固定して、棒ごと天井の穴を滑って見えるようにする
+        float rodBottom = tip + HEAD_HEIGHT;
         VertexConsumer rod = buffers.getBuffer(RenderType.entitySolid(ROD));
-        FxDraw.box(pose, rod, -0.18F, tip + 0.35F, -0.18F, 0.18F, WALL, 0.18F, lit, 0xFFFFFF);
+        FxDraw.pixelBox(pose, rod, -ROD_HALF, rodBottom, -ROD_HALF, ROD_HALF, WALL, ROD_HALF,
+                5, 0, 5, 11, (WALL - rodBottom) * 16, 11, lit, 0xFFFFFF);
         VertexConsumer ram = buffers.getBuffer(RenderType.entitySolid(RAM));
-        FxDraw.box(pose, ram, -0.42F, tip, -0.42F, 0.42F, tip + 0.35F, 0.42F, lit, 0xFFFFFF);
-        // アンビルの上の塊（打たれて締まっていく縮退物質）
+        FxDraw.pixelBox(pose, ram, -HEAD_HALF, tip, -HEAD_HALF, HEAD_HALF, rodBottom, HEAD_HALF,
+                1, 5, 1, 15, 11, 15, lit, 0xFFFFFF);
+        // アンビルの上の塊（打たれて締まっていく縮退物質）。大きさが変わっても絵は伸ばさず、中心から切り出す
         VertexConsumer anvil = buffers.getBuffer(RenderType.entitySolid(ANVIL));
         float half = 0.26F + (running ? 0.02F * (1 - flash) : 0.04F);
         int lump = FxDraw.lerpRgb(0x8A80A8, 0xE8D8FF, flash);
-        FxDraw.box(pose, anvil, -half, -WALL, -half, half, lumpTop, half, lit, lump);
+        float lumpDots = (lumpTop + WALL) * 8;
+        FxDraw.pixelBox(pose, anvil, -half, -WALL, -half, half, lumpTop, half,
+                8 - half * 16, 8 - lumpDots, 8 - half * 16, 8 + half * 16, 8 + lumpDots, 8 + half * 16, lit, lump);
         if (running) {
             VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
             var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
