@@ -734,7 +734,9 @@ UI_LANG = {
     'lab.singulo.log.7.title': ('個人の日記', 'Personal Diary'),
     'lab.singulo.log.7': ('夜になっても、ラインの音が止まらない。アンドロイドたちは毎晩、廊下を磨き、壁を塗り直している。あれは掃除じゃない。私たちが汚したところを、消しているんだ。', 'Even at night the lines never stop. Every night the androids polish the corridors and repaint the walls. That is not cleaning. They are erasing every mark we left.'),
     'lab.singulo.log.8.title': ('医務記録', 'Medical Record'),
-    'lab.singulo.log.8': ('隔壁の閉鎖に巻き込まれた職員3名、軽傷。運んできたのはアンドロイドだった。手当ての仕方まで正確で、誰も傷つけなかった。彼らは命令がない限り、人を傷つけないのだと思う。命令がない限りは。', 'Three staff caught in the bulkhead closure, minor injuries. Androids carried them here, and even dressed the wounds correctly. No one was hurt. I believe they will not harm people unless ordered to. Unless ordered to.'),
+    'lab.singulo.log.8': ('隔壁の閉鎖に巻き込まれた職員3名、軽傷。運んできたのはアンドロイドだった。手当ての仕方まで正確で、誰も傷つけなかった。彼らは命令がない限り、人を傷つけないのだと思う。命令がない限りは。', 'Three staff caught in the bulkhead closure, minor injuries. Androids carried them here, and eve'
+                                                                                                                                                                                                                                                                                                                'n dressed the wounds correctly. The androids harmed no one. I believe they will not harm people'
+                                                                                                                                                                                                                                                                                                                ' unless ordered to. Unless ordered to.'),
     'lab.singulo.log.9.title': ('主任技師の記録', "Chief Engineer's Log"),
     'lab.singulo.log.9': ('炉を止める。非常電源だけでは、ファウンドリは中枢から出られない。アンドロイドたちは「維持せよ」に従って、ここを守り続けるだろう。もし誰かがこれを読んで炉を動かすなら、覚悟してくれ。あれは、まだ待っている。', 'I am shutting down the reactor. On emergency power, Foundry cannot leave the core. The androids will keep guarding this place, obeying "Maintain." If someone reads this and restarts the reactor, be ready. It is still waiting.'),
     'lab.singulo.log.10.title': ('食堂の掲示', 'Cafeteria Notice'),
@@ -1668,6 +1670,8 @@ def lang_files():
     for station, sid in STATIONS.items():
         name = station.split('（')[0]
         en_name = next((v[1] for k, v in MOD.items() if k == name), sid)
+        en_name = {'penrose_reactor_power': 'P-Reactor (generation mode)',
+                   'penrose_reactor_catalyst': 'P-Reactor (catalyst mode)'}.get(sid, en_name)
         ja[f'station.{MODID}.{sid}'] = station
         en[f'station.{MODID}.{sid}'] = en_name
     import gen_docs
