@@ -13,7 +13,7 @@
     "complete": true
   },
   "mekanism_gametests": 1,
-  "python_tests": 63,
+  "python_tests": 65,
   "translations_per_language": {
     "en_us": 3458,
     "ja_jp": 3458,
@@ -136,7 +136,7 @@
     "ordinary_restart_port_modes_and_links": true,
     "workflow_actionlint": "1.7.12",
     "workflow_bash_blocks_syntax_checked": 14,
-    "python_tests": 63,
+    "python_tests": 65,
     "old_0151_artifact_tests_accepted_from_its_source": 662,
     "remote_ci_retry": {
       "run": 42182540523,
@@ -146,6 +146,22 @@
     },
     "github_required_status_checks_configured": false,
     "repository_protection_settings_changed": false,
-    "publication_executed": false
+    "publication_executed": false,
+    "pristine_tag_checkout_required": true,
+    "maintenance_safety_fixes": {
+      "1.21.1": {
+        "branch": "fix/release-actions-1211",
+        "commit": "ccaf33d10ca9ae50fd13fba9864e1cb8726dbea3",
+        "pr": 63,
+        "python_tests": 61
+      },
+      "1.20.1": {
+        "branch": "fix/release-actions-1201",
+        "commit": "c4435af66ca3241ffd03ee80ea37d7ff120cf6f1",
+        "python_tests": 48
+      },
+      "prepared_0151_jar_bytes_unchanged": true,
+      "existing_release_pr_heads_unchanged": true
+    }
   }
 }

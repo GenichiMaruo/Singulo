@@ -23,6 +23,8 @@ def inspect(repo, run_id, tag, source):
                  if '=' in line and not line.startswith('#'))
     if tag != 'v' + props['mod_version'] or props['minecraft_version'] != '1.21.1':
         raise RuntimeError('Tag must match the checked-out 1.21.1 version')
+    if git(source, 'status', '--porcelain', '--untracked-files=all', '--ignored=matching'):
+        raise RuntimeError('Verified tagged source checkout must be clean')
     run = api(repo, f'actions/runs/{run_id}')
     if not (run['conclusion'] == 'success' and run['status'] == 'completed'
             and run['event'] == 'pull_request' and run['path'] == '.github/workflows/pr-validation.yml'

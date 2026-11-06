@@ -30,7 +30,7 @@ class ProvenanceTests(unittest.TestCase):
 
     def inspect(self):
         with patch.object(release, 'api', side_effect=lambda repo, endpoint: copy.deepcopy(self.data[endpoint])), \
-             patch.object(release, 'git', side_effect=lambda source, *args: self.tree if args[-1] == 'HEAD^{tree}' else self.sha):
+             patch.object(release, 'git', side_effect=lambda source, *args: '' if args[0] == 'status' else self.tree if args[-1] == 'HEAD^{tree}' else self.sha):
             return release.inspect('owner/repo', 1, 'v0.8.1', self.source)
 
     def test_neoforge_selected_from_actual_tested_commit(self):
@@ -42,6 +42,12 @@ class ProvenanceTests(unittest.TestCase):
         self.data['actions/runs/1/jobs?per_page=100']['jobs'][1]['conclusion'] = 'failure'
         with self.assertRaisesRegex(RuntimeError, 'Mekanism validation'):
             self.inspect()
+
+    def test_dirty_tag_checkout_is_rejected_before_api_access(self):
+        with patch.object(release, 'git', return_value=' M src/main/java/Changed.java'), patch.object(release, 'api') as api:
+            with self.assertRaisesRegex(RuntimeError, 'must be clean'):
+                release.inspect('owner/repo', 1, 'v0.8.1', self.source)
+        api.assert_not_called()
 
     def test_unmerged_or_diverged_tag_cannot_publish(self):
         for status in ('behind', 'diverged'):
