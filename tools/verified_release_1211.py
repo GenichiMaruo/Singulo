@@ -23,6 +23,8 @@ def inspect(repo, run_id, tag, source):
                  if '=' in line and not line.startswith('#'))
     if tag != 'v' + props['mod_version'] or props['minecraft_version'] != '1.21.1':
         raise RuntimeError('Tag must match the checked-out 1.21.1 version')
+    if git(source, 'status', '--porcelain', '--untracked-files=all', '--ignored=matching'):
+        raise RuntimeError('Verified tagged source checkout must be clean')
     run = api(repo, f'actions/runs/{run_id}')
     if not (run['conclusion'] == 'success' and run['status'] == 'completed'
             and run['event'] == 'pull_request' and run['path'] == '.github/workflows/pr-validation.yml'
@@ -36,6 +38,8 @@ def inspect(repo, run_id, tag, source):
         ref = api(repo, 'git/tags/' + ref['sha'])['object']
     if ref['type'] != 'commit' or ref['sha'] != git(source, 'rev-parse', 'HEAD'):
         raise RuntimeError('Checkout does not match immutable tag')
+    if api(repo, f"compare/{ref['sha']}...1.21.1")['status'] not in {'ahead', 'identical'}:
+        raise RuntimeError('Release tag is not on the maintained 1.21.1 branch')
     tree = git(source, 'rev-parse', 'HEAD^{tree}')
     if api(repo, f"git/commits/{run['head_sha']}")['tree']['sha'] != tree:
         raise RuntimeError('PR source differs from tagged tree')
@@ -61,13 +65,13 @@ def inspect(repo, run_id, tag, source):
             'version': props['mod_version'], 'mod_name': props['mod_name'], 'artifacts': selected}
 
 
-def promote(metadata, artifacts, output):
+def promote(metadata, artifacts, output, source):
     output.mkdir(parents=True, exist_ok=True)
     hashes = {}
     for loader, suffix in [('neoforge', 'N')]:
         root = artifacts / metadata['artifacts'][loader]['name']
         name = f"{metadata['mod_name']}-{metadata['version']}-1.21.1{suffix}.jar"
-        validate(root, loader, name)
+        validate(root, loader, name, source=source)
         gui = (root / 'gui-review/logs/latest.log').read_text()
         pixels = json.loads((root / 'gui-review/inventory-pixels.json').read_text())
         if 'SINGULO_GUI_COMPLETE 22' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or 'SINGULO_HANDBOOK_SEARCH_COMPLETE' not in gui or 'SINGULO_MACHINE_GUI_COMPLETE 240' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 262:
@@ -106,7 +110,7 @@ def main():
     if a.mode == 'promote':
         if metadata != json.loads(a.metadata.read_text()):
             raise RuntimeError('Provenance changed during artifact download')
-        hashes = promote(metadata, a.artifacts, a.output)
+        hashes = promote(metadata, a.artifacts, a.output, a.source)
         (a.output / 'provenance.json').write_text(json.dumps({**metadata, 'jar_sha256': hashes}, indent=2) + '\n')
     else:
         a.metadata.write_text(json.dumps(metadata, indent=2) + '\n')
