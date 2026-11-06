@@ -111,7 +111,7 @@ final class GlowDepth extends RenderType {
             event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("glow_depth"), DefaultVertexFormat.NEW_ENTITY),
                     s -> shader = s);
             // ジェットの光の頂点の形の分（同じシェーダー）
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("glow_depth"), DefaultVertexFormat.POSITION_COLOR),
+            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("glow_depth_color"), DefaultVertexFormat.POSITION_COLOR),
                     s -> {
                         colorShader = s;
                         s.safeGetUniform("AlphaCut").set(JET_ALPHA_CUT);

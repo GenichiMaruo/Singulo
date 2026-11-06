@@ -22,7 +22,7 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = COSMIC ? 3 : SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 32;
+    private static int SCREENS = COSMIC ? 7 : SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 32;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen;
     private static long renderedFrames, shownFrame;
@@ -69,6 +69,7 @@ public final class MachineGuiReviewHarness {
             pixels.writeToFile(output.resolve(name + ".png"));
         }
         Singulo.LOGGER.info("SINGULO_MACHINE_GUI_CAPTURE {}", name);
+        if (COSMIC) checkCosmicRegions();
         shown = false;
         if (++screen < SCREENS) return;
         screen = 0;
@@ -95,15 +96,23 @@ public final class MachineGuiReviewHarness {
 
     private static void show(Minecraft mc) throws Exception {
         if(COSMIC){
+            int kind=Math.min(screen,2);
+            io.github.genichimaruo.singulo.energy.EnergyText.detail=()->screen>=3;
+            hoverX=-1;
+            org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(),20,20);
             var data=SyncedInts.client(io.github.genichimaruo.singulo.cosmic.CosmicMenu.COUNT);
-            int[] values={screen,0,screen==1?4_000_000:12_000,screen==1?8_000_000:20_000,500,250,screen==0?8_000_000:8_000,screen==0?16_000_000:16_000,600,1200,1,net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(net.minecraft.world.level.material.Fluids.WATER)+1};
+            int[] values={kind,0,kind==1?4_000_000:19_999,kind==1?8_000_000:20_000,500,250,kind==0?8_000_000:8_000,kind==0?16_000_000:16_000,600,1200,1,net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(net.minecraft.world.level.material.Fluids.WATER)+1,0,1};
             for(int i=0;i<values.length;i++)value(data,i,values[i]);
             var items=new ItemStackHandler(4);
             String[] ids={"collapsar_billet","exotic_matter","singularity_seed","tidal_filament"};
             for(int i=0;i<4;i++)items.setStackInSlot(i,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(ids[i]))));
-            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,screen==2,data);
+            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,kind==2,data);
             String[] blocks={"suspension_reservoir","pasta_accumulator","tidal_spindle"};
-            mc.setScreen(new CosmicScreen(menu,mc.player.getInventory(),Component.translatable("block.singulo."+blocks[screen])));
+            mc.setScreen(new CosmicScreen(menu,mc.player.getInventory(),Component.translatable("block.singulo."+blocks[kind])));
+            if(screen>=4){
+                hoverX=(mc.getWindow().getGuiScaledWidth()-io.github.genichimaruo.singulo.cosmic.CosmicMenu.WIDTH)/2+(screen==4?118:screen==5?148:180);
+                hoverY=(mc.getWindow().getGuiScaledHeight()-io.github.genichimaruo.singulo.cosmic.CosmicMenu.HEIGHT)/2+98;
+            }
             return;
         }
         hoverX = -1;
@@ -430,6 +439,10 @@ public final class MachineGuiReviewHarness {
     @net.neoforged.bus.api.SubscribeEvent
     public static void renderTooltips(net.neoforged.neoforge.client.event.ScreenEvent.Render.Post event) throws Exception {
         if (!shown || hoverX < 0) return;
+        if(event.getScreen() instanceof CosmicScreen screen){
+            screen.renderStatTooltips(event.getGuiGraphics(),hoverX,hoverY);
+            return;
+        }
         if (event.getScreen() instanceof MachineScreen screen) {
             var method = MachineScreen.class.getDeclaredMethod(SIDES ? "renderSides" : "renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);
             method.setAccessible(true);
@@ -441,6 +454,24 @@ public final class MachineGuiReviewHarness {
         } else if (event.getScreen() instanceof CatalystDeviceScreen screen) {
             screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
         }
+    }
+
+    /** Real font widths and the actual tooltip rectangles must not steal a port's hover. */
+    private static void checkCosmicRegions() throws Exception {
+        var field=FramedScreen.class.getDeclaredField("stats");field.setAccessible(true);
+        var stats=(java.util.List<?>)field.get(fixture);
+        for(int i=0;i<stats.size();i++)for(int j=i+1;j<stats.size();j++){
+            Object a=stats.get(i),b=stats.get(j);
+            int ax=statNumber(a,"x"),ay=statNumber(a,"y"),aw=statNumber(a,"w"),ah=statNumber(a,"h");
+            int bx=statNumber(b,"x"),by=statNumber(b,"y"),bw=statNumber(b,"w"),bh=statNumber(b,"h");
+            if(ax<bx+bw&&bx<ax+aw&&ay<by+bh&&by<ay+ah)
+                throw new IllegalStateException("Cosmic tooltip regions overlap: language="+LANGUAGES[language]+" screen="+screen+" "+a+" / "+b);
+        }
+        Singulo.LOGGER.info("SINGULO_COSMIC_GUI_REGIONS {} {}",LANGUAGES[language],screen);
+    }
+
+    private static int statNumber(Object stat,String name)throws Exception{
+        var method=stat.getClass().getDeclaredMethod(name);method.setAccessible(true);return (int)method.invoke(stat);
     }
 
 }

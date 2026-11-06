@@ -19,6 +19,8 @@ public final class CosmicWorldReviewHarness {
     private static volatile boolean ready;
     private static int index=Integer.getInteger("singulo.cosmicStart",0),ticks,wait;
     private static long frame,shown;
+    private static java.util.concurrent.CompletableFuture<Void> reload;
+    private static java.util.List<net.minecraft.client.renderer.ShaderInstance> oldShaders;
     private static io.github.genichimaruo.singulo.machine.MachineBlockEntity pipeGiver;
     @net.neoforged.bus.api.SubscribeEvent
     public static void drive(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event){
@@ -29,6 +31,11 @@ public final class CosmicWorldReviewHarness {
     @net.neoforged.bus.api.SubscribeEvent
     public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event)throws Exception{
         Minecraft mc=Minecraft.getInstance();
+        if(reload!=null){
+            if(!reload.isDone()||mc.getOverlay()!=null)return;
+            reload.join();CosmicGeometryReviewHarness.afterReload(oldShaders);
+            Singulo.LOGGER.info("SINGULO_COSMIC_COMPLETE 18");mc.stop();return;
+        }
         if(++ticks>20*240)throw new IllegalStateException("Cosmic review timed out "+index);
         if(mc.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen
                 && mc.screen.getTitle().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
@@ -57,7 +64,7 @@ public final class CosmicWorldReviewHarness {
         Path output=Path.of(System.getProperty("singulo.cosmicOutput"));Files.createDirectories(output);
         try(var pixels=Screenshot.takeScreenshot(mc.getMainRenderTarget())){pixels.writeToFile(output.resolve("cosmic-"+index+".png"));}
         Singulo.LOGGER.info("SINGULO_COSMIC_CAPTURE {}",index);
-        if(++index==16){Singulo.LOGGER.info("SINGULO_COSMIC_COMPLETE 16");mc.stop();return;}
+        if(++index==18){CosmicGeometryReviewHarness.verify();oldShaders=CosmicGeometryReviewHarness.shaders();reload=mc.reloadResourcePacks();return;}
         wait=0;
     }
     private static CosmicChamberBlockEntity opening;
@@ -73,6 +80,11 @@ public final class CosmicWorldReviewHarness {
         var player=server.getPlayerList().getPlayer(mc.player.getUUID());player.setGameMode(GameType.CREATIVE);
         player.setNoGravity(true);player.getAbilities().flying=true;player.onUpdateAbilities();
         level.setDayTime(6000);level.setWeatherParameters(0,6000,false,false);
+        if(index>=16){
+            BlockPos c=new BlockPos(48,100,0);
+            player.teleportTo(level,c.getX()+(index==16?-8:8),c.getY()+5,c.getZ()+12.5,index==16?-90:90,4);
+            ready=true;return;
+        }
         if(index==15){
             // 光の奥の水とガラスが手前に割り込まないこと
             BlockPos c=new BlockPos(48,100,0);

@@ -165,6 +165,10 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         return String.format(Locale.ROOT, "%,d", n);
     }
 
+    private static String exactEnergy(long n) {
+        return String.format(Locale.ROOT, "%,d", n);
+    }
+
     private String fit(Component text, int width) {
         String s = text.getString();
         return font.width(s) <= width ? s : font.plainSubstrByWidth(s, width - font.width("…")) + "…";
@@ -237,7 +241,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         long out = menu.value(5) * 1_000_000L;
         float fill = (float) (stored / (double) capacity);
         float ease = smooth(fill);
-        Component storedText = Component.literal(EnergyText.of(stored) + " / " + EnergyText.of(capacity));
+        Component storedText = Component.literal(exactEnergy(stored) + " / " + exactEnergy(capacity));
         int phase = fill < 0.35F ? 0 : fill < 0.72F ? 1 : 2;
 
         well(g, WELL_X, WELL_Y, WELL_W + 8, WELL_H);
@@ -295,11 +299,11 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         area(WELL_X, WELL_Y, WELL_W + 8, WELL_H, List.of(tr("phase." + phase), storedText));
 
         int y = WELL_Y + 2;
-        stat(g, STAT_X, y, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(stored), skin.text(), List.of(storedText));
+        stat(g, STAT_X, y, Panel.Icon.BOLT, Panel.GLOW, EnergyText.shortForm(stored), skin.text(), List.of(storedText));
         y += STAT_PITCH + 2;
-        stat(g, STAT_X, y, Panel.Icon.IN, 0xFFBFEFFF, EnergyText.of(in) + "/t", skin.text(), List.of(tr("rate_in", EnergyText.of(in))));
+        stat(g, STAT_X, y, Panel.Icon.IN, 0xFFBFEFFF, EnergyText.shortForm(in) + "/t", skin.text(), List.of(tr("rate_in", exactEnergy(in))));
         y += STAT_PITCH + 2;
-        stat(g, STAT_X, y, Panel.Icon.OUT, 0xFFFFD890, EnergyText.of(out) + "/t", skin.text(), List.of(tr("rate_out", EnergyText.of(out))));
+        stat(g, STAT_X, y, Panel.Icon.OUT, 0xFFFFD890, EnergyText.shortForm(out) + "/t", skin.text(), List.of(tr("rate_out", exactEnergy(out))));
         energyBar(g, stored / (double) capacity, List.of(storedText));
     }
 
@@ -314,7 +318,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         long capacity = Math.max(1, menu.value(3)) * 1_000_000L;
         int helium = menu.value(6);
         int heliumMax = Math.max(1, menu.value(7));
-        Component storedText = Component.literal(EnergyText.of(stored) + " / " + EnergyText.of(capacity));
+        Component storedText = Component.literal(exactEnergy(stored) + " / " + exactEnergy(capacity));
 
         int wx = CosmicMenu.WIDTH / 2 - 88;
         int ww = 170;
@@ -360,7 +364,9 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         Panel.arrow(g, skin, leftPos + CosmicMenu.EXOTIC_X + 26, topPos + slotY, k);
         statBar(g, wx + 2, slotY + 22, Panel.Icon.DROP, 0xFF7FB8E8, 62, helium / (double) heliumMax, 0xFF7FB8E8,
                 List.of(tr("helium", number(helium), number(heliumMax))));
-        stat(g, wx + 86, slotY + 22, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(stored), skin.text(), List.of(storedText));
+        // Keep the inline value inside its own column, including while Shift is held.
+        // The tooltip always contains the full synchronized value and capacity.
+        stat(g, wx + 86, slotY + 22, Panel.Icon.BOLT, Panel.GLOW, EnergyText.shortForm(stored), skin.text(), List.of(storedText));
         energyBar(g, stored / (double) capacity, List.of(storedText));
     }
 

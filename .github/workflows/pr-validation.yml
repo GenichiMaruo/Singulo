@@ -61,6 +61,28 @@ jobs:
         run: python3 -m pip install -r tools/review/requirements.txt
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py
+      - name: Verify cosmic screen values and independent port tooltips in five languages
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_gui.py --cosmic
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient -PmachineGuiReview -PcosmicGuiReview
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 35' build/cosmic-gui-review/logs/latest.log
+          test "$(grep -c 'SINGULO_COSMIC_GUI_REGIONS ' build/cosmic-gui-review/logs/latest.log)" -eq 35
+          test "$(ls build/cosmic-gui-review/screenshots/machine-*.png | wc -l)" -eq 35
+      - name: Verify cosmic geometry and release shaders on resource reload
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_gui.py --cosmic-world
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/cosmic.gradle runClient
+          grep -q 'SINGULO_COSMIC_COMPLETE 18' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_COSMIC_GEOMETRY_COMPLETE 144 outward quads' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 4 replaced and released programs' build/cosmic-review/logs/latest.log
+          test "$(ls build/cosmic-review/screenshots/cosmic-*.png | wc -l)" -eq 18
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -76,6 +98,10 @@ jobs:
             build/gui-review/inventory-pixels.json
             build/gui-review/machine-font-metrics.tsv
             build/gui-review/machine-pixels.json
+            build/cosmic-gui-review/screenshots/
+            build/cosmic-gui-review/logs/
+            build/cosmic-review/screenshots/
+            build/cosmic-review/logs/
 
   sodium-lighting:
     runs-on: ubuntu-latest
@@ -132,6 +158,16 @@ jobs:
           grep -q 'SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup' build/ponder-review/logs/latest.log
           grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE' build/ponder-review/logs/latest.log
           python3 tools/review/check_ponder_png.py
+      - name: Verify cosmic effects and shader reload with Sodium and Distant Horizons
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_gui.py --cosmic-world
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/cosmic.gradle runClient -PwithSodium -PwithDistantHorizons
+          grep -q 'SINGULO_COSMIC_COMPLETE 18' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 4 replaced and released programs' build/cosmic-review/logs/latest.log
       - name: Save Sodium lighting evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -142,6 +178,8 @@ jobs:
             build/rayleigh-review/screenshots/
             build/ponder-review/logs/
             build/ponder-review/screenshots/
+            build/cosmic-review/logs/
+            build/cosmic-review/screenshots/
 
   optional-mekanism:
     runs-on: ubuntu-latest

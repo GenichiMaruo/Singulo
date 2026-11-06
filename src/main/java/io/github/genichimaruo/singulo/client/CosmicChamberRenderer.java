@@ -665,12 +665,12 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
             vertex(vc, p, x1, y0, z0, 0.5F, 0.5F, c, alpha, light, 0, ny, nz);
             // 両端のふた
             vertex(vc, p, x0, SPOOL_Y, SPOOL_Z, 0.5F, 0.5F, rgb, alpha, light, -1, 0, 0);
-            vertex(vc, p, x0, y0, z0, 0.5F, 0.5F, rgb, alpha, light, -1, 0, 0);
             vertex(vc, p, x0, y1, z1, 0.5F, 0.5F, rgb, alpha, light, -1, 0, 0);
+            vertex(vc, p, x0, y0, z0, 0.5F, 0.5F, rgb, alpha, light, -1, 0, 0);
             vertex(vc, p, x0, SPOOL_Y, SPOOL_Z, 0.5F, 0.5F, rgb, alpha, light, -1, 0, 0);
             vertex(vc, p, x1, SPOOL_Y, SPOOL_Z, 0.5F, 0.5F, rgb, alpha, light, 1, 0, 0);
-            vertex(vc, p, x1, y1, z1, 0.5F, 0.5F, rgb, alpha, light, 1, 0, 0);
             vertex(vc, p, x1, y0, z0, 0.5F, 0.5F, rgb, alpha, light, 1, 0, 0);
+            vertex(vc, p, x1, y1, z1, 0.5F, 0.5F, rgb, alpha, light, 1, 0, 0);
             vertex(vc, p, x1, SPOOL_Y, SPOOL_Z, 0.5F, 0.5F, rgb, alpha, light, 1, 0, 0);
         }
     }

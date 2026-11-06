@@ -5,21 +5,21 @@
   "java": 21,
   "jar": {
     "name": "Singulo-0.16.0-1.21.1N.jar",
-    "size": 8990632,
-    "sha256": "dd37657569f81f0ee338cb2c02bb391993b96e4c5517d9ff76d31e2959e12344"
+    "size": 9120016,
+    "sha256": "ea9275d2ba8cd63a1c17472d655062034ec651328377734d8026d974cc6eab9a"
   },
   "regular_gametests": {
-    "passed": 697,
+    "passed": 701,
     "complete": true
   },
   "mekanism_gametests": 1,
   "python_tests": 51,
   "translations_per_language": {
-    "en_us": 3419,
-    "ja_jp": 3419,
-    "ko_kr": 3419,
-    "zh_cn": 3419,
-    "zh_tw": 3419
+    "en_us": 3458,
+    "ja_jp": 3458,
+    "ko_kr": 3458,
+    "zh_cn": 3458,
+    "zh_tw": 3458
   },
   "existing_gui_pixels": {
     "languages": [
@@ -79,7 +79,7 @@
     "FluidStack gases supported; Mekanism Chemical API is not a reservoir capability.",
     "No low-end GPU or long-term multiplayer load/balance test.",
     "Cross-dimension transit tested with ServerPlayer GameTests; native two-client tests cover forge/spindle menus, reconnect and chunk reload.",
-    "No independent human review, PR, remote CI, merge or publication in this task."
+    "Draft PR #62 exists; remote CI cannot start because the GitHub account is locked due to a billing issue. No merge or publication."
   ],
   "independent_review_fixes": {
     "stale_menu_inventory_duplication": {
@@ -102,5 +102,29 @@
       "completed_output": 4
     }
   },
-  "native_evidence_scope": "Existing GUI/rendering, two-client and restart evidence was recorded before these two review fixes; the review fixes are covered by the current 697-test run and focused 14-test run."
+  "native_evidence_scope": "The 0.16.0 visual rebuild is covered by the current 701 GameTests, 262 existing GUI captures, 35 cosmic GUI cases and 18 world states in vanilla and Sodium/DH. Earlier two-client and dedicated-server restart evidence predates the visual rebuild.",
+  "visual_review": {
+    "reviewed_head": "8d3eccd248e2fb7cea44848fb2e30e7adc9dc4ab",
+    "findings_fixed": [
+      "Inward spool end-cap winding",
+      "Shift energy text and port tooltip overlap",
+      "Duplicate shader registry names leaking programs on reload",
+      "Survey flow chevrons hidden inside opaque pipes"
+    ],
+    "cosmic_gui_cases": 35,
+    "existing_gui_captures": 262,
+    "spool_outward_quads_checked": 144,
+    "pipe_external_surface_cases": 24,
+    "old_shader_programs_released_on_reload": 4,
+    "standard_world_states": 18,
+    "sodium_dh_world_states": 18,
+    "gpu": "NVIDIA GeForce RTX 4070 SUPER",
+    "generator_reproducible": true,
+    "native_multiplayer_rerun": false,
+    "remote_ci": {
+      "initial_run": 42179782810,
+      "status": "blocked_before_start",
+      "reason": "The job was not started because your account is locked due to a billing issue."
+    }
+  }
 }

@@ -18,7 +18,7 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
 /**
- * 測量メガネで見る液体パイプ: 流れている向きへ、液体の色の山形の光がパイプの中を走る。止まっているパイプは琥珀の輪で脈打つ。
+ * 測量メガネで見る液体パイプ: 流れている向きへ、液体の色の山形の光がパイプの表面を走る。止まっているパイプは琥珀の輪で脈打つ。
  * 見ているパイプの量と種類は、画面の中央の近くに小さな札で出す。
  */
 final class PipeSurveyRenderer {
@@ -74,10 +74,10 @@ final class PipeSurveyRenderer {
                 int rgb = pipe.mixed() || pipe.visualFluid().isEmpty() ? 0x78E6FF : tint(pipe);
                 for (Direction d : Direction.values()) {
                     if ((pipe.outMask() & (1 << d.get3DDataValue())) != 0) {
-                        chevrons(pose, vc, c, d, false, time, rgb);
+                        chevrons(pose, vc, c, d, false, time, rgb, camera);
                     }
                     if ((pipe.inMask() & (1 << d.get3DDataValue())) != 0) {
-                        chevrons(pose, vc, c, d, true, time, rgb);
+                        chevrons(pose, vc, c, d, true, time, rgb, camera);
                     }
                 }
             }
@@ -92,7 +92,7 @@ final class PipeSurveyRenderer {
     }
 
     /** パイプの中心と面の間を、流れの向きへ走る山形の光。 */
-    private static void chevrons(PoseStack pose, VertexConsumer vc, Vec3 center, Direction side, boolean incoming, float time, int rgb) {
+    private static void chevrons(PoseStack pose, VertexConsumer vc, Vec3 center, Direction side, boolean incoming, float time, int rgb, Vec3 camera) {
         Vec3 d = Vec3.atLowerCornerOf(side.getNormal());
         Vec3 along = incoming ? d.scale(-1) : d;
         Vec3 up = side.getAxis() == Direction.Axis.Y ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
@@ -101,11 +101,16 @@ final class PipeSurveyRenderer {
             float k = (time * 1.4F + i * 0.5F) % 1;
             // 流れてくる側から出ていく側へ（入口は面から中心へ、出口は中心から面へ）
             float at = incoming ? 0.5F - 0.5F * k : 0.5F * k;
-            Vec3 tip = center.add(d.scale(at));
             int alpha = (int) (235 * Mth.sin(k * Mth.PI));
-            for (Vec3 arm : new Vec3[]{up, across}) {
-                FxDraw.beam(pose.last(), vc, tip.subtract(along.scale(0.11)).add(arm.scale(0.17)), tip, 0.035F, rgb, alpha);
-                FxDraw.beam(pose.last(), vc, tip.subtract(along.scale(0.11)).subtract(arm.scale(0.17)), tip, 0.035F, rgb, alpha);
+            // The opaque pipe extends 3/16 blocks from its axis. Draw on the
+            // two camera-facing outer surfaces, retaining ordinary depth tests
+            // and the existing beam count instead of burying the arrows inside it.
+            for (Vec3 normal : new Vec3[]{up, across}) {
+                Vec3 arm = normal == up ? across : up;
+                double offset = camera.subtract(center).dot(normal) >= 0 ? 0.215 : -0.215;
+                Vec3 tip = center.add(d.scale(at)).add(normal.scale(offset));
+                FxDraw.beam(pose.last(), vc, tip.subtract(along.scale(0.11)).add(arm.scale(0.11)), tip, 0.035F, rgb, alpha);
+                FxDraw.beam(pose.last(), vc, tip.subtract(along.scale(0.11)).subtract(arm.scale(0.11)), tip, 0.035F, rgb, alpha);
             }
         }
     }

@@ -68,7 +68,7 @@ final class JetForgeRenderTypes extends RenderType {
         try {
             event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("jet_beam"),
                     DefaultVertexFormat.POSITION_TEX_COLOR), s -> beamShader = s);
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("jet_beam"),
+            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("jet_beam_depth"),
                     DefaultVertexFormat.POSITION_TEX_COLOR), s -> {
                 beamDepthShader = s;
                 s.safeGetUniform("DepthCut").set(BEAM_DEPTH_CUT);
