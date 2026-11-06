@@ -40,6 +40,17 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         default IFluidHandler ejectFluids() {
             return null;
         }
+
+        /** ポートごとに入出力を決められる装置は、このポートから押し出してよい物を返す。 */
+        @Nullable
+        default IItemHandler ejectItems(BlockPos port) {
+            return ejectItems();
+        }
+
+        @Nullable
+        default IFluidHandler ejectFluids(BlockPos port) {
+            return ejectFluids();
+        }
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MultiblockPortBlockEntity port) {
@@ -50,8 +61,8 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         IEnergyStorage energy = port.delegate(Capabilities.EnergyStorage.BLOCK);
         boolean slow = (level.getGameTime() + pos.asLong()) % ITEM_INTERVAL == 0;
         Outputs outputs = slow && level.getBlockEntity(controller) instanceof Outputs o ? o : null;
-        IItemHandler items = outputs == null ? null : outputs.ejectItems();
-        IFluidHandler fluids = outputs == null ? null : outputs.ejectFluids();
+        IItemHandler items = outputs == null ? null : outputs.ejectItems(pos);
+        IFluidHandler fluids = outputs == null ? null : outputs.ejectFluids(pos);
         if ((energy == null || !energy.canExtract()) && items == null && fluids == null) {
             return;
         }
