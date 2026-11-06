@@ -1360,6 +1360,14 @@ Mk1を材料にする。蓄電容量を最低4,000,000 FEにする
 
 ![重力懸垂タンク](389_suspension_reservoir.png)
 
+### 重力懸垂冠
+
+![重力懸垂冠](397_suspension_crown.png)
+
+### 懸垂支柱
+
+![懸垂支柱](398_suspension_strut.png)
+
 ## 段階4　時間
 
 ### 工場式印刷ユニット
@@ -2125,3 +2133,15 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 ### コラプサー並列カセット
 
 ![コラプサー並列カセット](396_collapsar_parallel_cassette.png)
+
+### 核パスタ導体
+
+![核パスタ導体](399_pasta_conductor.png)
+
+### 潮汐絞りリング
+
+![潮汐絞りリング](400_tidal_draw_ring.png)
+
+### スプール受け台
+
+![スプール受け台](401_spindle_cradle.png)

@@ -210,6 +210,11 @@
     "singulo:pasta_laminate",
     "singulo:suspension_reservoir",
     "singulo:pasta_accumulator",
-    "singulo:tidal_spindle"
+    "singulo:tidal_spindle",
+    "singulo:suspension_crown",
+    "singulo:suspension_strut",
+    "singulo:pasta_conductor",
+    "singulo:tidal_draw_ring",
+    "singulo:spindle_cradle"
   ]
 }

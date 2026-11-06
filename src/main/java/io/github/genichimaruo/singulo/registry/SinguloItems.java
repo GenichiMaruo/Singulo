@@ -269,6 +269,11 @@ public final class SinguloItems {
         }
         block(SinguloBlocks.COSMIC_FRAME,3);
         block(SinguloBlocks.PASTA_LAMINATE,5);
+        block(SinguloBlocks.SUSPENSION_CROWN,3);
+        block(SinguloBlocks.SUSPENSION_STRUT,3);
+        block(SinguloBlocks.PASTA_CONDUCTOR,5);
+        block(SinguloBlocks.TIDAL_DRAW_RING,5);
+        block(SinguloBlocks.SPINDLE_CRADLE,5);
         block(SinguloBlocks.SUSPENSION_RESERVOIR,3);
         block(SinguloBlocks.PASTA_ACCUMULATOR,5);
         block(SinguloBlocks.TIDAL_SPINDLE,5);

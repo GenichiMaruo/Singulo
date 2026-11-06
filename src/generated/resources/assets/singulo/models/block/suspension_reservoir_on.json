@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t3",
-    "side": "singulo:block/machine_side_t3",
-    "bottom": "singulo:block/machine_bottom_t3",
+    "top": "singulo:block/cosmic_frame",
+    "side": "singulo:block/cosmic_frame",
+    "bottom": "singulo:block/cosmic_frame",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/suspension_reservoir_front_on",
-    "particle": "singulo:block/machine_side_t3"
+    "particle": "singulo:block/cosmic_frame"
   },
   "elements": [
     {

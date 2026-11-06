@@ -1705,6 +1705,9 @@ CONTROLLER_SKINS = {
     'tipler_core': 'tipler_housing',
     'wormhole_generator_core': 'wormhole_generator_shell',
     'jet_forge_core': 'jet_forge_foundation',
+    'suspension_reservoir': 'cosmic_frame',
+    'pasta_accumulator': 'cosmic_frame',
+    'tidal_spindle': 'cosmic_frame',
 }
 
 
@@ -2802,6 +2805,9 @@ SOUNDS = {
     'wormhole_mouth_ambient': ('machine/wormhole_mouth_ambient', 'ワームホールがざわめく', 'Wormhole murmurs', 20),
     'wormhole_stabilizer_running': ('machine/wormhole_stabilizer_running', 'ワームホール固定化装置が動く', 'Wormhole stabilizer runs', 16),
     'halo_collector_running': ('machine/halo_collector_running', 'ハロー捕集器が集める', 'Halo collector gathers', 16),
+    'suspension_reservoir_running': ('machine/suspension_reservoir_running', '重力懸垂タンクが液体を吊る', 'Suspension reservoir hums', 16),
+    'pasta_accumulator_running': ('machine/pasta_accumulator_running', '核パスタが圧縮される', 'Nuclear pasta compresses', 16),
+    'tidal_spindle_running': ('machine/tidal_spindle_running', '潮汐紡糸機が糸を巻く', 'Tidal spindle winds thread', 24),
     'containment_tank_running': ('machine/containment_tank_running', '閉じ込めタンクがうなる', 'Containment tank hums', 12),
     'penrose_reactor_ignition': ('machine/penrose_reactor_ignition', 'Pリアクターが点火を始める', 'P-Reactor ignition begins', 48),
     'probe_station_launch': ('machine/probe_station_launch', '探査機が飛び立つ', 'Probe launches', 24),
@@ -3773,7 +3779,10 @@ TAB_GROUPS = [
                    'wormhole_generator_window', 'wormhole_generator_port',
                    'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed',
                    'jet_forge_core', 'jet_forge_foundation', 'jet_forge_confinement_coil', 'jet_forge_collimator',
-                   'jet_forge_heat_sink', 'jet_forge_truss', 'jet_forge_levitator', 'jet_forge_collector']),
+                   'jet_forge_heat_sink', 'jet_forge_truss', 'jet_forge_levitator', 'jet_forge_collector',
+                   'cosmic_frame', 'suspension_reservoir', 'suspension_crown', 'suspension_strut',
+                   'pasta_accumulator', 'pasta_laminate', 'pasta_conductor',
+                   'tidal_spindle', 'tidal_draw_ring', 'spindle_cradle']),
     ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector', 'void_collector',
                      'low_gravity_panel',
                      'high_gravity_panel', 'zero_gravity_block', 'zero_gravity_controller', 'gravitational_wave_detector', 'neutrino_observatory',
@@ -4133,7 +4142,7 @@ GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass'
 
 
 # 空のスロットに描く、入れる物のグレーの影（textures/gui/ghost/<id>.png）
-GHOSTS = {'singularity_seed': 'item', 'mass_pellet': 'item', 'jet_collector': 'item', 'hawking_collector': 'item',
+GHOSTS = {'collapsar_parallel_cassette': 'item', 'singularity_seed': 'item', 'mass_pellet': 'item', 'jet_collector': 'item', 'hawking_collector': 'item',
           'ergosphere_ring': 'item', 'exotic_matter': 'item', 'shield_permit': 'item', 'compressed_block_2': 'block'}
 
 

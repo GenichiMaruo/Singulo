@@ -640,6 +640,15 @@ public final class SinguloBlocks {
 
     public static final DeferredBlock<PartBlock> COSMIC_FRAME = part("cosmic_frame", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> PASTA_LAMINATE = part("pasta_laminate", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> SUSPENSION_CROWN = part("suspension_crown", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> SUSPENSION_STRUT = BLOCKS.register("suspension_strut",
+            () -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().noOcclusion(), MultiblockPart.Role.STRUCTURE,
+                    net.minecraft.world.phys.shapes.Shapes.or(Block.box(6, 0, 6, 10, 16, 10), Block.box(5, 6, 5, 11, 10, 11))));
+    public static final DeferredBlock<PartBlock> PASTA_CONDUCTOR = BLOCKS.register("pasta_conductor",
+            () -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().noOcclusion(), MultiblockPart.Role.STRUCTURE,
+                    net.minecraft.world.phys.shapes.Shapes.or(Block.box(4, 0, 4, 12, 16, 12), Block.box(2, 2, 2, 14, 5, 14), Block.box(2, 11, 2, 14, 14, 14))));
+    public static final DeferredBlock<PartBlock> TIDAL_DRAW_RING = part("tidal_draw_ring", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> SPINDLE_CRADLE = part("spindle_cradle", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> SUSPENSION_RESERVOIR =
             BLOCKS.register("suspension_reservoir", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> PASTA_ACCUMULATOR =
