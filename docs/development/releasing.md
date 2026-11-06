@@ -1,5 +1,8 @@
 # CurseForge ファイルのアップロード
 
+Actionsを利用できない場合の、同じ成功CI成果物と来歴検証を使う経路は
+[ローカルCurseForge公開](local-curseforge.md)を参照。アップロードには別途の明示承認と作者画面での全状態確認が必要。
+
 ## 対象と配布ファイル
 
 Minecraft 1.21.1は0.9.0以降NeoForgeのみ。Forge版の最終版は0.8.1。1.20.1のForge / NeoForge版は`1.20.1`ブランチで扱う。

@@ -1,5 +1,10 @@
 # テストの実行と追加
 
+ローカルCurseForge公開経路のオフライン検査は
+`python -m unittest discover -s tools -p test_local_curseforge.py`。
+実トークン・外部送信を使わず、来歴の結合、予約・同時実行・送信意図の永続化・不確実な結果での停止を確認する。
+実行方法と手動確認が必要な範囲は[ローカル公開手順](local-curseforge.md)を参照。
+
 ## 全体の検証
 
 Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 662件、Mekanismを入れる専用GameTest 1件、検証ツールの単体テスト47件。GUIは通常22画面と5言語×48画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
