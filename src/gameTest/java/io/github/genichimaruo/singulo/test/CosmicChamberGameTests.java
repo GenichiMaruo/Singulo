@@ -36,22 +36,21 @@ public final class CosmicChamberGameTests {
     @GameTest(template="forge",timeoutTicks=1600)
     public static void cosmicSpindleRunsFromSeparateCablePipeAndHopperConnections(GameTestHelper h){
         var be=build(h,Blueprints.Kind.TIDAL_SPINDLE);stored(h,be,0,true);
-        h.setBlock(C.west(),io.github.genichimaruo.singulo.registry.SinguloBlocks.HORIZON_BUS.get());
+        // 左（西）のポートは入力: ケーブルとパイプをつなぐ。右（東）のポートは出力: ホッパーへ押し出す
         h.setBlock(C.west().south(),io.github.genichimaruo.singulo.registry.SinguloBlocks.HORIZON_BUS.get());
         h.setBlock(C.west().south(2),io.github.genichimaruo.singulo.registry.SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        h.setBlock(C.east(),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get());
-        h.setBlock(C.east().south(),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get());
-        BlockPos producer=C.east().south(2);
+        h.setBlock(C.west().above(),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get());
+        BlockPos producer=C.west().above(2);
         h.setBlock(producer,io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.ELECTROLYZER).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity source=h.getBlockEntity(producer);
         source.forceOutputTankForTest(new FluidStack(SinguloFluids.get("liquid_helium"),500));
         h.setBlock(C.south(),Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING,Direction.NORTH));
-        h.setBlock(C.below(),Blocks.HOPPER);
+        h.setBlock(C.east().south(),Blocks.HOPPER);
         net.minecraft.world.level.block.entity.HopperBlockEntity input=h.getBlockEntity(C.south());input.setItem(0,item("collapsar_billet",1));input.setItem(1,item("exotic_matter",1));
         h.assertTrue(be.ready(),"Separate normal cable, fluid pipe and item hoppers break the spindle structure");
         h.runAtTickTime(50,()->h.assertTrue(be.stored()>0&&!be.reserved().isEmpty()&&be.tank().isEmpty()&&input.isEmpty(),"Ordinary cable/pipe/hopper did not supply and reserve resources"));
         h.succeedWhen(()->{
-            net.minecraft.world.level.block.entity.HopperBlockEntity output=h.getBlockEntity(C.below());int count=0;
+            net.minecraft.world.level.block.entity.HopperBlockEntity output=h.getBlockEntity(C.east().south());int count=0;
             for(int i=0;i<output.getContainerSize();i++)if(output.getItem(i).is(item("tidal_filament",1).getItem()))count+=output.getItem(i).getCount();
             h.assertTrue(count==4&&be.reserved().isEmpty(),"Four filaments did not exit through a normal hopper");
             h.assertTrue(input.isEmpty()&&source.automationFluids().drain(500,FluidAction.SIMULATE).isEmpty(),"Ingredients or coolant were not consumed exactly once");
@@ -159,7 +158,7 @@ public final class CosmicChamberGameTests {
     public static void cosmicBrokenStructureStopsImmediatelyAndKeepsContents(GameTestHelper h){
         var be=build(h,Blueprints.Kind.SUSPENSION_RESERVOIR);
         be.fluidFor(null).fill(new FluidStack(Fluids.WATER,7000),FluidAction.EXECUTE);
-        var part=CosmicLayouts.RESERVOIR.pos(be.getBlockPos(),Direction.NORTH,0,6,0);
+        var part=CosmicLayouts.RESERVOIR.pos(be.getBlockPos(),Direction.NORTH,1,3,1);
         var state=h.getLevel().getBlockState(part);h.getLevel().setBlockAndUpdate(part,Blocks.AIR.defaultBlockState());
         h.assertTrue(be.fluidFor(null).drain(7000,FluidAction.EXECUTE).isEmpty(),"Broken structure still drains in same tick");
         h.assertTrue(be.fluidFor(null).fill(new FluidStack(Fluids.WATER,100),FluidAction.EXECUTE)==0,"Broken structure accepts input");
@@ -233,5 +232,56 @@ public final class CosmicChamberGameTests {
         be.items().setStackInSlot(0,item("collapsar_billet",1));be.items().setStackInSlot(1,item("exotic_matter",1));be.items().setStackInSlot(3,item("tidal_filament",64));
         be.fluidFor(null).fill(new FluidStack(SinguloFluids.get("liquid_helium"),500),FluidAction.EXECUTE);
         h.runAtTickTime(20,()->{h.assertTrue(be.reserved().isEmpty()&&be.items().getStackInSlot(0).getCount()==1&&be.tank().getFluidAmount()==500&&be.stored()==1_000_000_000L,"Blocked start consumed inputs");h.succeed();});
+    }
+    /** 左右のポートは制御卓につながり、入力・出力・入出力の設定どおりに働く。設定は保存される。 */
+    @GameTest(template="forge",timeoutTicks=40)
+    public static void cosmicPortsFollowTheirMode(GameTestHelper h){
+        var be=build(h,Blueprints.Kind.PASTA_ACCUMULATOR);stored(h,be,1_000_000_000_000L,false);
+        var west=be.portPos(0);
+        h.assertTrue(west.equals(h.absolutePos(C).west()),"Left port (seen from the front) is the west one");
+        h.runAfterDelay(2,()->{
+            var cap=h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,west,Direction.SOUTH);
+            h.assertTrue(cap!=null,"Fixed port did not link to the controller");
+            h.assertTrue(be.portMode(0)==CosmicChamberBlockEntity.PORT_INPUT&&cap.receiveEnergy(1000,true)>0&&cap.extractEnergy(1000,true)==0,"Input port must only receive");
+            be.cyclePort(0);
+            h.assertTrue(be.portMode(0)==CosmicChamberBlockEntity.PORT_OUTPUT&&cap.receiveEnergy(1000,true)==0&&cap.extractEnergy(1000,true)>0,"Output port must only extract");
+            be.cyclePort(0);
+            h.assertTrue(be.portMode(0)==CosmicChamberBlockEntity.PORT_BOTH&&cap.receiveEnergy(1000,true)>0&&cap.extractEnergy(1000,true)>0,"Both must do both");
+            var copy=(CosmicChamberBlockEntity)BlockEntity.loadStatic(be.getBlockPos(),be.getBlockState(),be.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());
+            h.assertTrue(copy.portMode(0)==CosmicChamberBlockEntity.PORT_BOTH&&copy.portMode(1)==CosmicChamberBlockEntity.PORT_OUTPUT,"Port modes were not saved");
+            h.getLevel().setBlockAndUpdate(west,Blocks.AIR.defaultBlockState());
+            h.assertTrue(!be.ready(),"A missing port must break the structure");
+            h.succeed();
+        });
+    }
+    /** 制御卓は中身があるあいだ点く（稼働音もこれで鳴る）。 */
+    @GameTest(template="forge",timeoutTicks=40)
+    public static void cosmicControllerLightsWhileHoldingContents(GameTestHelper h){
+        var be=build(h,Blueprints.Kind.SUSPENSION_RESERVOIR);
+        var lit=io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT;
+        h.runAfterDelay(5,()->{
+            h.assertTrue(!h.getBlockState(C).getValue(lit),"Empty reservoir must stay dark");
+            be.fluidFor(null).fill(new FluidStack(Fluids.WATER,1000),FluidAction.EXECUTE);
+            h.runAfterDelay(5,()->{
+                h.assertTrue(h.getBlockState(C).getValue(lit),"Filled reservoir must light up");
+                be.fluidFor(null).drain(1000,FluidAction.EXECUTE);
+                h.runAfterDelay(5,()->{h.assertTrue(!h.getBlockState(C).getValue(lit),"Drained reservoir must go dark");h.succeed();});
+            });
+        });
+    }
+    /** 箱いっぱいでない部品の当たり判定は見た目と同じ大きさ。組み上げると間を通れる。 */
+    @GameTest(template="forge")
+    public static void cosmicThinPartsCollideLikeTheirModels(GameTestHelper h){
+        var level=h.getLevel();
+        var checks=new Object[][]{
+            {io.github.genichimaruo.singulo.registry.SinguloBlocks.SUSPENSION_STRUT.get(),5.0,0.0,11.0,16.0},
+            {io.github.genichimaruo.singulo.registry.SinguloBlocks.PASTA_CONDUCTOR.get(),2.0,0.0,14.0,16.0},
+            {io.github.genichimaruo.singulo.registry.SinguloBlocks.RUIN_CACHE.get(),0.0,0.0,16.0,15.0}};
+        for(var c:checks){
+            var block=(net.minecraft.world.level.block.Block)c[0];
+            var box=block.defaultBlockState().getCollisionShape(level,BlockPos.ZERO).bounds();
+            h.assertTrue(Math.abs(box.minX*16-(double)c[1])<1e-6&&Math.abs(box.minY*16-(double)c[2])<1e-6&&Math.abs(box.maxX*16-(double)c[3])<1e-6&&Math.abs(box.maxY*16-(double)c[4])<1e-6,block+" collision box does not match its model: "+box);
+        }
+        h.succeed();
     }
 }

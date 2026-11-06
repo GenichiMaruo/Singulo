@@ -15,7 +15,10 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 public final class CosmicMenu extends AbstractContainerMenu {
-    public static final int COUNT=12;
+    public static final int COUNT=14;
+    /** 画面の枠（DeviceMenu と同じ大きさ。インベントリは枠の中央）とスロットの位置。CosmicScreen と同じ値。 */
+    public static final int WIDTH=212, HEIGHT=206;
+    public static final int SLOT_Y=72, SEED_X=25, BILLET_X=61, EXOTIC_X=81, OUTPUT_X=147;
     private final BlockPos pos;
     private final SyncedInts data;
     private final int machineSlots;
@@ -30,13 +33,14 @@ public final class CosmicMenu extends AbstractContainerMenu {
         machineSlots=spindle?4:0;
         if(spindle)for(int i=0;i<4;i++){
             final int index=i;
-            addSlot(new SlotItemHandler(items,i,i==3?154:30+i*28,92){
+            addSlot(new SlotItemHandler(items,i,i==0?BILLET_X:i==1?EXOTIC_X:i==2?SEED_X:OUTPUT_X,SLOT_Y){
                 @Override public boolean mayPlace(ItemStack stack){return index!=3&&(owner==null||stillValid(inventory.player))&&super.mayPlace(stack);}
                 @Override public boolean mayPickup(Player player){return (owner==null||stillValid(player))&&super.mayPickup(player);}
             });
         }
-        for(int y=0;y<3;y++)for(int x=0;x<9;x++)addSlot(new Slot(inventory,x+y*9+9,26+x*18,128+y*18));
-        for(int x=0;x<9;x++)addSlot(new Slot(inventory,x,26+x*18,186));
+        int left=io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH);
+        for(int y=0;y<3;y++)for(int x=0;x<9;x++)addSlot(new Slot(inventory,x+y*9+9,left+x*18,io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT)+y*18));
+        for(int x=0;x<9;x++)addSlot(new Slot(inventory,x,left+x*18,io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT)));
     }
     public static CosmicMenu client(int id,Inventory inventory,RegistryFriendlyByteBuf buf){
         return new CosmicMenu(id,inventory,buf.readBlockPos(),new ItemStackHandler(4){
@@ -50,6 +54,11 @@ public final class CosmicMenu extends AbstractContainerMenu {
     @Override public boolean stillValid(Player player){
         return player.level().isClientSide || owner!=null&&owner.menuActive()&&owner.getLevel()==player.level()
                 &&player.level().getBlockEntity(pos)==owner&&io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player,pos);
+    }
+    /** 画面のボタン: ポートの向きを切り替える（0 が左、1 が右）。 */
+    @Override public boolean clickMenuButton(Player player,int id){
+        if(owner==null||!stillValid(player)||id<0||id>1)return false;
+        owner.cyclePort(id);return true;
     }
     @Override public void clicked(int slot,int button,ClickType type,Player player){
         if(stillValid(player))super.clicked(slot,button,type,player);

@@ -37,11 +37,16 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /** Finite storage and a reserved-work spindle, with no runtime chunk loading. */
-public final class CosmicChamberBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider {
+public final class CosmicChamberBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
+        io.github.genichimaruo.singulo.multiblock.PortAccess, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     public static final int RESERVOIR=0, ACCUMULATOR=1, SPINDLE=2;
     public static final int FLUID_CAPACITY=16_000_000;
     public static final long PASTA_CAPACITY=8_000_000_000_000L, PASTA_RATE=2_000_000_000L;
     public static final long SPINDLE_CAPACITY=20_000_000_000L, SPINDLE_RATE=200_000_000L, CORE_COST=10_000_000_000L;
+    /** ポートの向き。切り替えは 入力 → 出力 → 両方 の順。 */
+    public static final int PORT_INPUT=0, PORT_OUTPUT=1, PORT_BOTH=2;
+    /** 制御卓の左右のポート（正面から見て 0 が左、1 が右）。はじめは左が入力、右が出力。 */
+    private final int[] portModes={PORT_INPUT,PORT_OUTPUT};
     private long stored, pendingOutput, budgetTick=Long.MIN_VALUE, tickIn, tickOut;
     private int lastIn, lastOut, progress, duration, cost, status=1;
     private boolean core;
@@ -71,6 +76,19 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         public ItemStack extractItem(int slot,int count,boolean simulate){return slot==3&&ready()?items.extractItem(slot,count,simulate):ItemStack.EMPTY;}
     };
 
+    private final IItemHandler itemInput=new ItemsOneWay(true), itemOutput=new ItemsOneWay(false);
+    /** ポート用: 入れるだけ、または完成品を出すだけ。 */
+    private final class ItemsOneWay implements IItemHandler {
+        private final boolean in;
+        ItemsOneWay(boolean in){this.in=in;}
+        public int getSlots(){return automation.getSlots();}
+        public ItemStack getStackInSlot(int slot){return automation.getStackInSlot(slot);}
+        public int getSlotLimit(int slot){return automation.getSlotLimit(slot);}
+        public boolean isItemValid(int slot,ItemStack stack){return in&&automation.isItemValid(slot,stack);}
+        public ItemStack insertItem(int slot,ItemStack stack,boolean simulate){return in?automation.insertItem(slot,stack,simulate):stack;}
+        public ItemStack extractItem(int slot,int count,boolean simulate){return in?ItemStack.EMPTY:automation.extractItem(slot,count,simulate);}
+    }
+
     public CosmicChamberBlockEntity(BlockPos pos, BlockState state) { super(SinguloBlockEntities.COSMIC_CHAMBER.get(),pos,state); }
     public static boolean acceptsSpindleItem(int slot,ItemStack stack){
         return slot>=0&&slot<3&&stack.is(BuiltInRegistries.ITEM.get(Singulo.id(
@@ -91,6 +109,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public void retireForRemoval(){
         if(retired)return;
         retired=true;
+        if(level!=null&&!level.isClientSide)linkPorts(false);
         if(level instanceof ServerLevel server)for(var player:java.util.List.copyOf(server.players()))
             if(player.containerMenu instanceof CosmicMenu menu&&menu.ownedBy(this))player.closeContainer();
     }
@@ -122,10 +141,15 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     }
     public static void serverTick(Level level,BlockPos pos,BlockState state,CosmicChamberBlockEntity be) {
         be.budgets();
-        if(be.ready()) {
+        boolean formed=be.ready();
+        be.linkPorts(formed);
+        if(formed) {
             if(be.kind()==ACCUMULATOR)be.pushPower();
             else if(be.kind()==SPINDLE)be.process((ServerLevel)level);
         }
+        // 稼働灯と音: 構造が完成していて、中身があるあいだ点く
+        boolean lit=be.status==0&&switch(be.kind()){case RESERVOIR->!be.tank.isEmpty();case ACCUMULATOR->be.stored>0;default->be.core;};
+        if(state.getValue(AbstractMachineBlock.LIT)!=lit)level.setBlock(pos,state.setValue(AbstractMachineBlock.LIT,lit),Block.UPDATE_CLIENTS);
         if(level.getGameTime()%20==0){be.setChanged();level.sendBlockUpdated(pos,state,state,Block.UPDATE_CLIENTS);}
     }
     private void pushPower() {
@@ -153,6 +177,9 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         if(!core) {
             if(stored<CORE_COST || !items.getStackInSlot(2).is(BuiltInRegistries.ITEM.get(Singulo.id("singularity_seed"))))return;
             stored-=CORE_COST;items.extractItem(2,1,false);core=true;setChanged();
+            // 開く演出をすぐ見せる
+            level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
+            io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level,worldPosition,"wormhole_generator_open",0.7F,1.5F);
         }
         if(!reserved.isEmpty()) {
             if(progress<duration && stored>=cost){stored-=cost;progress++;setChanged();}
@@ -222,13 +249,54 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         public FluidStack drain(FluidStack f,FluidAction a){return drain&&kind()==RESERVOIR&&ready()?tank.drain(f,a):FluidStack.EMPTY;}
         public FluidStack drain(int n,FluidAction a){return drain&&kind()==RESERVOIR&&ready()?tank.drain(n,a):FluidStack.EMPTY;}
     }
+    public BlockPos portPos(int index){
+        return worldPosition.relative(index==0?back().getCounterClockWise():back().getClockWise());
+    }
+    public int portMode(int index){return portModes[index];}
+    public void cyclePort(int index){
+        portModes[index]=(portModes[index]+1)%3;
+        setChanged();
+        if(level!=null&&!level.isClientSide){
+            level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
+            // つないだパイプにつなぎ直させる（出し入れできる物が変わった）
+            level.updateNeighborsAt(portPos(index),level.getBlockState(portPos(index)).getBlock());
+        }
+    }
+    private int modeOf(BlockPos port){return port.equals(portPos(0))?portModes[0]:portModes[1];}
+    /** 形が完成している間だけ、ポートをこの制御卓へつなぐ。 */
+    private void linkPorts(boolean formed){
+        for(int i=0;i<2;i++){
+            BlockPos at=portPos(i);
+            if(level.isLoaded(at)&&level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity port)
+                port.link(formed?worldPosition:null);
+        }
+    }
+    @SuppressWarnings("unchecked")
+    @Override public <T> T portCapability(BlockPos port,net.neoforged.neoforge.capabilities.BlockCapability<T,Direction> capability){
+        int mode=modeOf(port);
+        if(capability==Capabilities.EnergyStorage.BLOCK){
+            if(kind()==RESERVOIR)return null;
+            return (T)(mode==PORT_INPUT?input:mode==PORT_OUTPUT?output:both);
+        }
+        if(capability==Capabilities.FluidHandler.BLOCK){
+            if(kind()==ACCUMULATOR)return null;
+            return (T)(mode==PORT_INPUT?fluidInput:mode==PORT_OUTPUT?fluidOutput:fluidBoth);
+        }
+        if(capability==Capabilities.ItemHandler.BLOCK){
+            if(kind()!=SPINDLE)return null;
+            return (T)(mode==PORT_INPUT?itemInput:mode==PORT_OUTPUT?itemOutput:automation);
+        }
+        return null;
+    }
+    @Override public IItemHandler ejectItems(BlockPos port){return kind()==SPINDLE&&modeOf(port)!=PORT_INPUT?itemOutput:null;}
+    @Override public IFluidHandler ejectFluids(BlockPos port){return kind()==RESERVOIR&&modeOf(port)!=PORT_INPUT?fluidOutput:null;}
     @Override public void openMenu(ServerPlayer player){player.openMenu(this,b->{b.writeBlockPos(worldPosition);b.writeBoolean(kind()==SPINDLE);});}
     @Override public Component getDisplayName(){return Component.translatable(getBlockState().getBlock().getDescriptionId());}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player player){
         return new CosmicMenu(id,inv,worldPosition,items,kind()==SPINDLE,SyncedInts.server(CosmicMenu.COUNT,i->switch(i){
             case 0->kind();case 1->status;case 2->(int)(stored/1_000_000);case 3->(int)(capacity()/1_000_000);
             case 4->lastIn;case 5->lastOut;case 6->tank.getFluidAmount();case 7->tankCapacity();case 8->progress;case 9->duration;case 10->core?1:0;
-            case 11->tank.isEmpty()?0:BuiltInRegistries.FLUID.getId(tank.getFluid().getFluid())+1;default->0;
+            case 11->tank.isEmpty()?0:BuiltInRegistries.FLUID.getId(tank.getFluid().getFluid())+1;case 12->portModes[0];case 13->portModes[1];default->0;
         }),this);
     }
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider registries){
@@ -237,7 +305,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     private void write(CompoundTag tag,HolderLookup.Provider registries){
         tag.putLong("stored",stored);tag.put("tank",tank.writeToNBT(registries,new CompoundTag()));
         tag.putInt("progress",progress);tag.putInt("duration",duration);tag.putInt("cost",cost);tag.putBoolean("core",core);tag.putInt("status",status);
-        tag.putInt("in",lastIn);tag.putInt("out",lastOut);if(!reserved.isEmpty())tag.put("reserved",reserved.save(registries));
+        tag.putInt("in",lastIn);tag.putInt("out",lastOut);tag.putIntArray("ports",portModes);if(!reserved.isEmpty())tag.put("reserved",reserved.save(registries));
     }
     @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider registries){
         super.loadAdditional(tag,registries);
@@ -246,6 +314,8 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         if(tank.getFluidAmount()>tankCapacity())tank.setFluid(tank.getFluid().copyWithAmount(tankCapacity()));
         duration=Math.max(0,tag.getInt("duration"));progress=Math.max(0,Math.min(duration,tag.getInt("progress")));cost=Math.max(0,tag.getInt("cost"));core=tag.getBoolean("core");
         status=tag.getInt("status");lastIn=tag.getInt("in");lastOut=tag.getInt("out");
+        int[] ports=tag.getIntArray("ports");
+        if(ports.length==2)for(int i=0;i<2;i++)portModes[i]=Math.floorMod(ports[i],3);
         reserved=tag.contains("reserved")?ItemStack.parseOptional(registries,tag.getCompound("reserved")):ItemStack.EMPTY;
     }
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries){CompoundTag tag=new CompoundTag();write(tag,registries);return tag;}
