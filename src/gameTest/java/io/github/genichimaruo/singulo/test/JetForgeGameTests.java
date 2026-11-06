@@ -661,4 +661,33 @@ public final class JetForgeGameTests {
             helper.succeed();
         });
     }
+    /** カセットは実際の右クリックで、どの部品からでも積める。積めたら画面は開かない。画面の枠からも出し入れできる。 */
+    @GameTest(template="forge",timeoutTicks=40)
+    public static void jetForgeCassetteInstallsThroughRealClickOnAnyPart(GameTestHelper helper) {
+        JetForgeBlockEntity be=build(helper);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper,
+                new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(),helper.getLevel(),
+                        new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"cassette-click"),net.minecraft.server.level.ClientInformation.createDefault()));
+        ItemStack cassette=new ItemStack(item("collapsar_parallel_cassette"),2);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,cassette);
+        var shape=io.github.genichimaruo.singulo.forge.JetForgeLayout.SPEC;
+        var part=shape.pos(be.getBlockPos(),be.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING).getOpposite(),io.github.genichimaruo.singulo.forge.JetForgeLayout.COIL_X[0],8+io.github.genichimaruo.singulo.forge.JetForgeLayout.COIL_R,8);
+        helper.assertTrue(io.github.genichimaruo.singulo.multiblock.Blueprints.controllerOf(helper.getLevel(),part)!=null,"Fixture must click a formed part");
+        var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(part),net.minecraft.core.Direction.UP,part,false);
+        player.gameMode.useItemOn(player,helper.getLevel(),cassette,net.minecraft.world.InteractionHand.MAIN_HAND,hit);
+        helper.assertTrue(be.parallelUpgrade()&&cassette.getCount()==1,"Right-clicking a part did not install exactly one cassette");
+        helper.assertTrue(player.containerMenu==player.inventoryMenu,"Installing must not also open the screen");
+        // 2個目は受け取らない（受け取らなければ、右クリックはいつもどおり画面を開く）
+        helper.assertFalse(be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND),"A second cassette must not be taken");
+        // 画面の枠: 取り出すと外れ、戻すと付く
+        var menu=new io.github.genichimaruo.singulo.machine.DeviceMenu(0,player.getInventory(),io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.JET_FORGE,be.getBlockPos(),be.screenItems(),
+                io.github.genichimaruo.singulo.machine.SyncedInts.client(io.github.genichimaruo.singulo.machine.DeviceMenu.Forge.COUNT),null);
+        var slot=menu.getSlot(io.github.genichimaruo.singulo.machine.DeviceMenu.Forge.SLOT_CASSETTE);
+        helper.assertTrue(slot.hasItem(),"Upgrade slot must show the installed cassette");
+        helper.assertTrue(!slot.remove(1).isEmpty()&&!be.parallelUpgrade(),"Taking the cassette must uninstall it");
+        helper.assertTrue(slot.mayPlace(new ItemStack(item("collapsar_parallel_cassette")))&&!slot.mayPlace(new ItemStack(item("collapsar_billet"))),"Upgrade slot only accepts cassettes");
+        slot.set(new ItemStack(item("collapsar_parallel_cassette")));
+        helper.assertTrue(be.parallelUpgrade(),"Placing the cassette must install it");
+        helper.succeed();
+    }
 }

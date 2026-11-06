@@ -1080,6 +1080,10 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     private final net.neoforged.neoforge.items.IItemHandlerModifiable menuItems = new net.neoforged.neoforge.items.IItemHandlerModifiable() {
         @Override
         public void setStackInSlot(int slot, ItemStack stack) {
+            if (slot == SLOTS) {
+                setCassette(!stack.isEmpty());
+                return;
+            }
             // 画面での入れ替え（つかんだ物を置く・取る）。加工中のコアは動かさない
             if (slot == SLOT_CORE && bh == BH_IGNITING) {
                 return;
@@ -1088,23 +1092,46 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         }
 
 
+        // 最後の枠（SLOTS）はアップグレード枠。中身は parallelUpgrade そのもの
         @Override
         public int getSlots() {
-            return SLOTS;
+            return SLOTS + 1;
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
+            if (slot == SLOTS) {
+                return parallelUpgrade ? new ItemStack(item("collapsar_parallel_cassette")) : ItemStack.EMPTY;
+            }
             return items.getStackInSlot(slot);
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (slot == SLOTS) {
+                if (parallelUpgrade || !isItemValid(slot, stack)) {
+                    return stack;
+                }
+                if (!simulate) {
+                    setCassette(true);
+                }
+                return stack.copyWithCount(stack.getCount() - 1);
+            }
             return slot >= SLOT_OUT ? stack : items.insertItem(slot, stack, simulate);
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot == SLOTS) {
+                if (!parallelUpgrade || amount <= 0) {
+                    return ItemStack.EMPTY;
+                }
+                ItemStack out = getStackInSlot(slot);
+                if (!simulate) {
+                    setCassette(false);
+                }
+                return out;
+            }
             if (slot == SLOT_CORE && bh == BH_IGNITING) {
                 return ItemStack.EMPTY;
             }
@@ -1113,14 +1140,29 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
         @Override
         public int getSlotLimit(int slot) {
-            return items.getSlotLimit(slot);
+            return slot == SLOTS ? 1 : items.getSlotLimit(slot);
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
+            if (slot == SLOTS) {
+                return stack.is(item("collapsar_parallel_cassette"));
+            }
             return slot < SLOT_OUT && items.isItemValid(slot, stack);
         }
     };
+
+    /** 画面のスロットの口（最後の枠がアップグレード）。 */
+    public net.neoforged.neoforge.items.IItemHandlerModifiable screenItems() {
+        return menuItems;
+    }
+
+    /** 進行中の加工の数は開始時に決まっているので、付け外ししても変わらない。 */
+    private void setCassette(boolean installed) {
+        parallelUpgrade = installed;
+        setChanged();
+        markSync();
+    }
 
     /** 点火中はコアを外せない（画面のスロットの判定）。 */
     public boolean coreLocked() {

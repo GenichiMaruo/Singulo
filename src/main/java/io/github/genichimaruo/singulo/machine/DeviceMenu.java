@@ -29,7 +29,7 @@ public class DeviceMenu extends AbstractContainerMenu {
         HALO_COLLECTOR(0, Halo.COUNT, false),
         MUON_COLLECTOR(1, Muon.COUNT, false),
         DETECTOR(0, Detector.COUNT, false),
-        JET_FORGE(6, Forge.COUNT, true);
+        JET_FORGE(7, Forge.COUNT, true);
 
         public final int slots;
         public final int data;
@@ -89,7 +89,7 @@ public class DeviceMenu extends AbstractContainerMenu {
         /** 画面のボタン: 点火。 */
         public static final int BUTTON_IGNITE = 0;
         /** スロット: 種・材料3つ・完成品・空の容器（JetForgeBlockEntity と同じ並び）。 */
-        public static final int SLOT_CORE = 0, SLOT_OUT = 4, SLOT_EMPTY = 5;
+        public static final int SLOT_CORE = 0, SLOT_OUT = 4, SLOT_EMPTY = 5, SLOT_CASSETTE = 6;
     }
 
     /** ボタンを受け取る装置。 */
@@ -113,7 +113,9 @@ public class DeviceMenu extends AbstractContainerMenu {
             case MUON_COLLECTOR -> new int[][]{{CONTENT_X + 150, 60}};
             // コア（炉心の下）・材料3つ（左）・完成品（右）
             case JET_FORGE -> new int[][]{{CONTENT_X + 54, 84}, {CONTENT_X + 12, 30}, {CONTENT_X + 12, 50}, {CONTENT_X + 12, 70},
-                    {CONTENT_X + 160, 36}, {CONTENT_X + 160, 68}};
+                    {CONTENT_X + 160, 36}, {CONTENT_X + 160, 68},
+                    // 並列カセット（ほかの装置と同じ、右のレールのアップグレード枠）
+                    {GuiFrame.railSlotX(WIDTH), GuiFrame.railSlotY(GuiFrame.RAIL_UPGRADE)}};
             default -> new int[0][];
         };
     }
@@ -135,8 +137,21 @@ public class DeviceMenu extends AbstractContainerMenu {
         for (int i = 0; i < kind.slots; i++) {
             addSlot(new NotifyingItemSlot(items, i, at[i][0], at[i][1]) {
                 @Override
+                public int getMaxStackSize() {
+                    return kind == Kind.JET_FORGE && getSlotIndex() == Forge.SLOT_CASSETTE ? 1 : super.getMaxStackSize();
+                }
+
+                @Override
+                public int getMaxStackSize(ItemStack stack) {
+                    return kind == Kind.JET_FORGE && getSlotIndex() == Forge.SLOT_CASSETTE ? 1 : super.getMaxStackSize(stack);
+                }
+
+                @Override
                 public boolean mayPlace(ItemStack stack) {
                     // 燃料を入れられるのは口だけ。生成器とミュオン収集器は取り出すだけ。鍛造炉はコアと材料を入れ、完成品は取り出すだけ
+                    if (kind == Kind.JET_FORGE && getSlotIndex() == Forge.SLOT_CASSETTE) {
+                        return isCassette(stack);
+                    }
                     if (kind == Kind.JET_FORGE) {
                         // 加工中のコアは、サーバー側の口が取り出しを断る（SlotItemHandler の mayPickup）
                         return getSlotIndex() == Forge.SLOT_CORE ? io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.isCore(stack)
@@ -175,6 +190,10 @@ public class DeviceMenu extends AbstractContainerMenu {
                 SyncedInts.client(kind.data), null);
     }
 
+    private static boolean isCassette(ItemStack stack) {
+        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("collapsar_parallel_cassette")));
+    }
+
     public Kind kind() {
         return kind;
     }
@@ -207,6 +226,10 @@ public class DeviceMenu extends AbstractContainerMenu {
             }
         } else if (kind == Kind.WORMHOLE_MOUTH && ExoticCharge.isExoticMatter(stack)) {
             if (!moveItemStackTo(stack, 0, 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (kind == Kind.JET_FORGE && isCassette(stack)) {
+            if (!moveItemStackTo(stack, Forge.SLOT_CASSETTE, Forge.SLOT_CASSETTE + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (kind == Kind.JET_FORGE && slots.get(Forge.SLOT_CORE).mayPlace(stack)) {
