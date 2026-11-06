@@ -82,7 +82,11 @@ jobs:
           JAR_NAME: ${{ steps.version.outputs.name }}.jar
         run: |
           python3 tools/verified_release.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source --output "release-artifacts/$JAR_NAME"
-      - name: Reserve release tag without distributing a GitHub JAR
+      - name: Acquire permanent shared CurseForge upload lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/curseforge_guard.py --repo "$GITHUB_REPOSITORY" --tag "$RELEASE_TAG" --commit "$(git -C release-source rev-parse HEAD)" --run-id "$GITHUB_RUN_ID" --receipt cf-lock-receipt.json
+      - name: Reserve release audit record without distributing a GitHub JAR
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_NAME: ${{ steps.version.outputs.name }}
@@ -124,3 +128,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest=false
+      - name: Retain permanent CF lock intent
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cf-lock-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cf-lock-receipt.json
+          if-no-files-found: ignore
