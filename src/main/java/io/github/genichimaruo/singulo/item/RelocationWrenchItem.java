@@ -29,7 +29,8 @@ public final class RelocationWrenchItem extends SinguloItem {
             CosmicMuonCollectorBlockEntity.class, ProbeStationBlockEntity.class, DegenerateFurnaceBlockEntity.class,
             QuantumHeatEngineBlockEntity.class, InertialStabilizerBlockEntity.class,
             ShieldTowerBlockEntity.class, TiplerCylinderBlockEntity.class,
-            WorldlineAnchorBlockEntity.class, AdvancedWorldlineAnchorBlockEntity.class);
+            WorldlineAnchorBlockEntity.class, AdvancedWorldlineAnchorBlockEntity.class,
+            io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.class);
 
     public RelocationWrenchItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
@@ -106,7 +107,8 @@ public final class RelocationWrenchItem extends SinguloItem {
                     || menu instanceof GeneratorSlotsMenu m2 && m2.pos().equals(pos)
                     || menu instanceof SmesMenu m3 && m3.pos().equals(pos)
                     || menu instanceof ThermoelectricGeneratorMenu m4 && m4.pos().equals(pos)
-                    || menu instanceof DeviceMenu m5 && m5.pos().equals(pos);
+                    || menu instanceof DeviceMenu m5 && m5.pos().equals(pos)
+                    || menu instanceof io.github.genichimaruo.singulo.cosmic.CosmicMenu m6 && m6.pos().equals(pos);
             if (viewing) viewer.closeContainer();
         }
         var tag = be.saveCustomOnly(level.registryAccess());

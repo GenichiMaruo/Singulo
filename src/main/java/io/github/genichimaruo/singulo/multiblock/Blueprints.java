@@ -33,7 +33,10 @@ public final class Blueprints {
         TIPLER_CYLINDER("tipler_cylinder", new int[]{9}),
         WORMHOLE_GENERATOR("wormhole_generator", new int[]{5}),
         GENESIS_ENGINE("genesis_engine", new int[]{7}),
-        JET_FORGE("accretion_jet_forge", new int[]{io.github.genichimaruo.singulo.forge.JetForgeLayout.H});
+        JET_FORGE("accretion_jet_forge", new int[]{io.github.genichimaruo.singulo.forge.JetForgeLayout.H}),
+        SUSPENSION_RESERVOIR("suspension_reservoir", new int[]{7}),
+        PASTA_ACCUMULATOR("pasta_accumulator", new int[]{7}),
+        TIDAL_SPINDLE("tidal_spindle", new int[]{7});
 
         private final String id;
         private final int[] sizes;
@@ -99,6 +102,9 @@ public final class Blueprints {
             case WORMHOLE_GENERATOR -> SinguloBlocks.WORMHOLE_GENERATOR_CORE.get();
             case GENESIS_ENGINE -> SinguloBlocks.GENESIS_CORE.get();
             case JET_FORGE -> SinguloBlocks.JET_FORGE_CORE.get();
+            case SUSPENSION_RESERVOIR -> SinguloBlocks.SUSPENSION_RESERVOIR.get();
+            case PASTA_ACCUMULATOR -> SinguloBlocks.PASTA_ACCUMULATOR.get();
+            case TIDAL_SPINDLE -> SinguloBlocks.TIDAL_SPINDLE.get();
         };
     }
 

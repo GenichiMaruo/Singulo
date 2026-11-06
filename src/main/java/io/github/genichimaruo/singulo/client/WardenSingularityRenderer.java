@@ -31,7 +31,7 @@ public class WardenSingularityRenderer extends EntityRenderer<WardenSingularity>
         FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
         pose.mulPose(Axis.XP.rotationDegrees(18));
         pose.mulPose(Axis.YP.rotationDegrees(t * 9));
-        var glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        var glow = GlowDepth.of(buffers, FxDraw.WHITE);
         FxDraw.ring(pose.last(), glow, r * 1.5F, r * 3.2F, 0xFF5A5A, 220, 0);
         FxDraw.ring(pose.last(), glow, r * 1.5F, r * 2.0F, 0xFFD0B0, 200, 40);
         pose.popPose();

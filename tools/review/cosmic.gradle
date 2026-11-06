@@ -1,0 +1,23 @@
+// Disposable native rendering fixtures; excluded from distribution builds.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/cosmic-src'))
+        if (providers.gradleProperty('withSodium').isPresent()) {
+            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+        }
+        if (providers.gradleProperty('withDistantHorizons').isPresent()) {
+            dependencies.add('localRuntime', 'maven.modrinth:distanthorizons:9w34y8ai') { transitive = false }
+        }
+        neoForge.runs.client {
+            gameDirectory = file('build/cosmic-review')
+            systemProperty 'singulo.cosmicOutput', file('build/cosmic-review/screenshots').absolutePath
+            systemProperty 'singulo.cosmicStart', providers.gradleProperty('cosmicStart').getOrElse('0')
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

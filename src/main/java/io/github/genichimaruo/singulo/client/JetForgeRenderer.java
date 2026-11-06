@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.forge.JetForgeBlockEntity;
 import io.github.genichimaruo.singulo.forge.JetForgeLayout;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -73,6 +75,9 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     }
 
     /** 1回の描画で使う基準（形の向きと、カメラの位置）。 */
+    /** 鍛造炉ごとの渦の筋の時計: (前に見た時刻, 時計)。 */
+    private final Map<JetForgeBlockEntity, float[]> swirlClocks = new WeakHashMap<>();
+
     private record Frame(PoseStack.Pose pose, Vec3 origin, Vec3 axis, Vec3 up, Vec3 cam, float time, float dist, boolean far) {}
 
     @Override
@@ -94,9 +99,11 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         JetForgeTimeline tl = JetForgeTimeline.of(be, partialTick);
         Frame f = new Frame(pose.last(), core, axis, new Vec3(0, 1, 0), cam, time, dist, dist > 96);
         // 2種類の光と素材のアイテムを交互に描くので、頂点ごとに描き込み先を引き直す（共有の描き込み先は、別の描き方を引くと閉じられる）
-        VertexConsumer glow = new Lazy(buffers, JetForgeRenderTypes.GLOW);
+        // ジェットの光は、固体とほかの光を描いたあとでまとめて描く（奥の物が手前に重ならないように）
+        MultiBufferSource jets = GlowDepth.additive(buffers);
+        VertexConsumer glow = new Lazy(jets, JetForgeRenderTypes.GLOW);
         RenderType beamType = JetForgeRenderTypes.beam();
-        VertexConsumer beam = beamType == null ? null : new Lazy(buffers, beamType);
+        VertexConsumer beam = beamType == null ? null : new Lazy(jets, beamType);
         boolean fancy = mc.options.graphicsMode().get() != net.minecraft.client.GraphicsStatus.FAST;
 
         if (be.shownCore()) {
@@ -147,7 +154,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         }
         float beaming = 0.45F;
         boolean traced = GravitationalLensing.addBlackHole(coreW, radius, 1, 5.0F, f.axis(), SHADOW * 1.1F, DISK_OUTER, beaming, bright,
-                f.time() * (0.4F + 1.6F * tl.power()));
+                swirlClock(be, f.time(), tl.power()));
         if (!traced) {
             // 重力レンズを掛けない（設定・シェーダーパック）: 黒い球と、光る円盤をワールドに描く
             VertexConsumer solid = FxDraw.glow(buffers);
@@ -160,6 +167,18 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             disc(f, glow, f.origin(), f.axis(), SHADOW * 1.1F, DISK_OUTER, 48, WARM, (int) (220 * a), 0, 0);
             GravitationalLensing.add(coreW, radius, 1, 5.0F);
         }
+    }
+
+    /**
+     * 円盤の渦の筋の時計。時刻に速さを掛けると出力が変わった瞬間に模様が飛ぶので、速さを積み上げる。
+     * 筋は 2π/3 ごとに同じ形に戻るので、その周期で折り返す（0 は筋なしの意味なので返さない）。
+     */
+    private float swirlClock(JetForgeBlockEntity be, float time, float power) {
+        float[] clock = swirlClocks.computeIfAbsent(be, b -> new float[]{time, 0});
+        float dt = Mth.clamp(time - clock[0], 0, 1);
+        clock[0] = time;
+        clock[1] = (clock[1] + dt * (0.4F + 1.6F * power)) % (Mth.TWO_PI / 3);
+        return Math.max(clock[1], 1.0E-3F);
     }
 
     /** 拘束コイルの輪を巡る電流の光。 */
@@ -819,6 +838,28 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
 
     private void drawMaterial(JetForgeBlockEntity be, Frame f, JetForgeTimeline tl, PoseStack pose, MultiBufferSource buffers,
                               VertexConsumer glow, Direction back, BlockPos pos, Vec3 corner, float partialTick) {
+        int count = be.batchSize();
+        Vec3[] plane = basis(f.axis());
+        if (count > 1) {
+            // 並列カセットの受け台: 素材を抱える輪が照射室の中でゆっくり回る
+            Vec3 center = f.origin().add(f.axis().scale(TARGET_S));
+            ringSegments(f, glow, center, f.axis(), 0.72F, 0.86F, f.far() ? 24 : 48, CYAN, 0.55F, f.time() * 1.2F, count);
+            ringSegments(f, glow, center, f.axis(), 1.0F, 1.08F, f.far() ? 24 : 48, WHITE, 0.3F, -f.time() * 0.7F, count);
+        }
+        for (int i = 0; i < count; i++) {
+            double angle = i * Math.PI * 2 / count;
+            Vec3 offset = count == 1 ? Vec3.ZERO : plane[0].scale(Math.cos(angle) * 0.9).add(plane[1].scale(Math.sin(angle) * 0.9));
+            drawOneMaterial(be, f, tl, pose, buffers, glow, back, pos, corner, partialTick, offset);
+            if (count > 1 && tl.phase() >= JetForgeBlockEntity.FOCUS && tl.phase() <= JetForgeBlockEntity.IRRADIATE) {
+                Vec3 target = f.origin().add(f.axis().scale(TARGET_S)).add(offset);
+                ribbonGlow(f, glow, f.origin().add(f.axis().scale(TARGET_S - 3)), target,
+                        0.025F, 0.09F, CYAN, WHITE, 0.35F, 0.6F);
+            }
+        }
+    }
+
+    private void drawOneMaterial(JetForgeBlockEntity be, Frame f, JetForgeTimeline tl, PoseStack pose, MultiBufferSource buffers,
+                                VertexConsumer glow, Direction back, BlockPos pos, Vec3 corner, float partialTick, Vec3 offset) {
         ItemStack stack = tl.phase() >= JetForgeBlockEntity.FINISH && !be.result().isEmpty() ? be.result() : be.working();
         if (stack.isEmpty()) {
             return;
@@ -834,10 +875,10 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         }
         float bob = 0.06F * Mth.sin(f.time() * 2.1F) * (1 - tl.heat() * 0.6F);
         float shake = tl.phase() == JetForgeBlockEntity.IRRADIATE ? 0.035F * tl.shatter() * Mth.sin(f.time() * 61F) : 0;
-        p = p.add(0, bob + shake, 0);
+        p = p.add(0, bob + shake, 0).add(offset);
         float squeeze = tl.phase() == JetForgeBlockEntity.IRRADIATE ? 1 - 0.18F * JetForgeTimeline.ease((tl.irr() - 0.85F) / 0.15F) : 1;
         float pop = tl.finish() >= 0 ? 1 + 0.25F * Math.max(0, 1 - tl.finish() / 6F) : 1;
-        float scale = 1.35F * squeeze * pop;
+        float scale = (be.batchSize() == 1 ? 1.35F : 0.8F) * squeeze * pop;
         // カメラの方へ向き、ゆっくり回る（熱いほど速く）
         Vec3 toCam = f.cam().subtract(p);
         float yaw = (float) Math.atan2(toCam.x, toCam.z) + Mth.sin(f.time() * (0.6F + tl.heat())) * 0.5F;

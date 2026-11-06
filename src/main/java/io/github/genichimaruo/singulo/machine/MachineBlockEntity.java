@@ -297,6 +297,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);
+            // 隣の液体パイプにつなぎ直させる（出し入れしない面になった・なくなった）
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
         }
     }
 
@@ -1422,13 +1424,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** 面の設定で絞った液体の入れ物。inTanks・outTanks は入れてよい・取り出してよいタンクのビット（-1 ならすべて）。 */
-    private final class SidedFluids implements IFluidHandler {
+    private final class SidedFluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
         private final int inTanks;
         private final int outTanks;
 
         SidedFluids(int inTanks, int outTanks) {
             this.inTanks = inTanks;
             this.outTanks = outTanks;
+        }
+
+        @Override
+        public boolean pipeAccepts(FluidStack fluid) {
+            return usesFluid(fluid);
         }
 
         @Override
@@ -1495,8 +1502,34 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return 0;
     }
 
+    /** パイプから入れてよい液体か: すでに入力タンクに入っているか、この装置のレシピが使うもの。 */
+    private boolean usesFluid(FluidStack fluid) {
+        for (int i = 0; i < type.fluidInputs(); i++) {
+            if (FluidStack.isSameFluidSameComponents(tanks[i].getFluid(), fluid)) {
+                return true;
+            }
+        }
+        return level != null && (usesFluid(stationRecipes(level), fluid) || usesFluid(massRecipes(level, type), fluid));
+    }
+
+    private static boolean usesFluid(List<RecipeHolder<MachineRecipe>> recipes, FluidStack fluid) {
+        for (RecipeHolder<MachineRecipe> holder : recipes) {
+            for (MachineRecipe.FluidInput in : holder.value().fluidIngredients()) {
+                if (in.fluid() == fluid.getFluid()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /** 入力タンクへは入れるだけ、出力タンクからは取り出すだけ。 */
-    private final class AutomationFluids implements IFluidHandler {
+    private final class AutomationFluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        @Override
+        public boolean pipeAccepts(FluidStack fluid) {
+            return usesFluid(fluid);
+        }
+
         @Override
         public int getTanks() {
             return tanks.length;

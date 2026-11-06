@@ -32,7 +32,9 @@ import org.lwjgl.opengl.GL30;
  * 重力レンズの画面効果。ブラックホール（リアクターの炉心）とワームホールの口の描画がフレームごとに「レンズ」を登録し、
  * ワールドを描き終えたあとで画面をコピーして、シュバルツシルト時空の光の曲がり方で背景をずらして描き直す。
  * 中心は地平線の約2.6倍の影で黒く、その縁に光子リングが光り、外側では背景がアインシュタインリング状に引き伸ばされる。
- * 歪みの範囲はミップマップから読むので、低い解像度でもブロック状のノイズにならない。1フレームに効かせるのは4つまで（影と円盤を受理した分の枠を先に確保し、残りは近い歪みを使う）。
+ * 歪みの範囲はミップマップから読むので、低い解像度でもブロック状のノイズにならない。
+ * レンズの数に上限はない: 1つずつ、影響が及ぶ画面の範囲だけを奥のものから描くので、重さは画面に占める面積で決まる。
+ * 画面で重なるレンズは手前のものが奥のものを歪めた絵を読めるよう、画面をコピーし直して次のパスで描く（{@link #MAX_PASSES}）。
  * クライアント設定 gravitationalLensing で切れる。
  * <p>
  * Iris 系のシェーダーパックを使っているとき（専用の処理）: シェーダーパックは自分の画面と深度で描き、最後に画面へ合成するので、
@@ -49,12 +51,24 @@ public final class GravitationalLensing {
 
     /**
      * シェーダーで光の経路をたどって描く降着円盤。normal はワールドでの面の向き、beaming はドップラーで明るさが変わる幅。
-     * brightness は明るさの倍率（1 で従来どおり。大きいほど白く熱い）、swirl は渦の筋の時計（秒。0 なら筋を描かない）。
+     * brightness は明るさの倍率（1 で従来どおり。大きいほど白く熱い）、swirl は渦の筋の時計（0 なら筋を描かない）。
      */
     private record Disk(Vec3 normal, float inner, float outer, float beaming, float brightness, float swirl) {}
 
+    /** 1回の描画に渡すレンズ。minX〜maxY は描く画面の範囲（UV）。lens・sphere・disk はシェーダーの Lens・Sphere・Disk 系にそのまま渡す。 */
+    private record Draw(float[] lens, float[] sphere, float[] disk, float minX, float minY, float maxX, float maxY) {
+        boolean overlaps(Draw o) {
+            return minX < o.maxX && o.minX < maxX && minY < o.maxY && o.minY < maxY;
+        }
+    }
+
     private static final List<Source> SOURCES = new ArrayList<>();
-    private static final int MAX_LENSES = 4;
+    /**
+     * 画面をコピーし直す回数の上限。1回ごとに画面全体のミップマップを作り直すので、視線に沿って並んだレンズで重くなりすぎないよう抑える。
+     * 超えた分も描くが、同じコピーを読むので、重なった所だけは手前のレンズが奥のレンズを歪めず上に重なる。
+     */
+    private static final int MAX_PASSES = 16;
+    private static final float[] NO_DISK = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
     /**
      * add に渡す大きさ ÷ 事象の地平線の半径。ブラックホールのレンズは、渡された大きさをこれで割ったものを地平線の半径とし、
      * そこからシュバルツシルト時空の曲がり方で影・光子リング・アインシュタインリングを出す。
@@ -82,32 +96,18 @@ public final class GravitationalLensing {
 
     /** region: 歪みが及ぶ球の半径（ブロック）。リアクターなら内側の空洞に収める。 */
     public static void add(Vec3 pos, float radius, float strength, float region) {
-        if (SOURCES.size() < 32) {
-            SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true, null));
-        }
+        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true, null));
     }
 
     /**
      * 降着円盤つきのブラックホール。シェーダーが画素ごとに光の経路をたどり、影と円盤（重力で影の上下に回り込んで見える
      * 奥側の像も含めて）を描く。このフレームにワールドでレンズを掛けない（設定で切っている・シェーダーパック使用時）なら
      * 何もせず false を返すので、呼び出し側で影と円盤をワールドに描き、{@link #add} でレンズだけを足す。
+     * brightness は円盤の明るさの倍率、swirl は渦の筋の時計（{@link Disk}）。
      */
     static boolean addBlackHole(Vec3 pos, float radius, float strength, float region, Vec3 diskNormal, float inner, float outer,
-                                float beaming) {
-        if (shader == null || !enabled() || shaderPackInUse() || SOURCES.size() >= 32
-                || SOURCES.stream().filter(s -> s.disk != null).count() >= MAX_LENSES) {
-            return false;
-        }
-        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true,
-                new Disk(diskNormal.normalize(), inner, outer, beaming, 1, 0)));
-        return true;
-    }
-
-    /** 明るさと渦の筋を変えられる降着円盤つきのブラックホール（降着ジェット鍛造炉）。ほかは {@link #addBlackHole} と同じ。 */
-    static boolean addBlackHole(Vec3 pos, float radius, float strength, float region, Vec3 diskNormal, float inner, float outer,
                                 float beaming, float brightness, float swirl) {
-        if (shader == null || !enabled() || shaderPackInUse() || SOURCES.size() >= 32
-                || SOURCES.stream().filter(s -> s.disk != null).count() >= MAX_LENSES) {
+        if (shader == null || !enabled() || shaderPackInUse()) {
             return false;
         }
         SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true,
@@ -117,9 +117,7 @@ public final class GravitationalLensing {
 
     /** 景色を少し歪めるだけのレンズ（黒い中心・リングなし）。 */
     public static void addDistortion(Vec3 pos, float radius, float strength, float region) {
-        if (SOURCES.size() < 32) {
-            SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), false, null));
-        }
+        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), false, null));
     }
 
     /** 杖の先の球の見かけの半径に対する、歪みの大きさと範囲。 */
@@ -275,19 +273,12 @@ public final class GravitationalLensing {
         RenderTarget main = mc.getMainRenderTarget();
         int w = main.width;
         int h = main.height;
+        float aspect = (float) w / h;
         Matrix4f view = new Matrix4f().rotation(cameraRotation.conjugate(new Quaternionf()));
-        float[][] lenses = new float[MAX_LENSES][];
-        float[][] spheres = new float[MAX_LENSES][];
-        float[][] disks = new float[MAX_LENSES][];
-        int n = 0;
-        // Traced sources suppressed their world geometry when accepted. Reserve their
-        // shader slots before adding optional distortions, so none can be evicted.
-        SOURCES.sort(Comparator.comparing((Source s) -> s.disk == null)
-                .thenComparingDouble(s -> s.pos.distanceToSqr(cam)));
+        // 奥のレンズから描く。同じ場所に重ねた歪みと影では、影と円盤を手前（あと）にする
+        SOURCES.sort(Comparator.comparingDouble((Source s) -> -s.pos.distanceToSqr(cam)).thenComparing(s -> s.disk != null));
+        List<Draw> draws = new ArrayList<>();
         for (Source s : SOURCES) {
-            if (n >= MAX_LENSES) {
-                break;
-            }
             Vector4f v = new Vector4f((float) (s.pos.x - cam.x), (float) (s.pos.y - cam.y), (float) (s.pos.z - cam.z), 1);
             view.transform(v);
             Vector3f inView = new Vector3f(v.x, v.y, v.z);
@@ -298,13 +289,15 @@ public final class GravitationalLensing {
             float x = v.x / v.w * 0.5F + 0.5F;
             float y = v.y / v.w * 0.5F + 0.5F;
             float r = proj.m11() * s.radius / v.w * 0.5F;   // 縦方向の UV での半径
-            // 歪みは球（region）の中だけ。その範囲が画面に少しでもかかれば効かせる
+            // 歪みは球（region）の中だけ
             float reach = r * s.region / s.radius;
-            float aspect = (float) w / h;
-            if (x < -reach / aspect || x > 1 + reach / aspect || y < -reach || y > 1 + reach || r < 0.002F) {
-                continue;
+            if (reach * h < 1) {
+                continue;                                    // 1画素に満たない
             }
             float uvPerBlock = r / s.radius;
+            float[] lens;
+            float[] sphere;
+            float[] disk = NO_DISK;
             if (s.horizon) {
                 float horizon = s.radius / EINSTEIN_PER_HORIZON;
                 float shadow = shadowRadius(horizon, s.region);
@@ -312,24 +305,48 @@ public final class GravitationalLensing {
                 // 球の半径くらい）奥にあるとみなす。近くで見るほど影が大きく、遠くから見るほどアインシュタインリングが広がる
                 float behind = Math.max(v.w, s.region);
                 float k = behind / (v.w + behind);
-                spheres[n] = new float[]{v.w, horizon, reach, k};
+                sphere = new float[]{v.w, horizon, reach, k};
                 if (s.disk != null) {
                     // 光の経路をたどるときの地平線の半径は、影の大きさから逆算する（影を球の範囲に収めて小さくしたときも
                     // 影と円盤の回り込みが合うように）。中心と面の向きはカメラから見た座標で渡す
                     Vector3f nv = view.transformDirection(new Vector3f((float) s.disk.normal.x, (float) s.disk.normal.y,
                             (float) s.disk.normal.z));
-                    disks[n] = new float[]{inView.x, inView.y, inView.z, shadow / SHADOW_PER_HORIZON,
+                    disk = new float[]{inView.x, inView.y, inView.z, shadow / SHADOW_PER_HORIZON,
                             nv.x, nv.y, nv.z, s.disk.inner, s.disk.outer, s.disk.beaming * s.strength, s.disk.brightness, s.disk.swirl};
                 }
-                lenses[n++] = new float[]{x, y, Math.min(shadow * uvPerBlock, 0.5F), s.strength};
+                lens = new float[]{x, y, Math.min(shadow * uvPerBlock, 0.5F), s.strength};
             } else {
                 // 歪みだけ: 手前の面はアインシュタイン半径の 0.45 倍（従来どおり）
-                spheres[n] = new float[]{v.w, s.radius * 0.4545F, reach, 0};
-                lenses[n++] = new float[]{x, y, Math.min(r, 0.5F), s.strength};
+                sphere = new float[]{v.w, s.radius * 0.4545F, reach, 0};
+                lens = new float[]{x, y, Math.min(r, 0.5F), s.strength};
+            }
+            // 描く範囲: 歪みの球と円盤を覆う長方形（はみ出した分は切る。画面にかからないレンズはここで落ちる）
+            float[] rect = {x - reach / aspect, y - reach, x + reach / aspect, y + reach};
+            if (s.disk != null) {
+                includeDisk(rect, inView, s.disk.outer, proj);
+            }
+            float minX = Math.max(rect[0] - 2F / w, 0);
+            float minY = Math.max(rect[1] - 2F / h, 0);
+            float maxX = Math.min(rect[2] + 2F / w, 1);
+            float maxY = Math.min(rect[3] + 2F / h, 1);
+            if (minX < maxX && minY < maxY) {
+                draws.add(new Draw(lens, sphere, disk, minX, minY, maxX, maxY));
             }
         }
-        if (n == 0) {
+        if (draws.isEmpty()) {
             return;
+        }
+        // パスを割り当てる: 画面で重なる奥のレンズより後のパスにする（重ならないレンズは同じコピーを読んで同じパスで描ける）
+        int[] passes = new int[draws.size()];
+        int passCount = 0;
+        for (int i = 0; i < passes.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (draws.get(i).overlaps(draws.get(j))) {
+                    passes[i] = Math.max(passes[i], passes[j] + 1);
+                }
+            }
+            passes[i] = Math.min(passes[i], MAX_PASSES - 1);
+            passCount = Math.max(passCount, passes[i] + 1);
         }
         if (copy == null || copy.width != w || copy.height != h || copy.isStencilEnabled() != main.isStencilEnabled()) {
             if (copy != null) {
@@ -347,29 +364,10 @@ public final class GravitationalLensing {
             GlStateManager._texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
             GlStateManager._bindTexture(0);
         }
-        // 今の画面をコピーし、それを歪めて元の画面に描き直す
-        GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, main.frameBufferId);
-        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, copy.frameBufferId);
-        GlStateManager._glBlitFrameBuffer(0, 0, w, h, 0, 0, w, h,
-                useDepth ? GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT : GL11.GL_COLOR_BUFFER_BIT, GL11.GL_NEAREST);
-        GlStateManager._bindTexture(copy.getColorTextureId());
-        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-        GlStateManager._bindTexture(0);
-        main.bindWrite(true);
 
-        for (int i = 0; i < MAX_LENSES; i++) {
-            float[] l = i < n ? lenses[i] : new float[]{0, 0, 0, 0};
-            shader.safeGetUniform("Lens" + i).set(l[0], l[1], l[2], l[3]);
-            float[] sp = i < n ? spheres[i] : new float[]{0, 1, 1, 0};
-            shader.safeGetUniform("Sphere" + i).set(sp[0], sp[1], sp[2], sp[3]);
-            float[] dk = i < n && disks[i] != null ? disks[i] : new float[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
-            shader.safeGetUniform("Disk" + i).set(dk[0], dk[1], dk[2], dk[3]);
-            shader.safeGetUniform("DiskN" + i).set(dk[4], dk[5], dk[6], dk[7]);
-            shader.safeGetUniform("DiskP" + i).set(dk[8], dk[9], dk[10], dk[11]);
-        }
         shader.safeGetUniform("InvProj").set(new Matrix4f(proj).invert());
         shader.safeGetUniform("DepthParams").set(proj.m22(), proj.m32());
-        shader.safeGetUniform("Aspect").set((float) w / h);
+        shader.safeGetUniform("Aspect").set(aspect);
         shader.safeGetUniform("Focal").set(proj.m11() * 0.5F);
         shader.safeGetUniform("UseDepth").set(useDepth ? 1.0F : 0.0F);
         // drawWithShader は描く直前に SamplerN を RenderSystem のシェーダーテクスチャで上書きするので、
@@ -384,15 +382,71 @@ public final class GravitationalLensing {
         RenderSystem.depthMask(false);
         RenderSystem.disableBlend();
         RenderSystem.setShader(() -> shader);
-        BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        b.addVertex(-1, -1, 0).setUv(0, 0);
-        b.addVertex(1, -1, 0).setUv(1, 0);
-        b.addVertex(1, 1, 0).setUv(1, 1);
-        b.addVertex(-1, 1, 0).setUv(0, 1);
-        BufferUploader.drawWithShader(b.buildOrThrow());
+        for (int pass = 0; pass < passCount; pass++) {
+            // レンズは深度に書かないので、深度のコピーは最初の1回でよい
+            copyScreen(main, w, h, useDepth && pass == 0);
+            for (int i = 0; i < passes.length; i++) {
+                if (passes[i] == pass) {
+                    drawLens(draws.get(i));
+                }
+            }
+        }
         RenderSystem.setShaderTexture(0, previous);
         RenderSystem.setShaderTexture(1, previousDepth);
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
+    }
+
+    /** 円盤の光をたどる範囲（シェーダーでは外側の半径の 1.25 倍の球）が画面に写る範囲を rect に足す。カメラがそばにあれば画面全体。 */
+    private static void includeDisk(float[] rect, Vector3f inView, float outer, Matrix4f proj) {
+        float e = outer * 1.25F + 0.1F;
+        for (int i = 0; i < 8; i++) {
+            Vector4f c = new Vector4f(inView.x + ((i & 1) == 0 ? -e : e), inView.y + ((i & 2) == 0 ? -e : e),
+                    inView.z + ((i & 4) == 0 ? -e : e), 1);
+            proj.transform(c);
+            if (c.w <= 0.05F) {
+                rect[0] = 0;
+                rect[1] = 0;
+                rect[2] = 1;
+                rect[3] = 1;
+                return;
+            }
+            float x = c.x / c.w * 0.5F + 0.5F;
+            float y = c.y / c.w * 0.5F + 0.5F;
+            rect[0] = Math.min(rect[0], x);
+            rect[1] = Math.min(rect[1], y);
+            rect[2] = Math.max(rect[2], x);
+            rect[3] = Math.max(rect[3], y);
+        }
+    }
+
+    /** 今の画面をコピーに写す（これを歪めて元の画面に描き直す）。 */
+    private static void copyScreen(RenderTarget main, int w, int h, boolean depth) {
+        GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, main.frameBufferId);
+        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, copy.frameBufferId);
+        GlStateManager._glBlitFrameBuffer(0, 0, w, h, 0, 0, w, h,
+                depth ? GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT : GL11.GL_COLOR_BUFFER_BIT, GL11.GL_NEAREST);
+        GlStateManager._bindTexture(copy.getColorTextureId());
+        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
+        GlStateManager._bindTexture(0);
+        main.bindWrite(true);
+    }
+
+    private static void drawLens(Draw d) {
+        shader.safeGetUniform("Lens").set(d.lens[0], d.lens[1], d.lens[2], d.lens[3]);
+        shader.safeGetUniform("Sphere").set(d.sphere[0], d.sphere[1], d.sphere[2], d.sphere[3]);
+        shader.safeGetUniform("Disk").set(d.disk[0], d.disk[1], d.disk[2], d.disk[3]);
+        shader.safeGetUniform("DiskN").set(d.disk[4], d.disk[5], d.disk[6], d.disk[7]);
+        shader.safeGetUniform("DiskP").set(d.disk[8], d.disk[9], d.disk[10], d.disk[11]);
+        float x0 = d.minX * 2 - 1;
+        float y0 = d.minY * 2 - 1;
+        float x1 = d.maxX * 2 - 1;
+        float y1 = d.maxY * 2 - 1;
+        BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        b.addVertex(x0, y0, 0).setUv(d.minX, d.minY);
+        b.addVertex(x1, y0, 0).setUv(d.maxX, d.minY);
+        b.addVertex(x1, y1, 0).setUv(d.maxX, d.maxY);
+        b.addVertex(x0, y1, 0).setUv(d.minX, d.maxY);
+        BufferUploader.drawWithShader(b.buildOrThrow());
     }
 }

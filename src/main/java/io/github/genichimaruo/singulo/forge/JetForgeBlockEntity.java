@@ -166,6 +166,12 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     private final List<ItemStack> charged = new ArrayList<>();
     private int energyPerTick;
     private int irradiateTicks = 1200;
+    /** Locked when a run begins; upgrade changes cannot alter reserved output. */
+    private int batchSize = 1;
+    private boolean parallelUpgrade;
+
+    public int batchSize() { return batchSize; }
+    public boolean parallelUpgrade() { return parallelUpgrade; }
     @Nullable
     private ResourceLocation recipeId;
 
@@ -783,8 +789,18 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     private void tryStart(ServerLevel level) {
         for (RecipeHolder<MachineRecipe> h : recipes()) {
             MachineRecipe r = h.value();
-            int[] take = plan(r);
-            if (take == null || !fluidsReady(r) || !fits(r.result()) || buffer < r.energy()) {
+            int batch = parallelUpgrade ? 4 : 1;
+            int[] take = null;
+            ItemStack product = ItemStack.EMPTY;
+            for (; batch >= 1; batch--) {
+                long demand = (long) r.energy() * batch;
+                long count = (long) r.result().getCount() * batch;
+                if (demand < 0 || demand > Integer.MAX_VALUE || count < 1 || count > r.result().getMaxStackSize()) continue;
+                take = plan(r, batch);
+                product = r.result().copyWithCount((int) count);
+                if (take != null && fluidsReady(r, batch) && fits(product) && buffer >= demand) break;
+            }
+            if (batch < 1) {
                 continue;
             }
             charged.clear();
@@ -794,7 +810,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
                 }
             }
             for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
-                tank.drain(in.amount(), IFluidHandler.FluidAction.EXECUTE);
+                tank.drain(Math.multiplyExact(in.amount(), batch), IFluidHandler.FluidAction.EXECUTE);
             }
             ItemStack first = ItemStack.EMPTY;
             if (!r.ingredients().isEmpty()) {
@@ -806,8 +822,9 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
                 }
             }
             working = first;
-            result = r.result().copy();
-            energyPerTick = r.energy();
+            result = product;
+            batchSize = batch;
+            energyPerTick = Math.multiplyExact(r.energy(), batch);
             irradiateTicks = Math.max(1, r.time());
             recipeId = h.id();
             phase = PRIME;
@@ -821,14 +838,16 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** 入力の枠から、レシピの材料を取る個数（枠ごと）。そろわなければ null。 */
     @Nullable
-    private int[] plan(MachineRecipe r) {
+    private int[] plan(MachineRecipe r, int batch) {
         int[] left = new int[INPUTS];
         int[] take = new int[INPUTS];
         for (int i = 0; i < INPUTS; i++) {
             left[i] = items.getStackInSlot(SLOT_IN + i).getCount();
         }
         for (MachineRecipe.ItemInput in : r.ingredients()) {
-            int need = in.count();
+            long wanted = (long) in.count() * batch;
+            if (wanted < 0 || wanted > INPUTS * 64) return null;
+            int need = (int) wanted;
             for (int i = 0; i < INPUTS && need > 0; i++) {
                 ItemStack s = items.getStackInSlot(SLOT_IN + i);
                 if (left[i] > 0 && in.ingredient().test(s)) {
@@ -845,13 +864,13 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         return take;
     }
 
-    private boolean fluidsReady(MachineRecipe r) {
+    private boolean fluidsReady(MachineRecipe r, int batch) {
         long total = 0;
         for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
             if (!in.matches(tank.getFluid())) {
                 return false;
             }
-            total += in.amount();
+            total += (long) in.amount() * batch;
         }
         return total <= tank.getFluidAmount();
     }
@@ -1031,6 +1050,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             case DeviceMenu.Forge.IGNITION_SECS -> bh != BH_IGNITING ? 0 : ignitionCharged
                     ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : Math.max(0, ignitionLeft) / 20;
             case DeviceMenu.Forge.IGNITION_GFE -> (int) Math.min(Integer.MAX_VALUE, ignitionEnergy() / 1_000_000_000L);
+            case DeviceMenu.Forge.BATCH -> phase == IDLE ? (parallelUpgrade ? 4 : 1) : batchSize;
             default -> 0;
         }, this);
     }
@@ -1044,10 +1064,26 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         return false;
     }
 
+    @Override
+    public boolean useItem(ServerPlayer player, ItemStack stack, net.minecraft.world.InteractionHand hand) {
+        if (!parallelUpgrade && stack.is(item("collapsar_parallel_cassette"))) {
+            parallelUpgrade = true;
+            if (!player.isCreative()) stack.shrink(1);
+            setChanged();
+            markSync();
+            return true;
+        }
+        return false;
+    }
+
     /** 画面のスロット: コアは加工中は取り出せない。出力は取り出すだけ。 */
     private final net.neoforged.neoforge.items.IItemHandlerModifiable menuItems = new net.neoforged.neoforge.items.IItemHandlerModifiable() {
         @Override
         public void setStackInSlot(int slot, ItemStack stack) {
+            if (slot == SLOTS) {
+                setCassette(!stack.isEmpty());
+                return;
+            }
             // 画面での入れ替え（つかんだ物を置く・取る）。加工中のコアは動かさない
             if (slot == SLOT_CORE && bh == BH_IGNITING) {
                 return;
@@ -1056,23 +1092,46 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         }
 
 
+        // 最後の枠（SLOTS）はアップグレード枠。中身は parallelUpgrade そのもの
         @Override
         public int getSlots() {
-            return SLOTS;
+            return SLOTS + 1;
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
+            if (slot == SLOTS) {
+                return parallelUpgrade ? new ItemStack(item("collapsar_parallel_cassette")) : ItemStack.EMPTY;
+            }
             return items.getStackInSlot(slot);
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (slot == SLOTS) {
+                if (parallelUpgrade || !isItemValid(slot, stack)) {
+                    return stack;
+                }
+                if (!simulate) {
+                    setCassette(true);
+                }
+                return stack.copyWithCount(stack.getCount() - 1);
+            }
             return slot >= SLOT_OUT ? stack : items.insertItem(slot, stack, simulate);
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot == SLOTS) {
+                if (!parallelUpgrade || amount <= 0) {
+                    return ItemStack.EMPTY;
+                }
+                ItemStack out = getStackInSlot(slot);
+                if (!simulate) {
+                    setCassette(false);
+                }
+                return out;
+            }
             if (slot == SLOT_CORE && bh == BH_IGNITING) {
                 return ItemStack.EMPTY;
             }
@@ -1081,14 +1140,29 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
         @Override
         public int getSlotLimit(int slot) {
-            return items.getSlotLimit(slot);
+            return slot == SLOTS ? 1 : items.getSlotLimit(slot);
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
+            if (slot == SLOTS) {
+                return stack.is(item("collapsar_parallel_cassette"));
+            }
             return slot < SLOT_OUT && items.isItemValid(slot, stack);
         }
     };
+
+    /** 画面のスロットの口（最後の枠がアップグレード）。 */
+    public net.neoforged.neoforge.items.IItemHandlerModifiable screenItems() {
+        return menuItems;
+    }
+
+    /** 進行中の加工の数は開始時に決まっているので、付け外ししても変わらない。 */
+    private void setCassette(boolean installed) {
+        parallelUpgrade = installed;
+        setChanged();
+        markSync();
+    }
 
     /** 点火中はコアを外せない（画面のスロットの判定）。 */
     public boolean coreLocked() {
@@ -1273,6 +1347,10 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     @Override
     public void onBroken(Level level) {
+        if (parallelUpgrade && !level.isClientSide) {
+            parallelUpgrade = false;
+            Block.popResource(level, worldPosition, new ItemStack(item("collapsar_parallel_cassette")));
+        }
         List<ItemStack> drops = new ArrayList<>();
         for (int i = 0; i < SLOTS; i++) {
             drops.add(items.getStackInSlot(i).copy());
@@ -1368,6 +1446,8 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** 段階と、見せる物（同期にも使う）。 */
     private void writeProcess(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putBoolean("parallel_upgrade", parallelUpgrade);
+        tag.putInt("batch_size", batchSize);
         tag.putInt("phase", phase);
         tag.putInt("phase_ticks", phaseTicks);
         tag.putInt("hold", hold);
@@ -1411,6 +1491,8 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             firstCheck = true;
         }
         phase = tag.getInt("phase");
+        parallelUpgrade = tag.getBoolean("parallel_upgrade");
+        batchSize = tag.contains("batch_size") ? Math.max(1, Math.min(4, tag.getInt("batch_size"))) : 1;
         phaseTicks = tag.getInt("phase_ticks");
         hold = tag.getInt("hold");
         energyPerTick = tag.getInt("energy_per_tick");

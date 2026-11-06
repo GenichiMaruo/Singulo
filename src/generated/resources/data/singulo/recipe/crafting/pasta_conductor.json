@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "C",
+    "H",
+    "C"
+  ],
+  "key": {
+    "C": {
+      "item": "singulo:superconducting_coil"
+    },
+    "H": {
+      "item": "singulo:horizon_bus"
+    }
+  },
+  "result": {
+    "id": "singulo:pasta_conductor",
+    "count": 4
+  }
+}

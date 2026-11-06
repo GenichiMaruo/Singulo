@@ -137,7 +137,7 @@ public class DronePortRenderer implements BlockEntityRenderer<DronePortBlockEnti
 
     /** 動いている間、開口部の四隅の誘導灯が順に点滅する。 */
     private static void drawBeacons(PoseStack pose, MultiBufferSource buffers, float t) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         float[][] corners = {{0.5F, 0.5F}, {14.5F, 0.5F}, {14.5F, 14.5F}, {0.5F, 14.5F}};
         for (int k = 0; k < 4; k++) {
             boolean on = ((int) (t / 3) + k) % 4 < 2;

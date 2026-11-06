@@ -36,7 +36,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 液体窒素は、パイプのほか、冷媒カートリッジを入口に入れても（空のカートリッジは出口へ）、カートリッジで右クリックしても入る。
  */
 public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner {
+        AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner, io.github.genichimaruo.singulo.pipe.PipeInputOnly {
     static final int COOLANT_TEMPERATURE = 77;
     static final int REFERENCE_HOT = 1300;
     /** 液体窒素 1 mB に詰まっている電力（冷却塔の液体窒素のレシピ: 100 mB に 25,000 FE）。加工装置の消費電力倍率も掛ける。 */

@@ -146,7 +146,11 @@ public final class GeneratedContent {
             new ItemDef("spent_time_crystal_catalyst", "item", 4, 0),
             new ItemDef("spent_singularity_core", "item", 5, 0),
             new ItemDef("magnetic_monopole", "item", 2, 0),
-            new ItemDef("record_fragment", "item", 1, 0)
+            new ItemDef("record_fragment", "item", 1, 0),
+            new ItemDef("nuclear_pasta", "item", 5, 0),
+            new ItemDef("tidal_filament", "item", 5, 0),
+            new ItemDef("wormhole_seam_upgrade", "item", 5, 0),
+            new ItemDef("collapsar_parallel_cassette", "item", 5, 0)
     );
 
     public static final List<BlockDef> BLOCKS = List.of(
@@ -180,6 +184,7 @@ public final class GeneratedContent {
             "superconducting_cable",
             "topological_wire",
             "horizon_bus",
+            "fluid_pipe",
             "kiln",
             "compressor",
             "electrolyzer",
@@ -267,6 +272,16 @@ public final class GeneratedContent {
             "jet_forge_truss",
             "jet_forge_levitator",
             "jet_forge_collector",
+            "cosmic_frame",
+            "suspension_reservoir",
+            "suspension_crown",
+            "suspension_strut",
+            "pasta_accumulator",
+            "pasta_laminate",
+            "pasta_conductor",
+            "tidal_spindle",
+            "tidal_draw_ring",
+            "spindle_cradle",
             "worldline_anchor_small",
             "inertial_stabilizer",
             "gravity_panel_receiver",
@@ -446,6 +461,10 @@ public final class GeneratedContent {
             "artificial_star_core",
             "hawking_condensate",
             "singularity_seed",
+            "nuclear_pasta",
+            "tidal_filament",
+            "wormhole_seam_upgrade",
+            "collapsar_parallel_cassette",
             "observation_log",
             "degraded_control_unit",
             "quantum_data_fragment",
@@ -620,6 +639,7 @@ public final class GeneratedContent {
             Map.entry("glowing_bismuth_crystal", 2),
             Map.entry("creative_energy_source", 1),
             Map.entry("copper_wire", 1),
+            Map.entry("fluid_pipe", 1),
             Map.entry("thermoelectric_generator", 1),
             Map.entry("kiln", 1),
             Map.entry("compressor", 1),
@@ -756,6 +776,16 @@ public final class GeneratedContent {
             Map.entry("sealed_container_1", 2),
             Map.entry("sealed_container_2", 3),
             Map.entry("sealed_container_3", 4),
-            Map.entry("sealed_container_4", 5)
+            Map.entry("sealed_container_4", 5),
+            Map.entry("cosmic_frame", 3),
+            Map.entry("pasta_laminate", 5),
+            Map.entry("suspension_reservoir", 3),
+            Map.entry("pasta_accumulator", 5),
+            Map.entry("tidal_spindle", 5),
+            Map.entry("suspension_crown", 3),
+            Map.entry("suspension_strut", 3),
+            Map.entry("pasta_conductor", 5),
+            Map.entry("tidal_draw_ring", 5),
+            Map.entry("spindle_cradle", 5)
     );
 }

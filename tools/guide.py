@@ -31,15 +31,17 @@ CHAPTERS = [
          'to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it). Type in the search box above the chapter list to find matching pages.\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
         ('basics', '電力・触媒・遺構',
-         '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。'
-         '液体とガスは、液体キャニスター（1,000 mB）で装置を右クリックすれば、パイプがなくても汲んで運べます。\n'
+         '電力（FE）は自前のケーブルで、液体とガスは液体パイプで運びます。パイプは置くだけでつながり、'
+         '装置の出口の液体を使う装置やタンクへ送り、隣の水源や溶岩源からも汲みます。出し入れする面は装置の面の設定で決まります。'
+         '液体キャニスター（1,000 mB）で装置を右クリックしても汲んで運べます。アイテムは面ごとの設定とホッパーなどで運びます。\n'
          '段階2から「触媒」が登場します。触媒は寿命のある消耗品で、触媒を入れる装置は触媒専用のスロットを持ちます。'
          'ティアが装置より1つ上なら速く、1つ下なら遅く減りも速く、2つ下は使えません。\n'
          'ワールドには旧文明の「遺構」があり、そこでしか手に入らない記録や部品があります。'
          '段階1から地表観測拠点を探しておきましょう。',
          'Power, catalysts and ruins',
-         'Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods\' pipes. '
-         'Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\n'
+         'Power (FE) travels through Singulo cables, and fluids and gases through Fluid Pipes. Pipes connect on their own, '
+         'send machine outputs to the machines and tanks that use them, and draw from adjacent water and lava sources. A machine\'s Sides settings decide which faces take part. '
+         'You can also right-click machines with a Fluid Canister (1,000 mB) to carry fluids by hand. Items use per-side settings and hoppers.\n'
          'From stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. '
          'One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\n'
          'Ancient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.'),
@@ -661,12 +663,21 @@ CHAPTERS = [
          '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増'
          'え、本気になると壊した投影器を2つまで映し直します。重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。',
          'The Foundry and awakened guardians',
-         '- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber a'
-         'nd it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along'
-         ' the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n'
-         '  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); w'
-         'hen the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it la'
-         'shes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.'),
+         '- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the co'
+         're that never moves and fights with the facility itself. While the four production lines on the'
+         ' walls run, it takes less damage (20% per line): break them first. The lines also send out mass'
+         '-produced androids. A red mark on the floor is a robot arm (it follows you briefly, stops, then'
+         ' drops; caught, you are thrown), a shadowed circle is the press (step out at once), and a fan d'
+         'rawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). The '
+         'floor conveyors carry you along and reverse after their frames glow red. Below half health it c'
+         'alls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each ch'
+         'allenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakene'
+         'd with an Awakened Foundry Core, it reprints its broken lines when enraged.\n- Awakened guardian'
+         's: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gr'
+         "avity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, en"
+         'raged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors'
+         ' when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Lea'
+         've and the core is returned.'),
         ('leviathan', 'エルゴ球の大蛇',
          '・エルゴ球の大蛇（沈んだ炉心区画）: 球形の封じ込め室の床の、止まった炉心に近づくと現れます。体力の 2/3・1/3 で姿を変えます（変える間は傷つきません）。泳いだ跡の帯の中では泳ぐ向きへ流されるので、流れに乗って追い'
          'かけましょう。尾の金色に光る芯はいつも弱点です。\n'
@@ -679,31 +690,25 @@ CHAPTERS = [
          'ゅうを引き込む「引き潮」も使います（炉心の近くは傷つくので、流れに逆らって外へ走る）。\n'
          '\u3000炉心の再点火: 骨格と龍の姿では、炉心に巻きついて力を溜め、部屋じゅうへ衝撃を放ちます。画面に前触れが出たら、封じ込め柱の陰へ（柱の強化遺構ガラスも衝撃を遮ります）。',
          'The Ergosphere Leviathan',
-         '  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes f'
-         'ull damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you '
-         'come close and chains its dives.\n'
-         '  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, '
-         'it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a'
-         ' dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n'
-         '  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump '
-         'them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a '
-         'new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against'
-         ' the pull).\n'
-         '  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the'
-         ' warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n'
-         '- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never m'
-         'oves and fights with the facility itself. While the four production lines on the walls run, it takes less dama'
-         'ge (20% per line): break them first. The lines also send out mass-produced androids. A red mark on the floor i'
-         's a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the pr'
-         'ess (step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns;'
-         ' jump over it). The floor conveyors carry you along and reverse after their frames glow red. Below half health'
-         ' it calls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each challenger a'
-         ' compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundr'
-         'y Core, it reprints its broken lines when enraged.\n'
-         '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakene'
-         "d Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65"
-         '%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant'
-         ' fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
+         '- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the sphe'
+         'rical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it chan'
+         'ges). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core'
+         ' in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow'
+         ' on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (i'
+         't pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive graze'
+         's the floor it lingers low for a moment: your chance to strike back.\n  Skeleton: it blasts its '
+         'scales away (painful up close) and becomes a skeleton of light; its body now takes full damage.'
+         ' It coils in the middle of the room, dragging you around while firing light shards, bites when '
+         'you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a blac'
+         'k wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes'
+         ' where you stand (a light pillar warns you); where it rests after a dive, it leaves a singulari'
+         'ty as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it'
+         ' slams the center and two shockwaves race across the floor (jump them). When lines of light cro'
+         'ss the floor, get off them before the rift tears open (three volleys, each at a new angle). The'
+         ' skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against'
+         ' the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blas'
+         'ts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced R'
+         'uin Glass in the pillars blocks it too).'),
         ('lab', '地下アンドロイド研究所',
          '旧文明のアンドロイドの研究所。統括AI「ファウンドリ」が暴走し、職員は中央動力炉を止めて主立坑から逃げ出しました。'
          '人がいなくなった今も、アンドロイドたちは「施設を維持せよ」という最後の命令に従って施設を直し続けています。\n'
@@ -1389,3 +1394,6 @@ CHAPTERS.insert([c[0] for c in CHAPTERS].index('genesis') + 1, ('jet_forge', 'si
      'Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, '
      '2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).'),
 ]))
+
+from cosmic_content import CHAPTER as _COSMIC_CHAPTER
+CHAPTERS.append(_COSMIC_CHAPTER)

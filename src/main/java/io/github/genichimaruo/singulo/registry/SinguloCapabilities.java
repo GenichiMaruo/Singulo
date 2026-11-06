@@ -13,6 +13,12 @@ public final class SinguloCapabilities {
     private SinguloCapabilities() {}
 
     public static void register(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),
+                (be,side)->be.kind()==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.RESERVOIR?null:be.energyFor(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),
+                (be,side)->be.kind()==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.ACCUMULATOR?null:be.fluidFor(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),
+                (be,side)->be.kind()==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.SPINDLE?be.automation():null);
         machine(event, SinguloBlockEntities.MACHINE.get());
         machine(event, SinguloBlockEntities.COOLING_TOWER_CONTROLLER.get());
         machine(event, SinguloBlockEntities.ACCELERATOR_CONTROLLER.get());

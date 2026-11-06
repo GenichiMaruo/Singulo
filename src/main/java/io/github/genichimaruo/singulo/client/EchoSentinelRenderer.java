@@ -82,7 +82,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         if (death > 0) {
             jitter += Mth.sin(t * 7.1F) * Mth.cos(t * 3.3F) * 0.18F * death;
         }
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         int full = LightTexture.FULL_BRIGHT;
 
         pose.pushPose();

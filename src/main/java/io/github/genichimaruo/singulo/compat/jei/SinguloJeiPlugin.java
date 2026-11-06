@@ -35,6 +35,7 @@ public class SinguloJeiPlugin implements IModPlugin {
     static final Map<MachineRecipe, ResourceLocation> RECIPE_IDS = new java.util.IdentityHashMap<>();
     /** 降着ジェット鍛造炉のレシピ（同じ singulo:machine のレシピで、station が accretion_jet_forge のもの）。 */
     static final RecipeType<MachineRecipe> JET_FORGE = RecipeType.create(Singulo.MODID, "accretion_jet_forge", MachineRecipe.class);
+    static final RecipeType<MachineRecipe> TIDAL_SPINDLE = RecipeType.create(Singulo.MODID, "tidal_spindle", MachineRecipe.class);
 
     static {
         for (MachineType t : MachineType.values()) {
@@ -98,6 +99,10 @@ public class SinguloJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(new MachineRecipeCategory(registration.getJeiHelpers().getGuiHelper(),
                 new MachineRecipeCategory.Station(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.INPUTS, 1, 1, 0, false, Long.MAX_VALUE,
                         SinguloBlocks.JET_FORGE_CORE.get()), JET_FORGE));
+        registration.addRecipeCategories(new MachineRecipeCategory(registration.getJeiHelpers().getGuiHelper(),
+                new MachineRecipeCategory.Station(2,1,1,0,false,
+                        io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.SPINDLE_CAPACITY,
+                        SinguloBlocks.TIDAL_SPINDLE.get()),TIDAL_SPINDLE));
     }
 
     @Override
@@ -114,6 +119,7 @@ public class SinguloJeiPlugin implements IModPlugin {
         }
         Map<MachineType, List<MachineRecipe>> byType = new EnumMap<>(MachineType.class);
         List<MachineRecipe> forge = new ArrayList<>();
+        List<MachineRecipe> spindle = new ArrayList<>();
         // 装置と同じく、サーバー設定（プリセット・殻の材料・育成時間など）を当てはめたレシピを見せる
         for (RecipeHolder<MachineRecipe> h : io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(
                 Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()))) {
@@ -126,9 +132,11 @@ public class SinguloJeiPlugin implements IModPlugin {
             if (io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.STATION.equals(h.value().station())) {
                 forge.add(h.value());
             }
+            if("tidal_spindle".equals(h.value().station()))spindle.add(h.value());
         }
         byType.forEach((t, list) -> registration.addRecipes(TYPES.get(t), list));
         registration.addRecipes(JET_FORGE, forge);
+        registration.addRecipes(TIDAL_SPINDLE, spindle);
         // JEI のレシピで作れないアイテムには説明と入手方法（遺構の回収物・粒子加速器の副産物・Pリアクターの運転で生まれる物・
         // 専用の処理で作る物・クリエイティブ専用など）
         var registries = Minecraft.getInstance().level.registryAccess();
@@ -183,5 +191,6 @@ public class SinguloJeiPlugin implements IModPlugin {
         }
         registration.addRecipeCatalyst(new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.HOLO_PROJECTOR.get()), MultiblockInfoCategory.TYPE);
         registration.addRecipeCatalyst(new ItemStack(SinguloBlocks.JET_FORGE_CORE.get()), JET_FORGE);
+        registration.addRecipeCatalyst(new ItemStack(SinguloBlocks.TIDAL_SPINDLE.get()), TIDAL_SPINDLE);
     }
 }

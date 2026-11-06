@@ -6,6 +6,7 @@
     "singulo:glowing_bismuth_crystal",
     "singulo:creative_energy_source",
     "singulo:copper_wire",
+    "singulo:fluid_pipe",
     "singulo:compressed_block_1",
     "singulo:thermoelectric_generator",
     "singulo:kiln",
@@ -204,6 +205,16 @@
     "singulo:sealed_container_1",
     "singulo:sealed_container_2",
     "singulo:sealed_container_3",
-    "singulo:sealed_container_4"
+    "singulo:sealed_container_4",
+    "singulo:cosmic_frame",
+    "singulo:pasta_laminate",
+    "singulo:suspension_reservoir",
+    "singulo:pasta_accumulator",
+    "singulo:tidal_spindle",
+    "singulo:suspension_crown",
+    "singulo:suspension_strut",
+    "singulo:pasta_conductor",
+    "singulo:tidal_draw_ring",
+    "singulo:spindle_cradle"
   ]
 }

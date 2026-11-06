@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "CFC",
+    "PSP"
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:nuclear_pasta"
+    },
+    "H": {
+      "item": "singulo:horizon_bus"
+    },
+    "C": {
+      "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:nihonium_frame"
+    },
+    "S": {
+      "item": "singulo:degenerate_matter_shell"
+    }
+  },
+  "result": {
+    "id": "singulo:pasta_accumulator",
+    "count": 1
+  }
+}

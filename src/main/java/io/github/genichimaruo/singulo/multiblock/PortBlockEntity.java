@@ -93,6 +93,9 @@ public class PortBlockEntity extends BlockEntity {
         if (level.getBlockEntity(controller) instanceof MachineBlockEntity machine && machine.structureSize() <= 0) {
             return null;
         }
+        if (level.getBlockEntity(controller) instanceof PortAccess access) {
+            return access.portCapability(worldPosition, capability);
+        }
         return level.getCapability(capability, controller, null);
     }
 }

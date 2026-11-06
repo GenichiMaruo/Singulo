@@ -23,13 +23,14 @@ class ProvenanceTests(unittest.TestCase):
             'git/ref/tags/v0.8.1': {'object': {'type': 'commit', 'sha': self.sha}},
             'git/commits/' + self.sha: {'tree': {'sha': self.tree}},
             'git/commits/' + self.tested: {'tree': {'sha': self.tree}},
+            'compare/' + self.sha + '...1.21.1': {'status': 'identical'},
             'actions/runs/1/artifacts?per_page=100': {'artifacts': [
                 {'id': i, 'name': n + '-validation-' + self.tested, 'expired': False} for i, n in enumerate(['pr'])]},
         }
 
     def inspect(self):
         with patch.object(release, 'api', side_effect=lambda repo, endpoint: copy.deepcopy(self.data[endpoint])), \
-             patch.object(release, 'git', side_effect=lambda source, *args: self.tree if args[-1] == 'HEAD^{tree}' else self.sha):
+             patch.object(release, 'git', side_effect=lambda source, *args: '' if args[0] == 'status' else self.tree if args[-1] == 'HEAD^{tree}' else self.sha):
             return release.inspect('owner/repo', 1, 'v0.8.1', self.source)
 
     def test_neoforge_selected_from_actual_tested_commit(self):
@@ -41,6 +42,23 @@ class ProvenanceTests(unittest.TestCase):
         self.data['actions/runs/1/jobs?per_page=100']['jobs'][1]['conclusion'] = 'failure'
         with self.assertRaisesRegex(RuntimeError, 'Mekanism validation'):
             self.inspect()
+
+    def test_dirty_tag_checkout_is_rejected_before_api_access(self):
+        with patch.object(release, 'git', return_value=' M src/main/java/Changed.java'), patch.object(release, 'api') as api:
+            with self.assertRaisesRegex(RuntimeError, 'must be clean'):
+                release.inspect('owner/repo', 1, 'v0.8.1', self.source)
+        api.assert_not_called()
+
+    def test_unmerged_or_diverged_tag_cannot_publish(self):
+        for status in ('behind', 'diverged'):
+            with self.subTest(status=status):
+                self.data['compare/' + self.sha + '...1.21.1']['status'] = status
+                with self.assertRaisesRegex(RuntimeError, 'maintained 1.21.1 branch'):
+                    self.inspect()
+
+    def test_older_merged_tag_remains_publishable(self):
+        self.data['compare/' + self.sha + '...1.21.1']['status'] = 'ahead'
+        self.assertEqual(self.inspect()['commit'], self.sha)
 
     def test_leftover_forge_job_is_rejected(self):
         self.data['actions/runs/1/jobs?per_page=100']['jobs'].append({'name': 'forge', 'conclusion': 'success'})
@@ -93,7 +111,12 @@ class PromotionTests(unittest.TestCase):
 
     def promote(self):
         with patch.object(release, 'validate'):
-            return release.promote(self.metadata, self.base / 'artifacts', self.base / 'output')
+            return release.promote(self.metadata, self.base / 'artifacts', self.base / 'output', self.base / 'release-source')
+
+    def test_promote_passes_verified_tag_to_trusted_validator(self):
+        with patch.object(release, 'validate') as validate:
+            release.promote(self.metadata, self.base / 'artifacts', self.base / 'output', self.base / 'release-source')
+        validate.assert_called_once_with(self.root, 'neoforge', self.jar, source=self.base / 'release-source')
 
     def test_full_gui_evidence_promotes_exact_validated_bytes(self):
         self.promote()

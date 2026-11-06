@@ -186,7 +186,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
         FxDraw.box(pose, solid, -0.04F, -0.02F, -0.03F, 0.46F, 0.03F, 0.03F, light, 0x58606C);
         FxDraw.box(pose, solid, 0.40F, -0.02F, -0.03F, 0.46F, 0.03F, 0.18F, light, 0x58606C);
         FxDraw.box(pose, solid, 0.39F, -0.06F, 0.12F, 0.47F, -0.02F, 0.20F, light, 0x2E333A);
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         int pulse = 180 + (int) (60 * Mth.sin(t * 1.3F));
         FxDraw.box(pose, glow, 0.41F, -0.07F, 0.14F, 0.45F, -0.06F, 0.18F, FxDraw.FULL_BRIGHT, DroneStationScreen.ACCENT, pulse);
         FxDraw.box(pose, glow, 0.425F, -0.1F, 0.155F, 0.435F, -0.07F, 0.165F, FxDraw.FULL_BRIGHT, 0xFFE2B0, 200);
@@ -195,7 +195,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
 
     /** 印刷の走査面: 橙の光る薄い板が下から上がる。 */
     private void renderScan(CargoDrone drone, float print, PoseStack pose, MultiBufferSource buffers) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         float y = print * (drone.getBbHeight() + 0.1F);
         float r = 0.42F;
         int alpha = 120 + (int) (60 * Mth.sin((drone.tickCount) * 0.8F));
