@@ -404,17 +404,6 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         return l < 1e-4 ? f.up() : sd.scale(1 / l);
     }
 
-    private static void ribbonShader(Frame f, VertexConsumer vc, Vec3 p0, Vec3 p1, float w0, float w1, int c0, int c1, float a0,
-                                     float a1, float u0, float u1, int style) {
-        Vec3 s0 = side(f, p0).scale(w0);
-        Vec3 s1 = side(f, p1).scale(w1);
-        float v = 4F * style;
-        uv(vc, f, p0.subtract(s0), c0, a0, u0, v - 1);
-        uv(vc, f, p0.add(s0), c0, a0, u0, v + 1);
-        uv(vc, f, p1.add(s1), c1, a1, u1, v + 1);
-        uv(vc, f, p1.subtract(s1), c1, a1, u1, v - 1);
-    }
-
     /** シェーダーがないとき: 中心が明るく縁が消える2枚の帯。 */
     private static void ribbonGlow(Frame f, VertexConsumer vc, Vec3 p0, Vec3 p1, float w0, float w1, int c0, int c1, float a0, float a1) {
         Vec3 s0 = side(f, p0).scale(w0);

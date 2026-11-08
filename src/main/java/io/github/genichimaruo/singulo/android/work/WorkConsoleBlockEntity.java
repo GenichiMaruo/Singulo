@@ -1497,19 +1497,6 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 流体の入れ物にある、この流体の量（mB）。 */
-    private static long fluidIn(List<net.minecraftforge.fluids.capability.IFluidHandler> stores, net.minecraftforge.fluids.FluidStack like) {
-        long n = 0;
-        for (var h : stores) {
-            for (int t = 0; t < h.getTanks(); t++) {
-                if (io.github.genichimaruo.singulo.compat.Legacy.sameFluid(h.getFluidInTank(t), like)) {
-                    n += h.getFluidInTank(t).getAmount();
-                }
-            }
-        }
-        return n;
-    }
-
     /** 受け渡し場所 point にある、この物（流体の見本なら流体）の数。 */
     private long countAt(BlockPos point, ItemStack item, List<IItemHandler> stores) {
         if (FluidSamples.liquid(item)) {
