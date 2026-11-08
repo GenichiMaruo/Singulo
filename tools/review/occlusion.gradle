@@ -1,0 +1,15 @@
+allprojects {
+ afterEvaluate {
+  sourceSets.main.java.srcDir(file('tools/review/occlusion-src'))
+  neoForge.runs.client {
+   gameDirectory = file('build/occlusion-review')
+   systemProperty 'singulo.occlusionOutput', file('build/occlusion-review/screenshots').absolutePath
+   programArgument '--quickPlaySingleplayer'
+   programArgument 'Review'
+   programArgument '--width'
+   programArgument '1280'
+   programArgument '--height'
+   programArgument '800'
+  }
+ }
+}
