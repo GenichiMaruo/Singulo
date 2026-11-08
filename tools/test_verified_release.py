@@ -24,13 +24,15 @@ class UnifiedReleaseTests(unittest.TestCase):
                               'head_repository': {'full_name': self.repo},
                               'head_sha': self.sha, 'run_attempt': 1},
             'actions/runs/1/jobs?per_page=100': {'jobs': [
-                {'name': name, 'conclusion': 'success'} for name in jobs]},
+                {'id': i, 'name': name, 'conclusion': 'success',
+                 'started_at': '2026-11-08T10:00:00Z', 'completed_at': '2026-11-08T10:10:00Z'}
+                for i, name in enumerate(jobs)]},
             'git/ref/tags/v0.8.1-1.20.1F': {'object': {'type': 'commit', 'sha': self.sha}},
             'git/ref/tags/v0.8.1-1.20.1N': {'object': {'type': 'commit', 'sha': self.sha}},
             f'compare/{self.sha}...1.20.1': {'status': 'identical'},
             f'git/commits/{self.sha}': {'tree': {'sha': self.tree}},
-            'actions/runs/1/artifacts?per_page=100': {'artifacts': [
-                {'id': i, 'name': f'pr-validation-{self.sha}-{loader}-{ns}', 'expired': False}
+            'actions/runs/1/artifacts?per_page=100': {'total_count': 2, 'artifacts': [
+                {'id': i, 'name': f'pr-validation-{self.sha}-{loader}-{ns}', 'expired': False, 'created_at': '2026-11-08T10:09:00Z'}
                 for i, (loader, ns) in enumerate((loader, ns)
                     for loader in ('forge', 'neoforge') for ns in ("full",))]},
         }
@@ -69,7 +71,8 @@ class UnifiedReleaseTests(unittest.TestCase):
     def test_missing_loader_cannot_use_other_loader_artifacts(self):
         artifacts = self.responses['actions/runs/1/artifacts?per_page=100']['artifacts']
         artifacts[:] = [a for a in artifacts if '-neoforge-' in a['name']]
-        with self.assertRaisesRegex(RuntimeError, 'Expected all required'):
+        self.responses['actions/runs/1/artifacts?per_page=100']['total_count'] = len(artifacts)
+        with self.assertRaisesRegex(RuntimeError, 'Expected exactly one'):
             self.inspect('forge')
 
     def test_failure_in_either_loader_blocks_release(self):
