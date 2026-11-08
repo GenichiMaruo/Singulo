@@ -45,6 +45,10 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertNotIn('contents: write', text)
         self.assertNotIn('pull_request_target:', text)
 
+    def test_production_artifact_names_are_unique_per_attempt(self):
+        text = (WORKFLOWS / 'pr-validation.yml').read_text()
+        self.assertIn('name: pr-validation-${{ github.sha }}-attempt-${{ github.run_attempt }}', text)
+
     def test_publication_executes_trusted_validation_code(self):
         for name in ('publish-curseforge.yml', 'publish-modrinth.yml'):
             text = (WORKFLOWS / name).read_text()

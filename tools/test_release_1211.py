@@ -19,13 +19,13 @@ class ProvenanceTests(unittest.TestCase):
             'actions/runs/1': {'status': 'completed', 'conclusion': 'success', 'event': 'pull_request',
                               'path': '.github/workflows/pr-validation.yml', 'head_repository': {'full_name': 'owner/repo'},
                               'head_sha': self.sha, 'run_attempt': 1},
-            'actions/runs/1/jobs?per_page=100': {'jobs': [{'name': n, 'conclusion': 'success'} for n in ['build-and-gametest', 'optional-mekanism', 'sodium-lighting']]},
+            'actions/runs/1/jobs?per_page=100': {'jobs': [{'id': 1, 'name': n, 'conclusion': 'success', 'started_at': '2026-11-08T10:00:00Z', 'completed_at': '2026-11-08T10:10:00Z'} for n in ['build-and-gametest', 'optional-mekanism', 'sodium-lighting']]},
             'git/ref/tags/v0.8.1': {'object': {'type': 'commit', 'sha': self.sha}},
             'git/commits/' + self.sha: {'tree': {'sha': self.tree}},
             'git/commits/' + self.tested: {'tree': {'sha': self.tree}},
             'compare/' + self.sha + '...1.21.1': {'status': 'identical'},
-            'actions/runs/1/artifacts?per_page=100': {'artifacts': [
-                {'id': i, 'name': n + '-validation-' + self.tested, 'expired': False} for i, n in enumerate(['pr'])]},
+            'actions/runs/1/artifacts?per_page=100': {'total_count': 1, 'artifacts': [
+                {'id': i, 'name': n + '-validation-' + self.tested, 'expired': False, 'created_at': '2026-11-08T10:09:00Z'} for i, n in enumerate(['pr'])]},
         }
 
     def inspect(self):
@@ -72,7 +72,8 @@ class ProvenanceTests(unittest.TestCase):
 
     def test_missing_artifact_is_rejected(self):
         self.data['actions/runs/1/artifacts?per_page=100']['artifacts'].pop()
-        with self.assertRaisesRegex(RuntimeError, 'NeoForge artifact'):
+        self.data['actions/runs/1/artifacts?per_page=100']['total_count'] = 0
+        with self.assertRaisesRegex(RuntimeError, 'exactly one artifact'):
             self.inspect()
 
     def test_actual_merge_tree_must_match_release(self):
