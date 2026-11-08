@@ -20,7 +20,6 @@ import net.minecraft.world.inventory.Slot;
 public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     private static final int INFO_X = 52;
     private static final int INFO_W = 162;
-    private static final int BAR_LABEL_W = 30;
     private static final int MODE_Y = 62;
     /** 動き方のボタン（迎撃・徘徊・追従・巡回）。 */
     private static final int MODES = 4;
