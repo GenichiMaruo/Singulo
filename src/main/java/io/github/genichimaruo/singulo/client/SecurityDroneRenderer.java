@@ -61,7 +61,7 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
                 var f = net.minecraft.world.phys.Vec3.directionFromRotation(0, bodyYaw).scale(0.3);
                 pose.translate(f.x, 0, f.z);
             }
-            VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
             var camera = entityRenderDispatcher.cameraOrientation();
             float size = state == SecurityDrone.STATE_PULSE ? 1.6F : 0.9F;
             FxDraw.billboard(pose, vc, camera, size * pulse, rgb, 110);

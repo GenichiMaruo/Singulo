@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "GCG",
+    "PGP"
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:nihonium_plate"
+    },
+    "G": {
+      "tag": "c:glass_blocks/colorless"
+    },
+    "C": {
+      "item": "singulo:superconducting_coil"
+    }
+  },
+  "result": {
+    "id": "singulo:cosmic_frame",
+    "count": 4
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "accretion_jet_forge",
+  "stage": 5,
+  "time": 1800,
+  "energy": 125000000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_matter_shell"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:mass_pellet"
+      },
+      "count": 32
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_helium",
+      "amount": 2000
+    }
+  ],
+  "result": {
+    "id": "singulo:nuclear_pasta",
+    "count": 1
+  }
+}

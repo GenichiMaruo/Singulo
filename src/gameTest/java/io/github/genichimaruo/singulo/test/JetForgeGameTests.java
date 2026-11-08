@@ -79,6 +79,53 @@ public final class JetForgeGameTests {
         });
     }
 
+    @GameTest(template = FORGE, timeoutTicks = 500)
+    public static void jetForgeParallelReservesScaledInputsAndPersistsBatch(GameTestHelper helper) {
+        JetForgeBlockEntity be=build(helper);load(be,4);
+        // Vanilla's GameTest mock overrides isCreative() to always return true.
+        // This interaction needs an ordinary, unconnected survival player instead.
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper,
+                new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(),helper.getLevel(),
+                        new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"cassette-test"),net.minecraft.server.level.ClientInformation.createDefault()));
+        helper.assertFalse(player.isCreative(),"Survival interaction fixture is creative");
+        ItemStack cassette=new ItemStack(item("collapsar_parallel_cassette"),2);
+        helper.assertTrue(be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND)&&cassette.getCount()==1&&be.parallelUpgrade(),"Cassette installation not charged once");
+        be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND);helper.assertTrue(cassette.getCount()==1,"Duplicate installation consumed another cassette");
+        power(helper,be,new boolean[]{true});
+        helper.succeedWhen(()->{
+            helper.assertTrue(be.phase()!=JetForgeBlockEntity.IDLE,"Run has not started");
+            helper.assertTrue(be.batchSize()==4&&be.result().getCount()==4,"Parallel count not four");
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN).isEmpty()&&be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN+1).isEmpty()&&be.tank().isEmpty(),"Scaled inputs/coolant not reserved");
+            var saved=be.saveWithFullMetadata(helper.getLevel().registryAccess());
+            var copy=(JetForgeBlockEntity)BlockEntity.loadStatic(be.getBlockPos(),be.getBlockState(),saved,helper.getLevel().registryAccess());
+            helper.assertTrue(copy.parallelUpgrade()&&copy.batchSize()==4&&copy.result().getCount()==4&&copy.charged().stream().mapToInt(ItemStack::getCount).sum()==68,"Reserved batch lost on reload");
+            helper.assertTrue(saved.getInt("energy_per_tick")==1_000_000_000,"Parallel power not scaled");
+        });
+    }
+
+    @GameTest(template = FORGE, timeoutTicks = 500)
+    public static void jetForgeParallelRespectsOutputSpaceAndCoolant(GameTestHelper helper) {
+        JetForgeBlockEntity be=build(helper);load(be,4);
+        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);be.loadWithComponents(tag,helper.getLevel().registryAccess());
+        be.items().setStackInSlot(JetForgeBlockEntity.SLOT_OUT,new ItemStack(item("collapsar_ingot"),62));power(helper,be,new boolean[]{true});
+        helper.succeedWhen(()->{
+            helper.assertTrue(be.phase()!=JetForgeBlockEntity.IDLE,"Run has not started");
+            helper.assertTrue(be.batchSize()==2&&be.result().getCount()==2,"Output capacity did not reduce batch");
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN).getCount()==2&&be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN+1).getCount()==32&&be.tank().getFluidAmount()==2000,"Reduced batch consumed wrong resources");
+        });
+    }
+
+    @GameTest(template=FORGE,timeoutTicks=2200)
+    public static void jetForgeParallelCompletesExactlyFourProducts(GameTestHelper helper){
+        var be=build(helper);load(be,4);
+        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);be.loadWithComponents(tag,helper.getLevel().registryAccess());
+        power(helper,be,new boolean[]{true});
+        helper.runAtTickTime(RUN+100,()->{
+            helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_OUT).getCount()==4&&be.result().isEmpty()&&be.charged().isEmpty(),"Parallel completion duplicated/lost output");
+            helper.assertTrue(be.consumedTotal()>=1_200_000_000_000L,"Four batches did not pay four irradiation costs");helper.succeed();
+        });
+    }
+
     // ------------------------------------------------------------------ 形
 
     /** 部品の個数が tools/jet_forge.py の数（レシピ表と説明に使う）と同じ。 */
@@ -613,5 +660,34 @@ public final class JetForgeGameTests {
             helper.assertTrue(be.hold() == JetForgeBlockEntity.OK && be.phaseTicks() > frozen[0], "Reload did not resume processing");
             helper.succeed();
         });
+    }
+    /** カセットは実際の右クリックで、どの部品からでも積める。積めたら画面は開かない。画面の枠からも出し入れできる。 */
+    @GameTest(template="forge",timeoutTicks=40)
+    public static void jetForgeCassetteInstallsThroughRealClickOnAnyPart(GameTestHelper helper) {
+        JetForgeBlockEntity be=build(helper);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper,
+                new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(),helper.getLevel(),
+                        new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"cassette-click"),net.minecraft.server.level.ClientInformation.createDefault()));
+        ItemStack cassette=new ItemStack(item("collapsar_parallel_cassette"),2);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,cassette);
+        var shape=io.github.genichimaruo.singulo.forge.JetForgeLayout.SPEC;
+        var part=shape.pos(be.getBlockPos(),be.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING).getOpposite(),io.github.genichimaruo.singulo.forge.JetForgeLayout.COIL_X[0],8+io.github.genichimaruo.singulo.forge.JetForgeLayout.COIL_R,8);
+        helper.assertTrue(io.github.genichimaruo.singulo.multiblock.Blueprints.controllerOf(helper.getLevel(),part)!=null,"Fixture must click a formed part");
+        var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(part),net.minecraft.core.Direction.UP,part,false);
+        player.gameMode.useItemOn(player,helper.getLevel(),cassette,net.minecraft.world.InteractionHand.MAIN_HAND,hit);
+        helper.assertTrue(be.parallelUpgrade()&&cassette.getCount()==1,"Right-clicking a part did not install exactly one cassette");
+        helper.assertTrue(player.containerMenu==player.inventoryMenu,"Installing must not also open the screen");
+        // 2個目は受け取らない（受け取らなければ、右クリックはいつもどおり画面を開く）
+        helper.assertFalse(be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND),"A second cassette must not be taken");
+        // 画面の枠: 取り出すと外れ、戻すと付く
+        var menu=new io.github.genichimaruo.singulo.machine.DeviceMenu(0,player.getInventory(),io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.JET_FORGE,be.getBlockPos(),be.screenItems(),
+                io.github.genichimaruo.singulo.machine.SyncedInts.client(io.github.genichimaruo.singulo.machine.DeviceMenu.Forge.COUNT),null);
+        var slot=menu.getSlot(io.github.genichimaruo.singulo.machine.DeviceMenu.Forge.SLOT_CASSETTE);
+        helper.assertTrue(slot.hasItem(),"Upgrade slot must show the installed cassette");
+        helper.assertTrue(!slot.remove(1).isEmpty()&&!be.parallelUpgrade(),"Taking the cassette must uninstall it");
+        helper.assertTrue(slot.mayPlace(new ItemStack(item("collapsar_parallel_cassette")))&&!slot.mayPlace(new ItemStack(item("collapsar_billet"))),"Upgrade slot only accepts cassettes");
+        slot.set(new ItemStack(item("collapsar_parallel_cassette")));
+        helper.assertTrue(be.parallelUpgrade(),"Placing the cassette must install it");
+        helper.succeed();
     }
 }

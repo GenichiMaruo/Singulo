@@ -447,7 +447,18 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     // ------------------------------------------------------------------ 液体
 
-    private final class Fluids implements IFluidHandler {
+    private final class Fluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        @Override
+        public boolean pipeAccepts(FluidStack fluid) {
+            refresh();
+            for (IFluidHandler h : fluidTargets) {
+                if (!(h instanceof io.github.genichimaruo.singulo.pipe.PipeFluidFilter filter) || filter.pipeAccepts(fluid)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         @Nullable
         private IFluidHandler handler(int tank, int[] local) {
             for (IFluidHandler h : fluidTargets) {

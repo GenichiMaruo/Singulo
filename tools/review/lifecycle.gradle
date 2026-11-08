@@ -6,6 +6,7 @@ allprojects {
         neoForge.runs.server {
             gameDirectory = file('build/lifecycle-server-' + providers.gradleProperty('lifecycleRun').getOrElse('v2'))
             systemProperty 'singulo.lifecycleServer', 'true'
+            systemProperty 'singulo.cosmicLifecycle', providers.gradleProperty('cosmicLifecycle').isPresent().toString()
             systemProperty 'singulo.lifecycleOutput', output
         }
         neoForge.runs.client {

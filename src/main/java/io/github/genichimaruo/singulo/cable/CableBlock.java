@@ -63,7 +63,7 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     /** つながり方から、まっすぐ1本だけ通っているかを決める（中心の形を腕と同じ断面にするため）。 */
-    static BlockState withStraight(BlockState state) {
+    public static BlockState withStraight(BlockState state) {
         int n = 0;
         for (BooleanProperty p : CONNECTIONS.values()) {
             if (state.getValue(p)) {

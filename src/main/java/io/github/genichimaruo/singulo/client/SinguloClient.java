@@ -36,6 +36,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::addWingLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
         modBus.addListener(JetForgeRenderTypes::registerShaders);
+        modBus.addListener(GlowDepth::registerShaders);
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
@@ -44,9 +45,13 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
         NeoForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(GlowDepth::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::render);
+        NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::hud);
+        NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::clear);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
             ClientGalaxies.set(java.util.List.of(), false);
@@ -205,6 +210,7 @@ public final class SinguloClient {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.COOLING_TOWER_CONTROLLER.get(),
                 CoolingTowerRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.JET_FORGE.get(), JetForgeRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.COSMIC_CHAMBER.get(), CosmicChamberRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.WORMHOLE_GENERATOR.get(),
                 WormholeGeneratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ROGUE_BLACK_HOLE.get(),
@@ -230,6 +236,7 @@ public final class SinguloClient {
     }
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(SinguloMenus.COSMIC.get(), CosmicScreen::new);
         event.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
         event.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
         event.register(SinguloMenus.GENERATOR_SLOTS.get(), GeneratorSlotsScreen::new);

@@ -22,7 +22,7 @@ public class HorizonBoltRenderer extends EntityRenderer<HorizonBolt> {
         float pulse = 1 + 0.15F * Mth.sin(t * 1.3F);
         pose.pushPose();
         pose.translate(0, bolt.getBbHeight() / 2, 0);
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         var camera = entityRenderDispatcher.cameraOrientation();
         float size = bolt.size();
         int rgb = bolt.color();

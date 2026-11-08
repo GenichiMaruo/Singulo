@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CCC",
+    "GGG",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:ingots/copper"
+    },
+    "G": {
+      "tag": "c:glass_blocks/colorless"
+    }
+  },
+  "result": {
+    "id": "singulo:fluid_pipe",
+    "count": 16
+  }
+}

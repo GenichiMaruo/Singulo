@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 from check_release_1211 import validate
+from release_artifact import select_artifact
 
 
 def api(repo, endpoint):
@@ -43,21 +44,12 @@ def inspect(repo, run_id, tag, source):
     tree = git(source, 'rev-parse', 'HEAD^{tree}')
     if api(repo, f"git/commits/{run['head_sha']}")['tree']['sha'] != tree:
         raise RuntimeError('PR source differs from tagged tree')
-    artifacts = api(repo, f'actions/runs/{run_id}/artifacts?per_page=100')['artifacts']
-    selected = {}
-    commits = set()
-    for a in artifacts:
-        m = re.fullmatch(r'pr-validation-([0-9a-f]{40})', a['name'])
-        if not m:
-            continue
-        loader = 'neoforge'
-        if a['expired'] or loader in selected:
-            raise RuntimeError('Expired or ambiguous artifacts')
-        commits.add(m[1])
-        selected[loader] = {'id': a['id'], 'name': a['name']}
-    if set(selected) != {'neoforge'} or len(commits) != 1:
-        raise RuntimeError('Expected the NeoForge artifact from one actual tested commit')
-    tested = commits.pop()
+    artifacts = api(repo, f'actions/runs/{run_id}/artifacts?per_page=100')
+    producer = next(job for job in jobs if job['name'] == 'build-and-gametest')
+    artifact, tested = select_artifact(
+        artifacts, producer, run['run_attempt'],
+        r'pr-validation-(?P<tested>[0-9a-f]{40})(?:-attempt-(?P<attempt>[1-9][0-9]*))?')
+    selected = {'neoforge': artifact}
     if api(repo, 'git/commits/' + tested)['tree']['sha'] != tree:
         raise RuntimeError('Actual tested merge tree differs from tagged tree')
     return {'repository': repo, 'run_id': run_id, 'run_attempt': run['run_attempt'],

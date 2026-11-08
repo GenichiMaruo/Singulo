@@ -8,6 +8,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 /**
  * 形成済みのマルチブロックは、どの部品を右クリックしてもコントローラーの画面を開く。
+ * 手に持った物をコントローラーが受け取るなら（アップグレードなど）、画面を開かずに使う。
  * スニーク中は普通どおり（部品にブロックを置くなど）。
  */
 public final class MultiblockInteraction {
@@ -25,7 +26,8 @@ public final class MultiblockInteraction {
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
         if (event.getEntity() instanceof ServerPlayer player
-                && level.getBlockEntity(controller) instanceof AbstractMachineBlock.MenuOpener opener) {
+                && level.getBlockEntity(controller) instanceof AbstractMachineBlock.MenuOpener opener
+                && !opener.useItem(player, event.getItemStack(), event.getHand())) {
             opener.openMenu(player);
         }
     }

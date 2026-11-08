@@ -259,6 +259,9 @@ def accent(stage):
 # ---------------------------------------------------------------- 8×8 の絵柄（# 色、+ 明るい、. 透明）
 
 ICONS = {
+    'pendant': ["########", "..####..", "...##...", "..####..", ".######.", ".##++##.", "..####..", "........"],
+    'lamina': ["########", "........", "+#+#+#+#", "........", "########", "........", "#+#+#+#+", "########"],
+    'spool': ["#.....##", "##...###", ".+#..###", "..+#.###", "...+####", "..+#.###", ".+#..###", "##...###"],
     'jet': ["........", "...##...", "..#..#..", "+++..+++", "+++..+++", "..#..#..", "...##...", "........"],
     'flame': ["...#....", "..##....", "..###...", ".####+..", ".##++##.", "##+++##.", "##+++##.", ".######."],
     'press': ["########", "...##...", "...##...", "...##...", ".######.", "..####..", "........", "########"],
@@ -320,6 +323,8 @@ MACHINE_ICONS = {
     'deep_sea_collector': ('bubbles', (90, 150, 255)), 'void_collector': ('halo', (170, 120, 240)),
     'keraunos_tower': ('star', (150, 220, 255)),
     'jet_forge_core': ('jet', (176, 226, 255)),
+    'suspension_reservoir': ('pendant', (150, 226, 240)), 'pasta_accumulator': ('lamina', (232, 90, 192)),
+    'tidal_spindle': ('spool', (255, 235, 192)),
 }
 
 
@@ -686,6 +691,8 @@ def furnace_front(on, frame=0, frames=1):
 MATERIALS = {
     # 降着ジェット鍛造炉: 黒に近い砲金と、青白いジェットの光（tools/jet_forge_assets.py）
     'jet': __import__('jet_forge_assets').JET,
+    # 宇宙現象を封じ込める設備: 紫がかった黒鋼と、淡いシアンの重力の光（tools/cosmic_assets.py）
+    'cosmic': __import__('cosmic_assets').COSMIC,
     # 冷却塔: 白いコンクリートと鋼、氷の青
     'tower': dict(plate=(198, 210, 220), frame=(118, 128, 140), edge=(236, 241, 246), trim=(96, 150, 190), glow=(150, 232, 255),
                   hot=(232, 250, 255), dark=(40, 56, 72)),
@@ -797,6 +804,9 @@ def _multiblock_part(iid):
     if iid.startswith('jet_forge_'):
         import jet_forge_assets
         return jet_forge_assets.part(iid)
+    import cosmic_assets
+    if iid in cosmic_assets.PARTS:
+        return cosmic_assets.part(iid)
     T, C, V, SH, TI, W = (MATERIALS[k] for k in ('tower', 'compactor', 'cavity', 'shield', 'tipler', 'wormhole'))
     # ---- 冷却塔
     if iid == 'cooling_tower_base':
@@ -1021,6 +1031,9 @@ CONTROLLER_FRONTS = {
     'tipler_core': ('tipler_housing', 'tipler', 'cylinder'),
     'wormhole_generator_core': ('wormhole_generator_shell', 'wormhole', 'swirl'),
     'jet_forge_core': ('jet_forge_foundation', 'jet', 'jet'),
+    'suspension_reservoir': ('cosmic_frame', 'cosmic', 'pendant'),
+    'pasta_accumulator': ('cosmic_frame', 'cosmic', 'lamina'),
+    'tidal_spindle': ('cosmic_frame', 'cosmic', 'spool'),
 }
 
 
@@ -2635,7 +2648,7 @@ def item_texture(iid, stage):
 
 # 断面（ケーブルの軸に直交する面の長方形の集まり、0〜16 の座標）。上位ほど凹凸のある断面になる
 # 断面は中心に置いた正方形の一辺（偶数）。Java の CableProfile と同じ値
-CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8}
+CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8, 'fluid_pipe': 6}
 
 
 def cable_bands(iid, core, on, glow):
@@ -2643,6 +2656,8 @@ def cable_bands(iid, core, on, glow):
     jacket = (226, 230, 234)
     c = glow if on and glow else core
     half = CABLE_WIDTHS[iid] // 2
+    if iid == 'fluid_pipe':
+        return [c, lighten(c, 0.35), (176, 112, 78)]                  # 液体の見えるガラスと銅の縁
     if iid == 'copper_wire':
         return [c, darken(c, 0.22)]                                   # 銅むき出しの1本（縁は少し酸化した色）
     if iid == 'superconducting_cable':

@@ -52,7 +52,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         float r = (0.72F + flipPulse + 0.03F * Mth.sin(t * 0.2F)) * grow * collapse(death, t);
         float cy = e.getBbHeight() / 2;
         Quaternionf camera = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
 
         Vec3 world = e.getPosition(partialTick).add(0, cy, 0);
         if (death > 0 && death < FLASH_AT) {
@@ -67,7 +67,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         if (r > 0.02F) {
             FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
             // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
-            glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, r * 3.4F, RIM, (int) (150 * grow));
             FxDraw.billboard(pose, glow, camera, r * 2.3F, HOT, (int) (90 * grow));
             // 傾いた降着の輪
@@ -141,7 +141,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
                 // 灼けた継ぎ目: 瓦礫が内側から紅く光る
                 pose.pushPose();
                 pose.translate(Math.cos(a) * orbit, y, Math.sin(a) * orbit);
-                FxDraw.billboard(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE)), camera, 1.1F * s / 0.42F * 0.5F,
+                FxDraw.billboard(pose, GlowDepth.of(buffers, FxDraw.WHITE), camera, 1.1F * s / 0.42F * 0.5F,
                         AWAKE, 150);
                 pose.popPose();
             }
@@ -159,7 +159,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
                         net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
                 pose.popPose();
             }
-            VertexConsumer g = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            VertexConsumer g = GlowDepth.of(buffers, FxDraw.WHITE);
             pose.pushPose();
             pose.translate(0, cy, 0);
             pose.mulPose(Axis.ZP.rotationDegrees(90));

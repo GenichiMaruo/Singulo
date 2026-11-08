@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CQC",
+    "GFG",
+    "CQC"
+  ],
+  "key": {
+    "C": {
+      "item": "singulo:superconducting_coil"
+    },
+    "Q": {
+      "item": "singulo:entangled_element"
+    },
+    "G": {
+      "item": "singulo:zero_gravity_block"
+    },
+    "F": {
+      "item": "singulo:nihonium_frame"
+    }
+  },
+  "result": {
+    "id": "singulo:suspension_reservoir",
+    "count": 1
+  }
+}

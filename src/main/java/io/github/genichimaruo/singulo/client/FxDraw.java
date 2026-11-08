@@ -14,7 +14,7 @@ import org.joml.Quaternionf;
 final class FxDraw {
     /** 光の描き方（足し合わせの半透明。深度は書かない）の入れ物。 */
     static com.mojang.blaze3d.vertex.VertexConsumer glow(net.minecraft.client.renderer.MultiBufferSource buffers) {
-        return buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityTranslucentEmissive(WHITE));
+        return GlowDepth.of(buffers, WHITE);
     }
 
     /** +Z を dir に向ける回転。 */

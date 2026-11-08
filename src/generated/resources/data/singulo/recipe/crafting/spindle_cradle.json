@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PFP",
+    " C ",
+    " F "
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:nihonium_plate"
+    },
+    "F": {
+      "item": "singulo:cosmic_frame"
+    },
+    "C": {
+      "item": "singulo:superconducting_coil"
+    }
+  },
+  "result": {
+    "id": "singulo:spindle_cradle",
+    "count": 4
+  }
+}

@@ -228,10 +228,6 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         return menu.value(sidesChannel == DronePortBlockEntity.CHANNEL_CRATES ? DronePortBlockEntity.D_CRATE_SIDES : DronePortBlockEntity.D_SIDES);
     }
 
-    private boolean cratesChannel() {
-        return sidesChannel == DronePortBlockEntity.CHANNEL_CRATES;
-    }
-
     /** 面の設定のタブ（窓の左に縦に並ぶ: 荷物・空き箱）。 */
     private int[] sideTab(int channel) {
         return new int[]{sides.x + 4, sides.bodyY() + 4 + channel * 15, 13, 13};

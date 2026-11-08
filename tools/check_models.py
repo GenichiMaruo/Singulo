@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent / 'src' / 'generated' / 'resources
 EPS = 1e-6
 # アンドロイド用ガラスの縁（厚さのない面）を、ちらつかないように1マスの外へずらしてよい幅
 EDGE_OFFSET = 0.02
-CABLES = ('copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus')
+CABLES = ('copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus', 'fluid_pipe')
 
 # 面 → (固定する軸, 値は from/to のどちら, 面の2つの軸)
 FACES = {'north': (2, 0, (0, 1)), 'south': (2, 1, (0, 1)), 'west': (0, 0, (1, 2)), 'east': (0, 1, (1, 2)),
