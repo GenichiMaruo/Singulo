@@ -31,6 +31,6 @@ Local pre-occlusion checkpoint: `c492ed3b46f6138b4d4f9bbc75127fe9d3b3e76e`.
 - Legacy source layout, three translation catalogs (3,458 entries each), five-language gameplay text and model checks pass.
 - Initial pre-adapter Forge run: 715/716 passed; the lava-cauldron failure was fixed rather than excluded. Later suites include three additional legacy regressions.
 
-Later changes are the private-only cleanup (`69ec99f2`, parity with modern `7de9831`) and Fabulous occlusion correction plus legacy nine-state regression (`043c3f96`, parity with modern `9202b1fc`). The old full-suite evidence is not represented as exact-head evidence for those later commits. Native visual review is in progress; final-tree CI must produce the artifacts promoted for publication.
+Later changes are the private-only cleanup (`69ec99f2`, parity with modern `7de9831`) and Fabulous occlusion correction plus legacy nine-state regression (`043c3f96`, parity with modern `9202b1fc`). The old full-suite evidence is not represented as exact-head evidence for those later commits. Native NeoForge occlusion at `043c3f96` passed all nine Fancy/Fabulous/Fancy states (18 PNGs): complete walls and the protected side of partial walls changed zero pixels; exposed controls remained visible. Remaining GUI/integration review is in progress; final-tree CI must produce the artifacts promoted for publication.
 
 Release remains **not ready** until final-source CI, remaining GUI/integration checks and independent review pass. No merge, tag or upload is authorized by this report itself.
