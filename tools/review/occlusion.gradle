@@ -1,0 +1,15 @@
+allprojects {
+ afterEvaluate {
+  sourceSets.main.java.srcDir(file('tools/review/occlusion-src'))
+  legacyForge.runs.client {
+   gameDirectory = layout.buildDirectory.dir('occlusion-review').get().asFile
+   systemProperty 'singulo.occlusionOutput', layout.buildDirectory.dir('occlusion-review/screenshots').get().asFile.absolutePath
+   programArgument '--quickPlaySingleplayer'
+   programArgument 'Review'
+   programArgument '--width'
+   programArgument '1280'
+   programArgument '--height'
+   programArgument '800'
+  }
+ }
+}
