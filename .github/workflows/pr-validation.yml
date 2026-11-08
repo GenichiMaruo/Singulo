@@ -85,6 +85,14 @@ jobs:
           grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs' build/cosmic-review/logs/latest.log
           test "$(ls build/cosmic-review/screenshots/cosmic-*.png | wc -l)" -eq 18
+      - name: Verify opaque occlusion across Fancy and Fabulous graphics
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_occlusion.py
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/occlusion.gradle runClient
+          grep -q 'SINGULO_OCCLUSION_COMPLETE 9' build/occlusion-review/logs/latest.log
       - name: Verify fifteen gravitational lenses on a real software-rendered client
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -109,6 +117,8 @@ jobs:
             build/gui-review/inventory-pixels.json
             build/gui-review/machine-font-metrics.tsv
             build/gui-review/machine-pixels.json
+            build/occlusion-review/screenshots/
+            build/occlusion-review/logs/
             build/lensing-review/screenshots/
             build/lensing-review/logs/
             build/cosmic-gui-review/screenshots/
