@@ -21,6 +21,16 @@ This report covers the isolated 1.20.1 Forge / NeoForge port. Other files in thi
 
 ## Validation status
 
-Production and GameTest sources compile for Forge. Legacy source-layout, localization, gameplay text and model checks pass. Python release/tool checks pass. The first full Forge run exposed a lava-to-cauldron compatibility gap; final results must be recorded after the adapter and capability fixes are tested.
+Local pre-occlusion checkpoint: `c492ed3b46f6138b4d4f9bbc75127fe9d3b3e76e`.
 
-Release is **not ready** until final full suites for both loaders, GUI/integration checks and the reported spindle distortion occlusion fix have been verified. No merge, tag or upload is authorized by this report itself.
+- Forge 47.4.26: **719/719** regular GameTests pass (280.333 seconds).
+- NeoForge 47.1.106: **719/719** regular GameTests pass (345.127 seconds).
+- Both distributions pass exact named membership, Java 17, loader metadata, resource layout, mixin/refmap and development-code exclusion checks.
+- Focused regressions: **69/69**, including cosmic storage/packing, cassette, wormhole passage, pipe transport, cauldron parity and retained capability invalidation.
+- Python safeguards: **63/63** after the final occlusion source adaptation.
+- Legacy source layout, three translation catalogs (3,458 entries each), five-language gameplay text and model checks pass.
+- Initial pre-adapter Forge run: 715/716 passed; the lava-cauldron failure was fixed rather than excluded. Later suites include three additional legacy regressions.
+
+Later changes are the private-only cleanup (`69ec99f2`, parity with modern `7de9831`) and Fabulous occlusion correction plus legacy nine-state regression (`043c3f96`, parity with modern `9202b1fc`). The old full-suite evidence is not represented as exact-head evidence for those later commits. Native visual review is in progress; final-tree CI must produce the artifacts promoted for publication.
+
+Release remains **not ready** until final-source CI, remaining GUI/integration checks and independent review pass. No merge, tag or upload is authorized by this report itself.
