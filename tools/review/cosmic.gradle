@@ -1,0 +1,29 @@
+// Disposable native rendering fixtures; excluded from distribution builds.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/cosmic-src'))
+        if (providers.gradleProperty('withSodium').isPresent()) {
+            throw new GradleException('Use withEmbeddium for the Minecraft 1.20.1 renderer review.')
+        }
+        if (providers.gradleProperty('withEmbeddium').isPresent()) {
+            dependencies.add('modRuntimeOnly', 'maven.modrinth:embeddium:UTbfe5d1') { transitive = false }
+        }
+        if (providers.gradleProperty('withDistantHorizons').isPresent()) {
+            dependencies.add('modRuntimeOnly', 'maven.modrinth:distanthorizons:6UnEfsRQ') { transitive = false }
+        }
+        if (providers.gradleProperty('rendererModsDir').isPresent()) {
+            dependencies.add('modRuntimeOnly', fileTree(providers.gradleProperty('rendererModsDir').get()) { include '*.jar' })
+        }
+        legacyForge.runs.client {
+            gameDirectory = layout.buildDirectory.dir('cosmic-review').get().asFile
+            systemProperty 'singulo.cosmicOutput', layout.buildDirectory.dir('cosmic-review/screenshots').get().asFile.absolutePath
+            systemProperty 'singulo.cosmicStart', providers.gradleProperty('cosmicStart').getOrElse('0')
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

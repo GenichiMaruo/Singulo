@@ -119,6 +119,16 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     }
 
     @Override
+    protected boolean railUsed(int row) {
+        return kind == Kind.JET_FORGE && row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE;
+    }
+
+    @Override
+    protected boolean railConnected(int row) {
+        return railUsed(row);
+    }
+
+    @Override
     protected Panel.Status status() {
         return state().icon();
     }
@@ -312,6 +322,14 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         int[] ringH = {12, 9, 6};
         Panel.well(g, skin, cx(32), cy(22), 122, 48);
         g.fill(cx(32), cy(22), cx(154), cy(70), 0xFF080A12);
+        int batch = Math.max(1, v(DeviceMenu.Forge.BATCH));
+        // 並列カセットが効いているときだけ、照射室の上に受け口の数を灯す
+        if (batch > 1) {
+            for (int i = 0; i < 4; i++) {
+                g.fill(cx(131 + i * 5), cy(25), cx(134 + i * 5), cy(29), i < batch ? 0xFFBFE6FF : 0xFF2A3048);
+            }
+            hint(129, 23, 24, 8, tr("forge.batch", batch));
+        }
         // 排熱側の杯とビーム止め
         int heat = phase >= 2 && phase <= 5 ? 0xFFFF7A30 : 0xFF5A3420;
         g.fill(cx(sink), cy(ay - 9), cx(sink + 2), cy(ay + 10), heat);
@@ -391,7 +409,11 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         g.renderOutline(leftPos + at[4][0] - 2, topPos + at[4][1] - 2, 20, 20, CYAN);
         // スロットの説明は空のときだけ（物が入っていれば、その物の説明と重ならないように出さない）
         Component[] slotHints = {tr("forge.core"), tr("forge.inputs"), tr("forge.inputs"), tr("forge.inputs"), tr("forge.output"),
-                tr("forge.empties")};
+                tr("forge.empties"), tr("forge.cassette")};
+        if (menu.slots.get(DeviceMenu.Forge.SLOT_CASSETTE).getItem().isEmpty()) {
+            int[] c = at[DeviceMenu.Forge.SLOT_CASSETTE];
+            Panel.ghost(g, leftPos + c[0], topPos + c[1], "collapsar_parallel_cassette");
+        }
         for (int i = 0; i < at.length; i++) {
             if (!menu.slots.get(i).hasItem() && menu.getCarried().isEmpty()) {
                 hint(at[i][0] - OX, at[i][1], 16, 16, slotHints[i]);
@@ -455,6 +477,17 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     private static final int BTN = 16;
 
     private void drawMouth(GuiGraphics g, float t, int mouseX, int mouseY) {
+        int passage=v(DeviceMenu.Mouth.PASSAGE);
+        if (passage > 0) {
+            // 縫合した口: 渦のまわりを、光る糸の縫い目が四隅から囲む
+            int c = passage == 2 ? 0xFFFFEBC0 : GuiSkin.WARN;
+            for (int i = 0; i < 6; i++) {
+                int y = 24 + i * 11;
+                g.fill(cx(20), cy(y), cx(25), cy(y + 1), c);
+                g.fill(cx(87), cy(y), cx(92), cy(y + 1), c);
+            }
+        }
+        hint(20, 20, 72, 64, tr("mouth.passage." + passage));
         int size = v(DeviceMenu.Mouth.SIZE);
         int target = v(DeviceMenu.Mouth.TARGET);
         // 喉の大きさを入れ子の輪で（今の大きさは明るく、目標は暗く）

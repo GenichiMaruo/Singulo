@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CQC",
+    "SFS",
+    "CIC"
+  ],
+  "key": {
+    "C": {
+      "item": "singulo:superconducting_coil"
+    },
+    "Q": {
+      "item": "singulo:gravity_field_stabilizer"
+    },
+    "S": {
+      "item": "singulo:collapsar_ingot"
+    },
+    "F": {
+      "item": "singulo:nihonium_frame"
+    },
+    "I": {
+      "item": "singulo:exotic_matter"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:tidal_spindle"
+  }
+}

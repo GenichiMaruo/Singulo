@@ -263,6 +263,16 @@ public final class SinguloItems {
         for (var entry : SinguloBlocks.CONTROLLERS.entrySet()) {
             block(entry.getValue(), entry.getKey().stage());
         }
+        block(SinguloBlocks.COSMIC_FRAME,3);
+        block(SinguloBlocks.PASTA_LAMINATE,5);
+        block(SinguloBlocks.SUSPENSION_CROWN,3);
+        block(SinguloBlocks.SUSPENSION_STRUT,3);
+        block(SinguloBlocks.PASTA_CONDUCTOR,5);
+        block(SinguloBlocks.TIDAL_DRAW_RING,5);
+        block(SinguloBlocks.SPINDLE_CRADLE,5);
+        block(SinguloBlocks.SUSPENSION_RESERVOIR,3);
+        block(SinguloBlocks.PASTA_ACCUMULATOR,5);
+        block(SinguloBlocks.TIDAL_SPINDLE,5);
         TAB_ORDER.add(HANDBOOK);
         TAB_ORDER.add(SETTINGS_CARD);
         TAB_ORDER.add(RELOCATION_WRENCH);
@@ -272,6 +282,7 @@ public final class SinguloItems {
         TAB_ORDER.add(DECODED_RECORD);
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
+        block(SinguloBlocks.FLUID_PIPE, 1);
         block(SinguloBlocks.MULTIBLOCK_PORT, 2);
         block(SinguloBlocks.COOLING_TOWER_BASE, 2);
         block(SinguloBlocks.COOLING_TOWER_CASING, 2);

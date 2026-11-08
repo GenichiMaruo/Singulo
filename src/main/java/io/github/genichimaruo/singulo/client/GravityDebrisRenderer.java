@@ -29,7 +29,7 @@ public class GravityDebrisRenderer extends EntityRenderer<GravityDebris> {
         pose.pushPose();
         pose.translate(0, 0.3, 0);
         Quaternionf camera = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
-        FxDraw.billboard(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE)), camera, 1.1F,
+        FxDraw.billboard(pose, GlowDepth.of(buffers, FxDraw.WHITE), camera, 1.1F,
                 GravityRemnantRenderer.RIM, 90);
         pose.mulPose(Axis.YP.rotationDegrees(t * 17));
         pose.mulPose(Axis.XP.rotationDegrees(t * 11));

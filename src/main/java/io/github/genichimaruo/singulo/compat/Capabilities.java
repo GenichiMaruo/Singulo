@@ -18,8 +18,12 @@ public final class Capabilities {
         public static final Capability<net.minecraftforge.fluids.capability.IFluidHandlerItem> ITEM = ForgeCapabilities.FLUID_HANDLER_ITEM;
         public static final Capability<IFluidHandler> BLOCK = ForgeCapabilities.FLUID_HANDLER;
     }
+    @SuppressWarnings("unchecked")
     public static <T> T get(net.minecraft.world.level.Level level, Capability<T> cap,
                           net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side) {
+        if (!level.isLoaded(pos)) return null;
+        if (cap == ForgeCapabilities.FLUID_HANDLER && LegacyCauldron.supports(level.getBlockState(pos)))
+            return (T) new LegacyCauldron(level, pos);
         var be = level.getBlockEntity(pos);
         return be == null ? null : be.getCapability(cap, side).orElse(null);
     }

@@ -283,6 +283,9 @@ public final class Shapes {
             case TIPLER_CYLINDER -> TIPLER;
             case WORMHOLE_GENERATOR -> WORMHOLE_GENERATOR;
             case JET_FORGE -> io.github.genichimaruo.singulo.forge.JetForgeLayout.SPEC;
+            case SUSPENSION_RESERVOIR -> io.github.genichimaruo.singulo.cosmic.CosmicLayouts.RESERVOIR;
+            case PASTA_ACCUMULATOR -> io.github.genichimaruo.singulo.cosmic.CosmicLayouts.ACCUMULATOR;
+            case TIDAL_SPINDLE -> io.github.genichimaruo.singulo.cosmic.CosmicLayouts.SPINDLE;
             case PARTICLE_ACCELERATOR, PENROSE_REACTOR, GENESIS_ENGINE -> null;
         };
     }

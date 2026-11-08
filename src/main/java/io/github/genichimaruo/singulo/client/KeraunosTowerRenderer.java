@@ -40,7 +40,7 @@ public class KeraunosTowerRenderer implements BlockEntityRenderer<KeraunosTowerB
         float charge = be.chargeStart() >= 0 ? Mth.clamp((time - be.chargeStart()) / KeraunosTowerBlockEntity.CHARGE_TICKS, 0, 1) : 0;
         float sinceBolt = time - be.boltAt();
         boolean bolting = sinceBolt >= 0 && sinceBolt < KeraunosTowerBlockEntity.BOLT_TICKS;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         Quaternionf camera = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
         Vec3 orb = new Vec3(0.5, KeraunosTowerBlockEntity.ORB_HEIGHT, 0.5);
 

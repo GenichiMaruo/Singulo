@@ -296,6 +296,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         sides(channel).set(face, mode, eject);
         setChanged();
         if (level != null) {
+            io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent.invalidate(this);
+            // 隣の液体パイプにつなぎ直させる（出し入れしない面になった・なくなった）
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
         }
     }
 
@@ -325,6 +328,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
         setChanged();
         if (level != null) {
+            io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent.invalidate(this);
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
         }
     }
 
@@ -615,7 +620,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             MachineRecipe blocked = null;
             hasFree = false;
             for (MachineRecipe holder : stationRecipes(level)) {
-                MachineRecipe r = holder.value();
+                MachineRecipe r = holder;
                 boolean free = isFree(r);
                 hasFree |= free;
                 if (r.isMassRecipe() || !sizeAllows(r) || r.plan(inputs) == null || !fluidsAvailable(r)
@@ -681,7 +686,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (selectedRecipe != null) {
             return holder.id().equals(selectedRecipe);
         }
-        MachineRecipe.Plan plan = holder.value().plan(inputs);
+        MachineRecipe.Plan plan = holder.plan(inputs);
         if (plan == null || !RecipeSelection.usesEveryInput(type, inputs, plan)) {
             return false;
         }
@@ -1420,13 +1425,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** 面の設定で絞った液体の入れ物。inTanks・outTanks は入れてよい・取り出してよいタンクのビット（-1 ならすべて）。 */
-    private final class SidedFluids implements IFluidHandler {
+    private final class SidedFluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
         private final int inTanks;
         private final int outTanks;
 
         SidedFluids(int inTanks, int outTanks) {
             this.inTanks = inTanks;
             this.outTanks = outTanks;
+        }
+
+        @Override
+        public boolean pipeAccepts(FluidStack fluid) {
+            return usesFluid(fluid);
         }
 
         @Override
@@ -1493,8 +1503,34 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return 0;
     }
 
+    /** パイプから入れてよい液体か: すでに入力タンクに入っているか、この装置のレシピが使うもの。 */
+    private boolean usesFluid(FluidStack fluid) {
+        for (int i = 0; i < type.fluidInputs(); i++) {
+            if (io.github.genichimaruo.singulo.compat.Legacy.sameFluid(tanks[i].getFluid(), fluid)) {
+                return true;
+            }
+        }
+        return level != null && (usesFluid(stationRecipes(level), fluid) || usesFluid(massRecipes(level, type), fluid));
+    }
+
+    private static boolean usesFluid(List<MachineRecipe> recipes, FluidStack fluid) {
+        for (MachineRecipe holder : recipes) {
+            for (MachineRecipe.FluidInput in : holder.fluidIngredients()) {
+                if (in.fluid() == fluid.getFluid()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /** 入力タンクへは入れるだけ、出力タンクからは取り出すだけ。 */
-    private final class AutomationFluids implements IFluidHandler {
+    private final class AutomationFluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        @Override
+        public boolean pipeAccepts(FluidStack fluid) {
+            return usesFluid(fluid);
+        }
+
         @Override
         public int getTanks() {
             return tanks.length;

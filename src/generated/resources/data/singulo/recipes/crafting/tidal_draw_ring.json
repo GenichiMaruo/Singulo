@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    "C C",
+    "PCP"
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:nihonium_plate"
+    },
+    "C": {
+      "item": "singulo:superconducting_coil"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:tidal_draw_ring"
+  }
+}

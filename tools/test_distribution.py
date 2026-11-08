@@ -71,5 +71,53 @@ class DistributionTests(unittest.TestCase):
         path.write_text(path.read_text() * 2)
         with self.assertRaisesRegex(RuntimeError, 'expected'): self.check()
 
+    def tagged_source(self):
+        source = self.root / 'release-source'
+        directory = source / 'src/gameTest/java'
+        directory.mkdir(parents=True)
+        names = []
+        for index, namespace in enumerate(DEFAULT_NAMESPACES):
+            name = f'oldcase{index}'
+            names.append(name)
+            (directory / f'Old{index}GameTests.java').write_text(
+                f'@GameTestHolder("{namespace}")\n@PrefixGameTestTemplate(false)\n'
+                f'class Old{index}GameTests {{ @GameTest(template="empty")\n'
+                f'public static void {name}(GameTestHelper h) {{ h.succeed(); }} }}')
+        (source / 'gradle.properties').write_text('mod_name=Singulo\nmod_version=0.0.0\n')
+        # The tag may contain Python scripts; validation must not execute them.
+        (source / 'tools').mkdir()
+        (source / 'tools/check_release_1201.py').write_text('raise AssertionError("untrusted tag code executed")')
+        self.report.update(expected=names, results=[
+            {'name': n, 'status': 'passed', 'required': True, 'millis': 0} for n in names])
+        self.write_report()
+        (self.root / 'gametest/logs/latest.log').write_text(f'All {len(names)} required tests passed :)\n')
+        with zipfile.ZipFile(self.root / 'libs' / self.name, 'w') as jar:
+            for name, value in self.entries.items(): jar.writestr(name, value)
+        return source
+
+    def test_current_release_counts_match_exact_inventory(self):
+        from collections import Counter
+        import verified_release
+        regular = [e for e in self.source_entries if e['namespace'] in DEFAULT_NAMESPACES]
+        self.assertEqual(dict(Counter(e['namespace'] for e in regular)), verified_release.GROUPS)
+        self.assertEqual(release.COUNTS, {'forge': len(regular), 'neoforge': len(regular)})
+
+    def test_wrong_current_release_count_is_rejected(self):
+        with patch.dict(release.COUNTS, neoforge=len(self.report['expected']) + 1):
+            with self.assertRaisesRegex(RuntimeError, 'expected'):
+                self.check()
+
+    def test_old_tag_uses_its_own_test_inventory_and_version(self):
+        source = self.tagged_source()
+        with redirect_stdout(io.StringIO()):
+            release.validate(self.root, 'neoforge', source=source)
+
+    def test_tagged_report_still_rejects_same_count_wrong_test(self):
+        source = self.tagged_source()
+        self.report['results'][0]['name'] = 'wrong_test_from_another_tree'
+        self.write_report()
+        with self.assertRaisesRegex(RuntimeError, 'Missing, unexpected'):
+            release.validate(self.root, 'neoforge', source=source)
+
 
 if __name__ == '__main__': unittest.main()

@@ -49,7 +49,7 @@ public class FactoryLineRenderer implements BlockEntityRenderer<FactoryLineBlock
             fade *= 0.2F;
         }
         int color = target.awakened() ? FoundryOverseerRenderer.AWAKENED : FoundryOverseerRenderer.ORANGE;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         Vec3 from = new Vec3(0.5, 0.62, 0.5);
         Vec3 to = target.getPosition(partialTick).add(0, FoundryOverseerRenderer.CY, 0).subtract(Vec3.atLowerCornerOf(be.getBlockPos()));
         Vec3 tip = from.add(to.subtract(from).scale(Math.min(1, e * 1.3)));

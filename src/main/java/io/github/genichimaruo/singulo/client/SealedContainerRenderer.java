@@ -104,7 +104,7 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
 
     /** 4面の縦の継ぎ目と、上の縁の光（面ごとの明るさ）。 */
     private static void drawSeams(PoseStack pose, MultiBufferSource buffers, int color, float[] seam) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         float lo = 4 / 16F;
         float hi = 12 / 16F;
         float e = 0.002F;
@@ -169,7 +169,7 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
         VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(BASE));
         FxDraw.pixelBox(pose, vc, 5.5F / 16F, 4 / 16F, 5.5F / 16F, 10.5F / 16F, top, 10.5F / 16F, 5.5F, 4, 5.5F, 10.5F, top * 16, 10.5F,
                 light, 0xFFFFFF);
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         float y = top + 0.003F;
         quad(pose.last(), glow, 6 / 16F, y, 6 / 16F, 6 / 16F, y, 10 / 16F, 10 / 16F, y, 10 / 16F, 10 / 16F, y, 6 / 16F,
                 color, (int) (200 * rise));
@@ -177,7 +177,7 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
 
     /** 読み取りの光の輪（高さ y、強さ k）。 */
     private static void drawScan(PoseStack pose, MultiBufferSource buffers, int color, float y, float k) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         pose.pushPose();
         pose.translate(0.5, y, 0.5);
         FxDraw.ring(pose.last(), vc, 0.5F, 0.72F, color, (int) (230 * k), 0);
@@ -189,7 +189,7 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
     private static void drawContents(SealedContainerBlockEntity be, PoseStack pose, MultiBufferSource buffers, int color, float rise,
                                      float time) {
         float k = clamp01((rise - 0.6F) / 0.4F);
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         pose.pushPose();
         pose.translate(0.5, 11 / 16F, 0.5);
         // 光の柱（上ほど薄い4枚の板）

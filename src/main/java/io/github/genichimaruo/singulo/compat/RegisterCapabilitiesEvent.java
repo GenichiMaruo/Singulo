@@ -16,6 +16,17 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 /** Adapts the mod's sided factories to Forge's attachment lifecycle. */
 public final class RegisterCapabilitiesEvent {
     private static final Map<Object, Map<Capability<?>, BiFunction<Object, Direction, Object>>> FACTORIES = new IdentityHashMap<>();
+    // Weak keys and weak values avoid retaining unloaded block entities through
+    // providers (whose factories reference their owner). Dispatcher owns provider.
+    private static final Map<BlockEntity, java.lang.ref.WeakReference<Runnable>> INVALIDATORS =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    public static void invalidate(BlockEntity owner) {
+        var reference = INVALIDATORS.get(owner);
+        Runnable invalidate = reference == null ? null : reference.get();
+        if (invalidate != null) invalidate.run();
+    }
+
     @SuppressWarnings("unchecked")
     public <T, B extends BlockEntity> void registerBlockEntity(Capability<T> cap, BlockEntityType<B> type,
             BiFunction<B, Direction, T> factory) {
@@ -29,7 +40,7 @@ public final class RegisterCapabilitiesEvent {
         Object key = object instanceof BlockEntity be ? be.getType() : object instanceof ItemStack s ? s.getItem() : null;
         var factories = FACTORIES.get(key);
         if (factories == null) return;
-        class Provider implements ICapabilityProvider {
+        class Provider implements ICapabilityProvider, Runnable {
             private record Entry(Object value, LazyOptional<?> optional) {}
             private final Map<Capability<?>, Map<Direction, Entry>> sides = new IdentityHashMap<>();
             private final Map<Capability<?>, Entry> unsided = new IdentityHashMap<>();
@@ -47,15 +58,19 @@ public final class RegisterCapabilitiesEvent {
                 return (LazyOptional<T>)old.optional();
             }
             private LazyOptional<?> optional(Object value) { return value == null ? LazyOptional.empty() : LazyOptional.of(() -> value); }
-            void invalidate() {
-                unsided.values().forEach(e -> e.optional().invalidate());
-                sides.values().forEach(m -> m.values().forEach(e -> e.optional().invalidate()));
+            public void run() {
+                // Clear before notifying: listeners may immediately re-query.
+                var previous = new java.util.ArrayList<LazyOptional<?>>();
+                unsided.values().forEach(e -> previous.add(e.optional()));
+                sides.values().forEach(m -> m.values().forEach(e -> previous.add(e.optional())));
                 unsided.clear();
                 sides.clear();
+                previous.forEach(LazyOptional::invalidate);
             }
         }
         Provider provider = new Provider();
         event.addCapability(io.github.genichimaruo.singulo.Singulo.id("capabilities"), provider);
-        event.addListener(provider::invalidate);
+        event.addListener(provider::run);
+        if (object instanceof BlockEntity be) INVALIDATORS.put(be, new java.lang.ref.WeakReference<>(provider));
     }
 }

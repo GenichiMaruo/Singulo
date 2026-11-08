@@ -1,0 +1,167 @@
+{
+  "version": "0.16.0",
+  "minecraft": "1.21.1",
+  "loader": "NeoForge 21.1.256",
+  "java": 21,
+  "jar": {
+    "name": "Singulo-0.16.0-1.21.1N.jar",
+    "size": 9120016,
+    "sha256": "ea9275d2ba8cd63a1c17472d655062034ec651328377734d8026d974cc6eab9a"
+  },
+  "regular_gametests": {
+    "passed": 701,
+    "complete": true
+  },
+  "mekanism_gametests": 1,
+  "python_tests": 65,
+  "translations_per_language": {
+    "en_us": 3458,
+    "ja_jp": 3458,
+    "ko_kr": 3458,
+    "zh_cn": 3458,
+    "zh_tw": 3458
+  },
+  "existing_gui_pixels": {
+    "languages": [
+      "ja_jp",
+      "en_us",
+      "zh_cn",
+      "zh_tw",
+      "ko_kr"
+    ],
+    "machine_captures": 240,
+    "headers_without_title_status_overlap": 80,
+    "generator_font_probes": 5,
+    "jet_forge_inventory_slots": 700,
+    "supply_port_inventory_slots": 350,
+    "supply_port_tooltips": 5
+  },
+  "existing_gui_captures": 262,
+  "cosmic_gui_captures": 15,
+  "native_world_states": 13,
+  "render_mods": {
+    "sodium": "0.6.13+mc1.21.1",
+    "distant_horizons": "3.3.3"
+  },
+  "lifecycle": {
+    "minecraft": "1.21.1",
+    "footprintChunks": "[[254, 255], [254, 256], [255, 255], [255, 256], [256, 255], [256, 256]]",
+    "controllerChunk": "[255, 255]",
+    "unloadedFootprintChunk": "[254, 256]",
+    "probeMode": "Real FULL-only tickets (level 33), explicit serverTick probe; natural block ticking resumes for multiplayer",
+    "actualFootprintInaccessible": true,
+    "footprintUnloadEvent": false,
+    "probeSuspendedWhileAwaitingEviction": true,
+    "pausedProbeTicks": 100,
+    "actualFootprintReloadResume": true,
+    "actualControllerUnload": true,
+    "diskReloadPreservesState": true,
+    "playerDrivenUnload": true,
+    "playerDrivenReloadPreservesState": true,
+    "twoRealClients": true,
+    "bothServerMenus": true,
+    "clientAConnections": 2,
+    "parallelBatch": 4,
+    "spindleActualDiskReload": true,
+    "spindleTwoClientPortModeSynchronization": true,
+    "spindleTwoClientSynchronization": true,
+    "complete": true
+  },
+  "ordinary_server_restart": {
+    "complete": true,
+    "ordinaryServerRestart": true,
+    "fluid": 7654321,
+    "energy": 7123456789012,
+    "reserved": 4,
+    "progress": 123,
+    "portModesPersisted": true,
+    "portsRelinkedAfterRestart": true
+  },
+  "limits": [
+    "Same-recipe parallel batches only, up to four.",
+    "FluidStack gases supported; Mekanism Chemical API is not a reservoir capability.",
+    "No low-end GPU or long-term multiplayer load/balance test.",
+    "Cross-dimension transit tested with ServerPlayer GameTests; native two-client tests cover forge/spindle menus, reconnect and chunk reload.",
+    "Draft PR #62 exists; remote CI cannot start because the GitHub account is locked due to a billing issue. No merge or publication."
+  ],
+  "independent_review_fixes": {
+    "stale_menu_inventory_duplication": {
+      "reproduced_before": {
+        "viewer": 7,
+        "replacement": 7
+      },
+      "survival_mining_and_world_destruction": true,
+      "original_block_entity_identity_required": true,
+      "immediate_viewer_close": true,
+      "stale_pickup_and_quick_move_rejected": true,
+      "fresh_menu_usable_with_total_items": 7
+    },
+    "spindle_direct_automation": {
+      "reproduced_before": "Cable, fluid pipe and item hoppers broke structure",
+      "side_service_openings": 2,
+      "real_power_cable": true,
+      "real_fluid_pipe": true,
+      "vanilla_hopper_input_output": true,
+      "completed_output": 4
+    }
+  },
+  "native_evidence_scope": "Current 0.16.0 visual rebuild: 701 GameTests, 262 existing GUI captures, 35 cosmic GUI cases, 18 standard and Sodium/DH world states, real loopback two-client synchronization, reconnect, chunk disk reload, network port-mode changes and an ordinary three-device server restart. Native two-client dimension transit remains untested; ServerPlayer GameTests cover it.",
+  "visual_review": {
+    "reviewed_head": "8d3eccd248e2fb7cea44848fb2e30e7adc9dc4ab",
+    "findings_fixed": [
+      "Inward spool end-cap winding",
+      "Shift energy text and port tooltip overlap",
+      "Duplicate shader registry names leaking programs on reload",
+      "Survey flow chevrons hidden inside opaque pipes"
+    ],
+    "cosmic_gui_cases": 35,
+    "existing_gui_captures": 262,
+    "spool_outward_quads_checked": 144,
+    "pipe_external_surface_cases": 24,
+    "old_shader_programs_released_on_reload": 4,
+    "standard_world_states": 18,
+    "sodium_dh_world_states": 18,
+    "gpu": "NVIDIA GeForce RTX 4070 SUPER",
+    "generator_reproducible": true,
+    "native_multiplayer_rerun": true,
+    "remote_ci": {
+      "initial_run": 42179782810,
+      "status": "blocked_before_start",
+      "reason": "The job was not started because your account is locked due to a billing issue."
+    }
+  },
+  "merge_preparation": {
+    "product_source_commit": "53baef95442540efa5cb2fb8b93a14414cd638ba",
+    "native_client_ports_rendered_after_synchronization": true,
+    "ordinary_restart_port_modes_and_links": true,
+    "workflow_actionlint": "1.7.12",
+    "workflow_bash_blocks_syntax_checked": 14,
+    "python_tests": 65,
+    "old_0151_artifact_tests_accepted_from_its_source": 662,
+    "remote_ci_retry": {
+      "run": 42182540523,
+      "attempt": 2,
+      "jobs_started": 0,
+      "reason": "The job was not started because your account is locked due to a billing issue."
+    },
+    "github_required_status_checks_configured": false,
+    "repository_protection_settings_changed": false,
+    "publication_executed": false,
+    "pristine_tag_checkout_required": true,
+    "maintenance_safety_fixes": {
+      "1.21.1": {
+        "branch": "fix/release-actions-1211",
+        "commit": "ccaf33d10ca9ae50fd13fba9864e1cb8726dbea3",
+        "pr": 63,
+        "python_tests": 61
+      },
+      "1.20.1": {
+        "branch": "fix/release-actions-1201",
+        "commit": "c4435af66ca3241ffd03ee80ea37d7ff120cf6f1",
+        "python_tests": 48
+      },
+      "prepared_0151_jar_bytes_unchanged": true,
+      "existing_release_pr_heads_unchanged": true
+    }
+  }
+}

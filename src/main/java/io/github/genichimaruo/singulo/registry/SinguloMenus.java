@@ -13,6 +13,8 @@ import net.minecraftforge.registries.DeferredRegister;
 
 public final class SinguloMenus {
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(Registries.MENU, Singulo.MODID);
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.cosmic.CosmicMenu>> COSMIC = REGISTER.register(
+            "cosmic", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.cosmic.CosmicMenu::client));
 
     public static final Supplier<MenuType<MachineMenu>> MACHINE = REGISTER.register("machine",
             () -> IForgeMenuType.create(MachineMenu::client));

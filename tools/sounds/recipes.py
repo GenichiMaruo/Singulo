@@ -315,6 +315,34 @@ def containment_tank(d, seed):
                        tank, 1.0, (C3, G3), 0.05, 500, [lambda s: bubbles(0.8, 15, s, 120, 400) * 0.8], 2)
 
 
+@machine('machine/suspension_reservoir_running', level=-20)
+def suspension_reservoir(d, seed):
+    # 重力で液体を吊る: 低く澄んだうなりに、液体の中をゆっくり昇る泡と、遠い水の揺れ
+    field = sine(55, d) * 0.5 * (0.85 + 0.15 * lfo(0.25, d)) + sine(110, d) * 0.14 + sine(165.5, d) * 0.05
+    sway = lowpass(brown(d, seed), 260) * 0.6 * (0.7 + 0.3 * lfo(0.5, d))
+    rising = bubbles(d, 2, seed + 1, 90, 260) * 0.22
+    return field + sway + rising + shimmer(d, 0.4, 500, 1.0, 2.0, seed + 2) * 0.05
+
+
+@machine('machine/pasta_accumulator_running', level=-19)
+def pasta_accumulator(d, seed):
+    # 押し固められた核物質: 重い圧力のうなりと母線の交流、ときどき軋む
+    pressure = lowpass(brown(d, seed), 110) * 0.9 * (0.8 + 0.2 * lfo(0.25, d))
+    busbar = bandpass(saw(50, d), 300, 1.5) * 0.14 + sine(100, d) * 0.12
+    strain = bandpass(pink(d, seed + 1), 900, 3.0) * (0.04 + 0.05 * lfo(0.5, d))
+    return pressure + busbar + strain + sine(28, d) * 0.3
+
+
+@machine('machine/tidal_spindle_running', level=-18)
+def tidal_spindle(d, seed):
+    # ブラックホールの低い轟きの上で、スプールが軽やかに回り、糸がガイドを擦る
+    hole = lowpass(brown(d, seed), 90) * 0.8 * (0.85 + 0.15 * lfo(0.5, d))
+    whirl = bandpass(pink(d, seed + 1), 1400 + 200 * lfo(1.0, d), 3.0) * 0.14 * (0.7 + 0.3 * lfo(4.0, d))
+    thread = highpass(white(d, seed + 2), 5000) * 0.03 * (0.7 + 0.3 * lfo(2.0, d))
+    motor = sine(220, d) * 0.05 + sine(330, d) * 0.03
+    return hole + whirl + thread + motor
+
+
 @machine('machine/graviton_manipulator_active')
 def graviton_active(d, seed):
     warp = fm(70, 0.5, 2 + lfo(1, d), d) * 0.5 + bandpass(pink(d, seed), 500 + 300 * lfo(2, d), 3) * 0.3

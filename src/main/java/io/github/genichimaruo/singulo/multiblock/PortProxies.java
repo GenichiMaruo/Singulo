@@ -133,11 +133,16 @@ public final class PortProxies {
     }
 
     /** 液体の口。 */
-    public static final class Fluids implements IFluidHandler {
+    public static final class Fluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
         private final Supplier<IFluidHandler> target;
 
         public Fluids(Supplier<IFluidHandler> target) {
             this.target = target;
+        }
+
+        @Override
+        public boolean pipeAccepts(FluidStack fluid) {
+            return !(target.get() instanceof io.github.genichimaruo.singulo.pipe.PipeFluidFilter filter) || filter.pipeAccepts(fluid);
         }
 
         @Override

@@ -191,7 +191,7 @@ public final class V011ReviewHarness {
                     tag.putInt("In", x == 0 ? 0 : 1 << Direction.WEST.get3DDataValue());
                     tag.putInt("Out", x == 5 ? 0 : 1 << Direction.EAST.get3DDataValue());
                     tag.putInt("Dist", x);
-                    cable.handleUpdateTag(tag, mc.level.registryAccess());
+                    cable.handleUpdateTag(tag);
                 }
             }
         }

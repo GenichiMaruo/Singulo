@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "singulo:block/suspension_crown",
+    "top": "singulo:block/suspension_crown_top",
+    "bottom": "singulo:block/suspension_crown_bottom"
+  }
+}

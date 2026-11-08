@@ -30,7 +30,7 @@ public class EchoProjectorRenderer implements BlockEntityRenderer<EchoProjectorB
             return;
         }
         float t = be.getLevel().getGameTime() + partialTick;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         Vec3 lens = Vec3.atLowerCornerOf(be.getBlockPos()).add(0.5, 0.95, 0.5);
         EchoSentinel target = null;
         double best = RANGE * RANGE;

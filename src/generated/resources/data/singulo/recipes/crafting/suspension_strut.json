@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "F",
+    "P"
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:nihonium_plate"
+    },
+    "F": {
+      "item": "singulo:cosmic_frame"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "singulo:suspension_strut"
+  }
+}

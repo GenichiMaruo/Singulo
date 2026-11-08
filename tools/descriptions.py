@@ -83,6 +83,8 @@ DESC = {
     '酸素': ('電解槽の副産物。焼成炉に送ると炉温が上がる。', 'By-product of electrolysis. Boosts the kiln.'),
     '銅導線': ('段階1の電線。つないだ装置どうしで電力を分け合う。距離が長いと少し損失がある。',
              'Tier 1 power cable. Loses a little energy over distance.'),
+    '液体パイプ': ('液体とガスを装置やタンクへ運ぶパイプ。置くだけでつながり、出口の液体を使う装置へ送る。隣の水源や溶岩源からも汲む。',
+              'Carries any fluid or gas between machines and tanks. It connects on its own and sends outputs to the machines that use them. It also draws from adjacent water and lava sources.'),
     '白紙データカード': ('アーカイブ端末で記録を書き写す空のカード。', 'An empty card for copying records in the Archive Terminal.'),
     'データカード（観測ログ）': ('観測ログを書き写したカード。レシピで使える。', 'A copy of an observation log, usable in recipes.'),
     '圧縮ブロックLv1': ('質量モードの圧縮機で9単位の質量を固めたブロック。上位の圧縮ブロックと燃料の元。',
@@ -781,6 +783,7 @@ SUMMARY = {
         'Presses plates, or packs any item into mass in mass mode.'),
     'ワームホール生成器ポート': ('生成器の外殻と置き換える、受電と搬出の口。',
         'A generator shell that takes power and outputs mouths.'),
+    '液体パイプ': ('液体とガスを運ぶパイプ。', 'A pipe that carries fluids and gases.'),
     '液体キャニスター': ('どの液体・ガスでも1,000 mB運べる容器。',
         'Carries 1,000 mB of any liquid or gas.'),
     '冷媒カートリッジ': ('液体窒素100 mBを詰めた、運べる容器。',
@@ -988,3 +991,8 @@ SUMMARY = {
     'コラプサー・インゴット': ('ブラックホールのジェットで鍛えた、光を吸う黒の地金。',
         'Light-drinking black metal forged in a jet.'),
 }
+
+# 0.16.0 cosmic facilities
+from cosmic_content import DESC as _COSMIC_DESC, SUMMARY as _COSMIC_SUMMARY
+DESC.update(_COSMIC_DESC)
+SUMMARY.update(_COSMIC_SUMMARY)

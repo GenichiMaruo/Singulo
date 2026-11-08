@@ -33,6 +33,9 @@ import net.minecraftforge.registries.DeferredRegister;
 public final class SinguloBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> REGISTER =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Singulo.MODID);
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity>> COSMIC_CHAMBER =
+            REGISTER.register("cosmic_chamber", () -> build(io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity::new,
+                    SinguloBlocks.SUSPENSION_RESERVOIR.get(), SinguloBlocks.PASTA_ACCUMULATOR.get(), SinguloBlocks.TIDAL_SPINDLE.get()));
 
     /** 汎用加工装置すべてで共有する。種類はブロック側の MachineType で決まる。 */
     public static final Supplier<BlockEntityType<MachineBlockEntity>> MACHINE = REGISTER.register("machine",
@@ -247,6 +250,8 @@ public final class SinguloBlockEntities {
             REGISTER.register("genesis_core", () -> build(io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity::new,
                     SinguloBlocks.GENESIS_CORE.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity>> FLUID_PIPE = REGISTER.register("fluid_pipe",
+            () -> build(io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity::new, SinguloBlocks.FLUID_PIPE.get()));
     public static final Supplier<BlockEntityType<CableBlockEntity>> CABLE = REGISTER.register("cable",
             () -> build(CableBlockEntity::new, SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(),
                     SinguloBlocks.TOPOLOGICAL_WIRE.get(), SinguloBlocks.HORIZON_BUS.get()));

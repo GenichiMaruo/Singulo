@@ -41,7 +41,7 @@ public class CoolingTowerRenderer implements BlockEntityRenderer<CoolingTowerCon
         BlockPos bottom = shape.pos(be.getBlockPos(), 2, 1, 2);
         Vec3 base = Vec3.atLowerCornerOf(bottom.subtract(be.getBlockPos())).add(0.5, 0, 0.5);
         float time = level.getGameTime() + partialTick;
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         float top = h - 2;                                                // コアの列の高さ（y=1〜h−2）
         pose.pushPose();

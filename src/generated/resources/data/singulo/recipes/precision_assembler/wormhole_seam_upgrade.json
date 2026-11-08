@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 400,
+  "energy": 200000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:tidal_filament"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:collapsar_ingot"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:wormhole_seam_upgrade",
+    "count": 1
+  }
+}

@@ -771,6 +771,10 @@
     "source": "Copper Wire",
     "translation": "銅導線"
   },
+  "block.singulo.fluid_pipe": {
+    "source": "Fluid Pipe",
+    "translation": "流體管道"
+  },
   "block.singulo.core_controller": {
     "source": "Core Controller",
     "translation": "爐心控制器"
@@ -1990,6 +1994,10 @@
   "desc.singulo.copper_wire": {
     "source": "Tier 1 power cable. Loses a little energy over distance.",
     "translation": "1 級電線。距離越長，損失的能量越多一點。"
+  },
+  "desc.singulo.fluid_pipe": {
+    "source": "Carries any fluid or gas between machines and tanks. It connects on its own and sends outputs to the machines that use them. It also draws from adjacent water and lava sources.",
+    "translation": "在機器和儲罐之間輸送任意液體或氣體。放置後自動連接，把產物送往需要它的機器，也會從相鄰的水源和熔岩源抽取。"
   },
   "desc.singulo.core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
@@ -6724,8 +6732,8 @@
     "translation": "入門"
   },
   "guide.singulo.intro.basics.body": {
-    "source": "Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods' pipes. Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
-    "translation": "電力（FE）透過 Singulo 的電纜傳輸；物品與流體則透過裝置各面的設定與其他模組的管線傳輸。沒有管線時，拿著流體罐（1,000 mB）右鍵機器即可搬運液體與氣體。\n從第 2 階段開始會用到催化劑：有壽命的消耗品，放在專用的催化劑槽中。等級比裝置高一級時速度較快；低一級時速度較慢且消耗較快；低兩級則無法使用。\n古代廢墟中保存著無法製作的記錄與零件。及早開始尋找地表觀測站吧。"
+    "source": "Power (FE) travels through Singulo cables, and fluids and gases through Fluid Pipes. Pipes connect on their own, send machine outputs to the machines and tanks that use them, and draw from adjacent water and lava sources. A machine's Sides settings decide which faces take part. You can also right-click machines with a Fluid Canister (1,000 mB) to carry fluids by hand. Items use per-side settings and hoppers.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
+    "translation": "電力（FE）透過 Singulo 內建的線纜傳輸，液體和氣體透過流體管道傳輸。管道放置後自動連接，把機器的產物送往需要它的機器和儲罐，也會從相鄰的水源和熔岩源抽取。機器的「面」設定決定哪些面參與輸送。也可以拿著流體罐（1,000 mB）右鍵機器手動搬運。物品透過各個面的設定和漏斗等傳輸。\n從第 2 階段開始會用到催化劑：有壽命的消耗品，放在專用的催化劑槽中。等級比裝置高一級時速度較快；低一級時速度較慢且消耗較快；低兩級則無法使用。\n古代廢墟中保存著無法製作的記錄與零件。及早開始尋找地表觀測站吧。"
   },
   "guide.singulo.intro.basics.title": {
     "source": "Power, catalysts and ruins",
@@ -7550,6 +7558,10 @@
   "howto.singulo.copper_wire": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製作：工作台（階段1）"
+  },
+  "howto.singulo.fluid_pipe": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.core_controller": {
     "source": "Made in: Precision Assembler (stage 5)",
@@ -11047,6 +11059,10 @@
     "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
     "translation": "守護鑄造廠並送出量產型仿生人的列印艙。"
   },
+  "summary.singulo.fluid_pipe": {
+    "source": "A pipe that carries fluids and gases.",
+    "translation": "輸送液體和氣體的管道。"
+  },
   "summary.singulo.genesis_core": {
     "source": "The heart of an engine that makes a universe from energy.",
     "translation": "以能量創造宇宙的爐之核心。"
@@ -11604,8 +11620,8 @@
     "translation": "用於：玻色凝聚態催化劑、相位同步板、量子鎖鑰匙"
   },
   "uses.singulo.collapsar_billet": {
-    "source": "Used in: Collapsar Ingot",
-    "translation": "用於：塌縮星錠"
+    "source": "Used in: Collapsar Ingot, Tidal Filament",
+    "translation": "用途：塌縮星錠、潮汐纖維"
   },
   "uses.singulo.compressed_block_1": {
     "source": "Used in: Compressed Block Lv2, Compressed Block Lv2 (Mixed)",
@@ -11744,8 +11760,8 @@
     "translation": "用於：簡併熱爐"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 2 more",
-    "translation": "用於：反應爐外殼、奇點種子、奇點核心、微中子靈敏度模組 Mk3、封印容器（時間鎖） 等 2 個"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 4 more",
+    "translation": "用途：反應爐外殼、奇點種子、奇點核心、微中子靈敏度模組 Mk3、封印容器（時間鎖） 等 4 項"
   },
   "uses.singulo.degenerate_nucleus": {
     "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
@@ -11784,8 +11800,8 @@
     "translation": "用於：冷媒罐、液態氦冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 23 more",
-    "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 23 個"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 26 more",
+    "translation": "用途：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 26 項"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11796,8 +11812,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 31 more",
-    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 31 個"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 34 more",
+    "translation": "用途：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 34 項"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11812,8 +11828,8 @@
     "translation": "用於：終焉之記錄"
   },
   "uses.singulo.gravity_field_stabilizer": {
-    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock), Jet Forge Levitator and 1 more",
-    "translation": "用於：爐心控制器、微中子靈敏度模組 Mk3、奇點鎖鑰匙、封印容器（奇點鎖）、噴流鍛造爐懸浮器 等 1 個"
+    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock), Jet Forge Levitator and 2 more",
+    "translation": "用途：爐心控制器、微中子靈敏度模組 Mk3、奇點鎖鑰匙、封印容器（奇點鎖）、噴流鍛造爐懸浮器 等 2 項"
   },
   "uses.singulo.gravity_panel_receiver": {
     "source": "Used in: Impact Generator Panel",
@@ -11892,8 +11908,8 @@
     "translation": "用於：單極子升級模組"
   },
   "uses.singulo.mass_pellet": {
-    "source": "Used in: Collapsar Ingot",
-    "translation": "用於：塌縮星錠"
+    "source": "Used in: Collapsar Ingot, Nuclear Pasta",
+    "translation": "用途：塌縮星錠、核義大利麵"
   },
   "uses.singulo.meteoric_iron_ingot": {
     "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 4 more",
@@ -11924,16 +11940,16 @@
     "translation": "用於：鉨錠"
   },
   "uses.singulo.nihonium_frame": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 12 more",
-    "translation": "用於：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、簡併熱爐控制器、自動探測站 等 12 個"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 15 more",
+    "translation": "用途：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、簡併熱爐控制器、自動探測站 等 15 項"
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
     "translation": "用於：鉨板"
   },
   "uses.singulo.nihonium_plate": {
-    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 2 more",
-    "translation": "用於：視界匯流排、陀螺驅動裝置、霍金收集器、噴流收集器、鉨框架 等 2 個"
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 9 more",
+    "translation": "用途：視界匯流排、陀螺驅動裝置、霍金收集器、噴流收集器、鉨框架 等 9 項"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
@@ -12052,8 +12068,8 @@
     "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 91 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 69 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 69 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 78 more",
+    "translation": "用途：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 78 項"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
@@ -13366,5 +13382,453 @@
   "gui.singulo.reason.capacity_exceeded": {
     "source": "Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold",
     "translation": "每刻需要 %s FE。即使安裝容量升級 Mk3，蓄電容量也不夠"
+  },
+  "block.singulo.cosmic_frame": {
+    "source": "Gravitational Confinement Frame",
+    "translation": "引力拘束框架"
+  },
+  "block.singulo.pasta_accumulator": {
+    "source": "Nuclear Pasta Accumulator",
+    "translation": "核義大利麵積層儲能庫"
+  },
+  "block.singulo.pasta_laminate": {
+    "source": "Nuclear Pasta Laminate",
+    "translation": "核義大利麵層板"
+  },
+  "block.singulo.suspension_reservoir": {
+    "source": "Suspension Reservoir",
+    "translation": "重力懸吊儲槽"
+  },
+  "block.singulo.tidal_spindle": {
+    "source": "Tidal Spindle",
+    "translation": "潮汐紡絲機"
+  },
+  "desc.singulo.collapsar_parallel_cassette": {
+    "source": "Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.",
+    "translation": "放入鍛造爐介面右側的槽，或手持按右鍵點擊鍛造爐安裝，同一配方最多同時加工 4 批。批數在開始時鎖定，材料、冷卻劑和電力按批數消耗。"
+  },
+  "desc.singulo.cosmic_frame": {
+    "source": "A heavy braced frame used for the bases and beams of cosmic containment facilities.",
+    "translation": "宇宙現象拘束設備的底座和橫梁所用的重型斜撐框架。"
+  },
+  "desc.singulo.nuclear_pasta": {
+    "source": "Confined layers of nuclear matter made in the existing Accretion Jet Forge. No new accumulator is required.",
+    "translation": "在現有吸積噴流鍛造爐中製造的層狀核物質。不需要先造新儲能庫。"
+  },
+  "desc.singulo.pasta_accumulator": {
+    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both.",
+    "translation": "7×9×7 的設備，容量 8 TFE，輸入、輸出各為 2 GFE/t。充電時壓板收緊，核義大利麵由顆粒變成細棒再變成薄板；放電經四角導體流出。左右兩個埠可分別設為輸入、輸出或輸入輸出。"
+  },
+  "desc.singulo.pasta_laminate": {
+    "source": "Layered plates that form the top and bottom of the Nuclear Pasta Accumulator.",
+    "translation": "構成核義大利麵積層儲能庫上下底座的積層板。"
+  },
+  "desc.singulo.suspension_reservoir": {
+    "source": "A 7×9×7 facility that hangs 16,000,000 mB of liquids or gases from its octagonal crown as a single drop. Its two ports can each be set to input, output or both.",
+    "translation": "7×9×7 的設備。從八角冠把 16,000,000 mB 液體或氣體吊成一滴。左右兩個埠可分別設為輸入、輸出或輸入輸出。"
+  },
+  "desc.singulo.tidal_filament": {
+    "source": "Luminous filament stretched by black-hole tidal forces. Combined with Collapsar material, it stitches open a traversable wormhole.",
+    "translation": "用黑洞潮汐力拉伸的發光纖維。與塌縮星材料一起，將可通行蟲洞縫合展開。"
+  },
+  "desc.singulo.tidal_spindle": {
+    "source": "A 7×8×15 facility. Form its core with a Singularity Seed and 10 GFE, then stretch matter into wound filament using tidal forces. Processing needs 20 MFE/t and liquid helium. Reserved work survives stops and unloaded chunks.",
+    "translation": "7×8×15 的設備。用奇點種子和 10 GFE 形成拘束核心，以潮汐力拉伸材料並捲繞纖維。加工需要 20 MFE/t 和液態氦。停止或區塊未載入時保留已預留的加工內容。"
+  },
+  "desc.singulo.wormhole_seam_upgrade": {
+    "source": "Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it. Logistics remain available, and travel requires a safe landing.",
+    "translation": "對現有蟲洞口按右鍵安裝。兩端均已升級並開啟時，可走過上方的方形開口。原有物流不變；出口沒有安全落腳點時不會傳送。"
+  },
+  "gui.singulo.cosmic.amount": {
+    "source": "%s / %s mB",
+    "translation": "%s / %s mB"
+  },
+  "gui.singulo.cosmic.empty": {
+    "source": "Empty",
+    "translation": "空"
+  },
+  "gui.singulo.cosmic.seed": {
+    "source": "Start: Singularity Seed + 10 GFE",
+    "translation": "啟動：奇點種子 + 10 GFE"
+  },
+  "gui.singulo.cosmic.state.0": {
+    "source": "Structure complete",
+    "translation": "結構完成"
+  },
+  "gui.singulo.cosmic.state.1": {
+    "source": "Structure incomplete",
+    "translation": "結構未完成"
+  },
+  "gui.singulo.cosmic.state.2": {
+    "source": "Waiting for structure chunks",
+    "translation": "等待結構區塊載入"
+  },
+  "gui.singulo.device.forge.batch": {
+    "source": "Parallel processing: %s batches. Materials, coolant and power scale with the batch count",
+    "translation": "並行加工：%s 批。材料、冷卻劑、電力按批數消耗"
+  },
+  "gui.singulo.device.mouth.passage.0": {
+    "source": "Logistics mouth. To walk through, use a Wormhole Seam Upgrade on both mouths",
+    "translation": "物流用的口。要步行通過，請對兩端的口右鍵使用蟲洞縫合擴充"
+  },
+  "gui.singulo.device.mouth.passage.1": {
+    "source": "Install the upgrade on the other mouth too, then keep both open and loaded to pass",
+    "translation": "另一端的口也裝上擴充，並讓兩端保持開啟且已載入後即可通行"
+  },
+  "gui.singulo.device.mouth.passage.2": {
+    "source": "Passage ready. Unsafe exits prevent travel",
+    "translation": "可以通行。出口危險時不傳送"
+  },
+  "gui.singulo.pipe.blocked": {
+    "source": "Pipe: blocked (check space and compatible inputs)",
+    "translation": "配管：停止轉移（檢查空間和相容輸入）"
+  },
+  "gui.singulo.pipe.flow": {
+    "source": "Pipe: %s mB / 5 ticks",
+    "translation": "配管：%s mB / 5 tick"
+  },
+  "gui.singulo.pipe.idle": {
+    "source": "Pipe: idle (no fluid offered)",
+    "translation": "配管：待機（無流體供給）"
+  },
+  "gui.singulo.pipe.mixed": {
+    "source": "Multiple fluids",
+    "translation": "多種流體"
+  },
+  "gui.singulo.pipe.stale": {
+    "source": "Pipe: awaiting observation",
+    "translation": "配管：等待觀測資料"
+  },
+  "guide.singulo.cosmic": {
+    "source": "Confinement and Seams",
+    "translation": "拘束與縫合"
+  },
+  "guide.singulo.cosmic.links.body": {
+    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open and loaded, walk through the square opening above a mouth. Existing logistics remain available. Travel is refused without safe footing and space at the exit, or while riding. A cooldown prevents immediate return trips.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
+    "translation": "用潮汐纖維和塌縮星材料製作蟲洞縫合升級，對現有口的兩端分別按右鍵安裝。兩端均開啟且已載入時，可走過口上方的方形開口。原有物流仍可使用。出口沒有安全落腳點或空間、或正騎乘時，不會傳送。傳送後有冷卻時間以防立即返回。\n把塌縮星並行加工匣放入鍛造爐介面右側的槽，或手持按右鍵點擊鍛造爐的任意部件來安裝，可同時加工同一配方最多 4 批。開始時鎖定數量，材料、冷卻劑、電力按批數消耗。安裝不會改變已經開始的加工。\n戴上測量眼鏡，可在附近流體配管上看到轉移方向箭頭，並查看注視配管的量、流體和阻塞狀態。箭頭顯示實際端點間轉移的一條代表性連通路徑，並非分支或環路的所有路徑。配管本身不儲存流體。"
+  },
+  "guide.singulo.cosmic.links.title": {
+    "source": "Seams and parallel irradiation",
+    "translation": "縫合與並行照射"
+  },
+  "guide.singulo.cosmic.production.body": {
+    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 7×8×15. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nFeed power, coolant and materials through the left port, and take filament from the right port.",
+    "translation": "核義大利麵在現有 Jet Forge 中製造：簡併物質殼 1 個、質量顆粒 32 個、液態氦 2,000 mB，以 125 MFE/t 照射 90 秒（僅照射就需 225 GFE）。不需要先造新儲能庫。\n潮汐紡絲機為 7×8×15。將奇點種子放入核心槽，並儲存 10 GFE 來形成拘束核心。用塌縮星胚料 1 個、奇異物質 1 個、液態氦 500 mB，以 20 MFE/t 加工 60 秒，可捲繞 4 根潮汐纖維。材料、冷卻劑、成果和進度均會預留並保存。輸出滿時等待。\n從左側埠送入電力、冷卻劑和材料，從右側埠取出纖維。"
+  },
+  "guide.singulo.cosmic.production.title": {
+    "source": "From tides to thread",
+    "translation": "從潮汐到纖維"
+  },
+  "guide.singulo.cosmic.storage.body": {
+    "source": "The two blocks beside each controller are fixed I/O ports. Connect cables, pipes and hoppers to them, and use the buttons in the controller screen to set each one to input, output or both. By default, seen from the front, the left port is input and the right is output. Use the Holo Projector on a controller to see its structure. Broken or unloaded structures pause and keep their contents. The Relocation Wrench packs the contents; mining a controller also produces one filled item.\nThe 7×9×7 Suspension Reservoir holds 16,000,000 mB of ordinary liquids or gases, hanging from its octagonal crown as a drop that lengthens and swells as it fills. Connect the existing fluid pipe directly to a port. Mekanism chemicals using a separate API are not supported.\nThe 7×9×7 Nuclear Pasta Accumulator has finite capacity: 8 TFE, with 2 GFE/t input and output. It stores only received power. As it charges, its press plates close and the nuclear pasta inside changes from drops to rods to sheets. ",
+    "translation": "新設備控制台的左右兩側是位置固定的搬入搬出埠。線纜、配管和漏斗都接到埠上，並用控制台介面的按鈕分別設為輸入、輸出或輸入輸出。預設從正面看左側為輸入，右側為輸出。對控制台使用全息投影機可查看結構。結構損壞或部分區塊未載入時會暫停並保留內容。搬遷扳手可連同內容打包；挖掉控制台也會掉落一個裝有內容的物品。\n7×9×7 的重力懸吊儲槽可存放 16,000,000 mB 普通液體或氣體，流體從八角冠垂成一滴，越多就越長越鼓。現有流體配管可直接連接到埠。不支援使用獨立 API 的 Mekanism 化學品。\n7×9×7 的核義大利麵積層儲能庫容量為有限的 8 TFE，輸入、輸出各為 2 GFE/t。只儲存實際接收的電力。充電時壓板收緊，內部的核義大利麵由顆粒變成細棒再變成薄板。"
+  },
+  "guide.singulo.cosmic.storage.title": {
+    "source": "Hanging storage, compressed layers",
+    "translation": "懸吊與壓縮"
+  },
+  "howto.singulo.collapsar_parallel_cassette": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製作：精密組裝台（階段5）"
+  },
+  "howto.singulo.cosmic_frame": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製作：工作台（階段3）"
+  },
+  "howto.singulo.nuclear_pasta": {
+    "source": "Made in: Accretion Jet Forge (stage 5)",
+    "translation": "製作：吸積噴流鍛造爐（階段5）"
+  },
+  "howto.singulo.pasta_accumulator": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製作：工作台（階段5）"
+  },
+  "howto.singulo.pasta_laminate": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製作：精密組裝台（階段5）"
+  },
+  "howto.singulo.suspension_reservoir": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製作：工作台（階段3）"
+  },
+  "howto.singulo.tidal_filament": {
+    "source": "Made in: Tidal Spindle (stage 5)",
+    "translation": "製作：潮汐紡絲機（階段5）"
+  },
+  "howto.singulo.tidal_spindle": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製作：工作台（階段5）"
+  },
+  "howto.singulo.wormhole_seam_upgrade": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製作：精密組裝台（階段5）"
+  },
+  "item.singulo.collapsar_parallel_cassette": {
+    "source": "Collapsar Parallel Cassette",
+    "translation": "塌縮星並行加工匣"
+  },
+  "item.singulo.nuclear_pasta": {
+    "source": "Nuclear Pasta",
+    "translation": "核義大利麵"
+  },
+  "item.singulo.tidal_filament": {
+    "source": "Tidal Filament",
+    "translation": "潮汐纖維"
+  },
+  "item.singulo.wormhole_seam_upgrade": {
+    "source": "Wormhole Seam Upgrade",
+    "translation": "蟲洞縫合升級"
+  },
+  "jei.singulo.mb.pasta_accumulator": {
+    "source": "7×9×7. Capacity: 8 TFE. Input and output: 2 GFE/t each.",
+    "translation": "7×9×7。 容量：8 TFE。輸入、輸出各為 2 GFE/t。"
+  },
+  "jei.singulo.mb.suspension_reservoir": {
+    "source": "7×9×7. Suspends fluid from an octagonal crown. Capacity: 16,000,000 mB.",
+    "translation": "7×9×7。 從八角冠懸吊流體。容量：16,000,000 mB。"
+  },
+  "jei.singulo.mb.tidal_spindle": {
+    "source": "7×8×15. Start: Singularity Seed + 10 GFE. Processing: 20 MFE/t.",
+    "translation": "7×8×15。 啟動：奇點種子 + 10 GFE。加工：20 MFE/t。"
+  },
+  "multiblock.singulo.pasta_accumulator": {
+    "source": "Nuclear Pasta Accumulator",
+    "translation": "核義大利麵積層儲能庫"
+  },
+  "multiblock.singulo.suspension_reservoir": {
+    "source": "Suspension Reservoir",
+    "translation": "重力懸吊儲槽"
+  },
+  "multiblock.singulo.tidal_spindle": {
+    "source": "Tidal Spindle",
+    "translation": "潮汐紡絲機"
+  },
+  "station.singulo.tidal_spindle": {
+    "source": "Tidal Spindle",
+    "translation": "潮汐紡絲機"
+  },
+  "summary.singulo.collapsar_parallel_cassette": {
+    "source": "Process up to four Jet Forge batches together.",
+    "translation": "將 Jet Forge 擴展為最多 4 批並行加工。"
+  },
+  "summary.singulo.cosmic_frame": {
+    "source": "A frame for facility bases and beams.",
+    "translation": "設備底座和橫梁用的框架。"
+  },
+  "summary.singulo.nuclear_pasta": {
+    "source": "Layered nuclear matter made in the Jet Forge.",
+    "translation": "由 Jet Forge 製造的層狀核物質。"
+  },
+  "summary.singulo.pasta_accumulator": {
+    "source": "Finite energy storage in compressed layers.",
+    "translation": "以壓縮層儲存電力，容量有限。"
+  },
+  "summary.singulo.pasta_laminate": {
+    "source": "The top and bottom plates of the accumulator.",
+    "translation": "儲能庫的上下板。"
+  },
+  "summary.singulo.suspension_reservoir": {
+    "source": "A large tank that suspends fluid from above.",
+    "translation": "從上方懸吊流體的大型儲槽。"
+  },
+  "summary.singulo.tidal_filament": {
+    "source": "Luminous filament for stitching traversable wormholes.",
+    "translation": "縫合通行用蟲洞的發光纖維。"
+  },
+  "summary.singulo.tidal_spindle": {
+    "source": "Stretches matter with tidal forces and winds luminous thread.",
+    "translation": "用潮汐力拉伸材料並捲繞發光纖維。"
+  },
+  "summary.singulo.wormhole_seam_upgrade": {
+    "source": "Upgrade both mouths to walk between them.",
+    "translation": "升級兩端的口，步行通行。"
+  },
+  "uses.singulo.collapsar_ingot": {
+    "source": "Used in: Tidal Spindle, Wormhole Seam Upgrade, Collapsar Parallel Cassette",
+    "translation": "用途：潮汐紡絲機、蟲洞縫合升級、塌縮星並行加工匣"
+  },
+  "uses.singulo.cosmic_frame": {
+    "source": "Used in: Nuclear Pasta Laminate, Suspension Strut, Spool Cradle",
+    "translation": "用途：核義大利麵層板、懸吊支柱、線軸支座"
+  },
+  "uses.singulo.horizon_bus": {
+    "source": "Used in: Nuclear Pasta Accumulator, Pasta Conductor",
+    "translation": "用途：核義大利麵積層儲能庫、核義大利麵導體"
+  },
+  "uses.singulo.nuclear_pasta": {
+    "source": "Used in: Nuclear Pasta Laminate, Nuclear Pasta Accumulator",
+    "translation": "用途：核義大利麵層板、核義大利麵積層儲能庫"
+  },
+  "uses.singulo.tidal_filament": {
+    "source": "Used in: Wormhole Seam Upgrade",
+    "translation": "用途：蟲洞縫合升級"
+  },
+  "uses.singulo.zero_gravity_block": {
+    "source": "Used in: Suspension Reservoir, Suspension Crown",
+    "translation": "用途：重力懸吊儲槽、懸吊冠"
+  },
+  "block.singulo.suspension_crown": {
+    "source": "Suspension Crown",
+    "translation": "懸吊冠"
+  },
+  "block.singulo.suspension_strut": {
+    "source": "Suspension Strut",
+    "translation": "懸吊支柱"
+  },
+  "block.singulo.pasta_conductor": {
+    "source": "Pasta Conductor",
+    "translation": "核義大利麵導體"
+  },
+  "block.singulo.tidal_draw_ring": {
+    "source": "Tidal Draw Ring",
+    "translation": "潮汐拉絲環"
+  },
+  "block.singulo.spindle_cradle": {
+    "source": "Spool Cradle",
+    "translation": "線軸支座"
+  },
+  "subtitles.singulo.suspension_reservoir_running": {
+    "source": "Suspension reservoir hums",
+    "translation": "重力懸吊儲槽嗡鳴"
+  },
+  "subtitles.singulo.pasta_accumulator_running": {
+    "source": "Nuclear pasta compresses",
+    "translation": "核義大利麵被壓縮"
+  },
+  "subtitles.singulo.tidal_spindle_running": {
+    "source": "Tidal spindle winds thread",
+    "translation": "潮汐紡絲機捲繞絲線"
+  },
+  "gui.singulo.cosmic.rate_in": {
+    "source": "Input %s/t",
+    "translation": "輸入 %s/t"
+  },
+  "gui.singulo.cosmic.rate_out": {
+    "source": "Output %s/t",
+    "translation": "輸出 %s/t"
+  },
+  "gui.singulo.cosmic.phase.0": {
+    "source": "Gnocchi phase: nuclear matter in separate drops",
+    "translation": "團子相：核物質分成一顆顆液滴"
+  },
+  "gui.singulo.cosmic.phase.1": {
+    "source": "Spaghetti phase: drops have joined into rods",
+    "translation": "義大利麵相：液滴連成了細棒"
+  },
+  "gui.singulo.cosmic.phase.2": {
+    "source": "Lasagna phase: rods have spread into sheets",
+    "translation": "千層麵相：細棒展開成了薄板"
+  },
+  "gui.singulo.cosmic.helium": {
+    "source": "Liquid Helium %s / %s mB",
+    "translation": "液態氦 %s / %s mB"
+  },
+  "gui.singulo.cosmic.slot.seed": {
+    "source": "Singularity Seed: forms the core",
+    "translation": "奇點種子：形成核心"
+  },
+  "gui.singulo.cosmic.slot.billet": {
+    "source": "Collapsar Billet",
+    "translation": "塌縮星胚料"
+  },
+  "gui.singulo.cosmic.slot.exotic": {
+    "source": "Exotic Matter",
+    "translation": "奇異物質"
+  },
+  "gui.singulo.cosmic.slot.output": {
+    "source": "Wound filament",
+    "translation": "捲繞完成的纖維"
+  },
+  "gui.singulo.cosmic.core.on": {
+    "source": "Confined core active",
+    "translation": "拘束核心運作中"
+  },
+  "desc.singulo.suspension_crown": {
+    "source": "The octagonal crown of the Suspension Reservoir. The glowing ring on its underside holds the fluid up.",
+    "translation": "重力懸吊儲槽的八角冠。底面的發光環托住流體。"
+  },
+  "summary.singulo.suspension_crown": {
+    "source": "The octagonal crown of the reservoir.",
+    "translation": "儲槽的八角冠。"
+  },
+  "howto.singulo.suspension_crown": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製造地：工作台（第 3 階段）"
+  },
+  "desc.singulo.suspension_strut": {
+    "source": "A slender strut that lifts the crown of the Suspension Reservoir.",
+    "translation": "撐起重力懸吊儲槽之冠的細柱。"
+  },
+  "summary.singulo.suspension_strut": {
+    "source": "A slender strut that lifts the crown.",
+    "translation": "撐起冠的細柱。"
+  },
+  "howto.singulo.suspension_strut": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製造地：工作台（第 3 階段）"
+  },
+  "desc.singulo.pasta_conductor": {
+    "source": "Wound bus bars at the four corners of the Nuclear Pasta Accumulator.",
+    "translation": "立在核義大利麵積層儲能庫四角的繞線母線。"
+  },
+  "summary.singulo.pasta_conductor": {
+    "source": "Corner bus bars for the accumulator.",
+    "translation": "儲能庫四角的母線。"
+  },
+  "howto.singulo.pasta_conductor": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製造地：工作台（第 5 階段）"
+  },
+  "desc.singulo.tidal_draw_ring": {
+    "source": "Forms the core drum and draw rings of the Tidal Spindle, narrowing the thread.",
+    "translation": "構成潮汐紡絲機的核心筒和拉絲環，把絲線逐步收細。"
+  },
+  "summary.singulo.tidal_draw_ring": {
+    "source": "The drum and draw rings of the spindle.",
+    "translation": "紡絲機的核心筒和拉絲環。"
+  },
+  "howto.singulo.tidal_draw_ring": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製造地：工作台（第 5 階段）"
+  },
+  "desc.singulo.spindle_cradle": {
+    "source": "Bearing stands that hold the spool of the Tidal Spindle.",
+    "translation": "支撐潮汐紡絲機線軸的軸承座。"
+  },
+  "summary.singulo.spindle_cradle": {
+    "source": "A stand that holds the spool.",
+    "translation": "支撐線軸的底座。"
+  },
+  "howto.singulo.spindle_cradle": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製造地：工作台（第 5 階段）"
+  },
+  "gui.singulo.cosmic.port.left": {
+    "source": "Left port: %s",
+    "translation": "左側埠：%s"
+  },
+  "gui.singulo.cosmic.port.right": {
+    "source": "Right port: %s",
+    "translation": "右側埠：%s"
+  },
+  "gui.singulo.cosmic.port.mode.0": {
+    "source": "Input",
+    "translation": "輸入"
+  },
+  "gui.singulo.cosmic.port.mode.1": {
+    "source": "Output",
+    "translation": "輸出"
+  },
+  "gui.singulo.cosmic.port.mode.2": {
+    "source": "Input and output",
+    "translation": "輸入輸出"
+  },
+  "gui.singulo.cosmic.port.click": {
+    "source": "Click to change",
+    "translation": "點擊切換"
+  },
+  "gui.singulo.device.forge.cassette": {
+    "source": "Holds a Collapsar Parallel Cassette, which processes up to four batches of the same recipe together",
+    "translation": "放入塌縮星並行加工匣後，同一配方最多同時加工 4 批"
   }
 }

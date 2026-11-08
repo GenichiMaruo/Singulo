@@ -29,7 +29,7 @@ final class JetForgeRenderTypes extends RenderType {
                     .setCullState(NO_CULL)
                     .createCompositeState(false));
 
-    private static final RenderType BEAM = create("singulo_jet_forge_beam", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS,
+    static final RenderType BEAM_TYPE = create("singulo_jet_forge_beam", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS,
             16384, false, false, CompositeState.builder()
                     .setShaderState(new ShaderStateShard(() -> beamShader))
                     .setTransparencyState(LIGHTNING_TRANSPARENCY)
@@ -45,7 +45,7 @@ final class JetForgeRenderTypes extends RenderType {
     /** ビームのシェーダーの描き方（読めなかった・シェーダーパックを使っているときは null）。 */
     @Nullable
     static RenderType beam() {
-        return beamShader == null || GravitationalLensing.shaderPackInUse() ? null : BEAM;
+        return beamShader == null || GravitationalLensing.shaderPackInUse() ? null : BEAM_TYPE;
     }
 
     static void registerShaders(RegisterShadersEvent event) {

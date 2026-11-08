@@ -115,7 +115,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         pose.pushPose();
         pose.mulPose(Axis.XP.rotation(tilt));
         pose.mulPose(Axis.YP.rotationDegrees(angle));
-        drawDisk(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE)), inner, outer, Math.toRadians(angle),
+        drawDisk(pose, GlowDepth.of(buffers, WHITE), inner, outer, Math.toRadians(angle),
                 toCamera, beaming);
         pose.popPose();
         GravitationalLensing.add(worldCenter, horizon * GravitationalLensing.EINSTEIN_PER_HORIZON, 1.0F, region);
@@ -139,7 +139,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         if (flights.isEmpty()) {
             return 0;
         }
-        VertexConsumer glow = buffers.getBuffer(JetForgeRenderTypes.GLOW);
+        VertexConsumer glow = GlowDepth.additive(buffers).getBuffer(JetForgeRenderTypes.GLOW);
         var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         double c = Structures.REACTOR_RADIUS * Math.sqrt(0.5) - 0.6;
         float seen = VISIBLE_HORIZON_BASE + (horizon - 0.6F) * VISIBLE_HORIZON_GROWTH;
@@ -330,7 +330,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         float collapse = Mth.clamp((p - 0.85F) / 0.15F, 0, 1);            // 崩壊
         float power = 0.25F * wake + 0.75F * inject;
         Vec3 center = be.coreCenter();
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, WHITE);
         var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         int beamRgb = lerpRgb(0x64DCFF, 0xFFFFFF, power + collapse);
         // 電力が満ちていないうちは、流れ込む光がちらつく
@@ -455,7 +455,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     /** ブラックホールができた瞬間: まぶしい光が縮み、3平面に衝撃波の輪が広がる。 */
     private static void renderFormationFlash(PenroseReactorBlockEntity be, float age, PoseStack pose, MultiBufferSource buffers) {
         float k = Mth.clamp(age / FLASH_TICKS, 0, 1);
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, WHITE);
         var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         pose.pushPose();
         pose.translate(0.5, 0.5 + Structures.CONTROLLER_BELOW_CENTER, 0.5);
