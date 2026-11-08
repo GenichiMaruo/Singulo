@@ -85,6 +85,15 @@ jobs:
           grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs' build/cosmic-review/logs/latest.log
           test "$(ls build/cosmic-review/screenshots/cosmic-*.png | wc -l)" -eq 18
+      - name: Verify fifteen gravitational lenses on a real software-rendered client
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_lensing.py
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/lensing.gradle runClient
+          grep -q 'SINGULO_LENSING_MANY_COMPLETE traced=15' build/lensing-review/logs/latest.log
+          grep -q 'SINGULO_LENSING_FRAME_TIME holes=15' build/lensing-review/logs/latest.log
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -100,6 +109,8 @@ jobs:
             build/gui-review/inventory-pixels.json
             build/gui-review/machine-font-metrics.tsv
             build/gui-review/machine-pixels.json
+            build/lensing-review/screenshots/
+            build/lensing-review/logs/
             build/cosmic-gui-review/screenshots/
             build/cosmic-gui-review/logs/
             build/cosmic-review/screenshots/
