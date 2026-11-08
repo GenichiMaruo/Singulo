@@ -25,6 +25,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 
 @EventBusSubscriber(modid = Singulo.MODID)
 public final class LifecycleServerReview {
+    private static final boolean COSMIC=Boolean.getBoolean("singulo.cosmicLifecycle");
+    public static final BlockPos COSMIC_C=new BlockPos(1023,80,1023);
+    private static io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity cosmic,oldCosmic;
+    private static final Set<ChunkPos> cosmicChunks=new HashSet<>();
     public static final BlockPos C = new BlockPos(4095, 80, 4095);
     private static final Direction BACK = Direction.SOUTH;
     private static final TicketType<ChunkPos> TICKET = TicketType.create("singulo_pc_review", Comparator.comparingLong(ChunkPos::toLong));
@@ -68,9 +72,11 @@ public final class LifecycleServerReview {
         for(var e:Blueprints.layout(Blueprints.Kind.JET_FORGE,C,BACK,JetForgeLayout.H).entrySet()) level.setBlockAndUpdate(e.getKey(),e.getValue());
         be=(JetForgeBlockEntity)level.getBlockEntity(C);
         be.forceBlackHole();
-        be.items().setStackInSlot(JetForgeBlockEntity.SLOT_IN,new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("collapsar_billet"))));
-        be.items().setStackInSlot(JetForgeBlockEntity.SLOT_IN+1,new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("mass_pellet")),16));
-        be.tank().fill(new FluidStack(SinguloFluids.get("liquid_helium"),1000),IFluidHandler.FluidAction.EXECUTE);
+        if(COSMIC){var tag=be.saveWithoutMetadata();tag.putBoolean("parallel_upgrade",true);be.load(tag);}
+        int batches=COSMIC?4:1;
+        be.items().setStackInSlot(JetForgeBlockEntity.SLOT_IN,new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("collapsar_billet")),batches));
+        be.items().setStackInSlot(JetForgeBlockEntity.SLOT_IN+1,new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("mass_pellet")),16*batches));
+        be.tank().fill(new FluidStack(SinguloFluids.get("liquid_helium"),1000*batches),IFluidHandler.FluidAction.EXECUTE);
         ChunkPos controller=new ChunkPos(C);
         tail=footprint.stream().max(Comparator.comparingInt(p->Math.abs(p.x-controller.x)+Math.abs(p.z-controller.z))).orElseThrow();
         require(!tail.equals(controller),"Fixture must cross a real chunk boundary");
@@ -83,7 +89,7 @@ public final class LifecycleServerReview {
     private static void write(String name,String value) throws Exception { Files.createDirectories(output());Files.writeString(output().resolve(name),value); }
 
     @SubscribeEvent
-    public static void tick(TickEvent.ServerTickEvent event) throws Exception {
+    public static void tick(TickEvent.ServerTickEvent event) throws Exception { if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         if(event.phase!=TickEvent.Phase.END)return;
         if (!Boolean.getBoolean("singulo.lifecycleServer")) return;
         var server=event.getServer(); var level=server.overworld();
@@ -139,17 +145,32 @@ public final class LifecycleServerReview {
                         write("server-ready.txt","ready for loopback clients");phase=6;at=ticks;
                         Singulo.LOGGER.info("SINGULO_REAL_CHUNK_COMPLETE newBlockEntity=true reservedInventory=true progress={}",savedProgress);
                         for(ChunkPos p:footprint) level.setChunkForced(p.x,p.z,true);
+                        if(COSMIC){
+                            var layout=Blueprints.layout(Blueprints.Kind.TIDAL_SPINDLE,COSMIC_C,Direction.SOUTH,7);
+                            layout.keySet().forEach(p->cosmicChunks.add(new ChunkPos(p)));
+                            for(var p:cosmicChunks){level.setChunkForced(p.x,p.z,true);level.getChunk(p.x,p.z);}
+                            layout.forEach((p,s)->level.setBlockAndUpdate(p,s));
+                            cosmic=(io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity)level.getBlockEntity(COSMIC_C);
+                            var tag=cosmic.saveWithoutMetadata();tag.putBoolean("core",true);tag.putInt("progress",100);tag.putInt("duration",1200);tag.putInt("cost",20_000_000);
+                            tag.put("reserved",new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("tidal_filament")),4).save(new net.minecraft.nbt.CompoundTag()));cosmic.load(tag);
+                        }
                     } else require(ticks-at<1000,"Controller never actually unloaded");
                 }
                 case 6,7 -> {
                     var players=server.getPlayerList().getPlayers();
+                    for(var player:players){player.setNoGravity(true);player.getAbilities().flying=true;player.onUpdateAbilities();}
                     boolean nowA=players.stream().anyMatch(p->p.getGameProfile().getName().equals("ReviewA"));
                     if(nowA&&!aPresent) aLogins++;
                     aPresent=nowA;
                     for(var player:players) if(!playerTravel && player.distanceToSqr(C.getX(),C.getY(),C.getZ())>256) {
                         player.setGameMode(GameType.CREATIVE);player.teleportTo(level,C.getX()+0.5,C.getY()+1,C.getZ()-2.5,0,0);
                     }
-                    if(phase==7) be.energy().receiveLong(Long.MAX_VALUE,false);
+                    if(phase==7){
+                        be.energy().receiveLong(Long.MAX_VALUE,false);
+                        // Keep this synthetic irradiation fixture available while clients
+                        // finish loading/reconnecting; complete runs are covered by GameTests.
+                        if(be.phase()==JetForgeBlockEntity.IRRADIATE&&be.phaseTicks()>400)be.forcePhase(JetForgeBlockEntity.IRRADIATE,100);
+                    }
                     if(phase==6 && players.size()==2) { be.forcePhase(JetForgeBlockEntity.IRRADIATE,100);phase=7; }
                     if(phase==7 && !bothMenus && players.size()==2 && players.stream().allMatch(p->p.containerMenu instanceof DeviceMenu)) {
                         if(!travelDone) {
@@ -162,8 +183,14 @@ public final class LifecycleServerReview {
                     }
                     if(Files.exists(output().resolve("client-A-complete.txt"))&&Files.exists(output().resolve("client-B-complete.txt"))) {
                         require(bothMenus&&aLogins>=2,"Two-client menu or reconnect evidence missing");
-                        require(be.hasCore()&&be.charged().size()==2&&be.result().getCount()==1,"Reserved batch duplicated or lost during multiplayer/reconnect");
+                        require(be.hasCore()&&be.charged().size()==2&&be.result().getCount()==(COSMIC?4:1),"Reserved batch duplicated or lost during multiplayer/reconnect");
                         evidence.put("twoRealClients",true);evidence.put("bothServerMenus",true);evidence.put("clientAConnections",aLogins);
+                        if(COSMIC){
+                            evidence.put("parallelBatch",be.batchSize());oldCosmic=cosmic;unloadEvents.remove(new ChunkPos(COSMIC_C).toLong());
+                            for(var p:cosmicChunks)level.setChunkForced(p.x,p.z,false);
+                            for(var player:players){player.closeContainer();player.teleportTo(level,8,150,8,0,0);}
+                            phase=11;at=ticks;break;
+                        }
                         evidence.put("reservedBatchRetained",true);evidence.put("complete",true);
                         write("results.json",new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(evidence));
                         Singulo.LOGGER.info("SINGULO_MULTIPLAYER_COMPLETE clients=2 reconnects={} inventory=true",aLogins-1);
@@ -176,7 +203,10 @@ public final class LifecycleServerReview {
                         evidence.put("playerDrivenUnload",true);
                         for(var player:server.getPlayerList().getPlayers()) player.teleportTo(level,C.getX()+0.5,C.getY()+1,C.getZ()-2.5,0,0);
                         phase=9;at=ticks;
-                    } else require(ticks-at<1000,"Players left but controller did not unload");
+                    } else {
+                        if((ticks-at)%200==0)Singulo.LOGGER.info("SINGULO_PLAYER_UNLOAD_WAIT {} players={}",level.getChunkSource().getChunkDebugData(new ChunkPos(C)),server.getPlayerList().getPlayers().stream().map(p->p.position().toString()).toList());
+                        require(ticks-at<1000,"Players left but controller did not unload");
+                    }
                 }
                 case 9 -> {
                     if(loaded(level,new ChunkPos(C))) {
@@ -189,6 +219,36 @@ public final class LifecycleServerReview {
                         }
                     }
                     require(ticks-at<1000,"Players returned but new forge block entity did not load");
+                }
+                case 11 -> {
+                    if(!loaded(level,new ChunkPos(COSMIC_C))&&unloadEvents.contains(new ChunkPos(COSMIC_C).toLong())){
+                        for(var p:cosmicChunks){level.setChunkForced(p.x,p.z,true);level.getChunk(p.x,p.z);}
+                        cosmic=(io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity)level.getBlockEntity(COSMIC_C);
+                        require(cosmic!=null&&cosmic!=oldCosmic&&cosmic.progress()==100&&cosmic.reserved().getCount()==4&&cosmic.core(),"Spindle disk reload lost reserved work");
+                        evidence.put("spindleActualDiskReload",true);
+                        for(var player:server.getPlayerList().getPlayers())player.teleportTo(level,COSMIC_C.getX()+0.5,COSMIC_C.getY()+1,COSMIC_C.getZ()-2.5,0,0);
+                        write("cosmic-stage.txt","native spindle menu synchronization");phase=12;at=ticks;
+                    }else require(ticks-at<1000,"Spindle never physically unloaded");
+                }
+                case 12 -> {
+                    cosmic.energyFor(null).receiveLong(Long.MAX_VALUE,false);
+                    if(Files.exists(output().resolve("cosmic-A-complete.txt"))&&Files.exists(output().resolve("cosmic-B-complete.txt"))){
+                        require(server.getPlayerList().getPlayers().stream().allMatch(p->p.containerMenu instanceof io.github.genichimaruo.singulo.cosmic.CosmicMenu),"Both spindle menus not server-open");
+                        require(cosmic.portMode(0)==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT
+                                &&cosmic.portMode(1)==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT,"Network port button did not update server mode");
+                        evidence.put("spindleTwoClientPortModeSynchronization",true);
+                        evidence.put("spindleTwoClientSynchronization",true);evidence.put("complete",true);
+                        write("results.json",new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(evidence));
+                        Singulo.LOGGER.info("SINGULO_COSMIC_MULTIPLAYER_COMPLETE clients=2 parallelBatch=4 spindleDiskReload=true");
+                        for(var p:footprint){ticket(level,p,false);level.setChunkForced(p.x,p.z,false);}
+                        for(var p:cosmicChunks)level.setChunkForced(p.x,p.z,false);
+                        phase=13;at=ticks;
+                    }else require(ticks-at<600,"Spindle menus did not synchronize");
+                }
+                case 13 -> {
+                    // Let normal ticks finish release callbacks before entering vanilla's
+                    // shutdown flush; clients stop themselves after reading results.json.
+                    if(ticks-at>=100){phase=10;server.halt(false);}
                 }
                 default -> {}
             }

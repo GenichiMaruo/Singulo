@@ -185,7 +185,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             Vec3 a = muzzle(android, gun.shotFrom().subtract(base)), b = gun.shotAt().subtract(base);
             FxDraw.beam(pose.last(), buffers.getBuffer(GlowCore.TYPE), a, b, 0.02F + 0.02F * k, 0xFFFFFF, (int) (230 * k));
             FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.lightning()), a, b, 0.05F + 0.06F * k, variant.accent, (int) (150 * k));
-            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             pose.pushPose();
             pose.translate(a.x, a.y, a.z);
             FxDraw.billboard(pose, glow, entityRenderDispatcher.cameraOrientation(), 0.12F + 0.25F * k, variant.accent, (int) (220 * k));
@@ -364,7 +364,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     private void renderHologram(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, float plane) {
         pose.pushPose();
         modelSpace(android, partialTick, pose);
-        VertexConsumer vc = ClipBuffers.above(buffers.getBuffer(RenderType.entityTranslucentEmissive(variant.texture)), plane);
+        VertexConsumer vc = ClipBuffers.above(GlowDepth.of(buffers, variant.texture), plane);
         int flicker = 45 + (int) (20 * Mth.sin((android.tickCount + partialTick) * 0.9F));
         LegacyRender.model(model, pose, vc, FxDraw.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, argb(flicker, mix(variant.accent, 0xFFFFFF, 0.3F)));
         pose.popPose();
@@ -374,7 +374,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     private void renderPrintHead(RuinAndroid android, float print, float partialTick, PoseStack pose, MultiBufferSource buffers) {
         float t = android.tickCount + partialTick;
         float y = print * (android.getBbHeight() + 0.1F);
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         pose.pushPose();
         bodySpace(android, partialTick, pose);
         pose.translate(0, y, 0);
@@ -398,7 +398,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         float t = android.stateTime(partialTick);
         float age = android.tickCount + partialTick;
         Quaternionf camera = entityRenderDispatcher.cameraOrientation();
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         int accent = variant.accent;
         switch (state) {
             case BladeAndroid.STATE_DASH_WINDUP -> {
@@ -425,7 +425,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     Vec3 from = muzzle(android, gun.railFrom().subtract(base)), to = gun.railTo().subtract(base);
                     FxDraw.beam(pose.last(), fx, from, alongBarrel(android, to.distanceTo(from), to),
                             0.025F + 0.04F * k, color, (int) (70 + 120 * k));
-                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                    glow = GlowDepth.of(buffers, FxDraw.WHITE);
                     pose.pushPose();
                     Vec3 at = muzzle(android, gun.railFrom().subtract(base));
                     pose.translate(at.x, at.y, at.z);
@@ -441,7 +441,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     Vec3 a = muzzle(android, gun.railFrom().subtract(base)), b = gun.railTo().subtract(base);
                     FxDraw.beam(pose.last(), buffers.getBuffer(GlowCore.TYPE), a, b, 0.07F + 0.12F * k, 0xFFFFFF, (int) (250 * k));
                     FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.lightning()), a, b, 0.2F + 0.5F * k, accent, (int) (170 * k));
-                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                    glow = GlowDepth.of(buffers, FxDraw.WHITE);
                     for (Vec3 at : new Vec3[]{a, b}) {
                         pose.pushPose();
                         pose.translate(at.x, at.y, at.z);
@@ -455,7 +455,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 if (t < 3) {
                     renderAfterimages(android, partialTick, pose, buffers, 1 - t / 3);
                     // 別の描画先を取り出すと、前に取り出した描画先は閉じられるので、取り直す
-                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                    glow = GlowDepth.of(buffers, FxDraw.WHITE);
                 }
                 slashTrail(android, partialTick, pose, glow, t, 4, 1.45F, 1F);
             }
@@ -605,7 +605,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                             prev = p;
                         }
                     }
-                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                    glow = GlowDepth.of(buffers, FxDraw.WHITE);
                 }
                 pose.pushPose();
                 pose.translate(0, 0.02, 0);
@@ -791,7 +791,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.pushPose();
             pose.translate(at[shot].x, at[shot].y, at[shot].z);
             Quaternionf camera = entityRenderDispatcher.cameraOrientation();
-            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, 0.35F * k + 0.1F, BitAndroid.BEAM, (int) (200 * k));
             pose.popPose();
         }
@@ -827,7 +827,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     private void renderAfterimages(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, float strength) {
         Vec3 v = android.getDeltaMovement().multiply(1, 0, 1);
         Vec3 dir = v.lengthSqr() > 1e-4 ? v.normalize() : Vec3.directionFromRotation(0, android.yBodyRot);
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(variant.texture));
+        VertexConsumer vc = GlowDepth.of(buffers, variant.texture);
         for (int i = 1; i <= 3; i++) {
             pose.pushPose();
             pose.translate(-dir.x * 0.55 * i, 0, -dir.z * 0.55 * i);

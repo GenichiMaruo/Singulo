@@ -51,9 +51,9 @@ public class CableRenderReviewHarness {
             Singulo.LOGGER.info("SINGULO_CABLE_CAMERA player={} camera={} yaw={} pitch={} screen={}",mc.player.position(),mc.gameRenderer.getMainCamera().getPosition(),mc.player.getYRot(),mc.player.getXRot(),mc.screen);
             capture(mc,"cable-powered");
             var original=mc.level.getBlockState(CUT);
-            var oldSample=a.getUpdateTag(mc.level.registryAccess());
+            var oldSample=a.getUpdateTag();
             mc.level.setBlock(CUT,Blocks.AIR.defaultBlockState(),3);
-            a.handleUpdateTag(oldSample,mc.level.registryAccess());
+            a.handleUpdateTag(oldSample);
             if(a.flow()!=0||b.flow()!=0) throw new IllegalStateException("Predicted cut did not hide both sides");
             mc.level.setBlock(CUT,original,3);
             if(a.flow()<=0||b.flow()<=0) throw new IllegalStateException("Rejected cut lost authoritative glow");

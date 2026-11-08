@@ -259,9 +259,19 @@ public final class GravitationalLensing {
                     pending = new Pending(List.copyOf(SOURCES), event.getCamera().getPosition(), new Matrix4f(event.getProjectionMatrix()),
                             new Quaternionf(event.getCamera().rotation()));
                 } else {
-                    apply(event.getCamera().getPosition(), event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）
+                    Vec3 cam = event.getCamera().getPosition();
+                    List<Source> front = new ArrayList<>();
+                    SOURCES.removeIf(s -> !GlowDepth.behindJet(cam, s.pos, s.region) && front.add(s));
+                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    GlowDepth.drawJets(event);
+                    SOURCES.clear();
+                    SOURCES.addAll(front);
+                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
                 }
             }
+            // レンズがないフレームや、レンズを切っているときのジェット
+            GlowDepth.drawJets(event);
         } finally {
             SOURCES.clear();
         }
@@ -271,6 +281,12 @@ public final class GravitationalLensing {
     private static void apply(Vec3 cam, Matrix4f proj, Quaternionf cameraRotation, boolean useDepth) {
         Minecraft mc = Minecraft.getInstance();
         RenderTarget main = mc.getMainRenderTarget();
+        // Fabulous composites color back into main and clears its depth first. The
+        // translucent target retains opaque terrain plus the translucent depth.
+        RenderTarget depthSource = mc.levelRenderer.getTranslucentTarget();
+        if (depthSource == null || !useDepth) {
+            depthSource = main;
+        }
         int w = main.width;
         int h = main.height;
         float aspect = (float) w / h;
@@ -348,14 +364,14 @@ public final class GravitationalLensing {
             passes[i] = Math.min(passes[i], MAX_PASSES - 1);
             passCount = Math.max(passCount, passes[i] + 1);
         }
-        if (copy == null || copy.width != w || copy.height != h || copy.isStencilEnabled() != main.isStencilEnabled()) {
+        if (copy == null || copy.width != w || copy.height != h || copy.isStencilEnabled() != depthSource.isStencilEnabled()) {
             if (copy != null) {
                 copy.destroyBuffers();
             }
             // 深度もコピーする（描き込み先の深度をそのまま読むと、フレームによって読めたり読めなかったりして、
-            // 手前のブロックの上にレンズが出たり消えたりする）。形式を合わせるため、ステンシルの有無も画面にそろえる
+            // 手前のブロックの上にレンズが出たり消えたりする）。形式を合わせるため、ステンシルの有無も深度の読み元にそろえる
             copy = new TextureTarget(w, h, true, Minecraft.ON_OSX);
-            if (main.isStencilEnabled()) {
+            if (depthSource.isStencilEnabled()) {
                 copy.enableStencil();
             }
             // 歪めて拡大した所はなめらかに補間し、縮める所はミップマップで（1画素が写す範囲をならして）読む
@@ -384,7 +400,7 @@ public final class GravitationalLensing {
         RenderSystem.setShader(() -> shader);
         for (int pass = 0; pass < passCount; pass++) {
             // レンズは深度に書かないので、深度のコピーは最初の1回でよい
-            copyScreen(main, w, h, useDepth && pass == 0);
+            copyScreen(main, depthSource, w, h, useDepth && pass == 0);
             for (int i = 0; i < passes.length; i++) {
                 if (passes[i] == pass) {
                     drawLens(draws.get(i));
@@ -421,11 +437,15 @@ public final class GravitationalLensing {
     }
 
     /** 今の画面をコピーに写す（これを歪めて元の画面に描き直す）。 */
-    private static void copyScreen(RenderTarget main, int w, int h, boolean depth) {
+    private static void copyScreen(RenderTarget main, RenderTarget depthSource, int w, int h, boolean depth) {
         GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, main.frameBufferId);
         GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, copy.frameBufferId);
         GlStateManager._glBlitFrameBuffer(0, 0, w, h, 0, 0, w, h,
-                depth ? GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT : GL11.GL_COLOR_BUFFER_BIT, GL11.GL_NEAREST);
+                depth && depthSource == main ? GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT : GL11.GL_COLOR_BUFFER_BIT, GL11.GL_NEAREST);
+        if (depth && depthSource != main) {
+            GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, depthSource.frameBufferId);
+            GlStateManager._glBlitFrameBuffer(0, 0, w, h, 0, 0, w, h, GL11.GL_DEPTH_BUFFER_BIT, GL11.GL_NEAREST);
+        }
         GlStateManager._bindTexture(copy.getColorTextureId());
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         GlStateManager._bindTexture(0);

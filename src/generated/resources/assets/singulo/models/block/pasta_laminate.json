@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "singulo:block/pasta_laminate",
+    "end": "singulo:block/pasta_laminate_top"
+  }
+}

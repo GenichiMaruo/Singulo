@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import zipfile
 from collections import Counter
+from release_artifact import select_artifact
 
 GROUPS = json.loads((Path(__file__).resolve().parent / "gametest_groups.json").read_text())
 ROOT = Path(__file__).resolve().parent.parent
@@ -79,20 +80,12 @@ def inspect(repo, run_id, tag, source, loader):
     tree = git(source, "rev-parse", "HEAD^{tree}")
     if api(repo, f"git/commits/{run['head_sha']}")["tree"]["sha"] != tree:
         raise RuntimeError("Reviewed source tree differs from the release tag")
-    artifacts = api(repo, f"actions/runs/{run_id}/artifacts?per_page=100")["artifacts"]
-    selected = {}
-    tested_commits = set()
-    for artifact in artifacts:
-        match = re.fullmatch(rf"pr-validation-([0-9a-f]{{40}})-{loader}-(full)", artifact["name"])
-        if match:
-            ns = match[2]
-            if artifact["expired"] or ns in selected:
-                raise RuntimeError("Expired or ambiguous validation artifacts")
-            tested_commits.add(match[1])
-            selected[ns] = {"id": artifact["id"], "name": artifact["name"]}
-    if set(selected) != {"full"} or len(tested_commits) != 1:
-        raise RuntimeError("Expected all required namespace artifacts from one tested merge commit")
-    tested_commit = tested_commits.pop()
+    artifacts = api(repo, f"actions/runs/{run_id}/artifacts?per_page=100")
+    producer = next(job for job in jobs if job['name'] == f'build-and-gametest ({loader})')
+    artifact, tested_commit = select_artifact(
+        artifacts, producer, run['run_attempt'],
+        rf'pr-validation-(?P<tested>[0-9a-f]{{40}})-{loader}-full(?:-attempt-(?P<attempt>[1-9][0-9]*))?')
+    selected = {'full': artifact}
     if api(repo, f"git/commits/{tested_commit}")["tree"]["sha"] != tree:
         raise RuntimeError("The actual CI merge tree differs from the release tag")
     return {"loader": loader, "repository": repo, "run_id": run_id, "run_attempt": run["run_attempt"],

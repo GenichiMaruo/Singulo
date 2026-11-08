@@ -30,7 +30,7 @@ public class AndroidLaserRenderer extends EntityRenderer<AndroidLaser> {
         float t = laser.tickCount + partialTick;
         int rgb = laser.color();
         float r = (float) AndroidLaser.RADIUS;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         pose.pushPose();
         pose.translate(0, 0.03, 0);
         if (t < AndroidLaser.WARN) {

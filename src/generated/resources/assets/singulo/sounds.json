@@ -331,6 +331,33 @@
       }
     ]
   },
+  "suspension_reservoir_running": {
+    "subtitle": "subtitles.singulo.suspension_reservoir_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/suspension_reservoir_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "pasta_accumulator_running": {
+    "subtitle": "subtitles.singulo.pasta_accumulator_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/pasta_accumulator_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "tidal_spindle_running": {
+    "subtitle": "subtitles.singulo.tidal_spindle_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/tidal_spindle_running",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "containment_tank_running": {
     "subtitle": "subtitles.singulo.containment_tank_running",
     "sounds": [

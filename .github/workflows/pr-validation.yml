@@ -77,6 +77,16 @@ jobs:
           grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py --loader "$LOADER"
+      - name: Verify cosmic screen values and port tooltips in five languages
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_gui.py --loader "$LOADER" --cosmic
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient -PmachineGuiReview -PcosmicGuiReview
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 35' build/$LOADER/cosmic-gui-review/logs/latest.log
+          test "$(grep -c 'SINGULO_COSMIC_GUI_REGIONS ' build/$LOADER/cosmic-gui-review/logs/latest.log)" -eq 35
+          test "$(find build/$LOADER/cosmic-gui-review/screenshots -name 'machine-*.png' | wc -l)" -eq 35
       - name: Verify JEI 15 transfer, popup input and all capacity tiers
         if: matrix.loader == 'forge'
         env:
@@ -118,7 +128,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: pr-validation-${{ github.sha }}-${{ matrix.loader }}-full
+          name: pr-validation-${{ github.sha }}-${{ matrix.loader }}-full-attempt-${{ github.run_attempt }}
           if-no-files-found: warn
           path: |
             build/${{ matrix.loader }}/libs/*.jar
@@ -129,6 +139,9 @@ jobs:
             build/${{ matrix.loader }}/gui-review/inventory-pixels.json
             build/${{ matrix.loader }}/gui-review/machine-pixels.json
             build/${{ matrix.loader }}/gui-review/machine-font-metrics.tsv
+            build/${{ matrix.loader }}/cosmic-gui-review/screenshots/
+            build/${{ matrix.loader }}/cosmic-gui-review/logs/
+            build/${{ matrix.loader }}/cosmic-gui-review/machine-font-metrics.tsv
             build/${{ matrix.loader }}/jei-review/screenshots/
             build/${{ matrix.loader }}/jei-review/logs/
             build/${{ matrix.loader }}/ponder-review/logs/
@@ -198,6 +211,16 @@ jobs:
           test "$(grep -c 'SINGULO_DH_LIGHTMAP_COMPLETE 256' build/$LOADER/rayleigh-review/logs/latest.log)" -eq 4
           python3 tools/review/check_rayleigh_png.py build/$LOADER/rayleigh-review/screenshots
           cp build/$LOADER/rayleigh-review/logs/latest.log build/$LOADER/rayleigh-review/logs/lighting.log
+      - name: Verify spindle occlusion in Fancy and Fabulous pipelines
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_occlusion.py --loader "$LOADER"
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/occlusion.gradle runClient
+          grep -q 'SINGULO_OCCLUSION_COMPLETE 9' build/$LOADER/occlusion-review/logs/latest.log
+          test "$(grep -c 'SINGULO_OCCLUSION_RESULT' build/$LOADER/occlusion-review/logs/latest.log)" -eq 9
+          test "$(find build/$LOADER/occlusion-review/screenshots -name '*.png' | wc -l)" -eq 18
       - name: Re-enter the saved panel world five times in one client
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -212,3 +235,5 @@ jobs:
           path: |
             build/forge/rayleigh-review/logs/
             build/forge/rayleigh-review/screenshots/
+            build/forge/occlusion-review/logs/
+            build/forge/occlusion-review/screenshots/

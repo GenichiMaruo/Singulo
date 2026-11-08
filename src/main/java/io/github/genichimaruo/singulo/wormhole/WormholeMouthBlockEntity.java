@@ -98,6 +98,26 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     private int grace;
     private int starve;
     private int grow;
+    private boolean traversable;
+    public boolean traversable() { return traversable; }
+    private int clientPassage;
+    public int passageState() {
+        if(!traversable)return 0;
+        if(level!=null&&level.isClientSide)return clientPassage;
+        var other=partner();return open()&&other!=null&&other.open()&&other.traversable()?2:1;
+    }
+
+    private boolean installSeam(ServerPlayer player, ItemStack stack) {
+        if (!traversable && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                io.github.genichimaruo.singulo.Singulo.id("wormhole_seam_upgrade")))) {
+            traversable = true;
+            if (!player.isCreative()) stack.shrink(1);
+            setChanged();
+            level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
+            return true;
+        }
+        return false;
+    }
     private boolean registered;
     private boolean crossDimension;
     private long budgetTick = -1;
@@ -314,11 +334,13 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
             crossDimension = p != null && !p.dimension().equals(level.dimension());
         }
         upkeep(level);
+        if(traversable&&level.getGameTime()%20==0)level.sendBlockUpdated(pos,state,state,Block.UPDATE_CLIENTS);
         if (isRemoved()) {
             return;
         }
-        if (size > 0 && level.getGameTime() % 5 == 0) {
-            pull(level);
+        if (size > 0) {
+            WormholeTransit.tick(this, level);
+            if(level.getGameTime()%5==0)pull(level);
         }
         boolean lit = size > 0 && partner() != null;
         if (lit && level.getGameTime() % 20 == 0) {
@@ -388,6 +410,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         double radius = 2 + size;
         for (Entity e : level.getEntities((Entity) null, new AABB(c, c).inflate(radius),
                 e -> !e.isSpectator() && !(e instanceof Player p && p.isCreative()))) {
+            if (traversable && e instanceof Player) continue;
             Vec3 to = c.subtract(e.position().add(0, e.getBbHeight() / 2, 0));
             double d = to.length();
             if (d > 0.3 && d <= radius) {
@@ -410,6 +433,11 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public void onBroken(Level level) {
+        if (traversable && !level.isClientSide) {
+            traversable=false;
+            Block.popResource(level,worldPosition,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                    io.github.genichimaruo.singulo.Singulo.id("wormhole_seam_upgrade"))));
+        }
         unregister(level);
         Block.popResource(level, worldPosition, fuel.getStackInSlot(0));
     }
@@ -429,6 +457,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public boolean useItem(ServerPlayer player, ItemStack stack, InteractionHand hand) {
+        if (installSeam(player,stack)) return true;
         if (ExoticCharge.isExoticMatter(stack)) {
             ItemStack rest = fuel.insertItem(0, stack.copy(), false);
             stack.setCount(rest.getCount());
@@ -454,6 +483,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.GRACE -> grace;
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PORTS -> rankedPorts().size();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PORT_LIMIT -> portLimit();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PASSAGE -> passageState();
                 default -> 0;
             };
         }, (pl, id) -> {
@@ -503,6 +533,8 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("size", size);
+        tag.putBoolean("traversable",traversable);
+        tag.putInt("passage_state",passageState());
         return tag;
     }
 
@@ -520,6 +552,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
         tag.putInt("size", size);
         tag.putInt("target", target);
+        tag.putBoolean("traversable",traversable);
         tag.putDouble("burn", burn);
         tag.putInt("grace", grace);
         tag.putInt("starve", starve);
@@ -533,6 +566,8 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
             data = new WormholeData(tag.getLong("pair"), tag.getLong("created"), true);
         }
         size = tag.contains("size") ? tag.getInt("size") : 1;
+        traversable=tag.getBoolean("traversable");
+        clientPassage=tag.getInt("passage_state");
         if (tag.contains("target")) {
             target = tag.getInt("target");
         }

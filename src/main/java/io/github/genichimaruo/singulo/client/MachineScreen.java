@@ -139,7 +139,6 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     private final Popup sides = new Popup("machine.sides");
     /** 0 はアイテム、1 以降はタンクごと（1 + タンクの番号、MachineBlockEntity.sideChannels）。 */
     private int sidesChannel;
-    private static final int FACE = 18;
     /** 面の設定の、ドラッグで回せる立方体。 */
     private final SideCube cube = new SideCube();
     private static final float CUBE_HALF = 13;
@@ -205,20 +204,6 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     // ------------------------------------------------------------------ 面の設定
-
-    /** 面のボタンの位置（十字の展開図。中央が正面）。 */
-    private int[] facePos(io.github.genichimaruo.singulo.machine.SideConfig.Face f) {
-        int cx = leftPos + imageWidth / 2 - FACE / 2;
-        int cy = topPos + 38;
-        return switch (f) {
-            case FRONT -> new int[]{cx, cy};
-            case TOP -> new int[]{cx, cy - FACE - 2};
-            case BOTTOM -> new int[]{cx, cy + FACE + 2};
-            case LEFT -> new int[]{cx - FACE - 2, cy};
-            case RIGHT -> new int[]{cx + FACE + 2, cy};
-            case BACK -> new int[]{cx + 2 * (FACE + 2), cy};
-        };
-    }
 
     /** 面の設定があるか。マルチブロックのコントローラにはない（入出力はマルチブロック搬入出ポートで行う）。 */
     private boolean hasSides() {

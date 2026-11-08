@@ -38,7 +38,7 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         float time = be.getLevel().getGameTime() + partialTick;
         boolean active = be.shownProtection() > 0;
         boolean core = be.shownProtection() >= 5;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, WHITE);
         // ここから先は塔の軸の根元を原点にする
         net.minecraft.core.BlockPos axis = be.axis();
         pose.pushPose();

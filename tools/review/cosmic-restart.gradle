@@ -1,0 +1,10 @@
+// Two ordinary dedicated-server starts, without custom chunk-retention probes.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/cosmic-restart-src'))
+        legacyForge.runs.server {
+            gameDirectory = layout.buildDirectory.dir('cosmic-restart').get().asFile
+            systemProperty 'singulo.cosmicRestartOutput', file(providers.gradleProperty('cosmicRestartOutput').getOrElse('../handoff/0160-restart')).absolutePath
+        }
+    }
+}

@@ -23,13 +23,47 @@ import net.minecraftforge.event.TickEvent;
 public final class LifecycleClientReview {
     private static int ticks,phase,wait,before=-1,visits,menuTicks;
     private static boolean sawA,sawALeave;
+    private static int cosmicBefore=-1;
+    private static boolean portRequested;
+    private static long renderedFrames,cosmicShown=-1;
+    @SubscribeEvent
+    public static void rendered(net.minecraftforge.event.TickEvent.RenderTickEvent event){ if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;renderedFrames++;}
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) throws Exception {
         if(event.phase!=TickEvent.Phase.END)return;
         String role=System.getProperty("singulo.lifecycleRole");if(role==null)return;
         var mc=Minecraft.getInstance();var output=Path.of(System.getProperty("singulo.lifecycleOutput"));
-        if(phase==4&&Files.exists(output.resolve("results.json"))){mc.stop();return;}
-        if(++ticks>4000) throw new AssertionError("Multiplayer client timeout role="+role+" phase="+phase);
+        if(Files.exists(output.resolve("results.json"))){mc.stop();return;}
+        if(++ticks>8000) throw new AssertionError("Multiplayer client timeout role="+role+" phase="+phase);
+        // Observe the connection list before waiting on the menu fixture. Otherwise A
+        // can leave while B's first menu is opening and B misses its initial presence.
+        if(role.equals("B")&&mc.getConnection()!=null){
+            boolean present=mc.getConnection().getOnlinePlayers().stream().anyMatch(p->p.getProfile().getName().equals("ReviewA"));
+            if(present)sawA=true;if(sawA&&!present)sawALeave=true;
+        }
+        if(Files.exists(output.resolve("cosmic-stage.txt"))){
+            if(mc.level==null||mc.player==null||mc.getOverlay()!=null)return;
+            var pos=LifecycleServerReview.COSMIC_C;
+            if(!(mc.level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity))return;
+            if(!(mc.player.containerMenu instanceof io.github.genichimaruo.singulo.cosmic.CosmicMenu menu)){
+                mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(pos),Direction.UP,pos,false));return;
+            }
+            if(cosmicBefore<0){cosmicBefore=menu.value(8);return;}
+            if(menu.value(8)<cosmicBefore+8)return;
+            if(menu.value(0)!=2||menu.value(10)!=1||menu.slots.size()!=40)throw new AssertionError("Spindle menu layout/data mismatch");
+            if(role.equals("A")&&!portRequested){
+                portRequested=true;mc.gameMode.handleInventoryButtonClick(menu.containerId,0);
+            }
+            if(menu.value(12)!=io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT
+                    ||menu.value(13)!=io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.PORT_OUTPUT)return;
+            if(cosmicShown<0){cosmicShown=renderedFrames;return;}
+            if(renderedFrames-cosmicShown<2)return;
+            if(!Files.exists(output.resolve("cosmic-"+role+"-complete.txt"))){
+                Files.writeString(output.resolve("cosmic-"+role+"-complete.txt"),"real network menu: 40 slots, core, progress and both port modes synchronized after A's menu button packet");
+                try(var png=Screenshot.takeScreenshot(mc.getMainRenderTarget())){png.writeToFile(output.resolve("cosmic-client-"+role+".png"));}
+            }
+            return;
+        }
         if(phase==2 && mc.screen instanceof TitleScreen) {
             if(++wait<40)return;
             String address=System.getProperty("singulo.lifecycleAddress","127.0.0.1:25595");

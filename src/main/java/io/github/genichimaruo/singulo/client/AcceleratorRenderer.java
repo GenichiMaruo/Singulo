@@ -44,7 +44,7 @@ public class AcceleratorRenderer implements BlockEntityRenderer<AcceleratorContr
         double head = ((tick % 40 + partialTick) / 40.0) * ring.perimeter();
         double tail = Math.min(6, ring.perimeter() * .2);
         int steps = (int) Math.ceil(tail / .06);
-        var glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(PULSE));
+        var glow = GlowDepth.of(buffers, PULSE);
         pose.pushPose();
         var offset = ring.minimum().subtract(be.getBlockPos());
         pose.translate(offset.getX(), offset.getY(), offset.getZ());

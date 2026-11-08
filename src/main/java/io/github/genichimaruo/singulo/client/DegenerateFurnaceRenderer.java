@@ -85,7 +85,7 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
         FxDraw.box(pose, ram, -0.45F - shake, -gap - 0.32F, -0.45F, 0.45F - shake, -gap, 0.45F, lit, hot);
 
         if (running) {
-            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+            VertexConsumer glow = GlowDepth.of(buffers, WHITE);
             var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
             // 押し込み棒の先の、赤熱した面
             int face = FxDraw.lerpRgb(0xFF5A1E, 0xFFE6B0, flash);

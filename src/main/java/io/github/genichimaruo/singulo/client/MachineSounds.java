@@ -76,6 +76,9 @@ final class MachineSounds {
         put(0.8F, "wormhole_stabilizer", "wormhole_stabilizer_running");
         put(0.7F, "halo_collector", "halo_collector_running");
         put(0.5F, "gravitational_containment_tank", "containment_tank_running");
+        put(0.8F, "suspension_reservoir", "suspension_reservoir_running");
+        put(0.9F, "pasta_accumulator", "pasta_accumulator_running");
+        put(1.0F, "tidal_spindle", "tidal_spindle_running");
         put(0.8F, "wormhole_mouth", "wormhole_mouth_ambient");
         BY_BLOCK.put("wormhole_generator_core", new Spec("wormhole_generator_charge", 1.2F, false));
     }

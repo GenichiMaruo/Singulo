@@ -93,7 +93,7 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         FxDraw.pixelBox(pose, anvil, -half, -WALL, -half, half, lumpTop, half,
                 8 - half * 16, 8 - lumpDots, 8 - half * 16, 8 + half * 16, 8 + lumpDots, 8 + half * 16, lit, lump);
         if (running) {
-            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
             // 打った瞬間の閃きと、床を走る衝撃の輪
             pose.pushPose();

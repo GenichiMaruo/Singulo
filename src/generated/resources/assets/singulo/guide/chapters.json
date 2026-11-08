@@ -184,6 +184,15 @@
         "factory_expansion.probes",
         "factory_expansion.limits"
       ]
+    },
+    {
+      "id": "cosmic",
+      "icon": "singulo:nuclear_pasta",
+      "pages": [
+        "cosmic.storage",
+        "cosmic.production",
+        "cosmic.links"
+      ]
     }
   ]
 }

@@ -152,7 +152,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
     }
 
     static VertexConsumer glow(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        return GlowDepth.of(buffers, FxDraw.WHITE);
     }
 
     // ------------------------------------------------------------------ 出現の前半

@@ -59,6 +59,7 @@ MOD = {
     'セラミック基板': ('ceramic_substrate', 'Ceramic Substrate', 'item'),
     '水素': ('hydrogen', 'Hydrogen', 'fluid'),
     '銅導線': ('copper_wire', 'Copper Wire', 'machine'),
+    '液体パイプ': ('fluid_pipe', 'Fluid Pipe', 'machine'),
     '白紙データカード': ('blank_data_card', 'Blank Data Card', 'item'),
     'データカード（観測ログ）': ('data_card_observation_log', 'Data Card (Observation Log)', 'item'),
     '圧縮ブロックLv1': ('compressed_block_1', 'Compressed Block Lv1', 'block'),
@@ -756,3 +757,8 @@ ACCEPTS_SPENT = {('BE凝縮触媒', 'ミュオン触媒')}
 
 # マルチブロックの大きさの下限（冷却塔の高さなど）があるレシピ
 MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ': 10, 'ニホニウム': 16}
+
+# 0.16.0 cosmic facilities
+from cosmic_content import IDS as _COSMIC_IDS
+MOD.update(_COSMIC_IDS)
+STATIONS["潮汐紡糸機"] = "tidal_spindle"

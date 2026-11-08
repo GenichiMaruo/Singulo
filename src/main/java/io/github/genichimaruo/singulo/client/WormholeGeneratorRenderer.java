@@ -37,7 +37,7 @@ public class WormholeGeneratorRenderer implements BlockEntityRenderer<WormholeGe
         BlockPos core = be.core();
         Vec3 offset = Vec3.atLowerCornerOf(core.subtract(be.getBlockPos())).add(0.5, 0.5, 0.5);
         float time = level.getGameTime() + partialTick;
-        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         float size = 0.25F + 1.05F * p;
         pose.pushPose();

@@ -6,6 +6,7 @@ allprojects {
         legacyForge.runs.server {
             gameDirectory = layout.buildDirectory.dir('lifecycle-server-' + providers.gradleProperty('lifecycleRun').getOrElse('v2')).get().asFile
             systemProperty 'singulo.lifecycleServer', 'true'
+            systemProperty 'singulo.cosmicLifecycle', providers.gradleProperty('cosmicLifecycle').isPresent().toString()
             systemProperty 'singulo.lifecycleOutput', output
         }
         legacyForge.runs.client {

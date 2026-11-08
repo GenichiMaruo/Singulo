@@ -83,7 +83,7 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
         };
         float lo = (8 - w / 2F) / 16F - LIFT;
         float hi = (8 + w / 2F) / 16F + LIFT;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
         PoseStack.Pose last = pose.last();
         for (Direction d : Direction.values()) {
             boolean in = be.flowsIn(d);

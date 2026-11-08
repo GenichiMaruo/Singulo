@@ -24,6 +24,16 @@ import org.joml.Vector3f;
  * sealed のあいだは力場で封鎖され、開けない（最終実験施設は守護機を倒すまで）。
  */
 public class RuinCacheBlock extends BaseEntityBlock {
+    /** 当たり判定は見た目と同じ形（台・胴と四隅の柱・ふた・上のつまみ）。 */
+    private static final net.minecraft.world.phys.shapes.VoxelShape SHAPE = net.minecraft.world.phys.shapes.Shapes.or(
+            Block.box(0, 0, 0, 16, 2, 16), Block.box(1, 2, 1, 15, 11, 15), Block.box(0, 11, 0, 16, 14, 16), Block.box(6, 14, 6, 10, 15, 10));
+
+    @Override
+    public net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+                                                                  net.minecraft.world.phys.shapes.CollisionContext context) {
+        return SHAPE;
+    }
+
     public static final BooleanProperty SEALED = BooleanProperty.create("sealed");
     private static final DustParticleOptions FIELD = new DustParticleOptions(new Vector3f(1.0F, 0.35F, 0.35F), 1.0F);
     private static final DustParticleOptions GOLD = new DustParticleOptions(new Vector3f(1.0F, 0.82F, 0.36F), 0.6F);

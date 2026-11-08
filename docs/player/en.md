@@ -17,7 +17,8 @@ Superconductivity, particle accelerators, the Casimir effect and Hawking radiati
 - **Minecraft 1.21.1**, with a compatible **NeoForge 21.1.256 or later** build for that Minecraft version. Minecraft runs on Java 21.
 - Put the Singulo JAR in `mods/`. Multiplayer needs the mod on both the client and server.
 - JEI is optional. Its integration shows machine recipes and multiblock construction information.
-- Singulo supplies energy cables. Compatible transport mods can provide pipes for item and fluid automation.
+- With a machine screen open, JEI's + button moves one recipe's item ingredients from your inventory. Shift-click transfers as many sets as fit. Catalysts go into their dedicated slot; the Precision Assembler and Singularity Encapsulator also select that recipe. Supply fluids and compressor mass separately.
+- Singulo supplies energy cables and Fluid Pipes for liquids and gases, so no other mod is needed. Compatible transport mods can provide item pipes.
 
 For building from source, see the [development instructions in the README](../../README.md#開発するには).
 
@@ -69,6 +70,7 @@ Equipment such as the Core Controller, Singularity Encapsulator, Shield Tower Co
 
 - The Muon-Catalyzed Fusion Reactor is the stage 2 power source: at default settings, 4 kFE/t, 3000 mB of water and one fresh muon catalyst for 10 minutes. It wears catalysts twice as fast, so a used catalyst runs for half its remaining lifetime.
 - The Cryogenic Turbine recovers stored power from liquid nitrogen. It does not make net power. Nitrogen costs 250 FE/mB to produce; lava allows up to 90% recovery, capped at 4.5 kFE/t. A height-7 tower draws about 1786 FE/t for nitrogen and keeps progress when power runs short. Other cooling tower processes still use less total power on taller towers.
+- **Fluid Pipes** (16 from 6 Copper Ingots and 3 Glass) carry liquids and gases. They connect on their own and send machine outputs to the machines and tanks that use them. One pipe can carry any mix of fluids; machines only receive fluids their recipes use. Tanks do not trade with each other, and pipes do not draw fuel out of turbines or fusion reactors. Next to a water or lava source, a pipe draws from it only while receivers have room for 1,000 mB (this removes that source, so use water sources that refill from two or more neighbors). A machine's Sides settings decide which faces take part; connect multiblocks through their ports.
 - Fluid Canisters carry 1000 mB of liquids or gases. Coolant Cartridges carry 100 mB of nitrogen and return empty when poured into a machine. Precision Assembler recipes consume the container too.
 - Crush tuff for zinc and collect bismuth as a by-product of raw copper refining. Fuse them into nihonium in a ring of side 16 or more. Plates and frames are used in stage 4 and 5 machines and parts. Meteoric iron also goes into magnetic shields, Magnetic Bottles and Gyro Drives.
 - Limestone powder replaces bone meal, and carbon dust replaces coal. Two flint can replace quartz in Unfired Ceramic; zinc phosphor provides glowstone dust. In the Kiln, 250 mB oxygen, 2 iron and 1 coal or carbon dust make 2 steel. The Peltier Cooler freezes 1000 mB water into 1 ice.

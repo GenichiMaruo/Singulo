@@ -2,12 +2,14 @@
 allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/gui-src'))
+        def reviewRoot = layout.buildDirectory.dir(providers.gradleProperty('cosmicGuiReview').isPresent() ? 'cosmic-gui-review' : 'gui-review').get().asFile
         legacyForge.runs.client {
-            gameDirectory = layout.buildDirectory.dir('gui-review').get().asFile
+            gameDirectory = reviewRoot
             systemProperty 'singulo.sidesGuiReview', providers.gradleProperty('sidesGuiReview').isPresent().toString()
             systemProperty 'singulo.machineGuiReview', providers.gradleProperty('machineGuiReview').isPresent().toString()
+            systemProperty 'singulo.cosmicGuiReview', providers.gradleProperty('cosmicGuiReview').isPresent().toString()
             systemProperty 'singulo.selectorGuiReview', providers.gradleProperty('selectorGuiReview').isPresent().toString()
-            systemProperty 'singulo.guiReviewOutput', layout.buildDirectory.dir('gui-review/screenshots').get().asFile.absolutePath
+            systemProperty 'singulo.guiReviewOutput', new File(reviewRoot, 'screenshots').absolutePath
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'
             programArgument '--width'

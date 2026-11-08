@@ -34,6 +34,50 @@ public final class ControlGameTests {
 
     private ControlGameTests() {}
 
+    /** Retained third-party capability caches must be invalidated without another lookup. */
+    @GameTest(setupTicks = 20, template = EMPTY)
+    public static void legacySideChangesInvalidateRetainedCapabilities(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
+        Direction front = machine.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING);
+        machine.setSide(0, SideConfig.Face.FRONT, SideConfig.INPUT, false);
+        var items = machine.getCapability(Capabilities.ItemHandler.BLOCK, front);
+        helper.assertTrue(items.isPresent(), "Missing initial item capability");
+        int[] notices = {0};
+        items.addListener(ignored -> notices[0]++);
+        machine.setSide(0, SideConfig.Face.FRONT, SideConfig.NONE, false);
+        helper.assertTrue(notices[0] == 1 && !items.isPresent(), "Cached item capability survived side disable");
+        helper.assertTrue(!machine.getCapability(Capabilities.ItemHandler.BLOCK, front).isPresent(), "Disabled item face reopened");
+        machine.setSide(0, SideConfig.Face.FRONT, SideConfig.INPUT, false);
+        helper.assertTrue(machine.getCapability(Capabilities.ItemHandler.BLOCK, front).isPresent(), "Side invalidation permanently disabled dispatcher");
+
+        for (int channel = 1; channel < machine.sideChannels(); channel++)
+            machine.setSide(channel, SideConfig.Face.FRONT, channel == 1 ? SideConfig.INPUT : SideConfig.NONE, false);
+        var fluids = machine.getCapability(Capabilities.FluidHandler.BLOCK, front);
+        helper.assertTrue(fluids.isPresent(), "Missing initial fluid capability");
+        fluids.addListener(ignored -> notices[0]++);
+        int[] tankSides = machine.tankSidesPacked();
+        SideConfig blocked = new SideConfig();
+        blocked.setPacked(tankSides[0]);
+        blocked.set(SideConfig.Face.FRONT, SideConfig.NONE, false);
+        tankSides[0] = blocked.packed();
+        machine.pasteSides(machine.itemSides().packed(), tankSides);
+        helper.assertTrue(notices[0] == 2 && !fluids.isPresent(), "Settings paste retained old fluid access");
+        helper.assertTrue(!machine.getCapability(Capabilities.FluidHandler.BLOCK, front).isPresent(), "Pasted disabled fluid face reopened");
+        machine.setSide(1, SideConfig.Face.FRONT, SideConfig.INPUT, false);
+        var restored = machine.getCapability(Capabilities.FluidHandler.BLOCK, front);
+        helper.assertTrue(restored.isPresent() && restored.orElseThrow(IllegalStateException::new)
+                .fill(new FluidStack(Fluids.WATER, 100), IFluidHandler.FluidAction.SIMULATE) == 100,
+                "Fresh fluid capability did not restore input");
+        restored.addListener(ignored -> notices[0]++);
+        helper.setBlock(pos, Blocks.AIR);
+        helper.assertTrue(notices[0] == 3 && !restored.isPresent(), "Removal retained live capability");
+        helper.succeed();
+    }
+
+
     /** 電力が通った道のケーブルだけが、入ってきた面と出ていった面を記録する（行き止まりの枝は光らない）。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void cableRecordsOnlyTheActualPath(GameTestHelper helper) {
