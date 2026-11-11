@@ -1,10 +1,10 @@
 # 開発ガイド
 
-Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.properties`を最初に確認する。`release/0.14.1`ではCreate/Ponderの照明互換性を修正している。1.20.1のForge / NeoForge実装は別ブランチ`1.20.1`で扱う。
+Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.properties`を最初に確認する。1.20.1のForge / NeoForge実装は別ブランチ`1.20.1`で扱う。
 
 ## 最初に読むもの
 
-1. [現在の仕様・検証の目次](../0.14.0/README.md)（前の版は[0.13.0](../0.13.0/README.md)）、[課題](../../issue.md)。
+1. [0.17.0の仕様・検証](../0.17.0/README.md)、[版別資料の目次](../README.md)、[課題](../../issue.md)。
 2. [プレイヤー説明](../player/ja.md)またはゲーム内ハンドブック。
 3. [テストの実行と追加](testing.md)。過去レビューの件数を現在の検査条件に使わない。
 
@@ -14,7 +14,7 @@ Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.pr
 |---|---|
 | レシピ・配置・材料 | `tools/recipes.py`。登録名・別名・タグは`tools/ids.py` |
 | 設定の既定値 | `tools/config_spec.py` |
-| ハンドブック・説明文 | `tools/guide.py`、`tools/descriptions.py` |
+| ハンドブック・説明文 | `tools/guide.py`、`tools/descriptions.py`。宇宙設備・液体輸送・コラプサー材の章と説明は `tools/cosmic_content.py`、`tools/logistics_content.py`、`tools/collapsar_content.py` |
 | 翻訳 | 英日原稿と`tools/locales/`。`source`も一致させる |
 | 実際の加工補正 | `src/main/java/.../recipe/RecipeTweaks.java`。ティア・寿命・設定補正を含む |
 | 機械の枠と能力 | `machine/`、`multiblock/`、`reactor/`などの実装 |

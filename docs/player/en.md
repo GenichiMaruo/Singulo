@@ -2,7 +2,7 @@
 
 [README](../../README.md) · [日本語](ja.md) · [English](en.md) · [简体中文](zh-cn.md) · [繁體中文](zh-tw.md) · [한국어](ko-kr.md) · [Recipes](../recipes/README.md)
 
-Defaults for the 0.13.0 development branch. Existing `timeCrystalGrowthTicks=14400` settings are preserved; `9600` gives eight minutes.
+Defaults for the 0.17.0 development branch. Existing `timeCrystalGrowthTicks=14400` settings are preserved; `9600` gives eight minutes.
 
 ## What is Singulo?
 
@@ -71,6 +71,7 @@ Equipment such as the Core Controller, Singularity Encapsulator, Shield Tower Co
 - The Muon-Catalyzed Fusion Reactor is the stage 2 power source: at default settings, 4 kFE/t, 3000 mB of water and one fresh muon catalyst for 10 minutes. It wears catalysts twice as fast, so a used catalyst runs for half its remaining lifetime.
 - The Cryogenic Turbine recovers stored power from liquid nitrogen. It does not make net power. Nitrogen costs 250 FE/mB to produce; lava allows up to 90% recovery, capped at 4.5 kFE/t. A height-7 tower draws about 1786 FE/t for nitrogen and keeps progress when power runs short. Other cooling tower processes still use less total power on taller towers.
 - **Fluid Pipes** (16 from 6 Copper Ingots and 3 Glass) carry liquids and gases. They connect on their own and send machine outputs to the machines and tanks that use them. One pipe can carry any mix of fluids; machines only receive fluids their recipes use. Tanks do not trade with each other, and pipes do not draw fuel out of turbines or fusion reactors. Next to a water or lava source, a pipe draws from it only while receivers have room for 1,000 mB (this removes that source, so use water sources that refill from two or more neighbors). A machine's Sides settings decide which faces take part; connect multiblocks through their ports.
+- **Pipe tiers**: Fluid Pipe (stage 1) carries 2,000 mB per tick, Vacuum-Jacketed Pipe (stage 2) 32,000 mB, Superfluid Conduit (stage 4) 512,000 mB, and Horizon Duct (stage 5) has no limit. Different tiers connect; the amount is set by the narrowest part of the route between two ports, and flows sharing a stretch share its capacity. While fluid flows you can see it and its direction through the windows and clear tubes. Unbranched runs are handled as one stretch, so long networks stay light.
 - Fluid Canisters carry 1000 mB of liquids or gases. Coolant Cartridges carry 100 mB of nitrogen and return empty when poured into a machine. Precision Assembler recipes consume the container too.
 - Crush tuff for zinc and collect bismuth as a by-product of raw copper refining. Fuse them into nihonium in a ring of side 16 or more. Plates and frames are used in stage 4 and 5 machines and parts. Meteoric iron also goes into magnetic shields, Magnetic Bottles and Gyro Drives.
 - Limestone powder replaces bone meal, and carbon dust replaces coal. Two flint can replace quartz in Unfired Ceramic; zinc phosphor provides glowstone dust. In the Kiln, 250 mB oxygen, 2 iron and 1 coal or carbon dust make 2 steel. The Peltier Cooler freezes 1000 mB water into 1 ice.
@@ -94,6 +95,9 @@ Place the controller and **right-click it with a Holo Projector**. Follow the pr
 | T-Cylinder | 5×5×9; its field accelerates supported machine processing |
 | Wormhole Generator | Spherical structure within 5×5×5 |
 | Accretion Jet Forge | Long 44×16×15 facility: exhaust cup, core, three collimator rings and irradiation chamber in a line. Foundation blocks accept common ports |
+| Suspension Reservoir | 7×9×7. Holds 16,000,000 mB of one fluid |
+| Nuclear Pasta Accumulator | 7×9×7. Stores 8 TFE, with input and output of up to 2 GFE/t each |
+| Tidal Spindle | 7×8×15. Supply a Singularity Seed and 10 GFE to start the core. At 20 MFE/t it spins four Tidal Filaments per minute of processing |
 
 The outer dimensions are only a starting point. Frames, windows, internal components and required air spaces must also match. Shared I/O Ports replace designated panels, not arbitrary components. Accelerator ports sit on either side of its controller. Reactor Extraction Ports replace ring shell blocks: the six ring intersections use Gyro Drives, while the twelve diagonal positions use **Reactor Stabilizer Coils**.
 
@@ -106,18 +110,19 @@ Structure parts also require the controller's stage. Particle Accelerator tubes 
 | Observation Post | Observation Logs and degraded Control Units; the entry to superconducting and muon technology |
 | Research Building | Quantum Data Fragments and degraded Cold Atom Traps for quantum technology |
 | Culture Facility | Culture Data and degraded Time Crystal Seeds for temporal technology and exotic matter |
+| Underground Android Laboratory | Tune the compass at the Research Building to find the main shaft. The Foundry Overseer guards a cache with Precision Actuators and Android Kits |
 | Final Lab | Anomaly Samples and the initial Dormant Singularity Seed, guarded by the Horizon Warden |
 | Sunken Reactor Sector | A dead second reactor: exotic matter, Jet Condensate and H-Condensate, guarded by the Ergosphere Leviathan |
 
-Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground, the Final Lab deeper still, and the Sunken Reactor Sector below it (around Y −60 to −54). The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts and Research Buildings, or fourteen for Culture Facilities, Final Labs and Sunken Reactor Sectors.
+Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground, the Final Lab deeper still, and the Sunken Reactor Sector below it (around Y −60 to −54). The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts, Research Buildings and Underground Android Laboratories, or fourteen for Culture Facilities, Final Labs and Sunken Reactor Sectors.
 
-Every ruin hides a **sealed container** that opens only with the key of the next stage (magnetic, quantum, temporal, then singularity). Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: the Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. Once you reach a stage you can craft its container yourself, and sneak-use a key on it to seal it.
+Every ruin hides a **sealed container** that opens only with the key of the next stage (magnetic, quantum, temporal, then singularity). Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item for that tier: the Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. Once you reach a stage you can craft its container yourself, and sneak-use a key on it to seal it.
 
-A loaded Singularity Core also unlocks Research Building collection. At the matching tier, a probe visits one site in five minutes. Cooldown and full-output waiting consume no resources, and overflow cargo is saved. A Probe Station only visits ruins a player has discovered by opening their caches. With default settings, the stage 4 station automates Observation Posts. Culture Facilities, Final Labs and Sunken Reactor Sectors always require manual exploration. Decode Record Fragments in the Archive Terminal and read the decoded items to add ancient stories to your handbook.
+A loaded Singularity Core also unlocks Research Building collection. At the matching tier, a probe visits one site in five minutes. Cooldown and full-output waiting consume no resources, and overflow cargo is saved. A Probe Station only visits ruins a player has discovered by opening their caches. With default settings, the stage 4 station automates Observation Posts. Culture Facilities, Final Labs and Sunken Reactor Sectors always require manual exploration. Decode Crystal Memories in the Archive Terminal and read the decoded items to add ancient stories to your handbook.
 
 ## Androids
 
-Every ruin has **Ruin Android Fabricators** against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind onto its bed, built up from the feet, and sends them out. Defeat them all and a **compact crystal memory** of that design appears on the fabricator (which then rests for a day).
+Every ruin has **Ruin Android Fabricators** against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind onto its bed, built up from the feet, and sends them out. Defeat the whole wave for a 50% chance that a **compact crystal memory** of that design appears on the fabricator (which then rests for a day).
 
 | Kind | Main moves |
 | --- | --- |
@@ -125,15 +130,17 @@ Every ruin has **Ruin Android Fabricators** against its walls. When a survival p
 | Whip Android "Verna" | A lash reaching about 6 blocks, a bind that pulls you in, a shockwave along the floor (jump it) |
 | Saber Android "Soleil" | Lunging thrust, a sweep whose blade stretches, a flying crescent slash. Raises a light shield when hit and counters if you keep striking |
 
+The Underground Android Laboratory also has two prototypes. Foundry summons the axe-wielding Alma and Nox, who attacks with floating bits.
+
 Androids run on charge and run out after about ten big moves. They return to a nearby fabricator, unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging.
 
 **Your own androids:** make an **Android Assembly Station** and android kits in the stage 2 Precision Assembler. Put a compact crystal memory (never used up) and kits (one per print) in the station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last.
 
-- Guards attack hostile mobs only and never fight players or bosses. Player and boss attacks do not hurt them.
-- Modes: Guard (by the station), Wander (within 16 blocks) and Follow (goes with its owner). Below its return health it goes back to the station and repairs and recharges in 5 s.
+- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.
+- Modes: Guard (by the station), Wander (within 16 blocks), Follow (accompanies the selected player) and Patrol (walks a set route). Below its return health it goes back to the station and repairs and recharges in 5 s.
 - While following, if you carry an **Android Wireless Charger** (30 refills when full), it recharges as it walks beside you.
 - While following, choose "Just follow" (never fights) or "Escort" (fights nearby enemies), in the station or by clicking the mode tag in the android screen.
-- Put a **Shield Permit** in the station's permit slot and only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.
+- Register at least one player on a **Shield Permit** and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.
 - Right-click an android to open its inventory: **Self-Repair Kits** (one restores half its health when it gets hurt) and an **Android Armor Plate** that takes armor enchantments.
 - **Upgrades:** a **Production Upgrade** in the station lets it print up to two androids (only one charges on top at a time; the other waits beside it). On the android's "Gear and inventory" page (the button left of its name) you can fit **Battery Upgrades** (+50% charge each, up to two), a **Backpack Upgrade** (three tiers: +12, +18 or +24 inventory slots; each tier is made from the one below) and a **Mining Upgrade** (for mining work; takes pickaxe enchantments). Androids carry 5 slots of items, more with a backpack.
 - **Work automation:** an **Android Work Console** uses the chests next to it as the stockpile (add **Supply Ports** for more). Link **Recipe Racks** to it with a **Work Location Card**. Put **Recipe Cards** recorded in the console's Record tab in a rack row, with a Work Location Card holding a crafting table, and you can order them at the console. Finished items go to the console's outbox or a named **Delivery Port**. Orders need every material in stock, and intermediate materials are crafted automatically.
@@ -151,7 +158,7 @@ Androids run on charge and run out after about ten big moves. They return to a n
 
 ## Drone delivery
 
-A **Drone Station** prints cargo drones that carry crates between **Drone Ports**. Every port with the same owner in the same dimension appears as a destination automatically.
+A **Drone Station** prints cargo drones that carry crates between **Drone Ports**. Each port lists destinations of the same kind and owner. For cross-dimensional routes, see “Using Collapsar” below.
 
 - **Getting drones**: defeating a whole wave from a ruin Guard Dock sometimes drops a **Drone Crystal Memory**. Put the memory (not used up) and **Drone Kits** (one per drone) in a station and give it power to print a drone for 20,000 FE. Each Production Upgrade adds a drone, up to three.
 - **Drone types**: the memory decides the type. Rotor memories drop from any facility, **jet** memories (1.6× the rotor speed) from the Research Building and higher, and **anti-gravity** memories (1.25×) rarely from the Culture Facility and the Underground Android Laboratory.
@@ -162,6 +169,8 @@ A **Drone Station** prints cargo drones that carry crates between **Drone Ports*
 
 See the in-game handbook chapter "Drone Delivery" for details.
 
+**Sending fluids:** The Fluid Drone Port sends fluids with the same drones and stations (destinations are fluid ports with the same owner). Put in empty Fluid Capsules, fill the send tank and press Send: up to 64,000 mB of one fluid goes into a capsule. Arrived capsules empty into the receive tank (128,000 mB) and return to the crate slot. Pipes fill the send tank through input faces and drain the receive tank through output faces; auto-eject pushes received fluid into a neighbouring tank. Range and power match packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks).
+
 ## Black holes and late-game technology
 
 Insert your first Singularity Seed into the Core Controller, start ignition, and supply **50 GFE within ten seconds** under default settings. The formation sequence then creates the core. Prepare a high-capacity power network before attempting ignition: 50 GFE in ten seconds averages 250 MFE/t, and a power route is capped by its lowest-capacity cable, so a single topological-wire route delivers at most 20 GFE. While igniting the screen shows the intake and what will arrive, and a failure reports what was missing.
@@ -170,7 +179,7 @@ A new core starts in **harvest mode**: it keeps mass at 480 or below, so H-Conde
 
 During operation, feed Mass Pellets and manage core mass and spin. Spin determines accretion efficiency; mass affects the fuel injection limit. Collectors produce Jet Condensate, H-Condensate (Hawking Condensate) and exotic matter under their respective operating conditions. Pellet-driven growth is capped, but feeding other matter beyond safe limits can collapse the reactor and leave a rogue black hole.
 
-**Bosses and rematches:** the Echo Sentinel guards the Research Building, the Gravity Remnant the Culture Facility, the Horizon Warden the Final Lab and the Ergosphere Leviathan the Sunken Reactor Sector; each cache stays sealed until its guardian falls. After the endgame, awakening cores made in the Singularity Encapsulator (Awakening Record Core, Awakened Echo, Gravity and Ergosphere Cores) can be used on the seal console or a guardian core to fight an awakened version (2.5× health, 1.5× damage, faster moves) as often as you like. Victory adds Overclock Chips and more to the usual drops. If you give up and leave, the core is returned.
+**Bosses and rematches:** the Echo Sentinel guards the Research Building, the Gravity Remnant the Culture Facility, the Foundry Overseer the Underground Android Laboratory, the Horizon Warden the Final Lab and the Ergosphere Leviathan the Sunken Reactor Sector; each cache stays sealed until its guardian falls. After the endgame, awakening cores made in the Singularity Encapsulator (Awakening Record Core, Awakened Echo, Gravity, Foundry and Ergosphere Cores) can be used on the seal console or a guardian core to fight an awakened version (2.5× health, 1.5× damage, faster moves) as often as you like. Victory adds Overclock Chips and more to the usual drops. If you give up and leave, the core is returned.
 
 **Chapters of records:** the three awakened guardians (Echo Sentinel, Gravity Remnant, Horizon Warden) drop chapters of records, and the Ergosphere Leviathan drops the Chapter of the Vortex. Bind all four into a Terminus Record in the Singularity Encapsulator and use it on the Final Lab's seal console, and something that slept in the time field wakes up. The chamber is sealed until the fight ends, and some attacks change gravity, so prepare for falls. The Genesis Engine also needs one chapter of the Vortex, so collect extras if you want both.
 
@@ -202,7 +211,15 @@ The P-Reactor makes power and the Genesis Engine makes matter; the **Accretion J
 4. **Pauses lose nothing:** if power runs short, the structure breaks, part of the facility is unloaded or the output is full, it pauses where it is. A redstone signal on the controller stops new runs from starting.
    Liquid helium can also come in Liquid Helium Cartridges (filled from empty coolant cartridges in a cooling tower) or fluid canisters placed in the material slots; the empties go to the bottom-right slot.
 
-Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. The Collapsar Ingot is meant as a material for the finest gear and tools in other mods (common tag `c:ingots/collapsar`). Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The finishing flash and screen shake can be reduced or turned off with the client settings `jetForgeFlash` and `jetForgeShake`.
+Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. The Collapsar Ingot has the common tag `c:ingots/collapsar`. Use it to make a Collapsar Parallel Cassette for up to four batches of the same forge recipe at once, or a Wormhole Seam Upgrade for each mouth of a walkable wormhole. Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The finishing flash and screen shake can be reduced or turned off with the client settings `jetForgeFlash` and `jetForgeShake`.
+
+## Using Collapsar
+
+Collapsar Ingots from the Accretion Jet Forge also go into these:
+
+- **Collapsar Lining**: replaces casing blocks on the Degenerate Compactor, Casimir Cavity and Cryogenic Cooling Tower. Each lining speeds processing up by 5%, up to 2× at 20. Use the Holo Projector on a finished controller: swappable casing glows in gold, and the bar below shows the count and speed.
+- **Event Horizon Vault**: stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. Use an item to insert it; use again quickly to insert every matching item you carry. Empty-handed use takes a stack, or one while sneaking. Breaking it keeps the contents in the item.
+- **Wormhole delivery**: place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and ports in the far dimension appear as destinations. The sending drone carries the cargo to the near mouth. Set up a station within 64 blocks of the far mouth so a second drone can deliver it. Range and power use the sum of the two port-to-mouth distances.
 
 ## Troubleshooting and hazards
 
@@ -212,7 +229,7 @@ Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot
 - **The factory stops when you leave:** unloaded chunks do not process. Worldline Anchors also need their operating requirements maintained. Each player can run up to 8 anchors at once by default (server setting `maxAnchorsPerPlayer`, 0 for no limit).
 - **Dangerous equipment:** black holes exert pull, deal tidal damage and consume entities at the event horizon. Hydrogen leaks near fire can explode. Large accelerators with low stored energy can leak strangelets; prepare Magnetic Bottles and protective equipment.
 
-Standard textures are 16×16. Enable the bundled **Singulo HD** resource pack for 32×32 textures. Accelerator sides and corners connect automatically, with a circulating light effect while operating.
+Standard textures are 16×16. Accelerator sides and corners connect automatically, with a circulating light effect while operating.
 
 The server setting `preset` changes difficulty: `casual` removes nether stars, doubles catalyst life and halves ruin regrowth, Warden health and shell compression; `expert` doubles stars, uses 0.75× catalyst life, allows two repairs, uses 1.5× shell compression and doubles ignition energy. Individual settings such as star counts, shell materials and growth time also apply to recipes and JEI when changed from their defaults.
 
@@ -223,7 +240,7 @@ This manual describes the current implementation and default settings. See the [
 
 Craft the Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack a supported device with its items, fluids, energy, progress and side settings. Only the controller of a multiblock is packed. See “Power and Logistics → Relocation Wrench” in the handbook for supported devices.
 
-The wrench also has a **cable mode**; sneak-use it in the air to switch modes. In cable mode, use a cable to take back that one cable, sneak-use to take up to 64 connected cables of the same kind, and left-click to break cables instantly.
+Sneak-use the wrench in the air to switch to cable and pipe removal. Use it on a cable or fluid pipe to collect one, or sneak-use it to collect up to 64 connected pieces of the same kind. Left-click to break one instantly.
 
 Automatic ejection on ordinary processing machines defaults off. Enable the master switch in Sides to eject through allowed output faces. Hover a face to see the adjacent block. Newly generated underground labs always include both shafts, with the supply shaft connected to a dedicated cargo lift room.
 
@@ -233,7 +250,7 @@ Restored parts and original records exhausted during processing become item outp
 
 ## Precision Assembler recipe selection
 
-The Precision Assembler normally stores 100,000 FE and accepts up to 4,000,000 FE per reception. Install one Capacity Upgrade Mk1, Mk2 or Mk3 in the dedicated slot on the right rail for 1,000,000, 4,000,000 or 40,000,000 FE. Craft Mk1 on a stage-2 crafting table; craft Mk2 and Mk3 in the assembler using the previous tier as an ingredient. The separate slot supports speed upgrades at the same time, and intake limits stay unchanged. Removing or replacing an upgrade preserves surplus charge, including charge from older versions, and blocks further reception until the buffer falls below capacity. Recipes whose per-tick cost exceeds the normal buffer, such as the Mk3 sensitivity module, require a capacity upgrade; JEI shows this requirement.
+The Precision Assembler normally stores 100,000 FE and accepts up to 4,000,000 FE per reception. Install one Capacity Upgrade Mk1, Mk2 or Mk3 in the dedicated slot on the right rail for 1,000,000, 4,000,000 or 40,000,000 FE. Craft Mk1 on a crafting table using stage 2 materials. Make Mk2 and Mk3 in the assembler using the previous tier as an ingredient. The separate slot supports speed upgrades at the same time, and intake limits stay unchanged. Removing or replacing an upgrade preserves surplus charge, including charge from older versions, and blocks further reception until the buffer falls below capacity. Recipes whose per-tick cost exceeds the normal buffer, such as the Mk3 sensitivity module, require a capacity upgrade; JEI shows this requirement.
 
 Without a chosen recipe, the Precision Assembler starts crafting when the kinds of items inside exactly match a recipe. A mix that could also be part of another recipe starts only after items have stopped going in for 3 seconds. Choose a recipe with the button below the output slot to craft only that one; the choice is saved, and other items may be present. Androids select their recorded recipe before inserting materials. The Singularity Encapsulator works the same way.
 
