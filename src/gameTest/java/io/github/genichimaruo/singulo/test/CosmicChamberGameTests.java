@@ -284,4 +284,12 @@ public final class CosmicChamberGameTests {
         }
         h.succeed();
     }
+
+    /** 組み終わると、ほかのマルチブロックと同じく部品へ光が走る（3設備で共通の処理）。 */
+    @GameTest(template="forge",timeoutTicks=100)
+    public static void cosmicFacilitiesPlayFormationEffect(GameTestHelper h){
+        CosmicChamberBlockEntity be=build(h,Blueprints.Kind.TIDAL_SPINDLE);
+        h.succeedWhen(()->h.assertTrue(io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedNear(h.getLevel(),h.absolutePos(C),16),
+                "No formation sparks when the structure completed"));
+    }
 }

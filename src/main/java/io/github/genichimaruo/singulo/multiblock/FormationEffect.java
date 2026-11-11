@@ -59,6 +59,30 @@ public final class FormationEffect {
         io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, controller, "multiblock_formed", 1.5F, 1.0F);
     }
 
+    /**
+     * 決まった部品の位置（parts）に光を走らせる。部品の役割（Structures.role）を持たない専用の部品で組む設備のため。
+     * コントローラから近い順に光り、起動音が鳴る。
+     */
+    public static void play(ServerLevel level, BlockPos controller, java.util.Collection<BlockPos> parts) {
+        long now = level.getGameTime();
+        QUEUE.add(new Spark(level, controller.immutable(), now));
+        int n = 1;
+        for (BlockPos p : parts) {
+            if (n++ >= MAX_SPARKS) {
+                break;
+            }
+            int dist = Math.max(Math.abs(p.getX() - controller.getX()),
+                    Math.max(Math.abs(p.getY() - controller.getY()), Math.abs(p.getZ() - controller.getZ())));
+            QUEUE.add(new Spark(level, p.immutable(), now + dist));
+        }
+        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, controller, "multiblock_formed", 1.5F, 1.0F);
+    }
+
+    /** テスト用: pos から radius ブロック以内に光る予定の継ぎ目があるか（ほかのテストの演出と混ざらないよう、場所で数える）。 */
+    public static boolean queuedNear(ServerLevel level, BlockPos pos, int radius) {
+        return QUEUE.stream().anyMatch(s -> s.level == level && s.pos.closerThan(pos, radius));
+    }
+
     /** テスト用: これから光る継ぎ目の数（演出が始まったか）。 */
     public static int queuedSparks() {
         return QUEUE.size();

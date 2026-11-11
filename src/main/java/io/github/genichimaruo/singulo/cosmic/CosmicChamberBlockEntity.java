@@ -135,6 +135,25 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         status=valid?0:1;
         return valid;
     }
+    /** 前の判定で完成していたか（保存しない）と、読み込み後に1回でも判定したか（読み込み直しでは演出しない）。 */
+    private boolean wasFormed, checked = true;
+
+    /** 未完成から完成になったら、ほかのマルチブロックと同じく部品へ光を走らせて起動音を鳴らす。読み込み待ちは崩れたと見なさない。 */
+    private void formationEffect(ServerLevel level,boolean formed){
+        if(status==2)return;
+        if(formed&&!wasFormed&&checked){
+            var shape=CosmicLayouts.of(kind());
+            java.util.List<BlockPos> parts=new ArrayList<>();
+            for(int x=0;x<shape.width();x++)for(int y=0;y<shape.height();y++)for(int z=0;z<shape.depth();z++){
+                var k=shape.slot(x,y,z).kind();
+                if(k==io.github.genichimaruo.singulo.multiblock.ShapeSpec.Kind.PART||k==io.github.genichimaruo.singulo.multiblock.ShapeSpec.Kind.PANEL)
+                    parts.add(shape.pos(worldPosition,back(),x,y,z));
+            }
+            parts.sort(java.util.Comparator.comparingDouble(p->p.distSqr(worldPosition)));
+            io.github.genichimaruo.singulo.multiblock.FormationEffect.play(level,worldPosition,parts);
+        }
+        wasFormed=formed;checked=true;
+    }
     private void budgets() {
         long now=level==null?0:level.getGameTime();
         if(now!=budgetTick){budgetTick=now;lastIn=(int)(tickIn/1_000_000);lastOut=(int)(tickOut/1_000_000);tickIn=0;tickOut=0;}
@@ -142,6 +161,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public static void serverTick(Level level,BlockPos pos,BlockState state,CosmicChamberBlockEntity be) {
         be.budgets();
         boolean formed=be.ready();
+        be.formationEffect((ServerLevel)level,formed);
         be.linkPorts(formed);
         if(formed) {
             if(be.kind()==ACCUMULATOR)be.pushPower();
@@ -309,6 +329,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     }
     @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider registries){
         super.loadAdditional(tag,registries);
+        if(tag.contains("items")){checked=false;}                 // 保存データから読み込んだ: 最初の判定では演出しない
         if(tag.contains("items"))items.deserializeNBT(registries,tag.getCompound("items"));
         stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(registries,tag.getCompound("tank"));
         if(tank.getFluidAmount()>tankCapacity())tank.setFluid(tank.getFluid().copyWithAmount(tankCapacity()));
