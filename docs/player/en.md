@@ -97,7 +97,7 @@ Place the controller and **right-click it with a Holo Projector**. Follow the pr
 | Accretion Jet Forge | Long 44×16×15 facility: exhaust cup, core, three collimator rings and irradiation chamber in a line. Foundation blocks accept common ports |
 | Suspension Reservoir | 7×9×7. Holds 16,000,000 mB of one fluid |
 | Nuclear Pasta Accumulator | 7×9×7. Stores 8 TFE, with input and output of up to 2 GFE/t each |
-| Tidal Spindle | 7×8×15. Supply a Singularity Seed and 10 GFE to start the core. At 20 MFE/t it spins four Tidal Filaments per minute of processing |
+| Tidal Spindle | 7×8×15. Supply a Singularity Seed and 10 GFE to start the core. At 20 MFE/t it spins four Tidal Filaments per minute of processing. Once the core is formed it can also stretch vanilla materials from its left slot at 1 MFE/t without coolant: Wool → 4 String, Iron Ingot → 2 Chains, 4 Blaze Powder → Blaze Rod, Leather → Phantom Membrane, Stone → 2 Pointed Dripstone |
 
 The outer dimensions are only a starting point. Frames, windows, internal components and required air spaces must also match. Shared I/O Ports replace designated panels, not arbitrary components. Accelerator ports sit on either side of its controller. Reactor Extraction Ports replace ring shell blocks: the six ring intersections use Gyro Drives, while the twelve diagonal positions use **Reactor Stabilizer Coils**.
 

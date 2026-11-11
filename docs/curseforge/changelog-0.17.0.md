@@ -9,6 +9,7 @@
 - Add Collapsar Lining. Place it in the casing positions of the Degenerate Compactor, Casimir Cavity or Cryogenic Cooling Tower for 5% faster processing per lining, up to 2× at 20. The Holo Projector highlights the positions in gold.
 - Add the Event Horizon Vault, which stores a practically unlimited amount of one item inside a small black hole and keeps its contents when broken.
 - Add the Wormhole Drone Beacon. With one beside both mouths of a wormhole, drones hand cargo through it to ports in another dimension.
+- The Tidal Spindle can now stretch vanilla materials from its left slot once its core is formed (1 MFE/t, no coolant): Wool → 4 String, Iron Ingot → 2 Chains, 4 Blaze Powder → Blaze Rod, Leather → Phantom Membrane, Stone → 2 Pointed Dripstone.
 
 ## Changes
 
@@ -29,6 +30,7 @@
 - コラプサー内張りを追加しました。縮退圧縮炉・C空洞・極低温冷却塔の外装板の位置に置くと、1枚ごとに加工が5%速くなります（20枚で2倍）。置ける場所はホロ投影機が金色で示します。
 - 事象の地平線倉庫を追加しました。1種類の物を中の小さなブラックホールに事実上無制限にしまい、壊しても中身を失いません。
 - ワームホール航路標識を追加しました。ワームホールの両方の口のそばに置くと、ドローンが口で荷物を受け渡し、別の次元のポートへ送ります。
+- 潮汐紡糸機が、炉心の形成後に左の枠のバニラ素材を引き伸ばせるようになりました（1 MFE/t、冷却材なし）。羊毛→糸4、鉄インゴット→鎖2、ブレイズパウダー4→ブレイズロッド、革→ファントムの皮膜、石→鍾乳石2。
 
 ## 変更
 
