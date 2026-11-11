@@ -13432,8 +13432,8 @@
     "translation": "블랙홀의 조석력으로 늘인 발광 섬유. 콜랍사 재료와 함께 통행용 웜홀을 봉합해 엽니다."
   },
   "desc.singulo.tidal_spindle": {
-    "source": "A 7×8×15 facility. Form its core with a Singularity Seed and 10 GFE, then stretch matter into wound filament using tidal forces. Processing needs 20 MFE/t and liquid helium. Reserved work survives stops and unloaded chunks.",
-    "translation": "7×8×15 설비. 특이점 씨앗과 10 GFE로 구속 핵을 형성하고, 조석력으로 재료를 늘여 섬유를 감습니다. 가공에는 20 MFE/t와 액체 헬륨이 필요합니다. 정지하거나 청크가 내려가도 예약한 가공 내용은 보존됩니다."
+    "source": "A 7×8×15 facility. Form its core with a Singularity Seed and 10 GFE, then stretch matter into wound filament using tidal forces. Processing needs 20 MFE/t and liquid helium. It can also stretch wool into string, iron into chains, leather into phantom membranes and more. Reserved work survives stops and unloaded chunks.",
+    "translation": "7×8×15 설비. 특이점 씨앗과 10 GFE로 구속 핵을 형성하고, 조석력으로 재료를 늘여 섬유를 감습니다. 가공에는 20 MFE/t와 액체 헬륨이 필요합니다. 양털을 실로, 철을 사슬로, 가죽을 팬텀 막으로 늘이는 등 바닐라 재료도 만들 수 있습니다. 정지하거나 청크가 내려가도 예약한 가공 내용은 보존됩니다."
   },
   "desc.singulo.wormhole_seam_upgrade": {
     "source": "Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it. Logistics remain available, and travel requires a safe landing.",
@@ -13512,8 +13512,8 @@
     "translation": "봉합과 병렬 조사"
   },
   "guide.singulo.cosmic.production.body": {
-    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 7×8×15. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nFeed power, coolant and materials through the left port, and take filament from the right port.",
-    "translation": "핵 파스타는 기존 Jet Forge에서 만듭니다. 축퇴 물질 껍질 1개, 질량 펠릿 32개, 액체 헬륨 2,000 mB를 125 MFE/t로 90초 조사합니다(조사에만 225 GFE). 새 축전고를 먼저 만들 필요가 없습니다.\n조석 방사기는 7×8×15입니다. 핵 슬롯에 특이점 씨앗을 넣고 10 GFE를 저장해 구속 핵을 형성합니다. 콜랍사 빌릿 1개, 특이 물질 1개, 액체 헬륨 500 mB를 20 MFE/t로 60초 가공해 조석 섬유 4개를 감습니다. 재료·냉각재·생산물·진행은 예약해 저장하며, 출력이 가득 차면 기다립니다.\n왼쪽 포트로 전력, 냉각재, 재료를 넣고 오른쪽 포트로 섬유를 꺼냅니다."
+    "source": "Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\nThe Tidal Spindle is 7×8×15. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nOnce the core is formed, the spindle can also stretch vanilla materials from its left slot (1 MFE/t, no coolant): 1 Wool → 4 String, 1 Iron Ingot → 2 Chains, 4 Blaze Powder → 1 Blaze Rod, 1 Leather → 1 Phantom Membrane, 1 Stone → 2 Pointed Dripstone.\nFeed power, coolant and materials through the left port, and take filament from the right port.",
+    "translation": "핵 파스타는 기존 Jet Forge에서 만듭니다. 축퇴 물질 껍질 1개, 질량 펠릿 32개, 액체 헬륨 2,000 mB를 125 MFE/t로 90초 조사합니다(조사에만 225 GFE). 새 축전고를 먼저 만들 필요가 없습니다.\n조석 방사기는 7×8×15입니다. 핵 슬롯에 특이점 씨앗을 넣고 10 GFE를 저장해 구속 핵을 형성합니다. 콜랍사 빌릿 1개, 특이 물질 1개, 액체 헬륨 500 mB를 20 MFE/t로 60초 가공해 조석 섬유 4개를 감습니다. 재료·냉각재·생산물·진행은 예약해 저장하며, 출력이 가득 차면 기다립니다.\n코어를 형성하면 왼쪽 칸의 바닐라 재료도 조석력으로 늘여 만들 수 있습니다(1 MFE/t, 냉각재 불필요). 양털 1 → 실 4, 철 주괴 1 → 사슬 2, 블레이즈 가루 4 → 블레이즈 막대 1, 가죽 1 → 팬텀 막 1, 돌 1 → 뾰족한 점적석 2.\n왼쪽 포트로 전력, 냉각재, 재료를 넣고 오른쪽 포트로 섬유를 꺼냅니다."
   },
   "guide.singulo.cosmic.production.title": {
     "source": "From tides to thread",
@@ -13728,8 +13728,8 @@
     "translation": "특이점 씨앗: 핵을 형성합니다"
   },
   "gui.singulo.cosmic.slot.billet": {
-    "source": "Collapsar Billet",
-    "translation": "콜랍사 빌릿"
+    "source": "Collapsar Billet, or a material to stretch (wool, iron ingot, blaze powder, leather or stone)",
+    "translation": "콜랍사 빌릿, 또는 늘일 재료(양털, 철 주괴, 블레이즈 가루, 가죽, 돌)"
   },
   "gui.singulo.cosmic.slot.exotic": {
     "source": "Exotic Matter",

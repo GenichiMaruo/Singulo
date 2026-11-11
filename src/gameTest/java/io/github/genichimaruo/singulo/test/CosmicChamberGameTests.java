@@ -107,7 +107,8 @@ public final class CosmicChamberGameTests {
             var menu=io.github.genichimaruo.singulo.cosmic.CosmicMenu.client(1,player.getInventory(),buf);
             h.assertTrue(menu.slots.size()==40,"Menu layout depends on a client block-entity packet arriving first");
             h.assertTrue(menu.getSlot(2).getMaxStackSize()==1&&menu.getSlot(2).mayPlace(item("singularity_seed",1)),"Client core slot differs from server");
-            h.assertTrue(menu.getSlot(0).mayPlace(item("collapsar_billet",1))&&!menu.getSlot(0).mayPlace(new ItemStack(net.minecraft.world.item.Items.IRON_INGOT)),"Client predicts invalid ingredient placement");
+            h.assertTrue(menu.getSlot(0).mayPlace(item("collapsar_billet",1))&&menu.getSlot(0).mayPlace(new ItemStack(net.minecraft.world.item.Items.IRON_INGOT))
+                    &&!menu.getSlot(0).mayPlace(new ItemStack(net.minecraft.world.item.Items.DIRT))&&!menu.getSlot(1).mayPlace(new ItemStack(net.minecraft.world.item.Items.IRON_INGOT)),"Client predicts invalid ingredient placement");
             h.assertFalse(menu.getSlot(3).mayPlace(item("tidal_filament",1)),"Client accepts output insertion");h.succeed();
         }finally{buf.release();}
     }
@@ -225,6 +226,23 @@ public final class CosmicChamberGameTests {
             be.items().setStackInSlot(3,ItemStack.EMPTY);
         });
         h.runAtTickTime(1320,()->{h.assertTrue(be.reserved().isEmpty()&&be.items().getStackInSlot(3).getCount()==4,"Completion duplicated or lost product");h.succeed();});
+    }
+    /** 核があれば、左の枠のバニラの素材を冷却材なしで引き伸ばす（羊毛 1 → 糸 4、ブレイズパウダー 4 → ブレイズロッド 1）。 */
+    @GameTest(template="forge",timeoutTicks=260)
+    public static void cosmicSpindleStretchesVanillaMaterials(GameTestHelper h){
+        var be=build(h,Blueprints.Kind.TIDAL_SPINDLE);stored(h,be,1_000_000_000L,true);
+        h.assertTrue(be.items().insertItem(0,new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL,1),false).isEmpty(),"Wool rejected by the left slot");
+        h.runAtTickTime(80,()->{
+            h.assertTrue(be.items().getStackInSlot(3).is(net.minecraft.world.item.Items.STRING)&&be.items().getStackInSlot(3).getCount()==4
+                    &&be.items().getStackInSlot(0).isEmpty()&&be.tank().isEmpty(),"Wool was not stretched into 4 string without coolant");
+            be.items().setStackInSlot(3,ItemStack.EMPTY);
+            be.items().setStackInSlot(0,new ItemStack(net.minecraft.world.item.Items.BLAZE_POWDER,5));
+        });
+        h.runAtTickTime(215,()->{
+            h.assertTrue(be.items().getStackInSlot(3).is(net.minecraft.world.item.Items.BLAZE_ROD)&&be.items().getStackInSlot(3).getCount()==1
+                    &&be.items().getStackInSlot(0).getCount()==1,"Blaze powder was not pressed 4 → 1 rod");
+            h.succeed();
+        });
     }
     @GameTest(template="forge",timeoutTicks=50)
     public static void cosmicSpindleFullOutputDoesNotConsumeInputs(GameTestHelper h){

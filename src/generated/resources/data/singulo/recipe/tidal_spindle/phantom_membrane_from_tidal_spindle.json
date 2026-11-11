@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "tidal_spindle",
+  "stage": 5,
+  "time": 100,
+  "energy": 1000000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "c:leathers"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:phantom_membrane",
+    "count": 1
+  }
+}

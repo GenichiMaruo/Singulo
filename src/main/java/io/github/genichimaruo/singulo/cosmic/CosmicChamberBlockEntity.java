@@ -90,9 +90,12 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     }
 
     public CosmicChamberBlockEntity(BlockPos pos, BlockState state) { super(SinguloBlockEntities.COSMIC_CHAMBER.get(),pos,state); }
+    /** 左の枠に入る素材: コラプサー・ビレットと、潮汐力で引き伸ばすバニラの素材（データパックで足せる）。 */
+    public static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item> SPINDLE_FEEDSTOCK=
+            net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,Singulo.id("tidal_spindle_feedstock"));
     public static boolean acceptsSpindleItem(int slot,ItemStack stack){
-        return slot>=0&&slot<3&&stack.is(BuiltInRegistries.ITEM.get(Singulo.id(
-                slot==0?"collapsar_billet":slot==1?"exotic_matter":"singularity_seed")));
+        if(slot==0)return stack.is(SPINDLE_FEEDSTOCK)||stack.is(BuiltInRegistries.ITEM.get(Singulo.id("collapsar_billet")));
+        return (slot==1||slot==2)&&stack.is(BuiltInRegistries.ITEM.get(Singulo.id(slot==1?"exotic_matter":"singularity_seed")));
     }
     public int kind() {
         String id=BuiltInRegistries.BLOCK.getKey(getBlockState().getBlock()).getPath();

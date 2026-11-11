@@ -3361,6 +3361,17 @@ def tags():
     write_json(DATA / 'tags' / 'item' / 'ceramic_flux.json', {'values': ['minecraft:bone_meal', mid('石灰粉')]})
     write_json(DATA / 'tags' / 'item' / 'carbon.json', {'values': ['minecraft:coal', mid('炭素粉')]})
     write_json(DATA / 'tags' / 'item' / 'limestone.json', {'values': ['minecraft:calcite', 'minecraft:dripstone_block']})
+    # 潮汐紡糸機の左の枠に入る素材（レシピの材料から。右の枠のエキゾチック物質と冷却材は除く）
+    feed = []
+    for r in RECIPES.values():
+        if r['station'] != '潮汐紡糸機':
+            continue
+        for n in r['inputs']:
+            kind, value = resolve(n)
+            entry = '#' + value if kind == 'tag' else value
+            if kind in ('tag', 'item') and n != 'エキゾチック物質' and entry not in feed:
+                feed.append(entry)
+    write_json(DATA / 'tags' / 'item' / 'tidal_spindle_feedstock.json', {'values': feed})
     write_json(DATA / 'tags' / 'item' / 'helium_bearing_stone.json', {'values': [
         'minecraft:deepslate', 'minecraft:cobbled_deepslate', 'minecraft:basalt', 'minecraft:smooth_basalt']})
     write_json(DATA / 'tags' / 'block' / 'ruin_blocks.json',

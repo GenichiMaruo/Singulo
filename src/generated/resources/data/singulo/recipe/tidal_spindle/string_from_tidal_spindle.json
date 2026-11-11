@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "tidal_spindle",
+  "stage": 5,
+  "time": 40,
+  "energy": 1000000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "minecraft:wool"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:string",
+    "count": 4
+  }
+}
