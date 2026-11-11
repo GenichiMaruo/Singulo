@@ -1,0 +1,134 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/fluid_pipe_full",
+    "c": "singulo:block/fluid_pipe",
+    "g": "singulo:block/fluid_pipe_glass",
+    "f": "singulo:block/fluid_pipe_flange",
+    "r": "singulo:block/fluid_pipe_rim",
+    "j": "singulo:block/fluid_pipe_joint"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        4,
+        4,
+        0
+      ],
+      "to": [
+        12,
+        12,
+        1
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#f"
+        },
+        "south": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#f"
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            12,
+            1
+          ],
+          "texture": "#r"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            12,
+            1
+          ],
+          "texture": "#r"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        5,
+        1
+      ],
+      "to": [
+        11,
+        11,
+        4
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#c",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

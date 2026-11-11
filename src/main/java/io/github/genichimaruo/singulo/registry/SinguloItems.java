@@ -83,6 +83,12 @@ public final class SinguloItems {
             "battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(2, new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> LARGE_BATTERY_PACKING_CRATE = ITEMS.register(
             "large_battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(3, new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.drone.FluidCapsuleItem> FLUID_CAPSULE = ITEMS.register(
+            "fluid_capsule", () -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(1, new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.drone.FluidCapsuleItem> BATTERY_FLUID_CAPSULE = ITEMS.register(
+            "battery_fluid_capsule", () -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(2, new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.drone.FluidCapsuleItem> LARGE_BATTERY_FLUID_CAPSULE = ITEMS.register(
+            "large_battery_fluid_capsule", () -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(3, new Item.Properties()));
     /** アンドロイド用の無線充電器。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
@@ -227,6 +233,9 @@ public final class SinguloItems {
             Map.entry("packing_crate", 2),
             Map.entry("battery_packing_crate", 2),
             Map.entry("large_battery_packing_crate", 3),
+            Map.entry("fluid_capsule", 2),
+            Map.entry("battery_fluid_capsule", 2),
+            Map.entry("large_battery_fluid_capsule", 3),
             Map.entry("android_armor_plate", 2),
             Map.entry("android_mining_upgrade", 2),
             Map.entry("android_felling_upgrade", 2),
@@ -342,9 +351,13 @@ public final class SinguloItems {
         block(SinguloBlocks.ANDROID_STATION, 2);
         block(SinguloBlocks.DRONE_STATION, 2);
         block(SinguloBlocks.DRONE_PORT, 2);
+        block(SinguloBlocks.FLUID_DRONE_PORT, 2);
         TAB_ORDER.add(PACKING_CRATE);
         TAB_ORDER.add(BATTERY_PACKING_CRATE);
         TAB_ORDER.add(LARGE_BATTERY_PACKING_CRATE);
+        TAB_ORDER.add(FLUID_CAPSULE);
+        TAB_ORDER.add(BATTERY_FLUID_CAPSULE);
+        TAB_ORDER.add(LARGE_BATTERY_FLUID_CAPSULE);
         block(SinguloBlocks.ANDROID_WORK_CONSOLE, 2);
         block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
         block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
@@ -364,6 +377,7 @@ public final class SinguloItems {
         TAB_ORDER.addAll(ACCESSORIES);
         block(SinguloBlocks.SMES_MODULE, 4);
         block(SinguloBlocks.TOPOLOGICAL_WIRE, 4);
+        block(SinguloBlocks.SUPERFLUID_CONDUIT, 4);
         block(SinguloBlocks.REACTOR_SHELL, 5);
         block(SinguloBlocks.GYRO_DRIVE, 5);
         block(SinguloBlocks.EXTRACTION_PORT, 5);
@@ -371,6 +385,10 @@ public final class SinguloItems {
         block(SinguloBlocks.REACTOR_MASS_ALARM, 5);
         block(SinguloBlocks.CORE_CONTROLLER, 5);
         block(SinguloBlocks.HORIZON_BUS, 5);
+        block(SinguloBlocks.HORIZON_DUCT, 5);
+        block(SinguloBlocks.COLLAPSAR_LINING, 5);
+        block(SinguloBlocks.HORIZON_VAULT, 5);
+        block(SinguloBlocks.WORMHOLE_DRONE_BEACON, 5);
         block(SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED, 5);
         block(SinguloBlocks.SHIELD_TOWER_CORE, 5);
         TAB_ORDER.add(SHIELD_PERMIT);
@@ -395,6 +413,7 @@ public final class SinguloItems {
         block(SinguloBlocks.COSMIC_MUON_COLLECTOR, 2);
         block(SinguloBlocks.WORLDLINE_ANCHOR_SMALL, 2);
         block(SinguloBlocks.SUPERCONDUCTING_CABLE, 2);
+        block(SinguloBlocks.VACUUM_JACKETED_PIPE, 2);
         block(SinguloBlocks.QUANTUM_HEAT_ENGINE, 3);
         block(SinguloBlocks.INERTIAL_STABILIZER, 3);
         block(SinguloBlocks.LOW_GRAVITY_PANEL, 3);

@@ -1916,8 +1916,8 @@
     "translation": "用简并物质壳包裹下界合金并浸透喷流凝聚体的锻造前坯料。在吸积喷流锻造炉中锻造后成为坍缩星锭。"
   },
   "desc.singulo.collapsar_ingot": {
-    "source": "A light-drinking black metal forged in a black hole jet, a material for the finest gear and tools. Common tag: c:ingots/collapsar.",
-    "translation": "以黑洞喷流锻造、能吞噬光的黑色金属锭，是最高级装备与工具的材料。通用标签：c:ingots/collapsar。"
+    "source": "Forged in a black hole jet. Used for Collapsar Lining, the Event Horizon Vault and the Wormhole Drone Beacon. Common tag: c:ingots/collapsar.",
+    "translation": "以黑洞喷流锻造，可用于制作坍缩星内衬、视界仓库和虫洞航路信标。通用标签：c:ingots/collapsar。"
   },
   "desc.singulo.compressed_block_1": {
     "source": "Nine units of mass pressed together. The start of the compression chain.",
@@ -1996,8 +1996,8 @@
     "translation": "1 级电源线。随着距离的增加会损失一点能量。"
   },
   "desc.singulo.fluid_pipe": {
-    "source": "Carries any fluid or gas between machines and tanks. It connects on its own and sends outputs to the machines that use them. It also draws from adjacent water and lava sources.",
-    "translation": "在机器和储罐之间输送任意液体或气体。放置后自动连接，把产物送往需要它的机器，也会从相邻的水源和熔岩源抽取。"
+    "source": "A stage 1 pipe for fluids and gases: 2,000 mB per tick. Connects on its own, sends outputs to the machines that use them and draws from adjacent water and lava sources.",
+    "translation": "输送液体和气体的阶段1管道：每 tick 2,000 mB。放置后自动连接，把产物送往需要它的机器，也会从相邻的水源和熔岩源抽取。"
   },
   "desc.singulo.core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
@@ -6540,8 +6540,8 @@
     "translation": "仿生人"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. The android treats anyone else (except in Creative) as an enemy and attacks them, and their attacks can hurt it. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
-    "translation": "在仿生人组装站放入小型水晶存储器（决定型号，不会消耗）和仿生人套件（每次打印一个）并供电，它就会在上方打印一个护卫仿生人（每次 40,000 FE）。被击倒后，只要还有套件就会重新打印。放置组装站的人就是主人。\n- 护卫只攻击敌对生物（包括遗迹的仿生人和无人机），从不与玩家或首领战斗。玩家和首领的攻击不会伤到它。\n- 行动方式：迎击（在组装站旁等待）、徘徊（在 16 格内四处走动）、跟随（跟着主人）、巡逻（巡视设定的地点）。跟随时可以选择“只跟随”或“护卫”（与附近的敌人战斗）。\n- 许可证：在组装站放入护盾通行证后，只有主人和已登记的人能打开组装站和仿生人的界面。仿生人会把其他人（创造模式除外）视为敌人并发动攻击，他们的攻击也能伤到仿生人。也可以选择跟随主人还是某位已登记的人。\n- 返回生命：低于此值时，仿生人会回去维修并充电。按“召回”可立即让它回去。（把光标移到上面会显示当前生命和充电）。Shift+点击“召回”可召回附近（64 格以内）你能操作的组装站的所有仿生人。\n- 名字：在组装站或仿生人界面中点击名字即可改名（↺ 按钮恢复昵称）。\n- 比较器：组装站会根据仿生人的生命输出信号（0〜15）。\n- 组装站被破坏后，仿生人会留在原地。在新的组装站放入相同型号的存储器并按“链接”即可重新连接。\n- 日常生活：无事可做时，护卫会在组装站附近休息。坐在楼梯、台阶或椅子上（夜里会打盹），把手放在盆栽和作物上方，扫地，把掉在地上一段时间的物品收进附近的箱子，和同伴聊天，下雨时躲到屋檐下（拿着伞就留在外面），眺望夕阳或夜空。"
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
+    "translation": "在仿生人组装站放入小型水晶存储器（决定型号，不会消耗）和仿生人套件（每次打印一个）并供电，它就会在上方打印一个护卫仿生人（每次 40,000 FE）。被击倒后，只要还有套件就会重新打印。放置组装站的人就是主人。\n- 护卫攻击敌对生物，包括遗迹的仿生人和警备无人机。它们不会攻击首领。\n- 行动方式：迎击（在组装站旁等待）、徘徊（在 16 格内四处走动）、跟随（跟着主人）、巡逻（巡视设定的地点）。跟随时可以选择“只跟随”或“护卫”（与附近的敌人战斗）。\n- 许可证：在护盾通行证上登记至少一名玩家后，将其放入组装站。此时只有主人和已登记的人能打开组装站和仿生人的界面。护卫会将其他生存或冒险模式玩家视为入侵者，双方都能伤到对方。也可以选择跟随主人还是某位已登记的人。\n- 返回生命：低于此值时，仿生人会回去维修并充电。按“召回”可立即让它回去。（把光标移到上面会显示当前生命和充电）。Shift+点击“召回”可召回附近（64 格以内）你能操作的组装站的所有仿生人。\n- 名字：在组装站或仿生人界面中点击名字即可改名（↺ 按钮恢复昵称）。\n- 比较器：组装站会根据仿生人的生命输出信号（0〜15）。\n- 组装站被破坏后，仿生人会留在原地。在新的组装站放入相同型号的存储器并按“链接”即可重新连接。\n- 日常生活：无事可做时，护卫会在组装站附近休息。坐在楼梯、台阶或椅子上（夜里会打盹），把手放在盆栽和作物上方，扫地，把掉在地上一段时间的物品收进附近的箱子，和同伴聊天，下雨时躲到屋檐下（拿着伞就留在外面），眺望夕阳或夜空。"
   },
   "guide.singulo.androids.build.title": {
     "source": "Your own androids",
@@ -6776,8 +6776,8 @@
     "translation": "建造锻造炉"
   },
   "guide.singulo.jet_forge.ingot.body": {
-    "source": "A light-drinking black metal forged in a black hole jet. It is meant as a material for the finest gear and tools in other mods (common tag c:ingots/collapsar, ID singulo:collapsar_ingot).\nMake the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).",
-    "translation": "以黑洞喷流锻造、能吞噬光的黑色金属锭。它被设计为其他模组中最高级装备与工具的材料（通用标签 c:ingots/collapsar、ID singulo:collapsar_ingot）。\n坍缩星坯料在奇点封装器中，由下界合金锭、简并物质壳、喷流凝聚体 4 个、奇异物质 2 个和鿭板 2 个制成。锻造配方可以用数据包（type: singulo:machine、station: accretion_jet_forge）修改或添加。"
+    "source": "Forge this ingot in a black hole jet. Use it for Collapsar Lining, the Event Horizon Vault, the Wormhole Drone Beacon, the Collapsar Parallel Cassette and the Wormhole Seam Upgrade (common tag c:ingots/collapsar, ID singulo:collapsar_ingot).\nMake the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, 2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).",
+    "translation": "以黑洞喷流锻造的金属锭，可用于制作坍缩星内衬、视界仓库、虫洞航路信标、坍缩星并行加工盒和虫洞缝合升级（通用标签 c:ingots/collapsar、ID singulo:collapsar_ingot）。\n坍缩星坯料在奇点封装器中，由下界合金锭、简并物质壳、喷流凝聚体 4 个、奇异物质 2 个和鿭板 2 个制成。锻造配方可以用数据包（type: singulo:machine、station: accretion_jet_forge）修改或添加。"
   },
   "guide.singulo.jet_forge.ingot.title": {
     "source": "Collapsar Ingot",
@@ -6824,8 +6824,8 @@
     "translation": "电缆"
   },
   "guide.singulo.power.relocation.body": {
-    "source": "Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\nFor multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.",
-    "translation": "用3个钢锭、2个铜锭和1个基础电路制作迁移扳手。潜行使用可回收加工装置、常规发电机、SMES及催化装置，并在重新放置时恢复物品、流体、电力、进度和侧面设置。背包已满时会掉落1个已打包的装置。\n多方块结构只回收控制器，周围部件留在原处；迁移后需重新组装。彭罗斯反应堆、虫洞装置及仿生人设施等不在支持范围内。"
+    "source": "Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\nFor multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.\nSneak-use the wrench in the air to switch to cable and pipe removal. Use it on a cable or fluid pipe to collect one, or sneak-use it to collect up to 64 connected pieces of the same kind. Left-click to break one instantly.",
+    "translation": "用3个钢锭、2个铜锭和1个基础电路制作迁移扳手。潜行使用可回收加工装置、常规发电机、SMES及催化装置，并在重新放置时恢复物品、流体、电力、进度和侧面设置。背包已满时会掉落1个已打包的装置。\n多方块结构只回收控制器，周围部件留在原处；迁移后需重新组装。彭罗斯反应堆、虫洞装置及仿生人设施等不在支持范围内。\n对空潜行右键可切换到拆除线缆和管道模式。右键一根线缆或流体管道可回收一根，潜行右键可回收相连的同种线缆或管道，最多 64 根。左键可立即破坏。"
   },
   "guide.singulo.power.relocation.title": {
     "source": "Relocation Wrench",
@@ -6840,8 +6840,8 @@
     "translation": "侧面配置"
   },
   "guide.singulo.power.wormhole.body": {
-    "source": "The only wireless link. Generate a pair of mouths, stabilize them within 60 s using exotic matter and a mouth casing, then carry one away and place it. A port within 8 blocks of a mouth links to the port with the same number (0-127, set with the seven circles in its screen) near the twin mouth, joining power, items and fluids. Each mouth runs 8, 32 or 128 ports depending on its throat size, nearest first, and active ports glow. Throughput also grows with the throat and is unlimited at 7x7. Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.",
-    "translation": "唯一的无线连接。生成一对入口，在 60 秒内用奇异物质和入口外壳将其稳定，然后带走其中一个并放置。入口 8 格内的端口会与另一端入口附近编号相同（0-127，在界面中用 7 个圆圈设定）的端口相连，直接连通电力、物品和液体。每个入口按喉部大小可让 8、32 或 128 个端口工作，按距离由近到远，工作中的端口会发光。可传输的量也随喉部变大，7×7 时不受上限限制。入口以奇异物质维持，耗尽时会关闭；新放置的入口无需燃料也会保持开启 5 分钟。"
+    "source": "Generate a pair of mouths, stabilize them within 60 s using exotic matter and a mouth casing, then carry one away and place it. A port within 8 blocks of a mouth links to the port with the same number (0-127, set with the seven circles in its screen) near the twin mouth, joining power, items and fluids. Each mouth runs 8, 32 or 128 ports depending on its throat size, nearest first, and active ports glow. Throughput also grows with the throat and is unlimited at 7x7. Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.",
+    "translation": "生成一对入口，在 60 秒内用奇异物质和入口外壳将其稳定，然后带走其中一个并放置。入口 8 格内的端口会与另一端入口附近编号相同（0-127，在界面中用 7 个圆圈设定）的端口相连，直接连通电力、物品和液体。每个入口按喉部大小可让 8、32 或 128 个端口工作，按距离由近到远，工作中的端口会发光。可传输的量也随喉部变大，7×7 时不受上限限制。入口以奇异物质维持，耗尽时会关闭；新放置的入口无需燃料也会保持开启 5 分钟。"
   },
   "guide.singulo.power.wormhole.title": {
     "source": "Wormholes",
@@ -6888,16 +6888,16 @@
     "translation": "废墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
-    "translation": "研究楼、封闭培养设施和最终实验室的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间后，守卫仍会停留 3 分钟（让倒下的人回来取装备），之后若无人返回才会复原。开启服务器设置 bossHardMode 后，守卫会变得更强。击败后的掉落物会出现在地板上的守卫封印核心（视界守卫为封印控制台）上方，经验则由房间内的挑战者平分并直接获得（经验修补依然有效）。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按战斗开始时的挑战者人数掉落（之后加入的人不会增加掉落）。多人攻击时，每个人的攻击都不会被他人挡住（同一个人连续攻击，仍需像以往一样稍作间隔）。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。重力井在拉扯之后会蓄力（有光和声音预兆），把附近的对手弹飞，然后漂移到房间的其他位置。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。最后形态在你脚下展开的奇点会先预警 1 秒再开始牵引，请立刻离开。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。"
+    "source": "The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
+    "translation": "研究楼、封闭培养设施、地下仿生人研究所、最终实验室和沉没的炉心区的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间后，守卫仍会停留 3 分钟（让倒下的人回来取装备），之后若无人返回才会复原。开启服务器设置 bossHardMode 后，守卫会变得更强。击败后的掉落物会出现在地板上的守卫封印核心（视界守卫为封印控制台）上方，经验则由房间内的挑战者平分并直接获得（经验修补依然有效）。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按战斗开始时的挑战者人数掉落（之后加入的人不会增加掉落）。多人攻击时，每个人的攻击都不会被他人挡住（同一个人连续攻击，仍需像以往一样稍作间隔）。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。重力井在拉扯之后会蓄力（有光和声音预兆），把附近的对手弹飞，然后漂移到房间的其他位置。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。最后形态在你脚下展开的奇点会先预警 1 秒再开始牵引，请立刻离开。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
     "translation": "废墟的守卫"
   },
   "guide.singulo.ruins.compass.body": {
-    "source": "At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Underground ruins lie below the spot it points to.",
-    "translation": "罗盘起初只能搜寻地表观测站。潜行右键你已攻略的废墟的保管库，即可调校以搜寻下一处：研究楼，然后是封闭培养设施，再是最终实验室，最后是沉没的炉心区。地下废墟位于指针所指位置的下方。"
+    "source": "At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Tuning at the Research Building also unlocks the Underground Android Laboratory. Select it to find the main shaft at the surface.",
+    "translation": "罗盘起初只能搜寻地表观测站。潜行右键你已攻略的废墟的保管库，即可调校以搜寻下一处：研究楼，然后是封闭培养设施，再是最终实验室，最后是沉没的炉心区。在研究楼调校后也能搜寻地下仿生人研究所。选中研究所时，指针指向通往地表的主竖井。"
   },
   "guide.singulo.ruins.compass.title": {
     "source": "Tuning the Explorer Compass",
@@ -6936,8 +6936,8 @@
     "translation": "能层大蛇"
   },
   "guide.singulo.ruins.list.body": {
-    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The overseer AI Foundry waits in the AI core. Precision actuators and android kits (14 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
-    "translation": "- 地表观测站：平原、沙漠等地表上唯一建在地面的遗迹。白色警卫无人机。观测日志、控制单元（7 天再生）。\n- 研究楼：浅层地下（约 Y −20〜4）。警卫机，以及深处档案室的回响守卫。冷原子陷阱、量子数据片段（7 天）。\n- 封闭培养设施：深层地下（约 Y −46〜−30）。低温核心、更强的警卫机，以及深处隔离槽室的重力残渣。时间晶种、培养数据（14 天）。\n- 地下仿生人研究所：中等深度的地下（地板约 Y −38〜−26）。与封闭培养设施并列的分支，在研究楼调校罗盘后就能一起搜寻（罗盘指向贯通到地表的主竖井）。房间的排列每次都不同。深处的 AI 中枢里是统筹 AI“铸造厂”。精密致动器・仿生人套件（14 天）。\n- 最终实验室：最深处地下（约 Y −56〜−46）的重力异常点。由视界守卫看守。奇点种子、异常样本（14 天）。\n- 沉没的炉心区：比最终实验室更深的地下（约 Y −60〜−54），停止运转的第二座反应堆。攻略最终实验室后调整探索罗盘即可寻找。能层巨蛇。奇异物质、喷流凝聚体、霍金凝聚体（14 天）。"
+    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The overseer AI Foundry waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
+    "translation": "- 地表观测站：平原、沙漠等地表上唯一建在地面的遗迹。白色警卫无人机。观测日志、控制单元（7 天再生）。\n- 研究楼：浅层地下（约 Y −20〜4）。警卫机，以及深处档案室的回响守卫。冷原子陷阱、量子数据片段（7 天）。\n- 封闭培养设施：深层地下（约 Y −46〜−30）。低温核心、更强的警卫机，以及深处隔离槽室的重力残渣。时间晶种、培养数据（14 天）。\n- 地下仿生人研究所：中等深度的地下（地板约 Y −38〜−26）。与封闭培养设施并列的分支，在研究楼调校罗盘后就能一起搜寻（罗盘指向贯通到地表的主竖井）。房间的排列每次都不同。深处的 AI 中枢里是统筹 AI“铸造厂”。精密致动器・仿生人套件（7 天）。\n- 最终实验室：最深处地下（约 Y −56〜−46）的重力异常点。由视界守卫看守。奇点种子、异常样本（14 天）。\n- 沉没的炉心区：比最终实验室更深的地下（约 Y −60〜−54），停止运转的第二座反应堆。攻略最终实验室后调整探索罗盘即可寻找。能层巨蛇。奇异物质、喷流凝聚体、霍金凝聚体（14 天）。"
   },
   "guide.singulo.ruins.list.title": {
     "source": "The six ruins",
@@ -6960,8 +6960,8 @@
     "translation": "水晶存储器"
   },
   "guide.singulo.ruins.sealed.body": {
-    "source": "Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.",
-    "translation": "每座废墟都藏着一个封印容器，只能用下一阶段的钥匙打开：磁力锁、量子锁、时间锁，最后是奇点锁。钥匙在精密组装台制造，每次使用都会消耗。里面有材料、彩色灯，有时还有别处找不到的稀有道具：超频芯片、重力靴、催化剂稳定剂或次元口袋。强行破坏封印中的容器会连同内容物一起失去。你也可以自己制作容器，潜行时使用钥匙即可封印。"
+    "source": "Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item for that tier (Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket). Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.",
+    "translation": "每座废墟都藏着一个封印容器，只能用下一阶段的钥匙打开：磁力锁、量子锁、时间锁，最后是奇点锁。钥匙在精密组装台制造，每次使用都会消耗。里面有材料、彩色灯，有时还有该等级的稀有道具：超频芯片、重力靴、催化剂稳定剂或次元口袋。强行破坏封印中的容器会连同内容物一起失去。你也可以自己制作容器，潜行时使用钥匙即可封印。"
   },
   "guide.singulo.ruins.sealed.title": {
     "source": "Sealed containers",
@@ -9104,24 +9104,24 @@
     "translation": "迁移扳手"
   },
   "item.singulo.relocation_wrench.cables_removed": {
-    "source": "Took back %s cables",
-    "translation": "回收了 %s 格线缆"
+    "source": "Took back %s cables or pipes",
+    "translation": "回收了 %s 格线缆或管道"
   },
   "item.singulo.relocation_wrench.hint.0": {
     "source": "Sneak-use on a device to pack it with its contents and settings.",
     "translation": "潜行对装置使用，可连同内容物和设置一起回收"
   },
   "item.singulo.relocation_wrench.hint.1": {
-    "source": "Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.",
-    "translation": "对线缆使用可回收1格，潜行使用可一次回收最多64格相连的同种线缆。左键也能立即破坏"
+    "source": "Use on a cable or pipe to take it back; sneak-use to take up to 64 joined pieces of that kind. Left-click also breaks them at once.",
+    "translation": "对线缆或管道使用可回收1格，潜行使用可一次回收最多64格相连的同种线缆或管道。左键也能立即破坏"
   },
   "item.singulo.relocation_wrench.mode.0": {
     "source": "Mode: relocate devices",
     "translation": "模式：搬迁装置"
   },
   "item.singulo.relocation_wrench.mode.1": {
-    "source": "Mode: remove cables",
-    "translation": "模式：拆除线缆"
+    "source": "Mode: remove cables and pipes",
+    "translation": "模式：拆除线缆和管道"
   },
   "item.singulo.relocation_wrench.packed": {
     "source": "Device packed with contents and settings",
@@ -11524,8 +11524,8 @@
     "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 52 个"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 28 more",
-    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 28 个"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
+    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 29 个"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11608,8 +11608,8 @@
     "translation": "用于：卡西米尔腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 18 more",
-    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 18 个"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 19 more",
+    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 19 个"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -11800,8 +11800,8 @@
     "translation": "用于：冷媒罐、液氦冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 26 more",
-    "translation": "用途：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 26 项"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 29 more",
+    "translation": "用途：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 29 项"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11812,8 +11812,8 @@
     "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 34 more",
-    "translation": "用途：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 34 项"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 35 more",
+    "translation": "用途：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 35 项"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11948,8 +11948,8 @@
     "translation": "用于：鿭板"
   },
   "uses.singulo.nihonium_plate": {
-    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 9 more",
-    "translation": "用途：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鿭框架 等 9 项"
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 13 more",
+    "translation": "用途：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鿭框架 等 13 项"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
@@ -12064,16 +12064,16 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 91 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 91 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 95 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 95 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 78 more",
-    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 78 项"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
+    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 80 项"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 3 more",
-    "translation": "用于：超导电缆、加速管、量子纠缠元件、玻色凝聚态催化剂、简并热炉换热管 等 3 个"
+    "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 4 more",
+    "translation": "用于：超导电缆、加速管、量子纠缠元件、玻色凝聚态催化剂、简并热炉换热管 等 4 个"
   },
   "uses.singulo.thermocouple_module": {
     "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
@@ -12140,8 +12140,8 @@
     "translation": "用于：重力场稳定器、虫洞生成器聚焦器、虫洞入口外壳"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 24 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 24 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 25 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 25 个"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
@@ -12612,24 +12612,24 @@
     "translation": "准备无人机"
   },
   "guide.singulo.drones.start.body": {
-    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
-    "translation": "把遗迹警卫机坞站放出的一波警卫无人机全部击败后，有时坞站上方会出现无人机水晶存储器（地表观测站为 40%）。在第 2 阶段的工作台制作无人机站，在精密组装台制作无人机套件。把存储器（不会消耗）和套件（每次打印用 1 个）放入无人机站并供电，它就会在上方打印一架运输无人机（20,000 FE）。每张生产升级增加 1 架，2 张最多 3 架。无人机在站的上空待命。\n无人机不会受到玩家或生物的伤害。破坏无人机站时，待命中的无人机会变回套件。"
+    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). At stage 2, make a Drone Station on a crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
+    "translation": "把遗迹警卫机坞站放出的一波警卫无人机全部击败后，有时坞站上方会出现无人机水晶存储器（地表观测站为 40%）。到第 2 阶段后，在工作台制作无人机站，在精密组装台制作无人机套件。把存储器（不会消耗）和套件（每次打印用 1 个）放入无人机站并供电，它就会在上方打印一架运输无人机（20,000 FE）。每张生产升级增加 1 架，2 张最多 3 架。无人机在站的上空待命。\n无人机不会受到玩家或生物的伤害。破坏无人机站时，待命中的无人机会变回套件。"
   },
   "guide.singulo.drones.send.title": {
     "source": "Sending cargo",
     "translation": "发送货物"
   },
   "guide.singulo.drones.send.body": {
-    "source": "A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\nPut an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. Before the drone arrives, Cancel puts everything back (power included).\nHoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.",
-    "translation": "放置无人机起降港后，它会加入放置者的运输网：同一维度中同一所有者的所有起降港都会列为目的地。点击标题栏的名字可以为它命名。\n在左上放入空的包装箱，中间放入货物，在右侧列表选择目的地并按“发送”。起降港会打包货物、支付电力，并从 64 格内的无人机站呼叫待命的无人机。无人机悬停在正上方时，顶部舱门打开，升降台把箱子举起，无人机的爪子将其抓住。到达目的地后舱门再次打开，箱子被放下并自动拆开到接收栏。空箱会回到空箱栏。在无人机到达之前，按“取消”可以全部恢复原状（电力也会退回）。\n漏斗和管道可以放入空箱和货物，并从接收栏取出物品。比较器输出接收栏的填满程度。"
+    "source": "Destinations are item ports with the same owner in this dimension. A loaded, open wormhole with a Drone Beacon at each mouth also lists matching ports in the far dimension. Click the name in the header to name the port.\nPut an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. Before the drone arrives, Cancel puts everything back (power included).\nHoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.",
+    "translation": "目的地会列出同一维度中属于同一所有者的物品起降港。如果虫洞两端都已加载、开启并各有虫洞航路信标，还能选择另一维度的同类起降港。点击标题栏的名字可以为起降港命名。\n在左上放入空的包装箱，中间放入货物，在右侧列表选择目的地并按“发送”。起降港会打包货物、支付电力，并从 64 格内的无人机站呼叫待命的无人机。无人机悬停在正上方时，顶部舱门打开，升降台把箱子举起，无人机的爪子将其抓住。到达目的地后舱门再次打开，箱子被放下并自动拆开到接收栏。空箱会回到空箱栏。在无人机到达之前，按“取消”可以全部恢复原状（电力也会退回）。\n漏斗和管道可以放入空箱和货物，并从接收栏取出物品。比较器输出接收栏的填满程度。"
   },
   "guide.singulo.drones.range.title": {
     "source": "Range and power",
     "translation": "航程与电力"
   },
   "guide.singulo.drones.range.body": {
-    "source": "Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\nCargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. If the destination port was broken, the cargo goes back to where it came from.",
-    "translation": "发送所需电力为 2,000 FE，直线距离每格另加 50 FE，在打包时由起降港支付。能送多远由包装箱决定：包装箱 160 格，附电池包装箱 760 格，大容量电池包装箱 3,160 格。目的地列表中，够不到的距离显示为红色。\n无人机飞过未加载的区域时，货物也不会丢失。目的地已加载时无人机会降落卸货；未加载时，起降港会在加载时接收箱子。如果目的地起降港已被破坏，货物会送回出发地。"
+    "source": "The port pays 2,000 FE plus 50 FE per block when it packs the cargo. Direct flights use the straight-line distance between ports. Wormhole flights add the distance from the sender to the near mouth and from the far mouth to the destination. The crate decides how far it can go: Packing Crate 160 blocks, Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\nCargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. If the destination of a direct flight is gone, the drone takes the cargo back to the sending port. If there is no port to return it to, the packed crate drops at the delivery site.",
+    "translation": "起降港在打包时支付 2,000 FE，每格距离另加 50 FE。直达按两座起降港之间的直线距离计算。经虫洞时，将发送港到本侧入口、另一侧入口到目的港的直线距离相加。能送多远由包装箱决定：包装箱 160 格，附电池包装箱 760 格，大容量电池包装箱 3,160 格。目的地列表中，够不到的距离显示为红色。\n无人机飞过未加载的区域时，货物也不会丢失。目的地已加载时无人机会降落卸货；未加载时，起降港会在加载时接收箱子。直达航班发现目的港已被破坏时，会将货物送回发送港。如果没有可以退回的起降港，包装好的箱子会掉在交货地点。"
   },
   "gui.singulo.drone_port.status.10": {
     "source": "No drone serves this port",
@@ -13376,8 +13376,8 @@
     "translation": "容量升级"
   },
   "guide.singulo.power.capacity.body": {
-    "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
-    "translation": "在加工装置右侧栏的容量专用槽中放入 1 个，蓄电容量会变为 Mk1 1,000,000、Mk2 4,000,000、Mk3 40,000,000 FE。Mk1 在第 2 阶段工作台制作，Mk2 和 Mk3 在精密组装台用低一级的升级制作。可与速度升级同时使用，不改变受电上限。\n取下时超出容量的电力不会消失，在降到容量以下之前不再接收新电力。单次耗电超过通常容量的配方需要容量升级。"
+    "source": "One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). Make Mk1 on a crafting table using stage 2 materials and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\nRemoving one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.",
+    "translation": "在加工装置右侧栏的容量专用槽中放入 1 个，蓄电容量会变为 Mk1 1,000,000、Mk2 4,000,000、Mk3 40,000,000 FE。Mk1 用第 2 阶段的材料在工作台制作，Mk2 和 Mk3 在精密组装台用低一级的升级制作。可与速度升级同时使用，不改变受电上限。\n取下时超出容量的电力不会消失，在降到容量以下之前不再接收新电力。单次耗电超过通常容量的配方需要容量升级。"
   },
   "gui.singulo.reason.capacity_exceeded": {
     "source": "Needs %s FE per tick, more than even Capacity Upgrade Mk3 can hold",
@@ -13484,8 +13484,8 @@
     "translation": "配管：停止转移（检查空间和兼容输入）"
   },
   "gui.singulo.pipe.flow": {
-    "source": "Pipe: %s mB / 5 ticks",
-    "translation": "配管：%s mB / 5 tick"
+    "source": "Pipe: %s mB/t",
+    "translation": "配管：%s mB/t"
   },
   "gui.singulo.pipe.idle": {
     "source": "Pipe: idle (no fluid offered)",
@@ -13644,8 +13644,8 @@
     "translation": "升级两端的口，步行通行。"
   },
   "uses.singulo.collapsar_ingot": {
-    "source": "Used in: Tidal Spindle, Wormhole Seam Upgrade, Collapsar Parallel Cassette",
-    "translation": "用途：潮汐纺丝机、虫洞缝合升级、坍缩星并行加工盒"
+    "source": "Used in: Tidal Spindle, Wormhole Seam Upgrade, Collapsar Parallel Cassette, Collapsar Lining, Event Horizon Vault and 1 more",
+    "translation": "用途：潮汐纺丝机、虫洞缝合升级、坍缩星并行加工盒、坍缩星内衬、视界仓库 等 1 项"
   },
   "uses.singulo.cosmic_frame": {
     "source": "Used in: Nuclear Pasta Laminate, Suspension Strut, Spool Cradle",
@@ -13656,8 +13656,8 @@
     "translation": "用途：核面食层叠储能库、核面食导体"
   },
   "uses.singulo.nuclear_pasta": {
-    "source": "Used in: Nuclear Pasta Laminate, Nuclear Pasta Accumulator",
-    "translation": "用途：核面食层板、核面食层叠储能库"
+    "source": "Used in: Nuclear Pasta Laminate, Nuclear Pasta Accumulator, Event Horizon Vault",
+    "translation": "用途：核面食层板、核面食层叠储能库、视界仓库"
   },
   "uses.singulo.tidal_filament": {
     "source": "Used in: Wormhole Seam Upgrade",
@@ -13830,5 +13830,329 @@
   "gui.singulo.device.forge.cassette": {
     "source": "Holds a Collapsar Parallel Cassette, which processes up to four batches of the same recipe together",
     "translation": "放入坍缩星并行加工盒后，同一配方最多同时加工 4 批"
+  },
+  "block.singulo.vacuum_jacketed_pipe": {
+    "source": "Vacuum-Jacketed Pipe",
+    "translation": "真空绝热管道"
+  },
+  "block.singulo.superfluid_conduit": {
+    "source": "Superfluid Conduit",
+    "translation": "超流体导管"
+  },
+  "block.singulo.horizon_duct": {
+    "source": "Horizon Duct",
+    "translation": "视界管道"
+  },
+  "block.singulo.fluid_drone_port": {
+    "source": "Fluid Drone Port",
+    "translation": "流体无人机起降港"
+  },
+  "item.singulo.fluid_capsule": {
+    "source": "Fluid Capsule",
+    "translation": "流体胶囊"
+  },
+  "item.singulo.battery_fluid_capsule": {
+    "source": "Battery Fluid Capsule",
+    "translation": "附电池流体胶囊"
+  },
+  "item.singulo.large_battery_fluid_capsule": {
+    "source": "Large Battery Fluid Capsule",
+    "translation": "大容量电池流体胶囊"
+  },
+  "gui.singulo.fluid_drone_port.crates": {
+    "source": "Empty fluid capsules",
+    "translation": "空的流体胶囊"
+  },
+  "gui.singulo.fluid_drone_port.send_tank": {
+    "source": "Send tank (filled into a capsule when sent)",
+    "translation": "发送罐（发送时装进胶囊）"
+  },
+  "gui.singulo.fluid_drone_port.receive_tank": {
+    "source": "Receive tank (arrived capsules empty into it)",
+    "translation": "接收罐（送达的胶囊注入这里）"
+  },
+  "gui.singulo.fluid_drone_port.amount": {
+    "source": "%s / %s mB",
+    "translation": "%s / %s mB"
+  },
+  "gui.singulo.fluid_drone_port.auto.amount": {
+    "source": "Auto: %s B",
+    "translation": "自动 %s 桶"
+  },
+  "gui.singulo.fluid_drone_port.status.6": {
+    "source": "No empty fluid capsule",
+    "translation": "没有空的流体胶囊"
+  },
+  "gui.singulo.fluid_drone_port.status.7": {
+    "source": "Out of range (needs a higher-tier capsule)",
+    "translation": "超出航程（需要更高阶段的流体胶囊）"
+  },
+  "gui.singulo.fluid_drone_port.status.9": {
+    "source": "No fluid to send",
+    "translation": "没有要发送的液体"
+  },
+  "tooltip.singulo.fluid_capsule.empty": {
+    "source": "Empty (holds up to %s mB)",
+    "translation": "空（最多可装 %s mB）"
+  },
+  "tooltip.singulo.fluid_capsule.contents": {
+    "source": "%s %s / %s mB",
+    "translation": "%s %s / %s mB"
+  },
+  "tooltip.singulo.fluid_capsule.pour": {
+    "source": "Use on a tank to pour in what fits",
+    "translation": "对储罐使用，可注入能装下的量"
+  },
+  "tooltip.singulo.fluid_pipe.capacity": {
+    "source": "Carries up to %s mB per tick",
+    "translation": "每 tick 最多输送 %s mB"
+  },
+  "tooltip.singulo.fluid_pipe.unlimited": {
+    "source": "No transfer limit",
+    "translation": "输送量没有上限"
+  },
+  "uses.singulo.fluid_pipe": {
+    "source": "Used in: Vacuum-Jacketed Pipe, Fluid Drone Port",
+    "translation": "用于：真空绝热管道、流体无人机起降港"
+  },
+  "desc.singulo.vacuum_jacketed_pipe": {
+    "source": "A stage 2 pipe wrapped in a vacuum insulation jacket: 32,000 mB per tick. Connects to pipes of any tier.",
+    "translation": "用真空绝热层包裹的阶段2管道：每 tick 32,000 mB。可与任何阶段的管道相连。"
+  },
+  "summary.singulo.vacuum_jacketed_pipe": {
+    "source": "Carries 16 times as much as a Fluid Pipe.",
+    "translation": "输送量是流体管道的 16 倍。"
+  },
+  "howto.singulo.vacuum_jacketed_pipe": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "uses.singulo.vacuum_jacketed_pipe": {
+    "source": "Used in: Superfluid Conduit",
+    "translation": "用于：超流体导管"
+  },
+  "desc.singulo.superfluid_conduit": {
+    "source": "A clear stage 4 conduit that moves fluid as a frictionless superfluid: 512,000 mB per tick.",
+    "translation": "以无黏性的超流体输送液体的阶段4透明导管：每 tick 512,000 mB。"
+  },
+  "summary.singulo.superfluid_conduit": {
+    "source": "A clear conduit for very large flows.",
+    "translation": "输送大量液体的透明导管。"
+  },
+  "howto.singulo.superfluid_conduit": {
+    "source": "Made in: Cryogenic Cooling Tower (stage 4)",
+    "translation": "制造地：低温冷却塔（第 4 阶段）"
+  },
+  "uses.singulo.superfluid_conduit": {
+    "source": "Used in: Horizon Duct",
+    "translation": "用于：视界管道"
+  },
+  "desc.singulo.horizon_duct": {
+    "source": "A thick stage 5 main with no transfer limit.",
+    "translation": "阶段5的粗大主管道，输送量没有上限。"
+  },
+  "summary.singulo.horizon_duct": {
+    "source": "A fluid main with no limit.",
+    "translation": "没有上限的流体主管道。"
+  },
+  "howto.singulo.horizon_duct": {
+    "source": "Made in: Degenerate Compactor (stage 5)",
+    "translation": "制造地：简并压缩炉（第 5 阶段）"
+  },
+  "desc.singulo.fluid_drone_port": {
+    "source": "Fills fluid capsules from its send tank and sends them by drone to other fluid ports with the same owner. Arrived fluid empties into its receive tank.",
+    "translation": "把发送罐中的液体装进流体胶囊，用无人机送往同一所有者的其他流体起降港。送达的液体会注入接收罐。"
+  },
+  "summary.singulo.fluid_drone_port": {
+    "source": "Sends and receives fluids by drone.",
+    "translation": "用无人机发送和接收液体。"
+  },
+  "howto.singulo.fluid_drone_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "desc.singulo.fluid_capsule": {
+    "source": "A pressure vessel that carries up to 64,000 mB of one fluid by drone. Reaches 160 blocks.",
+    "translation": "用无人机运送一种液体的耐压容器，最多 64,000 mB。最远可送 160 格。"
+  },
+  "summary.singulo.fluid_capsule": {
+    "source": "A container for sending fluid by drone.",
+    "translation": "用无人机运送液体的容器。"
+  },
+  "howto.singulo.fluid_capsule": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "uses.singulo.fluid_capsule": {
+    "source": "Used in: Battery Fluid Capsule",
+    "translation": "用于：附电池流体胶囊"
+  },
+  "desc.singulo.battery_fluid_capsule": {
+    "source": "A fluid capsule with a battery. Reaches 760 blocks.",
+    "translation": "装有电池的流体胶囊。最远可送 760 格。"
+  },
+  "summary.singulo.battery_fluid_capsule": {
+    "source": "A fluid capsule with longer range.",
+    "translation": "能送得更远的流体胶囊。"
+  },
+  "howto.singulo.battery_fluid_capsule": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "uses.singulo.battery_fluid_capsule": {
+    "source": "Used in: Large Battery Fluid Capsule",
+    "translation": "用于：大容量电池流体胶囊"
+  },
+  "desc.singulo.large_battery_fluid_capsule": {
+    "source": "A fluid capsule with a large battery. Reaches 3,160 blocks.",
+    "translation": "装有大容量电池的流体胶囊。最远可送 3,160 格。"
+  },
+  "summary.singulo.large_battery_fluid_capsule": {
+    "source": "The longest-range fluid capsule.",
+    "translation": "能送得最远的流体胶囊。"
+  },
+  "howto.singulo.large_battery_fluid_capsule": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "制造地：工作台（第 3 阶段）"
+  },
+  "guide.singulo.fluids": {
+    "source": "Moving Fluids",
+    "translation": "流体运输"
+  },
+  "guide.singulo.fluids.pipes.title": {
+    "source": "Pipe tiers",
+    "translation": "管道的阶段"
+  },
+  "guide.singulo.fluids.pipes.body": {
+    "source": "Fluid pipes come in four tiers. Higher tiers are thicker and carry more per tick.\n- Fluid Pipe (stage 1): 2,000 mB. A copper pipe with glass windows.\n- Vacuum-Jacketed Pipe (stage 2): 32,000 mB. A white insulated jacket with frost-blue fittings.\n- Superfluid Conduit (stage 4): 512,000 mB. A clear tube held by gold rings.\n- Horizon Duct (stage 5): no limit. A thick black main with gold fittings.\nPipes of different tiers connect to each other. The amount moved is set by the narrowest part of the route from one port to another, and flows that share a stretch share its capacity. While fluid flows, you can see it and its direction through the windows and clear tubes.\nPipes hold no fluid, and long networks stay light: unbranched runs are handled as a single stretch.",
+    "translation": "流体管道有 4 个阶段，阶段越高越粗，每 tick 输送得越多。\n- 流体管道（阶段1）：2,000 mB。带玻璃窗的铜管。\n- 真空绝热管道（阶段2）：32,000 mB。白色绝热外筒与霜蓝色接头。\n- 超流体导管（阶段4）：512,000 mB。由金环箍住的透明管。\n- 视界管道（阶段5）：没有上限。粗黑的主管道与金色接头。\n不同阶段的管道也能相连。输送量由从一个端口到另一个端口路线上最细的部分决定，经过同一段的流动会分享该段的容量。液体流动时，可以透过窗口和透明管看到液体及其流向。\n管道不储存液体，连得再长也不容易变卡：没有分支的一段会被当作一个整体处理。"
+  },
+  "guide.singulo.fluids.drone.title": {
+    "source": "Sending fluids by drone",
+    "translation": "用无人机运送液体"
+  },
+  "guide.singulo.fluids.drone.body": {
+    "source": "The Fluid Drone Port sends fluids with the same drones and stations as the item port. Only fluid ports with the same owner appear as destinations.\nPut empty fluid capsules top left, fill the send tank (left) and press Send. The port fills a capsule from the tank (one fluid, up to 64,000 mB) and sends it. Arrived capsules empty into the receive tank (right, 128,000 mB), and empty capsules return to the crate slot. If the receive tank is full, the capsule waits in the arrival slots.\nPipes follow the Sides settings: input faces fill the send tank and output faces drain the receive tank. With auto-eject on, received fluid is pushed into the neighbouring tank or machine. Buckets also work.\nRange and power are the same as packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks). Auto-send thresholds count buckets (1, 16, 32 or full).",
+    "translation": "流体无人机起降港使用与物品起降港相同的无人机和无人机站来发送液体。目的地中只会列出同一所有者的流体起降港。\n把空的流体胶囊放进左上方，向发送罐（左）注入液体后按下“发送”，起降港会把罐中的液体（一种，最多 64,000 mB）装进胶囊送出。送达的胶囊会注入接收罐（右，128,000 mB），空胶囊回到空箱栏。接收罐满了时，胶囊会在到货栏中等待。\n管道遵循面设置：从“输入”面注入发送罐，从“输出”面抽出接收罐。开启自动排出后，收到的液体会被推入相邻的储罐或机器。也可以用桶存取。\n航程和电力与包装箱相同（流体胶囊 160、附电池 760、大容量 3,160 格）。自动发送的阈值以桶计（1、16、32 或满）。"
+  },
+  "tooltip.singulo.fluid_drone_port.send": {
+    "source": "Send tank: %s %s mB",
+    "translation": "发送罐：%s %s mB"
+  },
+  "tooltip.singulo.fluid_drone_port.receive": {
+    "source": "Receive tank: %s %s mB",
+    "translation": "接收罐：%s %s mB"
+  },
+  "block.singulo.collapsar_lining": {
+    "source": "Collapsar Lining",
+    "translation": "坍缩星内衬"
+  },
+  "block.singulo.horizon_vault": {
+    "source": "Event Horizon Vault",
+    "translation": "视界仓库"
+  },
+  "block.singulo.wormhole_drone_beacon": {
+    "source": "Wormhole Drone Beacon",
+    "translation": "虫洞航路信标"
+  },
+  "gui.singulo.lining.count": {
+    "source": "Collapsar Lining: %s (processing ×%s)",
+    "translation": "坍缩星内衬 %s 块：加工 ×%s"
+  },
+  "gui.singulo.lining.hint": {
+    "source": "Fits in casing positions; the Holo Projector shows them in gold (+5% each, 2× at 20)",
+    "translation": "可放在外壳板位置。全息投影仪会以金色显示（每块 +5%，20 块达到 2 倍）"
+  },
+  "holo.singulo.lining": {
+    "source": "Lining %s / %s (processing ×%s) · %s gold casing spots left",
+    "translation": "内衬 %s / %s 块（加工 ×%s）·金色外壳板还剩 %s 处"
+  },
+  "holo.singulo.lining.report": {
+    "source": "Collapsar Lining: fits in %s casing positions (%s placed; %s for the maximum 2×)",
+    "translation": "坍缩星内衬：可放在 %s 处外壳板位置（目前 %s 块；%s 块达到最大 2 倍）"
+  },
+  "tooltip.singulo.horizon_vault.contents": {
+    "source": "%s × %s",
+    "translation": "%s × %s"
+  },
+  "tooltip.singulo.horizon_vault.capacity": {
+    "source": "Holds up to %s of one item",
+    "translation": "同一种物品最多可储存 %s 个"
+  },
+  "gui.singulo.drone_port.via_wormhole": {
+    "source": "Via wormhole: %s",
+    "translation": "经由虫洞：%s"
+  },
+  "desc.singulo.collapsar_lining": {
+    "source": "A plate for casing positions on processing multiblocks (Degenerate Compactor, Casimir Cavity, Cryogenic Cooling Tower). Each one speeds processing by 5%, up to 2× at 20. The Holo Projector shows where it fits in gold.",
+    "translation": "可放在加工类多方块结构（简并压缩炉、卡西米尔腔、低温冷却塔）外壳板位置的板。每块使加工加快 5%，20 块时达到 2 倍。可放置的位置会由全息投影仪以金色显示。"
+  },
+  "summary.singulo.collapsar_lining": {
+    "source": "A plate that speeds up multiblock processing.",
+    "translation": "加快多方块结构加工的板。"
+  },
+  "howto.singulo.collapsar_lining": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制造地：工作台（第 5 阶段）"
+  },
+  "desc.singulo.horizon_vault": {
+    "source": "Stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. Insert and take by hand, or connect hoppers and pipes. Breaking it keeps the contents.",
+    "translation": "在内部的小黑洞中储存几乎无限量（约 922 京个）的同一种物品。可以手动存取，也可以连接漏斗和管道。破坏后内容物不会丢失。"
+  },
+  "summary.singulo.horizon_vault": {
+    "source": "Mass storage for one item.",
+    "translation": "大量储存同一种物品的仓库。"
+  },
+  "howto.singulo.horizon_vault": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制造地：工作台（第 5 阶段）"
+  },
+  "desc.singulo.wormhole_drone_beacon": {
+    "source": "Place one near both mouths of a wormhole and drones hand cargo through it to ports in another dimension. The far side also needs a Drone Station.",
+    "translation": "放在虫洞两端入口附近后，无人机会在入口交接货物，送往另一个维度的起降港。另一侧也需要无人机站。"
+  },
+  "summary.singulo.wormhole_drone_beacon": {
+    "source": "Lets drones use a wormhole.",
+    "translation": "让无人机穿过虫洞的信标。"
+  },
+  "howto.singulo.wormhole_drone_beacon": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制造地：工作台（第 5 阶段）"
+  },
+  "guide.singulo.collapsar": {
+    "source": "Using Collapsar",
+    "translation": "坍缩星的用途"
+  },
+  "guide.singulo.collapsar.lining.title": {
+    "source": "Collapsar Lining",
+    "translation": "坍缩星内衬"
+  },
+  "guide.singulo.collapsar.lining.body": {
+    "source": "Collapsar Lining replaces casing blocks on processing multiblocks: the Degenerate Compactor, Casimir Cavity and Cryogenic Cooling Tower. Each lining speeds processing up by 5%, up to 2× at 20 (the cooling tower multiplies this with its height bonus). Energy per operation stays the same, so power per tick rises.\nUse the Holo Projector on a finished controller to see where lining fits: casing blocks you can swap pulse in gold, and lined spots show a faint gold frame. The bar below shows the count and speed, and chat lists how many spots there are. Port positions are not marked, since swapping them would remove the port.\nIn the controller screen, hover the structure size to see the lining count and speed.",
+    "translation": "坍缩星内衬可以代替外壳板，放在加工类多方块结构（简并压缩炉、卡西米尔腔、低温冷却塔）的外壳板位置。每块使加工加快 5%，20 块时达到 2 倍（冷却塔会与高度倍率相乘）。每次加工的电力不变，因此每 tick 的电力会增加。\n对完成的多方块控制器使用全息投影仪，可以替换成内衬的外壳板会以闪烁的金色框显示，已安装内衬的位置显示为淡金色框。画面下方显示数量和速度，聊天栏显示可放置的位置数。搬入搬出端口的位置不会标示（替换后端口会消失）。\n在控制器画面中，把光标移到结构大小的标记上，可以查看内衬数量和速度。"
+  },
+  "guide.singulo.collapsar.vault.title": {
+    "source": "Event Horizon Vault",
+    "translation": "视界仓库"
+  },
+  "guide.singulo.collapsar.vault.body": {
+    "source": "The Event Horizon Vault stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. The hole grows as it fills (it looks full at a trillion), the stored item orbits it, the plates on all four sides show the count, and light on the corner pillars shows how full it is.\nUse an item on it to insert what you hold; use it again quickly to insert every matching item in your inventory. Use it empty-handed to take a stack, or sneak to take one. Hoppers, pipes, androids and drone ports see it as a single slot. It never accepts more than fits.\nBreaking it keeps the contents in the item, restored when placed. Filled vaults and packed crates cannot go inside a vault. A comparator reads how full it is.",
+    "translation": "视界仓库能在内部的小黑洞中储存几乎无限量（约 922 京个）的同一种物品。内容越多黑洞越大（1 万亿个时看起来已满），储存的物品会绕着它转，四面的台上显示数量，四角的柱子以光显示填满程度。\n拿着物品使用会存入手中的物品，快速再使用一次会存入物品栏中所有相同的物品。空手使用取出一组，空手潜行使用取出 1 个。漏斗、管道、仿生人和无人机起降港把它视为一个格子的容器来存取。装不下的部分不会接收。\n破坏后内容物会留在物品中，重新放置后恢复。装有内容物的仓库和已打包的箱子不能放进仓库。比较器会输出填满程度。"
+  },
+  "guide.singulo.collapsar.wormhole.title": {
+    "source": "Wormhole delivery",
+    "translation": "虫洞运输"
+  },
+  "guide.singulo.collapsar.wormhole.body": {
+    "source": "Place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and drones can send cargo through it to ports in another dimension. Ports on the far side with the same owner appear in the destination list with a purple mark. Distance is from your port to the mouth plus from the far mouth to the port, and range and power follow it.\nA drone carries the crate to this mouth and passes it through. A drone from a station within 64 blocks of the far mouth picks it up and delivers it, so the far side needs a station too.\nThe cargo is always in one place: the carrying drone, the record at the mouth, then the far drone. If a mouth is closed or unloaded, drones wait above it. Breaking a mouth drops any crate waiting there.",
+    "translation": "在虫洞两端入口附近（4 格以内）放置虫洞航路信标后，无人机就能穿过该入口，把货物送往另一个维度的起降港。起降港的目的地列表中，会以紫色标记列出入口另一侧维度中同一所有者的起降港。距离为从本起降港到入口、加上从另一端入口到目标起降港，航程和电力也按此距离计算。\n无人机把货物运到这一侧的入口，送入入口后返回。另一端入口附近（64 格以内）的无人机站的无人机会从入口取出货物并送达，因此另一侧也需要无人机站。\n货物始终只在一个地方：运送的无人机、在入口等待时的记录、另一侧的无人机，不会丢失。入口关闭或未加载时，无人机会在入口上方等待。破坏入口时，在那里等待的货物会以已打包箱子的形式掉落。"
+  },
+  "holo.singulo.ports": {
+    "source": "Casing blocks you can swap for ports: %s (cyan frames)",
+    "translation": "可替换为搬入搬出端口的外壳板 %s 处（水色框）"
+  },
+  "holo.singulo.ports.report": {
+    "source": "Multiblock ports fit in %s casing positions (cyan frames in the projection)",
+    "translation": "搬入搬出端口：可放在 %s 处外壳板位置（投影中的水色框）"
   }
 }

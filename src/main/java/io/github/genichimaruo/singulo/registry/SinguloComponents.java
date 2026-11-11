@@ -49,6 +49,26 @@ public final class SinguloComponents {
             REGISTER.registerComponentType("fluid_sample", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
                     .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
 
+    /** 液体のドローン発着ポートを壊したときに、アイテムへ写す送るタンク・受け取りのタンクの中身（置き直すと戻る）。 */
+    public static final Supplier<DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> PORT_SEND_FLUID =
+            REGISTER.registerComponentType("port_send_fluid", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
+                    .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
+    public static final Supplier<DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> PORT_RECEIVE_FLUID =
+            REGISTER.registerComponentType("port_receive_fluid", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
+                    .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
+
+    /** 事象の地平線倉庫の中身（1種類の物の見本と、個数）。壊したときにアイテムへ写し、置き直すと戻る。 */
+    public static final Supplier<DataComponentType<net.minecraft.world.item.component.ItemContainerContents>> VAULT_ITEM =
+            REGISTER.registerComponentType("vault_item", b -> b.persistent(net.minecraft.world.item.component.ItemContainerContents.CODEC)
+                    .networkSynchronized(net.minecraft.world.item.component.ItemContainerContents.STREAM_CODEC));
+    public static final Supplier<DataComponentType<Long>> VAULT_COUNT =
+            REGISTER.registerComponentType("vault_count", b -> b.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+
+    /** 液体カプセル（ドローンで液体を運ぶ梱包）の中身。 */
+    public static final Supplier<DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> CAPSULE_FLUID =
+            REGISTER.registerComponentType("capsule_fluid", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
+                    .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
+
     /** 液体キャニスターの中身。 */
     public static final Supplier<DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> CANISTER_FLUID =
             REGISTER.registerComponentType("canister_fluid", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)

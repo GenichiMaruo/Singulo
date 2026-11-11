@@ -1,76 +1,203 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "singulo:block/fluid_pipe",
+    "particle": "singulo:block/fluid_pipe_full",
     "c": "singulo:block/fluid_pipe",
-    "e": "singulo:block/fluid_pipe_end"
+    "g": "singulo:block/fluid_pipe_glass",
+    "f": "singulo:block/fluid_pipe_flange",
+    "r": "singulo:block/fluid_pipe_rim",
+    "j": "singulo:block/fluid_pipe_joint",
+    "item": "singulo:block/fluid_pipe_full"
   },
+  "render_type": "minecraft:translucent",
   "elements": [
     {
       "from": [
-        0,
+        1,
         5,
         5
       ],
       "to": [
-        16,
+        15,
         11,
         11
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
+            1,
             5,
-            16,
+            15,
             11
           ],
-          "texture": "#c"
+          "texture": "#item"
+        },
+        "south": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#item"
+        },
+        "up": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#item"
+        },
+        "down": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#item"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        4,
+        4
+      ],
+      "to": [
+        1,
+        12,
+        12
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#f"
+        },
+        "west": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#f"
+        },
+        "north": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r"
         },
         "south": {
           "uv": [
             0,
-            5,
-            16,
-            11
+            4,
+            1,
+            12
           ],
-          "texture": "#c"
+          "texture": "#r"
         },
         "up": {
           "uv": [
             0,
-            5,
-            16,
-            11
+            4,
+            1,
+            12
           ],
-          "texture": "#c"
+          "texture": "#r",
+          "rotation": 90
         },
         "down": {
           "uv": [
             0,
-            5,
-            16,
-            11
+            4,
+            1,
+            12
           ],
-          "texture": "#c"
-        },
+          "texture": "#r",
+          "rotation": 90
+        }
+      }
+    },
+    {
+      "from": [
+        15,
+        4,
+        4
+      ],
+      "to": [
+        16,
+        12,
+        12
+      ],
+      "faces": {
         "east": {
           "uv": [
-            5,
-            5,
-            11,
-            11
+            4,
+            4,
+            12,
+            12
           ],
-          "texture": "#e"
+          "texture": "#f"
         },
         "west": {
           "uv": [
-            5,
-            5,
-            11,
-            11
+            4,
+            4,
+            12,
+            12
           ],
-          "texture": "#e"
+          "texture": "#f"
+        },
+        "north": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r"
+        },
+        "up": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            4,
+            1,
+            12
+          ],
+          "texture": "#r",
+          "rotation": 90
         }
       }
     }
@@ -83,9 +210,9 @@
         0
       ],
       "scale": [
-        0.8,
-        0.8,
-        0.8
+        0.7,
+        0.7,
+        0.7
       ]
     },
     "fixed": {

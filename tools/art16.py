@@ -442,7 +442,7 @@ def creative_front(on, frame=0, frames=CREATIVE_FRAMES):
 ANDROID_FACES = ('android_station', 'android_work_console', 'android_supply_port', 'android_delivery_port',
                  'android_recipe_rack', 'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench')
 # ドローン輸送の装置（同じバイザーに、橙の単眼。tools/drones.py）
-DRONE_FACES = ('drone_station', 'drone_port')
+DRONE_FACES = ('drone_station', 'drone_port', 'fluid_drone_port')
 # 動いている間のまばたき: コマ0が開いた目、コマ1が閉じた目。ふだんは開けていて、ときどき1回か2回つぶる（time は tick）
 ANDROID_BLINK = {'animation': {'interpolate': False, 'frames': [
     {'index': 0, 'time': 90}, {'index': 1, 'time': 3},
@@ -2648,7 +2648,7 @@ def item_texture(iid, stage):
 
 # 断面（ケーブルの軸に直交する面の長方形の集まり、0〜16 の座標）。上位ほど凹凸のある断面になる
 # 断面は中心に置いた正方形の一辺（偶数）。Java の CableProfile と同じ値
-CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8, 'fluid_pipe': 6}
+CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8}
 
 
 def cable_bands(iid, core, on, glow):
@@ -2656,8 +2656,6 @@ def cable_bands(iid, core, on, glow):
     jacket = (226, 230, 234)
     c = glow if on and glow else core
     half = CABLE_WIDTHS[iid] // 2
-    if iid == 'fluid_pipe':
-        return [c, lighten(c, 0.35), (176, 112, 78)]                  # 液体の見えるガラスと銅の縁
     if iid == 'copper_wire':
         return [c, darken(c, 0.22)]                                   # 銅むき出しの1本（縁は少し酸化した色）
     if iid == 'superconducting_cable':

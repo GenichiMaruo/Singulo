@@ -40,6 +40,8 @@ public class CargoDrone extends Mob {
     private static final EntityDataAccessor<Integer> PRINT = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.INT);
     /** 運んでいる箱の段階（0 は空）。 */
     private static final EntityDataAccessor<Integer> CRATE = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.INT);
+    /** 運んでいる箱そのもの（液体カプセルの中身の色を描くため。空の箱は段階の絵で描く）。 */
+    private static final EntityDataAccessor<ItemStack> CARGO = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.ITEM_STACK);
     /** ポートの真上で受け渡しをしているか（爪を下ろす）。 */
     private static final EntityDataAccessor<Boolean> DOCKED = SynchedEntityData.defineId(CargoDrone.class, EntityDataSerializers.BOOLEAN);
     /** 解体中か（ステーションの上に降りて、印刷を逆にたどって消える）。 */
@@ -93,6 +95,7 @@ public class CargoDrone extends Mob {
         super.defineSynchedData(builder);
         builder.define(PRINT, PRINT_TICKS + RETRACT_TICKS);
         builder.define(CRATE, 0);
+        builder.define(CARGO, ItemStack.EMPTY);
         builder.define(DOCKED, false);
         builder.define(DISMANTLE, false);
         builder.define(PHASING, false);
@@ -147,7 +150,7 @@ public class CargoDrone extends Mob {
             d.station = f.station;
             d.unit = f.unit;
             d.moveTo(at.x, at.y, at.z, (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG) + 180, 0);
-            d.entityData.set(CRATE, DroneCrateItem.tier(f.crate));
+            d.showCrate(f.crate);
             d.flightId = f.id;
             d.phase = f.phase;
             d.entityData.set(KIND, f.kind.ordinal());
@@ -185,6 +188,23 @@ public class CargoDrone extends Mob {
 
     public int crateTier() {
         return entityData.get(CRATE);
+    }
+
+    /** 運んでいる箱（描画用）。 */
+    public ItemStack cargo() {
+        return entityData.get(CARGO);
+    }
+
+    /** 運んでいる箱を見せる（変わったときだけ送る。液体カプセルだけ中身ごと送る）。 */
+    private void showCrate(ItemStack crate) {
+        int tier = DroneCrateItem.displayTier(crate);
+        if (entityData.get(CRATE) != tier) {
+            entityData.set(CRATE, tier);
+        }
+        ItemStack shown = DroneCrateItem.isFluid(crate) ? crate : ItemStack.EMPTY;
+        if (!ItemStack.matches(entityData.get(CARGO), shown)) {
+            entityData.set(CARGO, shown.copy());
+        }
     }
 
     public DroneKind kind() {
@@ -364,7 +384,7 @@ public class CargoDrone extends Mob {
         }
         if (f == null) {
             if (station == null) { discard(); return; }
-            entityData.set(CRATE, 0);
+            showCrate(ItemStack.EMPTY);
             entityData.set(DOCKED, false);
             if (tickCount % 20 == 0 && level.isLoaded(station)) {
                 if (!(level.getBlockEntity(station) instanceof DroneStationBlockEntity s) || !s.manages(getUUID(), unit)) {
@@ -375,7 +395,7 @@ public class CargoDrone extends Mob {
             flyTo(level, DroneStationBlockEntity.hover(station, unit));
             return;
         }
-        entityData.set(CRATE, DroneCrateItem.tier(f.crate));
+        showCrate(f.crate);
         BlockPos target = f.target();
         if (target == null) {
             net.remove(f);
@@ -392,6 +412,20 @@ public class CargoDrone extends Mob {
         Vec3 over = new Vec3(target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5);
         boolean targetLoaded = level.isLoaded(target);
         DronePortBlockEntity port = targetLoaded && level.getBlockEntity(target) instanceof DronePortBlockEntity p ? p : null;
+        // ワームホール便: 口の上で荷物を向こうへ渡す（届ける段階）か、向こうから来た荷物を受け取る（取りに行く段階）
+        if (port == null && targetLoaded && WormholeRelay.isMouth(level, target)
+                && (f.stage == DroneNetwork.DELIVER && f.relayTo != null || f.stage == DroneNetwork.PICKUP && net.relayOfFlight(f.id) != null)) {
+            entityData.set(DOCKED, false);
+            f.docked = false;
+            if (flyTo(level, over.add(0, 0.6, 0))) {
+                if (f.stage == DroneNetwork.DELIVER) {
+                    WormholeRelay.handOff(level, net, f);
+                } else {
+                    WormholeRelay.pickUp(level, net, f);
+                }
+            }
+            return;
+        }
         if (port != null && port.handling(f)) {
             // 受け渡しの間は、ポートの時間に合わせて上下する（扉が動く間は高く待ち、台と同じ高さで箱を受け渡す）
             setPos(over.x, over.y + port.dockLift(), over.z);

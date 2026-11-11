@@ -13,6 +13,8 @@ public abstract class FixedShapeControllerBlockEntity extends MachineBlockEntity
     static final int CHECK_INTERVAL = 40;
 
     private int size;
+    /** コラプサー内張りの数（形を確かめるたびに数え直す）。 */
+    private int linings;
     private final PortLinks ports = new PortLinks();
     /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
     private boolean firstCheck;
@@ -30,6 +32,11 @@ public abstract class FixedShapeControllerBlockEntity extends MachineBlockEntity
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             Shapes.Found found = Shapes.find(kind(), level, worldPosition);
             int newSize = found == null ? 0 : found.size();
+            int newLinings = found == null ? 0 : found.linings(level, worldPosition);
+            if (newLinings != linings) {
+                linings = newLinings;
+                markDirty();
+            }
             ports.update(level, worldPosition, found == null ? List.of() : found.ports());
             if (newSize != size) {
                 if (level instanceof net.minecraft.server.level.ServerLevel server) {
@@ -52,6 +59,17 @@ public abstract class FixedShapeControllerBlockEntity extends MachineBlockEntity
     @Override
     public int structureSize() {
         return size;
+    }
+
+    @Override
+    public int liningCount() {
+        return size > 0 ? linings : 0;
+    }
+
+    /** コラプサー内張り1枚ごとに速くなる（{@link CollapsarLining}）。 */
+    @Override
+    protected double speedMultiplier() {
+        return CollapsarLining.factor(liningCount());
     }
 
     @Override

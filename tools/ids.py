@@ -762,3 +762,7 @@ MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ':
 from cosmic_content import IDS as _COSMIC_IDS
 MOD.update(_COSMIC_IDS)
 STATIONS["潮汐紡糸機"] = "tidal_spindle"
+
+# 0.17.0 液体パイプの段階・液体のドローン発着ポート・液体カプセル
+from logistics_content import IDS as _LOGISTICS_IDS
+MOD.update(_LOGISTICS_IDS)

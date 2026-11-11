@@ -78,6 +78,37 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     /** Release runtime references when this level closes. */
     public static void forgetLevel(Level level) { LOADED.remove(level); }
 
+    /** 読み込まれている口（ドローンのワームホール便が、行き先を探すのに使う）。 */
+    public static java.util.List<WormholeMouthBlockEntity> loaded(Level level) {
+        Set<WormholeMouthBlockEntity> set = LOADED.get(level);
+        return set == null ? java.util.List.of() : java.util.List.copyOf(set);
+    }
+
+    /** そばに（各方向 {@link #GATE_RANGE} ブロック以内に）ワームホール航路標識があるか（調べた時刻から40 tick 覚える。保存しない）。 */
+    private boolean droneGate;
+    private long droneGateAt = Long.MIN_VALUE;
+    public static final int GATE_RANGE = 4;
+
+    /** ドローンがこの口を通って荷物を受け渡せるか: 開いていて、そばに航路標識がある（ワームホール便に使われたときだけ調べる）。 */
+    public boolean droneGate() {
+        if (level == null || !open()) {
+            return false;
+        }
+        long now = level.getGameTime();
+        if (droneGateAt == Long.MIN_VALUE || now - droneGateAt >= 40 || now < droneGateAt) {
+            droneGateAt = now;
+            droneGate = false;
+            BlockPos pos = worldPosition;
+            for (BlockPos p : BlockPos.betweenClosed(pos.offset(-GATE_RANGE, -GATE_RANGE, -GATE_RANGE), pos.offset(GATE_RANGE, GATE_RANGE, GATE_RANGE))) {
+                if (level.isLoaded(p) && level.getBlockState(p).is(io.github.genichimaruo.singulo.registry.SinguloBlocks.WORMHOLE_DRONE_BEACON.get())) {
+                    droneGate = true;
+                    break;
+                }
+            }
+        }
+        return droneGate;
+    }
+
     private final ItemStackHandler fuel = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
@@ -334,6 +365,9 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
             crossDimension = p != null && !p.dimension().equals(level.dimension());
         }
         upkeep(level);
+        if (level.getGameTime() % 10 == 0) {
+            io.github.genichimaruo.singulo.drone.WormholeRelay.tickMouth(level, this);
+        }
         if(traversable&&level.getGameTime()%20==0)level.sendBlockUpdated(pos,state,state,Block.UPDATE_CLIENTS);
         if (isRemoved()) {
             return;
@@ -433,6 +467,10 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public void onBroken(Level level) {
+        if (level instanceof ServerLevel server) {
+            // 口で次のドローンを待っていた荷物は、梱包済みの箱のままここに落とす（失わない）
+            io.github.genichimaruo.singulo.drone.WormholeRelay.mouthRemoved(server, worldPosition);
+        }
         if (traversable && !level.isClientSide) {
             traversable=false;
             Block.popResource(level,worldPosition,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
@@ -580,9 +618,4 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
     }
 
-    /** テスト用: 読み込まれている口の一覧。 */
-    static List<WormholeMouthBlockEntity> loaded(Level level) {
-        Set<WormholeMouthBlockEntity> set = LOADED.get(level);
-        return set == null ? List.of() : new ArrayList<>(set);
-    }
 }

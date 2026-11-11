@@ -29,6 +29,50 @@ public final class DroneBlocks {
         }
     }
 
+    /** 液体のドローン発着ポート。コンパレーターに、受け取りのタンクの埋まり具合を出す。 */
+    public static class FluidPort extends SimpleMachineBlock<FluidDronePortBlockEntity> {
+        public FluidPort(Properties properties) {
+            super(properties, SinguloBlockEntities.FLUID_DRONE_PORT, FluidDronePortBlockEntity::new, DronePortBlockEntity::serverTick);
+        }
+
+        @Override
+        public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+            super.setPlacedBy(level, pos, state, placer, stack);
+            if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof FluidDronePortBlockEntity port) {
+                port.setOwner(player.getUUID());
+            }
+        }
+
+        @Override
+        protected boolean hasAnalogOutputSignal(BlockState state) {
+            return true;
+        }
+
+        /** 壊して中身ごと持ち出したポート: タンクの中身を出す（置き直すと戻る）。 */
+        @Override
+        public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+                                    java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
+            super.appendHoverText(stack, context, lines, flag);
+            var send = stack.get(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_SEND_FLUID.get());
+            var receive = stack.get(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_RECEIVE_FLUID.get());
+            for (var e : new Object[][]{{"send", send}, {"receive", receive}}) {
+                if (e[1] instanceof net.neoforged.neoforge.fluids.SimpleFluidContent c && !c.isEmpty()) {
+                    var f = c.copy();
+                    lines.add(net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_drone_port." + e[0], f.getHoverName(),
+                            String.format("%,d", f.getAmount())).withStyle(net.minecraft.ChatFormatting.GRAY));
+                }
+            }
+        }
+
+        @Override
+        protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+            if (!(level.getBlockEntity(pos) instanceof FluidDronePortBlockEntity port) || port.receiveTank().isEmpty()) {
+                return 0;
+            }
+            return 1 + Math.round(14F * port.receiveTank().getFluidAmount() / FluidDronePortBlockEntity.RECEIVE_CAPACITY);
+        }
+    }
+
     /** ドローン発着ポート。コンパレーターに、受け取りの欄の埋まり具合を出す。 */
     public static class Port extends SimpleMachineBlock<DronePortBlockEntity> {
         public Port(Properties properties) {

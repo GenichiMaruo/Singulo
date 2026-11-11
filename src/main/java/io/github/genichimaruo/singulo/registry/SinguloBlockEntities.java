@@ -198,6 +198,12 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.drone.DronePortBlockEntity>> DRONE_PORT =
             REGISTER.register("drone_port", () -> build(io.github.genichimaruo.singulo.drone.DronePortBlockEntity::new,
                     SinguloBlocks.DRONE_PORT.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.storage.HorizonVaultBlockEntity>> HORIZON_VAULT =
+            REGISTER.register("horizon_vault", () -> build(io.github.genichimaruo.singulo.storage.HorizonVaultBlockEntity::new,
+                    SinguloBlocks.HORIZON_VAULT.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity>> FLUID_DRONE_PORT =
+            REGISTER.register("fluid_drone_port", () -> build(io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity::new,
+                    SinguloBlocks.FLUID_DRONE_PORT.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity>> ANDROID_WORK_CONSOLE =
             REGISTER.register("android_work_console", () -> build(io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity::new, SinguloBlocks.ANDROID_WORK_CONSOLE.get()));
@@ -251,7 +257,8 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.GENESIS_CORE.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity>> FLUID_PIPE = REGISTER.register("fluid_pipe",
-            () -> build(io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity::new, SinguloBlocks.FLUID_PIPE.get()));
+            () -> build(io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity::new, SinguloBlocks.FLUID_PIPE.get(),
+                    SinguloBlocks.VACUUM_JACKETED_PIPE.get(), SinguloBlocks.SUPERFLUID_CONDUIT.get(), SinguloBlocks.HORIZON_DUCT.get()));
     public static final Supplier<BlockEntityType<CableBlockEntity>> CABLE = REGISTER.register("cable",
             () -> build(CableBlockEntity::new, SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(),
                     SinguloBlocks.TOPOLOGICAL_WIRE.get(), SinguloBlocks.HORIZON_BUS.get()));

@@ -85,6 +85,14 @@ public final class SinguloCapabilities {
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DRONE_PORT.get(),
                 (be, side) -> be.sidedItems(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.HORIZON_VAULT.get(),
+                (be, side) -> be.items());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),
+                (be, side) -> be.sidedItems(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),
+                (be, side) -> be.sidedFluids(side));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),

@@ -49,8 +49,29 @@ public class HoloProjectorItem extends SinguloItem {
                 : Direction.NORTH;
     }
 
+    /**
+     * ブロックの右クリック（装置の画面を開く処理）より先に呼ばれる。コントローラなら投影し、ほかの装置でも画面は開かない
+     * （投影機を持っている間は、完成済みのコントローラに使っても画面を開かずに、替えられる場所を示す）。
+     * 装置でないブロック（扉など）は、ふつうの右クリックに任せる。
+     */
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockState state = level.getBlockState(context.getClickedPos());
+        boolean machine = state.getBlock() instanceof io.github.genichimaruo.singulo.machine.AbstractMachineBlock
+                || level.getBlockEntity(context.getClickedPos()) instanceof net.minecraft.world.MenuProvider;
+        if (Blueprints.kindOf(state.getBlock()) == null && !machine) {
+            return InteractionResult.PASS;
+        }
+        return project(context);
+    }
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
+        return project(context);
+    }
+
+    private InteractionResult project(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
@@ -81,6 +102,9 @@ public class HoloProjectorItem extends SinguloItem {
     public static void report(Level level, Player player, Blueprints.Kind kind, BlockPos pos, Direction back, int size) {
         Map<Block, int[]> counts = new LinkedHashMap<>();   // [必要, 足りない]
         int blocking = 0;
+        var shape = io.github.genichimaruo.singulo.multiblock.Shapes.spec(kind, size);
+        java.util.Set<BlockPos> panels = shape == null ? java.util.Set.of() : new java.util.HashSet<>(shape.panelSlots(pos, back));
+        boolean liningShape = shape != null && shape.acceptsLining();
         for (Map.Entry<BlockPos, BlockState> e : Blueprints.layout(kind, pos, back, size).entrySet()) {
             BlockState want = e.getValue();
             BlockState have = level.getBlockState(e.getKey());
@@ -92,7 +116,7 @@ public class HoloProjectorItem extends SinguloItem {
             }
             int[] c = counts.computeIfAbsent(want.getBlock(), b -> new int[2]);
             c[0]++;
-            if (!Blueprints.matches(want, have)) {
+            if (!Blueprints.matches(want, have, panels.contains(e.getKey()), liningShape)) {
                 c[1]++;
             }
         }
@@ -110,6 +134,20 @@ public class HoloProjectorItem extends SinguloItem {
         }
         if (missing == 0 && blocking == 0) {
             player.displayClientMessage(Component.translatable("holo.singulo.complete").withStyle(ChatFormatting.GREEN), false);
+        }
+        // コラプサー内張りを置ける設備: 置ける場所の数と効き目（場所は投影の金色の枠）
+        var spec = io.github.genichimaruo.singulo.multiblock.Shapes.spec(kind, size);
+        if (spec != null && !spec.acceptsLining()) {
+            // 内張りを置けない設備: 搬入出ポートに替えられる外装板の数（投影の水色の枠）
+            player.displayClientMessage(Component.translatable("holo.singulo.ports.report", spec.panelSlots(pos, back).size())
+                    .withStyle(ChatFormatting.AQUA), false);
+        }
+        if (spec != null && spec.acceptsLining()) {
+            var lining = io.github.genichimaruo.singulo.registry.SinguloBlocks.COLLAPSAR_LINING.get();
+            var slots = spec.liningSlots(pos, back);
+            long lined = slots.stream().filter(p -> level.getBlockState(p).is(lining)).count();
+            player.displayClientMessage(Component.translatable("holo.singulo.lining.report", slots.size(), lined,
+                    io.github.genichimaruo.singulo.multiblock.CollapsarLining.MAX).withStyle(ChatFormatting.GOLD), false);
         }
     }
 

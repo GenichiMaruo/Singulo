@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -27,8 +30,8 @@ public class DroneNetwork extends SavedData {
     /** 巡航の速さ（ブロック/tick）。見えない飛行の到着時刻もこれで決める。 */
     public static final double SPEED = 0.6;
 
-    /** 発着ポート（持ち主・名前）。 */
-    public record Port(@Nullable UUID owner, String name) {}
+    /** 発着ポート（持ち主・名前・液体用か）。物のポートと液体のポートは、それぞれ同じ種類のポートだけを行き先にする。 */
+    public record Port(@Nullable UUID owner, String name, boolean fluid) {}
 
     /** 便の段階: ポートへ荷物を取りに行く、荷物を届ける、ステーションへ帰る。 */
     public static final int PICKUP = 0, DELIVER = 1, RETURN = 2;
@@ -64,6 +67,14 @@ public class DroneNetwork extends SavedData {
         public boolean phase;
         /** 飛んでいるドローンの型（速さと、見えない飛行から出てくるときの姿）。 */
         public DroneKind kind = DroneKind.ROTOR;
+        /**
+         * ワームホール便: 届ける先（to）はこちらの口で、その先の次元（relayDim）と最終の行き先のポート（relayTo）。
+         * 口に着くと荷物を向こうの口のリレーに渡す（{@link WormholeRelay}）。ふつうの便は null。
+         */
+        @Nullable
+        public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> relayDim;
+        @Nullable
+        public BlockPos relayTo;
 
         Flight(long id, @Nullable BlockPos station, int unit) {
             this.id = id;
@@ -103,6 +114,68 @@ public class DroneNetwork extends SavedData {
 
     private final Map<Long, Port> ports = new LinkedHashMap<>();
     private final Map<Long, Flight> flights = new LinkedHashMap<>();
+    /** ワームホールの口で、こちら側のドローンを待つ荷物（{@link WormholeRelay}）。 */
+    private final Map<Long, Relay> relays = new LinkedHashMap<>();
+
+    /**
+     * 口で待つ荷物: 口の位置、梱包済みの箱、行き先のポート、持ち主、発送元（向こうの次元のポート。表示用）、受け持つ便（まだなら 0）。
+     * 荷物の正は、こちら側のドローンに渡すまでこの記録が持つ。
+     */
+    public static final class Relay {
+        public final long id;
+        public final BlockPos mouth;
+        public ItemStack crate;
+        public final BlockPos to;
+        @Nullable
+        public final UUID owner;
+        public long flight;
+
+        Relay(long id, BlockPos mouth, ItemStack crate, BlockPos to, @Nullable UUID owner) {
+            this.id = id;
+            this.mouth = mouth;
+            this.crate = crate;
+            this.to = to;
+            this.owner = owner;
+        }
+    }
+
+    public Relay addRelay(BlockPos mouth, ItemStack crate, BlockPos to, @Nullable UUID owner) {
+        Relay r = new Relay(nextId++, mouth.immutable(), crate, to.immutable(), owner);
+        relays.put(r.id, r);
+        setDirty();
+        return r;
+    }
+
+    public List<Relay> relaysAt(BlockPos mouth) {
+        List<Relay> out = new ArrayList<>();
+        for (Relay r : relays.values()) {
+            if (r.mouth.equals(mouth)) {
+                out.add(r);
+            }
+        }
+        return out;
+    }
+
+    @Nullable
+    public Relay relayOfFlight(long flight) {
+        for (Relay r : relays.values()) {
+            if (r.flight == flight) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public void removeRelay(Relay r) {
+        if (relays.remove(r.id) != null) {
+            setDirty();
+        }
+    }
+
+    /** テスト・表示用: 待っている荷物の数。 */
+    public int relayCount() {
+        return relays.size();
+    }
     /**
      * 便を探す手間を減らす控え（便を足す・消すたびに作り直す）: 便の一覧の写しと、ステーションの枠ごとの便。
      * ステーションが壊されて便の station が null になっても、控えから引いたあとで確かめるので、取り違えない。
@@ -131,8 +204,18 @@ public class DroneNetwork extends SavedData {
 
     // ------------------------------------------------------------------ ポート
 
+    /** 物の発着ポートとして載せる（0.16.0 までの呼び方）。 */
     public void putPort(BlockPos pos, @Nullable UUID owner, String name) {
-        Port next = new Port(owner, name);
+        putPort(pos, owner, name, false);
+    }
+
+    /** owner の物の発着ポート（0.16.0 までの呼び方）。 */
+    public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from) {
+        return portsOf(owner, from, false);
+    }
+
+    public void putPort(BlockPos pos, @Nullable UUID owner, String name, boolean fluid) {
+        Port next = new Port(owner, name, fluid);
         if (!next.equals(ports.put(pos.asLong(), next))) {
             setDirty();
         }
@@ -149,12 +232,12 @@ public class DroneNetwork extends SavedData {
         return ports.get(pos.asLong());
     }
 
-    /** owner の発着ポート（from 自身を除く。近い順）。 */
-    public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from) {
+    /** owner の発着ポートのうち、物か液体か（fluid）が同じもの（from 自身を除く。近い順）。 */
+    public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from, boolean fluid) {
         List<BlockPos> out = new ArrayList<>();
         for (var e : ports.entrySet()) {
             BlockPos p = BlockPos.of(e.getKey());
-            if (!p.equals(from) && java.util.Objects.equals(owner, e.getValue().owner())) {
+            if (!p.equals(from) && e.getValue().fluid() == fluid && java.util.Objects.equals(owner, e.getValue().owner())) {
                 out.add(p);
             }
         }
@@ -330,6 +413,8 @@ public class DroneNetwork extends SavedData {
         f.stage = PICKUP;
         f.progress = 0;
         f.docked = false;
+        f.relayDim = null;                                // 前の便のワームホールの行き先を持ち越さない
+        f.relayTo = null;
         setDirty();
     }
 
@@ -363,6 +448,7 @@ public class DroneNetwork extends SavedData {
                 p.putUUID("owner", e.getValue().owner());
             }
             p.putString("name", e.getValue().name());
+            p.putBoolean("fluid", e.getValue().fluid());
             list.add(p);
         }
         tag.put("ports", list);
@@ -396,9 +482,29 @@ public class DroneNetwork extends SavedData {
             t.putInt("kind", f.kind.ordinal());
             t.putFloat("virtual_from", f.virtualFrom);
             t.putLong("virtual_at", f.virtualAt);
+            if (f.relayDim != null && f.relayTo != null) {
+                t.putString("relay_dim", f.relayDim.location().toString());
+                t.put("relay_to", NbtUtils.writeBlockPos(f.relayTo));
+            }
             fl.add(t);
         }
         tag.put("flights", fl);
+        ListTag rl = new ListTag();
+        for (Relay r : relays.values()) {
+            CompoundTag t = new CompoundTag();
+            t.putLong("id", r.id);
+            t.put("mouth", NbtUtils.writeBlockPos(r.mouth));
+            if (!r.crate.isEmpty()) {
+                t.put("crate", r.crate.save(registries));
+            }
+            t.put("to", NbtUtils.writeBlockPos(r.to));
+            if (r.owner != null) {
+                t.putUUID("owner", r.owner);
+            }
+            t.putLong("flight", r.flight);
+            rl.add(t);
+        }
+        tag.put("relays", rl);
         tag.putLong("next_id", nextId);
         return tag;
     }
@@ -407,7 +513,7 @@ public class DroneNetwork extends SavedData {
         DroneNetwork net = new DroneNetwork();
         for (Tag t : tag.getList("ports", Tag.TAG_COMPOUND)) {
             CompoundTag p = (CompoundTag) t;
-            net.ports.put(p.getLong("pos"), new Port(p.hasUUID("owner") ? p.getUUID("owner") : null, p.getString("name")));
+            net.ports.put(p.getLong("pos"), new Port(p.hasUUID("owner") ? p.getUUID("owner") : null, p.getString("name"), p.getBoolean("fluid")));
         }
         for (Tag t : tag.getList("flights", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
@@ -426,10 +532,26 @@ public class DroneNetwork extends SavedData {
             f.kind = DroneKind.byId(c.getInt("kind"));
             f.virtualFrom = c.getFloat("virtual_from");
             f.virtualAt = c.getLong("virtual_at");
+            if (c.contains("relay_dim")) {
+                var loc = ResourceLocation.tryParse(c.getString("relay_dim"));
+                f.relayDim = loc == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
+                f.relayTo = NbtUtils.readBlockPos(c, "relay_to").orElse(null);
+            }
             net.flights.put(f.id, f);
             net.forgetIndex();
         }
+        for (Tag t : tag.getList("relays", Tag.TAG_COMPOUND)) {
+            CompoundTag c = (CompoundTag) t;
+            Relay r = new Relay(c.getLong("id"), NbtUtils.readBlockPos(c, "mouth").orElse(BlockPos.ZERO),
+                    c.contains("crate") ? ItemStack.parse(registries, c.getCompound("crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY,
+                    NbtUtils.readBlockPos(c, "to").orElse(BlockPos.ZERO), c.hasUUID("owner") ? c.getUUID("owner") : null);
+            r.flight = c.getLong("flight");
+            net.relays.put(r.id, r);
+        }
         net.nextId = Math.max(tag.getLong("next_id"), 1);
+        for (long id : net.relays.keySet()) {
+            net.nextId = Math.max(net.nextId, id + 1);
+        }
         for (long id : net.flights.keySet()) {
             net.nextId = Math.max(net.nextId, id + 1);
         }

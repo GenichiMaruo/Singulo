@@ -44,6 +44,19 @@ public class DroneCrateItem extends Item {
         return CAPACITY[Math.max(0, Math.min(3, tier))];
     }
 
+    /** 液体カプセルか（液体のポートで使う箱）。 */
+    public static boolean isFluid(ItemStack stack) {
+        return stack.getItem() instanceof FluidCapsuleItem;
+    }
+
+    /**
+     * 描くときの箱の番号: 梱包箱は段階（1〜3）、液体カプセルは段階 + 3（4〜6）。0 は箱なし。
+     */
+    public static int displayTier(ItemStack stack) {
+        int t = tier(stack);
+        return t > 0 && isFluid(stack) ? t + 3 : t;
+    }
+
     /** その段階の箱で届く距離（ブロック）。 */
     public static int range(int tier) {
         return tier <= 0 ? 0 : (capacity(tier) - BASE_FE) / FE_PER_BLOCK;
@@ -54,8 +67,11 @@ public class DroneCrateItem extends Item {
         return BASE_FE + (int) Math.ceil(distance * FE_PER_BLOCK);
     }
 
-    /** 中身の入った（梱包済みの）箱か。 */
+    /** 中身の入った（梱包済みの）箱か。液体カプセルは液体が入っていれば梱包済み。 */
     public static boolean packed(ItemStack stack) {
+        if (stack.getItem() instanceof FluidCapsuleItem) {
+            return !FluidCapsuleItem.fluid(stack).isEmpty();
+        }
         ItemContainerContents c = stack.get(DataComponents.CONTAINER);
         return tier(stack) > 0 && c != null && c.nonEmptyItems().iterator().hasNext();
     }

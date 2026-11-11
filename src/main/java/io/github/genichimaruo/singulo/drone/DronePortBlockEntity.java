@@ -62,7 +62,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     public static final double WAIT_LIFT = 0.5;
 
     /** GUI に送る値。 */
-    public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_COST = 3, D_PROBLEM = 4, D_SIDES = 5, D_AUTO = 6, D_CRATE_SIDES = 7, COUNT = 8;
+    public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_COST = 3, D_PROBLEM = 4, D_SIDES = 5, D_AUTO = 6, D_CRATE_SIDES = 7;
+    /** 液体のポートだけ: 送るタンク・受け取りのタンクの液体（登録番号 + 1。空なら 0）と量（mB）。 */
+    public static final int D_SEND_FLUID = 8, D_SEND_AMOUNT = 9, D_RECV_FLUID = 10, D_RECV_AMOUNT = 11, COUNT = 12;
     /** 面の設定の種類: 荷物（入出力と自動排出）と、空き箱の搬入出（空き箱の欄だけ）。 */
     public static final int CHANNEL_ITEMS = 0, CHANNEL_CRATES = 1;
     /**
@@ -99,10 +101,10 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == SLOT_CRATES) {
-                return DroneCrateItem.tier(stack) > 0 && !DroneCrateItem.packed(stack);
+                return acceptsCrate(stack);
             }
             if (slot < SLOT_ARRIVED) {
-                return DroneCrateItem.mayCarry(stack);
+                return acceptsCargo(stack);
             }
             return true;                                   // 着荷箱・受け取りへはポート自身が入れる（外からは入れられない）
         }
@@ -111,9 +113,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     @Nullable
     private UUID owner;
     private String name = "";
-    /** 選んでいる行き先。 */
+    /** 選んでいる行き先と、その次元（null はこの次元。別の次元はワームホール便 {@link WormholeRelay}）。 */
     @Nullable
     private BlockPos destination;
+    @Nullable
+    private net.minecraft.resources.ResourceKey<Level> destinationDim, stagedDim, autoDim;
     /** 積み込み待ちの梱包済みの箱と、その行き先・払った電力・受け持つ便（まだなら 0）。 */
     private ItemStack staged = ItemStack.EMPTY;
     @Nullable
@@ -124,6 +128,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     private int anim;
     private long animStart;
     private int animTier;
+    /** 台に載る箱そのもの（液体カプセルの中身の色を描くため。描画用の写し）。 */
+    private ItemStack animCrate = ItemStack.EMPTY;
     private long animFlight;
     private boolean handed;
     /** 面ごとの搬入出と自動排出（受け取りの欄と、空き箱の欄に入りきらなかった空の箱を押し出す）。 */
@@ -157,17 +163,131 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         case D_ENERGY -> energy.getEnergyStored();
         case D_CAPACITY -> energy.getMaxEnergyStored();
         case D_STATUS -> status();
-        case D_COST -> destination == null ? 0 : DroneCrateItem.cost(Math.sqrt(destination.distSqr(worldPosition)));
+        case D_COST -> destination == null ? 0 : Math.max(0, DroneCrateItem.cost(Math.max(0, distanceTo(destination, destinationDim))));
         case D_PROBLEM -> currentProblem();
         case D_SIDES -> sides.packed();
         case D_AUTO -> autoMode;
         case D_CRATE_SIDES -> crateSides.packed();
-        default -> 0;
+        default -> fluidData(i);
     });
 
     public DronePortBlockEntity(BlockPos pos, BlockState state) {
-        super(SinguloBlockEntities.DRONE_PORT.get(), pos, state);
+        this(SinguloBlockEntities.DRONE_PORT.get(), pos, state);
     }
+
+    protected DronePortBlockEntity(net.minecraft.world.level.block.entity.BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
+
+    // ------------------------------------------------------------------ 物と液体で変わるところ（液体のポートが上書きする）
+
+    /** 液体のポートか（行き先は同じ種類のポートだけ）。 */
+    public boolean fluidPort() {
+        return false;
+    }
+
+    /** 空き箱の欄に入れられる箱（物のポートは梱包箱、液体のポートは液体カプセル）。 */
+    protected boolean acceptsCrate(ItemStack stack) {
+        return DroneCrateItem.tier(stack) > 0 && !DroneCrateItem.packed(stack) && !DroneCrateItem.isFluid(stack);
+    }
+
+    /** 荷物の欄に入れられる物。 */
+    protected boolean acceptsCargo(ItemStack stack) {
+        return DroneCrateItem.mayCarry(stack);
+    }
+
+    /** 送る荷物があるか。 */
+    protected boolean hasCargo() {
+        for (int i = 0; i < CARGO; i++) {
+            if (!items.getStackInSlot(SLOT_CARGO + i).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 荷物を空き箱1つ（crate）に詰めて、梱包済みの箱を返す（荷物はここで取り出す）。 */
+    protected ItemStack packCargo(ItemStack crate) {
+        List<ItemStack> cargo = new ArrayList<>();
+        for (int i = 0; i < CARGO; i++) {
+            cargo.add(items.getStackInSlot(SLOT_CARGO + i).copy());
+            items.setStackInSlot(SLOT_CARGO + i, ItemStack.EMPTY);
+        }
+        return DroneCrateItem.pack(crate, cargo);
+    }
+
+    /**
+     * 取り消し: 梱包済みの箱の中身を荷物の欄へ戻せるか（simulate）、戻す。全部が入るときだけ戻す。
+     * 戻す先は空の欄だけ（途中で入れ直されていても混ぜない）。
+     */
+    protected boolean restoreCargo(ItemStack packed, boolean simulate) {
+        NonNullList<ItemStack> contents = DroneCrateItem.contents(packed);
+        int free = 0;
+        for (int i = 0; i < CARGO; i++) {
+            free += items.getStackInSlot(SLOT_CARGO + i).isEmpty() ? 1 : 0;
+        }
+        long need = contents.stream().filter(s -> !s.isEmpty()).count();
+        if (free < need) {
+            return false;
+        }
+        if (!simulate) {
+            int slot = SLOT_CARGO;
+            for (ItemStack s : contents) {
+                if (s.isEmpty()) {
+                    continue;
+                }
+                while (!items.getStackInSlot(slot).isEmpty()) {
+                    slot++;
+                }
+                items.setStackInSlot(slot, s);
+            }
+        }
+        return true;
+    }
+
+    /** 着荷箱の欄の梱包済みの箱1つ（slot）を、入る分だけ開ける。 */
+    protected void unpackOne(int slot, ItemStack crate) {
+        NonNullList<ItemStack> contents = DroneCrateItem.contents(crate);
+        boolean moved = false;
+        for (int i = 0; i < contents.size(); i++) {
+            ItemStack s = contents.get(i);
+            for (int r = 0; r < RECEIVE && !s.isEmpty(); r++) {
+                ItemStack before = s;
+                s = items.insertItem(SLOT_RECEIVE + r, s, false);
+                moved |= s.getCount() != before.getCount();
+            }
+            contents.set(i, s);
+        }
+        if (moved) {
+            ItemStack next = crate.copy();
+            DroneCrateItem.setContents(next, contents);
+            items.setStackInSlot(slot, next);
+        }
+    }
+
+    /** 自動発送のしきい値までたまっているか（AUTO_THRESHOLDS の番号 mode）。 */
+    protected boolean autoReady(int mode) {
+        int threshold = AUTO_THRESHOLDS[mode];
+        if (threshold == 0) {
+            return false;
+        }
+        int total = 0;
+        boolean full = true;
+        for (int i = 0; i < CARGO; i++) {
+            ItemStack s = items.getStackInSlot(SLOT_CARGO + i);
+            total += s.getCount();
+            full &= !s.isEmpty() && s.getCount() >= s.getMaxStackSize();
+        }
+        return threshold == AUTO_FULL ? full : total >= threshold;
+    }
+
+    /** GUI に送る液体の値（物のポートは 0）。 */
+    protected int fluidData(int index) {
+        return 0;
+    }
+
+    /** 自動排出の面ごとに、物のほかに押し出すもの（液体のポートは受け取りのタンクの液体）。 */
+    protected void ejectExtra(ServerLevel level, Direction dir) {}
 
     // ------------------------------------------------------------------ 中身
 
@@ -304,18 +424,77 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         return animTier;
     }
 
+    /** 台に載っている（載る）箱（クライアントの描画用）。 */
+    public ItemStack animCrate() {
+        return animCrate;
+    }
+
     // ------------------------------------------------------------------ 発送
 
     /** 行き先を選ぶ（一覧の番号。一覧は DronePortMenu が開いたときに作る）。 */
     public void select(@Nullable BlockPos to) {
+        select(to, null);
+    }
+
+    /** 行き先を選ぶ（dim が null かこの次元ならふつうの便、別の次元ならワームホール便）。 */
+    public void select(@Nullable BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
         destination = to;
+        destinationDim = dim == null || level != null && dim.equals(level.dimension()) ? null : dim;
         problemStale = true;
         setChanged();
     }
 
     /** 今の行き先と箱で発送できない理由（できるなら S_IDLE）。 */
     public int problem() {
-        return problem(destination);
+        return problem(destination, destinationDim);
+    }
+
+    @Nullable
+    public net.minecraft.resources.ResourceKey<Level> destinationDim() {
+        return destinationDim;
+    }
+
+    /** to までの道のり（別の次元はワームホール経由。行けなければ -1）。 */
+    public int distanceTo(BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+        if (dim == null) {
+            return (int) Math.ceil(Math.sqrt(to.distSqr(worldPosition)));
+        }
+        if (!(level instanceof ServerLevel server)) {
+            return -1;
+        }
+        WormholeRelay.Route r = WormholeRelay.route(server, owner, worldPosition, dim, to, fluidPort());
+        return r == null ? -1 : r.distance();
+    }
+
+    /** dim の to へ発送できない理由（できるなら S_IDLE）。 */
+    public int problem(@Nullable BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+        if (dim == null) {
+            return problem(to);
+        }
+        if (!(level instanceof ServerLevel server) || to == null) {
+            return S_IDLE;
+        }
+        WormholeRelay.Route route = WormholeRelay.route(server, owner, worldPosition, dim, to, fluidPort());
+        if (route == null) {
+            return S_NO_DESTINATION;
+        }
+        if (!hasCargo()) {
+            return S_NO_CARGO;
+        }
+        int tier = DroneCrateItem.tier(items.getStackInSlot(SLOT_CRATES));
+        if (tier == 0) {
+            return S_NO_CRATE;
+        }
+        if (route.distance() > DroneCrateItem.range(tier)) {
+            return S_OUT_OF_RANGE;
+        }
+        if (energy.getEnergyStored() < DroneCrateItem.cost(route.distance())) {
+            return S_NO_ENERGY;
+        }
+        if (!dronesAvailable(server, false) || !WormholeRelay.dronesThere(server, route, owner)) {
+            return S_NO_DRONE;
+        }
+        return S_IDLE;
     }
 
     /** to へ発送できない理由（できるなら S_IDLE）。 */
@@ -324,14 +503,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return S_IDLE;
         }
         DroneNetwork.Port target = to == null ? null : DroneNetwork.get(server).port(to);
-        if (target == null || !java.util.Objects.equals(target.owner(), owner) || to.equals(worldPosition)) {
+        if (target == null || !java.util.Objects.equals(target.owner(), owner) || to.equals(worldPosition)
+                || target.fluid() != fluidPort()) {
             return S_NO_DESTINATION;
         }
-        boolean cargo = false;
-        for (int i = 0; i < CARGO; i++) {
-            cargo |= !items.getStackInSlot(SLOT_CARGO + i).isEmpty();
-        }
-        if (!cargo) {
+        if (!hasCargo()) {
             return S_NO_CARGO;
         }
         int tier = DroneCrateItem.tier(items.getStackInSlot(SLOT_CRATES));
@@ -364,7 +540,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     /** テスト用: 今の荷物を to 行きに梱包して積み込み待ちにし、便 flight を受け持たせる（ドローンの呼び出しを省く）。 */
     public void stageForTest(BlockPos to, long flight) {
-        if (pack(to)) {
+        if (pack(to, null)) {
             flightId = flight;
         }
     }
@@ -379,21 +555,21 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         }
         cachedProblem = problem();
         problemAt = level == null ? 0 : level.getGameTime();
-        return cachedProblem == S_IDLE && pack(destination);
+        return cachedProblem == S_IDLE && pack(destination, destinationDim);
     }
 
     /** 荷物と空き箱1つを to 行きに梱包する（発送できるのは確かめてある）。 */
-    private boolean pack(BlockPos to) {
-        int cost = DroneCrateItem.cost(Math.sqrt(to.distSqr(worldPosition)));
-        List<ItemStack> cargo = new ArrayList<>();
-        for (int i = 0; i < CARGO; i++) {
-            cargo.add(items.getStackInSlot(SLOT_CARGO + i).copy());
-            items.setStackInSlot(SLOT_CARGO + i, ItemStack.EMPTY);
+    private boolean pack(BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+        int distance = distanceTo(to, dim);
+        if (distance < 0) {
+            return false;
         }
+        int cost = DroneCrateItem.cost(distance);
         ItemStack crate = items.extractItem(SLOT_CRATES, 1, false);
         energy.consume(cost);
-        staged = DroneCrateItem.pack(crate, cargo);
+        staged = packCargo(crate);
         stagedTo = to;
+        stagedDim = dim;
         stagedCost = cost;
         flightId = 0;
         if (level != null) {
@@ -414,6 +590,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         return autoTo;
     }
 
+    @Nullable
+    public net.minecraft.resources.ResourceKey<Level> autoDim() {
+        return autoDim;
+    }
+
     /** しきい値を次へ（しない → 1個 → 64個 → 256個 → 満杯 → しない）。 */
     public void cycleAuto() {
         autoMode = (autoMode + 1) % AUTO_THRESHOLDS.length;
@@ -424,24 +605,23 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     public void registerAuto() {
         if (destination != null) {
             autoTo = destination;
+            autoDim = destinationDim;
             setChanged();
         }
     }
 
     /** 荷物がしきい値までたまっているか。 */
     private boolean autoReady() {
-        int threshold = AUTO_THRESHOLDS[autoMode];
-        if (threshold == 0) {
-            return false;
+        return autoReady(autoMode);
+    }
+
+    /** 荷物が最後に変わった時刻を今にする（液体のポートのタンクが変わったとき）。 */
+    protected void cargoChanged() {
+        problemStale = true;
+        if (level != null) {
+            cargoChangedAt = level.getGameTime();
         }
-        int total = 0;
-        boolean full = true;
-        for (int i = 0; i < CARGO; i++) {
-            ItemStack s = items.getStackInSlot(SLOT_CARGO + i);
-            total += s.getCount();
-            full &= !s.isEmpty() && s.getCount() >= s.getMaxStackSize();
-        }
-        return threshold == AUTO_FULL ? full : total >= threshold;
+        setChanged();
     }
 
     /** 自動発送: たまっていて、少し待っても増えなければ（満杯なら待たずに）、登録した行き先へ送る。 */
@@ -453,8 +633,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (!full && now - cargoChangedAt < AUTO_SETTLE) {
             return;
         }
-        if (problem(autoTo) == S_IDLE) {
-            pack(autoTo);
+        if (problem(autoTo, autoDim) == S_IDLE) {
+            pack(autoTo, autoDim);
             problemStale = true;
         }
     }
@@ -467,28 +647,12 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (staged.isEmpty() || anim == ANIM_LOAD || !(level instanceof ServerLevel server)) {
             return false;
         }
-        NonNullList<ItemStack> contents = DroneCrateItem.contents(staged);
-        ItemStack crate = staged.copy();
-        DroneCrateItem.setContents(crate, List.of());
-        // 入りきるか先に確かめる（入れる先は空の欄だけ。途中で入れ直されていても混ぜない）
-        int free = 0;
-        for (int i = 0; i < CARGO; i++) {
-            free += items.getStackInSlot(SLOT_CARGO + i).isEmpty() ? 1 : 0;
-        }
-        long need = contents.stream().filter(s -> !s.isEmpty()).count();
-        if (free < need || !items.insertItem(SLOT_CRATES, crate, true).isEmpty()) {
+        ItemStack crate = emptied(staged);
+        // 入りきるか先に確かめる
+        if (!restoreCargo(staged, true) || !items.insertItem(SLOT_CRATES, crate, true).isEmpty()) {
             return false;
         }
-        int slot = SLOT_CARGO;
-        for (ItemStack s : contents) {
-            if (s.isEmpty()) {
-                continue;
-            }
-            while (!items.getStackInSlot(slot).isEmpty()) {
-                slot++;
-            }
-            items.setStackInSlot(slot, s);
-        }
+        restoreCargo(staged, false);
         items.insertItem(SLOT_CRATES, crate, false);
         // 払った電力をそのまま戻す（蓄電が満杯近くでも捨てない。容量を超えた分を使い切るまで受電しない）
         energy.restoreEnergy(energy.getEnergyStored() + stagedCost);
@@ -499,10 +663,22 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         }
         staged = ItemStack.EMPTY;
         stagedTo = null;
+        stagedDim = null;
         stagedCost = 0;
         flightId = 0;
         changedVisible();
         return true;
+    }
+
+    /** 梱包済みの箱から中身を除いた、空の箱。 */
+    static ItemStack emptied(ItemStack packed) {
+        ItemStack crate = packed.copy();
+        if (DroneCrateItem.isFluid(crate)) {
+            FluidCapsuleItem.setFluid(crate, net.neoforged.neoforge.fluids.FluidStack.EMPTY);
+        } else {
+            DroneCrateItem.setContents(crate, List.of());
+        }
+        return crate;
     }
 
     /** 便を帰りの段階にする。 */
@@ -521,20 +697,22 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return animFlight == f.id;
         }
         if (f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.from) && flightId == f.id && !staged.isEmpty()) {
-            begin(ANIM_LOAD, f, DroneCrateItem.tier(staged));
+            begin(ANIM_LOAD, f, staged);
             return true;
         }
         if (f.stage == DroneNetwork.DELIVER && worldPosition.equals(f.to) && !f.crate.isEmpty() && freeArrival() >= 0) {
-            begin(ANIM_UNLOAD, f, DroneCrateItem.tier(f.crate));
+            begin(ANIM_UNLOAD, f, f.crate);
             return true;
         }
         return false;
     }
 
-    private void begin(int kind, DroneNetwork.Flight f, int tier) {
+    private void begin(int kind, DroneNetwork.Flight f, ItemStack crate) {
         anim = kind;
         animStart = level.getGameTime();
-        animTier = tier;
+        animTier = DroneCrateItem.displayTier(crate);
+        // 中身の色を描く液体カプセルだけ写す（梱包箱は段階の絵で描くので、中身をクライアントへ送らない）
+        animCrate = DroneCrateItem.isFluid(crate) ? crate.copy() : ItemStack.EMPTY;
         animFlight = f.id;
         handed = false;
         level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.hatch_open"), SoundSource.BLOCKS, 0.8F, 1.0F);
@@ -563,7 +741,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         DroneNetwork net = DroneNetwork.get(level);
         long now = level.getGameTime();
         if (now % 40 == 0) {
-            net.putPort(worldPosition, owner, name);        // 網に載せておく（置き直し・読み込み直しのとき）
+            net.putPort(worldPosition, owner, name, fluidPort());        // 網に載せておく（置き直し・読み込み直しのとき）
         }
         tickAnim(level, net, now);
         tickOutgoing(level, net, now);
@@ -727,6 +905,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 continue;
             }
             Direction dir = SideConfig.directionOf(facing, f);
+            if (cargo) {
+                ejectExtra(level, dir);
+            }
             IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                     worldPosition.relative(dir), dir.getOpposite());
             if (dest == null) {
@@ -822,6 +1003,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 f.crate = staged;
                 staged = ItemStack.EMPTY;
                 stagedTo = null;
+                stagedDim = null;
                 stagedCost = 0;
                 flightId = 0;
             } else {
@@ -852,7 +1034,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return;
         }
         DroneNetwork.Flight f = flightId == 0 ? null : net.flight(flightId);
-        if (stagedTo != null && net.port(stagedTo) == null && anim != ANIM_LOAD) {
+        if (stagedDim == null && stagedTo != null && net.port(stagedTo) == null && anim != ANIM_LOAD) {
             // 行き先のポートが壊された: 積む前なら取り消して荷物と電力を戻す。入りきらなければ、ドローンを帰して箱をここに
             // 置いておく（取消を押せば、空けたあとで戻せる。積んで、ない行き先へ飛ばすことはしない）
             if (!cancel()) {
@@ -873,7 +1055,18 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             }
             // ドローンを呼ぶのは周りのステーションを調べるので重い。全機が運んでいる間も続くので、1秒に1回にする
             if (now % CALL_TICKS == 0 && stagedTo != null) {
-                f = DroneStationBlockEntity.call(level, worldPosition, owner, stagedTo);
+                if (stagedDim != null) {
+                    // ワームホール便: こちらの口へ届ける便にして、最終の行き先を便に持たせる（道がなければ待つ）
+                    WormholeRelay.Route route = WormholeRelay.route(level, owner, worldPosition, stagedDim, stagedTo, fluidPort());
+                    f = route == null ? null : DroneStationBlockEntity.call(level, worldPosition, owner, route.mouthHere());
+                    if (f != null) {
+                        f.relayDim = stagedDim;
+                        f.relayTo = stagedTo;
+                        net.changed();
+                    }
+                } else {
+                    f = DroneStationBlockEntity.call(level, worldPosition, owner, stagedTo);
+                }
                 if (f != null) {
                     flightId = f.id;
                     changedVisible();
@@ -889,6 +1082,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             f.crate = staged;
             staged = ItemStack.EMPTY;
             stagedTo = null;
+            stagedDim = null;
             stagedCost = 0;
             flightId = 0;
             net.advance(f, DroneNetwork.DELIVER, now);
@@ -933,22 +1127,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                 }
                 continue;
             }
-            NonNullList<ItemStack> contents = DroneCrateItem.contents(crate);
-            boolean moved = false;
-            for (int i = 0; i < contents.size(); i++) {
-                ItemStack s = contents.get(i);
-                for (int r = 0; r < RECEIVE && !s.isEmpty(); r++) {
-                    ItemStack before = s;
-                    s = items.insertItem(SLOT_RECEIVE + r, s, false);
-                    moved |= s.getCount() != before.getCount();
-                }
-                contents.set(i, s);
-            }
-            if (moved) {
-                ItemStack next = crate.copy();
-                DroneCrateItem.setContents(next, contents);
-                items.setStackInSlot(SLOT_ARRIVED + a, next);
-            }
+            unpackOne(SLOT_ARRIVED + a, crate);
         }
     }
 
@@ -963,15 +1142,16 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             player.displayClientMessage(Component.translatable("gui.singulo.drone_port.locked"), true);
             return;
         }
-        List<BlockPos> targets = DroneNetwork.get((ServerLevel) level).portsOf(owner, worldPosition);
-        DroneNetwork net = DroneNetwork.get((ServerLevel) level);
+        List<Target> targets = menuTargets();
         player.openMenu(this, buf -> {
             buf.writeBlockPos(worldPosition);
+            buf.writeBoolean(fluidPort());
             buf.writeVarInt(targets.size());
-            for (BlockPos p : targets) {
-                buf.writeBlockPos(p);
-                DroneNetwork.Port info = net.port(p);
-                buf.writeUtf(info == null ? "" : info.name());
+            for (Target t : targets) {
+                buf.writeBlockPos(t.pos());
+                buf.writeUtf(t.name());
+                buf.writeUtf(t.dim());
+                buf.writeVarInt(t.distance());
             }
         });
     }
@@ -983,13 +1163,30 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        List<BlockPos> targets = level instanceof ServerLevel server ? DroneNetwork.get(server).portsOf(owner, worldPosition) : List.of();
-        List<String> names = new ArrayList<>();
-        for (BlockPos p : targets) {
-            DroneNetwork.Port info = level instanceof ServerLevel server ? DroneNetwork.get(server).port(p) : null;
-            names.add(info == null ? "" : info.name());
+        List<Target> targets = menuTargets();
+        return new DronePortMenu(id, inventory, worldPosition, items, data, targets.stream().map(Target::pos).toList(),
+                targets.stream().map(Target::name).toList(), targets.stream().map(Target::dim).toList(),
+                targets.stream().map(Target::distance).toList(), fluidPort());
+    }
+
+    /** 画面の行き先の1行: 位置・次元（"" はこの次元）・名前・道のり。 */
+    private record Target(BlockPos pos, String dim, String name, int distance) {}
+
+    /** 画面の行き先: この次元の同じ種類のポート（近い順）と、ワームホールの先のポート（近い順）。 */
+    private List<Target> menuTargets() {
+        List<Target> out = new ArrayList<>();
+        if (!(level instanceof ServerLevel server)) {
+            return out;
         }
-        return new DronePortMenu(id, inventory, worldPosition, items, data, targets, names);
+        DroneNetwork net = DroneNetwork.get(server);
+        for (BlockPos p : net.portsOf(owner, worldPosition, fluidPort())) {
+            DroneNetwork.Port info = net.port(p);
+            out.add(new Target(p, "", info == null ? "" : info.name(), (int) Math.ceil(Math.sqrt(p.distSqr(worldPosition)))));
+        }
+        for (WormholeRelay.Route r : WormholeRelay.routes(server, owner, worldPosition, fluidPort())) {
+            out.add(new Target(r.to(), r.dim().location().toString(), r.name(), r.distance()));
+        }
+        return out;
     }
 
     /** 壊されたら: 中身を落とす。積み込み待ちは梱包済みの箱のまま落とし、ここへ向かう便は発送元へ戻す。 */
@@ -1038,7 +1235,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
             if (level instanceof ServerLevel server) {
-                DroneNetwork.get(server).putPort(worldPosition, owner, name);
+                DroneNetwork.get(server).putPort(worldPosition, owner, name, fluidPort());
             }
         }
     }
@@ -1047,7 +1244,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     public void onLoad() {
         super.onLoad();
         if (level instanceof ServerLevel server) {
-            DroneNetwork.get(server).putPort(worldPosition, owner, name);
+            DroneNetwork.get(server).putPort(worldPosition, owner, name, fluidPort());
         }
     }
 
@@ -1072,14 +1269,32 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         tag.putInt("sides", sides.packed());
         tag.putInt("crate_sides", crateSides.packed());
         tag.putInt("auto", autoMode);
+        putDim(tag, "destination_dim", destinationDim);
+        putDim(tag, "staged_dim", stagedDim);
+        putDim(tag, "auto_dim", autoDim);
         if (autoTo != null) {
             tag.put("auto_to", NbtUtils.writeBlockPos(autoTo));
         }
-        saveVisible(tag);
+        saveVisible(tag, registries);
+    }
+
+    private static void putDim(CompoundTag tag, String key, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+        if (dim != null) {
+            tag.putString(key, dim.location().toString());
+        }
+    }
+
+    @Nullable
+    private static net.minecraft.resources.ResourceKey<Level> readDim(CompoundTag tag, String key) {
+        if (!tag.contains(key)) {
+            return null;
+        }
+        var loc = net.minecraft.resources.ResourceLocation.tryParse(tag.getString(key));
+        return loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 
     /** クライアントにも送るもの（名前・持ち主・扉の動き）。 */
-    private void saveVisible(CompoundTag tag) {
+    private void saveVisible(CompoundTag tag, HolderLookup.Provider registries) {
         if (owner != null) {
             tag.putUUID("owner", owner);
         }
@@ -1087,6 +1302,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         tag.putInt("anim", anim);
         tag.putLong("anim_start", animStart);
         tag.putInt("anim_tier", animTier);
+        if (!animCrate.isEmpty()) {
+            tag.put("anim_crate", animCrate.save(registries));
+        }
         tag.putLong("anim_flight", animFlight);
         tag.putBoolean("handed", handed);
     }
@@ -1094,7 +1312,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        saveVisible(tag);
+        saveVisible(tag, registries);
         return tag;
     }
 
@@ -1118,6 +1336,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             destination = NbtUtils.readBlockPos(tag, "destination").orElse(null);
             autoMode = Math.floorMod(tag.getInt("auto"), AUTO_THRESHOLDS.length);
             autoTo = NbtUtils.readBlockPos(tag, "auto_to").orElse(null);
+            destinationDim = readDim(tag, "destination_dim");
+            stagedDim = readDim(tag, "staged_dim");
+            autoDim = readDim(tag, "auto_dim");
             if (tag.contains("crate_sides")) {
                 crateSides.setPacked(tag.getInt("crate_sides"));
             }
@@ -1130,6 +1351,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         anim = tag.getInt("anim");
         animStart = tag.getLong("anim_start");
         animTier = tag.getInt("anim_tier");
+        animCrate = tag.contains("anim_crate") ? ItemStack.parse(registries, tag.getCompound("anim_crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
         animFlight = tag.getLong("anim_flight");
         handed = tag.getBoolean("handed");
     }

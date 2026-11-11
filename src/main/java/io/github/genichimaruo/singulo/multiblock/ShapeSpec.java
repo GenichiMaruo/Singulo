@@ -63,6 +63,8 @@ public final class ShapeSpec {
     /** 外装板として使うブロック（初めて判定するときに設計図から集める。登録が済む前には作れないため）。 */
     @Nullable
     private java.util.Set<Block> panelBlocks;
+    /** 外装板の位置にコラプサー内張りを置けるか（加工が速くなる設備だけ。{@link CollapsarLining}）。 */
+    private boolean lining;
 
     public ShapeSpec(int width, int height, int depth, int cx, int cy, int cz, Layout layout) {
         this.width = width;
@@ -72,6 +74,44 @@ public final class ShapeSpec {
         this.cy = cy;
         this.cz = cz;
         this.layout = layout;
+    }
+
+    /** 外装板の位置にコラプサー内張りを置けるようにする（設計図を作るときに呼ぶ）。 */
+    public ShapeSpec allowLining() {
+        lining = true;
+        return this;
+    }
+
+    public boolean acceptsLining() {
+        return lining;
+    }
+
+    /** コラプサー内張りを置ける位置（外装板の位置。内張りを受け付けない形なら空）。 */
+    public List<BlockPos> liningSlots(BlockPos controller, Direction back) {
+        return lining ? panelSlots(controller, back) : new ArrayList<>();
+    }
+
+    /** 外装板の位置（マルチブロック搬入出ポートに替えられる。内張りを受け付ける形なら内張りにも）。 */
+    public List<BlockPos> panelSlots(BlockPos controller, Direction back) {
+        List<BlockPos> out = new ArrayList<>();
+        for (int[] c : cells()) {
+            Slot slot = layout.at(c[0], c[1], c[2]);
+            if (effectiveKind(slot) == Kind.PANEL) {
+                out.add(pos(controller, back, c[0], c[1], c[2]));
+            }
+        }
+        return out;
+    }
+
+    /** 形成できている形の、コラプサー内張りの数（読み込まれていない位置は数えない）。 */
+    public int countLinings(Level level, BlockPos controller, Direction back) {
+        int n = 0;
+        for (BlockPos p : liningSlots(controller, back)) {
+            if (level.isLoaded(p) && level.getBlockState(p).is(SinguloBlocks.COLLAPSAR_LINING.get())) {
+                n++;
+            }
+        }
+        return n;
     }
 
     public int width() {
@@ -217,6 +257,9 @@ public final class ShapeSpec {
             boolean ok = switch (effectiveKind(slot)) {
                 case PART -> s.is(slot.block().get());
                 case PANEL -> {
+                    if (lining && s.is(SinguloBlocks.COLLAPSAR_LINING.get())) {
+                        yield true;
+                    }
                     if (s.is(SinguloBlocks.MULTIBLOCK_PORT.get()) || (s.is(SinguloBlocks.WORMHOLE_GENERATOR_PORT.get())
                             && slot.block().get() == SinguloBlocks.WORMHOLE_GENERATOR_SHELL.get())) {
                         ports.add(p.immutable());

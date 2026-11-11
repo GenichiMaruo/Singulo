@@ -1,0 +1,134 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/horizon_duct_full",
+    "c": "singulo:block/horizon_duct",
+    "g": "singulo:block/horizon_duct_glass",
+    "f": "singulo:block/horizon_duct_flange",
+    "r": "singulo:block/horizon_duct_rim",
+    "j": "singulo:block/horizon_duct_joint"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        2,
+        2,
+        0
+      ],
+      "to": [
+        14,
+        14,
+        1
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#f"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#f"
+        },
+        "east": {
+          "uv": [
+            0,
+            2,
+            1,
+            14
+          ],
+          "texture": "#r"
+        },
+        "west": {
+          "uv": [
+            0,
+            2,
+            1,
+            14
+          ],
+          "texture": "#r"
+        },
+        "up": {
+          "uv": [
+            2,
+            0,
+            14,
+            1
+          ],
+          "texture": "#r"
+        },
+        "down": {
+          "uv": [
+            2,
+            0,
+            14,
+            1
+          ],
+          "texture": "#r"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        3,
+        1
+      ],
+      "to": [
+        13,
+        13,
+        2
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            1,
+            3,
+            2,
+            13
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            1,
+            3,
+            2,
+            13
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            1,
+            3,
+            2,
+            13
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            1,
+            3,
+            2,
+            13
+          ],
+          "texture": "#c",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

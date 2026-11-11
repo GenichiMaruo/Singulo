@@ -120,7 +120,12 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
 
     @Override
     protected Component statusText() {
-        return Component.translatable("gui.singulo.drone_port.status." + portStatus());
+        int s = portStatus();
+        // 液体のポートは、箱と荷物の言い方だけ変える（カプセル・液体）
+        if (menu.fluid() && (s == DronePortBlockEntity.S_NO_CRATE || s == DronePortBlockEntity.S_NO_CARGO || s == DronePortBlockEntity.S_OUT_OF_RANGE)) {
+            return Component.translatable("gui.singulo.fluid_drone_port.status." + s);
+        }
+        return Component.translatable("gui.singulo.drone_port.status." + s);
     }
 
     private int crateTier() {
@@ -419,15 +424,15 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     private void drawCargo(GuiGraphics g) {
         int x = leftPos;
         int y = topPos;
-        var crate = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("packing_crate")));
+        var crate = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(menu.fluid() ? "fluid_capsule" : "packing_crate")));
         for (int i = 0; i < DronePortBlockEntity.SLOTS; i++) {
             var s = menu.getSlot(i);
             if (i == DronePortBlockEntity.SLOT_CRATES) {
                 ghostSlot(g, x + s.x, y + s.y, s, crate);
                 if (!s.hasItem()) {
-                    area(s.x, s.y, 16, 16, List.of(Component.translatable("gui.singulo.drone_port.crates")));
+                    area(s.x, s.y, 16, 16, List.of(Component.translatable(menu.fluid() ? "gui.singulo.fluid_drone_port.crates" : "gui.singulo.drone_port.crates")));
                 }
-            } else {
+            } else if (s.isActive()) {
                 Panel.slot(g, skin, x + s.x, y + s.y);
             }
         }
@@ -435,13 +440,42 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         Panel.icon(g, x + DronePortMenu.ARROW_X, y + DronePortMenu.ARRIVED_Y + 18 + 4, Panel.Icon.OUT, skin.dim());
         area(DronePortMenu.ARRIVED_X - 1, DronePortMenu.ARRIVED_Y - 1, 18, 3 * 18,
                 List.of(Component.translatable("gui.singulo.drone_port.arrived")));
-        area(DronePortMenu.RECEIVE_X - 1, DronePortMenu.RECEIVE_Y - 1, 3 * 18, 3 * 18,
-                List.of(Component.translatable("gui.singulo.drone_port.receive")));
+        if (menu.fluid()) {
+            drawTank(g, DronePortMenu.CARGO_X, DronePortMenu.CARGO_Y, DronePortBlockEntity.D_SEND_FLUID, DronePortBlockEntity.D_SEND_AMOUNT,
+                    io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.SEND_CAPACITY, "gui.singulo.fluid_drone_port.send_tank");
+            drawTank(g, DronePortMenu.RECEIVE_X, DronePortMenu.RECEIVE_Y, DronePortBlockEntity.D_RECV_FLUID, DronePortBlockEntity.D_RECV_AMOUNT,
+                    io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.RECEIVE_CAPACITY, "gui.singulo.fluid_drone_port.receive_tank");
+        } else {
+            area(DronePortMenu.RECEIVE_X - 1, DronePortMenu.RECEIVE_Y - 1, 3 * 18, 3 * 18,
+                    List.of(Component.translatable("gui.singulo.drone_port.receive")));
+        }
         int cap = Math.max(1, menu.value(DronePortBlockEntity.D_CAPACITY));
         Panel.gauge(g, skin, x + DronePortMenu.ENERGY_X, y + DronePortMenu.ENERGY_Y, 6, DronePortMenu.ENERGY_H,
                 (double) menu.value(DronePortBlockEntity.D_ENERGY) / cap, Panel.GLOW);
         area(DronePortMenu.ENERGY_X, DronePortMenu.ENERGY_Y, 6, DronePortMenu.ENERGY_H,
                 Panel.energyLines(menu.value(DronePortBlockEntity.D_ENERGY), cap));
+    }
+
+    /** 液体のポートのタンク（荷物・受け取りの 3×3 の欄の場所に、同じ大きさで）。説明は液体と量。 */
+    private void drawTank(GuiGraphics g, int px, int py, int fluidIndex, int amountIndex, int capacity, String key) {
+        int w = 3 * 18 - 2, h = 3 * 18 - 2;
+        int fluidId = menu.value(fluidIndex);
+        int amount = menu.value(amountIndex);
+        int x = leftPos + px, y = topPos + py;
+        Panel.well(g, skin, x, y, w, h);
+        List<Component> tip = new ArrayList<>();
+        tip.add(Component.translatable(key));
+        if (fluidId > 0 && amount > 0) {
+            var fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
+            double fraction = (double) amount / capacity;
+            FluidGauge.draw(g, x + 1, y + 1, w - 2, h - 2, fraction, fluid);
+            int filled = (int) Math.round((h - 2) * Math.min(1, fraction));
+            Panel.glass(g, x + 1, y + 1 + h - 2 - filled, w - 2, filled);
+            tip.add(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName().copy().withStyle(st -> st.withColor(0xFFDDE6EE)));
+        }
+        tip.add(Component.translatable("gui.singulo.fluid_drone_port.amount", String.format("%,d", amount), String.format("%,d", capacity))
+                .withStyle(st -> st.withColor(0xFF8A949E)));
+        area(px, py, w, h, tip);
     }
 
     /** 行き先の一覧: 名前と距離。選んだ行は光り、今の箱で届かない行は距離が赤い。 */
@@ -471,7 +505,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 g.fill(x + 1, ry + 1, x + textW, ry + DronePortMenu.ROW_H - 1, 0x30FFFFFF);
             }
             int text = selected ? skin.onAccent() : skin.text();
-            int d = distance(to);
+            int d = i < menu.distances().size() ? menu.distances().get(i) : distance(to);
+            boolean remote = i < menu.dims().size() && !menu.dims().get(i).isEmpty();
             String dist = d + "m";
             boolean reach = range > 0 && d <= range;
             int dw = font.width(dist);
@@ -482,12 +517,20 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 Panel.autoIconSmall(g, nx, ry + 3, selected ? skin.onAccent() : 0xFF000000 | DroneStationScreen.ACCENT);
                 nx += 9;
             }
+            if (remote) {
+                // ワームホールの先の行き先の印（紫の渦）
+                g.drawString(font, "⦿", nx, ry + 3, selected ? skin.onAccent() : 0xFFB48CFF, false);
+                nx += 9;
+            }
             AndroidStationScreen.fit(g, font, placeName(menu.names().get(i), to), nx, ry + 3, x + textW - dw - 6 - nx, text);
             g.drawString(font, dist, x + textW - dw - 2, ry + 3, reach ? text : GuiSkin.BAD, false);
             List<Component> tip = new ArrayList<>();
             tip.add(placeName(menu.names().get(i), to));
             tip.add(Component.translatable("gui.singulo.drone_port.target", to.getX(), to.getY(), to.getZ()).withStyle(st -> st.withColor(0xFF8A949E)));
-            tip.add(Component.translatable("gui.singulo.drone_port.cost", DroneCrateItem.cost(Math.sqrt(to.distSqr(menu.pos())))));
+            if (remote) {
+                tip.add(Component.translatable("gui.singulo.drone_port.via_wormhole", menu.dims().get(i)).withStyle(st -> st.withColor(0xFFB48CFF)));
+            }
+            tip.add(Component.translatable("gui.singulo.drone_port.cost", DroneCrateItem.cost(d)));
             if (auto) {
                 tip.add(Component.translatable("gui.singulo.drone_port.auto.is_target").withStyle(st -> st.withColor(0xFF000000 | DroneStationScreen.ACCENT)));
             }
@@ -545,6 +588,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         int threshold = DronePortBlockEntity.AUTO_THRESHOLDS[mode];
         Component label = threshold == 0 ? Component.translatable("gui.singulo.drone_port.auto.off")
                 : threshold == DronePortBlockEntity.AUTO_FULL ? Component.translatable("gui.singulo.drone_port.auto.full")
+                : menu.fluid() ? Component.translatable("gui.singulo.fluid_drone_port.auto.amount",
+                        io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.autoThreshold(mode) / 1000)
                 : Component.translatable("gui.singulo.drone_port.auto.count", threshold);
         int[] a = autoRect();
         boolean ah = free && Panel.inside(mouseX, mouseY, a[0], a[1], a[2], a[3]);

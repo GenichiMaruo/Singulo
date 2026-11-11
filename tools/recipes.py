@@ -1021,3 +1021,13 @@ _cosmic_recipes(R, SHAPED)
 for _cosmic_name in SHAPED:
     if _cosmic_name in RECIPES and "shape" not in RECIPES[_cosmic_name]:
         RECIPES[_cosmic_name]["shape"] = SHAPED[_cosmic_name]
+
+# 0.17.0 液体パイプの段階・液体のドローン発着ポート・液体カプセル（一覧の番号がずれないよう、最後に足す）
+from logistics_content import recipes as _logistics_recipes
+_logistics_shaped = {}
+_logistics_recipes(R, _logistics_shaped)
+for _name, _shape in _logistics_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape
