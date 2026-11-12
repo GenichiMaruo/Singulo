@@ -281,7 +281,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     /** 働けるドローンが1機でもいるか（待機中・運搬中。止めた枠と解体中は数えない）。 */
     private boolean hasFleet(DroneNetwork net) {
         for (int i = 0; i < MAX_UNITS; i++) {
-            if (net.flightOf(worldPosition, i) != null || drones[i] != null && !stopped[i]) {
+            if (net.flightOf(worldPosition, i) != null || net.isAway(worldPosition, i) || drones[i] != null && !stopped[i]) {
                 return true;
             }
         }
@@ -369,7 +369,22 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         long now = level.getGameTime();
         boolean printing = false;
         for (int i = 0; i < MAX_UNITS; i++) {
+            if (net.isAway(worldPosition, i)) {
+                // ワームホールをくぐって別の次元へ出ている（便の記録は向こうの網にある）。帰ってくるまで待つ。
+                // 向こうで着いた先が読み込まれていなければ、読み込ませる（行き先のポートへ届け、帰りの口をくぐれるように）
+                ServerLevel far = now % 20 == 0 ? level.getServer().getLevel(net.awayDim(worldPosition, i)) : null;
+                DroneNetwork.Flight visiting = far == null ? null : DroneNetwork.get(far).visitor(level.dimension(), worldPosition, i);
+                if (visiting != null) {
+                    DroneWormhole.watch(far, visiting);
+                }
+                statuses[i] = S_FLYING;
+                missing[i] = 0;
+                continue;
+            }
             DroneNetwork.Flight f = net.flightOf(worldPosition, i);
+            if (f != null && now % 20 == 0) {
+                DroneWormhole.watch(level, f);            // 見えないまま口に着いたのに、口が動いていなければ読み込ませる
+            }
             if (f != null) {
                 if (f.stage == DroneNetwork.RETURN && f.arrived(now) && f.crate.isEmpty()) {
                     // 見えないまま帰ってきた: 空から待機位置へ降りてくる（出せなければ便を残して次の tick にやり直す。
@@ -488,6 +503,11 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         var kit = BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
         // ドローンは1機ごとにキットを1つ返す（帰りかけ・運搬中のものも。運搬中のドローンは届け終えたら消える）
         for (int i = 0; i < MAX_UNITS; i++) {
+            if (net.clearAway(worldPosition, i)) {
+                // 別の次元へ出ているドローン: 届け終えて口をくぐって戻ってきたとき、帰る先がないので消える
+                Block.popResource(level, worldPosition, new ItemStack(kit));
+                continue;
+            }
             DroneNetwork.Flight f = net.flightOf(worldPosition, i);
             if (f != null) {
                 if (f.stage == DroneNetwork.RETURN && f.crate.isEmpty()) {

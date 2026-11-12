@@ -30,7 +30,7 @@ def recipes(R, shaped):
     shaped['事象の地平線倉庫'] = (('PGP', 'CNC', 'PGP'), {'P': 'ニホニウム板', 'G': 'ガラス', 'C': 'コラプサー・インゴット', 'N': '核パスタ'})
     # ニホニウム板の台と柱に、コラプサーの芯、てっぺんに量子もつれ素子の灯
     R('ワームホール航路標識', 5, '作業台', {'ニホニウム板': 5, 'コラプサー・インゴット': 1, '量子もつれ素子': 1}, cat='machine',
-      note='ワームホールの両方の口のそば（4ブロック以内）に置くと、ドローンが口で荷物を受け渡して別の次元へ送る')
+      note='ワームホールの両方の口のそば（4ブロック以内）に置くと、ドローンが口をくぐって別の次元のポートへ荷物を届け、同じ口で帰ってくる')
     shaped['ワームホール航路標識'] = ((' E ', 'NCN', 'NNN'), {'E': '量子もつれ素子', 'N': 'ニホニウム板', 'C': 'コラプサー・インゴット'})
 
 
@@ -74,13 +74,13 @@ CHAPTER = ('collapsar', 'singulo:collapsar_ingot', 'コラプサーの使い道'
     ('wormhole', 'ワームホール便',
      'ワームホールの両方の口のそば（4ブロック以内）にワームホール航路標識を置くと、ドローンがその口を通って別の次元のポートへ荷物を送れます。'
      '発着ポートの行き先の一覧に、口の先の次元の同じ持ち主のポートが紫の印つきで並びます。道のりは、こちらのポートから口まで＋向こうの口からポートまでで、射程と電力もこの道のりで決まります。\n'
-     'ドローンは荷物をこちらの口まで運び、口へ入れて帰ります。向こうの口のそばのドローン・ステーション（64ブロック以内）のドローンが、口から荷物を受け取って届けます。向こう側にもステーションが要ります。\n'
-     '荷物は、運ぶドローン・口で待つ間の記録・向こうのドローンの順にいつも1か所にあり、失われません。口が閉じていたり読み込まれていないときは、ドローンは口の上で待ちます。口を壊すと、そこで待っていた荷物は梱包済みの箱のまま落ちます。',
+     'ドローンは荷物を積んでこちらの口に入り、向こうの口から出て行き先のポートへ届けます。届け終えると同じ口を通って、自分のステーションへ帰ります。向こう側にステーションは要りません。別の次元へ出ている間、ステーションの枠は「飛行中」のままです。両方の口が同じ次元にあるワームホールも、くぐるほうが近ければドローンが近道に使います（射程と電力も近道の道のりで数えます）。\n'
+     '向こうの口が読み込まれていなければ、ネザーポータルと同じく少しの間読み込ませてくぐります。口が閉じているときは、ドローンは口の上で待ちます。行きの途中で口を壊すと、荷物は発送元のポートへ戻ります。帰りの口を壊すと、ドローンは口を通らずにステーションへ帰ってきます。',
      'Wormhole delivery',
      'Place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and drones can send cargo through it to ports in another dimension. '
      'Ports on the far side with the same owner appear in the destination list with a purple mark. Distance is from your port to the mouth plus from the far mouth to the port, and range and power follow it.\n'
-     'A drone carries the crate to this mouth and passes it through. A drone from a station within 64 blocks of the far mouth picks it up and delivers it, so the far side needs a station too.\n'
-     'The cargo is always in one place: the carrying drone, the record at the mouth, then the far drone. If a mouth is closed or unloaded, drones wait above it. Breaking a mouth drops any crate waiting there.'),
+     'The drone flies into this mouth with the crate, comes out of the far mouth, and delivers to the port. Then it flies back through the same mouths to its own station, so the far side needs no station. While it is in another dimension, its station slot shows it as flying. Within one dimension, drones also take a wormhole as a shortcut when going through it is shorter, and range and power use the shorter distance.\n'
+     'If the far mouth is unloaded, it is loaded briefly, like a Nether portal, so the drone can pass. If a mouth is closed, drones wait above it. Breaking a mouth on the way out sends the crate back to the sending port. Breaking the mouth a drone needs to get home makes it fly back to its station without the wormhole.'),
 ])
 
 DESC = {
@@ -88,8 +88,8 @@ DESC = {
                   'A plate for casing positions on processing multiblocks (Degenerate Compactor, Casimir Cavity, Cryogenic Cooling Tower). Each one speeds processing by 5%, up to 2× at 20. The Holo Projector shows where it fits in gold.'),
     '事象の地平線倉庫': ('1種類の物を中の小さなブラックホールに、事実上無制限（約922京個）までしまう。手で入れる・取り出す、ホッパーやパイプで出し入れできる。壊しても中身を失わない。',
                   'Stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. Insert and take by hand, or connect hoppers and pipes. Breaking it keeps the contents.'),
-    'ワームホール航路標識': ('ワームホールの両方の口のそばに置くと、ドローンが口で荷物を受け渡し、別の次元のポートへ送る。向こう側にもドローン・ステーションが要る。',
-                    'Place one near both mouths of a wormhole and drones hand cargo through it to ports in another dimension. The far side also needs a Drone Station.'),
+    'ワームホール航路標識': ('ワームホールの両方の口のそばに置くと、ドローンが口をくぐって別の次元のポートへ荷物を届け、同じ口を通って帰ってくる。向こう側にステーションは要らない。同じ次元のワームホールも、くぐるほうが近ければ近道に使う。',
+                    'Place one near both mouths of a wormhole and drones fly through it to deliver to ports in another dimension, then return the same way. The far side needs no Drone Station. Within one dimension, drones also use it as a shortcut when that is shorter.'),
 }
 
 SUMMARY = {

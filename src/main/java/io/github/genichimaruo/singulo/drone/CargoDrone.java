@@ -62,12 +62,23 @@ public class CargoDrone extends Mob {
     private int unit;
     /** 受け持っている便（0 はなし）。ステーションが壊されても便を最後まで飛ぶため、番号で探す。 */
     private long flightId;
+    /** ワームホールをくぐって別の次元に来ているときの、ステーションのある次元（家の次元にいるときは null）。 */
+    @Nullable
+    private net.minecraft.resources.ResourceKey<Level> home;
     /** 今の区間の目的地と通り道（目的地が変わったら探し直す。保存しない）。道が見つからなければ route は null。 */
     @Nullable
     private Vec3 legGoal;
     @Nullable
     private DroneRoute route;
     private int replanAt;
+    /**
+     * 同じ次元のワームホールの近道: 今の区間の目的地（viaFor）へ向かうのに、先に入る口（via。使わないなら null）。
+     * 区間の目的地が変わったときに1回だけ決める（くぐったあとは、そのまま目的地へ）。保存しない。
+     */
+    @Nullable
+    private BlockPos via;
+    @Nullable
+    private Vec3 viaFor;
     /** 壁を抜けて飛べるか（ステーションの位相透過アップグレード。ステーションが読み込まれている間に覚える）。 */
     private boolean phase;
     private int phaseHold;
@@ -149,6 +160,7 @@ public class CargoDrone extends Mob {
             }
             d.station = f.station;
             d.unit = f.unit;
+            d.home = f.homeDim;
             d.moveTo(at.x, at.y, at.z, (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG) + 180, 0);
             d.showCrate(f.crate);
             d.flightId = f.id;
@@ -163,7 +175,41 @@ public class CargoDrone extends Mob {
         return false;
     }
 
+    /**
+     * ワームホールの口をくぐって出てきた便に、ドローンの実体を出す（口の真上から、次の目的地へ飛ぶ）。home は家の次元
+     * （別の次元に来たとき。家に帰ってきたときは null）。出せたら true。
+     */
+    static boolean emerge(ServerLevel level, DroneNetwork net, DroneNetwork.Flight f, Vec3 at,
+            @Nullable net.minecraft.resources.ResourceKey<Level> home) {
+        CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
+        if (d == null) {
+            return false;
+        }
+        d.station = f.station;
+        d.unit = f.unit;
+        d.home = home;
+        BlockPos goal = f.target();
+        float yaw = goal == null ? 0 : (float) (Mth.atan2(goal.getZ() + 0.5 - at.z, goal.getX() + 0.5 - at.x) * Mth.RAD_TO_DEG) - 90;
+        d.moveTo(at.x, at.y, at.z, yaw, 0);
+        d.yBodyRot = yaw;
+        d.yHeadRot = yaw;
+        d.showCrate(f.crate);
+        d.flightId = f.id;
+        d.phase = f.phase;
+        d.entityData.set(KIND, f.kind.ordinal());
+        level.addFreshEntity(d);
+        f.virtual = false;
+        f.drone = d.getUUID();
+        net.changed();
+        return true;
+    }
+
     // ------------------------------------------------------------------ 状態
+
+    /** ワームホールをくぐって、ステーションのない次元に来ているか。 */
+    public boolean away() {
+        return home != null;
+    }
 
     /** 受け持つステーション（壊されていても、置かれていた場所）。 */
     @Nullable
@@ -232,7 +278,7 @@ public class CargoDrone extends Mob {
 
     /** 便を受け持たずに待機しているか（ステーションが呼び出しに使う）。 */
     public boolean idle() {
-        return printed() && !dismantling() && station != null && level() instanceof ServerLevel server && flight(DroneNetwork.get(server)) == null;
+        return printed() && !dismantling() && station != null && !away() && level() instanceof ServerLevel server && flight(DroneNetwork.get(server)) == null;
     }
 
     public boolean dismantling() {
@@ -359,7 +405,7 @@ public class CargoDrone extends Mob {
         }
         DroneNetwork net = DroneNetwork.get(level);
         DroneNetwork.Flight f = flight(net);
-        if (station != null && tickCount % 20 == 0 && level.isLoaded(station) && level.getBlockEntity(station) instanceof DroneStationBlockEntity s) {
+        if (station != null && !away() && tickCount % 20 == 0 && level.isLoaded(station) && level.getBlockEntity(station) instanceof DroneStationBlockEntity s) {
             phase = s.hasPhaseUpgrade();
         } else if (f != null) {
             phase = f.phase;
@@ -383,7 +429,7 @@ public class CargoDrone extends Mob {
             }
         }
         if (f == null) {
-            if (station == null) { discard(); return; }
+            if (station == null || away()) { discard(); return; }   // 別の次元で便がなくなった: 帰る道がない
             showCrate(ItemStack.EMPTY);
             entityData.set(DOCKED, false);
             if (tickCount % 20 == 0 && level.isLoaded(station)) {
@@ -402,9 +448,25 @@ public class CargoDrone extends Mob {
             discard();
             return;
         }
+        if (DroneWormhole.crossing(f)) {
+            // ワームホール便: 口の真上まで飛んで、口をくぐる（向こうの口から出てくる）
+            entityData.set(DOCKED, false);
+            f.docked = false;
+            if (travel(level, DroneWormhole.gate(target)) && level.isLoaded(target)) {
+                if (DroneWormhole.isMouth(level, target)) {
+                    DroneWormhole.cross(level, net, f, this);
+                } else if (f.away()) {
+                    DroneWormhole.sendHome(level, net, f, target);   // 帰りの口がない: 口を通らずに家のステーションへ帰す
+                    discard();
+                } else {
+                    DroneWormhole.turnBack(net, f, level.getGameTime());   // 行きの口がない: 荷物を発送元へ戻す
+                }
+            }
+            return;
+        }
         if (f.stage == DroneNetwork.RETURN) {
             entityData.set(DOCKED, false);
-            if (flyTo(level, DroneStationBlockEntity.hover(target, unit))) {
+            if (travel(level, DroneStationBlockEntity.hover(target, unit))) {
                 net.remove(f);
             }
             return;
@@ -412,20 +474,6 @@ public class CargoDrone extends Mob {
         Vec3 over = new Vec3(target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5);
         boolean targetLoaded = level.isLoaded(target);
         DronePortBlockEntity port = targetLoaded && level.getBlockEntity(target) instanceof DronePortBlockEntity p ? p : null;
-        // ワームホール便: 口の上で荷物を向こうへ渡す（届ける段階）か、向こうから来た荷物を受け取る（取りに行く段階）
-        if (port == null && targetLoaded && WormholeRelay.isMouth(level, target)
-                && (f.stage == DroneNetwork.DELIVER && f.relayTo != null || f.stage == DroneNetwork.PICKUP && net.relayOfFlight(f.id) != null)) {
-            entityData.set(DOCKED, false);
-            f.docked = false;
-            if (flyTo(level, over.add(0, 0.6, 0))) {
-                if (f.stage == DroneNetwork.DELIVER) {
-                    WormholeRelay.handOff(level, net, f);
-                } else {
-                    WormholeRelay.pickUp(level, net, f);
-                }
-            }
-            return;
-        }
         if (port != null && port.handling(f)) {
             // 受け渡しの間は、ポートの時間に合わせて上下する（扉が動く間は高く待ち、台と同じ高さで箱を受け渡す）
             setPos(over.x, over.y + port.dockLift(), over.z);
@@ -435,7 +483,7 @@ public class CargoDrone extends Mob {
             return;
         }
         // 着いたら、扉が開き閉めする高さより上（WAIT_LIFT）で待つ
-        boolean there = flyTo(level, over.add(0, DronePortBlockEntity.WAIT_LIFT, 0));
+        boolean there = travel(level, over.add(0, DronePortBlockEntity.WAIT_LIFT, 0));
         if (f.stage == DroneNetwork.DELIVER) {
             // 届ける区間の進み（水平の距離で）
             double total = Math.sqrt(Math.pow(f.to.getX() - f.from.getX(), 2) + Math.pow(f.to.getZ() - f.from.getZ(), 2));
@@ -472,11 +520,39 @@ public class CargoDrone extends Mob {
     @Nullable
     private DroneNetwork.Flight flight(DroneNetwork net) {
         DroneNetwork.Flight f = flightId == 0 ? null : net.flight(flightId);
-        if (f == null && station != null) {
+        if (f == null && station != null && !away()) {
             f = net.flightOf(station, unit);
         }
         flightId = f == null ? 0 : f.id;
         return f;
+    }
+
+    /**
+     * 便の区間の目的地 goal へ1 tick 進む。同じ次元のワームホールをくぐるほうが近ければ（区間ごとに1回だけ決める）、先に口の真上へ
+     * 飛んで口に入り、向こうの口の真上から出て goal へ向かう。着いたら true。
+     */
+    private boolean travel(ServerLevel level, Vec3 goal) {
+        if (viaFor == null || viaFor.distanceToSqr(goal) > 0.01) {
+            viaFor = goal;
+            via = DroneWormhole.shortcut(level, position(), goal);
+        }
+        if (via == null) {
+            return flyTo(level, goal);
+        }
+        Vec3 exit = DroneWormhole.shortcutExit(level, via);
+        if (exit == null) {
+            via = null;                                   // 口が閉じた・壊れた: まっすぐ向かう
+            return flyTo(level, goal);
+        }
+        if (flyTo(level, DroneWormhole.gate(via))) {
+            DroneWormhole.shortcutEffects(level, via, exit);
+            setPos(exit.x, exit.y, exit.z);
+            setDeltaMovement(Vec3.ZERO);
+            via = null;
+            legGoal = null;                               // 出た所から道を探し直す
+            route = null;
+        }
+        return false;
     }
 
     /**
@@ -613,6 +689,9 @@ public class CargoDrone extends Mob {
         tag.putLong("flight", flightId);
         tag.putBoolean("phase", phase);
         tag.putInt("kind", entityData.get(KIND));
+        if (home != null) {
+            tag.putString("home", home.location().toString());
+        }
     }
 
     @Override
@@ -624,5 +703,7 @@ public class CargoDrone extends Mob {
         flightId = tag.getLong("flight");
         phase = tag.getBoolean("phase");
         entityData.set(KIND, DroneKind.byId(tag.getInt("kind")).ordinal());
+        var loc = tag.contains("home") ? net.minecraft.resources.ResourceLocation.tryParse(tag.getString("home")) : null;
+        home = loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 }

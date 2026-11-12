@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.drone.DroneCrateItem;
 import io.github.genichimaruo.singulo.drone.DroneNetwork;
 import io.github.genichimaruo.singulo.drone.DronePortBlockEntity;
-import io.github.genichimaruo.singulo.drone.WormholeRelay;
+import io.github.genichimaruo.singulo.drone.DroneWormhole;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
@@ -150,12 +150,30 @@ public final class CollapsarGameTests {
         return be;
     }
 
+    /** 網の中から、station の unit の便を探す（口をくぐると番号が振り直されるため）。 */
+    private static DroneNetwork.Flight flightOf(DroneNetwork net, BlockPos station) {
+        for (DroneNetwork.Flight f : net.flights()) {
+            if (station.equals(f.station) && f.unit == 0) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    /** くぐったあとに出てきたドローンの実体を片付ける（テストの外へ飛んでいかないように）。 */
+    private static void discardDrone(ServerLevel level, DroneNetwork.Flight f) {
+        if (f != null && f.drone != null && level.getEntity(f.drone) != null) {
+            level.getEntity(f.drone).discard();
+        }
+    }
+
     /**
      * ネザーとのワームホールの両方の口のそばに航路標識を置くと、発着ポートの行き先にネザーのポートが並ぶ。こちらの口に着いた便は
-     * 荷物を向こうの口のリレーに渡して帰り、向こうの便がリレーから受け取って届ける段階へ進む。口を壊すと、待っていた荷物は落ちる。
+     * 口をくぐってネザーの網の便になり（ステーションには「出ている」印）、届け終えると向こうの口をくぐって家の網の便に戻る。
+     * 口を壊すと、行きの便は発送元へ戻り、帰りの口を失った便は口を通らずに家へ帰る。
      */
     @GameTest(template = "forge", timeoutTicks = 100)
-    public static void wormholeRelayCarriesCargoAcrossDimensions(GameTestHelper h) {
+    public static void wormholeDroneCrossesToAnotherDimensionAndBack(GameTestHelper h) {
         ServerLevel here = h.getLevel();
         ServerLevel nether = here.getServer().getLevel(Level.NETHER);
         UUID owner = UUID.nameUUIDFromBytes(("relay-test" + h.absolutePos(BlockPos.ZERO)).getBytes(java.nio.charset.StandardCharsets.UTF_8));
@@ -200,47 +218,154 @@ public final class CollapsarGameTests {
             WormholeMouthBlockEntity.serverTick(nether, mouthB, b.getBlockState(), b);
             h.assertTrue(a.partner() == b && b.partner() == a, "Cross-dimensional pairing failed");
             h.assertTrue(a.droneGate() && b.droneGate(), "Beacons were not detected");
-            var routes = WormholeRelay.routes(here, owner, h.absolutePos(portA), false);
+            var routes = DroneWormhole.routes(here, owner, h.absolutePos(portA), false);
             h.assertTrue(routes.size() == 1 && routes.get(0).to().equals(portB) && routes.get(0).dim().equals(Level.NETHER),
                     "Route to the nether port missing: " + routes);
             int expected = (int) Math.ceil(Math.sqrt(h.absolutePos(portA).distSqr(a.getBlockPos())) + Math.sqrt(mouthB.distSqr(portB)));
             h.assertTrue(routes.get(0).distance() == expected, "Route distance " + routes.get(0).distance() + " != " + expected);
-            h.assertTrue(WormholeRelay.routes(here, owner, h.absolutePos(portA), true).isEmpty(), "Item port listed for fluid sending");
-            // 行き先に選ぶと、行き先は認められる（ステーションがないので「呼べるドローンがいない」）
+            h.assertTrue(DroneWormhole.routes(here, owner, h.absolutePos(portA), true).isEmpty(), "Item port listed for fluid sending");
+            // 行き先に選ぶと、行き先は認められる（こちらにステーションがないので「呼べるドローンがいない」。向こうには要らない）
             port.items().setStackInSlot(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.BATTERY_PACKING_CRATE.get()));
             port.items().setStackInSlot(DronePortBlockEntity.SLOT_CARGO, new ItemStack(Items.DIAMOND, 3));
             port.energy().setEnergy(DronePortBlockEntity.CAPACITY);
             port.select(portB, Level.NETHER);
             h.assertTrue(port.problem() == DronePortBlockEntity.S_NO_DRONE, "Remote destination not accepted: " + port.problem());
 
-            // 1本目の便: こちらの口に着いたら、荷物を向こうのリレーに渡して帰る
+            // 行き: こちらの口に着いた便は口をくぐり、ネザーの網の便として行き先へ届ける段階になる
+            BlockPos station = h.absolutePos(new BlockPos(1, 1, 6));
+            scope.defer(() -> {
+                for (DroneNetwork net : List.of(netA, netB)) {
+                    DroneNetwork.Flight left = flightOf(net, station);
+                    while (left != null) {
+                        net.remove(left);
+                        left = flightOf(net, station);
+                    }
+                }
+                netA.clearAway(station, 0);
+            });
             ItemStack crate = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.DIAMOND, 3)));
-            DroneNetwork.Flight leg1 = netA.create(h.absolutePos(new BlockPos(1, 1, 6)), 0, owner, h.absolutePos(portA), a.getBlockPos());
-            netA.advance(leg1, DroneNetwork.DELIVER, here.getGameTime());
-            leg1.crate = crate.copy();
-            leg1.relayDim = Level.NETHER;
-            leg1.relayTo = portB;
-            h.assertTrue(WormholeRelay.handOff(here, netA, leg1), "Hand-off refused");
-            h.assertTrue(leg1.crate.isEmpty() && leg1.stage == DroneNetwork.RETURN, "Leg 1 kept the crate or did not return");
-            List<DroneNetwork.Relay> waiting = netB.relaysAt(mouthB);
-            h.assertTrue(waiting.size() == 1 && waiting.get(0).to.equals(portB) && ItemStack.matches(waiting.get(0).crate, crate),
-                    "Relay not waiting at the far mouth");
-            netA.remove(leg1);
+            DroneNetwork.Flight out = netA.create(station, 0, owner, h.absolutePos(portA), a.getBlockPos());
+            netA.advance(out, DroneNetwork.DELIVER, here.getGameTime());
+            out.crate = crate.copy();
+            out.relayDim = Level.NETHER;
+            out.relayTo = portB;
+            h.assertTrue(DroneWormhole.crossing(out) && out.target().equals(a.getBlockPos()), "Outbound flight does not head for the mouth");
+            h.assertTrue(DroneWormhole.cross(here, netA, out, null), "Crossing refused");
+            DroneNetwork.Flight far = flightOf(netB, station);
+            h.assertTrue(netA.flight(out.id) == null && flightOf(netA, station) == null && netA.isAway(station, 0),
+                    "The home network kept the flight or lost the away mark");
+            h.assertTrue(far != null && far.stage == DroneNetwork.DELIVER && portB.equals(far.to) && ItemStack.matches(far.crate, crate)
+                    && here.dimension().equals(far.homeDim) && mouthB.equals(far.homeGate), "Far flight not set up: " + far);
+            discardDrone(nether, far);
 
-            // 2本目の便: 向こうの口でリレーから受け取り、届ける段階へ
-            DroneNetwork.Flight leg2 = netB.create(mouthB.offset(3, 0, 3), 0, owner, mouthB, portB);
-            waiting.get(0).flight = leg2.id;
-            h.assertTrue(WormholeRelay.pickUp(nether, netB, leg2), "Pick-up refused");
-            h.assertTrue(ItemStack.matches(leg2.crate, crate) && leg2.stage == DroneNetwork.DELIVER && netB.relaysAt(mouthB).isEmpty(),
-                    "Leg 2 did not take the crate");
-            netB.remove(leg2);
+            // 届け終えたら、帰りは向こうの口が目的地。くぐると家の網の便に戻り、ステーションへ帰る
+            far.crate = ItemStack.EMPTY;
+            netB.advance(far, DroneNetwork.RETURN, nether.getGameTime());
+            h.assertTrue(DroneWormhole.crossing(far) && mouthB.equals(far.target()), "Return does not head for the far mouth");
+            h.assertTrue(DroneWormhole.cross(nether, netB, far, null), "Crossing home refused");
+            DroneNetwork.Flight back = flightOf(netA, station);
+            h.assertTrue(flightOf(netB, station) == null && !netA.isAway(station, 0), "Far network kept the flight or the away mark stayed");
+            h.assertTrue(back != null && back.stage == DroneNetwork.RETURN && !back.away() && station.equals(back.target()),
+                    "Home flight not restored: " + back);
+            discardDrone(here, back);
+            netA.remove(back);
 
-            // 口を壊すと、待っていた荷物は梱包済みの箱のまま落ちる
-            netB.addRelay(mouthB, crate.copy(), portB, owner);
-            WormholeRelay.mouthRemoved(nether, mouthB);
-            var dropped = nether.getEntitiesOfClass(ItemEntity.class, new AABB(mouthB).inflate(2), e -> DroneCrateItem.packed(e.getItem()));
-            h.assertTrue(netB.relaysAt(mouthB).isEmpty() && dropped.size() == 1, "Waiting crate was not dropped: relays " + netB.relaysAt(mouthB).size() + " crates " + dropped.size() + " items " + nether.getEntitiesOfClass(ItemEntity.class, new AABB(mouthB).inflate(4)).size());
-            dropped.forEach(ItemEntity::discard);
+            // 口を壊す: 行きの便は発送元のポートへ戻る
+            DroneNetwork.Flight going = netA.create(station, 0, owner, h.absolutePos(portA), a.getBlockPos());
+            netA.advance(going, DroneNetwork.DELIVER, here.getGameTime());
+            going.crate = crate.copy();
+            going.relayDim = Level.NETHER;
+            going.relayTo = portB;
+            DroneWormhole.mouthRemoved(here, a.getBlockPos());
+            h.assertTrue(h.absolutePos(portA).equals(going.to) && going.relayTo == null && ItemStack.matches(going.crate, crate),
+                    "Outbound flight was not turned back to its port");
+            netA.remove(going);
+
+            // 帰りの口を壊す: 別の次元に来ていた便は、口を通らずに家のステーションへ帰る
+            DroneNetwork.Flight stranded = netB.create(station, 0, owner, mouthB, portB);
+            stranded.homeDim = here.dimension();
+            stranded.homeGate = mouthB;
+            netB.advance(stranded, DroneNetwork.RETURN, nether.getGameTime());
+            netA.markAway(station, 0, Level.NETHER);
+            DroneWormhole.mouthRemoved(nether, mouthB);
+            DroneNetwork.Flight rescued = flightOf(netA, station);
+            h.assertTrue(flightOf(netB, station) == null && !netA.isAway(station, 0) && rescued != null
+                    && rescued.stage == DroneNetwork.RETURN && rescued.virtual, "Stranded drone was not sent home");
+            h.succeed();
+        });
+    }
+
+    /**
+     * 向こうの口が読み込まれていなくても（ほかの次元はプレイヤーがいなければふつう読み込まれていない）、行き先の一覧に並び、
+     * 口に着いた便がくぐろうとすると、ネザーポータルと同じく向こうの口のまわりが読み込まれる。
+     */
+    @GameTest(template = "forge", timeoutTicks = 400)
+    public static void wormholeDroneLoadsTheUnloadedFarMouth(GameTestHelper h) {
+        ServerLevel here = h.getLevel();
+        ServerLevel nether = here.getServer().getLevel(Level.NETHER);
+        UUID owner = UUID.nameUUIDFromBytes(("far-test" + h.absolutePos(BlockPos.ZERO)).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        long pair = here.random.nextLong();
+        BlockPos base = h.absolutePos(BlockPos.ZERO);
+        // 向こうの口は、読み込まれていない遠くの場所に「置かれている」ことにする（網に場所だけ載せる）
+        BlockPos far = new BlockPos(Math.floorMod(base.getX(), 4096) + 200_000, 64, Math.floorMod(base.getZ(), 4096) + 200_000);
+        BlockPos farPort = far.offset(6, 0, 0);
+        var scope = io.github.genichimaruo.singulo.test.harness.TestScope.of(h);
+        var wormholes = io.github.genichimaruo.singulo.wormhole.WormholeNetwork.get(here.getServer());
+        wormholes.register(pair, net.minecraft.core.GlobalPos.of(Level.NETHER, far));
+        DroneNetwork netA = DroneNetwork.get(here), netB = DroneNetwork.get(nether);
+        netB.putPort(farPort, owner, "far", false);
+        BlockPos station = h.absolutePos(new BlockPos(1, 1, 6));
+        scope.defer(() -> {
+            wormholes.unregister(pair, net.minecraft.core.GlobalPos.of(Level.NETHER, far));
+            netB.removePort(farPort);
+            DroneNetwork.Flight left = flightOf(netA, station);
+            if (left != null) {
+                netA.remove(left);
+            }
+        });
+        WormholeMouthBlockEntity a = openMouth(here, h.absolutePos(new BlockPos(10, 1, 2)), pair);
+        h.setBlock(new BlockPos(10, 1, 4), SinguloBlocks.WORMHOLE_DRONE_BEACON.get());
+        h.runAtTickTime(5, () -> {
+            WormholeMouthBlockEntity.serverTick(here, a.getBlockPos(), a.getBlockState(), a);
+            h.assertFalse(nether.isLoaded(far), "Fixture expects the far mouth to be unloaded");
+            h.assertTrue(a.partner() == null && a.droneGate(), "An unloaded far mouth should still accept drones");
+            var routes = DroneWormhole.routes(here, owner, h.absolutePos(new BlockPos(2, 1, 2)), false);
+            h.assertTrue(routes.size() == 1 && routes.get(0).to().equals(farPort) && routes.get(0).mouthThere().equals(far),
+                    "Far port missing while its mouth is unloaded: " + routes);
+            DroneNetwork.Flight out = netA.create(station, 0, owner, h.absolutePos(new BlockPos(2, 1, 2)), a.getBlockPos());
+            netA.advance(out, DroneNetwork.DELIVER, here.getGameTime());
+            out.relayDim = Level.NETHER;
+            out.relayTo = farPort;
+            h.assertFalse(DroneWormhole.cross(here, netA, out, null), "Crossed without the far mouth");
+        });
+        h.succeedWhen(() -> h.assertTrue(nether.isLoaded(far), "The far mouth was not loaded"));
+    }
+
+    /**
+     * 同じ次元のワームホールでも、両方の口のそばに航路標識があり、くぐるほうが近ければドローンは近道に使う。道のり（射程と電力）も
+     * 近道で数える。標識がなければ使わない。わずかな差では寄り道しない。
+     */
+    @GameTest(template = "forge", timeoutTicks = 60)
+    public static void wormholeShortcutInTheSameDimension(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        long pair = level.random.nextLong();
+        WormholeMouthBlockEntity a = openMouth(level, h.absolutePos(new BlockPos(5, 1, 5)), pair);
+        WormholeMouthBlockEntity b = openMouth(level, h.absolutePos(new BlockPos(20, 1, 5)), pair);
+        h.runAtTickTime(5, () -> {
+            h.assertTrue(a.partner() == b && b.partner() == a, "Pair fixture not linked");
+            var from = DroneWormhole.gate(a.getBlockPos()).add(0, 0, 1);
+            var to = DroneWormhole.gate(b.getBlockPos()).add(0, 0, 1);
+            h.assertTrue(DroneWormhole.shortcut(level, from, to) == null, "Used a wormhole without beacons");
+            h.setBlock(new BlockPos(5, 1, 8), SinguloBlocks.WORMHOLE_DRONE_BEACON.get());
+            h.setBlock(new BlockPos(20, 1, 8), SinguloBlocks.WORMHOLE_DRONE_BEACON.get());
+        });
+        h.runAtTickTime(50, () -> {                       // 標識の有無は40 tick 覚えるので、覚え直してから
+            var from = DroneWormhole.gate(a.getBlockPos()).add(0, 0, 1);
+            var to = DroneWormhole.gate(b.getBlockPos()).add(0, 0, 1);
+            h.assertTrue(a.getBlockPos().equals(DroneWormhole.shortcut(level, from, to)), "Shorter wormhole not used");
+            h.assertTrue(Math.abs(DroneWormhole.distance(level, from, to) - 2) < 1e-6, "Shortcut distance: " + DroneWormhole.distance(level, from, to));
+            h.assertTrue(DroneWormhole.shortcut(level, from, from.add(3, 0, 0)) == null, "Detoured for a short hop");
+            h.assertTrue(DroneWormhole.distance(level, a.getBlockPos().above(2), b.getBlockPos().above(2)) < 15, "Port distance ignores the shortcut");
             h.succeed();
         });
     }

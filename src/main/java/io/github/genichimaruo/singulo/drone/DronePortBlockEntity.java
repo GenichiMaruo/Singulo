@@ -113,7 +113,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     @Nullable
     private UUID owner;
     private String name = "";
-    /** 選んでいる行き先と、その次元（null はこの次元。別の次元はワームホール便 {@link WormholeRelay}）。 */
+    /** 選んでいる行き先と、その次元（null はこの次元。別の次元はワームホール便 {@link DroneWormhole}）。 */
     @Nullable
     private BlockPos destination;
     @Nullable
@@ -457,12 +457,14 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     /** to までの道のり（別の次元はワームホール経由。行けなければ -1）。 */
     public int distanceTo(BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
         if (dim == null) {
-            return (int) Math.ceil(Math.sqrt(to.distSqr(worldPosition)));
+            // 同じ次元: ワームホールの近道のほうが近ければ、その道のり
+            return level instanceof ServerLevel server ? DroneWormhole.distance(server, worldPosition, to)
+                    : (int) Math.ceil(Math.sqrt(to.distSqr(worldPosition)));
         }
         if (!(level instanceof ServerLevel server)) {
             return -1;
         }
-        WormholeRelay.Route r = WormholeRelay.route(server, owner, worldPosition, dim, to, fluidPort());
+        DroneWormhole.Route r = DroneWormhole.route(server, owner, worldPosition, dim, to, fluidPort());
         return r == null ? -1 : r.distance();
     }
 
@@ -474,7 +476,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (!(level instanceof ServerLevel server) || to == null) {
             return S_IDLE;
         }
-        WormholeRelay.Route route = WormholeRelay.route(server, owner, worldPosition, dim, to, fluidPort());
+        DroneWormhole.Route route = DroneWormhole.route(server, owner, worldPosition, dim, to, fluidPort());
         if (route == null) {
             return S_NO_DESTINATION;
         }
@@ -491,7 +493,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (energy.getEnergyStored() < DroneCrateItem.cost(route.distance())) {
             return S_NO_ENERGY;
         }
-        if (!dronesAvailable(server, false) || !WormholeRelay.dronesThere(server, route, owner)) {
+        if (!dronesAvailable(server, false)) {
             return S_NO_DRONE;
         }
         return S_IDLE;
@@ -514,7 +516,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (tier == 0) {
             return S_NO_CRATE;
         }
-        double distance = Math.sqrt(to.distSqr(worldPosition));
+        double distance = DroneWormhole.distance(server, worldPosition, to);
         if (distance > DroneCrateItem.range(tier)) {
             return S_OUT_OF_RANGE;
         }
@@ -1057,7 +1059,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             if (now % CALL_TICKS == 0 && stagedTo != null) {
                 if (stagedDim != null) {
                     // ワームホール便: こちらの口へ届ける便にして、最終の行き先を便に持たせる（道がなければ待つ）
-                    WormholeRelay.Route route = WormholeRelay.route(level, owner, worldPosition, stagedDim, stagedTo, fluidPort());
+                    DroneWormhole.Route route = DroneWormhole.route(level, owner, worldPosition, stagedDim, stagedTo, fluidPort());
                     f = route == null ? null : DroneStationBlockEntity.call(level, worldPosition, owner, route.mouthHere());
                     if (f != null) {
                         f.relayDim = stagedDim;
@@ -1181,9 +1183,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         DroneNetwork net = DroneNetwork.get(server);
         for (BlockPos p : net.portsOf(owner, worldPosition, fluidPort())) {
             DroneNetwork.Port info = net.port(p);
-            out.add(new Target(p, "", info == null ? "" : info.name(), (int) Math.ceil(Math.sqrt(p.distSqr(worldPosition)))));
+            out.add(new Target(p, "", info == null ? "" : info.name(), DroneWormhole.distance(server, worldPosition, p)));
         }
-        for (WormholeRelay.Route r : WormholeRelay.routes(server, owner, worldPosition, fluidPort())) {
+        for (DroneWormhole.Route r : DroneWormhole.routes(server, owner, worldPosition, fluidPort())) {
             out.add(new Target(r.to(), r.dim().location().toString(), r.name(), r.distance()));
         }
         return out;

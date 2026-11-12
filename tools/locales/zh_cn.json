@@ -13436,8 +13436,8 @@
     "translation": "7×8×15 的设备。用奇点种子和 10 GFE 形成拘束核心，以潮汐力拉伸材料并卷绕纤维。加工需要 20 MFE/t 和液态氦。也能把羊毛拉成线、铁拉成锁链、皮革拉成幻翼膜等。停止或区块未加载时保留已预留的加工内容。"
   },
   "desc.singulo.wormhole_seam_upgrade": {
-    "source": "Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it. Logistics remain available, and travel requires a safe landing.",
-    "translation": "对现有虫洞口右键安装。两端均已升级并打开时，可走过上方的方形开口。原有物流不变；出口没有安全落脚点时不会传送。"
+    "source": "Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it and come out at the same spot in the far opening, like a Nether portal. Logistics remain available, and you never land somewhere unsafe.",
+    "translation": "对现有虫洞口右键安装。两端均已升级并打开时，可走过上方的方形开口，并像下界传送门一样从另一端开口的相同位置出来。原有物流不变；不会传送到危险的出口。"
   },
   "gui.singulo.cosmic.amount": {
     "source": "%s / %s mB",
@@ -13504,8 +13504,8 @@
     "translation": "拘束与缝合"
   },
   "guide.singulo.cosmic.links.body": {
-    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open and loaded, walk through the square opening above a mouth. Existing logistics remain available. Travel is refused without safe footing and space at the exit, or while riding. A cooldown prevents immediate return trips.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
-    "translation": "用潮汐纤维和坍缩星材料制作虫洞缝合升级，对现有口的两端分别右键安装。两端均打开且已加载时，可走过口上方的方形开口。原有物流仍可使用。出口没有安全落脚点或空间、或正骑乘时，不会传送。传送后有冷却时间以防立即返回。\n把坍缩星并行加工盒放入锻造炉界面右侧的槽，或手持右键点击锻造炉的任意部件来安装，可同时加工同一配方最多 4 批。开始时锁定数量，材料、冷却剂、电力按批数消耗。安装不会改变已经开始的加工。\n戴上测量眼镜，可在附近流体配管上看到转移方向箭头，并查看注视配管的量、流体和堵塞状态。箭头显示实际端点间转移的一条代表性连通路径，并非分支或环路的所有路径。配管本身不储存流体。"
+    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\nLike a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
+    "translation": "用潮汐纤维和坍缩星材料制作虫洞缝合升级，对现有口的两端分别右键安装。两端均打开时，可走过口上方的方形开口（与下界传送门一样，进入时会加载另一端的口）。原有物流仍可使用。\n与下界传送门一样，会从另一端开口的相同位置出来，没有等待时间。朝向和动量会随口的朝向旋转，从正面进入就从另一端的正面出来。离开到达的开口之前不会再次传送。该位置被堵住、有危险或脚下 4 格内没有地面时，会改为出现在另一端口前方的安全落脚点；若也没有则不会传送。骑乘时不会传送。\n把坍缩星并行加工盒放入锻造炉界面右侧的槽，或手持右键点击锻造炉的任意部件来安装，可同时加工同一配方最多 4 批。开始时锁定数量，材料、冷却剂、电力按批数消耗。安装不会改变已经开始的加工。\n戴上测量眼镜，可在附近流体配管上看到转移方向箭头，并查看注视配管的量、流体和堵塞状态。箭头显示实际端点间转移的一条代表性连通路径，并非分支或环路的所有路径。配管本身不储存流体。"
   },
   "guide.singulo.cosmic.links.title": {
     "source": "Seams and parallel irradiation",
@@ -14108,8 +14108,8 @@
     "translation": "制造地：工作台（第 5 阶段）"
   },
   "desc.singulo.wormhole_drone_beacon": {
-    "source": "Place one near both mouths of a wormhole and drones hand cargo through it to ports in another dimension. The far side also needs a Drone Station.",
-    "translation": "放在虫洞两端入口附近后，无人机会在入口交接货物，送往另一个维度的起降港。另一侧也需要无人机站。"
+    "source": "Place one near both mouths of a wormhole and drones fly through it to deliver to ports in another dimension, then return the same way. The far side needs no Drone Station. Within one dimension, drones also use it as a shortcut when that is shorter.",
+    "translation": "放在虫洞两端入口附近后，无人机会穿过入口，把货物送到另一个维度的起降港，再经同一入口返回。另一侧不需要无人机站。同一维度的虫洞，若穿过更近，也会当作近路使用。"
   },
   "summary.singulo.wormhole_drone_beacon": {
     "source": "Lets drones use a wormhole.",
@@ -14144,8 +14144,8 @@
     "translation": "虫洞运输"
   },
   "guide.singulo.collapsar.wormhole.body": {
-    "source": "Place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and drones can send cargo through it to ports in another dimension. Ports on the far side with the same owner appear in the destination list with a purple mark. Distance is from your port to the mouth plus from the far mouth to the port, and range and power follow it.\nA drone carries the crate to this mouth and passes it through. A drone from a station within 64 blocks of the far mouth picks it up and delivers it, so the far side needs a station too.\nThe cargo is always in one place: the carrying drone, the record at the mouth, then the far drone. If a mouth is closed or unloaded, drones wait above it. Breaking a mouth drops any crate waiting there.",
-    "translation": "在虫洞两端入口附近（4 格以内）放置虫洞航路信标后，无人机就能穿过该入口，把货物送往另一个维度的起降港。起降港的目的地列表中，会以紫色标记列出入口另一侧维度中同一所有者的起降港。距离为从本起降港到入口、加上从另一端入口到目标起降港，航程和电力也按此距离计算。\n无人机把货物运到这一侧的入口，送入入口后返回。另一端入口附近（64 格以内）的无人机站的无人机会从入口取出货物并送达，因此另一侧也需要无人机站。\n货物始终只在一个地方：运送的无人机、在入口等待时的记录、另一侧的无人机，不会丢失。入口关闭或未加载时，无人机会在入口上方等待。破坏入口时，在那里等待的货物会以已打包箱子的形式掉落。"
+    "source": "Place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and drones can send cargo through it to ports in another dimension. Ports on the far side with the same owner appear in the destination list with a purple mark. Distance is from your port to the mouth plus from the far mouth to the port, and range and power follow it.\nThe drone flies into this mouth with the crate, comes out of the far mouth, and delivers to the port. Then it flies back through the same mouths to its own station, so the far side needs no station. While it is in another dimension, its station slot shows it as flying. Within one dimension, drones also take a wormhole as a shortcut when going through it is shorter, and range and power use the shorter distance.\nIf the far mouth is unloaded, it is loaded briefly, like a Nether portal, so the drone can pass. If a mouth is closed, drones wait above it. Breaking a mouth on the way out sends the crate back to the sending port. Breaking the mouth a drone needs to get home makes it fly back to its station without the wormhole.",
+    "translation": "在虫洞两端入口附近（4 格以内）放置虫洞航路信标后，无人机就能穿过该入口，把货物送往另一个维度的起降港。起降港的目的地列表中，会以紫色标记列出入口另一侧维度中同一所有者的起降港。距离为从本起降港到入口、加上从另一端入口到目标起降港，航程和电力也按此距离计算。\n无人机载着货物飞入这一侧的入口，从另一端入口飞出，送到目标起降港。送达后经同一入口飞回自己的无人机站，因此另一侧不需要无人机站。在另一个维度期间，无人机站的槽位显示为“飞行中”。两端入口在同一维度的虫洞，若穿过更近，无人机也会把它当作近路使用（航程和电力也按近路计算）。\n另一端入口未加载时，会像下界传送门一样短暂加载后穿过。入口关闭时，无人机会在入口上方等待。在去程途中破坏入口时，货物会退回发货的起降港。破坏回程要经过的入口时，无人机会不经虫洞直接飞回无人机站。"
   },
   "holo.singulo.ports": {
     "source": "Casing blocks you can swap for ports: %s (cyan frames)",

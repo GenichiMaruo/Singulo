@@ -191,7 +191,7 @@ public final class SinguloBlocks {
             "drone_station", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Station(machineProperties()));
     public static final DeferredBlock<io.github.genichimaruo.singulo.drone.DroneBlocks.Port> DRONE_PORT = BLOCKS.register(
             "drone_port", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Port(machineProperties()));
-    /** ワームホール航路標識: ワームホールの両方の口のそばに置くと、ドローンが口で荷物を受け渡して別の次元へ送る。 */
+    /** ワームホール航路標識: ワームホールの両方の口のそばに置くと、ドローンが口をくぐって別の次元のポートへ荷物を届け、同じ口で帰ってくる。 */
     public static final DeferredBlock<Block> WORMHOLE_DRONE_BEACON = BLOCKS.register("wormhole_drone_beacon",
             () -> new Block(machineProperties().noOcclusion().lightLevel(s -> 10)));
     /** 事象の地平線倉庫（1種類の物を中の小さなブラックホールに約10億個まで）。 */

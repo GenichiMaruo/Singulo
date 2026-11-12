@@ -89,9 +89,12 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     private long droneGateAt = Long.MIN_VALUE;
     public static final int GATE_RANGE = 4;
 
-    /** ドローンがこの口を通って荷物を受け渡せるか: 開いていて、そばに航路標識がある（ワームホール便に使われたときだけ調べる）。 */
+    /**
+     * ドローンがこの口をくぐれるか: 喉が開いていて相手の口が決まっていて（相手が読み込まれていなくてもよい。くぐるときに読み込ませる）、
+     * そばに航路標識がある（ワームホール便に使われたときだけ調べる）。
+     */
     public boolean droneGate() {
-        if (level == null || !open()) {
+        if (level == null || size <= 0 || partnerPos() == null) {
             return false;
         }
         long now = level.getGameTime();
@@ -132,10 +135,16 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     private boolean traversable;
     public boolean traversable() { return traversable; }
     private int clientPassage;
+    /** 向こうの口が最後に読み込まれていたとき、開いていて縫い開かれていたか（向こうが読み込まれていない間の見た目と案内に使う。保存する）。 */
+    private boolean farPassable;
     public int passageState() {
         if(!traversable)return 0;
         if(level!=null&&level.isClientSide)return clientPassage;
-        var other=partner();return open()&&other!=null&&other.open()&&other.traversable()?2:1;
+        var other=partner();
+        if(other==null)return size>0&&partnerPos()!=null&&farPassable?2:1;
+        boolean passable=other.open()&&other.traversable();
+        if(passable!=farPassable){farPassable=passable;setChanged();}
+        return size>0&&passable?2:1;
     }
 
     private boolean installSeam(ServerPlayer player, ItemStack stack) {
@@ -366,7 +375,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
         upkeep(level);
         if (level.getGameTime() % 10 == 0) {
-            io.github.genichimaruo.singulo.drone.WormholeRelay.tickMouth(level, this);
+            io.github.genichimaruo.singulo.drone.DroneWormhole.tickMouth(level, this);
         }
         if(traversable&&level.getGameTime()%20==0)level.sendBlockUpdated(pos,state,state,Block.UPDATE_CLIENTS);
         if (isRemoved()) {
@@ -468,8 +477,8 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     @Override
     public void onBroken(Level level) {
         if (level instanceof ServerLevel server) {
-            // 口で次のドローンを待っていた荷物は、梱包済みの箱のままここに落とす（失わない）
-            io.github.genichimaruo.singulo.drone.WormholeRelay.mouthRemoved(server, worldPosition);
+            // この口へ向かう行きの便は発送元へ戻し、この口から帰るはずだったドローンは口を通らずに家へ帰す（荷物は失わない）
+            io.github.genichimaruo.singulo.drone.DroneWormhole.mouthRemoved(server, worldPosition);
         }
         if (traversable && !level.isClientSide) {
             traversable=false;
@@ -592,6 +601,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         tag.putInt("size", size);
         tag.putInt("target", target);
         tag.putBoolean("traversable",traversable);
+        tag.putBoolean("far_passable",farPassable);
         tag.putDouble("burn", burn);
         tag.putInt("grace", grace);
         tag.putInt("starve", starve);
@@ -606,6 +616,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
         size = tag.contains("size") ? tag.getInt("size") : 1;
         traversable=tag.getBoolean("traversable");
+        farPassable=tag.getBoolean("far_passable");
         clientPassage=tag.getInt("passage_state");
         if (tag.contains("target")) {
             target = tag.getInt("target");

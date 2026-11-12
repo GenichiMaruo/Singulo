@@ -219,7 +219,8 @@ Collapsar Ingots from the Accretion Jet Forge also go into these:
 
 - **Collapsar Lining**: replaces casing blocks on the Degenerate Compactor, Casimir Cavity and Cryogenic Cooling Tower. Each lining speeds processing up by 5%, up to 2× at 20. Use the Holo Projector on a finished controller: swappable casing glows in gold, and the bar below shows the count and speed.
 - **Event Horizon Vault**: stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. Use an item to insert it; use again quickly to insert every matching item you carry. Empty-handed use takes a stack, or one while sneaking. Breaking it keeps the contents in the item.
-- **Wormhole delivery**: place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and ports in the far dimension appear as destinations. The sending drone carries the cargo to the near mouth. Set up a station within 64 blocks of the far mouth so a second drone can deliver it. Range and power use the sum of the two port-to-mouth distances.
+- **Wormhole delivery**: place a Wormhole Drone Beacon within 4 blocks of both mouths of a wormhole, and ports in the far dimension appear as destinations. The drone flies into the near mouth, comes out of the far one, delivers to the port and returns to its own station the same way, so the far side needs no station. Range and power use the sum of the two port-to-mouth distances. Within one dimension, drones also take a beaconed wormhole as a shortcut when going through it is shorter.
+- **Walking through a seam**: with a Wormhole Seam Upgrade on both mouths, you come out at the same spot in the far opening, like a Nether portal, with no wait. Your facing and momentum turn to match the far mouth. You are not sent back until you step out of the opening; if the spot is blocked, dangerous or has no floor within 4 blocks, you land in front of the far mouth instead.
 
 ## Troubleshooting and hazards
 

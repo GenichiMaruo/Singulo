@@ -1,8 +1,10 @@
 package io.github.genichimaruo.singulo.wormhole;
 
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -10,29 +12,96 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-/** Server-only passage through a loaded, mutually upgraded pair. Never creates tickets. */
+/**
+ * 縫い開いた口の通行（サーバーだけ。チャンクを読み込ませない）。ネザーポータルと同じく、入った口の中の位置を保ったまま向こうの口の
+ * 同じ位置に出る。待ち時間はない。
+ * <ul>
+ *   <li>出る位置: 開口部の面からの横と高さのずれを、向こうの口の向きに回して写す（面に垂直なずれは捨てて、開口部の面の上に出す）。</li>
+ *   <li>向きと勢い: 入った口から出る口への回転で、体の向きと動きの勢いを回す。前から入れば向こうの前へ、後ろから入れば向こうの後ろへ出る。</li>
+ *   <li>出た口の中にいる間は、もう一度は飛ばない（待ち時間を口の中にいる間ずっと延ばす）。いったん出てから入り直すと通る。</li>
+ *   <li>写した位置がふさがっている・危ない・足の下に床がない（4ブロック以内）ときは、向こうの口の前の安全な足場に出す。それもなければ通さない。</li>
+ * </ul>
+ */
 public final class WormholeTransit {
     private WormholeTransit() {}
+    /** 足の下に床を探す深さ（これより深く落ちる出口には出さない）。 */
+    static final int FLOOR_DEPTH = 4;
+
     public static Vec3 center(WormholeMouthBlockEntity mouth){return Vec3.atCenterOf(mouth.getBlockPos()).add(0,2,0);}
+
+    /** 口の開口部（通行の判定に使う箱）。 */
+    public static AABB opening(WormholeMouthBlockEntity mouth){
+        Direction normal=facing(mouth);
+        Vec3 c=center(mouth);
+        return new AABB(c,c).inflate(normal.getAxis()==Direction.Axis.X?0.28:1.35,1.45,normal.getAxis()==Direction.Axis.Z?0.28:1.35);
+    }
+
+    /** 出る場所: 足の位置・体の向き（度）・動きの勢い。 */
+    public record Arrival(Vec3 pos,float yRot,Vec3 motion){}
+
     public static void tick(WormholeMouthBlockEntity mouth,ServerLevel source){
-        if(!mouth.traversable()||!mouth.open())return;
+        if(!mouth.traversable()||mouth.size()<=0)return;
         WormholeMouthBlockEntity other=mouth.partner();
+        if(other==null){
+            // 向こうの口が読み込まれていない: 開口部に人がいれば、ネザーポータルと同じく向こうを読み込ませる（読み込めたら通す）
+            var far=mouth.partnerPos();
+            ServerLevel farLevel=far==null?null:source.getServer().getLevel(far.dimension());
+            if(farLevel!=null&&!source.getEntitiesOfClass(ServerPlayer.class,opening(mouth),p->p.isAlive()&&!p.isSpectator()).isEmpty())
+                io.github.genichimaruo.singulo.drone.DroneWormhole.wake(farLevel,far.pos());
+            return;
+        }
         if(other==null||!other.traversable()||!other.open()||!(other.getLevel() instanceof ServerLevel target))return;
         // A stale or changed pairing must not be used for one last transfer.
         if(other.partner()!=mouth)return;
-        Direction normal=mouth.getBlockState().getValue(AbstractMachineBlock.FACING);
-        Vec3 c=center(mouth);
-        AABB area=new AABB(c,c).inflate(normal.getAxis()==Direction.Axis.X?0.28:1.35,1.45,normal.getAxis()==Direction.Axis.Z?0.28:1.35);
-        for(ServerPlayer player:source.getEntitiesOfClass(ServerPlayer.class,area,Player::isAlive)){
-            if(player.isSpectator()||player.isPassenger()||player.isVehicle()||player.isSleeping()||player.isOnPortalCooldown())continue;
-            Vec3 exit=findSafeExit(other,target,player);
-            if(exit==null)continue;
-            Direction front=other.getBlockState().getValue(AbstractMachineBlock.FACING);
+        for(ServerPlayer player:source.getEntitiesOfClass(ServerPlayer.class,opening(mouth),Player::isAlive)){
+            if(player.isSpectator()||player.isPassenger()||player.isVehicle()||player.isSleeping())continue;
+            if(player.isOnPortalCooldown()){
+                // 出てきたばかりの口の中: 出るまで待ち時間を延ばし続ける（ネザーポータルと同じ）
+                player.setPortalCooldown();
+                continue;
+            }
+            Arrival a=arrival(mouth,other,target,player);
+            if(a==null)continue;
             player.closeContainer();
-            player.teleportTo(target,exit.x,exit.y,exit.z,front.toYRot(),player.getXRot());
-            player.setDeltaMovement(Vec3.ZERO);player.fallDistance=0;player.setPortalCooldown();
+            player.teleportTo(target,a.pos().x,a.pos().y,a.pos().z,a.yRot(),player.getXRot());
+            player.setDeltaMovement(a.motion());
+            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+            player.fallDistance=0;player.setPortalCooldown();
         }
     }
+
+    /** from の口から入った player が、to の口のどこへ出るか（出せなければ null）。 */
+    @Nullable
+    public static Arrival arrival(WormholeMouthBlockEntity from,WormholeMouthBlockEntity to,ServerLevel target,Player player){
+        Direction a=facing(from),b=facing(to);
+        int turns=quarterTurns(a,b.getOpposite());
+        Vec3 rel=player.position().subtract(center(from));
+        double across=rel.x*a.getStepX()+rel.z*a.getStepZ();
+        rel=rel.subtract(a.getStepX()*across,0,a.getStepZ()*across);
+        Vec3 at=center(to).add(rotate(rel,turns));
+        if(clear(target,player,at,true))
+            return new Arrival(at,player.getYRot()+90*turns,rotate(player.getDeltaMovement(),turns));
+        Vec3 exit=findSafeExit(to,target,player);
+        return exit==null?null:new Arrival(exit,b.toYRot(),Vec3.ZERO);
+    }
+
+    private static Direction facing(WormholeMouthBlockEntity mouth){
+        return mouth.getBlockState().getValue(AbstractMachineBlock.FACING);
+    }
+
+    /** a を時計回り（上から見て）に何回 90° 回すと b になるか。 */
+    static int quarterTurns(Direction a,Direction b){
+        int n=0;
+        for(Direction d=a;d!=b&&n<4;d=d.getClockWise())n++;
+        return n%4;
+    }
+
+    /** 上から見て時計回りに turns × 90° 回す（北 → 東）。 */
+    static Vec3 rotate(Vec3 v,int turns){
+        for(int i=0;i<turns;i++)v=new Vec3(-v.z,v.y,v.x);
+        return v;
+    }
+
     public static Vec3 findSafeExit(WormholeMouthBlockEntity mouth,ServerLevel target,Player player){
         Direction front=mouth.getBlockState().getValue(AbstractMachineBlock.FACING),side=front.getClockWise();
         for(int distance:new int[]{2,3,1})for(int lateral:new int[]{0,-1,1})for(int height=1;height<=3;height++){
@@ -45,15 +114,41 @@ public final class WormholeTransit {
         }
         return null;
     }
+
+    /** 写した位置に出られるか: 世界の中で読み込まれていて、ふさがっておらず、危ないものがなく、足の下 FLOOR_DEPTH 以内に床がある。 */
+    private static boolean clear(ServerLevel level,Player player,Vec3 at,boolean needFloor){
+        double half=player.getBbWidth()/2.0;
+        AABB box=new AABB(at.x-half,at.y,at.z-half,at.x+half,at.y+player.getBbHeight(),at.z+half);
+        if(!level.getWorldBorder().isWithinBounds(box)||box.minY<level.getMinBuildHeight()||box.maxY>=level.getMaxBuildHeight())return false;
+        for(BlockPos p:BlockPos.betweenClosed(BlockPos.containing(box.minX,box.minY,box.minZ),BlockPos.containing(box.maxX,box.maxY,box.maxZ))){
+            if(!level.isLoaded(p)||hazard(level.getBlockState(p))||level.getFluidState(p).is(net.minecraft.tags.FluidTags.LAVA))return false;
+        }
+        if(!level.noCollision(player,box))return false;
+        if(!needFloor)return true;
+        BlockPos feet=BlockPos.containing(at.x,at.y,at.z);
+        for(int d=0;d<=FLOOR_DEPTH;d++){
+            BlockPos p=feet.below(d);
+            if(!level.isLoaded(p))return false;
+            var state=level.getBlockState(p);
+            if(hazard(state)||level.getFluidState(p).is(net.minecraft.tags.FluidTags.LAVA))return false;
+            if(!state.getCollisionShape(level,p).isEmpty()||!level.getFluidState(p).isEmpty())return true;
+        }
+        return false;
+    }
+
+    private static boolean hazard(net.minecraft.world.level.block.state.BlockState state){
+        return state.is(Blocks.FIRE)||state.is(Blocks.SOUL_FIRE)||state.is(Blocks.CACTUS)||state.is(Blocks.MAGMA_BLOCK)
+                ||state.is(Blocks.CAMPFIRE)||state.is(Blocks.SOUL_CAMPFIRE)||state.is(Blocks.SWEET_BERRY_BUSH)
+                ||state.is(Blocks.POWDER_SNOW)||state.is(Blocks.WITHER_ROSE)||state.is(Blocks.LAVA);
+    }
+
     private static boolean safe(ServerLevel level,Player player,BlockPos feet,AABB box){
         if(!level.getWorldBorder().isWithinBounds(box)||box.minY<level.getMinBuildHeight()||box.maxY>=level.getMaxBuildHeight())return false;
         BlockPos min=BlockPos.containing(box.minX,box.minY-1,box.minZ),max=BlockPos.containing(box.maxX,box.maxY,box.maxZ);
         for(BlockPos p:BlockPos.betweenClosed(min,max)){
             if(!level.isLoaded(p))return false;
             var state=level.getBlockState(p);
-            if(!state.getFluidState().isEmpty()||state.is(Blocks.FIRE)||state.is(Blocks.SOUL_FIRE)||state.is(Blocks.CACTUS)
-                    ||state.is(Blocks.MAGMA_BLOCK)||state.is(Blocks.CAMPFIRE)||state.is(Blocks.SOUL_CAMPFIRE)
-                    ||state.is(Blocks.SWEET_BERRY_BUSH)||state.is(Blocks.POWDER_SNOW)||state.is(Blocks.WITHER_ROSE))return false;
+            if(!state.getFluidState().isEmpty()||hazard(state))return false;
         }
         // Also support players whose dimensions were enlarged by another mod.
         // Every block under the footprint must support them, rather than just its centre.
