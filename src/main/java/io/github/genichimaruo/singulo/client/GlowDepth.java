@@ -115,9 +115,14 @@ final class GlowDepth extends RenderType {
     private static TextureTarget laterDepth;
 
     private static MultiBufferSource.BufferSource jetSource() {
+        return jetSource(1 << 20);
+    }
+
+    /** size は最初に取る大きさ（足りなければ伸びる）。 */
+    private static MultiBufferSource.BufferSource jetSource(int size) {
         java.util.SequencedMap<RenderType, ByteBufferBuilder> buffers = new java.util.LinkedHashMap<>();
-        buffers.put(JetForgeRenderTypes.GLOW, new ByteBufferBuilder(1 << 20));
-        buffers.put(JetForgeRenderTypes.BEAM_TYPE, new ByteBufferBuilder(1 << 20));
+        buffers.put(JetForgeRenderTypes.GLOW, new ByteBufferBuilder(size));
+        buffers.put(JetForgeRenderTypes.BEAM_TYPE, new ByteBufferBuilder(size));
         return MultiBufferSource.immediateWithBuffers(buffers, new ByteBufferBuilder(1 << 10));
     }
 
@@ -136,6 +141,83 @@ final class GlowDepth extends RenderType {
             jetsPending = true;
             return JET_SOURCE.getBuffer(type);
         };
+    }
+
+    /**
+     * 鍛造炉1基ぶんのジェットの光。炉心のブラックホール（重力レンズ）より奥の光（far）と手前の光（near）を分けて持ち、
+     * {@link GravitationalLensing} が遠い炉から順に「奥の光 → その炉のレンズ → 手前の光」と描く。
+     * 手前の光をレンズより先に描くと、ブラックホールの影と円盤が、カメラとのあいだにあるジェットの上に出てしまう。
+     */
+    static final class JetGroup {
+        final Vec3 core;
+        private final MultiBufferSource.BufferSource far;
+        private final MultiBufferSource.BufferSource near;
+        private boolean farPending;
+        private boolean nearPending;
+
+        private JetGroup(Vec3 core, MultiBufferSource.BufferSource far, MultiBufferSource.BufferSource near) {
+            this.core = core;
+            this.far = far;
+            this.near = near;
+        }
+    }
+
+    private static final List<JetGroup> GROUPS = new ArrayList<>();
+    /** 炉ごとの入れ物の使い回し（フレームごとに作らない）。 */
+    private static final List<MultiBufferSource.BufferSource> POOL = new ArrayList<>();
+    private static int pooled;
+
+    private static MultiBufferSource.BufferSource pooledSource() {
+        if (pooled == POOL.size()) {
+            POOL.add(jetSource(1 << 16));
+        }
+        return POOL.get(pooled++);
+    }
+
+    /** 炉心 core の炉のジェットの組を、このフレームに作る。ワールドの外やシェーダーパック使用時は null（ふつうの入れ物に描く）。 */
+    @Nullable
+    static JetGroup group(Vec3 core) {
+        if (!active || GravitationalLensing.shaderPackInUse()) {
+            return null;
+        }
+        JetGroup g = new JetGroup(core, pooledSource(), pooledSource());
+        GROUPS.add(g);
+        return g;
+    }
+
+    /** 組 group の、炉心より奥（near が false）か手前（true）の光の入れ物。group が null ならふつうの {@link #additive}。 */
+    static MultiBufferSource additive(MultiBufferSource buffers, @Nullable JetGroup group, boolean near) {
+        if (group == null) {
+            return additive(buffers);
+        }
+        return type -> {
+            if (type != JetForgeRenderTypes.GLOW && type != JetForgeRenderTypes.BEAM_TYPE) {
+                return buffers.getBuffer(type);
+            }
+            if (near) {
+                group.nearPending = true;
+                return group.near.getBuffer(type);
+            }
+            group.farPending = true;
+            return group.far.getBuffer(type);
+        };
+    }
+
+    /** このフレームの炉ごとのジェットの組。 */
+    static List<JetGroup> jetGroups() {
+        return GROUPS;
+    }
+
+    private static boolean anyPending() {
+        if (jetsPending) {
+            return true;
+        }
+        for (JetGroup g : GROUPS) {
+            if (g.farPending || g.nearPending) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** ジェットの通り道: 出している炉心と両端。 */
@@ -217,7 +299,7 @@ final class GlowDepth extends RenderType {
             FLUID_SOURCE.endBatch(FLUID_DEPTH);
             COLOR_SOURCE.endBatch();
             SOURCE.endBatch();
-            if (jetsPending) {
+            if (anyPending()) {
                 RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
                 solidDepth = sized(solidDepth, main);
                 copyDepth(main, solidDepth);
@@ -228,14 +310,40 @@ final class GlowDepth extends RenderType {
 
     /** 奥行きを固体だけに戻してジェットを足し、元へ戻す（重力レンズはジェットのない奥行きを読む）。このフレームのジェットがなければ何もしない。 */
     static void drawJets(RenderLevelStageEvent event) {
-        JET_PATHS.clear();
-        if (!jetsPending) {
-            return;
+        if (jetsPending) {
+            jetsPending = false;
+            flush(event, JET_SOURCE);
         }
-        jetsPending = false;
+    }
+
+    /** 組 g の奥（near が false）か手前（true）の光を足す。 */
+    static void drawJets(RenderLevelStageEvent event, JetGroup g, boolean near) {
+        if (near ? g.nearPending : g.farPending) {
+            if (near) {
+                g.nearPending = false;
+            } else {
+                g.farPending = false;
+            }
+            flush(event, near ? g.near : g.far);
+        }
+    }
+
+    /** このフレームの残りのジェットを全部足し、組を片付ける（フレームの終わりに必ず呼ぶ）。 */
+    static void finishJets(RenderLevelStageEvent event) {
+        drawJets(event);
+        for (JetGroup g : GROUPS) {
+            drawJets(event, g, false);
+            drawJets(event, g, true);
+        }
+        GROUPS.clear();
+        pooled = 0;
+        JET_PATHS.clear();
+    }
+
+    private static void flush(RenderLevelStageEvent event, MultiBufferSource.BufferSource source) {
         RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
         if (solidDepth == null) {
-            JET_SOURCE.endBatch();
+            source.endBatch();
             return;
         }
         laterDepth = sized(laterDepth, main);
@@ -246,7 +354,7 @@ final class GlowDepth extends RenderType {
         modelView.pushMatrix();
         modelView.set(event.getModelViewMatrix());
         RenderSystem.applyModelViewMatrix();
-        JET_SOURCE.endBatch();
+        source.endBatch();
         modelView.popMatrix();
         RenderSystem.applyModelViewMatrix();
         copyDepth(laterDepth, main);

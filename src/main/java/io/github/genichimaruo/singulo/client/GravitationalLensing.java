@@ -259,22 +259,56 @@ public final class GravitationalLensing {
                     pending = new Pending(List.copyOf(SOURCES), event.getCamera().getPosition(), new Matrix4f(event.getProjectionMatrix()),
                             new Quaternionf(event.getCamera().rotation()));
                 } else {
-                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）
+                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）。
+                    // 鍛造炉の炉心のレンズは、遠い炉から順に「その炉の奥側の光 → 炉心のレンズ → 手前側の光」とはさむ
+                    // （カメラと炉心のあいだのジェットの上に、炉心のブラックホールが出ないように）
                     Vec3 cam = event.getCamera().getPosition();
+                    var groups = new ArrayList<>(GlowDepth.jetGroups());
+                    groups.sort(Comparator.comparingDouble((GlowDepth.JetGroup g) -> -g.core.distanceToSqr(cam)));
+                    java.util.Map<GlowDepth.JetGroup, List<Source>> own = new java.util.IdentityHashMap<>();
+                    List<Source> behind = new ArrayList<>();
                     List<Source> front = new ArrayList<>();
-                    SOURCES.removeIf(s -> !GlowDepth.behindJet(cam, s.pos, s.region) && front.add(s));
-                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    for (Source s : SOURCES) {
+                        GlowDepth.JetGroup owner = null;
+                        for (GlowDepth.JetGroup g : groups) {
+                            if (g.core.distanceToSqr(s.pos) < 1) {
+                                owner = g;
+                                break;
+                            }
+                        }
+                        if (owner != null) {
+                            own.computeIfAbsent(owner, g -> new ArrayList<>()).add(s);
+                        } else if (GlowDepth.behindJet(cam, s.pos, s.region)) {
+                            behind.add(s);
+                        } else {
+                            front.add(s);
+                        }
+                    }
+                    applyOnly(behind, cam, event);
                     GlowDepth.drawJets(event);
-                    SOURCES.clear();
-                    SOURCES.addAll(front);
-                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    for (GlowDepth.JetGroup g : groups) {
+                        GlowDepth.drawJets(event, g, false);
+                        applyOnly(own.getOrDefault(g, List.of()), cam, event);
+                        GlowDepth.drawJets(event, g, true);
+                    }
+                    applyOnly(front, cam, event);
                 }
             }
-            // レンズがないフレームや、レンズを切っているときのジェット
-            GlowDepth.drawJets(event);
         } finally {
             SOURCES.clear();
+            // レンズがないフレームや、レンズを切っているときのジェット（組もここで片付ける）
+            GlowDepth.finishJets(event);
         }
+    }
+
+    /** sources のレンズだけを掛ける（空なら何もしない）。 */
+    private static void applyOnly(List<Source> sources, Vec3 cam, RenderLevelStageEvent event) {
+        if (sources.isEmpty()) {
+            return;
+        }
+        SOURCES.clear();
+        SOURCES.addAll(sources);
+        apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
     }
 
     /** レンズを掛ける。useDepth が false なら深度を使わない（シェーダーパック使用時）。 */
