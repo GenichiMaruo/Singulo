@@ -1415,6 +1415,12 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
         }
 
+        /** 三角柱（ピクセル単位。前は z0、後ろは z1、後ろの面は backScale 倍）。猫の耳など斜めの辺の形に。 */
+        private void ear(PoseStack pose, VertexConsumer vc, int light, float ax, float ay, float bx, float by, float cx, float cy,
+                         float z0, float z1, float backScale, int rgb) {
+            FxDraw.prism(pose, vc, ax * P, ay * P, bx * P, by * P, cx * P, cy * P, z0 * P, z1 * P, backScale, light, rgb);
+        }
+
         /** 羽の1枚（x0..x1 は左右どちら向きでもよい。厚さはごくうすく）。 */
         private void wingBox(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float x1, float y1, int rgb, int alpha) {
             FxDraw.box(pose, vc, Math.min(x0, x1) * P, y0 * P, 0, Math.max(x0, x1) * P, y1 * P, 0.12F * P, light, rgb, alpha);
@@ -1642,46 +1648,30 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 case "cat_ears" -> {
                     // 細いカチューシャ（髪の殻 y -8.45・x ±4.45 から少し離す）と、本物の猫に似せた耳。
-                    // 耳は厚みのある先の丸い三角で、少し外へ開いて前を向く。内側は桃色（真ん中ほど濃い）、根元に白いふわふわの毛、
-                    // 先は少し濃い。ときどき片方ずつ、ぴくっと外へ動く
+                    // 耳は斜めの辺の三角柱（段を積まないので縁がなめらか）。後ろの面は一回り小さく、裏がなだらかに丸く見える。
+                    // 少し外へ開いて前を向き、先は少し外寄り。内側は桃色（真ん中に濃い筋）、根元に白い毛、先は少し濃い。
+                    // ときどき片方ずつ、ぴくっと外へ動く
                     b(pose, vc, light, -4.65F, -8.95F, -1.0F, 4.65F, -8.5F, -0.45F, dark);
                     b(pose, vc, light, -4.85F, -8.5F, -1.0F, -4.55F, -6.4F, -0.45F, dark);
                     b(pose, vc, light, 4.55F, -8.5F, -1.0F, 4.85F, -6.4F, -0.45F, dark);
-                    int tip = mix(c, 0x000000, 0.22F);
+                    int tip = mix(c, 0x000000, 0.2F);
                     for (int side = -1; side <= 1; side += 2) {
                         float t = (age + (side > 0 ? 37 : 0)) % 90;
                         float twitch = t < 6 ? 12 * Mth.sin(t / 6 * Mth.PI) : 0;
                         pose.pushPose();
                         pose.translate(side * 2.5F * P, -8.4F * P, -0.7F * P);
-                        pose.mulPose(Axis.ZP.rotationDegrees(side * (14 + twitch)));   // 先を外へ
+                        pose.mulPose(Axis.ZP.rotationDegrees(side * (12 + twitch)));   // 先を外へ
                         pose.mulPose(Axis.YP.rotationDegrees(-side * 12));             // 内側を少し外へ向ける
-                        // 外側（染めた色）: 下ほど広い段（高さは H 倍に詰める）。先の2段は少し濃い
-                        final float H = 0.8F;
-                        float[][] layers = {{0.3F, -0.9F, 1.7F}, {-0.9F, -1.8F, 1.45F}, {-1.8F, -2.6F, 1.15F}, {-2.6F, -3.3F, 0.85F},
-                                {-3.3F, -3.85F, 0.55F}, {-3.85F, -4.2F, 0.3F}};
-                        int back = mix(c, 0x000000, 0.08F), backDeep = mix(c, 0x000000, 0.14F);
-                        for (int i = 0; i < layers.length; i++) {
-                            float[] l = layers[i];
-                            float y0 = l[0] * H, y1 = l[1] * H;
-                            b(pose, vc, light, -l[2], y1, -0.3F, l[2], y0, 0.5F, i >= 4 ? tip : c);
-                            // 後ろもふくらませる: 真ん中ほど厚い2段の丸み（下の段ほど広く厚い。少し陰になる）
-                            if (i < 4) {
-                                b(pose, vc, light, -l[2] * 0.72F, y1, 0.5F, l[2] * 0.72F, y0, 0.85F - i * 0.06F, back);
-                            }
-                            if (i < 2) {
-                                b(pose, vc, light, -l[2] * 0.42F, y1, 0.85F, l[2] * 0.42F, y0, 1.12F - i * 0.08F, backDeep);
-                            }
-                        }
-                        // 内側の桃色（前の面のすぐ前。縁を残して一回り小さく）と、真ん中の濃い筋
-                        float[][] inner = {{0, -0.9F, 1.25F}, {-0.9F, -1.8F, 1.0F}, {-1.8F, -2.6F, 0.7F}, {-2.6F, -3.1F, 0.4F}};
-                        for (float[] l : inner) {
-                            b(pose, vc, light, -l[2], l[1] * H, -0.36F, l[2], l[0] * H, -0.3F, 0xF6B4C4);
-                        }
-                        b(pose, vc, light, -0.35F, -2.4F * H, -0.4F, 0.35F, -0.6F * H, -0.36F, 0xE893AA);
-                        // 根元の白い毛（前へ少しふくらむ房）
-                        b(pose, vc, light, -1.05F, -1.25F * H, -0.62F, -0.3F, 0.0F, -0.3F, 0xFFF8FA);
-                        b(pose, vc, light, 0.25F, -0.95F * H, -0.58F, 0.95F, 0.0F, -0.3F, 0xF6EEF2);
-                        b(pose, vc, light, -0.3F, -1.75F * H, -0.5F, 0.3F, -0.9F * H, -0.38F, 0xFFF8FA);
+                        pose.scale(side, 1, 1);                                        // 左右対称（先は外寄り）
+                        // 耳（根元は髪に少し埋める）。先の部分だけ少し濃い色を、ほんの少し大きく重ねる
+                        ear(pose, vc, light, -1.75F, 0.3F, 1.75F, 0.3F, 0.35F, -3.6F, -0.3F, 0.55F, 0.62F, c);
+                        ear(pose, vc, light, -0.36F, -2.35F, 0.84F, -2.35F, 0.35F, -3.64F, -0.32F, 0.57F, 0.62F, tip);     // 耳の辺に沿う
+                        // 内側の桃色と真ん中の濃い筋（前の面のすぐ前）
+                        ear(pose, vc, light, -1.25F, 0.0F, 1.25F, 0.0F, 0.3F, -2.75F, -0.36F, -0.3F, 1, 0xF6B4C4);
+                        ear(pose, vc, light, -0.45F, -0.2F, 0.5F, -0.2F, 0.25F, -2.0F, -0.4F, -0.36F, 1, 0xE893AA);
+                        // 根元の白い毛（前へ少しふくらむ、斜めの房2つ）
+                        ear(pose, vc, light, -1.15F, 0.05F, -0.05F, 0.05F, -0.75F, -1.05F, -0.6F, -0.3F, 1, 0xFFF8FA);
+                        ear(pose, vc, light, 0.05F, 0.05F, 1.05F, 0.05F, 0.65F, -0.85F, -0.55F, -0.3F, 1, 0xF6EEF2);
                         pose.popPose();
                     }
                 }
