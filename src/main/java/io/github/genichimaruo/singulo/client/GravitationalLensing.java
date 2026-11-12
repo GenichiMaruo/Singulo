@@ -286,12 +286,23 @@ public final class GravitationalLensing {
                     }
                     applyOnly(behind, cam, event);
                     GlowDepth.drawJets(event);
+                    // 炉心より奥にあるほかのレンズ（紡糸機・リアクターなど）は、その炉心のレンズと同じ回に掛ける。
+                    // 1回の中では奥から描くので、手前の炉心のレンズが奥のブラックホールもまわりの景色と一緒に歪める
+                    // （炉心のレンズより後に掛けると、奥のブラックホールだけが歪まない位置に出て、景色とずれる）。
+                    // ジェットが手前にかかるレンズは behind に入っているので、炉の奥側の光のあとに掛けてもよい
+                    front.sort(Comparator.comparingDouble((Source s) -> -s.pos.distanceToSqr(cam)));
+                    int next = 0;
                     for (GlowDepth.JetGroup g : groups) {
                         GlowDepth.drawJets(event, g, false);
-                        applyOnly(own.getOrDefault(g, List.of()), cam, event);
+                        double reach = g.core.distanceToSqr(cam);
+                        List<Source> batch = new ArrayList<>(own.getOrDefault(g, List.of()));
+                        while (next < front.size() && front.get(next).pos.distanceToSqr(cam) > reach) {
+                            batch.add(front.get(next++));
+                        }
+                        applyOnly(batch, cam, event);
                         GlowDepth.drawJets(event, g, true);
                     }
-                    applyOnly(front, cam, event);
+                    applyOnly(front.subList(next, front.size()), cam, event);
                 }
             }
         } finally {
