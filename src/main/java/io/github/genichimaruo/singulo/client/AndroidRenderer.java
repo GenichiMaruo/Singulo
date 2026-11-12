@@ -1655,23 +1655,33 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                         pose.translate(side * 2.5F * P, -8.4F * P, -0.7F * P);
                         pose.mulPose(Axis.ZP.rotationDegrees(side * (14 + twitch)));   // 先を外へ
                         pose.mulPose(Axis.YP.rotationDegrees(-side * 12));             // 内側を少し外へ向ける
-                        // 外側（染めた色）: 下ほど広い段。先の2段は少し濃い
+                        // 外側（染めた色）: 下ほど広い段（高さは H 倍に詰める）。先の2段は少し濃い
+                        final float H = 0.8F;
                         float[][] layers = {{0.3F, -0.9F, 1.7F}, {-0.9F, -1.8F, 1.45F}, {-1.8F, -2.6F, 1.15F}, {-2.6F, -3.3F, 0.85F},
                                 {-3.3F, -3.85F, 0.55F}, {-3.85F, -4.2F, 0.3F}};
+                        int back = mix(c, 0x000000, 0.08F), backDeep = mix(c, 0x000000, 0.14F);
                         for (int i = 0; i < layers.length; i++) {
                             float[] l = layers[i];
-                            b(pose, vc, light, -l[2], l[1], -0.3F, l[2], l[0], 0.5F, i >= 4 ? tip : c);
+                            float y0 = l[0] * H, y1 = l[1] * H;
+                            b(pose, vc, light, -l[2], y1, -0.3F, l[2], y0, 0.5F, i >= 4 ? tip : c);
+                            // 後ろもふくらませる: 真ん中ほど厚い2段の丸み（下の段ほど広く厚い。少し陰になる）
+                            if (i < 4) {
+                                b(pose, vc, light, -l[2] * 0.72F, y1, 0.5F, l[2] * 0.72F, y0, 0.85F - i * 0.06F, back);
+                            }
+                            if (i < 2) {
+                                b(pose, vc, light, -l[2] * 0.42F, y1, 0.85F, l[2] * 0.42F, y0, 1.12F - i * 0.08F, backDeep);
+                            }
                         }
                         // 内側の桃色（前の面のすぐ前。縁を残して一回り小さく）と、真ん中の濃い筋
                         float[][] inner = {{0, -0.9F, 1.25F}, {-0.9F, -1.8F, 1.0F}, {-1.8F, -2.6F, 0.7F}, {-2.6F, -3.1F, 0.4F}};
                         for (float[] l : inner) {
-                            b(pose, vc, light, -l[2], l[1], -0.36F, l[2], l[0], -0.3F, 0xF6B4C4);
+                            b(pose, vc, light, -l[2], l[1] * H, -0.36F, l[2], l[0] * H, -0.3F, 0xF6B4C4);
                         }
-                        b(pose, vc, light, -0.35F, -2.4F, -0.4F, 0.35F, -0.6F, -0.36F, 0xE893AA);
+                        b(pose, vc, light, -0.35F, -2.4F * H, -0.4F, 0.35F, -0.6F * H, -0.36F, 0xE893AA);
                         // 根元の白い毛（前へ少しふくらむ房）
-                        b(pose, vc, light, -1.05F, -1.25F, -0.62F, -0.3F, 0.0F, -0.3F, 0xFFF8FA);
-                        b(pose, vc, light, 0.25F, -0.95F, -0.58F, 0.95F, 0.0F, -0.3F, 0xF6EEF2);
-                        b(pose, vc, light, -0.3F, -1.75F, -0.5F, 0.3F, -0.9F, -0.38F, 0xFFF8FA);
+                        b(pose, vc, light, -1.05F, -1.25F * H, -0.62F, -0.3F, 0.0F, -0.3F, 0xFFF8FA);
+                        b(pose, vc, light, 0.25F, -0.95F * H, -0.58F, 0.95F, 0.0F, -0.3F, 0xF6EEF2);
+                        b(pose, vc, light, -0.3F, -1.75F * H, -0.5F, 0.3F, -0.9F * H, -0.38F, 0xFFF8FA);
                         pose.popPose();
                     }
                 }

@@ -1525,25 +1525,35 @@ def accessory_icons(Image):
         for x, y in pts:
             p[x, y] = c
 
-    # 猫耳カチューシャ: 大きな先の丸い三角の耳（少し外へ開く。縁は濃く、先はさらに濃い）、内側の桃色と根元の白い毛、
-    # 下に細い ∩ のカチューシャ
+    # 猫耳カチューシャ: 左右に離した、先の丸い三角の耳（先は少し外へ）。縁は濃く、外側の縁に光、
+    # 内側は縁から真ん中へ濃くなる桃色、根元に白い毛の房。下に細い ∩ のカチューシャ（上の縁に光）。
+    # 左の耳を1ドットずつ決め、右は左右反転（E: 縁 W: 光 S: 陰 P: 桃色 D: 濃い桃色 F: 白い毛）
     b, d = new(), new()
-    ear = {1: (2, 2), 2: (2, 3), 3: (1, 4), 4: (1, 4), 5: (1, 5), 6: (1, 6), 7: (1, 6), 8: (2, 6)}
-    for y, (x0, x1) in ear.items():
-        for x in range(x0, x1 + 1):
+    left_ear = {
+        1: '..E.....',
+        2: '..EE....',
+        3: '.EWPE...',
+        4: '.EWPPE..',
+        5: '.EWPDPE.',
+        6: '.EWPDPSE',
+        7: '.ESFFFSE',
+        8: '..EEEEE.',
+    }
+    tone = {'E': E, 'W': W, 'S': S}
+    pinks = {'P': (246, 180, 196, 255), 'D': (226, 136, 160, 255), 'F': (255, 250, 252, 255)}
+    for y, row in left_ear.items():
+        for x, ch in enumerate(row):
             for xx in (x, 15 - x):
-                b.load()[xx, y] = E if x in (x0, x1) or y <= 2 else (S if x == x1 - 1 else W)
-    pink, deep, fluff = (246, 180, 196, 255), (232, 147, 170, 255), (255, 248, 250, 255)
-    inner = [(2, 3), (3, 3), (2, 4), (3, 4), (2, 5), (3, 5), (4, 5), (2, 6), (3, 6), (4, 6), (5, 6)]
-    for x, y in inner:
-        for xx in (x, 15 - x):
-            d.load()[xx, y] = deep if (x, y) in ((3, 4), (3, 5), (3, 6)) else pink
-    for x, y in ((2, 7), (3, 7), (4, 7), (5, 7)):
-        for xx in (x, 15 - x):
-            d.load()[xx, y] = fluff
-    band = [(x, 8) for x in range(7, 9)] + [(x, 9) for x in range(3, 13)] + [(2, y) for y in range(10, 15)] \
-        + [(13, y) for y in range(10, 15)]
+                if ch in tone:
+                    b.load()[xx, y] = tone[ch]
+                elif ch in pinks:
+                    d.load()[xx, y] = pinks[ch]
+    d.load()[4, 6] = (255, 250, 252, 255)            # 毛の房の先が、桃色へ少し伸びる
+    d.load()[11, 6] = (255, 250, 252, 255)
+    band = [(x, 9) for x in range(4, 12)] + [(3, 10), (12, 10)] + [(2, y) for y in range(11, 15)] + [(13, y) for y in range(11, 15)]
     px(b, band, E)
+    px(b, [(x, 10) for x in range(4, 12)], S)
+    px(b, [(x, 9) for x in range(6, 10)], W)
     out['android_cat_ears'] = (b, d)
     # 魔女の帽子: 広いつば、上ほど細く先が右へ折れるとんがり、すその金の帯と留め金
     b, d = new(), new()
