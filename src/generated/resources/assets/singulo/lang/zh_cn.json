@@ -2696,6 +2696,8 @@
   "message.singulo.area_card.first": "记录了第一个角（%s, %s, %s）。潜行右键另一个角",
   "message.singulo.area_card.recorded": "记录了范围（%s×%s×%s）",
   "message.singulo.area_card.too_large": "范围太大（每边最多 %s 格）",
+  "message.singulo.arsenal_notice": "Singulo 官方附属模组“Singulo Arsenal”已发布：用 Singulo 的材料制作以物理现象为题材的防具、武器和工具。%s",
+  "message.singulo.arsenal_notice.link": "[在 CurseForge 查看]",
   "message.singulo.cryogenic_turbine.now_storage": "低温涡轮机现在是液氮储能装置。它能取回冷却塔灌入液氮的电力的最多 90%（与冷却塔连在一起循环也不会增加电力）。第 2 阶段的发电请使用缪子催化核聚变炉。",
   "message.singulo.deep_sea_collector.idle": "水深不够（上方需要 16 格以上的水）",
   "message.singulo.deep_sea_collector.rate": "水压 %s%%：约每 %s 秒生成 1 个高压晶体",

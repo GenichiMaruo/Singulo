@@ -14154,5 +14154,13 @@
   "holo.singulo.ports.report": {
     "source": "Multiblock ports fit in %s casing positions (cyan frames in the projection)",
     "translation": "반입출 포트: 외장판 자리 %s곳에 놓을 수 있다(투영의 하늘색 틀)"
+  },
+  "message.singulo.arsenal_notice": {
+    "source": "Singulo Arsenal, the official Singulo add-on, is out: armor, weapons and tools made from Singulo materials, each built around a physical phenomenon. %s",
+    "translation": "Singulo 공식 애드온 \"Singulo Arsenal\"이 공개되었습니다. Singulo 재료로 물리 현상을 주제로 한 방어구·무기·도구를 만들 수 있습니다. %s"
+  },
+  "message.singulo.arsenal_notice.link": {
+    "source": "[View on CurseForge]",
+    "translation": "[CurseForge에서 보기]"
   }
 }

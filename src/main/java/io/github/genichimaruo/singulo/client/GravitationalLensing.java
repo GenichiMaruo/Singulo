@@ -259,22 +259,67 @@ public final class GravitationalLensing {
                     pending = new Pending(List.copyOf(SOURCES), event.getCamera().getPosition(), new Matrix4f(event.getProjectionMatrix()),
                             new Quaternionf(event.getCamera().rotation()));
                 } else {
-                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）
+                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）。
+                    // 鍛造炉の炉心のレンズは、遠い炉から順に「その炉の奥側の光 → 炉心のレンズ → 手前側の光」とはさむ
+                    // （カメラと炉心のあいだのジェットの上に、炉心のブラックホールが出ないように）
                     Vec3 cam = event.getCamera().getPosition();
+                    var groups = new ArrayList<>(GlowDepth.jetGroups());
+                    groups.sort(Comparator.comparingDouble((GlowDepth.JetGroup g) -> -g.core.distanceToSqr(cam)));
+                    java.util.Map<GlowDepth.JetGroup, List<Source>> own = new java.util.IdentityHashMap<>();
+                    List<Source> behind = new ArrayList<>();
                     List<Source> front = new ArrayList<>();
-                    SOURCES.removeIf(s -> !GlowDepth.behindJet(cam, s.pos, s.region) && front.add(s));
-                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    for (Source s : SOURCES) {
+                        GlowDepth.JetGroup owner = null;
+                        for (GlowDepth.JetGroup g : groups) {
+                            if (g.core.distanceToSqr(s.pos) < 1) {
+                                owner = g;
+                                break;
+                            }
+                        }
+                        if (owner != null) {
+                            own.computeIfAbsent(owner, g -> new ArrayList<>()).add(s);
+                        } else if (GlowDepth.behindJet(cam, s.pos, s.region)) {
+                            behind.add(s);
+                        } else {
+                            front.add(s);
+                        }
+                    }
+                    applyOnly(behind, cam, event);
                     GlowDepth.drawJets(event);
-                    SOURCES.clear();
-                    SOURCES.addAll(front);
-                    apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                    // 炉心より奥にあるほかのレンズ（紡糸機・リアクターなど）は、その炉心のレンズと同じ回に掛ける。
+                    // 1回の中では奥から描くので、手前の炉心のレンズが奥のブラックホールもまわりの景色と一緒に歪める
+                    // （炉心のレンズより後に掛けると、奥のブラックホールだけが歪まない位置に出て、景色とずれる）。
+                    // ジェットが手前にかかるレンズは behind に入っているので、炉の奥側の光のあとに掛けてもよい
+                    front.sort(Comparator.comparingDouble((Source s) -> -s.pos.distanceToSqr(cam)));
+                    int next = 0;
+                    for (GlowDepth.JetGroup g : groups) {
+                        GlowDepth.drawJets(event, g, false);
+                        double reach = g.core.distanceToSqr(cam);
+                        List<Source> batch = new ArrayList<>(own.getOrDefault(g, List.of()));
+                        while (next < front.size() && front.get(next).pos.distanceToSqr(cam) > reach) {
+                            batch.add(front.get(next++));
+                        }
+                        applyOnly(batch, cam, event);
+                        GlowDepth.drawJets(event, g, true);
+                    }
+                    applyOnly(front.subList(next, front.size()), cam, event);
                 }
             }
-            // レンズがないフレームや、レンズを切っているときのジェット
-            GlowDepth.drawJets(event);
         } finally {
             SOURCES.clear();
+            // レンズがないフレームや、レンズを切っているときのジェット（組もここで片付ける）
+            GlowDepth.finishJets(event);
         }
+    }
+
+    /** sources のレンズだけを掛ける（空なら何もしない）。 */
+    private static void applyOnly(List<Source> sources, Vec3 cam, RenderLevelStageEvent event) {
+        if (sources.isEmpty()) {
+            return;
+        }
+        SOURCES.clear();
+        SOURCES.addAll(sources);
+        apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
     }
 
     /** レンズを掛ける。useDepth が false なら深度を使わない（シェーダーパック使用時）。 */

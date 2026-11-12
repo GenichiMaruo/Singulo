@@ -128,6 +128,42 @@ public final class CollapsarGameTests {
         h.succeed();
     }
 
+    /** 倉庫の上に積んだ倉庫だけが、下とつながった形（down）になり、下を壊すと元に戻る。 */
+    @GameTest(template = "empty")
+    public static void stackedVaultsJoinTheVaultBelow(GameTestHelper h) {
+        var DOWN = io.github.genichimaruo.singulo.storage.HorizonVaultBlock.DOWN;
+        BlockPos low = new BlockPos(2, 1, 2), high = low.above();
+        // 上を先に置き、あとから下に倉庫を置く（隣の変化で上の形が変わる）
+        h.setBlock(high, SinguloBlocks.HORIZON_VAULT.get());
+        h.assertFalse(h.getBlockState(high).getValue(DOWN), "A lone vault joined the floor");
+        h.setBlock(low, SinguloBlocks.HORIZON_VAULT.get());
+        h.assertTrue(h.getBlockState(high).getValue(DOWN), "Upper vault did not join the one below");
+        h.assertFalse(h.getBlockState(low).getValue(DOWN), "Bottom vault joined the floor");
+        h.setBlock(low, net.minecraft.world.level.block.Blocks.STONE);
+        h.assertFalse(h.getBlockState(high).getValue(DOWN), "Upper vault stayed joined after the vault below was removed");
+        h.succeed();
+    }
+
+    /** 全部取り出して空になったことも、見た目の更新でクライアントへ届く（空のデータはクライアントで読まれず、前の個数が残る）。 */
+    @GameTest(template = "empty")
+    public static void vaultSendsEmptinessToClients(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
+        HorizonVaultBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
+        var registries = h.getLevel().registryAccess();
+        vault.items().insertItem(0, new ItemStack(Items.COBBLESTONE, 2), false);
+        // クライアント側の写し: 2個入っているところを受け取ってある
+        HorizonVaultBlockEntity shown = new HorizonVaultBlockEntity(h.absolutePos(at), vault.getBlockState());
+        shown.load(vault.getUpdateTag());
+        h.assertTrue(shown.count() == 2, "Client copy did not receive the count");
+        vault.items().extractItem(0, 64, false);
+        var update = vault.getUpdateTag();
+        h.assertFalse(update.isEmpty(), "Empty vault sends an empty update, which clients ignore");
+        shown.load(update);
+        h.assertTrue(shown.count() == 0 && shown.type().isEmpty(), "Client copy still shows " + shown.count());
+        h.succeed();
+    }
+
     @GameTest(template = "empty")
     public static void vaultStoresOneItemAndRejectsTheRest(GameTestHelper h) throws Exception {
         BlockPos at = new BlockPos(2, 1, 2);

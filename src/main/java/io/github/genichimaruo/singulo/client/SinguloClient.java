@@ -55,6 +55,9 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(PipeSurveyRenderer::hud);
         MinecraftForge.EVENT_BUS.addListener(PipeSurveyRenderer::clear);
         MinecraftForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(ArsenalNotice::onLogin);
+        MinecraftForge.EVENT_BUS.addListener(ArsenalNotice::onLogout);
+        MinecraftForge.EVENT_BUS.addListener(ArsenalNotice::onClientTick);
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
             ClientGalaxies.set(java.util.List.of(), false);
             ClientRecords.set(java.util.List.of());
