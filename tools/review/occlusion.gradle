@@ -1,5 +1,6 @@
 allprojects {
  afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
   sourceSets.main.java.srcDir(file('tools/review/occlusion-src'))
   legacyForge.runs.client {
    gameDirectory = layout.buildDirectory.dir('occlusion-review').get().asFile

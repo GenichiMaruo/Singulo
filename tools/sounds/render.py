@@ -23,7 +23,7 @@ from recipes import RECIPES, LOOP  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'src' / 'main' / 'resources' / 'assets' / 'singulo' / 'sounds'
-QUALITY = 0.68          # libsndfile の compression_level（大きいほど小さく、音は荒くなる）
+QUALITY = 0.82          # libsndfile の compression_level（大きいほど小さく、音は荒くなる）
 
 
 def sound_paths():

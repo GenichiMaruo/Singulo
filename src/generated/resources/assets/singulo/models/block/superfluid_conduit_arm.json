@@ -1,0 +1,134 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/superfluid_conduit_full",
+    "c": "singulo:block/superfluid_conduit",
+    "g": "singulo:block/superfluid_conduit_glass",
+    "f": "singulo:block/superfluid_conduit_flange",
+    "r": "singulo:block/superfluid_conduit_rim",
+    "j": "singulo:block/superfluid_conduit_joint"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        3,
+        3,
+        0
+      ],
+      "to": [
+        13,
+        13,
+        1
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#f"
+        },
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#f"
+        },
+        "east": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r"
+        },
+        "west": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r"
+        },
+        "up": {
+          "uv": [
+            3,
+            0,
+            13,
+            1
+          ],
+          "texture": "#r"
+        },
+        "down": {
+          "uv": [
+            3,
+            0,
+            13,
+            1
+          ],
+          "texture": "#r"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        4,
+        1
+      ],
+      "to": [
+        12,
+        12,
+        4
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            1,
+            4,
+            4,
+            12
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            1,
+            4,
+            4,
+            12
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            1,
+            4,
+            4,
+            12
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            1,
+            4,
+            4,
+            12
+          ],
+          "texture": "#c",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 // Standalone JEI render review. Never included in distribution JARs.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/jei-src'))
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('jei-review').get().asFile

@@ -88,6 +88,8 @@ public final class SinguloBlocks {
     public static final RegistryObject<PartBlock> HEAT_EXCHANGE_CORE = part("heat_exchange_core", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_FRAME = part("degenerate_compactor_frame", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_PLATE = part("degenerate_compactor_plate", MultiblockPart.Role.STRUCTURE);
+    /** コラプサー内張り（加工するマルチブロックの外装板の位置に置くと速くなる。{@link io.github.genichimaruo.singulo.multiblock.CollapsarLining}）。 */
+    public static final RegistryObject<PartBlock> COLLAPSAR_LINING = part("collapsar_lining", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_RAM = part("degenerate_compactor_ram", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_ANVIL = part("degenerate_compactor_anvil", MultiblockPart.Role.STRUCTURE);
     public static final RegistryObject<PartBlock> DEGENERATE_COMPACTOR_VENT = part("degenerate_compactor_vent", MultiblockPart.Role.STRUCTURE);
@@ -193,6 +195,15 @@ public final class SinguloBlocks {
             "drone_station", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Station(machineProperties()));
     public static final RegistryObject<io.github.genichimaruo.singulo.drone.DroneBlocks.Port> DRONE_PORT = BLOCKS.register(
             "drone_port", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Port(machineProperties()));
+    /** ワームホール航路標識: ワームホールの両方の口のそばに置くと、ドローンが口をくぐって別の次元のポートへ荷物を届け、同じ口で帰ってくる。 */
+    public static final RegistryObject<Block> WORMHOLE_DRONE_BEACON = BLOCKS.register("wormhole_drone_beacon",
+            () -> new Block(machineProperties().noOcclusion().lightLevel(s -> 10)));
+    /** 事象の地平線倉庫（1種類の物を中の小さなブラックホールに約10億個まで）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.storage.HorizonVaultBlock> HORIZON_VAULT = BLOCKS.register(
+            "horizon_vault", () -> new io.github.genichimaruo.singulo.storage.HorizonVaultBlock(machineProperties().noOcclusion()));
+    /** 液体のドローン発着ポート（液体カプセルに詰めて送る・受け取る）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.drone.DroneBlocks.FluidPort> FLUID_DRONE_PORT = BLOCKS.register(
+            "fluid_drone_port", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.FluidPort(machineProperties()));
     /** アンドロイドの作業（自動化）: 作業指令台（資材口とレシピの記録を兼ねる）・資材口・納品口・レシピ棚。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.work.WorkConsoleBlock> ANDROID_WORK_CONSOLE = BLOCKS.register(
             "android_work_console", () -> new io.github.genichimaruo.singulo.android.work.WorkConsoleBlock(machineProperties()));
@@ -573,7 +584,18 @@ public final class SinguloBlocks {
 
     // ---- 液体パイプ
     public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
-            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER)));
+            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), 2_000,
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.COPPER));
+    public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> VACUUM_JACKETED_PIPE = BLOCKS.register(
+            "vacuum_jacketed_pipe", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.METAL),
+                    32_000, io.github.genichimaruo.singulo.pipe.PipeProfile.VACUUM));
+    public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> SUPERFLUID_CONDUIT = BLOCKS.register(
+            "superfluid_conduit", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.GLASS),
+                    512_000, io.github.genichimaruo.singulo.pipe.PipeProfile.SUPERFLUID));
+    /** 上限なし（1つの口の1回の受け渡しは int まで）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> HORIZON_DUCT = BLOCKS.register(
+            "horizon_duct", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.NETHERITE_BLOCK),
+                    Long.MAX_VALUE, io.github.genichimaruo.singulo.pipe.PipeProfile.HORIZON));
 
     private static RegistryObject<Block> ruinLamp(String id) {
         return simpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)

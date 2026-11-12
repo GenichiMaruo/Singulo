@@ -16,9 +16,17 @@ public class SinguloBlockItem extends BlockItem {
         this.stage = stage;
     }
 
+    /** Legacy equivalent of the modern stack-aware container eligibility hook. */
+    public static boolean mayNest(ItemStack stack) {
+        return stack.getItem().canFitInsideContainerItems()
+                && !io.github.genichimaruo.singulo.drone.DroneCrateItem.packed(stack)
+                && SinguloComponents.get(stack, SinguloComponents.VAULT_COUNT.get()) == null;
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         SinguloItem.addStageLine(tooltip, stage);
+        super.appendHoverText(stack, context, tooltip, flag);
         if (packed(stack)) {
             tooltip.add(Component.translatable("tooltip.singulo.packed_device").withStyle(net.minecraft.ChatFormatting.AQUA));
         }

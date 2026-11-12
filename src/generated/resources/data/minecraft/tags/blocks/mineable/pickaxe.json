@@ -215,6 +215,13 @@
     "singulo:suspension_strut",
     "singulo:pasta_conductor",
     "singulo:tidal_draw_ring",
-    "singulo:spindle_cradle"
+    "singulo:spindle_cradle",
+    "singulo:vacuum_jacketed_pipe",
+    "singulo:superfluid_conduit",
+    "singulo:horizon_duct",
+    "singulo:fluid_drone_port",
+    "singulo:collapsar_lining",
+    "singulo:horizon_vault",
+    "singulo:wormhole_drone_beacon"
   ]
 }

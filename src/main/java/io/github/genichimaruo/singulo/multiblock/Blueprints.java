@@ -369,4 +369,20 @@ public final class Blueprints {
     public static boolean matches(BlockState want, BlockState have) {
         return want.isAir() ? have.isAir() : have.is(want.getBlock());
     }
+
+    /**
+     * 外装板の位置（panel）では、形の判定と同じく、マルチブロック搬入出ポート・ワームホール生成器のポート・
+     * （受け付ける形なら）コラプサー内張りも正しいブロックと見なす。投影とチャットの報告が使う。
+     */
+    public static boolean matches(BlockState want, BlockState have, boolean panel, boolean lining) {
+        if (matches(want, have)) {
+            return true;
+        }
+        if (!panel) {
+            return false;
+        }
+        return have.is(SinguloBlocks.MULTIBLOCK_PORT.get())
+                || have.is(SinguloBlocks.WORMHOLE_GENERATOR_PORT.get()) && want.is(SinguloBlocks.WORMHOLE_GENERATOR_SHELL.get())
+                || lining && have.is(SinguloBlocks.COLLAPSAR_LINING.get());
+    }
 }

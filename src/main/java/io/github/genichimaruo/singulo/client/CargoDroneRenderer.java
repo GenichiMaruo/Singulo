@@ -50,7 +50,9 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     private static final ResourceLocation[] TEXTURES = new ResourceLocation[SKINS.length];
     private static final RenderType[] GLOWS = new RenderType[SKINS.length];
     private static final RenderType[] SHELLS = new RenderType[SKINS.length];
-    private static final String[] CRATES = {"", "packing_crate", "battery_packing_crate", "large_battery_packing_crate"};
+    /** 箱の番号（DroneCrateItem.displayTier）ごとのアイテム: 梱包箱3段階と、液体カプセル3段階。 */
+    private static final String[] CRATES = {"", "packing_crate", "battery_packing_crate", "large_battery_packing_crate",
+            "fluid_capsule", "battery_fluid_capsule", "large_battery_fluid_capsule"};
     /** 箱の半分の高さ（箱の絵は 10/16 の立方体）。 */
     static final float CRATE_HALF = 5 / 16F;
 
@@ -98,7 +100,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
             return;
         }
         super.render(drone, yaw, partialTick, pose, buffers, light);
-        ItemStack crate = crate(drone.crateTier());
+        ItemStack crate = drone.cargo().isEmpty() ? crate(drone.crateTier()) : drone.cargo();
         if (!crate.isEmpty()) {
             pose.pushPose();
             float body = Mth.rotLerp(partialTick, drone.yBodyRotO, drone.yBodyRot);

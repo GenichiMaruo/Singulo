@@ -1,6 +1,7 @@
 // Dedicated loopback-only lifecycle and real two-client regression.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/lifecycle-src'))
         def output = file(providers.gradleProperty('lifecycleOutput').get()).absolutePath
         legacyForge.runs.server {

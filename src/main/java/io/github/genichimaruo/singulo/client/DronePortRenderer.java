@@ -91,7 +91,7 @@ public class DronePortRenderer implements BlockEntityRenderer<DronePortBlockEnti
         boolean crateOnPlatform = anim == DronePortBlockEntity.ANIM_LOAD ? t < DronePortBlockEntity.ANIM_HANDOFF
                 : anim == DronePortBlockEntity.ANIM_UNLOAD && t >= DronePortBlockEntity.ANIM_HANDOFF;
         if (crateOnPlatform) {
-            ItemStack crate = CargoDroneRenderer.crate(be.animTier());
+            ItemStack crate = be.animCrate().isEmpty() ? CargoDroneRenderer.crate(be.animTier()) : be.animCrate();
             if (!crate.isEmpty()) {
                 pose.pushPose();
                 pose.translate(0.5, top / 16F + CargoDroneRenderer.CRATE_HALF, 0.5);

@@ -1,10 +1,14 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "singulo:block/fluid_pipe",
+    "particle": "singulo:block/fluid_pipe_full",
     "c": "singulo:block/fluid_pipe",
-    "e": "singulo:block/fluid_pipe_end"
+    "g": "singulo:block/fluid_pipe_glass",
+    "f": "singulo:block/fluid_pipe_flange",
+    "r": "singulo:block/fluid_pipe_rim",
+    "j": "singulo:block/fluid_pipe_joint"
   },
+  "render_type": "minecraft:cutout",
   "elements": [
     {
       "from": [
@@ -20,27 +24,27 @@
       "faces": {
         "east": {
           "uv": [
-            0,
             5,
-            6,
+            5,
+            11,
             11
           ],
           "texture": "#c"
         },
         "west": {
           "uv": [
-            0,
             5,
-            6,
+            5,
+            11,
             11
           ],
           "texture": "#c"
         },
         "up": {
           "uv": [
-            0,
             5,
-            6,
+            5,
+            11,
             11
           ],
           "texture": "#c",
@@ -48,9 +52,9 @@
         },
         "down": {
           "uv": [
-            0,
             5,
-            6,
+            5,
+            11,
             11
           ],
           "texture": "#c",

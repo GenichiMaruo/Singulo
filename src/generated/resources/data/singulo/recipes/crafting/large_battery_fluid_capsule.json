@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WEW",
+    "OXO"
+  ],
+  "key": {
+    "W": {
+      "item": "singulo:superconducting_wire"
+    },
+    "E": {
+      "item": "singulo:entangled_element"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "X": {
+      "item": "singulo:battery_fluid_capsule"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:large_battery_fluid_capsule"
+  }
+}

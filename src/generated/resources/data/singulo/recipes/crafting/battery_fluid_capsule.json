@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ROR",
+    "CXC"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:dusts/redstone"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "C": {
+      "tag": "forge:ingots/copper"
+    },
+    "X": {
+      "item": "singulo:fluid_capsule"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:battery_fluid_capsule"
+  }
+}

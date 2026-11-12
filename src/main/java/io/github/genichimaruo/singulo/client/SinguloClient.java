@@ -39,6 +39,7 @@ public final class SinguloClient {
         modBus.addListener(JetForgeRenderTypes::registerShaders);
         modBus.addListener(GlowDepth::registerShaders);
         modBus.addListener(JetForgeRenderer::registerModels);
+        modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
@@ -132,6 +133,8 @@ public final class SinguloClient {
                 AcceleratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(),
                 CableRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_PIPE.get(),
+                FluidPipeRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.RAYLEIGH_PANEL.get(),
                 RayleighPanelRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.KERAUNOS_TOWER.get(),
@@ -144,6 +147,10 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.CARGO_DRONE.get(), CargoDroneRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DRONE_PORT.get(),
                 DronePortRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_DRONE_PORT.get(),
+                DronePortRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.HORIZON_VAULT.get(),
+                HorizonVaultRenderer::new);
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
         event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
         event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
@@ -305,6 +312,8 @@ public final class SinguloClient {
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
     private static void addPacks(net.minecraftforge.event.AddPackFindersEvent event) {
         if (event.getPackType() != net.minecraft.server.packs.PackType.CLIENT_RESOURCES) return;
+        var modFile = net.minecraftforge.fml.ModList.get().getModFileById(Singulo.MODID).getFile();
+        if (!java.nio.file.Files.isRegularFile(modFile.findResource("resourcepacks/singulo_hd/pack.mcmeta"))) return;
         event.addRepositorySource(consumer -> {
             var file = net.minecraftforge.fml.ModList.get().getModFileById(Singulo.MODID).getFile();
             var resources = new net.minecraft.server.packs.PathPackResources("singulo_hd", file.findResource("resourcepacks/singulo_hd"), false);

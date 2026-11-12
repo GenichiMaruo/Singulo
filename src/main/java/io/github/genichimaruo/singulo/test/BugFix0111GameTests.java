@@ -10,6 +10,7 @@ import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock;
+import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -214,6 +215,7 @@ public final class BugFix0111GameTests {
     }
 
     /** アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。 */
+
     @GameTest(template = EMPTY, batch = "android_zero_gravity_alone", timeoutTicks = 200)
     public static void androidsFlyInZeroGravity(GameTestHelper helper) throws Exception {
         io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
@@ -232,8 +234,10 @@ public final class BugFix0111GameTests {
             field.setAccessible(true);
             ((net.minecraft.world.entity.ai.goal.GoalSelector) field.get(android)).removeAllGoals(goal -> true);
         }
+
         android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 2, 1))));
         android.setPersistenceRequired();
+        TestScope.of(helper).defer(android::discard);
         helper.getLevel().addFreshEntity(android);
         Vec3 up = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 5, 3)));
         helper.onEachTick(() -> {
@@ -242,10 +246,10 @@ public final class BugFix0111GameTests {
             }
         });
         helper.succeedWhen(() -> {
+            helper.assertTrue(ZeroGravity.inZone(helper.getLevel(), up.x, up.y, up.z), "行き先の無重力領域が登録されていない");
             helper.assertTrue(android.floating(), "無重力の中で飛ばない: " + android.position().subtract(Vec3.atLowerCornerOf(helper.absolutePos(BlockPos.ZERO))));
             helper.assertFalse(ZeroGravity.weightless(android), "アンドロイドの重力の属性が変わった");
             helper.assertTrue(android.position().distanceToSqr(up) < 1.5, "上の行き先まで飛べない: " + android.position() + " → " + up);
-            android.discard();
         });
     }
 

@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "tidal_spindle",
+  "stage": 5,
+  "time": 60,
+  "energy": 1000000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:ingots/iron"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:chain",
+    "count": 2
+  }
+}

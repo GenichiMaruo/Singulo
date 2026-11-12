@@ -5,6 +5,8 @@
   "plugin": "io.github.genichimaruo.singulo.mixin.RayleighMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ProjectileAccessor",
+    "WormholeProjectileTickMixin",
     "DaylightDetectorBlockMixin",
     "RayleighLightEngineMixin",
     "RayleighWeatherMixin",

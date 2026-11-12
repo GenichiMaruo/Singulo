@@ -193,6 +193,23 @@
         "cosmic.production",
         "cosmic.links"
       ]
+    },
+    {
+      "id": "fluids",
+      "icon": "singulo:vacuum_jacketed_pipe",
+      "pages": [
+        "fluids.pipes",
+        "fluids.drone"
+      ]
+    },
+    {
+      "id": "collapsar",
+      "icon": "singulo:collapsar_ingot",
+      "pages": [
+        "collapsar.lining",
+        "collapsar.vault",
+        "collapsar.wormhole"
+      ]
     }
   ]
 }

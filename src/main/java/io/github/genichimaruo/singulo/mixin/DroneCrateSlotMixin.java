@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class DroneCrateSlotMixin {
     @Inject(method = "mayPlace", at = @At("HEAD"), cancellable = true)
     private void singulo$guard(ItemStack stack, CallbackInfoReturnable<Boolean> result) {
-        if (DroneCrateItem.packed(stack)) result.setReturnValue(false);
+        if (!io.github.genichimaruo.singulo.item.SinguloBlockItem.mayNest(stack)) result.setReturnValue(false);
     }
 }

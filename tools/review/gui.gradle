@@ -1,6 +1,7 @@
 // Development-only: ordinary build/jar tasks never include the GUI harness.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/gui-src'))
         def reviewRoot = layout.buildDirectory.dir(providers.gradleProperty('cosmicGuiReview').isPresent() ? 'cosmic-gui-review' : 'gui-review').get().asFile
         legacyForge.runs.client {

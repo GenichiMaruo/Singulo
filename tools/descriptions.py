@@ -662,8 +662,8 @@ DESC = {
                    'A facility that forges materials with a beam squeezed from the jets of a black hole.'),
     'コラプサー・ビレット': ('ネザライトを縮退物質殻で包み、ジェット凝縮体を染み込ませた鍛造前の地金。降着ジェット鍛造炉で鍛えるとコラプサー・インゴットになる。',
                     'Netherite wrapped in a degenerate-matter shell and soaked with jet condensate. Forge it in the Accretion Jet Forge to make a Collapsar Ingot.'),
-    'コラプサー・インゴット': ('ブラックホールのジェットで鍛えた、光を吸う黒の地金。最高位の装備や道具の素材になる。共通タグ c:ingots/collapsar。',
-                     'A light-drinking black metal forged in a black hole jet, a material for the finest gear and tools. Common tag: c:ingots/collapsar.'),
+    'コラプサー・インゴット': ('ブラックホールのジェットで鍛えた地金。コラプサー内張り、事象の地平線倉庫、ワームホール航路標識などの材料。共通タグ c:ingots/collapsar。',
+                     'Forged in a black hole jet. Used for Collapsar Lining, the Event Horizon Vault and the Wormhole Drone Beacon. Common tag: c:ingots/collapsar.'),
 }
 # 施設の建材の設計図（tools/blueprints.py）
 from blueprints import DESCRIPTIONS as _BLUEPRINT_DESC  # noqa: E402
@@ -996,3 +996,6 @@ SUMMARY = {
 from cosmic_content import DESC as _COSMIC_DESC, SUMMARY as _COSMIC_SUMMARY
 DESC.update(_COSMIC_DESC)
 SUMMARY.update(_COSMIC_SUMMARY)
+from logistics_content import DESC as _LOGISTICS_DESC, SUMMARY as _LOGISTICS_SUMMARY
+DESC.update(_LOGISTICS_DESC)
+SUMMARY.update(_LOGISTICS_SUMMARY)

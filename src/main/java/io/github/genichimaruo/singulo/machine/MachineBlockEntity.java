@@ -50,7 +50,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
             D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_SELECTED = 11,
-            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_LOADED_USES = 14, D_TANKS = 15;
+            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_LOADED_USES = 14, D_LINING = 15, D_TANKS = 16;
     /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
@@ -460,6 +460,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     /** マルチブロックの大きさ。-1 はマルチブロックでない。 */
     public int structureSize() {
         return -1;
+    }
+
+    /** マルチブロックの外装板の位置に置いたコラプサー内張りの数（内張りを受け付けない装置は 0）。 */
+    public int liningCount() {
+        return 0;
     }
 
     /** 処理速度の倍率（マルチブロックの大きさなど）。 */
@@ -1110,6 +1115,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_MASS -> massTargetIsMetal() ? (int) Math.round(metalMass * 100) : (int) Math.round(mass * 100);
             case D_MASS_TARGET -> massTarget();
             case D_STRUCTURE -> structureSize();
+            case D_LINING -> liningCount();
             case D_SELECTED -> selectedIndex() + 1;
             case D_LOADED_ITEM -> magazine.loadedItemId();
             case D_LOADED_FILL -> Math.round(magazine.fill() * 1000);

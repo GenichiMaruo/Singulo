@@ -48,5 +48,13 @@ public final class SinguloComponents {
         }
     }
     public static final Supplier<Key<io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content>> CHEMICAL_SAMPLE = key("chemical_sample", io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content.CODEC);
+    private static final Codec<net.minecraftforge.fluids.FluidStack> FLUID_CODEC = net.minecraft.nbt.CompoundTag.CODEC.xmap(
+            net.minecraftforge.fluids.FluidStack::loadFluidStackFromNBT,
+            fluid -> fluid.writeToNBT(new net.minecraft.nbt.CompoundTag()));
+    public static final Supplier<Key<net.minecraftforge.fluids.FluidStack>> CAPSULE_FLUID = key("capsule_fluid", FLUID_CODEC);
+    public static final Supplier<Key<net.minecraftforge.fluids.FluidStack>> PORT_SEND_FLUID = key("port_send_fluid", FLUID_CODEC);
+    public static final Supplier<Key<net.minecraftforge.fluids.FluidStack>> PORT_RECEIVE_FLUID = key("port_receive_fluid", FLUID_CODEC);
+    public static final Supplier<Key<ItemStack>> VAULT_ITEM = key("vault_item", ItemStack.CODEC);
+    public static final Supplier<Key<Long>> VAULT_COUNT = key("vault_count", Codec.LONG);
     private SinguloComponents() {}
 }

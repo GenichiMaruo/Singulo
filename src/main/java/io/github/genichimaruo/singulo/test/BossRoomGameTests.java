@@ -183,22 +183,16 @@ public final class BossRoomGameTests {
     }
 
     /** 記録保管室から出ない:押し出されると核の上へ戻り、部屋の外の相手の背後へは跳ばない。 */
-    // 押し出した先はテストの区画の外のチャンクなので、強制読み込みして動けるようにする
-    // （読み込みは実時間で進むので、tick を速めたテストでは戻るまで待つ）
-    @GameTest(setupTicks = 20, template = EMPTY, batch = BATCH + "_28", timeoutTicks = 200)
+    // Keep the displaced boss and target inside the runner's loaded template.
+    // An immediate teleport into a forced outside chunk races asynchronous entity ticking.
+    @GameTest(setupTicks = 20, template = "forge", batch = BATCH + "_28", timeoutTicks = 200)
     public static void sentinelStaysInItsRoom(GameTestHelper helper) {
         io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         BlockPos home = helper.absolutePos(CORE);
-        net.minecraft.world.level.ChunkPos pushed = new net.minecraft.world.level.ChunkPos(home.offset(14, 0, 0));
-        boolean wasForced = helper.getLevel().getForcedChunks().contains(pushed.toLong());
-        // The GameTest batch runner releases forced tickets even after failure.
-        // A completion listener runs after that runner may have started the next batch;
-        // it must not release a ticket now owned by the next fixture.
         io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(s::discard);
-        helper.getLevel().setChunkForced(pushed.x, pushed.z, true);
         s.teleportTo(home.getX() + 14.5, home.getY() + 2, home.getZ() + 0.5);
         helper.startSequence().thenWaitUntil(() -> {
             double dx = Math.abs(s.getX() - (home.getX() + 0.5));
@@ -213,7 +207,6 @@ public final class BossRoomGameTests {
             }
             outside.discard();
             s.discard();
-            helper.getLevel().setChunkForced(pushed.x, pushed.z, wasForced);
         }).thenSucceed();
     }
 

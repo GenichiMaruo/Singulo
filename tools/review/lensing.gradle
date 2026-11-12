@@ -1,6 +1,7 @@
 // Development-only many-source rendering regression; never ship this harness.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/lensing-src'))
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('lensing-review').get().asFile

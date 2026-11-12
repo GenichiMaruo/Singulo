@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = InvWrapper.class, remap = false)
 abstract class DroneCrateInventoryMixin {
     private boolean singulo$blocked(ItemStack stack) {
-        return ((InvWrapper)(Object)this).getInv() instanceof ShulkerBoxBlockEntity && DroneCrateItem.packed(stack);
+        return ((InvWrapper)(Object)this).getInv() instanceof ShulkerBoxBlockEntity && !io.github.genichimaruo.singulo.item.SinguloBlockItem.mayNest(stack);
     }
     @Inject(method = "isItemValid", at = @At("HEAD"), cancellable = true)
     private void singulo$valid(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> result) {
