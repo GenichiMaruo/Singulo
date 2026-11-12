@@ -1415,13 +1415,13 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
         }
 
-        /** 猫の耳の左右の辺（耳の中の座標。高さ y での x）。根元 (-2.0, 0)・(2.0, 0) から先 (-0.18, -2.4)・(0.75, -2.4) へ。 */
+        /** 猫の耳の左右の辺（耳の中の座標。高さ y での x）。根元 (-1.8, 0)・(1.8, 0) から先 (-0.18, -2.65)・(0.75, -2.65) へ。 */
         private static float earLeft(float y) {
-            return -2.0F + 1.82F * (-y / 2.4F);
+            return -1.8F + 1.62F * (-y / 2.65F);
         }
 
         private static float earRight(float y) {
-            return 2.0F - 1.25F * (-y / 2.4F);
+            return 1.8F - 1.05F * (-y / 2.65F);
         }
 
         /** 三角柱（ピクセル単位。前は z0、後ろは z1、後ろの面は backScale 倍）。猫の耳など斜めの辺の形に。 */
@@ -1672,11 +1672,11 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                         pose.mulPose(Axis.ZP.rotationDegrees(side * (12 + twitch)));   // 先を外へ
                         pose.mulPose(Axis.YP.rotationDegrees(-side * 12));             // 内側を少し外へ向ける
                         pose.scale(side, 1, 1);                                        // 左右対称（先は外寄り）
-                        // 耳は箱が主: 根元が広く低い三角（猫の耳。縦長だとウサギに見える）。左右の辺は、根元 (-2.0, 0) と
-                        // (2.0, 0) から先 (-0.18, -2.4)・(0.75, -2.4) へのまっすぐな線で、3段の箱をその線の内側に置き、
+                        // 耳は箱が主: 根元が広く低い三角（猫の耳。縦長だとウサギに見える）。左右の辺は、根元 (-1.8, 0) と
+                        // (1.8, 0) から先 (-0.18, -2.65)・(0.75, -2.65) へのまっすぐな線で、3段の箱をその線の内側に置き、
                         // 段の角を斜めの三角で線まで埋める。先は幅1ドットほどの小さな平らで、少し濃い。根元は髪に少し埋める
                         float z0 = -0.3F, z1 = 0.5F;
-                        float[] ys = {0, -0.9F, -1.7F, -2.4F};
+                        float[] ys = {0, -1.0F, -1.85F, -2.65F};
                         for (int i = 0; i < 3; i++) {
                             float yb = ys[i], yt = ys[i + 1];
                             float lb = earLeft(yb), lt = earLeft(yt), rb = earRight(yb), rt = earRight(yt);
@@ -1685,9 +1685,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                             ear(pose, vc, light, lb, yb, lt, yb, lt, yt, z0, z1, 1, col);      // 内側の辺
                             ear(pose, vc, light, rb, yb, rt, yb, rt, yt, z0, z1, 1, col);      // 外側の辺
                         }
-                        b(pose, vc, light, -2.0F, 0, z0, 2.0F, 0.3F, z1, c);                    // 髪に埋まる根元
+                        b(pose, vc, light, -1.8F, 0, z0, 1.8F, 0.3F, z1, c);                    // 髪に埋まる根元
                         // 裏の丸み（真ん中ほど厚い箱。少し陰になる）
-                        b(pose, vc, light, -1.3F, -0.9F, z1, 1.3F, 0.3F, 0.82F, mix(c, 0x000000, 0.08F));
+                        b(pose, vc, light, -1.15F, -0.9F, z1, 1.15F, 0.3F, 0.82F, mix(c, 0x000000, 0.08F));
                         b(pose, vc, light, -0.5F, -1.6F, z1, 0.9F, -0.9F, 0.72F, mix(c, 0x000000, 0.1F));
                         // 内側の桃色（前の面のすぐ前）と真ん中の濃い筋
                         b(pose, vc, light, -1.0F, -0.9F, -0.36F, 1.2F, 0.0F, z0, 0xF6B4C4);
