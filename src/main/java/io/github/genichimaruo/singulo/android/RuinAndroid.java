@@ -224,9 +224,11 @@ public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** タンクの見た目: 流体の番号（+1。0 は空）と入っている割合（0〜100）を、タンクごとに1つの数にまとめる。-1 はタンクなし。 */
     private static final EntityDataAccessor<Integer> TANK_A = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
-    /** 装飾（頭・背中/腰・手。クライアントで描くため）。 */
+    /** 装飾（頭・首/背中・手・顔・腰。クライアントで描くため）。 */
     @SuppressWarnings("unchecked")
     private static final EntityDataAccessor<net.minecraft.world.item.ItemStack>[] DECOR = new EntityDataAccessor[] {
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK)};
@@ -280,8 +282,8 @@ public abstract class RuinAndroid extends Monster {
     public static final int BACKPACK_SLOTS_BASIC = 12, BACKPACK_SLOTS_REINFORCED = 18;
     /** 伐採アップグレード・タンクアップグレードの枠（あとから足したので、持ち物のうしろ）。 */
     public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
-    /** 装飾の枠（頭・背中/腰・手）。 */
-    public static final int SLOT_DECOR = SLOT_TANK + 1, DECOR_SLOTS = 3;
+    /** 装飾の枠（{@link AndroidAccessoryItem#HEAD} などの番号の順。顔と腰は 0.18.0 でうしろに足した）。 */
+    public static final int SLOT_DECOR = SLOT_TANK + 1, DECOR_SLOTS = AndroidAccessoryItem.PARTS;
     public static final int INVENTORY_SIZE = SLOT_DECOR + DECOR_SLOTS;
     /** タンクアップグレードのタンクの数と、1つの容量（mB）。1つのタンクには1種類の流体。 */
     public static final int TANKS = 2, TANK_CAPACITY = 32000;
@@ -1500,6 +1502,20 @@ public abstract class RuinAndroid extends Monster {
         }
     }
 
+    /**
+     * 0.17 までは頭の枠にメガネ、背中/腰の枠に腰リボンを着けていた。0.18.0 で顔と腰の枠に分けたので、
+     * 枠に合わない装飾は、その装飾の枠が空いていればそこへ移す（空いていなければそのまま。外せば手で着け直せる）。
+     */
+    private void moveDecorToItsPart() {
+        for (int i = 0; i < DECOR_SLOTS; i++) {
+            net.minecraft.world.item.ItemStack d = inventory.getItem(SLOT_DECOR + i);
+            if (d.getItem() instanceof AndroidAccessoryItem acc && acc.part() != i && inventory.getItem(SLOT_DECOR + acc.part()).isEmpty()) {
+                inventory.setItem(SLOT_DECOR + acc.part(), d);
+                inventory.setItem(SLOT_DECOR + i, net.minecraft.world.item.ItemStack.EMPTY);
+            }
+        }
+    }
+
     /** 持ち物を読み込む。0.6.0 までの保存（位置なしの並び）は、自己修理キットと装甲板をそれぞれの場所へ戻す。 */
     private void loadInventory(CompoundTag tag) {
         inventory.clearContent();
@@ -1510,6 +1526,7 @@ public abstract class RuinAndroid extends Monster {
             for (int i = 0; i < INVENTORY_SIZE; i++) {
                 inventory.setItem(i, items.get(i));
             }
+            moveDecorToItsPart();
             return;
         }
         for (net.minecraft.nbt.Tag t : tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND)) {

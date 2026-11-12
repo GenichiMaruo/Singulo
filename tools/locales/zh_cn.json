@@ -3444,24 +3444,24 @@
     "translation": "头部"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret, headdress or glasses",
-    "translation": "缎带、发饰、贝雷帽、头饰、眼镜"
+    "source": "Ribbon, hair flower, beret, headdress, cat ears, a hat or a hair extension",
+    "translation": "缎带、发饰、贝雷帽、头饰、猫耳、帽子、接发"
   },
   "gui.singulo.android.decor.1": {
-    "source": "Back / waist",
-    "translation": "背部・腰部"
+    "source": "Neck / back",
+    "translation": "颈部・背部"
   },
   "gui.singulo.android.decor.1.hint": {
-    "source": "Cape, scarf or waist ribbon",
-    "translation": "披风、围巾、腰部缎带"
+    "source": "Cape, scarf or fairy wings",
+    "translation": "披风、围巾、妖精之翼"
   },
   "gui.singulo.android.decor.2": {
     "source": "Hand",
     "translation": "手部"
   },
   "gui.singulo.android.decor.2.hint": {
-    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
-    "translation": "文库本、花束、茶杯、伞（仅在待机时拿着）"
+    "source": "Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)",
+    "translation": "文库本、花束、茶杯、伞、提灯、扫帚（仅在待机时拿着）"
   },
   "gui.singulo.android.decor.dye": {
     "source": "Dye them with dyes on a crafting table",
@@ -11160,8 +11160,8 @@
     "translation": "戴在仿生人头上（装饰页）"
   },
   "tooltip.singulo.android_accessory.1": {
-    "source": "Worn on an android's back or waist (decoration page)",
-    "translation": "戴在仿生人背部或腰部（装饰页）"
+    "source": "Worn on an android's neck or back (decoration page)",
+    "translation": "戴在仿生人颈部或背部（装饰页）"
   },
   "tooltip.singulo.android_accessory.2": {
     "source": "Held by an idle android (decoration page)",
@@ -14162,5 +14162,189 @@
   "message.singulo.arsenal_notice.link": {
     "source": "[View on CurseForge]",
     "translation": "[在 CurseForge 查看]"
+  },
+  "item.singulo.android_cat_ears": {
+    "source": "Cat Ear Headband",
+    "translation": "猫耳发箍"
+  },
+  "item.singulo.android_witch_hat": {
+    "source": "Witch Hat",
+    "translation": "魔女帽"
+  },
+  "item.singulo.android_straw_hat": {
+    "source": "Straw Hat",
+    "translation": "草帽"
+  },
+  "item.singulo.android_ponytail": {
+    "source": "Hair Extension (Ponytail)",
+    "translation": "接发（马尾）"
+  },
+  "item.singulo.android_twin_tails": {
+    "source": "Hair Extension (Twin Tails)",
+    "translation": "接发（双马尾）"
+  },
+  "item.singulo.android_monocle": {
+    "source": "Monocle",
+    "translation": "单片眼镜"
+  },
+  "item.singulo.android_fairy_wings": {
+    "source": "Fairy Wings",
+    "translation": "妖精之翼"
+  },
+  "item.singulo.android_apron": {
+    "source": "Apron",
+    "translation": "围裙"
+  },
+  "item.singulo.android_lantern": {
+    "source": "Lantern",
+    "translation": "提灯"
+  },
+  "item.singulo.android_broom": {
+    "source": "Broom",
+    "translation": "扫帚"
+  },
+  "gui.singulo.android.decor.3": {
+    "source": "Face",
+    "translation": "脸部"
+  },
+  "gui.singulo.android.decor.4": {
+    "source": "Waist",
+    "translation": "腰部"
+  },
+  "gui.singulo.android.decor.3.hint": {
+    "source": "Glasses or monocle",
+    "translation": "眼镜、单片眼镜"
+  },
+  "gui.singulo.android.decor.4.hint": {
+    "source": "Waist ribbon or apron",
+    "translation": "腰部缎带、围裙"
+  },
+  "tooltip.singulo.android_accessory.3": {
+    "source": "Worn on an android's face (decoration page)",
+    "translation": "戴在仿生人脸上（装饰页）"
+  },
+  "tooltip.singulo.android_accessory.4": {
+    "source": "Worn on an android's waist (decoration page)",
+    "translation": "戴在仿生人腰部（装饰页）"
+  },
+  "desc.singulo.android_apron": {
+    "source": "An apron with a frilled hem. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "下摆带有褶边的围裙。装在装饰页的腰部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_apron": {
+    "source": "An apron for an android.",
+    "translation": "仿生人系在腰上的围裙。"
+  },
+  "howto.singulo.android_apron": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_broom": {
+    "source": "A broom an android holds upright while idle. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the binding.",
+    "translation": "仿生人待机时竖着拿的扫帚。装在装饰页的手部槽中。与染料一起在工作台上染色会改变绑绳的颜色。"
+  },
+  "summary.singulo.android_broom": {
+    "source": "A broom an idle android holds.",
+    "translation": "待机的仿生人拿着的扫帚。"
+  },
+  "howto.singulo.android_broom": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_cat_ears": {
+    "source": "A headband with cat ears for an android. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "戴在仿生人头上、带猫耳的发箍。装在装饰页的头部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_cat_ears": {
+    "source": "Cat ears for an android.",
+    "translation": "戴在仿生人头上的猫耳。"
+  },
+  "howto.singulo.android_cat_ears": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_fairy_wings": {
+    "source": "Four clear wings that flutter slowly on an android's back. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "在背上缓缓扇动的四片透明翅膀。装在装饰页的颈部・背部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_fairy_wings": {
+    "source": "Wings that flutter on an android's back.",
+    "translation": "在仿生人背上扇动的翅膀。"
+  },
+  "howto.singulo.android_fairy_wings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_lantern": {
+    "source": "A lantern an android carries while idle. Its flame looks bright even in the dark, though it does not light the area. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the metal frame.",
+    "translation": "仿生人待机时提在手上的提灯。里面的火在暗处也显得明亮（不会照亮周围）。装在装饰页的手部槽中。与染料一起在工作台上染色会改变金属框的颜色。"
+  },
+  "summary.singulo.android_lantern": {
+    "source": "A lantern an idle android carries.",
+    "translation": "待机的仿生人提着的提灯。"
+  },
+  "howto.singulo.android_lantern": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_monocle": {
+    "source": "A monocle on a chain for the right eye. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the rim.",
+    "translation": "戴在右眼、带链子的单片眼镜。装在装饰页的脸部槽中（与眼镜同一槽）。与染料一起在工作台上染色会改变镜框的颜色。"
+  },
+  "summary.singulo.android_monocle": {
+    "source": "A monocle for an android's right eye.",
+    "translation": "戴在仿生人右眼的单片眼镜。"
+  },
+  "howto.singulo.android_monocle": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_ponytail": {
+    "source": "A high ponytail in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair tie.",
+    "translation": "在后脑高处扎起的马尾。头发是仿生人自己的发色。装在装饰页的头部槽中。与染料一起在工作台上染色会改变发圈的颜色。"
+  },
+  "summary.singulo.android_ponytail": {
+    "source": "Gives an android a ponytail.",
+    "translation": "把仿生人的头发扎成马尾。"
+  },
+  "howto.singulo.android_ponytail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_straw_hat": {
+    "source": "A straw hat with a ribbon. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the ribbon.",
+    "translation": "缠着缎带的草帽。装在装饰页的头部槽中。与染料一起在工作台上染色会改变缎带的颜色。"
+  },
+  "summary.singulo.android_straw_hat": {
+    "source": "A straw hat for an android.",
+    "translation": "仿生人戴的草帽。"
+  },
+  "howto.singulo.android_straw_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_twin_tails": {
+    "source": "Twin tails in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair ties.",
+    "translation": "在头的左右两侧扎起的双马尾。头发是仿生人自己的发色。装在装饰页的头部槽中。与染料一起在工作台上染色会改变发圈的颜色。"
+  },
+  "summary.singulo.android_twin_tails": {
+    "source": "Gives an android twin tails.",
+    "translation": "把仿生人的头发扎成双马尾。"
+  },
+  "howto.singulo.android_twin_tails": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_witch_hat": {
+    "source": "A pointed hat with a bent tip. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "尖端折弯的尖顶帽。装在装饰页的头部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_witch_hat": {
+    "source": "A pointed hat for an android.",
+    "translation": "仿生人戴的尖顶帽。"
+  },
+  "howto.singulo.android_witch_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
   }
 }

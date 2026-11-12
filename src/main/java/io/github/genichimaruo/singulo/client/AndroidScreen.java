@@ -401,7 +401,8 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             g.fill(leftPos + dx + 1, topPos + dy + 4, leftPos + dx + 6, topPos + dy + 6, 0xFF6AB8E8);
             g.fill(leftPos + dx + 2, topPos + dy + 6, leftPos + dx + 5, topPos + dy + 7, 0xFF7CD88A);
             area(dx - 1, dy - 1, 9, 10, List.of(Component.translatable("gui.singulo.android.decor.dye")));
-            String[] ghosts = {"android_ribbon", "android_cape", "android_bouquet"};
+            // 空の枠の薄い見本（部位の番号の順: 頭・首/背中・手・顔・腰）
+            String[] ghosts = {"android_ribbon", "android_cape", "android_bouquet", "android_glasses", "android_apron"};
             for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
                 Slot s = menu.getSlot(RuinAndroid.SLOT_DECOR + i);
                 ghostSlot(g, leftPos + s.x, topPos + s.y, s, item(ghosts[i]));

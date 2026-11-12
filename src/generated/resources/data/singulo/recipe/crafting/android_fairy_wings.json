@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    " G "
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:phantom_membrane"
+    },
+    "G": {
+      "tag": "c:dusts/glowstone"
+    }
+  },
+  "result": {
+    "id": "singulo:android_fairy_wings",
+    "count": 1
+  }
+}

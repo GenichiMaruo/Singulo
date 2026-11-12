@@ -1253,11 +1253,14 @@ def felling_icon(Image):
 # ---------------------------------------------------------------- アンドロイドの装飾
 
 ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
-                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella', 'android_glasses')
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella', 'android_glasses',
+                 # 0.18.0
+                 'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail', 'android_twin_tails',
+                 'android_monocle', 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom')
 
 
 # 2枚の層を合わせた外形で、上下中央に寄せる装飾
-CENTERED_ACCESSORIES = ('android_teacup', 'android_umbrella')
+CENTERED_ACCESSORIES = ('android_teacup', 'android_umbrella', 'android_lantern')
 
 
 def _vcenter_pair(Image, base, detail):
@@ -1275,7 +1278,8 @@ def _vcenter_pair(Image, base, detail):
     return out[0], out[1]
 
 
-FABRIC_ACCESSORIES = ('android_ribbon', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon')
+FABRIC_ACCESSORIES = ('android_ribbon', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon',
+                      'android_witch_hat', 'android_apron')
 
 
 def fabric(im, seed):
@@ -1515,6 +1519,134 @@ def accessory_icons(Image):
     rect(b, 0, 6, 0, 7, E)
     rect(b, 15, 6, 15, 7, E)
     out['android_glasses'] = (b, d)
+    # ---- 0.18.0 の装飾（あとに足したので、汚しの種の番号は前のものと変わらない）
+    def px(im, pts, c):
+        p = im.load()
+        for x, y in pts:
+            p[x, y] = c
+
+    # 猫耳カチューシャ: 正面から見た ∩ の形のカチューシャと、その上に立つ左右の三角の耳（内側は桃色）
+    b, d = new(), new()
+    band = [(x, 6) for x in range(6, 10)] + [(4, 7), (5, 7), (10, 7), (11, 7), (3, 8), (12, 8), (3, 9), (12, 9)]         + [(2, y) for y in range(10, 15)] + [(13, y) for y in range(10, 15)]
+    px(b, band, W)
+    px(b, [(x, 7) for x in range(6, 10)] + [(4, 8), (11, 8)], S)
+    for cx, side in ((5, -1), (10, 1)):
+        for y, (a0, a1) in ((1, (0, 0)), (2, (0, 1)), (3, (-1, 1)), (4, (-1, 2)), (5, (-1, 2))):
+            for x in range(cx + min(a0 * side, a1 * side), cx + max(a0 * side, a1 * side) + 1):
+                b.load()[x, y] = E if y == 5 or x in (cx + a0 * side, cx + a1 * side) else W
+        px(d, ((cx, 3), (cx, 4), (cx + side, 4)), (242, 166, 182, 255))
+    out['android_cat_ears'] = (b, d)
+    # 魔女の帽子: 広いつば、上ほど細く先が右へ折れるとんがり、すその金の帯と留め金
+    b, d = new(), new()
+    shaded(b, 0, 12, 15, 13)
+    for y, (x0, x1) in ((11, (4, 11)), (10, (4, 11)), (9, (5, 10)), (8, (5, 10)), (7, (6, 9)), (6, (6, 9)), (5, (7, 8)), (4, (7, 9))):
+        for x in range(x0, x1 + 1):
+            b.load()[x, y] = E if x in (x0, x1) else (S if x >= x1 - 1 else W)
+    px(b, ((10, 3), (11, 3), (12, 2)), E)
+    for x in range(4, 12):
+        d.load()[x, 11] = (224, 184, 80, 255)
+    px(d, ((7, 11), (8, 11)), (250, 222, 140, 255))
+    out['android_witch_hat'] = (b, d)
+    # 麦わら帽子: 麦わらのつばと山（編み目の濃淡）と、染めた色のリボン
+    b, d = new(), new()
+    straw, straw_d, straw_e = (232, 200, 120, 255), (201, 164, 88, 255), (168, 132, 64, 255)
+    for y, (x0, x1) in ((5, (5, 10)), (6, (4, 11)), (7, (4, 11)), (8, (4, 11)), (9, (4, 11)), (10, (1, 14)), (11, (0, 15)), (12, (1, 14))):
+        for x in range(x0, x1 + 1):
+            d.load()[x, y] = straw_e if x in (x0, x1) or y == 12 else (straw_d if (x + y) % 3 == 0 else straw)
+    for x in range(4, 12):
+        for y in (8, 9):
+            b.load()[x, y] = W if y == 8 else S
+            d.load()[x, y] = (0, 0, 0, 0)
+    out['android_straw_hat'] = (b, d)
+    # 付け毛: 染めた色の髪留めと、垂れる髪の房（絵では明るい銀髪。着けると、そのアンドロイドの髪の色）
+    hair, hair_s, hair_e = (226, 230, 240, 255), (192, 198, 214, 255), (150, 158, 178, 255)
+    b, d = new(), new()
+    shaded(b, 6, 1, 9, 3)
+    for y, (x0, x1) in ((4, (6, 9)), (5, (6, 10)), (6, (7, 10)), (7, (7, 10)), (8, (7, 10)), (9, (8, 10)), (10, (8, 10)), (11, (8, 10)),
+                        (12, (8, 9)), (13, (8, 9)), (14, (9, 9))):
+        for x in range(x0, x1 + 1):
+            d.load()[x, y] = hair_e if x == x1 else (hair_s if (x + y) % 3 == 0 else hair)
+    out['android_ponytail'] = (b, d)
+    b, d = new(), new()
+    for x0 in (2, 10):
+        shaded(b, x0, 1, x0 + 3, 3)
+        for y, (a0, a1) in ((4, (0, 3)), (5, (0, 3)), (6, (1, 3)), (7, (1, 3)), (8, (1, 3)), (9, (1, 3)), (10, (1, 2)), (11, (1, 2)),
+                            (12, (1, 2)), (13, (2, 2))):
+            for x in range(x0 + a0, x0 + a1 + 1):
+                d.load()[x, y] = hair_e if x == x0 + a1 else (hair_s if (x + y) % 3 == 0 else hair)
+    out['android_twin_tails'] = (b, d)
+    # モノクル: 丸い縁（染める）と水色に透けるレンズ、右下へ垂れる鎖
+    b, d = new(), new()
+    ring_pts = [(x, 2) for x in range(5, 9)] + [(x, 9) for x in range(5, 9)] + [(2, y) for y in range(5, 7)] + [(11, y) for y in range(5, 7)] \
+        + [(3, 3), (4, 3), (9, 3), (10, 3), (3, 8), (4, 8), (9, 8), (10, 8), (3, 4), (10, 4), (3, 7), (10, 7)]
+    px(b, ring_pts, W)
+    px(b, ((5, 9), (6, 9), (7, 9), (8, 9), (9, 8), (10, 8), (10, 7)), S)
+    for y in range(3, 9):
+        for x in range(4, 10):
+            if (x, y) not in ring_pts and not (y in (3, 8) and x in (4, 9)):
+                d.load()[x, y] = (190, 226, 250, 150)
+    px(d, ((5, 4), (6, 4), (5, 5)), (250, 254, 255, 220))
+    px(b, ((11, 9), (12, 10), (12, 11), (13, 12), (13, 13), (14, 14)), E)
+    out['android_monocle'] = (b, d)
+    # 妖精の羽: 上の大きな2枚と下の小さな2枚（染める）、白く光る筋
+    b, d = new(), new()
+    for (x0, y0, x1, y1) in ((0, 1, 6, 7), (9, 1, 15, 7)):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                edge = x in (x0, x1) or y in (y0, y1)
+                if not ((x, y) in ((x0, y0), (x1, y0), (x0, y1), (x1, y1))):
+                    b.load()[x, y] = E if edge else W
+    for (x0, y0, x1, y1) in ((2, 8, 6, 13), (9, 8, 13, 13)):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                edge = x in (x0, x1) or y in (y0, y1)
+                if not ((x, y) in ((x0, y1), (x1, y1))):
+                    b.load()[x, y] = E if edge else S
+    vein = (255, 255, 255, 200)
+    px(d, ((2, 4), (3, 4), (4, 4), (5, 5), (13, 4), (12, 4), (11, 4), (10, 5), (3, 10), (4, 10), (5, 10), (12, 10), (11, 10), (10, 10)), vein)
+    px(d, ((7, 5), (8, 5), (7, 6), (8, 6), (7, 7), (8, 7), (7, 8), (8, 8)), (120, 96, 150, 255))
+    out['android_fairy_wings'] = (b, d)
+    # エプロン: 腰ひも（両わきに垂れ）、前掛け、ポケット、すそのフリル
+    b, d = new(), new()
+    shaded(b, 1, 2, 14, 3)
+    px(b, ((1, 4), (1, 5), (14, 4), (14, 5)), S)
+    shaded(b, 3, 4, 12, 12)
+    for x in range(5, 11):
+        b.load()[x, 7] = E
+    for y in range(7, 10):
+        b.load()[5, y] = E
+        b.load()[10, y] = E
+    for x in range(3, 13):
+        b.load()[x, 13] = W if x % 2 == 0 else S
+        if x % 2 == 0:
+            b.load()[x, 14] = E
+    out['android_apron'] = (b, d)
+    # ランタン: 吊り輪・屋根・柱・台（染める金具）と、ガラスの中に灯る火
+    b, d = new(), new()
+    px(b, ((7, 0), (8, 0), (6, 1), (9, 1)), E)
+    shaded(b, 4, 2, 11, 3)
+    for y in range(4, 12):
+        b.load()[4, y] = E
+        b.load()[11, y] = E
+    shaded(b, 4, 12, 11, 13)
+    for y in range(4, 12):
+        for x in range(5, 11):
+            d.load()[x, y] = (255, 210, 122, 255)
+    px(d, ((7, 6), (8, 6), (7, 7), (8, 7), (7, 8), (8, 8), (7, 9), (8, 9)), (255, 246, 204, 255))
+    px(d, ((5, 4), (6, 4), (5, 5)), (255, 232, 170, 255))
+    out['android_lantern'] = (b, d)
+    # ほうき: 斜めの木の柄、染めた色の結び目、広がる穂
+    b, d = new(), new()
+    wood, wood_d = (138, 100, 64, 255), (104, 74, 46, 255)
+    for i in range(8):
+        d.load()[14 - i, 1 + i] = wood
+        d.load()[14 - i, 2 + i] = wood_d
+    shaded(b, 5, 8, 8, 10)
+    bristle, bristle_d = (217, 184, 96, 255), (184, 149, 74, 255)
+    for y, (x0, x1) in ((11, (3, 7)), (12, (2, 7)), (13, (1, 7)), (14, (0, 7)), (15, (0, 6))):
+        for x in range(x0, x1 + 1):
+            d.load()[x, y] = bristle_d if (x + y) % 2 == 0 else bristle
+    out['android_broom'] = (b, d)
     return out
 
 

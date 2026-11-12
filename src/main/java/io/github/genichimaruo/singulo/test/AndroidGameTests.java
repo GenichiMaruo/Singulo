@@ -2261,6 +2261,63 @@ public final class AndroidGameTests {
     }
 
 
+    /**
+     * 装飾の枠は頭・顔・首/背中・腰・手の5つで、5つ同時に着けられ、どれもクライアントへ伝わる。
+     * 各枠には、その部位の装飾だけが入る（新しい装飾も、着ける所が決まっている）。
+     */
+    @GameTest(template = EMPTY)
+    public static void androidWearsFiveAccessoriesAtOnce(GameTestHelper helper) {
+        var Acc = io.github.genichimaruo.singulo.android.AndroidAccessoryItem.class;
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        helper.assertTrue(RuinAndroid.DECOR_SLOTS == 5, "装飾の枠が5つでない");
+        String[][] wear = {
+                {"android_witch_hat", "android_cat_ears", "android_straw_hat", "android_ponytail", "android_twin_tails"},
+                {"android_fairy_wings"}, {"android_broom", "android_lantern"}, {"android_monocle"}, {"android_apron"}};
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
+        for (int part = 0; part < wear.length; part++) {
+            for (String id : wear[part]) {
+                ItemStack stack = new ItemStack(item(id));
+                helper.assertTrue(stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc && acc.part() == part,
+                        id + " の着ける所が違う");
+                helper.assertTrue(stack.is(net.minecraft.tags.ItemTags.DYEABLE), id + " が染められない");
+                for (int other = 0; other < wear.length; other++) {
+                    helper.assertTrue(menu.getSlot(RuinAndroid.SLOT_DECOR + other).mayPlace(stack) == (other == part),
+                            id + " が枠 " + other + " に入るかどうかが違う");
+                }
+            }
+            a.inventory().setItem(RuinAndroid.SLOT_DECOR + part, new ItemStack(item(wear[part][0])));
+        }
+        for (int part = 0; part < wear.length; part++) {
+            helper.assertTrue(a.decor(part).is(item(wear[part][0])), "枠 " + part + " の装飾が伝わらない");
+        }
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 0.17 までの保存で頭の枠にあったメガネ・背中の枠にあった腰リボンは、読み込むと顔・腰の枠へ移る（枠が空いていれば）。 */
+    @GameTest(template = EMPTY)
+    public static void oldDecorMovesToTheFaceAndWaistSlots(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.inventory().setItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, new ItemStack(item("android_glasses")));
+        a.inventory().setItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, new ItemStack(item("android_waist_ribbon")));
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        a.saveWithoutId(tag);
+        BladeAndroid b = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        b.load(tag);
+        helper.assertTrue(b.inventory().getItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE).is(item("android_glasses")),
+                "メガネが顔の枠へ移らない");
+        helper.assertTrue(b.inventory().getItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST).is(item("android_waist_ribbon")),
+                "腰リボンが腰の枠へ移らない");
+        helper.assertTrue(b.inventory().getItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).isEmpty()
+                && b.inventory().getItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK).isEmpty(),
+                "移したあとに元の枠に残る");
+        a.discard();
+        b.discard();
+        helper.succeed();
+    }
+
     /** 満杯の納品箱へ少しずつ届けても、製作の余りを注文数に足さない。 */
     @GameTest(template = EMPTY)
     public static void partialDeliveryKeepsSurplus(GameTestHelper helper) {
@@ -2768,17 +2825,17 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
-    /** メガネ（装飾）は頭の枠に着けられ、染められる。測量メガネの掛ける高さは範囲に収まり、絵の切り替えの値になる。 */
+    /** メガネ（装飾）は顔の枠に着けられ、染められる。測量メガネの掛ける高さは範囲に収まり、絵の切り替えの値になる。 */
     @GameTest(template = EMPTY)
     public static void glassesFitTheHeadAndSurveyGlassesKeepTheirHeight(GameTestHelper helper) {
         ItemStack glasses = new ItemStack(item("android_glasses"));
         helper.assertTrue(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.isAccessory(glasses,
-                io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD), "メガネが頭の装飾にならない");
+                io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE), "メガネが顔の装飾にならない");
         helper.assertTrue(glasses.is(net.minecraft.tags.ItemTags.DYEABLE), "メガネが染められない");
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
-        a.inventory().setItem(RuinAndroid.SLOT_DECOR, glasses);
-        helper.assertTrue(a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).is(item("android_glasses")),
-                "頭の装飾にメガネが伝わらない");
+        a.inventory().setItem(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, glasses);
+        helper.assertTrue(a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE).is(item("android_glasses")),
+                "顔の装飾にメガネが伝わらない");
         ItemStack survey = new ItemStack(item("survey_glasses"));
         helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey) == 0, "新しいメガネの高さが0でない");
         io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 3);

@@ -1306,7 +1306,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /**
-     * 装飾: 頭（リボン・髪飾り・ベレー帽・ヘッドドレス）、背中/腰（マント・マフラー・腰リボン）、手（本・花束・ティーカップ・傘）。
+     * 装飾: 頭（リボン・髪飾り・ベレー帽・ヘッドドレス・猫耳・魔女の帽子・麦わら帽子・付け毛）、顔（メガネ・モノクル）、
+     * 首/背中（マント・マフラー・妖精の羽）、腰（腰リボン・エプロン）、手（本・花束・ティーカップ・傘・ランタン・ほうき）。
      * 染めた色で描く。手に持つ物は、待機している間だけ。大きさは体のピクセル（1/16）で決める。
      */
     final class Accessories extends RenderLayer<RuinAndroid, AndroidModel> {
@@ -1324,7 +1325,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
             VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
             AndroidModel m = getParentModel();
-            for (int part = 0; part < 3; part++) {
+            int hair = hairColor(android.kind());
+            for (int part = 0; part < io.github.genichimaruo.singulo.android.AndroidAccessoryItem.PARTS; part++) {
                 net.minecraft.world.item.ItemStack stack = android.decor(part);
                 if (!(stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc)) {
                     continue;
@@ -1335,14 +1337,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 int c = acc.color(stack);
                 pose.pushPose();
                 switch (part) {
-                    case 0 -> m.toHead(pose);
-                    case 1 -> {
-                        if (acc.style().equals("waist_ribbon")) {
-                            m.toHips(pose);
-                        } else {
-                            m.toTorso(pose);
-                        }
-                    }
+                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD,
+                         io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE -> m.toHead(pose);
+                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK -> m.toTorso(pose);
+                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST -> m.toHips(pose);
                     default -> m.toLeftHand(pose);
                 }
                 if (acc.style().equals("bouquet")) {
@@ -1351,7 +1349,19 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 if (acc.style().equals("umbrella")) {
                     pose.mulPose(Axis.XP.rotationDegrees(UMBRELLA_TILT));   // 傘を後ろへ傾け、肩にあずけるように持つ
                 }
-                draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age);
+                if (acc.style().equals("broom")) {
+                    pose.mulPose(Axis.XP.rotationDegrees(BROOM_TILT));      // ほうきは少し前へ傾けて立てて持つ
+                }
+                draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age, hair);
+                if (acc.style().equals("fairy_wings")) {
+                    fairyWings(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light, c, age);
+                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                }
+                if (acc.style().equals("monocle")) {
+                    FxDraw.box(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), -3.2F * P, -3.1F * P, -3.86F * P,
+                            -0.8F * P, -1.1F * P, -3.8F * P, light, 0xD2ECFF, 70);
+                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                }
                 if (acc.style().equals("bouquet")) {
                     // 透ける包装は、形を描き終えてから別の描き方で（描き方を混ぜないよう、形の受け口は取り直す）
                     bouquetWrap(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
@@ -1367,6 +1377,48 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
 
         /** アンドロイドが傘を持つ傾き（度。手の向きに対して後ろへ）。 */
         static final float UMBRELLA_TILT = -30;
+        /** ほうきを持つ傾き（度。少し前へ）。 */
+        static final float BROOM_TILT = 8;
+
+        /** 型ごとの髪の色（tools/androids.py の型ごとの色の hair の明るい色）。付け毛をアンドロイド自身の髪に合わせる。 */
+        static int hairColor(io.github.genichimaruo.singulo.android.AndroidKind kind) {
+            return switch (kind) {
+                case BLADE -> 0xEEF1F7;
+                case WHIP -> 0x2C2A38;
+                case SABER -> 0xE2E6EE;
+                case AXE -> 0xBA6646;
+                case GUNNER -> 0xCCE4F6;
+                case BIT -> 0x323A62;
+            };
+        }
+
+        /**
+         * 妖精の羽（透ける4枚。上の2枚は大きく、下の2枚は小さい）。背中の真ん中から左右へ、ゆっくり羽ばたく。
+         * 羽は染めた色で、筋は白っぽく明るい。
+         */
+        private void fairyWings(PoseStack pose, VertexConsumer vc, int light, int c, float age) {
+            int vein = mix(c, 0xFFFFFF, 0.6F);
+            float flap = 25 + 12 * Mth.sin(age * 0.25F);
+            for (int side = -1; side <= 1; side += 2) {
+                pose.pushPose();
+                pose.translate(side * 0.4F * P, -5.8F * P, 1.75F * P);
+                // 右（+x）の羽は −、左は + に回すと、羽の先が後ろ（+z）へ開く
+                pose.mulPose(Axis.YP.rotationDegrees(-side * flap));
+                float s = side;
+                wingBox(pose, vc, light, 0, -4.4F, 5.6F * s, 0, c, 120);                 // 上の羽
+                wingBox(pose, vc, light, 0.6F * s, -6.0F, 4.6F * s, -4.4F, c, 120);
+                wingBox(pose, vc, light, 0.2F * s, -2.5F, 5.0F * s, -2.3F, vein, 190);   // 上の羽の筋
+                wingBox(pose, vc, light, 0, 0, 3.8F * s, 3.4F, c, 110);                   // 下の羽
+                wingBox(pose, vc, light, 0.4F * s, 3.4F, 2.8F * s, 4.5F, c, 110);
+                wingBox(pose, vc, light, 0.2F * s, 1.4F, 3.3F * s, 1.6F, vein, 180);     // 下の羽の筋
+                pose.popPose();
+            }
+        }
+
+        /** 羽の1枚（x0..x1 は左右どちら向きでもよい。厚さはごくうすく）。 */
+        private void wingBox(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float x1, float y1, int rgb, int alpha) {
+            FxDraw.box(pose, vc, Math.min(x0, x1) * P, y0 * P, 0, Math.max(x0, x1) * P, y1 * P, 0.12F * P, light, rgb, alpha);
+        }
 
         /** 花束の透明な包装（下ほど細い3段と、開いた口の縁。うっすら水色に透ける）。 */
         private void bouquetWrap(PoseStack pose, VertexConsumer vc, int light) {
@@ -1406,7 +1458,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
         }
 
-        private void draw(String style, PoseStack pose, VertexConsumer vc, int light, int c, float walk, float age) {
+        private void draw(String style, PoseStack pose, VertexConsumer vc, int light, int c, float walk, float age, int hair) {
             int dark = mix(c, 0x000000, 0.25F);
             switch (style) {
                 // ---- 頭（頭の箱: x -4〜4、y -8〜0、z -3.5〜3.5。前は -z）
@@ -1587,6 +1639,137 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     for (float[] t : tips) {                                                            // 骨の先
                         b(pose, vc, light, t[0], t[1], -20.8F, t[0] + 0.5F, t[1] + 0.5F, -20.4F, 0xC8C8C8);
                     }
+                }
+                case "cat_ears" -> {
+                    // 頭の上を渡るカチューシャ（髪の殻 y -8.45・x ±4.45 から少し離す）と、左右の三角の猫耳（内側は桃色）
+                    b(pose, vc, light, -4.6F, -9.0F, -0.8F, 4.6F, -8.5F, -0.2F, dark);
+                    b(pose, vc, light, -4.8F, -8.5F, -0.8F, -4.5F, -6.2F, -0.2F, dark);
+                    b(pose, vc, light, 4.5F, -8.5F, -0.8F, 4.8F, -6.2F, -0.2F, dark);
+                    for (int side = -1; side <= 1; side += 2) {
+                        float x = side * 2.6F;
+                        b(pose, vc, light, x - 1.1F, -10.0F, -0.85F, x + 1.1F, -9.0F, -0.15F, c);
+                        b(pose, vc, light, x - 0.8F, -10.8F, -0.85F, x + 0.8F, -10.0F, -0.15F, c);
+                        b(pose, vc, light, x - 0.45F, -11.5F, -0.85F, x + 0.45F, -10.8F, -0.15F, c);
+                        b(pose, vc, light, x - 0.6F, -10.4F, -0.92F, x + 0.6F, -9.1F, -0.85F, 0xF2A6B6);   // 内側
+                    }
+                }
+                case "witch_hat" -> {
+                    // 広いつばと、上ほど細い段のとんがり（先は後ろへ折れる）。山のすそに金の帯と留め金
+                    pose.pushPose();
+                    pose.translate(0, -8.4F * P, 0);
+                    pose.mulPose(Axis.ZP.rotationDegrees(-6));
+                    b(pose, vc, light, -6.6F, -0.4F, -6.0F, 6.6F, 0.2F, 6.0F, c);
+                    b(pose, vc, light, -4.2F, -3.0F, -3.7F, 4.2F, -0.4F, 3.7F, c);
+                    b(pose, vc, light, -4.3F, -1.4F, -3.8F, 4.3F, -0.4F, 3.8F, 0xE0B850);
+                    b(pose, vc, light, -0.8F, -1.6F, -3.95F, 0.8F, -0.2F, -3.85F, 0xF4D27A);
+                    b(pose, vc, light, -3.2F, -5.5F, -2.8F, 3.2F, -3.0F, 2.8F, c);
+                    b(pose, vc, light, -2.2F, -7.5F, -1.9F, 2.2F, -5.5F, 1.9F, dark);
+                    b(pose, vc, light, -1.4F, -9.0F, -0.9F, 1.4F, -7.5F, 1.7F, dark);
+                    b(pose, vc, light, -0.8F, -10.0F, 0.6F, 0.8F, -9.0F, 2.7F, dark);
+                    b(pose, vc, light, -0.4F, -10.6F, 2.0F, 0.4F, -10.0F, 3.5F, dark);
+                    pose.popPose();
+                }
+                case "straw_hat" -> {
+                    // 麦わらのつばと低い山、山に巻いた染めた色のリボン（後ろで結ぶ）。つばには編み目の輪
+                    int straw = 0xE8C878, weave = 0xC9A458;
+                    pose.pushPose();
+                    pose.translate(0, -8.4F * P, 0);
+                    pose.mulPose(Axis.ZP.rotationDegrees(4));
+                    b(pose, vc, light, -7.0F, -0.3F, -7.0F, 7.0F, 0.2F, 7.0F, straw);
+                    ring(pose, vc, light, -5.7F, -5.7F, 5.7F, 5.7F, -5.3F, -5.3F, 5.3F, 5.3F, -0.36F, -0.3F, weave);
+                    b(pose, vc, light, -4.3F, -3.2F, -4.0F, 4.3F, -0.3F, 4.0F, straw);
+                    b(pose, vc, light, -4.4F, -1.3F, -4.1F, 4.4F, -0.4F, 4.1F, c);
+                    b(pose, vc, light, -0.8F, -1.7F, 4.1F, 0.8F, -0.2F, 4.6F, dark);
+                    b(pose, vc, light, -0.9F, -0.4F, 4.15F, -0.2F, 2.2F, 4.45F, c);
+                    b(pose, vc, light, 0.2F, -0.4F, 4.15F, 0.9F, 1.8F, 4.45F, c);
+                    pose.popPose();
+                }
+                case "ponytail" -> {
+                    // 後頭部の高い所を染めた色の髪留めでまとめ、アンドロイド自身の髪の色の房を後ろへ垂らす（歩くと揺れる）
+                    int shade = mix(hair, 0x000000, 0.18F);
+                    b(pose, vc, light, -0.9F, -7.4F, 3.95F, 0.9F, -5.8F, 4.9F, c);
+                    pose.pushPose();
+                    pose.translate(0, -6.6F * P, 4.5F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(18 + 14 * walk + 3 * Mth.sin(age * 0.1F)));
+                    b(pose, vc, light, -1.2F, 0, 0, 1.2F, 2.6F, 1.6F, hair);
+                    b(pose, vc, light, -1.0F, 2.6F, 0.1F, 1.0F, 6.0F, 1.5F, hair);
+                    b(pose, vc, light, -0.7F, 6.0F, 0.2F, 0.7F, 8.6F, 1.3F, shade);
+                    b(pose, vc, light, -0.4F, 8.6F, 0.3F, 0.4F, 9.6F, 1.1F, shade);
+                    pose.popPose();
+                }
+                case "twin_tails" -> {
+                    // 頭の左右の高い所に染めた色の髪留め、そこから髪の色の房を垂らす（外へ少し開き、歩くと後ろへ揺れる）
+                    int shade = mix(hair, 0x000000, 0.18F);
+                    for (int side = -1; side <= 1; side += 2) {
+                        pose.pushPose();
+                        pose.translate(side * 4.9F * P, -6.6F * P, 1.2F * P);
+                        // +x の房は - に回すと外（+x）へ開く
+                        pose.mulPose(Axis.ZP.rotationDegrees(-side * (10 + 2 * Mth.sin(age * 0.1F + side))));
+                        pose.mulPose(Axis.XP.rotationDegrees(8 + 12 * walk));
+                        b(pose, vc, light, -1.1F, -0.6F, -1.1F, 1.1F, 0.6F, 1.1F, c);
+                        b(pose, vc, light, -1.0F, 0.6F, -1.0F, 1.0F, 3.4F, 1.0F, hair);
+                        b(pose, vc, light, -0.8F, 3.4F, -0.8F, 0.8F, 7.6F, 0.8F, hair);
+                        b(pose, vc, light, -0.55F, 7.6F, -0.55F, 0.55F, 10.0F, 0.55F, shade);
+                        pose.popPose();
+                    }
+                }
+                // ---- 顔（頭と同じ変形）
+                case "monocle" -> {
+                    // 右目（x -3〜-1）にはめる丸い縁（四角の角を欠く）と、頬へ垂れる細い鎖。レンズは透ける板（呼ぶ側で描く）
+                    float z0 = -3.92F, z1 = -3.64F;
+                    ring(pose, vc, light, -3.5F, -3.5F, -0.5F, -0.7F, -3.15F, -3.1F, -0.85F, -1.1F, z0, z1, c);
+                    b(pose, vc, light, -3.65F, -3.1F, z0, -3.5F, -1.1F, z1, c);
+                    b(pose, vc, light, -0.5F, -3.1F, z0, -0.35F, -1.1F, z1, c);
+                    int chain = mix(c, 0x000000, 0.2F);
+                    b(pose, vc, light, -3.45F, -0.7F, -3.85F, -3.25F, 0.3F, -3.7F, chain);
+                    b(pose, vc, light, -4.05F, 0.3F, -3.85F, -3.25F, 0.5F, -3.7F, chain);
+                    b(pose, vc, light, -4.25F, 0.3F, -3.75F, -4.05F, 0.5F, -1.5F, chain);
+                }
+                // ---- 腰（腰の箱: x -3.5〜3.5、y -3〜0、z -2〜2。前は -z）
+                case "apron" -> {
+                    // 腰ひも（前と横）、後ろの蝶結び、スカートの前の面に沿う前掛け（ポケットと、すその交互のフリル）
+                    b(pose, vc, light, -3.8F, -2.9F, -2.35F, 3.8F, -2.3F, -2.05F, c);
+                    b(pose, vc, light, -3.8F, -2.9F, -2.05F, -3.55F, -2.3F, 2.05F, c);
+                    b(pose, vc, light, 3.55F, -2.9F, -2.05F, 3.8F, -2.3F, 2.05F, c);
+                    b(pose, vc, light, -1.3F, -3.2F, 2.05F, 1.3F, -2.1F, 2.45F, c);
+                    b(pose, vc, light, -0.35F, -2.1F, 2.1F, 0.35F, 0.6F, 2.35F, c);
+                    pose.popPose();
+                    pose.pushPose();
+                    getParentModel().toSkirtFront(pose);
+                    int frill = mix(c, 0x000000, 0.06F);
+                    b(pose, vc, light, -2.9F, -0.2F, -0.65F, 2.9F, 4.4F, -0.35F, c);
+                    b(pose, vc, light, -1.1F, 1.0F, -0.72F, 1.1F, 2.4F, -0.65F, mix(c, 0x000000, 0.12F));
+                    for (int i = 0; i < 7; i++) {
+                        float x0 = -2.9F + i * 0.83F;
+                        b(pose, vc, light, x0, 4.4F, -0.7F + (i % 2) * 0.05F, x0 + 0.8F, 4.9F + (i % 2) * 0.35F, -0.4F, frill);
+                    }
+                }
+                // ---- 手（つづき）
+                case "lantern" -> {
+                    // 手から下げたランタン（下は +z）。金具は染めた色、ガラスの中に灯る火（いつも明るく見える）。少し揺れる
+                    int full = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
+                    b(pose, vc, light, -0.15F, 0.3F, -0.3F, 0.15F, 0.6F, 1.2F, dark);
+                    pose.pushPose();
+                    pose.translate(0, 0.45F * P, 1.2F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(6 * Mth.sin(age * 0.09F)));
+                    b(pose, vc, light, -1.3F, -1.25F, 0, 1.3F, 1.25F, 0.45F, c);                  // 屋根
+                    b(pose, vc, light, -0.5F, -0.5F, -0.35F, 0.5F, 0.5F, 0, c);                   // 吊り輪の座
+                    FxDraw.box(pose, vc, -0.95F * P, -0.95F * P, 0.45F * P, 0.95F * P, 0.95F * P, 2.95F * P, full, 0xFFD27A, 255);
+                    FxDraw.box(pose, vc, -0.35F * P, -0.35F * P, 1.2F * P, 0.35F * P, 0.35F * P, 2.4F * P, full, 0xFFF6CC, 255);
+                    for (float[] q : new float[][] {{-1.15F, -1.15F}, {0.85F, -1.15F}, {-1.15F, 0.85F}, {0.85F, 0.85F}}) {
+                        b(pose, vc, light, q[0], q[1], 0.45F, q[0] + 0.3F, q[1] + 0.3F, 2.95F, c);   // 柱
+                    }
+                    b(pose, vc, light, -1.3F, -1.25F, 2.95F, 1.3F, 1.25F, 3.4F, c);                // 底
+                    pose.popPose();
+                }
+                case "broom" -> {
+                    // 立てて持つほうき（上は -z）。木の柄、染めた色の結び、下ほど広がる穂
+                    b(pose, vc, light, -0.25F, 0.2F, -10.0F, 0.25F, 0.7F, 5.6F, 0x8A6440);
+                    b(pose, vc, light, -0.9F, -0.3F, 5.6F, 0.9F, 1.2F, 6.6F, c);
+                    b(pose, vc, light, -1.4F, -0.55F, 6.6F, 1.4F, 1.45F, 8.5F, 0xD9B860);
+                    b(pose, vc, light, -2.0F, -0.8F, 8.5F, 2.0F, 1.7F, 10.3F, 0xCFAE55);
+                    b(pose, vc, light, -1.6F, -0.85F, 9.2F, -1.4F, 1.75F, 10.3F, 0xB8954A);
+                    b(pose, vc, light, 1.4F, -0.85F, 9.2F, 1.6F, 1.75F, 10.3F, 0xB8954A);
                 }
                 default -> {
                 }

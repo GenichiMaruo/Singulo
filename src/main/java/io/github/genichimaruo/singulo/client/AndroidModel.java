@@ -288,6 +288,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtBack.translateAndRotate(pose);
     }
 
+    /** スカートの前の面までの変形（エプロンを、スカートの角度に合わせて沿わせる）。 */
+    void toSkirtFront(PoseStack pose) {
+        toHips(pose);
+        skirtFront.translateAndRotate(pose);
+    }
+
     /** 胴までの変形（背中の装飾）。 */
     void toTorso(PoseStack pose) {
         root.translateAndRotate(pose);
@@ -509,9 +515,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         strapR.visible = pack;
         thrusterL.visible = !pack;
         thrusterR.visible = !pack;
-        // ベレー帽をかぶっている間は、アホ毛を帽子の中にしまう（突き抜けないように）
+        // 帽子（ベレー帽・魔女の帽子・麦わら帽子）をかぶっている間は、アホ毛を帽子の中にしまう（突き抜けないように）
         ahoge.visible = !(android.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).getItem()
-                instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc && acc.style().equals("beret"));
+                instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc
+                && (acc.style().equals("beret") || acc.style().equals("witch_hat") || acc.style().equals("straw_hat")));
         int batteries = android.batteries();
         batteryL.visible = batteries >= 1;
         batteryR.visible = batteries >= 2;

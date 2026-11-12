@@ -3444,24 +3444,24 @@
     "translation": "머리"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret, headdress or glasses",
-    "translation": "리본·머리 장식·베레모·헤드드레스·안경"
+    "source": "Ribbon, hair flower, beret, headdress, cat ears, a hat or a hair extension",
+    "translation": "리본·머리 장식·베레모·헤드드레스·고양이 귀·모자·붙임머리"
   },
   "gui.singulo.android.decor.1": {
-    "source": "Back / waist",
-    "translation": "등・허리"
+    "source": "Neck / back",
+    "translation": "목・등"
   },
   "gui.singulo.android.decor.1.hint": {
-    "source": "Cape, scarf or waist ribbon",
-    "translation": "망토·목도리·허리 리본"
+    "source": "Cape, scarf or fairy wings",
+    "translation": "망토·목도리·요정 날개"
   },
   "gui.singulo.android.decor.2": {
     "source": "Hand",
     "translation": "손"
   },
   "gui.singulo.android.decor.2.hint": {
-    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
-    "translation": "문고본·꽃다발·찻잔·우산(대기 중에만 듭니다)"
+    "source": "Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)",
+    "translation": "문고본·꽃다발·찻잔·우산·랜턴·빗자루(대기 중에만 듭니다)"
   },
   "gui.singulo.android.decor.dye": {
     "source": "Dye them with dyes on a crafting table",
@@ -11160,8 +11160,8 @@
     "translation": "안드로이드 머리에 답니다(장식 페이지)"
   },
   "tooltip.singulo.android_accessory.1": {
-    "source": "Worn on an android's back or waist (decoration page)",
-    "translation": "안드로이드 등이나 허리에 답니다(장식 페이지)"
+    "source": "Worn on an android's neck or back (decoration page)",
+    "translation": "안드로이드 목이나 등에 답니다(장식 페이지)"
   },
   "tooltip.singulo.android_accessory.2": {
     "source": "Held by an idle android (decoration page)",
@@ -14162,5 +14162,189 @@
   "message.singulo.arsenal_notice.link": {
     "source": "[View on CurseForge]",
     "translation": "[CurseForge에서 보기]"
+  },
+  "item.singulo.android_cat_ears": {
+    "source": "Cat Ear Headband",
+    "translation": "고양이 귀 머리띠"
+  },
+  "item.singulo.android_witch_hat": {
+    "source": "Witch Hat",
+    "translation": "마녀 모자"
+  },
+  "item.singulo.android_straw_hat": {
+    "source": "Straw Hat",
+    "translation": "밀짚모자"
+  },
+  "item.singulo.android_ponytail": {
+    "source": "Hair Extension (Ponytail)",
+    "translation": "붙임머리(포니테일)"
+  },
+  "item.singulo.android_twin_tails": {
+    "source": "Hair Extension (Twin Tails)",
+    "translation": "붙임머리(트윈테일)"
+  },
+  "item.singulo.android_monocle": {
+    "source": "Monocle",
+    "translation": "외알 안경"
+  },
+  "item.singulo.android_fairy_wings": {
+    "source": "Fairy Wings",
+    "translation": "요정 날개"
+  },
+  "item.singulo.android_apron": {
+    "source": "Apron",
+    "translation": "앞치마"
+  },
+  "item.singulo.android_lantern": {
+    "source": "Lantern",
+    "translation": "랜턴"
+  },
+  "item.singulo.android_broom": {
+    "source": "Broom",
+    "translation": "빗자루"
+  },
+  "gui.singulo.android.decor.3": {
+    "source": "Face",
+    "translation": "얼굴"
+  },
+  "gui.singulo.android.decor.4": {
+    "source": "Waist",
+    "translation": "허리"
+  },
+  "gui.singulo.android.decor.3.hint": {
+    "source": "Glasses or monocle",
+    "translation": "안경·외알 안경"
+  },
+  "gui.singulo.android.decor.4.hint": {
+    "source": "Waist ribbon or apron",
+    "translation": "허리 리본·앞치마"
+  },
+  "tooltip.singulo.android_accessory.3": {
+    "source": "Worn on an android's face (decoration page)",
+    "translation": "안드로이드 얼굴에 답니다(장식 페이지)"
+  },
+  "tooltip.singulo.android_accessory.4": {
+    "source": "Worn on an android's waist (decoration page)",
+    "translation": "안드로이드 허리에 답니다(장식 페이지)"
+  },
+  "desc.singulo.android_apron": {
+    "source": "An apron with a frilled hem. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "밑단에 프릴이 달린 앞치마. 장식 페이지의 허리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_apron": {
+    "source": "An apron for an android.",
+    "translation": "안드로이드 허리에 다는 앞치마."
+  },
+  "howto.singulo.android_apron": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_broom": {
+    "source": "A broom an android holds upright while idle. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the binding.",
+    "translation": "안드로이드가 대기 중에 세워 드는 빗자루. 장식 페이지의 손 칸에 답니다. 염료와 함께 제작대에서 염색하면 묶은 끈의 색이 바뀝니다."
+  },
+  "summary.singulo.android_broom": {
+    "source": "A broom an idle android holds.",
+    "translation": "대기 중인 안드로이드가 드는 빗자루."
+  },
+  "howto.singulo.android_broom": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_cat_ears": {
+    "source": "A headband with cat ears for an android. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리에 다는 고양이 귀 머리띠. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_cat_ears": {
+    "source": "Cat ears for an android.",
+    "translation": "안드로이드 머리에 다는 고양이 귀."
+  },
+  "howto.singulo.android_cat_ears": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_fairy_wings": {
+    "source": "Four clear wings that flutter slowly on an android's back. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "등에서 천천히 날갯짓하는 투명한 날개 네 장. 장식 페이지의 목・등 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_fairy_wings": {
+    "source": "Wings that flutter on an android's back.",
+    "translation": "안드로이드 등에서 날갯짓하는 날개."
+  },
+  "howto.singulo.android_fairy_wings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_lantern": {
+    "source": "A lantern an android carries while idle. Its flame looks bright even in the dark, though it does not light the area. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the metal frame.",
+    "translation": "안드로이드가 대기 중에 손에 드는 랜턴. 안의 불은 어두운 곳에서도 밝게 보입니다(주변을 비추지는 않습니다). 장식 페이지의 손 칸에 답니다. 염료와 함께 제작대에서 염색하면 금속 틀의 색이 바뀝니다."
+  },
+  "summary.singulo.android_lantern": {
+    "source": "A lantern an idle android carries.",
+    "translation": "대기 중인 안드로이드가 드는 랜턴."
+  },
+  "howto.singulo.android_lantern": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_monocle": {
+    "source": "A monocle on a chain for the right eye. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the rim.",
+    "translation": "오른쪽 눈에 끼우는 사슬 달린 외알 안경. 장식 페이지의 얼굴 칸에 답니다(안경과 같은 칸). 염료와 함께 제작대에서 염색하면 테의 색이 바뀝니다."
+  },
+  "summary.singulo.android_monocle": {
+    "source": "A monocle for an android's right eye.",
+    "translation": "안드로이드 오른쪽 눈에 끼우는 외알 안경."
+  },
+  "howto.singulo.android_monocle": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_ponytail": {
+    "source": "A high ponytail in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair tie.",
+    "translation": "뒤통수 높은 곳에서 묶는 포니테일. 머리카락은 안드로이드 자신의 머리색이 됩니다. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 머리끈의 색이 바뀝니다."
+  },
+  "summary.singulo.android_ponytail": {
+    "source": "Gives an android a ponytail.",
+    "translation": "안드로이드의 머리를 포니테일로 만듭니다."
+  },
+  "howto.singulo.android_ponytail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_straw_hat": {
+    "source": "A straw hat with a ribbon. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the ribbon.",
+    "translation": "리본을 두른 밀짚모자. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 리본의 색이 바뀝니다."
+  },
+  "summary.singulo.android_straw_hat": {
+    "source": "A straw hat for an android.",
+    "translation": "안드로이드가 쓰는 밀짚모자."
+  },
+  "howto.singulo.android_straw_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_twin_tails": {
+    "source": "Twin tails in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair ties.",
+    "translation": "머리 양옆에서 묶는 트윈테일. 머리카락은 안드로이드 자신의 머리색이 됩니다. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 머리끈의 색이 바뀝니다."
+  },
+  "summary.singulo.android_twin_tails": {
+    "source": "Gives an android twin tails.",
+    "translation": "안드로이드의 머리를 트윈테일로 만듭니다."
+  },
+  "howto.singulo.android_twin_tails": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_witch_hat": {
+    "source": "A pointed hat with a bent tip. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "끝이 꺾인 뾰족 모자. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_witch_hat": {
+    "source": "A pointed hat for an android.",
+    "translation": "안드로이드가 쓰는 뾰족 모자."
+  },
+  "howto.singulo.android_witch_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   }
 }

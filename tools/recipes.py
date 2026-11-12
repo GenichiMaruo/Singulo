@@ -1031,3 +1031,13 @@ for _name, _shape in _logistics_shaped.items():
     assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
     SHAPED[_name] = _shape
     RECIPES[_name]['shape'] = _shape
+
+# 0.18.0 アンドロイドの装飾（一覧の番号がずれないよう、最後に足す）
+from decor_content import recipes as _decor_recipes
+_decor_shaped = {}
+_decor_recipes(R, _decor_shaped)
+for _name, _shape in _decor_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape

@@ -110,7 +110,7 @@ public final class SinguloItems {
             "survey_glasses", () -> new io.github.genichimaruo.singulo.android.work.SurveyGlassesItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
             "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
-    /** アンドロイドの装飾（頭・背中/腰・手）。 */
+    /** アンドロイドの装飾（頭・顔・首/背中・腰・手）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_RIBBON = ITEMS.register(
             "android_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ribbon", 0xE0607E));
@@ -125,7 +125,7 @@ public final class SinguloItems {
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "headdress", 0xF5F5F5));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_GLASSES = ITEMS.register(
             "android_glasses", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
-                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "glasses", 0x3A3F4A));
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "glasses", 0x3A3F4A));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAPE = ITEMS.register(
             "android_cape", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "cape", 0x8E2F3F));
@@ -134,7 +134,7 @@ public final class SinguloItems {
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "scarf", 0xC84E4E));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WAIST_RIBBON = ITEMS.register(
             "android_waist_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
-                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "waist_ribbon", 0x5A8ED6));
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "waist_ribbon", 0x5A8ED6));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BOOK = ITEMS.register(
             "android_book", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "book", 0x6B4A3A));
@@ -147,9 +147,40 @@ public final class SinguloItems {
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_UMBRELLA = ITEMS.register(
             "android_umbrella", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "umbrella", 0x4A78C8));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAT_EARS = ITEMS.register(
+            "android_cat_ears", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "cat_ears", 0x3A3440));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WITCH_HAT = ITEMS.register(
+            "android_witch_hat", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "witch_hat", 0x3C2E5E));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_STRAW_HAT = ITEMS.register(
+            "android_straw_hat", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "straw_hat", 0xD8454A));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_PONYTAIL = ITEMS.register(
+            "android_ponytail", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ponytail", 0xE0607E));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_TWIN_TAILS = ITEMS.register(
+            "android_twin_tails", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "twin_tails", 0x5A8ED6));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_MONOCLE = ITEMS.register(
+            "android_monocle", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "monocle", 0xE0B850));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_FAIRY_WINGS = ITEMS.register(
+            "android_fairy_wings", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "fairy_wings", 0xA8E8F0));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_APRON = ITEMS.register(
+            "android_apron", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "apron", 0xF5F5F5));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_LANTERN = ITEMS.register(
+            "android_lantern", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "lantern", 0x3A3A40));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BROOM = ITEMS.register(
+            "android_broom", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "broom", 0x8E2F3F));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
-            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
+            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA,
+            ANDROID_CAT_EARS, ANDROID_WITCH_HAT, ANDROID_STRAW_HAT, ANDROID_PONYTAIL, ANDROID_TWIN_TAILS, ANDROID_MONOCLE, ANDROID_FAIRY_WINGS, ANDROID_APRON, ANDROID_LANTERN, ANDROID_BROOM);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
