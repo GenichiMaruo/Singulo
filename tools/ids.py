@@ -630,6 +630,9 @@ VANILLA = {
     '緑色の染料': '#c:dyes/green',
     '紫色の染料': '#c:dyes/purple',
     '赤色の染料': '#c:dyes/red',
+    '青色の染料': '#c:dyes/blue',
+    '白色の染料': '#c:dyes/white',
+    '黒色の染料': '#c:dyes/black',
     'ガラス板': '#c:glass_panes/colorless',
     # Mekanism（任意の連携。Mekanism が入っているときだけ読まれるレシピに使う）
     '基本ケミカルタンク': 'mekanism:basic_chemical_tank',
@@ -795,3 +798,7 @@ STATIONS["潮汐紡糸機"] = "tidal_spindle"
 # 0.17.0 液体パイプの段階・液体のドローン発着ポート・液体カプセル
 from logistics_content import IDS as _LOGISTICS_IDS
 MOD.update(_LOGISTICS_IDS)
+
+# 0.18.0 RGB染色台
+from decor_content import IDS as _DECOR_IDS
+MOD.update(_DECOR_IDS)

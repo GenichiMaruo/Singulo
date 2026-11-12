@@ -45,6 +45,8 @@ public final class SinguloMenus {
 
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.WorkConsoleMenu>> ANDROID_WORK_CONSOLE = REGISTER.register(
             "android_work_console", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.WorkConsoleMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.dye.RgbDyeStationMenu>> RGB_DYE_STATION = REGISTER.register(
+            "rgb_dye_station", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.dye.RgbDyeStationMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.DeliveryPortMenu>> ANDROID_DELIVERY_PORT = REGISTER.register(
             "android_delivery_port", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.DeliveryPortMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.SupplyPortMenu>> ANDROID_SUPPLY_PORT = REGISTER.register(

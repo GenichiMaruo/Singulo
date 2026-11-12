@@ -1666,6 +1666,8 @@ def lang_files():
     UI_LANG.update(UI)
     from logistics_content import UI as _LOGISTICS_UI
     UI_LANG.update(_LOGISTICS_UI)
+    from decor_content import UI as _DECOR_UI
+    UI_LANG.update(_DECOR_UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
@@ -2250,6 +2252,10 @@ def art_textures():
                 sheet, frames = art16.machine_front(iid, stage_of(name), on)
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
                 art16.save(sheet, path)
+                if iid == 'rgb_dye_station':
+                    # 色の輪のドットは16pxの絵をそのまま拡大する
+                    art.save(sheet.resize((32, 32), __import__('PIL').Image.NEAREST), hb / f'{iid}_front{"_on" if on else ""}.png')
+                    continue
                 if iid in art16.ANDROID_FACES or iid in art16.DRONE_FACES:
                     # 顔のバイザーは16pxの絵をそのまま拡大する（細かい表情を描き直さない）。まばたきも同じ動き
                     hd = hb / f'{iid}_front{"_on" if on else ""}.png'
@@ -3835,7 +3841,7 @@ TAB_GROUPS = [
                  'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_glasses', 'android_cape', 'android_scarf',
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',
                  'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail', 'android_twin_tails', 'android_monocle',
-                 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom',
+                 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom', 'rgb_dye_station',
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     # ドローン輸送: ステーションと材料 → 発着ポート → 梱包箱

@@ -206,6 +206,11 @@ public final class SinguloBlocks {
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT = BLOCKS.register(
             "android_supply_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_SUPPLY_PORT,
                     io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
+    /** RGB染色台（0.18.0）。好きな色に染める。 */
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity>> RGB_DYE_STATION = BLOCKS.register(
+            "rgb_dye_station", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.RGB_DYE_STATION,
+                    io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::new,
+                    io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT = BLOCKS.register(
             "android_delivery_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_DELIVERY_PORT,
                     io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new,

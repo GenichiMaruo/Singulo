@@ -377,6 +377,7 @@ public final class GeneratedContent {
             "android_apron",
             "android_lantern",
             "android_broom",
+            "rgb_dye_station",
             "blade_android_spawn_egg",
             "whip_android_spawn_egg",
             "saber_android_spawn_egg",
@@ -813,6 +814,7 @@ public final class GeneratedContent {
             Map.entry("fluid_drone_port", 2),
             Map.entry("collapsar_lining", 5),
             Map.entry("horizon_vault", 5),
-            Map.entry("wormhole_drone_beacon", 5)
+            Map.entry("wormhole_drone_beacon", 5),
+            Map.entry("rgb_dye_station", 1)
     );
 }

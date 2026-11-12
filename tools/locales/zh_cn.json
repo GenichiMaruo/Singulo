@@ -14346,5 +14346,81 @@
   "howto.singulo.android_witch_hat": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
+  },
+  "block.singulo.rgb_dye_station": {
+    "source": "RGB Dye Station",
+    "translation": "RGB染色台"
+  },
+  "gui.singulo.rgb_dye_station.apply": {
+    "source": "Dye",
+    "translation": "染色"
+  },
+  "gui.singulo.rgb_dye_station.wheel": {
+    "source": "Hue and saturation (click or drag)",
+    "translation": "色相和饱和度（点击或拖动选择）"
+  },
+  "gui.singulo.rgb_dye_station.brightness": {
+    "source": "Brightness",
+    "translation": "亮度"
+  },
+  "gui.singulo.rgb_dye_station.cost": {
+    "source": "Ink per dye",
+    "translation": "每次染色使用的墨水"
+  },
+  "gui.singulo.rgb_dye_station.cost.0": {
+    "source": "Red %s",
+    "translation": "红 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.1": {
+    "source": "Green %s",
+    "translation": "绿 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.2": {
+    "source": "Blue %s",
+    "translation": "蓝 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.3": {
+    "source": "White %s",
+    "translation": "白 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.4": {
+    "source": "Black %s",
+    "translation": "黑 %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.0": {
+    "source": "Red ink %s / %s",
+    "translation": "红色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.1": {
+    "source": "Green ink %s / %s",
+    "translation": "绿色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.2": {
+    "source": "Blue ink %s / %s",
+    "translation": "蓝色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.3": {
+    "source": "White ink %s / %s",
+    "translation": "白色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.4": {
+    "source": "Black ink %s / %s",
+    "translation": "黑色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.no_target": {
+    "source": "Put in something to dye",
+    "translation": "放入要染色的物品"
+  },
+  "summary.singulo.rgb_dye_station": {
+    "source": "Dyes things any color you pick on a color wheel.",
+    "translation": "用色轮选择任意颜色来染色的工作台。"
+  },
+  "desc.singulo.rgb_dye_station": {
+    "source": "Put red, green, blue, white and black dyes in their slots to turn them into ink (8 units per dye, up to 64 of each), then dye anything dyeable, such as leather armor or android decorations, any color you pick on the color wheel and brightness bar. The ink used depends on the color: a pure hue uses only its colored inks, a gray only white and black (up to 4 units of each). Breaking it drops its dyes and as many dyes as its ink can make again.",
+    "translation": "把红、绿、蓝、白、黑染料放入各自的槽中就会变成墨水（每个染料 8 格，每种颜色最多 64 格），可将可染色的物品（皮革盔甲、仿生人装饰等）染成在界面的色轮和亮度中选择的任意颜色。每次使用的墨水由所选颜色决定：纯色只用对应颜色的墨水，灰色只用白色和黑色（每种颜色最多 4 格）。破坏后会掉落其中的染料，以及墨水能变回的染料。"
+  },
+  "howto.singulo.rgb_dye_station": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
   }
 }

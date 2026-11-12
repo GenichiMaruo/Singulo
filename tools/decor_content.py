@@ -6,6 +6,56 @@
 
 DYE = 'アンドロイドの装飾。染料で染められる'
 
+# RGB染色台（machine。正面の絵は rgb_front）
+IDS = {
+    'RGB染色台': ('rgb_dye_station', 'RGB Dye Station', 'machine'),
+}
+
+UI = {
+    'gui.singulo.rgb_dye_station.apply': ('染める', 'Dye'),
+    'gui.singulo.rgb_dye_station.wheel': ('色みと鮮やかさ（クリックかドラッグで選ぶ）', 'Hue and saturation (click or drag)'),
+    'gui.singulo.rgb_dye_station.brightness': ('明るさ', 'Brightness'),
+    'gui.singulo.rgb_dye_station.cost': ('1回に使うインク', 'Ink per dye'),
+    'gui.singulo.rgb_dye_station.cost.0': ('赤 %s', 'Red %s'),
+    'gui.singulo.rgb_dye_station.cost.1': ('緑 %s', 'Green %s'),
+    'gui.singulo.rgb_dye_station.cost.2': ('青 %s', 'Blue %s'),
+    'gui.singulo.rgb_dye_station.cost.3': ('白 %s', 'White %s'),
+    'gui.singulo.rgb_dye_station.cost.4': ('黒 %s', 'Black %s'),
+    'gui.singulo.rgb_dye_station.ink.0': ('赤のインク %s / %s', 'Red ink %s / %s'),
+    'gui.singulo.rgb_dye_station.ink.1': ('緑のインク %s / %s', 'Green ink %s / %s'),
+    'gui.singulo.rgb_dye_station.ink.2': ('青のインク %s / %s', 'Blue ink %s / %s'),
+    'gui.singulo.rgb_dye_station.ink.3': ('白のインク %s / %s', 'White ink %s / %s'),
+    'gui.singulo.rgb_dye_station.ink.4': ('黒のインク %s / %s', 'Black ink %s / %s'),
+    'gui.singulo.rgb_dye_station.no_target': ('染める物を入れる', 'Put in something to dye'),
+}
+
+
+def rgb_front(stage):
+    """RGB染色台の正面: 外装に、暗いくぼみの中のドットの色の輪（中心ほど白い）と、下に赤・緑・青の小さな染料のしずく。"""
+    import colorsys
+    import art16
+    from art16 import rgba
+    im = art16.casing(stage, 'side', seed=59)
+    px = im.load()
+    for y in range(2, 13):
+        for x in range(2, 14):
+            px[x, y] = rgba((34, 32, 40)) if 3 <= x <= 12 and 3 <= y <= 11 else rgba((70, 66, 78))
+    for y in range(3, 12):
+        for x in range(3, 13):
+            dx, dy = x - 7.5, y - 7.0
+            r = (dx * dx + dy * dy) ** 0.5
+            if r <= 4.4:
+                import math
+                h = (math.atan2(dy, dx) / (2 * math.pi)) % 1
+                cr, cg, cb = colorsys.hsv_to_rgb(h, min(1, r / 4.0), 1.0)
+                px[x, y] = rgba((int(cr * 255), int(cg * 255), int(cb * 255)))
+    px[6, 5] = rgba((255, 255, 255))                 # 光
+    for x, c in ((5, (216, 58, 58)), (7, (76, 176, 76)), (9, (58, 98, 216))):
+        px[x, 13] = rgba(c)
+        px[x + 1, 13] = rgba(tuple(min(255, v + 40) for v in c))
+    return im
+
+
 
 def recipes(R, shaped):
     # 猫耳: 上の左右に羊毛の耳、下に糸のカチューシャ
@@ -39,12 +89,26 @@ def recipes(R, shaped):
     # ほうき: 上から柄（棒）、結び目（糸）、穂（小麦）
     R('ほうき', 1, '作業台', {'棒': 1, '糸': 1, '小麦': 1}, cat='tool', note=DYE + '（結び目の色）')
     shaped['ほうき'] = (('R', 'S', 'H'), {'R': '棒', 'S': '糸', 'H': '小麦'})
+    # RGB染色台: 上に赤・緑・青の染料、真ん中に白の染料・作業台・黒の染料、下に板材
+    R('RGB染色台', 1, '作業台', {'赤色の染料': 1, '緑色の染料': 1, '青色の染料': 1, '白色の染料': 1, '黒色の染料': 1,
+                              '作業台（ブロック）': 1, '板材': 3}, cat='machine',
+      note='赤・緑・青・白・黒の染料をインクにして、染められる物を色の輪から選んだ好きな色に染める')
+    shaped['RGB染色台'] = (('RGB', 'WCK', 'PPP'), {'R': '赤色の染料', 'G': '緑色の染料', 'B': '青色の染料', 'W': '白色の染料',
+                                                  'C': '作業台（ブロック）', 'K': '黒色の染料', 'P': '板材'})
 
 
 _DYE_JA = '染料と一緒に作業台で染められる。'
 _DYE_EN = 'Dye it with dyes on a crafting table.'
 
 DESC = {
+    'RGB染色台': ('赤・緑・青・白・黒の染料をそれぞれの枠に入れるとインクになり（染料1個で8目盛り、各色64目盛りまで）、'
+                '画面の色の輪と明るさで選んだ好きな色に、染められる物（革の防具・アンドロイドの装飾など）を染める。'
+                '1回に使うインクは選んだ色で決まり、純色なら色みのインクだけ、灰色なら白と黒だけを使う（各色4目盛りまで）。'
+                '壊すと、中の染料と、インクを染料に戻せる分を落とす。',
+                'Put red, green, blue, white and black dyes in their slots to turn them into ink (8 units per dye, up to 64 of each), '
+                'then dye anything dyeable, such as leather armor or android decorations, any color you pick on the color wheel and '
+                'brightness bar. The ink used depends on the color: a pure hue uses only its colored inks, a gray only white and black '
+                '(up to 4 units of each). Breaking it drops its dyes and as many dyes as its ink can make again.'),
     '猫耳カチューシャ': ('アンドロイドの頭に着ける、猫の耳がついたカチューシャ。装飾のページの頭の枠に着ける。' + _DYE_JA,
                     'A headband with cat ears for an android. Goes in the head slot of the decoration page. ' + _DYE_EN),
     '魔女の帽子': ('先が折れたとんがり帽子。装飾のページの頭の枠に着ける。' + _DYE_JA,
@@ -76,6 +140,7 @@ DESC = {
 }
 
 SUMMARY = {
+    'RGB染色台': ('色の輪から選んだ好きな色に染める台。', 'Dyes things any color you pick on a color wheel.'),
     '猫耳カチューシャ': ('アンドロイドの頭に着ける猫耳。', 'Cat ears for an android.'),
     '魔女の帽子': ('アンドロイドがかぶるとんがり帽子。', 'A pointed hat for an android.'),
     '麦わら帽子': ('アンドロイドがかぶる麦わら帽子。', 'A straw hat for an android.'),

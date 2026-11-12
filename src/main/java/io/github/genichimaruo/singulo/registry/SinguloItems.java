@@ -392,6 +392,7 @@ public final class SinguloItems {
         block(SinguloBlocks.ANDROID_WORK_CONSOLE, 2);
         block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
         block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
+        block(SinguloBlocks.RGB_DYE_STATION, 1);
         block(SinguloBlocks.ANDROID_RECIPE_RACK, 2);
         block(SinguloBlocks.ANDROID_WORKBENCH, 2);
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);

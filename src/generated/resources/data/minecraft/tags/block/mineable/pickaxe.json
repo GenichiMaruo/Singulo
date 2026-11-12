@@ -222,6 +222,7 @@
     "singulo:fluid_drone_port",
     "singulo:collapsar_lining",
     "singulo:horizon_vault",
-    "singulo:wormhole_drone_beacon"
+    "singulo:wormhole_drone_beacon",
+    "singulo:rgb_dye_station"
   ]
 }

@@ -14346,5 +14346,81 @@
   "howto.singulo.android_witch_hat": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
+  },
+  "block.singulo.rgb_dye_station": {
+    "source": "RGB Dye Station",
+    "translation": "RGB 염색대"
+  },
+  "gui.singulo.rgb_dye_station.apply": {
+    "source": "Dye",
+    "translation": "염색"
+  },
+  "gui.singulo.rgb_dye_station.wheel": {
+    "source": "Hue and saturation (click or drag)",
+    "translation": "색상과 채도(클릭하거나 드래그해서 선택)"
+  },
+  "gui.singulo.rgb_dye_station.brightness": {
+    "source": "Brightness",
+    "translation": "밝기"
+  },
+  "gui.singulo.rgb_dye_station.cost": {
+    "source": "Ink per dye",
+    "translation": "한 번 염색에 쓰는 잉크"
+  },
+  "gui.singulo.rgb_dye_station.cost.0": {
+    "source": "Red %s",
+    "translation": "빨강 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.1": {
+    "source": "Green %s",
+    "translation": "초록 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.2": {
+    "source": "Blue %s",
+    "translation": "파랑 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.3": {
+    "source": "White %s",
+    "translation": "하양 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.4": {
+    "source": "Black %s",
+    "translation": "검정 %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.0": {
+    "source": "Red ink %s / %s",
+    "translation": "빨간 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.1": {
+    "source": "Green ink %s / %s",
+    "translation": "초록 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.2": {
+    "source": "Blue ink %s / %s",
+    "translation": "파란 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.3": {
+    "source": "White ink %s / %s",
+    "translation": "하얀 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.4": {
+    "source": "Black ink %s / %s",
+    "translation": "검은 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.no_target": {
+    "source": "Put in something to dye",
+    "translation": "염색할 물건을 넣으세요"
+  },
+  "summary.singulo.rgb_dye_station": {
+    "source": "Dyes things any color you pick on a color wheel.",
+    "translation": "색상환에서 고른 원하는 색으로 염색하는 작업대."
+  },
+  "desc.singulo.rgb_dye_station": {
+    "source": "Put red, green, blue, white and black dyes in their slots to turn them into ink (8 units per dye, up to 64 of each), then dye anything dyeable, such as leather armor or android decorations, any color you pick on the color wheel and brightness bar. The ink used depends on the color: a pure hue uses only its colored inks, a gray only white and black (up to 4 units of each). Breaking it drops its dyes and as many dyes as its ink can make again.",
+    "translation": "빨강·초록·파랑·하양·검정 염료를 각 칸에 넣으면 잉크가 되고(염료 1개에 8칸, 색마다 최대 64칸), 화면의 색상환과 밝기에서 고른 원하는 색으로 염색할 수 있는 물건(가죽 갑옷, 안드로이드 장식 등)을 염색합니다. 한 번에 쓰는 잉크는 고른 색에 따라 정해지며, 순색은 그 색의 잉크만, 회색은 하양과 검정만 씁니다(색마다 최대 4칸). 부수면 안의 염료와, 잉크를 염료로 되돌릴 수 있는 만큼을 떨어뜨립니다."
+  },
+  "howto.singulo.rgb_dye_station": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   }
 }
