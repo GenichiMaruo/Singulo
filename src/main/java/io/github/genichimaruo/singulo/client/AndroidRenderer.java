@@ -1914,13 +1914,14 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 case "necktie" -> {
                     // 首の結び目（剣先より1ピクセル奥）と、胸の前に下がる幅2ピクセルの剣先（1段おきに少し濃い縞）。
                     // 先だけ斜めの三角（ワンポイント）。歩くと少し揺れる
+                    // 結び目は剣先と同じ布（少しだけ暗い）。剣先の最上段は後ろへ結び目まで伸ばして、すき間なくつなげる
                     int stripe = mix(c, 0x000000, 0.22F);
-                    b(pose, vc, light, -1, -8, -1.9F, 1, -7, -1.5F, dark);
+                    b(pose, vc, light, -1, -8, -1.9F, 1, -7, -1.5F, mix(c, 0x000000, 0.1F));
                     pose.pushPose();
                     pose.translate(0, -7 * P, -2.4F * P);
                     pose.mulPose(Axis.XP.rotationDegrees(-(2 + 6 * walk)));
                     for (int r = 0; r < 4; r++) {
-                        b(pose, vc, light, -1, r, -0.5F, 1, r + 1, 0, r % 2 == 1 ? stripe : c);
+                        b(pose, vc, light, -1, r, -0.5F, 1, r + 1, r == 0 ? 0.5F : 0, r % 2 == 1 ? stripe : c);
                     }
                     ear(pose, vc, light, -1, 4, 1, 4, 0, 5, -0.5F, 0, 1, c);
                     pose.popPose();
