@@ -19,6 +19,7 @@ def convert(path: Path, obj):
             value = value.replace('#c:', '#forge:')
             if value.startswith('c:'): value = 'forge:' + value[2:]
             value = value.replace('forge:glass_blocks/colorless', 'forge:glass/colorless').replace('forge:glass_blocks', 'forge:glass')
+            value = value.replace('forge:leathers', 'forge:leather')
             value = value.replace('forge:gravels', 'forge:gravel').replace('forge:netherracks', 'forge:netherrack').replace('forge:obsidians', 'forge:obsidian').replace('forge:sandstone/blocks', 'forge:sandstone')
             value = value.replace('forge:cobblestones', 'forge:cobblestone').replace('forge:stones', 'forge:stone').replace('forge:sands', 'forge:sand')
             return value

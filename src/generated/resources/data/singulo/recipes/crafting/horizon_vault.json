@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "CNC",
+    "PGP"
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:nihonium_plate"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "C": {
+      "item": "singulo:collapsar_ingot"
+    },
+    "N": {
+      "item": "singulo:nuclear_pasta"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:horizon_vault"
+  }
+}

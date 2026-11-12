@@ -58,6 +58,50 @@ final class GlowDepth extends RenderType {
                     .setOverlayState(OVERLAY)
                     .createCompositeState(false));
 
+    /**
+     * 管の中の液体（液体パイプ）の色。深度は書かず、面を遠い順に並べて重ねる。深度を書くと、並べ替えの順がずれた所で手前の面が
+     * 奥の面をはじいて、面が抜けて見える（中心の箱・腕・流れの帯が重なり合うため）。
+     */
+    private static final RenderType FLUID_COLOR = create("singulo_pipe_fluid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
+            1536, false, true, CompositeState.builder()
+                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
+                    .setTextureState(new TextureStateShard(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS, false, false))
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setLightmapState(LIGHTMAP)
+                    .setOverlayState(OVERLAY)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
+
+    /** 管の中の液体の深度（色のあとに、同じ形を深度だけ書く。あとから描く窓のガラスや水が、液体の手前に割り込まないように）。 */
+    private static final RenderType FLUID_DEPTH = create("singulo_pipe_fluid_depth", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
+            1536, false, false, CompositeState.builder()
+                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
+                    .setTextureState(new TextureStateShard(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS, false, false))
+                    .setLightmapState(LIGHTMAP)
+                    .setOverlayState(OVERLAY)
+                    .setWriteMaskState(DEPTH_WRITE)
+                    .createCompositeState(false));
+
+    private static final MultiBufferSource.BufferSource FLUID_SOURCE = fluidSource();
+
+    private static MultiBufferSource.BufferSource fluidSource() {
+        java.util.Map<RenderType, BufferBuilder> buffers = new java.util.LinkedHashMap<>();
+        buffers.put(FLUID_COLOR, new BufferBuilder(1 << 18));
+        buffers.put(FLUID_DEPTH, new BufferBuilder(1 << 18));
+        return MultiBufferSource.immediateWithBuffers(buffers, new BufferBuilder(1 << 10));
+    }
+
+    /**
+     * 管の中の液体の入れ物。ワールドの中では色と深度の2つに同じ面を書き、ブロックエンティティを描き終えた時点で、色（遠い順）→
+     * 深度の順にまとめて描く。ワールドの外やシェーダーパック使用時は、これまでどおりの描き方（{@link FluidLook#buffer}）。
+     */
+    static VertexConsumer fluid(MultiBufferSource buffers) {
+        if (!active || GravitationalLensing.shaderPackInUse()) {
+            return FluidLook.buffer(buffers);
+        }
+        return VertexMultiConsumer.create(FLUID_SOURCE.getBuffer(FLUID_COLOR), FLUID_SOURCE.getBuffer(FLUID_DEPTH));
+    }
+
     private static final MultiBufferSource.BufferSource SOURCE = MultiBufferSource.immediate(new BufferBuilder(1 << 18));
     private static final MultiBufferSource.BufferSource COLOR_SOURCE = MultiBufferSource.immediate(new BufferBuilder(1 << 20));
     /** 鍛造炉のジェットとビーム（加算の光）。種類ごとに入れ物を分けて、水や雲まで描き終えてからまとめて描く。 */
@@ -172,6 +216,9 @@ final class GlowDepth extends RenderType {
             jetModelView.set(RenderSystem.getModelViewMatrix());
             // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
             net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
+            // 管の中の液体: 色を遠い順に重ねてから、深度を書く
+            FLUID_SOURCE.endBatch(FLUID_COLOR);
+            FLUID_SOURCE.endBatch(FLUID_DEPTH);
             COLOR_SOURCE.endBatch();
             SOURCE.endBatch();
             if (jetsPending) {

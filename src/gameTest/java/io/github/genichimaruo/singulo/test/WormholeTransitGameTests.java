@@ -89,6 +89,118 @@ public final class WormholeTransitGameTests {
             h.assertTrue(player.position().equals(start),"Cooldown allowed immediate travel");h.succeed();
         });
     }
+    /**
+     * ネザーポータルと同じく、口の中の位置を保って向こうの口の同じ位置に出る。横のずれ・体の向き・勢いは口の向きの違いだけ回る。
+     * 出た口の中にいる間は、もう一度は飛ばない。
+     */
+    @GameTest(template="forge",timeoutTicks=80)
+    public static void wormholeTransitKeepsPositionFacingAndMomentum(GameTestHelper h){
+        long pair=h.getLevel().random.nextLong();
+        var a=mouth(h,A,pair,true);
+        // 向こうの口は東向き（こちらは南向き）: 南の前から北へ入ると、東の前へ東向きに出る
+        h.setBlock(B,SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,Direction.EAST));
+        WormholeMouthBlockEntity b=(WormholeMouthBlockEntity)h.getBlockEntity(B);b.setData(new WormholeData(pair,0));
+        var tag=b.saveWithoutMetadata();tag.putBoolean("traversable",true);tag.putInt("grace",6000);tag.putInt("size",1);b.load(tag);
+        // 両方の口の開口部を空け、床（口の高さ）を敷く
+        for(BlockPos m:new BlockPos[]{A,B})for(int dx=-3;dx<=3;dx++)for(int dz=-3;dz<=3;dz++){
+            BlockPos p=m.offset(dx,0,dz);
+            if(!p.equals(m))h.setBlock(p,Blocks.STONE);
+            for(int y=1;y<=4;y++)h.setBlock(p.above(y),Blocks.AIR);
+        }
+        ServerPlayer player=TestScope.player(h);
+        h.runAtTickTime(5,()->{
+            h.assertTrue(a.partner()==b&&b.partner()==a,"Pair fixture not linked");
+            // こちらの口の中心から東へ1ブロック、床の上に立ち、北（口の中）へ歩いている
+            Vec3 start=new Vec3(WormholeTransit.center(a).x+1,h.absolutePos(A).getY()+1,WormholeTransit.center(a).z+0.2);
+            place(player,start);player.setYRot(180);player.setDeltaMovement(new Vec3(0,0,-0.2));
+            WormholeTransit.tick(a,h.getLevel());
+            Vec3 c=WormholeTransit.center(b);
+            // 南向き → 東向き（の反対の西へ入る向き）: 時計回りに1回。東へ1のずれは南へ1、北への勢いは東へ
+            h.assertTrue(Math.abs(player.getX()-c.x)<1e-6&&Math.abs(player.getZ()-(c.z+1))<1e-6&&Math.abs(player.getY()-start.y)<1e-6,
+                    "Arrival not mirrored: "+player.position()+" centre "+c);
+            h.assertTrue(Math.abs(net.minecraft.util.Mth.wrapDegrees(player.getYRot()-270))<1e-3,"Facing not rotated: "+player.getYRot());
+            h.assertTrue(player.getDeltaMovement().distanceTo(new Vec3(0.2,0,0))<1e-6,"Momentum not rotated: "+player.getDeltaMovement());
+            // 出た口の中にいる間は戻らない（待ち時間が延び続ける）
+            for(int i=0;i<20;i++)WormholeTransit.tick(b,h.getLevel());
+            h.assertTrue(player.position().distanceToSqr(Vec3.atCenterOf(h.absolutePos(B)))<9&&player.isOnPortalCooldown(),
+                    "Player bounced back while still in the exit mouth");
+            h.succeed();
+        });
+    }
+    /** 口へ撃った矢は、人と同じ写し方で向こうの口から出て飛び続ける（向きの違う口では勢いが回る）。 */
+    @GameTest(template="forge",timeoutTicks=80)
+    public static void wormholeCarriesArrowsToTheOtherMouth(GameTestHelper h){
+        long pair=h.getLevel().random.nextLong();
+        var a=mouth(h,A,pair,true);
+        h.setBlock(B,SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,Direction.EAST));
+        WormholeMouthBlockEntity b=(WormholeMouthBlockEntity)h.getBlockEntity(B);b.setData(new WormholeData(pair,0));
+        var tag=b.saveWithoutMetadata();tag.putBoolean("traversable",true);tag.putInt("grace",6000);tag.putInt("size",1);b.load(tag);
+        for(BlockPos m:new BlockPos[]{A,B})for(int dx=-3;dx<=3;dx++)for(int dz=-3;dz<=3;dz++)for(int y=1;y<=4;y++)h.setBlock(m.offset(dx,y,dz),Blocks.AIR);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());
+        h.runAtTickTime(5,()->{
+            h.assertTrue(a.partner()==b&&b.partner()==a,"Pair fixture not linked");
+            // こちらの口の中心から東へ1、南の前2.5から北（口の中）へ飛ぶ
+            Vec3 c=WormholeTransit.center(a);
+            arrow.setNoGravity(true);
+            arrow.setPos(c.x+1,c.y-arrow.getBbHeight()/2,c.z+2.5);arrow.setDeltaMovement(0,0,-1);
+            h.getLevel().addFreshEntity(arrow);
+        });
+        h.succeedWhen(()->{
+            Vec3 c=WormholeTransit.center(b);
+            // 東向きの口: 東へ1のずれは南へ1、北への勢いは東へ
+            h.assertTrue(arrow.isAlive()&&arrow.level()==h.getLevel(),"Arrow vanished");
+            h.assertTrue(arrow.getX()>c.x&&arrow.getX()<c.x+4&&Math.abs(arrow.getZ()-(c.z+1))<0.05,"Arrow not at the far mouth: "+arrow.position()+" centre "+c);
+            h.assertTrue(arrow.getDeltaMovement().x>0.9&&Math.abs(arrow.getDeltaMovement().z)<1e-6,"Arrow momentum not rotated: "+arrow.getDeltaMovement());
+        });
+    }
+    /** 向こうの口が読み込まれていないとき、開口部に入った人がいれば、ネザーポータルと同じく向こうを読み込ませる。 */
+    @GameTest(template="forge",timeoutTicks=80)
+    public static void wormholeProjectilesRespectEntitiesBeforeTheMouth(GameTestHelper h){
+        long pair=h.getLevel().random.nextLong();var a=mouth(h,A,pair,true);var b=mouth(h,B,pair,true);
+        var scope=TestScope.of(h);
+        for(BlockPos m:new BlockPos[]{A,B})for(int dx=-2;dx<=2;dx++)for(int dz=-3;dz<=3;dz++)for(int y=1;y<=4;y++)h.setBlock(m.offset(dx,y,dz),Blocks.AIR);
+        var pig=new net.minecraft.world.entity.animal.Pig(net.minecraft.world.entity.EntityType.PIG,h.getLevel());
+        pig.setNoAi(true);pig.setNoGravity(true);scope.defer(pig::discard);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());
+        var owned=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());
+        scope.defer(arrow::discard);scope.defer(owned::discard);
+        h.runAtTickTime(5,()->{
+            h.assertTrue(a.partner()==b,"Pair fixture not linked");
+            Vec3 c=WormholeTransit.center(a);
+            pig.setPos(c.x,c.y-0.4,c.z+1.3);h.getLevel().addFreshEntity(pig);
+            arrow.setPos(c.x,c.y,c.z+2.5);arrow.setDeltaMovement(0,0,-3);arrow.setNoGravity(true);h.getLevel().addFreshEntity(arrow);
+            boolean crossed=WormholeTransit.onProjectileTick(arrow);
+            h.assertFalse(crossed,"Portal teleported the arrow through an entity in front of it");
+            float health=pig.getHealth();arrow.tick();
+            h.assertTrue(pig.getHealth()<health,"Vanilla arrow collision did not hit the intervening entity");
+            arrow.discard();
+            // A newly fired projectile must still ignore its owner, as vanilla's canHitEntity does.
+            owned.setOwner(pig);owned.setPos(c.x,c.y,c.z+1.3);owned.setDeltaMovement(0,0,-2);owned.setNoGravity(true);h.getLevel().addFreshEntity(owned);
+            boolean ownerCrossed=WormholeTransit.onProjectileTick(owned);
+            h.assertTrue(ownerCrossed&&owned.position().distanceToSqr(WormholeTransit.center(b))<4,
+                    "Portal collision check treated the projectile's owner as a hittable obstacle");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template="forge",timeoutTicks=400)
+    public static void wormholeTransitLoadsTheUnloadedFarMouth(GameTestHelper h){
+        long pair=h.getLevel().random.nextLong();var a=mouth(h,A,pair,true);
+        var nether=h.getLevel().getServer().getLevel(net.minecraft.world.level.Level.NETHER);
+        BlockPos base=h.absolutePos(BlockPos.ZERO);
+        BlockPos far=new BlockPos(Math.floorMod(base.getX(),4096)+260_000,64,Math.floorMod(base.getZ(),4096)+260_000);
+        var wormholes=WormholeNetwork.get(h.getLevel().getServer());
+        var at=net.minecraft.core.GlobalPos.of(net.minecraft.world.level.Level.NETHER,far);
+        wormholes.register(pair,at);TestScope.of(h).defer(()->wormholes.unregister(pair,at));
+        ServerPlayer player=TestScope.player(h);
+        h.runAtTickTime(5,()->{
+            h.assertFalse(nether.isLoaded(far),"Fixture expects the far mouth to be unloaded");
+            place(player,WormholeTransit.center(a).add(0,-0.9,0));
+            WormholeTransit.tick(a,h.getLevel());
+            h.assertTrue(player.serverLevel()==h.getLevel(),"Travelled to an unloaded mouth");
+        });
+        h.succeedWhen(()->h.assertTrue(nether.isLoaded(far),"The far mouth was not loaded"));
+    }
     @GameTest(template="forge")
     public static void wormholeExitRejectsMissingFloorFluidAndObstruction(GameTestHelper h){
         var b=mouth(h,B,h.getLevel().random.nextLong(),true);ServerPlayer player=TestScope.player(h);place(player,Vec3.atCenterOf(h.absolutePos(A)));

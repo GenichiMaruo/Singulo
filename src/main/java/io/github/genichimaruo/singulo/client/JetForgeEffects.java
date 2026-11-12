@@ -24,9 +24,10 @@ import net.minecraftforge.client.event.ViewportEvent;
 /**
  * 降着ジェット鍛造炉の、画面と音の演出（クライアント）。
  * <ul>
- *   <li>閃光: 仕上げの瞬間に画面を白く光らせる（設定 jetForgeFlash で弱める・切る。近いほど強い）。光が出るのは一瞬だけで、
- *       照射中は画面を白くしない</li>
- *   <li>揺れ: 照射中は近くで細かく、仕上げの衝撃波で大きく揺れる（設定 jetForgeShake）</li>
+ *   <li>閃光: 仕上げの瞬間に画面を白く光らせる（設定 jetForgeFlash で弱める・切る。近いほど強い）。ジェットが収束リングを
+ *       突き抜けるたびにも軽く光る。光が出るのは一瞬だけで、照射中は画面を白くしない</li>
+ *   <li>揺れ: 収束リングの突き抜けで短く、照射中は近くで細かく、仕上げの衝撃波で大きく揺れる（設定 jetForgeShake）</li>
+ *   <li>火花: 収束リングの突き抜けで、リングの縁から放射状に飛ぶ</li>
  *   <li>音: 炉心のうなり（待機中も）・ジェットの轟音（点火から仕上げまで、ジェットの強さに合わせて）・ビームのうなり（収束と照射のあいだ）をくり返し鳴らす。段階の切り替わりの音はサーバーが鳴らす</li>
  *   <li>粒: 照射中の火花、冷却中の湯気（粒子の設定で減らす）</li>
  * </ul>
@@ -43,6 +44,8 @@ final class JetForgeEffects {
     static final int HUM = 0, BEAM = 1, JET = 2, ARC = 3;
     private static float flash;
     private static float shake;
+    /** 突き抜けの火花を最後に散らした時刻（キーは位置 × 4 + リングの番号。同じ突き抜けで2回散らさない）。 */
+    private static final Map<Long, Long> BURSTS = new HashMap<>();
 
     private JetForgeEffects() {}
 
@@ -62,6 +65,7 @@ final class JetForgeEffects {
             BEAMS.clear();
             JETS.clear();
             ARCS.clear();
+            BURSTS.clear();
             flash = 0;
             shake = 0;
             return;
@@ -87,6 +91,26 @@ final class JetForgeEffects {
                 shakeNow = Math.max(shakeNow, (float) Mth.clamp(1 - d / 18, 0, 1) * (0.08F + 0.22F * tl.shatter()));
             } else if (tl.phase() == JetForgeBlockEntity.IGNITE && tl.t() < 25) {
                 shakeNow = Math.max(shakeNow, (float) Mth.clamp(1 - d / 24, 0, 1) * 0.25F * (1 - tl.t() / 25F));
+            } else if (tl.phase() == JetForgeBlockEntity.FOCUS && !tl.stalled()) {
+                // ジェットが収束リングを突き抜けた瞬間: 軽い閃光と揺れ、リングから火花（後ろのリングほど強い）
+                for (int i = 0; i < 3; i++) {
+                    float age = JetForgeRenderer.punchAge(tl, i);
+                    if (age < 0 || age >= 10) {
+                        continue;
+                    }
+                    Vec3 ring = JetForgeLayout.at(pos, back, JetForgeLayout.LENS_X[i], JetForgeLayout.AXIS_Y, JetForgeLayout.AXIS_Z);
+                    double dr = eye.distanceTo(ring);
+                    float k = (1 - age / 10F) * (0.8F + 0.2F * i);
+                    flashNow = Math.max(flashNow, (float) Mth.clamp(1 - dr / 48, 0, 1) * 0.3F * k);
+                    shakeNow = Math.max(shakeNow, (float) Mth.clamp(1 - dr / 32, 0, 1) * 0.65F * k);
+                    long key = pos.asLong() * 4 + i;
+                    long now = mc.level.getGameTime();
+                    Long last = BURSTS.get(key);
+                    if (age < 4 && dr < 96 && (last == null || now - last > 40 || now < last)) {
+                        BURSTS.put(key, now);
+                        burst(mc, ring, JetForgeLayout.axis(back), JetForgeLayout.LENS_R[i], i);
+                    }
+                }
             }
             if (d < SOUND_RANGE) {
                 keepLoop(mc, HUMS, pos, be, HUM, core);
@@ -107,6 +131,27 @@ final class JetForgeEffects {
         BEAMS.values().removeIf(l -> l.isStopped());
         JETS.values().removeIf(l -> l.isStopped());
         ARCS.values().removeIf(l -> l.isStopped());
+    }
+
+    /** 突き抜けの火花: リングの縁から外へ放射状に飛ぶ光の粒と、ジェットの向きへ噴き出す粒（粒子の設定で減る）。 */
+    private static void burst(Minecraft mc, Vec3 c, Vec3 axis, float radius, int ring) {
+        RandomSource rnd = mc.level.random;
+        Vec3 a = Math.abs(axis.y) < 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+        Vec3 e1 = axis.cross(a).normalize();
+        Vec3 e2 = axis.cross(e1).normalize();
+        int count = 48 + 16 * ring;
+        for (int k = 0; k < count; k++) {
+            float ang = rnd.nextFloat() * Mth.TWO_PI;
+            Vec3 dir = e1.scale(Mth.cos(ang)).add(e2.scale(Mth.sin(ang)));
+            Vec3 p = c.add(dir.scale(radius * (0.6 + 0.4 * rnd.nextDouble())));
+            double speed = 0.35 + 0.65 * rnd.nextDouble();
+            Vec3 v = dir.scale(speed).add(axis.scale(0.25 + 0.5 * rnd.nextDouble()));
+            mc.level.addParticle(k % 3 == 0 ? ParticleTypes.END_ROD : ParticleTypes.ELECTRIC_SPARK, p.x, p.y, p.z, v.x, v.y, v.z);
+        }
+        for (int k = 0; k < 16; k++) {
+            Vec3 v = axis.scale(0.8 + 0.8 * rnd.nextDouble()).add(e1.scale(rnd.nextGaussian() * 0.08)).add(e2.scale(rnd.nextGaussian() * 0.08));
+            mc.level.addParticle(ParticleTypes.FIREWORK, c.x, c.y, c.z, v.x, v.y, v.z);
+        }
     }
 
     private static void keepArc(Minecraft mc, BlockPos pos, JetForgeBlockEntity be, int ring, Vec3 at) {

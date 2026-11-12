@@ -1,0 +1,66 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/horizon_duct_full",
+    "c": "singulo:block/horizon_duct",
+    "g": "singulo:block/horizon_duct_glass",
+    "f": "singulo:block/horizon_duct_flange",
+    "r": "singulo:block/horizon_duct_rim",
+    "j": "singulo:block/horizon_duct_joint"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        3,
+        3,
+        3
+      ],
+      "to": [
+        13,
+        13,
+        13
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#c",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

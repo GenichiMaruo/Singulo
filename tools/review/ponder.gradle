@@ -1,6 +1,7 @@
 // Development-only Create/Ponder reproduction. Never included in distribution JARs.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/ponder-src'))
         dependencies.add('modRuntimeOnly', 'maven.modrinth:create:8amzvn9x') { transitive = false }
         if (providers.gradleProperty('withEmbeddium').isPresent()) {

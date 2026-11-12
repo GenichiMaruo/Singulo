@@ -64,7 +64,9 @@ STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
 BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
                'boss_block', 'genesis', 'lab')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
-          'horizon_bus': (20, 20, 26), 'fluid_pipe': (120, 190, 235)}
+          'horizon_bus': (20, 20, 26)}
+# 液体パイプ（4段階）: 絵とモデルは tools/logistics_content.py が書く（電線と見分けられる、継ぎ手のつばと窓のある管）
+from logistics_content import PIPES, CAPSULES, CUSTOM  # noqa: E402
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
 # レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
 CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
@@ -573,11 +575,11 @@ UI_LANG = {
     'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
     'item.singulo.relocation_wrench.packed': ('中身と設定を保持して回収した', 'Device packed with contents and settings'),
     'item.singulo.blueprint.hint': ('作業台で素材と一緒に並べると、建材を作れる。設計図は使ってもなくならない', 'Place it with materials on a crafting table to make building blocks. The blueprint is not used up.'),
-    'item.singulo.relocation_wrench.cables_removed': ('ケーブルを %s 本回収した', 'Took back %s cables'),
+    'item.singulo.relocation_wrench.cables_removed': ('ケーブル・パイプを %s 本回収した', 'Took back %s cables or pipes'),
     'item.singulo.relocation_wrench.switch': ('スニークして空中で使うとモードを切り替える', 'Sneak-use in the air to switch modes.'),
-    'item.singulo.relocation_wrench.hint.1': ('ケーブルに使うと1本回収、スニークして使うとつながった同じケーブルを最大64本まとめて回収。左クリックでもすぐ壊せる', 'Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.'),
+    'item.singulo.relocation_wrench.hint.1': ('ケーブルやパイプに使うと1本回収、スニークして使うとつながった同じ種類を最大64本まとめて回収。左クリックでもすぐ壊せる', 'Use on a cable or pipe to take it back; sneak-use to take up to 64 joined pieces of that kind. Left-click also breaks them at once.'),
     'item.singulo.relocation_wrench.hint.0': ('スニークして装置に使うと、中身と設定ごと回収する', 'Sneak-use on a device to pack it with its contents and settings.'),
-    'item.singulo.relocation_wrench.mode.1': ('モード: ケーブルの撤去', 'Mode: remove cables'),
+    'item.singulo.relocation_wrench.mode.1': ('モード: ケーブル・パイプの撤去', 'Mode: remove cables and pipes'),
     'item.singulo.relocation_wrench.mode.0': ('モード: 装置の移設', 'Mode: relocate devices'),
     'tooltip.singulo.packed_device': ('中身・電力・設定を保持', 'Contents, energy and settings preserved'),
     'item.singulo.settings_card.copied': ('設定を写した', 'Settings copied'),
@@ -1654,6 +1656,8 @@ UI_LANG = {
 def lang_files():
     from cosmic_content import UI
     UI_LANG.update(UI)
+    from logistics_content import UI as _LOGISTICS_UI
+    UI_LANG.update(_LOGISTICS_UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
@@ -1759,6 +1763,8 @@ def models():
             if iid in CABLES:
                 cable_models(iid)
                 continue
+            if iid in CUSTOM:
+                continue                                   # logistics_content.models が書く
             st = stage_of(name)
             import shapes
             skin = CONTROLLER_SKINS.get(iid)
@@ -1779,7 +1785,7 @@ def models():
                 if iid == 'android_station':
                     # 上面は印刷床（光の走査線が往復する。blocks_extra3.station_top）
                     model['textures']['top'] = f'{MODID}:block/android_station_top'
-                if iid in ('drone_station', 'drone_port'):
+                if iid in ('drone_station', 'drone_port', 'fluid_drone_port'):
                     # 上面は着陸パッド（光の輪が広がる）と、縞の縁の昇降口（tools/drones.py）
                     model['textures']['top'] = f'{MODID}:block/{iid}_top'
                 if iid.endswith('android_workbench'):
@@ -1822,7 +1828,7 @@ def models():
         else:
             if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'meteor_compass', 'graviton_manipulator'):
                 continue
-            if iid in drones.CRATES:
+            if iid in drones.CRATES or iid in CAPSULES:
                 continue                                       # 梱包箱は立体のモデル（drones.models）                                       # 立体のモデル・針のモデルは別に作る
             model = {'parent': 'minecraft:item/handheld' if iid == 'relocation_wrench' else 'minecraft:item/generated',
                      'textures': {'layer0': f'{MODID}:item/{iid}'}}
@@ -1989,7 +1995,7 @@ def textures():
         'precision_assembler': (200, 220, 255),
     }
     for n, (iid, _, kind) in MOD.items():
-        if kind == 'machine' and iid not in CABLES and iid not in fronts:
+        if kind == 'machine' and iid not in CABLES and iid not in CUSTOM and iid not in fronts:
             fronts[iid] = STAGE_COLORS[stage_of(n)]
     for iid, col in fronts.items():
         for on in (False, True):
@@ -2231,7 +2237,7 @@ def art_textures():
     art16.save(art16.glass(), tb / 'machine_glass.png')
     art16.save(art16.inner(), tb / 'machine_inner.png')
     for name, (iid, _, kind) in MOD.items():
-        if kind == 'machine' and iid not in CABLES:
+        if kind == 'machine' and iid not in CABLES and iid not in CUSTOM:
             for on in (False, True):
                 sheet, frames = art16.machine_front(iid, stage_of(name), on)
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
@@ -3357,6 +3363,17 @@ def tags():
     write_json(DATA / 'tags' / 'item' / 'ceramic_flux.json', {'values': ['minecraft:bone_meal', mid('石灰粉')]})
     write_json(DATA / 'tags' / 'item' / 'carbon.json', {'values': ['minecraft:coal', mid('炭素粉')]})
     write_json(DATA / 'tags' / 'item' / 'limestone.json', {'values': ['minecraft:calcite', 'minecraft:dripstone_block']})
+    # 潮汐紡糸機の左の枠に入る素材（レシピの材料から。右の枠のエキゾチック物質と冷却材は除く）
+    feed = []
+    for r in RECIPES.values():
+        if r['station'] != '潮汐紡糸機':
+            continue
+        for n in r['inputs']:
+            kind, value = resolve(n)
+            entry = '#' + value if kind == 'tag' else value
+            if kind in ('tag', 'item') and n != 'エキゾチック物質' and entry not in feed:
+                feed.append(entry)
+    write_json(DATA / 'tags' / 'item' / 'tidal_spindle_feedstock.json', {'values': feed})
     write_json(DATA / 'tags' / 'item' / 'helium_bearing_stone.json', {'values': [
         'minecraft:deepslate', 'minecraft:cobbled_deepslate', 'minecraft:basalt', 'minecraft:smooth_basalt']})
     write_json(DATA / 'tags' / 'block' / 'ruin_blocks.json',
@@ -3395,6 +3412,10 @@ def tags():
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
+                       # 液体のドローン発着ポート: 2つのタンクの中身をアイテムへ写す（置き直すと戻る）
+                       'fluid_drone_port': [f'{MODID}:port_send_fluid', f'{MODID}:port_receive_fluid'],
+                       # 事象の地平線倉庫: しまっている物と個数
+                       'horizon_vault': [f'{MODID}:vault_item', f'{MODID}:vault_count'],
                        'zero_gravity_controller': ['minecraft:block_entity_data'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
     for n, (iid, _, kind) in MOD.items():
@@ -3757,7 +3778,8 @@ def thermal():
 TAB_GROUPS = [
     ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'relocation_wrench', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
-                       'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus', 'fluid_pipe']),
+                       'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
+                       'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
                'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2', 'capacity_upgrade_3']),
@@ -3808,7 +3830,7 @@ TAB_GROUPS = [
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     # ドローン輸送: ステーションと材料 → 発着ポート → 梱包箱
     ('ドローン', ['drone_station', 'drone_kit', 'drone_memory', 'drone_memory_jet', 'drone_memory_gravity', 'drone_phase_upgrade', 'drone_port', 'packing_crate', 'battery_packing_crate',
-               'large_battery_packing_crate']),
+               'large_battery_packing_crate', 'fluid_drone_port', 'fluid_capsule', 'battery_fluid_capsule', 'large_battery_fluid_capsule']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core', 'catalyst_stabilizer']),
@@ -4237,6 +4259,8 @@ def main():
     opaque_block_textures()
     import cosmic_content
     cosmic_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import logistics_content
+    logistics_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

@@ -1,0 +1,448 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "metal": "singulo:block/wormhole_drone_beacon_metal",
+    "gold": "singulo:block/wormhole_drone_beacon_gold",
+    "glow": "singulo:block/wormhole_drone_beacon_glow",
+    "particle": "singulo:block/wormhole_drone_beacon_metal"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        1,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        1,
+        4
+      ],
+      "to": [
+        12,
+        3,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#metal"
+        },
+        "south": {
+          "texture": "#metal"
+        },
+        "east": {
+          "texture": "#metal"
+        },
+        "west": {
+          "texture": "#metal"
+        },
+        "up": {
+          "texture": "#metal"
+        },
+        "down": {
+          "texture": "#metal"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        3,
+        6
+      ],
+      "to": [
+        10,
+        11,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#metal"
+        },
+        "south": {
+          "texture": "#metal"
+        },
+        "east": {
+          "texture": "#metal"
+        },
+        "west": {
+          "texture": "#metal"
+        },
+        "up": {
+          "texture": "#metal"
+        },
+        "down": {
+          "texture": "#metal"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        7,
+        2
+      ],
+      "to": [
+        14,
+        8,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        },
+        "south": {
+          "texture": "#glow"
+        },
+        "east": {
+          "texture": "#glow"
+        },
+        "west": {
+          "texture": "#glow"
+        },
+        "up": {
+          "texture": "#glow"
+        },
+        "down": {
+          "texture": "#glow"
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        2,
+        7,
+        13
+      ],
+      "to": [
+        14,
+        8,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        },
+        "south": {
+          "texture": "#glow"
+        },
+        "east": {
+          "texture": "#glow"
+        },
+        "west": {
+          "texture": "#glow"
+        },
+        "up": {
+          "texture": "#glow"
+        },
+        "down": {
+          "texture": "#glow"
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        2,
+        7,
+        3
+      ],
+      "to": [
+        3,
+        8,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        },
+        "south": {
+          "texture": "#glow"
+        },
+        "east": {
+          "texture": "#glow"
+        },
+        "west": {
+          "texture": "#glow"
+        },
+        "up": {
+          "texture": "#glow"
+        },
+        "down": {
+          "texture": "#glow"
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        13,
+        7,
+        3
+      ],
+      "to": [
+        14,
+        8,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        },
+        "south": {
+          "texture": "#glow"
+        },
+        "east": {
+          "texture": "#glow"
+        },
+        "west": {
+          "texture": "#glow"
+        },
+        "up": {
+          "texture": "#glow"
+        },
+        "down": {
+          "texture": "#glow"
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        3,
+        7,
+        7
+      ],
+      "to": [
+        6,
+        8,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        7,
+        7
+      ],
+      "to": [
+        13,
+        8,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        7,
+        3
+      ],
+      "to": [
+        9,
+        8,
+        6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        7,
+        10
+      ],
+      "to": [
+        9,
+        8,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        11,
+        5
+      ],
+      "to": [
+        11,
+        12,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        12,
+        7
+      ],
+      "to": [
+        9,
+        15,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        },
+        "south": {
+          "texture": "#glow"
+        },
+        "east": {
+          "texture": "#glow"
+        },
+        "west": {
+          "texture": "#glow"
+        },
+        "up": {
+          "texture": "#glow"
+        },
+        "down": {
+          "texture": "#glow"
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  ]
+}

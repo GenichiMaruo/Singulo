@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PTP",
+    "UFL",
+    "KXK"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "T": {
+      "item": "minecraft:iron_trapdoor"
+    },
+    "U": {
+      "item": "minecraft:bucket"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "L": {
+      "item": "singulo:fluid_pipe"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    },
+    "X": {
+      "item": "minecraft:piston"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:fluid_drone_port"
+  }
+}

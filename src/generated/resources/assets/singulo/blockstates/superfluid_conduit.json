@@ -1,0 +1,300 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_core"
+      }
+    },
+    {
+      "when": {
+        "straight": "z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_straight"
+      }
+    },
+    {
+      "when": {
+        "straight": "z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_straight_glass"
+      }
+    },
+    {
+      "when": {
+        "straight": "x"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "straight": "x"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_straight_glass",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "straight": "y"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "straight": "y"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_straight_glass",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_glass"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short_glass"
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_glass",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short_glass",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_glass",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short_glass",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_glass",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short_glass",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_glass",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short_glass",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "straight": "x|y|z"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_glass",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "straight": "none"
+      },
+      "apply": {
+        "model": "singulo:block/superfluid_conduit_arm_short_glass",
+        "x": 90
+      }
+    }
+  ]
+}

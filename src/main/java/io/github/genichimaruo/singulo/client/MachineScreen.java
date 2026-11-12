@@ -893,6 +893,15 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return new int[]{leftPos + imageWidth - 8 - w, topPos + inventoryLabelY - 1, w, 10};
     }
 
+    /** この装置がコラプサー内張りを受け付けるマルチブロックなら、その種類（そうでなければ null）。 */
+    @javax.annotation.Nullable
+    private io.github.genichimaruo.singulo.multiblock.Blueprints.Kind liningKind() {
+        var block = net.minecraft.client.Minecraft.getInstance().level == null ? null
+                : net.minecraft.client.Minecraft.getInstance().level.getBlockState(menu.pos()).getBlock();
+        var kind = block == null ? null : io.github.genichimaruo.singulo.multiblock.Blueprints.kindOf(block);
+        return kind != null && io.github.genichimaruo.singulo.multiblock.Shapes.acceptsLining(kind) ? kind : null;
+    }
+
     private void drawTank(GuiGraphics g, int x, int y, int tank) {
         int fluidId = menu.value(MachineBlockEntity.D_TANKS + tank * 2);
         int amount = menu.value(MachineBlockEntity.D_TANKS + tank * 2 + 1);
@@ -934,8 +943,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         int[] sr = structureRect();
         if (sr != null && Panel.inside(mouseX, mouseY, sr[0], sr[1], sr[2], sr[3])) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.structure." + type().id(), menu.value(MachineBlockEntity.D_STRUCTURE)),
-                    mouseX, mouseY);
+            java.util.List<Component> lines = new java.util.ArrayList<>();
+            lines.add(Component.translatable("gui.singulo.structure." + type().id(), menu.value(MachineBlockEntity.D_STRUCTURE)));
+            // コラプサー内張り（置ける設備だけ）: 枚数と加工の速さ。置ける場所はホロ投影機で金色に光る
+            if (liningKind() != null) {
+                int n = menu.value(MachineBlockEntity.D_LINING);
+                lines.add(Component.translatable("gui.singulo.lining.count", n,
+                        String.format("%.2f", io.github.genichimaruo.singulo.multiblock.CollapsarLining.factor(n)))
+                        .withStyle(st -> st.withColor(0xFFE0B860)));
+                lines.add(Component.translatable("gui.singulo.lining.hint").withStyle(st -> st.withColor(0xFF8A949E)));
+            }
+            g.renderComponentTooltip(font, lines, mouseX, mouseY);
             return;
         }
         int[] sp = selectPos();

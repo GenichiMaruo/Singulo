@@ -78,6 +78,46 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     /** Release runtime references when this level closes. */
     public static void forgetLevel(Level level) { LOADED.remove(level); }
 
+    /** 読み込まれている口（写さない。飛び道具が毎 tick 調べる。調べている間に口を増減させないこと）。 */
+    static Set<WormholeMouthBlockEntity> loadedView(Level level) {
+        Set<WormholeMouthBlockEntity> set = LOADED.get(level);
+        return set == null ? Set.of() : set;
+    }
+
+    /** 読み込まれている口（ドローンのワームホール便が、行き先を探すのに使う）。 */
+    public static java.util.List<WormholeMouthBlockEntity> loaded(Level level) {
+        Set<WormholeMouthBlockEntity> set = LOADED.get(level);
+        return set == null ? java.util.List.of() : java.util.List.copyOf(set);
+    }
+
+    /** そばに（各方向 {@link #GATE_RANGE} ブロック以内に）ワームホール航路標識があるか（調べた時刻から40 tick 覚える。保存しない）。 */
+    private boolean droneGate;
+    private long droneGateAt = Long.MIN_VALUE;
+    public static final int GATE_RANGE = 4;
+
+    /**
+     * ドローンがこの口をくぐれるか: 喉が開いていて相手の口が決まっていて（相手が読み込まれていなくてもよい。くぐるときに読み込ませる）、
+     * そばに航路標識がある（ワームホール便に使われたときだけ調べる）。
+     */
+    public boolean droneGate() {
+        if (level == null || size <= 0 || partnerPos() == null) {
+            return false;
+        }
+        long now = level.getGameTime();
+        if (droneGateAt == Long.MIN_VALUE || now - droneGateAt >= 40 || now < droneGateAt) {
+            droneGateAt = now;
+            droneGate = false;
+            BlockPos pos = worldPosition;
+            for (BlockPos p : BlockPos.betweenClosed(pos.offset(-GATE_RANGE, -GATE_RANGE, -GATE_RANGE), pos.offset(GATE_RANGE, GATE_RANGE, GATE_RANGE))) {
+                if (level.isLoaded(p) && level.getBlockState(p).is(io.github.genichimaruo.singulo.registry.SinguloBlocks.WORMHOLE_DRONE_BEACON.get())) {
+                    droneGate = true;
+                    break;
+                }
+            }
+        }
+        return droneGate;
+    }
+
     private final ItemStackHandler fuel = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
@@ -101,10 +141,16 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     private boolean traversable;
     public boolean traversable() { return traversable; }
     private int clientPassage;
+    /** 向こうの口が最後に読み込まれていたとき、開いていて縫い開かれていたか（向こうが読み込まれていない間の見た目と案内に使う。保存する）。 */
+    private boolean farPassable;
     public int passageState() {
         if(!traversable)return 0;
         if(level!=null&&level.isClientSide)return clientPassage;
-        var other=partner();return open()&&other!=null&&other.open()&&other.traversable()?2:1;
+        var other=partner();
+        if(other==null)return size>0&&partnerPos()!=null&&farPassable?2:1;
+        boolean passable=other.open()&&other.traversable();
+        if(passable!=farPassable){farPassable=passable;setChanged();}
+        return size>0&&passable?2:1;
     }
 
     private boolean installSeam(ServerPlayer player, ItemStack stack) {
@@ -334,6 +380,9 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
             crossDimension = p != null && !p.dimension().equals(level.dimension());
         }
         upkeep(level);
+        if (level.getGameTime() % 10 == 0) {
+            io.github.genichimaruo.singulo.drone.DroneWormhole.tickMouth(level, this);
+        }
         if(traversable&&level.getGameTime()%20==0)level.sendBlockUpdated(pos,state,state,Block.UPDATE_CLIENTS);
         if (isRemoved()) {
             return;
@@ -410,7 +459,8 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         double radius = 2 + size;
         for (Entity e : level.getEntities((Entity) null, new AABB(c, c).inflate(radius),
                 e -> !e.isSpectator() && !(e instanceof Player p && p.isCreative()))) {
-            if (traversable && e instanceof Player) continue;
+            // 縫い開いた口は、通り抜ける人と飛び道具を喉へ引かない（狙ったとおりに開口部へ入り、向こうからまっすぐ出る）
+            if (traversable && (e instanceof Player || e instanceof net.minecraft.world.entity.projectile.Projectile)) continue;
             Vec3 to = c.subtract(e.position().add(0, e.getBbHeight() / 2, 0));
             double d = to.length();
             if (d > 0.3 && d <= radius) {
@@ -433,6 +483,10 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public void onBroken(Level level) {
+        if (level instanceof ServerLevel server) {
+            // この口へ向かう行きの便は発送元へ戻し、この口から帰るはずだったドローンは口を通らずに家へ帰す（荷物は失わない）
+            io.github.genichimaruo.singulo.drone.DroneWormhole.mouthRemoved(server, worldPosition);
+        }
         if (traversable && !level.isClientSide) {
             traversable=false;
             Block.popResource(level,worldPosition,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
@@ -553,6 +607,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         tag.putInt("size", size);
         tag.putInt("target", target);
         tag.putBoolean("traversable",traversable);
+        tag.putBoolean("far_passable",farPassable);
         tag.putDouble("burn", burn);
         tag.putInt("grace", grace);
         tag.putInt("starve", starve);
@@ -567,6 +622,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
         size = tag.contains("size") ? tag.getInt("size") : 1;
         traversable=tag.getBoolean("traversable");
+        farPassable=tag.getBoolean("far_passable");
         clientPassage=tag.getInt("passage_state");
         if (tag.contains("target")) {
             target = tag.getInt("target");
@@ -579,9 +635,4 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
     }
 
-    /** テスト用: 読み込まれている口の一覧。 */
-    static List<WormholeMouthBlockEntity> loaded(Level level) {
-        Set<WormholeMouthBlockEntity> set = LOADED.get(level);
-        return set == null ? List.of() : new ArrayList<>(set);
-    }
 }

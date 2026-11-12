@@ -57,6 +57,11 @@ public class DronePortMenu extends AbstractContainerMenu {
     private final SyncedInts data;
     private final List<BlockPos> targets;
     private final List<String> names;
+    /** 行き先の次元（"" はこの次元。ほかはワームホール便）と、道のり（ブロック）。 */
+    private final List<String> dims;
+    private final List<Integer> distances;
+    /** 液体のポートの画面か（荷物と受け取りの欄の代わりに、送るタンクと受け取りのタンクを出す）。 */
+    private final boolean fluid;
     /** 見ているページ（クライアント）。荷物のページ以外では、ポートのスロットを出さない。 */
     private int page = PAGE_CARGO;
     /** 選んでいる行き先の一覧での番号（-1 はなし）。サーバーではポートから、クライアントでは同期された値。 */
@@ -69,8 +74,17 @@ public class DronePortMenu extends AbstractContainerMenu {
     private int[] shipSnapshot = new int[SHIP_ROWS * SHIP_INTS];
 
     public DronePortMenu(int id, Inventory inventory, BlockPos pos, IItemHandler items, SyncedInts data, List<BlockPos> targets,
-                         List<String> names) {
+                         List<String> names, boolean fluid) {
+        this(id, inventory, pos, items, data, targets, names, java.util.Collections.nCopies(targets.size(), ""),
+                targets.stream().map(t -> (int) Math.ceil(Math.sqrt(t.distSqr(pos)))).toList(), fluid);
+    }
+
+    public DronePortMenu(int id, Inventory inventory, BlockPos pos, IItemHandler items, SyncedInts data, List<BlockPos> targets,
+                         List<String> names, List<String> dims, List<Integer> distances, boolean fluid) {
         super(SinguloMenus.DRONE_PORT.get(), id);
+        this.fluid = fluid;
+        this.dims = dims;
+        this.distances = distances;
         this.pos = pos;
         this.data = data;
         this.targets = targets;
@@ -102,8 +116,8 @@ public class DronePortMenu extends AbstractContainerMenu {
                 if (inventory.player.level().isClientSide) {
                     return value;
                 }
-                BlockPos to = inventory.player.level().getBlockEntity(pos) instanceof DronePortBlockEntity port ? port.destination() : null;
-                return to == null ? -1 : targets.indexOf(to);
+                return inventory.player.level().getBlockEntity(pos) instanceof DronePortBlockEntity port
+                        ? indexOf(port.destination(), port.destinationDim()) : -1;
             }
 
             @Override
@@ -120,8 +134,8 @@ public class DronePortMenu extends AbstractContainerMenu {
                 if (inventory.player.level().isClientSide) {
                     return value;
                 }
-                BlockPos to = inventory.player.level().getBlockEntity(pos) instanceof DronePortBlockEntity port ? port.autoTo() : null;
-                return to == null ? -1 : targets.indexOf(to);
+                return inventory.player.level().getBlockEntity(pos) instanceof DronePortBlockEntity port
+                        ? indexOf(port.autoTo(), port.autoDim()) : -1;
             }
 
             @Override
@@ -181,15 +195,20 @@ public class DronePortMenu extends AbstractContainerMenu {
 
     public static DronePortMenu client(int id, Inventory inventory, FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
+        boolean fluid = buf.readBoolean();
         int n = buf.readVarInt();
         List<BlockPos> targets = new ArrayList<>();
         List<String> names = new ArrayList<>();
+        List<String> dims = new ArrayList<>();
+        List<Integer> distances = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             targets.add(buf.readBlockPos());
             names.add(buf.readUtf());
+            dims.add(buf.readUtf());
+            distances.add(buf.readVarInt());
         }
         return new DronePortMenu(id, inventory, pos, new ItemStackHandler(DronePortBlockEntity.SLOTS),
-                SyncedInts.client(DronePortBlockEntity.COUNT), targets, names);
+                SyncedInts.client(DronePortBlockEntity.COUNT), targets, names, dims, distances, fluid);
     }
 
     /** ポートのスロット（荷物のページでだけ出す。着荷箱と受け取りへは入れられない）。 */
@@ -208,7 +227,9 @@ public class DronePortMenu extends AbstractContainerMenu {
 
         @Override
         public boolean isActive() {
-            return page == PAGE_CARGO;
+            // 液体のポートでは、荷物と受け取りの欄は使わない（タンクを出す）
+            return page == PAGE_CARGO && !(fluid && (getSlotIndex() >= DronePortBlockEntity.SLOT_CARGO && getSlotIndex() < DronePortBlockEntity.SLOT_ARRIVED
+                    || getSlotIndex() >= DronePortBlockEntity.SLOT_RECEIVE));
         }
     }
 
@@ -218,6 +239,10 @@ public class DronePortMenu extends AbstractContainerMenu {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public boolean fluid() {
+        return fluid;
     }
 
     public BlockPos pos() {
@@ -234,6 +259,38 @@ public class DronePortMenu extends AbstractContainerMenu {
 
     public List<String> names() {
         return names;
+    }
+
+    /** 行き先の次元の名前（"" はこの次元）。 */
+    public List<String> dims() {
+        return dims;
+    }
+
+    public List<Integer> distances() {
+        return distances;
+    }
+
+    /** 一覧の index の次元（この次元なら null）。 */
+    @javax.annotation.Nullable
+    public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimKey(int index) {
+        String d = index >= 0 && index < dims.size() ? dims.get(index) : "";
+        var loc = d.isEmpty() ? null : net.minecraft.resources.ResourceLocation.tryParse(d);
+        return loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
+    }
+
+    /** 行き先（位置と次元）の一覧の番号（なければ -1）。 */
+    public int indexOf(@javax.annotation.Nullable BlockPos to,
+                       @javax.annotation.Nullable net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim) {
+        if (to == null) {
+            return -1;
+        }
+        String d = dim == null ? "" : dim.location().toString();
+        for (int i = 0; i < targets.size(); i++) {
+            if (targets.get(i).equals(to) && dims.get(i).equals(d)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public int selected() {
@@ -274,7 +331,7 @@ public class DronePortMenu extends AbstractContainerMenu {
         }
         int index = id - DronePortBlockEntity.BUTTON_SELECT;
         if (index >= 0 && index < targets.size()) {
-            port.select(targets.get(index));
+            port.select(targets.get(index), dimKey(index));
             return true;
         }
         return false;
@@ -297,10 +354,10 @@ public class DronePortMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else if (DroneCrateItem.tier(stack) > 0 && !DroneCrateItem.packed(stack)) {
-            if (!moveItemStackTo(stack, 0, 1, false) && !moveItemStackTo(stack, 1, 1 + DronePortBlockEntity.CARGO, false)) {
+            if (!moveItemStackTo(stack, 0, 1, false) && (fluid || !moveItemStackTo(stack, 1, 1 + DronePortBlockEntity.CARGO, false))) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, 1, 1 + DronePortBlockEntity.CARGO, false)) {
+        } else if (fluid || !moveItemStackTo(stack, 1, 1 + DronePortBlockEntity.CARGO, false)) {
             return ItemStack.EMPTY;
         }
         if (stack.isEmpty()) {

@@ -1,6 +1,7 @@
 // Development only: exclude the client fixture from normal builds and distribution JARs.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/cable-src'))
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('gui-review').get().asFile

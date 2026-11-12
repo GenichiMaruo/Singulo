@@ -1,6 +1,7 @@
 // Disposable native rendering fixtures; excluded from distribution builds.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/cosmic-src'))
         if (providers.gradleProperty('withSodium').isPresent()) {
             throw new GradleException('Use withEmbeddium for the Minecraft 1.20.1 renderer review.')

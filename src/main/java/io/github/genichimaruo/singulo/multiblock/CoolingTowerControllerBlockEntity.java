@@ -16,6 +16,8 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
     static final int CHECK_INTERVAL = 20;
 
     private int height;
+    /** コラプサー内張りの数（形を確かめるたびに数え直す）。 */
+    private int linings;
     private final PortLinks ports = new PortLinks();
     private long nextCheck;
     /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
@@ -31,6 +33,11 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             Shapes.Found tower = Shapes.find(Blueprints.Kind.COOLING_TOWER, level, worldPosition);
             int newHeight = tower == null ? 0 : tower.size();
+            int newLinings = tower == null ? 0 : tower.linings(level, worldPosition);
+            if (newLinings != linings) {
+                linings = newLinings;
+                markDirty();
+            }
             boolean relinked = ports.update(level, worldPosition, tower == null ? List.of() : tower.ports());
             if (newHeight != height || relinked) {
                 if (level instanceof net.minecraft.server.level.ServerLevel server) {
@@ -55,10 +62,15 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
         return height;
     }
 
-    /** 高さ÷5 倍（高さ7で1.4倍、高さ10で2倍、高さ15で3倍）。 */
+    @Override
+    public int liningCount() {
+        return height > 0 ? linings : 0;
+    }
+
+    /** 高さ÷5 倍（高さ7で1.4倍、高さ10で2倍、高さ15で3倍）に、コラプサー内張りの倍率（最大2倍）を掛ける。 */
     @Override
     protected double speedMultiplier() {
-        return height / 5.0;
+        return height / 5.0 * CollapsarLining.factor(liningCount());
     }
 
     /**

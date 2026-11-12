@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "G G",
+    "PGP"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "singulo:fluid_capsule"
+  }
+}

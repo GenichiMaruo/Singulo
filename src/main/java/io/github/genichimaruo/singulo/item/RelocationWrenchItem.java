@@ -63,7 +63,7 @@ public final class RelocationWrenchItem extends SinguloItem {
     /** Cable mode breaks cables instantly with a left click. */
     @Override
     public float getDestroySpeed(ItemStack wrench, net.minecraft.world.level.block.state.BlockState state) {
-        return mode(wrench) == MODE_CABLE && state.getBlock() instanceof io.github.genichimaruo.singulo.cable.CableBlock
+        return mode(wrench) == MODE_CABLE && isConduit(state.getBlock())
                 ? 1000F : super.getDestroySpeed(wrench, state);
     }
 
@@ -143,7 +143,8 @@ public final class RelocationWrenchItem extends SinguloItem {
         var level = context.getLevel();
         var start = context.getClickedPos();
         var state = level.getBlockState(start);
-        if (!(state.getBlock() instanceof io.github.genichimaruo.singulo.cable.CableBlock cable)) return InteractionResult.PASS;
+        if (!isConduit(state.getBlock())) return InteractionResult.PASS;
+        Block cable = state.getBlock();
         if (!player.mayBuild() || !level.mayInteract(player, start)
                 || !player.mayUseItemAt(start, context.getClickedFace(), wrench)) return InteractionResult.FAIL;
         if (level.isClientSide) return InteractionResult.SUCCESS;
@@ -172,6 +173,11 @@ public final class RelocationWrenchItem extends SinguloItem {
             player.displayClientMessage(Component.translatable("item.singulo.relocation_wrench.cables_removed", removed), true);
         }
         return InteractionResult.CONSUME;
+    }
+
+    /** 撤去モードで外せるブロック: 電線と液体パイプ（どちらも中身を溜めないので、壊しても何も失わない）。 */
+    static boolean isConduit(Block block) {
+        return block instanceof io.github.genichimaruo.singulo.cable.CableBlock || block instanceof io.github.genichimaruo.singulo.pipe.FluidPipeBlock;
     }
 
     /** The cables of the same kind joined to start (breadth first, so the nearest go first when capped). */

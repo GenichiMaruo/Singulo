@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parent.parent / 'src' / 'generated' / 'resources
 EPS = 1e-6
 # アンドロイド用ガラスの縁（厚さのない面）を、ちらつかないように1マスの外へずらしてよい幅
 EDGE_OFFSET = 0.02
-CABLES = ('copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus', 'fluid_pipe')
+CABLES = ('copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus')
+# 液体パイプ（継ぎ手のつばは12ドットまで。tools/logistics_content.py）
+PIPES = ('fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct')
 
 # 面 → (固定する軸, 値は from/to のどちら, 面の2つの軸)
 FACES = {'north': (2, 0, (0, 1)), 'south': (2, 1, (0, 1)), 'west': (0, 0, (1, 2)), 'east': (0, 1, (1, 2)),
@@ -64,6 +66,19 @@ def main():
                     continue
                 if min(e['from'] + e['to']) < -EPS or max(e['from'] + e['to']) > 16 + EPS:
                     problems.append(f'{rel}: 1マスからはみ出している {e["from"]} → {e["to"]}')
+        pipe = any(rel.startswith(f'block/{c}') or rel == f'item/{c}.json' for c in PIPES)
+        if pipe:
+            # パイプ: 座標は整数、断面（継ぎ手のつばを含む）は12ドットまで
+            for e in els:
+                for v in e['from'] + e['to']:
+                    if abs(v - round(v)) > EPS:
+                        problems.append(f'{rel}: 整数でない座標 {e["from"]} → {e["to"]}')
+                        break
+                f, t = e['from'], e['to']
+                long = max(range(3), key=lambda k: t[k] - f[k]) if rel.startswith('item/') else None
+                for k in range(3):
+                    if k != long and t[k] - f[k] > 12 + EPS:
+                        problems.append(f'{rel}: 幅が12ドットを超える {f} → {t}')
         if any(rel.startswith(f'block/{c}') or rel == f'item/{c}.json' for c in CABLES):
             # ケーブル: 座標は整数（1ドットの幅は1ドットだけ）、断面の幅は8ドットまで
             for e in els:
@@ -77,7 +92,7 @@ def main():
                 for k in range(3):
                     if k != long and t[k] - f[k] > 8 + EPS and 'core' not in rel:
                         problems.append(f'{rel}: 幅が8ドットを超える {f} → {t}')
-        if any(rel.startswith(f'block/{c}') or rel == f'item/{c}.json' for c in CABLES):
+        if pipe or any(rel.startswith(f'block/{c}') or rel == f'item/{c}.json' for c in CABLES):
             # 1ドットを1ドットのまま貼っているか（UV の大きさ＝面の大きさ。90°・270°回すときは縦横を入れ替える）
             for e in els:
                 for name, spec in e.get('faces', {}).items():

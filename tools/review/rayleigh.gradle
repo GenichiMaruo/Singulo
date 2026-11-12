@@ -1,6 +1,7 @@
 // Development-only real-lightmap and terrain capture; excluded from normal builds.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/rayleigh-src'))
         if (providers.gradleProperty('withEmbeddium').isPresent()) {
             dependencies.add('modRuntimeOnly', 'maven.modrinth:embeddium:UTbfe5d1') { transitive = false }

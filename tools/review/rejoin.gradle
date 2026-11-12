@@ -1,6 +1,7 @@
 // Development-only same-process world re-entry regression.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/rejoin-src'))
         if (providers.gradleProperty('withEmbeddium').isPresent()) {
             dependencies.add('modRuntimeOnly', 'maven.modrinth:embeddium:UTbfe5d1') { transitive = false }

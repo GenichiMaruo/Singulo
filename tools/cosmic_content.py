@@ -30,6 +30,13 @@ def recipes(R, shaped):
     shaped['潮汐紡糸機']=(('CQC','SFS','CIC'),{'C':'超伝導コイル','Q':'重力場安定化ユニット','S':'コラプサー・インゴット','F':'ニホニウム筐体','I':'エキゾチック物質'})
     R('潮汐繊維',5,'潮汐紡糸機',{'コラプサー・ビレット':1,'エキゾチック物質':1,'液体ヘリウム':500},out=4,t=60,fe=20_000_000,
       note='最初に特異点の種と 10 GFE で封じ込め核を形成する。素材・冷却材・成果物を予約して保存する。')
+    # 0.17.0: 潮汐力で素材を伸ばしてバニラの素材を作る（冷却材なし、材料は左の枠1つ。核の形成は必要）
+    tidal = '潮汐力で引き伸ばす。材料は左の枠に入れる（エキゾチック物質と液体ヘリウムは使わない）'
+    R('糸（潮汐紡糸）',5,'潮汐紡糸機',{'羊毛':1},out=4,t=2,fe=1_000_000,note=tidal)
+    R('鎖（潮汐紡糸）',5,'潮汐紡糸機',{'鉄インゴット':1},out=2,t=3,fe=1_000_000,note=tidal)
+    R('ブレイズロッド（潮汐紡糸）',5,'潮汐紡糸機',{'ブレイズパウダー':4},t=5,fe=1_000_000,note=tidal)
+    R('ファントムの皮膜（潮汐紡糸）',5,'潮汐紡糸機',{'革':1},t=5,fe=1_000_000,note=tidal)
+    R('鍾乳石（潮汐紡糸）',5,'潮汐紡糸機',{'石':1},out=2,t=2,fe=1_000_000,note=tidal)
     R('ワームホール縫合拡張',5,'精密組立台',{'潮汐繊維':4,'コラプサー・インゴット':4,'量子もつれ素子':2},t=20,fe=200_000,cat='part')
     R('コラプサー並列カセット',5,'精密組立台',{'コラプサー・インゴット':4,'超伝導コイル':2,'量子もつれ素子':2,'ニホニウム板':4},t=20,fe=200_000,cat='part')
     # 無重力ブロックを超伝導コイルで挟み、鋼の冠で囲む
@@ -68,7 +75,7 @@ UI = {
  'gui.singulo.cosmic.phase.2':('ラザニア相: 棒が広がって板になった','Lasagna phase: rods have spread into sheets'),
  'gui.singulo.cosmic.helium':('液体ヘリウム %s / %s mB','Liquid Helium %s / %s mB'),
  'gui.singulo.cosmic.slot.seed':('特異点の種: 核を作る','Singularity Seed: forms the core'),
- 'gui.singulo.cosmic.slot.billet':('コラプサー・ビレット','Collapsar Billet'),
+ 'gui.singulo.cosmic.slot.billet':('コラプサー・ビレット、または引き伸ばす素材（羊毛・鉄インゴット・ブレイズパウダー・革・石）','Collapsar Billet, or a material to stretch (wool, iron ingot, blaze powder, leather or stone)'),
  'gui.singulo.cosmic.slot.exotic':('エキゾチック物質','Exotic Matter'),
  'gui.singulo.cosmic.slot.output':('巻き上がった繊維','Wound filament'),
  'gui.singulo.cosmic.core.on':('封じ込め核あり','Confined core active'),
@@ -102,16 +109,18 @@ CHAPTER = ('cosmic','singulo:nuclear_pasta','拘束と縫合','Confinement and S
   'The 7×9×7 Nuclear Pasta Accumulator has finite capacity: 8 TFE, with 2 GFE/t input and output. It stores only received power. As it charges, its press plates close and the nuclear pasta inside changes from drops to rods to sheets. '),
  ('production','潮汐力から糸へ',
   '核パスタは既存の Jet Forge で作ります。縮退物質殻 1 個、質量ペレット 32 個、液体ヘリウム 2,000 mB を使い、90 秒間 125 MFE/t で照射します（照射だけで 225 GFE）。新しい蓄電庫を先に作る必要はありません。\n'
-  '潮汐紡糸機は 7×8×15。特異点の種を核のスロットに入れ、10 GFE を蓄えると封じ込め核を形成します。コラプサー・ビレット 1 個、エキゾチック物質 1 個、液体ヘリウム 500 mB を 60 秒間 20 MFE/t で加工し、潮汐繊維 4 本を巻き取ります。材料・冷却材・成果物・進行を保存し、出力が満杯なら待ちます。\n左のポートから電力、冷却材、材料を入れ、右のポートから繊維を取り出せます。',
+  '潮汐紡糸機は 7×8×15。特異点の種を核のスロットに入れ、10 GFE を蓄えると封じ込め核を形成します。コラプサー・ビレット 1 個、エキゾチック物質 1 個、液体ヘリウム 500 mB を 60 秒間 20 MFE/t で加工し、潮汐繊維 4 本を巻き取ります。材料・冷却材・成果物・進行を保存し、出力が満杯なら待ちます。\n核があれば、左の枠の素材を潮汐力で引き伸ばしてバニラの素材も作れます（1 MFE/t、冷却材は不要）。羊毛 1 → 糸 4、鉄インゴット 1 → 鎖 2、ブレイズパウダー 4 → ブレイズロッド 1、革 1 → ファントムの皮膜 1、石 1 → 鍾乳石 2。\n左のポートから電力、冷却材、材料を入れ、右のポートから繊維を取り出せます。',
   'From tides to thread',
   'Make Nuclear Pasta in the existing Jet Forge: 1 Degenerate Matter Shell, 32 Mass Pellets and 2,000 mB liquid helium, irradiated for 90 seconds at 125 MFE/t (225 GFE for irradiation alone). No new accumulator is needed first.\n'
-  'The Tidal Spindle is 7×8×15. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nFeed power, coolant and materials through the left port, and take filament from the right port.'),
+  'The Tidal Spindle is 7×8×15. Put a Singularity Seed in its core slot and store 10 GFE to form the confined core. Process 1 Collapsar Billet, 1 Exotic Matter and 500 mB liquid helium for 60 seconds at 20 MFE/t to wind 4 Tidal Filaments. Ingredients, coolant, output and progress are reserved and saved. A full output pauses completion.\nOnce the core is formed, the spindle can also stretch vanilla materials from its left slot (1 MFE/t, no coolant): 1 Wool → 4 String, 1 Iron Ingot → 2 Chains, 4 Blaze Powder → 1 Blaze Rod, 1 Leather → 1 Phantom Membrane, 1 Stone → 2 Pointed Dripstone.\nFeed power, coolant and materials through the left port, and take filament from the right port.'),
  ('links','縫合と並列照射',
-  '潮汐繊維とコラプサー材でワームホール縫合拡張を作り、既存の口の両端に右クリックで取り付けます。両端が開いて読み込まれていると、口の上の四角い開口部を歩いて通れます。物流はそのまま使えます。出口に安全な足場と空間がない場合、移動しません。乗り物に乗っている場合も移動しません。移動直後は再転送を防ぐ待ち時間があります。\n'
+  '潮汐繊維とコラプサー材でワームホール縫合拡張を作り、既存の口の両端に右クリックで取り付けます。両端が開いていると、口の上の四角い開口部を歩いて通れます（向こうの口は、ネザーポータルと同じく入ったときに読み込まれます）。物流はそのまま使えます。\n'
+  'ネザーポータルと同じく、入った位置のまま向こうの開口部の同じ位置に出ます。待ち時間はなく、体の向きと勢いは口の向きに合わせて回ります。前から入れば向こうの前へ出ます。出た開口部からいったん出るまでは、もう一度は飛びません。その位置がふさがっている・危ない・足の下4ブロック以内に床がないときは、向こうの口の前の安全な足場に出ます。それもなければ移動しません。乗り物に乗っている場合も移動しません。飛び道具（矢・投げた物など）も、開口部へ飛び込むと向こうの口から同じように飛び出します。\n'
   'コラプサー並列カセットを鍛造炉の画面の右の枠に入れるか、手に持って鍛造炉のどこかを右クリックして取り付けると、同じレシピを最大 4 バッチ同時に加工します。開始時に数量を固定し、材料・冷却材・電力を数量分使います。すでに進行中の処理は取り付けても変わりません。\n'
   '測量メガネを掛けると、近くの流体パイプに転送方向の矢印が見えます。見ている配管の転送量・種類・停止状態も表示します。矢印は実際の端点間転送を結ぶ代表経路を示し、分岐や環状配管の全経路を表すものではありません。パイプ自体は流体を蓄えません。',
   'Seams and parallel irradiation',
-  'Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open and loaded, walk through the square opening above a mouth. Existing logistics remain available. Travel is refused without safe footing and space at the exit, or while riding. A cooldown prevents immediate return trips.\n'
+  'Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\n'
+  'Like a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel. Projectiles such as arrows and thrown items that fly into the opening come out of the far mouth the same way.\n'
   'Put a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\n'
   'Wear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.'),
 ])
@@ -127,9 +136,9 @@ DESC = {
  '核パスタ積層板':('核パスタ積層蓄電庫の上下の土台になる、層を重ねた板。','Layered plates that form the top and bottom of the Nuclear Pasta Accumulator.'),
  '重力懸垂タンク':('7×9×7 の設備。八角の冠から 16,000,000 mB の液体・気体を涙の形に吊る。左右のポートで入出力する。','A 7×9×7 facility that hangs 16,000,000 mB of liquids or gases from its octagonal crown as a single drop. Its two ports can each be set to input, output or both.'),
  '核パスタ積層蓄電庫':('7×9×7 の設備。容量 8 TFE、入出力は各 2 GFE/t。充電につれて押し板が締まり、核パスタが粒、棒、板と形を変える。左右のポートで入出力する。','A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both.'),
- '潮汐紡糸機':('7×8×15 の設備。特異点の種と 10 GFE で核を形成し、潮汐力で素材を伸ばして繊維を巻く。加工には 20 MFE/t と液体ヘリウムが必要。停止・未ロード中は予約内容を保持する。','A 7×8×15 facility. Form its core with a Singularity Seed and 10 GFE, then stretch matter into wound filament using tidal forces. Processing needs 20 MFE/t and liquid helium. Reserved work survives stops and unloaded chunks.'),
+ '潮汐紡糸機':('7×8×15 の設備。特異点の種と 10 GFE で核を形成し、潮汐力で素材を伸ばして繊維を巻く。加工には 20 MFE/t と液体ヘリウムが必要。羊毛から糸、鉄から鎖、革からファントムの皮膜なども引き伸ばして作れる。停止・未ロード中は予約内容を保持する。','A 7×8×15 facility. Form its core with a Singularity Seed and 10 GFE, then stretch matter into wound filament using tidal forces. Processing needs 20 MFE/t and liquid helium. It can also stretch wool into string, iron into chains, leather into phantom membranes and more. Reserved work survives stops and unloaded chunks.'),
  '潮汐繊維':('ブラックホールの潮汐力で引き伸ばした発光繊維。コラプサー材とともに、通行用のワームホールを縫い開く。','Luminous filament stretched by black-hole tidal forces. Combined with Collapsar material, it stitches open a traversable wormhole.'),
- 'ワームホール縫合拡張':('既存のワームホールの口へ右クリックして取り付ける。両端が拡張済みで開いていると、上の四角い開口部を歩いて通れる。物流は維持され、安全な足場がない出口へは移動しない。','Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it. Logistics remain available, and travel requires a safe landing.'),
+ 'ワームホール縫合拡張':('既存のワームホールの口へ右クリックして取り付ける。両端が拡張済みで開いていると、上の四角い開口部を歩いて通れる。ネザーポータルと同じく、向こうの開口部の同じ位置に出る。物流は維持され、危ない出口へは移動しない。','Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it and come out at the same spot in the far opening, like a Nether portal. Logistics remain available, and you never land somewhere unsafe.'),
  'コラプサー並列カセット':('鍛造炉の画面の右の枠に入れるか、手に持って鍛造炉を右クリックして取り付け、同じレシピを最大 4 バッチ同時に加工する。開始時に数量を固定し、材料・冷却材・電力を数量分使う。','Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.'),
 }
 

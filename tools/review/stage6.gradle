@@ -1,6 +1,7 @@
 // Development-only visual harness; never part of ordinary build or release JARs.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/stage6-src'))
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('stage6-review').get().asFile

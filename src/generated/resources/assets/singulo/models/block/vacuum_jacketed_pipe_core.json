@@ -1,0 +1,82 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/vacuum_jacketed_pipe_full",
+    "c": "singulo:block/vacuum_jacketed_pipe",
+    "g": "singulo:block/vacuum_jacketed_pipe_glass",
+    "f": "singulo:block/vacuum_jacketed_pipe_flange",
+    "r": "singulo:block/vacuum_jacketed_pipe_rim",
+    "j": "singulo:block/vacuum_jacketed_pipe_joint"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        3,
+        3,
+        3
+      ],
+      "to": [
+        13,
+        13,
+        13
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#j"
+        },
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#j"
+        },
+        "east": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#j"
+        },
+        "west": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#j"
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#j"
+        },
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#j"
+        }
+      }
+    }
+  ]
+}

@@ -63,6 +63,9 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
      * 通行用の縫合口: 空間の裂け目を光る潮汐繊維で縫ったもの。片側だけで閉じている間は糸が裂け目を綴じていて、
      * 両端がつながると糸が左右へ引かれて開き、向こう側へ歩いて通れる。大きさは通行の判定（WormholeTransit）と同じ。
      */
+    /** 縫い糸の太さ（ブロック）。膜（z=0）から表面が半分ずつ離れる。 */
+    private static final float THREAD_WIDTH = 0.06F;
+
     private static void seam(WormholeMouthBlockEntity be, float partial, PoseStack pose, MultiBufferSource buffers) {
         pose.pushPose();
         pose.translate(0.5, 2.5, 0.5);
@@ -94,14 +97,15 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
                 float x1 = side > 0 ? w : -w + 0.09F;
                 FxDraw.box(pose, solid, x0, y0, -0.04F, x1, y1, 0.04F, LightTexture.FULL_BRIGHT, rim);
             }
-            // 縫い目: 閉じているときは裂け目を横切って綴じ、開いているときは縁をまたいで外へ張る
+            // 縫い目: 閉じているときは裂け目を横切って綴じ、開いているときは縁をまたいで外へ張る。
+            // 四角い棒で描く（板を十字に組むと、1枚が膜と同じ面に入ってちらつくため）
             if (open) {
                 for (int side = -1; side <= 1; side += 2) {
-                    FxDraw.beam(pose.last(), solid, new Vec3(side * (w - reach), y0 + 0.02F, 0), new Vec3(side * (w + reach), y1 - 0.02F, 0), 0.05F, thread, 255);
+                    FxDraw.rod(pose.last(), solid, new Vec3(side * (w - reach), y0 + 0.02F, 0), new Vec3(side * (w + reach), y1 - 0.02F, 0), THREAD_WIDTH, thread, LightTexture.FULL_BRIGHT);
                 }
             } else {
                 float side = i % 2 == 0 ? 1 : -1;
-                FxDraw.beam(pose.last(), solid, new Vec3(-side * (w + reach), y0, 0), new Vec3(side * (w + reach), y1, 0), 0.05F, thread, 255);
+                FxDraw.rod(pose.last(), solid, new Vec3(-side * (w + reach), y0, 0), new Vec3(side * (w + reach), y1, 0), THREAD_WIDTH, thread, LightTexture.FULL_BRIGHT);
             }
         }
         if (open) {

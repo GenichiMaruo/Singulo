@@ -567,28 +567,30 @@ CHAPTERS = [
          ' Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.'),
         ('relocation', '移設レンチ',
          '移設レンチは鋼鉄インゴット3個・銅インゴット2個・基礎回路1個から作れます。スニーク＋右クリックで、加工装置・通常の発電機・SMES・触媒装置を回収できます。中身・液体・電力・進捗・面設定を保持し、再設置すると復元します。持ち物が満杯なら、その場に装置を1個落とします。\n'
-         'マルチブロックはコントローラだけを回収し、周囲の部材は残ります。再設置後は形を組み直してください。Pリアクター・ワームホール装置・アンドロイド用設備などは対象外です。',
+         'マルチブロックはコントローラだけを回収し、周囲の部材は残ります。再設置後は形を組み直してください。Pリアクター・ワームホール装置・アンドロイド用設備などは対象外です。\n'
+         '空中でスニーク＋右クリックすると、ケーブル・パイプの撤去に切り替わります。右クリックで1本、スニーク＋右クリックでつながった同じ種類を最大64本回収します。左クリックならすぐに壊せます。',
          'Relocation Wrench',
          'Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\n'
-         'For multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.'),
+         'For multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.\n'
+         'Sneak-use the wrench in the air to switch to cable and pipe removal. Use it on a cable or fluid pipe to collect one, or sneak-use it to collect up to 64 connected pieces of the same kind. Left-click to break one instantly.'),
         ('wormhole', 'ワームホール',
-         '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化装置でエキゾチック物質と口の筐体を使って固定化し、片方を運んで置きます。'
+         '生成器で一対の口を作り、60秒以内に固定化装置でエキゾチック物質と口の筐体を使って固定化し、片方を運んで置きます。'
          '口から8ブロック以内のワームホール・ポートは、向こう側の口の近くにある同じポート番号（0〜127、画面の7つの丸で決める）のポートとつながり、'
          '電力・アイテム・液体を直結します。1つの口で働けるポートは喉の大きさで 8・32・128 個まで（口に近い順）で、働いているポートは光ります。'
          '通せる量も喉の大きさで決まり、7×7 では上限がなくなります。口はエキゾチック物質で維持し、切れると閉じて休みます。'
          '初めて置いたときは5分間、燃料なしで開いています。',
          'Wormholes',
-         'The only wireless link. Generate a pair of mouths, stabilize them within 60 s using exotic matter and a mouth casing, then carry one away and place it.'
+         'Generate a pair of mouths, stabilize them within 60 s using exotic matter and a mouth casing, then carry one away and place it.'
          ' A port within 8 blocks of a mouth links to the port with the same number (0-127, set with the seven circles in its screen) near the twin mouth, joining power, items and fluids.'
          ' Each mouth runs 8, 32 or 128 ports depending on its throat size, nearest first, and active ports glow. Throughput also grows with the throat and is unlimited at 7x7.'
          ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
         ('capacity', '容量アップグレード',
          '加工装置の右レールの容量専用枠に1個入れると、蓄電容量が Mk1 で1,000,000、Mk2 で4,000,000、Mk3 で40,000,000 FE になります。'
-         'Mk1 は段階2の作業台で、Mk2・Mk3 は精密組立台で一つ下のアップグレードから作ります。速度アップグレードと一緒に使え、受電の上限は変わりません。\n'
+         'Mk1 は段階2の素材を使って作業台で、Mk2・Mk3 は精密組立台で一つ下のアップグレードから作ります。速度アップグレードと一緒に使え、受電の上限は変わりません。\n'
          '外したときに容量を超えていた電力は消えず、容量より少なくなるまで新しい電力を受け取りません。1回に使う電力が通常の容量を超えるレシピには、容量アップグレードが要ります。',
          'Capacity upgrades',
          'One in the capacity slot on a processing machine’s right rail raises its buffer to 1,000,000 FE (Mk1), 4,000,000 FE (Mk2) or 40,000,000 FE (Mk3). '
-         'Make Mk1 at a stage 2 crafting table and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\n'
+         'Make Mk1 on a crafting table using stage 2 materials and Mk2 and Mk3 at a Precision Assembler from the previous upgrade. They work alongside speed upgrades and do not change the intake limit.\n'
          'Removing one keeps any charge above the new capacity; the machine accepts no new power until it falls below. Recipes that draw more than the normal buffer in one go need a capacity upgrade.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
@@ -597,7 +599,7 @@ CHAPTERS = [
          '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
          '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
          '・地下アンドロイド研究所: 中くらいの深さの地下（床は Y−38〜−26あたり）。封鎖培養施設と並ぶ分かれ道で、研究棟でコンパスを調整すると一緒に探せる'
-         '（コンパスは地表まで突き抜けた主立坑を指す）。部屋の並びは毎回変わる。奥のAI中枢に統括AI「ファウンドリ」。精密アクチュエーター・アンドロイドキット（14日）。\n'
+         '（コンパスは地表まで突き抜けた主立坑を指す）。部屋の並びは毎回変わる。奥のAI中枢に統括AI「ファウンドリ」。精密アクチュエーター・アンドロイドキット（7日）。\n'
          '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。\n'
          '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
          '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
@@ -610,13 +612,13 @@ CHAPTERS = [
          'containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: '
          'mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building '
          'lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. '
-         'The overseer AI Foundry waits in the AI core. Precision actuators and android kits (14 days).\n- Final Lab: a gravity '
+         'The overseer AI Foundry waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity '
          'anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds '
          'and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the '
          'Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. '
          'The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).'),
         ('bosses', '遺構の番人',
-         '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。番人は部屋から挑戦者がいなくなっても3分は残り、それでも誰も戻らなければ元に'
+         '研究棟・封鎖培養施設・地下アンドロイド研究所・最終実験施設・沈んだ炉心区画の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。番人は部屋から挑戦者がいなくなっても3分は残り、それでも誰も戻らなければ元に'
          '戻ります（倒れて装備を取りに戻る猶予）。サーバー設定 bossHardMode をオンにすると、番人はもっと強くなります。倒したときの落とし物は床の封印核（ウォーデンは封印コンソール）の上に出て、経験値は部屋にいる挑戦者'
          'で等しく分けて直接入ります（修繕も効きます）。\n'
          '大勢で挑むと、番人は人数に合わせて強くなります（1人増えるごとに体力が5割増え、技の間も少し縮む。6人まで）。途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は戦いが始まったときの挑'
@@ -630,7 +632,7 @@ CHAPTERS = [
          '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。最後の姿で足元に出す特異点は、1秒の前触れのあとに引き寄せ始めるので、すぐ離れること。倒したあとは、覚醒の記録核をコンソールに使うと「'
          '覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。やめて部屋を離れると記録核は戻ります。',
          'Ruin guardians',
-         'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardia'
+         'The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardia'
          'n. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian wa'
          'its three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes gua'
          'rdians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), an'
@@ -764,17 +766,17 @@ CHAPTERS = [
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
          '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになります。'
-         '地下の遺構は、針の指す場所の下を掘って探します。',
+         '研究棟での調整では地下アンドロイド研究所も解禁されます。研究所を選ぶと、針は地表に通じる主立坑を指します。',
          'Tuning the Explorer Compass',
          'At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it '
-         'for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Underground ruins lie below the spot it points to.'),
+         'for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Tuning at the Research Building also unlocks the Underground Android Laboratory. Select it to find the main shaft at the surface.'),
         ('sealed', '封印コンテナ',
          '各遺構には、次の段階の鍵でしか開かない封印コンテナが眠っています（磁気錠 → 量子錠 → 時間錠 → 特異点錠）。'
-         '鍵は精密組立台で作り、1回で使い切ります。中には素材や色つきの照明のほか、ここでしか手に入らない珍しい道具'
+         '鍵は精密組立台で作り、1回で使い切ります。中には素材や色つきの照明のほか、鍵の種類に応じた珍しい道具'
          '（オーバークロック・チップ・重力ブーツ・触媒安定化剤・次元ポケット）が入っていることがあります。'
          '封印中のコンテナを無理に壊すと、中身ごと失われます。段階が進めば自分でもコンテナを作れ、鍵を持ってスニークして使うと封印できます。',
          'Sealed containers',
-         'Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.'),
+         'Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item for that tier (Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket). Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.'),
         ('records', 'クリスタルメモリ',
          '遺構の保管庫からときどき「クリスタルメモリ」が出ます。アーカイブ端末で電力を使って解読すると、旧文明の記録が読めます'
          '（ハンドブックの「旧文明の記録」の章に追加されます）。全部集めると、文明が滅んだ理由が分かります。',
@@ -838,11 +840,11 @@ CHAPTERS = [
         ('build', '自分のアンドロイド',
          'アンドロイド組立ステーションに小型クリスタルメモリ（型を決める。減らない）とアンドロイドキット（印刷ごとに1つ）を入れ、電力を送ると、'
          '上に護衛のアンドロイドを1体印刷します（1回 40,000 FE）。倒されたら、キットがあれば印刷し直します。置いた人が持ち主です。\n'
-         '・護衛は敵対モブ（遺構のアンドロイドやドローンも）だけを狙い、プレイヤーやボスとは戦いません。プレイヤーとボスの攻撃では傷つきません。\n'
+         '・護衛は敵対モブや遺構のアンドロイド、警備ドローンを狙います。ボスは対象外です。\n'
          '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）・巡回（決めた場所を回る）。'
          '追従中に戦うかは「ついていくだけ」と「護衛する」で選べます。\n'
-         '・許可証: ステーションにシールド許可証を入れると、持ち主と登録した人だけがステーションとアンドロイドの画面を開けます。'
-         '登録していない人（クリエイティブを除く）は敵とみなして攻撃し、その人の攻撃はアンドロイドにも当たります。'
+         '・許可証: 1人以上を登録したシールド許可証をステーションに入れると、持ち主と登録者だけがステーションとアンドロイドの画面を開けます。'
+         '護衛はそれ以外のサバイバル・アドベンチャーモードのプレイヤーを敵とみなし、互いの攻撃が当たります。'
          '追従する人も、持ち主か登録した人から選べます。\n'
          '・戻る体力: これを下回ると、ステーションへ戻って修理と充電をします（カーソルを合わせると、今の体力と充電が出る）。'
          '「呼び戻す」で戻すこともでき、Shift＋クリックなら近く（64ブロック以内）の操作できるステーションのアンドロイドをみな呼び戻します。\n'
@@ -853,11 +855,11 @@ CHAPTERS = [
          'Your own androids',
          'Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, '
          'and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
-         '- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n'
+         '- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n'
          '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). '
          'While following, choose "Just follow" or "Escort" (fights nearby enemies).\n'
-         '- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. '
-         'The android treats anyone else (except in Creative) as an enemy and attacks them, and their attacks can hurt it. '
+         '- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. '
+         'Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. '
          'You can also choose whether it follows the owner or one of the registered players.\n'
          '- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). '
          'Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n'
@@ -1147,12 +1149,12 @@ CHAPTERS = [
     ('drones', 'singulo:drone_station', 'ドローン輸送', 'Drone Delivery', [
         ('start', 'ドローンを用意する',
          '遺構の警備機ドックが出した警備ドローンの一波を全部倒すと、ときどきドックの上にドローン用クリスタルメモリが出ます（地表観測拠点で40%）。'
-         '段階2の作業台でドローン・ステーションを、精密組立台でドローンキットを作ります。ステーションにメモリ（減らない）とキット（印刷ごとに1つ）を入れて'
+         '段階2になったら、作業台でドローン・ステーションを、精密組立台でドローンキットを作ります。ステーションにメモリ（減らない）とキット（印刷ごとに1つ）を入れて'
          '電力を送ると、上に輸送ドローンを1機印刷します（20,000 FE）。生産アップグレード1枚につき1機増え、2枚で3機まで。ドローンはステーションの上空で待機します。\n'
          'ドローンはプレイヤーやモブの攻撃では傷つきません。ステーションを壊すと、待機中のドローンはキットに戻ります。',
          'Getting drones',
          'Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). '
-         'Make a Drone Station at a stage 2 crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) '
+         'At stage 2, make a Drone Station on a crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) '
          'in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\n'
          'Drones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.'),
         ('kinds', 'ドローンの型',
@@ -1168,28 +1170,28 @@ CHAPTERS = [
          '- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\n'
          'Swapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.'),
         ('send', '荷物を送る',
-         'ドローン発着ポートを置くと、置いた人の輸送網に入ります（同じディメンションの、同じ持ち主のポートが行き先に並ぶ）。ヘッダーの名前をクリックすると名前を付けられます。\n'
+         '行き先には、同じ次元にある同じ持ち主のアイテム用ポートが並びます。開いたワームホールの両端に航路標識があれば、別の次元のアイテム用ポートも選べます。ヘッダーの名前をクリックすると名前を付けられます。\n'
          '左上に空の梱包箱、真ん中に荷物を入れ、右の一覧で行き先を選んで「発送」を押すと、荷物を梱包して電力を払い、半径64ブロックのステーションから待機中のドローンを呼びます。'
          'ドローンが真上に来ると、天井の扉が開いて昇降台が箱を持ち上げ、ドローンの爪が掴みます。行き先でも扉が開いて箱を降ろし、受け取りの欄へ自動で開梱します。'
          '空になった箱は空き箱の欄へ戻ります。ドローンが来る前なら「取消」で元に戻せます（電力も戻る）。\n'
          'ホッパーやパイプで、空き箱と荷物を入れ、受け取りの欄から取り出せます。コンパレーターは受け取りの欄の埋まり具合を出します。',
          'Sending cargo',
-         'A Drone Port joins its placer’s delivery network: every port with the same owner in the same dimension appears as a destination. Click the name in the header to name it.\n'
+         'Destinations are item ports with the same owner in this dimension. A loaded, open wormhole with a Drone Beacon at each mouth also lists matching ports in the far dimension. Click the name in the header to name the port.\n'
          'Put an empty packing crate top left and cargo in the middle, pick a destination on the right and press Send. The port packs the cargo, pays the power and calls '
          'a waiting drone from a station within 64 blocks. When the drone hovers overhead, the roof hatch opens, a lift raises the crate and the drone’s claws grab it. '
          'At the destination the hatch opens again, the crate is lowered and unpacked into the received row. Empty crates go back to the crate slot. '
          'Before the drone arrives, Cancel puts everything back (power included).\n'
          'Hoppers and pipes can insert crates and cargo and extract from the received row. A comparator reads how full the received row is.'),
         ('range', '射程と電力',
-         '発送の電力は 2,000 FE＋直線距離1ブロックにつき 50 FE で、梱包のときにポートが払います。届く距離は梱包箱で決まります: 梱包箱160ブロック、'
+         '発送の電力は 2,000 FE＋距離1ブロックにつき 50 FE で、梱包時にポートが払います。直送はポート間の直線距離、ワームホール便は発送元から手前の口までと、向こうの口から行き先までの直線距離の合計で計算します。届く距離は梱包箱で決まります: 梱包箱160ブロック、'
          'バッテリー付き梱包箱760ブロック、大容量バッテリー付き梱包箱3,160ブロック。行き先の一覧で、届かない距離は赤く出ます。\n'
          'ドローンが読み込まれていない所を飛ぶ間も、荷物は失われません。行き先が読み込まれていれば着陸して降ろし、読み込まれていなければ、そのポートが読み込まれたときに受け取ります。'
-         '行き先のポートが壊されていれば、荷物は発送元へ戻ります。',
+         '直送の行き先が壊されると、荷物は発送元へ戻ります。戻せるポートがない場合は、行き先で梱包済みの箱が落ちます。',
          'Range and power',
-         'Sending costs 2,000 FE plus 50 FE per block of straight-line distance, paid by the port when it packs. The crate decides how far it can go: Packing Crate 160 blocks, '
+         'The port pays 2,000 FE plus 50 FE per block when it packs the cargo. Direct flights use the straight-line distance between ports. Wormhole flights add the distance from the sender to the near mouth and from the far mouth to the destination. The crate decides how far it can go: Packing Crate 160 blocks, '
          'Battery Packing Crate 760, Large Battery Packing Crate 3,160. Destinations out of reach show their distance in red.\n'
          'Cargo is never lost while a drone flies through unloaded areas. If the destination is loaded the drone lands and unloads; if not, the port receives the crate when it loads. '
-         'If the destination port was broken, the cargo goes back to where it came from.'),
+         'If the destination of a direct flight is gone, the drone takes the cargo back to the sending port. If there is no port to return it to, the packed crate drops at the delivery site.'),
         ('more', '自動搬出・輸送の様子・解体',
          '右レールの設定の段で、加工装置と同じ面の設定を開けます。面ごとに入出力を決め、自動排出をオンにすると、受け取った荷物を隣のチェストなどへ'
          '押し出します（空き箱の欄に入りきらなかった空の箱も）。\n'
@@ -1384,12 +1386,12 @@ CHAPTERS.insert([c[0] for c in CHAPTERS].index('genesis') + 1, ('jet_forge', 'si
      'it pauses where it is (no materials or progress are lost). A redstone signal on the controller stops new runs from starting. '
      'Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The flash and screen shake can be reduced in the client config.'),
     ('ingot', 'コラプサー・インゴット',
-     'ブラックホールのジェットで鍛えた、光を吸う黒の地金です。最高位の装備や道具の素材として、ほかの mod から使えるようにしてあります'
+     'ブラックホールのジェットで鍛えた地金です。コラプサー内張り、事象の地平線倉庫、ワームホール航路標識のほか、鍛造炉の並列カセットやワームホール縫合拡張にも使います'
      '（共通タグ c:ingots/collapsar・ID singulo:collapsar_ingot）。\n'
      'コラプサー・ビレットは特異点封入台で、ネザライトインゴット・縮退物質殻・ジェット凝縮体4・エキゾチック物質2・ニホニウム板2から作ります。'
      '鍛造のレシピはデータパック（type: singulo:machine、station: accretion_jet_forge）で変えたり足したりできます。',
      'Collapsar Ingot',
-     'A light-drinking black metal forged in a black hole jet. It is meant as a material for the finest gear and tools in other mods '
+     'Forge this ingot in a black hole jet. Use it for Collapsar Lining, the Event Horizon Vault, the Wormhole Drone Beacon, the Collapsar Parallel Cassette and the Wormhole Seam Upgrade '
      '(common tag c:ingots/collapsar, ID singulo:collapsar_ingot).\n'
      'Make the Collapsar Billet in the Singularity Encapsulator from a Netherite Ingot, a Degenerate Matter Shell, 4 Jet Condensate, '
      '2 Exotic Matter and 2 Nihonium Plates. Forging recipes can be changed or added with a datapack (type: singulo:machine, station: accretion_jet_forge).'),
@@ -1397,3 +1399,5 @@ CHAPTERS.insert([c[0] for c in CHAPTERS].index('genesis') + 1, ('jet_forge', 'si
 
 from cosmic_content import CHAPTER as _COSMIC_CHAPTER
 CHAPTERS.append(_COSMIC_CHAPTER)
+from logistics_content import CHAPTERS as _LOGISTICS_CHAPTERS
+CHAPTERS.extend(_LOGISTICS_CHAPTERS)

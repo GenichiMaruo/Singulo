@@ -1,6 +1,7 @@
 // Development-only visual harness for 0.11.0; never part of ordinary build or release JARs.
 allprojects {
     afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
         sourceSets.main.java.srcDir(file('tools/review/v011-src'))
         // Optional real renderer compatibility checks; never add these mods to production dependencies.
         if (providers.gradleProperty('rendererModsDir').isPresent()) {

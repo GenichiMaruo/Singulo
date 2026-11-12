@@ -219,6 +219,42 @@ final class FxDraw {
         }
     }
 
+    /**
+     * from から to への四角い棒（太さ width の角柱。4つの側面と両端のふた）。座標は今の PoseStack の原点から。
+     * 軸を通る面を持たないので、軸と同じ平面にある膜と重なってちらつかない。面の向き（表裏）は気にせず、両面を描く。
+     */
+    static void rod(PoseStack.Pose last, VertexConsumer vc, Vec3 from, Vec3 to, float width, int rgb, int light) {
+        Vec3 axis = to.subtract(from);
+        if (axis.lengthSqr() < 1e-6) {
+            return;
+        }
+        Vec3 dir = axis.normalize();
+        Vec3 up = Math.abs(dir.y) > 0.95 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
+        Vec3 a = dir.cross(up).normalize().scale(width / 2);
+        Vec3 b = dir.cross(a).normalize().scale(width / 2);
+        // 断面の4つの角（順に回る）
+        Vec3[] corner = {a.add(b), a.subtract(b), a.scale(-1).subtract(b), a.scale(-1).add(b)};
+        for (int k = 0; k < 4; k++) {
+            Vec3 c0 = corner[k], c1 = corner[(k + 1) % 4];
+            Vec3 n = c0.add(c1).normalize();
+            rodQuad(vc, last, from.add(c0), from.add(c1), to.add(c1), to.add(c0), n, rgb, light);
+        }
+        rodQuad(vc, last, from.add(corner[0]), from.add(corner[1]), from.add(corner[2]), from.add(corner[3]), dir.scale(-1), rgb, light);
+        rodQuad(vc, last, to.add(corner[0]), to.add(corner[1]), to.add(corner[2]), to.add(corner[3]), dir, rgb, light);
+    }
+
+    /** 四角形を両面で描く（裏向きを落とす描き方でも、どちら側から見えるようにする）。 */
+    private static void rodQuad(VertexConsumer vc, PoseStack.Pose last, Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, int rgb, int light) {
+        Vec3[] ps = {p0, p1, p2, p3};
+        for (int side = 0; side < 2; side++) {
+            float s = side == 0 ? 1 : -1;
+            for (int i = 0; i < 4; i++) {
+                Vec3 p = ps[side == 0 ? i : 3 - i];
+                vertex(vc, last, (float) p.x, (float) p.y, (float) p.z, rgb, 255, light, (float) n.x * s, (float) n.y * s, (float) n.z * s);
+            }
+        }
+    }
+
     /** from から to への光の帯（向きを変えた4枚の板を重ねて、どこから見ても太さが出るように）。座標は今の PoseStack の原点から。 */
     static void beam(PoseStack.Pose last, VertexConsumer vc, Vec3 from, Vec3 to, float width, int rgb, int alpha) {
         Vec3 axis = to.subtract(from);

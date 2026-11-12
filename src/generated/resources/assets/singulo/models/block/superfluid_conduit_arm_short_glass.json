@@ -1,0 +1,66 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/superfluid_conduit_full",
+    "c": "singulo:block/superfluid_conduit",
+    "g": "singulo:block/superfluid_conduit_glass",
+    "f": "singulo:block/superfluid_conduit_flange",
+    "r": "singulo:block/superfluid_conduit_rim",
+    "j": "singulo:block/superfluid_conduit_joint"
+  },
+  "render_type": "minecraft:translucent",
+  "elements": [
+    {
+      "from": [
+        4,
+        4,
+        1
+      ],
+      "to": [
+        12,
+        12,
+        3
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            1,
+            4,
+            3,
+            12
+          ],
+          "texture": "#g"
+        },
+        "west": {
+          "uv": [
+            1,
+            4,
+            3,
+            12
+          ],
+          "texture": "#g"
+        },
+        "up": {
+          "uv": [
+            1,
+            4,
+            3,
+            12
+          ],
+          "texture": "#g",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            1,
+            4,
+            3,
+            12
+          ],
+          "texture": "#g",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

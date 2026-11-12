@@ -24,6 +24,11 @@ public final class Shapes {
 
     /** 形成できた形。size は大きさ（冷却塔は高さ、ほかは決まった大きさ）、ports は搬入出ポート。 */
     public record Found(ShapeSpec spec, Direction back, int size, List<BlockPos> ports) {
+        /** コラプサー内張りの数。 */
+        public int linings(Level level, BlockPos controller) {
+            return spec.countLinings(level, controller, back);
+        }
+
         public BlockPos pos(BlockPos controller, int x, int y, int z) {
             return spec.pos(controller, back, x, y, z);
         }
@@ -91,7 +96,7 @@ public final class Shapes {
             return Slot.part(SinguloBlocks.DEGENERATE_COMPACTOR_WINDOW);
         }
         return y == 1 && u == 2 && z == 0 ? Slot.CONTROLLER : Slot.panel(SinguloBlocks.DEGENERATE_COMPACTOR_PLATE);
-    });
+    }).allowLining();
 
     // ------------------------------------------------------------------ C空洞（5×5×5）
 
@@ -118,7 +123,7 @@ public final class Shapes {
             return Slot.part(u == 2 ? SinguloBlocks.CASIMIR_CAVITY_WINDOW : SinguloBlocks.CASIMIR_CAVITY_SHIELD);
         }
         return y == 1 && u == 2 && z == 0 ? Slot.CONTROLLER : Slot.panel(SinguloBlocks.CASIMIR_CAVITY_WALL);
-    });
+    }).allowLining();
 
     // ------------------------------------------------------------------ 極低温冷却塔（5×5、高さ7〜15）
 
@@ -134,7 +139,7 @@ public final class Shapes {
             throw new IllegalArgumentException("tower height " + h);
         }
         if (TOWERS[h] == null) {
-            TOWERS[h] = new ShapeSpec(5, h, 5, 2, 1, 0, (x, y, z) -> towerSlot(x, y, z, h));
+            TOWERS[h] = new ShapeSpec(5, h, 5, 2, 1, 0, (x, y, z) -> towerSlot(x, y, z, h)).allowLining();
         }
         return TOWERS[h];
     }
@@ -272,6 +277,12 @@ public final class Shapes {
     // ------------------------------------------------------------------ 種類ごと
 
     /** 種類と大きさの形。粒子加速器・ペンローズ・リアクター・創世炉は null（別の判定）。 */
+    /** コラプサー内張りを置ける形か（縮退圧縮炉・C空洞・極低温冷却塔）。 */
+    public static boolean acceptsLining(Blueprints.Kind kind) {
+        ShapeSpec spec = spec(kind, kind.defaultSize());
+        return spec != null && spec.acceptsLining();
+    }
+
     @Nullable
     public static ShapeSpec spec(Blueprints.Kind kind, int size) {
         return switch (kind) {

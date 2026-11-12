@@ -60,6 +60,7 @@ RECESSES = {
     'casimir_cavity_controller': [SCREEN],
     # ドローン発着ポート: 天面の昇降口（扉と昇降台は DronePortRenderer が描く）
     'drone_port': [('up', (2, 2, 14, 14), 13, '#inner', False, False)],
+    'fluid_drone_port': [('up', (2, 2, 14, 14), 13, '#inner', False, False)],
 }
 
 # ワールドの面ごとの、ふだんのテクスチャ

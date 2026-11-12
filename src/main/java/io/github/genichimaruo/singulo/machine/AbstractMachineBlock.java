@@ -166,6 +166,7 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
             if (!stack.is(state.getBlock().asItem())) continue;
             if (be instanceof io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank) tank.collectImplicitComponents(stack);
             if (be instanceof io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity mouth) mouth.collectImplicitComponents(stack);
+            if (be instanceof io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity port) port.collectComponents(stack);
         }
         return drops;
     }
@@ -176,6 +177,7 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
         var be = level.getBlockEntity(pos);
         if (be instanceof io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank) tank.applyComponentsFromItemStack(stack);
         if (be instanceof io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity mouth) mouth.applyComponentsFromItemStack(stack);
+        if (be instanceof io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity port) port.applyComponentsFromItemStack(stack);
     }
 
     public interface BreakListener {
