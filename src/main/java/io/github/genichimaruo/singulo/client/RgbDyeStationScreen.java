@@ -26,13 +26,51 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     /** 最後にサーバーへ送った色（ほかの人が変えたときだけ、画面の色を合わせ直す）。 */
     private int sent = -1;
     private boolean dragWheel, dragSlider;
+    /** カラーコードの入力欄（#RRGGBB。6桁そろったらその色にする）。 */
+    private net.minecraft.client.gui.components.EditBox hex;
 
     public RgbDyeStationScreen(RgbDyeStationMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, RgbDyeStationMenu.WIDTH, RgbDyeStationMenu.HEIGHT);
         syncFrom(menu.color());
     }
 
+    @Override
+    protected void init() {
+        super.init();
+        hex = new net.minecraft.client.gui.components.EditBox(font, leftPos + RgbDyeStationMenu.HEX_X, topPos + RgbDyeStationMenu.HEX_Y,
+                RgbDyeStationMenu.HEX_W, RgbDyeStationMenu.HEX_H, Component.translatable("gui.singulo.rgb_dye_station.hex"));
+        hex.setMaxLength(7);
+        hex.setValue(hexText());
+        hex.setFilter(t -> t.matches("#?[0-9A-Fa-f]{0,6}"));
+        hex.setResponder(t -> {
+            String digits = t.startsWith("#") ? t.substring(1) : t;
+            if (digits.length() == 6 && hex.isFocused()) {
+                setFromRgb(Integer.parseInt(digits, 16));
+                send();
+            }
+        });
+        addRenderableWidget(hex);
+    }
+
+    private String hexText() {
+        return String.format("#%06X", rgb());
+    }
+
+    /** 入力欄の表示を今の色に合わせる（入力中は触らない）。 */
+    private void refreshHex() {
+        if (hex != null && !hex.isFocused()) {
+            hex.setValue(hexText());
+        }
+    }
+
     private void syncFrom(int rgb) {
+        setFromRgb(rgb);
+        sent = rgb;
+        refreshHex();
+    }
+
+    /** 色み・鮮やかさ・明るさを rgb に合わせる（灰色なら色みはそのまま）。 */
+    private void setFromRgb(int rgb) {
         float r = ((rgb >> 16) & 0xFF) / 255F, g = ((rgb >> 8) & 0xFF) / 255F, b = (rgb & 0xFF) / 255F;
         float max = Math.max(r, Math.max(g, b)), min = Math.min(r, Math.min(g, b)), d = max - min;
         val = max;
@@ -41,7 +79,6 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
             float h = max == r ? (g - b) / d : max == g ? 2 + (b - r) / d : 4 + (r - g) / d;
             hue = Mth.positiveModulo(h / 6, 1);
         }
-        sent = rgb;
     }
 
     private int rgb() {
@@ -49,6 +86,7 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     }
 
     private void send() {
+        refreshHex();
         int c = rgb();
         if (c != sent && minecraft != null && minecraft.gameMode != null) {
             sent = c;
@@ -121,7 +159,28 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // 入力中は文字のキー（E など）で画面を閉じない。Enter で入力を終える
+        if (hex != null && hex.isFocused()) {
+            if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER || keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER) {
+                hex.setFocused(false);
+                refreshHex();
+                return true;
+            }
+            if (keyCode != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
+                hex.keyPressed(keyCode, scanCode, modifiers);
+                return true;
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (hex != null && hex.isFocused() && !hex.isMouseOver(mx, my)) {
+            hex.setFocused(false);
+            refreshHex();
+        }
         if (button == 0 && overWheel(mx, my) && pickWheel(mx, my)) {
             dragWheel = true;
             return true;

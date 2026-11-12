@@ -27,6 +27,7 @@ UI = {
     'gui.singulo.rgb_dye_station.ink.3': ('白のインク %s / %s', 'White ink %s / %s'),
     'gui.singulo.rgb_dye_station.ink.4': ('黒のインク %s / %s', 'Black ink %s / %s'),
     'gui.singulo.rgb_dye_station.no_target': ('染める物を入れる', 'Put in something to dye'),
+    'gui.singulo.rgb_dye_station.hex': ('カラーコード（#RRGGBB）', 'Color code (#RRGGBB)'),
 }
 
 
@@ -95,12 +96,43 @@ def recipes(R, shaped):
       note='赤・緑・青・白・黒の染料をインクにして、染められる物を色の輪から選んだ好きな色に染める')
     shaped['RGB染色台'] = (('RGB', 'WCK', 'PPP'), {'R': '赤色の染料', 'G': '緑色の染料', 'B': '青色の染料', 'W': '白色の染料',
                                                   'C': '作業台（ブロック）', 'K': '黒色の染料', 'P': '板材'})
+    # ネクタイ: 上に糸の結び目、下へ羊毛
+    R('ネクタイ', 1, '作業台', {'糸': 1, '羊毛': 2}, cat='tool', note=DYE)
+    shaped['ネクタイ'] = (('S', 'W', 'W'), {'S': '糸', 'W': '羊毛'})
+    # ダイヤの装飾（染めると金具の色が変わる。ダイヤはそのまま）
+    JEWEL = 'アンドロイドの装飾。染料で染められる（金具の色）'
+    R('ダイヤのネックレス', 1, '作業台', {'金塊': 3, 'ダイヤモンド': 1}, cat='tool', note=JEWEL)
+    shaped['ダイヤのネックレス'] = (('N N', ' N ', ' D '), {'N': '金塊', 'D': 'ダイヤモンド'})
+    R('ダイヤのイヤリング', 1, '作業台', {'金塊': 2, 'ダイヤモンド': 2}, cat='tool', note=JEWEL)
+    shaped['ダイヤのイヤリング'] = (('N N', 'D D'), {'N': '金塊', 'D': 'ダイヤモンド'})
+    R('ダイヤのティアラ', 1, '作業台', {'金塊': 5, 'ダイヤモンド': 1}, cat='tool', note=JEWEL)
+    shaped['ダイヤのティアラ'] = (('NDN', 'NNN'), {'N': '金塊', 'D': 'ダイヤモンド'})
+    R('ダイヤのブローチ', 1, '作業台', {'金塊': 4, 'ダイヤモンド': 1}, cat='tool', note=JEWEL)
+    shaped['ダイヤのブローチ'] = ((' N ', 'NDN', ' N '), {'N': '金塊', 'D': 'ダイヤモンド'})
 
 
 _DYE_JA = '染料と一緒に作業台で染められる。'
 _DYE_EN = 'Dye it with dyes on a crafting table.'
 
 DESC = {
+    'ネクタイ': ('首の結び目から胸へ下がる、斜めの縞のネクタイ。装飾のページの首・背中の枠に着ける。' + _DYE_JA,
+             'A striped necktie from a knot at the collar down the chest. Goes in the neck / back slot of the decoration page. ' + _DYE_EN),
+    'ダイヤのネックレス': ('首を回る細い鎖が胸元でＶに下がり、先にダイヤが光る。装飾のページの首・背中の枠に着ける。'
+                   '染料と一緒に作業台で染めると、鎖と台の色が変わる（ダイヤはそのまま）。',
+                   'A fine chain that dips into a V with a diamond pendant. Goes in the neck / back slot of the decoration page. '
+                   'Dyeing it on a crafting table changes the chain and setting; the diamond stays.'),
+    'ダイヤのイヤリング': ('両耳の下で揺れるダイヤ。装飾のページの顔の枠に着ける（メガネと同じ枠）。'
+                   '染料と一緒に作業台で染めると、金具の色が変わる（ダイヤはそのまま）。',
+                   'Diamonds that sway below both ears. Goes in the face slot of the decoration page, like glasses. '
+                   'Dyeing it on a crafting table changes the metal; the diamonds stay.'),
+    'ダイヤのティアラ': ('頭の上に乗る、3つの山にダイヤをちりばめた小さな冠。装飾のページの頭の枠に着ける。'
+                  '染料と一緒に作業台で染めると、金具の色が変わる（ダイヤはそのまま）。',
+                  'A small crown with three peaks set with diamonds. Goes in the head slot of the decoration page. '
+                  'Dyeing it on a crafting table changes the metal; the diamonds stay.'),
+    'ダイヤのブローチ': ('左胸に留める、丸い台にダイヤのブローチ。装飾のページの腰の枠に着ける。'
+                  '染料と一緒に作業台で染めると、台の色が変わる（ダイヤはそのまま）。',
+                  'A round diamond brooch pinned on the left of the chest. Goes in the waist slot of the decoration page. '
+                  'Dyeing it on a crafting table changes the setting; the diamond stays.'),
     'RGB染色台': ('赤・緑・青・白・黒の染料をそれぞれの枠に入れるとインクになり（染料1個で8目盛り、各色64目盛りまで）、'
                 '画面の色の輪と明るさで選んだ好きな色に、染められる物（革の防具・アンドロイドの装飾など）を染める。'
                 '1回に使うインクは選んだ色で決まり、純色なら色みのインクだけ、灰色なら白と黒だけを使う（各色4目盛りまで）。'
@@ -140,6 +172,11 @@ DESC = {
 }
 
 SUMMARY = {
+    'ネクタイ': ('アンドロイドの胸元のネクタイ。', 'A necktie for an android.'),
+    'ダイヤのネックレス': ('胸元にダイヤが下がるネックレス。', 'A necklace with a diamond pendant.'),
+    'ダイヤのイヤリング': ('両耳に揺れるダイヤのイヤリング。', 'Diamond earrings that sway.'),
+    'ダイヤのティアラ': ('ダイヤをちりばめた小さな冠。', 'A small crown set with diamonds.'),
+    'ダイヤのブローチ': ('胸元に留めるダイヤのブローチ。', 'A diamond brooch for the chest.'),
     'RGB染色台': ('色の輪から選んだ好きな色に染める台。', 'Dyes things any color you pick on a color wheel.'),
     '猫耳カチューシャ': ('アンドロイドの頭に着ける猫耳。', 'Cat ears for an android.'),
     '魔女の帽子': ('アンドロイドがかぶるとんがり帽子。', 'A pointed hat for an android.'),

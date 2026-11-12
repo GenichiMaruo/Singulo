@@ -1299,7 +1299,8 @@ ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'andr
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella', 'android_glasses',
                  # 0.18.0
                  'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail', 'android_twin_tails',
-                 'android_monocle', 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom')
+                 'android_monocle', 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom',
+                 'android_necktie', 'android_diamond_necklace', 'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch')
 
 
 # 2枚の層を合わせた外形で、上下中央に寄せる装飾
@@ -1322,7 +1323,7 @@ def _vcenter_pair(Image, base, detail):
 
 
 FABRIC_ACCESSORIES = ('android_ribbon', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon',
-                      'android_witch_hat', 'android_apron')
+                      'android_witch_hat', 'android_apron', 'android_necktie')
 
 
 def fabric(im, seed):
@@ -1706,6 +1707,71 @@ def accessory_icons(Image):
         for x in range(x0, x1 + 1):
             d.load()[x, y] = bristle_d if (x + y) % 2 == 0 else bristle
     out['android_broom'] = (b, d)
+    # ネクタイ: 結び目と、下ほど広い剣先（斜めの縞）
+    b, d = new(), new()
+    shaded(b, 6, 1, 9, 3)
+    for y, (x0, x1) in ((4, (6, 9)), (5, (6, 9)), (6, (5, 10)), (7, (5, 10)), (8, (5, 10)), (9, (5, 10)), (10, (5, 10)),
+                        (11, (5, 10)), (12, (6, 9)), (13, (7, 8))):
+        for x in range(x0, x1 + 1):
+            b.load()[x, y] = E if x in (x0, x1) else (S if (x + y) % 4 == 0 else W)
+    out['android_necktie'] = (b, d)
+
+    # ダイヤ（染めない層）: 上の段は明るく、下はとがる。左上に光
+    dia_l, dia_m, dia_d, shine = (191, 246, 242, 255), (111, 216, 210, 255), (58, 168, 176, 255), (255, 255, 255, 255)
+
+    def gem(cx, top, w):
+        """cx は左の列、w は上の段の幅（偶数）。"""
+        for x in range(cx, cx + w):
+            d.load()[x, top] = dia_l
+            d.load()[x, top + 1] = dia_m
+        rows = w // 2
+        for k in range(rows):
+            for x in range(cx + k + 1, cx + w - k - 1):
+                d.load()[x, top + 2 + k] = dia_d if x >= cx + w // 2 else dia_m
+        d.load()[cx, top] = shine
+
+    # ダイヤのネックレス: Ｖに下がる鎖（1ドットおき）と、先のダイヤ
+    b, d = new(), new()
+    for k in range(6):
+        for x, y in ((2 + k, 2 + k), (13 - k, 2 + k)):
+            b.load()[x, y] = W if k % 2 == 0 else S
+    b.load()[7, 8] = E
+    b.load()[8, 8] = E
+    gem(6, 9, 4)
+    out['android_diamond_necklace'] = (b, d)
+    # ダイヤのイヤリング: 左右の金具と、下がるダイヤ
+    b, d = new(), new()
+    for x0 in (3, 10):
+        b.load()[x0 + 1, 2] = E
+        b.load()[x0 + 1, 3] = W
+        b.load()[x0 + 1, 4] = S
+        gem(x0, 5, 4)
+    out['android_diamond_earrings'] = (b, d)
+    # ダイヤのティアラ: 帯と3つの山（真ん中が高い）、山のダイヤ
+    b, d = new(), new()
+    shaded(b, 1, 11, 14, 12)
+    for cx, top in ((7, 3), (3, 7), (12, 7)):
+        for y in range(top, 11):
+            w = (y - top) // 2
+            for x in range(cx - w, cx + w + 2):
+                if 0 <= x < 16:
+                    b.load()[x, y] = E if x in (cx - w, cx + w + 1) else W
+    gem(6, 6, 4)
+    for x in (3, 12):
+        d.load()[x, 9] = dia_l
+        d.load()[x, 10] = dia_m
+    out['android_diamond_tiara'] = (b, d)
+    # ダイヤのブローチ: 丸い台（四隅に粒）と真ん中のダイヤ
+    b, d = new(), new()
+    for y in range(3, 13):
+        for x in range(3, 13):
+            dx, dy = x - 7.5, y - 7.5
+            if dx * dx + dy * dy <= 22:
+                b.load()[x, y] = E if dx * dx + dy * dy > 14 else (S if x + y > 15 else W)
+    for x, y in ((3, 7), (12, 8), (7, 3), (8, 12)):
+        b.load()[x, y] = W
+    gem(6, 5, 4)
+    out['android_diamond_brooch'] = (b, d)
     return out
 
 

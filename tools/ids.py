@@ -167,6 +167,11 @@ MOD = {
     'エプロン': ('android_apron', 'Apron', 'tool'),
     'ランタン': ('android_lantern', 'Lantern', 'tool'),
     'ほうき': ('android_broom', 'Broom', 'tool'),
+    'ネクタイ': ('android_necktie', 'Necktie', 'tool'),
+    'ダイヤのネックレス': ('android_diamond_necklace', 'Diamond Necklace', 'tool'),
+    'ダイヤのイヤリング': ('android_diamond_earrings', 'Diamond Earrings', 'tool'),
+    'ダイヤのティアラ': ('android_diamond_tiara', 'Diamond Tiara', 'tool'),
+    'ダイヤのブローチ': ('android_diamond_brooch', 'Diamond Brooch', 'tool'),
     # ドローン輸送（0.14.0。tools/drones.py が絵とモデルを作る）
     'ドローン用クリスタルメモリ': ('drone_memory', 'Drone Crystal Memory', 'item'),
     'ドローン用クリスタルメモリ（ジェット型）': ('drone_memory_jet', 'Drone Crystal Memory (Jet)', 'item'),

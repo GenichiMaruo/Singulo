@@ -177,10 +177,26 @@ public final class SinguloItems {
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BROOM = ITEMS.register(
             "android_broom", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "broom", 0x8E2F3F));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_NECKTIE = ITEMS.register(
+            "android_necktie", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "necktie", 0x2E3E8C));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_NECKLACE = ITEMS.register(
+            "android_diamond_necklace", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "diamond_necklace", 0xE0B850));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_EARRINGS = ITEMS.register(
+            "android_diamond_earrings", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "diamond_earrings", 0xE0B850));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_TIARA = ITEMS.register(
+            "android_diamond_tiara", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "diamond_tiara", 0xE0B850));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_BROOCH = ITEMS.register(
+            "android_diamond_brooch", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "diamond_brooch", 0xE0B850));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
             ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA,
-            ANDROID_CAT_EARS, ANDROID_WITCH_HAT, ANDROID_STRAW_HAT, ANDROID_PONYTAIL, ANDROID_TWIN_TAILS, ANDROID_MONOCLE, ANDROID_FAIRY_WINGS, ANDROID_APRON, ANDROID_LANTERN, ANDROID_BROOM);
+            ANDROID_CAT_EARS, ANDROID_WITCH_HAT, ANDROID_STRAW_HAT, ANDROID_PONYTAIL, ANDROID_TWIN_TAILS, ANDROID_MONOCLE, ANDROID_FAIRY_WINGS, ANDROID_APRON, ANDROID_LANTERN, ANDROID_BROOM,
+            ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));

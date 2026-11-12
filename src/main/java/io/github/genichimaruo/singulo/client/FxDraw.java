@@ -312,6 +312,15 @@ final class FxDraw {
      */
     static void texBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
                        int light, int rgb, int alpha) {
+        texBox(pose, vc, x0, y0, z0, x1, y1, z1, light, rgb, alpha, false);
+    }
+
+    /**
+     * zLong なら、前後（z）に長い物として貼る: 筋の模様が z の向きに走るよう、西・東の面は u を y、v を z にする
+     * （下・上の面は、もとから v が z）。
+     */
+    static void texBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                       int light, int rgb, int alpha, boolean zLong) {
         PoseStack.Pose p = pose.last();
         float sx = Math.min(1, (x1 - x0) * 16 / TEX_SIZE), sy = Math.min(1, (y1 - y0) * 16 / TEX_SIZE),
                 sz = Math.min(1, (z1 - z0) * 16 / TEX_SIZE);
@@ -322,6 +331,12 @@ final class FxDraw {
         // 北・南: u は x、v は y
         texQuad(vc, p, light, rgb, alpha, 0, 0, -1, x0, y1, z0, ox, oy + sy, x1, y1, z0, ox + sx, oy + sy, x1, y0, z0, ox + sx, oy, x0, y0, z0, ox, oy);
         texQuad(vc, p, light, rgb, alpha, 0, 0, 1, x0, y0, z1, ox, oy, x1, y0, z1, ox + sx, oy, x1, y1, z1, ox + sx, oy + sy, x0, y1, z1, ox, oy + sy);
+        if (zLong) {
+            // 西・東: u は y、v は z
+            texQuad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, oy, oz, x0, y0, z1, oy, oz + sz, x0, y1, z1, oy + sy, oz + sz, x0, y1, z0, oy + sy, oz);
+            texQuad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, oy + sy, oz, x1, y1, z1, oy + sy, oz + sz, x1, y0, z1, oy, oz + sz, x1, y0, z0, oy, oz);
+            return;
+        }
         // 西・東: u は z、v は y
         texQuad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, oz, oy, x0, y0, z1, oz + sz, oy, x0, y1, z1, oz + sz, oy + sy, x0, y1, z0, oz, oy + sy);
         texQuad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, oz, oy + sy, x1, y1, z1, oz + sz, oy + sy, x1, y0, z1, oz + sz, oy, x1, y0, z0, oz, oy);
@@ -367,8 +382,23 @@ final class FxDraw {
             bky[i] = my + (fy[i] - my) * backScale;
         }
         float nz = z1 > z0 ? -1 : 1;
-        quad(vc, p, light, rgb, alpha, 0, 0, nz, fx[0], fy[0], z0, fx[1], fy[1], z0, fx[2], fy[2], z0, fx[2], fy[2], z0);
-        quad(vc, p, light, rgb, alpha, 0, 0, -nz, bkx[0], bky[0], z1, bkx[2], bky[2], z1, bkx[1], bky[1], z1, bkx[1], bky[1], z1);
+        // 絵は長さに合わせた細かさで（1/16 ブロックに1ドット）。前後の面は x・y の位置から、側面は辺の長さと奥行きから
+        float minX = Math.min(ax, Math.min(bx, cx)), minY = Math.min(ay, Math.min(by, cy));
+        float k = 16 / TEX_SIZE;
+        float ou = texOffset(ax * 5 + ay * 3, Math.min(1, (Math.max(ax, Math.max(bx, cx)) - minX) * k));
+        float ov = texOffset(ay * 7 + bx, Math.min(1, (Math.max(ay, Math.max(by, cy)) - minY) * k));
+        float[] fu = new float[3], fv = new float[3], bu = new float[3], bv = new float[3];
+        for (int i = 0; i < 3; i++) {
+            fu[i] = Math.min(1, ou + (fx[i] - minX) * k);
+            fv[i] = Math.min(1, ov + (fy[i] - minY) * k);
+            bu[i] = Math.min(1, ou + (bkx[i] - minX) * k);
+            bv[i] = Math.min(1, ov + (bky[i] - minY) * k);
+        }
+        texQuad(vc, p, light, rgb, alpha, 0, 0, nz, fx[0], fy[0], z0, fu[0], fv[0], fx[1], fy[1], z0, fu[1], fv[1],
+                fx[2], fy[2], z0, fu[2], fv[2], fx[2], fy[2], z0, fu[2], fv[2]);
+        texQuad(vc, p, light, rgb, alpha, 0, 0, -nz, bkx[0], bky[0], z1, bu[0], bv[0], bkx[2], bky[2], z1, bu[2], bv[2],
+                bkx[1], bky[1], z1, bu[1], bv[1], bkx[1], bky[1], z1, bu[1], bv[1]);
+        float depth = Math.min(1, Math.abs(z1 - z0) * k);
         for (int i = 0; i < 3; i++) {
             int j = (i + 1) % 3;
             // 側面の向き: 辺に垂直で、重心から外へ（後ろへの傾きは小さいので、前後の成分は入れない）
@@ -379,7 +409,10 @@ final class FxDraw {
                 sy = -sy;
             }
             float len = (float) Math.sqrt(sx * sx + sy * sy);
-            quad(vc, p, light, rgb, alpha, sx / len, sy / len, 0, fx[i], fy[i], z0, fx[j], fy[j], z0, bkx[j], bky[j], z1, bkx[i], bky[i], z1);
+            float edge = (float) Math.sqrt(ex * ex + ey * ey) * k;
+            float eu = Math.min(1, edge), o = texOffset(fx[i] * 3 + fy[j] * 11, eu);
+            texQuad(vc, p, light, rgb, alpha, sx / len, sy / len, 0, fx[i], fy[i], z0, o, 0, fx[j], fy[j], z0, o + eu, 0,
+                    bkx[j], bky[j], z1, o + eu, depth, bkx[i], bky[i], z1, o, depth);
         }
     }
 

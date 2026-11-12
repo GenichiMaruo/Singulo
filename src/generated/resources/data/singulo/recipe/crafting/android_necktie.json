@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S",
+    "W",
+    "W"
+  ],
+  "key": {
+    "S": {
+      "tag": "c:strings"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
+  },
+  "result": {
+    "id": "singulo:android_necktie",
+    "count": 1
+  }
+}

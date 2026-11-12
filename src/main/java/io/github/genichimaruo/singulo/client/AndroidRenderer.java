@@ -1351,7 +1351,13 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD,
                          io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE -> m.toHead(pose);
                     case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK -> m.toTorso(pose);
-                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST -> m.toHips(pose);
+                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST -> {
+                        if (acc.style().equals("diamond_brooch")) {
+                            m.toTorso(pose);                                  // ブローチは腰の枠だが、胸元に留める
+                        } else {
+                            m.toHips(pose);
+                        }
+                    }
                     default -> m.toLeftHand(pose);
                 }
                 if (acc.style().equals("bouquet")) {
@@ -1401,6 +1407,23 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         private void ear(PoseStack pose, VertexConsumer vc, int light, float ax, float ay, float bx, float by, float cx, float cy,
                          float z0, float z1, float backScale, int rgb) {
             FxDraw.prism(pose, vc, ax * P, ay * P, bx * P, by * P, cx * P, cy * P, z0 * P, z1 * P, backScale, light, rgb);
+        }
+
+        /**
+         * ダイヤ（上の段は明るく、下は斜めの三角でとがる。真ん中に光の面）。(x, y) は上の段の下の縁の真ん中、z は前の面、
+         * size は上の段の幅の半分。ときどき（seed でずらす）白くきらりと光る（暗い所でも見える）。
+         */
+        private void diamond(PoseStack pose, VertexConsumer vc, int light, float x, float y, float z, float size, float age, int seed) {
+            int full = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
+            float d = size * 0.5F;
+            b(pose, vc, light, x - size, y - size * 0.7F, z, x + size, y, z + d, 0xBFF6F2);           // 上の段
+            b(pose, vc, light, x - size * 0.55F, y - size * 0.95F, z + 0.02F, x + size * 0.55F, y - size * 0.7F, z + d * 0.8F, 0xE4FEFC);
+            ear(pose, vc, light, x - size, y, x + size, y, x, y + size * 1.3F, z, z + d, 1, 0x6FD8D2);   // 下のとがり
+            b(pose, vc, light, x - size * 0.35F, y - size * 0.55F, z - 0.03F, x - size * 0.05F, y - size * 0.25F, z, 0xFFFFFF);   // 光の面
+            if ((age + seed * 17) % 50 < 3) {
+                FxDraw.texBox(pose, vc, (x + size * 0.3F - 0.15F) * P, (y - size - 0.15F) * P, (z - 0.08F) * P,
+                        (x + size * 0.3F + 0.15F) * P, (y - size + 0.15F) * P, (z - 0.02F) * P, full, 0xFFFFFF, 255);
+            }
         }
 
         /** ツインテールの片方の変形（頭の左右の高い所から、外へ少し開いて垂らす）。pushPose するので、使い終えたら popPose。 */
@@ -1537,6 +1560,11 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
 
         /** 箱（ピクセル単位）。 */
+        /** 前後（z）に長い箱（手に持つ物の穂など。筋の模様が長さの向きに走る）。 */
+        private void bz(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float z0, float x1, float y1, float z1, int rgb) {
+            FxDraw.texBox(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255, true);
+        }
+
         private void b(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float z0, float x1, float y1, float z1, int rgb) {
             // 模様は長さに合わせた細かさで（体の1ピクセルに絵の1ドット）
             FxDraw.texBox(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
@@ -1874,6 +1902,72 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     b(pose, vc, light, -4.05F, 0.3F, -3.85F, -3.25F, 0.5F, -3.7F, chain);
                     b(pose, vc, light, -4.25F, 0.3F, -3.75F, -4.05F, 0.5F, -1.5F, chain);
                 }
+                // ---- ネクタイとダイヤ（0.18.0）。胴の箱: x -3〜3、y -8〜0、z -1.5〜1.5（前は -z）
+                case "necktie" -> {
+                    // 首の結び目から胸へ下がる、下ほど広いネクタイ。先は斜めの三角。斜めの縞（少し濃い）。歩くと少し揺れる
+                    int stripe = mix(c, 0x000000, 0.22F);
+                    b(pose, vc, light, -0.65F, -7.95F, -1.98F, 0.65F, -7.05F, -1.5F, dark);         // 結び目
+                    pose.pushPose();
+                    pose.translate(0, -7.05F * P, -1.62F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(-4 - 8 * walk));
+                    b(pose, vc, light, -0.5F, 0, -0.2F, 0.5F, 1.5F, 0.05F, c);
+                    b(pose, vc, light, -0.75F, 1.5F, -0.2F, 0.75F, 4.0F, 0.05F, c);
+                    ear(pose, vc, light, -0.75F, 4.0F, 0.75F, 4.0F, 0, 4.9F, -0.2F, 0.05F, 1, c);  // 先の三角
+                    for (float y : new float[] {1.0F, 2.2F, 3.4F}) {
+                        b(pose, vc, light, -0.7F, y, -0.24F, 0.7F, y + 0.3F, -0.2F, stripe);
+                    }
+                    pose.popPose();
+                }
+                case "diamond_necklace" -> {
+                    // 首の後ろを回る細い鎖が、胸元でＶに下がり、先にダイヤ。鎖と台は染めた色（金）
+                    b(pose, vc, light, -2.35F, -7.95F, -1.62F, -2.15F, -7.8F, 1.62F, c);            // 首の横と後ろ
+                    b(pose, vc, light, 2.15F, -7.95F, -1.62F, 2.35F, -7.8F, 1.62F, c);
+                    b(pose, vc, light, -2.35F, -7.95F, 1.55F, 2.35F, -7.8F, 1.62F, c);
+                    float[][] chain = {{2.2F, -7.85F}, {1.75F, -7.55F}, {1.3F, -7.25F}, {0.85F, -6.95F}, {0.4F, -6.7F}};
+                    for (float[] q : chain) {
+                        for (int side = -1; side <= 1; side += 2) {
+                            float x = side * q[0];
+                            b(pose, vc, light, x - 0.2F, q[1], -1.66F, x + 0.2F, q[1] + 0.18F, -1.55F, c);
+                        }
+                    }
+                    b(pose, vc, light, -0.35F, -6.75F, -1.72F, 0.35F, -6.45F, -1.55F, c);          // 台
+                    diamond(pose, vc, light, 0, -6.45F, -1.9F, 0.6F, age, 0);
+                }
+                case "diamond_earrings" -> {
+                    // 両耳の下（髪の外）の金具から下がるダイヤ。少し揺れる（頭の箱: x -4〜4、y -8〜0）
+                    for (int side = -1; side <= 1; side += 2) {
+                        pose.pushPose();
+                        pose.translate(side * 4.62F * P, -2.6F * P, 0.6F * P);
+                        pose.mulPose(Axis.ZP.rotationDegrees(side * 6 * Mth.sin(age * 0.12F + side)));
+                        b(pose, vc, light, -0.12F, 0, -0.12F, 0.12F, 0.7F, 0.12F, c);                 // 金具
+                        b(pose, vc, light, -0.25F, 0.6F, -0.25F, 0.25F, 0.8F, 0.25F, c);
+                        diamond(pose, vc, light, 0, 0.8F, -0.22F, 0.42F, age, side);
+                        pose.popPose();
+                    }
+                }
+                case "diamond_tiara" -> {
+                    // 頭の上の前寄りの帯（髪の殻 y -8.45 の上）と、斜めの三角の山3つ。真ん中と両わきにダイヤ、帯にも小さな粒
+                    b(pose, vc, light, -4.3F, -8.8F, -2.15F, 4.3F, -8.45F, -1.6F, c);
+                    ear(pose, vc, light, -1.0F, -8.8F, 1.0F, -8.8F, 0, -10.7F, -2.05F, -1.7F, 1, c);
+                    ear(pose, vc, light, -3.0F, -8.8F, -1.6F, -8.8F, -2.3F, -9.9F, -2.05F, -1.7F, 1, c);
+                    ear(pose, vc, light, 1.6F, -8.8F, 3.0F, -8.8F, 2.3F, -9.9F, -2.05F, -1.7F, 1, c);
+                    diamond(pose, vc, light, 0, -9.55F, -2.25F, 0.55F, age, 0);
+                    diamond(pose, vc, light, -2.3F, -9.2F, -2.2F, 0.38F, age, 1);
+                    diamond(pose, vc, light, 2.3F, -9.2F, -2.2F, 0.38F, age, 2);
+                    for (float x : new float[] {-3.6F, 3.6F}) {
+                        b(pose, vc, light, x - 0.18F, -8.75F, -2.25F, x + 0.18F, -8.5F, -2.15F, 0xBFF6F2);
+                    }
+                }
+                case "diamond_brooch" -> {
+                    // 左胸に留める、染めた色の丸い台（四隅に粒）と真ん中のダイヤ
+                    float x = -1.6F, y = -5.6F;
+                    b(pose, vc, light, x - 0.85F, y - 0.6F, -1.68F, x + 0.85F, y + 0.6F, -1.5F, c);
+                    b(pose, vc, light, x - 0.6F, y - 0.85F, -1.68F, x + 0.6F, y + 0.85F, -1.5F, c);
+                    for (float[] q : new float[][] {{-0.75F, -0.75F}, {0.55F, -0.75F}, {-0.75F, 0.55F}, {0.55F, 0.55F}}) {
+                        b(pose, vc, light, x + q[0], y + q[1], -1.76F, x + q[0] + 0.2F, y + q[1] + 0.2F, -1.66F, dark);
+                    }
+                    diamond(pose, vc, light, x, y - 0.25F, -1.86F, 0.5F, age, 3);
+                }
                 // ---- 腰（腰の箱: x -3.5〜3.5、y -3〜0、z -2〜2。前は -z）
                 case "apron" -> {
                     // 腰ひも（前と横）、後ろの蝶結び、スカートの前の面に沿う前掛け（ポケットと、すその交互のフリル）
@@ -1903,8 +1997,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.mulPose(Axis.XP.rotationDegrees(6 * Mth.sin(age * 0.09F)));
                     b(pose, vc, light, -1.3F, -1.25F, 0, 1.3F, 1.25F, 0.45F, c);                  // 屋根
                     b(pose, vc, light, -0.5F, -0.5F, -0.35F, 0.5F, 0.5F, 0, c);                   // 吊り輪の座
-                    FxDraw.box(pose, vc, -0.95F * P, -0.95F * P, 0.45F * P, 0.95F * P, 0.95F * P, 2.95F * P, full, 0xFFD27A, 255);
-                    FxDraw.box(pose, vc, -0.35F * P, -0.35F * P, 1.2F * P, 0.35F * P, 0.35F * P, 2.4F * P, full, 0xFFF6CC, 255);
+                    FxDraw.texBox(pose, vc, -0.95F * P, -0.95F * P, 0.45F * P, 0.95F * P, 0.95F * P, 2.95F * P, full, 0xFFD27A, 255);
+                    FxDraw.texBox(pose, vc, -0.35F * P, -0.35F * P, 1.2F * P, 0.35F * P, 0.35F * P, 2.4F * P, full, 0xFFF6CC, 255);
                     for (float[] q : new float[][] {{-1.15F, -1.15F}, {0.85F, -1.15F}, {-1.15F, 0.85F}, {0.85F, 0.85F}}) {
                         b(pose, vc, light, q[0], q[1], 0.45F, q[0] + 0.3F, q[1] + 0.3F, 2.95F, c);   // 柱
                     }
@@ -1919,10 +2013,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     b(pose, vc, light, -0.42F, 0.03F, -13.6F, 0.42F, 0.87F, -13.0F, woodDark);
                     b(pose, vc, light, -0.6F, -0.15F, 4.6F, 0.6F, 1.05F, 5.2F, c);
                     VertexConsumer st = strands(buffers);
-                    b(pose, st, light, -0.9F, -0.45F, 5.2F, 0.9F, 1.35F, 6.0F, bristle);
-                    b(pose, st, light, -1.35F, -0.9F, 6.0F, 1.35F, 1.8F, 7.4F, bristle);
-                    b(pose, st, light, -1.8F, -1.35F, 7.4F, 1.8F, 2.25F, 9.0F, bristle);
-                    b(pose, st, light, -2.0F, -1.55F, 9.0F, 2.0F, 2.45F, 9.8F, bristle2);
+                    bz(pose, st, light, -0.9F, -0.45F, 5.2F, 0.9F, 1.35F, 6.0F, bristle);
+                    bz(pose, st, light, -1.35F, -0.9F, 6.0F, 1.35F, 1.8F, 7.4F, bristle);
+                    bz(pose, st, light, -1.8F, -1.35F, 7.4F, 1.8F, 2.25F, 9.0F, bristle);
+                    bz(pose, st, light, -2.0F, -1.55F, 9.0F, 2.0F, 2.45F, 9.8F, bristle2);
                     b(pose, st, light, -1.8F, -1.3F, 9.8F, -1.0F, -0.2F, 10.2F, bristle2);         // 不ぞろいな毛先
                     b(pose, st, light, 0.2F, -0.6F, 9.8F, 1.0F, 0.6F, 10.35F, bristle2);
                     b(pose, st, light, 1.2F, 1.1F, 9.8F, 1.9F, 2.2F, 10.1F, bristle2);

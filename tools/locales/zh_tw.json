@@ -3444,16 +3444,16 @@
     "translation": "頭部"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret, headdress, cat ears, a hat or a hair extension",
-    "translation": "緞帶、髮飾、貝雷帽、頭飾、貓耳、帽子、接髮"
+    "source": "Ribbon, hair flower, beret, headdress, cat ears, a hat, a hair extension or a tiara",
+    "translation": "緞帶、髮飾、貝雷帽、頭飾、貓耳、帽子、接髮、頭冠"
   },
   "gui.singulo.android.decor.1": {
     "source": "Neck / back",
     "translation": "頸部・背部"
   },
   "gui.singulo.android.decor.1.hint": {
-    "source": "Cape, scarf or fairy wings",
-    "translation": "披風、圍巾、妖精之翼"
+    "source": "Cape, scarf, fairy wings, necktie or necklace",
+    "translation": "披風、圍巾、妖精之翼、領帶、項鍊"
   },
   "gui.singulo.android.decor.2": {
     "source": "Hand",
@@ -14212,12 +14212,12 @@
     "translation": "腰部"
   },
   "gui.singulo.android.decor.3.hint": {
-    "source": "Glasses or monocle",
-    "translation": "眼鏡、單片眼鏡"
+    "source": "Glasses, monocle or earrings",
+    "translation": "眼鏡、單片眼鏡、耳環"
   },
   "gui.singulo.android.decor.4.hint": {
-    "source": "Waist ribbon or apron",
-    "translation": "腰部緞帶、圍裙"
+    "source": "Waist ribbon, apron or brooch (pinned on the chest)",
+    "translation": "腰部緞帶、圍裙、胸針（別在胸前）"
   },
   "tooltip.singulo.android_accessory.3": {
     "source": "Worn on an android's face (decoration page)",
@@ -14422,5 +14422,89 @@
   "howto.singulo.rgb_dye_station": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製作：工作台（階段1）"
+  },
+  "item.singulo.android_necktie": {
+    "source": "Necktie",
+    "translation": "領帶"
+  },
+  "item.singulo.android_diamond_necklace": {
+    "source": "Diamond Necklace",
+    "translation": "鑽石項鍊"
+  },
+  "item.singulo.android_diamond_earrings": {
+    "source": "Diamond Earrings",
+    "translation": "鑽石耳環"
+  },
+  "item.singulo.android_diamond_tiara": {
+    "source": "Diamond Tiara",
+    "translation": "鑽石頭冠"
+  },
+  "item.singulo.android_diamond_brooch": {
+    "source": "Diamond Brooch",
+    "translation": "鑽石胸針"
+  },
+  "summary.singulo.android_necktie": {
+    "source": "A necktie for an android.",
+    "translation": "仿生人胸前的領帶。"
+  },
+  "summary.singulo.android_diamond_necklace": {
+    "source": "A necklace with a diamond pendant.",
+    "translation": "胸前垂著鑽石的項鍊。"
+  },
+  "summary.singulo.android_diamond_earrings": {
+    "source": "Diamond earrings that sway.",
+    "translation": "在雙耳搖晃的鑽石耳環。"
+  },
+  "summary.singulo.android_diamond_tiara": {
+    "source": "A small crown set with diamonds.",
+    "translation": "鑲滿鑽石的小王冠。"
+  },
+  "summary.singulo.android_diamond_brooch": {
+    "source": "A diamond brooch for the chest.",
+    "translation": "別在胸前的鑽石胸針。"
+  },
+  "desc.singulo.android_necktie": {
+    "source": "A striped necktie from a knot at the collar down the chest. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "從領口的結垂到胸前、帶斜條紋的領帶。裝在裝飾頁的頸部・背部槽中。與染料一起在工作台上可以染色。"
+  },
+  "desc.singulo.android_diamond_necklace": {
+    "source": "A fine chain that dips into a V with a diamond pendant. Goes in the neck / back slot of the decoration page. Dyeing it on a crafting table changes the chain and setting; the diamond stays.",
+    "translation": "繞過頸部的細鏈在胸前垂成 V 形，末端閃著鑽石。裝在裝飾頁的頸部・背部槽中。與染料一起在工作台上染色會改變鏈子和底座的顏色（鑽石不變）。"
+  },
+  "desc.singulo.android_diamond_earrings": {
+    "source": "Diamonds that sway below both ears. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the metal; the diamonds stay.",
+    "translation": "在雙耳下方搖晃的鑽石。裝在裝飾頁的臉部槽中（與眼鏡同一槽）。與染料一起在工作台上染色會改變金屬件的顏色（鑽石不變）。"
+  },
+  "desc.singulo.android_diamond_tiara": {
+    "source": "A small crown with three peaks set with diamonds. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the metal; the diamonds stay.",
+    "translation": "戴在頭上、三座尖峰鑲滿鑽石的小王冠。裝在裝飾頁的頭部槽中。與染料一起在工作台上染色會改變金屬件的顏色（鑽石不變）。"
+  },
+  "desc.singulo.android_diamond_brooch": {
+    "source": "A round diamond brooch pinned on the left of the chest. Goes in the waist slot of the decoration page. Dyeing it on a crafting table changes the setting; the diamond stays.",
+    "translation": "別在左胸、圓形底座上鑲著鑽石的胸針。裝在裝飾頁的腰部槽中。與染料一起在工作台上染色會改變底座的顏色（鑽石不變）。"
+  },
+  "howto.singulo.android_necktie": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "howto.singulo.android_diamond_necklace": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "howto.singulo.android_diamond_earrings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "howto.singulo.android_diamond_tiara": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "howto.singulo.android_diamond_brooch": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "gui.singulo.rgb_dye_station.hex": {
+    "source": "Color code (#RRGGBB)",
+    "translation": "顏色代碼（#RRGGBB）"
   }
 }

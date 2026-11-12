@@ -26,6 +26,8 @@ public class RgbDyeStationMenu extends AbstractContainerMenu {
     public static final int TARGET_X = 102, TARGET_Y = 24;
     public static final int APPLY_X = 124, APPLY_Y = 24, APPLY_W = 42, APPLY_H = 16;
     public static final int SWATCH_X = 172, SWATCH_Y = 24, SWATCH_SIZE = 16;
+    /** カラーコードの入力欄（#RRGGBB）。 */
+    public static final int HEX_X = 124, HEX_Y = 44, HEX_W = 64, HEX_H = 12;
     public static final int DYE_X = 100, DYE_Y = 60, DYE_STEP = 20;
     public static final int INV_X = GuiFrame.inventoryX(WIDTH), INV_Y = GuiFrame.inventoryY(HEIGHT), HOTBAR_Y = GuiFrame.hotbarY(HEIGHT);
     /** ボタンの番号: 染める。色を選ぶのは SET_COLOR | RGB。 */

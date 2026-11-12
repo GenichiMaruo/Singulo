@@ -2272,8 +2272,9 @@ public final class AndroidGameTests {
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         helper.assertTrue(RuinAndroid.DECOR_SLOTS == 5, "装飾の枠が5つでない");
         String[][] wear = {
-                {"android_witch_hat", "android_cat_ears", "android_straw_hat", "android_ponytail", "android_twin_tails"},
-                {"android_fairy_wings"}, {"android_broom", "android_lantern"}, {"android_monocle"}, {"android_apron"}};
+                {"android_witch_hat", "android_cat_ears", "android_straw_hat", "android_ponytail", "android_twin_tails", "android_diamond_tiara"},
+                {"android_fairy_wings", "android_necktie", "android_diamond_necklace"}, {"android_broom", "android_lantern"},
+                {"android_monocle", "android_diamond_earrings"}, {"android_apron", "android_diamond_brooch"}};
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
         for (int part = 0; part < wear.length; part++) {
