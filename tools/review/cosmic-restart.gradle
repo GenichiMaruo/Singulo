@@ -1,6 +1,8 @@
 // Two ordinary dedicated-server starts, without custom chunk-retention probes.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/cosmic-restart-src'))
         neoForge.runs.server {
             gameDirectory = file('build/cosmic-restart')

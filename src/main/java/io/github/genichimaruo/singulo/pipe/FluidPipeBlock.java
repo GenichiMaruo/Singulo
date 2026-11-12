@@ -23,16 +23,20 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
 /**
- * 液体パイプ。隣のパイプと、液体を扱うブロックと、水源に自動で接続する。形とモデルはケーブルと同じ作り。
+ * 液体パイプ（4段階）。隣のパイプ（段階を問わない）と、液体を扱うブロックと、水源に自動で接続する。
  * 運ぶ液体やガスの種類を問わない。どの面から出し入れするかは、つないだ装置の面の設定で決まる。
+ * <p>
+ * capacity は1 tick に運べる量（mB）。分かれ目のない区間は {@link FluidPipeNetwork} が1つにまとめ、
+ * 経路のいちばん細いところで量が決まる（電線と同じ）。パイプ自体は tick しない。
  */
 public class FluidPipeBlock extends BaseEntityBlock {
-    /** 断面は6ドット角（tools/art16.py の CABLE_WIDTHS）。トポロジカル導線と同じ太さ。 */
-    private static final CableProfile PROFILE = CableProfile.TOPOLOGICAL;
-    private static final MapCodec<FluidPipeBlock> CODEC = simpleCodec(FluidPipeBlock::new);
+    private final long capacity;
+    private final PipeProfile profile;
 
-    public FluidPipeBlock(Properties properties) {
+    public FluidPipeBlock(Properties properties, long capacity, PipeProfile profile) {
         super(properties);
+        this.capacity = capacity;
+        this.profile = profile;
         BlockState state = stateDefinition.any();
         for (BooleanProperty p : CableBlock.CONNECTIONS.values()) {
             state = state.setValue(p, false);
@@ -40,9 +44,28 @@ public class FluidPipeBlock extends BaseEntityBlock {
         registerDefaultState(state.setValue(CableBlock.STRAIGHT, CableProfile.Straight.NONE));
     }
 
+    /** 1 tick に運べる量（mB）。Long.MAX_VALUE は上限なし。 */
+    public long capacity() {
+        return capacity;
+    }
+
+    public PipeProfile profile() {
+        return profile;
+    }
+
+    @Override
+    public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+                                java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
+        lines.add((capacity == Long.MAX_VALUE
+                ? net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.unlimited")
+                : net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.capacity", String.format("%,d", capacity)))
+                .withStyle(net.minecraft.ChatFormatting.AQUA));
+        super.appendHoverText(stack, context, lines, flag);
+    }
+
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
+        return simpleCodec(p -> new FluidPipeBlock(p, capacity, profile));
     }
 
     @Override
@@ -58,10 +81,10 @@ public class FluidPipeBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = PROFILE.core(state.getValue(CableBlock.STRAIGHT));
+        VoxelShape shape = profile.core(state.getValue(CableBlock.STRAIGHT));
         for (var e : CableBlock.CONNECTIONS.entrySet()) {
             if (state.getValue(e.getValue())) {
-                shape = Shapes.or(shape, PROFILE.arm(e.getKey()));
+                shape = Shapes.or(shape, profile.arm(e.getKey()));
             }
         }
         return shape;
@@ -99,6 +122,15 @@ public class FluidPipeBlock extends BaseEntityBlock {
         if (updated != state) {
             level.setBlock(pos, updated, Block.UPDATE_CLIENTS);
         }
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+        // 別の段階のパイプに置き換えたときも、ネットワークを作り直す（区間の容量が変わる）
+        if (!state.is(newState.getBlock()) && !level.isClientSide && level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
+            pipe.invalidateNetwork();
+        }
+        super.onRemove(state, level, pos, newState, moving);
     }
 
     static boolean connects(Level level, BlockPos pos, Direction dir) {

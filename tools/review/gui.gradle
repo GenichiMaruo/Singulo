@@ -1,6 +1,8 @@
 // Development-only: ordinary build/jar tasks never include the GUI harness.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/gui-src'))
         def reviewRoot = file(providers.gradleProperty('cosmicGuiReview').isPresent() ? 'build/cosmic-gui-review' : 'build/gui-review')
         neoForge.runs.client {

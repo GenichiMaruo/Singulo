@@ -530,6 +530,12 @@ OUTPUT_ALIASES = {
     '超伝導ケーブル（銅導線）': 'singulo:superconducting_cable',
     'トポロジカル導線（超伝導ケーブル）': 'singulo:topological_wire',
     '銅インゴット（銅導線）': 'minecraft:copper_ingot',
+    # 0.17.0: 潮汐紡糸機で伸ばして作るバニラの素材
+    '糸（潮汐紡糸）': 'minecraft:string',
+    '鎖（潮汐紡糸）': 'minecraft:chain',
+    'ブレイズロッド（潮汐紡糸）': 'minecraft:blaze_rod',
+    'ファントムの皮膜（潮汐紡糸）': 'minecraft:phantom_membrane',
+    '鍾乳石（潮汐紡糸）': 'minecraft:pointed_dripstone',
 }
 
 # 同じ成果物の別レシピの、レシピのファイル名（成果物のIDのままだと、同じ装置の中で重なるもの）
@@ -582,6 +588,11 @@ ALIAS_RECIPE_IDS = {
     '超伝導ケーブル（銅導線）': 'superconducting_cable_from_copper_wire',
     'トポロジカル導線（超伝導ケーブル）': 'topological_wire_from_superconducting_cable',
     '銅インゴット（銅導線）': 'copper_ingot_from_copper_wire',
+    '糸（潮汐紡糸）': 'string_from_tidal_spindle',
+    '鎖（潮汐紡糸）': 'chain_from_tidal_spindle',
+    'ブレイズロッド（潮汐紡糸）': 'blaze_rod_from_tidal_spindle',
+    'ファントムの皮膜（潮汐紡糸）': 'phantom_membrane_from_tidal_spindle',
+    '鍾乳石（潮汐紡糸）': 'pointed_dripstone_from_tidal_spindle',
 }
 
 # 成果物と一緒に出る副産物: レシピ名 → (副産物, 個数)
@@ -690,6 +701,9 @@ VANILLA = {
     '金のブーツ': 'minecraft:golden_boots',
     '粗銅': '#c:raw_materials/copper',
     '黒曜石': '#c:obsidians',
+    'ブレイズパウダー': 'minecraft:blaze_powder',
+    '革': '#c:leathers',
+    '石': 'minecraft:stone',
 }
 
 # 液体（バニラ）
@@ -762,3 +776,7 @@ MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ':
 from cosmic_content import IDS as _COSMIC_IDS
 MOD.update(_COSMIC_IDS)
 STATIONS["潮汐紡糸機"] = "tidal_spindle"
+
+# 0.17.0 液体パイプの段階・液体のドローン発着ポート・液体カプセル
+from logistics_content import IDS as _LOGISTICS_IDS
+MOD.update(_LOGISTICS_IDS)

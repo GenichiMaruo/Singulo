@@ -424,20 +424,84 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             float on = tl.ring(i);
             float idle = tl.phase() <= JetForgeBlockEntity.IGNITE ? 0.15F * tl.power() : 0;
             float a = Math.max(on, idle) * flicker;
+            Vec3 c = f.origin().add(f.axis().scale(RING_S[i]));
+            float R = JetForgeLayout.LENS_R[i];
+            // ジェットがリングを突き抜けた瞬間（入り始めから PUNCH_TICKS の間。リングの光がまだ弱い最初の瞬間から描く）
+            float age = punchAge(tl, i);
+            if (age >= 0 && age < PUNCH_TICKS) {
+                punch(f, glow, c, R, i, age, flicker);
+            }
             if (a <= 0.01F) {
                 continue;
             }
-            Vec3 c = f.origin().add(f.axis().scale(RING_S[i]));
-            float R = JetForgeLayout.LENS_R[i];
             ringSegments(f, glow, c, f.axis(), R - 0.62F, R + 0.55F, f.far() ? 24 : 56, 0xA8E4FF, 0.85F * a, f.time() * (4 + i * 2F), 4);
-            // 入った瞬間のひらめき
-            float flash = tl.phase() == JetForgeBlockEntity.FOCUS ? Math.max(0, 1 - Math.abs(tl.focus() - i / 3F) * 12) : 0;
-            if (flash > 0) {
-                disc(f, glow, c, f.axis(), R - 0.6F, R + 2.5F * flash, 48, WHITE, (int) (200 * flash), 0, 0);
-            }
             if (!f.far() && on > 0.3F) {
                 arcs(f, glow, c, R, narrowRadius(RING_S[i]) * 1.2F, i, on * flicker);
             }
+        }
+    }
+
+    /** 突き抜けの演出の長さ（tick）。 */
+    static final float PUNCH_TICKS = 24;
+
+    /** 収束リング i にジェットが入り始めてからの tick（収束の段階でなければ −1）。画面の閃光・揺れ・火花も同じ値を使う。 */
+    static float punchAge(JetForgeTimeline tl, int i) {
+        return tl.phase() == JetForgeBlockEntity.FOCUS ? (tl.focus() - i / 3F) * JetForgeBlockEntity.FOCUS_TICKS : -1;
+    }
+
+    /**
+     * ジェットがリングを突き抜けた瞬間: リングの内側いっぱいの白い閃光、外へ広がる2重の衝撃の輪、放射状に飛ぶ光の筋、
+     * 次のリング（最後は素材）へ軸を走る光の塊。後ろのリングほど強い。
+     */
+    private void punch(Frame f, VertexConsumer glow, Vec3 c, float R, int ring, float age, float flicker) {
+        float power = (0.8F + 0.2F * ring) * flicker;
+        Vec3 n = f.axis();
+        // 閃光: リングの内側を白く埋め、外へ少しにじむ（最初の 8 tick）
+        float flash = Math.max(0, 1 - age / 8F);
+        if (flash > 0) {
+            disc(f, glow, c, n, 0, R + 0.4F, 48, WHITE, (int) (255 * flash * power), (int) (180 * flash * power), 0);
+            disc(f, glow, c, n, R + 0.4F, R + 1.6F + 2.4F * (1 - flash), 48, 0xCFEFFF, (int) (170 * flash * power), 0, 0);
+        }
+        // 衝撃の輪: 白い速い輪と、遅れて広がる水色の輪
+        for (int k = 0; k < 2; k++) {
+            float t = (age - k * 3) / (k == 0 ? 16F : 22F);
+            if (t < 0 || t >= 1) {
+                continue;
+            }
+            float r = R + (k == 0 ? 9F : 6.5F) * (1 - (1 - t) * (1 - t));
+            float w = (k == 0 ? 0.45F : 0.7F) * (1 - 0.6F * t);
+            int rgb = k == 0 ? WHITE : CYAN;
+            float a = (1 - t) * power;
+            disc(f, glow, c, n, r - w, r, f.far() ? 32 : 72, rgb, 0, (int) (255 * a), 0);
+            disc(f, glow, c, n, r, r + w * 0.5F, f.far() ? 32 : 72, rgb, (int) (255 * a), 0, 0);
+        }
+        // 放射状の光の筋（12 tick。リングごとに向きを変える）
+        float streak = age / 12F;
+        if (!f.far() && streak < 1) {
+            Vec3[] b = basis(n);
+            RandomSource rnd = RandomSource.create(ring * 7919L + 17);
+            float len = 6.5F * (1 - (1 - streak) * (1 - streak));
+            for (int k = 0; k < 22; k++) {
+                float ang = (k + rnd.nextFloat() * 0.7F) * Mth.TWO_PI / 22;
+                float l = len * (0.55F + 0.45F * rnd.nextFloat());
+                Vec3 dir = b[0].scale(Mth.cos(ang)).add(b[1].scale(Mth.sin(ang)));
+                Vec3 from = c.add(dir.scale(R + 0.3F + l * 0.35F)).add(n.scale((rnd.nextFloat() - 0.5F) * 0.6F));
+                Vec3 to = c.add(dir.scale(R + 0.3F + l)).add(n.scale(l * 0.25F));
+                float a = (1 - streak) * power;
+                ribbonGlow(f, glow, from, to, 0.18F, 0.04F, 0xBFE8FF, CYAN, 0.6F * a, 0);
+                ribbonGlow(f, glow, from, to, 0.06F, 0.01F, WHITE, WHITE, a, 0);
+            }
+        }
+        // 軸を走る光の塊: 次のリング（最後のリングからは素材）へ 10 tick で届く
+        float run = age / 10F;
+        if (run < 1) {
+            float s1 = ring < 2 ? RING_S[ring + 1] : TARGET_S;
+            float s = Mth.lerp(run * run * (3 - 2 * run), RING_S[ring], s1);
+            Vec3 p = f.origin().add(n.scale(s));
+            float a = (1 - run * 0.7F) * power;
+            disc(f, glow, p, n, 0, 1.1F, 32, WHITE, (int) (255 * a), 0, 0);
+            disc(f, glow, p, n, 0, 2.2F, 32, CYAN, (int) (150 * a), 0, 0);
+            ribbonGlow(f, glow, p.subtract(n.scale(2.5F)), p, 0.05F, 0.9F, CYAN, WHITE, 0, a);
         }
     }
 

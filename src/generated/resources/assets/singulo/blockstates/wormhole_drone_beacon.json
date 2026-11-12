@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "singulo:block/wormhole_drone_beacon"
+    }
+  }
+}

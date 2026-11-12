@@ -1,0 +1,231 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/vacuum_jacketed_pipe_full",
+    "c": "singulo:block/vacuum_jacketed_pipe",
+    "g": "singulo:block/vacuum_jacketed_pipe_glass",
+    "f": "singulo:block/vacuum_jacketed_pipe_flange",
+    "r": "singulo:block/vacuum_jacketed_pipe_rim",
+    "j": "singulo:block/vacuum_jacketed_pipe_joint",
+    "item": "singulo:block/vacuum_jacketed_pipe_full"
+  },
+  "render_type": "minecraft:translucent",
+  "elements": [
+    {
+      "from": [
+        1,
+        4,
+        4
+      ],
+      "to": [
+        15,
+        12,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#item"
+        },
+        "south": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#item"
+        },
+        "up": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#item"
+        },
+        "down": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#item"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        3,
+        3
+      ],
+      "to": [
+        1,
+        13,
+        13
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#f"
+        },
+        "west": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#f"
+        },
+        "north": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r"
+        },
+        "south": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r"
+        },
+        "up": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r",
+          "rotation": 90
+        }
+      }
+    },
+    {
+      "from": [
+        15,
+        3,
+        3
+      ],
+      "to": [
+        16,
+        13,
+        13
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#f"
+        },
+        "west": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#f"
+        },
+        "north": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r"
+        },
+        "south": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r"
+        },
+        "up": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            3,
+            1,
+            13
+          ],
+          "texture": "#r",
+          "rotation": 90
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        45,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    }
+  }
+}

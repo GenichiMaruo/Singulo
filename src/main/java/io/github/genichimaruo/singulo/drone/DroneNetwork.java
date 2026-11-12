@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -27,8 +30,8 @@ public class DroneNetwork extends SavedData {
     /** 巡航の速さ（ブロック/tick）。見えない飛行の到着時刻もこれで決める。 */
     public static final double SPEED = 0.6;
 
-    /** 発着ポート（持ち主・名前）。 */
-    public record Port(@Nullable UUID owner, String name) {}
+    /** 発着ポート（持ち主・名前・液体用か）。物のポートと液体のポートは、それぞれ同じ種類のポートだけを行き先にする。 */
+    public record Port(@Nullable UUID owner, String name, boolean fluid) {}
 
     /** 便の段階: ポートへ荷物を取りに行く、荷物を届ける、ステーションへ帰る。 */
     public static final int PICKUP = 0, DELIVER = 1, RETURN = 2;
@@ -64,6 +67,25 @@ public class DroneNetwork extends SavedData {
         public boolean phase;
         /** 飛んでいるドローンの型（速さと、見えない飛行から出てくるときの姿）。 */
         public DroneKind kind = DroneKind.ROTOR;
+        /**
+         * ワームホール便の行き: 届ける先（to）はこちらの口で、口をくぐった先の次元（relayDim）と最終の行き先のポート（relayTo）。
+         * ドローンは口に入り、向こうの口から出て届ける（{@link DroneWormhole}）。ふつうの便は null。
+         */
+        @Nullable
+        public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> relayDim;
+        @Nullable
+        public BlockPos relayTo;
+        /**
+         * ワームホールをくぐって、ステーションのない次元に来ている便: ステーション（station）がある次元（homeDim）と、
+         * 帰りにくぐるこちらの口（homeGate）。帰る段階の目的地はこの口になる。家の次元にいる便は null。
+         */
+        @Nullable
+        public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> homeDim;
+        @Nullable
+        public BlockPos homeGate;
+        /** Original sending port in homeDim, retained so a failed remote delivery can return its cargo. */
+        @Nullable
+        public BlockPos homeFrom;
 
         Flight(long id, @Nullable BlockPos station, int unit) {
             this.id = id;
@@ -77,8 +99,13 @@ public class DroneNetwork extends SavedData {
             return switch (stage) {
                 case PICKUP -> from;
                 case DELIVER -> to;
-                default -> station;
+                default -> homeDim != null ? homeGate : station;
             };
+        }
+
+        /** ワームホールをくぐって別の次元に来ているか（帰りは口を通る）。 */
+        public boolean away() {
+            return homeDim != null;
         }
 
         /** 届ける区間の進み（0〜1。届ける段階でなければ 0）。 */
@@ -104,6 +131,64 @@ public class DroneNetwork extends SavedData {
     private final Map<Long, Port> ports = new LinkedHashMap<>();
     private final Map<Long, Flight> flights = new LinkedHashMap<>();
     /**
+     * ワームホールをくぐって別の次元へ出ている、この次元のステーションの枠（枠の鍵 → 行った先の次元）。便の記録は行った先の網が持つ。
+     * ステーションはこの印で、枠のドローンが飛んでいる（印刷し直さない）と分かる。帰ってくると消える。
+     */
+    private final Map<Long, ResourceKey<net.minecraft.world.level.Level>> away = new LinkedHashMap<>();
+
+    /** station の unit のドローンが、ワームホールをくぐって dim へ出た。 */
+    public void markAway(BlockPos station, int unit, ResourceKey<net.minecraft.world.level.Level> dim) {
+        away.put(unitKey(station, unit), dim);
+        setDirty();
+    }
+
+    /** station の unit のドローンが別の次元へ出ているか。 */
+    public boolean isAway(BlockPos station, int unit) {
+        return away.containsKey(unitKey(station, unit));
+    }
+
+    /** station の unit のドローンが出ている先の次元（出ていなければ null）。 */
+    @Nullable
+    public ResourceKey<net.minecraft.world.level.Level> awayDim(BlockPos station, int unit) {
+        return away.get(unitKey(station, unit));
+    }
+
+    /** home の次元の station の unit から、この次元へ来ている便（なければ null）。 */
+    @Nullable
+    public Flight visitor(ResourceKey<net.minecraft.world.level.Level> home, BlockPos station, int unit) {
+        for (Flight f : flights.values()) {
+            if (home.equals(f.homeDim) && f.unit == unit && station.equals(f.station)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    /** 別の次元へ出ていた印を消す（帰ってきた・ステーションが壊された）。印があったら true。 */
+    public boolean clearAway(BlockPos station, int unit) {
+        if (away.remove(unitKey(station, unit)) != null) {
+            setDirty();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 別の次元から口をくぐって来た便を、この網の便として新しく載せる（番号はこの網で振り直す）。持ち主・型・壁抜け・荷物は写す。
+     * 段階・場所・ワームホールの行き先は呼ぶ側で決める。
+     */
+    public Flight adopt(Flight src) {
+        Flight f = new Flight(nextId++, src.station, src.unit);
+        f.owner = src.owner;
+        f.crate = src.crate;
+        f.phase = src.phase;
+        f.kind = src.kind;
+        flights.put(f.id, f);
+        forgetIndex();
+        setDirty();
+        return f;
+    }
+    /**
      * 便を探す手間を減らす控え（便を足す・消すたびに作り直す）: 便の一覧の写しと、ステーションの枠ごとの便。
      * ステーションが壊されて便の station が null になっても、控えから引いたあとで確かめるので、取り違えない。
      */
@@ -125,14 +210,35 @@ public class DroneNetwork extends SavedData {
     private static final UUID NO_OWNER = new UUID(0, 0);
     private long nextId = 1;
 
+    /** この網の次元（見えない飛行の道のりで、ワームホールの近道を調べるため。保存しない）。 */
+    @Nullable
+    private ServerLevel level;
+
     public static DroneNetwork get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(DroneNetwork::new, DroneNetwork::load, null), NAME);
+        DroneNetwork net = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(DroneNetwork::new, DroneNetwork::load, null), NAME);
+        net.level = level;
+        return net;
+    }
+
+    /** 見えない飛行の道のり（同じ次元のワームホールの近道を使うほうが近ければ、その道のり）。 */
+    private double travel(Vec3 from, Vec3 to) {
+        return level == null ? from.distanceTo(to) : DroneWormhole.distance(level, from, to);
     }
 
     // ------------------------------------------------------------------ ポート
 
+    /** 物の発着ポートとして載せる（0.16.0 までの呼び方）。 */
     public void putPort(BlockPos pos, @Nullable UUID owner, String name) {
-        Port next = new Port(owner, name);
+        putPort(pos, owner, name, false);
+    }
+
+    /** owner の物の発着ポート（0.16.0 までの呼び方）。 */
+    public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from) {
+        return portsOf(owner, from, false);
+    }
+
+    public void putPort(BlockPos pos, @Nullable UUID owner, String name, boolean fluid) {
+        Port next = new Port(owner, name, fluid);
         if (!next.equals(ports.put(pos.asLong(), next))) {
             setDirty();
         }
@@ -149,12 +255,12 @@ public class DroneNetwork extends SavedData {
         return ports.get(pos.asLong());
     }
 
-    /** owner の発着ポート（from 自身を除く。近い順）。 */
-    public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from) {
+    /** owner の発着ポートのうち、物か液体か（fluid）が同じもの（from 自身を除く。近い順）。 */
+    public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from, boolean fluid) {
         List<BlockPos> out = new ArrayList<>();
         for (var e : ports.entrySet()) {
             BlockPos p = BlockPos.of(e.getKey());
-            if (!p.equals(from) && java.util.Objects.equals(owner, e.getValue().owner())) {
+            if (!p.equals(from) && e.getValue().fluid() == fluid && java.util.Objects.equals(owner, e.getValue().owner())) {
                 out.add(p);
             }
         }
@@ -187,14 +293,14 @@ public class DroneNetwork extends SavedData {
         if (byUnit == null) {
             Map<Long, Flight> index = new java.util.HashMap<>();
             for (Flight f : flights.values()) {
-                if (f.station != null) {
+                if (f.station != null && !f.away()) {
                     index.put(unitKey(f.station, f.unit), f);
                 }
             }
             byUnit = index;
         }
         Flight f = byUnit.get(unitKey(station, unit));
-        return f != null && f.unit == unit && station.equals(f.station) ? f : null;
+        return f != null && !f.away() && f.unit == unit && station.equals(f.station) ? f : null;
     }
 
     private static long unitKey(BlockPos station, int unit) {
@@ -241,7 +347,11 @@ public class DroneNetwork extends SavedData {
             if (f.to != null && !f.to.equals(f.from)) {
                 ports.computeIfAbsent(f.to.asLong(), k -> new ArrayList<>()).add(f);
             }
-            if (f.stage == RETURN) {
+            if (f.homeGate != null && !f.homeGate.equals(f.from) && !f.homeGate.equals(f.to)) {
+                ports.computeIfAbsent(f.homeGate.asLong(), k -> new ArrayList<>()).add(f);   // 帰りにくぐる口
+            }
+            // 別の次元から来ている便は、こちらの仕事に回さない（家のステーションへ帰す）
+            if (f.stage == RETURN && f.homeDim == null) {
                 returning.computeIfAbsent(f.owner == null ? NO_OWNER : f.owner, k -> new ArrayList<>()).add(f);
             }
         }
@@ -292,7 +402,7 @@ public class DroneNetwork extends SavedData {
         f.docked = false;
         f.last = at;
         BlockPos t = f.target();
-        double d = t == null ? 0 : Math.sqrt(at.distanceToSqr(Vec3.atCenterOf(t)));
+        double d = t == null ? 0 : travel(at, Vec3.atCenterOf(t));
         f.arriveAt = now + (long) Math.ceil(d / (SPEED * f.kind.speed)) + 20;
         setDirty();
     }
@@ -304,14 +414,14 @@ public class DroneNetwork extends SavedData {
         f.virtualAt = now;
         f.last = at;
         BlockPos t = f.target();
-        double d = t == null ? 0 : Math.sqrt(at.distanceToSqr(Vec3.atCenterOf(t)));
+        double d = t == null ? 0 : travel(at, Vec3.atCenterOf(t));
         f.arriveAt = now + (long) Math.ceil(d / (SPEED * f.kind.speed)) + 20;
         setDirty();
     }
 
     /** 便を次の段階へ。帰る先のステーションがなくなっていれば、帰らずに記録を消す（ドローンの実体も消える）。 */
     public void advance(Flight f, int stage, long now) {
-        if (stage == RETURN && f.station == null) {
+        if (stage == RETURN && f.station == null && !(f.away() && !f.crate.isEmpty())) {
             remove(f);
         } else if (f.virtual) {
             advanceVirtual(f, stage, now);
@@ -330,6 +440,8 @@ public class DroneNetwork extends SavedData {
         f.stage = PICKUP;
         f.progress = 0;
         f.docked = false;
+        f.relayDim = null;                                // 前の便のワームホールの行き先を持ち越さない
+        f.relayTo = null;
         setDirty();
     }
 
@@ -346,7 +458,7 @@ public class DroneNetwork extends SavedData {
             f.last = Vec3.atCenterOf(was);
         }
         BlockPos t = f.target();
-        double d = t == null || was == null ? 0 : Math.sqrt(was.distSqr(t));
+        double d = t == null || was == null ? 0 : travel(Vec3.atCenterOf(was), Vec3.atCenterOf(t));
         f.arriveAt = now + (long) Math.ceil(d / (SPEED * f.kind.speed)) + 20;
         setDirty();
     }
@@ -363,6 +475,7 @@ public class DroneNetwork extends SavedData {
                 p.putUUID("owner", e.getValue().owner());
             }
             p.putString("name", e.getValue().name());
+            p.putBoolean("fluid", e.getValue().fluid());
             list.add(p);
         }
         tag.put("ports", list);
@@ -396,9 +509,26 @@ public class DroneNetwork extends SavedData {
             t.putInt("kind", f.kind.ordinal());
             t.putFloat("virtual_from", f.virtualFrom);
             t.putLong("virtual_at", f.virtualAt);
+            if (f.relayDim != null && f.relayTo != null) {
+                t.putString("relay_dim", f.relayDim.location().toString());
+                t.put("relay_to", NbtUtils.writeBlockPos(f.relayTo));
+            }
+            if (f.homeDim != null && f.homeGate != null) {
+                t.putString("home_dim", f.homeDim.location().toString());
+                t.put("home_gate", NbtUtils.writeBlockPos(f.homeGate));
+                if (f.homeFrom != null) t.put("home_from", NbtUtils.writeBlockPos(f.homeFrom));
+            }
             fl.add(t);
         }
         tag.put("flights", fl);
+        ListTag al = new ListTag();
+        for (var e : away.entrySet()) {
+            CompoundTag t = new CompoundTag();
+            t.putLong("unit", e.getKey());
+            t.putString("dim", e.getValue().location().toString());
+            al.add(t);
+        }
+        tag.put("away", al);
         tag.putLong("next_id", nextId);
         return tag;
     }
@@ -407,7 +537,7 @@ public class DroneNetwork extends SavedData {
         DroneNetwork net = new DroneNetwork();
         for (Tag t : tag.getList("ports", Tag.TAG_COMPOUND)) {
             CompoundTag p = (CompoundTag) t;
-            net.ports.put(p.getLong("pos"), new Port(p.hasUUID("owner") ? p.getUUID("owner") : null, p.getString("name")));
+            net.ports.put(p.getLong("pos"), new Port(p.hasUUID("owner") ? p.getUUID("owner") : null, p.getString("name"), p.getBoolean("fluid")));
         }
         for (Tag t : tag.getList("flights", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
@@ -426,8 +556,26 @@ public class DroneNetwork extends SavedData {
             f.kind = DroneKind.byId(c.getInt("kind"));
             f.virtualFrom = c.getFloat("virtual_from");
             f.virtualAt = c.getLong("virtual_at");
+            if (c.contains("relay_dim")) {
+                var loc = ResourceLocation.tryParse(c.getString("relay_dim"));
+                f.relayDim = loc == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
+                f.relayTo = NbtUtils.readBlockPos(c, "relay_to").orElse(null);
+            }
+            if (c.contains("home_dim")) {
+                var loc = ResourceLocation.tryParse(c.getString("home_dim"));
+                f.homeGate = NbtUtils.readBlockPos(c, "home_gate").orElse(null);
+                f.homeFrom = NbtUtils.readBlockPos(c, "home_from").orElse(null);
+                f.homeDim = loc == null || f.homeGate == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
+            }
             net.flights.put(f.id, f);
             net.forgetIndex();
+        }
+        for (Tag t : tag.getList("away", Tag.TAG_COMPOUND)) {
+            CompoundTag c = (CompoundTag) t;
+            var loc = ResourceLocation.tryParse(c.getString("dim"));
+            if (loc != null) {
+                net.away.put(c.getLong("unit"), ResourceKey.create(Registries.DIMENSION, loc));
+            }
         }
         net.nextId = Math.max(tag.getLong("next_id"), 1);
         for (long id : net.flights.keySet()) {

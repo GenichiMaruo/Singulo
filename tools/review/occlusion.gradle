@@ -1,5 +1,7 @@
 allprojects {
  afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
   sourceSets.main.java.srcDir(file('tools/review/occlusion-src'))
   neoForge.runs.client {
    gameDirectory = file('build/occlusion-review')

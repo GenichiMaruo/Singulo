@@ -38,6 +38,7 @@ public final class SinguloClient {
         modBus.addListener(JetForgeRenderTypes::registerShaders);
         modBus.addListener(GlowDepth::registerShaders);
         modBus.addListener(JetForgeRenderer::registerModels);
+        modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
@@ -131,6 +132,8 @@ public final class SinguloClient {
                 AcceleratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(),
                 CableRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_PIPE.get(),
+                FluidPipeRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.RAYLEIGH_PANEL.get(),
                 RayleighPanelRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.KERAUNOS_TOWER.get(),
@@ -143,6 +146,10 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.CARGO_DRONE.get(), CargoDroneRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DRONE_PORT.get(),
                 DronePortRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_DRONE_PORT.get(),
+                DronePortRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.HORIZON_VAULT.get(),
+                HorizonVaultRenderer::new);
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
         event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
         event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
@@ -307,6 +314,10 @@ public final class SinguloClient {
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
     private static void addPacks(net.neoforged.neoforge.event.AddPackFindersEvent event) {
+        var modFile = net.neoforged.fml.ModList.get().getModFileById(Singulo.MODID).getFile();
+        if (!java.nio.file.Files.isRegularFile(modFile.findResource("resourcepacks/singulo_hd/pack.mcmeta"))) {
+            return;
+        }
         event.addPackFinders(Singulo.id("resourcepacks/singulo_hd"), net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.singulo.hd"), net.minecraft.server.packs.repository.PackSource.BUILT_IN, false,
                 net.minecraft.server.packs.repository.Pack.Position.TOP);
@@ -390,6 +401,14 @@ public final class SinguloClient {
     }
 
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
+        // 液体カプセル: 立体の殻の中に、詰めた液体を描く
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return FluidCapsuleRenderer.get();
+            }
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CAPSULE.get(), io.github.genichimaruo.singulo.registry.SinguloItems.BATTERY_FLUID_CAPSULE.get(),
+                io.github.genichimaruo.singulo.registry.SinguloItems.LARGE_BATTERY_FLUID_CAPSULE.get());
         // 傘を手に持つ間は、腕を上げて柄を握る構えにする（ほかの人から見て、手で持って見えるように）
         event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
             @Override

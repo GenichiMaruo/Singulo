@@ -44,8 +44,33 @@ base {
     archivesName = mod_name
 }
 
+// Keep the normal source-set outputs intact for IDE runs and GameTests.
+def compactFiles = ['**/*.class', '**/*.png', '**/*.json', '**/*.mcmeta']
+def distributionDir = layout.buildDirectory.dir('distribution/compact')
+def prepareDistribution = tasks.register('prepareDistribution', Sync) {
+    from(sourceSets.main.output) {
+        include compactFiles
+        exclude 'resourcepacks/singulo_hd/**'
+    }
+    into distributionDir
+    doLast {
+        destinationDir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+            singulo.packaging.DistributionFiles.compact(file.toPath())
+        }
+    }
+}
+
 tasks.named('jar', Jar) {
     archiveFileName = "${mod_name}-${mod_version}-${minecraft_version}${mod_loader_suffix}.jar"
+    includeEmptyDirs = false
+    exclude 'resourcepacks/singulo_hd/**'
+    from(prepareDistribution)
+    def mainDirs = sourceSets.main.output.files
+    filesMatching(compactFiles) { entry ->
+        if (mainDirs.any { dir -> entry.file.toPath().startsWith(dir.toPath()) }) {
+            entry.exclude()
+        }
+    }
 }
 
 // Minecraft 1.21.1 ships Java 21, so compile and run with a Java 21 toolchain.

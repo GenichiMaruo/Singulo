@@ -1,6 +1,8 @@
 // Development-only runtime and visual harness for 0.11.0; never part of ordinary build or release JARs.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/v011-src'))
         sourceSets.main.java.srcDir(file('tools/review/runtime-src'))
         neoForge.runs.client {

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PWP",
+    "LLL",
+    "PWP"
+  ],
+  "key": {
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "L": {
+      "item": "singulo:fluid_pipe"
+    }
+  },
+  "result": {
+    "id": "singulo:vacuum_jacketed_pipe",
+    "count": 3
+  }
+}

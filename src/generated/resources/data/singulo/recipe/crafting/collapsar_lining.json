@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NPN",
+    "PCP",
+    "NPN"
+  ],
+  "key": {
+    "N": {
+      "item": "singulo:nihonium_plate"
+    },
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "C": {
+      "item": "singulo:collapsar_ingot"
+    }
+  },
+  "result": {
+    "id": "singulo:collapsar_lining",
+    "count": 4
+  }
+}

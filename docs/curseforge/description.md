@@ -70,6 +70,7 @@ Bring them home, decode and restore them to reach the next stage.
 | Observation Post | Observation logs and control units for superconductor and muon technology |
 | Research Building | Quantum data and cold atom traps |
 | Culture Facility | Culture data and time crystal seeds |
+| Underground Android Laboratory (1.21.1) | Tune the compass at the Research Building to find the main shaft. The Foundry Overseer guards precision actuators and android kits |
 | Final Lab | Anomaly samples and the dormant singularity seed |
 | Sunken Reactor Sector | Exotic matter, jet condensate and H-Condensate from a dead second reactor |
 
@@ -79,7 +80,7 @@ In its later phases it sends your projectiles back at you.
 Deepest of all, the **Ergosphere Leviathan** swims around the dead core of the Sunken Reactor Sector:
 a long serpent of reactor plates that dives through the chamber, drags you along its wake and breathes a vortex beam.
 When it coils around the core to reignite it, only the shadow of a containment pillar will save you.
-After the endgame, every boss can be refought in an awakened form with more health, harder hits and faster moves:
+After the endgame, the ruin guardians can be refought in an awakened form with more health, harder hits and faster moves:
 use an Awakening Record Core on the Final Lab's seal console, or an awakened core on the guardian core of the other ruins.
 Awakened guardians drop chapters of records... and someone is still waiting to be read.
 
@@ -92,11 +93,11 @@ Decoded records add the story of the lost civilization to your handbook.
 
 Ruin fabricators print androids that fight with an arm blade, a light whip or a saber, each with its own moves, warnings and openings.
 They run on charge: when it runs out they head back to their fabricator, unfold a solar panel or sit down to recharge.
-Defeat a fabricator's androids to recover a compact crystal memory of their design, then print your own guard android in an Android Assembly Station.
-Choose how it guards (stay, wander or follow you), give it a name, self-repair kits and an enchantable armor plate, recharge it on the go with a wireless charger,
+Defeat a fabricator's entire wave for a chance to recover its compact crystal memory, then use the memory to print your own guard in an Android Assembly Station.
+Choose how it guards, give it a name, self-repair kits and an enchantable armor plate, recharge it on the go with a wireless charger,
 and keep it out of (or let it through) places with android barrier and gate glass.
 
-On the 1.21.1 branch, androids can also take crafting, processing and mining orders from an **Android Work Console**.
+On the 1.21.1 branch, guards can patrol a route and take crafting, processing and mining orders from an **Android Work Console**.
 Record recipes and procedures, keep items in stock or trigger orders with redstone, and let them farm, tend animals and operate blocks.
 Upgrades add battery capacity, inventory space and fluid tanks; head, back/waist and hand decorations can be dyed.
 
@@ -141,7 +142,7 @@ JEI is optional and supported on both versions.
 Multiplayer servers and clients both need the mod.
 Recipes and many values can be changed in the server config.
 
-A **Singulo HD** resource pack with 32×32 textures is included.
+The 1.21.1 version uses 16×16 textures by default.
 
 ## Languages
 

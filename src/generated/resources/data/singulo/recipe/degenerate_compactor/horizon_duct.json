@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "degenerate_compactor",
+  "stage": 5,
+  "time": 400,
+  "energy": 50000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superfluid_conduit"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:nihonium_plate"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:horizon_duct",
+    "count": 8
+  }
+}

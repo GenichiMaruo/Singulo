@@ -1,0 +1,66 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/fluid_pipe_full",
+    "c": "singulo:block/fluid_pipe",
+    "g": "singulo:block/fluid_pipe_glass",
+    "f": "singulo:block/fluid_pipe_flange",
+    "r": "singulo:block/fluid_pipe_rim",
+    "j": "singulo:block/fluid_pipe_joint"
+  },
+  "render_type": "minecraft:translucent",
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        1
+      ],
+      "to": [
+        11,
+        11,
+        4
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#g"
+        },
+        "west": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#g"
+        },
+        "up": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#g",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            1,
+            5,
+            4,
+            11
+          ],
+          "texture": "#g",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 // Development-only export of effective recipes and actual blueprint block counts.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/balance-src'))
         neoForge.runs.gameTestServer {
             systemProperty 'singulo.balanceOutput', file('build/balance/runtime.json').absolutePath

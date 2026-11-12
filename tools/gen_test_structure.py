@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""GameTest 用の空の構造物（src/main/resources/data/singulo/structure/*.nbt）を書き出す。"""
+"""GameTest 用の空の構造物を src/gameTest/resources に書き出す。"""
 import gzip
 import struct
 from pathlib import Path
 
-OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "main" / "resources" / "data" / "singulo" / "structure"
+OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "gameTest" / "resources" / "data" / "singulo" / "structure"
 # 名前 → (幅, 高さ, 奥行き)
 TEMPLATES = {"empty": (8, 8, 8), "tall": (5, 13, 5), "large": (9, 11, 9), "huge": (15, 15, 15),
              # 降着ジェット鍛造炉（44×16×15）を建てる
@@ -54,7 +54,8 @@ def main():
         write(template, *size)
     # 分けて実行する群も同じ空テンプレートを使う。寸法変更時に複製を取り残さない。
     for namespace, templates in {'singulo_mekanism': ('empty',), 'singulo_prototype': ('empty', 'huge'),
-                                 'singulo_progression': ('empty',), 'singulo_rayleigh': ('empty',), 'singulo_panel_review': ('empty',), 'singulo_cable': ('empty', 'tall', 'huge')}.items():
+                                 'singulo_progression': ('empty',), 'singulo_rayleigh': ('empty',), 'singulo_panel_review': ('empty',), 'singulo_cable': ('empty', 'tall', 'huge'),
+                                 'singulo_gunner': ('empty', 'huge'), 'singulo_scaling': ('empty',)}.items():
         target = OUT_DIR.parent.parent / namespace / 'structure'
         target.mkdir(parents=True, exist_ok=True)
         for template in templates:

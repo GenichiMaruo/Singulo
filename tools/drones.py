@@ -16,6 +16,8 @@ ORANGE = (240, 160, 64)
 ORANGE_HI = (255, 214, 140)
 ORANGE_LO = (120, 74, 36)
 CYAN = (120, 225, 255)
+# 液体のドローン発着ポートの縞としずくの色
+FLUID_BLUE = (72, 150, 240)
 ANIM_FRAMES = 8
 CRATES = ('packing_crate', 'battery_packing_crate', 'large_battery_packing_crate')
 
@@ -39,6 +41,14 @@ def front(iid, stage, on, blink=False):
             px(cx, cy, c)
             if on:
                 px(cx - 1 if cx < 8 else cx + 1, cy, mix(c, glass, 0.5))
+    elif iid == 'fluid_drone_port':
+        # 単眼の下に、小さなしずくの印（液体のポート）
+        c = mix(FLUID_BLUE, glass, 0.25 if on else 0.65)
+        px(7, 9, mix(c, glass, 0.4))
+        d.rectangle([7, 10, 8, 10], fill=rgba(c))
+        px(8, 9, c)
+        px(6, 10, mix(c, glass, 0.6))
+        px(9, 10, mix(c, glass, 0.6))
     else:
         # 単眼の下に、小さな箱の印
         c = mix(ORANGE, glass, 0.3 if on else 0.7)
@@ -88,8 +98,9 @@ def station_top(k):
     return im
 
 
-def port_top():
-    """発着ポートの上面: 開口部（2〜13）のまわりの縁に、橙と黒の斜めの縞。外側は白い外装。"""
+def port_top(stripe_color=None):
+    """発着ポートの上面: 開口部（2〜13）のまわりの縁に、橙と黒の斜めの縞（液体のポートは青と黒）。外側は白い外装。"""
+    stripe_color = stripe_color or ORANGE
     im, d = new(fill=(228, 232, 236, 255))
     d.rectangle([0, 0, S - 1, S - 1], outline=(196, 202, 210, 255))
     for y in range(S):
@@ -99,7 +110,7 @@ def port_top():
             if x in (0, S - 1) or y in (0, S - 1):
                 continue
             stripe = (x + y) % 4 < 2
-            d.point((x, y), fill=rgba(ORANGE if stripe else (40, 42, 48)))
+            d.point((x, y), fill=rgba(stripe_color if stripe else (40, 42, 48)))
     return im
 
 
@@ -552,6 +563,7 @@ def textures(tb, ti, save, write_json):
     save(art16_sheet([station_top(k) for k in range(ANIM_FRAMES)]), tb / 'drone_station_top.png')
     write_json(tb / 'drone_station_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
     save(port_top(), tb / 'drone_port_top.png')
+    save(port_top(FLUID_BLUE), tb / 'fluid_drone_port_top.png')
     save(hatch(), tb / 'drone_port_hatch.png')
     save(platform(), tb / 'drone_port_platform.png')
     for iid, (crystal, mark) in MEMORY_KINDS.items():
