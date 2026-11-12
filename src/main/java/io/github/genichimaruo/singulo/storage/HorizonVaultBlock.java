@@ -32,11 +32,13 @@ import net.minecraft.world.phys.BlockHitResult;
 /** 事象の地平線倉庫のブロック。正面（個数を出す台の向き）は置いた人のほう。使い方は {@link HorizonVaultBlockEntity}。 */
 public class HorizonVaultBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    /** 下に倉庫があるか（積んだ倉庫は下の金の板をなくして、下の倉庫とつながった形になる）。 */
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty DOWN = BlockStateProperties.DOWN;
     private static final MapCodec<HorizonVaultBlock> CODEC = simpleCodec(HorizonVaultBlock::new);
 
     public HorizonVaultBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(DOWN, false));
     }
 
     @Override
@@ -46,12 +48,19 @@ public class HorizonVaultBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, DOWN);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite())
+                .setValue(DOWN, context.getLevel().getBlockState(context.getClickedPos().below()).is(this));
+    }
+
+    @Override
+    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
+                                     BlockPos pos, BlockPos neighborPos) {
+        return dir == Direction.DOWN ? state.setValue(DOWN, neighbor.is(this)) : state;
     }
 
     @Override
