@@ -78,6 +78,12 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     /** Release runtime references when this level closes. */
     public static void forgetLevel(Level level) { LOADED.remove(level); }
 
+    /** 読み込まれている口（写さない。飛び道具が毎 tick 調べる。調べている間に口を増減させないこと）。 */
+    static Set<WormholeMouthBlockEntity> loadedView(Level level) {
+        Set<WormholeMouthBlockEntity> set = LOADED.get(level);
+        return set == null ? Set.of() : set;
+    }
+
     /** 読み込まれている口（ドローンのワームホール便が、行き先を探すのに使う）。 */
     public static java.util.List<WormholeMouthBlockEntity> loaded(Level level) {
         Set<WormholeMouthBlockEntity> set = LOADED.get(level);
@@ -453,7 +459,8 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         double radius = 2 + size;
         for (Entity e : level.getEntities((Entity) null, new AABB(c, c).inflate(radius),
                 e -> !e.isSpectator() && !(e instanceof Player p && p.isCreative()))) {
-            if (traversable && e instanceof Player) continue;
+            // 縫い開いた口は、通り抜ける人と飛び道具を喉へ引かない（狙ったとおりに開口部へ入り、向こうからまっすぐ出る）
+            if (traversable && (e instanceof Player || e instanceof net.minecraft.world.entity.projectile.Projectile)) continue;
             Vec3 to = c.subtract(e.position().add(0, e.getBbHeight() / 2, 0));
             double d = to.length();
             if (d > 0.3 && d <= radius) {

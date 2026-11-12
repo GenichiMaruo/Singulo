@@ -7,10 +7,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * 縫い開いた口の通行（サーバーだけ。チャンクを読み込ませない）。ネザーポータルと同じく、入った口の中の位置を保ったまま向こうの口の
@@ -83,6 +89,65 @@ public final class WormholeTransit {
             return new Arrival(at,player.getYRot()+90*turns,rotate(player.getDeltaMovement(),turns));
         Vec3 exit=findSafeExit(to,target,player);
         return exit==null?null:new Arrival(exit,b.toYRot(),Vec3.ZERO);
+    }
+
+    /**
+     * 口をくぐる飛び道具（矢・トライデント・投げた物・火の玉、ほかの MOD の弾も {@link Projectile} なら同じ）。動く前に、この tick の
+     * 動きが縫い開いた口の開口部の面を横切るなら、向こうの口の同じ位置へ、向きと勢いを回して移す（人と同じ写し方。待ち時間はない）。
+     * 開口部まで何かに当たるときは移さない。向こうの口が読み込まれていなければ、ネザーポータルと同じくその場で読み込ませる。
+     */
+    public static void onEntityTick(EntityTickEvent.Pre event){
+        if(!(event.getEntity() instanceof Projectile shot)||!(shot.level() instanceof ServerLevel level)||shot.isRemoved()||shot.isPassenger())return;
+        Vec3 v=shot.getDeltaMovement();
+        if(v.lengthSqr()<1.0E-6)return;
+        var mouths=WormholeMouthBlockEntity.loadedView(level);
+        if(mouths.isEmpty())return;
+        Vec3 from=shot.position().add(0,shot.getBbHeight()/2,0),to=from.add(v);
+        double reach=v.length()+3;
+        WormholeMouthBlockEntity hit=null;double best=2;
+        for(WormholeMouthBlockEntity m:mouths){
+            if(m.isRemoved()||!m.traversable()||m.size()<=0||center(m).distanceToSqr(from)>reach*reach)continue;
+            double t=crossing(m,from,to);
+            if(t>=0&&t<best){best=t;hit=m;}
+        }
+        if(hit==null)return;
+        Vec3 at=from.add(v.scale(best));
+        if(level.clip(new ClipContext(from,at,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,shot)).getType()!=HitResult.Type.MISS)return;
+        WormholeMouthBlockEntity other=hit.partner();
+        if(other==null){
+            var far=hit.partnerPos();
+            ServerLevel farLevel=far==null?null:level.getServer().getLevel(far.dimension());
+            if(farLevel==null)return;
+            io.github.genichimaruo.singulo.drone.DroneWormhole.wake(farLevel,far.pos());
+            farLevel.getChunk(far.pos());
+            other=hit.partner();
+        }
+        if(other==null||!other.traversable()||!other.open()||other.partner()!=hit||!(other.getLevel() instanceof ServerLevel target))return;
+        Direction a=facing(hit);
+        int turns=quarterTurns(a,facing(other).getOpposite());
+        Vec3 rel=at.subtract(center(hit));
+        double across=rel.x*a.getStepX()+rel.z*a.getStepZ();
+        rel=rel.subtract(a.getStepX()*across,0,a.getStepZ()*across);
+        Vec3 motion=rotate(v,turns);
+        // 向こうの開口部の面の少し先（出ていく向き）に、体の中ほどを合わせて置く
+        Vec3 out=center(other).add(rotate(rel,turns)).add(motion.normalize().scale(0.05)).subtract(0,shot.getBbHeight()/2,0);
+        float yRot=(float)(Mth.atan2(motion.x,motion.z)*(180F/Math.PI));
+        shot.changeDimension(new DimensionTransition(target,out,motion,yRot,shot.getXRot(),DimensionTransition.PLACE_PORTAL_TICKET));
+        event.setCanceled(true);
+    }
+
+    /** from から to への動きが口の開口部の面を横切るなら、横切る割合（0〜1）。横切らなければ -1。 */
+    static double crossing(WormholeMouthBlockEntity mouth,Vec3 from,Vec3 to){
+        Direction n=facing(mouth);
+        Vec3 c=center(mouth);
+        double s0=(from.x-c.x)*n.getStepX()+(from.z-c.z)*n.getStepZ();
+        double s1=(to.x-c.x)*n.getStepX()+(to.z-c.z)*n.getStepZ();
+        if(s0==0||(s0>0)==(s1>0)&&s1!=0)return -1;
+        double t=s0/(s0-s1);
+        Vec3 q=from.add(to.subtract(from).scale(t)).subtract(c);
+        Direction side=n.getClockWise();
+        double lateral=q.x*side.getStepX()+q.z*side.getStepZ();
+        return Math.abs(lateral)<=1.35&&Math.abs(q.y)<=1.45?t:-1;
     }
 
     private static Direction facing(WormholeMouthBlockEntity mouth){

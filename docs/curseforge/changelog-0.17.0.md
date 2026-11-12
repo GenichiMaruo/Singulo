@@ -17,6 +17,7 @@
 - The Relocation Wrench in cable mode now also takes back Fluid Pipes, one at a time or a whole joined run of one tier.
 - A broken Fluid Drone Port keeps the fluid in both tanks in its item and restores it when placed.
 - Walking through a seamed wormhole now works like a Nether portal: you come out at the same spot in the far opening with your facing and momentum turned to match, instead of being placed in front of the far mouth. You are not sent back until you step out of the opening.
+- Arrows, tridents, thrown items and other projectiles now pass through a seamed wormhole like a Nether portal, coming out of the same spot in the far opening with their direction turned to match.
 - A route made only of Fluid Pipes carries up to 2,000 mB per tick. Before this version each port moved 4,000 mB per 5 ticks with no shared limit. Upgrade busy trunks to a higher tier.
 
 ## Fixes
@@ -40,6 +41,7 @@
 - 移設レンチの撤去モードで、液体パイプも1本ずつ、またはつながった同じ段階をまとめて回収できるようになりました。
 - 液体ドローン発着ポートを壊すと、2つのタンクの液体をアイテムに残し、置き直すと戻ります。
 - 縫い開いたワームホールを歩いて通ると、ネザーポータルと同じく、向こうの開口部の同じ位置に、体の向きと勢いを合わせて出るようになりました。これまでは向こうの口の前に置かれていました。開口部からいったん出るまでは戻されません。
+- 矢・トライデント・投げた物などの飛び道具も、縫い開いたワームホールをネザーポータルと同じようにくぐり、向こうの開口部の同じ位置から向きを合わせて飛び出すようになりました。
 - 液体パイプだけの経路で運べるのは 1 tick に 2,000 mB までになりました。これまでは口ごとに 5 tick に 4,000 mB を、全体の上限なしで運んでいました。多く流す幹は上の段階に替えてください。
 
 ## 修正

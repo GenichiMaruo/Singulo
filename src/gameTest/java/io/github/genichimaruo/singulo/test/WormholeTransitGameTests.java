@@ -127,6 +127,32 @@ public final class WormholeTransitGameTests {
             h.succeed();
         });
     }
+    /** 口へ撃った矢は、人と同じ写し方で向こうの口から出て飛び続ける（向きの違う口では勢いが回る）。 */
+    @GameTest(template="forge",timeoutTicks=80)
+    public static void wormholeCarriesArrowsToTheOtherMouth(GameTestHelper h){
+        long pair=h.getLevel().random.nextLong();
+        var a=mouth(h,A,pair,true);
+        h.setBlock(B,SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,Direction.EAST));
+        WormholeMouthBlockEntity b=h.getBlockEntity(B);b.setData(new WormholeData(pair,0));
+        var tag=b.saveWithoutMetadata(h.getLevel().registryAccess());tag.putBoolean("traversable",true);tag.putInt("grace",6000);tag.putInt("size",1);b.loadWithComponents(tag,h.getLevel().registryAccess());
+        for(BlockPos m:new BlockPos[]{A,B})for(int dx=-3;dx<=3;dx++)for(int dz=-3;dz<=3;dz++)for(int y=1;y<=4;y++)h.setBlock(m.offset(dx,y,dz),Blocks.AIR);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());
+        h.runAtTickTime(5,()->{
+            h.assertTrue(a.partner()==b&&b.partner()==a,"Pair fixture not linked");
+            // こちらの口の中心から東へ1、南の前2.5から北（口の中）へ飛ぶ
+            Vec3 c=WormholeTransit.center(a);
+            arrow.setNoGravity(true);
+            arrow.setPos(c.x+1,c.y-arrow.getBbHeight()/2,c.z+2.5);arrow.setDeltaMovement(0,0,-1);
+            h.getLevel().addFreshEntity(arrow);
+        });
+        h.succeedWhen(()->{
+            Vec3 c=WormholeTransit.center(b);
+            // 東向きの口: 東へ1のずれは南へ1、北への勢いは東へ
+            h.assertTrue(arrow.isAlive()&&arrow.level()==h.getLevel(),"Arrow vanished");
+            h.assertTrue(arrow.getX()>c.x&&arrow.getX()<c.x+4&&Math.abs(arrow.getZ()-(c.z+1))<0.05,"Arrow not at the far mouth: "+arrow.position()+" centre "+c);
+            h.assertTrue(arrow.getDeltaMovement().x>0.9&&Math.abs(arrow.getDeltaMovement().z)<1e-6,"Arrow momentum not rotated: "+arrow.getDeltaMovement());
+        });
+    }
     /** 向こうの口が読み込まれていないとき、開口部に入った人がいれば、ネザーポータルと同じく向こうを読み込ませる。 */
     @GameTest(template="forge",timeoutTicks=400)
     public static void wormholeTransitLoadsTheUnloadedFarMouth(GameTestHelper h){
