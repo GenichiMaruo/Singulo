@@ -349,7 +349,9 @@ final class FxDraw {
         }
         float f = seed * 12.9898F;
         f = f - (float) Math.floor(f);
-        return f * (1 - span);
+        // 絵のドットの境目が箱の辺に来るよう、切り出しの始まりはドット単位
+        int free = (int) Math.floor((1 - span) * TEX_SIZE + 1.0E-4F);
+        return (float) Math.floor(f * (free + 1)) / TEX_SIZE;
     }
 
     private static void texQuad(VertexConsumer vc, PoseStack.Pose p, int light, int rgb, int alpha, float nx, float ny, float nz,

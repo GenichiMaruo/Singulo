@@ -1730,14 +1730,21 @@ def accessory_icons(Image):
                 d.load()[x, top + 2 + k] = dia_d if x >= cx + w // 2 else dia_m
         d.load()[cx, top] = shine
 
-    # ダイヤのネックレス: Ｖに下がる鎖（1ドットおき）と、先のダイヤ
+    # ダイヤのネックレス: Ｖに下がる鎖（1ドットおき）、両わきの真珠、先の小さなダイヤと、きらりの星
+    pearl, pink = (246, 240, 230, 255), (244, 166, 198, 255)
     b, d = new(), new()
     for k in range(6):
         for x, y in ((2 + k, 2 + k), (13 - k, 2 + k)):
             b.load()[x, y] = W if k % 2 == 0 else S
     b.load()[7, 8] = E
     b.load()[8, 8] = E
+    d.load()[5, 7] = pearl
+    d.load()[10, 7] = pearl
     gem(6, 9, 4)
+    d.load()[11, 9] = shine
+    d.load()[12, 10] = (255, 255, 255, 160)
+    d.load()[10, 10] = (255, 255, 255, 160)
+    d.load()[11, 11] = (255, 255, 255, 160)
     out['android_diamond_necklace'] = (b, d)
     # ダイヤのイヤリング: 左右の金具と、下がるダイヤ
     b, d = new(), new()
@@ -1747,30 +1754,41 @@ def accessory_icons(Image):
         b.load()[x0 + 1, 4] = S
         gem(x0, 5, 4)
     out['android_diamond_earrings'] = (b, d)
-    # ダイヤのティアラ: 帯と3つの山（真ん中が高い）、山のダイヤ
+    # ダイヤのティアラ: 帯と5つの小さな山（真ん中が高い）。真ん中にダイヤ、両わきに桃色の石、山の先と帯の両はしに真珠
     b, d = new(), new()
-    shaded(b, 1, 11, 14, 12)
-    for cx, top in ((7, 3), (3, 7), (12, 7)):
+    shaded(b, 2, 11, 13, 12)
+    for x0, top in ((6, 6), (3, 8), (11, 8)):
+        w = 4 if x0 == 6 else 2
         for y in range(top, 11):
-            w = (y - top) // 2
-            for x in range(cx - w, cx + w + 2):
-                if 0 <= x < 16:
-                    b.load()[x, y] = E if x in (cx - w, cx + w + 1) else W
-    gem(6, 6, 4)
-    for x in (3, 12):
-        d.load()[x, 9] = dia_l
-        d.load()[x, 10] = dia_m
+            for x in range(x0, x0 + w):
+                b.load()[x, y] = E if x in (x0, x0 + w - 1) else W
+    for x, y in ((7, 5), (8, 5), (3, 7), (12, 7), (1, 11), (14, 11)):
+        d.load()[x, y] = pearl
+    for x in (7, 8):
+        d.load()[x, 7] = dia_l
+        d.load()[x, 8] = dia_m
+        d.load()[x, 9] = dia_d
+    d.load()[7, 7] = shine
+    for x in (3, 4, 11, 12):
+        d.load()[x, 9] = pink
     out['android_diamond_tiara'] = (b, d)
-    # ダイヤのブローチ: 丸い台（四隅に粒）と真ん中のダイヤ
+    # ダイヤのブローチ: リボン結び（左右の輪と垂れ）の真ん中にダイヤ、きらりの星
     b, d = new(), new()
-    for y in range(3, 13):
-        for x in range(3, 13):
-            dx, dy = x - 7.5, y - 7.5
-            if dx * dx + dy * dy <= 22:
-                b.load()[x, y] = E if dx * dx + dy * dy > 14 else (S if x + y > 15 else W)
-    for x, y in ((3, 7), (12, 8), (7, 3), (8, 12)):
-        b.load()[x, y] = W
-    gem(6, 5, 4)
+    for x0 in (2, 10):
+        for y in range(4, 10):
+            for x in range(x0, x0 + 4):
+                edge = x in (x0, x0 + 3) or y in (4, 9)
+                b.load()[x, y] = E if edge else (S if y >= 7 else W)
+    for x, y in ((5, 10), (5, 11), (4, 12), (10, 10), (10, 11), (11, 12)):
+        b.load()[x, y] = S
+    for y in range(5, 10):
+        for x in range(6, 10):
+            d.load()[x, y] = dia_l if y <= 6 else (dia_m if y <= 8 else dia_d)
+    d.load()[6, 5] = shine
+    d.load()[12, 2] = shine
+    d.load()[12, 1] = (255, 255, 255, 160)
+    d.load()[11, 2] = (255, 255, 255, 160)
+    d.load()[13, 2] = (255, 255, 255, 160)
     out['android_diamond_brooch'] = (b, d)
     return out
 
