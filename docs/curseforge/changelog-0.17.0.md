@@ -8,13 +8,15 @@
 - Add three tiers of Fluid Capsule with the same ranges as packing crates. Capsules are 3D pressure vessels that show their contents, in your hand, under a drone and on the port lift.
 - Add Collapsar Lining. Place it in the casing positions of the Degenerate Compactor, Casimir Cavity or Cryogenic Cooling Tower for 5% faster processing per lining, up to 2× at 20. The Holo Projector highlights the positions in gold.
 - Add the Event Horizon Vault, which stores a practically unlimited amount of one item inside a small black hole and keeps its contents when broken.
-- Add the Wormhole Drone Beacon. With one beside both mouths of a wormhole, drones hand cargo through it to ports in another dimension.
+- Add the Wormhole Drone Beacon. With one beside both mouths of a wormhole, drones fly through it to deliver to ports in another dimension and come back the same way. The far side needs no Drone Station. Within one dimension, drones also use a beaconed wormhole as a shortcut when it is shorter.
 - The Tidal Spindle can now stretch vanilla materials from its left slot once its core is formed (1 MFE/t, no coolant): Wool → 4 String, Iron Ingot → 2 Chains, 4 Blaze Powder → Blaze Rod, Leather → Phantom Membrane, Stone → 2 Pointed Dripstone.
 
 ## Changes
 
+- The Accretion Jet Forge now makes more of the moment the jet punches through each focusing ring: a white flash fills the ring, two shock rings and light streaks spread outward, a pulse runs along the beam to the next ring, sparks fly, and the screen flashes and shakes briefly (both follow the existing flash and shake settings).
 - The Relocation Wrench in cable mode now also takes back Fluid Pipes, one at a time or a whole joined run of one tier.
 - A broken Fluid Drone Port keeps the fluid in both tanks in its item and restores it when placed.
+- Walking through a seamed wormhole now works like a Nether portal: you come out at the same spot in the far opening with your facing and momentum turned to match, instead of being placed in front of the far mouth. You are not sent back until you step out of the opening.
 - A route made only of Fluid Pipes carries up to 2,000 mB per tick. Before this version each port moved 4,000 mB per 5 ticks with no shared limit. Upgrade busy trunks to a higher tier.
 
 ## Fixes
@@ -29,13 +31,15 @@
 - 液体カプセル3段階を追加しました。射程は梱包箱と同じです。中の液体が見える立体の耐圧容器で、手に持っても、ドローンに吊るしても、ポートの台の上でも中身が見えます。
 - コラプサー内張りを追加しました。縮退圧縮炉・C空洞・極低温冷却塔の外装板の位置に置くと、1枚ごとに加工が5%速くなります（20枚で2倍）。置ける場所はホロ投影機が金色で示します。
 - 事象の地平線倉庫を追加しました。1種類の物を中の小さなブラックホールに事実上無制限にしまい、壊しても中身を失いません。
-- ワームホール航路標識を追加しました。ワームホールの両方の口のそばに置くと、ドローンが口で荷物を受け渡し、別の次元のポートへ送ります。
+- ワームホール航路標識を追加しました。ワームホールの両方の口のそばに置くと、ドローンが口をくぐって別の次元のポートへ荷物を届け、同じ口を通って帰ってきます。向こう側にドローン・ステーションは要りません。同じ次元の中でも、くぐるほうが近ければ近道に使います。
 - 潮汐紡糸機が、炉心の形成後に左の枠のバニラ素材を引き伸ばせるようになりました（1 MFE/t、冷却材なし）。羊毛→糸4、鉄インゴット→鎖2、ブレイズパウダー4→ブレイズロッド、革→ファントムの皮膜、石→鍾乳石2。
 
 ## 変更
 
+- 降着ジェット鍛造炉で、ジェットが収束リングを突き抜ける瞬間を派手にしました。リングの内側が白く光り、2重の衝撃の輪と光の筋が外へ広がり、光の塊がビームを次のリングへ走り、火花が飛び、画面が短く光って揺れます（閃光と揺れは、これまでの設定に従います）。
 - 移設レンチの撤去モードで、液体パイプも1本ずつ、またはつながった同じ段階をまとめて回収できるようになりました。
 - 液体ドローン発着ポートを壊すと、2つのタンクの液体をアイテムに残し、置き直すと戻ります。
+- 縫い開いたワームホールを歩いて通ると、ネザーポータルと同じく、向こうの開口部の同じ位置に、体の向きと勢いを合わせて出るようになりました。これまでは向こうの口の前に置かれていました。開口部からいったん出るまでは戻されません。
 - 液体パイプだけの経路で運べるのは 1 tick に 2,000 mB までになりました。これまでは口ごとに 5 tick に 4,000 mB を、全体の上限なしで運んでいました。多く流す幹は上の段階に替えてください。
 
 ## 修正
