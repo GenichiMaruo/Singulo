@@ -926,36 +926,39 @@ def upgrade_board(Image):
 
 
 def decor_grain(Image):
-    """アンドロイドの装飾の立体に貼る模様（白い濃淡。装飾の色に掛ける）。箱の面ごとに1枚まるごと貼るので、
-    縁を少し暗く（使い込んだ角の擦れ）、面に細かなむら、ところどころに光る小傷を入れて、のっぺりさせない（汚し）。"""
-    im = Image.new('RGBA', (16, 16), (255, 255, 255, 255))
+    """アンドロイドの装飾の立体に貼る模様（32×32 の白い濃淡。装飾の色に掛ける）。体の1ピクセルに1ドットの細かさで、
+    面の大きさのぶんだけ切り出して貼る。のっぺりさせない汚し: 細かなむら、ところどころ少し暗い擦れの斑、光る小傷。"""
+    im = Image.new('RGBA', (32, 32), (255, 255, 255, 255))
     px = im.load()
     rng = random.Random(83)
-    for y in range(16):
-        for x in range(16):
-            k = 246 + rng.choice((0, 0, 3, -4, -7, 5))
-            edge = min(x, y, 15 - x, 15 - y)
-            if edge == 0:
-                k -= 22
-            elif edge == 1:
-                k -= 8
-            if (x // 4 + y // 4) % 2 == 0:
-                k -= 3                                # ごく薄い面のむら
+    for y in range(32):
+        for x in range(32):
+            k = 246 + rng.choice((0, 0, 0, 3, -4, -6, 5))
             px[x, y] = (k, k, k, 255)
-    for x, y in ((4, 5), (5, 4), (11, 10), (12, 9), (9, 3)):
-        px[x, y] = (255, 255, 255, 255)               # 小傷の光
+    for _ in range(9):                                # 擦れの斑（少し暗い、ぼんやりした小さな塊）
+        cx, cy = rng.randrange(32), rng.randrange(32)
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if rng.random() < 0.7:
+                    x, y = (cx + dx) % 32, (cy + dy) % 32
+                    r = px[x, y][0] - (8 if dx == 0 and dy == 0 else 4)
+                    px[x, y] = (r, r, r, 255)
+    for _ in range(6):                                # 光る斜めの小傷
+        x, y = rng.randrange(31), rng.randrange(1, 32)
+        px[x, y] = (255, 255, 255, 255)
+        px[x + 1, y - 1] = (252, 252, 252, 255)
     return im
 
 
 def decor_strands(Image):
-    """髪・麦わら・ほうきの穂に貼る、縦の細い筋の模様（白い濃淡）。毛先の側（下）ほど少し暗い。"""
-    im = Image.new('RGBA', (16, 16), (255, 255, 255, 255))
+    """髪・麦わら・ほうきの穂に貼る、縦の細い筋の模様（32×32 の白い濃淡）。毛先の側（下）ほど少し暗い。"""
+    im = Image.new('RGBA', (32, 32), (255, 255, 255, 255))
     px = im.load()
     rng = random.Random(89)
-    shades = [rng.choice((255, 246, 236, 226, 250)) for _ in range(16)]
-    for x in range(16):
-        for y in range(16):
-            k = shades[x] - y // 3 - (10 if (x + y // 5) % 4 == 0 else 0)
+    shades = [rng.choice((255, 246, 236, 226, 250)) for _ in range(32)]
+    for x in range(32):
+        for y in range(32):
+            k = shades[x] - y // 4 - (10 if (x + y // 6) % 5 == 0 else 0)
             if rng.random() < 0.04:
                 k += 12
             k = max(150, min(255, k))

@@ -302,6 +302,50 @@ final class FxDraw {
         quad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, x1, y1, z1, x1, y0, z1, x1, y0, z0);
     }
 
+    /** {@link #texBox} の絵の大きさ（ドット）。 */
+    static final float TEX_SIZE = 32;
+
+    /**
+     * 模様を、長さに合わせた細かさで貼る箱（ブロック単位の座標。1/16 ブロックの長さに絵の1ドットを当てる）。
+     * 面ごとに、その面の大きさのぶんだけ絵を切り出す（場所は面ごとにずらして、同じ模様が並ばないようにする）。
+     * 縦（y）は絵の下へ向かう向き（筋の模様は、下の毛先ほど暗い）。
+     */
+    static void texBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                       int light, int rgb, int alpha) {
+        PoseStack.Pose p = pose.last();
+        float sx = Math.min(1, (x1 - x0) * 16 / TEX_SIZE), sy = Math.min(1, (y1 - y0) * 16 / TEX_SIZE),
+                sz = Math.min(1, (z1 - z0) * 16 / TEX_SIZE);
+        float ox = texOffset(x0 * 7 + z0 * 3 + y0, sx), oy = texOffset(y0 * 5 + x0 * 2, sy), oz = texOffset(z0 * 11 + y0 * 3, sz);
+        // 下・上: u は x、v は z
+        texQuad(vc, p, light, rgb, alpha, 0, -1, 0, x0, y0, z0, ox, oz, x1, y0, z0, ox + sx, oz, x1, y0, z1, ox + sx, oz + sz, x0, y0, z1, ox, oz + sz);
+        texQuad(vc, p, light, rgb, alpha, 0, 1, 0, x0, y1, z1, ox, oz + sz, x1, y1, z1, ox + sx, oz + sz, x1, y1, z0, ox + sx, oz, x0, y1, z0, ox, oz);
+        // 北・南: u は x、v は y
+        texQuad(vc, p, light, rgb, alpha, 0, 0, -1, x0, y1, z0, ox, oy + sy, x1, y1, z0, ox + sx, oy + sy, x1, y0, z0, ox + sx, oy, x0, y0, z0, ox, oy);
+        texQuad(vc, p, light, rgb, alpha, 0, 0, 1, x0, y0, z1, ox, oy, x1, y0, z1, ox + sx, oy, x1, y1, z1, ox + sx, oy + sy, x0, y1, z1, ox, oy + sy);
+        // 西・東: u は z、v は y
+        texQuad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, oz, oy, x0, y0, z1, oz + sz, oy, x0, y1, z1, oz + sz, oy + sy, x0, y1, z0, oz, oy + sy);
+        texQuad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, oz, oy + sy, x1, y1, z1, oz + sz, oy + sy, x1, y0, z1, oz + sz, oy, x1, y0, z0, oz, oy);
+    }
+
+    /** 絵の中の切り出し位置（0〜1 − span）。位置から決めるので、同じ箱はいつも同じ所を貼る。 */
+    private static float texOffset(float seed, float span) {
+        if (span >= 1) {
+            return 0;
+        }
+        float f = seed * 12.9898F;
+        f = f - (float) Math.floor(f);
+        return f * (1 - span);
+    }
+
+    private static void texQuad(VertexConsumer vc, PoseStack.Pose p, int light, int rgb, int alpha, float nx, float ny, float nz,
+                                float ax, float ay, float az, float au, float av, float bx, float by, float bz, float bu, float bv,
+                                float cx, float cy, float cz, float cu, float cv, float dx, float dy, float dz, float du, float dv) {
+        uvVertex(vc, p, ax, ay, az, au, av, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, bx, by, bz, bu, bv, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, cx, cy, cz, cu, cv, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, dx, dy, dz, du, dv, light, rgb, alpha, nx, ny, nz);
+    }
+
     /**
      * 三角柱（前の面の三角 a・b・c は x, y。前は z0、後ろは z1）。後ろの三角は重心へ backScale 倍に縮めるので、
      * 1 未満なら側面が斜めになって、後ろへなだらかに細る（猫の耳の裏の丸みなど）。面を落とさない描き方で使う。

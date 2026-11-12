@@ -1538,7 +1538,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
 
         /** 箱（ピクセル単位）。 */
         private void b(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float z0, float x1, float y1, float z1, int rgb) {
-            FxDraw.box(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
+            // 模様は長さに合わせた細かさで（体の1ピクセルに絵の1ドット）
+            FxDraw.texBox(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
         }
 
         private void draw(String style, PoseStack pose, VertexConsumer vc, MultiBufferSource buffers, int light, int c, float walk, float age,
