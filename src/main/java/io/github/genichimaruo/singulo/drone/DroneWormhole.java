@@ -191,9 +191,14 @@ public final class DroneWormhole {
                 return true;
             }
             DroneNetwork far = DroneNetwork.get(other);
+            if (far.port(f.relayTo) == null) {
+                turnBack(net, f, now);
+                return true;
+            }
             DroneNetwork.Flight g = far.adopt(f);
             g.homeDim = level.dimension();
             g.homeGate = there.getBlockPos().immutable();
+            g.homeFrom = f.from;
             g.from = there.getBlockPos().immutable();
             g.to = f.relayTo;
             g.stage = DroneNetwork.DELIVER;
@@ -208,21 +213,21 @@ public final class DroneWormhole {
         if (!other.dimension().equals(f.homeDim)) {
             return false;                                 // 口が家とは別の次元へつなぎ直された: つながり直すまで待つ
         }
+        // Older saves may not identify the source port. Keep their cargo until a destination is restored.
+        if (!f.crate.isEmpty() && f.homeFrom == null) return false;
         DroneNetwork home = DroneNetwork.get(other);
         // 家のステーションがなくなっていれば（印が消えている）、ドローンはここで役目を終える
         boolean welcome = f.station != null && home.clearAway(f.station, f.unit);
         net.remove(f);
         leave(level, here.getBlockPos(), drone);
-        if (!welcome) {
-            if (!f.crate.isEmpty()) {
-                Block.popResource(level, here.getBlockPos().above(), f.crate);
-            }
+        if (!welcome && f.crate.isEmpty()) {
             return true;
         }
         DroneNetwork.Flight g = home.adopt(f);
+        if (!welcome) g.station = null;
         g.from = there.getBlockPos().immutable();
-        g.to = there.getBlockPos().immutable();
-        g.stage = DroneNetwork.RETURN;
+        g.to = f.crate.isEmpty() ? there.getBlockPos().immutable() : f.homeFrom;
+        g.stage = f.crate.isEmpty() ? DroneNetwork.RETURN : DroneNetwork.DELIVER;
         emerge(other, home, g, there.getBlockPos(), null);
         return true;
     }
@@ -286,8 +291,18 @@ public final class DroneWormhole {
             return;
         }
         BlockPos t = f.target();
-        if (t != null && !level.shouldTickBlocksAt(t)) {
+        if (t == null) return;
+        if (!level.shouldTickBlocksAt(t)) {
             wake(level, t);
+            return;
+        }
+        // A removed endpoint has no block entity to materialize an arrived virtual flight.
+        if (crossing(f) && !isMouth(level, t)) {
+            if (f.away()) sendHome(level, DroneNetwork.get(level), f, t);
+            else turnBack(DroneNetwork.get(level), f, level.getGameTime());
+        } else if (f.away() && f.stage == DroneNetwork.DELIVER
+                && !(level.getBlockEntity(t) instanceof DronePortBlockEntity)) {
+            DroneNetwork.get(level).advance(f, DroneNetwork.RETURN, level.getGameTime());
         }
     }
 
@@ -314,28 +329,27 @@ public final class DroneWormhole {
 
     /**
      * 帰りにくぐる口がなくなった便を、口を通らずに家のステーションへ帰す（見えない飛行で、ステーションの上から降りてくる）。
-     * 運んでいた箱があれば at に落とす。家のステーションがもうなければ、そのまま消える。
+     * 運んでいた箱は家の発送元へ返す。空なら家のステーションへ帰る。
      */
     static void sendHome(ServerLevel level, DroneNetwork net, DroneNetwork.Flight f, BlockPos at) {
-        if (!f.crate.isEmpty()) {
-            Block.popResource(level, at, f.crate);
-            f.crate = ItemStack.EMPTY;
-        }
-        net.remove(f);
         ServerLevel home = f.homeDim == null ? null : level.getServer().getLevel(f.homeDim);
-        if (home == null || f.station == null) {
+        if (home == null || !f.crate.isEmpty() && f.homeFrom == null) {
             return;
         }
         DroneNetwork homeNet = DroneNetwork.get(home);
-        if (!homeNet.clearAway(f.station, f.unit)) {
+        boolean welcome = f.station != null && homeNet.clearAway(f.station, f.unit);
+        net.remove(f);
+        if (!welcome && f.crate.isEmpty()) {
             return;
         }
         DroneNetwork.Flight g = homeNet.adopt(f);
-        g.from = f.station;
-        g.to = f.station;
-        g.stage = DroneNetwork.RETURN;
+        if (!welcome) g.station = null;
+        BlockPos destination = f.crate.isEmpty() ? f.station : f.homeFrom;
+        g.from = destination;
+        g.to = destination;
+        g.stage = f.crate.isEmpty() ? DroneNetwork.RETURN : DroneNetwork.DELIVER;
         g.virtual = true;
-        homeNet.redirectVirtual(g, Vec3.atCenterOf(f.station).add(0, 16, 0), home.getGameTime());
+        homeNet.redirectVirtual(g, Vec3.atCenterOf(destination).add(0, 16, 0), home.getGameTime());
     }
 
     /**

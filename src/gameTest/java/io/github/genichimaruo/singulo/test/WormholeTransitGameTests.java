@@ -154,6 +154,37 @@ public final class WormholeTransitGameTests {
         });
     }
     /** 向こうの口が読み込まれていないとき、開口部に入った人がいれば、ネザーポータルと同じく向こうを読み込ませる。 */
+    @GameTest(template="forge",timeoutTicks=80)
+    public static void wormholeProjectilesRespectEntitiesBeforeTheMouth(GameTestHelper h){
+        long pair=h.getLevel().random.nextLong();var a=mouth(h,A,pair,true);var b=mouth(h,B,pair,true);
+        var scope=TestScope.of(h);
+        for(BlockPos m:new BlockPos[]{A,B})for(int dx=-2;dx<=2;dx++)for(int dz=-3;dz<=3;dz++)for(int y=1;y<=4;y++)h.setBlock(m.offset(dx,y,dz),Blocks.AIR);
+        var pig=new net.minecraft.world.entity.animal.Pig(net.minecraft.world.entity.EntityType.PIG,h.getLevel());
+        pig.setNoAi(true);pig.setNoGravity(true);scope.defer(pig::discard);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());
+        var owned=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());
+        scope.defer(arrow::discard);scope.defer(owned::discard);
+        h.runAtTickTime(5,()->{
+            h.assertTrue(a.partner()==b,"Pair fixture not linked");
+            Vec3 c=WormholeTransit.center(a);
+            pig.setPos(c.x,c.y-0.4,c.z+1.3);h.getLevel().addFreshEntity(pig);
+            arrow.setPos(c.x,c.y,c.z+2.5);arrow.setDeltaMovement(0,0,-3);arrow.setNoGravity(true);h.getLevel().addFreshEntity(arrow);
+            var event=new net.neoforged.neoforge.event.tick.EntityTickEvent.Pre(arrow);
+            WormholeTransit.onEntityTick(event);
+            h.assertFalse(event.isCanceled(),"Portal teleported the arrow through an entity in front of it");
+            float health=pig.getHealth();arrow.tick();
+            h.assertTrue(pig.getHealth()<health,"Vanilla arrow collision did not hit the intervening entity");
+            arrow.discard();
+            // A newly fired projectile must still ignore its owner, as vanilla's canHitEntity does.
+            owned.setOwner(pig);owned.setPos(c.x,c.y,c.z+1.3);owned.setDeltaMovement(0,0,-2);owned.setNoGravity(true);h.getLevel().addFreshEntity(owned);
+            var ownerEvent=new net.neoforged.neoforge.event.tick.EntityTickEvent.Pre(owned);
+            WormholeTransit.onEntityTick(ownerEvent);
+            h.assertTrue(ownerEvent.isCanceled()&&owned.position().distanceToSqr(WormholeTransit.center(b))<4,
+                    "Portal collision check treated the projectile's owner as a hittable obstacle");
+            h.succeed();
+        });
+    }
+
     @GameTest(template="forge",timeoutTicks=400)
     public static void wormholeTransitLoadsTheUnloadedFarMouth(GameTestHelper h){
         long pair=h.getLevel().random.nextLong();var a=mouth(h,A,pair,true);

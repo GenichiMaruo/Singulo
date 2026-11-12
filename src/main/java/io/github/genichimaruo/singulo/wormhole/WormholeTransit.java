@@ -113,6 +113,10 @@ public final class WormholeTransit {
         if(hit==null)return;
         Vec3 at=from.add(v.scale(best));
         if(level.clip(new ClipContext(from,at,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,shot)).getType()!=HitResult.Type.MISS)return;
+        Vec3 beforePortal=v.scale(best);
+        if(net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,shot,shot.position(),shot.position().add(beforePortal),
+                shot.getBoundingBox().expandTowards(beforePortal).inflate(1),
+                ((io.github.genichimaruo.singulo.mixin.ProjectileAccessor)shot)::singulo$canHitEntity)!=null)return;
         WormholeMouthBlockEntity other=hit.partner();
         if(other==null){
             var far=hit.partnerPos();

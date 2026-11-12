@@ -94,14 +94,53 @@ public final class CollapsarGameTests {
     // ------------------------------------------------------------------ 事象の地平線倉庫
 
     @GameTest(template = "empty")
+    public static void vaultEmptyHandExtractsThroughPlayerInteraction(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
+        HorizonVaultBlockEntity vault = h.getBlockEntity(at);
+        vault.insert(new ItemStack(Items.COBBLESTONE, 100), false);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        try {
+            BlockPos absolute = h.absolutePos(at);
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(absolute), Direction.UP, absolute, false);
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            player.gameMode.useItemOn(player, h.getLevel(), ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            h.assertTrue(vault.count() == 36 && player.getInventory().countItem(Items.COBBLESTONE) == 64,
+                    "Empty-hand interaction did not extract one stack");
+            player.getInventory().selected = 1;
+            player.setShiftKeyDown(true);
+            player.gameMode.useItemOn(player, h.getLevel(), ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            h.assertTrue(vault.count() == 35 && player.getInventory().countItem(Items.COBBLESTONE) == 65,
+                    "Sneaking with an empty hand did not extract one item");
+            player.setShiftKeyDown(false);
+            player.getInventory().selected = 2;
+            ItemStack held = new ItemStack(Items.COBBLESTONE, 12);
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, held);
+            player.gameMode.useItemOn(player, h.getLevel(), held, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            h.assertTrue(vault.count() == 47 && player.getMainHandItem().isEmpty(), "Held-stack deposit failed");
+            player.gameMode.useItemOn(player, h.getLevel(), ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            h.assertTrue(vault.count() == 112 && player.getInventory().countItem(Items.COBBLESTONE) == 0,
+                    "Second click with the now-empty hand did not deposit the rest of the inventory");
+        } finally {
+            player.discard();
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void vaultStoresOneItemAndRejectsTheRest(GameTestHelper h) {
         BlockPos at = new BlockPos(2, 1, 2);
         h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
         HorizonVaultBlockEntity vault = h.getBlockEntity(at);
         var handler = vault.items();
+        ItemStack packed = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.IRON_INGOT)));
+        h.assertFalse(vault.accepts(packed), "An empty vault accepted a packed crate");
+        ItemStack capsule = io.github.genichimaruo.singulo.drone.FluidCapsuleItem.pack(new ItemStack(SinguloItems.FLUID_CAPSULE.get()),
+                new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1_000));
+        h.assertFalse(vault.accepts(capsule), "An empty vault accepted a packed capsule");
         h.assertTrue(handler.insertItem(0, new ItemStack(Items.COBBLESTONE, 64), false).isEmpty(), "Cobblestone not inserted");
         h.assertTrue(handler.insertItem(0, new ItemStack(Items.DIRT, 5), false).getCount() == 5, "A second kind of item was accepted");
-        ItemStack packed = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.IRON_INGOT)));
         h.assertFalse(vault.accepts(packed), "A packed crate was accepted");
         for (int i = 0; i < 100; i++) {
             handler.insertItem(0, new ItemStack(Items.COBBLESTONE, 64), false);
@@ -118,6 +157,8 @@ public final class CollapsarGameTests {
         Long count = item.get(SinguloComponents.VAULT_COUNT.get());
         h.assertTrue(count != null && count == 64 * 100, "Vault item lost its count: " + count);
         h.assertFalse(vault.accepts(item), "A filled vault could go inside a vault");
+        h.assertFalse(item.canFitInsideContainerItems(), "A filled vault could go inside a container item");
+        h.assertTrue(new ItemStack(SinguloBlocks.HORIZON_VAULT.get()).canFitInsideContainerItems(), "An empty vault should fit inside container items");
         drops.forEach(ItemEntity::discard);
         h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
         HorizonVaultBlockEntity placed = h.getBlockEntity(at);

@@ -1,6 +1,8 @@
 // Development only: exclude the client fixture from normal builds and distribution JARs.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/cable-src'))
         neoForge.runs.client {
             gameDirectory = file('build/gui-review')

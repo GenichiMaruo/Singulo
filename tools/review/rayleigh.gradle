@@ -1,6 +1,8 @@
 // Development-only real-lightmap and terrain capture; excluded from normal builds.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/rayleigh-src'))
         if (providers.gradleProperty('withSodium').isPresent()) {
             dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }

@@ -22,6 +22,11 @@
 
 ## Fixes
 
+- Fix empty-hand vault withdrawal, rapid inventory deposits and nested packed-container rejection.
+- Let fluid capsules pour before opening machine screens. Source pumping requires room for a whole bucket at one endpoint, preventing shared tank ports from double-counting free space.
+- Keep visiting drones separate from local stations at the same coordinates, and return intact cargo when remote ports or return mouths disappear.
+- Projectiles still hit entities in front of a wormhole before crossing it.
+
 - The Suspension Reservoir, Nuclear Pasta Accumulator and Tidal Spindle now play the formation sparks and sound when completed, like other multiblocks.
 
 ## 追加
@@ -45,5 +50,10 @@
 - 液体パイプだけの経路で運べるのは 1 tick に 2,000 mB までになりました。これまでは口ごとに 5 tick に 4,000 mB を、全体の上限なしで運んでいました。多く流す幹は上の段階に替えてください。
 
 ## 修正
+
+- 倉庫の素手での取り出し・連続クリックでの投入・梱包済み容器の入れ子拒否を修正しました。
+- 液体カプセルは装置の画面より先に注げます。水源を汲む際は1つの受け口に1バケツ分の空きを要求し、共有タンクの空き容量を重複して数えないようにしました。
+- 別次元の同座標のステーションがドローンを誤認しないようにし、輸送先や帰還口の消失時も荷物を保って発送元へ返すようにしました。
+- ワームホール直前の生物にも飛び道具が正しく当たるようにしました。
 
 - 重力懸垂タンク・核パスタ積層蓄電庫・潮汐紡糸機が、ほかのマルチブロックと同じく、完成したときに光と起動音の演出を出すようになりました。

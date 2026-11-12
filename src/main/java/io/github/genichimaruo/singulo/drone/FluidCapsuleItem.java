@@ -63,6 +63,12 @@ public class FluidCapsuleItem extends DroneCrateItem {
         return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
+    /** タンクの画面を開くブロック操作より先に注ぐ（スニークを要求しない）。 */
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        return useOn(context);
+    }
+
     /** 液体を受けるブロック（タンク・装置）に使うと、入るだけ注ぐ。残りはカプセルに残る。 */
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -73,7 +79,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
         }
         Level level = context.getLevel();
         IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, context.getClickedPos(), context.getClickedFace());
-        if (target == null) {
+        if (target == null || target.fill(inside, IFluidHandler.FluidAction.SIMULATE) <= 0) {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide) {

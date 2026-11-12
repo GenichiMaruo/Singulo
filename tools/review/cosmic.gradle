@@ -1,6 +1,8 @@
 // Disposable native rendering fixtures; excluded from distribution builds.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/cosmic-src'))
         if (providers.gradleProperty('withSodium').isPresent()) {
             dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }

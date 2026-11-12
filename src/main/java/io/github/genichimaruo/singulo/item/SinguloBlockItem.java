@@ -16,6 +16,12 @@ public class SinguloBlockItem extends BlockItem {
     }
 
     @Override
+    public boolean canFitInsideContainerItems(ItemStack stack) {
+        return !stack.has(io.github.genichimaruo.singulo.registry.SinguloComponents.VAULT_COUNT.get())
+                && super.canFitInsideContainerItems(stack);
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         SinguloItem.addStageLine(tooltip, stage);
         if (stack.has(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA)

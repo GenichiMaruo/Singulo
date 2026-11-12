@@ -501,7 +501,9 @@ public class CargoDrone extends Mob {
             f.docked = docked && f.stage == DroneNetwork.DELIVER;
         } else if (targetLoaded) {
             // ポートがない（置き換えられた）: 取りに行く途中なら帰り、届ける途中なら発送元へ戻す
-            if (f.stage == DroneNetwork.PICKUP || net.port(f.from) == null || f.from.equals(target)) {
+            if (f.away()) {
+                net.advance(f, DroneNetwork.RETURN, level.getGameTime());
+            } else if (f.stage == DroneNetwork.PICKUP || net.port(f.from) == null || f.from.equals(target)) {
                 if (!f.crate.isEmpty()) {
                     Block.popResource(level, target, f.crate);
                     f.crate = ItemStack.EMPTY;

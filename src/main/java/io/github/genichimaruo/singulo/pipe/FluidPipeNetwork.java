@@ -471,41 +471,25 @@ public final class FluidPipeNetwork {
             return;
         }
         FluidStack fluid = new FluidStack(state.getFluidState().getType(), FluidType.BUCKET_VOLUME);
-        List<Port> takers = new ArrayList<>();
-        long room = 0;
-        // 汲む前に、経路の容量の残りと受け手の空きを合わせて確かめる（同じ区間を通る受け手は見積もりを分け合う）
-        Map<Object, Long> planned = new IdentityHashMap<>();
-        for (Port port : ports) {
-            if (room >= fluid.getAmount()) {
-                break;
-            }
-            if (!accepts(port.handler, fluid)) {
+        // 別の面やマルチブロックの別ポートでも、同じタンクの空きを公開することがある。
+        // capability から共有先は判別できないので、1つの口へ1バケツ全部が入るときだけ汲む。
+        List<Port> takers = new ArrayList<>(ports);
+        rotate(takers);
+        for (Port taker : takers) {
+            Path path = path(source.node, taker.endpoint.node);
+            if (!accepts(taker.handler, fluid) || available(path) < fluid.getAmount()
+                    || taker.handler.fill(fluid, FluidAction.SIMULATE) < fluid.getAmount()) {
                 continue;
             }
-            Path path = path(source.node, port.endpoint.node);
-            long r = Math.min(port.handler.fill(fluid, FluidAction.SIMULATE), available(path, planned));
-            if (r > 0) {
-                takers.add(port);
-                room += r;
-                reserve(planned, path, r);
+            if (((BucketPickup) state.getBlock()).pickupBlock(null, level, source.pos, state).isEmpty()) {
+                return;
             }
-        }
-        if (room < fluid.getAmount()
-                || ((BucketPickup) state.getBlock()).pickupBlock(null, level, source.pos, state).isEmpty()) {
-            return;
-        }
-        int left = fluid.getAmount();
-        for (Port taker : takers) {
-            if (left <= 0) {
-                break;
-            }
-            Path path = path(source.node, taker.endpoint.node);
-            int filled = taker.handler.fill(fluid.copyWithAmount((int) Math.min(left, available(path))), FluidAction.EXECUTE);
+            int filled = taker.handler.fill(fluid, FluidAction.EXECUTE);
             if (filled > 0) {
                 account(path, filled);
                 sample(path, source.pos, taker.pos(), fluid, filled);
             }
-            left -= filled;
+            return;
         }
     }
 

@@ -99,7 +99,7 @@ public class HorizonVaultBlockEntity extends BlockEntity {
 
     /** しまえる物か: 空か同じ物。中身を持つ入れ物（梱包済みの箱・中身入りのシュルカーボックスや倉庫）は入れ子にしない。 */
     public boolean accepts(ItemStack stack) {
-        if (stack.isEmpty() || !stack.getItem().canFitInsideContainerItems() || stack.has(SinguloComponents.VAULT_COUNT.get())) {
+        if (stack.isEmpty() || !stack.canFitInsideContainerItems() || stack.has(SinguloComponents.VAULT_COUNT.get())) {
             return false;
         }
         return type.isEmpty() || ItemStack.isSameItemSameComponents(type, stack);
@@ -144,6 +144,16 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     }
 
     // ------------------------------------------------------------------ 手で使う
+
+    /** 最初の投入で手が空になった場合も、2回目のクリックで残りをまとめて入れる。 */
+    boolean insertRemainingOnDoubleUse(Player player) {
+        if (!player.getUUID().equals(lastUser) || level.getGameTime() - lastUseAt > DOUBLE_USE_TICKS || type.isEmpty()) {
+            return false;
+        }
+        insertFromPlayer(player, ItemStack.EMPTY);
+        lastUser = null;
+        return true;
+    }
 
     /** 手の物を入れる。続けてすばやく使ったら、持ち物の同じ物も全部入れる。入れたら true。 */
     boolean insertFromPlayer(Player player, ItemStack held) {

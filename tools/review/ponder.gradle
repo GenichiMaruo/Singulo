@@ -1,6 +1,8 @@
 // Development-only Create/Ponder reproduction. Never included in distribution JARs.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/ponder-src'))
         if (providers.gradleProperty('ponderModsDir').isPresent()) {
             dependencies.add('localRuntime', fileTree(providers.gradleProperty('ponderModsDir').get()) { include '*.jar' })

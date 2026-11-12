@@ -83,6 +83,9 @@ public class DroneNetwork extends SavedData {
         public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> homeDim;
         @Nullable
         public BlockPos homeGate;
+        /** Original sending port in homeDim, retained so a failed remote delivery can return its cargo. */
+        @Nullable
+        public BlockPos homeFrom;
 
         Flight(long id, @Nullable BlockPos station, int unit) {
             this.id = id;
@@ -290,14 +293,14 @@ public class DroneNetwork extends SavedData {
         if (byUnit == null) {
             Map<Long, Flight> index = new java.util.HashMap<>();
             for (Flight f : flights.values()) {
-                if (f.station != null) {
+                if (f.station != null && !f.away()) {
                     index.put(unitKey(f.station, f.unit), f);
                 }
             }
             byUnit = index;
         }
         Flight f = byUnit.get(unitKey(station, unit));
-        return f != null && f.unit == unit && station.equals(f.station) ? f : null;
+        return f != null && !f.away() && f.unit == unit && station.equals(f.station) ? f : null;
     }
 
     private static long unitKey(BlockPos station, int unit) {
@@ -418,7 +421,7 @@ public class DroneNetwork extends SavedData {
 
     /** 便を次の段階へ。帰る先のステーションがなくなっていれば、帰らずに記録を消す（ドローンの実体も消える）。 */
     public void advance(Flight f, int stage, long now) {
-        if (stage == RETURN && f.station == null) {
+        if (stage == RETURN && f.station == null && !(f.away() && !f.crate.isEmpty())) {
             remove(f);
         } else if (f.virtual) {
             advanceVirtual(f, stage, now);
@@ -513,6 +516,7 @@ public class DroneNetwork extends SavedData {
             if (f.homeDim != null && f.homeGate != null) {
                 t.putString("home_dim", f.homeDim.location().toString());
                 t.put("home_gate", NbtUtils.writeBlockPos(f.homeGate));
+                if (f.homeFrom != null) t.put("home_from", NbtUtils.writeBlockPos(f.homeFrom));
             }
             fl.add(t);
         }
@@ -560,6 +564,7 @@ public class DroneNetwork extends SavedData {
             if (c.contains("home_dim")) {
                 var loc = ResourceLocation.tryParse(c.getString("home_dim"));
                 f.homeGate = NbtUtils.readBlockPos(c, "home_gate").orElse(null);
+                f.homeFrom = NbtUtils.readBlockPos(c, "home_from").orElse(null);
                 f.homeDim = loc == null || f.homeGate == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
             }
             net.flights.put(f.id, f);

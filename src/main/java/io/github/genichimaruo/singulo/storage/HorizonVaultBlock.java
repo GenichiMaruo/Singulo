@@ -63,6 +63,9 @@ public class HorizonVaultBlock extends BaseEntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
+        if (stack.isEmpty()) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
         if (!(level.getBlockEntity(pos) instanceof HorizonVaultBlockEntity vault)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
@@ -77,7 +80,9 @@ public class HorizonVaultBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof HorizonVaultBlockEntity vault && !level.isClientSide) {
-            vault.takeForPlayer(player, player.isShiftKeyDown());
+            if (player.isShiftKeyDown() || !vault.insertRemainingOnDoubleUse(player)) {
+                vault.takeForPlayer(player, player.isShiftKeyDown());
+            }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

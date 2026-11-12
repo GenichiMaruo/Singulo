@@ -149,6 +149,96 @@ public final class FluidLogisticsGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "empty")
+    public static void capsulePoursBeforeFluidPortOpensItsMenu(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        FluidDronePortBlockEntity port = fluidPort(h, at);
+        port.sendTank().fill(new FluidStack(Fluids.WATER, 63_500), IFluidHandler.FluidAction.EXECUTE);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        port.setOwner(player.getUUID());
+        try {
+            ItemStack capsule = FluidCapsuleItem.pack(new ItemStack(SinguloItems.FLUID_CAPSULE.get()), new FluidStack(Fluids.WATER, 1_000));
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, capsule);
+            BlockPos absolute = h.absolutePos(at);
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(absolute),
+                    net.minecraft.core.Direction.UP, absolute, false);
+            player.gameMode.useItemOn(player, h.getLevel(), capsule, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            h.assertTrue(port.sendTank().getFluidAmount() == 64_000
+                    && FluidCapsuleItem.fluid(player.getMainHandItem()).getAmount() == 500, "Normal right-click did not pour only the available space");
+            h.assertTrue(player.containerMenu == player.inventoryMenu, "Pouring opened the port menu");
+            h.assertTrue(player.getMainHandItem().getItem().onItemUseFirst(player.getMainHandItem(),
+                    new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit))
+                    == net.minecraft.world.InteractionResult.PASS, "A full tank consumed the normal block interaction");
+            port.sendTank().drain(500, IFluidHandler.FluidAction.EXECUTE);
+            player.setShiftKeyDown(true);
+            player.gameMode.useItemOn(player, h.getLevel(), player.getMainHandItem(), net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            ItemStack emptied = player.getMainHandItem();
+            h.assertTrue(port.sendTank().getFluidAmount() == 64_000,
+                    "Remainder pour left tank amount " + port.sendTank().getFluidAmount());
+            h.assertTrue(FluidCapsuleItem.fluid(emptied).isEmpty(),
+                    "Emptied capsule retained " + FluidCapsuleItem.fluid(emptied).getAmount() + " mB");
+            h.assertTrue(emptied.getCount() == 1, "Emptied capsule count is " + emptied.getCount());
+            ItemStack fresh = new ItemStack(SinguloItems.FLUID_CAPSULE.get());
+            h.assertTrue(emptied.getMaxStackSize() == fresh.getMaxStackSize(),
+                    "Emptied capsule stack limit is " + emptied.getMaxStackSize() + ", expected " + fresh.getMaxStackSize());
+            h.assertTrue(ItemStack.isSameItemSameComponents(emptied, fresh), "Emptied capsule does not stack with a fresh capsule");
+        } finally {
+            player.discard();
+        }
+        h.succeed();
+    }
+
+    /** 同じ送信タンクの2面に接続しても、500 mB の空きを1,000 mB と数えて水源を消費しない。 */
+    @GameTest(template = "empty", timeoutTicks = 80)
+    public static void sourcePumpCountsSharedTankRoomOnlyOnce(GameTestHelper h) {
+        BlockPos at = new BlockPos(3, 1, 3), water = new BlockPos(1, 1, 2);
+        FluidDronePortBlockEntity port = fluidPort(h, at);
+        port.sendTank().fill(new FluidStack(Fluids.WATER, 63_500), IFluidHandler.FluidAction.EXECUTE);
+        for (BlockPos p : List.of(new BlockPos(2, 1, 2), new BlockPos(2, 1, 3), new BlockPos(3, 1, 2))) {
+            pipe(h, p, SinguloBlocks.FLUID_PIPE.get());
+        }
+        // 水が周囲へ広がらないように、水没したブロックから汲む。
+        h.setBlock(water, net.minecraft.world.level.block.Blocks.OAK_SLAB.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, true));
+        h.runAfterDelay(20, () -> {
+            h.assertTrue(h.getBlockState(water).getFluidState().isSource(), "Two faces counted the same 500 mB twice and consumed the source");
+            h.assertTrue(port.sendTank().getFluidAmount() == 63_500, "A partial bucket was consumed");
+            port.sendTank().drain(500, IFluidHandler.FluidAction.EXECUTE);
+            h.runAfterDelay(10, () -> {
+                h.assertTrue(h.getBlockState(water).getFluidState().isEmpty(), "A whole bucket should be pumped once there is room");
+                h.assertTrue(port.sendTank().getFluidAmount() == 64_000, "Pumped bucket was lost or duplicated");
+                h.succeed();
+            });
+        });
+    }
+
+    @GameTest(template = "forge", timeoutTicks = 80)
+    public static void sourcePumpDoesNotSumDifferentReservoirPortWrappers(GameTestHelper h) {
+        BlockPos at = new BlockPos(15, 1, 16), water = at.south(2);
+        TestBuild.build(h, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SUSPENSION_RESERVOIR,
+                at, net.minecraft.core.Direction.NORTH, 7);
+        io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity reservoir = h.getBlockEntity(at);
+        h.assertTrue(reservoir.ready(), "Reservoir did not form");
+        reservoir.cyclePort(1); // Output -> both: a different wrapper over the input port's same tank.
+        reservoir.tank().fill(new FluidStack(Fluids.WATER, reservoir.tankCapacity() - 500), IFluidHandler.FluidAction.EXECUTE);
+        for (BlockPos p : List.of(at.west().south(), at.south(), at.east().south())) {
+            pipe(h, p, SinguloBlocks.FLUID_PIPE.get());
+        }
+        h.setBlock(water, net.minecraft.world.level.block.Blocks.OAK_SLAB.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, true));
+        h.runAfterDelay(20, () -> {
+            var first = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                    reservoir.portPos(0), net.minecraft.core.Direction.SOUTH);
+            var second = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                    reservoir.portPos(1), net.minecraft.core.Direction.SOUTH);
+            h.assertTrue(first != null && second != null && first != second, "Expected two distinct reservoir port wrappers");
+            h.assertTrue(h.getBlockState(water).getFluidState().isSource(), "Shared reservoir room was counted twice");
+            h.assertTrue(reservoir.tank().getFluidAmount() == reservoir.tankCapacity() - 500, "Reservoir consumed a partial bucket");
+            h.succeed();
+        });
+    }
+
     /** 液体のポートは液体のポートだけを行き先にし、空き箱の欄には液体カプセルだけを受ける。取り消すと液体・カプセル・電力が戻る。 */
     @GameTest(template = "empty", batch = DRONES)
     public static void fluidPortPacksCancelsAndKeepsToFluidPorts(GameTestHelper h) {

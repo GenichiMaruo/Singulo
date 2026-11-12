@@ -1,6 +1,8 @@
 // Development-only many-source rendering regression; never ship this harness.
 allprojects {
     afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
         sourceSets.main.java.srcDir(file('tools/review/lensing-src'))
         neoForge.runs.client {
             gameDirectory = file('build/lensing-review')

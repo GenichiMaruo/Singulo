@@ -1214,7 +1214,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
                     // ここで積む便も、ここへ届けるために取りに行く便も帰す（発送元の箱は、発送元が取り消して荷物を戻す）
                     goHome(net, f, now);
                 } else if (f.stage == DroneNetwork.DELIVER && worldPosition.equals(f.to)) {
-                    if (net.port(f.from) != null && !f.from.equals(worldPosition)) {
+                    if (f.away()) {
+                        goHome(net, f, now);
+                    } else if (net.port(f.from) != null && !f.from.equals(worldPosition)) {
                         BlockPos back = f.from;          // 発送元へ戻す
                         f.from = f.to;
                         f.to = back;
