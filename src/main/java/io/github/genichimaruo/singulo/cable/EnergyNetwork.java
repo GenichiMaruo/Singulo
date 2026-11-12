@@ -25,7 +25,8 @@ public final class EnergyNetwork {
      * (a pipe or machine placed beside a cable). The rebuilt network adopts them, so the light does not blink off
      * for a whole sample window; anything not adopted before the deadline (game time) is cleared.
      */
-    private static final Map<Level, Map<BlockPos, Long>> HANDOVER = new java.util.WeakHashMap<>();
+    private record Handover(EnergyNetwork owner, long until, boolean lit) {}
+    private static final Map<Level, Map<BlockPos, Handover>> HANDOVER = new java.util.WeakHashMap<>();
 
     static final class Flow {
         long generation;
@@ -127,9 +128,12 @@ public final class EnergyNetwork {
         this.endpoints = endpoints; this.cableTypes = cableTypes;
         nodes.values().forEach(n -> segments.addAll(n.edges));
         endpoints.forEach(e -> devicePositions.add(e.pos));
-        Map<BlockPos, Long> handed = HANDOVER.get(level);
+        Map<BlockPos, Handover> handed = HANDOVER.get(level);
         if (handed != null && !handed.isEmpty()) {
-            for (BlockPos pos : cables.keySet()) if (handed.remove(pos) != null) lit.add(pos);
+            for (BlockPos pos : cables.keySet()) {
+                Handover pending = handed.remove(pos);
+                if (pending != null && pending.lit()) lit.add(pos);
+            }
             if (!lit.isEmpty()) {
                 // Keep showing the old light until this network has sampled a full window of its own
                 nextVisual = level.getGameTime() + CableBlockEntity.WINDOW;
@@ -213,12 +217,31 @@ public final class EnergyNetwork {
         if (!valid) return;
         valid = false;
         if (!lit.isEmpty()) {
-            Map<BlockPos, Long> handed = HANDOVER.computeIfAbsent(level, l -> new HashMap<>());
+            Map<BlockPos, Handover> handed = HANDOVER.computeIfAbsent(level, l -> new HashMap<>());
             long until = level.getGameTime() + 2L * CableBlockEntity.WINDOW;
-            for (BlockPos pos : lit) handed.put(pos, until);
+            // Track unlit branches too: cutting one still invalidates the old component immediately.
+            for (BlockPos pos : cables.keySet()) handed.put(pos, new Handover(this, until, lit.contains(pos)));
         }
         lit.clear(); samples.clear();
         for (CableBlockEntity cable : cables.values()) if (cable.network == this) cable.network = null;
+    }
+    /** The topology owner is retained only until these cables are adopted or the short handover expires. */
+    static EnergyNetwork handoverOwner(Level level, BlockPos pos) {
+        Map<BlockPos, Handover> handed = HANDOVER.get(level);
+        Handover pending = handed == null ? null : handed.get(pos);
+        return pending == null ? null : pending.owner();
+    }
+    void cancelHandover() {
+        Map<BlockPos, Handover> handed = HANDOVER.get(level);
+        if (handed == null) return;
+        handed.entrySet().removeIf(entry -> {
+            // Never erase a cable already adopted by another network or by a newer handover.
+            if (entry.getValue().owner() != this) return false;
+            if (entry.getValue().lit() && level.isLoaded(entry.getKey())
+                    && level.getBlockEntity(entry.getKey()) instanceof CableBlockEntity be) be.showFlow(null);
+            return true;
+        });
+        if (handed.isEmpty()) HANDOVER.remove(level);
     }
     /** pos is not yet an endpoint of this network (a block beside a cable that may become one). */
     boolean isNewDevice(BlockPos pos) {
@@ -435,9 +458,9 @@ public final class EnergyNetwork {
             if (level.getServer() != event.getServer()) continue;
             long now = level.getGameTime();
             e.getValue().entrySet().removeIf(h -> {
-                if (h.getValue() > now) return false;
+                if (h.getValue().until() > now) return false;
                 // No network adopted this cable in time (nothing flows any more): put its light out
-                if (level.isLoaded(h.getKey()) && level.getBlockEntity(h.getKey()) instanceof CableBlockEntity be) be.showFlow(null);
+                if (h.getValue().lit() && level.isLoaded(h.getKey()) && level.getBlockEntity(h.getKey()) instanceof CableBlockEntity be) be.showFlow(null);
                 return true;
             });
             if (e.getValue().isEmpty()) levels.remove();
