@@ -1525,19 +1525,19 @@ def accessory_icons(Image):
         for x, y in pts:
             p[x, y] = c
 
-    # 猫耳カチューシャ: 左右に離した、先の丸い三角の耳（先は少し外へ）。縁は濃く、外側の縁に光、
-    # 内側は縁から真ん中へ濃くなる桃色、根元に白い毛の房。下に細い ∩ のカチューシャ（上の縁に光）。
+    # 猫耳カチューシャ（着けたときの形に合わせる）: 根元が広く低い三角の耳を左右に離して置く。先は小さく平らで少し外寄り、
+    # 縁は濃く、外側の縁に光。内側は桃色（真ん中が濃い）、根元に白い毛の房。下に細い ∩ のカチューシャ（上の縁に光）。
     # 左の耳を1ドットずつ決め、右は左右反転（E: 縁 W: 光 S: 陰 P: 桃色 D: 濃い桃色 F: 白い毛）
     b, d = new(), new()
     left_ear = {
-        1: '..E.....',
-        2: '..EE....',
-        3: '.EWPE...',
-        4: '.EWPPE..',
-        5: '.EWPDPE.',
-        6: '.EWPDPSE',
-        7: '.ESFFFSE',
-        8: '..EEEEE.',
+        2: '..E.....',
+        3: '..EE....',
+        4: '.EWSE...',
+        5: '.EWPSE..',
+        6: 'EWPPPE..',
+        7: 'EWPDPSE.',
+        8: 'EWFDFFE.',
+        9: '.EEEEEE.',
     }
     tone = {'E': E, 'W': W, 'S': S}
     pinks = {'P': (246, 180, 196, 255), 'D': (226, 136, 160, 255), 'F': (255, 250, 252, 255)}
@@ -1548,12 +1548,9 @@ def accessory_icons(Image):
                     b.load()[xx, y] = tone[ch]
                 elif ch in pinks:
                     d.load()[xx, y] = pinks[ch]
-    d.load()[4, 6] = (255, 250, 252, 255)            # 毛の房の先が、桃色へ少し伸びる
-    d.load()[11, 6] = (255, 250, 252, 255)
-    band = [(x, 9) for x in range(4, 12)] + [(3, 10), (12, 10)] + [(2, y) for y in range(11, 15)] + [(13, y) for y in range(11, 15)]
+    band = [(x, 10) for x in range(2, 14)] + [(1, y) for y in range(11, 15)] + [(14, y) for y in range(11, 15)]
     px(b, band, E)
-    px(b, [(x, 10) for x in range(4, 12)], S)
-    px(b, [(x, 9) for x in range(6, 10)], W)
+    px(b, [(x, 10) for x in range(6, 10)], W)
     out['android_cat_ears'] = (b, d)
     # 魔女の帽子: 広いつば、上ほど細く先が右へ折れるとんがり、すその金の帯と留め金
     b, d = new(), new()

@@ -1668,7 +1668,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                         float t = (age + (side > 0 ? 37 : 0)) % 90;
                         float twitch = t < 6 ? 12 * Mth.sin(t / 6 * Mth.PI) : 0;
                         pose.pushPose();
-                        pose.translate(side * 2.5F * P, -8.4F * P, -0.7F * P);
+                        pose.translate(side * 2.5F * P, -8.65F * P, -0.7F * P);       // 根元は髪（てっぺん -8.45）に少し埋まる
                         pose.mulPose(Axis.ZP.rotationDegrees(side * (12 + twitch)));   // 先を外へ
                         pose.mulPose(Axis.YP.rotationDegrees(-side * 12));             // 内側を少し外へ向ける
                         pose.scale(side, 1, 1);                                        // 左右対称（先は外寄り）
