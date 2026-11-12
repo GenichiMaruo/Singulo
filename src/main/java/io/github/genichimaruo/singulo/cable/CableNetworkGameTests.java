@@ -138,6 +138,28 @@ public final class CableNetworkGameTests {
                             "Source light change rebuilt topology or made cable flicker");
                 }).thenSucceed();
     }
+    /** 光っている電線の隣にパイプを置いても、網を作り直すあいだ電線の光は消えない（作り直した網へ引き継ぐ）。 */
+    @GameTest(template="empty",timeoutTicks=120)
+    public static void placingPipeBesideLitCableKeepsDisplay(GameTestHelper h) {
+        var source=storage(h,new BlockPos(1,1,2),Direction.EAST);
+        source.energy().setEnergy(100_000_000);
+        for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        storage(h,new BlockPos(5,1,2),Direction.SOUTH);
+        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(4,1,2));
+        int[] watched={0};
+        h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
+                .thenExecute(()->{
+                    EnergyNetwork before=a.network;
+                    h.setBlock(new BlockPos(3,1,3),SinguloBlocks.FLUID_PIPE.get());
+                    h.assertTrue(before!=null && !before.isValid(),"Fixture expects the pipe to rebuild the network");
+                    h.assertTrue(a.flow()>0 && b.flow()>0,"Placing a pipe put the cable light out");
+                })
+                .thenExecuteFor(30,()->{
+                    watched[0]++;
+                    h.assertTrue(a.flow()>0 && b.flow()>0,"Cable light blinked off after a pipe was placed (tick "+watched[0]+")");
+                })
+                .thenSucceed();
+    }
     @GameTest(template="empty",timeoutTicks=100)
     public static void localBreakDisplayClearsBothSidesWithoutWaitingForPacket(GameTestHelper h) {
         var source=storage(h,new BlockPos(1,1,2),Direction.EAST);

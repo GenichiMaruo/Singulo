@@ -157,7 +157,13 @@ public class CableBlockEntity extends BlockEntity {
     }
 
     void invalidateForNeighbor(BlockPos pos) {
-        if (network != null && network.topologyChanged(pos)) network.invalidate();
+        if (network == null || !network.topologyChanged(pos)) return;
+        // A cable placed or broken beside this one may cut the flow, so its light goes out at once. A pipe or machine
+        // placed beside the cable only adds a possible endpoint: keep the light until the rebuilt network samples again
+        // (a machine that was an endpoint and is now gone may have been the source, so that also cuts the light at once)
+        if (level != null && level.isLoaded(pos) && !(level.getBlockEntity(pos) instanceof CableBlockEntity)
+                && !(level.getBlockState(pos).getBlock() instanceof CableBlock) && network.isNewDevice(pos)) network.invalidateKeepingLight();
+        else network.invalidate();
     }
 
     EnergyNetwork network() {
