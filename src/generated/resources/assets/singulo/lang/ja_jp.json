@@ -2696,6 +2696,8 @@
   "message.singulo.area_card.first": "1つ目の角を記録した（%s, %s, %s）。もう1つの角をシフト右クリック",
   "message.singulo.area_card.recorded": "範囲を記録した（%s×%s×%s）",
   "message.singulo.area_card.too_large": "範囲が大きすぎる（1辺 %sブロックまで）",
+  "message.singulo.arsenal_notice": "Singulo の公式アドオン「Singulo Arsenal」を公開しました。Singulo の素材から、物理現象を題材にした防具・武器・工具を作れます。%s",
+  "message.singulo.arsenal_notice.link": "[CurseForge で見る]",
   "message.singulo.cryogenic_turbine.now_storage": "極低温タービンは、液体窒素の蓄電装置に変わりました。冷却塔で液体窒素に詰めた電力の最大9割を取り戻します（冷却塔とつないで回しても電力は増えません）。第2段階の発電には、ミュオン触媒核融合炉を使ってください。",
   "message.singulo.deep_sea_collector.idle": "水深が足りない（真上に16ブロック以上の水が必要）",
   "message.singulo.deep_sea_collector.rate": "水圧 %s%%: 約%s秒ごとに高圧結晶が1個できる",

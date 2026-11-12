@@ -54,6 +54,9 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::hud);
         NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::clear);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(ArsenalNotice::onLogin);
+        NeoForge.EVENT_BUS.addListener(ArsenalNotice::onLogout);
+        NeoForge.EVENT_BUS.addListener(ArsenalNotice::onClientTick);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
             ClientGalaxies.set(java.util.List.of(), false);
             ClientRecords.set(java.util.List.of());

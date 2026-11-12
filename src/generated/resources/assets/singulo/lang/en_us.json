@@ -2696,6 +2696,8 @@
   "message.singulo.area_card.first": "Recorded the first corner (%s, %s, %s). Sneak-use the other corner",
   "message.singulo.area_card.recorded": "Recorded the area (%s×%s×%s)",
   "message.singulo.area_card.too_large": "The area is too large (up to %s blocks per side)",
+  "message.singulo.arsenal_notice": "Singulo Arsenal, the official Singulo add-on, is out: armor, weapons and tools made from Singulo materials, each built around a physical phenomenon. %s",
+  "message.singulo.arsenal_notice.link": "[View on CurseForge]",
   "message.singulo.cryogenic_turbine.now_storage": "The Cryogenic Turbine is now liquid-nitrogen energy storage. It returns up to 90% of the power the cooling tower put into the nitrogen, so running it from a cooling tower no longer makes power. For stage 2 power, build a Muon-Catalyzed Fusion Reactor.",
   "message.singulo.deep_sea_collector.idle": "Not deep enough: needs 16+ blocks of water above",
   "message.singulo.deep_sea_collector.rate": "Pressure %s%%: one Pressure Crystal every %ss",

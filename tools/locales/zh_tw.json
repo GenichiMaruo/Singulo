@@ -14154,5 +14154,13 @@
   "holo.singulo.ports.report": {
     "source": "Multiblock ports fit in %s casing positions (cyan frames in the projection)",
     "translation": "搬入搬出埠：可放在 %s 處外殼板位置（投影中的水色框）"
+  },
+  "message.singulo.arsenal_notice": {
+    "source": "Singulo Arsenal, the official Singulo add-on, is out: armor, weapons and tools made from Singulo materials, each built around a physical phenomenon. %s",
+    "translation": "Singulo 官方附加模組「Singulo Arsenal」已發布：用 Singulo 的材料製作以物理現象為題材的防具、武器與工具。%s"
+  },
+  "message.singulo.arsenal_notice.link": {
+    "source": "[View on CurseForge]",
+    "translation": "[在 CurseForge 查看]"
   }
 }

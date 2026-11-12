@@ -62,6 +62,12 @@
 - 電線を置いた・壊したとき、装置として数えていたブロックがなくなったとき（電源だったかもしれない）は、これまでどおりすぐ消す。
 - GameTest `placingPipeBesideLitCableKeepsDisplay`。
 
+## Singulo Arsenal の告知
+
+- 初めてワールドに入ってから 60 tick 後（参加の知らせに埋もれないように）、チャットに1回だけ出す（`client/ArsenalNotice.java`）。リンクは https://www.curseforge.com/minecraft/mc-mods/singulo-arsenal 。
+- 出したらクライアント設定 `notice.arsenalNotice` を false にして保存する（`tools/config_spec.py`）。true に戻すともう一度出る。`singulo_arsenal` を入れていれば出さない。
+- 文は `message.singulo.arsenal_notice`・`.link`（5言語）。クライアントだけの処理なので GameTest はない。
+
 ## 検証
 
 - ビルドと GameTest。ゲーム内の見た目はユーザーの確認を待つ。

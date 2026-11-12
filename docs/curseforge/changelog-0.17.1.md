@@ -2,6 +2,7 @@
 
 ## Changes
 
+- The first time you join a world, a chat message announces Singulo Arsenal, the official add-on, with a link to its CurseForge page. It appears once, and not at all if Singulo Arsenal is installed. To see it again, set `arsenalNotice` back to `true` in `singulo-client.toml`.
 - Event Horizon Vaults stacked on top of each other now join up: the upper vault drops its gold base plate and its steel stand rests directly on the vault below.
 
 ## Fixes
@@ -13,6 +14,7 @@
 
 ## 変更
 
+- 初めてワールドに入ったとき、公式アドオン Singulo Arsenal の公開をチャットで知らせるようにしました（CurseForge のページへのリンクつき）。知らせるのは1回だけで、Singulo Arsenal を入れていれば出ません。もう一度見るには、`singulo-client.toml` の `arsenalNotice` を `true` に戻します。
 - 事象の地平線倉庫を縦に積むと、つながった形になるようにしました。上の倉庫は下の金の板がなくなり、黒鋼の台が下の倉庫にじかに乗ります。
 
 ## 修正
