@@ -56,6 +56,16 @@ final class FluidLook {
     }
 
     /**
+     * 入れ物（ガラスの殻）の中の液体の描き込み先。殻の半透明（{@code Sheets.translucentItemSheet}）は共有の描き込み先なので、
+     * 液体も別の共有の描き込み先に入れる。共有の描き込み先は、別の共有の種類を求めた時点でそれまでの分を描くため、殻を求めた
+     * 瞬間に液体が先に描かれ、ガラスの奥に必ず見える（{@link #buffer} の種類は固定の描き込み先で、殻より後に描かれて隠れる）。
+     * 面を落とさない描き方で、裏の面も奥から順に重なる。
+     */
+    static VertexConsumer insideBuffer(MultiBufferSource buffers) {
+        return buffers.getBuffer(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
+    }
+
+    /**
      * 箱（ブロック単位）。mask は描く面（Direction の 3D 番号のビット。0x3F で全部）。rgb・alpha は液体の色に掛ける。
      */
     static void box(PoseStack pose, VertexConsumer vc, Look look, int rgb, int alpha, int light, int mask,
@@ -63,9 +73,10 @@ final class FluidLook {
         PoseStack.Pose p = pose.last();
         TextureAtlasSprite s = look.sprite();
         int lum = look.light(light);
-        // DOWN, UP, NORTH, SOUTH, WEST, EAST の順（Direction.get3DDataValue）
-        if ((mask & 1) != 0) quad(vc, p, s, rgb, alpha, lum, 0, -1, 0, x0, y0, z1, x1, y0, z1, x1, y0, z0, x0, y0, z0, x1 - x0, z1 - z0);
-        if ((mask & 2) != 0) quad(vc, p, s, rgb, alpha, lum, 0, 1, 0, x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, x1 - x0, z1 - z0);
+        // DOWN, UP, NORTH, SOUTH, WEST, EAST の順（Direction.get3DDataValue）。
+        // 頂点は面の外から見て反時計回り（裏を落とす描き方で、外から見える向き）。上と下は以前逆回りで、上からは上面が消えて下面が見えた
+        if ((mask & 1) != 0) quad(vc, p, s, rgb, alpha, lum, 0, -1, 0, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, x1 - x0, z1 - z0);
+        if ((mask & 2) != 0) quad(vc, p, s, rgb, alpha, lum, 0, 1, 0, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0, x1 - x0, z1 - z0);
         if ((mask & 4) != 0) quad(vc, p, s, rgb, alpha, lum, 0, 0, -1, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, x1 - x0, y1 - y0);
         if ((mask & 8) != 0) quad(vc, p, s, rgb, alpha, lum, 0, 0, 1, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, x1 - x0, y1 - y0);
         if ((mask & 16) != 0) quad(vc, p, s, rgb, alpha, lum, -1, 0, 0, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, z1 - z0, y1 - y0);

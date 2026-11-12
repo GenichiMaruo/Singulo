@@ -54,17 +54,21 @@ public final class FluidCapsuleRenderer extends BlockEntityWithoutLevelRenderer 
     @Override
     public void renderByItem(ItemStack stack, ItemDisplayContext context, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         Minecraft mc = Minecraft.getInstance();
-        VertexConsumer vc = buffers.getBuffer(Sheets.translucentItemSheet());
         FluidStack fluid = FluidCapsuleItem.fluid(stack);
         if (!fluid.isEmpty()) {
+            // 中身は殻とは別の共有の描き込み先で描く。殻と同じ描き込み先に入れると面は遠い順に並べ替えられ、液体の上面や側面が
+            // 手前のガラスより後になって、ガラスの奥行きに阻まれて正面だけが残る。固定の描き込み先（液体パイプの種類）に入れると、
+            // 殻（共有）より後に描かれて全部隠れる。別の共有の種類なら、殻を求めた瞬間に液体が先に描かれる
+            VertexConsumer inside = FluidLook.insideBuffer(buffers);
             FluidLook.Look look = FluidLook.look(fluid);
             boolean gas = fluid.getFluidType().isLighterThanAir();
             float fill = Mth.clamp(fluid.getAmount() / (float) FluidCapsuleItem.CAPACITY, 0.08F, 1);
             float time = mc.level == null ? 0 : (mc.level.getGameTime() % 24000 + mc.getTimer().getGameTimeDeltaPartialTick(false)) / 20F;
             float wobble = fill < 0.98F ? Mth.sin(time * 2.4F) * 0.12F / 16 : 0;
             float top = gas ? Y1 : Math.min(Y1, Y0 + (Y1 - Y0) * fill + wobble);
-            FluidLook.box(pose, vc, look, look.rgb(), look.alpha(), light, 0x3F, X0, Y0, Z0, X1, top, Z1);
+            FluidLook.box(pose, inside, look, look.rgb(), look.alpha(), light, 0x3F, X0, Y0, Z0, X1, top, Z1);
         }
+        VertexConsumer vc = buffers.getBuffer(Sheets.translucentItemSheet());
         var model = mc.getModelManager().getModel(shell(DroneCrateItem.tier(stack)));
         mc.getItemRenderer().renderModelLists(model, stack, light, overlay, pose, vc);
     }

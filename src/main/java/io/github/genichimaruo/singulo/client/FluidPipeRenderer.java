@@ -43,7 +43,8 @@ public class FluidPipeRenderer implements BlockEntityRenderer<FluidPipeBlockEnti
         // 液体は量の桁で深さが決まる（細い流れは底を這い、その段階の上限近くでいっぱい）
         float level = gas ? 1 : depth(be.visualAmount(), pipe.capacity());
         float top = lo + (hi - lo) * level;
-        VertexConsumer vc = FluidLook.buffer(buffers);
+        // 色は深度を書かずに遠い順に重ね、そのあと深度だけ書く（重なり合う箱と帯で、面が抜けて見えないように）
+        VertexConsumer vc = GlowDepth.fluid(buffers);
         int rgb = look.rgb();
         int alpha = look.alpha();
         FluidLook.box(pose, vc, look, rgb, alpha, light, 0x3F, lo, lo, lo, hi, top, hi);
