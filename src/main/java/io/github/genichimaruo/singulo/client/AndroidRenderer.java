@@ -1641,16 +1641,38 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     }
                 }
                 case "cat_ears" -> {
-                    // 頭の上を渡るカチューシャ（髪の殻 y -8.45・x ±4.45 から少し離す）と、左右の三角の猫耳（内側は桃色）
-                    b(pose, vc, light, -4.6F, -9.0F, -0.8F, 4.6F, -8.5F, -0.2F, dark);
-                    b(pose, vc, light, -4.8F, -8.5F, -0.8F, -4.5F, -6.2F, -0.2F, dark);
-                    b(pose, vc, light, 4.5F, -8.5F, -0.8F, 4.8F, -6.2F, -0.2F, dark);
+                    // 細いカチューシャ（髪の殻 y -8.45・x ±4.45 から少し離す）と、本物の猫に似せた耳。
+                    // 耳は厚みのある先の丸い三角で、少し外へ開いて前を向く。内側は桃色（真ん中ほど濃い）、根元に白いふわふわの毛、
+                    // 先は少し濃い。ときどき片方ずつ、ぴくっと外へ動く
+                    b(pose, vc, light, -4.65F, -8.95F, -1.0F, 4.65F, -8.5F, -0.45F, dark);
+                    b(pose, vc, light, -4.85F, -8.5F, -1.0F, -4.55F, -6.4F, -0.45F, dark);
+                    b(pose, vc, light, 4.55F, -8.5F, -1.0F, 4.85F, -6.4F, -0.45F, dark);
+                    int tip = mix(c, 0x000000, 0.22F);
                     for (int side = -1; side <= 1; side += 2) {
-                        float x = side * 2.6F;
-                        b(pose, vc, light, x - 1.1F, -10.0F, -0.85F, x + 1.1F, -9.0F, -0.15F, c);
-                        b(pose, vc, light, x - 0.8F, -10.8F, -0.85F, x + 0.8F, -10.0F, -0.15F, c);
-                        b(pose, vc, light, x - 0.45F, -11.5F, -0.85F, x + 0.45F, -10.8F, -0.15F, c);
-                        b(pose, vc, light, x - 0.6F, -10.4F, -0.92F, x + 0.6F, -9.1F, -0.85F, 0xF2A6B6);   // 内側
+                        float t = (age + (side > 0 ? 37 : 0)) % 90;
+                        float twitch = t < 6 ? 12 * Mth.sin(t / 6 * Mth.PI) : 0;
+                        pose.pushPose();
+                        pose.translate(side * 2.5F * P, -8.4F * P, -0.7F * P);
+                        pose.mulPose(Axis.ZP.rotationDegrees(side * (14 + twitch)));   // 先を外へ
+                        pose.mulPose(Axis.YP.rotationDegrees(-side * 12));             // 内側を少し外へ向ける
+                        // 外側（染めた色）: 下ほど広い段。先の2段は少し濃い
+                        float[][] layers = {{0.3F, -0.9F, 1.7F}, {-0.9F, -1.8F, 1.45F}, {-1.8F, -2.6F, 1.15F}, {-2.6F, -3.3F, 0.85F},
+                                {-3.3F, -3.85F, 0.55F}, {-3.85F, -4.2F, 0.3F}};
+                        for (int i = 0; i < layers.length; i++) {
+                            float[] l = layers[i];
+                            b(pose, vc, light, -l[2], l[1], -0.3F, l[2], l[0], 0.5F, i >= 4 ? tip : c);
+                        }
+                        // 内側の桃色（前の面のすぐ前。縁を残して一回り小さく）と、真ん中の濃い筋
+                        float[][] inner = {{0, -0.9F, 1.25F}, {-0.9F, -1.8F, 1.0F}, {-1.8F, -2.6F, 0.7F}, {-2.6F, -3.1F, 0.4F}};
+                        for (float[] l : inner) {
+                            b(pose, vc, light, -l[2], l[1], -0.36F, l[2], l[0], -0.3F, 0xF6B4C4);
+                        }
+                        b(pose, vc, light, -0.35F, -2.4F, -0.4F, 0.35F, -0.6F, -0.36F, 0xE893AA);
+                        // 根元の白い毛（前へ少しふくらむ房）
+                        b(pose, vc, light, -1.05F, -1.25F, -0.62F, -0.3F, 0.0F, -0.3F, 0xFFF8FA);
+                        b(pose, vc, light, 0.25F, -0.95F, -0.58F, 0.95F, 0.0F, -0.3F, 0xF6EEF2);
+                        b(pose, vc, light, -0.3F, -1.75F, -0.5F, 0.3F, -0.9F, -0.38F, 0xFFF8FA);
+                        pose.popPose();
                     }
                 }
                 case "witch_hat" -> {

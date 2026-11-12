@@ -1525,16 +1525,25 @@ def accessory_icons(Image):
         for x, y in pts:
             p[x, y] = c
 
-    # 猫耳カチューシャ: 正面から見た ∩ の形のカチューシャと、その上に立つ左右の三角の耳（内側は桃色）
+    # 猫耳カチューシャ: 大きな先の丸い三角の耳（少し外へ開く。縁は濃く、先はさらに濃い）、内側の桃色と根元の白い毛、
+    # 下に細い ∩ のカチューシャ
     b, d = new(), new()
-    band = [(x, 6) for x in range(6, 10)] + [(4, 7), (5, 7), (10, 7), (11, 7), (3, 8), (12, 8), (3, 9), (12, 9)]         + [(2, y) for y in range(10, 15)] + [(13, y) for y in range(10, 15)]
-    px(b, band, W)
-    px(b, [(x, 7) for x in range(6, 10)] + [(4, 8), (11, 8)], S)
-    for cx, side in ((5, -1), (10, 1)):
-        for y, (a0, a1) in ((1, (0, 0)), (2, (0, 1)), (3, (-1, 1)), (4, (-1, 2)), (5, (-1, 2))):
-            for x in range(cx + min(a0 * side, a1 * side), cx + max(a0 * side, a1 * side) + 1):
-                b.load()[x, y] = E if y == 5 or x in (cx + a0 * side, cx + a1 * side) else W
-        px(d, ((cx, 3), (cx, 4), (cx + side, 4)), (242, 166, 182, 255))
+    ear = {1: (2, 2), 2: (2, 3), 3: (1, 4), 4: (1, 4), 5: (1, 5), 6: (1, 6), 7: (1, 6), 8: (2, 6)}
+    for y, (x0, x1) in ear.items():
+        for x in range(x0, x1 + 1):
+            for xx in (x, 15 - x):
+                b.load()[xx, y] = E if x in (x0, x1) or y <= 2 else (S if x == x1 - 1 else W)
+    pink, deep, fluff = (246, 180, 196, 255), (232, 147, 170, 255), (255, 248, 250, 255)
+    inner = [(2, 3), (3, 3), (2, 4), (3, 4), (2, 5), (3, 5), (4, 5), (2, 6), (3, 6), (4, 6), (5, 6)]
+    for x, y in inner:
+        for xx in (x, 15 - x):
+            d.load()[xx, y] = deep if (x, y) in ((3, 4), (3, 5), (3, 6)) else pink
+    for x, y in ((2, 7), (3, 7), (4, 7), (5, 7)):
+        for xx in (x, 15 - x):
+            d.load()[xx, y] = fluff
+    band = [(x, 8) for x in range(7, 9)] + [(x, 9) for x in range(3, 13)] + [(2, y) for y in range(10, 15)] \
+        + [(13, y) for y in range(10, 15)]
+    px(b, band, E)
     out['android_cat_ears'] = (b, d)
     # 魔女の帽子: 広いつば、上ほど細く先が右へ折れるとんがり、すその金の帯と留め金
     b, d = new(), new()
