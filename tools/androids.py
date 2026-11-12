@@ -668,6 +668,8 @@ def item_textures(ti, save):
                 json.dumps({'animation': {'frametime': 2, 'interpolate': False}}), encoding='utf-8')
             continue
         save(memory_icon(pal['accent'], Image), ti / f'android_memory_{kind}.png')
+    save(decor_grain(Image), ti.parent / 'entity' / 'android_decor_grain.png')
+    save(decor_strands(Image), ti.parent / 'entity' / 'android_decor_strands.png')
     save(kit_icon(Image), ti / 'android_kit.png')
     save(charger_icon(Image), ti / 'android_charger.png')
     save(repair_icon(Image), ti / 'android_repair_kit.png')
@@ -921,6 +923,44 @@ def upgrade_board(Image):
     for x in (5, 7, 9):
         px[x, 14] = (226, 186, 92, 255)
     return im, px
+
+
+def decor_grain(Image):
+    """アンドロイドの装飾の立体に貼る模様（白い濃淡。装飾の色に掛ける）。箱の面ごとに1枚まるごと貼るので、
+    縁を少し暗く（使い込んだ角の擦れ）、面に細かなむら、ところどころに光る小傷を入れて、のっぺりさせない（汚し）。"""
+    im = Image.new('RGBA', (16, 16), (255, 255, 255, 255))
+    px = im.load()
+    rng = random.Random(83)
+    for y in range(16):
+        for x in range(16):
+            k = 246 + rng.choice((0, 0, 3, -4, -7, 5))
+            edge = min(x, y, 15 - x, 15 - y)
+            if edge == 0:
+                k -= 22
+            elif edge == 1:
+                k -= 8
+            if (x // 4 + y // 4) % 2 == 0:
+                k -= 3                                # ごく薄い面のむら
+            px[x, y] = (k, k, k, 255)
+    for x, y in ((4, 5), (5, 4), (11, 10), (12, 9), (9, 3)):
+        px[x, y] = (255, 255, 255, 255)               # 小傷の光
+    return im
+
+
+def decor_strands(Image):
+    """髪・麦わら・ほうきの穂に貼る、縦の細い筋の模様（白い濃淡）。毛先の側（下）ほど少し暗い。"""
+    im = Image.new('RGBA', (16, 16), (255, 255, 255, 255))
+    px = im.load()
+    rng = random.Random(89)
+    shades = [rng.choice((255, 246, 236, 226, 250)) for _ in range(16)]
+    for x in range(16):
+        for y in range(16):
+            k = shades[x] - y // 3 - (10 if (x + y // 5) % 4 == 0 else 0)
+            if rng.random() < 0.04:
+                k += 12
+            k = max(150, min(255, k))
+            px[x, y] = (k, k, k, 255)
+    return im
 
 
 def wear(im, seed):

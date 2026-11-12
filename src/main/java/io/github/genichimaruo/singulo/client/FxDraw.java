@@ -308,6 +308,12 @@ final class FxDraw {
      */
     static void prism(PoseStack pose, VertexConsumer vc, float ax, float ay, float bx, float by, float cx, float cy,
                       float z0, float z1, float backScale, int light, int rgb) {
+        prism(pose, vc, ax, ay, bx, by, cx, cy, z0, z1, backScale, light, rgb, 255);
+    }
+
+    /** 透ける三角柱（alpha は 0〜255）。 */
+    static void prism(PoseStack pose, VertexConsumer vc, float ax, float ay, float bx, float by, float cx, float cy,
+                      float z0, float z1, float backScale, int light, int rgb, int alpha) {
         PoseStack.Pose p = pose.last();
         float mx = (ax + bx + cx) / 3, my = (ay + by + cy) / 3;
         float[] fx = {ax, bx, cx}, fy = {ay, by, cy};
@@ -317,8 +323,8 @@ final class FxDraw {
             bky[i] = my + (fy[i] - my) * backScale;
         }
         float nz = z1 > z0 ? -1 : 1;
-        quad(vc, p, light, rgb, 255, 0, 0, nz, fx[0], fy[0], z0, fx[1], fy[1], z0, fx[2], fy[2], z0, fx[2], fy[2], z0);
-        quad(vc, p, light, rgb, 255, 0, 0, -nz, bkx[0], bky[0], z1, bkx[2], bky[2], z1, bkx[1], bky[1], z1, bkx[1], bky[1], z1);
+        quad(vc, p, light, rgb, alpha, 0, 0, nz, fx[0], fy[0], z0, fx[1], fy[1], z0, fx[2], fy[2], z0, fx[2], fy[2], z0);
+        quad(vc, p, light, rgb, alpha, 0, 0, -nz, bkx[0], bky[0], z1, bkx[2], bky[2], z1, bkx[1], bky[1], z1, bkx[1], bky[1], z1);
         for (int i = 0; i < 3; i++) {
             int j = (i + 1) % 3;
             // 側面の向き: 辺に垂直で、重心から外へ（後ろへの傾きは小さいので、前後の成分は入れない）
@@ -329,7 +335,7 @@ final class FxDraw {
                 sy = -sy;
             }
             float len = (float) Math.sqrt(sx * sx + sy * sy);
-            quad(vc, p, light, rgb, 255, sx / len, sy / len, 0, fx[i], fy[i], z0, fx[j], fy[j], z0, bkx[j], bky[j], z1, bkx[i], bky[i], z1);
+            quad(vc, p, light, rgb, alpha, sx / len, sy / len, 0, fx[i], fy[i], z0, fx[j], fy[j], z0, bkx[j], bky[j], z1, bkx[i], bky[i], z1);
         }
     }
 

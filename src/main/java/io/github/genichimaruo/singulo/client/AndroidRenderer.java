@@ -108,8 +108,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Tanks(this));
         addLayer(new Thrusters(this));
         addLayer(new SwimRing(this));
-        addLayer(new Accessories(this));
+        // まぶたは装飾より先に描く（メガネ・モノクルの透けるレンズが先に奥行きを書くと、その奥のまぶたが隠れて目を閉じられない）
         addLayer(new Blink(this));
+        addLayer(new Accessories(this));
         addLayer(new ArmorGlint(this));
     }
 
@@ -1312,6 +1313,17 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      */
     final class Accessories extends RenderLayer<RuinAndroid, AndroidModel> {
         private static final float P = 1 / 16F;
+        /** 装飾の立体に貼る模様（面の縁の擦れ・むら・小傷の汚し）と、髪・麦わら・穂の筋の模様（tools/androids.py）。 */
+        static final ResourceLocation GRAIN = io.github.genichimaruo.singulo.Singulo.id("textures/entity/android_decor_grain.png");
+        static final ResourceLocation STRANDS = io.github.genichimaruo.singulo.Singulo.id("textures/entity/android_decor_strands.png");
+
+        private static VertexConsumer grain(MultiBufferSource buffers) {
+            return buffers.getBuffer(RenderType.entityCutoutNoCull(GRAIN));
+        }
+
+        private static VertexConsumer strands(MultiBufferSource buffers) {
+            return buffers.getBuffer(RenderType.entityCutoutNoCull(STRANDS));
+        }
 
         Accessories(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
@@ -1323,7 +1335,6 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             if (!android.printed()) {
                 return;
             }
-            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
             AndroidModel m = getParentModel();
             int hair = hairColor(android.kind());
             for (int part = 0; part < io.github.genichimaruo.singulo.android.AndroidAccessoryItem.PARTS; part++) {
@@ -1352,24 +1363,21 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 if (acc.style().equals("broom")) {
                     pose.mulPose(Axis.XP.rotationDegrees(BROOM_TILT));      // ほうきは少し前へ傾けて立てて持つ
                 }
-                draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age, hair);
+                // 描き込み先は装飾ごとに取り直す（筋の模様や透ける物で別の描き方を求めると、前の描き込み先は閉じられる）
+                draw(acc.style(), pose, grain(buffers), buffers, light, c, Math.min(1, limbSwingAmount), age, hair);
                 if (acc.style().equals("fairy_wings")) {
-                    fairyWings(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light, c, age);
-                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                    fairyWings(pose, buffers, c, age);
                 }
                 if (acc.style().equals("monocle")) {
                     FxDraw.box(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), -3.2F * P, -3.1F * P, -3.86F * P,
                             -0.8F * P, -1.1F * P, -3.8F * P, light, 0xD2ECFF, 70);
-                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 }
                 if (acc.style().equals("bouquet")) {
-                    // 透ける包装は、形を描き終えてから別の描き方で（描き方を混ぜないよう、形の受け口は取り直す）
+                    // 透ける包装は、形を描き終えてから別の描き方で
                     bouquetWrap(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
-                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 }
                 if (acc.style().equals("glasses")) {
                     glassesLenses(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
-                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 }
                 pose.popPose();
             }
@@ -1379,41 +1387,6 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         static final float UMBRELLA_TILT = -30;
         /** ほうきを持つ傾き（度。少し前へ）。 */
         static final float BROOM_TILT = 8;
-
-        /** 型ごとの髪の色（tools/androids.py の型ごとの色の hair の明るい色）。付け毛をアンドロイド自身の髪に合わせる。 */
-        static int hairColor(io.github.genichimaruo.singulo.android.AndroidKind kind) {
-            return switch (kind) {
-                case BLADE -> 0xEEF1F7;
-                case WHIP -> 0x2C2A38;
-                case SABER -> 0xE2E6EE;
-                case AXE -> 0xBA6646;
-                case GUNNER -> 0xCCE4F6;
-                case BIT -> 0x323A62;
-            };
-        }
-
-        /**
-         * 妖精の羽（透ける4枚。上の2枚は大きく、下の2枚は小さい）。背中の真ん中から左右へ、ゆっくり羽ばたく。
-         * 羽は染めた色で、筋は白っぽく明るい。
-         */
-        private void fairyWings(PoseStack pose, VertexConsumer vc, int light, int c, float age) {
-            int vein = mix(c, 0xFFFFFF, 0.6F);
-            float flap = 25 + 12 * Mth.sin(age * 0.25F);
-            for (int side = -1; side <= 1; side += 2) {
-                pose.pushPose();
-                pose.translate(side * 0.4F * P, -5.8F * P, 1.75F * P);
-                // 右（+x）の羽は −、左は + に回すと、羽の先が後ろ（+z）へ開く
-                pose.mulPose(Axis.YP.rotationDegrees(-side * flap));
-                float s = side;
-                wingBox(pose, vc, light, 0, -4.4F, 5.6F * s, 0, c, 120);                 // 上の羽
-                wingBox(pose, vc, light, 0.6F * s, -6.0F, 4.6F * s, -4.4F, c, 120);
-                wingBox(pose, vc, light, 0.2F * s, -2.5F, 5.0F * s, -2.3F, vein, 190);   // 上の羽の筋
-                wingBox(pose, vc, light, 0, 0, 3.8F * s, 3.4F, c, 110);                   // 下の羽
-                wingBox(pose, vc, light, 0.4F * s, 3.4F, 2.8F * s, 4.5F, c, 110);
-                wingBox(pose, vc, light, 0.2F * s, 1.4F, 3.3F * s, 1.6F, vein, 180);     // 下の羽の筋
-                pose.popPose();
-            }
-        }
 
         /** 猫の耳の左右の辺（耳の中の座標。高さ y での x）。根元 (-1.8, 0)・(1.8, 0) から先 (-0.18, -2.65)・(0.75, -2.65) へ。 */
         private static float earLeft(float y) {
@@ -1430,9 +1403,104 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.prism(pose, vc, ax * P, ay * P, bx * P, by * P, cx * P, cy * P, z0 * P, z1 * P, backScale, light, rgb);
         }
 
-        /** 羽の1枚（x0..x1 は左右どちら向きでもよい。厚さはごくうすく）。 */
-        private void wingBox(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float x1, float y1, int rgb, int alpha) {
-            FxDraw.box(pose, vc, Math.min(x0, x1) * P, y0 * P, 0, Math.max(x0, x1) * P, y1 * P, 0.12F * P, light, rgb, alpha);
+        /** ツインテールの片方の変形（頭の左右の高い所から、外へ少し開いて垂らす）。pushPose するので、使い終えたら popPose。 */
+        private void twinTail(PoseStack pose, int side, float walk, float age) {
+            pose.pushPose();
+            pose.translate(side * 4.9F * P, -6.6F * P, 1.2F * P);
+            // +x の房は - に回すと外（+x）へ開く
+            pose.mulPose(Axis.ZP.rotationDegrees(-side * (10 + 2 * Mth.sin(age * 0.1F + side))));
+            pose.mulPose(Axis.XP.rotationDegrees(8 + 12 * walk));
+        }
+
+        /** 型ごとの髪の色（tools/androids.py の型ごとの色の hair の明るい色）。付け毛をアンドロイド自身の髪に合わせる。 */
+        static int hairColor(io.github.genichimaruo.singulo.android.AndroidKind kind) {
+            return switch (kind) {
+                case BLADE -> 0xEEF1F7;
+                case WHIP -> 0x2C2A38;
+                case SABER -> 0xE2E6EE;
+                case AXE -> 0xBA6646;
+                case GUNNER -> 0xCCE4F6;
+                case BIT -> 0x323A62;
+            };
+        }
+
+        /**
+         * 妖精の羽（ホログラム）: 背中から少し離れて浮かび、ゆっくり上下しながら羽ばたく、光でできた4枚の羽。
+         * 羽の面は奥へ3枚重ねた半透明の層（奥ほど薄い）で厚みを見せ、縁と筋は光る線（加算）。羽のまわりに光の粒が流れる。
+         * 羽の形は斜めの辺の三角で作る。羽は染めた色、縁と筋は白っぽく明るい。暗い所でも光って見える。
+         */
+        private void fairyWings(PoseStack pose, MultiBufferSource buffers, int c, float age) {
+            int full = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
+            float flap = 18 + 10 * Mth.sin(age * 0.18F);
+            float bob = 0.35F * Mth.sin(age * 0.09F);
+            float flicker = 0.88F + 0.12F * Mth.sin(age * 0.7F);
+            VertexConsumer fill = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            for (int side = -1; side <= 1; side += 2) {
+                wingPose(pose, side, flap, bob);
+                for (int k = 0; k < 3; k++) {
+                    float z = k * 0.45F;
+                    int alpha = (int) ((k == 0 ? 95 : k == 1 ? 55 : 30) * flicker);
+                    int rgb = mix(c, 0xFFFFFF, 0.12F * k);
+                    for (float[] t : WING_TRIS) {
+                        FxDraw.prism(pose, fill, t[0] * P, t[1] * P, t[2] * P, t[3] * P, t[4] * P, t[5] * P, z * P, (z + 0.06F) * P, 1,
+                                full, rgb, alpha);
+                    }
+                }
+                pose.popPose();
+            }
+            VertexConsumer glow = FxDraw.glow(buffers);
+            int rim = mix(c, 0xFFFFFF, 0.55F);
+            for (int side = -1; side <= 1; side += 2) {
+                wingPose(pose, side, flap, bob);
+                for (float[] e : WING_RIM) {
+                    glowLine(pose, glow, e[0], e[1], e[2], e[3], 0, 0.22F, rim, (int) (230 * flicker));
+                    glowLine(pose, glow, e[0], e[1], e[2], e[3], 0.9F, 0.16F, rim, (int) (110 * flicker));
+                }
+                for (float[] e : WING_VEINS) {
+                    glowLine(pose, glow, e[0], e[1], e[2], e[3], 0.03F, 0.12F, rim, (int) (170 * flicker));
+                }
+                // 羽のまわりを流れる光の粒
+                for (int i = 0; i < 4; i++) {
+                    float t = (age * 0.015F + i / 4F + (side > 0 ? 0.13F : 0)) % 1;
+                    float x = 1.0F + 5.0F * t, y = -4.5F + 8.0F * t + Mth.sin(age * 0.2F + i) * 0.6F;
+                    int a = (int) (200 * Mth.sin(t * Mth.PI));
+                    FxDraw.box(pose, glow, (x - 0.18F) * P, (y - 0.18F) * P, -0.4F * P, (x + 0.18F) * P, (y + 0.18F) * P, -0.04F * P,
+                            full, rim, a);
+                }
+                pose.popPose();
+            }
+        }
+
+        /** 羽の面の三角（羽の中の座標。x は外へ、y は下へ）: 上の羽2枚と下の羽2枚。 */
+        private static final float[][] WING_TRIS = {
+                {0, -0.5F, 5.5F, -6.0F, 6.6F, -3.0F}, {0, -0.5F, 6.6F, -3.0F, 4.2F, -0.1F},
+                {0, 0.3F, 4.6F, 1.6F, 3.1F, 4.6F}, {0, 0.3F, 3.1F, 4.6F, 0.7F, 3.4F}};
+        /** 羽の縁（光る線の両端）。 */
+        private static final float[][] WING_RIM = {
+                {0, -0.5F, 5.5F, -6.0F}, {5.5F, -6.0F, 6.6F, -3.0F}, {6.6F, -3.0F, 4.2F, -0.1F}, {4.2F, -0.1F, 0, -0.5F},
+                {0, 0.3F, 4.6F, 1.6F}, {4.6F, 1.6F, 3.1F, 4.6F}, {3.1F, 4.6F, 0.7F, 3.4F}, {0.7F, 3.4F, 0, 0.3F}};
+        /** 羽の筋（根元から先へ）。 */
+        private static final float[][] WING_VEINS = {{0.3F, -0.5F, 5.0F, -4.9F}, {0.3F, -0.4F, 5.8F, -2.6F}, {0.3F, 0.5F, 3.3F, 3.7F}};
+
+        /** 羽の変形（左右の羽を、背中から浮かせて羽ばたかせる）。pushPose するので、使い終えたら popPose。 */
+        private void wingPose(PoseStack pose, int side, float flap, float bob) {
+            pose.pushPose();
+            pose.translate(side * 0.6F * P, (-5.6F + bob) * P, 2.6F * P);
+            // 右（+x）の羽は −、左は + に回すと、羽の先が後ろ（+z）へ開く
+            pose.mulPose(Axis.YP.rotationDegrees(-side * flap));
+            pose.scale(side, 1, 1);
+        }
+
+        /** 光る線（羽の中の座標の (x0, y0) から (x1, y1)。z は奥行き、w は太さ。いつも明るい）。 */
+        private void glowLine(PoseStack pose, VertexConsumer vc, float x0, float y0, float x1, float y1, float z, float w, int rgb, int alpha) {
+            float dx = x1 - x0, dy = y1 - y0;
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
+            pose.pushPose();
+            pose.translate(x0 * P, y0 * P, z * P);
+            pose.mulPose(Axis.ZP.rotation((float) Math.atan2(dy, dx)));
+            FxDraw.box(pose, vc, 0, -w / 2 * P, -0.04F * P, len * P, w / 2 * P, 0.04F * P,
+                    net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, rgb, alpha);
+            pose.popPose();
         }
 
         /** 花束の透明な包装（下ほど細い3段と、開いた口の縁。うっすら水色に透ける）。 */
@@ -1473,7 +1541,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
         }
 
-        private void draw(String style, PoseStack pose, VertexConsumer vc, int light, int c, float walk, float age, int hair) {
+        private void draw(String style, PoseStack pose, VertexConsumer vc, MultiBufferSource buffers, int light, int c, float walk, float age,
+                          int hair) {
             int dark = mix(c, 0x000000, 0.25F);
             switch (style) {
                 // ---- 頭（頭の箱: x -4〜4、y -8〜0、z -3.5〜3.5。前は -z）
@@ -1703,8 +1772,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     // 広いつばと、上ほど細い段のとんがり（先は後ろへ折れる）。山のすそに金の帯と留め金
                     pose.pushPose();
                     pose.translate(0, -8.4F * P, 0);
-                    pose.mulPose(Axis.ZP.rotationDegrees(-6));
+                    pose.mulPose(Axis.ZP.rotationDegrees(-3));
                     b(pose, vc, light, -6.6F, -0.4F, -6.0F, 6.6F, 0.2F, 6.0F, c);
+                    b(pose, vc, light, -4.65F, 0.2F, -4.15F, 4.65F, 0.8F, 4.15F, dark);             // 頭に沿う内側の帯（髪の角を隠す）
                     b(pose, vc, light, -4.2F, -3.0F, -3.7F, 4.2F, -0.4F, 3.7F, c);
                     b(pose, vc, light, -4.3F, -1.4F, -3.8F, 4.3F, -0.4F, 3.8F, 0xE0B850);
                     b(pose, vc, light, -0.8F, -1.6F, -3.95F, 0.8F, -0.2F, -3.85F, 0xF4D27A);
@@ -1716,50 +1786,82 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                 }
                 case "straw_hat" -> {
-                    // 麦わらのつばと低い山、山に巻いた染めた色のリボン（後ろで結ぶ）。つばには編み目の輪
-                    int straw = 0xE8C878, weave = 0xC9A458;
+                    // 麦わらのつば（縁は少し下がる）と、上が少しまるい山。山に巻いた染めた色のリボンは後ろで結ぶ。
+                    // 麦わらは筋の模様、つばの上に編み目の輪（つばの面に沿って）
+                    int straw = 0xE8C878, straw2 = 0xF0D48A, weave = 0xC9A458;
                     pose.pushPose();
                     pose.translate(0, -8.4F * P, 0);
                     pose.mulPose(Axis.ZP.rotationDegrees(4));
-                    b(pose, vc, light, -7.0F, -0.3F, -7.0F, 7.0F, 0.2F, 7.0F, straw);
-                    ring(pose, vc, light, -5.7F, -5.7F, 5.7F, 5.7F, -5.3F, -5.3F, 5.3F, 5.3F, -0.36F, -0.3F, weave);
-                    b(pose, vc, light, -4.3F, -3.2F, -4.0F, 4.3F, -0.3F, 4.0F, straw);
-                    b(pose, vc, light, -4.4F, -1.3F, -4.1F, 4.4F, -0.4F, 4.1F, c);
-                    b(pose, vc, light, -0.8F, -1.7F, 4.1F, 0.8F, -0.2F, 4.6F, dark);
+                    b(pose, vc, light, -4.4F, -1.3F, -4.1F, 4.4F, -0.4F, 4.1F, c);                  // リボン
+                    b(pose, vc, light, -0.8F, -1.7F, 4.1F, 0.8F, -0.2F, 4.6F, dark);                // 後ろの結び目
                     b(pose, vc, light, -0.9F, -0.4F, 4.15F, -0.2F, 2.2F, 4.45F, c);
                     b(pose, vc, light, 0.2F, -0.4F, 4.15F, 0.9F, 1.8F, 4.45F, c);
+                    VertexConsumer st = strands(buffers);
+                    b(pose, st, light, -7.0F, -0.3F, -7.0F, 7.0F, 0.2F, 7.0F, straw);              // つば
+                    b(pose, st, light, -7.0F, 0.2F, -7.0F, 7.0F, 0.45F, -6.5F, weave);              // つばの縁（少し下がる）
+                    b(pose, st, light, -7.0F, 0.2F, 6.5F, 7.0F, 0.45F, 7.0F, weave);
+                    b(pose, st, light, -7.0F, 0.2F, -6.5F, -6.5F, 0.45F, 6.5F, weave);
+                    b(pose, st, light, 6.5F, 0.2F, -6.5F, 7.0F, 0.45F, 6.5F, weave);
+                    b(pose, st, light, -5.7F, -0.36F, -5.7F, 5.7F, -0.3F, -5.3F, weave);           // 編み目の輪（つばの上）
+                    b(pose, st, light, -5.7F, -0.36F, 5.3F, 5.7F, -0.3F, 5.7F, weave);
+                    b(pose, st, light, -5.7F, -0.36F, -5.3F, -5.3F, -0.3F, 5.3F, weave);
+                    b(pose, st, light, 5.3F, -0.36F, -5.3F, 5.7F, -0.3F, 5.3F, weave);
+                    b(pose, st, light, -4.3F, -3.0F, -4.0F, 4.3F, -0.3F, 4.0F, straw);              // 山
+                    b(pose, st, light, -3.7F, -3.4F, -3.4F, 3.7F, -3.0F, 3.4F, straw2);             // 山の上のまるみ
                     pose.popPose();
                 }
                 case "ponytail" -> {
-                    // 後頭部の高い所を染めた色の髪留めでまとめ、アンドロイド自身の髪の色の房を後ろへ垂らす（歩くと揺れる）
-                    int shade = mix(hair, 0x000000, 0.18F);
-                    b(pose, vc, light, -0.9F, -7.4F, 3.95F, 0.9F, -5.8F, 4.9F, c);
+                    // 後頭部の高い所に、染めた色のふわっとしたシュシュと小さなリボン。そこからアンドロイド自身の髪の色の房が、
+                    // 中ほどでふくらみ、先が後ろへくるんと巻いて垂れる（筋の模様。後ろの面に光の筋）。歩くと揺れる
+                    int shade = mix(hair, 0x000000, 0.16F), shine = mix(hair, 0xFFFFFF, 0.3F);
                     pose.pushPose();
-                    pose.translate(0, -6.6F * P, 4.5F * P);
-                    pose.mulPose(Axis.XP.rotationDegrees(18 + 14 * walk + 3 * Mth.sin(age * 0.1F)));
-                    b(pose, vc, light, -1.2F, 0, 0, 1.2F, 2.6F, 1.6F, hair);
-                    b(pose, vc, light, -1.0F, 2.6F, 0.1F, 1.0F, 6.0F, 1.5F, hair);
-                    b(pose, vc, light, -0.7F, 6.0F, 0.2F, 0.7F, 8.6F, 1.3F, shade);
-                    b(pose, vc, light, -0.4F, 8.6F, 0.3F, 0.4F, 9.6F, 1.1F, shade);
+                    pose.translate(0, -6.9F * P, 4.3F * P);
+                    b(pose, vc, light, -1.35F, -0.75F, -0.35F, 1.35F, 0.75F, 1.15F, c);
+                    b(pose, vc, light, -1.6F, -0.5F, -0.15F, 1.6F, 0.5F, 0.95F, c);                 // シュシュのふくらみ
+                    b(pose, vc, light, -2.3F, -1.6F, 0.1F, -0.45F, -0.55F, 0.8F, c);               // リボンの輪
+                    b(pose, vc, light, 0.45F, -1.6F, 0.1F, 2.3F, -0.55F, 0.8F, c);
+                    b(pose, vc, light, -0.45F, -1.4F, 0.15F, 0.45F, -0.7F, 0.75F, dark);            // 結び目
+                    pose.popPose();
+                    VertexConsumer st = strands(buffers);
+                    pose.pushPose();
+                    pose.translate(0, -6.4F * P, 4.9F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(16 + 14 * walk + 3 * Mth.sin(age * 0.1F)));
+                    pose.mulPose(Axis.ZP.rotationDegrees(4 * Mth.sin(age * 0.07F)));
+                    b(pose, st, light, -1.05F, 0, 0, 1.05F, 2.0F, 1.4F, hair);
+                    b(pose, st, light, -1.5F, 2.0F, -0.1F, 1.5F, 4.6F, 1.6F, hair);
+                    b(pose, st, light, -1.25F, 4.6F, 0, 1.25F, 6.6F, 1.5F, hair);
+                    b(pose, st, light, -0.85F, 6.6F, 0.15F, 0.85F, 8.0F, 1.35F, shade);
+                    b(pose, st, light, -0.5F, 8.0F, 0.35F, 0.5F, 8.7F, 1.4F, shade);
+                    b(pose, st, light, -0.4F, 8.35F, 1.4F, 0.4F, 9.0F, 1.95F, shade);              // 先が後ろへ巻く
+                    b(pose, st, light, -0.5F, 1.0F, 1.6F, 0.05F, 5.0F, 1.66F, shine);              // 光の筋
                     pose.popPose();
                 }
                 case "twin_tails" -> {
-                    // 頭の左右の高い所に染めた色の髪留め、そこから髪の色の房を垂らす（外へ少し開き、歩くと後ろへ揺れる）
-                    int shade = mix(hair, 0x000000, 0.18F);
+                    // 頭の左右の高い所に、染めた色の髪留めと小さなリボン。そこから髪の色の房が、外へ少しふくらんでから内へ戻り、
+                    // 先が内へくるんと巻く（筋の模様。外側の面に光の筋）。外へ少し開き、歩くと後ろへ揺れる
+                    int shade = mix(hair, 0x000000, 0.16F), shine = mix(hair, 0xFFFFFF, 0.3F);
                     for (int side = -1; side <= 1; side += 2) {
-                        pose.pushPose();
-                        pose.translate(side * 4.9F * P, -6.6F * P, 1.2F * P);
-                        // +x の房は - に回すと外（+x）へ開く
-                        pose.mulPose(Axis.ZP.rotationDegrees(-side * (10 + 2 * Mth.sin(age * 0.1F + side))));
-                        pose.mulPose(Axis.XP.rotationDegrees(8 + 12 * walk));
-                        b(pose, vc, light, -1.1F, -0.6F, -1.1F, 1.1F, 0.6F, 1.1F, c);
-                        b(pose, vc, light, -1.0F, 0.6F, -1.0F, 1.0F, 3.4F, 1.0F, hair);
-                        b(pose, vc, light, -0.8F, 3.4F, -0.8F, 0.8F, 7.6F, 0.8F, hair);
-                        b(pose, vc, light, -0.55F, 7.6F, -0.55F, 0.55F, 10.0F, 0.55F, shade);
+                        twinTail(pose, side, walk, age);
+                        b(pose, vc, light, -1.2F, -0.7F, -1.2F, 1.2F, 0.7F, 1.2F, c);
+                        b(pose, vc, light, -0.3F, -1.7F, -1.7F, 0.3F, -0.6F, -0.3F, c);            // リボンの輪（前と後ろ）
+                        b(pose, vc, light, -0.3F, -1.7F, 0.3F, 0.3F, -0.6F, 1.7F, c);
+                        b(pose, vc, light, -0.38F, -1.3F, -0.38F, 0.38F, -0.6F, 0.38F, dark);       // 結び目
+                        pose.popPose();
+                    }
+                    VertexConsumer st = strands(buffers);
+                    for (int side = -1; side <= 1; side += 2) {
+                        twinTail(pose, side, walk, age);
+                        float out = side * 0.15F, in = -side * 0.1F, tipIn = -side * 0.3F, curl = -side * 0.7F;
+                        b(pose, st, light, -1.0F, 0.7F, -1.0F, 1.0F, 2.6F, 1.0F, hair);
+                        b(pose, st, light, -1.3F + out, 2.6F, -1.15F, 1.3F + out, 5.4F, 1.15F, hair);
+                        b(pose, st, light, -1.05F + in, 5.4F, -0.95F, 1.05F + in, 7.8F, 0.95F, hair);
+                        b(pose, st, light, -0.7F + tipIn, 7.8F, -0.65F, 0.7F + tipIn, 9.3F, 0.65F, shade);
+                        b(pose, st, light, -0.45F + curl, 9.1F, -0.45F, 0.45F + curl, 9.8F, 0.45F, shade);   // 先が内へ巻く
+                        float sx = side * (1.3F + out);
+                        b(pose, st, light, Math.min(sx, sx + side * 0.06F), 3.0F, -0.35F, Math.max(sx, sx + side * 0.06F), 5.0F, 0.35F, shine);
                         pose.popPose();
                     }
                 }
-                // ---- 顔（頭と同じ変形）
                 case "monocle" -> {
                     // 右目（x -3〜-1）にはめる丸い縁（四角の角を欠く）と、頬へ垂れる細い鎖。レンズは透ける板（呼ぶ側で描く）
                     float z0 = -3.92F, z1 = -3.64F;
@@ -1809,13 +1911,23 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                 }
                 case "broom" -> {
-                    // 立てて持つほうき（上は -z）。木の柄、染めた色の結び、下ほど広がる穂
-                    b(pose, vc, light, -0.25F, 0.2F, -10.0F, 0.25F, 0.7F, 5.6F, 0x8A6440);
-                    b(pose, vc, light, -0.9F, -0.3F, 5.6F, 0.9F, 1.2F, 6.6F, c);
-                    b(pose, vc, light, -1.4F, -0.55F, 6.6F, 1.4F, 1.45F, 8.5F, 0xD9B860);
-                    b(pose, vc, light, -2.0F, -0.8F, 8.5F, 2.0F, 1.7F, 10.3F, 0xCFAE55);
-                    b(pose, vc, light, -1.6F, -0.85F, 9.2F, -1.4F, 1.75F, 10.3F, 0xB8954A);
-                    b(pose, vc, light, 1.4F, -0.85F, 9.2F, 1.6F, 1.75F, 10.3F, 0xB8954A);
+                    // 魔女のほうき（上は -z）: 木の柄と頭の丸い握り、染めた色の結び目2本。穂は丸く束ねて先へ広がり、
+                    // 毛先は不ぞろい（筋の模様）
+                    int wood = 0x8A6440, woodDark = 0x6E4E30, bristle = 0xD9B860, bristle2 = 0xC9A44E;
+                    b(pose, vc, light, -0.3F, 0.15F, -13.0F, 0.3F, 0.75F, 5.0F, wood);
+                    b(pose, vc, light, -0.42F, 0.03F, -13.6F, 0.42F, 0.87F, -13.0F, woodDark);
+                    b(pose, vc, light, -0.6F, -0.15F, 4.6F, 0.6F, 1.05F, 5.2F, c);
+                    VertexConsumer st = strands(buffers);
+                    b(pose, st, light, -0.9F, -0.45F, 5.2F, 0.9F, 1.35F, 6.0F, bristle);
+                    b(pose, st, light, -1.35F, -0.9F, 6.0F, 1.35F, 1.8F, 7.4F, bristle);
+                    b(pose, st, light, -1.8F, -1.35F, 7.4F, 1.8F, 2.25F, 9.0F, bristle);
+                    b(pose, st, light, -2.0F, -1.55F, 9.0F, 2.0F, 2.45F, 9.8F, bristle2);
+                    b(pose, st, light, -1.8F, -1.3F, 9.8F, -1.0F, -0.2F, 10.2F, bristle2);         // 不ぞろいな毛先
+                    b(pose, st, light, 0.2F, -0.6F, 9.8F, 1.0F, 0.6F, 10.35F, bristle2);
+                    b(pose, st, light, 1.2F, 1.1F, 9.8F, 1.9F, 2.2F, 10.1F, bristle2);
+                    b(pose, st, light, -0.9F, 1.3F, 9.8F, -0.1F, 2.3F, 10.25F, bristle2);
+                    VertexConsumer band = grain(buffers);
+                    b(pose, band, light, -1.42F, -0.97F, 6.4F, 1.42F, 1.87F, 6.8F, c);              // 穂の上の結び目
                 }
                 default -> {
                 }
