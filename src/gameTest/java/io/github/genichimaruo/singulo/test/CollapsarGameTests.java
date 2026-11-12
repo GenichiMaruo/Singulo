@@ -128,6 +128,26 @@ public final class CollapsarGameTests {
         h.succeed();
     }
 
+    /** 全部取り出して空になったことも、見た目の更新でクライアントへ届く（空のデータはクライアントで読まれず、前の個数が残る）。 */
+    @GameTest(template = "empty")
+    public static void vaultSendsEmptinessToClients(GameTestHelper h) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
+        HorizonVaultBlockEntity vault = h.getBlockEntity(at);
+        var registries = h.getLevel().registryAccess();
+        vault.items().insertItem(0, new ItemStack(Items.COBBLESTONE, 2), false);
+        // クライアント側の写し: 2個入っているところを受け取ってある
+        HorizonVaultBlockEntity shown = new HorizonVaultBlockEntity(h.absolutePos(at), vault.getBlockState());
+        shown.loadWithComponents(vault.getUpdateTag(registries), registries);
+        h.assertTrue(shown.count() == 2, "Client copy did not receive the count");
+        vault.items().extractItem(0, 64, false);
+        var update = vault.getUpdateTag(registries);
+        h.assertFalse(update.isEmpty(), "Empty vault sends an empty update, which clients ignore");
+        shown.loadWithComponents(update, registries);
+        h.assertTrue(shown.count() == 0 && shown.type().isEmpty(), "Client copy still shows " + shown.count());
+        h.succeed();
+    }
+
     @GameTest(template = "empty")
     public static void vaultStoresOneItemAndRejectsTheRest(GameTestHelper h) {
         BlockPos at = new BlockPos(2, 1, 2);
