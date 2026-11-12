@@ -80,6 +80,68 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
 
     private record Frame(PoseStack.Pose pose, Vec3 origin, Vec3 axis, Vec3 up, Vec3 cam, float time, float dist, boolean far) {}
 
+    /** 炉心のブラックホールの歪みが及ぶ球の半径（ブロック）。 */
+    static final float LENS_REGION = 5.0F;
+
+    /**
+     * 光の四角形を、カメラからの距離で炉心のレンズの前後に振り分ける。レンズは、画面で球に重なる所のうち、球の手前の面
+     * （炉心までの距離 − 球の半径）より奥にあるものを歪める。光は深度を書かないので、そのままだと光の下の景色の深度で歪むかが
+     * 決まり、リングのブロックとリングの光が別々の所に見える。四角形の最初の頂点がその面より奥ならレンズの前（歪む）、
+     * 手前ならレンズのあと（歪まない）に描き、ブロックと同じに合わせる。頂点はカメラからの位置で届く（ブロックエンティティの姿勢）。
+     */
+    private static final class DepthSplit implements VertexConsumer {
+        private final VertexConsumer far;
+        private final VertexConsumer near;
+        private final float front;
+        private VertexConsumer current;
+        private int vertex;
+
+        DepthSplit(VertexConsumer far, VertexConsumer near, float front) {
+            this.far = far;
+            this.near = near;
+            this.front = Math.max(0, front);
+        }
+
+        @Override
+        public VertexConsumer addVertex(float x, float y, float z) {
+            if (vertex++ % 4 == 0) {
+                current = x * x + y * y + z * z > front * front ? far : near;
+            }
+            current.addVertex(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+            current.setColor(red, green, blue, alpha);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            current.setUv(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            current.setUv1(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            current.setUv2(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setNormal(float x, float y, float z) {
+            current.setNormal(x, y, z);
+            return this;
+        }
+    }
+
     /** 炉心から加工側（dir 1）と排熱側（dir −1）の光の描き込み先。カメラ側の半分は、炉心のブラックホールのあとで描かれる。 */
     private record Sides(VertexConsumer glowPlus, @Nullable VertexConsumer beamPlus, VertexConsumer glowMinus,
                          @Nullable VertexConsumer beamMinus) {
@@ -127,6 +189,8 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         VertexConsumer beam = beamType == null ? null : new Lazy(jets, beamType);
         VertexConsumer nearBeam = beamType == null ? null : new Lazy(nearJets, beamType);
         Sides sides = cam.subtract(core).dot(axis) >= 0 ? new Sides(nearGlow, nearBeam, glow, beam) : new Sides(glow, beam, nearGlow, nearBeam);
+        // リング・コイル・杯などの光は、まわりのブロックと同じ所で歪むよう、カメラからの距離で四角形ごとに分ける
+        VertexConsumer placed = new DepthSplit(glow, nearGlow, (float) cam.distanceTo(core) - LENS_REGION);
         boolean fancy = mc.options.graphicsMode().get() != net.minecraft.client.GraphicsStatus.FAST;
 
         if (be.shownCore()) {
@@ -140,7 +204,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         float wake = Mth.clamp(ignition / 0.375F, 0, 1);
         float inject = Mth.clamp((ignition - 0.375F) / (0.85F - 0.375F), 0, 1);
         float ignitionPower = ignition > 0 ? 0.25F * wake + 0.75F * inject : 0;
-        drawCoils(f, tl, sides, ignitionPower);
+        drawCoils(f, tl, placed, ignitionPower);
         if (ignition > 0) {
             drawIgnition(f, beam, glow, coreW, ignition, be.ignitionCharged(), back, pos, corner, buffers);
         }
@@ -155,13 +219,13 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         if (tl.active()) {
             float flicker = tl.stalled() ? 0.35F + 0.3F * Mth.sin(time * 37F) * Mth.sin(time * 13F) : 1;
             drawJets(f, tl, sides, flicker, fancy);
-            drawCollimators(f, tl, sides.glow(1), flicker);
+            drawCollimators(f, tl, placed, flicker);
             drawBeacons(f, tl, glow, back, pos, corner);
             drawField(f, tl, beam, glow, back, pos, corner);
-            drawSinks(f, tl, sides, flicker);
-            drawImpact(f, tl, sides.glow(1), flicker);
-            drawMaterial(be, f, tl, pose, buffers, sides.glow(1), back, pos, corner, partialTick);
-            drawFinish(f, tl, sides.glow(1), coreW.add(axis.scale(TARGET_S)));
+            drawSinks(f, tl, placed, flicker);
+            drawImpact(f, tl, placed, flicker);
+            drawMaterial(be, f, tl, pose, buffers, placed, back, pos, corner, partialTick);
+            drawFinish(f, tl, placed, coreW.add(axis.scale(TARGET_S)));
         }
     }
 
@@ -176,7 +240,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             bright += 1.2F * Math.max(0, 1 - tl.finish() / 10F);
         }
         float beaming = 0.45F;
-        boolean traced = GravitationalLensing.addBlackHole(coreW, radius, 1, 5.0F, f.axis(), SHADOW * 1.1F, DISK_OUTER, beaming, bright,
+        boolean traced = GravitationalLensing.addBlackHole(coreW, radius, 1, LENS_REGION, f.axis(), SHADOW * 1.1F, DISK_OUTER, beaming, bright,
                 swirlClock(be, f.time(), tl.power()));
         if (!traced) {
             // 重力レンズを掛けない（設定・シェーダーパック）: 黒い球と、光る円盤をワールドに描く
@@ -188,7 +252,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             FxDraw.sphere(ps.last(), solid, SHADOW * 0.75F, 0x000000, LightTexture.FULL_BRIGHT);
             float a = Mth.clamp(0.25F + 0.5F * tl.power(), 0, 1);
             disc(f, glow, f.origin(), f.axis(), SHADOW * 1.1F, DISK_OUTER, 48, WARM, (int) (220 * a), 0, 0);
-            GravitationalLensing.add(coreW, radius, 1, 5.0F);
+            GravitationalLensing.add(coreW, radius, 1, LENS_REGION);
         }
     }
 
@@ -205,7 +269,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     }
 
     /** 拘束コイルの輪を巡る電流の光。 */
-    private void drawCoils(Frame f, JetForgeTimeline tl, Sides sides, float ignition) {
+    private void drawCoils(Frame f, JetForgeTimeline tl, VertexConsumer glow, float ignition) {
         float a = 0.12F + 0.78F * Math.max(tl.power(), ignition);
         for (int k = 0; k < 2; k++) {
             float s = JetForgeLayout.COIL_X[k] - JetForgeLayout.CORE_X;
@@ -213,7 +277,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             float r = JetForgeLayout.COIL_R;
             int segs = f.far() ? 32 : 72;
             float speed = (k == 0 ? 1 : -1) * (1.5F + 6F * tl.power());
-            ringSegments(f, sides.glow(s), c, f.axis(), r - 0.62F, r + 0.62F, segs, CYAN, a, f.time() * speed, 6);
+            ringSegments(f, glow, c, f.axis(), r - 0.62F, r + 0.62F, segs, CYAN, a, f.time() * speed, 6);
         }
     }
 
@@ -642,8 +706,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
 
     // ------------------------------------------------------------------ 排熱側の杯・ビーム止め
 
-    private void drawSinks(Frame f, JetForgeTimeline tl, Sides sides, float flicker) {
-        VertexConsumer glow = sides.glow(-1);
+    private void drawSinks(Frame f, JetForgeTimeline tl, VertexConsumer glow, float flicker) {
         float heat = Math.max(tl.jet() * flicker, tl.cool() > 0 ? 0.5F * (1 - tl.cool()) : 0);
         if (heat <= 0.01F) {
             return;
@@ -662,7 +725,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         // 素材を抜けた光が止まる板
         float stop = tl.jet() * flicker * (tl.phase() == JetForgeBlockEntity.IRRADIATE ? 0.7F : 0.35F);
         if (stop > 0.01F) {
-            heatFace(f, sides.glow(1), f.origin().add(f.axis().scale(STOP_S - 0.02F)), b[0], b[1], 2.5F, 2.5F, 1.2F, stop, 0.8F);
+            heatFace(f, glow, f.origin().add(f.axis().scale(STOP_S - 0.02F)), b[0], b[1], 2.5F, 2.5F, 1.2F, stop, 0.8F);
         }
     }
 
