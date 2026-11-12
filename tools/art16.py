@@ -862,9 +862,10 @@ def _multiblock_part(iid):
         im = mat_plate(C, 56, rivets=False, seam=False)
         d = ImageDraw.Draw(im)
         d.rectangle([2, 2, 13, 13], fill=rgba(C['frame']), outline=rgba(C['trim']))
-        for k in range(3, 13, 3):
-            d.line([(k, 3), (k + 2, 3)], fill=rgba((230, 200, 80)))
-            d.line([(k, 12), (k + 2, 12)], fill=rgba((230, 200, 80)))
+        # 注意の破線: 枠の内側（3〜12）に左右対称に収める（つなげて引くと枠の外へはみ出る）
+        for x0, x1 in ((3, 5), (7, 8), (10, 12)):
+            d.line([(x0, 3), (x1, 3)], fill=rgba((230, 200, 80)))
+            d.line([(x0, 12), (x1, 12)], fill=rgba((230, 200, 80)))
         d.rectangle([5, 5, 10, 10], fill=rgba(lighten(C['frame'], 0.2)), outline=rgba(C['edge']))
         d.rectangle([7, 7, 8, 8], fill=rgba(C['glow']))
         return im
