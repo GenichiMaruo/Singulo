@@ -1,4 +1,5 @@
 {
+    "blend": { "func": "add", "srcrgb": "srcalpha", "dstrgb": "1" },
     "vertex": "singulo:jet_beam",
     "fragment": "singulo:jet_beam",
     "attributes": [ "Position", "UV0", "Color" ],

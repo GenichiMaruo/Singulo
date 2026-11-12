@@ -7,6 +7,8 @@
 
 ## Fixes
 
+- Explicitly preserve additive beam blending on 1.20.1 so Jet Forge plasma does not turn into opaque solid-color tubes.
+
 - Add regression coverage for block-specific item tooltips, already supported on 1.20.1. Stored items and fluid amounts are unchanged.
 
 - Stop the Accretion Jet Forge's black hole from showing in front of its own glowing jet. Looking along the forge from the exhaust or beam side, the black hole and its disk used to cover the plasma between you and the core. Now each forge draws the jet behind its core first, then its black hole, then the jet on your side. Forges lined up one behind another overlap correctly too.
@@ -20,6 +22,8 @@
 - 事象の地平線倉庫を縦に積むと、つながった形になるようにしました。上の倉庫は下の金の板がなくなり、黒鋼の台が下の倉庫にじかに乗ります。
 
 ## 修正
+
+- 1.20.1で鍛造炉のプラズマが不透明な単色の筒にならないよう、ビームの加算ブレンドを明示しました。
 
 - 1.20.1ですでに対応しているパイプ・倉庫・液体ポートのアイテム説明に回帰テストを追加しました。保存された中身は変更しません。
 

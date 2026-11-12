@@ -2,7 +2,7 @@
 
 ## 全体の検証
 
-Minecraft 1.20.1 / Java 17 / Forge・NeoForge。現在は通常のGameTest 761件、Mekanismを入れる専用GameTest 2件、検証ツールの単体テスト78件。GUIは通常22画面と5言語×48画面を同じクライアントで確認する。Embeddium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
+Minecraft 1.20.1 / Java 17 / Forge・NeoForge。現在は通常のGameTest 761件、Mekanismを入れる専用GameTest 2件、検証ツールの単体テスト79件。GUIは通常22画面と5言語×48画面を同じクライアントで確認する。Embeddium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
 
 ```sh
 python3 -m unittest discover -s tools -p 'test_*.py'

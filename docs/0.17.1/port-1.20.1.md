@@ -6,9 +6,11 @@ Port of PR #69 and review fixes at cfd40b4d to Forge 47.4.26 and NeoForge 47.1.1
 - Use legacy tick phases, NBT update tags and typed stack data; preserve generated legacy resource conversion (forge_data).
 - Preserve the existing BlockItem tooltip delegation and add four registered ItemStack-path regression tests from PR #68.
 - Add three handover regression tests and update the exact inventory to 761 required tests, plus two optional Mekanism tests.
-- Python tool tests: 78 passed. Static translations/models/supporters/advancements/recipe parity/gameplay text/legacy source checks passed.
+- Python tool tests: 79 passed. Static translations/models/supporters/advancements/recipe parity/gameplay text/legacy source checks passed.
 - Full local loader tests and formal CI are pending at initial PR creation. Do not publish until all four required CI jobs pass on the final tree and its artifacts are promoted without rebuilding.
 
 No release tag or upload is part of this port. Existing Modrinth review and publication sequence remain untouched.
 
 Legacy coordinate verification: Forge 47.4.26 source GameRenderer lines 1125-1132 rotates the BER pose; LevelRenderer lines 1256-1274 adds block-camera translation. DepthSplit therefore tests emitted -z, and transforms only the world-relative core using the legacy lens view matrix. This intentionally differs from the 1.21.1 forward-dot implementation. Renderer CI now executes the cosmic-world fixtures with Embeddium/Distant Horizons and requires all 15 depth cases.
+
+CI image review found the legacy jet shader rendering opaque solid-color tubes. `ShaderInstance.apply()` applies a JSON BlendMode after RenderType; missing blend defaults to opaque and disables blending when the cached mode changes. The omission also exists at the 0.17.0 base, but prior visual behavior was not independently reproduced. Explicit SRC_ALPHA/ONE matches LIGHTNING_TRANSPARENCY and is guarded by a new Python regression test (failed before the fix). Final CI images must confirm translucent glowing jets before merge.
