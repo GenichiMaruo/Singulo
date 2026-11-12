@@ -177,13 +177,20 @@ def vault_models(write, assets):
     """倉庫（上から見て点対称。4面とも同じ）。低い台（金の台座 0〜1、黒鋼の台 1〜4、4面に個数の台）の上に、
     立方体のガラスの箱（x, z 2〜14、y 4〜16）が乗る。箱の12本の辺が太さ2ドットの枠（下と上の辺は金の継ぎ輪、
     縦の辺は黒鋼の柱、上の四隅は光る発生器）で、ガラスは面から1ドット内側。外側には余白を残す。
-    ガラスは別のモデル（半透明）。"""
+    ガラスは別のモデル（半透明）。
+    倉庫の上に積んだ倉庫（down=true）は、下の金の板（0〜1）をなくして黒鋼の台を 0 まで伸ばし、下の倉庫の上の枠に
+    じかに乗ってつながる（horizon_vault_stacked）。"""
     tex = {k: f'{MODID}:block/horizon_vault_{k}' for k in ('metal', 'gold', 'glass', 'plate', 'lens')}
     # 座標と厚みはすべて整数のドット（貼る絵のドット数と長さをそろえる。1ドットに満たない帯を作らない）
-    solid = [
-        # 低い台: 金の台座と黒鋼の台（1〜4）、4面に一段出た個数の台
+    base = [
+        # 低い台: 金の台座と黒鋼の台（1〜4）
         _el((0, 0, 0), (16, 1, 16), '#gold'),
         _el((1, 1, 1), (15, 4, 15), '#metal'),
+    ]
+    # 積んだとき: 金の台座なし、黒鋼の台は下の倉庫まで（0〜4）
+    stacked_base = [_el((1, 0, 1), (15, 4, 15), '#metal')]
+    solid = [
+        # 4面に一段出た個数の台
         _el((3, 1, 0), (13, 3, 1), '#plate'), _el((3, 1, 15), (13, 3, 16), '#plate'),
         _el((0, 1, 3), (1, 3, 13), '#plate'), _el((15, 1, 3), (16, 3, 13), '#plate'),
         # 室の床の、場を作る光る板
@@ -209,17 +216,20 @@ def vault_models(write, assets):
     ]
     textures = {**tex, 'particle': tex['metal']}
     write(assets / 'models' / 'block' / 'horizon_vault.json', {
-        'parent': 'minecraft:block/block', 'textures': textures, 'render_type': 'minecraft:cutout', 'elements': solid})
+        'parent': 'minecraft:block/block', 'textures': textures, 'render_type': 'minecraft:cutout', 'elements': base + solid})
+    write(assets / 'models' / 'block' / 'horizon_vault_stacked.json', {
+        'parent': 'minecraft:block/block', 'textures': textures, 'render_type': 'minecraft:cutout', 'elements': stacked_base + solid})
     write(assets / 'models' / 'block' / 'horizon_vault_glass.json', {
         'parent': 'minecraft:block/block', 'textures': textures, 'render_type': 'minecraft:translucent', 'elements': glass})
     rot = {'north': 0, 'east': 90, 'south': 180, 'west': 270}
     multipart = []
     for facing, y in rot.items():
-        for model in ('horizon_vault', 'horizon_vault_glass'):
+        for model, when in (('horizon_vault', {'down': 'false'}), ('horizon_vault_stacked', {'down': 'true'}),
+                            ('horizon_vault_glass', {})):
             apply = {'model': f'{MODID}:block/{model}'}
             if y:
                 apply['y'] = y
-            multipart.append({'when': {'facing': facing}, 'apply': apply})
+            multipart.append({'when': {'facing': facing, **when}, 'apply': apply})
     write(assets / 'blockstates' / 'horizon_vault.json', {'multipart': multipart})
     write(assets / 'models' / 'item' / 'horizon_vault.json', {'parent': f'{MODID}:block/horizon_vault'})
 

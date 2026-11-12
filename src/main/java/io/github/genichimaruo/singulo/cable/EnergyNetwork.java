@@ -20,6 +20,13 @@ public final class EnergyNetwork {
     private static final java.util.concurrent.atomic.AtomicLong GENERATIONS = new java.util.concurrent.atomic.AtomicLong();
     private final long generation = GENERATIONS.incrementAndGet();
     private static final Set<EnergyNetwork> ACTIVE = Collections.newSetFromMap(new IdentityHashMap<>());
+    /**
+     * Lit cables handed over by a network that was replaced only because a neighbouring non-cable block changed
+     * (a pipe or machine placed beside a cable). The rebuilt network adopts them, so the light does not blink off
+     * for a whole sample window; anything not adopted before the deadline (game time) is cleared.
+     */
+    private record Handover(EnergyNetwork owner, long until, boolean lit) {}
+    private static final Map<Level, Map<BlockPos, Handover>> HANDOVER = new java.util.WeakHashMap<>();
 
     static final class Flow {
         long generation;
@@ -121,6 +128,18 @@ public final class EnergyNetwork {
         this.endpoints = endpoints; this.cableTypes = cableTypes;
         nodes.values().forEach(n -> segments.addAll(n.edges));
         endpoints.forEach(e -> devicePositions.add(e.pos));
+        Map<BlockPos, Handover> handed = HANDOVER.get(level);
+        if (handed != null && !handed.isEmpty()) {
+            for (BlockPos pos : cables.keySet()) {
+                Handover pending = handed.remove(pos);
+                if (pending != null && pending.lit()) lit.add(pos);
+            }
+            if (!lit.isEmpty()) {
+                // Keep showing the old light until this network has sampled a full window of its own
+                nextVisual = level.getGameTime() + CableBlockEntity.WINDOW;
+                ACTIVE.add(this);
+            }
+        }
     }
 
     static void build(Level level, BlockPos start) {
@@ -192,6 +211,41 @@ public final class EnergyNetwork {
         // Release unloaded cable BEs even when the rest of an idle network stays loaded.
         for (CableBlockEntity cable : cables.values()) if (cable.network == this) cable.network = null;
         // No energy is buffered in the network, so splitting/removing it cannot lose stored energy.
+    }
+    /** Replaced because a neighbouring non-cable block changed: no cable was cut, so hand the light to the next network. */
+    void invalidateKeepingLight() {
+        if (!valid) return;
+        valid = false;
+        if (!lit.isEmpty()) {
+            Map<BlockPos, Handover> handed = HANDOVER.computeIfAbsent(level, l -> new HashMap<>());
+            long until = level.getGameTime() + 2L * CableBlockEntity.WINDOW;
+            // Track unlit branches too: cutting one still invalidates the old component immediately.
+            for (BlockPos pos : cables.keySet()) handed.put(pos, new Handover(this, until, lit.contains(pos)));
+        }
+        lit.clear(); samples.clear();
+        for (CableBlockEntity cable : cables.values()) if (cable.network == this) cable.network = null;
+    }
+    /** The topology owner is retained only until these cables are adopted or the short handover expires. */
+    static EnergyNetwork handoverOwner(Level level, BlockPos pos) {
+        Map<BlockPos, Handover> handed = HANDOVER.get(level);
+        Handover pending = handed == null ? null : handed.get(pos);
+        return pending == null ? null : pending.owner();
+    }
+    void cancelHandover() {
+        Map<BlockPos, Handover> handed = HANDOVER.get(level);
+        if (handed == null) return;
+        handed.entrySet().removeIf(entry -> {
+            // Never erase a cable already adopted by another network or by a newer handover.
+            if (entry.getValue().owner() != this) return false;
+            if (entry.getValue().lit() && level.isLoaded(entry.getKey())
+                    && level.getBlockEntity(entry.getKey()) instanceof CableBlockEntity be) be.showFlow(null);
+            return true;
+        });
+        if (handed.isEmpty()) HANDOVER.remove(level);
+    }
+    /** pos is not yet an endpoint of this network (a block beside a cable that may become one). */
+    boolean isNewDevice(BlockPos pos) {
+        return !devicePositions.contains(pos);
     }
     boolean topologyChanged(BlockPos pos) {
         if (!level.isLoaded(pos)) return true;
@@ -399,10 +453,23 @@ public final class EnergyNetwork {
 
     public static void onServerTick(ServerTickEvent event) {
         if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
+        for (var levels = HANDOVER.entrySet().iterator(); levels.hasNext();) {
+            var e = levels.next();
+            Level level = e.getKey();
+            if (level.getServer() != net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer()) continue;
+            long now = level.getGameTime();
+            e.getValue().entrySet().removeIf(h -> {
+                if (h.getValue().until() > now) return false;
+                // No network adopted this cable in time (nothing flows any more): put its light out
+                if (h.getValue().lit() && level.isLoaded(h.getKey()) && level.getBlockEntity(h.getKey()) instanceof CableBlockEntity be) be.showFlow(null);
+                return true;
+            });
+            if (e.getValue().isEmpty()) levels.remove();
+        }
         for (Iterator<EnergyNetwork> it = ACTIVE.iterator(); it.hasNext();) {
             EnergyNetwork n = it.next();
             if (!n.valid) { n.clearVisuals(); it.remove(); continue; }
-            if (n.level.getServer() != event.getServer()) continue;
+            if (n.level.getServer() != net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer()) continue;
             if (n.level.getGameTime() >= n.nextVisual) {
                 n.publish();
                 n.nextVisual = n.level.getGameTime()+CableBlockEntity.WINDOW;
@@ -412,6 +479,7 @@ public final class EnergyNetwork {
     }
     public static void onLevelUnload(net.minecraftforge.event.level.LevelEvent.Unload event) {
         ACTIVE.removeIf(n -> n.level == event.getLevel());
+        if (event.getLevel() instanceof Level level) HANDOVER.remove(level);
     }
     private void clearVisuals() {
         for (BlockPos pos : lit) {

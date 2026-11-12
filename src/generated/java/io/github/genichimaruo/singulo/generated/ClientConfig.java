@@ -20,6 +20,7 @@ public final class ClientConfig {
     public static final ForgeConfigSpec.BooleanValue WORK_ORDER_JEI_SYNC;
     public static final ForgeConfigSpec.IntValue WORK_ORDER_ROWS;
     public static final ForgeConfigSpec.IntValue SELECTOR_ROWS;
+    public static final ForgeConfigSpec.BooleanValue ARSENAL_NOTICE;
     public static final ForgeConfigSpec SPEC;
 
     static {
@@ -36,6 +37,7 @@ public final class ClientConfig {
         ForgeConfigSpec.BooleanValue WORK_ORDER_JEI_SYNC_;
         ForgeConfigSpec.IntValue WORK_ORDER_ROWS_;
         ForgeConfigSpec.IntValue SELECTOR_ROWS_;
+        ForgeConfigSpec.BooleanValue ARSENAL_NOTICE_;
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
         b.push("render");
         b.comment("重力レンズの歪み表示", "範囲: true / false");
@@ -67,6 +69,10 @@ public final class ClientConfig {
         b.comment("装置の「作るもの」を選ぶ板の行数。板はインベントリの見出しの上から上へ伸び、画面に収まる行数までになる（板の右上のボタンでも変えられる）", "範囲: 2〜8（整数）");
         SELECTOR_ROWS_ = b.defineInRange("selectorRows", 3, 2, 8);
         b.pop();
+        b.push("notice");
+        b.comment("初めてワールドに入ったとき、公式アドオン Singulo Arsenal の公開をチャットで1回だけ知らせる（知らせると false になる。true に戻すともう一度知らせる。Singulo Arsenal を入れていれば知らせない）", "範囲: true / false");
+        ARSENAL_NOTICE_ = b.define("arsenalNotice", true);
+        b.pop();
         GRAVITATIONAL_LENSING = GRAVITATIONAL_LENSING_;
         LENSING_WITH_SHADER_PACKS = LENSING_WITH_SHADER_PACKS_;
         DOPPLER_BEAMING = DOPPLER_BEAMING_;
@@ -80,6 +86,7 @@ public final class ClientConfig {
         WORK_ORDER_JEI_SYNC = WORK_ORDER_JEI_SYNC_;
         WORK_ORDER_ROWS = WORK_ORDER_ROWS_;
         SELECTOR_ROWS = SELECTOR_ROWS_;
+        ARSENAL_NOTICE = ARSENAL_NOTICE_;
         SPEC = b.build();
     }
 }

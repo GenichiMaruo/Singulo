@@ -68,6 +68,7 @@ final class CosmicGeometryReviewHarness {
         }
         Singulo.LOGGER.info("SINGULO_COSMIC_GEOMETRY_COMPLETE 144 outward quads");
         verifyPipeChevrons();
+        verifyJetGlowDepth();
     }
 
     private static void verifyPipeChevrons() throws Exception {
@@ -97,4 +98,45 @@ final class CosmicGeometryReviewHarness {
         }
         Singulo.LOGGER.info("SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases");
     }
+    /** Exercise the real quad router using view-space fixtures transformed into camera-relative world coordinates. */
+    private static void verifyJetGlowDepth() throws Exception {
+        var type = Class.forName(JetForgeRenderer.class.getName() + "$DepthSplit");
+        var ctor = type.getDeclaredConstructor(VertexConsumer.class, VertexConsumer.class, Vec3.class, org.joml.Quaternionf.class);
+        ctor.setAccessible(true);
+        int cases = 0;
+        for (var rotation : new org.joml.Quaternionf[]{new org.joml.Quaternionf(),
+                new org.joml.Quaternionf().rotationYXZ(0.8F, 0.45F, 0),
+                new org.joml.Quaternionf().rotationYXZ(-1.7F, -0.6F, 0.2F)}) {
+            var core = new org.joml.Vector3f(10, 3, -20).rotate(rotation);
+            int[] counts = new int[2];
+            VertexConsumer[] sinks = new VertexConsumer[2];
+            for (int side = 0; side < 2; side++) {
+                final int index = side;
+                sinks[side] = (VertexConsumer) Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(),
+                        new Class<?>[]{VertexConsumer.class}, (proxy, method, args) -> {
+                            if (method.getName().equals("vertex")) counts[index]++;
+                            return proxy;
+                        });
+            }
+            VertexConsumer split = (VertexConsumer) ctor.newInstance(sinks[0], sinks[1],
+                    new Vec3(core.x, core.y, core.z), rotation);
+            // Depth 19 is in front of the actual horizon plane (~19.673), but the old radius-5 rule put it behind.
+            // The far-off-axis point also catches using radial distance instead of view depth.
+            for (float[] sample : new float[][]{{10, 3, -19, 1}, {30, 3, -19, 1},
+                    {10, 3, -21, 0}, {10, 3, -19.8F, 0}, {10, 3, -19.5F, 1}}) {
+                int side = (int) sample[3];
+                int before = counts[side], other = counts[1-side];
+                for (int vertex = 0; vertex < 4; vertex++) {
+                    // Only the first vertex routes the quad: crossing the plane must not split a quad between buffers.
+                    var point = new org.joml.Vector3f(sample[0], sample[1], vertex == 0 ? sample[2] : -30).rotate(rotation);
+                    split.vertex(point.x, point.y, point.z).color(255, 255, 255, 255);
+                }
+                if (counts[side] != before + 4 || counts[1-side] != other)
+                    throw new IllegalStateException("Jet glow quad differs from lens depth: " + java.util.Arrays.toString(sample));
+                cases++;
+            }
+        }
+        Singulo.LOGGER.info("SINGULO_JET_GLOW_DEPTH_COMPLETE {} view-depth/quad cases", cases);
+    }
+
 }
