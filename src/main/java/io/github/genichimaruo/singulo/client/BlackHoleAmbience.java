@@ -43,7 +43,8 @@ final class BlackHoleAmbience {
             PLAYING.clear();
             return;
         }
-        PLAYING.values().removeIf(Loop::isStopped);
+        // 言語の変更などで音の読み込み直しが入ると、鳴っていた音は止まった印なしに消える。鳴っていなければ忘れて鳴らし直す
+        PLAYING.values().removeIf(loop -> loop.isStopped() || !mc.getSoundManager().isActive(loop));
         for (PenroseReactorBlockEntity r : PenroseReactorBlockEntity.clientRunning(mc.level)) {
             if (PLAYING.containsKey(r.getBlockPos())) continue;
             start(mc, r.getBlockPos(), new Source() {
