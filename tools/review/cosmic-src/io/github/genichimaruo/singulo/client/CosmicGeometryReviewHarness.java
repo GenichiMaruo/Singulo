@@ -98,7 +98,7 @@ final class CosmicGeometryReviewHarness {
         }
         Singulo.LOGGER.info("SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases");
     }
-    /** Exercise the real quad router using view-space fixtures transformed into camera-relative world coordinates. */
+    /** Exercise the real quad router using legacy view-space vertices and world-space core fixtures. */
     private static void verifyJetGlowDepth() throws Exception {
         var type = Class.forName(JetForgeRenderer.class.getName() + "$DepthSplit");
         var ctor = type.getDeclaredConstructor(VertexConsumer.class, VertexConsumer.class, Vec3.class, org.joml.Quaternionf.class);
@@ -107,7 +107,9 @@ final class CosmicGeometryReviewHarness {
         for (var rotation : new org.joml.Quaternionf[]{new org.joml.Quaternionf(),
                 new org.joml.Quaternionf().rotationYXZ(0.8F, 0.45F, 0),
                 new org.joml.Quaternionf().rotationYXZ(-1.7F, -0.6F, 0.2F)}) {
-            var core = new org.joml.Vector3f(10, 3, -20).rotate(rotation);
+            var inverseView = new org.joml.Matrix4f().rotationY((float) Math.PI)
+                    .rotate(rotation.conjugate(new org.joml.Quaternionf())).invert();
+            var core = inverseView.transformPosition(new org.joml.Vector3f(10, 3, -20));
             int[] counts = new int[2];
             VertexConsumer[] sinks = new VertexConsumer[2];
             for (int side = 0; side < 2; side++) {
@@ -128,7 +130,7 @@ final class CosmicGeometryReviewHarness {
                 int before = counts[side], other = counts[1-side];
                 for (int vertex = 0; vertex < 4; vertex++) {
                     // Only the first vertex routes the quad: crossing the plane must not split a quad between buffers.
-                    var point = new org.joml.Vector3f(sample[0], sample[1], vertex == 0 ? sample[2] : -30).rotate(rotation);
+                    var point = new org.joml.Vector3f(sample[0], sample[1], vertex == 0 ? sample[2] : -30);
                     split.vertex(point.x, point.y, point.z).color(255, 255, 255, 255);
                 }
                 if (counts[side] != before + 4 || counts[1-side] != other)

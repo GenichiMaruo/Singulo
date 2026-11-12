@@ -221,6 +221,19 @@ jobs:
           grep -q 'SINGULO_OCCLUSION_COMPLETE 9' build/$LOADER/occlusion-review/logs/latest.log
           test "$(grep -c 'SINGULO_OCCLUSION_RESULT' build/$LOADER/occlusion-review/logs/latest.log)" -eq 9
           test "$(find build/$LOADER/occlusion-review/screenshots -name '*.png' | wc -l)" -eq 18
+      - name: Verify cosmic geometry, jet glow depth and shader reload with Embeddium and Distant Horizons
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_gui.py --loader "$LOADER" --cosmic-world
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/cosmic.gradle runClient -PwithEmbeddium -PwithDistantHorizons
+          grep -q 'SINGULO_COSMIC_COMPLETE 18' build/$LOADER/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_COSMIC_GEOMETRY_COMPLETE 144 outward quads' build/$LOADER/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/$LOADER/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_JET_GLOW_DEPTH_COMPLETE 15 view-depth/quad cases' build/$LOADER/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs' build/$LOADER/cosmic-review/logs/latest.log
+          test "$(find build/$LOADER/cosmic-review/screenshots -name 'cosmic-*.png' | wc -l)" -eq 18
       - name: Re-enter the saved panel world five times in one client
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -237,3 +250,5 @@ jobs:
             build/forge/rayleigh-review/screenshots/
             build/forge/occlusion-review/logs/
             build/forge/occlusion-review/screenshots/
+            build/forge/cosmic-review/logs/
+            build/forge/cosmic-review/screenshots/

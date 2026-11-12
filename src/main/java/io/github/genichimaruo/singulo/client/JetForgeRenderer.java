@@ -82,17 +82,12 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     /** 炉心のブラックホールの歪みが及ぶ球の半径（ブロック）。 */
     static final float LENS_REGION = 5.0F;
 
-    /**
-     * 光の四角形を、カメラからの距離で炉心のレンズの前後に振り分ける。レンズは、画面で球に重なる所のうち、球の手前の面
-     * （カメラ方向の炉心の深度 − 地平線の半径）より奥にあるものを歪める。光は深度を書かないので、そのままだと光の下の景色の深度で歪むかが
-     * 決まり、リングのブロックとリングの光が別々の所に見える。四角形の最初の頂点がその面より奥ならレンズの前（歪む）、
-     * 手前ならレンズのあと（歪まない）に描き、ブロックと同じに合わせる。頂点はカメラ相対のワールド座標で届く（ブロックエンティティの姿勢）。カメラの前方向との内積で、シェーダーと同じ視点深度にする。
-     */
+    /** Route complete quads using view depth, matching the lens horizon plane.
+     * Legacy BER vertices already carry camera rotation, unlike 1.21.1's camera-relative world vertices. */
     private static final class DepthSplit implements VertexConsumer {
         private final VertexConsumer far;
         private final VertexConsumer near;
         private final float front;
-        private final org.joml.Vector3f forward;
         private VertexConsumer current;
         private int vertex;
 
@@ -103,17 +98,19 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         DepthSplit(VertexConsumer far, VertexConsumer near, Vec3 relativeCore, org.joml.Quaternionf cameraRotation) {
             this.far = far;
             this.near = near;
-            // GravitationalLensing uses inverse camera rotation, then projection.w (= -view.z).
-            // Sphere.y is the horizon radius, not the screen-space influence region (LENS_REGION).
-            this.forward = new org.joml.Vector3f(0, 0, -1).rotate(cameraRotation);
-            this.front = forward.dot((float) relativeCore.x, (float) relativeCore.y, (float) relativeCore.z)
-                    - SHADOW / GravitationalLensing.SHADOW_PER_HORIZON;
+            // Legacy BER vertices already include camera rotation (GameRenderer -> LevelRenderer pose stack).
+            // Match the legacy lens shader's view matrix for the core, but never rotate emitted vertices twice.
+            var view = new org.joml.Matrix4f().rotationY((float) Math.PI)
+                    .rotate(cameraRotation.conjugate(new org.joml.Quaternionf()));
+            var core = view.transformPosition(new org.joml.Vector3f((float) relativeCore.x,
+                    (float) relativeCore.y, (float) relativeCore.z));
+            this.front = -core.z - SHADOW / GravitationalLensing.SHADOW_PER_HORIZON;
         }
 
         @Override
         public VertexConsumer vertex(double x, double y, double z) {
             if (vertex++ % 4 == 0) {
-                current = forward.dot((float) x, (float) y, (float) z) > front ? far : near;
+                current = -z > front ? far : near;
             }
             current.vertex(x, y, z);
             return this;
