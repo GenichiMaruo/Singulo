@@ -111,6 +111,8 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
+        // 空のデータはクライアントで読まれない（前に見せた物が残る）ので、空になったときも印を送る
+        tag.putBoolean("sync", true);
         if (!firstStored().isEmpty()) {
             tag.put("shown", firstStored().copyWithCount(1).save(registries));
         }

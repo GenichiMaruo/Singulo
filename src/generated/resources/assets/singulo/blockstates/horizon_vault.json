@@ -2,10 +2,20 @@
   "multipart": [
     {
       "when": {
-        "facing": "north"
+        "facing": "north",
+        "down": "false"
       },
       "apply": {
         "model": "singulo:block/horizon_vault"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "down": "true"
+      },
+      "apply": {
+        "model": "singulo:block/horizon_vault_stacked"
       }
     },
     {
@@ -18,10 +28,21 @@
     },
     {
       "when": {
-        "facing": "east"
+        "facing": "east",
+        "down": "false"
       },
       "apply": {
         "model": "singulo:block/horizon_vault",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "down": "true"
+      },
+      "apply": {
+        "model": "singulo:block/horizon_vault_stacked",
         "y": 90
       }
     },
@@ -36,10 +57,21 @@
     },
     {
       "when": {
-        "facing": "south"
+        "facing": "south",
+        "down": "false"
       },
       "apply": {
         "model": "singulo:block/horizon_vault",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "down": "true"
+      },
+      "apply": {
+        "model": "singulo:block/horizon_vault_stacked",
         "y": 180
       }
     },
@@ -54,10 +86,21 @@
     },
     {
       "when": {
-        "facing": "west"
+        "facing": "west",
+        "down": "false"
       },
       "apply": {
         "model": "singulo:block/horizon_vault",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "down": "true"
+      },
+      "apply": {
+        "model": "singulo:block/horizon_vault_stacked",
         "y": 270
       }
     },

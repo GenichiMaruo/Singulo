@@ -83,6 +83,7 @@ jobs:
           grep -q 'SINGULO_COSMIC_COMPLETE 18' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_COSMIC_GEOMETRY_COMPLETE 144 outward quads' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_JET_GLOW_DEPTH_COMPLETE 15 view-depth/quad cases' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs' build/cosmic-review/logs/latest.log
           test "$(ls build/cosmic-review/screenshots/cosmic-*.png | wc -l)" -eq 18
       - name: Verify opaque occlusion across Fancy and Fabulous graphics
@@ -192,6 +193,7 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/cosmic.gradle runClient -PwithSodium -PwithDistantHorizons
           grep -q 'SINGULO_COSMIC_COMPLETE 18' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_PIPE_ARROW_GEOMETRY_COMPLETE 24 external-surface cases' build/cosmic-review/logs/latest.log
+          grep -q 'SINGULO_JET_GLOW_DEPTH_COMPLETE 15 view-depth/quad cases' build/cosmic-review/logs/latest.log
           grep -q 'SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs' build/cosmic-review/logs/latest.log
       - name: Save Sodium lighting evidence
         if: always()

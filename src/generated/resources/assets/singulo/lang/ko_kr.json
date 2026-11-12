@@ -2696,6 +2696,8 @@
   "message.singulo.area_card.first": "첫 번째 모서리를 기록했습니다(%s, %s, %s). 다른 모서리를 웅크리고 우클릭하세요",
   "message.singulo.area_card.recorded": "범위를 기록했습니다(%s×%s×%s)",
   "message.singulo.area_card.too_large": "범위가 너무 큽니다(한 변 %s블록까지)",
+  "message.singulo.arsenal_notice": "Singulo 공식 애드온 \"Singulo Arsenal\"이 공개되었습니다. Singulo 재료로 물리 현상을 주제로 한 방어구·무기·도구를 만들 수 있습니다. %s",
+  "message.singulo.arsenal_notice.link": "[CurseForge에서 보기]",
   "message.singulo.cryogenic_turbine.now_storage": "극저온 터빈은 이제 액체 질소 축전 장치입니다. 냉각탑이 액체 질소에 담은 전력의 최대 90%를 되돌려 줍니다(냉각탑과 연결해 돌려도 전력은 늘지 않습니다). 2단계 발전에는 뮤온 촉매 핵융합로를 사용하세요.",
   "message.singulo.deep_sea_collector.idle": "수심이 부족합니다(위에 물이 16블록 이상 필요)",
   "message.singulo.deep_sea_collector.rate": "수압 %s%%: 약 %s초마다 고압 결정 1개",

@@ -129,6 +129,8 @@ public class CableBlockEntity extends BlockEntity {
         if (network != null) {
             network.invalidate();
         }
+        EnergyNetwork pending = level == null ? null : EnergyNetwork.handoverOwner(level, worldPosition);
+        if (pending != null) pending.cancelHandover();
     }
 
     /** Client prediction can remove a cable before the server's immediate zero-flow packet arrives. */
@@ -157,7 +159,17 @@ public class CableBlockEntity extends BlockEntity {
     }
 
     void invalidateForNeighbor(BlockPos pos) {
-        if (network != null && network.topologyChanged(pos)) network.invalidate();
+        EnergyNetwork owner = network != null ? network : level == null ? null : EnergyNetwork.handoverOwner(level, worldPosition);
+        if (owner == null || !owner.topologyChanged(pos)) return;
+        // A cable placed or broken beside this one may cut the flow, so its light goes out at once. A pipe or machine
+        // placed beside the cable only adds a possible endpoint: keep the light until the rebuilt network samples again
+        // (a machine that was an endpoint and is now gone may have been the source, so that also cuts the light at once)
+        if (level != null && level.isLoaded(pos) && !(level.getBlockEntity(pos) instanceof CableBlockEntity)
+                && !(level.getBlockState(pos).getBlock() instanceof CableBlock) && owner.isNewDevice(pos)) owner.invalidateKeepingLight();
+        else {
+            owner.invalidate();
+            owner.cancelHandover();
+        }
     }
 
     EnergyNetwork network() {

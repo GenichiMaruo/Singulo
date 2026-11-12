@@ -283,6 +283,8 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         write(tag, registries);
+        // 空になったときのデータが空だと、クライアントで読まれずに前の個数（最後の1個など）が残るので、個数はいつも送る
+        tag.putLong("count", count);
         return tag;
     }
 
