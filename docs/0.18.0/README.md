@@ -26,7 +26,7 @@
 
 - 付け毛の髪の色は、型ごとの髪の明るい色（`tools/androids.py` の型ごとの色）を `AndroidRenderer.Accessories.hairColor` に写した。
 - 定義: 名前 `tools/ids.py`、レシピと説明 `tools/decor_content.py`（レシピ一覧の最後に足すので、既存のレシピ画像の番号は変わらない）、絵 `tools/androids.py` の `accessory_icons`、染められるタグ `data/minecraft/tags/item/dyeable.json`。
-- GameTest: `androidWearsFiveAccessoriesAtOnce`（5枠に同時に着け、各枠にはその部位だけ入る）・`oldDecorMovesToTheFaceAndWaistSlots`（古い保存の移し替え）。
+- GameTest: `androidWearsFiveAccessoriesAtOnce`（全装飾の着ける所・染め・5枠同時。登録と一覧の数も照合。以前の `androidWearsAccessories` と、メガネの部分の検査をまとめた。測量メガネは `surveyGlassesKeepTheirHeight`）・`oldDecorMovesToTheFaceAndWaistSlots`（古い保存の移し替え）。
 
 ## RGB染色台
 
