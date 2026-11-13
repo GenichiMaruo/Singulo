@@ -1912,19 +1912,23 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 // ---- ネクタイとダイヤ（0.18.0）。どれもピクセル単位の箱。胴の箱: x -3〜3、y -8〜0、z -1.5〜1.5（前は -z）。
                 // 胸（y -7〜-4）と装甲板は前へ z -2.4 近くまで出るので、胸の上の物はそれより前（z -2.4〜-2.9）に置く
                 case "necktie" -> {
-                    // 首の結び目（剣先より1ピクセル奥）と、胸の前に下がる幅2ピクセルの剣先（1段おきに少し濃い縞）。
-                    // 先だけ斜めの三角（ワンポイント）。歩くと少し揺れる
-                    // 結び目は剣先と同じ布（少しだけ暗い）。剣先の最上段は後ろへ結び目まで伸ばして、すき間なくつなげる
+                    // 横から見て（左が前、1マス1ピクセル。体の前の面は z -1.5、胸の層は z -2.5 まで）:
+                    //   空空ネ体   1段目: 結び目は胸の層（体のすぐ前）
+                    //   空ネ胸体   2〜4段目: 胸の前の層に、まっすぐ垂らす
+                    //   空ネ胸体
+                    //   空ネ胸体
+                    //   空ネ空体   5〜6段目: 同じ層のまままっすぐ下ろす（体とのあいだは空気）。6段目は先の三角（ワンポイントの斜め）
+                    //   空ネ空体
+                    // 幅2ピクセル、1段おきに少し濃い縞。結び目は同じ布の少し暗い色
                     int stripe = mix(c, 0x000000, 0.22F);
-                    b(pose, vc, light, -1, -8, -1.9F, 1, -7, -1.5F, mix(c, 0x000000, 0.1F));
-                    pose.pushPose();
-                    pose.translate(0, -7 * P, -2.4F * P);
-                    pose.mulPose(Axis.XP.rotationDegrees(-(2 + 6 * walk)));
-                    for (int r = 0; r < 4; r++) {
-                        b(pose, vc, light, -1, r, -0.5F, 1, r + 1, r == 0 ? 0.5F : 0, r % 2 == 1 ? stripe : c);
+                    // 形はそのまま、全体を体の方へ 0.3 ピクセル寄せる
+                    float shift = 0.3F, front = -3.5F + shift, back = -2.5F + shift;
+                    b(pose, vc, light, -1, -8, back, 1, -7, -1.5F + shift, mix(c, 0x000000, 0.1F));  // 1段目（結び目）
+                    for (int r = 0; r < 4; r++) {                                                      // 2〜5段目
+                        float y = -7 + r;
+                        b(pose, vc, light, -1, y, front, 1, y + 1, back, r % 2 == 1 ? stripe : c);
                     }
-                    ear(pose, vc, light, -1, 4, 1, 4, 0, 5, -0.5F, 0, 1, c);
-                    pose.popPose();
+                    ear(pose, vc, light, -1, -3, 1, -3, 0, -2, front, back, 1, c);                     // 6段目（先）
                 }
                 case "diamond_necklace" -> {
                     // 首の後ろを回る1ピクセルの鎖が、胸の上でＵに下がる。真ん中に小さな台と、明るい2・中2の小さなダイヤ、
