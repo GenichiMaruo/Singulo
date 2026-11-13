@@ -33,7 +33,7 @@ public final class MekanismQio implements QioStores.Access {
      * 周波数ごとの入れ物（同じ周波数のダッシュボードを何枚つないでも、同じ入れ物を返す。集める側は同じ入れ物を1回だけ数える）。
      * 周波数が消えたら忘れる。
      */
-    private static final java.util.Map<IQIOFrequency, Handler> HANDLERS = new java.util.WeakHashMap<>();
+    private static final java.util.Map<IQIOFrequency, java.lang.ref.WeakReference<Handler>> HANDLERS = new java.util.WeakHashMap<>();
     private static final java.util.concurrent.atomic.AtomicInteger IDS = new java.util.concurrent.atomic.AtomicInteger();
 
     @Override
@@ -51,11 +51,32 @@ public final class MekanismQio implements QioStores.Access {
         if (!(level.getBlockEntity(pos) instanceof IQIOComponent component)) {
             return null;
         }
+        // No player identity is carried by the automation API. Respect effective block
+        // security (including owner overrides), and fail closed if capability is absent.
+        if (!publicAccess(level, pos)) {
+            return null;
+        }
         IQIOFrequency frequency = component.getQIOFrequency();
         if (frequency == null) {
             return null;
         }
-        Handler handler = HANDLERS.computeIfAbsent(frequency, f -> new Handler(level, f));
+        return handler(level, frequency);
+    }
+
+    static boolean publicAccess(Level level, BlockPos pos) {
+        var security = mekanism.api.security.IBlockSecurityUtils.INSTANCE.securityCapability(level, pos);
+        return security != null && mekanism.api.security.ISecurityUtils.INSTANCE
+                .getEffectiveSecurityMode(security, level.isClientSide) == mekanism.api.security.SecurityMode.PUBLIC;
+    }
+
+    // Weak values are essential: a Handler itself holds its frequency and world.
+    static IItemHandler handler(Level level, IQIOFrequency frequency) {
+        var reference = HANDLERS.get(frequency);
+        Handler handler = reference == null ? null : reference.get();
+        if (handler == null) {
+            handler = new Handler(level, frequency);
+            HANDLERS.put(frequency, new java.lang.ref.WeakReference<>(handler));
+        }
         handler.level = level;
         return handler;
     }
@@ -114,12 +135,13 @@ public final class MekanismQio implements QioStores.Access {
             if (stack.isEmpty()) {
                 return ItemStack.EMPTY;
             }
+            // Capture before mutation, otherwise the first insertion of a tick is counted twice.
+            List<ItemStack> t = types();
             long in = frequency.massInsert(stack, stack.getCount(), simulate ? Action.SIMULATE : Action.EXECUTE);
             if (in <= 0) {
                 return stack;
             }
             if (!simulate) {
-                List<ItemStack> t = types();
                 for (int i = 0; i < t.size(); i++) {
                     if (ItemStack.isSameItemSameComponents(t.get(i), stack)) {
                         t.set(i, t.get(i).copyWithCount((int) Math.min(Integer.MAX_VALUE, t.get(i).getCount() + in)));

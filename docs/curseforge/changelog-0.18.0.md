@@ -19,6 +19,8 @@
 
 ## Fixes
 
+- QIO automation respects the dashboard's effective security mode: only public dashboards allow access. First-tick insertions no longer double-count stock, and unused QIO handlers no longer keep worlds alive.
+- Large multi-tank fluid inventories no longer overflow when their total exceeds the signed 32-bit limit.
 - The Android Work Console and its supply ports no longer count items, fluids or chemicals they cannot take out (such as cartridges in a Food Printer or a machine's input slots and tanks) as stock, so androids do not plan around them and get stuck.
 
 ## 追加
@@ -40,4 +42,6 @@
 
 ## 修正
 
+- QIO連携は実効セキュリティ設定が公開のダッシュボードだけを利用します。アイテム投入直後の在庫の二重計上と、使い終わったQIO連携がワールドを保持し続ける問題を修正しました。
+- 同じ流体を持つ複数タンクの合計が約21億mBを超えても、量が整数あふれで誤って数えられないようにしました。
 - アンドロイド作業指令台と資材口が、取り出せない物・液体・化学物質（フードプリンターのカートリッジ、装置の入れる欄やタンクなど）を在庫に数えないようにしました。取れない物を当てにして作業が止まることがなくなります。

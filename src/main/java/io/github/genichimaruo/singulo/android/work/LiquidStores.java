@@ -137,9 +137,9 @@ public final class LiquidStores {
         FluidStack like = FluidSamples.fluid(sample);
         long n = 0;
         for (IFluidHandler h : fluids) {
-            for (FluidStack f : contents(h)) {
-                if (FluidStack.isSameFluidSameComponents(f, like)) {
-                    n += f.getAmount();
+            for (FluidAmount f : contents(h)) {
+                if (FluidStack.isSameFluidSameComponents(f.type(), like)) {
+                    n += f.amount();
                 }
             }
         }
@@ -147,27 +147,37 @@ public final class LiquidStores {
     }
 
     /** 入れ物の中身（流体の種類ごと）。素材置き場なら、抜ける量だけ。 */
-    private List<FluidStack> contents(IFluidHandler h) {
-        List<FluidStack> out = new ArrayList<>();
+    private record FluidAmount(FluidStack type, long amount) {}
+
+    private List<FluidAmount> contents(IFluidHandler h) {
+        List<FluidAmount> out = new ArrayList<>();
         for (int t = 0; t < h.getTanks(); t++) {
             FluidStack f = h.getFluidInTank(t);
-            if (f.isEmpty()) {
-                continue;
+            if (f.isEmpty()) continue;
+            int index = -1;
+            for (int i = 0; i < out.size(); i++) {
+                if (FluidStack.isSameFluidSameComponents(out.get(i).type(), f)) {
+                    index = i;
+                    break;
+                }
             }
-            FluidStack same = out.stream().filter(o -> FluidStack.isSameFluidSameComponents(o, f)).findFirst().orElse(null);
-            if (same == null) {
-                out.add(f.copy());
+            if (index < 0) {
+                out.add(new FluidAmount(f.copyWithAmount(1), f.getAmount()));
             } else {
-                same.grow(f.getAmount());
+                FluidAmount previous = out.get(index);
+                out.set(index, new FluidAmount(previous.type(), previous.amount() + f.getAmount()));
             }
         }
         if (storage) {
-            out.replaceAll(f -> f.copyWithAmount(h.drain(f.copy(), IFluidHandler.FluidAction.SIMULATE).getAmount()));
-            out.removeIf(FluidStack::isEmpty);
+            // A single handler's drain API is int-sized. Do not repeat simulations: each
+            // would see the same stock and could incorrectly count inaccessible tanks.
+            out.replaceAll(f -> new FluidAmount(f.type(), h.drain(
+                    f.type().copyWithAmount((int) Math.min(Integer.MAX_VALUE, f.amount())),
+                    IFluidHandler.FluidAction.SIMULATE).getAmount()));
+            out.removeIf(f -> f.amount() <= 0);
         }
         return out;
     }
-
     /** 抜く（最大 amount）。抜けた量。 */
     public long drain(ItemStack sample, long amount, boolean simulate) {
         long got = 0;
@@ -219,8 +229,8 @@ public final class LiquidStores {
     /** 中身をすべて、数え方の目印（量 1 の見本）と量で足す。 */
     public void addTo(List<ItemCount> out) {
         for (IFluidHandler h : fluids) {
-            for (FluidStack f : contents(h)) {
-                ItemCount.add(out, FluidSamples.of(f.copyWithAmount(1)), f.getAmount());
+            for (FluidAmount f : contents(h)) {
+                ItemCount.add(out, FluidSamples.of(f.type().copyWithAmount(1)), f.amount());
             }
         }
         for (Chemicals.Store s : chemicals) {
