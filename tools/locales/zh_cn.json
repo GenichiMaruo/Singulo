@@ -2824,8 +2824,8 @@
     "translation": "被点燃后成为黑洞核心。"
   },
   "desc.singulo.smes_cell": {
-    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen.",
-    "translation": "超导磁储能装置，可储存大量电力。右键打开界面。"
+    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "超导磁储能装置，可储存大量电力。右键打开界面。在界面的充电槽中放入可接收电力的物品即可充电，充满后会从旁边的槽出来。"
   },
   "desc.singulo.smes_module": {
     "source": "High-capacity energy storage.",
@@ -3444,24 +3444,24 @@
     "translation": "头部"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret, headdress or glasses",
-    "translation": "缎带、发饰、贝雷帽、头饰、眼镜"
+    "source": "Ribbon, hair flower, beret, headdress, cat ears, a hat, a hair extension or a tiara",
+    "translation": "缎带、发饰、贝雷帽、头饰、猫耳、帽子、接发、头冠"
   },
   "gui.singulo.android.decor.1": {
-    "source": "Back / waist",
-    "translation": "背部・腰部"
+    "source": "Neck / back",
+    "translation": "颈部・背部"
   },
   "gui.singulo.android.decor.1.hint": {
-    "source": "Cape, scarf or waist ribbon",
-    "translation": "披风、围巾、腰部缎带"
+    "source": "Cape, scarf, fairy wings, necktie or necklace",
+    "translation": "披风、围巾、妖精之翼、领带、项链"
   },
   "gui.singulo.android.decor.2": {
     "source": "Hand",
     "translation": "手部"
   },
   "gui.singulo.android.decor.2.hint": {
-    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
-    "translation": "文库本、花束、茶杯、伞（仅在待机时拿着）"
+    "source": "Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)",
+    "translation": "文库本、花束、茶杯、伞、提灯、扫帚（仅在待机时拿着）"
   },
   "gui.singulo.android.decor.dye": {
     "source": "Dye them with dyes on a crafting table",
@@ -11160,8 +11160,8 @@
     "translation": "戴在仿生人头上（装饰页）"
   },
   "tooltip.singulo.android_accessory.1": {
-    "source": "Worn on an android's back or waist (decoration page)",
-    "translation": "戴在仿生人背部或腰部（装饰页）"
+    "source": "Worn on an android's neck or back (decoration page)",
+    "translation": "戴在仿生人颈部或背部（装饰页）"
   },
   "tooltip.singulo.android_accessory.2": {
     "source": "Held by an idle android (decoration page)",
@@ -11520,8 +11520,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 52 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 53 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -12064,8 +12064,8 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 95 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 95 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 97 个"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
@@ -13416,8 +13416,8 @@
     "translation": "在现有吸积喷流锻造炉中制造的层状核物质。不需要先造新储能库。"
   },
   "desc.singulo.pasta_accumulator": {
-    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both.",
-    "translation": "7×9×7 的设备，容量 8 TFE，输入、输出各为 2 GFE/t。充电时压板收紧，核面食由颗粒变成细棒再变成薄板；放电经四角导体流出。左右两个端口可分别设为输入、输出或输入输出。"
+    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "7×9×7 的设备，容量 8 TFE，输入、输出各为 2 GFE/t。充电时压板收紧，核面食由颗粒变成细棒再变成薄板；放电经四角导体流出。左右两个端口可分别设为输入、输出或输入输出。在界面的充电槽中放入可接收电力的物品即可充电，充满后会从旁边的槽出来。"
   },
   "desc.singulo.pasta_laminate": {
     "source": "Layered plates that form the top and bottom of the Nuclear Pasta Accumulator.",
@@ -14162,5 +14162,605 @@
   "message.singulo.arsenal_notice.link": {
     "source": "[View on CurseForge]",
     "translation": "[在 CurseForge 查看]"
+  },
+  "item.singulo.android_cat_ears": {
+    "source": "Cat Ear Headband",
+    "translation": "猫耳发箍"
+  },
+  "item.singulo.android_witch_hat": {
+    "source": "Witch Hat",
+    "translation": "魔女帽"
+  },
+  "item.singulo.android_straw_hat": {
+    "source": "Straw Hat",
+    "translation": "草帽"
+  },
+  "item.singulo.android_ponytail": {
+    "source": "Hair Extension (Ponytail)",
+    "translation": "接发（马尾）"
+  },
+  "item.singulo.android_twin_tails": {
+    "source": "Hair Extension (Twin Tails)",
+    "translation": "接发（双马尾）"
+  },
+  "item.singulo.android_monocle": {
+    "source": "Monocle",
+    "translation": "单片眼镜"
+  },
+  "item.singulo.android_fairy_wings": {
+    "source": "Fairy Wings",
+    "translation": "妖精之翼"
+  },
+  "item.singulo.android_apron": {
+    "source": "Apron",
+    "translation": "围裙"
+  },
+  "item.singulo.android_lantern": {
+    "source": "Lantern",
+    "translation": "提灯"
+  },
+  "item.singulo.android_broom": {
+    "source": "Broom",
+    "translation": "扫帚"
+  },
+  "gui.singulo.android.decor.3": {
+    "source": "Face",
+    "translation": "脸部"
+  },
+  "gui.singulo.android.decor.4": {
+    "source": "Waist",
+    "translation": "腰部"
+  },
+  "gui.singulo.android.decor.3.hint": {
+    "source": "Glasses, monocle or earrings",
+    "translation": "眼镜、单片眼镜、耳环"
+  },
+  "gui.singulo.android.decor.4.hint": {
+    "source": "Waist ribbon, apron or brooch",
+    "translation": "腰部缎带、围裙、胸针"
+  },
+  "tooltip.singulo.android_accessory.3": {
+    "source": "Worn on an android's face (decoration page)",
+    "translation": "戴在仿生人脸上（装饰页）"
+  },
+  "tooltip.singulo.android_accessory.4": {
+    "source": "Worn on an android's waist (decoration page)",
+    "translation": "戴在仿生人腰部（装饰页）"
+  },
+  "desc.singulo.android_apron": {
+    "source": "An apron with a frilled hem. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "下摆带有褶边的围裙。装在装饰页的腰部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_apron": {
+    "source": "An apron for an android.",
+    "translation": "仿生人系在腰上的围裙。"
+  },
+  "howto.singulo.android_apron": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_broom": {
+    "source": "A broom an android holds upright while idle. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the binding.",
+    "translation": "仿生人待机时竖着拿的扫帚。装在装饰页的手部槽中。与染料一起在工作台上染色会改变绑绳的颜色。"
+  },
+  "summary.singulo.android_broom": {
+    "source": "A broom an idle android holds.",
+    "translation": "待机的仿生人拿着的扫帚。"
+  },
+  "howto.singulo.android_broom": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_cat_ears": {
+    "source": "A headband with cat ears for an android. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "戴在仿生人头上、带猫耳的发箍。装在装饰页的头部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_cat_ears": {
+    "source": "Cat ears for an android.",
+    "translation": "戴在仿生人头上的猫耳。"
+  },
+  "howto.singulo.android_cat_ears": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_fairy_wings": {
+    "source": "Four clear wings that flutter slowly on an android's back. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "在背上缓缓扇动的四片透明翅膀。装在装饰页的颈部・背部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_fairy_wings": {
+    "source": "Wings that flutter on an android's back.",
+    "translation": "在仿生人背上扇动的翅膀。"
+  },
+  "howto.singulo.android_fairy_wings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_lantern": {
+    "source": "A lantern an android carries while idle. Its flame looks bright even in the dark, though it does not light the area. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the metal frame.",
+    "translation": "仿生人待机时提在手上的提灯。里面的火在暗处也显得明亮（不会照亮周围）。装在装饰页的手部槽中。与染料一起在工作台上染色会改变金属框的颜色。"
+  },
+  "summary.singulo.android_lantern": {
+    "source": "A lantern an idle android carries.",
+    "translation": "待机的仿生人提着的提灯。"
+  },
+  "howto.singulo.android_lantern": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_monocle": {
+    "source": "A monocle on a chain for the right eye. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the rim.",
+    "translation": "戴在右眼、带链子的单片眼镜。装在装饰页的脸部槽中（与眼镜同一槽）。与染料一起在工作台上染色会改变镜框的颜色。"
+  },
+  "summary.singulo.android_monocle": {
+    "source": "A monocle for an android's right eye.",
+    "translation": "戴在仿生人右眼的单片眼镜。"
+  },
+  "howto.singulo.android_monocle": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_ponytail": {
+    "source": "A high ponytail in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair tie.",
+    "translation": "在后脑高处扎起的马尾。头发是仿生人自己的发色。装在装饰页的头部槽中。与染料一起在工作台上染色会改变发圈的颜色。"
+  },
+  "summary.singulo.android_ponytail": {
+    "source": "Gives an android a ponytail.",
+    "translation": "把仿生人的头发扎成马尾。"
+  },
+  "howto.singulo.android_ponytail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_straw_hat": {
+    "source": "A straw hat with a ribbon. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the ribbon.",
+    "translation": "缠着缎带的草帽。装在装饰页的头部槽中。与染料一起在工作台上染色会改变缎带的颜色。"
+  },
+  "summary.singulo.android_straw_hat": {
+    "source": "A straw hat for an android.",
+    "translation": "仿生人戴的草帽。"
+  },
+  "howto.singulo.android_straw_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_twin_tails": {
+    "source": "Twin tails in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair ties.",
+    "translation": "在头的左右两侧扎起的双马尾。头发是仿生人自己的发色。装在装饰页的头部槽中。与染料一起在工作台上染色会改变发圈的颜色。"
+  },
+  "summary.singulo.android_twin_tails": {
+    "source": "Gives an android twin tails.",
+    "translation": "把仿生人的头发扎成双马尾。"
+  },
+  "howto.singulo.android_twin_tails": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_witch_hat": {
+    "source": "A pointed hat with a bent tip. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "尖端折弯的尖顶帽。装在装饰页的头部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_witch_hat": {
+    "source": "A pointed hat for an android.",
+    "translation": "仿生人戴的尖顶帽。"
+  },
+  "howto.singulo.android_witch_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "block.singulo.rgb_dye_station": {
+    "source": "RGB Dye Station",
+    "translation": "RGB染色台"
+  },
+  "gui.singulo.rgb_dye_station.apply": {
+    "source": "Dye",
+    "translation": "染色"
+  },
+  "gui.singulo.rgb_dye_station.wheel": {
+    "source": "Hue and saturation (click or drag)",
+    "translation": "色相和饱和度（点击或拖动选择）"
+  },
+  "gui.singulo.rgb_dye_station.brightness": {
+    "source": "Brightness",
+    "translation": "亮度"
+  },
+  "gui.singulo.rgb_dye_station.cost": {
+    "source": "Ink per dye",
+    "translation": "每次染色使用的墨水"
+  },
+  "gui.singulo.rgb_dye_station.cost.0": {
+    "source": "Red %s",
+    "translation": "红 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.1": {
+    "source": "Green %s",
+    "translation": "绿 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.2": {
+    "source": "Blue %s",
+    "translation": "蓝 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.3": {
+    "source": "White %s",
+    "translation": "白 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.4": {
+    "source": "Black %s",
+    "translation": "黑 %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.0": {
+    "source": "Red ink %s / %s",
+    "translation": "红色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.1": {
+    "source": "Green ink %s / %s",
+    "translation": "绿色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.2": {
+    "source": "Blue ink %s / %s",
+    "translation": "蓝色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.3": {
+    "source": "White ink %s / %s",
+    "translation": "白色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.4": {
+    "source": "Black ink %s / %s",
+    "translation": "黑色墨水 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.no_target": {
+    "source": "Put in something to dye",
+    "translation": "放入要染色的物品"
+  },
+  "summary.singulo.rgb_dye_station": {
+    "source": "Dyes things any color you pick on a color wheel.",
+    "translation": "用色轮选择任意颜色来染色的工作台。"
+  },
+  "desc.singulo.rgb_dye_station": {
+    "source": "Put red, green, blue, white and black dyes in their slots to turn them into ink (8 units per dye, up to 64 of each), then dye anything dyeable, such as leather armor or android decorations, any color you pick on the color wheel and brightness bar. The ink used depends on the color: a pure hue uses only its colored inks, a gray only white and black (up to 4 units of each). Breaking it drops its dyes and as many dyes as its ink can make again.",
+    "translation": "把红、绿、蓝、白、黑染料放入各自的槽中就会变成墨水（每个染料 8 格，每种颜色最多 64 格），可将可染色的物品（皮革盔甲、仿生人装饰等）染成在界面的色轮和亮度中选择的任意颜色。每次使用的墨水由所选颜色决定：纯色只用对应颜色的墨水，灰色只用白色和黑色（每种颜色最多 4 格）。破坏后会掉落其中的染料，以及墨水能变回的染料。"
+  },
+  "howto.singulo.rgb_dye_station": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "item.singulo.android_necktie": {
+    "source": "Necktie",
+    "translation": "领带"
+  },
+  "item.singulo.android_diamond_necklace": {
+    "source": "Diamond Necklace",
+    "translation": "钻石项链"
+  },
+  "item.singulo.android_diamond_earrings": {
+    "source": "Diamond Earrings",
+    "translation": "钻石耳环"
+  },
+  "item.singulo.android_diamond_tiara": {
+    "source": "Diamond Tiara",
+    "translation": "钻石头冠"
+  },
+  "item.singulo.android_diamond_brooch": {
+    "source": "Diamond Brooch",
+    "translation": "钻石胸针"
+  },
+  "summary.singulo.android_necktie": {
+    "source": "A necktie for an android.",
+    "translation": "仿生人胸前的领带。"
+  },
+  "summary.singulo.android_diamond_necklace": {
+    "source": "A necklace with a diamond pendant.",
+    "translation": "胸前垂着钻石的项链。"
+  },
+  "summary.singulo.android_diamond_earrings": {
+    "source": "Diamond earrings that sway.",
+    "translation": "在双耳摇晃的钻石耳环。"
+  },
+  "summary.singulo.android_diamond_tiara": {
+    "source": "A small crown set with diamonds.",
+    "translation": "镶满钻石的小王冠。"
+  },
+  "summary.singulo.android_diamond_brooch": {
+    "source": "A diamond brooch for the waist.",
+    "translation": "别在腰前的钻石胸针。"
+  },
+  "desc.singulo.android_necktie": {
+    "source": "A striped necktie from a knot at the collar down the chest. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "从领口的结垂到胸前、带斜条纹的领带。装在装饰页的颈部・背部槽中。与染料一起在工作台上可以染色。"
+  },
+  "desc.singulo.android_diamond_necklace": {
+    "source": "A fine chain that dips into a V with a diamond pendant. Goes in the neck / back slot of the decoration page. Dyeing it on a crafting table changes the chain and setting; the diamond stays.",
+    "translation": "绕过颈部的细链在胸前垂成 V 形，末端闪着钻石。装在装饰页的颈部・背部槽中。与染料一起在工作台上染色会改变链子和底座的颜色（钻石不变）。"
+  },
+  "desc.singulo.android_diamond_earrings": {
+    "source": "Diamonds that sway below both ears. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the metal; the diamonds stay.",
+    "translation": "在双耳下方摇晃的钻石。装在装饰页的脸部槽中（与眼镜同一槽）。与染料一起在工作台上染色会改变金属件的颜色（钻石不变）。"
+  },
+  "desc.singulo.android_diamond_tiara": {
+    "source": "A small crown with three peaks set with diamonds. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the metal; the diamonds stay.",
+    "translation": "戴在头上、三座尖峰镶满钻石的小王冠。装在装饰页的头部槽中。与染料一起在工作台上染色会改变金属件的颜色（钻石不变）。"
+  },
+  "desc.singulo.android_diamond_brooch": {
+    "source": "A bow brooch with a diamond knot, pinned on the front of the waist. Goes in the waist slot of the decoration page. Dyeing it on a crafting table changes the bow; the diamond stays.",
+    "translation": "别在腰前、蝴蝶结中央镶着钻石的胸针。装在装饰页的腰部槽中。与染料一起在工作台上染色会改变蝴蝶结的颜色（钻石不变）。"
+  },
+  "howto.singulo.android_necktie": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "howto.singulo.android_diamond_necklace": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "howto.singulo.android_diamond_earrings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "howto.singulo.android_diamond_tiara": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "howto.singulo.android_diamond_brooch": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "gui.singulo.rgb_dye_station.hex": {
+    "source": "Color code (#RRGGBB)",
+    "translation": "颜色代码（#RRGGBB）"
+  },
+  "gui.singulo.android.hair_color": {
+    "source": "Hair color %s",
+    "translation": "发色 %s"
+  },
+  "gui.singulo.charge.in": {
+    "source": "Put in something to charge",
+    "translation": "放入要充电的物品（可接收电力的物品）"
+  },
+  "gui.singulo.charge.out": {
+    "source": "Charged items come out here",
+    "translation": "充好电的物品从这里出来"
+  },
+  "gui.singulo.charge.progress": {
+    "source": "Charged %s%%",
+    "translation": "已充电 %s%%"
+  },
+  "summary.singulo.smes_cell": {
+    "source": "Superconducting storage for a lot of power.",
+    "translation": "储存大量电力的超导蓄电方块。"
+  },
+  "block.singulo.food_printer": {
+    "source": "Food Printer",
+    "translation": "食品打印机"
+  },
+  "item.singulo.food_cartridge": {
+    "source": "Food Cartridge",
+    "translation": "食品墨盒"
+  },
+  "item.singulo.food_cartridge.filled": {
+    "source": "Food Cartridge (%s)",
+    "translation": "食品墨盒（%s）"
+  },
+  "item.singulo.nutrient_bar": {
+    "source": "Nutrient Bar",
+    "translation": "营养棒"
+  },
+  "item.singulo.printed_steak": {
+    "source": "Layered Steak",
+    "translation": "层叠牛排"
+  },
+  "item.singulo.spiral_pasta": {
+    "source": "Spiral Pasta",
+    "translation": "螺旋意面"
+  },
+  "item.singulo.honeycomb_cake": {
+    "source": "Honeycomb Cake",
+    "translation": "蜂巢蛋糕"
+  },
+  "item.singulo.fruit_gel_cube": {
+    "source": "Fruit Gel Cube",
+    "translation": "水果果冻块"
+  },
+  "desc.singulo.food_cartridge": {
+    "source": "A paste container for the Food Printer. Holds up to 64 of one kind of paste, and can switch kinds once empty.",
+    "translation": "食品打印机用的糊料容器。可存放最多64份同一种糊料，清空后可改装其他种类。"
+  },
+  "desc.singulo.food_printer": {
+    "source": "Refills Food Cartridges with the protein, carbohydrate or sweet paste that runs short from the ingredients in each row, then prints the space food you pick, layer by layer, on power. A nozzle builds the food up inside the glass chamber.",
+    "translation": "用蛋白质、碳水化合物和甜味各自槽中的食材，为食品墨盒补充不足的糊料，再用电力逐层打印所选的太空食品。喷嘴在玻璃打印室中把食品堆叠成形。"
+  },
+  "desc.singulo.fruit_gel_cube": {
+    "source": "Four layers of jelly. Edible when full, and heals a little.",
+    "translation": "四层颜色的果冻。饱腹时也能吃，并稍微回复生命。"
+  },
+  "desc.singulo.honeycomb_cake": {
+    "source": "A cake topped with honey hexagons. Eating it gives Speed.",
+    "translation": "顶上铺着六角形蜂蜜的蛋糕。吃下后获得迅捷。"
+  },
+  "desc.singulo.nutrient_bar": {
+    "source": "A printed nutrient bar. Quick to eat.",
+    "translation": "打印出来的营养棒。可以很快吃完。"
+  },
+  "desc.singulo.printed_steak": {
+    "source": "A steak printed down to its sear marks and marbling.",
+    "translation": "连烤痕和油花都打印出来的牛排。"
+  },
+  "desc.singulo.spiral_pasta": {
+    "source": "Spiral pasta with tomato sauce. Eating it gives Haste.",
+    "translation": "配番茄酱的螺旋意面。吃下后获得急迫。"
+  },
+  "food_paste.singulo.carb": {
+    "source": "Carbohydrate",
+    "translation": "碳水化合物"
+  },
+  "food_paste.singulo.protein": {
+    "source": "Protein",
+    "translation": "蛋白质"
+  },
+  "food_paste.singulo.sweet": {
+    "source": "Sweet",
+    "translation": "甜味"
+  },
+  "gui.singulo.food_printer.cartridge": {
+    "source": "Food Cartridge for %s",
+    "translation": "%s的食品墨盒"
+  },
+  "gui.singulo.food_printer.cost": {
+    "source": "Paste per item",
+    "translation": "每个所用的糊料"
+  },
+  "gui.singulo.food_printer.cost.line": {
+    "source": "%s %s",
+    "translation": "%s %s"
+  },
+  "gui.singulo.food_printer.no_cartridge": {
+    "source": "No cartridge",
+    "translation": "没有墨盒"
+  },
+  "gui.singulo.food_printer.output": {
+    "source": "Printed food",
+    "translation": "打印好的食品"
+  },
+  "gui.singulo.food_printer.paste": {
+    "source": "%s %s / %s",
+    "translation": "%s %s / %s"
+  },
+  "gui.singulo.food_printer.progress": {
+    "source": "Printing %s%%",
+    "translation": "打印中 %s%%"
+  },
+  "gui.singulo.food_printer.time": {
+    "source": "%s s · %s FE",
+    "translation": "%s秒・%s FE"
+  },
+  "guide.singulo.food": {
+    "source": "Printed Food",
+    "translation": "打印食品"
+  },
+  "guide.singulo.food.foods.title": {
+    "source": "Space food",
+    "translation": "太空食品"
+  },
+  "guide.singulo.food.printer.title": {
+    "source": "Food Printer",
+    "translation": "食品打印机"
+  },
+  "guide.singulo.food.foods.body": {
+    "source": "Nutrient Bar: 4 carbohydrate, 2 protein. Quick to eat (6 hunger).\nLayered Steak: 8 protein. Printed down to the sear marks and marbling (9 hunger).\nSpiral Pasta: 6 carbohydrate, 2 protein. Pasta with tomato sauce. Haste for 1 minute (8 hunger).\nHoneycomb Cake: 4 sweet, 3 carbohydrate. A cake topped with honey hexagons. Speed for 1 minute (7 hunger).\nFruit Gel Cube: 4 sweet. Four layers of jelly. Edible when full, with 5 seconds of Regeneration (3 hunger).",
+    "translation": "营养棒：碳水化合物4、蛋白质2。可以很快吃完（饥饿值6）。\n层叠牛排：蛋白质8。连烤痕和油花都打印出来的牛排（饥饿值9）。\n螺旋意面：碳水化合物6、蛋白质2。配番茄酱的意面。急迫1分钟（饥饿值8）。\n蜂巢蛋糕：甜味4、碳水化合物3。顶上铺着六角形蜂蜜的蛋糕。迅捷1分钟（饥饿值7）。\n水果果冻块：甜味4。四层颜色的果冻。饱腹时也能吃，获得5秒生命恢复（饥饿值3）。"
+  },
+  "guide.singulo.food.printer.body": {
+    "source": "The Food Printer turns ingredients into paste and prints space food layer by layer. It runs on power (20 FE per tick).\nThe left of the screen has a row each for protein, carbohydrate and sweet, from the top. A Food Cartridge in the right slot of a row holds up to 64 of that paste. Stock the left slot of each row with that kind of ingredient: meat, fish and eggs for protein; grains and vegetables for carbohydrate; fruit, sugar and honeycomb for sweet. The cartridges are refilled while they have room, the kind the chosen food is short of first, then the lowest. Ingredients that do not fit wait in their slot. One ingredient gives as much paste as the food it restores (wheat and eggs give 2, sugar and cocoa beans 1, honeycomb 3).\nPick the food with the button above the output (right-click returns to automatic). The printer keeps printing it while there is paste and room in the output. On automatic it prints any food the paste allows, the food already in the output first. To stop, switch it off at the top right (it keeps turning ingredients into paste). Inside the glass chamber, the nozzle runs back and forth and builds the food up from the bottom layer. The windows on the back glow with how much paste each cartridge holds.\nHoppers can put in ingredients and cartridges and take out printed food. Breaking it drops its items, and cartridges keep their paste.",
+    "translation": "食品打印机把食材制成糊料，并逐层打印太空食品。它使用电力运行（每 tick 20 FE）。\n界面左侧从上到下依次是蛋白质、碳水化合物和甜味三行。在每行右边的槽中放入食品墨盒，即可存放最多 64 份该种糊料。在每行左边的槽中成批放入该种食材：肉、鱼和蛋是蛋白质；谷物和蔬菜是碳水化合物；水果、糖和蜂巢是甜味。只要墨盒还有空间就会补充，先补所选食品不足的种类，再补最少的种类。放不下的食材会留在槽中等待。一个食材产生的糊料等于该食物恢复的饥饿值（小麦和蛋为 2，糖和可可豆为 1，蜂巢为 3）。\n用输出槽上方的按钮选择食品（右键恢复为自动）。只要糊料足够且输出槽有空间，就会持续打印。自动模式会打印糊料足够的食品，优先输出槽中已有的食品。要停止时，关闭右上角的电源（仍会继续把食材制成糊料）。在玻璃打印室中，喷嘴前后左右移动，从最下层开始按形状堆叠食品。背面的窗口会按墨盒中的糊料量发光。\n漏斗等可以放入食材和墨盒，并取出打印好的食品。破坏时会掉落其中的物品，墨盒会保留糊料。"
+  },
+  "howto.singulo.food_cartridge": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "howto.singulo.food_printer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "summary.singulo.food_cartridge": {
+    "source": "Holds paste for the Food Printer.",
+    "translation": "食品打印机的糊料容器。"
+  },
+  "summary.singulo.food_printer": {
+    "source": "Prints space food from ingredients.",
+    "translation": "用食材打印太空食品的装置。"
+  },
+  "tooltip.singulo.food_cartridge.amount": {
+    "source": "%s paste %s / %s",
+    "translation": "%s糊料 %s / %s"
+  },
+  "tooltip.singulo.food_cartridge.empty": {
+    "source": "Empty (holds %s paste)",
+    "translation": "空（可装 %s 份糊料）"
+  },
+  "gui.singulo.food_printer.auto.hint": {
+    "source": "Prints any food the paste allows (the food in the output first)",
+    "translation": "打印糊料足够的食品（优先输出槽中的食品）"
+  },
+  "gui.singulo.food_printer.fixed.hint": {
+    "source": "Prints only this food while the paste lasts",
+    "translation": "只要糊料足够，就只打印这种食品"
+  },
+  "gui.singulo.food_printer.nothing": {
+    "source": "No food has enough paste",
+    "translation": "没有糊料足够的食品"
+  },
+  "gui.singulo.food_printer.status.short": {
+    "source": "Short of paste",
+    "translation": "糊料不足"
+  },
+  "gui.singulo.food_printer.ingredient": {
+    "source": "Ingredients for %s",
+    "translation": "%s的食材"
+  },
+  "gui.singulo.food_printer.ingredient.protein": {
+    "source": "Meat, fish and eggs",
+    "translation": "肉、鱼和蛋"
+  },
+  "gui.singulo.food_printer.ingredient.carb": {
+    "source": "Grains and vegetables",
+    "translation": "谷物和蔬菜"
+  },
+  "gui.singulo.food_printer.ingredient.sweet": {
+    "source": "Fruit, sugar and honeycomb",
+    "translation": "水果、糖和蜂巢"
+  },
+  "gui.singulo.food_printer.ingredient.hint": {
+    "source": "Stock plenty and the paste that runs short is refilled first",
+    "translation": "多放一些，会先补充不足的糊料"
+  },
+  "subtitles.singulo.food_printer_running": {
+    "source": "Food printer prints",
+    "translation": "食品打印机正在打印"
+  },
+  "item.singulo.cover_frame": {
+    "source": "Cover Frame",
+    "translation": "覆盖框"
+  },
+  "howto.singulo.cover_frame": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "guide.singulo.cover": {
+    "source": "Cable Covers",
+    "translation": "线缆覆盖"
+  },
+  "guide.singulo.cover.cover.title": {
+    "source": "Cover Frame",
+    "translation": "覆盖框"
+  },
+  "message.singulo.cover.not_allowed": {
+    "source": "%s can't be set in a cover (only full, solid, opaque blocks)",
+    "translation": "%s无法嵌入（只能用无缝隙的不透明完整方块）"
+  },
+  "tooltip.singulo.cover_frame.fit": {
+    "source": "Right-click a cable or pipe to fit it. Elsewhere it places as an empty frame you can put a cable or pipe into later",
+    "translation": "右键点击线缆或管道即可安装。在其他地方可以只放置框，之后再装入线缆或管道"
+  },
+  "tooltip.singulo.cover_frame.inlay": {
+    "source": "Right-click the fitted frame with a block to set it in and take its look",
+    "translation": "用方块右键点击已安装的框，即可嵌入并变成该方块的外观"
+  },
+  "tooltip.singulo.cover_frame.remove": {
+    "source": "Breaking it takes off the block, then the frame, and leaves the cable",
+    "translation": "破坏后会保留线缆，依次掉落方块、框"
+  },
+  "desc.singulo.cover_frame": {
+    "source": "A frame fitted to a cable or pipe; set a real block into it to take that block's look. Connections and flow stay the same. Breaking it takes off the block, then the frame, and leaves the cable.",
+    "translation": "安装在线缆或管道上、嵌入真正的方块后即变成该方块外观的框。连接和传输量不变。破坏后会保留线缆，依次掉落方块、框。"
+  },
+  "summary.singulo.cover_frame": {
+    "source": "Makes a cable or pipe look like another block.",
+    "translation": "让线缆或管道变成其他方块的外观。"
+  },
+  "guide.singulo.cover.cover.body": {
+    "source": "A Cover Frame makes a cable or pipe look like another block. Craft 8 on a crafting table from 4 iron ingots and 4 iron bars.\nRight-click any cable or pipe with a frame to fit it. Then right-click the fitted frame with a block such as stone or planks: one block is set in, and that spot takes its look. What you see is the real block you set in. A block that faces a direction keeps the facing it would get if placed there normally (a log follows the clicked face, a carved pumpkin faces you).\nA cover changes neither the connections nor how much flows. It collides as a full block. An empty frame lets light through like glass; once a block is set in, it blocks light like an ordinary block. Only full, solid, opaque blocks can be set in: glass, leaves, stairs, slabs, and blocks that hold items, such as chests and furnaces, cannot.\nTo take a cover off, break the covered cable: the cable stays, and the first break drops the block, the second the frame (with a block set in, it breaks as fast as that block would). Sneak-right-clicking with the Relocation Wrench in relocate mode takes them off in the same order, straight into your inventory. To change the block, take it off and set in another. The wrench in cable mode removes the whole cable, returning the frame and block too.\nA frame can also be placed on its own like an ordinary block. Right-click a placed frame with a cable or pipe to put it inside (sneak to place the cable or pipe next to the frame instead), so you can lay out frames first and run the wiring later. Removing the cable from a frame with no block in it, with the wrench in cable mode, takes only the cable and leaves the frame in place.",
+    "translation": "覆盖框可以让线缆或管道变成其他方块的外观。在工作台用 4 个铁锭和 4 个铁栏杆制作 8 个。\n手持覆盖框右键点击线缆或管道（所有种类），即可安装框。再用石头、木板等方块右键点击已安装的框，就会嵌入 1 个该方块，那里便会变成嵌入方块的外观。看到的就是嵌入的真正方块本身。有朝向的方块会和在那里正常放置时的朝向相同（原木朝向右键点击的面，雕刻南瓜的脸朝向你）。\n装上覆盖后，连接和可传输的量都不会改变。碰撞箱会变成一整格。只有框时会像玻璃一样透光，嵌入方块后会像普通方块一样遮挡光线。只能嵌入无缝隙的不透明完整方块（玻璃、树叶、楼梯、台阶，以及箱子、熔炉等内部存放物品的方块都不能用）。\n要取下时，破坏装有覆盖的线缆。线缆会保留，第 1 次掉落嵌入的方块，第 2 次掉落框（嵌入方块时，以挖掘该方块的速度破坏）。潜行并用搬迁扳手（装置搬迁模式）右键点击，也会按同样顺序取下并回到物品栏。要更换方块时，先取下再嵌入其他方块。用拆除模式的扳手时，会连同线缆一起拆下，框和方块也会一起返还。\n覆盖框也可以像普通方块一样放在没有线缆的地方。用线缆或管道右键点击已放置的框，线缆或管道就会装进框里（潜行时，线缆或管道会放在框的旁边）。可以先排好框，之后再布线。对没有嵌入方块的框中的线缆使用拆除模式的扳手时，只会拆下线缆，框会留在原处。"
+  },
+  "block.singulo.cover_frame": {
+    "source": "Cover Frame",
+    "translation": "覆盖框"
   }
 }

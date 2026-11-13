@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.android.RuinAndroid;
+import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.item.ShieldPermitItem;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
@@ -179,6 +180,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private final Set<BlockPos> links = new LinkedHashSet<>();
     private final List<WorkOrder> orders = new ArrayList<>();
     private int nextOrderId = 1;
+    private final java.util.Map<UUID, ExternalOrderLedger> externalOrders = new java.util.LinkedHashMap<>();
     /** 渡している作業。途中の消費と再割当てが重ならないよう保存する。 */
     private final List<WorkJob.Lease> leases = new ArrayList<>();
     /** 登録した注文。 */
@@ -420,6 +422,89 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         return null;
+    }
+
+    /** Implementation behind AndroidOrders; callers should use that facade. */
+    public AndroidOrders.Receipt submitExternalOrder(UUID actor, UUID id, ItemStack target, long count,
+                                                     List<UUID> workers, @Nullable BlockPos destination) {
+        if (!externalAllowed(actor)) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "not_console_owner");
+        if (target.isEmpty() || FluidSamples.liquid(target) || count < 1 || count > MAX_COUNT || workers.stream().anyMatch(java.util.Objects::isNull))
+            return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "invalid_item_count_or_workers");
+        var previous = externalOrders.get(id);
+        if (previous != null) {
+            if (!previous.actor.equals(actor) || !previous.matches(target, count, workers, destination))
+                return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "request_id_conflict");
+            return externalOrderStatus(actor, id);
+        }
+        if (externalOrders.size() >= AndroidOrders.MAX_RECEIPTS)
+            return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "receipt_limit_acknowledge_terminal_orders");
+        if (destination != null && (destination.equals(worldPosition) || deliveryPort(destination) == null))
+            return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "invalid_delivery_port");
+        int orderId = nextOrderId;
+        Component why = start(actorFor(level, actor), target.copy(), count, List.copyOf(workers), destination,
+                false, workers.isEmpty(), true);
+        if (why != null) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, why.getString());
+        var entry = new ExternalOrderLedger(id, actor, orderId, target, count, workers, destination);
+        externalOrders.put(id, entry);
+        setChanged();
+        return entry.receipt();
+    }
+    /** Read-only view; missing active orders are reported failed without changing persisted state. */
+    public AndroidOrders.ConsoleSnapshot externalOrderSnapshot(UUID actor) {
+        if (!externalAllowed(actor)) return new AndroidOrders.ConsoleSnapshot(AndroidOrders.SnapshotState.REJECTED,
+                List.of(), 0, 0, AndroidOrders.MAX_RECEIPTS, 0, MAX_COUNT);
+        List<AndroidOrders.Receipt> receipts = new ArrayList<>();
+        int activeCount = 0, historyCount = 0;
+        for (var entry : externalOrders.values()) {
+            if (!entry.actor.equals(actor)) continue;
+            var receipt = entry.receipt();
+            if (entry.state == AndroidOrders.State.RUNNING) {
+                var active = order(entry.order);
+                receipt = new AndroidOrders.Receipt(entry.request,
+                        active == null ? AndroidOrders.State.FAILED : AndroidOrders.State.RUNNING,
+                        entry.order, entry.count, active == null ? entry.delivered : active.delivered,
+                        active == null ? "order_missing_not_completed" : entry.reason);
+            }
+            receipts.add(receipt);
+            if (receipt.state() == AndroidOrders.State.RUNNING) activeCount++;
+            else if (receipt.terminal()) historyCount++;
+        }
+        return new AndroidOrders.ConsoleSnapshot(AndroidOrders.SnapshotState.AVAILABLE, receipts, activeCount,
+                historyCount, AndroidOrders.MAX_RECEIPTS, AndroidOrders.MAX_RECEIPTS - externalOrders.size(), MAX_COUNT);
+    }
+    private boolean externalAllowed(UUID actor) {
+        if (!(level instanceof ServerLevel server) || !server.getServer().isSameThread() || isRemoved()) return false;
+        return owner != null && owner.equals(actor) && mayOperate(actorFor(level, actor));
+    }
+    public AndroidOrders.Receipt externalOrderStatus(UUID actor, UUID id) {
+        if (!externalAllowed(actor)) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "not_console_owner");
+        var entry = externalOrders.get(id);
+        if (entry == null) return AndroidOrders.result(id, AndroidOrders.State.UNKNOWN, "unknown_request");
+        if (!entry.actor.equals(actor)) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "not_request_owner");
+        if (entry.state == AndroidOrders.State.RUNNING) {
+            var active = order(entry.order);
+            if (active == null) { entry.state = AndroidOrders.State.FAILED; entry.reason = "order_missing_not_completed"; setChanged(); }
+            else entry.delivered = active.delivered;
+        }
+        return entry.receipt();
+    }
+    public AndroidOrders.Receipt cancelExternalOrder(UUID actor, UUID id) {
+        var status = externalOrderStatus(actor, id);
+        if (status.state() == AndroidOrders.State.RUNNING) cancel(status.orderId(), null);
+        return status.state() == AndroidOrders.State.RUNNING ? externalOrderStatus(actor, id) : status;
+    }
+    public boolean acknowledgeExternalOrder(UUID actor, UUID id) {
+        var status = externalOrderStatus(actor, id);
+        if (!status.terminal()) return false;
+        externalOrders.remove(id); setChanged(); return true;
+    }
+    private void finishExternalOrder(WorkOrder order, AndroidOrders.State state, @Nullable Component reason) {
+        for (var entry : externalOrders.values()) {
+            if (entry.order == order.id && entry.state == AndroidOrders.State.RUNNING) {
+                entry.state = state; entry.delivered = order.delivered;
+                entry.reason = reason == null ? null : reason.getString(); setChanged();
+            }
+        }
     }
 
     /** 注文する。できなければ理由を返す（できたら null）。 */
@@ -723,6 +808,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (o == null) {
             return;
         }
+        finishExternalOrder(o, reason == null ? AndroidOrders.State.CANCELLED : AndroidOrders.State.FAILED, reason);
         orders.remove(o);
         leases.removeIf(l -> l.job.orderId() == id);
         message = reason != null ? reason : Component.translatable("gui.singulo.work_console.cancelled", o.target.getHoverName());
@@ -2326,6 +2412,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     private void finishIfDone(WorkOrder o) {
         if (o.finished()) {
+            finishExternalOrder(o, AndroidOrders.State.COMPLETED, null);
             orders.remove(o);
             if (o.orderer != null && level instanceof ServerLevel server) {
                 io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), o.orderer, "android_order_complete");
@@ -2906,6 +2993,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             os.add(o.save(registries));
         }
         tag.put("orders", os);
+        ListTag receipts = new ListTag();
+        for (var entry : externalOrders.values()) receipts.add(entry.save(registries));
+        tag.put("external_orders_v1", receipts);
         tag.putInt("next_order", nextOrderId);
         tag.putInt("next_job", nextJobId);
         ListTag jobs = new ListTag();
@@ -2967,6 +3057,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (o != null) {
                 orders.add(o);
             }
+        }
+        externalOrders.clear();
+        for (Tag t : tag.getList("external_orders_v1", Tag.TAG_COMPOUND)) {
+            var entry = ExternalOrderLedger.load((CompoundTag) t, registries);
+            if (entry != null && externalOrders.size() < AndroidOrders.MAX_RECEIPTS) externalOrders.putIfAbsent(entry.request, entry);
         }
         nextOrderId = Math.max(1, tag.getInt("next_order"));
         nextJobId = Math.max(1, tag.getInt("next_job"));

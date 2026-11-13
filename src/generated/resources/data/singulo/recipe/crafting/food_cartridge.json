@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "NBN",
+    " W "
+  ],
+  "key": {
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "N": {
+      "tag": "c:glass_panes/colorless"
+    },
+    "B": {
+      "item": "minecraft:glass_bottle"
+    },
+    "W": {
+      "tag": "c:ingots/copper"
+    }
+  },
+  "result": {
+    "id": "singulo:food_cartridge",
+    "count": 1
+  }
+}

@@ -8,7 +8,7 @@ import zipfile
 from check_gametests import check, inventory, DEFAULT_NAMESPACES
 
 # 0.9.0 以降の 1.21.1 は NeoForge 版のみ（Forge 版は 0.8.1 まで）
-COUNTS = {'neoforge': 742}
+COUNTS = {'neoforge': 767}
 
 
 def validate(root, loader, name=None, source=None):

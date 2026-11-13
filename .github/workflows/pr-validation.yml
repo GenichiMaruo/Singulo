@@ -2,7 +2,7 @@ name: PR validation
 
 on:
   pull_request:
-    branches: [1.21.1, main]
+    branches: [1.21.1, main, feature/0.18.0]
 
 permissions:
   contents: read
@@ -29,6 +29,8 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
+      - name: Install validation dependencies
+        run: python3 -m pip install -r tools/review/requirements.txt
       - name: Validate translations and models
         run: |
           python3 tools/localization.py --check
@@ -53,8 +55,8 @@ jobs:
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient -PmachineGuiReview
       - name: Require GUI captures
         run: |
-          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 262
-          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 240' build/gui-review/logs/latest.log
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 272
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 250' build/gui-review/logs/latest.log
           grep -q 'SINGULO_GUI_COMPLETE 22' build/gui-review/logs/latest.log
           grep -q 'SINGULO_SEARCH_COMPLETE' build/gui-review/logs/latest.log
           grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/gui-review/logs/latest.log
@@ -226,7 +228,7 @@ jobs:
         run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism
       - name: Require completed nonempty integration tests
         run: |
-          grep -E 'All 1 required tests passed' build/gametest/logs/latest.log
+          grep -E 'All 4 required tests passed' build/gametest/logs/latest.log
           python3 tools/check_gametests.py --namespaces singulo_mekanism
       - name: Save integration logs
         if: always()

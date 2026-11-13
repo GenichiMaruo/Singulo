@@ -19,18 +19,32 @@ public final class CosmicMenu extends AbstractContainerMenu {
     /** 画面の枠（DeviceMenu と同じ大きさ。インベントリは枠の中央）とスロットの位置。CosmicScreen と同じ値。 */
     public static final int WIDTH=212, HEIGHT=206;
     public static final int SLOT_Y=72, SEED_X=25, BILLET_X=61, EXOTIC_X=81, OUTPUT_X=147;
+    /** 核パスタ積層蓄電庫の充電の枠（入れる枠・出てくる枠）。数値の行の下、ポートのボタンの上。左の表示窓（右端107）と蓄電バー（左端189）のあいだの空きの左右中央（148）に並べ、あいだに矢印（幅22、すき間3）。 */
+    public static final int CHARGE_Y=66, CHARGE_IN_X=117, CHARGE_OUT_X=163;
     private final BlockPos pos;
     private final SyncedInts data;
     private final int machineSlots;
+    /** 持ち物からシフトクリックで送る先の枠の数（先頭から。紡糸機は素材・エキゾチック・種の3つ、蓄電庫は充電の入れる枠1つ）。 */
+    private final int intoMachine;
     private final CosmicChamberBlockEntity owner;
     /** Client and visual-fixture constructor; server menus must bind their inventory owner. */
-    public CosmicMenu(int id,Inventory inventory,BlockPos pos,IItemHandler items,boolean spindle,SyncedInts data){
-        this(id,inventory,pos,items,spindle,data,null);
+    public CosmicMenu(int id,Inventory inventory,BlockPos pos,IItemHandler items,int kind,SyncedInts data){
+        this(id,inventory,pos,items,kind,data,null);
     }
-    CosmicMenu(int id,Inventory inventory,BlockPos pos,IItemHandler items,boolean spindle,SyncedInts data,CosmicChamberBlockEntity owner){
+    CosmicMenu(int id,Inventory inventory,BlockPos pos,IItemHandler items,int kind,SyncedInts data,CosmicChamberBlockEntity owner){
         super(SinguloMenus.COSMIC.get(),id);this.pos=pos;this.data=data;addDataSlots(data);
         this.owner=owner;
-        machineSlots=spindle?4:0;
+        boolean spindle=kind==CosmicChamberBlockEntity.SPINDLE, accumulator=kind==CosmicChamberBlockEntity.ACCUMULATOR;
+        machineSlots=spindle?4:accumulator?2:0;
+        intoMachine=spindle?3:accumulator?1:0;
+        if(accumulator)for(int i:new int[]{0,3}){
+            final int index=i;
+            // 充電の枠: 0 は入れる枠、3 は充電済みの物が出てくる枠（入れられない）
+            addSlot(new SlotItemHandler(items,i,i==0?CHARGE_IN_X:CHARGE_OUT_X,CHARGE_Y){
+                @Override public boolean mayPlace(ItemStack stack){return index==0&&(owner==null||stillValid(inventory.player))&&super.mayPlace(stack);}
+                @Override public boolean mayPickup(Player player){return (owner==null||stillValid(player))&&super.mayPickup(player);}
+            });
+        }
         if(spindle)for(int i=0;i<4;i++){
             final int index=i;
             addSlot(new SlotItemHandler(items,i,i==0?BILLET_X:i==1?EXOTIC_X:i==2?SEED_X:OUTPUT_X,SLOT_Y){
@@ -43,10 +57,15 @@ public final class CosmicMenu extends AbstractContainerMenu {
         for(int x=0;x<9;x++)addSlot(new Slot(inventory,x,left+x*18,io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT)));
     }
     public static CosmicMenu client(int id,Inventory inventory,RegistryFriendlyByteBuf buf){
-        return new CosmicMenu(id,inventory,buf.readBlockPos(),new ItemStackHandler(4){
-            @Override public int getSlotLimit(int slot){return slot==2?1:64;}
-            @Override public boolean isItemValid(int slot,ItemStack stack){return CosmicChamberBlockEntity.acceptsSpindleItem(slot,stack);}
-        },buf.readBoolean(),SyncedInts.client(COUNT));
+        BlockPos pos=buf.readBlockPos();
+        int kind=buf.readVarInt();
+        return new CosmicMenu(id,inventory,pos,new ItemStackHandler(4){
+            @Override public int getSlotLimit(int slot){return slot==2||kind==CosmicChamberBlockEntity.ACCUMULATOR&&slot==0?1:64;}
+            @Override public boolean isItemValid(int slot,ItemStack stack){
+                return kind==CosmicChamberBlockEntity.SPINDLE?CosmicChamberBlockEntity.acceptsSpindleItem(slot,stack)
+                        :kind==CosmicChamberBlockEntity.ACCUMULATOR&&slot==0&&io.github.genichimaruo.singulo.energy.ItemCharging.chargeable(stack);
+            }
+        },kind,SyncedInts.client(COUNT));
     }
     public BlockPos pos(){return pos;}
     public int value(int i){return data.getInt(i);}
@@ -68,7 +87,7 @@ public final class CosmicMenu extends AbstractContainerMenu {
         if(index<0||index>=slots.size())return ItemStack.EMPTY;
         Slot slot=slots.get(index);if(!slot.hasItem())return ItemStack.EMPTY;
         ItemStack stack=slot.getItem(),copy=stack.copy();
-        boolean moved=index<machineSlots?moveItemStackTo(stack,machineSlots,slots.size(),true):machineSlots>0&&moveItemStackTo(stack,0,3,false);
+        boolean moved=index<machineSlots?moveItemStackTo(stack,machineSlots,slots.size(),true):intoMachine>0&&moveItemStackTo(stack,0,intoMachine,false);
         if(!moved && index>=machineSlots){
             int hotbar=machineSlots+27;
             moved=index<hotbar?moveItemStackTo(stack,hotbar,slots.size(),false):moveItemStackTo(stack,machineSlots,hotbar,false);

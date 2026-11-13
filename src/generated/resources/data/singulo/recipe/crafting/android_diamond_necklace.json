@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "N N",
+    " N ",
+    " D "
+  ],
+  "key": {
+    "N": {
+      "tag": "c:nuggets/gold"
+    },
+    "D": {
+      "tag": "c:gems/diamond"
+    }
+  },
+  "result": {
+    "id": "singulo:android_diamond_necklace",
+    "count": 1
+  }
+}

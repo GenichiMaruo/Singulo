@@ -86,6 +86,14 @@
         "model": "singulo:block/superconducting_cable_arm",
         "x": 90
       }
+    },
+    {
+      "when": {
+        "cover": "frame|block"
+      },
+      "apply": {
+        "model": "singulo:block/cover_frame"
+      }
     }
   ]
 }

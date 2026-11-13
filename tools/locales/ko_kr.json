@@ -2824,8 +2824,8 @@
     "translation": "반응로에 넣고 점화하면 블랙홀 노심이 됩니다."
   },
   "desc.singulo.smes_cell": {
-    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen.",
-    "translation": "초전도 자기 에너지 저장 장치로, 많은 전력을 저장합니다. 우클릭하면 화면이 열립니다."
+    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "초전도 자기 에너지 저장 장치로, 많은 전력을 저장합니다. 우클릭하면 화면이 열립니다. 화면의 충전 칸에 전력을 받을 수 있는 물건을 넣으면 충전되고, 가득 차면 옆 칸으로 나옵니다."
   },
   "desc.singulo.smes_module": {
     "source": "High-capacity energy storage.",
@@ -3444,24 +3444,24 @@
     "translation": "머리"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret, headdress or glasses",
-    "translation": "리본·머리 장식·베레모·헤드드레스·안경"
+    "source": "Ribbon, hair flower, beret, headdress, cat ears, a hat, a hair extension or a tiara",
+    "translation": "리본·머리 장식·베레모·헤드드레스·고양이 귀·모자·붙임머리·티아라"
   },
   "gui.singulo.android.decor.1": {
-    "source": "Back / waist",
-    "translation": "등・허리"
+    "source": "Neck / back",
+    "translation": "목・등"
   },
   "gui.singulo.android.decor.1.hint": {
-    "source": "Cape, scarf or waist ribbon",
-    "translation": "망토·목도리·허리 리본"
+    "source": "Cape, scarf, fairy wings, necktie or necklace",
+    "translation": "망토·목도리·요정 날개·넥타이·목걸이"
   },
   "gui.singulo.android.decor.2": {
     "source": "Hand",
     "translation": "손"
   },
   "gui.singulo.android.decor.2.hint": {
-    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
-    "translation": "문고본·꽃다발·찻잔·우산(대기 중에만 듭니다)"
+    "source": "Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)",
+    "translation": "문고본·꽃다발·찻잔·우산·랜턴·빗자루(대기 중에만 듭니다)"
   },
   "gui.singulo.android.decor.dye": {
     "source": "Dye them with dyes on a crafting table",
@@ -11160,8 +11160,8 @@
     "translation": "안드로이드 머리에 답니다(장식 페이지)"
   },
   "tooltip.singulo.android_accessory.1": {
-    "source": "Worn on an android's back or waist (decoration page)",
-    "translation": "안드로이드 등이나 허리에 답니다(장식 페이지)"
+    "source": "Worn on an android's neck or back (decoration page)",
+    "translation": "안드로이드 목이나 등에 답니다(장식 페이지)"
   },
   "tooltip.singulo.android_accessory.2": {
     "source": "Held by an idle android (decoration page)",
@@ -11520,8 +11520,8 @@
     "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 53개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -12064,8 +12064,8 @@
     "translation": "사용처: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 95 more",
-    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 95개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
+    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 97개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
@@ -13416,8 +13416,8 @@
     "translation": "기존 강착 제트 단조로에서 만드는 층상 핵물질. 새 축전고를 먼저 만들 필요가 없습니다."
   },
   "desc.singulo.pasta_accumulator": {
-    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both.",
-    "translation": "7×9×7 설비. 용량 8 TFE, 입력과 출력은 각각 2 GFE/t입니다. 충전하면 압판이 조여지며 핵 파스타가 방울, 막대, 판으로 변합니다. 방전은 네 모서리 도체로 흐릅니다. 좌우 두 포트를 각각 입력, 출력, 입출력으로 설정할 수 있습니다."
+    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "7×9×7 설비. 용량 8 TFE, 입력과 출력은 각각 2 GFE/t입니다. 충전하면 압판이 조여지며 핵 파스타가 방울, 막대, 판으로 변합니다. 방전은 네 모서리 도체로 흐릅니다. 좌우 두 포트를 각각 입력, 출력, 입출력으로 설정할 수 있습니다. 화면의 충전 칸에 전력을 받을 수 있는 물건을 넣으면 충전되고, 가득 차면 옆 칸으로 나옵니다."
   },
   "desc.singulo.pasta_laminate": {
     "source": "Layered plates that form the top and bottom of the Nuclear Pasta Accumulator.",
@@ -14162,5 +14162,605 @@
   "message.singulo.arsenal_notice.link": {
     "source": "[View on CurseForge]",
     "translation": "[CurseForge에서 보기]"
+  },
+  "item.singulo.android_cat_ears": {
+    "source": "Cat Ear Headband",
+    "translation": "고양이 귀 머리띠"
+  },
+  "item.singulo.android_witch_hat": {
+    "source": "Witch Hat",
+    "translation": "마녀 모자"
+  },
+  "item.singulo.android_straw_hat": {
+    "source": "Straw Hat",
+    "translation": "밀짚모자"
+  },
+  "item.singulo.android_ponytail": {
+    "source": "Hair Extension (Ponytail)",
+    "translation": "붙임머리(포니테일)"
+  },
+  "item.singulo.android_twin_tails": {
+    "source": "Hair Extension (Twin Tails)",
+    "translation": "붙임머리(트윈테일)"
+  },
+  "item.singulo.android_monocle": {
+    "source": "Monocle",
+    "translation": "외알 안경"
+  },
+  "item.singulo.android_fairy_wings": {
+    "source": "Fairy Wings",
+    "translation": "요정 날개"
+  },
+  "item.singulo.android_apron": {
+    "source": "Apron",
+    "translation": "앞치마"
+  },
+  "item.singulo.android_lantern": {
+    "source": "Lantern",
+    "translation": "랜턴"
+  },
+  "item.singulo.android_broom": {
+    "source": "Broom",
+    "translation": "빗자루"
+  },
+  "gui.singulo.android.decor.3": {
+    "source": "Face",
+    "translation": "얼굴"
+  },
+  "gui.singulo.android.decor.4": {
+    "source": "Waist",
+    "translation": "허리"
+  },
+  "gui.singulo.android.decor.3.hint": {
+    "source": "Glasses, monocle or earrings",
+    "translation": "안경·외알 안경·귀걸이"
+  },
+  "gui.singulo.android.decor.4.hint": {
+    "source": "Waist ribbon, apron or brooch",
+    "translation": "허리 리본·앞치마·브로치"
+  },
+  "tooltip.singulo.android_accessory.3": {
+    "source": "Worn on an android's face (decoration page)",
+    "translation": "안드로이드 얼굴에 답니다(장식 페이지)"
+  },
+  "tooltip.singulo.android_accessory.4": {
+    "source": "Worn on an android's waist (decoration page)",
+    "translation": "안드로이드 허리에 답니다(장식 페이지)"
+  },
+  "desc.singulo.android_apron": {
+    "source": "An apron with a frilled hem. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "밑단에 프릴이 달린 앞치마. 장식 페이지의 허리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_apron": {
+    "source": "An apron for an android.",
+    "translation": "안드로이드 허리에 다는 앞치마."
+  },
+  "howto.singulo.android_apron": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_broom": {
+    "source": "A broom an android holds upright while idle. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the binding.",
+    "translation": "안드로이드가 대기 중에 세워 드는 빗자루. 장식 페이지의 손 칸에 답니다. 염료와 함께 제작대에서 염색하면 묶은 끈의 색이 바뀝니다."
+  },
+  "summary.singulo.android_broom": {
+    "source": "A broom an idle android holds.",
+    "translation": "대기 중인 안드로이드가 드는 빗자루."
+  },
+  "howto.singulo.android_broom": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_cat_ears": {
+    "source": "A headband with cat ears for an android. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리에 다는 고양이 귀 머리띠. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_cat_ears": {
+    "source": "Cat ears for an android.",
+    "translation": "안드로이드 머리에 다는 고양이 귀."
+  },
+  "howto.singulo.android_cat_ears": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_fairy_wings": {
+    "source": "Four clear wings that flutter slowly on an android's back. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "등에서 천천히 날갯짓하는 투명한 날개 네 장. 장식 페이지의 목・등 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_fairy_wings": {
+    "source": "Wings that flutter on an android's back.",
+    "translation": "안드로이드 등에서 날갯짓하는 날개."
+  },
+  "howto.singulo.android_fairy_wings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_lantern": {
+    "source": "A lantern an android carries while idle. Its flame looks bright even in the dark, though it does not light the area. Goes in the hand slot of the decoration page. Dyeing it on a crafting table changes the metal frame.",
+    "translation": "안드로이드가 대기 중에 손에 드는 랜턴. 안의 불은 어두운 곳에서도 밝게 보입니다(주변을 비추지는 않습니다). 장식 페이지의 손 칸에 답니다. 염료와 함께 제작대에서 염색하면 금속 틀의 색이 바뀝니다."
+  },
+  "summary.singulo.android_lantern": {
+    "source": "A lantern an idle android carries.",
+    "translation": "대기 중인 안드로이드가 드는 랜턴."
+  },
+  "howto.singulo.android_lantern": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_monocle": {
+    "source": "A monocle on a chain for the right eye. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the rim.",
+    "translation": "오른쪽 눈에 끼우는 사슬 달린 외알 안경. 장식 페이지의 얼굴 칸에 답니다(안경과 같은 칸). 염료와 함께 제작대에서 염색하면 테의 색이 바뀝니다."
+  },
+  "summary.singulo.android_monocle": {
+    "source": "A monocle for an android's right eye.",
+    "translation": "안드로이드 오른쪽 눈에 끼우는 외알 안경."
+  },
+  "howto.singulo.android_monocle": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_ponytail": {
+    "source": "A high ponytail in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair tie.",
+    "translation": "뒤통수 높은 곳에서 묶는 포니테일. 머리카락은 안드로이드 자신의 머리색이 됩니다. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 머리끈의 색이 바뀝니다."
+  },
+  "summary.singulo.android_ponytail": {
+    "source": "Gives an android a ponytail.",
+    "translation": "안드로이드의 머리를 포니테일로 만듭니다."
+  },
+  "howto.singulo.android_ponytail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_straw_hat": {
+    "source": "A straw hat with a ribbon. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the ribbon.",
+    "translation": "리본을 두른 밀짚모자. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 리본의 색이 바뀝니다."
+  },
+  "summary.singulo.android_straw_hat": {
+    "source": "A straw hat for an android.",
+    "translation": "안드로이드가 쓰는 밀짚모자."
+  },
+  "howto.singulo.android_straw_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_twin_tails": {
+    "source": "Twin tails in the android's own hair color. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the hair ties.",
+    "translation": "머리 양옆에서 묶는 트윈테일. 머리카락은 안드로이드 자신의 머리색이 됩니다. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 머리끈의 색이 바뀝니다."
+  },
+  "summary.singulo.android_twin_tails": {
+    "source": "Gives an android twin tails.",
+    "translation": "안드로이드의 머리를 트윈테일로 만듭니다."
+  },
+  "howto.singulo.android_twin_tails": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_witch_hat": {
+    "source": "A pointed hat with a bent tip. Goes in the head slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "끝이 꺾인 뾰족 모자. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_witch_hat": {
+    "source": "A pointed hat for an android.",
+    "translation": "안드로이드가 쓰는 뾰족 모자."
+  },
+  "howto.singulo.android_witch_hat": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "block.singulo.rgb_dye_station": {
+    "source": "RGB Dye Station",
+    "translation": "RGB 염색대"
+  },
+  "gui.singulo.rgb_dye_station.apply": {
+    "source": "Dye",
+    "translation": "염색"
+  },
+  "gui.singulo.rgb_dye_station.wheel": {
+    "source": "Hue and saturation (click or drag)",
+    "translation": "색상과 채도(클릭하거나 드래그해서 선택)"
+  },
+  "gui.singulo.rgb_dye_station.brightness": {
+    "source": "Brightness",
+    "translation": "밝기"
+  },
+  "gui.singulo.rgb_dye_station.cost": {
+    "source": "Ink per dye",
+    "translation": "한 번 염색에 쓰는 잉크"
+  },
+  "gui.singulo.rgb_dye_station.cost.0": {
+    "source": "Red %s",
+    "translation": "빨강 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.1": {
+    "source": "Green %s",
+    "translation": "초록 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.2": {
+    "source": "Blue %s",
+    "translation": "파랑 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.3": {
+    "source": "White %s",
+    "translation": "하양 %s"
+  },
+  "gui.singulo.rgb_dye_station.cost.4": {
+    "source": "Black %s",
+    "translation": "검정 %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.0": {
+    "source": "Red ink %s / %s",
+    "translation": "빨간 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.1": {
+    "source": "Green ink %s / %s",
+    "translation": "초록 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.2": {
+    "source": "Blue ink %s / %s",
+    "translation": "파란 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.3": {
+    "source": "White ink %s / %s",
+    "translation": "하얀 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.ink.4": {
+    "source": "Black ink %s / %s",
+    "translation": "검은 잉크 %s / %s"
+  },
+  "gui.singulo.rgb_dye_station.no_target": {
+    "source": "Put in something to dye",
+    "translation": "염색할 물건을 넣으세요"
+  },
+  "summary.singulo.rgb_dye_station": {
+    "source": "Dyes things any color you pick on a color wheel.",
+    "translation": "색상환에서 고른 원하는 색으로 염색하는 작업대."
+  },
+  "desc.singulo.rgb_dye_station": {
+    "source": "Put red, green, blue, white and black dyes in their slots to turn them into ink (8 units per dye, up to 64 of each), then dye anything dyeable, such as leather armor or android decorations, any color you pick on the color wheel and brightness bar. The ink used depends on the color: a pure hue uses only its colored inks, a gray only white and black (up to 4 units of each). Breaking it drops its dyes and as many dyes as its ink can make again.",
+    "translation": "빨강·초록·파랑·하양·검정 염료를 각 칸에 넣으면 잉크가 되고(염료 1개에 8칸, 색마다 최대 64칸), 화면의 색상환과 밝기에서 고른 원하는 색으로 염색할 수 있는 물건(가죽 갑옷, 안드로이드 장식 등)을 염색합니다. 한 번에 쓰는 잉크는 고른 색에 따라 정해지며, 순색은 그 색의 잉크만, 회색은 하양과 검정만 씁니다(색마다 최대 4칸). 부수면 안의 염료와, 잉크를 염료로 되돌릴 수 있는 만큼을 떨어뜨립니다."
+  },
+  "howto.singulo.rgb_dye_station": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "item.singulo.android_necktie": {
+    "source": "Necktie",
+    "translation": "넥타이"
+  },
+  "item.singulo.android_diamond_necklace": {
+    "source": "Diamond Necklace",
+    "translation": "다이아몬드 목걸이"
+  },
+  "item.singulo.android_diamond_earrings": {
+    "source": "Diamond Earrings",
+    "translation": "다이아몬드 귀걸이"
+  },
+  "item.singulo.android_diamond_tiara": {
+    "source": "Diamond Tiara",
+    "translation": "다이아몬드 티아라"
+  },
+  "item.singulo.android_diamond_brooch": {
+    "source": "Diamond Brooch",
+    "translation": "다이아몬드 브로치"
+  },
+  "summary.singulo.android_necktie": {
+    "source": "A necktie for an android.",
+    "translation": "안드로이드 가슴의 넥타이."
+  },
+  "summary.singulo.android_diamond_necklace": {
+    "source": "A necklace with a diamond pendant.",
+    "translation": "가슴에 다이아몬드가 늘어지는 목걸이."
+  },
+  "summary.singulo.android_diamond_earrings": {
+    "source": "Diamond earrings that sway.",
+    "translation": "양쪽 귀에서 흔들리는 다이아몬드 귀걸이."
+  },
+  "summary.singulo.android_diamond_tiara": {
+    "source": "A small crown set with diamonds.",
+    "translation": "다이아몬드를 박은 작은 왕관."
+  },
+  "summary.singulo.android_diamond_brooch": {
+    "source": "A diamond brooch for the waist.",
+    "translation": "허리 앞에 다는 다이아몬드 브로치."
+  },
+  "desc.singulo.android_necktie": {
+    "source": "A striped necktie from a knot at the collar down the chest. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "목의 매듭에서 가슴으로 내려오는 사선 줄무늬 넥타이. 장식 페이지의 목・등 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "desc.singulo.android_diamond_necklace": {
+    "source": "A fine chain that dips into a V with a diamond pendant. Goes in the neck / back slot of the decoration page. Dyeing it on a crafting table changes the chain and setting; the diamond stays.",
+    "translation": "목을 두른 가는 사슬이 가슴에서 V자로 늘어지고, 끝에 다이아몬드가 빛납니다. 장식 페이지의 목・등 칸에 답니다. 염료와 함께 제작대에서 염색하면 사슬과 받침의 색이 바뀝니다(다이아몬드는 그대로)."
+  },
+  "desc.singulo.android_diamond_earrings": {
+    "source": "Diamonds that sway below both ears. Goes in the face slot of the decoration page, like glasses. Dyeing it on a crafting table changes the metal; the diamonds stay.",
+    "translation": "양쪽 귀 아래에서 흔들리는 다이아몬드. 장식 페이지의 얼굴 칸에 답니다(안경과 같은 칸). 염료와 함께 제작대에서 염색하면 금속 장식의 색이 바뀝니다(다이아몬드는 그대로)."
+  },
+  "desc.singulo.android_diamond_tiara": {
+    "source": "A small crown with three peaks set with diamonds. Goes in the head slot of the decoration page. Dyeing it on a crafting table changes the metal; the diamonds stay.",
+    "translation": "머리 위에 얹는, 세 봉우리에 다이아몬드를 박은 작은 왕관. 장식 페이지의 머리 칸에 답니다. 염료와 함께 제작대에서 염색하면 금속 장식의 색이 바뀝니다(다이아몬드는 그대로)."
+  },
+  "desc.singulo.android_diamond_brooch": {
+    "source": "A bow brooch with a diamond knot, pinned on the front of the waist. Goes in the waist slot of the decoration page. Dyeing it on a crafting table changes the bow; the diamond stays.",
+    "translation": "허리 앞에 다는, 리본 매듭 가운데에 다이아몬드가 박힌 브로치. 장식 페이지의 허리 칸에 답니다. 염료와 함께 제작대에서 염색하면 리본의 색이 바뀝니다(다이아몬드는 그대로)."
+  },
+  "howto.singulo.android_necktie": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_diamond_necklace": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_diamond_earrings": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_diamond_tiara": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_diamond_brooch": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "gui.singulo.rgb_dye_station.hex": {
+    "source": "Color code (#RRGGBB)",
+    "translation": "색상 코드(#RRGGBB)"
+  },
+  "gui.singulo.android.hair_color": {
+    "source": "Hair color %s",
+    "translation": "머리색 %s"
+  },
+  "gui.singulo.charge.in": {
+    "source": "Put in something to charge",
+    "translation": "충전할 물건을 넣으세요(전력을 받을 수 있는 물건)"
+  },
+  "gui.singulo.charge.out": {
+    "source": "Charged items come out here",
+    "translation": "충전이 끝난 물건이 나옵니다"
+  },
+  "gui.singulo.charge.progress": {
+    "source": "Charged %s%%",
+    "translation": "충전 %s%%"
+  },
+  "summary.singulo.smes_cell": {
+    "source": "Superconducting storage for a lot of power.",
+    "translation": "많은 전력을 저장하는 초전도 축전 블록."
+  },
+  "block.singulo.food_printer": {
+    "source": "Food Printer",
+    "translation": "푸드 프린터"
+  },
+  "item.singulo.food_cartridge": {
+    "source": "Food Cartridge",
+    "translation": "푸드 카트리지"
+  },
+  "item.singulo.food_cartridge.filled": {
+    "source": "Food Cartridge (%s)",
+    "translation": "푸드 카트리지(%s)"
+  },
+  "item.singulo.nutrient_bar": {
+    "source": "Nutrient Bar",
+    "translation": "영양 바"
+  },
+  "item.singulo.printed_steak": {
+    "source": "Layered Steak",
+    "translation": "적층 스테이크"
+  },
+  "item.singulo.spiral_pasta": {
+    "source": "Spiral Pasta",
+    "translation": "나선 파스타"
+  },
+  "item.singulo.honeycomb_cake": {
+    "source": "Honeycomb Cake",
+    "translation": "허니콤 케이크"
+  },
+  "item.singulo.fruit_gel_cube": {
+    "source": "Fruit Gel Cube",
+    "translation": "과일 젤리 큐브"
+  },
+  "desc.singulo.food_cartridge": {
+    "source": "A paste container for the Food Printer. Holds up to 64 of one kind of paste, and can switch kinds once empty.",
+    "translation": "푸드 프린터에 넣는 페이스트 용기입니다. 한 종류의 페이스트를 64까지 담으며, 비면 다른 종류로 바꿀 수 있습니다."
+  },
+  "desc.singulo.food_printer": {
+    "source": "Refills Food Cartridges with the protein, carbohydrate or sweet paste that runs short from the ingredients in each row, then prints the space food you pick, layer by layer, on power. A nozzle builds the food up inside the glass chamber.",
+    "translation": "단백질·탄수화물·단맛 각 칸의 재료로 푸드 카트리지에 부족한 페이스트를 채우고, 고른 우주식을 전력으로 한 층씩 인쇄합니다. 유리 인쇄실에서 노즐이 음식을 모양대로 쌓아 올립니다."
+  },
+  "desc.singulo.fruit_gel_cube": {
+    "source": "Four layers of jelly. Edible when full, and heals a little.",
+    "translation": "네 가지 색 층의 젤리입니다. 배가 불러도 먹을 수 있고 조금 회복합니다."
+  },
+  "desc.singulo.honeycomb_cake": {
+    "source": "A cake topped with honey hexagons. Eating it gives Speed.",
+    "translation": "꿀 육각형을 올린 케이크입니다. 먹으면 신속 효과를 얻습니다."
+  },
+  "desc.singulo.nutrient_bar": {
+    "source": "A printed nutrient bar. Quick to eat.",
+    "translation": "인쇄한 영양 바입니다. 빨리 먹을 수 있습니다."
+  },
+  "desc.singulo.printed_steak": {
+    "source": "A steak printed down to its sear marks and marbling.",
+    "translation": "굽기 자국과 마블링까지 인쇄한 스테이크입니다."
+  },
+  "desc.singulo.spiral_pasta": {
+    "source": "Spiral pasta with tomato sauce. Eating it gives Haste.",
+    "translation": "토마토소스를 곁들인 나선 파스타입니다. 먹으면 성급함 효과를 얻습니다."
+  },
+  "food_paste.singulo.carb": {
+    "source": "Carbohydrate",
+    "translation": "탄수화물"
+  },
+  "food_paste.singulo.protein": {
+    "source": "Protein",
+    "translation": "단백질"
+  },
+  "food_paste.singulo.sweet": {
+    "source": "Sweet",
+    "translation": "단맛"
+  },
+  "gui.singulo.food_printer.cartridge": {
+    "source": "Food Cartridge for %s",
+    "translation": "%s 푸드 카트리지"
+  },
+  "gui.singulo.food_printer.cost": {
+    "source": "Paste per item",
+    "translation": "1개에 쓰는 페이스트"
+  },
+  "gui.singulo.food_printer.cost.line": {
+    "source": "%s %s",
+    "translation": "%s %s"
+  },
+  "gui.singulo.food_printer.no_cartridge": {
+    "source": "No cartridge",
+    "translation": "카트리지 없음"
+  },
+  "gui.singulo.food_printer.output": {
+    "source": "Printed food",
+    "translation": "인쇄한 음식"
+  },
+  "gui.singulo.food_printer.paste": {
+    "source": "%s %s / %s",
+    "translation": "%s %s / %s"
+  },
+  "gui.singulo.food_printer.progress": {
+    "source": "Printing %s%%",
+    "translation": "인쇄 %s%%"
+  },
+  "gui.singulo.food_printer.time": {
+    "source": "%s s · %s FE",
+    "translation": "%s초 · %s FE"
+  },
+  "guide.singulo.food": {
+    "source": "Printed Food",
+    "translation": "인쇄된 음식"
+  },
+  "guide.singulo.food.foods.title": {
+    "source": "Space food",
+    "translation": "우주식"
+  },
+  "guide.singulo.food.printer.title": {
+    "source": "Food Printer",
+    "translation": "푸드 프린터"
+  },
+  "guide.singulo.food.foods.body": {
+    "source": "Nutrient Bar: 4 carbohydrate, 2 protein. Quick to eat (6 hunger).\nLayered Steak: 8 protein. Printed down to the sear marks and marbling (9 hunger).\nSpiral Pasta: 6 carbohydrate, 2 protein. Pasta with tomato sauce. Haste for 1 minute (8 hunger).\nHoneycomb Cake: 4 sweet, 3 carbohydrate. A cake topped with honey hexagons. Speed for 1 minute (7 hunger).\nFruit Gel Cube: 4 sweet. Four layers of jelly. Edible when full, with 5 seconds of Regeneration (3 hunger).",
+    "translation": "영양 바: 탄수화물 4, 단백질 2. 빨리 먹을 수 있습니다(허기 6).\n적층 스테이크: 단백질 8. 굽기 자국과 마블링까지 인쇄한 스테이크입니다(허기 9).\n나선 파스타: 탄수화물 6, 단백질 2. 토마토소스 파스타. 성급함 1분(허기 8).\n허니콤 케이크: 단맛 4, 탄수화물 3. 꿀 육각형을 올린 케이크. 신속 1분(허기 7).\n과일 젤리 큐브: 단맛 4. 네 가지 색 층의 젤리. 배가 불러도 먹을 수 있고 재생 5초(허기 3)."
+  },
+  "guide.singulo.food.printer.body": {
+    "source": "The Food Printer turns ingredients into paste and prints space food layer by layer. It runs on power (20 FE per tick).\nThe left of the screen has a row each for protein, carbohydrate and sweet, from the top. A Food Cartridge in the right slot of a row holds up to 64 of that paste. Stock the left slot of each row with that kind of ingredient: meat, fish and eggs for protein; grains and vegetables for carbohydrate; fruit, sugar and honeycomb for sweet. The cartridges are refilled while they have room, the kind the chosen food is short of first, then the lowest. Ingredients that do not fit wait in their slot. One ingredient gives as much paste as the food it restores (wheat and eggs give 2, sugar and cocoa beans 1, honeycomb 3).\nPick the food with the button above the output (right-click returns to automatic). The printer keeps printing it while there is paste and room in the output. On automatic it prints any food the paste allows, the food already in the output first. To stop, switch it off at the top right (it keeps turning ingredients into paste). Inside the glass chamber, the nozzle runs back and forth and builds the food up from the bottom layer. The windows on the back glow with how much paste each cartridge holds.\nHoppers can put in ingredients and cartridges and take out printed food. Breaking it drops its items, and cartridges keep their paste.",
+    "translation": "푸드 프린터는 재료를 페이스트로 만들어 우주식을 한 층씩 인쇄하는 장치입니다. 전력(1 tick당 20 FE)으로 작동합니다.\n화면 왼쪽은 위에서부터 단백질·탄수화물·단맛 줄입니다. 각 줄 오른쪽 칸에 푸드 카트리지를 넣으면 그 종류의 페이스트를 64까지 담습니다. 각 줄 왼쪽 칸에는 그 종류의 재료를 넉넉히 넣어 둡니다. 고기·생선·달걀은 단백질, 곡물·채소는 탄수화물, 과일·설탕·벌집은 단맛입니다. 카트리지에 자리가 있는 동안, 고른 음식에 부족한 종류부터, 그다음 가장 적은 종류 순으로 채웁니다. 들어가지 않는 재료는 칸에서 기다립니다. 재료 1개의 페이스트는 그 음식의 허기 회복량만큼입니다(밀과 달걀은 2, 설탕과 코코아 콩은 1, 벌집은 3).\n출력 칸 위의 버튼으로 음식을 고릅니다(우클릭하면 자동으로 돌아갑니다). 페이스트가 충분하고 출력 칸에 자리가 있는 동안 계속 인쇄합니다. 자동에서는 출력 칸에 있는 음식을 우선해, 페이스트가 충분한 음식을 인쇄합니다. 멈추려면 오른쪽 위의 전원을 끕니다(재료를 페이스트로 만드는 일은 계속합니다). 유리 인쇄실에서는 노즐이 앞뒤 좌우로 움직이며 음식을 아래층부터 모양대로 쌓아 올립니다. 뒷면 창은 카트리지의 페이스트 양만큼 빛납니다.\n호퍼 등으로 재료와 카트리지를 넣고 인쇄한 음식을 꺼낼 수 있습니다. 부수면 안의 물건을 떨어뜨리며, 카트리지는 페이스트를 그대로 유지합니다."
+  },
+  "howto.singulo.food_cartridge": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.food_printer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "summary.singulo.food_cartridge": {
+    "source": "Holds paste for the Food Printer.",
+    "translation": "푸드 프린터의 페이스트 용기입니다."
+  },
+  "summary.singulo.food_printer": {
+    "source": "Prints space food from ingredients.",
+    "translation": "재료로 우주식을 인쇄하는 장치입니다."
+  },
+  "tooltip.singulo.food_cartridge.amount": {
+    "source": "%s paste %s / %s",
+    "translation": "%s 페이스트 %s / %s"
+  },
+  "tooltip.singulo.food_cartridge.empty": {
+    "source": "Empty (holds %s paste)",
+    "translation": "비어 있음(페이스트 %s까지)"
+  },
+  "gui.singulo.food_printer.auto.hint": {
+    "source": "Prints any food the paste allows (the food in the output first)",
+    "translation": "페이스트가 충분한 음식을 인쇄합니다(출력 칸에 있는 음식 우선)"
+  },
+  "gui.singulo.food_printer.fixed.hint": {
+    "source": "Prints only this food while the paste lasts",
+    "translation": "페이스트가 있는 동안 이 음식만 인쇄합니다"
+  },
+  "gui.singulo.food_printer.nothing": {
+    "source": "No food has enough paste",
+    "translation": "페이스트가 충분한 음식이 없음"
+  },
+  "gui.singulo.food_printer.status.short": {
+    "source": "Short of paste",
+    "translation": "페이스트 부족"
+  },
+  "gui.singulo.food_printer.ingredient": {
+    "source": "Ingredients for %s",
+    "translation": "%s 재료"
+  },
+  "gui.singulo.food_printer.ingredient.protein": {
+    "source": "Meat, fish and eggs",
+    "translation": "고기·생선·달걀"
+  },
+  "gui.singulo.food_printer.ingredient.carb": {
+    "source": "Grains and vegetables",
+    "translation": "곡물·채소"
+  },
+  "gui.singulo.food_printer.ingredient.sweet": {
+    "source": "Fruit, sugar and honeycomb",
+    "translation": "과일·설탕·벌집"
+  },
+  "gui.singulo.food_printer.ingredient.hint": {
+    "source": "Stock plenty and the paste that runs short is refilled first",
+    "translation": "넉넉히 넣어 두면 부족한 페이스트부터 채웁니다"
+  },
+  "subtitles.singulo.food_printer_running": {
+    "source": "Food printer prints",
+    "translation": "푸드 프린터가 인쇄함"
+  },
+  "item.singulo.cover_frame": {
+    "source": "Cover Frame",
+    "translation": "커버 틀"
+  },
+  "howto.singulo.cover_frame": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "guide.singulo.cover": {
+    "source": "Cable Covers",
+    "translation": "케이블 커버"
+  },
+  "guide.singulo.cover.cover.title": {
+    "source": "Cover Frame",
+    "translation": "커버 틀"
+  },
+  "message.singulo.cover.not_allowed": {
+    "source": "%s can't be set in a cover (only full, solid, opaque blocks)",
+    "translation": "%s은(는) 끼울 수 없습니다 (틈이 없는 불투명한 한 블록만)"
+  },
+  "tooltip.singulo.cover_frame.fit": {
+    "source": "Right-click a cable or pipe to fit it. Elsewhere it places as an empty frame you can put a cable or pipe into later",
+    "translation": "케이블이나 파이프를 우클릭하면 끼웁니다. 다른 곳에는 틀만 놓고 나중에 케이블이나 파이프를 넣을 수 있습니다"
+  },
+  "tooltip.singulo.cover_frame.inlay": {
+    "source": "Right-click the fitted frame with a block to set it in and take its look",
+    "translation": "끼운 틀을 블록으로 우클릭하면 끼워 넣어 그 블록의 모습이 됩니다"
+  },
+  "tooltip.singulo.cover_frame.remove": {
+    "source": "Breaking it takes off the block, then the frame, and leaves the cable",
+    "translation": "부수면 케이블은 남고 블록 → 틀 순서로 빠집니다"
+  },
+  "desc.singulo.cover_frame": {
+    "source": "A frame fitted to a cable or pipe; set a real block into it to take that block's look. Connections and flow stay the same. Breaking it takes off the block, then the frame, and leaves the cable.",
+    "translation": "케이블이나 파이프에 끼우고 진짜 블록을 끼워 넣으면 그 블록의 모습이 되는 틀. 연결과 보내는 양은 그대로입니다. 부수면 케이블은 남고 블록 → 틀 순서로 빠집니다."
+  },
+  "summary.singulo.cover_frame": {
+    "source": "Makes a cable or pipe look like another block.",
+    "translation": "케이블이나 파이프를 다른 블록의 모습으로 만듭니다."
+  },
+  "guide.singulo.cover.cover.body": {
+    "source": "A Cover Frame makes a cable or pipe look like another block. Craft 8 on a crafting table from 4 iron ingots and 4 iron bars.\nRight-click any cable or pipe with a frame to fit it. Then right-click the fitted frame with a block such as stone or planks: one block is set in, and that spot takes its look. What you see is the real block you set in. A block that faces a direction keeps the facing it would get if placed there normally (a log follows the clicked face, a carved pumpkin faces you).\nA cover changes neither the connections nor how much flows. It collides as a full block. An empty frame lets light through like glass; once a block is set in, it blocks light like an ordinary block. Only full, solid, opaque blocks can be set in: glass, leaves, stairs, slabs, and blocks that hold items, such as chests and furnaces, cannot.\nTo take a cover off, break the covered cable: the cable stays, and the first break drops the block, the second the frame (with a block set in, it breaks as fast as that block would). Sneak-right-clicking with the Relocation Wrench in relocate mode takes them off in the same order, straight into your inventory. To change the block, take it off and set in another. The wrench in cable mode removes the whole cable, returning the frame and block too.\nA frame can also be placed on its own like an ordinary block. Right-click a placed frame with a cable or pipe to put it inside (sneak to place the cable or pipe next to the frame instead), so you can lay out frames first and run the wiring later. Removing the cable from a frame with no block in it, with the wrench in cable mode, takes only the cable and leaves the frame in place.",
+    "translation": "커버 틀은 케이블이나 파이프를 다른 블록의 모습으로 만드는 틀입니다. 제작대에서 철 주괴 4개와 철창 4개로 8개를 만듭니다.\n틀을 들고 케이블이나 파이프(모든 종류)를 우클릭하면 틀이 끼워집니다. 끼운 틀을 돌이나 판자 같은 블록으로 우클릭하면 그 블록 1개를 끼워 넣고, 그 자리가 끼워 넣은 블록의 모습이 됩니다. 보이는 것은 끼워 넣은 진짜 블록 그 자체입니다. 방향이 있는 블록은 그 자리에 보통으로 놓았을 때와 같은 방향이 됩니다(원목은 우클릭한 면의 방향, 조각된 호박은 얼굴이 이쪽을 봅니다).\n커버를 달아도 연결과 보낼 수 있는 양은 바뀌지 않습니다. 충돌 판정은 한 블록 가득이 됩니다. 틀만 있을 때는 유리처럼 빛을 통과시키고, 블록을 끼우면 보통 블록처럼 빛을 막습니다. 끼울 수 있는 것은 틈이 없는 불투명한 한 블록입니다(유리·나뭇잎·계단·반 블록, 상자나 화로처럼 안에 물건을 담는 블록은 쓸 수 없습니다).\n뺄 때는 커버를 단 케이블을 부숩니다. 케이블은 남고, 1번째에 끼운 블록, 2번째에 틀이 빠져 떨어집니다(블록을 끼웠을 때는 끼운 블록을 캐는 속도로 부서집니다). 웅크린 채 이전 렌치(장치 이전 모드)로 우클릭해도 같은 순서로 빠져 소지품으로 돌아옵니다. 블록을 바꿀 때는 빼고 나서 다른 블록을 끼웁니다. 철거 모드의 렌치로는 케이블째 빠지고, 틀과 블록도 함께 돌아옵니다.\n틀은 케이블이 없는 곳에도 보통 블록처럼 놓을 수 있습니다. 놓은 틀을 케이블이나 파이프로 우클릭하면 그 안에 케이블이나 파이프가 들어갑니다(웅크리면 케이블이나 파이프는 틀 옆에 놓입니다). 먼저 틀을 늘어놓고 나중에 배선을 지나가게 할 수 있습니다. 블록을 끼우지 않은 틀의 케이블을 철거 모드의 렌치로 빼면, 케이블만 빠지고 틀은 그 자리에 남습니다."
+  },
+  "block.singulo.cover_frame": {
+    "source": "Cover Frame",
+    "translation": "커버 틀"
   }
 }

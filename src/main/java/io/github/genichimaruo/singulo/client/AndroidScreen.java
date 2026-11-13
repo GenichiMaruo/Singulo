@@ -328,6 +328,16 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
             return;
         }
+        // 隠し機能: Shift を押しながら姿の絵に重ねると、髪のメインの色（付け毛と同じ。染色台で色を合わせるのに使う）
+        RuinAndroid shown = menu.android();
+        if (shown != null && hasShiftDown()
+                && Panel.inside(mouseX, mouseY, leftPos + PORTRAIT_X, topPos + PORTRAIT_Y, PORTRAIT_W, PORTRAIT_H)) {
+            int hair = AndroidRenderer.Accessories.hairColor(shown.kind());
+            g.renderTooltip(font, Component.literal("\u25A0 ").withStyle(st -> st.withColor(hair))
+                    .append(Component.translatable("gui.singulo.android.hair_color", String.format("#%06X", hair))
+                            .withStyle(st -> st.withColor(0xFFFFFFFF))), mouseX, mouseY);
+            return;
+        }
         if (gearPage()) {
             renderTankTooltips(g, mouseX, mouseY);
         }
@@ -401,7 +411,8 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             g.fill(leftPos + dx + 1, topPos + dy + 4, leftPos + dx + 6, topPos + dy + 6, 0xFF6AB8E8);
             g.fill(leftPos + dx + 2, topPos + dy + 6, leftPos + dx + 5, topPos + dy + 7, 0xFF7CD88A);
             area(dx - 1, dy - 1, 9, 10, List.of(Component.translatable("gui.singulo.android.decor.dye")));
-            String[] ghosts = {"android_ribbon", "android_cape", "android_bouquet"};
+            // 空の枠の薄い見本（部位の番号の順: 頭・首/背中・手・顔・腰）
+            String[] ghosts = {"android_ribbon", "android_cape", "android_bouquet", "android_glasses", "android_apron"};
             for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
                 Slot s = menu.getSlot(RuinAndroid.SLOT_DECOR + i);
                 ghostSlot(g, leftPos + s.x, topPos + s.y, s, item(ghosts[i]));

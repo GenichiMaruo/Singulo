@@ -40,6 +40,8 @@ public final class SinguloClient {
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
+        modBus.addListener(CoverModel::wrap);
+        modBus.addListener(CoverModel::registerColors);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
         modBus.addListener(SinguloKeys::register);
@@ -151,6 +153,8 @@ public final class SinguloClient {
                 DronePortRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_DRONE_PORT.get(),
                 DronePortRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FOOD_PRINTER.get(),
+                FoodPrinterRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.HORIZON_VAULT.get(),
                 HorizonVaultRenderer::new);
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
@@ -261,6 +265,8 @@ public final class SinguloClient {
         event.register(SinguloMenus.ANDROID_WORK_CONSOLE.get(), WorkConsoleScreen::new);
         event.register(SinguloMenus.ANDROID_RECIPE_RACK.get(), RecipeRackScreen::new);
         event.register(SinguloMenus.ANDROID_DELIVERY_PORT.get(), DeliveryPortScreen::new);
+        event.register(SinguloMenus.RGB_DYE_STATION.get(), RgbDyeStationScreen::new);
+        event.register(SinguloMenus.FOOD_PRINTER.get(), FoodPrinterScreen::new);
         event.register(SinguloMenus.ANDROID_SUPPLY_PORT.get(), SupplyPortScreen::new);
         event.register(SinguloMenus.DRONE_STATION.get(), DroneStationScreen::new);
         event.register(SinguloMenus.DRONE_PORT.get(), DronePortScreen::new);
@@ -284,6 +290,14 @@ public final class SinguloClient {
             }
             return f.isEmpty() ? 0 : 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
         }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CANISTER.get());
+        // フードカートリッジ: 窓の絵（layer1）だけをペーストの色に。空なら窓を描かない
+        event.register((stack, layer) -> {
+            if (layer != 1) {
+                return 0xFFFFFFFF;
+            }
+            int kind = io.github.genichimaruo.singulo.food.FoodPaste.kind(stack);
+            return kind < 0 ? 0 : 0xFF000000 | io.github.genichimaruo.singulo.food.FoodPaste.COLORS[kind];
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.FOOD_CARTRIDGE.get());
         // 化学物質の見本は、化学物質の色に
         event.register((stack, layer) -> {
             String id = io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(stack);

@@ -208,8 +208,27 @@ final class GlowDepth extends RenderType {
         return GROUPS;
     }
 
+    /**
+     * 重力レンズを掛け終えたあとで足す光（アンドロイドの妖精の羽など、ブラックホールの近くでも歪みの手前に見せたい物）。
+     * ジェットと同じく深度は書かず、固体の奥行きと比べて足す。
+     */
+    private static final MultiBufferSource.BufferSource LATE_SOURCE = jetSource(1 << 16);
+    private static boolean latePending;
+
+    /** 重力レンズのあとで足す光の入れ物（ワールドの外やシェーダーパック使用時は、ふつうの入れ物）。 */
+    static MultiBufferSource afterLensing(MultiBufferSource buffers) {
+        return type -> {
+            if (!active || GravitationalLensing.shaderPackInUse()
+                    || type != JetForgeRenderTypes.GLOW && type != JetForgeRenderTypes.BEAM_TYPE) {
+                return buffers.getBuffer(type);
+            }
+            latePending = true;
+            return LATE_SOURCE.getBuffer(type);
+        };
+    }
+
     private static boolean anyPending() {
-        if (jetsPending) {
+        if (jetsPending || latePending) {
             return true;
         }
         for (JetGroup g : GROUPS) {
@@ -338,6 +357,10 @@ final class GlowDepth extends RenderType {
         GROUPS.clear();
         pooled = 0;
         JET_PATHS.clear();
+        if (latePending) {
+            latePending = false;
+            flush(event, LATE_SOURCE);
+        }
     }
 
     private static void flush(RenderLevelStageEvent event, MultiBufferSource.BufferSource source) {

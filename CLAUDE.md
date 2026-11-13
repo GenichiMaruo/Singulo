@@ -15,3 +15,4 @@ Start with [docs/README.md](docs/README.md) and [docs/development/README.md](doc
 - [0.15.0 Accretion Jet Forge and black hole rework](docs/0.15.0/README.md).
 - [0.16.0 cosmic machines and wormhole seams](docs/0.16.0/implementation.md).
 - [0.17.0 fluid logistics and Collapsar equipment](docs/0.17.0/README.md).
+- [0.18.0 android decorations](docs/0.18.0/README.md).

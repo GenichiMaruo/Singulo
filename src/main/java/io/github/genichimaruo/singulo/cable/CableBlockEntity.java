@@ -21,7 +21,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * 実際に電力が通っているあいだは、通った面（入ってきた面と出ていった面）と量をクライアントへ送る（光り方に使う）。
  * 通電表示はネットワークがまとめて更新する。切断は周期を待たず、クライアント側でも直ちに消す。
  */
-public class CableBlockEntity extends BlockEntity {
+public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder {
     static final int WINDOW = 10;
 
     @Nullable
@@ -103,6 +103,7 @@ public class CableBlockEntity extends BlockEntity {
         tag.putInt("In", shownIn);
         tag.putInt("Out", shownOut);
         tag.putInt("Dist", shownDist);
+        ConduitCover.save(tag, coverState);
         return tag;
     }
 
@@ -121,7 +122,49 @@ public class CableBlockEntity extends BlockEntity {
         shownIn = tag.getInt("In");
         shownOut = tag.getInt("Out");
         shownDist = tag.getInt("Dist");
+        loadCover(tag, registries);
     }
+
+    // ------------------------------------------------------------------ カバー（{@link ConduitCover}）
+
+    /** カバーにはめ込んだブロック（向きを含む状態。なければ null）。 */
+    @Nullable
+    private BlockState coverState;
+
+    @Override
+    @Nullable
+    public BlockState coverState() {
+        return coverState;
+    }
+
+    @Override
+    public void setCoverState(@Nullable BlockState state) {
+        coverState = state;
+        setChanged();
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ConduitCover.save(tag, coverState);
+    }
+
+    /** 読んだカバーが変わっていれば、クライアントでは見た目を描き直す。 */
+    private void loadCover(CompoundTag tag, HolderLookup.Provider registries) {
+        BlockState before = coverState;
+        coverState = ConduitCover.load(tag, registries);
+        if (before != coverState && level != null && level.isClientSide) {
+            requestModelDataUpdate();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    public net.neoforged.neoforge.client.model.data.ModelData getModelData() {
+        return coverState == null ? net.neoforged.neoforge.client.model.data.ModelData.EMPTY
+                : net.neoforged.neoforge.client.model.data.ModelData.builder().with(ConduitCover.MODEL_STATE, coverState).build();
+    }
+
 
     // ------------------------------------------------------------------ ネットワーク
 

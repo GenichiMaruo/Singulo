@@ -22,7 +22,7 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = COSMIC ? 7 : SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 32;
+    private static int SCREENS = COSMIC ? 7 : SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 34;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen;
     private static long renderedFrames, shownFrame;
@@ -106,7 +106,7 @@ public final class MachineGuiReviewHarness {
             var items=new ItemStackHandler(4);
             String[] ids={"collapsar_billet","exotic_matter","singularity_seed","tidal_filament"};
             for(int i=0;i<4;i++)items.setStackInSlot(i,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(ids[i]))));
-            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,kind==2,data);
+            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,kind,data);
             String[] blocks={"suspension_reservoir","pasta_accumulator","tidal_spindle"};
             mc.setScreen(new CosmicScreen(menu,mc.player.getInventory(),Component.translatable("block.singulo."+blocks[kind])));
             if(screen>=4){
@@ -199,7 +199,7 @@ public final class MachineGuiReviewHarness {
             value(data, SmesMenu.D_IN, 1_200);
             value(data, SmesMenu.D_OUT, 3_400);
             value(data, SmesMenu.D_RATE, 100_000);
-            mc.setScreen(new SmesScreen(new SmesMenu(0, mc.player.getInventory(), BlockPos.ZERO, data), mc.player.getInventory(),
+            mc.setScreen(new SmesScreen(new SmesMenu(0, mc.player.getInventory(), BlockPos.ZERO, new net.neoforged.neoforge.items.ItemStackHandler(2), data), mc.player.getInventory(),
                     Component.translatable("block.singulo.smes_cell")));
             metrics.add(LANGUAGES[language] + "	smes	0	0	176");
         } else if (extra == 9) {
@@ -404,6 +404,30 @@ public final class MachineGuiReviewHarness {
             var menu = new DeviceMenu(0, mc.player.getInventory(), kind, BlockPos.ZERO, items, data, null);
             mc.setScreen(new DeviceScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.jet_forge_core")));
             metrics.add(LANGUAGES[language] + "\tjet-forge-" + state + "\t0\t0\t" + DeviceMenu.WIDTH);
+        } else if (extra == 32) {
+            var data = new net.minecraft.world.inventory.SimpleContainerData(6);
+            int[] values = {16000, 0, 0, 40, 1, 1};
+            for (int i = 0; i < values.length; i++) data.set(i, values[i]);
+            var items = new ItemStackHandler(7);
+            var ingredients = new net.minecraft.world.item.Item[] {net.minecraft.world.item.Items.BEEF, net.minecraft.world.item.Items.WHEAT, net.minecraft.world.item.Items.APPLE};
+            for (int i = 0; i < 3; i++) {
+                items.setStackInSlot(i, new net.minecraft.world.item.ItemStack(ingredients[i], 8));
+                var cartridge = new net.minecraft.world.item.ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.FOOD_CARTRIDGE.get());
+                io.github.genichimaruo.singulo.food.FoodPaste.set(cartridge, i, 32);
+                items.setStackInSlot(i + 3, cartridge);
+            }
+            var menu = new io.github.genichimaruo.singulo.food.FoodPrinterMenu(0, mc.player.getInventory(), BlockPos.ZERO, items, data);
+            mc.setScreen(new FoodPrinterScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.food_printer")));
+            metrics.add(LANGUAGES[language] + "\tfood-printer\t0\t0\t212");
+        } else if (extra == 33) {
+            var data = new net.minecraft.world.inventory.SimpleContainerData(8);
+            int[] values = {32, 32, 32, 32, 32, 224, 96, 126};
+            for (int i = 0; i < values.length; i++) data.set(i, values[i]);
+            var items = new net.minecraft.world.SimpleContainer(6);
+            items.setItem(5, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LEATHER_CHESTPLATE));
+            var menu = new io.github.genichimaruo.singulo.dye.RgbDyeStationMenu(0, mc.player.getInventory(), BlockPos.ZERO, items, data);
+            mc.setScreen(new RgbDyeStationScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.rgb_dye_station")));
+            metrics.add(LANGUAGES[language] + "\trgb-dye-station\t0\t0\t212");
         } else {
             int variant = extra == 7 ? 2 : extra, kind = variant / 2;
             SyncedInts data = SyncedInts.client(GeneratorSlotsMenu.COUNT);

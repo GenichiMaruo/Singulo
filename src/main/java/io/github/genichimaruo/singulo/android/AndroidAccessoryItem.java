@@ -9,12 +9,14 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.DyedItemColor;
 
 /**
- * アンドロイドの装飾。装備のページのとなりの「装飾」のページで、頭・背中/腰・手の枠に着ける。戦い・作業には影響しない。
+ * アンドロイドの装飾。装備のページのとなりの「装飾」のページで、頭・顔・首/背中・腰・手の5つの枠に1つずつ着ける。戦い・作業には影響しない。
  * 染料と一緒に作業台で染められる（革の防具と同じ。タグ minecraft:dyeable）。手に持つ物は、待機している間だけ持つ。
  */
 public class AndroidAccessoryItem extends Item {
-    /** 着ける所。 */
-    public static final int HEAD = 0, BACK = 1, HAND = 2;
+    /**
+     * 着ける所（持ち物の装飾の枠の番号と同じ。0.17 までの3枠（頭・背中/腰・手）の番号は変えず、顔と腰をうしろに足した）。
+     */
+    public static final int HEAD = 0, BACK = 1, HAND = 2, FACE = 3, WAIST = 4, PARTS = 5;
 
     private final int part;
     private final String style;

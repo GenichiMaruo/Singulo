@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "R",
+    "S",
+    "H"
+  ],
+  "key": {
+    "R": {
+      "tag": "c:rods/wooden"
+    },
+    "S": {
+      "tag": "c:strings"
+    },
+    "H": {
+      "tag": "c:crops/wheat"
+    }
+  },
+  "result": {
+    "id": "singulo:android_broom",
+    "count": 1
+  }
+}

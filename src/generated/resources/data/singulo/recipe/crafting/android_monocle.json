@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " N ",
+    "NGN",
+    " N "
+  ],
+  "key": {
+    "N": {
+      "tag": "c:nuggets/gold"
+    },
+    "G": {
+      "tag": "c:glass_panes/colorless"
+    }
+  },
+  "result": {
+    "id": "singulo:android_monocle",
+    "count": 1
+  }
+}

@@ -1031,3 +1031,33 @@ for _name, _shape in _logistics_shaped.items():
     assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
     SHAPED[_name] = _shape
     RECIPES[_name]['shape'] = _shape
+
+# 0.18.0 アンドロイドの装飾（一覧の番号がずれないよう、最後に足す）
+from decor_content import recipes as _decor_recipes
+_decor_shaped = {}
+_decor_recipes(R, _decor_shaped)
+for _name, _shape in _decor_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape
+
+# 0.18.0 印刷された食品（一覧の番号がずれないよう、最後に足す）
+from food_content import recipes as _food_recipes
+_food_shaped = {}
+_food_recipes(R, _food_shaped)
+for _name, _shape in _food_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape
+
+# 0.18.0 ケーブル・パイプのカバー（一覧の番号がずれないよう、最後に足す）
+from cover_content import recipes as _cover_recipes
+_cover_shaped = {}
+_cover_recipes(R, _cover_shaped)
+for _name, _shape in _cover_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape

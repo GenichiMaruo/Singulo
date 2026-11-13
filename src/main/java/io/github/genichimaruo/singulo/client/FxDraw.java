@@ -302,6 +302,122 @@ final class FxDraw {
         quad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, x1, y1, z1, x1, y0, z1, x1, y0, z0);
     }
 
+    /** {@link #texBox} の絵の大きさ（ドット）。 */
+    static final float TEX_SIZE = 32;
+
+    /**
+     * 模様を、長さに合わせた細かさで貼る箱（ブロック単位の座標。1/16 ブロックの長さに絵の1ドットを当てる）。
+     * 面ごとに、その面の大きさのぶんだけ絵を切り出す（場所は面ごとにずらして、同じ模様が並ばないようにする）。
+     * 縦（y）は絵の下へ向かう向き（筋の模様は、下の毛先ほど暗い）。
+     */
+    static void texBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                       int light, int rgb, int alpha) {
+        texBox(pose, vc, x0, y0, z0, x1, y1, z1, light, rgb, alpha, false);
+    }
+
+    /**
+     * zLong なら、前後（z）に長い物として貼る: 筋の模様が z の向きに走るよう、西・東の面は u を y、v を z にする
+     * （下・上の面は、もとから v が z）。
+     */
+    static void texBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                       int light, int rgb, int alpha, boolean zLong) {
+        PoseStack.Pose p = pose.last();
+        float sx = Math.min(1, (x1 - x0) * 16 / TEX_SIZE), sy = Math.min(1, (y1 - y0) * 16 / TEX_SIZE),
+                sz = Math.min(1, (z1 - z0) * 16 / TEX_SIZE);
+        float ox = texOffset(x0 * 7 + z0 * 3 + y0, sx), oy = texOffset(y0 * 5 + x0 * 2, sy), oz = texOffset(z0 * 11 + y0 * 3, sz);
+        // 下・上: u は x、v は z
+        texQuad(vc, p, light, rgb, alpha, 0, -1, 0, x0, y0, z0, ox, oz, x1, y0, z0, ox + sx, oz, x1, y0, z1, ox + sx, oz + sz, x0, y0, z1, ox, oz + sz);
+        texQuad(vc, p, light, rgb, alpha, 0, 1, 0, x0, y1, z1, ox, oz + sz, x1, y1, z1, ox + sx, oz + sz, x1, y1, z0, ox + sx, oz, x0, y1, z0, ox, oz);
+        // 北・南: u は x、v は y
+        texQuad(vc, p, light, rgb, alpha, 0, 0, -1, x0, y1, z0, ox, oy + sy, x1, y1, z0, ox + sx, oy + sy, x1, y0, z0, ox + sx, oy, x0, y0, z0, ox, oy);
+        texQuad(vc, p, light, rgb, alpha, 0, 0, 1, x0, y0, z1, ox, oy, x1, y0, z1, ox + sx, oy, x1, y1, z1, ox + sx, oy + sy, x0, y1, z1, ox, oy + sy);
+        if (zLong) {
+            // 西・東: u は y、v は z
+            texQuad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, oy, oz, x0, y0, z1, oy, oz + sz, x0, y1, z1, oy + sy, oz + sz, x0, y1, z0, oy + sy, oz);
+            texQuad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, oy + sy, oz, x1, y1, z1, oy + sy, oz + sz, x1, y0, z1, oy, oz + sz, x1, y0, z0, oy, oz);
+            return;
+        }
+        // 西・東: u は z、v は y
+        texQuad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, oz, oy, x0, y0, z1, oz + sz, oy, x0, y1, z1, oz + sz, oy + sy, x0, y1, z0, oz, oy + sy);
+        texQuad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, oz, oy + sy, x1, y1, z1, oz + sz, oy + sy, x1, y0, z1, oz + sz, oy, x1, y0, z0, oz, oy);
+    }
+
+    /** 絵の中の切り出し位置（0〜1 − span）。位置から決めるので、同じ箱はいつも同じ所を貼る。 */
+    private static float texOffset(float seed, float span) {
+        if (span >= 1) {
+            return 0;
+        }
+        float f = seed * 12.9898F;
+        f = f - (float) Math.floor(f);
+        // 絵のドットの境目が箱の辺に来るよう、切り出しの始まりはドット単位
+        int free = (int) Math.floor((1 - span) * TEX_SIZE + 1.0E-4F);
+        return (float) Math.floor(f * (free + 1)) / TEX_SIZE;
+    }
+
+    private static void texQuad(VertexConsumer vc, PoseStack.Pose p, int light, int rgb, int alpha, float nx, float ny, float nz,
+                                float ax, float ay, float az, float au, float av, float bx, float by, float bz, float bu, float bv,
+                                float cx, float cy, float cz, float cu, float cv, float dx, float dy, float dz, float du, float dv) {
+        uvVertex(vc, p, ax, ay, az, au, av, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, bx, by, bz, bu, bv, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, cx, cy, cz, cu, cv, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, dx, dy, dz, du, dv, light, rgb, alpha, nx, ny, nz);
+    }
+
+    /**
+     * 三角柱（前の面の三角 a・b・c は x, y。前は z0、後ろは z1）。後ろの三角は重心へ backScale 倍に縮めるので、
+     * 1 未満なら側面が斜めになって、後ろへなだらかに細る（猫の耳の裏の丸みなど）。面を落とさない描き方で使う。
+     */
+    static void prism(PoseStack pose, VertexConsumer vc, float ax, float ay, float bx, float by, float cx, float cy,
+                      float z0, float z1, float backScale, int light, int rgb) {
+        prism(pose, vc, ax, ay, bx, by, cx, cy, z0, z1, backScale, light, rgb, 255);
+    }
+
+    /** 透ける三角柱（alpha は 0〜255）。 */
+    static void prism(PoseStack pose, VertexConsumer vc, float ax, float ay, float bx, float by, float cx, float cy,
+                      float z0, float z1, float backScale, int light, int rgb, int alpha) {
+        PoseStack.Pose p = pose.last();
+        float mx = (ax + bx + cx) / 3, my = (ay + by + cy) / 3;
+        float[] fx = {ax, bx, cx}, fy = {ay, by, cy};
+        float[] bkx = new float[3], bky = new float[3];
+        for (int i = 0; i < 3; i++) {
+            bkx[i] = mx + (fx[i] - mx) * backScale;
+            bky[i] = my + (fy[i] - my) * backScale;
+        }
+        float nz = z1 > z0 ? -1 : 1;
+        // 絵は長さに合わせた細かさで（1/16 ブロックに1ドット）。前後の面は x・y の位置から、側面は辺の長さと奥行きから
+        float minX = Math.min(ax, Math.min(bx, cx)), minY = Math.min(ay, Math.min(by, cy));
+        float k = 16 / TEX_SIZE;
+        float ou = texOffset(ax * 5 + ay * 3, Math.min(1, (Math.max(ax, Math.max(bx, cx)) - minX) * k));
+        float ov = texOffset(ay * 7 + bx, Math.min(1, (Math.max(ay, Math.max(by, cy)) - minY) * k));
+        float[] fu = new float[3], fv = new float[3], bu = new float[3], bv = new float[3];
+        for (int i = 0; i < 3; i++) {
+            fu[i] = Math.min(1, ou + (fx[i] - minX) * k);
+            fv[i] = Math.min(1, ov + (fy[i] - minY) * k);
+            bu[i] = Math.min(1, ou + (bkx[i] - minX) * k);
+            bv[i] = Math.min(1, ov + (bky[i] - minY) * k);
+        }
+        texQuad(vc, p, light, rgb, alpha, 0, 0, nz, fx[0], fy[0], z0, fu[0], fv[0], fx[1], fy[1], z0, fu[1], fv[1],
+                fx[2], fy[2], z0, fu[2], fv[2], fx[2], fy[2], z0, fu[2], fv[2]);
+        texQuad(vc, p, light, rgb, alpha, 0, 0, -nz, bkx[0], bky[0], z1, bu[0], bv[0], bkx[2], bky[2], z1, bu[2], bv[2],
+                bkx[1], bky[1], z1, bu[1], bv[1], bkx[1], bky[1], z1, bu[1], bv[1]);
+        float depth = Math.min(1, Math.abs(z1 - z0) * k);
+        for (int i = 0; i < 3; i++) {
+            int j = (i + 1) % 3;
+            // 側面の向き: 辺に垂直で、重心から外へ（後ろへの傾きは小さいので、前後の成分は入れない）
+            float ex = fx[j] - fx[i], ey = fy[j] - fy[i];
+            float sx = ey, sy = -ex;
+            if (sx * (fx[i] - mx) + sy * (fy[i] - my) < 0) {
+                sx = -sx;
+                sy = -sy;
+            }
+            float len = (float) Math.sqrt(sx * sx + sy * sy);
+            float edge = (float) Math.sqrt(ex * ex + ey * ey) * k;
+            float eu = Math.min(1, edge), o = texOffset(fx[i] * 3 + fy[j] * 11, eu);
+            texQuad(vc, p, light, rgb, alpha, sx / len, sy / len, 0, fx[i], fy[i], z0, o, 0, fx[j], fy[j], z0, o + eu, 0,
+                    bkx[j], bky[j], z1, o + eu, depth, bkx[i], bky[i], z1, o, depth);
+        }
+    }
+
     /**
      * 1ドットを1ドットのまま貼る箱（ブロックのモデルの既定の UV と同じ決め方）。
      * 形は (x0..x1, y0..y1, z0..z1)（今の PoseStack の座標、ブロック単位）、絵の場所は (px0..px1, py0..py1, pz0..pz1)

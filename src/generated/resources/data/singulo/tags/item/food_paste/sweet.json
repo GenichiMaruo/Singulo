@@ -1,0 +1,29 @@
+{
+  "values": [
+    "minecraft:apple",
+    "minecraft:melon_slice",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "minecraft:sugar",
+    "minecraft:cocoa_beans",
+    "minecraft:honeycomb",
+    "minecraft:cookie",
+    "minecraft:pumpkin_pie",
+    {
+      "id": "#c:foods/fruit",
+      "required": false
+    },
+    {
+      "id": "#c:foods/berry",
+      "required": false
+    },
+    {
+      "id": "#c:foods/cookie",
+      "required": false
+    },
+    {
+      "id": "#c:foods/candy",
+      "required": false
+    }
+  ]
+}
