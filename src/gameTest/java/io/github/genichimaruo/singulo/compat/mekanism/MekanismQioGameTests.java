@@ -86,7 +86,8 @@ public final class MekanismQioGameTests {
         helper.setBlock(position, block);
         var security = mekanism.api.security.IBlockSecurityUtils.INSTANCE.securityCapability(helper.getLevel(), absolute);
         helper.assertTrue(security != null, "Dashboard must expose official security capability");
-        security.setOwnerUUID(java.util.UUID.randomUUID());
+        // No owner override is needed to exercise the three effective block modes.
+        // GameTestServer has no profile cache, so do not create an owner frequency.
         security.setSecurityMode(mekanism.api.security.SecurityMode.PUBLIC);
         helper.assertTrue(MekanismQio.publicAccess(helper.getLevel(), absolute), "Public dashboard should be usable");
         security.setSecurityMode(mekanism.api.security.SecurityMode.PRIVATE);
