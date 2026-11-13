@@ -160,6 +160,51 @@ public final class CableNetworkGameTests {
                 })
                 .thenSucceed();
     }
+    @GameTest(template="empty",timeoutTicks=120)
+    public static void handoverSourceRemovalClearsLightImmediately(GameTestHelper h) {
+        handoverRemoval(h, new BlockPos(1,1,2));
+    }
+    @GameTest(template="empty",timeoutTicks=120)
+    public static void handoverUnlitBranchCutClearsLightImmediately(GameTestHelper h) {
+        handoverRemoval(h, new BlockPos(3,2,2));
+    }
+    private static void handoverRemoval(GameTestHelper h, BlockPos removed) {
+        var source=storage(h,new BlockPos(1,1,2),Direction.EAST);
+        source.energy().setEnergy(100_000_000);
+        for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        h.setBlock(new BlockPos(3,2,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        storage(h,new BlockPos(5,1,2),Direction.SOUTH);
+        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(4,1,2));
+        h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
+                .thenExecute(()->{
+                    h.setBlock(new BlockPos(3,1,3),SinguloBlocks.FLUID_PIPE.get());
+                    h.assertTrue(a.flow()>0 && b.flow()>0,"Pipe placement lost the handover light");
+                    h.setBlock(removed,Blocks.AIR);
+                    h.assertTrue(a.flow()==0 && b.flow()==0,"Removal during handover did not clear the old component immediately");
+                }).thenSucceed();
+    }
+    @GameTest(template="empty",timeoutTicks=150)
+    public static void abandonedHandoverExpiresAndPowerCanResume(GameTestHelper h) {
+        var source=storage(h,new BlockPos(1,1,2),Direction.EAST);
+        source.energy().setEnergy(100_000_000);
+        for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        storage(h,new BlockPos(5,1,2),Direction.SOUTH);
+        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(4,1,2));
+        h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
+                .thenExecute(()->{
+                    source.energy().setEnergy(0);
+                    h.setBlock(new BlockPos(3,1,3),SinguloBlocks.FLUID_PIPE.get());
+                    h.assertTrue(a.flow()>0 && b.flow()>0,"Pipe placement lost the handover light");
+                    h.assertTrue(a.network==null && EnergyNetwork.handoverOwner(h.getLevel(),a.getBlockPos())!=null,
+                            "Fixture did not retain an unadopted handover");
+                }).thenIdle(22).thenExecute(()->{
+                    h.assertTrue(a.network==null && EnergyNetwork.handoverOwner(h.getLevel(),a.getBlockPos())==null,
+                            "Handover was adopted instead of expiring, or did not expire");
+                    h.assertTrue(a.flow()==0 && b.flow()==0,"Abandoned handover retained stale light");
+                    source.energy().setEnergy(100_000_000);
+                }).thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Power did not resume after handover expired"))
+                .thenSucceed();
+    }
     @GameTest(template="empty",timeoutTicks=100)
     public static void localBreakDisplayClearsBothSidesWithoutWaitingForPacket(GameTestHelper h) {
         var source=storage(h,new BlockPos(1,1,2),Direction.EAST);
