@@ -21,6 +21,34 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class FoodPrinterGameTests {
     private static final BlockPos AT = new BlockPos(2, 1, 2);
+    @GameTest(template = "empty")
+    public static void malformedPasteIsEmpty(GameTestHelper h) {
+        var item = SinguloItems.FOOD_CARTRIDGE.get();
+        for (int[] bad : new int[][] {{-1, 1}, {3, 1}, {Integer.MAX_VALUE, 1}, {0, -1}, {0, 0}, {0, 65}, {0, Integer.MAX_VALUE}}) {
+            var json = new com.google.gson.JsonObject();
+            json.addProperty("kind", bad[0]);
+            json.addProperty("amount", bad[1]);
+            var decoded = FoodPaste.Content.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, json).getOrThrow();
+            h.assertTrue(decoded.kind() == -1 && decoded.amount() == 0, "Malformed codec data was not emptied");
+            ItemStack c = new ItemStack(item);
+            c.set(io.github.genichimaruo.singulo.registry.SinguloComponents.FOOD_PASTE.get(), new FoodPaste.Content(bad[0], bad[1]));
+            h.assertTrue(FoodPaste.kind(c) == -1 && FoodPaste.amount(c) == 0, "Malformed direct component was not emptied");
+            h.assertTrue(!item.isBarVisible(c) && item.getBarWidth(c) == 0 && item.getBarColor(c) == 0xFFFFFF, "Malformed bar state");
+            item.getName(c);
+            var tooltip = new java.util.ArrayList<net.minecraft.network.chat.Component>();
+            item.appendHoverText(c, net.minecraft.world.item.Item.TooltipContext.of(h.getLevel()), tooltip, net.minecraft.world.item.TooltipFlag.NORMAL);
+            FoodPaste.set(c, bad[0], bad[1]);
+            h.assertTrue(!c.has(io.github.genichimaruo.singulo.registry.SinguloComponents.FOOD_PASTE.get()), "Invalid setter must clear component");
+        }
+        for (int kind = 0; kind < FoodPaste.KINDS; kind++) {
+            for (int amount : new int[] {1, FoodPaste.CAPACITY}) {
+                ItemStack c = cartridge(kind, amount);
+                h.assertTrue(FoodPaste.kind(c) == kind && FoodPaste.amount(c) == amount, "Valid paste changed");
+                h.assertTrue(item.getBarColor(c) == FoodPaste.COLORS[kind], "Valid paste color changed");
+            }
+        }
+        h.succeed();
+    }
 
     private static ItemStack cartridge(int kind, int amount) {
         ItemStack c = new ItemStack(SinguloItems.FOOD_CARTRIDGE.get());

@@ -40,6 +40,14 @@ public final class FoodPaste {
 
     /** カートリッジの中身（種類と量）。 */
     public record Content(int kind, int amount) {
+        // Normalize both persistent and network decoding, and direct component creation.
+        // Invalid data must behave as an empty cartridge before any color/name indexing.
+        public Content {
+            if (kind < 0 || kind >= KINDS || amount <= 0 || amount > CAPACITY) {
+                kind = -1;
+                amount = 0;
+            }
+        }
         public static final Codec<Content> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.fieldOf("kind").forGetter(Content::kind),
                 Codec.INT.fieldOf("amount").forGetter(Content::amount)).apply(i, Content::new));
@@ -93,10 +101,10 @@ public final class FoodPaste {
 
     /** カートリッジの中身を書き換える（0 なら空にする。空のカートリッジどうしは重なる）。 */
     public static void set(ItemStack cartridge, int kind, int amount) {
-        if (amount <= 0) {
+        if (kind < 0 || kind >= KINDS || amount <= 0 || amount > CAPACITY) {
             cartridge.remove(SinguloComponents.FOOD_PASTE.get());
         } else {
-            cartridge.set(SinguloComponents.FOOD_PASTE.get(), new Content(kind, Math.min(CAPACITY, amount)));
+            cartridge.set(SinguloComponents.FOOD_PASTE.get(), new Content(kind, amount));
         }
     }
 
