@@ -14216,8 +14216,8 @@
     "translation": "眼鏡、單片眼鏡、耳環"
   },
   "gui.singulo.android.decor.4.hint": {
-    "source": "Waist ribbon, apron or brooch (pinned on the chest)",
-    "translation": "腰部緞帶、圍裙、胸針（別在胸前）"
+    "source": "Waist ribbon, apron or brooch",
+    "translation": "腰部緞帶、圍裙、胸針"
   },
   "tooltip.singulo.android_accessory.3": {
     "source": "Worn on an android's face (decoration page)",
@@ -14460,8 +14460,8 @@
     "translation": "鑲滿鑽石的小王冠。"
   },
   "summary.singulo.android_diamond_brooch": {
-    "source": "A diamond brooch for the chest.",
-    "translation": "別在胸前的鑽石胸針。"
+    "source": "A diamond brooch for the waist.",
+    "translation": "別在腰前的鑽石胸針。"
   },
   "desc.singulo.android_necktie": {
     "source": "A striped necktie from a knot at the collar down the chest. Goes in the neck / back slot of the decoration page. Dye it with dyes on a crafting table.",
@@ -14480,8 +14480,8 @@
     "translation": "戴在頭上、三座尖峰鑲滿鑽石的小王冠。裝在裝飾頁的頭部槽中。與染料一起在工作台上染色會改變金屬件的顏色（鑽石不變）。"
   },
   "desc.singulo.android_diamond_brooch": {
-    "source": "A round diamond brooch pinned on the left of the chest. Goes in the waist slot of the decoration page. Dyeing it on a crafting table changes the setting; the diamond stays.",
-    "translation": "別在左胸、圓形底座上鑲著鑽石的胸針。裝在裝飾頁的腰部槽中。與染料一起在工作台上染色會改變底座的顏色（鑽石不變）。"
+    "source": "A bow brooch with a diamond knot, pinned on the front of the waist. Goes in the waist slot of the decoration page. Dyeing it on a crafting table changes the bow; the diamond stays.",
+    "translation": "別在腰前、蝴蝶結中央鑲著鑽石的胸針。裝在裝飾頁的腰部槽中。與染料一起在工作台上染色會改變蝴蝶結的顏色（鑽石不變）。"
   },
   "howto.singulo.android_necktie": {
     "source": "Made in: Crafting Table (stage 1)",

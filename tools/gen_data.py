@@ -961,7 +961,7 @@ UI_LANG = {
     'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘・ランタン・ほうき（待機している間だけ持つ）',
                                          'Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)'),
     'gui.singulo.android.decor.3.hint': ('メガネ・モノクル・イヤリング', 'Glasses, monocle or earrings'),
-    'gui.singulo.android.decor.4.hint': ('腰リボン・エプロン・ブローチ（胸元に留める）', 'Waist ribbon, apron or brooch (pinned on the chest)'),
+    'gui.singulo.android.decor.4.hint': ('腰リボン・エプロン・ブローチ', 'Waist ribbon, apron or brooch'),
     'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
     'gui.singulo.android.decor.speech': ('似合う？', 'Does it suit me?'),
     'tooltip.singulo.android_accessory.0': ('アンドロイドの頭に着ける（装飾のページ）', 'Worn on an android\'s head (decoration page)'),

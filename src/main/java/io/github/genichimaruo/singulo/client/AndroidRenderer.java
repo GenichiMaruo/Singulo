@@ -1351,13 +1351,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD,
                          io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE -> m.toHead(pose);
                     case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK -> m.toTorso(pose);
-                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST -> {
-                        if (acc.style().equals("diamond_brooch")) {
-                            m.toTorso(pose);                                  // ブローチは腰の枠だが、胸元に留める
-                        } else {
-                            m.toHips(pose);
-                        }
-                    }
+                    case io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST -> m.toHips(pose);
                     default -> m.toLeftHand(pose);
                 }
                 if (acc.style().equals("bouquet")) {
@@ -1923,7 +1917,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     int stripe = mix(c, 0x000000, 0.22F);
                     // 形はそのまま、全体を体の方へ 0.3 ピクセル寄せる
                     float shift = 0.3F, front = -3.5F + shift, back = -2.5F + shift;
-                    b(pose, vc, light, -1, -8, back, 1, -7, -1.5F + shift, mix(c, 0x000000, 0.1F));  // 1段目（結び目）
+                    // 結び目の上の面は胴の上の面（y -8）と、下の面は胸の上の面（y -7）と同じ高さで重なるとちらつくので、
+                    // 上はわずかに上へ、下はわずかに胸の中へずらす
+                    b(pose, vc, light, -1, -8.03F, back, 1, -6.97F, -1.5F + shift, mix(c, 0x000000, 0.1F));  // 1段目（結び目）
                     for (int r = 0; r < 4; r++) {                                                      // 2〜5段目
                         float y = -7 + r;
                         b(pose, vc, light, -1, y, front, 1, y + 1, back, r % 2 == 1 ? stripe : c);
@@ -1931,28 +1927,23 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     ear(pose, vc, light, -1, -3, 1, -3, 0, -2, front, back, 1, c);                     // 6段目（先）
                 }
                 case "diamond_necklace" -> {
-                    // 首の後ろを回る1ピクセルの鎖が、胸の上でＵに下がる。真ん中に小さな台と、明るい2・中2の小さなダイヤ、
-                    // 両わきに真珠の粒。ダイヤは、ときどききらりと光り、星が出る
+                    // 前から見て（1マス1ピクセル、x -3〜3）:
+                    //   空金空空金空   首の高さ（y -8〜-7）に左右の金具
+                    //   空空ダダ空空   その下の真ん中に 2×2 のダイヤ（上の段は明るく、ときどききらりと光る）
+                    //   空空ダダ空空
+                    //   空空空空空空
+                    // 横からはネクタイと同じ段差: 金具は胸の層（体のすぐ前）、ダイヤは胸の前の層。全体を体の方へ 0.3 ピクセル寄せる。
+                    // 首の後ろは鎖が回る
+                    float shift = 0.3F, front = -3.5F + shift, back = -2.5F + shift, body = -1.5F + shift;
                     b(pose, vc, light, -3, -8, 1.5F, 3, -7, 2.0F, c);                                // 首の後ろ
-                    b(pose, vc, light, -3, -8, -2.0F, -2, -7, -1.5F, c);                              // 胸の上の手前
-                    b(pose, vc, light, 2, -8, -2.0F, 3, -7, -1.5F, c);
-                    b(pose, vc, light, -2, -7, -2.9F, 2, -6, -2.4F, c);                               // 胸の上の鎖と台
-                    b(pose, vc, light, -3, -7, -2.9F, -2, -6, -2.4F, 0xF6F0E6);                       // 真珠
-                    b(pose, vc, light, 2, -7, -2.9F, 3, -6, -2.4F, 0xF6F0E6);
-                    gem(pose, vc, light, -1, -6, 1, -5, -3.0F, age, 0);
-                    b(pose, vc, light, -1, -5, -3.0F, 1, -4, -2.4F, 0x6FD8D2);
-                    star(pose, vc, 1.5F, -6.5F, -3.1F, age, 0);
-                }
-                case "diamond_brooch" -> {
-                    // 左胸のリボン結びのブローチ: 左右の輪と垂れ（染めた色）、結び目の所にダイヤ。ときどき星が出る
-                    int tail = mix(c, 0x000000, 0.18F);
-                    b(pose, vc, light, -4, -7, -2.75F, -2, -5, -2.4F, c);                            // 左の輪
-                    b(pose, vc, light, -1, -7, -2.75F, 1, -5, -2.4F, c);                             // 右の輪
-                    b(pose, vc, light, -3, -5, -2.7F, -2, -4, -2.4F, tail);                          // 垂れ
-                    b(pose, vc, light, -1, -5, -2.7F, 0, -4, -2.4F, tail);
-                    gem(pose, vc, light, -2, -7, -1, -6, -3.0F, age, 3);                             // 結び目のダイヤ
-                    b(pose, vc, light, -2, -6, -2.95F, -1, -5, -2.4F, 0x6FD8D2);
-                    star(pose, vc, -0.5F, -7.5F, -3.1F, age, 3);
+                    // 金具の上の面は胴の上の面と、下の面は胸の上の面と重なるとちらつくので、わずかにずらす
+                    b(pose, vc, light, -2, -8.03F, back, -1, -6.97F, body, c);                        // 金具
+                    b(pose, vc, light, 1, -8.03F, back, 2, -6.97F, body, c);
+                    FxDraw.texBox(pose, vc, -1 * P, -7 * P, front * P, 1 * P, -6 * P, back * P,
+                            (age % 50) < 3 ? net.minecraft.client.renderer.LightTexture.FULL_BRIGHT : light,
+                            (age % 50) < 3 ? 0xFFFFFF : 0xBFF6F2, 255);                               // ダイヤの上の段
+                    b(pose, vc, light, -1, -6, front, 1, -5, back, 0x6FD8D2);                          // ダイヤの下の段
+                    star(pose, vc, 1.5F, -7.5F, front - 0.1F, age, 0);
                 }
                 case "diamond_earrings" -> {
                     // 髪の殻（x ±4.45）の1ピクセル外、横の髪（z -3〜-1）より後ろに、頭の下の縁から下がる金具とダイヤ
@@ -1970,24 +1961,45 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 case "diamond_tiara" -> {
                     // 頭の上（髪の殻 y -8.45）に乗る1ピクセルの帯と、5つの小さな山（真ん中が高い）。真ん中にダイヤ、
-                    // 両わきに桃色の石、山の先に真珠の粒。ダイヤは、ときどききらりと光り、星が出る
+                    // 両わきに桃色の石、山の先に真珠の粒。ダイヤは、ときどききらりと光り、星が出る。
+                    // 石の板は山の前の面（z -2.5）よりわずかに前に置き、真珠は山の上の面よりわずかに上に置く
+                    // （同じ位置に面が重なるとちらつく）
                     int pearl = 0xF6F0E6, pink = 0xF4A6C6;
+                    float plate = -2.52F, face = -2.75F;
                     b(pose, vc, light, -4, -9.5F, -2.5F, 4, -8.5F, -1.5F, c);
                     b(pose, vc, light, -1, -11.5F, -2.5F, 1, -9.5F, -1.5F, c);                       // 真ん中の山
                     b(pose, vc, light, -3, -10.5F, -2.5F, -2, -9.5F, -1.5F, c);
                     b(pose, vc, light, 2, -10.5F, -2.5F, 3, -9.5F, -1.5F, c);
-                    b(pose, vc, light, -0.5F, -12.5F, -2.2F, 0.5F, -11.5F, -1.8F, pearl);             // 山の先の真珠
-                    b(pose, vc, light, -3, -11.5F, -2.2F, -2, -10.5F, -1.8F, pearl);
-                    b(pose, vc, light, 2, -11.5F, -2.2F, 3, -10.5F, -1.8F, pearl);
+                    b(pose, vc, light, -0.5F, -12.53F, -2.2F, 0.5F, -11.53F, -1.8F, pearl);           // 山の先の真珠
+                    b(pose, vc, light, -3, -11.53F, -2.2F, -2, -10.53F, -1.8F, pearl);
+                    b(pose, vc, light, 2, -11.53F, -2.2F, 3, -10.53F, -1.8F, pearl);
                     b(pose, vc, light, -4.5F, -10, -2.2F, -3.5F, -9, -1.8F, pearl);                   // 帯の両はしの粒
                     b(pose, vc, light, 3.5F, -10, -2.2F, 4.5F, -9, -1.8F, pearl);
-                    gem(pose, vc, light, -1, -11, 1, -10, -2.8F, age, 0);
-                    b(pose, vc, light, -1, -10, -2.7F, 1, -9.5F, -2.5F, 0x6FD8D2);
-                    b(pose, vc, light, -3, -10, -2.7F, -2, -9.5F, -2.5F, pink);
-                    b(pose, vc, light, 2, -10, -2.7F, 3, -9.5F, -2.5F, pink);
-                    star(pose, vc, 1.5F, -11.5F, -2.9F, age, 0);
+                    boolean sparkle = age % 50 < 3;
+                    FxDraw.texBox(pose, vc, -1 * P, -11 * P, face * P, 1 * P, -10 * P, plate * P,
+                            sparkle ? net.minecraft.client.renderer.LightTexture.FULL_BRIGHT : light, sparkle ? 0xFFFFFF : 0xBFF6F2, 255);
+                    b(pose, vc, light, -1, -10, face, 1, -9.5F, plate, 0x6FD8D2);
+                    b(pose, vc, light, -3, -10, face, -2, -9.5F, plate, pink);
+                    b(pose, vc, light, 2, -10, face, 3, -9.5F, plate, pink);
+                    star(pose, vc, 1.5F, -11.5F, face - 0.1F, age, 0);
                 }
                 // ---- 腰（腰の箱: x -3.5〜3.5、y -3〜0、z -2〜2。前は -z）
+                case "diamond_brooch" -> {
+                    // スカートの前の面に沿わせて（スカートと同じ角度で斜めに）留める、リボン結びのブローチ。
+                    // スカートの前の面の中の座標（x -4〜4、上から y 0〜5、外の面は z -0.3）の左寄り・上のほうに、
+                    // 左右の輪と短い垂れ（染めた色）、結び目にダイヤ。ときどき星が出る
+                    pose.popPose();
+                    pose.pushPose();
+                    getParentModel().toSkirtFront(pose);
+                    int tail = mix(c, 0x000000, 0.18F);
+                    b(pose, vc, light, -3, 0, -0.65F, -1, 2, -0.32F, c);                              // 左の輪
+                    b(pose, vc, light, 0, 0, -0.65F, 2, 2, -0.32F, c);                                // 右の輪
+                    b(pose, vc, light, -2, 2, -0.6F, -1, 2.5F, -0.32F, tail);                         // 垂れ
+                    b(pose, vc, light, 0, 2, -0.6F, 1, 2.5F, -0.32F, tail);
+                    gem(pose, vc, light, -1, 0, 0, 1, -0.92F, age, 3);                                // 結び目のダイヤ
+                    b(pose, vc, light, -1, 1, -0.87F, 0, 2, -0.32F, 0x6FD8D2);
+                    star(pose, vc, 0.5F, -0.5F, -1.0F, age, 3);
+                }
                 case "apron" -> {
                     // 腰ひも（前と横）、後ろの蝶結び、スカートの前の面に沿う前掛け（ポケットと、すその1ピクセルおきのフリル）。
                     // 整数ピクセルの箱

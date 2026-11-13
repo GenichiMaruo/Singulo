@@ -129,10 +129,10 @@ DESC = {
                   '染料と一緒に作業台で染めると、金具の色が変わる（ダイヤはそのまま）。',
                   'A small crown with three peaks set with diamonds. Goes in the head slot of the decoration page. '
                   'Dyeing it on a crafting table changes the metal; the diamonds stay.'),
-    'ダイヤのブローチ': ('左胸に留める、丸い台にダイヤのブローチ。装飾のページの腰の枠に着ける。'
-                  '染料と一緒に作業台で染めると、台の色が変わる（ダイヤはそのまま）。',
-                  'A round diamond brooch pinned on the left of the chest. Goes in the waist slot of the decoration page. '
-                  'Dyeing it on a crafting table changes the setting; the diamond stays.'),
+    'ダイヤのブローチ': ('腰の前に留める、リボン結びの真ん中にダイヤのブローチ。装飾のページの腰の枠に着ける。'
+                  '染料と一緒に作業台で染めると、リボンの色が変わる（ダイヤはそのまま）。',
+                  'A bow brooch with a diamond knot, pinned on the front of the waist. Goes in the waist slot of the decoration page. '
+                  'Dyeing it on a crafting table changes the bow; the diamond stays.'),
     'RGB染色台': ('赤・緑・青・白・黒の染料をそれぞれの枠に入れるとインクになり（染料1個で8目盛り、各色64目盛りまで）、'
                 '画面の色の輪と明るさで選んだ好きな色に、染められる物（革の防具・アンドロイドの装飾など）を染める。'
                 '1回に使うインクは選んだ色で決まり、純色なら色みのインクだけ、灰色なら白と黒だけを使う（各色4目盛りまで）。'
@@ -176,7 +176,7 @@ SUMMARY = {
     'ダイヤのネックレス': ('胸元にダイヤが下がるネックレス。', 'A necklace with a diamond pendant.'),
     'ダイヤのイヤリング': ('両耳に揺れるダイヤのイヤリング。', 'Diamond earrings that sway.'),
     'ダイヤのティアラ': ('ダイヤをちりばめた小さな冠。', 'A small crown set with diamonds.'),
-    'ダイヤのブローチ': ('胸元に留めるダイヤのブローチ。', 'A diamond brooch for the chest.'),
+    'ダイヤのブローチ': ('腰の前に留めるダイヤのブローチ。', 'A diamond brooch for the waist.'),
     'RGB染色台': ('色の輪から選んだ好きな色に染める台。', 'Dyes things any color you pick on a color wheel.'),
     '猫耳カチューシャ': ('アンドロイドの頭に着ける猫耳。', 'Cat ears for an android.'),
     '魔女の帽子': ('アンドロイドがかぶるとんがり帽子。', 'A pointed hat for an android.'),
