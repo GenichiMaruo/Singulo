@@ -193,6 +193,7 @@ public final class GeneratedContent {
             "vacuum_jacketed_pipe",
             "superfluid_conduit",
             "horizon_duct",
+            "cover_frame",
             "kiln",
             "compressor",
             "electrolyzer",

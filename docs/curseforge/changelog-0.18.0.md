@@ -13,6 +13,7 @@
 - With Mekanism installed, the back of a linked QIO Dashboard placed against an Android Work Console (or its supply and delivery ports) works like an adjacent chest: androids count, take and store items in that QIO network.
 - SMES Cells, SMES Modules and the Nuclear Pasta Accumulator get charge slots in their screens. Put in anything that takes power (Singulo's gauntlets, scanner and charger, or other mods' tools and batteries); it charges from the stored power and moves to the output slot when full. Hoppers can feed SMES charge slots and take out charged items. Sneak-clicking the blocks still works.
 - Add the Food Printer, Food Cartridges and five kinds of printed space food: Nutrient Bar, Layered Steak, Spiral Pasta, Honeycomb Cake and Fruit Gel Cube. Stock each nutrient row with ingredients and it keeps the cartridges topped up with protein, carbohydrate or sweet paste, whatever runs short first, and the printer builds the food you pick layer by layer inside its glass chamber on power. Some foods give a short effect.
+- Add Cover Frames for every cable and pipe. Fit a frame to a cable or pipe, then set a real block into it (any full, solid, opaque block such as stone, planks or logs, which keep the facing they would be placed with) to make that spot look like the block. An empty frame lets light through. Frames can also be placed on their own and filled with a cable or pipe later. Connections and flow stay the same. Breaking a covered cable takes off the block, then the frame, and leaves the cable; sneak-right-clicking with the Relocation Wrench in relocate mode does the same straight into your inventory.
 - Add the RGB Dye Station. Put red, green, blue, white and black dyes in it to make ink, pick any color on its pixel color wheel and brightness bar or type a color code, and dye anything dyeable, such as leather armor or android decorations. The ink each dye uses depends on the color.
 - Android decorations look less flat: they get a worn texture, and hair, straw and bristles get fine strands. Hair extensions, the straw hat, the broom and the fairy wings (now a floating hologram) were reworked.
 
@@ -33,6 +34,7 @@
 - Mekanism を入れているとき、リンク済みの QIO ダッシュボードの裏をアンドロイド作業指令台（資材口・納品口も）に接すると、隣のチェストと同じように使えるようにしました。アンドロイドがその QIO の中身を数え、取り出し、しまいます。
 - SMESセル・SMESモジュール・核パスタ積層蓄電庫の画面に充電の枠を付けました。電力を受け取れる物（このMODのガントレット・スキャナー・充電器、ほかのMODの道具や電池）を入れると蓄えた電力で充電し、満タンになると出てくる枠へ移ります。SMES はホッパーなどでも出し入れできます。スニークして右クリックで充電する方法もそのまま使えます。
 - フードプリンター・フードカートリッジと、5種類の印刷された宇宙食（栄養バー・積層ステーキ・らせんパスタ・ハニカムケーキ・フルーツゼリーキューブ）を追加しました。タンパク質・炭水化物・甘味それぞれの枠に食材をまとめて入れておくと、足りないタンパク質・炭水化物・甘味のペーストからカートリッジに補われ、選んだ食品をガラスの印刷室で電力を使って1層ずつ印刷します。少しの間効き目のある食品もあります。
+- すべてのケーブル・パイプに使えるカバーの枠を追加しました。ケーブルやパイプに枠を取り付け、本物のブロック（石・木材・丸太など、すき間のない不透明な1ブロック。向きのあるブロックは、ふつうに置いたときの向きになります）をはめ込むと、その場所がそのブロックの見た目になります。枠だけの間は光を通します。枠だけを先に置いて、あとからケーブル・パイプを入れることもできます。つながりと送る量は変わりません。カバーを付けたケーブルを壊すと、ケーブルは残してブロック → 枠の順に外れます（移設レンチ（装置の移設モード）でスニークして右クリックすると、持ち物に戻ります）。
 - RGB染色台を追加しました。赤・緑・青・白・黒の染料を入れてインクにし、ドットの色の輪と明るさのつまみ、またはカラーコードの入力で好きな色を選んで、染められる物（革の防具・アンドロイドの装飾など）を染めます。使うインクは色によって変わります。
 - アンドロイドの装飾がのっぺりしないよう、使い込んだ模様（汚し）を入れ、髪・麦わら・穂には細い筋を入れました。付け毛・麦わら帽子・ほうき・妖精の羽（浮かぶホログラムに）を作り直しました。
 

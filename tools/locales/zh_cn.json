@@ -14714,5 +14714,53 @@
   "subtitles.singulo.food_printer_running": {
     "source": "Food printer prints",
     "translation": "食品打印机正在打印"
+  },
+  "item.singulo.cover_frame": {
+    "source": "Cover Frame",
+    "translation": "覆盖框"
+  },
+  "howto.singulo.cover_frame": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "guide.singulo.cover": {
+    "source": "Cable Covers",
+    "translation": "线缆覆盖"
+  },
+  "guide.singulo.cover.cover.title": {
+    "source": "Cover Frame",
+    "translation": "覆盖框"
+  },
+  "message.singulo.cover.not_allowed": {
+    "source": "%s can't be set in a cover (only full, solid, opaque blocks)",
+    "translation": "%s无法嵌入（只能用无缝隙的不透明完整方块）"
+  },
+  "tooltip.singulo.cover_frame.fit": {
+    "source": "Right-click a cable or pipe to fit it. Elsewhere it places as an empty frame you can put a cable or pipe into later",
+    "translation": "右键点击线缆或管道即可安装。在其他地方可以只放置框，之后再装入线缆或管道"
+  },
+  "tooltip.singulo.cover_frame.inlay": {
+    "source": "Right-click the fitted frame with a block to set it in and take its look",
+    "translation": "用方块右键点击已安装的框，即可嵌入并变成该方块的外观"
+  },
+  "tooltip.singulo.cover_frame.remove": {
+    "source": "Breaking it takes off the block, then the frame, and leaves the cable",
+    "translation": "破坏后会保留线缆，依次掉落方块、框"
+  },
+  "desc.singulo.cover_frame": {
+    "source": "A frame fitted to a cable or pipe; set a real block into it to take that block's look. Connections and flow stay the same. Breaking it takes off the block, then the frame, and leaves the cable.",
+    "translation": "安装在线缆或管道上、嵌入真正的方块后即变成该方块外观的框。连接和传输量不变。破坏后会保留线缆，依次掉落方块、框。"
+  },
+  "summary.singulo.cover_frame": {
+    "source": "Makes a cable or pipe look like another block.",
+    "translation": "让线缆或管道变成其他方块的外观。"
+  },
+  "guide.singulo.cover.cover.body": {
+    "source": "A Cover Frame makes a cable or pipe look like another block. Craft 8 on a crafting table from 4 iron ingots and 4 iron bars.\nRight-click any cable or pipe with a frame to fit it. Then right-click the fitted frame with a block such as stone or planks: one block is set in, and that spot takes its look. What you see is the real block you set in. A block that faces a direction keeps the facing it would get if placed there normally (a log follows the clicked face, a carved pumpkin faces you).\nA cover changes neither the connections nor how much flows. It collides as a full block. An empty frame lets light through like glass; once a block is set in, it blocks light like an ordinary block. Only full, solid, opaque blocks can be set in: glass, leaves, stairs, slabs, and blocks that hold items, such as chests and furnaces, cannot.\nTo take a cover off, break the covered cable: the cable stays, and the first break drops the block, the second the frame (with a block set in, it breaks as fast as that block would). Sneak-right-clicking with the Relocation Wrench in relocate mode takes them off in the same order, straight into your inventory. To change the block, take it off and set in another. The wrench in cable mode removes the whole cable, returning the frame and block too.\nA frame can also be placed on its own like an ordinary block. Right-click a placed frame with a cable or pipe to put it inside (sneak to place the cable or pipe next to the frame instead), so you can lay out frames first and run the wiring later. Removing the cable from a frame with no block in it, with the wrench in cable mode, takes only the cable and leaves the frame in place.",
+    "translation": "覆盖框可以让线缆或管道变成其他方块的外观。在工作台用 4 个铁锭和 4 个铁栏杆制作 8 个。\n手持覆盖框右键点击线缆或管道（所有种类），即可安装框。再用石头、木板等方块右键点击已安装的框，就会嵌入 1 个该方块，那里便会变成嵌入方块的外观。看到的就是嵌入的真正方块本身。有朝向的方块会和在那里正常放置时的朝向相同（原木朝向右键点击的面，雕刻南瓜的脸朝向你）。\n装上覆盖后，连接和可传输的量都不会改变。碰撞箱会变成一整格。只有框时会像玻璃一样透光，嵌入方块后会像普通方块一样遮挡光线。只能嵌入无缝隙的不透明完整方块（玻璃、树叶、楼梯、台阶，以及箱子、熔炉等内部存放物品的方块都不能用）。\n要取下时，破坏装有覆盖的线缆。线缆会保留，第 1 次掉落嵌入的方块，第 2 次掉落框（嵌入方块时，以挖掘该方块的速度破坏）。潜行并用搬迁扳手（装置搬迁模式）右键点击，也会按同样顺序取下并回到物品栏。要更换方块时，先取下再嵌入其他方块。用拆除模式的扳手时，会连同线缆一起拆下，框和方块也会一起返还。\n覆盖框也可以像普通方块一样放在没有线缆的地方。用线缆或管道右键点击已放置的框，线缆或管道就会装进框里（潜行时，线缆或管道会放在框的旁边）。可以先排好框，之后再布线。对没有嵌入方块的框中的线缆使用拆除模式的扳手时，只会拆下线缆，框会留在原处。"
+  },
+  "block.singulo.cover_frame": {
+    "source": "Cover Frame",
+    "translation": "覆盖框"
   }
 }

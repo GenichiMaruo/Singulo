@@ -40,6 +40,8 @@ public final class SinguloClient {
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
+        modBus.addListener(CoverModel::wrap);
+        modBus.addListener(CoverModel::registerColors);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
         modBus.addListener(SinguloKeys::register);

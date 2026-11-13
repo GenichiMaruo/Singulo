@@ -812,3 +812,5 @@ MOD.update(_DECOR_IDS)
 from food_content import IDS as _FOOD_IDS, VANILLA as _FOOD_VANILLA
 MOD.update(_FOOD_IDS)
 VANILLA.update(_FOOD_VANILLA)
+from cover_content import IDS as _COVER_IDS
+MOD.update(_COVER_IDS)

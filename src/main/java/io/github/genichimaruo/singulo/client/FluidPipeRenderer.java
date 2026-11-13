@@ -33,8 +33,9 @@ public class FluidPipeRenderer implements BlockEntityRenderer<FluidPipeBlockEnti
     @Override
     public void render(FluidPipeBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         if (be.visualState() != FluidPipeBlockEntity.FLOWING || be.visualFluid().isEmpty() || be.getLevel() == null
-                || !(be.getBlockState().getBlock() instanceof FluidPipeBlock pipe)) {
-            return;
+                || !(be.getBlockState().getBlock() instanceof FluidPipeBlock pipe)
+                || io.github.genichimaruo.singulo.cable.ConduitCover.of(be.getBlockState()) == io.github.genichimaruo.singulo.cable.ConduitCover.State.BLOCK) {
+            return;     // ブロックをはめ込んだカバーの中は見えない
         }
         FluidLook.Look look = FluidLook.look(be.visualFluid());
         boolean gas = be.visualFluid().getFluidType().isLighterThanAir();

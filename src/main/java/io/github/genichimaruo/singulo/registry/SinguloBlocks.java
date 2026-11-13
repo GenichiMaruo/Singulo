@@ -586,6 +586,10 @@ public final class SinguloBlocks {
     public static final DeferredBlock<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
             () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
 
+    /** 置いたカバーの枠（あとからケーブル・パイプを入れられる）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.cable.CoverFrameBlock> COVER_FRAME = BLOCKS.register("cover_frame",
+            () -> new io.github.genichimaruo.singulo.cable.CoverFrameBlock(cableProperties(SoundType.CHAIN)));
+
     // ---- 液体パイプ
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
             () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), 2_000,
@@ -659,7 +663,11 @@ public final class SinguloBlocks {
     }
 
     static BlockBehaviour.Properties cableProperties(SoundType sound) {
-        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(0.5F).sound(sound).noOcclusion();
+        // 隣を隠す形・光は ConduitCover（ブロック入りのカバーだけがふつうのブロックのようにふるまう。枠だけなら窒息しない・視界をさえぎらない）
+        BlockBehaviour.StatePredicate covered = (s, level, pos) -> io.github.genichimaruo.singulo.cable.ConduitCover.of(s)
+                == io.github.genichimaruo.singulo.cable.ConduitCover.State.BLOCK;
+        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(0.5F).sound(sound)
+                .isSuffocating(covered).isViewBlocking(covered).isRedstoneConductor((s, level, pos) -> false);
     }
 
     static BlockBehaviour.Properties machineProperties() {

@@ -64,8 +64,9 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
     @Override
     public void render(CableBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         long flow = be.flow();
-        if (flow <= 0 || be.getLevel() == null || !(be.getBlockState().getBlock() instanceof CableBlock cable)) {
-            return;
+        if (flow <= 0 || be.getLevel() == null || !(be.getBlockState().getBlock() instanceof CableBlock cable)
+                || io.github.genichimaruo.singulo.cable.ConduitCover.of(be.getBlockState()) == io.github.genichimaruo.singulo.cable.ConduitCover.State.BLOCK) {
+            return;     // ブロックをはめ込んだカバーの中は見えない
         }
         Glow glow = glowOf(cable);
         // 量の桁で明るさを決める（1 FE/t で 0、その段階の上限で 1）

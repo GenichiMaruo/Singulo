@@ -1675,6 +1675,8 @@ def lang_files():
     UI_LANG.update(_LOGISTICS_UI)
     from food_content import UI as _FOOD_UI
     UI_LANG.update(_FOOD_UI)
+    from cover_content import UI as _COVER_UI
+    UI_LANG.update(_COVER_UI)
     from decor_content import UI as _DECOR_UI
     UI_LANG.update(_DECOR_UI)
     ja, en = {}, {}
@@ -3803,7 +3805,7 @@ TAB_GROUPS = [
     ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'relocation_wrench', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
-                       'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct']),
+                       'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct', 'cover_frame']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
                'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2', 'capacity_upgrade_3']),
@@ -4291,6 +4293,8 @@ def main():
     logistics_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     import food_content
     food_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import cover_content
+    cover_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

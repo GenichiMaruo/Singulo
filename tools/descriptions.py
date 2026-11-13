@@ -1008,3 +1008,6 @@ SUMMARY['SMESセル'] = ('大量の電力をためる超伝導の蓄電ブロッ
 from food_content import DESC as _FOOD_DESC, SUMMARY as _FOOD_SUMMARY
 DESC.update(_FOOD_DESC)
 SUMMARY.update(_FOOD_SUMMARY)
+from cover_content import DESC as _COVER_DESC, SUMMARY as _COVER_SUMMARY
+DESC.update(_COVER_DESC)
+SUMMARY.update(_COVER_SUMMARY)

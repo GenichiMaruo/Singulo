@@ -66,6 +66,9 @@ public final class SinguloItems {
             "fluid_canister", () -> new io.github.genichimaruo.singulo.item.FluidCanisterItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.food.FoodCartridgeItem> FOOD_CARTRIDGE = ITEMS.register(
             "food_cartridge", () -> new io.github.genichimaruo.singulo.food.FoodCartridgeItem(new Item.Properties(), 1));
+    /** カバーの枠（ケーブル・パイプに取り付けて、ブロックをはめ込む）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.cable.CoverFrameItem> COVER_FRAME = ITEMS.register(
+            "cover_frame", () -> new io.github.genichimaruo.singulo.cable.CoverFrameItem(SinguloBlocks.COVER_FRAME.get(), new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
             "magnetic_bottle", () -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(
@@ -345,6 +348,7 @@ public final class SinguloItems {
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
         block(SinguloBlocks.FLUID_PIPE, 1);
+        TAB_ORDER.add(COVER_FRAME);
         block(SinguloBlocks.MULTIBLOCK_PORT, 2);
         block(SinguloBlocks.COOLING_TOWER_BASE, 2);
         block(SinguloBlocks.COOLING_TOWER_CASING, 2);
