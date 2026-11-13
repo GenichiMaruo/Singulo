@@ -807,3 +807,8 @@ MOD.update(_LOGISTICS_IDS)
 # 0.18.0 RGB染色台
 from decor_content import IDS as _DECOR_IDS
 MOD.update(_DECOR_IDS)
+
+# 0.18.0 印刷された食品（フードプリンター・フードカートリッジ・宇宙食）
+from food_content import IDS as _FOOD_IDS, VANILLA as _FOOD_VANILLA
+MOD.update(_FOOD_IDS)
+VANILLA.update(_FOOD_VANILLA)

@@ -150,7 +150,12 @@ public final class GeneratedContent {
             new ItemDef("nuclear_pasta", "item", 5, 0),
             new ItemDef("tidal_filament", "item", 5, 0),
             new ItemDef("wormhole_seam_upgrade", "item", 5, 0),
-            new ItemDef("collapsar_parallel_cassette", "item", 5, 0)
+            new ItemDef("collapsar_parallel_cassette", "item", 5, 0),
+            new ItemDef("nutrient_bar", "item", 1, 0),
+            new ItemDef("printed_steak", "item", 1, 0),
+            new ItemDef("spiral_pasta", "item", 1, 0),
+            new ItemDef("honeycomb_cake", "item", 1, 0),
+            new ItemDef("fruit_gel_cube", "item", 1, 0)
     );
 
     public static final List<BlockDef> BLOCKS = List.of(
@@ -595,6 +600,13 @@ public final class GeneratedContent {
             "sports_drink",
             "energy_drink",
             "coffee",
+            "food_printer",
+            "food_cartridge",
+            "nutrient_bar",
+            "printed_steak",
+            "spiral_pasta",
+            "honeycomb_cake",
+            "fruit_gel_cube",
             "paper_stack",
             "trash_bin",
             "factory_line",
@@ -820,6 +832,7 @@ public final class GeneratedContent {
             Map.entry("collapsar_lining", 5),
             Map.entry("horizon_vault", 5),
             Map.entry("wormhole_drone_beacon", 5),
-            Map.entry("rgb_dye_station", 1)
+            Map.entry("rgb_dye_station", 1),
+            Map.entry("food_printer", 1)
     );
 }

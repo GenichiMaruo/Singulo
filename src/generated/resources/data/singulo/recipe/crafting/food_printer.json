@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "GXG",
+    "PCP"
+  ],
+  "key": {
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "G": {
+      "tag": "c:glass_blocks/colorless"
+    },
+    "X": {
+      "item": "minecraft:piston"
+    },
+    "C": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "id": "singulo:food_printer",
+    "count": 1
+  }
+}

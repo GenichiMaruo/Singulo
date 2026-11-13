@@ -211,6 +211,9 @@ public final class SinguloBlocks {
             "rgb_dye_station", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.RGB_DYE_STATION,
                     io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::new,
                     io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::serverTick));
+    /** フードプリンター（0.18.0）。食材から宇宙食を印刷する。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.food.FoodPrinterBlock> FOOD_PRINTER = BLOCKS.register(
+            "food_printer", () -> new io.github.genichimaruo.singulo.food.FoodPrinterBlock(machineProperties().noOcclusion()));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT = BLOCKS.register(
             "android_delivery_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_DELIVERY_PORT,
                     io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new,

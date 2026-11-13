@@ -1843,3 +1843,44 @@ def jet_forge_arc(d, seed):
     air = lowpass(highpass(white(d, seed + 1), 900), 2400) * 0.06
     swells = lowpass(bandpass(pink(d, seed + 2), 1200, 1.2), 2200) * (np.clip(lfo(0.45, d) * lfo(0.17, d, phase=1.0), 0, 1) ** 2) * 0.5
     return reverb(tone + shimmer + air + swells, 0.5, 0.25, 2500, 0.0)
+
+
+def _printer_sweep(length, f, seed):
+    """印刷ヘッドの台車が端から端まで走る「ジーッ」: 加速して一定の速さで走り、減速して止まる。
+    モーターのうなり（速さにつれて高くなる、音階にしない）に、ベルトのこすれと、レールを転がる低いゴロゴロを重ねる。"""
+    ramp = min(0.08, length / 4)
+    speed = env([(0, 0), (ramp, 1), (length - ramp, 1), (length, 0)], length)
+    freq = f * (0.6 + 0.4 * speed)
+    motor = lowpass(saw(freq) * 0.5 + square(freq * 2.003, duty=0.3) * 0.12, 1600)
+    belt = bandpass(white(length, seed), 1200 + 450 * speed, 1.6) * 0.3
+    rumble = lowpass(brown(length, seed + 1), 160) * 0.6
+    return (motor * 0.45 + belt + rumble) * (0.2 + 0.8 * speed)
+
+
+@machine('machine/food_printer_running')
+def food_printer(d, seed):
+    # 食品を印刷する音（事務のプリンターのように）: 印刷ヘッドの台車が左右に「ジーッ、ジーッ」と一定の間で往復し、折り返しで「カチッ」と止まる。
+    # 4往復ごとに台が1層ぶん下がる（短いモーターの「ウィッ」と送りの「カタン」）。止まるたびにノズルがペーストを押し出す小さな音。
+    # 6 秒にちょうど 8 回（0.75 秒ごと）入れて、継ぎ目でもリズムがずれない
+    period, sweep = 0.75, 0.5
+    n = int(d * SR)
+    out = np.zeros(n)
+
+    def put(x, at):
+        i = int(at * SR)
+        if i < n:
+            k = min(n - i, len(x))
+            out[i:i + k] += x[:k]
+
+    for k in range(int(np.ceil(d / period))):
+        t = k * period
+        f = 410 if k % 2 == 0 else 395                                   # 行きと帰りで、わずかに高さが違う
+        put(_printer_sweep(sweep, f, seed + k % 8), t)
+        stop = t + sweep
+        put(tick(1500, 0.025, seed + k % 8) * 0.9, stop)                                                  # 折り返しで止まる
+        put(clank(600, 0.08, seed + k % 8) * 0.07, stop)
+        put(bandpass(pink(0.1, seed + 20 + k % 8), 420, 1.4) * perc(0.1, 0.01, 0.045) * 0.4, stop + 0.03)    # ペーストを押し出す
+        if k % 4 == 3:
+            put(servo(0.12, 160, 210, seed + k % 8) * 0.3, stop + 0.06)                                    # 台が1層下がる
+            put(tick(800, 0.035, seed + 40 + k % 8) * 0.8, stop + 0.19)
+    return machine_bed(d, seed, 45, 0.06, (500, 2000), 0.05, None, 0, out, 1.0, None, 0, 900, None, 0, room=0.18)

@@ -11520,8 +11520,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 52 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 53 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -12064,8 +12064,8 @@
     "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 95 more",
-    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 95 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 97 個"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
@@ -14526,5 +14526,193 @@
   "summary.singulo.smes_cell": {
     "source": "Superconducting storage for a lot of power.",
     "translation": "儲存大量電力的超導蓄電方塊。"
+  },
+  "block.singulo.food_printer": {
+    "source": "Food Printer",
+    "translation": "食品列印機"
+  },
+  "item.singulo.food_cartridge": {
+    "source": "Food Cartridge",
+    "translation": "食品墨匣"
+  },
+  "item.singulo.food_cartridge.filled": {
+    "source": "Food Cartridge (%s)",
+    "translation": "食品墨匣（%s）"
+  },
+  "item.singulo.nutrient_bar": {
+    "source": "Nutrient Bar",
+    "translation": "營養棒"
+  },
+  "item.singulo.printed_steak": {
+    "source": "Layered Steak",
+    "translation": "層疊牛排"
+  },
+  "item.singulo.spiral_pasta": {
+    "source": "Spiral Pasta",
+    "translation": "螺旋義大利麵"
+  },
+  "item.singulo.honeycomb_cake": {
+    "source": "Honeycomb Cake",
+    "translation": "蜂巢蛋糕"
+  },
+  "item.singulo.fruit_gel_cube": {
+    "source": "Fruit Gel Cube",
+    "translation": "水果果凍塊"
+  },
+  "desc.singulo.food_cartridge": {
+    "source": "A paste container for the Food Printer. Holds up to 64 of one kind of paste, and can switch kinds once empty.",
+    "translation": "食品列印機用的糊料容器。可存放最多64份同一種糊料，清空後可改裝其他種類。"
+  },
+  "desc.singulo.food_printer": {
+    "source": "Refills Food Cartridges with the protein, carbohydrate or sweet paste that runs short from the ingredients in each row, then prints the space food you pick, layer by layer, on power. A nozzle builds the food up inside the glass chamber.",
+    "translation": "用蛋白質、碳水化合物和甜味各自槽中的食材，為食品墨匣補充不足的糊料，再用電力逐層列印所選的太空食品。噴嘴在玻璃列印室中把食品堆疊成形。"
+  },
+  "desc.singulo.fruit_gel_cube": {
+    "source": "Four layers of jelly. Edible when full, and heals a little.",
+    "translation": "四層顏色的果凍。飽食時也能吃，並稍微回復生命。"
+  },
+  "desc.singulo.honeycomb_cake": {
+    "source": "A cake topped with honey hexagons. Eating it gives Speed.",
+    "translation": "頂上鋪著六角形蜂蜜的蛋糕。吃下後獲得迅捷。"
+  },
+  "desc.singulo.nutrient_bar": {
+    "source": "A printed nutrient bar. Quick to eat.",
+    "translation": "列印出來的營養棒。可以很快吃完。"
+  },
+  "desc.singulo.printed_steak": {
+    "source": "A steak printed down to its sear marks and marbling.",
+    "translation": "連烤痕和油花都列印出來的牛排。"
+  },
+  "desc.singulo.spiral_pasta": {
+    "source": "Spiral pasta with tomato sauce. Eating it gives Haste.",
+    "translation": "配番茄醬的螺旋義大利麵。吃下後獲得急迫。"
+  },
+  "food_paste.singulo.carb": {
+    "source": "Carbohydrate",
+    "translation": "碳水化合物"
+  },
+  "food_paste.singulo.protein": {
+    "source": "Protein",
+    "translation": "蛋白質"
+  },
+  "food_paste.singulo.sweet": {
+    "source": "Sweet",
+    "translation": "甜味"
+  },
+  "gui.singulo.food_printer.cartridge": {
+    "source": "Food Cartridge for %s",
+    "translation": "%s的食品墨匣"
+  },
+  "gui.singulo.food_printer.cost": {
+    "source": "Paste per item",
+    "translation": "每個所用的糊料"
+  },
+  "gui.singulo.food_printer.cost.line": {
+    "source": "%s %s",
+    "translation": "%s %s"
+  },
+  "gui.singulo.food_printer.no_cartridge": {
+    "source": "No cartridge",
+    "translation": "沒有墨匣"
+  },
+  "gui.singulo.food_printer.output": {
+    "source": "Printed food",
+    "translation": "列印好的食品"
+  },
+  "gui.singulo.food_printer.paste": {
+    "source": "%s %s / %s",
+    "translation": "%s %s / %s"
+  },
+  "gui.singulo.food_printer.progress": {
+    "source": "Printing %s%%",
+    "translation": "列印中 %s%%"
+  },
+  "gui.singulo.food_printer.time": {
+    "source": "%s s · %s FE",
+    "translation": "%s秒・%s FE"
+  },
+  "guide.singulo.food": {
+    "source": "Printed Food",
+    "translation": "列印食品"
+  },
+  "guide.singulo.food.foods.title": {
+    "source": "Space food",
+    "translation": "太空食品"
+  },
+  "guide.singulo.food.printer.title": {
+    "source": "Food Printer",
+    "translation": "食品列印機"
+  },
+  "guide.singulo.food.foods.body": {
+    "source": "Nutrient Bar: 4 carbohydrate, 2 protein. Quick to eat (6 hunger).\nLayered Steak: 8 protein. Printed down to the sear marks and marbling (9 hunger).\nSpiral Pasta: 6 carbohydrate, 2 protein. Pasta with tomato sauce. Haste for 1 minute (8 hunger).\nHoneycomb Cake: 4 sweet, 3 carbohydrate. A cake topped with honey hexagons. Speed for 1 minute (7 hunger).\nFruit Gel Cube: 4 sweet. Four layers of jelly. Edible when full, with 5 seconds of Regeneration (3 hunger).",
+    "translation": "營養棒：碳水化合物4、蛋白質2。可以很快吃完（飢餓值6）。\n層疊牛排：蛋白質8。連烤痕和油花都列印出來的牛排（飢餓值9）。\n螺旋義大利麵：碳水化合物6、蛋白質2。配番茄醬的義大利麵。急迫1分鐘（飢餓值8）。\n蜂巢蛋糕：甜味4、碳水化合物3。頂上鋪著六角形蜂蜜的蛋糕。迅捷1分鐘（飢餓值7）。\n水果果凍塊：甜味4。四層顏色的果凍。飽食時也能吃，獲得5秒生命恢復（飢餓值3）。"
+  },
+  "guide.singulo.food.printer.body": {
+    "source": "The Food Printer turns ingredients into paste and prints space food layer by layer. It runs on power (20 FE per tick).\nThe left of the screen has a row each for protein, carbohydrate and sweet, from the top. A Food Cartridge in the right slot of a row holds up to 64 of that paste. Stock the left slot of each row with that kind of ingredient: meat, fish and eggs for protein; grains and vegetables for carbohydrate; fruit, sugar and honeycomb for sweet. The cartridges are refilled while they have room, the kind the chosen food is short of first, then the lowest. Ingredients that do not fit wait in their slot. One ingredient gives as much paste as the food it restores (wheat and eggs give 2, sugar and cocoa beans 1, honeycomb 3).\nPick the food with the button above the output (right-click returns to automatic). The printer keeps printing it while there is paste and room in the output. On automatic it prints any food the paste allows, the food already in the output first. To stop, switch it off at the top right (it keeps turning ingredients into paste). Inside the glass chamber, the nozzle runs back and forth and builds the food up from the bottom layer. The windows on the back glow with how much paste each cartridge holds.\nHoppers can put in ingredients and cartridges and take out printed food. Breaking it drops its items, and cartridges keep their paste.",
+    "translation": "食品列印機把食材製成糊料，並逐層列印太空食品。它使用電力運作（每 tick 20 FE）。\n介面左側從上到下依次是蛋白質、碳水化合物和甜味三行。在每行右邊的槽中放入食品墨匣，即可存放最多 64 份該種糊料。在每行左邊的槽中成批放入該種食材：肉、魚和蛋是蛋白質；穀物和蔬菜是碳水化合物；水果、糖和蜂巢是甜味。只要墨匣還有空間就會補充，先補所選食品不足的種類，再補最少的種類。放不下的食材會留在槽中等待。一個食材產生的糊料等於該食物恢復的飢餓值（小麥和蛋為 2，糖和可可豆為 1，蜂巢為 3）。\n用輸出槽上方的按鈕選擇食品（右鍵恢復為自動）。只要糊料足夠且輸出槽有空間，就會持續列印。自動模式會列印糊料足夠的食品，優先輸出槽中已有的食品。要停止時，關閉右上角的電源（仍會繼續把食材製成糊料）。在玻璃列印室中，噴嘴前後左右移動，從最下層開始按形狀堆疊食品。背面的窗口會按墨匣中的糊料量發光。\n漏斗等可以放入食材和墨匣，並取出列印好的食品。破壞時會掉落其中的物品，墨匣會保留糊料。"
+  },
+  "howto.singulo.food_cartridge": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "howto.singulo.food_printer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "summary.singulo.food_cartridge": {
+    "source": "Holds paste for the Food Printer.",
+    "translation": "食品列印機的糊料容器。"
+  },
+  "summary.singulo.food_printer": {
+    "source": "Prints space food from ingredients.",
+    "translation": "用食材列印太空食品的裝置。"
+  },
+  "tooltip.singulo.food_cartridge.amount": {
+    "source": "%s paste %s / %s",
+    "translation": "%s糊料 %s / %s"
+  },
+  "tooltip.singulo.food_cartridge.empty": {
+    "source": "Empty (holds %s paste)",
+    "translation": "空（可裝 %s 份糊料）"
+  },
+  "gui.singulo.food_printer.auto.hint": {
+    "source": "Prints any food the paste allows (the food in the output first)",
+    "translation": "列印糊料足夠的食品（優先輸出槽中的食品）"
+  },
+  "gui.singulo.food_printer.fixed.hint": {
+    "source": "Prints only this food while the paste lasts",
+    "translation": "只要糊料足夠，就只列印這種食品"
+  },
+  "gui.singulo.food_printer.nothing": {
+    "source": "No food has enough paste",
+    "translation": "沒有糊料足夠的食品"
+  },
+  "gui.singulo.food_printer.status.short": {
+    "source": "Short of paste",
+    "translation": "糊料不足"
+  },
+  "gui.singulo.food_printer.ingredient": {
+    "source": "Ingredients for %s",
+    "translation": "%s的食材"
+  },
+  "gui.singulo.food_printer.ingredient.protein": {
+    "source": "Meat, fish and eggs",
+    "translation": "肉、魚和蛋"
+  },
+  "gui.singulo.food_printer.ingredient.carb": {
+    "source": "Grains and vegetables",
+    "translation": "穀物和蔬菜"
+  },
+  "gui.singulo.food_printer.ingredient.sweet": {
+    "source": "Fruit, sugar and honeycomb",
+    "translation": "水果、糖和蜂巢"
+  },
+  "gui.singulo.food_printer.ingredient.hint": {
+    "source": "Stock plenty and the paste that runs short is refilled first",
+    "translation": "多放一些，會先補充不足的糊料"
+  },
+  "subtitles.singulo.food_printer_running": {
+    "source": "Food printer prints",
+    "translation": "食品列印機正在列印"
   }
 }

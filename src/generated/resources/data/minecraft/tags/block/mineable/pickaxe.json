@@ -223,6 +223,7 @@
     "singulo:collapsar_lining",
     "singulo:horizon_vault",
     "singulo:wormhole_drone_beacon",
-    "singulo:rgb_dye_station"
+    "singulo:rgb_dye_station",
+    "singulo:food_printer"
   ]
 }

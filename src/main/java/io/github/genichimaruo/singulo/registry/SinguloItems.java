@@ -64,6 +64,8 @@ public final class SinguloItems {
             "decoded_record", () -> new io.github.genichimaruo.singulo.item.DecodedRecordItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.FluidCanisterItem> FLUID_CANISTER = ITEMS.register(
             "fluid_canister", () -> new io.github.genichimaruo.singulo.item.FluidCanisterItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.food.FoodCartridgeItem> FOOD_CARTRIDGE = ITEMS.register(
+            "food_cartridge", () -> new io.github.genichimaruo.singulo.food.FoodCartridgeItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
             "magnetic_bottle", () -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(
@@ -409,6 +411,8 @@ public final class SinguloItems {
         block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
         block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
         block(SinguloBlocks.RGB_DYE_STATION, 1);
+        block(SinguloBlocks.FOOD_PRINTER, 1);
+        TAB_ORDER.add(FOOD_CARTRIDGE);
         block(SinguloBlocks.ANDROID_RECIPE_RACK, 2);
         block(SinguloBlocks.ANDROID_WORKBENCH, 2);
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
@@ -591,6 +595,10 @@ public final class SinguloItems {
             props.rarity(Rarity.EPIC);
         } else if (def.stage() >= 4) {
             props.rarity(Rarity.RARE);
+        }
+        io.github.genichimaruo.singulo.food.PrintedFood printed = io.github.genichimaruo.singulo.food.PrintedFood.byId(def.id());
+        if (printed != null) {
+            return new io.github.genichimaruo.singulo.food.PrintedFoodItem(props, def.stage(), printed);    // 印刷した宇宙食
         }
         if (io.github.genichimaruo.singulo.item.DrinkItem.DRINKS.containsKey(def.id())) {
             return new io.github.genichimaruo.singulo.item.DrinkItem(props, def.stage(), def.id());   // 自販機の缶・コーヒー

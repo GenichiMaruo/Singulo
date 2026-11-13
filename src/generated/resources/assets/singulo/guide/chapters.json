@@ -210,6 +210,14 @@
         "collapsar.vault",
         "collapsar.wormhole"
       ]
+    },
+    {
+      "id": "food",
+      "icon": "singulo:nutrient_bar",
+      "pages": [
+        "food.printer",
+        "food.foods"
+      ]
     }
   ]
 }

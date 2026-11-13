@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "singulo:item/food_cartridge",
+    "layer1": "singulo:item/food_cartridge_paste"
+  }
+}

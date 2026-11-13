@@ -11520,8 +11520,8 @@
     "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 52 more",
-    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 52개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 53개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -12064,8 +12064,8 @@
     "translation": "사용처: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 95 more",
-    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 95개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
+    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 97개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
@@ -14526,5 +14526,193 @@
   "summary.singulo.smes_cell": {
     "source": "Superconducting storage for a lot of power.",
     "translation": "많은 전력을 저장하는 초전도 축전 블록."
+  },
+  "block.singulo.food_printer": {
+    "source": "Food Printer",
+    "translation": "푸드 프린터"
+  },
+  "item.singulo.food_cartridge": {
+    "source": "Food Cartridge",
+    "translation": "푸드 카트리지"
+  },
+  "item.singulo.food_cartridge.filled": {
+    "source": "Food Cartridge (%s)",
+    "translation": "푸드 카트리지(%s)"
+  },
+  "item.singulo.nutrient_bar": {
+    "source": "Nutrient Bar",
+    "translation": "영양 바"
+  },
+  "item.singulo.printed_steak": {
+    "source": "Layered Steak",
+    "translation": "적층 스테이크"
+  },
+  "item.singulo.spiral_pasta": {
+    "source": "Spiral Pasta",
+    "translation": "나선 파스타"
+  },
+  "item.singulo.honeycomb_cake": {
+    "source": "Honeycomb Cake",
+    "translation": "허니콤 케이크"
+  },
+  "item.singulo.fruit_gel_cube": {
+    "source": "Fruit Gel Cube",
+    "translation": "과일 젤리 큐브"
+  },
+  "desc.singulo.food_cartridge": {
+    "source": "A paste container for the Food Printer. Holds up to 64 of one kind of paste, and can switch kinds once empty.",
+    "translation": "푸드 프린터에 넣는 페이스트 용기입니다. 한 종류의 페이스트를 64까지 담으며, 비면 다른 종류로 바꿀 수 있습니다."
+  },
+  "desc.singulo.food_printer": {
+    "source": "Refills Food Cartridges with the protein, carbohydrate or sweet paste that runs short from the ingredients in each row, then prints the space food you pick, layer by layer, on power. A nozzle builds the food up inside the glass chamber.",
+    "translation": "단백질·탄수화물·단맛 각 칸의 재료로 푸드 카트리지에 부족한 페이스트를 채우고, 고른 우주식을 전력으로 한 층씩 인쇄합니다. 유리 인쇄실에서 노즐이 음식을 모양대로 쌓아 올립니다."
+  },
+  "desc.singulo.fruit_gel_cube": {
+    "source": "Four layers of jelly. Edible when full, and heals a little.",
+    "translation": "네 가지 색 층의 젤리입니다. 배가 불러도 먹을 수 있고 조금 회복합니다."
+  },
+  "desc.singulo.honeycomb_cake": {
+    "source": "A cake topped with honey hexagons. Eating it gives Speed.",
+    "translation": "꿀 육각형을 올린 케이크입니다. 먹으면 신속 효과를 얻습니다."
+  },
+  "desc.singulo.nutrient_bar": {
+    "source": "A printed nutrient bar. Quick to eat.",
+    "translation": "인쇄한 영양 바입니다. 빨리 먹을 수 있습니다."
+  },
+  "desc.singulo.printed_steak": {
+    "source": "A steak printed down to its sear marks and marbling.",
+    "translation": "굽기 자국과 마블링까지 인쇄한 스테이크입니다."
+  },
+  "desc.singulo.spiral_pasta": {
+    "source": "Spiral pasta with tomato sauce. Eating it gives Haste.",
+    "translation": "토마토소스를 곁들인 나선 파스타입니다. 먹으면 성급함 효과를 얻습니다."
+  },
+  "food_paste.singulo.carb": {
+    "source": "Carbohydrate",
+    "translation": "탄수화물"
+  },
+  "food_paste.singulo.protein": {
+    "source": "Protein",
+    "translation": "단백질"
+  },
+  "food_paste.singulo.sweet": {
+    "source": "Sweet",
+    "translation": "단맛"
+  },
+  "gui.singulo.food_printer.cartridge": {
+    "source": "Food Cartridge for %s",
+    "translation": "%s 푸드 카트리지"
+  },
+  "gui.singulo.food_printer.cost": {
+    "source": "Paste per item",
+    "translation": "1개에 쓰는 페이스트"
+  },
+  "gui.singulo.food_printer.cost.line": {
+    "source": "%s %s",
+    "translation": "%s %s"
+  },
+  "gui.singulo.food_printer.no_cartridge": {
+    "source": "No cartridge",
+    "translation": "카트리지 없음"
+  },
+  "gui.singulo.food_printer.output": {
+    "source": "Printed food",
+    "translation": "인쇄한 음식"
+  },
+  "gui.singulo.food_printer.paste": {
+    "source": "%s %s / %s",
+    "translation": "%s %s / %s"
+  },
+  "gui.singulo.food_printer.progress": {
+    "source": "Printing %s%%",
+    "translation": "인쇄 %s%%"
+  },
+  "gui.singulo.food_printer.time": {
+    "source": "%s s · %s FE",
+    "translation": "%s초 · %s FE"
+  },
+  "guide.singulo.food": {
+    "source": "Printed Food",
+    "translation": "인쇄된 음식"
+  },
+  "guide.singulo.food.foods.title": {
+    "source": "Space food",
+    "translation": "우주식"
+  },
+  "guide.singulo.food.printer.title": {
+    "source": "Food Printer",
+    "translation": "푸드 프린터"
+  },
+  "guide.singulo.food.foods.body": {
+    "source": "Nutrient Bar: 4 carbohydrate, 2 protein. Quick to eat (6 hunger).\nLayered Steak: 8 protein. Printed down to the sear marks and marbling (9 hunger).\nSpiral Pasta: 6 carbohydrate, 2 protein. Pasta with tomato sauce. Haste for 1 minute (8 hunger).\nHoneycomb Cake: 4 sweet, 3 carbohydrate. A cake topped with honey hexagons. Speed for 1 minute (7 hunger).\nFruit Gel Cube: 4 sweet. Four layers of jelly. Edible when full, with 5 seconds of Regeneration (3 hunger).",
+    "translation": "영양 바: 탄수화물 4, 단백질 2. 빨리 먹을 수 있습니다(허기 6).\n적층 스테이크: 단백질 8. 굽기 자국과 마블링까지 인쇄한 스테이크입니다(허기 9).\n나선 파스타: 탄수화물 6, 단백질 2. 토마토소스 파스타. 성급함 1분(허기 8).\n허니콤 케이크: 단맛 4, 탄수화물 3. 꿀 육각형을 올린 케이크. 신속 1분(허기 7).\n과일 젤리 큐브: 단맛 4. 네 가지 색 층의 젤리. 배가 불러도 먹을 수 있고 재생 5초(허기 3)."
+  },
+  "guide.singulo.food.printer.body": {
+    "source": "The Food Printer turns ingredients into paste and prints space food layer by layer. It runs on power (20 FE per tick).\nThe left of the screen has a row each for protein, carbohydrate and sweet, from the top. A Food Cartridge in the right slot of a row holds up to 64 of that paste. Stock the left slot of each row with that kind of ingredient: meat, fish and eggs for protein; grains and vegetables for carbohydrate; fruit, sugar and honeycomb for sweet. The cartridges are refilled while they have room, the kind the chosen food is short of first, then the lowest. Ingredients that do not fit wait in their slot. One ingredient gives as much paste as the food it restores (wheat and eggs give 2, sugar and cocoa beans 1, honeycomb 3).\nPick the food with the button above the output (right-click returns to automatic). The printer keeps printing it while there is paste and room in the output. On automatic it prints any food the paste allows, the food already in the output first. To stop, switch it off at the top right (it keeps turning ingredients into paste). Inside the glass chamber, the nozzle runs back and forth and builds the food up from the bottom layer. The windows on the back glow with how much paste each cartridge holds.\nHoppers can put in ingredients and cartridges and take out printed food. Breaking it drops its items, and cartridges keep their paste.",
+    "translation": "푸드 프린터는 재료를 페이스트로 만들어 우주식을 한 층씩 인쇄하는 장치입니다. 전력(1 tick당 20 FE)으로 작동합니다.\n화면 왼쪽은 위에서부터 단백질·탄수화물·단맛 줄입니다. 각 줄 오른쪽 칸에 푸드 카트리지를 넣으면 그 종류의 페이스트를 64까지 담습니다. 각 줄 왼쪽 칸에는 그 종류의 재료를 넉넉히 넣어 둡니다. 고기·생선·달걀은 단백질, 곡물·채소는 탄수화물, 과일·설탕·벌집은 단맛입니다. 카트리지에 자리가 있는 동안, 고른 음식에 부족한 종류부터, 그다음 가장 적은 종류 순으로 채웁니다. 들어가지 않는 재료는 칸에서 기다립니다. 재료 1개의 페이스트는 그 음식의 허기 회복량만큼입니다(밀과 달걀은 2, 설탕과 코코아 콩은 1, 벌집은 3).\n출력 칸 위의 버튼으로 음식을 고릅니다(우클릭하면 자동으로 돌아갑니다). 페이스트가 충분하고 출력 칸에 자리가 있는 동안 계속 인쇄합니다. 자동에서는 출력 칸에 있는 음식을 우선해, 페이스트가 충분한 음식을 인쇄합니다. 멈추려면 오른쪽 위의 전원을 끕니다(재료를 페이스트로 만드는 일은 계속합니다). 유리 인쇄실에서는 노즐이 앞뒤 좌우로 움직이며 음식을 아래층부터 모양대로 쌓아 올립니다. 뒷면 창은 카트리지의 페이스트 양만큼 빛납니다.\n호퍼 등으로 재료와 카트리지를 넣고 인쇄한 음식을 꺼낼 수 있습니다. 부수면 안의 물건을 떨어뜨리며, 카트리지는 페이스트를 그대로 유지합니다."
+  },
+  "howto.singulo.food_cartridge": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.food_printer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "summary.singulo.food_cartridge": {
+    "source": "Holds paste for the Food Printer.",
+    "translation": "푸드 프린터의 페이스트 용기입니다."
+  },
+  "summary.singulo.food_printer": {
+    "source": "Prints space food from ingredients.",
+    "translation": "재료로 우주식을 인쇄하는 장치입니다."
+  },
+  "tooltip.singulo.food_cartridge.amount": {
+    "source": "%s paste %s / %s",
+    "translation": "%s 페이스트 %s / %s"
+  },
+  "tooltip.singulo.food_cartridge.empty": {
+    "source": "Empty (holds %s paste)",
+    "translation": "비어 있음(페이스트 %s까지)"
+  },
+  "gui.singulo.food_printer.auto.hint": {
+    "source": "Prints any food the paste allows (the food in the output first)",
+    "translation": "페이스트가 충분한 음식을 인쇄합니다(출력 칸에 있는 음식 우선)"
+  },
+  "gui.singulo.food_printer.fixed.hint": {
+    "source": "Prints only this food while the paste lasts",
+    "translation": "페이스트가 있는 동안 이 음식만 인쇄합니다"
+  },
+  "gui.singulo.food_printer.nothing": {
+    "source": "No food has enough paste",
+    "translation": "페이스트가 충분한 음식이 없음"
+  },
+  "gui.singulo.food_printer.status.short": {
+    "source": "Short of paste",
+    "translation": "페이스트 부족"
+  },
+  "gui.singulo.food_printer.ingredient": {
+    "source": "Ingredients for %s",
+    "translation": "%s 재료"
+  },
+  "gui.singulo.food_printer.ingredient.protein": {
+    "source": "Meat, fish and eggs",
+    "translation": "고기·생선·달걀"
+  },
+  "gui.singulo.food_printer.ingredient.carb": {
+    "source": "Grains and vegetables",
+    "translation": "곡물·채소"
+  },
+  "gui.singulo.food_printer.ingredient.sweet": {
+    "source": "Fruit, sugar and honeycomb",
+    "translation": "과일·설탕·벌집"
+  },
+  "gui.singulo.food_printer.ingredient.hint": {
+    "source": "Stock plenty and the paste that runs short is refilled first",
+    "translation": "넉넉히 넣어 두면 부족한 페이스트부터 채웁니다"
+  },
+  "subtitles.singulo.food_printer_running": {
+    "source": "Food printer prints",
+    "translation": "푸드 프린터가 인쇄함"
   }
 }

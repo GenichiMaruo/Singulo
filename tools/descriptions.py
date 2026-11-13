@@ -1004,3 +1004,7 @@ DESC.update(_DECOR_DESC)
 SUMMARY.update(_DECOR_SUMMARY)
 # 0.18.0: SMESセルの説明に充電の枠を足して長くなったので、要約を足す
 SUMMARY['SMESセル'] = ('大量の電力をためる超伝導の蓄電ブロック。', 'Superconducting storage for a lot of power.')
+# 0.18.0 印刷された食品
+from food_content import DESC as _FOOD_DESC, SUMMARY as _FOOD_SUMMARY
+DESC.update(_FOOD_DESC)
+SUMMARY.update(_FOOD_SUMMARY)

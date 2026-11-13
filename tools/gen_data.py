@@ -65,6 +65,8 @@ CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240
           'horizon_bus': (20, 20, 26)}
 # 液体パイプ（4段階）: 絵とモデルは tools/logistics_content.py が書く（電線と見分けられる、継ぎ手のつばと窓のある管）
 from logistics_content import PIPES, CAPSULES, CUSTOM  # noqa: E402
+from food_content import CUSTOM_BLOCKS as _FOOD_CUSTOM  # noqa: E402
+CUSTOM = CUSTOM | _FOOD_CUSTOM
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
 # レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
 CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
@@ -1671,6 +1673,8 @@ def lang_files():
     UI_LANG.update(UI)
     from logistics_content import UI as _LOGISTICS_UI
     UI_LANG.update(_LOGISTICS_UI)
+    from food_content import UI as _FOOD_UI
+    UI_LANG.update(_FOOD_UI)
     from decor_content import UI as _DECOR_UI
     UI_LANG.update(_DECOR_UI)
     ja, en = {}, {}
@@ -2835,6 +2839,7 @@ SOUNDS = {
     'suspension_reservoir_running': ('machine/suspension_reservoir_running', '重力懸垂タンクが液体を吊る', 'Suspension reservoir hums', 16),
     'pasta_accumulator_running': ('machine/pasta_accumulator_running', '核パスタが圧縮される', 'Nuclear pasta compresses', 16),
     'tidal_spindle_running': ('machine/tidal_spindle_running', '潮汐紡糸機が糸を巻く', 'Tidal spindle winds thread', 24),
+    'food_printer_running': ('machine/food_printer_running', 'フードプリンターが印刷する', 'Food printer prints', 12),
     'containment_tank_running': ('machine/containment_tank_running', '閉じ込めタンクがうなる', 'Containment tank hums', 12),
     'penrose_reactor_ignition': ('machine/penrose_reactor_ignition', 'Pリアクターが点火を始める', 'P-Reactor ignition begins', 48),
     'probe_station_launch': ('machine/probe_station_launch', '探査機が飛び立つ', 'Probe launches', 24),
@@ -3882,7 +3887,8 @@ TAB_GROUPS = [
     ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
               'facility_light', 'emergency_light', 'room_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
               'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
-              'coffee', 'paper_stack', 'trash_bin',
+              'coffee', 'food_printer', 'food_cartridge', 'nutrient_bar', 'printed_steak', 'spiral_pasta', 'honeycomb_cake',
+              'fruit_gel_cube', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),
     # 施設の建材の設計図（遺構 → 研究所）
     ('設計図', ['blueprint_ruin_panels', 'blueprint_pristine_ruin', 'blueprint_ruin_glass', 'blueprint_lighting',
@@ -4283,6 +4289,8 @@ def main():
     cosmic_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     import logistics_content
     logistics_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import food_content
+    food_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

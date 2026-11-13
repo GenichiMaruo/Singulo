@@ -30,7 +30,7 @@ public final class SinguloSounds {
             "advanced_worldline_anchor_running", "advanced_worldline_anchor_embed", "inertial_stabilizer_running",
             "degenerate_furnace_running", "degenerate_furnace_press", "shield_tower_running", "tipler_cylinder_running",
             "wormhole_generator_charge", "wormhole_generator_open", "wormhole_mouth_ambient", "wormhole_stabilizer_running",
-            "halo_collector_running", "containment_tank_running", "suspension_reservoir_running", "pasta_accumulator_running", "tidal_spindle_running", "penrose_reactor_ignition", "probe_station_launch",
+            "halo_collector_running", "containment_tank_running", "suspension_reservoir_running", "pasta_accumulator_running", "tidal_spindle_running", "food_printer_running", "penrose_reactor_ignition", "probe_station_launch",
             "probe_station_return", "gravitational_wave_detector_ping", "multiblock_formed",
             "graviton_manipulator_active", "graviton_manipulator_charge", "graviton_manipulator_throw",
             "sealed_container.denied", "sealed_container.insert", "sealed_container.scan", "sealed_container.unlock",

@@ -99,5 +99,10 @@ public final class SinguloComponents {
     public static final Supplier<DataComponentType<Integer>> CATALYST_TIER = REGISTER.registerComponentType("catalyst_tier",
             b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    /** フードカートリッジのペースト（種類と量）。 */
+    public static final Supplier<DataComponentType<io.github.genichimaruo.singulo.food.FoodPaste.Content>> FOOD_PASTE =
+            REGISTER.registerComponentType("food_paste", b -> b.persistent(io.github.genichimaruo.singulo.food.FoodPaste.Content.CODEC)
+                    .networkSynchronized(io.github.genichimaruo.singulo.food.FoodPaste.Content.STREAM_CODEC));
+
     private SinguloComponents() {}
 }
