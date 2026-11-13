@@ -44,7 +44,11 @@ public final class SinguloMenus {
             "android", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.android.AndroidMenu::client));
 
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.WorkConsoleMenu>> ANDROID_WORK_CONSOLE = REGISTER.register(
-            "android_work_console", () -> net.minecraftforge.common.extensions.IForgeMenuType.create(io.github.genichimaruo.singulo.android.work.WorkConsoleMenu::client));
+            "android_work_console", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.android.work.WorkConsoleMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.dye.RgbDyeStationMenu>> RGB_DYE_STATION = REGISTER.register(
+            "rgb_dye_station", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.dye.RgbDyeStationMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.food.FoodPrinterMenu>> FOOD_PRINTER = REGISTER.register(
+            "food_printer", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.food.FoodPrinterMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.DeliveryPortMenu>> ANDROID_DELIVERY_PORT = REGISTER.register(
             "android_delivery_port", () -> net.minecraftforge.common.extensions.IForgeMenuType.create(io.github.genichimaruo.singulo.android.work.DeliveryPortMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.SupplyPortMenu>> ANDROID_SUPPLY_PORT = REGISTER.register(

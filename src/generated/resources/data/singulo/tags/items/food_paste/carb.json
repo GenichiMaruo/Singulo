@@ -1,0 +1,19 @@
+{
+  "values": [
+    "minecraft:wheat",
+    "minecraft:bread",
+    "minecraft:potato",
+    "minecraft:baked_potato",
+    "minecraft:carrot",
+    "minecraft:beetroot",
+    "minecraft:dried_kelp",
+    {
+      "id": "#forge:foods/bread",
+      "required": false
+    },
+    {
+      "id": "#forge:foods/vegetable",
+      "required": false
+    }
+  ]
+}

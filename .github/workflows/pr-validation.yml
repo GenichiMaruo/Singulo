@@ -69,8 +69,8 @@ jobs:
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle -PmachineGuiReview runClient
       - name: Require GUI captures
         run: |
-          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 262
-          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 240' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 272
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 250' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_GUI_COMPLETE 22' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log

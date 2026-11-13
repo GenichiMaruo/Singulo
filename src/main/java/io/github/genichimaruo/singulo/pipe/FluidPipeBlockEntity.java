@@ -23,7 +23,7 @@ import net.minecraftforge.fluids.FluidStack;
  * 見た目のための流れ（状態・入ってきた面・出ていった面・量・液体）だけを持つ。ネットワークが {@link FluidPipeNetwork#DISPLAY} tick ごとに
  * 決め、変わったときだけクライアントへ送る（量は桁の段階が変わったときだけ）。描くのは FluidPipeRenderer と測量メガネ。
  */
-public class FluidPipeBlockEntity extends BlockEntity {
+public class FluidPipeBlockEntity extends BlockEntity implements io.github.genichimaruo.singulo.cable.ConduitCover.Holder {
     /** 状態: 流れていない・流れている・詰まっている（出せる液体があるのに受け手がない。測量メガネをかけた人が近いときだけ）。 */
     public static final int IDLE = 0, FLOWING = 1, BLOCKED = 2;
 
@@ -118,6 +118,7 @@ public class FluidPipeBlockEntity extends BlockEntity {
         if (!visualFluid.isEmpty()) {
             tag.put("fluid", visualFluid.writeToNBT(new CompoundTag()));
         }
+        io.github.genichimaruo.singulo.cable.ConduitCover.save(tag, coverState);
         return tag;
     }
 
@@ -129,14 +130,56 @@ public class FluidPipeBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        // 保存データには何も書かない（見た目はクライアントへの更新でだけ届く。読み込み直したら流れていない状態から始める）
+        // 流れの見た目は保存しない（クライアントへの更新でだけ届く。読み込み直したら流れていない状態から始める）。保存するのはカバーだけ
         visualState = tag.getInt("state");
         inMask = tag.getInt("in");
         outMask = tag.getInt("out");
         visualAmount = tag.getInt("amount");
         mixed = tag.getBoolean("mixed");
         visualFluid = tag.contains("fluid") ? FluidStack.loadFluidStackFromNBT(tag.getCompound("fluid")) : FluidStack.EMPTY;
+        loadCover(tag);
     }
+
+    // ------------------------------------------------------------------ カバー（{@link io.github.genichimaruo.singulo.cable.ConduitCover}）
+
+    /** カバーにはめ込んだブロック（向きを含む状態。なければ null）。 */
+    @Nullable
+    private BlockState coverState;
+
+    @Override
+    @Nullable
+    public BlockState coverState() {
+        return coverState;
+    }
+
+    @Override
+    public void setCoverState(@Nullable BlockState state) {
+        coverState = state;
+        setChanged();
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        io.github.genichimaruo.singulo.cable.ConduitCover.save(tag, coverState);
+    }
+
+    /** 読んだカバーが変わっていれば、クライアントでは見た目を描き直す。 */
+    private void loadCover(CompoundTag tag) {
+        BlockState before = coverState;
+        coverState = io.github.genichimaruo.singulo.cable.ConduitCover.load(tag);
+        if (before != coverState && level != null && level.isClientSide) {
+            requestModelDataUpdate();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    public net.minecraftforge.client.model.data.ModelData getModelData() {
+        return coverState == null ? net.minecraftforge.client.model.data.ModelData.EMPTY
+                : net.minecraftforge.client.model.data.ModelData.builder().with(io.github.genichimaruo.singulo.cable.ConduitCover.MODEL_STATE, coverState).build();
+    }
+
 
     /** 隣が変わった。口が増えた・消えたときだけネットワークを作り直す。 */
     void neighborChanged(BlockPos from) {

@@ -210,6 +210,14 @@ public final class SinguloBlocks {
     public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT = BLOCKS.register(
             "android_supply_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_SUPPLY_PORT,
                     io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
+    /** RGB染色台（0.18.0）。好きな色に染める。 */
+    public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity>> RGB_DYE_STATION = BLOCKS.register(
+            "rgb_dye_station", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.RGB_DYE_STATION,
+                    io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::new,
+                    io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::serverTick));
+    /** フードプリンター（0.18.0）。食材から宇宙食を印刷する。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.food.FoodPrinterBlock> FOOD_PRINTER = BLOCKS.register(
+            "food_printer", () -> new io.github.genichimaruo.singulo.food.FoodPrinterBlock(machineProperties().noOcclusion()));
     public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT = BLOCKS.register(
             "android_delivery_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_DELIVERY_PORT,
                     io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new,
@@ -582,6 +590,10 @@ public final class SinguloBlocks {
     public static final RegistryObject<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
             () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
 
+    /** 置いたカバーの枠（あとからケーブル・パイプを入れられる）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.cable.CoverFrameBlock> COVER_FRAME = BLOCKS.register("cover_frame",
+            () -> new io.github.genichimaruo.singulo.cable.CoverFrameBlock(cableProperties(SoundType.CHAIN)));
+
     // ---- 液体パイプ
     public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
             () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), 2_000,
@@ -655,7 +667,11 @@ public final class SinguloBlocks {
     }
 
     static BlockBehaviour.Properties cableProperties(SoundType sound) {
-        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(0.5F).sound(sound).noOcclusion();
+        // 隣を隠す形・光は ConduitCover（ブロック入りのカバーだけがふつうのブロックのようにふるまう。枠だけなら窒息しない・視界をさえぎらない）
+        BlockBehaviour.StatePredicate covered = (s, level, pos) -> io.github.genichimaruo.singulo.cable.ConduitCover.of(s)
+                == io.github.genichimaruo.singulo.cable.ConduitCover.State.BLOCK;
+        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(0.5F).sound(sound)
+                .isSuffocating(covered).isViewBlocking(covered).isRedstoneConductor((s, level, pos) -> false);
     }
 
     static BlockBehaviour.Properties machineProperties() {

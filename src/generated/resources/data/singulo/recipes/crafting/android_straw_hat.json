@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " H ",
+    "HHH",
+    " S "
+  ],
+  "key": {
+    "H": {
+      "tag": "forge:crops/wheat"
+    },
+    "S": {
+      "tag": "forge:strings"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_straw_hat"
+  }
+}

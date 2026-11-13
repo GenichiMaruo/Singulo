@@ -123,16 +123,16 @@ class ArtifactPromotionTests(unittest.TestCase):
                 (root / 'full/reports/gametest/results.json').write_text(json.dumps(report))
                 gui = root / 'full/gui-review'
                 (gui / 'screenshots').mkdir(parents=True)
-                for index in range(262):
+                for index in range(272):
                     (gui / 'screenshots' / f'{index}.png').touch()
                 (gui / 'logs').mkdir()
                 markers = ['SINGULO_GUI_COMPLETE 22', 'SINGULO_SEARCH_COMPLETE', 'SINGULO_JEI_SYNC_COMPLETE']
                 if defect != 'handbook':
                     markers.append('SINGULO_HANDBOOK_SEARCH_COMPLETE')
                 if defect != 'machine_marker':
-                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 240')
+                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 250')
                 (gui / 'machine-pixels.json').write_text(json.dumps({'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'],
-                    'machine_captures': 240, 'jet_forge_inventory_slots': 700, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5, 'supply_port_inventory_slots': 350, 'supply_port_tooltips': 5}))
+                    'machine_captures': 250, 'jet_forge_inventory_slots': 700, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5, 'supply_port_inventory_slots': 350, 'supply_port_tooltips': 5}))
                 (gui / 'logs/latest.log').write_text('\n'.join(markers))
                 (gui / 'inventory-pixels.json').write_text(json.dumps([
                     {'checked_empty_slot_centers': 35}, {'checked_empty_slot_centers': 35},

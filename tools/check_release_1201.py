@@ -7,7 +7,7 @@ import tomllib
 import zipfile
 from check_gametests import check, inventory, DEFAULT_NAMESPACES
 
-COUNTS = {'forge': 761, 'neoforge': 761}
+COUNTS = {'forge': 788, 'neoforge': 788}
 
 
 def validate(root, loader, name=None, source=None):

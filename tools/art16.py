@@ -507,6 +507,9 @@ def machine_front(iid, stage, on):
         for f in range(frames):
             sheet.paste(draw(iid, stage, on, f == 1), (0, S * f))
         return sheet, frames
+    if iid == 'rgb_dye_station':
+        import decor_content
+        return decor_content.rgb_front(stage), 1
     frames = 8 if on and stage >= 3 or iid == 'creative_energy_source' else 1
     sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
     for f in range(frames):

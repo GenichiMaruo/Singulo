@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    " W ",
+    "WGW"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "G": {
+      "tag": "forge:nuggets/gold"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_witch_hat"
+  }
+}

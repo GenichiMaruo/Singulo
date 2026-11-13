@@ -1401,3 +1401,7 @@ from cosmic_content import CHAPTER as _COSMIC_CHAPTER
 CHAPTERS.append(_COSMIC_CHAPTER)
 from logistics_content import CHAPTERS as _LOGISTICS_CHAPTERS
 CHAPTERS.extend(_LOGISTICS_CHAPTERS)
+from food_content import CHAPTER as _FOOD_CHAPTER
+CHAPTERS.append(_FOOD_CHAPTER)
+from cover_content import CHAPTER as _COVER_CHAPTER
+CHAPTERS.append(_COVER_CHAPTER)

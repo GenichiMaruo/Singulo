@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "WWW",
+    " W "
+  ],
+  "key": {
+    "S": {
+      "tag": "forge:strings"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_apron"
+  }
+}

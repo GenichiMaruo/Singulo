@@ -51,11 +51,16 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     private boolean core;
     private boolean retired;
     private ItemStack reserved=ItemStack.EMPTY;
+    /**
+     * 物の枠。潮汐紡糸機は 0 素材・1 エキゾチック物質・2 種・3 できた物。核パスタ積層蓄電庫は 0 を「充電する物を入れる枠」、
+     * 3 を「充電済みの物が出てくる枠」に使う（{@link io.github.genichimaruo.singulo.energy.ItemCharging}）。
+     */
     private final ItemStackHandler items = new ItemStackHandler(4) {
-        @Override public int getSlotLimit(int slot) { return slot==2?1:64; }
+        @Override public int getSlotLimit(int slot) { return slot==2||kind()==ACCUMULATOR&&slot==0?1:64; }
         @Override protected void onContentsChanged(int slot) { setChanged(); }
         @Override public boolean isItemValid(int slot, ItemStack stack) {
-            return kind()==SPINDLE && acceptsSpindleItem(slot,stack);
+            return kind()==SPINDLE ? acceptsSpindleItem(slot,stack)
+                    : kind()==ACCUMULATOR && slot==0 && io.github.genichimaruo.singulo.energy.ItemCharging.chargeable(stack);
         }
         @Override public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return slot==3 ? stack : super.insertItem(slot,stack,simulate);
@@ -167,7 +172,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         be.formationEffect((ServerLevel)level,formed);
         be.linkPorts(formed);
         if(formed) {
-            if(be.kind()==ACCUMULATOR)be.pushPower();
+            if(be.kind()==ACCUMULATOR){be.pushPower();be.chargeItems();}
             else if(be.kind()==SPINDLE)be.process((ServerLevel)level);
         }
         // 稼働灯と音: 構造が完成していて、中身があるあいだ点く
@@ -313,10 +318,16 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     }
     @Override public IItemHandler ejectItems(BlockPos port){return kind()==SPINDLE&&modeOf(port)!=PORT_INPUT?itemOutput:null;}
     @Override public IFluidHandler ejectFluids(BlockPos port){return kind()==RESERVOIR&&modeOf(port)!=PORT_INPUT?fluidOutput:null;}
-    @Override public void openMenu(ServerPlayer player){net.minecraftforge.network.NetworkHooks.openScreen(player,this,b->{b.writeBlockPos(worldPosition);b.writeBoolean(kind()==SPINDLE);});}
+    /** 充電の枠の物を充電する（出す電力の上限 rate の残りまで。充電に使った分は出した電力に数える）。 */
+    private void chargeItems(){
+        long available=Math.min(stored,Math.max(0,rate()-tickOut));
+        long used=io.github.genichimaruo.singulo.energy.ItemCharging.tick(items,0,3,available);
+        if(used>0){stored-=used;tickOut+=used;setChanged();}
+    }
+    @Override public void openMenu(ServerPlayer player){net.minecraftforge.network.NetworkHooks.openScreen(player,this,b->{b.writeBlockPos(worldPosition);b.writeVarInt(kind());});}
     @Override public Component getDisplayName(){return Component.translatable(getBlockState().getBlock().getDescriptionId());}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player player){
-        return new CosmicMenu(id,inv,worldPosition,items,kind()==SPINDLE,SyncedInts.server(CosmicMenu.COUNT,i->switch(i){
+        return new CosmicMenu(id,inv,worldPosition,items,kind(),SyncedInts.server(CosmicMenu.COUNT,i->switch(i){
             case 0->kind();case 1->status;case 2->(int)(stored/1_000_000);case 3->(int)(capacity()/1_000_000);
             case 4->lastIn;case 5->lastOut;case 6->tank.getFluidAmount();case 7->tankCapacity();case 8->progress;case 9->duration;case 10->core?1:0;
             case 11->tank.isEmpty()?0:BuiltInRegistries.FLUID.getId(tank.getFluid().getFluid())+1;case 12->portModes[0];case 13->portModes[1];default->0;

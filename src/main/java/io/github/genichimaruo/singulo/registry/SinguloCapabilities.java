@@ -85,6 +85,8 @@ public final class SinguloCapabilities {
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DRONE_PORT.get(),
                 (be, side) -> be.sidedItems(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.FOOD_PRINTER.get(), (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.FOOD_PRINTER.get(), (be, side) -> be.automation());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.HORIZON_VAULT.get(),
                 (be, side) -> be.items());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),
@@ -156,6 +158,9 @@ public final class SinguloCapabilities {
                 (be, side) -> net.minecraftforge.items.wrapper.EmptyHandler.INSTANCE);
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_MODULE.get(),
                 (be, side) -> be.energyFor(side));
+        // SMES の充電の枠（ホッパーなどで、入れる枠へ入れ、充電済みの物を取り出す）
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.SMES_CELL.get(), (be, side) -> be.chargeAutomation());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.SMES_MODULE.get(), (be, side) -> be.chargeAutomation());
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> io.github.genichimaruo.singulo.android.AndroidChargerItem.energy(stack),
                 SinguloItems.ANDROID_CHARGER.get());
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> GravityGauntletItem.energy(stack),

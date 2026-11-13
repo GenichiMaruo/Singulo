@@ -16,17 +16,12 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
     private static final int BAR_X = 8, BAR_H = 16;
 
     public SmesScreen(SmesMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, 176, 78);
+        super(menu, inventory, title, SmesMenu.WIDTH, SmesMenu.HEIGHT);
     }
 
-    @Override
-    protected boolean hasInventory() {
-        return false;
-    }
-
-    /** 蓄電バーの上端（バーから下の2行までを上下中央に）。 */
+    /** 蓄電バーの上端。 */
     private int barY() {
-        return centeredY(BAR_H + 2 + 18 + 8) + 1;
+        return 22;
     }
 
     private List<Component> hint() {
@@ -38,7 +33,8 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
-        if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
+        renderTooltip(g, mouseX, mouseY);
+        if (hoveredSlot != null && hoveredSlot.hasItem() || renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + BAR_X, topPos + barY(), imageWidth - 16, BAR_H)) {
@@ -78,5 +74,23 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
         out.add(Component.translatable("gui.singulo.smes.out", EnergyText.of(menu.value(SmesMenu.D_OUT))));
         out.addAll(hint());
         stat(g, imageWidth / 2, y, Panel.Icon.OUT, 0xFFC08020, EnergyText.of(menu.value(SmesMenu.D_OUT)) + " FE/t", skin.text(), out);
+        // 充電の枠: 入れる枠 → 矢印（入れた物の充電の進み）→ 充電済みの物が出てくる枠
+        var in = menu.getSlot(0);
+        var outSlot = menu.getSlot(1);
+        ghostSlot(g, leftPos + in.x, topPos + in.y, in, new net.minecraft.world.item.ItemStack(
+                io.github.genichimaruo.singulo.registry.SinguloItems.NEUTRINO_SCANNER.get()));
+        Panel.slot(g, skin, leftPos + outSlot.x, topPos + outSlot.y);
+        float k = io.github.genichimaruo.singulo.energy.ItemCharging.fraction(in.getItem());
+        int arrowX = Panel.arrowBetween(in.x, outSlot.x);
+        Panel.arrow(g, skin, leftPos + arrowX, topPos + in.y, k);
+        if (!in.hasItem()) {
+            area(in.x, in.y, 16, 16, List.of(Component.translatable("gui.singulo.charge.in")));
+        } else {
+            area(arrowX, in.y, 22, 16,
+                    List.of(Component.translatable("gui.singulo.charge.progress", Math.round(100 * k))));
+        }
+        if (!outSlot.hasItem()) {
+            area(outSlot.x, outSlot.y, 16, 16, List.of(Component.translatable("gui.singulo.charge.out")));
+        }
     }
 }

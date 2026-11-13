@@ -178,6 +178,11 @@ final class Panel {
         }
     }
 
+    /** 横に並んだ2つの枠（左上 inX と outX、同じ高さ）のあいだの真ん中に矢印（幅22）を置くときの左端。上端は枠と同じ y にする。 */
+    static int arrowBetween(int inX, int outX) {
+        return (inX + 17 + outX - 1 - 22) / 2;
+    }
+
     private static void arrowShape(GuiGraphics g, int x, int y, int color, int limit) {
         g.fill(x, y + 6, x + Math.min(limit, 16), y + 10, color);
         for (int i = 0; i < 8 && 14 + i < limit; i++) {

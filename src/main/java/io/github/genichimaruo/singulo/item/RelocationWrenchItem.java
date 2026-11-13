@@ -85,6 +85,7 @@ public final class RelocationWrenchItem extends SinguloItem {
         var pos = context.getClickedPos();
         if (player != null && mode(wrench) == MODE_CABLE) return removeCables(wrench, context);
         if (player == null || !player.isSecondaryUseActive()) return InteractionResult.PASS;
+        if (isConduit(level.getBlockState(pos).getBlock())) return removeCover(wrench, context);
         var be = level.getBlockEntity(pos);
         if (!(be instanceof MachineBlockEntity) && (be == null || !DEVICES.contains(be.getClass()))) return InteractionResult.PASS;
         var state = level.getBlockState(pos);
@@ -155,7 +156,15 @@ public final class RelocationWrenchItem extends SinguloItem {
             if (!level.isLoaded(pos) || !level.getBlockState(pos).is(cable)
                     || !level.mayInteract(player, pos) || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)
                     || !(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
-                    || net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.level.BlockEvent.BreakEvent(level, pos, level.getBlockState(pos), serverPlayer))) continue;
+                    || net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,
+                            serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos) == -1) continue;
+            // 枠だけのカバーは、ケーブルだけを外して枠を置いたまま残す（枠を置いてからケーブルを入れたのと逆）
+            if (io.github.genichimaruo.singulo.cable.ConduitCover.leaveFrame(level, pos)) {
+                removed++;
+                continue;
+            }
+            // ブロック入りのカバー（枠とはめ込んだブロック）は、ケーブルと一緒に持ち物へ（創造モードでも返す。ケーブルと違って作った物なので）
+            io.github.genichimaruo.singulo.cable.ConduitCover.strip(level, pos).forEach(s -> give(player, s));
             if (level.removeBlock(pos, false)) removed++;
         }
         if (removed == 0) return InteractionResult.FAIL;
@@ -173,6 +182,30 @@ public final class RelocationWrenchItem extends SinguloItem {
             player.displayClientMessage(Component.translatable("item.singulo.relocation_wrench.cables_removed", removed), true);
         }
         return InteractionResult.CONSUME;
+    }
+
+    /**
+     * 移設モードで、ケーブル・パイプをスニークして右クリック: カバーを1つ外す（はめ込んだブロック → 枠の順）。外した物は持ち物へ
+     * （いっぱいなら足元へ）。カバーがなければ何もしない。
+     */
+    private static InteractionResult removeCover(ItemStack wrench, UseOnContext context) {
+        var player = context.getPlayer();
+        var level = context.getLevel();
+        var pos = context.getClickedPos();
+        if (io.github.genichimaruo.singulo.cable.ConduitCover.of(level.getBlockState(pos))
+                == io.github.genichimaruo.singulo.cable.ConduitCover.State.NONE) return InteractionResult.PASS;
+        if (!player.mayBuild() || !level.mayInteract(player, pos)
+                || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)) return InteractionResult.FAIL;
+        if (level.isClientSide) return InteractionResult.SUCCESS;
+        ItemStack back = io.github.genichimaruo.singulo.cable.ConduitCover.takeOne(level, pos);
+        if (back.isEmpty()) return InteractionResult.FAIL;
+        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.CHAIN_BREAK, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.1F);
+        give(player, back);
+        return InteractionResult.CONSUME;
+    }
+
+    private static void give(net.minecraft.world.entity.player.Player player, ItemStack stack) {
+        if (!player.getInventory().add(stack) && !stack.isEmpty()) player.drop(stack, false);
     }
 
     /** 撤去モードで外せるブロック: 電線と液体パイプ（どちらも中身を溜めないので、壊しても何も失わない）。 */

@@ -43,10 +43,16 @@ final class AdjacentItemStores {
         }
         return cached.view;
     }
+
+    /**
+     * pos の入れ物を、アンドロイドの素材置き場として見たもの（AndroidStorageView なら専用の見え方）。
+     * どちらも、取り出せない欄は空に見せる（{@link ExtractableItems}）。
+     */
     static IItemHandler androidView(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, Direction side, IItemHandler handler) {
-        if (handler != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof AndroidStorageView view)
-            return view.androidItems(side);
-        return handler;
+        if (handler != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof AndroidStorageView view) {
+            return ExtractableItems.of(view.androidItems(side));
+        }
+        return ExtractableItems.of(handler);
     }
 
 }

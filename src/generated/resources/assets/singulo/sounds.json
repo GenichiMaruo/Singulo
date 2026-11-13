@@ -358,6 +358,15 @@
       }
     ]
   },
+  "food_printer_running": {
+    "subtitle": "subtitles.singulo.food_printer_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/food_printer_running",
+        "attenuation_distance": 12
+      }
+    ]
+  },
   "containment_tank_running": {
     "subtitle": "subtitles.singulo.containment_tank_running",
     "sounds": [

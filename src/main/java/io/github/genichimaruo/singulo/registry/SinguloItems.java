@@ -65,6 +65,11 @@ public final class SinguloItems {
             "decoded_record", () -> new io.github.genichimaruo.singulo.item.DecodedRecordItem(new Item.Properties(), 1));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.FluidCanisterItem> FLUID_CANISTER = ITEMS.register(
             "fluid_canister", () -> new io.github.genichimaruo.singulo.item.FluidCanisterItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.food.FoodCartridgeItem> FOOD_CARTRIDGE = ITEMS.register(
+            "food_cartridge", () -> new io.github.genichimaruo.singulo.food.FoodCartridgeItem(new Item.Properties(), 1));
+    /** カバーの枠（ケーブル・パイプに取り付けて、ブロックをはめ込む）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.cable.CoverFrameItem> COVER_FRAME = ITEMS.register(
+            "cover_frame", () -> new io.github.genichimaruo.singulo.cable.CoverFrameItem(SinguloBlocks.COVER_FRAME.get(), new Item.Properties(), 1));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
             "magnetic_bottle", () -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(
@@ -111,7 +116,7 @@ public final class SinguloItems {
             "survey_glasses", () -> new io.github.genichimaruo.singulo.android.work.SurveyGlassesItem(new Item.Properties()));
     public static final RegistryObject<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
             "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
-    /** アンドロイドの装飾（頭・背中/腰・手）。 */
+    /** アンドロイドの装飾（頭・顔・首/背中・腰・手）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_RIBBON = ITEMS.register(
             "android_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ribbon", 0xE0607E));
@@ -126,7 +131,7 @@ public final class SinguloItems {
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "headdress", 0xF5F5F5));
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_GLASSES = ITEMS.register(
             "android_glasses", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
-                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "glasses", 0x3A3F4A));
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "glasses", 0x3A3F4A));
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAPE = ITEMS.register(
             "android_cape", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "cape", 0x8E2F3F));
@@ -135,7 +140,7 @@ public final class SinguloItems {
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "scarf", 0xC84E4E));
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WAIST_RIBBON = ITEMS.register(
             "android_waist_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
-                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "waist_ribbon", 0x5A8ED6));
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "waist_ribbon", 0x5A8ED6));
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BOOK = ITEMS.register(
             "android_book", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "book", 0x6B4A3A));
@@ -148,9 +153,56 @@ public final class SinguloItems {
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_UMBRELLA = ITEMS.register(
             "android_umbrella", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "umbrella", 0x4A78C8));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAT_EARS = ITEMS.register(
+            "android_cat_ears", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "cat_ears", 0x3A3440));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WITCH_HAT = ITEMS.register(
+            "android_witch_hat", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "witch_hat", 0x3C2E5E));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_STRAW_HAT = ITEMS.register(
+            "android_straw_hat", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "straw_hat", 0xD8454A));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_PONYTAIL = ITEMS.register(
+            "android_ponytail", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ponytail", 0xE0607E));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_TWIN_TAILS = ITEMS.register(
+            "android_twin_tails", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "twin_tails", 0x5A8ED6));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_MONOCLE = ITEMS.register(
+            "android_monocle", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "monocle", 0xE0B850));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_FAIRY_WINGS = ITEMS.register(
+            "android_fairy_wings", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "fairy_wings", 0xA8E8F0));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_APRON = ITEMS.register(
+            "android_apron", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "apron", 0xF5F5F5));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_LANTERN = ITEMS.register(
+            "android_lantern", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "lantern", 0x3A3A40));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BROOM = ITEMS.register(
+            "android_broom", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "broom", 0x8E2F3F));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_NECKTIE = ITEMS.register(
+            "android_necktie", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "necktie", 0x2E3E8C));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_NECKLACE = ITEMS.register(
+            "android_diamond_necklace", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "diamond_necklace", 0xE0B850));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_EARRINGS = ITEMS.register(
+            "android_diamond_earrings", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "diamond_earrings", 0xE0B850));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_TIARA = ITEMS.register(
+            "android_diamond_tiara", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "diamond_tiara", 0xE0B850));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_BROOCH = ITEMS.register(
+            "android_diamond_brooch", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "diamond_brooch", 0xE0B850));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
-            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
+            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA,
+            ANDROID_CAT_EARS, ANDROID_WITCH_HAT, ANDROID_STRAW_HAT, ANDROID_PONYTAIL, ANDROID_TWIN_TAILS, ANDROID_MONOCLE, ANDROID_FAIRY_WINGS, ANDROID_APRON, ANDROID_LANTERN, ANDROID_BROOM,
+            ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
@@ -292,6 +344,7 @@ public final class SinguloItems {
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
         block(SinguloBlocks.FLUID_PIPE, 1);
+        TAB_ORDER.add(COVER_FRAME);
         block(SinguloBlocks.MULTIBLOCK_PORT, 2);
         block(SinguloBlocks.COOLING_TOWER_BASE, 2);
         block(SinguloBlocks.COOLING_TOWER_CASING, 2);
@@ -357,6 +410,9 @@ public final class SinguloItems {
         block(SinguloBlocks.ANDROID_WORK_CONSOLE, 2);
         block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
         block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
+        block(SinguloBlocks.RGB_DYE_STATION, 1);
+        block(SinguloBlocks.FOOD_PRINTER, 1);
+        TAB_ORDER.add(FOOD_CARTRIDGE);
         block(SinguloBlocks.ANDROID_RECIPE_RACK, 2);
         block(SinguloBlocks.ANDROID_WORKBENCH, 2);
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
@@ -539,6 +595,10 @@ public final class SinguloItems {
             props.rarity(Rarity.EPIC);
         } else if (def.stage() >= 4) {
             props.rarity(Rarity.RARE);
+        }
+        io.github.genichimaruo.singulo.food.PrintedFood printed = io.github.genichimaruo.singulo.food.PrintedFood.byId(def.id());
+        if (printed != null) {
+            return new io.github.genichimaruo.singulo.food.PrintedFoodItem(props, def.stage(), printed);    // 印刷した宇宙食
         }
         if (io.github.genichimaruo.singulo.item.DrinkItem.DRINKS.containsKey(def.id())) {
             return new io.github.genichimaruo.singulo.item.DrinkItem(props, def.stage(), def.id());   // 自販機の缶・コーヒー
