@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.mixin;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
@@ -55,8 +56,9 @@ public abstract class RayleighLightTextureMixin {
             } finally { singulo$noonPass = false; }
         }
     }
-    @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getSkyDarken(F)F"))
-    private float singulo$daylight(ClientLevel level, float tick) { return singulo$noonPass ? 1 : level.getSkyDarken(tick); }
+    @ModifyExpressionValue(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getSkyDarken(F)F"))
+    // Preserve other mods' sky-darkening operations in the ordinary pass.
+    private float singulo$daylight(float original) { return singulo$noonPass ? 1 : original; }
     @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getSkyFlashTime()I"))
     private int singulo$lightning(ClientLevel level) { return singulo$noonPass ? 0 : level.getSkyFlashTime(); }
     @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;forceBrightLightmap()Z"))
