@@ -950,6 +950,7 @@
   "gui.singulo.android.follow.escort": "따라가며 호위",
   "gui.singulo.android.follow.hint": "클릭하면 \"따라가기만\"(싸우지 않음)과 \"따라가며 호위\"(근처의 적과 싸움)를 바꿉니다. 스테이션의 설정도 함께 바뀝니다.",
   "gui.singulo.android.follow.only": "따라가기만",
+  "gui.singulo.android.hair_color": "머리색 %s",
   "gui.singulo.android.hp": "체력 %s / %s",
   "gui.singulo.android.log.alarm": "%1$s 등 %2$s마리의 무리를 발견하고 경보를 울림",
   "gui.singulo.android.log.boss": "%s을(를) 발견하고 경보를 울림",

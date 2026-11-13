@@ -963,6 +963,7 @@ UI_LANG = {
     'gui.singulo.android.decor.3.hint': ('メガネ・モノクル・イヤリング', 'Glasses, monocle or earrings'),
     'gui.singulo.android.decor.4.hint': ('腰リボン・エプロン・ブローチ', 'Waist ribbon, apron or brooch'),
     'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
+    'gui.singulo.android.hair_color': ('髪の色 %s', 'Hair color %s'),
     'gui.singulo.android.decor.speech': ('似合う？', 'Does it suit me?'),
     'tooltip.singulo.android_accessory.0': ('アンドロイドの頭に着ける（装飾のページ）', 'Worn on an android\'s head (decoration page)'),
     'tooltip.singulo.android_accessory.1': ('アンドロイドの首・背中に着ける（装飾のページ）', 'Worn on an android\'s neck or back (decoration page)'),

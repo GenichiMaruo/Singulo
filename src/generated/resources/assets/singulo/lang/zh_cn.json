@@ -950,6 +950,7 @@
   "gui.singulo.android.follow.escort": "跟随·护卫",
   "gui.singulo.android.follow.hint": "点击在“只跟随”（不战斗）和“跟随·护卫”（与附近的敌人战斗）之间切换。组装站的设置也会一起改变。",
   "gui.singulo.android.follow.only": "只跟随",
+  "gui.singulo.android.hair_color": "发色 %s",
   "gui.singulo.android.hp": "生命 %s / %s",
   "gui.singulo.android.log.alarm": "发现了 %1$s 等 %2$s 个敌人的群体，发出了警报",
   "gui.singulo.android.log.boss": "发现了 %s，发出了警报",

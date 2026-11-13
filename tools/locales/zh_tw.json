@@ -14506,5 +14506,9 @@
   "gui.singulo.rgb_dye_station.hex": {
     "source": "Color code (#RRGGBB)",
     "translation": "顏色代碼（#RRGGBB）"
+  },
+  "gui.singulo.android.hair_color": {
+    "source": "Hair color %s",
+    "translation": "髮色 %s"
   }
 }

@@ -950,6 +950,7 @@
   "gui.singulo.android.follow.escort": "追従・護衛",
   "gui.singulo.android.follow.hint": "クリックで「追従のみ」（戦わない）と「追従・護衛」（そばの敵と戦う）を切り替える。ステーションの設定も変わる。",
   "gui.singulo.android.follow.only": "追従のみ",
+  "gui.singulo.android.hair_color": "髪の色 %s",
   "gui.singulo.android.hp": "体力 %s / %s",
   "gui.singulo.android.log.alarm": "%sなど%s体の群れを見つけて、警報を出した",
   "gui.singulo.android.log.boss": "%sを見つけて、警報を出した",

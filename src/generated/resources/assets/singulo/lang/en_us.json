@@ -950,6 +950,7 @@
   "gui.singulo.android.follow.escort": "Follow & escort",
   "gui.singulo.android.follow.hint": "Click to switch between \"Follow only\" (never fights) and \"Follow & escort\" (fights nearby enemies). Also changes the station setting.",
   "gui.singulo.android.follow.only": "Follow only",
+  "gui.singulo.android.hair_color": "Hair color %s",
   "gui.singulo.android.hp": "HP %s / %s",
   "gui.singulo.android.log.alarm": "Spotted a group of %2$s (%1$s and others) and raised the alarm",
   "gui.singulo.android.log.boss": "Spotted %s and raised the alarm",

@@ -328,6 +328,16 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
             return;
         }
+        // 隠し機能: Shift を押しながら姿の絵に重ねると、髪のメインの色（付け毛と同じ。染色台で色を合わせるのに使う）
+        RuinAndroid shown = menu.android();
+        if (shown != null && hasShiftDown()
+                && Panel.inside(mouseX, mouseY, leftPos + PORTRAIT_X, topPos + PORTRAIT_Y, PORTRAIT_W, PORTRAIT_H)) {
+            int hair = AndroidRenderer.Accessories.hairColor(shown.kind());
+            g.renderTooltip(font, Component.literal("\u25A0 ").withStyle(st -> st.withColor(hair))
+                    .append(Component.translatable("gui.singulo.android.hair_color", String.format("#%06X", hair))
+                            .withStyle(st -> st.withColor(0xFFFFFFFF))), mouseX, mouseY);
+            return;
+        }
         if (gearPage()) {
             renderTankTooltips(g, mouseX, mouseY);
         }
