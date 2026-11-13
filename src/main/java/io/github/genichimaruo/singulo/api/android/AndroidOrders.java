@@ -24,6 +24,21 @@ public final class AndroidOrders {
     public record Receipt(UUID requestId, State state, int orderId, long requested, long delivered, @Nullable String reason) {
         public boolean terminal() { return state == State.COMPLETED || state == State.CANCELLED || state == State.FAILED; }
     }
+    public enum SnapshotState { AVAILABLE, REJECTED, UNAVAILABLE }
+    /** Point-in-time external API receipts only; historyCount counts terminal receipts, not UI orders.
+     * Remaining capacity is global ledger space, not a reservation or promise that submit will succeed.
+     */
+    public record ConsoleSnapshot(SnapshotState state, List<Receipt> receipts, int activeCount,
+                                  int historyCount, int receiptCapacity, int remainingReceiptCapacity,
+                                  long maxRequestCount) {
+        public ConsoleSnapshot { Objects.requireNonNull(state); receipts = List.copyOf(receipts); }
+    }
+    public static ConsoleSnapshot snapshot(ServerLevel level, BlockPos pos, UUID actor) {
+        Objects.requireNonNull(actor);
+        var c = console(level, pos);
+        return c == null ? new ConsoleSnapshot(SnapshotState.UNAVAILABLE, List.of(), 0, 0,
+                MAX_RECEIPTS, 0, WorkConsoleBlockEntity.MAX_COUNT) : c.externalOrderSnapshot(actor);
+    }
     public static Receipt result(UUID id, State state, String reason) {
         return new Receipt(Objects.requireNonNull(id), state, -1, 0, 0, reason);
     }

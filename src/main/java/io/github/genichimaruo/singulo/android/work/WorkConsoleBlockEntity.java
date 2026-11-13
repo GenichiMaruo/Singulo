@@ -449,6 +449,29 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         setChanged();
         return entry.receipt();
     }
+    /** Read-only view; missing active orders are reported failed without changing persisted state. */
+    public AndroidOrders.ConsoleSnapshot externalOrderSnapshot(UUID actor) {
+        if (!externalAllowed(actor)) return new AndroidOrders.ConsoleSnapshot(AndroidOrders.SnapshotState.REJECTED,
+                List.of(), 0, 0, AndroidOrders.MAX_RECEIPTS, 0, MAX_COUNT);
+        List<AndroidOrders.Receipt> receipts = new ArrayList<>();
+        int activeCount = 0, historyCount = 0;
+        for (var entry : externalOrders.values()) {
+            if (!entry.actor.equals(actor)) continue;
+            var receipt = entry.receipt();
+            if (entry.state == AndroidOrders.State.RUNNING) {
+                var active = order(entry.order);
+                receipt = new AndroidOrders.Receipt(entry.request,
+                        active == null ? AndroidOrders.State.FAILED : AndroidOrders.State.RUNNING,
+                        entry.order, entry.count, active == null ? entry.delivered : active.delivered,
+                        active == null ? "order_missing_not_completed" : entry.reason);
+            }
+            receipts.add(receipt);
+            if (receipt.state() == AndroidOrders.State.RUNNING) activeCount++;
+            else if (receipt.terminal()) historyCount++;
+        }
+        return new AndroidOrders.ConsoleSnapshot(AndroidOrders.SnapshotState.AVAILABLE, receipts, activeCount,
+                historyCount, AndroidOrders.MAX_RECEIPTS, AndroidOrders.MAX_RECEIPTS - externalOrders.size(), MAX_COUNT);
+    }
     private boolean externalAllowed(UUID actor) {
         if (!(level instanceof ServerLevel server) || !server.getServer().isSameThread() || isRemoved()) return false;
         return owner != null && owner.equals(actor) && mayOperate(actorFor(level, actor));

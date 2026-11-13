@@ -58,3 +58,29 @@ receipt の delivered だけから材料全量が返却されたと判断しな�
 `gradlew runGameTestServer -PtestClasses=AndroidOrderApiGameTests -PtestNamespace=singulo`
 で所有権、数量・納品先、再送/衝突、取消、保存復元、消失判定、履歴上限、スレッド制限、
 実際のアンドロイド製作・納品完了を検証します。配布 JAR に GameTest クラスは含めません。
+
+## Read-only console snapshot
+
+`snapshot(ServerLevel, BlockPos, UUID actor)` returns `ConsoleSnapshot` with
+`SnapshotState.AVAILABLE`, `REJECTED` (not the current console owner), or `UNAVAILABLE`.
+The immutable, detached `receipts` list contains only that actor's external API receipts.
+`activeCount` counts RUNNING receipts; `historyCount` counts terminal receipts.
+Neither count includes built-in UI orders or another owner's receipts.
+`receiptCapacity` is 256; `remainingReceiptCapacity` reflects the **whole** ledger,
+including retained previous-owner receipts; `maxRequestCount` is 4096.
+Denied/unavailable snapshots have no receipts and zero counts/remaining capacity.
+The static capacity/count limits remain visible. No inventory, worker or mutable order references escape.
+
+This is a point-in-time display/reconciliation aid, **not a reservation or acceptance guarantee**.
+Available space does not imply recipes, workers, materials or a delivery port are available.
+Missing active orders appear as FAILED in the view without mutating persisted ledger state.
+Normal status/cancel reconciliation and acknowledgement remain explicit operations.
+Snapshot does not load chunks, and must run on the server thread like the other API methods.
+
+Validation: the base `7aad405e` inventory already contained 739 required tests
+(740 including the optional Mekanism namespace), while the release guard still said 732.
+The 12 Android API tests bring the default suite to 751. All 751 were executed and
+passed before updating the release guard to 751; no test was excluded or retried.
+Commands: `gradlew --no-daemon build`, focused `runGameTestServer
+-PtestClasses=AndroidOrderApiGameTests -PtestNamespace=singulo`, and full
+`gradlew --no-daemon runGameTestServer -PtestTickRate=200`.

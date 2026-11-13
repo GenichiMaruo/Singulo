@@ -141,6 +141,63 @@ public final class AndroidOrderApiGameTests {
         }).join();
         h.assertTrue(rejected,"Off-thread API call accepted"); h.succeed();
     }
+    @GameTest(template="empty")
+    public static void snapshotIsOwnerOnlyAndDetached(GameTestHelper h) {
+        var c=setup(h,false); var id=UUID.randomUUID(); submit(h,id,8);
+        var snap=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
+        h.assertTrue(snap.state()==AndroidOrders.SnapshotState.AVAILABLE && snap.activeCount()==1 && snap.historyCount()==0,"Wrong active snapshot");
+        h.assertTrue(snap.receiptCapacity()==256 && snap.remainingReceiptCapacity()==255 && snap.maxRequestCount()==4096,"Wrong limits");
+        boolean immutable=false; try { snap.receipts().clear(); } catch(UnsupportedOperationException expected) { immutable=true; }
+        h.assertTrue(immutable,"Mutable receipt list");
+        AndroidOrders.cancel(h.getLevel(),c.getBlockPos(),c.owner(),id);
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var after=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
+        h.assertTrue(after.activeCount()==0 && after.historyCount()==1 && after.receipts().getFirst().state()==State.CANCELLED,"History lost on reload");
+        h.assertTrue(snap.receipts().getFirst().state()==State.RUNNING,"Snapshot changed after cancellation");
+        var denied=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),UUID.randomUUID());
+        h.assertTrue(denied.state()==AndroidOrders.SnapshotState.REJECTED && denied.receipts().isEmpty()
+                && denied.activeCount()==0 && denied.historyCount()==0 && denied.remainingReceiptCapacity()==0,"Non-owner information leak");
+        var source=new java.util.ArrayList<>(after.receipts());
+        var copy=new AndroidOrders.ConsoleSnapshot(after.state(),source,0,1,256,255,4096); source.clear();
+        h.assertTrue(copy.receipts().size()==1,"Constructor retained mutable list"); h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void snapshotCapacityIncludesOtherOwnersWithoutExposingReceipts(GameTestHelper h) {
+        var c=setup(h,false); var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); var list=new ListTag();
+        for(int i=0;i<AndroidOrders.MAX_RECEIPTS;i++) {
+            var e=new ExternalOrderLedger(UUID.randomUUID(),i==0?c.owner():UUID.randomUUID(),i+1,new ItemStack(Items.STICK),8,List.of(),null);
+            e.state=State.CANCELLED; list.add(e.save(h.getLevel().registryAccess()));
+        }
+        tag.put("external_orders_v1",list); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var snap=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
+        h.assertTrue(snap.receipts().size()==1 && snap.historyCount()==1 && snap.remainingReceiptCapacity()==0,"Foreign receipt leak or false capacity");
+        AndroidOrders.acknowledge(h.getLevel(),c.getBlockPos(),c.owner(),snap.receipts().getFirst().requestId());
+        h.assertTrue(AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner()).remainingReceiptCapacity()==1,"Capacity not freed"); h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void snapshotMissingOrderIsReadOnlyFailure(GameTestHelper h) {
+        var c=setup(h,false); var id=UUID.randomUUID(); submit(h,id,8);
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); tag.put("orders",new ListTag()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var before=c.saveWithoutMetadata(h.getLevel().registryAccess());
+        var snap=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
+        h.assertTrue(snap.activeCount()==0 && snap.historyCount()==1 && snap.receipts().getFirst().state()==State.FAILED,"Missing order is not failure");
+        h.assertTrue(before.equals(c.saveWithoutMetadata(h.getLevel().registryAccess())),"Snapshot mutated persistent state"); h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void snapshotUnavailableAndThreadConstraints(GameTestHelper h) {
+        var c=setup(h,false); var owner=c.owner(); var pos=c.getBlockPos();
+        var missing=AndroidOrders.snapshot(h.getLevel(),pos.above(),owner);
+        h.assertTrue(missing.state()==AndroidOrders.SnapshotState.UNAVAILABLE && missing.receipts().isEmpty() && missing.remainingReceiptCapacity()==0,"Missing console not unavailable");
+        var far=new BlockPos(28000000,64,28000000);
+        h.assertTrue(!h.getLevel().hasChunk(far.getX()>>4,far.getZ()>>4),"Fixture chunk already loaded");
+        h.assertTrue(AndroidOrders.snapshot(h.getLevel(),far,owner).state()==AndroidOrders.SnapshotState.UNAVAILABLE,"Unloaded console not unavailable");
+        h.assertTrue(!h.getLevel().hasChunk(far.getX()>>4,far.getZ()>>4),"Snapshot loaded chunk");
+        boolean rejected=java.util.concurrent.CompletableFuture.supplyAsync(()->{
+            try { AndroidOrders.snapshot(h.getLevel(),pos,owner); return false; }
+            catch(IllegalStateException expected) { return true; }
+        }).join();
+        h.assertTrue(rejected,"Off-thread snapshot accepted"); h.succeed();
+    }
     @GameTest(template="empty",timeoutTicks=2400)
     public static void actualCraftAndDeliveryProducesPersistentCompletion(GameTestHelper h) {
         var c=setup(h,true); var id=UUID.randomUUID();
