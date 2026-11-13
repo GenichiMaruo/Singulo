@@ -85,27 +85,32 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
 
     /**
      * 光の四角形を、カメラからの距離で炉心のレンズの前後に振り分ける。レンズは、画面で球に重なる所のうち、球の手前の面
-     * （炉心までの距離 − 球の半径）より奥にあるものを歪める。光は深度を書かないので、そのままだと光の下の景色の深度で歪むかが
+     * （カメラ方向の炉心の深度 − 地平線の半径）より奥にあるものを歪める。光は深度を書かないので、そのままだと光の下の景色の深度で歪むかが
      * 決まり、リングのブロックとリングの光が別々の所に見える。四角形の最初の頂点がその面より奥ならレンズの前（歪む）、
-     * 手前ならレンズのあと（歪まない）に描き、ブロックと同じに合わせる。頂点はカメラからの位置で届く（ブロックエンティティの姿勢）。
+     * 手前ならレンズのあと（歪まない）に描き、ブロックと同じに合わせる。頂点はカメラ相対のワールド座標で届く（ブロックエンティティの姿勢）。カメラの前方向との内積で、シェーダーと同じ視点深度にする。
      */
     private static final class DepthSplit implements VertexConsumer {
         private final VertexConsumer far;
         private final VertexConsumer near;
         private final float front;
+        private final org.joml.Vector3f forward;
         private VertexConsumer current;
         private int vertex;
 
-        DepthSplit(VertexConsumer far, VertexConsumer near, float front) {
+        DepthSplit(VertexConsumer far, VertexConsumer near, Vec3 relativeCore, org.joml.Quaternionf cameraRotation) {
             this.far = far;
             this.near = near;
-            this.front = Math.max(0, front);
+            // GravitationalLensing uses inverse camera rotation, then projection.w (= -view.z).
+            // Sphere.y is the horizon radius, not the screen-space influence region (LENS_REGION).
+            this.forward = new org.joml.Vector3f(0, 0, -1).rotate(cameraRotation);
+            this.front = forward.dot((float) relativeCore.x, (float) relativeCore.y, (float) relativeCore.z)
+                    - SHADOW / GravitationalLensing.SHADOW_PER_HORIZON;
         }
 
         @Override
         public VertexConsumer addVertex(float x, float y, float z) {
             if (vertex++ % 4 == 0) {
-                current = x * x + y * y + z * z > front * front ? far : near;
+                current = forward.dot(x, y, z) > front ? far : near;
             }
             current.addVertex(x, y, z);
             return this;
@@ -190,7 +195,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         VertexConsumer nearBeam = beamType == null ? null : new Lazy(nearJets, beamType);
         Sides sides = cam.subtract(core).dot(axis) >= 0 ? new Sides(nearGlow, nearBeam, glow, beam) : new Sides(glow, beam, nearGlow, nearBeam);
         // リング・コイル・杯などの光は、まわりのブロックと同じ所で歪むよう、カメラからの距離で四角形ごとに分ける
-        VertexConsumer placed = new DepthSplit(glow, nearGlow, (float) cam.distanceTo(core) - LENS_REGION);
+        VertexConsumer placed = new DepthSplit(glow, nearGlow, core.subtract(cam), mc.gameRenderer.getMainCamera().rotation());
         boolean fancy = mc.options.graphicsMode().get() != net.minecraft.client.GraphicsStatus.FAST;
 
         if (be.shownCore()) {
