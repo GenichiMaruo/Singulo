@@ -20,12 +20,18 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 public final class LiquidStores {
     private final List<IFluidHandler> fluids = new ArrayList<>();
     private final List<Chemicals.Store> chemicals = new ArrayList<>();
+    /**
+     * 素材置き場として数えるか（{@link #at}）。そのときは、抜ける量だけを数える（装置の入れるだけのタンクのように、中身は見えても
+     * 抜けない物を在庫にしない）。装置の面（{@link #machine}）は、まだ残っている素材も数えたいので、見えている量のまま。
+     */
+    private boolean storage;
 
     private LiquidStores() {}
 
     /** point の隣の入れ物（seen にある場所は除き、見つけた場所を足す）。 */
     public static LiquidStores at(Level level, BlockPos point, Set<BlockPos> seen) {
         LiquidStores out = new LiquidStores();
+        out.storage = true;
         Set<BlockPos> chemSeen = new HashSet<>(seen);
         SupplyPortBlockEntity.collectFluids(level, point, seen, out.fluids);
         if (Chemicals.present()) {
@@ -47,7 +53,7 @@ public final class LiquidStores {
     /**
      * 素材置き場の化学物質の入れ物（Mekanism のケミカルタンクなど）を、面を問わず1つの入れ物として扱う。Mekanism の装置は面ごとに
      * 入れる・出すの設定があるので（ケミカルタンクの既定は、前だけが出口）、数えるのは最初に見つかった面で（同じ中身を何度も数えない）、
-     * 出し入れはできる面を順に試す。
+     * 出し入れはできる面を順に試す。数えるのは、どこかの面から取り出せる量だけ（入れるだけの欄の中身を在庫にしない）。
      */
     @javax.annotation.Nullable
     private static Chemicals.Store anySide(Level level, BlockPos p) {
@@ -64,7 +70,8 @@ public final class LiquidStores {
         return new Chemicals.Store() {
             @Override
             public long amount(String id) {
-                return sides.get(0).amount(id);
+                long seen = sides.get(0).amount(id);
+                return seen <= 0 ? 0 : extract(id, seen, true);
             }
 
             @Override
@@ -101,7 +108,14 @@ public final class LiquidStores {
 
             @Override
             public Map<String, Long> contents() {
-                return sides.get(0).contents();
+                Map<String, Long> out = new java.util.LinkedHashMap<>();
+                for (Map.Entry<String, Long> e : sides.get(0).contents().entrySet()) {
+                    long n = extract(e.getKey(), e.getValue(), true);
+                    if (n > 0) {
+                        out.put(e.getKey(), n);
+                    }
+                }
+                return out;
             }
         };
     }
@@ -123,13 +137,35 @@ public final class LiquidStores {
         FluidStack like = FluidSamples.fluid(sample);
         long n = 0;
         for (IFluidHandler h : fluids) {
-            for (int t = 0; t < h.getTanks(); t++) {
-                if (FluidStack.isSameFluidSameComponents(h.getFluidInTank(t), like)) {
-                    n += h.getFluidInTank(t).getAmount();
+            for (FluidStack f : contents(h)) {
+                if (FluidStack.isSameFluidSameComponents(f, like)) {
+                    n += f.getAmount();
                 }
             }
         }
         return n;
+    }
+
+    /** 入れ物の中身（流体の種類ごと）。素材置き場なら、抜ける量だけ。 */
+    private List<FluidStack> contents(IFluidHandler h) {
+        List<FluidStack> out = new ArrayList<>();
+        for (int t = 0; t < h.getTanks(); t++) {
+            FluidStack f = h.getFluidInTank(t);
+            if (f.isEmpty()) {
+                continue;
+            }
+            FluidStack same = out.stream().filter(o -> FluidStack.isSameFluidSameComponents(o, f)).findFirst().orElse(null);
+            if (same == null) {
+                out.add(f.copy());
+            } else {
+                same.grow(f.getAmount());
+            }
+        }
+        if (storage) {
+            out.replaceAll(f -> f.copyWithAmount(h.drain(f.copy(), IFluidHandler.FluidAction.SIMULATE).getAmount()));
+            out.removeIf(FluidStack::isEmpty);
+        }
+        return out;
     }
 
     /** 抜く（最大 amount）。抜けた量。 */
@@ -183,11 +219,8 @@ public final class LiquidStores {
     /** 中身をすべて、数え方の目印（量 1 の見本）と量で足す。 */
     public void addTo(List<ItemCount> out) {
         for (IFluidHandler h : fluids) {
-            for (int t = 0; t < h.getTanks(); t++) {
-                FluidStack f = h.getFluidInTank(t);
-                if (!f.isEmpty()) {
-                    ItemCount.add(out, FluidSamples.of(f.copyWithAmount(1)), f.getAmount());
-                }
+            for (FluidStack f : contents(h)) {
+                ItemCount.add(out, FluidSamples.of(f.copyWithAmount(1)), f.getAmount());
             }
         }
         for (Chemicals.Store s : chemicals) {
