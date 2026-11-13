@@ -42,6 +42,19 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int PAGE_STATUS = 0, PAGE_GEAR = 1, PAGE_DECOR = 2, PAGE_LOG = 3, PAGES = 4;
     /** 装飾のページ: 姿の右に、頭・背中/腰・手の枠を縦に並べる。 */
     public static final int DECOR_X = 96, DECOR_Y = 34, DECOR_STEP = 28;
+    /**
+     * 装飾の枠の位置（部位の番号の順: 頭・首/背中・手・顔・腰）。体の並びに合わせて、左の列に上から頭・首/背中・腰、
+     * 右の列に顔（頭のとなり）と手（腰のとなり）。
+     */
+    private static final int[][] DECOR_AT = {{0, 0}, {0, 1}, {1, 2}, {1, 0}, {0, 2}};
+
+    public static int decorX(int part) {
+        return DECOR_X + DECOR_AT[part][0] * DECOR_STEP;
+    }
+
+    public static int decorY(int part) {
+        return DECOR_Y + DECOR_AT[part][1] * DECOR_STEP;
+    }
 
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
             D_STALL = 8, COUNT = 9;
@@ -148,7 +161,7 @@ public class AndroidMenu extends AbstractContainerMenu {
         });
         for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
             int part = i;
-            addSlot(new PageSlot(items, RuinAndroid.SLOT_DECOR + i, DECOR_X, DECOR_Y + i * DECOR_STEP, PAGE_DECOR, 1) {
+            addSlot(new PageSlot(items, RuinAndroid.SLOT_DECOR + i, decorX(i), decorY(i), PAGE_DECOR, 1) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return AndroidAccessoryItem.isAccessory(stack, part);

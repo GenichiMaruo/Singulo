@@ -226,7 +226,10 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
         }
     }
 
-    /** from の隣（6方向）のストレージを集める（作業指令台・資材口・納品口・レシピ棚は除く）。 */
+    /**
+     * from の隣（6方向）のストレージを集める（作業指令台・資材口・納品口・レシピ棚は除く）。
+     * リンク済みの QIO ダッシュボードの裏が接していれば、その周波数の中身も入れる（{@link QioStores}）。
+     */
     static void collect(Level level, BlockPos from, Set<BlockPos> seen, List<IItemHandler> out) {
         var owner = level.isLoaded(from) ? level.getBlockEntity(from) : null;
         AdjacentItemStores cache = owner instanceof WorkConsoleBlockEntity console ? console.adjacentItems
@@ -241,6 +244,16 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
             }
             IItemHandler h = cache != null ? cache.get(d)
                     : AdjacentItemStores.androidView(level, p, d.getOpposite(), Capabilities.get(level, Capabilities.ItemHandler.BLOCK, p, d.getOpposite()));
+            if (h == null) {
+                // リンク済みの QIO ダッシュボードの裏が接していれば、その周波数の中身をチェストと同じように使う（Mekanism があるときだけ）。
+                // 同じ周波数のダッシュボードは同じ入れ物なので、もう集めていれば数えない（何枚つないでも1回）
+                // 印は周波数ごと（指令台と資材口など、場所をまたいで集めても数えるのは1回）
+                IItemHandler qio = QioStores.dashboard(level, p, d);
+                if (qio != null && seen.add(QioStores.seenKey(qio))) {
+                    out.add(qio);
+                }
+                continue;
+            }
             if (h == null) {
                 continue;
             }

@@ -54,7 +54,7 @@ public class CableBlock extends BaseEntityBlock {
         for (BooleanProperty p : CONNECTIONS.values()) {
             state = state.setValue(p, false);
         }
-        registerDefaultState(state.setValue(STRAIGHT, CableProfile.Straight.NONE));
+        registerDefaultState(state.setValue(STRAIGHT, CableProfile.Straight.NONE).setValue(ConduitCover.PROPERTY, ConduitCover.State.NONE));
     }
 
     public CableProfile profile() {
@@ -95,7 +95,7 @@ public class CableBlock extends BaseEntityBlock {
     @Override
     public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         CONNECTIONS.values().forEach(builder::add);
-        builder.add(STRAIGHT);
+        builder.add(STRAIGHT, ConduitCover.PROPERTY);
     }
 
     @Override
@@ -112,8 +112,78 @@ public class CableBlock extends BaseEntityBlock {
                 shape = Shapes.or(shape, profile.arm(e.getKey()));
             }
         }
-        return shape;
+        return ConduitCover.shape(state, shape);
     }
+
+    // ------------------------------------------------------------------ カバー（{@link ConduitCover}）
+
+    @Override
+    public net.minecraft.world.InteractionResult use(BlockState state, Level level,
+            BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.phys.BlockHitResult hit) {
+        return ConduitCover.use(player.getItemInHand(hand), state, level, pos, player, hand, hit);
+    }
+
+    /** はめ込みの次の tick に、ブロック入りの状態にする（{@link ConduitCover#settle}）。 */
+    @Override
+    public void tick(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        ConduitCover.settle(state, level, pos);
+    }
+
+    /** ブロック入りのカバーは、はめ込んだブロックと同じ爆発への強さ（{@link ConduitCover#explosionResistance}）。 */
+    @Override
+    public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.level.Explosion explosion) {
+        return ConduitCover.explosionResistance(state, level, pos, explosion, super.getExplosionResistance(state, level, pos, explosion));
+    }
+
+    /** カバーがあれば、壊してもケーブルは残し、カバーを1つずつ外す（{@link ConduitCover#breakCover}）。 */
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                       boolean willHarvest, net.minecraft.world.level.material.FluidState fluid) {
+        return !ConduitCover.breakCover(state, level, pos, player) && super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
+
+    @Override
+    public float getDestroyProgress(BlockState state, net.minecraft.world.entity.player.Player player, BlockGetter level, BlockPos pos) {
+        return ConduitCover.destroyProgress(state, player, level, pos, super.getDestroyProgress(state, player, level, pos));
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return ConduitCover.collision(state, super.getCollisionShape(state, level, pos, context));
+    }
+
+    @Override
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return ConduitCover.occlusion(state);
+    }
+
+    @Override
+    public net.minecraft.world.level.block.SoundType getSoundType(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos,
+            @Nullable net.minecraft.world.entity.Entity entity) {
+        if (ConduitCover.of(state) == ConduitCover.State.BLOCK && level.getBlockEntity(pos) instanceof ConduitCover.Holder holder
+                && holder.coverState() != null) {
+            return holder.coverState().getSoundType(level, pos, entity);
+        }
+        return super.getSoundType(state, level, pos, entity);
+    }
+
+    /** 枠だけ・カバーなしは光を通し、隣に陰を落とさない（ガラスのように）。ブロック入りはふつうのブロックと同じ。 */
+    @Override
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state, level, pos);
+    }
+
+    @Override
+    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
+        return ConduitCover.passesLight(state) ? 0 : super.getLightBlock(state, level, pos);
+    }
+
+    @Override
+    public float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
+        return ConduitCover.passesLight(state) ? 1.0F : super.getShadeBrightness(state, level, pos);
+    }
+
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -152,6 +222,7 @@ public class CableBlock extends BaseEntityBlock {
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+        ConduitCover.dropOnRemove(state, level, pos, newState);
         if (!state.is(newState.getBlock())) {
             if (level.isClientSide) CableBlockEntity.clearConnectedDisplay(level,pos);
             else if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) cable.invalidateNetwork();

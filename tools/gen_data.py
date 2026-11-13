@@ -67,6 +67,8 @@ CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240
           'horizon_bus': (20, 20, 26)}
 # 液体パイプ（4段階）: 絵とモデルは tools/logistics_content.py が書く（電線と見分けられる、継ぎ手のつばと窓のある管）
 from logistics_content import PIPES, CAPSULES, CUSTOM  # noqa: E402
+from food_content import CUSTOM_BLOCKS as _FOOD_CUSTOM  # noqa: E402
+CUSTOM = CUSTOM | _FOOD_CUSTOM
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
 # レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
 CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
@@ -953,16 +955,28 @@ UI_LANG = {
     'message.singulo.android.patrol_report': ('%s: 留守のあいだに、敵を%s体倒しました', '%s: while you were away, I defeated %s enemies'),
     'message.singulo.android.patrol_report.alarm': ('%s: 留守のあいだに、敵を%s体倒して、警報を%s回出しました', '%s: while you were away, I defeated %s enemies and raised %s alarms'),
     'gui.singulo.android.decor.0': ('頭', 'Head'),
-    'gui.singulo.android.decor.1': ('背中・腰', 'Back / waist'),
+    'gui.singulo.android.decor.1': ('首・背中', 'Neck / back'),
     'gui.singulo.android.decor.2': ('手', 'Hand'),
-    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス・メガネ', 'Ribbon, hair flower, beret, headdress or glasses'),
-    'gui.singulo.android.decor.1.hint': ('マント・マフラー・腰リボン', 'Cape, scarf or waist ribbon'),
-    'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘（待機している間だけ持つ）', 'Paperback, bouquet, teacup or umbrella (held only while idle)'),
+    'gui.singulo.android.decor.3': ('顔', 'Face'),
+    'gui.singulo.android.decor.4': ('腰', 'Waist'),
+    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス・猫耳・帽子・付け毛・ティアラ',
+                                         'Ribbon, hair flower, beret, headdress, cat ears, a hat, a hair extension or a tiara'),
+    'gui.singulo.android.decor.1.hint': ('マント・マフラー・妖精の羽・ネクタイ・ネックレス', 'Cape, scarf, fairy wings, necktie or necklace'),
+    'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘・ランタン・ほうき（待機している間だけ持つ）',
+                                         'Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)'),
+    'gui.singulo.android.decor.3.hint': ('メガネ・モノクル・イヤリング', 'Glasses, monocle or earrings'),
+    'gui.singulo.android.decor.4.hint': ('腰リボン・エプロン・ブローチ', 'Waist ribbon, apron or brooch'),
     'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
+    'gui.singulo.android.hair_color': ('髪の色 %s', 'Hair color %s'),
+    'gui.singulo.charge.in': ('充電する物を入れる（電力を受け取れる物）', 'Put in something to charge'),
+    'gui.singulo.charge.out': ('充電済みの物が出てくる', 'Charged items come out here'),
+    'gui.singulo.charge.progress': ('充電 %s%%', 'Charged %s%%'),
     'gui.singulo.android.decor.speech': ('似合う？', 'Does it suit me?'),
     'tooltip.singulo.android_accessory.0': ('アンドロイドの頭に着ける（装飾のページ）', 'Worn on an android\'s head (decoration page)'),
-    'tooltip.singulo.android_accessory.1': ('アンドロイドの背中・腰に着ける（装飾のページ）', 'Worn on an android\'s back or waist (decoration page)'),
+    'tooltip.singulo.android_accessory.1': ('アンドロイドの首・背中に着ける（装飾のページ）', 'Worn on an android\'s neck or back (decoration page)'),
     'tooltip.singulo.android_accessory.2': ('待機しているアンドロイドが手に持つ（装飾のページ）', 'Held by an idle android (decoration page)'),
+    'tooltip.singulo.android_accessory.3': ('アンドロイドの顔に着ける（装飾のページ）', 'Worn on an android\'s face (decoration page)'),
+    'tooltip.singulo.android_accessory.4': ('アンドロイドの腰に着ける（装飾のページ）', 'Worn on an android\'s waist (decoration page)'),
     'message.singulo.work_location.recorded': ('%s の位置を記録した（%s, %s, %s）', 'Recorded %s at %s, %s, %s'),
     'tooltip.singulo.work_location.empty': ('記録なし（ブロックをシフト右クリックで記録）', 'Empty: sneak-use on a block to record it'),
     'tooltip.singulo.work_location.block': ('%s（%s, %s, %s）', '%s at %s, %s, %s'),
@@ -1661,6 +1675,12 @@ def lang_files():
     UI_LANG.update(UI)
     from logistics_content import UI as _LOGISTICS_UI
     UI_LANG.update(_LOGISTICS_UI)
+    from food_content import UI as _FOOD_UI
+    UI_LANG.update(_FOOD_UI)
+    from cover_content import UI as _COVER_UI
+    UI_LANG.update(_COVER_UI)
+    from decor_content import UI as _DECOR_UI
+    UI_LANG.update(_DECOR_UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
@@ -2245,6 +2265,10 @@ def art_textures():
                 sheet, frames = art16.machine_front(iid, stage_of(name), on)
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
                 art16.save(sheet, path)
+                if iid == 'rgb_dye_station':
+                    # 色の輪のドットは16pxの絵をそのまま拡大する
+                    art.save(sheet.resize((32, 32), __import__('PIL').Image.NEAREST), hb / f'{iid}_front{"_on" if on else ""}.png')
+                    continue
                 if iid in art16.ANDROID_FACES or iid in art16.DRONE_FACES:
                     # 顔のバイザーは16pxの絵をそのまま拡大する（細かい表情を描き直さない）。まばたきも同じ動き
                     hd = hb / f'{iid}_front{"_on" if on else ""}.png'
@@ -2819,6 +2843,7 @@ SOUNDS = {
     'suspension_reservoir_running': ('machine/suspension_reservoir_running', '重力懸垂タンクが液体を吊る', 'Suspension reservoir hums', 16),
     'pasta_accumulator_running': ('machine/pasta_accumulator_running', '核パスタが圧縮される', 'Nuclear pasta compresses', 16),
     'tidal_spindle_running': ('machine/tidal_spindle_running', '潮汐紡糸機が糸を巻く', 'Tidal spindle winds thread', 24),
+    'food_printer_running': ('machine/food_printer_running', 'フードプリンターが印刷する', 'Food printer prints', 12),
     'containment_tank_running': ('machine/containment_tank_running', '閉じ込めタンクがうなる', 'Containment tank hums', 12),
     'penrose_reactor_ignition': ('machine/penrose_reactor_ignition', 'Pリアクターが点火を始める', 'P-Reactor ignition begins', 48),
     'probe_station_launch': ('machine/probe_station_launch', '探査機が飛び立つ', 'Probe launches', 24),
@@ -3782,7 +3807,7 @@ TAB_GROUPS = [
     ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'relocation_wrench', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
-                       'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct']),
+                       'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct', 'cover_frame']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
                'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2', 'capacity_upgrade_3']),
@@ -3829,6 +3854,9 @@ TAB_GROUPS = [
                  'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
                  'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_glasses', 'android_cape', 'android_scarf',
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',
+                 'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail', 'android_twin_tails', 'android_monocle',
+                 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom', 'android_necktie',
+                 'android_diamond_necklace', 'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch', 'rgb_dye_station',
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     # ドローン輸送: ステーションと材料 → 発着ポート → 梱包箱
@@ -3863,7 +3891,8 @@ TAB_GROUPS = [
     ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
               'facility_light', 'emergency_light', 'room_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
               'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
-              'coffee', 'paper_stack', 'trash_bin',
+              'coffee', 'food_printer', 'food_cartridge', 'nutrient_bar', 'printed_steak', 'spiral_pasta', 'honeycomb_cake',
+              'fruit_gel_cube', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),
     # 施設の建材の設計図（遺構 → 研究所）
     ('設計図', ['blueprint_ruin_panels', 'blueprint_pristine_ruin', 'blueprint_ruin_glass', 'blueprint_lighting',
@@ -4264,6 +4293,10 @@ def main():
     cosmic_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     import logistics_content
     logistics_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import food_content
+    food_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import cover_content
+    cover_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

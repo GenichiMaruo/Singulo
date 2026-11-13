@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RGB",
+    "WCK",
+    "PPP"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:dyes/red"
+    },
+    "G": {
+      "tag": "forge:dyes/green"
+    },
+    "B": {
+      "tag": "forge:dyes/blue"
+    },
+    "W": {
+      "tag": "forge:dyes/white"
+    },
+    "C": {
+      "item": "minecraft:crafting_table"
+    },
+    "K": {
+      "tag": "forge:dyes/black"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:rgb_dye_station"
+  }
+}

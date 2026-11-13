@@ -281,11 +281,11 @@ public final class MachineWatch {
         return n;
     }
 
-    /** 出口にある、主な物の数（物だけ。液体・化学物質は {@link LiquidStores#machine}）。 */
+    /** 出口にある、取り出せる主な物の数（物だけ。液体・化学物質は {@link LiquidStores#machine}。同じ物でも入れる欄の分は数えない）。 */
     private static long output(IItemHandler out, ItemStack main) {
         long n = 0;
         for (int i = 0; out != null && i < out.getSlots(); i++) {
-            if (ItemStack.isSameItemSameTags(out.getStackInSlot(i), main)) {
+            if (ItemStack.isSameItemSameTags(out.getStackInSlot(i), main) && !out.extractItem(i, 1, true).isEmpty()) {
                 n += out.getStackInSlot(i).getCount();
             }
         }

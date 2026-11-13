@@ -198,8 +198,8 @@ DESC = {
                   'A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one for half its remaining lifetime, then comes out spent.'),
     '宇宙線ミュオン収集器': ('空が見える高い場所で、電力なしでミュオンを集める。',
                      'Collects cosmic-ray muons for free high up under open sky.'),
-    'SMESセル': ('超伝導の磁気エネルギー貯蔵。大量の電力をためる。右クリックで画面を開く。', 'Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its '
-                                                       'screen.'),
+    'SMESセル': ('超伝導の磁気エネルギー貯蔵。大量の電力をためる。右クリックで画面を開く。画面の充電の枠に、電力を受け取れる物を入れると充電し、満タンになると隣の枠へ出てくる。', 'Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its '
+                                                       'screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.'),
     '精密組立台': ('段階2以降のほとんどの部品と装置を組み立てる作業台。', 'Assembles most parts and machines from tier 2 on.'),
     'ワールドライン・アンカー（小）': ('触媒を入れると、周りのチャンクを読み込み続ける。',
                           'Keeps nearby chunks loaded while fed a catalyst.'),
@@ -999,3 +999,15 @@ SUMMARY.update(_COSMIC_SUMMARY)
 from logistics_content import DESC as _LOGISTICS_DESC, SUMMARY as _LOGISTICS_SUMMARY
 DESC.update(_LOGISTICS_DESC)
 SUMMARY.update(_LOGISTICS_SUMMARY)
+from decor_content import DESC as _DECOR_DESC, SUMMARY as _DECOR_SUMMARY
+DESC.update(_DECOR_DESC)
+SUMMARY.update(_DECOR_SUMMARY)
+# 0.18.0: SMESセルの説明に充電の枠を足して長くなったので、要約を足す
+SUMMARY['SMESセル'] = ('大量の電力をためる超伝導の蓄電ブロック。', 'Superconducting storage for a lot of power.')
+# 0.18.0 印刷された食品
+from food_content import DESC as _FOOD_DESC, SUMMARY as _FOOD_SUMMARY
+DESC.update(_FOOD_DESC)
+SUMMARY.update(_FOOD_SUMMARY)
+from cover_content import DESC as _COVER_DESC, SUMMARY as _COVER_SUMMARY
+DESC.update(_COVER_DESC)
+SUMMARY.update(_COVER_SUMMARY)

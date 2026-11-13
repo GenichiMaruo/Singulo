@@ -150,7 +150,12 @@ public final class GeneratedContent {
             new ItemDef("nuclear_pasta", "item", 5, 0),
             new ItemDef("tidal_filament", "item", 5, 0),
             new ItemDef("wormhole_seam_upgrade", "item", 5, 0),
-            new ItemDef("collapsar_parallel_cassette", "item", 5, 0)
+            new ItemDef("collapsar_parallel_cassette", "item", 5, 0),
+            new ItemDef("nutrient_bar", "item", 1, 0),
+            new ItemDef("printed_steak", "item", 1, 0),
+            new ItemDef("spiral_pasta", "item", 1, 0),
+            new ItemDef("honeycomb_cake", "item", 1, 0),
+            new ItemDef("fruit_gel_cube", "item", 1, 0)
     );
 
     public static final List<BlockDef> BLOCKS = List.of(
@@ -188,6 +193,7 @@ public final class GeneratedContent {
             "vacuum_jacketed_pipe",
             "superfluid_conduit",
             "horizon_duct",
+            "cover_frame",
             "kiln",
             "compressor",
             "electrolyzer",
@@ -367,6 +373,22 @@ public final class GeneratedContent {
             "unfired_teacup",
             "android_teacup",
             "android_umbrella",
+            "android_cat_ears",
+            "android_witch_hat",
+            "android_straw_hat",
+            "android_ponytail",
+            "android_twin_tails",
+            "android_monocle",
+            "android_fairy_wings",
+            "android_apron",
+            "android_lantern",
+            "android_broom",
+            "android_necktie",
+            "android_diamond_necklace",
+            "android_diamond_earrings",
+            "android_diamond_tiara",
+            "android_diamond_brooch",
+            "rgb_dye_station",
             "blade_android_spawn_egg",
             "whip_android_spawn_egg",
             "saber_android_spawn_egg",
@@ -579,6 +601,13 @@ public final class GeneratedContent {
             "sports_drink",
             "energy_drink",
             "coffee",
+            "food_printer",
+            "food_cartridge",
+            "nutrient_bar",
+            "printed_steak",
+            "spiral_pasta",
+            "honeycomb_cake",
+            "fruit_gel_cube",
             "paper_stack",
             "trash_bin",
             "factory_line",
@@ -803,6 +832,8 @@ public final class GeneratedContent {
             Map.entry("fluid_drone_port", 2),
             Map.entry("collapsar_lining", 5),
             Map.entry("horizon_vault", 5),
-            Map.entry("wormhole_drone_beacon", 5)
+            Map.entry("wormhole_drone_beacon", 5),
+            Map.entry("rgb_dye_station", 1),
+            Map.entry("food_printer", 1)
     );
 }

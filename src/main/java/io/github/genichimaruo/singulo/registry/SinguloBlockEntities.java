@@ -209,6 +209,10 @@ public final class SinguloBlockEntities {
             REGISTER.register("android_work_console", () -> build(io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity::new, SinguloBlocks.ANDROID_WORK_CONSOLE.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT =
             REGISTER.register("android_supply_port", () -> build(io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity::new, SinguloBlocks.ANDROID_SUPPLY_PORT.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity>> RGB_DYE_STATION =
+            REGISTER.register("rgb_dye_station", () -> build(io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::new, SinguloBlocks.RGB_DYE_STATION.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.food.FoodPrinterBlockEntity>> FOOD_PRINTER =
+            REGISTER.register("food_printer", () -> build(io.github.genichimaruo.singulo.food.FoodPrinterBlockEntity::new, SinguloBlocks.FOOD_PRINTER.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT =
             REGISTER.register("android_delivery_port", () -> build(io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new, SinguloBlocks.ANDROID_DELIVERY_PORT.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ANDROID_WORKBENCH =

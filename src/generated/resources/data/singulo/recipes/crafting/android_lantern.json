@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "GTG",
+    " I "
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "G": {
+      "tag": "forge:glass_panes/colorless"
+    },
+    "T": {
+      "item": "minecraft:torch"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_lantern"
+  }
+}

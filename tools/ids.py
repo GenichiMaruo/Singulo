@@ -156,6 +156,22 @@ MOD = {
     '髪飾り': ('android_hair_flower', 'Hair Flower', 'tool'),
     'ベレー帽': ('android_beret', 'Beret', 'tool'),
     'メガネ': ('android_glasses', 'Glasses', 'tool'),
+    # 0.18.0: 装飾の枠を頭・顔・首/背中・腰・手の5つにして、装飾を足した
+    '猫耳カチューシャ': ('android_cat_ears', 'Cat Ear Headband', 'tool'),
+    '魔女の帽子': ('android_witch_hat', 'Witch Hat', 'tool'),
+    '麦わら帽子': ('android_straw_hat', 'Straw Hat', 'tool'),
+    '付け毛（ポニーテール）': ('android_ponytail', 'Hair Extension (Ponytail)', 'tool'),
+    '付け毛（ツインテール）': ('android_twin_tails', 'Hair Extension (Twin Tails)', 'tool'),
+    'モノクル': ('android_monocle', 'Monocle', 'tool'),
+    '妖精の羽': ('android_fairy_wings', 'Fairy Wings', 'tool'),
+    'エプロン': ('android_apron', 'Apron', 'tool'),
+    'ランタン': ('android_lantern', 'Lantern', 'tool'),
+    'ほうき': ('android_broom', 'Broom', 'tool'),
+    'ネクタイ': ('android_necktie', 'Necktie', 'tool'),
+    'ダイヤのネックレス': ('android_diamond_necklace', 'Diamond Necklace', 'tool'),
+    'ダイヤのイヤリング': ('android_diamond_earrings', 'Diamond Earrings', 'tool'),
+    'ダイヤのティアラ': ('android_diamond_tiara', 'Diamond Tiara', 'tool'),
+    'ダイヤのブローチ': ('android_diamond_brooch', 'Diamond Brooch', 'tool'),
     # ドローン輸送（0.14.0。tools/drones.py が絵とモデルを作る）
     'ドローン用クリスタルメモリ': ('drone_memory', 'Drone Crystal Memory', 'item'),
     'ドローン用クリスタルメモリ（ジェット型）': ('drone_memory_jet', 'Drone Crystal Memory (Jet)', 'item'),
@@ -619,6 +635,9 @@ VANILLA = {
     '緑色の染料': '#c:dyes/green',
     '紫色の染料': '#c:dyes/purple',
     '赤色の染料': '#c:dyes/red',
+    '青色の染料': '#c:dyes/blue',
+    '白色の染料': '#c:dyes/white',
+    '黒色の染料': '#c:dyes/black',
     'ガラス板': '#c:glass_panes/colorless',
     # Mekanism（任意の連携。Mekanism が入っているときだけ読まれるレシピに使う）
     '基本ケミカルタンク': 'mekanism:basic_chemical_tank',
@@ -650,7 +669,11 @@ VANILLA = {
     '板材': '#minecraft:planks',
     '作業台（ブロック）': 'minecraft:crafting_table',
     'ファントムの皮膜': 'minecraft:phantom_membrane',
-    'レッドストーン': '#forge:dusts/redstone',
+    '金塊': '#c:nuggets/gold',
+    '小麦': '#c:crops/wheat',
+    'たいまつ': 'minecraft:torch',
+    '鎖': 'minecraft:chain',
+    'レッドストーン': '#c:dusts/redstone',
     '時計': 'minecraft:clock',
     '残響の欠片（型）': 'minecraft:echo_shard',
     '深層岩': '#singulo:helium_bearing_stone',
@@ -780,3 +803,14 @@ STATIONS["潮汐紡糸機"] = "tidal_spindle"
 # 0.17.0 液体パイプの段階・液体のドローン発着ポート・液体カプセル
 from logistics_content import IDS as _LOGISTICS_IDS
 MOD.update(_LOGISTICS_IDS)
+
+# 0.18.0 RGB染色台
+from decor_content import IDS as _DECOR_IDS
+MOD.update(_DECOR_IDS)
+
+# 0.18.0 印刷された食品（フードプリンター・フードカートリッジ・宇宙食）
+from food_content import IDS as _FOOD_IDS, VANILLA as _FOOD_VANILLA
+MOD.update(_FOOD_IDS)
+VANILLA.update(_FOOD_VANILLA)
+from cover_content import IDS as _COVER_IDS
+MOD.update(_COVER_IDS)

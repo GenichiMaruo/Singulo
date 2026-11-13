@@ -295,6 +295,14 @@
         "model": "singulo:block/fluid_pipe_arm_short_glass",
         "x": 90
       }
+    },
+    {
+      "when": {
+        "cover": "frame|block"
+      },
+      "apply": {
+        "model": "singulo:block/cover_frame"
+      }
     }
   ]
 }

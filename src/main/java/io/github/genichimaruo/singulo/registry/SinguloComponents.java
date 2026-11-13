@@ -56,5 +56,6 @@ public final class SinguloComponents {
     public static final Supplier<Key<net.minecraftforge.fluids.FluidStack>> PORT_RECEIVE_FLUID = key("port_receive_fluid", FLUID_CODEC);
     public static final Supplier<Key<ItemStack>> VAULT_ITEM = key("vault_item", ItemStack.CODEC);
     public static final Supplier<Key<Long>> VAULT_COUNT = key("vault_count", Codec.LONG);
+    public static final Supplier<Key<io.github.genichimaruo.singulo.food.FoodPaste.Content>> FOOD_PASTE = key("food_paste", io.github.genichimaruo.singulo.food.FoodPaste.Content.CODEC);
     private SinguloComponents() {}
 }
