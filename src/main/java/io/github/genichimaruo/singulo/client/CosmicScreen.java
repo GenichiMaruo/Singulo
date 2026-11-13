@@ -121,7 +121,8 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     }
 
     private int portY() {
-        return kind() == CosmicChamberBlockEntity.RESERVOIR || kind() == CosmicChamberBlockEntity.ACCUMULATOR ? 82 : CosmicMenu.SLOT_Y + 20;
+        // 蓄電庫は、充電の枠（数値の行の下）の下へ少し下げる
+        return kind() == CosmicChamberBlockEntity.ACCUMULATOR ? 88 : kind() == CosmicChamberBlockEntity.RESERVOIR ? 82 : CosmicMenu.SLOT_Y + 20;
     }
 
     /** 制御卓の左右のポートのボタン。押すと 入力 → 出力 → 両方 と切り替わる。 */
@@ -305,6 +306,16 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         y += STAT_PITCH + 2;
         stat(g, STAT_X, y, Panel.Icon.OUT, 0xFFFFD890, EnergyText.shortForm(out) + "/t", skin.text(), List.of(tr("rate_out", exactEnergy(out))));
         energyBar(g, stored / (double) capacity, List.of(storedText));
+        // 充電の枠: 入れる枠 → 矢印（入れた物の充電の進み）→ 充電済みの物が出てくる枠
+        slotHint(g, CosmicMenu.CHARGE_IN_X, CosmicMenu.CHARGE_Y, 0, "neutrino_scanner", Component.translatable("gui.singulo.charge.in"));
+        net.minecraft.world.item.ItemStack charging = menu.slots.get(0).getItem();
+        Panel.arrow(g, skin, leftPos + CosmicMenu.CHARGE_IN_X + 19, topPos + CosmicMenu.CHARGE_Y + 4,
+                io.github.genichimaruo.singulo.energy.ItemCharging.fraction(charging));
+        if (!charging.isEmpty()) {
+            area(CosmicMenu.CHARGE_IN_X + 19, CosmicMenu.CHARGE_Y + 2, 22, 12, List.of(Component.translatable("gui.singulo.charge.progress",
+                    Math.round(100 * io.github.genichimaruo.singulo.energy.ItemCharging.fraction(charging)))));
+        }
+        slotHint(g, CosmicMenu.CHARGE_OUT_X, CosmicMenu.CHARGE_Y, 1, "neutrino_scanner", Component.translatable("gui.singulo.charge.out"));
     }
 
     // ------------------------------------------------------------------ 潮汐紡糸機

@@ -19,9 +19,14 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 /**
  * SMESセル（超伝導磁気エネルギー貯蔵）。10 MFE を蓄える。正面から出し、ほかの5面から受け取る。
  * 右クリックで画面を開き、蓄電量と1 tick あたりの出し入れを見られる。
+ * 画面の充電の枠: 「充電する物を入れる枠」の物を蓄えた電力で充電し（出し入れの速さまで。正面から出す分と合わせる）、
+ * 満タンになったら「充電済みの物が出てくる枠」へ移す。ホッパーなどからも、入れる枠へ入れ、出てくる枠から取り出せる。
+ * 壊すと枠の物を落とす。
  */
 public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
-        net.minecraft.world.MenuProvider {
+        net.minecraft.world.MenuProvider, AbstractMachineBlock.BreakListener {
+    /** 充電の枠: 0 は入れる枠、1 は充電済みの物が出てくる枠。 */
+    public static final int CHARGE_IN = 0, CHARGE_OUT = 1;
     public static final int CAPACITY = 10_000_000;
     public static final int RATE = 100_000;
 
@@ -34,6 +39,54 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
     private int lastIn;
     private int lastOut;
     private int externallyExtracted;
+    private final net.neoforged.neoforge.items.ItemStackHandler charge = new net.neoforged.neoforge.items.ItemStackHandler(2) {
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, net.minecraft.world.item.ItemStack stack) {
+            return slot == CHARGE_IN && io.github.genichimaruo.singulo.energy.ItemCharging.chargeable(stack);
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
+    /** ホッパーなど用: 入れる枠へ入れるだけ、出てくる枠から取り出すだけ。 */
+    private final net.neoforged.neoforge.items.IItemHandler chargeAutomation = new net.neoforged.neoforge.items.IItemHandler() {
+        @Override
+        public int getSlots() {
+            return 2;
+        }
+
+        @Override
+        public net.minecraft.world.item.ItemStack getStackInSlot(int slot) {
+            return charge.getStackInSlot(slot);
+        }
+
+        @Override
+        public net.minecraft.world.item.ItemStack insertItem(int slot, net.minecraft.world.item.ItemStack stack, boolean simulate) {
+            return slot == CHARGE_IN ? charge.insertItem(slot, stack, simulate) : stack;
+        }
+
+        @Override
+        public net.minecraft.world.item.ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return slot == CHARGE_OUT ? charge.extractItem(slot, amount, simulate) : net.minecraft.world.item.ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, net.minecraft.world.item.ItemStack stack) {
+            return charge.isItemValid(slot, stack);
+        }
+    };
 
     public SmesCellBlockEntity(BlockPos pos, BlockState state) {
         this(SinguloBlockEntities.SMES_CELL.get(), pos, state, CAPACITY, RATE);
@@ -58,6 +111,23 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
 
     public SinguloEnergyStorage energy() {
         return energy;
+    }
+
+    /** 充電の枠（画面用）。 */
+    public net.neoforged.neoforge.items.ItemStackHandler chargeSlots() {
+        return charge;
+    }
+
+    /** 充電の枠（ホッパーなど用。入れる枠へ入れ、出てくる枠から取り出す）。 */
+    public net.neoforged.neoforge.items.IItemHandler chargeAutomation() {
+        return chargeAutomation;
+    }
+
+    @Override
+    public void onBroken(Level level) {
+        for (int i = 0; i < charge.getSlots(); i++) {
+            Block.popResource(level, worldPosition, charge.getStackInSlot(i));
+        }
     }
 
     @Nullable
@@ -86,6 +156,14 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
                 }
             }
         }
+        // 充電の枠の物を充電する（出し入れの速さのうち、正面から出した残りまで）
+        long used = io.github.genichimaruo.singulo.energy.ItemCharging.tick(be.charge, CHARGE_IN, CHARGE_OUT,
+                Math.min(be.energy.getEnergyStored(), Math.max(0, be.rate - be.lastOut)));
+        if (used > 0) {
+            be.energy.consume((int) used);
+            be.lastOut += (int) used;
+            active = true;
+        }
         if (state.getValue(AbstractMachineBlock.LIT) != active && level.getGameTime() % 10 == 0) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
         }
@@ -104,7 +182,7 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id, net.minecraft.world.entity.player.Inventory inv,
                                                                           net.minecraft.world.entity.player.Player player) {
-        return new SmesMenu(id, inv, worldPosition, SyncedInts.server(SmesMenu.COUNT, i -> switch (i) {
+        return new SmesMenu(id, inv, worldPosition, charge, SyncedInts.server(SmesMenu.COUNT, i -> switch (i) {
             case SmesMenu.D_STORED -> energy.getEnergyStored();
             case SmesMenu.D_CAPACITY -> energy.getMaxEnergyStored();
             case SmesMenu.D_IN -> lastIn;
@@ -118,12 +196,16 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
+        tag.put("charge", charge.serializeNBT(registries));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         energy.setEnergy(tag.getInt("energy"));
+        if (tag.contains("charge")) {
+            charge.deserializeNBT(registries, tag.getCompound("charge"));
+        }
     }
 
     /** 受け取り専用・出力専用の口。 */

@@ -106,7 +106,7 @@ public final class MachineGuiReviewHarness {
             var items=new ItemStackHandler(4);
             String[] ids={"collapsar_billet","exotic_matter","singularity_seed","tidal_filament"};
             for(int i=0;i<4;i++)items.setStackInSlot(i,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(ids[i]))));
-            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,kind==2,data);
+            var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,kind,data);
             String[] blocks={"suspension_reservoir","pasta_accumulator","tidal_spindle"};
             mc.setScreen(new CosmicScreen(menu,mc.player.getInventory(),Component.translatable("block.singulo."+blocks[kind])));
             if(screen>=4){
@@ -199,7 +199,7 @@ public final class MachineGuiReviewHarness {
             value(data, SmesMenu.D_IN, 1_200);
             value(data, SmesMenu.D_OUT, 3_400);
             value(data, SmesMenu.D_RATE, 100_000);
-            mc.setScreen(new SmesScreen(new SmesMenu(0, mc.player.getInventory(), BlockPos.ZERO, data), mc.player.getInventory(),
+            mc.setScreen(new SmesScreen(new SmesMenu(0, mc.player.getInventory(), BlockPos.ZERO, new net.neoforged.neoforge.items.ItemStackHandler(2), data), mc.player.getInventory(),
                     Component.translatable("block.singulo.smes_cell")));
             metrics.add(LANGUAGES[language] + "	smes	0	0	176");
         } else if (extra == 9) {

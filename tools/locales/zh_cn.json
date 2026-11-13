@@ -2824,8 +2824,8 @@
     "translation": "被点燃后成为黑洞核心。"
   },
   "desc.singulo.smes_cell": {
-    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen.",
-    "translation": "超导磁储能装置，可储存大量电力。右键打开界面。"
+    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "超导磁储能装置，可储存大量电力。右键打开界面。在界面的充电槽中放入可接收电力的物品即可充电，充满后会从旁边的槽出来。"
   },
   "desc.singulo.smes_module": {
     "source": "High-capacity energy storage.",
@@ -13416,8 +13416,8 @@
     "translation": "在现有吸积喷流锻造炉中制造的层状核物质。不需要先造新储能库。"
   },
   "desc.singulo.pasta_accumulator": {
-    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both.",
-    "translation": "7×9×7 的设备，容量 8 TFE，输入、输出各为 2 GFE/t。充电时压板收紧，核面食由颗粒变成细棒再变成薄板；放电经四角导体流出。左右两个端口可分别设为输入、输出或输入输出。"
+    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "7×9×7 的设备，容量 8 TFE，输入、输出各为 2 GFE/t。充电时压板收紧，核面食由颗粒变成细棒再变成薄板；放电经四角导体流出。左右两个端口可分别设为输入、输出或输入输出。在界面的充电槽中放入可接收电力的物品即可充电，充满后会从旁边的槽出来。"
   },
   "desc.singulo.pasta_laminate": {
     "source": "Layered plates that form the top and bottom of the Nuclear Pasta Accumulator.",
@@ -14510,5 +14510,21 @@
   "gui.singulo.android.hair_color": {
     "source": "Hair color %s",
     "translation": "发色 %s"
+  },
+  "gui.singulo.charge.in": {
+    "source": "Put in something to charge",
+    "translation": "放入要充电的物品（可接收电力的物品）"
+  },
+  "gui.singulo.charge.out": {
+    "source": "Charged items come out here",
+    "translation": "充好电的物品从这里出来"
+  },
+  "gui.singulo.charge.progress": {
+    "source": "Charged %s%%",
+    "translation": "已充电 %s%%"
+  },
+  "summary.singulo.smes_cell": {
+    "source": "Superconducting storage for a lot of power.",
+    "translation": "储存大量电力的超导蓄电方块。"
   }
 }

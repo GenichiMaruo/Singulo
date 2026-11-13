@@ -2824,8 +2824,8 @@
     "translation": "반응로에 넣고 점화하면 블랙홀 노심이 됩니다."
   },
   "desc.singulo.smes_cell": {
-    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen.",
-    "translation": "초전도 자기 에너지 저장 장치로, 많은 전력을 저장합니다. 우클릭하면 화면이 열립니다."
+    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "초전도 자기 에너지 저장 장치로, 많은 전력을 저장합니다. 우클릭하면 화면이 열립니다. 화면의 충전 칸에 전력을 받을 수 있는 물건을 넣으면 충전되고, 가득 차면 옆 칸으로 나옵니다."
   },
   "desc.singulo.smes_module": {
     "source": "High-capacity energy storage.",
@@ -13416,8 +13416,8 @@
     "translation": "기존 강착 제트 단조로에서 만드는 층상 핵물질. 새 축전고를 먼저 만들 필요가 없습니다."
   },
   "desc.singulo.pasta_accumulator": {
-    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both.",
-    "translation": "7×9×7 설비. 용량 8 TFE, 입력과 출력은 각각 2 GFE/t입니다. 충전하면 압판이 조여지며 핵 파스타가 방울, 막대, 판으로 변합니다. 방전은 네 모서리 도체로 흐릅니다. 좌우 두 포트를 각각 입력, 출력, 입출력으로 설정할 수 있습니다."
+    "source": "A 7×9×7 facility storing 8 TFE, with 2 GFE/t input and output. Charging closes its press plates and turns the nuclear pasta from drops to rods to sheets; discharge flows through the corner conductors. Its two ports can each be set to input, output or both. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
+    "translation": "7×9×7 설비. 용량 8 TFE, 입력과 출력은 각각 2 GFE/t입니다. 충전하면 압판이 조여지며 핵 파스타가 방울, 막대, 판으로 변합니다. 방전은 네 모서리 도체로 흐릅니다. 좌우 두 포트를 각각 입력, 출력, 입출력으로 설정할 수 있습니다. 화면의 충전 칸에 전력을 받을 수 있는 물건을 넣으면 충전되고, 가득 차면 옆 칸으로 나옵니다."
   },
   "desc.singulo.pasta_laminate": {
     "source": "Layered plates that form the top and bottom of the Nuclear Pasta Accumulator.",
@@ -14510,5 +14510,21 @@
   "gui.singulo.android.hair_color": {
     "source": "Hair color %s",
     "translation": "머리색 %s"
+  },
+  "gui.singulo.charge.in": {
+    "source": "Put in something to charge",
+    "translation": "충전할 물건을 넣으세요(전력을 받을 수 있는 물건)"
+  },
+  "gui.singulo.charge.out": {
+    "source": "Charged items come out here",
+    "translation": "충전이 끝난 물건이 나옵니다"
+  },
+  "gui.singulo.charge.progress": {
+    "source": "Charged %s%%",
+    "translation": "충전 %s%%"
+  },
+  "summary.singulo.smes_cell": {
+    "source": "Superconducting storage for a lot of power.",
+    "translation": "많은 전력을 저장하는 초전도 축전 블록."
   }
 }

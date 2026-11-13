@@ -103,7 +103,7 @@ public final class CosmicChamberGameTests {
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         var buf=new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(),h.getLevel().registryAccess());
         try{
-            buf.writeBlockPos(BlockPos.ZERO);buf.writeBoolean(true);
+            buf.writeBlockPos(BlockPos.ZERO);buf.writeVarInt(io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.SPINDLE);
             var menu=io.github.genichimaruo.singulo.cosmic.CosmicMenu.client(1,player.getInventory(),buf);
             h.assertTrue(menu.slots.size()==40,"Menu layout depends on a client block-entity packet arriving first");
             h.assertTrue(menu.getSlot(2).getMaxStackSize()==1&&menu.getSlot(2).mayPlace(item("singularity_seed",1)),"Client core slot differs from server");
