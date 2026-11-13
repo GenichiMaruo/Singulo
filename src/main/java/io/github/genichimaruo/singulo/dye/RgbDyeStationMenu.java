@@ -41,25 +41,9 @@ public class RgbDyeStationMenu extends AbstractContainerMenu {
         this.pos = pos;
         this.data = data;
         for (int i = 0; i < RgbDyeStationBlockEntity.INKS; i++) {
-            int slot = i;
-            addSlot(new Slot(items, i, DYE_X + i * DYE_STEP, DYE_Y) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return RgbDyeStationBlockEntity.accepts(slot, stack);
-                }
-            });
+            addSlot(new DyeSlot(items, i, DYE_X + i * DYE_STEP, DYE_Y));
         }
-        addSlot(new Slot(items, RgbDyeStationBlockEntity.TARGET, TARGET_X, TARGET_Y) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return RgbDyeStationBlockEntity.accepts(RgbDyeStationBlockEntity.TARGET, stack);
-            }
-
-            @Override
-            public int getMaxStackSize() {
-                return 1;
-            }
-        });
+        addSlot(new DyeSlot(items, RgbDyeStationBlockEntity.TARGET, TARGET_X, TARGET_Y));
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
@@ -69,6 +53,23 @@ public class RgbDyeStationMenu extends AbstractContainerMenu {
             addSlot(new Slot(inventory, col, INV_X + col * 18, HOTBAR_Y));
         }
         addDataSlots(data);
+    }
+
+    // Named constructors avoid duplicate mapped Slot parameter names in Java 17 javac.
+    private static final class DyeSlot extends Slot {
+        private final int dyeSlot;
+        DyeSlot(Container items, int slot, int x, int y) {
+            super(items, slot, x, y);
+            dyeSlot = slot;
+        }
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return RgbDyeStationBlockEntity.accepts(dyeSlot, stack);
+        }
+        @Override
+        public int getMaxStackSize() {
+            return dyeSlot == RgbDyeStationBlockEntity.TARGET ? 1 : super.getMaxStackSize();
+        }
     }
 
     public static RgbDyeStationMenu client(int id, Inventory inventory, FriendlyByteBuf buf) {

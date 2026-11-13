@@ -13,4 +13,4 @@ Targets Java 17, Forge 47.4.26 and NeoForge 47.1.106. Distribution filenames rem
 
 ## Required release evidence
 
-The official PR workflow requires both loader builds, all 787 ordinary GameTests, the five optional Mekanism tests, 272 GUI screenshots (250 machine views across five languages plus 22 standard views), pixel checks and the existing renderer integration checks. Publication must use successful CI artifacts, not these local development JARs.
+The official PR workflow requires both loader builds, all 788 ordinary GameTests, the five optional Mekanism tests, 272 GUI screenshots (250 machine views across five languages plus 22 standard views), pixel checks and the existing renderer integration checks. Publication must use successful CI artifacts, not these local development JARs.

@@ -37,6 +37,13 @@ public final class FoodPaste {
 
     /** カートリッジの中身（種類と量）。 */
     public record Content(int kind, int amount) {
+        // Normalize persistent decoding and direct construction before UI array indexing.
+        public Content {
+            if (kind < 0 || kind >= KINDS || amount <= 0 || amount > CAPACITY) {
+                kind = -1;
+                amount = 0;
+            }
+        }
         public static final Codec<Content> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.fieldOf("kind").forGetter(Content::kind),
                 Codec.INT.fieldOf("amount").forGetter(Content::amount)).apply(i, Content::new));
@@ -76,20 +83,24 @@ public final class FoodPaste {
     /** カートリッジのペーストの種類（空なら -1）。 */
     public static int kind(ItemStack cartridge) {
         Content c = SinguloComponents.get(cartridge, SinguloComponents.FOOD_PASTE.get());
-        return c == null || c.amount() <= 0 ? -1 : c.kind();
+        return valid(c) ? c.kind() : -1;
+    }
+
+    private static boolean valid(Content content) {
+        return content != null && content.kind() >= 0 && content.kind() < KINDS && content.amount() > 0;
     }
 
     public static int amount(ItemStack cartridge) {
         Content c = SinguloComponents.get(cartridge, SinguloComponents.FOOD_PASTE.get());
-        return c == null ? 0 : Math.max(0, c.amount());
+        return valid(c) ? Math.min(CAPACITY, c.amount()) : 0;
     }
 
     /** カートリッジの中身を書き換える（0 なら空にする。空のカートリッジどうしは重なる）。 */
     public static void set(ItemStack cartridge, int kind, int amount) {
-        if (amount <= 0) {
+        if (amount <= 0 || amount > CAPACITY || kind < 0 || kind >= KINDS) {
             SinguloComponents.remove(cartridge, SinguloComponents.FOOD_PASTE.get());
         } else {
-            SinguloComponents.set(cartridge, SinguloComponents.FOOD_PASTE.get(), new Content(kind, Math.min(CAPACITY, amount)));
+            SinguloComponents.set(cartridge, SinguloComponents.FOOD_PASTE.get(), new Content(kind, amount));
         }
     }
 

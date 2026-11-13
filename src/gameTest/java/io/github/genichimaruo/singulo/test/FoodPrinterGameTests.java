@@ -28,6 +28,33 @@ public final class FoodPrinterGameTests {
         return c;
     }
 
+    @GameTest(template = "empty")
+    public static void foodCartridgeRejectsMalformedContent(GameTestHelper h) {
+        var component = io.github.genichimaruo.singulo.registry.SinguloComponents.FOOD_PASTE.get();
+        for (int[] invalid : new int[][] {{-1, 1}, {FoodPaste.KINDS, 1}, {Integer.MAX_VALUE, 1},
+                {0, -1}, {0, 0}, {0, FoodPaste.CAPACITY + 1}, {0, Integer.MAX_VALUE}}) {
+            ItemStack stack = new ItemStack(SinguloItems.FOOD_CARTRIDGE.get());
+            CompoundTag malformed = new CompoundTag();
+            malformed.putInt("kind", invalid[0]);
+            malformed.putInt("amount", invalid[1]);
+            stack.getOrCreateTag().put(component.name(), malformed);
+            stack = ItemStack.of(stack.save(new CompoundTag()));
+            h.assertTrue(FoodPaste.kind(stack) == -1 && FoodPaste.amount(stack) == 0, "Malformed paste is not empty");
+            h.assertFalse(stack.getItem().isBarVisible(stack), "Malformed paste shows a bar");
+            h.assertTrue(stack.getItem().getBarWidth(stack) == 0 && stack.getItem().getBarColor(stack) == 0xFFFFFF,
+                    "Malformed paste has unsafe bar values");
+            stack.getHoverName();
+        }
+        ItemStack stack = new ItemStack(SinguloItems.FOOD_CARTRIDGE.get());
+        io.github.genichimaruo.singulo.registry.SinguloComponents.set(stack, component,
+                new FoodPaste.Content(FoodPaste.PROTEIN, Integer.MAX_VALUE));
+        h.assertTrue(FoodPaste.kind(stack) == -1 && FoodPaste.amount(stack) == 0 && stack.getItem().getBarWidth(stack) == 0,
+                "Oversized paste was not rejected");
+        FoodPaste.set(stack, FoodPaste.KINDS, 1);
+        h.assertTrue(FoodPaste.kind(stack) == -1 && FoodPaste.amount(stack) == 0, "Setter retained invalid kind");
+        h.succeed();
+    }
+
     /**
      * 食材は種類ごとのカートリッジにペーストとして入る（満腹度の分。小麦は2）。カートリッジがない・入りきらない食材は待つ。
      * 容器が残る物・毒のある物・印刷した食品は食材にならない。満タンのカートリッジに別の種類は入らない。
