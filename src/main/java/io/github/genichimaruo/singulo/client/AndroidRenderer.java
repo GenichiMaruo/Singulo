@@ -1451,13 +1451,17 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
          * 妖精の羽（ホログラム）: 背中から少し離れて浮かび、ゆっくり上下しながら羽ばたく、光でできた4枚の羽。
          * 羽の面は奥へ3枚重ねた半透明の層（奥ほど薄い）で厚みを見せ、縁と筋は光る線（加算）。羽のまわりに光の粒が流れる。
          * 羽の形は斜めの辺の三角で作る。羽は染めた色、縁と筋は白っぽく明るい。暗い所でも光って見える。
+         * 深度を書かない加算の光で、ワールドを描き終えたあとで足す（奥の雲や水がそのまま透けて見える）。
          */
         private void fairyWings(PoseStack pose, MultiBufferSource buffers, int c, float age) {
             int full = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
             float flap = 18 + 10 * Mth.sin(age * 0.18F);
             float bob = 0.35F * Mth.sin(age * 0.09F);
             float flicker = 0.88F + 0.12F * Mth.sin(age * 0.7F);
-            VertexConsumer fill = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            // 羽は深度を書かない光として、ワールド（雲や水も）を描き、重力レンズも掛け終えたあとで足す。
+            // 深度を書く半透明で描くと、あとから描かれる雲が羽の奥で隠れて、空が抜けて見えた。レンズより先に足すと、
+            // 近くのブラックホールの歪みと影の下に入った。手前の固体には隠れる
+            VertexConsumer fill = GlowDepth.afterLensing(buffers).getBuffer(JetForgeRenderTypes.GLOW);
             for (int side = -1; side <= 1; side += 2) {
                 wingPose(pose, side, flap, bob);
                 for (int k = 0; k < 3; k++) {
@@ -1471,7 +1475,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 pose.popPose();
             }
-            VertexConsumer glow = FxDraw.glow(buffers);
+            VertexConsumer glow = GlowDepth.afterLensing(buffers).getBuffer(JetForgeRenderTypes.GLOW);
             int rim = mix(c, 0xFFFFFF, 0.55F);
             for (int side = -1; side <= 1; side += 2) {
                 wingPose(pose, side, flap, bob);
@@ -1508,7 +1512,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         /** 羽の変形（左右の羽を、背中から浮かせて羽ばたかせる）。pushPose するので、使い終えたら popPose。 */
         private void wingPose(PoseStack pose, int side, float flap, float bob) {
             pose.pushPose();
-            pose.translate(side * 0.6F * P, (-5.6F + bob) * P, 2.6F * P);
+            // 背負った物（バックパックは背中から z 4.6 まで、射撃型のレールガンは背中の低い所に z 6 近くまで）に重ならないよう、
+            // 背中から離して上寄りに浮かべる
+            pose.translate(side * 0.6F * P, (-6.8F + bob) * P, 5.6F * P);
             // 右（+x）の羽は −、左は + に回すと、羽の先が後ろ（+z）へ開く
             pose.mulPose(Axis.YP.rotationDegrees(-side * flap));
             pose.scale(side, 1, 1);
