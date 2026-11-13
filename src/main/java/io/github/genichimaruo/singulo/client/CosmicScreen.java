@@ -116,7 +116,9 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     private static final int PORT_SIZE = 14;
 
     private int portX(int index) {
-        int center = kind() == CosmicChamberBlockEntity.RESERVOIR || kind() == CosmicChamberBlockEntity.ACCUMULATOR ? STAT_X + 26 : 164;
+        // 蓄電庫は、上の充電の枠の並び（入れる枠の縁から出てくる枠の縁まで）の真ん中にそろえる
+        int center = kind() == CosmicChamberBlockEntity.ACCUMULATOR ? (CosmicMenu.CHARGE_IN_X - 1 + CosmicMenu.CHARGE_OUT_X + 17) / 2
+                : kind() == CosmicChamberBlockEntity.RESERVOIR ? STAT_X + 26 : 164;
         return center + (index == 0 ? -PORT_SIZE - 9 : 9);
     }
 
@@ -309,10 +311,11 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         // 充電の枠: 入れる枠 → 矢印（入れた物の充電の進み）→ 充電済みの物が出てくる枠
         slotHint(g, CosmicMenu.CHARGE_IN_X, CosmicMenu.CHARGE_Y, 0, "neutrino_scanner", Component.translatable("gui.singulo.charge.in"));
         net.minecraft.world.item.ItemStack charging = menu.slots.get(0).getItem();
-        Panel.arrow(g, skin, leftPos + CosmicMenu.CHARGE_IN_X + 19, topPos + CosmicMenu.CHARGE_Y + 4,
+        int arrowX = Panel.arrowBetween(CosmicMenu.CHARGE_IN_X, CosmicMenu.CHARGE_OUT_X);
+        Panel.arrow(g, skin, leftPos + arrowX, topPos + CosmicMenu.CHARGE_Y,
                 io.github.genichimaruo.singulo.energy.ItemCharging.fraction(charging));
         if (!charging.isEmpty()) {
-            area(CosmicMenu.CHARGE_IN_X + 19, CosmicMenu.CHARGE_Y + 2, 22, 12, List.of(Component.translatable("gui.singulo.charge.progress",
+            area(arrowX, CosmicMenu.CHARGE_Y, 22, 16, List.of(Component.translatable("gui.singulo.charge.progress",
                     Math.round(100 * io.github.genichimaruo.singulo.energy.ItemCharging.fraction(charging)))));
         }
         slotHint(g, CosmicMenu.CHARGE_OUT_X, CosmicMenu.CHARGE_Y, 1, "neutrino_scanner", Component.translatable("gui.singulo.charge.out"));

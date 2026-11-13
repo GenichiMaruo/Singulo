@@ -80,11 +80,12 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
                 io.github.genichimaruo.singulo.registry.SinguloItems.NEUTRINO_SCANNER.get()));
         Panel.slot(g, skin, leftPos + outSlot.x, topPos + outSlot.y);
         float k = io.github.genichimaruo.singulo.energy.ItemCharging.fraction(in.getItem());
-        Panel.arrow(g, skin, leftPos + SmesMenu.CHARGE_IN_X + 22, topPos + SmesMenu.CHARGE_Y + 1, k);
+        int arrowX = Panel.arrowBetween(in.x, outSlot.x);
+        Panel.arrow(g, skin, leftPos + arrowX, topPos + in.y, k);
         if (!in.hasItem()) {
             area(in.x, in.y, 16, 16, List.of(Component.translatable("gui.singulo.charge.in")));
         } else {
-            area(SmesMenu.CHARGE_IN_X + 22, SmesMenu.CHARGE_Y, 22, 16,
+            area(arrowX, in.y, 22, 16,
                     List.of(Component.translatable("gui.singulo.charge.progress", Math.round(100 * k))));
         }
         if (!outSlot.hasItem()) {

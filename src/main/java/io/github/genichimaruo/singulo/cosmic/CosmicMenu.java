@@ -19,8 +19,8 @@ public final class CosmicMenu extends AbstractContainerMenu {
     /** 画面の枠（DeviceMenu と同じ大きさ。インベントリは枠の中央）とスロットの位置。CosmicScreen と同じ値。 */
     public static final int WIDTH=212, HEIGHT=206;
     public static final int SLOT_Y=72, SEED_X=25, BILLET_X=61, EXOTIC_X=81, OUTPUT_X=147;
-    /** 核パスタ積層蓄電庫の充電の枠（入れる枠・出てくる枠）。数値の行の下、ポートのボタンの上。 */
-    public static final int CHARGE_Y=66, CHARGE_IN_X=112, CHARGE_OUT_X=158;
+    /** 核パスタ積層蓄電庫の充電の枠（入れる枠・出てくる枠）。数値の行の下、ポートのボタンの上。左の表示窓（右端107）と蓄電バー（左端189）のあいだの空きの左右中央（148）に並べ、あいだに矢印（幅22、すき間3）。 */
+    public static final int CHARGE_Y=66, CHARGE_IN_X=117, CHARGE_OUT_X=163;
     private final BlockPos pos;
     private final SyncedInts data;
     private final int machineSlots;
