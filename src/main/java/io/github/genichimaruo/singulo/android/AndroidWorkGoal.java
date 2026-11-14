@@ -623,6 +623,12 @@ final class AndroidWorkGoal extends Goal {
      * 主な物が作る回数分そろえば、次の工程へ。副産物（記録した、ほかに出てくる物）も取り出して持つ。
      */
     private void process(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, WorkJob.Batch step) {
+        // Also protect restored jobs from development versions that admitted machine escrow.
+        // Do not insert private inputs or claim an unowned machine's existing products.
+        if (android.escrowRequest() != null) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
         if (++craftTimer < PROCESS_INTERVAL) {
             return;
         }

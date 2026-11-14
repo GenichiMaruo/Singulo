@@ -607,12 +607,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 historyCount, AndroidOrders.MAX_RECEIPTS, AndroidOrders.MAX_RECEIPTS - externalOrders.size(), MAX_COUNT);
     }
     /**
-     * Steps that restricted orders can run. Source restriction: plain crafting with items. Private escrow: crafting
-     * or machine processing with items and fluids. Never fuel, catalysts or chemicals (they would come from shared stock).
+     * Restricted orders only run plain crafting. Machine capabilities do not isolate pre-existing output or
+     * retain request ownership after insertion, cancellation, worker loss or reload. Even a currently empty
+     * furnace cannot provide that contract. Recipe discovery and ordinary processing orders remain available.
      */
     private static boolean restrictedStep(RecipeData r, boolean escrow) {
-        boolean mode = RecipeData.MODE_CRAFTING.equals(r.mode()) || escrow && RecipeData.MODE_PROCESSING.equals(r.mode());
-        if (!mode || !r.fuel().isEmpty()) return false;
+        if (!RecipeData.MODE_CRAFTING.equals(r.mode()) || !r.fuel().isEmpty()) return false;
         for (ItemStack out : r.outputs()) if (ChemicalSamples.is(out) || !escrow && FluidSamples.liquid(out)) return false;
         for (ItemCount in : r.inputs()) {
             if (unsupportedMaterial(in.item, escrow)) return false;
@@ -752,12 +752,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (!plan.ok()) {
             return Component.translatable(plan.failureKey());
         }
-        // Endpoint source restriction: exactly one plain crafting step. Private escrow: a chain of crafting and
-        // machine steps with item and fluid materials (intermediates and fluids stay in the request's own custody).
+        // Endpoint source restriction: exactly one plain crafting step. Private escrow: plain crafting chains.
+        // Reject every machine step before custody binding: an output baseline is not an ownership protocol.
         if (source != null && (plan.steps.size() != 1 || plan.steps.stream().anyMatch(s -> !restrictedStep(s.entry().recipe(), false))))
             return Component.literal("source_restriction_requires_single_plain_crafting_step");
         if (escrowRequest != null && (plan.steps.isEmpty() || plan.steps.stream().anyMatch(s -> !restrictedStep(s.entry().recipe(), true))))
-            return Component.literal("escrow_requires_crafting_or_machine_steps_without_fuel_or_catalysts");
+            return Component.literal("escrow_requires_plain_crafting_steps_without_fuel_or_catalysts");
         if ((toStock || fresh) && plan.steps.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
