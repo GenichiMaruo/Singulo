@@ -2345,13 +2345,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             long left = need.count;
             for (IItemHandler h : stores) {
                 for (int i = 0; i < h.getSlots() && left > 0; i++) {
-                    if (need.matches(h.getStackInSlot(i))) {
+                    // 1つの欄にスタックより多く入っている入れ物（QIO・ME など、種類ごとに1欄）もあるので、
+                    // 足りるか、その欄が空になるか、持ち物がいっぱいになるまで、同じ欄から続けて取る
+                    while (left > 0 && need.matches(h.getStackInSlot(i))) {
                         ItemStack got = h.extractItem(i, (int) Math.min(left, h.getStackInSlot(i).getMaxStackSize()), false);
+                        if (got.isEmpty()) {
+                            break;
+                        }
                         left -= got.getCount();
                         ItemStack rest = a.addToCarry(got);
                         if (!rest.isEmpty()) {
                             ItemHandlerHelper.insertItemStacked(h, rest, false);      // 入りきらなければ戻す（ふつうは起きない）
                             left += rest.getCount();
+                            break;
                         }
                     }
                 }
