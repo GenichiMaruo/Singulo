@@ -20,6 +20,7 @@ final class ExternalOrderLedger {
     final long count;
     final List<UUID> workers;
     @Nullable final BlockPos destination;
+    @Nullable BlockPos materialSource;
     AndroidOrders.State state = AndroidOrders.State.RUNNING;
     long delivered;
     @Nullable String reason;
@@ -31,15 +32,20 @@ final class ExternalOrderLedger {
         return count==amount && ItemStack.isSameItemSameComponents(target,item)
                 && workers.equals(selected.stream().distinct().sorted().toList()) && Objects.equals(destination,dest);
     }
+    boolean matches(ItemStack item, long amount, List<UUID> selected, @Nullable BlockPos dest, @Nullable BlockPos source) {
+        return matches(item, amount, selected, dest) && Objects.equals(materialSource, source);
+    }
     AndroidOrders.Receipt receipt() { return new AndroidOrders.Receipt(request,state,order,count,delivered,reason); }
     CompoundTag save(HolderLookup.Provider registries) {
         var t=new CompoundTag(); t.putUUID("request",request); t.putUUID("actor",actor); t.putInt("order",order);
         t.put("target",target.save(registries)); t.putLong("count",count); t.putString("state",state.name()); t.putLong("delivered",delivered);
         if(reason!=null)t.putString("reason",reason);
         if(destination!=null)t.put("destination",NbtUtils.writeBlockPos(destination));
+        if(materialSource!=null)t.put("material_source",NbtUtils.writeBlockPos(materialSource));
         var w=new ListTag(); for(UUID id:workers)w.add(NbtUtils.createUUID(id)); t.put("workers",w); return t;
     }
     @Nullable static ExternalOrderLedger load(CompoundTag t, HolderLookup.Provider registries) {
+        if(t.contains("material_source") && NbtUtils.readBlockPos(t,"material_source").isEmpty()) return null;
         if(!t.hasUUID("request")||!t.hasUUID("actor")||t.getInt("order")<1)return null;
         var item=ItemStack.parseOptional(registries,t.getCompound("target")); long count=t.getLong("count");
         if(item.isEmpty()||count<1||count>WorkConsoleBlockEntity.MAX_COUNT)return null;
@@ -48,6 +54,7 @@ final class ExternalOrderLedger {
             try { workers.add(NbtUtils.loadUUID(w)); } catch(IllegalArgumentException ignored) { return null; }
         }
         var e=new ExternalOrderLedger(t.getUUID("request"),t.getUUID("actor"),t.getInt("order"),item,count,workers,NbtUtils.readBlockPos(t,"destination").orElse(null));
+        e.materialSource=NbtUtils.readBlockPos(t,"material_source").orElse(null);
         try { e.state=AndroidOrders.State.valueOf(t.getString("state")); }
         catch(IllegalArgumentException ex) { e.state=AndroidOrders.State.FAILED; e.reason="invalid_saved_state"; }
         if(e.state!=AndroidOrders.State.RUNNING&&!e.receipt().terminal()) { e.state=AndroidOrders.State.FAILED; e.reason="invalid_saved_state"; }

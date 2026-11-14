@@ -2857,6 +2857,7 @@
   "message.singulo.void_collector.rate": "虚空 %s%%：约每 %s 秒收集 1 个虚空之尘",
   "message.singulo.welcome": "您收到了 Singulo 手册。右键单击打开它",
   "message.singulo.work_link.added": "已连接到作业指令台（%s, %s, %s）",
+  "message.singulo.work_link.endpoint_result": "端点连接: %s",
   "message.singulo.work_link.info": "已连接的作业指令台：%s, %s, %s",
   "message.singulo.work_link.none": "没有连接到任何作业指令台",
   "message.singulo.work_link.not_console": "这张卡没有记录作业指令台",

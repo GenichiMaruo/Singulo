@@ -2857,6 +2857,7 @@
   "message.singulo.void_collector.rate": "Void %s%%: one Void Dust every %ss",
   "message.singulo.welcome": "You received the Singulo Handbook. Right-click to open it",
   "message.singulo.work_link.added": "Linked to the work console at %s, %s, %s",
+  "message.singulo.work_link.endpoint_result": "Endpoint link: %s",
   "message.singulo.work_link.info": "Linked to the work console at %s, %s, %s",
   "message.singulo.work_link.none": "Not linked to a work console",
   "message.singulo.work_link.not_console": "This card does not hold a work console",

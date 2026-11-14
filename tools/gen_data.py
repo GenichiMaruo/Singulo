@@ -1089,6 +1089,7 @@ UI_LANG = {
     'message.singulo.work_link.not_console': ('このカードは作業指令台を記録していない', 'This card does not hold a work console'),
     'message.singulo.work_link.removed': ('作業指令台から外した', 'Unlinked from the work console'),
     'message.singulo.work_link.too_far': ('作業指令台から遠すぎる（%sブロックまで）', 'Too far from the work console (up to %s blocks)'),
+    'message.singulo.work_link.endpoint_result': ('連携先のリンク: %s', 'Endpoint link: %s'),
     'message.singulo.work_link.added': ('作業指令台（%s, %s, %s）につないだ', 'Linked to the work console at %s, %s, %s'),
     'message.singulo.work_link.none': ('どの作業指令台にもつながっていない', 'Not linked to a work console'),
     'message.singulo.work_link.info': ('つながっている作業指令台：%s, %s, %s', 'Linked to the work console at %s, %s, %s'),

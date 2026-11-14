@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -178,6 +180,39 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     };
     private final IItemHandler outboxHandler = new net.neoforged.neoforge.items.wrapper.InvWrapper(outbox);
     private final Set<BlockPos> links = new LinkedHashSet<>();
+    private record EndpointLink(UUID identity, UUID owner) { }
+    private final java.util.Map<BlockPos, EndpointLink> endpointLinks = new java.util.LinkedHashMap<>();
+
+    public AndroidWorkEndpoints.Result linkExternalEndpoint(UUID actor, BlockPos pos) {
+        if (!externalAllowed(actor) || pos.equals(worldPosition) || !pos.closerThan(worldPosition, LINK_RANGE))
+            return AndroidWorkEndpoints.Result.REJECTED;
+        if (!level.isLoaded(pos)) return AndroidWorkEndpoints.Result.UNAVAILABLE;
+        if (!(level.getBlockEntity(pos) instanceof AndroidWorkEndpoint e) || e.endpointId() == null
+                || !actor.equals(e.endpointOwner())) return AndroidWorkEndpoints.Result.REJECTED;
+        EndpointLink wanted = new EndpointLink(e.endpointId(), actor);
+        if (wanted.equals(endpointLinks.get(pos))) return AndroidWorkEndpoints.Result.LINKED;
+        if (!orders.isEmpty()) return AndroidWorkEndpoints.Result.BUSY;
+        if (endpointLinks.size() >= 64 && !endpointLinks.containsKey(pos)) return AndroidWorkEndpoints.Result.REJECTED;
+        endpointLinks.put(pos.immutable(), wanted); setChanged();
+        return AndroidWorkEndpoints.Result.LINKED;
+    }
+    public AndroidWorkEndpoints.Result unlinkExternalEndpoint(UUID actor, BlockPos pos) {
+        if (!externalAllowed(actor)) return AndroidWorkEndpoints.Result.REJECTED;
+        if (!orders.isEmpty()) return AndroidWorkEndpoints.Result.BUSY;
+        endpointLinks.remove(pos); setChanged(); return AndroidWorkEndpoints.Result.UNLINKED;
+    }
+    @Nullable public AndroidWorkEndpoint workEndpoint(BlockPos pos) {
+        var link = endpointLinks.get(pos);
+        if (link == null || !java.util.Objects.equals(owner(), link.owner()) || level == null || !level.isLoaded(pos)) return null;
+        var be = level.getBlockEntity(pos);
+        if (be != null && !be.isRemoved() && be instanceof AndroidWorkEndpoint e
+                && link.identity().equals(e.endpointId()) && link.owner().equals(e.endpointOwner())) return e;
+        return null;
+    }
+    private boolean validDelivery(BlockPos pos) {
+        var e = workEndpoint(pos);
+        return deliveryPort(pos) != null || e != null && e.deliveryItems() != null;
+    }
     private final List<WorkOrder> orders = new ArrayList<>();
     private int nextOrderId = 1;
     private final java.util.Map<UUID, ExternalOrderLedger> externalOrders = new java.util.LinkedHashMap<>();
@@ -268,6 +303,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 外す（画面のボタン）。 */
     public void unlink(BlockPos pos) {
+        if (endpointLinks.containsKey(pos)) {
+            if (orders.isEmpty()) { endpointLinks.remove(pos); setChanged(); }
+            return;
+        }
         if (level != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof WorkLinkedBlockEntity b && worldPosition.equals(b.console())) {
             b.setConsole(null);
         }
@@ -291,7 +330,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** つながっている場所の一覧（画面用。種類はブロックで見る）。 */
     public List<BlockPos> links() {
-        return new ArrayList<>(links);
+        var out = new ArrayList<>(links); out.addAll(endpointLinks.keySet()); return out;
     }
 
     // ------------------------------------------------------------------ 在庫・レシピ
@@ -304,6 +343,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (SupplyPortBlockEntity port : linked(SupplyPortBlockEntity.class)) {
             port.storages(level, seen, out);
         }
+        for (BlockPos p : endpointLinks.keySet()) {
+            var e = workEndpoint(p);
+            if (e != null && e.supplyItems() != null) out.add(e.supplyItems());
+        }
         return out;
     }
 
@@ -313,7 +356,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         Set<BlockPos> stores = new HashSet<>();
         for (BlockPos p : supplyPoints()) {
             List<IItemHandler> here = new ArrayList<>();
-            SupplyPortBlockEntity.collect(level, p, stores, here);
+            here.addAll(storagesAt(p, stores));
             for (IItemHandler h : here) {
                 for (int i = 0; i < h.getSlots(); i++) {
                     ItemStack s = h.getStackInSlot(i);
@@ -323,6 +366,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         Set<BlockPos> seen = new HashSet<>();
         for (BlockPos p : supplyPoints()) {
+            if (endpointLinks.containsKey(p)) continue;
             LiquidStores.at(level, p, seen).addTo(out);       // 液体・化学物質（Mekanism）も、量で数える
         }
         return out;
@@ -427,24 +471,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** Implementation behind AndroidOrders; callers should use that facade. */
     public AndroidOrders.Receipt submitExternalOrder(UUID actor, UUID id, ItemStack target, long count,
                                                      List<UUID> workers, @Nullable BlockPos destination) {
+        return submitExternalOrder(actor, id, target, count, workers, destination, null);
+    }
+    public AndroidOrders.Receipt submitExternalOrder(UUID actor, UUID id, ItemStack target, long count,
+                                                     List<UUID> workers, @Nullable BlockPos destination, @Nullable BlockPos source) {
         if (!externalAllowed(actor)) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "not_console_owner");
         if (target.isEmpty() || FluidSamples.liquid(target) || count < 1 || count > MAX_COUNT || workers.stream().anyMatch(java.util.Objects::isNull))
             return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "invalid_item_count_or_workers");
         var previous = externalOrders.get(id);
         if (previous != null) {
-            if (!previous.actor.equals(actor) || !previous.matches(target, count, workers, destination))
+            if (!previous.actor.equals(actor) || !previous.matches(target, count, workers, destination, source))
                 return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "request_id_conflict");
             return externalOrderStatus(actor, id);
         }
         if (externalOrders.size() >= AndroidOrders.MAX_RECEIPTS)
             return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "receipt_limit_acknowledge_terminal_orders");
-        if (destination != null && (destination.equals(worldPosition) || deliveryPort(destination) == null))
+        if (destination != null && (destination.equals(worldPosition) || !validDelivery(destination)))
             return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "invalid_delivery_port");
+        var endpoint = source == null ? null : workEndpoint(source);
+        if (source != null && (endpoint == null || endpoint.supplyItems() == null))
+            return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "source_endpoint_unavailable");
         int orderId = nextOrderId;
         Component why = start(actorFor(level, actor), target.copy(), count, List.copyOf(workers), destination,
-                false, workers.isEmpty(), true);
+                false, workers.isEmpty(), true, source == null ? null : itemsAt(storagesAt(source, new HashSet<>())), source);
         if (why != null) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, why.getString());
         var entry = new ExternalOrderLedger(id, actor, orderId, target, count, workers, destination);
+        entry.materialSource = source == null ? null : source.immutable();
         externalOrders.put(id, entry);
         setChanged();
         return entry.receipt();
@@ -565,13 +617,36 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
                             boolean toStock, boolean auto, boolean fresh, @Nullable List<ItemCount> stock) {
+        return start(player, target, count, androids, destination, toStock, auto, fresh, stock, null);
+    }
+    @Nullable
+    private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
+                            boolean toStock, boolean auto, boolean fresh, @Nullable List<ItemCount> stock, @Nullable BlockPos source) {
         if (!mayOperate(player)) {
             return Component.translatable("gui.singulo.work_console.locked");
         }
-        WorkPlanner.Plan plan = plan(target, count, toStock || fresh, stock == null ? stock() : stock);
+        WorkPlanner.Plan plan;
+        if (source == null) {
+            plan = plan(target, count, toStock || fresh, stock == null ? stock() : stock);
+        } else {
+            List<ItemCount> scoped = new ArrayList<>();
+            for (ItemCount actual : stock) {
+                long available = actual.count;
+                for (WorkOrder other : orders) available -= other.held(source, actual.item);
+                if (available > 0 && !actual.matches(target)) scoped.add(new ItemCount(actual.item, available));
+            }
+            plan = WorkPlanner.plan(target, count, recipes(), scoped);
+        }
         if (!plan.ok()) {
             return Component.translatable(plan.failureKey());
         }
+        if (source != null && (plan.steps.size() != 1 || plan.steps.stream().anyMatch(s ->
+                !RecipeData.MODE_CRAFTING.equals(s.entry().recipe().mode()) || !s.entry().recipe().fuel().isEmpty()
+                || s.entry().recipe().inputs().stream().anyMatch(i -> FluidSamples.liquid(i.item)
+                || io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(i.item)
+                || i.alt != null && java.util.Arrays.stream(i.alt.getItems()).anyMatch(a ->
+                    FluidSamples.liquid(a) || io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(a))))))
+            return Component.literal("source_restriction_requires_single_plain_crafting_step");
         if ((toStock || fresh) && plan.steps.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
@@ -587,8 +662,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return Component.translatable("gui.singulo.work_console.error.no_android");
         }
         WorkOrder order = WorkOrder.create(nextOrderId++, plan, player.getUUID());
+        order.materialSource = source == null ? null : source.immutable();
+        order.materialEndpointId = source == null ? null : workEndpoint(source).endpointId();
         order.toStock = toStock || FluidSamples.liquid(target);
-        order.destination = destination != null && !destination.equals(worldPosition) && deliveryPort(destination) != null ? destination : null;
+        order.destination = destination != null && !destination.equals(worldPosition) && validDelivery(destination) ? destination.immutable() : null;
+        if (order.destination != null && workEndpoint(order.destination) != null)
+            order.deliveryEndpointId = workEndpoint(order.destination).endpointId();
         // どの工程も、選んだアンドロイドのだれかが一度に運べるか
         for (WorkOrder.StepState s : order.steps) {
             boolean fits = false;
@@ -1500,6 +1579,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (SupplyPortBlockEntity port : linked(SupplyPortBlockEntity.class)) {
             out.add(port.getBlockPos());
         }
+        for (BlockPos p : endpointLinks.keySet()) {
+            var e = workEndpoint(p);
+            if (e != null && e.supplyItems() != null) out.add(p);
+        }
         return out;
     }
 
@@ -1566,6 +1649,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所の隣のストレージ。アンドロイド作業台なら、その預かり箱（作った物があふれたときに入れた所）。 */
     public List<IItemHandler> storagesAt(BlockPos point, Set<BlockPos> seen) {
         List<IItemHandler> out = new ArrayList<>();
+        if (endpointLinks.containsKey(point)) {
+            var e = workEndpoint(point);
+            if (e != null && seen.add(point) && e.supplyItems() != null) out.add(e.supplyItems());
+            return out;
+        }
+        if (!level.isLoaded(point)) return out;
         if (level.getBlockEntity(point) instanceof AndroidWorkbenchBlockEntity bench) {
             out.add(bench.buffer());
             return out;
@@ -1577,6 +1666,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所 point の隣の、流体の入れ物（タンクなど）。 */
     public List<net.neoforged.neoforge.fluids.capability.IFluidHandler> fluidStoresAt(BlockPos point, Set<BlockPos> seen) {
         List<net.neoforged.neoforge.fluids.capability.IFluidHandler> out = new ArrayList<>();
+        if (endpointLinks.containsKey(point)) return out;
         SupplyPortBlockEntity.collectFluids(level, point, seen, out);
         return out;
     }
@@ -1689,7 +1779,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private List<ItemCount> reserveItems(WorkOrder order, List<ItemCount> need) {
         List<ItemCount> short_ = new ArrayList<>();
         Set<BlockPos> seen = new HashSet<>();
-        List<BlockPos> points = supplyPoints();
+        List<BlockPos> points = order.materialSource == null ? supplyPoints()
+                : validMaterialSource(order) ? List.of(order.materialSource) : List.of();
         List<List<IItemHandler>> stores = new ArrayList<>();
         for (BlockPos p : points) {
             stores.add(storagesAt(p, seen));
@@ -1754,6 +1845,17 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         return out;
+    }
+    private static List<ItemCount> itemsAt(List<IItemHandler> stores) {
+        List<ItemCount> out = new ArrayList<>();
+        for (IItemHandler h : stores) for (int s = 0; s < h.getSlots(); s++) {
+            ItemStack item = h.getStackInSlot(s); ItemCount.add(out, item, item.getCount());
+        }
+        return out;
+    }
+    private boolean validMaterialSource(WorkOrder order) {
+        var e = order.materialSource == null ? null : workEndpoint(order.materialSource);
+        return e != null && e.endpointId().equals(order.materialEndpointId) && e.supplyItems() != null;
     }
 
     /**
@@ -2043,6 +2145,30 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 受け渡し場所で、そこにある物を持ち物へ取り出す（全部そろわなければ取らない）。 */
     public boolean fetchAt(RuinAndroid a, WorkJob job, Pickup pickup) {
+        WorkOrder restricted = order(job.orderId());
+        if (restricted != null && restricted.materialSource != null && !validMaterialSource(restricted)) return false;
+        // Check the complete item pickup before extraction. Addon supplies can be read-only on
+        // insertion; relying on returning an overflow to them can otherwise discard resources.
+        a.compactCarry();
+        List<ItemStack> simulatedCarry = new ArrayList<>();
+        for (int slot : a.carrySlots()) simulatedCarry.add(a.inventory().getItem(slot).copy());
+        for (ItemCount need : pickup.items()) {
+            if (FluidSamples.liquid(need.item)) continue;
+            long remaining = need.count;
+            for (int pass = 0; pass < 2 && remaining > 0; pass++) {
+                for (int i = 0; i < simulatedCarry.size() && remaining > 0; i++) {
+                    ItemStack held = simulatedCarry.get(i);
+                    if (pass == 0 && !held.isEmpty() && ItemStack.isSameItemSameComponents(held, need.item)) {
+                        int move = (int) Math.min(remaining, Math.max(0, held.getMaxStackSize() - held.getCount()));
+                        held.grow(move); remaining -= move;
+                    } else if (pass == 1 && held.isEmpty()) {
+                        int move = (int) Math.min(remaining, need.item.getMaxStackSize());
+                        simulatedCarry.set(i, need.item.copyWithCount(move)); remaining -= move;
+                    }
+                }
+            }
+            if (remaining > 0) return false;
+        }
         List<IItemHandler> stores = storagesAt(pickup.point(), new HashSet<>());
         LiquidStores liquids = LiquidStores.at(level, pickup.point());
         for (ItemCount need : pickup.items()) {
@@ -2203,6 +2329,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             return best != null ? best : worldPosition;
         }
+        // Never silently redirect an endpoint order after unloading, replacement or permission change.
+        if (o != null && o.deliveryEndpointId != null && o.destination != null) return o.destination;
         return o != null && o.destination != null && deliveryPort(o.destination) != null ? o.destination : worldPosition;
     }
 
@@ -2230,6 +2358,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return deliverFluid(a, job, at, o, active);
         }
         IItemHandler box = o != null && o.toStock ? stockHandler(at) : port != null ? port.handler() : outboxHandler;
+        if (o != null && o.deliveryEndpointId != null) {
+            var endpoint = workEndpoint(at);
+            if (endpoint == null || !o.deliveryEndpointId.equals(endpoint.endpointId()) || endpoint.deliveryItems() == null) {
+                o.status = WorkOrder.WAIT_SPACE;
+                return false;
+            }
+            box = endpoint.deliveryItems();
+        }
         boolean all = true;
         long moved = 0;
         long limit = active.remainingDelivery;
@@ -2988,6 +3124,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             ls.add(NbtUtils.writeBlockPos(p));
         }
         tag.put("links", ls);
+        ListTag endpoints = new ListTag();
+        endpointLinks.forEach((p, link) -> {
+            CompoundTag e = new CompoundTag(); e.putLong("pos", p.asLong());
+            e.putUUID("identity", link.identity()); e.putUUID("owner", link.owner()); endpoints.add(e);
+        });
+        tag.put("work_endpoints_v1", endpoints);
         ListTag os = new ListTag();
         for (WorkOrder o : orders) {
             os.add(o.save(registries));
@@ -3048,6 +3190,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         rt.putInt("Size", PathRule.SLOTS);
         routes.deserializeNBT(registries, rt);
         links.clear();
+        endpointLinks.clear();
+        for (Tag entry : tag.getList("work_endpoints_v1", Tag.TAG_COMPOUND)) {
+            CompoundTag e = (CompoundTag) entry;
+            BlockPos p = BlockPos.of(e.getLong("pos"));
+            if (endpointLinks.size() < 64 && e.hasUUID("identity") && e.hasUUID("owner")
+                    && !p.equals(worldPosition) && p.closerThan(worldPosition, LINK_RANGE))
+                endpointLinks.putIfAbsent(p, new EndpointLink(e.getUUID("identity"), e.getUUID("owner")));
+        }
         for (Tag t : tag.getList("links", Tag.TAG_INT_ARRAY)) {
             NbtUtils.readBlockPos(wrap(t), "p").ifPresent(links::add);
         }

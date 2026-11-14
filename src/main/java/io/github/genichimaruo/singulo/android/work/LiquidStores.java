@@ -32,6 +32,9 @@ public final class LiquidStores {
     public static LiquidStores at(Level level, BlockPos point, Set<BlockPos> seen) {
         LiquidStores out = new LiquidStores();
         out.storage = true;
+        // The addon contract exposes item handlers only, never neighboring fluid/chemical stores.
+        if (level.isLoaded(point) && level.getBlockEntity(point) instanceof io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint)
+            return out;
         Set<BlockPos> chemSeen = new HashSet<>(seen);
         SupplyPortBlockEntity.collectFluids(level, point, seen, out.fluids);
         if (Chemicals.present()) {

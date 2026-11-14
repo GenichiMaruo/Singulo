@@ -62,6 +62,11 @@ public final class WorkOrder {
     /** 納品先（作業指令台か、納品口）。 */
     @Nullable
     public BlockPos destination;
+    /** Pins a placed addon endpoint; missing/replaced destinations must not fall back. */
+    @Nullable public UUID deliveryEndpointId;
+    /** New input reservation source only, not exclusive inventory/return isolation. */
+    @Nullable public BlockPos materialSource;
+    @Nullable public UUID materialEndpointId;
     /** できた物を、納品先ではなく素材置き場へ入れる（登録した注文の「在庫を保つ」）。 */
     public boolean toStock;
     /** 画面から今すぐ出した注文: できたとき・止まったときに、注文した人へ知らせる（登録した注文の繰り返しでは知らせない）。 */
@@ -301,6 +306,11 @@ public final class WorkOrder {
         if (destination != null) {
             t.put("destination", NbtUtils.writeBlockPos(destination));
         }
+        if (deliveryEndpointId != null) t.putUUID("delivery_endpoint_id", deliveryEndpointId);
+        if (materialSource != null) {
+            t.put("material_source", NbtUtils.writeBlockPos(materialSource));
+            if (materialEndpointId != null) t.putUUID("material_endpoint_id", materialEndpointId);
+        }
         t.putBoolean("to_stock", toStock);
         t.putBoolean("notify", notify);
         ListTag pr = new ListTag();
@@ -327,6 +337,10 @@ public final class WorkOrder {
 
     @Nullable
     public static WorkOrder load(CompoundTag t, HolderLookup.Provider registries) {
+        if ((t.contains("material_source") || t.contains("material_endpoint_id"))
+                && (!t.hasUUID("material_endpoint_id") || NbtUtils.readBlockPos(t, "material_source").isEmpty())) return null;
+        if (t.contains("delivery_endpoint_id") && (!t.hasUUID("delivery_endpoint_id")
+                || NbtUtils.readBlockPos(t, "destination").isEmpty())) return null;
         ItemStack target = ItemStack.parseOptional(registries, t.getCompound("target"));
         if (target.isEmpty()) {
             return null;
@@ -348,6 +362,10 @@ public final class WorkOrder {
         }
         o.delivered = t.getLong("delivered");
         o.destination = NbtUtils.readBlockPos(t, "destination").orElse(null);
+        o.deliveryEndpointId = t.hasUUID("delivery_endpoint_id") ? t.getUUID("delivery_endpoint_id") : null;
+        o.materialSource = NbtUtils.readBlockPos(t, "material_source").orElse(null);
+        // Invalid identity remains restricted/unavailable, never silently becomes shared.
+        o.materialEndpointId = t.hasUUID("material_endpoint_id") ? t.getUUID("material_endpoint_id") : null;
         o.toStock = t.getBoolean("to_stock");
         o.notify = t.getBoolean("notify");
         for (Tag p : t.getList("pending_reserve", Tag.TAG_COMPOUND)) {
