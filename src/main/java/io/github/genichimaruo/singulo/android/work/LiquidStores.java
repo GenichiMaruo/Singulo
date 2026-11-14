@@ -28,6 +28,14 @@ public final class LiquidStores {
 
     private LiquidStores() {}
 
+    /** One fluid handler as a store (private escrow custody). Counts what can be drained. */
+    public static LiquidStores of(IFluidHandler handler) {
+        LiquidStores out = new LiquidStores();
+        out.storage = true;
+        out.fluids.add(handler);
+        return out;
+    }
+
     /** point の隣の入れ物（seen にある場所は除き、見つけた場所を足す）。 */
     public static LiquidStores at(Level level, BlockPos point, Set<BlockPos> seen) {
         LiquidStores out = new LiquidStores();

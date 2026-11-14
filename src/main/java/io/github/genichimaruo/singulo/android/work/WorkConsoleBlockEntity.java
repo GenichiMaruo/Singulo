@@ -216,7 +216,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         entry.requestedWorker = worker;
         data.setDirty();
         List<ItemCount> supplied = new ArrayList<>();
-        for (ItemStack s : offered) ItemCount.add(supplied, s, s.getCount());
+        for (ItemStack s : offered) ItemCount.add(supplied, FluidSamples.liquid(s) ? FluidSamples.key(s) : s, FluidSamples.amount(s));
         int id = nextOrderId;
         Component why;
         try {
@@ -606,6 +606,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return new AndroidOrders.ConsoleSnapshot(AndroidOrders.SnapshotState.AVAILABLE, receipts, activeCount,
                 historyCount, AndroidOrders.MAX_RECEIPTS, AndroidOrders.MAX_RECEIPTS - externalOrders.size(), MAX_COUNT);
     }
+    /**
+     * Steps that restricted orders can run. Source restriction: plain crafting with items. Private escrow: crafting
+     * or machine processing with items and fluids. Never fuel, catalysts or chemicals (they would come from shared stock).
+     */
+    private static boolean restrictedStep(RecipeData r, boolean escrow) {
+        boolean mode = RecipeData.MODE_CRAFTING.equals(r.mode()) || escrow && RecipeData.MODE_PROCESSING.equals(r.mode());
+        if (!mode || !r.fuel().isEmpty()) return false;
+        for (ItemStack out : r.outputs()) if (ChemicalSamples.is(out) || !escrow && FluidSamples.liquid(out)) return false;
+        for (ItemCount in : r.inputs()) {
+            if (unsupportedMaterial(in.item, escrow)) return false;
+            if (in.alt != null) for (ItemStack a : in.alt.getItems()) if (unsupportedMaterial(a, escrow)) return false;
+        }
+        return true;
+    }
+    private static boolean unsupportedMaterial(ItemStack s, boolean escrow) {
+        return io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(s) || ChemicalSamples.is(s) || !escrow && FluidSamples.liquid(s);
+    }
     private boolean externalAllowed(UUID actor) {
         if (!(level instanceof ServerLevel server) || !server.getServer().isSameThread() || isRemoved()) return false;
         return owner != null && owner.equals(actor) && mayOperate(actorFor(level, actor));
@@ -735,16 +752,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (!plan.ok()) {
             return Component.translatable(plan.failureKey());
         }
-        // Endpoint source restriction: exactly one plain crafting step. Private escrow: a chain of plain crafting
-        // steps (intermediates are returned into the request's own custody and fetched again from there).
-        if ((source != null || escrowRequest != null) && ((source != null ? plan.steps.size() != 1 : plan.steps.isEmpty())
-                || plan.steps.stream().anyMatch(s ->
-                !RecipeData.MODE_CRAFTING.equals(s.entry().recipe().mode()) || !s.entry().recipe().fuel().isEmpty()
-                || s.entry().recipe().inputs().stream().anyMatch(i -> FluidSamples.liquid(i.item)
-                || io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(i.item)
-                || i.alt != null && java.util.Arrays.stream(i.alt.getItems()).anyMatch(a ->
-                    FluidSamples.liquid(a) || io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(a))))))
+        // Endpoint source restriction: exactly one plain crafting step. Private escrow: a chain of crafting and
+        // machine steps with item and fluid materials (intermediates and fluids stay in the request's own custody).
+        if (source != null && (plan.steps.size() != 1 || plan.steps.stream().anyMatch(s -> !restrictedStep(s.entry().recipe(), false))))
             return Component.literal("source_restriction_requires_single_plain_crafting_step");
+        if (escrowRequest != null && (plan.steps.isEmpty() || plan.steps.stream().anyMatch(s -> !restrictedStep(s.entry().recipe(), true))))
+            return Component.literal("escrow_requires_crafting_or_machine_steps_without_fuel_or_catalysts");
         if ((toStock || fresh) && plan.steps.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
@@ -1967,6 +1980,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (IItemHandler h : stores) {
             for (int s = 0; s < h.getSlots(); s++) {
                 ItemStack st = h.getStackInSlot(s);
+                if (FluidSamples.liquid(need.item)) {   // escrow custody keeps fluids as samples (amount in mB)
+                    if (FluidSamples.is(st) && FluidSamples.is(need.item) && net.neoforged.neoforge.fluids.FluidStack
+                            .isSameFluidSameComponents(FluidSamples.fluid(st), FluidSamples.fluid(need.item)))
+                        ItemCount.add(out, FluidSamples.key(st), FluidSamples.amount(st));
+                    continue;
+                }
                 if (!st.isEmpty() && need.matches(st)) {
                     ItemCount.add(out, st, st.getCount());
                 }
@@ -2308,9 +2327,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         List<IItemHandler> stores = escrow == null ? storagesAt(pickup.point(), new HashSet<>())
                 : List.of(AndroidEscrowData.get((ServerLevel) level).inputHandler(escrow));
-        LiquidStores liquids = LiquidStores.at(level, pickup.point());
+        LiquidStores liquids = escrow == null ? LiquidStores.at(level, pickup.point())
+                : LiquidStores.of(AndroidEscrowData.get((ServerLevel) level).fluidHandler(escrow, false));
         for (ItemCount need : pickup.items()) {
-            long have = countAt(pickup.point(), need.item, stores);
+            long have = escrow != null && FluidSamples.liquid(need.item) ? liquids.amount(need.item) : countAt(pickup.point(), need.item, stores);
             if (have < need.count) {
                 WorkOrder short_ = order(job.orderId());
                 if (short_ != null) {
@@ -2421,6 +2441,17 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 ItemStack rest = data.returnCargo(e, stack);
                 if (o != null && a.escrowRequest().equals(o.escrowRequest)) o.hold(worldPosition, stack, stack.getCount() - rest.getCount());
                 a.inventory().setItem(slot, rest); allReturned &= rest.isEmpty();
+            }
+            // fluids carried in tanks go back into the same request's custody
+            var fluids = LiquidStores.of(data.fluidHandler(e, false));
+            for (var held : new ArrayList<>(a.liquids())) {
+                if (!FluidSamples.is(held.getKey())) { allReturned = false; continue; }
+                long moved = fluids.fill(held.getKey(), held.getValue(), false);
+                if (moved > 0) {
+                    a.drainLiquid(held.getKey(), moved, false);
+                    if (o != null && a.escrowRequest().equals(o.escrowRequest)) o.hold(worldPosition, FluidSamples.key(held.getKey()), moved);
+                }
+                allReturned &= moved >= held.getValue();
             }
             setChanged(); return allReturned;
         }

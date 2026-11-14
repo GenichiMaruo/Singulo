@@ -187,6 +187,64 @@ public final class AndroidEscrowOrderGameTests {
             h.assertTrue(shared.getItem(0).getCount()==32 && c.outbox().isEmpty(),"Shared stock or outbox touched");
         });
     }
+    /** Machine step: raw iron from private custody into a (pre-fuelled) furnace, ingots into the private product buffer. */
+    @GameTest(template="empty",timeoutTicks=3000)
+    public static void actualWorkerRunsPrivateMachineStep(GameTestHelper h) {
+        var c=setup(h,true);var id=UUID.randomUUID();
+        net.minecraft.world.level.block.entity.ChestBlockEntity shared=h.getBlockEntity(CHEST);
+        BlockPos furnacePos=new BlockPos(5,1,3);
+        h.setBlock(furnacePos,net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace=h.getBlockEntity(furnacePos);
+        furnace.setItem(1,new ItemStack(Items.COAL,8));   // fuel already inside: the recipe itself records no fuel
+        ItemStack card=new ItemStack(item("work_location_card"));
+        WorkLocationCardItem.record(card,h.getLevel(),h.absolutePos(furnacePos),net.minecraft.world.level.block.Blocks.FURNACE);
+        RecipeRackBlockEntity rack=h.getBlockEntity(RACK);
+        rack.items().setStackInSlot(RecipeRackBlockEntity.COLS,card);
+        ItemStack recipe=new ItemStack(item("recipe_card"));
+        java.util.List<ItemStack> grid=new java.util.ArrayList<>(java.util.Collections.nCopies(9,ItemStack.EMPTY));
+        grid.set(0,new ItemStack(Items.RAW_IRON));
+        RecipeData.processing(grid,new ItemStack(Items.IRON_INGOT),List.of(),ItemStack.EMPTY).write(recipe,h.getLevel().registryAccess());
+        rack.items().setStackInSlot(RecipeRackBlockEntity.COLS+1,recipe);
+        var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.IRON_INGOT),2,
+                List.of(new ItemStack(Items.RAW_IRON,2)),null);
+        h.assertTrue(accepted.acceptedNow(),"Machine request rejected: "+accepted.receipt().reason());
+        h.succeedWhen(()->{
+            var snap=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
+            h.assertTrue(snap.phase()==AndroidEscrows.Phase.COMPLETED && !snap.workerPending(),"Not completed: "+snap.phase());
+            h.assertTrue(count(snap.products(),Items.IRON_INGOT)==2 && c.outbox().isEmpty(),"Ingots in private custody: "+snap.products());
+            h.assertTrue(shared.getItem(0).getCount()==32,"Shared stock untouched");
+        });
+    }
+    /** Fluids in custody: one sample per fluid, amounts in mB, partial claims in mB. */
+    @GameTest(template="empty")
+    public static void privateCustodyKeepsFluidAmounts(GameTestHelper h) {
+        var c=setup(h,false);var id=UUID.randomUUID();
+        var water=AndroidEscrows.fluidSample(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,1500));
+        h.assertTrue(AndroidEscrows.fluidOf(water).getAmount()==1500,"Sample API");
+        var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.OAK_PLANKS),4,
+                List.of(new ItemStack(Items.OAK_LOG),water),null);
+        h.assertTrue(accepted.acceptedNow(),"Offer with a fluid rejected: "+accepted.receipt().reason());
+        var data=AndroidEscrowData.get(h.getLevel());var e=data.find(id);
+        var tanks=data.fluidHandler(e,false);
+        var drained=tanks.drain(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,500),
+                net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        h.assertTrue(drained.getAmount()==500,"Drain from custody");
+        tanks.fill(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,200),
+                net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        long water1=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).materials().stream().mapToLong(s->AndroidEscrows.fluidOf(s).getAmount()).sum();
+        h.assertTrue(water1==1200,"Fluid amount kept per fluid: "+water1);
+        var a=worker(h,c,accepted.receipt().orderId());
+        AndroidEscrows.cancel(h.getLevel(),c.owner(),id);
+        h.assertTrue(a.recoverEscrowCargo(),"Worker released");
+        var mats=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).materials();
+        int slot=-1;for(int i=0;i<mats.size();i++) if(!AndroidEscrows.fluidOf(mats.get(i)).isEmpty()) slot=i;
+        h.assertTrue(slot>=0,"Fluid refund listed");
+        var part=AndroidEscrows.claim(h.getLevel(),c.owner(),id,false,slot,1000,false);
+        h.assertTrue(AndroidEscrows.fluidOf(part).getAmount()==1000,"Partial fluid claim in mB");
+        var rest=AndroidEscrows.claim(h.getLevel(),c.owner(),id,false,slot,1000,false);
+        h.assertTrue(AndroidEscrows.fluidOf(rest).getAmount()==200,"Remaining fluid claim");
+        h.succeed();
+    }
     @GameTest(template="empty")
     public static void workerEntitySaveRetainsRequestOwnerAndOriginalDimension(GameTestHelper h) {
         var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");

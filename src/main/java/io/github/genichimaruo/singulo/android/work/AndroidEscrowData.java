@@ -8,6 +8,8 @@ import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /** Per-dimension physical custody. Internal trusted server-thread API, not a capability.
@@ -69,7 +71,8 @@ public final class AndroidEscrowData extends SavedData {
         if (invalidRoot || records.containsKey(request) || blocked.contains(request) || records.size()+quarantined.size()>=MAX_RECORDS
                 || target==null || target.isEmpty() || FluidSamples.liquid(target) || count<1 || count>WorkConsoleBlockEntity.MAX_COUNT
                 || offer==null || offer.isEmpty() || offer.size()>MAX_OFFER_STACKS) return null;
-        for (ItemStack s:offer) if(s==null || s.isEmpty() || FluidSamples.liquid(s) || s.getCount()>s.getMaxStackSize()) return null;
+        for (ItemStack s:offer) if(s==null || s.isEmpty() || ChemicalSamples.is(s) || s.getCount()>s.getMaxStackSize()
+                || FluidSamples.is(s) && FluidSamples.amount(s)<1) return null;
         Entry e=new Entry(request,owner,console,identity,target,count,offer); e.inputs.addAll(copy(offer));
         records.put(request,e); setDirty(); return e;
     }
@@ -106,6 +109,7 @@ public final class AndroidEscrowData extends SavedData {
         if(!valid(e)) return stack.copy(); append(e.inputs,stack); setDirty(); return ItemStack.EMPTY;
     }
     private static void append(List<ItemStack> inventory, ItemStack offered) {
+        if(FluidSamples.is(offered)) { appendFluid(inventory, FluidSamples.fluid(offered)); return; }
         ItemStack rest=offered.copy();
         for(ItemStack held:inventory) if(!held.isEmpty() && ItemStack.isSameItemSameComponents(held,rest)) {
             int n=Math.min(rest.getCount(),Math.max(0,held.getMaxStackSize()-held.getCount())); held.grow(n); rest.shrink(n); if(rest.isEmpty())return;
@@ -125,11 +129,57 @@ public final class AndroidEscrowData extends SavedData {
                 || e.inputs.stream().anyMatch(s->!s.isEmpty()) || e.products.stream().anyMatch(s->!s.isEmpty())) return false;
         records.remove(request); setDirty(); return true;
     }
+    /** Fluids are kept as one sample per fluid; its amount (mB) grows and shrinks. */
+    private static void appendFluid(List<ItemStack> inventory, FluidStack fluid) {
+        if(fluid.isEmpty()) return;
+        for(int i=0;i<inventory.size();i++){ var f=FluidSamples.fluid(inventory.get(i));
+            if(!f.isEmpty() && FluidStack.isSameFluidSameComponents(f,fluid)){ inventory.set(i,FluidSamples.of(f.copyWithAmount(f.getAmount()+fluid.getAmount()))); return; } }
+        for(int i=0;i<inventory.size();i++) if(inventory.get(i).isEmpty()){ inventory.set(i,FluidSamples.of(fluid.copy())); return; }
+        inventory.add(FluidSamples.of(fluid.copy()));
+    }
     private ItemStack extract(List<ItemStack> inv,int slot,int amount,boolean simulate) {
         if(slot<0 || slot>=inv.size() || amount<=0)return ItemStack.EMPTY;
         ItemStack held=inv.get(slot); if(held.isEmpty())return ItemStack.EMPTY;
+        if(FluidSamples.is(held)) {   // amount = mB
+            var f=FluidSamples.fluid(held); int take=Math.min(amount,f.getAmount());
+            if(!simulate){ inv.set(slot,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(f.copyWithAmount(f.getAmount()-take))); setDirty(); }
+            return FluidSamples.of(f.copyWithAmount(take));
+        }
         ItemStack result=held.copyWithCount(Math.min(amount,held.getCount()));
         if(!simulate){held.shrink(result.getCount());setDirty();} return result;
+    }
+    /**
+     * Fluids of a request's custody (inputs, or products) as a fluid handler: workers drain inputs into their tanks
+     * and return leftovers; nothing else can reach it.
+     */
+    public IFluidHandler fluidHandler(Entry e, boolean products) {
+        return new IFluidHandler() {
+            private List<ItemStack> inv(){return products?e.products:e.inputs;}
+            private List<Integer> tanks(){List<Integer> out=new ArrayList<>(); if(!valid(e))return out;
+                for(int i=0;i<inv().size();i++) if(FluidSamples.is(inv().get(i)))out.add(i); return out;}
+            public int getTanks(){return tanks().size()+1;}
+            public FluidStack getFluidInTank(int tank){var t=tanks(); return tank<t.size()?FluidSamples.fluid(inv().get(t.get(tank))):FluidStack.EMPTY;}
+            public int getTankCapacity(int tank){return Integer.MAX_VALUE;}
+            public boolean isFluidValid(int tank,FluidStack stack){return valid(e);}
+            public int fill(FluidStack resource,FluidAction action){
+                if(!valid(e) || resource.isEmpty())return 0;
+                if(action.execute()){appendFluid(inv(),resource.copy());setDirty();}
+                return resource.getAmount();
+            }
+            public FluidStack drain(FluidStack resource,FluidAction action){
+                if(!valid(e) || resource.isEmpty() || !products && e.state!=State.RUNNING)return FluidStack.EMPTY;
+                for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i));
+                    if(FluidStack.isSameFluidSameComponents(f,resource)){
+                        int take=Math.min(resource.getAmount(),f.getAmount());
+                        if(action.execute()){inv().set(i,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(f.copyWithAmount(f.getAmount()-take)));setDirty();}
+                        return f.copyWithAmount(take);}}
+                return FluidStack.EMPTY;
+            }
+            public FluidStack drain(int maxDrain,FluidAction action){
+                for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i)); if(!f.isEmpty())return drain(f.copyWithAmount(maxDrain),action);}
+                return FluidStack.EMPTY;
+            }
+        };
     }
     public IItemHandler inputHandler(Entry e) { return handler(e,false); }
     public IItemHandler productHandler(Entry e) { return handler(e,true); }
@@ -204,7 +254,7 @@ public final class AndroidEscrowData extends SavedData {
                 }
                 BlockPos pos=NbtUtils.readBlockPos(t,"console").orElseThrow();ItemStack target=ItemStack.parseOptional(registries,t.getCompound("target"));
                 long count=t.getLong("count");List<ItemStack> offer=readStacks(t,"offer",registries,false);
-                if(target.isEmpty() || FluidSamples.liquid(target) || count<1 || count>WorkConsoleBlockEntity.MAX_COUNT || offer.isEmpty() || offer.size()>MAX_OFFER_STACKS || offer.stream().anyMatch(FluidSamples::liquid))throw new IllegalArgumentException();
+                if(target.isEmpty() || FluidSamples.liquid(target) || count<1 || count>WorkConsoleBlockEntity.MAX_COUNT || offer.isEmpty() || offer.size()>MAX_OFFER_STACKS || offer.stream().anyMatch(ChemicalSamples::is))throw new IllegalArgumentException();
                 Entry e=new Entry(id,t.getUUID("owner"),pos,t.getUUID("identity"),target,count,offer);
                 e.inputs.addAll(readStacks(t,"inputs",registries,true));e.products.addAll(readStacks(t,"products",registries,true));
                 e.state=State.valueOf(t.getString("state"));e.orderId=t.getInt("order");
