@@ -383,7 +383,7 @@ public final class AndroidEscrowOrderGameTests {
             var entry=(net.minecraft.nbt.CompoundTag)raw;if(!id.equals(entry.getUUID("request")))continue;records++;
             h.assertTrue(wrongOwner.equals(entry.getUUID("owner")),"Forensic owner rewritten");
             for(var stackTag:entry.getList("actual_cargo",net.minecraft.nbt.Tag.TAG_COMPOUND))
-                recovered+=FluidSamples.fluid(ItemStack.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag)).getAmount();
+                recovered+=FluidSamples.fluid(ItemStack.of((net.minecraft.nbt.CompoundTag)stackTag)).getAmount();
         }
         h.assertTrue(records==1 && recovered==1200,"Mismatched fluid salvage lost or duplicated");
         h.assertTrue(AndroidEscrows.claim(h.getLevel(),wrongOwner,id,false,0,1200,false).isEmpty(),"Forensic cargo became claimable");h.succeed();
