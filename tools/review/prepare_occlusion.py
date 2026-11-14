@@ -17,6 +17,6 @@ for target in (root / 'saves/Review', root / 'screenshots'):
         shutil.rmtree(target)
 (root / 'saves/Review').mkdir(parents=True)
 shutil.copy2(source, root / 'saves/Review/level.dat')
-(root / 'options.txt').write_text('tutorialStep:none\nlang:en_us\nguiScale:2\nmaxFps:120\nenableVsync:false\nrenderDistance:6\nsimulationDistance:5\npauseOnLostFocus:false\nonboardAccessibility:false\ngraphicsMode:1\nbobView:false\n', encoding='utf-8')
+(root / 'options.txt').write_text('tutorialStep:none\nlang:en_us\nguiScale:2\nmaxFps:120\nenableVsync:false\nrenderDistance:6\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nonboardAccessibility:false\ngraphicsMode:1\nbobView:false\n', encoding='utf-8')
 (root / 'config').mkdir(exist_ok=True)
 (root / 'config/fml.toml').write_text('earlyWindowControl = false\n', encoding='utf-8')
