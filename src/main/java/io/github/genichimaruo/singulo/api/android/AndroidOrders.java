@@ -39,6 +39,45 @@ public final class AndroidOrders {
         return c == null ? new ConsoleSnapshot(SnapshotState.UNAVAILABLE, List.of(), 0, 0,
                 MAX_RECEIPTS, 0, WorkConsoleBlockEntity.MAX_COUNT) : c.externalOrderSnapshot(actor);
     }
+    /** Loaded linked recipes only. Empty AVAILABLE is distinct from inaccessible/unloaded console.
+     * This view may be incomplete while linked racks are unloaded. It never loads their chunks.
+     * Material alternatives are descriptive, not a promise that an arbitrary candidate will craft.
+     */
+    public record RecipeSnapshot(SnapshotState state, List<AndroidRecipe> recipes) {
+        public RecipeSnapshot { Objects.requireNonNull(state); recipes = List.copyOf(recipes); }
+    }
+    public static RecipeSnapshot recipes(ServerLevel level, BlockPos pos, UUID actor) {
+        Objects.requireNonNull(actor);
+        var c = console(level, pos);
+        if (c == null) return new RecipeSnapshot(SnapshotState.UNAVAILABLE, List.of());
+        if (!actor.equals(c.owner())) return new RecipeSnapshot(SnapshotState.REJECTED, List.of());
+        var out = new java.util.ArrayList<AndroidRecipe>();
+        for (var entry : c.recipes()) {
+            var recipe = entry.recipe();
+            var products = recipe.outputs().stream().map(s -> new AndroidRecipe.Product(
+                    io.github.genichimaruo.singulo.android.work.FluidSamples.key(s),
+                    io.github.genichimaruo.singulo.android.work.FluidSamples.amount(s),
+                    io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(s))).toList();
+            var materials = new java.util.ArrayList<AndroidRecipe.Material>();
+            for (var input : recipe.inputs()) {
+                materials.add(new AndroidRecipe.Material(input.item, input.count,
+                        input.alt == null ? List.of(input.item) : java.util.Arrays.asList(input.alt.getItems()),
+                        input.alt == null ? "" : io.github.genichimaruo.singulo.android.work.ItemCount.key(input.alt),
+                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item), false,
+                        io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(input.item)));
+            }
+            if (!recipe.fuel().isEmpty()) {
+                var fuel = recipe.fuel();
+                materials.add(new AndroidRecipe.Material(
+                        io.github.genichimaruo.singulo.android.work.FluidSamples.key(fuel),
+                        io.github.genichimaruo.singulo.android.work.FluidSamples.amount(fuel), List.of(fuel), "",
+                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(fuel), true,
+                        io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(fuel)));
+            }
+            out.add(new AndroidRecipe(recipe.mode(), entry.location(), products, materials, recipe.fuelFill()));
+        }
+        return new RecipeSnapshot(SnapshotState.AVAILABLE, out);
+    }
     public static Receipt result(UUID id, State state, String reason) {
         return new Receipt(Objects.requireNonNull(id), state, -1, 0, 0, reason);
     }
@@ -52,6 +91,19 @@ public final class AndroidOrders {
         Objects.requireNonNull(actor); Objects.requireNonNull(requestId); Objects.requireNonNull(target); Objects.requireNonNull(workers);
         var c = console(level, pos);
         return c == null ? result(requestId, State.UNAVAILABLE, "console_unavailable") : c.submitExternalOrder(actor, requestId, target, count, workers, destination);
+    }
+    /** Initial/retry material reservations use only sourceEndpoint. NOT escrow: other consumers
+     * and cancellation returns follow normal inventory rules. Only a single ordinary crafting
+     * step without catalysts/fuel/liquids is supported; other plans are explicitly rejected.
+     */
+    public static Receipt submitFromEndpoint(ServerLevel level, BlockPos pos, UUID actor, UUID requestId,
+                                            ItemStack target, long count, List<UUID> workers,
+                                            @Nullable BlockPos destination, BlockPos sourceEndpoint) {
+        Objects.requireNonNull(actor); Objects.requireNonNull(requestId); Objects.requireNonNull(target);
+        Objects.requireNonNull(workers); Objects.requireNonNull(sourceEndpoint);
+        var c = console(level, pos);
+        return c == null ? result(requestId, State.UNAVAILABLE, "console_unavailable")
+                : c.submitExternalOrder(actor, requestId, target, count, workers, destination, sourceEndpoint);
     }
     public static Receipt status(ServerLevel level, BlockPos pos, UUID actor, UUID requestId) {
         Objects.requireNonNull(actor); Objects.requireNonNull(requestId);

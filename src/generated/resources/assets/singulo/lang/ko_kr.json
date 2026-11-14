@@ -2857,6 +2857,7 @@
   "message.singulo.void_collector.rate": "공허 %s%%: 약 %s초마다 공허의 먼지 1개",
   "message.singulo.welcome": "Singulo 핸드북을 받았습니다. 마우스 오른쪽 버튼을 클릭하여 엽니다.",
   "message.singulo.work_link.added": "작업 지령대(%s, %s, %s)에 연결했습니다",
+  "message.singulo.work_link.endpoint_result": "엔드포인트 연결: %s",
   "message.singulo.work_link.info": "연결된 작업 지령대: %s, %s, %s",
   "message.singulo.work_link.none": "어느 작업 지령대에도 연결되어 있지 않습니다",
   "message.singulo.work_link.not_console": "이 카드는 작업 지령대를 기록하지 않았습니다",
