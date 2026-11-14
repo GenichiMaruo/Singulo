@@ -17,7 +17,11 @@ public final class CreativeTabGameTests {
         helper.assertTrue(new HashSet<>(actual).size() == actual.size(), "Duplicate creative item");
         helper.assertTrue(actual.stream().noneMatch(SinguloItems.HIDDEN::contains), "Hidden item leaked into tab");
         var expected = GeneratedContent.TAB_ORDER.stream().filter(id -> !SinguloItems.HIDDEN.contains(id)).toList();
-        helper.assertTrue(actual.equals(expected), "Registered items are missing or differ from generated tab order");
+        var missing = new HashSet<>(expected);
+        missing.removeAll(actual);
+        var unexpected = new HashSet<>(actual);
+        unexpected.removeAll(expected);
+        helper.assertTrue(actual.equals(expected), "Creative order mismatch; missing=" + missing + ", unexpected=" + unexpected);
         boolean eggs = false;
         for (String id : actual) {
             if (id.endsWith("_spawn_egg")) eggs = true;

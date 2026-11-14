@@ -315,8 +315,8 @@ public final class SinguloItems {
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
-    /** まだ表に出さないアイテム（クリエイティブタブにも JEI にも出さない）: 射撃型のスポーンエッグと設計メモリ。 */
-    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner");
+    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテムと隠しボスの報酬。 */
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings");
     /** 段階に関係なく、名前を紫（エピック）にするアイテム（とても珍しい物）。 */
     private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
 
@@ -345,6 +345,9 @@ public final class SinguloItems {
         TAB_ORDER.add(EXPLORER_COMPASS);
         TAB_ORDER.add(METEOR_COMPASS);
         TAB_ORDER.add(DECODED_RECORD);
+        TAB_ORDER.add(FLUID_CANISTER);
+        TAB_ORDER.addAll(java.util.List.of(BLUEPRINT_RUIN_PANELS, BLUEPRINT_PRISTINE_RUIN, BLUEPRINT_RUIN_GLASS,
+                BLUEPRINT_LIGHTING, BLUEPRINT_LAB_BUILDING, BLUEPRINT_LAB_FURNITURE, BLUEPRINT_RAYLEIGH));
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
         block(SinguloBlocks.FLUID_PIPE, 1);
@@ -576,6 +579,9 @@ public final class SinguloItems {
         TAB_ORDER.add(HORIZON_WARDEN_SPAWN_EGG);
         TAB_ORDER.add(ECHO_SENTINEL_SPAWN_EGG);
         TAB_ORDER.add(GRAVITY_REMNANT_SPAWN_EGG);
+        TAB_ORDER.add(ERGOSPHERE_LEVIATHAN_SPAWN_EGG);
+        TAB_ORDER.add(LAST_ARCHIVIST_SPAWN_EGG);
+        TAB_ORDER.add(FOUNDRY_OVERSEER_SPAWN_EGG);
         for (BlockDef def : GeneratedContent.BLOCKS) {
             block(SinguloBlocks.SIMPLE.get(def.id()), def.stage());
         }
