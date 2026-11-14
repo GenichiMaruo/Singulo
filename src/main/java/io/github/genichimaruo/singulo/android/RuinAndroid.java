@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android;
+import java.util.UUID;
+import net.minecraft.world.item.ItemStack;
 
 import io.github.genichimaruo.singulo.ruin.RuinGuards;
 import java.util.EnumSet;
@@ -318,6 +320,68 @@ public abstract class RuinAndroid extends Monster {
     @Nullable
     private BlockPos workConsole;
     private int workOrder = -1;
+    @Nullable private UUID escrowRequest;
+    @Nullable private UUID escrowOwner;
+    @Nullable private String escrowDimension;
+    @Nullable public ServerLevel escrowLevel() {
+        if (!(level() instanceof ServerLevel current) || escrowDimension==null) return null;
+        var id=net.minecraft.resources.ResourceLocation.tryParse(escrowDimension);
+        return id==null ? null : current.getServer().getLevel(net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.DIMENSION,id));
+    }
+
+    @Nullable public UUID escrowRequest() { return escrowRequest; }
+    /** Bind before the first extraction, never overwrite another order's cargo ownership. */
+    public void bindEscrow(UUID request) {
+        if (!(level() instanceof ServerLevel server) || !server.getServer().isSameThread())
+            throw new IllegalStateException("Escrow binding requires the server thread");
+        if (escrowRequest != null && !escrowRequest.equals(request))
+            throw new IllegalStateException("Worker already bound to escrow");
+        var entry=io.github.genichimaruo.singulo.android.work.AndroidEscrowData.get(server).find(request);
+        if (entry==null || !getUUID().equals(entry.worker)) throw new IllegalStateException("Unknown escrow worker");
+        if (escrowRequest!=null && !server.dimension().location().toString().equals(escrowDimension))
+            throw new IllegalStateException("Escrow dimension mismatch");
+        escrowRequest=request; escrowOwner=entry.owner; escrowDimension=server.dimension().location().toString();
+    }
+
+    public void bindEscrow(UUID request, UUID actor) {
+        if (!(level() instanceof ServerLevel server)) throw new IllegalStateException("Server only");
+        var e=io.github.genichimaruo.singulo.android.work.AndroidEscrowData.get(server).find(request);
+        if (e==null || !actor.equals(e.owner)) throw new IllegalStateException("Escrow owner mismatch");
+        bindEscrow(request);
+    }
+    @Nullable public UUID escrowOwner() { return escrowOwner; }
+    /** Recover actual cargo only; never synthesize consumed ingredients or share private leftovers. */
+    public boolean recoverEscrowCargo() {
+        if (escrowRequest==null) return true;
+        if (!(level() instanceof ServerLevel server) || !server.getServer().isSameThread()) return false;
+        var custodyLevel=escrowLevel();
+        var data=io.github.genichimaruo.singulo.android.work.AndroidEscrowData.get(custodyLevel==null?server:custodyLevel);
+        var entry=custodyLevel==null?null:data.find(escrowRequest);
+        if (entry==null || data.quarantined(escrowRequest) || !java.util.Objects.equals(escrowOwner,entry.owner) || !getUUID().equals(entry.worker)) {
+            // Unknown owners remain forensic-only; never infer a new refund recipient.
+            var cargo=new java.util.ArrayList<ItemStack>();
+            for (int slot:carrySlots()) if(!inventory.getItem(slot).isEmpty()) cargo.add(inventory.getItem(slot).copy());
+            if (!data.quarantineCargo(escrowRequest,escrowOwner,getUUID(),cargo)) return false;
+            for (int slot:carrySlots()) inventory.setItem(slot,ItemStack.EMPTY);
+            escrowRequest=null; escrowOwner=null; escrowDimension=null; return true;
+        }
+        if (entry.state==io.github.genichimaruo.singulo.android.work.AndroidEscrowData.State.RUNNING)
+            data.markTerminal(entry,io.github.genichimaruo.singulo.api.android.AndroidOrders.State.CANCELLED,entry.delivered);
+        if (custodyLevel!=null && custodyLevel.isLoaded(entry.console)
+                && custodyLevel.getBlockEntity(entry.console) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity c
+                && entry.consoleIdentity.equals(c.escrowConsoleIdentity())) c.cancel(entry.orderId,null);
+        for (int slot:carrySlots()) {
+            var stack=inventory.getItem(slot);
+            if (stack.isEmpty()) continue;
+            var rest=data.returnCargo(entry,stack.copy());
+            inventory.setItem(slot,rest);
+            if (!rest.isEmpty()) return false;
+        }
+        data.workerReturned(entry,getUUID());
+        escrowRequest=null; escrowOwner=null; escrowDimension=null;
+        return true;
+    }
     /** 作業の途中も保存し、再読込・転送後に同じ所から続ける。 */
     private AndroidWorkGoal workGoal;
     /** 今進めている作業（作業指令台に毎秒知らせる）。 */
@@ -991,6 +1055,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 作業指令台の注文を割り当てる（作業中は戦わず、持ち物を取り出せない）。 */
     public void assignWork(BlockPos console, int order) {
+        if (escrowRequest != null && (!console.equals(workConsole) || order != workOrder)) return;
         this.workConsole = console.immutable();
         this.workOrder = order;
         this.workJob = null;
@@ -1009,6 +1074,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 同じ作業指令台の、受け持つほかの注文へ移る（手が空いているとき。持ち主の物の区別はそのまま）。 */
     public void switchOrder(int order) {
+        if (escrowRequest != null && order != workOrder) return;
         this.workOrder = order;
     }
 
@@ -1016,6 +1082,9 @@ public abstract class RuinAndroid extends Monster {
     public CompoundTag saveWorkState() {
         CompoundTag t = workGoal.saveWork();
         t.putInt("personal", personal);
+        if (escrowRequest != null) t.putUUID("escrow_request",escrowRequest);
+        if (escrowOwner != null) t.putUUID("escrow_owner",escrowOwner);
+        if (escrowDimension != null) t.putString("escrow_dimension",escrowDimension);
         var fluids = new net.minecraft.nbt.ListTag();
         for (var tank : tanks) {
             fluids.add(tank.writeToNBT(registryAccess(), new CompoundTag()));
@@ -1046,6 +1115,9 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public void restoreWorkState(CompoundTag t) {
+        if (t.hasUUID("escrow_request")) escrowRequest=t.getUUID("escrow_request");
+        if (t.hasUUID("escrow_owner")) escrowOwner=t.getUUID("escrow_owner");
+        if (t.contains("escrow_dimension")) escrowDimension=t.getString("escrow_dimension");
         personal = t.getInt("personal");
         workGoal.loadWork(t);
         var fluids = t.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
@@ -1061,6 +1133,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 作業をやめる（元の動き方に戻る）。 */
     public void clearWork() {
+        if (escrowRequest != null && !recoverEscrowCargo()) return;
         workGoal.loadWork(new CompoundTag());
         this.workConsole = null;
         this.workOrder = -1;
@@ -1473,6 +1546,10 @@ public abstract class RuinAndroid extends Monster {
      * 次に印刷するアンドロイドに持たせる。なければその場に落とす。
      */
     private void releaseInventory(ServerLevel level) {
+        if (escrowRequest != null) {
+            if (!recoverEscrowCargo()) return;
+            clearWork();
+        }
         AndroidStationBlockEntity station = home != null
                 && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
         boolean sent = false;
@@ -2817,6 +2894,12 @@ public abstract class RuinAndroid extends Monster {
         tag.put("tanks", tl);
         tag.put("chem_tanks", saveChems());
         tag.putBoolean("work", workEnabled);
+        if (escrowRequest != null) {
+            tag.putUUID("escrow_request",escrowRequest);
+            tag.putInt("work_personal",personal);
+        }
+        if (escrowOwner != null) tag.putUUID("escrow_owner",escrowOwner);
+        if (escrowDimension != null) tag.putString("escrow_dimension",escrowDimension);
         if (workConsole != null) {
             tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
             tag.putInt("work_order", workOrder);
@@ -2852,6 +2935,7 @@ public abstract class RuinAndroid extends Monster {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         facilitySpawned = tag.getBoolean("facility_spawned");
+
         if (tag.contains("charge")) {
             setCharge(tag.getInt("charge"));
         }
@@ -2885,6 +2969,12 @@ public abstract class RuinAndroid extends Monster {
                 restoreWorkState(tag.getCompound("work_state"));
             }
         }, this::clearWork);
+        if (tag.hasUUID("escrow_request")) {
+            escrowRequest=tag.getUUID("escrow_request");
+            personal=tag.getInt("work_personal");
+        }
+        if (tag.hasUUID("escrow_owner")) escrowOwner=tag.getUUID("escrow_owner");
+        if (tag.contains("escrow_dimension")) escrowDimension=tag.getString("escrow_dimension");
         if (tag.contains("charge")) {
             setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す
         }

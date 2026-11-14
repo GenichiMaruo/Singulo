@@ -254,6 +254,13 @@ final class AndroidWorkGoal extends Goal {
             return null;
         }
         if (level.getBlockEntity(p) instanceof WorkConsoleBlockEntity c) {
+            if (android.escrowRequest()!=null) {
+                var e=io.github.genichimaruo.singulo.android.work.AndroidEscrowData.get(level).find(android.escrowRequest());
+                if (e==null || !e.consoleIdentity.equals(c.escrowConsoleIdentity())) {
+                    if (android.recoverEscrowCargo()) android.clearWork();
+                    return null;
+                }
+            }
             return c;
         }
         android.clearWork();                  // 作業指令台が壊された
@@ -299,6 +306,17 @@ final class AndroidWorkGoal extends Goal {
 
     @Override
     public void tick() {
+        if (android.escrowRequest()!=null && android.level() instanceof ServerLevel escrowLevel) {
+            if (android.escrowLevel()!=escrowLevel) {
+                if (android.recoverEscrowCargo()) android.clearWork();
+                return;
+            }
+            var e=io.github.genichimaruo.singulo.android.work.AndroidEscrowData.get(escrowLevel).find(android.escrowRequest());
+            if (e==null || e.state!=io.github.genichimaruo.singulo.android.work.AndroidEscrowData.State.RUNNING) {
+                if (android.recoverEscrowCargo()) android.clearWork();
+                return;
+            }
+        }
         if (!(android.level() instanceof ServerLevel level)) {
             return;
         }
@@ -406,7 +424,7 @@ final class AndroidWorkGoal extends Goal {
             return true;
         }
         if (dropPoints == null) {
-            dropPoints = c.supplyPoints();
+            dropPoints = c.returnPoints(android,job);
             dropTarget = null;
             dropReached = false;
         }
@@ -455,6 +473,10 @@ final class AndroidWorkGoal extends Goal {
      * 持ち物を戻してから取る（戻しに行くだけの道を省く）。取りに行く作業がなければ、持ち物を資材口へ戻しに行く。
      */
     private void afterJob(WorkConsoleBlockEntity c, WorkJob done) {
+        if (android.escrowRequest()!=null && c.order(done.orderId())==null) {
+            if (android.recoverEscrowCargo()) android.clearWork();
+            return;
+        }
         WorkJob next = c.chainJob(android, done.orderId());
         if (next != null) {
             begin(next);
@@ -465,6 +487,10 @@ final class AndroidWorkGoal extends Goal {
         leftoverOrder = done.orderId();
         returning = false;
         if (android.carryEmpty()) {
+            return;
+        }
+        if (android.escrowRequest()!=null) {
+            returning=true;
             return;
         }
         next = c.requestJob(android, true);
@@ -2478,7 +2504,7 @@ final class AndroidWorkGoal extends Goal {
         outputs.addAll(remaining);
         for (ItemStack output : outputs) {
             ItemStack rest = ItemHandlerHelper.insertItemStacked(carried, output.copy(), false);
-            if (!rest.isEmpty() && bench != null) {
+            if (!rest.isEmpty() && bench != null && android.escrowRequest()==null) {
                 // たいていは持ち物に収まる。あふれたときだけ、作業台の預かり箱の写しを作って入れてみる
                 if (stored == null) {
                     stored = new ItemStackHandler(bench.buffer().getSlots());
@@ -2513,6 +2539,7 @@ final class AndroidWorkGoal extends Goal {
      * この注文が預けた分だけを、持ち物に入るだけ取る。
      */
     private void unbuffer(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, RecipeData recipe) {
+        if (android.escrowRequest()!=null) return;
         if (!(level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity bench) || bench.bufferEmpty()) {
             return;
         }

@@ -67,6 +67,7 @@ public final class WorkOrder {
     /** New input reservation source only, not exclusive inventory/return isolation. */
     @Nullable public BlockPos materialSource;
     @Nullable public UUID materialEndpointId;
+    @Nullable public UUID escrowRequest;
     /** できた物を、納品先ではなく素材置き場へ入れる（登録した注文の「在庫を保つ」）。 */
     public boolean toStock;
     /** 画面から今すぐ出した注文: できたとき・止まったときに、注文した人へ知らせる（登録した注文の繰り返しでは知らせない）。 */
@@ -307,6 +308,7 @@ public final class WorkOrder {
             t.put("destination", NbtUtils.writeBlockPos(destination));
         }
         if (deliveryEndpointId != null) t.putUUID("delivery_endpoint_id", deliveryEndpointId);
+        if (escrowRequest != null) t.putUUID("escrow_request", escrowRequest);
         if (materialSource != null) {
             t.put("material_source", NbtUtils.writeBlockPos(materialSource));
             if (materialEndpointId != null) t.putUUID("material_endpoint_id", materialEndpointId);
@@ -337,6 +339,7 @@ public final class WorkOrder {
 
     @Nullable
     public static WorkOrder load(CompoundTag t, HolderLookup.Provider registries) {
+        if (t.contains("escrow_request") && !t.hasUUID("escrow_request")) return null;
         if ((t.contains("material_source") || t.contains("material_endpoint_id"))
                 && (!t.hasUUID("material_endpoint_id") || NbtUtils.readBlockPos(t, "material_source").isEmpty())) return null;
         if (t.contains("delivery_endpoint_id") && (!t.hasUUID("delivery_endpoint_id")
@@ -363,6 +366,7 @@ public final class WorkOrder {
         o.delivered = t.getLong("delivered");
         o.destination = NbtUtils.readBlockPos(t, "destination").orElse(null);
         o.deliveryEndpointId = t.hasUUID("delivery_endpoint_id") ? t.getUUID("delivery_endpoint_id") : null;
+        o.escrowRequest = t.hasUUID("escrow_request") ? t.getUUID("escrow_request") : null;
         o.materialSource = NbtUtils.readBlockPos(t, "material_source").orElse(null);
         // Invalid identity remains restricted/unavailable, never silently becomes shared.
         o.materialEndpointId = t.hasUUID("material_endpoint_id") ? t.getUUID("material_endpoint_id") : null;
