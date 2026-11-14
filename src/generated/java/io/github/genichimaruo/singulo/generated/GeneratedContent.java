@@ -214,7 +214,6 @@ public final class GeneratedContent {
             "compressed_metal_block_1",
             "compressed_metal_block_2",
             "strange_matter",
-            "strangelet",
             "steel_blend",
             "unfired_ceramic",
             "white_ceramic_composite",

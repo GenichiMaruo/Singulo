@@ -61,6 +61,8 @@ FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
 BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
                'boss_block', 'genesis', 'lab')
+# World hazards have a block registration but no obtainable BlockItem.
+ITEMLESS_BLOCKS = {'strangelet'}
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 # 液体パイプ（4段階）: 絵とモデルは tools/logistics_content.py が書く（電線と見分けられる、継ぎ手のつばと窓のある管）
@@ -3446,7 +3448,7 @@ def tags():
                        'zero_gravity_controller': ['minecraft:block_entity_data'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
     for n, (iid, _, kind) in MOD.items():
-        if kind in BLOCK_KINDS and iid != 'strangelet':
+        if kind in BLOCK_KINDS and iid not in ITEMLESS_BLOCKS:
             entry = {'type': 'minecraft:item', 'name': mid(n)}
             if iid in copy_components:
                 entry['functions'] = [{'function': 'minecraft:copy_components', 'source': 'block_entity',
@@ -3827,7 +3829,7 @@ TAB_GROUPS = [
     ]),
     ('圧縮素材', [
         'compressed_block_1', 'compressed_block_2', 'compressed_block_3', 'compressed_metal_block_1',
-        'compressed_metal_block_2', 'strange_matter', 'strangelet',
+        'compressed_metal_block_2', 'strange_matter',
     ]),
     ('中間素材', None),
     ('触媒', [
@@ -3980,10 +3982,10 @@ def tab_order():
     materials = []
     names = [n for n in ORDER if n in MOD] + sorted((n for n in MOD if n not in RECIPES), key=stage_of)
     # レシピのないもの（加速器の事故でできるストレンジ物質など）は、手に入る段階に置く
-    stage_hint = {'strange_matter': 2, 'strangelet': 2}
+    stage_hint = {'strange_matter': 2}
     for n in sorted(names, key=lambda n: (stage_hint.get(MOD[n][0], stage_of(n)), names.index(n))):
         iid, _, kind = MOD[n]
-        if kind in ('fluid', 'structure') or iid in placed or iid in materials:
+        if kind in ('fluid', 'structure') or iid in ITEMLESS_BLOCKS or iid in placed or iid in materials:
             continue
         if kind not in ('item', 'planned'):
             raise ValueError(f'Classify {iid} ({kind}) in TAB_GROUPS before generating')

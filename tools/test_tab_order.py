@@ -16,7 +16,7 @@ class CreativeTabOrderTests(unittest.TestCase):
         self.assertEqual(indices, list(range(indices[0], indices[-1] + 1)))
 
     def test_all_content_and_spawn_eggs_appear_once(self):
-        content = {i for i, _, kind in data.MOD.values() if kind not in ('fluid', 'structure')}
+        content = {i for i, _, kind in data.MOD.values() if kind not in ('fluid', 'structure') and i not in data.ITEMLESS_BLOCKS}
         eggs = {'security_drone_spawn_egg', 'blade_android_spawn_egg', 'whip_android_spawn_egg',
                 'saber_android_spawn_egg', 'axe_android_spawn_egg', 'bit_android_spawn_egg',
                 'gunner_android_spawn_egg', 'horizon_warden_spawn_egg', 'echo_sentinel_spawn_egg',
@@ -25,6 +25,7 @@ class CreativeTabOrderTests(unittest.TestCase):
         self.assertEqual(set(self.order), content | eggs)
         self.assertEqual(len(self.order), len(set(self.order)))
         self.assertEqual(set(self.order[-len(eggs):]), eggs)
+        self.assertNotIn('strangelet', self.order)  # World hazard; no registered item.
 
     def test_ingots_and_plates_have_separate_contiguous_groups(self):
         ingots = {i for i, _, _ in data.MOD.values() if i.endswith('_ingot')} | {'collapsar_billet'}
