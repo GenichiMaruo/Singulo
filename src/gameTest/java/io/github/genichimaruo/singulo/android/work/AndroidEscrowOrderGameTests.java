@@ -87,10 +87,12 @@ public final class AndroidEscrowOrderGameTests {
         var denied=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.OAK_PLANKS),4,List.of(offered),null);
         h.assertTrue(!denied.acceptedNow() && denied.receipt().state()==State.REJECTED,"Shared logs covered wrong offer");
         h.assertTrue(offered.getCount()==1 && c.orders().isEmpty() && AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).phase()==AndroidEscrows.Phase.UNKNOWN,"Rejected offer mutated ownership");
-        var multistep=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),4,
+        // A crafting chain (logs -> planks -> sticks) is planned only from the offer: 1 log cannot make 64 sticks,
+        // and the 32 shared logs must not make up the difference.
+        var shortChain=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),64,
                 List.of(new ItemStack(Items.OAK_LOG)),null);
-        h.assertTrue(!multistep.acceptedNow() && multistep.receipt().state()==State.REJECTED
-                && AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).phase()==AndroidEscrows.Phase.UNKNOWN,"Unsupported multistep took ownership");
+        h.assertTrue(!shortChain.acceptedNow() && shortChain.receipt().state()==State.REJECTED
+                && AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).phase()==AndroidEscrows.Phase.UNKNOWN,"Insufficient chain offer took ownership");
         var accepted=offer(h,c,id,1); h.assertTrue(accepted.acceptedNow(),"Valid offer rejected");
         var snapshot=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
         h.assertTrue(count(snapshot.materials(),Items.OAK_LOG)==1,"Escrow did not own exact offer");
@@ -165,6 +167,24 @@ public final class AndroidEscrowOrderGameTests {
             h.assertTrue(AndroidEscrows.claim(h.getLevel(),c.owner(),id,true,0,64,false).getCount()==4,"Claim wrong");
             h.assertTrue(AndroidEscrows.claim(h.getLevel(),c.owner(),id,true,0,64,false).isEmpty(),"Claim duplicated");
             h.assertTrue(AndroidEscrows.acknowledge(h.getLevel(),c.owner(),id),"Empty terminal escrow not acknowledged");
+        });
+    }
+    /** Logs -> planks -> sticks in one private request: intermediates stay in that request's custody, never shared stock. */
+    @GameTest(template="empty",timeoutTicks=2400)
+    public static void actualWorkerCraftsPrivateChainInOneRequest(GameTestHelper h) {
+        var c=setup(h,true);var id=UUID.randomUUID();
+        net.minecraft.world.level.block.entity.ChestBlockEntity shared=h.getBlockEntity(CHEST);
+        var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),8,
+                List.of(new ItemStack(Items.OAK_LOG,1)),null);
+        h.assertTrue(accepted.acceptedNow(),"Chain request rejected: "+accepted.receipt().reason());
+        h.assertTrue(c.orders().size()==1 && c.orders().getFirst().steps.size()==2,"One order with two steps expected");
+        h.succeedWhen(()->{
+            var snap=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
+            h.assertTrue(snap.phase()==AndroidEscrows.Phase.COMPLETED && !snap.workerPending(),"Not completed: "+snap.phase());
+            h.assertTrue(count(snap.products(),Items.STICK)==8,"Sticks: "+snap.products());
+            h.assertTrue(snap.materials().stream().allMatch(ItemStack::isEmpty),
+                    "The whole log was used through the chain: "+snap.materials());
+            h.assertTrue(shared.getItem(0).getCount()==32 && c.outbox().isEmpty(),"Shared stock or outbox touched");
         });
     }
     @GameTest(template="empty")

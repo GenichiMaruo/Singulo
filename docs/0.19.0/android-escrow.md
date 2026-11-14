@@ -43,8 +43,10 @@ requests rather than silently evicting them.
 
 ## Supported execution
 
-The initial safe scope is one ordinary crafting recipe step, one initially idle worker with empty
-carry, and item inputs. Multi-step plans, processing machines, procedures, fuel, catalysts and
+The supported scope is a chain of ordinary crafting recipe steps planned only from the offer (for
+example logs -> planks -> sticks), one initially idle worker with empty carry, and item inputs.
+Intermediates are returned into the same request's custody and fetched again from there; they never
+enter shared stock. Processing machines, procedures, fuel, catalysts and
 liquid inputs are rejected. Worker identity and source dimension persist independently of the
 current work goal. Private work cannot switch into an ordinary or another escrow order.
 
