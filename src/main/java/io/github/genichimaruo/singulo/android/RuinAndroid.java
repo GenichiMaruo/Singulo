@@ -378,6 +378,15 @@ public abstract class RuinAndroid extends Monster {
             inventory.setItem(slot,rest);
             if (!rest.isEmpty()) return false;
         }
+        var fluids=data.fluidHandler(entry,false);
+        for (var held:new java.util.ArrayList<>(liquids())) {
+            var f=io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(held.getKey());
+            if (f.isEmpty()) continue;   // chemicals never enter private custody
+            int moved=fluids.fill(f.copyWithAmount((int)Math.min(Integer.MAX_VALUE,held.getValue())),
+                    net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+            drainLiquid(held.getKey(),moved,false);
+            if (moved<held.getValue()) return false;
+        }
         data.workerReturned(entry,getUUID());
         escrowRequest=null; escrowOwner=null; escrowDimension=null;
         return true;

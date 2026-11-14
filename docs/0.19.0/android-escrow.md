@@ -43,11 +43,15 @@ requests rather than silently evicting them.
 
 ## Supported execution
 
-The supported scope is a chain of ordinary crafting recipe steps planned only from the offer (for
-example logs -> planks -> sticks), one initially idle worker with empty carry, and item inputs.
+The supported scope is a chain of crafting and machine (processing) steps planned only from the offer
+(for example logs -> planks -> sticks, or raw iron -> furnace -> ingots), one initially idle worker with
+empty carry, and item and fluid materials. Fluids are offered and kept as fluid samples (one per fluid,
+amount in mB; `AndroidEscrows.fluidSample` / `fluidOf`); tanks are filled from and returned to the
+request's custody, and claims of fluid samples are in mB. Liquid main products are not supported.
 Intermediates are returned into the same request's custody and fetched again from there; they never
-enter shared stock. Processing machines, procedures, fuel, catalysts and
-liquid inputs are rejected. Worker identity and source dimension persist independently of the
+enter shared stock. Machines are used like in ordinary orders (one order at a time per location);
+automation outside Singulo can still touch a machine's slots. Procedures, fuel, catalysts and chemicals
+are rejected. Worker identity and source dimension persist independently of the
 current work goal. Private work cannot switch into an ordinary or another escrow order.
 
 Workers physically obtain inputs, craft and deliver normally, but storage and results remain
