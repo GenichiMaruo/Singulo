@@ -19,7 +19,7 @@ for name in ('region', 'entities', 'poi', 'DIM-1', 'DIM1'):
     shutil.rmtree(root / 'saves/Review' / name, ignore_errors=True)
 (root / 'saves/Review/data/forcedchunks.dat').unlink(missing_ok=True)
 (root / 'options.txt').write_text(
-    'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:4\nsimulationDistance:5\npauseOnLostFocus:false\nonboardAccessibility:false\n',
+    'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:4\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nonboardAccessibility:false\n',
     encoding='utf-8')
 
 # Forge's optional early OpenGL window has a short initialization timeout that
