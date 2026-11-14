@@ -735,7 +735,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (!plan.ok()) {
             return Component.translatable(plan.failureKey());
         }
-        if ((source != null || escrowRequest != null) && (plan.steps.size() != 1 || plan.steps.stream().anyMatch(s ->
+        // Endpoint source restriction: exactly one plain crafting step. Private escrow: a chain of plain crafting
+        // steps (intermediates are returned into the request's own custody and fetched again from there).
+        if ((source != null || escrowRequest != null) && ((source != null ? plan.steps.size() != 1 : plan.steps.isEmpty())
+                || plan.steps.stream().anyMatch(s ->
                 !RecipeData.MODE_CRAFTING.equals(s.entry().recipe().mode()) || !s.entry().recipe().fuel().isEmpty()
                 || s.entry().recipe().inputs().stream().anyMatch(i -> FluidSamples.liquid(i.item)
                 || io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(i.item)

@@ -58,9 +58,9 @@ interpret acceptance as AE2 all-or-nothing pushPattern ingredient ownership tran
 ## Private crafting escrow
 
 A separate opt-in [AndroidEscrows API](android-escrow.md) now provides physically private
-per-request custody for one ordinary crafting step. It does not change the source-restriction
+per-request custody for a chain of ordinary crafting steps. It does not change the source-restriction
 API above into escrow. See its acceptance, worker-return, recovery and corruption contracts.
-Processing/multi-step/fuel isolation remains intentionally unsupported; Minecraft's independent
+Processing/fuel isolation remains intentionally unsupported; Minecraft's independent
 saves are not a crash-atomic distributed transaction log.
 
 ## Tests

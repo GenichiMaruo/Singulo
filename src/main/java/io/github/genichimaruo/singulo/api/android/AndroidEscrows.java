@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
-/** Owner-authenticated, server-thread API for physically private single-step crafting inputs.
+/** Owner-authenticated, server-thread API for physically private inputs of a plain crafting chain (one or more steps).
  * acceptedNow transfers ownership of the WHOLE offered list. Replays never transfer it again.
  * The caller must relinquish offered items only on acceptedNow, and persist the request ID.
  * This is synchronous in-memory atomic acceptance, NOT crash-atomic distributed persistence.
