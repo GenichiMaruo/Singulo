@@ -28,10 +28,21 @@ public final class LiquidStores {
 
     private LiquidStores() {}
 
+    /** One fluid handler as a store (private escrow custody). Counts what can be drained. */
+    public static LiquidStores of(IFluidHandler handler) {
+        LiquidStores out = new LiquidStores();
+        out.storage = true;
+        out.fluids.add(handler);
+        return out;
+    }
+
     /** point の隣の入れ物（seen にある場所は除き、見つけた場所を足す）。 */
     public static LiquidStores at(Level level, BlockPos point, Set<BlockPos> seen) {
         LiquidStores out = new LiquidStores();
         out.storage = true;
+        // The addon contract exposes item handlers only, never neighboring fluid/chemical stores.
+        if (level.isLoaded(point) && level.getBlockEntity(point) instanceof io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint)
+            return out;
         Set<BlockPos> chemSeen = new HashSet<>(seen);
         SupplyPortBlockEntity.collectFluids(level, point, seen, out.fluids);
         if (Chemicals.present()) {

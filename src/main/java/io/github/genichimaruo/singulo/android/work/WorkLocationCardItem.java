@@ -42,6 +42,17 @@ public class WorkLocationCardItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
+        if (player != null && !player.isSecondaryUseActive()
+                && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint) {
+            if (context.getLevel() instanceof net.minecraft.server.level.ServerLevel server) {
+                BlockPos console = pos(context.getItemInHand());
+                if (console == null || !sameDimension(context.getItemInHand(), server)) return InteractionResult.PASS;
+                var result = io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints.link(
+                        server, console, player.getUUID(), context.getClickedPos());
+                player.displayClientMessage(Component.translatable("message.singulo.work_link.endpoint_result", result.name()), true);
+            }
+            return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
+        }
         if (player == null || !player.isSecondaryUseActive()) {
             return InteractionResult.PASS;
         }

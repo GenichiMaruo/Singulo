@@ -1,3 +1,5 @@
+> 0.19.0 additions and limitations: [Android integration API](../0.19.0/android-integration.md). Source-restricted reservations are not escrow.
+
 # Android 注文 API v1（0.18.0 開発版）
 
 `io.github.genichimaruo.singulo.api.android.AndroidOrders` は AE2 非依存のサーバー側 API です。

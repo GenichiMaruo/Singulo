@@ -26,6 +26,6 @@ for name in ("inventory-pixels.json", "machine-pixels.json", "machine-font-metri
     (root / name).unlink(missing_ok=True)
 shutil.copytree(source, target)
 (root / "options.txt").write_text(
-    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:" + ('4' if _args.cosmic_world else '2') + "\nsimulationDistance:5\npauseOnLostFocus:false\n",
+    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:" + ('4' if _args.cosmic_world else '2') + "\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\n",
     encoding="utf-8",
 )

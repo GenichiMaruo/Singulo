@@ -1,8 +1,10 @@
 name: PR validation
 
 on:
+  push:
+    branches: [feature/0.19.0]
   pull_request:
-    branches: [1.21.1, main, feature/0.18.0]
+    branches: [1.21.1, main, feature/0.19.0]
 
 permissions:
   contents: read

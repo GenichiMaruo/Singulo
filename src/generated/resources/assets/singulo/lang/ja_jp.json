@@ -2857,6 +2857,7 @@
   "message.singulo.void_collector.rate": "虚空 %s%%: 約%s秒ごとに虚空の塵が1個集まる",
   "message.singulo.welcome": "Singulo ハンドブックを受け取った。右クリックで開ける",
   "message.singulo.work_link.added": "作業指令台（%s, %s, %s）につないだ",
+  "message.singulo.work_link.endpoint_result": "連携先のリンク: %s",
   "message.singulo.work_link.info": "つながっている作業指令台：%s, %s, %s",
   "message.singulo.work_link.none": "どの作業指令台にもつながっていない",
   "message.singulo.work_link.not_console": "このカードは作業指令台を記録していない",

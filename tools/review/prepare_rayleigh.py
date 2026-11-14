@@ -12,5 +12,5 @@ for target in (root / 'saves/Review', root / 'screenshots'):
         shutil.rmtree(target)
 shutil.copytree(source, root / 'saves/Review')
 (root / 'options.txt').write_text(
-    'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:4\nsimulationDistance:5\npauseOnLostFocus:false\nonboardAccessibility:false\n',
+    'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:4\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nonboardAccessibility:false\n',
     encoding='utf-8')
