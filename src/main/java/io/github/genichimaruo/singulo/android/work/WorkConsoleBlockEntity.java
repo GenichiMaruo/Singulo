@@ -1285,7 +1285,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0 || (ready == null && !o.ready(s)) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe) || fuelBlocked(s)) {
                 continue;
             }
-            long k = Math.min(workbenchCrafts(s, slots), tankLimit(a, s.recipe));
+            // Private escrow work cannot spill products into the workbench buffer, so the whole trip
+            // (materials and products) must fit in the carry; otherwise the worker refetches forever.
+            long k = Math.min(o.escrowRequest != null ? maxCrafts(s.recipe, slots, s.remaining())
+                    : workbenchCrafts(s, slots), tankLimit(a, s.recipe));
             if (k <= 0) {
                 tooSmall = true;
                 continue;

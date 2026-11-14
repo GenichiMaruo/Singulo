@@ -2497,6 +2497,21 @@ final class AndroidWorkGoal extends Goal {
             ItemStack before = android.inventory().getItem(slots[i]);
             carried.setStackInSlot(i, before.copyWithCount(before.getCount() - used[i]));
         }
+        // Using materials leaves partial stacks in several slots. Work planning counts same items as one
+        // stack (see RuinAndroid.compactCarry), so merge them before the products go in; without this, a trip
+        // sized to the exact carry capacity runs out of slots mid-way. Private escrow work has no workbench
+        // buffer to absorb that overflow and would otherwise refetch forever.
+        for (int i = 0; i < slots.length; i++) {
+            ItemStack into = carried.getStackInSlot(i);
+            for (int j = i + 1; j < slots.length && !into.isEmpty() && into.getCount() < into.getMaxStackSize(); j++) {
+                ItemStack from = carried.getStackInSlot(j);
+                if (!from.isEmpty() && ItemStack.isSameItemSameComponents(into, from)) {
+                    int move = Math.min(from.getCount(), into.getMaxStackSize() - into.getCount());
+                    into.grow(move);
+                    from.shrink(move);
+                }
+            }
+        }
         var bench = level.getBlockEntity(at) instanceof AndroidWorkbenchBlockEntity b ? b : null;
         ItemStackHandler stored = null;
         List<ItemStack> outputs = new ArrayList<>();
