@@ -27,7 +27,9 @@ public final class AndroidEscrowStorageGameTests {
         var d=new AndroidEscrowData();var id=UUID.randomUUID();var owner=UUID.randomUUID();
         var e=d.create(id,owner,BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,List.of(new ItemStack(Items.OAK_PLANKS,2)));
         d.bind(e,1,UUID.randomUUID());var tag=d.save(new CompoundTag(),h.getLevel().registryAccess());
+        h.assertTrue(d.save(new CompoundTag()).equals(tag),"Legacy SavedData save override lost custody");
         var loaded=AndroidEscrowData.load(tag,h.getLevel().registryAccess());h.assertTrue(loaded.inputs(loaded.find(id)).get(0).getCount()==2,"Restore lost stacks");
+        h.assertTrue(loaded.save(new CompoundTag()).equals(tag),"Legacy SavedData restore/save changed custody");
         var raw=tag.getList("records",Tag.TAG_COMPOUND).getCompound(0);raw.putString("worker","broken");
         var bad=AndroidEscrowData.load(tag,h.getLevel().registryAccess());h.assertTrue(bad.find(id)==null&&bad.isKnown(id),"Malformed record usable");
         h.assertTrue(bad.save(new CompoundTag(),h.getLevel().registryAccess()).getList("records",Tag.TAG_COMPOUND).getCompound(0).equals(raw),"Quarantine changed raw record");h.succeed();
