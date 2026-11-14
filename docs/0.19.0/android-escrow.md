@@ -43,17 +43,23 @@ requests rather than silently evicting them.
 
 ## Supported execution
 
-The supported scope is a chain of crafting and machine (processing) steps planned only from the offer
-(for example logs -> planks -> sticks, or raw iron -> furnace -> ingots), one initially idle worker with
+The supported scope is a chain of plain crafting steps planned only from the offer
+(for example logs -> planks -> sticks), one initially idle worker with
 empty carry, and item and fluid materials. Fluids are offered and kept as fluid samples (amount in mB;
 `AndroidEscrows.fluidSample` / `fluidOf`). A fluid can span several stable slots, with each sample
 holding at most `Integer.MAX_VALUE` mB. Tank extraction combines matching slots up to the requested
 amount. Tanks are filled from and returned to the request's custody, and both simulated and real
 claims of fluid samples are in mB. Liquid main products are not supported.
 Intermediates are returned into the same request's custody and fetched again from there; they never
-enter shared stock. Machines are used like in ordinary orders (one order at a time per location);
-automation outside Singulo can still touch a machine's slots. Procedures, fuel, catalysts and chemicals
-are rejected. Worker identity and source dimension persist independently of the
+enter shared stock. Machine processing, procedures, fuel, catalysts and chemicals are rejected
+before ownership is transferred. This includes vanilla furnaces and Singulo's own machines, even
+when they are currently empty. Existing item/fluid capabilities cannot distinguish a request's
+new output from pre-existing or concurrently inserted output, nor safely recover that request's
+remaining inputs or in-flight products after cancellation, worker death or reload. Counting an
+initial output baseline alone cannot provide those guarantees. Ordinary `AndroidOrders` processing
+and machine entries in `AndroidOrders.recipes` remain available; a recipe snapshot is not a promise
+that private escrow can execute it. A separate persisted machine ownership protocol is required
+before enabling machine escrow. Worker identity and source dimension persist independently of the
 current work goal. Private work cannot switch into an ordinary or another escrow order.
 
 Workers physically obtain inputs, craft and deliver normally, but storage and results remain
@@ -98,7 +104,10 @@ repair of arbitrary corrupt data.
 Minecraft saves SavedData, entities and AE2 block entities independently. `setDirty` is not a
 durable commit barrier. Arbitrary process crashes between their saves are **not** guaranteed
 exactly-once transactions. Callers must reconcile uncertain results rather than automatically
-resubmit UNKNOWN requests. Downgrading with active private orders is unsupported.
+resubmit UNKNOWN requests. Downgrading with active private orders is unsupported. Development builds
+that admitted machine escrow must finish and recover those requests before upgrading: the release
+refuses to execute restored machine jobs and does not invent refunds for items already inserted
+into an unowned machine.
 
 ## Applied Singulo adoption work
 

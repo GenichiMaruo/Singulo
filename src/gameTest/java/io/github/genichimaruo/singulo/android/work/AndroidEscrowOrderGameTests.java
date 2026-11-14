@@ -187,15 +187,12 @@ public final class AndroidEscrowOrderGameTests {
             h.assertTrue(shared.getItem(0).getCount()==32 && c.outbox().isEmpty(),"Shared stock or outbox touched");
         });
     }
-    /** Machine step: raw iron from private custody into a (pre-fuelled) furnace, ingots into the private product buffer. */
-    @GameTest(template="empty",timeoutTicks=3000)
-    public static void actualWorkerRunsPrivateMachineStep(GameTestHelper h) {
-        var c=setup(h,true);var id=UUID.randomUUID();
-        net.minecraft.world.level.block.entity.ChestBlockEntity shared=(net.minecraft.world.level.block.entity.ChestBlockEntity) h.getBlockEntity(CHEST);
+    /** Install an ordinary machine recipe; discovery must remain available even when escrow refuses it. */
+    private static net.minecraft.world.level.block.entity.FurnaceBlockEntity furnaceRecipe(GameTestHelper h) {
         BlockPos furnacePos=new BlockPos(5,1,3);
         h.setBlock(furnacePos,net.minecraft.world.level.block.Blocks.FURNACE);
         net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace=(net.minecraft.world.level.block.entity.FurnaceBlockEntity) h.getBlockEntity(furnacePos);
-        furnace.setItem(1,new ItemStack(Items.COAL,8));   // fuel already inside: the recipe itself records no fuel
+        furnace.setItem(1,new ItemStack(Items.COAL,8));
         ItemStack card=new ItemStack(item("work_location_card"));
         WorkLocationCardItem.record(card,h.getLevel(),h.absolutePos(furnacePos),net.minecraft.world.level.block.Blocks.FURNACE);
         RecipeRackBlockEntity rack=(RecipeRackBlockEntity) h.getBlockEntity(RACK);
@@ -205,15 +202,73 @@ public final class AndroidEscrowOrderGameTests {
         grid.set(0,new ItemStack(Items.RAW_IRON));
         RecipeData.processing(grid,new ItemStack(Items.IRON_INGOT),List.of(),ItemStack.EMPTY).write(recipe,h.getLevel().registryAccess());
         rack.items().setStackInSlot(RecipeRackBlockEntity.COLS+1,recipe);
-        var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.IRON_INGOT),2,
+        return furnace;
+    }
+    @GameTest(template="empty")
+    public static void machineEscrowRejectsBeforeTakingPrivateInputs(GameTestHelper h) {
+        var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
+        ItemStack offered=new ItemStack(Items.RAW_IRON,2);
+        var rejected=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.IRON_INGOT),2,List.of(offered),null);
+        h.assertTrue(!rejected.acceptedNow() && rejected.receipt().state()==State.REJECTED
+                && "escrow_requires_plain_crafting_steps_without_fuel_or_catalysts".equals(rejected.receipt().reason()),"Machine offer took ownership");
+        h.assertTrue(c.orders().isEmpty() && offered.getCount()==2 && furnace.getItem(0).isEmpty() && furnace.getItem(2).isEmpty(),"Rejected machine changed stock");
+        h.assertTrue(AndroidEscrows.cancel(h.getLevel(),c.owner(),id).phase()==AndroidEscrows.Phase.UNKNOWN
+                && AndroidEscrows.claim(h.getLevel(),c.owner(),id,false,0,64,false).isEmpty(),"Rejected offer created duplicate refund");
+        // A rejection must not consume the request ID or bind the idle worker.
+        h.assertTrue(offer(h,c,id,1).acceptedNow(),"Rejected machine retained the worker or request ID");h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void machineEscrowCannotClaimPreexistingProducts(GameTestHelper h) {
+        var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
+        furnace.setItem(2,new ItemStack(Items.IRON_INGOT,2));
+        var exposed=AndroidOrders.recipes(h.getLevel(),c.getBlockPos(),c.owner());
+        h.assertTrue(exposed.recipes().stream().anyMatch(r->RecipeData.MODE_PROCESSING.equals(r.mode())
+                && r.outputs().stream().anyMatch(o->o.sample().is(Items.IRON_INGOT))),"Machine recipe discovery was removed");
+        var rejected=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.IRON_INGOT),2,
                 List.of(new ItemStack(Items.RAW_IRON,2)),null);
-        h.assertTrue(accepted.acceptedNow(),"Machine request rejected: "+accepted.receipt().reason());
-        h.succeedWhen(()->{
-            var snap=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
-            h.assertTrue(snap.phase()==AndroidEscrows.Phase.COMPLETED && !snap.workerPending(),"Not completed: "+snap.phase());
-            h.assertTrue(count(snap.products(),Items.IRON_INGOT)==2 && c.outbox().isEmpty(),"Ingots in private custody: "+snap.products());
-            h.assertTrue(shared.getItem(0).getCount()==32,"Shared stock untouched");
-        });
+        h.assertTrue(!rejected.acceptedNow() && rejected.receipt().state()==State.REJECTED,"Pre-existing output entered private custody");
+        h.assertTrue(furnace.getItem(0).isEmpty() && furnace.getItem(1).getCount()==8 && furnace.getItem(2).getCount()==2,
+                "Rejected request touched furnace input, fuel or existing output");
+        h.assertTrue(AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).phase()==AndroidEscrows.Phase.UNKNOWN
+                && AndroidEscrows.claim(h.getLevel(),c.owner(),id,true,0,64,false).isEmpty(),"Foreign output became claimable");h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void machineEscrowRejectsProcessingHiddenInsideCraftingChain(GameTestHelper h) {
+        var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
+        RecipeRackBlockEntity rack=(RecipeRackBlockEntity) h.getBlockEntity(RACK);
+        var grid=new java.util.ArrayList<>(java.util.Collections.nCopies(9,ItemStack.EMPTY));
+        grid.set(0,new ItemStack(Items.IRON_INGOT));
+        rack.items().setStackInSlot(3,recipeCard(h,grid,new ItemStack(Items.IRON_NUGGET,9)));
+        var rejected=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.IRON_NUGGET),18,
+                List.of(new ItemStack(Items.RAW_IRON,2)),null);
+        h.assertTrue(!rejected.acceptedNow() && rejected.receipt().state()==State.REJECTED
+                && "escrow_requires_plain_crafting_steps_without_fuel_or_catalysts".equals(rejected.receipt().reason()),"Crafting target bypassed machine restriction");
+        h.assertTrue(c.orders().isEmpty() && furnace.getItem(0).isEmpty()
+                && AndroidEscrows.snapshot(h.getLevel(),c.owner(),id).phase()==AndroidEscrows.Phase.UNKNOWN,"Partial chain acquired custody");h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void restoredEscrowMachineJobCannotTouchMachine(GameTestHelper h) throws Exception {
+        var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
+        furnace.setItem(2,new ItemStack(Items.IRON_INGOT,2));
+        var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"Plain crafting rejected");
+        var a=worker(h,c,accepted.receipt().orderId());var job=c.requestJob(a);var route=c.planPickup(job,a.blockPosition());
+        h.assertTrue(route!=null && c.fetchAt(a,job,route.get(0)),"Private fetch failed");
+        var machine=c.recipes().stream().filter(e->e.recipe().processing()).findFirst().orElseThrow();
+        var step=new WorkJob.Batch(0,2,machine.location(),machine.recipe());
+        var constructor=Class.forName("io.github.genichimaruo.singulo.android.AndroidWorkGoal").getDeclaredConstructor(RuinAndroid.class);
+        constructor.setAccessible(true);
+        var goal=constructor.newInstance(a);
+        var process=goal.getClass().getDeclaredMethod("process",net.minecraft.server.level.ServerLevel.class,
+                WorkConsoleBlockEntity.class,WorkJob.class,WorkJob.Batch.class);
+        process.setAccessible(true);
+        // Development-version persisted jobs must also fail closed at the actual insertion/collection boundary.
+        process.invoke(goal,h.getLevel(),c,job,step);
+        h.assertTrue(c.orders().isEmpty() && a.recoverEscrowCargo(),"Restored machine job continued or stranded carried inputs");
+        var snap=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
+        h.assertTrue(snap.receipt().state()==State.FAILED && count(snap.materials(),Items.OAK_LOG)==1
+                && snap.products().isEmpty() && !snap.workerPending(),"Restored job fabricated products or lost actual carry");
+        h.assertTrue(furnace.getItem(0).isEmpty() && furnace.getItem(1).getCount()==8 && furnace.getItem(2).getCount()==2,
+                "Restored job touched unowned machine inventory");h.succeed();
     }
     /** Fluids in custody retain their mB amounts through fills, drains and partial claims. */
     @GameTest(template="empty")
