@@ -55,21 +55,13 @@ This is **not exclusive isolation**. Hoppers, other mods or consoles may alter t
 may return carried materials to shared storage; already produced items are not rolled back. Do not
 interpret acceptance as AE2 all-or-nothing pushPattern ingredient ownership transfer.
 
-## Full escrow: intentionally not exposed
+## Private crafting escrow
 
-Filtering supplyPoints alone was rejected: fuel, auto-suborders and cancellation bypass it.
-The implemented source restriction is deliberately narrower. A future console-owned escrow needs:
-
-1. Staged deposit, validation and seal before any execution.
-2. Persisted per-request ownership on worker carry and intermediate products.
-3. CANCEL_REQUESTED -> RETURNING -> REFUND_READY, instead of immediate order deletion.
-4. Refund tombstones retained until all workers return; acknowledgement blocked meanwhile.
-5. Original endpoint identity-only refunds, retaining materials when full/unavailable.
-6. Owner recovery containers on console destruction and duplicate-refund prevention tests.
-
-Minecraft saves entities/block entities separately. Neither current APIs nor this design promise
-crash-atomic exactly-once transfers after arbitrary process termination. Normal-save recovery is
-the existing 0.18.0 contract, not an external durable transaction log.
+A separate opt-in [AndroidEscrows API](android-escrow.md) now provides physically private
+per-request custody for one ordinary crafting step. It does not change the source-restriction
+API above into escrow. See its acceptance, worker-return, recovery and corruption contracts.
+Processing/multi-step/fuel isolation remains intentionally unsupported; Minecraft's independent
+saves are not a crash-atomic distributed transaction log.
 
 ## Tests
 
@@ -77,3 +69,9 @@ Run the full suite, not only focused `AndroidRecipeApiGameTests,AndroidEndpointA
 AndroidOrderApiGameTests`. Added tests cover owner/range/thread checks, replacement, saved links,
 real-worker remote supply and partial delivery, replay, source restriction, malformed saved
 bindings and full carry with an extraction-only source.
+
+`AndroidEscrowStorageGameTests` and `AndroidEscrowOrderGameTests` additionally exercise physical
+custody, independent same-output orders, replay fingerprints, owner-only refund, private real-worker
+crafting, cancellation after pickup, console replacement, normal save/reload, worker death and
+unknown-owner forensic quarantine. Full-receiver integration must simulate capacity before claiming;
+neither the test suite nor API claims distributed crash atomicity with AE2.
