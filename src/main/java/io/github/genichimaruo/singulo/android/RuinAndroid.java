@@ -362,8 +362,11 @@ public abstract class RuinAndroid extends Monster {
             // Unknown owners remain forensic-only; never infer a new refund recipient.
             var cargo=new java.util.ArrayList<ItemStack>();
             for (int slot:carrySlots()) if(!inventory.getItem(slot).isEmpty()) cargo.add(inventory.getItem(slot).copy());
+            var fluidCargo=tankFluids();
+            for (var fluid:fluidCargo) cargo.add(io.github.genichimaruo.singulo.android.work.FluidSamples.of(fluid));
             if (!data.quarantineCargo(escrowRequest,escrowOwner,getUUID(),cargo)) return false;
             for (int slot:carrySlots()) inventory.setItem(slot,ItemStack.EMPTY);
+            for (var fluid:fluidCargo) drainTanks(fluid,fluid.getAmount(),false);
             escrowRequest=null; escrowOwner=null; escrowDimension=null; return true;
         }
         if (entry.state==io.github.genichimaruo.singulo.android.work.AndroidEscrowData.State.RUNNING)
