@@ -22,6 +22,11 @@ final class ExtractableItems implements IItemHandler {
         return handler == null || handler instanceof ExtractableItems ? handler : new ExtractableItems(handler);
     }
 
+    /** 包む前の入れ物（包んでいなければそのもの）。 */
+    static IItemHandler source(IItemHandler handler) {
+        return handler instanceof ExtractableItems e ? e.handler : handler;
+    }
+
     @Override
     public int getSlots() {
         return handler.getSlots();
