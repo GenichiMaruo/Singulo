@@ -45,9 +45,11 @@ requests rather than silently evicting them.
 
 The supported scope is a chain of crafting and machine (processing) steps planned only from the offer
 (for example logs -> planks -> sticks, or raw iron -> furnace -> ingots), one initially idle worker with
-empty carry, and item and fluid materials. Fluids are offered and kept as fluid samples (one per fluid,
-amount in mB; `AndroidEscrows.fluidSample` / `fluidOf`); tanks are filled from and returned to the
-request's custody, and claims of fluid samples are in mB. Liquid main products are not supported.
+empty carry, and item and fluid materials. Fluids are offered and kept as fluid samples (amount in mB;
+`AndroidEscrows.fluidSample` / `fluidOf`). A fluid can span several stable slots, with each sample
+holding at most `Integer.MAX_VALUE` mB. Tank extraction combines matching slots up to the requested
+amount. Tanks are filled from and returned to the request's custody, and both simulated and real
+claims of fluid samples are in mB. Liquid main products are not supported.
 Intermediates are returned into the same request's custody and fetched again from there; they never
 enter shared stock. Machines are used like in ordinary orders (one order at a time per location);
 automation outside Singulo can still touch a machine's slots. Procedures, fuel, catalysts and chemicals
@@ -89,7 +91,7 @@ The ordinary order acknowledgement API cannot bypass those checks.
 
 Normal save/reload preserves custody, private order linkage and worker binding. Malformed or
 conflicting saved records are retained in quarantine and not made claimable or reused. Actual
-cargo from a disappearing worker with unresolvable ownership is retained separately for forensic
+cargo, including fluid tank contents, from a disappearing worker with unresolvable ownership is retained separately for forensic
 recovery, never attributed to a guessed owner. This is fail-closed preservation, not automatic
 repair of arbitrary corrupt data.
 

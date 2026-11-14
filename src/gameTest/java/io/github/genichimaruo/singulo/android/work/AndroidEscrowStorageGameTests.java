@@ -1,11 +1,15 @@
 package io.github.genichimaruo.singulo.android.work;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
+import io.github.genichimaruo.singulo.api.android.AndroidEscrows;
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.item.*;
 import net.minecraftforge.gametest.*;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraft.world.level.material.Fluids;
 @GameTestHolder("singulo") @PrefixGameTestTemplate(false)
 public final class AndroidEscrowStorageGameTests {
     @GameTest(template="empty") public static void physicalCustodyStableSlotsAndOwnerRefund(GameTestHelper h){
@@ -74,4 +78,71 @@ public final class AndroidEscrowStorageGameTests {
         h.assertTrue(e.requestedWorker.equals(AndroidEscrowData.load(saved,h.getLevel().registryAccess()).find(id).requestedWorker),"Requested worker lost");
         saved.getList("records",Tag.TAG_COMPOUND).getCompound(0).putString("requested_worker","invalid");
         h.assertTrue(AndroidEscrowData.load(saved,h.getLevel().registryAccess()).find(id)==null,"Invalid requested worker accepted");h.succeed();
-    }}
+    }
+
+    @GameTest(template="empty") public static void fluidClaimsSimulateTheSameMilliBucketsAsExecution(GameTestHelper h){
+        var d=AndroidEscrowData.get(h.getLevel());var id=UUID.randomUUID();var owner=UUID.randomUUID();var worker=UUID.randomUUID();
+        var e=d.create(id,owner,BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,
+                List.of(FluidSamples.of(new FluidStack(Fluids.WATER,1000))));
+        d.bind(e,1,worker);d.fluidHandler(e,true).fill(new FluidStack(Fluids.WATER,750),FluidAction.EXECUTE);
+        h.assertTrue(AndroidEscrows.claim(h.getLevel(),owner,id,false,0,100,true).isEmpty(),"Live material simulation bypassed custody");
+        for(boolean products:List.of(true,false)){
+            if(!products){d.markTerminal(e,AndroidOrders.State.CANCELLED,0);d.workerReturned(e,worker);}
+            int before=products?750:1000;
+            var simulated=AndroidEscrows.claim(h.getLevel(),owner,id,products,0,100,true);
+            h.assertTrue(FluidSamples.amount(simulated)==100,"Fluid simulation used stack count instead of mB");
+            h.assertTrue(FluidSamples.amount((products?d.products(e):d.inputs(e)).get(0))==before,"Simulation changed custody");
+            h.assertTrue(AndroidEscrows.claim(h.getLevel(),UUID.randomUUID(),id,products,0,100,true).isEmpty(),"Foreign simulation leaked custody");
+            var actual=AndroidEscrows.claim(h.getLevel(),owner,id,products,0,100,false);
+            h.assertTrue(ItemStack.matches(simulated,actual),"Simulation and execution differ");
+            h.assertTrue(FluidSamples.amount((products?d.products(e):d.inputs(e)).get(0))==before-100,"Partial claim lost fluid");
+            h.assertTrue(FluidSamples.amount(AndroidEscrows.claim(h.getLevel(),owner,id,products,0,Integer.MAX_VALUE,true))==before-100,"Oversized simulation wrong");
+            h.assertTrue(FluidSamples.amount(AndroidEscrows.claim(h.getLevel(),owner,id,products,0,Integer.MAX_VALUE,false))==before-100,"Remainder claim wrong");
+            h.assertTrue(AndroidEscrows.claim(h.getLevel(),owner,id,products,0,100,false).isEmpty(),"Fluid claimed twice");
+        }
+        h.assertTrue(AndroidEscrows.acknowledge(h.getLevel(),owner,id),"Empty fluid custody not acknowledged");h.succeed();
+    }
+
+    @GameTest(template="empty") public static void fluidCustodySplitsOverflowAndPreservesItAcrossSave(GameTestHelper h){
+        var d=new AndroidEscrowData();var id=UUID.randomUUID();var owner=UUID.randomUUID();var worker=UUID.randomUUID();
+        var e=d.create(id,owner,BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,
+                List.of(FluidSamples.of(new FluidStack(Fluids.WATER,Integer.MAX_VALUE-100))));
+        d.bind(e,1,worker);
+        h.assertTrue(d.returnCargo(e,FluidSamples.of(new FluidStack(Fluids.WATER,200))).isEmpty(),"Fluid return rejected");
+        long expected=2L*Integer.MAX_VALUE+100;
+        for(boolean products:List.of(false,true)){
+            var handler=d.fluidHandler(e,products);
+            if(products){handler.fill(new FluidStack(Fluids.WATER,Integer.MAX_VALUE),FluidAction.EXECUTE);handler.fill(new FluidStack(Fluids.WATER,100),FluidAction.EXECUTE);}
+            long before=(products?d.products(e):d.inputs(e)).stream().mapToLong(FluidSamples::amount).sum();
+            h.assertTrue(before==(long)Integer.MAX_VALUE+100,"Initial overflow lost fluid");
+            h.assertTrue(handler.fill(new FluidStack(Fluids.WATER,Integer.MAX_VALUE),FluidAction.SIMULATE)==Integer.MAX_VALUE,"Simulation rejected capacity");
+            h.assertTrue((products?d.products(e):d.inputs(e)).stream().mapToLong(FluidSamples::amount).sum()==before,"Simulated fill changed custody");
+            h.assertTrue(handler.fill(new FluidStack(Fluids.WATER,Integer.MAX_VALUE),FluidAction.EXECUTE)==Integer.MAX_VALUE,"Fill silently dropped excess");
+            h.assertTrue((products?d.products(e):d.inputs(e)).stream().mapToLong(FluidSamples::amount).sum()==expected,"Int overflow changed total");
+        }
+        d=AndroidEscrowData.load(d.save(new CompoundTag(),h.getLevel().registryAccess()),h.getLevel().registryAccess());e=d.find(id);
+        d.markTerminal(e,AndroidOrders.State.CANCELLED,0);d.workerReturned(e,worker);
+        for(boolean products:List.of(false,true)){
+            int slots=(products?d.products(e):d.inputs(e)).size();long claimed=0;
+            for(int i=0;i<slots;i++)claimed+=FluidSamples.amount(d.claim(owner,id,products,i,Integer.MAX_VALUE));
+            h.assertTrue(claimed==expected,"Save/claim lost overflow: "+claimed);
+        }
+        h.assertTrue(d.acknowledge(owner,id),"Overflow left unclaimable cargo");h.succeed();
+    }
+
+    @GameTest(template="empty") public static void fluidDrainsAggregateMatchingSlotsWithoutChangingSimulation(GameTestHelper h){
+        var d=new AndroidEscrowData();var id=UUID.randomUUID();var owner=UUID.randomUUID();
+        var e=d.create(id,owner,BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,List.of(
+                FluidSamples.of(new FluidStack(Fluids.WATER,500)),FluidSamples.of(new FluidStack(Fluids.LAVA,400)),
+                FluidSamples.of(new FluidStack(Fluids.WATER,500))));
+        d.bind(e,1,UUID.randomUUID());var handler=d.fluidHandler(e,false);
+        h.assertTrue(handler.drain(new FluidStack(Fluids.WATER,800),FluidAction.SIMULATE).getAmount()==800,"Simulation only saw first matching slot");
+        h.assertTrue(d.inputs(e).stream().mapToLong(FluidSamples::amount).sum()==1400,"Drain simulation mutated custody");
+        h.assertTrue(handler.drain(new FluidStack(Fluids.WATER,800),FluidAction.EXECUTE).getAmount()==800,"Execution only drained first matching slot");
+        var remaining=d.inputs(e);
+        h.assertTrue(remaining.size()==3 && remaining.get(0).isEmpty() && FluidSamples.amount(remaining.get(1))==400
+                && FluidSamples.amount(remaining.get(2))==200,"Drain shifted slots, touched other fluid or lost remainder");
+        h.assertTrue(handler.drain(new FluidStack(Fluids.WATER,500),FluidAction.EXECUTE).getAmount()==200,"Final remainder wrong");
+        h.assertTrue(handler.drain(new FluidStack(Fluids.WATER,500),FluidAction.EXECUTE).isEmpty(),"Fluid drained twice");h.succeed();
+    }
+}

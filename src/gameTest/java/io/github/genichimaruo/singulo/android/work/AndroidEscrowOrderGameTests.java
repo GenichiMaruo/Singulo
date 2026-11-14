@@ -215,7 +215,7 @@ public final class AndroidEscrowOrderGameTests {
             h.assertTrue(shared.getItem(0).getCount()==32,"Shared stock untouched");
         });
     }
-    /** Fluids in custody: one sample per fluid, amounts in mB, partial claims in mB. */
+    /** Fluids in custody retain their mB amounts through fills, drains and partial claims. */
     @GameTest(template="empty")
     public static void privateCustodyKeepsFluidAmounts(GameTestHelper h) {
         var c=setup(h,false);var id=UUID.randomUUID();
@@ -276,17 +276,24 @@ public final class AndroidEscrowOrderGameTests {
         var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");
         var original=worker(h,c,accepted.receipt().orderId());var job=c.requestJob(original);var route=c.planPickup(job,original.blockPosition());
         h.assertTrue(route!=null && c.fetchAt(original,job,route.get(0)),"Private fetch failed");
+        original.inventory().setItem(RuinAndroid.SLOT_TANK,new ItemStack(item("android_tank_upgrade")));
+        var water=new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,1500);
+        var lava=new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA,750);
+        h.assertTrue(original.fillTanks(water,false)==1500 && original.fillTanks(lava,false)==750,"Fluid cargo fixture failed");
         var tag=original.saveWithoutId(new net.minecraft.nbt.CompoundTag());tag.remove("escrow_owner");
         tag.getCompound("work_state").remove("escrow_owner");
         // Move, not copy, the actual cargo into a restored corrupt-owner entity.
         for(int slot:original.carrySlots()) original.inventory().setItem(slot,ItemStack.EMPTY);
+        original.drainTanks(water,1500,false);original.drainTanks(lava,750,false);
         original.discard();
         var restored=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());restored.load(tag);h.getLevel().addFreshEntity(restored);
         h.assertTrue(restored.escrowOwner()==null && id.equals(restored.escrowRequest()),"Corrupt owner fixture unexpectedly inferred owner");
         restored.hurt(h.getLevel().damageSources().genericKill(),Float.MAX_VALUE);
         h.assertTrue(!restored.isAlive(),"Worker did not die");
+        h.assertTrue(restored.tanksEmpty() && restored.escrowRequest()==null && restored.recoverEscrowCargo(),"Recovered fluids remained on worker");
         var saved=AndroidEscrowData.get(h.getLevel()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());
-        var salvage=saved.getList("recovery_salvage_v1",net.minecraft.nbt.Tag.TAG_COMPOUND);long recovered=0;
+        saved=AndroidEscrowData.load(saved,h.getLevel().registryAccess()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());
+        var salvage=saved.getList("recovery_salvage_v1",net.minecraft.nbt.Tag.TAG_COMPOUND);long recovered=0,recoveredWater=0,recoveredLava=0;
         for(var raw:salvage) {
             var entry=(net.minecraft.nbt.CompoundTag)raw;
             if(!entry.hasUUID("request") || !id.equals(entry.getUUID("request"))) continue;
@@ -294,12 +301,37 @@ public final class AndroidEscrowOrderGameTests {
             for(var stackTag:entry.getList("actual_cargo",net.minecraft.nbt.Tag.TAG_COMPOUND)) {
                 var stack=ItemStack.of((net.minecraft.nbt.CompoundTag)stackTag);
                 if(stack.is(Items.OAK_LOG)) recovered+=stack.getCount();
+                var fluid=FluidSamples.fluid(stack);
+                if(fluid.getFluid()==net.minecraft.world.level.material.Fluids.WATER) recoveredWater+=fluid.getAmount();
+                if(fluid.getFluid()==net.minecraft.world.level.material.Fluids.LAVA) recoveredLava+=fluid.getAmount();
             }
         }
         h.assertTrue(recovered==1,"Unknown-owner actual cargo not retained exactly once");
+        h.assertTrue(recoveredWater==1500 && recoveredLava==750,"Unknown-owner fluid cargo lost or duplicated");
         h.assertTrue(AndroidEscrows.claim(h.getLevel(),c.owner(),id,false,0,64,false).isEmpty(),"Unknown-owner quarantine became a normal refund");
         h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(c.getBlockPos()).inflate(16))
                 .stream().noneMatch(e->e.getItem().is(Items.OAK_LOG)),"Quarantined material also dropped");h.succeed();
+    }
+    @GameTest(template="empty")
+    public static void mismatchedOwnerRecoveryQuarantinesFluidAndClearsWorkerTanks(GameTestHelper h) {
+        var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");
+        var a=worker(h,c,accepted.receipt().orderId());
+        a.inventory().setItem(RuinAndroid.SLOT_TANK,new ItemStack(item("android_tank_upgrade")));
+        var water=new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,1200);
+        h.assertTrue(a.fillTanks(water,false)==1200,"Fluid fixture failed");
+        var work=a.saveWorkState();var wrongOwner=UUID.randomUUID();work.putUUID("escrow_owner",wrongOwner);a.restoreWorkState(work);
+        h.assertTrue(wrongOwner.equals(a.escrowOwner()),"Mismatched owner fixture failed");
+        h.assertTrue(a.recoverEscrowCargo() && a.tanksEmpty() && a.escrowRequest()==null,"Mismatched recovery left accessible fluid");
+        h.assertTrue(a.recoverEscrowCargo(),"Repeated recovery failed");
+        var saved=AndroidEscrowData.get(h.getLevel()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());long recovered=0;int records=0;
+        for(var raw:saved.getList("recovery_salvage_v1",net.minecraft.nbt.Tag.TAG_COMPOUND)){
+            var entry=(net.minecraft.nbt.CompoundTag)raw;if(!id.equals(entry.getUUID("request")))continue;records++;
+            h.assertTrue(wrongOwner.equals(entry.getUUID("owner")),"Forensic owner rewritten");
+            for(var stackTag:entry.getList("actual_cargo",net.minecraft.nbt.Tag.TAG_COMPOUND))
+                recovered+=FluidSamples.fluid(ItemStack.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag)).getAmount();
+        }
+        h.assertTrue(records==1 && recovered==1200,"Mismatched fluid salvage lost or duplicated");
+        h.assertTrue(AndroidEscrows.claim(h.getLevel(),wrongOwner,id,false,0,1200,false).isEmpty(),"Forensic cargo became claimable");h.succeed();
     }
     /** Fault injection is confined to this test block entity; production has no testing hook. */
     private static final class FailingEscrowConsole extends WorkConsoleBlockEntity {

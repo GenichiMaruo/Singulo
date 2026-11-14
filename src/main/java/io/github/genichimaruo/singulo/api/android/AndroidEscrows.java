@@ -79,9 +79,7 @@ public final class AndroidEscrows {
         if (e == null || !actor.equals(e.owner) || amount <= 0 || slot < 0
                 || e.state == AndroidEscrowData.State.QUARANTINED || e.state == AndroidEscrowData.State.PREPARING
                 || !products && (e.worker != null || e.state == AndroidEscrowData.State.RUNNING)) return ItemStack.EMPTY;
-        if (!simulate) return data.claim(actor, request, products, slot, amount);
-        var stacks = products ? data.products(e) : data.inputs(e);
-        return slot >= stacks.size() ? ItemStack.EMPTY : stacks.get(slot).copyWithCount(Math.min(amount, stacks.get(slot).getCount()));
+        return data.claim(actor, request, products, slot, amount, simulate);
     }
     public static boolean acknowledge(ServerLevel level, UUID actor, UUID request) {
         check(level, actor, request);

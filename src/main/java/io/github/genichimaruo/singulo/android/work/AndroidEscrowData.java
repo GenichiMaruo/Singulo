@@ -120,22 +120,32 @@ public final class AndroidEscrowData extends SavedData {
         while(!rest.isEmpty()) { int n=Math.min(rest.getCount(),rest.getMaxStackSize()); inventory.add(rest.copyWithCount(n)); rest.shrink(n); }
     }
     public ItemStack claim(UUID owner, UUID request, boolean products, int slot, int amount) {
+        return claim(owner,request,products,slot,amount,false);
+    }
+    public ItemStack claim(UUID owner, UUID request, boolean products, int slot, int amount, boolean simulate) {
         Entry e=find(request);
         if(!valid(e) || !e.owner.equals(owner) || (!products && (!terminal(e) || e.worker!=null))) return ItemStack.EMPTY;
-        return extract(products?e.products:e.inputs,slot,amount,false);
+        return extract(products?e.products:e.inputs,slot,amount,simulate);
     }
     public boolean acknowledge(UUID owner, UUID request) {
         Entry e=find(request); if(!valid(e) || !e.owner.equals(owner) || !terminal(e) || e.worker!=null
                 || e.inputs.stream().anyMatch(s->!s.isEmpty()) || e.products.stream().anyMatch(s->!s.isEmpty())) return false;
         records.remove(request); setDirty(); return true;
     }
-    /** Fluids are kept as one sample per fluid; its amount (mB) grows and shrinks. */
+    /** Compact matching fluids up to the sample's int limit, retaining any excess in another stable slot. */
     private static void appendFluid(List<ItemStack> inventory, FluidStack fluid) {
         if(fluid.isEmpty()) return;
+        int remaining=fluid.getAmount();
         for(int i=0;i<inventory.size();i++){ var f=FluidSamples.fluid(inventory.get(i));
-            if(!f.isEmpty() && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(f,fluid)){ inventory.set(i,FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, f.getAmount()+fluid.getAmount()))); return; } }
-        for(int i=0;i<inventory.size();i++) if(inventory.get(i).isEmpty()){ inventory.set(i,FluidSamples.of(fluid.copy())); return; }
-        inventory.add(FluidSamples.of(fluid.copy()));
+            if(!f.isEmpty() && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(f,fluid)){
+                int moved=Math.min(remaining,Integer.MAX_VALUE-f.getAmount());
+                if(moved>0)inventory.set(i,FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, f.getAmount()+moved)));
+                remaining-=moved;if(remaining==0)return;
+            }
+        }
+        var rest=FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, remaining));
+        for(int i=0;i<inventory.size();i++) if(inventory.get(i).isEmpty()){ inventory.set(i,rest); return; }
+        inventory.add(rest);
     }
     private ItemStack extract(List<ItemStack> inv,int slot,int amount,boolean simulate) {
         if(slot<0 || slot>=inv.size() || amount<=0)return ItemStack.EMPTY;
@@ -158,7 +168,7 @@ public final class AndroidEscrowData extends SavedData {
             private List<Integer> tanks(){List<Integer> out=new ArrayList<>(); if(!valid(e))return out;
                 for(int i=0;i<inv().size();i++) if(FluidSamples.is(inv().get(i)))out.add(i); return out;}
             public int getTanks(){return tanks().size()+1;}
-            public FluidStack getFluidInTank(int tank){var t=tanks(); return tank<t.size()?FluidSamples.fluid(inv().get(t.get(tank))):FluidStack.EMPTY;}
+            public FluidStack getFluidInTank(int tank){var t=tanks(); return tank>=0 && tank<t.size()?FluidSamples.fluid(inv().get(t.get(tank))):FluidStack.EMPTY;}
             public int getTankCapacity(int tank){return Integer.MAX_VALUE;}
             public boolean isFluidValid(int tank,FluidStack stack){return valid(e);}
             public int fill(FluidStack resource,FluidAction action){
@@ -168,12 +178,13 @@ public final class AndroidEscrowData extends SavedData {
             }
             public FluidStack drain(FluidStack resource,FluidAction action){
                 if(!valid(e) || resource.isEmpty() || !products && e.state!=State.RUNNING)return FluidStack.EMPTY;
+                int drained=0;
                 for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i));
                     if(io.github.genichimaruo.singulo.compat.Legacy.sameFluid(f,resource)){
-                        int take=Math.min(resource.getAmount(),f.getAmount());
+                        int take=Math.min(resource.getAmount()-drained,f.getAmount());
                         if(action.execute()){inv().set(i,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, f.getAmount()-take)));setDirty();}
-                        return io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, take);}}
-                return FluidStack.EMPTY;
+                        drained+=take;if(drained==resource.getAmount())break;}}
+                return io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, drained);
             }
             public FluidStack drain(int maxDrain,FluidAction action){
                 for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i)); if(!f.isEmpty())return drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, maxDrain),action);}
