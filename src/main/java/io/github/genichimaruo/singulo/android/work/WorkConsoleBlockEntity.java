@@ -1983,8 +1983,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             for (int s = 0; s < h.getSlots(); s++) {
                 ItemStack st = h.getStackInSlot(s);
                 if (FluidSamples.liquid(need.item)) {   // escrow custody keeps fluids as samples (amount in mB)
-                    if (FluidSamples.is(st) && FluidSamples.is(need.item) && net.neoforged.neoforge.fluids.FluidStack
-                            .isSameFluidSameComponents(FluidSamples.fluid(st), FluidSamples.fluid(need.item)))
+                    if (FluidSamples.is(st) && FluidSamples.is(need.item) && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(FluidSamples.fluid(st), FluidSamples.fluid(need.item)))
                         ItemCount.add(out, FluidSamples.key(st), FluidSamples.amount(st));
                     continue;
                 }
@@ -2316,7 +2315,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             for (int pass = 0; pass < 2 && remaining > 0; pass++) {
                 for (int i = 0; i < simulatedCarry.size() && remaining > 0; i++) {
                     ItemStack held = simulatedCarry.get(i);
-                    if (pass == 0 && !held.isEmpty() && ItemStack.isSameItemSameComponents(held, need.item)) {
+                    if (pass == 0 && !held.isEmpty() && ItemStack.isSameItemSameTags(held, need.item)) {
                         int move = (int) Math.min(remaining, Math.max(0, held.getMaxStackSize() - held.getCount()));
                         held.grow(move); remaining -= move;
                     } else if (pass == 1 && held.isEmpty()) {

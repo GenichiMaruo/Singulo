@@ -23,12 +23,12 @@ public final class AndroidEscrows {
      * Fluids in offers, materials and products are fluid sample stacks; their amount (mB) is the sample's fluid
      * amount, not the stack count, and {@link #claim} amounts for them are mB.
      */
-    public static ItemStack fluidSample(net.neoforged.neoforge.fluids.FluidStack fluid) {
+    public static ItemStack fluidSample(net.minecraftforge.fluids.FluidStack fluid) {
         return io.github.genichimaruo.singulo.android.work.FluidSamples.of(fluid);
     }
 
     /** The fluid of a sample stack, or empty for ordinary items. */
-    public static net.neoforged.neoforge.fluids.FluidStack fluidOf(ItemStack stack) {
+    public static net.minecraftforge.fluids.FluidStack fluidOf(ItemStack stack) {
         return io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(stack);
     }
     public enum Phase { UNKNOWN, REJECTED, PREPARING, RUNNING, RETURNING, RECOVERABLE, COMPLETED, QUARANTINED }

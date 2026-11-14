@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.api.android;
 
 import java.util.UUID;
 import javax.annotation.Nullable;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 /** Optional addon block-entity contract, server thread only (0.19.0).
  * Persist a random identity for the placed lifetime; replacements MUST get new identities.

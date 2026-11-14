@@ -18,6 +18,6 @@ world.mkdir(parents=True)
 shutil.copy2(source / 'level.dat', world / 'level.dat')
 if (source / 'serverconfig').is_dir():
     shutil.copytree(source / 'serverconfig', world / 'serverconfig')
-(review / 'options.txt').write_text('lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:2\nsimulationDistance:5\npauseOnLostFocus:false\nonboardAccessibility:false\n')
+(review / 'options.txt').write_text('lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:2\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nonboardAccessibility:false\n')
 (review / 'config').mkdir(exist_ok=True)
 (review / 'config/fml.toml').write_text('earlyWindowControl = false\n')

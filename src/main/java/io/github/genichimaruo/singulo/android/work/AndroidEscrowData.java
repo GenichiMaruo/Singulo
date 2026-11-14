@@ -8,9 +8,9 @@ import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 
 /** Per-dimension physical custody. Internal trusted server-thread API, not a capability.
  * Entity and SavedData writes are not crash-atomic. Invalid saved records are retained verbatim.
@@ -46,7 +46,7 @@ public final class AndroidEscrowData extends SavedData {
     private CompoundTag rawRoot;
     public static AndroidEscrowData get(ServerLevel level) {
         if (!level.getServer().isSameThread()) throw new IllegalStateException("Escrow requires server thread");
-        var data = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(AndroidEscrowData::new, AndroidEscrowData::load, null), "singulo_android_escrow_v1");
+        var data = level.getDataStorage().computeIfAbsent(tag -> AndroidEscrowData.load(tag, level.registryAccess()), AndroidEscrowData::new, "singulo_android_escrow_v1");
         data.registriesForRecovery=level.registryAccess(); return data;
     }
     private static List<ItemStack> copy(List<ItemStack> stacks) { return stacks.stream().map(ItemStack::copy).toList(); }
@@ -78,7 +78,7 @@ public final class AndroidEscrowData extends SavedData {
     }
     public boolean matches(Entry e, UUID actor, ItemStack target, long count, List<ItemStack> offer, BlockPos console, UUID identity) {
         if(!valid(e) || !e.owner.equals(actor) || !e.console.equals(console) || !e.consoleIdentity.equals(identity)
-                || e.count!=count || !ItemStack.isSameItemSameComponents(e.target,target) || offer.size()!=e.originalOffer.size()) return false;
+                || e.count!=count || !ItemStack.isSameItemSameTags(e.target,target) || offer.size()!=e.originalOffer.size()) return false;
         for(int i=0;i<offer.size();i++) if(!ItemStack.matches(offer.get(i),e.originalOffer.get(i))) return false;
         return true;
     }
@@ -111,7 +111,7 @@ public final class AndroidEscrowData extends SavedData {
     private static void append(List<ItemStack> inventory, ItemStack offered) {
         if(FluidSamples.is(offered)) { appendFluid(inventory, FluidSamples.fluid(offered)); return; }
         ItemStack rest=offered.copy();
-        for(ItemStack held:inventory) if(!held.isEmpty() && ItemStack.isSameItemSameComponents(held,rest)) {
+        for(ItemStack held:inventory) if(!held.isEmpty() && ItemStack.isSameItemSameTags(held,rest)) {
             int n=Math.min(rest.getCount(),Math.max(0,held.getMaxStackSize()-held.getCount())); held.grow(n); rest.shrink(n); if(rest.isEmpty())return;
         }
         for(int i=0;i<inventory.size() && !rest.isEmpty();i++) if(inventory.get(i).isEmpty()) {
@@ -133,7 +133,7 @@ public final class AndroidEscrowData extends SavedData {
     private static void appendFluid(List<ItemStack> inventory, FluidStack fluid) {
         if(fluid.isEmpty()) return;
         for(int i=0;i<inventory.size();i++){ var f=FluidSamples.fluid(inventory.get(i));
-            if(!f.isEmpty() && FluidStack.isSameFluidSameComponents(f,fluid)){ inventory.set(i,FluidSamples.of(f.copyWithAmount(f.getAmount()+fluid.getAmount()))); return; } }
+            if(!f.isEmpty() && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(f,fluid)){ inventory.set(i,FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, f.getAmount()+fluid.getAmount()))); return; } }
         for(int i=0;i<inventory.size();i++) if(inventory.get(i).isEmpty()){ inventory.set(i,FluidSamples.of(fluid.copy())); return; }
         inventory.add(FluidSamples.of(fluid.copy()));
     }
@@ -142,8 +142,8 @@ public final class AndroidEscrowData extends SavedData {
         ItemStack held=inv.get(slot); if(held.isEmpty())return ItemStack.EMPTY;
         if(FluidSamples.is(held)) {   // amount = mB
             var f=FluidSamples.fluid(held); int take=Math.min(amount,f.getAmount());
-            if(!simulate){ inv.set(slot,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(f.copyWithAmount(f.getAmount()-take))); setDirty(); }
-            return FluidSamples.of(f.copyWithAmount(take));
+            if(!simulate){ inv.set(slot,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, f.getAmount()-take))); setDirty(); }
+            return FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, take));
         }
         ItemStack result=held.copyWithCount(Math.min(amount,held.getCount()));
         if(!simulate){held.shrink(result.getCount());setDirty();} return result;
@@ -169,14 +169,14 @@ public final class AndroidEscrowData extends SavedData {
             public FluidStack drain(FluidStack resource,FluidAction action){
                 if(!valid(e) || resource.isEmpty() || !products && e.state!=State.RUNNING)return FluidStack.EMPTY;
                 for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i));
-                    if(FluidStack.isSameFluidSameComponents(f,resource)){
+                    if(io.github.genichimaruo.singulo.compat.Legacy.sameFluid(f,resource)){
                         int take=Math.min(resource.getAmount(),f.getAmount());
-                        if(action.execute()){inv().set(i,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(f.copyWithAmount(f.getAmount()-take)));setDirty();}
-                        return f.copyWithAmount(take);}}
+                        if(action.execute()){inv().set(i,take>=f.getAmount()?ItemStack.EMPTY:FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, f.getAmount()-take)));setDirty();}
+                        return io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, take);}}
                 return FluidStack.EMPTY;
             }
             public FluidStack drain(int maxDrain,FluidAction action){
-                for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i)); if(!f.isEmpty())return drain(f.copyWithAmount(maxDrain),action);}
+                for(int i:tanks()){var f=FluidSamples.fluid(inv().get(i)); if(!f.isEmpty())return drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, maxDrain),action);}
                 return FluidStack.EMPTY;
             }
         };
@@ -194,7 +194,7 @@ public final class AndroidEscrowData extends SavedData {
                 if(!isItemValid(slot,s))return s.copy();
                 if(s.isEmpty())return ItemStack.EMPTY;
                 ItemStack held=slot<e.products.size()?e.products.get(slot):ItemStack.EMPTY;
-                if(!held.isEmpty()&&!ItemStack.isSameItemSameComponents(held,s))return s.copy();
+                if(!held.isEmpty()&&!ItemStack.isSameItemSameTags(held,s))return s.copy();
                 int accepted=Math.min(s.getCount(),Math.max(0,Math.min(64,s.getMaxStackSize())-held.getCount()));
                 if(!simulate&&accepted>0){
                     if(slot==e.products.size())e.products.add(s.copyWithCount(accepted));
@@ -209,24 +209,27 @@ public final class AndroidEscrowData extends SavedData {
         };
     }
     private static ListTag stacks(List<ItemStack> inv,HolderLookup.Provider registries) {
-        ListTag out=new ListTag(); for(ItemStack s:inv)out.add(s.isEmpty()?new CompoundTag():s.save(registries));return out;
+        ListTag out=new ListTag(); for(ItemStack s:inv)out.add(s.isEmpty()?new CompoundTag():s.save(new CompoundTag()));return out;
     }
     private static List<ItemStack> readStacks(CompoundTag t,String key,HolderLookup.Provider registries,boolean allowEmpty) {
         if(!t.contains(key,Tag.TAG_LIST))throw new IllegalArgumentException("Missing inventory");
         ListTag list=t.getList(key,Tag.TAG_COMPOUND);
         if(list.size()!=((ListTag)t.get(key)).size())throw new IllegalArgumentException("Invalid inventory tags");
         List<ItemStack> out=new ArrayList<>();
-        for(Tag raw:list){CompoundTag st=(CompoundTag)raw; ItemStack s=st.isEmpty()?ItemStack.EMPTY:ItemStack.parseOptional(registries,st);
+        for(Tag raw:list){CompoundTag st=(CompoundTag)raw; ItemStack s=st.isEmpty()?ItemStack.EMPTY:ItemStack.of(st);
             if((s.isEmpty() && (!allowEmpty || !st.isEmpty())) || !s.isEmpty() && (s.getCount()<1 || s.getCount()>s.getMaxStackSize()))throw new IllegalArgumentException("Invalid stack");out.add(s);}
         return out;
     }
-    @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries) {
+    @Override public CompoundTag save(CompoundTag tag) {
+        return save(tag, registriesForRecovery == null ? net.minecraft.core.RegistryAccess.EMPTY : registriesForRecovery);
+    }
+    public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries) {
         if(invalidRoot){CompoundTag out=rawRoot.copy();out.put("recovery_salvage_extra_v1",salvage.copy());return out;}
         tag.put("recovery_salvage_v1",salvage.copy());
         tag.putInt("schema",1); ListTag list=new ListTag();
         for(Entry e:records.values()){
             CompoundTag t=new CompoundTag();t.putUUID("request",e.request);t.putUUID("owner",e.owner);t.putUUID("identity",e.consoleIdentity);
-            t.put("console",NbtUtils.writeBlockPos(e.console));t.put("target",e.target.save(registries));t.putLong("count",e.count);
+            t.put("console",NbtUtils.writeBlockPos(e.console));t.put("target",e.target.save(new CompoundTag()));t.putLong("count",e.count);
             t.putInt("order",e.orderId);t.putString("state",e.state.name());if(e.worker!=null)t.putUUID("worker",e.worker);
             if(e.requestedWorker!=null)t.putUUID("requested_worker",e.requestedWorker);
             if(e.outcome!=null)t.putString("outcome",e.outcome.name());t.putLong("delivered",e.delivered);
@@ -252,7 +255,7 @@ public final class AndroidEscrowData extends SavedData {
                     AndroidEscrowData temp=new AndroidEscrowData();temp.records.put(id,old);previous=(CompoundTag)temp.save(new CompoundTag(),registries).getList("records",Tag.TAG_COMPOUND).get(0);
                     data.quarantined.add(previous);throw new IllegalArgumentException();
                 }
-                BlockPos pos=NbtUtils.readBlockPos(t,"console").orElseThrow();ItemStack target=ItemStack.parseOptional(registries,t.getCompound("target"));
+                BlockPos pos=io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(t,"console").orElseThrow();ItemStack target=ItemStack.of(t.getCompound("target"));
                 long count=t.getLong("count");List<ItemStack> offer=readStacks(t,"offer",registries,false);
                 if(target.isEmpty() || FluidSamples.liquid(target) || count<1 || count>WorkConsoleBlockEntity.MAX_COUNT || offer.isEmpty() || offer.size()>MAX_OFFER_STACKS || offer.stream().anyMatch(ChemicalSamples::is))throw new IllegalArgumentException();
                 Entry e=new Entry(id,t.getUUID("owner"),pos,t.getUUID("identity"),target,count,offer);

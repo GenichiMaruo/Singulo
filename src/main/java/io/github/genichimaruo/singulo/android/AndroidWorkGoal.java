@@ -2500,7 +2500,7 @@ final class AndroidWorkGoal extends Goal {
             ItemStack into = carried.getStackInSlot(i);
             for (int j = i + 1; j < slots.length && !into.isEmpty() && into.getCount() < into.getMaxStackSize(); j++) {
                 ItemStack from = carried.getStackInSlot(j);
-                if (!from.isEmpty() && ItemStack.isSameItemSameComponents(into, from)) {
+                if (!from.isEmpty() && ItemStack.isSameItemSameTags(into, from)) {
                     int move = Math.min(from.getCount(), into.getMaxStackSize() - into.getCount());
                     into.grow(move);
                     from.shrink(move);

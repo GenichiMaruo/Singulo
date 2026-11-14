@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.item.*;
-import net.neoforged.neoforge.gametest.*;
+import net.minecraftforge.gametest.*;
 @GameTestHolder("singulo") @PrefixGameTestTemplate(false)
 public final class AndroidEscrowStorageGameTests {
     @GameTest(template="empty") public static void physicalCustodyStableSlotsAndOwnerRefund(GameTestHelper h){
