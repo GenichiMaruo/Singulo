@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -180,6 +182,121 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     };
     private final IItemHandler outboxHandler = new net.minecraftforge.items.wrapper.InvWrapper(outbox);
     private final Set<BlockPos> links = new LinkedHashSet<>();
+    private UUID escrowConsoleIdentity = UUID.randomUUID();
+    public UUID escrowConsoleIdentity() { return escrowConsoleIdentity; }
+    @Nullable private AndroidEscrowData.Entry escrowEntry(WorkOrder order) {
+        if (order == null || order.escrowRequest == null || !(level instanceof ServerLevel server)) return null;
+        var e = AndroidEscrowData.get(server).find(order.escrowRequest);
+        return e != null && e.consoleIdentity.equals(escrowConsoleIdentity) && e.console.equals(worldPosition)
+                && java.util.Objects.equals(e.owner, order.orderer) ? e : null;
+    }
+    public boolean escrowReturning(RuinAndroid a) {
+        if (a.escrowRequest() == null || !(level instanceof ServerLevel server)) return false;
+        var e = AndroidEscrowData.get(server).find(a.escrowRequest());
+        return e == null || e.state != AndroidEscrowData.State.RUNNING || !e.consoleIdentity.equals(escrowConsoleIdentity)
+                || !java.util.Objects.equals(e.worker, a.getUUID()) || !java.util.Objects.equals(e.owner, owner()) || order(e.orderId) == null;
+    }
+    public List<BlockPos> returnPoints(RuinAndroid a, WorkJob job) {
+        return a.escrowRequest() == null ? supplyPoints() : new ArrayList<>(List.of(worldPosition));
+    }
+    public io.github.genichimaruo.singulo.api.android.AndroidEscrows.Submission submitEscrowed(
+            UUID actor, UUID request, ItemStack target, long count, List<ItemStack> offered, @Nullable UUID worker) {
+        var denied = new io.github.genichimaruo.singulo.api.android.AndroidEscrows.Submission(false,
+                AndroidOrders.result(request, AndroidOrders.State.REJECTED, "escrow_request_rejected"));
+        if (!externalAllowed(actor) || !(level instanceof ServerLevel server) || target.isEmpty()
+                || count < 1 || count > MAX_COUNT || offered.stream().anyMatch(java.util.Objects::isNull)) return denied;
+        var data = AndroidEscrowData.get(server); var previous = data.find(request);
+        if (data.isKnown(request)) {
+            if (previous == null || !java.util.Objects.equals(previous.requestedWorker, worker)
+                    || !data.matches(previous, actor, target, count, offered, worldPosition, escrowConsoleIdentity)) return denied;
+            return new io.github.genichimaruo.singulo.api.android.AndroidEscrows.Submission(false,
+                    new AndroidOrders.Receipt(request, previous.outcome, previous.orderId, previous.count, previous.delivered, null));
+        }
+        if (externalOrders.containsKey(request) || externalOrders.size() >= AndroidOrders.MAX_RECEIPTS) return denied;
+        var entry = data.create(request, actor, worldPosition, escrowConsoleIdentity, target, count, offered);
+        if (entry == null) return denied;
+        entry.requestedWorker = worker;
+        data.setDirty();
+        List<ItemCount> supplied = new ArrayList<>();
+        for (ItemStack s : offered) ItemCount.add(supplied, FluidSamples.liquid(s) ? FluidSamples.key(s) : s, FluidSamples.amount(s));
+        int id = nextOrderId;
+        Component why;
+        try {
+            why = start(actorFor(level, actor), target.copy(), count, worker == null ? List.of() : List.of(worker), null,
+                    false, false, true, supplied, null, request);
+        } catch (RuntimeException failure) {
+            // Before binding, no ownership transferred and the caller keeps its offer.
+            if (data.discardPreparing(request)) throw failure;
+            // Binding commits custody. Report acceptance with a recoverable failure rather
+            // than throw an ambiguous rejection while retaining the offered physical items.
+            // start only reserves metadata/assigns workers; it never runs pickup or crafting.
+            data.markTerminal(entry, AndroidOrders.State.FAILED, entry.delivered);
+            orders.removeIf(o -> o.id == entry.orderId && request.equals(o.escrowRequest));
+            leases.removeIf(l -> l.job.orderId() == entry.orderId);
+            UUID boundWorker = entry.worker;
+            try {
+                var entity = boundWorker == null ? null : server.getEntity(boundWorker);
+                if (entity instanceof RuinAndroid android && request.equals(android.escrowRequest())) {
+                    android.clearWork(); // Return any actual private cargo before clearing binding.
+                } else {
+                    if (entity instanceof RuinAndroid android && worldPosition.equals(android.workConsole())
+                            && android.workOrder() == entry.orderId && android.escrowRequest() == null) android.clearWork();
+                    data.workerReturned(entry, boundWorker);
+                }
+            } catch (RuntimeException cleanupFailure) {
+                // Keep RETURNING custody if cleanup itself fails; never discard retained items.
+                if (cleanupFailure != failure) failure.addSuppressed(cleanupFailure);
+            }
+            io.github.genichimaruo.singulo.Singulo.LOGGER.error("Escrow start failed after custody acceptance for {}", request, failure);
+            var failed = new ExternalOrderLedger(request, actor, entry.orderId, target, count,
+                    worker == null ? List.of() : List.of(worker), null);
+            failed.state = AndroidOrders.State.FAILED;
+            failed.reason = "escrow_start_failed_recover_materials";
+            externalOrders.put(request, failed); setChanged();
+            return new io.github.genichimaruo.singulo.api.android.AndroidEscrows.Submission(true, failed.receipt());
+        }
+        if (why != null) {
+            data.discardPreparing(request);
+            return new io.github.genichimaruo.singulo.api.android.AndroidEscrows.Submission(false,
+                    AndroidOrders.result(request, AndroidOrders.State.REJECTED, why.getString()));
+        }
+        var receipt = new ExternalOrderLedger(request, actor, id, target, count, worker == null ? List.of() : List.of(worker), null);
+        externalOrders.put(request, receipt); setChanged();
+        return new io.github.genichimaruo.singulo.api.android.AndroidEscrows.Submission(true, receipt.receipt());
+    }
+    private record EndpointLink(UUID identity, UUID owner) { }
+    private final java.util.Map<BlockPos, EndpointLink> endpointLinks = new java.util.LinkedHashMap<>();
+
+    public AndroidWorkEndpoints.Result linkExternalEndpoint(UUID actor, BlockPos pos) {
+        if (!externalAllowed(actor) || pos.equals(worldPosition) || !pos.closerThan(worldPosition, LINK_RANGE))
+            return AndroidWorkEndpoints.Result.REJECTED;
+        if (!level.isLoaded(pos)) return AndroidWorkEndpoints.Result.UNAVAILABLE;
+        if (!(level.getBlockEntity(pos) instanceof AndroidWorkEndpoint e) || e.endpointId() == null
+                || !actor.equals(e.endpointOwner())) return AndroidWorkEndpoints.Result.REJECTED;
+        EndpointLink wanted = new EndpointLink(e.endpointId(), actor);
+        if (wanted.equals(endpointLinks.get(pos))) return AndroidWorkEndpoints.Result.LINKED;
+        if (!orders.isEmpty()) return AndroidWorkEndpoints.Result.BUSY;
+        if (endpointLinks.size() >= 64 && !endpointLinks.containsKey(pos)) return AndroidWorkEndpoints.Result.REJECTED;
+        endpointLinks.put(pos.immutable(), wanted); setChanged();
+        return AndroidWorkEndpoints.Result.LINKED;
+    }
+    public AndroidWorkEndpoints.Result unlinkExternalEndpoint(UUID actor, BlockPos pos) {
+        if (!externalAllowed(actor)) return AndroidWorkEndpoints.Result.REJECTED;
+        if (!orders.isEmpty()) return AndroidWorkEndpoints.Result.BUSY;
+        endpointLinks.remove(pos); setChanged(); return AndroidWorkEndpoints.Result.UNLINKED;
+    }
+    @Nullable public AndroidWorkEndpoint workEndpoint(BlockPos pos) {
+        var link = endpointLinks.get(pos);
+        if (link == null || !java.util.Objects.equals(owner(), link.owner()) || level == null || !level.isLoaded(pos)) return null;
+        var be = level.getBlockEntity(pos);
+        if (be != null && !be.isRemoved() && be instanceof AndroidWorkEndpoint e
+                && link.identity().equals(e.endpointId()) && link.owner().equals(e.endpointOwner())) return e;
+        return null;
+    }
+    private boolean validDelivery(BlockPos pos) {
+        var e = workEndpoint(pos);
+        return deliveryPort(pos) != null || e != null && e.deliveryItems() != null;
+    }
     private final List<WorkOrder> orders = new ArrayList<>();
     private int nextOrderId = 1;
     private final java.util.Map<UUID, ExternalOrderLedger> externalOrders = new java.util.LinkedHashMap<>();
@@ -270,6 +387,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 外す（画面のボタン）。 */
     public void unlink(BlockPos pos) {
+        if (endpointLinks.containsKey(pos)) {
+            if (orders.isEmpty()) { endpointLinks.remove(pos); setChanged(); }
+            return;
+        }
         if (level != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof WorkLinkedBlockEntity b && worldPosition.equals(b.console())) {
             b.setConsole(null);
         }
@@ -293,7 +414,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** つながっている場所の一覧（画面用。種類はブロックで見る）。 */
     public List<BlockPos> links() {
-        return new ArrayList<>(links);
+        var out = new ArrayList<>(links); out.addAll(endpointLinks.keySet()); return out;
     }
 
     // ------------------------------------------------------------------ 在庫・レシピ
@@ -306,6 +427,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (SupplyPortBlockEntity port : linked(SupplyPortBlockEntity.class)) {
             port.storages(level, seen, out);
         }
+        for (BlockPos p : endpointLinks.keySet()) {
+            var e = workEndpoint(p);
+            if (e != null && e.supplyItems() != null) out.add(e.supplyItems());
+        }
         return out;
     }
 
@@ -315,7 +440,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         Set<BlockPos> stores = new HashSet<>();
         for (BlockPos p : supplyPoints()) {
             List<IItemHandler> here = new ArrayList<>();
-            SupplyPortBlockEntity.collect(level, p, stores, here);
+            here.addAll(storagesAt(p, stores));
             for (IItemHandler h : here) {
                 for (int i = 0; i < h.getSlots(); i++) {
                     ItemStack s = h.getStackInSlot(i);
@@ -325,6 +450,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         Set<BlockPos> seen = new HashSet<>();
         for (BlockPos p : supplyPoints()) {
+            if (endpointLinks.containsKey(p)) continue;
             LiquidStores.at(level, p, seen).addTo(out);       // 液体・化学物質（Mekanism）も、量で数える
         }
         return out;
@@ -341,7 +467,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             ItemCount c = new ItemCount(actual.item, actual.count);
             c.takePriority = actual.takePriority;
             for (WorkOrder o : orders) {
-                c.count -= o.outstanding(c.item);
+                if (o.escrowRequest == null) c.count -= o.outstanding(c.item);
             }
             c.count = Math.max(0, c.count);
             out.add(c);
@@ -429,24 +555,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** Implementation behind AndroidOrders; callers should use that facade. */
     public AndroidOrders.Receipt submitExternalOrder(UUID actor, UUID id, ItemStack target, long count,
                                                      List<UUID> workers, @Nullable BlockPos destination) {
+        return submitExternalOrder(actor, id, target, count, workers, destination, null);
+    }
+    public AndroidOrders.Receipt submitExternalOrder(UUID actor, UUID id, ItemStack target, long count,
+                                                     List<UUID> workers, @Nullable BlockPos destination, @Nullable BlockPos source) {
         if (!externalAllowed(actor)) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "not_console_owner");
         if (target.isEmpty() || FluidSamples.liquid(target) || count < 1 || count > MAX_COUNT || workers.stream().anyMatch(java.util.Objects::isNull))
             return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "invalid_item_count_or_workers");
         var previous = externalOrders.get(id);
         if (previous != null) {
-            if (!previous.actor.equals(actor) || !previous.matches(target, count, workers, destination))
+            if (!previous.actor.equals(actor) || !previous.matches(target, count, workers, destination, source))
                 return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "request_id_conflict");
             return externalOrderStatus(actor, id);
         }
         if (externalOrders.size() >= AndroidOrders.MAX_RECEIPTS)
             return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "receipt_limit_acknowledge_terminal_orders");
-        if (destination != null && (destination.equals(worldPosition) || deliveryPort(destination) == null))
+        if (destination != null && (destination.equals(worldPosition) || !validDelivery(destination)))
             return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "invalid_delivery_port");
+        var endpoint = source == null ? null : workEndpoint(source);
+        if (source != null && (endpoint == null || endpoint.supplyItems() == null))
+            return AndroidOrders.result(id, AndroidOrders.State.REJECTED, "source_endpoint_unavailable");
         int orderId = nextOrderId;
         Component why = start(actorFor(level, actor), target.copy(), count, List.copyOf(workers), destination,
-                false, workers.isEmpty(), true);
+                false, workers.isEmpty(), true, source == null ? null : itemsAt(storagesAt(source, new HashSet<>())), source);
         if (why != null) return AndroidOrders.result(id, AndroidOrders.State.REJECTED, why.getString());
         var entry = new ExternalOrderLedger(id, actor, orderId, target, count, workers, destination);
+        entry.materialSource = source == null ? null : source.immutable();
         externalOrders.put(id, entry);
         setChanged();
         return entry.receipt();
@@ -474,6 +608,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return new AndroidOrders.ConsoleSnapshot(AndroidOrders.SnapshotState.AVAILABLE, receipts, activeCount,
                 historyCount, AndroidOrders.MAX_RECEIPTS, AndroidOrders.MAX_RECEIPTS - externalOrders.size(), MAX_COUNT);
     }
+    /**
+     * Restricted orders only run plain crafting. Machine capabilities do not isolate pre-existing output or
+     * retain request ownership after insertion, cancellation, worker loss or reload. Even a currently empty
+     * furnace cannot provide that contract. Recipe discovery and ordinary processing orders remain available.
+     */
+    private static boolean restrictedStep(RecipeData r, boolean escrow) {
+        if (!RecipeData.MODE_CRAFTING.equals(r.mode()) || !r.fuel().isEmpty()) return false;
+        for (ItemStack out : r.outputs()) if (ChemicalSamples.is(out) || !escrow && FluidSamples.liquid(out)) return false;
+        for (ItemCount in : r.inputs()) {
+            if (unsupportedMaterial(in.item, escrow)) return false;
+            if (in.alt != null) for (ItemStack a : in.alt.getItems()) if (unsupportedMaterial(a, escrow)) return false;
+        }
+        return true;
+    }
+    private static boolean unsupportedMaterial(ItemStack s, boolean escrow) {
+        return io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(s) || ChemicalSamples.is(s) || !escrow && FluidSamples.liquid(s);
+    }
     private boolean externalAllowed(UUID actor) {
         if (!(level instanceof ServerLevel server) || !server.getServer().isSameThread() || isRemoved()) return false;
         return owner != null && owner.equals(actor) && mayOperate(actorFor(level, actor));
@@ -496,11 +647,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return status.state() == AndroidOrders.State.RUNNING ? externalOrderStatus(actor, id) : status;
     }
     public boolean acknowledgeExternalOrder(UUID actor, UUID id) {
+        if (level instanceof ServerLevel server && AndroidEscrowData.get(server).isKnown(id)) return false;
         var status = externalOrderStatus(actor, id);
         if (!status.terminal()) return false;
         externalOrders.remove(id); setChanged(); return true;
     }
     private void finishExternalOrder(WorkOrder order, AndroidOrders.State state, @Nullable Component reason) {
+        var escrow = escrowEntry(order);
+        if (escrow != null) AndroidEscrowData.get((ServerLevel) level).markTerminal(escrow, state, order.delivered);
         for (var entry : externalOrders.values()) {
             if (entry.order == order.id && entry.state == AndroidOrders.State.RUNNING) {
                 entry.state = state; entry.delivered = order.delivered;
@@ -567,13 +721,45 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
                             boolean toStock, boolean auto, boolean fresh, @Nullable List<ItemCount> stock) {
+        return start(player, target, count, androids, destination, toStock, auto, fresh, stock, null);
+    }
+    @Nullable
+    private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
+                            boolean toStock, boolean auto, boolean fresh, @Nullable List<ItemCount> stock, @Nullable BlockPos source) {
+        return start(player, target, count, androids, destination, toStock, auto, fresh, stock, source, null);
+    }
+    @Nullable
+    private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
+                            boolean toStock, boolean auto, boolean fresh, @Nullable List<ItemCount> stock,
+                            @Nullable BlockPos source, @Nullable UUID escrowRequest) {
         if (!mayOperate(player)) {
             return Component.translatable("gui.singulo.work_console.locked");
         }
-        WorkPlanner.Plan plan = plan(target, count, toStock || fresh, stock == null ? stock() : stock);
+        WorkPlanner.Plan plan;
+        if (escrowRequest != null) {
+            List<ItemCount> privateStock = new ArrayList<>();
+            for (ItemCount actual : stock) if (!actual.matches(target)) privateStock.add(new ItemCount(actual.item, actual.count));
+            plan = WorkPlanner.plan(target, count, recipes(), privateStock);
+        } else if (source == null) {
+            plan = plan(target, count, toStock || fresh, stock == null ? stock() : stock);
+        } else {
+            List<ItemCount> scoped = new ArrayList<>();
+            for (ItemCount actual : stock) {
+                long available = actual.count;
+                for (WorkOrder other : orders) available -= other.held(source, actual.item);
+                if (available > 0 && !actual.matches(target)) scoped.add(new ItemCount(actual.item, available));
+            }
+            plan = WorkPlanner.plan(target, count, recipes(), scoped);
+        }
         if (!plan.ok()) {
             return Component.translatable(plan.failureKey());
         }
+        // Endpoint source restriction: exactly one plain crafting step. Private escrow: plain crafting chains.
+        // Reject every machine step before custody binding: an output baseline is not an ownership protocol.
+        if (source != null && (plan.steps.size() != 1 || plan.steps.stream().anyMatch(s -> !restrictedStep(s.entry().recipe(), false))))
+            return Component.literal("source_restriction_requires_single_plain_crafting_step");
+        if (escrowRequest != null && (plan.steps.isEmpty() || plan.steps.stream().anyMatch(s -> !restrictedStep(s.entry().recipe(), true))))
+            return Component.literal("escrow_requires_plain_crafting_steps_without_fuel_or_catalysts");
         if ((toStock || fresh) && plan.steps.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
@@ -581,16 +767,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         boolean felling = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsFelling());
         List<RuinAndroid> chosen = new ArrayList<>();
         for (RuinAndroid a : candidates(player)) {
-            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a)) {
+            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a) && a.escrowRequest() == null
+                    && (escrowRequest == null || a.carryEmpty() && a.workConsole() == null)) {
                 chosen.add(a);
             }
         }
+        if (escrowRequest != null && chosen.size() > 1) chosen.subList(1, chosen.size()).clear();
         if (chosen.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.no_android");
         }
         WorkOrder order = WorkOrder.create(nextOrderId++, plan, player.getUUID());
+        order.escrowRequest = escrowRequest;
+        order.materialSource = source == null ? null : source.immutable();
+        order.materialEndpointId = source == null ? null : workEndpoint(source).endpointId();
         order.toStock = toStock || FluidSamples.liquid(target);
-        order.destination = destination != null && !destination.equals(worldPosition) && deliveryPort(destination) != null ? destination : null;
+        order.destination = destination != null && !destination.equals(worldPosition) && validDelivery(destination) ? destination.immutable() : null;
+        if (order.destination != null && workEndpoint(order.destination) != null)
+            order.deliveryEndpointId = workEndpoint(order.destination).endpointId();
         // どの工程も、選んだアンドロイドのだれかが一度に運べるか
         for (WorkOrder.StepState s : order.steps) {
             boolean fits = false;
@@ -620,8 +813,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 return Component.translatable("gui.singulo.work_console.error.no_feller", s.recipe.output().getHoverName());
             }
         }
-        if (androids.isEmpty() || auto) {
+        if (escrowRequest == null && (androids.isEmpty() || auto)) {
             chosen = recruit(order, chosen);   // 選ばなかったとき: 作業量に見合う人数だけ招集する
+        }
+        if (escrowRequest != null) {
+            var data = AndroidEscrowData.get((ServerLevel) level);
+            data.bind(data.find(escrowRequest), order.id, chosen.get(0).getUUID());
         }
         reserve(order, plan);
         orders.add(order);
@@ -629,6 +826,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             order.workers.add(a.getUUID());
             if (order(a.workOrder()) == null || !worldPosition.equals(a.workConsole())) {
                 a.assignWork(worldPosition, order.id);     // 今の注文の作業中なら、それを続けてから（手が空いたら）こちらへ
+                if (escrowRequest != null) a.bindEscrow(escrowRequest, player.getUUID());
             }
         }
         message = null;
@@ -1013,6 +1211,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     public WorkJob requestJob(RuinAndroid a, boolean carrying) {
         WorkOrder o = order(a.workOrder());
+        if (a.escrowRequest() != null && (escrowReturning(a) || o == null || !a.escrowRequest().equals(o.escrowRequest)))
+            return WorkJob.simple(WorkJob.Type.EXIT, a.workOrder());
+        if (o != null && o.escrowRequest != null && !o.escrowRequest.equals(a.escrowRequest()))
+            return WorkJob.simple(WorkJob.Type.EXIT, a.workOrder());
         if (o == null) {
             if (!carrying && !a.carryEmpty()) {
                 return WorkJob.simple(WorkJob.Type.DEPOSIT, a.workOrder());     // 終わった注文の残りを戻してから
@@ -1034,7 +1236,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         // この注文に今できることがない（装置の加工を待っているなど）: 受け持っているほかの注文の作業をする
         for (WorkOrder other : orders) {
-            if (other != o && other.workers.contains(a.getUUID())) {
+            if (a.escrowRequest() == null && other.escrowRequest == null && other != o && other.workers.contains(a.getUUID())) {
                 WorkJob j = jobIn(other, a, carrying, busy);
                 if (j.type() != WorkJob.Type.WAIT) {
                     a.switchOrder(other.id);
@@ -1049,7 +1251,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private WorkOrder nextOrder(RuinAndroid a) {
         for (WorkOrder o : orders) {
-            if (o.workers.contains(a.getUUID())) {
+            if (o.escrowRequest == null && o.workers.contains(a.getUUID())) {
                 return o;
             }
         }
@@ -1101,7 +1303,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0 || (ready == null && !o.ready(s)) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe) || fuelBlocked(s)) {
                 continue;
             }
-            long k = Math.min(workbenchCrafts(s, slots), tankLimit(a, s.recipe));
+            // Private escrow work cannot spill products into the workbench buffer, so the whole trip
+            // (materials and products) must fit in the carry; otherwise the worker refetches forever.
+            long k = Math.min(o.escrowRequest != null ? maxCrafts(s.recipe, slots, s.remaining())
+                    : workbenchCrafts(s, slots), tankLimit(a, s.recipe));
             if (k <= 0) {
                 tooSmall = true;
                 continue;
@@ -1175,6 +1380,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (o == null) {
             return null;
         }
+        if (o.escrowRequest != null && (!o.escrowRequest.equals(a.escrowRequest()) || escrowReturning(a))) return null;
         List<Integer> ready = o.readySteps();
         for (int index = 0; index < (ready == null ? o.steps.size() : ready.size()); index++) {
             int i = ready == null ? index : ready.get(index);
@@ -1502,6 +1708,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (SupplyPortBlockEntity port : linked(SupplyPortBlockEntity.class)) {
             out.add(port.getBlockPos());
         }
+        for (BlockPos p : endpointLinks.keySet()) {
+            var e = workEndpoint(p);
+            if (e != null && e.supplyItems() != null) out.add(p);
+        }
         return out;
     }
 
@@ -1568,6 +1778,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所の隣のストレージ。アンドロイド作業台なら、その預かり箱（作った物があふれたときに入れた所）。 */
     public List<IItemHandler> storagesAt(BlockPos point, Set<BlockPos> seen) {
         List<IItemHandler> out = new ArrayList<>();
+        if (endpointLinks.containsKey(point)) {
+            var e = workEndpoint(point);
+            if (e != null && seen.add(point) && e.supplyItems() != null) out.add(e.supplyItems());
+            return out;
+        }
+        if (!level.isLoaded(point)) return out;
         if (level.getBlockEntity(point) instanceof AndroidWorkbenchBlockEntity bench) {
             out.add(bench.buffer());
             return out;
@@ -1579,6 +1795,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所 point の隣の、流体の入れ物（タンクなど）。 */
     public List<net.minecraftforge.fluids.capability.IFluidHandler> fluidStoresAt(BlockPos point, Set<BlockPos> seen) {
         List<net.minecraftforge.fluids.capability.IFluidHandler> out = new ArrayList<>();
+        if (endpointLinks.containsKey(point)) return out;
         SupplyPortBlockEntity.collectFluids(level, point, seen, out);
         return out;
     }
@@ -1689,9 +1906,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** need を、受け渡し場所の在庫（ほかの注文の予約を除く）から予約する。予約しきれなかった物を返す。 */
     private List<ItemCount> reserveItems(WorkOrder order, List<ItemCount> need) {
+        if (order.escrowRequest != null) {
+            List<ItemCount> missing = new ArrayList<>();
+            var e = escrowEntry(order);
+            List<IItemHandler> stores = e == null ? List.of() : List.of(AndroidEscrowData.get((ServerLevel) level).inputHandler(e));
+            for (ItemCount needItem : need) {
+                long left = needItem.count;
+                for (ItemCount have : itemsAt(stores, needItem)) {
+                    long n = Math.min(left, Math.max(0, have.count - order.held(worldPosition, have.item)));
+                    order.hold(worldPosition, have.item, n); left -= n;
+                }
+                if (left > 0) missing.add(new ItemCount(needItem.item, left, needItem.alt));
+            }
+            return missing;
+        }
         List<ItemCount> short_ = new ArrayList<>();
         Set<BlockPos> seen = new HashSet<>();
-        List<BlockPos> points = supplyPoints();
+        List<BlockPos> points = order.materialSource == null ? supplyPoints()
+                : validMaterialSource(order) ? List.of(order.materialSource) : List.of();
         List<List<IItemHandler>> stores = new ArrayList<>();
         for (BlockPos p : points) {
             stores.add(storagesAt(p, seen));
@@ -1710,7 +1942,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                     for (ItemCount have : found) {
                         long here = have.count;
                         for (WorkOrder other : orders) {
-                            here -= other.held(points.get(i), have.item);
+                            if (other.escrowRequest == null) here -= other.held(points.get(i), have.item);
                         }
                         long take = Math.min(left, Math.max(0, here));
                         order.hold(points.get(i), have.item, take);
@@ -1731,7 +1963,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
                 long here = countAt(points.get(i), c.item, stores.get(i));
                 for (WorkOrder other : orders) {
-                    here -= other.held(points.get(i), c.item);
+                    if (other.escrowRequest == null) here -= other.held(points.get(i), c.item);
                 }
                 long take = Math.min(left, Math.max(0, here));
                 order.hold(points.get(i), c.item, take);
@@ -1750,12 +1982,28 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (IItemHandler h : stores) {
             for (int s = 0; s < h.getSlots(); s++) {
                 ItemStack st = h.getStackInSlot(s);
+                if (FluidSamples.liquid(need.item)) {   // escrow custody keeps fluids as samples (amount in mB)
+                    if (FluidSamples.is(st) && FluidSamples.is(need.item) && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(FluidSamples.fluid(st), FluidSamples.fluid(need.item)))
+                        ItemCount.add(out, FluidSamples.key(st), FluidSamples.amount(st));
+                    continue;
+                }
                 if (!st.isEmpty() && need.matches(st)) {
                     ItemCount.add(out, st, st.getCount());
                 }
             }
         }
         return out;
+    }
+    private static List<ItemCount> itemsAt(List<IItemHandler> stores) {
+        List<ItemCount> out = new ArrayList<>();
+        for (IItemHandler h : stores) for (int s = 0; s < h.getSlots(); s++) {
+            ItemStack item = h.getStackInSlot(s); ItemCount.add(out, item, item.getCount());
+        }
+        return out;
+    }
+    private boolean validMaterialSource(WorkOrder order) {
+        var e = order.materialSource == null ? null : workEndpoint(order.materialSource);
+        return e != null && e.endpointId().equals(order.materialEndpointId) && e.supplyItems() != null;
     }
 
     /**
@@ -2045,10 +2293,45 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 受け渡し場所で、そこにある物を持ち物へ取り出す（全部そろわなければ取らない）。 */
     public boolean fetchAt(RuinAndroid a, WorkJob job, Pickup pickup) {
-        List<IItemHandler> stores = storagesAt(pickup.point(), new HashSet<>());
-        LiquidStores liquids = LiquidStores.at(level, pickup.point());
+        WorkOrder restricted = order(job.orderId());
+        if (a.escrowRequest() != null && (restricted == null || !a.escrowRequest().equals(restricted.escrowRequest))) return false;
+        AndroidEscrowData.Entry escrow = escrowEntry(restricted);
+        if (restricted != null && restricted.escrowRequest != null) {
+            var active = lease(job.jobId());
+            if (escrow == null || escrow.state != AndroidEscrowData.State.RUNNING || active == null
+                    || !a.getUUID().equals(active.worker) || !a.getUUID().equals(escrow.worker)
+                    || !restricted.escrowRequest.equals(a.escrowRequest()) || !worldPosition.equals(pickup.point())) return false;
+            for (ItemCount need : pickup.items()) if (need.count > restricted.held(worldPosition, need.item)) return false;
+        }
+        if (restricted != null && restricted.materialSource != null && !validMaterialSource(restricted)) return false;
+        // Check the complete item pickup before extraction. Addon supplies can be read-only on
+        // insertion; relying on returning an overflow to them can otherwise discard resources.
+        a.compactCarry();
+        List<ItemStack> simulatedCarry = new ArrayList<>();
+        for (int slot : a.carrySlots()) simulatedCarry.add(a.inventory().getItem(slot).copy());
         for (ItemCount need : pickup.items()) {
-            long have = countAt(pickup.point(), need.item, stores);
+            if (FluidSamples.liquid(need.item)) continue;
+            long remaining = need.count;
+            for (int pass = 0; pass < 2 && remaining > 0; pass++) {
+                for (int i = 0; i < simulatedCarry.size() && remaining > 0; i++) {
+                    ItemStack held = simulatedCarry.get(i);
+                    if (pass == 0 && !held.isEmpty() && ItemStack.isSameItemSameTags(held, need.item)) {
+                        int move = (int) Math.min(remaining, Math.max(0, held.getMaxStackSize() - held.getCount()));
+                        held.grow(move); remaining -= move;
+                    } else if (pass == 1 && held.isEmpty()) {
+                        int move = (int) Math.min(remaining, need.item.getMaxStackSize());
+                        simulatedCarry.set(i, need.item.copyWithCount(move)); remaining -= move;
+                    }
+                }
+            }
+            if (remaining > 0) return false;
+        }
+        List<IItemHandler> stores = escrow == null ? storagesAt(pickup.point(), new HashSet<>())
+                : List.of(AndroidEscrowData.get((ServerLevel) level).inputHandler(escrow));
+        LiquidStores liquids = escrow == null ? LiquidStores.at(level, pickup.point())
+                : LiquidStores.of(AndroidEscrowData.get((ServerLevel) level).fluidHandler(escrow, false));
+        for (ItemCount need : pickup.items()) {
+            long have = escrow != null && FluidSamples.liquid(need.item) ? liquids.amount(need.item) : countAt(pickup.point(), need.item, stores);
             if (have < need.count) {
                 WorkOrder short_ = order(job.orderId());
                 if (short_ != null) {
@@ -2083,13 +2366,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             long left = need.count;
             for (IItemHandler h : stores) {
                 for (int i = 0; i < h.getSlots() && left > 0; i++) {
-                    if (need.matches(h.getStackInSlot(i))) {
+                    // 1つの欄にスタックより多く入っている入れ物（QIO・ME など、種類ごとに1欄）もあるので、
+                    // 足りるか、その欄が空になるか、持ち物がいっぱいになるまで、同じ欄から続けて取る
+                    while (left > 0 && need.matches(h.getStackInSlot(i))) {
                         ItemStack got = h.extractItem(i, (int) Math.min(left, h.getStackInSlot(i).getMaxStackSize()), false);
+                        if (got.isEmpty()) {
+                            break;
+                        }
                         left -= got.getCount();
                         ItemStack rest = a.addToCarry(got);
                         if (!rest.isEmpty()) {
                             ItemHandlerHelper.insertItemStacked(h, rest, false);      // 入りきらなければ戻す（ふつうは起きない）
                             left += rest.getCount();
+                            break;
                         }
                     }
                 }
@@ -2143,6 +2432,30 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     public boolean depositAt(RuinAndroid a, @Nullable WorkJob job, BlockPos point, @Nullable java.util.Collection<BlockPos> candidates) {
         WorkOrder o = job == null ? null : order(job.orderId());
+        if (a.escrowRequest() != null) {
+            var data = AndroidEscrowData.get((ServerLevel) level); var e = data.find(a.escrowRequest());
+            if (e == null || !a.getUUID().equals(e.worker) || !e.consoleIdentity.equals(escrowConsoleIdentity)
+                    || !worldPosition.equals(point)) return false;
+            boolean allReturned = true;
+            for (int slot : a.carrySlots()) {
+                ItemStack stack = a.inventory().getItem(slot);
+                ItemStack rest = data.returnCargo(e, stack);
+                if (o != null && a.escrowRequest().equals(o.escrowRequest)) o.hold(worldPosition, stack, stack.getCount() - rest.getCount());
+                a.inventory().setItem(slot, rest); allReturned &= rest.isEmpty();
+            }
+            // fluids carried in tanks go back into the same request's custody
+            var fluids = LiquidStores.of(data.fluidHandler(e, false));
+            for (var held : new ArrayList<>(a.liquids())) {
+                if (!FluidSamples.is(held.getKey())) { allReturned = false; continue; }
+                long moved = fluids.fill(held.getKey(), held.getValue(), false);
+                if (moved > 0) {
+                    a.drainLiquid(held.getKey(), moved, false);
+                    if (o != null && a.escrowRequest().equals(o.escrowRequest)) o.hold(worldPosition, FluidSamples.key(held.getKey()), moved);
+                }
+                allReturned &= moved >= held.getValue();
+            }
+            setChanged(); return allReturned;
+        }
         List<IItemHandler> stores = storagesAt(point, new HashSet<>());
         boolean all = true;
         boolean kept = false;
@@ -2205,6 +2518,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             return best != null ? best : worldPosition;
         }
+        // Never silently redirect an endpoint order after unloading, replacement or permission change.
+        if (o != null && o.deliveryEndpointId != null && o.destination != null) return o.destination;
         return o != null && o.destination != null && deliveryPort(o.destination) != null ? o.destination : worldPosition;
     }
 
@@ -2232,6 +2547,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return deliverFluid(a, job, at, o, active);
         }
         IItemHandler box = o != null && o.toStock ? stockHandler(at) : port != null ? port.handler() : outboxHandler;
+        if (o != null && o.escrowRequest != null) {
+            var e = escrowEntry(o);
+            if (e == null || e.state != AndroidEscrowData.State.RUNNING || !a.getUUID().equals(e.worker)
+                    || !a.getUUID().equals(active.worker) || !o.escrowRequest.equals(a.escrowRequest())) return false;
+            box = AndroidEscrowData.get((ServerLevel) level).productHandler(e);
+        }
+        if (o != null && o.deliveryEndpointId != null) {
+            var endpoint = workEndpoint(at);
+            if (endpoint == null || !o.deliveryEndpointId.equals(endpoint.endpointId()) || endpoint.deliveryItems() == null) {
+                o.status = WorkOrder.WAIT_SPACE;
+                return false;
+            }
+            box = endpoint.deliveryItems();
+        }
         boolean all = true;
         long moved = 0;
         long limit = active.remainingDelivery;
@@ -2251,6 +2580,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         all = active.remainingDelivery == 0;
         if (o != null) {
             o.delivered += moved;
+            var escrow = escrowEntry(o);
+            if (escrow != null) { escrow.delivered = o.delivered; AndroidEscrowData.get((ServerLevel) level).setDirty(); }
             o.deliverInProgress = Math.max(0, o.deliverInProgress - moved);
             o.status = all ? WorkOrder.RUNNING : WorkOrder.WAIT_SPACE;
         }
@@ -2957,6 +3288,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     @Override
     public void onBroken(Level level) {
+        if (level instanceof ServerLevel server) {
+            for (WorkOrder o : new ArrayList<>(orders)) if (o.escrowRequest != null) cancel(o.id, null);
+            for (var e : AndroidEscrowData.get(server).entries())
+                if (e.consoleIdentity.equals(escrowConsoleIdentity) && e.state == AndroidEscrowData.State.RUNNING)
+                    AndroidEscrowData.get(server).markTerminal(e, AndroidOrders.State.CANCELLED, e.delivered);
+        }
         Block.popResource(level, worldPosition, permit.getStackInSlot(0));
         for (int i = 0; i < routes.getSlots(); i++) {
             Block.popResource(level, worldPosition, routes.getStackInSlot(i));
@@ -2981,6 +3318,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     protected void saveAdditional(CompoundTag tag) {
         net.minecraft.core.HolderLookup.Provider registries = net.minecraft.core.RegistryAccess.EMPTY;
         super.saveAdditional(tag);
+        tag.putUUID("escrow_console_identity", escrowConsoleIdentity);
         if (owner != null) {
             tag.putUUID("owner", owner);
         }
@@ -2991,6 +3329,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             ls.add(NbtUtils.writeBlockPos(p));
         }
         tag.put("links", ls);
+        ListTag endpoints = new ListTag();
+        endpointLinks.forEach((p, link) -> {
+            CompoundTag e = new CompoundTag(); e.putLong("pos", p.asLong());
+            e.putUUID("identity", link.identity()); e.putUUID("owner", link.owner()); endpoints.add(e);
+        });
+        tag.put("work_endpoints_v1", endpoints);
         ListTag os = new ListTag();
         for (WorkOrder o : orders) {
             os.add(o.save(registries));
@@ -3044,6 +3388,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     public void load(CompoundTag tag) {
         net.minecraft.core.HolderLookup.Provider registries = net.minecraft.core.RegistryAccess.EMPTY;
         super.load(tag);
+        escrowConsoleIdentity = tag.hasUUID("escrow_console_identity") ? tag.getUUID("escrow_console_identity") : UUID.randomUUID();
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         if (tag.contains("permit")) {
             permit.deserializeNBT(tag.getCompound("permit"));
@@ -3052,6 +3397,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         rt.putInt("Size", PathRule.SLOTS);
         routes.deserializeNBT(rt);
         links.clear();
+        endpointLinks.clear();
+        for (Tag entry : tag.getList("work_endpoints_v1", Tag.TAG_COMPOUND)) {
+            CompoundTag e = (CompoundTag) entry;
+            BlockPos p = BlockPos.of(e.getLong("pos"));
+            if (endpointLinks.size() < 64 && e.hasUUID("identity") && e.hasUUID("owner")
+                    && !p.equals(worldPosition) && p.closerThan(worldPosition, LINK_RANGE))
+                endpointLinks.putIfAbsent(p, new EndpointLink(e.getUUID("identity"), e.getUUID("owner")));
+        }
         for (Tag t : tag.getList("links", Tag.TAG_COMPOUND)) {
             io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(wrap(t), "p").ifPresent(links::add);
         }

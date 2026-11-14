@@ -230,6 +230,14 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
      * from の隣（6方向）のストレージを集める（作業指令台・資材口・納品口・レシピ棚は除く）。
      * リンク済みの QIO ダッシュボードの裏が接していれば、その周波数の中身も入れる（{@link QioStores}）。
      */
+    /**
+     * {@link io.github.genichimaruo.singulo.api.android.AndroidSharedStorage} の印。実際の場所とも QIO の印
+     * （x が int の最小値）とも重ならない（x が int の最小値 + 1 の場所）。
+     */
+    static BlockPos sharedSeenKey(long key) {
+        return new BlockPos(Integer.MIN_VALUE + 1, (int) (key >>> 32), (int) key);
+    }
+
     static void collect(Level level, BlockPos from, Set<BlockPos> seen, List<IItemHandler> out) {
         var owner = level.isLoaded(from) ? level.getBlockEntity(from) : null;
         AdjacentItemStores cache = owner instanceof WorkConsoleBlockEntity console ? console.adjacentItems
@@ -255,6 +263,13 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                 continue;
             }
             if (h == null) {
+                continue;
+            }
+            // 何か所からでも同じ中身が見える入れ物（AE2 の ME ネットワークなど）は、印で1回だけ数える（QIO の周波数と同じ）
+            if (ExtractableItems.source(h) instanceof io.github.genichimaruo.singulo.api.android.AndroidSharedStorage shared) {
+                if (seen.add(sharedSeenKey(shared.sharedStorageKey()))) {
+                    out.add(h);
+                }
                 continue;
             }
             BlockPos key = p;

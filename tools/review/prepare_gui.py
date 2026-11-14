@@ -32,7 +32,7 @@ for name in ("region", "entities", "poi", "DIM-1", "DIM1"):
     shutil.rmtree(target / name, ignore_errors=True)
 (target / "data/forcedchunks.dat").unlink(missing_ok=True)
 (root / "options.txt").write_text(
-    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:" + ('4' if _args.cosmic_world else '2') + "\nsimulationDistance:5\npauseOnLostFocus:false\n",
+    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:" + ('4' if _args.cosmic_world else '2') + "\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\n",
     encoding="utf-8",
 )
 

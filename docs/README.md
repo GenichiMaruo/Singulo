@@ -1,6 +1,6 @@
 # ドキュメント案内
 
-現在の開発は **0.18.0 / Minecraft 1.20.1 / Forge・NeoForge**。
+現在の開発は **0.19.0 / Minecraft 1.20.1 / Forge・NeoForge**。
 
 | 目的 | 読むもの |
 |---|---|
@@ -48,6 +48,10 @@ Minecraft 1.20.1向けの差分と検証は[移植記録](0.13.0/port-1.20.1.md)
 
 - [鍛造炉のブラックホールがジェットの手前に出る](0.17.1/README.md)・[変更履歴](curseforge/changelog-0.17.1.md)
 
-## 0.18.0（開発中）
+## 0.18.0
 
 - [アンドロイドの装飾（5つの枠と10種類の追加）](0.18.0/README.md)・[変更履歴](curseforge/changelog-0.18.0.md)
+
+## 0.19.0（開発中）
+
+- [アドオン連携 API](0.19.0/android-integration.md)・[独立したクラフト依頼](0.19.0/android-escrow.md)・[変更履歴](curseforge/changelog-0.19.0.md)

@@ -22,7 +22,7 @@ import net.minecraftforge.registries.DeferredRegister;
 
 public final class SinguloItems {
     private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
-    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner");
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings");
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(net.minecraft.core.registries.Registries.ITEM, Singulo.MODID);
 
     /** 手持ちの道具（生成表ではなく専用クラスで作る）。 */
@@ -341,6 +341,9 @@ public final class SinguloItems {
         TAB_ORDER.add(EXPLORER_COMPASS);
         TAB_ORDER.add(METEOR_COMPASS);
         TAB_ORDER.add(DECODED_RECORD);
+        TAB_ORDER.add(FLUID_CANISTER);
+        TAB_ORDER.addAll(java.util.List.of(BLUEPRINT_RUIN_PANELS, BLUEPRINT_PRISTINE_RUIN, BLUEPRINT_RUIN_GLASS,
+                BLUEPRINT_LIGHTING, BLUEPRINT_LAB_BUILDING, BLUEPRINT_LAB_FURNITURE, BLUEPRINT_RAYLEIGH));
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
         block(SinguloBlocks.FLUID_PIPE, 1);
@@ -572,6 +575,9 @@ public final class SinguloItems {
         TAB_ORDER.add(HORIZON_WARDEN_SPAWN_EGG);
         TAB_ORDER.add(ECHO_SENTINEL_SPAWN_EGG);
         TAB_ORDER.add(GRAVITY_REMNANT_SPAWN_EGG);
+        TAB_ORDER.add(ERGOSPHERE_LEVIATHAN_SPAWN_EGG);
+        TAB_ORDER.add(LAST_ARCHIVIST_SPAWN_EGG);
+        TAB_ORDER.add(FOUNDRY_OVERSEER_SPAWN_EGG);
         for (BlockDef def : GeneratedContent.BLOCKS) {
             block(SinguloBlocks.SIMPLE.get(def.id()), def.stage());
         }

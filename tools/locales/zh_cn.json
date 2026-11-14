@@ -14762,5 +14762,9 @@
   "block.singulo.cover_frame": {
     "source": "Cover Frame",
     "translation": "覆盖框"
+  },
+  "message.singulo.work_link.endpoint_result": {
+    "source": "Endpoint link: %s",
+    "translation": "端点连接: %s"
   }
 }
