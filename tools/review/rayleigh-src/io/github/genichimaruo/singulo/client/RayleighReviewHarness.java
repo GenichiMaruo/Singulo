@@ -23,7 +23,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class RayleighReviewHarness {
     private static final BlockPos SAMPLE = new BlockPos(3, 241, 3);
-    private static int phase, ticks, wait;
+    private static int phase, ticks, wait, settledTicks;
     private static volatile boolean ready;
     private static int[] reference;
     private static Path output() { return Path.of(System.getProperty("singulo.rayleighOutput")); }
@@ -69,6 +69,26 @@ public final class RayleighReviewHarness {
         for (int x = 0; x <= 6; x++) for (int z = 0; z <= 6; z++) level.setBlockAndUpdate(new BlockPos(x, 246, z),
                 SinguloBlocks.LAB_RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, on));
     }
+    private static boolean fixtureUpdatesSettled(Minecraft mc) throws Exception {
+        if (phase < 2 || phase > 4) return true;
+        int matching = 0;
+        for (int x = 0; x <= 6; x++) for (int z = 0; z <= 6; z++) {
+            var state = mc.level.getBlockState(new BlockPos(x, 246, z));
+            if (state.is(SinguloBlocks.LAB_RAYLEIGH_PANEL.get()) && state.getValue(RayleighPanelBlock.LIT) == (phase != 3)) matching++;
+        }
+        var field = net.minecraft.client.multiplayer.ClientLevel.class.getDeclaredField("lightUpdateQueue");
+        field.setAccessible(true);
+        int queued = ((java.util.Deque<?>) field.get(mc.level)).size();
+        boolean work = mc.level.getLightEngine().hasLightWork();
+        // Observe packet/lighting completion, not the expected light result. A stable but
+        // incorrect sunlight field must still fail the original assertions below.
+        if (matching != 49 || queued != 0 || work) {
+            settledTicks = 0;
+            if (wait % 20 == 0) Singulo.LOGGER.info("RAYLEIGH_FIXTURE_PENDING phase={} roof={}/49 queued={} work={}", phase, matching, queued, work);
+            return false;
+        }
+        return ++settledTicks >= 20;
+    }
     @SubscribeEvent
     public static void tick(ClientTickEvent.Post event) throws Exception {
         Minecraft mc = Minecraft.getInstance();
@@ -98,6 +118,7 @@ public final class RayleighReviewHarness {
         mc.player.setYRot(180); mc.player.setXRot(48);
         mc.options.fov().set(60);
         if (++wait < 150) return;
+        if (!fixtureUpdatesSettled(mc)) return;
         if (!net.neoforged.fml.ModList.get().isLoaded("sodium")) {
             var vf=mc.levelRenderer.getClass().getDeclaredField("viewArea");vf.setAccessible(true);
             var area=vf.get(mc.levelRenderer);
@@ -121,7 +142,7 @@ public final class RayleighReviewHarness {
                 require(image.getPixel(x, y * 16) == reference[y * 16 + x], "Local-noon lightmap differs from vanilla noon at " + x + "," + y);
             }
             capture(mc, "01-clear-noon-reference");
-            phase = 2; wait = 0; ready = false;
+            phase = 2; wait = 0; settledTicks = 0; ready = false;
             mc.getSingleplayerServer().execute(() -> {
                 var level = mc.getSingleplayerServer().overworld(); roof(level, true);
                 level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 18000); level.getServer().setWeatherParameters(0, 10000, true, true);
@@ -156,13 +177,17 @@ public final class RayleighReviewHarness {
             require((entityLight >>> 24 & 15) == 15, "Entity renderer does not receive full artificial sunlight");
             zombie.discard();
             capture(mc, "02-powered-rainy-night");
-            phase = 3; wait = 0; ready = false;
-            mc.getSingleplayerServer().execute(() -> { roof(mc.getSingleplayerServer().overworld(), false); ready = true; });
+            phase = 3; wait = 0; settledTicks = 0; ready = false;
+            mc.getSingleplayerServer().execute(() -> {
+                var level = mc.getSingleplayerServer().overworld(); roof(level, false);
+                require(RayleighSky.light(level, SAMPLE) == 0, "Server retains artificial sunlight after roof power removal");
+                ready = true;
+            });
         } else if (phase == 3) {
-            require(RayleighSky.light(mc.level, SAMPLE) == 0 && mc.level.getBrightness(LightLayer.SKY, SAMPLE) == 0, "Switching off leaves ghost sunlight");
+            require(RayleighSky.light(mc.level, SAMPLE) == 0 && mc.level.getBrightness(LightLayer.SKY, SAMPLE) == 0, "Switching off leaves ghost sunlight: artificial=" + RayleighSky.light(mc.level, SAMPLE) + " sky=" + mc.level.getBrightness(LightLayer.SKY, SAMPLE) + " stableTicks=" + settledTicks);
             require((net.minecraft.client.renderer.LevelRenderer.getLightCoords(mc.level, SAMPLE) & RayleighLighting.NOON) == 0, "Switched-off panel retains local-noon rendering");
             capture(mc, "03-unpowered-rainy-night");
-            phase = 4; wait = 0; ready = false;
+            phase = 4; wait = 0; settledTicks = 0; ready = false;
             mc.getSingleplayerServer().execute(() -> { roof(mc.getSingleplayerServer().overworld(), true); ready = true; });
         } else if (phase == 4) {
             require(mc.level.getBrightness(LightLayer.SKY, SAMPLE) == 15, "Re-enabling panel did not relight client");

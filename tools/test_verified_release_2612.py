@@ -141,6 +141,46 @@ class OutlineTests(unittest.TestCase):
             Image.new('RGB',(1,1)).save(d/'outline-4.png')
             with self.assertRaises(RuntimeError):release.validate_outline(root)
 
+class GuiImageTests(unittest.TestCase):
+    def test_shared_and_cosmic_exact_inventory(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as temp:
+            d=Path(temp)
+            for name in release.GUI_BASE_NAMES:
+                Image.new('RGB',(854,480) if '-854x480' in name else (1280,800)).save(d/(name+'.png'))
+            for lang in ('en_us','ja_jp','ko_kr','zh_cn','zh_tw'):
+                for i in range(7):Image.new('RGB',(854,480)).save(d/f'machine-{lang}-{i:02d}.png')
+            release.validate_gui_images(d,7)
+            (d/'machine-en_us-00.png').rename(d/'unrelated.png')
+            with self.assertRaises(RuntimeError):release.validate_gui_images(d,7)
+            (d/'unrelated.png').rename(d/'machine-en_us-00.png')
+            Image.new('RGB',(1,1)).save(d/'machine-en_us-00.png')
+            with self.assertRaises(RuntimeError):release.validate_gui_images(d,7)
+
+class RejoinTests(unittest.TestCase):
+    def validate(self, text):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp); log=root/'rayleigh-review/logs/latest.log';log.parent.mkdir(parents=True)
+            log.write_text(text,encoding='utf-8');release.validate_rejoin(root)
+    def sequence(self):
+        return [f'SINGULO_REJOIN_{kind} {visit}' for visit in range(1,5) for kind in ('ENTER','TITLE')]+['SINGULO_REJOIN_ENTER 5','SINGULO_REJOIN_COMPLETE 5']
+    def test_actual_ci3_terminal_duplicate(self):
+        self.validate((Path(__file__).parent/'fixtures/rejoin-ci3.txt').read_text(encoding='utf-8'))
+    def test_single_complete(self):self.validate('\n'.join(self.sequence()))
+    def test_wrong_sequences(self):
+        correct=self.sequence()
+        invalid=[correct[:-1],correct[1:],correct[:4]+correct[5:],
+                 correct[:2]+[correct[1]]+correct[2:],
+                 [correct[1],correct[0]]+correct[2:],
+                 correct+['SINGULO_REJOIN_ENTER 5'],
+                 correct+['SINGULO_REJOIN_TITLE 5'],
+                 correct+['SINGULO_REJOIN_COMPLETE 4'],
+                 correct+['SINGULO_REJOIN_COMPLETE 50'],
+                 correct+['SINGULO_REJOIN_COMPLETE 5 trailing'],
+                 ['SINGULO_REJOIN_COMPLETE 5']+correct]
+        for lines in invalid:
+            with self.subTest(lines=lines),self.assertRaises(RuntimeError):self.validate('\n'.join(lines))
+
 class ArchiveTests(unittest.TestCase):
     def archive(self,name='evidence.txt'):
         out=io.BytesIO()
