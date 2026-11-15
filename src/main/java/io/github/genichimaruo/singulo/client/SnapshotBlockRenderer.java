@@ -44,15 +44,29 @@ abstract class SnapshotBlockRenderer<T extends BlockEntity> implements BlockEnti
         ModelSubmissions.submit(state.models, pose, collector);
     }
     static void submitGeometry(List<Batch> geometry, PoseStack pose, SubmitNodeCollector collector) {
+        submitGeometry(geometry, pose, collector, 0);
+    }
+    /** Custom mesh submits do not receive vanilla ModelFeatureRenderer's outline pass. */
+    static void submitGeometry(List<Batch> geometry, PoseStack pose, SubmitNodeCollector collector, int outlineColor) {
         for (Batch batch : geometry) {
             if (GlowDepth.submitDeferred(batch,pose)) continue;
             collector.submitCustomGeometry(pose, batch.type(), (transform, output) -> {
-                for (Vertex v : batch.vertices()) {
-                    output.addVertex(transform, v.x(), v.y(), v.z()).setColor(v.color()).setUv(v.u(), v.v())
-                            .setOverlay(v.overlay()).setLight(v.light()).setNormal(transform, v.nx(), v.ny(), v.nz())
-                            .setLineWidth(v.width());
+                if (!batch.type().isOutline()) emitBatch(batch, transform, output);
+                if (outlineColor != 0 && (batch.type().isOutline() || batch.type().outline().isPresent())) {
+                    // Mirror ModelFeatureRenderer: use the dedicated outline source, flushed by
+                    // LevelRenderer.endOutlineBatch before outline post-processing, not the normal source.
+                    var outlines = net.minecraft.client.Minecraft.getInstance().renderBuffers().outlineBufferSource();
+                    outlines.setColor(outlineColor);
+                    emitBatch(batch, transform, outlines.getBuffer(batch.type()));
                 }
             });
+        }
+    }
+    private static void emitBatch(Batch batch, PoseStack.Pose transform, VertexConsumer output) {
+        for (Vertex v : batch.vertices()) {
+            output.addVertex(transform, v.x(), v.y(), v.z()).setColor(v.color()).setUv(v.u(), v.v())
+                    .setOverlay(v.overlay()).setLight(v.light()).setNormal(transform, v.nx(), v.ny(), v.nz())
+                    .setLineWidth(v.width());
         }
     }
     static final class Capture implements MultiBufferSource {

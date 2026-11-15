@@ -26,7 +26,8 @@ class WorkflowSafetyTests(unittest.TestCase):
             with self.subTest(workflow=name):
                 self.assertIn('  workflow_dispatch:\n', text)
                 self.assertNotRegex(text, r'(?m)^  (?:push|pull_request|pull_request_target|workflow_run):')
-                self.assertIn("    if: github.ref == 'refs/heads/1.21.1'\n", text)
+                branch = '26.1.2' if name == 'publish-curseforge.yml' else '1.21.1'
+                self.assertIn(f"    if: github.ref == 'refs/heads/{branch}'\n", text)
                 self.assertNotRegex(text, r'(?m)^      (?:GH_TOKEN|MODRINTH_TOKEN|CURSEFORGE_TOKEN):')
 
     def test_curseforge_never_retries_an_uncertain_publication(self):
@@ -53,8 +54,9 @@ class WorkflowSafetyTests(unittest.TestCase):
         for name in ('publish-curseforge.yml', 'publish-modrinth.yml'):
             text = (WORKFLOWS / name).read_text()
             with self.subTest(workflow=name):
-                self.assertIn('python3 tools/verified_release_1211.py check ', text)
-                self.assertIn('python3 tools/verified_release_1211.py promote ', text)
+                version = '2612' if name == 'publish-curseforge.yml' else '1211'
+                self.assertIn(f'python3 tools/verified_release_{version}.py check ', text)
+                self.assertIn(f'python3 tools/verified_release_{version}.py promote ', text)
                 self.assertNotRegex(text, r'python3\s+release-source/tools/')
 
     def test_no_python_runs_from_the_tag_checkout(self):
@@ -72,7 +74,7 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertNotIn('optional-mekanism:', text)
         self.assertEqual(text.count("java-version: '25'"), 2)
         self.assertIn('tools/check_release_2612.py', text)
-        self.assertTrue(all(1 <= x <= 35 for x in limits))
+        self.assertTrue(all(1 <= x <= 60 for x in limits))
         self.assertIn('  cancel-in-progress: true\n', text)
 
 

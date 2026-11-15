@@ -15,6 +15,7 @@ REPO = 'GenichiMaruo/Singulo'
 PROTOCOL = 1
 PREFIX = 'refs/tags/singulo-cf-upload-lock-v1/'
 WORKFLOW_DIGESTS = {
+    '26.1.2': '543939c3d1adfc4448b3d6b2f4a7a015038113e843f3a32dcd6125d789a66b6f',
     '1.21.1': 'e67f8aa097c46de06d2af5e0979118f1b9d9f246c68bb68873ac60f8fa649f42',
     '1.20.1': '4c6990fa1579c7050a7a14043b5ae547d59672ad72228bfd5d02d3ebcb1009e7',
 }
@@ -26,7 +27,7 @@ class GuardError(RuntimeError):
 
 
 def ref_name(tag):
-    match = re.fullmatch(r'(v[0-9]+\.[0-9]+\.[0-9]+(?:-1\.20\.1[FN])?)(?:-r[1-9][0-9]*)?', tag)
+    match = re.fullmatch(r'(v[0-9]+\.[0-9]+\.[0-9]+(?:-1\.20\.1[FN]|-26\.1\.2N)?)(?:-r[1-9][0-9]*)?', tag)
     if not match:
         raise GuardError('Invalid release tag')
     # Revised tags must not evade the lock for the same release filename.

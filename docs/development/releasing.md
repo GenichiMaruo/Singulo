@@ -1,3 +1,20 @@
+26.1.2 publication additionally re-fetches the merged PR (using commit-associated PR discovery when Actions omits its association), requires one matching merged head/base/repository/tree and maintained-branch ancestry, and checks all twenty outline entity cases plus five 1280x800 images. The always-retained `cf-publication-receipt.json` records documented non-secret publisher outputs, exact JAR/provenance hashes, CI attempt and permanent lock. An accepted receipt does not assert moderator approval. Missing or inconsistent successful outputs remain unknown and require manual investigation, never automatic resubmission.
+
+# Minecraft 26.1.2 NeoForge publication
+
+This branch publishes only `Singulo-<mod_version>-26.1.2N.jar` with Java 25. No Forge, Mekanism or unsupported Ponder compatibility is claimed. Maintain older releases on their original branches and do not move existing tags.
+
+1. Complete successful **pull_request** CI on the exact release tree. Both and only `build-and-gametest` and `sodium-lighting` must succeed. Merge into maintained `26.1.2` only after review.
+2. Create the immutable tag `v<mod_version>-26.1.2N` on that merged commit (currently `v0.19.0-26.1.2N`). Tag creation never uploads.
+3. Dispatch `publish-curseforge.yml` from `26.1.2` with that tag and its successful PR run ID. Use `release_type=auto` for the 0.x Beta channel.
+4. `verified_release_2612.py` checks tag/branch/tree equality and independently binds both attempt-suffixed artifact names to their successful producer timestamps. Both must name the same tested commit and exact release tree. Missing, duplicate, stale, expired, failed or ambiguous evidence stops publication.
+5. Download each archive by immutable artifact ID, verify the API SHA-256 digest, safely extract it, then recheck a complete per-file SHA-256 receipt. The production JAR and all GUI, cosmic, occlusion, lens, standard lighting, Sodium/DH, and rejoin evidence are checked before copying the tested JAR. No rebuild or validation bypass is permitted.
+6. Keep the permanent shared CurseForge lock, collision-checking draft release reservation, and single upload attempt. If sending fails or is uncertain, inspect the actual CurseForge state and receipts; never automatically retry or delete the permanent lock.
+
+Rayleigh's four zero-tolerance lighting captures use identical review-only fog distances (32..1024); a fifth image retains actual rainy fog. This isolates lighting from Minecraft 26.1's near-camera rain fog and does not change production weather. Ponder has no verified 26.1.2 dependency and is explicitly unsupported, not silently marked as passed.
+
+## Historical release instructions (other maintained branches)
+
 # CurseForge ファイルのアップロード
 
 Actionsを利用できない場合の、同じ成功CI成果物と来歴検証を使う経路は

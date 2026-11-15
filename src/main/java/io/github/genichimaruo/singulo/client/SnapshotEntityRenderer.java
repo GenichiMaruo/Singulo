@@ -29,7 +29,7 @@ abstract class SnapshotEntityRenderer<T extends Entity> extends EntityRenderer<T
     protected abstract void render(T entity, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light);
     @Override public final void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
         super.submit(state, pose, collector, camera);
-        SnapshotBlockRenderer.submitGeometry(state.geometry, pose, collector);
+        SnapshotBlockRenderer.submitGeometry(state.geometry, pose, collector, state.outlineColor);
         ModelSubmissions.submit(state.models, pose, collector);
     }
 }

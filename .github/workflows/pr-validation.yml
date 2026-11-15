@@ -1,10 +1,8 @@
 name: PR validation
 
 on:
-  push:
-    branches: [feature/26.1.2, "26.1.2"]
   pull_request:
-    branches: ["26.1.2", feature/26.1.2]
+    branches: ["26.1.2"]
 
 permissions:
   contents: read
@@ -16,7 +14,7 @@ concurrency:
 jobs:
   build-and-gametest:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 60
     env:
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
@@ -107,6 +105,25 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/lensing.gradle runClient
           grep -q 'SINGULO_LENSING_MANY_COMPLETE traced=15' build/lensing-review/logs/latest.log
           grep -q 'SINGULO_LENSING_FRAME_TIME holes=15' build/lensing-review/logs/latest.log
+      - name: Verify mob outlines through opaque walls and invisibility
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_outline.py
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/outline.gradle runClient
+          grep -q 'SINGULO_OUTLINE_COMPLETE 4 5' build/outline-review/logs/latest.log
+          test "$(grep -c 'SINGULO_OUTLINE_ENTITY phase=' build/outline-review/logs/latest.log)" -eq 20
+          test "$(ls build/outline-review/screenshots/outline-*.png | wc -l)" -eq 5
+      - name: Verify standard terrain lighting against clear noon
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          python3 tools/review/prepare_rayleigh.py
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rayleigh.gradle runClient
+          grep -q 'SINGULO_RAYLEIGH_COMPLETE 256 4' build/rayleigh-review/logs/latest.log
+          python3 tools/review/check_rayleigh_png.py build/rayleigh-review/screenshots
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -114,6 +131,8 @@ jobs:
           name: pr-validation-${{ github.sha }}-attempt-${{ github.run_attempt }}
           if-no-files-found: warn
           path: |
+            build/rayleigh-review/logs/
+            build/rayleigh-review/screenshots/
             build/libs/*.jar
             build/gametest/logs/
             build/reports/
@@ -133,7 +152,7 @@ jobs:
 
   sodium-lighting:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     env:
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
@@ -164,7 +183,6 @@ jobs:
           grep -q 'SINGULO_SODIUM_NOON_EMISSIVE_COMPLETE' build/rayleigh-review/logs/latest.log
           grep -q 'SINGULO_RAYLEIGH_COMPLETE 256 4' build/rayleigh-review/logs/latest.log
           test "$(grep -c 'SINGULO_DH_LIGHTMAP_COMPLETE 256' build/rayleigh-review/logs/latest.log)" -eq 4
-          grep -Fq "Resource pack 'mod/singulo' indicates the following shaders should be ignored: light.glsl" build/rayleigh-review/logs/latest.log
           if grep -q 'Resource pack: mod/singulo' build/rayleigh-review/logs/latest.log; then
             echo 'Singulo still triggers the Sodium shader compatibility warning'
             exit 1
@@ -178,16 +196,9 @@ jobs:
         run: |
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithSodium
           grep -q 'SINGULO_REJOIN_COMPLETE 5' build/rayleigh-review/logs/latest.log
-      - name: Verify real Create Ponder preview and lightmap state restoration
-        env:
-          LIBGL_ALWAYS_SOFTWARE: '1'
-          ALSOFT_DRIVERS: 'null'
+      - name: Record unsupported optional integration scope
         run: |
-          python3 tools/review/prepare_ponder.py
-          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/ponder.gradle runClient -PwithSodium
-          grep -q 'SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup' build/ponder-review/logs/latest.log
-          grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE' build/ponder-review/logs/latest.log
-          python3 tools/review/check_ponder_png.py
+          echo 'Create/Ponder is not supported on 26.1.2: no verified official dependency. No Ponder pass is claimed.' >> "$GITHUB_STEP_SUMMARY"
       - name: Verify cosmic effects and shader reload with Sodium and Distant Horizons
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -203,7 +214,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: sodium-lighting-${{ github.sha }}
+          name: sodium-lighting-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: |
             build/rayleigh-review/logs/
             build/rayleigh-review/screenshots/

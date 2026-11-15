@@ -51,6 +51,7 @@ abstract class ExtractedMobRenderer<T extends Mob,M extends ExtractedEntityModel
         int overlay=OverlayTexture.pack(OverlayTexture.u(0),OverlayTexture.v(entity.hurtTime>0||entity.deathTime>0));
         if(!entity.isInvisible()) model.renderToBuffer(pose,buffers.getBuffer(RenderTypes.entityCutout(getTextureLocation(entity))),light,overlay);
         else if(!entity.isInvisibleTo(Minecraft.getInstance().player)) model.renderToBuffer(pose,buffers.getBuffer(RenderTypes.entityTranslucent(getTextureLocation(entity))),light,overlay,0x26FFFFFF);
+        else if(Minecraft.getInstance().shouldEntityAppearGlowing(entity)) model.renderToBuffer(pose,buffers.getBuffer(RenderTypes.outline(getTextureLocation(entity))),light,overlay);
         for(var layer:layers) layer.render(pose,buffers,light,entity,walk,speed,partialTick,age,headYaw,pitch);
         pose.popPose();
     }
