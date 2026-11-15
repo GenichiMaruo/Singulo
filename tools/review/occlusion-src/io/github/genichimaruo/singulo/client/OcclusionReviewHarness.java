@@ -30,6 +30,11 @@ public final class OcclusionReviewHarness {
     private static volatile boolean prepared;
     private static boolean requested,captured;
     private static NativeImage before;
+    private static Boolean activeTransparency;
+    @SubscribeEvent public static void observePipeline(RenderLevelStageEvent.AfterTranslucentFeatures e) {
+        // Framegraph attachments are released before AfterLevel in 26.1; observe while alive.
+        activeTransparency=Minecraft.getInstance().levelRenderer.getTranslucentTarget()!=null;
+    }
     @SubscribeEvent public static void tick(ClientTickEvent.Post e) {
         var mc=Minecraft.getInstance();
         if (++ticks>4000) throw new AssertionError("Occlusion timed out "+stage);
@@ -70,7 +75,7 @@ public final class OcclusionReviewHarness {
         if(!prepared||wait<100||captured)return;
         var f=GravitationalLensing.class.getDeclaredField("SOURCES");f.setAccessible(true);int n=((List<?>)f.get(null)).size();
         if(n<1)throw new AssertionError("Spindle lens source not registered");
-        if ((Minecraft.getInstance().levelRenderer.getTranslucentTarget()!=null) != (MODES[stage/3]==net.minecraft.client.GraphicsPreset.FABULOUS)) {
+        if ((activeTransparency==null || activeTransparency != (MODES[stage/3]==net.minecraft.client.GraphicsPreset.FABULOUS))) {
             throw new AssertionError("Requested graphics pipeline not active");
         }
         before=ReviewScreenshot.take(Minecraft.getInstance().getMainRenderTarget());

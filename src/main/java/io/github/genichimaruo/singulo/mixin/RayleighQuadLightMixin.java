@@ -18,6 +18,7 @@ public abstract class RayleighQuadLightMixin {
         var normal=quad.direction();
         BlockPos sample=BlockPos.containing(pos.getX()+x/4+normal.getStepX()*0.001,pos.getY()+y/4+normal.getStepY()*0.001,pos.getZ()+z/4+normal.getStepZ()*0.001);
         for(int i=0;i<4;i++)output.setLightCoords(i,RayleighLighting.tag(level,sample,output.getLightCoords(i)));
+
     }
     @Inject(method="prepareQuadAmbientOcclusion",at=@At("RETURN"))
     private void singulo$ao(BlockAndTintGetter level,BlockState state,BlockPos pos,BakedQuad quad,QuadInstance output,CallbackInfo ci){singulo$tag(level,pos,quad,output);}

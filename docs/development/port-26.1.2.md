@@ -63,10 +63,13 @@ factory geometry bookkeeping. These were not hidden by reducing test coverage.
 
 ## Remaining validation boundaries
 
-The client reached its title screen after startup fixes. The user stopped
-computer control before in-world visual QA, so no further GUI was launched.
-World rendering, optional Sodium/JEI visual behavior and the complete screenshot
-review gates remain unverified. Static compilation is not a visual pass.
+The user reauthorized in-world visual QA after the earlier computer-control stop.
+GUI, cosmic devices, lensing and foreground occlusion have since passed their
+local capture/assertion gates, including Sodium and Distant Horizons device
+rendering. Lighting GPU/terrain comparisons and five reconnect cycles also
+passed. Review-only fog normalization separates lighting from vanilla 26.1.2
+rain fog, with an additional real-fog capture. Create/Ponder remains the
+separate unsupported-dependency boundary; see the validation companion document.
 
 The PR workflow is ported to Java 25 and the exact 815-test gate while
 retaining visual review checks. Publication workflows are deliberately not
@@ -85,12 +88,16 @@ then `python tools/check_gametests.py` and
 Exact membership, required status, no duplicate results and no retries are checked.
 Local diagnostic logs are in `build/port-diagnostics/` and are not shipped.
 
-## Final local artifact
+## Final local artifact after visual fixes
 
 `build/libs/Singulo-0.19.0-26.1.2N.jar`
 
-SHA-256: `0B42F241C71ECF36C1DDEBD5D5303DCF79547522C5C2FC5166015A493A04AD25`
+SHA-256: `521AAA4699FDF7CB7306C5047CA09A2AC9141711884C51C40373987CFD2F73A1`
 
-Passing evidence is retained locally as `port-final.log`,
-`final-results.json`, and `final-server.log` under `build/port-diagnostics`.
-This artifact is built and headless-tested, not published or visually certified.
+Passing final build evidence is retained locally as `port-visual-final.log`,
+`visual-final-results.json`, and `visual-final-server.log` under `build/port-diagnostics`.
+All 815 custom tests plus the vanilla test passed again after the visual fixes.
+Python 140 checks and standalone Java checks (21 energy, 16 migration, 9 clipping,
+65 mip layout) passed. JAR size is 8,722,596 bytes.
+The supported local visual gates passed as recorded in the validation companion,
+but Create/Ponder remains unverified. This artifact has not been published.

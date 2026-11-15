@@ -62,9 +62,21 @@ public final class CosmicWorldReviewHarness {
         if(wait==(index>=13&&index<15?openAt:delay)){shown=frame;return;}
         if(frame-shown<4)return;
         Path output=Path.of(System.getProperty("singulo.cosmicOutput"));Files.createDirectories(output);
-        try(var pixels=ReviewScreenshot.take(mc.getMainRenderTarget())){pixels.writeToFile(output.resolve("cosmic-"+index+".png"));}
+        try(var pixels=ReviewScreenshot.take(mc.getMainRenderTarget())){
+            // Initial teleport can precede client chunk meshes. Never accept an empty sky capture.
+            int machinery=0;
+            for(int y=pixels.getHeight()/8;y<pixels.getHeight()*7/8;y++)
+                for(int x=pixels.getWidth()/8;x<pixels.getWidth()*7/8;x++){
+                    int rgb=pixels.getPixel(x,y);
+                    int b=rgb&255,g=rgb>>>8&255,r=rgb>>>16&255;
+                    if(b<110&&g<90&&r<90&&b>=g&&b>=r)machinery++;
+                }
+            if(machinery<500)return; // bounded by the existing global review timeout
+            pixels.writeToFile(output.resolve("cosmic-"+index+".png"));
+            Singulo.LOGGER.info("SINGULO_COSMIC_VISIBLE {} darkPixels={}",index,machinery);
+        }
         Singulo.LOGGER.info("SINGULO_COSMIC_CAPTURE {}",index);
-        if(++index==18){CosmicGeometryReviewHarness.verify();oldShaders=CosmicGeometryReviewHarness.shaders();reload=mc.reloadResourcePacks();return;}
+        if(++index==18){CosmicGeometryReviewHarness.verify();oldShaders=CosmicGeometryReviewHarness.beforeReload();reload=mc.reloadResourcePacks();return;}
         wait=0;
     }
     private static CosmicChamberBlockEntity opening;

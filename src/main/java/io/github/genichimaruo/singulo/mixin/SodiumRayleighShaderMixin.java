@@ -18,7 +18,7 @@ public abstract class SodiumRayleighShaderMixin {
                 uint singuloSun = (a_Position.x >> 30u) | ((a_Position.y >> 30u) << 2u) | ((a_LightAndData.z >> 4u) << 4u);
                 if (singuloSun != 0u) {
                     vec4 noon = texture(u_LightTex, vec2(_vert_tex_light_coord.x,
-                        (256.0 + clamp(float(singuloSun) / 16.0, 0.5, 15.5)) / singuloHeight));
+                        (256.0 + clamp(float(singuloSun) / 16.0 + 0.5, 0.5, 15.5)) / singuloHeight));
                     singuloLight = max(singuloLight, noon);
                 }
                 v_Color = _vert_color * singuloLight;

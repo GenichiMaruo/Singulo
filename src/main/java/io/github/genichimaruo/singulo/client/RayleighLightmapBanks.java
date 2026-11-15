@@ -31,7 +31,10 @@ public final class RayleighLightmapBanks implements AutoCloseable {
         sun.needsUpdate = true;
         sun.skyFactor = 1.0F;
         sun.skyLightColor = new Vector3f(1, 1, 1);
-        sun.ambientColor = new Vector3f();
+        // Vanilla 26.1.2 overworld.json supplies #0a0a0a ambient light even at clear noon.
+        // Zero here darkens the entire ramp (including sky=0) relative to the real reference.
+        // Artificial sunlight is canonical clear-overworld noon, independent of current dimension/weather.
+        sun.ambientColor = new Vector3f(10.0F / 255.0F);
         sun.blockFactor = state.blockFactor;
         sun.blockLightTint = state.blockLightTint;
         sun.brightness = state.brightness;

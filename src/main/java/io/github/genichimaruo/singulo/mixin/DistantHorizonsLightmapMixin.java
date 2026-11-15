@@ -1,27 +1,38 @@
 package io.github.genichimaruo.singulo.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.opengl.GlTexture;
+import com.mojang.blaze3d.textures.GpuTexture;
+import io.github.genichimaruo.singulo.client.PreviewLighting;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-/** DH's standard LOD shaders sample a normalized 16x16 vanilla lightmap. */
+/** DH 3.3 consumes a GPU lightmap, whose normalized UVs require vanilla's 16x16 view. */
 @Pseudo
-@Mixin(targets = "com.seibel.distanthorizons.common.wrappers.misc.LightMapWrapper_neoforge", remap = false)
+@Mixin(targets = "com.seibel.distanthorizons.common.wrappers.misc.LightMapWrapper", remap = false)
 public abstract class DistantHorizonsLightmapMixin {
-    @WrapMethod(method = "uploadLightmap")
-    private void singulo$naturalLightmap(NativeImage image, Operation<Void> original) {
-        if (image.getWidth() != 16 || image.getHeight() != 512) {
-            original.call(image);
-            return;
-        }
-        // Do not expose the artificial-light banks (or unused rows) to normalized DH UVs.
-        // Leave the original image and shader-pack-owned lightmap IDs untouched.
-        try (NativeImage natural = new NativeImage(16, 16, false)) {
-            for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++)
-                natural.setPixel(x, y, image.getPixel(x, y));
-            original.call(natural);
-        }
+    @ModifyVariable(method = "setLightmapGpuTexture", at = @At("HEAD"), argsOnly = true)
+    private GpuTexture singulo$naturalGpuLightmap(GpuTexture incoming) {
+        var renderer = Minecraft.getInstance().gameRenderer;
+        var current = renderer.levelLightmap().texture();
+        // Preserve third-party/shader-pack-owned textures. Only substitute our own banks.
+        if (incoming != current || current.getWidth(0) != 16 || current.getHeight(0) != 512) return incoming;
+        return singulo$naturalTexture();
+    }
+    @ModifyVariable(method = "setLightmapId", at = @At("HEAD"), argsOnly = true)
+    private int singulo$naturalGlLightmap(int incoming) {
+        var current = Minecraft.getInstance().gameRenderer.levelLightmap().texture();
+        if (!(current instanceof GlTexture gl) || incoming != gl.glId()
+                || current.getWidth(0) != 16 || current.getHeight(0) != 512) return incoming;
+        var natural = singulo$naturalTexture();
+        return natural instanceof GlTexture glNatural ? glNatural.glId() : incoming;
+    }
+    @Unique private static GpuTexture singulo$naturalTexture() {
+        GpuTexture[] natural = new GpuTexture[1];
+        PreviewLighting.render(() -> natural[0] = Minecraft.getInstance().gameRenderer.levelLightmap().texture());
+        return natural[0];
     }
 }

@@ -249,7 +249,8 @@ tasks.register('extractSodiumApi', Sync) {
 // These focused headless tests have main methods rather than a test framework.
 // Compile and execute them as part of check; never package them in the mod JAR.
 ['EnergyTransactionTest', 'PocketAttachmentMigrationTest',
- 'io.github.genichimaruo.singulo.client.ClipBuffersTest'].each { testClass ->
+ 'io.github.genichimaruo.singulo.client.ClipBuffersTest',
+ 'io.github.genichimaruo.singulo.client.LensingMipLayoutTest'].each { testClass ->
     def taskName = 'verify' + testClass.tokenize('.').last()
     def verification = tasks.register(taskName, JavaExec) {
         dependsOn tasks.named('testClasses')

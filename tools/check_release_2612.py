@@ -51,7 +51,7 @@ def validate_distribution(path, loader="neoforge"):
     name = path.name
     with zipfile.ZipFile(path) as jar:
         names = jar.namelist()
-        if len(names) != len(set(names)) or any('ReviewHarness' in n or 'ReviewScreenshot' in n or 'ReviewLightmap' in n
+        if len(names) != len(set(names)) or any('ReviewHarness' in n or 'ReviewScreenshot' in n or 'ReviewLightmap' in n or 'ReviewEnvironment' in n
                 or re.search(r'(?:GameTests(?:\$[^/]*)?|TestBuild)\.class$', n)
                 or '/test/harness/' in n or '/singulo/review/' in n
                 or n == 'singulo-test-suites.list' or '/compat/mekanism/' in n for n in names):

@@ -33,6 +33,14 @@ public final class RayleighReviewHarness {
         level.getGameRules().set(GameRules.ADVANCE_WEATHER, false, level.getServer());
         level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 6000); level.getServer().setWeatherParameters(10000, 0, false, false);
         level.setRainLevel(0); level.setThunderLevel(0); level.updateSkyBrightness();
+        // Rejoin review intentionally saves a 16x16 roof in this same disposable Review world.
+        // Remove those owned panels before rebuilding the smaller lighting fixture; otherwise
+        // the emissive probe at (10,241,10) incorrectly remains inside the old sunlight field.
+        for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) {
+            BlockPos oldPanel = new BlockPos(x, 246, z);
+            if (level.getBlockState(oldPanel).is(SinguloBlocks.LAB_RAYLEIGH_PANEL.get()))
+                level.setBlockAndUpdate(oldPanel, Blocks.AIR.defaultBlockState());
+        }
         for (int x = -1; x <= 7; x++) for (int z = -1; z <= 7; z++) for (int y = 240; y <= 247; y++) {
             level.setBlockAndUpdate(new BlockPos(x, y, z), y == 240 || ((x == -1 || x == 7 || z == -1 || z == 7) && y < 246)
                     ? Blocks.WHITE_CONCRETE.defaultBlockState() : Blocks.AIR.defaultBlockState());
@@ -79,7 +87,7 @@ public final class RayleighReviewHarness {
             Files.createDirectories(output()); phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc.getSingleplayerServer().overworld())); return;
         }
-        if (!ready || phase == 5) return;
+        if (!ready || phase == 6) return;
         // Directly setting server weather strengths can suppress vanilla's transition packet.
         // Apply the same prescribed review weather on the client so repeated runs start identically.
         // Rain and thunder strengths below are the client-side weather inputs.
@@ -90,15 +98,26 @@ public final class RayleighReviewHarness {
         mc.player.setYRot(180); mc.player.setXRot(48);
         mc.options.fov().set(60);
         if (++wait < 150) return;
+        if (!net.neoforged.fml.ModList.get().isLoaded("sodium")) {
+            var vf=mc.levelRenderer.getClass().getDeclaredField("viewArea");vf.setAccessible(true);
+            var area=vf.get(mc.levelRenderer);
+            if(area==null)return;
+            var get=net.minecraft.client.renderer.ViewArea.class.getDeclaredMethod("getRenderSectionAt",BlockPos.class);get.setAccessible(true);
+            var section=(net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection)get.invoke(area,SAMPLE.below());
+            if(section==null||!mc.levelRenderer.isSectionCompiledAndVisible(SAMPLE.below()))return;
+            float visibility=section.getVisibility(net.minecraft.util.Util.getMillis());
+            Singulo.LOGGER.info("RAYLEIGH_CAPTURE_VISIBILITY phase={} value={}",phase,visibility);
+            if(visibility<1.0F)return;
+        }
         try (NativeImage image = lightmap(mc)) {
-        if (net.neoforged.fml.ModList.get().isLoaded("distanthorizons")) DistantHorizonsReviewHarness.verify(image);
+        if (phase <= 4 && net.neoforged.fml.ModList.get().isLoaded("distanthorizons")) DistantHorizonsReviewHarness.verify(image);
         require(image.getWidth() == 16 && image.getHeight() == 512, "No separate local-noon lightmap rows");
         if (phase == 1) {
             require(mc.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_FACTOR, SAMPLE) == 1, "Reference is not clear noon: " + mc.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_FACTOR, SAMPLE));
             reference = new int[256];
             for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) {
                 reference[y * 16 + x] = image.getPixel(x, y);
-                require(image.getPixel(x, 256 + y) == reference[y * 16 + x], "Contiguous noon ramp differs from reference");
+                require(image.getPixel(x, 256 + y) == reference[y * 16 + x], "Contiguous noon ramp differs from reference at " + x + "," + y + " actual=" + Integer.toHexString(image.getPixel(x, 256 + y)) + " reference=" + Integer.toHexString(reference[y * 16 + x]));
                 require(image.getPixel(x, y * 16) == reference[y * 16 + x], "Local-noon lightmap differs from vanilla noon at " + x + "," + y);
             }
             capture(mc, "01-clear-noon-reference");
@@ -125,6 +144,8 @@ public final class RayleighReviewHarness {
             var quads = parts.stream().flatMap(part -> part.getQuads(net.minecraft.core.Direction.UP).stream()).toList();
             require(!quads.isEmpty(), "Concrete review model has no upward quads");
             var lighter = new net.neoforged.neoforge.client.model.ao.EnhancedBlockModelLighter();
+            // NeoForge reset() begins a block and supplies the shared light cache to FullFaceCalculator.
+            lighter.reset();
             var outputQuad = new com.mojang.blaze3d.vertex.QuadInstance();
             lighter.prepareQuadAmbientOcclusion(mc.level, state, SAMPLE.below(), quads.getFirst(), outputQuad);
             for (int i = 0; i < 4; i++) require((outputQuad.getLightCoords(i) & RayleighLighting.NOON) != 0, "NeoForge smooth light pipeline dropped local noon");
@@ -143,11 +164,15 @@ public final class RayleighReviewHarness {
             capture(mc, "03-unpowered-rainy-night");
             phase = 4; wait = 0; ready = false;
             mc.getSingleplayerServer().execute(() -> { roof(mc.getSingleplayerServer().overworld(), true); ready = true; });
-        } else {
+        } else if (phase == 4) {
             require(mc.level.getBrightness(LightLayer.SKY, SAMPLE) == 15, "Re-enabling panel did not relight client");
             capture(mc, "04-repowered-rainy-night");
-            Files.writeString(output().resolve("done.txt"), "256/256 artificial lightmap pixels equal vanilla clear noon\n256/256 pixels remain identical during rainy midnight\noutside lightmap retains night/weather\nclient SKY=15 / raw darkened=15\npower off SKY=0, no stale noon marker\npower on SKY=15 restored\nNeoForge smooth light pipeline and entity renderer retain local noon\n4 terrain screenshots\n");
-            Singulo.LOGGER.info("SINGULO_RAYLEIGH_COMPLETE 256 4"); phase = 5; mc.stop();
+            RayleighReviewEnvironment.isolateLighting = false;
+            phase = 5; wait = 0;
+        } else {
+            capture(mc, "05-powered-natural-rain-fog");
+            Files.writeString(output().resolve("done.txt"), "256/256 artificial lightmap pixels equal vanilla clear noon\n256/256 pixels remain identical during rainy midnight\noutside lightmap retains night/weather\nclient SKY=15 / raw darkened=15\npower off SKY=0, no stale noon marker\npower on SKY=15 restored\nNeoForge smooth light pipeline and entity renderer retain local noon\n4 lighting-isolated terrain screenshots; fixed environmental fog 32..1024\n1 additional unmodified rainy-fog screenshot\n");
+            Singulo.LOGGER.info("SINGULO_RAYLEIGH_COMPLETE 256 4"); phase = 6; mc.stop();
         }
         }
     }
