@@ -127,15 +127,20 @@ public final class RayleighSunlightGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", timeoutTicks = 400)
     public static void detectorUsesAttenuatedNoonLightAndCorrectInversion(GameTestHelper h) {
         room(h, 6);
         h.setBlock(SAMPLE.east(), Blocks.DAYLIGHT_DETECTOR);
         h.setBlock(SAMPLE.west(), Blocks.DAYLIGHT_DETECTOR.defaultBlockState().setValue(DaylightDetectorBlock.INVERTED, true));
-        h.runAtTickTime(30, () -> {
-            h.assertTrue(h.getBlockState(SAMPLE.east()).getValue(DaylightDetectorBlock.POWER) == 14, "Shadowed detector is forced to full 15");
-            h.assertTrue(h.getBlockState(SAMPLE.west()).getValue(DaylightDetectorBlock.POWER) == 1, "Inverted detector ignores attenuated daylight");
-            h.succeed();
+        // Native light propagation runs asynchronously; the detector also updates only
+        // every 20 world ticks. A fixed test tick is not a lighting-completion barrier,
+        // especially in the small CI namespace batch. Require the same exact final
+        // signals after both engines settle, with a bounded timeout and actual values.
+        h.succeedWhen(() -> {
+            h.assertTrue(sunlight(h, SAMPLE.east()) == 14 && sunlight(h, SAMPLE.west()) == 14,
+                    "Fixture must retain attenuated artificial skylight 14 on both sides");
+            h.assertTrue(h.getBlockState(SAMPLE.east()).getValue(DaylightDetectorBlock.POWER) == 14, "Shadowed detector expected14 actual=" + h.getBlockState(SAMPLE.east()).getValue(DaylightDetectorBlock.POWER) + " artificial=" + sunlight(h,SAMPLE.east()) + " native=" + h.getLevel().getEffectiveSkyBrightness(h.absolutePos(SAMPLE.east())));
+            h.assertTrue(h.getBlockState(SAMPLE.west()).getValue(DaylightDetectorBlock.POWER) == 1, "Inverted detector ignores attenuated daylight: " + h.getBlockState(SAMPLE.west()).getValue(DaylightDetectorBlock.POWER));
         });
     }
 
