@@ -36,6 +36,8 @@ final class CosmicGeometryReviewHarness {
         return previous;
     }
     static void afterReload(java.util.List<com.mojang.blaze3d.opengl.GlProgram> previous)throws Exception {
+        if(previous==null||previous.size()!=2||tracked.size()!=2||previous.stream().anyMatch(old->!tracked.containsKey(old)))
+            throw new IllegalStateException("Missing or already-consumed cosmic shader lifetime capture");
         var current=shaders();
         for(var old:previous) {
             int id=old.getProgramId();

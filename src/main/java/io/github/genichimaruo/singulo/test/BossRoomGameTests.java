@@ -479,7 +479,7 @@ public final class BossRoomGameTests {
         boss.kill((net.minecraft.server.level.ServerLevel)boss.level());
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
-            helper.assertTrue(dropped(helper, item("overclock_chip")) == 1, "オーバークロック・チップが出ない");
+            helper.assertTrue(dropped(helper, item("overclock_chip")) == 1, "オーバークロック・チップが出ない: " + dropped(helper, item("overclock_chip")) + ", participants=" + boss.rewardParticipants());
             helper.assertTrue(dropped(helper, item("sentinel_core")) == 4, "番人の投影核が通常の2＋追加2にならない: "
                     + dropped(helper, item("sentinel_core")));
             helper.succeed();

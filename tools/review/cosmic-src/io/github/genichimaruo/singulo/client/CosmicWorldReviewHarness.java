@@ -17,6 +17,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 @net.neoforged.fml.common.EventBusSubscriber(modid=Singulo.MODID,value=net.neoforged.api.distmarker.Dist.CLIENT)
 public final class CosmicWorldReviewHarness {
     private static volatile boolean ready;
+    private static boolean complete;
     private static int index=Integer.getInteger("singulo.cosmicStart",0),ticks,wait;
     private static long frame,shown;
     private static java.util.concurrent.CompletableFuture<Void> reload;
@@ -30,10 +31,12 @@ public final class CosmicWorldReviewHarness {
     public static void frame(net.neoforged.neoforge.client.event.RenderFrameEvent.Post e){frame++;}
     @net.neoforged.bus.api.SubscribeEvent
     public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event)throws Exception{
+        if(complete)return; // Minecraft.stop() requests shutdown; more client ticks may still arrive.
         Minecraft mc=Minecraft.getInstance();
         if(reload!=null){
             if(!reload.isDone()||mc.getOverlay()!=null)return;
             reload.join();CosmicGeometryReviewHarness.afterReload(oldShaders);
+            complete=true; // Only successful reload and shader lifetime verification may finish the run.
             Singulo.LOGGER.info("SINGULO_COSMIC_COMPLETE 18");mc.stop();return;
         }
         if(++ticks>20*240)throw new IllegalStateException("Cosmic review timed out "+index);
