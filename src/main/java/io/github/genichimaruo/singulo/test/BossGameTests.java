@@ -103,7 +103,7 @@ public final class BossGameTests {
     public static void defeatOpensVaultWithSeed(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
-        warden.kill();
+        warden.kill((net.minecraft.server.level.ServerLevel)warden.level());
         helper.runAtTickTime(2, () -> {
             RuinCacheBlockEntity vault = vault(helper);
             helper.assertTrue(!vault.isSealed(), "倒しても力場が消えない");
@@ -251,7 +251,7 @@ public final class BossGameTests {
                 "潮汐ダメージが防具を無視しない");
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
-        helper.assertTrue(warden.getType().is(Tags.EntityTypes.BOSSES), "ボス扱いになっていない");
+        helper.assertTrue(warden.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES), "ボス扱いになっていない");
         helper.assertTrue(!GravityGauntletItem.canAffect(warden), "ガントレットで操れてしまう");
         helper.succeed();
     }
@@ -308,7 +308,7 @@ public final class BossGameTests {
     public static void wardenDeathPlaysOut(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
-        warden.kill();
+        warden.kill((net.minecraft.server.level.ServerLevel)warden.level());
         helper.runAtTickTime(HorizonWarden.DEATH_TICKS / 2, () -> helper.assertFalse(warden.isRemoved(), "演出の途中で消えた"));
         helper.runAtTickTime(HorizonWarden.DEATH_TICKS + 10, () -> {
             helper.assertTrue(warden.isRemoved(), "演出が終わっても消えない");
@@ -369,7 +369,7 @@ public final class BossGameTests {
     public static void archivistDeathLeavesHalo(GameTestHelper helper) {
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
-        a.kill();
+        a.kill((net.minecraft.server.level.ServerLevel)a.level());
         helper.runAtTickTime(LastArchivist.DEATH_TICKS / 2, () -> helper.assertFalse(a.isRemoved(), "演出の途中で消えた"));
         helper.runAtTickTime(LastArchivist.DEATH_TICKS + 10, () -> {
             helper.assertTrue(a.isRemoved(), "演出が終わっても消えない");
@@ -407,7 +407,7 @@ public final class BossGameTests {
         helper.assertTrue(console.anomalyScale(woke + SealConsoleBlockEntity.ANOMALY_SHRINK_TICKS / 2F) < 0.5F, "縮み始めない");
         helper.assertTrue(console.anomalyScale(woke + SealConsoleBlockEntity.ANOMALY_SHRINK_TICKS) == 0, "縮みきって消えない");
         warden.skipEmerging();
-        warden.kill();
+        warden.kill((net.minecraft.server.level.ServerLevel)warden.level());
         helper.runAtTickTime(5, () -> {
             long t = helper.getLevel().getGameTime();
             helper.assertFalse(console.bossAwake(), "倒したのにまだ起きていることになっている");
@@ -428,7 +428,7 @@ public final class BossGameTests {
             helper.assertTrue(io.github.genichimaruo.singulo.ruin.ArenaShield.crosses(helper.getLevel(), c, out), "中から外への移動を止めない");
             helper.assertFalse(io.github.genichimaruo.singulo.ruin.ArenaShield.crosses(helper.getLevel(), c, c.add(3, 0, 0)), "中での移動まで止める");
             a.skipEmerging();
-            a.kill();
+            a.kill((net.minecraft.server.level.ServerLevel)a.level());
         });
         helper.runAtTickTime(8, () -> {
             helper.assertFalse(io.github.genichimaruo.singulo.ruin.ArenaShield.active(a.getUUID()), "倒しても力場が消えない");
@@ -472,7 +472,7 @@ public final class BossGameTests {
         float before = a.getHealth();
         var bomb = io.github.genichimaruo.singulo.registry.SinguloEntities.BLACK_HOLE_BOMB.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
-        bomb.moveTo(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5);
+        bomb.snapTo(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5);
         bomb.setDeltaMovement(0, -0.5, 0);
         helper.getLevel().addFreshEntity(bomb);
         helper.runAtTickTime(60, () -> {
@@ -490,11 +490,11 @@ public final class BossGameTests {
     public static void archivistDropsAfterglowWings(GameTestHelper helper) {
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
-        a.kill();
+        a.kill((net.minecraft.server.level.ServerLevel)a.level());
         var wings = io.github.genichimaruo.singulo.registry.SinguloItems.AFTERGLOW_WINGS.get();
         ItemStack stack = new ItemStack(wings);
-        helper.assertTrue(wings.getEquipmentSlot() == EquipmentSlot.CHEST, "翼を胴に着けられない");
-        helper.assertTrue(wings.canElytraFly(stack, a) && !stack.isDamageableItem(), "翼で滑空できないか、壊れてしまう");
+        helper.assertTrue(stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE) != null && stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE).slot() == EquipmentSlot.CHEST, "翼を胴に着けられない");
+        helper.assertTrue(stack.has(net.minecraft.core.component.DataComponents.GLIDER) && !stack.isDamageableItem(), "翼で滑空できないか、壊れてしまう");
         helper.runAtTickTime(LastArchivist.DEATH_TICKS + 20, () -> {
             boolean dropped = !helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new net.minecraft.world.phys.AABB(helper.absolutePos(CONSOLE)).inflate(24), e -> e.getItem().is(wings)).isEmpty();

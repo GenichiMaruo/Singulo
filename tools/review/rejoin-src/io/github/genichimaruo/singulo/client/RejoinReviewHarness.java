@@ -55,7 +55,7 @@ public final class RejoinReviewHarness {
             }
             if (++wait == 100) mc.pauseGame(false);
             if (wait < 160) return;
-            try (var image = net.minecraft.client.Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+            try (var image = ReviewScreenshot.take(mc.getMainRenderTarget())) {
                 var output = java.nio.file.Path.of("screenshots", "rejoin-" + visits + ".png");
                 java.nio.file.Files.createDirectories(output.getParent()); image.writeToFile(output);
             } catch (java.io.IOException e) { throw new RuntimeException(e); }
@@ -63,8 +63,8 @@ public final class RejoinReviewHarness {
             if (visits == 5) {
                 Singulo.LOGGER.info("SINGULO_REJOIN_COMPLETE 5"); mc.stop(); return;
             }
-            mc.level.disconnect();
-            mc.disconnect(new TitleScreen());
+            mc.level.disconnect(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE);
+            mc.disconnect(new TitleScreen(), false);
             entered = false; wait = 0;
             Singulo.LOGGER.info("SINGULO_REJOIN_TITLE {}", visits);
         } else if (visits > 0 && mc.screen instanceof TitleScreen && ++wait == 30) {

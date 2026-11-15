@@ -6,6 +6,8 @@ original deterministic two-layer pixel drawing, not a bundled Minecraft asset.
 from pathlib import Path
 import json
 import re
+import shutil
+import copy
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,13 +18,47 @@ def write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 def main():
+    # Item display-context selection replaced the removed separate_transforms loader.
+    contexts = {}
+    for path in sorted((ASSETS / 'models/item').glob('*.json')):
+        data = json.loads(path.read_text(encoding='utf-8'))
+        if data.get('loader') == 'neoforge:separate_transforms':
+            replacement = dict(data['base'])
+            replacement['singulo_display_models'] = data['perspectives']
+            if 'overrides' in data: replacement['overrides'] = data['overrides']
+            data = replacement
+            write(path, data)
+        views = data.get('singulo_display_models')
+        if views:
+            cases = []
+            for context, value in views.items():
+                helper = path.stem + '__display_' + context
+                write(path.with_name(helper + '.json'), value)
+                cases.append({'when': context, 'model': {'type': 'minecraft:model', 'model': 'singulo:item/' + helper}})
+            contexts['singulo:item/' + path.stem] = cases
+    def contextual(model):
+        cases = copy.deepcopy(contexts.get(model.get('model')))
+        if cases and 'tints' in model:
+            for case in cases: case['model']['tints'] = copy.deepcopy(model['tints'])
+        return {'type':'minecraft:select', 'property':'minecraft:display_context', 'cases':cases, 'fallback':model} if cases else model
+    # A cuboid item cannot span the separated item and block atlases in 26.1.
+    # Copy identical pixels into item-local aliases; geometry and appearance stay unchanged.
+    staff = ASSETS / 'models/item/graviton_manipulator.json'
+    if staff.exists():
+        data = json.loads(staff.read_text(encoding='utf-8'))
+        for key, texture in list(data.get('textures', {}).items()):
+            if texture.startswith('singulo:block/'):
+                name = texture.split('/')[-1]
+                shutil.copyfile(ASSETS / 'textures/block' / (name + '.png'), ASSETS / 'textures/item' / ('graviton_' + name + '.png'))
+                data['textures'][key] = 'singulo:item/graviton_' + name
+        write(staff, data)
     eggs = json.loads((ROOT / 'tools/spawn_egg_colors.json').read_text(encoding='utf-8'))
     source = (ROOT / 'src/main/java/io/github/genichimaruo/singulo/registry/SinguloItems.java').read_text(encoding='utf-8')
     accessories = set(re.findall(r'"([a-z_]+)", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem', source))
     white = {'type': 'minecraft:constant', 'value': 0xFFFFFF}
     for file in sorted((ASSETS / 'models/item').glob('*.json')):
         name = file.stem
-        if name == "colored_spawn_egg" or name.startswith("fluid_capsule_shell_"): continue
+        if name == "colored_spawn_egg" or name.startswith("fluid_capsule_shell_") or "__display_" in name: continue
         old = json.loads(file.read_text(encoding='utf-8'))
         model = {'type': 'minecraft:model', 'model': 'singulo:item/' + name}
         if name in eggs:
@@ -37,13 +73,14 @@ def main():
             model['tints'] = [white, {'type': 'singulo:dynamic', 'kind': name}]
         elif name in accessories:
             model['tints'] = [{'type': 'singulo:dynamic', 'kind': 'accessory'}]
+        model = contextual(model)
         if old.get('overrides'):
             entries = []
             for override in old['overrides']:
                 if len(override['predicate']) != 1:
                     raise ValueError(f'Explicit combined-predicate migration needed: {file}')
                 threshold = next(iter(override['predicate'].values()))
-                entries.append({'threshold': threshold, 'model': {'type': 'minecraft:model', 'model': override['model']}})
+                entries.append({'threshold': threshold, 'model': contextual({'type': 'minecraft:model', 'model': override['model']})})
             model = {'type': 'minecraft:range_dispatch', 'property': 'singulo:dynamic', 'kind': name,
                      'entries': sorted(entries, key=lambda entry: entry['threshold']), 'fallback': model}
         if name in ('fluid_capsule', 'battery_fluid_capsule', 'large_battery_fluid_capsule'):

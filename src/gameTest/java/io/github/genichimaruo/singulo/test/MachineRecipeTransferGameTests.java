@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.*;
@@ -14,8 +16,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -103,7 +103,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void jeiTransferKeepsReserveCatalysts(GameTestHelper h) {
         var menu = menu(h);
-        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst")));
         int slot = menu.type().catalystSlot();
         menu.getSlot(slot).set(catalyst.copyWithCount(16));
         menu.getSlot(menu.type().itemSlots()).set(new ItemStack(Items.IRON_INGOT, 12));
@@ -143,7 +143,7 @@ public final class MachineRecipeTransferGameTests {
     public static void loadedCatalystEstimateMatchesTheServer(GameTestHelper h) {
         var menu = menu(h);
         MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1, 1, 1));
-        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst")));
         int max = io.github.genichimaruo.singulo.item.UsesHelper.get(catalyst).max();
         ItemStack worn = catalyst.copy();
         io.github.genichimaruo.singulo.item.UsesHelper.consume(worn, max - 7);
@@ -167,7 +167,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void jeiMaxTransferPlansCatalystsPerBatch(GameTestHelper h) {
         var menu = menu(h);
-        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst")));
         int slot = menu.type().catalystSlot();
         int inventory = menu.type().itemSlots();
         menu.getSlot(slot).set(catalyst.copyWithCount(1));
@@ -179,7 +179,7 @@ public final class MachineRecipeTransferGameTests {
         MachineRecipeTransfer.apply(menu, plan);
         h.assertTrue(menu.getSlot(0).getItem().getCount() == 16 && menu.getSlot(slot).getItem().getCount() == 4,
                 "Catalysts not planned per batch: inputs " + menu.getSlot(0).getItem() + ", catalyst " + menu.getSlot(slot).getItem());
-        var data = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("control_unit")));
+        var data = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("control_unit")));
         h.assertTrue(io.github.genichimaruo.singulo.item.UsesHelper.hasUses(data), "Control unit fixture has no uses");
         for (int i = 0; i < menu.type().inputSlots(); i++) menu.getSlot(i).set(ItemStack.EMPTY);
         menu.getSlot(inventory + 2).set(data.copyWithCount(1));
@@ -230,7 +230,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void jeiTransferCatalystUsesDedicatedSlotAndPreservesLifetime(GameTestHelper h) {
         var menu = menu(h);
-        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst")));
         int inventory = menu.type().itemSlots();
         menu.getSlot(inventory).set(catalyst.copyWithCount(3));
         menu.getSlot(inventory + 1).set(new ItemStack(Items.IRON_INGOT, 12));
@@ -281,7 +281,7 @@ public final class MachineRecipeTransferGameTests {
     public static void jeiTransferUsesAlreadyLoadedCatalystWithoutMovingIt(GameTestHelper h) {
         var menu = menu(h);
         MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1, 1, 1));
-        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst")));
         machine.items().setStackInSlot(menu.type().catalystSlot(), catalyst.copy());
         machine.magazine().tick(machine.items(), menu.type().catalystSlot(), s -> s);
         menu.getSlot(menu.type().itemSlots()).set(new ItemStack(Items.IRON_INGOT, 4));

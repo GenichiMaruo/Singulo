@@ -2,9 +2,9 @@ name: PR validation
 
 on:
   push:
-    branches: [feature/0.19.0]
+    branches: [feature/26.1.2, "26.1.2"]
   pull_request:
-    branches: [1.21.1, main, feature/0.19.0]
+    branches: ["26.1.2", feature/26.1.2]
 
 permissions:
   contents: read
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: gradle
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -47,7 +47,7 @@ jobs:
         run: |
           bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=200
       - name: Require all NeoForge GameTests
-        run: python3 tools/check_release_1211.py --loader neoforge --build-dir build
+        run: python3 tools/check_release_2612.py --loader neoforge --build-dir build
       - name: Prepare disposable GUI review world
         run: python3 tools/review/prepare_gui.py
       - name: Run real client GUI smoke
@@ -143,7 +143,7 @@ jobs:
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: gradle
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -211,32 +211,3 @@ jobs:
             build/ponder-review/screenshots/
             build/cosmic-review/logs/
             build/cosmic-review/screenshots/
-
-  optional-mekanism:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
-      - name: Run optional chemical integration tests against real Mekanism
-        run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism
-      - name: Require completed nonempty integration tests
-        run: |
-          grep -E 'All 4 required tests passed' build/gametest/logs/latest.log
-          python3 tools/check_gametests.py --namespaces singulo_mekanism
-      - name: Save integration logs
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: mekanism-validation-${{ github.sha }}
-          path: |
-            build/gametest/logs/
-            build/reports/gametest/

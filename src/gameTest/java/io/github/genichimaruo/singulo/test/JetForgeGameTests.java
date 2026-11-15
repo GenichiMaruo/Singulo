@@ -49,6 +49,17 @@ public final class JetForgeGameTests {
 
     private JetForgeGameTests() {}
 
+    /** Initialize an unconnected survival fixture without sending login packets. MC26 inherits the server's creative default. */
+    private static void survival(net.minecraft.server.level.ServerPlayer player) {
+        try {
+            var initialize=net.minecraft.server.level.ServerPlayerGameMode.class.getDeclaredMethod("setGameModeForPlayer",
+                    net.minecraft.world.level.GameType.class,net.minecraft.world.level.GameType.class);
+            initialize.setAccessible(true);
+            initialize.invoke(player.gameMode,net.minecraft.world.level.GameType.SURVIVAL,null);
+        } catch (ReflectiveOperationException e) { throw new AssertionError("Cannot initialize survival fixture",e); }
+    }
+
+
     private static Item item(String id) {
         return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
@@ -87,6 +98,7 @@ public final class JetForgeGameTests {
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper,
                 new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(),helper.getLevel(),
                         new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"cassette-test"),net.minecraft.server.level.ClientInformation.createDefault()));
+        survival(player);
         helper.assertFalse(player.isCreative(),"Survival interaction fixture is creative");
         ItemStack cassette=new ItemStack(item("collapsar_parallel_cassette"),2);
         helper.assertTrue(be.useItem(player,cassette,net.minecraft.world.InteractionHand.MAIN_HAND)&&cassette.getCount()==1&&be.parallelUpgrade(),"Cassette installation not charged once");
@@ -668,6 +680,7 @@ public final class JetForgeGameTests {
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper,
                 new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(),helper.getLevel(),
                         new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"cassette-click"),net.minecraft.server.level.ClientInformation.createDefault()));
+        survival(player);
         ItemStack cassette=new ItemStack(item("collapsar_parallel_cassette"),2);
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,cassette);
         var shape=io.github.genichimaruo.singulo.forge.JetForgeLayout.SPEC;

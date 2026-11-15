@@ -340,6 +340,16 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     }
 
     /** 部屋の仕掛けを元の形へ直す。 */
+    /** Keep paired restoration positions and states aligned when restricting an arena. */
+    public void retainPropsWithin(net.minecraft.world.phys.AABB bounds) {
+        retainPropsWithin(bounds, linePos, lineState);
+        retainPropsWithin(bounds, conveyorPos, conveyorState);
+    }
+    private static void retainPropsWithin(net.minecraft.world.phys.AABB bounds, List<BlockPos> positions, List<BlockState> states) {
+        for (int i = positions.size() - 1; i >= 0; i--) if (!bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(positions.get(i)))) {
+            positions.remove(i); states.remove(i);
+        }
+    }
     public void restoreProps(ServerLevel level) {
         BlockState projector = SinguloBlocks.ECHO_PROJECTOR.get().defaultBlockState();
         for (BlockPos p : projectors) {

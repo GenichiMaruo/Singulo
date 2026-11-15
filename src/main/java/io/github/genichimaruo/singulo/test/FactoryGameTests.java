@@ -69,8 +69,8 @@ public final class FactoryGameTests {
         be.scan(helper.getLevel());
         // ほかの組のテストが残した仕掛けを数えないように、このテストの場所の中のものだけにする
         AABB bounds = helper.getBounds();
-        be.lines().removeIf(p -> !bounds.contains(Vec3.atCenterOf(p)));
-        be.conveyors().removeIf(p -> !bounds.contains(Vec3.atCenterOf(p)));
+        be.retainPropsWithin(bounds);
+
         return be;
     }
 
@@ -143,7 +143,7 @@ public final class FactoryGameTests {
                 .setValue(io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock.SEALED, true));
         core.setFacility(net.minecraft.world.level.levelgen.structure.BoundingBox.fromCorners(helper.absolutePos(BlockPos.ZERO),
                 helper.absolutePos(new BlockPos(14, 14, 14))));
-        f.kill();
+        f.kill((net.minecraft.server.level.ServerLevel)f.level());
         helper.runAtTickTime(FoundryOverseer.DEATH_TICKS + 10, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
             int n = dropped(helper, item("precision_actuator"));

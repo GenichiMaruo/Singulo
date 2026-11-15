@@ -82,6 +82,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 neoForge {
     version = project.neo_version
     addModdingDependenciesTo(sourceSets.gameTest)
+    addModdingDependenciesTo(sourceSets.test)
 
 
     runs {
@@ -127,6 +128,8 @@ neoForge {
 // サーバー設定もワールドの外（config/）に残るので消す。古い版の設定（前の既定値）が残ると、CI（まっさらな状態）と違う値で走る。
 var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
     delete layout.projectDirectory.dir('build/gametest/world')
+    // Minecraft 26 GameTestMain uses this new universe directory.
+    delete layout.projectDirectory.dir('build/gametest/gametestserver')
     delete layout.projectDirectory.dir('build/reports/gametest')
     delete layout.projectDirectory.file('build/gametest/config/singulo-server.toml')
 }
@@ -242,3 +245,21 @@ tasks.register('extractSodiumApi', Sync) {
     }
     into(layout.buildDirectory.dir('sodium-api'))
 }
+
+// These focused headless tests have main methods rather than a test framework.
+// Compile and execute them as part of check; never package them in the mod JAR.
+['EnergyTransactionTest', 'PocketAttachmentMigrationTest',
+ 'io.github.genichimaruo.singulo.client.ClipBuffersTest'].each { testClass ->
+    def taskName = 'verify' + testClass.tokenize('.').last()
+    def verification = tasks.register(taskName, JavaExec) {
+        dependsOn tasks.named('testClasses')
+        classpath = sourceSets.test.runtimeClasspath
+        mainClass = testClass
+        javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+    }
+    tasks.named('check').configure { dependsOn verification }
+}
+
+// src/test contains only explicitly executed main-method checks above, not JUnit.
+// Their JavaExec tasks remain mandatory even though framework discovery is empty.
+tasks.named('test', Test).configure { failOnNoDiscoveredTests = false }

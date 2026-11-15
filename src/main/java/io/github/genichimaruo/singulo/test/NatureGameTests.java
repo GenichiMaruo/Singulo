@@ -67,7 +67,7 @@ public final class NatureGameTests {
         helper.setBlock(sand.above(), Blocks.LIGHTNING_ROD);
         LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         BlockPos at = helper.absolutePos(sand.above(2));
-        bolt.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+        bolt.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
         helper.getLevel().addFreshEntity(bolt);
         helper.runAfterDelay(2, () -> {
             helper.assertBlockPresent(SinguloBlocks.FULGURITE_BLOCK.get(), sand);
@@ -161,7 +161,7 @@ public final class NatureGameTests {
         net.minecraft.server.level.ServerLevel level = helper.getLevel();
         var manager = level.getServer().getStructureManager();
         var context = net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext.fromLevel(level);
-        var crater = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).get(Singulo.id("meteor_crater"));
+        var crater = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,Singulo.id("meteor_crater"))).value();
         for (String v : new String[] {"a", "b", "c"}) {
             var id = Singulo.id("craters/meteor_crater_" + v);
             var template = manager.get(id);
@@ -173,7 +173,7 @@ public final class NatureGameTests {
             var piece = new net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece(manager, element, pos, 0,
                     net.minecraft.world.level.block.Rotation.NONE, element.getBoundingBox(manager, pos, net.minecraft.world.level.block.Rotation.NONE),
                     net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings.APPLY_WATERLOGGING);
-            var cp = new net.minecraft.world.level.ChunkPos(pos);
+            var cp = net.minecraft.world.level.ChunkPos.containing(pos);
             var start = new net.minecraft.world.level.levelgen.structure.StructureStart(crater, cp, 0,
                     new net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer(java.util.List.of(piece)));
             var restored = net.minecraft.world.level.levelgen.structure.StructureStart.loadStaticStart(context, start.createTag(context, cp), 0);
@@ -212,7 +212,7 @@ public final class NatureGameTests {
         for (int cx = box.minX() >> 4; cx <= box.maxX() >> 4; cx++) {
             for (int cz = box.minZ() >> 4; cz <= box.maxZ() >> 4; cz++) {
                 var chunkBox = new net.minecraft.world.level.levelgen.structure.BoundingBox(cx * 16, level.getMinY(), cz * 16,
-                        cx * 16 + 15, level.getMaxBuildHeight(), cz * 16 + 15);
+                        cx * 16 + 15, level.getMaxY(), cz * 16 + 15);
                 piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(), chunkBox,
                         new net.minecraft.world.level.ChunkPos(cx, cz), center);
             }

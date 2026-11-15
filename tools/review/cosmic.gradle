@@ -3,12 +3,13 @@ allprojects {
     afterEvaluate {
         // Init scripts also visit buildSrc; only the mod project has these runs.
         if (!plugins.hasPlugin('net.neoforged.moddev')) return
+        sourceSets.main.java.srcDir(file('tools/review/common-src'))
         sourceSets.main.java.srcDir(file('tools/review/cosmic-src'))
         if (providers.gradleProperty('withSodium').isPresent()) {
-            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+            dependencies.add('localRuntime', 'maven.modrinth:sodium:zg4YQ9EL') { transitive = false }
         }
         if (providers.gradleProperty('withDistantHorizons').isPresent()) {
-            dependencies.add('localRuntime', 'maven.modrinth:distanthorizons:9w34y8ai') { transitive = false }
+            dependencies.add('localRuntime', 'maven.modrinth:distanthorizons:QHxoccsN') { transitive = false }
         }
         neoForge.runs.client {
             gameDirectory = file('build/cosmic-review')

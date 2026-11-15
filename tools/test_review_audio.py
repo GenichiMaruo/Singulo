@@ -15,7 +15,7 @@ class ReviewAudioTests(unittest.TestCase):
                   ('gui', ['--cosmic-world'], 'cosmic-review')]
         with tempfile.TemporaryDirectory(prefix='singulo-review-audio-') as tmp:
             root = Path(tmp).resolve()
-            source = root / 'build/gametest/world/level.dat'
+            source = root / 'build/gametest/gametestserver/gametestworld/level.dat'
             source.parent.mkdir(parents=True)
             source.write_bytes(b'disposable-test-fixture')
             for name, args, directory in cases:

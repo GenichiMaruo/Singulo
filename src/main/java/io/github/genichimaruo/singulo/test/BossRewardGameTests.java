@@ -46,20 +46,12 @@ public final class BossRewardGameTests {
         server.getPlayerList().placeNewPlayer(connection, p, cookie);
         io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, p);
         p.setGameMode(GameType.SURVIVAL);
-        p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, 0, 0);
+        p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, java.util.Set.of(), 0, 0, true);
         return p;
     }
 
     /** 入ってきたばかりのプレイヤーの3秒の無敵を外す（このテストのプレイヤーは tick しないので、待っても切れない）。 */
-    private static void vulnerable(ServerPlayer p) {
-        try {
-            var f = ServerPlayer.class.getDeclaredField("spawnInvulnerableTime");
-            f.setAccessible(true);
-            f.setInt(p, 0);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+    private static void vulnerable(ServerPlayer p) { p.connection.markClientLoaded(); }
 
     private static void leave(GameTestHelper helper, ServerPlayer p) {
         helper.getLevel().getServer().getPlayerList().remove(p);
@@ -87,7 +79,7 @@ public final class BossRewardGameTests {
         helper.getLevel().addFreshEntity(ordinary);
         helper.runAtTickTime(40, () -> {
             helper.assertTrue(!loot.isRemoved() && loot.getItem().getCount() == 1, "落とし物がほかのアイテムと結合した");
-            helper.assertTrue(loot.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED), "ブラックホールよけの印が消えた");
+            helper.assertTrue(loot.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false), "ブラックホールよけの印が消えた");
             helper.assertTrue(ordinary.getItem().getCount() == 10, "ふつうのアイテムに落とし物が混ざった: " + ordinary.getItem().getCount());
             boss.discard();
             loot.discard();
@@ -188,8 +180,8 @@ public final class BossRewardGameTests {
         ServerPlayer p = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
         try {
             ItemStack chest = new ItemStack(Items.DIAMOND_CHESTPLATE);
-            chest.enchant(helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                    .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.MENDING), 1);
+            chest.enchant(helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                    .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.MENDING), 1);
             chest.setDamageValue(200);
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, chest);
             int before = p.totalExperience;
@@ -219,7 +211,7 @@ public final class BossRewardGameTests {
             helper.assertTrue(!orbs.isEmpty(), "誰もいないのにオーブが出ない");
             int total = 0;
             for (ExperienceOrb orb : orbs) {
-                helper.assertTrue(orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED), "オーブにブラックホールよけの印がない");
+                helper.assertTrue(orb.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false), "オーブにブラックホールよけの印がない");
                 helper.assertTrue(io.github.genichimaruo.singulo.test.harness.TestNbt.save(orb).getShortOr("Age", (short) 0) < 0, "オーブがふつうの寿命のまま");
                 total += orb.getValue();
                 orb.discard();
@@ -282,12 +274,12 @@ public final class BossRewardGameTests {
             for (ExperienceOrb orb : helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around)) {
                 CompoundTag tag = io.github.genichimaruo.singulo.test.harness.TestNbt.save(orb);
                 int xp = orb.getValue() * Math.max(1, tag.getIntOr("Count", 0));
-                if (orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)) {
+                if (orb.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false)) {
                     protectedXp += xp;
                     helper.assertTrue(tag.getShortOr("Age", (short) 0) < 0, "保護されたオーブの寿命がふつうに戻った");
                     ExperienceOrb restored = new ExperienceOrb(net.minecraft.world.entity.EntityType.EXPERIENCE_ORB, helper.getLevel());
                     io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag);
-                    helper.assertTrue(restored.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
+                    helper.assertTrue(restored.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false)
                             && io.github.genichimaruo.singulo.test.harness.TestNbt.save(restored).getShortOr("Age", (short) 0) < 0, "保存し直すと印か寿命を失う");
                 } else {
                     ordinaryXp += xp;

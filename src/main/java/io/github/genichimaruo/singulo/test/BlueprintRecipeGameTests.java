@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
@@ -21,8 +23,6 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 施設の建材の設計図: 作業台で素材と並べると建材ができ、設計図は残る。置いた施設灯は点いている。 */
 @GameTestHolder(Singulo.MODID)

@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
@@ -12,8 +14,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /**
  * 精密組立台の作るものの指定（{@link RecipeSelection}）。材料を入れている途中で、その一部だけでできる別のものが
@@ -60,7 +60,7 @@ public final class RecipeSelectionGameTests {
             var absolute = helper.absolutePos(pos);
             var state = level.getBlockState(absolute);
             MachineBlockEntity restored = new MachineBlockEntity(absolute, state);
-            restored.loadWithComponents(tag, level.registryAccess());
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, tag, level.registryAccess());
             restored.setLevel(level);
             restored.onLoad();
             restored.energy().setEnergy(restored.energy().getMaxEnergyStored());
@@ -128,7 +128,7 @@ public final class RecipeSelectionGameTests {
         helper.assertTrue("singulo:precision_assembler/tipler_bearing".equals(tag.getStringOr("selected_recipe", "")), "指定が保存されない");
         m.selectRecipe(-1);
         helper.assertTrue(m.selectedRecipe() == null, "指定が外れない");
-        m.loadWithComponents(tag, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(m, tag, helper.getLevel().registryAccess());
         helper.assertTrue(m.selectedRecipe() != null, "指定が読み込まれない");
         helper.succeed();
     }

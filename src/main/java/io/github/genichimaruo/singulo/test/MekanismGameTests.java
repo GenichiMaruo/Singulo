@@ -69,7 +69,7 @@ public final class MekanismGameTests {
             helper.assertTrue(drained == 1000 && ItemCount.get(console.stock(), hydrogen) == 4000, "素材置き場のケミカルタンクから取り出せない: " + drained);
 
             BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
+            a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
             helper.getLevel().addFreshEntity(a);
             a.inventory().setItem(RuinAndroid.SLOT_TANK, item("android_gas_tank_upgrade"));
             helper.assertTrue(a.hasChemTank() && !a.hasTank(), "ガスタンクアップグレードで化学物質のタンクにならない");
@@ -77,7 +77,7 @@ public final class MekanismGameTests {
                     "化学物質のタンク2つに 64,000 mB 入らない: " + a.liquidAmount(hydrogen));
             helper.assertTrue(a.drainLiquid(hydrogen, 2000, false) == 2000 && a.liquidAmount(hydrogen) == 62000, "化学物質のタンクから出せない");
             var reloaded = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            reloaded.load(io.github.genichimaruo.singulo.test.harness.TestNbt.save(a));
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(reloaded,io.github.genichimaruo.singulo.test.harness.TestNbt.save(a));
             helper.assertTrue(reloaded.hasChemTank() && reloaded.liquidAmount(hydrogen) == 62000,
                     "再読み込みで化学物質の種類・量かタンク装備を失った");
             helper.assertTrue(reloaded.drainLiquid(hydrogen, 2000, true) == 2000 && reloaded.liquidAmount(hydrogen) == 62000,

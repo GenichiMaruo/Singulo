@@ -8,7 +8,7 @@ parser.add_argument('--build-dir', default='build')
 build = Path(parser.parse_args().build_dir).resolve()
 if build == Path.cwd().resolve() or not build.is_relative_to(Path.cwd().resolve()):
     raise SystemExit('The disposable build directory must be inside this checkout')
-source = build / 'gametest/world/level.dat'
+source = build / 'gametest/gametestserver/gametestworld/level.dat'
 if not source.is_file():
     raise SystemExit('Run GameTests before preparing the preview world')
 root = build / 'occlusion-review'

@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
 import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.drone.*;
@@ -88,7 +90,7 @@ public final class DroneRegressionGameTests {
         h.setBlock(pos, SinguloBlocks.DRONE_PORT.get());
         var port = (DronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
-        var at = h.absolutePos(pos); player.moveTo(at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5);
+        var at = h.absolutePos(pos); player.snapTo(at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5);
         port.setOwner(new java.util.UUID(100, 200));
         h.assertFalse(port.mayOperate(player), "Fixture player is authorized");
         int before = port.sides().packed();

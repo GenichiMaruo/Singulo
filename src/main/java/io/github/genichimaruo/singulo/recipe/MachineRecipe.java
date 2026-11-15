@@ -16,6 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -24,6 +25,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 
 /**
  * 本modの装置で処理するレシピ（type: singulo:machine）。tools/gen_data.py が recipes.py から生成する。
@@ -40,8 +42,24 @@ import net.neoforged.neoforge.fluids.FluidStack;
  */
 public record MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
                             List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
-                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
+                            Optional<ItemStackTemplate> resultTemplate, List<FluidStackTemplate> fluidResultTemplates, int minSize, int priority, Optional<ItemStackTemplate> byproductTemplate)
         implements Recipe<MachineRecipe.Input> {
+
+    /** Keep recipe loading independent of item component initialization. */
+    public ItemStack result() { return resultTemplate.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY); }
+    public List<FluidStack> fluidResults() { return fluidResultTemplates.stream().map(FluidStackTemplate::create).toList(); }
+    public ItemStack byproduct() { return byproductTemplate.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY); }
+
+    /** Compatibility constructor for runtime callers and tests with already initialized stacks. */
+    public MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
+                         List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
+                         ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct) {
+        this(station, stage, time, energy, ingredients, fluidIngredients, mass, restore,
+             template(result), fluidResults.stream().map(FluidStackTemplate::fromNonEmptyStack).toList(), minSize, priority, template(byproduct));
+    }
+    private static Optional<ItemStackTemplate> template(ItemStack stack) {
+        return stack.isEmpty() ? Optional.empty() : Optional.of(ItemStackTemplate.fromNonEmptyStack(stack));
+    }
 
     /**
      * アイテム材料。tier &gt; 0 は触媒の寿命で払う材料で、ingredient（そのティアの触媒）のほか、上位の触媒でも払える。
@@ -135,11 +153,11 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             FluidInput.CODEC.listOf().optionalFieldOf("fluid_ingredients", List.of()).forGetter(MachineRecipe::fluidIngredients),
             MassInput.CODEC.optionalFieldOf("mass").forGetter(MachineRecipe::mass),
             Ingredient.CODEC.optionalFieldOf("restore").forGetter(MachineRecipe::restore),
-            ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MachineRecipe::result),
-            FluidStack.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
+            ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(MachineRecipe::resultTemplate),
+            FluidStackTemplate.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResultTemplates),
             Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
             Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority),
-            ItemStack.CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(MachineRecipe::byproduct)
+            ItemStackTemplate.CODEC.optionalFieldOf("byproduct").forGetter(MachineRecipe::byproductTemplate)
     ).apply(i, MachineRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> STREAM_CODEC = StreamCodec.of(
@@ -152,11 +170,11 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 FluidInput.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.fluidIngredients);
                 ByteBufCodecs.optional(MassInput.STREAM_CODEC).encode(buf, r.mass);
                 ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC).encode(buf, r.restore);
-                ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, r.result);
-                FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.fluidResults);
+                ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).encode(buf, r.resultTemplate);
+                FluidStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.fluidResultTemplates);
                 buf.writeVarInt(r.minSize);
                 buf.writeVarInt(r.priority);
-                ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, r.byproduct);
+                ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).encode(buf, r.byproductTemplate);
             },
             buf -> new MachineRecipe(
                     buf.readUtf(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
@@ -164,11 +182,11 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                     FluidInput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
                     ByteBufCodecs.optional(MassInput.STREAM_CODEC).decode(buf),
                     ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC).decode(buf),
-                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
-                    FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
+                    ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buf),
+                    FluidStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
                     buf.readVarInt(),
                     buf.readVarInt(),
-                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf)));
+                    ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buf)));
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
@@ -252,7 +270,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     public ItemStack assemble(Input input, HolderLookup.Provider registries) {
-        return result.copy();
+        return result();
     }
 
     public boolean canCraftInDimensions(int width, int height) {
@@ -260,7 +278,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     public ItemStack getResultItem(HolderLookup.Provider registries) {
-        return result;
+        return result();
     }
 
     public NonNullList<Ingredient> getIngredients() {
@@ -285,7 +303,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
         return SinguloRecipes.MACHINE.get();
     }
 
-    @Override public ItemStack assemble(Input input) { return result.copy(); }
+    @Override public ItemStack assemble(Input input) { return result(); }
     @Override public boolean showNotification() { return false; }
     @Override public String group() { return ""; }
     @Override public net.minecraft.world.item.crafting.PlacementInfo placementInfo() {

@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.drone;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
@@ -11,8 +13,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -153,7 +153,7 @@ public final class DroneWormholeGameTests {
         homeLevel.setBlockAndUpdate(homeBeacon, SinguloBlocks.WORMHOLE_DRONE_BEACON.get().defaultBlockState());
         var here = (io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity) level.getBlockEntity(gate);
         var there = (io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity) homeLevel.getBlockEntity(homeGate);
-        long pair = level.random.nextLong();
+        long pair = level.getRandom().nextLong();
         here.setData(new io.github.genichimaruo.singulo.wormhole.WormholeData(pair, 0));
         there.setData(new io.github.genichimaruo.singulo.wormhole.WormholeData(pair, 0));
         io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.serverTick(level, gate, here.getBlockState(), here);

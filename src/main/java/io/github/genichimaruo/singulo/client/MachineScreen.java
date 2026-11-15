@@ -785,7 +785,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             }
             RecipeHolder<MachineRecipe> h = entries.get(index);
             int[] c = cellPos(v);
-            boolean isSelected = h == null ? selected == null : selected != null && selected.id().equals(h.id().identifier());
+            boolean isSelected = h == null ? selected == null : selected != null && selected.id().equals(h.id());
             boolean ready = h != null && h.value().plan(inputs) != null;
             Panel.slot(g, skin, c[0] + 1, c[1] + 1);
             int ring = isSelected ? skin.accent() : index == hovered ? Panel.GLOW : ready ? GuiSkin.OK : 0;

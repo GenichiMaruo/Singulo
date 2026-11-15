@@ -52,8 +52,9 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
         NeoForge.EVENT_BUS.addListener(ClientRecipes::receive);
         NeoForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
-        NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(GlowDepth::onRenderStage);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterLevel e) -> GravitationalLensing.onRenderStage(e));
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterSky e) -> GlowDepth.onRenderStage(e));
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterTranslucentFeatures e) -> GlowDepth.onRenderStage(e));
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(WorldGeometry::extract);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::extract);

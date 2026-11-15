@@ -7,70 +7,200 @@
       {
         "threshold": 0.0,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hm4"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hm4__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hm4"
+          }
         }
       },
       {
         "threshold": 0.125,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hm3"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hm3__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hm3"
+          }
         }
       },
       {
         "threshold": 0.25,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hm2"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hm2__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hm2"
+          }
         }
       },
       {
         "threshold": 0.375,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hm1"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hm1__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hm1"
+          }
         }
       },
       {
         "threshold": 0.5,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_h0"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_h0__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_h0"
+          }
         }
       },
       {
         "threshold": 0.625,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hp1"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hp1__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hp1"
+          }
         }
       },
       {
         "threshold": 0.75,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hp2"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hp2__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hp2"
+          }
         }
       },
       {
         "threshold": 0.875,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hp3"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hp3__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hp3"
+          }
         }
       },
       {
         "threshold": 1.0,
         "model": {
-          "type": "minecraft:model",
-          "model": "singulo:item/survey_glasses_hp4"
+          "type": "minecraft:select",
+          "property": "minecraft:display_context",
+          "cases": [
+            {
+              "when": "head",
+              "model": {
+                "type": "minecraft:model",
+                "model": "singulo:item/survey_glasses_hp4__display_head"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses_hp4"
+          }
         }
       }
     ],
     "fallback": {
-      "type": "minecraft:model",
-      "model": "singulo:item/survey_glasses"
+      "type": "minecraft:select",
+      "property": "minecraft:display_context",
+      "cases": [
+        {
+          "when": "head",
+          "model": {
+            "type": "minecraft:model",
+            "model": "singulo:item/survey_glasses__display_head"
+          }
+        }
+      ],
+      "fallback": {
+        "type": "minecraft:model",
+        "model": "singulo:item/survey_glasses"
+      }
     }
   }
 }

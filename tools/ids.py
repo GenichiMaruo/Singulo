@@ -548,7 +548,7 @@ OUTPUT_ALIASES = {
     '銅インゴット（銅導線）': 'minecraft:copper_ingot',
     # 0.17.0: 潮汐紡糸機で伸ばして作るバニラの素材
     '糸（潮汐紡糸）': 'minecraft:string',
-    '鎖（潮汐紡糸）': 'minecraft:chain',
+    '鎖（潮汐紡糸）': 'minecraft:iron_chain',
     'ブレイズロッド（潮汐紡糸）': 'minecraft:blaze_rod',
     'ファントムの皮膜（潮汐紡糸）': 'minecraft:phantom_membrane',
     '鍾乳石（潮汐紡糸）': 'minecraft:pointed_dripstone',
@@ -672,7 +672,7 @@ VANILLA = {
     '金塊': '#c:nuggets/gold',
     '小麦': '#c:crops/wheat',
     'たいまつ': 'minecraft:torch',
-    '鎖': 'minecraft:chain',
+    '鎖': 'minecraft:iron_chain',
     'レッドストーン': '#c:dusts/redstone',
     '時計': 'minecraft:clock',
     '残響の欠片（型）': 'minecraft:echo_shard',

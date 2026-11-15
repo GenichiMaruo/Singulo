@@ -48,8 +48,8 @@ public final class LensingReviewHarness {
             mc.getSingleplayerServer().execute(() -> {
                 var server = mc.getSingleplayerServer();
                 var level = server.overworld();
-                level.setDayTime(6000);
-                level.setWeatherParameters(6000, 0, false, false);
+                server.clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 6000);
+                server.setWeatherParameters(6000, 0, false, false);
                 for (int row : ROWS) for (int i = 0; i < COLUMNS; i++) {
                     BlockPos p = new BlockPos(i * 10, row, 0);
                     level.getChunkAt(p);
@@ -60,7 +60,7 @@ public final class LensingReviewHarness {
                 }
                 var player = server.getPlayerList().getPlayer(mc.player.getUUID());
                 player.setGameMode(GameType.SPECTATOR);
-                player.teleportTo(level, 20.5, 88, 62.5, 180, 0);
+                player.teleportTo(level, 20.5, 88, 62.5, java.util.Set.of(), 180, 0, false);
                 prepared = true;
             });
         }
@@ -72,9 +72,10 @@ public final class LensingReviewHarness {
         }
     }
 
+    // Both opaque and translucent block-entity features have been submitted; lensing runs later at AfterLevel.
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void stage(RenderLevelStageEvent event) throws Exception {
-        if (!prepared || complete || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
+    public static void stage(RenderLevelStageEvent.AfterTranslucentFeatures event) throws Exception {
+        if (!prepared || complete) return;
         var field = GravitationalLensing.class.getDeclaredField("SOURCES");
         field.setAccessible(true);
         var sources = (List<?>) field.get(null);
@@ -93,13 +94,13 @@ public final class LensingReviewHarness {
 
     /** Where each hole center lands on the screen this frame (pixels, y down). */
     private static void project(RenderLevelStageEvent event) {
-        Vec3 cam = event.getCamera().getPosition();
-        Matrix4f view = new Matrix4f().rotation(event.getCamera().rotation().conjugate(new Quaternionf()));
+        Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
+        Matrix4f view = new Matrix4f().rotation(event.getLevelRenderState().cameraRenderState.orientation.conjugate(new Quaternionf()));
         int n = 0;
         for (int row : ROWS) for (int i = 0; i < COLUMNS; i++) {
             Vector4f v = new Vector4f((float) (i * 10 + 0.5 - cam.x), (float) (row + 0.5 - cam.y), (float) (0.5 - cam.z), 1);
             view.transform(v);
-            event.getProjectionMatrix().transform(v);
+            event.getLevelRenderState().cameraRenderState.projectionMatrix.transform(v);
             screen[n++] = new float[]{(v.x / v.w * 0.5F + 0.5F) * 1280, (0.5F - v.y / v.w * 0.5F) * 800};
         }
     }
@@ -136,7 +137,7 @@ public final class LensingReviewHarness {
         Minecraft mc = Minecraft.getInstance();
         Path output = Path.of(System.getProperty("singulo.lensingOutput"));
         Files.createDirectories(output);
-        try (var png = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+        try (var png = ReviewScreenshot.take(mc.getMainRenderTarget())) {
             png.writeToFile(output.resolve("many-holes-and-remnant.png"));
             if (png.getWidth() != 1280 || png.getHeight() != 800) throw new AssertionError("Unexpected lensing viewport");
             // Traced holes draw nothing in the world, so a dark center proves the shader drew this hole.
@@ -145,7 +146,7 @@ public final class LensingReviewHarness {
                 int cx = (int) center[0];
                 int cy = (int) center[1];
                 for (int y = cy - 4; y < cy + 4; y++) for (int x = cx - 4; x < cx + 4; x++) {
-                    int pixel = png.getPixelRGBA(x, y);
+                    int pixel = png.getPixel(x, y);
                     if ((pixel & 255) < 20 && (pixel >> 8 & 255) < 20 && (pixel >> 16 & 255) < 20) black++;
                 }
                 if (black < 40) throw new AssertionError("Black-hole shadow missing at screen " + cx + "," + cy);

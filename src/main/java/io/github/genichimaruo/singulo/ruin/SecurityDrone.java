@@ -282,9 +282,12 @@ public class SecurityDrone extends Monster {
         return facilitySpawned;
     }
 
+    public java.util.Optional<net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable>> effectiveLootTable() {
+        return facilitySpawned ? java.util.Optional.of(FACILITY_LOOT) : getLootTable();
+    }
     @Override
     protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
-        if (facilitySpawned) super.dropFromLootTable(level, source, playerKilled, FACILITY_LOOT);
+        if (facilitySpawned) super.dropFromLootTable(level, source, playerKilled, effectiveLootTable().orElseThrow());
         else super.dropFromLootTable(level, source, playerKilled);
     }
 

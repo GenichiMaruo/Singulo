@@ -16,7 +16,7 @@ public final class MachineRecipeIndex {
                          List<RecipeHolder<MachineRecipe>> selectable) {}
     // Values contain recipes only: never keep the weak key (or a Level) alive through the value.
     private record Snapshot(Object recipes, long revision, Map<MachineType, Lists> lists) {}
-    private static final Comparator<RecipeHolder<MachineRecipe>> ID_ORDER = Comparator.comparing(h -> h.id().toString());
+    private static final Comparator<RecipeHolder<MachineRecipe>> ID_ORDER = Comparator.comparing(h -> h.id().identifier().toString());
     private static final Comparator<RecipeHolder<MachineRecipe>> STATION_ORDER = Comparator
             .comparingInt((RecipeHolder<MachineRecipe> h) -> -h.value().priority())
             .thenComparingInt(h -> -(h.value().ingredients().size() + h.value().fluidIngredients().size()

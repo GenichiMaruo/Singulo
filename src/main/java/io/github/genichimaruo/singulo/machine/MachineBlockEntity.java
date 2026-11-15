@@ -656,7 +656,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         }
         Identifier previous = current != null ? current.id().identifier() : resumeRecipe;
         resumeRecipe = null;
-        if (found == null || !found.id().equals(previous)) {
+        if (found == null || !found.id().identifier().equals(previous)) {
             progress = 0;
             underpoweredTicks = 0;
         }

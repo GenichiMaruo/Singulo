@@ -83,18 +83,18 @@ public final class CosmicChamberGameTests {
         h.assertTrue(replacement!=null&&replacement!=be&&replacement.items().getStackInSlot(0).getCount()==7,"Mined inventory did not survive immediate replacement");
         boolean accepted=old.stillValid(viewer);
         // This is the same validity gate and ClickType that the server packet handler uses.
-        if(accepted)old.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        if(accepted)old.clicked(0,0,net.minecraft.world.inventory.ContainerInput.QUICK_MOVE,viewer);
         int extracted=0;for(int i=0;i<viewer.getInventory().getContainerSize();i++)if(viewer.getInventory().getItem(i).is(item("collapsar_billet",1).getItem()))extracted+=viewer.getInventory().getItem(i).getCount();
         h.assertTrue(extracted+replacement.items().getStackInSlot(0).getCount()==7,"Stale menu duplicated mined inventory: player="+extracted+", replacement="+replacement.items().getStackInSlot(0).getCount());
         h.assertFalse(accepted,"Old viewer menu accepted a replacement block entity");
-        old.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,viewer);
-        old.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        old.clicked(0,0,net.minecraft.world.inventory.ContainerInput.PICKUP,viewer);
+        old.clicked(0,0,net.minecraft.world.inventory.ContainerInput.QUICK_MOVE,viewer);
         h.assertTrue(old.quickMoveStack(viewer,0).isEmpty()&&old.getCarried().isEmpty()&&replacement.items().getStackInSlot(0).getCount()==7,"Direct stale-menu operations bypassed invalidation");
         h.assertTrue(viewer.containerMenu==viewer.inventoryMenu,"Destruction did not immediately close the other viewer");
         var fresh=(io.github.genichimaruo.singulo.cosmic.CosmicMenu)replacement.createMenu(5,viewer.getInventory(),viewer);viewer.containerMenu=fresh;
         h.assertTrue(fresh.stillValid(viewer),"Replacement inherited a retired menu state");
-        fresh.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
-        old.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,viewer);
+        fresh.clicked(0,0,net.minecraft.world.inventory.ContainerInput.QUICK_MOVE,viewer);
+        old.clicked(0,0,net.minecraft.world.inventory.ContainerInput.QUICK_MOVE,viewer);
         int total=0;for(int i=0;i<viewer.getInventory().getContainerSize();i++)if(viewer.getInventory().getItem(i).is(item("collapsar_billet",1).getItem()))total+=viewer.getInventory().getItem(i).getCount();
         h.assertTrue(total==7&&replacement.items().getStackInSlot(0).isEmpty(),"Fresh menu is unusable or stale menu duplicated a second extraction");h.succeed();
     }
@@ -188,17 +188,22 @@ public final class CosmicChamberGameTests {
     @GameTest(template="forge")
     public static void cosmicPushReservationCannotOverfillOnReentrantReceive(GameTestHelper h){
         var be=build(h,Blueprints.Kind.PASTA_ACCUMULATOR);stored(h,be,be.capacity()-1_000_000_000L,false);long[] injected={0};
-        var receiver=new net.neoforged.neoforge.energy.IEnergyStorage(){
-            public int receiveEnergy(int amount,boolean simulate){if(!simulate)injected[0]+=be.energyFor(null).receiveLong(amount,false);return 0;}
-            public int extractEnergy(int amount,boolean simulate){return 0;}
-            public int getEnergyStored(){return 0;}public int getMaxEnergyStored(){return Integer.MAX_VALUE;}
-            public boolean canExtract(){return false;}public boolean canReceive(){return true;}
+        long before=be.stored();
+        var receiver=new net.neoforged.neoforge.transfer.energy.EnergyHandler(){
+            public int insert(int amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+                injected[0]+=be.energyFor(null).insertLong(amount,tx);
+                h.assertTrue(be.stored()<=be.capacity(),"Re-entrant insertion exceeded capacity inside transaction");
+                return 0;
+            }
+            public int extract(int amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){return 0;}
+            public long getAmountAsLong(){return 0;}public long getCapacityAsLong(){return Integer.MAX_VALUE;}
         };
         try{
-            // Inject a foreign capability that re-enters the public input during delivery.
-            var send=CosmicChamberBlockEntity.class.getDeclaredMethod("sendPower",net.neoforged.neoforge.energy.IEnergyStorage.class);send.setAccessible(true);send.invoke(be,receiver);
+            // Re-enter in the same transaction; a rejected delivery must roll back BOTH mutations.
+            var send=CosmicChamberBlockEntity.class.getDeclaredMethod("sendPower",net.neoforged.neoforge.transfer.energy.EnergyHandler.class);send.setAccessible(true);send.invoke(be,receiver);
         }catch(ReflectiveOperationException e){throw new AssertionError(e);}
-        h.assertTrue(injected[0]==1_000_000_000L&&be.stored()==be.capacity(),"Refund and re-entrant input exceeded finite capacity");h.succeed();
+        h.assertTrue(injected[0]>0&&be.stored()==before,"Rejected delivery failed to roll back extraction and re-entrant insertion");
+        h.assertTrue(be.energyFor(null).receiveLong(Long.MAX_VALUE,false)==1_000_000_000L&&be.stored()==be.capacity(),"Rollback lost capacity or input budget");h.succeed();
     }
     @GameTest(template="forge",timeoutTicks=100)
     public static void cosmicSpindleCoreConsumesSeedAndStartupOnce(GameTestHelper h){

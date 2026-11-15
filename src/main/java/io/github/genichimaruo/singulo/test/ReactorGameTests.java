@@ -65,6 +65,12 @@ public final class ReactorGameTests {
         }
         helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
+        var ownedController=helper.absolutePos(CONTROLLER).immutable();
+        // Non-default reactor batches also leave live dilation fields behind unless their own fixture is retired.
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(() -> {
+            if(helper.getLevel().getBlockEntity(ownedController) instanceof PenroseReactorBlockEntity)
+                helper.getLevel().removeBlock(ownedController,false);
+        });
         return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CONTROLLER);
     }
 
@@ -85,7 +91,7 @@ public final class ReactorGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(r.isFormed(), "13×13×13 のリアクターとして形成されない");
             helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.DORMANT, "形成後は停止中のはず");
-            IEnergyStorage viaPort = helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,
+            IEnergyStorage viaPort = io.github.genichimaruo.singulo.test.harness.TestEnergy.find(helper.getLevel(),
                     helper.absolutePos(PORT), null);
             helper.assertTrue(viaPort != null, "抽出ポートからリアクターの電力につながらない");
         });
@@ -168,7 +174,7 @@ public final class ReactorGameTests {
             helper.assertTrue(r != null, "ポートや警報器を置くと形成されない");
             helper.assertTrue(r.ports().size() == 2 && r.ports().contains(helper.absolutePos(port2)), "置いたポートが数えられない: " + r.ports().size());
             helper.assertTrue(r.alarms().contains(helper.absolutePos(alarm)), "警報器が数えられない");
-            helper.assertTrue(helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, helper.absolutePos(port2), null) != null,
+            helper.assertTrue(io.github.genichimaruo.singulo.test.harness.TestEnergy.find(helper.getLevel(), helper.absolutePos(port2), null) != null,
                     "置いたポートから電力に届かない");
             helper.assertTrue(helper.getLevel().getSignal(helper.absolutePos(alarm), net.minecraft.core.Direction.UP) >= 7,
                     "上限を超えても警報器が信号を出さない");
@@ -214,7 +220,7 @@ public final class ReactorGameTests {
         zombie.setInvulnerable(true);
         zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1024);
         zombie.setHealth(1024);
-        zombie.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,
+        zombie.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.RESISTANCE,
                 100_000, 255));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.TOTEM_OF_UNDYING));
         helper.succeedWhen(() -> helper.assertTrue(zombie.isDeadOrDying() || zombie.isRemoved(),

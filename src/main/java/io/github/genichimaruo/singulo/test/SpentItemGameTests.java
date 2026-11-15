@@ -61,7 +61,7 @@ public final class SpentItemGameTests {
         var be = archive(h);
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenExecute(() -> {
             var registries = h.getLevel().registryAccess();
-            be.loadCustomOnly(be.saveCustomOnly(registries),registries);
+            io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(be,be.saveCustomOnly(registries),registries);
             h.assertTrue(!be.automationItems().extractItem(0,1,true).isEmpty(), "Return flag lost on reload");
             be.automationItems().extractItem(be.type().outputSlot(),64,false);
         }).thenIdle(2).thenExecute(() -> {

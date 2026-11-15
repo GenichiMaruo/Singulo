@@ -12,7 +12,7 @@ import shutil
 
 root = pathlib.Path(_build) / ('cosmic-review' if _args.cosmic_world else 'cosmic-gui-review' if _args.cosmic else 'gui-review')
 root.mkdir(parents=True, exist_ok=True)
-source = pathlib.Path(_build + "/gametest/world")
+source = pathlib.Path(_build + "/gametest/gametestserver/gametestworld")
 if not (source / "level.dat").is_file():
     raise SystemExit("GameTest world was not saved; cannot start GUI review")
 target = root / "saves/Review"

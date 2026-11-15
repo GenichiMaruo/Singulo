@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 root = Path('build/v011-review')
-source = Path('build/gametest/world')
+source = Path('build/gametest/gametestserver/gametestworld')
 if not (source / 'level.dat').is_file():
     raise SystemExit('Run GameTests first to create a disposable world')
 root.mkdir(parents=True, exist_ok=True)

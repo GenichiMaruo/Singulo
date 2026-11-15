@@ -154,11 +154,11 @@ public final class BalanceGameTests {
     /** 設定が既定値のままなら、データパックのレシピをそのまま使う（JSONと同じもの）。 */
     @GameTest(template = EMPTY)
     public static void defaultSettingsKeepDatapackRecipes(GameTestHelper helper) {
-        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getServer().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getServer().getRecipeManager().recipeMap().byType(SinguloRecipes.MACHINE.get())) {
             String path = h.id().identifier().getPath();
             if (path.equals("degenerate_compactor/reactor_shell") || path.equals("degenerate_compactor/degenerate_matter_shell")
                     || path.equals("casimir_cavity/exotic_matter")) {
-                helper.assertTrue(RecipeTweaks.adjust(h.id(), h.value()) == h.value(), "既定の設定なのにレシピが変わった: " + path);
+                helper.assertTrue(RecipeTweaks.adjust(h.id().identifier(), h.value()) == h.value(), "既定の設定なのにレシピが変わった: " + path);
             }
             if (path.equals("degenerate_compactor/reactor_shell")) {
                 helper.assertTrue(h.value().result().getCount() == 24, "殻1個から炉殻24枚にならない");
@@ -171,9 +171,9 @@ public final class BalanceGameTests {
 
     private static MachineRecipe adjusted(GameTestHelper helper, String path) {
         RecipeTweaks.invalidate();
-        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getServer().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
-            if (h.id().equals(Singulo.id(path))) {
-                return RecipeTweaks.adjust(h.id(), h.value());
+        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getServer().getRecipeManager().recipeMap().byType(SinguloRecipes.MACHINE.get())) {
+            if (h.id().identifier().equals(Singulo.id(path))) {
+                return RecipeTweaks.adjust(h.id().identifier(), h.value());
             }
         }
         throw new IllegalStateException("レシピがない: " + path);

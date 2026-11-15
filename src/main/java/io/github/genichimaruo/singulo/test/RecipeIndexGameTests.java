@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
 import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.Singulo;
@@ -20,7 +22,7 @@ public final class RecipeIndexGameTests {
         var out = RecipeTweaks.adjustAll(raw);
         out.sort(Comparator.comparingInt((RecipeHolder<MachineRecipe> r) -> -r.value().priority())
                 .thenComparingInt(r -> -(r.value().ingredients().size() + r.value().fluidIngredients().size()
-                        + (r.value().restore().isPresent() ? 1 : 0))).thenComparing(r -> r.id().toString()));
+                        + (r.value().restore().isPresent() ? 1 : 0))).thenComparing(r -> r.id().identifier().toString()));
         return out;
     }
 
@@ -31,7 +33,7 @@ public final class RecipeIndexGameTests {
             var expected = legacy(h, type);
             h.assertTrue(actual.equals(expected), "Recipe priority, values or order changed for " + type);
             h.assertTrue(MachineBlockEntity.massRecipes(h.getLevel(), type).equals(expected.stream()
-                    .filter(r -> r.value().isMassRecipe()).sorted(Comparator.comparing(r -> r.id().toString())).toList()),
+                    .filter(r -> r.value().isMassRecipe()).sorted(Comparator.comparing(r -> r.id().identifier().toString())).toList()),
                     "Mass recipe order changed for " + type);
         }
         // Reuse is a correctness invariant; expensive timing comparisons are opt-in.

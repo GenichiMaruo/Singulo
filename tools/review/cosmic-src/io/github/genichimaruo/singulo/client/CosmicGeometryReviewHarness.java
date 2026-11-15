@@ -9,25 +9,25 @@ import net.minecraft.world.phys.Vec3;
 
 /** Checks the actual emitted, culled spool mesh; never included in the distribution. */
 final class CosmicGeometryReviewHarness {
-    static java.util.List<net.minecraft.client.renderer.ShaderInstance> shaders() throws Exception {
-        var shaders=new ArrayList<net.minecraft.client.renderer.ShaderInstance>();
-        for(var entry:java.util.List.of(new Object[]{GlowDepth.class,"shader"},new Object[]{JetForgeRenderTypes.class,"beamShader"})){
+    static java.util.List<com.mojang.blaze3d.opengl.GlProgram> shaders() throws Exception {
+        var programs=new ArrayList<com.mojang.blaze3d.opengl.GlProgram>();
+        for(var entry:java.util.List.of(new Object[]{GlowDepth.class,"DEPTH_PIPELINE"},new Object[]{JetForgeRenderTypes.class,"BEAM_PIPELINE"})) {
             var field=((Class<?>)entry[0]).getDeclaredField((String)entry[1]);field.setAccessible(true);
-            var shader=(net.minecraft.client.renderer.ShaderInstance)field.get(null);
-            if(shader==null||net.minecraft.client.Minecraft.getInstance().gameRenderer.getShader(shader.getName())!=shader)
-                throw new IllegalStateException("Shader is missing or overwritten: "+entry[1]);
-            shaders.add(shader);
+            var pipeline=(com.mojang.blaze3d.pipeline.RenderPipeline)field.get(null);
+            var compiled=com.mojang.blaze3d.systems.RenderSystem.getDevice().precompilePipeline(pipeline);
+            if(!(compiled instanceof com.mojang.blaze3d.opengl.GlRenderPipeline gl)||!gl.isValid())
+                throw new IllegalStateException("Review requires a valid OpenGL pipeline: "+entry[1]);
+            programs.add(gl.program());
         }
-        if(shaders.stream().map(net.minecraft.client.renderer.ShaderInstance::getName).distinct().count()!=2)
-            throw new IllegalStateException("Duplicate cosmic shader registry names");
-        return shaders;
+        if(programs.stream().map(com.mojang.blaze3d.opengl.GlProgram::getProgramId).distinct().count()!=2)
+            throw new IllegalStateException("Duplicate cosmic shader programs");
+        return programs;
     }
-
-    static void afterReload(java.util.List<net.minecraft.client.renderer.ShaderInstance> previous)throws Exception{
+    static void afterReload(java.util.List<com.mojang.blaze3d.opengl.GlProgram> previous)throws Exception {
         var current=shaders();
-        for(var old:previous){
-            if(current.contains(old)||org.lwjgl.opengl.GL20.glIsProgram(old.getId()))
-                throw new IllegalStateException("Cosmic shader program survived resource reload: "+old.getName());
+        for(var old:previous) {
+            if(current.contains(old)||org.lwjgl.opengl.GL20.glIsProgram(old.getProgramId()))
+                throw new IllegalStateException("Cosmic shader program survived resource reload: "+old.getDebugLabel());
         }
         Singulo.LOGGER.info("SINGULO_COSMIC_SHADER_RELOAD_COMPLETE 2 replaced and released programs");
     }

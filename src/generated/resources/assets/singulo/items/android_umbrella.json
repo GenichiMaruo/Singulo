@@ -1,12 +1,96 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "singulo:item/android_umbrella",
-    "tints": [
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
       {
-        "type": "singulo:dynamic",
-        "kind": "accessory"
+        "when": "gui",
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/android_umbrella__display_gui",
+          "tints": [
+            {
+              "type": "singulo:dynamic",
+              "kind": "accessory"
+            }
+          ]
+        }
+      },
+      {
+        "when": "ground",
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/android_umbrella__display_ground",
+          "tints": [
+            {
+              "type": "singulo:dynamic",
+              "kind": "accessory"
+            }
+          ]
+        }
+      },
+      {
+        "when": "fixed",
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/android_umbrella__display_fixed",
+          "tints": [
+            {
+              "type": "singulo:dynamic",
+              "kind": "accessory"
+            }
+          ]
+        }
+      },
+      {
+        "when": "head",
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/android_umbrella__display_head",
+          "tints": [
+            {
+              "type": "singulo:dynamic",
+              "kind": "accessory"
+            }
+          ]
+        }
+      },
+      {
+        "when": "firstperson_righthand",
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/android_umbrella__display_firstperson_righthand",
+          "tints": [
+            {
+              "type": "singulo:dynamic",
+              "kind": "accessory"
+            }
+          ]
+        }
+      },
+      {
+        "when": "firstperson_lefthand",
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/android_umbrella__display_firstperson_lefthand",
+          "tints": [
+            {
+              "type": "singulo:dynamic",
+              "kind": "accessory"
+            }
+          ]
+        }
       }
-    ]
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "singulo:item/android_umbrella",
+      "tints": [
+        {
+          "type": "singulo:dynamic",
+          "kind": "accessory"
+        }
+      ]
+    }
   }
 }

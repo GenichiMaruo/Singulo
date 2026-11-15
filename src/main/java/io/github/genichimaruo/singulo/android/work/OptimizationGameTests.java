@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.minecraft.world.entity.EntitySpawnReason;
 
 import java.util.*;
@@ -13,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 

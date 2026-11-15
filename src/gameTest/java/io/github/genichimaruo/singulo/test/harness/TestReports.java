@@ -61,8 +61,15 @@ public final class TestReports implements TestReporter {
 
     private void record(GameTestInfo test, String status) {
         lastProgress = System.nanoTime();
+        var definition = PortGameTests.definitions().stream().filter(d -> d.id().equals(test.getTestHolder().key().identifier())).findFirst();
+        // Vanilla also runs its own built-in tests. Keep delegating their reports, but
+        // this mod-specific evidence file must only contain the expected Singulo suite.
+        if (definition.isEmpty()) {
+            io.github.genichimaruo.singulo.Singulo.LOGGER.info("SINGULO_VANILLA_TEST {} {} required={}", test.getTestHolder().key().identifier(), status, test.isRequired());
+            return;
+        }
         results.add(new Result(test.getTestHolder().key().identifier().toString(),
-                PortGameTests.definitions().stream().filter(d -> d.id().equals(test.getTestHolder().key().identifier())).findFirst().orElseThrow().batch(),
+                definition.orElseThrow().batch(),
                 test.getTest().structure().toString(),
                 test.isRequired(), status, test.getRunTime(), test.getTimeoutTicks()));
     }

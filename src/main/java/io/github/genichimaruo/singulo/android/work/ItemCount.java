@@ -85,7 +85,30 @@ public final class ItemCount {
 
     /** 同じ数え方か比べるための文字（材料の中身を書いたもの）。 */
     public static String key(Ingredient alt) {
-        return Ingredient.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, alt).result().map(Object::toString).orElse("");
+        return Ingredient.CODEC.encodeStart(ingredientOps(), alt).result().map(Object::toString).orElse("");
+    }
+
+    private static com.mojang.serialization.DynamicOps<com.google.gson.JsonElement> ingredientOps() {
+        return net.minecraft.core.RegistryAccess.fromRegistryOfRegistries(net.minecraft.core.registries.BuiltInRegistries.REGISTRY)
+            .createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
+    }
+
+    /** Preserve already written 1.21 ingredient alternatives when loading a recipe card. */
+    private static com.google.gson.JsonElement legacyIngredient(com.google.gson.JsonElement value) {
+        if (value.isJsonArray()) {
+            var out = new com.google.gson.JsonArray();
+            value.getAsJsonArray().forEach(v -> out.add(legacyIngredient(v)));
+            return out;
+        }
+        if (value.isJsonObject()) {
+            var obj = value.getAsJsonObject();
+            if (obj.size() == 1 && obj.has("item")) return obj.get("item");
+            if (obj.size() == 1 && obj.has("tag")) return new com.google.gson.JsonPrimitive("#" + obj.get("tag").getAsString());
+            if (obj.has("type") && obj.get("type").getAsString().equals("neoforge:components")) {
+                var copy = obj.deepCopy(); copy.add("neoforge:ingredient_type", copy.remove("type")); return copy;
+            }
+        }
+        return value;
     }
 
     /** 一覧の中の数（なければ 0）。 */
@@ -120,7 +143,7 @@ public final class ItemCount {
             return null;
         }
         try {
-            return Ingredient.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(json)).result()
+            return Ingredient.CODEC.parse(ingredientOps(), legacyIngredient(com.google.gson.JsonParser.parseString(json))).result()
                     .orElse(null);
         } catch (RuntimeException e) {
             return null;

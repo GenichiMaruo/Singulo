@@ -11,7 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.*;
 import net.minecraft.world.phys.*;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
@@ -234,7 +234,7 @@ public final class RelocationGameTests {
         for (int x = 1; x <= 3; x++) h.setBlock(new BlockPos(x, 1, 4), SinguloBlocks.COPPER_WIRE.get());
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        java.util.function.Consumer<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> protect = event -> {
+        java.util.function.Consumer<net.neoforged.neoforge.event.level.block.BreakBlockEvent> protect = event -> {
             if (event.getPlayer() == player && (event.getPos().equals(h.absolutePos(machine))
                     || event.getPos().equals(h.absolutePos(new BlockPos(2, 1, 4))))) event.setCanceled(true);
         };

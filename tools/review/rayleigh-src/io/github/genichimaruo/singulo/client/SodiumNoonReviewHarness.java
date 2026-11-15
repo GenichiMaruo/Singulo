@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.Singulo;
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder;
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.impl.CompactChunkVertex;
-import net.caffeinemc.mods.sodium.client.render.frapi.helper.ColorHelper;
+import net.caffeinemc.mods.sodium.client.render.helper.ColorHelper;
 import org.lwjgl.system.MemoryUtil;
 
 /** Exercises the real mixed-in Sodium encoder and model-light merger, not a duplicate codec. */
@@ -13,13 +13,14 @@ public final class SodiumNoonReviewHarness {
         if (!sunlight.near(pos) || sunlight.light(pos.getX(), pos.getY(), pos.getZ()) != 0) {
             throw new AssertionError("Emissive test must be near a panel but outside its sunlight field");
         }
-        var view = (net.minecraft.world.level.BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(
+        var view = (net.minecraft.client.renderer.block.BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(
                 SodiumNoonReviewHarness.class.getClassLoader(),
-                new Class<?>[] {net.minecraft.world.level.BlockAndTintGetter.class, SodiumRayleighView.class},
+                new Class<?>[] {net.minecraft.client.renderer.block.BlockAndTintGetter.class, SodiumRayleighView.class},
                 (proxy, method, args) -> switch (method.getName()) {
                     case "singulo$sunlight" -> sunlight;
                     case "singulo$lightEpoch" -> 1L;
                     case "getShade" -> 1F;
+                    case "cardinalLighting" -> new net.minecraft.world.level.CardinalLighting(1, 1, 1, 1, 1, 1);
                     default -> throw new AssertionError("Unexpected live view access: " + method.getName());
                 });
         for (boolean selfEmissive : new boolean[] {false, true}) {

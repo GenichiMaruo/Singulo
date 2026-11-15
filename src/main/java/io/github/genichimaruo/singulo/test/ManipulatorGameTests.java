@@ -64,7 +64,7 @@ public final class ManipulatorGameTests {
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(2, 1, 1));
-            player.moveTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 0F);   // 南（+Z）を向く
+            player.snapTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 0F);   // 南（+Z）を向く
             var item = io.github.genichimaruo.singulo.registry.SinguloItems.GRAVITON_MANIPULATOR.get();
             net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(item);
             io.github.genichimaruo.singulo.item.GravityGauntletItem.energy(stack).receiveEnergy(Integer.MAX_VALUE, false);
@@ -87,7 +87,7 @@ public final class ManipulatorGameTests {
             });
             String[] after = new String[1];
             helper.runAtTickTime(41, () -> after[0] = "直後の速さ " + zombie.getDeltaMovement() + " 位置 " + zombie.position());
-            helper.runAtTickTime(50, () -> helper.assertTrue(player.getCooldowns().isOnCooldown(item), "投げたあとにクールタイムがない"));
+            helper.runAtTickTime(50, () -> helper.assertTrue(player.getCooldowns().isOnCooldown(new net.minecraft.world.item.ItemStack(item)), "投げたあとにクールタイムがない"));
             // 左クリックは押したまま。クールタイムが明けても掴み直して引き戻さない
             helper.runAtTickTime(75, () -> {
                 helper.assertTrue(zombie.getZ() > startZ[0] + 3, "離しても飛んでいかない: " + startZ[0] + " → " + zombie.getZ() + " / " + after[0]);
@@ -107,7 +107,7 @@ public final class ManipulatorGameTests {
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(7, 1, 1));
-            player.moveTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 0F);
+            player.snapTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 0F);
             var item = io.github.genichimaruo.singulo.registry.SinguloItems.GRAVITON_MANIPULATOR.get();
             net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(item);
             io.github.genichimaruo.singulo.item.GravityGauntletItem.energy(stack).receiveEnergy(Integer.MAX_VALUE, false);

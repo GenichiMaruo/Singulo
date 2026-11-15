@@ -58,7 +58,7 @@ public final class BossFairnessGameTests {
         server.getPlayerList().placeNewPlayer(connection, p, cookie);
         io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, p);
         p.setGameMode(GameType.SURVIVAL);
-        p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, 0, 0);
+        p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, java.util.Set.of(), 0, 0, true);
         helper.assertTrue(!p.isCreative() && p.isAlive(), "サバイバルの挑戦者を用意できない");
         return p;
     }
@@ -217,7 +217,7 @@ public final class BossFairnessGameTests {
             b.setParticipants(32);
             double before = b.effectiveMaxHealth();
             LastArchivist reloaded = archivist(helper);
-            reloaded.load(io.github.genichimaruo.singulo.test.harness.TestNbt.save(b));
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(reloaded,io.github.genichimaruo.singulo.test.harness.TestNbt.save(b));
             double after = reloaded.effectiveMaxHealth();
             // 体力 100,000 × 通常の強さの倍率 × 32人ぶん（1 + 4 × 31）
             helper.assertTrue(before > 100_000 * LastArchivist.NORMAL_HEALTH_FACTOR * 120 && Math.abs(after - before) / before < 1e-3,
@@ -228,7 +228,7 @@ public final class BossFairnessGameTests {
             warden.setParticipants(32);
             double wBefore = warden.effectiveMaxHealth();
             var wReloaded = SinguloEntities.HORIZON_WARDEN.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            wReloaded.load(io.github.genichimaruo.singulo.test.harness.TestNbt.save(warden));
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(wReloaded,io.github.genichimaruo.singulo.test.harness.TestNbt.save(warden));
             helper.assertTrue(Math.abs(wReloaded.effectiveMaxHealth() - wBefore) / wBefore < 1e-3,
                     "ホライズン・ウォーデンの硬さが変わる: " + wBefore + " → " + wReloaded.effectiveMaxHealth());
             warden.discard();
@@ -250,7 +250,7 @@ public final class BossFairnessGameTests {
         call(b, LastArchivist.class, "fillFloor", helper);
         helper.assertFalse(helper.getLevel().getBlockState(pos).is(Blocks.WATER), "床で埋まらない");
         LastArchivist reloaded = archivist(helper);
-        reloaded.load(io.github.genichimaruo.singulo.test.harness.TestNbt.save(b));
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(reloaded,io.github.genichimaruo.singulo.test.harness.TestNbt.save(b));
         call(reloaded, LastArchivist.class, "clearFloor", helper);
         helper.assertTrue(helper.getLevel().getBlockState(pos).is(Blocks.WATER), "元の水に戻らない: " + helper.getLevel().getBlockState(pos));
         b.discard();
@@ -319,7 +319,7 @@ public final class BossFairnessGameTests {
             for (int i = 0; i < LastArchivist.TIDE_LIFT + LastArchivist.TIDE_LOW + 3; i++) {
                 call(b, LastArchivist.class, "tickTide", helper);
             }
-            late.teleportTo(helper.getLevel(), c.x + 50, c.y, c.z, 0, 0);
+            late.teleportTo(helper.getLevel(), c.x + 50, c.y, c.z, java.util.Set.of(), 0, 0, true);
             b.discard();
             helper.assertTrue(late.getAttributeValue(Attributes.FALL_DAMAGE_MULTIPLIER) == 1, "外へ出てボスが消えても落下無効が残る");
         } finally {
@@ -343,7 +343,7 @@ public final class BossFairnessGameTests {
         old.remove("legacy_insiders");
         original.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
         LastArchivist loaded = archivist(helper);
-        loaded.load(old);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(loaded,old);
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
         try {
             call(loaded, LastArchivist.class, "holdShield", helper);     // まだ誰もいない
@@ -353,7 +353,7 @@ public final class BossFairnessGameTests {
             helper.assertTrue(bodyDistance(first, c) < 15, "ログインして戻った人が外へ追い出された: " + bodyDistance(first, c));
             // 読み込み直しても移行の途中のまま（別の人があとから戻ってくる）
             LastArchivist again = archivist(helper);
-            again.load(io.github.genichimaruo.singulo.test.harness.TestNbt.save(loaded));
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(again,io.github.genichimaruo.singulo.test.harness.TestNbt.save(loaded));
             loaded.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
             loaded = again;
             call(loaded, LastArchivist.class, "holdShield", helper);
@@ -365,7 +365,7 @@ public final class BossFairnessGameTests {
             ServerPlayer walker = survivor(helper, c.add(20, -0.9, 0));
             players.add(walker);
             walker.tickCount = LastArchivist.LOGIN_GRACE + 1;
-            walker.teleportTo(helper.getLevel(), c.x + 14.5, c.y - 0.9, c.z + 1, 0, 0);
+            walker.teleportTo(helper.getLevel(), c.x + 14.5, c.y - 0.9, c.z + 1, java.util.Set.of(), 0, 0, true);
             call(loaded, LastArchivist.class, "holdShield", helper);
             helper.assertTrue(bodyDistance(walker, c) > 15, "外から来た人が中へ入れた: " + bodyDistance(walker, c));
         } finally {

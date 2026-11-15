@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.minecraft.world.entity.EntitySpawnReason;
 
 import io.github.genichimaruo.singulo.Singulo;
@@ -26,8 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** ドローン輸送: 梱包・電力・射程・取り消し・受け渡し・見えない飛行・壊したときの保全・メモリの入手。 */
 @GameTestHolder("singulo")
@@ -38,7 +38,7 @@ public final class DroneGameTests {
     private static final BlockPos STATION = new BlockPos(1, 1, 1), FROM = new BlockPos(1, 1, 7), TO = new BlockPos(7, 1, 7);
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     /** テストごとの持ち主（並んで動くほかのテストのポートやステーションと網が混ざらないように）。 */
@@ -166,7 +166,7 @@ public final class DroneGameTests {
                 if (f != null && f.stage == DroneNetwork.DELIVER) {
                     // 真下の床までの高さ（テストの場所は防壁の天井で囲まれるので、高さマップは使えない）
                     BlockPos.MutableBlockPos below = d.blockPosition().mutable();
-                    while (below.getY() > h.getLevel().getMinBuildHeight()
+                    while (below.getY() > h.getLevel().getMinY()
                             && h.getLevel().getBlockState(below).getCollisionShape(h.getLevel(), below).isEmpty()) {
                         below.move(0, -1, 0);
                     }
@@ -311,13 +311,13 @@ public final class DroneGameTests {
     public static void guardDroneRemembersItsDockAfterReload(GameTestHelper h) {
         BlockPos dock = h.absolutePos(new BlockPos(3, 1, 3));
         SecurityDrone drone = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
-        drone.restrictTo(dock, GuardDockBlockEntity.HOME_RADIUS);
+        drone.setHomeTo(dock, GuardDockBlockEntity.HOME_RADIUS);
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         io.github.genichimaruo.singulo.test.harness.TestNbt.save(drone, tag);
         SecurityDrone loaded = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         io.github.genichimaruo.singulo.test.harness.TestNbt.load(loaded, tag);
-        h.assertTrue(loaded.hasRestriction() && loaded.getRestrictCenter().equals(dock)
-                && loaded.getRestrictRadius() == GuardDockBlockEntity.HOME_RADIUS, "Dock forgotten after reload");
+        h.assertTrue(loaded.hasHome() && loaded.getHomePosition().equals(dock)
+                && loaded.getHomeRadius() == GuardDockBlockEntity.HOME_RADIUS, "Dock forgotten after reload");
         h.succeed();
     }
 
@@ -384,11 +384,11 @@ public final class DroneGameTests {
     public static void unpackingInCreativeKeepsOverflow(GameTestHelper h) {
         var player = TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-        for (int i = 0; i < player.getInventory().items.size(); i++) {
-            player.getInventory().items.set(i, new ItemStack(Items.COBBLESTONE, 64));
+        for (int i = 0; i < player.getInventory().getNonEquipmentItems().size(); i++) {
+            player.getInventory().getNonEquipmentItems().set(i, new ItemStack(Items.COBBLESTONE, 64));
         }
         ItemStack packed = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.DIAMOND, 5)));
-        player.getInventory().items.set(player.getInventory().selected, packed);
+        player.getInventory().getNonEquipmentItems().set(player.getInventory().getSelectedSlot(), packed);
         packed.getItem().use(h.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND);
         ItemStack crate = player.getMainHandItem();
         int left = DroneCrateItem.contents(crate).stream().filter(s -> s.is(Items.DIAMOND)).mapToInt(ItemStack::getCount).sum();

@@ -27,8 +27,9 @@ public final class DistantHorizonsReviewHarness {
                 GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
                 for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) {
                     int at = (y * 16 + x) * 4, actual = 0;
-                    for (int b = 0; b < 4; b++) actual |= (pixels.get(at + b) & 255) << (8 * b);
-                    if (actual != source.getPixelRGBA(x, y)) throw new AssertionError("DH natural light differs at " + x + "," + y);
+                    actual = ((pixels.get(at + 3) & 255) << 24) | ((pixels.get(at) & 255) << 16)
+                            | ((pixels.get(at + 1) & 255) << 8) | (pixels.get(at + 2) & 255);
+                    if (actual != source.getPixel(x, y)) throw new AssertionError("DH natural light differs at " + x + "," + y);
                 }
             }
         } finally { GL11.glBindTexture(GL11.GL_TEXTURE_2D, binding); MemoryUtil.memFree(pixels); }

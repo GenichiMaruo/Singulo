@@ -122,7 +122,7 @@ public final class GenesisGameTests {
         net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
         done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
         done.putLong("galaxy", 12345L);
-        core.loadCustomOnly(done, registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(core,done, registries);
         // 画面の枠で作る物を決める
         var menu = new io.github.genichimaruo.singulo.genesis.GenesisCoreMenu(0, player.getInventory(), helper.absolutePos(CORE),
                 core.outputContainer(), core.templateContainer());
@@ -167,7 +167,7 @@ public final class GenesisGameTests {
             tag.putInt("stage", GenesisCoreBlockEntity.KINDLING);
             tag.putBoolean("formed", true);
             tag.putBoolean("feeding", true);
-            core.loadCustomOnly(tag, helper.getLevel().registryAccess());
+            io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(core,tag, helper.getLevel().registryAccess());
             helper.assertTrue(core.energy().receiveLong(1, false) == 1, "大きな受電の設定で受電できない");
         } finally {
             io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.set(old);
@@ -182,7 +182,7 @@ public final class GenesisGameTests {
         GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
         net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
         done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
-        core.loadCustomOnly(done, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(core,done, helper.getLevel().registryAccess());
         ItemStack fancy = new ItemStack(Items.DIAMOND);
         fancy.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("宝"));
         helper.assertTrue(core.chooseTemplate(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), fancy), "ダイヤモンドを登録できない");
@@ -202,16 +202,16 @@ public final class GenesisGameTests {
         GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
         ItemStack sample = new ItemStack(Items.TRIDENT);
         sample.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("古い見本"));
-        sample.enchant(registries.registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.LOYALTY), 3);
+        sample.enchant(registries.lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.LOYALTY), 3);
         sample.set(net.minecraft.core.component.DataComponents.DAMAGE, 17);
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
         tag.putBoolean("formed", true);
         tag.putBoolean("feeding", true);
-        tag.put("template", sample.save(registries));
+        tag.put("template", io.github.genichimaruo.singulo.compat.NbtCompat.save(sample,registries));
         tag.putDouble("synth", MassSynthesis.cost(MassSynthesis.INSTANCE.entry(sample)));
-        core.loadCustomOnly(tag, registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(core,tag, registries);
         helper.assertTrue(core.template().is(Items.TRIDENT) && ItemStack.isSameItemSameComponents(core.template(), new ItemStack(Items.TRIDENT)),
                 "読み込んだ見本が素の形にならない");
         try {
@@ -280,9 +280,9 @@ public final class GenesisGameTests {
         record Step(java.util.List<net.minecraft.world.item.crafting.Ingredient> inputs, java.util.List<Integer> counts, ItemStack result,
                     String id) {}
         java.util.List<Step> steps = new java.util.ArrayList<>();
-        for (var holder : level.getRecipeManager().getRecipes()) {
+        for (var holder : level.getServer().getRecipeManager().getRecipes()) {
             var recipe = holder.value();
-            ItemStack result = recipe.getResultItem(registries);
+            ItemStack result = io.github.genichimaruo.singulo.test.harness.TestRecipe.result(recipe,level);
             if (result.isEmpty()) {
                 continue;
             }
@@ -297,7 +297,7 @@ public final class GenesisGameTests {
                     counts.add(in.count());
                 }
             } else {
-                for (var in : recipe.getIngredients()) {
+                for (var in : recipe.placementInfo().ingredients()) {
                     if (!in.isEmpty()) {
                         inputs.add(in);
                         counts.add(1);
@@ -305,7 +305,7 @@ public final class GenesisGameTests {
                 }
             }
             if (!inputs.isEmpty()) {
-                steps.add(new Step(inputs, counts, result, holder.id().toString()));
+                steps.add(new Step(inputs, counts, result, holder.id().identifier().toString()));
             }
         }
         // いちばん安い作り方を、変わらなくなるまでたどる（加工を何段重ねても）
@@ -315,7 +315,7 @@ public final class GenesisGameTests {
                 double total = 0;
                 for (int i = 0; i < s.inputs().size() && total < Double.MAX_VALUE; i++) {
                     double best = Double.MAX_VALUE;
-                    for (ItemStack option : s.inputs().get(i).getItems()) {
+                    for (ItemStack option : s.inputs().get(i).items().map(holder -> new ItemStack(holder)).toList()) {
                         best = Math.min(best, cost.getOrDefault(option.getItem(), Double.MAX_VALUE));
                     }
                     total = best == Double.MAX_VALUE ? Double.MAX_VALUE : total + best * s.counts().get(i);

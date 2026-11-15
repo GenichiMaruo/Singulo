@@ -1,12 +1,9 @@
 {
-  "loader": "neoforge:separate_transforms",
-  "base": {
-    "parent": "minecraft:item/generated",
-    "textures": {
-      "layer0": "singulo:item/survey_glasses"
-    }
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "singulo:item/survey_glasses"
   },
-  "perspectives": {
+  "singulo_display_models": {
     "head": {
       "parent": "singulo:item/survey_glasses_worn_down2"
     }

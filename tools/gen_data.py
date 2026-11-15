@@ -50,6 +50,10 @@ def ingredient_26(value):
     if isinstance(value, list):
         return [ingredient_26(v) for v in value]
     if isinstance(value, dict):
+        if value.get('type') == 'neoforge:components':
+            out = dict(value)
+            out['neoforge:ingredient_type'] = out.pop('type')
+            return out
         if set(value) == {'item'}:
             return value['item']
         if set(value) == {'tag'}:
@@ -827,6 +831,7 @@ UI_LANG = {
     'key.singulo.toggle_area': ('重力操作の範囲を切り替え', 'Toggle gravity tool area'),
     'key.singulo.handbook_lookup': ('ハンドブックで調べる', 'Look up in Handbook'),
     'key.categories.singulo': ('Singulo', 'Singulo'),
+    'key.category.singulo.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.dark_matter': ('ダークマター: %s mB', 'Dark matter: %s mB'),
     'gui.singulo.containment.status': ('ダークマター %s / %s mB', 'Dark matter %s / %s mB'),
     'gui.singulo.containment.leaking': ('ダークマター %s / %s mB　漏れている', 'Dark matter %s / %s mB · leaking'),

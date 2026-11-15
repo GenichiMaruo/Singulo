@@ -1939,10 +1939,13 @@ public abstract class RuinAndroid extends Monster {
     }
 
     /** 工場で印刷された個体は何も落とさない。 */
+    public java.util.Optional<net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable>> effectiveLootTable() {
+        return facilitySpawned ? java.util.Optional.of(FACILITY_LOOT) : getLootTable();
+    }
     @Override
     protected void dropFromLootTable(ServerLevel lootLevel, DamageSource source, boolean recentlyHit) {
         if (!factoryMade) {
-            if (facilitySpawned) super.dropFromLootTable(lootLevel, source, recentlyHit, FACILITY_LOOT);
+            if (facilitySpawned) super.dropFromLootTable(lootLevel, source, recentlyHit, effectiveLootTable().orElseThrow());
             else super.dropFromLootTable(lootLevel, source, recentlyHit);
         }
     }

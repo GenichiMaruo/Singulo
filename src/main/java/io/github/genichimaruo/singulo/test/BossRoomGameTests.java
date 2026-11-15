@@ -232,7 +232,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
-        s.kill();
+        s.kill((net.minecraft.server.level.ServerLevel)s.level());
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("sentinel_core")) == 2, "番人の投影核を2つ落とさない: " + dropped(helper, item("sentinel_core")));
@@ -291,7 +291,7 @@ public final class BossRoomGameTests {
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         helper.assertTrue(r != null, "封鎖培養施設の部屋で重力の澱が現れない");
         r.skipEmerging();
-        r.kill();
+        r.kill((net.minecraft.server.level.ServerLevel)r.level());
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 3, "縮退核を3つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
@@ -371,7 +371,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
-        s.kill();
+        s.kill((net.minecraft.server.level.ServerLevel)s.level());
         helper.runAtTickTime(EchoSentinel.DEATH_TICKS / 2, () -> {
             helper.assertFalse(s.isRemoved(), "演出の途中で消えた");
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒したのに保管庫が開かない");
@@ -388,7 +388,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         r.skipEmerging();
-        r.kill();
+        r.kill((net.minecraft.server.level.ServerLevel)r.level());
         helper.runAtTickTime(GravityRemnant.DEATH_TICKS / 2, () -> helper.assertFalse(r.isRemoved(), "演出の途中で消えた"));
         helper.runAtTickTime(GravityRemnant.DEATH_TICKS + 10, () -> {
             helper.assertTrue(r.isRemoved(), "演出が終わっても消えない");
@@ -476,7 +476,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
         boss.skipEmerging();
-        boss.kill();
+        boss.kill((net.minecraft.server.level.ServerLevel)boss.level());
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("overclock_chip")) == 1, "オーバークロック・チップが出ない");
@@ -568,7 +568,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
         l.skipEmerging();
-        l.kill();
+        l.kill((net.minecraft.server.level.ServerLevel)l.level());
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
             helper.assertTrue(dropped(helper, item("ergosphere_chapter")) == 1, "渦の断章を落とさない");
@@ -640,7 +640,7 @@ public final class BossRoomGameTests {
         RuinBoss boss = core.awaken(helper.getLevel());
         boss.skipEmerging();
         boss.setParticipants(2);
-        boss.kill();
+        boss.kill((net.minecraft.server.level.ServerLevel)boss.level());
         helper.runAtTickTime(5, () -> {
             int n = dropped(helper, item("sentinel_core"));
             helper.assertTrue(n == 2 * io.github.genichimaruo.singulo.ruin.BossScaling.lootRolls(2), "2人ぶんの番人の投影核が出ない: " + n);

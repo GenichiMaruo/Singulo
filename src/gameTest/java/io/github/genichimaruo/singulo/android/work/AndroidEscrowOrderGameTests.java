@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.minecraft.world.entity.EntitySpawnReason;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidEscrows;
@@ -19,14 +21,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class AndroidEscrowOrderGameTests {
     private static final BlockPos CONSOLE=new BlockPos(0,1,0), SUPPLY=new BlockPos(1,1,0), CHEST=new BlockPos(1,1,1),
             DELIVERY=new BlockPos(3,1,0), RACK=new BlockPos(4,1,0), TABLE=new BlockPos(4,1,3);
-    private static Item item(String name) { return BuiltInRegistries.ITEM.get(Identifier.fromNamespaceAndPath("singulo",name)); }
+    private static Item item(String name) { return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("singulo",name)); }
     private static ItemStack recipeCard(GameTestHelper h,List<ItemStack> grid,ItemStack output) {
         var card=new ItemStack(item("recipe_card")); new RecipeData(grid,output).write(card,h.getLevel().registryAccess()); return card;
     }
@@ -67,7 +67,7 @@ public final class AndroidEscrowOrderGameTests {
         var c=workshop(h,32); c.setOwner(TestScope.player(h).getUUID());
         var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
-        a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
+        a.snapTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
         a.setNoAi(!moving); h.getLevel().addFreshEntity(a); return c;
     }
     private static AndroidEscrows.Submission offer(GameTestHelper h,WorkConsoleBlockEntity c,UUID id,int logs) {
@@ -115,7 +115,7 @@ public final class AndroidEscrowOrderGameTests {
     public static void twoEqualOutputsHaveSeparateWorkersAndCustody(GameTestHelper h) {
         var c=setup(h,false); var extra=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         extra.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
-        extra.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,3)))); extra.setNoAi(true); h.getLevel().addFreshEntity(extra);
+        extra.snapTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,3)))); extra.setNoAi(true); h.getLevel().addFreshEntity(extra);
         var one=UUID.randomUUID();var two=UUID.randomUUID();var a=offer(h,c,one,1);var b=offer(h,c,two,2);
         h.assertTrue(a.acceptedNow() && b.acceptedNow(),"Second independent order rejected");
         h.assertTrue(!worker(h,c,a.receipt().orderId()).getUUID().equals(worker(h,c,b.receipt().orderId()).getUUID()),"Orders shared worker");
@@ -152,7 +152,7 @@ public final class AndroidEscrowOrderGameTests {
         var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");
         var a=worker(h,c,accepted.receipt().orderId());var identity=c.escrowConsoleIdentity();
         var consoleTag=c.saveWithoutMetadata(h.getLevel().registryAccess());var workTag=a.saveWorkState();
-        c.loadWithComponents(consoleTag,h.getLevel().registryAccess());a.restoreWorkState(workTag);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, consoleTag,h.getLevel().registryAccess());a.restoreWorkState(workTag);
         h.assertTrue(identity.equals(c.escrowConsoleIdentity()) && id.equals(a.escrowRequest()) && c.owner().equals(a.escrowOwner()),"Escrow binding lost");
         h.assertTrue(!offer(h,c,id,1).acceptedNow() && c.orders().size()==1,"Restore allowed duplicate transfer"); h.succeed();
     }
@@ -306,7 +306,7 @@ public final class AndroidEscrowOrderGameTests {
         var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");
         var a=worker(h,c,accepted.receipt().orderId());
         var work=a.saveWorkState(); var tag=io.github.genichimaruo.singulo.test.harness.TestNbt.save(a, new net.minecraft.nbt.CompoundTag());
-        h.assertTrue(id.equals(tag.getUUID("escrow_request")) && c.owner().equals(tag.getUUID("escrow_owner")),"Independent entity binding absent");
+        h.assertTrue(id.equals(tag.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow()) && c.owner().equals(tag.read("escrow_owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow()),"Independent entity binding absent");
         h.assertTrue(h.getLevel().dimension().identifier().toString().equals(tag.getStringOr("escrow_dimension", ""))
                 && tag.getStringOr("escrow_dimension", "").equals(work.getStringOr("escrow_dimension", "")),"Original dimension not saved in both formats");
         var restored=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED); io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, tag);
@@ -352,7 +352,7 @@ public final class AndroidEscrowOrderGameTests {
         var salvage=saved.getListOrEmpty("recovery_salvage_v1");long recovered=0,recoveredWater=0,recoveredLava=0;
         for(var raw:salvage) {
             var entry=(net.minecraft.nbt.CompoundTag)raw;
-            if(!entry.hasUUID("request") || !id.equals(entry.getUUID("request"))) continue;
+            if(!entry.read("request", net.minecraft.core.UUIDUtil.CODEC).isPresent() || !id.equals(entry.read("request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow())) continue;
             h.assertTrue(!entry.contains("owner"),"Forensic recovery invented owner");
             for(var stackTag:entry.getListOrEmpty("actual_cargo")) {
                 var stack=io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag);
@@ -375,14 +375,14 @@ public final class AndroidEscrowOrderGameTests {
         a.inventory().setItem(RuinAndroid.SLOT_TANK,new ItemStack(item("android_tank_upgrade")));
         var water=new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,1200);
         h.assertTrue(a.fillTanks(water,false)==1200,"Fluid fixture failed");
-        var work=a.saveWorkState();var wrongOwner=UUID.randomUUID();work.putUUID("escrow_owner",wrongOwner);a.restoreWorkState(work);
+        var work=a.saveWorkState();var wrongOwner=UUID.randomUUID();work.store("escrow_owner", net.minecraft.core.UUIDUtil.CODEC,wrongOwner);a.restoreWorkState(work);
         h.assertTrue(wrongOwner.equals(a.escrowOwner()),"Mismatched owner fixture failed");
         h.assertTrue(a.recoverEscrowCargo() && a.tanksEmpty() && a.escrowRequest()==null,"Mismatched recovery left accessible fluid");
         h.assertTrue(a.recoverEscrowCargo(),"Repeated recovery failed");
         var saved=AndroidEscrowData.get(h.getLevel()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());long recovered=0;int records=0;
         for(var raw:saved.getListOrEmpty("recovery_salvage_v1")){
-            var entry=(net.minecraft.nbt.CompoundTag)raw;if(!id.equals(entry.getUUID("request")))continue;records++;
-            h.assertTrue(wrongOwner.equals(entry.getUUID("owner")),"Forensic owner rewritten");
+            var entry=(net.minecraft.nbt.CompoundTag)raw;if(!id.equals(entry.read("request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow()))continue;records++;
+            h.assertTrue(wrongOwner.equals(entry.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow()),"Forensic owner rewritten");
             for(var stackTag:entry.getListOrEmpty("actual_cargo"))
                 recovered+=FluidSamples.fluid(io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag)).getAmount();
         }
@@ -410,7 +410,7 @@ public final class AndroidEscrowOrderGameTests {
         var original=setup(h,false);var owner=original.owner();var id=UUID.randomUUID();
         var saved=original.saveWithoutMetadata(h.getLevel().registryAccess());
         var failing=new FailingEscrowConsole(original.getBlockPos(),original.getBlockState());
-        failing.loadWithComponents(saved,h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(failing, saved,h.getLevel().registryAccess());
         h.getLevel().setBlockEntity(failing);
         failing.armedRequest=id;
         var offered=new ItemStack(Items.OAK_LOG);

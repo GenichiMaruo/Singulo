@@ -15,7 +15,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 @io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate(false)
 public final class CableCapacityGameTests {
     private static IEnergyStorage port(GameTestHelper h, BlockPos pos) {
-        var cap=h.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,h.absolutePos(pos),Direction.NORTH);
+        var cap=io.github.genichimaruo.singulo.test.harness.TestEnergy.find(h.getLevel(),h.absolutePos(pos),Direction.NORTH);
         h.assertTrue(cap!=null,"Cable energy port missing");
         return cap;
     }
@@ -134,7 +134,7 @@ public final class CableCapacityGameTests {
         h.startSequence().thenWaitUntil(()->h.assertTrue(tower.structureSize()==7,"Cooling tower not formed"))
                 .thenExecute(()->{
                     tower.energy().setEnergy(0);
-                    var cap=h.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,cable,Direction.WEST);
+                    var cap=io.github.genichimaruo.singulo.test.harness.TestEnergy.find(h.getLevel(),cable,Direction.WEST);
                     h.assertTrue(cap!=null,"Tower supply cable missing");
                     int expected=tower.energy().receiveEnergy(20_000,true);
                     h.assertTrue(expected>2_000,"Tower must accept more than copper capacity for this regression");

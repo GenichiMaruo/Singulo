@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.minecraft.world.entity.EntitySpawnReason;
 
 import java.util.ArrayList;
@@ -11,8 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** Large-order arithmetic and bounded server work, independent of renderer/tick timing. */
 @GameTestHolder("singulo_scaling")
@@ -275,7 +275,7 @@ public final class ScalingGameTests {
                 worker.assignWork(console.getBlockPos(), 1);
                 WorkJob job = console.requestJob(worker);
                 h.assertTrue(job.type() == WorkJob.Type.CRAFT && !job.batch().isEmpty(), "Worker received no available task: index=" + occupied.size() + " type=" + job.type() + " slots=" + worker.carryCapacity() + " orders=" + console.orders().size());
-                for (var batch : job.batch()) h.assertTrue(occupied.add(batch.identifier()), "Two workers leased the same machine");
+                for (var batch : job.batch()) h.assertTrue(occupied.add(batch.location()), "Two workers leased the same machine");
             }
             io.github.genichimaruo.singulo.Singulo.LOGGER.info("Scaling check: 100 scheduling workers, 300 bulk orders: {} ms",
                     (System.nanoTime() - start) / 1_000_000.0);

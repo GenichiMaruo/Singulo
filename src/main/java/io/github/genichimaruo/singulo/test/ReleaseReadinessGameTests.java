@@ -37,7 +37,7 @@ public final class ReleaseReadinessGameTests {
         var android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         android.setNoAi(true);
         android.setNoGravity(true);
-        android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 2, 2))));
+        android.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 2, 2))));
         android.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 2)), RuinAndroid.MODE_GUARD, 0);
         helper.getLevel().addFreshEntity(android);
         return android;
@@ -88,7 +88,7 @@ public final class ReleaseReadinessGameTests {
         tidy.setAccessible(true);
         tidy.invoke(life, helper.getLevel());
         helper.assertTrue(drop.isRemoved(), "片付けで拾う前提が成立していない");
-        android.kill();
+        android.kill((net.minecraft.server.level.ServerLevel)android.level());
         helper.runAtTickTime(30, () -> {
             int count = helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(android.blockPosition()).inflate(3),
                     e -> e.getItem().is(Items.DIAMOND)).stream().mapToInt(e -> e.getItem().getCount()).sum();

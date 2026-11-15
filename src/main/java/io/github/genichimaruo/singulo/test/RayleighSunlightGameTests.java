@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DaylightDetectorBlock;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 
 @GameTestHolder("singulo_rayleigh")
 @PrefixGameTestTemplate(false)
@@ -34,7 +34,7 @@ public final class RayleighSunlightGameTests {
         // must finish chunk initialization. Both worker notifications must return anyway.
         synchronized (rebuilding) {
             var block = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.changed(h.getLevel(), h.absolutePos(SAMPLE)));
-            var chunk = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.chunkChanged(h.getLevel(), new net.minecraft.world.level.ChunkPos(h.absolutePos(SAMPLE))));
+            var chunk = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.chunkChanged(h.getLevel(), net.minecraft.world.level.ChunkPos.containing(h.absolutePos(SAMPLE))));
             java.util.concurrent.CompletableFuture.allOf(block, chunk).get(2, java.util.concurrent.TimeUnit.SECONDS);
         }
         h.assertTrue(sunlight(h, SAMPLE) == 15, "Worker notification broke rebuilt sunlight");
@@ -144,25 +144,25 @@ public final class RayleighSunlightGameTests {
         room(h, 6);
         var level = h.getLevel();
         long time = level.getDefaultClockTime();
-        boolean rain = level.getLevelData().isRaining(), thunder = level.getLevelData().isThundering();
+        boolean rain = level.getServer().getWeatherData().isRaining(), thunder = level.getServer().getWeatherData().isThundering();
         float rainStrength = level.getRainLevel(1), thunderStrength = level.getThunderLevel(1);
         var zombie = EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         try {
-            level.setDayTime(18000); level.getLevelData().setRaining(true); ((net.minecraft.world.level.storage.ServerLevelData) level.getLevelData()).setThundering(true);
+            level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 18000); level.getServer().getWeatherData().setRaining(true); level.getServer().getWeatherData().setThundering(true);
             level.setRainLevel(1); level.setThunderLevel(1); level.updateSkyBrightness();
             var p = h.absolutePos(SAMPLE);
-            zombie.moveTo(p.getX() + .5, p.getY(), p.getZ() + .5, 0, 0);
+            zombie.snapTo(p.getX() + .5, p.getY(), p.getZ() + .5, 0, 0);
             var method = Mob.class.getDeclaredMethod("isSunBurnTick"); method.setAccessible(true);
             boolean exposed = false;
             for (int i = 0; i < 4096 && !exposed; i++) exposed = (boolean) method.invoke(zombie);
             h.assertTrue(exposed, "Undead do not recognize artificial noon during a rainy night");
             h.assertFalse(level.isRainingAt(p), "Artificial sun is treated as rain exposure");
-            zombie.moveTo(p.getX() + 2.5, p.getY(), p.getZ() + .5, 0, 0); // Solid wall, no source light.
+            zombie.snapTo(p.getX() + 2.5, p.getY(), p.getZ() + .5, 0, 0); // Solid wall, no source light.
             h.assertFalse((boolean) method.invoke(zombie), "Night outside the lit area is treated as day");
-            h.assertTrue(level.getDefaultClockTime() == 18000 && !level.isDay() && level.isRaining() && level.isThundering(), "Local noon changes global time/weather");
+            h.assertTrue(level.getDefaultClockTime() == 18000 && !level.isBrightOutside() && level.isRaining() && level.isThundering(), "Local noon changes global time/weather");
         } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
         finally {
-            zombie.discard(); level.setDayTime(time); level.getLevelData().setRaining(rain); ((net.minecraft.world.level.storage.ServerLevelData) level.getLevelData()).setThundering(thunder);
+            zombie.discard(); level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), time); level.getServer().getWeatherData().setRaining(rain); level.getServer().getWeatherData().setThundering(thunder);
             level.setRainLevel(rainStrength); level.setThunderLevel(thunderStrength); level.updateSkyBrightness();
         }
         h.succeed();

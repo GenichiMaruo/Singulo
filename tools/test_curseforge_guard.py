@@ -67,7 +67,8 @@ class GuardTests(unittest.TestCase):
 
     def test_protocol_not_deployed_or_changed_is_not_ready(self):
         root = Path(guard.__file__).resolve().parent.parent
-        self.assertTrue(guard.workflow_ready(root))
+        # The 26.1.2 branch deliberately has no authorized publisher protocol yet.
+        self.assertFalse(guard.workflow_ready(root))
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp)
             (dest / 'tools').mkdir()
@@ -76,7 +77,7 @@ class GuardTests(unittest.TestCase):
             helper = dest / 'tools/curseforge_guard.py'
             helper.write_bytes(Path(guard.__file__).read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n'))
             workflow = dest / '.github/workflows/publish-curseforge.yml'
-            (dest / 'gradle.properties').write_bytes((root / 'gradle.properties').read_bytes())
+            (dest / 'gradle.properties').write_text('minecraft_version=1.21.1\n')
             workflow.write_bytes((root / '.github/workflows/publish-curseforge.yml').read_bytes())
             self.assertTrue(guard.workflow_ready(dest))
             workflow.write_text(workflow.read_text().replace('      - name: Acquire permanent', '      - if: false\n        name: Acquire permanent'))

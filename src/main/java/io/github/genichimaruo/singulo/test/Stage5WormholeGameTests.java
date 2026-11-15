@@ -81,7 +81,7 @@ public final class Stage5WormholeGameTests {
         WormholeGeneratorBlockEntity gen = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,GENERATOR);
         helper.succeedWhen(() -> {
             helper.assertTrue(gen.formed(), "ポートを置くと形成されない");
-            var energy = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, portPos, null);
+            var energy = io.github.genichimaruo.singulo.test.harness.TestEnergy.find(helper.getLevel(), portPos, null);
             helper.assertTrue(energy != null && energy.receiveEnergy(1000, true) > 0, "ポートから電力が入らない");
             var items = io.github.genichimaruo.singulo.compat.ItemResourceView.find(helper.getLevel(), portPos, null);
             helper.assertTrue(items != null, "ポートから口を取り出せない");
@@ -139,7 +139,7 @@ public final class Stage5WormholeGameTests {
         helper.runAtTickTime(5, () -> {
             BlockPos a = helper.absolutePos(portA);
             IItemHandler items = io.github.genichimaruo.singulo.compat.ItemResourceView.find(helper.getLevel(), a, null);
-            IEnergyStorage energy = helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, a, null);
+            IEnergyStorage energy = io.github.genichimaruo.singulo.test.harness.TestEnergy.find(helper.getLevel(), a, null);
             IFluidHandler fluids = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), a, null);
             helper.assertTrue(items != null && energy != null && fluids != null, "ポートが能力を持たない");
             // 向こうのチェスト（27）と、アンカーの触媒スロット・失活触媒の出口（2）が並んで見える
@@ -328,7 +328,7 @@ public final class Stage5WormholeGameTests {
         try {
             player.getAbilities().instabuild = false;
             BlockPos at = helper.absolutePos(new BlockPos(1, 1, 4));
-            player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, -90, 0);   // +X を向く
+            player.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, -90, 0);   // +X を向く
             Zombie front1 = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 1, 4));
             Zombie front2 = helper.spawn(EntityType.ZOMBIE, new BlockPos(6, 1, 5));
             Zombie behind = helper.spawn(EntityType.ZOMBIE, new BlockPos(0, 1, 1));

@@ -52,6 +52,18 @@ import net.minecraft.world.phys.Vec3;
 public class SealedContainerBlockEntity extends BaseContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
     private static final int[] NO_SLOTS = new int[0];
 
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        // BaseContainerBlockEntity would always drop its inventory. A sealed box
+        // intentionally destroys it instead, while an open box drops exactly once.
+        if (level != null && state.getBlock() instanceof io.github.genichimaruo.singulo.compat.RemovalAwareBlock aware) {
+            aware.beforeEntityRemoval(state, level, pos, level.getBlockState(pos), false);
+        } else {
+            super.preRemoveSideEffects(pos, state);
+        }
+    }
+
+
     /** ホッパーなどからは、どの面からも出し入れできない（開けて手で取り出す）。 */
     @Override
     public int[] getSlotsForFace(net.minecraft.core.Direction side) {

@@ -59,17 +59,25 @@ public final class PortGameTests {
         return List.copyOf(out);
     }
     @SubscribeEvent public static void functions(RegisterEvent event) {
+        event.register(Registries.TEST_ENVIRONMENT_DEFINITION_TYPE, helper -> helper.register(
+            Identifier.fromNamespaceAndPath("singulo", "legacy_batch"), LegacyBatchEnvironment.CODEC));
         event.register(Registries.TEST_FUNCTION, helper -> {
             for (var test : definitions()) helper.register(test.id(), (Consumer<GameTestHelper>) context -> {
                 try { test.method().invoke(null, context); }
-                catch (ReflectiveOperationException e) { throw new RuntimeException("GameTest failed: " + test.id(), e.getCause() == null ? e : e.getCause()); }
+                catch (ReflectiveOperationException e) {
+                    Throwable cause = e.getCause() == null ? e : e.getCause();
+                    if (cause instanceof RuntimeException runtime) throw runtime;
+                    if (cause instanceof AssertionError assertion) throw new RuntimeException(assertion.getMessage(), assertion);
+                    if (cause instanceof Error error) throw error;
+                    throw new RuntimeException("GameTest failed: " + test.id() + ": " + cause.getMessage(), cause);
+                }
             });
         });
     }
     @SubscribeEvent public static void tests(RegisterGameTestsEvent event) {
         var environments = new HashMap<Identifier, net.minecraft.core.Holder<net.minecraft.gametest.framework.TestEnvironmentDefinition<?>>>();
         for (var test : definitions()) {
-            var environment = environments.computeIfAbsent(test.environment(), event::registerEnvironment);
+            var environment = environments.computeIfAbsent(test.environment(), id -> event.registerEnvironment(id, new LegacyBatchEnvironment(id.toString())));
             event.registerTest(test.id(), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, test.id()),
                 new TestData<>(environment, test.template(), test.timeout(), 0, true)));
         }

@@ -84,7 +84,7 @@ public final class ControlGameTests {
     /** 材料なしのレシピ（電力だけで作るもの）を見分けられる。 */
     @GameTest(template = EMPTY)
     public static void freeRecipesAreRecognized(GameTestHelper helper) {
-        var recipes = helper.getLevel().getServer().getRecipeManager().getAllRecipesFor(
+        var recipes = helper.getLevel().getServer().getRecipeManager().recipeMap().byType(
                 io.github.genichimaruo.singulo.registry.SinguloRecipes.MACHINE.get());
         boolean any = recipes.stream().anyMatch(h -> MachineBlockEntity.isFree(h.value())
                 && h.value().station().equals(MachineType.CRYOGENIC_COOLING_TOWER.id()));

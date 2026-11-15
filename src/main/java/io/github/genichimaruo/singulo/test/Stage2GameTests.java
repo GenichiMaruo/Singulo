@@ -312,14 +312,14 @@ public final class Stage2GameTests {
         old.setStackInSlot(6, new ItemStack(item("monopole_upgrade")));
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(old, registries));
-        reactor.loadCustomOnly(tag, registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(reactor,tag, registries);
         helper.assertTrue(reactor.items().getStackInSlot(0).getCount() == 3, "入力が残らない");
         helper.assertTrue(reactor.items().getStackInSlot(5).is(item("muon_catalyst")), "出力が1つめの出口に残らない");
         helper.assertTrue(reactor.items().getStackInSlot(6).isEmpty(), "2つめの出口に別の物が入る: " + reactor.items().getStackInSlot(6));
         helper.assertTrue(reactor.items().getStackInSlot(MachineType.CATALYTIC_REACTOR.upgradeSlot()).is(item("monopole_upgrade")),
                 "単極子アップグレードが新しいスロットへ移らない");
         // 保存し直したデータは、新しい並びのまま読める
-        reactor.loadCustomOnly(reactor.saveCustomOnly(registries), registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(reactor,reactor.saveCustomOnly(registries), registries);
         helper.assertTrue(reactor.items().getStackInSlot(MachineType.CATALYTIC_REACTOR.upgradeSlot()).is(item("monopole_upgrade")),
                 "保存し直すと単極子アップグレードがずれる");
         helper.succeed();
@@ -429,13 +429,13 @@ public final class Stage2GameTests {
         net.minecraft.nbt.CompoundTag old = new net.minecraft.nbt.CompoundTag();
         old.putInt("energy", 0);
         old.put("tank", new net.minecraft.nbt.CompoundTag());
-        turbine.loadCustomOnly(old, registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(turbine,old, registries);
         helper.assertTrue(turbine.legacyNotice(), "前の版のタービンが知らせない");
-        turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(turbine,turbine.saveCustomOnly(registries), registries);
         helper.assertTrue(turbine.legacyNotice(), "保存し直すと知らせを忘れる");
         turbine.noticeIfLegacy(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper));
         helper.assertTrue(!turbine.legacyNotice(), "画面を開いても知らせが残る");
-        turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(turbine,turbine.saveCustomOnly(registries), registries);
         helper.assertTrue(!turbine.legacyNotice(), "知らせたあと保存し直すと、また知らせる");
         helper.succeed();
     }

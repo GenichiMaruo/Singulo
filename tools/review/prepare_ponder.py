@@ -2,7 +2,7 @@
 from pathlib import Path
 import shutil
 
-source = Path('build/gametest/world/level.dat')
+source = Path('build/gametest/gametestserver/gametestworld/level.dat')
 if not source.is_file():
     raise SystemExit('Run GameTests before preparing the preview world')
 root = Path('build/ponder-review')

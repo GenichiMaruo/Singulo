@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
-@Mixin(targets = "net.caffeinemc.mods.sodium.client.render.frapi.helper.ColorHelper", remap = false)
+@Mixin(targets = "net.caffeinemc.mods.sodium.client.render.helper.ColorHelper", remap = false)
 public abstract class SodiumRayleighColorMixin {
     @Inject(method = "maxBrightness", at = @At("HEAD"), cancellable = true)
     private static void singulo$independentSky(int a, int b, CallbackInfoReturnable<Integer> ci) {

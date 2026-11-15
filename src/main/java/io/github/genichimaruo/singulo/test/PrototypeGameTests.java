@@ -70,7 +70,7 @@ public final class PrototypeGameTests {
     public static void axeShockwaveRunsStraight(GameTestHelper helper) {
         AxeAndroid axe = SinguloEntities.AXE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         axe.setNoAi(true);
-        axe.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
+        axe.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
         helper.getLevel().addFreshEntity(axe);
         Zombie ahead = dummy(helper, new BlockPos(7, 1, 6));
         Zombie aside = dummy(helper, new BlockPos(11, 1, 6));
@@ -95,7 +95,7 @@ public final class PrototypeGameTests {
     public static void bitBeamNeedsLineOfSight(GameTestHelper helper) {
         BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bit.setNoAi(true);
-        bit.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
+        bit.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
         helper.getLevel().addFreshEntity(bit);
         Zombie target = dummy(helper, new BlockPos(7, 1, 11));
         helper.runAtTickTime(5, () -> {
@@ -124,7 +124,7 @@ public final class PrototypeGameTests {
         BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bit.setNoAi(true);
         bit.setNoGravity(true);
-        bit.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 3))));
+        bit.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 3))));
         bit.makeGuard(java.util.UUID.randomUUID(), helper.absolutePos(new BlockPos(7, 1, 3)), 0, 0);
         helper.getLevel().addFreshEntity(bit);
         bit.setDeployed(BitAndroid.BITS_OUT);
@@ -180,7 +180,7 @@ public final class PrototypeGameTests {
     public static void bitSlashProtectsAlliesAndTracksSeparately(GameTestHelper helper) {
         BitAndroid bit = bit(helper);
         BitAndroid ally = bit(helper);
-        ally.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 7))));
+        ally.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 7))));
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         target.setNoGravity(true);
         helper.runAtTickTime(5, () -> {

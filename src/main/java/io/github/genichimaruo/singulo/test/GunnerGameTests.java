@@ -42,7 +42,7 @@ public final class GunnerGameTests {
     private static GunnerAndroid gunner(GameTestHelper helper, BlockPos at) {
         GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         g.setNoAi(true);
-        g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(at)), 0, 0);
+        g.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(at)), 0, 0);
         g.yBodyRot = 0;
         helper.getLevel().addFreshEntity(g);
         return g;
@@ -76,7 +76,7 @@ public final class GunnerGameTests {
         int kills = 40, withMemory = 0;
         for (int i = 0; i < kills; i++) {
             var foundry = SinguloEntities.FOUNDRY_OVERSEER.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            foundry.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 7))));
+            foundry.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 7))));
             foundry.setNoAi(true);
             foundry.makeAwakened();
             helper.getLevel().addFreshEntity(foundry);
@@ -169,7 +169,7 @@ public final class GunnerGameTests {
         }
         GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         g.makeGuard(java.util.UUID.randomUUID(), helper.absolutePos(new BlockPos(7, 0, 1)), 0, 0);
-        g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))), 0, 0);
+        g.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))), 0, 0);
         helper.getLevel().addFreshEntity(g);
         Zombie target = dummy(helper, new BlockPos(7, 1, 11));
         java.util.Set<Integer> seen = new java.util.HashSet<>();

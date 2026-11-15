@@ -29,8 +29,9 @@ public final class RayleighGameTests {
         // 屋根と壁で囲んで日を遮る（パネル以外は不透明。中に空の光が入らない）
         for (int x = 0; x <= 5; x++) {
             for (int z = 0; z <= 5; z++) {
-                for (int y = 1; y <= 5; y++) {
-                    if (y == 5 || x == 0 || x == 5 || z == 0 || z == 5) {
+                // Seal the floor too: neighboring test panels can diffuse light beneath an open fixture.
+                for (int y = 0; y <= 5; y++) {
+                    if (y == 0 || y == 5 || x == 0 || x == 5 || z == 0 || z == 5) {
                         helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
                     }
                 }
@@ -54,6 +55,8 @@ public final class RayleighGameTests {
         });
         helper.runAtTickTime(120, () -> {
             helper.assertFalse(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "電力が切れても点いたまま");
+            helper.assertTrue(io.github.genichimaruo.singulo.ruin.lab.RayleighSky.light(helper.getLevel(), helper.absolutePos(sensor)) == 0,
+                    "Artificial sunlight remains inside the sealed room after power removal");
             int expected = vanillaSignal(helper, sensor);
             helper.assertTrue(helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == expected,
                     "消えたあと、ふつうの日照センサーの値に戻らない: " + helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER)
@@ -65,8 +68,8 @@ public final class RayleighGameTests {
     /** バニラの日照センサー（反転なし）が、その場所で出す値（DaylightDetectorBlock.updateSignalStrength と同じ式）。 */
     private static int vanillaSignal(GameTestHelper helper, BlockPos pos) {
         var level = helper.getLevel();
-        int i = level.getBrightness(net.minecraft.world.level.LightLayer.SKY, helper.absolutePos(pos)) - level.getSkyDarken();
-        float f = level.getSunAngle(1.0F);
+        int i = level.getEffectiveSkyBrightness(helper.absolutePos(pos));
+        float f = level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SUN_ANGLE, helper.absolutePos(pos)) * ((float)Math.PI / 180.0F);
         if (i > 0) {
             float f1 = f < (float) Math.PI ? 0.0F : (float) (Math.PI * 2);
             f += (f1 - f) * 0.2F;
@@ -81,7 +84,7 @@ public final class RayleighGameTests {
         BlockPos pos = new BlockPos(2, 3, 2);
         helper.setBlock(pos, SinguloBlocks.LAB_RAYLEIGH_PANEL.get());
         BlockPos abs = helper.absolutePos(pos);
-        helper.assertTrue(helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, abs, null) == null,
+        helper.assertTrue(io.github.genichimaruo.singulo.test.harness.TestEnergy.find(helper.getLevel(), abs, null) == null,
                 "研究所のパネルが FE を受ける");
         LabPower.restore(helper.getLevel(), new BoundingBox(abs.getX() - 1, abs.getY() - 1, abs.getZ() - 1, abs.getX() + 1, abs.getY() + 1, abs.getZ() + 1));
         helper.assertTrue(helper.getBlockState(pos).getValue(RayleighPanelBlock.LIT), "研究所の電力で点かない");

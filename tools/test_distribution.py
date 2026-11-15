@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import zipfile
-import check_release_1211 as release
+import check_release_2612 as release
 from check_gametests import DEFAULT_NAMESPACES, inventory
 
 
@@ -23,17 +23,17 @@ class DistributionTests(unittest.TestCase):
         (self.root / 'gametest/logs').mkdir(parents=True)
         (self.root / 'reports/gametest').mkdir(parents=True)
         (self.root / 'libs').mkdir()
-        (self.root / 'gametest/logs/latest.log').write_text(f'All {release.COUNTS["neoforge"]} required tests passed :)\n')
+        (self.root / 'gametest/logs/latest.log').write_text(f'All {release.COUNTS["neoforge"] + 1} required tests passed :)\nSINGULO_VANILLA_TEST minecraft:always_pass passed required=false\n')
         names = sorted(e['name'] for e in self.source_entries if e['namespace'] in DEFAULT_NAMESPACES)
         self.report = {'schema': 1, 'complete': True, 'elapsedMillis': 123, 'expected': names, 'results': [
             {'name': n, 'status': 'passed', 'required': True, 'millis': 0} for n in names]}
         self.write_report()
-        self.name = 'Singulo-0.0.0-1.21.1N.jar'
+        self.name = 'Singulo-0.0.0-26.1.2N.jar'
         self.entries = {
             'META-INF/neoforge.mods.toml': b'[[mods]]\nmodId="singulo"\nversion="0.0.0"\n'
-                b'[[dependencies.singulo]]\nmodId="neoforge"\nversionRange="[21.1,)"\n'
-                b'[[dependencies.singulo]]\nmodId="minecraft"\nversionRange="[1.21.1]"\n',
-            'example/Main.class': b'\xca\xfe\xba\xbe' + struct.pack('>HH', 0, 65)}
+                b'[[dependencies.singulo]]\nmodId="neoforge"\ntype="required"\nversionRange="[21.1,)"\n'
+                b'[[dependencies.singulo]]\nmodId="minecraft"\ntype="required"\nversionRange="[26.1.2]"\n',
+            'example/Main.class': b'\xca\xfe\xba\xbe' + struct.pack('>HH', 0, 69)}
 
     def write_report(self):
         (self.root / 'reports/gametest/results.json').write_text(json.dumps(self.report))
@@ -44,7 +44,7 @@ class DistributionTests(unittest.TestCase):
         with redirect_stdout(io.StringIO()), patch('check_gametests.inventory', return_value=self.source_entries):
             release.validate(self.root, 'neoforge', self.name)
 
-    def test_valid_java21_distribution(self): self.check()
+    def test_valid_java25_distribution(self): self.check()
 
     def test_test_or_review_code_never_ships(self):
         for name in ['example/FooGameTests.class', 'example/FooGameTests$1.class',
@@ -55,8 +55,8 @@ class DistributionTests(unittest.TestCase):
                 del self.entries[name]
 
     def test_newer_java_is_rejected(self):
-        self.entries['example/Main.class'] = b'\xca\xfe\xba\xbe' + struct.pack('>HH', 0, 66)
-        with self.assertRaisesRegex(RuntimeError, 'newer than Java 21'): self.check()
+        self.entries['example/Main.class'] = b'\xca\xfe\xba\xbe' + struct.pack('>HH', 0, 70)
+        with self.assertRaisesRegex(RuntimeError, 'newer than Java 25'): self.check()
 
     def test_success_count_cannot_replace_a_missing_result(self):
         self.report['results'].pop(); self.write_report()
@@ -78,7 +78,7 @@ class DistributionTests(unittest.TestCase):
         names = []
         for index, namespace in enumerate(DEFAULT_NAMESPACES):
             name = f'oldcase{index}'
-            names.append(name)
+            names.append(f'{namespace}:old{index}gametests.{name}')
             (directory / f'Old{index}GameTests.java').write_text(
                 f'@GameTestHolder("{namespace}")\n@PrefixGameTestTemplate(false)\n'
                 f'class Old{index}GameTests {{ @GameTest(template="empty")\n'
@@ -86,11 +86,11 @@ class DistributionTests(unittest.TestCase):
         (source / 'gradle.properties').write_text('mod_name=Singulo\nmod_version=0.0.0\n')
         # The tag may contain Python scripts; validation must not execute them.
         (source / 'tools').mkdir()
-        (source / 'tools/check_release_1211.py').write_text('raise AssertionError("untrusted tag code executed")')
+        (source / 'tools/check_release_2612.py').write_text('raise AssertionError("untrusted tag code executed")')
         self.report.update(expected=names, results=[
             {'name': n, 'status': 'passed', 'required': True, 'millis': 0} for n in names])
         self.write_report()
-        (self.root / 'gametest/logs/latest.log').write_text(f'All {len(names)} required tests passed :)\n')
+        (self.root / 'gametest/logs/latest.log').write_text(f'All {len(names) + 1} required tests passed :)\nSINGULO_VANILLA_TEST minecraft:always_pass passed required=false\n')
         with zipfile.ZipFile(self.root / 'libs' / self.name, 'w') as jar:
             for name, value in self.entries.items(): jar.writestr(name, value)
         return source

@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.minecraft.world.entity.EntitySpawnReason;
 
 import io.github.genichimaruo.singulo.Singulo;
@@ -28,8 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** アンドロイド（充電・護衛・組立ステーション・転送アップグレード・アンドロイド用のガラス）の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -50,7 +50,7 @@ public final class AndroidGameTests {
         BlockPos floor = new BlockPos(2, 1, 2);
         helper.setBlock(floor, net.minecraft.world.level.block.Blocks.STONE);
         ItemStack cup = new ItemStack(item("android_teacup"));
-        cup.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x3366CC, true));
+        cup.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x3366CC));
         var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, cup);
         BlockPos abs = helper.absolutePos(floor);
@@ -206,7 +206,7 @@ public final class AndroidGameTests {
             RuinAndroid first = current.get(0);
             transferred[0] = true;
             first.inventory().setItem(RuinAndroid.SLOT_REPAIR, new ItemStack(item("android_repair_kit"), 5));
-            first.kill();
+            first.kill((net.minecraft.server.level.ServerLevel) first.level());
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(STATION)).inflate(8), e -> e.getItem().is(item("android_repair_kit"))).isEmpty(),
                     "転送アップグレードがあるのに持ち物が落ちた");
@@ -235,7 +235,7 @@ public final class AndroidGameTests {
         ListTag ids = new ListTag();
         ids.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(a.getUUID()));
         tag.put("androids", ids);
-        f.loadWithComponents(tag, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(f, tag, helper.getLevel().registryAccess());
         return f;
     }
 
@@ -243,7 +243,7 @@ public final class AndroidGameTests {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.setNoAi(true);
         a.setHome(helper.absolutePos(fabricator));
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 5))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 5))));
         helper.getLevel().addFreshEntity(a);
         return a;
     }
@@ -274,7 +274,7 @@ public final class AndroidGameTests {
         BladeAndroid a = ruinAndroid(helper, at);
         AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
         f.setMemoryChanceForTest(1);
-        a.kill();
+        a.kill((net.minecraft.server.level.ServerLevel) a.level());
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
             helper.assertTrue(memories(helper, at) == 1, "設計メモリが1つ出ない: " + memories(helper, at));
@@ -293,7 +293,7 @@ public final class AndroidGameTests {
         BladeAndroid a = ruinAndroid(helper, at);
         AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
         f.setMemoryChanceForTest(0);
-        a.kill();
+        a.kill((net.minecraft.server.level.ServerLevel) a.level());
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
             helper.assertTrue(memories(helper, at) == 0, "出ない回なのに設計メモリが出た: " + memories(helper, at));
@@ -305,21 +305,21 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY)
     public static void guardAttacksSpareBossesAndNeutrals(GameTestHelper helper) {
         var level = helper.getLevel();
-        BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
-        BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level), EntityType.COW.create(level),
-                EntityType.VILLAGER.create(level), player);
+        List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED), EntityType.COW.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED),
+                EntityType.VILLAGER.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED), player);
         for (LivingEntity e : spared) {
             helper.assertFalse(RuinAndroid.canHit(true, guard, e), "護衛の技が当たる: " + e.getType());
             helper.assertFalse(RuinAndroid.canHit(true, null, e), "出した護衛がいない技が当たる: " + e.getType());
         }
-        var zombie = EntityType.ZOMBIE.create(level);
+        var zombie = EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         helper.assertTrue(RuinAndroid.canHit(true, guard, zombie), "護衛の技が敵対モブに当たらない");
-        helper.assertTrue(RuinAndroid.canHit(false, ruin, EntityType.VILLAGER.create(level)), "遺構の技が村人に当たらない");
-        helper.assertFalse(RuinAndroid.canHit(false, ruin, SinguloEntities.WHIP_ANDROID.get().create(level)), "遺構の技が遺構の仲間に当たる");
+        helper.assertTrue(RuinAndroid.canHit(false, ruin, EntityType.VILLAGER.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED)), "遺構の技が村人に当たらない");
+        helper.assertFalse(RuinAndroid.canHit(false, ruin, SinguloEntities.WHIP_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED)), "遺構の技が遺構の仲間に当たる");
         helper.succeed();
     }
 
@@ -329,16 +329,16 @@ public final class AndroidGameTests {
         var level = helper.getLevel();
         helper.setBlock(new BlockPos(3, 1, 3), net.minecraft.world.level.block.Blocks.STONE);
         Vec3 at = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 2, 3)));
-        BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         guard.setNoAi(true);
-        guard.moveTo(at.add(3, 0, 0));
+        guard.snapTo(at.add(3, 0, 0));
         level.addFreshEntity(guard);
-        var villager = EntityType.VILLAGER.create(level);
-        var zombie = EntityType.ZOMBIE.create(level);
+        var villager = EntityType.VILLAGER.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+        var zombie = EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         for (var e : List.<net.minecraft.world.entity.Mob>of(villager, zombie)) {
             e.setNoAi(true);
-            e.moveTo(at);
+            e.snapTo(at);
             level.addFreshEntity(e);
         }
         AndroidLaser.spawn(level, guard, at);
@@ -360,7 +360,7 @@ public final class AndroidGameTests {
         station(helper, 1);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid old = androids(helper).get(0);
-            old.moveTo(old.position().add(3, 0, 0));
+            old.snapTo(old.position().add(3, 0, 0));
             helper.setBlock(STATION, net.minecraft.world.level.block.Blocks.AIR);
             AndroidStationBlockEntity s = station(helper, 0);
             helper.runAfterDelay(45, () -> {
@@ -406,7 +406,7 @@ public final class AndroidGameTests {
             helper.assertFalse(RuinAndroid.canHit(true, a, friend), "登録した人に護衛の技が当たる");
             helper.assertFalse(a.isAlliedTo(stranger), "許可証に載っていない人が味方のまま");
             helper.assertTrue(a.isAlliedTo(friend), "登録した人が味方でない");
-            stranger.moveTo(a.position().add(2, 0, 0));
+            stranger.snapTo(a.position().add(2, 0, 0));
             helper.assertTrue(a.guardTargetsForTest(stranger), "ステーションの近くにいる、許可証に載っていない人を狙わない");
             float before = a.getHealth();
             a.invulnerableTime = 0;
@@ -448,10 +448,10 @@ public final class AndroidGameTests {
             helper.assertTrue(a.mayOperate(friend) && !a.mayOperate(stranger), "アンドロイドの画面を開ける人が許可証と合わない");
             // 索敵の AI のタイミングによらないよう、狙いを直接付けて、毎 tick の見直しで外されるかを見る
             a.setNoAi(true);
-            owner.moveTo(a.position());
+            owner.snapTo(a.position());
             var zombie = EntityType.ZOMBIE.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
             zombie.setNoAi(true);
-            zombie.moveTo(a.position().add(3, 0, 0));
+            zombie.snapTo(a.position().add(3, 0, 0));
             helper.getLevel().addFreshEntity(zombie);
             a.setTarget(zombie);
             helper.runAfterDelay(3, () -> {
@@ -481,8 +481,8 @@ public final class AndroidGameTests {
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, permit);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid a = androids(helper).get(0);
-            owner.moveTo(a.position());
-            friend.moveTo(a.position());
+            owner.snapTo(a.position());
+            friend.snapTo(a.position());
             var friendMenu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, friend.getInventory(), a);
             var ownerMenu = new io.github.genichimaruo.singulo.android.AndroidMenu(2, owner.getInventory(), a);
             helper.assertTrue(friendMenu.stillValid(friend), "登録した人が画面を使えない");
@@ -624,7 +624,7 @@ public final class AndroidGameTests {
     public static void tankTakesBuckets(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
@@ -646,7 +646,7 @@ public final class AndroidGameTests {
      * 迎撃モードは暮らしをしないので、巡回路のない巡回モード（ステーションのそばで待つ）で確かめる。 */
     @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 2400)
     public static void idleGuardSitsOnStairs(GameTestHelper helper) {
-        helper.getLevel().setDayTime(1000);
+        helper.getLevel().getServer().clockManager().setTotalTicks(helper.getLevel().dimensionType().defaultClock().orElseThrow(), 1000);
         floor(helper);
         station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos stair = new BlockPos(5, 1, 2);
@@ -676,7 +676,7 @@ public final class AndroidGameTests {
     /** 拠点の暮らし: しばらく落ちたままの物を拾って、そばのチェストへしまう。 */
     @GameTest(template = EMPTY, batch = "android_life_tidy", timeoutTicks = 1200)
     public static void idleGuardTidiesIntoChest(GameTestHelper helper) {
-        helper.getLevel().setDayTime(1000);
+        helper.getLevel().getServer().clockManager().setTotalTicks(helper.getLevel().dimensionType().defaultClock().orElseThrow(), 1000);
         floor(helper);
         station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos chest = new BlockPos(6, 1, 6);
@@ -708,7 +708,7 @@ public final class AndroidGameTests {
     /** 迎撃モード: 手の空いた護衛は暮らし（座るなど）をせず、1体はステーションの上、もう1体はすぐ横で待つ。 */
     @GameTest(template = EMPTY, batch = "android_guard_dock", timeoutTicks = 1200)
     public static void interceptGuardsWaitOnStation(GameTestHelper helper) {
-        helper.getLevel().setDayTime(1000);
+        helper.getLevel().getServer().clockManager().setTotalTicks(helper.getLevel().dimensionType().defaultClock().orElseThrow(), 1000);
         floor(helper);
         // ステーションが2体印刷する（ステーションが受け持たない護衛は、はぐれになって持ち場を持たない）
         AndroidStationBlockEntity station = station(helper, 2);
@@ -766,7 +766,7 @@ public final class AndroidGameTests {
             for (int i = 0; i < 5; i++) {
                 // Sunlight must not kill the victim before the guard can earn a kill log.
                 var zombie = EntityType.HUSK.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
-                zombie.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 6))));
+                zombie.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 6))));
                 zombie.setNoAi(true);
                 zombie.setPersistenceRequired();
                 helper.getLevel().addFreshEntity(zombie);
@@ -818,7 +818,7 @@ public final class AndroidGameTests {
     public static void backpackTiersSetCapacity(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         String[] tiers = {"android_backpack_upgrade", "android_reinforced_backpack_upgrade", "android_large_backpack_upgrade"};
         int[] slots = {12, 18, 24};
@@ -964,7 +964,7 @@ public final class AndroidGameTests {
                 "取り出しだけの登録の優先度が合わない");
         var tag = port.saveWithoutMetadata(helper.getLevel().registryAccess());
         port.entries().setItem(0, ItemStack.EMPTY);
-        port.loadWithComponents(tag, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(port, tag, helper.getLevel().registryAccess());
         helper.assertTrue(port.priority(new ItemStack(planks), true) == 9, "優先の登録が保存されない");
         net.minecraft.world.level.block.entity.ChestBlockEntity near = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CHEST);
         near.setItem(1, new ItemStack(planks, 4));
@@ -1086,7 +1086,7 @@ public final class AndroidGameTests {
         chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 32));
         var g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-        g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        g.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
         var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
@@ -1133,7 +1133,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(3, recipeCard(helper, fence, new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 3)));
         var g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-        g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        g.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
         var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
@@ -1334,7 +1334,7 @@ public final class AndroidGameTests {
         CompoundTag tag = wb.saveWithoutMetadata(helper.getLevel().registryAccess());
         var copy = new io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity(helper.absolutePos(TABLE),
                 helper.getBlockState(TABLE));
-        copy.loadWithComponents(tag, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(copy, tag, helper.getLevel().registryAccess());
         helper.assertTrue(copy.buffer().getStackInSlot(0).getCount() == 10, "保存すると預かり箱の物が消える");
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         wb.openMenu(player);
@@ -1447,7 +1447,7 @@ public final class AndroidGameTests {
             CompoundTag saved = io.github.genichimaruo.singulo.test.harness.TestNbt.save(a, new CompoundTag());
             saved.putInt("charge", a.maxCharge() / 2);                     // 半分（充電切れではない）
             io.github.genichimaruo.singulo.test.harness.TestNbt.load(a, saved);
-            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(6, 1, 6))));
+            a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(6, 1, 6))));
         });
         helper.succeedWhen(() -> {
             List<RuinAndroid> list = androids(helper);
@@ -1489,7 +1489,7 @@ public final class AndroidGameTests {
     public static void androidSortsCarriedItems(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.setNoAi(true);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         var inv = a.inventory();
         inv.setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 10));
@@ -1514,11 +1514,11 @@ public final class AndroidGameTests {
     public static void androidStashesIntoNearbyChest(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(new BlockPos(1, 1, 1)), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 30, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 30, 2))));
         helper.getLevel().addFreshEntity(a);
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 12));
         helper.assertTrue(a.requestStash() != null, "近くに箱がないのに、預けに行くことになった");
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.setBlock(new BlockPos(5, 1, 2), net.minecraft.world.level.block.Blocks.CHEST);
         helper.assertTrue(a.requestStash() == null, "近くのチェストへ預けに行かない");
         helper.succeedWhen(() -> {
@@ -1535,7 +1535,7 @@ public final class AndroidGameTests {
         var console = workshop(helper, 2);
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
@@ -1571,7 +1571,7 @@ public final class AndroidGameTests {
         for (int i = 0; i < 3; i++) {
             BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
             a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 2))));
+            a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 2))));
             helper.getLevel().addFreshEntity(a);
             crew.add(a);
         }
@@ -1614,7 +1614,7 @@ public final class AndroidGameTests {
         BladeAndroid capable = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         for (BladeAndroid a : List.of(small, capable)) {
             a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(a == small ? new BlockPos(1, 1, 0) : new BlockPos(6, 1, 6))));
+            a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(a == small ? new BlockPos(1, 1, 0) : new BlockPos(6, 1, 6))));
             helper.getLevel().addFreshEntity(a);
         }
         capable.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
@@ -1657,7 +1657,7 @@ public final class AndroidGameTests {
     private static BladeAndroid worker(GameTestHelper helper, boolean miner) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         if (miner) {
             a.inventory().setItem(RuinAndroid.SLOT_MINING, new ItemStack(item("android_mining_upgrade")));
         }
@@ -1969,6 +1969,12 @@ public final class AndroidGameTests {
         sticks.set(3, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
         String planks = io.github.genichimaruo.singulo.android.work.ItemCount.key(
                 net.minecraft.world.item.crafting.Ingredient.of(helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ITEM).getOrThrow(net.minecraft.tags.ItemTags.PLANKS)));
+        var roundTrip = io.github.genichimaruo.singulo.android.work.ItemCount.parse(planks);
+        helper.assertTrue(roundTrip != null && roundTrip.test(new ItemStack(net.minecraft.world.item.Items.BIRCH_PLANKS)),
+                "Serialized alternatives must retain tag membership");
+        var legacy = io.github.genichimaruo.singulo.android.work.ItemCount.parse("{\"tag\":\"minecraft:planks\"}");
+        helper.assertTrue(legacy != null && legacy.test(new ItemStack(net.minecraft.world.item.Items.BIRCH_PLANKS)),
+                "Old recipe-card alternative tags must remain readable");
         java.util.List<String> alts = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ""));
         alts.set(0, planks);
         alts.set(3, planks);
@@ -2112,7 +2118,7 @@ public final class AndroidGameTests {
                 .thenWaitUntil(() -> helper.assertTrue(a.tickCount >= 5 && a.active(), "個体のAIが動き始めるのを待つ"))
                 .thenExecute(() -> {
                     var zombie = EntityType.ZOMBIE.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
-                    zombie.moveTo(a.position().add(1.5, 0, 0));
+                    zombie.snapTo(a.position().add(1.5, 0, 0));
                     zombie.setNoAi(true);
                     zombie.setPersistenceRequired();       // プレイヤーから遠いと消える（遠くで動くほかのテストのプレイヤーが一番近いとき）
                     zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
@@ -2222,7 +2228,7 @@ public final class AndroidGameTests {
     public static void androidShearsSheep(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var sheep = EntityType.SHEEP.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
-        sheep.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 6))));
+        sheep.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 6))));
         sheep.setNoAi(true);
         helper.getLevel().addFreshEntity(sheep);
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
@@ -2269,14 +2275,14 @@ public final class AndroidGameTests {
                 ItemStack stack = new ItemStack(item(id));
                 helper.assertTrue(stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc && acc.part() == part,
                         id + " の着ける所が違う");
-                helper.assertTrue(stack.is(net.minecraft.tags.ItemTags.DYEABLE), id + " が染められない");
+                helper.assertTrue(stack.is(net.minecraft.tags.ItemTags.CAULDRON_CAN_REMOVE_DYE) || stack.is(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.withDefaultNamespace("dyeable"))), id + " が染められない");
                 for (int other = 0; other < wear.length; other++) {
                     helper.assertTrue(menu.getSlot(RuinAndroid.SLOT_DECOR + other).mayPlace(stack) == (other == part),
                             id + " が枠 " + other + " に入るかどうかが違う");
                 }
             }
             ItemStack worn = new ItemStack(item(wear[part][0]));
-            worn.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x123450 + part, true));
+            worn.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x123450 + part));
             a.inventory().setItem(RuinAndroid.SLOT_DECOR + part, worn);
         }
         for (int part = 0; part < wear.length; part++) {
@@ -2335,7 +2341,7 @@ public final class AndroidGameTests {
         console.outbox().setItem(0, new ItemStack(planks, 63));
         helper.assertFalse(console.deliver(a, job), "1個だけで納品完了になった");
         CompoundTag controller = console.saveWithFullMetadata(helper.getLevel().registryAccess());
-        console.loadWithComponents(controller, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(console, controller, helper.getLevel().registryAccess());
         helper.assertTrue(console.orders().getFirst().deliverInProgress == 2, "再読込で未納品数を失った");
         console.outbox().setItem(0, new ItemStack(planks, 63));
         helper.assertFalse(console.deliver(a, job), "2個だけで納品完了になった");
@@ -2538,7 +2544,7 @@ public final class AndroidGameTests {
                 .thenExecute(() -> {
                     CompoundTag saved = io.github.genichimaruo.singulo.test.harness.TestNbt.save(a, new CompoundTag());
                     CompoundTag controller = console.saveWithFullMetadata(helper.getLevel().registryAccess());
-                    console.loadWithComponents(controller, helper.getLevel().registryAccess());
+                    io.github.genichimaruo.singulo.test.harness.TestNbt.load(console, controller, helper.getLevel().registryAccess());
                     io.github.genichimaruo.singulo.test.harness.TestNbt.load(a, saved);
                 })
                 .thenWaitUntil(() -> {
@@ -2553,7 +2559,7 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY)
     public static void transferredWorkKeepsPersonalSlotsAndFluids(GameTestHelper helper) {
         var level = helper.getLevel();
-        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.EMERALD));
         a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
         a.assignWork(helper.absolutePos(CONSOLE), 1);
@@ -2561,7 +2567,7 @@ public final class AndroidGameTests {
         var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000);
         a.fillTanks(water, false);
         CompoundTag work = a.saveWorkState();
-        BladeAndroid b = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid b = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         for (int i = 0; i < RuinAndroid.INVENTORY_SIZE; i++) {
             b.inventory().setItem(i, a.inventory().getItem(i).copy());
         }
@@ -2624,7 +2630,7 @@ public final class AndroidGameTests {
         var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var stranger = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
-        friend.moveTo(Vec3.atCenterOf(helper.absolutePos(SUPPLY)));
+        friend.snapTo(Vec3.atCenterOf(helper.absolutePos(SUPPLY)));
         console.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -2654,7 +2660,7 @@ public final class AndroidGameTests {
         helper.assertTrue(port.name().isEmpty(), "権限を外された後も納品口の名前を変えられる");
         CompoundTag linkedSave = rack.saveWithFullMetadata(level.registryAccess());
         helper.setBlock(CONSOLE, net.minecraft.world.level.block.Blocks.AIR);
-        rack.loadWithComponents(linkedSave, level.registryAccess()); // 棚が未読込の間に指令台が壊された場合
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(rack, linkedSave, level.registryAccess()); // 棚が未読込の間に指令台が壊された場合
         helper.assertTrue(rack.mayOperate(stranger) && rack.console() == null, "壊れた指令台へのリンクで締め出された");
         helper.succeed();
     }
@@ -2681,8 +2687,8 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY)
     public static void workOutputSurvivesFullCargo(GameTestHelper helper) throws Exception {
         var level = helper.getLevel();
-        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
-        a.moveTo(Vec3.atCenterOf(helper.absolutePos(STATION)));
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+        a.snapTo(Vec3.atCenterOf(helper.absolutePos(STATION)));
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.EMERALD));
         a.assignWork(helper.absolutePos(CONSOLE), 1);
         var target = new ItemStack(net.minecraft.world.item.Items.DIAMOND);
@@ -2732,7 +2738,7 @@ public final class AndroidGameTests {
     public static void stashSkipsFullStorage(GameTestHelper helper) throws Exception {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(Items.STICK, 12));
         BlockPos full = new BlockPos(3, 1, 2), empty = new BlockPos(6, 1, 2);
         helper.setBlock(full, net.minecraft.world.level.block.Blocks.CHEST);
@@ -2774,7 +2780,7 @@ public final class AndroidGameTests {
     public static void androidStashesViaSupplyPort(GameTestHelper helper) throws Exception {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(4, 1, 2))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(4, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(Items.STICK, 12));
         BlockPos port = new BlockPos(5, 1, 2), box = new BlockPos(6, 1, 2);
@@ -2807,8 +2813,8 @@ public final class AndroidGameTests {
                 new Move(SinguloEntities.WHIP_ANDROID.get(), io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM, io.github.genichimaruo.singulo.android.WhipAndroid.WAVE_RANGE),
                 new Move(SinguloEntities.SABER_ANDROID.get(), io.github.genichimaruo.singulo.android.SaberAndroid.STATE_THRUST, io.github.genichimaruo.singulo.android.SaberAndroid.THRUST_REACH),
                 new Move(SinguloEntities.AXE_ANDROID.get(), io.github.genichimaruo.singulo.android.AxeAndroid.STATE_SLAM, io.github.genichimaruo.singulo.android.AxeAndroid.SHOCKWAVE_LENGTH))) {
-            var a = m.type().create(level);
-            a.moveTo(100.5, 64, 100.5, 0, 0);
+            var a = m.type().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+            a.snapTo(100.5, 64, 100.5, 0, 0);
             var far = new net.minecraft.world.phys.Vec3(100.5 + m.reach(), 65, 100.5);
             helper.assertFalse(a.getBoundingBoxForCulling().contains(far), m.type().getDescriptionId() + ": ふだんから描画の箱が広い");
             setState.invoke(a, m.state());

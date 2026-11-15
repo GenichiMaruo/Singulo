@@ -384,8 +384,8 @@ public final class SinguloGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void spareCablesAreRecycled(GameTestHelper helper) {
         var recipes = helper.getLevel().getServer().getRecipeManager();
-        helper.assertTrue(recipes.byKey(Singulo.id("crafting/superconducting_cable_from_copper_wire")).isPresent(), "銅導線で超伝導ケーブルを作れない");
-        helper.assertTrue(recipes.byKey(Singulo.id("cryogenic_cooling_tower/topological_wire_from_superconducting_cable")).isPresent(),
+        helper.assertTrue(recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,Singulo.id("crafting/superconducting_cable_from_copper_wire"))).isPresent(), "銅導線で超伝導ケーブルを作れない");
+        helper.assertTrue(recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,Singulo.id("cryogenic_cooling_tower/topological_wire_from_superconducting_cable"))).isPresent(),
                 "超伝導ケーブルでトポロジカル導線を作れない");
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));

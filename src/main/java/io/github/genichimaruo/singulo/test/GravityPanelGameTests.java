@@ -173,7 +173,7 @@ public final class GravityPanelGameTests {
         BlockPos kilnPos = new BlockPos(1, 1, 0);
         helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.KILN).get());
         io.github.genichimaruo.singulo.machine.MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,kilnPos);
-        var cap = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+        var cap = io.github.genichimaruo.singulo.test.harness.TestEnergy.find(helper.getLevel(),
                 helper.absolutePos(gen), Direction.NORTH);
         helper.assertTrue(cap != null && cap.canExtract() && !cap.canReceive(), "ケーブル用の口が取り出し専用でない");
         helper.assertTrue(cap.receiveEnergy(1_000, false) == 0, "ケーブルから受け取ってしまう");

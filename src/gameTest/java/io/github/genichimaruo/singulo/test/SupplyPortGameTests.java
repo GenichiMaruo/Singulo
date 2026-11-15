@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
 import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.android.work.*;
@@ -6,7 +8,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.test.harness.TestScope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.*;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.*;
 import net.neoforged.neoforge.gametest.*;
 
@@ -21,7 +23,7 @@ public final class SupplyPortGameTests {
         var player = TestScope.player(h);
         var menu = new SupplyPortMenu(1, player.getInventory(), h.absolutePos(pos), port.entries(), port.entryData());
         menu.setCarried(new ItemStack(Items.IRON_INGOT, 64));
-        menu.clicked(0, 0, ClickType.PICKUP, player);
+        menu.clicked(0, 0, ContainerInput.PICKUP, player);
         h.assertTrue(port.entries().getItem(0).getCount() == 1 && menu.getCarried().getCount() == 64,
                 "Ghost registration consumed or copied a physical stack");
         h.assertFalse(menu.slots.getFirst().mayPickup(player), "Ghost sample could be picked up");

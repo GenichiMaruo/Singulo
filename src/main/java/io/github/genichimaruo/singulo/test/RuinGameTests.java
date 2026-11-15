@@ -210,7 +210,7 @@ public final class RuinGameTests {
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
         drone.setTier(3);
         helper.assertTrue(drone.getMaxHealth() == 24, "段階3のドローンはHP24");
-        drone.kill();
+        drone.kill((net.minecraft.server.level.ServerLevel)drone.level());
         helper.runAtTickTime(5, () -> {
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(POS)).inflate(4)).isEmpty(), "ドローンが何か落とした");

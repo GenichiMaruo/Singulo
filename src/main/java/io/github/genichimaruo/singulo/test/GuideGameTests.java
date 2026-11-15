@@ -59,13 +59,13 @@ public final class GuideGameTests {
         server.getPlayerList().placeNewPlayer(connection, player, cookie);
         io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, player);
         var pos = helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4));
-        player.teleportTo(helper.getLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
+        player.teleportTo(helper.getLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, java.util.Set.of(), 0, 0, true);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         return player;
     }
 
     private static boolean done(ServerPlayer player, String id) {
-        var advancement = player.server.getAdvancements().get(Singulo.id(id));
+        var advancement = player.level().getServer().getAdvancements().get(Singulo.id(id));
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
@@ -145,7 +145,7 @@ public final class GuideGameTests {
         var bit = io.github.genichimaruo.singulo.registry.SinguloEntities.BIT_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bit.setNoAi(true);
         bit.setNoGravity(true);
-        bit.moveTo(net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4))));
+        bit.snapTo(net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4))));
         bit.makeGuard(player.getUUID(), helper.absolutePos(new net.minecraft.core.BlockPos(4, 1, 4)), 0, 0);
         bit.startPrinting();
         helper.getLevel().addFreshEntity(bit);
@@ -160,7 +160,7 @@ public final class GuideGameTests {
         });
         helper.runAtTickTime(75, () -> {
             try {
-                io.github.genichimaruo.singulo.registry.PendingMilestones.get(player.server).deliver(player);
+                io.github.genichimaruo.singulo.registry.PendingMilestones.get(player.level().getServer()).deliver(player);
                 helper.assertTrue(done(player, "android_printed"), "印刷完了から実績が発火しない");
                 helper.assertTrue(done(player, "android_delivery"), "注文完了から実績が発火しない");
                 helper.succeed();
@@ -184,7 +184,7 @@ public final class GuideGameTests {
         creative.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
         var boss = io.github.genichimaruo.singulo.registry.SinguloEntities.FOUNDRY_OVERSEER.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         boss.setNoAi(true);
-        boss.moveTo(at);
+        boss.snapTo(at);
         helper.getLevel().addFreshEntity(boss);
         try {
             boss.setHealth(0);

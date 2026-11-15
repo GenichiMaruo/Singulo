@@ -119,7 +119,7 @@ public final class CapacityUpgradeGameTests {
         machine.energy().receiveEnergy(Integer.MAX_VALUE, false);
         MachineBlockEntity.serverTick(h.getLevel(), machine.getBlockPos(), machine.getBlockState(), machine);
         h.assertTrue(machine.status() == MachineBlockEntity.Status.NO_POWER && machine.energy().getEnergyStored() == 100_000
-                && machine.items().getStackInSlot(machine.type().outputSlot()).isEmpty(), "Undersized buffer bypassed recipe energy demand");
+                && machine.items().getStackInSlot(machine.type().outputSlot()).isEmpty(), "Undersized buffer bypassed recipe energy demand: status="+machine.status()+", energy="+machine.energy().getEnergyStored()+", capacity="+machine.energy().getMaxEnergyStored()+", selected="+machine.selectedRecipe()+", recipeEnergy="+recipe.energy()+", speed="+TimeFields.speed(h.getLevel(),machine.getBlockPos()));
         for (int i = 0; i < recipe.ingredients().size(); i++)
             h.assertTrue(machine.items().getStackInSlot(i).getCount() == recipe.ingredients().get(i).count(),
                     "Insufficient capacity consumed materials");

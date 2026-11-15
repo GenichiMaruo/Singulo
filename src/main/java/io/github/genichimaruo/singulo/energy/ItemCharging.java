@@ -47,7 +47,8 @@ public final class ItemCharging {
         }
         if (available <= 0) return 0;
         var contents = NonNullList.of(ItemStack.EMPTY, stack.copy());
-        var access = ItemAccess.forHandlerIndexStrict(new ItemStacksResourceHandler(contents), 0);
+        var storage = new ItemStacksResourceHandler(contents);
+        var access = ItemAccess.forHandlerIndexStrict(storage, 0);
         var energy = access.getCapability(Capabilities.Energy.ITEM);
         if (energy == null) return 0;
         int got;
@@ -55,7 +56,7 @@ public final class ItemCharging {
             got = energy.insert((int) Math.min(Integer.MAX_VALUE, available), tx);
             tx.commit();
         }
-        if (got > 0) items.setStackInSlot(in, contents.getFirst());
+        if (got > 0) items.setStackInSlot(in, storage.getResource(0).toStack(storage.getAmountAsInt(0)));
         return got;
     }
 }

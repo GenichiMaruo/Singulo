@@ -224,7 +224,7 @@ public final class LabGameTests {
     private static void draw(GameTestHelper helper, net.minecraft.world.level.levelgen.structure.StructurePiece piece) {
         var level = helper.getLevel();
         piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), net.minecraft.util.RandomSource.create(0),
-                piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
+                piece.getBoundingBox(), net.minecraft.world.level.ChunkPos.containing(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
     }
 
     /** 耐圧殻は部屋の箱から2マス以内だけ（部屋の中と、3マス以上離れた所は描かない）。 */
@@ -321,7 +321,7 @@ public final class LabGameTests {
      */
     @GameTest(template = EMPTY)
     public static void labIsPlacedAfterSculk(GameTestHelper helper) {
-        var lab = helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).get(Singulo.id("android_lab"));
+        var lab = helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,Singulo.id("android_lab"))).value();
         helper.assertTrue(lab != null, "研究所の構造物がない");
         var step = lab.step();
         helper.assertTrue(step.ordinal() > net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_DECORATION.ordinal()
@@ -452,7 +452,7 @@ public final class LabGameTests {
         var haste = player.getEffect(net.minecraft.world.effect.MobEffects.HASTE);
         helper.assertTrue(haste != null && haste.getAmplifier() == 1, "エナジードリンクで採掘速度上昇 II がつかない");
         new net.minecraft.world.item.ItemStack(item("canned_soda")).finishUsingItem(level, player);
-        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED), "ソーダで移動速度上昇がつかない");
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.SPEED), "ソーダで移動速度上昇がつかない");
         new net.minecraft.world.item.ItemStack(item("sports_drink")).finishUsingItem(level, player);
         helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION), "スポーツドリンクで再生がつかない");
         var rest = net.minecraft.stats.Stats.CUSTOM.get(net.minecraft.stats.Stats.TIME_SINCE_REST);
@@ -525,8 +525,8 @@ public final class LabGameTests {
     @GameTest(template = EMPTY)
     public static void onlyTheWhiteSlidingDoorIsCraftable(GameTestHelper helper) {
         var level = helper.getLevel();
-        java.util.function.Predicate<net.minecraft.world.item.Item> craftable = item -> level.getRecipeManager().getRecipes().stream()
-                .anyMatch(r -> r.value().getResultItem(level.registryAccess()).is(item));
+        java.util.function.Predicate<net.minecraft.world.item.Item> craftable = item -> level.getServer().getRecipeManager().getRecipes().stream()
+                .anyMatch(r -> io.github.genichimaruo.singulo.test.harness.TestRecipe.result(r.value(),level).is(item));
         helper.assertFalse(craftable.test(SinguloBlocks.LAB_DOOR.get().asItem()), "研究所のドアにレシピがある");
         helper.assertTrue(craftable.test(SinguloBlocks.WHITE_SLIDING_DOOR.get().asItem()), "ホワイトスライドドアにレシピがない");
         BlockPos at = new BlockPos(2, 1, 2);

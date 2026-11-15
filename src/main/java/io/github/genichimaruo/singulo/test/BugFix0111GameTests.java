@@ -58,10 +58,10 @@ public final class BugFix0111GameTests {
                 List.class, int.class, net.minecraft.world.item.crafting.Ingredient.class);
         method.setAccessible(true);
         // Vanilla permits mirrored shapes: keep a second row to disambiguate orientation.
-        var recipe = new net.minecraft.world.item.crafting.ShapedRecipe("", net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+        var recipe = new net.minecraft.world.item.crafting.ShapedRecipe(new net.minecraft.world.item.crafting.Recipe.CommonInfo(true), new net.minecraft.world.item.crafting.CraftingRecipe.CraftingBookInfo(net.minecraft.world.item.crafting.CraftingBookCategory.MISC, ""),
                 net.minecraft.world.item.crafting.ShapedRecipePattern.of(java.util.Map.of('A', broad,
                         'B', net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS),
-                        'C', net.minecraft.world.item.crafting.Ingredient.of(Items.COBBLESTONE)), "AB", "C "), new ItemStack(Items.STICK));
+                        'C', net.minecraft.world.item.crafting.Ingredient.of(Items.COBBLESTONE)), "AB", "C "), new net.minecraft.world.item.ItemStackTemplate(Items.STICK));
         grid.set(3, new ItemStack(Items.COBBLESTONE));
         helper.assertTrue((Boolean) method.invoke(console, recipe, grid, 0, broad), "Valid alternatives were rejected");
         helper.assertTrue(!(Boolean) method.invoke(console, recipe, grid, 1, broad), "A different slot's broad ingredient leaked into a strict slot");
@@ -69,7 +69,7 @@ public final class BugFix0111GameTests {
         assign.setAccessible(true);
         @SuppressWarnings("unchecked")
         var slots = (List<net.minecraft.world.item.crafting.Ingredient>) assign.invoke(null, recipe, grid);
-        helper.assertTrue(slots.get(0) == broad && slots.get(1).getItems().length == 1,
+        helper.assertTrue(slots.get(0) == broad && slots.get(1).items().count() == 1,
                 "Shaped ingredients were not assigned to their actual positions");
         helper.succeed();
     }
@@ -133,7 +133,7 @@ public final class BugFix0111GameTests {
         helper.assertTrue(drops.size() == 1, "コントロールボックスが落ちない");
         ItemStack dropped = drops.get(0);
         var data = dropped.get(DataComponents.BLOCK_ENTITY_DATA);
-        helper.assertTrue(data != null && data.copyTag().getIntOr("height", 0) == 9, "壊したアイテムに高さが残らない");
+        helper.assertTrue(data != null && data.copyTagWithoutId().getIntOr("height", 0) == 9, "壊したアイテムに高さが残らない");
         // 両方壊して、ひとつだけ置き直す: 残っていた高さ 9 のまま
         helper.setBlock(boxA, Blocks.AIR);
         helper.setBlock(boxB, Blocks.AIR);
@@ -163,7 +163,7 @@ public final class BugFix0111GameTests {
             BlockPos pa = helper.absolutePos(projector), pl = helper.absolutePos(line);
             helper.assertTrue(level.getBlockState(pa).getDestroyProgress(player, level, pa) > 0, "ふだんから壊せない");
             var boss = SinguloEntities.ECHO_SENTINEL.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            boss.moveTo(Vec3.atCenterOf(helper.absolutePos(new BlockPos(2, 2, 4))));
+            boss.snapTo(Vec3.atCenterOf(helper.absolutePos(new BlockPos(2, 2, 4))));
             boss.setNoAi(true);
             level.addFreshEntity(boss);
             boss.startEmerging();
@@ -223,7 +223,7 @@ public final class BugFix0111GameTests {
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         android.getRandom().setSeed(2L);                    // 自律行動を残すと受電器の上へ逸れる再現条件
         android.removeFreeWill();
-        android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 2, 1))));
+        android.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 2, 1))));
         android.setPersistenceRequired();
         TestScope.of(helper).defer(android::discard);
         helper.getLevel().addFreshEntity(android);
@@ -267,7 +267,7 @@ public final class BugFix0111GameTests {
 
     private static BladeAndroid swimmer(GameTestHelper helper, int charge) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
         a.setPersistenceRequired();
         net.minecraft.nbt.CompoundTag saved = io.github.genichimaruo.singulo.test.harness.TestNbt.save(a);
         saved.putInt("charge", charge);
@@ -329,7 +329,7 @@ public final class BugFix0111GameTests {
             }
         }
         BladeAndroid a = swimmer(helper, 2);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 3, 3))));
+        a.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 3, 3))));
         swimUntilEmpty(helper, a);
         helper.succeedWhen(() -> {
             helper.assertTrue(a.state() == RuinAndroid.STATE_SEABED_REST, "水の底で充電しない: state=" + a.state());
@@ -347,7 +347,7 @@ public final class BugFix0111GameTests {
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-        android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 3, 2))));
+        android.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 3, 2))));
         android.setPersistenceRequired();
         helper.getLevel().addFreshEntity(android);
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(2, 3, 4));   // 押し合わないよう、別の列に
@@ -381,18 +381,18 @@ public final class BugFix0111GameTests {
         BladeAndroid plain = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         BladeAndroid printed = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         printed.markFacilitySpawned();
-        helper.assertTrue(printed.getLootTable().equals(RuinAndroid.FACILITY_LOOT), "印刷台の個体のドロップ表が違う");
-        helper.assertFalse(plain.getLootTable().equals(RuinAndroid.FACILITY_LOOT), "ふつうの個体まで部品を落とす");
+        helper.assertTrue(printed.effectiveLootTable().equals(java.util.Optional.of(RuinAndroid.FACILITY_LOOT)), "印刷台の個体のドロップ表が違う");
+        helper.assertFalse(plain.effectiveLootTable().equals(java.util.Optional.of(RuinAndroid.FACILITY_LOOT)), "ふつうの個体まで部品を落とす");
         var drone = SinguloEntities.SECURITY_DRONE.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         var dockDrone = SinguloEntities.SECURITY_DRONE.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         dockDrone.markFacilitySpawned();
-        helper.assertTrue(dockDrone.getLootTable().equals(io.github.genichimaruo.singulo.ruin.SecurityDrone.FACILITY_LOOT), "ドックのドローンのドロップ表が違う");
-        helper.assertFalse(drone.getLootTable().equals(io.github.genichimaruo.singulo.ruin.SecurityDrone.FACILITY_LOOT), "ふつうのドローンまで部品を落とす");
+        helper.assertTrue(dockDrone.effectiveLootTable().equals(java.util.Optional.of(io.github.genichimaruo.singulo.ruin.SecurityDrone.FACILITY_LOOT)), "ドックのドローンのドロップ表が違う");
+        helper.assertFalse(drone.effectiveLootTable().equals(java.util.Optional.of(io.github.genichimaruo.singulo.ruin.SecurityDrone.FACILITY_LOOT)), "ふつうのドローンまで部品を落とす");
         helper.assertTrue(level.getServer().reloadableRegistries().getLootTable(RuinAndroid.FACILITY_LOOT)
                 != net.minecraft.world.level.storage.loot.LootTable.EMPTY, "アンドロイドのドロップ表がない");
         // 保存しても印は残る
         var tag = new net.minecraft.nbt.CompoundTag();
-        printed.addAdditionalSaveData(tag);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.save(printed,tag);
         helper.assertTrue(tag.getBooleanOr("facility_spawned", false), "印が保存されない");
         helper.succeed();
     }

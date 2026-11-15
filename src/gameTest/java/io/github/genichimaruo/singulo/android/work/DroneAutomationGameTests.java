@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.drone.DroneCrateItem;
 import io.github.genichimaruo.singulo.drone.DronePortBlockEntity;
@@ -14,8 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
-import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -87,7 +87,7 @@ public final class DroneAutomationGameTests {
         h.assertTrue(view.extractItem(0, 4, false).getCount() == 4, "Crate output was not extractable");
         var saved = port.saveWithoutMetadata(h.getLevel().registryAccess());
         var restored = new DronePortBlockEntity(port.getBlockPos(), port.getBlockState());
-        restored.loadWithComponents(saved, h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, saved, h.getLevel().registryAccess());
         h.assertTrue(restored.androidItems(Direction.WEST).extractItem(0, 16, true).getCount() == 2,
                 "Reload lost the crate count or output configuration");
         h.assertTrue(restored.androidItems(Direction.EAST).extractItem(0, 16, true).isEmpty(), "Crates leaked through an input-only face");

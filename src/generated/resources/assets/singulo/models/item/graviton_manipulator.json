@@ -3,8 +3,8 @@
   "textures": {
     "particle": "singulo:item/graviton_staff",
     "t": "singulo:item/graviton_staff",
-    "s": "singulo:block/bh_dark",
-    "r": "singulo:block/bh_ring_white"
+    "s": "singulo:item/graviton_bh_dark",
+    "r": "singulo:item/graviton_bh_ring_white"
   },
   "elements": [
     {
