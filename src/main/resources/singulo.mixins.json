@@ -6,6 +6,7 @@
   "mixins": [
     "ProjectileAccessor",
     "DaylightDetectorBlockMixin",
+    "HealOrHarmMobEffectMixin",
     "RayleighLightEngineMixin",
     "RayleighWeatherMixin",
     "RayleighSunBurnMixin",
