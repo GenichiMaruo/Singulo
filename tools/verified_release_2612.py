@@ -204,6 +204,47 @@ def validate_outline(root):
                 raise RuntimeError('Invalid outline evidence dimensions')
 
 
+# Shared GuiReviewHarness fixtures precede either machine inventory.
+GUI_BASE_NAMES = {
+    'android-status', 'android-gear', 'android-decor', 'android-log-en-854x480', 'android-log-ja-854x480',
+    'console-detail', 'console-detail-scrolled', 'console-order-confirmation', 'console-orders',
+    'console-record-crafting', 'console-record-procedure', 'console-record-processing', 'delivery-port',
+    'handbook-item-lookup-en-854x480', 'handbook-search-en-1280x800', 'recipe-rack',
+    'station', 'station-en-854x480', 'station-ja-854x480', 'station-patrol-en-854x480',
+    'station-patrol-ja-854x480', 'station-rules-ja-854x480',
+}
+
+def validate_gui_images(directory, machines_per_language):
+    from PIL import Image
+    base = {name + '.png' for name in GUI_BASE_NAMES}
+    machines = {f'machine-{language}-{index:02d}.png' for language in
+                ('en_us','ja_jp','ko_kr','zh_cn','zh_tw') for index in range(machines_per_language)}
+    if {p.name for p in directory.glob('*.png')} != base | machines:
+        raise RuntimeError('GUI fixture image set differs from exact shared and machine inventory')
+    validate_pngs(directory, len(base) + len(machines))
+    for path in directory.glob('*.png'):
+        expected = (854,480) if path.name in machines or '-854x480' in path.name else (1280,800)
+        with Image.open(path) as image:
+            if image.size != expected:
+                raise RuntimeError('Wrong GUI fixture dimensions: ' + path.name)
+
+
+def validate_rejoin(root):
+    """Require all five visits in order; only the terminal stop notification is idempotent."""
+    log = (root / 'rayleigh-review/logs/latest.log').read_text(encoding='utf-8', errors='replace')
+    events = []
+    for line in log.splitlines():
+        if 'SINGULO_REJOIN_' not in line:
+            continue
+        match = re.search(r'SINGULO_REJOIN_(ENTER|TITLE|COMPLETE) ([1-5])$', line)
+        if not match or line.count('SINGULO_REJOIN_') != 1:
+            raise RuntimeError('Malformed rejoin validation event')
+        events.append((match.group(1), int(match.group(2))))
+    expected = [(kind, visit) for visit in range(1, 5) for kind in ('ENTER', 'TITLE')] + [('ENTER', 5)]
+    if events[:9] != expected or len(events) < 10 or any(event != ('COMPLETE', 5) for event in events[9:]):
+        raise RuntimeError('Missing, reordered or repeated rejoin cycle evidence')
+
+
 def validate_visual_evidence(metadata, artifacts):
     roots = {key: artifacts / value['name'] for key, value in metadata['artifacts'].items()}
     tools = Path(__file__).resolve().parent
@@ -214,7 +255,7 @@ def validate_visual_evidence(metadata, artifacts):
             require_markers(root, lighting, ['SINGULO_SODIUM_NOON_VERTEX_COMPLETE 241', 'SINGULO_SODIUM_NOON_EMISSIVE_COMPLETE'])
             if log.count('SINGULO_DH_LIGHTMAP_COMPLETE 256') != 4:
                 raise RuntimeError('Missing exact four DH lightmap validations')
-            require_markers(root, 'rayleigh-review/logs/latest.log', ['SINGULO_REJOIN_COMPLETE 5'])
+            validate_rejoin(root)
         subprocess.run([os.sys.executable, str(tools / 'review/check_rayleigh_png.py'),
                         str(root / 'rayleigh-review/screenshots')], check=True)
         require_markers(root, 'cosmic-review/logs/latest.log', [
@@ -235,8 +276,8 @@ def validate_visual_evidence(metadata, artifacts):
         raise RuntimeError('Missing cosmic GUI screenshots')
     validate_pngs(root / 'occlusion-review/screenshots', 18)
     validate_pngs(root / 'lensing-review/screenshots', 1)
-    validate_pngs(root / 'cosmic-gui-review/screenshots', 35)
-    validate_pngs(root / 'gui-review/screenshots', 272)
+    validate_gui_images(root / 'cosmic-gui-review/screenshots', 7)
+    validate_gui_images(root / 'gui-review/screenshots', 50)
     require_markers(root, 'occlusion-review/logs/latest.log', ['SINGULO_OCCLUSION_COMPLETE 9'])
     require_markers(root, 'lensing-review/logs/latest.log', ['SINGULO_LENSING_MANY_COMPLETE traced=15', 'SINGULO_LENSING_FRAME_TIME holes=15'])
 

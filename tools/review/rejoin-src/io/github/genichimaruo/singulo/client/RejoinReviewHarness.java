@@ -15,11 +15,12 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class RejoinReviewHarness {
     private static int visits, wait;
-    private static boolean entered, started;
+    private static boolean entered, started, complete;
     private static volatile long progress = System.nanoTime();
 
     @SubscribeEvent
     public static void tick(ClientTickEvent.Post event) {
+        if (complete) return; // stop() can leave another client tick queued.
         var mc = Minecraft.getInstance();
         if (!started) {
             started = true;
@@ -61,6 +62,7 @@ public final class RejoinReviewHarness {
             } catch (java.io.IOException e) { throw new RuntimeException(e); }
             progress = System.nanoTime();
             if (visits == 5) {
+                complete = true;
                 Singulo.LOGGER.info("SINGULO_REJOIN_COMPLETE 5"); mc.stop(); return;
             }
             mc.level.disconnect(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE);

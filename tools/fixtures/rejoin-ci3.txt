@@ -1,0 +1,11 @@
+[15Nov2026 10:15:46.663] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_ENTER 1
+[15Nov2026 10:15:54.776] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_TITLE 1
+[15Nov2026 10:15:58.501] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_ENTER 2
+[15Nov2026 10:16:06.439] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_TITLE 2
+[15Nov2026 10:16:10.181] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_ENTER 3
+[15Nov2026 10:16:17.968] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_TITLE 3
+[15Nov2026 10:16:21.358] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_ENTER 4
+[15Nov2026 10:16:29.216] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_TITLE 4
+[15Nov2026 10:16:32.549] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_ENTER 5
+[15Nov2026 10:16:40.228] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_COMPLETE 5
+[15Nov2026 10:16:40.277] [Render thread/INFO] [io.github.genichimaruo.singulo.Singulo/]: SINGULO_REJOIN_COMPLETE 5
