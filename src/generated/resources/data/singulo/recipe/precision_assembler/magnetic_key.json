@@ -6,21 +6,15 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:meteoric_iron_ingot"
-      },
+      "ingredient": "singulo:meteoric_iron_ingot",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:data_card_observation_log"
-      },
+      "ingredient": "singulo:data_card_observation_log",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 1
     }
   ],

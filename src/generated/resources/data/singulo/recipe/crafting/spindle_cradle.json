@@ -7,15 +7,9 @@
     " F "
   ],
   "key": {
-    "P": {
-      "item": "singulo:nihonium_plate"
-    },
-    "F": {
-      "item": "singulo:cosmic_frame"
-    },
-    "C": {
-      "item": "singulo:superconducting_coil"
-    }
+    "P": "singulo:nihonium_plate",
+    "F": "singulo:cosmic_frame",
+    "C": "singulo:superconducting_coil"
   },
   "result": {
     "id": "singulo:spindle_cradle",

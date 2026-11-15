@@ -165,7 +165,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 }
                 if (permit.isActive()) {
                     ghostSlot(g, leftPos + WorkConsoleMenu.PERMIT_X, topPos + WorkConsoleMenu.PERMIT_Y, permit,
-                            new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("shield_permit"))));
+                            new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("shield_permit"))));
                 }
                 continue;
             }
@@ -493,7 +493,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         List<CompoundTag> out = new ArrayList<>();
         CompoundTag v = menu.view();
         if (v != null) {
-            for (Tag t : v.getList(key, Tag.TAG_COMPOUND)) {
+            for (Tag t : v.getListOrEmpty(key)) {
                 out.add((CompoundTag) t);
             }
         }
@@ -501,11 +501,11 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     private ItemStack stack(CompoundTag t, String key) {
-        return ItemStack.parseOptional(reg(), t.getCompound(key));
+        return ItemStack.OPTIONAL_CODEC.parse(reg().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), t.getCompoundOrEmpty(key)).result().orElse(ItemStack.EMPTY);
     }
 
     private Component text(CompoundTag t, String key) {
-        Component c = t.contains(key) ? Component.Serializer.fromJson(t.getString(key), reg()) : null;
+        Component c = t.contains(key) ? net.minecraft.network.chat.ComponentSerialization.CODEC.parse(reg().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE), com.google.gson.JsonParser.parseString(t.getStringOr(key, ""))).result().orElse(null) : null;
         return c == null ? Component.empty() : c;
     }
 
@@ -520,7 +520,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             seenVersion = menu.viewVersion();
             CompoundTag v = menu.view();
             if (v != null && v.contains("plan")) {
-                CompoundTag p = v.getCompound("plan");
+                CompoundTag p = v.getCompoundOrEmpty("plan");
                 if (p.contains("started")) {
                     if (p.getBooleanOr("started", false)) {
                         closePicking();
@@ -577,7 +577,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
         float k = Math.min(0.6F, 17F / font.width(text));
         g.pose().pushMatrix();
-        g.pose().translate(x + 17 - font.width(text) * k, y + 17 - font.lineHeight * k, 300);
+        g.pose().translate(x + 17 - font.width(text) * k, y + 17 - font.lineHeight * k);
         g.pose().scale(k, k);
         g.text(font, text, 0, 0, 0xFFFFFFFF, true);
         g.pose().popMatrix();
@@ -655,13 +655,13 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 setFocused(null);
                 return true;
             }
-            searchBox.keyPressed(keyCode, scanCode, modifiers);
+            searchBox.keyPressed(event);
             return true;                                // 打っている間は、E などで画面を閉じない
         }
-        if (countBox != null && countBox.isFocused() && countBox.keyPressed(keyCode, scanCode, modifiers)) {
+        if (countBox != null && countBox.isFocused() && countBox.keyPressed(event)) {
             return true;
         }
-        if (countBox != null && countBox.isFocused() && minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+        if (countBox != null && countBox.isFocused() && minecraft.options.keyInventory.matches(event)) {
             return true;
         }
         return super.keyPressed(event);
@@ -675,11 +675,11 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (top == recordPop) {
             if (optionShown() && Panel.inside(mouseX, mouseY, recordX() + WorkConsoleMenu.OPTION_X, recordY() + WorkConsoleMenu.OPTION_Y,
                     WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H)) {
-                adjustOption(dy > 0, hasShiftDown());
+                adjustOption(dy > 0, net.minecraft.client.Minecraft.getInstance().hasShiftDown());
                 return true;
             }
             // 加工モードの見本: ホイールで数を変える（シフトで10ずつ）
-            adjustHovered(dy > 0, hasShiftDown());
+            adjustHovered(dy > 0, net.minecraft.client.Minecraft.getInstance().hasShiftDown());
             return true;
         }
         if (top == detailPop) {
@@ -720,7 +720,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 return true;
             }
             if (top == orderPop) {
-                return clickPicking(mouseX, mouseY, button);
+                return clickPicking(event, doubleClick);
             }
             if (top == recordPop) {
                 return clickRecord(mouseX, mouseY, button) || super.mouseClicked(event, doubleClick);
@@ -747,13 +747,13 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 if (button == 1) {
                     searchBox.setValue("");               // 右クリック: 消す
                 } else {
-                    searchBox.mouseClicked(mouseX, mouseY, button);
+                    searchBox.mouseClicked(event, doubleClick);
                 }
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + SORT_X, y + searchY(), SORT_W, SEARCH_H)) {
                 int i = java.util.Arrays.asList(SORTS).indexOf(sortMode());
-                int next = Math.floorMod(i + (Screen.hasShiftDown() || button == 1 ? -1 : 1), SORTS.length);
+                int next = Math.floorMod(i + (net.minecraft.client.Minecraft.getInstance().hasShiftDown() || button == 1 ? -1 : 1), SORTS.length);
                 saveConfig(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT, SORTS[next]);
                 scroll = 0;
                 return true;
@@ -842,13 +842,15 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 注文の確認の窓の中のクリック（窓の中は下の画面に届かない）。 */
-    private boolean clickPicking(double mouseX, double mouseY, int button) {
+    private boolean clickPicking(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX=event.x(), mouseY=event.y();
+        int button=event.button();
         int x = pickX(), y = pickY();
-        if (countBox != null && countBox.mouseClicked(mouseX, mouseY, button)) {
+        if (countBox != null && countBox.mouseClicked(event, doubleClick)) {
             setFocused(countBox);
             return true;
         }
-        long step = Screen.hasShiftDown() ? 10 : Screen.hasControlDown() ? 64 : 1;
+        long step = net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? 10 : net.minecraft.client.Minecraft.getInstance().hasControlDown() ? 64 : 1;
         if (Panel.inside(mouseX, mouseY, x + 8, y + 27, 14, 14)) {
             addCount(-step);
             return true;
@@ -862,7 +864,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             int idx = i + androidScroll;
             if (idx < androids.size() && Panel.inside(mouseX, mouseY, x + 128, y + LIST_Y + i * LIST_H, 112, LIST_H)) {
                 CompoundTag a = androids.get(idx);
-                UUID id = a.getUUID("id");
+                UUID id = a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0));
                 if (selectable(a) && !chosen.remove(id)) {
                     chosen.add(id);
                 }
@@ -915,7 +917,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             return false;
         }
         int x = recordX(), y = recordY();
-        if (button == 2 && adjustHovered(!hasShiftDown(), false)) {
+        if (button == 2 && adjustHovered(!net.minecraft.client.Minecraft.getInstance().hasShiftDown(), false)) {
             return true;                   // ミドルクリックで1つ増やす（シフトで減らす）
         }
         if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.MODE_X, y + WorkConsoleMenu.MODE_Y, WorkConsoleMenu.BUTTON_W,
@@ -952,7 +954,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             }
             if (optionShown() && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y,
                     WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H)) {
-                adjustOption(button != 1, hasShiftDown());
+                adjustOption(button != 1, net.minecraft.client.Minecraft.getInstance().hasShiftDown());
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.ADD_X, y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.ADD_W,
@@ -997,7 +999,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
 
     /** だれも選んでいない（選べる候補をみな送り、指令台が作業量に見合う人数だけを招集する）。 */
     private boolean autoAndroids() {
-        return chosen.stream().noneMatch(id -> list("androids").stream().anyMatch(a -> a.getUUID("id").equals(id) && selectable(a)));
+        return chosen.stream().noneMatch(id -> list("androids").stream().anyMatch(a -> a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)).equals(id) && selectable(a)));
     }
 
     /** 作業を始めるアンドロイド: 選んだうちの選べるもの。だれも選んでいなければ、選べるもの全部。 */
@@ -1005,9 +1007,9 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         List<UUID> picked = new ArrayList<>(), all = new ArrayList<>();
         for (CompoundTag a : list("androids")) {
             if (selectable(a)) {
-                all.add(a.getUUID("id"));
-                if (chosen.contains(a.getUUID("id"))) {
-                    picked.add(a.getUUID("id"));
+                all.add(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)));
+                if (chosen.contains(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)))) {
+                    picked.add(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)));
                 }
             }
         }
@@ -1247,7 +1249,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         popupTitle(g, orderPop, picking.getHoverName(), picking);
         renderPicking(g, x, y, mouseX, mouseY);
         if (countBox != null) {
-            countBox.render(g, mouseX, mouseY, partialTick);
+            countBox.extractRenderState(g, mouseX, mouseY, partialTick);
         }
         g.pose().pushMatrix();
         g.pose().translate(x, y);
@@ -1527,7 +1529,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             }
         }
         if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && canStart() && chosen.stream().noneMatch(
-                id -> androids.stream().anyMatch(a -> a.getUUID("id").equals(id) && selectable(a)))) {
+                id -> androids.stream().anyMatch(a -> a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)).equals(id) && selectable(a)))) {
             g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.work_console.auto_android", startAndroids().size()), 160),
                     mouseX, mouseY);
             return;
@@ -1575,7 +1577,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private List<CompoundTag> planList(String key) {
         List<CompoundTag> out = new ArrayList<>();
         if (plan != null) {
-            for (Tag t : plan.getList(key, Tag.TAG_COMPOUND)) {
+            for (Tag t : plan.getListOrEmpty(key)) {
                 out.add((CompoundTag) t);
             }
         }
@@ -2019,7 +2021,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
 
     private static List<CompoundTag> tags(CompoundTag t, String key) {
         List<CompoundTag> out = new ArrayList<>();
-        for (Tag e : t.getList(key, Tag.TAG_COMPOUND)) {
+        for (Tag e : t.getListOrEmpty(key)) {
             out.add((CompoundTag) e);
         }
         return out;
@@ -2093,7 +2095,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             CompoundTag a = androids.get(idx);
             int ry = y + LIST_Y + i * LIST_H;
             boolean can = selectable(a);
-            boolean on = can && chosen.contains(a.getUUID("id"));
+            boolean on = can && chosen.contains(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)));
             int accent = 0xFF000000 | a.getIntOr("accent", 0);
             Panel.inset(g, skin, x + 130, ry + 3, 10, 10, on ? accent : can ? 0xFFF4F6F8 : skin.dim());
         }

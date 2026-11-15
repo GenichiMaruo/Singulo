@@ -32,7 +32,7 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
     }
 
     private static ItemStack ghost(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     private int unitStatus(int unit) {

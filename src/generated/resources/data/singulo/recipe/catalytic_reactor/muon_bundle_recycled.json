@@ -6,9 +6,7 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:spent_muon_catalyst"
-      },
+      "ingredient": "singulo:spent_muon_catalyst",
       "count": 4
     }
   ],

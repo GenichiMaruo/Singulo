@@ -85,7 +85,7 @@ public class MetricDriveItem extends SinguloItem {
 
     /** 持ち物の中で最初に動いているドライブ。 */
     public static ItemStack activeDrive(Player player) {
-        for (ItemStack s : player.getInventory().items) {
+        for (ItemStack s : player.getInventory().getNonEquipmentItems()) {
             if (s.getItem() instanceof MetricDriveItem && mode(s) != Mode.OFF) {
                 return s;
             }

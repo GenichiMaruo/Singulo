@@ -34,8 +34,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
 
     private int loadedRadius = -1;
     /** 置いた人（設定 maxAnchorsPerPlayer の数え先）。旧版で置いたものや、人以外が置いたものは null（上限の対象外）。 */
-    @org.jspecify.annotations.Nullable
-    private java.util.UUID owner;
+    private java.util.@org.jspecify.annotations.Nullable UUID owner;
 
     /**
      * 持ち主ごとの、チャンクを読み込み中のアンカー（ディメンションと位置 → 動き出したゲーム時刻）。上限に達した持ち主の
@@ -45,7 +44,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     private static final java.util.Map<java.util.UUID, java.util.Map<String, Long>> ACTIVE = new java.util.HashMap<>();
     /** Drop runtime quota entries for a closed dimension; saved start times remain unchanged. */
     public static void forgetLevel(Level level) {
-        String prefix = level.dimension().location() + "@";
+        String prefix = level.dimension().identifier() + "@";
         ACTIVE.entrySet().removeIf(e -> {
             e.getValue().keySet().removeIf(key -> key.startsWith(prefix));
             return e.getValue().isEmpty();
@@ -61,7 +60,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     private String key() {
-        return (level == null ? "?" : level.dimension().location().toString()) + "@" + worldPosition.asLong();
+        return (level == null ? "?" : level.dimension().identifier().toString()) + "@" + worldPosition.asLong();
     }
 
     /** 1人が同時に動かせるアンカーの数。0 は無制限。 */
@@ -214,10 +213,10 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
         if (radius < 0) {
             return;
         }
-        ChunkPos center = new ChunkPos(worldPosition);
+        ChunkPos center = ChunkPos.containing(worldPosition);
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                TICKETS.forceChunk(level, worldPosition, center.x + dx, center.z + dz, add, true);
+                TICKETS.forceChunk(level, worldPosition, center.x() + dx, center.z() + dz, add, true);
             }
         }
     }

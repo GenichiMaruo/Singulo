@@ -66,7 +66,7 @@ public final class StandingOrder {
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag t = new CompoundTag();
         t.putInt("id", id);
-        t.put("target", target.save(registries));
+        t.put("target", io.github.genichimaruo.singulo.compat.NbtCompat.save(target, registries));
         t.putLong("count", count);
         t.putInt("trigger", trigger);
         if (destination != null) {
@@ -74,7 +74,7 @@ public final class StandingOrder {
         }
         ListTag as = new ListTag();
         for (UUID a : androids) {
-            as.add(NbtUtils.createUUID(a));
+            as.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(a));
         }
         t.put("androids", as);
         if (registrant != null) {
@@ -92,8 +92,8 @@ public final class StandingOrder {
             return null;
         }
         List<UUID> androids = new ArrayList<>();
-        for (Tag a : t.getList("androids", Tag.TAG_INT_ARRAY)) {
-            androids.add(NbtUtils.loadUUID(a));
+        for (Tag a : t.getListOrEmpty("androids")) {
+            androids.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(a));
         }
         StandingOrder s = new StandingOrder(t.getIntOr("id", 0), target, Math.max(1, t.getLongOr("count", 0L)), t.getIntOr("trigger", 0),
                 t.contains("destination") ? BlockPos.of(t.getLongOr("destination", 0L)) : null, androids,

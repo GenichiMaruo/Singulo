@@ -19,7 +19,7 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 public final class PrototypeMemories {
     public static final Supplier<AttachmentType<List<String>>> RECEIVED = AncientRecords.REGISTER.register("prototype_memories",
             () -> AttachmentType.<List<String>>builder(() -> List.of())
-                    .serialize(Codec.STRING.listOf()).copyOnDeath().build());
+                    .serialize(Codec.STRING.listOf().fieldOf("entries")).copyOnDeath().build());
 
     private PrototypeMemories() {}
 
@@ -43,6 +43,6 @@ public final class PrototypeMemories {
     }
 
     public static ItemStack stack(AndroidKind kind) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(kind.memoryId())));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(kind.memoryId())));
     }
 }

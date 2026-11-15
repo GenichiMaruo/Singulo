@@ -64,7 +64,7 @@ public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.s
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_VALUE = 3, D_USAGE = 4, D_SPEED_X100 = 5,
             D_WEAR_X100 = 6, D_EXTRA = 7, D_ENABLED = 8, D_LOADED_ITEM = 9, D_LOADED_FILL = 10, COUNT = 11;
 
-    protected final ItemStackHandler slot = new ItemStackHandler(1) {
+    protected final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler slot = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return CatalystHelper.tierOf(stack) > 0;
@@ -83,7 +83,7 @@ public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.s
     /** 触媒の装填（触媒スロットは予備の置き場。使う1個は中に装填する）。 */
     protected final CatalystMagazine magazine = new CatalystMagazine(this::setChanged);
     /** 使い切った失活触媒と、入れ替えで外した使いかけの出口（取り出すだけ）。 */
-    protected final ItemStackHandler spent = new ItemStackHandler(1) {
+    protected final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler spent = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int s) {
             setChanged();
@@ -205,8 +205,7 @@ public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.s
     /**
      * 触媒も電力も使わずに動く場合の効き方（シンギュラリティ・コアを埋め込んだアンカー）。普通は null。
      */
-    @org.jspecify.annotations.Nullable
-    protected CatalystHelper.Effect permanentEffect() {
+    protected CatalystHelper.@org.jspecify.annotations.Nullable Effect permanentEffect() {
         return null;
     }
 
@@ -282,13 +281,10 @@ public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.s
             if (energy.getEnergyStored() <= 0) {
                 return;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK,
+            var target = level.getCapability(Capabilities.Energy.BLOCK,
                     worldPosition.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), perTick), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), perTick));
             }
         }
     }
@@ -359,5 +355,9 @@ public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.s
         energy.setEnergy(tag.getIntOr("energy", 0));
         wear = tag.getDoubleOr("wear", 0.0D);
         enabled = !tag.contains("enabled") || tag.getBooleanOr("enabled", false);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return io.github.genichimaruo.singulo.compat.ItemTransferView.combined(slot, new io.github.genichimaruo.singulo.compat.ItemTransferView(spent, (s,r) -> false, (s,r) -> true));
     }
 }

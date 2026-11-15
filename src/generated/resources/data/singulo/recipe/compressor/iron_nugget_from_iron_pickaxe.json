@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:iron_pickaxe"
-      },
+      "ingredient": "minecraft:iron_pickaxe",
       "count": 1
     }
   ],

@@ -38,7 +38,7 @@ public class WormholeGeneratorRenderer extends SnapshotBlockRenderer<WormholeGen
         Vec3 offset = Vec3.atLowerCornerOf(core.subtract(be.getBlockPos())).add(0.5, 0.5, 0.5);
         float time = level.getGameTime() + partialTick;
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         float size = 0.25F + 1.05F * p;
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);

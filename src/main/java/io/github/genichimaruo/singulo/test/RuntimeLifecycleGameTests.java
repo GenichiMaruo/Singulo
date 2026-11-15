@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.data.RuntimeLifecycle;

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "tag": "c:ingots/iron"
-    },
-    {
-      "tag": "singulo:carbon"
-    },
-    {
-      "tag": "singulo:carbon"
-    }
+    "#c:ingots/iron",
+    "#singulo:carbon",
+    "#singulo:carbon"
   ],
   "result": {
     "id": "singulo:steel_blend",

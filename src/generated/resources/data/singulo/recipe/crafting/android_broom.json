@@ -7,15 +7,9 @@
     "H"
   ],
   "key": {
-    "R": {
-      "tag": "c:rods/wooden"
-    },
-    "S": {
-      "tag": "c:strings"
-    },
-    "H": {
-      "tag": "c:crops/wheat"
-    }
+    "R": "#c:rods/wooden",
+    "S": "#c:strings",
+    "H": "#c:crops/wheat"
   },
   "result": {
     "id": "singulo:android_broom",

@@ -16,6 +16,9 @@ import net.neoforged.neoforge.items.IItemHandler;
  * Entity and SavedData writes are not crash-atomic. Invalid saved records are retained verbatim.
  */
 public final class AndroidEscrowData extends SavedData {
+    private static final net.minecraft.world.level.saveddata.SavedDataType<AndroidEscrowData> TYPE =
+        io.github.genichimaruo.singulo.compat.LegacySavedDataTypes.create("singulo_android_escrow_v1", AndroidEscrowData::new, AndroidEscrowData::load, AndroidEscrowData::save);
+
     public enum State { PREPARING, RUNNING, RETURNING, RECOVERABLE, COMPLETED, QUARANTINED }
     public static final int MAX_RECORDS = 64, MAX_OFFER_STACKS = 128;
     public static final class Entry {
@@ -46,7 +49,7 @@ public final class AndroidEscrowData extends SavedData {
     private CompoundTag rawRoot;
     public static AndroidEscrowData get(ServerLevel level) {
         if (!level.getServer().isSameThread()) throw new IllegalStateException("Escrow requires server thread");
-        var data = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(AndroidEscrowData::new, AndroidEscrowData::load, null), "singulo_android_escrow_v1");
+        var data = level.getDataStorage().computeIfAbsent(TYPE);
         data.registriesForRecovery=level.registryAccess(); return data;
     }
     private static List<ItemStack> copy(List<ItemStack> stacks) { return stacks.stream().map(ItemStack::copy).toList(); }
@@ -220,10 +223,10 @@ public final class AndroidEscrowData extends SavedData {
         };
     }
     private static ListTag stacks(List<ItemStack> inv,HolderLookup.Provider registries) {
-        ListTag out=new ListTag(); for(ItemStack s:inv)out.add(s.isEmpty()?new CompoundTag():s.save(registries));return out;
+        ListTag out=new ListTag(); for(ItemStack s:inv)out.add(s.isEmpty()?new CompoundTag():io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));return out;
     }
     private static List<ItemStack> readStacks(CompoundTag t,String key,HolderLookup.Provider registries,boolean allowEmpty) {
-        if(!t.contains(key,Tag.TAG_LIST))throw new IllegalArgumentException("Missing inventory");
+        if(!(t.get(key) instanceof ListTag))throw new IllegalArgumentException("Missing inventory");
         ListTag list=t.getListOrEmpty(key);
         if(list.size()!=((ListTag)t.get(key)).size())throw new IllegalArgumentException("Invalid inventory tags");
         List<ItemStack> out=new ArrayList<>();
@@ -231,13 +234,13 @@ public final class AndroidEscrowData extends SavedData {
             if((s.isEmpty() && (!allowEmpty || !st.isEmpty())) || !s.isEmpty() && (s.getCount()<1 || s.getCount()>s.getMaxStackSize()))throw new IllegalArgumentException("Invalid stack");out.add(s);}
         return out;
     }
-    @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries) {
         if(invalidRoot){CompoundTag out=rawRoot.copy();out.put("recovery_salvage_extra_v1",salvage.copy());return out;}
         tag.put("recovery_salvage_v1",salvage.copy());
         tag.putInt("schema",1); ListTag list=new ListTag();
         for(Entry e:records.values()){
             CompoundTag t=new CompoundTag();t.store("request", net.minecraft.core.UUIDUtil.CODEC, e.request);t.store("owner", net.minecraft.core.UUIDUtil.CODEC, e.owner);t.store("identity", net.minecraft.core.UUIDUtil.CODEC, e.consoleIdentity);
-            t.put("console",io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(e.console));t.put("target",e.target.save(registries));t.putLong("count",e.count);
+            t.put("console",io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(e.console));t.put("target",io.github.genichimaruo.singulo.compat.NbtCompat.save(e.target, registries));t.putLong("count",e.count);
             t.putInt("order",e.orderId);t.putString("state",e.state.name());if(e.worker!=null)t.store("worker", net.minecraft.core.UUIDUtil.CODEC, e.worker);
             if(e.requestedWorker!=null)t.store("requested_worker", net.minecraft.core.UUIDUtil.CODEC, e.requestedWorker);
             if(e.outcome!=null)t.putString("outcome",e.outcome.name());t.putLong("delivered",e.delivered);
@@ -247,12 +250,12 @@ public final class AndroidEscrowData extends SavedData {
     }
     public static AndroidEscrowData load(CompoundTag tag,HolderLookup.Provider registries) {
         AndroidEscrowData data=new AndroidEscrowData();data.registriesForRecovery=registries;
-        if(tag.contains("recovery_salvage_extra_v1",Tag.TAG_LIST)) for(Tag raw:tag.getListOrEmpty("recovery_salvage_extra_v1"))data.salvage.add(raw.copy());
+        if(tag.get("recovery_salvage_extra_v1") instanceof ListTag) for(Tag raw:tag.getListOrEmpty("recovery_salvage_extra_v1"))data.salvage.add(raw.copy());
 
-        if(tag.getIntOr("schema", 0)!=1 || !tag.contains("records",Tag.TAG_LIST) || ((ListTag)tag.get("records")).getElementType()!=Tag.TAG_COMPOUND && !((ListTag)tag.get("records")).isEmpty()) {
+        if(tag.getIntOr("schema", 0)!=1 || !(tag.get("records") instanceof ListTag records) || records.stream().anyMatch(value -> !(value instanceof CompoundTag))) {
             data.invalidRoot=true;data.rawRoot=tag.copy();return data;
         }
-        if(tag.contains("recovery_salvage_v1",Tag.TAG_LIST)) for(Tag raw:tag.getListOrEmpty("recovery_salvage_v1"))data.salvage.add(raw.copy());
+        if(tag.get("recovery_salvage_v1") instanceof ListTag) for(Tag raw:tag.getListOrEmpty("recovery_salvage_v1"))data.salvage.add(raw.copy());
         for(Tag raw:tag.getListOrEmpty("records")){
             CompoundTag t=(CompoundTag)raw; UUID id=t.read("request", net.minecraft.core.UUIDUtil.CODEC).isPresent()?t.read("request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow():null;
             try {

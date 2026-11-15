@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class MachineRecipeTransferGameTests {
     private static MachineMenu menu(GameTestHelper h) {
         h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1, 1, 1));
         return new MachineMenu(1, TestScope.player(h).getInventory(), machine);
     }
 
@@ -123,15 +123,15 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer", timeoutTicks = 60)
     public static void jeiTransferPlanningDoesNotTouchMachineSlots(GameTestHelper h) {
         var menu = menu(h);
-        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1, 1, 1));
         machine.items().setStackInSlot(0, new ItemStack(Items.IRON_INGOT, 3));
         menu.getSlot(menu.type().itemSlots()).set(new ItemStack(Items.IRON_INGOT, 2));
         var registries = h.getLevel().registryAccess();
         h.runAtTickTime(10, () -> {
-            long before = machine.saveWithoutMetadata(registries).getLong("inputs_changed_at");
+            long before = machine.saveWithoutMetadata(registries).getLongOr("inputs_changed_at", 0L);
             h.assertTrue(MachineRecipeTransfer.plan(menu, recipe(iron(64)), true) == null, "Impossible transfer planned");
             h.assertTrue(MachineRecipeTransfer.plan(menu, recipe(iron(4)), true) != null, "Possible transfer failed");
-            long after = machine.saveWithoutMetadata(registries).getLong("inputs_changed_at");
+            long after = machine.saveWithoutMetadata(registries).getLongOr("inputs_changed_at", 0L);
             h.assertTrue(before == after && machine.items().getStackInSlot(0).getCount() == 3,
                     "Planning changed the machine: " + before + " -> " + after);
             h.succeed();
@@ -142,7 +142,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void loadedCatalystEstimateMatchesTheServer(GameTestHelper h) {
         var menu = menu(h);
-        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1, 1, 1));
         var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
         int max = io.github.genichimaruo.singulo.item.UsesHelper.get(catalyst).max();
         ItemStack worn = catalyst.copy();
@@ -280,7 +280,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void jeiTransferUsesAlreadyLoadedCatalystWithoutMovingIt(GameTestHelper h) {
         var menu = menu(h);
-        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1, 1, 1));
         var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
         machine.items().setStackInSlot(menu.type().catalystSlot(), catalyst.copy());
         machine.magazine().tick(machine.items(), menu.type().catalystSlot(), s -> s);

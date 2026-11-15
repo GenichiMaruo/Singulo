@@ -88,7 +88,7 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
     protected void onCrafted(Level level, MachineRecipe recipe) {
         double chance = MONOPOLE_CHANCE_AT_MAX * side / Structures.RING_MAX_SIDE;
         if (level.getRandom().nextDouble() < chance) {
-            insertOutput(new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("magnetic_monopole"))), false);
+            insertOutput(new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("magnetic_monopole"))), false);
         }
         maybeLeakStrangelet(level);
     }

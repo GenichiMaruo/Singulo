@@ -6,15 +6,9 @@
     "GBG"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_glass"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "B": "singulo:blueprint_ruin_glass",
+    "G": "#c:glass_blocks/colorless",
+    "W": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:intact_ruin_glass",

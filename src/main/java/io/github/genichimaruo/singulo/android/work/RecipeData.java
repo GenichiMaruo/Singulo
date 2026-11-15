@@ -58,8 +58,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
     }
 
     /** 見本の欄 i で使ってよい物（同じ種類の別の物も使わないなら null）。 */
-    @Nullable
-    public net.minecraft.world.item.crafting.Ingredient alt(int i) {
+    public net.minecraft.world.item.crafting.@Nullable Ingredient alt(int i) {
         if (i >= alts.size() || alts.get(i).isEmpty()) {
             return null;
         }
@@ -196,8 +195,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
     }
 
     /** 燃料を入れる面（自動なら null）。 */
-    @Nullable
-    public net.minecraft.core.Direction fuelFace(net.minecraft.world.level.block.state.BlockState machine) {
+    public net.minecraft.core.@Nullable Direction fuelFace(net.minecraft.world.level.block.state.BlockState machine) {
         return auto(2) ? null : face(2, machine, net.minecraft.core.Direction.NORTH);
     }
 
@@ -299,13 +297,13 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         r.putString("mode", mode);
         ListTag list = new ListTag();
         for (ItemStack s : grid) {
-            list.add(s.isEmpty() ? new CompoundTag() : s.save(registries));
+            list.add(s.isEmpty() ? new CompoundTag() : io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));
         }
         r.put("grid", list);
-        r.put("output", output.save(registries));
+        r.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.save(output, registries));
         ListTag ex = new ListTag();
         for (ItemStack s : extras) {
-            ex.add(s.isEmpty() ? new CompoundTag() : s.save(registries));
+            ex.add(s.isEmpty() ? new CompoundTag() : io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));
         }
         r.put("extras", ex);
         if (!steps.isEmpty()) {
@@ -316,7 +314,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             r.put("steps", st);
         }
         if (!fuel.isEmpty()) {
-            r.put("fuel", fuel.save(registries));
+            r.put("fuel", io.github.genichimaruo.singulo.compat.NbtCompat.save(fuel, registries));
         }
         r.putInt("faces", faces);
         if (variants()) {
@@ -356,7 +354,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         int faces = r.contains("faces") ? r.getIntOr("faces", 0) : DEFAULT_FACES;
         List<String> alts = new ArrayList<>();
         for (Tag t : r.getListOrEmpty("alts")) {
-            alts.add(t.getAsString());
+            alts.add(t.asString().orElse(""));
         }
         return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces, alts);
     }

@@ -6,9 +6,7 @@
   "energy": 2000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:empty_coolant_cartridge"
-      },
+      "ingredient": "singulo:empty_coolant_cartridge",
       "count": 1
     }
   ],

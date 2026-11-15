@@ -12,27 +12,19 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:android_tank_upgrade"
-      },
+      "ingredient": "singulo:android_tank_upgrade",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:android_gas_tank_upgrade"
-      },
+      "ingredient": "singulo:android_gas_tank_upgrade",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "mekanism:alloy_infused"
-      },
+      "ingredient": "mekanism:alloy_infused",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "mekanism:basic_control_circuit"
-      },
+      "ingredient": "mekanism:basic_control_circuit",
       "count": 1
     }
   ],

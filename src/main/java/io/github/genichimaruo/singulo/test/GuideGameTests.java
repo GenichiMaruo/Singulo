@@ -5,13 +5,13 @@ import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.ruin.AncientRecords;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 旧文明の記録と進捗の確認。 */
 @GameTestHolder("singulo_progression")
@@ -91,9 +91,9 @@ public final class GuideGameTests {
         ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             var inventory = player.getInventory();
-            var axe = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("android_memory_axe")));
-            var bit = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("android_memory_bit")));
-            var blade = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("android_memory_blade")));
+            var axe = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("android_memory_axe")));
+            var bit = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("android_memory_bit")));
+            var blade = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("android_memory_blade")));
             inventory.setItem(0, axe);
             net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, inventory, axe);
             helper.assertFalse(done(player, "android_prototypes"), "メモリ1種類だけで両型を達成した");
@@ -118,7 +118,7 @@ public final class GuideGameTests {
         io.github.genichimaruo.singulo.registry.PendingMilestones.award(server, owner, "android_order_complete");
         var data = io.github.genichimaruo.singulo.registry.PendingMilestones.get(server);
         var saved = data.save(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess());
-        helper.assertTrue(saved.getList("pending", net.minecraft.nbt.Tag.TAG_COMPOUND).stream().anyMatch(t ->
+        helper.assertTrue(saved.getListOrEmpty("pending").stream().anyMatch(t ->
                 ((net.minecraft.nbt.CompoundTag) t).read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow().equals(owner)), "オフラインの注文者を保存していない");
         var restored = io.github.genichimaruo.singulo.registry.PendingMilestones.load(saved, helper.getLevel().registryAccess());
         ServerPlayer player = player(helper, owner);
@@ -130,7 +130,7 @@ public final class GuideGameTests {
             helper.assertTrue(done(player, "android_delivery"), "保存・復元した完了通知が届かない");
             helper.assertFalse(done(player, "android_printed"), "注文だけで印刷まで達成した");
             helper.assertFalse(restored.save(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess())
-                    .getList("pending", net.minecraft.nbt.Tag.TAG_COMPOUND).stream().anyMatch(t ->
+                    .getListOrEmpty("pending").stream().anyMatch(t ->
                             ((net.minecraft.nbt.CompoundTag) t).read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow().equals(owner)), "通知後にも本人の保留データが残った");
             helper.succeed();
         } finally {
@@ -142,7 +142,7 @@ public final class GuideGameTests {
     @GameTest(template = EMPTY, batch = "progression_completion", timeoutTicks = 100)
     public static void printingAndDeliveryEmitOwnerMilestones(GameTestHelper helper) {
         ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
-        var bit = io.github.genichimaruo.singulo.registry.SinguloEntities.BIT_ANDROID.get().create(helper.getLevel());
+        var bit = io.github.genichimaruo.singulo.registry.SinguloEntities.BIT_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bit.setNoAi(true);
         bit.setNoGravity(true);
         bit.moveTo(net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4))));
@@ -151,7 +151,7 @@ public final class GuideGameTests {
         helper.getLevel().addFreshEntity(bit);
         var consolePos = new net.minecraft.core.BlockPos(1, 1, 1);
         helper.setBlock(consolePos, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = helper.getBlockEntity(consolePos);
+        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,consolePos);
         var order = new io.github.genichimaruo.singulo.android.work.WorkOrder(1, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4, player.getUUID());
         console.orders().add(order);
         helper.runAtTickTime(10, () -> {
@@ -182,7 +182,7 @@ public final class GuideGameTests {
         first.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         second.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         creative.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-        var boss = io.github.genichimaruo.singulo.registry.SinguloEntities.FOUNDRY_OVERSEER.get().create(helper.getLevel());
+        var boss = io.github.genichimaruo.singulo.registry.SinguloEntities.FOUNDRY_OVERSEER.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         boss.setNoAi(true);
         boss.moveTo(at);
         helper.getLevel().addFreshEntity(boss);

@@ -58,7 +58,7 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
     public static final int BUTTON_DISMANTLE = 0, BUTTON_RESUME = 10;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -216,7 +216,7 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
     // ------------------------------------------------------------------ 呼び出し
 
     /** 呼べるドローン: 待機中のドローン（ステーションの枠）か、荷物を届け終えて帰りかけのドローン（その便）。 */
-    private record Candidate(@Nullable DroneStationBlockEntity station, int unit, @Nullable DroneNetwork.Flight returning, double distSqr) {}
+    private record Candidate(@Nullable DroneStationBlockEntity station, int unit, DroneNetwork.@Nullable Flight returning, double distSqr) {}
 
     /**
      * port に呼べるドローン（port に近い順）。読み込まれているものだけ。調べるのは、持ち主の読み込まれたステーションと、
@@ -291,8 +291,7 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
     /**
      * port に近い、owner のドローン（待機中か、帰りかけ）を1機呼ぶ。呼べたら便の記録。
      */
-    @Nullable
-    public static DroneNetwork.Flight call(ServerLevel level, BlockPos port, @Nullable UUID owner, BlockPos to) {
+    public static DroneNetwork.@Nullable Flight call(ServerLevel level, BlockPos port, @Nullable UUID owner, BlockPos to) {
         DroneNetwork net = DroneNetwork.get(level);
         for (Candidate c : candidates(level, port, owner)) {
             if (c.returning() != null) {
@@ -339,7 +338,7 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
         }
         drones[unit] = null;
         stopped[unit] = true;
-        ItemStack kit = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit")));
+        ItemStack kit = new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("drone_kit")));
         ItemStack rest = items.insertItem(SLOT_KIT, kit, false);
         if (!rest.isEmpty()) {
             Block.popResource(level, worldPosition.above(), rest);
@@ -500,7 +499,7 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
             return;
         }
         DroneNetwork net = DroneNetwork.get(server);
-        var kit = BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
+        var kit = BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
         // ドローンは1機ごとにキットを1つ返す（帰りかけ・運搬中のものも。運搬中のドローンは届け終えたら消える）
         for (int i = 0; i < MAX_UNITS; i++) {
             if (net.clearAway(worldPosition, i)) {
@@ -584,8 +583,10 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
         owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         for (int i = 0; i < MAX_UNITS; i++) {
             drones[i] = tag.read("drone" + i, net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("drone" + i, net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
-            stopped[i] = tag.getBoolean("stopped" + i);
-            kinds[i] = DroneKind.byId(tag.getInt("kind" + i));
+            stopped[i] = tag.getBooleanOr("stopped" + i, false);
+            kinds[i] = DroneKind.byId(tag.getIntOr("kind" + i, 0));
         }
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> slot == SLOT_KIT, (slot,r) -> false); }
 }

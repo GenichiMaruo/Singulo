@@ -54,10 +54,9 @@ public class AcceleratorPartBlock extends PartBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
-            LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighbor, net.minecraft.util.RandomSource random) {
         if (direction.getAxis().isHorizontal()) {
-            level.scheduleTick(pos, this, 1);
+            ticks.scheduleTick(pos, this, 1);
         }
         return state;
     }

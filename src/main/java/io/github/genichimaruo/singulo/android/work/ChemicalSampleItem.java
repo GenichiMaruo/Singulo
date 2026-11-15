@@ -11,7 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
  * 化学物質の見本（{@link ChemicalSamples}）。作業指令台の見本の欄・注文の一覧で、Mekanism の化学物質を表す。名前は化学物質の名前、
  * 色は化学物質の色。手に入れる物ではない（クリエイティブのタブにも JEI にも出さない）。
  */
-public class ChemicalSampleItem extends Item {
+public class ChemicalSampleItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public ChemicalSampleItem(Properties properties) {
         super(properties.stacksTo(1));
     }

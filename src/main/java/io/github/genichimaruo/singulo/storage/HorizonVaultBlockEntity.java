@@ -248,9 +248,9 @@ public class HorizonVaultBlockEntity extends io.github.genichimaruo.singulo.comp
     }
 
     @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("type");
-        tag.remove("count");
+    public void removeComponentsFromTag(net.minecraft.world.level.storage.ValueOutput tag) {
+        tag.discard("type");
+        tag.discard("count");
     }
 
     // ------------------------------------------------------------------ 保存
@@ -263,7 +263,7 @@ public class HorizonVaultBlockEntity extends io.github.genichimaruo.singulo.comp
 
     private void write(CompoundTag tag, HolderLookup.Provider registries) {
         if (!type.isEmpty() && count > 0) {
-            tag.put("type", type.save(registries));
+            tag.put("type", io.github.genichimaruo.singulo.compat.NbtCompat.save(type, registries));
             tag.putLong("count", count);
         }
     }
@@ -292,4 +292,34 @@ public class HorizonVaultBlockEntity extends io.github.genichimaruo.singulo.comp
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    private record TransferState(ItemStack type, long count) {}
+    private final class TransferStorage extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<TransferState>
+            implements net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> {
+        private void checkSlot(int slot) { if (slot != 0) throw new IndexOutOfBoundsException(slot); }
+        @Override protected TransferState createSnapshot() { return new TransferState(type.copy(), count); }
+        @Override protected void revertToSnapshot(TransferState state) { type = state.type().copy(); count = state.count(); }
+        @Override protected void onRootCommit(TransferState state) { changed(); }
+        public int size() { return 1; }
+        public net.neoforged.neoforge.transfer.item.ItemResource getResource(int slot) { checkSlot(slot); return count <= 0 ? net.neoforged.neoforge.transfer.item.ItemResource.EMPTY : net.neoforged.neoforge.transfer.item.ItemResource.of(type); }
+        public long getAmountAsLong(int slot) { checkSlot(slot); return Math.max(0, count); }
+        public long getCapacityAsLong(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource) { checkSlot(slot); return resource.isEmpty() || accepts(resource.toStack()) ? CAPACITY : 0; }
+        public boolean isValid(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource) { checkSlot(slot); return !resource.isEmpty() && accepts(resource.toStack()); }
+        public int insert(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            checkSlot(slot); net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            if (!isValid(slot, resource)) return 0;
+            int inserted = (int) Math.min(amount, CAPACITY - count);
+            if (inserted > 0) { updateSnapshots(tx); if (type.isEmpty()) type = resource.toStack(); count += inserted; }
+            return inserted;
+        }
+        public int extract(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            checkSlot(slot); net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            if (type.isEmpty() || !resource.matches(type)) return 0;
+            int extracted = (int) Math.min(Math.min(amount, type.getMaxStackSize()), count);
+            if (extracted > 0) { updateSnapshots(tx); count -= extracted; if (count == 0) type = ItemStack.EMPTY; }
+            return extracted;
+        }
+    }
+    private final TransferStorage transferStorage = new TransferStorage();
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return transferStorage; }
 }

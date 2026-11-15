@@ -11,7 +11,7 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -22,8 +22,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** ストレンジレット・磁気瓶・ニュートリノ・スキャナー・水素漏れの確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -40,7 +40,7 @@ public final class HazardGameTests {
             helper.setBlock(p, Blocks.STONE);
         }
         helper.setBlock(pos, SinguloBlocks.STRANGELET.get());
-        StrangeletBlockEntity s = helper.getBlockEntity(pos);
+        StrangeletBlockEntity s = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         helper.runAtTickTime(120, () -> {
             helper.assertTrue(s.converted() >= 1, "ストレンジ物質に変わらない: " + s.converted());
             helper.assertBlockPresent(SinguloBlocks.STRANGELET.get(), pos);
@@ -93,7 +93,7 @@ public final class HazardGameTests {
     public static void hydrogenLeakNearFireExplodes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         // 出力の水素タンクに直接入れる（搬入では出力タンクに入らない）
         m.forceOutputTankForTest(new FluidStack(SinguloFluids.get("hydrogen"), 2000));
         helper.setBlock(new BlockPos(5, 1, 3), Blocks.CAMPFIRE);

@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:nihonium_ingot"
-      },
+      "ingredient": "singulo:nihonium_ingot",
       "count": 1
     }
   ],

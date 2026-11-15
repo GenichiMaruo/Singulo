@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerInput;
@@ -13,15 +13,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import java.util.List;
 
-@net.neoforged.neoforge.gametest.GameTestHolder(Singulo.MODID)
-@net.neoforged.neoforge.gametest.PrefixGameTestTemplate(false)
+@io.github.genichimaruo.singulo.test.harness.GameTestHolder(Singulo.MODID)
+@io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate(false)
 public final class MachineRefillGameTests {
     private static ItemStack item(String id, int count) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)),count);
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)),count);
     }
     private static MachineBlockEntity machine(GameTestHelper h, BlockPos pos, MachineType type) {
         h.setBlock(pos,SinguloBlocks.MACHINES.get(type).get());
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
     }
     private static void takeOutput(GameTestHelper h, MachineMenu menu, MachineBlockEntity machine, Player player) {
         menu.clicked(machine.type().outputSlot(),0,ContainerInput.PICKUP,player);

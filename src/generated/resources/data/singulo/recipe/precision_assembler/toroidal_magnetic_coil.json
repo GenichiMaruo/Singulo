@@ -6,15 +6,11 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:topological_wire"
-      },
+      "ingredient": "singulo:topological_wire",
       "count": 8
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     }
   ],

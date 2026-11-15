@@ -6,21 +6,15 @@
   "energy": 200000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:jet_condensate"
-      },
+      "ingredient": "singulo:jet_condensate",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:compressed_metal_block_2"
-      },
+      "ingredient": "singulo:compressed_metal_block_2",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:stardust"
-      },
+      "ingredient": "singulo:stardust",
       "count": 4
     }
   ],

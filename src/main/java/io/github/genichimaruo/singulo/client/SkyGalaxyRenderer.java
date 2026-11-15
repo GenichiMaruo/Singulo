@@ -22,24 +22,26 @@ import org.joml.Vector3f;
 final class SkyGalaxyRenderer {
     private SkyGalaxyRenderer() {}
 
-    static void onRenderStage(RenderLevelStageEvent event) {
+    private static final net.minecraft.util.context.ContextKey<java.util.List<SnapshotBlockRenderer.Batch>> KEY = new net.minecraft.util.context.ContextKey<>(io.github.genichimaruo.singulo.Singulo.id("sky_galaxies"));
+    static void extract(net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent event) {
+        event.getRenderState().setRenderData(KEY,java.util.List.of());
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY || level == null || level.dimension() != Level.OVERWORLD) {
+        if (level == null || level.dimension() != Level.OVERWORLD) {
             return;
         }
         List<Long> seeds = ClientGalaxies.seeds();
         if (seeds.isEmpty()) {
             return;
         }
-        float pt = event.getPartialTick().getGameTimeDeltaPartialTick(false);
-        float night = Mth.clamp(level.getStarBrightness(pt) * 2.2F, 0, 1) * (1 - level.getRainLevel(pt));
+        float pt = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float night = Mth.clamp(event.getRenderState().skyRenderState.starBrightness * 2.2F, 0, 1) * (1 - level.getRainLevel(pt));
         if (night <= 0.01F || mc.gameRenderer.getMainCamera().getFluidInCamera() != net.minecraft.world.level.material.FogType.NONE) {
             return;
         }
         // 空の霧の中で薄れすぎない距離（地形はこの後に上から描かれるので、近くても隠れる）
-        float dist = Math.min(30F, mc.gameRenderer.getRenderDistance() * 0.3F);
-        Quaternionf sky = new Quaternionf().rotationY(-Mth.HALF_PI).rotateX(level.getTimeOfDay(pt) * Mth.TWO_PI);
+        float dist = Math.min(30F, mc.options.getEffectiveRenderDistance()*16F * 0.3F);
+        Quaternionf sky = new Quaternionf().rotationY(-Mth.HALF_PI).rotateX(event.getRenderState().skyRenderState.starAngle);
         Quaternionf toLocal = new Quaternionf(sky).conjugate();
         Quaternionf camRot = mc.gameRenderer.getMainCamera().rotation();
         Quaternionf localCam = new Quaternionf(toLocal).mul(camRot);
@@ -48,9 +50,8 @@ final class SkyGalaxyRenderer {
         float time = level.getGameTime() + pt;
 
         PoseStack pose = new PoseStack();
-        pose.mulPose(event.getModelViewMatrix());
         pose.mulPose(sky);
-        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
+        var buffers = new SnapshotBlockRenderer.Capture();
         RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.eyes(FxDraw.WHITE);
         VertexConsumer vc = buffers.getBuffer(type);
         for (long seed : seeds) {
@@ -70,6 +71,18 @@ final class SkyGalaxyRenderer {
             GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, radius, time * 0.0004F, bright, time, 0, true);
             pose.popPose();
         }
-        buffers.endBatch(type);
+        event.getRenderState().setRenderData(KEY,buffers.finish());
     }
+    static void onRenderStage(RenderLevelStageEvent.AfterSky event) {
+        var batches=event.getLevelRenderState().getRenderData(KEY);
+        if(batches==null||batches.isEmpty())return;
+        var pose=new PoseStack();pose.mulPose(event.getModelViewMatrix());
+        var buffers=Minecraft.getInstance().renderBuffers().bufferSource();
+        for(var batch:batches) {
+            var out=buffers.getBuffer(batch.type());
+            for(var v:batch.vertices())out.addVertex(pose.last(),v.x(),v.y(),v.z()).setColor(v.color()).setUv(v.u(),v.v()).setOverlay(v.overlay()).setLight(v.light()).setNormal(pose.last(),v.nx(),v.ny(),v.nz()).setLineWidth(v.width());
+            buffers.endBatch(batch.type());
+        }
+    }
+
 }

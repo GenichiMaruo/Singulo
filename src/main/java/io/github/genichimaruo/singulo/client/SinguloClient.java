@@ -31,35 +31,42 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerItemColors);
         modBus.addListener(SinguloClient::registerBlockColors);
         modBus.addListener(SinguloClient::registerExtensions);
+        modBus.addListener(SinguloClient::registerFluidModels);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(SinguloClient::addWingLayers);
+        modBus.addListener((net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent event) -> AfterglowWingsLayer.registerModifiers(event));
+        modBus.addListener(RayleighLightmapBanks::registerShaders);
         modBus.addListener(GravitationalLensing::registerShaders);
         modBus.addListener(JetForgeRenderTypes::registerPipelines);
+        modBus.addListener(EffectRenderTypes::register);
         modBus.addListener(GlowDepth::registerShaders);
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(FluidCapsuleRenderer::registerModels);
-        modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(CoverModel::wrap);
         modBus.addListener(CoverModel::registerColors);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
+        modBus.addListener(SinguloClient::registerNumericProperties);
         modBus.addListener(SinguloKeys::register);
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
+        NeoForge.EVENT_BUS.addListener(ClientRecipes::receive);
         NeoForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GlowDepth::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
-        NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::render);
+        NeoForge.EVENT_BUS.addListener(WorldGeometry::extract);
+        NeoForge.EVENT_BUS.addListener(GravitationalLensing::extract);
+        NeoForge.EVENT_BUS.addListener(WorldGeometry::submit);
         NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::hud);
         NeoForge.EVENT_BUS.addListener(PipeSurveyRenderer::clear);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::extract);
         NeoForge.EVENT_BUS.addListener(ArsenalNotice::onLogin);
         NeoForge.EVENT_BUS.addListener(ArsenalNotice::onLogout);
         NeoForge.EVENT_BUS.addListener(ArsenalNotice::onClientTick);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
+            ClientRecipes.clear();
             ClientGalaxies.set(java.util.List.of(), false);
             ClientRecords.set(java.util.List.of());
             clearWorldState();
@@ -67,7 +74,6 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.LevelEvent.Unload e) -> {
             if (e.getLevel().isClientSide()) clearWorldState();
         });
-        NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(RayleighLighting::tick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
@@ -119,8 +125,8 @@ public final class SinguloClient {
     /** 残光の翼を、プレイヤー（両方の体型）と防具立てに描く。 */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void addWingLayers(EntityRenderersEvent.AddLayers event) {
-        for (net.minecraft.client.resources.PlayerSkin.Model skin : event.getSkins()) {
-            if (event.getSkin(skin) instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer r) {
+        for (var skin : event.getSkins()) {
+            if (event.getPlayerRenderer(skin) instanceof net.minecraft.client.renderer.entity.player.AvatarRenderer<?> r) {
                 r.addLayer(new AfterglowWingsLayer<>(r));
             }
         }
@@ -180,7 +186,7 @@ public final class SinguloClient {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
                 PenroseReactorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEAL_CONSOLE.get(),
-                ctx -> new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<>() {
+                ctx -> new SnapshotBlockRenderer<io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity>() {
                     // 重力異常点: 封印コンソールの上の空間がゆがんで見える。ボスが現れると縮んで消え、倒されると戻る
                     @Override
                     public void render(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be, float pt,
@@ -197,7 +203,7 @@ public final class SinguloClient {
                     }
 
                     @Override
-                    public boolean shouldRenderOffScreen(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be) {
+                    public boolean shouldRenderOffScreen() {
                         return true;
                     }
 
@@ -274,53 +280,19 @@ public final class SinguloClient {
 
     /** 作業位置カードとレシピカードは、シフトを押している間、中身の絵を重ねて見せる。 */
     /** 流体の見本は、流体の色に染める。 */
-    private static void registerItemColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Item event) {
-        event.register((stack, layer) -> {
-            var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(stack);
-            if (f.isEmpty()) {
-                return 0xFFFFFFFF;
-            }
-            return 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
-        // 液体キャニスター: 窓の絵（layer1）だけを中身の色に。空なら窓を描かない
-        event.register((stack, layer) -> {
-            var f = io.github.genichimaruo.singulo.item.FluidCanisterItem.fluid(stack);
-            if (layer != 1) {
-                return 0xFFFFFFFF;
-            }
-            return f.isEmpty() ? 0 : 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CANISTER.get());
-        // フードカートリッジ: 窓の絵（layer1）だけをペーストの色に。空なら窓を描かない
-        event.register((stack, layer) -> {
-            if (layer != 1) {
-                return 0xFFFFFFFF;
-            }
-            int kind = io.github.genichimaruo.singulo.food.FoodPaste.kind(stack);
-            return kind < 0 ? 0 : 0xFF000000 | io.github.genichimaruo.singulo.food.FoodPaste.COLORS[kind];
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.FOOD_CARTRIDGE.get());
-        // 化学物質の見本は、化学物質の色に
-        event.register((stack, layer) -> {
-            String id = io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(stack);
-            return id.isEmpty() ? 0xFFFFFFFF : 0xFF000000 | io.github.genichimaruo.singulo.android.work.Chemicals.tint(id);
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.CHEMICAL_SAMPLE.get());
-        // アンドロイドの装飾: 染める絵（layer0）だけを、染めた色に
-        for (var acc : io.github.genichimaruo.singulo.registry.SinguloItems.ACCESSORIES) {
-            event.register((stack, layer) -> layer == 0 && stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem a
-                    ? 0xFF000000 | a.color(stack) : 0xFFFFFFFF, acc.get());
-        }
+    private static void registerItemColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.ItemTintSources event) {
+        event.register(Singulo.id("dynamic"), SinguloItemTint.CODEC);
     }
-
-    /** 置いたティーカップ: 色付けの番号0（カップと受け皿）を、ブロックエンティティの色に。 */
-    private static void registerBlockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
-        event.register((state, level, pos, tint) -> {
-            if (tint == 0 && level != null && pos != null
-                    && level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.TeacupBlockEntity cup) {
-                return 0xFF000000 | cup.color();
+    private static void registerBlockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.BlockTintSources event) {
+        event.register(java.util.List.of(new net.minecraft.client.color.block.BlockTintSource() {
+            @Override public int color(net.minecraft.world.level.block.state.BlockState state) { return -1; }
+            @Override public int colorInWorld(net.minecraft.world.level.block.state.BlockState state,
+                    net.minecraft.client.renderer.block.BlockAndTintGetter level, net.minecraft.core.BlockPos pos) {
+                Integer color=level.getModelData(pos).get(io.github.genichimaruo.singulo.android.TeacupBlockEntity.MODEL_COLOR);
+                return color==null?-1:0xFF000000|color;
             }
-            return 0xFFFFFFFF;
-        }, io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get());
+        }), io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get());
     }
-
     private static void registerDecorations(net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent event) {
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), WorkCardDecorator.LOCATION);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
@@ -332,7 +304,7 @@ public final class SinguloClient {
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
     private static void addPacks(net.neoforged.neoforge.event.AddPackFindersEvent event) {
         var modFile = net.neoforged.fml.ModList.get().getModFileById(Singulo.MODID).getFile();
-        if (!java.nio.file.Files.isRegularFile(modFile.findResource("resourcepacks/singulo_hd/pack.mcmeta"))) {
+        if (!modFile.getContents().containsFile("resourcepacks/singulo_hd/pack.mcmeta")) {
             return;
         }
         event.addPackFinders(Singulo.id("resourcepacks/singulo_hd"), net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
@@ -342,35 +314,11 @@ public final class SinguloClient {
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
-        // 電力の数: Shift を押している間は正確な値
-        io.github.genichimaruo.singulo.energy.EnergyText.detail = net.minecraft.client.gui.screens.Screen::hasShiftDown;
-        // 作業位置カード: 記録済みなら絵を切り替える
-        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
-                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.pos(stack) != null ? 1 : 0));
-        // 範囲カード: 1つ目の角だけなら 0.5、範囲ができていれば 1
-        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.AREA_CARD.get(), Singulo.id("recorded"),
-                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.AreaCardItem.box(stack) != null ? 1
-                        : io.github.genichimaruo.singulo.android.work.AreaCardItem.first(stack) != null ? 0.5F : 0));
-        // 測量メガネ: 掛ける高さごとに、頭の模型を切り替える
-        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.SURVEY_GLASSES.get(), Singulo.id("height"),
-                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.heightPredicate(stack)));
-        // 移設レンチ: ケーブル撤去モードは表示灯が橙の絵
-        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.RELOCATION_WRENCH.get(), Singulo.id("mode"),
-                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.item.RelocationWrenchItem.mode(stack)));
-        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), Identifier.withDefaultNamespace("angle"),
-                new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
-                        io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
-        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), Identifier.withDefaultNamespace("angle"),
-                new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
-                        io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
+        io.github.genichimaruo.singulo.energy.EnergyText.detail = () -> net.minecraft.client.Minecraft.getInstance().hasShiftDown();
     }
-
+    private static void registerNumericProperties(net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent event) {
+        event.register(Singulo.id("dynamic"), SinguloItemProperty.CODEC);
+    }
     /**
      * 説明（折り返し）。長い説明には短い要約があり、ふだんは要約だけを出す。
      * Shift を押している間は、説明の全文と作り方・使い道を出す（詳しく見られるものには「Shift: 詳しく見る」を添える）。
@@ -393,7 +341,7 @@ public final class SinguloClient {
         boolean hasSummary = net.minecraft.client.resources.language.I18n.exists(summary);
         boolean hasHowto = net.minecraft.client.resources.language.I18n.exists("howto.singulo." + id.getPath());
         boolean hasUses = net.minecraft.client.resources.language.I18n.exists("uses.singulo." + id.getPath());
-        boolean detailed = net.minecraft.client.gui.screens.Screen.hasShiftDown();
+        boolean detailed = net.minecraft.client.Minecraft.getInstance().hasShiftDown();
         java.util.List<Component> tip = event.getToolTip();
         tip.add(Component.translatable(hasSummary && !detailed ? summary : key).withStyle(ChatFormatting.GRAY));
         if (detailed) {
@@ -421,38 +369,19 @@ public final class SinguloClient {
         // 液体カプセル: 立体の殻の中に、詰めた液体を描く
         event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
             @Override
-            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return FluidCapsuleRenderer.get();
-            }
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CAPSULE.get(), io.github.genichimaruo.singulo.registry.SinguloItems.BATTERY_FLUID_CAPSULE.get(),
-                io.github.genichimaruo.singulo.registry.SinguloItems.LARGE_BATTERY_FLUID_CAPSULE.get());
-        // 傘を手に持つ間は、腕を上げて柄を握る構えにする（ほかの人から見て、手で持って見えるように）
-        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
-            @Override
             public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,
                                                                               net.minecraft.world.InteractionHand hand,
                                                                               net.minecraft.world.item.ItemStack stack) {
                 return UmbrellaArmPose.UMBRELLA.getValue();
             }
         }, io.github.genichimaruo.singulo.registry.SinguloItems.ANDROID_UMBRELLA.get());
-        for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
-            int color = entry.def().color();
-            event.registerFluidType(new IClientFluidTypeExtensions() {
-                @Override
-                public Identifier getStillTexture() {
-                    return STILL;
-                }
-
-                @Override
-                public Identifier getFlowingTexture() {
-                    return FLOWING;
-                }
-
-                @Override
-                public int getTintColor() {
-                    return color;
-                }
-            }, entry.type().get());
+    }
+    private static void registerFluidModels(net.neoforged.neoforge.client.event.RegisterFluidModelsEvent event) {
+        for(SinguloFluids.Entry entry:SinguloFluids.ALL.values()) {
+            net.neoforged.neoforge.client.fluid.FluidTintSource tint=state->entry.def().color();
+            event.register(new net.minecraft.client.renderer.block.FluidModel.Unbaked(
+                    new net.minecraft.client.resources.model.sprite.Material(STILL),
+                    new net.minecraft.client.resources.model.sprite.Material(FLOWING),null,tint),entry.source(),entry.flowing());
         }
     }
 }

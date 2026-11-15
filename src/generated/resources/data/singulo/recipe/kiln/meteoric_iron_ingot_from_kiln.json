@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:raw_meteoric_iron"
-      },
+      "ingredient": "singulo:raw_meteoric_iron",
       "count": 1
     }
   ],

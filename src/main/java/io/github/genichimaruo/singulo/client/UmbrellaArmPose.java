@@ -14,7 +14,7 @@ public final class UmbrellaArmPose {
     /** 腕を前へ上げる角度（ラジアン。負が前）と、体の内側へ寄せる角度。 */
     static final float RAISE = -0.95F, INWARD = 0.12F;
 
-    public static final EnumProxy<HumanoidModel.ArmPose> UMBRELLA = new EnumProxy<>(HumanoidModel.ArmPose.class, false,
+    public static final EnumProxy<HumanoidModel.ArmPose> UMBRELLA = new EnumProxy<>(HumanoidModel.ArmPose.class, false, false,
             (IArmPoseTransformer) (model, entity, arm) -> {
                 ModelPart part = arm == HumanoidArm.RIGHT ? model.rightArm : model.leftArm;
                 part.xRot = RAISE;

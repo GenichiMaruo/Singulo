@@ -1,7 +1,11 @@
 {
   "pack": {
     "description": "Singulo generated resources",
-    "pack_format": 34
+    "min_format": 84,
+    "max_format": [
+      101,
+      1
+    ]
   },
   "sodium": {
     "ignored_shaders": [

@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -47,14 +47,14 @@ public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.
     static final int TANK = 32_000;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(200_000, 0, PUSH_PER_TICK, this::setChanged);
-    private final FluidTank tank = new FluidTank(TANK, f -> f.getFluid().isSame(SinguloFluids.get("liquid_nitrogen"))) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(TANK, f -> f.getFluid().isSame(SinguloFluids.get("liquid_nitrogen"))) {
         @Override
         protected void onContentsChanged() {
             setChanged();
         }
     };
     /** 入口（冷媒カートリッジ）と出口（空のカートリッジ）。 */
-    private final ItemStackHandler items = new ItemStackHandler(2) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return slot == 0 ? CoolantCartridges.isFilled(stack) : CoolantCartridges.isEmptyCartridge(stack);
@@ -111,7 +111,7 @@ public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.
         return energy;
     }
 
-    public IFluidHandler tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
@@ -180,12 +180,9 @@ public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.
             if (energy.getEnergyStored() <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            var target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), PUSH_PER_TICK));
             }
         }
         boolean active = rate > 0;
@@ -249,7 +246,7 @@ public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (legacyNotice) {
             tag.putBoolean("legacy_notice", true);
@@ -265,11 +262,15 @@ public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         energy.setEnergy(tag.getIntOr("energy", 0));
-        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
         if (tag.contains("items")) {
             io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
         // 前の版はスロットを持たなかった（タンクだけを書いていた）
         legacyNotice = tag.getBooleanOr("legacy_notice", false) || tag.contains("tank") && !tag.contains("items");
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot, resource) -> slot == 0, (slot, resource) -> slot == 1);
     }
 }

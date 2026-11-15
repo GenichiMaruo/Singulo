@@ -47,7 +47,7 @@ public final class SinguloBlocks {
 
     static {
         for (BlockDef def : GeneratedContent.BLOCKS) {
-            SIMPLE.put(def.id(), BLOCKS.registerSimpleBlock(def.id(), BlockBehaviour.Properties.of()
+            SIMPLE.put(def.id(), BLOCKS.registerSimpleBlock(def.id(), () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE).strength(5.0F, 12.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.NETHERITE_BLOCK)));
         }
@@ -61,17 +61,17 @@ public final class SinguloBlocks {
     static {
         for (MachineType type : MachineType.values()) {
             if (!type.isMultiblock()) {
-                MACHINES.put(type, BLOCKS.register(type.id(), () -> new MachineBlock(machineProperties(), type)));
+                MACHINES.put(type, BLOCKS.register(type.id(), registryId -> new MachineBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), type)));
             }
         }
         CONTROLLERS.put(MachineType.CRYOGENIC_COOLING_TOWER, BLOCKS.register("cooling_tower_controller",
-                () -> new MultiblockControllerBlock(machineProperties(), MachineType.CRYOGENIC_COOLING_TOWER)));
+                registryId -> new MultiblockControllerBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MachineType.CRYOGENIC_COOLING_TOWER)));
         CONTROLLERS.put(MachineType.PARTICLE_ACCELERATOR, BLOCKS.register("accelerator_controller",
-                () -> new MultiblockControllerBlock(machineProperties(), MachineType.PARTICLE_ACCELERATOR)));
+                registryId -> new MultiblockControllerBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MachineType.PARTICLE_ACCELERATOR)));
         CONTROLLERS.put(MachineType.DEGENERATE_COMPACTOR, BLOCKS.register("degenerate_compactor_controller",
-                () -> new MultiblockControllerBlock(machineProperties(), MachineType.DEGENERATE_COMPACTOR)));
+                registryId -> new MultiblockControllerBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MachineType.DEGENERATE_COMPACTOR)));
         CONTROLLERS.put(MachineType.CASIMIR_CAVITY, BLOCKS.register("casimir_cavity_controller",
-                () -> new MultiblockControllerBlock(machineProperties(), MachineType.CASIMIR_CAVITY)));
+                registryId -> new MultiblockControllerBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MachineType.CASIMIR_CAVITY)));
     }
 
     // ---- マルチブロックの部品（決まった形のもの。形は multiblock/Shapes）
@@ -125,174 +125,174 @@ public final class SinguloBlocks {
     public static final DeferredBlock<PartBlock> JET_FORGE_LEVITATOR = part("jet_forge_levitator", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> JET_FORGE_COLLECTOR = part("jet_forge_collector", MultiblockPart.Role.STRUCTURE);
     // 粒子加速器・ペンローズ・リアクター
-    public static final DeferredBlock<PartBlock> ACCELERATOR_TUBE = BLOCKS.register("accelerator_tube", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.ACCELERATOR_TUBE));
-    public static final DeferredBlock<PartBlock> FOCUSING_MAGNET = BLOCKS.register("focusing_magnet", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.FOCUSING_MAGNET));
+    public static final DeferredBlock<PartBlock> ACCELERATOR_TUBE = BLOCKS.register("accelerator_tube", registryId -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.ACCELERATOR_TUBE));
+    public static final DeferredBlock<PartBlock> FOCUSING_MAGNET = BLOCKS.register("focusing_magnet", registryId -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.FOCUSING_MAGNET));
     public static final DeferredBlock<PartBlock> REACTOR_SHELL = part("reactor_shell", MultiblockPart.Role.REACTOR_SHELL);
     public static final DeferredBlock<PartBlock> GYRO_DRIVE = part("gyro_drive", MultiblockPart.Role.GYRO_DRIVE);
     public static final DeferredBlock<PortBlock> EXTRACTION_PORT = BLOCKS.register("extraction_port",
-            () -> new PortBlock(partProperties(), MultiblockPart.Role.EXTRACTION_PORT));
+            registryId -> new PortBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.EXTRACTION_PORT));
     public static final DeferredBlock<PartBlock> REACTOR_STABILIZER = part("reactor_stabilizer", MultiblockPart.Role.REACTOR_STABILIZER);
     /** 炉心質量警報器（炉殻の代わりにどこにでも置ける。質量が上限に達すると赤石信号を出す）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.SignalPartBlock> REACTOR_MASS_ALARM = BLOCKS.register(
-            "reactor_mass_alarm", () -> new io.github.genichimaruo.singulo.multiblock.SignalPartBlock(partProperties(),
+            "reactor_mass_alarm", registryId -> new io.github.genichimaruo.singulo.multiblock.SignalPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     MultiblockPart.Role.MASS_ALARM));
     /** マルチブロック搬入出ポート（どのマルチブロックでも、外装板の代わりに置ける。加速器はコントローラの左右）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock> MULTIBLOCK_PORT =
-            BLOCKS.register("multiblock_port", () -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties()));
+            BLOCKS.register("multiblock_port", registryId -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** ワームホール生成器ポート（生成器の外殻の代わりに置く受電・搬出口。働きはマルチブロック搬入出ポートと同じ）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock> WORMHOLE_GENERATOR_PORT =
-            BLOCKS.register("wormhole_generator_port", () -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties()));
+            BLOCKS.register("wormhole_generator_port", registryId -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
 
     /** 野良ブラックホール（リアクターが崩壊したあとに残る。壊せない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlock> ROGUE_BLACK_HOLE = BLOCKS.register(
-            "rogue_black_hole", () -> new io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlock(BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3_600_000.0F).noLootTable().noCollission().noOcclusion()
+            "rogue_black_hole", registryId -> new io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))
+                    .mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3_600_000.0F).noLootTable().noCollision().noOcclusion()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 炉心制御装置（ペンローズ・リアクターのコントローラ）。 */
     public static final DeferredBlock<SimpleMachineBlock<PenroseReactorBlockEntity>> CORE_CONTROLLER = BLOCKS.register(
-            "core_controller", () -> new SimpleMachineBlock<>(machineProperties(),
+            "core_controller", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.PENROSE_REACTOR, PenroseReactorBlockEntity::new, PenroseReactorBlockEntity::serverTick));
 
     // ---- 1マスの装置（汎用加工装置以外）
     public static final DeferredBlock<ThermoelectricGeneratorBlock> THERMOELECTRIC_GENERATOR = BLOCKS.register(
-            "thermoelectric_generator", () -> new ThermoelectricGeneratorBlock(machineProperties()));
+            "thermoelectric_generator", registryId -> new ThermoelectricGeneratorBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<SimpleMachineBlock<CryogenicTurbineBlockEntity>> CRYOGENIC_TURBINE = BLOCKS.register(
-            "cryogenic_turbine", () -> new SimpleMachineBlock<>(machineProperties(),
+            "cryogenic_turbine", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.CRYOGENIC_TURBINE, CryogenicTurbineBlockEntity::new, CryogenicTurbineBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity>> MUON_FUSION_REACTOR = BLOCKS.register(
-            "muon_fusion_reactor", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.MUON_FUSION_REACTOR,
+            "muon_fusion_reactor", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.MUON_FUSION_REACTOR,
                     io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::new,
                     io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity>> HYDROGEN_FUEL_CELL = BLOCKS.register(
-            "hydrogen_fuel_cell", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.HYDROGEN_FUEL_CELL,
+            "hydrogen_fuel_cell", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.HYDROGEN_FUEL_CELL,
                     io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity::new,
                     io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<SmesCellBlockEntity>> SMES_CELL = BLOCKS.register(
-            "smes_cell", () -> new SimpleMachineBlock<>(machineProperties(),
+            "smes_cell", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.SMES_CELL, SmesCellBlockEntity::new, SmesCellBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<CosmicMuonCollectorBlockEntity>> COSMIC_MUON_COLLECTOR = BLOCKS.register(
-            "cosmic_muon_collector", () -> new SimpleMachineBlock<>(machineProperties(),
+            "cosmic_muon_collector", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.COSMIC_MUON_COLLECTOR, CosmicMuonCollectorBlockEntity::new,
                     CosmicMuonCollectorBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<QuantumHeatEngineBlockEntity>> QUANTUM_HEAT_ENGINE = BLOCKS.register(
-            "quantum_heat_engine", () -> new SimpleMachineBlock<>(machineProperties(),
+            "quantum_heat_engine", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.QUANTUM_HEAT_ENGINE, QuantumHeatEngineBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<InertialStabilizerBlockEntity>> INERTIAL_STABILIZER = BLOCKS.register(
-            "inertial_stabilizer", () -> new SimpleMachineBlock<>(machineProperties(),
+            "inertial_stabilizer", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.INERTIAL_STABILIZER, InertialStabilizerBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<DegenerateFurnaceBlockEntity>> DEGENERATE_FURNACE_CONTROLLER =
-            BLOCKS.register("degenerate_furnace_controller", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("degenerate_furnace_controller", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.DEGENERATE_FURNACE, DegenerateFurnaceBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
     /** アンドロイド組立ステーション（護衛のアンドロイドを印刷する）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidStationBlock> ANDROID_STATION = BLOCKS.register(
-            "android_station", () -> new io.github.genichimaruo.singulo.android.AndroidStationBlock(machineProperties()));
+            "android_station", registryId -> new io.github.genichimaruo.singulo.android.AndroidStationBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** ドローン輸送: ドローン・ステーション（印刷して待機させる）と発着ポート（梱包して送る・受け取る）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.drone.DroneBlocks.Station> DRONE_STATION = BLOCKS.register(
-            "drone_station", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Station(machineProperties()));
+            "drone_station", registryId -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Station(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.drone.DroneBlocks.Port> DRONE_PORT = BLOCKS.register(
-            "drone_port", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Port(machineProperties()));
+            "drone_port", registryId -> new io.github.genichimaruo.singulo.drone.DroneBlocks.Port(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** ワームホール航路標識: ワームホールの両方の口のそばに置くと、ドローンが口をくぐって別の次元のポートへ荷物を届け、同じ口で帰ってくる。 */
     public static final DeferredBlock<Block> WORMHOLE_DRONE_BEACON = BLOCKS.register("wormhole_drone_beacon",
-            () -> new Block(machineProperties().noOcclusion().lightLevel(s -> 10)));
+            registryId -> new Block(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion().lightLevel(s -> 10)));
     /** 事象の地平線倉庫（1種類の物を中の小さなブラックホールに約10億個まで）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.storage.HorizonVaultBlock> HORIZON_VAULT = BLOCKS.register(
-            "horizon_vault", () -> new io.github.genichimaruo.singulo.storage.HorizonVaultBlock(machineProperties().noOcclusion()));
+            "horizon_vault", registryId -> new io.github.genichimaruo.singulo.storage.HorizonVaultBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion()));
     /** 液体のドローン発着ポート（液体カプセルに詰めて送る・受け取る）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.drone.DroneBlocks.FluidPort> FLUID_DRONE_PORT = BLOCKS.register(
-            "fluid_drone_port", () -> new io.github.genichimaruo.singulo.drone.DroneBlocks.FluidPort(machineProperties()));
+            "fluid_drone_port", registryId -> new io.github.genichimaruo.singulo.drone.DroneBlocks.FluidPort(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** アンドロイドの作業（自動化）: 作業指令台（資材口とレシピの記録を兼ねる）・資材口・納品口・レシピ棚。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.work.WorkConsoleBlock> ANDROID_WORK_CONSOLE = BLOCKS.register(
-            "android_work_console", () -> new io.github.genichimaruo.singulo.android.work.WorkConsoleBlock(machineProperties()));
+            "android_work_console", registryId -> new io.github.genichimaruo.singulo.android.work.WorkConsoleBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT = BLOCKS.register(
-            "android_supply_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_SUPPLY_PORT,
+            "android_supply_port", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.ANDROID_SUPPLY_PORT,
                     io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
     /** RGB染色台（0.18.0）。好きな色に染める。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity>> RGB_DYE_STATION = BLOCKS.register(
-            "rgb_dye_station", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.RGB_DYE_STATION,
+            "rgb_dye_station", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.RGB_DYE_STATION,
                     io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::new,
                     io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity::serverTick));
     /** フードプリンター（0.18.0）。食材から宇宙食を印刷する。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.food.FoodPrinterBlock> FOOD_PRINTER = BLOCKS.register(
-            "food_printer", () -> new io.github.genichimaruo.singulo.food.FoodPrinterBlock(machineProperties().noOcclusion()));
+            "food_printer", registryId -> new io.github.genichimaruo.singulo.food.FoodPrinterBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion()));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT = BLOCKS.register(
-            "android_delivery_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_DELIVERY_PORT,
+            "android_delivery_port", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.ANDROID_DELIVERY_PORT,
                     io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new,
                     io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ANDROID_WORKBENCH = BLOCKS.register(
-            "android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
+            "android_workbench", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.ANDROID_WORKBENCH,
                     io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
     /** 上位のアンドロイド作業台（段階3・4。速く作り、預かり箱が大きい）。同じブロックエンティティで、段階はブロックで決まる。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ADVANCED_ANDROID_WORKBENCH = BLOCKS.register(
-            "advanced_android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
+            "advanced_android_workbench", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.ANDROID_WORKBENCH,
                     io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> QUANTUM_ANDROID_WORKBENCH = BLOCKS.register(
-            "quantum_android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
+            "quantum_android_workbench", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.ANDROID_WORKBENCH,
                     io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK = BLOCKS.register(
-            "android_recipe_rack", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_RECIPE_RACK,
+            "android_recipe_rack", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), SinguloBlockEntities.ANDROID_RECIPE_RACK,
                     io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, (l, p, s, be) -> be.eyes().tick(l, p, s)));
     public static final DeferredBlock<SimpleMachineBlock<ProbeStationBlockEntity>> PROBE_STATION = BLOCKS.register(
-            "probe_station", () -> new SimpleMachineBlock<>(machineProperties(),
+            "probe_station", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.PROBE_STATION, ProbeStationBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<SmesCellBlockEntity.Module>> SMES_MODULE = BLOCKS.register(
-            "smes_module", () -> new SimpleMachineBlock<>(machineProperties(),
+            "smes_module", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.SMES_MODULE, SmesCellBlockEntity.Module::new, SmesCellBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<WorldlineAnchorBlockEntity>> WORLDLINE_ANCHOR_SMALL = BLOCKS.register(
-            "worldline_anchor_small", () -> new SimpleMachineBlock<>(machineProperties(),
+            "worldline_anchor_small", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORLDLINE_ANCHOR, WorldlineAnchorBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
 
     // ---- 段階5の特異点技術
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.AdvancedWorldlineAnchorBlockEntity>>
-            WORLDLINE_ANCHOR_ADVANCED = BLOCKS.register("worldline_anchor_advanced", () -> new SimpleMachineBlock<>(machineProperties(),
+            WORLDLINE_ANCHOR_ADVANCED = BLOCKS.register("worldline_anchor_advanced", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORLDLINE_ANCHOR_ADVANCED,
                     io.github.genichimaruo.singulo.machine.AdvancedWorldlineAnchorBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
     /** イベントホライズン・シールド発生塔のコア（塔の底の中央に置く）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity>> SHIELD_TOWER_CORE =
-            BLOCKS.register("shield_tower_core", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("shield_tower_core", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.SHIELD_TOWER, io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity::new,
                     CatalystDeviceBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity>> HALO_COLLECTOR =
-            BLOCKS.register("halo_collector", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("halo_collector", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.HALO_COLLECTOR, io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity::new, io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity>> CONTAINMENT_TANK =
-            BLOCKS.register("gravitational_containment_tank", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("gravitational_containment_tank", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.CONTAINMENT_TANK, io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::new,
                     io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::serverTick));
     /** 降着ジェット鍛造炉の制御核（土台の手前の枝の先に置く）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.forge.JetForgeBlockEntity>> JET_FORGE_CORE =
-            BLOCKS.register("jet_forge_core", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("jet_forge_core", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.JET_FORGE, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::new,
                     io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::serverTick,
                     io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::clientTick));
     /** ワームホール生成器のコア（3×3×3 の底の中央に置く）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity>> WORMHOLE_GENERATOR_CORE =
-            BLOCKS.register("wormhole_generator_core", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("wormhole_generator_core", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORMHOLE_GENERATOR, io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity::new,
                     io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity>> WORMHOLE_STABILIZER =
-            BLOCKS.register("wormhole_stabilizer", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("wormhole_stabilizer", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORMHOLE_STABILIZER, io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity::new,
                     io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity::serverTick));
     /** ワームホールの口（固定化した口を置いたもの）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity>> WORMHOLE_MOUTH =
-            BLOCKS.register("wormhole_mouth", () -> new SimpleMachineBlock<>(machineProperties().noOcclusion(),
+            BLOCKS.register("wormhole_mouth", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion(),
                     SinguloBlockEntities.WORMHOLE_MOUTH, io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity::new, io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity>> WORMHOLE_PORT =
-            BLOCKS.register("wormhole_port", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("wormhole_port", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORMHOLE_PORT, io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::new,
                     io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::serverTick));
     /** クリエイティブ電源（クリエイティブ専用）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity>> CREATIVE_ENERGY_SOURCE =
-            BLOCKS.register("creative_energy_source", () -> new SimpleMachineBlock<>(machineProperties().strength(-1.0F, 3_600_000.0F),
+            BLOCKS.register("creative_energy_source", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).strength(-1.0F, 3_600_000.0F),
                     SinguloBlockEntities.CREATIVE_ENERGY, io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity::new,
                     io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity::serverTick));
     /** ストレンジレット（危険。壊せず、磁気瓶で取り除く）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.hazard.StrangeletBlock> STRANGELET = BLOCKS.register("strangelet",
-            () -> new io.github.genichimaruo.singulo.hazard.StrangeletBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE)
+            registryId -> new io.github.genichimaruo.singulo.hazard.StrangeletBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_PURPLE)
                     .strength(-1.0F, 3_600_000.0F).noLootTable().lightLevel(s -> 10).sound(SoundType.SCULK)));
     /** ティプラー・シリンダーのコア（底の中央に置く）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity>> TIPLER_CORE =
-            BLOCKS.register("tipler_core", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("tipler_core", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.TIPLER_CYLINDER, io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity::new,
                     CatalystDeviceBlockEntity::serverTick, io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity::clientTick));
 
@@ -308,7 +308,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<TransparentBlock> REINFORCED_RUIN_GLASS = glass("reinforced_ruin_glass", MapColor.NONE, 25.0F,
             1200.0F, SoundType.GLASS);
     public static final DeferredBlock<Block> RUIN_LAMP = BLOCKS.registerSimpleBlock("ruin_lamp",
-            BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.GLASS).lightLevel(s -> 12));
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.GLASS).lightLevel(s -> 12));
     public static final DeferredBlock<Block> RUIN_LAMP_AMBER = ruinLamp("ruin_lamp_amber");
     public static final DeferredBlock<Block> RUIN_LAMP_VERDANT = ruinLamp("ruin_lamp_verdant");
     public static final DeferredBlock<Block> RUIN_LAMP_VIOLET = ruinLamp("ruin_lamp_violet");
@@ -323,31 +323,31 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> PRISTINE_RUIN_TILES = pristine("pristine_ruin_tiles", 0);
     /** 柱は原木のように、置く向きで縦・横に倒れる。 */
     public static final DeferredBlock<net.minecraft.world.level.block.RotatedPillarBlock> PRISTINE_RUIN_PILLAR = BLOCKS.register(
-            "pristine_ruin_pillar", () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.of()
+            "pristine_ruin_pillar", registryId -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))
                     .mapColor(MapColor.SNOW).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final DeferredBlock<Block> PRISTINE_RUIN_LIGHT = pristine("pristine_ruin_light", 11);
 
     // ---- 自分で作れる建材（遺構の建材とは別の、新しい白いパネル）
     public static final DeferredBlock<Block> WHITE_PANEL = BLOCKS.registerSimpleBlock("white_panel",
-            BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL));
     public static final DeferredBlock<Block> WHITE_LIGHT_PANEL = BLOCKS.registerSimpleBlock("white_light_panel",
-            BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.GLASS).lightLevel(s -> 15));
     /** 置いたティーカップ（アイテムはアンドロイドの装飾のティーカップ。ブロック用のアイテムは作らない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.TeacupBlock> TEACUP = BLOCKS.register("teacup",
-            () -> new io.github.genichimaruo.singulo.android.TeacupBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+            registryId -> new io.github.genichimaruo.singulo.android.TeacupBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.SNOW)
                     .strength(0.3F).sound(SoundType.DECORATED_POT).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     /** ビスマス結晶ブロック（溶かしたビスマスが冷えてできる、階段状の虹色の骸晶）と、その光るもの。 */
     public static final DeferredBlock<Block> BISMUTH_CRYSTAL_BLOCK = BLOCKS.registerSimpleBlock("bismuth_crystal_block",
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.AMETHYST));
     public static final DeferredBlock<Block> GLOWING_BISMUTH_CRYSTAL = BLOCKS.registerSimpleBlock("glowing_bismuth_crystal",
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.AMETHYST).lightLevel(s -> 12));
     /** 黒色強化パネル（黒曜石なみに爆発に強い）。 */
     public static final DeferredBlock<Block> BLACK_REINFORCED_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_panel",
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.NETHERITE_BLOCK));
 
     /** 透けるパネル（ホワイトパネルと黒色強化パネルの系統と、四芒星の模様入り）。音はそれぞれのパネルと同じ。 */
@@ -362,189 +362,189 @@ public final class SinguloBlocks {
 
     /** アンドロイド用のガラス（遮断: アンドロイドだけ通れない、透過: アンドロイドだけ通れる。無地は隣とつながる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS = BLOCKS.register(
-            "android_barrier_glass", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), false, true));
+            "android_barrier_glass", registryId -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), false, true));
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS_PATTERNED = BLOCKS.register(
-            "android_barrier_glass_patterned", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), false, false));
+            "android_barrier_glass_patterned", registryId -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), false, false));
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_GATE_GLASS = BLOCKS.register(
-            "android_gate_glass", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), true, true));
+            "android_gate_glass", registryId -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), true, true));
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_GATE_GLASS_PATTERNED = BLOCKS.register(
-            "android_gate_glass_patterned", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), true, false));
+            "android_gate_glass_patterned", registryId -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), true, false));
 
     // ---- 隕石クレーター（地表の小さな構造物）と、雷ガラス
     /** 隕石の溶融殻（クレーターに最初からあるものだけ、星屑の結晶を育てる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.nature.MeteoriteCrustBlock> METEORITE_CRUST = BLOCKS.register(
-            "meteorite_crust", () -> new io.github.genichimaruo.singulo.nature.MeteoriteCrustBlock(BlockBehaviour.Properties.of()
+            "meteorite_crust", registryId -> new io.github.genichimaruo.singulo.nature.MeteoriteCrustBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))
                     .mapColor(MapColor.COLOR_BLACK).strength(5.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.BASALT)
                     .randomTicks()));
     /** 隕鉄塊（掘ると隕鉄の原石が出る。鉄以上のツルハシ）。 */
     public static final DeferredBlock<Block> METEORIC_IRON_CHUNK = BLOCKS.registerSimpleBlock("meteoric_iron_chunk",
-            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(6.0F, 9.0F).requiresCorrectToolForDrops()
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(6.0F, 9.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.ANCIENT_DEBRIS));
     /** 星屑の結晶（隕石の溶融殻の表面に育つ。壊すと星屑）。 */
     public static final DeferredBlock<net.minecraft.world.level.block.AmethystClusterBlock> STARDUST_CLUSTER = BLOCKS.register(
-            "stardust_cluster", () -> new net.minecraft.world.level.block.AmethystClusterBlock(7.0F, 3.0F, BlockBehaviour.Properties.of()
+            "stardust_cluster", registryId -> new net.minecraft.world.level.block.AmethystClusterBlock(7.0F, 3.0F, BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))
                     .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5F).sound(SoundType.AMETHYST_CLUSTER).noOcclusion()
                     .lightLevel(s -> 6).forceSolidOn().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     /** 隕石の核（隕石の芯に1つだけ。隕石コンパスが指す。掘ると隕鉄の原石と星屑。鉄以上のツルハシ）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock> METEORITE_CORE = BLOCKS.register(
-            "meteorite_core", () -> new io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock(BlockBehaviour.Properties.of()
+            "meteorite_core", registryId -> new io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))
                     .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(8.0F, 12.0F).requiresCorrectToolForDrops().sound(SoundType.ANCIENT_DEBRIS)
                     .lightLevel(s -> 7)));
     /** 雷ガラス塊（雷が落ちた砂が溶けて固まったもの。壊すと雷ガラス）。 */
     public static final DeferredBlock<Block> FULGURITE_BLOCK = BLOCKS.registerSimpleBlock("fulgurite_block",
-            BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(0.8F).sound(SoundType.GLASS));
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(0.8F).sound(SoundType.GLASS));
     /** 深海圧力収集器と虚空捕集器（その場所に置かないと動かない）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity>> DEEP_SEA_COLLECTOR =
-            BLOCKS.register("deep_sea_collector", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("deep_sea_collector", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.DEEP_SEA_COLLECTOR, io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity::new,
                     io.github.genichimaruo.singulo.nature.EnvironmentCollectorBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity>> VOID_COLLECTOR =
-            BLOCKS.register("void_collector", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("void_collector", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.VOID_COLLECTOR, io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity::new,
                     io.github.genichimaruo.singulo.nature.EnvironmentCollectorBlockEntity::serverTick));
     /** ケラウノス放電塔（人工の雷を避雷針へ撃つ）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity>> KERAUNOS_TOWER =
-            BLOCKS.register("keraunos_tower", () -> new SimpleMachineBlock<>(machineProperties().noOcclusion(),
+            BLOCKS.register("keraunos_tower", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion(),
                     SinguloBlockEntities.KERAUNOS_TOWER, io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity::new,
                     io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity::serverTick));
 
     // ---- 重力パネル（電力の届いたパネルに乗ると、次の着地まで重力が変わる）
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> LOW_GRAVITY_PANEL = BLOCKS.register(
-            "low_gravity_panel", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.SNOW),
+            "low_gravity_panel", registryId -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.SNOW).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.LOW));
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> HIGH_GRAVITY_PANEL = BLOCKS.register(
-            "high_gravity_panel", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_BLACK),
+            "high_gravity_panel", registryId -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_BLACK).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.HIGH));
     /** 無重力ブロック（働いている間、上の空間が無重力になる。高さは無重力コントロールボックスで変える）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> ZERO_GRAVITY_BLOCK = BLOCKS.register(
-            "zero_gravity_block", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_PURPLE),
+            "zero_gravity_block", registryId -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_PURPLE).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.ZERO));
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock> ZERO_GRAVITY_CONTROLLER = BLOCKS.register(
-            "zero_gravity_controller", () -> new io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock(machineProperties()));
+            "zero_gravity_controller", registryId -> new io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityReceiverBlock> GRAVITY_PANEL_RECEIVER = BLOCKS.register(
-            "gravity_panel_receiver", () -> new io.github.genichimaruo.singulo.gravity.GravityReceiverBlock(machineProperties()));
+            "gravity_panel_receiver", registryId -> new io.github.genichimaruo.singulo.gravity.GravityReceiverBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** 衝撃発電パネル（上に落ちても落下ダメージを受けず、落ちた高さに応じてわずかに発電し、重力パネルへ配る）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlock> IMPACT_GENERATOR = BLOCKS.register(
-            "impact_generator_panel", () -> new io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlock(gravityProperties(MapColor.SNOW)));
+            "impact_generator_panel", registryId -> new io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlock(gravityProperties(MapColor.SNOW).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** 封印コンテナ（段階1〜4の鍵で開く）。開いていれば普通に壊せ、封印中はとても硬い（SealedContainerBlock）。 */
     public static final java.util.List<DeferredBlock<io.github.genichimaruo.singulo.ruin.SealedContainerBlock>> SEALED_CONTAINERS =
             java.util.stream.IntStream.rangeClosed(1, 4).mapToObj(tier -> BLOCKS.register("sealed_container_" + tier,
-                    () -> new io.github.genichimaruo.singulo.ruin.SealedContainerBlock(BlockBehaviour.Properties.of()
+                    registryId -> new io.github.genichimaruo.singulo.ruin.SealedContainerBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))
                             .mapColor(MapColor.SNOW).strength(5.0F, 1200.0F).requiresCorrectToolForDrops()
                             .sound(SoundType.NETHERITE_BLOCK).noOcclusion(), tier))).toList();
     public static final DeferredBlock<RuinCacheBlock> RUIN_CACHE = BLOCKS.register("ruin_cache",
-            () -> new RuinCacheBlock(unbreakable().noOcclusion().lightLevel(s -> 6)));
+            registryId -> new RuinCacheBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion().lightLevel(s -> 6)));
     public static final DeferredBlock<GuardDockBlock> RUIN_GUARD_DOCK = BLOCKS.register("ruin_guard_dock",
-            () -> new GuardDockBlock(unbreakable()));
+            registryId -> new GuardDockBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     /** 遺構の印刷台（アンドロイドを印刷して出す）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidFabricatorBlock> RUIN_ANDROID_FABRICATOR = BLOCKS.register(
-            "ruin_android_fabricator", () -> new io.github.genichimaruo.singulo.android.AndroidFabricatorBlock(unbreakable().lightLevel(s -> 7)));
+            "ruin_android_fabricator", registryId -> new io.github.genichimaruo.singulo.android.AndroidFabricatorBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 7)));
     public static final DeferredBlock<SealConsoleBlock> SEAL_CONSOLE = BLOCKS.register("seal_console",
-            () -> new SealConsoleBlock(unbreakable().lightLevel(s -> 10)));
+            registryId -> new SealConsoleBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 10)));
     /**
      * ホログラムの床。最後の記録者が現れたとき、ボス部屋の床の欠けた所を埋める仮の床（赤い半透明の投影）。
      * 壊せず、何も落とさず、アイテムもない。戦いが終わると消える。
      */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.ArenaHologramBlock> ARENA_HOLOGRAM = BLOCKS.register("arena_hologram",
-            () -> new io.github.genichimaruo.singulo.ruin.ArenaHologramBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
+            registryId -> new io.github.genichimaruo.singulo.ruin.ArenaHologramBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_RED)
                     .strength(-1.0F, 3_600_000.0F).noLootTable().sound(SoundType.AMETHYST).lightLevel(s -> 6).noOcclusion()
                     .isValidSpawn((s, l, p, e) -> false).isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false)
                     .isViewBlocking((s, l, p) -> false).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 創世炉の核（GenesisCoreBlock）。動き出したらサバイバルでは壊せない。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.genesis.GenesisCoreBlock> GENESIS_CORE = BLOCKS.register("genesis_core",
-            () -> new io.github.genichimaruo.singulo.genesis.GenesisCoreBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+            registryId -> new io.github.genichimaruo.singulo.genesis.GenesisCoreBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_BLACK)
                     .strength(8.0F, 1200.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 12)));
     /** 番人の封印核（研究棟・封鎖培養施設のボス部屋の床。壊せない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.GuardianCoreBlock> GUARDIAN_CORE = BLOCKS.register("guardian_core",
-            () -> new io.github.genichimaruo.singulo.ruin.GuardianCoreBlock(unbreakable().lightLevel(s -> 9)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.GuardianCoreBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 9)));
     /** 残響投影器（素手でも壊せ、何も落とさない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.EchoProjectorBlock> ECHO_PROJECTOR = BLOCKS.register("echo_projector",
-            () -> new io.github.genichimaruo.singulo.ruin.EchoProjectorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIAMOND)
+            registryId -> new io.github.genichimaruo.singulo.ruin.EchoProjectorBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.DIAMOND)
                     .strength(1.5F, 6.0F).sound(SoundType.AMETHYST).lightLevel(s -> 8).noOcclusion()));
     /** 製造ライン（廃アンドロイド工場のボス部屋の仕掛け。素手でも壊せ、何も落とさない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FactoryLineBlock> FACTORY_LINE = BLOCKS.register("factory_line",
-            () -> new io.github.genichimaruo.singulo.ruin.FactoryLineBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE)
+            registryId -> new io.github.genichimaruo.singulo.ruin.FactoryLineBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_ORANGE)
                     .strength(1.5F, 6.0F).sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 7).noOcclusion()));
     /** 工場のコンベア（動いている間は、上に乗ったものを流す）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock> FACTORY_CONVEYOR = BLOCKS.register("factory_conveyor",
-            () -> new io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
+            registryId -> new io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_GRAY)
                     .strength(2.0F, 6.0F).sound(SoundType.METAL)));
     // ---- 地下アンドロイド研究所（白い建材は硬く、鉄以上のツルハシで掘る）。建材・照明・調度品は、研究所で見つかる設計図から作れる
     public static final DeferredBlock<Block> LAB_PANEL = pristine("lab_panel", 0);
     public static final DeferredBlock<Block> LAB_PANEL_LINED = pristine("lab_panel_lined", 0);
     public static final DeferredBlock<Block> LAB_TILES = pristine("lab_tiles", 0);
-    public static final DeferredBlock<Block> LAB_FRAME = BLOCKS.registerSimpleBlock("lab_frame", BlockBehaviour.Properties.of()
+    public static final DeferredBlock<Block> LAB_FRAME = BLOCKS.registerSimpleBlock("lab_frame", () -> BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GRAY).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK));
     public static final DeferredBlock<TransparentBlock> LAB_GLASS = glass("lab_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.GLASS);
     /** 施設灯（電力で白く光る）・非常灯（電力がない間だけ赤く光る）・炉心（電力で強く光る）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> FACILITY_LIGHT = BLOCKS.register("facility_light",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0), true));
     /** 居室灯（個室の天井灯。レバーなどのレッドストーンの信号で点く）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock> ROOM_LIGHT = BLOCKS.register("room_light",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock.LIT) ? 15 : 0)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> EMERGENCY_LIGHT = BLOCKS.register("emergency_light",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_RED)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 0 : 7)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> REACTOR_CORE = BLOCKS.register("reactor_core",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_LIGHT_BLUE)
                     .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 3)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> POWER_CONDUIT = BLOCKS.register("power_conduit",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_CYAN)
                     .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 10 : 0), true));
     /** 耐圧殻（封じられている間は壊せない。黒曜石より硬い。爆発では壊れない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> PRESSURE_HULL = BLOCKS.register("pressure_hull",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_GRAY)
                     .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 溶接された蓋（搬入出の立坑をふさぐ。封じられている間は壊せない。封じが解けるとダイヤのツルハシで掘れる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> WELDED_HATCH = BLOCKS.register("welded_hatch",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.METAL)
                     .strength(20.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 隔壁（ボス部屋の出入口。壊せない。電力が戻ると開く）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock> BULKHEAD = BLOCKS.register("bulkhead",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock(unbreakable().noOcclusion()
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 動力炉の制御盤（壊せない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock> REACTOR_CONSOLE = BLOCKS.register("reactor_console",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock(unbreakable().lightLevel(s -> 5)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 5)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock> SERVER_RACK = BLOCKS.register("server_rack",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_BLACK)
                     .strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock.POWERED) ? 4 : 0)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock> LAB_TERMINAL = BLOCKS.register("lab_terminal",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.SNOW)
                     .strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).lightLevel(s -> 4)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.AndroidCapsuleBlock> ANDROID_CAPSULE = BLOCKS.register("android_capsule",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.AndroidCapsuleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.AndroidCapsuleBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).sound(SoundType.GLASS).noOcclusion()));
     /** 研究所の小物（机のモニター・コーヒーメーカー・書類の山・ごみ箱・自販機）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> DESK_MONITOR = BLOCKS.register("desk_monitor",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14), null, null));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14), null, null));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock(decor(SoundType.METAL)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock(decor(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> PAPER_STACK = BLOCKS.register("paper_stack",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.WOOL).strength(0.3F), Block.box(3, 0, 3, 13, 5, 13), null, null));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.WOOL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).strength(0.3F), Block.box(3, 0, 3, 13, 5, 13), null, null));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> TRASH_BIN = BLOCKS.register("trash_bin",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 10, 12), null, null));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), Block.box(4, 0, 4, 12, 10, 12), null, null));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock> VENDING_MACHINE = BLOCKS.register("vending_machine",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock(decor(SoundType.METAL).strength(3.0F, 9.0F).lightLevel(s -> 6)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock(decor(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).strength(3.0F, 9.0F).lightLevel(s -> 6)));
 
     /**
      * レイリー散乱パネル（天井の空の投影板）。研究所の天井のものは研究所の電力で点き、壊すと何も残らない（作れない）。
      * 作れるものは FE で点く。点いている間は真下を真昼の日差しで照らす（明るさ15）。
      */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock> LAB_RAYLEIGH_PANEL = BLOCKS.register(
-            "lab_rayleigh_panel", () -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh().noLootTable(), true));
+            "lab_rayleigh_panel", registryId -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noLootTable(), true));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock> RAYLEIGH_PANEL = BLOCKS.register(
-            "rayleigh_panel", () -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh(), false));
+            "rayleigh_panel", registryId -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), false));
 
     private static BlockBehaviour.Properties rayleigh() {
         return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
@@ -553,9 +553,9 @@ public final class SinguloBlocks {
 
     /** 研究所のスライドドア（作れない）と、それに似せた作れるスライドドア。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> LAB_DOOR = BLOCKS.register("lab_door",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> WHITE_SLIDING_DOOR = BLOCKS.register("white_sliding_door",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
 
     private static BlockBehaviour.Properties slidingDoor() {
         return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(5.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
@@ -568,62 +568,62 @@ public final class SinguloBlocks {
 
     /** ニュートリノ観測所（設置型のニュートリノ・スキャナー）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
-            BLOCKS.register("neutrino_observatory", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("neutrino_observatory", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.NEUTRINO_OBSERVATORY, io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::new,
                     io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<GravitationalWaveDetectorBlockEntity>> GRAVITATIONAL_WAVE_DETECTOR =
-            BLOCKS.register("gravitational_wave_detector", () -> new SimpleMachineBlock<>(machineProperties(),
+            BLOCKS.register("gravitational_wave_detector", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.GRAVITATIONAL_WAVE_DETECTOR, GravitationalWaveDetectorBlockEntity::new, (l, p, s, be) -> {}));
 
     // ---- ケーブル
     public static final DeferredBlock<CableBlock> COPPER_WIRE = BLOCKS.register("copper_wire",
-            () -> new CableBlock(cableProperties(SoundType.COPPER), 2_000, 0.001, io.github.genichimaruo.singulo.cable.CableProfile.COPPER));
+            registryId -> new CableBlock(cableProperties(SoundType.COPPER).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), 2_000, 0.001, io.github.genichimaruo.singulo.cable.CableProfile.COPPER));
     public static final DeferredBlock<CableBlock> SUPERCONDUCTING_CABLE = BLOCKS.register("superconducting_cable",
-            () -> new CableBlock(cableProperties(SoundType.METAL), 1_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
+            registryId -> new CableBlock(cableProperties(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), 1_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
     public static final DeferredBlock<CableBlock> TOPOLOGICAL_WIRE = BLOCKS.register("topological_wire",
-            () -> new CableBlock(cableProperties(SoundType.METAL), 100_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
+            registryId -> new CableBlock(cableProperties(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), 100_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
     /** 上限なし。mod の装置どうしは int（約 2.1 GFE/t）を超えて受け渡す（ほかの mod の装置へは1台あたり int まで）。 */
     public static final DeferredBlock<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
-            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
+            registryId -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
 
     /** 置いたカバーの枠（あとからケーブル・パイプを入れられる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.cable.CoverFrameBlock> COVER_FRAME = BLOCKS.register("cover_frame",
-            () -> new io.github.genichimaruo.singulo.cable.CoverFrameBlock(cableProperties(SoundType.CHAIN)));
+            registryId -> new io.github.genichimaruo.singulo.cable.CoverFrameBlock(cableProperties(SoundType.CHAIN).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
 
     // ---- 液体パイプ
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
-            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), 2_000,
+            registryId -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), 2_000,
                     io.github.genichimaruo.singulo.pipe.PipeProfile.COPPER));
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> VACUUM_JACKETED_PIPE = BLOCKS.register(
-            "vacuum_jacketed_pipe", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.METAL),
+            "vacuum_jacketed_pipe", registryId -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     32_000, io.github.genichimaruo.singulo.pipe.PipeProfile.VACUUM));
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> SUPERFLUID_CONDUIT = BLOCKS.register(
-            "superfluid_conduit", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.GLASS),
+            "superfluid_conduit", registryId -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.GLASS).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     512_000, io.github.genichimaruo.singulo.pipe.PipeProfile.SUPERFLUID));
     /** 上限なし（1つの口の1回の受け渡しは int まで）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> HORIZON_DUCT = BLOCKS.register(
-            "horizon_duct", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.NETHERITE_BLOCK),
+            "horizon_duct", registryId -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.NETHERITE_BLOCK).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     Long.MAX_VALUE, io.github.genichimaruo.singulo.pipe.PipeProfile.HORIZON));
 
     private static DeferredBlock<Block> ruinLamp(String id) {
-        return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)
+        return BLOCKS.registerSimpleBlock(id, () -> BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)
                 .sound(SoundType.GLASS).lightLevel(s -> 12));
     }
 
     private static DeferredBlock<Block> ruinPanel(String id) {
-        return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SAND)
+        return BLOCKS.registerSimpleBlock(id, () -> BlockBehaviour.Properties.of().mapColor(MapColor.SAND)
                 .strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.STONE));
     }
 
     /** 朽ちていない遺構の建材: 硬く（鉄以上のツルハシ）、爆発にも強い。 */
     private static DeferredBlock<Block> pristine(String id, int light) {
-        return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+        return BLOCKS.registerSimpleBlock(id, () -> BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
                 .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).lightLevel(s -> light));
     }
 
     /** 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。 */
     private static DeferredBlock<TransparentBlock> glass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
-        return BLOCKS.register(id, () -> new TransparentBlock(BlockBehaviour.Properties.of().mapColor(color)
+        return BLOCKS.register(id, registryId -> new TransparentBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(color)
                 .strength(hardness, resistance).requiresCorrectToolForDrops().sound(sound).noOcclusion()
                 .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
                 .isValidSpawn((s, l, p, e) -> false)));
@@ -647,12 +647,12 @@ public final class SinguloBlocks {
     }
 
     private static DeferredBlock<PartBlock> part(String id, MultiblockPart.Role role) {
-        return BLOCKS.register(id, () -> new PartBlock(partProperties(), role));
+        return BLOCKS.register(id, registryId -> new PartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), role));
     }
 
     /** 部品の窓（色つきの半透明ガラス。中が見える）。 */
     private static DeferredBlock<GlassPartBlock> glassPart(String id) {
-        return BLOCKS.register(id, () -> new GlassPartBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(3.0F, 6.0F)
+        return BLOCKS.register(id, registryId -> new GlassPartBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.NONE).strength(3.0F, 6.0F)
                 .sound(SoundType.GLASS).noOcclusion().isViewBlocking((s, l, p) -> false)
                 .isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)));
     }
@@ -680,19 +680,19 @@ public final class SinguloBlocks {
     public static final DeferredBlock<PartBlock> PASTA_LAMINATE = part("pasta_laminate", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> SUSPENSION_CROWN = part("suspension_crown", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> SUSPENSION_STRUT = BLOCKS.register("suspension_strut",
-            () -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().noOcclusion(), MultiblockPart.Role.STRUCTURE,
+            registryId -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion(), MultiblockPart.Role.STRUCTURE,
                     net.minecraft.world.phys.shapes.Shapes.or(Block.box(6, 0, 6, 10, 16, 10), Block.box(5, 6, 5, 11, 10, 11))));
     public static final DeferredBlock<PartBlock> PASTA_CONDUCTOR = BLOCKS.register("pasta_conductor",
-            () -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().noOcclusion(), MultiblockPart.Role.STRUCTURE,
+            registryId -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion(), MultiblockPart.Role.STRUCTURE,
                     net.minecraft.world.phys.shapes.Shapes.or(Block.box(4, 0, 4, 12, 16, 12), Block.box(2, 2, 2, 14, 5, 14), Block.box(2, 11, 2, 14, 14, 14))));
     public static final DeferredBlock<PartBlock> TIDAL_DRAW_RING = part("tidal_draw_ring", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> SPINDLE_CRADLE = part("spindle_cradle", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> SUSPENSION_RESERVOIR =
-            BLOCKS.register("suspension_reservoir", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
+            BLOCKS.register("suspension_reservoir", registryId -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> PASTA_ACCUMULATOR =
-            BLOCKS.register("pasta_accumulator", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
+            BLOCKS.register("pasta_accumulator", registryId -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> TIDAL_SPINDLE =
-            BLOCKS.register("tidal_spindle", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
+            BLOCKS.register("tidal_spindle", registryId -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
 
     private SinguloBlocks() {}
 }

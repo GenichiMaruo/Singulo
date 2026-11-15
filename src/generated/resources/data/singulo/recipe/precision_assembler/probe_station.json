@@ -6,45 +6,31 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:nihonium_frame"
-      },
+      "ingredient": "singulo:nihonium_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:quantum_computing_module"
-      },
+      "ingredient": "singulo:quantum_computing_module",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "minecraft:phantom_membrane"
-      },
+      "ingredient": "minecraft:phantom_membrane",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:sentinel_core"
-      },
+      "ingredient": "singulo:sentinel_core",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 36000
     }

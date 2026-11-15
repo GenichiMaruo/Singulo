@@ -6,13 +6,13 @@ import io.github.genichimaruo.singulo.gravity.ZeroGravity;
 import io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 無重力ブロック: 受電器から電力を受けると上の空間が無重力になり、コントロールボックスで高さと電力が変わる。大きな集まりも配れる。 */
 @GameTestHolder(Singulo.MODID)
@@ -62,13 +62,13 @@ public final class ZeroGravityGameTests {
         helper.setBlock(controller, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(source, SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        ZeroGravityControllerBlockEntity box = helper.getBlockEntity(controller);
+        ZeroGravityControllerBlockEntity box = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,controller);
         box.setHeight(8);
         Zombie high = zombie(helper, new BlockPos(1, 8, 2));
         helper.assertTrue(Math.abs(ZeroGravity.costPerBlock(15) / (double) ZeroGravity.costPerBlock(14) - 1.4) < 0.02, "高さ1ブロックで電力が1.4倍にならない");
         helper.assertTrue(ZeroGravity.costPerBlock(10_000) == Long.MAX_VALUE, "とても高いときに電力が飽和しない");
         helper.runAtTickTime(40, () -> {
-            GravityReceiverBlockEntity r = helper.getBlockEntity(receiver);
+            GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,receiver);
             helper.assertTrue(r.demand() == 2 * ZeroGravity.costPerBlock(8), "集まりの電力が高さ8の2つ分でない: " + r.demand());
             helper.assertTrue(ZeroGravity.weightless(high), "高さ8の中（7ブロック上）が無重力にならない");
             high.discard();

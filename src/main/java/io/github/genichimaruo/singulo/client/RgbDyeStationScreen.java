@@ -169,7 +169,7 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
                 return true;
             }
             if (keyCode != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
-                hex.keyPressed(keyCode, scanCode, modifiers);
+                hex.keyPressed(event);
                 return true;
             }
         }

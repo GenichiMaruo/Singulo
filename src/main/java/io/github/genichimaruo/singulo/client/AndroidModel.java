@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
-import net.minecraft.client.model.HierarchicalModel;
+
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -24,7 +24,7 @@ import net.minecraft.util.Mth;
  *
  * <p>テクスチャは 128×64。配置は tools/gen_data.py の ANDROID_PARTS と同じ。
  */
-public class AndroidModel extends HierarchicalModel<RuinAndroid> {
+public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
     public static final ModelLayerLocation BLADE_LAYER = new ModelLayerLocation(Singulo.id("blade_android"), "main");
     public static final ModelLayerLocation WHIP_LAYER = new ModelLayerLocation(Singulo.id("whip_android"), "main");
     public static final ModelLayerLocation SABER_LAYER = new ModelLayerLocation(Singulo.id("saber_android"), "main");
@@ -110,7 +110,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.axeGrip = forearmR.hasChild("axe_grip") ? forearmR.getChild("axe_grip") : null;
         this.daggerGrip = forearmR.hasChild("dagger_grip") ? forearmR.getChild("dagger_grip") : null;
         this.gunGrip = forearmR.hasChild("gun_grip") ? forearmR.getChild("gun_grip") : null;
-        this.hairSide = ponytail.getInitialPose().x > 0 ? 1 : -1;
+        this.hairSide = ponytail.getInitialPose().x() > 0 ? 1 : -1;
         this.armorChest = torso.getChild("armor_chest");
         this.armorPad = armL.getChild("armor_pad");
         this.backpack = torso.getChild("backpack");

@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:golden_axe"
-      },
+      "ingredient": "minecraft:golden_axe",
       "count": 1
     }
   ],

@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
  * LIFETIME のあいだ、半径 RADIUS の中のものを中心へ引き寄せ、10 tick ごとに防具を無視する潮汐ダメージを与える。
  */
 public class WardenSingularity extends Entity {
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
     public static final int LIFETIME = 100;
     public static final double RADIUS = 3.5;
     public static final float DAMAGE = 5.0F;
@@ -93,7 +94,7 @@ public class WardenSingularity extends Entity {
                     // エルゴ球の大蛇（龍の姿）の特異点
                     b.hurtWith("singularity", e, SinguloDamageTypes.tidal(level, owner), DAMAGE * (hard ? 1F : NORMAL_DAMAGE_FACTOR));
                 } else {
-                    e.hurt(SinguloDamageTypes.tidal(level, owner), DAMAGE);
+                    e.hurtOrSimulate(SinguloDamageTypes.tidal(level, owner), DAMAGE);
                 }
             }
         }

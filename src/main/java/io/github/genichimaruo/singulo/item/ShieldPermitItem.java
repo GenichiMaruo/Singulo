@@ -80,7 +80,7 @@ public class ShieldPermitItem extends SinguloItem {
     /** 登録する（もう入っていれば名前だけ新しくする）。新しく入ったら true。 */
     public static boolean add(ItemStack stack, Player player) {
         List<Member> members = members(stack);
-        String name = player.getGameProfile().getName();
+        String name = player.getGameProfile().name();
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i).id().equals(player.getUUID())) {
                 members.set(i, new Member(player.getUUID(), name));
@@ -98,7 +98,7 @@ public class ShieldPermitItem extends SinguloItem {
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide()) {
             if (player.isSecondaryUseActive()) {
-                write(stack, List.of(new Member(player.getUUID(), player.getGameProfile().getName())));
+                write(stack, List.of(new Member(player.getUUID(), player.getGameProfile().name())));
                 player.sendOverlayMessage(Component.translatable("item.singulo.shield_permit.reset", player.getName()));
             } else {
                 boolean added = add(stack, player);

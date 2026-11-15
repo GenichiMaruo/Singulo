@@ -6,12 +6,8 @@
     " I "
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_furniture"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    }
+    "B": "singulo:blueprint_lab_furniture",
+    "I": "#c:ingots/iron"
   },
   "result": {
     "id": "singulo:trash_bin",

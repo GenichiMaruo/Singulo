@@ -136,9 +136,9 @@ public class GravityGauntletItem extends SinguloItem {
 
     // ------------------------------------------------------------------
 
-    public static IEnergyStorage energy(ItemStack stack) {
+    public static io.github.genichimaruo.singulo.energy.SinguloItemEnergy energy(ItemStack stack) {
         int capacity = stack.getItem() instanceof GravityGauntletItem g ? g.capacity() : CAPACITY;
-        return new ComponentEnergyStorage(stack, SinguloComponents.ENERGY.get(), capacity);
+        return new io.github.genichimaruo.singulo.energy.SinguloItemEnergy(stack, capacity);
     }
 
     public Mode mode(ItemStack stack) {
@@ -159,7 +159,7 @@ public class GravityGauntletItem extends SinguloItem {
 
     /** ボスと重力耐性のモブ（浮遊・圧壊の拘束を受けない）。 */
     public static boolean isGravityImmune(Entity entity) {
-        return entity.getType().is(Tags.EntityTypes.BOSSES) || entity.getType().is(SinguloTags.GRAVITY_IMMUNE);
+        return entity.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES) || entity.getType().builtInRegistryHolder().is(SinguloTags.GRAVITY_IMMUNE);
     }
 
     @Override
@@ -200,16 +200,14 @@ public class GravityGauntletItem extends SinguloItem {
             return InteractionResult.PASS;
         }
         Level level = context.getLevel();
-        IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, context.getClickedPos(),
+        net.neoforged.neoforge.transfer.energy.EnergyHandler source = level.getCapability(Capabilities.Energy.BLOCK, context.getClickedPos(),
                 context.getClickedFace());
-        if (source == null || !source.canExtract()) {
+        if (source == null) {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide()) {
-            IEnergyStorage own = energy(context.getItemInHand());
-            int want = own.receiveEnergy(Integer.MAX_VALUE, true);
-            int got = source.extractEnergy(want, false);
-            own.receiveEnergy(got, false);
+            var own = energy(context.getItemInHand());
+            int got = io.github.genichimaruo.singulo.energy.EnergyTransfers.move(source, own, Integer.MAX_VALUE);
             player.sendOverlayMessage(Component.translatable("gauntlet.singulo.charged", got));
         }
         return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
@@ -303,7 +301,7 @@ public class GravityGauntletItem extends SinguloItem {
     @Nullable
     static Entity heldTarget(ServerPlayer player) {
         Integer id = TARGETS.get(player.getUUID());
-        return id == null ? null : player.serverLevel().getEntity(id);
+        return id == null ? null : player.level().getEntity(id);
     }
 
     public static void clearRuntime() { TARGETS.clear(); }
@@ -346,8 +344,9 @@ public class GravityGauntletItem extends SinguloItem {
     protected void repel(ServerLevel level, ServerPlayer player) {}
 
     @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int timeLeft) {
+    public boolean releaseUsing(ItemStack stack, Level level, LivingEntity user, int timeLeft) {
         TARGETS.remove(user.getUUID());
+        return false;
     }
 
     /** 使い始めに視線上の1体を捕まえ、離すまで同じ対象を保つ。 */

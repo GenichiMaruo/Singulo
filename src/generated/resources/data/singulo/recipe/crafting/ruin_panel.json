@@ -7,15 +7,9 @@
     "CWC"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_panels"
-    },
-    "C": {
-      "tag": "c:cobblestones/normal"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "B": "singulo:blueprint_ruin_panels",
+    "C": "#c:cobblestones/normal",
+    "W": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:ruin_panel",

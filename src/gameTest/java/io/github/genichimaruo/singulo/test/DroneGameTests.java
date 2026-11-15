@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.drone.CargoDrone;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -25,8 +26,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** ドローン輸送: 梱包・電力・射程・取り消し・受け渡し・見えない飛行・壊したときの保全・メモリの入手。 */
 @GameTestHolder("singulo")
@@ -47,7 +48,7 @@ public final class DroneGameTests {
 
     private static DronePortBlockEntity port(GameTestHelper h, BlockPos at) {
         h.setBlock(at, SinguloBlocks.DRONE_PORT.get());
-        DronePortBlockEntity port = h.getBlockEntity(at);
+        DronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, at);
         port.setOwner(owner(h));
         port.energy().setEnergy(DronePortBlockEntity.CAPACITY);
         DroneNetwork.get(h.getLevel()).putPort(h.absolutePos(at), owner(h), "");
@@ -89,7 +90,7 @@ public final class DroneGameTests {
     /** テスト用のステーション（メモリ・キット・電力つき）。印刷が済むまで少し待つこと。 */
     private static DroneStationBlockEntity station(GameTestHelper h, BlockPos at, int kits) {
         h.setBlock(at, SinguloBlocks.DRONE_STATION.get());
-        DroneStationBlockEntity station = h.getBlockEntity(at);
+        DroneStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, at);
         station.setOwner(owner(h));
         station.energy().setEnergy(DroneStationBlockEntity.CAPACITY);
         station.items().setStackInSlot(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(item("drone_memory")));
@@ -267,7 +268,7 @@ public final class DroneGameTests {
     public static void brokenStationReturnsKitsOfFlyingDrones(GameTestHelper h) {
         BlockPos at = new BlockPos(2, 1, 2);
         h.setBlock(at, SinguloBlocks.DRONE_STATION.get());
-        DroneStationBlockEntity station = h.getBlockEntity(at);
+        DroneStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, at);
         DroneNetwork net = DroneNetwork.get(h.getLevel());
         BlockPos abs = h.absolutePos(at);
         DroneNetwork.Flight back = net.create(abs, 0, null, abs, abs.east(3));
@@ -309,12 +310,12 @@ public final class DroneGameTests {
     @GameTest(template = "empty", batch = BATCH)
     public static void guardDroneRemembersItsDockAfterReload(GameTestHelper h) {
         BlockPos dock = h.absolutePos(new BlockPos(3, 1, 3));
-        SecurityDrone drone = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel());
+        SecurityDrone drone = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         drone.restrictTo(dock, GuardDockBlockEntity.HOME_RADIUS);
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        drone.saveWithoutId(tag);
-        SecurityDrone loaded = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel());
-        loaded.load(tag);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.save(drone, tag);
+        SecurityDrone loaded = io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(loaded, tag);
         h.assertTrue(loaded.hasRestriction() && loaded.getRestrictCenter().equals(dock)
                 && loaded.getRestrictRadius() == GuardDockBlockEntity.HOME_RADIUS, "Dock forgotten after reload");
         h.succeed();
@@ -331,7 +332,7 @@ public final class DroneGameTests {
         var facing = state.getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING);
         h.getLevel().setBlock(h.absolutePos(at), state.setValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING,
                 facing.getClockWise()), 3);
-        h.assertTrue(h.getBlockEntity(at) == port, "Fixture replaced the block entity");
+        h.assertTrue(io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, at) == port, "Fixture replaced the block entity");
         h.assertTrue(before != port.androidItems(net.minecraft.core.Direction.EAST), "Rotated port kept the old face mapping");
         h.succeed();
     }
@@ -342,7 +343,7 @@ public final class DroneGameTests {
         BlockPos at = new BlockPos(2, 1, 2);
         DroneStationBlockEntity station = station(h, at, 1);
         station.items().setStackInSlot(DroneStationBlockEntity.SLOT_PERMIT, new ItemStack(SinguloItems.SHIELD_PERMIT.get()));
-        var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, h.absolutePos(at),
+        var handler = io.github.genichimaruo.singulo.compat.ItemResourceView.find(h.getLevel(), h.absolutePos(at),
                 net.minecraft.core.Direction.DOWN);
         h.assertTrue(handler != null, "No item capability");
         for (int slot = 0; slot < DroneStationBlockEntity.SLOTS; slot++) {
@@ -545,7 +546,7 @@ public final class DroneGameTests {
         port.items().setStackInSlot(DronePortBlockEntity.SLOT_RECEIVE, new ItemStack(Items.COPPER_INGOT, 20));
         port.items().setStackInSlot(DronePortBlockEntity.SLOT_ARRIVED, new ItemStack(SinguloItems.PACKING_CRATE.get()));
         port.items().setStackInSlot(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.PACKING_CRATE.get(), 16));
-        net.minecraft.world.Container chest = (net.minecraft.world.Container) h.getBlockEntity(chestPos);
+        net.minecraft.world.Container chest = (net.minecraft.world.Container) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, chestPos);
         h.runAtTickTime(25, () -> {
             h.assertTrue(chest.isEmpty(), "Ejected while the master switch was off");
             port.setEjectEnabled(0, true);
@@ -682,7 +683,7 @@ public final class DroneGameTests {
     /** 保存して読み込み直した箱（便の記録を通ったのと同じ）。 */
     private static ItemStack roundTrip(GameTestHelper h, ItemStack stack) {
         var registries = h.getLevel().registryAccess();
-        return ItemStack.parse(registries, stack.save(registries)).orElseThrow();
+        return io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, io.github.genichimaruo.singulo.compat.NbtCompat.save(stack, registries)).orElseThrow();
     }
 
     /** 空き箱専用の面: 荷物を「無効」・空き箱を「入力」にした面からは空き箱の欄にだけ入り、空き箱を「無効」にした面からは空き箱が入らない。 */
@@ -713,7 +714,7 @@ public final class DroneGameTests {
     @GameTest(template = "empty", batch = BATCH)
     public static void productionUpgradesAddOneDroneEach(GameTestHelper h) {
         h.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.DRONE_STATION.get());
-        DroneStationBlockEntity station = h.getBlockEntity(new BlockPos(2, 1, 2));
+        DroneStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2, 1, 2));
         Item upgrade = item("android_production_upgrade");
         h.assertTrue(station.units() == 1, "Expected 1 drone without upgrades");
         station.items().setStackInSlot(DroneStationBlockEntity.SLOT_PRODUCTION, new ItemStack(upgrade, 1));
@@ -826,14 +827,14 @@ public final class DroneGameTests {
     public static void guardDockDropsDroneMemoryOnlyForPlayerKills(GameTestHelper h) {
         BlockPos dockPos = new BlockPos(3, 1, 3);
         h.setBlock(dockPos, SinguloBlocks.RUIN_GUARD_DOCK.get());
-        GuardDockBlockEntity dock = h.getBlockEntity(dockPos);
+        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, dockPos);
         dock.setMemoryChanceForTest(1);
         var player = TestScope.player(h);
         dock.launch(h.getLevel());
         List<SecurityDrone> wave = h.getLevel().getEntitiesOfClass(SecurityDrone.class, new AABB(h.absolutePos(dockPos)).inflate(4));
         h.assertTrue(wave.size() == dock.waveSize(), "Wave not launched");
         for (SecurityDrone d : wave) {
-            d.hurt(h.getLevel().damageSources().playerAttack(player), 1000);
+            d.hurtServer(h.getLevel(), h.getLevel().damageSources().playerAttack(player), 1000);
         }
         h.succeedWhen(() -> {
             List<ItemEntity> drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(h.absolutePos(dockPos)).inflate(4),
@@ -848,13 +849,13 @@ public final class DroneGameTests {
     public static void upperKindsDropOnlyFromUpperFacilities(GameTestHelper h) {
         BlockPos dockPos = new BlockPos(3, 1, 3);
         h.setBlock(dockPos, SinguloBlocks.RUIN_GUARD_DOCK.get());
-        GuardDockBlockEntity dock = h.getBlockEntity(dockPos);
+        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, dockPos);
         dock.setTier(3);
         dock.setMemoryChanceForTest(1);
         var player = TestScope.player(h);
         dock.launch(h.getLevel());
         for (SecurityDrone d : h.getLevel().getEntitiesOfClass(SecurityDrone.class, new AABB(h.absolutePos(dockPos)).inflate(4))) {
-            d.hurt(h.getLevel().damageSources().playerAttack(player), 1000);
+            d.hurtServer(h.getLevel(), h.getLevel().damageSources().playerAttack(player), 1000);
         }
         var random = net.minecraft.util.RandomSource.create(7);
         java.util.EnumSet<DroneKind>[] seen = new java.util.EnumSet[4];
@@ -880,7 +881,7 @@ public final class DroneGameTests {
     public static void guardDockWithoutPlayerKillsDropsNoMemory(GameTestHelper h) {
         BlockPos dockPos = new BlockPos(3, 1, 3);
         h.setBlock(dockPos, SinguloBlocks.RUIN_GUARD_DOCK.get());
-        GuardDockBlockEntity dock = h.getBlockEntity(dockPos);
+        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, dockPos);
         dock.setMemoryChanceForTest(1);
         TestScope.player(h);
         dock.launch(h.getLevel());

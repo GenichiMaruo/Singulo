@@ -122,7 +122,7 @@ public class DeliveryPortBlockEntity extends WorkLinkedBlockEntity {
         for (int i = 0; i < SLOTS; i++) {
             list.set(i, contents.getItem(i));
         }
-        tag.put("items", ContainerHelper.saveAllItems(new CompoundTag(), list, registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(new CompoundTag(), list, registries));
         tag.putString("name", name);
     }
 
@@ -130,10 +130,14 @@ public class DeliveryPortBlockEntity extends WorkLinkedBlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         NonNullList<ItemStack> list = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag.getCompoundOrEmpty("items"), list, registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag.getCompoundOrEmpty("items"), list, registries);
         for (int i = 0; i < SLOTS; i++) {
             contents.setItem(i, list.get(i));
         }
         name = tag.getStringOr("name", "");
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return net.neoforged.neoforge.transfer.item.VanillaContainerWrapper.of(contents);
     }
 }

@@ -6,21 +6,15 @@
   "energy": 2000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:cold_atoms"
-      },
+      "ingredient": "singulo:cold_atoms",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:data_card_quantum_fragment"
-      },
+      "ingredient": "singulo:data_card_quantum_fragment",
       "count": 1
     }
   ],

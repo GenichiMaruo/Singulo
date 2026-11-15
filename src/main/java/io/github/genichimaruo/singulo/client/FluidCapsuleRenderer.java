@@ -1,75 +1,49 @@
 package io.github.genichimaruo.singulo.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.Singulo;
-import io.github.genichimaruo.singulo.drone.DroneCrateItem;
 import io.github.genichimaruo.singulo.drone.FluidCapsuleItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.resources.model.ModelIdentifier;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import java.util.function.Consumer;
 
-/**
- * 液体カプセルの絵（手に持ったとき・持ち物の欄・ドローンに吊るしたとき・発着ポートの台の上）。
- * <p>
- * 殻は立体のモデル（tools/drones.py の capsule_models: 両端の鏡板・ガラスの胴・保護の枠と脚・上の弁・段階のバッテリー）で、
- * 胴の中に、詰めた液体をその液体の絵と色で量に応じた高さまで描く（気体は胴いっぱいにうすく）。少し揺れて見えるように、
- * 液面は時間でわずかに上下する。
- */
-public final class FluidCapsuleRenderer extends BlockEntityWithoutLevelRenderer {
-    /** ガラスの胴の内側（ドット。モデルの胴は x 3〜13、y 5〜11、z 5〜11）。 */
-    private static final float X0 = 3.2F / 16, X1 = 12.8F / 16, Y0 = 5.2F / 16, Y1 = 10.8F / 16, Z0 = 5.2F / 16, Z1 = 10.8F / 16;
-
-    private static FluidCapsuleRenderer instance;
-
-    private FluidCapsuleRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+/** Liquid interior. The shell is a regular model in the composite item definition. */
+public final class FluidCapsuleRenderer implements SpecialModelRenderer<FluidCapsuleRenderer.Frame> {
+    private static final float X0=3.2F/16, X1=12.8F/16, Y0=5.2F/16, Y1=10.8F/16, Z0=5.2F/16, Z1=10.8F/16;
+    public record Frame(FluidLook.Look look, float top) {}
+    static void registerModels(RegisterSpecialModelRendererEvent event) {
+        event.register(Singulo.id("fluid_capsule"), Unbaked.CODEC);
     }
-
-    public static FluidCapsuleRenderer get() {
-        if (instance == null) {
-            instance = new FluidCapsuleRenderer();
-        }
-        return instance;
+    @Override public Frame extractArgument(ItemStack stack) {
+        var fluid=FluidCapsuleItem.fluid(stack);
+        if(fluid.isEmpty()) return null;
+        var mc=Minecraft.getInstance();
+        float fill=Mth.clamp(fluid.getAmount()/(float)FluidCapsuleItem.CAPACITY,.08F,1);
+        float time=mc.level==null?0:(mc.level.getGameTime()%24000+mc.getDeltaTracker().getGameTimeDeltaPartialTick(false))/20F;
+        float wobble=fill<.98F?Mth.sin(time*2.4F)*.12F/16:0;
+        float top=fluid.getFluidType().isLighterThanAir()?Y1:Math.min(Y1,Y0+(Y1-Y0)*fill+wobble);
+        return new Frame(FluidLook.look(fluid),top);
     }
-
-    /** 段階ごとの殻のモデル（ModelEvent.RegisterAdditional で読む）。 */
-    static ModelIdentifier shell(int tier) {
-        return ModelIdentifier.standalone(Singulo.id("item/fluid_capsule_shell_" + Mth.clamp(tier, 1, 3)));
+    @Override public void submit(Frame frame,PoseStack pose,SubmitNodeCollector collector,int light,int overlay,boolean foil,int outline) {
+        if(frame==null)return;
+        var capture=new SnapshotBlockRenderer.Capture();
+        var look=frame.look();
+        FluidLook.box(new PoseStack(),FluidLook.insideBuffer(capture),look,look.rgb(),look.alpha(),light,0x3F,X0,Y0,Z0,X1,frame.top(),Z1);
+        SnapshotBlockRenderer.submitGeometry(capture.finish(),pose,collector);
     }
-
-    static void registerModels(ModelEvent.RegisterAdditional event) {
-        for (int t = 1; t <= 3; t++) {
-            event.register(shell(t));
-        }
+    @Override public void getExtents(Consumer<Vector3fc> output) {
+        output.accept(new Vector3f(X0,Y0,Z0));output.accept(new Vector3f(X1,Y1,Z1));
     }
-
-    @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext context, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
-        Minecraft mc = Minecraft.getInstance();
-        FluidStack fluid = FluidCapsuleItem.fluid(stack);
-        if (!fluid.isEmpty()) {
-            // 中身は殻とは別の共有の描き込み先で描く。殻と同じ描き込み先に入れると面は遠い順に並べ替えられ、液体の上面や側面が
-            // 手前のガラスより後になって、ガラスの奥行きに阻まれて正面だけが残る。固定の描き込み先（液体パイプの種類）に入れると、
-            // 殻（共有）より後に描かれて全部隠れる。別の共有の種類なら、殻を求めた瞬間に液体が先に描かれる
-            VertexConsumer inside = FluidLook.insideBuffer(buffers);
-            FluidLook.Look look = FluidLook.look(fluid);
-            boolean gas = fluid.getFluidType().isLighterThanAir();
-            float fill = Mth.clamp(fluid.getAmount() / (float) FluidCapsuleItem.CAPACITY, 0.08F, 1);
-            float time = mc.level == null ? 0 : (mc.level.getGameTime() % 24000 + mc.getTimer().getGameTimeDeltaPartialTick(false)) / 20F;
-            float wobble = fill < 0.98F ? Mth.sin(time * 2.4F) * 0.12F / 16 : 0;
-            float top = gas ? Y1 : Math.min(Y1, Y0 + (Y1 - Y0) * fill + wobble);
-            FluidLook.box(pose, inside, look, look.rgb(), look.alpha(), light, 0x3F, X0, Y0, Z0, X1, top, Z1);
-        }
-        VertexConsumer vc = buffers.getBuffer(Sheets.translucentItemSheet());
-        var model = mc.getModelManager().getModel(shell(DroneCrateItem.tier(stack)));
-        mc.getItemRenderer().renderModelLists(model, stack, light, overlay, pose, vc);
+    public record Unbaked() implements SpecialModelRenderer.Unbaked<Frame> {
+        public static final MapCodec<Unbaked> CODEC=MapCodec.unit(new Unbaked());
+        @Override public SpecialModelRenderer<Frame> bake(SpecialModelRenderer.BakingContext context){return new FluidCapsuleRenderer();}
+        @Override public MapCodec<Unbaked> type(){return CODEC;}
     }
 }

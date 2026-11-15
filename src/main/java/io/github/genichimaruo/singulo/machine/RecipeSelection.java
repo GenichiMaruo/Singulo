@@ -46,7 +46,7 @@ public final class RecipeSelection {
         }
         List<RecipeHolder<MachineRecipe>> list = selectable(level, type);
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).id().equals(id)) {
+            if (list.get(i).id().identifier().equals(id)) {
                 return i;
             }
         }
@@ -72,7 +72,7 @@ public final class RecipeSelection {
 
     /** レシピマネージャーごとの「ほかのレシピの途中になりうるか」の結果（レシピの再読み込みで作り直す）。 */
     private record AmbiguityCache(Object recipes, Map<Identifier, Boolean> values) {}
-    private static final Map<RecipeManager, AmbiguityCache> AMBIGUOUS = new WeakHashMap<>();
+    private static final Map<Level, AmbiguityCache> AMBIGUOUS = new WeakHashMap<>();
 
     public static synchronized void clear() {
         synchronized (AMBIGUOUS) { AMBIGUOUS.clear(); }
@@ -85,18 +85,17 @@ public final class RecipeSelection {
     public static boolean ambiguous(Level level, MachineType type, RecipeHolder<MachineRecipe> recipe) {
         Map<Identifier, Boolean> cache;
         synchronized (AMBIGUOUS) {
-            RecipeManager manager = level.getRecipeManager();
             Object snapshot = MachineRecipeIndex.snapshot(level);
-            AmbiguityCache known = AMBIGUOUS.get(manager);
+            AmbiguityCache known = AMBIGUOUS.get(level);
             // /reload replaces the immutable recipe collection inside the SAME manager.
             if (known == null || known.recipes() != snapshot) {
                 known = new AmbiguityCache(snapshot, new HashMap<>());
-                AMBIGUOUS.put(manager, known);
+                AMBIGUOUS.put(level, known);
             }
             cache = known.values();
         }
         synchronized (cache) {
-            Boolean known = cache.get(recipe.id());
+            Boolean known = cache.get(recipe.id().identifier());
             if (known != null) {
                 return known;
             }
@@ -108,7 +107,7 @@ public final class RecipeSelection {
                     break;
                 }
             }
-            cache.put(recipe.id(), result);
+            cache.put(recipe.id().identifier(), result);
             return result;
         }
     }
@@ -128,7 +127,7 @@ public final class RecipeSelection {
 
     private static String key(Ingredient ingredient) {
         List<String> ids = new ArrayList<>();
-        for (ItemStack s : ingredient.getItems()) {
+        for (ItemStack s : ingredient.items().map(holder -> new ItemStack(holder)).toList()) {
             ids.add(BuiltInRegistries.ITEM.getKey(s.getItem()).toString());
         }
         ids.sort(null);

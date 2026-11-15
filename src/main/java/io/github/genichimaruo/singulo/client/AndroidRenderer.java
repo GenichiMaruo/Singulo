@@ -15,9 +15,9 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
+
+
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -30,7 +30,7 @@ import org.joml.Quaternionf;
  * 技の見た目: 刃の軌跡（三日月）、回転斬りの輪、突進の残像、前触れの光、充電切れの点滅、充電の輪。
  * 印刷中は、光る走査面より下だけが実体で、上はうすい光の像（下から積み上がるように見える）。
  */
-public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
+public class AndroidRenderer extends ExtractedMobRenderer<RuinAndroid, AndroidModel> {
     /** 体の大きさ（モデルはプレイヤーの大きさで作り、少し縮める）。 */
     static final float SCALE = 0.85F;
     /** 画面の中（インベントリの全身）に描いている間だけ true。世界の座標で描く飾りは、体の座標で描き直す。 */
@@ -114,6 +114,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new ArmorGlint(this));
     }
 
+    @Override protected net.minecraft.world.phys.AABB getBoundingBoxForCulling(RuinAndroid android) { return android.getBoundingBoxForCulling(); }
     @Override
     public Identifier getTextureLocation(RuinAndroid android) {
         return variant.texture;
@@ -189,7 +190,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             pose.pushPose();
             pose.translate(a.x, a.y, a.z);
-            FxDraw.billboard(pose, glow, entityRenderDispatcher.cameraOrientation(), 0.12F + 0.25F * k, variant.accent, (int) (220 * k));
+            FxDraw.billboard(pose, glow, entityRenderDispatcher.camera.rotation(), 0.12F + 0.25F * k, variant.accent, (int) (220 * k));
             pose.popPose();
         }
         renderWorkIcon(android, partialTick, pose, buffers, light);
@@ -211,7 +212,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
             pose.pushPose();
             pose.translate(0.15F + phase * 0.35F, android.getBbHeight() + 0.05F + phase * 0.7F, 0);
-            pose.mulPose(entityRenderDispatcher.cameraOrientation());
+            pose.mulPose(entityRenderDispatcher.camera.rotation());
             float scale = 0.012F + phase * 0.012F;
             pose.scale(scale, -scale, scale);
             mc.font.drawInBatch("Z", -2.5F, 0, (alpha << 24) | 0xE8F0FF, false, pose.last().pose(), buffers,
@@ -254,7 +255,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         pose.translate(0, android.getBbHeight() + 0.45F + 0.04F * Mth.sin(age * 0.1F), 0);
         pose.mulPose(Axis.YP.rotationDegrees(age * 3));
         pose.scale(0.35F, 0.35F, 0.35F);
-        net.minecraft.client.Minecraft.getInstance().getItemRenderer().renderStatic(icon, net.minecraft.world.item.ItemDisplayContext.FIXED,
+        ItemDraw.get().renderStatic(icon, net.minecraft.world.item.ItemDisplayContext.FIXED,
                 light, OverlayTexture.NO_OVERLAY, pose, buffers, android.level(), android.getId());
         pose.popPose();
     }
@@ -263,22 +264,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 透きとおって光る刃の描き方: entityTranslucentEmissive と同じだが、奥行きも書く。書かないと、あとから描かれるブロックの
      * 絵（チェストなど）が、手前にある刃の上に描かれてしまう。
      */
-    private static final class DepthGlow extends RenderType {
-        static final java.util.function.Function<Identifier, RenderType> TYPE = net.minecraft.util.Util.memoize(texture -> create(
-                "singulo_translucent_emissive_depth", com.mojang.blaze3d.vertex.DefaultVertexFormat.NEW_ENTITY,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, true, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                        .setTextureState(new TextureStateShard(texture, false, false))
-                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                        .setCullState(NO_CULL)
-                        .setWriteMaskState(COLOR_DEPTH_WRITE)
-                        .setOverlayState(OVERLAY)
-                        .createCompositeState(false)));
-
-        private DepthGlow(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class DepthGlow {
+        static final java.util.function.Function<Identifier, RenderType> TYPE = net.minecraft.util.Util.memoize(texture -> EffectRenderTypes.emissive("singulo_translucent_emissive_depth", texture, true));
     }
 
     /**
@@ -286,58 +273,24 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * lightning は描く前に面を遠い順に並べ替えるので、芯と外側の光を同じ描き先に入れると、芯より先に外側の面が描かれて
      * 奥行きを書き、中の芯が隠れることがある（見る角度で芯が消える）。芯をこの描き先で先に描き終えてから、外側を描く。
      */
-    private static final class GlowCore extends RenderType {
-        static final RenderType TYPE = create("singulo_glow_core", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_DEPTH_WRITE)
-                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
-                        .setOutputState(WEATHER_TARGET)
-                        .createCompositeState(false));
-
-        private GlowCore(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                         boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class GlowCore {
+        static final RenderType TYPE = EffectRenderTypes.color("singulo_glow_core", "add", true, true, true, net.minecraft.client.renderer.rendertype.OutputTarget.WEATHER_TARGET);
     }
 
     /**
      * スラスターの炎の描き方: RenderType.lightning と同じく光を足して描くが、奥行きを書かない（書くと、あとから描かれる
      * 透ける物（後ろのリボンなど）が、炎の奥にあるとして消えてしまう）。円錐の内側の面も描く。
      */
-    private static final class Exhaust extends RenderType {
-        static final RenderType TYPE = create("singulo_exhaust", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_WRITE)
-                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
-                        .setCullState(NO_CULL)
-                        .setOutputState(WEATHER_TARGET)
-                        .createCompositeState(false));
-
-        private Exhaust(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                        boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class Exhaust {
+        static final RenderType TYPE = EffectRenderTypes.color("singulo_exhaust", "add", false, false, true, net.minecraft.client.renderer.rendertype.OutputTarget.WEATHER_TARGET);
     }
 
     /**
      * 光る部品の描き方: 陰をつけず、色そのままの明るさで描く（ふつうの体の描き方や entityTranslucentEmissive は、
      * 面の向きで暗くなるので、昼に光って見えない）。透けずに奥行きも書く。
      */
-    private static final class Shine extends RenderType {
-        static final RenderType TYPE = create("singulo_shine", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, false, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_DEPTH_WRITE)
-                        .setTransparencyState(NO_TRANSPARENCY)
-                        .setCullState(NO_CULL)
-                        .createCompositeState(false));
-
-        private Shine(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                      boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class Shine {
+        static final RenderType TYPE = EffectRenderTypes.color("singulo_shine", "opaque", true, false, false, net.minecraft.client.renderer.rendertype.OutputTarget.MAIN_TARGET);
     }
 
     /** 体を描くときと同じ変形（向き・裏返し・大きさ）を pose に積む。 */
@@ -398,7 +351,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         int state = android.state();
         float t = android.stateTime(partialTick);
         float age = android.tickCount + partialTick;
-        Quaternionf camera = entityRenderDispatcher.cameraOrientation();
+        Quaternionf camera = entityRenderDispatcher.camera.rotation();
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
         int accent = variant.accent;
         switch (state) {
@@ -592,7 +545,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 // 持ち主の無線充電器から胸へ流れる光の線（ゆるく揺れる）と、足元の充電の目盛り
                 Entity link = android.chargerLink();
                 if (link != null) {
-                    Vec3 camera3 = entityRenderDispatcher.camera.getPosition();
+                    Vec3 camera3 = entityRenderDispatcher.camera.position();
                     Vec3 from = link.getPosition(partialTick).add(0, link.getBbHeight() * 0.45, 0).subtract(camera3);
                     Vec3 to = android.getPosition(partialTick).add(0, android.getBbHeight() * 0.6, 0).subtract(camera3);
                     if (from.distanceToSqr(to) < 6 * 6) {
@@ -736,7 +689,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 size[i] = Mth.lerp(back, 1F, 0.8F);
             }
         }
-        VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
         for (int i = 0; i < total; i++) {
             pose.pushPose();
             pose.translate(at[i].x, at[i].y, at[i].z);
@@ -791,7 +744,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.beam(p, fx, bit.shotFrom().subtract(bit.getPosition(partialTick)), to, 0.05F * k + 0.015F, 0xFFFFFF, (int) (240 * k));
             pose.pushPose();
             pose.translate(at[shot].x, at[shot].y, at[shot].z);
-            Quaternionf camera = entityRenderDispatcher.cameraOrientation();
+            Quaternionf camera = entityRenderDispatcher.camera.rotation();
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, 0.35F * k + 0.1F, BitAndroid.BEAM, (int) (200 * k));
             pose.popPose();
@@ -873,8 +826,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     // ------------------------------------------------------------------ 重ねる層
 
     /** 光る線と目（暗くても光る）。充電切れ・充電中・印刷中は消える。 */
-    final class Glow extends RenderLayer<RuinAndroid, AndroidModel> {
-        Glow(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Glow extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Glow(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -914,8 +867,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * ソーラー充電: 空へ掲げた左手の上に、3枚の羽根のソーラーパネルが広がる（両脇の2枚が、たたまれた状態から開く）。
      * 濃い紺のセルに銀の枠と格子。パネルから腕へ、光が流れ落ちる。
      */
-    final class Solar extends RenderLayer<RuinAndroid, AndroidModel> {
-        Solar(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Solar extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Solar(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -948,7 +901,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.translate(0, (0.12F + 0.1F * rise) / SCALE, 0);
             float s = (0.35F + 0.65F * rise) / SCALE;
             pose.scale(s, s, s);
-            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer body = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             leaf(pose, body, light);
             for (int side = -1; side <= 1; side += 2) {
                 pose.pushPose();
@@ -988,8 +941,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 採掘: 左手に持つツルハシ。プレイヤーと同じく、柄は前腕に直角（手から前へ）、頭は柄の先で腕と同じ向きに張り出す。
      * 柄は実体（濃い金属色）、頭はアンドロイドの色で光る（先が持ち手の方へ曲がった弧）。
      */
-    final class Pickaxe extends RenderLayer<RuinAndroid, AndroidModel> {
-        Pickaxe(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Pickaxe extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Pickaxe(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -1002,7 +955,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.pushPose();
             getParentModel().toLeftHand(pose);
             float k = 1 / SCALE;
-            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer body = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             // 柄: 手の中（少し後ろに出る）から前へ
             FxDraw.box(pose, body, -0.022F * k, -0.022F * k, -0.42F * k, 0.022F * k, 0.022F * k, 0.08F * k, light, 0x4A505C, 255);
             // 頭の付け根
@@ -1042,10 +995,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 無重力に入るとノズルが開いて出てきて、外へ出るとたたまれる。炎は芯の白い光と、そのまわりのプラズマの炎の二重の円錐で、
      * 進む速さと向きで長さと明るさが変わり（前や上へ進むほど主ノズルが、上へ上がるほどかかとが強く噴く）、少しずつゆらぐ。
      */
-    final class Thrusters extends RenderLayer<RuinAndroid, AndroidModel> {
+    final class Thrusters extends ExtractedLayer<RuinAndroid, AndroidModel> {
         private static final int SIDES = 10;
 
-        Thrusters(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+        Thrusters(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -1091,7 +1044,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
          */
         private void nozzle(PoseStack pose, MultiBufferSource buffers, int light, float open, float size,
                             RuinAndroid android, float age, int seed, float power, int plasma, float reach) {
-            VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));   // 炎の描き先へ替えたあとなので、毎回取り直す
+            VertexConsumer metal = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));   // 炎の描き先へ替えたあとなので、毎回取り直す
             float h = size * 0.9F * open;
             float r = size / 2;
             // 根元の台座と、口の広がったベル（暗い金属と明るい縁）
@@ -1139,9 +1092,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * マイクラらしく、四角い管を八角形につないだ輪（前後左右の4本はアクセントの色、角の4つは白のしま）。管は上下の角を1段ずつ
      * 落として、ふっくらした断面にする。ふくらむときは少し大きくなってから落ち着く。空気を入れる口が前に付いている。
      */
-    final class SwimRing extends RenderLayer<RuinAndroid, AndroidModel> {
+    final class SwimRing extends ExtractedLayer<RuinAndroid, AndroidModel> {
 
-        SwimRing(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+        SwimRing(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -1158,7 +1111,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             getParentModel().toHips(pose);
             pose.translate(0, -1.2F / 16, 0);
             pose.scale(pop, pop, pop);
-            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             float p = 1 / 16F;
             int accent = variant.accent, white = 0xF8FAFC;
             // 前後左右のまっすぐな管（ピクセル単位: 内側 4.5、外側 7.5、高さ ±1.5）
@@ -1190,8 +1143,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
     }
 
-    final class Tanks extends RenderLayer<RuinAndroid, AndroidModel> {
-        Tanks(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Tanks extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Tanks(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -1219,7 +1172,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     continue;
                 }
                 // 蓋は筒よりほんの少し太く、ガラスの上下の面は蓋から少し離す（同じ面が重なると、境目がちらつく）
-                VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                VertexConsumer metal = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
                 float lip = 0.06F / 16, gap = 0.02F / 16;
                 FxDraw.box(pose, metal, lo - lip, y0 - 0.35F / 16, z0 - lip, hi + lip, y0, z1 + lip, light, 0x8C94A2, 255);
                 FxDraw.box(pose, metal, lo - lip, y1, z0 - lip, hi + lip, y1 + 0.35F / 16, z1 + lip, light, 0x8C94A2, 255);
@@ -1227,7 +1180,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
                 if (fluid != null && fill > 0) {
                     // 中身: 流体そのものの絵（流れるアニメーションも動く）。ガスは上から溜まる
-                    VertexConsumer liquid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
+                    VertexConsumer liquid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
                     float level = (y1 - y0) * Math.min(1, fill);
                     float bottom = FluidDraw.gaseous(fluid) ? y1 - level : y0, top = FluidDraw.gaseous(fluid) ? y1 : y0 + level;
                     FluidDraw.box(pose, liquid, fluid, lo + 0.15F / 16, bottom, z0 + 0.15F / 16, hi - 0.15F / 16, top, z1 - 0.15F / 16, light,
@@ -1246,7 +1199,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         private void cylinder(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, int i, float lo, float hi, float y0, float y1,
                               float z0, float z1) {
             float p = 1 / 16F;
-            VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer metal = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             int steel = 0xB4BCC8, dark = 0x6E7684;
             FxDraw.box(pose, metal, lo, y0 - 0.3F * p, z0, hi, y1 - 0.4F * p, z1, light, steel, 255);                            // 胴
             float inset = 0.25F * p;
@@ -1262,7 +1215,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             float wx0 = lo + 0.45F * (hi - lo), wx1 = hi - 0.2F * (hi - lo), wy0 = y0 + 0.2F * p, wy1 = y1 - 1.5F * p, wz = z0 - 0.01F * p;
             FxDraw.box(pose, metal, wx0, wy0, wz - 0.02F * p, wx1, wy1, wz, light, 0x2A3040, 255);
             if (!id.isEmpty() && fill > 0) {
-                VertexConsumer chem = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
+                VertexConsumer chem = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
                 FluidDraw.chemicalBox(pose, chem, id, wx0, wy0, wz - 0.045F * p, wx1, wy0 + (wy1 - wy0) * Math.min(1, fill), wz - 0.025F * p, light, 235);
             }
         }
@@ -1272,10 +1225,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 瞬き: 数秒ごと（アンドロイドごとに間合いを変える）に、目の上にまぶた（肌の色と、下の縁のまつげの線）を重ねる。
      * 半分閉じる → 閉じる（2 tick）→ 半分閉じる。目は顔（頭の前の面、z -3.5）の 5〜6 段目、左右 1〜2 列・5〜6 列。
      */
-    final class Blink extends RenderLayer<RuinAndroid, AndroidModel> {
+    final class Blink extends ExtractedLayer<RuinAndroid, AndroidModel> {
         private static final int SKIN = 0xFFECE4, CREASE = 0xE6CFC8, LASH = 0x4A3A44;
 
-        Blink(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+        Blink(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -1294,7 +1247,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             float p = 1 / 16F;
             pose.pushPose();
             getParentModel().toHead(pose);
-            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             float z0 = -3.52F * p, z1 = -3.5F * p;
             for (float x0 : new float[] {-3, 1}) {
                 float x1 = x0 + 2;
@@ -1311,21 +1264,21 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 首/背中（マント・マフラー・妖精の羽）、腰（腰リボン・エプロン）、手（本・花束・ティーカップ・傘・ランタン・ほうき）。
      * 染めた色で描く。手に持つ物は、待機している間だけ。大きさは体のピクセル（1/16）で決める。
      */
-    final class Accessories extends RenderLayer<RuinAndroid, AndroidModel> {
+    final class Accessories extends ExtractedLayer<RuinAndroid, AndroidModel> {
         private static final float P = 1 / 16F;
         /** 装飾の立体に貼る模様（面の縁の擦れ・むら・小傷の汚し）と、髪・麦わら・穂の筋の模様（tools/androids.py）。 */
         static final Identifier GRAIN = io.github.genichimaruo.singulo.Singulo.id("textures/entity/android_decor_grain.png");
         static final Identifier STRANDS = io.github.genichimaruo.singulo.Singulo.id("textures/entity/android_decor_strands.png");
 
         private static VertexConsumer grain(MultiBufferSource buffers) {
-            return buffers.getBuffer(RenderType.entityCutoutNoCull(GRAIN));
+            return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(GRAIN));
         }
 
         private static VertexConsumer strands(MultiBufferSource buffers) {
-            return buffers.getBuffer(RenderType.entityCutoutNoCull(STRANDS));
+            return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(STRANDS));
         }
 
-        Accessories(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+        Accessories(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2067,8 +2020,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /** エンチャントした装甲板の光沢（防具と同じ光沢を、装甲の部品だけに重ねる）。 */
-    final class ArmorGlint extends RenderLayer<RuinAndroid, AndroidModel> {
-        ArmorGlint(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class ArmorGlint extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        ArmorGlint(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2086,8 +2039,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 光の鞭。柄の先から、動きに合わせた曲線で描く（待機: 床へ垂れる、振りかぶり: 頭の後ろ、打ち込み: 前へ伸びて波打つ、
      * 絡め取り: 相手まで張る、叩きつけ: 頭上で回してから床へ）。叩きつけの衝撃波も描く。
      */
-    final class Whip extends RenderLayer<RuinAndroid, AndroidModel> {
-        Whip(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Whip extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Whip(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2102,7 +2055,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 hangInGui(pose, m, age, buffers);
                 return;
             }
-            Vec3 camera = entityRenderDispatcher.camera.getPosition();
+            Vec3 camera = entityRenderDispatcher.camera.position();
             pose.pushPose();
             m.toWhip(pose);
             org.joml.Vector3f h = pose.last().pose().transformPosition(new org.joml.Vector3f());
@@ -2248,8 +2201,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /** 光の刀身。柄の先から伸びる（横薙ぎで伸び、溜め突きと構えで強く光る）。足し合わせで描く。 */
-    final class Saber extends RenderLayer<RuinAndroid, AndroidModel> {
-        Saber(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Saber extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Saber(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2301,8 +2254,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * 斧型の両手斧: 長い柄（濃い金属、握りに革巻き、端に石突き）の先に、両刃の斧頭。斧頭の芯は金属で、刃は光る
      * （真ん中が広い三日月の形を、薄い光の箱を重ねて作る）。前触れのあいだは強く光る。
      */
-    final class Axe extends RenderLayer<RuinAndroid, AndroidModel> {
-        Axe(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Axe extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Axe(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2322,7 +2275,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             m.axeGrip.translateAndRotate(pose);
             float k = 1 / SCALE;
             pose.scale(k, k, k);                       // ここからはブロックの長さで描く
-            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer body = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             float r = 0.028F;
             FxDraw.box(pose, body, -r, -0.42F, -r, r, 1.02F, r, light, 0x3C424E, 255);                       // 柄
             FxDraw.box(pose, body, -r - 0.006F, -0.12F, -r - 0.006F, r + 0.006F, 0.16F, r + 0.006F, light, 0x5A3E30, 255);  // 革巻き
@@ -2373,8 +2326,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /** ビット型の短剣: 短い柄と鍔、光の刃（白い芯と菫の外側）。 */
-    final class Dagger extends RenderLayer<RuinAndroid, AndroidModel> {
-        Dagger(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Dagger extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Dagger(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2394,7 +2347,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             m.daggerGrip.translateAndRotate(pose);
             float k = 1 / SCALE;
             pose.scale(k, k, k);
-            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer body = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             FxDraw.box(pose, body, -0.022F, -0.12F, -0.022F, 0.022F, 0.06F, 0.022F, light, 0x2C345C, 255);
             FxDraw.box(pose, body, -0.07F, 0.06F, -0.018F, 0.07F, 0.09F, 0.018F, light, 0x8C94B8, 255);
             float outer = 0.03F * glow;
@@ -2412,7 +2365,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      * レールガンを出すと、背中のレールガンの部品（機関部・握り・銃床・2本のレール・光る芯・3つのコイル・照準・銃口）が
      * 順に弧を描いて手元へ飛び、そのまま組み上がる（飛んでいる間は光る）。溜めの間はレールの間とコイルが光り、しまうときは逆に背中へ戻る。
      */
-    final class Gun extends RenderLayer<RuinAndroid, AndroidModel> {
+    final class Gun extends ExtractedLayer<RuinAndroid, AndroidModel> {
         /**
          * レールガンの部品: 箱（画素の単位。+X が銃口、+Y が下（握りの側）、+Z が背負ったときの外側）・色・塗り方・飛び始める tick。
          * 塗り方は 0 がふつうの色、1 が光る水緑、2 が白っぽく光る水緑、3〜5 が順に脈打つコイルの帯。
@@ -2497,7 +2450,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             };
         }
 
-        Gun(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+        Gun(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2717,7 +2670,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             boolean locked = state == GunnerAndroid.STATE_RAIL_CHARGE && t >= GunnerAndroid.RAIL_CHARGE - GunnerAndroid.RAIL_LOCK;
             boolean blink = locked && ((int) (age * 0.8F)) % 2 == 0;
             // 先に形（同じ描き方をまとめて描く。描き方を混ぜると、前の描き方の受け口が閉じられる）
-            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer body = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             if (onBack) {
                 push(pose, back);
                 for (float x : CLAMPS) {
@@ -2826,7 +2779,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             int accent = mix(mix(DARK, variant.accent, 0.35F + 0.65F * glow), 0xFFFFFF, 0.12F * glow);
             int hot = mix(accent, 0xFFFFFF, Math.min(1, 0.35F * glow + 0.6F * flash));
             float wave = 0.5F + 0.5F * Mth.sin(age * 0.25F);
-            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer body = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             FxDraw.box(pose, body, -1.0F, -0.1F, -0.45F, 3.6F, 0.7F, 0.45F, light, DARK, 255);          // 骨組み
             FxDraw.box(pose, body, -1.3F, -0.95F, -0.55F, 3.4F, 0.0F, 0.55F, light, WHITE, 255);        // 遊底
             FxDraw.box(pose, body, -0.8F, -1.15F, -0.3F, 2.8F, -0.9F, 0.3F, light, LIGHT, 255);
@@ -2925,8 +2878,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /** ビット型の、背中にしまったビット（浮かべていない間）。背中の上に、翼のように並ぶ。 */
-    final class StowedBits extends RenderLayer<RuinAndroid, AndroidModel> {
-        StowedBits(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class StowedBits extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        StowedBits(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 
@@ -2947,7 +2900,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             getParentModel().toTorso(pose);
             float k = 1 / SCALE;
             // 別の描画先を取り出すと前の描画先は閉じられるので、本体を全部描いてから光を描く
-            VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
             for (int i = out; i < BitAndroid.BITS; i++) {
                 stowed(pose, i, k);
                 bitBody(pose, solid, light);
@@ -2976,8 +2929,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
     }
 
-    final class Blade extends RenderLayer<RuinAndroid, AndroidModel> {
-        Blade(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+    final class Blade extends ExtractedLayer<RuinAndroid, AndroidModel> {
+        Blade(ExtractedLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
         }
 

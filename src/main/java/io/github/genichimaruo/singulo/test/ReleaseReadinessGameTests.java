@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -14,8 +14,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 0.8.0をmainへ統合する際に見つかった境界条件の回帰試験。 */
 @GameTestHolder("singulo_progression")
@@ -34,7 +34,7 @@ public final class ReleaseReadinessGameTests {
     }
 
     private static RuinAndroid guard(GameTestHelper helper) {
-        var android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        var android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         android.setNoAi(true);
         android.setNoGravity(true);
         android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 2, 2))));
@@ -48,7 +48,7 @@ public final class ReleaseReadinessGameTests {
     public static void leftoverDepositDoesNotAbandonNextLease(GameTestHelper helper) throws Exception {
         var at = new BlockPos(1, 1, 1);
         helper.setBlock(at, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = helper.getBlockEntity(at);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,at);
         RuinAndroid android = guard(helper);
         android.assignWork(helper.absolutePos(at), 1); // 注文1は完了して一覧から消えている
         android.addToCarry(new ItemStack(Items.DIRT)); // 作業で出た余り。私物にはしない
@@ -106,8 +106,8 @@ public final class ReleaseReadinessGameTests {
         var report = patrol.getClass().getDeclaredMethod("report");
         kill.setAccessible(true);
         report.setAccessible(true);
-        var zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(helper.getLevel());
-        var skeleton = net.minecraft.world.entity.EntityType.SKELETON.create(helper.getLevel());
+        var zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var skeleton = net.minecraft.world.entity.EntityType.SKELETON.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         zombie.setPos(android.position());
         skeleton.setPos(android.position());
         try {

@@ -50,7 +50,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     public static final int FUEL_TICKS = 1200;
     static final int CHECK_INTERVAL = 40;
 
-    private final ItemStackHandler fuel = new ItemStackHandler(1) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler fuel = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return isFuel(stack);
@@ -82,7 +82,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     public static boolean isFuel(ItemStack stack) {
-        return stack.is(BuiltInRegistries.ITEM.get(Singulo.id("exotic_matter")));
+        return stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("exotic_matter")));
     }
 
     public static int radius() {
@@ -189,10 +189,10 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         extraTickCarry -= ticks;
         if (ticks > 0) {
             List<BlockEntity> targets = new ArrayList<>();
-            ChunkPos min = new ChunkPos(c.offset(-r, 0, -r));
-            ChunkPos max = new ChunkPos(c.offset(r, 0, r));
-            for (int cx = min.x; cx <= max.x; cx++) {
-                for (int cz = min.z; cz <= max.z; cz++) {
+            ChunkPos min = ChunkPos.containing(c.offset(-r, 0, -r));
+            ChunkPos max = ChunkPos.containing(c.offset(r, 0, r));
+            for (int cx = min.x(); cx <= max.x(); cx++) {
+                for (int cz = min.z(); cz <= max.z(); cz++) {
                     if (!level.hasChunk(cx, cz)) {
                         continue;
                     }
@@ -219,7 +219,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         }
         // ランダムティック: 1区画（16³）あたり randomTickSpeed 回なので、範囲の立方体ぶんを extra 倍だけ足す
         int side = 2 * r + 1;
-        randomTickCarry += level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING) * extra * side * side * side / 4096.0;
+        randomTickCarry += level.getGameRules().get(GameRules.RANDOM_TICK_SPEED) * extra * side * side * side / 4096.0;
         int count = (int) randomTickCarry;
         randomTickCarry -= count;
         for (int i = 0; i < count; i++) {
@@ -349,5 +349,9 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
             axis = BlockPos.of(tag.getLongOr("axis", 0L));
             formed = tag.getBooleanOr("formed", false);
         }
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return io.github.genichimaruo.singulo.compat.ItemTransferView.combined(slot, fuel, new io.github.genichimaruo.singulo.compat.ItemTransferView(spent, (s,r) -> false, (s,r) -> true));
     }
 }

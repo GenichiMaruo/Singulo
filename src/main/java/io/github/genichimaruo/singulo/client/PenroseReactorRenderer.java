@@ -105,12 +105,12 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
         // 影: 光子球に捕まる光の範囲（地平線の約2.6倍）を、カメラに向いた黒い円板として中心の面に描く。
         // 円盤の手前側は影の上に、奥側は影の後ろになる
         pose.pushPose();
-        pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation());
         drawShadow(pose, solid, shadow);
         pose.popPose();
         // 降着円盤: スピンに比例した速さで回す
         float angle = time * (0.5F + 4.0F * spin);
-        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().position();
         Vec3 toCamera = camera.subtract(worldCenter).normalize();
         pose.pushPose();
         pose.mulPose(Axis.XP.rotation(tilt));
@@ -140,7 +140,7 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
             return 0;
         }
         VertexConsumer glow = GlowDepth.additive(buffers).getBuffer(JetForgeRenderTypes.GLOW);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         double c = Structures.REACTOR_RADIUS * Math.sqrt(0.5) - 0.6;
         float seen = VISIBLE_HORIZON_BASE + (horizon - 0.6F) * VISIBLE_HORIZON_GROWTH;
         float tilt = 12 * Mth.DEG_TO_RAD;
@@ -245,7 +245,7 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
         var blocks = be.collapseBlocks();
         int n = blocks.size();
         float t = time - be.collapseStart();
-        var dispatcher = Minecraft.getInstance().getBlockRenderer();
+        var dispatcher = BlockDraw.get();
         BlockPos origin = be.getBlockPos();
         int fly = 24;
         for (int i = 0; i < n; i++) {
@@ -270,8 +270,8 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
             pose.popPose();
         }
         var level = be.getLevel();
-        if (level != null && level.random.nextInt(2) == 0 && n > 0) {
-            BlockPos p = blocks.get(level.random.nextInt(n));
+        if (level != null && level.getRandom().nextInt(2) == 0 && n > 0) {
+            BlockPos p = blocks.get(level.getRandom().nextInt(n));
             Vec3 v = center.subtract(Vec3.atCenterOf(p)).scale(0.06);
             level.addParticle(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
                     v.x, v.y, v.z);
@@ -294,7 +294,7 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
             FORMED_AT.put(be, now);
             Vec3 c = be.coreCenter();
             var level = be.getLevel();
-            var rnd = level.random;
+            var rnd = level.getRandom();
             for (int i = 0; i < 120; i++) {
                 Vec3 d = new Vec3(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).normalize().scale(0.4 + rnd.nextDouble() * 0.6);
                 level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, c.x, c.y, c.z, d.x, d.y, d.z);
@@ -331,7 +331,7 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
         float power = 0.25F * wake + 0.75F * inject;
         Vec3 center = be.coreCenter();
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         int beamRgb = lerpRgb(0x64DCFF, 0xFFFFFF, power + collapse);
         // 電力が満ちていないうちは、流れ込む光がちらつく
         float flicker = charge >= 1F ? 1F : 0.55F + 0.45F * Mth.sin(t * 2.3F) * Mth.sin(t * 0.7F);
@@ -434,7 +434,7 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
         // 崩壊: 渦を巻いて吸い込まれる粒
         var level = be.getLevel();
         if (level != null && (inject > 0.5F || collapse > 0)) {
-            var rnd = level.random;
+            var rnd = level.getRandom();
             int n = collapse > 0 ? 6 : 1;
             for (int k = 0; k < n; k++) {
                 if (rnd.nextFloat() > 0.5F + 0.5F * collapse) {
@@ -456,7 +456,7 @@ public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactor
     private static void renderFormationFlash(PenroseReactorBlockEntity be, float age, PoseStack pose, MultiBufferSource buffers) {
         float k = Mth.clamp(age / FLASH_TICKS, 0, 1);
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(0.5, 0.5 + Structures.CONTROLLER_BELOW_CENTER, 0.5);
         FxDraw.billboard(pose, glow, camera, 9 * (1 - k) + 0.5F, 0xFFFFFF, (int) (255 * (1 - k)));

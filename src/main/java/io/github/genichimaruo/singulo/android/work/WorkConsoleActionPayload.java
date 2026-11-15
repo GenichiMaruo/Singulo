@@ -44,7 +44,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
     public static CompoundTag plan(ItemStack item, long count, boolean fresh, net.minecraft.core.HolderLookup.Provider reg) {
         CompoundTag t = new CompoundTag();
         t.putString("type", PLAN);
-        t.put("item", item.copyWithCount(1).save(reg));
+        t.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(item.copyWithCount(1), reg));
         t.putLong("count", count);
         t.putBoolean("fresh", fresh);
         return t;
@@ -65,7 +65,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
         t.putLong("destination", destination.asLong());
         net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
         for (UUID id : androids) {
-            list.add(NbtUtils.createUUID(id));
+            list.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(id));
         }
         t.put("androids", list);
         return t;
@@ -100,7 +100,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
         t.putString("type", GRID);
         net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
         for (ItemStack s : grid) {
-            list.add(s.isEmpty() ? new CompoundTag() : s.copyWithCount(1).save(reg));
+            list.add(s.isEmpty() ? new CompoundTag() : io.github.genichimaruo.singulo.compat.NbtCompat.save(s.copyWithCount(1), reg));
         }
         t.put("grid", list);
         return t;
@@ -119,7 +119,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
         net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
         for (ItemStack s : items) {
             if (!s.isEmpty()) {
-                list.add(s.save(reg));
+                list.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(s, reg));
             }
         }
         return list;
@@ -163,8 +163,8 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                 }
                 case START -> {
                     List<UUID> ids = new ArrayList<>();
-                    for (Tag t : a.getList("androids", Tag.TAG_INT_ARRAY)) {
-                        ids.add(NbtUtils.loadUUID(t));
+                    for (Tag t : a.getListOrEmpty("androids")) {
+                        ids.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(t));
                     }
                     BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLongOr("destination", 0L)) : null;
                     Component error = item.isEmpty() ? Component.literal("?")
@@ -172,13 +172,13 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {
-                        plan.putString("error", Component.Serializer.toJson(error, reg));
+                        plan.putString("error", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(error, reg));
                     }
                 }
                 case REGISTER -> {
                     List<UUID> ids = new ArrayList<>();
-                    for (Tag t : a.getList("androids", Tag.TAG_INT_ARRAY)) {
-                        ids.add(NbtUtils.loadUUID(t));
+                    for (Tag t : a.getListOrEmpty("androids")) {
+                        ids.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(t));
                     }
                     BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLongOr("destination", 0L)) : null;
                     Component error = item.isEmpty() ? Component.literal("?")
@@ -186,7 +186,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {
-                        plan.putString("error", Component.Serializer.toJson(error, reg));
+                        plan.putString("error", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(error, reg));
                     }
                 }
                 case UNREGISTER -> {

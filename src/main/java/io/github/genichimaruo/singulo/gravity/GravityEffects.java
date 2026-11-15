@@ -63,8 +63,7 @@ public final class GravityEffects {
     }
 
     /** 今の重力の種類（どちらでもなければ null）。 */
-    @Nullable
-    public static GravityPanelBlock.Kind current(LivingEntity living) {
+    public static GravityPanelBlock.@Nullable Kind current(LivingEntity living) {
         AttributeInstance gravity = living.getAttribute(Attributes.GRAVITY);
         if (gravity == null) {
             return null;
@@ -72,7 +71,7 @@ public final class GravityEffects {
         return gravity.hasModifier(LOW_ID) ? GravityPanelBlock.Kind.LOW : gravity.hasModifier(HIGH_ID) ? GravityPanelBlock.Kind.HIGH : null;
     }
 
-    private static void apply(LivingEntity living, AttributeInstance gravity, @Nullable GravityPanelBlock.Kind kind) {
+    private static void apply(LivingEntity living, AttributeInstance gravity, GravityPanelBlock.@Nullable Kind kind) {
         boolean low = kind == GravityPanelBlock.Kind.LOW;
         boolean high = kind == GravityPanelBlock.Kind.HIGH;
         set(gravity, LOW_ID, low, LOW_GRAVITY - 1);

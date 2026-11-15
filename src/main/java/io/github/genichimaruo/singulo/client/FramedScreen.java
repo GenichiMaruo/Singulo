@@ -19,9 +19,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     protected GuiSkin skin = GuiSkin.STANDARD;
 
     FramedScreen(M menu, Inventory inventory, Component title, int width, int height) {
-        super(menu, inventory, title);
-        imageWidth = width;
-        imageHeight = height;
+        super(menu, inventory, title, width, height);
         titleLabelX = 8;
         titleLabelY = 6;
         inventoryLabelX = GuiFrame.inventoryX(width);
@@ -123,8 +121,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     /** 状態の記号（null なら出さない）。 */
-    @Nullable
-    protected Panel.Status status() {
+    protected Panel.@Nullable Status status() {
         return null;
     }
 
@@ -432,8 +429,8 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
 
     /** 右レールは枠の外にあるが、そこをクリックしても持っている物を捨てない。 */
     @Override
-    protected boolean hasClickedOutside(double mouseX, double mouseY, int left, int top, int button) {
-        if (!super.hasClickedOutside(mouseX, mouseY, left, top, button) || onRail(mouseX, mouseY) || overPopup(mouseX, mouseY)) {
+    protected boolean hasClickedOutside(double mouseX, double mouseY, int left, int top) {
+        if (!super.hasClickedOutside(mouseX, mouseY, left, top) || onRail(mouseX, mouseY) || overPopup(mouseX, mouseY)) {
             return false;
         }
         for (int[] r : outsideAreas()) {

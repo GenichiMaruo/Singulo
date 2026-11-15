@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 4
     },
     {
-      "ingredient": {
-        "tag": "c:obsidians"
-      },
+      "ingredient": "#c:obsidians",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_module"
-      },
+      "ingredient": "singulo:time_crystal_module",
       "count": 1
     }
   ],

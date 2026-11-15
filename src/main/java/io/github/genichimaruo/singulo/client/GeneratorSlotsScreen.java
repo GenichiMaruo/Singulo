@@ -89,7 +89,7 @@ public class GeneratorSlotsScreen extends FramedScreen<GeneratorSlotsMenu> {
         Panel.gauge(g, skin, leftPos + 8, topPos + barY(), 8, BAR_H, (double) menu.value(GeneratorSlotsMenu.D_ENERGY) / capacity, Panel.GLOW);
         var in = menu.getSlot(0);
         ghostSlot(g, leftPos + in.x, topPos + in.y, in,
-                new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(turbine() ? "coolant_cartridge" : "muon_catalyst"))));
+                new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(turbine() ? "coolant_cartridge" : "muon_catalyst"))));
         var out = menu.getSlot(1);
         Panel.slot(g, skin, leftPos + out.x, topPos + out.y);
         Panel.downArrow(g, skin, leftPos + GeneratorSlotsMenu.IN_X + 4, topPos + GeneratorSlotsMenu.IN_Y + 18);

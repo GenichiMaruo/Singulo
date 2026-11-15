@@ -6,15 +6,11 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:observation_log"
-      },
+      "ingredient": "singulo:observation_log",
       "uses": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:blank_data_card"
-      },
+      "ingredient": "singulo:blank_data_card",
       "count": 1
     }
   ],

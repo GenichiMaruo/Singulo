@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 public final class ShapeCache {
     private ShapeCache() {}
 
-    private record Entry(long checked, Blueprints.Kind kind, @Nullable Shapes.Found found) {}
+    private record Entry(long checked, Blueprints.Kind kind, Shapes.@Nullable Found found) {}
 
     private static final Map<BlockPos, Entry> CACHE = new LinkedHashMap<>(16, 0.75F, true) {
         @Override protected boolean removeEldestEntry(Map.Entry<BlockPos, Entry> eldest) { return size() > 4096; }
@@ -28,8 +28,7 @@ public final class ShapeCache {
         lastLevel.clear();
     }
 
-    @Nullable
-    public static Shapes.Found get(Level level, BlockPos controller, Blueprints.Kind kind) {
+    public static Shapes.@Nullable Found get(Level level, BlockPos controller, Blueprints.Kind kind) {
         if (level != lastLevel.get()) {
             CACHE.clear();
             lastLevel = new WeakReference<>(level);

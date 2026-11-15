@@ -12,7 +12,7 @@ import net.minecraft.world.item.TooltipFlag;
  * 未記録のカードは64枚まで重なり、記録したカードは重ならない。何もない所でシフト右クリックすると、記録を消す。
  * シフトを押している間は、作る物の絵が重なって見える。
  */
-public class RecipeCardItem extends Item {
+public class RecipeCardItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public RecipeCardItem(Properties properties) {
         super(properties.stacksTo(64));
     }

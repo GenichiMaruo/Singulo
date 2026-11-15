@@ -46,7 +46,7 @@ public final class MachineWatch {
         }
         RecipeData r = s.recipe;
         net.minecraft.core.Direction outFace = outputFace(level, at, r);
-        IItemHandler out = outFace == null ? null : level.getCapability(Capabilities.ItemHandler.BLOCK, at, outFace);
+        IItemHandler out = outFace == null ? null : io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, outFace);
         if (!handlesInput(level, at, r) || !handlesOutput(level, at, r)) {
             s.collectReady = true;                 // 装置が壊された: 見に行く（作れないので、注文を取り消すことになる）
             return;
@@ -75,11 +75,11 @@ public final class MachineWatch {
             if (cooking.isEmpty()) {
                 return 0;
             }
-            if (f.litTime <= 0 && f.getItem(1).isEmpty()) {
+            if (f.litTimeRemaining <= 0 && f.getItem(1).isEmpty()) {
                 return -1;
             }
             int each = Math.max(1, f.cookingTotalTime);
-            return Math.max(0, each - f.cookingProgress) + (cooking.getCount() - 1) * each;
+            return Math.max(0, each - f.cookingTimer) + (cooking.getCount() - 1) * each;
         }
         return -1;
     }
@@ -118,7 +118,7 @@ public final class MachineWatch {
     /** 取り出す面のどれかから、物か流体を出し入れできるか。 */
     public static boolean handlesOutput(Level level, BlockPos at, RecipeData r) {
         for (net.minecraft.core.Direction d : r.outputAuto() ? OUT_ORDER : new net.minecraft.core.Direction[] {r.outputFace(level.getBlockState(at))}) {
-            if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
+            if (io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
         }
@@ -129,8 +129,7 @@ public final class MachineWatch {
      * できた物を今取り出す面: 記録した面か、自動なら、かまどの仲間は下（横は燃料の欄なので）、ほかの装置は下・横・上の順に、
      * 主な物か副産物を今取り出せる最初の面（まだ何もできていなければ null）。
      */
-    @org.jspecify.annotations.Nullable
-    public static net.minecraft.core.Direction outputFace(Level level, BlockPos at, RecipeData r) {
+    public static net.minecraft.core.@org.jspecify.annotations.Nullable Direction outputFace(Level level, BlockPos at, RecipeData r) {
         if (!r.outputAuto()) {
             return r.outputFace(level.getBlockState(at));
         }
@@ -138,7 +137,7 @@ public final class MachineWatch {
             return net.minecraft.core.Direction.DOWN;
         }
         for (net.minecraft.core.Direction d : OUT_ORDER) {
-            IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, at, d);
+            IItemHandler h = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, d);
             for (int i = 0; h != null && i < h.getSlots(); i++) {
                 ItemStack s = h.getStackInSlot(i);
                 if (!s.isEmpty() && producedBy(r, s) && !h.extractItem(i, 1, true).isEmpty()) {
@@ -176,7 +175,7 @@ public final class MachineWatch {
     /** 素材を入れる面のどれかから、物か流体を出し入れできるか（装置として使えるか）。 */
     public static boolean handlesInput(Level level, BlockPos at, RecipeData r) {
         for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
-            if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
+            if (io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
         }
@@ -187,8 +186,7 @@ public final class MachineWatch {
      * 素材 item（流体の見本なら流体）を今入れる面: 記録した面か、自動なら上・横・下の順に、今その物を受け付ける面
      * （どこも受け付けなければ null。いっぱいなど）。かまどなら、焼く物は上、燃料にもなる物でも上から（焼く物の欄）入る。
      */
-    @org.jspecify.annotations.Nullable
-    public static net.minecraft.core.Direction inputFace(Level level, BlockPos at, RecipeData r, ItemStack item) {
+    public static net.minecraft.core.@org.jspecify.annotations.Nullable Direction inputFace(Level level, BlockPos at, RecipeData r, ItemStack item) {
         if (!r.inputAuto()) {
             return r.inputFace(level.getBlockState(at));
         }
@@ -208,7 +206,7 @@ public final class MachineWatch {
         if (level.getBlockEntity(at) instanceof net.minecraft.world.WorldlyContainer wc && !placeable(wc, d, item)) {
             return false;                          // かまどの横（燃料の欄）に焼く物を入れない
         }
-        IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, at, d);
+        IItemHandler h = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, d);
         if (h == null) {
             return false;
         }
@@ -244,7 +242,7 @@ public final class MachineWatch {
                 if (level.getBlockEntity(at) instanceof net.minecraft.world.WorldlyContainer wc) {
                     ok |= placeable(wc, face, need.item);
                 } else {
-                    IItemHandler in = level.getCapability(Capabilities.ItemHandler.BLOCK, at, face);
+                    IItemHandler in = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, face);
                     ok |= in != null && !refuses(in, need.item);
                 }
             }
@@ -267,7 +265,7 @@ public final class MachineWatch {
                 if (FluidSamples.liquid(need.item)) {
                     here = LiquidStores.machine(level, at, d).amount(need.item);
                 } else {
-                    IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, at, d);
+                    IItemHandler h = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, d);
                     if (h != null) {
                         here = heldInputs(h, List.of(need));
                     }

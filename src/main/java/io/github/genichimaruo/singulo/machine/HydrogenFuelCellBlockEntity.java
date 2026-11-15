@@ -18,7 +18,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 
 /**
  * 水素燃料電池（段階1）。水素と酸素を反応させて電力と水（水蒸気として出す）を作る、電解槽の逆の装置。
@@ -40,10 +40,12 @@ public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.
     static final int PUSH_PER_TICK = 2_000;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(50_000, 0, PUSH_PER_TICK, this::setChanged);
-    private final FluidTank hydrogen = tank(HYDROGEN_TANK, "hydrogen");
-    private final FluidTank oxygen = tank(OXYGEN_TANK, "oxygen");
+    private final TransactionalFluidTank hydrogen = tank(HYDROGEN_TANK, "hydrogen");
+    private final TransactionalFluidTank oxygen = tank(OXYGEN_TANK, "oxygen");
     /** 外からの出し入れ: 水素と酸素を、それぞれのタンクへ入れる（取り出しはしない）。 */
-    private final IFluidHandler fluids = new IFluidHandler() {
+    private final io.github.genichimaruo.singulo.compat.TankFluidAccess fluids = new io.github.genichimaruo.singulo.compat.TankFluidAccess() {
+        public TransactionalFluidTank tankAt(int index) { return index == 0 ? hydrogen : oxygen; }
+        public boolean allowsExtract(int index) { return false; }
         @Override
         public int getTanks() {
             return 2;
@@ -91,8 +93,8 @@ public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.
         super(SinguloBlockEntities.HYDROGEN_FUEL_CELL.get(), pos, state);
     }
 
-    private FluidTank tank(int capacity, String fluid) {
-        return new FluidTank(capacity, f -> f.getFluid().isSame(SinguloFluids.get(fluid))) {
+    private TransactionalFluidTank tank(int capacity, String fluid) {
+        return new TransactionalFluidTank(capacity, f -> f.getFluid().isSame(SinguloFluids.get(fluid))) {
             @Override
             protected void onContentsChanged() {
                 setChanged();
@@ -110,15 +112,15 @@ public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.
         return energy;
     }
 
-    public IFluidHandler fluids() {
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess fluids() {
         return fluids;
     }
 
-    public FluidTank hydrogen() {
+    public TransactionalFluidTank hydrogen() {
         return hydrogen;
     }
 
-    public FluidTank oxygen() {
+    public TransactionalFluidTank oxygen() {
         return oxygen;
     }
 
@@ -160,12 +162,9 @@ public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.
             if (energy.getEnergyStored() <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            var target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), PUSH_PER_TICK));
             }
         }
         boolean active = rate > 0;
@@ -193,8 +192,8 @@ public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("hydrogen", hydrogen.writeToNBT(registries, new CompoundTag()));
-        tag.put("oxygen", oxygen.writeToNBT(registries, new CompoundTag()));
+        tag.put("hydrogen", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(hydrogen, registries, new CompoundTag()));
+        tag.put("oxygen", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(oxygen, registries, new CompoundTag()));
         tag.putDouble("carry", carry);
     }
 
@@ -202,8 +201,8 @@ public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         energy.setEnergy(tag.getIntOr("energy", 0));
-        hydrogen.readFromNBT(registries, tag.getCompoundOrEmpty("hydrogen"));
-        oxygen.readFromNBT(registries, tag.getCompoundOrEmpty("oxygen"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(hydrogen, registries, tag.getCompoundOrEmpty("hydrogen"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(oxygen, registries, tag.getCompoundOrEmpty("oxygen"));
         carry = tag.getDoubleOr("carry", 0.0D);
     }
 }

@@ -7,18 +7,10 @@
     "PBP"
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    },
-    "X": {
-      "item": "minecraft:piston"
-    },
-    "T": {
-      "item": "minecraft:crafting_table"
-    }
+    "P": "#c:plates/steel",
+    "B": "singulo:basic_circuit",
+    "X": "minecraft:piston",
+    "T": "minecraft:crafting_table"
   },
   "result": {
     "id": "singulo:android_workbench",

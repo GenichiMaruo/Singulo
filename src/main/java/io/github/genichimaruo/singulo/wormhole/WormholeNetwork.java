@@ -22,13 +22,16 @@ import net.minecraft.world.level.saveddata.SavedData;
  * 向こう側のチャンクが読み込まれていないときも、場所だけはここでわかる。
  */
 public class WormholeNetwork extends SavedData {
+    private static final net.minecraft.world.level.saveddata.SavedDataType<WormholeNetwork> TYPE =
+        io.github.genichimaruo.singulo.compat.LegacySavedDataTypes.create("singulo_wormholes", WormholeNetwork::new, WormholeNetwork::load, WormholeNetwork::save);
+
     static final String NAME = "singulo_wormholes";
 
     private final Map<Long, List<GlobalPos>> mouths = new HashMap<>();
 
     public static WormholeNetwork get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(WormholeNetwork::new, WormholeNetwork::load, null), NAME);
+                TYPE);
     }
 
     public void register(long pair, GlobalPos pos) {
@@ -63,14 +66,13 @@ public class WormholeNetwork extends SavedData {
         return null;
     }
 
-    @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag list = new ListTag();
         mouths.forEach((pair, positions) -> {
             for (GlobalPos p : positions) {
                 CompoundTag e = new CompoundTag();
                 e.putLong("pair", pair);
-                e.putString("dim", p.dimension().location().toString());
+                e.putString("dim", p.dimension().identifier().toString());
                 e.putLong("pos", p.pos().asLong());
                 list.add(e);
             }

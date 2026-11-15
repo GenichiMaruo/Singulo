@@ -7,21 +7,11 @@
     "CBC"
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "K": "singulo:ceramic_substrate",
+    "F": "singulo:basic_frame",
+    "C": "#c:ingots/copper",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:hydrogen_fuel_cell",

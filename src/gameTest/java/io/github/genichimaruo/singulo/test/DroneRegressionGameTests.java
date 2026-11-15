@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.drone.*;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
@@ -19,7 +20,7 @@ public final class DroneRegressionGameTests {
         var targetPos = new BlockPos(3, 1, 3);
         h.setBlock(stationPos, SinguloBlocks.DRONE_STATION.get());
         h.setBlock(targetPos, SinguloBlocks.DRONE_PORT.get());
-        var station = (DroneStationBlockEntity) h.getBlockEntity(stationPos);
+        var station = (DroneStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, stationPos);
         var net = DroneNetwork.get(level);
         var f = net.create(h.absolutePos(stationPos), 0, null, h.absolutePos(stationPos), h.absolutePos(targetPos));
         f.stage = DroneNetwork.DELIVER;
@@ -33,7 +34,7 @@ public final class DroneRegressionGameTests {
         d.tick();
         boolean live = d.isAlive(), virtual = f.virtual;
         h.assertTrue(live || virtual, "Cargo stranded: materialized drone discarded and virtual=" + virtual);
-        var port = (DronePortBlockEntity) h.getBlockEntity(targetPos);
+        var port = (DronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, targetPos);
         h.succeedWhen(() -> {
             int received = 0;
             for (int i = 0; i < DronePortBlockEntity.RECEIVE; i++) {
@@ -85,7 +86,7 @@ public final class DroneRegressionGameTests {
     public static void nonOwnerCannotChangeDronePortSidesThroughPayload(GameTestHelper h) throws Exception {
         var pos = new BlockPos(2, 1, 2);
         h.setBlock(pos, SinguloBlocks.DRONE_PORT.get());
-        var port = (DronePortBlockEntity) h.getBlockEntity(pos);
+        var port = (DronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         var at = h.absolutePos(pos); player.moveTo(at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5);
         port.setOwner(new java.util.UUID(100, 200));

@@ -36,6 +36,7 @@ public final class Singulo {
 
     public Singulo(IEventBus modBus, ModContainer container) {
         SinguloComponents.REGISTER.register(modBus);
+        io.github.genichimaruo.singulo.registry.SinguloDataSerializers.REGISTER.register(modBus);
         io.github.genichimaruo.singulo.registry.SinguloTriggers.REGISTER.register(modBus);
         SinguloFluids.FLUID_TYPES.register(modBus);
         SinguloFluids.FLUIDS.register(modBus);
@@ -49,7 +50,6 @@ public final class Singulo {
         RuinDiscovery.REGISTER.register(modBus);
         io.github.genichimaruo.singulo.item.DimensionalPocketItem.REGISTER.register(modBus);
         io.github.genichimaruo.singulo.item.AfterglowWingsItem.init();      // 翼の鎧の素材を、登録より先に用意する
-        io.github.genichimaruo.singulo.item.GravityBootsItem.MATERIALS.register(modBus);
         SinguloMenus.REGISTER.register(modBus);
         SinguloRecipes.TYPES.register(modBus);
         SinguloRecipes.SERIALIZERS.register(modBus);
@@ -63,6 +63,7 @@ public final class Singulo {
         modBus.addListener((RegisterTicketControllersEvent e) -> e.register(WorldlineAnchorBlockEntity.TICKETS));
         NeoForge.EVENT_BUS.addListener(SinguloReloadListeners::register);
         NeoForge.EVENT_BUS.addListener(Singulo::speedUpGameTests);
+        NeoForge.EVENT_BUS.addListener(Singulo::syncRecipes);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onTeleport);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onBreak);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
@@ -76,6 +77,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(MetricDriveItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravityBootsItem::onFall);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.AfterglowWingsItem::onFall);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.AfterglowWingsItem::onEntityTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravitonManipulatorItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.MultiblockInteraction::onRightClickBlock);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.SealedContainerBlock::onRightClickBlock);
@@ -125,6 +127,18 @@ public final class Singulo {
         } catch (NumberFormatException e) {
             LOGGER.warn("Bad singulo.gameTestTickRate: {}", rate);
         }
+    }
+
+    /** Sync the recipe types used by machine screens and JEI after login/reload. */
+    private static void syncRecipes(net.neoforged.neoforge.event.OnDatapackSyncEvent event) {
+        event.sendRecipes(SinguloRecipes.MACHINE.get(),
+                net.minecraft.world.item.crafting.RecipeType.CRAFTING,
+                net.minecraft.world.item.crafting.RecipeType.SMELTING,
+                net.minecraft.world.item.crafting.RecipeType.BLASTING,
+                net.minecraft.world.item.crafting.RecipeType.SMOKING,
+                net.minecraft.world.item.crafting.RecipeType.CAMPFIRE_COOKING,
+                net.minecraft.world.item.crafting.RecipeType.STONECUTTING,
+                net.minecraft.world.item.crafting.RecipeType.SMITHING);
     }
 
     public static Identifier id(String path) {

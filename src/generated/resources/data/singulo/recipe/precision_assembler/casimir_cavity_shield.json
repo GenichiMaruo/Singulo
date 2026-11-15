@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:meteoric_iron_ingot"
-      },
+      "ingredient": "singulo:meteoric_iron_ingot",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 750
     }

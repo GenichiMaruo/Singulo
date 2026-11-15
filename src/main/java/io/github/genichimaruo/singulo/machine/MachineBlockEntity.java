@@ -33,7 +33,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -55,15 +55,15 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
     private final MachineType type;
-    private final ItemStackHandler items;
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items;
     /** Exhausted recipe tools waiting for space in the normal output slots. */
     private final java.util.BitSet pendingReturns = new java.util.BitSet();
     /** 触媒の装填（触媒スロットのある装置だけ使う）。触媒スロットは予備の置き場で、使う1個は中に装填する。 */
     private final CatalystMagazine magazine = new CatalystMagazine(this::markDirty);
-    private final FluidTank[] tanks;
+    private final TransactionalFluidTank[] tanks;
     private final SinguloEnergyStorage energy;
     private final IItemHandler automationItems;
-    private final IFluidHandler automationFluids;
+    private final io.github.genichimaruo.singulo.compat.TankFluidAccess automationFluids;
 
     private int progress;
     private int maxProgress;
@@ -101,7 +101,19 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     protected MachineBlockEntity(BlockEntityType<?> beType, BlockPos pos, BlockState state) {
         super(beType, pos, state);
         this.type = ((MachineBlock) state.getBlock()).type();
-        this.items = new ItemStackHandler(type.itemSlots()) {
+        this.items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(type.itemSlots()) {
+            @Override public int insert(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount,
+                    net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+                int accepted = super.insert(slot, resource, amount, transaction);
+                if (accepted > 0) clearReturnTransactional(slot, transaction);
+                return accepted;
+            }
+            @Override public int extract(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount,
+                    net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+                int taken = super.extract(slot, resource, amount, transaction);
+                if (taken > 0) clearReturnTransactional(slot, transaction);
+                return taken;
+            }
             @Override
             protected void onContentsChanged(int slot) {
                 pendingReturns.clear(slot);
@@ -131,9 +143,9 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                         : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
             }
         };
-        this.tanks = new FluidTank[type.tanks()];
+        this.tanks = new TransactionalFluidTank[type.tanks()];
         for (int i = 0; i < tanks.length; i++) {
-            tanks[i] = new FluidTank(MachineType.TANK_CAPACITY) {
+            tanks[i] = new TransactionalFluidTank(MachineType.TANK_CAPACITY) {
                 @Override
                 protected void onContentsChanged() {
                     markDirty();
@@ -179,11 +191,11 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     public static boolean isMonopoleUpgrade(ItemStack stack) {
-        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("monopole_upgrade")));
+        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("monopole_upgrade")));
     }
 
     public static boolean isOverclockChip(ItemStack stack) {
-        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("overclock_chip")));
+        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("overclock_chip")));
     }
 
     /** アップグレード枠に入るもの（単極子アップグレードかオーバークロック・チップ）。 */
@@ -350,7 +362,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     /** 面ごとの設定に従うアイテムの入れ物（side が null なら制限なし）。無効の面は null。 */
     @org.jspecify.annotations.Nullable
-    public IItemHandler itemsFor(@org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
+    public IItemHandler itemsFor(net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
         if (side == null || !usesSideConfig()) {
             return automationItems;
         }
@@ -364,8 +376,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     /** 面ごとの設定に従う液体の入れ物。無効の面は null。 */
-    @org.jspecify.annotations.Nullable
-    public IFluidHandler fluidsFor(@org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
+    public io.github.genichimaruo.singulo.compat.@org.jspecify.annotations.Nullable TankFluidAccess fluidsFor(net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
         if (type.tanks() == 0) {
             return null;
         }
@@ -398,7 +409,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             net.minecraft.core.Direction dir = SideConfig.directionOf(facing, f);
             BlockPos target = worldPosition.relative(dir);
             if (itemSides.ejectEnabled() && itemSides.eject(f) && itemSides.canExtract(f) && type.hasOutput()) {
-                IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                IItemHandler dest = io.github.genichimaruo.singulo.compat.ItemResourceView.find(level,
                         target, dir.getOpposite());
                 if (dest != null) {
                     // Finished products first, then exhausted tools still waiting in their input slots.
@@ -411,8 +422,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 }
             }
             if (type.fluidOutputs() > 0) {
-                IFluidHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
-                        target, dir.getOpposite());
+                IFluidHandler dest = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, target, dir.getOpposite());
                 if (dest != null) {
                     for (int i = type.fluidInputs(); i < tanks.length; i++) {
                         SideConfig c = tankSides[i];
@@ -644,7 +654,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 found = blocked;
             }
         }
-        Identifier previous = current != null ? current.id() : resumeRecipe;
+        Identifier previous = current != null ? current.id().identifier() : resumeRecipe;
         resumeRecipe = null;
         if (found == null || !found.id().equals(previous)) {
             progress = 0;
@@ -688,7 +698,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             return true;
         }
         if (selectedRecipe != null) {
-            return holder.id().equals(selectedRecipe);
+            return holder.id().identifier().equals(selectedRecipe);
         }
         MachineRecipe.Plan plan = holder.value().plan(inputs);
         if (plan == null || !RecipeSelection.usesEveryInput(type, inputs, plan)) {
@@ -737,8 +747,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 bestScore = score;
             }
         }
-        if (best != null && !best.id().equals(selectedRecipe)) {
-            selectedRecipe = best.id();
+        if (best != null && !best.id().identifier().equals(selectedRecipe)) {
+            selectedRecipe = best.id().identifier();
             selectedIndex = -2;
             markDirty();
         }
@@ -750,7 +760,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             return;
         }
         RecipeHolder<MachineRecipe> holder = RecipeSelection.byIndex(level, type, index);
-        selectedRecipe = holder == null ? null : holder.id();
+        selectedRecipe = holder == null ? null : holder.id().identifier();
         selectedIndex = -2;
         markDirty();
     }
@@ -847,8 +857,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     /** 液体材料は入力タンクを先に、足りなければ出力タンク（自分で作った液体窒素など）から取る。 */
     @Nullable
-    private FluidTank tankFor(MachineRecipe.FluidInput in) {
-        for (FluidTank tank : tanks) {
+    private TransactionalFluidTank tankFor(MachineRecipe.FluidInput in) {
+        for (TransactionalFluidTank tank : tanks) {
             if (in.matches(tank.getFluid())) {
                 return tank;
             }
@@ -963,7 +973,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             int target = -1;
             for (int pass = 0; pass < 2 && target < 0; pass++) {
                 for (int i = 0; i < type.fluidOutputs(); i++) {
-                    FluidTank tank = tanks[type.fluidInputs() + i];
+                    TransactionalFluidTank tank = tanks[type.fluidInputs() + i];
                     boolean candidate = pass == 0 ? FluidStack.isSameFluidSameComponents(tank.getFluid(), result)
                             : tank.isEmpty();
                     if (!used[i] && candidate && tank.getSpace() >= result.getAmount()) {
@@ -1034,7 +1044,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             }
         }
         for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
-            FluidTank tank = tankFor(in);
+            TransactionalFluidTank tank = tankFor(in);
             if (tank != null) {
                 tank.drain(in.amount(), IFluidHandler.FluidAction.EXECUTE);
             }
@@ -1204,7 +1214,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             return;
         }
         int hydrogen = 0;
-        for (FluidTank tank : tanks) {
+        for (TransactionalFluidTank tank : tanks) {
             if (tank.getFluid().is(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"))) {
                 hydrogen += tank.getFluidAmount();
             }
@@ -1242,8 +1252,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         tag.putBoolean("enabled", enabled);
         tag.putBoolean("make_free", makeFree);
         ListTag tankList = new ListTag();
-        for (FluidTank tank : tanks) {
-            tankList.add(tank.writeToNBT(registries, new CompoundTag()));
+        for (TransactionalFluidTank tank : tanks) {
+            tankList.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         }
         tag.put("tanks", tankList);
         tag.putInt("energy", energy.getEnergyStored());
@@ -1255,7 +1265,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         tag.putDouble("mass", mass);
         tag.putDouble("metal_mass", metalMass);
         if (current != null) {
-            tag.putString("recipe", current.id().toString());
+            tag.putString("recipe", current.id().identifier().toString());
         }
     }
 
@@ -1282,7 +1292,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
         ItemStackHandler loaded = new ItemStackHandler();
         io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(loaded, registries, tag.getCompoundOrEmpty("items"));
-        int[] layout = tag.getIntArray("slot_layout");
+        int[] layout = tag.getIntArray("slot_layout").orElseGet(() -> new int[0]);
         if (layout.length != 2) {
             layout = type.legacyLayout();
         }
@@ -1291,7 +1301,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             items.setStackInSlot(i, from >= 0 && from < loaded.getSlots() ? loaded.getStackInSlot(from) : ItemStack.EMPTY);
         }
         java.util.BitSet savedReturns = new java.util.BitSet();
-        for (int slot : tag.getIntArray("pending_returns")) {
+        for (int slot : tag.getIntArray("pending_returns").orElseGet(() -> new int[0])) {
             if (slot >= 0 && slot < loaded.getSlots()) savedReturns.set(slot);
         }
         pendingReturns.clear();
@@ -1308,7 +1318,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 itemSides.setEjectEnabled(true);
             }
         }
-        int[] savedTankSides = tag.getIntArray("tank_sides");
+        int[] savedTankSides = tag.getIntArray("tank_sides").orElseGet(() -> new int[0]);
         if (savedTankSides.length == tankSides.length) {
             for (int i = 0; i < tankSides.length; i++) {
                 tankSides[i].setPacked(savedTankSides[i]);
@@ -1331,7 +1341,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         makeFree = !tag.contains("make_free") || tag.getBooleanOr("make_free", false);
         ListTag tankList = tag.getListOrEmpty("tanks");
         for (int i = 0; i < tanks.length && i < tankList.size(); i++) {
-            tanks[i].readFromNBT(registries, tankList.getCompoundOrEmpty(i));
+            io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tanks[i], registries, tankList.getCompoundOrEmpty(i));
         }
         refreshEnergyCapacity();
         energy.restoreEnergy(tag.getIntOr("energy", 0));
@@ -1430,7 +1440,9 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     /** 面の設定で絞った液体の入れ物。inTanks・outTanks は入れてよい・取り出してよいタンクのビット（-1 ならすべて）。 */
-    private final class SidedFluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+    private final class SidedFluids implements io.github.genichimaruo.singulo.compat.TankFluidAccess, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        public TransactionalFluidTank tankAt(int index) { return tanks[index]; }
+        public boolean allowsExtract(int index) { return index >= type.fluidInputs() && (outTanks & (1 << index)) != 0; }
         private final int inTanks;
         private final int outTanks;
 
@@ -1497,7 +1509,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 if ((mask & (1 << i)) == 0) {
                     continue;
                 }
-                FluidTank tank = tanks[i];
+                TransactionalFluidTank tank = tanks[i];
                 boolean candidate = pass == 0 ? FluidStack.isSameFluidSameComponents(tank.getFluid(), resource)
                         : tank.isEmpty();
                 if (candidate) {
@@ -1530,7 +1542,10 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     /** 入力タンクへは入れるだけ、出力タンクからは取り出すだけ。 */
-    private final class AutomationFluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+    private final class AutomationFluids implements io.github.genichimaruo.singulo.compat.TankFluidAccess, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        public TransactionalFluidTank tankAt(int index) { return tanks[index]; }
+        public boolean allowsExtract(int index) { return index >= type.fluidInputs(); }
+
         @Override
         public boolean pipeAccepts(FluidStack fluid) {
             return usesFluid(fluid);
@@ -1580,5 +1595,41 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             }
             return FluidStack.EMPTY;
         }
+    }
+
+    private final net.neoforged.neoforge.transfer.transaction.SnapshotJournal<java.util.BitSet> returnJournal =
+            new net.neoforged.neoforge.transfer.transaction.SnapshotJournal<>() {
+        @Override protected java.util.BitSet createSnapshot() { return (java.util.BitSet) pendingReturns.clone(); }
+        @Override protected void revertToSnapshot(java.util.BitSet snapshot) {
+            pendingReturns.clear(); pendingReturns.or(snapshot);
+        }
+    };
+    private void clearReturnTransactional(int slot, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+        if (pendingReturns.get(slot)) { returnJournal.updateSnapshots(tx); pendingReturns.clear(slot); }
+    }
+
+    /** Native external automation with identical side, catalyst and spent-item policies. */
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItemsFor(
+            net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
+        boolean insert = true, extract = true;
+        if (side != null && usesSideConfig()) {
+            SideConfig.Face face = faceOf(side);
+            if (itemSides.mode(face) == SideConfig.NONE) return null;
+            insert = itemSides.canInsert(face);
+            extract = itemSides.canExtract(face);
+        }
+        final boolean allowInsert = insert, allowExtract = extract;
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items,
+                (slot, resource) -> allowInsert && (slot < type.inputSlots() || slot == type.catalystSlot()) && slotAccepts(slot, resource.toStack()),
+                (slot, resource) -> allowExtract && ((slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || pendingReturns.get(slot))) {
+            @Override public int insert(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount,
+                    net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+                int accepted = super.insert(slot, resource, amount, tx);
+                int remaining = amount - accepted;
+                if (allowInsert && slot == type.catalystSlot() && remaining > 0
+                        && magazine.absorbTransactional(resource.toStack(remaining), items, slot, tx)) accepted += remaining;
+                return accepted;
+            }
+        };
     }
 }

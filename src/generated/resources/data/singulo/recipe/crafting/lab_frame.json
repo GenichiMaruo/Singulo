@@ -6,15 +6,9 @@
     "IBI"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_building"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    },
-    "I": {
-      "tag": "c:ingots/steel"
-    }
+    "B": "singulo:blueprint_lab_building",
+    "S": "#c:plates/steel",
+    "I": "#c:ingots/steel"
   },
   "result": {
     "id": "singulo:lab_frame",

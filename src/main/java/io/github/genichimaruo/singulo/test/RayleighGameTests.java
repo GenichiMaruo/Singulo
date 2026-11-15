@@ -5,13 +5,13 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.lab.LabPower;
 import io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DaylightDetectorBlock;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** レイリー散乱パネル: パネル受電器から電力を受けて点き、真下の日照センサーは真昼の値。研究所のものは研究所の電力で点き、壊すと何も残らない。 */
 @GameTestHolder(Singulo.MODID)

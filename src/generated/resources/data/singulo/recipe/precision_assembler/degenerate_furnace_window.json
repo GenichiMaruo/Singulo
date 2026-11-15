@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:glass_blocks/colorless"
-      },
+      "ingredient": "#c:glass_blocks/colorless",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 750
     }

@@ -3690,5 +3690,6 @@
   "uses.singulo.wormhole_mouth_casing": "Used in: Wormhole Mouth",
   "uses.singulo.zero_gravity_block": "Used in: Suspension Reservoir, Suspension Crown",
   "uses.singulo.zinc_dust": "Used in: Zinc Ingot, Unfired Phosphor",
-  "uses.singulo.zinc_ingot": "Used in: Nihonium"
+  "uses.singulo.zinc_ingot": "Used in: Nihonium",
+  "key.category.singulo.singulo": "Singulo"
 }

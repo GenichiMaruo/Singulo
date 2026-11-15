@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /** 0.3.1 の調整（時間結晶モジュール・満充電の待機・アンカーの上限・設定の当てはめ）の確認。 */
@@ -40,12 +40,12 @@ public final class BalanceGameTests {
     private BalanceGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static MachineBlockEntity assembler(GameTestHelper helper, BlockPos pos) {
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
         return m;
     }
@@ -106,7 +106,7 @@ public final class BalanceGameTests {
     public static void fullGeneratorWaitsWithoutWearingCatalyst(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.QUANTUM_HEAT_ENGINE.get());
-        QuantumHeatEngineBlockEntity engine = helper.getBlockEntity(pos);
+        QuantumHeatEngineBlockEntity engine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         engine.energy().setEnergy(engine.energy().getMaxEnergyStored());
         engine.catalystSlot().insertItem(0, new ItemStack(item("bose_condensate_catalyst")), false);
         helper.runAtTickTime(20, () -> {
@@ -135,7 +135,7 @@ public final class BalanceGameTests {
         for (int i = 0; i < limit + 1; i++) {
             BlockPos pos = new BlockPos(1 + (i % 3) * 2, 1 + (i / 9) * 2, 1 + (i / 3 % 3) * 2);
             helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
-            WorldlineAnchorBlockEntity a = helper.getBlockEntity(pos);
+            WorldlineAnchorBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
             a.setOwner(owner);
             a.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
             anchors.add(a);
@@ -154,8 +154,8 @@ public final class BalanceGameTests {
     /** 設定が既定値のままなら、データパックのレシピをそのまま使う（JSONと同じもの）。 */
     @GameTest(template = EMPTY)
     public static void defaultSettingsKeepDatapackRecipes(GameTestHelper helper) {
-        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
-            String path = h.id().getPath();
+        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getServer().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+            String path = h.id().identifier().getPath();
             if (path.equals("degenerate_compactor/reactor_shell") || path.equals("degenerate_compactor/degenerate_matter_shell")
                     || path.equals("casimir_cavity/exotic_matter")) {
                 helper.assertTrue(RecipeTweaks.adjust(h.id(), h.value()) == h.value(), "既定の設定なのにレシピが変わった: " + path);
@@ -171,7 +171,7 @@ public final class BalanceGameTests {
 
     private static MachineRecipe adjusted(GameTestHelper helper, String path) {
         RecipeTweaks.invalidate();
-        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+        for (RecipeHolder<MachineRecipe> h : helper.getLevel().getServer().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
             if (h.id().equals(Singulo.id(path))) {
                 return RecipeTweaks.adjust(h.id(), h.value());
             }
@@ -247,7 +247,7 @@ public final class BalanceGameTests {
         BlockPos vaultPos = new BlockPos(1, 1, 1);
         BlockPos consolePos = new BlockPos(4, 1, 4);
         helper.setBlock(vaultPos, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity vault = helper.getBlockEntity(vaultPos);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,vaultPos);
         vault.setRuin("final_lab");
         var data = (net.minecraft.world.level.storage.ServerLevelData) helper.getLevel().getLevelData();
         long oldTime = helper.getLevel().getGameTime();
@@ -258,7 +258,7 @@ public final class BalanceGameTests {
             vault.refillIfDue(helper.getLevel(), oldTime);
             data.setGameTime(oldTime + vault.regenTicks() + 1000);
             helper.setBlock(consolePos, SinguloBlocks.SEAL_CONSOLE.get());
-            SealConsoleBlockEntity console = helper.getBlockEntity(consolePos);
+            SealConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,consolePos);
             HorizonWarden warden = console.activateAwakened(helper.getLevel(), null);
             helper.assertTrue(warden != null, "覚醒した守護機が起きない");
             warden.skipEmerging();
@@ -284,7 +284,7 @@ public final class BalanceGameTests {
         for (int i = 0; i < 3; i++) {
             BlockPos p = new BlockPos(i * 2 + 1, 1, 2);
             helper.setBlock(p, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
-            WorldlineAnchorBlockEntity a = helper.getBlockEntity(p);
+            WorldlineAnchorBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,p);
             a.setOwner(owner);
             a.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
             anchors.add(a);

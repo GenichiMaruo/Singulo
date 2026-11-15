@@ -144,7 +144,7 @@ public class RogueBlackHoleBlockEntity extends io.github.genichimaruo.singulo.co
     /** 蒸発しきって消える: まぶしい光と衝撃（ブロックは壊さない）。 */
     private void vanish(ServerLevel level) {
         Vec3 c = center();
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLASH, c.x, c.y, c.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 1, 0, 0, 0, 0);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, c.x, c.y, c.z, 80, 0.3, 0.3, 0.3, 0.4);
         level.explode(null, c.x, c.y, c.z, 3.0F, Level.ExplosionInteraction.NONE);
         level.removeBlock(worldPosition, false);

@@ -6,27 +6,19 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:dusts/redstone"
-      },
+      "ingredient": "#c:dusts/redstone",
       "count": 4
     },
     {
-      "ingredient": {
-        "tag": "c:dusts/glowstone"
-      },
+      "ingredient": "#c:dusts/glowstone",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:ceramic_substrate"
-      },
+      "ingredient": "singulo:ceramic_substrate",
       "count": 1
     }
   ],
-  "restore": {
-    "item": "singulo:observation_log"
-  },
+  "restore": "singulo:observation_log",
   "result": {
     "id": "singulo:observation_log",
     "count": 1

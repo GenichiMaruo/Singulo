@@ -28,7 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * boosted はティプラー・シリンダーの時間加速か、イベントホライズン・シールドの守りの中にあるとき true になり、
  * 外装にエネルギーの流れの模様が浮かび上がる。
  */
-public abstract class AbstractMachineBlock extends BaseEntityBlock {
+public abstract class AbstractMachineBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
     public static final EnumProperty<net.minecraft.core.Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty BOOSTED = BooleanProperty.create("boosted");
@@ -119,7 +119,7 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
                                               InteractionHand hand, BlockHitResult hit) {
         // 液体の容器（バケツ・冷媒カートリッジ）: タンクを持つブロックなら、直接出し入れする（加工装置は MachineBlock が受け持つ）
         if (!(this instanceof MachineBlock) && net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(stack).isPresent()
-                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, hit.getDirection()) != null
+                && io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, pos, hit.getDirection()) != null
                 && net.neoforged.neoforge.fluids.FluidUtil.interactWithFluidHandler(player, hand, level, pos, hit.getDirection())) {
             return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
         }
@@ -132,7 +132,7 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BreakListener listener) {
@@ -147,7 +147,6 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
                 Block.popResource(level, pos, collector.output().getStackInSlot(0));
             }
         }
-        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     /** ブロックが壊されたとき（チャンクの読み込み解除では呼ばれない）に後始末をするブロックエンティティ。 */

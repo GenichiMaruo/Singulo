@@ -211,7 +211,7 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
         return Vec3.atBottomCenterOf(worldPosition).add(0, LENS_Y, 0);
     }
 
-    public LongEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
@@ -390,10 +390,10 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
         Vec3 c = lens();
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y, c.z, 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 200, 3, 3, 3, 1.2);
-        level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 2, 0.1, 0.1, 0.1, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 2, 0.1, 0.1, 0.1, 0);
         level.playSound(null, worldPosition.above(5), SinguloSounds.get("genesis.collapse"), SoundSource.BLOCKS, 4.0F, 0.6F);
         for (Player p : players(level, 16)) {
-            p.hurt(SinguloDamageTypes.tidal(level, null), 8);
+            p.hurtOrSimulate(SinguloDamageTypes.tidal(level, null), 8);
             Vec3 push = p.position().subtract(c).multiply(1, 0, 1);
             if (push.lengthSqr() > 1e-4) {
                 p.push(push.normalize().x * 1.4, 0.6, push.normalize().z * 1.4);
@@ -422,16 +422,16 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
             case 1 -> {
                 for (int i = 0; i < 3; i++) {
                     Player target = players.get(level.getRandom().nextInt(players.size()));
-                    EchoSentinel echo = SinguloEntities.ECHO_SENTINEL.get().create(level);
+                    EchoSentinel echo = SinguloEntities.ECHO_SENTINEL.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
                     if (echo == null) {
                         continue;
                     }
                     echo.makeMinion();
                     double a = level.getRandom().nextDouble() * Math.PI * 2;
-                    echo.moveTo(target.getX() + Math.cos(a) * 6, target.getY() + 2, target.getZ() + Math.sin(a) * 6, 0, 0);
+                    echo.snapTo(target.getX() + Math.cos(a) * 6, target.getY() + 2, target.getZ() + Math.sin(a) * 6, 0, 0);
                     echo.setTarget(target);
                     level.addFreshEntity(echo);
-                    level.sendParticles(ParticleTypes.FLASH, echo.getX(), echo.getY() + 1.2, echo.getZ(), 1, 0, 0, 0, 0);
+                    level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), echo.getX(), echo.getY() + 1.2, echo.getZ(), 1, 0, 0, 0, 0);
                 }
                 level.playSound(null, worldPosition.above(5), SinguloSounds.get("echo_sentinel.summon"), SoundSource.HOSTILE, 2.5F, 0.8F);
                 tellNear(level, "gui.singulo.genesis.event.echoes", 48);
@@ -495,7 +495,7 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
             for (ServerPlayer p : serverPlayers(level, 96)) {
                 // 見ている人の目の前で閃光（画面いっぱいの光）
                 Vec3 eye = p.getEyePosition().add(p.getLookAngle().scale(1.5));
-                level.sendParticles(p, ParticleTypes.FLASH, true, eye.x, eye.y, eye.z, 4, 0.2, 0.2, 0.2, 0);
+                level.sendParticles(p, net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), true, false, eye.x, eye.y, eye.z, 4, 0.2, 0.2, 0.2, 0);
             }
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y, c.z, 2, 0.5, 0.5, 0.5, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y, c.z, 400, 0.2, 0.2, 0.2, 1.2);
@@ -673,17 +673,17 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
         tag.putInt("stage", COMPLETE);
         tag.putLong("galaxy", galaxySeed);
         if (!template.isEmpty() && level != null) {
-            tag.put("template", template.save(level.registryAccess()));
+            tag.put("template", io.github.genichimaruo.singulo.compat.NbtCompat.save(template, level.registryAccess()));
         }
-        net.minecraft.world.item.BlockItem.setBlockEntityData(drop, SinguloBlockEntities.GENESIS_CORE.get(), tag);
+        drop.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(SinguloBlockEntities.GENESIS_CORE.get(), tag));
         drop.set(net.minecraft.core.component.DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         return drop;
     }
 
     /** 宇宙の記憶を宿した核のアイテムか（説明に使う）。 */
     public static boolean remembersUniverse(ItemStack stack) {
-        net.minecraft.world.item.component.CustomData data = stack.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA);
-        return data != null && data.copyTag().getIntOr("stage", 0) == COMPLETE;
+        var data = stack.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA);
+        return data != null && data.copyTagWithoutId().getIntOr("stage", 0) == COMPLETE;
     }
 
     /** クライアント側の見込み（腕を振るかどうか）。 */
@@ -795,7 +795,7 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
     // ------------------------------------------------------------------ 道具
 
     public static Item primordialSeed() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("primordial_seed"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("primordial_seed"));
     }
 
     static String percent(float f) {
@@ -836,65 +836,26 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
     // ------------------------------------------------------------------ 電力と取り出し口
 
     /** 電力の口。種火・安定化・質量生成のときだけ、genesisMaxInput まで受け取る（投入を止めている間は受け取らない）。 */
-    private final class Energy implements LongEnergyStorage {
-        /** 蓄えの大きさ（1 tick の上限の4倍。とても大きな設定でも long をあふれない）。 */
-        private long capacity() {
-            long max = maxInput();
-            return max > Long.MAX_VALUE / 4 ? Long.MAX_VALUE : max * 4;
+    private final class Energy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        private long capacity(){long max=maxInput();return max>Long.MAX_VALUE/4?Long.MAX_VALUE:max*4;}
+        private boolean accepting(){return formed&&feeding&&(stage==KINDLING||stage==STABILIZING||stage==COMPLETE);}
+        @Override protected long[] createSnapshot(){return new long[]{buffer,receivedThisTick,receivedTick};}
+        @Override protected void revertToSnapshot(long[] s){buffer=s[0];receivedThisTick=s[1];receivedTick=s[2];}
+        @Override protected void onRootCommit(long[] s){setChanged();}
+        @Override public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            if(!accepting()||amount==0||level==null)return 0;updateSnapshots(tx);
+            long now=level.getGameTime();if(now!=receivedTick){receivedTick=now;receivedThisTick=0;}
+            long accepted=Math.max(0,Math.min(amount,Math.min(maxInput()-receivedThisTick,capacity()-buffer)));
+            buffer+=accepted;receivedThisTick+=accepted;return accepted;
         }
-
-        private boolean accepting() {
-            return formed && feeding && (stage == KINDLING || stage == STABILIZING || stage == COMPLETE);
+        @Override public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");return 0;
         }
-
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            if (!accepting() || amount <= 0 || level == null) {
-                return 0;
-            }
-            long now = level.getGameTime();
-            if (now != receivedTick) {
-                receivedTick = now;
-                receivedThisTick = 0;
-            }
-            long room = Math.min(maxInput() - receivedThisTick, capacity() - buffer);
-            long accepted = Math.max(0, Math.min(amount, room));
-            if (!simulate && accepted > 0) {
-                buffer += accepted;
-                receivedThisTick += accepted;
-            }
-            return accepted;
-        }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return 0;
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, buffer);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, capacity());
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return accepting();
-        }
+        @Override public long getAmountAsLong(){return buffer;}
+        @Override public long getCapacityAsLong(){return capacity();}
+        @Override public boolean canReceive(){return accepting();}
+        @Override public boolean canExtract(){return false;}
     }
 
     /** 出来上がった物の取り出し口（取り出すだけ）。 */
@@ -962,10 +923,10 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
         tag.putLong("galaxy", galaxySeed);
         tag.putDouble("synth", synthProgress);
         if (!template.isEmpty()) {
-            tag.put("template", template.save(registries));
+            tag.put("template", io.github.genichimaruo.singulo.compat.NbtCompat.save(template, registries));
         }
         if (!output.isEmpty()) {
-            tag.put("output", output.save(registries));
+            tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.save(output, registries));
         }
     }
 
@@ -1004,4 +965,16 @@ public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compa
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    private final net.neoforged.neoforge.transfer.item.ItemStackResourceHandler transferOutput = new net.neoforged.neoforge.transfer.item.ItemStackResourceHandler() {
+        @Override protected ItemStack getStack() { return output; }
+        @Override protected void setStack(ItemStack stack) { output = stack; }
+        @Override protected void onRootCommit(ItemStack original) { markSync(); }
+        @Override public int insert(int index, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount,
+                net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            return 0;
+        }
+    };
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return transferOutput; }
 }

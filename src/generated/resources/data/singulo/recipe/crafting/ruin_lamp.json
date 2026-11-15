@@ -6,18 +6,10 @@
     "YBY"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lighting"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "Y": {
-      "tag": "c:dusts/glowstone"
-    }
+    "B": "singulo:blueprint_lighting",
+    "W": "singulo:white_ceramic_composite",
+    "G": "#c:glass_blocks/colorless",
+    "Y": "#c:dusts/glowstone"
   },
   "result": {
     "id": "singulo:ruin_lamp",

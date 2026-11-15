@@ -19,7 +19,7 @@ final class FluidSampleDecorator implements IItemDecorator {
         String text = WorkConsoleScreen.compact(amount);
         float k = Math.min(0.6F, 17F / font.width(text));
         g.pose().pushMatrix();
-        g.pose().translate(x + 17 - font.width(text) * k, y + 17 - font.lineHeight * k, 300);
+        g.pose().translate(x + 17 - font.width(text) * k, y + 17 - font.lineHeight * k);
         g.pose().scale(k, k);
         g.text(font, text, 0, 0, 0xFF9FE4FF, true);
         g.pose().popMatrix();

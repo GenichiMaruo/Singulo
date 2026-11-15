@@ -92,7 +92,7 @@ public final class WorkPlanner {
 
     /** 実際の在庫と、先に計画した工程の余りを分けて使う（予約するのは実際の在庫だけ）。 */
     private static void need(Plan plan, ItemStack item, long amount,
-                             @org.jspecify.annotations.Nullable net.minecraft.world.item.crafting.Ingredient alt,
+                             net.minecraft.world.item.crafting.@org.jspecify.annotations.Nullable Ingredient alt,
                              Context context, List<Key> path) {
         if (plan.limited) {
             return;

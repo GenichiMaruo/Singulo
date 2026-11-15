@@ -7,15 +7,9 @@
     "NNN"
   ],
   "key": {
-    "E": {
-      "item": "singulo:entangled_element"
-    },
-    "N": {
-      "item": "singulo:nihonium_plate"
-    },
-    "C": {
-      "item": "singulo:collapsar_ingot"
-    }
+    "E": "singulo:entangled_element",
+    "N": "singulo:nihonium_plate",
+    "C": "singulo:collapsar_ingot"
   },
   "result": {
     "id": "singulo:wormhole_drone_beacon",

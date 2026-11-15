@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,8 +28,8 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 0.17.0: 液体パイプの段階（区間のまとめ・いちばん細いところの制限）、液体カプセル、液体のドローン発着ポート。 */
 @GameTestHolder("singulo")
@@ -49,7 +49,7 @@ public final class FluidLogisticsGameTests {
 
     private static FluidDronePortBlockEntity fluidPort(GameTestHelper h, BlockPos at) {
         h.setBlock(at, SinguloBlocks.FLUID_DRONE_PORT.get());
-        FluidDronePortBlockEntity port = h.getBlockEntity(at);
+        FluidDronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         port.setOwner(owner(h));
         port.energy().setEnergy(DronePortBlockEntity.CAPACITY);
         DroneNetwork.get(h.getLevel()).putPort(h.absolutePos(at), owner(h), "", true);
@@ -70,7 +70,7 @@ public final class FluidLogisticsGameTests {
             pipe(h, new BlockPos(2 + i, 1, 2), tiers[i]);
         }
         h.succeedWhen(() -> {
-            int[] stats = FluidPipeNetwork.statsForTest(h.getBlockEntity(new BlockPos(2, 1, 2)));
+            int[] stats = FluidPipeNetwork.statsForTest(io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,new BlockPos(2, 1, 2)));
             h.assertTrue(stats != null && stats[0] == 4, "Mixed tiers did not join one network: " + java.util.Arrays.toString(stats));
         });
     }
@@ -81,7 +81,7 @@ public final class FluidLogisticsGameTests {
         BlockPos a = new BlockPos(1, 1, 1), b = new BlockPos(0, 1, 6);
         h.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
         h.setBlock(b, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity giver = h.getBlockEntity(a), taker = h.getBlockEntity(b);
+        MachineBlockEntity giver = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,a), taker = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,b);
         for (int x = 2; x <= 6; x++) {
             pipe(h, new BlockPos(x, 1, 1), SinguloBlocks.FLUID_PIPE.get());
         }
@@ -93,7 +93,7 @@ public final class FluidLogisticsGameTests {
         }
         giver.forceOutputTankForTest(new FluidStack(Fluids.WATER, 2_000));
         h.succeedWhen(() -> {
-            int[] stats = FluidPipeNetwork.statsForTest(h.getBlockEntity(new BlockPos(6, 1, 3)));
+            int[] stats = FluidPipeNetwork.statsForTest(io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,new BlockPos(6, 1, 3)));
             h.assertTrue(stats != null && stats[0] == 15 && stats[1] == 1 && stats[2] == 2,
                     "Expected 15 pipes in 1 stretch between 2 junctions: " + java.util.Arrays.toString(stats));
             h.assertTrue(taker.automationFluids().getFluidInTank(0).getAmount()
@@ -218,7 +218,7 @@ public final class FluidLogisticsGameTests {
         BlockPos at = new BlockPos(15, 1, 16), water = at.south(2);
         TestBuild.build(h, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SUSPENSION_RESERVOIR,
                 at, net.minecraft.core.Direction.NORTH, 7);
-        io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity reservoir = h.getBlockEntity(at);
+        io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity reservoir = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         h.assertTrue(reservoir.ready(), "Reservoir did not form");
         reservoir.cyclePort(1); // Output -> both: a different wrapper over the input port's same tank.
         reservoir.tank().fill(new FluidStack(Fluids.WATER, reservoir.tankCapacity() - 500), IFluidHandler.FluidAction.EXECUTE);
@@ -228,9 +228,9 @@ public final class FluidLogisticsGameTests {
         h.setBlock(water, net.minecraft.world.level.block.Blocks.OAK_SLAB.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, true));
         h.runAfterDelay(20, () -> {
-            var first = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+            var first = io.github.genichimaruo.singulo.compat.FluidResourceView.find(h.getLevel(),
                     reservoir.portPos(0), net.minecraft.core.Direction.SOUTH);
-            var second = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+            var second = io.github.genichimaruo.singulo.compat.FluidResourceView.find(h.getLevel(),
                     reservoir.portPos(1), net.minecraft.core.Direction.SOUTH);
             h.assertTrue(first != null && second != null && first != second, "Expected two distinct reservoir port wrappers");
             h.assertTrue(h.getBlockState(water).getFluidState().isSource(), "Shared reservoir room was counted twice");
@@ -271,11 +271,11 @@ public final class FluidLogisticsGameTests {
     @GameTest(template = "large", batch = DRONES, timeoutTicks = 1200)
     public static void droneCarriesFluidCapsuleBetweenPorts(GameTestHelper h) {
         h.setBlock(STATION, SinguloBlocks.DRONE_STATION.get());
-        DroneStationBlockEntity station = h.getBlockEntity(STATION);
+        DroneStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,STATION);
         station.setOwner(owner(h));
         station.energy().setEnergy(DroneStationBlockEntity.CAPACITY);
-        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("drone_memory"))));
-        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_KIT, new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("drone_kit"))));
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_MEMORY, new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("drone_memory"))));
+        station.items().setStackInSlot(DroneStationBlockEntity.SLOT_KIT, new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("drone_kit"))));
         FluidDronePortBlockEntity a = fluidPort(h, FROM);
         FluidDronePortBlockEntity b = fluidPort(h, TO);
         a.items().setStackInSlot(DronePortBlockEntity.SLOT_CRATES, new ItemStack(SinguloItems.FLUID_CAPSULE.get()));
@@ -304,13 +304,13 @@ public final class FluidLogisticsGameTests {
         BlockPos a = new BlockPos(1, 1, 1), b = new BlockPos(5, 1, 1), mid = new BlockPos(3, 1, 1);
         h.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
         h.setBlock(b, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity giver = h.getBlockEntity(a);
+        MachineBlockEntity giver = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,a);
         for (int x = 2; x <= 4; x++) {
             pipe(h, new BlockPos(x, 1, 1), SinguloBlocks.SUPERFLUID_CONDUIT.get());
         }
         h.onEachTick(() -> giver.forceOutputTankForTest(new FluidStack(Fluids.WATER, 500)));
         h.succeedWhen(() -> {
-            FluidPipeBlockEntity pipe = h.getBlockEntity(mid);
+            FluidPipeBlockEntity pipe = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,mid);
             h.assertTrue(pipe.visualState() == FluidPipeBlockEntity.FLOWING && pipe.visualFluid().getFluid() == Fluids.WATER
                     && pipe.flowsIn(net.minecraft.core.Direction.WEST) && pipe.flowsOut(net.minecraft.core.Direction.EAST),
                     "Flow not shown: state " + pipe.visualState() + " fluid " + pipe.visualFluid());
@@ -335,7 +335,7 @@ public final class FluidLogisticsGameTests {
                 && receive.copy().getFluid() == Fluids.LAVA, "Tank contents were not copied to the item");
         drops.forEach(net.minecraft.world.entity.Entity::discard);
         h.setBlock(at, SinguloBlocks.FLUID_DRONE_PORT.get());
-        FluidDronePortBlockEntity placed = h.getBlockEntity(at);
+        FluidDronePortBlockEntity placed = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         placed.applyComponentsFromItemStack(item);
         h.assertTrue(placed.sendTank().getFluidAmount() == 12_000 && placed.receiveTank().getFluidAmount() == 90_000,
                 "Placing the port did not restore its tanks");

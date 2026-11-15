@@ -7,15 +7,9 @@
     " P "
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "A": {
-      "item": "minecraft:blue_ice"
-    }
+    "P": "#c:plates/steel",
+    "C": "#c:ingots/copper",
+    "A": "minecraft:blue_ice"
   },
   "result": {
     "id": "singulo:heat_exchange_core",

@@ -119,7 +119,7 @@ public class SecurityDrone extends Monster {
         FlyingPathNavigation nav = new FlyingPathNavigation(this, level);
         nav.setCanOpenDoors(false);
         nav.setCanFloat(true);
-        nav.setCanPassDoors(true);
+        nav.getNodeEvaluator().setCanPassDoors(true);
         return nav;
     }
 
@@ -133,16 +133,16 @@ public class SecurityDrone extends Monster {
     }
 
     @Override
-    public boolean isAlliedTo(net.minecraft.world.entity.Entity other) {
-        return RuinGuards.isGuard(other) || super.isAlliedTo(other);
+    protected boolean considersEntityAsAlly(net.minecraft.world.entity.Entity other) {
+        return RuinGuards.isGuard(other) || super.considersEntityAsAlly(other);
     }
 
     @Override
-    public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
         if (RuinGuards.friendlyFire(source)) {
             return false;
         }
-        return super.hurt(source, amount);
+        return super.hurtServer(damageLevel, source, amount);
     }
 
     /** 壊れかけか（体力が最大の {@link #CRIPPLED_AT} 以下）。 */
@@ -217,33 +217,33 @@ public class SecurityDrone extends Monster {
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX() + Math.cos(a) * PULSE_RADIUS * 0.7, getY() + 0.3,
                     getZ() + Math.sin(a) * PULSE_RADIUS * 0.7, 2, 0.2, 0.2, 0.2, 0.3);
         }
-        level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 0.3, getZ(), 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), getX(), getY() + 0.3, getZ(), 1, 0, 0, 0, 0);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(PULSE_RADIUS),
                 e -> e != this && e.isAlive() && !(e instanceof SecurityDrone) && !(e instanceof HorizonWarden))) {
             if (e.distanceTo(this) > PULSE_RADIUS) {
                 continue;
             }
             hurtWithoutKnockback(e, damageSources().mobAttack(this), PULSE_DAMAGE);
-            e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1));
+            e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1));
         }
     }
 
     /** Keep existing movement (including jumps), suppress only this hit's impulse. */
     static boolean hurtWithoutKnockback(Entity target, DamageSource source, float damage) {
         Vec3 velocity = target.getDeltaMovement();
-        try { return target.hurt(source, damage); }
+        try { return target.hurtOrSimulate(source, damage); }
         finally { target.setDeltaMovement(velocity); }
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
+    public boolean doHurtTarget(ServerLevel attackLevel, Entity target) {
         Vec3 velocity = target.getDeltaMovement();
-        try { return super.doHurtTarget(target); }
+        try { return super.doHurtTarget(attackLevel,target); }
         finally { target.setDeltaMovement(velocity); }
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(double distance, float multiplier, DamageSource source) {
         return false;
     }
 
@@ -272,8 +272,8 @@ public class SecurityDrone extends Monster {
     @Override
     public void die(net.minecraft.world.damagesource.DamageSource source) {
         super.die(source);
-        if (facilitySpawned && source.getEntity() instanceof net.minecraft.world.entity.player.Player && hasRestriction()
-                && level().getBlockEntity(getRestrictCenter()) instanceof GuardDockBlockEntity dock) {
+        if (facilitySpawned && source.getEntity() instanceof net.minecraft.world.entity.player.Player && hasHome()
+                && level().getBlockEntity(getHomePosition()) instanceof GuardDockBlockEntity dock) {
             dock.recordKill(getUUID());
         }
     }
@@ -283,8 +283,9 @@ public class SecurityDrone extends Monster {
     }
 
     @Override
-    protected net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> getDefaultLootTable() {
-        return facilitySpawned ? FACILITY_LOOT : super.getDefaultLootTable();
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (facilitySpawned) super.dropFromLootTable(level, source, playerKilled, FACILITY_LOOT);
+        else super.dropFromLootTable(level, source, playerKilled);
     }
 
     @Override
@@ -294,9 +295,9 @@ public class SecurityDrone extends Monster {
         tag.putInt("tier", tier());
         tag.putBoolean("facility_spawned", facilitySpawned);
         // 出撃したドックと行動範囲（バニラは保存しないので、読み込み直すとドックに撃破を知らせられなくなる）
-        if (hasRestriction()) {
-            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(getRestrictCenter()));
-            tag.putFloat("home_radius", getRestrictRadius());
+        if (hasHome()) {
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(getHomePosition()));
+            tag.putFloat("home_radius", getHomeRadius());
         }
 
         values.store(tag);
@@ -310,7 +311,7 @@ public class SecurityDrone extends Monster {
         if (tag.contains("tier")) {
             entityData.set(TIER, Mth.clamp(tag.getIntOr("tier", 0), 1, 3));
         }
-        io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").ifPresent(home -> restrictTo(home, (int) tag.getFloatOr("home_radius", 0.0F)));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").ifPresent(home -> setHomeTo(home, (int) tag.getFloatOr("home_radius", 0.0F)));
     }
 
     /**
@@ -379,7 +380,7 @@ public class SecurityDrone extends Monster {
                     getLookControl().setLookAt(target, 60, 60);
                     level.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 0.3, getZ(), 1, 0.05, 0.05, 0.05, 0);
                     if (distanceToSqr(target) < 1.8 * 1.8) {
-                        doHurtTarget(target);
+                        doHurtTarget((ServerLevel) level(), target);
                         timer = 0;
                     }
                     if (--timer <= 0 || horizontalCollision || verticalCollision) {

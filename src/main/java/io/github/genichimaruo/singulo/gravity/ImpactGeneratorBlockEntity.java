@@ -32,40 +32,25 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
     public static final int RESERVE_TICKS = 100;
 
     /** 外向きの電力の口（取り出すだけ）。 */
-    private final IEnergyStorage output = new IEnergyStorage() {
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return 0;
+    private final io.github.genichimaruo.singulo.energy.LongEnergyHandler output = new OutputEnergy();
+    private final class OutputEnergy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]>
+            implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        protected long[] createSnapshot() { return new long[]{stored, outputTick, outputUsed}; }
+        protected void revertToSnapshot(long[] previous) { stored=previous[0]; outputTick=previous[1]; outputUsed=previous[2]; }
+        protected void onRootCommit(long[] previous) { if(stored!=previous[0])setChanged(); }
+        public long insertLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion"); return 0;
         }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            int take = (int) Math.max(0, Math.min(amount, outputLeft()));
-            if (!simulate && take > 0) {
-                spend(take);
-            }
-            return take;
+        public long extractLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");
+            updateSnapshots(tx);
+            long take=Math.max(0,Math.min(amount,outputLeft()));
+            stored-=take; outputUsed+=take; return take;
         }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, stored);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return (int) CAPACITY;
-        }
-
-        @Override
-        public boolean canExtract() {
-            return true;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return false;
-        }
+        public long getAmountAsLong(){return stored;}
+        public long getCapacityAsLong(){return CAPACITY;}
+        public boolean canExtract(){return true;}
+        public boolean canReceive(){return false;}
     };
 
     /** 外へ出した量を数えている tick と、その tick に出した量。 */
@@ -86,7 +71,7 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
         return CAPACITY;
     }
 
-    public IEnergyStorage output() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler output() {
         return output;
     }
 
@@ -125,18 +110,15 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
             if (!level.isLoaded(n) || level.getBlockEntity(n) instanceof GravityReceiverBlockEntity) {
                 continue;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                long sent = Math.min(room, LongEnergyStorage.receive(target, room, false));
-                if (sent > 0) {
-                    spend(sent);
-                }
+            var target = level.getCapability(Capabilities.Energy.BLOCK, n, dir.getOpposite());
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(output, target, room);
             }
         }
     }
 
     /** 落ちてきた（fallDistance ブロック）。ためた量を返す。 */
-    public long absorb(float fallDistance) {
+    public long absorb(double fallDistance) {
         if (fallDistance < MIN_FALL) {
             return 0;
         }

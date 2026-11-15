@@ -12,7 +12,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 /** ウォーデンの小型の特異点: 黒い球と赤い降着の輪、周りの景色を歪める重力レンズ。出てくるときに育ち、消える前にしぼむ。 */
-public class WardenSingularityRenderer extends EntityRenderer<WardenSingularity> {
+public class WardenSingularityRenderer extends SnapshotEntityRenderer<WardenSingularity> {
     static final float HORIZON = 0.5F;
 
     public WardenSingularityRenderer(EntityRendererProvider.Context context) {
@@ -44,8 +44,7 @@ public class WardenSingularityRenderer extends EntityRenderer<WardenSingularity>
         return true;
     }
 
-    @Override
-    public Identifier getTextureLocation(WardenSingularity e) {
+     public Identifier getTextureLocation(WardenSingularity e) {
         return FxDraw.WHITE;
     }
 }

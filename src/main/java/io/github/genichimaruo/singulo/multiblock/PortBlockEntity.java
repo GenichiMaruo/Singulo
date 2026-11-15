@@ -66,11 +66,11 @@ public class PortBlockEntity extends io.github.genichimaruo.singulo.compat.Legac
 
     /** パイプやケーブルに見せる口（いつも同じ物。中でつながっているコントローラの口へ渡す。{@link PortProxies}）。 */
     private final PortProxies.Energy energyProxy = new PortProxies.Energy(
-            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK));
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK));
     private final PortProxies.Items itemProxy = new PortProxies.Items(
-            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK));
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK));
     private final PortProxies.Fluids fluidProxy = new PortProxies.Fluids(
-            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK));
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK));
 
     public PortProxies.Energy energyProxy() {
         return energyProxy;

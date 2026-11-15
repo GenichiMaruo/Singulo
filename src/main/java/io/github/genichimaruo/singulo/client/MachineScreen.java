@@ -43,8 +43,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     /** 待機している理由（待機中だけ、何 tick かごとに調べ直す）。 */
-    @org.jspecify.annotations.Nullable
-    private io.github.genichimaruo.singulo.machine.MachineDiagnosis.Result idleReason;
+    private io.github.genichimaruo.singulo.machine.MachineDiagnosis.@org.jspecify.annotations.Nullable Result idleReason;
     private int reasonTimer;
 
     private MachineBlockEntity.Status machineStatus() {
@@ -683,10 +682,10 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         List<RecipeHolder<MachineRecipe>> all = new ArrayList<>(io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(level, type()));
         java.util.Map<net.minecraft.resources.Identifier, Integer> score = new java.util.HashMap<>();
         for (RecipeHolder<MachineRecipe> h : all) {
-            score.put(h.id(), matchScore(h.value(), inputs));
+            score.put(h.id().identifier(), matchScore(h.value(), inputs));
         }
-        all.sort(java.util.Comparator.comparingInt((RecipeHolder<MachineRecipe> h) -> -score.get(h.id()))
-                .thenComparingInt(h -> h.value().stage()).thenComparing(h -> h.id().toString()));
+        all.sort(java.util.Comparator.comparingInt((RecipeHolder<MachineRecipe> h) -> -score.get(h.id().identifier()))
+                .thenComparingInt(h -> h.value().stage()).thenComparing(h -> h.id().identifier().toString()));
         out.addAll(all);
         return out;
     }
@@ -786,7 +785,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             }
             RecipeHolder<MachineRecipe> h = entries.get(index);
             int[] c = cellPos(v);
-            boolean isSelected = h == null ? selected == null : selected != null && selected.id().equals(h.id());
+            boolean isSelected = h == null ? selected == null : selected != null && selected.id().equals(h.id().identifier());
             boolean ready = h != null && h.value().plan(inputs) != null;
             Panel.slot(g, skin, c[0] + 1, c[1] + 1);
             int ring = isSelected ? skin.accent() : index == hovered ? Panel.GLOW : ready ? GuiSkin.OK : 0;
@@ -820,12 +819,12 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         MachineRecipe r = h.value();
         lines.add(r.result().getHoverName());
         r.restore().ifPresent(in -> {
-            ItemStack[] options = in.getItems();
+            ItemStack[] options = in.items().map(ItemStack::new).toArray(ItemStack[]::new);
             lines.add(Component.translatable("gui.singulo.select.restore", options.length > 0 ? options[0].getHoverName()
                     : Component.literal("?")).withStyle(s -> s.withColor(0xFF8A949E)));
         });
         for (MachineRecipe.ItemInput in : r.ingredients()) {
-            ItemStack[] options = in.ingredient().getItems();
+            ItemStack[] options = in.ingredient().items().map(ItemStack::new).toArray(ItemStack[]::new);
             Component name = options.length > 0 ? options[0].getHoverName() : Component.literal("?");
             boolean catalyst = in.uses() > 0 && options.length > 0 && io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(options[0]);
             Component line = catalyst ? Component.translatable("gui.singulo.select.lifetime", name,
@@ -859,7 +858,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         RecipeHolder<MachineRecipe> h = entries.get(index);
         var level = Minecraft.getInstance().level;
-        int id = h == null || level == null ? -1 : io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(level, type(), h.id());
+        int id = h == null || level == null ? -1 : io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(level, type(), h.id().identifier());
         minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id < 0 ? MachineMenu.BUTTON_CLEAR_SELECTION
                 : MachineMenu.BUTTON_SELECT + id);
         return true;
@@ -896,8 +895,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     /** この装置がコラプサー内張りを受け付けるマルチブロックなら、その種類（そうでなければ null）。 */
-    @org.jspecify.annotations.Nullable
-    private io.github.genichimaruo.singulo.multiblock.Blueprints.Kind liningKind() {
+    private io.github.genichimaruo.singulo.multiblock.Blueprints.@org.jspecify.annotations.Nullable Kind liningKind() {
         var block = net.minecraft.client.Minecraft.getInstance().level == null ? null
                 : net.minecraft.client.Minecraft.getInstance().level.getBlockState(menu.pos()).getBlock();
         var kind = block == null ? null : io.github.genichimaruo.singulo.multiblock.Blueprints.kindOf(block);
@@ -1037,7 +1035,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         Panel.slot(g, skin, sx, sy);
         if (menu.getSlot(menuIndexOf(slotIndex)).getItem().isEmpty()) {
             g.pose().pushMatrix();
-            g.item(new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), sx, sy);
+            g.item(new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(ghost))), sx, sy);
             g.nextStratum();
             g.fill(sx, sy, sx + 16, sy + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
             g.pose().popMatrix();

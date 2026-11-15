@@ -6,39 +6,27 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:nihonium_frame"
-      },
+      "ingredient": "singulo:nihonium_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:quantum_computing_module"
-      },
+      "ingredient": "singulo:quantum_computing_module",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:ender_pearls"
-      },
+      "ingredient": "#c:ender_pearls",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:glass_blocks/colorless"
-      },
+      "ingredient": "#c:glass_blocks/colorless",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 36000
     }

@@ -6,15 +6,11 @@
   "energy": 250000000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:collapsar_billet"
-      },
+      "ingredient": "singulo:collapsar_billet",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:mass_pellet"
-      },
+      "ingredient": "singulo:mass_pellet",
       "count": 16
     }
   ],

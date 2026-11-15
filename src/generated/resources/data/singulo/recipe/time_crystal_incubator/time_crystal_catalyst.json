@@ -6,33 +6,23 @@
   "energy": 30000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_seed"
-      },
+      "ingredient": "singulo:time_crystal_seed",
       "uses": 1
     },
     {
-      "ingredient": {
-        "item": "minecraft:echo_shard"
-      },
+      "ingredient": "minecraft:echo_shard",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:phase_sync_plate"
-      },
+      "ingredient": "singulo:phase_sync_plate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 36000
     }

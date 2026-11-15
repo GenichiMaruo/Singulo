@@ -73,8 +73,8 @@ public class DegenerateFurnaceRenderer extends SnapshotBlockRenderer<DegenerateF
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);
         // 押し込み棒（上下）。炉心の明かりで照らされる
-        int block = Math.max(LightCoordsUtil.block(LevelRenderer.getLightColor(level, center)), (int) (3 + 12 * heat));
-        int lit = LightCoordsUtil.pack(Math.min(15, block), LightCoordsUtil.sky(LevelRenderer.getLightColor(level, center)));
+        int block = Math.max(LightCoordsUtil.block(LevelRenderer.getLightCoords(level, center)), (int) (3 + 12 * heat));
+        int lit = LightCoordsUtil.pack(Math.min(15, block), LightCoordsUtil.sky(LevelRenderer.getLightCoords(level, center)));
         float shake = flash > 0.6F ? (float) Math.sin(time * 9.0) * 0.015F * flash : 0F;
         VertexConsumer rod = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(ROD));
         FxDraw.box(pose, rod, -0.2F, gap + 0.3F, -0.2F, 0.2F, WALL, 0.2F, lit, 0xFFFFFF);
@@ -86,7 +86,7 @@ public class DegenerateFurnaceRenderer extends SnapshotBlockRenderer<DegenerateF
 
         if (running) {
             VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-            var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+            var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
             // 押し込み棒の先の、赤熱した面
             int face = FxDraw.lerpRgb(0xFF5A1E, 0xFFE6B0, flash);
             FxDraw.box(pose, glow, -0.43F, gap - 0.01F, -0.43F, 0.43F, gap + 0.02F, 0.43F, LightCoordsUtil.FULL_BRIGHT, face, (int) (90 + 150 * heat));
@@ -164,7 +164,7 @@ public class DegenerateFurnaceRenderer extends SnapshotBlockRenderer<DegenerateF
         if (last != null && last == cycle) {
             return;
         }
-        var rnd = level.random;
+        var rnd = level.getRandom();
         for (int i = 0; i < 14; i++) {
             double a = rnd.nextDouble() * Math.PI * 2;
             double v = 0.06 + rnd.nextDouble() * 0.12;

@@ -6,15 +6,11 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:white_ceramic_composite"
-      },
+      "ingredient": "singulo:white_ceramic_composite",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:dusts/redstone"
-      },
+      "ingredient": "#c:dusts/redstone",
       "count": 1
     }
   ],

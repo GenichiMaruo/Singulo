@@ -6,15 +6,9 @@
     "PBP"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_panels"
-    },
-    "P": {
-      "item": "singulo:ruin_panel"
-    },
-    "X": {
-      "tag": "c:gems/lapis"
-    }
+    "B": "singulo:blueprint_ruin_panels",
+    "P": "singulo:ruin_panel",
+    "X": "#c:gems/lapis"
   },
   "result": {
     "id": "singulo:striped_ruin_panel",

@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "singulo:helium_bearing_stone"
-      },
+      "ingredient": "#singulo:helium_bearing_stone",
       "count": 16
     }
   ],

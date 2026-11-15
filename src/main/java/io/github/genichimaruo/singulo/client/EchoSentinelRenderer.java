@@ -31,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
  * 覚醒した個体: 兜に紅い光の冠、頭の後ろに放射のついた大きな二重の光輪、肩から伸びる4枚の光の翼。
  * 目の帯と光の刃が紅く燃え、胸の記録結晶は金色に光る。
  */
-public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
+public class EchoSentinelRenderer extends SnapshotEntityRenderer<EchoSentinel> {
     static final int RGB = 0x8FEAFF;
     static final int DEEP = 0x2C8FB8;
     static final int CORE = 0xE8FFFF;
@@ -45,8 +45,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public Identifier getTextureLocation(EchoSentinel entity) {
+     public Identifier getTextureLocation(EchoSentinel entity) {
         return FxDraw.WHITE;
     }
 
@@ -137,7 +136,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
             pose.popPose();
         }
         renderCircle(e, partialTick, t, pose, vc);
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     /**

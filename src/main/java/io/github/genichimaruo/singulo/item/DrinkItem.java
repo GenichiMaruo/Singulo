@@ -30,40 +30,28 @@ import net.minecraft.world.level.Level;
 public class DrinkItem extends SinguloItem {
     /** 飲み物のID → 中身。 */
     public static final Map<String, Supplier<FoodProperties>> DRINKS = Map.of(
-            "canned_soda", () -> drink(2, MobEffects.MOVEMENT_SPEED, 20 * 120, 0, false),
+            "canned_soda", () -> drink(2, MobEffects.SPEED, 20 * 120, 0, false),
             "sports_drink", () -> drink(2, MobEffects.REGENERATION, 20 * 15, 0, false),
-            "energy_drink", () -> drink(1, MobEffects.DIG_SPEED, 20 * 120, 1, false),
-            "coffee", () -> drink(1, MobEffects.DIG_SPEED, 20 * 180, 0, true));
+            "energy_drink", () -> drink(1, MobEffects.HASTE, 20 * 120, 1, false),
+            "coffee", () -> drink(1, MobEffects.HASTE, 20 * 180, 0, true));
 
     private final boolean wakesUp;
 
     public DrinkItem(Properties properties, int stage, String id) {
-        super(properties.food(DRINKS.get(id).get()).stacksTo(16), stage, false);
+        super(properties(properties, id), stage, false);
         this.wakesUp = id.equals("coffee");
     }
 
     private static FoodProperties drink(int nutrition, Holder<MobEffect> effect, int ticks, int amplifier, boolean bottle) {
-        FoodProperties.Builder b = new FoodProperties.Builder().nutrition(nutrition).saturationModifier(0.2F).alwaysEdible()
-                .effect(() -> new MobEffectInstance(effect, ticks, amplifier), 1.0F);
-        if (bottle) {
-            b.usingConvertsTo(Items.GLASS_BOTTLE);
-        }
-        return b.build();
+        return new FoodProperties.Builder().nutrition(nutrition).saturationModifier(0.2F).alwaysEdible().build();
     }
 
-    @Override
-    public ItemUseAnimation getUseAnimation(ItemStack stack) {
-        return ItemUseAnimation.DRINK;
-    }
-
-    @Override
-    public SoundEvent getEatingSound() {
-        return SoundEvents.GENERIC_DRINK;
-    }
-
-    @Override
-    public SoundEvent getDrinkingSound() {
-        return SoundEvents.GENERIC_DRINK;
+    private static Properties properties(Properties properties, String id) {
+        var consumable = net.minecraft.world.item.component.Consumables.defaultDrink()
+                .onConsume(new net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(effects(id), 1.0F)).build();
+        properties.food(DRINKS.get(id).get(), consumable).stacksTo(16);
+        if (id.equals("coffee")) properties.usingConvertsTo(Items.GLASS_BOTTLE);
+        return properties;
     }
 
     /** コーヒーは眠気を覚ます（最後に眠ってからの時間を戻す。ファントムが出なくなる）。 */
@@ -77,6 +65,12 @@ public class DrinkItem extends SinguloItem {
 
     /** 効果の一覧（説明とテスト用）。 */
     public static List<MobEffectInstance> effects(String id) {
-        return DRINKS.get(id).get().effects().stream().map(e -> e.effect()).toList();
+        return List.of(switch (id) {
+            case "canned_soda" -> new MobEffectInstance(MobEffects.SPEED, 20 * 120, 0);
+            case "sports_drink" -> new MobEffectInstance(MobEffects.REGENERATION, 20 * 15, 0);
+            case "energy_drink" -> new MobEffectInstance(MobEffects.HASTE, 20 * 120, 1);
+            case "coffee" -> new MobEffectInstance(MobEffects.HASTE, 20 * 180, 0);
+            default -> throw new IllegalArgumentException("Unknown drink: " + id);
+        });
     }
 }

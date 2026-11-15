@@ -6,19 +6,19 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.test.harness.TestScope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class CapacityUpgradeGameTests {
     private static MachineBlockEntity machine(GameTestHelper h) {
         h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        return h.getBlockEntity(new BlockPos(1, 1, 1));
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,new BlockPos(1, 1, 1));
     }
 
     @GameTest(template = "empty", batch = "capacity_upgrade")
@@ -51,7 +51,7 @@ public final class CapacityUpgradeGameTests {
         machine.items().setStackInSlot(slot, ItemStack.EMPTY);
         var tag = machine.saveWithoutMetadata(h.getLevel().registryAccess());
         var restored = new MachineBlockEntity(machine.getBlockPos(), machine.getBlockState());
-        restored.loadWithComponents(tag, h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag, h.getLevel().registryAccess());
         h.assertTrue(restored.energy().getEnergyStored() == 20_000_000 && restored.energy().getMaxEnergyStored() == 100_000
                 && restored.energy().receiveEnergy(Integer.MAX_VALUE, true) == 0, "Reload lost surplus or bypassed capacity");
         h.assertTrue(restored.energy().consume(19_950_000) && restored.energy().receiveEnergy(100_000, false) == 50_000
@@ -65,7 +65,7 @@ public final class CapacityUpgradeGameTests {
         var player = TestScope.player(h);
         var menu = new MachineMenu(1, player.getInventory(), machine);
         int inventory = machine.type().itemSlots();
-        var overclock = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("overclock_chip")));
+        var overclock = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("overclock_chip")));
         machine.items().setStackInSlot(machine.type().upgradeSlot(), overclock.copy());
         menu.getSlot(inventory).set(CapacityUpgrades.item(2).copyWithCount(3));
         menu.quickMoveStack(player, inventory);
@@ -74,17 +74,17 @@ public final class CapacityUpgradeGameTests {
                 && menu.getSlot(inventory).getItem().getCount() == 2 && machine.hasOverclock(), "Shift-click moved wrong slot or multiple upgrades");
         var tag = machine.saveWithoutMetadata(h.getLevel().registryAccess());
         var restored = new MachineBlockEntity(machine.getBlockPos(), machine.getBlockState());
-        restored.loadWithComponents(tag, h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag, h.getLevel().registryAccess());
         h.assertTrue(restored.hasOverclock() && restored.energy().getMaxEnergyStored() == 4_000_000
                 && CapacityUpgrades.tier(restored.items().getStackInSlot(restored.type().capacitySlot())) == 2,
                 "Reload changed separate upgrade slots");
         // Old inventory lacks only the appended capacity slot; speed/catalyst indices stay intact.
         var old = new net.neoforged.neoforge.items.ItemStackHandler(machine.type().capacitySlot());
         old.setStackInSlot(machine.type().upgradeSlot(), overclock.copy());
-        old.setStackInSlot(machine.type().catalystSlot(), new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst"))));
+        old.setStackInSlot(machine.type().catalystSlot(), new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst"))));
         old.setStackInSlot(0, new ItemStack(Items.IRON_INGOT, 7));
-        tag.put("items", old.serializeNBT(h.getLevel().registryAccess()));
-        restored.loadWithComponents(tag, h.getLevel().registryAccess());
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(old,h.getLevel().registryAccess()));
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag, h.getLevel().registryAccess());
         h.assertTrue(restored.hasOverclock() && restored.items().getStackInSlot(0).getCount() == 7
                 && restored.items().getStackInSlot(restored.type().catalystSlot()).getCount() == 1
                 && restored.items().getStackInSlot(restored.type().capacitySlot()).isEmpty(), "Old inventory migration shifted or duplicated slots");
@@ -113,7 +113,7 @@ public final class CapacityUpgradeGameTests {
         var recipe = RecipeSelection.byIndex(h.getLevel(), machine.type(), index).value();
         for (int i = 0; i < recipe.ingredients().size(); i++) {
             var input = recipe.ingredients().get(i);
-            machine.items().setStackInSlot(i, input.ingredient().getItems()[0].copyWithCount(input.count()));
+            machine.items().setStackInSlot(i, new ItemStack(input.ingredient().items().findFirst().orElseThrow(), input.count()));
         }
         machine.selectRecipe(index);
         machine.energy().receiveEnergy(Integer.MAX_VALUE, false);
@@ -129,7 +129,7 @@ public final class CapacityUpgradeGameTests {
     @GameTest(template = "empty", batch = "capacity_upgrade")
     public static void capacityUpgradeDoesNotReduceLargeMachinesOrAcceptWrongItems(GameTestHelper h) {
         h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
-        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,new BlockPos(1, 1, 1));
         machine.items().setStackInSlot(machine.type().capacitySlot(), CapacityUpgrades.item(1));
         h.assertTrue(machine.energy().getMaxEnergyStored() == machine.type().energyCapacity(), "Low-tier upgrade shrank a larger base buffer");
         h.assertTrue(!machine.items().insertItem(machine.type().capacitySlot(), new ItemStack(Items.DIRT), true).isEmpty()

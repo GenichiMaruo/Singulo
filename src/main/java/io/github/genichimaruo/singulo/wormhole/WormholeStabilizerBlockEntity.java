@@ -38,7 +38,7 @@ public class WormholeStabilizerBlockEntity extends io.github.genichimaruo.singul
     public static final int SLOT_CASING = 3;
     public static final int SLOTS = 4;
 
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return s == SLOT_FUEL ? ExoticCharge.isExoticMatter(stack) : s == SLOT_CASING ? isCasing(stack)
@@ -116,7 +116,7 @@ public class WormholeStabilizerBlockEntity extends io.github.genichimaruo.singul
 
     /** 口の筐体（固定化した喉を収める入れ物）。 */
     public static boolean isCasing(ItemStack stack) {
-        return !stack.isEmpty() && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+        return !stack.isEmpty() && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(
                 io.github.genichimaruo.singulo.Singulo.id("wormhole_mouth_casing")));
     }
 
@@ -230,9 +230,13 @@ public class WormholeStabilizerBlockEntity extends io.github.genichimaruo.singul
             items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
         }
         energy.setEnergy(tag.getIntOr("energy", 0));
-        int[] p = tag.getIntArray("progress");
+        int[] p = tag.getIntArray("progress").orElseGet(() -> new int[0]);
         for (int i = 0; i < Math.min(2, p.length); i++) {
             progress[i] = p[i];
         }
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot, resource) -> slot >= SLOT_FUEL || (level != null && !UnstableMouthItem.expired(resource.toStack(), level)), (slot, resource) -> slot < SLOT_FUEL && isSealed(resource.toStack()));
     }
 }

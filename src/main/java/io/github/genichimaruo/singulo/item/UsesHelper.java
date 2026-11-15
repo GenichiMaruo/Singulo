@@ -87,12 +87,12 @@ public final class UsesHelper {
         if (uses.isCatalyst()) {
             // 触媒は失活触媒になる
             String spent = GeneratedContent.SPENT_FORM.get(id);
-            return spent == null ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(spent)));
+            return spent == null ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(spent)));
         }
         String worn = GeneratedContent.WORN_FORM.get(id);
         if (worn != null) {
             // 復元品は劣化品に戻る。次の復元は修復1回ぶんとして数える
-            Item wornItem = BuiltInRegistries.ITEM.get(Singulo.id(worn));
+            Item wornItem = BuiltInRegistries.ITEM.getValue(Singulo.id(worn));
             ItemStack out = new ItemStack(wornItem);
             out.set(SinguloComponents.USES.get(), new UsesData(0, 0, data.repairs() + 1));
             return out;

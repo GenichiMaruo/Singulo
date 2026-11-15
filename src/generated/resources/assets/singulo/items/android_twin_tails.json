@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "singulo:item/android_twin_tails",
+    "tints": [
+      {
+        "type": "singulo:dynamic",
+        "kind": "accessory"
+      }
+    ]
+  }
+}

@@ -37,8 +37,8 @@ public class RuinCacheBlock extends BaseEntityBlock {
 
     public static final MapCodec<RuinCacheBlock> CODEC = simpleCodec(RuinCacheBlock::new);
     public static final BooleanProperty SEALED = BooleanProperty.create("sealed");
-    private static final DustParticleOptions FIELD = new DustParticleOptions(new Vector3f(1.0F, 0.35F, 0.35F), 1.0F);
-    private static final DustParticleOptions GOLD = new DustParticleOptions(new Vector3f(1.0F, 0.82F, 0.36F), 0.6F);
+    private static final DustParticleOptions FIELD = io.github.genichimaruo.singulo.compat.Particles.dust(new Vector3f(1.0F, 0.35F, 0.35F), 1.0F);
+    private static final DustParticleOptions GOLD = io.github.genichimaruo.singulo.compat.Particles.dust(new Vector3f(1.0F, 0.82F, 0.36F), 0.6F);
 
     public RuinCacheBlock(Properties properties) {
         super(properties);
@@ -83,7 +83,7 @@ public class RuinCacheBlock extends BaseEntityBlock {
 
     /** プレイヤーが置いた保管庫（壊して置き直したものも）は、中身が入らず再生もしない。 */
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.@Nullable LivingEntity placer,
                             net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof RuinCacheBlockEntity cache) {

@@ -191,7 +191,7 @@ public class DeviceMenu extends AbstractContainerMenu {
     }
 
     private static boolean isCassette(ItemStack stack) {
-        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("collapsar_parallel_cassette")));
+        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("collapsar_parallel_cassette")));
     }
 
     public Kind kind() {

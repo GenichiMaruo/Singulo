@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "singulo:unfired_ceramic"
-  },
+  "ingredient": "singulo:unfired_ceramic",
   "result": {
     "id": "singulo:white_ceramic_composite",
     "count": 1

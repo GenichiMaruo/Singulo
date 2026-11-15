@@ -64,11 +64,11 @@ public final class FoodPaste {
      * （容器の行き場がない）。
      */
     public static int kindOf(ItemStack stack) {
-        if (stack.isEmpty() || stack.getItem() instanceof PrintedFoodItem || stack.hasCraftingRemainingItem()) {
+        if (stack.isEmpty() || stack.getItem() instanceof PrintedFoodItem || stack.getItem().getCraftingRemainder(stack) != null) {
             return -1;
         }
-        FoodProperties food = stack.getFoodProperties(null);
-        if (food != null && food.usingConvertsTo().isPresent()) {
+        FoodProperties food = stack.get(net.minecraft.core.component.DataComponents.FOOD);
+        if (stack.has(net.minecraft.core.component.DataComponents.USE_REMAINDER)) {
             return -1;
         }
         for (int k = 0; k < KINDS; k++) {
@@ -81,7 +81,7 @@ public final class FoodPaste {
 
     /** 食材1個のペーストの量。 */
     public static int unitsOf(ItemStack stack) {
-        FoodProperties food = stack.getFoodProperties(null);
+        FoodProperties food = stack.get(net.minecraft.core.component.DataComponents.FOOD);
         if (food != null) {
             return Math.max(1, food.nutrition());
         }

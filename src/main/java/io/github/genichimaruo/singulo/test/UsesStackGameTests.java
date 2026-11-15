@@ -6,18 +6,18 @@ import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class UsesStackGameTests {
     private static ItemStack item(String id, int count) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)), count);
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)), count);
     }
 
     @GameTest(template="empty")
@@ -43,7 +43,7 @@ public final class UsesStackGameTests {
     public static void archiveTakesOneOriginalAndUsesOnlyThatOne(GameTestHelper h) {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity archive=h.getBlockEntity(pos);
+        MachineBlockEntity archive=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         ItemStack originals=item("observation_log",64);
         ItemStack simulated=archive.automationItems().insertItem(0,originals,true);
         h.assertTrue(simulated.getCount()==63 && archive.items().getStackInSlot(0).isEmpty(),"Simulation consumed originals");
@@ -65,7 +65,7 @@ public final class UsesStackGameTests {
     public static void menuShiftClickInsertsOnlyOneOriginalAndNormalMaterialsStillStack(GameTestHelper h) {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity archive=h.getBlockEntity(pos);
+        MachineBlockEntity archive=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             player.getInventory().setItem(9,item("quantum_data_fragment",64));

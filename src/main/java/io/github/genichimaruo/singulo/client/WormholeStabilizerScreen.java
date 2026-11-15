@@ -94,7 +94,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     private static ItemStack item(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     @Override

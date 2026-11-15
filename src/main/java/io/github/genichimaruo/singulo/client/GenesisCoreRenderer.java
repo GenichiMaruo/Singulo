@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -36,10 +36,10 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
     /** 柱の先（核の中心から）。 */
     private static final Vec3[] TOPS = {new Vec3(2, 4.05, 2), new Vec3(-2, 4.05, 2), new Vec3(2, 4.05, -2), new Vec3(-2, 4.05, -2)};
 
-    private final ItemRenderer items;
+    private final ItemDraw items;
 
     public GenesisCoreRenderer(BlockEntityRendererProvider.Context context) {
-        this.items = context.getItemRenderer();
+        this.items = ItemDraw.get();
     }
 
     private static VertexConsumer glow(MultiBufferSource buffers) {
@@ -52,7 +52,7 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
             return;
         }
         float time = be.clientTicks() + pt;
-        Quaternionf camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        Quaternionf camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(0.5, 0, 0.5);
         switch (be.stage()) {

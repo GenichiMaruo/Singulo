@@ -84,16 +84,15 @@ public class GravityPanelBlock extends Block {
     }
 
     @Override
-    protected void onRemove(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState newState, boolean moving) {
+    protected void affectNeighborsAfterRemoval(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, boolean moving) {
+        BlockState newState = level.getBlockState(pos);
         if (kind == Kind.ZERO && !state.is(newState.getBlock())) {
             ZeroGravity.remove(level, pos);                           // 壊れた無重力ブロックの上は、すぐに重力が戻る
         }
-        super.onRemove(state, level, pos, newState, moving);
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
-                                     BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
         return state.setValue(CONNECTIONS.get(dir), joins(neighborState));
     }
 }

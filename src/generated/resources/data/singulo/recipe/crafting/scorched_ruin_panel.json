@@ -6,15 +6,9 @@
     "PBP"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_panels"
-    },
-    "P": {
-      "item": "singulo:ruin_panel"
-    },
-    "X": {
-      "item": "minecraft:charcoal"
-    }
+    "B": "singulo:blueprint_ruin_panels",
+    "P": "singulo:ruin_panel",
+    "X": "minecraft:charcoal"
   },
   "result": {
     "id": "singulo:scorched_ruin_panel",

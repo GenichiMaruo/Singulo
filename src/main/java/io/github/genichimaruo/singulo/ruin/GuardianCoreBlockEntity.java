@@ -65,11 +65,9 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     private final List<BlockPos> conveyorPos = new ArrayList<>();
     private final List<BlockState> conveyorState = new ArrayList<>();
     /** 地下アンドロイド研究所のボス部屋の核なら、施設の範囲（番人を倒すと、その中の耐圧殻の封じが解ける）。 */
-    @Nullable
-    private net.minecraft.world.level.levelgen.structure.BoundingBox facility;
+    private net.minecraft.world.level.levelgen.structure.@Nullable BoundingBox facility;
     /** 研究所の搬入出の立坑の範囲（ボスを倒すと、ここの溶接も解く）。 */
-    @Nullable
-    private net.minecraft.world.level.levelgen.structure.BoundingBox access;
+    private net.minecraft.world.level.levelgen.structure.@Nullable BoundingBox access;
     /** 出現の演出で、槽をどこまで壊したか（0: 無傷、1: ひび、2: 砕けた）。 */
     private int tankStage;
 
@@ -102,13 +100,12 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     }
 
     /** 番人の種類 → その覚醒核。 */
-    @Nullable
-    public static net.minecraft.world.item.Item awakeningCoreFor(EntityType<?> type) {
+    public static net.minecraft.world.item.@Nullable Item awakeningCoreFor(EntityType<?> type) {
         String id = type == SinguloEntities.ECHO_SENTINEL.get() ? "awakening_echo_core"
                 : type == SinguloEntities.GRAVITY_REMNANT.get() ? "awakening_gravity_core"
                 : type == SinguloEntities.ERGOSPHERE_LEVIATHAN.get() ? "awakening_ergosphere_core"
                 : type == SinguloEntities.FOUNDRY_OVERSEER.get() ? "awakening_foundry_core" : null;
-        return id == null ? null : net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id));
+        return id == null ? null : net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id));
     }
 
     /** どれかの番人の覚醒核か。 */
@@ -132,19 +129,17 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         setChanged();
     }
 
-    @Nullable
-    public net.minecraft.world.level.levelgen.structure.BoundingBox facility() {
+    public net.minecraft.world.level.levelgen.structure.@Nullable BoundingBox facility() {
         return facility;
     }
 
     /** 研究所の搬入出の立坑の範囲を覚える（生成のとき。なければ null）。 */
-    public void setAccess(@Nullable net.minecraft.world.level.levelgen.structure.BoundingBox box) {
+    public void setAccess(net.minecraft.world.level.levelgen.structure.@Nullable BoundingBox box) {
         access = box;
         setChanged();
     }
 
-    @Nullable
-    public net.minecraft.world.level.levelgen.structure.BoundingBox access() {
+    public net.minecraft.world.level.levelgen.structure.@Nullable BoundingBox access() {
         return access;
     }
 
@@ -298,7 +293,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
             return null;
         }
         String id = awakeningCoreId(vault.ruin());
-        if (id == null || !core.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)))) {
+        if (id == null || !core.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)))) {
             tell(player, "gui.singulo.guardian.wrong_core");
             return null;
         }
@@ -314,7 +309,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     @Nullable
     private RuinBoss spawn(ServerLevel level, RuinCacheBlockEntity vault, boolean awakened) {
         EntityType<? extends RuinBoss> type = bossFor(vault.ruin());
-        RuinBoss b = type == null ? null : type.create(level);
+        RuinBoss b = type == null ? null : type.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (b == null) {
             return null;
         }
@@ -323,7 +318,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         }
         restoreProps(level);
         tankStage = 0;
-        b.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0 + b.spawnHeight(), worldPosition.getZ() + 0.5, 0, 0);
+        b.snapTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0 + b.spawnHeight(), worldPosition.getZ() + 0.5, 0, 0);
         b.awaken(worldPosition);
         if (awakened) {
             b.makeAwakened();
@@ -513,7 +508,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         boss = tag.read("boss", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("boss", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         scanned = tag.getBooleanOr("scanned", false);
         projectors.clear();
-        for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
+        for (Tag t : tag.getListOrEmpty("projectors")) {
             projectors.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(wrap(t), "p").orElse(BlockPos.ZERO));
         }
         tankPos.clear();
@@ -529,9 +524,9 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
             tankState.add(s);
         }
         readStates(tag.getListOrEmpty("lines"), registries, linePos, lineState);
-        int[] f = tag.getIntArray("facility");
+        int[] f = tag.getIntArray("facility").orElseGet(() -> new int[0]);
         facility = f.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(f) : null;
-        int[] a = tag.getIntArray("access");
+        int[] a = tag.getIntArray("access").orElseGet(() -> new int[0]);
         access = a.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(a) : null;
         readStates(tag.getListOrEmpty("conveyors"), registries, conveyorPos, conveyorState);
     }

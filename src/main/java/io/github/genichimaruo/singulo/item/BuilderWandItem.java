@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 組み立ての杖（クリエイティブ専用）。置いたコントローラに使うと、その向きのままマルチブロックを一瞬で組み立てる。
  * スニークして使うと大きさ（冷却塔の高さ・加速器の一辺）が切り替わる。
  */
-public class BuilderWandItem extends Item {
+public class BuilderWandItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public BuilderWandItem(Properties properties) {
         super(properties.stacksTo(1).rarity(Rarity.EPIC));
     }

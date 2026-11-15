@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.cable;
 
-import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
+import io.github.genichimaruo.singulo.energy.LongEnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
@@ -39,7 +40,7 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
     }
 
     /** Rendering state only; all electrical accounting and scheduling belong to the network. */
-    void showFlow(@Nullable EnergyNetwork.Flow flow) {
+    void showFlow(EnergyNetwork.@Nullable Flow flow) {
         long amount = flow == null ? 0 : flow.amount;
         int in = flow == null ? 0 : flow.in, out = flow == null ? 0 : flow.out;
         int dist = flow == null ? 0 : flow.dist;
@@ -160,9 +161,9 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
     }
 
     @Override
-    public net.neoforged.neoforge.client.model.data.ModelData getModelData() {
-        return coverState == null ? net.neoforged.neoforge.client.model.data.ModelData.EMPTY
-                : net.neoforged.neoforge.client.model.data.ModelData.builder().with(ConduitCover.MODEL_STATE, coverState).build();
+    public net.neoforged.neoforge.model.data.ModelData getModelData() {
+        return coverState == null ? net.neoforged.neoforge.model.data.ModelData.EMPTY
+                : net.neoforged.neoforge.model.data.ModelData.builder().with(ConduitCover.MODEL_STATE, coverState).build();
     }
 
 
@@ -257,7 +258,7 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
     }
 
     @Nullable
-    public IEnergyStorage energyFor(@Nullable Direction side) {
+    public LongEnergyHandler energyFor(@Nullable Direction side) {
         if (level == null || level.isClientSide()) {
             return null;
         }
@@ -265,7 +266,7 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
     }
 
     /** 導線の口。受け取った電力を、入ってきた口以外の受け手へ流す。 */
-    private final class Port implements LongEnergyStorage {
+    private final class Port implements LongEnergyHandler {
         @Nullable
         private final Direction side;
 
@@ -274,13 +275,21 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
         }
 
         @Override
-        public long receiveLong(long amount, boolean simulate) {
+        public long insertLong(long amount, TransactionContext transaction) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
             if (level == null || isRemoved() || !level.isLoaded(worldPosition)
                     || level.getBlockEntity(worldPosition) != CableBlockEntity.this) return 0;
             BlockPos source = side == null ? null : worldPosition.relative(side);
-            return network().distribute(worldPosition, source, amount, simulate);
+            return network().distribute(worldPosition, source, amount, transaction);
         }
-
+        @Override public long extractLong(long amount, TransactionContext transaction) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
+            return 0;
+        }
+        @Override public long getAmountAsLong() { return 0; }
+        @Override public long getCapacityAsLong() {
+            return getBlockState().getBlock() instanceof CableBlock cable ? cable.capacity() : 0;
+        }
         @Override
         public int receiveEnergy(int amount, boolean simulate) {
             return (int) receiveLong(amount, simulate);

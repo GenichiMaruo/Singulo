@@ -5,12 +5,8 @@
     "RKR"
   ],
   "key": {
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    }
+    "R": "#c:dusts/redstone",
+    "K": "singulo:ceramic_substrate"
   },
   "result": {
     "id": "singulo:blank_data_card",

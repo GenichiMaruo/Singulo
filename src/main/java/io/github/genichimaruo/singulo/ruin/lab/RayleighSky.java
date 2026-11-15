@@ -68,13 +68,13 @@ public final class RayleighSky {
         Field field = FIELDS.get(level);
         if (field == null) return;
         // The light worker must never wait for a rebuild which could depend on that worker.
-        if (field.affectedChunks.containsKey(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4))) field.invalidations.incrementAndGet();
+        if (field.affectedChunks.containsKey(ChunkPos.pack(pos.getX() >> 4, pos.getZ() >> 4))) field.invalidations.incrementAndGet();
     }
 
     private static void index(Field field, BlockPos panel, int delta) {
         for (int x = (panel.getX() - 15) >> 4; x <= (panel.getX() + 15) >> 4; x++)
             for (int z = (panel.getZ() - 15) >> 4; z <= (panel.getZ() + 15) >> 4; z++) {
-                long key = ChunkPos.asLong(x, z);
+                long key = ChunkPos.pack(x, z);
                 int count = field.affectedChunks.getOrDefault(key, 0) + delta;
                 if (count == 0) field.affectedChunks.remove(key); else field.affectedChunks.put(key, count);
             }
@@ -83,7 +83,7 @@ public final class RayleighSky {
     /** Chunk borders can open/close diffusion paths even when the source chunk stays loaded. */
     public static void chunkChanged(Level level, ChunkPos pos) {
         Field field = FIELDS.get(level);
-        if (field != null && field.affectedChunks.containsKey(pos.toLong())) field.invalidations.incrementAndGet();
+        if (field != null && field.affectedChunks.containsKey(pos.pack())) field.invalidations.incrementAndGet();
     }
 
     public static int light(Level level, BlockPos pos) {
@@ -130,10 +130,10 @@ public final class RayleighSky {
                 BlockState panelState = chunk.getBlockState(pos);
                 if (!(panelState.getBlock() instanceof RayleighPanelBlock) || !panelState.getValue(RayleighPanelBlock.LIT)) continue;
                 BlockState previous = null;
-                for (int y = pos.getY() - 1; y >= level.getMinBuildHeight(); y--) {
+                for (int y = pos.getY() - 1; y >= level.getMinY(); y--) {
                     pos.setY(y);
                     BlockState state = chunk.getBlockState(pos);
-                    if (state.getLightBlock(level, pos) != 0 || occludes(level, pos.above(), previous, pos, state, Direction.DOWN)) break;
+                    if (state.getLightDampening() != 0 || occludes(level, pos.above(), previous, pos, state, Direction.DOWN)) break;
                     if (light.put(pos.asLong(), (byte) 15) != 15) queue.enqueue(pos.asLong());
                     previous = state;
                 }
@@ -155,7 +155,7 @@ public final class RayleighSky {
                     LevelChunk neighborChunk = loadedChunk(level, chunks, next);
                     if (neighborChunk == null) continue;
                     BlockState neighbor = neighborChunk.getBlockState(next);
-                    int candidate = strength - Math.max(1, neighbor.getLightBlock(level, next));
+                    int candidate = strength - Math.max(1, neighbor.getLightDampening());
                     if (candidate > light.get(key) && !occludes(level, pos, state, next, neighbor, direction)) {
                         light.put(key, (byte) candidate);
                         queue.enqueue(key);
@@ -178,7 +178,7 @@ public final class RayleighSky {
     }
 
     private static LevelChunk loadedChunk(Level level, Long2ObjectMap<LevelChunk> chunks, BlockPos pos) {
-        long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
+        long key = ChunkPos.pack(pos.getX() >> 4, pos.getZ() >> 4);
         if (!chunks.containsKey(key)) {
             // hasChunkAt only tests tickets on the server; getBlockState can still wait for FULL.
             // getChunkNow never waits for generation/light work, including during reconnect.
@@ -189,8 +189,8 @@ public final class RayleighSky {
 
     private static boolean occludes(Level level, BlockPos from, BlockState source, BlockPos to, BlockState target, Direction direction) {
         // The panel emits through its underside, regardless of its own solid model.
-        return Shapes.faceShapeOccludes(source == null ? Shapes.empty() : LightEngine.getOcclusionShape(level, from, source, direction),
-                LightEngine.getOcclusionShape(level, to, target, direction.getOpposite()));
+        return Shapes.faceShapeOccludes(source == null ? Shapes.empty() : LightEngine.getOcclusionShape(source, direction),
+                LightEngine.getOcclusionShape(target, direction.getOpposite()));
     }
 
     private static final class Field {

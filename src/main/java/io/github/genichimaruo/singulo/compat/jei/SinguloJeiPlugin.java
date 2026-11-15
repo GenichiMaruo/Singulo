@@ -122,8 +122,8 @@ public class SinguloJeiPlugin implements IModPlugin {
         List<MachineRecipe> spindle = new ArrayList<>();
         // 装置と同じく、サーバー設定（プリセット・殻の材料・育成時間など）を当てはめたレシピを見せる
         for (RecipeHolder<MachineRecipe> h : io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(
-                Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()))) {
-            RECIPE_IDS.put(h.value(), h.id());
+                io.github.genichimaruo.singulo.client.ClientRecipes.recipes().byType(SinguloRecipes.MACHINE.get()))) {
+            RECIPE_IDS.put(h.value(), h.id().identifier());
             for (MachineType t : MachineType.values()) {
                 if (t.id().equals(h.value().station())) {
                     byType.computeIfAbsent(t, k -> new ArrayList<>()).add(h.value());
@@ -141,10 +141,11 @@ public class SinguloJeiPlugin implements IModPlugin {
         // 専用の処理で作る物・クリエイティブ専用など）
         var registries = Minecraft.getInstance().level.registryAccess();
         java.util.Set<Item> made = new java.util.HashSet<>();
-        for (RecipeHolder<?> h : Minecraft.getInstance().level.getRecipeManager().getRecipes()) {
-            ItemStack result = h.value().getResultItem(registries);
-            if (!result.isEmpty()) {
-                made.add(result.getItem());
+        for (RecipeHolder<?> h : io.github.genichimaruo.singulo.client.ClientRecipes.recipes().values()) {
+            for (var display : h.value().display()) {
+                for (ItemStack result : display.result().resolveForStacks(registration.getContextMap())) {
+                    if (!result.isEmpty()) made.add(result.getItem());
+                }
             }
         }
         for (Item item : BuiltInRegistries.ITEM) {
@@ -174,7 +175,7 @@ public class SinguloJeiPlugin implements IModPlugin {
                 new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get()),
                 new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.CHEMICAL_SAMPLE.get())));
         for (String id : io.github.genichimaruo.singulo.registry.SinguloItems.HIDDEN) {
-            hidden.add(new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(id))));
+            hidden.add(new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id(id))));
         }
         runtime.getIngredientManager().removeIngredientsAtRuntime(mezz.jei.api.constants.VanillaTypes.ITEM_STACK, hidden);
     }

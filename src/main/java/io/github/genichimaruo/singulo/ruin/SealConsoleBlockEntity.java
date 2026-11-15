@@ -91,12 +91,12 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
             tell(player, "gui.singulo.console.open");
             return null;
         }
-        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (w == null) {
             return null;
         }
         BlockPos spawn = worldPosition.above();
-        w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.snapTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition);
         w.startEmerging();
         level.addFreshEntity(w);
@@ -108,7 +108,7 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
 
     /** 覚醒の記録核（覚醒した守護機を呼び出す）。 */
     public static net.minecraft.world.item.Item awakeningCore() {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("awakening_record_core"));
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("awakening_record_core"));
     }
 
     /**
@@ -129,12 +129,12 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
         // 通常戦と同じく、中身の再生期限が過ぎていればここで入れ直して封鎖を確定させる（勝てばその封鎖が解ける）。
         // これをしないと、勝ったあとに保管庫を開こうとした時点で入れ直しが起きて、また封鎖されてしまう
         vault.refillIfDue(level, level.getGameTime());
-        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (w == null) {
             return null;
         }
         BlockPos spawn = worldPosition.above();
-        w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.snapTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition, true);
         w.startEmerging();
         level.addFreshEntity(w);
@@ -148,7 +148,7 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
 
     /** 終焉の記録（4つの断章から作る。最後の記録者を呼び出す）。 */
     public static net.minecraft.world.item.Item terminusRecord() {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("terminus_record"));
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("terminus_record"));
     }
 
     @Nullable
@@ -174,12 +174,12 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
             tell(player, "gui.singulo.console.no_vault");
             return null;
         }
-        LastArchivist a = SinguloEntities.LAST_ARCHIVIST.get().create(level);
+        LastArchivist a = SinguloEntities.LAST_ARCHIVIST.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (a == null) {
             return null;
         }
         net.minecraft.world.phys.Vec3 at = LastArchivist.spawnAt(worldPosition);
-        a.moveTo(at.x, at.y, at.z, 180, 0);
+        a.snapTo(at.x, at.y, at.z, 180, 0);
         a.awaken(worldPosition);
         a.startEmerging();
         level.addFreshEntity(a);

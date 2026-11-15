@@ -6,15 +6,9 @@
     "PBP"
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "H": {
-      "item": "minecraft:hopper"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "P": "#c:plates/steel",
+    "H": "minecraft:hopper",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:android_supply_port",

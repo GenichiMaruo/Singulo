@@ -118,7 +118,7 @@ public final class RelocationWrenchItem extends SinguloItem {
             tag.putInt("radius", -1);
             anchor.prepareForRelocation();
         }
-        BlockItem.setBlockEntityData(packed, be.getType(), tag);
+        packed.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(be.getType(), tag));
         packed.set(DataComponents.MAX_STACK_SIZE, 1);
         // setRemoved disconnects multiblock ports. Removing the BE before the block prevents
         // AbstractMachineBlock.onRemove from also dropping the serialized inventory.

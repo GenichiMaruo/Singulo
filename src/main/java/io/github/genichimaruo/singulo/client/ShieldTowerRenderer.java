@@ -99,7 +99,7 @@ public class ShieldTowerRenderer extends SnapshotBlockRenderer<ShieldTowerBlockE
         int rgb = core ? 0xEAF4FF : 0x9ED8FF;
         float charge = deploy < 0 ? 1 : Mth.clamp(deploy / ShieldTowerBlockEntity.DEPLOY_BEAM, 0, 1);
         float rush = deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_DOME ? 1 + 2 * charge : 1;
-        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(0.5, 0, 0.5);
         FxDraw.beam(pose.last(), vc, new net.minecraft.world.phys.Vec3(0, 1, 0), new net.minecraft.world.phys.Vec3(0, CROWN_HEIGHT, 0),
@@ -122,7 +122,7 @@ public class ShieldTowerRenderer extends SnapshotBlockRenderer<ShieldTowerBlockE
     private static void renderCrown(ShieldTowerBlockEntity be, PoseStack pose, VertexConsumer vc, float time, boolean active,
                                     boolean core, float deploy) {
         int rgb = core ? 0xEAF4FF : 0x9ED8FF;
-        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         float charge = deploy < 0 ? (active ? 1 : 0) : Mth.clamp(deploy / ShieldTowerBlockEntity.DEPLOY_BEAM, 0, 1);
         float spinUp = deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_DOME ? 1 + 4 * charge : 1;
         float crystalY = CROWN_HEIGHT + 1.4F + Mth.sin(time * 0.05F) * 0.12F;
@@ -152,8 +152,8 @@ public class ShieldTowerRenderer extends SnapshotBlockRenderer<ShieldTowerBlockE
         }
         pose.popPose();
         // 充電のあいだ、まわりから光の粒が結晶へ集まる
-        if (deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_BEAM && be.getLevel() != null && be.getLevel().random.nextInt(2) == 0) {
-            var rnd = be.getLevel().random;
+        if (deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_BEAM && be.getLevel() != null && be.getLevel().getRandom().nextInt(2) == 0) {
+            var rnd = be.getLevel().getRandom();
             net.minecraft.core.BlockPos ax = be.axis();
             double cx = ax.getX() + 0.5, cy = ax.getY() + crystalY, cz = ax.getZ() + 0.5;
             net.minecraft.world.phys.Vec3 d = new net.minecraft.world.phys.Vec3(rnd.nextGaussian(), rnd.nextGaussian() * 0.5, rnd.nextGaussian())

@@ -7,15 +7,9 @@
     "PCP"
   ],
   "key": {
-    "P": {
-      "item": "singulo:nihonium_plate"
-    },
-    "C": {
-      "item": "singulo:superconducting_coil"
-    },
-    "G": {
-      "item": "singulo:zero_gravity_block"
-    }
+    "P": "singulo:nihonium_plate",
+    "C": "singulo:superconducting_coil",
+    "G": "singulo:zero_gravity_block"
   },
   "result": {
     "id": "singulo:suspension_crown",

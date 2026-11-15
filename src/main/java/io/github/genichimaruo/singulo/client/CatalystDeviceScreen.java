@@ -150,13 +150,13 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
             Panel.slot(g, skin, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y);
         } else {
             ghostSlot(g, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, menu.getSlot(0),
-                    new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("muon_catalyst"))));
+                    new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("muon_catalyst"))));
         }
         drawLoadedCatalyst(g, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, loaded,
                 value(CatalystDeviceBlockEntity.D_LOADED_FILL), empty);
         // 失活触媒の出口（取り出すだけ）
         ghostSlot(g, leftPos + CatalystDeviceMenu.SPENT_X, topPos + CatalystDeviceMenu.SLOT_Y, menu.getSlot(menu.spentIndex()),
-                new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("spent_muon_catalyst"))));
+                new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("spent_muon_catalyst"))));
         if (menu.kind().extraSlot() != null) {
             Panel.slot(g, skin, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y);
             if (!menu.getSlot(1).hasItem()) {

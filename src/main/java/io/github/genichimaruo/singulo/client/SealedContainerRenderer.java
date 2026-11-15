@@ -204,7 +204,7 @@ public class SealedContainerRenderer extends SnapshotBlockRenderer<SealedContain
         if (items.isEmpty() || be.getLevel() == null) {
             return;
         }
-        var renderer = Minecraft.getInstance().getItemRenderer();
+        var renderer = ItemDraw.get();
         int n = items.size();
         for (int i = 0; i < n; i++) {
             pose.pushPose();

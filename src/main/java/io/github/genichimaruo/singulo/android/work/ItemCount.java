@@ -100,7 +100,7 @@ public final class ItemCount {
 
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag t = new CompoundTag();
-        t.put("item", item.save(registries));
+        t.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(item, registries));
         t.putLong("count", count);
         if (alt != null) {
             t.putString("alt", key(alt));

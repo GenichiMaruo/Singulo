@@ -87,7 +87,7 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
         int key = event.key(), scan = event.scancode(), modifiers = event.modifiers();
         // 入力中は E などで画面が閉じないように
         if (interval != null && interval.isFocused() && key != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
-            return interval.keyPressed(key, scan, modifiers) || interval.canConsumeInput();
+            return interval.keyPressed(event) || interval.canConsumeInput();
         }
         return super.keyPressed(event);
     }

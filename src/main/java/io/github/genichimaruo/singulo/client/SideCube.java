@@ -84,8 +84,7 @@ final class SideCube {
     }
 
     /** マウスの下のいちばん手前の面。なければ null。 */
-    @Nullable
-    SideConfig.Face pick(List<Quad> quads, double mx, double my) {
+    SideConfig.@Nullable Face pick(List<Quad> quads, double mx, double my) {
         SideConfig.Face hit = null;
         for (Quad q : quads) {
             if (q.contains(mx, my)) {
@@ -97,7 +96,7 @@ final class SideCube {
 
     /** 面を色で塗り、縁と、面の頭文字・自動排出の印を描く。 */
     void draw(GuiGraphicsExtractor g, Font font, List<Quad> quads, ToIntFunction<SideConfig.Face> color, java.util.function.Predicate<SideConfig.Face> eject,
-              java.util.function.Function<SideConfig.Face, String> label, @Nullable SideConfig.Face hovered) {
+              java.util.function.Function<SideConfig.Face, String> label, SideConfig.@Nullable Face hovered) {
 
 
         for (Quad q : quads) {

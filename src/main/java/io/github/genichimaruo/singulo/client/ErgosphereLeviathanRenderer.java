@@ -9,7 +9,7 @@ import java.util.Iterator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -37,7 +37,7 @@ import static io.github.genichimaruo.singulo.client.FxDraw.orient;
  *   <li>倒されたとき: 継ぎ目の光が消え、体が尾から崩れて渦へ沈み、最後に渦がつぶれて閃光と衝撃波の輪</li>
  * </ul>
  */
-public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviathan> {
+public class ErgosphereLeviathanRenderer extends SnapshotEntityRenderer<ErgosphereLeviathan> {
     static final int SEAM = 0x8A5CFF;
     static final int SEAM_HOT = 0x6FE3FF;
     static final int CORE = 0xFFD27A;
@@ -46,13 +46,13 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
     static final int GOLD = 0xFFC860;
     static final int AWAKE = 0xFF3C78;
 
+    @Override public boolean shouldRender(ErgosphereLeviathan entity,net.minecraft.client.renderer.culling.Frustum frustum,double x,double y,double z){return true;}
     public ErgosphereLeviathanRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public Identifier getTextureLocation(ErgosphereLeviathan entity) {
+     public Identifier getTextureLocation(ErgosphereLeviathan entity) {
         return FxDraw.WHITE;
     }
 
@@ -68,7 +68,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         boolean hasHome = !e.homePos().equals(net.minecraft.core.BlockPos.ZERO);
         int state = e.state();
         int form = e.form();
-        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        BlockDraw blocks = BlockDraw.get();
         BlockState plate = ErgosphereLeviathan.plate();
         if (hasHome) {
             renderVortex(e, emerge, emergeT, death, state, t, partialTick, core, origin, camera, pose, buffers);
@@ -79,7 +79,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         boolean underground = emerge < 1 && emergeT < ErgosphereLeviathan.SWALLOW
                 || state == ErgosphereLeviathan.ASCEND && e.stateTicks() > ErgosphereLeviathan.ASCEND_TICKS - ErgosphereLeviathan.ASCEND_BURST;
         if (underground) {
-            super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
             return;
         }
         int n = ErgosphereLeviathan.SEGMENTS;
@@ -147,7 +147,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         if (e.isAlive()) {
             renderMoves(e, state, form, centers, origin, t, partialTick, camera, pose, buffers);
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     /** 倒されたとき、i 番目の節が崩れた割合（尾から順に。頭は i = -1 で最後）。 */
@@ -163,7 +163,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
      * 鱗の板を1枚描く: 体の軸（Z）のまわりに roll 度回し、lift だけ外へ、z だけ前へ出し、pitch 度起こして、
      * sx × sy × sz の大きさのブロックとして描く。
      */
-    static void plate(PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState state, int light, float roll,
+    static void plate(PoseStack pose, MultiBufferSource buffers, BlockDraw blocks, BlockState state, int light, float roll,
                       float lift, float z, float pitch, float sx, float sy, float sz) {
         pose.pushPose();
         pose.mulPose(Axis.ZP.rotationDegrees(roll));
@@ -178,7 +178,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
     // ------------------------------------------------------------------ 姿1: 装甲
 
     private static void armorSegment(int i, int n, Vec3 local, Vec3 fwd, float r, float peel, int seam, float seamAlpha, float t,
-                                     Quaternionf camera, PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks,
+                                     Quaternionf camera, PoseStack pose, MultiBufferSource buffers, BlockDraw blocks,
                                      BlockState plate, int light) {
         Quaternionf q = orient(fwd);
         float roll = Mth.sin(t * 0.12F - i * 0.5F) * 8;
@@ -357,7 +357,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             {-68, 0.6F, 1.3F, 0.3F, 1.8F, -10}};
 
     /** 鱗を楔のように重ねた頭（上・左右・下顎）。peel は剥がれた割合（外へ飛び、小さくなる）。 */
-    static void headPlates(PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState state, int light,
+    static void headPlates(PoseStack pose, MultiBufferSource buffers, BlockDraw blocks, BlockState state, int light,
                            float jawLift, float jawPitch, float peel) {
         float s = 1 - peel;
         for (float[] p : HEAD_PLATES) {
@@ -368,7 +368,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
 
     private static void renderHead(ErgosphereLeviathan e, int form, Vec3 local, Vec3 fwd, float peel, boolean windup, float alpha,
                                    float emergeT, float emerge, float t, float partialTick, Vec3 origin, Quaternionf camera, PoseStack pose,
-                                   MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState plate, int light) {
+                                   MultiBufferSource buffers, BlockDraw blocks, BlockState plate, int light) {
         Quaternionf q = orient(fwd);
         float mouthOpen = mouthOpen(e, emerge, emergeT, partialTick);
         float s = 1 - peel;
@@ -700,7 +700,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
      * 黒い体と鱗を先にまとめて描き、光はあとでまとめて描く（描き方を何度も切り替えない）。
      */
     private static void renderHatchling(ErgosphereLeviathan e, float emergeT, float t, Vec3 core, Vec3 origin, Quaternionf camera,
-                                        PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState plate, int light) {
+                                        PoseStack pose, MultiBufferSource buffers, BlockDraw blocks, BlockState plate, int light) {
         float swallow = Mth.clamp((emergeT - ErgosphereLeviathan.SWALLOW) / 5F, 0, 1);
         float scale = Mth.clamp((emergeT - ErgosphereLeviathan.EMERGE_VORTEX) / 8F, 0, 1) * (1 - swallow);
         if (scale <= 0.01F) {

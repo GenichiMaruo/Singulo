@@ -23,7 +23,7 @@ public class AndroidStationBlock extends SimpleMachineBlock<AndroidStationBlockE
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, net.minecraft.core.Direction direction) {
         return level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station ? station.signal() : 0;
     }
 

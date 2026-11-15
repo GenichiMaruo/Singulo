@@ -7,15 +7,9 @@
     " R "
   ],
   "key": {
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "R": "#c:dusts/redstone",
+    "C": "#c:ingots/copper",
+    "W": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:basic_circuit",

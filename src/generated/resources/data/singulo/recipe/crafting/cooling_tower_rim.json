@@ -5,12 +5,8 @@
     "PWP"
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "P": "#c:plates/steel",
+    "W": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:cooling_tower_rim",

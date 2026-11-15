@@ -7,7 +7,7 @@ import io.github.genichimaruo.singulo.ruin.GravityRemnant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -27,7 +27,7 @@ import org.joml.Quaternionf;
  *       縦に回る泣く黒曜石の環（6つ）と、核から突き出す4本の光の棘が加わる</li>
  * </ul>
  */
-public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
+public class GravityRemnantRenderer extends SnapshotEntityRenderer<GravityRemnant> {
     static final int RIM = 0x9A6CFF;
     static final int HOT = 0xE0C8FF;
 
@@ -36,8 +36,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public Identifier getTextureLocation(GravityRemnant entity) {
+     public Identifier getTextureLocation(GravityRemnant entity) {
         return FxDraw.WHITE;
     }
 
@@ -112,7 +111,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         float gather = e.gatherTicks() > 0 ? (e.gatherTicks() - partialTick) / GravityRemnant.GATHER_TICKS : 0;
         float arrive = emerge < 1 ? Mth.clamp((emerge - 0.75F) / 0.25F, 0, 1) : 1;
         int pieces = death > 0 ? Math.max(shell, e.deathShell()) : e.gatherTicks() > 0 ? GravityRemnant.SHELL_PIECES : shell;
-        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        BlockDraw blocks = BlockDraw.get();
         // 倒されたとき: 殻は回るのをやめて床へ崩れ落ち、最後は小さくなって消える
         float fallTicks = e.deathTime > 0 ? e.deathTime + partialTick : 0;
         double frozen = e.deathTime > 0 ? (e.tickCount - e.deathTime) * 0.06 : t * 0.06;
@@ -167,7 +166,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
             FxDraw.ring(pose.last(), g, 2.7F, 2.9F, AWAKE, 160, 160);
             pose.popPose();
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     static final int AWAKE = 0xFF3C50;

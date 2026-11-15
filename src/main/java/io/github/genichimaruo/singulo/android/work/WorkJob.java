@@ -61,9 +61,9 @@ public record WorkJob(Type type, int orderId, int jobId, long amount, List<ItemC
             return null;
         }
         var fetch = new java.util.ArrayList<ItemCount>();
-        WorkOrder.loadCounts(tag.getList("fetch", net.minecraft.nbt.Tag.TAG_COMPOUND), fetch, registries);
+        WorkOrder.loadCounts(tag.getListOrEmpty("fetch"), fetch, registries);
         var batch = new java.util.ArrayList<Batch>();
-        for (var element : tag.getList("batch", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+        for (var element : tag.getListOrEmpty("batch")) {
             var t = (net.minecraft.nbt.CompoundTag) element;
             var recipe = RecipeData.load(t.getCompoundOrEmpty("recipe"), registries);
             if (recipe == null || t.getIntOr("step", 0) < 0 || t.getLongOr("crafts", 0L) <= 0) {

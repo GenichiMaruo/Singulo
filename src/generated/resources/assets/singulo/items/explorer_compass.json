@@ -1,0 +1,132 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "singulo:dynamic",
+    "kind": "explorer_compass",
+    "entries": [
+      {
+        "threshold": 0.0,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_00"
+        }
+      },
+      {
+        "threshold": 0.03125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_01"
+        }
+      },
+      {
+        "threshold": 0.09375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_02"
+        }
+      },
+      {
+        "threshold": 0.15625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_03"
+        }
+      },
+      {
+        "threshold": 0.21875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_04"
+        }
+      },
+      {
+        "threshold": 0.28125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_05"
+        }
+      },
+      {
+        "threshold": 0.34375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_06"
+        }
+      },
+      {
+        "threshold": 0.40625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_07"
+        }
+      },
+      {
+        "threshold": 0.46875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_08"
+        }
+      },
+      {
+        "threshold": 0.53125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_09"
+        }
+      },
+      {
+        "threshold": 0.59375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_10"
+        }
+      },
+      {
+        "threshold": 0.65625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_11"
+        }
+      },
+      {
+        "threshold": 0.71875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_12"
+        }
+      },
+      {
+        "threshold": 0.78125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_13"
+        }
+      },
+      {
+        "threshold": 0.84375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_14"
+        }
+      },
+      {
+        "threshold": 0.90625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_15"
+        }
+      },
+      {
+        "threshold": 0.96875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/explorer_compass_00"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "singulo:item/explorer_compass"
+    }
+  }
+}

@@ -51,7 +51,7 @@ public class ImpactGeneratorBlock extends GravityReceiverBlock {
 
     /** 落ちてきた: 落下ダメージを与えず（標準の処理を呼ばない）、高さに応じて発電する。 */
     @Override
-    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
         if (level instanceof ServerLevel server && entity instanceof LivingEntity
                 && level.getBlockEntity(pos) instanceof ImpactGeneratorBlockEntity be && be.absorb(fallDistance) > 0) {
             server.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 1.02, pos.getZ() + 0.5,

@@ -6,15 +6,9 @@
     " B "
   ],
   "key": {
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "M": {
-      "item": "minecraft:compass"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "C": "#c:ingots/copper",
+    "M": "minecraft:compass",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:explorer_compass",

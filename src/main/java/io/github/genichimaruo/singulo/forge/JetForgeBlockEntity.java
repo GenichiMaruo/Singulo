@@ -41,7 +41,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -118,7 +118,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     // ------------------------------------------------------------------ 状態
 
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == SLOT_CORE) {
@@ -140,7 +140,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             }
         }
     };
-    private final FluidTank tank = new FluidTank(TANK_CAPACITY, s -> isCoolant(s)) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(TANK_CAPACITY, s -> isCoolant(s)) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -298,7 +298,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
         return items;
     }
 
-    public FluidTank tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
@@ -353,11 +353,11 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
         return back == null ? null : JetForgeLayout.core(worldPosition, back);
     }
 
-    public LongEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
-    public IFluidHandler coolant() {
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess coolant() {
         return coolantHandler;
     }
 
@@ -374,7 +374,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     /** 点火に使う種（Pリアクターと同じく、特異点の種かシンギュラリティ・コア）。 */
     public static boolean isCore(ItemStack stack) {
-        return stack.is(BuiltInRegistries.ITEM.get(Singulo.id("singularity_seed"))) || stack.is(BuiltInRegistries.ITEM.get(Singulo.id("singularity_core")));
+        return stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("singularity_seed"))) || stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("singularity_core")));
     }
 
     private List<RecipeHolder<MachineRecipe>> recipes() {
@@ -382,7 +382,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             return List.of();
         }
         List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> h : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+        for (RecipeHolder<MachineRecipe> h : (level instanceof net.minecraft.server.level.ServerLevel server ? server.recipeAccess().recipeMap() : io.github.genichimaruo.singulo.recipe.SyncedRecipes.recipes()).byType(SinguloRecipes.MACHINE.get())) {
             if (STATION.equals(h.value().station())) {
                 out.add(h);
             }
@@ -826,7 +826,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             batchSize = batch;
             energyPerTick = Math.multiplyExact(r.energy(), batch);
             irradiateTicks = Math.max(1, r.time());
-            recipeId = h.id();
+            recipeId = h.id().identifier();
             phase = PRIME;
             phaseTicks = 0;
             hold = OK;
@@ -1005,7 +1005,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             e.push(push.x * 0.6, 0.25, push.z * 0.6);
             e.hurtMarked = true;
             // 通り道で浴びると大けが（防具を無視）。照射中のビームは致命的
-            e.hurt(io.github.genichimaruo.singulo.registry.SinguloDamageTypes.jetBeam(level), phase == IRRADIATE ? BEAM_DAMAGE : JET_DAMAGE);
+            e.hurtOrSimulate(io.github.genichimaruo.singulo.registry.SinguloDamageTypes.jetBeam(level), phase == IRRADIATE ? BEAM_DAMAGE : JET_DAMAGE);
             e.igniteForSeconds(8);
         }
     }
@@ -1238,7 +1238,9 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
     };
 
     /** 冷媒の口（入れるだけ）。 */
-    private final IFluidHandler coolantHandler = new IFluidHandler() {
+    private final io.github.genichimaruo.singulo.compat.TankFluidAccess coolantHandler = new io.github.genichimaruo.singulo.compat.TankFluidAccess() {
+        public TransactionalFluidTank tankAt(int index) { return tank; }
+        public boolean allowsExtract(int index) { return false; }
         @Override
         public int getTanks() {
             return 1;
@@ -1276,71 +1278,30 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
     };
 
     /** 電力の口。形ができてコアが入っている間だけ、1 tick に jetForgeMaxInput まで受け取る（蓄えはその4倍まで）。 */
-    private final class Energy implements LongEnergyStorage {
-        long capacity() {
-            long max = maxInput();
-            return max > Long.MAX_VALUE / 4 ? Long.MAX_VALUE : max * 4;
-        }
-
-        private boolean accepting() {
-            return formed && bh != BH_NONE;
-        }
-
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            if (!accepting() || amount <= 0 || level == null) {
-                return 0;
-            }
-            long now = level.getGameTime();
-            if (now != receivedTick) {
-                receivedTick = now;
-                receivedThisTick = 0;
-            }
-            boolean igniting = bh == BH_IGNITING;
-            long room = Math.min(maxInput() - receivedThisTick,
-                    igniting ? (ignitionCharged ? 0 : ignitionEnergy() - ignitionStored) : capacity() - buffer);
-            long accepted = Math.max(0, Math.min(amount, room));
-            if (!simulate && accepted > 0 && igniting) {
-                ignitionStored += accepted;
-                receivedThisTick += accepted;
-                setChanged();
-            } else if (!simulate && accepted > 0) {
-                buffer += accepted;
-                receivedThisTick += accepted;
-                setChanged();
-            }
+    private final class Energy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        long capacity() { long max=maxInput(); return max>Long.MAX_VALUE/4?Long.MAX_VALUE:max*4; }
+        private boolean accepting() { return formed && bh != BH_NONE; }
+        @Override protected long[] createSnapshot() { return new long[]{buffer,ignitionStored,receivedThisTick,receivedTick}; }
+        @Override protected void revertToSnapshot(long[] s) { buffer=s[0];ignitionStored=s[1];receivedThisTick=s[2];receivedTick=s[3]; }
+        @Override protected void onRootCommit(long[] s) { setChanged(); }
+        @Override public long insertLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            if(!accepting() || amount==0 || level==null)return 0;
+            updateSnapshots(tx);
+            long now=level.getGameTime();if(now!=receivedTick){receivedTick=now;receivedThisTick=0;}
+            boolean igniting=bh==BH_IGNITING;
+            long room=Math.min(maxInput()-receivedThisTick,igniting?(ignitionCharged?0:ignitionEnergy()-ignitionStored):capacity()-buffer);
+            long accepted=Math.max(0,Math.min(amount,room));
+            if(accepted>0){if(igniting)ignitionStored+=accepted;else buffer+=accepted;receivedThisTick+=accepted;}
             return accepted;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
+        @Override public long extractLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");return 0;
         }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return 0;
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, buffer);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, capacity());
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return accepting();
-        }
+        @Override public long getAmountAsLong(){return buffer;}
+        @Override public long getCapacityAsLong(){return capacity();}
+        @Override public boolean canExtract(){return false;}
+        @Override public boolean canReceive(){return accepting();}
     }
 
     // ------------------------------------------------------------------ 壊す・読み込み解除
@@ -1425,7 +1386,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.putLong("buffer", buffer);
         tag.putLong("consumed", consumedTotal);
         tag.putLong("ignition_stored", ignitionStored);
@@ -1435,7 +1396,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
         ListTag list = new ListTag();
         for (ItemStack s : charged) {
             if (!s.isEmpty()) {
-                list.add(s.save(registries));
+                list.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));
             }
         }
         tag.put("charged", list);
@@ -1458,10 +1419,10 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
         tag.putBoolean("ignition_charged", ignitionCharged);
         tag.putInt("back", back == null ? -1 : back.get3DDataValue());
         if (!working.isEmpty()) {
-            tag.put("working", working.save(registries));
+            tag.put("working", io.github.genichimaruo.singulo.compat.NbtCompat.save(working, registries));
         }
         if (!result.isEmpty()) {
-            tag.put("result", result.save(registries));
+            tag.put("result", io.github.genichimaruo.singulo.compat.NbtCompat.save(result, registries));
         }
     }
 
@@ -1474,7 +1435,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             for (int i = 0; i < SLOTS; i++) {
                 items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
             }
-            tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
             buffer = tag.getLongOr("buffer", 0L);
             consumedTotal = tag.getLongOr("consumed", 0L);
             charged.clear();
@@ -1562,6 +1523,8 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
     }
 
     static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> slot < SLOT_OUT, (slot,r) -> slot >= SLOT_OUT); }
 }

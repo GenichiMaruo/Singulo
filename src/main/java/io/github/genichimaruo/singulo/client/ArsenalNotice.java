@@ -51,7 +51,7 @@ final class ArsenalNotice {
         }
         ClientConfig.ARSENAL_NOTICE.set(false);
         ClientConfig.ARSENAL_NOTICE.save();
-        mc.player.displayClientMessage(message(), false);
+        mc.gui.getChat().addClientSystemMessage(message());
     }
 
     static boolean shouldShow() {
@@ -61,8 +61,8 @@ final class ArsenalNotice {
     static Component message() {
         Component link = Component.translatable("message.singulo.arsenal_notice.link").withStyle(style -> style
                 .withColor(ChatFormatting.AQUA).withUnderlined(true)
-                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, URL))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(URL))));
+                .withClickEvent(new ClickEvent.OpenUrl(java.net.URI.create(URL)))
+                .withHoverEvent(new HoverEvent.ShowText(Component.literal(URL))));
         return Component.translatable("message.singulo.arsenal_notice", link).withStyle(ChatFormatting.GOLD);
     }
 }

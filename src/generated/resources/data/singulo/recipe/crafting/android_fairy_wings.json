@@ -6,12 +6,8 @@
     " G "
   ],
   "key": {
-    "P": {
-      "item": "minecraft:phantom_membrane"
-    },
-    "G": {
-      "tag": "c:dusts/glowstone"
-    }
+    "P": "minecraft:phantom_membrane",
+    "G": "#c:dusts/glowstone"
   },
   "result": {
     "id": "singulo:android_fairy_wings",

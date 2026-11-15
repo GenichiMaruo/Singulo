@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 
 /** ブラックホール爆弾が開いた小さなブラックホール: 黒い地平線・降着円盤・景色の歪み。 */
-public class MicroBlackHoleRenderer extends EntityRenderer<MicroBlackHole> {
+public class MicroBlackHoleRenderer extends SnapshotEntityRenderer<MicroBlackHole> {
     public MicroBlackHoleRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
@@ -28,8 +28,7 @@ public class MicroBlackHoleRenderer extends EntityRenderer<MicroBlackHole> {
         return true;
     }
 
-    @Override
-    public Identifier getTextureLocation(MicroBlackHole hole) {
+     public Identifier getTextureLocation(MicroBlackHole hole) {
         return FxDraw.WHITE;
     }
 }

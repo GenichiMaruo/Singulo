@@ -22,4 +22,18 @@ public abstract class LegacyBlockEntity extends BlockEntity {
     }
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {}
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {}
+
+    @Override public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        if (level != null && state.getBlock() instanceof RemovalAwareBlock aware) {
+            aware.beforeEntityRemoval(state, level, pos, level.getBlockState(pos), false);
+        } else {
+            super.preRemoveSideEffects(pos, state);
+        }
+    }
+    @Override public void setRemoved() {
+        if (level != null && level.isClientSide() && getBlockState().getBlock() instanceof RemovalAwareBlock aware) {
+            aware.beforeEntityRemoval(getBlockState(), level, worldPosition, level.getBlockState(worldPosition), false);
+        }
+        super.setRemoved();
+    }
 }

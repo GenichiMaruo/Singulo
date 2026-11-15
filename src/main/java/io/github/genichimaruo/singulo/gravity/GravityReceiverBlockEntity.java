@@ -92,47 +92,27 @@ public class GravityReceiverBlockEntity extends io.github.genichimaruo.singulo.c
     protected long stored;
     private long nextScan;
 
-    private final LongEnergyStorage energy = new LongEnergyStorage() {
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            long room = buffered() ? capacity() - stored : groupDemand - groupInbox();     // ためない受電器は、足りない分だけ
+    private final io.github.genichimaruo.singulo.energy.LongEnergyHandler energy = new ReceiverEnergy();
+    private final class ReceiverEnergy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<Long>
+            implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        protected Long createSnapshot() { return stored; }
+        protected void revertToSnapshot(Long previous) { stored = previous; }
+        protected void onRootCommit(Long previous) { if (stored != previous) setChanged(); }
+        public long insertLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
+            long room = buffered() ? capacity() - stored : groupDemand - groupInbox();
             long take = Math.max(0, Math.min(amount, room));
-            if (!simulate && take > 0) {
-                stored += take;
-                setChanged();
-            }
+            if (take > 0) { updateSnapshots(tx); stored += take; }
             return take;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
+        public long extractLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
             return 0;
         }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, stored);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, capacity());
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return true;
-        }
+        public long getAmountAsLong() { return stored; }
+        public long getCapacityAsLong() { return capacity(); }
+        public boolean canExtract() { return false; }
+        public boolean canReceive() { return true; }
     };
 
     public GravityReceiverBlockEntity(BlockPos pos, BlockState state) {
@@ -143,7 +123,7 @@ public class GravityReceiverBlockEntity extends io.github.genichimaruo.singulo.c
         super(type, pos, state);
     }
 
-    public LongEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 

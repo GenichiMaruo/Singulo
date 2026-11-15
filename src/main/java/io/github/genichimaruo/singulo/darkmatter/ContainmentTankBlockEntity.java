@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 
 /**
  * 重力閉じ込めタンク（段階5）。内部に重力場を張ってダークマターを閉じ込める、ダークマターを保管できる唯一の容器。
@@ -28,7 +28,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     public static final int FE_PER_TICK = 500;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(CAPACITY, ContainmentTankBlockEntity::isDarkMatter) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(CAPACITY, ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -49,7 +49,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
         return new FluidStack(SinguloFluids.get("dark_matter"), amount);
     }
 
-    public FluidTank tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
@@ -72,7 +72,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
         }
         be.contained = be.amount() == 0 || be.energy.consume(FE_PER_TICK * INTERVAL);
         if (!be.contained) {
-            be.tank.drain(Math.max(1, be.amount() / 100), FluidTank.FluidAction.EXECUTE);
+            be.tank.drain(Math.max(1, be.amount() / 100), TransactionalFluidTank.FluidAction.EXECUTE);
         }
         boolean lit = be.amount() > 0 && be.contained;
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != lit) {
@@ -110,21 +110,21 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     }
 
     @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("tank");
+    public void removeComponentsFromTag(net.minecraft.world.level.storage.ValueOutput tag) {
+        tag.discard("tank");
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
         energy.setEnergy(tag.getIntOr("energy", 0));
     }
 }

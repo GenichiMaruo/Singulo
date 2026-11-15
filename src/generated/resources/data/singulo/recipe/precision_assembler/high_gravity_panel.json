@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:black_reinforced_panel"
-      },
+      "ingredient": "singulo:black_reinforced_panel",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:obsidians"
-      },
+      "ingredient": "#c:obsidians",
       "count": 2
     }
   ],

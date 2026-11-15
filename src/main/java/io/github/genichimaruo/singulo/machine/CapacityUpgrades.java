@@ -16,7 +16,7 @@ public final class CapacityUpgrades {
         Item[] cached = items;
         if (cached == null) {
             cached = new Item[4];
-            for (int tier = 1; tier <= 3; tier++) cached[tier] = BuiltInRegistries.ITEM.get(Singulo.id("capacity_upgrade_" + tier));
+            for (int tier = 1; tier <= 3; tier++) cached[tier] = BuiltInRegistries.ITEM.getValue(Singulo.id("capacity_upgrade_" + tier));
             items = cached;
         }
         return cached;

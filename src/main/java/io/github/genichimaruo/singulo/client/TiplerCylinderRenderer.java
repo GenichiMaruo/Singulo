@@ -89,7 +89,7 @@ public class TiplerCylinderRenderer extends SnapshotBlockRenderer<TiplerCylinder
     private static void timeMotes(TiplerCylinderBlockEntity be, PoseStack pose, MultiBufferSource buffers, float partialTick, float spin) {
         float time = be.getLevel().getGameTime() + partialTick;
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         for (int i = 0; i < 18; i++) {
             float f = (time * 0.015F * (1 + spin) + i / 18F) % 1F;
             float ang = time * 0.12F * (1 + spin) + i * 2.4F;

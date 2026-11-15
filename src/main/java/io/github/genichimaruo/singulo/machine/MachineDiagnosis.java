@@ -97,7 +97,7 @@ public final class MachineDiagnosis {
                 ? best.fluidResults().get(0).getHoverName() : best.result().getHoverName()));
         Kind kind = Kind.MISSING;
         for (MachineRecipe.ItemInput in : best.ingredients()) {
-            ItemStack[] options = in.ingredient().getItems();
+            ItemStack[] options = in.ingredient().items().map(holder -> new ItemStack(holder)).toArray(ItemStack[]::new);
             Component name = options.length > 0 ? options[0].getHoverName() : Component.literal("?");
             if (in.uses() > 0) {
                 if (inputs.stream().noneMatch(s -> in.usesFrom(s) > 0)) {

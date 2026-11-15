@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:golden_leggings"
-      },
+      "ingredient": "minecraft:golden_leggings",
       "count": 1
     }
   ],

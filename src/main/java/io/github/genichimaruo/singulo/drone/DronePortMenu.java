@@ -271,8 +271,7 @@ public class DronePortMenu extends AbstractContainerMenu {
     }
 
     /** 一覧の index の次元（この次元なら null）。 */
-    @org.jspecify.annotations.Nullable
-    public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimKey(int index) {
+    public net.minecraft.resources.@org.jspecify.annotations.Nullable ResourceKey<net.minecraft.world.level.Level> dimKey(int index) {
         String d = index >= 0 && index < dims.size() ? dims.get(index) : "";
         var loc = d.isEmpty() ? null : net.minecraft.resources.Identifier.tryParse(d);
         return loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
@@ -280,11 +279,11 @@ public class DronePortMenu extends AbstractContainerMenu {
 
     /** 行き先（位置と次元）の一覧の番号（なければ -1）。 */
     public int indexOf(@org.jspecify.annotations.Nullable BlockPos to,
-                       @org.jspecify.annotations.Nullable net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim) {
+                       net.minecraft.resources.@org.jspecify.annotations.Nullable ResourceKey<net.minecraft.world.level.Level> dim) {
         if (to == null) {
             return -1;
         }
-        String d = dim == null ? "" : dim.location().toString();
+        String d = dim == null ? "" : dim.identifier().toString();
         for (int i = 0; i < targets.size(); i++) {
             if (targets.get(i).equals(to) && dims.get(i).equals(d)) {
                 return i;

@@ -176,7 +176,7 @@ final class DroneRoute {
                     level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + LEAF_GAP)
                     : known;
         }
-        double ceiling = level.getMaxBuildHeight() - 2;
+        double ceiling = (level.getMaxY() + 1) - 2;
         List<Vec3> out = new ArrayList<>();
         for (int i = 0; i <= n; i = i == n ? n + 1 : Math.min(n, i + 4)) {
             double y = 0;
@@ -199,7 +199,7 @@ final class DroneRoute {
 
     /** ドローンがいられるマスか（読み込まれていて、ぶつかる形がなく、溶岩でない）。 */
     static boolean free(ServerLevel level, BlockPos p) {
-        if (!level.isLoaded(p) || p.getY() < level.getMinBuildHeight() || p.getY() >= level.getMaxBuildHeight() - 1) {
+        if (!level.isLoaded(p) || p.getY() < level.getMinY() || p.getY() >= (level.getMaxY() + 1) - 1) {
             return false;
         }
         BlockState s = level.getBlockState(p);

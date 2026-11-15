@@ -102,8 +102,8 @@ public class ZeroGravityControllerBlockEntity extends io.github.genichimaruo.sin
         super.collectImplicitComponents(components);
         CompoundTag tag = new CompoundTag();
         tag.putInt("height", height);
-        net.minecraft.world.level.block.entity.BlockEntity.addEntityType(tag, getType());
-        components.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.CustomData.of(tag));
+
+        components.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(getType(), tag));
     }
 
     /** 接している無重力ブロックの集まりにつながった受電器へ、調べ直しを頼む（集まりをたどる。大きくても1回だけ）。 */

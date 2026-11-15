@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
@@ -26,8 +26,8 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 地下アンドロイド研究所: 部屋の並び・部品・型紙・電力・耐圧殻。 */
 @GameTestHolder(Singulo.MODID)
@@ -179,7 +179,7 @@ public final class LabGameTests {
                 "ボス部屋に研究所の保管庫が1つない");
         helper.assertTrue(count(boss, SinguloBlocks.GUARDIAN_CORE.get()) == 1, "ボス部屋に封印核がない");
         helper.assertTrue(boss.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
-                net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(Singulo.id("sealed_container_3"))).size() == 1, "ボス部屋に封印コンテナがない");
+                net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(Singulo.id("sealed_container_3"))).size() == 1, "ボス部屋に封印コンテナがない");
         helper.assertTrue(count(boss, SinguloBlocks.FACTORY_LINE.get()) == 4, "ボス部屋の製造ラインが4つでない");
         helper.assertTrue(count(boss, SinguloBlocks.PRESSURE_HULL.get()) > 1000, "ボス部屋の壁が耐圧殻でない");
         StructureTemplate reactor = template(helper, LabLayout.REACTOR).orElseThrow();
@@ -202,7 +202,7 @@ public final class LabGameTests {
         helper.setBlock(door, SinguloBlocks.BULKHEAD.get());
         BlockPos outside = new BlockPos(6, 1, 6);
         helper.setBlock(outside, SinguloBlocks.FACILITY_LIGHT.get());
-        ReactorConsoleBlockEntity be = helper.getBlockEntity(console);
+        ReactorConsoleBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,console);
         be.setFacility(BoundingBox.fromCorners(helper.absolutePos(new BlockPos(0, 0, 0)), helper.absolutePos(new BlockPos(5, 4, 5))));
         helper.assertTrue(helper.getLevel().getLightEmission(helper.absolutePos(alarm)) > 0, "電力がないのに非常灯が消えている");
         helper.assertTrue(helper.getLevel().getLightEmission(helper.absolutePos(lamp)) == 0, "電力がないのに施設灯が光っている");
@@ -373,7 +373,7 @@ public final class LabGameTests {
     // ------------------------------------------------------------------ 自販機・コーヒーメーカー
 
     private static net.minecraft.world.item.Item item(String id) {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     /**
@@ -449,7 +449,7 @@ public final class LabGameTests {
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);           // クリエイティブでは飲んでも減らない（瓶も残らない）
         new net.minecraft.world.item.ItemStack(item("energy_drink")).finishUsingItem(level, player);
-        var haste = player.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED);
+        var haste = player.getEffect(net.minecraft.world.effect.MobEffects.HASTE);
         helper.assertTrue(haste != null && haste.getAmplifier() == 1, "エナジードリンクで採掘速度上昇 II がつかない");
         new net.minecraft.world.item.ItemStack(item("canned_soda")).finishUsingItem(level, player);
         helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED), "ソーダで移動速度上昇がつかない");

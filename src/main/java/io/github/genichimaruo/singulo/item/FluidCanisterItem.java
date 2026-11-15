@@ -34,6 +34,27 @@ public class FluidCanisterItem extends SinguloItem {
         return new FluidHandlerItemStack(SinguloComponents.CANISTER_FLUID, stack, CAPACITY);
     }
 
+    /** Native item-access exchange provides rollback of the entire container and its components. */
+    public static net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> resourceHandler(net.neoforged.neoforge.transfer.access.ItemAccess access) {
+        return new net.neoforged.neoforge.transfer.ItemAccessResourceHandler<>(access, 1) {
+            protected net.neoforged.neoforge.transfer.fluid.FluidResource getResourceFrom(net.neoforged.neoforge.transfer.item.ItemResource item, int index) {
+                return net.neoforged.neoforge.transfer.fluid.FluidResource.of(item.getOrDefault(SinguloComponents.CANISTER_FLUID.get(), SimpleFluidContent.EMPTY).copy());
+            }
+            protected int getAmountFrom(net.neoforged.neoforge.transfer.item.ItemResource item, int index) {
+                return item.getOrDefault(SinguloComponents.CANISTER_FLUID.get(), SimpleFluidContent.EMPTY).copy().getAmount();
+            }
+            protected net.neoforged.neoforge.transfer.item.ItemResource update(net.neoforged.neoforge.transfer.item.ItemResource item, int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount) {
+                return item.with(SinguloComponents.CANISTER_FLUID.get(), SimpleFluidContent.copyOf(fluid.toStack(amount)));
+            }
+            protected int getCapacity(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid) { java.util.Objects.checkIndex(index, 1); return CAPACITY; }
+            @Override public int insert(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+                return itemAccess.getAmount() == 1 ? super.insert(index, fluid, amount, tx) : 0;
+            }
+            @Override public int extract(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+                return itemAccess.getAmount() == 1 ? super.extract(index, fluid, amount, tx) : 0;
+            }
+        };
+    }
     /** 中身（空なら空）。 */
     public static FluidStack fluid(ItemStack stack) {
         return stack.getOrDefault(SinguloComponents.CANISTER_FLUID.get(), SimpleFluidContent.EMPTY).copy();

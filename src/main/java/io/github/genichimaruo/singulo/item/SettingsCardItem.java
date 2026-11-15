@@ -70,7 +70,7 @@ public class SettingsCardItem extends SinguloItem {
             return InteractionResult.FAIL;
         }
         if (be instanceof MachineBlockEntity m) {
-            m.pasteSides(tag.getIntOr("item_sides", 0), tag.getIntArray("tank_sides"));
+            m.pasteSides(tag.getIntOr("item_sides", 0), tag.getIntArray("tank_sides").orElseGet(() -> new int[0]));
             if (m.type().id().equals(tag.getStringOr("machine_type", ""))) {
                 m.pasteSelectedRecipe(tag.contains("selected_recipe")
                         ? net.minecraft.resources.Identifier.tryParse(tag.getStringOr("selected_recipe", "")) : null);

@@ -111,7 +111,7 @@ public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.com
         if (slot < INKS) {
             return stack.is(DYE_TAGS[slot]);
         }
-        return slot == TARGET && stack.is(ItemTags.DYEABLE);
+        return slot == TARGET && isDyeable(stack);
     }
 
     /** 色 rgb に染めるのに使うインク（赤・緑・青・白・黒の目盛り）。 */
@@ -129,7 +129,7 @@ public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.com
     /** 今の色で染められるか（染める物があって、インクが足りる）。 */
     public boolean canApply() {
         ItemStack target = items.getItem(TARGET);
-        if (target.isEmpty() || !target.is(ItemTags.DYEABLE)) {
+        if (target.isEmpty() || !isDyeable(target)) {
             return false;
         }
         int[] need = cost(color);
@@ -151,7 +151,7 @@ public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.com
             ink[i] -= need[i];
         }
         ItemStack target = items.getItem(TARGET).copy();
-        target.set(DataComponents.DYED_COLOR, new DyedItemColor(color, true));
+        target.set(DataComponents.DYED_COLOR, new DyedItemColor(color));
         items.setItem(TARGET, target);
         if (level != null) {
             level.playSound(null, worldPosition, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1, 1);
@@ -192,7 +192,7 @@ public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.com
         for (int i = 0; i < INKS; i++) {
             int dyes = ink[i] / PER_DYE;
             if (dyes > 0) {
-                Block.popResource(level, worldPosition, new ItemStack(net.minecraft.world.item.DyeItem.byColor(DYES[i]), dyes));
+                Block.popResource(level, worldPosition, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(DYES[i].getName() + "_dye")), dyes));
             }
         }
     }
@@ -208,7 +208,7 @@ public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.com
         for (int i = 0; i < SLOTS; i++) {
             list.set(i, items.getItem(i));
         }
-        tag.put("items", ContainerHelper.saveAllItems(new CompoundTag(), list, registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(new CompoundTag(), list, registries));
         tag.putIntArray("ink", ink);
         tag.putInt("color", color);
     }
@@ -217,16 +217,21 @@ public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.com
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         NonNullList<ItemStack> list = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag.getCompoundOrEmpty("items"), list, registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag.getCompoundOrEmpty("items"), list, registries);
         for (int i = 0; i < SLOTS; i++) {
             items.setItem(i, list.get(i));
         }
-        int[] saved = tag.getIntArray("ink");
+        int[] saved = tag.getIntArray("ink").orElseGet(() -> new int[0]);
         for (int i = 0; i < INKS; i++) {
             ink[i] = i < saved.length ? Math.max(0, Math.min(MAX_INK, saved[i])) : 0;
         }
         if (tag.contains("color")) {
             color = tag.getIntOr("color", 0) & 0xFFFFFF;
         }
+    }
+    private static boolean isDyeable(ItemStack stack) {
+        // Current vanilla dye-removal targets plus the legacy extension tag used by addon packs.
+        return stack.is(ItemTags.CAULDRON_CAN_REMOVE_DYE) || stack.is(net.minecraft.tags.TagKey.create(
+                net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.withDefaultNamespace("dyeable")));
     }
 }

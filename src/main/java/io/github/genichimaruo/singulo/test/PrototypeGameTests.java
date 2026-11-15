@@ -9,14 +9,14 @@ import io.github.genichimaruo.singulo.ruin.PrototypeMemories;
 import java.util.HashSet;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 地下アンドロイド研究所の試作機（斧型「アルマ」・ビット型「ノクス」）と、その設計メモリ。 */
 @GameTestHolder("singulo_prototype")
@@ -68,7 +68,7 @@ public final class PrototypeGameTests {
     /** 斧型の叩きつけ: 体の前へまっすぐ走る衝撃波が、線の上の相手にだけ当たる。 */
     @GameTest(template = HUGE, batch = BATCH + "_1", timeoutTicks = 40)
     public static void axeShockwaveRunsStraight(GameTestHelper helper) {
-        AxeAndroid axe = SinguloEntities.AXE_ANDROID.get().create(helper.getLevel());
+        AxeAndroid axe = SinguloEntities.AXE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         axe.setNoAi(true);
         axe.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
         helper.getLevel().addFreshEntity(axe);
@@ -93,7 +93,7 @@ public final class PrototypeGameTests {
     /** ビット型のビット: 見通しがあれば光線で撃ち、壁があれば撃たない。 */
     @GameTest(template = HUGE, batch = BATCH + "_2", timeoutTicks = 40)
     public static void bitBeamNeedsLineOfSight(GameTestHelper helper) {
-        BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel());
+        BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bit.setNoAi(true);
         bit.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))));
         helper.getLevel().addFreshEntity(bit);
@@ -121,7 +121,7 @@ public final class PrototypeGameTests {
         });
     }
     private static BitAndroid bit(GameTestHelper helper) {
-        BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel());
+        BitAndroid bit = SinguloEntities.BIT_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bit.setNoAi(true);
         bit.setNoGravity(true);
         bit.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 3))));

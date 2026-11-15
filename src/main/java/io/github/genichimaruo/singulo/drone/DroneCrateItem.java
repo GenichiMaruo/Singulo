@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
  * 梱包箱（3段階）。空の箱は重なり、梱包すると中身（9枠）を持つ1個だけの箱になる。段階が上がるほどバッテリーが大きく、遠くへ送れる。
  * 発送の電力は梱包のときにポートが払い、その便で使い切る（箱には電力をためない）。梱包済みの箱は右クリックで開梱できる。
  */
-public class DroneCrateItem extends Item {
+public class DroneCrateItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public static final int SLOTS = 9;
     /** 発送の電力 = BASE_FE + 直線距離 × FE_PER_BLOCK。 */
     public static final int BASE_FE = 2_000, FE_PER_BLOCK = 50;

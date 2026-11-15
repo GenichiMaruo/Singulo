@@ -7,24 +7,12 @@
     "IWI"
   ],
   "key": {
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    },
-    "T": {
-      "item": "singulo:thermocouple_module"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "C": "#c:ingots/copper",
+    "B": "singulo:basic_circuit",
+    "T": "singulo:thermocouple_module",
+    "F": "singulo:basic_frame",
+    "I": "#c:ingots/iron",
+    "W": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:thermoelectric_generator",

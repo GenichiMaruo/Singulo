@@ -558,7 +558,7 @@ final class Panel {
                     .positionTooltip(screenWidth, screenHeight, x, y, width, height);
             return new org.joml.Vector2i(Math.max(4, Math.min(preferred.x(), screenWidth - width - 4)),
                     Math.max(4, Math.min(preferred.y(), screenHeight - height - 4)));
-        }, mouseX, mouseY);
+        }, mouseX, mouseY, false);
     }
 
 }

@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 abstract class SnapshotBlockRenderer<T extends BlockEntity> implements BlockEntityRenderer<T, SnapshotBlockRenderer.State> {
     static final class State extends BlockEntityRenderState {
         List<Batch> geometry = List.of();
+        List<ModelSubmissions.Draw> models = List.of();
     }
     record Vertex(float x, float y, float z, int color, float u, float v,
                           int overlay, int light, float nx, float ny, float nz, float width) {}
@@ -32,15 +33,19 @@ abstract class SnapshotBlockRenderer<T extends BlockEntity> implements BlockEnti
             ModelFeatureRenderer.@Nullable CrumblingOverlay breaking) {
         BlockEntityRenderer.super.extractRenderState(entity, state, partialTick, camera, breaking);
         Capture capture = new Capture();
-        render(entity, partialTick, new PoseStack(), capture, state.lightCoords, OverlayTexture.NO_OVERLAY);
+        GlowDepth.beginExtract();
+        try { state.models = ModelSubmissions.capture(() -> render(entity, partialTick, new PoseStack(), capture, state.lightCoords, OverlayTexture.NO_OVERLAY)); }
+        finally { GlowDepth.endExtract(); }
         state.geometry = capture.finish();
     }
     protected abstract void render(T entity, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay);
     @Override public final void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
         submitGeometry(state.geometry, pose, collector);
+        ModelSubmissions.submit(state.models, pose, collector);
     }
     static void submitGeometry(List<Batch> geometry, PoseStack pose, SubmitNodeCollector collector) {
         for (Batch batch : geometry) {
+            if (GlowDepth.submitDeferred(batch,pose)) continue;
             collector.submitCustomGeometry(pose, batch.type(), (transform, output) -> {
                 for (Vertex v : batch.vertices()) {
                     output.addVertex(transform, v.x(), v.y(), v.z()).setColor(v.color()).setUv(v.u(), v.v())

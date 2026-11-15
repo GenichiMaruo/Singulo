@@ -25,7 +25,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 public abstract class EnvironmentCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     static final int CHECK_INTERVAL = 20;
 
-    private final ItemStackHandler output = new ItemStackHandler(1) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler output = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -78,7 +78,7 @@ public abstract class EnvironmentCollectorBlockEntity extends io.github.genichim
         be.rate = be.rateAt(level, pos);
         be.progress += be.rate * CHECK_INTERVAL / be.ticksAtMax();
         while (be.progress >= 1) {
-            ItemStack made = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(be.product())));
+            ItemStack made = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(be.product())));
             if (!be.output.insertItem(0, made, false).isEmpty()) {
                 be.progress = 1;
                 break;
@@ -121,5 +121,10 @@ public abstract class EnvironmentCollectorBlockEntity extends io.github.genichim
         super.loadAdditional(tag, registries);
         io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
         progress = tag.getDoubleOr("progress", 0.0D);
+    }
+
+    /** Native platform automation, sharing owned storage and commit-only notifications. */
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(output, (slot, resource) -> false, (slot, resource) -> true);
     }
 }

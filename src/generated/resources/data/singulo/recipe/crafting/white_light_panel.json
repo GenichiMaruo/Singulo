@@ -7,12 +7,8 @@
     "LLL"
   ],
   "key": {
-    "L": {
-      "item": "singulo:white_panel"
-    },
-    "Y": {
-      "tag": "c:dusts/glowstone"
-    }
+    "L": "singulo:white_panel",
+    "Y": "#c:dusts/glowstone"
   },
   "result": {
     "id": "singulo:white_light_panel",

@@ -6,9 +6,7 @@
   "energy": 1000000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:leathers"
-      },
+      "ingredient": "#c:leathers",
       "count": 1
     }
   ],

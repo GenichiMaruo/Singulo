@@ -61,8 +61,7 @@ public final class ShapeSpec {
     private final int cz;
     private final Layout layout;
     /** 外装板として使うブロック（初めて判定するときに設計図から集める。登録が済む前には作れないため）。 */
-    @Nullable
-    private java.util.Set<Block> panelBlocks;
+    private java.util.@Nullable Set<Block> panelBlocks;
     /** 外装板の位置にコラプサー内張りを置けるか（加工が速くなる設備だけ。{@link CollapsarLining}）。 */
     private boolean lining;
 

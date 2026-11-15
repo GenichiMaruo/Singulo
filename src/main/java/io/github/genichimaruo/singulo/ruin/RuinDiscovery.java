@@ -31,7 +31,7 @@ public final class RuinDiscovery {
 
     public static final Supplier<AttachmentType<List<Discovered>>> DISCOVERED = REGISTER.register("discovered_ruins",
             () -> AttachmentType.<List<Discovered>>builder(() -> new ArrayList<>())
-                    .serialize(Discovered.CODEC.listOf().xmap(ArrayList::new, l -> l)).copyOnDeath().build());
+                    .serialize(Discovered.CODEC.listOf().fieldOf("entries")).copyOnDeath().build());
 
     /**
      * 遺構のティア（その回収物が使われる触媒の段階）。段階Nの探査機は「N − probeAutomationOffset」以下の遺構に飛べる

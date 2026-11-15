@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
  * 質量値（data/&lt;ns&gt;/mass_values/*.json）。丸石1個を1とする。
  * アイテム単位の指定がタグより優先し、タグ同士は後に読んだものが優先する。
  */
-public final class MassValues extends SimpleJsonResourceReloadListener {
+public final class MassValues extends SimpleJsonResourceReloadListener<JsonElement> {
     public static final MassValues INSTANCE = new MassValues();
 
     private record TagEntry(TagKey<Item> tag, double mass) {}
@@ -32,7 +32,7 @@ public final class MassValues extends SimpleJsonResourceReloadListener {
     private List<TagEntry> tags = List.of();
 
     private MassValues() {
-        super(new Gson(), "mass_values");
+        super(net.minecraft.util.ExtraCodecs.JSON, net.minecraft.resources.FileToIdConverter.json("mass_values"));
     }
 
     @Override

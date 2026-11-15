@@ -14,7 +14,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -87,17 +87,17 @@ public class MultiblockInfoCategory implements IRecipeCategory<MultiblockInfoCat
             int x = 1 + (i % 9) * 18;
             int y = 12 + (i / 9) * 18;
             // コントローラーは「作る対象」、ほかは部品として材料扱い（どちらを調べてもこのページが出る）
-            builder.addSlot(i == 0 ? RecipeIngredientRole.CATALYST : RecipeIngredientRole.INPUT, x, y)
+            builder.addSlot(i == 0 ? RecipeIngredientRole.CRAFTING_STATION : RecipeIngredientRole.INPUT, x, y)
                     .setBackground(slot, -1, -1).addIngredient(VanillaTypes.ITEM_STACK, part);
             i++;
         }
     }
 
     @Override
-    public void draw(Info info, IRecipeSlotsView view, GuiGraphics g, double mouseX, double mouseY) {
+    public void draw(Info info, IRecipeSlotsView view, GuiGraphicsExtractor g, double mouseX, double mouseY) {
         var font = Minecraft.getInstance().font;
         Component name = Component.translatable(Blueprints.controllerBlock(info.kind()).getDescriptionId());
-        g.drawString(font, name, 1, 1, 0xFF2A8FB8, false);
+        g.text(font, name, 1, 1, 0xFF2A8FB8, false);
         int y = 12 + PART_ROWS * 18 + 3;
         String key = "jei.singulo.mb." + info.kind().id();
         if (!I18n.exists(key)) {
@@ -109,7 +109,7 @@ public class MultiblockInfoCategory implements IRecipeCategory<MultiblockInfoCat
                 if (y > H - 9) {
                     return;
                 }
-                g.drawString(font, seq, 1, y, head ? 0xFFB06A10 : 0xFF3C4650, false);
+                g.text(font, seq, 1, y, head ? 0xFFB06A10 : 0xFF3C4650, false);
                 y += 9;
             }
         }

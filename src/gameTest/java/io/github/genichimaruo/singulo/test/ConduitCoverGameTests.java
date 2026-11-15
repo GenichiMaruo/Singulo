@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
@@ -74,7 +74,7 @@ public final class ConduitCoverGameTests {
         var collision = framed.getCollisionShape(level, pos);
         h.assertTrue(collision.bounds().equals(new AABB(0, 0, 0, 1, 1, 1)) && !framed.isCollisionShapeFullBlock(level, pos)
                 && !collision.isEmpty(), "Empty frame collision was not a hollow full-size box: " + collision.bounds());
-        h.assertTrue(!framed.isSolidRender(level, pos) && framed.getLightBlock(level, pos) == 0 && framed.propagatesSkylightDown(level, pos)
+        h.assertTrue(!framed.isSolidRender() && framed.getLightBlock() == 0 && framed.propagatesSkylightDown()
                 && !framed.isSuffocating(level, pos), "Empty frame did not let light through like glass");
 
         ItemStack glass = new ItemStack(Items.GLASS, 3);
@@ -104,7 +104,7 @@ public final class ConduitCoverGameTests {
         var be = level.getBlockEntity(pos);
         var tag = be.saveWithFullMetadata(level.registryAccess());
         holder.setCoverState(null);
-        be.loadWithComponents(tag, level.registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,tag, level.registryAccess());
         h.assertTrue(holder.coverState() != null && holder.coverState().getValue(RotatedPillarBlock.AXIS) == Direction.Axis.X,
                 "Reload lost the log or its axis");
 

@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/bismuth"
-      },
+      "ingredient": "#c:ingots/bismuth",
       "count": 1
     }
   ],

@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** 事象の地平線倉庫のブロック。正面（個数を出す台の向き）は置いた人のほう。使い方は {@link HorizonVaultBlockEntity}。 */
-public class HorizonVaultBlock extends BaseEntityBlock {
+public class HorizonVaultBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.BlockTooltip {
     public static final EnumProperty<net.minecraft.core.Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** 下に倉庫があるか（積んだ倉庫は下の金の板をなくして、下の倉庫とつながった形になる）。 */
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty DOWN = BlockStateProperties.DOWN;
@@ -58,8 +58,7 @@ public class HorizonVaultBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
-                                     BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighbor, net.minecraft.util.RandomSource random) {
         return dir == Direction.DOWN ? state.setValue(DOWN, neighbor.is(this)) : state;
     }
 
@@ -102,14 +101,13 @@ public class HorizonVaultBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, net.minecraft.core.Direction direction) {
         return level.getBlockEntity(pos) instanceof HorizonVaultBlockEntity vault ? vault.comparator() : 0;
     }
 
     /** 中身入りのアイテム: しまっている物と個数。 */
     @Override
     public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> lines, TooltipFlag flag) {
-        super.appendHoverText(stack, context, lines, flag);
         var held = stack.get(SinguloComponents.VAULT_ITEM.get());
         ItemStack type = held == null ? null : held.copyOne();
         Long count = stack.get(SinguloComponents.VAULT_COUNT.get());

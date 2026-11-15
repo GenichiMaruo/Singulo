@@ -7,12 +7,8 @@
     "IBI"
   ],
   "key": {
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "B": {
-      "item": "minecraft:iron_bars"
-    }
+    "I": "#c:ingots/iron",
+    "B": "minecraft:iron_bars"
   },
   "result": {
     "id": "singulo:cover_frame",

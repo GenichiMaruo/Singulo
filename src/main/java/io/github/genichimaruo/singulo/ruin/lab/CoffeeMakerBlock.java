@@ -68,7 +68,7 @@ public class CoffeeMakerBlock extends LabDecorBlock {
         if (stack.is(Items.GLASS_BOTTLE) && state.getValue(CUPS) > 0) {
             if (!level.isClientSide()) {
                 stack.consume(1, player);
-                ItemStack coffee = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("coffee")));
+                ItemStack coffee = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("coffee")));
                 if (!player.getInventory().add(coffee)) {
                     player.drop(coffee, false);
                 }

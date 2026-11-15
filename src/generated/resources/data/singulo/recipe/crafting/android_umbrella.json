@@ -7,12 +7,8 @@
     " R "
   ],
   "key": {
-    "W": {
-      "tag": "minecraft:wool"
-    },
-    "R": {
-      "tag": "c:rods/wooden"
-    }
+    "W": "#minecraft:wool",
+    "R": "#c:rods/wooden"
   },
   "result": {
     "id": "singulo:android_umbrella",

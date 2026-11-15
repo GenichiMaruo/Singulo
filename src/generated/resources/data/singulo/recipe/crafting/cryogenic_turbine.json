@@ -7,18 +7,10 @@
     "PHP"
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "H": {
-      "item": "singulo:heat_exchange_core"
-    },
-    "O": {
-      "item": "singulo:superconducting_coil"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    }
+    "P": "#c:plates/steel",
+    "H": "singulo:heat_exchange_core",
+    "O": "singulo:superconducting_coil",
+    "F": "singulo:basic_frame"
   },
   "result": {
     "id": "singulo:cryogenic_turbine",

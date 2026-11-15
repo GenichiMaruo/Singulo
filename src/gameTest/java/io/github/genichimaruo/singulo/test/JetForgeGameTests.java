@@ -11,7 +11,7 @@ import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -26,8 +26,8 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /**
@@ -50,12 +50,12 @@ public final class JetForgeGameTests {
     private JetForgeGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static JetForgeBlockEntity build(GameTestHelper helper) {
         TestBuild.build(helper, Blueprints.Kind.JET_FORGE, CONTROLLER, BACK, SIZE);
-        return helper.getBlockEntity(CONTROLLER);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CONTROLLER);
     }
 
     /** 形の (x, y, z) のワールドの位置。 */
@@ -99,14 +99,14 @@ public final class JetForgeGameTests {
             var saved=be.saveWithFullMetadata(helper.getLevel().registryAccess());
             var copy=(JetForgeBlockEntity)BlockEntity.loadStatic(be.getBlockPos(),be.getBlockState(),saved,helper.getLevel().registryAccess());
             helper.assertTrue(copy.parallelUpgrade()&&copy.batchSize()==4&&copy.result().getCount()==4&&copy.charged().stream().mapToInt(ItemStack::getCount).sum()==68,"Reserved batch lost on reload");
-            helper.assertTrue(saved.getInt("energy_per_tick")==1_000_000_000,"Parallel power not scaled");
+            helper.assertTrue(saved.getInt("energy_per_tick").orElseThrow()==1_000_000_000,"Parallel power not scaled");
         });
     }
 
     @GameTest(template = FORGE, timeoutTicks = 500)
     public static void jetForgeParallelRespectsOutputSpaceAndCoolant(GameTestHelper helper) {
         JetForgeBlockEntity be=build(helper);load(be,4);
-        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);be.loadWithComponents(tag,helper.getLevel().registryAccess());
+        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,tag,helper.getLevel().registryAccess());
         be.items().setStackInSlot(JetForgeBlockEntity.SLOT_OUT,new ItemStack(item("collapsar_ingot"),62));power(helper,be,new boolean[]{true});
         helper.succeedWhen(()->{
             helper.assertTrue(be.phase()!=JetForgeBlockEntity.IDLE,"Run has not started");
@@ -118,7 +118,7 @@ public final class JetForgeGameTests {
     @GameTest(template=FORGE,timeoutTicks=2200)
     public static void jetForgeParallelCompletesExactlyFourProducts(GameTestHelper helper){
         var be=build(helper);load(be,4);
-        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);be.loadWithComponents(tag,helper.getLevel().registryAccess());
+        var tag=be.saveWithoutMetadata(helper.getLevel().registryAccess());tag.putBoolean("parallel_upgrade",true);io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,tag,helper.getLevel().registryAccess());
         power(helper,be,new boolean[]{true});
         helper.runAtTickTime(RUN+100,()->{
             helper.assertTrue(be.items().getStackInSlot(JetForgeBlockEntity.SLOT_OUT).getCount()==4&&be.result().isEmpty()&&be.charged().isEmpty(),"Parallel completion duplicated/lost output");
@@ -407,7 +407,7 @@ public final class JetForgeGameTests {
             helper.assertTrue(helper.getLevel().getBlockState(center).is(SinguloBlocks.ROGUE_BLACK_HOLE.get()), "組み直しで消えた");
         });
         helper.runAtTickTime(60, () -> {
-            JetForgeBlockEntity again = helper.getBlockEntity(CONTROLLER);
+            JetForgeBlockEntity again = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CONTROLLER);
             helper.assertTrue(again.formed() && again.hasCore(), "組み直しても取り込まない");
             helper.assertTrue(helper.getLevel().getBlockState(center).isAir(), "取り込んだのに野良が残っている");
             helper.succeed();
@@ -419,8 +419,8 @@ public final class JetForgeGameTests {
     public static void jetForgeBlackHolePullsMobs(GameTestHelper helper) {
         JetForgeBlockEntity be = build(helper);
         BlockPos spot = at(helper, JetForgeLayout.CORE_X, JetForgeLayout.AXIS_Y, JetForgeLayout.AXIS_Z - 3);
-        var pig = net.minecraft.world.entity.EntityType.PIG.create(helper.getLevel());
-        pig.moveTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5);
+        var pig = net.minecraft.world.entity.EntityType.PIG.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        pig.snapTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5);
         helper.getLevel().addFreshEntity(pig);
         double[] start = new double[1];
         helper.runAtTickTime(3, () -> {
@@ -442,8 +442,8 @@ public final class JetForgeGameTests {
         power(helper, be, new boolean[]{true});
         BlockPos inBeam = at(helper, 30, JetForgeLayout.AXIS_Y, JetForgeLayout.AXIS_Z);
         helper.runAtTickTime(PRIME_TO_IRRADIATE + 20, () -> {
-            var golem = net.minecraft.world.entity.EntityType.IRON_GOLEM.create(helper.getLevel());
-            golem.moveTo(inBeam.getX() + 0.5, inBeam.getY() - 1.2, inBeam.getZ() + 0.5);
+            var golem = net.minecraft.world.entity.EntityType.IRON_GOLEM.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            golem.snapTo(inBeam.getX() + 0.5, inBeam.getY() - 1.2, inBeam.getZ() + 0.5);
             golem.setNoAi(true);
             golem.setNoGravity(true);
             helper.getLevel().addFreshEntity(golem);
@@ -506,9 +506,9 @@ public final class JetForgeGameTests {
         Object[] cached = new Object[3];
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(be.formed(), "コイルを外したのに形成している");
-            var energy = helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, port, Direction.DOWN);
-            var items = helper.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, port, Direction.DOWN);
-            var fluids = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, port, Direction.DOWN);
+            var energy = io.github.genichimaruo.singulo.energy.EnergyResourceView.of(helper.getLevel().getCapability(Capabilities.Energy.BLOCK, port, Direction.DOWN));
+            var items = io.github.genichimaruo.singulo.compat.ItemResourceView.find(helper.getLevel(), port, Direction.DOWN);
+            var fluids = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), port, Direction.DOWN);
             helper.assertTrue(energy != null && items != null && fluids != null, "形ができる前のポートに口がない");
             helper.assertTrue(energy.receiveEnergy(1000, false) == 0 && items.getSlots() == 0, "形ができる前に受け取った");
             cached[0] = energy;
@@ -540,13 +540,13 @@ public final class JetForgeGameTests {
         helper.getLevel().setBlockAndUpdate(chestPos, Blocks.CHEST.defaultBlockState());
         helper.runAtTickTime(10, () -> {
             helper.assertTrue(be.formed(), "ポートに替えると形成しない");
-            IItemHandler items = helper.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, port, Direction.DOWN);
+            IItemHandler items = io.github.genichimaruo.singulo.compat.ItemResourceView.find(helper.getLevel(), port, Direction.DOWN);
             helper.assertTrue(items != null, "ポートに物の口がない");
             ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(items, new ItemStack(item("mass_pellet"), 16), false);
             helper.assertTrue(rest.isEmpty() && be.items().getStackInSlot(JetForgeBlockEntity.SLOT_IN).getCount() == 16, "材料が入らない");
             ItemStack junk = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(items, new ItemStack(Items.DIRT, 4), false);
             helper.assertTrue(junk.getCount() == 4, "材料でない物が入った");
-            IFluidHandler fluids = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, port, Direction.DOWN);
+            IFluidHandler fluids = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), port, Direction.DOWN);
             helper.assertTrue(fluids != null && fluids.fill(new FluidStack(SinguloFluids.get("liquid_helium"), 2000),
                     IFluidHandler.FluidAction.EXECUTE) == 2000, "冷媒が入らない");
             helper.assertTrue(fluids.fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000),
@@ -571,15 +571,15 @@ public final class JetForgeGameTests {
             var registries = helper.getLevel().registryAccess();
             CompoundTag saved = be.saveWithoutMetadata(registries);
             saved.putInt("energy_per_tick", 1_000_000);
-            be.loadWithComponents(saved, registries);
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,saved, registries);
             be.forceBlackHole();
             be.forcePhase(JetForgeBlockEntity.IRRADIATE, 100);
         });
         helper.runAtTickTime(10, () -> {
             helper.assertTrue(be.hold() == JetForgeBlockEntity.NO_POWER, "Beam did not stop without power");
             BlockPos p = at(helper, 30, JetForgeLayout.AXIS_Y, JetForgeLayout.AXIS_Z);
-            var golem = net.minecraft.world.entity.EntityType.IRON_GOLEM.create(helper.getLevel());
-            golem.moveTo(p.getX() + 0.5, p.getY() - 1.2, p.getZ() + 0.5);
+            var golem = net.minecraft.world.entity.EntityType.IRON_GOLEM.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            golem.snapTo(p.getX() + 0.5, p.getY() - 1.2, p.getZ() + 0.5);
             golem.setNoAi(true);
             golem.setNoGravity(true);
             helper.getLevel().addFreshEntity(golem);
@@ -600,7 +600,7 @@ public final class JetForgeGameTests {
             be.forcePhase(JetForgeBlockEntity.PRIME, 1);
             JetForgeBlockEntity.serverTick(helper.getLevel(), be.getBlockPos(), be.getBlockState(), be);
             var chunk = helper.getLevel().getChunkAt(be.getBlockPos());
-            chunk.setUnsaved(false);
+            chunk.tryMarkSaved();
             int before = be.phaseTicks();
             JetForgeBlockEntity.serverTick(helper.getLevel(), be.getBlockPos(), be.getBlockState(), be);
             helper.assertTrue(be.phaseTicks() == before + 1 && chunk.isUnsaved(), "Progress did not mark the chunk dirty");
@@ -617,8 +617,8 @@ public final class JetForgeGameTests {
             be.forcePhase(JetForgeBlockEntity.COOL, JetForgeBlockEntity.COOL_TICKS);
             var registries = helper.getLevel().registryAccess();
             CompoundTag saved = be.saveWithoutMetadata(registries);
-            saved.put("result", new ItemStack(item("collapsar_ingot"), 65).save(registries));
-            be.loadWithComponents(saved, registries);
+            saved.put("result", io.github.genichimaruo.singulo.compat.NbtCompat.save(new ItemStack(item("collapsar_ingot"), 65), registries));
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,saved, registries);
         });
         helper.runAtTickTime(15, () -> {
             helper.assertTrue(be.hold() == JetForgeBlockEntity.OUTPUT_FULL && be.phase() == JetForgeBlockEntity.COOL,

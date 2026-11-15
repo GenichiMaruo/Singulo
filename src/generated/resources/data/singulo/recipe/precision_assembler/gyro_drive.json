@@ -6,39 +6,27 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:topological_wire"
-      },
+      "ingredient": "singulo:topological_wire",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:nihonium_plate"
-      },
+      "ingredient": "singulo:nihonium_plate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:meteoric_iron_ingot"
-      },
+      "ingredient": "singulo:meteoric_iron_ingot",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_catalyst"
-      },
+      "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
     }

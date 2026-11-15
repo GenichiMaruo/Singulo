@@ -63,8 +63,8 @@ public class NeutrinoScannerItem extends SinguloItem {
         super(properties.stacksTo(1), stage, false);
     }
 
-    public static IEnergyStorage energy(ItemStack stack) {
-        return new ComponentEnergyStorage(stack, SinguloComponents.ENERGY.get(), CAPACITY);
+    public static io.github.genichimaruo.singulo.energy.SinguloItemEnergy energy(ItemStack stack) {
+        return new io.github.genichimaruo.singulo.energy.SinguloItemEnergy(stack, CAPACITY);
     }
 
     /** 感度 tier で、鉱石と遺構のブロックを探す。 */
@@ -115,7 +115,7 @@ public class NeutrinoScannerItem extends SinguloItem {
             }
             sp.sendOverlayMessage(message);
             ((ServerLevel) level).playSound(null, sp.blockPosition(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 0.7F);
-            sp.getCooldowns().addCooldown(this, 40);
+            sp.getCooldowns().addCooldown(stack, 40);
         }
         return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
@@ -128,14 +128,13 @@ public class NeutrinoScannerItem extends SinguloItem {
             return InteractionResult.PASS;
         }
         Level level = context.getLevel();
-        IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, context.getClickedPos(), context.getClickedFace());
-        if (source == null || !source.canExtract()) {
+        net.neoforged.neoforge.transfer.energy.EnergyHandler source = level.getCapability(Capabilities.Energy.BLOCK, context.getClickedPos(), context.getClickedFace());
+        if (source == null) {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide()) {
-            IEnergyStorage own = energy(context.getItemInHand());
-            int got = source.extractEnergy(own.receiveEnergy(Integer.MAX_VALUE, true), false);
-            own.receiveEnergy(got, false);
+            var own = energy(context.getItemInHand());
+            int got = io.github.genichimaruo.singulo.energy.EnergyTransfers.move(source, own, Integer.MAX_VALUE);
             player.sendOverlayMessage(Component.translatable("gauntlet.singulo.charged", got));
         }
         return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());

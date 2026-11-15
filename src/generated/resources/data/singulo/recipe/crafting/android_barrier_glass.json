@@ -7,15 +7,9 @@
     "GRG"
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "R": "#c:dusts/redstone",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:android_barrier_glass",

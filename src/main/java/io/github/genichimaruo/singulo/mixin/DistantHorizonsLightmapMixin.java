@@ -20,7 +20,7 @@ public abstract class DistantHorizonsLightmapMixin {
         // Leave the original image and shader-pack-owned lightmap IDs untouched.
         try (NativeImage natural = new NativeImage(16, 16, false)) {
             for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++)
-                natural.setPixelRGBA(x, y, image.getPixelRGBA(x, y));
+                natural.setPixel(x, y, image.getPixel(x, y));
             original.call(natural);
         }
     }

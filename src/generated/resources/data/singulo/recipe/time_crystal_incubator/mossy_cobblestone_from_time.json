@@ -6,9 +6,7 @@
   "energy": 1000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:cobblestones/normal"
-      },
+      "ingredient": "#c:cobblestones/normal",
       "count": 8
     }
   ],

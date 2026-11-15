@@ -424,7 +424,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     private void drawCargo(GuiGraphicsExtractor g) {
         int x = leftPos;
         int y = topPos;
-        var crate = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(menu.fluid() ? "fluid_capsule" : "packing_crate")));
+        var crate = new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(menu.fluid() ? "fluid_capsule" : "packing_crate")));
         for (int i = 0; i < DronePortBlockEntity.SLOTS; i++) {
             var s = menu.getSlot(i);
             if (i == DronePortBlockEntity.SLOT_CRATES) {

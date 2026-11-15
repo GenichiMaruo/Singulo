@@ -49,9 +49,8 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
         return MAX_RADIUS;
     }
 
-    @Nullable
     @Override
-    protected CatalystHelper.Effect permanentEffect() {
+    protected CatalystHelper.@Nullable Effect permanentEffect() {
         return embedded ? new CatalystHelper.Effect(true, 1, 0) : null;
     }
 

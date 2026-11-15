@@ -59,11 +59,11 @@ public class EchoSentinel extends RuinBoss {
     /** 投影槍: 狙いの残り tick、撃った光が残る tick、狙った場所。 */
     private static final EntityDataAccessor<Integer> LANCE = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> LANCE_FLASH = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> LANCE_AT = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> LANCE_AT = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.VECTOR3);
     /** 投影陣: 立ち上がるまでの残り tick、光の柱が残る tick、陣の中心。 */
     private static final EntityDataAccessor<Integer> CIRCLE = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CIRCLE_FLASH = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> CIRCLE_AT = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> CIRCLE_AT = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.VECTOR3);
 
     public static final int EMERGE_TICKS = 100;
     public static final int DEATH_TICKS = 60;
@@ -248,7 +248,7 @@ public class EchoSentinel extends RuinBoss {
     }
 
     public Vec3 lanceTarget() {
-        Vector3f v = entityData.get(LANCE_AT);
+        Vector3f v = new org.joml.Vector3f(entityData.get(LANCE_AT));
         return new Vec3(v.x, v.y, v.z);
     }
 
@@ -263,7 +263,7 @@ public class EchoSentinel extends RuinBoss {
     }
 
     public Vec3 circleCenter() {
-        Vector3f v = entityData.get(CIRCLE_AT);
+        Vector3f v = new org.joml.Vector3f(entityData.get(CIRCLE_AT));
         return new Vec3(v.x, v.y, v.z);
     }
 
@@ -319,7 +319,7 @@ public class EchoSentinel extends RuinBoss {
 
     @Override
     protected void onEmerged(ServerLevel level) {
-        level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 1.2, getZ(), 40, 0.4, 0.8, 0.4, 0.15);
         playSound(SinguloSounds.get("echo_sentinel.awake"), 2.5F, 1.0F);
     }
@@ -327,8 +327,8 @@ public class EchoSentinel extends RuinBoss {
     // ------------------------------------------------------------------ 戦闘
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         if (isDeadOrDying()) {
             return;
         }
@@ -644,7 +644,7 @@ public class EchoSentinel extends RuinBoss {
             }
         }
         level.sendParticles(ParticleTypes.END_ROD, at.x, at.y + 1.5, at.z, 60, r * 0.5, 1.5, r * 0.5, 0.05);
-        level.sendParticles(ParticleTypes.FLASH, at.x, at.y + 0.5, at.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), at.x, at.y + 0.5, at.z, 1, 0, 0, 0, 0);
         entityData.set(CIRCLE_FLASH, FLASH_TICKS);
         level.playSound(null, at.x, at.y, at.z, SinguloSounds.get("echo_sentinel.circle_erupt"), SoundSource.HOSTILE, 2.0F, 1.0F);
     }
@@ -657,28 +657,28 @@ public class EchoSentinel extends RuinBoss {
         int count = minionCount();
         long alive = level.getEntitiesOfClass(EchoSentinel.class, getBoundingBox().inflate(32), EchoSentinel::isMinion).size();
         for (int i = (int) alive; i < count; i++) {
-            EchoSentinel echo = SinguloEntities.ECHO_SENTINEL.get().create(level);
+            EchoSentinel echo = SinguloEntities.ECHO_SENTINEL.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
             if (echo == null) {
                 continue;
             }
             echo.makeMinion();
             double a = orbitAngle + Math.PI * 2 * (i + 1) / (count + 1);
             Vec3 at = insideRoom(target.position().add(Math.cos(a) * ORBIT, HOVER, Math.sin(a) * ORBIT));
-            echo.moveTo(at.x, at.y, at.z, getYRot(), 0);
+            echo.snapTo(at.x, at.y, at.z, getYRot(), 0);
             echo.orbitAngle = a;
             echo.setTarget(target);
             if (home != null) {
                 // 分身も部屋から出ない
                 echo.home = home;
-                echo.restrictTo(home, ARENA_RADIUS);
+                echo.setHomeTo(home, ARENA_RADIUS);
             }
             level.addFreshEntity(echo);
-            level.sendParticles(ParticleTypes.FLASH, echo.getX(), echo.getY() + 1.2, echo.getZ(), 1, 0, 0, 0, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), echo.getX(), echo.getY() + 1.2, echo.getZ(), 1, 0, 0, 0, 0);
         }
         orbitAngle += Math.PI * 2 / (count + 1) * (1 + random.nextInt(count));
         Vec3 swap = insideRoom(target.position().add(Math.cos(orbitAngle) * ORBIT, HOVER, Math.sin(orbitAngle) * ORBIT));
         randomTeleport(swap.x, swap.y, swap.z, false);
-        level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
         playSound(SinguloSounds.get("echo_sentinel.summon"), 2.0F, 1.0F);
     }
 
@@ -691,12 +691,12 @@ public class EchoSentinel extends RuinBoss {
 
     /** 投影器が姿を映しているあいだは、受けるダメージが小さい。分身は何を受けても消える。 */
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
         if (emergeTicks() > 0 || RuinGuards.friendlyFire(source)) {
-            return super.hurt(source, amount);
+            return super.hurtServer(damageLevel, source, amount);
         }
         if (isMinion()) {
-            if (amount > 0 && !level().isClientSide() && !isInvulnerableTo(source)) {
+            if (amount > 0 && !level().isClientSide() && !isInvulnerableTo(damageLevel, source)) {
                 vanish((ServerLevel) level());
                 return true;
             }
@@ -708,7 +708,7 @@ public class EchoSentinel extends RuinBoss {
         if (n > 0 && !bypass && level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.2, getZ(), 6 + n * 2, 0.4, 0.6, 0.4, 0.3);
         }
-        return super.hurt(source, scaled);
+        return super.hurtServer(damageLevel, source, scaled);
     }
 
     // ------------------------------------------------------------------ 倒されたとき
@@ -759,7 +759,7 @@ public class EchoSentinel extends RuinBoss {
         if (t == DEATH_TICKS * 9 / 10) {
             // 記録結晶が砕け散る
             Vec3 core = c.add(0, 1.57, 0);
-            level.sendParticles(ParticleTypes.FLASH, core.x, core.y, core.z, 2, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), core.x, core.y, core.z, 2, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.END_ROD, core.x, core.y, core.z, 90, 0.1, 0.1, 0.1, 0.35);
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, core.x, core.y, core.z, 40, 0.2, 0.2, 0.2, 0.5);
             level.playSound(null, blockPosition(), SinguloSounds.get("echo_sentinel.death_shatter"), SoundSource.HOSTILE, 2.5F, 1.0F);
@@ -807,7 +807,7 @@ public class EchoSentinel extends RuinBoss {
         life = tag.getIntOr("life", 0);
         reprojected = tag.getBooleanOr("reprojected", false);
         projectors.clear();
-        for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
+        for (Tag t : tag.getListOrEmpty("projectors")) {
             CompoundTag c = new CompoundTag();
             c.put("p", t);
             io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "p").ifPresent(projectors::add);

@@ -6,15 +6,11 @@
   "energy": 600,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/zinc"
-      },
+      "ingredient": "#c:ingots/zinc",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:ingots/bismuth"
-      },
+      "ingredient": "#c:ingots/bismuth",
       "count": 1
     }
   ],

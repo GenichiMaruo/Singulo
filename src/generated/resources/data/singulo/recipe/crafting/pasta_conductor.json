@@ -7,12 +7,8 @@
     "C"
   ],
   "key": {
-    "C": {
-      "item": "singulo:superconducting_coil"
-    },
-    "H": {
-      "item": "singulo:horizon_bus"
-    }
+    "C": "singulo:superconducting_coil",
+    "H": "singulo:horizon_bus"
   },
   "result": {
     "id": "singulo:pasta_conductor",

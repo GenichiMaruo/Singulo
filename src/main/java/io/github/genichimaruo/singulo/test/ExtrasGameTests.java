@@ -11,7 +11,7 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -20,8 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 小型ブラックホール・野良ブラックホールの蒸発・設定カード。 */
 @GameTestHolder(Singulo.MODID)
@@ -51,7 +51,7 @@ public final class ExtrasGameTests {
     public static void rogueBlackHoleEvaporates(GameTestHelper helper) {
         BlockPos pos = new BlockPos(4, 4, 4);
         helper.setBlock(pos, SinguloBlocks.ROGUE_BLACK_HOLE.get());
-        RogueBlackHoleBlockEntity hole = helper.getBlockEntity(pos);
+        RogueBlackHoleBlockEntity hole = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         hole.setCore(RogueBlackHoleBlockEntity.VANISH_MASS + 5, 0);
         helper.succeedWhen(() -> helper.assertBlockNotPresent(SinguloBlocks.ROGUE_BLACK_HOLE.get(), pos));
     }
@@ -72,8 +72,8 @@ public final class ExtrasGameTests {
         BlockPos b = new BlockPos(5, 1, 2);
         helper.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
         helper.setBlock(b, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
-        MachineBlockEntity from = helper.getBlockEntity(a);
-        MachineBlockEntity to = helper.getBlockEntity(b);
+        MachineBlockEntity from = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,a);
+        MachineBlockEntity to = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,b);
         from.setSide(0, SideConfig.Face.TOP, SideConfig.INPUT, false);
         from.setSide(0, SideConfig.Face.BACK, SideConfig.OUTPUT, true);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);

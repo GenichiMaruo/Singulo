@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "singulo:item/chemical_sample",
+    "tints": [
+      {
+        "type": "singulo:dynamic",
+        "kind": "chemical_sample"
+      }
+    ]
+  }
+}

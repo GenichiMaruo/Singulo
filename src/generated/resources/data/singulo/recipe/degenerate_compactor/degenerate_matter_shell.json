@@ -6,21 +6,15 @@
   "energy": 50000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:compressed_block_3"
-      },
+      "ingredient": "singulo:compressed_block_3",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_precursor"
-      },
+      "ingredient": "singulo:degenerate_precursor",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:compressed_metal_block_2"
-      },
+      "ingredient": "singulo:compressed_metal_block_2",
       "count": 1
     }
   ],

@@ -84,7 +84,7 @@ public class MicroBlackHole extends Entity {
             }
         }
         if (tickCount >= LIFE) {
-            level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 1, 0, 0, 0, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y, c.z, 40, 0.2, 0.2, 0.2, 0.35);
             level.explode(this, c.x, c.y, c.z, 2.5F, Level.ExplosionInteraction.NONE);
             discard();
@@ -130,4 +130,6 @@ public class MicroBlackHole extends Entity {
     public boolean isPickable() {
         return false;
     }
+
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
 }

@@ -24,7 +24,7 @@ final class WorkCardDecorator implements IItemDecorator {
 
     @Override
     public boolean render(GuiGraphicsExtractor g, Font font, ItemStack stack, int x, int y) {
-        if (!Screen.hasShiftDown()) {
+        if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown()) {
             return false;
         }
         ItemStack shown = ItemStack.EMPTY;

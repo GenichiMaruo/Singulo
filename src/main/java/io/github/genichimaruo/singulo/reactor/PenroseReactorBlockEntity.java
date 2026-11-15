@@ -118,7 +118,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     /** 0 種, 1 燃料, 2 ジェット・コレクター, 3 ホーキング・コレクター, 4 エルゴスフィア・リング, 5〜8 副産物。 */
     public static final int SLOT_SEED = 0, SLOT_FUEL = 1, SLOT_JET = 2, SLOT_HAWKING = 3, SLOT_ERGO = 4, SLOT_OUT = 5, SLOTS = 9;
 
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {
@@ -141,8 +141,8 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
             setChanged();
         }
     };
-    private final IEnergyStorage energyPort = new EnergyPort();
-    private final net.neoforged.neoforge.fluids.capability.IFluidHandler darkMatterPort = new DarkMatterPort();
+    private final EnergyPort energyPort = new EnergyPort();
+    private final DarkMatterPort darkMatterPort = new DarkMatterPort();
 
     /** ダークマター 1 mB で炉心に加わる質量。 */
     public static final double DARK_MATTER_MASS_PER_MB = 0.01;
@@ -214,7 +214,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     }
 
     static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     // ------------------------------------------------------------------ 物理
@@ -676,7 +676,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         if (tidal > 0 && level.getGameTime() % 10 < interval && level.getGameTime() % interval == 0) {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(center).inflate(tidal),
                     e -> e.position().distanceTo(c) <= tidal && EventHorizonTargets.affected(e))) {
-                e.hurt(SinguloDamageTypes.tidal(level, null), 4.0F);
+                e.hurtOrSimulate(SinguloDamageTypes.tidal(level, null), 4.0F);
             }
         }
     }
@@ -816,7 +816,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     public static void returnRecord(ServerLevel level, Entity swallowed, Vec3 c, double horizon) {
         double chance = swallowed instanceof LivingEntity ? RECORD_FROM_MOB
                 : swallowed instanceof net.minecraft.world.entity.item.ItemEntity item && !EventHorizonTargets.isReturnedRecord(item)
-                        && !item.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
+                        && !item.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED, false)
                 ? RECORD_FROM_ITEM : 0;
         if (chance <= 0 || level.getRandom().nextDouble() >= chance) {
             return;
@@ -1013,13 +1013,13 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
             return;
         }
         collapseStart = tag.getLongOr("collapse_start", 0L);
-        long[] ps = tag.getLongArray("collapse_pos");
+        long[] ps = tag.getLongArray("collapse_pos").orElseGet(() -> new long[0]);
         List<BlockPos> list = new ArrayList<>(ps.length);
         for (long p : ps) {
             list.add(BlockPos.of(p));
         }
         collapseBlocks = List.copyOf(list);
-        collapseStates = tag.getIntArray("collapse_state");
+        collapseStates = tag.getIntArray("collapse_state").orElseGet(() -> new int[0]);
         collapseDone = tag.getIntOr("collapse_done", 0);
     }
 
@@ -1106,12 +1106,11 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
                 if (n.equals(worldPosition) || Structures.isReactorPart(level.getBlockState(n))) {
                     continue;
                 }
-                IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
-                if (target != null && target.canReceive()) {
+                var target = level.getCapability(Capabilities.Energy.BLOCK, n, dir.getOpposite());
+                if (target != null) {
                     // ケーブルなど mod の口へは int を超えて渡す
-                    long sent = io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, budget, false);
+                    long sent = io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(energyPort, target, budget);
                     budget -= sent;
-                    buffer -= sent;
                     lastOutput += sent;
                 }
             }
@@ -1126,7 +1125,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
     // ------------------------------------------------------------------ 外から見えるもの
 
-    public IEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energyPort;
     }
 
@@ -1135,11 +1134,36 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     }
 
     /** ダークマターの投入口。光を出さないのでエディントン限界を受けず、そのまま炉心の質量になる（発電はしない）。 */
-    public net.neoforged.neoforge.fluids.capability.IFluidHandler darkMatterInput() {
+    public DarkMatterPort darkMatterInput() {
         return darkMatterPort;
     }
 
-    private final class DarkMatterPort implements net.neoforged.neoforge.fluids.capability.IFluidHandler {
+    public final class DarkMatterPort extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<Double>
+            implements net.neoforged.neoforge.fluids.capability.IFluidHandler,
+            net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> {
+        protected Double createSnapshot() { return mass; }
+        protected void revertToSnapshot(Double snapshot) { mass = snapshot; }
+        protected void onRootCommit(Double original) { setChanged(); }
+        public int size() { return 1; }
+        public net.neoforged.neoforge.transfer.fluid.FluidResource getResource(int index) { java.util.Objects.checkIndex(index, 1); return net.neoforged.neoforge.transfer.fluid.FluidResource.EMPTY; }
+        public long getAmountAsLong(int index) { java.util.Objects.checkIndex(index, 1); return 0; }
+        public boolean isValid(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource) {
+            java.util.Objects.checkIndex(index, 1); return !resource.isEmpty() && isFluidValid(index, resource.toStack(1));
+        }
+        public long getCapacityAsLong(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource) {
+            java.util.Objects.checkIndex(index, 1); return resource.isEmpty() || isValid(index, resource) ? 1000 : 0;
+        }
+        public int insert(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            if (!isValid(index, resource) || state != State.RUNNING || !formed) return 0;
+            int room = (int) Math.floor((MAX_MASS - mass) / DARK_MATTER_MASS_PER_MB);
+            int taken = Math.max(0, Math.min(amount, room));
+            if (taken > 0) { updateSnapshots(tx); mass = Math.min(MAX_MASS, mass + taken * DARK_MATTER_MASS_PER_MB); }
+            return taken;
+        }
+        public int extract(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            java.util.Objects.checkIndex(index, 1); net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount); return 0;
+        }
         @Override
         public int getTanks() {
             return 1;
@@ -1162,6 +1186,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
         @Override
         public int fill(net.neoforged.neoforge.fluids.FluidStack resource, FluidAction action) {
+            if (action.execute() && isInTransaction()) throw new IllegalStateException("Legacy mass mutation during fluid transaction");
             if (!isFluidValid(0, resource) || state != State.RUNNING || !formed) {
                 return 0;
             }
@@ -1229,58 +1254,23 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     }
 
     /** 点火中は点火エネルギーを受け取り、稼働中は蓄電から取り出せる。 */
-    private final class EnergyPort implements io.github.genichimaruo.singulo.energy.LongEnergyStorage {
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            if (state != State.IGNITING) {
-                return 0;
-            }
-            long take = Math.min(amount, Math.max(0, ignitionEnergy() - ignitionStored));
-            if (!simulate) {
-                ignitionStored += take;
-                receivedThisTick += take;
-            }
-            return take;
+    private final class EnergyPort extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        @Override protected long[] createSnapshot(){return new long[]{buffer,ignitionStored,receivedThisTick};}
+        @Override protected void revertToSnapshot(long[] s){buffer=s[0];ignitionStored=s[1];receivedThisTick=s[2];}
+        @Override protected void onRootCommit(long[] s){setChanged();}
+        @Override public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");if(state!=State.IGNITING)return 0;
+            long take=Math.min(amount,Math.max(0,ignitionEnergy()-ignitionStored));
+            if(take>0){updateSnapshots(tx);ignitionStored+=take;receivedThisTick+=take;}return take;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
+        @Override public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");if(state!=State.RUNNING)return 0;
+            long take=Math.min(amount,buffer);if(take>0){updateSnapshots(tx);buffer-=take;}return take;
         }
-
-        @Override
-        public long extractLong(long amount, boolean simulate) {
-            long take = Math.min(amount, buffer);
-            if (!simulate) {
-                buffer -= take;
-            }
-            return take;
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return (int) extractLong(amount, simulate);
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, buffer);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public boolean canExtract() {
-            return state == State.RUNNING;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return state == State.IGNITING;
-        }
+        @Override public long getAmountAsLong(){return buffer;}
+        @Override public long getCapacityAsLong(){return Math.max(buffer,Integer.MAX_VALUE);}
+        @Override public boolean canExtract(){return state==State.RUNNING;}
+        @Override public boolean canReceive(){return state==State.IGNITING;}
     }
 
     /** 搬入は種・燃料・抽出装置、搬出は副産物だけ。 */
@@ -1488,4 +1478,6 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> slot < SLOT_OUT, (slot,r) -> slot >= SLOT_OUT); }
 }

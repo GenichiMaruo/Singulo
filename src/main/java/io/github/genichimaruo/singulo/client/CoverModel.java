@@ -3,101 +3,77 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.cable.ConduitCover;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelIdentifier;
-import net.minecraft.core.Direction;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.client.model.BakedModelWrapper;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.DelegateBlockStateModel;
+import org.jspecify.annotations.Nullable;
 
-/**
- * ブロックをはめ込んだカバー（{@link ConduitCover}）の見た目: ケーブル・パイプの代わりに、はめ込んだブロックのモデルを、その向きのまま描く
- * （面の隠し方・光・粒子の絵も、そのブロックのもの）。ブロックがまだ届いていない間は、もとのモデル（ケーブルと枠）のまま。
- * 包むのは、カバーがブロック入りの状態のモデルだけ。
- */
-final class CoverModel extends BakedModelWrapper<BakedModel> {
-    private CoverModel(BakedModel original) {
-        super(original);
-    }
-
-    /** 電線・パイプの全種類の、ブロック入りの状態のモデルを包む。 */
+/** Delegates covered conduit geometry, materials and particles to the inserted block. */
+final class CoverModel extends DelegateBlockStateModel {
+    private CoverModel(BlockStateModel original) { super(original); }
     static void wrap(ModelEvent.ModifyBakingResult event) {
         for (Block block : conduits()) {
             for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-                if (ConduitCover.of(state) != ConduitCover.State.BLOCK) {
-                    continue;
+                if (ConduitCover.of(state) == ConduitCover.State.BLOCK) {
+                    event.getBakingResult().blockStateModels().computeIfPresent(state, (key, model) -> new CoverModel(model));
                 }
-                ModelIdentifier key = BlockModelShaper.stateToModelLocation(state);
-                event.getModels().computeIfPresent(key, (k, model) -> new CoverModel(model));
             }
         }
     }
-
-    /** はめ込んだブロックの色付け（草のような色の変わるブロック）を、カバーにも使う。 */
-    static void registerColors(RegisterColorHandlersEvent.Block event) {
-        event.register((state, level, pos, tint) -> {
-            if (level != null && pos != null && level.getBlockEntity(pos) instanceof ConduitCover.Holder holder && holder.coverState() != null) {
-                return Minecraft.getInstance().getBlockColors().getColor(holder.coverState(), level, pos, tint);
-            }
-            return 0xFFFFFFFF;
-        }, conduits());
+    static void registerColors(RegisterColorHandlersEvent.BlockTintSources event) {
+        // Reserve independent delegates for material tint indices, not only vanilla's first layer.
+        var tints = new java.util.ArrayList<net.minecraft.client.color.block.BlockTintSource>();
+        int count = 1;
+        for (Block block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            count = Math.max(count, event.getBlockColors().getTintSources(block.defaultBlockState()).size());
+        }
+        for (int index=0; index<count; index++) {
+            final int layer=index;
+            tints.add(new net.minecraft.client.color.block.BlockTintSource() {
+                @Override public int color(BlockState state) { return 0xFFFFFFFF; }
+                @Override public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                    BlockState cover = cover(level,pos);
+                    if(cover==null) return 0xFFFFFFFF;
+                    var tint=event.getBlockColors().getTintSource(cover,layer);
+                    return tint==null ? 0xFFFFFFFF : tint.colorInWorld(cover,level,pos);
+                }
+            });
+        }
+        event.register(tints, conduits());
+    }    private static @Nullable BlockState cover(BlockAndTintGetter level, BlockPos pos) {
+        return level.getModelData(pos).get(ConduitCover.MODEL_STATE);
     }
-
+    private static BlockStateModel modelOf(BlockState state) {
+        return Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
+    }
+    @Override public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state,
+                                       RandomSource random, List<BlockStateModelPart> parts) {
+        BlockState cover = cover(level, pos);
+        if (cover == null) super.collectParts(level, pos, state, random, parts);
+        else modelOf(cover).collectParts(level, pos, cover, random, parts);
+    }
+    @Override public Material.Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+        BlockState cover = cover(level, pos);
+        return cover == null ? super.particleMaterial(level, pos, state) : modelOf(cover).particleMaterial(level, pos, cover);
+    }
+    @Override public int materialFlags(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+        BlockState cover = cover(level, pos);
+        return cover == null ? super.materialFlags(level, pos, state) : modelOf(cover).materialFlags(level, pos, cover);
+    }
     private static Block[] conduits() {
         return new Block[] {SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(), SinguloBlocks.TOPOLOGICAL_WIRE.get(),
                 SinguloBlocks.HORIZON_BUS.get(), SinguloBlocks.FLUID_PIPE.get(), SinguloBlocks.VACUUM_JACKETED_PIPE.get(),
                 SinguloBlocks.SUPERFLUID_CONDUIT.get(), SinguloBlocks.HORIZON_DUCT.get()};
     }
 
-    @Nullable
-    private static BlockState cover(ModelData data) {
-        return data.get(ConduitCover.MODEL_STATE);
-    }
 
-    private static BakedModel modelOf(BlockState cover) {
-        return Minecraft.getInstance().getBlockRenderer().getBlockModel(cover);
-    }
-
-    @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData data,
-                                    @Nullable RenderType renderType) {
-        BlockState cover = cover(data);
-        if (cover == null) {
-            return super.getQuads(state, side, rand, data, renderType);
-        }
-        BakedModel model = modelOf(cover);
-        if (renderType != null && !model.getRenderTypes(cover, rand, ModelData.EMPTY).contains(renderType)) {
-            return List.of();
-        }
-        return model.getQuads(cover, side, rand, ModelData.EMPTY, renderType);
-    }
-
-    @Override
-    public ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
-        BlockState cover = cover(data);
-        return cover == null ? super.getRenderTypes(state, rand, data) : modelOf(cover).getRenderTypes(cover, rand, ModelData.EMPTY);
-    }
-
-    @Override
-    public TextureAtlasSprite getParticleIcon(ModelData data) {
-        BlockState cover = cover(data);
-        return cover == null ? super.getParticleIcon(data) : modelOf(cover).getParticleIcon(ModelData.EMPTY);
-    }
-
-    @Override
-    public net.neoforged.neoforge.common.util.TriState useAmbientOcclusion(BlockState state, ModelData data, RenderType renderType) {
-        BlockState cover = cover(data);
-        return cover == null ? super.useAmbientOcclusion(state, data, renderType) : modelOf(cover).useAmbientOcclusion(cover, ModelData.EMPTY, renderType);
-    }
 }

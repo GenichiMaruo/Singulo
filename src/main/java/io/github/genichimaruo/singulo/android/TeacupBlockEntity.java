@@ -15,6 +15,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** 置いたティーカップの色（染めていなければ白）。壊すとルートテーブルの copy_components で、この色ごとアイテムに戻る。 */
 public class TeacupBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
+    public static final net.neoforged.neoforge.model.data.ModelProperty<Integer> MODEL_COLOR = new net.neoforged.neoforge.model.data.ModelProperty<>();
+    @Override public net.neoforged.neoforge.model.data.ModelData getModelData() {
+        return net.neoforged.neoforge.model.data.ModelData.builder().with(MODEL_COLOR, color).build();
+    }
     public static final int DEFAULT_COLOR = 0xFFFFFF;
     private int color = DEFAULT_COLOR;
 
@@ -29,6 +33,7 @@ public class TeacupBlockEntity extends io.github.genichimaruo.singulo.compat.Leg
     public void setColor(int color) {
         this.color = color & 0xFFFFFF;
         setChanged();
+        requestModelDataUpdate();
         if (level != null) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
         }
@@ -47,7 +52,7 @@ public class TeacupBlockEntity extends io.github.genichimaruo.singulo.compat.Leg
     protected void collectImplicitComponents(DataComponentMap.Builder builder) {
         super.collectImplicitComponents(builder);
         if (color != DEFAULT_COLOR) {
-            builder.set(DataComponents.DYED_COLOR, new DyedItemColor(color, true));
+            builder.set(DataComponents.DYED_COLOR, new DyedItemColor(color));
         }
     }
 

@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:compressed_block_1"
-      },
+      "ingredient": "singulo:compressed_block_1",
       "count": 9
     }
   ],

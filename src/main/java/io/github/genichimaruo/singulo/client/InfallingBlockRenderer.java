@@ -15,13 +15,12 @@ import net.minecraft.world.phys.Vec3;
  * 炉心へ吸い込まれていくブロック: 回りながら、中心へ近づくほど中心の向きへ引き伸ばされて細くなる（潮汐で引き裂かれる）。
  * 後ろに淡い光の尾を引く。
  */
-public class InfallingBlockRenderer extends EntityRenderer<InfallingBlock> {
+public class InfallingBlockRenderer extends SnapshotEntityRenderer<InfallingBlock> {
     public InfallingBlockRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    @Override
-    public Identifier getTextureLocation(InfallingBlock entity) {
+     public Identifier getTextureLocation(InfallingBlock entity) {
         return FxDraw.WHITE;
     }
 
@@ -40,7 +39,7 @@ public class InfallingBlockRenderer extends EntityRenderer<InfallingBlock> {
         pose.scale(thin, thin, stretch);
         pose.mulPose(Axis.XP.rotationDegrees(t * 9 * (1 - k)));
         pose.translate(-0.5, -0.5, -0.5);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(e.block(), pose, buffers, light, OverlayTexture.NO_OVERLAY);
+        BlockDraw.get().renderSingleBlock(e.block(), pose, buffers, light, OverlayTexture.NO_OVERLAY);
         pose.popPose();
         // 中心へ向かう淡い光の尾（後ろ側へ）
         if (to.lengthSqr() > 1e-4) {
@@ -48,6 +47,6 @@ public class InfallingBlockRenderer extends EntityRenderer<InfallingBlock> {
             FxDraw.beam(pose.last(), FxDraw.glow(buffers), Vec3.ZERO, tail,
                     0.25F * (1 - 0.5F * k), 0x9C7BFF, (int) (40 + 90 * k));
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 }

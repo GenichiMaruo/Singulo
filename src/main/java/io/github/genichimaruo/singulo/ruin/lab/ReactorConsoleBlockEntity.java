@@ -150,7 +150,7 @@ public class ReactorConsoleBlockEntity extends io.github.genichimaruo.singulo.co
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        int[] a = tag.getIntArray("facility");
+        int[] a = tag.getIntArray("facility").orElseGet(() -> new int[0]);
         facility = a.length == 6 ? LabPower.read(a) : null;
         powered = tag.getBooleanOr("powered", false);
         startup = tag.getIntOr("startup", 0);

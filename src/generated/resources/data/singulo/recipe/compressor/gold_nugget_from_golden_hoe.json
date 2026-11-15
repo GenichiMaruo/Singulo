@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:golden_hoe"
-      },
+      "ingredient": "minecraft:golden_hoe",
       "count": 1
     }
   ],

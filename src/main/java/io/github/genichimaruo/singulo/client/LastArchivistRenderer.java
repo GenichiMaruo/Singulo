@@ -31,7 +31,7 @@ import org.joml.Quaternionf;
  *       特異点がふくらんでからつぶれて閃光</li>
  * </ul>
  */
-public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
+public class LastArchivistRenderer extends SnapshotEntityRenderer<LastArchivist> {
     static final int IVORY = 0xECE4D2;
     static final int GOLD = 0xFFD27A;
     static final int PALE = 0xFFF2C8;
@@ -49,8 +49,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public Identifier getTextureLocation(LastArchivist entity) {
+     public Identifier getTextureLocation(LastArchivist entity) {
         return FxDraw.WHITE;
     }
 
@@ -148,7 +147,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
             FxDraw.ring(pose.last(), glow, 1 + 12 * c, 1.6F + 12 * c, PALE, (int) (220 * (1 - c)), 0);
             pose.popPose();
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     static VertexConsumer glow(MultiBufferSource buffers) {

@@ -1,6 +1,7 @@
 # Minecraft 26.1.2 NeoForge port checkpoint
 
-**Status: INCOMPLETE. Does not compile. Not a release or a supported build.**
+**Status: INCOMPLETE. Main Java compilation and development JAR creation pass.
+Full tests and runtime compatibility are not yet verified. Not a release.**
 
 This isolated `feature/26.1.2` branch starts at 1.21.1 commit
 `0f6fcff7645a2a5066a072acce55d4a03884080e` (Singulo 0.19.0).
@@ -11,17 +12,30 @@ No merge, upload, tag or release dispatch has been performed for this port.
 
 - Minecraft 26.1.2; NeoForge 26.1.2.126.
 - JDK 25, Gradle 9.8.0, ModDevGradle 2.0.148.
-- JEI 29.53.0.115 APIs resolved, integration migration still incomplete.
+- JEI 29.53.0.115 APIs resolved and compiling; runtime integration remains unverified.
 - Mekanism dependencies and its source package are excluded for this target,
   as requested. No Mekanism API is required or bundled.
-- The old Sodium compile-only integration is still a **migration blocker**;
-  it is not evidence of 26.1.2 compatibility.
+- Sodium 0.9.2 for Minecraft 26.1.2 (official Modrinth version zg4YQ9EL):
+  its nested implementation JAR is extracted for compile-only API access.
+  It is never bundled into Singulo. Runtime integration remains unverified.
 
 Official NeoForge/Minecraft resolved sources were used to inspect actual APIs.
-`createMinecraftArtifacts` completes, but `compileJava` fails. Tests, a usable
-JAR, client startup, dedicated-server startup and world-save migration have
-**not** passed. Existing test exclusions belong to the original main/test
-source-set split, not a reduced test gate for this port.
+`createMinecraftArtifacts`, `compileJava`, and `jar` now pass. The generated
+`Singulo-0.19.0-26.1.2N.jar` is for dependent-addon development only.
+The first full GameTest compile exposed 566 remaining test-source API errors;
+these are being ported without weakening assertions. A successful JAR build is
+not proof of client/server startup, visual correctness, or old-world safety.
+
+### Independently executed checks
+
+- Energy native transaction checks: 21 passed (including long amounts/rollback).
+- Legacy attachment-shape migration: 16 passed (opaque data preserved, source
+  unchanged, idempotence, and round trips for pocket/records/discoveries).
+- Client clipping primitive: 9 assertions passed in a headless harness.
+- Generated assets: 2523 JSON files parsed; 524 item definitions generated
+  idempotently; custom model references resolved and 13 spawn-egg colors retained.
+
+These are focused checks, not substitutes for the full GameTest/runtime gates.
 
 ## Work retained in this checkpoint
 

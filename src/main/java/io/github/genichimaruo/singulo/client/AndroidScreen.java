@@ -130,7 +130,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     private static ItemStack item(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     // ------------------------------------------------------------------ ヘッダー（顔・名前・ページのタブ）
@@ -259,7 +259,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                         return true;
                     }
                     if (Panel.inside(mouseX, mouseY, tx + BAR_W + 1, topPos + row.y(), CLEAR_W, row.h())) {
-                        if (hasShiftDown()) {
+                        if (net.minecraft.client.Minecraft.getInstance().hasShiftDown()) {
                             minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
                                     (row.chem() ? AndroidMenu.BUTTON_CHEM_CLEAR : AndroidMenu.BUTTON_TANK_CLEAR) + i);
                         }
@@ -332,7 +332,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         }
         // 隠し機能: Shift を押しながら姿の絵に重ねると、髪のメインの色（付け毛と同じ。染色台で色を合わせるのに使う）
         RuinAndroid shown = menu.android();
-        if (shown != null && hasShiftDown()
+        if (shown != null && net.minecraft.client.Minecraft.getInstance().hasShiftDown()
                 && Panel.inside(mouseX, mouseY, leftPos + PORTRAIT_X, topPos + PORTRAIT_Y, PORTRAIT_W, PORTRAIT_H)) {
             int hair = AndroidRenderer.Accessories.hairColor(shown.kind());
             g.setTooltipForNextFrame(font, Component.literal("\u25A0 ").withStyle(st -> st.withColor(hair))
@@ -576,9 +576,9 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                 // 捨てるボタン（小さな ×。シフト＋クリック）
                 int cx = tx + BAR_W + 1;
                 boolean ch = Panel.inside(mouseX, mouseY, cx, ty, CLEAR_W, th);
-                Panel.button(g, skin, cx, ty - 1, CLEAR_W, th + 2, ch && hasShiftDown() ? Panel.Press.ON : ch ? Panel.Press.HOVER : Panel.Press.NORMAL);
+                Panel.button(g, skin, cx, ty - 1, CLEAR_W, th + 2, ch && net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? Panel.Press.ON : ch ? Panel.Press.HOVER : Panel.Press.NORMAL);
                 int arm = Math.min(4, th - 2);
-                int xc = ch && hasShiftDown() ? GuiSkin.BAD : skin.dim();
+                int xc = ch && net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? GuiSkin.BAD : skin.dim();
                 for (int k = 0; k < arm; k++) {
                     int ox = (4 - arm) / 2;
                     g.fill(cx + 2 + ox + k, ty + 1 + k, cx + 3 + ox + k, ty + 2 + k, xc);
@@ -623,7 +623,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         if (android != null) {
             AndroidRenderer.inGui = true;
             try {
-                InventoryScreen.renderEntityInInventoryFollowsMouse(g, px + 2, py + 2, px + PORTRAIT_W - 2, py + PORTRAIT_H - 18, 32, 0.0625F,
+                InventoryScreen.extractEntityInInventoryFollowsMouse(g, px + 2, py + 2, px + PORTRAIT_W - 2, py + PORTRAIT_H - 18, 32, 0.0625F,
                         mouseX, mouseY, android);
             } finally {
                 AndroidRenderer.inGui = false;

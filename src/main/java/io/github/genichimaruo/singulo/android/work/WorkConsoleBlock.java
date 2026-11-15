@@ -18,7 +18,7 @@ public class WorkConsoleBlock extends SimpleMachineBlock<WorkConsoleBlockEntity>
 
     @Override
     protected void neighborChanged(net.minecraft.world.level.block.state.BlockState state, Level level, net.minecraft.core.BlockPos pos,
-                                   net.minecraft.world.level.block.Block block, net.minecraft.core.BlockPos from, boolean moving) {
+                                   net.minecraft.world.level.block.Block block, net.minecraft.world.level.redstone.Orientation from, boolean moving) {
         super.neighborChanged(state, level, pos, block, from, moving);
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity console) {
             console.onSignal(level.hasNeighborSignal(pos));
@@ -32,7 +32,7 @@ public class WorkConsoleBlock extends SimpleMachineBlock<WorkConsoleBlockEntity>
 
     /** 進行中の注文があれば 15。 */
     @Override
-    protected int getAnalogOutputSignal(net.minecraft.world.level.block.state.BlockState state, Level level, net.minecraft.core.BlockPos pos) {
+    protected int getAnalogOutputSignal(net.minecraft.world.level.block.state.BlockState state, Level level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction direction) {
         return level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity console && !console.orders().isEmpty() ? 15 : 0;
     }
 

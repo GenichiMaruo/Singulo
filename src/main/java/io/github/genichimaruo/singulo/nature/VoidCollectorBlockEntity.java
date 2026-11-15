@@ -22,7 +22,7 @@ public class VoidCollectorBlockEntity extends EnvironmentCollectorBlockEntity {
             return false;
         }
         BlockPos.MutableBlockPos p = pos.below().mutable();
-        while (p.getY() >= level.getMinBuildHeight()) {
+        while (p.getY() >= level.getMinY()) {
             if (!level.isLoaded(p) || !level.getBlockState(p).isAir()) {
                 return false;
             }

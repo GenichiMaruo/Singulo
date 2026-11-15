@@ -16,7 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -30,8 +30,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 0.11.1 の修正の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -42,14 +42,14 @@ public final class BugFix0111GameTests {
     private BugFix0111GameTests() {}
 
     private static ItemStack item(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)));
     }
 
     @GameTest(template = "empty")
     public static void alternativesRespectTheActualCraftingSlot(GameTestHelper helper) throws Exception {
         var pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) helper.getBlockEntity(pos);
+        var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         var broad = net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS, Items.BIRCH_PLANKS);
         var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         grid.set(0, new ItemStack(Items.OAK_PLANKS));
@@ -101,8 +101,8 @@ public final class BugFix0111GameTests {
         BlockPos a = new BlockPos(1, 1, 3), b = new BlockPos(3, 1, 3);
         helper.setBlock(a, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(b, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ZeroGravityControllerBlockEntity first = helper.getBlockEntity(a);
-        ZeroGravityControllerBlockEntity second = helper.getBlockEntity(b);
+        ZeroGravityControllerBlockEntity first = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,a);
+        ZeroGravityControllerBlockEntity second = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,b);
         first.setHeight(9);
         helper.assertTrue(second.height() == 9, "Mixed power group must share its height");
         second.setHeight(3);
@@ -121,9 +121,9 @@ public final class BugFix0111GameTests {
         helper.setBlock(b, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(boxA, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(boxB, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ZeroGravityControllerBlockEntity first = helper.getBlockEntity(boxA);
+        ZeroGravityControllerBlockEntity first = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,boxA);
         first.setHeight(9);
-        ZeroGravityControllerBlockEntity second = helper.getBlockEntity(boxB);
+        ZeroGravityControllerBlockEntity second = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,boxB);
         helper.assertTrue(second.height() == 9, "別のボックスに高さが共有されない: " + second.height());
         // 壊したときのアイテムに高さが残る
         var level = helper.getLevel();
@@ -146,7 +146,7 @@ public final class BugFix0111GameTests {
         } finally {
             player.discard();
         }
-        ZeroGravityControllerBlockEntity again = helper.getBlockEntity(boxA);
+        ZeroGravityControllerBlockEntity again = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,boxA);
         helper.assertTrue(again != null && again.height() == 9, "置き直すと高さが戻ってしまう: " + (again == null ? -1 : again.height()));
         helper.succeed();
     }
@@ -162,7 +162,7 @@ public final class BugFix0111GameTests {
             var level = helper.getLevel();
             BlockPos pa = helper.absolutePos(projector), pl = helper.absolutePos(line);
             helper.assertTrue(level.getBlockState(pa).getDestroyProgress(player, level, pa) > 0, "ふだんから壊せない");
-            var boss = SinguloEntities.ECHO_SENTINEL.get().create(level);
+            var boss = SinguloEntities.ECHO_SENTINEL.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             boss.moveTo(Vec3.atCenterOf(helper.absolutePos(new BlockPos(2, 2, 4))));
             boss.setNoAi(true);
             level.addFreshEntity(boss);
@@ -187,12 +187,12 @@ public final class BugFix0111GameTests {
         helper.setBlock(box, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(source, SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        ZeroGravityControllerBlockEntity c = helper.getBlockEntity(box);
+        ZeroGravityControllerBlockEntity c = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,box);
         c.setHeight(12);
         var level = helper.getLevel();
         BlockPos abs = helper.absolutePos(zero);
         helper.runAtTickTime(30, () -> {
-            io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity r = helper.getBlockEntity(receiver);
+            io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,receiver);
             helper.assertTrue(ZeroGravity.inZone(level, abs.getX() + 0.5, abs.getY() + 1, abs.getZ() + 0.5), "電力があるのに無重力にならない");
             long demand = r.demand();
             long took = r.energy().receiveLong(Long.MAX_VALUE / 2, false);
@@ -220,7 +220,7 @@ public final class BugFix0111GameTests {
         }
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(new BlockPos(5, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         android.getRandom().setSeed(2L);                    // 自律行動を残すと受電器の上へ逸れる再現条件
         android.removeFreeWill();
         android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 2, 1))));
@@ -266,12 +266,12 @@ public final class BugFix0111GameTests {
     }
 
     private static BladeAndroid swimmer(GameTestHelper helper, int charge) {
-        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
         a.setPersistenceRequired();
-        net.minecraft.nbt.CompoundTag saved = a.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        net.minecraft.nbt.CompoundTag saved = io.github.genichimaruo.singulo.test.harness.TestNbt.save(a);
         saved.putInt("charge", charge);
-        a.load(saved);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(a,saved);
         helper.getLevel().addFreshEntity(a);
         return a;
     }
@@ -346,7 +346,7 @@ public final class BugFix0111GameTests {
         helper.setBlock(new BlockPos(2, 1, 3), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 3, 2))));
         android.setPersistenceRequired();
         helper.getLevel().addFreshEntity(android);
@@ -367,7 +367,7 @@ public final class BugFix0111GameTests {
     @GameTest(template = EMPTY)
     public static void androidChoosesItsRecipe(GameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = helper.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,new BlockPos(1, 1, 1));
         m.selectFor(item("tipler_bearing"), List.of(item("steel_plate"), item("superconducting_coil")));
         helper.assertTrue(m.selectedRecipe() != null && m.selectedRecipe().getPath().equals("precision_assembler/tipler_bearing"),
                 "アンドロイドのレシピが指定されない: " + m.selectedRecipe());
@@ -378,13 +378,13 @@ public final class BugFix0111GameTests {
     @GameTest(template = EMPTY)
     public static void onlyFacilitySpawnsDropLoot(GameTestHelper helper) {
         var level = helper.getLevel();
-        BladeAndroid plain = SinguloEntities.BLADE_ANDROID.get().create(level);
-        BladeAndroid printed = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid plain = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        BladeAndroid printed = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         printed.markFacilitySpawned();
         helper.assertTrue(printed.getLootTable().equals(RuinAndroid.FACILITY_LOOT), "印刷台の個体のドロップ表が違う");
         helper.assertFalse(plain.getLootTable().equals(RuinAndroid.FACILITY_LOOT), "ふつうの個体まで部品を落とす");
-        var drone = SinguloEntities.SECURITY_DRONE.get().create(level);
-        var dockDrone = SinguloEntities.SECURITY_DRONE.get().create(level);
+        var drone = SinguloEntities.SECURITY_DRONE.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var dockDrone = SinguloEntities.SECURITY_DRONE.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         dockDrone.markFacilitySpawned();
         helper.assertTrue(dockDrone.getLootTable().equals(io.github.genichimaruo.singulo.ruin.SecurityDrone.FACILITY_LOOT), "ドックのドローンのドロップ表が違う");
         helper.assertFalse(drone.getLootTable().equals(io.github.genichimaruo.singulo.ruin.SecurityDrone.FACILITY_LOOT), "ふつうのドローンまで部品を落とす");

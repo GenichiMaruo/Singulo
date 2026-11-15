@@ -10,7 +10,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -23,8 +23,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /**
  * ペンローズ・リアクターの確認。引力帯が周りのテストに届かないよう、別の組（batch）にして順番に流す。
@@ -36,7 +36,7 @@ public final class ReactorGameTests {
     private static final String BATCH = "reactor";
 
     /** 点火したリアクターは、テストが終わっても動き続け、時間膨張の場が近くの別のテストに届く。組の終わりに止める。 */
-    @net.minecraft.gametest.framework.AfterBatch(batch = BATCH)
+    @io.github.genichimaruo.singulo.test.harness.AfterBatch(batch = BATCH)
     public static void stopReactors(net.minecraft.server.level.ServerLevel level) {
         for (BlockPos pos : PenroseReactorBlockEntity.runningPositions(level)) {
             level.removeBlock(pos, false);
@@ -51,7 +51,7 @@ public final class ReactorGameTests {
     private ReactorGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static PenroseReactorBlockEntity build(GameTestHelper helper) {
@@ -65,7 +65,7 @@ public final class ReactorGameTests {
         }
         helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
-        return helper.getBlockEntity(CONTROLLER);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CONTROLLER);
     }
 
     @GameTest(template = "empty", batch = BATCH)
@@ -161,7 +161,7 @@ public final class ReactorGameTests {
         BlockPos alarm = shells.get(40);
         helper.setBlock(port2, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(alarm, SinguloBlocks.REACTOR_MASS_ALARM.get());
-        PenroseReactorBlockEntity reactor = helper.getBlockEntity(CONTROLLER);
+        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CONTROLLER);
         helper.runAtTickTime(3, () -> reactor.forceCore(PenroseReactorBlockEntity.MAX_MASS + 100, 0));
         helper.succeedWhen(() -> {
             Structures.Reactor r = Structures.findReactor(helper.getLevel(), helper.absolutePos(CONTROLLER));
@@ -341,7 +341,7 @@ public final class ReactorGameTests {
     public static void encapsulatorMakesSingularityCore(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
         m.items().setStackInSlot(0, new ItemStack(item("degenerate_matter_shell")));
         m.items().setStackInSlot(1, new ItemStack(item("hawking_condensate"), 4));
@@ -362,15 +362,15 @@ public final class ReactorGameTests {
         BlockPos tankPos = new BlockPos(2, 1, 1);
         helper.setBlock(collectorPos, SinguloBlocks.HALO_COLLECTOR.get());
         helper.setBlock(tankPos, SinguloBlocks.CONTAINMENT_TANK.get());
-        io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity collector = helper.getBlockEntity(collectorPos);
-        io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank = helper.getBlockEntity(tankPos);
+        io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity collector = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,collectorPos);
+        io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,tankPos);
         helper.onEachTick(() -> {
             collector.energy().setEnergy(collector.energy().getMaxEnergyStored());
             tank.energy().setEnergy(tank.energy().getMaxEnergyStored());
         });
         helper.runAtTickTime(2, () -> r.forceCore(2000, 0));
         helper.runAtTickTime(5, () -> {
-            var input = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(CONTROLLER), null);
+            var input = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), helper.absolutePos(CONTROLLER), null);
             helper.assertTrue(input != null, "炉心制御装置にダークマターを入れられない");
             double before = r.mass();
             int taken = input.fill(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.darkMatter(1000),

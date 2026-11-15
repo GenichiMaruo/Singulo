@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:confinement_ring"
-      },
+      "ingredient": "singulo:confinement_ring",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:topological_wire"
-      },
+      "ingredient": "singulo:topological_wire",
       "count": 2
     }
   ],

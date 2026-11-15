@@ -6,15 +6,9 @@
     "CRI"
   ],
   "key": {
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "C": "#c:ingots/copper",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "singulo:thermocouple_module",

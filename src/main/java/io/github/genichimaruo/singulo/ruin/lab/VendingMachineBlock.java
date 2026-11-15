@@ -108,7 +108,7 @@ public class VendingMachineBlock extends AndroidCapsuleBlock {
             return null;
         }
         emeralds.consume(PRICES[col], player);
-        ItemStack drink = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(DRINKS[col])));
+        ItemStack drink = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(DRINKS[col])));
         // 下半分の取り出し口から、正面へ出す
         BlockPos lower = state.getValue(HALF) == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER ? pos : pos.below();
         Block.popResourceFromFace(level, lower, state.getValue(FACING), drink.copy());

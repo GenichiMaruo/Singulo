@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.ruin.HorizonWarden;
-import net.minecraft.client.model.HierarchicalModel;
+
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -17,9 +17,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.EyesLayer;
+
+
+
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -35,7 +35,7 @@ import net.minecraft.world.phys.Vec3;
  *       胸の炉心にも菫の輪がもう1本回る</li>
  * </ul>
  */
-public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWardenRenderer.Model> {
+public class HorizonWardenRenderer extends ExtractedMobRenderer<HorizonWarden, HorizonWardenRenderer.Model> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Singulo.id("horizon_warden"), "main");
     static final float SCALE = 1.6F;
     private static final Identifier TEXTURE = Singulo.id("textures/entity/horizon_warden.png");
@@ -414,12 +414,11 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
     }
 
     /** 光る線（目の帯・継ぎ目・刃の縁・炉心）。暗いところでも光る。 */
-    static final class Glow extends EyesLayer<HorizonWarden, Model> {
-        Glow(RenderLayerParent<HorizonWarden, Model> parent) {
+    static final class Glow extends ExtractedLayer<HorizonWarden, Model> {
+        Glow(ExtractedLayerParent<HorizonWarden, Model> parent) {
             super(parent);
         }
 
-        @Override
         public RenderType renderType() {
             return GLOW[0];
         }
@@ -490,7 +489,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
         return LayerDefinition.create(mesh, 128, 128);
     }
 
-    public static class Model extends HierarchicalModel<HorizonWarden> {
+    public static class Model extends ExtractedEntityModel<HorizonWarden> {
         private final ModelPart root;
         private final ModelPart head;
         private final ModelPart body;

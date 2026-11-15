@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
@@ -14,7 +15,7 @@ import net.neoforged.neoforge.gametest.*;
 @PrefixGameTestTemplate(false)
 public final class RecipeIndexGameTests {
     private static List<RecipeHolder<MachineRecipe>> legacy(GameTestHelper h, MachineType type) {
-        var raw = h.getLevel().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()).stream()
+        var raw = h.getLevel().recipeAccess().recipeMap().byType(SinguloRecipes.MACHINE.get()).stream()
                 .filter(r -> r.value().station().equals(type.id())).toList();
         var out = RecipeTweaks.adjustAll(raw);
         out.sort(Comparator.comparingInt((RecipeHolder<MachineRecipe> r) -> -r.value().priority())
@@ -37,7 +38,7 @@ public final class RecipeIndexGameTests {
         var stable = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER);
         for (int i = 0; i < 3; i++) h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER) == stable,
                 "Repeated queries rebuild lists");
-        if (Boolean.getBooleanOr("singulo.testBenchmarks", false)) {
+        if (Boolean.getBoolean("singulo.testBenchmarks")) {
             var type = MachineType.PRECISION_ASSEMBLER;
             var cached = MachineBlockEntity.stationRecipes(h.getLevel(), type);
             long start = System.nanoTime();
@@ -53,14 +54,14 @@ public final class RecipeIndexGameTests {
 
     @GameTest(template = "empty", batch = "recipe_reload")
     public static void indexedListsFollowReplacementAndRestoration(GameTestHelper h) {
-        var manager = h.getLevel().getRecipeManager();
+        var manager = h.getLevel().recipeAccess();
         var original = List.copyOf(manager.getRecipes());
         var before = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN);
         h.assertTrue(!before.isEmpty(), "Missing kiln recipes");
         try {
-            manager.replaceRecipes(List.of());
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, List.of());
             h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN).isEmpty(), "Reload kept removed recipes");
-        } finally { manager.replaceRecipes(original); }
+        } finally { io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original); }
         h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN).equals(before), "Recipes not restored");
         h.succeed();
     }

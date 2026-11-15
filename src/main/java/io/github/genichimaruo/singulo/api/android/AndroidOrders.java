@@ -61,7 +61,7 @@ public final class AndroidOrders {
             var materials = new java.util.ArrayList<AndroidRecipe.Material>();
             for (var input : recipe.inputs()) {
                 materials.add(new AndroidRecipe.Material(input.item, input.count,
-                        input.alt == null ? List.of(input.item) : java.util.Arrays.asList(input.alt.getItems()),
+                        input.alt == null ? List.of(input.item) : input.alt.items().map(holder -> new ItemStack(holder)).toList(),
                         input.alt == null ? "" : io.github.genichimaruo.singulo.android.work.ItemCount.key(input.alt),
                         io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item), false,
                         io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(input.item)));

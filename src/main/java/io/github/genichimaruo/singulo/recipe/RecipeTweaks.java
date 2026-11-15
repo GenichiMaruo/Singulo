@@ -84,7 +84,7 @@ public final class RecipeTweaks {
     public static List<RecipeHolder<MachineRecipe>> adjustAll(Iterable<RecipeHolder<MachineRecipe>> holders) {
         List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
         for (RecipeHolder<MachineRecipe> h : holders) {
-            MachineRecipe r = adjust(h.id(), h.value());
+            MachineRecipe r = adjust(h.id().identifier(), h.value());
             if (r != null) {
                 out.add(r == h.value() ? h : new RecipeHolder<>(h.id(), r));
             }
@@ -122,7 +122,7 @@ public final class RecipeTweaks {
     }
 
     private static Item item(String path) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(path));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(path));
     }
 
     private static Predicate<Ingredient> accepts(Item item) {
@@ -194,8 +194,8 @@ public final class RecipeTweaks {
                         // 既定（25%）で失活触媒 n 個なら、回収率 ratio では n × 0.25 / ratio 個
                         for (int i = 0; i < items.size(); i++) {
                             MachineRecipe.ItemInput in = items.get(i);
-                            if (in.uses() == 0 && in.ingredient().getItems().length > 0
-                                    && BuiltInRegistries.ITEM.getKey(in.ingredient().getItems()[0].getItem()).getPath().startsWith("spent_")) {
+                            if (in.uses() == 0 && !in.ingredient().isEmpty()
+                                    && BuiltInRegistries.ITEM.getKey(in.ingredient().items().findFirst().orElseThrow().value()).getPath().startsWith("spent_")) {
                                 int n = Math.max(1, (int) Math.round(in.count() * def / ratio));
                                 items.set(i, new MachineRecipe.ItemInput(in.ingredient(), n, 0));
                             }
@@ -212,7 +212,7 @@ public final class RecipeTweaks {
             if (in.uses() <= 0) {
                 continue;
             }
-            for (ItemStack s : in.ingredient().getItems()) {
+            for (ItemStack s : in.ingredient().items().map(holder -> new ItemStack(holder)).toList()) {
                 if (s.getItem() instanceof UsesItem u && u.isCatalyst() && !(s.getItem() instanceof CreativeCatalystItem)) {
                     int fresh = UsesHelper.baseMax(new ItemStack(u));
                     int def = u.defaultMax();

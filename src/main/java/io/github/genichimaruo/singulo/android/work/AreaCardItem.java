@@ -30,7 +30,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
  * </ul>
  * 作業指令台・組立ステーションの「経路」で、必須経由地点の対象範囲と、その経由のあいだの進入禁止ゾーンに使う。測量メガネを掛けて持つと、範囲が見える。
  */
-public class AreaCardItem extends Item {
+public class AreaCardItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     private static final String KEY = "area";
     /** 1辺の最大（ブロック）。 */
     public static final int MAX_SIZE = 128;
@@ -94,7 +94,7 @@ public class AreaCardItem extends Item {
     public static void recordFirst(ItemStack card, Level level, BlockPos pos) {
         CompoundTag t = new CompoundTag();
         t.putLong("a", pos.asLong());
-        t.putString("dim", level.dimension().location().toString());
+        t.putString("dim", level.dimension().identifier().toString());
         CustomData.update(DataComponents.CUSTOM_DATA, card, tag -> tag.put(KEY, t));
         card.set(DataComponents.MAX_STACK_SIZE, 1);
     }
@@ -154,7 +154,7 @@ public class AreaCardItem extends Item {
     /** 記録した範囲が、この次元のものか。 */
     public static boolean sameDimension(ItemStack card, Level level) {
         CompoundTag t = data(card);
-        return t != null && t.getStringOr("dim", "").equals(level.dimension().location().toString());
+        return t != null && t.getStringOr("dim", "").equals(level.dimension().identifier().toString());
     }
 
     public static boolean isCard(ItemStack stack) {

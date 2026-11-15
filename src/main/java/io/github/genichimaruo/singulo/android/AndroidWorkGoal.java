@@ -83,8 +83,7 @@ final class AndroidWorkGoal extends Goal {
     private long crafted;
     /** 加工モード: 装置に入れた回数、取り出した主な物の数、何も進まなかった時間。 */
     private long inserted, collected;
-    @Nullable
-    private java.util.List<ItemCount> processingPending;
+    private java.util.@Nullable List<ItemCount> processingPending;
     private boolean processingPaid, processingMoved;
     private int stalled;
     /** 加工モード: 素材を入れ終えてから、できるのを待っている時間（長くかかりそうなら、ほかの作業へ行く）。 */
@@ -114,12 +113,10 @@ final class AndroidWorkGoal extends Goal {
     private BlockPos standAt;
     private int arrived;
     /** 素材を取りに回る受け渡し場所（実際に入っている所）と、次に行く番号。 */
-    @Nullable
-    private java.util.List<WorkConsoleBlockEntity.Pickup> pickups;
+    private java.util.@Nullable List<WorkConsoleBlockEntity.Pickup> pickups;
     private int pickupIndex;
     /** 持ち物を戻しに回る受け渡し場所（近い順。いっぱいなら次へ）と、次に行く番号、たどり着けた所があるか。 */
-    @Nullable
-    private java.util.List<BlockPos> dropPoints;
+    private java.util.@Nullable List<BlockPos> dropPoints;
     /** 今戻しに行っている場所（dropPoints のうち。着くか、たどり着けなければ外して選び直す）。 */
     @Nullable
     private BlockPos dropTarget;
@@ -186,7 +183,7 @@ final class AndroidWorkGoal extends Goal {
         processingMoved = false;
         if (t.contains("processing_pending")) {
             processingPending = new java.util.ArrayList<>();
-            for (var input : t.getList("processing_pending", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            for (var input : t.getListOrEmpty("processing_pending")) {
                 processingPending.add(ItemCount.load((net.minecraft.nbt.CompoundTag) input, android.registryAccess()));
             }
         }
@@ -199,10 +196,10 @@ final class AndroidWorkGoal extends Goal {
         pickupIndex = 0;
         if (t.contains("pickups")) {
             pickups = new java.util.ArrayList<>();
-            for (var element : t.getList("pickups", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            for (var element : t.getListOrEmpty("pickups")) {
                 var pt = (net.minecraft.nbt.CompoundTag) element;
                 var items = new java.util.ArrayList<ItemCount>();
-                for (var item : pt.getList("items", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                for (var item : pt.getListOrEmpty("items")) {
                     var count = ItemCount.load((net.minecraft.nbt.CompoundTag) item, android.registryAccess());
                     if (count != null) {
                         items.add(count);
@@ -638,7 +635,7 @@ final class AndroidWorkGoal extends Goal {
         // 取り出す面: 記録した面か、自動なら、今できた物を取り出せる面（まだなければ null: 取り出さない）
         Direction outFace = io.github.genichimaruo.singulo.android.work.MachineWatch.outputFace(level, at, r);
         net.neoforged.neoforge.items.IItemHandler out = outFace == null ? null
-                : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, outFace);
+                : io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, outFace);
         if (!io.github.genichimaruo.singulo.android.work.MachineWatch.handlesInput(level, at, r)
                 || !io.github.genichimaruo.singulo.android.work.MachineWatch.handlesOutput(level, at, r)) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
@@ -798,7 +795,7 @@ final class AndroidWorkGoal extends Goal {
 
     /** 装置の燃料の面に、あと何個燃料が入るか。 */
     private int fuelRoom(ServerLevel level, BlockPos machine, RecipeData r) {
-        net.neoforged.neoforge.items.IItemHandler side = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+        net.neoforged.neoforge.items.IItemHandler side = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level,
                 machine, fuelSide(machine, r));
         if (side == null) {
             return 0;
@@ -818,7 +815,7 @@ final class AndroidWorkGoal extends Goal {
             return set;
         }
         Vec3 d = android.position().subtract(Vec3.atCenterOf(machine));
-        Direction dir = Direction.getNearest(d.x, 0, d.z);
+        Direction dir = Direction.getApproximateNearest(d.x, 0, d.z);
         return dir.getAxis().isHorizontal() ? dir : Direction.NORTH;
     }
 
@@ -831,7 +828,7 @@ final class AndroidWorkGoal extends Goal {
             return !lit && f.getItem(1).isEmpty() && !f.getItem(0).isEmpty();
         }
         // ほかの装置: 5秒進まず、横の面に燃料が入っていない
-        net.neoforged.neoforge.items.IItemHandler side = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+        net.neoforged.neoforge.items.IItemHandler side = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level,
                 machine, fuelSide(machine, r));
         return stalled >= 100 && side != null && side.getSlots() > 0;
     }
@@ -840,8 +837,7 @@ final class AndroidWorkGoal extends Goal {
     private boolean refuel(ServerLevel level, WorkConsoleBlockEntity c, BlockPos machine, RecipeData r) {
         ItemStack fuel = r.fuel();
         if (carriedCount(fuel.getItem()) > 0) {
-            net.neoforged.neoforge.items.IItemHandler side = level.getCapability(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, machine, fuelSide(machine, r));
+            net.neoforged.neoforge.items.IItemHandler side = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, machine, fuelSide(machine, r));
             if (side != null && insertFromCarry(side, fuel, carriedCount(fuel.getItem())) > 0) {
                 stalled = 0;
                 android.playSound(SoundEvents.ITEM_PICKUP, 0.4F, 0.8F);
@@ -1022,7 +1018,7 @@ final class AndroidWorkGoal extends Goal {
                 moved = in;
             }
         } else {
-            net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+            net.neoforged.neoforge.items.IItemHandler h = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level,
                     ps.pos(), insert ? Direction.UP : Direction.DOWN);
             if (h == null) {
                 fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
@@ -1050,7 +1046,7 @@ final class AndroidWorkGoal extends Goal {
             if (s.kind() != io.github.genichimaruo.singulo.android.work.ProcedureStep.INSERT || s.item().isEmpty()) {
                 continue;
             }
-            net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+            net.neoforged.neoforge.items.IItemHandler h = io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level,
                     s.pos(), Direction.UP);
             if (h != null && holdsAny(h, java.util.List.of(new ItemCount(s.item(), 1)))) {
                 return false;
@@ -1220,7 +1216,7 @@ final class AndroidWorkGoal extends Goal {
         // 掘り終えた: ほかの mod の守りも効くよう、注文した人として壊してよいか確かめる
         BlockState state = level.getBlockState(target);
         net.minecraft.world.entity.player.Player as = actor(level, c, job);
-        if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level, target,
+        if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.block.BreakBlockEvent(level, target,
                 state, as)).isCanceled()) {
             android.setStall(RuinAndroid.STALL_PROTECTED);   // 守られていて壊せない
             mineSkip.add(target);
@@ -1247,8 +1243,7 @@ final class AndroidWorkGoal extends Goal {
     /** 1つ収穫する・動物の世話をする時間。 */
     private static final int HARVEST_TICKS = 8, RANCH_TICKS = 12;
     /** 牧場で世話をしている動物と、たどり着けなかった動物。 */
-    @Nullable
-    private java.util.UUID ranchTarget;
+    private java.util.@Nullable UUID ranchTarget;
     private final java.util.Set<java.util.UUID> ranchSkip = new java.util.HashSet<>();
 
     /** 範囲の中で、条件に合う一番近いブロック（なければ null）。 */
@@ -1498,7 +1493,7 @@ final class AndroidWorkGoal extends Goal {
             return false;
         }
         net.minecraft.world.entity.player.Player as = actor(level, c, null);
-        return !net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level, p,
+        return !net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.block.BreakBlockEvent(level, p,
                 level.getBlockState(p), as)).isCanceled();
     }
 
@@ -1905,7 +1900,7 @@ final class AndroidWorkGoal extends Goal {
         switch (ps.kind()) {
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> {
                 if (target instanceof net.minecraft.world.entity.animal.sheep.Sheep sheep) {
-                    sheep.shear(net.minecraft.sounds.SoundSource.PLAYERS);        // 毛は足元に落ちる（拾う）
+                    sheep.shear(level, net.minecraft.sounds.SoundSource.PLAYERS, new ItemStack(net.minecraft.world.item.Items.SHEARS));        // 毛は足元に落ちる（拾う）
                 }
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK -> {
@@ -1916,7 +1911,7 @@ final class AndroidWorkGoal extends Goal {
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
                 android.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
-                target.hurt(level.damageSources().mobAttack(android), Float.MAX_VALUE);     // 落ちた物は拾う
+                target.hurtOrSimulate(level.damageSources().mobAttack(android), Float.MAX_VALUE);     // 落ちた物は拾う
             }
             default -> {
             }
@@ -2018,7 +2013,7 @@ final class AndroidWorkGoal extends Goal {
     /** 牧場の操作も、注文者としての保護判定を通す。 */
     private boolean mayTend(ServerLevel level, WorkConsoleBlockEntity c, net.minecraft.world.entity.animal.Animal target, boolean attack) {
         var as = actor(level, c, null);
-        as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
+        as.snapTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
         if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, target.blockPosition(), as)) {
             return false;
         }
@@ -2065,13 +2060,13 @@ final class AndroidWorkGoal extends Goal {
         BlockPos p = ps.pos();
         BlockState s = level.getBlockState(p);
         net.minecraft.world.entity.player.Player as = actor(level, c, null);
-        as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
+        as.snapTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
         var hit = new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(p), Direction.UP, p, false);
         var event = new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(
                 as, net.minecraft.world.InteractionHand.MAIN_HAND, p, hit);
         if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, p, as)
                 || net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event).isCanceled()
-                || event.getUseBlock() == net.neoforged.neoforge.common.util.TriState.FALSE) {
+                || event.getUseBlock() == net.minecraft.util.TriState.FALSE) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
         }
@@ -2089,7 +2084,7 @@ final class AndroidWorkGoal extends Goal {
                 level.playSound(null, p, SoundEvents.STONE_BUTTON_CLICK_ON, net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, 1);
             }
         } else {
-            as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
+            as.snapTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
             s.useWithoutItem(level, as, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(p), Direction.UP, p, false));
         }
         progress++;
@@ -2174,7 +2169,7 @@ final class AndroidWorkGoal extends Goal {
         // 入れる面: 記録した面か、自動なら、今この素材を受け付ける面（上・横・下の順）
         return insertOnce(item -> {
             Direction face = io.github.genichimaruo.singulo.android.work.MachineWatch.inputFace(level, at, r, item);
-            return face == null ? null : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, face);
+            return face == null ? null : io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, at, face);
         }, item -> {
             Direction face = io.github.genichimaruo.singulo.android.work.MachineWatch.inputFace(level, at, r, item);
             return face == null ? null : io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, at, face);
@@ -2466,7 +2461,7 @@ final class AndroidWorkGoal extends Goal {
         }
         NonNullList<ItemStack> grid = recipe.gridList();
         CraftingInput input = CraftingInput.of(3, 3, grid);
-        java.util.Optional<RecipeHolder<CraftingRecipe>> match = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+        java.util.Optional<RecipeHolder<CraftingRecipe>> match = level.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, level);
         if (match.isEmpty()) {
             return false;
         }
@@ -2486,7 +2481,7 @@ final class AndroidWorkGoal extends Goal {
                 return false;
             }
         }
-        ItemStack result = match.get().value().assemble(input, level.registryAccess());
+        ItemStack result = match.get().value().assemble(input);
         NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
         return commitCraft(level, c, job, at, used, result, remaining);
     }
@@ -2629,11 +2624,11 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         CraftingInput input = CraftingInput.of(3, 3, grid);
-        java.util.Optional<RecipeHolder<CraftingRecipe>> match = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+        java.util.Optional<RecipeHolder<CraftingRecipe>> match = level.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, level);
         if (match.isEmpty()) {
             return false;
         }
-        ItemStack result = match.get().value().assemble(input, level.registryAccess());
+        ItemStack result = match.get().value().assemble(input);
         NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
         return commitCraft(level, c, job, at, used, result, remaining);
     }
@@ -2695,7 +2690,7 @@ final class AndroidWorkGoal extends Goal {
     /** 持ち物に入りきらなかった物は、足元に落とす（ふつうは起きない）。 */
     private void drop(ItemStack rest) {
         if (!rest.isEmpty()) {
-            android.spawnAtLocation(rest);
+            if (android.level() instanceof ServerLevel server) android.spawnAtLocation(server, rest);
         }
     }
 }

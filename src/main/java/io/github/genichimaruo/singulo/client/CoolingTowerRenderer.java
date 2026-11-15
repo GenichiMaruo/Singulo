@@ -42,7 +42,7 @@ public class CoolingTowerRenderer extends SnapshotBlockRenderer<CoolingTowerCont
         Vec3 base = Vec3.atLowerCornerOf(bottom.subtract(be.getBlockPos())).add(0.5, 0, 0.5);
         float time = level.getGameTime() + partialTick;
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         float top = h - 2;                                                // コアの列の高さ（y=1〜h−2）
         pose.pushPose();
         pose.translate(base.x, base.y, base.z);
@@ -66,10 +66,10 @@ public class CoolingTowerRenderer extends SnapshotBlockRenderer<CoolingTowerCont
         }
         pose.popPose();
         // 格子のすき間から細かい冷気の粒
-        if (level.random.nextInt(3) == 0) {
+        if (level.getRandom().nextInt(3) == 0) {
             Vec3 t = Vec3.atCenterOf(shape.pos(be.getBlockPos(), 2, h - 1, 2));
-            level.addParticle(ParticleTypes.SNOWFLAKE, t.x + (level.random.nextDouble() - 0.5) * 2.4, t.y + 0.6,
-                    t.z + (level.random.nextDouble() - 0.5) * 2.4, 0, 0.05, 0);
+            level.addParticle(ParticleTypes.SNOWFLAKE, t.x + (level.getRandom().nextDouble() - 0.5) * 2.4, t.y + 0.6,
+                    t.z + (level.getRandom().nextDouble() - 0.5) * 2.4, 0, 0.05, 0);
         }
     }
 

@@ -30,7 +30,7 @@ public class DimensionalPocketItem extends SinguloItem {
             DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Singulo.MODID);
     public static final Supplier<AttachmentType<List<ItemStack>>> CONTENTS = REGISTER.register("dimensional_pocket",
             () -> AttachmentType.<List<ItemStack>>builder(() -> new ArrayList<>())
-                    .serialize(ItemStack.OPTIONAL_CODEC.listOf().xmap(ArrayList::new, l -> l)).copyOnDeath().build());
+                    .serialize(ItemStack.OPTIONAL_CODEC.listOf().fieldOf("items")).copyOnDeath().build());
 
     public DimensionalPocketItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
@@ -77,8 +77,9 @@ public class DimensionalPocketItem extends SinguloItem {
         }
 
         @Override
-        public void stopOpen(Player p) {
-            super.stopOpen(p);
+        public void stopOpen(net.minecraft.world.entity.ContainerUser user) {
+            super.stopOpen(user);
+            Player p = player;
             setChanged();
             p.level().playSound(null, p.blockPosition(), SinguloSounds.get("dimensional_pocket.close"), SoundSource.PLAYERS, 0.8F, 1.0F);
         }

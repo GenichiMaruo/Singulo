@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -34,10 +34,10 @@ public class DronePortRenderer extends SnapshotBlockRenderer<DronePortBlockEntit
     /** 閉じるときに、扉が壁ぎわからせり上がり終える時刻。 */
     static final int RISEN = DronePortBlockEntity.ANIM_LOWERED + (DronePortBlockEntity.ANIM_OPEN - DronePortBlockEntity.ANIM_HINGE);
 
-    private final ItemRenderer items;
+    private final ItemDraw items;
 
     public DronePortRenderer(BlockEntityRendererProvider.Context context) {
-        items = context.getItemRenderer();
+        items = ItemDraw.get();
     }
 
     private static float ease(float v) {
@@ -53,7 +53,7 @@ public class DronePortRenderer extends SnapshotBlockRenderer<DronePortBlockEntit
     @Override
     public void render(DronePortBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         // 中は暗いので、上の明るさで描く
-        int lit = be.getLevel() == null ? light : LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().above());
+        int lit = be.getLevel() == null ? light : LevelRenderer.getLightCoords(be.getLevel(), be.getBlockPos().above());
         int anim = be.anim();
         float t = anim == DronePortBlockEntity.ANIM_NONE ? 0 : be.animTime(partialTick);
         // 扉の跳ね上がり（0 閉 〜 1 立った）と、引っ込み（0 〜 1）

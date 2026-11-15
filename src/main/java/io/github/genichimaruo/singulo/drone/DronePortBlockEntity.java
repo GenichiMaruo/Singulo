@@ -88,7 +88,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
     static final int AUTO_SETTLE = 40;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
             problemStale = true;
@@ -116,8 +116,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
     /** 選んでいる行き先と、その次元（null はこの次元。別の次元はワームホール便 {@link DroneWormhole}）。 */
     @Nullable
     private BlockPos destination;
-    @Nullable
-    private net.minecraft.resources.ResourceKey<Level> destinationDim, stagedDim, autoDim;
+    private net.minecraft.resources.@Nullable ResourceKey<Level> destinationDim, stagedDim, autoDim;
     /** 積み込み待ちの梱包済みの箱と、その行き先・払った電力・受け持つ便（まだなら 0）。 */
     private ItemStack staged = ItemStack.EMPTY;
     @Nullable
@@ -437,7 +436,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
     }
 
     /** 行き先を選ぶ（dim が null かこの次元ならふつうの便、別の次元ならワームホール便）。 */
-    public void select(@Nullable BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+    public void select(@Nullable BlockPos to, net.minecraft.resources.@Nullable ResourceKey<Level> dim) {
         destination = to;
         destinationDim = dim == null || level != null && dim.equals(level.dimension()) ? null : dim;
         problemStale = true;
@@ -449,13 +448,12 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
         return problem(destination, destinationDim);
     }
 
-    @Nullable
-    public net.minecraft.resources.ResourceKey<Level> destinationDim() {
+    public net.minecraft.resources.@Nullable ResourceKey<Level> destinationDim() {
         return destinationDim;
     }
 
     /** to までの道のり（別の次元はワームホール経由。行けなければ -1）。 */
-    public int distanceTo(BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+    public int distanceTo(BlockPos to, net.minecraft.resources.@Nullable ResourceKey<Level> dim) {
         if (dim == null) {
             // 同じ次元: ワームホールの近道のほうが近ければ、その道のり
             return level instanceof ServerLevel server ? DroneWormhole.distance(server, worldPosition, to)
@@ -469,7 +467,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
     }
 
     /** dim の to へ発送できない理由（できるなら S_IDLE）。 */
-    public int problem(@Nullable BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+    public int problem(@Nullable BlockPos to, net.minecraft.resources.@Nullable ResourceKey<Level> dim) {
         if (dim == null) {
             return problem(to);
         }
@@ -561,7 +559,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
     }
 
     /** 荷物と空き箱1つを to 行きに梱包する（発送できるのは確かめてある）。 */
-    private boolean pack(BlockPos to, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+    private boolean pack(BlockPos to, net.minecraft.resources.@Nullable ResourceKey<Level> dim) {
         int distance = distanceTo(to, dim);
         if (distance < 0) {
             return false;
@@ -592,8 +590,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
         return autoTo;
     }
 
-    @Nullable
-    public net.minecraft.resources.ResourceKey<Level> autoDim() {
+    public net.minecraft.resources.@Nullable ResourceKey<Level> autoDim() {
         return autoDim;
     }
 
@@ -910,7 +907,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
             if (cargo) {
                 ejectExtra(level, dir);
             }
-            IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+            IItemHandler dest = io.github.genichimaruo.singulo.compat.ItemResourceView.find(level,
                     worldPosition.relative(dir), dir.getOpposite());
             if (dest == null) {
                 continue;
@@ -1186,7 +1183,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
             out.add(new Target(p, "", info == null ? "" : info.name(), DroneWormhole.distance(server, worldPosition, p)));
         }
         for (DroneWormhole.Route r : DroneWormhole.routes(server, owner, worldPosition, fluidPort())) {
-            out.add(new Target(r.to(), r.dim().location().toString(), r.name(), r.distance()));
+            out.add(new Target(r.to(), r.dim().identifier().toString(), r.name(), r.distance()));
         }
         return out;
     }
@@ -1260,7 +1257,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
         tag.putInt("energy", energy.getEnergyStored());
         tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (!staged.isEmpty()) {
-            tag.put("staged", staged.save(registries));
+            tag.put("staged", io.github.genichimaruo.singulo.compat.NbtCompat.save(staged, registries));
         }
         if (stagedTo != null) {
             tag.put("staged_to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(stagedTo));
@@ -1282,18 +1279,17 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
         saveVisible(tag, registries);
     }
 
-    private static void putDim(CompoundTag tag, String key, @Nullable net.minecraft.resources.ResourceKey<Level> dim) {
+    private static void putDim(CompoundTag tag, String key, net.minecraft.resources.@Nullable ResourceKey<Level> dim) {
         if (dim != null) {
-            tag.putString(key, dim.location().toString());
+            tag.putString(key, dim.identifier().toString());
         }
     }
 
-    @Nullable
-    private static net.minecraft.resources.ResourceKey<Level> readDim(CompoundTag tag, String key) {
+    private static net.minecraft.resources.@Nullable ResourceKey<Level> readDim(CompoundTag tag, String key) {
         if (!tag.contains(key)) {
             return null;
         }
-        var loc = net.minecraft.resources.Identifier.tryParse(tag.getString(key));
+        var loc = net.minecraft.resources.Identifier.tryParse(tag.getStringOr(key, ""));
         return loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 
@@ -1307,7 +1303,7 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
         tag.putLong("anim_start", animStart);
         tag.putInt("anim_tier", animTier);
         if (!animCrate.isEmpty()) {
-            tag.put("anim_crate", animCrate.save(registries));
+            tag.put("anim_crate", io.github.genichimaruo.singulo.compat.NbtCompat.save(animCrate, registries));
         }
         tag.putLong("anim_flight", animFlight);
         tag.putBoolean("handed", handed);
@@ -1358,5 +1354,11 @@ public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.
         animCrate = tag.contains("anim_crate") ? io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, tag.getCompoundOrEmpty("anim_crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
         animFlight = tag.getLongOr("anim_flight", 0L);
         handed = tag.getBooleanOr("handed", false);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItemsFor(@Nullable Direction side) {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items,
+            (slot,r) -> slot < SLOT_ARRIVED && (side == null || (slot == SLOT_CRATES ? crateSides : sides).canInsert(SideConfig.faceOf(facing(),side))),
+            (slot,r) -> side == null ? slot >= SLOT_ARRIVED : slot == SLOT_CRATES ? crateSides.canExtract(SideConfig.faceOf(facing(),side)) : slot >= SLOT_ARRIVED && sides.canExtract(SideConfig.faceOf(facing(),side)));
     }
 }

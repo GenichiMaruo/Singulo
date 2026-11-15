@@ -78,7 +78,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
             return InteractionResult.PASS;
         }
         Level level = context.getLevel();
-        IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, context.getClickedPos(), context.getClickedFace());
+        IFluidHandler target = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, context.getClickedPos(), context.getClickedFace());
         if (target == null || target.fill(inside, IFluidHandler.FluidAction.SIMULATE) <= 0) {
             return InteractionResult.PASS;
         }

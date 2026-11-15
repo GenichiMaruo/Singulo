@@ -61,7 +61,7 @@ public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, I
             t.putLong("corner", corner.asLong());
         }
         if (!item.isEmpty()) {
-            t.put("item", item.save(registries));
+            t.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(item, registries));
         }
         t.putInt("option", option);
         return t;

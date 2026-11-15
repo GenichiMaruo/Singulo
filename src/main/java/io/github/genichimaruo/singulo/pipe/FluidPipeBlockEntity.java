@@ -117,7 +117,7 @@ public class FluidPipeBlockEntity extends io.github.genichimaruo.singulo.compat.
         tag.putInt("amount", visualAmount);
         tag.putBoolean("mixed", mixed);
         if (!visualFluid.isEmpty()) {
-            tag.put("fluid", visualFluid.save(registries));
+            tag.put("fluid", io.github.genichimaruo.singulo.compat.NbtCompat.save(visualFluid, registries));
         }
         io.github.genichimaruo.singulo.cable.ConduitCover.save(tag, coverState);
         return tag;
@@ -137,7 +137,7 @@ public class FluidPipeBlockEntity extends io.github.genichimaruo.singulo.compat.
         outMask = tag.getIntOr("out", 0);
         visualAmount = tag.getIntOr("amount", 0);
         mixed = tag.getBooleanOr("mixed", false);
-        visualFluid = tag.contains("fluid") ? FluidStack.parseOptional(registries, tag.getCompoundOrEmpty("fluid")) : FluidStack.EMPTY;
+        visualFluid = tag.contains("fluid") ? FluidStack.CODEC.parse(registries.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), tag.getCompoundOrEmpty("fluid")).result().orElse(FluidStack.EMPTY) : FluidStack.EMPTY;
         loadCover(tag, registries);
     }
 
@@ -176,9 +176,9 @@ public class FluidPipeBlockEntity extends io.github.genichimaruo.singulo.compat.
     }
 
     @Override
-    public net.neoforged.neoforge.client.model.data.ModelData getModelData() {
-        return coverState == null ? net.neoforged.neoforge.client.model.data.ModelData.EMPTY
-                : net.neoforged.neoforge.client.model.data.ModelData.builder().with(io.github.genichimaruo.singulo.cable.ConduitCover.MODEL_STATE, coverState).build();
+    public net.neoforged.neoforge.model.data.ModelData getModelData() {
+        return coverState == null ? net.neoforged.neoforge.model.data.ModelData.EMPTY
+                : net.neoforged.neoforge.model.data.ModelData.builder().with(io.github.genichimaruo.singulo.cable.ConduitCover.MODEL_STATE, coverState).build();
     }
 
 

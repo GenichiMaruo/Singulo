@@ -6,21 +6,15 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:gems/diamond"
-      },
+      "ingredient": "#c:gems/diamond",
       "count": 1
     }
   ],
-  "restore": {
-    "item": "singulo:degraded_cold_atom_trap"
-  },
+  "restore": "singulo:degraded_cold_atom_trap",
   "result": {
     "id": "singulo:cold_atom_trap",
     "count": 1

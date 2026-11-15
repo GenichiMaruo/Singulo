@@ -6,15 +6,11 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:spent_singularity_core"
-      },
+      "ingredient": "singulo:spent_singularity_core",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     }
   ],

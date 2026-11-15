@@ -90,7 +90,7 @@ public final class GlassesHeightScreen extends Screen {
                 // 顔のあたりだけを、正面から大きく映す（マウスの位置を枠の真ん中にして、顔をこちらへ向ける）。
                 // yOffset は体の真ん中から映す中心までの高さ（ブロック）: 目の高さの少し上
                 float face = player.getEyeHeight() - player.getBbHeight() / 2 + 0.05F;
-                InventoryScreen.renderEntityInInventoryFollowsMouse(g, x + 4, y + 14, x + 100, y + 100, 120, face,
+                InventoryScreen.extractEntityInInventoryFollowsMouse(g, x + 4, y + 14, x + 100, y + 100, 120, face,
                         x + 52, y + 57, player);
             } finally {
                 if (swap) {

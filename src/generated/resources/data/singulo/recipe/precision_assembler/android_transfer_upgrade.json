@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ender_pearls"
-      },
+      "ingredient": "#c:ender_pearls",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:ceramic_substrate"
-      },
+      "ingredient": "singulo:ceramic_substrate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     }
   ],

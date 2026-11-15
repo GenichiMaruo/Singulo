@@ -36,7 +36,7 @@ public final class MekanismChemicals implements Chemicals.Access {
             return null;
         }
         Chemical c = MekanismAPI.CHEMICAL_REGISTRY.get(rl);
-        return c == null || MekanismAPI.EMPTY_CHEMICAL_KEY.location().equals(rl) ? null : c;
+        return c == null || MekanismAPI.EMPTY_CHEMICAL_KEY.identifier().equals(rl) ? null : c;
     }
 
     private static String id(Chemical c) {
@@ -93,15 +93,13 @@ public final class MekanismChemicals implements Chemicals.Access {
     }
 
     @Override
-    @Nullable
-    public Chemicals.Store store(Level level, BlockPos pos, @Nullable Direction side) {
+    public Chemicals.@Nullable Store store(Level level, BlockPos pos, @Nullable Direction side) {
         IChemicalHandler h = level.getCapability(BLOCK, pos, side);
         return h == null ? null : wrap(h);
     }
 
     @Override
-    @Nullable
-    public Map.Entry<String, Long> contained(ItemStack stack) {
+    public Map.@Nullable Entry<String, Long> contained(ItemStack stack) {
         IChemicalHandler h = stack.getCapability(ITEM);
         if (h == null) {
             return null;
@@ -116,8 +114,7 @@ public final class MekanismChemicals implements Chemicals.Access {
     }
 
     @Override
-    @Nullable
-    public Chemicals.Store itemStore(ItemStack stack) {
+    public Chemicals.@Nullable Store itemStore(ItemStack stack) {
         IChemicalHandler h = stack.getCapability(ITEM);
         return h == null ? null : wrap(h);
     }

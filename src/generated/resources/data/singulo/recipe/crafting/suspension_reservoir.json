@@ -7,18 +7,10 @@
     "CQC"
   ],
   "key": {
-    "C": {
-      "item": "singulo:superconducting_coil"
-    },
-    "Q": {
-      "item": "singulo:entangled_element"
-    },
-    "G": {
-      "item": "singulo:zero_gravity_block"
-    },
-    "F": {
-      "item": "singulo:nihonium_frame"
-    }
+    "C": "singulo:superconducting_coil",
+    "Q": "singulo:entangled_element",
+    "G": "singulo:zero_gravity_block",
+    "F": "singulo:nihonium_frame"
   },
   "result": {
     "id": "singulo:suspension_reservoir",

@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.DyedItemColor;
  * アンドロイドの装飾。装備のページのとなりの「装飾」のページで、頭・顔・首/背中・腰・手の5つの枠に1つずつ着ける。戦い・作業には影響しない。
  * 染料と一緒に作業台で染められる（革の防具と同じ。タグ minecraft:dyeable）。手に持つ物は、待機している間だけ持つ。
  */
-public class AndroidAccessoryItem extends Item {
+public class AndroidAccessoryItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     /**
      * 着ける所（持ち物の装飾の枠の番号と同じ。0.17 までの3枠（頭・背中/腰・手）の番号は変えず、顔と腰をうしろに足した）。
      */

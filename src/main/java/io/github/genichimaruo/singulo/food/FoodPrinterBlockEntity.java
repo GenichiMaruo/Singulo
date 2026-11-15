@@ -53,7 +53,7 @@ public class FoodPrinterBlockEntity extends io.github.genichimaruo.singulo.compa
     /** 状態（画面のヘッダーの表示）。待機: 自動で印刷できる食品がない。ペースト不足: 選んだ食品のペーストが足りない。 */
     public static final int S_IDLE = 0, S_RUNNING = 1, S_NO_POWER = 2, S_FULL = 3, S_OFF = 4, S_SHORT = 5;
 
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         public int getSlotLimit(int slot) {
             return isCartridge(slot) ? 1 : 64;
@@ -484,5 +484,10 @@ public class FoodPrinterBlockEntity extends io.github.genichimaruo.singulo.compa
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /** Native platform automation, sharing owned storage and commit-only notifications. */
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot, resource) -> slot != OUTPUT, (slot, resource) -> slot == OUTPUT);
     }
 }

@@ -229,8 +229,7 @@ public final class Structures {
         return out;
     }
 
-    @Nullable
-    static MultiblockPart.Role role(BlockState state) {
+    static MultiblockPart.@Nullable Role role(BlockState state) {
         return state.getBlock() instanceof MultiblockPart part ? part.role() : null;
     }
 }

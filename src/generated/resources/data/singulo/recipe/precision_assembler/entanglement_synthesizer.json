@@ -6,39 +6,27 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:basic_frame"
-      },
+      "ingredient": "singulo:basic_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:ceramic_substrate"
-      },
+      "ingredient": "singulo:ceramic_substrate",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:gems/diamond"
-      },
+      "ingredient": "#c:gems/diamond",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:glass_blocks/colorless"
-      },
+      "ingredient": "#c:glass_blocks/colorless",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:muon_catalyst"
-      },
+      "ingredient": "singulo:muon_catalyst",
       "tier": 2,
       "uses": 24000
     }

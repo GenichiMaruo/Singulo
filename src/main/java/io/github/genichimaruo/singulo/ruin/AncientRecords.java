@@ -26,7 +26,7 @@ public final class AncientRecords {
 
     public static final Supplier<AttachmentType<List<String>>> DECODED = REGISTER.register("records",
             () -> AttachmentType.<List<String>>builder(() -> List.of())
-                    .serialize(Codec.STRING.listOf()).copyOnDeath().build());
+                    .serialize(Codec.STRING.listOf().fieldOf("entries")).copyOnDeath().build());
 
     private AncientRecords() {}
 

@@ -6,21 +6,15 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:fulgurite"
-      },
+      "ingredient": "singulo:fulgurite",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:gems/quartz"
-      },
+      "ingredient": "#c:gems/quartz",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     }
   ],

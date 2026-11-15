@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:golden_shovel"
-      },
+      "ingredient": "minecraft:golden_shovel",
       "count": 1
     }
   ],

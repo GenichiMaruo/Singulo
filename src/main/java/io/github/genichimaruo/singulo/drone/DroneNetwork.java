@@ -11,6 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -26,6 +27,9 @@ import net.minecraft.world.phys.Vec3;
  * 読み込み範囲の外に出ると記録は「見えない飛行」になって時間で進む。
  */
 public class DroneNetwork extends SavedData {
+    private static final net.minecraft.world.level.saveddata.SavedDataType<DroneNetwork> TYPE =
+        io.github.genichimaruo.singulo.compat.LegacySavedDataTypes.create("singulo_drone_network", DroneNetwork::new, DroneNetwork::load, DroneNetwork::save);
+
     static final String NAME = "singulo_drone_network";
     /** 巡航の速さ（ブロック/tick）。見えない飛行の到着時刻もこれで決める。 */
     public static final double SPEED = 0.6;
@@ -71,16 +75,14 @@ public class DroneNetwork extends SavedData {
          * ワームホール便の行き: 届ける先（to）はこちらの口で、口をくぐった先の次元（relayDim）と最終の行き先のポート（relayTo）。
          * ドローンは口に入り、向こうの口から出て届ける（{@link DroneWormhole}）。ふつうの便は null。
          */
-        @Nullable
-        public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> relayDim;
+        public net.minecraft.resources.@Nullable ResourceKey<net.minecraft.world.level.Level> relayDim;
         @Nullable
         public BlockPos relayTo;
         /**
          * ワームホールをくぐって、ステーションのない次元に来ている便: ステーション（station）がある次元（homeDim）と、
          * 帰りにくぐるこちらの口（homeGate）。帰る段階の目的地はこの口になる。家の次元にいる便は null。
          */
-        @Nullable
-        public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> homeDim;
+        public net.minecraft.resources.@Nullable ResourceKey<net.minecraft.world.level.Level> homeDim;
         @Nullable
         public BlockPos homeGate;
         /** Original sending port in homeDim, retained so a failed remote delivery can return its cargo. */
@@ -215,7 +217,7 @@ public class DroneNetwork extends SavedData {
     private ServerLevel level;
 
     public static DroneNetwork get(ServerLevel level) {
-        DroneNetwork net = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(DroneNetwork::new, DroneNetwork::load, null), NAME);
+        DroneNetwork net = level.getDataStorage().computeIfAbsent(TYPE);
         net.level = level;
         return net;
     }
@@ -465,14 +467,13 @@ public class DroneNetwork extends SavedData {
 
     // ------------------------------------------------------------------ 保存
 
-    @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag list = new ListTag();
         for (var e : ports.entrySet()) {
             CompoundTag p = new CompoundTag();
             p.putLong("pos", e.getKey());
             if (e.getValue().owner() != null) {
-                p.store("owner", net.minecraft.core.UUIDUtil.CODEC, e.getValue().owner());
+                p.store("owner", UUIDUtil.CODEC, e.getValue().owner());
             }
             p.putString("name", e.getValue().name());
             p.putBoolean("fluid", e.getValue().fluid());
@@ -488,12 +489,12 @@ public class DroneNetwork extends SavedData {
             }
             t.putInt("unit", f.unit);
             if (f.drone != null) {
-                t.store("drone", net.minecraft.core.UUIDUtil.CODEC, f.drone);
+                t.store("drone", UUIDUtil.CODEC, f.drone);
             }
             t.put("from", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.from));
             t.put("to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.to));
             if (!f.crate.isEmpty()) {
-                t.put("crate", f.crate.save(registries));
+                t.put("crate", io.github.genichimaruo.singulo.compat.NbtCompat.save(f.crate, registries));
             }
             t.putInt("stage", f.stage);
             t.putBoolean("virtual", f.virtual);
@@ -502,7 +503,7 @@ public class DroneNetwork extends SavedData {
             t.putDouble("z", f.last.z);
             t.putLong("arrive_at", f.arriveAt);
             if (f.owner != null) {
-                t.store("owner", net.minecraft.core.UUIDUtil.CODEC, f.owner);
+                t.store("owner", UUIDUtil.CODEC, f.owner);
             }
             t.putFloat("progress", f.progress);
             t.putBoolean("phase", f.phase);
@@ -510,11 +511,11 @@ public class DroneNetwork extends SavedData {
             t.putFloat("virtual_from", f.virtualFrom);
             t.putLong("virtual_at", f.virtualAt);
             if (f.relayDim != null && f.relayTo != null) {
-                t.putString("relay_dim", f.relayDim.location().toString());
+                t.putString("relay_dim", f.relayDim.identifier().toString());
                 t.put("relay_to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.relayTo));
             }
             if (f.homeDim != null && f.homeGate != null) {
-                t.putString("home_dim", f.homeDim.location().toString());
+                t.putString("home_dim", f.homeDim.identifier().toString());
                 t.put("home_gate", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.homeGate));
                 if (f.homeFrom != null) t.put("home_from", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.homeFrom));
             }
@@ -525,7 +526,7 @@ public class DroneNetwork extends SavedData {
         for (var e : away.entrySet()) {
             CompoundTag t = new CompoundTag();
             t.putLong("unit", e.getKey());
-            t.putString("dim", e.getValue().location().toString());
+            t.putString("dim", e.getValue().identifier().toString());
             al.add(t);
         }
         tag.put("away", al);
@@ -537,12 +538,12 @@ public class DroneNetwork extends SavedData {
         DroneNetwork net = new DroneNetwork();
         for (Tag t : tag.getListOrEmpty("ports")) {
             CompoundTag p = (CompoundTag) t;
-            net.ports.put(p.getLongOr("pos", 0L), new Port(p.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? p.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null, p.getStringOr("name", ""), p.getBooleanOr("fluid", false)));
+            net.ports.put(p.getLongOr("pos", 0L), new Port(p.read("owner", UUIDUtil.CODEC).isPresent() ? p.read("owner", UUIDUtil.CODEC).orElseThrow() : null, p.getStringOr("name", ""), p.getBooleanOr("fluid", false)));
         }
         for (Tag t : tag.getListOrEmpty("flights")) {
             CompoundTag c = (CompoundTag) t;
             Flight f = new Flight(c.getLongOr("id", 0L), io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "station").orElse(null), c.getIntOr("unit", 0));
-            f.drone = c.read("drone", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? c.read("drone", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            f.drone = c.read("drone", UUIDUtil.CODEC).isPresent() ? c.read("drone", UUIDUtil.CODEC).orElseThrow() : null;
             f.from = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "from").orElse(BlockPos.ZERO);
             f.to = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "to").orElse(BlockPos.ZERO);
             f.crate = c.contains("crate") ? io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, c.getCompoundOrEmpty("crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
@@ -550,7 +551,7 @@ public class DroneNetwork extends SavedData {
             f.virtual = c.getBooleanOr("virtual", false);
             f.last = new Vec3(c.getDoubleOr("x", 0.0D), c.getDoubleOr("y", 0.0D), c.getDoubleOr("z", 0.0D));
             f.arriveAt = c.getLongOr("arrive_at", 0L);
-            f.owner = c.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? c.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            f.owner = c.read("owner", UUIDUtil.CODEC).isPresent() ? c.read("owner", UUIDUtil.CODEC).orElseThrow() : null;
             f.progress = c.getFloatOr("progress", 0.0F);
             f.phase = c.getBooleanOr("phase", false);
             f.kind = DroneKind.byId(c.getIntOr("kind", 0));

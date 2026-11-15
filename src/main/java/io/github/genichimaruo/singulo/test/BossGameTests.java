@@ -12,7 +12,7 @@ import io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity;
 import io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.EntityType;
@@ -23,8 +23,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** ホライズン・ウォーデンと封印コンソール・封鎖された保管庫の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -38,20 +38,20 @@ public final class BossGameTests {
     private BossGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     /** 最終実験施設の中央を再現する: 封鎖された保管庫と封印コンソール。 */
     private static SealConsoleBlockEntity arena(GameTestHelper helper) {
         helper.setBlock(VAULT, SinguloBlocks.RUIN_CACHE.get().defaultBlockState().setValue(RuinCacheBlock.SEALED, true));
-        RuinCacheBlockEntity vault = helper.getBlockEntity(VAULT);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT);
         vault.setRuin("final_lab");
         helper.setBlock(CONSOLE, SinguloBlocks.SEAL_CONSOLE.get());
-        return helper.getBlockEntity(CONSOLE);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CONSOLE);
     }
 
     private static RuinCacheBlockEntity vault(GameTestHelper helper) {
-        return helper.getBlockEntity(VAULT);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT);
     }
 
     /** 起動すると出現の演出が始まり、そのあいだは動かず傷つかない。演出が終わると戦い始める。 */
@@ -59,7 +59,7 @@ public final class BossGameTests {
     public static void wardenEmergesBeforeFighting(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         helper.assertTrue(warden != null && warden.emergeTicks() == HorizonWarden.EMERGE_TICKS && warden.isNoAi(), "出現の演出が始まらない");
-        helper.assertFalse(warden.hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
+        helper.assertFalse(warden.hurtOrSimulate(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
         helper.runAtTickTime(HorizonWarden.EMERGE_TICKS + 5, () -> {
             helper.assertTrue(warden.emergeTicks() == 0 && !warden.isNoAi(), "演出が終わっても動き出さない");
             helper.assertTrue(warden.getHealth() == warden.getMaxHealth(), "演出の間に体力が減った");
@@ -338,7 +338,7 @@ public final class BossGameTests {
         SealConsoleBlockEntity console = arena(helper);
         LastArchivist a = console.activateArchivist(helper.getLevel(), null);
         helper.assertTrue(a != null && a.emergeTicks() == LastArchivist.EMERGE_TICKS, "最後の記録者が目覚めない");
-        helper.assertFalse(a.hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
+        helper.assertFalse(a.hurtOrSimulate(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
         double archivist = LastArchivist.HEALTH * LastArchivist.healthFactor();
         helper.assertTrue(Math.abs(a.effectiveMaxHealth() - archivist) < 1.0, "体力が" + archivist + "相当でない: " + a.effectiveMaxHealth());
         helper.assertTrue(console.activate(helper.getLevel(), null) == null, "記録者がいるのに守護機が起きた");
@@ -470,7 +470,7 @@ public final class BossGameTests {
         a.skipEmerging();
         a.setHealth(a.getMaxHealth() * 0.5F);
         float before = a.getHealth();
-        var bomb = io.github.genichimaruo.singulo.registry.SinguloEntities.BLACK_HOLE_BOMB.get().create(helper.getLevel());
+        var bomb = io.github.genichimaruo.singulo.registry.SinguloEntities.BLACK_HOLE_BOMB.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
         bomb.moveTo(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5);
         bomb.setDeltaMovement(0, -0.5, 0);

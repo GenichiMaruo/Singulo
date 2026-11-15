@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/copper"
-      },
+      "ingredient": "#c:ingots/copper",
       "count": 3
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_wire"
-      },
+      "ingredient": "singulo:superconducting_wire",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 750
     }

@@ -7,18 +7,10 @@
     "CSC"
   ],
   "key": {
-    "C": {
-      "item": "singulo:superconducting_coil"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "C": "singulo:superconducting_coil",
+    "S": "#c:plates/steel",
+    "R": "#c:dusts/redstone",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:capacity_upgrade_1",

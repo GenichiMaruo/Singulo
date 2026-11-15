@@ -3,10 +3,10 @@ package io.github.genichimaruo.singulo.gravity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** Receiver state must be rebuilt from saved blocks, never from transient bookkeeping alone. */
 @GameTestHolder("singulo_panel_review")
@@ -17,7 +17,7 @@ public final class PanelReceiverRegressionGameTests {
 
     private static GravityReceiverBlockEntity receiver(GameTestHelper helper) {
         helper.setBlock(RECEIVER, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
-        return helper.getBlockEntity(RECEIVER);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, RECEIVER);
     }
 
     private static void tick(GameTestHelper helper, GravityReceiverBlockEntity receiver) {
@@ -63,9 +63,9 @@ public final class PanelReceiverRegressionGameTests {
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos control = PANEL.south();
         helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ((ZeroGravityControllerBlockEntity) helper.getBlockEntity(control)).setHeight(8);
+        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, control)).setHeight(8);
         helper.setBlock(RECEIVER, SinguloBlocks.IMPACT_GENERATOR.get());
-        ImpactGeneratorBlockEntity receiver = helper.getBlockEntity(RECEIVER);
+        ImpactGeneratorBlockEntity receiver = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, RECEIVER);
         receiver.absorb(20);
         tick(helper, receiver);
         long expected = receiver.stored() - ZeroGravity.costPerBlock(8) * ImpactGeneratorBlockEntity.RESERVE_TICKS;
@@ -78,7 +78,7 @@ public final class PanelReceiverRegressionGameTests {
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos control = PANEL.south();
         helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ((ZeroGravityControllerBlockEntity) helper.getBlockEntity(control)).setHeight(1);
+        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, control)).setHeight(1);
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
         receiver.energy().receiveLong(ZeroGravity.costPerBlock(1), false);
@@ -114,7 +114,7 @@ public final class PanelReceiverRegressionGameTests {
         helper.setBlock(second, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos control = PANEL.south();
         helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ((ZeroGravityControllerBlockEntity) helper.getBlockEntity(control)).setHeight(10_000);
+        ((ZeroGravityControllerBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, control)).setHeight(10_000);
         GravityReceiverBlockEntity receiver = receiver(helper);
         tick(helper, receiver);
         receiver.energy().receiveLong(Long.MAX_VALUE, false);

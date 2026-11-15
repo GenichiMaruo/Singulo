@@ -34,7 +34,7 @@ public class RoomLightBlock extends Block {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos from, boolean moving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, net.minecraft.world.level.redstone.Orientation from, boolean moving) {
         if (level.isClientSide()) {
             return;
         }

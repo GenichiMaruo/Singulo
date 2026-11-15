@@ -17,13 +17,18 @@ public class BlueprintItem extends SinguloItem {
 
     /** 作業台で使っても、設計図そのものが残る。 */
     @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
-        return true;
+    public net.minecraft.world.item.ItemStackTemplate getCraftingRemainder(net.minecraft.world.item.ItemInstance input) {
+        if (input instanceof ItemStack stack) return net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(stack).withCount(1);
+        if (input instanceof net.minecraft.world.item.ItemStackTemplate template) return template.withCount(1);
+        var patch = net.minecraft.core.component.DataComponentPatch.builder();
+        for (var type : net.minecraft.core.registries.BuiltInRegistries.DATA_COMPONENT_TYPE) copyComponent(input, patch, type);
+        return new net.minecraft.world.item.ItemStackTemplate(input.typeHolder(), 1, patch.build());
     }
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack stack) {
-        return stack.copyWithCount(1);
+    private static <T> void copyComponent(net.minecraft.world.item.ItemInstance input,
+                                          net.minecraft.core.component.DataComponentPatch.Builder patch,
+                                          net.minecraft.core.component.DataComponentType<T> type) {
+        T value = input.get(type);
+        if (value == null) patch.remove(type); else patch.set(type, value);
     }
 
     @Override

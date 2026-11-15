@@ -7,21 +7,11 @@
     "ILI"
   ],
   "key": {
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "L": {
-      "item": "minecraft:blast_furnace"
-    }
+    "W": "singulo:white_ceramic_composite",
+    "B": "singulo:basic_circuit",
+    "F": "singulo:basic_frame",
+    "I": "#c:ingots/iron",
+    "L": "minecraft:blast_furnace"
   },
   "result": {
     "id": "singulo:kiln",

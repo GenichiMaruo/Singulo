@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.android.work.*;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
@@ -16,7 +17,7 @@ public final class SupplyPortGameTests {
     public static void supplyGhostEntriesNeverCreateOrConsumePhysicalItems(GameTestHelper h) {
         var pos = new BlockPos(2, 1, 2);
         h.setBlock(pos, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
-        SupplyPortBlockEntity port = h.getBlockEntity(pos);
+        SupplyPortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
         var player = TestScope.player(h);
         var menu = new SupplyPortMenu(1, player.getInventory(), h.absolutePos(pos), port.entries(), port.entryData());
         menu.setCarried(new ItemStack(Items.IRON_INGOT, 64));
@@ -42,7 +43,7 @@ public final class SupplyPortGameTests {
     public static void supplyMenuRejectsInvalidButtonAndSlotIndices(GameTestHelper h) {
         var pos = new BlockPos(2, 1, 2);
         h.setBlock(pos, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
-        SupplyPortBlockEntity port = h.getBlockEntity(pos);
+        SupplyPortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
         var player = TestScope.player(h);
         var menu = new SupplyPortMenu(1, player.getInventory(), h.absolutePos(pos), port.entries(), port.entryData());
         port.entries().setItem(0, new ItemStack(Items.IRON_INGOT));

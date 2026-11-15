@@ -28,7 +28,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
  * capacity は1 tick に運べる量、lossPerBlock は1ブロックごとの損失の割合。
  * 実際に電力が通っている道だけが光る（{@link CableBlockEntity} が通った面と量をクライアントへ送り、描画で光らせる）。
  */
-public class CableBlock extends BaseEntityBlock {
+public class CableBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
     public static final Map<Direction, BooleanProperty> CONNECTIONS = new EnumMap<>(Direction.class);
     public static final net.minecraft.world.level.block.state.properties.EnumProperty<CableProfile.Straight> STRAIGHT =
             net.minecraft.world.level.block.state.properties.EnumProperty.create("straight", CableProfile.Straight.class);
@@ -144,8 +144,8 @@ public class CableBlock extends BaseEntityBlock {
     /** カバーがあれば、壊してもケーブルは残し、カバーを1つずつ外す（{@link ConduitCover#breakCover}）。 */
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
-                                       boolean willHarvest, net.minecraft.world.level.material.FluidState fluid) {
-        return !ConduitCover.breakCover(state, level, pos, player) && super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+                                       net.minecraft.world.item.ItemStack tool, boolean willHarvest, net.minecraft.world.level.material.FluidState fluid) {
+        return !ConduitCover.breakCover(state, level, pos, player) && super.onDestroyedByPlayer(state, level, pos, player, tool, willHarvest, fluid);
     }
 
     @Override
@@ -159,13 +159,13 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+    protected VoxelShape getOcclusionShape(BlockState state) {
         return ConduitCover.occlusion(state);
     }
 
     @Override
     public net.minecraft.world.level.block.SoundType getSoundType(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos,
-            @Nullable net.minecraft.world.entity.Entity entity) {
+            net.minecraft.world.entity.@Nullable Entity entity) {
         if (ConduitCover.of(state) == ConduitCover.State.BLOCK && level.getBlockEntity(pos) instanceof ConduitCover.Holder holder
                 && holder.coverState() != null) {
             return holder.coverState().getSoundType(level, pos, entity);
@@ -175,13 +175,13 @@ public class CableBlock extends BaseEntityBlock {
 
     /** 枠だけ・カバーなしは光を通し、隣に陰を落とさない（ガラスのように）。ブロック入りはふつうのブロックと同じ。 */
     @Override
-    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
-        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state, level, pos);
+    protected boolean propagatesSkylightDown(BlockState state) {
+        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state);
     }
 
     @Override
-    protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return ConduitCover.passesLight(state) ? 0 : super.getLightBlock(state, level, pos);
+    protected int getLightDampening(BlockState state) {
+        return ConduitCover.passesLight(state) ? 0 : super.getLightDampening(state);
     }
 
     @Override
@@ -200,8 +200,7 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
-                                     BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
             cable.invalidateForNeighbor(neighborPos);
         }
@@ -210,10 +209,10 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean moving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, net.minecraft.world.level.redstone.Orientation fromPos, boolean moving) {
         // ブロックエンティティだけが変わった場合（装置の設置直後など）も接続を取り直す
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            cable.invalidateForNeighbor(fromPos);
+            for (Direction direction : Direction.values()) cable.invalidateForNeighbor(pos.relative(direction));
         }
         BlockState updated = state;
         for (Direction dir : Direction.values()) {
@@ -226,13 +225,12 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         ConduitCover.dropOnRemove(state, level, pos, newState);
         if (!state.is(newState.getBlock())) {
             if (level.isClientSide()) CableBlockEntity.clearConnectedDisplay(level,pos);
             else if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) cable.invalidateNetwork();
         }
-        super.onRemove(state, level, pos, newState, moving);
     }
 
     static boolean connects(Level level, BlockPos pos, Direction dir) {
@@ -240,7 +238,7 @@ public class CableBlock extends BaseEntityBlock {
         if (level.getBlockState(other).getBlock() instanceof CableBlock) {
             return true;
         }
-        return level.getCapability(Capabilities.EnergyStorage.BLOCK, other, dir.getOpposite()) != null;
+        return level.getCapability(Capabilities.Energy.BLOCK, other, dir.getOpposite()) != null;
     }
 
     @Nullable
@@ -249,9 +247,8 @@ public class CableBlock extends BaseEntityBlock {
         return new CableBlockEntity(pos, state);
     }
 
-    @Nullable
     @Override
-    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.@Nullable BlockEntityTicker<T> getTicker(
             Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
         // A central network publishes active display samples; individual cable blocks never tick.
         return null;

@@ -49,7 +49,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
      */
     public record ItemInput(Ingredient ingredient, int count, int uses, int tier) {
         public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(ItemInput::ingredient),
+                Ingredient.CODEC.fieldOf("ingredient").forGetter(ItemInput::ingredient),
                 Codec.INT.optionalFieldOf("count", 1).forGetter(ItemInput::count),
                 Codec.INT.optionalFieldOf("uses", 0).forGetter(ItemInput::uses),
                 Codec.INT.optionalFieldOf("tier", 0).forGetter(ItemInput::tier)
@@ -134,7 +134,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             ItemInput.CODEC.listOf().optionalFieldOf("ingredients", List.of()).forGetter(MachineRecipe::ingredients),
             FluidInput.CODEC.listOf().optionalFieldOf("fluid_ingredients", List.of()).forGetter(MachineRecipe::fluidIngredients),
             MassInput.CODEC.optionalFieldOf("mass").forGetter(MachineRecipe::mass),
-            Ingredient.CODEC_NONEMPTY.optionalFieldOf("restore").forGetter(MachineRecipe::restore),
+            Ingredient.CODEC.optionalFieldOf("restore").forGetter(MachineRecipe::restore),
             ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MachineRecipe::result),
             FluidStack.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
             Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
@@ -251,22 +251,18 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
         return mass.isEmpty() && plan(input.items()) != null;
     }
 
-    @Override
     public ItemStack assemble(Input input, HolderLookup.Provider registries) {
         return result.copy();
     }
 
-    @Override
     public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
-    @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
         return result;
     }
 
-    @Override
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
         restore.ifPresent(list::add);
@@ -280,24 +276,23 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<MachineRecipe> getSerializer() {
         return SinguloRecipes.MACHINE_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<MachineRecipe> getType() {
         return SinguloRecipes.MACHINE.get();
     }
 
-    public static final class Serializer implements RecipeSerializer<MachineRecipe> {
-        @Override
-        public MapCodec<MachineRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
+    @Override public ItemStack assemble(Input input) { return result.copy(); }
+    @Override public boolean showNotification() { return false; }
+    @Override public String group() { return ""; }
+    @Override public net.minecraft.world.item.crafting.PlacementInfo placementInfo() {
+        return net.minecraft.world.item.crafting.PlacementInfo.NOT_PLACEABLE;
     }
+    @Override public net.minecraft.world.item.crafting.RecipeBookCategory recipeBookCategory() {
+        return net.minecraft.world.item.crafting.RecipeBookCategories.CRAFTING_MISC;
+    }
+    public static final RecipeSerializer<MachineRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
 }

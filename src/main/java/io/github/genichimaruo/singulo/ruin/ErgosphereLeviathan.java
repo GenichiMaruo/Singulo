@@ -66,7 +66,7 @@ import org.joml.Vector3f;
 public class ErgosphereLeviathan extends RuinBoss {
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> STATE_TICKS = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> AIM = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> AIM = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<BlockPos> HOME = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Integer> FORM = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> JET_YAW = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.FLOAT);
@@ -215,7 +215,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         setId(ENTITY_COUNTER.getAndAdd(parts.length + 1) + 1);
         this.xpReward = 2000;
         this.noPhysics = true;
-        this.noCulling = true;
+        // Culling is configured by the 26.1.2 renderer.
         setNoGravity(true);
         orbitAngle = random.nextDouble() * Math.PI * 2;
         setEffectiveHealth(configuredHealth());
@@ -338,7 +338,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     }
 
     public Vec3 aim() {
-        Vector3f v = entityData.get(AIM);
+        Vector3f v = new org.joml.Vector3f(entityData.get(AIM));
         return new Vec3(v.x, v.y, v.z);
     }
 
@@ -478,19 +478,19 @@ public class ErgosphereLeviathan extends RuinBoss {
     /** 体のどこかに当たったとき（部位から呼ばれる）。骨格からは胴も効く。 */
     public boolean hurtPart(LeviathanSegment part, DamageSource source, float amount) {
         float factor = part.index == SEGMENTS - 1 ? TAIL_FACTOR : form() >= 2 ? BODY_FACTOR_2 : BODY_FACTOR;
-        return hurt(source, amount * factor);
+        return level() instanceof net.minecraft.server.level.ServerLevel server && hurtServer(server, source, amount * factor);
     }
 
     /** 姿を変えている最中は傷つかない。 */
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
         boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
         if (transforming() && !bypass) {
             return false;
         }
         finishing = bypass;
         try {
-            return super.hurt(source, amount);
+            return super.hurtServer(damageLevel, source, amount);
         } finally {
             finishing = false;
         }
@@ -634,8 +634,8 @@ public class ErgosphereLeviathan extends RuinBoss {
     // ------------------------------------------------------------------ 戦闘
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         if (isDeadOrDying() || home == null) {
             return;
         }
@@ -914,7 +914,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             return;
         }
         if (t == REIGNITE_CHARGE) {
-            level.sendParticles(ParticleTypes.FLASH, core.x, core.y, core.z, 8, 2, 2, 2, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), core.x, core.y, core.z, 8, 2, 2, 2, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, core.x, core.y, core.z, 4, 2, 1, 2, 0);
             level.sendParticles(ParticleTypes.END_ROD, core.x, core.y, core.z, 500, 0.3, 0.3, 0.3, 1.8);
             level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, core.x, core.y, core.z, 200, 0.5, 0.5, 0.5, 1.2);
@@ -985,7 +985,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             }
             quakeAt = new Vec3(headCenter().x, c.y, headCenter().z);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, quakeAt.x, quakeAt.y + 0.5, quakeAt.z, 3, 1.5, 0.3, 1.5, 0);
-            level.sendParticles(ParticleTypes.FLASH, quakeAt.x, quakeAt.y + 1, quakeAt.z, 2, 0.5, 0.5, 0.5, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), quakeAt.x, quakeAt.y + 1, quakeAt.z, 2, 0.5, 0.5, 0.5, 0);
             level.sendParticles(floorDust(level, quakeAt), quakeAt.x, quakeAt.y + 0.5, quakeAt.z, 300, 2.5, 0.5, 2.5, 0.6);
             level.sendParticles(ParticleTypes.SONIC_BOOM, quakeAt.x, quakeAt.y + 1, quakeAt.z, 1, 0, 0, 0, 0);
             playSound(SinguloSounds.get("ergosphere_leviathan.dive"), 5.0F, 0.6F);
@@ -1408,7 +1408,7 @@ public class ErgosphereLeviathan extends RuinBoss {
                     d.shoot(Math.cos(a), 0.2 + random.nextDouble() * 0.6, Math.sin(a), 0.8F + random.nextFloat() * 0.5F, 4.0F);
                     level.addFreshEntity(d);
                 }
-                level.sendParticles(ParticleTypes.FLASH, p.getX(), p.getY() + 1, p.getZ(), 1, 0, 0, 0, 0);
+                level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), p.getX(), p.getY() + 1, p.getZ(), 1, 0, 0, 0, 0);
                 level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1, p.getZ(), 12, 0.5, 0.5, 0.5, 0.3);
             }
             playSound(SinguloSounds.get("ergosphere_leviathan.molt"), 5.0F, 1.0F);
@@ -1461,7 +1461,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             entityData.set(FORM, 3);
             setBarName(Component.translatable(wyrmName()));
             bossBar.setColor(BossEvent.BossBarColor.RED);
-            level.sendParticles(ParticleTypes.FLASH, c.x, c.y + 1, c.z, 3, 0.2, 0.2, 0.2, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y + 1, c.z, 3, 0.2, 0.2, 0.2, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
             playSound(SinguloSounds.get("ergosphere_leviathan.ascend"), 5.0F, 1.0F);
@@ -1677,7 +1677,7 @@ public class ErgosphereLeviathan extends RuinBoss {
 
     /** 鱗の見た目（炉殻ブロック）。 */
     public static BlockState plate() {
-        return BuiltInRegistries.BLOCK.get(Singulo.id("reactor_shell")).defaultBlockState();
+        return BuiltInRegistries.BLOCK.getValue(Singulo.id("reactor_shell")).defaultBlockState();
     }
 
     private List<Player> challengers(ServerLevel level, double range) {
@@ -1859,7 +1859,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.implode"), SoundSource.HOSTILE, 4.0F, 1.0F);
         }
         if (t == DEATH_TICKS - 8) {
-            level.sendParticles(ParticleTypes.FLASH, core.x, core.y + 1, core.z, 3, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), core.x, core.y + 1, core.z, 3, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, core.x, core.y + 1, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, core.x, core.y + 1, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.END_ROD, core.x, core.y + 1, core.z, 120, 0.2, 0.2, 0.2, 0.7);

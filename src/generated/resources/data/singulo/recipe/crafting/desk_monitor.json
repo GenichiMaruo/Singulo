@@ -7,18 +7,10 @@
     "S "
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_furniture"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "K": {
-      "item": "singulo:basic_circuit"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    }
+    "B": "singulo:blueprint_lab_furniture",
+    "G": "#c:glass_blocks/colorless",
+    "K": "singulo:basic_circuit",
+    "S": "#c:plates/steel"
   },
   "result": {
     "id": "singulo:desk_monitor",

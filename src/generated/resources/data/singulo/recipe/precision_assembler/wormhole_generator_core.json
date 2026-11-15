@@ -6,33 +6,23 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:nihonium_frame"
-      },
+      "ingredient": "singulo:nihonium_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:quantum_computing_module"
-      },
+      "ingredient": "singulo:quantum_computing_module",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 8
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_module"
-      },
+      "ingredient": "singulo:time_crystal_module",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 8
     }
   ],

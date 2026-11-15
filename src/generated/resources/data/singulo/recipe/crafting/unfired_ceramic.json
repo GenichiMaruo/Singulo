@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:clay_ball"
-    },
-    {
-      "item": "minecraft:clay_ball"
-    },
-    {
-      "tag": "c:gems/quartz"
-    },
-    {
-      "tag": "singulo:ceramic_flux"
-    },
-    {
-      "tag": "c:sands"
-    }
+    "minecraft:clay_ball",
+    "minecraft:clay_ball",
+    "#c:gems/quartz",
+    "#singulo:ceramic_flux",
+    "#c:sands"
   ],
   "result": {
     "id": "singulo:unfired_ceramic",

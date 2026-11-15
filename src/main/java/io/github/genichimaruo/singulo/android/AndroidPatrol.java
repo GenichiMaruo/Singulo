@@ -113,7 +113,7 @@ public final class AndroidPatrol {
 
     /** 今、巡回しているか（巡回路があり、夜だけの設定なら夜）。 */
     boolean active(ServerLevel level) {
-        return !route.isEmpty() && (!nightOnly || level.isNight());
+        return !route.isEmpty() && (!nightOnly || level.isDarkOutside());
     }
 
     /** 巡回の動き（毎 tick。戦っていないとき）。巡回していなければ false（ステーションのそばで待つ）。 */
@@ -241,10 +241,10 @@ public final class AndroidPatrol {
                 : Component.translatable("message.singulo.android.alarm", android.nickname(), name, count, at.getX(), at.getY(), at.getZ());
         if (android.owner() != null && level.getServer().getPlayerList().getPlayer(android.owner()) instanceof ServerPlayer p) {
             p.sendOverlayMessage(text.copy().withStyle(ChatFormatting.RED));
-            p.playNotifySound(SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.NEUTRAL, 1.0F, 0.7F);
+            p.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(SoundEvents.NOTE_BLOCK_BELL, SoundSource.NEUTRAL, p.getX(), p.getY(), p.getZ(), 1.0F, 0.7F, p.getRandom().nextLong()));
         }
         android.playSound(SoundEvents.NOTE_BLOCK_BELL.value(), 1.0F, 0.7F);
-        add(level, new Entry(level.getGameTime(), level.getDayTime(), kind, BuiltInRegistries.ENTITY_TYPE.getKey(what).toString(), count, at));
+        add(level, new Entry(level.getGameTime(), level.getDefaultClockTime(), kind, BuiltInRegistries.ENTITY_TYPE.getKey(what).toString(), count, at));
     }
 
     /** 倒した: 記録に残す（少し前に近くで同じ相手を倒していれば、まとめる）。 */
@@ -255,12 +255,12 @@ public final class AndroidPatrol {
             Entry last = log.get(0);
             if (unreported > 0 && last.kind == KIND_KILL && last.what.equals(what) && level.getGameTime() - last.gameTime < MERGE_TICKS
                     && last.pos.closerThan(at, MERGE_RANGE)) {
-                log.set(0, new Entry(level.getGameTime(), level.getDayTime(), KIND_KILL, what, last.count + 1, last.pos));
+                log.set(0, new Entry(level.getGameTime(), level.getDefaultClockTime(), KIND_KILL, what, last.count + 1, last.pos));
                 android.syncPatrolLog();
                 return;
             }
         }
-        add(level, new Entry(level.getGameTime(), level.getDayTime(), KIND_KILL, what, 1, at));
+        add(level, new Entry(level.getGameTime(), level.getDefaultClockTime(), KIND_KILL, what, 1, at));
     }
 
     private void add(ServerLevel level, Entry e) {
@@ -336,7 +336,7 @@ public final class AndroidPatrol {
 
     void load(CompoundTag t) {
         route.clear();
-        for (Tag p : t.getList("route", Tag.TAG_INT_ARRAY)) {
+        for (Tag p : t.getListOrEmpty("route")) {
             route.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(wrap(p), "p").orElse(BlockPos.ZERO));
         }
         backAndForth = t.getBooleanOr("back_and_forth", false);

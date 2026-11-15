@@ -25,7 +25,7 @@ public class BlackHoleBombItem extends SinguloItem {
             bomb.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.2F, 1.0F);
             level.addFreshEntity(bomb);
         }
-        player.getCooldowns().addCooldown(this, 30);
+        player.getCooldowns().addCooldown(stack, 30);
         stack.consume(1, player);
         return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }

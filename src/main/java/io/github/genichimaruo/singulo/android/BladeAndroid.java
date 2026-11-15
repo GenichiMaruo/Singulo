@@ -284,7 +284,7 @@ public class BladeAndroid extends RuinAndroid {
                 double a = base + Math.PI * i;
                 AndroidLaser.spawn(level, BladeAndroid.this, at.add(Math.cos(a) * 2.4, 0, Math.sin(a) * 2.4));
             }
-            level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 0.1, getZ(), 1, 0, 0, 0, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), getX(), getY() + 0.1, getZ(), 1, 0, 0, 0, 0);
             playSound(SinguloSounds.get("android.blade_cast"), 1.0F, 1.0F);
         }
     }

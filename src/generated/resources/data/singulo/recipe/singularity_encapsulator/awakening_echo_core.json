@@ -6,21 +6,15 @@
   "energy": 100000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:sentinel_core"
-      },
+      "ingredient": "singulo:sentinel_core",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "minecraft:echo_shard"
-      },
+      "ingredient": "minecraft:echo_shard",
       "count": 2
     }
   ],

@@ -51,7 +51,7 @@ public class MeteorCompassItem extends SinguloItem {
             return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
         }
         ServerLevel server = (ServerLevel) level;
-        player.getCooldowns().addCooldown(this, 60);
+        player.getCooldowns().addCooldown(stack, 60);
         BlockPos core = nearestCore(server, player.blockPosition());
         if (core == null) {
             stack.remove(DataComponents.LODESTONE_TRACKER);
@@ -88,8 +88,8 @@ public class MeteorCompassItem extends SinguloItem {
      * （見つかった輪の中でいちばん近いもの）。古い版で作られたクレーター（核がない）は数えない。
      */
     public static BlockPos nearestCore(ServerLevel level, BlockPos from) {
-        Optional<Holder.Reference<Structure>> holder = level.registryAccess().registryOrThrow(Registries.STRUCTURE)
-                .getHolder(ResourceKey.create(Registries.STRUCTURE, Singulo.id("meteor_crater")));
+        Optional<Holder.Reference<Structure>> holder = level.registryAccess().lookupOrThrow(Registries.STRUCTURE)
+                .get(ResourceKey.create(Registries.STRUCTURE, Singulo.id("meteor_crater")));
         if (holder.isEmpty()) {
             return null;
         }
@@ -164,7 +164,7 @@ public class MeteorCompassItem extends SinguloItem {
         if (presence == net.minecraft.world.level.levelgen.structure.StructureCheckResult.START_NOT_PRESENT) {
             return null;
         }
-        StructureStart start = level.getChunk(cp.x, cp.z, ChunkStatus.STRUCTURE_STARTS).getStartForStructure(crater);
+        StructureStart start = level.getChunk(cp.x(), cp.z(), ChunkStatus.STRUCTURE_STARTS).getStartForStructure(crater);
         if (start == null || !start.isValid()) {
             return null;
         }

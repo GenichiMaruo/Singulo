@@ -90,7 +90,7 @@ final class BlackHolePull {
             boosted = boosted.normalize().scale(SLINGSHOT_SPEED_CAP);
         }
         player.setDeltaMovement(boosted);
-        if (near > 0.15 && player.level().random.nextInt(2) == 0) {
+        if (near > 0.15 && player.level().getRandom().nextInt(2) == 0) {
             player.level().addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, body.x, body.y, body.z,
                     -v.x * 0.1, -v.y * 0.1, -v.z * 0.1);
         }

@@ -7,24 +7,12 @@
     "SKS"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_rayleigh"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "L": {
-      "tag": "c:gems/lapis"
-    },
-    "Y": {
-      "tag": "c:dusts/glowstone"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    },
-    "K": {
-      "item": "singulo:basic_circuit"
-    }
+    "B": "singulo:blueprint_rayleigh",
+    "G": "#c:glass_blocks/colorless",
+    "L": "#c:gems/lapis",
+    "Y": "#c:dusts/glowstone",
+    "S": "#c:plates/steel",
+    "K": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:rayleigh_panel",

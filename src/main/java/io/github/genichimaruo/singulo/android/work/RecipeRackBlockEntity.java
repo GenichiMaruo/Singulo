@@ -67,7 +67,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
     }
 
     /** 1つのレシピと、それを作る場所。 */
-    public record Entry(RecipeData recipe, BlockPos location, @Nullable net.minecraft.world.level.block.Block block) {}
+    public record Entry(RecipeData recipe, BlockPos location, net.minecraft.world.level.block.@Nullable Block block) {}
 
     /**
      * 並べたレシピ（上の行から順に）。場所のカードがない行、別の次元の場所の行のレシピカードは飛ばす。

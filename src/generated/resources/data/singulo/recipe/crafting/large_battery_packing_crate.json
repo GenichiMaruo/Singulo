@@ -6,18 +6,10 @@
     "OXO"
   ],
   "key": {
-    "W": {
-      "item": "singulo:superconducting_wire"
-    },
-    "E": {
-      "item": "singulo:entangled_element"
-    },
-    "O": {
-      "item": "singulo:superconducting_coil"
-    },
-    "X": {
-      "item": "singulo:battery_packing_crate"
-    }
+    "W": "singulo:superconducting_wire",
+    "E": "singulo:entangled_element",
+    "O": "singulo:superconducting_coil",
+    "X": "singulo:battery_packing_crate"
   },
   "result": {
     "id": "singulo:large_battery_packing_crate",

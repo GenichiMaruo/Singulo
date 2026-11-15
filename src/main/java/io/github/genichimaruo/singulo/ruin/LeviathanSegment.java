@@ -54,8 +54,8 @@ public class LeviathanSegment extends PartEntity<ErgosphereLeviathan> {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        return !isInvulnerableTo(source) && getParent().hurtPart(this, source, amount);
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return !isInvulnerableToBase(source) && getParent().hurtPart(this, source, amount);
     }
 
     @Override

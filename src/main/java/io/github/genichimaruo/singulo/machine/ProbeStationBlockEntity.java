@@ -40,7 +40,7 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
     /** 登録した遺構と、次に行ける時刻。 */
     private record Target(String ruin, BlockPos pos, long nextVisit) {}
 
-    private final ItemStackHandler output = new ItemStackHandler(27) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler output = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(27) {
         @Override
         protected void onContentsChanged(int s) {
             flushNeeded = true;
@@ -248,7 +248,7 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
         tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
         tag.putDouble("progress", progress);
         ListTag cargo = new ListTag();
-        for (ItemStack stack : pending) cargo.add(stack.save(registries));
+        for (ItemStack stack : pending) cargo.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(stack, registries));
         tag.put("pending", cargo);
         ListTag list = new ListTag();
         for (Target t : targets) {
@@ -276,5 +276,9 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
             CompoundTag c = (CompoundTag) t;
             io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "pos").ifPresent(p -> targets.add(new Target(c.getStringOr("ruin", ""), p, c.getLongOr("next", 0L))));
         }
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return io.github.genichimaruo.singulo.compat.ItemTransferView.combined(slot, new io.github.genichimaruo.singulo.compat.ItemTransferView(output, (s,r) -> false, (s,r) -> true), new io.github.genichimaruo.singulo.compat.ItemTransferView(spent, (s,r) -> false, (s,r) -> true));
     }
 }

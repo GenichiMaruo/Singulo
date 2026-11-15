@@ -7,21 +7,11 @@
     " B "
   ],
   "key": {
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    },
-    "D": {
-      "tag": "c:gems/diamond"
-    },
-    "O": {
-      "item": "singulo:superconducting_coil"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "K": "singulo:ceramic_substrate",
+    "D": "#c:gems/diamond",
+    "O": "singulo:superconducting_coil",
+    "F": "singulo:basic_frame",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:accelerator_controller",

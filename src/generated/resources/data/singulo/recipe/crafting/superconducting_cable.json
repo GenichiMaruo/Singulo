@@ -5,12 +5,8 @@
     "WLW"
   ],
   "key": {
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "L": {
-      "item": "singulo:superconducting_wire"
-    }
+    "W": "singulo:white_ceramic_composite",
+    "L": "singulo:superconducting_wire"
   },
   "result": {
     "id": "singulo:superconducting_cable",

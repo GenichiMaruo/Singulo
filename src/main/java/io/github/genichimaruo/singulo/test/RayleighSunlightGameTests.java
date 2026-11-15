@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.lab.*;
@@ -105,7 +106,7 @@ public final class RayleighSunlightGameTests {
         h.assertTrue(RayleighSky.snapshot(h.getLevel()).light(sample.getX(), sample.getY(), sample.getZ()) == 0,
                 "A new renderer snapshot retained disabled sunlight");
         h.setBlock(panel, SinguloBlocks.LAB_RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, true));
-        var be = (RayleighPanelBlockEntity) h.getBlockEntity(panel);
+        var be = (RayleighPanelBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,panel);
         be.onChunkUnloaded();
         h.assertTrue(sunlight(h, SAMPLE) == 0, "Unloaded panel retains its sunlight field");
         be.onLoad();
@@ -142,10 +143,10 @@ public final class RayleighSunlightGameTests {
     public static void artificialSunBurnsUndeadAtNightWithoutChangingWorldTimeOrWeather(GameTestHelper h) {
         room(h, 6);
         var level = h.getLevel();
-        long time = level.getDayTime();
+        long time = level.getDefaultClockTime();
         boolean rain = level.getLevelData().isRaining(), thunder = level.getLevelData().isThundering();
         float rainStrength = level.getRainLevel(1), thunderStrength = level.getThunderLevel(1);
-        var zombie = EntityType.ZOMBIE.create(level);
+        var zombie = EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         try {
             level.setDayTime(18000); level.getLevelData().setRaining(true); ((net.minecraft.world.level.storage.ServerLevelData) level.getLevelData()).setThundering(true);
             level.setRainLevel(1); level.setThunderLevel(1); level.updateSkyBrightness();
@@ -158,7 +159,7 @@ public final class RayleighSunlightGameTests {
             h.assertFalse(level.isRainingAt(p), "Artificial sun is treated as rain exposure");
             zombie.moveTo(p.getX() + 2.5, p.getY(), p.getZ() + .5, 0, 0); // Solid wall, no source light.
             h.assertFalse((boolean) method.invoke(zombie), "Night outside the lit area is treated as day");
-            h.assertTrue(level.getDayTime() == 18000 && !level.isDay() && level.isRaining() && level.isThundering(), "Local noon changes global time/weather");
+            h.assertTrue(level.getDefaultClockTime() == 18000 && !level.isDay() && level.isRaining() && level.isThundering(), "Local noon changes global time/weather");
         } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
         finally {
             zombie.discard(); level.setDayTime(time); level.getLevelData().setRaining(rain); ((net.minecraft.world.level.storage.ServerLevelData) level.getLevelData()).setThundering(thunder);

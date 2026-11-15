@@ -38,11 +38,11 @@ final class ExternalOrderLedger {
     AndroidOrders.Receipt receipt() { return new AndroidOrders.Receipt(request,state,order,count,delivered,reason); }
     CompoundTag save(HolderLookup.Provider registries) {
         var t=new CompoundTag(); t.store("request", net.minecraft.core.UUIDUtil.CODEC, request); t.store("actor", net.minecraft.core.UUIDUtil.CODEC, actor); t.putInt("order",order);
-        t.put("target",target.save(registries)); t.putLong("count",count); t.putString("state",state.name()); t.putLong("delivered",delivered);
+        t.put("target",io.github.genichimaruo.singulo.compat.NbtCompat.save(target, registries)); t.putLong("count",count); t.putString("state",state.name()); t.putLong("delivered",delivered);
         if(reason!=null)t.putString("reason",reason);
         if(destination!=null)t.put("destination",io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(destination));
         if(materialSource!=null)t.put("material_source",io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(materialSource));
-        var w=new ListTag(); for(UUID id:workers)w.add(NbtUtils.createUUID(id)); t.put("workers",w); return t;
+        var w=new ListTag(); for(UUID id:workers)w.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(id)); t.put("workers",w); return t;
     }
     @Nullable static ExternalOrderLedger load(CompoundTag t, HolderLookup.Provider registries) {
         if(t.contains("material_source") && io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t,"material_source").isEmpty()) return null;
@@ -50,8 +50,8 @@ final class ExternalOrderLedger {
         var item=io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries,t.getCompoundOrEmpty("target")); long count=t.getLongOr("count", 0L);
         if(item.isEmpty()||count<1||count>WorkConsoleBlockEntity.MAX_COUNT)return null;
         var workers=new ArrayList<UUID>();
-        for(Tag w:t.getList("workers",Tag.TAG_INT_ARRAY)) {
-            try { workers.add(NbtUtils.loadUUID(w)); } catch(IllegalArgumentException ignored) { return null; }
+        for(Tag w:t.getListOrEmpty("workers")) {
+            try { workers.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(w)); } catch(IllegalArgumentException ignored) { return null; }
         }
         var e=new ExternalOrderLedger(t.read("request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(),t.read("actor", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(),t.getIntOr("order", 0),item,count,workers,io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t,"destination").orElse(null));
         e.materialSource=io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t,"material_source").orElse(null);

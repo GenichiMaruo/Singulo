@@ -59,12 +59,12 @@ public class FoundryOverseer extends RuinBoss {
     private static final EntityDataAccessor<Integer> LINES = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.INT);
     /** ロボットアーム（2本）: 残り tick と、狙う床の位置。 */
     private static final EntityDataAccessor<Integer> ARM0 = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> ARM0_AT = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> ARM0_AT = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> ARM1 = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> ARM1_AT = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> ARM1_AT = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.VECTOR3);
     /** プレス: 残り tick と、叩く床の位置。 */
     private static final EntityDataAccessor<Integer> PRESS = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> PRESS_AT = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> PRESS_AT = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.VECTOR3);
     /** 溶接レーザー: 残り tick、なぞり始めの向き（度）、回る向き（+1 / −1）。 */
     private static final EntityDataAccessor<Integer> LASER = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> LASER_FROM = SynchedEntityData.defineId(FoundryOverseer.class, EntityDataSerializers.FLOAT);
@@ -189,7 +189,7 @@ public class FoundryOverseer extends RuinBoss {
     @Override
     protected void dropAwakenedBonus(ServerLevel level) {
         if (random.nextFloat() < GUNNER_MEMORY_CHANCE) {
-            spawnAtLocation(new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+            spawnAtLocation(new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(
                     io.github.genichimaruo.singulo.Singulo.id(io.github.genichimaruo.singulo.android.AndroidKind.GUNNER.memoryId()))), 1.0F);
         }
     }
@@ -205,7 +205,7 @@ public class FoundryOverseer extends RuinBoss {
         return false;
     }
 
-    @Override
+    
     public AABB getBoundingBoxForCulling() {
         return getBoundingBox().inflate(16);
     }
@@ -282,8 +282,8 @@ public class FoundryOverseer extends RuinBoss {
     }
 
     public Vec3 armTarget(int arm) {
-        Vector3f v = entityData.get(arm == 0 ? ARM0_AT : ARM1_AT);
-        return new Vec3(v.x, v.y, v.z);
+        org.joml.Vector3fc v = entityData.get(arm == 0 ? ARM0_AT : ARM1_AT);
+        return new Vec3(v.x(), v.y(), v.z());
     }
 
     public int pressTicks() {
@@ -291,8 +291,8 @@ public class FoundryOverseer extends RuinBoss {
     }
 
     public Vec3 pressTarget() {
-        Vector3f v = entityData.get(PRESS_AT);
-        return new Vec3(v.x, v.y, v.z);
+        Vector3f v = new org.joml.Vector3f(entityData.get(PRESS_AT));
+        return new Vec3(v.x(), v.y(), v.z());
     }
 
     public double pressRadius() {
@@ -342,7 +342,7 @@ public class FoundryOverseer extends RuinBoss {
 
     @Override
     protected void onEmerged(ServerLevel level) {
-        level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
         playSound(SinguloSounds.get("foundry.online"), 3.0F, 1.0F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.2, getZ(), 40, 0.8, 0.8, 0.8, 0.3);
         setConveyors(true);
@@ -351,8 +351,8 @@ public class FoundryOverseer extends RuinBoss {
     // ------------------------------------------------------------------ 戦闘
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         if (isDeadOrDying()) {
             return;
         }
@@ -525,7 +525,7 @@ public class FoundryOverseer extends RuinBoss {
                 e -> e.isAlive() && !RuinGuards.isGuard(e))) {
             if (e.position().subtract(at).horizontalDistance() <= r
                     && hurtWith("press", e, damageSources().mobAttack(this), BossScaling.hardMode() ? PRESS_DAMAGE : PRESS_DAMAGE_NORMAL)) {
-                e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1), this);
+                e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 1), this);
             }
         }
     }
@@ -672,7 +672,7 @@ public class FoundryOverseer extends RuinBoss {
 
     @Nullable
     private RuinAndroid spawnAt(ServerLevel level, @Nullable BlockPos line, AndroidKind kind, boolean prototype, @Nullable LivingEntity target) {
-        RuinAndroid a = kind.type().create(level);
+        RuinAndroid a = kind.type().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (a == null) {
             return null;
         }
@@ -684,10 +684,10 @@ public class FoundryOverseer extends RuinBoss {
         } else {
             at = clampToRoom(anchor().add(random.nextDouble() * 6 - 3, 0, random.nextDouble() * 6 - 3));
         }
-        a.moveTo(at.x, at.y, at.z, random.nextFloat() * 360, 0);
+        a.snapTo(at.x, at.y, at.z, random.nextFloat() * 360, 0);
         a.makeFactoryMade(prototype);
         if (home != null) {
-            a.restrictTo(home, arenaRadius());
+            a.setHomeTo(home, arenaRadius());
         }
         a.startPrinting();
         if (target != null) {
@@ -714,9 +714,9 @@ public class FoundryOverseer extends RuinBoss {
 
     /** 動いている製造ラインが多いほど、受けるダメージが小さい。 */
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
         if (emergeTicks() > 0 || RuinGuards.friendlyFire(source)) {
-            return super.hurt(source, amount);
+            return super.hurtServer(damageLevel, source, amount);
         }
         boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
         int n = lineCount();
@@ -724,7 +724,7 @@ public class FoundryOverseer extends RuinBoss {
         if (n > 0 && !bypass && level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.2, getZ(), 4 + n * 3, 0.6, 0.6, 0.6, 0.3);
         }
-        return super.hurt(source, scaled);
+        return super.hurtServer(damageLevel, source, scaled);
     }
 
     @Override
@@ -744,7 +744,7 @@ public class FoundryOverseer extends RuinBoss {
         if (level() instanceof ServerLevel level) {
             setConveyors(false);
             for (RuinAndroid a : factoryMade(level)) {
-                a.kill();
+                a.kill(level);
             }
             playSound(SinguloSounds.get("foundry.line_break"), 2.5F, 0.6F);
         }
@@ -752,20 +752,20 @@ public class FoundryOverseer extends RuinBoss {
 
     /** ふつうの落とし物に加え、部屋にいる挑戦者それぞれへ試作機の設計メモリを1つ（まだ持っていない型を先に）。 */
     @Override
-    protected void dropFromLootTable(DamageSource source, boolean recentlyHit) {
-        super.dropFromLootTable(source, recentlyHit);
+    protected void dropFromLootTable(ServerLevel lootLevel, DamageSource source, boolean recentlyHit) {
+        super.dropFromLootTable(lootLevel, source, recentlyHit);
         if (isMinion() || !(level() instanceof ServerLevel level)) {
             return;
         }
         List<Player> players = rewardPlayers(level);
         if (players.isEmpty()) {
             AndroidKind[] all = AndroidKind.prototypes();
-            spawnAtLocation(PrototypeMemories.stack(all[random.nextInt(all.length)]));
+            spawnAtLocation(level, PrototypeMemories.stack(all[random.nextInt(all.length)]));
             return;
         }
         for (Player p : players) {
             if (p instanceof net.minecraft.server.level.ServerPlayer sp) {
-                spawnAtLocation(PrototypeMemories.stack(PrototypeMemories.next(sp, random)));
+                spawnAtLocation(level, PrototypeMemories.stack(PrototypeMemories.next(sp, random)));
             }
         }
     }
@@ -832,8 +832,8 @@ public class FoundryOverseer extends RuinBoss {
     public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
         CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
         super.readAdditionalSaveData(values);
-        readList(tag.getList("lines", Tag.TAG_INT_ARRAY), lines);
-        readList(tag.getList("conveyors", Tag.TAG_INT_ARRAY), conveyors);
+        readList(tag.getListOrEmpty("lines"), lines);
+        readList(tag.getListOrEmpty("conveyors"), conveyors);
         conveyorsOn = tag.getBooleanOr("conveyors_on", false);
         prototypesCalled = tag.getBooleanOr("prototypes", false);
         reprinted = tag.getBooleanOr("reprinted", false);

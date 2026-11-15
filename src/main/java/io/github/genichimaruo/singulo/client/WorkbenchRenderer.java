@@ -32,8 +32,8 @@ public class WorkbenchRenderer extends SnapshotBlockRenderer<AndroidWorkbenchBlo
         pose.mulPose(Axis.YP.rotationDegrees(age * 2));
         pose.scale(0.5F, 0.5F, 0.5F);
         // 台のブロックの中は真っ暗なので、台の上のマスの明るさで描く
-        int above = net.minecraft.client.renderer.LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().above());
-        context.getItemRenderer().renderStatic(shown, ItemDisplayContext.FIXED, above, overlay, pose, buffers, be.getLevel(), (int) be.getBlockPos().asLong());
+        int above = net.minecraft.client.renderer.LevelRenderer.getLightCoords(be.getLevel(), be.getBlockPos().above());
+        ItemDraw.get().renderStatic(shown, ItemDisplayContext.FIXED, above, overlay, pose, buffers, be.getLevel(), (int) be.getBlockPos().asLong());
         pose.popPose();
     }
 }

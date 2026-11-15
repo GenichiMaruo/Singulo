@@ -33,7 +33,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 開いているときに鍵を持ってスニークして使うと、また封印する。
  * 封印中は壊しにくく（黒曜石より硬い）、無理に壊すと中身ごと失われる（何も落とさない）。開いていれば普通のチェストと同じ。
  */
-public class SealedContainerBlock extends BaseEntityBlock {
+public class SealedContainerBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
     public static final MapCodec<SealedContainerBlock> CODEC = simpleCodec(p -> new SealedContainerBlock(p, 1));
     private static final VoxelShape SHAPE = Shapes.or(box(0, 0, 0, 16, 3, 16), box(1, 3, 1, 15, 15, 15));
     /** 封印中の壊しにくさ（黒曜石は50）。 */
@@ -116,7 +116,7 @@ public class SealedContainerBlock extends BaseEntityBlock {
             return;
         }
         if (SealedContainerBlockEntity.isKey(event.getItemStack(), block.tier())) {
-            event.setUseBlock(net.neoforged.neoforge.common.util.TriState.TRUE);
+            event.setUseBlock(net.minecraft.util.TriState.TRUE);
         }
     }
 
@@ -124,7 +124,7 @@ public class SealedContainerBlock extends BaseEntityBlock {
     @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof SealedContainerBlockEntity box && box.phase() != SealedContainerBlockEntity.Phase.OPEN) {
-            float speed = player.getDigSpeed(state, pos);
+            float speed = player.getDestroySpeed(state, pos);
             return speed / SEALED_HARDNESS / (player.hasCorrectToolForDrops(state) ? 30 : 100);
         }
         return super.getDestroyProgress(state, player, level, pos);
@@ -142,7 +142,7 @@ public class SealedContainerBlock extends BaseEntityBlock {
 
     /** 開いているときに壊したら、中身をまき散らす（チェストと同じ）。封印中は中身ごと消える。 */
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof SealedContainerBlockEntity box) {
             if (box.phase() == SealedContainerBlockEntity.Phase.OPEN) {
                 Containers.dropContents(level, pos, box);
@@ -150,7 +150,6 @@ public class SealedContainerBlock extends BaseEntityBlock {
                 box.shatter(server);
             }
         }
-        super.onRemove(state, level, pos, newState, moving);
     }
 
     /** 封印中は、継ぎ目から細い光の粒がときどき漏れる。 */

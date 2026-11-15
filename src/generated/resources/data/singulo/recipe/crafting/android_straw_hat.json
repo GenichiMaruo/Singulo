@@ -7,12 +7,8 @@
     " S "
   ],
   "key": {
-    "H": {
-      "tag": "c:crops/wheat"
-    },
-    "S": {
-      "tag": "c:strings"
-    }
+    "H": "#c:crops/wheat",
+    "S": "#c:strings"
   },
   "result": {
     "id": "singulo:android_straw_hat",

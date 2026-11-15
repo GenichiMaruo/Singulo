@@ -11,13 +11,13 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /**
  * Mekanism との連携（化学物質）の確認。ふだんの GameTest（名前空間 singulo）とは分けてあり、Mekanism を入れて
@@ -32,7 +32,7 @@ public final class MekanismGameTests {
     private MekanismGameTests() {}
 
     private static ItemStack item(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)));
     }
 
     /**
@@ -44,7 +44,7 @@ public final class MekanismGameTests {
         helper.assertTrue(Chemicals.present(), "Mekanism が入っていない（-PwithMekanism で走らせる）");
         BlockPos consolePos = new BlockPos(1, 1, 1), tankPos = consolePos.above();
         helper.setBlock(consolePos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        var tankBlock = BuiltInRegistries.BLOCK.get(Identifier.parse("mekanism:basic_chemical_tank"));
+        var tankBlock = BuiltInRegistries.BLOCK.getValue(Identifier.parse("mekanism:basic_chemical_tank"));
         helper.setBlock(tankPos, tankBlock);
         // Mekanism の装置は、面ごとの設定の既定値をアイテムが持っている（手で置いたときと同じにする）
         helper.getLevel().getBlockEntity(helper.absolutePos(tankPos)).applyComponentsFromItemStack(new ItemStack(tankBlock));
@@ -57,7 +57,7 @@ public final class MekanismGameTests {
                     "化学物質の挿入シミュレーションがタンクを変えた");
             long put = store.insert("mekanism:hydrogen", 5000, false);
             helper.assertTrue(put == 5000, "ケミカルタンクに水素が入らない: " + put);
-            WorkConsoleBlockEntity console = helper.getBlockEntity(consolePos);
+            WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,consolePos);
             ItemStack hydrogen = ChemicalSamples.of("mekanism:hydrogen", 1);
             helper.assertTrue(ItemCount.get(console.stock(), hydrogen) == 5000, "素材置き場の在庫に水素が数えられない");
             // 指令台はタンクの下（入れるだけの面）にあるが、出せる面（前）から取り出せる
@@ -68,7 +68,7 @@ public final class MekanismGameTests {
                     .drain(hydrogen, 1000, false);
             helper.assertTrue(drained == 1000 && ItemCount.get(console.stock(), hydrogen) == 4000, "素材置き場のケミカルタンクから取り出せない: " + drained);
 
-            BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+            BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
             helper.getLevel().addFreshEntity(a);
             a.inventory().setItem(RuinAndroid.SLOT_TANK, item("android_gas_tank_upgrade"));
@@ -76,8 +76,8 @@ public final class MekanismGameTests {
             helper.assertTrue(a.fillLiquid(hydrogen, 70000, false) == 64000 && a.liquidAmount(hydrogen) == 64000,
                     "化学物質のタンク2つに 64,000 mB 入らない: " + a.liquidAmount(hydrogen));
             helper.assertTrue(a.drainLiquid(hydrogen, 2000, false) == 2000 && a.liquidAmount(hydrogen) == 62000, "化学物質のタンクから出せない");
-            var reloaded = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
-            reloaded.load(a.saveWithoutId(new net.minecraft.nbt.CompoundTag()));
+            var reloaded = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            reloaded.load(io.github.genichimaruo.singulo.test.harness.TestNbt.save(a));
             helper.assertTrue(reloaded.hasChemTank() && reloaded.liquidAmount(hydrogen) == 62000,
                     "再読み込みで化学物質の種類・量かタンク装備を失った");
             helper.assertTrue(reloaded.drainLiquid(hydrogen, 2000, true) == 2000 && reloaded.liquidAmount(hydrogen) == 62000,

@@ -45,7 +45,7 @@ public class CasimirCavityRenderer extends SnapshotBlockRenderer<FixedShapeContr
         Vec3 offset = Vec3.atLowerCornerOf(center.subtract(be.getBlockPos())).add(0.5, 0.5, 0.5);
         float time = level.getGameTime() + partialTick;
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);
 

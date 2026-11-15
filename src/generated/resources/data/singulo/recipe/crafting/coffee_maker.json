@@ -6,21 +6,11 @@
     "IBK"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_furniture"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "K": {
-      "item": "singulo:basic_circuit"
-    }
+    "B": "singulo:blueprint_lab_furniture",
+    "W": "singulo:white_ceramic_composite",
+    "G": "#c:glass_blocks/colorless",
+    "I": "#c:ingots/iron",
+    "K": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:coffee_maker",

@@ -65,9 +65,9 @@ public class BitAndroid extends RuinAndroid {
     private static final EntityDataAccessor<BlockPos> SHOT_ORIGIN = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Integer> SLASH_BIT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> SLASH_START = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.LONG);
-    private static final EntityDataAccessor<Vector3f> SLASH_FROM = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> SLASH_AT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> SHOT_FROM = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> SLASH_FROM = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> SLASH_AT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> SHOT_FROM = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
 
     // 本体の一部。別エンティティ・当たり判定・独立した保存データは作らない。
     // ワールド座標を保持するので、本体の旋回や歩行に即座に貼り付かない。
@@ -86,7 +86,7 @@ public class BitAndroid extends RuinAndroid {
     /** 最後に撃ったビットの番号・光の残り・撃った先。 */
     private static final EntityDataAccessor<Integer> SHOT_BIT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SHOT_FLASH = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> SHOT_AT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> SHOT_AT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
 
     /**
      * 描画するかを決める箱: 飛んでいるビット（送り出したもの・背中へ戻る途中のもの）と、ビットの光線の両端まで広げる
@@ -166,7 +166,7 @@ public class BitAndroid extends RuinAndroid {
     }
 
     public Vec3 shotAt() {
-        Vector3f v = entityData.get(SHOT_AT);
+        Vector3f v = new org.joml.Vector3f(entityData.get(SHOT_AT));
         return Vec3.atLowerCornerOf(entityData.get(SHOT_ORIGIN)).add(new Vec3(v));
     }
 
@@ -225,7 +225,7 @@ public class BitAndroid extends RuinAndroid {
     }
 
     public Vec3 shotFrom() {
-        return Vec3.atLowerCornerOf(entityData.get(SHOT_ORIGIN)).add(new Vec3(entityData.get(SHOT_FROM)));
+        return Vec3.atLowerCornerOf(entityData.get(SHOT_ORIGIN)).add(new Vec3(new org.joml.Vector3f(entityData.get(SHOT_FROM))));
     }
 
     public int slashBit() {
@@ -233,11 +233,11 @@ public class BitAndroid extends RuinAndroid {
     }
 
     private Vec3 slashFrom() {
-        return Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN)).add(new Vec3(entityData.get(SLASH_FROM)));
+        return Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN)).add(new Vec3(new org.joml.Vector3f(entityData.get(SLASH_FROM))));
     }
 
     public Vec3 slashAim() {
-        return Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN)).add(new Vec3(entityData.get(SLASH_AT)));
+        return Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN)).add(new Vec3(new org.joml.Vector3f(entityData.get(SLASH_AT))));
     }
 
     public float slashTime(float partialTick) {
@@ -353,7 +353,7 @@ public class BitAndroid extends RuinAndroid {
             if (!slashHits.contains(e.getId()) && (box.contains(a) || box.clip(a, b).isPresent())
                     && !blocked(level, a, e.getBoundingBox().getCenter())) {
                 slashHits.add(e.getId());
-                if (e.hurt(damageSources().mobAttack(this), SLASH_DAMAGE)) {
+                if (e.hurtOrSimulate(damageSources().mobAttack(this), SLASH_DAMAGE)) {
                     playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 0.7F, 1.8F);
                     sparks(level, e.getBoundingBox().getCenter(), 5, 0.15);
                 }
@@ -388,7 +388,7 @@ public class BitAndroid extends RuinAndroid {
             return false;
         }
         if (canHit(target)) {
-            target.hurt(damageSources().mobAttack(this), BIT_DAMAGE);
+            target.hurtOrSimulate(damageSources().mobAttack(this), BIT_DAMAGE);
         }
         entityData.set(SHOT_ORIGIN, blockPosition());
         Vec3 origin = Vec3.atLowerCornerOf(blockPosition());
@@ -496,7 +496,7 @@ public class BitAndroid extends RuinAndroid {
                         Vec3 back = position().subtract(target.position()).multiply(1, 0, 1);
                         back = back.lengthSqr() < 1e-4 ? Vec3.directionFromRotation(0, yBodyRot + 180) : back.normalize();
                         setDeltaMovement(back.x * 0.9, floating() ? 0 : 0.38, back.z * 0.9);      // 水の中・無重力では、跳ねずに下がる
-                        hasImpulse = true;
+                        needsSync = true;
                         setState(STATE_BACKSTEP);
                         playSound(SoundEvents.TRIDENT_RIPTIDE_2.value(), 0.6F, 1.9F);
                     }

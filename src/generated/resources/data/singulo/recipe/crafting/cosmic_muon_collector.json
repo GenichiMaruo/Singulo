@@ -7,18 +7,10 @@
     "P P"
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "O": {
-      "item": "singulo:superconducting_coil"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "P": {
-      "tag": "c:plates/steel"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "O": "singulo:superconducting_coil",
+    "F": "singulo:basic_frame",
+    "P": "#c:plates/steel"
   },
   "result": {
     "id": "singulo:cosmic_muon_collector",

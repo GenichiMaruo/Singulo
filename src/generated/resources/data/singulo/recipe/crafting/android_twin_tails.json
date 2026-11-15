@@ -7,12 +7,8 @@
     "S S"
   ],
   "key": {
-    "W": {
-      "tag": "minecraft:wool"
-    },
-    "S": {
-      "tag": "c:strings"
-    }
+    "W": "#minecraft:wool",
+    "S": "#c:strings"
   },
   "result": {
     "id": "singulo:android_twin_tails",

@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:gravity_panel_receiver"
-      },
+      "ingredient": "singulo:gravity_panel_receiver",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:slime_balls"
-      },
+      "ingredient": "#c:slime_balls",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "minecraft:piston"
-      },
+      "ingredient": "minecraft:piston",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:thermocouple_module"
-      },
+      "ingredient": "singulo:thermocouple_module",
       "count": 1
     }
   ],

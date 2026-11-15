@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.*;
 @Mixin(FleeSunGoal.class)
 public abstract class RayleighFleeSunMixin {
     @Shadow @Final protected PathfinderMob mob;
-    @Redirect(method = "canUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
+    @Redirect(method = "canUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isBrightOutside()Z"))
     private boolean singulo$localDay(Level level) {
-        return level.isDay() || RayleighSky.sunlit(level, mob.blockPosition());
+        return level.isBrightOutside() || RayleighSky.sunlit(level, mob.blockPosition());
     }
 }

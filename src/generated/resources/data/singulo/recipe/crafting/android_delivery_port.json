@@ -7,18 +7,10 @@
     " B "
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "H": {
-      "item": "minecraft:hopper"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "P": "#c:plates/steel",
+    "R": "#c:dusts/redstone",
+    "H": "minecraft:hopper",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:android_delivery_port",

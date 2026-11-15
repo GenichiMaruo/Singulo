@@ -1,9 +1,12 @@
 package io.github.genichimaruo.singulo.energy;
 
-import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
-/** 変更通知と直接の出し入れができる電力の入れ物。 */
-public class SinguloEnergyStorage extends EnergyStorage {
+/** Native transactional storage with synchronous helpers for machine-owned tick logic. */
+@SuppressWarnings("removal")
+public class SinguloEnergyStorage extends SimpleEnergyHandler implements IEnergyStorage {
     private final Runnable onChange;
 
     public SinguloEnergyStorage(int capacity, int maxReceive, int maxExtract, Runnable onChange) {
@@ -11,51 +14,42 @@ public class SinguloEnergyStorage extends EnergyStorage {
         this.onChange = onChange;
     }
 
-    @Override
-    public int receiveEnergy(int toReceive, boolean simulate) {
-        if (energy >= capacity || toReceive <= 0) return 0;
-        int r = super.receiveEnergy(toReceive, simulate);
-        if (r > 0 && !simulate) {
-            onChange.run();
+    @Override protected void onEnergyChanged(int previousAmount) { onChange.run(); }
+    @Override public int getEnergyStored() { return getAmountAsInt(); }
+    @Override public int getMaxEnergyStored() { return getCapacityAsInt(); }
+    @Override public boolean canReceive() { return maxInsert > 0; }
+    @Override public boolean canExtract() { return maxExtract > 0; }
+
+    @Override public int receiveEnergy(int amount, boolean simulate) {
+        if (amount <= 0) return 0;
+        try (var tx = Transaction.openRoot()) {
+            int result = insert(amount, tx);
+            if (!simulate) tx.commit();
+            return result;
         }
-        return r;
+    }
+    @Override public int extractEnergy(int amount, boolean simulate) {
+        if (amount <= 0) return 0;
+        try (var tx = Transaction.openRoot()) {
+            int result = extract(amount, tx);
+            if (!simulate) tx.commit();
+            return result;
+        }
     }
 
-    @Override
-    public int extractEnergy(int toExtract, boolean simulate) {
-        int r = super.extractEnergy(toExtract, simulate);
-        if (r > 0 && !simulate) {
-            onChange.run();
-        }
-        return r;
-    }
-
-    /** 装置自身が電力を使う（受け入れ・取り出しの上限を無視する）。 */
+    /** Internal machine consumption ignores the external extraction limit. */
     public boolean consume(int amount) {
-        if (energy < amount) {
-            return false;
-        }
-        energy -= amount;
-        onChange.run();
+        if (amount < 0 || energy < amount) return false;
+        if (amount != 0) set(energy - amount);
         return true;
     }
-
-    /** 発電機が電力を生む。入り切らなかった分は捨てる。 */
     public void generate(int amount) {
-        int before = energy;
-        energy = (int) Math.max(before, Math.min(capacity, (long) energy + amount));
-        if (energy != before) {
-            onChange.run();
-        }
+        int next = (int) Math.max(energy, Math.min(capacity, (long) energy + amount));
+        if (next != energy) set(next);
     }
-
-    public void setEnergy(int value) {
-        energy = Math.max(0, Math.min(capacity, value));
-    }
-
-    /** Downgrading never destroys stored energy. Reception stays blocked until surplus is spent. */
+    /** Loading state does not emit a dirty notification. */
+    public void setEnergy(int value) { energy = Math.max(0, Math.min(capacity, value)); }
+    /** Downgrading never destroys surplus charge. */
     public void resizeCapacity(int value) { capacity = Math.max(1, value); }
-
-    /** Restore pre-existing charge even if a removed upgrade or migration reduced the capacity. */
     public void restoreEnergy(int value) { energy = Math.max(0, value); }
 }

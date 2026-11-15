@@ -77,7 +77,7 @@ public final class BossLoot {
                 return xp;
             }
             ItemStack stack = found.get().itemStack();
-            int durability = net.minecraft.world.item.enchantment.EnchantmentHelper.modifyDurabilityToRepairFromXp(player.serverLevel(), stack, xp);
+            int durability = net.minecraft.world.item.enchantment.EnchantmentHelper.modifyDurabilityToRepairFromXp(player.level(), stack, xp);
             int fixed = Math.min(durability, stack.getDamageValue());
             if (fixed <= 0) {
                 return xp;
@@ -92,9 +92,11 @@ public final class BossLoot {
     private static void orbs(ServerLevel level, Vec3 at, int total) {
         for (int value : protectedOrbValues(total)) {
             ExperienceOrb orb = new ExperienceOrb(level, at.x, at.y, at.z, value);
-            net.minecraft.nbt.CompoundTag tag = orb.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            var output = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
+            orb.saveWithoutId(output);
+            net.minecraft.nbt.CompoundTag tag = output.buildResult();
             tag.putShort("Age", Short.MIN_VALUE);
-            orb.load(tag);
+            orb.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), tag));
             orb.getPersistentData().putBoolean(io.github.genichimaruo.singulo.reactor.EventHorizonTargets.PROTECTED, true);
             level.addFreshEntity(orb);
         }

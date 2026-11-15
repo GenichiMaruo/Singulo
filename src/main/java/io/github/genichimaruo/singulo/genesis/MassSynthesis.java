@@ -28,7 +28,7 @@ import net.minecraft.world.item.ItemStack;
  * 生成した物を炉に戻しても電力は増えない。表にない物は作れない（mod の圧縮ブロックや質量ペレットなどは載せない）。
  * アイテム単位の指定がタグより優先し、タグ同士は後に読んだものが優先する。
  */
-public final class MassSynthesis extends SimpleJsonResourceReloadListener {
+public final class MassSynthesis extends SimpleJsonResourceReloadListener<JsonElement> {
     public static final MassSynthesis INSTANCE = new MassSynthesis();
     public static final int MAX_TIER = 4;
 
@@ -41,7 +41,7 @@ public final class MassSynthesis extends SimpleJsonResourceReloadListener {
     private List<TagEntry> tags = List.of();
 
     private MassSynthesis() {
-        super(new Gson(), "mass_synthesis");
+        super(net.minecraft.util.ExtraCodecs.JSON, net.minecraft.resources.FileToIdConverter.json("mass_synthesis"));
     }
 
     @Override

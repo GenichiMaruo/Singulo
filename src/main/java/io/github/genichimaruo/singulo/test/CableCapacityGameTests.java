@@ -6,13 +6,13 @@ import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-@net.neoforged.neoforge.gametest.GameTestHolder("singulo_cable")
-@net.neoforged.neoforge.gametest.PrefixGameTestTemplate(false)
+@io.github.genichimaruo.singulo.test.harness.GameTestHolder("singulo_cable")
+@io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate(false)
 public final class CableCapacityGameTests {
     private static IEnergyStorage port(GameTestHelper h, BlockPos pos) {
         var cap=h.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,h.absolutePos(pos),Direction.NORTH);
@@ -22,7 +22,7 @@ public final class CableCapacityGameTests {
     private static SmesCellBlockEntity sink(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos,SinguloBlocks.SMES_MODULE.get().defaultBlockState()
                 .setValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING,Direction.SOUTH));
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
     }
     private static void superCable(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos,SinguloBlocks.SUPERCONDUCTING_CABLE.get());
@@ -130,7 +130,7 @@ public final class CableCapacityGameTests {
         var cable=output.north();
         h.getLevel().setBlockAndUpdate(cable,SinguloBlocks.SUPERCONDUCTING_CABLE.get().defaultBlockState());
         h.getLevel().setBlockAndUpdate(cable.north(),SinguloBlocks.COPPER_WIRE.get().defaultBlockState());
-        MachineBlockEntity tower=h.getBlockEntity(controller);
+        MachineBlockEntity tower=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,controller);
         h.startSequence().thenWaitUntil(()->h.assertTrue(tower.structureSize()==7,"Cooling tower not formed"))
                 .thenExecute(()->{
                     tower.energy().setEnergy(0);

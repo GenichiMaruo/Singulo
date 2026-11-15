@@ -17,7 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * 無重力コントロールボックス（{@link ZeroGravityControllerBlockEntity}）。無重力ブロックに付けて使う。
  * 右クリックで無重力の高さを1ブロック上げ、スニークして右クリックで1ブロック下げる。高さと電力を知らせる。
  */
-public class ZeroGravityControllerBlock extends BaseEntityBlock {
+public class ZeroGravityControllerBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
     public static final MapCodec<ZeroGravityControllerBlock> CODEC = simpleCodec(ZeroGravityControllerBlock::new);
 
     public ZeroGravityControllerBlock(Properties properties) {
@@ -61,7 +61,7 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
 
     /** 置いたら、同じ集まりのボックスの高さに合わせる（ブロックのデータを読んだあと）。 */
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.@Nullable LivingEntity placer,
                             net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
@@ -71,9 +71,8 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         boolean removed = !state.is(newState.getBlock());
-        super.onRemove(state, level, pos, newState, moving);
         if (removed && !level.isClientSide()) {
             ZeroGravityControllerBlockEntity.notifyReceivers(level, pos);
         }

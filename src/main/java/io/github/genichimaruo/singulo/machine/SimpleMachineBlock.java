@@ -50,7 +50,7 @@ public class SimpleMachineBlock<T extends BlockEntity> extends AbstractMachineBl
 
     /** ワールドライン・アンカーは置いた人を覚える（1人あたりの上限 maxAnchorsPerPlayer の数え先）。 */
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.@Nullable LivingEntity placer,
                             net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide() && placer instanceof net.minecraft.world.entity.player.Player player

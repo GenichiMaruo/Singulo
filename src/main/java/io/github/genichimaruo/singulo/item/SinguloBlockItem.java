@@ -22,8 +22,15 @@ public class SinguloBlockItem extends BlockItem {
     }
 
     @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                                java.util.function.Consumer<Component> output, TooltipFlag flag) {
+        super.appendHoverText(stack, context, display, output, flag);
+        List<Component> tooltip = new java.util.ArrayList<>();
+        appendHoverText(stack, context, tooltip, flag);
+        tooltip.forEach(output);
+    }
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
+        if (getBlock() instanceof io.github.genichimaruo.singulo.compat.BlockTooltip block) block.appendHoverText(stack, context, tooltip, flag);
         SinguloItem.addStageLine(tooltip, stage);
         if (stack.has(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA)
                 && Integer.valueOf(1).equals(stack.get(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE))) {

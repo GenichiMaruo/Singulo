@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.Blocks;
  * レシピ棚の行の左に置くと、その行のレシピを作る場所になる。作業指令台を記録したカードで資材口・納品口・レシピ棚を
  * 右クリックすると、その指令台につなぐ（もう一度で外す）。
  */
-public class WorkLocationCardItem extends Item {
+public class WorkLocationCardItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     private static final String KEY = "work_location";
 
     public WorkLocationCardItem(Properties properties) {
@@ -91,7 +91,7 @@ public class WorkLocationCardItem extends Item {
     public static void record(ItemStack card, Level level, BlockPos pos, Block block) {
         CompoundTag t = new CompoundTag();
         t.putLong("pos", pos.asLong());
-        t.putString("dim", level.dimension().location().toString());
+        t.putString("dim", level.dimension().identifier().toString());
         t.putString("block", BuiltInRegistries.BLOCK.getKey(block).toString());
         CustomData.update(DataComponents.CUSTOM_DATA, card, tag -> tag.put(KEY, t));
         card.set(DataComponents.MAX_STACK_SIZE, 1);
@@ -128,7 +128,7 @@ public class WorkLocationCardItem extends Item {
     /** 記録した位置が、この次元のものか。 */
     public static boolean sameDimension(ItemStack card, Level level) {
         CompoundTag t = data(card);
-        return t != null && t.getStringOr("dim", "").equals(level.dimension().location().toString());
+        return t != null && t.getStringOr("dim", "").equals(level.dimension().identifier().toString());
     }
 
     /** 記録したブロックの種類（記録がなければ空気）。 */
@@ -138,7 +138,7 @@ public class WorkLocationCardItem extends Item {
             return Blocks.AIR;
         }
         Identifier id = Identifier.tryParse(t.getStringOr("block", ""));
-        return id == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(id);
+        return id == null ? Blocks.AIR : BuiltInRegistries.BLOCK.getValue(id);
     }
 
     public static boolean isCard(ItemStack stack) {

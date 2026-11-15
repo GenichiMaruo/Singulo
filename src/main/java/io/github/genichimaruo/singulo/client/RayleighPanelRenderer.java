@@ -60,7 +60,7 @@ public class RayleighPanelRenderer extends SnapshotBlockRenderer<RayleighPanelBl
             return;
         }
         BlockPos pos = be.getBlockPos();
-        Vec3 eye = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 eye = Minecraft.getInstance().gameRenderer.getMainCamera().position();
         if (eye.y >= pos.getY()) {
             return;                                                         // 下の面は、下からしか見えない
         }
@@ -102,7 +102,7 @@ public class RayleighPanelRenderer extends SnapshotBlockRenderer<RayleighPanelBl
             return;
         }
         int rgb = panel.lab() ? LAB_FRAME : MADE_FRAME;
-        int light = net.minecraft.client.renderer.LevelRenderer.getLightColor(level, pos.below());
+        int light = net.minecraft.client.renderer.LevelRenderer.getLightCoords(level, pos.below());
         float y = -DROP * 2;
         for (float[] v : new float[][] {{cx, cz}, {cx + FRAME, cz}, {cx + FRAME, cz + FRAME}, {cx, cz + FRAME}}) {
             vc.addVertex(last, v[0], y, v[1]).setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, 255).setUv(0.5F, 0.5F)

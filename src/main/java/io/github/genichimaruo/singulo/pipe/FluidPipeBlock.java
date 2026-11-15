@@ -30,7 +30,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
  * capacity は1 tick に運べる量（mB）。分かれ目のない区間は {@link FluidPipeNetwork} が1つにまとめ、
  * 経路のいちばん細いところで量が決まる（電線と同じ）。パイプ自体は tick しない。
  */
-public class FluidPipeBlock extends BaseEntityBlock {
+public class FluidPipeBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock, io.github.genichimaruo.singulo.compat.BlockTooltip {
     private final long capacity;
     private final PipeProfile profile;
 
@@ -62,7 +62,6 @@ public class FluidPipeBlock extends BaseEntityBlock {
                 ? net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.unlimited")
                 : net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.capacity", String.format("%,d", capacity)))
                 .withStyle(net.minecraft.ChatFormatting.AQUA));
-        super.appendHoverText(stack, context, lines, flag);
     }
 
     @Override
@@ -116,8 +115,8 @@ public class FluidPipeBlock extends BaseEntityBlock {
     /** カバーがあれば、壊してもケーブルは残し、カバーを1つずつ外す（{@link ConduitCover#breakCover}）。 */
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
-                                       boolean willHarvest, net.minecraft.world.level.material.FluidState fluid) {
-        return !ConduitCover.breakCover(state, level, pos, player) && super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+                                       net.minecraft.world.item.ItemStack tool, boolean willHarvest, net.minecraft.world.level.material.FluidState fluid) {
+        return !ConduitCover.breakCover(state, level, pos, player) && super.onDestroyedByPlayer(state, level, pos, player, tool, willHarvest, fluid);
     }
 
     @Override
@@ -131,13 +130,13 @@ public class FluidPipeBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+    protected VoxelShape getOcclusionShape(BlockState state) {
         return ConduitCover.occlusion(state);
     }
 
     @Override
     public net.minecraft.world.level.block.SoundType getSoundType(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos,
-            @Nullable net.minecraft.world.entity.Entity entity) {
+            net.minecraft.world.entity.@Nullable Entity entity) {
         if (ConduitCover.of(state) == ConduitCover.State.BLOCK && level.getBlockEntity(pos) instanceof ConduitCover.Holder holder
                 && holder.coverState() != null) {
             return holder.coverState().getSoundType(level, pos, entity);
@@ -147,13 +146,13 @@ public class FluidPipeBlock extends BaseEntityBlock {
 
     /** 枠だけ・カバーなしは光を通し、隣に陰を落とさない（ガラスのように）。ブロック入りはふつうのブロックと同じ。 */
     @Override
-    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
-        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state, level, pos);
+    protected boolean propagatesSkylightDown(BlockState state) {
+        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state);
     }
 
     @Override
-    protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return ConduitCover.passesLight(state) ? 0 : super.getLightBlock(state, level, pos);
+    protected int getLightDampening(BlockState state) {
+        return ConduitCover.passesLight(state) ? 0 : super.getLightDampening(state);
     }
 
     @Override
@@ -175,8 +174,7 @@ public class FluidPipeBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
-                                     BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
         if (level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
             pipe.neighborChanged(neighborPos);
         }
@@ -185,10 +183,10 @@ public class FluidPipeBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean moving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, net.minecraft.world.level.redstone.Orientation fromPos, boolean moving) {
         // ブロックエンティティや面の設定だけが変わった場合も、接続を取り直す
         if (level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
-            pipe.neighborChanged(fromPos);
+            for (Direction direction : Direction.values()) pipe.neighborChanged(pos.relative(direction));
         }
         BlockState updated = connections(state, level, pos);
         if (updated != state) {
@@ -197,13 +195,12 @@ public class FluidPipeBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         ConduitCover.dropOnRemove(state, level, pos, newState);
         // 別の段階のパイプに置き換えたときも、ネットワークを作り直す（区間の容量が変わる）
         if (!state.is(newState.getBlock()) && !level.isClientSide() && level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
             pipe.invalidateNetwork();
         }
-        super.onRemove(state, level, pos, newState, moving);
     }
 
     static boolean connects(Level level, BlockPos pos, Direction dir) {
@@ -213,7 +210,7 @@ public class FluidPipeBlock extends BaseEntityBlock {
         }
         BlockState state = level.getBlockState(other);
         return state.getBlock() instanceof FluidPipeBlock || FluidPipeNetwork.isSource(state)
-                || level.getCapability(Capabilities.FluidHandler.BLOCK, other, dir.getOpposite()) != null;
+                || io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, other, dir.getOpposite()) != null;
     }
 
     @Nullable

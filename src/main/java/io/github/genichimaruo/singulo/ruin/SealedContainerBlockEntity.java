@@ -59,7 +59,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
         return false;
     }
 
@@ -109,7 +109,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     public static Item keyItem(int tier) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(KEYS[Math.max(1, Math.min(4, tier)) - 1]));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(KEYS[Math.max(1, Math.min(4, tier)) - 1]));
     }
 
     public static boolean isKey(ItemStack stack, int tier) {
@@ -129,7 +129,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
                 } else {
                     play("sealed_container.denied", 1.0F);
                     player.sendOverlayMessage(Component.translatable("message.singulo.sealed.need_key",
-                            keyItem(tier()).getDescription()));
+                            keyItem(tier()).getDefaultInstance().getHoverName()));
                 }
             }
             case OPEN -> {
@@ -250,7 +250,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     void shatter(ServerLevel level) {
         items.clear();
         Vec3 c = Vec3.atCenterOf(worldPosition);
-        level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.CLOUD, c.x, c.y, c.z, 20, 0.3, 0.3, 0.3, 0.05);
         level.playSound(null, worldPosition, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 0.6F);
     }
@@ -315,19 +315,23 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     // ------------------------------------------------------------------ 保存・同期
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, items, registries);
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
+        io.github.genichimaruo.singulo.compat.ValueIoCompat.write(output, (tag, registries) -> {
+        io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(tag, items, registries);
         tag.putString("Phase", phase.name());
         tag.putLong("PhaseStart", phaseStart);
         tag.putBoolean("Loot", lootPending);
+        });
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(input);
+        HolderLookup.Provider registries = input.lookup();
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, items, registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag, items, registries);
         lootPending = tag.getBooleanOr("Loot", false);
         if (tag.contains("Phase")) {
             try {
@@ -356,7 +360,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
         if (phase == Phase.OPEN || phase == Phase.SEALING) {
             for (ItemStack stack : items) {
                 if (!stack.isEmpty() && list.size() < 3) {
-                    list.add(stack.copyWithCount(1).save(registries));
+                    list.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(stack.copyWithCount(1), registries));
                 }
             }
         }

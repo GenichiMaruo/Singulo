@@ -134,7 +134,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         long now = player.level().getGameTime();
         map.entrySet().removeIf(e -> now - e.getValue() > LIFT_GRACE);
         for (int entityId : map.keySet()) {
-            Entity e = player.serverLevel().getEntity(entityId);
+            Entity e = player.level().getEntity(entityId);
             if (e != null && e.isAlive()) {
                 out.add(e);
             }
@@ -170,7 +170,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             return;
         }
         if (down) {
-            if (player.getCooldowns().isOnCooldown(item)) {
+            if (player.getCooldowns().isOnCooldown(stack)) {
                 return;
             }
             if (item.mode(stack) != Mode.LEVITATE) {
@@ -196,7 +196,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         if (thrown != null) {
             if (thrown.ticksLeft()[0]-- > 0) {
                 for (int entityId : thrown.entityIds()) {
-                    Entity e = player.serverLevel().getEntity(entityId);
+                    Entity e = player.level().getEntity(entityId);
                     if (e != null && e.isAlive()) {
                         launch(e, thrown.velocity());
                     }
@@ -216,7 +216,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             return;
         }
         // 投げた直後は持ち上げられない
-        if (player.getCooldowns().isOnCooldown(item)) {
+        if (player.getCooldowns().isOnCooldown(stack)) {
             dropAll(player);
             return;
         }
@@ -230,7 +230,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             }
             if (charged % 4 == 0) {
                 for (Entity held : lifted(player)) {
-                    player.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
+                    player.level().sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
                             held.getX(), held.getY() + held.getBbHeight() / 2, held.getZ(), 2 + charged / 8, 0.3, 0.3, 0.3, 0.02);
                 }
             }
@@ -260,7 +260,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         dropAll(player);
         // 左クリックを押したままでも、投げた対象をすぐ掴み直して引き戻さないよう、押し直すまで操作を止める
         LEFT_DOWN.remove(player.getUUID());
-        player.getCooldowns().addCooldown(this, THROW_COOLDOWN);
+        player.getCooldowns().addCooldown(stack, THROW_COOLDOWN);
         // プレイヤーが向いている方向へ初速を与える
         Vec3 velocity = flingVelocity(player.getLookAngle(), power);
         java.util.List<Integer> ids = new java.util.ArrayList<>();
@@ -291,7 +291,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         }
         target.setOnGround(false);
         target.setDeltaMovement(velocity);
-        target.hasImpulse = true;
+        target.needsSync = true;
         target.hurtMarked = true;
         target.fallDistance = 0;
     }
@@ -304,8 +304,8 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
 
     /** 左クリックでブロックを壊したり、生き物を叩いたりしない（重力を操るのに使う）。 */
     @Override
-    public boolean canAttackBlock(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.Level level,
-                                  net.minecraft.core.BlockPos pos, Player player) {
+    public boolean canDestroyBlock(ItemStack stack, net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.Level level,
+                                  net.minecraft.core.BlockPos pos, LivingEntity player) {
         return false;
     }
 
@@ -332,7 +332,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             return false;
         }
         // ほかのボスは圧壊のダメージだけ受ける（拘束はされない）
-        if (mode == Mode.CRUSH && entity.getType().is(Tags.EntityTypes.BOSSES)) {
+        if (mode == Mode.CRUSH && entity.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES)) {
             return true;
         }
         return !isGravityImmune(entity);
@@ -346,7 +346,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     /** 圧壊の1回（CRUSH_INTERVAL tick ごと）のダメージ。 */
     public static float crushDamage(LivingEntity target) {
         float damage = 4 + target.getMaxHealth() * 0.1F;
-        return target.getType().is(Tags.EntityTypes.BOSSES) ? Math.min(BOSS_CRUSH_CAP, damage) : damage;
+        return target.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES) ? Math.min(BOSS_CRUSH_CAP, damage) : damage;
     }
 
     @Override
@@ -368,7 +368,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             return;
         }
         LivingEntity living = (LivingEntity) target;
-        boolean boss = target.getType().is(Tags.EntityTypes.BOSSES);
+        boolean boss = target.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES);
         if (!boss) {
             // 自重で押しつぶす: 横の動きを止め、下へ押しつける
             Vec3 v = target.getDeltaMovement();
@@ -378,7 +378,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         if (remaining % CRUSH_INTERVAL == 0) {
             // 無敵時間（20 tick）より短い間隔で当てるので、そのぶんは外して毎回効かせる
             living.invulnerableTime = 0;
-            living.hurt(SinguloDamageTypes.tidal(player.level(), player), crushDamage(living));
+            living.hurtOrSimulate(SinguloDamageTypes.tidal(player.level(), player), crushDamage(living));
         }
     }
 
@@ -403,7 +403,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
                 }
                 double speed = Math.max(0.5, p.getDeltaMovement().length());
                 p.setDeltaMovement(out.scale(speed));
-                p.hasImpulse = true;
+                p.needsSync = true;
                 p.hurtMarked = true;
             } else if (e instanceof LivingEntity living && !(e instanceof Player) && !isGravityImmune(living)) {
                 e.setDeltaMovement(out.multiply(1, 0, 1).scale(0.6).add(0, 0.15, 0));

@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * 熱電発電機の高温源・低温源（data/&lt;ns&gt;/thermal/*.json）。
  * 液体（水・溶岩）は水源ブロックだけを数える。
  */
-public final class ThermalData extends SimpleJsonResourceReloadListener {
+public final class ThermalData extends SimpleJsonResourceReloadListener<JsonElement> {
     public static final ThermalData INSTANCE = new ThermalData();
 
     public record Hot(int temperature, boolean requiresLit) {}
@@ -32,7 +32,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
     private Map<Block, Cold> cold = Map.of();
 
     private ThermalData() {
-        super(new Gson(), "thermal");
+        super(net.minecraft.util.ExtraCodecs.JSON, net.minecraft.resources.FileToIdConverter.json("thermal"));
     }
 
     @Override
@@ -52,7 +52,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
                 if (root.has("cold")) {
                     for (JsonElement e : root.getAsJsonArray("cold")) {
                         JsonObject o = e.getAsJsonObject();
-                        Block becomes = BuiltInRegistries.BLOCK.get(Identifier.parse(o.get("becomes").getAsString()));
+                        Block becomes = BuiltInRegistries.BLOCK.getValue(Identifier.parse(o.get("becomes").getAsString()));
                         block(o).ifPresent(b -> newCold.put(b, new Cold(o.get("temperature").getAsInt(),
                                 o.get("tolerance").getAsInt(), becomes)));
                     }

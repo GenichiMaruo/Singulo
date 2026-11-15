@@ -7,12 +7,8 @@
     " D "
   ],
   "key": {
-    "N": {
-      "tag": "c:nuggets/gold"
-    },
-    "D": {
-      "tag": "c:gems/diamond"
-    }
+    "N": "#c:nuggets/gold",
+    "D": "#c:gems/diamond"
   },
   "result": {
     "id": "singulo:android_diamond_necklace",

@@ -26,7 +26,7 @@ public final class RuinSelfCheck {
     private RuinSelfCheck() {}
 
     public static boolean enabled() {
-        return Boolean.getBooleanOr("singulo.ruinSelfCheck", false);
+        return Boolean.getBoolean("singulo.ruinSelfCheck");
     }
 
     public static void onServerStarted(ServerStartedEvent event) {
@@ -35,7 +35,7 @@ public final class RuinSelfCheck {
         int ok = 0;
         for (String ruin : RUINS) {
             ResourceKey<Structure> key = ResourceKey.create(Registries.STRUCTURE, Singulo.id(ruin));
-            Holder<Structure> holder = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getHolderOrThrow(key);
+            Holder<Structure> holder = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(key);
             Pair<BlockPos, Holder<Structure>> found = level.getChunkSource().getGenerator().findNearestMapStructure(
                     level, HolderSet.direct(holder), BlockPos.ZERO, SEARCH_RADIUS_CHUNKS, false);
             if (found == null) {

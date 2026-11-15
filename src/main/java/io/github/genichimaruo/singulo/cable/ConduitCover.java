@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelProperty;
 
 /**
  * ケーブル・パイプのカバー。カバーの枠をケーブルに取り付け、枠に本物のブロックをはめ込むと、その場所がそのブロックの見た目になる
@@ -122,7 +122,7 @@ public final class ConduitCover {
         }
         var level = EmptyBlockGetter.INSTANCE;
         return s.getRenderShape() == RenderShape.MODEL && s.canOcclude()
-                && s.isSolidRender(level, BlockPos.ZERO) && s.isCollisionShapeFullBlock(level, BlockPos.ZERO);
+                && s.isSolidRender() && s.isCollisionShapeFullBlock(level, BlockPos.ZERO);
     }
 
     /** ブロックエンティティに保存する。 */
@@ -135,7 +135,7 @@ public final class ConduitCover {
     /** 保存から読む（はめ込めなくなったブロックでも、外すときに返せるよう、そのまま読む）。 */
     @Nullable
     public static BlockState load(CompoundTag tag, HolderLookup.Provider registries) {
-        if (!tag.contains(TAG, CompoundTag.TAG_COMPOUND)) {
+        if (tag.getCompound(TAG).isEmpty()) {
             return null;
         }
         BlockState state = NbtUtils.readBlockState(registries.lookupOrThrow(Registries.BLOCK), tag.getCompoundOrEmpty(TAG));

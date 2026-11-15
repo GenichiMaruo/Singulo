@@ -6,9 +6,7 @@
     "LL"
   ],
   "key": {
-    "L": {
-      "item": "singulo:android_gate_glass"
-    }
+    "L": "singulo:android_gate_glass"
   },
   "result": {
     "id": "singulo:android_gate_glass_patterned",

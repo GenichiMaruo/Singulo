@@ -154,7 +154,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         int r = radius();
         Vec3 c = Vec3.atCenterOf(axis());
         for (Mob mob : world.getEntitiesOfClass(Mob.class, new AABB(axis()).inflate(r),
-                m -> m instanceof Enemy && !m.getType().is(Tags.EntityTypes.BOSSES) && m.position().distanceToSqr(c) <= (double) r * r)) {
+                m -> m instanceof Enemy && !m.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES) && m.position().distanceToSqr(c) <= (double) r * r)) {
             Vec3 out = mob.position().subtract(c).multiply(1, 0, 1);
             out = out.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : out.normalize();
             mob.setDeltaMovement(out.scale(0.8).add(0, 0.2, 0));

@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:coolant_cartridge"
-      },
+      "ingredient": "singulo:coolant_cartridge",
       "count": 1
     }
   ],

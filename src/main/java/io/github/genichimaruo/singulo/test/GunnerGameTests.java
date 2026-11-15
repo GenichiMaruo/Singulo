@@ -8,15 +8,15 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 射撃型アンドロイド「シエル」（まだクリエイティブでだけ出す）: 出どころ・一覧に出さないこと・小型銃・レールガン。 */
 @GameTestHolder("singulo_gunner")
@@ -40,7 +40,7 @@ public final class GunnerGameTests {
 
     /** 南（+Z）を向いた、動かない射撃型。 */
     private static GunnerAndroid gunner(GameTestHelper helper, BlockPos at) {
-        GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel());
+        GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         g.setNoAi(true);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(at)), 0, 0);
         g.yBodyRot = 0;
@@ -55,7 +55,7 @@ public final class GunnerGameTests {
         helper.assertFalse(Set.of(AndroidKind.ruinKinds()).contains(AndroidKind.GUNNER), "射撃型が遺構の印刷台の型に入っている");
         helper.assertFalse(Set.of(AndroidKind.prototypes()).contains(AndroidKind.GUNNER), "射撃型が研究所の試作機の型に入っている");
         for (String id : Set.of("gunner_android_spawn_egg", AndroidKind.GUNNER.memoryId())) {
-            helper.assertTrue(BuiltInRegistries.ITEM.get(Singulo.id(id)) != Items.AIR, "アイテムが登録されていない: " + id);
+            helper.assertTrue(BuiltInRegistries.ITEM.getValue(Singulo.id(id)) != Items.AIR, "アイテムが登録されていない: " + id);
             helper.assertTrue(SinguloItems.HIDDEN.contains(id), "一覧に出さないアイテムに入っていない: " + id);
             helper.assertFalse(SinguloItems.TAB_ORDER.stream().anyMatch(i -> i.getId().getPath().equals(id)), "クリエイティブタブに並んでいる: " + id);
         }
@@ -68,14 +68,14 @@ public final class GunnerGameTests {
      */
     @GameTest(template = HUGE, batch = BATCH + "_foundry", timeoutTicks = 60)
     public static void awakenedFoundryDropsGunnerMemory(GameTestHelper helper) throws Exception {
-        var memory = BuiltInRegistries.ITEM.get(Singulo.id(AndroidKind.GUNNER.memoryId()));
+        var memory = BuiltInRegistries.ITEM.getValue(Singulo.id(AndroidKind.GUNNER.memoryId()));
         helper.assertTrue(new net.minecraft.world.item.ItemStack(memory).getRarity() == net.minecraft.world.item.Rarity.EPIC,
                 "射撃型の設計メモリの名前が紫（エピック）でない");
         var drop = io.github.genichimaruo.singulo.ruin.RuinBoss.class.getDeclaredMethod("dropAwakenedRewards", net.minecraft.server.level.ServerLevel.class);
         drop.setAccessible(true);
         int kills = 40, withMemory = 0;
         for (int i = 0; i < kills; i++) {
-            var foundry = SinguloEntities.FOUNDRY_OVERSEER.get().create(helper.getLevel());
+            var foundry = SinguloEntities.FOUNDRY_OVERSEER.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             foundry.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 2, 7))));
             foundry.setNoAi(true);
             foundry.makeAwakened();
@@ -98,8 +98,8 @@ public final class GunnerGameTests {
      */
     @GameTest(template = "empty")
     public static void gunnerHasPerksAndCostsMore(GameTestHelper helper) {
-        GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel());
-        var blade = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var blade = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         helper.assertTrue(g.packOpen() && !blade.packOpen(), "射撃型だけがバックパックを内蔵していない");
         helper.assertTrue(g.carryCapacity() == io.github.genichimaruo.singulo.android.RuinAndroid.CARRY_SLOTS
                 + io.github.genichimaruo.singulo.android.RuinAndroid.PACK_SLOTS, "射撃型の運べる欄が増えない: " + g.carryCapacity());
@@ -109,16 +109,16 @@ public final class GunnerGameTests {
         helper.assertTrue(g.workTicks(40) == 27 && blade.workTicks(40) == 40, "射撃型の作業が速くない: " + g.workTicks(40));
         BlockPos at = new BlockPos(1, 1, 1);
         helper.setBlock(at, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_STATION.get());
-        io.github.genichimaruo.singulo.android.AndroidStationBlockEntity s = helper.getBlockEntity(at);
+        io.github.genichimaruo.singulo.android.AndroidStationBlockEntity s = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,at);
         int fe = io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.PRINT_FE;
         s.items().setStackInSlot(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.SLOT_MEMORY,
-                new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(AndroidKind.BLADE.memoryId()))));
+                new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(AndroidKind.BLADE.memoryId()))));
         helper.assertTrue(s.printFe() == fe, "光刃型の印刷の電力が変わった: " + s.printFe());
         s.items().setStackInSlot(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.SLOT_MEMORY,
-                new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(AndroidKind.GUNNER.memoryId()))));
+                new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(AndroidKind.GUNNER.memoryId()))));
         helper.assertTrue(s.printFe() == fe * 3, "射撃型の印刷の電力が3倍でない: " + s.printFe());
         s.items().setStackInSlot(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.SLOT_PRINT_UNIT,
-                new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("android_factory_print_unit"))));
+                new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("android_factory_print_unit"))));
         helper.assertTrue(s.printFe() == fe * 3 / 2, "工場式印刷ユニットで半分にならない: " + s.printFe());
         g.discard();
         blade.discard();
@@ -167,7 +167,7 @@ public final class GunnerGameTests {
         for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 15, 0, 15)) {
             helper.setBlock(p, Blocks.STONE);
         }
-        GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel());
+        GunnerAndroid g = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         g.makeGuard(java.util.UUID.randomUUID(), helper.absolutePos(new BlockPos(7, 0, 1)), 0, 0);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(7, 1, 2))), 0, 0);
         helper.getLevel().addFreshEntity(g);

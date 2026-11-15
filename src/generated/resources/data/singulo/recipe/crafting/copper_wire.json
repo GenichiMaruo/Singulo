@@ -7,12 +7,8 @@
     " W "
   ],
   "key": {
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    }
+    "W": "singulo:white_ceramic_composite",
+    "C": "#c:ingots/copper"
   },
   "result": {
     "id": "singulo:copper_wire",

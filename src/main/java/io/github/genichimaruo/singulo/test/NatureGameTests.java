@@ -8,14 +8,14 @@ import io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 隕石クレーターの自然物、雷ガラス、深海・虚空の収集装置。 */
 @GameTestHolder(Singulo.MODID)
@@ -34,7 +34,7 @@ public final class NatureGameTests {
         helper.setBlock(sand.below(), Blocks.STONE);
         helper.setBlock(sand, Blocks.SAND);
         helper.setBlock(sand.above(), Blocks.LIGHTNING_ROD);
-        KeraunosTowerBlockEntity be = helper.getBlockEntity(tower);
+        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,tower);
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertTrue(be.fire(null), "撃てない");
         helper.assertFalse(be.fire(null), "ためている間にもう一度撃てる");
@@ -51,7 +51,7 @@ public final class NatureGameTests {
     public static void keraunosTowerNeedsALightningRod(GameTestHelper helper) {
         BlockPos tower = new BlockPos(1, 1, 1);
         helper.setBlock(tower, SinguloBlocks.KERAUNOS_TOWER.get());
-        KeraunosTowerBlockEntity be = helper.getBlockEntity(tower);
+        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,tower);
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertFalse(be.fire(null), "避雷針がないのに撃った");
         helper.assertTrue(be.energy().getEnergyStored() == be.energy().getMaxEnergyStored(), "撃たないのに電力を使った");
@@ -65,7 +65,7 @@ public final class NatureGameTests {
         helper.setBlock(sand.below(), Blocks.STONE);
         helper.setBlock(sand, Blocks.SAND);
         helper.setBlock(sand.above(), Blocks.LIGHTNING_ROD);
-        LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(helper.getLevel());
+        LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         BlockPos at = helper.absolutePos(sand.above(2));
         bolt.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
         helper.getLevel().addFreshEntity(bolt);
@@ -117,7 +117,7 @@ public final class NatureGameTests {
         }
         var level = helper.getLevel();
         helper.assertTrue(DeepSeaCollectorBlockEntity.depth(level, helper.absolutePos(sea)) == 5, "水の深さの数え方が違う");
-        DeepSeaCollectorBlockEntity collector = helper.getBlockEntity(sea);
+        DeepSeaCollectorBlockEntity collector = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,sea);
         helper.assertTrue(collector.rate() == 0 && DeepSeaCollectorBlockEntity.depth(level, helper.absolutePos(sea)) < DeepSeaCollectorBlockEntity.MIN_DEPTH,
                 "浅いのに動く");
         BlockPos voidPos = new BlockPos(5, 3, 5);
@@ -134,15 +134,15 @@ public final class NatureGameTests {
         BlockPos nextCell = new BlockPos(713, 17, 103);
         BlockPos from = new BlockPos(447, 20, 103);
         java.util.Map<Long, BlockPos> cores = new java.util.HashMap<>();
-        cores.put(net.minecraft.world.level.ChunkPos.asLong(0, 0), sameCell);
-        cores.put(net.minecraft.world.level.ChunkPos.asLong(1, 0), nextCell);
+        cores.put(net.minecraft.world.level.ChunkPos.pack(0, 0), sameCell);
+        cores.put(net.minecraft.world.level.ChunkPos.pack(1, 0), nextCell);
         var nearest = (java.util.function.Function<java.util.Map<Long, BlockPos>, BlockPos>) m ->
                 io.github.genichimaruo.singulo.item.MeteorCompassItem.nearestInCells(from, spacing, 4,
-                        (cx, cz) -> m.get(net.minecraft.world.level.ChunkPos.asLong(cx, cz)));
+                        (cx, cz) -> m.get(net.minecraft.world.level.ChunkPos.pack(cx, cz)));
         helper.assertTrue(nextCell.equals(nearest.apply(cores)), "区画の端で、隣の区画の近い核を選ばない: " + nearest.apply(cores));
         // 近いほうが掘り出されていれば、同じ区画の核
         java.util.Map<Long, BlockPos> mined = new java.util.HashMap<>(cores);
-        mined.remove(net.minecraft.world.level.ChunkPos.asLong(1, 0));
+        mined.remove(net.minecraft.world.level.ChunkPos.pack(1, 0));
         helper.assertTrue(sameCell.equals(nearest.apply(mined)), "残っている核を選ばない");
         helper.assertTrue(nearest.apply(java.util.Map.of()) == null, "候補がないのに何かを選んだ");
         // 負の座標の境目: 区画 -1 の端にいて、区画 0 の核が近い
@@ -211,7 +211,7 @@ public final class NatureGameTests {
         var box = piece.getBoundingBox();
         for (int cx = box.minX() >> 4; cx <= box.maxX() >> 4; cx++) {
             for (int cz = box.minZ() >> 4; cz <= box.maxZ() >> 4; cz++) {
-                var chunkBox = new net.minecraft.world.level.levelgen.structure.BoundingBox(cx * 16, level.getMinBuildHeight(), cz * 16,
+                var chunkBox = new net.minecraft.world.level.levelgen.structure.BoundingBox(cx * 16, level.getMinY(), cz * 16,
                         cx * 16 + 15, level.getMaxBuildHeight(), cz * 16 + 15);
                 piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(), chunkBox,
                         new net.minecraft.world.level.ChunkPos(cx, cz), center);

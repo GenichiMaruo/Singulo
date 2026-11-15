@@ -1,10 +1,11 @@
 package io.github.genichimaruo.singulo.android.work;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -12,8 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 
@@ -40,22 +41,21 @@ public final class OptimizationGameTests {
     public static void cachedStorageRemainsLiveAndInvalidates(GameTestHelper h) {
         BlockPos source = new BlockPos(1, 1, 1), target = source.east();
         h.setBlock(source, SinguloBlocks.ANDROID_SUPPLY_PORT.get()); h.setBlock(target, Blocks.CHEST);
-        SupplyPortBlockEntity port = h.getBlockEntity(source);
-        ChestBlockEntity chest = h.getBlockEntity(target);
+        SupplyPortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, source);
+        ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, target);
         chest.setItem(0, new ItemStack(Items.IRON_INGOT, 3));
         var first = port.adjacentItems.get(Direction.EAST);
         h.assertTrue(first != null && first.getStackInSlot(0).getCount() == 3, "Initial storage missing");
         for (int i = 0; i < 100; i++) h.assertTrue(port.adjacentItems.get(Direction.EAST) == first, "Connection was unnecessarily rebuilt");
         BlockPos absoluteTarget = h.absolutePos(target);
-        if (Boolean.getBooleanOr("singulo.testBenchmarks", false)) {
+        if (Boolean.getBoolean("singulo.testBenchmarks")) {
             for (int i = 0; i < 1000; i++) {
-                h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST);
+                io.github.genichimaruo.singulo.compat.ItemResourceView.find(h.getLevel(), absoluteTarget, Direction.WEST);
                 port.adjacentItems.get(Direction.EAST);
             }
             long start = System.nanoTime();
             long directSlots = 0, cachedSlots = 0;
-            for (int i = 0; i < 20000; i++) directSlots += h.getLevel().getCapability(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST).getSlots();
+            for (int i = 0; i < 20000; i++) directSlots += io.github.genichimaruo.singulo.compat.ItemResourceView.find(h.getLevel(), absoluteTarget, Direction.WEST).getSlots();
             long directNanos = System.nanoTime() - start;
             start = System.nanoTime();
             for (int i = 0; i < 20000; i++) cachedSlots += port.adjacentItems.get(Direction.EAST).getSlots();
@@ -68,7 +68,7 @@ public final class OptimizationGameTests {
         h.setBlock(target, Blocks.AIR);
         h.assertTrue(port.adjacentItems.get(Direction.EAST) == null, "Removed storage retained its capability");
         h.setBlock(target, Blocks.CHEST);
-        ChestBlockEntity replacement = h.getBlockEntity(target);
+        ChestBlockEntity replacement = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, target);
         replacement.setItem(0, new ItemStack(Items.GOLD_INGOT, 9));
         h.assertTrue(port.adjacentItems.get(Direction.EAST).getStackInSlot(0).is(Items.GOLD_INGOT), "Replacement reused the old inventory");
         h.getLevel().invalidateCapabilities(h.absolutePos(target));
@@ -88,7 +88,7 @@ public final class OptimizationGameTests {
             else for (int j = 0; j < 256; j++) step.after.add(j);
             order.steps.add(step);
         }
-        int workers = Boolean.getBooleanOr("singulo.testBenchmarks", false) ? 100 : 2;
+        int workers = Boolean.getBoolean("singulo.testBenchmarks") ? 100 : 2;
         long start = System.nanoTime();
         int baseline = 0;
         for (int worker = 0; worker < workers; worker++) for (var step : order.steps) {
@@ -114,7 +114,7 @@ public final class OptimizationGameTests {
         io.github.genichimaruo.singulo.Singulo.LOGGER.info("Optimization check: 512 steps, {} workers; dependency scans {} ms, ready queue {} ms", workers, scan / 1e6, indexed / 1e6);
         var console = new WorkConsoleBlockEntity(h.absolutePos(new BlockPos(1, 1, 1)), SinguloBlocks.ANDROID_WORK_CONSOLE.get().defaultBlockState());
         console.setLevel(h.getLevel()); console.orders().add(order);
-        var worker = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var worker = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         worker.makeGuard(null, console.getBlockPos(), 0, 30);
         worker.assignWork(console.getBlockPos(), order.id); order.workers.add(worker.getUUID());
         order.steps.get(256).inProgress = 1; // Prevent multi-step batching; this worker must use the ready queue.
@@ -128,7 +128,7 @@ public final class OptimizationGameTests {
     public static void commonViewsAreSharedWithoutLeakingViewerCandidates(GameTestHelper h) {
         var alice = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         var bob = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
-        var worker = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var worker = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         int[] reads = {0};
         var console = new WorkConsoleBlockEntity(h.absolutePos(new BlockPos(1, 1, 1)), SinguloBlocks.ANDROID_WORK_CONSOLE.get().defaultBlockState()) {
             @Override public List<ItemCount> available() { reads[0]++; return List.of(new ItemCount(new ItemStack(Items.IRON_INGOT), 42)); }
@@ -168,7 +168,7 @@ public final class OptimizationGameTests {
                 net.minecraft.world.level.block.state.properties.ChestType.RIGHT));
         h.setBlock(left.south(), SinguloBlocks.ANDROID_SUPPLY_PORT.get());
         h.setBlock(right.south(), SinguloBlocks.ANDROID_SUPPLY_PORT.get());
-        ChestBlockEntity a = h.getBlockEntity(left), b = h.getBlockEntity(right);
+        ChestBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, left), b = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, right);
         a.setItem(0, new ItemStack(Items.IRON_INGOT, 3)); b.setItem(0, new ItemStack(Items.IRON_INGOT, 7));
         for (int repeat = 0; repeat < 2; repeat++) {
             var seen = new HashSet<BlockPos>();

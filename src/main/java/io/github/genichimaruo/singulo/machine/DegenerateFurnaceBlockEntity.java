@@ -35,7 +35,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     public static final int SLAM_TICK = 8;
     static final int CHECK_INTERVAL = 40;
 
-    private final ItemStackHandler fuel = new ItemStackHandler(1) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler fuel = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return isFuel(stack);
@@ -61,7 +61,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     public static boolean isFuel(ItemStack stack) {
-        return stack.is(BuiltInRegistries.ITEM.get(Singulo.id("compressed_block_2")));
+        return stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("compressed_block_2")));
     }
 
     public ItemStackHandler fuel() {
@@ -197,5 +197,9 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
         firstCheck = true;
         io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(fuel, registries, tag.getCompoundOrEmpty("fuel"));
         burn = tag.getIntOr("burn", 0);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return io.github.genichimaruo.singulo.compat.ItemTransferView.combined(slot, fuel, new io.github.genichimaruo.singulo.compat.ItemTransferView(spent, (s,r) -> false, (s,r) -> true));
     }
 }

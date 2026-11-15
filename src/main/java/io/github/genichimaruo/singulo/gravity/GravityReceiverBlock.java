@@ -24,7 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * 重力パネル受電器。ケーブルから電力を受け、接している重力パネルの集まりへ配る（{@link GravityReceiverBlockEntity}）。
  * パネルが働いている間は光る。右クリックで、働いているパネルの数を知らせる。
  */
-public class GravityReceiverBlock extends BaseEntityBlock {
+public class GravityReceiverBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
     public static final MapCodec<GravityReceiverBlock> CODEC = simpleCodec(GravityReceiverBlock::new);
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
@@ -71,10 +71,9 @@ public class GravityReceiverBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
             be.onBroken(level);
         }
-        super.onRemove(state, level, pos, newState, moving);
     }
 }

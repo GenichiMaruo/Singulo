@@ -21,7 +21,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -143,7 +143,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
 
     /** 装置で触媒スロットに入れる材料か（触媒スロットを持つ装置の、触媒の材料）。 */
     private boolean inCatalystSlot(MachineRecipe.ItemInput in) {
-        return type.hasCatalystSlot() && Arrays.stream(in.ingredient().getItems()).anyMatch(s -> CatalystHelper.tierOf(s) > 0);
+        return type.hasCatalystSlot() && in.ingredient().items().map(ItemStack::new).anyMatch(s -> CatalystHelper.tierOf(s) > 0);
     }
 
     /** 材料のグリッドが2段以上になる装置か（装置の画面で入力スロットが2段の装置）。 */
@@ -197,7 +197,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
                 y = itemY + (i / columns) * 18;
                 i++;
             }
-            List<ItemStack> stacks = Arrays.stream(in.ingredient().getItems()).map(s -> shown(s, in)).toList();
+            List<ItemStack> stacks = in.ingredient().items().map(ItemStack::new).map(s -> shown(s, in)).toList();
             IRecipeSlotBuilder s = builder.addSlot(RecipeIngredientRole.INPUT, x, y).setBackground(slot, -1, -1)
                     .addIngredients(VanillaTypes.ITEM_STACK, stacks);
             if (in.uses() > 0) {
@@ -229,7 +229,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
         if (needsUpgrade(r)) {
             int shownDemand = demand(r);
             int required = io.github.genichimaruo.singulo.machine.CapacityUpgrades.requiredTier(shownDemand);
-            var upgrade = builder.addSlot(RecipeIngredientRole.CATALYST, RAIL_X + 3, RAIL_TAB_Y + 3)
+            var upgrade = builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, RAIL_X + 3, RAIL_TAB_Y + 3)
                     .setBackground(slot, -1, -1);
             // Mk3 でも足りないときは、どの容量アップグレードも並べない（説明だけ出す）
             for (int tier = Math.max(required, 1); required > 0 && tier <= 3; tier++) {
@@ -250,7 +250,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
     }
 
     @Override
-    public void draw(MachineRecipe r, IRecipeSlotsView view, GuiGraphics g, double mouseX, double mouseY) {
+    public void draw(MachineRecipe r, IRecipeSlotsView view, GuiGraphicsExtractor g, double mouseX, double mouseY) {
         var font = Minecraft.getInstance().font;
         // 矢印
         int ax = arrowX;
@@ -261,7 +261,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
             g.fill(ax + 14 + k, ay + k, ax + 15 + k, ay + 16 - k, 0xFF8B95A0);
         }
         if (hasCatalyst(r)) {
-            g.renderOutline(arrowX + 1, CATALYST_Y - 2, 20, 20, AMBER);
+            g.outline(arrowX + 1, CATALYST_Y - 2, 20, 20, AMBER);
         }
         if (needsUpgrade(r)) {
             // 装置の画面の右レール：枠の縁の線から、少し下げたタブが右に出る
@@ -274,21 +274,21 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
             g.fill(tx + 2, ty + RAIL_TAB, tx + tw + 1, ty + RAIL_TAB + 1, 0x40000000);
             g.fill(tx + tw, ty + 2, tx + tw + 1, ty + RAIL_TAB, 0x40000000);
         }
-        r.mass().ifPresent(m -> g.drawString(font, Component.translatable(m.metalOnly() ? "jei.singulo.metal_mass" : "jei.singulo.mass",
+        r.mass().ifPresent(m -> g.text(font, Component.translatable(m.metalOnly() ? "jei.singulo.metal_mass" : "jei.singulo.mass",
                 String.format("%.0f", m.amount())), itemX, CATALYST_Y, 0xFF3C4650, false));
         Component info = Component.translatable("jei.singulo.time_energy", String.format("%.1f", r.time() / 20.0),
                 io.github.genichimaruo.singulo.energy.EnergyText.of(r.energy()));
         Component stage = Component.translatable("gui.singulo.handbook.stage", r.stage());
         int infoWidth = width - font.width(stage) - 7;
         float scale = Math.min(1F, infoWidth / (float) Math.max(1, font.width(info)));
-        g.pose().pushPose();
-        g.pose().translate(1, H - 10, 0);
-        g.pose().scale(scale, scale, 1);
-        g.drawString(font, info, 0, 0, 0xFF3C4650, false);
-        g.pose().popPose();
-        g.drawString(font, stage, width - font.width(stage) - 1, H - 10, 0xFF2A8FB8, false);
+        g.pose().pushMatrix();
+        g.pose().translate(1, H - 10);
+        g.pose().scale(scale, scale);
+        g.text(font, info, 0, 0, 0xFF3C4650, false);
+        g.pose().popMatrix();
+        g.text(font, stage, width - font.width(stage) - 1, H - 10, 0xFF2A8FB8, false);
         if (r.minSize() > 0) {
-            g.drawString(font, Component.translatable("jei.singulo.min_size", r.minSize()), arrowX, CATALYST_Y, 0xFFC08020, false);
+            g.text(font, Component.translatable("jei.singulo.min_size", r.minSize()), arrowX, CATALYST_Y, 0xFFC08020, false);
         }
     }
 }

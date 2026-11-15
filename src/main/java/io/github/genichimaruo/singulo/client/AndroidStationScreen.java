@@ -391,7 +391,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 id = AndroidStationBlockEntity.BUTTON_RETREAT_UP;
             } else if (Panel.inside(mouseX, mouseY, leftPos + RECALL_X, topPos + RETREAT_Y, RECALL_W, 16)) {
                 id = orphanWaiting() ? AndroidStationBlockEntity.BUTTON_LINK
-                        : hasShiftDown() ? AndroidStationBlockEntity.BUTTON_RECALL_ALL : AndroidStationBlockEntity.BUTTON_RECALL;
+                        : net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? AndroidStationBlockEntity.BUTTON_RECALL_ALL : AndroidStationBlockEntity.BUTTON_RECALL;
             }
             if (menu.patrolling()) {
                 for (int i = 0; i < 3; i++) {
@@ -418,7 +418,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     }
 
     private static net.minecraft.world.item.ItemStack item(String id) {
-        return new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     /** 左の列の専用スロット（空のときは入れる物の見本と、重ねると名前）。 */

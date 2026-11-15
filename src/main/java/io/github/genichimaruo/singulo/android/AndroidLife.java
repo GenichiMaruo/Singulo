@@ -180,7 +180,7 @@ final class AndroidLife extends Goal {
 
     /** 場所・時間・天気に合う暮らしを1つ選んで、始める準備をする。できることがなければ false。 */
     private boolean choose(ServerLevel level) {
-        long time = level.getDayTime() % 24000;
+        long time = level.getDefaultClockTime() % 24000;
         boolean raining = level.isRainingAt(android.blockPosition().above());
         boolean umbrella = android.decor(AndroidAccessoryItem.HAND).getItem() instanceof AndroidAccessoryItem acc && "umbrella".equals(acc.style());
         if (raining && !umbrella) {
@@ -193,7 +193,7 @@ final class AndroidLife extends Goal {
             return true;                               // 落ちたままの物があれば、先に片付ける
         }
         List<Kind> options = new ArrayList<>();
-        boolean night = level.isNight();
+        boolean night = level.isDarkOutside();
         if (night) {
             options.add(Kind.NAP);
             options.add(Kind.NAP);
@@ -310,7 +310,7 @@ final class AndroidLife extends Goal {
         if (!held.isEmpty()) {
             ItemStack drop = held;
             held = ItemStack.EMPTY;
-            android.spawnAtLocation(drop);
+            if (android.level() instanceof ServerLevel server) android.spawnAtLocation(server, drop);
         }
     }
 
@@ -580,11 +580,11 @@ final class AndroidLife extends Goal {
         if (chest == null || !near(chest, 1.9)) {
             return;
         }
-        var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, chest, null);
+        var handler = io.github.genichimaruo.singulo.compat.ItemResourceView.find(level, chest, null);
         ItemStack rest = handler == null ? held : net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, held, false);
         held = ItemStack.EMPTY;
         if (!rest.isEmpty()) {
-            android.spawnAtLocation(rest);                  // 入りきらない: 足元に置く
+            if (android.level() instanceof ServerLevel server) android.spawnAtLocation(server, rest);                  // 入りきらない: 足元に置く
         }
         android.playSound(SoundEvents.CHEST_CLOSE, 0.4F, 1.4F);
         left = 0;
@@ -625,7 +625,7 @@ final class AndroidLife extends Goal {
     CompoundTag save() {
         CompoundTag t = new CompoundTag();
         if (!held.isEmpty()) {
-            t.put("held", held.save(android.registryAccess()));
+            t.put("held", io.github.genichimaruo.singulo.compat.NbtCompat.save(held, android.registryAccess()));
         }
         return t;
     }
@@ -633,7 +633,7 @@ final class AndroidLife extends Goal {
     void load(CompoundTag t) {
         held = t.contains("held") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(android.registryAccess(), t.getCompoundOrEmpty("held")) : ItemStack.EMPTY;
         if (!held.isEmpty()) {
-            android.spawnAtLocation(held);                  // 読み込み直したら、足元に置き直す
+            if (android.level() instanceof ServerLevel server) android.spawnAtLocation(server, held);                  // 読み込み直したら、足元に置き直す
             held = ItemStack.EMPTY;
         }
     }

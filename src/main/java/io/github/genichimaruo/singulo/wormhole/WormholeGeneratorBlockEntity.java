@@ -40,7 +40,7 @@ public class WormholeGeneratorBlockEntity extends io.github.genichimaruo.singulo
     public static final int GENERATE_TICKS = 200;
     static final int CHECK_INTERVAL = 40;
 
-    private final ItemStackHandler output = new ItemStackHandler(2) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler output = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         protected void onContentsChanged(int s) {
             setChanged();
@@ -52,44 +52,23 @@ public class WormholeGeneratorBlockEntity extends io.github.genichimaruo.singulo
             return stack;
         }
     };
-    private final IEnergyStorage energy = new IEnergyStorage() {
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            if (!formed || !outputEmpty()) {
-                return 0;
-            }
-            int take = Math.max(0, Math.min(amount, requiredPerTick() - received));
-            if (!simulate) {
-                received += take;
-            }
-            return take;
+    private final io.github.genichimaruo.singulo.energy.LongEnergyHandler energy = new Energy();
+    private final class Energy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<Integer> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        protected Integer createSnapshot(){return received;}
+        protected void revertToSnapshot(Integer previous){received=previous;}
+        protected void onRootCommit(Integer previous){if(received!=previous)setChanged();}
+        public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            if(!formed||!outputEmpty())return 0;
+            int take=(int)Math.max(0,Math.min(amount,requiredPerTick()-received));
+            if(take>0){updateSnapshots(tx);received+=take;}return take;
         }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return 0;
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return received;
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return requiredPerTick();
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return formed && outputEmpty();
-        }
-    };
+        public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){if(amount<0)throw new IllegalArgumentException("Negative energy extraction");return 0;}
+        public long getAmountAsLong(){return received;}
+        public long getCapacityAsLong(){return requiredPerTick();}
+        public boolean canExtract(){return false;}
+        public boolean canReceive(){return formed&&outputEmpty();}
+    }
     /** 前の tick の処理のあとに受け取った電力。 */
     private int received;
     /** 直前の tick に受け取った電力（画面に出す）。 */
@@ -104,7 +83,7 @@ public class WormholeGeneratorBlockEntity extends io.github.genichimaruo.singulo
         super(SinguloBlockEntities.WORMHOLE_GENERATOR.get(), pos, state);
     }
 
-    public IEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
@@ -286,5 +265,9 @@ public class WormholeGeneratorBlockEntity extends io.github.genichimaruo.singulo
     @Override
     public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
         return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(output, (slot, resource) -> false, (slot, resource) -> true);
     }
 }

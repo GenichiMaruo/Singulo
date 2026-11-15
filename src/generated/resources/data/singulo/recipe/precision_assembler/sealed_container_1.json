@@ -6,27 +6,19 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_frame"
-      },
+      "ingredient": "singulo:basic_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:white_ceramic_composite"
-      },
+      "ingredient": "singulo:white_ceramic_composite",
       "count": 2
     }
   ],

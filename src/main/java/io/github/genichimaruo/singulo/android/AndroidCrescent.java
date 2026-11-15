@@ -80,7 +80,7 @@ public class AndroidCrescent extends Entity {
                 }
                 hit.add(e.getUUID());
                 var source = owner instanceof LivingEntity le ? damageSources().mobAttack(le) : damageSources().magic();
-                e.hurt(source, DAMAGE);
+                e.hurtOrSimulate(source, DAMAGE);
             }
         }
         setPos(to);
@@ -105,4 +105,5 @@ public class AndroidCrescent extends Entity {
         CompoundTag tag = new CompoundTag();
         values.store(tag);
     }
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
 }

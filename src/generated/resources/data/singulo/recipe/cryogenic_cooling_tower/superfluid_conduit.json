@@ -6,15 +6,11 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:vacuum_jacketed_pipe"
-      },
+      "ingredient": "singulo:vacuum_jacketed_pipe",
       "count": 8
     }
   ],

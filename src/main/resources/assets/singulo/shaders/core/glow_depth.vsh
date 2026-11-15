@@ -1,11 +1,11 @@
-#version 150
+#version 330
+#moj_import <minecraft:dynamictransforms.glsl>
+#moj_import <minecraft:projection.glsl>
 
 // 光と同じ形を深度へ書く（GlowDepth）
 in vec3 Position;
 in vec4 Color;
 
-uniform mat4 ModelViewMat;
-uniform mat4 ProjMat;
 
 out float alpha;
 

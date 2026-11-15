@@ -20,7 +20,7 @@ final class FluidGauge {
         if (filled <= 0) {
             return;
         }
-        int rgb = IClientFluidTypeExtensions.of(fluid).getTintColor() & 0xFFFFFF;
+        int rgb = FluidVisuals.tint(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000)) & 0xFFFFFF;
         float t = (Util.getMillis() % 3_600_000L) / 1000F;
         // タンクごとに少しずらす（同じ液体のタンクが同じ動きにならないように）
         float seed = (x * 0.37F + y * 0.11F) % 10;

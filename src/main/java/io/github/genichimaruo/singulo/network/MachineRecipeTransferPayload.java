@@ -42,7 +42,9 @@ public record MachineRecipeTransferPayload(int containerId, Identifier recipeId,
                     || !menu.stillValid(player)) return;
             if (!(player.level().getBlockEntity(menu.pos()) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine)
                     || machine.type() != menu.type()) return;
-            var holder = player.level().getRecipeManager().byKey(payload.recipeId()).orElse(null);
+            if (!(player.level() instanceof net.minecraft.server.level.ServerLevel server)) return;
+            var holder = server.recipeAccess().byKey(net.minecraft.resources.ResourceKey.create(
+                    net.minecraft.core.registries.Registries.RECIPE, payload.recipeId())).orElse(null);
             if (holder == null || !(holder.value() instanceof MachineRecipe original)) return;
             MachineRecipe recipe = RecipeTweaks.adjust(payload.recipeId(), original);
             if (recipe == null) return;

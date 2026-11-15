@@ -42,7 +42,7 @@ public final class ShieldPermits {
         return false;
     }
 
-    private static void onBreak(BlockEvent.BreakEvent event) {
+    private static void onBreak(net.neoforged.neoforge.event.level.block.BreakBlockEvent event) {
         if (!(event.getLevel() instanceof Level level)) {
             return;
         }

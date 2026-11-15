@@ -5,14 +5,14 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -46,7 +46,7 @@ public final class DroneWormholeGameTests {
     public static void localStationCannotClaimOrDetachVisitingDrone(GameTestHelper h) {
         BlockPos relative = new BlockPos(2, 1, 2), stationPos = h.absolutePos(relative);
         h.setBlock(relative, SinguloBlocks.DRONE_STATION.get());
-        DroneStationBlockEntity station = h.getBlockEntity(relative);
+        DroneStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, relative);
         var net = DroneNetwork.get(h.getLevel());
         var visitor = net.create(stationPos, 0, null, stationPos, stationPos);
         TestScope.of(h).defer(() -> net.remove(visitor));
@@ -111,7 +111,7 @@ public final class DroneWormholeGameTests {
     public static void breakingRemotePortReturnsCargoWithoutDroppingIt(GameTestHelper h) {
         BlockPos relative = new BlockPos(3, 1, 3), target = h.absolutePos(relative);
         h.setBlock(relative, SinguloBlocks.DRONE_PORT.get());
-        DronePortBlockEntity port = h.getBlockEntity(relative);
+        DronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, relative);
         var net = DroneNetwork.get(h.getLevel());
         BlockPos gate = h.absolutePos(new BlockPos(5, 1, 5));
         var visitor = net.create(h.absolutePos(new BlockPos(1, 1, 1)), 0, null, gate, target);

@@ -29,12 +29,12 @@ public final class FluidDraw {
     /** 流体の静止した絵。 */
     public static TextureAtlasSprite sprite(Fluid fluid) {
         IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fluid);
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ext.getStillTexture(new FluidStack(fluid, 1000)));
+        return FluidVisuals.sprite(new FluidStack(fluid, 1000));
     }
 
     /** 流体の色（ARGB）。 */
     public static int tint(Fluid fluid) {
-        return IClientFluidTypeExtensions.of(fluid).getTintColor(new FluidStack(fluid, 1000));
+        return FluidVisuals.tint(new FluidStack(fluid, 1000));
     }
 
     /** 流体が空気より軽い（ガス）か（入れ物の上から溜まるように描く）。 */
@@ -55,8 +55,7 @@ public final class FluidDraw {
     /** 化学物質の絵（ブロックの絵の束の中。なければ白い絵）。 */
     public static TextureAtlasSprite chemicalSprite(String id) {
         net.minecraft.resources.Identifier icon = io.github.genichimaruo.singulo.android.work.Chemicals.icon(id);
-        var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
-        return atlas.apply(icon == null ? net.minecraft.resources.Identifier.withDefaultNamespace("block/white_concrete") : icon);
+        return Minecraft.getInstance().getAtlasManager().get(new net.minecraft.client.resources.model.sprite.SpriteId(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS, icon == null ? net.minecraft.resources.Identifier.withDefaultNamespace("block/white_concrete") : icon));
     }
 
     /** 画面の (x, y) から w×h を、絵 sprite を 16×16 ずつ並べ、色 argb で染めて埋める。 */

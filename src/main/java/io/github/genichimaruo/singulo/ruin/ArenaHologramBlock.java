@@ -19,7 +19,7 @@ import org.joml.Vector3f;
  * 上に立てるが、壊せず、何も落とさず、アイテムにもならない（拾えない・選べない）。戦いが終わると消える。
  */
 public class ArenaHologramBlock extends HalfTransparentBlock {
-    private static final DustParticleOptions RED = new DustParticleOptions(new Vector3f(1.0F, 0.25F, 0.25F), 0.8F);
+    private static final DustParticleOptions RED = io.github.genichimaruo.singulo.compat.Particles.dust(new Vector3f(1.0F, 0.25F, 0.25F), 0.8F);
 
     public ArenaHologramBlock(Properties properties) {
         super(properties);
@@ -37,13 +37,13 @@ public class ArenaHologramBlock extends HalfTransparentBlock {
     }
 
     @Override
-    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+    protected boolean propagatesSkylightDown(BlockState state) {
         return true;
     }
 
     /** 中ボタンで選んでも何も手に入らない。 */
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return ItemStack.EMPTY;
     }
 

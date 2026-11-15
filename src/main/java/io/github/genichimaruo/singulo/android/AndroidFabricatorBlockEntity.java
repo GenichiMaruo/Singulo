@@ -158,12 +158,12 @@ public class AndroidFabricatorBlockEntity extends io.github.genichimaruo.singulo
         if (kind == null) {
             return;
         }
-        RuinAndroid a = kind.type().create(level);
+        RuinAndroid a = kind.type().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (a == null) {
             return;
         }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
-        a.moveTo(top.x, top.y, top.z, level.getRandom().nextFloat() * 360, 0);
+        a.snapTo(top.x, top.y, top.z, level.getRandom().nextFloat() * 360, 0);
         a.setHome(worldPosition);
         a.markFacilitySpawned();                                   // 倒すと部品を少し落とす（印刷台の個体だけ）
         a.startPrinting();
@@ -185,7 +185,7 @@ public class AndroidFabricatorBlockEntity extends io.github.genichimaruo.singulo
         if (kind == null || level.getRandom().nextFloat() >= memoryChance) {
             return;
         }
-        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(kind.memoryId()));
+        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(kind.memoryId()));
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         net.minecraft.world.entity.item.ItemEntity drop = new net.minecraft.world.entity.item.ItemEntity(level, top.x, top.y + 0.2, top.z,
                 new net.minecraft.world.item.ItemStack(item), 0, 0.2, 0);
@@ -202,7 +202,7 @@ public class AndroidFabricatorBlockEntity extends io.github.genichimaruo.singulo
         }
         ListTag list = new ListTag();
         for (UUID id : androids) {
-            list.add(NbtUtils.createUUID(id));
+            list.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(id));
         }
         tag.put("androids", list);
         tag.putBoolean("wave", waveActive);
@@ -218,8 +218,8 @@ public class AndroidFabricatorBlockEntity extends io.github.genichimaruo.singulo
         super.loadAdditional(tag, registries);
         kind = tag.contains("kind") ? AndroidKind.byId(tag.getStringOr("kind", "")) : null;
         androids.clear();
-        for (Tag t : tag.getList("androids", Tag.TAG_INT_ARRAY)) {
-            androids.add(NbtUtils.loadUUID(t));
+        for (Tag t : tag.getListOrEmpty("androids")) {
+            androids.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(t));
         }
         waveActive = tag.getBooleanOr("wave", false);
         waveSize = tag.getIntOr("wave_size", 0);

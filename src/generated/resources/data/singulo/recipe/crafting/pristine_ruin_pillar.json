@@ -7,15 +7,9 @@
     "P "
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_pristine_ruin"
-    },
-    "P": {
-      "item": "singulo:pristine_ruin_panel"
-    },
-    "I": {
-      "tag": "c:ingots/steel"
-    }
+    "B": "singulo:blueprint_pristine_ruin",
+    "P": "singulo:pristine_ruin_panel",
+    "I": "#c:ingots/steel"
   },
   "result": {
     "id": "singulo:pristine_ruin_pillar",

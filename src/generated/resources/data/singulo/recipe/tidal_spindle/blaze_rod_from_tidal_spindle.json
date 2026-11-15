@@ -6,9 +6,7 @@
   "energy": 1000000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:blaze_powder"
-      },
+      "ingredient": "minecraft:blaze_powder",
       "count": 4
     }
   ],

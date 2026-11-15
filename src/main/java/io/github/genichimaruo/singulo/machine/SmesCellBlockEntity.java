@@ -15,6 +15,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 
 /**
  * SMESセル（超伝導磁気エネルギー貯蔵）。10 MFE を蓄える。正面から出し、ほかの5面から受け取る。
@@ -32,14 +36,14 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     private final SinguloEnergyStorage energy;
     private final int rate;
-    private final IEnergyStorage input = new Side(true);
-    private final IEnergyStorage output = new Side(false);
+    private final EnergyHandler input = new Side(true);
+    private final EnergyHandler output = new Side(false);
     /** この tick に受け取った量と、直前の tick に受け取った量・送り出した量（画面用）。 */
     private int inThisTick;
     private int lastIn;
     private int lastOut;
     private int externallyExtracted;
-    private final net.neoforged.neoforge.items.ItemStackHandler charge = new net.neoforged.neoforge.items.ItemStackHandler(2) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler charge = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         public int getSlotLimit(int slot) {
             return 1;
@@ -131,7 +135,7 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
     }
 
     @Nullable
-    public IEnergyStorage energyFor(@Nullable Direction side) {
+    public EnergyHandler energyFor(@Nullable Direction side) {
         if (side == null) {
             return energy;
         }
@@ -146,11 +150,17 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
         be.lastOut = be.externallyExtracted;
         be.externallyExtracted = 0;
         if (be.energy.getEnergyStored() > 0) {
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(front), front.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(be.energy.getEnergyStored(), be.rate), false);
+            EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(front), front.getOpposite());
+            if (target != null) {
+                int sent = 0;
+                try (var tx = Transaction.openRoot()) {
+                    int accepted = target.insert(Math.min(be.energy.getEnergyStored(), be.rate), tx);
+                    if (be.energy.extract(accepted, tx) == accepted) {
+                        tx.commit();
+                        sent = accepted;
+                    }
+                }
                 if (sent > 0) {
-                    be.energy.consume(sent);
                     be.lastOut += sent;
                     active = true;
                 }
@@ -209,50 +219,50 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
     }
 
     /** 受け取り専用・出力専用の口。 */
-    private final class Side implements IEnergyStorage {
-        private final boolean receive;
-
-        Side(boolean receive) {
-            this.receive = receive;
+    private final SnapshotJournal<int[]> flowJournal = new SnapshotJournal<>() {
+        @Override protected int[] createSnapshot() { return new int[]{inThisTick, externallyExtracted}; }
+        @Override protected void revertToSnapshot(int[] state) {
+            inThisTick = state[0]; externallyExtracted = state[1];
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            if (!receive) {
-                return 0;
-            }
-            int got = energy.receiveEnergy(amount, simulate);
-            if (!simulate) {
-                inThisTick += got;
-            }
+    };
+    private final class Side implements IEnergyStorage, EnergyHandler {
+        private final boolean receive;
+        Side(boolean receive) { this.receive = receive; }
+        @Override public int insert(int amount, TransactionContext tx) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
+            if (!receive) return 0;
+            int got = energy.insert(amount, tx);
+            if (got > 0) { flowJournal.updateSnapshots(tx); inThisTick += got; }
             return got;
         }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            int sent = receive ? 0 : energy.extractEnergy(amount, simulate);
-            if (!simulate) externallyExtracted += sent;
+        @Override public int extract(int amount, TransactionContext tx) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
+            if (receive) return 0;
+            int sent = energy.extract(amount, tx);
+            if (sent > 0) { flowJournal.updateSnapshots(tx); externallyExtracted += sent; }
             return sent;
         }
-
-        @Override
-        public int getEnergyStored() {
-            return energy.getEnergyStored();
+        @Override public long getAmountAsLong() { return energy.getAmountAsLong(); }
+        @Override public long getCapacityAsLong() { return energy.getCapacityAsLong(); }
+        @Override public int receiveEnergy(int amount, boolean simulate) {
+            if (amount <= 0) return 0;
+            try (var tx = Transaction.openRoot()) {
+                int got = insert(amount, tx); if (!simulate) tx.commit(); return got;
+            }
         }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return energy.getMaxEnergyStored();
+        @Override public int extractEnergy(int amount, boolean simulate) {
+            if (amount <= 0) return 0;
+            try (var tx = Transaction.openRoot()) {
+                int got = extract(amount, tx); if (!simulate) tx.commit(); return got;
+            }
         }
+        @Override public int getEnergyStored() { return energy.getEnergyStored(); }
+        @Override public int getMaxEnergyStored() { return energy.getMaxEnergyStored(); }
+        @Override public boolean canExtract() { return !receive; }
+        @Override public boolean canReceive() { return receive; }
+    }
 
-        @Override
-        public boolean canExtract() {
-            return !receive;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return receive;
-        }
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(charge, (s,r) -> s == CHARGE_IN, (s,r) -> s == CHARGE_OUT);
     }
 }

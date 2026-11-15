@@ -7,12 +7,8 @@
     "WGW"
   ],
   "key": {
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    }
+    "W": "singulo:white_ceramic_composite",
+    "G": "#c:glass_blocks/colorless"
   },
   "result": {
     "id": "singulo:white_glass_panel",

@@ -283,7 +283,7 @@ public final class WorkOrder {
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag t = new CompoundTag();
         t.putInt("id", id);
-        t.put("target", target.save(registries));
+        t.put("target", io.github.genichimaruo.singulo.compat.NbtCompat.save(target, registries));
         t.putLong("count", count);
         if (orderer != null) {
             t.store("orderer", net.minecraft.core.UUIDUtil.CODEC, orderer);
@@ -324,14 +324,14 @@ public final class WorkOrder {
         for (Holding h : held) {
             CompoundTag ht = new CompoundTag();
             ht.put("point", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(h.point));
-            ht.put("item", h.item.save(registries));
+            ht.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(h.item, registries));
             ht.putLong("count", h.count);
             hs.add(ht);
         }
         t.put("held", hs);
         ListTag ws = new ListTag();
         for (UUID w : workers) {
-            ws.add(NbtUtils.createUUID(w));
+            ws.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(w));
         }
         t.put("workers", ws);
         return t;
@@ -357,7 +357,7 @@ public final class WorkOrder {
             }
             Identifier bid = Identifier.tryParse(st.getStringOr("block", ""));
             StepState s = new StepState(r, io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(st, "location").orElse(BlockPos.ZERO),
-                    bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(bid), st.getLongOr("total", 0L));
+                    bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.getValue(bid), st.getLongOr("total", 0L));
             s.done = st.getLongOr("done", 0L);
             s.parked = Math.max(0, st.getLongOr("parked", 0L));
             s.parkedOut = Math.max(0, st.getLongOr("parked_out", 0L));
@@ -383,8 +383,8 @@ public final class WorkOrder {
             ItemStack item = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, ht.getCompoundOrEmpty("item"));
             io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, item, ht.getLongOr("count", 0L)));
         }
-        for (Tag w : t.getList("workers", Tag.TAG_INT_ARRAY)) {
-            o.workers.add(NbtUtils.loadUUID(w));
+        for (Tag w : t.getListOrEmpty("workers")) {
+            o.workers.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(w));
         }
         o.link();
         return o;

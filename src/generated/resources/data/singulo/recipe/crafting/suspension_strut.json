@@ -7,12 +7,8 @@
     "P"
   ],
   "key": {
-    "P": {
-      "item": "singulo:nihonium_plate"
-    },
-    "F": {
-      "item": "singulo:cosmic_frame"
-    }
+    "P": "singulo:nihonium_plate",
+    "F": "singulo:cosmic_frame"
   },
   "result": {
     "id": "singulo:suspension_strut",

@@ -39,8 +39,7 @@ public final class Chemicals {
         Store store(Level level, BlockPos pos, @Nullable Direction side);
 
         /** 物（ケミカルタンクなど）に入っている化学物質（ID と量。なければ null）。 */
-        @Nullable
-        Map.Entry<String, Long> contained(ItemStack stack);
+        Map.@Nullable Entry<String, Long> contained(ItemStack stack);
 
         /** 物（ケミカルタンクなど）の化学物質の入れ口（なければ null。stack は1個の写し）。 */
         @Nullable
@@ -85,8 +84,7 @@ public final class Chemicals {
         return ACCESS == null ? null : ACCESS.store(level, pos, side);
     }
 
-    @Nullable
-    public static Map.Entry<String, Long> contained(ItemStack stack) {
+    public static Map.@Nullable Entry<String, Long> contained(ItemStack stack) {
         return ACCESS == null || stack.isEmpty() ? null : ACCESS.contained(stack);
     }
 

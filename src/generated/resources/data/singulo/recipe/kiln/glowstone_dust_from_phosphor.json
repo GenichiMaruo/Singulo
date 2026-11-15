@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:unfired_phosphor"
-      },
+      "ingredient": "singulo:unfired_phosphor",
       "count": 1
     }
   ],

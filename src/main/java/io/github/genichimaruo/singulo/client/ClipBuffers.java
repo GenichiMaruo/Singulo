@@ -43,6 +43,8 @@ final class ClipBuffers {
             return this;
         }
 
+        @Override public VertexConsumer setColor(int color) { to.setColor(color); return this; }
+        @Override public VertexConsumer setLineWidth(float width) { to.setLineWidth(width); return this; }
         @Override
         public VertexConsumer setUv(float u, float v) {
             to.setUv(u, v);

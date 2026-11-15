@@ -17,7 +17,7 @@ import mezz.jei.api.recipe.transfer.RecipeTransferResult;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 final class MachineTransferHandler implements IRecipeTransferHandler<MachineMenu, MachineRecipe> {
     private final MachineType type;
@@ -60,7 +60,7 @@ final class MachineTransferHandler implements IRecipeTransferHandler<MachineMenu
             return helper.createUserErrorWithTooltip(Component.translatable("jei.tooltip.error.recipe.transfer.missing")
                     .append(" / ").append(Component.translatable("jei.tooltip.error.recipe.transfer.inventory.full")));
         }
-        if (doTransfer) PacketDistributor.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, maxTransfer));
+        if (doTransfer) ClientPacketDistributor.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, maxTransfer));
         return null;
     }
 }

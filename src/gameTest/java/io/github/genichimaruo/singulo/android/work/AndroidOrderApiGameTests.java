@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.android.work;
+import net.minecraft.world.entity.EntitySpawnReason;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders.State;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
@@ -10,15 +11,15 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class AndroidOrderApiGameTests {
@@ -36,20 +37,20 @@ public final class AndroidOrderApiGameTests {
         helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
         helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
-            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = helper.getBlockEntity(p);
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, p);
             b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         ItemStack table = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
                 net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, RACK);
         java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -58,22 +59,22 @@ public final class AndroidOrderApiGameTests {
         rack.items().setStackInSlot(0, table);
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
-        return helper.getBlockEntity(CONSOLE);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CONSOLE);
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
         var c=workshop(h,32); c.setOwner(TestScope.player(h).getUUID());
-        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
         a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
         a.setNoAi(!moving); h.getLevel().addFreshEntity(a); return c;
     }
     private static AndroidOrders.Receipt submit(GameTestHelper h, UUID id,long count) {
-        return AndroidOrders.submit(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)h.getBlockEntity(CONSOLE)).owner(),id,
+        return AndroidOrders.submit(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CONSOLE)).owner(),id,
                 new ItemStack(Items.STICK),count,List.of(),h.absolutePos(DELIVERY));
     }
     private static AndroidOrders.Receipt status(GameTestHelper h,UUID id) {
-        return AndroidOrders.status(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)h.getBlockEntity(CONSOLE)).owner(),id);
+        return AndroidOrders.status(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CONSOLE)).owner(),id);
     }
     @GameTest(template="empty")
     public static void ownerCountsAndDestinationsAreChecked(GameTestHelper h) {
@@ -205,7 +206,7 @@ public final class AndroidOrderApiGameTests {
         h.succeedWhen(()->{
             var receipt=status(h,id); h.assertTrue(receipt.state()==State.COMPLETED,"Not completed: "+receipt.state());
             h.assertTrue(receipt.delivered()==8 && c.orders().isEmpty(),"Completion before delivery");
-            DeliveryPortBlockEntity port=h.getBlockEntity(DELIVERY); int count=0;
+            DeliveryPortBlockEntity port=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, DELIVERY); int count=0;
             for(int i=0;i<port.handler().getSlots();i++)if(port.handler().getStackInSlot(i).is(Items.STICK))count+=port.handler().getStackInSlot(i).getCount();
             h.assertTrue(count==8,"Wrong physical output count");
             var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());

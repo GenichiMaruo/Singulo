@@ -6,9 +6,7 @@
   "energy": 60,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:record_fragment"
-      },
+      "ingredient": "singulo:record_fragment",
       "count": 1
     }
   ],

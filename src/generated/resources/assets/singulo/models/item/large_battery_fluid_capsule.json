@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:builtin/entity",
+  "parent": "minecraft:block/block",
   "gui_light": "side",
   "textures": {
     "particle": "singulo:block/fluid_capsule_3_m"
@@ -141,5 +141,6 @@
         0.45
       ]
     }
-  }
+  },
+  "elements": []
 }

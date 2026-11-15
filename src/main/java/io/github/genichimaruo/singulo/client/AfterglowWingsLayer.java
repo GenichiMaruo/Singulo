@@ -30,7 +30,7 @@ import net.minecraft.world.entity.LivingEntity;
  * 重なりは鳥と同じく、背中側から雨覆 → 三列風切 → 次列風切 → 初列風切の順。羽根は1枚ずつ瓦のように少し傾き、
  * 表（背中側）は白く、裏は少し陰らせる。
  */
-public class AfterglowWingsLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M> {
+public class AfterglowWingsLayer<T extends net.minecraft.client.renderer.entity.state.HumanoidRenderState, M extends HumanoidModel<T>> extends RenderLayer<T, M> {
     static final int WHITE = 0xFFFFFF;
     static final int SOFT = 0xF4F8FF;
     static final int GLOW = 0xC6F2FF;
@@ -51,17 +51,27 @@ public class AfterglowWingsLayer<T extends LivingEntity, M extends HumanoidModel
         super(parent);
     }
 
+    private record WingData(float fold, float flap) {}
+    private static final net.minecraft.util.context.ContextKey<WingData> DATA = new net.minecraft.util.context.ContextKey<>(io.github.genichimaruo.singulo.Singulo.id("wings"));
+    static void registerModifiers(net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent event) {
+        event.registerEntityModifier(new com.google.common.reflect.TypeToken<net.minecraft.client.renderer.entity.LivingEntityRenderer<LivingEntity, net.minecraft.client.renderer.entity.state.LivingEntityRenderState, ?>>() {}, (entity, state) -> {
+            if (!AfterglowWingsItem.wearing(entity) || entity.isInvisible()) { state.setRenderData(DATA, null); return; }
+            boolean gliding=entity.isFallFlying();
+            float[] st=STATE.computeIfAbsent(entity,k->new float[]{FOLD_GROUND,0});
+            st[0]=Mth.lerp(.1F,st[0],gliding?0:entity.onGround()?FOLD_GROUND:FOLD_AIR);
+            st[1]=Mth.lerp(.15F,st[1],gliding&&entity.isShiftKeyDown()?1:0);
+            state.setRenderData(DATA,new WingData(st[0],st[1]));
+        });
+    }
     @Override
-    public void render(PoseStack pose, MultiBufferSource buffers, int light, T entity, float limbSwing, float limbSwingAmount,
-                       float partialTick, float age, float netHeadYaw, float headPitch) {
-        if (!AfterglowWingsItem.wearing(entity) || entity.isInvisible()) {
-            return;
-        }
-        boolean gliding = entity.isFallFlying();
-        boolean flapping = gliding && entity.isShiftKeyDown();
-        float[] st = STATE.computeIfAbsent(entity, k -> new float[] {FOLD_GROUND, 0});
-        st[0] = Mth.lerp(0.1F, st[0], gliding ? 0 : entity.onGround() ? FOLD_GROUND : FOLD_AIR);
-        st[1] = Mth.lerp(0.15F, st[1], flapping ? 1 : 0);                             // 強い羽ばたき
+    public void submit(PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, T state, float netHeadYaw, float headPitch) {
+        WingData data=state.getRenderData(DATA);
+        if(data==null)return;
+        GlowDepth.beginExtract();
+        try {
+        var buffers=new SnapshotBlockRenderer.Capture();
+        float[] st={data.fold(),data.flap()};
+        float age=state.ageInTicks;
         float flap = st[1];
         // 強い羽ばたきは大きな鳥のように、ゆっくり大きく（1回およそ2.2秒、上下に約90°）。打ち下ろしは速く、打ち上げはゆっくり。
         // 打ち上げでは手首を曲げて翼を少し畳み、先は遅れてついてくる
@@ -77,7 +87,7 @@ public class AfterglowWingsLayer<T extends LivingEntity, M extends HumanoidModel
         pose.translate(0, 0.16F, 0.16F);                       // 肩甲骨のあたり（モデルは下が +Y、背中が +Z）
         pose.scale(1, -1, 1);                                  // 上を +Y にして描く
         // 半透明の描き方だと、後ろにある水やガラスと混ぜて描かれて透けてしまう。羽根はほぼ不透明なので、不透明（切り抜き）で描く
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(FxDraw.WHITE));
         for (int side = -1; side <= 1; side += 2) {
             pose.pushPose();
             pose.translate(side * 0.1F, 0, 0);
@@ -89,6 +99,8 @@ public class AfterglowWingsLayer<T extends LivingEntity, M extends HumanoidModel
             pose.popPose();
         }
         pose.popPose();
+        SnapshotBlockRenderer.submitGeometry(buffers.finish(),new PoseStack(),collector);
+        } finally { GlowDepth.endExtract(); }
     }
 
     /** 右の翼を、肩を原点に描く（翼の面は X が外・Y が上、+Z が背中側）。骨の関節の位置を出してから、羽根を並べる。 */

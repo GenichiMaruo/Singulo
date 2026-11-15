@@ -27,7 +27,7 @@ public class HorizonVaultRenderer extends SnapshotBlockRenderer<HorizonVaultBloc
     private final Font font;
 
     public HorizonVaultRenderer(BlockEntityRendererProvider.Context context) {
-        font = context.getFont();
+        font = Minecraft.getInstance().font;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class HorizonVaultRenderer extends SnapshotBlockRenderer<HorizonVaultBloc
             pose.mulPose(Axis.YP.rotationDegrees(time * 120));
             float s = 0.14F * (0.6F + 0.4F * spiral);
             pose.scale(s, s, s);
-            Minecraft.getInstance().getItemRenderer().renderStatic(type, ItemDisplayContext.FIXED, LightCoordsUtil.FULL_BRIGHT,
+            ItemDraw.get().renderStatic(type, ItemDisplayContext.FIXED, LightCoordsUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, pose, buffers, be.getLevel(), (int) be.getBlockPos().asLong());
             pose.popPose();
         }
@@ -130,7 +130,7 @@ public class HorizonVaultRenderer extends SnapshotBlockRenderer<HorizonVaultBloc
             pose.pushPose();
             pose.translate(3.8F / 16, 0, 0);
             pose.scale(1.4F / 16, 1.4F / 16, 0.002F);
-            Minecraft.getInstance().getItemRenderer().renderStatic(type, ItemDisplayContext.GUI, LightCoordsUtil.FULL_BRIGHT,
+            ItemDraw.get().renderStatic(type, ItemDisplayContext.GUI, LightCoordsUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, pose, buffers, be.getLevel(), 0);
             pose.popPose();
         }

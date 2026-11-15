@@ -146,11 +146,11 @@ public class ExplorerCompassItem extends SinguloItem {
         }
         ServerLevel server = (ServerLevel) level;
         String rid = targetId(stack);
-        Optional<Holder.Reference<Structure>> holder = server.registryAccess().registryOrThrow(Registries.STRUCTURE)
-                .getHolder(ResourceKey.create(Registries.STRUCTURE, Singulo.id(rid)));
+        Optional<Holder.Reference<Structure>> holder = server.registryAccess().lookupOrThrow(Registries.STRUCTURE)
+                .get(ResourceKey.create(Registries.STRUCTURE, Singulo.id(rid)));
         Pair<BlockPos, Holder<Structure>> found = holder.isEmpty() ? null : server.getChunkSource().getGenerator()
                 .findNearestMapStructure(server, HolderSet.direct(holder.get()), player.blockPosition(), SEARCH_CHUNKS, false);
-        player.getCooldowns().addCooldown(this, 60);
+        player.getCooldowns().addCooldown(stack, 60);
         if (found == null) {
             stack.remove(DataComponents.LODESTONE_TRACKER);
             player.sendOverlayMessage(Component.translatable("compass.singulo.not_found",
@@ -172,8 +172,8 @@ public class ExplorerCompassItem extends SinguloItem {
      * その構造物の始まりを読み、全体を囲む範囲の中心にする（読めなければ見つけた位置のまま）。
      */
     static BlockPos center(ServerLevel server, BlockPos found, Structure structure) {
-        net.minecraft.world.level.ChunkPos cp = new net.minecraft.world.level.ChunkPos(found);
-        var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
+        net.minecraft.world.level.ChunkPos cp = net.minecraft.world.level.ChunkPos.containing(found);
+        var start = server.getChunk(cp.x(), cp.z(), net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
                 .getStartForStructure(structure);
         if (start == null || !start.isValid()) {
             return found;

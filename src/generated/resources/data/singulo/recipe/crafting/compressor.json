@@ -7,21 +7,11 @@
     "BXB"
   ],
   "key": {
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "X": {
-      "item": "minecraft:piston"
-    },
-    "S": {
-      "tag": "c:ingots/steel"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "I": "#c:ingots/iron",
+    "X": "minecraft:piston",
+    "S": "#c:ingots/steel",
+    "F": "singulo:basic_frame",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:compressor",

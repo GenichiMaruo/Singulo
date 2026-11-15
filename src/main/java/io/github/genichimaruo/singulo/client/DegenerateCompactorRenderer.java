@@ -69,7 +69,7 @@ public class DegenerateCompactorRenderer extends SnapshotBlockRenderer<FixedShap
         float tip = ramTip(phase, lumpTop);
         float flash = running ? flash(phase) : 0F;
 
-        int sky = LightCoordsUtil.sky(LevelRenderer.getLightColor(level, center));
+        int sky = LightCoordsUtil.sky(LevelRenderer.getLightCoords(level, center));
         int lit = LightCoordsUtil.pack(Math.min(15, (int) (4 + 11 * Math.max(flash, running ? 0.35F : 0F))), sky);
 
         if (running) {
@@ -94,7 +94,7 @@ public class DegenerateCompactorRenderer extends SnapshotBlockRenderer<FixedShap
                 8 - half * 16, 8 - lumpDots, 8 - half * 16, 8 + half * 16, 8 + lumpDots, 8 + half * 16, lit, lump);
         if (running) {
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-            var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+            var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
             // 打った瞬間の閃きと、床を走る衝撃の輪
             pose.pushPose();
             pose.translate(0, lumpTop, 0);
@@ -146,7 +146,7 @@ public class DegenerateCompactorRenderer extends SnapshotBlockRenderer<FixedShap
         if (last != null && last == cycle) {
             return;
         }
-        var rnd = level.random;
+        var rnd = level.getRandom();
         for (int i = 0; i < 12; i++) {
             double a = rnd.nextDouble() * Math.PI * 2;
             double v = 0.05 + rnd.nextDouble() * 0.1;

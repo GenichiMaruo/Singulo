@@ -69,8 +69,7 @@ public class HandbookScreen extends Screen {
 
     private final List<Chapter> chapters = new ArrayList<>();
     /** 検索欄（文字があれば、左の一覧は章の代わりに、合うページの一覧になる）。 */
-    @org.jspecify.annotations.Nullable
-    private net.minecraft.client.gui.components.EditBox searchBox;
+    private net.minecraft.client.gui.components.@org.jspecify.annotations.Nullable EditBox searchBox;
     /** 検索で合ったページ（章の番号・ページの番号。よく合う順）。 */
     private final List<int[]> results = new ArrayList<>();
     private static int lastChapter;
@@ -237,7 +236,7 @@ public class HandbookScreen extends Screen {
 
     private static ItemStack icon(String id) {
         Identifier rl = Identifier.tryParse(id);
-        return rl == null ? new ItemStack(Items.BOOK) : new ItemStack(BuiltInRegistries.ITEM.get(rl));
+        return rl == null ? new ItemStack(Items.BOOK) : new ItemStack(BuiltInRegistries.ITEM.getValue(rl));
     }
 
     private Page textPage(Component title, String body) {
@@ -375,7 +374,7 @@ public class HandbookScreen extends Screen {
         // 検索欄と、章の一覧（検索しているときは、合うページの一覧）
         Panel.well(g, left + 6, top + 20, LIST_W, SEARCH_H - 2);
         if (searchBox != null) {
-            searchBox.render(g, mouseX, mouseY, partialTick);
+            searchBox.extractRenderState(g, mouseX, mouseY, partialTick);
         }
         int listTop = top + 20 + SEARCH_H;
         int listH = H - 28 - SEARCH_H;
@@ -488,7 +487,7 @@ public class HandbookScreen extends Screen {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-        renderTransparentBackground(g);
+        extractTransparentBackground(g);
     }
 
     // ------------------------------------------------------------------ 操作
@@ -580,7 +579,7 @@ public class HandbookScreen extends Screen {
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
         int key = event.key(), scan = event.scancode(), mods = event.modifiers();
         if (searchBox != null && searchBox.isFocused() && key != 256) {
-            return searchBox.keyPressed(key, scan, mods) || searchBox.canConsumeInput();   // 打っている間は、ページ送りや画面を閉じるキーにしない
+            return searchBox.keyPressed(event) || searchBox.canConsumeInput();   // 打っている間は、ページ送りや画面を閉じるキーにしない
         }
         if (key == 262 && page < chapters.get(chapter).pages.size() - 1) {          // →
             select(chapter, page + 1);

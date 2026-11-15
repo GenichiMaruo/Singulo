@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
  * </ul>
  * 同じ種類のパネルを並べると、境目の縁が消えて1枚の広い空に見える（空の色は見る向きで決まるので、つなぎ目が出ない）。
  */
-public class RayleighPanelBlock extends BaseEntityBlock {
+public class RayleighPanelBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     private final boolean lab;
@@ -79,9 +79,8 @@ public class RayleighPanelBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+    public void beforeEntityRemoval(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
         if (!(newState.getBlock() instanceof RayleighPanelBlock)) RayleighSky.unregister(level, pos);
-        super.onRemove(state, level, pos, newState, moved);
     }
 
     @Nullable

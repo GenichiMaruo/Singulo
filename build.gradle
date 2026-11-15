@@ -22,6 +22,7 @@ sourceSets {
             throw new GradleException('testClasses expects comma-separated GameTests class names')
         }
         for (name in selected) {
+            if (name in ['MekanismGameTests', 'MekanismQioGameTests']) throw new GradleException('Mekanism integration is not part of the 26.1.2 port')
             if (fileTree('src/main/java').matching { include "**/${name}.java" }.isEmpty()
                     && fileTree('src/gameTest/java').matching { include "**/${name}.java" }.isEmpty()) {
                 throw new GradleException("Unknown GameTest class: ${name}")
@@ -29,6 +30,8 @@ sourceSets {
         }
         java.include(selected.isEmpty() ? ['**/*GameTests.java'] : selected.collect { "**/${it}.java" })
         java.include('**/test/TestBuild.java', '**/test/harness/**')
+        // 26.1.2 intentionally has no Mekanism integration; retain older-version fixtures on disk.
+        java.exclude('**/MekanismQioGameTests.java', '**/MekanismGameTests.java')
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
@@ -153,9 +156,12 @@ repositories {
 
 }
 
+configurations { sodiumBootstrap }
+
 dependencies {
-    // Optional Sodium 0.6.13 integration API only; never bundle or require the renderer.
-    compileOnly('maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+    sodiumBootstrap('maven.modrinth:sodium:zg4YQ9EL') { transitive = false }
+    // Optional Sodium 0.9.2 (Minecraft 26.1.2) integration API only; never bundle or require the renderer.
+    compileOnly(files(layout.buildDirectory.file('sodium-api/sodium-api.jar')).builtBy('extractSodiumApi'))
     // JEI は任意の連携。API だけでコンパイルし、開発中の起動では本体も入れる
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
@@ -193,4 +199,46 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+// Registry-based 26.1 GameTests: only development resources contain this suite inventory.
+def testSuiteInventoryDir = layout.buildDirectory.dir('generated/gameTest/resources')
+def generateTestSuiteInventory = tasks.register('generateTestSuiteInventory') {
+    def selectedNames = providers.gradleProperty('testClasses').getOrElse('').split(',').findAll { !it.isBlank() }
+    def suites = files(fileTree('src/main/java') { include '**/*GameTests.java'; exclude '**/MekanismGameTests.java', '**/MekanismQioGameTests.java' },
+                       fileTree('src/gameTest/java') { include '**/*GameTests.java'; exclude '**/MekanismGameTests.java', '**/MekanismQioGameTests.java' })
+    inputs.files(suites)
+    inputs.property('selected', selectedNames)
+    outputs.file(testSuiteInventoryDir.map { it.file('singulo-test-suites.list') })
+    doLast {
+        def names = []
+        suites.files.sort { it.path }.each { source ->
+            def simpleName = source.name.substring(0, source.name.length() - 5)
+            if (selectedNames.isEmpty() || selectedNames.contains(simpleName)) {
+                def sourceText = source.getText('UTF-8')
+                def packageMatch = sourceText =~ /(?m)^package ([\w.]+);/
+                if (sourceText.contains('@GameTest(') && packageMatch.find()) {
+                    names.add(packageMatch.group(1) + '.' + simpleName)
+                }
+            }
+        }
+        if (names.isEmpty()) throw new GradleException('No selected GameTest suites found')
+        def destination = testSuiteInventoryDir.get().file('singulo-test-suites.list').asFile
+        destination.parentFile.mkdirs()
+        destination.setText(names.unique().sort().join('\n') + '\n', 'UTF-8')
+    }
+}
+sourceSets.gameTest.resources.srcDir(testSuiteInventoryDir)
+tasks.named('processGameTestResources').configure { dependsOn generateTestSuiteInventory }
+
+// Sodium 0.9.x ships its implementation as a nested jar behind a bootstrap mod.
+// Extract only that official API for compilation; never package it into Singulo.
+def sodiumBootstrapArchive = configurations.sodiumBootstrap.singleFile
+tasks.register('extractSodiumApi', Sync) {
+    from(zipTree(sodiumBootstrapArchive)) {
+        include 'META-INF/jarjar/*-mod.jar'
+        eachFile { details -> details.path = 'sodium-api.jar' }
+        includeEmptyDirs = false
+    }
+    into(layout.buildDirectory.dir('sodium-api'))
 }

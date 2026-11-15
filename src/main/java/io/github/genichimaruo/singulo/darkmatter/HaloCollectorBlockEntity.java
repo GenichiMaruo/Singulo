@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 
 /**
  * ハロー捕集器（段階5）。ペンローズ・リアクターの炉心から RANGE ブロック以内に置くと、炉心の重力で集まった
@@ -32,14 +32,17 @@ public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.com
     public static final int BUFFER = 4000;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(BUFFER, ContainmentTankBlockEntity::isDarkMatter) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(BUFFER, ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
         }
     };
     /** 外からは取り出すだけ。 */
-    private final IFluidHandler output = new IFluidHandler() {
+    private final io.github.genichimaruo.singulo.compat.TankFluidAccess output = new io.github.genichimaruo.singulo.compat.TankFluidAccess() {
+        @Override public TransactionalFluidTank tankAt(int index) { java.util.Objects.checkIndex(index, 1); return tank; }
+        @Override public boolean allowsInsert(int index) { return false; }
+        @Override public boolean allowsExtract(int index) { return true; }
         @Override
         public int getTanks() {
             return 1;
@@ -83,11 +86,11 @@ public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.com
         super(SinguloBlockEntities.HALO_COLLECTOR.get(), pos, state);
     }
 
-    public FluidTank tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
-    public IFluidHandler automationFluids() {
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess automationFluids() {
         return output;
     }
 
@@ -134,7 +137,7 @@ public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.com
             if (tank.isEmpty()) {
                 return;
             }
-            IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(dir), dir.getOpposite());
+            IFluidHandler target = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, pos.relative(dir), dir.getOpposite());
             if (target != null) {
                 int moved = target.fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
                 if (moved > 0) {
@@ -164,7 +167,7 @@ public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.com
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("carry", carry);
     }
@@ -172,7 +175,7 @@ public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.com
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
         energy.setEnergy(tag.getIntOr("energy", 0));
         carry = tag.getDoubleOr("carry", 0.0D);
     }

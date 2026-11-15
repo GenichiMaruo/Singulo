@@ -24,7 +24,7 @@ import net.minecraft.world.level.Level;
  * <p>掛ける高さはピクセル単位で上下に変えられる（持ってスニークして使うと、高さを決める画面が開く）。高さはメガネに残り、
  * 頭に掛けた模型を高さごとに切り替える（アイテムの絵の切り替え {@code singulo:height}）ので、ほかの人にも同じ高さで見える。
  */
-public class SurveyGlassesItem extends Item {
+public class SurveyGlassesItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     /** 掛ける高さの範囲（ピクセル。上が正）。 */
     public static final int MIN_HEIGHT = -4, MAX_HEIGHT = 4;
     private static final String HEIGHT_KEY = "glasses_height";

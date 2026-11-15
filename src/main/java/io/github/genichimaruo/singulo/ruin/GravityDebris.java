@@ -28,7 +28,7 @@ public class GravityDebris extends ThrowableProjectile {
     }
 
     public GravityDebris(Level level, LivingEntity shooter, BlockState block) {
-        super(SinguloEntities.GRAVITY_DEBRIS.get(), shooter, level);
+        super(SinguloEntities.GRAVITY_DEBRIS.get(), shooter.getX(), shooter.getEyeY() - 0.1, shooter.getZ(), level); setOwner(shooter);
         entityData.set(BLOCK, block);
     }
 
@@ -58,7 +58,7 @@ public class GravityDebris extends ThrowableProjectile {
     protected void onHitEntity(EntityHitResult hit) {
         super.onHitEntity(hit);
         if (hit.getEntity() instanceof LivingEntity target && !RuinGuards.isGuard(target)) {
-            target.hurt(damageSources().mobProjectile(this, getOwner() instanceof LivingEntity o ? o : null), DAMAGE);
+            target.hurtOrSimulate(damageSources().mobProjectile(this, getOwner() instanceof LivingEntity o ? o : null), DAMAGE);
         }
     }
 

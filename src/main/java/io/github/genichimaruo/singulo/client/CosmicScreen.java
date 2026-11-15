@@ -388,7 +388,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     private void slotHint(GuiGraphicsExtractor g, int x, int y, int slot, String ghost, Component hint) {
         Panel.slot(g, skin, leftPos + x, topPos + y);
         if (menu.slots.get(slot).getItem().isEmpty()) {
-            g.fakeItem(new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), leftPos + x, topPos + y);
+            g.fakeItem(new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(ghost))), leftPos + x, topPos + y);
             g.pose().pushMatrix();
             g.nextStratum();
             g.fill(leftPos + x, topPos + y, leftPos + x + 16, topPos + y + 16, 0xB0060814);

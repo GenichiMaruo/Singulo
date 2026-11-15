@@ -6,18 +6,10 @@
     "RBR"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lighting"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "G": {
-      "tag": "c:dusts/glowstone"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "B": "singulo:blueprint_lighting",
+    "W": "singulo:white_ceramic_composite",
+    "G": "#c:dusts/glowstone",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "singulo:room_light",

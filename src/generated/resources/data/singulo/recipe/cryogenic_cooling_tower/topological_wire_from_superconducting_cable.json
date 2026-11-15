@@ -6,15 +6,11 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_cable"
-      },
+      "ingredient": "singulo:superconducting_cable",
       "count": 16
     }
   ],

@@ -66,8 +66,7 @@ public final class LiquidStores {
      * 入れる・出すの設定があるので（ケミカルタンクの既定は、前だけが出口）、数えるのは最初に見つかった面で（同じ中身を何度も数えない）、
      * 出し入れはできる面を順に試す。数えるのは、どこかの面から取り出せる量だけ（入れるだけの欄の中身を在庫にしない）。
      */
-    @org.jspecify.annotations.Nullable
-    private static Chemicals.Store anySide(Level level, BlockPos p) {
+    private static Chemicals.@org.jspecify.annotations.Nullable Store anySide(Level level, BlockPos p) {
         java.util.List<Chemicals.Store> sides = new ArrayList<>();
         for (Direction d : Direction.values()) {
             Chemicals.Store s = Chemicals.store(level, p, d);
@@ -254,7 +253,7 @@ public final class LiquidStores {
     /** 装置の1つの面の、液体・化学物質の出入口（なければ空の入れ物）。 */
     public static LiquidStores machine(Level level, BlockPos pos, Direction face) {
         LiquidStores out = new LiquidStores();
-        IFluidHandler f = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, face);
+        IFluidHandler f = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, pos, face);
         if (f != null) {
             out.fluids.add(f);
         }
@@ -267,6 +266,6 @@ public final class LiquidStores {
 
     /** 機械の面から、液体・化学物質を出し入れできるか（化学物質は Mekanism があるときだけ）。 */
     public static boolean handles(Level level, BlockPos pos, Direction face) {
-        return level.getCapability(Capabilities.FluidHandler.BLOCK, pos, face) != null || Chemicals.store(level, pos, face) != null;
+        return io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, pos, face) != null || Chemicals.store(level, pos, face) != null;
     }
 }

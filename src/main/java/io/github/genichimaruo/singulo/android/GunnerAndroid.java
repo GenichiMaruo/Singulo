@@ -88,14 +88,14 @@ public class GunnerAndroid extends RuinAndroid {
 
     /** 位置は、整数の基準点からの差で送る（遠くても小数の精度を落とさない）。 */
     private static final EntityDataAccessor<BlockPos> FX_ORIGIN = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.BLOCK_POS);
-    private static final EntityDataAccessor<Vector3f> SHOT_FROM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> SHOT_AT = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> SHOT_FROM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> SHOT_AT = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> SHOT_FLASH = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.INT);
     /** レールガンの銃口と、狙い（溜めの間）・光線の先（撃った後）。 */
-    private static final EntityDataAccessor<Vector3f> RAIL_FROM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> RAIL_TO = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> RAIL_FROM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> RAIL_TO = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
     /** 構えている間の狙いの点（相手の体の中心）。描画で、銃身をここへぴったり向ける。 */
-    private static final EntityDataAccessor<Vector3f> AIM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> AIM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
 
     public GunnerAndroid(EntityType<? extends GunnerAndroid> type, Level level) {
         super(type, level);
@@ -179,11 +179,11 @@ public class GunnerAndroid extends RuinAndroid {
     }
 
     public Vec3 shotFrom() {
-        return fxOrigin().add(new Vec3(entityData.get(SHOT_FROM)));
+        return fxOrigin().add(new Vec3(new org.joml.Vector3f(entityData.get(SHOT_FROM))));
     }
 
     public Vec3 shotAt() {
-        return fxOrigin().add(new Vec3(entityData.get(SHOT_AT)));
+        return fxOrigin().add(new Vec3(new org.joml.Vector3f(entityData.get(SHOT_AT))));
     }
 
     public int shotFlash() {
@@ -191,16 +191,16 @@ public class GunnerAndroid extends RuinAndroid {
     }
 
     public Vec3 railFrom() {
-        return fxOrigin().add(new Vec3(entityData.get(RAIL_FROM)));
+        return fxOrigin().add(new Vec3(new org.joml.Vector3f(entityData.get(RAIL_FROM))));
     }
 
     public Vec3 railTo() {
-        return fxOrigin().add(new Vec3(entityData.get(RAIL_TO)));
+        return fxOrigin().add(new Vec3(new org.joml.Vector3f(entityData.get(RAIL_TO))));
     }
 
     /** 構えている間の狙いの点。 */
     public Vec3 aim() {
-        return fxOrigin().add(new Vec3(entityData.get(AIM)));
+        return fxOrigin().add(new Vec3(new org.joml.Vector3f(entityData.get(AIM))));
     }
 
     /** 狙いの点を at にする（構えている間、毎 tick）。 */
@@ -231,7 +231,7 @@ public class GunnerAndroid extends RuinAndroid {
         }
     }
 
-    private void setFx(Vec3 from, Vec3 to, EntityDataAccessor<Vector3f> a, EntityDataAccessor<Vector3f> b) {
+    private void setFx(Vec3 from, Vec3 to, EntityDataAccessor<org.joml.Vector3fc> a, EntityDataAccessor<org.joml.Vector3fc> b) {
         rebase();
         Vec3 base = fxOrigin();
         entityData.set(a, from.subtract(base).toVector3f());
@@ -255,7 +255,7 @@ public class GunnerAndroid extends RuinAndroid {
         // 3連射は 5 tick おきなので、受けたあとの無敵時間（10 tick）に2発目・3発目が消されないよう、光弾の前に外す
         // （当てたあとは、ふつうに無敵時間が付く）
         target.invulnerableTime = 0;
-        target.hurt(damageSources().mobAttack(this), SHOT_DAMAGE);
+        target.hurtOrSimulate(damageSources().mobAttack(this), SHOT_DAMAGE);
         setFx(from, to, SHOT_FROM, SHOT_AT);
         entityData.set(SHOT_FLASH, FLASH);
         // 銃声は遠くまで届かせる（音の届く距離は 16 × 音量 ブロック。1 を超えると近くでは最大の大きさで、遠くへ行くほど小さくなる）
@@ -295,7 +295,7 @@ public class GunnerAndroid extends RuinAndroid {
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(from, end).inflate(RAIL_RADIUS), this::canHit)) {
             AABB box = e.getBoundingBox().inflate(RAIL_RADIUS);
             if ((box.contains(from) || box.clip(from, end).isPresent()) && hit.add(e)
-                    && e.hurt(damageSources().mobAttack(this), RAIL_DAMAGE)) {
+                    && e.hurtOrSimulate(damageSources().mobAttack(this), RAIL_DAMAGE)) {
                 e.setDeltaMovement(e.getDeltaMovement().add(dir.x * 0.8, 0.25, dir.z * 0.8));
                 e.hurtMarked = true;
             }
@@ -306,11 +306,11 @@ public class GunnerAndroid extends RuinAndroid {
             Vec3 at = from.add(dir.scale(d));
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, 0.08, 0.08, 0.08, 0.05);
         }
-        level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), end.x, end.y, end.z, 1, 0, 0, 0, 0);
         sparks(level, end, 12, 0.4);
         playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_fire"), RAIL_SOUND_VOLUME, 1.0F);   // レールガンの轟音は、さらに遠くまで
         setDeltaMovement(getDeltaMovement().add(-dir.x * 0.35, 0.05, -dir.z * 0.35));
-        hasImpulse = true;
+        needsSync = true;
         return hit.size();
     }
 
@@ -353,11 +353,11 @@ public class GunnerAndroid extends RuinAndroid {
 
     /** 相手を倒した: 手が空いたら小型銃を一回す。 */
     @Override
-    public boolean killedEntity(ServerLevel level, LivingEntity killed) {
+    public boolean killedEntity(ServerLevel level, LivingEntity killed, net.minecraft.world.damagesource.DamageSource source) {
         if (killed != this) {
             twirlWait = TWIRL_WINDOW;
         }
-        return super.killedEntity(level, killed);
+        return super.killedEntity(level, killed, source);
     }
 
     @Override
@@ -560,7 +560,7 @@ public class GunnerAndroid extends RuinAndroid {
                 Vec3 away = position().subtract(target.position()).multiply(1, 0, 1);
                 away = away.lengthSqr() < 1e-4 ? Vec3.directionFromRotation(0, yBodyRot + 180) : away.normalize();
                 setDeltaMovement(away.x * 0.75, 0.42, away.z * 0.75);
-                hasImpulse = true;
+                needsSync = true;
                 setState(STATE_HOP);
                 playSound(SoundEvents.TRIDENT_RIPTIDE_1.value(), 0.6F, 1.9F);
                 return;

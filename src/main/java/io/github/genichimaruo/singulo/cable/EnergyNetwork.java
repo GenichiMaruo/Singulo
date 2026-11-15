@@ -1,13 +1,16 @@
 package io.github.genichimaruo.singulo.cable;
 
-import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
+import io.github.genichimaruo.singulo.energy.LongEnergyHandler;
 import java.util.*;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
@@ -164,7 +167,7 @@ public final class EnergyNetwork {
                     neighbors.add(next);
                     if (seen.add(next)) queue.add(next);
                 } else if (level.getBlockEntity(next) != null
-                        || level.getCapability(Capabilities.EnergyStorage.BLOCK,next,dir.getOpposite()) != null) {
+                        || level.getCapability(Capabilities.Energy.BLOCK,next,dir.getOpposite()) != null) {
                     // Keep potential endpoints: a port can acquire its capability after forming.
                     devices.computeIfAbsent(pos,p -> new ArrayList<>()).add(Map.entry(next,dir.getOpposite()));
                 }
@@ -255,7 +258,7 @@ public final class EnergyNetwork {
         if (level.getBlockEntity(pos) instanceof CableBlockEntity) return true;
         boolean endpoint = level.getBlockEntity(pos) != null;
         if (!endpoint) for (Direction d : Direction.values()) {
-            if (level.getCapability(Capabilities.EnergyStorage.BLOCK,pos,d) != null) { endpoint = true; break; }
+            if (level.getCapability(Capabilities.Energy.BLOCK,pos,d) != null) { endpoint = true; break; }
         }
         return endpoint != devicePositions.contains(pos);
     }
@@ -297,21 +300,23 @@ public final class EnergyNetwork {
         long now = level.getGameTime();
         if (now != tick) { state = new State(); tick = now; }
     }
-    private IEnergyStorage capability(Endpoint e) {
-        return level.isLoaded(e.pos) ? level.getCapability(Capabilities.EnergyStorage.BLOCK,e.pos,e.side) : null;
+    private EnergyHandler capability(Endpoint e) {
+        return level.isLoaded(e.pos) ? level.getCapability(Capabilities.Energy.BLOCK,e.pos,e.side) : null;
     }
-    private static long extract(IEnergyStorage source, long amount, boolean simulate) {
-        return source instanceof LongEnergyStorage big ? big.extractLong(amount,simulate)
-                : source.extractEnergy((int)Math.min(Integer.MAX_VALUE,amount),simulate);
+    private static long probeExtract(EnergyHandler source, long amount, TransactionContext parent) {
+        try (var tx = Transaction.open(parent)) { return LongEnergyHandler.extract(source, amount, tx); }
     }
-    private long sourceLeft(State s, Endpoint e, IEnergyStorage cap, long offer) {
-        long limit = s.sourceLimits.computeIfAbsent(e.pos,k -> cap != null && cap.canExtract() ? extract(cap,Long.MAX_VALUE,true) : Long.MAX_VALUE);
+    private static long probeInsert(EnergyHandler target, long amount, TransactionContext parent) {
+        try (var tx = Transaction.open(parent)) { return LongEnergyHandler.insert(target, amount, tx); }
+    }
+    private long sourceLeft(State s, Endpoint e, EnergyHandler cap, long offer, TransactionContext tx) {
+        long limit = s.sourceLimits.computeIfAbsent(e.pos,k -> cap != null ? probeExtract(cap,Long.MAX_VALUE,tx) : Long.MAX_VALUE);
         if (offer > limit) { limit = offer; s.sourceLimits.put(e.pos,limit); }
         long available = Math.max(0,limit - s.paid.getOrDefault(e.pos,0L));
-        return offer == 0 && cap != null && cap.canExtract() ? Math.min(available,extract(cap,Long.MAX_VALUE,true)) : available;
+        return offer == 0 && cap != null ? Math.min(available,probeExtract(cap,Long.MAX_VALUE,tx)) : available;
     }
-    private long receiverLeft(State s, Endpoint e, IEnergyStorage cap) {
-        long limit = LongEnergyStorage.receive(cap,Long.MAX_VALUE,true);
+    private long receiverLeft(State s, Endpoint e, EnergyHandler cap, TransactionContext tx) {
+        long limit = probeInsert(cap,Long.MAX_VALUE,tx);
         limit = Math.max(limit,s.receiverLimits.getOrDefault(e.pos,0L));
         s.receiverLimits.put(e.pos,limit);
         return Math.max(0,limit-s.received.getOrDefault(e.pos,0L));
@@ -330,17 +335,27 @@ public final class EnergyNetwork {
     }
 
     /** Immediate FE compatibility, with receiver-side nearest-source priority independent of push order. */
-    long distribute(BlockPos entry, @Nullable BlockPos source, long amount, boolean simulate) {
+    private boolean distributing;
+    long distribute(BlockPos entry, @Nullable BlockPos source, long amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
+        // A remote port can lead back into the same network. Never recursively mutate its accounting.
+        if (distributing) return 0;
+        distributing = true;
+        try { return distributeOnce(entry, source, amount, transaction); }
+        finally { distributing = false; }
+    }
+    private long distributeOnce(BlockPos entry, @Nullable BlockPos source, long amount, TransactionContext transaction) {
         if (amount <= 0 || !valid) return 0;
         Node node = nodes.get(entry);
         if (node == null) return 0;
         roll();
-        State s = simulate ? new State(state) : state;
+        flowJournal.updateSnapshots(transaction);
+        State s = state;
         Direction face = source == null ? Direction.DOWN : direction(source,entry);
         if (face == null) face = Direction.DOWN;
         Endpoint caller = new Endpoint(source == null ? entry : source,face,node);
-        IEnergyStorage callerCap = source == null ? null : capability(caller);
-        long callerLeft = Math.min(amount,sourceLeft(s,caller,callerCap,amount));
+        EnergyHandler callerCap = source == null ? null : capability(caller);
+        long callerLeft = Math.min(amount,sourceLeft(s,caller,callerCap,amount,transaction));
         long callerPaid = 0;
         List<Endpoint> targets = targetOrder.computeIfAbsent(node,n -> {
             List<Endpoint> ordered = new ArrayList<>(endpoints);
@@ -348,11 +363,11 @@ public final class EnergyNetwork {
                     .thenComparingLong(e -> e.pos.asLong()).thenComparingInt(e -> e.side.ordinal()));
             return List.copyOf(ordered);
         });
-        Map<Endpoint,IEnergyStorage> caps = new HashMap<>();
+        Map<Endpoint,EnergyHandler> caps = new HashMap<>();
         for (Endpoint target : targets) {
             if (target.pos.equals(caller.pos)) continue;
-            IEnergyStorage receiver = caps.computeIfAbsent(target,this::capability);
-            if (receiver == null || !receiver.canReceive() || receiverLeft(s,target,receiver) <= 0) continue;
+            EnergyHandler receiver = caps.computeIfAbsent(target,this::capability);
+            if (receiver == null || receiverLeft(s,target,receiver,transaction) <= 0) continue;
             List<Candidate> candidates = preferences.computeIfAbsent(target,t -> {
                 List<Candidate> choices = new ArrayList<>();
                 for (Endpoint e : endpoints) if (!e.pos.equals(t.pos)) choices.add(new Candidate(e,tree(t.node).distance.get(e.node)));
@@ -368,15 +383,15 @@ public final class EnergyNetwork {
                 boolean before = candidate == null || compare(caller,callerPath,candidate) <= 0;
                 if (!offered && before) {
                     offered = true;
-                    long paid = transfer(s,caller,callerCap,target,receiver,callerPath,callerLeft,simulate,true);
+                    long paid = transfer(s,caller,callerCap,target,receiver,callerPath,callerLeft,transaction,true);
                     callerLeft -= paid; callerPaid += paid;
                 }
-                if (receiverLeft(s,target,receiver) <= 0) break;
+                if (receiverLeft(s,target,receiver,transaction) <= 0) break;
                 if (candidate == null || candidate.endpoint.pos.equals(caller.pos)) continue;
-                IEnergyStorage supplier = caps.computeIfAbsent(candidate.endpoint,this::capability);
-                if (supplier == null || !supplier.canExtract()) continue;
+                EnergyHandler supplier = caps.computeIfAbsent(candidate.endpoint,this::capability);
+                if (supplier == null || probeExtract(supplier,Long.MAX_VALUE,transaction) <= 0) continue;
                 transfer(s,candidate.endpoint,supplier,target,receiver,path(candidate.endpoint.node,target.node),
-                        sourceLeft(s,candidate.endpoint,supplier,0),simulate,false);
+                        sourceLeft(s,candidate.endpoint,supplier,0,transaction),transaction,false);
             }
         }
         return callerPaid;
@@ -387,33 +402,44 @@ public final class EnergyNetwork {
         if (order == 0) order = Long.compare(caller.pos.asLong(),other.endpoint.pos.asLong());
         return order != 0 ? order : Integer.compare(caller.side.ordinal(),other.endpoint.side.ordinal());
     }
-    private long transfer(State s, Endpoint source, IEnergyStorage supplier, Endpoint target, IEnergyStorage receiver,
-                          Path path, long offer, boolean simulate, boolean offered) {
+    private long transfer(State s, Endpoint source, EnergyHandler supplier, Endpoint target, EnergyHandler receiver,
+                          Path path, long offer, TransactionContext transaction, boolean offered) {
         long budget = Math.min(offer,available(s,path));
         if (budget <= 0) return 0;
-        long wanted = Math.min(receiverLeft(s,target,receiver),(long)(budget*path.efficiency));
-        long received = LongEnergyStorage.receive(receiver,wanted,true);
+        long wanted = Math.min(receiverLeft(s,target,receiver,transaction),(long)(budget*path.efficiency));
+        long received = probeInsert(receiver,wanted,transaction);
         long paid = Math.min(budget,(long)Math.ceil(received/path.efficiency));
         if (paid <= 0) return 0;
-        if (!simulate) {
-            if (!offered) {
-                paid = extract(supplier,paid,false);
-                received = Math.min(received,(long)(paid*path.efficiency));
-            }
-            received = LongEnergyStorage.receive(receiver,received,false);
-            if (offered) paid = Math.min(paid,(long)Math.ceil(received/path.efficiency));
+        // A transfer is atomic even when a third-party handler rejects a previously simulated amount.
+        try (var transfer = Transaction.open(transaction)) {
+            if (!offered && LongEnergyHandler.extract(supplier,paid,transfer) != paid) return 0;
+            if (LongEnergyHandler.insert(receiver,received,transfer) != received) return 0;
+            transfer.commit();
         }
         account(s,path,source,target,paid,received);
-        if (!simulate && paid > 0) {
-            Sample sample = samples.computeIfAbsent(new SampleKey(path,source.pos,target),k -> new Sample());
-            sample.amount += paid;
-            if (windowStart < 0) windowStart = level.getGameTime();
-            ACTIVE.add(this);
-        }
+        Sample sample = samples.computeIfAbsent(new SampleKey(path,source.pos,target),k -> new Sample());
+        sample.amount += paid;
+        if (windowStart < 0) windowStart = level.getGameTime();
         return paid;
     }
 
-    /** Shortest cable-hop trees are built once on the compressed graph, never once per wire/tick. */
+    private record AccountingSnapshot(State state, Map<SampleKey,Double> samples, long windowStart) {}
+    private final SnapshotJournal<AccountingSnapshot> flowJournal = new SnapshotJournal<>() {
+        @Override protected AccountingSnapshot createSnapshot() {
+            Map<SampleKey,Double> copied = new HashMap<>();
+            samples.forEach((key,value) -> copied.put(key,value.amount));
+            return new AccountingSnapshot(new State(state),copied,windowStart);
+        }
+        @Override protected void revertToSnapshot(AccountingSnapshot snapshot) {
+            state = snapshot.state;
+            samples.clear();
+            snapshot.samples.forEach((key,value) -> { Sample sample = new Sample(); sample.amount=value; samples.put(key,sample); });
+            windowStart = snapshot.windowStart;
+        }
+        @Override protected void onRootCommit(AccountingSnapshot previous) {
+            if (!samples.isEmpty()) ACTIVE.add(EnergyNetwork.this);
+        }
+    };
     private Tree tree(Node root) {
         return trees.computeIfAbsent(root,r -> {
             Map<Node,Integer> distance = new IdentityHashMap<>();
@@ -544,6 +570,10 @@ public final class EnergyNetwork {
     private static long saturatedAdd(long a, long b) { return Long.MAX_VALUE-a < b ? Long.MAX_VALUE : a+b; }
     private static int bit(@Nullable Direction d) { return d == null ? 0 : 1 << d.get3DDataValue(); }
     @Nullable private static Direction direction(BlockPos from, BlockPos to) {
-        return Direction.fromDelta(to.getX()-from.getX(),to.getY()-from.getY(),to.getZ()-from.getZ());
+        int dx=to.getX()-from.getX(), dy=to.getY()-from.getY(), dz=to.getZ()-from.getZ();
+        for (Direction direction : Direction.values()) {
+            if (direction.getStepX()==dx && direction.getStepY()==dy && direction.getStepZ()==dz) return direction;
+        }
+        return null;
     }
 }

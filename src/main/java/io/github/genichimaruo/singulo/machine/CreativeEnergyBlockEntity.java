@@ -17,57 +17,28 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * ケーブルや装置から取り出すこともできる。検証用。
  */
 public class CreativeEnergyBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
-    private final io.github.genichimaruo.singulo.energy.LongEnergyStorage infinite = new io.github.genichimaruo.singulo.energy.LongEnergyStorage() {
-        @Override
-        public long receiveLong(long amount, boolean simulate) { return amount; }
-
-        @Override
-        public long extractLong(long amount, boolean simulate) { return amount; }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return amount;            // 何でも飲み込む（捨てる）
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return amount;
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public boolean canExtract() {
-            return true;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return false;
-        }
+    private final io.github.genichimaruo.singulo.energy.LongEnergyHandler infinite = new io.github.genichimaruo.singulo.energy.LongEnergyHandler() {
+        public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){if(amount<0)throw new IllegalArgumentException("Negative energy insertion");return 0;}
+        public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){if(amount<0)throw new IllegalArgumentException("Negative energy extraction");return amount;}
+        public long getAmountAsLong(){return Long.MAX_VALUE;}
+        public long getCapacityAsLong(){return Long.MAX_VALUE;}
+        public boolean canExtract(){return true;}
+        public boolean canReceive(){return false;}
     };
 
     public CreativeEnergyBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.CREATIVE_ENERGY.get(), pos, state);
     }
 
-    public IEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return infinite;
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CreativeEnergyBlockEntity be) {
         for (Direction dir : Direction.values()) {
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive() && !(level.getBlockEntity(pos.relative(dir)) instanceof CreativeEnergyBlockEntity)) {
-                io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, Long.MAX_VALUE / 4, false);
+            net.neoforged.neoforge.transfer.energy.EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null && !(level.getBlockEntity(pos.relative(dir)) instanceof CreativeEnergyBlockEntity)) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(be.infinite, target, Long.MAX_VALUE / 4);
             }
         }
     }

@@ -135,7 +135,7 @@ public class SlidingDoorBlock extends AndroidCapsuleBlock implements EntityBlock
 
     /** レッドストーン: 上下どちらかに信号があれば開き、なくなると少しして閉まる。 */
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbor, BlockPos neighborPos, boolean moving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbor, net.minecraft.world.level.redstone.Orientation neighborPos, boolean moving) {
         BlockPos low = lower(state, pos);
         boolean powered = level.hasNeighborSignal(low) || level.hasNeighborSignal(low.above());
         BlockState lowState = level.getBlockState(low);

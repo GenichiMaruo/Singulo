@@ -36,8 +36,8 @@ final class FluidLook {
 
     static Look look(FluidStack fluid) {
         IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fluid.getFluid());
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ext.getStillTexture(fluid));
-        int tint = ext.getTintColor(fluid);
+        TextureAtlasSprite sprite = FluidVisuals.sprite(fluid);
+        int tint = FluidVisuals.tint(fluid);
         int alpha = tint >>> 24;
         if (alpha == 0) {
             alpha = 255;
@@ -52,7 +52,7 @@ final class FluidLook {
     }
 
     static VertexConsumer buffer(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entityTranslucentCull(InventoryMenu.BLOCK_ATLAS));
+        return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentCullItemTarget(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
     }
 
     /**
@@ -62,7 +62,7 @@ final class FluidLook {
      * 面を落とさない描き方で、裏の面も奥から順に重なる。
      */
     static VertexConsumer insideBuffer(MultiBufferSource buffers) {
-        return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
+        return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
     }
 
     /**

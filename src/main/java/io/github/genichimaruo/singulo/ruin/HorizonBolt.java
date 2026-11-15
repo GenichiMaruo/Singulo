@@ -45,7 +45,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     public HorizonBolt(Level level, LivingEntity shooter) {
-        super(SinguloEntities.HORIZON_BOLT.get(), shooter, level);
+        super(SinguloEntities.HORIZON_BOLT.get(), shooter, level, new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("jet_condensate"))));
     }
 
     /** 相手を追いかける光弾にする。 */
@@ -97,7 +97,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
 
     @Override
     protected Item getDefaultItem() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("jet_condensate"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("jet_condensate"));
     }
 
     @Override
@@ -112,7 +112,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
             double speed = v.length();
             Vec3 want = homingTarget.getBoundingBox().getCenter().subtract(position()).normalize().scale(speed);
             setDeltaMovement(v.lerp(want, HOMING_TURN).normalize().scale(speed));
-            hasImpulse = true;
+            hurtMarked = true;
         }
         super.tick();
         if (!level().isClientSide() && tickCount > LIFETIME) {
@@ -125,7 +125,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
 
     /** ダメージと当たり方（防具を貫くか・防具で減るか）を保存する。読み込み直しても同じ強さで当たる。 */
     @Override
-    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         tag.putFloat("damage", damage);
         tag.putBoolean("armored", armored);
@@ -133,11 +133,11 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     @Override
-    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput tag) {
         super.readAdditionalSaveData(tag);
         // 0.5.0 より前に保存された光弾は、ダメージを持たない（既定の値のまま）
-        if (tag.contains("damage")) {
-            damage = tag.getFloatOr("damage", 0.0F);
+        {
+            damage = tag.getFloatOr("damage", damage);
         }
         armored = tag.getBooleanOr("armored", false);
         piercing = tag.getBooleanOr("piercing", false);
@@ -160,7 +160,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
                     : armored ? damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null)
                     : damageSources().indirectMagic(this, getOwner());
             if (getOwner() instanceof SecurityDrone) SecurityDrone.hurtWithoutKnockback(hit, source, damage);
-            else hit.hurt(source, damage);
+            else hit.hurtOrSimulate(source, damage);
         }
     }
 
@@ -175,7 +175,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
         super.onHit(result);
         if (!level().isClientSide()) {
             if (level() instanceof ServerLevel server) {
-                server.sendParticles(ParticleTypes.FLASH, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
+                server.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), getX(), getY(), getZ(), 1, 0, 0, 0, 0);
                 server.playSound(null, getX(), getY(), getZ(), SinguloSounds.get("horizon_warden.bolt_hit"),
                         net.minecraft.sounds.SoundSource.HOSTILE, 1.5F, 0.9F + random.nextFloat() * 0.2F);
             }

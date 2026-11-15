@@ -1,0 +1,20 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "singulo:dynamic",
+    "kind": "work_location_card",
+    "entries": [
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/work_location_card_recorded"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "singulo:item/work_location_card"
+    }
+  }
+}

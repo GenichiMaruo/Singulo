@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 // 重力レンズ。1回の描画で1つのレンズを、影響が及ぶ画面の範囲だけ描く（奥のレンズから順。GravitationalLensing.apply）。
 // 2種類のレンズを扱う:
@@ -19,26 +19,32 @@
 // ノイズ）が出ず、強く縮められる所もちらつかない。
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler1;
-uniform vec4 Lens;
 // (中心までの奥行き, 手前の面までの奥行きの差（ブロック）, 歪みが及ぶ球の半径（UV）, k)
 // k は背景までの距離の比 D_ls / D_s（ブラックホール）。0 なら歪みだけのレンズ
-uniform vec4 Sphere;
 // 光の経路をたどって描く降着円盤（ブラックホールのレンズだけ）。座標はカメラから見たもの（ブロック、視線は −z）。
 // Disk = (ブラックホールの中心 xyz, 地平線の半径)。地平線の半径が 0 なら円盤なし（影と円盤はワールドに描いてある）
 // DiskN = (円盤の面の向き xyz, 内側の半径)、DiskP = (外側の半径, ドップラーで明るさが変わる幅, 明るさの倍率, 渦の筋の時計（0 で筋なし）)
-uniform vec4 Disk;
-uniform vec4 DiskN;
-uniform vec4 DiskP;
 // 投影行列の逆行列。画素ごとの光の出発点と向きを、歩いたときの画面の揺れも含めて正確に求めるのに使う
-uniform mat4 InvProj;
 // 投影行列の (m22, m32)。深度から距離に戻すのに使う
-uniform vec2 DepthParams;
-uniform float Aspect;
 // 視線から 1 ラジアンずれた方向が、縦の UV でどれだけ離れて写るか（投影行列の m11 ÷ 2）
-uniform float Focal;
 // 1 なら深度で手前のものを除く。0 なら深度を使わない（Iris 系のシェーダーパック使用時。深度バッファが読めないため、
 // 球の範囲の中をすべて奥の景色とみなす）
-uniform float UseDepth;
+
+layout(std140) uniform LensData {
+    mat4 InvProj;
+    vec4 Projection;
+    vec4 Options;
+    vec4 Lens;
+    vec4 Sphere;
+    vec4 Disk;
+    vec4 DiskN;
+    vec4 DiskP;
+    vec4 Rect;
+};
+#define DepthParams Projection.xy
+#define Aspect Projection.z
+#define Focal Projection.w
+#define UseDepth Options.x
 
 in vec2 texCoord;
 
@@ -366,6 +372,7 @@ vec3 sampleScreen(vec2 p, mat2 J) {
 }
 
 void main() {
+    if (texCoord.x < Rect.x || texCoord.y < Rect.y || texCoord.x > Rect.z || texCoord.y > Rect.w) discard;
     float ring = 0.0;
     float dark = 0.0;
     float far = 0.0;

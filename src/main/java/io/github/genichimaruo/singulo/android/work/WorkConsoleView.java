@@ -72,7 +72,7 @@ public final class WorkConsoleView {
         for (WorkOrder o : c.orders()) {
             CompoundTag ot = new CompoundTag();
             ot.putInt("id", o.id);
-            ot.put("target", o.target.save(reg));
+            ot.put("target", io.github.genichimaruo.singulo.compat.NbtCompat.save(o.target, reg));
             ot.putLong("count", o.count);
             ot.putInt("progress", o.progress());
             ot.putInt("status", o.status);
@@ -81,7 +81,7 @@ public final class WorkConsoleView {
             ListTag st = new ListTag();
             for (WorkOrder.StepState s : o.steps) {
                 CompoundTag x = new CompoundTag();
-                x.put("item", s.recipe.output().save(reg));
+                x.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(s.recipe.output(), reg));
                 x.putLong("done", s.done);
                 x.putLong("total", s.total);
                 x.putLong("doing", s.inProgress);
@@ -104,13 +104,13 @@ public final class WorkConsoleView {
             for (java.util.UUID id : o.workers) {
                 CompoundTag w = new CompoundTag();
                 if (c.getLevel() instanceof net.minecraft.server.level.ServerLevel sl && sl.getEntity(id) instanceof RuinAndroid a && a.isAlive()) {
-                    w.putString("name", Component.Serializer.toJson(a.nickname(), reg));
+                    w.putString("name", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(a.nickname(), reg));
                     // ほかの注文の作業をしている（装置を待つあいだなど）なら、-2
                     w.putInt("activity", a.workOrder() == o.id ? a.activity() : c.order(a.workOrder()) != null ? -2 : RuinAndroid.ACT_NONE);
                     w.putInt("accent", a.accent());
                     w.putInt("stall", a.stall());
                 } else {
-                    w.putString("name", Component.Serializer.toJson(Component.translatable("gui.singulo.work_console.worker.away"), reg));
+                    w.putString("name", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(Component.translatable("gui.singulo.work_console.worker.away"), reg));
                     w.putInt("activity", -1);
                 }
                 wt.add(w);
@@ -143,7 +143,7 @@ public final class WorkConsoleView {
                 name = port != null && !port.name().isEmpty() ? Component.literal(port.name())
                         : Component.translatable("gui.singulo.work_console.delivery.port", p.getX(), p.getY(), p.getZ());
             }
-            dt.putString("name", Component.Serializer.toJson(name, reg));
+            dt.putString("name", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(name, reg));
             ds.add(dt);
         }
         t.put("deliveries", ds);
@@ -153,20 +153,20 @@ public final class WorkConsoleView {
         for (StandingOrder s : c.standing()) {
             CompoundTag st = new CompoundTag();
             st.putInt("id", s.id);
-            st.put("item", s.target.save(reg));
+            st.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(s.target, reg));
             st.putLong("count", s.count);
             st.putInt("trigger", s.trigger);
             st.putInt("state", s.state);
             st.putLong("stock", ItemCount.get(inStock, s.target));
             if (s.reason != null) {
-                st.putString("reason", Component.Serializer.toJson(s.reason, reg));
+                st.putString("reason", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(s.reason, reg));
             }
             ss.add(st);
         }
         t.put("standing", ss);
         t.putBoolean("powered", c.powered());
         if (c.message() != null) {
-            t.putString("message", Component.Serializer.toJson(c.message(), reg));
+            t.putString("message", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(c.message(), reg));
         }
         return t;
     }
@@ -175,7 +175,7 @@ public final class WorkConsoleView {
         HolderLookup.Provider reg = player.level().registryAccess();
         CompoundTag t = new CompoundTag();
         // 共通の部分は作ったあと変えない。見る人ごとに違うのは、いちばん上の項目だけ
-        for (String key : common.getAllKeys()) {
+        for (String key : common.keySet()) {
             t.put(key, common.get(key));
         }
         // 使えるアンドロイド
@@ -183,7 +183,7 @@ public final class WorkConsoleView {
         for (RuinAndroid a : c.candidates(player)) {
             CompoundTag at = new CompoundTag();
             at.store("id", net.minecraft.core.UUIDUtil.CODEC, a.getUUID());
-            at.putString("name", Component.Serializer.toJson(a.nickname(), reg));
+            at.putString("name", io.github.genichimaruo.singulo.compat.JsonComponents.toJson(a.nickname(), reg));
             at.putBoolean("busy", c.busy(a));
             at.putInt("slots", a.isWorking() ? a.carryCapacity() : a.freeCarry());
             at.putInt("accent", a.accent());
@@ -222,7 +222,7 @@ public final class WorkConsoleView {
     /** 計算の結果（画面に出す）。 */
     public static CompoundTag plan(WorkConsoleBlockEntity c, WorkPlanner.Plan plan, HolderLookup.Provider reg) {
         CompoundTag t = new CompoundTag();
-        t.put("target", plan.target.save(reg));
+        t.put("target", io.github.genichimaruo.singulo.compat.NbtCompat.save(plan.target, reg));
         t.putLong("count", plan.count);
         t.putBoolean("ok", plan.ok());
         t.putBoolean("loop", plan.loop);

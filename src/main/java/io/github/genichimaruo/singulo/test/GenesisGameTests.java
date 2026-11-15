@@ -5,14 +5,14 @@ import io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity;
 import io.github.genichimaruo.singulo.genesis.MassSynthesis;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 創世炉: 形・原初の種・投入の止め方・質量生成の電力。 */
 @GameTestHolder(Singulo.MODID)
@@ -32,7 +32,7 @@ public final class GenesisGameTests {
         for (int i = missingPylon ? 1 : 0; i < GenesisCoreBlockEntity.PYLONS.length; i++) {
             helper.setBlock(CORE.offset(GenesisCoreBlockEntity.PYLONS[i]), SinguloBlocks.SIMPLE.get("genesis_pylon").get());
         }
-        return helper.getBlockEntity(CORE);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
     }
 
     /** 形ができると揺籃になり、原初の種で種火が始まる。種火は 1 tick に genesisMaxInput までしか受け取らない。 */
@@ -148,7 +148,7 @@ public final class GenesisGameTests {
         BlockPos other = new BlockPos(1, 1, 1);
         helper.setBlock(other, SinguloBlocks.GENESIS_CORE.get());
         net.minecraft.world.item.BlockItem.updateCustomBlockEntityTag(helper.getLevel(), player, helper.absolutePos(other), drop);
-        GenesisCoreBlockEntity moved = helper.getBlockEntity(other);
+        GenesisCoreBlockEntity moved = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,other);
         helper.assertTrue(moved.stage() == GenesisCoreBlockEntity.COMPLETE, "置き直しても完成のまま: " + moved.stage());
         helper.assertTrue(moved.galaxySeed() == 12345L, "銀河の記憶が残る");
         helper.assertTrue(moved.template().is(Items.EMERALD), "作る物も残る");
@@ -162,7 +162,7 @@ public final class GenesisGameTests {
         try {
             io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.set(1L << 61);
             helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
-            GenesisCoreBlockEntity core = helper.getBlockEntity(CORE);
+            GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
             net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
             tag.putInt("stage", GenesisCoreBlockEntity.KINDLING);
             tag.putBoolean("formed", true);
@@ -179,7 +179,7 @@ public final class GenesisGameTests {
     @GameTest(template = LARGE)
     public static void templateIsThePlainItem(GameTestHelper helper) {
         helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
-        GenesisCoreBlockEntity core = helper.getBlockEntity(CORE);
+        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
         net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
         done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
         core.loadCustomOnly(done, helper.getLevel().registryAccess());
@@ -199,7 +199,7 @@ public final class GenesisGameTests {
     public static void legacyTemplateLoadsAsPlainItem(GameTestHelper helper) {
         var registries = helper.getLevel().registryAccess();
         helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
-        GenesisCoreBlockEntity core = helper.getBlockEntity(CORE);
+        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
         ItemStack sample = new ItemStack(Items.TRIDENT);
         sample.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("古い見本"));
         sample.enchant(registries.registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
@@ -245,7 +245,7 @@ public final class GenesisGameTests {
                 Items.ECHO_SHARD, Items.BEACON}) {
             helper.assertTrue(MassSynthesis.INSTANCE.entry(new ItemStack(item)) != null, item + " が作れない");
         }
-        var steel = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("steel_ingot"));
+        var steel = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("steel_ingot"));
         helper.assertTrue(MassSynthesis.INSTANCE.entry(new ItemStack(steel)) == null, "Singulo の鋼は作れない");
         double base = MassSynthesis.baseCost();
         helper.assertTrue(Math.abs(MassSynthesis.cost(stone) - stone.mass() * base) < 1, "希少度0は質量×基本の電力");

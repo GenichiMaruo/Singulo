@@ -55,7 +55,7 @@ public final class TimeFields {
             }
             for (int x = minX; x <= maxX; x++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    long key = ChunkPos.asLong(x, z);
+                    long key = ChunkPos.pack(x, z);
                     if (add) {
                         chunks.computeIfAbsent(key, k -> new HashMap<>()).put(f.owner, f);
                         continue;
@@ -117,7 +117,7 @@ public final class TimeFields {
         if (index == null) {
             return 0;
         }
-        Map<BlockPos, Field> nearby = index.chunks.get(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4));
+        Map<BlockPos, Field> nearby = index.chunks.get(ChunkPos.pack(pos.getX() >> 4, pos.getZ() >> 4));
         int found = covering(nearby, pos, 0);
         if (found != BOTH) {
             found = covering(index.wide, pos, found);

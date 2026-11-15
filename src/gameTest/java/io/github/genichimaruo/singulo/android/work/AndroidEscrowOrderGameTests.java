@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.android.work;
+import net.minecraft.world.entity.EntitySpawnReason;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidEscrows;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders.State;
@@ -11,15 +12,15 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class AndroidEscrowOrderGameTests {
@@ -37,20 +38,20 @@ public final class AndroidEscrowOrderGameTests {
         helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
         helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
-            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = helper.getBlockEntity(p);
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, p);
             b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         ItemStack table = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
                 net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, RACK);
         java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -59,12 +60,12 @@ public final class AndroidEscrowOrderGameTests {
         rack.items().setStackInSlot(0, table);
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
-        return helper.getBlockEntity(CONSOLE);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CONSOLE);
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
         var c=workshop(h,32); c.setOwner(TestScope.player(h).getUUID());
-        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
         a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
         a.setNoAi(!moving); h.getLevel().addFreshEntity(a); return c;
@@ -112,7 +113,7 @@ public final class AndroidEscrowOrderGameTests {
     }
     @GameTest(template="empty")
     public static void twoEqualOutputsHaveSeparateWorkersAndCustody(GameTestHelper h) {
-        var c=setup(h,false); var extra=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var c=setup(h,false); var extra=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         extra.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
         extra.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,3)))); extra.setNoAi(true); h.getLevel().addFreshEntity(extra);
         var one=UUID.randomUUID();var two=UUID.randomUUID();var a=offer(h,c,one,1);var b=offer(h,c,two,2);
@@ -141,7 +142,7 @@ public final class AndroidEscrowOrderGameTests {
         var a=worker(h,c,accepted.receipt().orderId());var job=c.requestJob(a);var route=c.planPickup(job,a.blockPosition());
         h.assertTrue(c.fetchAt(a,job,route.getFirst()),"No material fetch");
         h.setBlock(CONSOLE,net.minecraft.world.level.block.Blocks.AIR);h.setBlock(CONSOLE,SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity replacement=h.getBlockEntity(CONSOLE); replacement.setOwner(owner);
+        WorkConsoleBlockEntity replacement=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CONSOLE); replacement.setOwner(owner);
         h.assertTrue(!replacement.escrowConsoleIdentity().equals(c.escrowConsoleIdentity()),"Replacement inherited identity");
         h.assertTrue(a.recoverEscrowCargo(),"Removed console stranded cargo");
         h.assertTrue(count(AndroidEscrows.snapshot(h.getLevel(),owner,id).materials(),Items.OAK_LOG)==1 && replacement.orders().isEmpty(),"Replacement stole old custody"); h.succeed();
@@ -173,7 +174,7 @@ public final class AndroidEscrowOrderGameTests {
     @GameTest(template="empty",timeoutTicks=2400)
     public static void actualWorkerCraftsPrivateChainInOneRequest(GameTestHelper h) {
         var c=setup(h,true);var id=UUID.randomUUID();
-        net.minecraft.world.level.block.entity.ChestBlockEntity shared=h.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity shared=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CHEST);
         var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),8,
                 List.of(new ItemStack(Items.OAK_LOG,1)),null);
         h.assertTrue(accepted.acceptedNow(),"Chain request rejected: "+accepted.receipt().reason());
@@ -191,11 +192,11 @@ public final class AndroidEscrowOrderGameTests {
     private static net.minecraft.world.level.block.entity.FurnaceBlockEntity furnaceRecipe(GameTestHelper h) {
         BlockPos furnacePos=new BlockPos(5,1,3);
         h.setBlock(furnacePos,net.minecraft.world.level.block.Blocks.FURNACE);
-        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace=h.getBlockEntity(furnacePos);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, furnacePos);
         furnace.setItem(1,new ItemStack(Items.COAL,8));
         ItemStack card=new ItemStack(item("work_location_card"));
         WorkLocationCardItem.record(card,h.getLevel(),h.absolutePos(furnacePos),net.minecraft.world.level.block.Blocks.FURNACE);
-        RecipeRackBlockEntity rack=h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, RACK);
         rack.items().setStackInSlot(RecipeRackBlockEntity.COLS,card);
         ItemStack recipe=new ItemStack(item("recipe_card"));
         java.util.List<ItemStack> grid=new java.util.ArrayList<>(java.util.Collections.nCopies(9,ItemStack.EMPTY));
@@ -235,7 +236,7 @@ public final class AndroidEscrowOrderGameTests {
     @GameTest(template="empty")
     public static void machineEscrowRejectsProcessingHiddenInsideCraftingChain(GameTestHelper h) {
         var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
-        RecipeRackBlockEntity rack=h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, RACK);
         var grid=new java.util.ArrayList<>(java.util.Collections.nCopies(9,ItemStack.EMPTY));
         grid.set(0,new ItemStack(Items.IRON_INGOT));
         rack.items().setStackInSlot(3,recipeCard(h,grid,new ItemStack(Items.IRON_NUGGET,9)));
@@ -304,11 +305,11 @@ public final class AndroidEscrowOrderGameTests {
     public static void workerEntitySaveRetainsRequestOwnerAndOriginalDimension(GameTestHelper h) {
         var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");
         var a=worker(h,c,accepted.receipt().orderId());
-        var work=a.saveWorkState(); var tag=a.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        var work=a.saveWorkState(); var tag=io.github.genichimaruo.singulo.test.harness.TestNbt.save(a, new net.minecraft.nbt.CompoundTag());
         h.assertTrue(id.equals(tag.getUUID("escrow_request")) && c.owner().equals(tag.getUUID("escrow_owner")),"Independent entity binding absent");
-        h.assertTrue(h.getLevel().dimension().location().toString().equals(tag.getString("escrow_dimension"))
-                && tag.getString("escrow_dimension").equals(work.getString("escrow_dimension")),"Original dimension not saved in both formats");
-        var restored=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel()); restored.load(tag);
+        h.assertTrue(h.getLevel().dimension().identifier().toString().equals(tag.getStringOr("escrow_dimension", ""))
+                && tag.getStringOr("escrow_dimension", "").equals(work.getStringOr("escrow_dimension", "")),"Original dimension not saved in both formats");
+        var restored=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED); io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, tag);
         h.assertTrue(id.equals(restored.escrowRequest()) && c.owner().equals(restored.escrowOwner()) && restored.escrowLevel()==h.getLevel(),"Entity restore lost custody dimension");
         h.assertTrue(c.getBlockPos().equals(restored.workConsole()) && restored.workOrder()==accepted.receipt().orderId(),"Entity restore lost working assignment"); h.succeed();
     }
@@ -317,7 +318,7 @@ public final class AndroidEscrowOrderGameTests {
         var c=setup(h,false);var id=UUID.randomUUID();var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"No acceptance");
         var a=worker(h,c,accepted.receipt().orderId());var job=c.requestJob(a);var route=c.planPickup(job,a.blockPosition());
         h.assertTrue(route!=null && c.fetchAt(a,job,route.getFirst()),"Private fetch failed");
-        a.hurt(h.getLevel().damageSources().genericKill(),Float.MAX_VALUE);
+        a.hurtServer(h.getLevel(), h.getLevel().damageSources().genericKill(),Float.MAX_VALUE);
         h.assertTrue(!a.isAlive(),"Worker did not die");
         var snap=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
         h.assertTrue(!snap.workerPending() && count(snap.materials(),Items.OAK_LOG)==1,"Death failed to recover actual cargo");
@@ -335,26 +336,26 @@ public final class AndroidEscrowOrderGameTests {
         var water=new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER,1500);
         var lava=new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA,750);
         h.assertTrue(original.fillTanks(water,false)==1500 && original.fillTanks(lava,false)==750,"Fluid cargo fixture failed");
-        var tag=original.saveWithoutId(new net.minecraft.nbt.CompoundTag());tag.remove("escrow_owner");
-        tag.getCompound("work_state").remove("escrow_owner");
+        var tag=io.github.genichimaruo.singulo.test.harness.TestNbt.save(original, new net.minecraft.nbt.CompoundTag());tag.remove("escrow_owner");
+        tag.getCompoundOrEmpty("work_state").remove("escrow_owner");
         // Move, not copy, the actual cargo into a restored corrupt-owner entity.
         for(int slot:original.carrySlots()) original.inventory().setItem(slot,ItemStack.EMPTY);
         original.drainTanks(water,1500,false);original.drainTanks(lava,750,false);
         original.discard();
-        var restored=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());restored.load(tag);h.getLevel().addFreshEntity(restored);
+        var restored=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, tag);h.getLevel().addFreshEntity(restored);
         h.assertTrue(restored.escrowOwner()==null && id.equals(restored.escrowRequest()),"Corrupt owner fixture unexpectedly inferred owner");
-        restored.hurt(h.getLevel().damageSources().genericKill(),Float.MAX_VALUE);
+        restored.hurtServer(h.getLevel(), h.getLevel().damageSources().genericKill(),Float.MAX_VALUE);
         h.assertTrue(!restored.isAlive(),"Worker did not die");
         h.assertTrue(restored.tanksEmpty() && restored.escrowRequest()==null && restored.recoverEscrowCargo(),"Recovered fluids remained on worker");
         var saved=AndroidEscrowData.get(h.getLevel()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());
         saved=AndroidEscrowData.load(saved,h.getLevel().registryAccess()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());
-        var salvage=saved.getList("recovery_salvage_v1",net.minecraft.nbt.Tag.TAG_COMPOUND);long recovered=0,recoveredWater=0,recoveredLava=0;
+        var salvage=saved.getListOrEmpty("recovery_salvage_v1");long recovered=0,recoveredWater=0,recoveredLava=0;
         for(var raw:salvage) {
             var entry=(net.minecraft.nbt.CompoundTag)raw;
             if(!entry.hasUUID("request") || !id.equals(entry.getUUID("request"))) continue;
             h.assertTrue(!entry.contains("owner"),"Forensic recovery invented owner");
-            for(var stackTag:entry.getList("actual_cargo",net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-                var stack=ItemStack.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag);
+            for(var stackTag:entry.getListOrEmpty("actual_cargo")) {
+                var stack=io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag);
                 if(stack.is(Items.OAK_LOG)) recovered+=stack.getCount();
                 var fluid=FluidSamples.fluid(stack);
                 if(fluid.getFluid()==net.minecraft.world.level.material.Fluids.WATER) recoveredWater+=fluid.getAmount();
@@ -379,11 +380,11 @@ public final class AndroidEscrowOrderGameTests {
         h.assertTrue(a.recoverEscrowCargo() && a.tanksEmpty() && a.escrowRequest()==null,"Mismatched recovery left accessible fluid");
         h.assertTrue(a.recoverEscrowCargo(),"Repeated recovery failed");
         var saved=AndroidEscrowData.get(h.getLevel()).save(new net.minecraft.nbt.CompoundTag(),h.getLevel().registryAccess());long recovered=0;int records=0;
-        for(var raw:saved.getList("recovery_salvage_v1",net.minecraft.nbt.Tag.TAG_COMPOUND)){
+        for(var raw:saved.getListOrEmpty("recovery_salvage_v1")){
             var entry=(net.minecraft.nbt.CompoundTag)raw;if(!id.equals(entry.getUUID("request")))continue;records++;
             h.assertTrue(wrongOwner.equals(entry.getUUID("owner")),"Forensic owner rewritten");
-            for(var stackTag:entry.getList("actual_cargo",net.minecraft.nbt.Tag.TAG_COMPOUND))
-                recovered+=FluidSamples.fluid(ItemStack.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag)).getAmount();
+            for(var stackTag:entry.getListOrEmpty("actual_cargo"))
+                recovered+=FluidSamples.fluid(io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(h.getLevel().registryAccess(),(net.minecraft.nbt.CompoundTag)stackTag)).getAmount();
         }
         h.assertTrue(records==1 && recovered==1200,"Mismatched fluid salvage lost or duplicated");
         h.assertTrue(AndroidEscrows.claim(h.getLevel(),wrongOwner,id,false,0,1200,false).isEmpty(),"Forensic cargo became claimable");h.succeed();

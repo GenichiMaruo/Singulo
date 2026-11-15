@@ -28,4 +28,23 @@ public final class NbtCompat {
  }
  public static Tag writeBlockPos(BlockPos pos) { return BlockPos.CODEC.encodeStart(NbtOps.INSTANCE,pos).getOrThrow(); }
  public static Optional<BlockPos> readBlockPos(CompoundTag tag,String name) {return tag.read(name,BlockPos.CODEC);}
+
+ public static CompoundTag save(net.neoforged.neoforge.fluids.FluidStack stack, HolderLookup.Provider registries) {
+  return stack.isEmpty() ? new CompoundTag() : (CompoundTag) net.neoforged.neoforge.fluids.FluidStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE),stack).getOrThrow();
+ }
+ public static CompoundTag writeTank(net.neoforged.neoforge.fluids.capability.templates.FluidTank tank, HolderLookup.Provider registries, CompoundTag tag) {
+  tag.merge(save(tank.getFluid(), registries)); return tag;
+ }
+ public static void readTank(net.neoforged.neoforge.fluids.capability.templates.FluidTank tank, HolderLookup.Provider registries, CompoundTag tag) {
+  tank.setFluid(net.neoforged.neoforge.fluids.FluidStack.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE),tag).result().orElse(net.neoforged.neoforge.fluids.FluidStack.EMPTY));
+ }
+ public static CompoundTag saveAllItems(CompoundTag tag, net.minecraft.core.NonNullList<ItemStack> items, HolderLookup.Provider registries) {
+  var output=TagValueOutput.createWithContext(ProblemReporter.DISCARDING,registries);
+  net.minecraft.world.ContainerHelper.saveAllItems(output,items); tag.merge(output.buildResult()); return tag;
+ }
+ public static void loadAllItems(CompoundTag tag, net.minecraft.core.NonNullList<ItemStack> items, HolderLookup.Provider registries) {
+  net.minecraft.world.ContainerHelper.loadAllItems(TagValueInput.create(ProblemReporter.DISCARDING,registries,tag),items);
+ }
+ public static Tag createUUID(java.util.UUID uuid) {return net.minecraft.core.UUIDUtil.CODEC.encodeStart(NbtOps.INSTANCE,uuid).getOrThrow();}
+ public static java.util.UUID loadUUID(Tag tag) {return net.minecraft.core.UUIDUtil.CODEC.parse(NbtOps.INSTANCE,tag).getOrThrow();}
 }

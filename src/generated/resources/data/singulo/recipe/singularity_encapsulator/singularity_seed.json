@@ -6,33 +6,23 @@
   "energy": 1000000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:dormant_singularity_seed"
-      },
+      "ingredient": "singulo:dormant_singularity_seed",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_matter_shell"
-      },
+      "ingredient": "singulo:degenerate_matter_shell",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:confinement_ring"
-      },
+      "ingredient": "singulo:confinement_ring",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_nucleus"
-      },
+      "ingredient": "singulo:degenerate_nucleus",
       "count": 1
     }
   ],
