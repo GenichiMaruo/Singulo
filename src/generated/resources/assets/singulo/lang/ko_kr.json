@@ -3679,7 +3679,7 @@
   "uses.singulo.unstable_wormhole_mouth": "사용처: 웜홀 입구",
   "uses.singulo.vacuum_jacketed_pipe": "사용처: 초유체 도관",
   "uses.singulo.void_dust": "사용처: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱",
-  "uses.singulo.white_ceramic_composite": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 25개",
+  "uses.singulo.white_ceramic_composite": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 26개",
   "uses.singulo.white_glass_panel": "사용처: 사방별 흰색 유리 패널",
   "uses.singulo.white_panel": "사용처: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널, 무중력 블록",
   "uses.singulo.wormhole_generator_coil": "사용처: 웜홀 생성기",

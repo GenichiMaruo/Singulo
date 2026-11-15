@@ -787,7 +787,8 @@ def models(write_json, assets):
         'children': {'solid': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:solid', 'textures': t, 'elements': held_solid},
                      'glass': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t,
                                'elements': held_glass}},
-        'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass)})
+        # 細長いので、持ち物欄では上下いっぱいに見せる
+        'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass, gui_fill=16)})
     decor_models(write_json, mb, mi, bs)
     # 居室灯（レッドストーンで点く）
     for tag, on in (('off', False), ('on', True)):
@@ -898,7 +899,7 @@ def compress_halves(lower, upper, suffix=True):
     return out
 
 
-def held_display(elements):
+def held_display(elements, gui_fill=None):
     """小さく偏った模型を、手・額・地面・持ち物欄で真ん中に見せる（バニラの block/block の向きのまま）。
 
     バニラの変形は模型の箱（16x16x16）の中心を基準にするので、下に寄った小物は一人称で画面の外へ沈む。
@@ -929,7 +930,15 @@ def held_display(elements):
         return {'rotation': r, 'translation': [round(t[i] + off[i], 3) for i in range(3)], 'scale': [round(s, 4)] * 3}
     tp = view([75, 45, 0], 0.375, (0, 2.5, 0))
     fp = view([0, 45, 0], 0.40)
-    return {'gui': view([30, 225, 0], 0.625, k=min(grow, 1.25)), 'ground': view([0, 0, 0], 0.25, (0, 3, 0)),
+    gui_rot = [30, 225, 0]
+    if gui_fill:
+        # 持ち物欄の向きで見た模型の縦横を測り、長い方が gui_fill ピクセル（16 で欄いっぱい）になる大きさにする
+        corners = [rot([(hi[i] if (n >> i) & 1 else lo[i]) - 8 - c[i] for i in range(3)], gui_rot) for n in range(8)]
+        extent = max(max(p[a] for p in corners) - min(p[a] for p in corners) for a in (0, 1))
+        gui = view(gui_rot, gui_fill / extent, k=1)
+    else:
+        gui = view(gui_rot, 0.625, k=min(grow, 1.25))
+    return {'gui': gui, 'ground': view([0, 0, 0], 0.25, (0, 3, 0)),
             'fixed': view([0, 0, 0], 0.5), 'thirdperson_righthand': tp, 'thirdperson_lefthand': tp,
             'firstperson_righthand': fp, 'firstperson_lefthand': view([0, 225, 0], 0.40)}
 
