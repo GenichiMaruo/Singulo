@@ -438,7 +438,7 @@ def textures(tb, save, weather, write_json):
     save(weather(cracked_ruin_panel(), 13), tb / 'cracked_ruin_panel.png')
     save(intact_ruin_glass(), tb / 'intact_ruin_glass.png')
     save(reinforced_ruin_glass(), tb / 'reinforced_ruin_glass.png')
-    save(broken_ruin_glass(), tb / 'ruin_glass.png')
+    save(broken_ruin_glass(), tb / 'broken_ruin_glass.png')
     save(white_glass_panel(), tb / 'white_glass_panel.png')
     save(white_glass_panel(star=True), tb / 'white_star_glass_panel.png')
     save(black_reinforced_glass(), tb / 'black_reinforced_glass.png')

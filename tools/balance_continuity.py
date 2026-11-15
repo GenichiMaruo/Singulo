@@ -16,7 +16,7 @@ SELECTED = [
     ('steel_ingot', 'Steel ingot'), ('white_ceramic_composite', 'White ceramic'),
     ('basic_circuit', 'Basic circuit'), ('steel_plate', 'Steel plate'),
     ('ceramic_substrate', 'Ceramic substrate'), ('basic_frame', 'Basic frame'),
-    ('thermocouple_module', 'Thermocouple'), ('heat_exchange_core', 'Heat exchange core'),
+    ('thermocouple_module', 'Thermocouple'), ('cooling_tower_heat_exchange_core', 'Heat exchange core'),
     ('superconducting_coil', 'Superconducting coil'), ('superconducting_wire', 'Superconducting wire'),
     ('meteoric_iron_ingot', 'Meteoric iron'), ('quantum_computing_module', 'Quantum module'),
     ('entangled_element', 'Entangled element'), ('cold_atoms', 'Cold atoms'),

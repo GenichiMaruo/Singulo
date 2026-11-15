@@ -1484,7 +1484,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
                     charged.add(s);
                 }
             }
-            recipeId = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
+            recipeId = tag.contains("recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(ResourceLocation.tryParse(tag.getString("recipe"))) : null;
             ignitionStored = tag.getLong("ignition_stored");
             ignitionLeft = tag.getInt("ignition_left");
             bhMass = tag.contains("bh_mass") ? tag.getDouble("bh_mass") : CORE_MASS;

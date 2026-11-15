@@ -112,7 +112,7 @@ class CreativeTabOrderTests(unittest.TestCase):
                           'terminus_record', 'archivist_halo'])
 
     def test_cartridges_and_reactor_equipment_sit_with_their_multiblock(self):
-        tower = self.order.index('heat_exchange_core')
+        tower = self.order.index('cooling_tower_heat_exchange_core')
         self.assertEqual(self.order[tower + 1:tower + 4],
                          ['empty_coolant_cartridge', 'coolant_cartridge', 'helium_cartridge'])
         alarm = self.order.index('reactor_mass_alarm')

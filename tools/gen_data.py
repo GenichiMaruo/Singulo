@@ -1558,7 +1558,7 @@ UI_LANG = {
     'gui.singulo.console.awakened': ('封印が破れ、ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
     'gui.singulo.console.active': ('守護機はすでに起動している', 'The warden is already active'),
     'gui.singulo.console.open': ('保管庫の封鎖はすでに解かれている（覚醒の記録核を使えば、覚醒した守護機と再戦できる）',
-                                 'The vault is not sealed (use an Awakening Record Core to fight the awakened warden)'),
+                                 'The vault is not sealed (use an Awakened Record Core to fight the awakened warden)'),
     'gui.singulo.console.awakened_rematch': ('記録核が共鳴する。覚醒したホライズン・ウォーデンが目を覚ました',
                                              'The record core resonates. The Awakened Horizon Warden rises'),
     'gui.singulo.console.awakened_defeated': ('覚醒した守護機を退けた。残骸から上質な部品が転がり出た',
@@ -1780,7 +1780,7 @@ def models():
             else:
                 write_json(ASSETS / 'blockstates' / f'{iid}.json', {'variants': {'': {'model': f'{MODID}:block/{iid}'}}})
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
-            if iid in ('accelerator_tube', 'focusing_magnet'):
+            if iid in ('accelerator_tube', 'accelerator_focusing_magnet'):
                 import accelerator_assets
                 accelerator_assets.models(ASSETS)
         elif kind == 'container':
@@ -2143,11 +2143,11 @@ def textures():
                 d.rectangle([0, 0, 15, 15], outline=white)
                 d.line([(0, 8), (15, 8)], fill=(70, 74, 84, 255))
                 d.point([(4, 4), (11, 11), (11, 4), (4, 11)], fill=glow)
-            elif iid == 'gyro_drive':
+            elif iid == 'reactor_gyro_drive':
                 d.ellipse([2, 2, 13, 13], fill=(57, 66, 74, 255), outline=glow)
                 d.line([(2, 7), (13, 7)], fill=white)
                 d.line([(7, 2), (7, 13)], fill=white)
-            elif iid == 'mirror_plate':
+            elif iid == 'casimir_cavity_mirror_plate':
                 for y in range(16):
                     c = 200 + int(50 * (1 - abs(y - 5) / 11))
                     d.line([(0, y), (15, y)], fill=(c, c, min(255, c + 8), 255))
@@ -3836,19 +3836,19 @@ TAB_GROUPS = [
     ('マルチブロック', [
         'multiblock_port', 'collapsar_lining',
         'cooling_tower_controller', 'cooling_tower_base', 'cooling_tower_casing', 'cooling_tower_glass',
-        'cooling_tower_coolant_band', 'cooling_tower_rim', 'cooling_tower_grate', 'heat_exchange_core',
+        'cooling_tower_coolant_band', 'cooling_tower_rim', 'cooling_tower_grate', 'cooling_tower_heat_exchange_core',
         'empty_coolant_cartridge', 'coolant_cartridge', 'helium_cartridge',
-        'accelerator_controller', 'accelerator_tube', 'focusing_magnet',
+        'accelerator_controller', 'accelerator_tube', 'accelerator_focusing_magnet',
         'degenerate_compactor_controller', 'degenerate_compactor_frame', 'degenerate_compactor_plate',
         'degenerate_compactor_ram', 'degenerate_compactor_anvil', 'degenerate_compactor_vent',
         'degenerate_compactor_window',
         'casimir_cavity_controller', 'casimir_cavity_frame', 'casimir_cavity_pump', 'casimir_cavity_wall',
-        'casimir_cavity_shield', 'casimir_cavity_window', 'mirror_plate',
+        'casimir_cavity_shield', 'casimir_cavity_window', 'casimir_cavity_mirror_plate',
         'degenerate_furnace_controller', 'degenerate_furnace_frame', 'degenerate_furnace_shell',
         'degenerate_furnace_piston', 'degenerate_furnace_fin', 'degenerate_furnace_tube',
         'degenerate_furnace_window',
-        'core_controller', 'reactor_shell', 'gyro_drive', 'reactor_stabilizer',
-        'extraction_port', 'reactor_mass_alarm',
+        'reactor_core_controller', 'reactor_shell', 'reactor_gyro_drive', 'reactor_stabilizer',
+        'reactor_extraction_port', 'reactor_mass_alarm',
         'gravity_field_stabilizer', 'confinement_ring', 'singularity_seed', 'mass_pellet',
         'jet_collector', 'hawking_collector', 'ergosphere_ring',
         'shield_tower_core', 'shield_tower_plinth', 'shield_tower_coil', 'shield_tower_body',
@@ -3864,13 +3864,13 @@ TAB_GROUPS = [
         'cosmic_frame',
         'suspension_reservoir', 'suspension_crown', 'suspension_strut',
         'pasta_accumulator', 'pasta_laminate', 'pasta_conductor',
-        'tidal_spindle', 'tidal_draw_ring', 'spindle_cradle',
+        'tidal_spindle', 'tidal_draw_ring', 'tidal_spindle_cradle',
     ]),
     ('重力と宇宙の設備', [
-        'worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel',
+        'worldline_anchor', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel',
         'keraunos_tower', 'deep_sea_collector', 'void_collector', 'low_gravity_panel',
         'high_gravity_panel', 'zero_gravity_block', 'zero_gravity_controller', 'gravitational_wave_detector',
-        'neutrino_observatory', 'probe_station', 'worldline_anchor_advanced', 'halo_collector',
+        'neutrino_observatory', 'probe_station', 'advanced_worldline_anchor', 'halo_collector',
         'gravitational_containment_tank',
     ]),
     ('ワームホール', [
@@ -3909,7 +3909,7 @@ TAB_GROUPS = [
         'horizon_vault', 'wormhole_drone_beacon',
     ]),
     ('道具と装備', [
-        'fluid_canister', 'neutrino_scanner', 'scanner_module_2', 'scanner_module_3',
+        'fluid_canister', 'neutrino_scanner', 'neutrino_scanner_module_2', 'neutrino_scanner_module_3',
         'inertial_control_gauntlet', 'magnetic_bottle', 'black_hole_bomb', 'graviton_manipulator',
         'metric_drive', 'gravity_boots', 'dimensional_pocket', 'afterglow_wings',
     ]),
@@ -3954,15 +3954,15 @@ TAB_GROUPS = [
         'ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel',
         'vented_ruin_panel', 'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel',
         'pristine_ruin_tiles', 'pristine_ruin_pillar', 'pristine_ruin_light', 'intact_ruin_glass',
-        'reinforced_ruin_glass', 'ruin_glass', 'ruin_lamp', 'ruin_lamp_amber',
+        'reinforced_ruin_glass', 'broken_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber',
         'ruin_lamp_verdant', 'ruin_lamp_violet', 'ruin_lamp_crimson',
     ]),
     ('研究所の建材と調度品', [
         'lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame',
         'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead',
         'lab_door', 'facility_light', 'emergency_light', 'room_light',
-        'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core',
-        'reactor_console', 'server_rack', 'lab_terminal', 'android_capsule',
+        'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'lab_reactor_core',
+        'lab_reactor_console', 'server_rack', 'lab_terminal', 'android_capsule',
         'desk_monitor', 'paper_stack', 'trash_bin',
     ]),
     ('設計図', [
@@ -4011,7 +4011,7 @@ def tab_order():
     placed = set(explicit)
     data_originals = [n for n in EXPLORE if EXPLORE[n]['kind'] == 'data']
     degraded = list(RESTORED.values())
-    salvage_names = data_originals + [n for n in MOD if MOD[n][0] in ('record_fragment', 'sealed_record')] \
+    salvage_names = data_originals + [n for n in MOD if MOD[n][0] in ('crystal_memory', 'sealed_record')] \
         + list(RESTORED) + degraded + [n for n in EXPLORE if n not in data_originals and n not in degraded] \
         + [n for n in MOD if n.startswith('データカード') or n == '白紙データカード'] + list(SPENT.values())
     salvage = []
@@ -4296,7 +4296,7 @@ def validate():
 
 
 # わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
-SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
+SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'broken_ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
                               'android_barrier_glass_item', 'android_barrier_glass_edge', 'android_gate_glass_item',
                               'android_gate_glass_edge',
                               'lab_glass', 'android_capsule_glass')   # 研究所のガラス・素体カプセルの筒

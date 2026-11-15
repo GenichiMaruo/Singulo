@@ -251,12 +251,12 @@ public final class SinguloItems {
             "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_2 = ITEMS.register(
-            "scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
+            "neutrino_scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_3 = ITEMS.register(
-            "scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
+            "neutrino_scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
     private static final Map<String, Integer> TOOL_STAGES = Map.ofEntries(
-            Map.entry("scanner_module_2", 4),
-            Map.entry("scanner_module_3", 5),
+            Map.entry("neutrino_scanner_module_2", 4),
+            Map.entry("neutrino_scanner_module_3", 5),
             Map.entry("gravity_boots", 3),
             Map.entry("catalyst_stabilizer", 4),
             Map.entry("dimensional_pocket", 5),

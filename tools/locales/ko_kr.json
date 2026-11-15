@@ -775,7 +775,7 @@
     "source": "Fluid Pipe",
     "translation": "유체 파이프"
   },
-  "block.singulo.core_controller": {
+  "block.singulo.reactor_core_controller": {
     "source": "Core Controller",
     "translation": "노심 제어기"
   },
@@ -879,7 +879,7 @@
     "source": "Entanglement Synthesizer",
     "translation": "양자 얽힘 합성기"
   },
-  "block.singulo.extraction_port": {
+  "block.singulo.reactor_extraction_port": {
     "source": "Extraction Port",
     "translation": "추출 포트"
   },
@@ -895,7 +895,7 @@
     "source": "Production Line",
     "translation": "생산 라인"
   },
-  "block.singulo.focusing_magnet": {
+  "block.singulo.accelerator_focusing_magnet": {
     "source": "Focusing Magnet",
     "translation": "집속 자석"
   },
@@ -935,7 +935,7 @@
     "source": "Guardian Seal Core",
     "translation": "수호자 봉인 핵"
   },
-  "block.singulo.gyro_drive": {
+  "block.singulo.reactor_gyro_drive": {
     "source": "Gyro Drive",
     "translation": "자이로 구동 장치"
   },
@@ -943,7 +943,7 @@
     "source": "Halo Collector",
     "translation": "헤일로 수집기"
   },
-  "block.singulo.heat_exchange_core": {
+  "block.singulo.cooling_tower_heat_exchange_core": {
     "source": "Heat Exchange Core",
     "translation": "열교환 코어"
   },
@@ -1063,7 +1063,7 @@
     "source": "Meteorite Fusion Crust",
     "translation": "운석 용융각"
   },
-  "block.singulo.mirror_plate": {
+  "block.singulo.casimir_cavity_mirror_plate": {
     "source": "Mirror Plate",
     "translation": "거울판"
   },
@@ -1135,11 +1135,11 @@
     "source": "Rayleigh Sky Panel",
     "translation": "레일리 산란 패널"
   },
-  "block.singulo.reactor_console": {
+  "block.singulo.lab_reactor_console": {
     "source": "Reactor Control Panel",
     "translation": "동력로 제어반"
   },
-  "block.singulo.reactor_core": {
+  "block.singulo.lab_reactor_core": {
     "source": "Reactor Core",
     "translation": "노심"
   },
@@ -1175,7 +1175,7 @@
     "source": "Ruin Cache",
     "translation": "폐허 보관고"
   },
-  "block.singulo.ruin_glass": {
+  "block.singulo.broken_ruin_glass": {
     "source": "Broken Ruin Glass",
     "translation": "깨진 폐허 유리"
   },
@@ -1375,11 +1375,11 @@
     "source": "Starred White Glass Panel",
     "translation": "사방별 흰색 유리 패널"
   },
-  "block.singulo.worldline_anchor_advanced": {
+  "block.singulo.advanced_worldline_anchor": {
     "source": "Worldline Anchor (Advanced)",
     "translation": "세계선 앵커 (고급)"
   },
-  "block.singulo.worldline_anchor_small": {
+  "block.singulo.worldline_anchor": {
     "source": "Worldline Anchor (Small)",
     "translation": "세계선 앵커 (소형)"
   },
@@ -1775,7 +1775,7 @@
     "source": "The frame almost every machine is built on.",
     "translation": "거의 모든 기계의 토대가 되는 골조."
   },
-  "desc.singulo.bh_container": {
+  "desc.singulo.empty_black_hole_vessel": {
     "source": "A vessel for holding a tiny black hole.",
     "translation": "작은 블랙홀을 담아두는 용기."
   },
@@ -1999,7 +1999,7 @@
     "source": "A stage 1 pipe for fluids and gases: 2,000 mB per tick. Connects on its own, sends outputs to the machines that use them and draws from adjacent water and lava sources.",
     "translation": "액체와 기체를 운반하는 1단계 파이프: 틱당 2,000 mB. 설치하면 자동으로 연결되며 출력물을 필요한 장치로 보내고, 인접한 물과 용암 근원에서도 끌어옵니다."
   },
-  "desc.singulo.core_controller": {
+  "desc.singulo.reactor_core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
     "translation": "펜로즈 반응로의 두뇌. 노심 중심에서 5블록 아래에 설치하고, 화면에서 반응로를 점화합니다."
   },
@@ -2211,7 +2211,7 @@
     "source": "Right-click to point at the nearest ruin of the chosen kind. Sneak-use to change the kind.",
     "translation": "우클릭하면 선택한 종류 중 가장 가까운 폐허를 가리킵니다. 웅크린 채 사용하면 종류를 바꿉니다."
   },
-  "desc.singulo.extraction_port": {
+  "desc.singulo.reactor_extraction_port": {
     "source": "Power/fuel port for the reactor. Replaces any ring shell block (not the gyro drives).",
     "translation": "반응로의 전력·연료 반입출구. 링의 반응로 외피 어디와도 교체할 수 있습니다(자이로 구동 장치 제외)."
   },
@@ -2231,7 +2231,7 @@
     "source": "Holds up to 1,000 mB of any liquid or gas. Right-click a machine to fill it from the output tank or pour it into the input tank. Carries hydrogen (Electrolyzer to Particle Accelerator), helium (Compressor to Cooling Tower) and liquid helium without pipes.",
     "translation": "어떤 액체나 기체든 최대 1,000 mB까지 담는 용기. 기계를 우클릭하면 출력 탱크에서 담거나 입력 탱크에 붓습니다. 액체 파이프 없이도 수소(전해조→입자 가속기), 헬륨(압축기→냉각탑), 액체 헬륨을 옮길 수 있습니다."
   },
-  "desc.singulo.focusing_magnet": {
+  "desc.singulo.accelerator_focusing_magnet": {
     "source": "Magnet for the ring corners and at least 1/4 of the ring.",
     "translation": "입자 가속기 링의 네 모퉁이와 링의 1/4 이상에 설치하는 자석."
   },
@@ -2291,7 +2291,7 @@
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
     "translation": "폐허 보스 방 바닥에 묻힌 봉인입니다. 도전자가 방에 들어오면 그 폐허의 수호자를 깨웁니다. 부술 수 없습니다."
   },
-  "desc.singulo.gyro_drive": {
+  "desc.singulo.reactor_gyro_drive": {
     "source": "Placed where the reactor rings cross.",
     "translation": "반응로의 세 고리가 교차하는 6곳에 설치합니다."
   },
@@ -2311,7 +2311,7 @@
     "source": "Condensed Hawking radiation.",
     "translation": "호킹 복사를 모은 응축체."
   },
-  "desc.singulo.heat_exchange_core": {
+  "desc.singulo.cooling_tower_heat_exchange_core": {
     "source": "Heat exchangers stacked up the middle of the tower.",
     "translation": "냉각탑 중심에 쌓아 올리는 열교환기."
   },
@@ -2487,11 +2487,11 @@
     "source": "Switch between low gravity, flight and high gravity.",
     "translation": "들고 있으면 저중력, 비행, 고중력을 전환할 수 있습니다."
   },
-  "desc.singulo.micro_black_hole": {
+  "desc.singulo.micro_black_hole_vessel": {
     "source": "Holds a tiny black hole. Bends light around it.",
     "translation": "작은 블랙홀을 가둔 용기. 주변의 빛을 휘게 합니다."
   },
-  "desc.singulo.mirror_plate": {
+  "desc.singulo.casimir_cavity_mirror_plate": {
     "source": "Inner 3×3 of the cavity top and bottom: two facing mirrors.",
     "translation": "카시미르 공동 윗면과 아랫면 안쪽 3×3에 설치해, 마주 보는 두 장의 거울을 이룹니다."
   },
@@ -2651,11 +2651,11 @@
     "source": "A sky projection panel for ceilings. Powered by a panel receiver (20 FE/t each, shared across all joined panels), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
     "translation": "천장에 붙이는 하늘 투영판. 패널 수전기에서 전력이 오면(1장 20 FE/t. 이어진 패널 전체에 나눠진다) 아래 면에 구름·태양이 없는 한낮의 푸른 하늘이 비치고, 바로 아래를 햇살처럼 비춘다(밝기 15. 바로 아래의 햇빛 감지기는 계속 한낮의 값을 낸다). 밤이 되지 않는다. 전력이 끊기면 한밤중처럼 어둡다. 나란히 놓으면 테두리가 사라져 하나의 넓은 하늘이 된다. 레일리 산란 패널의 설계도로 만든다."
   },
-  "desc.singulo.reactor_console": {
+  "desc.singulo.lab_reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",
     "translation": "중앙 동력로의 제어반입니다. 우클릭으로 동력로를 기동하면 시설의 전력이 돌아옵니다."
   },
-  "desc.singulo.reactor_core": {
+  "desc.singulo.lab_reactor_core": {
     "source": "The central reactor core. It glows bright cyan once power returns.",
     "translation": "중앙 동력로의 노심입니다. 전력이 돌아오면 하늘색으로 강하게 빛납니다."
   },
@@ -2675,7 +2675,7 @@
     "source": "Record a recipe on it in a work console's Record tab and place it in a recipe rack. Sneak-use on nothing to clear it. Hold Shift to see what it makes.",
     "translation": "작업 지령대의 \"기록\"에서 레시피를 기록하고 레시피 선반에 놓습니다. 아무것도 없는 곳에서 웅크리고 우클릭하면 레시피를 지웁니다. Shift를 누르면 만드는 것의 그림이 됩니다."
   },
-  "desc.singulo.record_fragment": {
+  "desc.singulo.crystal_memory": {
     "source": "A storage medium with records etched in glass by light.",
     "translation": "빛으로 유리 내부에 기록을 새긴 저장 매체."
   },
@@ -2699,7 +2699,7 @@
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
     "translation": "폐허 회수품이 든 보관함입니다. 비운 뒤 며칠이 지나면 내용물이 돌아옵니다(옮긴 것은 제외). 호퍼나 파이프로는 꺼낼 수 없습니다."
   },
-  "desc.singulo.ruin_glass": {
+  "desc.singulo.broken_ruin_glass": {
     "source": "A cracked ancient window, as tough and blast-resistant as a ruin panel.",
     "translation": "금이 간 채 남은 고대의 창문으로, 폐허 패널만큼 단단하고 폭발에 강합니다."
   },
@@ -2731,11 +2731,11 @@
     "source": "Ancient building panel.",
     "translation": "고대 건물 패널."
   },
-  "desc.singulo.scanner_module_2": {
+  "desc.singulo.neutrino_scanner_module_2": {
     "source": "Use with a Neutrino Scanner in your other hand, or on an observatory, to reach sensitivity 2: gold, diamond and emerald show up.",
     "translation": "다른 손에 중성미자 스캐너를 들고 쓰거나 관측소에 쓰면 감도가 2가 되어 금, 다이아몬드, 에메랄드도 보입니다."
   },
-  "desc.singulo.scanner_module_3": {
+  "desc.singulo.neutrino_scanner_module_3": {
     "source": "Raises sensitivity to 3: ancient debris and ores that need a diamond pickaxe show up.",
     "translation": "감도를 3으로 올립니다: 고대 잔해와 다이아몬드 곡괭이가 필요한 광석도 보입니다."
   },
@@ -3039,11 +3039,11 @@
     "source": "Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.",
     "translation": "블록을 웅크리고 우클릭하면 위치를 기록합니다(겹쳐 있으면 한 장만 나눠서 기록). 아무것도 없는 곳에서 웅크리고 우클릭하면 기록을 지웁니다. 작업 지령대를 기록한 카드로 자재구·납품구·레시피 선반을 우클릭하면 연결됩니다. Shift를 누르면 기록한 블록의 그림이 됩니다."
   },
-  "desc.singulo.worldline_anchor_advanced": {
+  "desc.singulo.advanced_worldline_anchor": {
     "source": "Advanced chunk loader. Embedding a Singularity Core makes it free and maximal.",
     "translation": "고급 청크 로더. 특이점 코어를 내장하면 소모 없이 최대 범위로 작동합니다."
   },
-  "desc.singulo.worldline_anchor_small": {
+  "desc.singulo.worldline_anchor": {
     "source": "Keeps nearby chunks loaded while fed a catalyst.",
     "translation": "촉매를 넣어 두는 동안 근처 청크를 계속 로드합니다."
   },
@@ -4148,7 +4148,7 @@
     "translation": "근처에 봉쇄된 보관고가 없습니다"
   },
   "gui.singulo.console.open": {
-    "source": "The vault is not sealed (use an Awakening Record Core to fight the awakened warden)",
+    "source": "The vault is not sealed (use an Awakened Record Core to fight the awakened warden)",
     "translation": "보관고의 봉쇄가 풀려 있습니다(각성의 기록핵을 사용하면 각성한 감시자와 재대결할 수 있습니다)"
   },
   "gui.singulo.console.reset": {
@@ -6888,7 +6888,7 @@
     "translation": "유적"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
+    "source": "The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakened Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
     "translation": "연구동·봉쇄 배양 시설·지하 안드로이드 연구소·최종 실험 시설·가라앉은 노심 구획의 보관고는 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나도 수호자는 3분 동안 남아 있고(쓰러진 사람이 장비를 찾으러 돌아올 시간), 그래도 아무도 돌아오지 않으면 원래대로 돌아갑니다. 서버 설정 bossHardMode를 켜면 수호자가 더 강해집니다. 쓰러뜨렸을 때의 전리품은 바닥의 수호자 봉인 핵(지평선 감시자는 봉인 콘솔) 위에 나타나고, 경험치는 방에 있는 도전자들이 똑같이 나누어 바로 받습니다(수선도 적용됩니다).\n여럿이 도전하면 수호자는 인원에 맞춰 강해집니다. 한 명 늘 때마다 체력이 원래의 절반만큼 늘고 기술 간격도 조금 짧아집니다(최대 6명까지). 도중에 합류해도 체력 비율은 유지되며, 누가 빠져도 약해지지 않습니다. 대신 전리품은 전투가 시작될 때의 도전자 수만큼 떨어집니다(나중에 합류한 사람의 몫은 늘지 않습니다). 여럿이 공격해도 서로의 공격에 막히지 않고 모두의 공격이 들어갑니다(같은 사람의 연타는 지금처럼 조금 간격을 두어야 들어갑니다).\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 우물은 끌어당긴 뒤 힘을 모으고(빛과 소리가 전조), 가까운 상대를 날려 보낸 다음 방의 다른 곳으로 떠갑니다. 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 봉인 콘솔을 만지면 깨어납니다. 마지막 모습에서 발밑에 여는 특이점은 1초 전조 뒤에 끌어당기기 시작하니 바로 벗어나세요. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 감시자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다."
   },
   "guide.singulo.ruins.bosses.title": {
@@ -7124,7 +7124,7 @@
     "translation": "부산물 및 특이점 코어"
   },
   "guide.singulo.stage5.endgame.body": {
-    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
+    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakened Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
     "translation": "코어와 전력이 있으면 보호막, 티플러 원통, 웜홀 같은 후반 장치를 가동할 수 있습니다. 인공 항성 코어가 있으면 더 이상 네더의 별을 찾지 않아도 됩니다.\n진짜 싸움을 원한다면 특이점 캡슐화기에서 각성의 기록핵을 만들어 최종 실험 시설의 봉인 콘솔에 사용하세요. 각성한 지평선 감시자는 체력 2.5배, 피해 1.5배입니다. 이기면 오버클럭 칩 등을 얻고, 몇 번이든 도전할 수 있습니다.\n연구동과 봉쇄 배양 시설의 수호자와도 재대결할 수 있습니다. 각 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하세요.\n최종 실험 시설을 공략했다면 탐험가의 나침반을 조정해 가라앉은 노심 구획을 찾아보세요. 멈춘 두 번째 반응로에 에르고구의 거대 뱀이 살고 있습니다.\n각성한 수호자들은 쓰러질 때 기록의 단장을 떨어뜨린다고 합니다. 단장을 모두 모으면 무엇을 읽을 수 있을까요?"
   },
   "guide.singulo.stage5.endgame.title": {
@@ -7391,7 +7391,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
-  "howto.singulo.bh_container": {
+  "howto.singulo.empty_black_hole_vessel": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
@@ -7563,7 +7563,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
-  "howto.singulo.core_controller": {
+  "howto.singulo.reactor_core_controller": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
@@ -7743,7 +7743,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
-  "howto.singulo.extraction_port": {
+  "howto.singulo.reactor_extraction_port": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
@@ -7755,7 +7755,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
-  "howto.singulo.focusing_magnet": {
+  "howto.singulo.accelerator_focusing_magnet": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
@@ -7795,7 +7795,7 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "제작: 정밀 조립기(3단계)"
   },
-  "howto.singulo.gyro_drive": {
+  "howto.singulo.reactor_gyro_drive": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
@@ -7815,7 +7815,7 @@
     "source": "Made in: P-Reactor (catalyst mode) (stage 5)",
     "translation": "제작: 펜로즈 반응로(촉매 모드)(5단계)"
   },
-  "howto.singulo.heat_exchange_core": {
+  "howto.singulo.cooling_tower_heat_exchange_core": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
@@ -7959,11 +7959,11 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
-  "howto.singulo.micro_black_hole": {
+  "howto.singulo.micro_black_hole_vessel": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "제작: 특이점 캡슐화기(5단계)"
   },
-  "howto.singulo.mirror_plate": {
+  "howto.singulo.casimir_cavity_mirror_plate": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "제작: 정밀 조립기(4단계)"
   },
@@ -8131,7 +8131,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
-  "howto.singulo.ruin_glass": {
+  "howto.singulo.broken_ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
@@ -8159,11 +8159,11 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
-  "howto.singulo.scanner_module_2": {
+  "howto.singulo.neutrino_scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "제작: 정밀 조립기(4단계)"
   },
-  "howto.singulo.scanner_module_3": {
+  "howto.singulo.neutrino_scanner_module_3": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
@@ -8411,11 +8411,11 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
-  "howto.singulo.worldline_anchor_advanced": {
+  "howto.singulo.advanced_worldline_anchor": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
-  "howto.singulo.worldline_anchor_small": {
+  "howto.singulo.worldline_anchor": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
@@ -8664,7 +8664,7 @@
     "translation": "각성의 중력핵"
   },
   "item.singulo.awakening_record_core": {
-    "source": "Awakening Record Core",
+    "source": "Awakened Record Core",
     "translation": "각성의 기록핵"
   },
   "item.singulo.axe_android_spawn_egg": {
@@ -8679,7 +8679,7 @@
     "source": "Basic Frame",
     "translation": "기본 프레임"
   },
-  "item.singulo.bh_container": {
+  "item.singulo.empty_black_hole_vessel": {
     "source": "Empty BH Containment Vessel",
     "translation": "빈 BH 격리 용기"
   },
@@ -9007,7 +9007,7 @@
     "source": "Metric Drive",
     "translation": "계량 구동기"
   },
-  "item.singulo.micro_black_hole": {
+  "item.singulo.micro_black_hole_vessel": {
     "source": "Micro Black Hole Vessel",
     "translation": "소형 블랙홀 용기"
   },
@@ -9095,7 +9095,7 @@
     "source": "Recipe Card",
     "translation": "레시피 카드"
   },
-  "item.singulo.record_fragment": {
+  "item.singulo.crystal_memory": {
     "source": "Crystal Memory",
     "translation": "크리스털 메모리"
   },
@@ -9135,11 +9135,11 @@
     "source": "Saber Android Spawn Egg",
     "translation": "광검형 안드로이드 생성 알"
   },
-  "item.singulo.scanner_module_2": {
+  "item.singulo.neutrino_scanner_module_2": {
     "source": "Neutrino Sensitivity Module Mk2",
     "translation": "중성미자 감도 모듈 Mk2"
   },
-  "item.singulo.scanner_module_3": {
+  "item.singulo.neutrino_scanner_module_3": {
     "source": "Neutrino Sensitivity Module Mk3",
     "translation": "중성미자 감도 모듈 Mk3"
   },
@@ -11527,7 +11527,7 @@
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
     "translation": "사용처: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 29개"
   },
-  "uses.singulo.bh_container": {
+  "uses.singulo.empty_black_hole_vessel": {
     "source": "Used in: Micro Black Hole Vessel",
     "translation": "사용처: 소형 블랙홀 용기"
   },
@@ -11683,7 +11683,7 @@
     "source": "Used in: Cryogenic Cooling Tower",
     "translation": "사용처: 극저온 냉각탑"
   },
-  "uses.singulo.core_controller": {
+  "uses.singulo.reactor_core_controller": {
     "source": "Used in: P-Reactor",
     "translation": "사용처: 펜로즈 반응로"
   },
@@ -11815,7 +11815,7 @@
     "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 35 more",
     "translation": "사용처: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 35개"
   },
-  "uses.singulo.focusing_magnet": {
+  "uses.singulo.accelerator_focusing_magnet": {
     "source": "Used in: Particle Accelerator",
     "translation": "사용처: 입자 가속기"
   },
@@ -11835,15 +11835,15 @@
     "source": "Used in: Impact Generator Panel",
     "translation": "사용처: 충격 발전 패널"
   },
-  "uses.singulo.gyro_drive": {
+  "uses.singulo.reactor_gyro_drive": {
     "source": "Used in: P-Reactor",
     "translation": "사용처: 펜로즈 반응로"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 6 more",
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakened Record Core, Awakened Echo Core and 6 more",
     "translation": "사용처: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵, 각성의 메아리핵 외 6개"
   },
-  "uses.singulo.heat_exchange_core": {
+  "uses.singulo.cooling_tower_heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine, Jet Forge Heat Sink and 1 more",
     "translation": "사용처: 냉각탑 제어기, 극저온 냉각탑, 냉각탑 확장, 극저온 터빈, 제트 단조로 흡열판 외 1개"
   },
@@ -11915,11 +11915,11 @@
     "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 4 more",
     "translation": "사용처: 집속 자석, 중력파 검출기, 카시미르 공동 자기 차폐, 자기 병, 자이로 구동 장치 외 4개"
   },
-  "uses.singulo.micro_black_hole": {
+  "uses.singulo.micro_black_hole_vessel": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
     "translation": "사용처: 블랙홀 폭탄, 중력자 조작기, 특이점 잠금 열쇠"
   },
-  "uses.singulo.mirror_plate": {
+  "uses.singulo.casimir_cavity_mirror_plate": {
     "source": "Used in: C-Cavity",
     "translation": "사용처: 카시미르 공동"
   },
@@ -11995,7 +11995,7 @@
     "source": "Used in: P-Reactor, Accretion Jet Forge",
     "translation": "사용처: 펜로즈 반응로, 강착 제트 단조로"
   },
-  "uses.singulo.record_fragment": {
+  "uses.singulo.crystal_memory": {
     "source": "Used in: Decoded Record",
     "translation": "사용처: 디코딩된 기록"
   },
@@ -12007,7 +12007,7 @@
     "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
     "translation": "사용처: 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널, 띠 무늬 폐허 패널 외 1개"
   },
-  "uses.singulo.scanner_module_2": {
+  "uses.singulo.neutrino_scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
     "translation": "사용처: 중성미자 감도 모듈 Mk3"
   },
@@ -13123,11 +13123,11 @@
     "source": "Keeps showing ores and ruins in a wide area.",
     "translation": "넓은 범위의 광석과 유적을 근처 사람에게 계속 보여 준다."
   },
-  "summary.singulo.scanner_module_2": {
+  "summary.singulo.neutrino_scanner_module_2": {
     "source": "Raises scanner sensitivity to show gold and diamonds.",
     "translation": "스캐너 감도를 올려 금과 다이아몬드도 보여 준다."
   },
-  "summary.singulo.scanner_module_3": {
+  "summary.singulo.neutrino_scanner_module_3": {
     "source": "Maxes scanner sensitivity to show ancient debris.",
     "translation": "스캐너 감도를 최대로 올려 고대 잔해도 보여 준다."
   },
@@ -13683,7 +13683,7 @@
     "source": "Tidal Draw Ring",
     "translation": "조석 인발 링"
   },
-  "block.singulo.spindle_cradle": {
+  "block.singulo.tidal_spindle_cradle": {
     "source": "Spool Cradle",
     "translation": "스풀 받침대"
   },
@@ -13791,15 +13791,15 @@
     "source": "Made in: Crafting Table (stage 5)",
     "translation": "제작: 제작대(5단계)"
   },
-  "desc.singulo.spindle_cradle": {
+  "desc.singulo.tidal_spindle_cradle": {
     "source": "Bearing stands that hold the spool of the Tidal Spindle.",
     "translation": "조석 방사기의 스풀을 지탱하는 베어링 받침대입니다."
   },
-  "summary.singulo.spindle_cradle": {
+  "summary.singulo.tidal_spindle_cradle": {
     "source": "A stand that holds the spool.",
     "translation": "스풀을 지탱하는 받침대입니다."
   },
-  "howto.singulo.spindle_cradle": {
+  "howto.singulo.tidal_spindle_cradle": {
     "source": "Made in: Crafting Table (stage 5)",
     "translation": "제작: 제작대(5단계)"
   },

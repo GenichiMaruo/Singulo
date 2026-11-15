@@ -455,7 +455,7 @@ CHAPTERS = [
          '覚醒した番人たちは、倒れるときに記録の断章を落とすといいます。断章がすべてそろったら、何が読めるでしょうか。',
          'Beyond',
          'With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\n'
-         'For a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab\'s seal console: the Awakened Horizon Warden '
+         'For a real fight, make an Awakened Record Core in the singularity encapsulator and use it on the Final Lab\'s seal console: the Awakened Horizon Warden '
          'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\n'
          'The Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\n'
          'Once the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\n'
@@ -654,7 +654,7 @@ CHAPTERS = [
          ' you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts'
          ' the Remnant to another spot. Drops Degenerate Nuclei.\n'
          '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularit'
-         'ies at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Re'
+         'ies at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakened Re'
          'cord Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier '
          'phases). Leave and the core is returned.'),
         ('foundry', '統括AIと覚醒した番人',

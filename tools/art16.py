@@ -308,16 +308,16 @@ MACHINE_ICONS = {
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
     'muon_fusion_reactor': ('fusion', (200, 150, 255)),
     'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
-    'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
+    'worldline_anchor': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),
     'smes_module': ('battery', None), 'singularity_encapsulator': ('sphere', None), 'halo_collector': ('halo', (200, 160, 255)),
-    'gravitational_containment_tank': ('tank', (200, 160, 255)), 'worldline_anchor_advanced': ('anchor', None),
+    'gravitational_containment_tank': ('tank', (200, 160, 255)), 'advanced_worldline_anchor': ('anchor', None),
     'shield_tower_core': ('dome', (180, 230, 255)), 'tipler_core': ('cylinder', None), 'wormhole_generator_core': ('swirl', (200, 160, 255)),
     'wormhole_stabilizer': ('swirl', None), 'wormhole_mouth': ('blackhole', (200, 160, 255)), 'wormhole_port': ('port', (200, 160, 255)),
     'cooling_tower_controller': ('snow', None), 'accelerator_controller': ('ring', None),
     'degenerate_compactor_controller': ('inward', None), 'casimir_cavity_controller': ('mirrors', None),
-    'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'core_controller': ('blackhole', (255, 200, 140)),
+    'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'reactor_core_controller': ('blackhole', (255, 200, 140)),
     'creative_energy_source': ('star', (255, 120, 255)),
     'neutrino_observatory': ('dish', (190, 150, 255)),
     'deep_sea_collector': ('bubbles', (90, 150, 255)), 'void_collector': ('halo', (170, 120, 240)),
@@ -1110,7 +1110,7 @@ def part_texture(iid):
         return fp
     if iid == 'multiblock_port':
         return multiblock_port()
-    if iid == 'heat_exchange_core':
+    if iid == 'cooling_tower_heat_exchange_core':
         im = weathered((128, 82, 54), seed=11)
         d = ImageDraw.Draw(im)
         for x in range(1, S - 1, 2):
@@ -1128,14 +1128,14 @@ def part_texture(iid):
         for x in (1, S - 2):
             d.line([(x, 0), (x, S - 1)], fill=(156, 166, 178, 255))
         return im
-    if iid == 'focusing_magnet':
+    if iid == 'accelerator_focusing_magnet':
         im = weathered((200, 206, 214), seed=13)
         d = ImageDraw.Draw(im)
         d.rectangle([2, 2, 6, S - 3], fill=(206, 72, 72, 255))
         d.rectangle([9, 2, S - 3, S - 3], fill=(72, 110, 206, 255))
         d.line([(7, 1), (8, S - 2)], fill=(255, 255, 255, 255))
         return im
-    if iid == 'mirror_plate':
+    if iid == 'casimir_cavity_mirror_plate':
         im, d = new()
         for y in range(S):
             for x in range(S):
@@ -1158,7 +1158,7 @@ def part_texture(iid):
                 d.line([(x, y), (x + 2, y)], fill=(66, 68, 86, 255))
         edge_line(d, 0, (236, 238, 240, 255), gap=0)
         return im
-    if iid == 'gyro_drive':
+    if iid == 'reactor_gyro_drive':
         im = weathered((32, 32, 42), seed=17)
         d = ImageDraw.Draw(im)
         d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
@@ -1168,7 +1168,7 @@ def part_texture(iid):
         d.point((7, 7), fill=(255, 255, 255, 255))
         d.point((8, 8), fill=(255, 255, 255, 255))
         return im
-    if iid == 'extraction_port':
+    if iid == 'reactor_extraction_port':
         im = weathered((32, 32, 42), seed=18)
         d = ImageDraw.Draw(im)
         d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
@@ -2252,19 +2252,19 @@ ITEM_ART = {
     'degraded_anomaly_sample': lambda: vial((90, 80, 100)),
     'anomaly_sample': lambda: vial((60, 20, 80), glow=True),
     'magnetic_monopole': magnet,
-    'record_fragment': crystal_memory,
+    'crystal_memory': crystal_memory,
     'decoded_record': lambda: tablet(T1),
     'creative_catalyst': lambda: crystal_cluster((255, 120, 255), mark=(255, 255, 255)),
     'shield_permit': lambda: permit_card(),
-    'bh_container': lambda: vessel(None),
-    'micro_black_hole': lambda: vessel((200, 140, 255)),
+    'empty_black_hole_vessel': lambda: vessel(None),
+    'micro_black_hole_vessel': lambda: vessel((200, 140, 255)),
     'black_hole_bomb': lambda: bomb_item(),
     'settings_card': lambda: settings_card(),
     'relocation_wrench': lambda: relocation_wrench(),
     'builder_wand': lambda: outlined(lambda d: (d.line([(3, 12), (10, 5)], fill=(150, 110, 70, 255), width=2),
                                                d.ellipse([10, 2, 13, 5], fill=(255, 120, 255, 255)))),
-    'scanner_module_2': lambda: module((60, 54, 90), (250, 200, 90)),
-    'scanner_module_3': lambda: module((40, 36, 60), (120, 230, 255)),
+    'neutrino_scanner_module_2': lambda: module((60, 54, 90), (250, 200, 90)),
+    'neutrino_scanner_module_3': lambda: module((40, 36, 60), (120, 230, 255)),
     'magnetic_key': lambda: seal_key(1),
     'quantum_key': lambda: seal_key(2),
     'temporal_key': lambda: seal_key(3),
@@ -2619,7 +2619,7 @@ def anim_pocket(t):
 
 # ID: (コマを描く関数（t は 0〜1）, コマ数, 1コマの tick 数)
 ANIMATED_ITEMS = {
-    'micro_black_hole': (anim_micro_black_hole, 12, 2),
+    'micro_black_hole_vessel': (anim_micro_black_hole, 12, 2),
     'exotic_matter': (anim_exotic_matter, 12, 3),
     'jet_condensate': (lambda t: _anim_vial(t, (120, 220, 255), True), 8, 3),
     'hawking_condensate': (lambda t: _anim_vial(t, (255, 140, 80), True), 8, 3),

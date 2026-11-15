@@ -327,16 +327,16 @@ MACHINE_ICONS = {
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
     'muon_fusion_reactor': ('fusion', (200, 150, 255)),
     'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
-    'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
+    'worldline_anchor': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),
     'smes_module': ('battery', None), 'singularity_encapsulator': ('sphere', None), 'halo_collector': ('halo', (200, 160, 255)),
-    'gravitational_containment_tank': ('tank', (200, 160, 255)), 'worldline_anchor_advanced': ('anchor', None),
+    'gravitational_containment_tank': ('tank', (200, 160, 255)), 'advanced_worldline_anchor': ('anchor', None),
     'shield_tower_core': ('dome', (180, 230, 255)), 'tipler_core': ('cylinder', None), 'wormhole_generator_core': ('swirl', (200, 160, 255)),
     'wormhole_stabilizer': ('swirl', None), 'wormhole_mouth': ('blackhole', (200, 160, 255)), 'wormhole_port': ('port', (200, 160, 255)),
     'cooling_tower_controller': ('snow', None), 'accelerator_controller': ('ring', None),
     'degenerate_compactor_controller': ('inward', None), 'casimir_cavity_controller': ('mirrors', None),
-    'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'core_controller': ('blackhole', None),
+    'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'reactor_core_controller': ('blackhole', None),
 }
 
 
@@ -410,7 +410,7 @@ def part_texture(iid):
         import art16
         return art16.part_texture(iid).resize((S, S), Image.NEAREST)
     im, d = new()
-    if iid == 'heat_exchange_core':
+    if iid == 'cooling_tower_heat_exchange_core':
         d.rectangle([0, 0, S - 1, S - 1], fill=(120, 76, 50, 255))
         for x in range(2, S - 1, 4):
             d.rectangle([x, 2, x + 1, S - 3], fill=(210, 140, 90, 255))
@@ -423,7 +423,7 @@ def part_texture(iid):
         d.line([(0, 16), (S - 1, 16)], fill=(150, 232, 255, 255))
         for x in (3, S - 4):
             d.rectangle([x - 1, 0, x + 1, S - 1], fill=(160, 170, 182, 255))
-    elif iid == 'focusing_magnet':
+    elif iid == 'accelerator_focusing_magnet':
         d.rectangle([0, 0, S - 1, S - 1], fill=(200, 206, 214, 255))
         d.rectangle([3, 3, 14, S - 4], fill=(210, 70, 70, 255))
         d.rectangle([17, 3, S - 4, S - 4], fill=(70, 110, 210, 255))
@@ -431,7 +431,7 @@ def part_texture(iid):
         for y in range(6, S - 5, 4):
             d.line([(4, y), (13, y)], fill=(240, 120, 120, 255))
             d.line([(18, y), (S - 5, y)], fill=(120, 160, 240, 255))
-    elif iid == 'mirror_plate':
+    elif iid == 'casimir_cavity_mirror_plate':
         for y in range(S):
             for x in range(S):
                 t = ((x + y) % 32) / 32
@@ -453,13 +453,13 @@ def part_texture(iid):
                 d.polygon([(ox, row + 1), (ox + 4, row - 1), (ox + 8, row + 1), (ox + 8, row + 5), (ox + 4, row + 7), (ox, row + 5)],
                           outline=(70, 72, 90, 255))
         d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
-    elif iid == 'gyro_drive':
+    elif iid == 'reactor_gyro_drive':
         d.rectangle([0, 0, S - 1, S - 1], fill=(30, 30, 40, 255), outline=(236, 238, 240, 255))
         d.ellipse([4, 4, S - 5, S - 5], outline=(222, 192, 112, 255))
         d.ellipse([4, 10, S - 5, S - 11], outline=(255, 255, 255, 255))
         d.ellipse([10, 4, S - 11, S - 5], outline=(150, 232, 255, 255))
         d.ellipse([14, 14, S - 15, S - 15], fill=(255, 255, 255, 255))
-    elif iid == 'extraction_port':
+    elif iid == 'reactor_extraction_port':
         d.rectangle([0, 0, S - 1, S - 1], fill=(30, 30, 40, 255), outline=(236, 238, 240, 255))
         d.rectangle([7, 7, S - 8, S - 8], fill=(12, 12, 18, 255), outline=(222, 192, 112, 255))
         for k in range(4):
@@ -947,7 +947,7 @@ ITEM_ART = {
                                                               d.line([(10, 10), (16, 18), (13, 26)], fill=(60, 56, 50, 255)))),
     'spent_singularity_core': lambda: item_sphere_dark((120, 120, 128)),
     'magnetic_monopole': lambda: item_magnet(),
-    'record_fragment': lambda: __import__('art16').crystal_memory().resize((S, S), Image.NEAREST),
+    'crystal_memory': lambda: __import__('art16').crystal_memory().resize((S, S), Image.NEAREST),
     'sentinel_core': lambda: __import__('art16').sentinel_core().resize((S, S), Image.NEAREST),
     'decoded_record': lambda: item_tablet(T1),
 }

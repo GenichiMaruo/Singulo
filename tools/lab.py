@@ -25,7 +25,7 @@ LIGHT = (f'{MODID}:facility_light', {'powered': 'false'})
 RAYLEIGH = (f'{MODID}:lab_rayleigh_panel', {'lit': 'false'})
 ROOM_LIGHT = f'{MODID}:room_light'
 EMERGENCY = (f'{MODID}:emergency_light', {'powered': 'false'})
-REACTOR_CORE = (f'{MODID}:reactor_core', {'powered': 'false'})
+REACTOR_CORE = (f'{MODID}:lab_reactor_core', {'powered': 'false'})
 CONDUIT = (f'{MODID}:power_conduit', {'powered': 'false'})
 DOOR = f'{MODID}:lab_door'
 DARK = 'minecraft:polished_deepslate'
@@ -334,7 +334,7 @@ def reactor():
         b.set(c, y, c - 3, 'minecraft:ladder', {'facing': 'north', 'waterlogged': 'false'})
     b.set(c, 6, c - 4, AIR)                                    # はしごの上は、キャットウォークに開けておく
     # 操作卓（南）: 制御盤と、両わきの計器
-    b.put(c, 1, 14, f'{MODID}:reactor_console', {'facing': 'north', 'powered': 'false'})
+    b.put(c, 1, 14, f'{MODID}:lab_reactor_console', {'facing': 'north', 'powered': 'false'})
     for dx in (-2, -1, 1, 2):
         b.put(c + dx, 1, 14, *SLAB_TOP)
     b.put(c - 1, 2, 14, f'{MODID}:lab_terminal', {'facing': 'north', 'log': str(LOG_REACTOR)})

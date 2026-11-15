@@ -1337,11 +1337,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         energy.restoreEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
         mode = tag.getInt("mode");
-        selectedRecipe = tag.contains("selected_recipe") ? ResourceLocation.tryParse(tag.getString("selected_recipe")) : null;
+        selectedRecipe = tag.contains("selected_recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(ResourceLocation.tryParse(tag.getString("selected_recipe"))) : null;
         selectedIndex = -2;
         mass = tag.getDouble("mass");
         metalMass = tag.getDouble("metal_mass");
-        resumeRecipe = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
+        resumeRecipe = tag.contains("recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(ResourceLocation.tryParse(tag.getString("recipe"))) : null;
         // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
         inputsChangedAt = tag.getLong("inputs_changed_at");
         dirty = true;
