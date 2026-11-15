@@ -34,8 +34,13 @@ def make_receipt(env, root):
                 f'/minecraft/mc-mods/singulo/files/{file_id}', f'/minecraft/mc-mods/1734662/files/{file_id}'):
             raise ValueError('Accepted file URL does not match project/file identifier')
         expected = env.get('EXPECTED_FILE', '')
-        if len(files) != 1 or files[0].get('name') != expected or str(files[0].get('id')) != file_id:
-            raise ValueError('Accepted filename/file identifier mismatch')
+        # This workflow passes neo_name as the publisher display name and neo_name.jar
+        # as the local file. mc-publish files[].name is the API display name, not fileName.
+        if not expected.endswith('.jar') or Path(expected).name != expected:
+            raise ValueError('Invalid expected source JAR filename')
+        expected_display_name = expected[:-4]
+        if len(files) != 1 or files[0].get('name') != expected_display_name or str(files[0].get('id')) != file_id:
+            raise ValueError('Accepted display name/file identifier mismatch')
         jar = root / 'release-artifacts' / expected
         if not expected or Path(expected).name != expected or not provenance or not lock:
             raise ValueError('Missing immutable publication provenance/lock')
@@ -46,7 +51,9 @@ def make_receipt(env, root):
         digest = hashlib.sha256(jar.read_bytes()).hexdigest()
         if digest != provenance['jar_sha256']['neoforge']:
             raise ValueError('Publication JAR hash mismatch')
-        receipt.update(state='accepted', jar_sha256=digest, public_approval='not_verified')
+        receipt.update(state='accepted', display_name=expected_display_name, source_filename=expected,
+                       source_jar_sha256=digest, cdn_hash_verification='not_performed',
+                       remote_filename_verification='not_performed', public_approval='not_verified')
         return receipt, False
     except (ValueError, TypeError, KeyError, OSError, AttributeError, GuardError) as error:
         receipt['validation_error'] = str(error)
