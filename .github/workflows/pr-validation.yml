@@ -134,6 +134,8 @@ jobs:
             build/rayleigh-review/logs/
             build/rayleigh-review/screenshots/
             build/libs/*.jar
+            build/outline-review/logs/
+            build/outline-review/screenshots/
             build/gametest/logs/
             build/reports/
             build/gui-review/screenshots/

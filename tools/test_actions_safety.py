@@ -50,6 +50,14 @@ class WorkflowSafetyTests(unittest.TestCase):
         text = (WORKFLOWS / 'pr-validation.yml').read_text()
         self.assertIn('name: pr-validation-${{ github.sha }}-attempt-${{ github.run_attempt }}', text)
 
+    def test_outline_evidence_is_retained_in_primary_artifact(self):
+        text = (WORKFLOWS / 'pr-validation.yml').read_text()
+        upload = text.split('      - name: Save build outputs and validation logs', 1)[1].split('  sodium-lighting:', 1)[0]
+        for path in ('build/outline-review/logs/', 'build/outline-review/screenshots/'):
+            self.assertIn('            ' + path + '\n', upload)
+        self.assertIn('SINGULO_OUTLINE_COMPLETE 4 5', text)
+        self.assertIn('SINGULO_OUTLINE_ENTITY phase=', text)
+
     def test_publication_executes_trusted_validation_code(self):
         for name in ('publish-curseforge.yml', 'publish-modrinth.yml'):
             text = (WORKFLOWS / name).read_text()

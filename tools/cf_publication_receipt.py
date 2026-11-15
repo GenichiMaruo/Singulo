@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 from urllib.parse import urlparse
+from curseforge_guard import ref_name, GuardError
 
 
 def make_receipt(env, root):
@@ -38,12 +39,16 @@ def make_receipt(env, root):
         jar = root / 'release-artifacts' / expected
         if not expected or Path(expected).name != expected or not provenance or not lock:
             raise ValueError('Missing immutable publication provenance/lock')
+        if (not re.fullmatch(r'[0-9a-f]{40}', provenance.get('commit', ''))
+                or lock != {'status': 'atomic_lock_intent', 'ref': ref_name(provenance['tag']),
+                            'commit': provenance['commit']}):
+            raise ValueError('Permanent lock intent does not match release tag/commit')
         digest = hashlib.sha256(jar.read_bytes()).hexdigest()
         if digest != provenance['jar_sha256']['neoforge']:
             raise ValueError('Publication JAR hash mismatch')
         receipt.update(state='accepted', jar_sha256=digest, public_approval='not_verified')
         return receipt, False
-    except (ValueError, TypeError, KeyError, OSError, AttributeError) as error:
+    except (ValueError, TypeError, KeyError, OSError, AttributeError, GuardError) as error:
         receipt['validation_error'] = str(error)
         return receipt, env.get('PUBLISH_OUTCOME') == 'success'
 

@@ -10,8 +10,8 @@ class ReceiptTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.root=Path(self.tmp.name); d=self.root/'release-artifacts';d.mkdir()
         self.name='Singulo-0.19.0-26.1.2N.jar';(d/self.name).write_bytes(b'jar')
-        (d/'provenance.json').write_text(json.dumps({'run_attempt':1,'jar_sha256':{'neoforge':hashlib.sha256(b'jar').hexdigest()}}))
-        (self.root/'cf-lock-receipt.json').write_text('{"lock":"permanent"}')
+        (d/'provenance.json').write_text(json.dumps({'tag':'v0.19.0-26.1.2N','commit':'a'*40,'run_attempt':1,'jar_sha256':{'neoforge':hashlib.sha256(b'jar').hexdigest()}}))
+        (self.root/'cf-lock-receipt.json').write_text(json.dumps({'status':'atomic_lock_intent','ref':'refs/tags/singulo-cf-upload-lock-v1/v0.19.0-26.1.2N','commit':'a'*40}))
         self.env={'PUBLISH_OUTCOME':'success','CF_PROJECT':'1734662','CF_VERSION':'123',
                   'CF_URL':'https://www.curseforge.com/minecraft/mc-mods/singulo/files/123',
                   'CF_FILES':json.dumps([{'id':123,'name':self.name,'url':'https://cdn.example/file.jar'}]),'EXPECTED_FILE':self.name}
@@ -27,6 +27,16 @@ class ReceiptTests(unittest.TestCase):
         self.env['CF_FILES']='';self.assertTrue(make_receipt(self.env,self.root)[1])
     def test_hash_tamper(self):
         (self.root/'release-artifacts'/self.name).write_bytes(b'bad')
+        self.assertTrue(make_receipt(self.env,self.root)[1])
+    def test_wrong_lock_rejected(self):
+        path=self.root/'cf-lock-receipt.json'
+        original=json.loads(path.read_text())
+        for field,value in [('status','acquired'),('ref','refs/tags/other'),('commit','b'*40)]:
+            lock=dict(original);lock[field]=value;path.write_text(json.dumps(lock))
+            r,f=make_receipt(self.env,self.root)
+            self.assertTrue(f,field);self.assertEqual(r['state'],'unknown')
+    def test_placeholder_lock_rejected(self):
+        (self.root/'cf-lock-receipt.json').write_text('{"lock":"permanent"}')
         self.assertTrue(make_receipt(self.env,self.root)[1])
     def test_failure_unknown_and_no_secrets(self):
         self.env['PUBLISH_OUTCOME']='failure';self.env['TOKEN']='not-for-receipt'
