@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:white_panel"
-      },
+      "ingredient": "singulo:white_panel",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:ender_pearls"
-      },
+      "ingredient": "#c:ender_pearls",
       "count": 2
     }
   ],

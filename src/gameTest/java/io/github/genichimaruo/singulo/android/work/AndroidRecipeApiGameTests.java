@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidRecipe;
@@ -7,12 +9,10 @@ import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -21,7 +21,7 @@ public final class AndroidRecipeApiGameTests {
     public static void recipeAccessRequiresOwnerAndAvailableConsole(GameTestHelper h) {
         var p = new BlockPos(1,1,1);
         h.setBlock(p, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity c = h.getBlockEntity(p);
+        WorkConsoleBlockEntity c = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, p);
         UUID owner = TestScope.player(h).getUUID(); c.setOwner(owner);
         var ok = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), owner);
         h.assertTrue(ok.state() == AndroidOrders.SnapshotState.AVAILABLE && ok.recipes().isEmpty(), "Empty owned console unavailable");
@@ -52,15 +52,15 @@ public final class AndroidRecipeApiGameTests {
         h.setBlock(cp, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         h.setBlock(rp, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         var player = TestScope.player(h);
-        WorkConsoleBlockEntity c = h.getBlockEntity(cp); c.setOwner(player.getUUID());
-        RecipeRackBlockEntity rack = h.getBlockEntity(rp);
+        WorkConsoleBlockEntity c = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, cp); c.setOwner(player.getUUID());
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, rp);
         var registry = net.minecraft.core.registries.BuiltInRegistries.ITEM;
-        var link = new ItemStack(registry.get(net.minecraft.resources.ResourceLocation.parse("singulo:work_location_card")));
+        var link = new ItemStack(registry.getValue(net.minecraft.resources.Identifier.parse("singulo:work_location_card")));
         WorkLocationCardItem.record(link, h.getLevel(), c.getBlockPos(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         rack.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         var location = link.copy();
         WorkLocationCardItem.record(location, h.getLevel(), c.getBlockPos().above(), net.minecraft.world.level.block.Blocks.FURNACE);
-        var card = new ItemStack(registry.get(net.minecraft.resources.ResourceLocation.parse("singulo:recipe_card")));
+        var card = new ItemStack(registry.getValue(net.minecraft.resources.Identifier.parse("singulo:recipe_card")));
         RecipeData.processing(List.of(new ItemStack(Items.IRON_ORE, 2)), new ItemStack(Items.IRON_INGOT, 2),
                 List.of(new ItemStack(Items.STONE)), new ItemStack(Items.COAL, 3)).write(card, h.getLevel().registryAccess());
         rack.items().setStackInSlot(0, location); rack.items().setStackInSlot(1, card);

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -61,8 +61,7 @@ public final class ShapeSpec {
     private final int cz;
     private final Layout layout;
     /** 外装板として使うブロック（初めて判定するときに設計図から集める。登録が済む前には作れないため）。 */
-    @Nullable
-    private java.util.Set<Block> panelBlocks;
+    private java.util.@Nullable Set<Block> panelBlocks;
     /** 外装板の位置にコラプサー内張りを置けるか（加工が速くなる設備だけ。{@link CollapsarLining}）。 */
     private boolean lining;
 

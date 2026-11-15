@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorMenu;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -83,12 +83,13 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
     }
 
     @Override
-    public boolean keyPressed(int key, int scan, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key(), scan = event.scancode(), modifiers = event.modifiers();
         // 入力中は E などで画面が閉じないように
         if (interval != null && interval.isFocused() && key != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
-            return interval.keyPressed(key, scan, modifiers) || interval.canConsumeInput();
+            return interval.keyPressed(event) || interval.canConsumeInput();
         }
-        return super.keyPressed(key, scan, modifiers);
+        return super.keyPressed(event);
     }
 
     // ------------------------------------------------------------------ ヘッダー（状態・モード）
@@ -149,8 +150,8 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
     // ------------------------------------------------------------------ 描画
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
@@ -159,16 +160,16 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
                 int[] p = PenroseReactorMenu.SLOT_POS[i];
                 if (!menu.getSlot(i).hasItem() && Panel.inside(mouseX, mouseY, leftPos + p[0], topPos + p[1], 16, 16)) {
                     int k = Math.min(i, PenroseReactorBlockEntity.SLOT_OUT);
-                    g.renderTooltip(font, Component.translatable("gui.singulo.reactor.slot." + k), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.reactor.slot." + k), mouseX, mouseY);
                     return;
                 }
             }
         }
-        renderTooltip(g, mouseX, mouseY);
+        extractTooltip(g, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         for (int i = 0; i < PenroseReactorMenu.SLOT_POS.length; i++) {
@@ -184,18 +185,18 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
         stat(g, OX + STAT_X, INTERVAL_Y + 2, Panel.Icon.HOURGLASS, skin.dim(), "", skin.text(),
                 List.of(Component.translatable("gui.singulo.reactor.interval"),
                         Component.translatable("gui.singulo.reactor.interval.hint").withStyle(st -> st.withColor(0xFF8A949E))));
-        g.drawString(font, "tick", leftPos + OX + STAT_X + 48, topPos + INTERVAL_Y + 2, skin.dim(), false);
+        g.text(font, "tick", leftPos + OX + STAT_X + 48, topPos + INTERVAL_Y + 2, skin.dim(), false);
     }
 
     /** 炉の様子（アイコンと値。説明は重ねると出る）。 */
-    private void drawStats(GuiGraphics g) {
+    private void drawStats(GuiGraphicsExtractor g) {
         int x = OX + STAT_X;
         int y = 24;
         switch (state()) {
             case IGNITING -> {
                 int pct = v(PenroseReactorBlockEntity.D_IGNITION_PCT);
                 statBar(g, x, y, Panel.Icon.FLAME, 0xFFFF9A4A, 70, pct / 100.0, 0xFFFF9A4A, statusTooltip());
-                g.drawString(font, pct + "% " + v(PenroseReactorBlockEntity.D_IGNITION_SECS) + "s", leftPos + x + 11 + 74, topPos + y,
+                g.text(font, pct + "% " + v(PenroseReactorBlockEntity.D_IGNITION_SECS) + "s", leftPos + x + 11 + 74, topPos + y,
                         skin.text(), false);
                 y += STAT_PITCH;
             }
@@ -226,7 +227,7 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
     }
 
     /** 点火・スピン目標・回収運転（アイコンのボタン）。 */
-    private void drawButtons(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawButtons(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int bx = leftPos + OX;
         int by = topPos + BUTTON_Y;
         int d = Panel.button(g, skin, bx + IGNITE_X, by, IGNITE_W, BUTTON_H, hover(mouseX, mouseY, IGNITE_X, IGNITE_W) ? Panel.Press.HOVER : Panel.Press.NORMAL);
@@ -235,7 +236,7 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
                 ignitionNeed().copy().withStyle(st -> st.withColor(0xFF8A949E))));
         d = Panel.button(g, skin, bx + SPIN_X, by, SPIN_W, BUTTON_H, hover(mouseX, mouseY, SPIN_X, SPIN_W) ? Panel.Press.HOVER : Panel.Press.NORMAL);
         Panel.icon(g, bx + SPIN_X + 5, by + 4 + d, Panel.Icon.SPEED, 0xFF64DCFF);
-        g.drawString(font, String.valueOf(target()), bx + SPIN_X + 15, by + 4 + d, skin.text(), false);
+        g.text(font, String.valueOf(target()), bx + SPIN_X + 15, by + 4 + d, skin.text(), false);
         area(OX + SPIN_X, BUTTON_Y, SPIN_W, BUTTON_H, List.of(Component.translatable("gui.singulo.reactor.spin_target"),
                 Component.translatable("gui.singulo.reactor.spin", "-", target()).withStyle(st -> st.withColor(0xFF8A949E))));
         boolean on = harvestOn();
@@ -269,7 +270,8 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (clickFrame(mouseX, mouseY, button)) {
             return true;
         }
@@ -282,6 +284,6 @@ public class PenroseReactorScreen extends FramedScreen<PenroseReactorMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 }

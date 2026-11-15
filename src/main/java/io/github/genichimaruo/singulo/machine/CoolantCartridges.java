@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,15 +25,15 @@ public final class CoolantCartridges {
     private CoolantCartridges() {}
 
     public static Item filled() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("coolant_cartridge"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("coolant_cartridge"));
     }
 
     public static Item helium() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("helium_cartridge"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("helium_cartridge"));
     }
 
     public static Item empty() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("empty_coolant_cartridge"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("empty_coolant_cartridge"));
     }
 
     public static boolean isFilled(ItemStack stack) {
@@ -69,6 +69,30 @@ public final class CoolantCartridges {
     }
 
     /** カートリッジ1個ぶんの液体の出し入れ（満タン ⇔ 空。半端な量は受け付けない）。 */
+    public static net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> resourceHandler(net.neoforged.neoforge.transfer.access.ItemAccess access) {
+        return new net.neoforged.neoforge.transfer.ItemAccessResourceHandler<>(access, 1) {
+            protected net.neoforged.neoforge.transfer.fluid.FluidResource getResourceFrom(net.neoforged.neoforge.transfer.item.ItemResource item, int index) {
+                FluidStack fluid = contents(item.toStack(1));
+                return fluid == null ? net.neoforged.neoforge.transfer.fluid.FluidResource.EMPTY : net.neoforged.neoforge.transfer.fluid.FluidResource.of(fluid);
+            }
+            protected int getAmountFrom(net.neoforged.neoforge.transfer.item.ItemResource item, int index) {
+                FluidStack fluid = contents(item.toStack(1)); return fluid == null ? 0 : fluid.getAmount();
+            }
+            protected net.neoforged.neoforge.transfer.item.ItemResource update(net.neoforged.neoforge.transfer.item.ItemResource item, int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount) {
+                if (amount == 0) return net.neoforged.neoforge.transfer.item.ItemResource.of(empty());
+                FluidStack valid = fillable(fluid.getFluid());
+                if (valid == null || amount != valid.getAmount() || !fluid.matches(valid)) return net.neoforged.neoforge.transfer.item.ItemResource.EMPTY;
+                return net.neoforged.neoforge.transfer.item.ItemResource.of(amount == AMOUNT ? filled() : helium());
+            }
+            protected int getCapacity(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid) {
+                java.util.Objects.checkIndex(index, 1); if (fluid.isEmpty()) return HELIUM_AMOUNT;
+                FluidStack valid = fillable(fluid.getFluid()); return valid == null ? 0 : valid.getAmount();
+            }
+            public boolean isValid(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid) {
+                java.util.Objects.checkIndex(index, 1); FluidStack valid = fillable(fluid.getFluid()); return valid != null && fluid.matches(valid);
+            }
+        };
+    }
     public static final class Handler implements IFluidHandlerItem {
         private ItemStack container;
 

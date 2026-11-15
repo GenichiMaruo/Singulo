@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.ruin;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
  * <p>
  * 隠しボス: 終焉の記録を手に持って使うと、最後の記録者が目覚める（{@link #activateArchivist}）。
  */
-public class SealConsoleBlockEntity extends BlockEntity {
+public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public static final int VAULT_SEARCH_RADIUS = 12;
     public static final int MESSAGE_RADIUS = 32;
 
@@ -91,12 +91,12 @@ public class SealConsoleBlockEntity extends BlockEntity {
             tell(player, "gui.singulo.console.open");
             return null;
         }
-        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (w == null) {
             return null;
         }
         BlockPos spawn = worldPosition.above();
-        w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.snapTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition);
         w.startEmerging();
         level.addFreshEntity(w);
@@ -108,7 +108,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     /** 覚醒の記録核（覚醒した守護機を呼び出す）。 */
     public static net.minecraft.world.item.Item awakeningCore() {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("awakening_record_core"));
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("awakening_record_core"));
     }
 
     /**
@@ -129,12 +129,12 @@ public class SealConsoleBlockEntity extends BlockEntity {
         // 通常戦と同じく、中身の再生期限が過ぎていればここで入れ直して封鎖を確定させる（勝てばその封鎖が解ける）。
         // これをしないと、勝ったあとに保管庫を開こうとした時点で入れ直しが起きて、また封鎖されてしまう
         vault.refillIfDue(level, level.getGameTime());
-        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (w == null) {
             return null;
         }
         BlockPos spawn = worldPosition.above();
-        w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.snapTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition, true);
         w.startEmerging();
         level.addFreshEntity(w);
@@ -148,7 +148,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     /** 終焉の記録（4つの断章から作る。最後の記録者を呼び出す）。 */
     public static net.minecraft.world.item.Item terminusRecord() {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("terminus_record"));
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("terminus_record"));
     }
 
     @Nullable
@@ -174,12 +174,12 @@ public class SealConsoleBlockEntity extends BlockEntity {
             tell(player, "gui.singulo.console.no_vault");
             return null;
         }
-        LastArchivist a = SinguloEntities.LAST_ARCHIVIST.get().create(level);
+        LastArchivist a = SinguloEntities.LAST_ARCHIVIST.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (a == null) {
             return null;
         }
         net.minecraft.world.phys.Vec3 at = LastArchivist.spawnAt(worldPosition);
-        a.moveTo(at.x, at.y, at.z, 180, 0);
+        a.snapTo(at.x, at.y, at.z, 180, 0);
         a.awaken(worldPosition);
         a.startEmerging();
         level.addFreshEntity(a);
@@ -256,13 +256,13 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     private void broadcast(ServerLevel level, String key) {
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(MESSAGE_RADIUS))) {
-            p.displayClientMessage(Component.translatable(key), false);
+            p.sendSystemMessage(Component.translatable(key));
         }
     }
 
     private static void tell(@Nullable ServerPlayer player, String key) {
         if (player != null) {
-            player.displayClientMessage(Component.translatable(key), true);
+            player.sendOverlayMessage(Component.translatable(key));
         }
     }
 
@@ -270,10 +270,10 @@ public class SealConsoleBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (warden != null) {
-            tag.putUUID("warden", warden);
+            tag.store("warden", net.minecraft.core.UUIDUtil.CODEC, warden);
         }
         if (archivist != null) {
-            tag.putUUID("archivist", archivist);
+            tag.store("archivist", net.minecraft.core.UUIDUtil.CODEC, archivist);
         }
         tag.putLong("anomaly_changed", anomalyChangedAt);
     }
@@ -281,8 +281,8 @@ public class SealConsoleBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        warden = tag.hasUUID("warden") ? tag.getUUID("warden") : null;
-        archivist = tag.hasUUID("archivist") ? tag.getUUID("archivist") : null;
-        anomalyChangedAt = tag.getLong("anomaly_changed");
+        warden = tag.read("warden", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("warden", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        archivist = tag.read("archivist", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("archivist", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        anomalyChangedAt = tag.getLongOr("anomaly_changed", 0L);
     }
 }

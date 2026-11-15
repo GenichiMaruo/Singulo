@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.data.ThermalData;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -28,7 +28,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * P = thermoelectricCoefficient × ΔT FE/t を出す。
  * ΔT が低温源の「維持できる温度差」を超えると、超えた分に比例した速さで低温源が溶けて劣化する。
  */
-public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class ThermoelectricGeneratorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         GeneratorInfo {
     /** 維持できる温度差を 1 K 超えたまま、低温源が1段階劣化するまでの tick 数。100 K 超過なら約1分。 */
     static final double MELT_THRESHOLD = 120_000;
@@ -118,7 +118,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
             return;
         }
         // ネザーでは氷系が速く溶ける
-        meltProgress += excess * (level.dimensionType().ultraWarm() ? 2.0 : 1.0);
+        meltProgress += excess * (level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.WATER_EVAPORATES, worldPosition) ? 2.0 : 1.0);
         if (meltProgress < MELT_THRESHOLD) {
             return;
         }
@@ -126,7 +126,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         ThermalData.Cold c = ThermalData.INSTANCE.cold(level.getBlockState(coldPos));
         if (c != null) {
             Block next = c.becomes();
-            if (next == Blocks.WATER && level.dimensionType().ultraWarm()) {
+            if (next == Blocks.WATER && level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.WATER_EVAPORATES, worldPosition)) {
                 next = Blocks.AIR;
             }
             level.setBlock(coldPos, next.defaultBlockState(), Block.UPDATE_ALL);
@@ -139,12 +139,9 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
             if (energy.getEnergyStored() <= 0) {
                 return;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            var target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), PUSH_PER_TICK));
             }
         }
     }
@@ -191,7 +188,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        meltProgress = tag.getDouble("melt");
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        meltProgress = tag.getDoubleOr("melt", 0.0D);
     }
 }

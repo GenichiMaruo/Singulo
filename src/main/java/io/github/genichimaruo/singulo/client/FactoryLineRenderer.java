@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.ruin.FactoryLineBlockEntity;
 import io.github.genichimaruo.singulo.ruin.FoundryOverseer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.phys.AABB;
@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
  * 製造ライン: 近くのファウンドリが動いている間、印刷ヘッドの下からコアへ橙の給電の光が伸びる（脈打ちながら流れる）。
  * これが伸びているラインの数だけ、コアは硬い。ファウンドリが倒されると、光はちらついて消える。
  */
-public class FactoryLineRenderer implements BlockEntityRenderer<FactoryLineBlockEntity> {
+public class FactoryLineRenderer extends SnapshotBlockRenderer<FactoryLineBlockEntity> {
     static final double RANGE = 24;
 
     public FactoryLineRenderer(BlockEntityRendererProvider.Context context) {}
@@ -68,7 +68,7 @@ public class FactoryLineRenderer implements BlockEntityRenderer<FactoryLineBlock
     }
 
     @Override
-    public boolean shouldRenderOffScreen(FactoryLineBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

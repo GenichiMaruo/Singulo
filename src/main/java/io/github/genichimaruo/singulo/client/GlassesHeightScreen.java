@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.android.work.SurveyGlassesItem;
 import io.github.genichimaruo.singulo.network.GlassesHeightPayload;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * 測量メガネを掛ける高さを決める画面（メガネを持ってスニークして使うと開く）。▲▼で1ピクセルずつ動かし、
@@ -64,18 +64,18 @@ public final class GlassesHeightScreen extends Screen {
         if (minecraft != null && minecraft.player != null) {
             SurveyGlassesItem.setHeight(minecraft.player.getItemInHand(hand), pixels);
         }
-        PacketDistributor.sendToServer(new GlassesHeightPayload(hand == InteractionHand.OFF_HAND, pixels));
+        ClientPacketDistributor.sendToServer(new GlassesHeightPayload(hand == InteractionHand.OFF_HAND, pixels));
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         int x = left();
         int y = top();
-        g.drawCenteredString(font, title, width / 2, y, 0xFFFFFF);
-        g.drawCenteredString(font, Component.translatable("gui.singulo.glasses.height", (pixels > 0 ? "+" : "") + pixels),
+        g.centeredText(font, title, width / 2, y, 0xFFFFFF);
+        g.centeredText(font, Component.translatable("gui.singulo.glasses.height", (pixels > 0 ? "+" : "") + pixels),
                 x + 132, y + 54, 0xFFFFFF);
-        g.drawCenteredString(font, Component.translatable("gui.singulo.glasses.hint"), width / 2, y + 128, 0xA0A8B0);
+        g.centeredText(font, Component.translatable("gui.singulo.glasses.hint"), width / 2, y + 128, 0xA0A8B0);
         // 顔の見本: 手に持ったメガネを一時的に頭に掛けて、自分を大きく映す
         if (minecraft != null && minecraft.player != null) {
             var player = minecraft.player;
@@ -90,7 +90,7 @@ public final class GlassesHeightScreen extends Screen {
                 // 顔のあたりだけを、正面から大きく映す（マウスの位置を枠の真ん中にして、顔をこちらへ向ける）。
                 // yOffset は体の真ん中から映す中心までの高さ（ブロック）: 目の高さの少し上
                 float face = player.getEyeHeight() - player.getBbHeight() / 2 + 0.05F;
-                InventoryScreen.renderEntityInInventoryFollowsMouse(g, x + 4, y + 14, x + 100, y + 100, 120, face,
+                InventoryScreen.extractEntityInInventoryFollowsMouse(g, x + 4, y + 14, x + 100, y + 100, 120, face,
                         x + 52, y + 57, player);
             } finally {
                 if (swap) {

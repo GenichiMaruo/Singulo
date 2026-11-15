@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:topological_wire"
-      },
+      "ingredient": "singulo:topological_wire",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:meteoric_iron_ingot"
-      },
+      "ingredient": "singulo:meteoric_iron_ingot",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     }
   ],

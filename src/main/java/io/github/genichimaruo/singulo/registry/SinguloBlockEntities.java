@@ -273,7 +273,7 @@ public final class SinguloBlockEntities {
 
     @SuppressWarnings("DataFlowIssue")
     private static <T extends BlockEntity> BlockEntityType<T> build(BlockEntityType.BlockEntitySupplier<T> factory, Block... blocks) {
-        return BlockEntityType.Builder.of(factory, blocks).build(null);
+        return new BlockEntityType<>(factory, blocks);
     }
 
     private SinguloBlockEntities() {}

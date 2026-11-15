@@ -6,21 +6,15 @@
   "energy": 50000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superfluid_conduit"
-      },
+      "ingredient": "singulo:superfluid_conduit",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:nihonium_plate"
-      },
+      "ingredient": "singulo:nihonium_plate",
       "count": 1
     }
   ],

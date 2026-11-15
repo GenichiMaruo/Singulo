@@ -5,12 +5,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.ObjLongConsumer;
 import mekanism.api.Action;
 import mekanism.api.inventory.qio.IQIOFrequency;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo_mekanism")
 @PrefixGameTestTemplate(false)
@@ -82,7 +82,7 @@ public final class MekanismQioGameTests {
         helper.assertTrue(!MekanismQio.publicAccess(helper.getLevel(), absolute),
                 "Missing security capability must fail closed");
         var block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
-                net.minecraft.resources.ResourceLocation.parse("mekanism:qio_dashboard"));
+                net.minecraft.resources.Identifier.parse("mekanism:qio_dashboard"));
         helper.setBlock(position, block);
         var security = mekanism.api.security.IBlockSecurityUtils.INSTANCE.securityCapability(helper.getLevel(), absolute);
         helper.assertTrue(security != null, "Dashboard must expose official security capability");

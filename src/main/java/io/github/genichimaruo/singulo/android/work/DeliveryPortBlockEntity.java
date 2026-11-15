@@ -86,7 +86,7 @@ public class DeliveryPortBlockEntity extends WorkLinkedBlockEntity {
     @Override
     protected boolean openScreen(ServerPlayer player) {
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return true;
         }
         player.openMenu(new SimpleMenuProvider((id, inv, p) -> new DeliveryPortMenu(id, inv, worldPosition, contents),
@@ -122,7 +122,7 @@ public class DeliveryPortBlockEntity extends WorkLinkedBlockEntity {
         for (int i = 0; i < SLOTS; i++) {
             list.set(i, contents.getItem(i));
         }
-        tag.put("items", ContainerHelper.saveAllItems(new CompoundTag(), list, registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(new CompoundTag(), list, registries));
         tag.putString("name", name);
     }
 
@@ -130,10 +130,14 @@ public class DeliveryPortBlockEntity extends WorkLinkedBlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         NonNullList<ItemStack> list = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag.getCompound("items"), list, registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag.getCompoundOrEmpty("items"), list, registries);
         for (int i = 0; i < SLOTS; i++) {
             contents.setItem(i, list.get(i));
         }
-        name = tag.getString("name");
+        name = tag.getStringOr("name", "");
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return net.neoforged.neoforge.transfer.item.VanillaContainerWrapper.of(contents);
     }
 }

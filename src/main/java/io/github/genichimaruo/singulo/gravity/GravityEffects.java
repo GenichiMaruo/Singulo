@@ -1,8 +1,8 @@
 package io.github.genichimaruo.singulo.gravity;
 
 import io.github.genichimaruo.singulo.Singulo;
-import javax.annotation.Nullable;
-import net.minecraft.resources.ResourceLocation;
+import org.jspecify.annotations.Nullable;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -23,9 +23,9 @@ public final class GravityEffects {
     public static final double LOW_GRAVITY = 0.2;
     public static final double HIGH_GRAVITY = 2.5;
     public static final double LOW_FALL_DAMAGE = 0.25;
-    static final ResourceLocation LOW_ID = Singulo.id("low_gravity_panel");
-    static final ResourceLocation HIGH_ID = Singulo.id("high_gravity_panel");
-    static final ResourceLocation FALL_ID = Singulo.id("low_gravity_panel_fall");
+    static final Identifier LOW_ID = Singulo.id("low_gravity_panel");
+    static final Identifier HIGH_ID = Singulo.id("high_gravity_panel");
+    static final Identifier FALL_ID = Singulo.id("low_gravity_panel_fall");
 
     private GravityEffects() {}
 
@@ -63,8 +63,7 @@ public final class GravityEffects {
     }
 
     /** 今の重力の種類（どちらでもなければ null）。 */
-    @Nullable
-    public static GravityPanelBlock.Kind current(LivingEntity living) {
+    public static GravityPanelBlock.@Nullable Kind current(LivingEntity living) {
         AttributeInstance gravity = living.getAttribute(Attributes.GRAVITY);
         if (gravity == null) {
             return null;
@@ -72,7 +71,7 @@ public final class GravityEffects {
         return gravity.hasModifier(LOW_ID) ? GravityPanelBlock.Kind.LOW : gravity.hasModifier(HIGH_ID) ? GravityPanelBlock.Kind.HIGH : null;
     }
 
-    private static void apply(LivingEntity living, AttributeInstance gravity, @Nullable GravityPanelBlock.Kind kind) {
+    private static void apply(LivingEntity living, AttributeInstance gravity, GravityPanelBlock.@Nullable Kind kind) {
         boolean low = kind == GravityPanelBlock.Kind.LOW;
         boolean high = kind == GravityPanelBlock.Kind.HIGH;
         set(gravity, LOW_ID, low, LOW_GRAVITY - 1);
@@ -83,7 +82,7 @@ public final class GravityEffects {
         }
     }
 
-    private static void set(AttributeInstance attribute, ResourceLocation id, boolean on, double amount) {
+    private static void set(AttributeInstance attribute, Identifier id, boolean on, double amount) {
         boolean has = attribute.hasModifier(id);
         if (on && !has) {
             attribute.addTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));

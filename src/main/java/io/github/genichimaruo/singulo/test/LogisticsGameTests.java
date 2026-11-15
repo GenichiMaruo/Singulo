@@ -5,15 +5,15 @@ import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
@@ -23,7 +23,7 @@ public final class LogisticsGameTests {
         BlockPos from = new BlockPos(2,1,2), to = from.east();
         h.setBlock(from, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
         h.setBlock(to, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity a=h.getBlockEntity(from), b=h.getBlockEntity(to);
+        MachineBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,from), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,to);
         a.items().setStackInSlot(a.type().outputSlot(), new ItemStack(Items.IRON_INGOT, 7));
         h.assertFalse(a.itemSides().ejectEnabled(), "New machine auto-eject defaults on");
         h.runAtTickTime(20, () -> {
@@ -44,7 +44,7 @@ public final class LogisticsGameTests {
         BlockPos from=new BlockPos(2,1,2),to=from.east();
         h.setBlock(from,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
         h.setBlock(to,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity a=h.getBlockEntity(from), b=h.getBlockEntity(to);
+        MachineBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,from), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,to);
         a.items().setStackInSlot(a.type().outputSlot(),new ItemStack(Items.IRON_INGOT,5));
         a.setEjectEnabled(0,true);
         var face=SideConfig.faceOf(Direction.NORTH,Direction.WEST);
@@ -68,7 +68,7 @@ public final class LogisticsGameTests {
         var pa=TestBuild.port(h,kind,ca,Direction.SOUTH,7,0,1,2);
         var pb=TestBuild.port(h,kind,cb,Direction.SOUTH,7,4,1,2);
         h.assertTrue(pa.distManhattan(pb)==1,"Test ports must share a face");
-        MachineBlockEntity a=h.getBlockEntity(ca),b=h.getBlockEntity(cb);
+        MachineBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,ca),b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,cb);
         a.items().setStackInSlot(a.type().outputSlot(),new ItemStack(Items.IRON_INGOT,9));
         h.succeedWhen(()->{
             h.assertTrue(a.structureSize()==7 && b.structureSize()==7,"Both structures must be formed");

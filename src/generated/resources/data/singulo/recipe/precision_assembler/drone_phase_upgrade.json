@@ -6,27 +6,19 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ender_pearls"
-      },
+      "ingredient": "#c:ender_pearls",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     }
   ],

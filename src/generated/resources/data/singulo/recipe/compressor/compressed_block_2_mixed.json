@@ -8,7 +8,7 @@
   "ingredients": [
     {
       "ingredient": {
-        "type": "neoforge:components",
+        "neoforge:ingredient_type": "neoforge:components",
         "items": "singulo:compressed_block_1",
         "components": {
           "singulo:mixed_source": true

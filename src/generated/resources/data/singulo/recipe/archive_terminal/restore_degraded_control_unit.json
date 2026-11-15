@@ -6,27 +6,19 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:ceramic_substrate"
-      },
+      "ingredient": "singulo:ceramic_substrate",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:ingots/copper"
-      },
+      "ingredient": "#c:ingots/copper",
       "count": 2
     }
   ],
-  "restore": {
-    "item": "singulo:degraded_control_unit"
-  },
+  "restore": "singulo:degraded_control_unit",
   "result": {
     "id": "singulo:control_unit",
     "count": 1

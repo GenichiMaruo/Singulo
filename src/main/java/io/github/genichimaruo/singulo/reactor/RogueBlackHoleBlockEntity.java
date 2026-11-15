@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
  * まわりのものを引き寄せ、地平線に触れたものを消して質量にする。壊せないが、同じ場所にリアクターを組み直すと
  * リアクターが取り込んで、その質量のまま稼働を始める（炉心の中心がこのブロックになるように組む）。
  */
-public class RogueBlackHoleBlockEntity extends BlockEntity {
+public class RogueBlackHoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     private double mass = PenroseReactorBlockEntity.MAX_MASS;
     private double spin;
     /**
@@ -144,7 +144,7 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
     /** 蒸発しきって消える: まぶしい光と衝撃（ブロックは壊さない）。 */
     private void vanish(ServerLevel level) {
         Vec3 c = center();
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLASH, c.x, c.y, c.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 1, 0, 0, 0, 0);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, c.x, c.y, c.z, 80, 0.3, 0.3, 0.3, 0.4);
         level.explode(null, c.x, c.y, c.z, 3.0F, Level.ExplosionInteraction.NONE);
         level.removeBlock(worldPosition, false);
@@ -157,7 +157,7 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             CLIENT_LOADED.add(this);
         }
     }
@@ -193,12 +193,12 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("mass")) {
-            mass = tag.getDouble("mass");
-            spin = tag.getDouble("spin");
+            mass = tag.getDoubleOr("mass", 0.0D);
+            spin = tag.getDoubleOr("spin", 0.0D);
         }
-        stable = tag.getBoolean("stable");
+        stable = tag.getBooleanOr("stable", false);
         if (tag.contains("last_tick")) {
-            lastTick = tag.getLong("last_tick");
+            lastTick = tag.getLongOr("last_tick", 0L);
         }
     }
 

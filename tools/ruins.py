@@ -40,7 +40,7 @@ AIR = 'minecraft:air'
 FRAME = 'minecraft:polished_deepslate'
 DARK = 'minecraft:deepslate_tiles'
 SCREEN = 'minecraft:tinted_glass'
-CHAIN_Y = ('minecraft:chain', {'axis': 'y', 'waterlogged': 'false'})
+CHAIN_Y = ('minecraft:iron_chain', {'axis': 'y', 'waterlogged': 'false'})
 
 
 class Builder:

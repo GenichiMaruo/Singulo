@@ -6,22 +6,16 @@
   "energy": 2000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_catalyst"
-      },
+      "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 36000
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     }
   ],

@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.client;
 
 import io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -72,14 +72,14 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY) || !menu.getCarried().isEmpty()) {
             return;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + OX + BAR_X - 1, topPos + BAR_Y - 1, 8, BAR_H + 2)) {
-            g.renderComponentTooltip(font, Panel.energyLines(menu.value(WormholeStabilizerMenu.D_ENERGY),
+            g.setComponentTooltipForNextFrame(font, Panel.energyLines(menu.value(WormholeStabilizerMenu.D_ENERGY),
                     menu.value(WormholeStabilizerMenu.D_CAPACITY)), mouseX, mouseY);
             return;
         }
@@ -87,18 +87,18 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
         for (int i = 0; i < 4; i++) {
             int[] p = WormholeStabilizerMenu.SLOT_POS[i];
             if (!menu.slots.get(i).hasItem() && Panel.inside(mouseX, mouseY, leftPos + p[0], topPos + p[1], 16, 16)) {
-                g.renderTooltip(font, Component.translatable(empty[i]), mouseX, mouseY);
+                g.setTooltipForNextFrame(font, Component.translatable(empty[i]), mouseX, mouseY);
                 return;
             }
         }
     }
 
     private static ItemStack item(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int x = leftPos + OX;
@@ -110,7 +110,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
             int[] p = WormholeStabilizerMenu.SLOT_POS[i];
             chamber(g, leftPos + p[0], topPos + p[1], menu.progress(i), CHAMBER[i], t);
             ghostSlot(g, leftPos + p[0], topPos + p[1], menu.slots.get(i), item("unstable_wormhole_mouth"));
-            g.renderOutline(leftPos + p[0] - 2, topPos + p[1] - 2, 20, 20, CHAMBER[i]);
+            g.outline(leftPos + p[0] - 2, topPos + p[1] - 2, 20, 20, CHAMBER[i]);
             chamberStat(g, i, p);
         }
         int[] fuel = WormholeStabilizerMenu.SLOT_POS[2];
@@ -121,7 +121,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     /** 喉の下: 固定化中は％、待ちは「…」、完了は星（空きは見本だけで何も出さない）。 */
-    private void chamberStat(GuiGraphics g, int i, int[] p) {
+    private void chamberStat(GuiGraphicsExtractor g, int i, int[] p) {
         int state = chamberState(i);
         int sx = p[0] + 2;
         int sy = p[1] + 24;
@@ -145,7 +145,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     /** 真ん中のワームホール: 黒い喉と、回る渦の腕（動いている間は速く明るい）。 */
-    private void wormhole(GuiGraphics g, int cx, int cy, float t) {
+    private void wormhole(GuiGraphicsExtractor g, int cx, int cy, float t) {
         boolean on = working();
         float speed = on ? 0.12F : 0.025F;
         int arms = 4;
@@ -177,7 +177,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     /** 左右の喉から真ん中へ流れる光（動いている喉だけ）。x は中身の左端。 */
-    private void conduits(GuiGraphics g, int x, int y, float t) {
+    private void conduits(GuiGraphicsExtractor g, int x, int y, float t) {
         for (int i = 0; i < 2; i++) {
             if (menu.progress(i) <= 0) {
                 continue;
@@ -200,7 +200,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     /** 喉の周りの、固定化の進みに合わせて灯る16個の光点。 */
-    private static void chamber(GuiGraphics g, int sx, int sy, float progress, int color, float t) {
+    private static void chamber(GuiGraphicsExtractor g, int sx, int sy, float progress, int color, float t) {
         int cx = sx + 8;
         int cy = sy + 8;
         int lit = Math.round(progress * 16);
@@ -219,7 +219,7 @@ public class WormholeStabilizerScreen extends FramedScreen<WormholeStabilizerMen
     }
 
     /** 電力: 下から満ちる縦の光（赤紫→水色）。 */
-    private void energyBar(GuiGraphics g, int x, int y, float t) {
+    private void energyBar(GuiGraphicsExtractor g, int x, int y, float t) {
         Panel.well(g, skin, x, y, 6, BAR_H);
         int cap = Math.max(1, menu.value(WormholeStabilizerMenu.D_CAPACITY));
         int filled = Math.round(BAR_H * Math.min(1F, menu.value(WormholeStabilizerMenu.D_ENERGY) / (float) cap));

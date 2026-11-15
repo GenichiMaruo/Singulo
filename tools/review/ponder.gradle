@@ -3,14 +3,17 @@ allprojects {
     afterEvaluate {
         // Init scripts also visit buildSrc; only the mod project has these runs.
         if (!plugins.hasPlugin('net.neoforged.moddev')) return
+        sourceSets.main.java.srcDir(file('tools/review/common-src'))
         sourceSets.main.java.srcDir(file('tools/review/ponder-src'))
         if (providers.gradleProperty('ponderModsDir').isPresent()) {
             dependencies.add('localRuntime', fileTree(providers.gradleProperty('ponderModsDir').get()) { include '*.jar' })
         } else {
-            dependencies.add('localRuntime', 'maven.modrinth:create:UjX6dr61') { transitive = false }
+            tasks.named('runClient').configure {
+                doFirst { throw new GradleException('No verified Create/Ponder 26.1.2 artifact is available. Supply compatible jars explicitly with -PponderModsDir=...; never load the old 1.21.1 Create jar.') }
+            }
         }
         if (providers.gradleProperty('withSodium').isPresent()) {
-            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+            dependencies.add('localRuntime', 'maven.modrinth:sodium:zg4YQ9EL') { transitive = false }
         }
         neoForge.runs.client {
             gameDirectory = file('build/ponder-review')

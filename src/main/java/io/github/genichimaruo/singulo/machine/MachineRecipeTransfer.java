@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -29,7 +29,7 @@ public final class MachineRecipeTransfer {
         boolean catalystUsed = false;
         for (MachineRecipe.ItemInput ingredient : recipe.ingredients()) {
             boolean catalyst = menu.type().hasCatalystSlot()
-                    && Arrays.stream(ingredient.ingredient().getItems()).anyMatch(s -> CatalystHelper.tierOf(s) > 0);
+                    && ingredient.ingredient().items().map(holder -> new ItemStack(holder)).anyMatch(s -> CatalystHelper.tierOf(s) > 0);
             int target;
             if (catalyst) {
                 if (catalystUsed) return null;

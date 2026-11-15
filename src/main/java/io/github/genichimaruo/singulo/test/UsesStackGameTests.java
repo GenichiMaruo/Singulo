@@ -6,18 +6,18 @@ import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class UsesStackGameTests {
     private static ItemStack item(String id, int count) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)), count);
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)), count);
     }
 
     @GameTest(template="empty")
@@ -29,7 +29,7 @@ public final class UsesStackGameTests {
             h.assertFalse(UsesHelper.canUse(fresh,1),"Whole stack must not be consumed as one original");
             ItemStack used = UsesHelper.consume(fresh.copyWithCount(1),1);
             h.assertTrue(used.getCount()==1 && used.getMaxStackSize()==1,"Used item can stack: "+id);
-            ItemStack loaded = ItemStack.parse(h.getLevel().registryAccess(), used.save(h.getLevel().registryAccess())).orElseThrow();
+            ItemStack loaded = io.github.genichimaruo.singulo.compat.NbtCompat.parse(h.getLevel().registryAccess(), io.github.genichimaruo.singulo.compat.NbtCompat.save(used,h.getLevel().registryAccess())).orElseThrow();
             h.assertTrue(loaded.getMaxStackSize()==1 && UsesHelper.remaining(loaded)==UsesHelper.remaining(used),"Usage state lost after save: "+id);
             ItemStack exhausted = UsesHelper.consume(fresh.copyWithCount(1),UsesHelper.remaining(fresh));
             ItemStack repaired = UsesHelper.restore(exhausted,fresh.copyWithCount(1));
@@ -43,7 +43,7 @@ public final class UsesStackGameTests {
     public static void archiveTakesOneOriginalAndUsesOnlyThatOne(GameTestHelper h) {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity archive=h.getBlockEntity(pos);
+        MachineBlockEntity archive=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         ItemStack originals=item("observation_log",64);
         ItemStack simulated=archive.automationItems().insertItem(0,originals,true);
         h.assertTrue(simulated.getCount()==63 && archive.items().getStackInSlot(0).isEmpty(),"Simulation consumed originals");
@@ -65,7 +65,7 @@ public final class UsesStackGameTests {
     public static void menuShiftClickInsertsOnlyOneOriginalAndNormalMaterialsStillStack(GameTestHelper h) {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity archive=h.getBlockEntity(pos);
+        MachineBlockEntity archive=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             player.getInventory().setItem(9,item("quantum_data_fragment",64));

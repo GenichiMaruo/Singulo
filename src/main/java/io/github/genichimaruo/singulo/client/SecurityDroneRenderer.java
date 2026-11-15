@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.ruin.SecurityDrone;
-import net.minecraft.client.model.HierarchicalModel;
+
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -13,26 +13,26 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.EyesLayer;
+
+
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 /**
  * 警備ドローン: 白いセンサーの胴（暗い帯・上のふた・アンテナ）、光るレンズと下の砲身。周りを回る四角い輪と、
  * 4本の腕の先で回るローター。光る線は強さの色（水色・橙・赤）。突進の前はレンズが強く光って輪が速く回り、突進中は前に傾く。
  */
-public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDroneRenderer.Model> {
+public class SecurityDroneRenderer extends ExtractedMobRenderer<SecurityDrone, SecurityDroneRenderer.Model> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Singulo.id("security_drone"), "main");
-    private static final ResourceLocation TEXTURE = Singulo.id("textures/entity/security_drone.png");
+    private static final Identifier TEXTURE = Singulo.id("textures/entity/security_drone.png");
     private static final RenderType[] GLOW = {
-            RenderType.eyes(Singulo.id("textures/entity/security_drone_glow_1.png")),
-            RenderType.eyes(Singulo.id("textures/entity/security_drone_glow_2.png")),
-            RenderType.eyes(Singulo.id("textures/entity/security_drone_glow_3.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/security_drone_glow_1.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/security_drone_glow_2.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/security_drone_glow_3.png")),
     };
 
     public SecurityDroneRenderer(EntityRendererProvider.Context context) {
@@ -41,7 +41,7 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
     }
 
     @Override
-    public ResourceLocation getTextureLocation(SecurityDrone drone) {
+    public Identifier getTextureLocation(SecurityDrone drone) {
         return TEXTURE;
     }
 
@@ -62,7 +62,7 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
                 pose.translate(f.x, 0, f.z);
             }
             VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
-            var camera = entityRenderDispatcher.cameraOrientation();
+            var camera = entityRenderDispatcher.camera.rotation();
             float size = state == SecurityDrone.STATE_PULSE ? 1.6F : 0.9F;
             FxDraw.billboard(pose, vc, camera, size * pulse, rgb, 110);
             FxDraw.billboard(pose, vc, camera, size * 0.35F * pulse, 0xFFFFFF, 230);
@@ -71,12 +71,11 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
     }
 
     /** 光る線（レンズ・帯・輪の縁・砲口）。暗くても光る。 */
-    static final class Glow extends EyesLayer<SecurityDrone, Model> {
-        Glow(RenderLayerParent<SecurityDrone, Model> parent) {
+    static final class Glow extends ExtractedLayer<SecurityDrone, Model> {
+        Glow(ExtractedLayerParent<SecurityDrone, Model> parent) {
             super(parent);
         }
 
-        @Override
         public RenderType renderType() {
             return GLOW[0];
         }
@@ -123,7 +122,7 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
         return LayerDefinition.create(mesh, 64, 64);
     }
 
-    public static class Model extends HierarchicalModel<SecurityDrone> {
+    public static class Model extends ExtractedEntityModel<SecurityDrone> {
         private final ModelPart root;
         private final ModelPart body;
         private final ModelPart ring;

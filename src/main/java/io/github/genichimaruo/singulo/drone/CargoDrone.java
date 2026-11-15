@@ -1,7 +1,8 @@
 package io.github.genichimaruo.singulo.drone;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -63,8 +64,7 @@ public class CargoDrone extends Mob {
     /** 受け持っている便（0 はなし）。ステーションが壊されても便を最後まで飛ぶため、番号で探す。 */
     private long flightId;
     /** ワームホールをくぐって別の次元に来ているときの、ステーションのある次元（家の次元にいるときは null）。 */
-    @Nullable
-    private net.minecraft.resources.ResourceKey<Level> home;
+    private net.minecraft.resources.@Nullable ResourceKey<Level> home;
     /** 今の区間の目的地と通り道（目的地が変わったら探し直す。保存しない）。道が見つからなければ route は null。 */
     @Nullable
     private Vec3 legGoal;
@@ -116,14 +116,14 @@ public class CargoDrone extends Mob {
     /** ステーションの枠のドローンを出す。printing なら station の上で印刷から始める。 */
     @Nullable
     public static CargoDrone spawn(ServerLevel level, BlockPos station, int unit, DroneKind kind, Vec3 at, boolean printing) {
-        CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
+        CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level, EntitySpawnReason.TRIGGERED);
         if (d == null) {
             return null;
         }
         d.station = station;
         d.unit = unit;
         d.entityData.set(KIND, kind.ordinal());
-        d.moveTo(at.x, at.y, at.z, level.random.nextFloat() * 360, 0);
+        d.snapTo(at.x, at.y, at.z, level.getRandom().nextFloat() * 360, 0);
         if (printing) {
             d.entityData.set(PRINT, 0);
         }
@@ -154,14 +154,14 @@ public class CargoDrone extends Mob {
             Vec3 at = new Vec3(ax, Math.max(goal.getY() + 3, ground + DroneRoute.CLEARANCE), az);
             Vec3 dock = new Vec3(ax, goal.getY() + 1 + DronePortBlockEntity.WAIT_LIFT, az);
             if (back == 0 && DroneRoute.clearAt(level, dock)) at = dock;
-            CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
+            CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level, EntitySpawnReason.TRIGGERED);
             if (d == null) {
                 return false;
             }
             d.station = f.station;
             d.unit = f.unit;
             d.home = f.homeDim;
-            d.moveTo(at.x, at.y, at.z, (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG) + 180, 0);
+            d.snapTo(at.x, at.y, at.z, (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG) + 180, 0);
             d.showCrate(f.crate);
             d.flightId = f.id;
             d.phase = f.phase;
@@ -180,8 +180,8 @@ public class CargoDrone extends Mob {
      * （別の次元に来たとき。家に帰ってきたときは null）。出せたら true。
      */
     static boolean emerge(ServerLevel level, DroneNetwork net, DroneNetwork.Flight f, Vec3 at,
-            @Nullable net.minecraft.resources.ResourceKey<Level> home) {
-        CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level);
+            net.minecraft.resources.@Nullable ResourceKey<Level> home) {
+        CargoDrone d = SinguloEntities.CARGO_DRONE.get().create(level, EntitySpawnReason.TRIGGERED);
         if (d == null) {
             return false;
         }
@@ -190,7 +190,7 @@ public class CargoDrone extends Mob {
         d.home = home;
         BlockPos goal = f.target();
         float yaw = goal == null ? 0 : (float) (Mth.atan2(goal.getZ() + 0.5 - at.z, goal.getX() + 0.5 - at.x) * Mth.RAD_TO_DEG) - 90;
-        d.moveTo(at.x, at.y, at.z, yaw, 0);
+        d.snapTo(at.x, at.y, at.z, yaw, 0);
         d.yBodyRot = yaw;
         d.yHeadRot = yaw;
         d.showCrate(f.crate);
@@ -297,7 +297,7 @@ public class CargoDrone extends Mob {
     // ------------------------------------------------------------------ 傷つかない・押されない・消えない
 
     @Override
-    public boolean isInvulnerableTo(DamageSource source) {
+    public boolean isInvulnerableTo(ServerLevel damageLevel, DamageSource source) {
         return !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
     }
 
@@ -319,12 +319,7 @@ public class CargoDrone extends Mob {
         return false;
     }
 
-    @Override
-    protected boolean shouldDespawnInPeaceful() {
-        return false;
-    }
-
-    /** 自分では動かない（tick で位置を決める）。 */
+/** 自分では動かない（tick で位置を決める）。 */
     @Override
     public void travel(Vec3 input) {}
 
@@ -519,8 +514,7 @@ public class CargoDrone extends Mob {
     }
 
     /** 受け持っている便（番号で。なければ、ステーションに任された新しい便を探す）。 */
-    @Nullable
-    private DroneNetwork.Flight flight(DroneNetwork net) {
+    private DroneNetwork.@Nullable Flight flight(DroneNetwork net) {
         DroneNetwork.Flight f = flightId == 0 ? null : net.flight(flightId);
         if (f == null && station != null && !away()) {
             f = net.flightOf(station, unit);
@@ -681,10 +675,11 @@ public class CargoDrone extends Mob {
     // ------------------------------------------------------------------ 保存
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         if (station != null) {
-            tag.put("station", NbtUtils.writeBlockPos(station));
+            tag.put("station", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(station));
         }
         tag.putInt("unit", unit);
         tag.putInt("print", entityData.get(PRINT));
@@ -692,20 +687,23 @@ public class CargoDrone extends Mob {
         tag.putBoolean("phase", phase);
         tag.putInt("kind", entityData.get(KIND));
         if (home != null) {
-            tag.putString("home", home.location().toString());
+            tag.putString("home", home.identifier().toString());
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        station = NbtUtils.readBlockPos(tag, "station").orElse(null);
-        unit = Mth.clamp(tag.getInt("unit"), 0, DroneStationBlockEntity.MAX_UNITS - 1);
-        entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
-        flightId = tag.getLong("flight");
-        phase = tag.getBoolean("phase");
-        entityData.set(KIND, DroneKind.byId(tag.getInt("kind")).ordinal());
-        var loc = tag.contains("home") ? net.minecraft.resources.ResourceLocation.tryParse(tag.getString("home")) : null;
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        station = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "station").orElse(null);
+        unit = Mth.clamp(tag.getIntOr("unit", 0), 0, DroneStationBlockEntity.MAX_UNITS - 1);
+        entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getIntOr("print", 0), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
+        flightId = tag.getLongOr("flight", 0L);
+        phase = tag.getBooleanOr("phase", false);
+        entityData.set(KIND, DroneKind.byId(tag.getIntOr("kind", 0)).ordinal());
+        var loc = tag.contains("home") ? net.minecraft.resources.Identifier.tryParse(tag.getStringOr("home", "")) : null;
         home = loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 }

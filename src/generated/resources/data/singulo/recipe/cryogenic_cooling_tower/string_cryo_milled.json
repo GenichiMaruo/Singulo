@@ -6,9 +6,7 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "minecraft:wool"
-      },
+      "ingredient": "#minecraft:wool",
       "count": 1
     }
   ],

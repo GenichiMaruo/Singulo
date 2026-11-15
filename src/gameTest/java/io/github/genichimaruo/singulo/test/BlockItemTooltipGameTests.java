@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.storage.HorizonVaultBlockEntity;
 import java.util.List;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -19,8 +19,8 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** Exercise the registered ItemStack tooltip path, including BlockItem's delegation. */
 @GameTestHolder("singulo")
@@ -84,7 +84,7 @@ public final class BlockItemTooltipGameTests {
         stack.set(SinguloComponents.PORT_RECEIVE_FLUID.get(), SimpleFluidContent.copyOf(receive));
         CompoundTag data = new CompoundTag();
         data.putString("id", "singulo:fluid_drone_port");
-        stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(data));
+        stack.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_DRONE_PORT.get(), data));
         stack.set(DataComponents.MAX_STACK_SIZE, 1);
         stack.set(SinguloComponents.MIXED_SOURCE.get(), true);
         for (var flag : List.of(TooltipFlag.NORMAL, TooltipFlag.ADVANCED)) {

@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:tuff"
-      },
+      "ingredient": "minecraft:tuff",
       "count": 8
     }
   ],

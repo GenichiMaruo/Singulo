@@ -6,27 +6,19 @@
   "energy": 200000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:ergosphere_chapter"
-      },
+      "ingredient": "singulo:ergosphere_chapter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:jet_condensate"
-      },
+      "ingredient": "singulo:jet_condensate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 2
     }
   ],

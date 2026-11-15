@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * アンドロイドの顔のアイコン（11×11）。実際のテクスチャの顔（8×8）をデフォルメしたもの:
@@ -30,7 +30,7 @@ final class AndroidFace {
         };
     }
 
-    static void draw(GuiGraphics g, int x, int y, int accent) {
+    static void draw(GuiGraphicsExtractor g, int x, int y, int accent) {
         Colors c = colors(accent);
         for (int j = 0; j < FACE.length; j++) {
             String row = FACE[j];

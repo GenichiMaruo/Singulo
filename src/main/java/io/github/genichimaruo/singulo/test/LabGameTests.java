@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
@@ -26,8 +26,8 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 地下アンドロイド研究所: 部屋の並び・部品・型紙・電力・耐圧殻。 */
 @GameTestHolder(Singulo.MODID)
@@ -175,11 +175,11 @@ public final class LabGameTests {
         helper.assertTrue(sizes.size() >= 10, "部屋の大きさの種類が少ない: " + sizes);
         StructureTemplate boss = template(helper, LabLayout.BOSS).orElseThrow();
         var caches = boss.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), SinguloBlocks.RUIN_CACHE.get());
-        helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null && "android_lab".equals(caches.get(0).nbt().getString("ruin")),
+        helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null && "android_lab".equals(caches.get(0).nbt().getStringOr("ruin", "")),
                 "ボス部屋に研究所の保管庫が1つない");
         helper.assertTrue(count(boss, SinguloBlocks.GUARDIAN_CORE.get()) == 1, "ボス部屋に封印核がない");
         helper.assertTrue(boss.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
-                net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(Singulo.id("sealed_container_3"))).size() == 1, "ボス部屋に封印コンテナがない");
+                net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(Singulo.id("sealed_container_3"))).size() == 1, "ボス部屋に封印コンテナがない");
         helper.assertTrue(count(boss, SinguloBlocks.FACTORY_LINE.get()) == 4, "ボス部屋の製造ラインが4つでない");
         helper.assertTrue(count(boss, SinguloBlocks.PRESSURE_HULL.get()) > 1000, "ボス部屋の壁が耐圧殻でない");
         StructureTemplate reactor = template(helper, LabLayout.REACTOR).orElseThrow();
@@ -202,7 +202,7 @@ public final class LabGameTests {
         helper.setBlock(door, SinguloBlocks.BULKHEAD.get());
         BlockPos outside = new BlockPos(6, 1, 6);
         helper.setBlock(outside, SinguloBlocks.FACILITY_LIGHT.get());
-        ReactorConsoleBlockEntity be = helper.getBlockEntity(console);
+        ReactorConsoleBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,console);
         be.setFacility(BoundingBox.fromCorners(helper.absolutePos(new BlockPos(0, 0, 0)), helper.absolutePos(new BlockPos(5, 4, 5))));
         helper.assertTrue(helper.getLevel().getLightEmission(helper.absolutePos(alarm)) > 0, "電力がないのに非常灯が消えている");
         helper.assertTrue(helper.getLevel().getLightEmission(helper.absolutePos(lamp)) == 0, "電力がないのに施設灯が光っている");
@@ -224,7 +224,7 @@ public final class LabGameTests {
     private static void draw(GameTestHelper helper, net.minecraft.world.level.levelgen.structure.StructurePiece piece) {
         var level = helper.getLevel();
         piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), net.minecraft.util.RandomSource.create(0),
-                piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
+                piece.getBoundingBox(), net.minecraft.world.level.ChunkPos.containing(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
     }
 
     /** 耐圧殻は部屋の箱から2マス以内だけ（部屋の中と、3マス以上離れた所は描かない）。 */
@@ -321,7 +321,7 @@ public final class LabGameTests {
      */
     @GameTest(template = EMPTY)
     public static void labIsPlacedAfterSculk(GameTestHelper helper) {
-        var lab = helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).get(Singulo.id("android_lab"));
+        var lab = helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,Singulo.id("android_lab"))).value();
         helper.assertTrue(lab != null, "研究所の構造物がない");
         var step = lab.step();
         helper.assertTrue(step.ordinal() > net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_DECORATION.ordinal()
@@ -359,13 +359,13 @@ public final class LabGameTests {
             var chests = t.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), net.minecraft.world.level.block.Blocks.CHEST);
             helper.assertFalse(chests.isEmpty(), room.getKey() + " にチェストがない");
             for (var info : chests) {
-                helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").equals(Singulo.MODID + ":chests/" + room.getValue()),
+                helper.assertTrue(info.nbt() != null && info.nbt().getStringOr("LootTable", "").equals(Singulo.MODID + ":chests/" + room.getValue()),
                         room.getKey() + " のチェストの中身が " + room.getValue() + " でない");
             }
         }
         for (var info : template(helper, "private_rooms").orElseThrow().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
                 net.minecraft.world.level.block.Blocks.BARREL)) {
-            helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").endsWith("chests/lab_locker"), "個室のロッカーが空");
+            helper.assertTrue(info.nbt() != null && info.nbt().getStringOr("LootTable", "").endsWith("chests/lab_locker"), "個室のロッカーが空");
         }
         helper.succeed();
     }
@@ -373,7 +373,7 @@ public final class LabGameTests {
     // ------------------------------------------------------------------ 自販機・コーヒーメーカー
 
     private static net.minecraft.world.item.Item item(String id) {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     /**
@@ -449,10 +449,10 @@ public final class LabGameTests {
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);           // クリエイティブでは飲んでも減らない（瓶も残らない）
         new net.minecraft.world.item.ItemStack(item("energy_drink")).finishUsingItem(level, player);
-        var haste = player.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED);
+        var haste = player.getEffect(net.minecraft.world.effect.MobEffects.HASTE);
         helper.assertTrue(haste != null && haste.getAmplifier() == 1, "エナジードリンクで採掘速度上昇 II がつかない");
         new net.minecraft.world.item.ItemStack(item("canned_soda")).finishUsingItem(level, player);
-        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED), "ソーダで移動速度上昇がつかない");
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.SPEED), "ソーダで移動速度上昇がつかない");
         new net.minecraft.world.item.ItemStack(item("sports_drink")).finishUsingItem(level, player);
         helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION), "スポーツドリンクで再生がつかない");
         var rest = net.minecraft.stats.Stats.CUSTOM.get(net.minecraft.stats.Stats.TIME_SINCE_REST);
@@ -525,8 +525,8 @@ public final class LabGameTests {
     @GameTest(template = EMPTY)
     public static void onlyTheWhiteSlidingDoorIsCraftable(GameTestHelper helper) {
         var level = helper.getLevel();
-        java.util.function.Predicate<net.minecraft.world.item.Item> craftable = item -> level.getRecipeManager().getRecipes().stream()
-                .anyMatch(r -> r.value().getResultItem(level.registryAccess()).is(item));
+        java.util.function.Predicate<net.minecraft.world.item.Item> craftable = item -> level.getServer().getRecipeManager().getRecipes().stream()
+                .anyMatch(r -> io.github.genichimaruo.singulo.test.harness.TestRecipe.result(r.value(),level).is(item));
         helper.assertFalse(craftable.test(SinguloBlocks.LAB_DOOR.get().asItem()), "研究所のドアにレシピがある");
         helper.assertTrue(craftable.test(SinguloBlocks.WHITE_SLIDING_DOOR.get().asItem()), "ホワイトスライドドアにレシピがない");
         BlockPos at = new BlockPos(2, 1, 2);

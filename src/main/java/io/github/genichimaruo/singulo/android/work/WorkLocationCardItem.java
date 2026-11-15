@@ -1,18 +1,18 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.Blocks;
  * レシピ棚の行の左に置くと、その行のレシピを作る場所になる。作業指令台を記録したカードで資材口・納品口・レシピ棚を
  * 右クリックすると、その指令台につなぐ（もう一度で外す）。
  */
-public class WorkLocationCardItem extends Item {
+public class WorkLocationCardItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     private static final String KEY = "work_location";
 
     public WorkLocationCardItem(Properties properties) {
@@ -49,15 +49,15 @@ public class WorkLocationCardItem extends Item {
                 if (console == null || !sameDimension(context.getItemInHand(), server)) return InteractionResult.PASS;
                 var result = io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints.link(
                         server, console, player.getUUID(), context.getClickedPos());
-                player.displayClientMessage(Component.translatable("message.singulo.work_link.endpoint_result", result.name()), true);
+                player.sendOverlayMessage(Component.translatable("message.singulo.work_link.endpoint_result", result.name()));
             }
-            return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(context.getLevel().isClientSide());
         }
         if (player == null || !player.isSecondaryUseActive()) {
             return InteractionResult.PASS;
         }
         Level level = context.getLevel();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             BlockPos pos = context.getClickedPos();
             Block block = level.getBlockState(pos).getBlock();
             ItemStack held = context.getItemInHand();
@@ -66,32 +66,32 @@ public class WorkLocationCardItem extends Item {
             if (card != held && !player.getInventory().add(card)) {
                 player.drop(card, false);
             }
-            player.displayClientMessage(Component.translatable("message.singulo.work_location.recorded",
-                    block.getName(), pos.getX(), pos.getY(), pos.getZ()), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.work_location.recorded",
+                    block.getName(), pos.getX(), pos.getY(), pos.getZ()));
             level.playSound(null, pos, SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, net.minecraft.sounds.SoundSource.PLAYERS, 0.6F, 1.6F);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     /** 何もない所でシフト右クリック: 記録を消す。 */
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!player.isSecondaryUseActive() || pos(stack) == null) {
-            return InteractionResultHolder.pass(stack);
+            return io.github.genichimaruo.singulo.compat.Interactions.pass(stack);
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             clear(stack);
-            player.displayClientMessage(Component.translatable("message.singulo.work_location.cleared"), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.work_location.cleared"));
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     /** 記録する（記録したカードは重ならない）。 */
     public static void record(ItemStack card, Level level, BlockPos pos, Block block) {
         CompoundTag t = new CompoundTag();
         t.putLong("pos", pos.asLong());
-        t.putString("dim", level.dimension().location().toString());
+        t.putString("dim", level.dimension().identifier().toString());
         t.putString("block", BuiltInRegistries.BLOCK.getKey(block).toString());
         CustomData.update(DataComponents.CUSTOM_DATA, card, tag -> tag.put(KEY, t));
         card.set(DataComponents.MAX_STACK_SIZE, 1);
@@ -115,20 +115,20 @@ public class WorkLocationCardItem extends Item {
             return null;
         }
         CompoundTag tag = data.copyTag();
-        return tag.contains(KEY) ? tag.getCompound(KEY) : null;
+        return tag.contains(KEY) ? tag.getCompoundOrEmpty(KEY) : null;
     }
 
     /** 記録した位置（記録がなければ null）。 */
     @Nullable
     public static BlockPos pos(ItemStack card) {
         CompoundTag t = data(card);
-        return t == null ? null : BlockPos.of(t.getLong("pos"));
+        return t == null ? null : BlockPos.of(t.getLongOr("pos", 0L));
     }
 
     /** 記録した位置が、この次元のものか。 */
     public static boolean sameDimension(ItemStack card, Level level) {
         CompoundTag t = data(card);
-        return t != null && t.getString("dim").equals(level.dimension().location().toString());
+        return t != null && t.getStringOr("dim", "").equals(level.dimension().identifier().toString());
     }
 
     /** 記録したブロックの種類（記録がなければ空気）。 */
@@ -137,8 +137,8 @@ public class WorkLocationCardItem extends Item {
         if (t == null) {
             return Blocks.AIR;
         }
-        ResourceLocation id = ResourceLocation.tryParse(t.getString("block"));
-        return id == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(id);
+        Identifier id = Identifier.tryParse(t.getStringOr("block", ""));
+        return id == null ? Blocks.AIR : BuiltInRegistries.BLOCK.getValue(id);
     }
 
     public static boolean isCard(ItemStack stack) {

@@ -6,9 +6,7 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:rods/blaze"
-      },
+      "ingredient": "#c:rods/blaze",
       "count": 1
     }
   ],

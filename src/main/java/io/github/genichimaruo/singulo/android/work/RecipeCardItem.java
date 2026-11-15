@@ -12,25 +12,25 @@ import net.minecraft.world.item.TooltipFlag;
  * 未記録のカードは64枚まで重なり、記録したカードは重ならない。何もない所でシフト右クリックすると、記録を消す。
  * シフトを押している間は、作る物の絵が重なって見える。
  */
-public class RecipeCardItem extends Item {
+public class RecipeCardItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public RecipeCardItem(Properties properties) {
         super(properties.stacksTo(64));
     }
 
     /** 何もない所でシフト右クリック: 記録を消す。 */
     @Override
-    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level,
+    public net.minecraft.world.InteractionResult use(net.minecraft.world.level.Level level,
                                                                      net.minecraft.world.entity.player.Player player,
                                                                      net.minecraft.world.InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!player.isSecondaryUseActive() || RecipeData.read(stack, level.registryAccess()) == null) {
-            return net.minecraft.world.InteractionResultHolder.pass(stack);
+            return io.github.genichimaruo.singulo.compat.Interactions.pass(stack);
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             RecipeData.clear(stack);
-            player.displayClientMessage(Component.translatable("message.singulo.recipe_card.cleared"), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.recipe_card.cleared"));
         }
-        return net.minecraft.world.InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     public static boolean isCard(ItemStack stack) {

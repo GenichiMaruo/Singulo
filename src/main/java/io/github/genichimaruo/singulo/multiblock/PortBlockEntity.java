@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.multiblock;
 
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * 搬入出口。形成したコントローラが自分の位置を書き込み、壊れると消す（保存はせず、読み込み後の判定で付け直す）。
  */
-public class PortBlockEntity extends BlockEntity {
+public class PortBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     @Nullable
     private BlockPos controller;
 
@@ -53,8 +53,8 @@ public class PortBlockEntity extends BlockEntity {
     protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         // 同期のときだけ入っている（保存はしない。読み込み後の形の判定で付け直す）
-        if (level != null && level.isClientSide) {
-            controller = tag.contains("controller") ? BlockPos.of(tag.getLong("controller")) : null;
+        if (level != null && level.isClientSide()) {
+            controller = tag.contains("controller") ? BlockPos.of(tag.getLongOr("controller", 0L)) : null;
         }
     }
 
@@ -66,11 +66,11 @@ public class PortBlockEntity extends BlockEntity {
 
     /** パイプやケーブルに見せる口（いつも同じ物。中でつながっているコントローラの口へ渡す。{@link PortProxies}）。 */
     private final PortProxies.Energy energyProxy = new PortProxies.Energy(
-            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK));
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK));
     private final PortProxies.Items itemProxy = new PortProxies.Items(
-            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK));
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK));
     private final PortProxies.Fluids fluidProxy = new PortProxies.Fluids(
-            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK));
+            () -> delegate(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK));
 
     public PortProxies.Energy energyProxy() {
         return energyProxy;

@@ -7,18 +7,10 @@
     "G G"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_glass"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    },
-    "O": {
-      "tag": "c:obsidians"
-    },
-    "G": {
-      "item": "singulo:intact_ruin_glass"
-    }
+    "B": "singulo:blueprint_ruin_glass",
+    "S": "#c:plates/steel",
+    "O": "#c:obsidians",
+    "G": "singulo:intact_ruin_glass"
   },
   "result": {
     "id": "singulo:reinforced_ruin_glass",

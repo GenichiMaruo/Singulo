@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -88,7 +88,7 @@ public class AndroidLaser extends Entity {
                 }
                 hit.add(e.getUUID());
                 var source = owner instanceof LivingEntity le ? damageSources().mobAttack(le) : damageSources().magic();
-                e.hurt(source, DAMAGE);
+                e.hurtOrSimulate(source, DAMAGE);
             }
         }
         if (tickCount >= WARN + BEAM + 6) {
@@ -107,8 +107,13 @@ public class AndroidLaser extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {}
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {}
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        values.store(tag);
+    }
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
 }

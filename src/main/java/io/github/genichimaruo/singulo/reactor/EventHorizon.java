@@ -36,7 +36,7 @@ public final class EventHorizon {
         }
         DamageSource source = SinguloDamageTypes.eventHorizon(level);
         living.invulnerableTime = 0;
-        living.hurt(source, Float.MAX_VALUE);
+        living.hurtOrSimulate(source, Float.MAX_VALUE);
         if (!living.isDeadOrDying()) {
             living.setHealth(0);
             living.die(source);

@@ -6,28 +6,20 @@
   "energy": 10000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:amethyst_shard"
-      },
+      "ingredient": "minecraft:amethyst_shard",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 36000
     }
   ],
-  "restore": {
-    "item": "singulo:degraded_time_crystal_seed"
-  },
+  "restore": "singulo:degraded_time_crystal_seed",
   "result": {
     "id": "singulo:time_crystal_seed",
     "count": 1

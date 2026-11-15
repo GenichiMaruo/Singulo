@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.cosmic.CosmicMenu;
 import io.github.genichimaruo.singulo.energy.EnergyText;
 import java.util.List;
 import java.util.Locale;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -84,7 +84,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partial, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         float t = time(partial);
@@ -97,7 +97,8 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (button == 0 && minecraft != null && minecraft.gameMode != null) {
             for (int i = 0; i < 2; i++) {
                 if (Panel.inside(mouseX, mouseY, leftPos + portX(i), topPos + portY(), PORT_SIZE, PORT_SIZE)) {
@@ -108,7 +109,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     // ------------------------------------------------------------------ 搬入出ポート
@@ -128,7 +129,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     }
 
     /** 制御卓の左右のポートのボタン。押すと 入力 → 出力 → 両方 と切り替わる。 */
-    private void drawPorts(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawPorts(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int y = topPos + portY();
         int cx = leftPos + (portX(0) + PORT_SIZE + portX(1)) / 2;
         g.fill(cx - 4, y + 3, cx + 4, y + 11, 0xFF3A3650);
@@ -146,20 +147,20 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partial) {
-        super.render(g, mouseX, mouseY, partial);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
+        super.extractRenderState(g, mouseX, mouseY, partial);
+        extractTooltip(g, mouseX, mouseY);
         if (!renderFrameTooltips(g, mouseX, mouseY)) {
             renderStatTooltips(g, mouseX, mouseY);
         }
     }
 
-    private void well(GuiGraphics g, int x, int y, int w, int h) {
+    private void well(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         Panel.well(g, skin, leftPos + x, topPos + y, w, h);
         g.fill(leftPos + x, topPos + y, leftPos + x + w, topPos + y + h, 0xFF060814);
     }
 
-    private void energyBar(GuiGraphics g, double fraction, List<Component> tooltip) {
+    private void energyBar(GuiGraphicsExtractor g, double fraction, List<Component> tooltip) {
         Panel.gauge(g, skin, leftPos + BAR_X, topPos + BAR_Y, 6, BAR_H, fraction, Panel.GLOW);
         area(BAR_X - 1, BAR_Y - 1, 8, BAR_H + 2, tooltip);
     }
@@ -179,7 +180,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
 
     // ------------------------------------------------------------------ 重力懸垂タンク
 
-    private void drawReservoir(GuiGraphics g, float t) {
+    private void drawReservoir(GuiGraphicsExtractor g, float t) {
         int amount = menu.value(6);
         int capacity = Math.max(1, menu.value(7));
         int id = menu.value(11);
@@ -237,7 +238,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         return base | 0xFF000000;
     }
 
-    private void drawAccumulator(GuiGraphics g, float t) {
+    private void drawAccumulator(GuiGraphicsExtractor g, float t) {
         long stored = menu.value(2) * 1_000_000L;
         long capacity = Math.max(1, menu.value(3)) * 1_000_000L;
         long in = menu.value(4) * 1_000_000L;
@@ -323,7 +324,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
 
     // ------------------------------------------------------------------ 潮汐紡糸機
 
-    private void drawSpindle(GuiGraphics g, float t) {
+    private void drawSpindle(GuiGraphicsExtractor g, float t) {
         boolean core = menu.value(10) != 0;
         int duration = menu.value(9);
         float k = duration > 0 ? menu.value(8) / (float) duration : 0;
@@ -384,19 +385,19 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         energyBar(g, stored / (double) capacity, List.of(storedText));
     }
 
-    private void slotHint(GuiGraphics g, int x, int y, int slot, String ghost, Component hint) {
+    private void slotHint(GuiGraphicsExtractor g, int x, int y, int slot, String ghost, Component hint) {
         Panel.slot(g, skin, leftPos + x, topPos + y);
         if (menu.slots.get(slot).getItem().isEmpty()) {
-            g.renderFakeItem(new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), leftPos + x, topPos + y);
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 200);
+            g.fakeItem(new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(ghost))), leftPos + x, topPos + y);
+            g.pose().pushMatrix();
+            g.nextStratum();
             g.fill(leftPos + x, topPos + y, leftPos + x + 16, topPos + y + 16, 0xB0060814);
-            g.pose().popPose();
+            g.pose().popMatrix();
             area(x, y, 16, 16, List.of(hint));
         }
     }
 
-    private static void drum(GuiGraphics g, int x, int y, boolean core, float t, boolean working) {
+    private static void drum(GuiGraphicsExtractor g, int x, int y, boolean core, float t, boolean working) {
         // 胴の輪
         for (int a = 0; a < 40; a++) {
             float ang = a * Mth.TWO_PI / 40;
@@ -428,7 +429,7 @@ public final class CosmicScreen extends FramedScreen<CosmicMenu> {
         }
     }
 
-    private static void spool(GuiGraphics g, int x, int y, float k, float t, boolean working) {
+    private static void spool(GuiGraphicsExtractor g, int x, int y, float k, float t, boolean working) {
         int outer = 16;
         int wound = 5 + Math.round(9 * k);
         for (int dy = -outer; dy <= outer; dy++) {

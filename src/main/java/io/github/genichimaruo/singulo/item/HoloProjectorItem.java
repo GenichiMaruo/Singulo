@@ -78,10 +78,10 @@ public class HoloProjectorItem extends SinguloItem {
         Blueprints.Kind kind = Blueprints.kindOf(state.getBlock());
         Player player = context.getPlayer();
         if (kind == null) {
-            if (player != null && !level.isClientSide) {
-                player.displayClientMessage(Component.translatable("holo.singulo.not_controller"), true);
+            if (player != null && !level.isClientSide()) {
+                player.sendOverlayMessage(Component.translatable("holo.singulo.not_controller"));
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
         }
         ItemStack stack = context.getItemInHand();
         boolean resize = player != null && player.isShiftKeyDown();
@@ -90,12 +90,12 @@ public class HoloProjectorItem extends SinguloItem {
         }
         int size = size(stack, kind);
         Direction back = backOf(state);
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             io.github.genichimaruo.singulo.client.HologramRenderer.toggle(pos, kind, back, size, resize);
         } else if (player != null) {
             report(level, player, kind, pos, back, size);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     /** 必要なブロックと足りない数をチャットに出す。 */
@@ -120,34 +120,34 @@ public class HoloProjectorItem extends SinguloItem {
                 c[1]++;
             }
         }
-        player.displayClientMessage(Component.translatable("holo.singulo.header",
-                Component.translatable("multiblock.singulo." + kind.id()), size).withStyle(ChatFormatting.AQUA), false);
+        player.sendSystemMessage(Component.translatable("holo.singulo.header",
+                Component.translatable("multiblock.singulo." + kind.id()), size).withStyle(ChatFormatting.AQUA));
         int missing = 0;
         for (Map.Entry<Block, int[]> e : counts.entrySet()) {
             int[] c = e.getValue();
             missing += c[1];
-            player.displayClientMessage(Component.translatable("holo.singulo.line", e.getKey().getName(), c[0], c[1])
-                    .withStyle(c[1] == 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY), false);
+            player.sendSystemMessage(Component.translatable("holo.singulo.line", e.getKey().getName(), c[0], c[1])
+                    .withStyle(c[1] == 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY));
         }
         if (blocking > 0) {
-            player.displayClientMessage(Component.translatable("holo.singulo.blocking", blocking).withStyle(ChatFormatting.RED), false);
+            player.sendSystemMessage(Component.translatable("holo.singulo.blocking", blocking).withStyle(ChatFormatting.RED));
         }
         if (missing == 0 && blocking == 0) {
-            player.displayClientMessage(Component.translatable("holo.singulo.complete").withStyle(ChatFormatting.GREEN), false);
+            player.sendSystemMessage(Component.translatable("holo.singulo.complete").withStyle(ChatFormatting.GREEN));
         }
         // コラプサー内張りを置ける設備: 置ける場所の数と効き目（場所は投影の金色の枠）
         var spec = io.github.genichimaruo.singulo.multiblock.Shapes.spec(kind, size);
         if (spec != null && !spec.acceptsLining()) {
             // 内張りを置けない設備: 搬入出ポートに替えられる外装板の数（投影の水色の枠）
-            player.displayClientMessage(Component.translatable("holo.singulo.ports.report", spec.panelSlots(pos, back).size())
-                    .withStyle(ChatFormatting.AQUA), false);
+            player.sendSystemMessage(Component.translatable("holo.singulo.ports.report", spec.panelSlots(pos, back).size())
+                    .withStyle(ChatFormatting.AQUA));
         }
         if (spec != null && spec.acceptsLining()) {
             var lining = io.github.genichimaruo.singulo.registry.SinguloBlocks.COLLAPSAR_LINING.get();
             var slots = spec.liningSlots(pos, back);
             long lined = slots.stream().filter(p -> level.getBlockState(p).is(lining)).count();
-            player.displayClientMessage(Component.translatable("holo.singulo.lining.report", slots.size(), lined,
-                    io.github.genichimaruo.singulo.multiblock.CollapsarLining.MAX).withStyle(ChatFormatting.GOLD), false);
+            player.sendSystemMessage(Component.translatable("holo.singulo.lining.report", slots.size(), lined,
+                    io.github.genichimaruo.singulo.multiblock.CollapsarLining.MAX).withStyle(ChatFormatting.GOLD));
         }
     }
 

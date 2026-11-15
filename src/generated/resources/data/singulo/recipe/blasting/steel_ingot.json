@@ -1,9 +1,7 @@
 {
   "type": "minecraft:blasting",
   "category": "misc",
-  "ingredient": {
-    "item": "singulo:steel_blend"
-  },
+  "ingredient": "singulo:steel_blend",
   "result": {
     "id": "singulo:steel_ingot",
     "count": 1

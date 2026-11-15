@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.ruin;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -116,7 +116,7 @@ public class GravityRemnant extends RuinBoss {
         super(type, level, BossEvent.BossBarColor.PURPLE);
         this.xpReward = 800;
         setNoGravity(true);
-        if (!level.isClientSide && !BossScaling.hardMode()) {
+        if (!level.isClientSide() && !BossScaling.hardMode()) {
             // 読み込むときは、このあと保存した体力で上書きされる
             setEffectiveHealth(HEALTH_NORMAL);
         }
@@ -254,8 +254,8 @@ public class GravityRemnant extends RuinBoss {
     // ------------------------------------------------------------------ 戦闘
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         if (isDeadOrDying()) {
             return;
         }
@@ -478,16 +478,16 @@ public class GravityRemnant extends RuinBoss {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (emergeTicks() > 0 || RuinGuards.friendlyFire(source) || isInvulnerableTo(source)) {
-            return super.hurt(source, amount);
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (emergeTicks() > 0 || RuinGuards.friendlyFire(source) || isInvulnerableTo(damageLevel, source)) {
+            return super.hurtServer(damageLevel, source, amount);
         }
         boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
         if (shell() > 0 && !bypass && amount > 0) {
             // 殻がある間は、無敵時間の中でも外でも同じように軽くする（連打で軽減を外せないように）。
             // 殻が剥がれるのは、無敵時間の外で受けた一撃（その攻撃者にとって新しい一撃）が通ったときだけ
             boolean fresh = !inHurtWindow(source);
-            boolean hurt = super.hurt(source, amount * SHELL_FACTOR);
+            boolean hurt = super.hurtServer(damageLevel, source, amount * SHELL_FACTOR);
             if (hurt && fresh && shell() > 0) {
                 int piece = shell() - 1;
                 setShell(piece);
@@ -498,7 +498,7 @@ public class GravityRemnant extends RuinBoss {
             }
             return hurt;
         }
-        return super.hurt(source, amount);
+        return super.hurtServer(damageLevel, source, amount);
     }
 
     @Override
@@ -570,7 +570,7 @@ public class GravityRemnant extends RuinBoss {
             }
         } else if (t == DEATH_TICKS - 6) {
             // 一点につぶれて弾ける（ダメージはない）
-            level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 3, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 3, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, c.x, c.y, c.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y, c.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y, c.z, 80, 0.1, 0.1, 0.1, 0.6);
@@ -600,16 +600,20 @@ public class GravityRemnant extends RuinBoss {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("shell", shell());
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
         if (tag.contains("shell")) {
-            setShell(tag.getInt("shell"));
+            setShell(tag.getIntOr("shell", 0));
         }
     }
 }

@@ -8,7 +8,7 @@ import io.github.genichimaruo.singulo.multiblock.FixedShapeControllerBlockEntity
 import io.github.genichimaruo.singulo.multiblock.Shapes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  * その中で、仮想粒子の対がふっと生まれては離れ、また寄って消える（真空のゆらぎ）。鏡と鏡を細い光の筋がつなぐ。
  * 止まっている間は何も見えない（ただの真空）。
  */
-public class CasimirCavityRenderer implements BlockEntityRenderer<FixedShapeControllerBlockEntity.Cavity> {
+public class CasimirCavityRenderer extends SnapshotBlockRenderer<FixedShapeControllerBlockEntity.Cavity> {
     /** 部屋の中心から鏡までの距離。 */
     private static final float MIRROR = 1.5F;
     private static final int PAIRS = 14;
@@ -45,7 +45,7 @@ public class CasimirCavityRenderer implements BlockEntityRenderer<FixedShapeCont
         Vec3 offset = Vec3.atLowerCornerOf(center.subtract(be.getBlockPos())).add(0.5, 0.5, 0.5);
         float time = level.getGameTime() + partialTick;
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);
 
@@ -95,11 +95,11 @@ public class CasimirCavityRenderer implements BlockEntityRenderer<FixedShapeCont
 
     /** 水平な薄い膜（両面）。 */
     private static void sheet(PoseStack pose, VertexConsumer vc, float y, float half, int rgb, int alpha) {
-        FxDraw.box(pose, vc, -half, y, -half, half, y + 0.001F, half, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, rgb, alpha);
+        FxDraw.box(pose, vc, -half, y, -half, half, y + 0.001F, half, net.minecraft.util.LightCoordsUtil.FULL_BRIGHT, rgb, alpha);
     }
 
     @Override
-    public boolean shouldRenderOffScreen(FixedShapeControllerBlockEntity.Cavity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

@@ -1,96 +1,29 @@
 package io.github.genichimaruo.singulo.mixin;
 
-import com.mojang.blaze3d.platform.NativeImage;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.world.level.dimension.DimensionType;
+import com.mojang.blaze3d.textures.GpuTextureView;
+import io.github.genichimaruo.singulo.client.RayleighLightmapBanks;
+import io.github.genichimaruo.singulo.client.PreviewLighting;
+import net.minecraft.client.renderer.Lightmap;
+import net.minecraft.client.renderer.state.LightmapRenderState;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.*;
 
-/** Run the same vanilla color calculation for the additional local-noon banks. */
-@Mixin(LightTexture.class)
+/** Preserve vanilla GPU lightmap calculation and build independent artificial-sun banks. */
+@Mixin(Lightmap.class)
 public abstract class RayleighLightTextureMixin {
-    @Shadow @Final private Minecraft minecraft;
-    @Shadow private boolean updateLightTexture;
-    @Unique private boolean singulo$noonPass, singulo$wasDirty;
-    @Unique private DynamicTexture singulo$preview;
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void singulo$createPreview(net.minecraft.client.renderer.GameRenderer renderer, Minecraft client, CallbackInfo ci) {
-        singulo$preview = new DynamicTexture(16, 16, false);
-        singulo$preview.getPixels().fillRect(0, 0, 16, 16, -1);
-        singulo$preview.upload();
-        singulo$preview.setFilter(true, false);
+    @Shadow @Final private GpuTextureView textureView;
+    @Unique private RayleighLightmapBanks singulo$banks;
+    @Inject(method="render", at=@At("RETURN"))
+    private void singulo$banks(LightmapRenderState state, CallbackInfo ci) {
+        if (!state.needsUpdate || RayleighLightmapBanks.isNoonPass()) return;
+        if (singulo$banks == null) singulo$banks = new RayleighLightmapBanks();
+        singulo$banks.update(textureView, state);
     }
-    @Inject(method = "close", at = @At("HEAD"))
-    private void singulo$closePreview(CallbackInfo ci) { if (singulo$preview != null) singulo$preview.close(); }
-    @Inject(method = "turnOnLightLayer", at = @At("RETURN"))
-    private void singulo$bindPreview(CallbackInfo ci) {
-        if (io.github.genichimaruo.singulo.client.PreviewLighting.active() && singulo$preview != null) {
-            com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(2, singulo$preview.getId());
-            singulo$preview.bind();
-            singulo$preview.setFilter(true, false);
-        }
+    @Inject(method="getTextureView", at=@At("RETURN"), cancellable=true)
+    private void singulo$view(CallbackInfoReturnable<GpuTextureView> ci) {
+        if (singulo$banks != null && !PreviewLighting.active()) ci.setReturnValue(singulo$banks.view());
     }
-    @Unique private final int[] singulo$noonColors = new int[256];
-
-    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;<init>(IIZ)V"), index = 1)
-    private int singulo$height(int height) { return height * 32; }
-
-    @Inject(method = "updateLightTexture", at = @At("HEAD"))
-    private void singulo$before(float partialTick, CallbackInfo ci) {
-        if (!singulo$noonPass) singulo$wasDirty = updateLightTexture;
-    }
-    @Inject(method = "updateLightTexture", at = @At("RETURN"))
-    private void singulo$after(float partialTick, CallbackInfo ci) {
-        if (!singulo$noonPass && singulo$wasDirty && minecraft.level != null) {
-            singulo$noonPass = true;
-            try {
-                updateLightTexture = true;
-                ((LightTexture) (Object) this).updateLightTexture(partialTick);
-            } finally { singulo$noonPass = false; }
-        }
-    }
-    @ModifyExpressionValue(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getSkyDarken(F)F"))
-    // Preserve other mods' sky-darkening operations in the ordinary pass.
-    private float singulo$daylight(float original) { return singulo$noonPass ? 1 : original; }
-    @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getSkyFlashTime()I"))
-    private int singulo$lightning(ClientLevel level) { return singulo$noonPass ? 0 : level.getSkyFlashTime(); }
-    @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;forceBrightLightmap()Z"))
-    private boolean singulo$ordinarySun(DimensionSpecialEffects effects) { return !singulo$noonPass && effects.forceBrightLightmap(); }
-    @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LightTexture;getBrightness(Lnet/minecraft/world/level/dimension/DimensionType;I)F"))
-    private float singulo$brightness(DimensionType dimension, int light) {
-        if (!singulo$noonPass) return LightTexture.getBrightness(dimension, light);
-        float f = light / 15.0F;
-        return f / (4 - 3 * f); // Clear-noon Overworld ambient light is zero.
-    }
-    @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/NativeImage;setPixelRGBA(III)V"))
-    private void singulo$pixel(NativeImage image, int x, int y, int color) { image.setPixelRGBA(x, y + (singulo$noonPass ? 16 : 0), color); }
-    @Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V"))
-    private void singulo$upload(DynamicTexture texture) {
-        if (!singulo$noonPass) return;
-        NativeImage image = texture.getPixels();
-        // Keep ordinary 16x16 UVs valid for external previews. Copy before combined banks overwrite rows.
-        NativeImage preview = singulo$preview.getPixels();
-        for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) preview.setPixelRGBA(x, y, image.getPixelRGBA(x, y));
-        singulo$preview.upload();
-        // Rows 16..31 are temporary: copy before overwriting them with the combined banks.
-        int[] noon = singulo$noonColors;
-        for (int sky = 0; sky < 16; sky++) for (int block = 0; block < 16; block++) noon[sky * 16 + block] = image.getPixelRGBA(block, sky + 16);
-        // A separate contiguous noon ramp lets terrain use exactly the same GPU interpolation
-        // as vanilla. Entity shaders retain their direct texelFetch into the combined banks.
-        for (int sky = 0; sky < 16; sky++) for (int block = 0; block < 16; block++) image.setPixelRGBA(block, 256 + sky, noon[sky * 16 + block]);
-        for (int artificial = 1; artificial < 16; artificial++) for (int natural = 0; natural < 16; natural++) for (int block = 0; block < 16; block++) {
-            int a = image.getPixelRGBA(block, natural), b = noon[artificial * 16 + block];
-            int combined = 0xFF000000;
-            for (int shift = 0; shift <= 16; shift += 8) combined |= Math.max(a >>> shift & 255, b >>> shift & 255) << shift;
-            image.setPixelRGBA(block, artificial * 16 + natural, combined);
-        }
-        texture.upload();
-    }
+    @Inject(method="close", at=@At("HEAD"))
+    private void singulo$close(CallbackInfo ci) { if (singulo$banks != null) { singulo$banks.close(); singulo$banks = null; } }
 }

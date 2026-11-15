@@ -9,7 +9,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -17,8 +17,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /** 触媒専用スロット・単極子アップグレード・面の設定と自動排出の確認。 */
@@ -30,14 +30,14 @@ public final class MachineSlotGameTests {
     private MachineSlotGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     @GameTest(template = EMPTY)
     public static void catalystsOnlyGoIntoCatalystSlot(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         MachineType t = m.type();
         ItemStack catalyst = new ItemStack(item("time_crystal_catalyst"));
         helper.assertTrue(!m.items().insertItem(0, catalyst.copy(), true).isEmpty(), "触媒が普通の入力スロットに入る");
@@ -61,8 +61,8 @@ public final class MachineSlotGameTests {
         BlockPos b = new BlockPos(5, 1, 3);
         helper.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
         helper.setBlock(b, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
-        MachineBlockEntity plain = helper.getBlockEntity(a);
-        MachineBlockEntity boosted = helper.getBlockEntity(b);
+        MachineBlockEntity plain = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,a);
+        MachineBlockEntity boosted = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,b);
         boosted.items().setStackInSlot(boosted.type().upgradeSlot(), new ItemStack(item("monopole_upgrade")));
         helper.onEachTick(() -> {
             plain.energy().setEnergy(plain.energy().getMaxEnergyStored());
@@ -83,22 +83,22 @@ public final class MachineSlotGameTests {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get()
                 .defaultBlockState().setValue(AbstractMachineBlock.FACING, Direction.NORTH));
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         BlockPos abs = helper.absolutePos(pos);
         // 上の面を「入力だけ」に、後ろ（南）の面を「出力・自動排出」に
         m.setSide(0, SideConfig.Face.TOP, SideConfig.INPUT, false);
         m.setSide(0, SideConfig.Face.BACK, SideConfig.OUTPUT, true);
         m.setEjectEnabled(0, true);
         m.setSide(0, SideConfig.Face.LEFT, SideConfig.NONE, false);
-        IItemHandler top = helper.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, abs, Direction.UP);
-        IItemHandler left = helper.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, abs,
+        IItemHandler top = io.github.genichimaruo.singulo.compat.ItemResourceView.find(helper.getLevel(), abs, Direction.UP);
+        IItemHandler left = io.github.genichimaruo.singulo.compat.ItemResourceView.find(helper.getLevel(), abs,
                 SideConfig.directionOf(Direction.NORTH, SideConfig.Face.LEFT));
         helper.assertTrue(top != null && left == null, "面の設定が能力に効いていない");
         m.items().setStackInSlot(m.type().outputSlot(), new ItemStack(item("steel_plate"), 5));
         helper.assertTrue(top.extractItem(m.type().outputSlot(), 1, true).isEmpty(), "入力だけの面から取り出せる");
         helper.setBlock(pos.south(), Blocks.CHEST);
         helper.succeedWhen(() -> {
-            ChestBlockEntity chest = helper.getBlockEntity(pos.south());
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos.south());
             helper.assertTrue(chest.getItem(0).getCount() == 5, "後ろのチェストへ自動排出されない");
         });
     }

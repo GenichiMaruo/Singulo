@@ -12,7 +12,7 @@ import io.github.genichimaruo.singulo.ruin.HorizonBolt;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,8 +24,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** ボスの報酬（落とし物・経験値）、光弾の保存、重力の裂け目の当たり、叩きつけの死亡記録（PR #12 のレビューの回帰テスト）。 */
 @GameTestHolder(Singulo.MODID)
@@ -46,27 +46,19 @@ public final class BossRewardGameTests {
         server.getPlayerList().placeNewPlayer(connection, p, cookie);
         io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, p);
         p.setGameMode(GameType.SURVIVAL);
-        p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, 0, 0);
+        p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, java.util.Set.of(), 0, 0, true);
         return p;
     }
 
     /** 入ってきたばかりのプレイヤーの3秒の無敵を外す（このテストのプレイヤーは tick しないので、待っても切れない）。 */
-    private static void vulnerable(ServerPlayer p) {
-        try {
-            var f = ServerPlayer.class.getDeclaredField("spawnInvulnerableTime");
-            f.setAccessible(true);
-            f.setInt(p, 0);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+    private static void vulnerable(ServerPlayer p) { p.connection.markClientLoaded(); }
 
     private static void leave(GameTestHelper helper, ServerPlayer p) {
         helper.getLevel().getServer().getPlayerList().remove(p);
     }
 
     private static EchoSentinel sentinel(GameTestHelper helper, BlockPos home) {
-        EchoSentinel e = SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel());
+        EchoSentinel e = SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         e.awaken(helper.absolutePos(home));
         e.skipEmerging();
         Vec3 at = Vec3.atCenterOf(helper.absolutePos(home)).add(0, 2, 0);
@@ -82,12 +74,12 @@ public final class BossRewardGameTests {
         boss.setHealth(0);
         ItemEntity loot = boss.spawnAtLocation(new ItemStack(Items.DIAMOND), 0);
         helper.assertTrue(loot != null, "落とし物が出ない");
-        helper.assertTrue(loot.saveWithoutId(new CompoundTag()).getShort("Age") == -32768, "落とし物が時間で消える（無期限でない）");
+        helper.assertTrue(io.github.genichimaruo.singulo.test.harness.TestNbt.save(loot).getShortOr("Age", (short) 0) == -32768, "落とし物が時間で消える（無期限でない）");
         ItemEntity ordinary = new ItemEntity(helper.getLevel(), loot.getX(), loot.getY(), loot.getZ(), new ItemStack(Items.DIAMOND, 10));
         helper.getLevel().addFreshEntity(ordinary);
         helper.runAtTickTime(40, () -> {
             helper.assertTrue(!loot.isRemoved() && loot.getItem().getCount() == 1, "落とし物がほかのアイテムと結合した");
-            helper.assertTrue(loot.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED), "ブラックホールよけの印が消えた");
+            helper.assertTrue(loot.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false), "ブラックホールよけの印が消えた");
             helper.assertTrue(ordinary.getItem().getCount() == 10, "ふつうのアイテムに落とし物が混ざった: " + ordinary.getItem().getCount());
             boss.discard();
             loot.discard();
@@ -104,7 +96,7 @@ public final class BossRewardGameTests {
         try {
             int before = p.totalExperience;
             boss.setHealth(1);
-            boss.hurt(helper.getLevel().damageSources().playerAttack(p), 1000);
+            boss.hurtOrSimulate(helper.getLevel().damageSources().playerAttack(p), 1000);
             helper.assertTrue(boss.isDeadOrDying(), "倒れない");
             int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
             helper.assertTrue(p.totalExperience - before == want, "挑戦者に経験値が入らない: " + (p.totalExperience - before) + " / " + want);
@@ -136,7 +128,7 @@ public final class BossRewardGameTests {
             int beforeB = b.totalExperience;
             int beforeC = creative.totalExperience;
             boss.setHealth(1);
-            boss.hurt(helper.getLevel().damageSources().playerAttack(a), 1000);
+            boss.hurtOrSimulate(helper.getLevel().damageSources().playerAttack(a), 1000);
             int gotA = a.totalExperience - beforeA;
             int gotB = b.totalExperience - beforeB;
             int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
@@ -169,7 +161,7 @@ public final class BossRewardGameTests {
             }
             int before = party.stream().mapToInt(p -> p.totalExperience).sum();
             boss.setHealth(1);
-            boss.hurt(helper.getLevel().damageSources().playerAttack(party.get(0)), 1000);
+            boss.hurtOrSimulate(helper.getLevel().damageSources().playerAttack(party.get(0)), 1000);
             int got = party.stream().mapToInt(p -> p.totalExperience).sum() - before;
             int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
             helper.assertTrue(got == want, "人数ぶんの報酬を切ったのに合計が増えた: " + got + " / " + want);
@@ -188,13 +180,13 @@ public final class BossRewardGameTests {
         ServerPlayer p = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
         try {
             ItemStack chest = new ItemStack(Items.DIAMOND_CHESTPLATE);
-            chest.enchant(helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                    .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.MENDING), 1);
+            chest.enchant(helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                    .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.MENDING), 1);
             chest.setDamageValue(200);
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, chest);
             int before = p.totalExperience;
             boss.setHealth(1);
-            boss.hurt(helper.getLevel().damageSources().playerAttack(p), 1000);
+            boss.hurtOrSimulate(helper.getLevel().damageSources().playerAttack(p), 1000);
             ItemStack worn = p.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
             helper.assertTrue(worn.getDamageValue() < 200, "修繕で直らない: " + worn.getDamageValue());
             int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
@@ -213,14 +205,14 @@ public final class BossRewardGameTests {
         ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
         try {
             boss.setHealth(1);
-            boss.hurt(helper.getLevel().damageSources().playerAttack(far), 1000);
+            boss.hurtOrSimulate(helper.getLevel().damageSources().playerAttack(far), 1000);
             AABB around = new AABB(helper.absolutePos(new BlockPos(3, 1, 3))).inflate(12);
             var orbs = helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around);
             helper.assertTrue(!orbs.isEmpty(), "誰もいないのにオーブが出ない");
             int total = 0;
             for (ExperienceOrb orb : orbs) {
-                helper.assertTrue(orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED), "オーブにブラックホールよけの印がない");
-                helper.assertTrue(orb.saveWithoutId(new CompoundTag()).getShort("Age") < 0, "オーブがふつうの寿命のまま");
+                helper.assertTrue(orb.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false), "オーブにブラックホールよけの印がない");
+                helper.assertTrue(io.github.genichimaruo.singulo.test.harness.TestNbt.save(orb).getShortOr("Age", (short) 0) < 0, "オーブがふつうの寿命のまま");
                 total += orb.getValue();
                 orb.discard();
             }
@@ -260,7 +252,7 @@ public final class BossRewardGameTests {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
         boss.setHealth(1);
-        boss.hurt(helper.getLevel().damageSources().playerAttack(far), 1000);
+        boss.hurtOrSimulate(helper.getLevel().damageSources().playerAttack(far), 1000);
         leave(helper, far);
         boss.discard();
         int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
@@ -280,15 +272,15 @@ public final class BossRewardGameTests {
             int protectedXp = 0;
             int ordinaryXp = 0;
             for (ExperienceOrb orb : helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around)) {
-                CompoundTag tag = orb.saveWithoutId(new CompoundTag());
-                int xp = orb.getValue() * Math.max(1, tag.getInt("Count"));
-                if (orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)) {
+                CompoundTag tag = io.github.genichimaruo.singulo.test.harness.TestNbt.save(orb);
+                int xp = orb.getValue() * Math.max(1, tag.getIntOr("Count", 0));
+                if (orb.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false)) {
                     protectedXp += xp;
-                    helper.assertTrue(tag.getShort("Age") < 0, "保護されたオーブの寿命がふつうに戻った");
+                    helper.assertTrue(tag.getShortOr("Age", (short) 0) < 0, "保護されたオーブの寿命がふつうに戻った");
                     ExperienceOrb restored = new ExperienceOrb(net.minecraft.world.entity.EntityType.EXPERIENCE_ORB, helper.getLevel());
-                    restored.load(tag);
-                    helper.assertTrue(restored.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
-                            && restored.saveWithoutId(new CompoundTag()).getShort("Age") < 0, "保存し直すと印か寿命を失う");
+                    io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag);
+                    helper.assertTrue(restored.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED,false)
+                            && io.github.genichimaruo.singulo.test.harness.TestNbt.save(restored).getShortOr("Age", (short) 0) < 0, "保存し直すと印か寿命を失う");
                 } else {
                     ordinaryXp += xp;
                 }
@@ -330,15 +322,15 @@ public final class BossRewardGameTests {
     public static void boltKeepsItsDamageAcrossSaves(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         HorizonBolt bolt = new HorizonBolt(helper.getLevel(), boss).style(0x7FE8FF, 0.7F, 7).armored(true);
-        CompoundTag tag = bolt.saveWithoutId(new CompoundTag());
-        HorizonBolt restored = SinguloEntities.HORIZON_BOLT.get().create(helper.getLevel());
-        restored.load(tag);
+        CompoundTag tag = io.github.genichimaruo.singulo.test.harness.TestNbt.save(bolt);
+        HorizonBolt restored = SinguloEntities.HORIZON_BOLT.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag);
         helper.assertTrue(restored.damage() == 7 && restored.armored(), "読み込み直した光弾の強さが変わる: " + restored.damage() + " / " + restored.armored());
         // 0.5.0 より前の保存（ダメージを持たない）は、既定の値と魔法のまま
         tag.remove("damage");
         tag.remove("armored");
-        HorizonBolt old = SinguloEntities.HORIZON_BOLT.get().create(helper.getLevel());
-        old.load(tag);
+        HorizonBolt old = SinguloEntities.HORIZON_BOLT.get().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(old,tag);
         helper.assertTrue(old.damage() == HorizonBolt.DAMAGE && !old.armored(), "古い保存の光弾の読み込み方が違う");
         boss.discard();
         bolt.discard();
@@ -362,7 +354,7 @@ public final class BossRewardGameTests {
                 long deathsBefore = count(log, "player_died", "test_slam");
                 p.setHealth(1);
                 BossCombatLog.slammed(p, boss, "test_slam");
-                p.hurt(helper.getLevel().damageSources().fall(), 4);
+                p.hurtOrSimulate(helper.getLevel().damageSources().fall(), 4);
                 helper.assertTrue(p.isDeadOrDying(), "落下で倒れない");
                 helper.assertTrue(count(log, "hit_player", "test_slam") - hitsBefore == 1, "叩きつけの落下ダメージが記録されない");
                 helper.assertTrue(count(log, "player_died", "test_slam") - deathsBefore == 1, "叩きつけの落下で倒れたのに死亡が記録されない");

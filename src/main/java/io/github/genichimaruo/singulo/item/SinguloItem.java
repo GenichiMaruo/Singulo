@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 /** 段階の表示と、未実装の装置の注記を持つアイテム。 */
-public class SinguloItem extends Item {
+public class SinguloItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     private final int stage;
     private final boolean planned;
 

@@ -12,7 +12,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
  * 流体の見本（{@link FluidSamples}）。作業指令台の見本の欄・注文の一覧で、液体やガスを表す。名前は流体の名前、色は流体の色。
  * 手に入れる物ではない（クリエイティブのタブにも JEI にも出さない）。
  */
-public class FluidSampleItem extends Item {
+public class FluidSampleItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public FluidSampleItem(Properties properties) {
         super(properties.stacksTo(1));
     }

@@ -6,18 +6,10 @@
     "YBY"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lighting"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "Y": {
-      "tag": "c:dusts/glowstone"
-    }
+    "B": "singulo:blueprint_lighting",
+    "W": "singulo:white_ceramic_composite",
+    "R": "#c:dusts/redstone",
+    "Y": "#c:dusts/glowstone"
   },
   "result": {
     "id": "singulo:facility_light",

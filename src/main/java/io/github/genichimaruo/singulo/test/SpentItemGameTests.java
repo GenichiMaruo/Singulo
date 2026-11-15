@@ -8,26 +8,26 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class SpentItemGameTests {
     private static ItemStack item(String id, int count) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)), count);
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)), count);
     }
     private static MachineBlockEntity archive(GameTestHelper h) {
         BlockPos pos = new BlockPos(2,2,2);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity be = h.getBlockEntity(pos);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         ItemStack log = item("observation_log",1);
         be.items().setStackInSlot(0, UsesHelper.consume(log, UsesHelper.remaining(log)-1));
         be.items().setStackInSlot(1, item("blank_data_card",1));
@@ -43,7 +43,7 @@ public final class SpentItemGameTests {
     @GameTest(template="empty", timeoutTicks=350)
     public static void pipesCanPullSpentOriginalWhileProductBlocksOutput(GameTestHelper h) {
         var be = archive(h);
-        var cap = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, be.getBlockPos(), Direction.DOWN);
+        var cap = io.github.genichimaruo.singulo.compat.ItemResourceView.find(h.getLevel(), be.getBlockPos(), Direction.DOWN);
         h.assertTrue(cap != null && cap.extractItem(0,1,false).isEmpty(), "Automation removed a still usable original");
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenIdle(20).thenExecute(() -> {
             var simulated = cap.extractItem(0,1,true);
@@ -61,7 +61,7 @@ public final class SpentItemGameTests {
         var be = archive(h);
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenExecute(() -> {
             var registries = h.getLevel().registryAccess();
-            be.loadCustomOnly(be.saveCustomOnly(registries),registries);
+            io.github.genichimaruo.singulo.test.harness.TestNbt.loadCustom(be,be.saveCustomOnly(registries),registries);
             h.assertTrue(!be.automationItems().extractItem(0,1,true).isEmpty(), "Return flag lost on reload");
             be.automationItems().extractItem(be.type().outputSlot(),64,false);
         }).thenIdle(2).thenExecute(() -> {
@@ -77,7 +77,7 @@ public final class SpentItemGameTests {
         BlockPos below = new BlockPos(2,1,2);
         h.setBlock(below,Blocks.HOPPER);
         h.setBlock(new BlockPos(1,1,2),Blocks.REDSTONE_BLOCK);
-        HopperBlockEntity hopper = h.getBlockEntity(below);
+        HopperBlockEntity hopper = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,below);
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenExecute(() -> {
             h.assertFalse(be.itemSides().ejectEnabled(), "Test requires auto-eject off");
             h.setBlock(new BlockPos(1,1,2),Blocks.AIR);
@@ -98,7 +98,7 @@ public final class SpentItemGameTests {
         var be = archive(h);
         BlockPos target = new BlockPos(3,2,2);
         h.setBlock(target,Blocks.CHEST);
-        var chest = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK,h.absolutePos(target),Direction.WEST);
+        var chest = io.github.genichimaruo.singulo.compat.ItemResourceView.find(h.getLevel(),h.absolutePos(target),Direction.WEST);
         h.startSequence().thenWaitUntil(() -> finished(h,be)).thenIdle(20).thenExecute(() -> {
             finished(h,be);
             be.setEjectEnabled(0,true);
@@ -119,7 +119,7 @@ public final class SpentItemGameTests {
         var pos=new BlockPos(2,1,0);
         TestBuild.build(h,kind,pos,Direction.SOUTH,7);
         var port=TestBuild.port(h,kind,pos,Direction.SOUTH,7,1,1,0);
-        MachineBlockEntity be=h.getBlockEntity(pos);
+        MachineBlockEntity be=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         var unit=UsesHelper.restore(UsesHelper.consume(item("control_unit",1),16),item("control_unit",1));
         be.items().setStackInSlot(0,new ItemStack(Items.COPPER_INGOT,8));
         be.items().setStackInSlot(1,new ItemStack(Items.REDSTONE,4));
@@ -131,7 +131,7 @@ public final class SpentItemGameTests {
             h.assertTrue(be.items().getStackInSlot(be.type().outputSlot()).getCount()==4,"Final coils not produced");
             h.assertTrue(be.items().getStackInSlot(4).is(item("degraded_control_unit",1).getItem()),"No degraded control unit");
         }).thenExecute(() -> {
-            var cap=h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK,port,Direction.NORTH);
+            var cap=io.github.genichimaruo.singulo.compat.ItemResourceView.find(h.getLevel(),port,Direction.NORTH);
             h.assertTrue(cap!=null,"Port capability missing");
             var worn=cap.extractItem(4,1,false);
             h.assertTrue(worn.is(item("degraded_control_unit",1).getItem()) && UsesHelper.repairsOf(worn)==2,"Port lost worn part or repair history");
@@ -143,7 +143,7 @@ public final class SpentItemGameTests {
     public static void insertedRepairInputStaysUntilRestored(GameTestHelper h) {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity be=h.getBlockEntity(pos);
+        MachineBlockEntity be=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         be.items().setStackInSlot(0,UsesHelper.consume(item("observation_log",1),16));
         h.startSequence().thenIdle(20).thenExecute(() -> {
             h.assertTrue(!be.items().getStackInSlot(0).isEmpty() && be.items().getStackInSlot(be.type().outputSlot()).isEmpty(),"Repair ingredient auto-ejected");

@@ -9,7 +9,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
@@ -90,9 +90,9 @@ public class SupplyPortMenu extends AbstractContainerMenu {
 
     /** 見本の欄: 持っている物を1個の見本として登録する（何も持っていなければ外す）。持っている物は減らない。 */
     @Override
-    public void clicked(int slotId, int button, ClickType type, Player player) {
+    public void clicked(int slotId, int button, ContainerInput type, Player player) {
         if (slotId >= 0 && slotId < SupplyPortBlockEntity.ENTRIES) {
-            if (type == ClickType.PICKUP || type == ClickType.QUICK_MOVE) {
+            if (type == ContainerInput.PICKUP || type == ContainerInput.QUICK_MOVE) {
                 ItemStack carried = getCarried();
                 entries.setItem(slotId, carried.isEmpty() ? ItemStack.EMPTY : carried.copyWithCount(1));
             }

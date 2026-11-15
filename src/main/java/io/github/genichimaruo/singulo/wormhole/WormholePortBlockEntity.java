@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -33,7 +33,7 @@ import net.neoforged.neoforge.items.IItemHandler;
  * 1つの口で働けるポートは喉の大きさで決まる数（口に近い順）まで。通せる量も喉の大きさで決まり、いちばん大きい喉では上限なし
  * （mod のケーブルからは 1 tick に int を超えて送れる）。番号は0〜127（画面の7つの丸のオンオフ）。
  */
-public class WormholePortBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     private static final Map<Level, Set<WormholePortBlockEntity>> LOADED = new WeakHashMap<>();
 
     /** Release runtime references when this level closes. */
@@ -41,9 +41,9 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     /** 転送中に転送を呼び返さないための印（サーバーは1スレッド）。 */
     private static boolean busy;
 
-    private final IEnergyStorage energy = new Energy();
-    private final IItemHandler items = new Items();
-    private final IFluidHandler fluids = new Fluids();
+    private final Energy energy = new Energy();
+    private final Items items = new Items();
+    private final Fluids fluids = new Fluids();
     /** ポート番号。向こう側の同じ番号のポートとつながる。 */
     private int channel;
     private long cacheTick = -1;
@@ -51,15 +51,15 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     private WormholeMouthBlockEntity cachedMouth;
     /** 手前の口の上限の数に入っていて、働けるか。 */
     private boolean active;
-    private List<IEnergyStorage> energyTargets = List.of();
-    private List<IItemHandler> itemTargets = List.of();
-    private List<IFluidHandler> fluidTargets = List.of();
+    private List<net.neoforged.neoforge.transfer.energy.EnergyHandler> energyTargets = List.of();
+    private List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>> itemTargets = List.of();
+    private List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>> fluidTargets = List.of();
 
     public WormholePortBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.WORMHOLE_PORT.get(), pos, state);
     }
 
-    public IEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
@@ -67,7 +67,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         return items;
     }
 
-    public IFluidHandler fluids() {
+    public Fluids fluids() {
         return fluids;
     }
 
@@ -87,7 +87,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             LOADED.computeIfAbsent(level, l -> Collections.newSetFromMap(new WeakHashMap<>())).add(this);
         }
     }
@@ -107,7 +107,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     /** 1 tick に1回、手前の口と、向こう側のポートの隣の入れ物を調べ直す。 */
     private void refresh() {
-        if (level == null || level.isClientSide) {
+        if (level == null || level.isClientSide()) {
             return;
         }
         long now = level.getGameTime();
@@ -117,9 +117,9 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         cacheTick = now;
         cachedMouth = WormholeMouthBlockEntity.near(level, worldPosition);
         active = cachedMouth != null && cachedMouth.portActive(this);
-        List<IEnergyStorage> e = new ArrayList<>();
-        List<IItemHandler> it = new ArrayList<>();
-        List<IFluidHandler> f = new ArrayList<>();
+        List<net.neoforged.neoforge.transfer.energy.EnergyHandler> e = new ArrayList<>();
+        List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>> it = new ArrayList<>();
+        List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>> f = new ArrayList<>();
         WormholeMouthBlockEntity remote = active ? cachedMouth.partner() : null;
         if (remote != null && remote.getLevel() instanceof ServerLevel other) {
             Set<WormholePortBlockEntity> ports = LOADED.get(other);
@@ -134,9 +134,9 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                         if (be instanceof WormholePortBlockEntity || be instanceof WormholeMouthBlockEntity) {
                             continue;
                         }
-                        add(e, other, Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
-                        add(it, other, Capabilities.ItemHandler.BLOCK, n, dir.getOpposite());
-                        add(f, other, Capabilities.FluidHandler.BLOCK, n, dir.getOpposite());
+                        add(e, other, Capabilities.Energy.BLOCK, n, dir.getOpposite());
+                        add(it, other, Capabilities.Item.BLOCK, n, dir.getOpposite());
+                        add(f, other, Capabilities.Fluid.BLOCK, n, dir.getOpposite());
                     }
                 }
             }
@@ -230,208 +230,61 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     // ------------------------------------------------------------------ エネルギー（いちばん大きい喉では上限なし）
 
-    private final class Energy implements io.github.genichimaruo.singulo.energy.LongEnergyStorage {
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            WormholeMouthBlockEntity m = mouth();
-            if (busy || m == null || amount <= 0) {
-                return 0;
-            }
-            long budget = Math.min(amount, m.energyBudget());
-            long sent = 0;
-            busy = true;
-            try {
-                for (IEnergyStorage t : energyTargets) {
-                    if (sent >= budget) {
-                        break;
-                    }
-                    if (t.canReceive()) {
-                        sent += io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(t, budget - sent, simulate);
-                    }
-                }
-            } finally {
-                busy = false;
-            }
-            if (!simulate) {
-                m.useEnergy(sent);
-            }
-            return sent;
+    private final class Energy implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            WormholeMouthBlockEntity m=mouth();if(busy||m==null||amount==0)return 0;
+            long budget=Math.min(amount,m.energyBudget()),sent=0;busy=true;
+            try{for(var target:energyTargets){if(sent>=budget)break;sent+=io.github.genichimaruo.singulo.energy.LongEnergyHandler.insert(target,budget-sent,tx);}}
+            finally{busy=false;}m.useEnergy(sent,tx);return sent;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
+        public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");
+            WormholeMouthBlockEntity m=mouth();if(busy||m==null||amount==0)return 0;
+            long budget=Math.min(amount,m.energyBudget()),got=0;busy=true;
+            try{for(var target:energyTargets){if(got>=budget)break;got+=io.github.genichimaruo.singulo.energy.LongEnergyHandler.extract(target,budget-got,tx);}}
+            finally{busy=false;}m.useEnergy(got,tx);return got;
         }
-
-        @Override
-        public long extractLong(long amount, boolean simulate) {
-            WormholeMouthBlockEntity m = mouth();
-            if (busy || m == null || amount <= 0) {
-                return 0;
-            }
-            long budget = Math.min(amount, m.energyBudget());
-            long got = 0;
-            busy = true;
-            try {
-                for (IEnergyStorage t : energyTargets) {
-                    if (got >= budget) {
-                        break;
-                    }
-                    if (t.canExtract()) {
-                        long want = budget - got;
-                        got += t instanceof io.github.genichimaruo.singulo.energy.LongEnergyStorage big
-                                ? big.extractLong(want, simulate)
-                                : t.extractEnergy((int) Math.min(Integer.MAX_VALUE, want), simulate);
-                    }
-                }
-            } finally {
-                busy = false;
-            }
-            if (!simulate) {
-                m.useEnergy(got);
-            }
-            return got;
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return (int) extractLong(amount, simulate);
-        }
-
-        @Override
-        public int getEnergyStored() {
-            refresh();
-            long sum = 0;
-            for (IEnergyStorage t : energyTargets) {
-                sum += t.getEnergyStored();
-            }
-            return (int) Math.min(Integer.MAX_VALUE, sum);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            refresh();
-            long sum = 0;
-            for (IEnergyStorage t : energyTargets) {
-                sum += t.getMaxEnergyStored();
-            }
-            return (int) Math.min(Integer.MAX_VALUE, sum);
-        }
-
-        @Override
-        public boolean canExtract() {
-            return mouth() != null && !energyTargets.isEmpty();
-        }
-
-        @Override
-        public boolean canReceive() {
-            return mouth() != null && !energyTargets.isEmpty();
-        }
+        public long getAmountAsLong(){refresh();long sum=0;for(var t:energyTargets){long n=t.getAmountAsLong();sum=Long.MAX_VALUE-sum<n?Long.MAX_VALUE:sum+n;}return sum;}
+        public long getCapacityAsLong(){refresh();long sum=0;for(var t:energyTargets){long n=t.getCapacityAsLong();sum=Long.MAX_VALUE-sum<n?Long.MAX_VALUE:sum+n;}return sum;}
+        public boolean canReceive(){return mouth()!=null;}
+        public boolean canExtract(){return mouth()!=null;}
     }
 
     // ------------------------------------------------------------------ アイテム（向こうの入れ物のスロットを並べて見せる）
 
-    private final class Items implements IItemHandler {
-        /** スロット番号 → (入れ物, その中の番号)。 */
-        @Nullable
-        private IItemHandler handler(int slot, int[] local) {
-            for (IItemHandler h : itemTargets) {
-                if (slot < h.getSlots()) {
-                    local[0] = slot;
-                    return h;
-                }
-                slot -= h.getSlots();
-            }
+
+    private final class Items implements IItemHandler, net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> {
+        private net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> handler(int index,int[] local) {
+            if(index < 0) return null;
+            for(var h:itemTargets) { if(index<h.size()){local[0]=index;return h;} index-=h.size(); }
             return null;
         }
-
-        @Override
-        public int getSlots() {
-            if (mouth() == null) {
-                return 0;
-            }
-            int n = 0;
-            for (IItemHandler h : itemTargets) {
-                n += h.getSlots();
-            }
-            return n;
+        public int size(){if(mouth()==null)return 0;return itemTargets.stream().mapToInt(net.neoforged.neoforge.transfer.ResourceHandler::size).sum();}
+        public net.neoforged.neoforge.transfer.item.ItemResource getResource(int index){refresh();int[] local={0};var h=handler(index,local);return h==null?net.neoforged.neoforge.transfer.item.ItemResource.EMPTY:h.getResource(local[0]);}
+        public long getAmountAsLong(int index){refresh();int[] local={0};var h=handler(index,local);return h==null?0:h.getAmountAsLong(local[0]);}
+        public long getCapacityAsLong(int index,net.neoforged.neoforge.transfer.item.ItemResource resource){refresh();int[] local={0};var h=handler(index,local);return h==null?0:h.getCapacityAsLong(local[0],resource);}
+        public boolean isValid(int index,net.neoforged.neoforge.transfer.item.ItemResource resource){refresh();int[] local={0};var h=handler(index,local);return h!=null&&h.isValid(local[0],resource);}
+        public int insert(int index,net.neoforged.neoforge.transfer.item.ItemResource resource,int amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource,amount);
+            var m=mouth();int[] local={0};var h=handler(index,local);if(busy||m==null||h==null)return 0;
+            int budget=Math.min(amount,m.itemBudget());if(budget<=0)return 0;busy=true;
+            try{int moved=h.insert(local[0],resource,budget,tx);m.useItems(moved,tx);return moved;}finally{busy=false;}
         }
-
-        @Override
-        public ItemStack getStackInSlot(int slot) {
-            refresh();
-            int[] local = new int[1];
-            IItemHandler h = handler(slot, local);
-            return h == null ? ItemStack.EMPTY : h.getStackInSlot(local[0]);
+        public int extract(int index,net.neoforged.neoforge.transfer.item.ItemResource resource,int amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource,amount);
+            var m=mouth();int[] local={0};var h=handler(index,local);if(busy||m==null||h==null)return 0;
+            int budget=Math.min(amount,m.itemBudget());if(budget<=0)return 0;busy=true;
+            try{int moved=h.extract(local[0],resource,budget,tx);m.useItems(moved,tx);return moved;}finally{busy=false;}
         }
-
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            WormholeMouthBlockEntity m = mouth();
-            int[] local = new int[1];
-            IItemHandler h = handler(slot, local);
-            if (busy || m == null || h == null || stack.isEmpty()) {
-                return stack;
-            }
-            int budget = Math.min(stack.getCount(), m.itemBudget());
-            if (budget <= 0) {
-                return stack;
-            }
-            busy = true;
-            ItemStack rest;
-            try {
-                rest = h.insertItem(local[0], stack.copyWithCount(budget), simulate);
-            } finally {
-                busy = false;
-            }
-            int moved = budget - rest.getCount();
-            if (!simulate) {
-                m.useItems(moved);
-            }
-            return stack.copyWithCount(stack.getCount() - moved);
-        }
-
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            WormholeMouthBlockEntity m = mouth();
-            int[] local = new int[1];
-            IItemHandler h = handler(slot, local);
-            if (busy || m == null || h == null) {
-                return ItemStack.EMPTY;
-            }
-            int budget = Math.min(amount, m.itemBudget());
-            if (budget <= 0) {
-                return ItemStack.EMPTY;
-            }
-            busy = true;
-            ItemStack out;
-            try {
-                out = h.extractItem(local[0], budget, simulate);
-            } finally {
-                busy = false;
-            }
-            if (!simulate) {
-                m.useItems(out.getCount());
-            }
-            return out;
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            refresh();
-            int[] local = new int[1];
-            IItemHandler h = handler(slot, local);
-            return h == null ? 0 : h.getSlotLimit(local[0]);
-        }
-
-        @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            refresh();
-            int[] local = new int[1];
-            IItemHandler h = handler(slot, local);
-            return h != null && h.isItemValid(local[0], stack);
-        }
+        public int getSlots(){return size();}
+        public ItemStack getStackInSlot(int index){return getResource(index).toStack(getAmountAsInt(index));}
+        public ItemStack insertItem(int index,ItemStack stack,boolean simulate){return new io.github.genichimaruo.singulo.compat.ItemResourceView(this).insertItem(index,stack,simulate);}
+        public ItemStack extractItem(int index,int amount,boolean simulate){return new io.github.genichimaruo.singulo.compat.ItemResourceView(this).extractItem(index,amount,simulate);}
+        public int getSlotLimit(int index){return getCapacityAsInt(index,net.neoforged.neoforge.transfer.item.ItemResource.EMPTY);}
+        public boolean isItemValid(int index,ItemStack stack){return !stack.isEmpty()&&isValid(index,net.neoforged.neoforge.transfer.item.ItemResource.of(stack));}
     }
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems(){return items;}
 
     @Override
     protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
@@ -442,131 +295,64 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     @Override
     protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        channel = tag.getInt("channel");
+        channel = tag.getIntOr("channel", 0);
     }
 
     // ------------------------------------------------------------------ 液体
 
-    private final class Fluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
-        @Override
+    public final class Fluids implements IFluidHandler,
+            net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>,
+            io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        private final IFluidHandler legacy = new io.github.genichimaruo.singulo.compat.FluidResourceView(this);
         public boolean pipeAccepts(FluidStack fluid) {
             refresh();
-            for (IFluidHandler h : fluidTargets) {
-                if (!(h instanceof io.github.genichimaruo.singulo.pipe.PipeFluidFilter filter) || filter.pipeAccepts(fluid)) {
-                    return true;
-                }
-            }
+            for (var h : fluidTargets) if (!(h instanceof io.github.genichimaruo.singulo.pipe.PipeFluidFilter filter) || filter.pipeAccepts(fluid)) return true;
             return false;
         }
-
-        @Nullable
-        private IFluidHandler handler(int tank, int[] local) {
-            for (IFluidHandler h : fluidTargets) {
-                if (tank < h.getTanks()) {
-                    local[0] = tank;
-                    return h;
-                }
-                tank -= h.getTanks();
-            }
+        private record Slot(net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler, int local) {}
+        private Slot slot(int index) {
+            if (index < 0 || mouth() == null) return null;
+            for (var h : fluidTargets) { if (index < h.size()) return new Slot(h, index); index -= h.size(); }
             return null;
         }
-
-        @Override
-        public int getTanks() {
-            if (mouth() == null) {
-                return 0;
-            }
-            int n = 0;
-            for (IFluidHandler h : fluidTargets) {
-                n += h.getTanks();
-            }
-            return n;
+        public int size() { if (mouth() == null) return 0; return fluidTargets.stream().mapToInt(net.neoforged.neoforge.transfer.ResourceHandler::size).sum(); }
+        public net.neoforged.neoforge.transfer.fluid.FluidResource getResource(int index) {
+            var s = slot(index); return s == null ? net.neoforged.neoforge.transfer.fluid.FluidResource.EMPTY : s.handler.getResource(s.local);
         }
-
-        @Override
-        public FluidStack getFluidInTank(int tank) {
-            refresh();
-            int[] local = new int[1];
-            IFluidHandler h = handler(tank, local);
-            return h == null ? FluidStack.EMPTY : h.getFluidInTank(local[0]);
-        }
-
-        @Override
-        public int getTankCapacity(int tank) {
-            refresh();
-            int[] local = new int[1];
-            IFluidHandler h = handler(tank, local);
-            return h == null ? 0 : h.getTankCapacity(local[0]);
-        }
-
-        @Override
-        public boolean isFluidValid(int tank, FluidStack stack) {
-            refresh();
-            int[] local = new int[1];
-            IFluidHandler h = handler(tank, local);
-            return h != null && h.isFluidValid(local[0], stack);
-        }
-
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            WormholeMouthBlockEntity m = mouth();
-            if (busy || m == null || resource.isEmpty()) {
-                return 0;
-            }
-            int budget = Math.min(resource.getAmount(), m.fluidBudget());
-            int filled = 0;
+        public long getAmountAsLong(int index) { var s = slot(index); return s == null ? 0 : s.handler.getAmountAsLong(s.local); }
+        public long getCapacityAsLong(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid) { var s = slot(index); return s == null ? 0 : s.handler.getCapacityAsLong(s.local, fluid); }
+        public boolean isValid(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid) { var s = slot(index); return s != null && s.handler.isValid(s.local, fluid); }
+        public int insert(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) { return transfer(index, fluid, amount, tx, true); }
+        public int extract(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) { return transfer(index, fluid, amount, tx, false); }
+        public int insert(net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) { return transfer(-1, fluid, amount, tx, true); }
+        public int extract(net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) { return transfer(-1, fluid, amount, tx, false); }
+        private int transfer(int index, net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx, boolean insert) {
+            net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(fluid, amount);
+            var mouth = mouth();
+            if (busy || mouth == null || amount == 0) return 0;
+            int limit = Math.min(amount, mouth.fluidBudget()), moved = 0;
+            Slot selected = index < 0 ? null : slot(index);
+            if (index >= 0 && selected == null) return 0;
             busy = true;
             try {
-                for (IFluidHandler h : fluidTargets) {
-                    if (filled >= budget) {
-                        break;
+                if (selected != null) {
+                    moved = insert ? selected.handler.insert(selected.local, fluid, limit, tx) : selected.handler.extract(selected.local, fluid, limit, tx);
+                } else {
+                    for (var h : fluidTargets) {
+                        if (moved >= limit) break;
+                        moved += insert ? h.insert(fluid, limit - moved, tx) : h.extract(fluid, limit - moved, tx);
                     }
-                    filled += h.fill(resource.copyWithAmount(budget - filled), action);
                 }
-            } finally {
-                busy = false;
-            }
-            if (action.execute()) {
-                m.useFluid(filled);
-            }
-            return filled;
+                if (moved > 0) mouth.useFluid(moved, tx);
+                return moved;
+            } finally { busy = false; }
         }
-
-        @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
-            WormholeMouthBlockEntity m = mouth();
-            if (busy || m == null || resource.isEmpty()) {
-                return FluidStack.EMPTY;
-            }
-            int budget = Math.min(resource.getAmount(), m.fluidBudget());
-            int drained = 0;
-            busy = true;
-            try {
-                for (IFluidHandler h : fluidTargets) {
-                    if (drained >= budget) {
-                        break;
-                    }
-                    drained += h.drain(resource.copyWithAmount(budget - drained), action).getAmount();
-                }
-            } finally {
-                busy = false;
-            }
-            if (action.execute()) {
-                m.useFluid(drained);
-            }
-            return drained == 0 ? FluidStack.EMPTY : resource.copyWithAmount(drained);
-        }
-
-        @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
-            refresh();
-            for (IFluidHandler h : fluidTargets) {
-                FluidStack peek = h.drain(maxDrain, FluidAction.SIMULATE);
-                if (!peek.isEmpty()) {
-                    return drain(peek.copyWithAmount(maxDrain), action);
-                }
-            }
-            return FluidStack.EMPTY;
-        }
+        public int getTanks() { return size(); }
+        public FluidStack getFluidInTank(int index) { return legacy.getFluidInTank(index); }
+        public int getTankCapacity(int index) { return legacy.getTankCapacity(index); }
+        public boolean isFluidValid(int index, FluidStack stack) { return legacy.isFluidValid(index, stack); }
+        public int fill(FluidStack stack, FluidAction action) { return legacy.fill(stack, action); }
+        public FluidStack drain(FluidStack stack, FluidAction action) { return legacy.drain(stack, action); }
+        public FluidStack drain(int amount, FluidAction action) { return legacy.drain(amount, action); }
     }
 }

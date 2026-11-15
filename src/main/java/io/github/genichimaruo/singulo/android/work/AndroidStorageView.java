@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.items.IItemHandler;
 

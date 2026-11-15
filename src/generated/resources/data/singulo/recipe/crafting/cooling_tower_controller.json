@@ -6,18 +6,10 @@
     "HFH"
   ],
   "key": {
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    },
-    "H": {
-      "item": "singulo:heat_exchange_core"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    }
+    "K": "singulo:ceramic_substrate",
+    "B": "singulo:basic_circuit",
+    "H": "singulo:heat_exchange_core",
+    "F": "singulo:basic_frame"
   },
   "result": {
     "id": "singulo:cooling_tower_controller",

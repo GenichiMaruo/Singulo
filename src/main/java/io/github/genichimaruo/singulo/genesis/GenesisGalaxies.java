@@ -14,6 +14,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 /** 創世炉が生んだ銀河（ワールドに保存）。オーバーワールドの夜空に昇る。 */
 public class GenesisGalaxies extends SavedData {
+    private static final net.minecraft.world.level.saveddata.SavedDataType<GenesisGalaxies> TYPE =
+        io.github.genichimaruo.singulo.compat.LegacySavedDataTypes.create("singulo_galaxies", GenesisGalaxies::new, GenesisGalaxies::load, GenesisGalaxies::save);
+
     static final String NAME = "singulo_galaxies";
     /** 夜空に並べる数の上限（古いものから消える）。 */
     public static final int MAX = 8;
@@ -22,7 +25,7 @@ public class GenesisGalaxies extends SavedData {
 
     public static GenesisGalaxies get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(GenesisGalaxies::new, GenesisGalaxies::load, null), NAME);
+                TYPE);
     }
 
     public List<Long> seeds() {
@@ -43,23 +46,22 @@ public class GenesisGalaxies extends SavedData {
     }
 
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && player.getServer() != null
+        if (event.getEntity() instanceof ServerPlayer player && player.level().getServer() != null
                 && player.connection != null && player.connection.hasChannel(GalaxyPayload.TYPE)) {
-            PacketDistributor.sendToPlayer(player, new GalaxyPayload(get(player.getServer()).seeds(), false));
+            PacketDistributor.sendToPlayer(player, new GalaxyPayload(get(player.level().getServer()).seeds(), false));
         }
     }
 
     private static GenesisGalaxies load(CompoundTag tag, HolderLookup.Provider registries) {
         GenesisGalaxies data = new GenesisGalaxies();
-        for (long s : tag.getLongArray("seeds")) {
+        for (long s : tag.getLongArray("seeds").orElseGet(() -> new long[0])) {
             data.seeds.add(s);
         }
         return data;
     }
 
-    @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.put("seeds", new LongArrayTag(seeds));
+        tag.put("seeds", new LongArrayTag(seeds.stream().mapToLong(Long::longValue).toArray()));
         return tag;
     }
 }

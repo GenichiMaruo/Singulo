@@ -1,23 +1,23 @@
 package io.github.genichimaruo.singulo.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+
+
+
+
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
-import org.joml.Matrix4f;
+
 
 /**
  * 流体そのものの見た目（静止したときの絵。ブロックの絵の束にあるので、水や溶岩のように流れるアニメーションもそのまま動く）を、
@@ -29,12 +29,12 @@ public final class FluidDraw {
     /** 流体の静止した絵。 */
     public static TextureAtlasSprite sprite(Fluid fluid) {
         IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fluid);
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ext.getStillTexture(new FluidStack(fluid, 1000)));
+        return FluidVisuals.sprite(new FluidStack(fluid, 1000));
     }
 
     /** 流体の色（ARGB）。 */
     public static int tint(Fluid fluid) {
-        return IClientFluidTypeExtensions.of(fluid).getTintColor(new FluidStack(fluid, 1000));
+        return FluidVisuals.tint(new FluidStack(fluid, 1000));
     }
 
     /** 流体が空気より軽い（ガス）か（入れ物の上から溜まるように描く）。 */
@@ -43,47 +43,35 @@ public final class FluidDraw {
     }
 
     /** 画面の (x, y) から w×h を、流体の絵を 16×16 ずつ並べて埋める（はみ出す所は絵を切る）。 */
-    public static void fill(GuiGraphics g, Fluid fluid, int x, int y, int w, int h) {
+    public static void fill(GuiGraphicsExtractor g, Fluid fluid, int x, int y, int w, int h) {
         fill(g, sprite(fluid), tint(fluid), x, y, w, h);
     }
 
     /** 化学物質（Mekanism）の絵と色で埋める（絵が分からなければ、白い絵を色で塗る）。 */
-    public static void fillChemical(GuiGraphics g, String id, int x, int y, int w, int h) {
+    public static void fillChemical(GuiGraphicsExtractor g, String id, int x, int y, int w, int h) {
         fill(g, chemicalSprite(id), 0xFF000000 | io.github.genichimaruo.singulo.android.work.Chemicals.tint(id), x, y, w, h);
     }
 
     /** 化学物質の絵（ブロックの絵の束の中。なければ白い絵）。 */
     public static TextureAtlasSprite chemicalSprite(String id) {
-        net.minecraft.resources.ResourceLocation icon = io.github.genichimaruo.singulo.android.work.Chemicals.icon(id);
-        var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
-        return atlas.apply(icon == null ? net.minecraft.resources.ResourceLocation.withDefaultNamespace("block/white_concrete") : icon);
+        net.minecraft.resources.Identifier icon = io.github.genichimaruo.singulo.android.work.Chemicals.icon(id);
+        return Minecraft.getInstance().getAtlasManager().get(new net.minecraft.client.resources.model.sprite.SpriteId(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS, icon == null ? net.minecraft.resources.Identifier.withDefaultNamespace("block/white_concrete") : icon));
     }
 
     /** 画面の (x, y) から w×h を、絵 sprite を 16×16 ずつ並べ、色 argb で染めて埋める。 */
-    public static void fill(GuiGraphics g, TextureAtlasSprite sprite, int argb, int x, int y, int w, int h) {
+    public static void fill(GuiGraphicsExtractor g, TextureAtlasSprite sprite, int argb, int x, int y, int w, int h) {
         if (w <= 0 || h <= 0) {
             return;
         }
-        g.flush();
-        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.enableBlend();
-        Matrix4f m = g.pose().last().pose();
-        BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        // GUI extraction records each atlas tile; clipping preserves partial edge tiles.
+        g.enableScissor(x, y, x + w, y + h);
         for (int ty = 0; ty < h; ty += 16) {
-            int th = Math.min(16, h - ty);
             for (int tx = 0; tx < w; tx += 16) {
-                int tw = Math.min(16, w - tx);
-                float u0 = sprite.getU0(), u1 = sprite.getU(tw / 16F), v0 = sprite.getV0(), v1 = sprite.getV(th / 16F);
-                float x0 = x + tx, x1 = x0 + tw, y0 = y + ty, y1 = y0 + th;
-                b.addVertex(m, x0, y1, 0).setUv(u0, v1).setColor(argb);
-                b.addVertex(m, x1, y1, 0).setUv(u1, v1).setColor(argb);
-                b.addVertex(m, x1, y0, 0).setUv(u1, v0).setColor(argb);
-                b.addVertex(m, x0, y0, 0).setUv(u0, v0).setColor(argb);
+                g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
+                        sprite, x + tx, y + ty, 16, 16, argb);
             }
         }
-        BufferUploader.drawWithShader(b.buildOrThrow());
-        RenderSystem.disableBlend();
+        g.disableScissor();
     }
 
     /**

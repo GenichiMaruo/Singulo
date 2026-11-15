@@ -6,21 +6,15 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:sealed_container_2"
-      },
+      "ingredient": "singulo:sealed_container_2",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_matter_shell"
-      },
+      "ingredient": "singulo:degenerate_matter_shell",
       "count": 1
     }
   ],

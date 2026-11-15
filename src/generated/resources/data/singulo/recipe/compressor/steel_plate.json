@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/steel"
-      },
+      "ingredient": "#c:ingots/steel",
       "count": 1
     }
   ],

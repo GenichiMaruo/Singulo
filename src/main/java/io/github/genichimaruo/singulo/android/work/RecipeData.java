@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android.work;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
@@ -58,8 +58,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
     }
 
     /** 見本の欄 i で使ってよい物（同じ種類の別の物も使わないなら null）。 */
-    @Nullable
-    public net.minecraft.world.item.crafting.Ingredient alt(int i) {
+    public net.minecraft.world.item.crafting.@Nullable Ingredient alt(int i) {
         if (i >= alts.size() || alts.get(i).isEmpty()) {
             return null;
         }
@@ -196,8 +195,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
     }
 
     /** 燃料を入れる面（自動なら null）。 */
-    @Nullable
-    public net.minecraft.core.Direction fuelFace(net.minecraft.world.level.block.state.BlockState machine) {
+    public net.minecraft.core.@Nullable Direction fuelFace(net.minecraft.world.level.block.state.BlockState machine) {
         return auto(2) ? null : face(2, machine, net.minecraft.core.Direction.NORTH);
     }
 
@@ -284,7 +282,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         if (!tag.contains(KEY)) {
             return null;
         }
-        return load(tag.getCompound(KEY), registries);
+        return load(tag.getCompoundOrEmpty(KEY), registries);
     }
 
     /** カードに記録する。 */
@@ -299,13 +297,13 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         r.putString("mode", mode);
         ListTag list = new ListTag();
         for (ItemStack s : grid) {
-            list.add(s.isEmpty() ? new CompoundTag() : s.save(registries));
+            list.add(s.isEmpty() ? new CompoundTag() : io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));
         }
         r.put("grid", list);
-        r.put("output", output.save(registries));
+        r.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.save(output, registries));
         ListTag ex = new ListTag();
         for (ItemStack s : extras) {
-            ex.add(s.isEmpty() ? new CompoundTag() : s.save(registries));
+            ex.add(s.isEmpty() ? new CompoundTag() : io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));
         }
         r.put("extras", ex);
         if (!steps.isEmpty()) {
@@ -316,7 +314,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             r.put("steps", st);
         }
         if (!fuel.isEmpty()) {
-            r.put("fuel", fuel.save(registries));
+            r.put("fuel", io.github.genichimaruo.singulo.compat.NbtCompat.save(fuel, registries));
         }
         r.putInt("faces", faces);
         if (variants()) {
@@ -332,31 +330,31 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
     @Nullable
     public static RecipeData load(CompoundTag r, HolderLookup.Provider registries) {
         List<ItemStack> grid = new ArrayList<>(9);
-        ListTag list = r.getList("grid", Tag.TAG_COMPOUND);
+        ListTag list = r.getListOrEmpty("grid");
         for (int i = 0; i < 9; i++) {
-            CompoundTag t = i < list.size() ? list.getCompound(i) : new CompoundTag();
-            grid.add(t.isEmpty() ? ItemStack.EMPTY : ItemStack.parseOptional(registries, t));
+            CompoundTag t = i < list.size() ? list.getCompoundOrEmpty(i) : new CompoundTag();
+            grid.add(t.isEmpty() ? ItemStack.EMPTY : io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t));
         }
-        ItemStack output = ItemStack.parseOptional(registries, r.getCompound("output"));
+        ItemStack output = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, r.getCompoundOrEmpty("output"));
         List<ItemStack> extras = new ArrayList<>();
-        for (Tag t : r.getList("extras", Tag.TAG_COMPOUND)) {
-            ItemStack s = ((CompoundTag) t).isEmpty() ? ItemStack.EMPTY : ItemStack.parseOptional(registries, (CompoundTag) t);
+        for (Tag t : r.getListOrEmpty("extras")) {
+            ItemStack s = ((CompoundTag) t).isEmpty() ? ItemStack.EMPTY : io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, (CompoundTag) t);
             if (!s.isEmpty()) {
                 extras.add(s);
             }
         }
         List<ProcedureStep> steps = new ArrayList<>();
-        for (Tag t : r.getList("steps", Tag.TAG_COMPOUND)) {
+        for (Tag t : r.getListOrEmpty("steps")) {
             if (steps.size() < MAX_STEPS) {
                 steps.add(ProcedureStep.load((CompoundTag) t, registries));
             }
         }
-        String mode = r.contains("mode") ? r.getString("mode") : MODE_CRAFTING;
-        ItemStack fuel = r.contains("fuel") ? ItemStack.parseOptional(registries, r.getCompound("fuel")) : ItemStack.EMPTY;
-        int faces = r.contains("faces") ? r.getInt("faces") : DEFAULT_FACES;
+        String mode = r.contains("mode") ? r.getStringOr("mode", "") : MODE_CRAFTING;
+        ItemStack fuel = r.contains("fuel") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, r.getCompoundOrEmpty("fuel")) : ItemStack.EMPTY;
+        int faces = r.contains("faces") ? r.getIntOr("faces", 0) : DEFAULT_FACES;
         List<String> alts = new ArrayList<>();
-        for (Tag t : r.getList("alts", Tag.TAG_STRING)) {
-            alts.add(t.getAsString());
+        for (Tag t : r.getListOrEmpty("alts")) {
+            alts.add(t.asString().orElse(""));
         }
         return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces, alts);
     }

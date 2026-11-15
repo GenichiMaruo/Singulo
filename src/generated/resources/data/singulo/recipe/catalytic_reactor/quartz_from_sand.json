@@ -6,9 +6,7 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:sands"
-      },
+      "ingredient": "#c:sands",
       "count": 2
     }
   ],

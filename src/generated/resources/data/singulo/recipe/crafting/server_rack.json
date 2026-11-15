@@ -6,18 +6,10 @@
     "KBK"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_furniture"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "K": {
-      "item": "singulo:basic_circuit"
-    }
+    "B": "singulo:blueprint_lab_furniture",
+    "S": "#c:plates/steel",
+    "R": "#c:dusts/redstone",
+    "K": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:server_rack",

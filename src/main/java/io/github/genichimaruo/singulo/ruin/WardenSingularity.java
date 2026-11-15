@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
  * LIFETIME のあいだ、半径 RADIUS の中のものを中心へ引き寄せ、10 tick ごとに防具を無視する潮汐ダメージを与える。
  */
 public class WardenSingularity extends Entity {
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
     public static final int LIFETIME = 100;
     public static final double RADIUS = 3.5;
     public static final float DAMAGE = 5.0F;
@@ -93,7 +94,7 @@ public class WardenSingularity extends Entity {
                     // エルゴ球の大蛇（龍の姿）の特異点
                     b.hurtWith("singularity", e, SinguloDamageTypes.tidal(level, owner), DAMAGE * (hard ? 1F : NORMAL_DAMAGE_FACTOR));
                 } else {
-                    e.hurt(SinguloDamageTypes.tidal(level, owner), DAMAGE);
+                    e.hurtOrSimulate(SinguloDamageTypes.tidal(level, owner), DAMAGE);
                 }
             }
         }
@@ -103,10 +104,14 @@ public class WardenSingularity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {}
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {}
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        values.store(tag);
+    }
 
     @Override
     public boolean isPickable() {

@@ -78,7 +78,7 @@ public final class ArenaShield {
     }
 
     /** 守っている床は、プレイヤーには壊せない（創造モードは除く）。 */
-    public static void onBreak(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
+    public static void onBreak(net.neoforged.neoforge.event.level.block.BreakBlockEvent event) {
         if (!ACTIVE.isEmpty() && event.getLevel() instanceof Level level && protectedFloor(level, event.getPos())
                 && (event.getPlayer() == null || !event.getPlayer().isCreative())) {
             event.setCanceled(true);

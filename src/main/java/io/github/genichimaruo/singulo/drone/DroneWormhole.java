@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
@@ -62,7 +62,7 @@ public final class DroneWormhole {
             double leg = Math.sqrt(from.distSqr(here.getBlockPos()));
             for (BlockPos to : net.portsOf(owner, mouthThere, fluid)) {
                 int d = (int) Math.ceil(leg + Math.sqrt(mouthThere.distSqr(to)));
-                String key = other.dimension().location() + "|" + to.asLong();
+                String key = other.dimension().identifier() + "|" + to.asLong();
                 Route old = best.get(key);
                 if (old == null || d < old.distance()) {
                     DroneNetwork.Port info = net.port(to);
@@ -271,14 +271,12 @@ public final class DroneWormhole {
     }
 
     /** ワームホール便のために、口や行き先のまわりを少しの間読み込ませる札（ネザーポータルの札と同じ広さと長さ）。 */
-    private static final net.minecraft.server.level.TicketType<net.minecraft.world.level.ChunkPos> TICKET =
-            net.minecraft.server.level.TicketType.create("singulo_wormhole_drone",
-                    java.util.Comparator.comparingLong(net.minecraft.world.level.ChunkPos::toLong), 300);
+    private static final net.minecraft.server.level.TicketType TICKET = DroneTickets.WORMHOLE_DRONE;
 
     /** pos のまわり（ブロックエンティティが動く広さ）を、300 tick の間読み込ませる。続けて呼ぶと延びる。 */
     public static void wake(ServerLevel level, BlockPos pos) {
-        var chunk = new net.minecraft.world.level.ChunkPos(pos);
-        level.getChunkSource().addRegionTicket(TICKET, chunk, 3, chunk);
+        var chunk = net.minecraft.world.level.ChunkPos.containing(pos);
+        level.getChunkSource().addTicketWithRadius(TICKET, chunk, 3);
     }
 
     /**

@@ -24,10 +24,10 @@ public class MeteoriteCoreBlock extends Block {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    protected void affectNeighborsAfterRemoval(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        BlockState newState = level.getBlockState(pos);
         if (!state.is(newState.getBlock()) && level instanceof ServerLevel server) {
             MeteorCores.get(server).markMined(pos);
         }
-        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 }

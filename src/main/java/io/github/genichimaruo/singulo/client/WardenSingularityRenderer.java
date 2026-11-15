@@ -4,15 +4,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.WardenSingularity;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 /** ウォーデンの小型の特異点: 黒い球と赤い降着の輪、周りの景色を歪める重力レンズ。出てくるときに育ち、消える前にしぼむ。 */
-public class WardenSingularityRenderer extends EntityRenderer<WardenSingularity> {
+public class WardenSingularityRenderer extends SnapshotEntityRenderer<WardenSingularity> {
     static final float HORIZON = 0.5F;
 
     public WardenSingularityRenderer(EntityRendererProvider.Context context) {
@@ -28,7 +28,7 @@ public class WardenSingularityRenderer extends EntityRenderer<WardenSingularity>
         float t = e.tickCount + partialTick;
         float r = HORIZON * size;
         pose.pushPose();
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
         pose.mulPose(Axis.XP.rotationDegrees(18));
         pose.mulPose(Axis.YP.rotationDegrees(t * 9));
         var glow = GlowDepth.of(buffers, FxDraw.WHITE);
@@ -44,8 +44,7 @@ public class WardenSingularityRenderer extends EntityRenderer<WardenSingularity>
         return true;
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(WardenSingularity e) {
+     public Identifier getTextureLocation(WardenSingularity e) {
         return FxDraw.WHITE;
     }
 }

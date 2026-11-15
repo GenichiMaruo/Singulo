@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -19,23 +19,23 @@ public class HandbookItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (level.isClientSide) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        if (level.isClientSide()) {
             io.github.genichimaruo.singulo.client.HandbookScreen.open();
         }
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
     /** 初めて入ったプレイヤーにハンドブックを渡す。 */
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getEntity();
-        CompoundTag persisted = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
-        if (persisted.getBoolean(GIVEN)) {
+        CompoundTag persisted = player.getPersistentData().getCompoundOrEmpty(Player.PERSISTED_NBT_TAG);
+        if (persisted.getBooleanOr(GIVEN, false)) {
             return;
         }
         persisted.putBoolean(GIVEN, true);
         player.getPersistentData().put(Player.PERSISTED_NBT_TAG, persisted);
         player.getInventory().placeItemBackInInventory(new ItemStack(SinguloItems.HANDBOOK.get()));
-        player.displayClientMessage(Component.translatable("message.singulo.welcome"), false);
+        player.sendSystemMessage(Component.translatable("message.singulo.welcome"));
     }
 }

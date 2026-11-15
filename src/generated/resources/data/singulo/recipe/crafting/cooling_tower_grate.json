@@ -5,12 +5,8 @@
     "IPI"
   ],
   "key": {
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "P": {
-      "tag": "c:plates/steel"
-    }
+    "I": "#c:ingots/iron",
+    "P": "#c:plates/steel"
   },
   "result": {
     "id": "singulo:cooling_tower_grate",

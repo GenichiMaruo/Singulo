@@ -17,14 +17,14 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -34,8 +34,8 @@ import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /**
  * 段階5の特異点技術の確認。シールドとティプラーは範囲が広く周りのテストに効いてしまうので、それぞれ別の組（batch）にする。
@@ -50,7 +50,7 @@ public final class Stage5RomanceGameTests {
     private Stage5RomanceGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static void keepPowered(GameTestHelper helper, CatalystDeviceBlockEntity be) {
@@ -94,7 +94,7 @@ public final class Stage5RomanceGameTests {
     public static void tiplerCylinderDoublesFurnaceSpeed(GameTestHelper helper) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
                 net.minecraft.core.Direction.SOUTH, 9);
-        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(TIPLER);
+        TiplerCylinderBlockEntity tipler = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,TIPLER);
         keepPowered(helper, tipler);
         tipler.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         tipler.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 2), false);
@@ -102,7 +102,7 @@ public final class Stage5RomanceGameTests {
         // 普通なら200 tick かかる精錬が、×2 なら100 tick ほどで終わる
         BlockPos furnacePos = new BlockPos(7, 1, 0);
         helper.setBlock(furnacePos, Blocks.FURNACE);
-        FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
+        FurnaceBlockEntity furnace = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,furnacePos);
         furnace.setItem(0, new ItemStack(Items.RAW_IRON));
         furnace.setItem(1, new ItemStack(Items.COAL));
 
@@ -130,7 +130,7 @@ public final class Stage5RomanceGameTests {
         // 観察窓を1枚外す（中に入れてしまう）
         helper.getLevel().setBlockAndUpdate(TestBuild.at(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER,
                 TIPLER, net.minecraft.core.Direction.SOUTH, 9, 2, 4, 0), Blocks.AIR.defaultBlockState());
-        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(TIPLER);
+        TiplerCylinderBlockEntity tipler = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,TIPLER);
         keepPowered(helper, tipler);
         tipler.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         tipler.fuel().insertItem(0, new ItemStack(item("exotic_matter")), false);
@@ -149,7 +149,7 @@ public final class Stage5RomanceGameTests {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SHIELD_TOWER, SHIELD,
                 net.minecraft.core.Direction.SOUTH, 9);
         BlockPos core = SHIELD;
-        ShieldTowerBlockEntity shield = helper.getBlockEntity(core);
+        ShieldTowerBlockEntity shield = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,core);
         keepPowered(helper, shield);
         shield.catalystSlot().insertItem(0, new ItemStack(item(catalyst)), false);
         return shield;
@@ -175,7 +175,7 @@ public final class Stage5RomanceGameTests {
             net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, card, tag -> {
                 net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
                 net.minecraft.nbt.CompoundTag other = new net.minecraft.nbt.CompoundTag();
-                other.putUUID("id", java.util.UUID.randomUUID());
+                other.store("id", net.minecraft.core.UUIDUtil.CODEC, java.util.UUID.randomUUID());
                 other.putString("name", "someone");
                 list.add(other);
                 tag.put("permit_members", list);
@@ -240,7 +240,7 @@ public final class Stage5RomanceGameTests {
     public static void advancedAnchorScalesAndEmbedsCore(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED.get());
-        AdvancedWorldlineAnchorBlockEntity anchor = helper.getBlockEntity(pos);
+        AdvancedWorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         anchor.energy().setEnergy(anchor.energy().getMaxEnergyStored());
         anchor.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         helper.runAtTickTime(2, () -> {
@@ -271,7 +271,7 @@ public final class Stage5RomanceGameTests {
         helper.assertTrue(!manipulator.affects(warden, GravityGauntletItem.Mode.LEVITATE), "ボスを持ち上げられてしまう");
         helper.assertTrue(!manipulator.affects(warden, GravityGauntletItem.Mode.CRUSH), "遺構のボスに圧壊が効く");
         for (var type : java.util.List.of(SinguloEntities.ECHO_SENTINEL.get(), SinguloEntities.GRAVITY_REMNANT.get())) {
-            var boss = type.create(helper.getLevel());
+            var boss = type.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             helper.assertTrue(boss != null && !manipulator.affects(boss, GravityGauntletItem.Mode.CRUSH), "遺構のボスに圧壊が効く: " + type);
         }
         // ほかのmodや本来のボスには、ダメージだけ（上限つき）入る

@@ -6,21 +6,15 @@
   "energy": 200000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:micro_black_hole"
-      },
+      "ingredient": "singulo:micro_black_hole",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:gravity_field_stabilizer"
-      },
+      "ingredient": "singulo:gravity_field_stabilizer",
       "count": 1
     }
   ],

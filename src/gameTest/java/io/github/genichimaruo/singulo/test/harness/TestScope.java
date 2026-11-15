@@ -27,10 +27,12 @@ public final class TestScope implements GameTestListener {
     }
 
     public static ServerPlayer ownPlayer(GameTestHelper helper, ServerPlayer player) {
+        // A mock client has no loading handshake; make combat tests represent a loaded player.
+        if (player.connection != null) player.connection.markClientLoaded();
         of(helper).defer(() -> {
             // discard() removes the entity but leaves vanilla's login/player list populated.
-            if (player.getServer().getPlayerList().getPlayer(player.getUUID()) == player)
-                player.getServer().getPlayerList().remove(player);
+            if (player.level().getServer().getPlayerList().getPlayer(player.getUUID()) == player)
+                player.level().getServer().getPlayerList().remove(player);
             player.discard();
         });
         return player;

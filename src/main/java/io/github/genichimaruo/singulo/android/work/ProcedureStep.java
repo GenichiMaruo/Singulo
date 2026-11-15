@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -61,18 +61,18 @@ public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, I
             t.putLong("corner", corner.asLong());
         }
         if (!item.isEmpty()) {
-            t.put("item", item.save(registries));
+            t.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(item, registries));
         }
         t.putInt("option", option);
         return t;
     }
 
     public static ProcedureStep load(CompoundTag t, HolderLookup.Provider registries) {
-        int kind = Math.floorMod(t.getInt("kind"), KINDS);
-        return new ProcedureStep(kind, BlockPos.of(t.getLong("pos")),
-                t.contains("corner") ? BlockPos.of(t.getLong("corner")) : null,
-                t.contains("item") ? ItemStack.parseOptional(registries, t.getCompound("item")) : ItemStack.EMPTY,
-                t.contains("option") ? t.getInt("option") : defaultOption(kind));
+        int kind = Math.floorMod(t.getIntOr("kind", 0), KINDS);
+        return new ProcedureStep(kind, BlockPos.of(t.getLongOr("pos", 0L)),
+                t.contains("corner") ? BlockPos.of(t.getLongOr("corner", 0L)) : null,
+                t.contains("item") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t.getCompoundOrEmpty("item")) : ItemStack.EMPTY,
+                t.contains("option") ? t.getIntOr("option", 0) : defaultOption(kind));
     }
 
     /** 範囲（1か所なら、そのブロックだけ）。 */

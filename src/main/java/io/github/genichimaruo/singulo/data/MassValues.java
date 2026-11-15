@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
  * 質量値（data/&lt;ns&gt;/mass_values/*.json）。丸石1個を1とする。
  * アイテム単位の指定がタグより優先し、タグ同士は後に読んだものが優先する。
  */
-public final class MassValues extends SimpleJsonResourceReloadListener {
+public final class MassValues extends SimpleJsonResourceReloadListener<JsonElement> {
     public static final MassValues INSTANCE = new MassValues();
 
     private record TagEntry(TagKey<Item> tag, double mass) {}
@@ -32,11 +32,11 @@ public final class MassValues extends SimpleJsonResourceReloadListener {
     private List<TagEntry> tags = List.of();
 
     private MassValues() {
-        super(new Gson(), "mass_values");
+        super(net.minecraft.util.ExtraCodecs.JSON, net.minecraft.resources.FileToIdConverter.json("mass_values"));
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
         Map<Item, Double> newItems = new HashMap<>();
         List<TagEntry> newTags = new ArrayList<>();
         files.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(file -> {
@@ -45,11 +45,11 @@ public final class MassValues extends SimpleJsonResourceReloadListener {
                     JsonObject o = e.getAsJsonObject();
                     double mass = o.get("mass").getAsDouble();
                     if (o.has("item")) {
-                        ResourceLocation id = ResourceLocation.parse(o.get("item").getAsString());
+                        Identifier id = Identifier.parse(o.get("item").getAsString());
                         BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> newItems.put(item, mass));
                     } else if (o.has("tag")) {
                         newTags.add(new TagEntry(TagKey.create(Registries.ITEM,
-                                ResourceLocation.parse(o.get("tag").getAsString())), mass));
+                                Identifier.parse(o.get("tag").getAsString())), mass));
                     }
                 }
             } catch (RuntimeException ex) {

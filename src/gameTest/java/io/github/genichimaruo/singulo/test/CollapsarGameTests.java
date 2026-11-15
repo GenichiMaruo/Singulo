@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -29,8 +29,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 0.17.0: コラプサー材の使い道（内張り・事象の地平線倉庫・ワームホール便）。 */
 @GameTestHolder("singulo")
@@ -64,7 +64,7 @@ public final class CollapsarGameTests {
     public static void liningKeepsTheTowerFormedAndIsCounted(GameTestHelper h) {
         BlockPos c = new BlockPos(2, 1, 2);
         TestBuild.build(h, Blueprints.Kind.COOLING_TOWER, c, Direction.SOUTH, 7);
-        MachineBlockEntity tower = h.getBlockEntity(c);
+        MachineBlockEntity tower = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,c);
         List<BlockPos> lined = new ArrayList<>();
         h.startSequence()
                 .thenWaitUntil(() -> h.assertTrue(tower.structureSize() == 7, "Tower did not form"))
@@ -97,7 +97,7 @@ public final class CollapsarGameTests {
     public static void vaultEmptyHandExtractsThroughPlayerInteraction(GameTestHelper h) {
         BlockPos at = new BlockPos(2, 1, 2);
         h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
-        HorizonVaultBlockEntity vault = h.getBlockEntity(at);
+        HorizonVaultBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         vault.insert(new ItemStack(Items.COBBLESTONE, 100), false);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
@@ -108,13 +108,13 @@ public final class CollapsarGameTests {
             player.gameMode.useItemOn(player, h.getLevel(), ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
             h.assertTrue(vault.count() == 36 && player.getInventory().countItem(Items.COBBLESTONE) == 64,
                     "Empty-hand interaction did not extract one stack");
-            player.getInventory().selected = 1;
+            player.getInventory().setSelectedSlot(1);
             player.setShiftKeyDown(true);
             player.gameMode.useItemOn(player, h.getLevel(), ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
             h.assertTrue(vault.count() == 35 && player.getInventory().countItem(Items.COBBLESTONE) == 65,
                     "Sneaking with an empty hand did not extract one item");
             player.setShiftKeyDown(false);
-            player.getInventory().selected = 2;
+            player.getInventory().setSelectedSlot(2);
             ItemStack held = new ItemStack(Items.COBBLESTONE, 12);
             player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, held);
             player.gameMode.useItemOn(player, h.getLevel(), held, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
@@ -149,17 +149,17 @@ public final class CollapsarGameTests {
     public static void vaultSendsEmptinessToClients(GameTestHelper h) {
         BlockPos at = new BlockPos(2, 1, 2);
         h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
-        HorizonVaultBlockEntity vault = h.getBlockEntity(at);
+        HorizonVaultBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         var registries = h.getLevel().registryAccess();
         vault.items().insertItem(0, new ItemStack(Items.COBBLESTONE, 2), false);
         // クライアント側の写し: 2個入っているところを受け取ってある
         HorizonVaultBlockEntity shown = new HorizonVaultBlockEntity(h.absolutePos(at), vault.getBlockState());
-        shown.loadWithComponents(vault.getUpdateTag(registries), registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(shown,vault.getUpdateTag(registries), registries);
         h.assertTrue(shown.count() == 2, "Client copy did not receive the count");
         vault.items().extractItem(0, 64, false);
         var update = vault.getUpdateTag(registries);
         h.assertFalse(update.isEmpty(), "Empty vault sends an empty update, which clients ignore");
-        shown.loadWithComponents(update, registries);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(shown,update, registries);
         h.assertTrue(shown.count() == 0 && shown.type().isEmpty(), "Client copy still shows " + shown.count());
         h.succeed();
     }
@@ -168,7 +168,7 @@ public final class CollapsarGameTests {
     public static void vaultStoresOneItemAndRejectsTheRest(GameTestHelper h) {
         BlockPos at = new BlockPos(2, 1, 2);
         h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
-        HorizonVaultBlockEntity vault = h.getBlockEntity(at);
+        HorizonVaultBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         var handler = vault.items();
         ItemStack packed = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.IRON_INGOT)));
         h.assertFalse(vault.accepts(packed), "An empty vault accepted a packed crate");
@@ -197,7 +197,7 @@ public final class CollapsarGameTests {
         h.assertTrue(new ItemStack(SinguloBlocks.HORIZON_VAULT.get()).canFitInsideContainerItems(), "An empty vault should fit inside container items");
         drops.forEach(ItemEntity::discard);
         h.setBlock(at, SinguloBlocks.HORIZON_VAULT.get());
-        HorizonVaultBlockEntity placed = h.getBlockEntity(at);
+        HorizonVaultBlockEntity placed = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
         placed.applyComponentsFromItemStack(item);
         h.assertTrue(placed.count() == 64 * 100 && placed.type().is(Items.COBBLESTONE), "Placing did not restore the contents");
         placed.insert(new ItemStack(Items.COBBLESTONE, 1), false);
@@ -223,7 +223,7 @@ public final class CollapsarGameTests {
         var tag = be.saveWithoutMetadata(level.registryAccess());
         tag.putInt("grace", 6000);
         tag.putInt("size", 1);
-        be.loadWithComponents(tag, level.registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,tag, level.registryAccess());
         return be;
     }
 
@@ -254,21 +254,20 @@ public final class CollapsarGameTests {
         ServerLevel here = h.getLevel();
         ServerLevel nether = here.getServer().getLevel(Level.NETHER);
         UUID owner = UUID.nameUUIDFromBytes(("relay-test" + h.absolutePos(BlockPos.ZERO)).getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        long pair = here.random.nextLong();
+        long pair = here.getRandom().nextLong();
         BlockPos portA = new BlockPos(2, 1, 2), mouthARel = new BlockPos(10, 1, 2);
         BlockPos mouthB = h.absolutePos(new BlockPos(20, 1, 5)).atY(200), portB = mouthB.offset(6, 0, 0);
         var scope = io.github.genichimaruo.singulo.test.harness.TestScope.of(h);
-        var ticket = net.minecraft.server.level.TicketType.create("singulo_relay_fixture",
-                java.util.Comparator.comparingLong(net.minecraft.world.level.ChunkPos::toLong));
+        var ticket = new net.minecraft.server.level.TicketType(0, net.minecraft.server.level.TicketType.FLAG_LOADING | net.minecraft.server.level.TicketType.FLAG_SIMULATION);
         var previous = new java.util.HashMap<BlockPos, net.minecraft.world.level.block.state.BlockState>();
         var chunks = new java.util.HashSet<net.minecraft.world.level.ChunkPos>();
         for (BlockPos p : BlockPos.betweenClosed(mouthB.offset(-4, 0, -4), portB.offset(4, 0, 4))) {
-            chunks.add(new net.minecraft.world.level.ChunkPos(p));
+            chunks.add(net.minecraft.world.level.ChunkPos.containing(p));
         }
         for (var chunk : chunks) {
-            nether.getChunkSource().addRegionTicket(ticket, chunk, 0, chunk);
-            nether.getChunk(chunk.x, chunk.z);
-            scope.defer(() -> nether.getChunkSource().removeRegionTicket(ticket, chunk, 0, chunk));
+            nether.getChunkSource().addTicketWithRadius(ticket, chunk, 0);
+            nether.getChunk(chunk.x(), chunk.z());
+            scope.defer(() -> nether.getChunkSource().removeTicketWithRadius(ticket, chunk, 0));
         }
         scope.defer(() -> previous.forEach(nether::setBlockAndUpdate));
         BlockPos beaconB = mouthB.offset(0, 0, 2);
@@ -282,7 +281,7 @@ public final class CollapsarGameTests {
         });
         // こちら: ポート・口・標識。向こう: 口・標識・ポート（網に載せるだけ）
         h.setBlock(portA, SinguloBlocks.DRONE_PORT.get());
-        DronePortBlockEntity port = h.getBlockEntity(portA);
+        DronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,portA);
         port.setOwner(owner);
         netA.putPort(h.absolutePos(portA), owner, "", false);
         WormholeMouthBlockEntity a = openMouth(here, h.absolutePos(mouthARel), pair);
@@ -381,7 +380,7 @@ public final class CollapsarGameTests {
         ServerLevel here = h.getLevel();
         ServerLevel nether = here.getServer().getLevel(Level.NETHER);
         UUID owner = UUID.nameUUIDFromBytes(("far-test" + h.absolutePos(BlockPos.ZERO)).getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        long pair = here.random.nextLong();
+        long pair = here.getRandom().nextLong();
         BlockPos base = h.absolutePos(BlockPos.ZERO);
         // 向こうの口は、読み込まれていない遠くの場所に「置かれている」ことにする（網に場所だけ載せる）
         BlockPos far = new BlockPos(Math.floorMod(base.getX(), 4096) + 200_000, 64, Math.floorMod(base.getZ(), 4096) + 200_000);
@@ -425,7 +424,7 @@ public final class CollapsarGameTests {
     @GameTest(template = "forge", timeoutTicks = 60)
     public static void wormholeShortcutInTheSameDimension(GameTestHelper h) {
         ServerLevel level = h.getLevel();
-        long pair = level.random.nextLong();
+        long pair = level.getRandom().nextLong();
         WormholeMouthBlockEntity a = openMouth(level, h.absolutePos(new BlockPos(5, 1, 5)), pair);
         WormholeMouthBlockEntity b = openMouth(level, h.absolutePos(new BlockPos(20, 1, 5)), pair);
         h.runAtTickTime(5, () -> {
@@ -452,7 +451,7 @@ public final class CollapsarGameTests {
     public static void projectorOnFormedControllerDoesNotOpenTheScreen(GameTestHelper h) {
         BlockPos c = new BlockPos(2, 1, 2);
         TestBuild.build(h, Blueprints.Kind.COOLING_TOWER, c, Direction.SOUTH, 7);
-        MachineBlockEntity tower = h.getBlockEntity(c);
+        MachineBlockEntity tower = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,c);
         h.startSequence()
                 .thenWaitUntil(() -> h.assertTrue(tower.structureSize() == 7, "Tower did not form"))
                 .thenExecute(() -> {

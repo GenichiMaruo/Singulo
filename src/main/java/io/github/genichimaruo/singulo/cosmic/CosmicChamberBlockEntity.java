@@ -32,12 +32,12 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /** Finite storage and a reserved-work spindle, with no runtime chunk loading. */
-public final class CosmicChamberBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
+public final class CosmicChamberBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
         io.github.genichimaruo.singulo.multiblock.PortAccess, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     public static final int RESERVOIR=0, ACCUMULATOR=1, SPINDLE=2;
     public static final int FLUID_CAPACITY=16_000_000;
@@ -56,7 +56,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
      * 物の枠。潮汐紡糸機は 0 素材・1 エキゾチック物質・2 種・3 できた物。核パスタ積層蓄電庫は 0 を「充電する物を入れる枠」、
      * 3 を「充電済みの物が出てくる枠」に使う（{@link io.github.genichimaruo.singulo.energy.ItemCharging}）。
      */
-    private final ItemStackHandler items = new ItemStackHandler(4) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(4) {
         @Override public int getSlotLimit(int slot) { return slot==2||kind()==ACCUMULATOR&&slot==0?1:64; }
         @Override protected void onContentsChanged(int slot) { setChanged(); }
         @Override public boolean isItemValid(int slot, ItemStack stack) {
@@ -67,7 +67,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             return slot==3 ? stack : super.insertItem(slot,stack,simulate);
         }
     };
-    private final FluidTank tank = new FluidTank(FLUID_CAPACITY) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(FLUID_CAPACITY) {
         @Override protected void onContentsChanged() { setChanged(); }
     };
     private final Energy input=new Energy(true,false), output=new Energy(false,true), both=new Energy(true,true);
@@ -99,8 +99,8 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item> SPINDLE_FEEDSTOCK=
             net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,Singulo.id("tidal_spindle_feedstock"));
     public static boolean acceptsSpindleItem(int slot,ItemStack stack){
-        if(slot==0)return stack.is(SPINDLE_FEEDSTOCK)||stack.is(BuiltInRegistries.ITEM.get(Singulo.id("collapsar_billet")));
-        return (slot==1||slot==2)&&stack.is(BuiltInRegistries.ITEM.get(Singulo.id(slot==1?"exotic_matter":"singularity_seed")));
+        if(slot==0)return stack.is(SPINDLE_FEEDSTOCK)||stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("collapsar_billet")));
+        return (slot==1||slot==2)&&stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id(slot==1?"exotic_matter":"singularity_seed")));
     }
     public int kind() {
         String id=BuiltInRegistries.BLOCK.getKey(getBlockState().getBlock()).getPath();
@@ -110,14 +110,14 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public long stored(){return stored;}
     public long capacity(){return kind()==ACCUMULATOR?PASTA_CAPACITY:SPINDLE_CAPACITY;}
     public long rate(){return kind()==ACCUMULATOR?PASTA_RATE:SPINDLE_RATE;}
-    public FluidTank tank(){return tank;}
+    public TransactionalFluidTank tank(){return tank;}
     public ItemStackHandler items(){return items;}
     public boolean menuActive(){return !retired&&!isRemoved();}
     /** Retire access before close callbacks run; never serialize this runtime-only state. */
     public void retireForRemoval(){
         if(retired)return;
         retired=true;
-        if(level!=null&&!level.isClientSide)linkPorts(false);
+        if(level!=null&&!level.isClientSide())linkPorts(false);
         if(level instanceof ServerLevel server)for(var player:java.util.List.copyOf(server.players()))
             if(player.containerMenu instanceof CosmicMenu menu&&menu.ownedBy(this))player.closeContainer();
     }
@@ -129,13 +129,13 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public int lastOut(){return lastOut;}
     public ItemStack reserved(){return reserved;}
     public int tankCapacity(){return kind()==RESERVOIR?FLUID_CAPACITY:16_000;}
-    public LongEnergyStorage energyFor(Direction side){return side==null?both:kind()==ACCUMULATOR&&side==back().getOpposite()?output:input;}
-    public IFluidHandler fluidFor(Direction side){return side==null?fluidBoth:kind()==RESERVOIR&&side==back().getOpposite()?fluidOutput:fluidInput;}
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energyFor(Direction side){return side==null?both:kind()==ACCUMULATOR&&side==back().getOpposite()?output:input;}
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess fluidFor(Direction side){return side==null?fluidBoth:kind()==RESERVOIR&&side==back().getOpposite()?fluidOutput:fluidInput;}
     public IItemHandler automation(){return automation;}
 
     /** Every external mutation checks the loaded structure, including changes in this tick. */
     public boolean ready() {
-        if(level==null || level.isClientSide || isRemoved())return false;
+        if(level==null || level.isClientSide() || isRemoved())return false;
         var shape=CosmicLayouts.of(kind());
         for(int x=0;x<shape.width();x++) for(int z=0;z<shape.depth();z++)
             if(!level.isLoaded(shape.pos(worldPosition,back(),x,0,z))){status=2;return false;}
@@ -183,27 +183,18 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     private void pushPower() {
         Direction front=back().getOpposite();BlockPos next=worldPosition.relative(front);
         if(stored<=0 || !level.isLoaded(next))return;
-        IEnergyStorage target=level.getCapability(Capabilities.EnergyStorage.BLOCK,next,front.getOpposite());
-        if(target==null || !target.canReceive())return;
+        net.neoforged.neoforge.transfer.energy.EnergyHandler target=level.getCapability(Capabilities.Energy.BLOCK,next,front.getOpposite());
+        if(target==null)return;
         sendPower(target);
     }
-    private void sendPower(IEnergyStorage target) {
+    private void sendPower(net.neoforged.neoforge.transfer.energy.EnergyHandler target) {
         budgets();
         long offered=Math.min(stored,Math.max(0,rate()-tickOut));
-        if(offered<=0)return;
-        stored-=offered;tickOut+=offered;pendingOutput+=offered;
-        long paid=0;
-        try {paid=Math.max(0,Math.min(offered,LongEnergyStorage.receive(target,offered,false)));}
-        finally {
-            // Unaccepted power still owns its capacity while the foreign handler runs.
-            // Re-entrant input cannot occupy that room and then overflow on refund.
-            stored+=offered-paid;tickOut-=offered-paid;pendingOutput-=offered;
-        }
-        if(paid>0)setChanged();
+        io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(output,target,offered);
     }
     private void process(ServerLevel server) {
         if(!core) {
-            if(stored<CORE_COST || !items.getStackInSlot(2).is(BuiltInRegistries.ITEM.get(Singulo.id("singularity_seed"))))return;
+            if(stored<CORE_COST || !items.getStackInSlot(2).is(BuiltInRegistries.ITEM.getValue(Singulo.id("singularity_seed"))))return;
             stored-=CORE_COST;items.extractItem(2,1,false);core=true;setChanged();
             // 開く演出をすぐ見せる
             level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
@@ -219,7 +210,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             return;
         }
         if(server.getGameTime()%10!=0)return;
-        for(var holder:io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(server.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()))){
+        for(var holder:io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(server.recipeAccess().recipeMap().byType(SinguloRecipes.MACHINE.get()))){
             MachineRecipe r=holder.value();
             // This chamber has one ordinary output and no catalyst, mass or fluid-output slots.
             // Refuse incompatible data-pack recipes before reserving any resources.
@@ -243,27 +234,36 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     }
     private boolean fits(ItemStack product){ItemStack out=items.getStackInSlot(3);return !product.isEmpty() && product.getCount()<=product.getMaxStackSize() && (out.isEmpty() || ItemStack.isSameItemSameComponents(out,product) && out.getCount()+product.getCount()<=out.getMaxStackSize());}
 
-    private final class Energy implements LongEnergyStorage {
+    private final net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> energyJournal = new net.neoforged.neoforge.transfer.transaction.SnapshotJournal<>() {
+        @Override protected long[] createSnapshot(){return new long[]{stored,budgetTick,tickIn,tickOut,lastIn,lastOut,pendingOutput};}
+        @Override protected void revertToSnapshot(long[] v){stored=v[0];budgetTick=v[1];tickIn=v[2];tickOut=v[3];lastIn=(int)v[4];lastOut=(int)v[5];pendingOutput=v[6];}
+        @Override protected void onRootCommit(long[] v){if(stored!=v[0])setChanged();}
+    };
+    private final class Energy implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
         private final boolean receive,extract;
         Energy(boolean receive,boolean extract){this.receive=receive;this.extract=extract;}
-        public long receiveLong(long amount,boolean simulate){
-            if(!receive || amount<=0 || kind()==RESERVOIR || !ready())return 0;budgets();
+        @Override public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            if(!receive||amount==0||kind()==RESERVOIR||!ready())return 0;
+            energyJournal.updateSnapshots(tx);budgets();
             long n=Math.min(amount,Math.min(Math.max(0,capacity()-stored-pendingOutput),Math.max(0,rate()-tickIn)));
-            if(!simulate&&n>0){stored+=n;tickIn+=n;setChanged();}return n;
+            stored+=n;tickIn+=n;return n;
         }
-        public long extractLong(long amount,boolean simulate){
-            if(!extract || kind()!=ACCUMULATOR || amount<=0 || !ready())return 0;budgets();
-            long n=Math.min(amount,Math.min(stored,Math.max(0,rate()-tickOut)));
-            if(!simulate&&n>0){stored-=n;tickOut+=n;setChanged();}return n;
+        @Override public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");
+            if(!extract||kind()!=ACCUMULATOR||amount==0||!ready())return 0;
+            energyJournal.updateSnapshots(tx);budgets();
+            long n=Math.min(amount,Math.min(stored,Math.max(0,rate()-tickOut)));stored-=n;tickOut+=n;return n;
         }
-        public int receiveEnergy(int n,boolean simulate){return(int)receiveLong(n,simulate);}
-        public int extractEnergy(int n,boolean simulate){return(int)extractLong(n,simulate);}
-        public int getEnergyStored(){return(int)Math.min(Integer.MAX_VALUE,stored);}
-        public int getMaxEnergyStored(){return(int)Math.min(Integer.MAX_VALUE,capacity());}
-        public boolean canReceive(){return receive&&kind()!=RESERVOIR;}
-        public boolean canExtract(){return extract&&kind()==ACCUMULATOR;}
+        @Override public long getAmountAsLong(){return stored;}
+        @Override public long getCapacityAsLong(){return capacity();}
+        @Override public boolean canReceive(){return receive&&kind()!=RESERVOIR;}
+        @Override public boolean canExtract(){return extract&&kind()==ACCUMULATOR;}
     }
-    private final class Fluids implements IFluidHandler {
+    private final class Fluids implements io.github.genichimaruo.singulo.compat.TankFluidAccess {
+        public TransactionalFluidTank tankAt(int index) { return tank; }
+        public boolean allowsInsert(int index) { return fill && ready(); }
+        public boolean allowsExtract(int index) { return drain && kind() == RESERVOIR && ready(); }
         private final boolean fill,drain;
         Fluids(boolean fill,boolean drain){this.fill=fill;this.drain=drain;}
         public int getTanks(){return kind()==ACCUMULATOR?0:1;}
@@ -284,7 +284,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public void cyclePort(int index){
         portModes[index]=(portModes[index]+1)%3;
         setChanged();
-        if(level!=null&&!level.isClientSide){
+        if(level!=null&&!level.isClientSide()){
             level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
             // つないだパイプにつなぎ直させる（出し入れできる物が変わった）
             level.updateNeighborsAt(portPos(index),level.getBlockState(portPos(index)).getBlock());
@@ -302,17 +302,17 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     @SuppressWarnings("unchecked")
     @Override public <T> T portCapability(BlockPos port,net.neoforged.neoforge.capabilities.BlockCapability<T,Direction> capability){
         int mode=modeOf(port);
-        if(capability==Capabilities.EnergyStorage.BLOCK){
+        if(capability==Capabilities.Energy.BLOCK){
             if(kind()==RESERVOIR)return null;
             return (T)(mode==PORT_INPUT?input:mode==PORT_OUTPUT?output:both);
         }
-        if(capability==Capabilities.FluidHandler.BLOCK){
+        if(capability==Capabilities.Fluid.BLOCK){
             if(kind()==ACCUMULATOR)return null;
             return (T)(mode==PORT_INPUT?fluidInput:mode==PORT_OUTPUT?fluidOutput:fluidBoth);
         }
-        if(capability==Capabilities.ItemHandler.BLOCK){
+        if(capability==Capabilities.Item.BLOCK){
             if(kind()!=SPINDLE)return null;
-            return (T)(mode==PORT_INPUT?itemInput:mode==PORT_OUTPUT?itemOutput:automation);
+            return (T) transferItems(mode != PORT_OUTPUT, mode != PORT_INPUT);
         }
         return null;
     }
@@ -334,25 +334,30 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         }),this);
     }
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider registries){
-        super.saveAdditional(tag,registries);tag.put("items",items.serializeNBT(registries));write(tag,registries);
+        super.saveAdditional(tag,registries);tag.put("items",io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));write(tag,registries);
     }
     private void write(CompoundTag tag,HolderLookup.Provider registries){
-        tag.putLong("stored",stored);tag.put("tank",tank.writeToNBT(registries,new CompoundTag()));
+        tag.putLong("stored",stored);tag.put("tank",io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries,new CompoundTag()));
         tag.putInt("progress",progress);tag.putInt("duration",duration);tag.putInt("cost",cost);tag.putBoolean("core",core);tag.putInt("status",status);
-        tag.putInt("in",lastIn);tag.putInt("out",lastOut);tag.putIntArray("ports",portModes);if(!reserved.isEmpty())tag.put("reserved",reserved.save(registries));
+        tag.putInt("in",lastIn);tag.putInt("out",lastOut);tag.putIntArray("ports",portModes);if(!reserved.isEmpty())tag.put("reserved",io.github.genichimaruo.singulo.compat.NbtCompat.save(reserved, registries));
     }
     @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider registries){
         super.loadAdditional(tag,registries);
         if(tag.contains("items")){checked=false;}                 // 保存データから読み込んだ: 最初の判定では演出しない
-        if(tag.contains("items"))items.deserializeNBT(registries,tag.getCompound("items"));
-        stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(registries,tag.getCompound("tank"));
+        if(tag.contains("items"))io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries,tag.getCompoundOrEmpty("items"));
+        stored=Math.max(0,Math.min(capacity(),tag.getLongOr("stored", 0L)));io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries,tag.getCompoundOrEmpty("tank"));
         if(tank.getFluidAmount()>tankCapacity())tank.setFluid(tank.getFluid().copyWithAmount(tankCapacity()));
-        duration=Math.max(0,tag.getInt("duration"));progress=Math.max(0,Math.min(duration,tag.getInt("progress")));cost=Math.max(0,tag.getInt("cost"));core=tag.getBoolean("core");
-        status=tag.getInt("status");lastIn=tag.getInt("in");lastOut=tag.getInt("out");
-        int[] ports=tag.getIntArray("ports");
+        duration=Math.max(0,tag.getIntOr("duration", 0));progress=Math.max(0,Math.min(duration,tag.getIntOr("progress", 0)));cost=Math.max(0,tag.getIntOr("cost", 0));core=tag.getBooleanOr("core", false);
+        status=tag.getIntOr("status", 0);lastIn=tag.getIntOr("in", 0);lastOut=tag.getIntOr("out", 0);
+        int[] ports=tag.getIntArray("ports").orElseGet(() -> new int[0]);
         if(ports.length==2)for(int i=0;i<2;i++)portModes[i]=Math.floorMod(ports[i],3);
-        reserved=tag.contains("reserved")?ItemStack.parseOptional(registries,tag.getCompound("reserved")):ItemStack.EMPTY;
+        reserved=tag.contains("reserved")?io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries,tag.getCompoundOrEmpty("reserved")):ItemStack.EMPTY;
     }
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries){CompoundTag tag=new CompoundTag();write(tag,registries);return tag;}
     @Override public Packet<ClientGamePacketListener> getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return transferItems(true,true); }
+    private net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems(boolean allowInsert, boolean allowExtract) {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items,(slot,r) -> allowInsert && ready() && slot != 3,(slot,r) -> allowExtract && ready() && slot == 3);
+    }
 }

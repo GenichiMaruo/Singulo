@@ -22,10 +22,10 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 場所のよさ（0〜1）に比例して進み、最大のとき ticksAtMax() tick に1個できる。
  * 右クリックで、たまったものを受け取り、今の集まり具合を知らせる。搬出（ホッパーやパイプ）でも取り出せる。
  */
-public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public abstract class EnvironmentCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     static final int CHECK_INTERVAL = 20;
 
-    private final ItemStackHandler output = new ItemStackHandler(1) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler output = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -78,7 +78,7 @@ public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implem
         be.rate = be.rateAt(level, pos);
         be.progress += be.rate * CHECK_INTERVAL / be.ticksAtMax();
         while (be.progress >= 1) {
-            ItemStack made = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(be.product())));
+            ItemStack made = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(be.product())));
             if (!be.output.insertItem(0, made, false).isEmpty()) {
                 be.progress = 1;
                 break;
@@ -102,24 +102,29 @@ public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implem
         }
         double r = level == null ? 0 : rateAt(level, worldPosition);
         if (r <= 0) {
-            player.displayClientMessage(Component.translatable(messageKey() + ".idle"), true);
+            player.sendOverlayMessage(Component.translatable(messageKey() + ".idle"));
         } else {
             int seconds = (int) Math.round(ticksAtMax() / r / 20);
-            player.displayClientMessage(Component.translatable(messageKey() + ".rate", Math.round(r * 100), seconds), true);
+            player.sendOverlayMessage(Component.translatable(messageKey() + ".rate", Math.round(r * 100), seconds));
         }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
         tag.putDouble("progress", progress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
-        progress = tag.getDouble("progress");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
+        progress = tag.getDoubleOr("progress", 0.0D);
+    }
+
+    /** Native platform automation, sharing owned storage and commit-only notifications. */
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(output, (slot, resource) -> false, (slot, resource) -> true);
     }
 }

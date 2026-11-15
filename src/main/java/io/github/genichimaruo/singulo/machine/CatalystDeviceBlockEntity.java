@@ -29,7 +29,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 毎tick、触媒のティアと残量から効き方と必要電力を決め、触媒を1 tick ぶん（×消費倍率）減らす。
  * 必要電力が足りないと不完全反応で減りが速くなり、まったくなければ止まる。使い切ると失活触媒が残る。
  */
-public abstract class CatalystDeviceBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
     /**
      * STANDBY: 発電機の蓄電がいっぱいなので待機中（燃料・触媒を使わない）。LIMITED: 持ち主のアンカーが上限に達している。
      * 番号で同期するので、新しい値は後ろに足す。
@@ -41,7 +41,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         WORLDLINE_ANCHOR, INERTIAL_STABILIZER, QUANTUM_HEAT_ENGINE, DEGENERATE_FURNACE, PROBE_STATION, SHIELD_TOWER, TIPLER_CYLINDER;
 
         /** 触媒のほかにもう1つあるスロットの名前（燃料・許可証）。なければ null。 */
-        @javax.annotation.Nullable
+        @org.jspecify.annotations.Nullable
         public String extraSlot() {
             return switch (this) {
                 case DEGENERATE_FURNACE, TIPLER_CYLINDER -> "gui.singulo.slot.fuel";
@@ -64,7 +64,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_VALUE = 3, D_USAGE = 4, D_SPEED_X100 = 5,
             D_WEAR_X100 = 6, D_EXTRA = 7, D_ENABLED = 8, D_LOADED_ITEM = 9, D_LOADED_FILL = 10, COUNT = 11;
 
-    protected final ItemStackHandler slot = new ItemStackHandler(1) {
+    protected final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler slot = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return CatalystHelper.tierOf(stack) > 0;
@@ -83,7 +83,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     /** 触媒の装填（触媒スロットは予備の置き場。使う1個は中に装填する）。 */
     protected final CatalystMagazine magazine = new CatalystMagazine(this::setChanged);
     /** 使い切った失活触媒と、入れ替えで外した使いかけの出口（取り出すだけ）。 */
-    protected final ItemStackHandler spent = new ItemStackHandler(1) {
+    protected final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler spent = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int s) {
             setChanged();
@@ -174,7 +174,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     /** 動ける状態でなければその理由（未形成・燃料なしなど）。動けるなら null。触媒は減らない。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     protected Status readiness(ServerLevel level) {
         return null;
     }
@@ -205,8 +205,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     /**
      * 触媒も電力も使わずに動く場合の効き方（シンギュラリティ・コアを埋め込んだアンカー）。普通は null。
      */
-    @javax.annotation.Nullable
-    protected CatalystHelper.Effect permanentEffect() {
+    protected CatalystHelper.@org.jspecify.annotations.Nullable Effect permanentEffect() {
         return null;
     }
 
@@ -282,13 +281,10 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             if (energy.getEnergyStored() <= 0) {
                 return;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK,
+            var target = level.getCapability(Capabilities.Energy.BLOCK,
                     worldPosition.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), perTick), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), perTick));
             }
         }
     }
@@ -342,9 +338,9 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("catalyst", slot.serializeNBT(registries));
+        tag.put("catalyst", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(slot, registries));
         tag.put("magazine", magazine.save(registries));
-        tag.put("spent", spent.serializeNBT(registries));
+        tag.put("spent", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(spent, registries));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("wear", wear);
         tag.putBoolean("enabled", enabled);
@@ -353,11 +349,15 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        slot.deserializeNBT(registries, tag.getCompound("catalyst"));
-        magazine.load(tag.getCompound("magazine"), registries);
-        spent.deserializeNBT(registries, tag.getCompound("spent"));
-        energy.setEnergy(tag.getInt("energy"));
-        wear = tag.getDouble("wear");
-        enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(slot, registries, tag.getCompoundOrEmpty("catalyst"));
+        magazine.load(tag.getCompoundOrEmpty("magazine"), registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(spent, registries, tag.getCompoundOrEmpty("spent"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        wear = tag.getDoubleOr("wear", 0.0D);
+        enabled = !tag.contains("enabled") || tag.getBooleanOr("enabled", false);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return io.github.genichimaruo.singulo.compat.ItemTransferView.combined(slot, new io.github.genichimaruo.singulo.compat.ItemTransferView(spent, (s,r) -> false, (s,r) -> true));
     }
 }

@@ -1,0 +1,19 @@
+// Development-only many-source rendering regression; never ship this harness.
+allprojects {
+    afterEvaluate {
+        // Init scripts also visit buildSrc; only the mod project has these runs.
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
+        sourceSets.main.java.srcDir(file('tools/review/common-src'))
+        sourceSets.main.java.srcDir(file('tools/review/outline-src'))
+        neoForge.runs.client {
+            gameDirectory = file('build/outline-review')
+            systemProperty 'singulo.outlineOutput', file('build/outline-review/screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

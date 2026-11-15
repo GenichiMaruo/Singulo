@@ -3,10 +3,10 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.HashSet;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)

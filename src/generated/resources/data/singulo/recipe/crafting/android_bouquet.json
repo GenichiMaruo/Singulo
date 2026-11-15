@@ -6,12 +6,8 @@
     " P "
   ],
   "key": {
-    "F": {
-      "tag": "minecraft:small_flowers"
-    },
-    "P": {
-      "item": "minecraft:paper"
-    }
+    "F": "#minecraft:small_flowers",
+    "P": "minecraft:paper"
   },
   "result": {
     "id": "singulo:android_bouquet",

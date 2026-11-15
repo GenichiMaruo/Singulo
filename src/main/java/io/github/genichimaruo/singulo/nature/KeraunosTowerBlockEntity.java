@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.nature;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * どのモードでも右クリックで撃てる。CHARGE_TICKS のあいだ放電球に力をためてから（描画: KeraunosTowerRenderer）、
  * 先端から避雷針へ雷が飛ぶ。1回に COST FE を使い、撃ったあと COOLDOWN tick は撃てない。
  */
-public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class KeraunosTowerBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     /** 撃ち方。 */
     public enum Mode {
         MANUAL, REDSTONE, AUTO
@@ -129,7 +129,7 @@ public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMac
 
     private static void tell(@Nullable ServerPlayer player, String key) {
         if (player != null) {
-            player.displayClientMessage(Component.translatable("message.singulo.keraunos." + key), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.keraunos." + key));
         }
     }
 
@@ -175,13 +175,13 @@ public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMac
         if (player.isShiftKeyDown()) {
             setMode(Mode.values()[(mode.ordinal() + 1) % Mode.values().length]);
             level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("keraunos_tower.mode"), SoundSource.BLOCKS, 0.8F, 1.0F);
-            player.displayClientMessage(Component.translatable("message.singulo.keraunos.mode."
-                    + mode.name().toLowerCase(java.util.Locale.ROOT)), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.keraunos.mode."
+                    + mode.name().toLowerCase(java.util.Locale.ROOT)));
             return;
         }
         if (fire(player)) {
-            player.displayClientMessage(Component.translatable("message.singulo.keraunos.fire",
-                    energy.getEnergyStored(), energy.getMaxEnergyStored()), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.keraunos.fire",
+                    energy.getEnergyStored(), energy.getMaxEnergyStored()));
         }
     }
 
@@ -224,13 +224,13 @@ public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMac
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("energy")) {
-            energy.setEnergy(tag.getInt("energy"));
+            energy.setEnergy(tag.getIntOr("energy", 0));
         }
-        chargeStart = tag.contains("charge") ? tag.getLong("charge") : -1;
-        boltAt = tag.contains("bolt") ? tag.getLong("bolt") : -1000;
-        target = tag.contains("target") ? BlockPos.of(tag.getLong("target")) : null;
+        chargeStart = tag.contains("charge") ? tag.getLongOr("charge", 0L) : -1;
+        boltAt = tag.contains("bolt") ? tag.getLongOr("bolt", 0L) : -1000;
+        target = tag.contains("target") ? BlockPos.of(tag.getLongOr("target", 0L)) : null;
         try {
-            mode = tag.contains("mode") ? Mode.valueOf(tag.getString("mode")) : Mode.MANUAL;
+            mode = tag.contains("mode") ? Mode.valueOf(tag.getStringOr("mode", "")) : Mode.MANUAL;
         } catch (IllegalArgumentException e) {
             mode = Mode.MANUAL;
         }

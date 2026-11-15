@@ -6,27 +6,19 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:quantum_computing_module"
-      },
+      "ingredient": "singulo:quantum_computing_module",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:meteoric_iron_ingot"
-      },
+      "ingredient": "singulo:meteoric_iron_ingot",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 3000
     }

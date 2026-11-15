@@ -18,7 +18,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * JEI のレシピの「+」: 作業指令台の記録のページの見本の欄へ、レシピを置く（物は減らない）。
@@ -69,7 +69,7 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
                 return helper.createInternalError();   // 物のないレシピ（液体だけなど）は扱えない: ボタンを出さない
             }
             if (doTransfer) {
-                PacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId,
+                ClientPacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId,
                         WorkConsoleActionPayload.process(inputs, outputs, player.level().registryAccess())));
                 if (Minecraft.getInstance().screen instanceof io.github.genichimaruo.singulo.client.WorkConsoleScreen screen) {
                     screen.showRecordTab();
@@ -87,7 +87,7 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
         while (grid.size() < 9) {
             grid.add(ItemStack.EMPTY);
         }
-        PacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId,
+        ClientPacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId,
                 WorkConsoleActionPayload.grid(grid.subList(0, 9), player.level().registryAccess())));
         if (Minecraft.getInstance().screen instanceof io.github.genichimaruo.singulo.client.WorkConsoleScreen screen) {
             screen.showRecordTab();

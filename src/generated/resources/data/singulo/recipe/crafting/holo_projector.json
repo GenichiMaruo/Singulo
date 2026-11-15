@@ -7,15 +7,9 @@
     " B "
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "C": "#c:ingots/copper",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:holo_projector",

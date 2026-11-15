@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.supporter.SupporterCredits;
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
@@ -16,7 +16,7 @@ final class SupporterPlaque {
 
     private SupporterPlaque() {}
 
-    static void draw(GuiGraphics g, Font font, SupporterCredits.Entry entry, int x, int y, int w, int h, float time) {
+    static void draw(GuiGraphicsExtractor g, Font font, SupporterCredits.Entry entry, int x, int y, int w, int h, float time) {
         boolean rainbow = entry.tier() == SupporterCredits.Tier.RAINBOW;
         g.fill(x + 2, y + 3, x + w + 2, y + h + 3, 0x55000000);
         g.fill(x, y, x + w, y + h, 0xFF242333);
@@ -42,23 +42,23 @@ final class SupporterPlaque {
             scale = Math.max(0.65F, scale - 0.05F);
             lines = font.split(name, (int) ((w - 24) / scale));
         }
-        g.pose().pushPose();
-        g.pose().translate(x + w / 2F, y + (h - lines.size() * font.lineHeight * scale) / 2F, 0);
-        g.pose().scale(scale, scale, 1);
+        g.pose().pushMatrix();
+        g.pose().translate(x + w / 2F, y + (h - lines.size() * font.lineHeight * scale) / 2F);
+        g.pose().scale(scale, scale);
         int lineY = 0;
         for (FormattedCharSequence line : lines) {
             int lineX = -font.width(line) / 2;
             if (rainbow) {
                 // A soft halo around the animated, individually colored glyphs.
-                g.drawString(font, line, lineX - 1, lineY, 0x38FFFFFF, false);
-                g.drawString(font, line, lineX + 1, lineY, 0x38FFFFFF, false);
-                g.drawString(font, line, lineX, lineY - 1, 0x38FFFFFF, false);
-                g.drawString(font, line, lineX, lineY + 1, 0x38FFFFFF, false);
+                g.text(font, line, lineX - 1, lineY, 0x38FFFFFF, false);
+                g.text(font, line, lineX + 1, lineY, 0x38FFFFFF, false);
+                g.text(font, line, lineX, lineY - 1, 0x38FFFFFF, false);
+                g.text(font, line, lineX, lineY + 1, 0x38FFFFFF, false);
             }
-            g.drawString(font, line, lineX, lineY, rainbow ? 0xFFFFFFFF : 0xFFF6E9CE, true);
+            g.text(font, line, lineX, lineY, rainbow ? 0xFFFFFFFF : 0xFFF6E9CE, true);
             lineY += font.lineHeight;
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
         if (rainbow) {
             sparkles(g, entry.id().hashCode(), x, y, w, h, time);
         }
@@ -84,7 +84,7 @@ final class SupporterPlaque {
         return Mth.hsvToRgb(hue - Mth.floor(hue), 0.6F, 1);
     }
 
-    private static void border(GuiGraphics g, int x, int y, int w, int h, float time) {
+    private static void border(GuiGraphicsExtractor g, int x, int y, int w, int h, float time) {
         int perimeter = 2 * (w + h);
         for (int dx = 0; dx < w; dx += 4) {
             int n = Math.min(4, w - dx);
@@ -101,7 +101,7 @@ final class SupporterPlaque {
         }
     }
 
-    private static void sparkles(GuiGraphics g, int seed, int x, int y, int w, int h, float time) {
+    private static void sparkles(GuiGraphicsExtractor g, int seed, int x, int y, int w, int h, float time) {
         for (int i = 0; i < 4; i++) {
             float phase = time * 0.06F + i * 1.7F + (seed & 255) * 0.02F;
             float bright = Math.max(0, Mth.sin(phase));

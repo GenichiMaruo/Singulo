@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.machine.*;
@@ -7,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.item.*;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -16,8 +17,8 @@ public final class CatalystPersistenceGameTests {
     public static void reloadPreservesLoadedReserveAndBlockedCatalystReturns(GameTestHelper h) {
         var pos = new BlockPos(1, 1, 1);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity original = h.getBlockEntity(pos);
-        var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("muon_catalyst")));
+        MachineBlockEntity original = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
+        var catalyst = new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("muon_catalyst")));
         int slot = original.type().catalystSlot(), max = UsesHelper.remaining(catalyst);
         original.items().setStackInSlot(slot, catalyst.copyWithCount(3));
         original.magazine().tick(original.items(), slot, s -> s);
@@ -27,8 +28,8 @@ public final class CatalystPersistenceGameTests {
         var tag = original.saveWithoutMetadata(h.getLevel().registryAccess());
         var next = new BlockPos(5, 1, 1);
         h.setBlock(next, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity restored = h.getBlockEntity(next);
-        restored.loadWithComponents(tag, h.getLevel().registryAccess());
+        MachineBlockEntity restored = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,next);
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag, h.getLevel().registryAccess());
         h.assertTrue(restored.items().getStackInSlot(slot).getCount() == 1
                 && UsesHelper.remaining(restored.magazine().loaded()) == max - 17 && restored.magazine().hasReturns(),
                 "Reload lost active life, reserve count or pending shell");
@@ -38,7 +39,7 @@ public final class CatalystPersistenceGameTests {
             restored.items().setStackInSlot(restored.type().outputSlot() + i, ItemStack.EMPTY);
         for (int i = 0; i < 3; i++)
             MachineBlockEntity.serverTick(h.getLevel(), restored.getBlockPos(), restored.getBlockState(), restored);
-        var spent = BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("spent_muon_catalyst"));
+        var spent = BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("spent_muon_catalyst"));
         int returned = 0;
         for (int i = 0; i < restored.type().outputSlots(); i++) {
             var stack = restored.items().getStackInSlot(restored.type().outputSlot() + i);

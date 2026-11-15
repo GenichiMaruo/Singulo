@@ -23,7 +23,7 @@ import org.joml.Vector3f;
  */
 public class InfallingBlock extends Entity {
     private static final EntityDataAccessor<BlockState> BLOCK = SynchedEntityData.defineId(InfallingBlock.class, EntityDataSerializers.BLOCK_STATE);
-    private static final EntityDataAccessor<Vector3f> TARGET = SynchedEntityData.defineId(InfallingBlock.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> TARGET = SynchedEntityData.defineId(InfallingBlock.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Float> START = SynchedEntityData.defineId(InfallingBlock.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> HORIZON = SynchedEntityData.defineId(InfallingBlock.class, EntityDataSerializers.FLOAT);
     /** 吸い込まれきるまでの上限（これを過ぎたら消す）。 */
@@ -62,7 +62,7 @@ public class InfallingBlock extends Entity {
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
         if (TARGET.equals(key)) {
-            Vector3f t = entityData.get(TARGET);
+            Vector3f t = new org.joml.Vector3f(entityData.get(TARGET));
             target = new Vec3(t.x, t.y, t.z);
         }
     }
@@ -116,10 +116,16 @@ public class InfallingBlock extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+
+        values.store(tag);
     }
+
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
 }

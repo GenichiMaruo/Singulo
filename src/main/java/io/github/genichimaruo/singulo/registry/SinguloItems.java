@@ -16,7 +16,7 @@ import java.util.Map;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -26,176 +26,176 @@ public final class SinguloItems {
 
     /** 手持ちの道具（生成表ではなく専用クラスで作る）。 */
     public static final DeferredItem<GravityGauntletItem> INERTIAL_CONTROL_GAUNTLET = ITEMS.register(
-            "inertial_control_gauntlet", () -> new GravityGauntletItem(new Item.Properties().rarity(Rarity.UNCOMMON), 3));
+            "inertial_control_gauntlet", registryId -> new GravityGauntletItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.UNCOMMON), 3));
     public static final DeferredItem<GravitonManipulatorItem> GRAVITON_MANIPULATOR = ITEMS.register(
-            "graviton_manipulator", () -> new GravitonManipulatorItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+            "graviton_manipulator", registryId -> new GravitonManipulatorItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5));
     public static final DeferredItem<MetricDriveItem> METRIC_DRIVE = ITEMS.register(
-            "metric_drive", () -> new MetricDriveItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+            "metric_drive", registryId -> new MetricDriveItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.wormhole.UnstableMouthItem> UNSTABLE_WORMHOLE_MOUTH = ITEMS.register(
-            "unstable_wormhole_mouth", () -> new io.github.genichimaruo.singulo.wormhole.UnstableMouthItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+            "unstable_wormhole_mouth", registryId -> new io.github.genichimaruo.singulo.wormhole.UnstableMouthItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlackHoleBombItem> BLACK_HOLE_BOMB = ITEMS.register(
-            "black_hole_bomb", () -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+            "black_hole_bomb", registryId -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.RelocationWrenchItem> RELOCATION_WRENCH = ITEMS.register(
-            "relocation_wrench", () -> new io.github.genichimaruo.singulo.item.RelocationWrenchItem(new Item.Properties(), 1));
+            "relocation_wrench", registryId -> new io.github.genichimaruo.singulo.item.RelocationWrenchItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     /** 施設の建材の設計図（作業台で素材と並べると建材ができ、設計図は残る）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RUIN_PANELS = ITEMS.register(
-            "blueprint_ruin_panels", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_ruin_panels", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_PRISTINE_RUIN = ITEMS.register(
-            "blueprint_pristine_ruin", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_pristine_ruin", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RUIN_GLASS = ITEMS.register(
-            "blueprint_ruin_glass", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_ruin_glass", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LIGHTING = ITEMS.register(
-            "blueprint_lighting", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_lighting", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LAB_BUILDING = ITEMS.register(
-            "blueprint_lab_building", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_lab_building", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LAB_FURNITURE = ITEMS.register(
-            "blueprint_lab_furniture", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_lab_furniture", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RAYLEIGH = ITEMS.register(
-            "blueprint_rayleigh", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+            "blueprint_rayleigh", registryId -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
-            "settings_card", () -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties(), 1));
+            "settings_card", registryId -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
-            "shield_permit", () -> new io.github.genichimaruo.singulo.item.ShieldPermitItem(new Item.Properties().rarity(Rarity.RARE), 5));
+            "shield_permit", registryId -> new io.github.genichimaruo.singulo.item.ShieldPermitItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.RARE), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.HoloProjectorItem> HOLO_PROJECTOR = ITEMS.register(
-            "holo_projector", () -> new io.github.genichimaruo.singulo.item.HoloProjectorItem(new Item.Properties(), 1));
+            "holo_projector", registryId -> new io.github.genichimaruo.singulo.item.HoloProjectorItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.HandbookItem> HANDBOOK = ITEMS.register(
-            "handbook", () -> new io.github.genichimaruo.singulo.item.HandbookItem(new Item.Properties(), 1));
+            "handbook", registryId -> new io.github.genichimaruo.singulo.item.HandbookItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.DecodedRecordItem> DECODED_RECORD = ITEMS.register(
-            "decoded_record", () -> new io.github.genichimaruo.singulo.item.DecodedRecordItem(new Item.Properties(), 1));
+            "decoded_record", registryId -> new io.github.genichimaruo.singulo.item.DecodedRecordItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.FluidCanisterItem> FLUID_CANISTER = ITEMS.register(
-            "fluid_canister", () -> new io.github.genichimaruo.singulo.item.FluidCanisterItem(new Item.Properties(), 1));
+            "fluid_canister", registryId -> new io.github.genichimaruo.singulo.item.FluidCanisterItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.food.FoodCartridgeItem> FOOD_CARTRIDGE = ITEMS.register(
-            "food_cartridge", () -> new io.github.genichimaruo.singulo.food.FoodCartridgeItem(new Item.Properties(), 1));
+            "food_cartridge", registryId -> new io.github.genichimaruo.singulo.food.FoodCartridgeItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     /** カバーの枠（ケーブル・パイプに取り付けて、ブロックをはめ込む）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.cable.CoverFrameItem> COVER_FRAME = ITEMS.register(
-            "cover_frame", () -> new io.github.genichimaruo.singulo.cable.CoverFrameItem(SinguloBlocks.COVER_FRAME.get(), new Item.Properties(), 1));
+            "cover_frame", registryId -> new io.github.genichimaruo.singulo.cable.CoverFrameItem(SinguloBlocks.COVER_FRAME.get(), new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
-            "magnetic_bottle", () -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().rarity(Rarity.RARE), 4));
+            "magnetic_bottle", registryId -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(
-            "neutrino_scanner", () -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().rarity(Rarity.RARE), 3));
+            "neutrino_scanner", registryId -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.RARE), 3));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
-            "explorer_compass", () -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties(), 1));
+            "explorer_compass", registryId -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MeteorCompassItem> METEOR_COMPASS = ITEMS.register(
-            "meteor_compass", () -> new io.github.genichimaruo.singulo.item.MeteorCompassItem(new Item.Properties(), 2));
+            "meteor_compass", registryId -> new io.github.genichimaruo.singulo.item.MeteorCompassItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
-            "creative_catalyst", () -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().rarity(Rarity.EPIC)));
+            "creative_catalyst", registryId -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
-            "builder_wand", () -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties()));
+            "builder_wand", registryId -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 梱包箱（3段階。段階が上がるほど遠くへ送れる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> PACKING_CRATE = ITEMS.register(
-            "packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(1, new Item.Properties()));
+            "packing_crate", registryId -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(1, new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> BATTERY_PACKING_CRATE = ITEMS.register(
-            "battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(2, new Item.Properties()));
+            "battery_packing_crate", registryId -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(2, new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.DroneCrateItem> LARGE_BATTERY_PACKING_CRATE = ITEMS.register(
-            "large_battery_packing_crate", () -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(3, new Item.Properties()));
+            "large_battery_packing_crate", registryId -> new io.github.genichimaruo.singulo.drone.DroneCrateItem(3, new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.FluidCapsuleItem> FLUID_CAPSULE = ITEMS.register(
-            "fluid_capsule", () -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(1, new Item.Properties()));
+            "fluid_capsule", registryId -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(1, new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.FluidCapsuleItem> BATTERY_FLUID_CAPSULE = ITEMS.register(
-            "battery_fluid_capsule", () -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(2, new Item.Properties()));
+            "battery_fluid_capsule", registryId -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(2, new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.drone.FluidCapsuleItem> LARGE_BATTERY_FLUID_CAPSULE = ITEMS.register(
-            "large_battery_fluid_capsule", () -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(3, new Item.Properties()));
+            "large_battery_fluid_capsule", registryId -> new io.github.genichimaruo.singulo.drone.FluidCapsuleItem(3, new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** アンドロイド用の無線充電器。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
-            "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+            "android_charger", registryId -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
-            "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
+            "android_armor_plate", registryId -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 採掘アップグレード（ツルハシのエンチャントを付けられる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem> ANDROID_MINING_UPGRADE = ITEMS.register(
-            "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
+            "android_mining_upgrade", registryId -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem> ANDROID_FELLING_UPGRADE = ITEMS.register(
-            "android_felling_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem(new Item.Properties()));
+            "android_felling_upgrade", registryId -> new io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
-            "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
+            "work_location_card", registryId -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 範囲カード（2つの角で囲った範囲）と、記録した場所を見せる測量メガネ。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.AreaCardItem> AREA_CARD = ITEMS.register(
-            "area_card", () -> new io.github.genichimaruo.singulo.android.work.AreaCardItem(new Item.Properties()));
+            "area_card", registryId -> new io.github.genichimaruo.singulo.android.work.AreaCardItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.SurveyGlassesItem> SURVEY_GLASSES = ITEMS.register(
-            "survey_glasses", () -> new io.github.genichimaruo.singulo.android.work.SurveyGlassesItem(new Item.Properties()));
+            "survey_glasses", registryId -> new io.github.genichimaruo.singulo.android.work.SurveyGlassesItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
-            "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
+            "recipe_card", registryId -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** アンドロイドの装飾（頭・顔・首/背中・腰・手）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_RIBBON = ITEMS.register(
-            "android_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_ribbon", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ribbon", 0xE0607E));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_HAIR_FLOWER = ITEMS.register(
-            "android_hair_flower", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_hair_flower", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "hair_flower", 0xF2C94C));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BERET = ITEMS.register(
-            "android_beret", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_beret", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "beret", 0x34406E));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_HEADDRESS = ITEMS.register(
-            "android_headdress", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_headdress", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "headdress", 0xF5F5F5));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_GLASSES = ITEMS.register(
-            "android_glasses", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_glasses", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "glasses", 0x3A3F4A));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAPE = ITEMS.register(
-            "android_cape", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_cape", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "cape", 0x8E2F3F));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_SCARF = ITEMS.register(
-            "android_scarf", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_scarf", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "scarf", 0xC84E4E));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WAIST_RIBBON = ITEMS.register(
-            "android_waist_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_waist_ribbon", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "waist_ribbon", 0x5A8ED6));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BOOK = ITEMS.register(
-            "android_book", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_book", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "book", 0x6B4A3A));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BOUQUET = ITEMS.register(
-            "android_bouquet", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_bouquet", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "bouquet", 0xF0E2C0));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_TEACUP = ITEMS.register(
-            "android_teacup", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_teacup", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "teacup", 0xFFFFFF));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_UMBRELLA = ITEMS.register(
-            "android_umbrella", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_umbrella", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "umbrella", 0x4A78C8));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAT_EARS = ITEMS.register(
-            "android_cat_ears", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_cat_ears", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "cat_ears", 0x3A3440));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WITCH_HAT = ITEMS.register(
-            "android_witch_hat", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_witch_hat", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "witch_hat", 0x3C2E5E));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_STRAW_HAT = ITEMS.register(
-            "android_straw_hat", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_straw_hat", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "straw_hat", 0xD8454A));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_PONYTAIL = ITEMS.register(
-            "android_ponytail", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_ponytail", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ponytail", 0xE0607E));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_TWIN_TAILS = ITEMS.register(
-            "android_twin_tails", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_twin_tails", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "twin_tails", 0x5A8ED6));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_MONOCLE = ITEMS.register(
-            "android_monocle", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_monocle", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "monocle", 0xE0B850));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_FAIRY_WINGS = ITEMS.register(
-            "android_fairy_wings", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_fairy_wings", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "fairy_wings", 0xA8E8F0));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_APRON = ITEMS.register(
-            "android_apron", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_apron", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "apron", 0xF5F5F5));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_LANTERN = ITEMS.register(
-            "android_lantern", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_lantern", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "lantern", 0x3A3A40));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BROOM = ITEMS.register(
-            "android_broom", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_broom", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "broom", 0x8E2F3F));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_NECKTIE = ITEMS.register(
-            "android_necktie", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_necktie", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "necktie", 0x2E3E8C));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_NECKLACE = ITEMS.register(
-            "android_diamond_necklace", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_diamond_necklace", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "diamond_necklace", 0xE0B850));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_EARRINGS = ITEMS.register(
-            "android_diamond_earrings", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_diamond_earrings", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.FACE, "diamond_earrings", 0xE0B850));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_TIARA = ITEMS.register(
-            "android_diamond_tiara", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_diamond_tiara", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "diamond_tiara", 0xE0B850));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_BROOCH = ITEMS.register(
-            "android_diamond_brooch", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+            "android_diamond_brooch", registryId -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "diamond_brooch", 0xE0B850));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
@@ -204,56 +204,56 @@ public final class SinguloItems {
             ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
-            "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
+            "fluid_sample", registryId -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 化学物質の見本（Mekanism の化学物質。作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ChemicalSampleItem> CHEMICAL_SAMPLE = ITEMS.register(
-            "chemical_sample", () -> new io.github.genichimaruo.singulo.android.work.ChemicalSampleItem(new Item.Properties()));
+            "chemical_sample", registryId -> new io.github.genichimaruo.singulo.android.work.ChemicalSampleItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
-            "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.BLADE_ANDROID, 0xF0F2F6, 0x78E1FF, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> WHIP_ANDROID_SPAWN_EGG = ITEMS.register("whip_android_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.WHIP_ANDROID, 0x2A2A36, 0xFF6AC4, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> SABER_ANDROID_SPAWN_EGG = ITEMS.register("saber_android_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.SABER_ANDROID, 0xDCE0E8, 0xFFC45A, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> AXE_ANDROID_SPAWN_EGG = ITEMS.register("axe_android_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.AXE_ANDROID, 0xB86A48, 0xFF6E40, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> BIT_ANDROID_SPAWN_EGG = ITEMS.register("bit_android_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.BIT_ANDROID, 0x2C345C, 0xB080FF, new Item.Properties()));
+            "procedure_card", registryId -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.SECURITY_DRONE.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.BLADE_ANDROID.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> WHIP_ANDROID_SPAWN_EGG = ITEMS.register("whip_android_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.WHIP_ANDROID.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> SABER_ANDROID_SPAWN_EGG = ITEMS.register("saber_android_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.SABER_ANDROID.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> AXE_ANDROID_SPAWN_EGG = ITEMS.register("axe_android_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.AXE_ANDROID.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> BIT_ANDROID_SPAWN_EGG = ITEMS.register("bit_android_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.BIT_ANDROID.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 射撃型のスポーンエッグ（まだクリエイティブでだけ。クリエイティブタブにも JEI にも出さない。/give で取る）。 */
-    public static final DeferredItem<DeferredSpawnEggItem> GUNNER_ANDROID_SPAWN_EGG = ITEMS.register("gunner_android_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.GUNNER_ANDROID, 0xC8E2F6, 0x6EF0D2, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> ERGOSPHERE_LEVIATHAN_SPAWN_EGG = ITEMS.register("ergosphere_leviathan_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.ERGOSPHERE_LEVIATHAN, 0x1A1424, 0x8A5CFF, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> LAST_ARCHIVIST_SPAWN_EGG = ITEMS.register("last_archivist_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.LAST_ARCHIVIST, 0xECE4D2, 0xFFD27A, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> FOUNDRY_OVERSEER_SPAWN_EGG = ITEMS.register("foundry_overseer_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.FOUNDRY_OVERSEER, 0x2E333D, 0xF08C3C, new Item.Properties()));
+    public static final DeferredItem<SpawnEggItem> GUNNER_ANDROID_SPAWN_EGG = ITEMS.register("gunner_android_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.GUNNER_ANDROID.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.HORIZON_WARDEN.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.ECHO_SENTINEL.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.GRAVITY_REMNANT.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> ERGOSPHERE_LEVIATHAN_SPAWN_EGG = ITEMS.register("ergosphere_leviathan_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.ERGOSPHERE_LEVIATHAN.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> LAST_ARCHIVIST_SPAWN_EGG = ITEMS.register("last_archivist_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.LAST_ARCHIVIST.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
+    public static final DeferredItem<SpawnEggItem> FOUNDRY_OVERSEER_SPAWN_EGG = ITEMS.register("foundry_overseer_spawn_egg",
+            registryId -> new SpawnEggItem(new Item.Properties().spawnEgg(SinguloEntities.FOUNDRY_OVERSEER.get()).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId))));
     /** 封印コンテナからしか出ない道具。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
-            "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
+            "gravity_boots", registryId -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.RARE), 3));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.CatalystStabilizerItem> CATALYST_STABILIZER = ITEMS.register(
-            "catalyst_stabilizer", () -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().rarity(Rarity.RARE), 4));
+            "catalyst_stabilizer", registryId -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
-            "dimensional_pocket", () -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+            "dimensional_pocket", registryId -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5));
     /** 残光の翼（最後の記録者が落とす。クリエイティブのタブにも JEI にも出さない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.AfterglowWingsItem> AFTERGLOW_WINGS = ITEMS.register(
-            "afterglow_wings", () -> new io.github.genichimaruo.singulo.item.AfterglowWingsItem(new Item.Properties().rarity(Rarity.EPIC)));
+            "afterglow_wings", registryId -> new io.github.genichimaruo.singulo.item.AfterglowWingsItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
-            "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+            "sealed_record", registryId -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_2 = ITEMS.register(
-            "scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
+            "scanner_module_2", registryId -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.RARE), 4, 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_3 = ITEMS.register(
-            "scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
+            "scanner_module_3", registryId -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).rarity(Rarity.EPIC), 5, 3));
     private static final Map<String, Integer> TOOL_STAGES = Map.ofEntries(
             Map.entry("scanner_module_2", 4),
             Map.entry("scanner_module_3", 5),
@@ -460,8 +460,8 @@ public final class SinguloItems {
         block(SinguloBlocks.WORMHOLE_GENERATOR_CORE, 5);
         TAB_ORDER.add(UNSTABLE_WORMHOLE_MOUTH);
         block(SinguloBlocks.WORMHOLE_STABILIZER, 5);
-        TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
-                new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
+        TAB_ORDER.add(ITEMS.register("wormhole_mouth", registryId -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
+                new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)).stacksTo(1).rarity(Rarity.EPIC), 5)));
         block(SinguloBlocks.WORMHOLE_PORT, 5);
         block(SinguloBlocks.JET_FORGE_CORE, 5);
         block(SinguloBlocks.GENESIS_CORE, 5);
@@ -587,7 +587,7 @@ public final class SinguloItems {
         }
         // 素材・部品・回収物（生成表から）
         for (ItemDef def : GeneratedContent.ITEMS) {
-            DeferredItem<Item> item = ITEMS.register(def.id(), () -> create(def));
+            DeferredItem<Item> item = ITEMS.register(def.id(), registryId -> create(def, registryId));
             if (!HIDDEN.contains(def.id())) {
                 TAB_ORDER.add(item);
             }
@@ -597,8 +597,8 @@ public final class SinguloItems {
                 .thenComparingInt(SinguloItems::stageOf));
     }
 
-    private static Item create(ItemDef def) {
-        Item.Properties props = new Item.Properties();
+    private static Item create(ItemDef def, net.minecraft.resources.Identifier registryId) {
+        Item.Properties props = new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId));
         if (EPIC.contains(def.id())) {
             props.rarity(Rarity.EPIC);
         } else if (def.stage() >= 5) {
@@ -623,7 +623,7 @@ public final class SinguloItems {
 
     private static void block(DeferredBlock<? extends Block> block, int stage) {
         TAB_ORDER.add(ITEMS.register(block.getId().getPath(),
-                () -> new SinguloBlockItem(block.get(), new Item.Properties(), stage)));
+                registryId -> new SinguloBlockItem(block.get(), new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, registryId)), stage)));
     }
 
     private static int tabIndex(DeferredItem<? extends Item> item) {

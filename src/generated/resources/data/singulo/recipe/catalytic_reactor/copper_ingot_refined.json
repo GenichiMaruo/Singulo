@@ -6,9 +6,7 @@
   "energy": 300,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:raw_materials/copper"
-      },
+      "ingredient": "#c:raw_materials/copper",
       "count": 8
     }
   ],

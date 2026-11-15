@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -61,7 +61,7 @@ public final class AndroidPatrol {
         }
 
         static Entry load(CompoundTag t) {
-            return new Entry(t.getLong("g"), t.getLong("d"), t.getInt("k"), t.getString("w"), Math.max(1, t.getInt("c")), BlockPos.of(t.getLong("p")));
+            return new Entry(t.getLongOr("g", 0L), t.getLongOr("d", 0L), t.getIntOr("k", 0), t.getStringOr("w", ""), Math.max(1, t.getIntOr("c", 0)), BlockPos.of(t.getLongOr("p", 0L)));
         }
 
         /** 画面に出す文（日と時刻を除く）。 */
@@ -113,7 +113,7 @@ public final class AndroidPatrol {
 
     /** 今、巡回しているか（巡回路があり、夜だけの設定なら夜）。 */
     boolean active(ServerLevel level) {
-        return !route.isEmpty() && (!nightOnly || level.isNight());
+        return !route.isEmpty() && (!nightOnly || level.isDarkOutside());
     }
 
     /** 巡回の動き（毎 tick。戦っていないとき）。巡回していなければ false（ステーションのそばで待つ）。 */
@@ -240,11 +240,11 @@ public final class AndroidPatrol {
                 ? Component.translatable("message.singulo.android.alarm.boss", android.nickname(), name, at.getX(), at.getY(), at.getZ())
                 : Component.translatable("message.singulo.android.alarm", android.nickname(), name, count, at.getX(), at.getY(), at.getZ());
         if (android.owner() != null && level.getServer().getPlayerList().getPlayer(android.owner()) instanceof ServerPlayer p) {
-            p.displayClientMessage(text.copy().withStyle(ChatFormatting.RED), true);
-            p.playNotifySound(SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.NEUTRAL, 1.0F, 0.7F);
+            p.sendOverlayMessage(text.copy().withStyle(ChatFormatting.RED));
+            p.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(SoundEvents.NOTE_BLOCK_BELL, SoundSource.NEUTRAL, p.getX(), p.getY(), p.getZ(), 1.0F, 0.7F, p.getRandom().nextLong()));
         }
         android.playSound(SoundEvents.NOTE_BLOCK_BELL.value(), 1.0F, 0.7F);
-        add(level, new Entry(level.getGameTime(), level.getDayTime(), kind, BuiltInRegistries.ENTITY_TYPE.getKey(what).toString(), count, at));
+        add(level, new Entry(level.getGameTime(), level.getDefaultClockTime(), kind, BuiltInRegistries.ENTITY_TYPE.getKey(what).toString(), count, at));
     }
 
     /** 倒した: 記録に残す（少し前に近くで同じ相手を倒していれば、まとめる）。 */
@@ -255,12 +255,12 @@ public final class AndroidPatrol {
             Entry last = log.get(0);
             if (unreported > 0 && last.kind == KIND_KILL && last.what.equals(what) && level.getGameTime() - last.gameTime < MERGE_TICKS
                     && last.pos.closerThan(at, MERGE_RANGE)) {
-                log.set(0, new Entry(level.getGameTime(), level.getDayTime(), KIND_KILL, what, last.count + 1, last.pos));
+                log.set(0, new Entry(level.getGameTime(), level.getDefaultClockTime(), KIND_KILL, what, last.count + 1, last.pos));
                 android.syncPatrolLog();
                 return;
             }
         }
-        add(level, new Entry(level.getGameTime(), level.getDayTime(), KIND_KILL, what, 1, at));
+        add(level, new Entry(level.getGameTime(), level.getDefaultClockTime(), KIND_KILL, what, 1, at));
     }
 
     private void add(ServerLevel level, Entry e) {
@@ -312,7 +312,7 @@ public final class AndroidPatrol {
     /** 送られてきた記録を読む（クライアント）。 */
     public static List<Entry> readLog(CompoundTag t) {
         List<Entry> out = new ArrayList<>();
-        for (Tag e : t.getList("log", Tag.TAG_COMPOUND)) {
+        for (Tag e : t.getListOrEmpty("log")) {
             out.add(Entry.load((CompoundTag) e));
         }
         return out;
@@ -322,7 +322,7 @@ public final class AndroidPatrol {
         CompoundTag t = logTag();
         ListTag r = new ListTag();
         for (BlockPos p : route) {
-            r.add(NbtUtils.writeBlockPos(p));
+            r.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(p));
         }
         t.put("route", r);
         t.putBoolean("back_and_forth", backAndForth);
@@ -336,15 +336,15 @@ public final class AndroidPatrol {
 
     void load(CompoundTag t) {
         route.clear();
-        for (Tag p : t.getList("route", Tag.TAG_INT_ARRAY)) {
-            route.add(NbtUtils.readBlockPos(wrap(p), "p").orElse(BlockPos.ZERO));
+        for (Tag p : t.getListOrEmpty("route")) {
+            route.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(wrap(p), "p").orElse(BlockPos.ZERO));
         }
-        backAndForth = t.getBoolean("back_and_forth");
-        nightOnly = t.getBoolean("night_only");
-        dwell = t.contains("dwell") ? t.getInt("dwell") : 100;
-        index = t.contains("index") ? t.getInt("index") : -1;
-        dir = t.getInt("dir") == -1 ? -1 : 1;
-        unreported = t.getInt("unreported");
+        backAndForth = t.getBooleanOr("back_and_forth", false);
+        nightOnly = t.getBooleanOr("night_only", false);
+        dwell = t.contains("dwell") ? t.getIntOr("dwell", 0) : 100;
+        index = t.contains("index") ? t.getIntOr("index", 0) : -1;
+        dir = t.getIntOr("dir", 0) == -1 ? -1 : 1;
+        unreported = t.getIntOr("unreported", 0);
         log.clear();
         log.addAll(readLog(t));
     }

@@ -7,24 +7,12 @@
     "CBC"
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "V": {
-      "item": "minecraft:bucket"
-    },
-    "T": {
-      "item": "singulo:thermocouple_module"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "V": "minecraft:bucket",
+    "T": "singulo:thermocouple_module",
+    "F": "singulo:basic_frame",
+    "C": "#c:ingots/copper",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:peltier_cooler",

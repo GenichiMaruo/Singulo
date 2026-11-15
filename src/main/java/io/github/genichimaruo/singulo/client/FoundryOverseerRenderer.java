@@ -6,10 +6,10 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.FoundryOverseer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -25,7 +25,7 @@ import org.joml.Quaternionf;
  *   <li>覚醒した個体: 檻と単眼が紅く、守りの光も紅い</li>
  * </ul>
  */
-public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
+public class FoundryOverseerRenderer extends SnapshotEntityRenderer<FoundryOverseer> {
     static final int STEEL = 0x8C96A6, DARK = 0x2A2E36, CABLE = 0x23262C, EYE = 0xFF3B2E, ORANGE = 0xFF9A3C, HOT = 0xFFE2B0;
     static final int AWAKENED = 0xFF4060;
     /** 体の中心の高さ（足から）。 */
@@ -34,13 +34,13 @@ public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
     static final float CEIL = (float) (13 - FoundryOverseer.HOVER);
     static final float FLOOR = (float) -FoundryOverseer.HOVER;
 
+    @Override protected net.minecraft.world.phys.AABB getBoundingBoxForCulling(FoundryOverseer entity){return entity.getBoundingBoxForCulling();}
     public FoundryOverseerRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowRadius = 0;
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(FoundryOverseer entity) {
+     public Identifier getTextureLocation(FoundryOverseer entity) {
         return FxDraw.WHITE;
     }
 
@@ -57,7 +57,7 @@ public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
         Vec3 origin = e.getPosition(partialTick);
 
         // ---- 不透明な部分（ケーブル・コア・檻・爪・プレス）
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
         pose.pushPose();
         pose.translate(0, CY + lift, 0);
         for (int k = 0; k < 4; k++) {
@@ -138,7 +138,7 @@ public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
         if (e.laserTicks() > 0) {
             laser(e, partialTick, pose, glow, camera, lift, origin);
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     private static float ease(float k) {

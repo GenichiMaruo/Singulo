@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:basic_frame"
-      },
+      "ingredient": "singulo:basic_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:obsidians"
-      },
+      "ingredient": "#c:obsidians",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     }
   ],

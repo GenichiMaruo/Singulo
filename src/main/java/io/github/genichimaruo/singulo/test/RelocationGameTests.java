@@ -5,13 +5,13 @@ import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.*;
 import net.minecraft.world.phys.*;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
@@ -26,7 +26,7 @@ public final class RelocationGameTests {
     public static void wrenchPreservesContentsFluidsEnergyAndSidesOnPlacement(GameTestHelper h) {
         BlockPos a=new BlockPos(2,1,2), b=new BlockPos(5,1,2);
         h.setBlock(a,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity original=h.getBlockEntity(a);
+        MachineBlockEntity original=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,a);
         original.items().setStackInSlot(0,new ItemStack(Items.COAL,13));
         original.items().setStackInSlot(original.type().outputSlot(),new ItemStack(Items.IRON_INGOT,7));
         original.energy().receiveEnergy(1234,false);
@@ -58,7 +58,7 @@ public final class RelocationGameTests {
             player.setShiftKeyDown(false);
             player.setItemInHand(InteractionHand.MAIN_HAND,packed);
             ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
-            MachineBlockEntity restored=h.getBlockEntity(b);
+            MachineBlockEntity restored=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,b);
             h.assertTrue(restored!=null,"Packed machine could not be placed");
             h.assertTrue(restored.items().getStackInSlot(0).getCount()==13 && restored.items().getStackInSlot(restored.type().outputSlot()).getCount()==7,"Inventory not preserved");
             h.assertTrue(restored.energy().getEnergyStored()==1234,"Energy not preserved");
@@ -78,10 +78,10 @@ public final class RelocationGameTests {
             var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
             player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
             wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(a)));
-            h.assertTrue(h.getBlockEntity(a)!=null,"Ordinary click packed a device");
+            h.assertTrue(io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,a)!=null,"Ordinary click packed a device");
             player.setShiftKeyDown(true);
             wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(chest)));
-            h.assertTrue(h.getBlockEntity(chest)!=null,"Wrench packed an unrelated inventory");
+            h.assertTrue(io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,chest)!=null,"Wrench packed an unrelated inventory");
         } finally {player.discard();}
         h.succeed();
     }
@@ -98,11 +98,11 @@ public final class RelocationGameTests {
             for(var block:blocks) {
                 player.getInventory().clearContent();
                 h.setBlock(a,block.get());
-                var before=h.getBlockEntity(a);
+                var before=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,a);
                 var tag=before.saveCustomOnly(h.getLevel().registryAccess());
                 // Every audited generator/storage/catalyst device persists this buffer.
                 if(tag.contains("energy")) tag.putInt("energy",1234);
-                before.loadWithComponents(tag,h.getLevel().registryAccess());
+                io.github.genichimaruo.singulo.test.harness.TestNbt.load(before,tag,h.getLevel().registryAccess());
                 var expected=before.saveCustomOnly(h.getLevel().registryAccess());
                 var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
                 player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
@@ -117,7 +117,7 @@ public final class RelocationGameTests {
                 player.setShiftKeyDown(false);
                 player.setItemInHand(InteractionHand.MAIN_HAND,packed);
                 ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
-                var after=h.getBlockEntity(b);
+                var after=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,b);
                 h.assertTrue(after!=null && expected.equals(after.saveCustomOnly(h.getLevel().registryAccess())),"Device state changed on relocation: "+block.getId());
                 // Clear the empty test fixture without running its production loot path.
                 h.getLevel().removeBlockEntity(h.absolutePos(b));
@@ -131,7 +131,7 @@ public final class RelocationGameTests {
     public static void wrenchDropsOnePackedDeviceWhenInventoryIsFull(GameTestHelper h) {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity machine=h.getBlockEntity(pos);
+        MachineBlockEntity machine=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
         machine.items().setStackInSlot(0,new ItemStack(Items.COAL,13));
         var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
@@ -152,11 +152,11 @@ public final class RelocationGameTests {
     public static void relocatingAnchorReleasesOldTicketsAndRestartsAtNewPosition(GameTestHelper h) {
         BlockPos a=new BlockPos(2,1,2), b=new BlockPos(5,1,2);
         h.setBlock(a,SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
-        WorldlineAnchorBlockEntity original=h.getBlockEntity(a);
+        WorldlineAnchorBlockEntity original=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,a);
         var owner=java.util.UUID.randomUUID();
         original.setOwner(owner);
         original.energy().setEnergy(original.energy().getMaxEnergyStored());
-        original.catalystSlot().insertItem(0,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst"))),false);
+        original.catalystSlot().insertItem(0,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst"))),false);
         h.runAtTickTime(10,()->{
             h.assertTrue(original.loadedRadius()>=0,"Anchor did not start before packing");
             var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
@@ -172,12 +172,12 @@ public final class RelocationGameTests {
                 player.setShiftKeyDown(false);
                 player.setItemInHand(InteractionHand.MAIN_HAND,packed);
                 ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
-                WorldlineAnchorBlockEntity restored=h.getBlockEntity(b);
+                WorldlineAnchorBlockEntity restored=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,b);
                 h.assertTrue(restored!=null && !restored.catalyst().isEmpty(),"Anchor lost its catalyst");
             } finally {player.discard();}
         });
         h.runAtTickTime(30,()->{
-            WorldlineAnchorBlockEntity restored=h.getBlockEntity(b);
+            WorldlineAnchorBlockEntity restored=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,b);
             h.assertTrue(restored.loadedRadius()>=0,"Relocated anchor did not create new position tickets");
             restored.prepareForRelocation();
             h.succeed();
@@ -229,12 +229,12 @@ public final class RelocationGameTests {
     public static void wrenchRespectsCanceledBreaksForEachBlock(GameTestHelper h) {
         BlockPos machine = new BlockPos(2, 1, 2);
         h.setBlock(machine, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = h.getBlockEntity(machine);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,machine);
         kiln.items().setStackInSlot(0, new ItemStack(Items.COAL, 13));
         for (int x = 1; x <= 3; x++) h.setBlock(new BlockPos(x, 1, 4), SinguloBlocks.COPPER_WIRE.get());
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        java.util.function.Consumer<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> protect = event -> {
+        java.util.function.Consumer<net.neoforged.neoforge.event.level.block.BreakBlockEvent> protect = event -> {
             if (event.getPlayer() == player && (event.getPos().equals(h.absolutePos(machine))
                     || event.getPos().equals(h.absolutePos(new BlockPos(2, 1, 4))))) event.setCanceled(true);
         };

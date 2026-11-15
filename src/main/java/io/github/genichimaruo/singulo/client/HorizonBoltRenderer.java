@@ -4,14 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.ruin.HorizonBolt;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 /** 光弾: 白く光る芯と、撃った側の色のにじみ（脈打つ）。 */
-public class HorizonBoltRenderer extends EntityRenderer<HorizonBolt> {
+public class HorizonBoltRenderer extends SnapshotEntityRenderer<HorizonBolt> {
     public HorizonBoltRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
@@ -23,7 +23,7 @@ public class HorizonBoltRenderer extends EntityRenderer<HorizonBolt> {
         pose.pushPose();
         pose.translate(0, bolt.getBbHeight() / 2, 0);
         VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
-        var camera = entityRenderDispatcher.cameraOrientation();
+        var camera = entityRenderDispatcher.camera.rotation();
         float size = bolt.size();
         int rgb = bolt.color();
         int core = 0xFFFFFF;
@@ -32,11 +32,10 @@ public class HorizonBoltRenderer extends EntityRenderer<HorizonBolt> {
         FxDraw.billboard(pose, vc, camera, 0.5F * pulse * size, mid, 180);
         FxDraw.billboard(pose, vc, camera, 0.24F * size, core, 255);
         pose.popPose();
-        super.render(bolt, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(HorizonBolt bolt) {
+     public Identifier getTextureLocation(HorizonBolt bolt) {
         return FxDraw.WHITE;
     }
 }

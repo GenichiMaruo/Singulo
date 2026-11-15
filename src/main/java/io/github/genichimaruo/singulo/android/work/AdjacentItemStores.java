@@ -14,9 +14,9 @@ import net.neoforged.neoforge.items.IItemHandler;
  */
 final class AdjacentItemStores {
     private final BlockEntity owner;
-    private final EnumMap<Direction, BlockCapabilityCache<IItemHandler, Direction>> caches = new EnumMap<>(Direction.class);
-    /** アンドロイド用の見え方（入れ物の窓口が同じ間は使い回す。窓口が変わったら見え方を引き直す）。 */
-    private final EnumMap<Direction, IItemHandler> seen = new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, BlockCapabilityCache<IItemHandler, Direction>> sharedCaches = new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, BlockCapabilityCache<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>, Direction>> nativeCaches = new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, Object> seen = new EnumMap<>(Direction.class);
     private final EnumMap<Direction, IItemHandler> views = new EnumMap<>(Direction.class);
 
     AdjacentItemStores(BlockEntity owner) {
@@ -27,7 +27,8 @@ final class AdjacentItemStores {
     void clear() {
         seen.clear();
         views.clear();
-        caches.clear();
+        sharedCaches.clear();
+        nativeCaches.clear();
     }
 
     /** direction の隣の入れ物（なければ null）。 */
@@ -35,16 +36,26 @@ final class AdjacentItemStores {
         if (!(owner.getLevel() instanceof ServerLevel level) || owner.isRemoved()) {
             return null;
         }
-        var cache = caches.get(direction);
-        if (cache == null || cache.level() != level) {
-            cache = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, level,
-                    owner.getBlockPos().relative(direction), direction.getOpposite(),
-                    () -> !owner.isRemoved() && owner.getLevel() == level, () -> {});
-            caches.put(direction, cache);
+        var sharedCache = sharedCaches.get(direction);
+        var nativeCache = nativeCaches.get(direction);
+        if (sharedCache == null || sharedCache.level() != level) {
+            sharedCache = BlockCapabilityCache.create(io.github.genichimaruo.singulo.api.android.AndroidStorageCapabilities.SHARED_ITEMS,
+                level, owner.getBlockPos().relative(direction), direction.getOpposite(),
+                () -> !owner.isRemoved() && owner.getLevel() == level, () -> {});
+            nativeCache = BlockCapabilityCache.create(Capabilities.Item.BLOCK,
+                level, owner.getBlockPos().relative(direction), direction.getOpposite(),
+                () -> !owner.isRemoved() && owner.getLevel() == level, () -> {});
+            sharedCaches.put(direction, sharedCache);
+            nativeCaches.put(direction, nativeCache);
+            seen.remove(direction);
+            views.remove(direction);
         }
-        IItemHandler handler = cache.getCapability();
-        if (handler == null || handler != seen.get(direction)) {
-            seen.put(direction, handler);
+        var shared = sharedCache.getCapability();
+        var nativeHandler = shared == null ? nativeCache.getCapability() : null;
+        Object identity = shared != null ? shared : nativeHandler;
+        if (identity == null || identity != seen.get(direction)) {
+            seen.put(direction, identity);
+            IItemHandler handler = shared != null ? shared : io.github.genichimaruo.singulo.compat.ItemResourceView.of(nativeHandler);
             views.put(direction, androidView(level, owner.getBlockPos().relative(direction), direction.getOpposite(), handler));
         }
         return views.get(direction);

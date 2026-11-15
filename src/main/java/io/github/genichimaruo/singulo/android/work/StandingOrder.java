@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.android.work;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -66,7 +66,7 @@ public final class StandingOrder {
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag t = new CompoundTag();
         t.putInt("id", id);
-        t.put("target", target.save(registries));
+        t.put("target", io.github.genichimaruo.singulo.compat.NbtCompat.save(target, registries));
         t.putLong("count", count);
         t.putInt("trigger", trigger);
         if (destination != null) {
@@ -74,11 +74,11 @@ public final class StandingOrder {
         }
         ListTag as = new ListTag();
         for (UUID a : androids) {
-            as.add(NbtUtils.createUUID(a));
+            as.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(a));
         }
         t.put("androids", as);
         if (registrant != null) {
-            t.putUUID("registrant", registrant);
+            t.store("registrant", net.minecraft.core.UUIDUtil.CODEC, registrant);
         }
         t.putInt("active", activeOrder);
         t.putBoolean("pending", pending);
@@ -87,19 +87,19 @@ public final class StandingOrder {
 
     @Nullable
     public static StandingOrder load(CompoundTag t, HolderLookup.Provider registries) {
-        ItemStack target = ItemStack.parseOptional(registries, t.getCompound("target"));
+        ItemStack target = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t.getCompoundOrEmpty("target"));
         if (target.isEmpty()) {
             return null;
         }
         List<UUID> androids = new ArrayList<>();
-        for (Tag a : t.getList("androids", Tag.TAG_INT_ARRAY)) {
-            androids.add(NbtUtils.loadUUID(a));
+        for (Tag a : t.getListOrEmpty("androids")) {
+            androids.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(a));
         }
-        StandingOrder s = new StandingOrder(t.getInt("id"), target, Math.max(1, t.getLong("count")), t.getInt("trigger"),
-                t.contains("destination") ? BlockPos.of(t.getLong("destination")) : null, androids,
-                t.hasUUID("registrant") ? t.getUUID("registrant") : null);
-        s.activeOrder = t.getInt("active");
-        s.pending = t.getBoolean("pending");
+        StandingOrder s = new StandingOrder(t.getIntOr("id", 0), target, Math.max(1, t.getLongOr("count", 0L)), t.getIntOr("trigger", 0),
+                t.contains("destination") ? BlockPos.of(t.getLongOr("destination", 0L)) : null, androids,
+                t.read("registrant", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? t.read("registrant", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null);
+        s.activeOrder = t.getIntOr("active", 0);
+        s.pending = t.getBooleanOr("pending", false);
         return s;
     }
 }

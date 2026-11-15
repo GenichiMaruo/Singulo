@@ -11,7 +11,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -45,11 +45,11 @@ public class ShieldPermitItem extends SinguloItem {
         if (data == null) {
             return out;
         }
-        ListTag list = data.copyTag().getList(KEY, Tag.TAG_COMPOUND);
+        ListTag list = data.copyTag().getListOrEmpty(KEY);
         for (int i = 0; i < list.size(); i++) {
-            CompoundTag t = list.getCompound(i);
-            if (t.hasUUID("id")) {
-                out.add(new Member(t.getUUID("id"), t.getString("name")));
+            CompoundTag t = list.getCompoundOrEmpty(i);
+            if (t.read("id", net.minecraft.core.UUIDUtil.CODEC).isPresent()) {
+                out.add(new Member(t.read("id", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(), t.getStringOr("name", "")));
             }
         }
         return out;
@@ -70,7 +70,7 @@ public class ShieldPermitItem extends SinguloItem {
         ListTag list = new ListTag();
         for (Member m : members) {
             CompoundTag t = new CompoundTag();
-            t.putUUID("id", m.id());
+            t.store("id", net.minecraft.core.UUIDUtil.CODEC, m.id());
             t.putString("name", m.name());
             list.add(t);
         }
@@ -80,7 +80,7 @@ public class ShieldPermitItem extends SinguloItem {
     /** 登録する（もう入っていれば名前だけ新しくする）。新しく入ったら true。 */
     public static boolean add(ItemStack stack, Player player) {
         List<Member> members = members(stack);
-        String name = player.getGameProfile().getName();
+        String name = player.getGameProfile().name();
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i).id().equals(player.getUUID())) {
                 members.set(i, new Member(player.getUUID(), name));
@@ -94,19 +94,19 @@ public class ShieldPermitItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (player.isSecondaryUseActive()) {
-                write(stack, List.of(new Member(player.getUUID(), player.getGameProfile().getName())));
-                player.displayClientMessage(Component.translatable("item.singulo.shield_permit.reset", player.getName()), true);
+                write(stack, List.of(new Member(player.getUUID(), player.getGameProfile().name())));
+                player.sendOverlayMessage(Component.translatable("item.singulo.shield_permit.reset", player.getName()));
             } else {
                 boolean added = add(stack, player);
-                player.displayClientMessage(Component.translatable(added ? "item.singulo.shield_permit.added"
-                        : "item.singulo.shield_permit.already", player.getName(), members(stack).size()), true);
+                player.sendOverlayMessage(Component.translatable(added ? "item.singulo.shield_permit.added"
+                        : "item.singulo.shield_permit.already", player.getName(), members(stack).size()));
             }
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override
@@ -114,15 +114,15 @@ public class ShieldPermitItem extends SinguloItem {
         if (!(target instanceof Player other)) {
             return InteractionResult.PASS;
         }
-        if (!player.level().isClientSide) {
+        if (!player.level().isClientSide()) {
             // 手に持っている許可証そのものを書き換える（引数の stack は写しのことがある）
             ItemStack held = player.getItemInHand(hand);
             add(held, other);
             add(held, player);
-            player.displayClientMessage(Component.translatable("item.singulo.shield_permit.added", other.getName(),
-                    members(held).size()), true);
+            player.sendOverlayMessage(Component.translatable("item.singulo.shield_permit.added", other.getName(),
+                    members(held).size()));
         }
-        return InteractionResult.sidedSuccess(player.level().isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(player.level().isClientSide());
     }
 
     @Override

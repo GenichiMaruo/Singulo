@@ -1,4 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidEscrows;
 import java.util.*;
@@ -28,9 +31,9 @@ public final class AndroidEscrowStorageGameTests {
         var e=d.create(id,owner,BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,List.of(new ItemStack(Items.OAK_PLANKS,2)));
         d.bind(e,1,UUID.randomUUID());var tag=d.save(new CompoundTag(),h.getLevel().registryAccess());
         var loaded=AndroidEscrowData.load(tag,h.getLevel().registryAccess());h.assertTrue(loaded.inputs(loaded.find(id)).get(0).getCount()==2,"Restore lost stacks");
-        var raw=tag.getList("records",Tag.TAG_COMPOUND).getCompound(0);raw.putString("worker","broken");
+        var raw=tag.getListOrEmpty("records").getCompoundOrEmpty(0);raw.putString("worker","broken");
         var bad=AndroidEscrowData.load(tag,h.getLevel().registryAccess());h.assertTrue(bad.find(id)==null&&bad.isKnown(id),"Malformed record usable");
-        h.assertTrue(bad.save(new CompoundTag(),h.getLevel().registryAccess()).getList("records",Tag.TAG_COMPOUND).getCompound(0).equals(raw),"Quarantine changed raw record");h.succeed();
+        h.assertTrue(bad.save(new CompoundTag(),h.getLevel().registryAccess()).getListOrEmpty("records").getCompoundOrEmpty(0).equals(raw),"Quarantine changed raw record");h.succeed();
     }
     @GameTest(template="empty") public static void productsRespectSlotsAndSimulation(GameTestHelper h){
         var d=new AndroidEscrowData();var id=UUID.randomUUID();var owner=UUID.randomUUID();
@@ -45,7 +48,7 @@ public final class AndroidEscrowStorageGameTests {
         h.assertTrue(d.quarantineCargo(id,owner,UUID.randomUUID(),List.of(new ItemStack(Items.DIAMOND,7))),"Emergency custody rejected");
         var saved=d.save(new CompoundTag(),h.getLevel().registryAccess());
         var again=AndroidEscrowData.load(saved,h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
-        h.assertTrue(again.getString("records").equals("original corrupt payload")&&again.getList("recovery_salvage_extra_v1",Tag.TAG_COMPOUND).size()==1,"Lost original or duplicated salvage");
+        h.assertTrue(again.getStringOr("records", "").equals("original corrupt payload")&&again.getListOrEmpty("recovery_salvage_extra_v1").size()==1,"Lost original or duplicated salvage");
         h.assertTrue(d.claim(owner,id,true,0,64).isEmpty(),"Quarantine became claimable");h.succeed();
     }
     @GameTest(template="empty") public static void returnCargoGrowsWithoutDiscardAndStaleHandlersStop(GameTestHelper h){
@@ -61,22 +64,22 @@ public final class AndroidEscrowStorageGameTests {
     @GameTest(template="empty") public static void duplicateMalformedRecordBlocksOriginalCustody(GameTestHelper h){
         var d=new AndroidEscrowData();var id=UUID.randomUUID();var owner=UUID.randomUUID();
         d.create(id,owner,BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,List.of(new ItemStack(Items.OAK_PLANKS,2)));
-        var saved=d.save(new CompoundTag(),h.getLevel().registryAccess());var list=saved.getList("records",Tag.TAG_COMPOUND);
-        CompoundTag duplicate=list.getCompound(0).copy();duplicate.remove("owner");list.add(duplicate);
+        var saved=d.save(new CompoundTag(),h.getLevel().registryAccess());var list=saved.getListOrEmpty("records");
+        CompoundTag duplicate=list.getCompoundOrEmpty(0).copy();duplicate.remove("owner");list.add(duplicate);
         var loaded=AndroidEscrowData.load(saved,h.getLevel().registryAccess());
         h.assertTrue(loaded.isKnown(id)&&loaded.find(id)==null&&loaded.claim(owner,id,true,0,64).isEmpty(),"Conflicting malformed duplicate left original usable");
-        h.assertTrue(loaded.save(new CompoundTag(),h.getLevel().registryAccess()).getList("records",Tag.TAG_COMPOUND).size()==2,"Conflict discarded custody record");h.succeed();
+        h.assertTrue(loaded.save(new CompoundTag(),h.getLevel().registryAccess()).getListOrEmpty("records").size()==2,"Conflict discarded custody record");h.succeed();
     }
 
     @GameTest(template="empty") public static void unknownOwnerCargoAndWorkerFingerprintPersist(GameTestHelper h){
         var d=AndroidEscrowData.load(new CompoundTag(),h.getLevel().registryAccess());var id=UUID.randomUUID();
         h.assertTrue(d.quarantineCargo(id,null,UUID.randomUUID(),List.of(new ItemStack(Items.DIAMOND,2))),"Unknown owner cargo discarded");
-        var salvage=d.save(new CompoundTag(),h.getLevel().registryAccess()).getList("recovery_salvage_extra_v1",Tag.TAG_COMPOUND).getCompound(0);
-        h.assertTrue(!salvage.contains("owner")&&salvage.getList("actual_cargo",Tag.TAG_COMPOUND).size()==1,"Invented owner or lost cargo");
+        var salvage=d.save(new CompoundTag(),h.getLevel().registryAccess()).getListOrEmpty("recovery_salvage_extra_v1").getCompoundOrEmpty(0);
+        h.assertTrue(!salvage.contains("owner")&&salvage.getListOrEmpty("actual_cargo").size()==1,"Invented owner or lost cargo");
         var normal=new AndroidEscrowData();var e=normal.create(id,UUID.randomUUID(),BlockPos.ZERO,UUID.randomUUID(),new ItemStack(Items.STICK),4,List.of(new ItemStack(Items.OAK_PLANKS,2)));
         e.requestedWorker=UUID.randomUUID();var saved=normal.save(new CompoundTag(),h.getLevel().registryAccess());
         h.assertTrue(e.requestedWorker.equals(AndroidEscrowData.load(saved,h.getLevel().registryAccess()).find(id).requestedWorker),"Requested worker lost");
-        saved.getList("records",Tag.TAG_COMPOUND).getCompound(0).putString("requested_worker","invalid");
+        saved.getListOrEmpty("records").getCompoundOrEmpty(0).putString("requested_worker","invalid");
         h.assertTrue(AndroidEscrowData.load(saved,h.getLevel().registryAccess()).find(id)==null,"Invalid requested worker accepted");h.succeed();
     }
 

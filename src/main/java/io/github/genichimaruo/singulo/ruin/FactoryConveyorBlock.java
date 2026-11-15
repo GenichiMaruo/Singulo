@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -21,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
  * 止まっているときは、ただの床。
  */
 public class FactoryConveyorBlock extends Block {
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<net.minecraft.core.Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty RUNNING = BooleanProperty.create("running");
     public static final BooleanProperty WARN = BooleanProperty.create("warn");
     /** 1 tick に流す速さ（ブロック）。歩けば逆らえるくらい。 */

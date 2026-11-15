@@ -13,18 +13,18 @@ import io.github.genichimaruo.singulo.ruin.HorizonWarden;
 import io.github.genichimaruo.singulo.ruin.SecurityDrone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** ケーブルの通電の記録・装置の電源と材料なしのスイッチ・液体の出力タンクごとの面・ウォーデンの守り。 */
 @GameTestHolder(Singulo.MODID)
@@ -49,9 +49,9 @@ public final class ControlGameTests {
         helper.setBlock(new BlockPos(3, 1, 3), SinguloBlocks.COPPER_WIRE.get());
         helper.setBlock(new BlockPos(5, 1, 1), SinguloBlocks.MACHINES.get(MachineType.KILN).get());
         helper.succeedWhen(() -> {
-            CableBlockEntity middle = helper.getBlockEntity(new BlockPos(3, 1, 1));
-            CableBlockEntity last = helper.getBlockEntity(new BlockPos(4, 1, 1));
-            CableBlockEntity branch = helper.getBlockEntity(new BlockPos(3, 1, 3));
+            CableBlockEntity middle = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,new BlockPos(3, 1, 1));
+            CableBlockEntity last = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,new BlockPos(4, 1, 1));
+            CableBlockEntity branch = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,new BlockPos(3, 1, 3));
             Direction east = Direction.EAST;
             helper.assertTrue(middle.flow() > 0, "電力が通っているのに記録されない");
             helper.assertTrue(middle.flowsIn(east.getOpposite()) && middle.flowsOut(east), "入った面・出た面が違う");
@@ -66,7 +66,7 @@ public final class ControlGameTests {
     public static void powerSwitchStopsMachine(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         m.energy().setEnergy(m.energy().getMaxEnergyStored());
         m.togglePower();
         m.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
@@ -84,7 +84,7 @@ public final class ControlGameTests {
     /** 材料なしのレシピ（電力だけで作るもの）を見分けられる。 */
     @GameTest(template = EMPTY)
     public static void freeRecipesAreRecognized(GameTestHelper helper) {
-        var recipes = helper.getLevel().getRecipeManager().getAllRecipesFor(
+        var recipes = helper.getLevel().getServer().getRecipeManager().recipeMap().byType(
                 io.github.genichimaruo.singulo.registry.SinguloRecipes.MACHINE.get());
         boolean any = recipes.stream().anyMatch(h -> MachineBlockEntity.isFree(h.value())
                 && h.value().station().equals(MachineType.CRYOGENIC_COOLING_TOWER.id()));
@@ -99,16 +99,16 @@ public final class ControlGameTests {
     public static void electrolyzerOutputsEachGasOnItsOwnFace(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         helper.assertTrue(m.sideChannels() == 1 + m.type().tanks(), "タンクごとの面の設定がない");
         for (SideConfig.Face f : SideConfig.Face.values()) {
             m.setSide(1, f, f == SideConfig.Face.FRONT ? SideConfig.INPUT : SideConfig.NONE, false);
         }
         net.minecraft.core.Direction front = m.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING);
-        IFluidHandler back = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), front.getOpposite());
+        IFluidHandler back = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), helper.absolutePos(pos), front.getOpposite());
         helper.assertTrue(back == null || back.fill(new FluidStack(Fluids.WATER, 100), IFluidHandler.FluidAction.SIMULATE) == 0,
                 "入力にしていない面から水が入る");
-        IFluidHandler frontHandler = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), front);
+        IFluidHandler frontHandler = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), helper.absolutePos(pos), front);
         helper.assertTrue(frontHandler != null && frontHandler.fill(new FluidStack(Fluids.WATER, 100), IFluidHandler.FluidAction.SIMULATE) > 0,
                 "入力にした面から水が入らない");
         for (SideConfig.Face f : SideConfig.Face.values()) {
@@ -118,14 +118,14 @@ public final class ControlGameTests {
         m.energy().setEnergy(m.energy().getMaxEnergyStored());
         m.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
-            IFluidHandler top = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), Direction.UP);
-            IFluidHandler bottom = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), Direction.DOWN);
+            IFluidHandler top = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), helper.absolutePos(pos), Direction.UP);
+            IFluidHandler bottom = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), helper.absolutePos(pos), Direction.DOWN);
             helper.assertTrue(top != null && bottom != null, "面から液体に届かない");
             FluidStack fromTop = top.drain(1000, IFluidHandler.FluidAction.SIMULATE);
             FluidStack fromBottom = bottom.drain(1000, IFluidHandler.FluidAction.SIMULATE);
             helper.assertFalse(fromTop.isEmpty() || fromBottom.isEmpty(), "まだ出ていない");
             helper.assertTrue(!fromTop.getFluid().isSame(fromBottom.getFluid()), "上と下から同じ気体が出る");
-            IFluidHandler side = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), Direction.EAST);
+            IFluidHandler side = io.github.genichimaruo.singulo.compat.FluidResourceView.find(helper.getLevel(), helper.absolutePos(pos), Direction.EAST);
             helper.assertTrue(side == null || side.drain(1000, IFluidHandler.FluidAction.SIMULATE).isEmpty(),
                     "出力にしていない面から気体が出る");
         });
@@ -139,11 +139,11 @@ public final class ControlGameTests {
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(6, 1, 2));
         float droneHealth = drone.getHealth();
         float wardenHealth = warden.getHealth();
-        helper.assertFalse(drone.hurt(warden.damageSources().mobAttack(warden), 10), "ウォーデンの攻撃でドローンが傷つく");
-        helper.assertFalse(warden.hurt(drone.damageSources().mobAttack(drone), 10), "ドローンの攻撃でウォーデンが傷つく");
+        helper.assertFalse(drone.hurtOrSimulate(warden.damageSources().mobAttack(warden), 10), "ウォーデンの攻撃でドローンが傷つく");
+        helper.assertFalse(warden.hurtOrSimulate(drone.damageSources().mobAttack(drone), 10), "ドローンの攻撃でウォーデンが傷つく");
         helper.assertTrue(drone.getHealth() == droneHealth && warden.getHealth() == wardenHealth, "体力が減った");
         helper.assertTrue(warden.isAlliedTo(drone) && drone.isAlliedTo(warden), "味方とみなさない");
-        helper.assertTrue(zombie.hurt(warden.damageSources().mobAttack(warden), 1), "ほかのモブには攻撃が当たらない");
+        helper.assertTrue(zombie.hurtOrSimulate(warden.damageSources().mobAttack(warden), 1), "ほかのモブには攻撃が当たらない");
         helper.succeed();
     }
 

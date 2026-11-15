@@ -116,7 +116,7 @@ public class AxeAndroid extends RuinAndroid {
             }
             sparks(level, at.add(0, 0.2, 0), 3, 0.3);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(1.2, 1.0, 1.2), this::canHit)) {
-                if (e.onGround() && hit.add(e) && e.hurt(damageSources().mobAttack(this), SHOCKWAVE_DAMAGE)) {
+                if (e.onGround() && hit.add(e) && e.hurtOrSimulate(damageSources().mobAttack(this), SHOCKWAVE_DAMAGE)) {
                     e.setDeltaMovement(e.getDeltaMovement().add(dir.x * 0.3, 0.6, dir.z * 0.3));
                     e.hurtMarked = true;
                 }
@@ -221,7 +221,7 @@ public class AxeAndroid extends RuinAndroid {
                         leap = d > 0.01 ? to.scale(1 / d) : Vec3.directionFromRotation(0, yBodyRot);
                         double speed = Mth.clamp(d * 0.11, 0.45, 1.05);
                         setDeltaMovement(leap.x * speed, 0.62, leap.z * speed);
-                        hasImpulse = true;
+                        needsSync = true;
                         setState(STATE_LEAP);
                         playSound(SoundEvents.TRIDENT_RIPTIDE_1.value(), 0.9F, 1.6F);
                     }

@@ -6,9 +6,7 @@
   "energy": 200,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     }
   ],

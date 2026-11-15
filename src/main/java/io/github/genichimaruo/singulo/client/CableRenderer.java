@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.cable.CableBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.Block;
  *   <li>{@link #FRAME_FLOW} 以上: 被膜の外に、半透明の四角い箱の枠が流れに乗って次々と通り過ぎる。</li>
  * </ul>
  */
-public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
+public class CableRenderer extends SnapshotBlockRenderer<CableBlockEntity> {
     /** 波の長さ（ブロック）と速さ（ブロック/秒）。 */
     private static final float WAVELENGTH = 3.0F;
     private static final float SPEED = 4.0F;
@@ -312,18 +312,7 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
     }
 
     /** 被膜と箱の枠の描き方: RenderType.lightning と同じ加算だが、奥行きを書かない（中の芯の光の筋を隠さない）。 */
-    private static final class GlowLayer extends RenderType {
-        static final RenderType TYPE = create("singulo_cable_glow", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_WRITE)
-                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
-                        .setOutputState(WEATHER_TARGET)
-                        .createCompositeState(false));
-
-        private GlowLayer(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                     boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class GlowLayer {
+        static final RenderType TYPE = EffectRenderTypes.color("singulo_cable_glow", "add", false, true, true, net.minecraft.client.renderer.rendertype.OutputTarget.WEATHER_TARGET);
     }
 }

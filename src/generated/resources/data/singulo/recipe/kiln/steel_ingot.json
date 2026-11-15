@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:steel_blend"
-      },
+      "ingredient": "singulo:steel_blend",
       "count": 1
     }
   ],

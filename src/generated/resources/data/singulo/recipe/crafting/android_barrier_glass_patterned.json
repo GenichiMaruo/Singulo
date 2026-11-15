@@ -6,9 +6,7 @@
     "LL"
   ],
   "key": {
-    "L": {
-      "item": "singulo:android_barrier_glass"
-    }
+    "L": "singulo:android_barrier_glass"
   },
   "result": {
     "id": "singulo:android_barrier_glass_patterned",

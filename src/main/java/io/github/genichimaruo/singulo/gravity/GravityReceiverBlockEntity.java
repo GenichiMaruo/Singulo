@@ -33,7 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * （どの受電器がいちばん近いかも同じ探索で決まる）。どの受電器も自分の受け持ちを払えるふつうの tick は、受電器の数だけの計算で済み、
  * パネルには触らない。電力が足りなくなったときや形が変わったときだけパネルを1枚ずつ見直し、状態が変わるパネルだけを書き換える。
  */
-public class GravityReceiverBlockEntity extends BlockEntity {
+public class GravityReceiverBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     /** 毎tick必要な電力の既定値（設定 gravityPanelPower）。 */
     public static final int DEFAULT_PER_PANEL = 40;
     /** レイリー散乱パネル1枚の電力（FE/t）。 */
@@ -92,47 +92,27 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     protected long stored;
     private long nextScan;
 
-    private final LongEnergyStorage energy = new LongEnergyStorage() {
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            long room = buffered() ? capacity() - stored : groupDemand - groupInbox();     // ためない受電器は、足りない分だけ
+    private final io.github.genichimaruo.singulo.energy.LongEnergyHandler energy = new ReceiverEnergy();
+    private final class ReceiverEnergy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<Long>
+            implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        protected Long createSnapshot() { return stored; }
+        protected void revertToSnapshot(Long previous) { stored = previous; }
+        protected void onRootCommit(Long previous) { if (stored != previous) setChanged(); }
+        public long insertLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
+            long room = buffered() ? capacity() - stored : groupDemand - groupInbox();
             long take = Math.max(0, Math.min(amount, room));
-            if (!simulate && take > 0) {
-                stored += take;
-                setChanged();
-            }
+            if (take > 0) { updateSnapshots(tx); stored += take; }
             return take;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
+        public long extractLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
             return 0;
         }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, stored);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, capacity());
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return true;
-        }
+        public long getAmountAsLong() { return stored; }
+        public long getCapacityAsLong() { return capacity(); }
+        public boolean canExtract() { return false; }
+        public boolean canReceive() { return true; }
     };
 
     public GravityReceiverBlockEntity(BlockPos pos, BlockState state) {
@@ -143,7 +123,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         super(type, pos, state);
     }
 
-    public LongEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
@@ -552,7 +532,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
 
     @Override
     public void onChunkUnloaded() {
-        if (level != null && !level.isClientSide) onBroken(level);
+        if (level != null && !level.isClientSide()) onBroken(level);
         super.onChunkUnloaded();
     }
 
@@ -573,6 +553,6 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        stored = buffered() ? Math.max(0, tag.getLong("energy")) : 0;      // 受電器はためないので、前の分は持ち越さない
+        stored = buffered() ? Math.max(0, tag.getLongOr("energy", 0L)) : 0;      // 受電器はためないので、前の分は持ち越さない
     }
 }

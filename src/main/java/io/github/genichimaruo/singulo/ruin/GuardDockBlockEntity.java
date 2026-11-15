@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 警備機ドック。近くにプレイヤー（クリエイティブ・観戦を除く）が来ると、警備ドローンを出撃させる。
  * 出撃したドローンが全滅してから1日（24000 tick）経つと、次の出撃ができる。ドローンはドックから20ブロック以内を守る。
  */
-public class GuardDockBlockEntity extends BlockEntity {
+public class GuardDockBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public static final int DETECT_RANGE = 16;
     public static final int HOME_RADIUS = 20;
     public static final long COOLDOWN = 24_000;
@@ -90,16 +90,16 @@ public class GuardDockBlockEntity extends BlockEntity {
         killed.clear();
         launched = 0;
         for (int i = 0; i < waveSize(); i++) {
-            SecurityDrone drone = SinguloEntities.SECURITY_DRONE.get().create(level);
+            SecurityDrone drone = SinguloEntities.SECURITY_DRONE.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
             if (drone == null) {
                 continue;
             }
             double angle = Math.PI * 2 * i / waveSize();
-            drone.moveTo(worldPosition.getX() + 0.5 + Math.cos(angle), worldPosition.getY() + 1.5,
-                    worldPosition.getZ() + 0.5 + Math.sin(angle), level.random.nextFloat() * 360, 0);
+            drone.snapTo(worldPosition.getX() + 0.5 + Math.cos(angle), worldPosition.getY() + 1.5,
+                    worldPosition.getZ() + 0.5 + Math.sin(angle), level.getRandom().nextFloat() * 360, 0);
             drone.setTier(tier);
             drone.markFacilitySpawned();                           // 倒すと部品を少し落とす（ドックの個体だけ）
-            drone.restrictTo(worldPosition, HOME_RADIUS);
+            drone.setHomeTo(worldPosition, HOME_RADIUS);
             level.addFreshEntity(drone);
             drones.add(drone.getUUID());
             launched++;
@@ -125,11 +125,11 @@ public class GuardDockBlockEntity extends BlockEntity {
         killed.clear();
         launched = 0;
         float chance = memoryChance >= 0 ? memoryChance : io.github.genichimaruo.singulo.drone.DroneKind.memoryChance(tier);
-        if (!all || level.random.nextFloat() >= chance) {
+        if (!all || level.getRandom().nextFloat() >= chance) {
             return;
         }
-        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(
-                io.github.genichimaruo.singulo.drone.DroneKind.rollMemory(tier, level.random).memoryId));
+        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(
+                io.github.genichimaruo.singulo.drone.DroneKind.rollMemory(tier, level.getRandom()).memoryId));
         var top = net.minecraft.world.phys.Vec3.atBottomCenterOf(worldPosition.above());
         var drop = new net.minecraft.world.entity.item.ItemEntity(level, top.x, top.y + 0.2, top.z,
                 new net.minecraft.world.item.ItemStack(item), 0, 0.2, 0);
@@ -149,12 +149,12 @@ public class GuardDockBlockEntity extends BlockEntity {
         tag.putLong("next_wave", nextWave);
         ListTag list = new ListTag();
         for (UUID id : drones) {
-            list.add(NbtUtils.createUUID(id));
+            list.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(id));
         }
         tag.put("drones", list);
         ListTag dead = new ListTag();
         for (UUID id : killed) {
-            dead.add(NbtUtils.createUUID(id));
+            dead.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(id));
         }
         tag.put("killed", dead);
         tag.putInt("launched", launched);
@@ -163,16 +163,16 @@ public class GuardDockBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        tier = tag.contains("tier") ? Mth.clamp(tag.getInt("tier"), 1, 3) : 1;
-        nextWave = tag.getLong("next_wave");
+        tier = tag.contains("tier") ? Mth.clamp(tag.getIntOr("tier", 0), 1, 3) : 1;
+        nextWave = tag.getLongOr("next_wave", 0L);
         drones.clear();
-        for (Tag t : tag.getList("drones", Tag.TAG_INT_ARRAY)) {
-            drones.add(NbtUtils.loadUUID(t));
+        for (Tag t : tag.getListOrEmpty("drones")) {
+            drones.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(t));
         }
         killed.clear();
-        for (Tag t : tag.getList("killed", Tag.TAG_INT_ARRAY)) {
-            killed.add(NbtUtils.loadUUID(t));
+        for (Tag t : tag.getListOrEmpty("killed")) {
+            killed.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(t));
         }
-        launched = tag.getInt("launched");
+        launched = tag.getIntOr("launched", 0);
     }
 }

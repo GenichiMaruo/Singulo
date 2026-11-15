@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 
@@ -20,8 +20,8 @@ import net.minecraft.world.phys.AABB;
  * 半透明の球（半径はシールドの半径、中心は塔の軸）。上から下へ包み込むように張られ、横から見た縁ほど濃く見え、コアのシールドは白く光る。
  * 守っている間は、胴の中心をエネルギーの脈が昇り（導波管から見える）、放射冠が脈に合わせて光る。
  */
-public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlockEntity> {
-    private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
+public class ShieldTowerRenderer extends SnapshotBlockRenderer<ShieldTowerBlockEntity> {
+    private static final Identifier WHITE = Singulo.id("textures/misc/white.png");
     private static final int LAT = 16;
     private static final int LON = 48;
     /** 塔の軸の根元（基壇の上の段）からの、放射冠の高さ。 */
@@ -99,7 +99,7 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         int rgb = core ? 0xEAF4FF : 0x9ED8FF;
         float charge = deploy < 0 ? 1 : Mth.clamp(deploy / ShieldTowerBlockEntity.DEPLOY_BEAM, 0, 1);
         float rush = deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_DOME ? 1 + 2 * charge : 1;
-        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(0.5, 0, 0.5);
         FxDraw.beam(pose.last(), vc, new net.minecraft.world.phys.Vec3(0, 1, 0), new net.minecraft.world.phys.Vec3(0, CROWN_HEIGHT, 0),
@@ -122,7 +122,7 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
     private static void renderCrown(ShieldTowerBlockEntity be, PoseStack pose, VertexConsumer vc, float time, boolean active,
                                     boolean core, float deploy) {
         int rgb = core ? 0xEAF4FF : 0x9ED8FF;
-        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         float charge = deploy < 0 ? (active ? 1 : 0) : Mth.clamp(deploy / ShieldTowerBlockEntity.DEPLOY_BEAM, 0, 1);
         float spinUp = deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_DOME ? 1 + 4 * charge : 1;
         float crystalY = CROWN_HEIGHT + 1.4F + Mth.sin(time * 0.05F) * 0.12F;
@@ -152,8 +152,8 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         }
         pose.popPose();
         // 充電のあいだ、まわりから光の粒が結晶へ集まる
-        if (deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_BEAM && be.getLevel() != null && be.getLevel().random.nextInt(2) == 0) {
-            var rnd = be.getLevel().random;
+        if (deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_BEAM && be.getLevel() != null && be.getLevel().getRandom().nextInt(2) == 0) {
+            var rnd = be.getLevel().getRandom();
             net.minecraft.core.BlockPos ax = be.axis();
             double cx = ax.getX() + 0.5, cy = ax.getY() + crystalY, cz = ax.getZ() + 0.5;
             net.minecraft.world.phys.Vec3 d = new net.minecraft.world.phys.Vec3(rnd.nextGaussian(), rnd.nextGaussian() * 0.5, rnd.nextGaussian())
@@ -176,11 +176,11 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         float y = Mth.cos(theta);
         float z = Mth.sin(theta) * Mth.sin(phi);
         vc.addVertex(last, x * r, y * r, z * r).setColor(red, green, blue, alpha).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, x, y, z);
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightCoordsUtil.FULL_BRIGHT).setNormal(last, x, y, z);
     }
 
     @Override
-    public boolean shouldRenderOffScreen(ShieldTowerBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

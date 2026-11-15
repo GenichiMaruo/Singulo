@@ -45,7 +45,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
         return false;
     }
 
@@ -162,7 +162,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
                 free.add(i);
             }
         }
-        java.util.Collections.shuffle(free, new java.util.Random(level.random.nextLong()));
+        java.util.Collections.shuffle(free, new java.util.Random(level.getRandom().nextLong()));
         int next = 0;
         for (ItemStack stack : loot) {
             int count = Math.max(1, (int) Math.round(stack.getCount() * mult));
@@ -196,7 +196,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
-    public void stopOpen(Player player) {
+    public void stopOpen(net.minecraft.world.entity.ContainerUser player) {
         super.stopOpen(player);
         if (filledOnce && isEmpty() && emptiedAt < 0 && level != null) {
             emptiedAt = level.getGameTime();
@@ -230,23 +230,27 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, items, registries);
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
+        io.github.genichimaruo.singulo.compat.ValueIoCompat.write(output, (tag, registries) -> {
+        io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(tag, items, registries);
         tag.putString("ruin", ruin);
         tag.putBoolean("filled", filledOnce);
         tag.putLong("emptied_at", emptiedAt);
         tag.putBoolean("placed", placedByPlayer);
+        });
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(input);
+        HolderLookup.Provider registries = input.lookup();
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, items, registries);
-        ruin = tag.getString("ruin");
-        filledOnce = tag.getBoolean("filled");
-        emptiedAt = tag.contains("emptied_at") ? tag.getLong("emptied_at") : -1;
-        placedByPlayer = tag.getBoolean("placed");
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag, items, registries);
+        ruin = tag.getStringOr("ruin", "");
+        filledOnce = tag.getBooleanOr("filled", false);
+        emptiedAt = tag.contains("emptied_at") ? tag.getLongOr("emptied_at", 0L) : -1;
+        placedByPlayer = tag.getBooleanOr("placed", false);
     }
 }

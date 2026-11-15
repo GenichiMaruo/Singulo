@@ -1,4 +1,7 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
@@ -14,12 +17,12 @@ import net.neoforged.neoforge.gametest.*;
 @PrefixGameTestTemplate(false)
 public final class RecipeIndexGameTests {
     private static List<RecipeHolder<MachineRecipe>> legacy(GameTestHelper h, MachineType type) {
-        var raw = h.getLevel().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()).stream()
+        var raw = h.getLevel().recipeAccess().recipeMap().byType(SinguloRecipes.MACHINE.get()).stream()
                 .filter(r -> r.value().station().equals(type.id())).toList();
         var out = RecipeTweaks.adjustAll(raw);
         out.sort(Comparator.comparingInt((RecipeHolder<MachineRecipe> r) -> -r.value().priority())
                 .thenComparingInt(r -> -(r.value().ingredients().size() + r.value().fluidIngredients().size()
-                        + (r.value().restore().isPresent() ? 1 : 0))).thenComparing(r -> r.id().toString()));
+                        + (r.value().restore().isPresent() ? 1 : 0))).thenComparing(r -> r.id().identifier().toString()));
         return out;
     }
 
@@ -30,7 +33,7 @@ public final class RecipeIndexGameTests {
             var expected = legacy(h, type);
             h.assertTrue(actual.equals(expected), "Recipe priority, values or order changed for " + type);
             h.assertTrue(MachineBlockEntity.massRecipes(h.getLevel(), type).equals(expected.stream()
-                    .filter(r -> r.value().isMassRecipe()).sorted(Comparator.comparing(r -> r.id().toString())).toList()),
+                    .filter(r -> r.value().isMassRecipe()).sorted(Comparator.comparing(r -> r.id().identifier().toString())).toList()),
                     "Mass recipe order changed for " + type);
         }
         // Reuse is a correctness invariant; expensive timing comparisons are opt-in.
@@ -53,14 +56,14 @@ public final class RecipeIndexGameTests {
 
     @GameTest(template = "empty", batch = "recipe_reload")
     public static void indexedListsFollowReplacementAndRestoration(GameTestHelper h) {
-        var manager = h.getLevel().getRecipeManager();
+        var manager = h.getLevel().recipeAccess();
         var original = List.copyOf(manager.getRecipes());
         var before = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN);
         h.assertTrue(!before.isEmpty(), "Missing kiln recipes");
         try {
-            manager.replaceRecipes(List.of());
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, List.of());
             h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN).isEmpty(), "Reload kept removed recipes");
-        } finally { manager.replaceRecipes(original); }
+        } finally { io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original); }
         h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.KILN).equals(before), "Recipes not restored");
         h.succeed();
     }

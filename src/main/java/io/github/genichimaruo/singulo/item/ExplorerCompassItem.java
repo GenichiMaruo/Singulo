@@ -18,7 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -81,32 +81,32 @@ public class ExplorerCompassItem extends SinguloItem {
                 || !(level.getBlockEntity(context.getClickedPos()) instanceof io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity cache)) {
             return net.minecraft.world.InteractionResult.PASS;
         }
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return net.minecraft.world.InteractionResult.SUCCESS;
         }
         ItemStack stack = context.getItemInHand();
         int lv = level(stack);
         if (lv >= TARGETS.length) {
-            player.displayClientMessage(Component.translatable("compass.singulo.max"), true);
+            player.sendOverlayMessage(Component.translatable("compass.singulo.max"));
             return net.minecraft.world.InteractionResult.FAIL;
         }
         String deepest = TARGETS[lv - 1];
         Component deepestName = Component.translatable("ruin.singulo." + deepest);
         if (!deepest.equals(cache.ruin())) {
-            player.displayClientMessage(Component.translatable("compass.singulo.wrong_cache", deepestName), true);
+            player.sendOverlayMessage(Component.translatable("compass.singulo.wrong_cache", deepestName));
             return net.minecraft.world.InteractionResult.FAIL;
         }
         boolean cleared = io.github.genichimaruo.singulo.ruin.RuinDiscovery.discovered(player).stream()
                 .anyMatch(d -> d.ruin().equals(deepest));
         if (!cleared) {
-            player.displayClientMessage(Component.translatable("compass.singulo.not_cleared", deepestName), true);
+            player.sendOverlayMessage(Component.translatable("compass.singulo.not_cleared", deepestName));
             return net.minecraft.world.InteractionResult.FAIL;
         }
         upgrade(stack);
-        player.displayClientMessage(lv + 1 == BRANCH_LEVEL
+        player.sendOverlayMessage(lv + 1 == BRANCH_LEVEL
                 ? Component.translatable("compass.singulo.upgraded_branch", Component.translatable("ruin.singulo." + TARGETS[lv]),
                         Component.translatable("ruin.singulo." + BRANCH))
-                : Component.translatable("compass.singulo.upgraded", Component.translatable("ruin.singulo." + TARGETS[lv])), true);
+                : Component.translatable("compass.singulo.upgraded", Component.translatable("ruin.singulo." + TARGETS[lv])));
         level.playSound(null, context.getClickedPos(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 0.7F);
         level.playSound(null, context.getClickedPos(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 1.2F);
         if (level instanceof ServerLevel server) {
@@ -132,39 +132,39 @@ public class ExplorerCompassItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (level.isClientSide) {
-            return InteractionResultHolder.success(stack);
+        if (level.isClientSide()) {
+            return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
         }
         if (player.isShiftKeyDown()) {
             stack.set(SinguloComponents.HOLO_SIZE.get(), target(stack) + 1);
             stack.remove(DataComponents.LODESTONE_TRACKER);
-            player.displayClientMessage(Component.translatable("compass.singulo.target",
-                    Component.translatable("ruin.singulo." + targetId(stack))), true);
-            return InteractionResultHolder.success(stack);
+            player.sendOverlayMessage(Component.translatable("compass.singulo.target",
+                    Component.translatable("ruin.singulo." + targetId(stack))));
+            return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
         }
         ServerLevel server = (ServerLevel) level;
         String rid = targetId(stack);
-        Optional<Holder.Reference<Structure>> holder = server.registryAccess().registryOrThrow(Registries.STRUCTURE)
-                .getHolder(ResourceKey.create(Registries.STRUCTURE, Singulo.id(rid)));
+        Optional<Holder.Reference<Structure>> holder = server.registryAccess().lookupOrThrow(Registries.STRUCTURE)
+                .get(ResourceKey.create(Registries.STRUCTURE, Singulo.id(rid)));
         Pair<BlockPos, Holder<Structure>> found = holder.isEmpty() ? null : server.getChunkSource().getGenerator()
                 .findNearestMapStructure(server, HolderSet.direct(holder.get()), player.blockPosition(), SEARCH_CHUNKS, false);
-        player.getCooldowns().addCooldown(this, 60);
+        player.getCooldowns().addCooldown(stack, 60);
         if (found == null) {
             stack.remove(DataComponents.LODESTONE_TRACKER);
-            player.displayClientMessage(Component.translatable("compass.singulo.not_found",
-                    Component.translatable("ruin.singulo." + rid)), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendOverlayMessage(Component.translatable("compass.singulo.not_found",
+                    Component.translatable("ruin.singulo." + rid)));
+            return io.github.genichimaruo.singulo.compat.Interactions.fail(stack);
         }
         // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す
         BlockPos p = rid.equals(BRANCH) ? found.getFirst() : center(server, found.getFirst(), holder.get().value());
         stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), p)), false));
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(p.getX(), player.getBlockY(), p.getZ())));
-        player.displayClientMessage(Component.translatable("compass.singulo.found",
-                Component.translatable("ruin.singulo." + rid), dist), true);
+        player.sendOverlayMessage(Component.translatable("compass.singulo.found",
+                Component.translatable("ruin.singulo." + rid), dist));
         level.playSound(null, player.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 1.0F);
-        return InteractionResultHolder.success(stack);
+        return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
     }
 
     /**
@@ -172,8 +172,8 @@ public class ExplorerCompassItem extends SinguloItem {
      * その構造物の始まりを読み、全体を囲む範囲の中心にする（読めなければ見つけた位置のまま）。
      */
     static BlockPos center(ServerLevel server, BlockPos found, Structure structure) {
-        net.minecraft.world.level.ChunkPos cp = new net.minecraft.world.level.ChunkPos(found);
-        var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
+        net.minecraft.world.level.ChunkPos cp = net.minecraft.world.level.ChunkPos.containing(found);
+        var start = server.getChunk(cp.x(), cp.z(), net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
                 .getStartForStructure(structure);
         if (start == null || !start.isValid()) {
             return found;

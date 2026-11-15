@@ -3,9 +3,9 @@ package io.github.genichimaruo.singulo.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -22,7 +22,7 @@ final class FluidLook {
     /** 液体の見た目: 絵・色（不透明度を含む）・光（光る液体は最大の明るさ）。 */
     record Look(TextureAtlasSprite sprite, int argb, boolean glows) {
         int light(int light) {
-            return glows ? LightTexture.FULL_BRIGHT : light;
+            return glows ? LightCoordsUtil.FULL_BRIGHT : light;
         }
 
         int rgb() {
@@ -36,8 +36,8 @@ final class FluidLook {
 
     static Look look(FluidStack fluid) {
         IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fluid.getFluid());
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ext.getStillTexture(fluid));
-        int tint = ext.getTintColor(fluid);
+        TextureAtlasSprite sprite = FluidVisuals.sprite(fluid);
+        int tint = FluidVisuals.tint(fluid);
         int alpha = tint >>> 24;
         if (alpha == 0) {
             alpha = 255;
@@ -52,7 +52,7 @@ final class FluidLook {
     }
 
     static VertexConsumer buffer(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entityTranslucentCull(InventoryMenu.BLOCK_ATLAS));
+        return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentCullItemTarget(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
     }
 
     /**
@@ -62,7 +62,7 @@ final class FluidLook {
      * 面を落とさない描き方で、裏の面も奥から順に重なる。
      */
     static VertexConsumer insideBuffer(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
+        return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
     }
 
     /**

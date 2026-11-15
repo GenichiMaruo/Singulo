@@ -6,9 +6,7 @@
   "energy": 1000000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:stone"
-      },
+      "ingredient": "minecraft:stone",
       "count": 1
     }
   ],

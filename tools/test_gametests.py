@@ -62,11 +62,13 @@ class InventoryTests(unittest.TestCase):
 
     def test_comments_and_annotations_are_understood(self):
         (self.dir / 'ExampleGameTests.java').write_text('// @GameTest(not a real declaration)\n' + self.source())
-        self.assertEqual(inventory(self.root)[0]['name'], 'example')
+        self.assertEqual(inventory(self.root)[0]['name'], 'singulo:examplegametests.example')
 
     def test_duplicate_names_across_classes_are_rejected(self):
         (self.dir / 'AGameTests.java').write_text(self.source('A'))
-        (self.dir / 'BGameTests.java').write_text(self.source('B'))
+        other = self.root / 'src/gameTest/java'
+        other.mkdir(parents=True)
+        (other / 'AGameTests.java').write_text(self.source('A'))
         with self.assertRaisesRegex(RuntimeError, 'Duplicate'): inventory(self.root)
 
     def test_incompatible_declarations_fail_instead_of_being_skipped(self):

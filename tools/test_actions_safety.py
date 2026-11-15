@@ -26,7 +26,8 @@ class WorkflowSafetyTests(unittest.TestCase):
             with self.subTest(workflow=name):
                 self.assertIn('  workflow_dispatch:\n', text)
                 self.assertNotRegex(text, r'(?m)^  (?:push|pull_request|pull_request_target|workflow_run):')
-                self.assertIn("    if: github.ref == 'refs/heads/1.21.1'\n", text)
+                branch = '26.1.2' if name == 'publish-curseforge.yml' else '1.21.1'
+                self.assertIn(f"    if: github.ref == 'refs/heads/{branch}'\n", text)
                 self.assertNotRegex(text, r'(?m)^      (?:GH_TOKEN|MODRINTH_TOKEN|CURSEFORGE_TOKEN):')
 
     def test_curseforge_never_retries_an_uncertain_publication(self):
@@ -49,12 +50,21 @@ class WorkflowSafetyTests(unittest.TestCase):
         text = (WORKFLOWS / 'pr-validation.yml').read_text()
         self.assertIn('name: pr-validation-${{ github.sha }}-attempt-${{ github.run_attempt }}', text)
 
+    def test_outline_evidence_is_retained_in_primary_artifact(self):
+        text = (WORKFLOWS / 'pr-validation.yml').read_text()
+        upload = text.split('      - name: Save build outputs and validation logs', 1)[1].split('  sodium-lighting:', 1)[0]
+        for path in ('build/outline-review/logs/', 'build/outline-review/screenshots/'):
+            self.assertIn('            ' + path + '\n', upload)
+        self.assertIn('SINGULO_OUTLINE_COMPLETE 4 5', text)
+        self.assertIn('SINGULO_OUTLINE_ENTITY phase=', text)
+
     def test_publication_executes_trusted_validation_code(self):
         for name in ('publish-curseforge.yml', 'publish-modrinth.yml'):
             text = (WORKFLOWS / name).read_text()
             with self.subTest(workflow=name):
-                self.assertIn('python3 tools/verified_release_1211.py check ', text)
-                self.assertIn('python3 tools/verified_release_1211.py promote ', text)
+                version = '2612' if name == 'publish-curseforge.yml' else '1211'
+                self.assertIn(f'python3 tools/verified_release_{version}.py check ', text)
+                self.assertIn(f'python3 tools/verified_release_{version}.py promote ', text)
                 self.assertNotRegex(text, r'python3\s+release-source/tools/')
 
     def test_no_python_runs_from_the_tag_checkout(self):
@@ -68,8 +78,11 @@ class WorkflowSafetyTests(unittest.TestCase):
     def test_validation_jobs_have_bounded_runtime_and_cancel_obsolete_runs(self):
         text = (WORKFLOWS / 'pr-validation.yml').read_text()
         limits = [int(x) for x in re.findall(r'^    timeout-minutes: (\d+)\s*$', text, re.M)]
-        self.assertEqual(len(limits), 3)
-        self.assertTrue(all(1 <= x <= 35 for x in limits))
+        self.assertEqual(len(limits), 2)
+        self.assertNotIn('optional-mekanism:', text)
+        self.assertEqual(text.count("java-version: '25'"), 2)
+        self.assertIn('tools/check_release_2612.py', text)
+        self.assertTrue(all(1 <= x <= 60 for x in limits))
         self.assertIn('  cancel-in-progress: true\n', text)
 
 

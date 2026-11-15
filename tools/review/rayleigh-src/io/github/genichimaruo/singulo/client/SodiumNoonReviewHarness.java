@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.Singulo;
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder;
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.impl.CompactChunkVertex;
-import net.caffeinemc.mods.sodium.client.render.frapi.helper.ColorHelper;
+import net.caffeinemc.mods.sodium.client.render.helper.ColorHelper;
 import org.lwjgl.system.MemoryUtil;
 
 /** Exercises the real mixed-in Sodium encoder and model-light merger, not a duplicate codec. */
@@ -11,15 +11,19 @@ public final class SodiumNoonReviewHarness {
     public static void verifyEmissive(io.github.genichimaruo.singulo.ruin.lab.RayleighSky.LightSnapshot sunlight) {
         var pos = new net.minecraft.core.BlockPos(10, 241, 10);
         if (!sunlight.near(pos) || sunlight.light(pos.getX(), pos.getY(), pos.getZ()) != 0) {
-            throw new AssertionError("Emissive test must be near a panel but outside its sunlight field");
+            throw new AssertionError("Emissive test must be near a panel but outside its sunlight field: near=" + sunlight.near(pos)
+                    + " light=" + sunlight.light(pos.getX(), pos.getY(), pos.getZ())
+                    + " roomLight=" + sunlight.light(3,241,3)
+                    + " aboveProbe=" + net.minecraft.client.Minecraft.getInstance().level.getBlockState(pos.atY(246)));
         }
-        var view = (net.minecraft.world.level.BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(
+        var view = (net.minecraft.client.renderer.block.BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(
                 SodiumNoonReviewHarness.class.getClassLoader(),
-                new Class<?>[] {net.minecraft.world.level.BlockAndTintGetter.class, SodiumRayleighView.class},
+                new Class<?>[] {net.minecraft.client.renderer.block.BlockAndTintGetter.class, SodiumRayleighView.class},
                 (proxy, method, args) -> switch (method.getName()) {
                     case "singulo$sunlight" -> sunlight;
                     case "singulo$lightEpoch" -> 1L;
                     case "getShade" -> 1F;
+                    case "cardinalLighting" -> new net.minecraft.world.level.CardinalLighting(1, 1, 1, 1, 1, 1);
                     default -> throw new AssertionError("Unexpected live view access: " + method.getName());
                 });
         for (boolean selfEmissive : new boolean[] {false, true}) {
@@ -69,8 +73,12 @@ public final class SodiumNoonReviewHarness {
                     int decoded = (hi >>> 30) | (lo >>> 30) << 2 | ((data >>> 20) & 15) << 4;
                     if (decoded != sun || (hi & 0x3FFFFFFF) != ((int) base[i] & 0x3FFFFFFF)
                             || (lo & 0x3FFFFFFF) != ((int) (base[i] >>> 32) & 0x3FFFFFFF)
-                            || (data & 0xFF0FFFFF) != 0xAD05C070) {
-                        throw new AssertionError("Sodium noon vertex roundtrip/preservation failed at " + sun);
+                            // Sodium 0.9.2 encodes native light at texel centers: clamp(raw + 8, 8, 248).
+                            // Raw max sky C0 / block70 therefore becomes C8 /78, not the old C0 /70.
+                            || (data & 0xFF0FFFFF) != 0xAD05C878) {
+                        throw new AssertionError("Sodium noon vertex roundtrip/preservation failed at " + sun + " vertex=" + i
+                                + " decoded=" + decoded + " data=" + Integer.toHexString(data)
+                                + " hi=" + Integer.toHexString(hi) + " lo=" + Integer.toHexString(lo));
                     }
                 }
             }

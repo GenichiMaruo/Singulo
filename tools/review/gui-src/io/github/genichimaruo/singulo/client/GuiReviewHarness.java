@@ -36,7 +36,7 @@ public final class GuiReviewHarness {
     private static int lookupChapter, lookupPage;
     private static String bootScreen = "";
     private static ItemStack item(String name) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(name)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(name)));
     }
 
     @SubscribeEvent
@@ -61,7 +61,7 @@ public final class GuiReviewHarness {
                     if (child instanceof net.minecraft.client.gui.components.Button button
                             && button.getMessage().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents label
                             && "selectWorld.backupJoinSkipButton".equals(label.getKey()) && button.active) {
-                        button.onPress();
+                        button.onPress(new net.minecraft.client.input.KeyEvent(257, 0, 0));
                         return;
                     }
                 }
@@ -75,7 +75,7 @@ public final class GuiReviewHarness {
             return;
         }
         // Opening menus and resizing can move the real cursor back onto a tooltip.
-        org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
+        org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().handle(), 20, 20);
         if (phase == 0) {
             phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc));
@@ -86,7 +86,7 @@ public final class GuiReviewHarness {
         }
         switch (phase) {
             case 1 -> {
-                org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
+                org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().handle(), 20, 20);
                 openAndroid(mc);
                 phase++;
             }
@@ -132,10 +132,10 @@ public final class GuiReviewHarness {
                 ((Popup) field(mc.screen, "recordPop")).open = false;
                 method.invoke(mc.screen, new ItemStack(Items.OAK_PLANKS));
                 int[] fresh = ((WorkConsoleScreen) mc.screen).freshButton();
-                mc.screen.mouseClicked(fresh[0] + fresh[2] / 2, fresh[1] + fresh[3] / 2, 0);
+                mc.screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(fresh[0] + fresh[2] / 2, fresh[1] + fresh[3] / 2, new net.minecraft.client.input.MouseButtonInfo(0, 0)), false);
                 if (!(Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not enable");
                 fresh = ((WorkConsoleScreen) mc.screen).freshButton();
-                mc.screen.mouseClicked(fresh[0] + fresh[2] / 2, fresh[1] + fresh[3] / 2, 0);
+                mc.screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(fresh[0] + fresh[2] / 2, fresh[1] + fresh[3] / 2, new net.minecraft.client.input.MouseButtonInfo(0, 0)), false);
                 if ((Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not disable");
                 phase++;
             }
@@ -205,10 +205,9 @@ public final class GuiReviewHarness {
                 }
                 capture(mc, "station-patrol-ja-854x480");
                 // 経路のページは右レールの設定の段で開く
-                mc.screen.mouseClicked((mc.getWindow().getGuiScaledWidth() - AndroidStationMenu.WIDTH) / 2
-                                + io.github.genichimaruo.singulo.machine.GuiFrame.railX(AndroidStationMenu.WIDTH) + 8,
-                        (mc.getWindow().getGuiScaledHeight() - AndroidStationMenu.HEIGHT) / 2
-                                + io.github.genichimaruo.singulo.machine.GuiFrame.railY(io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) + 8, 0);
+                mc.screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent((mc.getWindow().getGuiScaledWidth() - AndroidStationMenu.WIDTH) / 2
+                                + io.github.genichimaruo.singulo.machine.GuiFrame.railX(AndroidStationMenu.WIDTH) + 8, (mc.getWindow().getGuiScaledHeight() - AndroidStationMenu.HEIGHT) / 2
+                                + io.github.genichimaruo.singulo.machine.GuiFrame.railY(io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) + 8, new net.minecraft.client.input.MouseButtonInfo(0, 0)), false);
                 phase++;
             }
             case 23 -> {
@@ -277,7 +276,7 @@ public final class GuiReviewHarness {
                 }
                 box.setFocused(true);
                 mc.screen.setFocused(box);
-                mc.screen.keyPressed(262, 0, 0);
+                mc.screen.keyPressed(new net.minecraft.client.input.KeyEvent(262, 0, 0));
                 if ((Integer) field(mc.screen, "page") != lookupPage) {
                     throw new IllegalStateException("Typing in handbook search turned the page");
                 }
@@ -312,13 +311,13 @@ public final class GuiReviewHarness {
         box.setValue("@minecraft");
         if (((List<?>) entries.invoke(screen)).isEmpty()) throw new IllegalStateException("Mod search removed vanilla stock");
         box.setFocused(true);
-        screen.keyPressed(69, 0, 0);
+        screen.keyPressed(new net.minecraft.client.input.KeyEvent(69, 0, 0));
         if (mc.screen != screen) throw new IllegalStateException("Inventory hotkey closed a focused search");
         box.setFocused(false);
         box.setValue("");
         int[] sort = screen.sortButton();
         for (int i = 0; i < 5; i++) {
-            screen.mouseClicked(sort[0] + sort[2] / 2, sort[1] + sort[3] / 2, 0);
+            screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(sort[0] + sort[2] / 2, sort[1] + sort[3] / 2, new net.minecraft.client.input.MouseButtonInfo(0, 0)), false);
             if (((List<?>) entries.invoke(screen)).size() != initial) throw new IllegalStateException("Sort lost entries");
         }
         if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
@@ -353,10 +352,10 @@ public final class GuiReviewHarness {
     /** Controlled UI fixture: six steps and six worker rows, including unloaded workers. */
     private static void detailFixture(Minecraft mc) {
         var player = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
-        var level = player.serverLevel();
+        var level = player.level();
         var t = new net.minecraft.nbt.CompoundTag();
         t.putInt("id", 999);
-        t.put("target", new ItemStack(Items.OAK_PLANKS).save(level.registryAccess()));
+        t.put("target", ItemStack.CODEC.encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), new ItemStack(Items.OAK_PLANKS)).getOrThrow());
         t.putLong("count", 24);
         var steps = new net.minecraft.nbt.ListTag();
         var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -365,7 +364,7 @@ public final class GuiReviewHarness {
         for (int i = 0; i < 6; i++) {
             var step = new net.minecraft.nbt.CompoundTag();
             step.put("recipe", recipe.save(level.registryAccess()));
-            step.put("location", net.minecraft.nbt.NbtUtils.writeBlockPos(CONSOLE));
+            step.put("location", BlockPos.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, CONSOLE).getOrThrow());
             step.putString("block", "minecraft:crafting_table");
             step.putLong("total", i + 1);
             step.putLong("done", i);
@@ -398,7 +397,7 @@ public final class GuiReviewHarness {
         Path dir = Path.of(System.getProperty("singulo.guiReviewOutput"));
         Files.createDirectories(dir);
         org.lwjgl.opengl.GL11.glFinish();
-        try (var screenshot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+        try (var screenshot = ReviewScreenshot.take(mc.getMainRenderTarget())) {
             screenshot.writeToFile(dir.resolve(name + ".png"));
             if (name.startsWith("android-")) {
                 var slot = mc.player.containerMenu.getSlot(RuinAndroid.INVENTORY_SIZE);
@@ -408,7 +407,7 @@ public final class GuiReviewHarness {
                 if (slot.x != AndroidMenu.INV_X || slot.y != AndroidMenu.INV_Y) {
                     throw new IllegalStateException("Unexpected first inventory slot: " + slot.x + "," + slot.y);
                 }
-                int pixel = screenshot.getPixelRGBA((int) ((left + AndroidMenu.INV_X + 8) * scale),
+                int pixel = screenshot.getPixel((int) ((left + AndroidMenu.INV_X + 8) * scale),
                         (int) ((top + AndroidMenu.INV_Y + 8) * scale));
                 for (int i = RuinAndroid.INVENTORY_SIZE; i < mc.player.containerMenu.slots.size(); i++) {
                     if (!mc.player.containerMenu.getSlot(i).isActive()) {
@@ -420,7 +419,7 @@ public final class GuiReviewHarness {
                 // スロットの中はアンドロイドのスキンの色（その子のアクセントで少し染まる）。NativeImage は ABGR
                 var android = ((AndroidMenu) mc.player.containerMenu).android();
                 int fill = GuiSkin.android(android == null ? 0x78E1FF : android.accent()).fill();
-                int expected = 0xFF000000 | (fill & 0xFF) << 16 | (fill & 0xFF00) | (fill >> 16 & 0xFF);
+                int expected = 0xFF000000 | fill;
                 if (pixel != expected) {
                     throw new IllegalStateException("Player inventory background missing in " + name);
                 }
@@ -433,7 +432,7 @@ public final class GuiReviewHarness {
         UUID playerId = mc.player.getUUID();
         mc.getSingleplayerServer().execute(() -> {
             ServerPlayer player = mc.getSingleplayerServer().getPlayerList().getPlayer(playerId);
-            RuinAndroid android = (RuinAndroid) player.serverLevel().getEntity(androidId);
+            RuinAndroid android = (RuinAndroid) player.level().getEntity(androidId);
             player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AndroidMenu(id, inv, android),
                     android.nickname()), buf -> buf.writeVarInt(android.getId()));
         });
@@ -443,14 +442,14 @@ public final class GuiReviewHarness {
         UUID id = mc.player.getUUID();
         mc.getSingleplayerServer().execute(() -> {
             ServerPlayer player = mc.getSingleplayerServer().getPlayerList().getPlayer(id);
-            var be = player.serverLevel().getBlockEntity(pos);
+            var be = player.level().getBlockEntity(pos);
             ((io.github.genichimaruo.singulo.machine.AbstractMachineBlock.MenuOpener) be).openMenu(player);
         });
     }
 
     private static void prepare(Minecraft mc) {
         ServerPlayer player = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
-        var level = player.serverLevel();
+        var level = player.level();
         player.setGameMode(GameType.CREATIVE);
         player.teleportTo(2.5, 80, 2.5);
         for (BlockPos p : BlockPos.betweenClosed(-2, 79, -2, 8, 79, 5)) {
@@ -466,10 +465,10 @@ public final class GuiReviewHarness {
         station.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
         station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_MEMORY, item(AndroidKind.BLADE.memoryId()));
         station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRODUCTION, item("android_production_upgrade"));
-        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(level);
+        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         android.makeGuard(player.getUUID(), STATION, RuinAndroid.MODE_GUARD, 30);
         android.setNoAi(true);
-        android.moveTo(1.5, 80, 1.5);
+        android.snapTo(1.5, 80, 1.5);
         android.inventory().setItem(RuinAndroid.SLOT_BATTERY, item("android_battery_upgrade").copyWithCount(2));
         android.inventory().setItem(RuinAndroid.SLOT_BACKPACK, item("android_backpack_upgrade"));
         android.inventory().setItem(RuinAndroid.SLOT_MINING, item("android_mining_upgrade"));
@@ -489,7 +488,7 @@ public final class GuiReviewHarness {
             var onKill = patrol.getClass().getDeclaredMethod("onKill", net.minecraft.server.level.ServerLevel.class,
                     net.minecraft.world.entity.LivingEntity.class);
             onKill.setAccessible(true);
-            var zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+            var zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             zombie.setPos(android.position());
             onKill.invoke(patrol, level, zombie);
         } catch (ReflectiveOperationException e) {

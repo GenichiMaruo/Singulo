@@ -7,15 +7,9 @@
     "PWP"
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "L": {
-      "item": "singulo:fluid_pipe"
-    }
+    "P": "#c:plates/steel",
+    "W": "singulo:white_ceramic_composite",
+    "L": "singulo:fluid_pipe"
   },
   "result": {
     "id": "singulo:vacuum_jacketed_pipe",

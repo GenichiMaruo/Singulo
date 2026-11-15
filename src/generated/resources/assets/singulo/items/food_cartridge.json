@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "singulo:item/food_cartridge",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 16777215
+      },
+      {
+        "type": "singulo:dynamic",
+        "kind": "food_cartridge"
+      }
+    ]
+  }
+}

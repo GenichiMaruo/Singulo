@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -30,14 +30,14 @@ public class DimensionalPocketItem extends SinguloItem {
             DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Singulo.MODID);
     public static final Supplier<AttachmentType<List<ItemStack>>> CONTENTS = REGISTER.register("dimensional_pocket",
             () -> AttachmentType.<List<ItemStack>>builder(() -> new ArrayList<>())
-                    .serialize(ItemStack.OPTIONAL_CODEC.listOf().xmap(ArrayList::new, l -> l)).copyOnDeath().build());
+                    .serialize(ItemStack.OPTIONAL_CODEC.listOf().fieldOf("items")).copyOnDeath().build());
 
     public DimensionalPocketItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player instanceof ServerPlayer sp) {
             Pocket pocket = new Pocket(sp);
@@ -45,7 +45,7 @@ public class DimensionalPocketItem extends SinguloItem {
                     Component.translatable("container.singulo.dimensional_pocket")));
             level.playSound(null, player.blockPosition(), SinguloSounds.get("dimensional_pocket.open"), SoundSource.PLAYERS, 0.8F, 1.0F);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     /** プレイヤーに付いた中身を写した入れ物。変わるたびに書き戻す。 */
@@ -77,8 +77,9 @@ public class DimensionalPocketItem extends SinguloItem {
         }
 
         @Override
-        public void stopOpen(Player p) {
-            super.stopOpen(p);
+        public void stopOpen(net.minecraft.world.entity.ContainerUser user) {
+            super.stopOpen(user);
+            Player p = player;
             setChanged();
             p.level().playSound(null, p.blockPosition(), SinguloSounds.get("dimensional_pocket.close"), SoundSource.PLAYERS, 0.8F, 1.0F);
         }

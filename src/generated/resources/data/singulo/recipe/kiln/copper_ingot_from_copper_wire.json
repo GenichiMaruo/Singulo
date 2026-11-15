@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:copper_wire"
-      },
+      "ingredient": "singulo:copper_wire",
       "count": 8
     }
   ],

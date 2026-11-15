@@ -5,12 +5,8 @@
     "PSP"
   ],
   "key": {
-    "P": {
-      "item": "minecraft:paper"
-    },
-    "S": {
-      "tag": "c:strings"
-    }
+    "P": "minecraft:paper",
+    "S": "#c:strings"
   },
   "result": {
     "id": "singulo:android_headdress",

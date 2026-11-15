@@ -7,7 +7,7 @@ public class PrintedFoodItem extends SinguloItem {
     private final PrintedFood food;
 
     public PrintedFoodItem(Properties properties, int stage, PrintedFood food) {
-        super(properties.food(food.food()), stage, false);
+        super(properties.food(food.food(), food.consumable()), stage, false);
         this.food = food;
     }
 

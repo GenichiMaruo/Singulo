@@ -6,33 +6,23 @@
   "energy": 200000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/netherite"
-      },
+      "ingredient": "#c:ingots/netherite",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_matter_shell"
-      },
+      "ingredient": "singulo:degenerate_matter_shell",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:jet_condensate"
-      },
+      "ingredient": "singulo:jet_condensate",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:nihonium_plate"
-      },
+      "ingredient": "singulo:nihonium_plate",
       "count": 2
     }
   ],

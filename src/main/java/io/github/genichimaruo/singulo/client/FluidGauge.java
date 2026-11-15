@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.client;
 
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Util;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -14,13 +14,13 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 final class FluidGauge {
     private FluidGauge() {}
 
-    static void draw(GuiGraphics g, int x, int y, int w, int h, double fraction, Fluid fluid) {
+    static void draw(GuiGraphicsExtractor g, int x, int y, int w, int h, double fraction, Fluid fluid) {
         Panel.well(g, x, y, w, h);
         int filled = (int) Math.round(h * Mth.clamp(fraction, 0, 1));
         if (filled <= 0) {
             return;
         }
-        int rgb = IClientFluidTypeExtensions.of(fluid).getTintColor() & 0xFFFFFF;
+        int rgb = FluidVisuals.tint(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000)) & 0xFFFFFF;
         float t = (Util.getMillis() % 3_600_000L) / 1000F;
         // タンクごとに少しずらす（同じ液体のタンクが同じ動きにならないように）
         float seed = (x * 0.37F + y * 0.11F) % 10;
@@ -31,7 +31,7 @@ final class FluidGauge {
         }
     }
 
-    private static void liquid(GuiGraphics g, int x, int y, int w, int h, int filled, int rgb, float t) {
+    private static void liquid(GuiGraphicsExtractor g, int x, int y, int w, int h, int filled, int rgb, float t) {
         int bottom = y + h;
         int top = bottom - filled;
         // 明るさの帯（下から上へゆっくり流れる）
@@ -63,7 +63,7 @@ final class FluidGauge {
         }
     }
 
-    private static void gas(GuiGraphics g, int x, int y, int w, int h, int filled, int rgb, float t) {
+    private static void gas(GuiGraphicsExtractor g, int x, int y, int w, int h, int filled, int rgb, float t) {
         int bottom = y + h;
         int top = bottom - filled;
         // 渦: 位置と時間でゆらぐ明るさ。上の数ドットは薄くして、境目をぼかす

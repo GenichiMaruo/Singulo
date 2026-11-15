@@ -7,15 +7,9 @@
     "PGP"
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "P": "#c:plates/steel",
+    "G": "#c:glass_blocks/colorless",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:android_recipe_rack",

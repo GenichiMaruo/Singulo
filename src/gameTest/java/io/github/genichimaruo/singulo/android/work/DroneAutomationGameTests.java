@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.drone.DroneCrateItem;
 import io.github.genichimaruo.singulo.drone.DronePortBlockEntity;
@@ -8,14 +10,12 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -23,13 +23,13 @@ public final class DroneAutomationGameTests {
     private static final BlockPos PORT = new BlockPos(3, 2, 3);
     private static DronePortBlockEntity port(GameTestHelper h) {
         h.setBlock(PORT, SinguloBlocks.DRONE_PORT.get());
-        return h.getBlockEntity(PORT);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, PORT);
     }
 
     @GameTest(template = "empty")
     public static void androidStockExcludesOutboundCargoAndSealedCrates(GameTestHelper h) {
         h.setBlock(PORT.west(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(PORT.west());
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, PORT.west());
         var port = port(h);
         port.items().setStackInSlot(DronePortBlockEntity.SLOT_CARGO, new ItemStack(Items.IRON_INGOT, 64));
         port.items().setStackInSlot(DronePortBlockEntity.SLOT_RECEIVE, new ItemStack(Items.IRON_INGOT, 7));
@@ -54,7 +54,7 @@ public final class DroneAutomationGameTests {
     public static void androidDeliveryKeepsOverflowUntilDroneCargoHasSpace(GameTestHelper h) {
         var port = port(h);
         h.setBlock(PORT.west(), SinguloBlocks.ANDROID_DELIVERY_PORT.get());
-        DeliveryPortBlockEntity delivery = h.getBlockEntity(PORT.west());
+        DeliveryPortBlockEntity delivery = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, PORT.west());
         for (int i = 0; i < DronePortBlockEntity.CARGO; i++)
             port.items().setStackInSlot(DronePortBlockEntity.SLOT_CARGO + i, new ItemStack(Items.COBBLESTONE, 64));
         h.assertTrue(delivery.insert(new ItemStack(Items.IRON_INGOT, 40)).isEmpty(), "Delivery rejected products");
@@ -87,7 +87,7 @@ public final class DroneAutomationGameTests {
         h.assertTrue(view.extractItem(0, 4, false).getCount() == 4, "Crate output was not extractable");
         var saved = port.saveWithoutMetadata(h.getLevel().registryAccess());
         var restored = new DronePortBlockEntity(port.getBlockPos(), port.getBlockState());
-        restored.loadWithComponents(saved, h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, saved, h.getLevel().registryAccess());
         h.assertTrue(restored.androidItems(Direction.WEST).extractItem(0, 16, true).getCount() == 2,
                 "Reload lost the crate count or output configuration");
         h.assertTrue(restored.androidItems(Direction.EAST).extractItem(0, 16, true).isEmpty(), "Crates leaked through an input-only face");
@@ -98,7 +98,7 @@ public final class DroneAutomationGameTests {
     public static void crateAutoEjectDoesNotEnableCargoAutoEject(GameTestHelper h) {
         var port = port(h);
         h.setBlock(PORT.below(), Blocks.CHEST);
-        ChestBlockEntity chest = h.getBlockEntity(PORT.below());
+        ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, PORT.below());
         for (int i = 0; i < chest.getContainerSize(); i++) chest.setItem(i, new ItemStack(Items.STONE, 64));
         port.items().setStackInSlot(0, new ItemStack(SinguloItems.PACKING_CRATE.get(), 6));
         port.items().setStackInSlot(DronePortBlockEntity.SLOT_RECEIVE, new ItemStack(Items.DIAMOND, 7));

@@ -3690,5 +3690,6 @@
   "uses.singulo.wormhole_mouth_casing": "사용처: 웜홀 입구",
   "uses.singulo.zero_gravity_block": "사용처: 중력 현수 저장 탱크, 현수 관",
   "uses.singulo.zinc_dust": "사용처: 아연 주괴, 소성되지 않은 형광체",
-  "uses.singulo.zinc_ingot": "사용처: 니호늄"
+  "uses.singulo.zinc_ingot": "사용처: 니호늄",
+  "key.category.singulo.singulo": "Singulo"
 }

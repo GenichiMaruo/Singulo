@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "singulo:basic_circuit"
-    },
-    {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "singulo:basic_circuit",
+    "singulo:white_ceramic_composite"
   ],
   "result": {
     "id": "singulo:settings_card",

@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:heat_exchange_core"
-      },
+      "ingredient": "singulo:heat_exchange_core",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:reactor_shell"
-      },
+      "ingredient": "singulo:reactor_shell",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 4
     }
   ],

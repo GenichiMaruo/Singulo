@@ -1,17 +1,18 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /** Large-order arithmetic and bounded server work, independent of renderer/tick timing. */
 @GameTestHolder("singulo_scaling")
@@ -257,7 +258,7 @@ public final class ScalingGameTests {
         var workers = new ArrayList<io.github.genichimaruo.singulo.android.BladeAndroid>();
         try {
             for (int i = 0; i < 100; i++) {
-                var worker = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+                var worker = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
                 worker.makeGuard(null, console.getBlockPos(), 0, 30);
                 workers.add(worker);
             }

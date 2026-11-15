@@ -3,7 +3,7 @@ import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -61,7 +61,7 @@ public final class AndroidOrders {
             var materials = new java.util.ArrayList<AndroidRecipe.Material>();
             for (var input : recipe.inputs()) {
                 materials.add(new AndroidRecipe.Material(input.item, input.count,
-                        input.alt == null ? List.of(input.item) : java.util.Arrays.asList(input.alt.getItems()),
+                        input.alt == null ? List.of(input.item) : input.alt.items().map(holder -> new ItemStack(holder)).toList(),
                         input.alt == null ? "" : io.github.genichimaruo.singulo.android.work.ItemCount.key(input.alt),
                         io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item), false,
                         io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(input.item)));

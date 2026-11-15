@@ -17,10 +17,11 @@ import net.neoforged.neoforge.fluids.FluidStack;
 @net.neoforged.fml.common.EventBusSubscriber(modid=Singulo.MODID,value=net.neoforged.api.distmarker.Dist.CLIENT)
 public final class CosmicWorldReviewHarness {
     private static volatile boolean ready;
+    private static boolean complete;
     private static int index=Integer.getInteger("singulo.cosmicStart",0),ticks,wait;
     private static long frame,shown;
     private static java.util.concurrent.CompletableFuture<Void> reload;
-    private static java.util.List<net.minecraft.client.renderer.ShaderInstance> oldShaders;
+    private static java.util.List<com.mojang.blaze3d.opengl.GlProgram> oldShaders;
     private static io.github.genichimaruo.singulo.machine.MachineBlockEntity pipeGiver;
     @net.neoforged.bus.api.SubscribeEvent
     public static void drive(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event){
@@ -30,10 +31,12 @@ public final class CosmicWorldReviewHarness {
     public static void frame(net.neoforged.neoforge.client.event.RenderFrameEvent.Post e){frame++;}
     @net.neoforged.bus.api.SubscribeEvent
     public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event)throws Exception{
+        if(complete)return; // Minecraft.stop() requests shutdown; more client ticks may still arrive.
         Minecraft mc=Minecraft.getInstance();
         if(reload!=null){
             if(!reload.isDone()||mc.getOverlay()!=null)return;
             reload.join();CosmicGeometryReviewHarness.afterReload(oldShaders);
+            complete=true; // Only successful reload and shader lifetime verification may finish the run.
             Singulo.LOGGER.info("SINGULO_COSMIC_COMPLETE 18");mc.stop();return;
         }
         if(++ticks>20*240)throw new IllegalStateException("Cosmic review timed out "+index);
@@ -42,7 +45,7 @@ public final class CosmicWorldReviewHarness {
                 && t.getKey().equals("selectWorld.backupQuestion.experimental")){
             for(var child:mc.screen.children())if(child instanceof net.minecraft.client.gui.components.Button b
                     && b.getMessage().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents l
-                    && l.getKey().equals("selectWorld.backupJoinSkipButton"))b.onPress();return;
+                    && l.getKey().equals("selectWorld.backupJoinSkipButton"))b.onPress(new net.minecraft.client.input.KeyEvent(257,0,0));return;
         }
         if(mc.level==null||mc.player==null||mc.getSingleplayerServer()==null||mc.getOverlay()!=null)return;
         mc.player.setNoGravity(true);mc.player.getAbilities().flying=true;mc.player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
@@ -62,9 +65,21 @@ public final class CosmicWorldReviewHarness {
         if(wait==(index>=13&&index<15?openAt:delay)){shown=frame;return;}
         if(frame-shown<4)return;
         Path output=Path.of(System.getProperty("singulo.cosmicOutput"));Files.createDirectories(output);
-        try(var pixels=Screenshot.takeScreenshot(mc.getMainRenderTarget())){pixels.writeToFile(output.resolve("cosmic-"+index+".png"));}
+        try(var pixels=ReviewScreenshot.take(mc.getMainRenderTarget())){
+            // Initial teleport can precede client chunk meshes. Never accept an empty sky capture.
+            int machinery=0;
+            for(int y=pixels.getHeight()/8;y<pixels.getHeight()*7/8;y++)
+                for(int x=pixels.getWidth()/8;x<pixels.getWidth()*7/8;x++){
+                    int rgb=pixels.getPixel(x,y);
+                    int b=rgb&255,g=rgb>>>8&255,r=rgb>>>16&255;
+                    if(b<110&&g<90&&r<90&&b>=g&&b>=r)machinery++;
+                }
+            if(machinery<500)return; // bounded by the existing global review timeout
+            pixels.writeToFile(output.resolve("cosmic-"+index+".png"));
+            Singulo.LOGGER.info("SINGULO_COSMIC_VISIBLE {} darkPixels={}",index,machinery);
+        }
         Singulo.LOGGER.info("SINGULO_COSMIC_CAPTURE {}",index);
-        if(++index==18){CosmicGeometryReviewHarness.verify();oldShaders=CosmicGeometryReviewHarness.shaders();reload=mc.reloadResourcePacks();return;}
+        if(++index==18){CosmicGeometryReviewHarness.verify();oldShaders=CosmicGeometryReviewHarness.beforeReload();reload=mc.reloadResourcePacks();return;}
         wait=0;
     }
     private static CosmicChamberBlockEntity opening;
@@ -72,17 +87,17 @@ public final class CosmicWorldReviewHarness {
     private static void formCore(){
         var level=(net.minecraft.server.level.ServerLevel)opening.getLevel();
         var tag=opening.saveWithoutMetadata(level.registryAccess());tag.putBoolean("core",true);
-        opening.loadWithComponents(tag,level.registryAccess());
+        opening.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess(),tag));
         level.sendBlockUpdated(opening.getBlockPos(),opening.getBlockState(),opening.getBlockState(),3);
     }
     private static void prepare(Minecraft mc){
         var server=mc.getSingleplayerServer();var level=server.overworld();
         var player=server.getPlayerList().getPlayer(mc.player.getUUID());player.setGameMode(GameType.CREATIVE);
         player.setNoGravity(true);player.getAbilities().flying=true;player.onUpdateAbilities();
-        level.setDayTime(6000);level.setWeatherParameters(0,6000,false,false);
+        level.getServer().getCommands().performPrefixedCommand(level.getServer().createCommandSourceStack().withLevel(level), "time set 6000");level.getServer().getCommands().performPrefixedCommand(level.getServer().createCommandSourceStack().withLevel(level), "weather clear 6000");
         if(index>=16){
             BlockPos c=new BlockPos(48,100,0);
-            player.teleportTo(level,c.getX()+(index==16?-8:8),c.getY()+5,c.getZ()+12.5,index==16?-90:90,4);
+            player.teleportTo(level,c.getX()+(index==16?-8:8),c.getY()+5,c.getZ()+12.5,java.util.Set.of(),index==16?-90:90,4,false);
             ready=true;return;
         }
         if(index==15){
@@ -92,14 +107,14 @@ public final class CosmicWorldReviewHarness {
                 var state=y<=4?net.minecraft.world.level.block.Blocks.WATER.defaultBlockState():net.minecraft.world.level.block.Blocks.BLUE_STAINED_GLASS.defaultBlockState();
                 level.setBlock(c.offset(-4,y,z),state,2|16);
             }
-            player.teleportTo(level,c.getX()+6,c.getY()+5,c.getZ()+8,90,3);
+            player.teleportTo(level,c.getX()+6,c.getY()+5,c.getZ()+8,java.util.Set.of(),90,3,false);
             ready=true;return;
         }
         if(index>=13){
             BlockPos c=new BlockPos(0,130+(index-13)*20,200);
             Blueprints.layout(Blueprints.Kind.TIDAL_SPINDLE,c,Direction.SOUTH,7).forEach((p,s)->level.setBlockAndUpdate(p,s));
             opening=(CosmicChamberBlockEntity)level.getBlockEntity(c);opening.ready();
-            player.teleportTo(level,c.getX()-6.5,c.getY()+6.5,c.getZ()-3,-40,10);
+            player.teleportTo(level,c.getX()-6.5,c.getY()+6.5,c.getZ()-3,java.util.Set.of(),-40,10,false);
             ready=true;return;
         }
         if(index>=9){prepareExtra(level,player);ready=true;return;}
@@ -108,14 +123,14 @@ public final class CosmicWorldReviewHarness {
         Blueprints.layout(type,c,Direction.SOUTH,7).forEach((p,s)->level.setBlockAndUpdate(p,s));
         var be=(CosmicChamberBlockEntity)level.getBlockEntity(c);var tag=be.saveWithoutMetadata(level.registryAccess());
         tag.putLong("stored",kind==1?state*4_000_000_000_000L:10_000_000_000L);tag.putBoolean("core",true);
-        if(kind==0)tag.put("tank",new net.neoforged.neoforge.fluids.capability.templates.FluidTank(CosmicChamberBlockEntity.FLUID_CAPACITY){
+        if(kind==0)tag.put("tank",io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(new net.neoforged.neoforge.fluids.capability.templates.FluidTank(CosmicChamberBlockEntity.FLUID_CAPACITY){
             {setFluid(new FluidStack(Fluids.WATER,(state+1)*CosmicChamberBlockEntity.FLUID_CAPACITY/3));}
-        }.writeToNBT(level.registryAccess(),new net.minecraft.nbt.CompoundTag()));
-        if(kind==2){tag.putInt("duration",1200);tag.putInt("progress",state*400);tag.put("reserved",new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("tidal_filament")),4).save(level.registryAccess()));tag.putInt("cost",0);}
-        be.loadWithComponents(tag,level.registryAccess());be.ready();
+        },level.registryAccess(),new net.minecraft.nbt.CompoundTag()));
+        if(kind==2){tag.putInt("duration",1200);tag.putInt("progress",state*400);tag.put("reserved",io.github.genichimaruo.singulo.compat.NbtCompat.save(new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("tidal_filament")),4),level.registryAccess()));tag.putInt("cost",0);}
+        be.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess(),tag));be.ready();
         level.sendBlockUpdated(c,be.getBlockState(),be.getBlockState(),3);
-        if(kind==2)player.teleportTo(level,c.getX()+15,c.getY()+6,c.getZ()+1,72,8);
-        else player.teleportTo(level,c.getX()+7,c.getY()+6,c.getZ()-7.5,38,8);
+        if(kind==2)player.teleportTo(level,c.getX()+15,c.getY()+6,c.getZ()+1,java.util.Set.of(),72,8,false);
+        else player.teleportTo(level,c.getX()+7,c.getY()+6,c.getZ()-7.5,java.util.Set.of(),38,8,false);
         ready=true;
     }
     private static void prepareExtra(net.minecraft.server.level.ServerLevel level,net.minecraft.server.level.ServerPlayer player){
@@ -123,9 +138,9 @@ public final class CosmicWorldReviewHarness {
             for(int x:new int[]{80,88}){
                 BlockPos p=new BlockPos(x,100,0);level.setBlockAndUpdate(p,io.github.genichimaruo.singulo.registry.SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING,Direction.SOUTH));
                 var be=(io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity)level.getBlockEntity(p);be.setData(new io.github.genichimaruo.singulo.wormhole.WormholeData(916000,0));
-                var tag=be.saveWithoutMetadata(level.registryAccess());tag.putBoolean("traversable",true);tag.putInt("size",1);tag.putInt("grace",6000);be.loadWithComponents(tag,level.registryAccess());
+                var tag=be.saveWithoutMetadata(level.registryAccess());tag.putBoolean("traversable",true);tag.putInt("size",1);tag.putInt("grace",6000);be.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess(),tag));
             }
-            player.teleportTo(level,91.5,101,4.5,145,-6);return;
+            player.teleportTo(level,91.5,101,4.5,java.util.Set.of(),145,-6,false);return;
         }
         if(index==10||index==11){
             var type=io.github.genichimaruo.singulo.machine.MachineType.ELECTROLYZER;BlockPos a=new BlockPos(110,100,0),b=new BlockPos(116,100,0);
@@ -135,14 +150,14 @@ public final class CosmicWorldReviewHarness {
             var taker=(io.github.genichimaruo.singulo.machine.MachineBlockEntity)level.getBlockEntity(b);
             if(index==11)taker.automationFluids().fill(new FluidStack(Fluids.WATER,Integer.MAX_VALUE),net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
             for(int x=111;x<116;x++)level.setBlockAndUpdate(new BlockPos(x,100,0),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get().defaultBlockState());
-            player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("survey_glasses"))));
-            player.teleportTo(level,113.5,101,4.5,180,28);return;
+            player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("survey_glasses"))));
+            player.teleportTo(level,113.5,101,4.5,java.util.Set.of(),180,28,false);return;
         }
         BlockPos c=new BlockPos(160,100,0);Direction back=Direction.NORTH;
         Blueprints.layout(Blueprints.Kind.JET_FORGE,c,back,io.github.genichimaruo.singulo.forge.JetForgeLayout.H).forEach((p,s)->level.setBlockAndUpdate(p,s));
         var be=(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity)level.getBlockEntity(c);be.forceBlackHole();
         var tag=be.saveWithoutMetadata(level.registryAccess());tag.putBoolean("parallel_upgrade",true);tag.putInt("batch_size",4);tag.putInt("phase",io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IRRADIATE);tag.putInt("phase_ticks",400);tag.putInt("irradiate_ticks",12000);tag.putInt("energy_per_tick",0);
-        tag.put("working",new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("collapsar_billet"))).save(level.registryAccess()));tag.put("result",new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("collapsar_ingot")),4).save(level.registryAccess()));be.loadWithComponents(tag,level.registryAccess());
+        tag.put("working",io.github.genichimaruo.singulo.compat.NbtCompat.save(new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("collapsar_billet"))),level.registryAccess()));tag.put("result",io.github.genichimaruo.singulo.compat.NbtCompat.save(new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("collapsar_ingot")),4),level.registryAccess()));be.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess(),tag));
         var target=io.github.genichimaruo.singulo.forge.JetForgeLayout.collector(c,back);
         for(int x=-40;x<=6;x++)for(int y=-4;y<=14;y++){
             var state=y<=1?net.minecraft.world.level.block.Blocks.WATER.defaultBlockState():net.minecraft.world.level.block.Blocks.BLUE_STAINED_GLASS.defaultBlockState();
@@ -152,6 +167,6 @@ public final class CosmicWorldReviewHarness {
         BlockPos far=BlockPos.containing((2*c.getX()+target.x)/3+6,target.y,target.z-14);
         level.setBlockAndUpdate(far,io.github.genichimaruo.singulo.registry.SinguloBlocks.ROGUE_BLACK_HOLE.get().defaultBlockState());
         var rogue=(io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity)level.getBlockEntity(far);rogue.setStable(true);rogue.setCore(5000,0.8);
-        player.teleportTo(level,(2*c.getX()+target.x)/3+1,target.y+1,target.z+9,180,4);
+        player.teleportTo(level,(2*c.getX()+target.x)/3+1,target.y+1,target.z+9,java.util.Set.of(),180,4,false);
     }
 }

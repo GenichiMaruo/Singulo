@@ -6,33 +6,23 @@
   "energy": 500000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:ergosphere_chapter"
-      },
+      "ingredient": "singulo:ergosphere_chapter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:artificial_star_core"
-      },
+      "ingredient": "singulo:artificial_star_core",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 8
     },
     {
-      "ingredient": {
-        "item": "singulo:anomaly_sample"
-      },
+      "ingredient": "singulo:anomaly_sample",
       "uses": 1
     }
   ],

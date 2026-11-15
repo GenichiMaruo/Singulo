@@ -6,15 +6,9 @@
     "LBL"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lighting"
-    },
-    "L": {
-      "item": "singulo:ruin_lamp"
-    },
-    "D": {
-      "tag": "c:dyes/orange"
-    }
+    "B": "singulo:blueprint_lighting",
+    "L": "singulo:ruin_lamp",
+    "D": "#c:dyes/orange"
   },
   "result": {
     "id": "singulo:ruin_lamp_amber",

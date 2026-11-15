@@ -76,7 +76,7 @@ public class LabStructure extends Structure {
         if (mouth != freightGround) return Optional.empty();
         // Lower the whole facility together on slopes, preserving room/corridor connections.
         int adjustedFloor = floorForShafts(floor, surface, mouth, freight.box().getYSpan());
-        if (adjustedFloor < floorMin || adjustedFloor - BOSS_DEPTH - HULL <= context.heightAccessor().getMinBuildHeight()) {
+        if (adjustedFloor < floorMin || adjustedFloor - BOSS_DEPTH - HULL <= context.heightAccessor().getMinY()) {
             return Optional.empty();
         }
         return Optional.of(new GenerationStub(new BlockPos(sx, adjustedFloor, sz),

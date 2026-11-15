@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 遺構（保管庫の中身と再生、警備機、重力波検出器、構造物ファイル）の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -33,7 +33,7 @@ public final class RuinGameTests {
     private RuinGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static int count(RuinCacheBlockEntity cache, Item item) {
@@ -48,7 +48,7 @@ public final class RuinGameTests {
 
     private static RuinCacheBlockEntity cache(GameTestHelper helper, String ruin) {
         helper.setBlock(POS, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity cache = helper.getBlockEntity(POS);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,POS);
         cache.setRuin(ruin);
         return cache;
     }
@@ -95,7 +95,7 @@ public final class RuinGameTests {
     @GameTest(template = EMPTY)
     public static void guardDockLaunchesTieredDrones(GameTestHelper helper) {
         helper.setBlock(POS, SinguloBlocks.RUIN_GUARD_DOCK.get());
-        GuardDockBlockEntity dock = helper.getBlockEntity(POS);
+        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,POS);
         for (int tier = 1; tier <= 3; tier++) {
             dock.setTier(tier);
             dock.launch(helper.getLevel());
@@ -183,9 +183,9 @@ public final class RuinGameTests {
         var pulse = SecurityDrone.class.getDeclaredMethod("pulse", net.minecraft.server.level.ServerLevel.class); pulse.setAccessible(true);
         before = target.getHealth(); pulse.invoke(drone, helper.getLevel());
         helper.assertTrue(target.getHealth() < before && target.getDeltaMovement().equals(movement), "パルスでダメージがないか、吹き飛ばされた");
-        helper.assertTrue(target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), "パルスの鈍足まで失われた");
+        helper.assertTrue(target.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS), "パルスの鈍足まで失われた");
         target.invulnerableTime = 0;
-        target.hurt(helper.getLevel().damageSources().mobAttack(target), 1);
+        target.hurtOrSimulate(helper.getLevel().damageSources().mobAttack(target), 1);
         helper.assertFalse(target.getDeltaMovement().equals(movement), "他の攻撃のノックバックまで無効化された");
         drone.discard(); target.discard(); helper.succeed();
     }
@@ -210,7 +210,7 @@ public final class RuinGameTests {
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
         drone.setTier(3);
         helper.assertTrue(drone.getMaxHealth() == 24, "段階3のドローンはHP24");
-        drone.kill();
+        drone.kill((net.minecraft.server.level.ServerLevel)drone.level());
         helper.runAtTickTime(5, () -> {
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(POS)).inflate(4)).isEmpty(), "ドローンが何か落とした");
@@ -254,7 +254,7 @@ public final class RuinGameTests {
             List<StructureTemplate.StructureBlockInfo> caches = template.get().filterBlocks(BlockPos.ZERO,
                     new StructurePlaceSettings(), SinguloBlocks.RUIN_CACHE.get());
             helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null
-                    && ruin.equals(caches.get(0).nbt().getString("ruin")), "保管庫が1つ・遺構IDつきで入っていない: " + ruin);
+                    && ruin.equals(caches.get(0).nbt().getStringOr("ruin", "")), "保管庫が1つ・遺構IDつきで入っていない: " + ruin);
             // 最終実験施設は警備機の代わりに守護機（封印コンソール）。研究棟・培養施設はボス部屋の封印核も持つ
             // 沈んだ炉心区画は、部屋全体が大蛇の泳ぐボス部屋なので警備機を置かない
             boolean finalLab = ruin.equals("final_lab");
@@ -301,7 +301,7 @@ public final class RuinGameTests {
     public static void compassUnlocksNextRuinOnlyAfterClearing(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         cache.setRuin("observation_post");
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setShiftKeyDown(true);

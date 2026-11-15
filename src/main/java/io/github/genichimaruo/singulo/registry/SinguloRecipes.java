@@ -17,9 +17,9 @@ public final class SinguloRecipes {
     public static final Supplier<RecipeType<MachineRecipe>> MACHINE = TYPES.register("machine",
             () -> RecipeType.simple(Singulo.id("machine")));
     public static final Supplier<RecipeSerializer<MachineRecipe>> MACHINE_SERIALIZER = SERIALIZERS.register("machine",
-            MachineRecipe.Serializer::new);
+            () -> MachineRecipe.SERIALIZER);
 
-    public static final Supplier<RecipeSerializer<SmesUpgradeRecipe>> SMES_UPGRADE = SERIALIZERS.register("smes_upgrade", SmesUpgradeRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<SmesUpgradeRecipe>> SMES_UPGRADE = SERIALIZERS.register("smes_upgrade", () -> SmesUpgradeRecipe.SERIALIZER);
 
     private SinguloRecipes() {}
 }

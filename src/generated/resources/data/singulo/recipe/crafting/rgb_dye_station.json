@@ -7,27 +7,13 @@
     "PPP"
   ],
   "key": {
-    "R": {
-      "tag": "c:dyes/red"
-    },
-    "G": {
-      "tag": "c:dyes/green"
-    },
-    "B": {
-      "tag": "c:dyes/blue"
-    },
-    "W": {
-      "tag": "c:dyes/white"
-    },
-    "C": {
-      "item": "minecraft:crafting_table"
-    },
-    "K": {
-      "tag": "c:dyes/black"
-    },
-    "P": {
-      "tag": "minecraft:planks"
-    }
+    "R": "#c:dyes/red",
+    "G": "#c:dyes/green",
+    "B": "#c:dyes/blue",
+    "W": "#c:dyes/white",
+    "C": "minecraft:crafting_table",
+    "K": "#c:dyes/black",
+    "P": "#minecraft:planks"
   },
   "result": {
     "id": "singulo:rgb_dye_station",

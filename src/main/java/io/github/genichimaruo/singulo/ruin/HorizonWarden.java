@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -64,12 +64,12 @@ public class HorizonWarden extends Monster {
     /** ビームを撃った光（残り tick）。 */
     private static final EntityDataAccessor<Integer> BEAM_FLASH = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
     /** ビームの終点（ワールド座標）。 */
-    private static final EntityDataAccessor<Vector3f> BEAM_END = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> BEAM_END = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.VECTOR3);
     /** 薙ぎ払い（残り tick。SWEEP_STRIKE より大きい間は振りかぶり、そのあとが振り抜き）。 */
     private static final EntityDataAccessor<Integer> SWEEP = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
     /** 胸のレーザー（残り tick）と、その終点。 */
     private static final EntityDataAccessor<Integer> LASER = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> LASER_END = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<org.joml.Vector3fc> LASER_END = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.VECTOR3);
     /** 重力の手（残り tick）と、つかんでいる相手の ID（-1 ならいない）。 */
     private static final EntityDataAccessor<Integer> GRIP = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> GRIP_TARGET = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
@@ -168,7 +168,7 @@ public class HorizonWarden extends Monster {
     /** 技。 */
     enum Move { VOLLEY, SWEEP, GRAVITY, SHARDS, LASER, GRIP, SHOCKWAVE, SINGULARITY, BEAM }
 
-    private final ServerBossEvent bossBar = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.WHITE,
+    private final ServerBossEvent bossBar = new ServerBossEvent(java.util.UUID.randomUUID(), getDisplayName(), BossEvent.BossBarColor.WHITE,
             BossEvent.BossBarOverlay.NOTCHED_10);
     @Nullable
     private BlockPos home;
@@ -275,7 +275,7 @@ public class HorizonWarden extends Monster {
         float factor = BossScaling.hardMode() ? 1F
                 : attack.equals("beam") || attack.equals("singularity") ? NORMAL_PIERCING_FACTOR : NORMAL_DAMAGE_FACTOR;
         try {
-            return target.hurt(source, amount * factor);
+            return target.hurtOrSimulate(source, amount * factor);
         } finally {
             combatAttack = null;
         }
@@ -321,7 +321,7 @@ public class HorizonWarden extends Monster {
     public void tick() {
         super.tick();
         hurtWindows.tick();
-        if (!level().isClientSide && emergeTicks() > 0) {
+        if (!level().isClientSide() && emergeTicks() > 0) {
             tickEmerge((ServerLevel) level());
         }
     }
@@ -382,20 +382,23 @@ public class HorizonWarden extends Monster {
         return console != null ? net.minecraft.world.phys.Vec3.atBottomCenterOf(console.above()).add(0, 0.2, 0) : position();
     }
 
-    @Override
     public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(net.minecraft.world.item.ItemStack stack, float offsetY) {
+        return level() instanceof ServerLevel server ? spawnAtLocation(server, stack, new Vec3(0, offsetY, 0)) : null;
+    }
+    @Override
+    public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(ServerLevel serverLevel, net.minecraft.world.item.ItemStack stack, net.minecraft.world.phys.Vec3 offset) {
         if (isDeadOrDying() || isRemoved()) {
             return BossLoot.drop(this, lootPos(), stack);
         }
-        return super.spawnAtLocation(stack, offsetY);
+        return super.spawnAtLocation(serverLevel, stack, offset);
     }
 
     @Override
-    protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
+    protected void dropExperience(ServerLevel rewardLevel, net.minecraft.world.entity.@Nullable Entity killer) {
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
-                || lastHurtByPlayerTime > 0 && shouldDropExperience()
-                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
-            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
+                || lastHurtByPlayerMemoryTime > 0 && shouldDropExperience()
+                && server.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.MOB_DROPS))) {
+            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, getLastHurtByPlayer(), getExperienceReward(server, killer));
             BossLoot.experience(server, lootPos(), reward, rewardPlayers(server));
         }
     }
@@ -420,7 +423,7 @@ public class HorizonWarden extends Monster {
 
     /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。 */
     @Override
-    protected int getBaseExperienceReward() {
+    protected int getBaseExperienceReward(ServerLevel rewardLevel) {
         return BossScaling.xp(xpReward, rewardParticipants());
     }
 
@@ -442,7 +445,7 @@ public class HorizonWarden extends Monster {
     }
 
     public Vec3 beamEnd() {
-        return toVec(entityData.get(BEAM_END));
+        return toVec(new org.joml.Vector3f(entityData.get(BEAM_END)));
     }
 
     /** 薙ぎ払いの残り tick（0 ならしていない）。 */
@@ -456,7 +459,7 @@ public class HorizonWarden extends Monster {
     }
 
     public Vec3 laserEnd() {
-        return toVec(entityData.get(LASER_END));
+        return toVec(new org.joml.Vector3f(entityData.get(LASER_END)));
     }
 
     /** 重力の手の残り tick と、つかんでいる相手（前触れの間も含む）。 */
@@ -527,7 +530,7 @@ public class HorizonWarden extends Monster {
         damageScale = (float) (max / health);
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
         setHealth((float) max);
-        restrictTo(home, ARENA_RADIUS);
+        setHomeTo(home, ARENA_RADIUS);
     }
 
     /** ボスバーの名前を変える（2人以上で挑んでいれば人数を添える）。 */
@@ -579,8 +582,8 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         ServerLevel level = (ServerLevel) level();
         updatePhase(level);
         bossBar.setProgress(getHealth() / getMaxHealth());
@@ -602,7 +605,7 @@ public class HorizonWarden extends Monster {
             // 覚醒した個体: 胸の炉心から菫色の炎がこぼれる
             Vec3 core = corePosition();
             level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, core.x, core.y, core.z, 2, 0.5, 0.6, 0.5, 0.02);
-            level.sendParticles(ParticleTypes.DRAGON_BREATH, getX(), getY() + 0.2, getZ(), 2, 0.8, 0.1, 0.8, 0.01);
+            level.sendParticles(net.minecraft.core.particles.PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1F), getX(), getY() + 0.2, getZ(), 2, 0.8, 0.1, 0.8, 0.01);
         }
         tickSweep(level, target);
         tickLaser(level, target);
@@ -1078,7 +1081,7 @@ public class HorizonWarden extends Monster {
         }
         for (int i = 0; i <= 24; i++) {
             Vec3 p = from.lerp(end, i / 24.0);
-            level.sendParticles(ParticleTypes.FLASH, p.x, p.y, p.z, 1, 0, 0, 0, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), p.x, p.y, p.z, 1, 0, 0, 0, 0);
         }
         level.sendParticles(ParticleTypes.EXPLOSION, end.x, end.y, end.z, 2, 0.2, 0.2, 0.2, 0);
     }
@@ -1086,12 +1089,12 @@ public class HorizonWarden extends Monster {
     // ------------------------------------------------------------------ 飛び道具を跳ね返す（フェーズ2以降）
 
     @Override
-    public boolean isAlliedTo(Entity other) {
-        return RuinGuards.isGuard(other) || super.isAlliedTo(other);
+    protected boolean considersEntityAsAlly(Entity other) {
+        return RuinGuards.isGuard(other) || super.considersEntityAsAlly(other);
     }
 
     @Override
-    public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
         if (emergeTicks() > 0 && !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;            // 出現の演出のあいだは傷つかない
         }
@@ -1101,7 +1104,7 @@ public class HorizonWarden extends Monster {
         if (!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             amount *= damageScale;
         }
-        return hurtWindows.hurt(this, source, amount, super::hurt, () -> lastHurt, v -> lastHurt = v);
+        return hurtWindows.hurt(this, source, amount, (s,a) -> super.hurtServer(damageLevel,s,a), () -> lastHurt, v -> lastHurt = v);
     }
 
     /** 跳ね返さない飛び道具（自分やドローンの光弾、すでに自分が跳ね返したもの）。 */
@@ -1138,16 +1141,18 @@ public class HorizonWarden extends Monster {
             proj.setXRot((float) (Mth.atan2(dir.y, horizontal) * Mth.RAD_TO_DEG));
             proj.yRotO = proj.getYRot();
             proj.xRotO = proj.getXRot();
-            proj.hasImpulse = true;
+            proj.needsSync = true;
             proj.hurtMarked = true;
-            if (proj instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
-                arrow.setBaseDamage(arrow.getBaseDamage() * REFLECT_ARROW_DAMAGE);
+            if (proj instanceof net.minecraft.world.entity.projectile.arrow.AbstractArrow arrow) {
+                var arrowData = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
+                arrow.saveWithoutId(arrowData);
+                arrow.setBaseDamage(arrowData.buildResult().getDoubleOr("damage", 2.0) * REFLECT_ARROW_DAMAGE);
                 arrow.setCritArrow(true);
             }
-            if (proj instanceof net.minecraft.world.entity.projectile.AbstractHurtingProjectile hurting) {
+            if (proj instanceof net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile hurting) {
                 hurting.accelerationPower = Math.max(hurting.accelerationPower, 0.1);
             }
-        }, this, this, false);
+        }, this, net.minecraft.world.entity.EntityReference.of(this), false);
         swing(InteractionHand.MAIN_HAND);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.getX(), p.getY(), p.getZ(), 8, 0.15, 0.15, 0.15, 0.3);
         level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY(), p.getZ(), 4, 0.1, 0.1, 0.1, 0.15);
@@ -1188,9 +1193,9 @@ public class HorizonWarden extends Monster {
         Vec3 dir = v;
         bomb.deflect((proj, by, rnd) -> {
             proj.setDeltaMovement(dir);
-            proj.hasImpulse = true;
+            proj.needsSync = true;
             proj.hurtMarked = true;
-        }, this, this, false);
+        }, this, net.minecraft.world.entity.EntityReference.of(this), false);
         bomb.markDeflected(this);
         swing(InteractionHand.MAIN_HAND);
         level.sendParticles(ParticleTypes.SONIC_BOOM, bomb.getX(), bomb.getY(), bomb.getZ(), 1, 0, 0, 0, 0);
@@ -1270,14 +1275,14 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
+    public boolean doHurtTarget(ServerLevel attackLevel, Entity target) {
         if (busy()) {
             return false;
         }
         combatAttack = "melee";
         boolean hit;
         try {
-            hit = super.doHurtTarget(target);
+            hit = super.doHurtTarget(attackLevel,target);
         } finally {
             combatAttack = null;
         }
@@ -1321,14 +1326,14 @@ public class HorizonWarden extends Monster {
     private void dropAwakenedRewards(ServerLevel level) {
         for (int roll = 0; roll < BossScaling.lootRolls(rewardParticipants()); roll++) {
             for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}, {"horizon_chapter", "1"}}) {
-                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
+                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(r[0]));
                 spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
             }
         }
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), ARENA_RADIUS + 16, "awakened_warden");
         Component msg = Component.translatable("gui.singulo.console.awakened_defeated");
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(ARENA_RADIUS + 16))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -1374,7 +1379,7 @@ public class HorizonWarden extends Monster {
                         0, -d.x, -d.y, -d.z, 0.8);
             }
         } else if (t == DEATH_TICKS - 10) {
-            level.sendParticles(ParticleTypes.FLASH, core.x, core.y, core.z, 3, 0.2, 0.2, 0.2, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), core.x, core.y, core.z, 3, 0.2, 0.2, 0.2, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, core.x, core.y, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, core.x, core.y, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.END_ROD, core.x, core.y, core.z, 120, 0.2, 0.2, 0.2, 0.7);
@@ -1389,7 +1394,7 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(double distance, float multiplier, DamageSource source) {
         return false;
     }
 
@@ -1399,7 +1404,7 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    public boolean canChangeDimensions(Level from, Level to) {
+    public boolean canTeleport(Level from, Level to) {
         return false;
     }
 
@@ -1431,8 +1436,9 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("phase", phase());
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("emerge", emergeTicks());
@@ -1440,32 +1446,35 @@ public class HorizonWarden extends Monster {
         tag.putInt("participants", participants);
         tag.putInt("reward_participants", rewardParticipants);
         if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(home));
         }
         if (console != null) {
-            tag.put("console", NbtUtils.writeBlockPos(console));
+            tag.put("console", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(console));
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        entityData.set(PHASE, Math.max(1, tag.getInt("phase")));
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        entityData.set(PHASE, Math.max(1, tag.getIntOr("phase", 0)));
         if (tag.contains("damage_scale")) {
-            damageScale = BossScaling.validDamageScale(tag.getFloat("damage_scale"));
+            damageScale = BossScaling.validDamageScale(tag.getFloatOr("damage_scale", 0.0F));
         }
-        entityData.set(EMERGE, tag.getInt("emerge"));
-        entityData.set(AWAKENED, tag.getBoolean("awakened"));
+        entityData.set(EMERGE, tag.getIntOr("emerge", 0));
+        entityData.set(AWAKENED, tag.getBooleanOr("awakened", false));
         if (awakened()) {
             xpReward = 4500;
         }
-        home = NbtUtils.readBlockPos(tag, "home").orElse(null);
-        console = NbtUtils.readBlockPos(tag, "console").orElse(null);
+        home = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").orElse(null);
+        console = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "console").orElse(null);
         if (home != null) {
-            restrictTo(home, ARENA_RADIUS);
+            setHomeTo(home, ARENA_RADIUS);
         }
-        participants = Math.max(1, tag.getInt("participants"));
-        rewardParticipants = tag.contains("reward_participants") ? tag.getInt("reward_participants")
+        participants = Math.max(1, tag.getIntOr("participants", 0));
+        rewardParticipants = tag.contains("reward_participants") ? tag.getIntOr("reward_participants", 0)
                 : emergeTicks() <= 0 ? participants : 0;
         if (hasCustomName()) {
             setBarName(getDisplayName());

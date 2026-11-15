@@ -6,21 +6,15 @@
   "energy": 100000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_nucleus"
-      },
+      "ingredient": "singulo:degenerate_nucleus",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 2
     }
   ],

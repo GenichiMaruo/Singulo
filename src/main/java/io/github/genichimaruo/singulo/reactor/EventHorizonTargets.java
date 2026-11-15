@@ -39,11 +39,11 @@ public final class EventHorizonTargets {
             return false;
         }
         if ((e instanceof net.minecraft.world.entity.item.ItemEntity || e instanceof net.minecraft.world.entity.ExperienceOrb)
-                && e.getPersistentData().getBoolean(PROTECTED)) {
+                && e.getPersistentData().getBooleanOr(PROTECTED, false)) {
             return false;
         }
         if (e instanceof net.minecraft.world.entity.item.ItemEntity item && isReturnedRecord(item)
-                && e.level().getGameTime() - item.getPersistentData().getLong(RETURNED) < RETURN_GRACE) {
+                && e.level().getGameTime() - item.getPersistentData().getLongOr(RETURNED, 0L) < RETURN_GRACE) {
             return false;
         }
         return !(e instanceof HangingEntity);

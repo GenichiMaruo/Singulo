@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:wormhole_generator_shell"
-      },
+      "ingredient": "singulo:wormhole_generator_shell",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     }
   ],

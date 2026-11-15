@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.genesis.GenesisCoreMenu;
 import io.github.genichimaruo.singulo.genesis.MassSynthesis;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -120,14 +120,14 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     // ------------------------------------------------------------------ 描画
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
         Slot out = menu.getSlot(0);
         if (out.isActive() && !out.hasItem() && Panel.inside(mouseX, mouseY, leftPos + out.x, topPos + out.y, 16, 16)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.genesis.screen.output"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.genesis.screen.output"), mouseX, mouseY);
             return;
         }
         Slot pick = menu.getSlot(GenesisCoreMenu.TEMPLATE_SLOT);
@@ -141,11 +141,11 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
             Panel.tooltip(g, font, lines, 200, mouseX, mouseY);
             return;
         }
-        renderTooltip(g, mouseX, mouseY);
+        extractTooltip(g, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int x = leftPos + OX;
@@ -167,7 +167,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
                 continue;
             }
             Panel.slot(g, skin, leftPos + s.x, topPos + s.y);
-            g.renderOutline(leftPos + s.x - 2, topPos + s.y - 2, 20, 20, s.index == 0 ? GOLD : MAGENTA);
+            g.outline(leftPos + s.x - 2, topPos + s.y - 2, 20, 20, s.index == 0 ? GOLD : MAGENTA);
         }
         if (core != null) {
             drawPanel(g, core);
@@ -175,7 +175,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     /** 右の欄: 段階の名前と、段階ごとの進み（アイコン・バー・%）。説明は重ねると出る。 */
-    private void drawPanel(GuiGraphics g, GenesisCoreBlockEntity core) {
+    private void drawPanel(GuiGraphicsExtractor g, GenesisCoreBlockEntity core) {
         int stage = core.stage();
         Component phase = Component.translatable("gui.singulo.genesis.phase." + stage);
         stat(g, OX + PX, 24, Panel.Icon.INFO, phaseColor(stage), phase.getString(), phaseColor(stage),
@@ -221,19 +221,19 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     /** アイコン・横長のバー・% の1行（右の欄）。 */
-    private void barRow(GuiGraphics g, int y, Panel.Icon icon, int color, float fraction, List<Component> tooltip) {
+    private void barRow(GuiGraphicsExtractor g, int y, Panel.Icon icon, int color, float fraction, List<Component> tooltip) {
         barRow(g, y, icon, color, fraction, color, tooltip);
     }
 
-    private void barRow(GuiGraphics g, int y, Panel.Icon icon, int iconColor, float fraction, int barColor, List<Component> tooltip) {
+    private void barRow(GuiGraphicsExtractor g, int y, Panel.Icon icon, int iconColor, float fraction, int barColor, List<Component> tooltip) {
         statBar(g, OX + PX, y, icon, iconColor, BAR_W, fraction, barColor, tooltip);
         String pct = percent(fraction);
-        g.drawString(font, pct, leftPos + OX + PX + 11 + BAR_W + 4, topPos + y, skin.text(), false);
+        g.text(font, pct, leftPos + OX + PX + 11 + BAR_W + 4, topPos + y, skin.text(), false);
     }
 
     // ------------------------------------------------------------------ 窓の中の宇宙
 
-    private static void drawCosmos(GuiGraphics g, GenesisCoreBlockEntity core, int cx, int cy, float t) {
+    private static void drawCosmos(GuiGraphicsExtractor g, GenesisCoreBlockEntity core, int cx, int cy, float t) {
         switch (core.stage()) {
             case GenesisCoreBlockEntity.UNFORMED -> dust(g, cx, cy, t, 0x40, 30);
             case GenesisCoreBlockEntity.CRADLE -> {
@@ -285,7 +285,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     /** うっすら瞬く塵（窓の背景）。 */
-    private static void dust(GuiGraphics g, int cx, int cy, float t, int alpha, int n) {
+    private static void dust(GuiGraphicsExtractor g, int cx, int cy, float t, int alpha, int n) {
         long seed = 0xD057L;
         for (int i = 0; i < n; i++) {
             seed = seed * 6364136223846793005L + 1442695040888963407L;
@@ -297,7 +297,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     /** 渦を巻く原始の宇宙（腕 arms 本、内側 inner 色から外側 outer 色へ）。 */
-    private static void swirl(GuiGraphics g, float cx, float cy, float radius, float t, long seed, int inner, int outer, int arms,
+    private static void swirl(GuiGraphicsExtractor g, float cx, float cy, float radius, float t, long seed, int inner, int outer, int arms,
                               float speed) {
         java.util.Random rng = new java.util.Random(seed ^ 0x51A7L);
         for (int i = 0; i < 260; i++) {
@@ -312,7 +312,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     /** 生まれた銀河（種で形と色が決まり、ゆっくり回る）。 */
-    private static void galaxy(GuiGraphics g, int cx, int cy, float radius, float t, long seed) {
+    private static void galaxy(GuiGraphicsExtractor g, int cx, int cy, float radius, float t, long seed) {
         java.util.Random rng = new java.util.Random(seed);
         float hue = rng.nextFloat();
         int arms = 2 + rng.nextInt(3);
@@ -330,7 +330,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     /** 丸い光（中心ほど明るい）。 */
-    private static void glow(GuiGraphics g, float cx, float cy, float radius, int rgb, float bright) {
+    private static void glow(GuiGraphicsExtractor g, float cx, float cy, float radius, int rgb, float bright) {
         int r = (int) Math.ceil(radius);
         for (int dy = -r; dy <= r; dy++) {
             for (int dx = -r; dx <= r; dx++) {
@@ -342,7 +342,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
         }
     }
 
-    private static void plot(GuiGraphics g, float x, float y, int rgb, float alpha) {
+    private static void plot(GuiGraphicsExtractor g, float x, float y, int rgb, float alpha) {
         int a = (int) (Mth.clamp(alpha, 0, 1) * 255);
         if (a <= 0) {
             return;
@@ -359,7 +359,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     // ------------------------------------------------------------------ 暴走の兆し（窓の上の帯）
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         drawLabels(g);
         GenesisCoreBlockEntity core = core();
         if (core == null || core.stage() != GenesisCoreBlockEntity.STABILIZING || core.surgeTicks() <= 0) {
@@ -373,7 +373,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
             int top = VIEW_Y + VIEW - 3 - lines.size() * 10;
             g.fill(left, top - 2, left + VIEW, VIEW_Y + VIEW - 1, held ? 0xC0103848 : 0xC0601010);
             for (var seq : lines) {
-                g.drawString(font, seq, left + VIEW / 2 - font.width(seq) / 2, top, held ? CYAN : 0xFFFFE0E0, false);
+                g.text(font, seq, left + VIEW / 2 - font.width(seq) / 2, top, held ? CYAN : 0xFFFFE0E0, false);
                 top += 10;
             }
         }
@@ -395,10 +395,11 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (clickFrame(mouseX, mouseY, button)) {
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 }

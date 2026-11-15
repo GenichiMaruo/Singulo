@@ -261,24 +261,61 @@ public final class CatalystMagazine {
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         if (!loaded.isEmpty()) {
-            tag.put("loaded", loaded.save(registries));
+            tag.put("loaded", io.github.genichimaruo.singulo.compat.NbtCompat.save(loaded, registries));
         }
         ListTag list = new ListTag();
         for (ItemStack r : returns) {
-            list.add(r.save(registries));
+            list.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(r, registries));
         }
         tag.put("returns", list);
         return tag;
     }
 
     public void load(CompoundTag tag, HolderLookup.Provider registries) {
-        loaded = tag.contains("loaded") ? ItemStack.parseOptional(registries, tag.getCompound("loaded")) : ItemStack.EMPTY;
+        loaded = tag.contains("loaded") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("loaded")) : ItemStack.EMPTY;
         returns.clear();
-        for (Tag t : tag.getList("returns", Tag.TAG_COMPOUND)) {
-            ItemStack r = ItemStack.parseOptional(registries, (CompoundTag) t);
+        for (Tag t : tag.getListOrEmpty("returns")) {
+            ItemStack r = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, (CompoundTag) t);
             if (!r.isEmpty()) {
                 returns.add(r);
             }
         }
+    }
+
+    private record TransferState(ItemStack loaded, List<ItemStack> returns) {}
+    private final net.neoforged.neoforge.transfer.transaction.SnapshotJournal<TransferState> transferJournal =
+            new net.neoforged.neoforge.transfer.transaction.SnapshotJournal<>() {
+        @Override protected TransferState createSnapshot() {
+            return new TransferState(loaded.copy(), returns.stream().map(ItemStack::copy).toList());
+        }
+        @Override protected void revertToSnapshot(TransferState state) {
+            loaded = state.loaded().copy();
+            returns.clear();
+            state.returns().forEach(stack -> returns.add(stack.copy()));
+        }
+        @Override protected void onRootCommit(TransferState state) { changed.run(); }
+    };
+
+    /** Native equivalent of absorb: magazine and reserve both join the caller transaction. */
+    public boolean absorbTransactional(ItemStack source,
+            io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler supply, int slot,
+            net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+        if (!absorb(source, supply, slot, true)) return false;
+        ItemStack reserve = supply.getStackInSlot(slot);
+        UsesData into = UsesHelper.get(loaded);
+        UsesData from = UsesHelper.get(source);
+        int moved = Math.min(from.remaining(), into.used());
+        transferJournal.updateSnapshots(transaction);
+        if (from.remaining() > moved) {
+            supply.setStackInSlot(slot, reserve.copyWithCount(reserve.getCount() + 1), transaction);
+            loaded = UsesHelper.consume(source.copy(), moved);
+        } else {
+            ItemStack target = loaded.copy();
+            target.set(SinguloComponents.USES.get(), new UsesData(into.used() - moved, into.max(), into.repairs()));
+            loaded = target;
+            ItemStack shell = UsesHelper.consume(source.copy(), moved);
+            if (!shell.isEmpty()) returns.add(shell);
+        }
+        return true;
     }
 }

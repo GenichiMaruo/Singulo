@@ -5,21 +5,20 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.GravityDebris;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 
 /** 重力の澱の瓦礫: 回りながら飛ぶ建材の塊と、うしろに引く菫色の光。 */
-public class GravityDebrisRenderer extends EntityRenderer<GravityDebris> {
+public class GravityDebrisRenderer extends SnapshotEntityRenderer<GravityDebris> {
     public GravityDebrisRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(GravityDebris entity) {
+     public Identifier getTextureLocation(GravityDebris entity) {
         return FxDraw.WHITE;
     }
 
@@ -35,8 +34,8 @@ public class GravityDebrisRenderer extends EntityRenderer<GravityDebris> {
         pose.mulPose(Axis.XP.rotationDegrees(t * 11));
         pose.scale(0.55F, 0.55F, 0.55F);
         pose.translate(-0.5, -0.5, -0.5);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(e.block(), pose, buffers, light, OverlayTexture.NO_OVERLAY);
+        BlockDraw.get().renderSingleBlock(e.block(), pose, buffers, light, OverlayTexture.NO_OVERLAY);
         pose.popPose();
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 }

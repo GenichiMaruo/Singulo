@@ -6,15 +6,11 @@
   "energy": 2000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:slime_balls"
-      },
+      "ingredient": "#c:slime_balls",
       "count": 1
     }
   ],

@@ -9,7 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class SinguloComponents {
-    public static final DeferredRegister.DataComponents REGISTER = DeferredRegister.createDataComponents(Singulo.MODID);
+    public static final DeferredRegister.DataComponents REGISTER = DeferredRegister.createDataComponents(net.minecraft.core.registries.Registries.DATA_COMPONENT_TYPE, Singulo.MODID);
 
     /** 使用回数（遺構回収物・復元品・触媒・型の欠片）。 */
     public static final Supplier<DataComponentType<UsesData>> USES = REGISTER.registerComponentType("uses",

@@ -6,12 +6,12 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.GravityRemnant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.rendertype.RenderType;
+
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -27,7 +27,7 @@ import org.joml.Quaternionf;
  *       縦に回る泣く黒曜石の環（6つ）と、核から突き出す4本の光の棘が加わる</li>
  * </ul>
  */
-public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
+public class GravityRemnantRenderer extends SnapshotEntityRenderer<GravityRemnant> {
     static final int RIM = 0x9A6CFF;
     static final int HOT = 0xE0C8FF;
 
@@ -36,8 +36,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(GravityRemnant entity) {
+     public Identifier getTextureLocation(GravityRemnant entity) {
         return FxDraw.WHITE;
     }
 
@@ -65,7 +64,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         pose.pushPose();
         pose.translate(0, cy, 0);
         if (r > 0.02F) {
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
             // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
             glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, r * 3.4F, RIM, (int) (150 * grow));
@@ -112,7 +111,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         float gather = e.gatherTicks() > 0 ? (e.gatherTicks() - partialTick) / GravityRemnant.GATHER_TICKS : 0;
         float arrive = emerge < 1 ? Mth.clamp((emerge - 0.75F) / 0.25F, 0, 1) : 1;
         int pieces = death > 0 ? Math.max(shell, e.deathShell()) : e.gatherTicks() > 0 ? GravityRemnant.SHELL_PIECES : shell;
-        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        BlockDraw blocks = BlockDraw.get();
         // 倒されたとき: 殻は回るのをやめて床へ崩れ落ち、最後は小さくなって消える
         float fallTicks = e.deathTime > 0 ? e.deathTime + partialTick : 0;
         double frozen = e.deathTime > 0 ? (e.tickCount - e.deathTime) * 0.06 : t * 0.06;
@@ -156,7 +155,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
                 pose.scale(0.38F, 0.38F, 0.38F);
                 pose.translate(-0.5, -0.5, -0.5);
                 blocks.renderSingleBlock(net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN.defaultBlockState(), pose, buffers,
-                        net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                        net.minecraft.util.LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
                 pose.popPose();
             }
             VertexConsumer g = GlowDepth.of(buffers, FxDraw.WHITE);
@@ -167,7 +166,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
             FxDraw.ring(pose.last(), g, 2.7F, 2.9F, AWAKE, 160, 160);
             pose.popPose();
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     static final int AWAKE = 0xFF3C50;

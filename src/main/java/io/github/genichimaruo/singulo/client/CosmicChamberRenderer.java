@@ -7,9 +7,9 @@ import io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -30,8 +30,8 @@ import net.neoforged.neoforge.fluids.FluidStack;
  * </ul>
  * 画面全体を光らせることはしない。遠いときは粒の数や滴を間引く。
  */
-public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicChamberBlockEntity> {
-    private static final int FULL = LightTexture.FULL_BRIGHT;
+public final class CosmicChamberRenderer extends SnapshotBlockRenderer<CosmicChamberBlockEntity> {
+    private static final int FULL = LightCoordsUtil.FULL_BRIGHT;
 
     /** 画面だけが持つ、なめらかに動かすための状態。 */
     private static final class Visual {
@@ -59,7 +59,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
     }
 
     @Override
-    public boolean shouldRenderOffScreen(CosmicChamberBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
@@ -77,7 +77,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
         Visual v = visuals.computeIfAbsent(be, b -> new Visual());
         float dt = v.lastTime < 0 ? 0 : Mth.clamp(time - v.lastTime, 0, 0.25F);
         v.lastTime = time;
-        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().position();
         boolean near = camera.distanceToSqr(Vec3.atCenterOf(be.getBlockPos())) < 56 * 56;
         pose.pushPose();
         pose.translate(0.5, 0, 0.5);
@@ -117,7 +117,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
 
     /** ローカルの (0, y, z) のワールドの位置。 */
     private static Vec3 world(CosmicChamberBlockEntity be, double y, double z) {
-        return Vec3.atBottomCenterOf(be.getBlockPos()).add(Vec3.atLowerCornerOf(be.back().getNormal()).scale(z)).add(0, y, 0);
+        return Vec3.atBottomCenterOf(be.getBlockPos()).add(Vec3.atLowerCornerOf(be.back().getUnitVec3i()).scale(z)).add(0, y, 0);
     }
 
     private static float smooth(float x) {
@@ -134,7 +134,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
     }
 
     private static VertexConsumer solid(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
     }
 
     /** 水平の輪。 */
@@ -190,9 +190,9 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
         if (!fluid.isEmpty()) {
             TextureAtlasSprite sprite = FluidDraw.sprite(fluid.getFluid());
             // 表の面だけ描く（裏面を描くと、奥の面が手前の面に重なって見える）
-            VertexConsumer liquid = buffers.getBuffer(RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS));
-            int fluidLight = LightTexture.pack(Math.max(fluid.getFluid().getFluidType().getLightLevel(), Math.max(11, LightTexture.block(light))),
-                    LightTexture.sky(light));
+            VertexConsumer liquid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentCullItemTarget(TextureAtlas.LOCATION_BLOCKS));
+            int fluidLight = LightCoordsUtil.pack(Math.max(fluid.getFluid().getFluidType().getLightLevel(), Math.max(11, LightCoordsUtil.block(light))),
+                    LightCoordsUtil.sky(light));
             pendant(pose, liquid, sprite, length, radius, time, tint, gas ? 130 : 225, fluidLight, gas ? 0.07F : 0.028F,
                     near ? 24 : 12, near ? 18 : 8);
         }
@@ -527,7 +527,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
      */
     private static void opening(PoseStack pose, MultiBufferSource buffers, float age, float time) {
         VertexConsumer glow = glow(buffers);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         if (age < SEED_FALL) {
             float a = age / SEED_FALL;
             float size = 0.3F * (1 - a * a * a);
@@ -576,7 +576,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
     private static void hole(CosmicChamberBlockEntity be, Visual v, PoseStack pose, MultiBufferSource buffers, float activity) {
         float horizon = SHADOW / GravitationalLensing.SHADOW_PER_HORIZON;
         float radius = horizon * GravitationalLensing.EINSTEIN_PER_HORIZON;
-        Vec3 axis = Vec3.atLowerCornerOf(be.back().getNormal());
+        Vec3 axis = Vec3.atLowerCornerOf(be.back().getUnitVec3i());
         Vec3 center = world(be, SPIN_Y, HOLE_Z);
         float appear = smooth((v.coreAge - SEED_FALL) / HOLE_OPEN);
         if (GravitationalLensing.addBlackHole(center, radius * appear, 1, REGION, axis, SHADOW * 1.15F, DISK_OUTER, 0.45F,
@@ -615,7 +615,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
             float h = body * (1 - 0.85F * mid * mid);
             float shake = 0.012F * Mth.sin(time * 23 + i * 2);
             FxDraw.box(pose, solid, -h + shake, SPIN_Y - h, BILLET_Z - half + 2 * half * s0, h + shake, SPIN_Y + h, BILLET_Z - half + 2 * half * s1,
-                    LightTexture.pack(15, 15), FxDraw.lerpRgb(0x4A4060, 0xF0B070, 0.25F + 0.75F * k));
+                    LightCoordsUtil.pack(15, 15), FxDraw.lerpRgb(0x4A4060, 0xF0B070, 0.25F + 0.75F * k));
         }
     }
 
@@ -640,7 +640,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
         cylinder(pose, solid, -1.3F, 1.3F, 0.42F, angle, 0x2A2738, 0x35324A, light, 255);
         cylinder(pose, solid, -1.5F, 1.5F, 0.16F, 0, 0x7E7A9E, 0x7E7A9E, light, 255);
         if (working || wound > 0.5F) {
-            int lit = LightTexture.pack(15, 15);
+            int lit = LightCoordsUtil.pack(15, 15);
             cylinder(pose, solid, -1.28F, 1.28F, wound, angle, 0xE8C088, 0xC89C68, lit, 255);
         }
     }

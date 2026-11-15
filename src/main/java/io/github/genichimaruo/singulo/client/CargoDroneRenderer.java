@@ -6,7 +6,7 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.drone.CargoDrone;
 import io.github.genichimaruo.singulo.drone.DroneKind;
-import net.minecraft.client.model.HierarchicalModel;
+
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -15,15 +15,15 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
+
+
+
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -41,13 +41,13 @@ import org.joml.Vector3f;
  * </ul>
  * 印刷中は下から積み上がる。
  */
-public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRenderer.Model> {
+public class CargoDroneRenderer extends ExtractedMobRenderer<CargoDrone, CargoDroneRenderer.Model> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Singulo.id("cargo_drone"), "main");
     public static final ModelLayerLocation JET_LAYER = new ModelLayerLocation(Singulo.id("cargo_drone_jet"), "main");
     public static final ModelLayerLocation GRAVITY_LAYER = new ModelLayerLocation(Singulo.id("cargo_drone_gravity"), "main");
     /** 型ごとの絵の名前（textures/entity/ の下。光る線は _glow）。 */
     private static final String[] SKINS = {"cargo_drone", "cargo_drone_jet", "cargo_drone_gravity"};
-    private static final ResourceLocation[] TEXTURES = new ResourceLocation[SKINS.length];
+    private static final Identifier[] TEXTURES = new Identifier[SKINS.length];
     private static final RenderType[] GLOWS = new RenderType[SKINS.length];
     private static final RenderType[] SHELLS = new RenderType[SKINS.length];
     /** 箱の番号（DroneCrateItem.displayTier）ごとのアイテム: 梱包箱3段階と、液体カプセル3段階。 */
@@ -59,18 +59,18 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     static {
         for (int i = 0; i < SKINS.length; i++) {
             TEXTURES[i] = Singulo.id("textures/entity/" + SKINS[i] + ".png");
-            GLOWS[i] = RenderType.eyes(Singulo.id("textures/entity/" + SKINS[i] + "_glow.png"));
+            GLOWS[i] = net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/" + SKINS[i] + "_glow.png"));
             SHELLS[i] = PhaseShellType.of(SKINS[i], TEXTURES[i]);
         }
     }
 
-    private final ItemRenderer items;
+    private final ItemDraw items;
     private final Model[] models;
 
     public CargoDroneRenderer(EntityRendererProvider.Context context) {
         super(context, new RotorModel(context.bakeLayer(LAYER)), 0.35F);
         models = new Model[]{model, new JetModel(context.bakeLayer(JET_LAYER)), new GravityModel(context.bakeLayer(GRAVITY_LAYER))};
-        items = context.getItemRenderer();
+        items = ItemDraw.get();
         addLayer(new Glow(this));
         addLayer(new Rotors(this));
         addLayer(new JetFlames(this));
@@ -79,13 +79,13 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     }
 
     @Override
-    public ResourceLocation getTextureLocation(CargoDrone drone) {
+    public Identifier getTextureLocation(CargoDrone drone) {
         return TEXTURES[drone.kind().ordinal()];
     }
 
     static ItemStack crate(int tier) {
         return tier <= 0 || tier >= CRATES.length ? ItemStack.EMPTY
-                : new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(CRATES[tier])));
+                : new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(CRATES[tier])));
     }
 
     @Override
@@ -175,7 +175,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     private void renderPrintArm(CargoDrone drone, float top, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float t = drone.tickCount + partialTick;
         float cx = -0.44F, cz = -0.44F, rod = 0.03F;
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
         // 上面の隅の受け口と、伸びる棒
         FxDraw.box(pose, solid, cx - 0.06F, 0, cz - 0.06F, cx + 0.06F, 0.03F, cz + 0.06F, light, 0x4E5560);
         if (top + 0.02F > 0) {
@@ -220,8 +220,8 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     }
 
     /** 光る線（型ごとの _glow の絵）。 */
-    static final class Glow extends RenderLayer<CargoDrone, Model> {
-        Glow(RenderLayerParent<CargoDrone, Model> parent) {
+    static final class Glow extends ExtractedLayer<CargoDrone, Model> {
+        Glow(ExtractedLayerParent<CargoDrone, Model> parent) {
             super(parent);
         }
 
@@ -236,10 +236,10 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
      * ローター: 2枚の羽根（薄い箱。裏の面を描かないので、上下の面が重なってちらつかない。2枚目は少し上にずらす）と、
      * 回っている羽根の残像のうすい円盤。モデルの羽根（厚さ0の板）は、両面が同じ位置で描かれてちらつくので使わない。
      */
-    static final class Rotors extends RenderLayer<CargoDrone, Model> {
+    static final class Rotors extends ExtractedLayer<CargoDrone, Model> {
         private static final int BLADE = 0x4E525C, TIP = 0xF0A040;
 
-        Rotors(RenderLayerParent<CargoDrone, Model> parent) {
+        Rotors(ExtractedLayerParent<CargoDrone, Model> parent) {
             super(parent);
         }
 
@@ -249,7 +249,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
             if (!flying(drone) || !(getParentModel() instanceof RotorModel rotor)) {
                 return;
             }
-            VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+            VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
             float u = 1 / 16F;
             for (int i = 0; i < 4; i++) {
                 pose.pushPose();
@@ -281,10 +281,10 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
      * ジェットの炎: 2つの噴射口から後ろへ、青い外炎と白い芯の円錐（速いほど長く、細かくゆらぐ）。噴射口の奥も光る。
      * 光を足して描き、奥行きを書かない（あとから描かれる透ける物を消さない）。
      */
-    static final class JetFlames extends RenderLayer<CargoDrone, Model> {
+    static final class JetFlames extends ExtractedLayer<CargoDrone, Model> {
         private static final int OUTER = 0x3F8CFF, CORE = 0xE6F6FF;
 
-        JetFlames(RenderLayerParent<CargoDrone, Model> parent) {
+        JetFlames(ExtractedLayerParent<CargoDrone, Model> parent) {
             super(parent);
         }
 
@@ -318,10 +318,10 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
      * 反重力の場: 箱を持っている間は、4つのビットの先から箱の上の四隅へ牽引の光を当て、箱を青緑の場で包む（ゆっくり明滅）。
      * 空のときは、足もとに浮かせる場のうすい輪が、広がりながら下りて消える。核・ビットの先・放射板のまわりは、外へぼんやりと光る。
      */
-    static final class GravityField extends RenderLayer<CargoDrone, Model> {
+    static final class GravityField extends ExtractedLayer<CargoDrone, Model> {
         static final int TEAL = 0x5CFFE0, TEAL_DEEP = 0x1FB5A8, TEAL_HI = 0xD2FFF6;
 
-        GravityField(RenderLayerParent<CargoDrone, Model> parent) {
+        GravityField(ExtractedLayerParent<CargoDrone, Model> parent) {
             super(parent);
         }
 
@@ -425,10 +425,10 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
      * 位相透過: 壁を抜ける少し前から抜けたあとまで、紫に光る半透明のドローンの姿を重ねる。奥行きを比べずに描くので、
      * 壁の中にいる間も、壁越しに光る姿が見える（ゆっくり明滅する）。
      */
-    static final class PhaseShell extends RenderLayer<CargoDrone, Model> {
+    static final class PhaseShell extends ExtractedLayer<CargoDrone, Model> {
         static final int COLOR = 0x9B7BFF;
 
-        PhaseShell(RenderLayerParent<CargoDrone, Model> parent) {
+        PhaseShell(ExtractedLayerParent<CargoDrone, Model> parent) {
             super(parent);
         }
 
@@ -449,67 +449,27 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     }
 
     /** 位相透過の姿の描き方: ドローンの絵を光らせて半透明で重ね、奥行きを比べない・書かない（壁越しに見える）。 */
-    private static final class PhaseShellType extends RenderType {
-        static RenderType of(String name, ResourceLocation texture) {
-            return create("singulo_" + name + "_phase", com.mojang.blaze3d.vertex.DefaultVertexFormat.NEW_ENTITY,
-                    com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, true, true, CompositeState.builder()
-                            .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                            .setTextureState(new TextureStateShard(texture, false, false))
-                            .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                            .setCullState(NO_CULL)
-                            .setWriteMaskState(COLOR_WRITE)
-                            .setDepthTestState(NO_DEPTH_TEST)
-                            .setOverlayState(OVERLAY)
-                            .createCompositeState(false));
-        }
-
-        private PhaseShellType(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode,
-                               int size, boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class PhaseShellType {
+        static RenderType of(String name, Identifier texture) { return EffectRenderTypes.emissive("singulo_"+name+"_phase", texture, false); }
     }
 
     /**
      * 回転の残像の描き方: うすく透けて重ねるが、奥行きを書かない（書くと、あとから描かれる奥のエンティティが、
      * 残像の円盤の向こうにあるとして消えてしまう。下から見上げたときに目立つ）。両面を描く。
      */
-    private static final class RotorBlur extends RenderType {
-        static final RenderType TYPE = create("singulo_rotor_blur", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_WRITE)
-                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                        .setCullState(NO_CULL)
-                        .setOutputState(ITEM_ENTITY_TARGET)
-                        .createCompositeState(false));
-
-        private RotorBlur(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class RotorBlur {
+        static final RenderType TYPE = EffectRenderTypes.color("singulo_rotor_blur", "alpha", false, false, true, net.minecraft.client.renderer.rendertype.OutputTarget.ITEM_ENTITY_TARGET);
     }
 
     /** 炎・牽引の光・場の描き方: 光を足して描き、奥行きを書かない（アンドロイドのスラスターの炎と同じ）。両面を描く。 */
-    private static final class Glare extends RenderType {
-        static final RenderType TYPE = create("singulo_drone_glare", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_WRITE)
-                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
-                        .setCullState(NO_CULL)
-                        .setOutputState(WEATHER_TARGET)
-                        .createCompositeState(false));
-
-        private Glare(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                      boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
+    private static final class Glare {
+        static final RenderType TYPE = EffectRenderTypes.color("singulo_drone_glare", "add", false, false, true, net.minecraft.client.renderer.rendertype.OutputTarget.WEATHER_TARGET);
     }
 
     // ------------------------------------------------------------------ モデル（テクスチャ 64×64。配置は tools/drones.py の PARTS・JET_PARTS・GRAVITY_PARTS と同じ）
 
     /** 型ごとのモデルの共通部分。 */
-    public abstract static class Model extends HierarchicalModel<CargoDrone> {
+    public abstract static class Model extends ExtractedEntityModel<CargoDrone> {
         protected final ModelPart root;
         protected final ModelPart body;
 

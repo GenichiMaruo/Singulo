@@ -7,15 +7,9 @@
     "R "
   ],
   "key": {
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "R": "#c:dusts/redstone",
+    "K": "singulo:ceramic_substrate",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:procedure_card",

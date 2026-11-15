@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,7 +35,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 電力を送ると、上に護衛のアンドロイドを1体（生産アップグレードを積めば2体まで）印刷する。上で充電できるのは1体ずつ。倒されたら、キットが残っていれば少しして印刷し直す。
  * 戻ってきたアンドロイドは、ここで電力を使って修理・充電する。GUI で動き方と、戻ってくる体力の割合を決める。
  */
-public class AndroidStationBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, MenuProvider {
     public static final int CAPACITY = 400_000;
     public static final int MAX_RECEIVE = 4_000;
@@ -90,7 +90,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 転送アップグレードで預かった持ち物（アンドロイドごと。次にその枠で印刷するアンドロイドに持たせる）。 */
     private final net.minecraft.world.SimpleContainer[] kept = {new net.minecraft.world.SimpleContainer(RuinAndroid.INVENTORY_SIZE),
             new net.minecraft.world.SimpleContainer(RuinAndroid.INVENTORY_SIZE)};
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -689,7 +689,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     }
 
     private void print(ServerLevel level, AndroidKind kind, int unit) {
-        RuinAndroid a = kind.type().create(level);
+        RuinAndroid a = kind.type().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (a == null || !energy.consume(printFe())) {
             return;
         }
@@ -712,7 +712,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             keptWork[unit] = null;
         }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
-        a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
+        a.snapTo(top.x, top.y, top.z, level.getRandom().nextFloat() * 360, 0);
         a.startPrinting();
         if (hasPrintUnit()) {
             a.skipPrinting(RuinAndroid.PRINT_TICKS / 2);           // 工場式印刷ユニット: 半分の時間で印刷し終える
@@ -813,7 +813,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             setOwner(player.getUUID());
         }
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.android_station.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.android_station.locked"));
             return;
         }
         player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
@@ -856,13 +856,13 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (owner != null) {
-            tag.putUUID("owner", owner);
+            tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
         }
         for (int i = 0; i < MAX_UNITS; i++) {
             if (androids[i] != null) {
-                tag.putUUID("android" + i, androids[i]);
+                tag.store("android" + i, net.minecraft.core.UUIDUtil.CODEC, androids[i]);
             }
             tag.putInt("delay" + i, delays[i]);
             tag.putString("name" + i, names[i]);
@@ -871,12 +871,12 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             for (int s = 0; s < RuinAndroid.INVENTORY_SIZE; s++) {
                 list.set(s, kept[i].getItem(s));
             }
-            tag.put("kept" + i, net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), list, registries));
+            tag.put("kept" + i, io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(new CompoundTag(), list, registries));
         }
         tag.putInt("selected", selected);
         for (int i = 0; i < MAX_UNITS; i++) {
             if (keptConsole[i] != null) {
-                tag.put("kept_console" + i, net.minecraft.nbt.NbtUtils.writeBlockPos(keptConsole[i]));
+                tag.put("kept_console" + i, io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(keptConsole[i]));
                 tag.putInt("kept_order" + i, keptOrder[i]);
                 if (keptWork[i] != null) {
                     tag.put("kept_work" + i, keptWork[i]);
@@ -887,7 +887,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         tag.putInt("retreat", retreat);
         tag.putBoolean("escort", escort);
         if (leader != null) {
-            tag.putUUID("leader", leader);
+            tag.store("leader", net.minecraft.core.UUIDUtil.CODEC, leader);
         }
         tag.putInt("signal", signal);
         tag.putBoolean("back_and_forth", backAndForth);
@@ -903,7 +903,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             tag.putString("name" + i, names[i]);
         }
         if (owner != null) {
-            tag.putUUID("owner", owner);
+            tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
         }
         return tag;
     }
@@ -916,52 +916,54 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        CompoundTag inv = tag.getCompound("items");
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        CompoundTag inv = tag.getCompoundOrEmpty("items");
         inv.putInt("Size", SLOTS);
-        items.deserializeNBT(registries, inv);
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, inv);
+        owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         for (int i = 0; i < MAX_UNITS; i++) {
-            androids[i] = tag.hasUUID("android" + i) ? tag.getUUID("android" + i) : null;
-            delays[i] = tag.getInt("delay" + i);
-            names[i] = tag.getString("name" + i);
-            signals[i] = tag.getInt("signal" + i);
+            androids[i] = tag.read("android" + i, net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("android" + i, net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            delays[i] = tag.getIntOr("delay" + i, 0);
+            names[i] = tag.getStringOr("name" + i, "");
+            signals[i] = tag.getIntOr("signal" + i, 0);
             kept[i].clearContent();
             if (tag.contains("kept" + i)) {
                 net.minecraft.core.NonNullList<ItemStack> list = net.minecraft.core.NonNullList.withSize(RuinAndroid.INVENTORY_SIZE, ItemStack.EMPTY);
-                net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("kept" + i), list, registries);
+                io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag.getCompoundOrEmpty("kept" + i), list, registries);
                 for (int s = 0; s < RuinAndroid.INVENTORY_SIZE; s++) {
                     kept[i].setItem(s, list.get(s));
                 }
             }
         }
         // 0.6.0 までの保存（1体だけ）は、1つ目の枠に入れる
-        if (tag.hasUUID("android")) {
-            androids[0] = tag.getUUID("android");
+        if (tag.read("android", net.minecraft.core.UUIDUtil.CODEC).isPresent()) {
+            androids[0] = tag.read("android", net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
         }
         if (tag.contains("name")) {
-            names[0] = tag.getString("name");
+            names[0] = tag.getStringOr("name", "");
         }
         if (tag.contains("delay")) {
-            delays[0] = tag.getInt("delay");
+            delays[0] = tag.getIntOr("delay", 0);
         }
-        for (net.minecraft.nbt.Tag t : tag.getList("kept", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-            ItemStack.parse(registries, t).ifPresent(stack -> kept[0].setItem(RuinAndroid.isArmorPlate(stack) ? RuinAndroid.SLOT_PLATE
+        for (net.minecraft.nbt.Tag t : tag.getListOrEmpty("kept")) {
+            io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, t).ifPresent(stack -> kept[0].setItem(RuinAndroid.isArmorPlate(stack) ? RuinAndroid.SLOT_PLATE
                     : RuinAndroid.SLOT_REPAIR, stack));
         }
-        selected = Mth.clamp(tag.getInt("selected"), 0, MAX_UNITS - 1);
+        selected = Mth.clamp(tag.getIntOr("selected", 0), 0, MAX_UNITS - 1);
         for (int i = 0; i < MAX_UNITS; i++) {
-            keptConsole[i] = net.minecraft.nbt.NbtUtils.readBlockPos(tag, "kept_console" + i).orElse(null);
-            keptOrder[i] = tag.getInt("kept_order" + i);
-            keptWork[i] = tag.contains("kept_work" + i) ? tag.getCompound("kept_work" + i).copy() : null;
+            keptConsole[i] = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "kept_console" + i).orElse(null);
+            keptOrder[i] = tag.getIntOr("kept_order" + i, 0);
+            keptWork[i] = tag.contains("kept_work" + i) ? tag.getCompoundOrEmpty("kept_work" + i).copy() : null;
         }
-        mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_PATROL);
-        retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;
-        escort = !tag.contains("escort") || tag.getBoolean("escort");
-        leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
-        signal = tag.getInt("signal");
-        backAndForth = tag.getBoolean("back_and_forth");
-        nightOnly = tag.getBoolean("night_only");
-        dwell = tag.contains("dwell") ? Mth.clamp(tag.getInt("dwell"), 0, DWELL_SECONDS.length - 1) : 2;
+        mode = Mth.clamp(tag.getIntOr("mode", 0), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_PATROL);
+        retreat = tag.contains("retreat") ? Mth.clamp(tag.getIntOr("retreat", 0), 0, 90) : 30;
+        escort = !tag.contains("escort") || tag.getBooleanOr("escort", false);
+        leader = tag.read("leader", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("leader", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        signal = tag.getIntOr("signal", 0);
+        backAndForth = tag.getBooleanOr("back_and_forth", false);
+        nightOnly = tag.getBooleanOr("night_only", false);
+        dwell = tag.contains("dwell") ? Mth.clamp(tag.getIntOr("dwell", 0), 0, DWELL_SECONDS.length - 1) : 2;
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> true, (slot,r) -> false); }
 }

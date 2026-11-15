@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -200,7 +200,7 @@ public final class FluidPipeNetwork {
      */
     static boolean mayBeEndpoint(Level level, BlockPos pos) {
         return level.getBlockEntity(pos) != null || isSource(level.getBlockState(pos))
-                || level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null) != null;
+                || io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, pos, null) != null;
     }
 
     /** 汲める水源か（水・溶岩の源。流れている水や、水没していないブロックは含まない）。 */
@@ -358,7 +358,7 @@ public final class FluidPipeNetwork {
             if (!level.isLoaded(e.pos)) {
                 continue;
             }
-            IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, e.pos, e.side);
+            IFluidHandler handler = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, e.pos, e.side);
             if (handler != null) {
                 ports.add(new Port(e, handler, !(level.getBlockEntity(e.pos) instanceof PipeInputOnly)));
             } else if (isSource(level.getBlockState(e.pos))) {
@@ -690,7 +690,7 @@ public final class FluidPipeNetwork {
 
     @Nullable
     private static Direction direction(BlockPos from, BlockPos to) {
-        return Direction.fromDelta(to.getX() - from.getX(), to.getY() - from.getY(), to.getZ() - from.getZ());
+        return Direction.getApproximateNearest(to.getX() - from.getX(), to.getY() - from.getY(), to.getZ() - from.getZ());
     }
 
     private static long saturatedAdd(long a, long b) {

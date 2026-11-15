@@ -2,31 +2,33 @@ package io.github.genichimaruo.singulo.client;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.generated.ClientConfig;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.event.RegisterShadersEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.Std140Builder;
+import com.mojang.blaze3d.textures.FilterMode;
+import org.lwjgl.system.MemoryStack;
+import java.util.OptionalInt;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
 /**
  * 重力レンズの画面効果。ブラックホール（リアクターの炉心）とワームホールの口の描画がフレームごとに「レンズ」を登録し、
@@ -84,8 +86,12 @@ public final class GravitationalLensing {
     static float shadowRadius(float horizon, float region) {
         return Math.min(horizon * SHADOW_PER_HORIZON, region * 0.5F);
     }
-    private static ShaderInstance shader;
-    private static TextureTarget copy;
+    private static final RenderPipeline shader = RenderPipeline.builder()
+            .withLocation(Singulo.id("pipeline/lensing")).withVertexShader(Singulo.id("core/lensing"))
+            .withFragmentShader(Singulo.id("core/lensing")).withSampler("Sampler0").withSampler("Sampler1")
+            .withUniform("LensData", UniformType.UNIFORM_BUFFER)
+            .withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).withCull(false).build();
+    private static LensingCopyTarget copy;
 
     private GravitationalLensing() {}
 
@@ -127,12 +133,12 @@ public final class GravitationalLensing {
     private static final float STAFF_DEPTH = 1.0F;
 
     /** グラビトン・マニピュレーターを持っているプレイヤーの杖の先に、小さな歪みを置く。 */
-    private static void addHeldStaffs(RenderLevelStageEvent event) {
+    private static void addHeldStaffs(ExtractLevelRenderStateEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) {
             return;
         }
-        float pt = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        float pt = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         for (net.minecraft.world.entity.player.Player p : mc.level.players()) {
             for (net.minecraft.world.InteractionHand hand : net.minecraft.world.InteractionHand.values()) {
                 if (!StaffTipTracker.distorts(p.getItemInHand(hand))) {
@@ -144,10 +150,10 @@ public final class GravitationalLensing {
                 if (p == mc.player && mc.options.getCameraType().isFirstPerson()) {
                     // 画面上の位置から、今の視野角で同じ所に写るワールドの点を逆算する
                     var cam = event.getCamera();
-                    Matrix4f proj = event.getProjectionMatrix();
-                    Vec3 look = new Vec3(cam.getLookVector());
-                    Vec3 up = new Vec3(cam.getUpVector());
-                    Vec3 left = new Vec3(cam.getLeftVector());
+                    Matrix4f proj = event.getRenderState().cameraRenderState.projectionMatrix;
+                    Vec3 look = new Vec3(cam.forwardVector());
+                    Vec3 up = new Vec3(cam.upVector());
+                    Vec3 left = new Vec3(cam.leftVector());
                     // 手の揺れ・振り・持ち替えに合わせるため、直前のフレームで実際に杖の球が描かれた位置を使う。
                     // まだ描かれていない（持ち替えた直後など）なら歪みも出さない
                     float[] seen = StaffTipTracker.recent(right);
@@ -159,7 +165,7 @@ public final class GravitationalLensing {
                     float lensUv = seen[2] * STAFF_LENS_PER_ORB;
                     float regionUv = seen[2] * STAFF_REGION_PER_ORB;
                     float d = STAFF_DEPTH;
-                    tip = cam.getPosition().add(look.scale(d))
+                    tip = cam.position().add(look.scale(d))
                             .add(left.scale(-sx * d / proj.m00())).add(up.scale(sy * d / proj.m11()));
                     // 縦の UV での大きさ → ブロック（r_uv = m11 × 半径 ÷ 奥行き ÷ 2 の逆）
                     float radius = lensUv * 2 * d / proj.m11();
@@ -178,14 +184,13 @@ public final class GravitationalLensing {
         }
     }
 
-    static void registerShaders(RegisterShadersEvent event) {
-        try {
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("lensing"),
-                    DefaultVertexFormat.POSITION_TEX), s -> shader = s);
-        } catch (IOException e) {
-            // 読めなければレンズなし（歪みなしの表示）で続ける
-            Singulo.LOGGER.error("重力レンズのシェーダーを読めなかった", e);
-        }
+    static void registerShaders(RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(shader);
+    }
+
+    static void extract(ExtractLevelRenderStateEvent event) {
+        StaffTipTracker.nextFrame();
+        if (enabled()) addHeldStaffs(event);
     }
 
     static boolean enabled() {
@@ -245,24 +250,20 @@ public final class GravitationalLensing {
     }
 
     static void onRenderStage(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) {
+        if (!(event instanceof RenderLevelStageEvent.AfterLevel)) {
             return;
         }
         try {
-            StaffTipTracker.nextFrame();
-            if (shader != null && enabled()) {
-                addHeldStaffs(event);
-            }
             if (!SOURCES.isEmpty() && shader != null && enabled()) {
                 if (shaderPackInUse()) {
                     // シェーダーパックの合成のあとで掛ける
-                    pending = new Pending(List.copyOf(SOURCES), event.getCamera().getPosition(), new Matrix4f(event.getProjectionMatrix()),
-                            new Quaternionf(event.getCamera().rotation()));
+                    pending = new Pending(List.copyOf(SOURCES), event.getLevelRenderState().cameraRenderState.pos, new Matrix4f(event.getLevelRenderState().cameraRenderState.projectionMatrix),
+                            new Quaternionf(event.getLevelRenderState().cameraRenderState.orientation));
                 } else {
                     // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）。
                     // 鍛造炉の炉心のレンズは、遠い炉から順に「その炉の奥側の光 → 炉心のレンズ → 手前側の光」とはさむ
                     // （カメラと炉心のあいだのジェットの上に、炉心のブラックホールが出ないように）
-                    Vec3 cam = event.getCamera().getPosition();
+                    Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
                     var groups = new ArrayList<>(GlowDepth.jetGroups());
                     groups.sort(Comparator.comparingDouble((GlowDepth.JetGroup g) -> -g.core.distanceToSqr(cam)));
                     java.util.Map<GlowDepth.JetGroup, List<Source>> own = new java.util.IdentityHashMap<>();
@@ -319,7 +320,7 @@ public final class GravitationalLensing {
         }
         SOURCES.clear();
         SOURCES.addAll(sources);
-        apply(cam, event.getProjectionMatrix(), event.getCamera().rotation(), true);
+        apply(cam, event.getLevelRenderState().cameraRenderState.projectionMatrix, event.getLevelRenderState().cameraRenderState.orientation, true);
     }
 
     /** レンズを掛ける。useDepth が false なら深度を使わない（シェーダーパック使用時）。 */
@@ -409,53 +410,16 @@ public final class GravitationalLensing {
             passes[i] = Math.min(passes[i], MAX_PASSES - 1);
             passCount = Math.max(passCount, passes[i] + 1);
         }
-        if (copy == null || copy.width != w || copy.height != h || copy.isStencilEnabled() != depthSource.isStencilEnabled()) {
-            if (copy != null) {
-                copy.destroyBuffers();
-            }
-            // 深度もコピーする（描き込み先の深度をそのまま読むと、フレームによって読めたり読めなかったりして、
-            // 手前のブロックの上にレンズが出たり消えたりする）。形式を合わせるため、ステンシルの有無も深度の読み元にそろえる
-            copy = new TextureTarget(w, h, true, Minecraft.ON_OSX);
-            if (depthSource.isStencilEnabled()) {
-                copy.enableStencil();
-            }
-            // 歪めて拡大した所はなめらかに補間し、縮める所はミップマップで（1画素が写す範囲をならして）読む
-            copy.setFilterMode(GL11.GL_LINEAR);
-            GlStateManager._bindTexture(copy.getColorTextureId());
-            GlStateManager._texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-            GlStateManager._bindTexture(0);
+        if (copy == null || copy.width != w || copy.height != h || copy.useStencil != depthSource.useStencil || copy.getColorTexture().getFormat() != main.getColorTexture().getFormat()) {
+            if (copy != null) copy.destroyBuffers();
+            copy = new LensingCopyTarget(w, h, depthSource.useStencil, main.getColorTexture().getFormat());
         }
-
-        shader.safeGetUniform("InvProj").set(new Matrix4f(proj).invert());
-        shader.safeGetUniform("DepthParams").set(proj.m22(), proj.m32());
-        shader.safeGetUniform("Aspect").set(aspect);
-        shader.safeGetUniform("Focal").set(proj.m11() * 0.5F);
-        shader.safeGetUniform("UseDepth").set(useDepth ? 1.0F : 0.0F);
-        // drawWithShader は描く直前に SamplerN を RenderSystem のシェーダーテクスチャで上書きするので、
-        // setSampler ではなくそちらに画面のコピーを渡す（でないと別のテクスチャを読んで画面が真っ黒になる）
-        int previous = RenderSystem.getShaderTexture(0);
-        int previousDepth = RenderSystem.getShaderTexture(1);
-        RenderSystem.setShaderTexture(0, copy.getColorTextureId());
-        // 深度: 球より手前のものを歪めないのに使う（コピーしたもの。シェーダーパック使用時は読まない）
-        RenderSystem.setShaderTexture(1, copy.getDepthTextureId());
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.disableBlend();
-        RenderSystem.setShader(() -> shader);
         for (int pass = 0; pass < passCount; pass++) {
-            // レンズは深度に書かないので、深度のコピーは最初の1回でよい
             copyScreen(main, depthSource, w, h, useDepth && pass == 0);
             for (int i = 0; i < passes.length; i++) {
-                if (passes[i] == pass) {
-                    drawLens(draws.get(i));
-                }
+                if (passes[i] == pass) drawLens(draws.get(i), main, proj, aspect, useDepth);
             }
         }
-        RenderSystem.setShaderTexture(0, previous);
-        RenderSystem.setShaderTexture(1, previousDepth);
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
     }
 
     /** 円盤の光をたどる範囲（シェーダーでは外側の半径の 1.25 倍の球）が画面に写る範囲を rect に足す。カメラがそばにあれば画面全体。 */
@@ -483,35 +447,33 @@ public final class GravitationalLensing {
 
     /** 今の画面をコピーに写す（これを歪めて元の画面に描き直す）。 */
     private static void copyScreen(RenderTarget main, RenderTarget depthSource, int w, int h, boolean depth) {
-        GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, main.frameBufferId);
-        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, copy.frameBufferId);
-        GlStateManager._glBlitFrameBuffer(0, 0, w, h, 0, 0, w, h,
-                depth && depthSource == main ? GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT : GL11.GL_COLOR_BUFFER_BIT, GL11.GL_NEAREST);
-        if (depth && depthSource != main) {
-            GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, depthSource.frameBufferId);
-            GlStateManager._glBlitFrameBuffer(0, 0, w, h, 0, 0, w, h, GL11.GL_DEPTH_BUFFER_BIT, GL11.GL_NEAREST);
-        }
-        GlStateManager._bindTexture(copy.getColorTextureId());
-        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-        GlStateManager._bindTexture(0);
-        main.bindWrite(true);
+        RenderSystem.getDevice().createCommandEncoder().copyTextureToTexture(
+                main.getColorTexture(), copy.getColorTexture(), 0, 0, 0, 0, 0, w, h);
+        if (depth) copy.copyDepthFrom(depthSource);
+        copy.generateMipmaps();
     }
 
-    private static void drawLens(Draw d) {
-        shader.safeGetUniform("Lens").set(d.lens[0], d.lens[1], d.lens[2], d.lens[3]);
-        shader.safeGetUniform("Sphere").set(d.sphere[0], d.sphere[1], d.sphere[2], d.sphere[3]);
-        shader.safeGetUniform("Disk").set(d.disk[0], d.disk[1], d.disk[2], d.disk[3]);
-        shader.safeGetUniform("DiskN").set(d.disk[4], d.disk[5], d.disk[6], d.disk[7]);
-        shader.safeGetUniform("DiskP").set(d.disk[8], d.disk[9], d.disk[10], d.disk[11]);
-        float x0 = d.minX * 2 - 1;
-        float y0 = d.minY * 2 - 1;
-        float x1 = d.maxX * 2 - 1;
-        float y1 = d.maxY * 2 - 1;
-        BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        b.addVertex(x0, y0, 0).setUv(d.minX, d.minY);
-        b.addVertex(x1, y0, 0).setUv(d.maxX, d.minY);
-        b.addVertex(x1, y1, 0).setUv(d.maxX, d.maxY);
-        b.addVertex(x0, y1, 0).setUv(d.minX, d.maxY);
-        BufferUploader.drawWithShader(b.buildOrThrow());
+    private static void drawLens(Draw d, RenderTarget main, Matrix4f proj, float aspect, boolean useDepth) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            Std140Builder data = Std140Builder.onStack(stack, 192);
+            data.putMat4f(new Matrix4f(proj).invert());
+            data.putVec4(proj.m22(), proj.m32(), aspect, proj.m11() * 0.5F);
+            data.putVec4(useDepth ? 1F : 0F, 0F, 0F, 0F);
+            data.putVec4(d.lens[0], d.lens[1], d.lens[2], d.lens[3]);
+            data.putVec4(d.sphere[0], d.sphere[1], d.sphere[2], d.sphere[3]);
+            data.putVec4(d.disk[0], d.disk[1], d.disk[2], d.disk[3]);
+            data.putVec4(d.disk[4], d.disk[5], d.disk[6], d.disk[7]);
+            data.putVec4(d.disk[8], d.disk[9], d.disk[10], d.disk[11]);
+            data.putVec4(d.minX, d.minY, d.maxX, d.maxY);
+            try (GpuBuffer uniforms = RenderSystem.getDevice().createBuffer(() -> "Singulo lens uniforms", GpuBuffer.USAGE_UNIFORM, data.get());
+                 var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                         () -> "Singulo gravitational lens", main.getColorTextureView(), OptionalInt.empty())) {
+                pass.setPipeline(shader);
+                pass.setUniform("LensData", uniforms);
+                pass.bindTexture("Sampler0", copy.getColorTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR, true));
+                pass.bindTexture("Sampler1", copy.getDepthTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+                pass.draw(0, 3);
+            }
+        }
     }
 }

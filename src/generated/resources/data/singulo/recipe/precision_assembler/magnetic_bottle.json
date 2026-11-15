@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:glass_blocks/colorless"
-      },
+      "ingredient": "#c:glass_blocks/colorless",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:meteoric_iron_ingot"
-      },
+      "ingredient": "singulo:meteoric_iron_ingot",
       "count": 1
     }
   ],

@@ -15,7 +15,7 @@ import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,7 +26,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,7 +41,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -66,7 +66,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 完成品の入る所がなくなっていれば、冷却の終わりで待つ。形の判定は毎 tick {@value #VERIFY_PER_TICK} か所ずつ確かめる
  * （全体を一度に読まない）。保存するのは段階・進み具合・素材・完成品・電力で、読み込み直すと続きから進む。
  */
-public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         MultiblockPortBlockEntity.Outputs, DeviceMenu.Host {
     public static final String STATION = "accretion_jet_forge";
     public static final int IDLE = 0, PRIME = 1, IGNITE = 2, FOCUS = 3, IRRADIATE = 4, FINISH = 5, COOL = 6;
@@ -118,7 +118,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     // ------------------------------------------------------------------ 状態
 
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == SLOT_CORE) {
@@ -140,7 +140,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             }
         }
     };
-    private final FluidTank tank = new FluidTank(TANK_CAPACITY, s -> isCoolant(s)) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(TANK_CAPACITY, s -> isCoolant(s)) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -173,7 +173,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     public int batchSize() { return batchSize; }
     public boolean parallelUpgrade() { return parallelUpgrade; }
     @Nullable
-    private ResourceLocation recipeId;
+    private Identifier recipeId;
 
     // 炉心のブラックホール
     private int bh = BH_NONE;
@@ -298,7 +298,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         return items;
     }
 
-    public FluidTank tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
@@ -353,11 +353,11 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         return back == null ? null : JetForgeLayout.core(worldPosition, back);
     }
 
-    public LongEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
-    public IFluidHandler coolant() {
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess coolant() {
         return coolantHandler;
     }
 
@@ -374,7 +374,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** 点火に使う種（Pリアクターと同じく、特異点の種かシンギュラリティ・コア）。 */
     public static boolean isCore(ItemStack stack) {
-        return stack.is(BuiltInRegistries.ITEM.get(Singulo.id("singularity_seed"))) || stack.is(BuiltInRegistries.ITEM.get(Singulo.id("singularity_core")));
+        return stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("singularity_seed"))) || stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("singularity_core")));
     }
 
     private List<RecipeHolder<MachineRecipe>> recipes() {
@@ -382,7 +382,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             return List.of();
         }
         List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> h : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+        for (RecipeHolder<MachineRecipe> h : (level instanceof net.minecraft.server.level.ServerLevel server ? server.recipeAccess().recipeMap() : io.github.genichimaruo.singulo.recipe.SyncedRecipes.recipes()).byType(SinguloRecipes.MACHINE.get())) {
             if (STATION.equals(h.value().station())) {
                 out.add(h);
             }
@@ -679,7 +679,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** 画面の「点火」。形ができていて、ブラックホールがなく、コアが入っていれば始める。 */
     public boolean ignite() {
-        if (!formed || bh != BH_NONE || !hasSeed() || level == null || level.isClientSide) {
+        if (!formed || bh != BH_NONE || !hasSeed() || level == null || level.isClientSide()) {
             return false;
         }
         bh = BH_IGNITING;
@@ -746,7 +746,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         net.minecraft.network.chat.Component msg = net.minecraft.network.chat.Component.translatable(key)
                 .withStyle(net.minecraft.ChatFormatting.GOLD);
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(48))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -826,7 +826,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             batchSize = batch;
             energyPerTick = Math.multiplyExact(r.energy(), batch);
             irradiateTicks = Math.max(1, r.time());
-            recipeId = h.id();
+            recipeId = h.id().identifier();
             phase = PRIME;
             phaseTicks = 0;
             hold = OK;
@@ -1005,7 +1005,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
             e.push(push.x * 0.6, 0.25, push.z * 0.6);
             e.hurtMarked = true;
             // 通り道で浴びると大けが（防具を無視）。照射中のビームは致命的
-            e.hurt(io.github.genichimaruo.singulo.registry.SinguloDamageTypes.jetBeam(level), phase == IRRADIATE ? BEAM_DAMAGE : JET_DAMAGE);
+            e.hurtOrSimulate(io.github.genichimaruo.singulo.registry.SinguloDamageTypes.jetBeam(level), phase == IRRADIATE ? BEAM_DAMAGE : JET_DAMAGE);
             e.igniteForSeconds(8);
         }
     }
@@ -1238,7 +1238,9 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     };
 
     /** 冷媒の口（入れるだけ）。 */
-    private final IFluidHandler coolantHandler = new IFluidHandler() {
+    private final io.github.genichimaruo.singulo.compat.TankFluidAccess coolantHandler = new io.github.genichimaruo.singulo.compat.TankFluidAccess() {
+        public TransactionalFluidTank tankAt(int index) { return tank; }
+        public boolean allowsExtract(int index) { return false; }
         @Override
         public int getTanks() {
             return 1;
@@ -1276,78 +1278,37 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     };
 
     /** 電力の口。形ができてコアが入っている間だけ、1 tick に jetForgeMaxInput まで受け取る（蓄えはその4倍まで）。 */
-    private final class Energy implements LongEnergyStorage {
-        long capacity() {
-            long max = maxInput();
-            return max > Long.MAX_VALUE / 4 ? Long.MAX_VALUE : max * 4;
-        }
-
-        private boolean accepting() {
-            return formed && bh != BH_NONE;
-        }
-
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            if (!accepting() || amount <= 0 || level == null) {
-                return 0;
-            }
-            long now = level.getGameTime();
-            if (now != receivedTick) {
-                receivedTick = now;
-                receivedThisTick = 0;
-            }
-            boolean igniting = bh == BH_IGNITING;
-            long room = Math.min(maxInput() - receivedThisTick,
-                    igniting ? (ignitionCharged ? 0 : ignitionEnergy() - ignitionStored) : capacity() - buffer);
-            long accepted = Math.max(0, Math.min(amount, room));
-            if (!simulate && accepted > 0 && igniting) {
-                ignitionStored += accepted;
-                receivedThisTick += accepted;
-                setChanged();
-            } else if (!simulate && accepted > 0) {
-                buffer += accepted;
-                receivedThisTick += accepted;
-                setChanged();
-            }
+    private final class Energy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        long capacity() { long max=maxInput(); return max>Long.MAX_VALUE/4?Long.MAX_VALUE:max*4; }
+        private boolean accepting() { return formed && bh != BH_NONE; }
+        @Override protected long[] createSnapshot() { return new long[]{buffer,ignitionStored,receivedThisTick,receivedTick}; }
+        @Override protected void revertToSnapshot(long[] s) { buffer=s[0];ignitionStored=s[1];receivedThisTick=s[2];receivedTick=s[3]; }
+        @Override protected void onRootCommit(long[] s) { setChanged(); }
+        @Override public long insertLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            if(!accepting() || amount==0 || level==null)return 0;
+            updateSnapshots(tx);
+            long now=level.getGameTime();if(now!=receivedTick){receivedTick=now;receivedThisTick=0;}
+            boolean igniting=bh==BH_IGNITING;
+            long room=Math.min(maxInput()-receivedThisTick,igniting?(ignitionCharged?0:ignitionEnergy()-ignitionStored):capacity()-buffer);
+            long accepted=Math.max(0,Math.min(amount,room));
+            if(accepted>0){if(igniting)ignitionStored+=accepted;else buffer+=accepted;receivedThisTick+=accepted;}
             return accepted;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
+        @Override public long extractLong(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");return 0;
         }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return 0;
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, buffer);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, capacity());
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return accepting();
-        }
+        @Override public long getAmountAsLong(){return buffer;}
+        @Override public long getCapacityAsLong(){return capacity();}
+        @Override public boolean canExtract(){return false;}
+        @Override public boolean canReceive(){return accepting();}
     }
 
     // ------------------------------------------------------------------ 壊す・読み込み解除
 
     @Override
     public void onBroken(Level level) {
-        if (parallelUpgrade && !level.isClientSide) {
+        if (parallelUpgrade && !level.isClientSide()) {
             parallelUpgrade = false;
             Block.popResource(level, worldPosition, new ItemStack(item("collapsar_parallel_cassette")));
         }
@@ -1399,7 +1360,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             JetForgeClientIndex.add(this);
         }
     }
@@ -1413,7 +1374,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     public void setRemoved() {
         ports.onRemoved(level);
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             JetForgeClientIndex.remove(this);
         }
         super.setRemoved();
@@ -1424,8 +1385,8 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.putLong("buffer", buffer);
         tag.putLong("consumed", consumedTotal);
         tag.putLong("ignition_stored", ignitionStored);
@@ -1435,7 +1396,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         ListTag list = new ListTag();
         for (ItemStack s : charged) {
             if (!s.isEmpty()) {
-                list.add(s.save(registries));
+                list.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(s, registries));
             }
         }
         tag.put("charged", list);
@@ -1458,10 +1419,10 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         tag.putBoolean("ignition_charged", ignitionCharged);
         tag.putInt("back", back == null ? -1 : back.get3DDataValue());
         if (!working.isEmpty()) {
-            tag.put("working", working.save(registries));
+            tag.put("working", io.github.genichimaruo.singulo.compat.NbtCompat.save(working, registries));
         }
         if (!result.isEmpty()) {
-            tag.put("result", result.save(registries));
+            tag.put("result", io.github.genichimaruo.singulo.compat.NbtCompat.save(result, registries));
         }
     }
 
@@ -1470,50 +1431,50 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         super.loadAdditional(tag, registries);
         if (tag.contains("items")) {
             ItemStackHandler saved = new ItemStackHandler();
-            saved.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(saved, registries, tag.getCompoundOrEmpty("items"));
             for (int i = 0; i < SLOTS; i++) {
                 items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
             }
-            tank.readFromNBT(registries, tag.getCompound("tank"));
-            buffer = tag.getLong("buffer");
-            consumedTotal = tag.getLong("consumed");
+            io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
+            buffer = tag.getLongOr("buffer", 0L);
+            consumedTotal = tag.getLongOr("consumed", 0L);
             charged.clear();
-            for (Tag t : tag.getList("charged", Tag.TAG_COMPOUND)) {
-                ItemStack s = ItemStack.parseOptional(registries, (CompoundTag) t);
+            for (Tag t : tag.getListOrEmpty("charged")) {
+                ItemStack s = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, (CompoundTag) t);
                 if (!s.isEmpty()) {
                     charged.add(s);
                 }
             }
-            recipeId = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
-            ignitionStored = tag.getLong("ignition_stored");
-            ignitionLeft = tag.getInt("ignition_left");
-            bhMass = tag.contains("bh_mass") ? tag.getDouble("bh_mass") : CORE_MASS;
+            recipeId = tag.contains("recipe") ? Identifier.tryParse(tag.getStringOr("recipe", "")) : null;
+            ignitionStored = tag.getLongOr("ignition_stored", 0L);
+            ignitionLeft = tag.getIntOr("ignition_left", 0);
+            bhMass = tag.contains("bh_mass") ? tag.getDoubleOr("bh_mass", 0.0D) : CORE_MASS;
             firstCheck = true;
         }
-        phase = tag.getInt("phase");
-        parallelUpgrade = tag.getBoolean("parallel_upgrade");
-        batchSize = tag.contains("batch_size") ? Math.max(1, Math.min(4, tag.getInt("batch_size"))) : 1;
-        phaseTicks = tag.getInt("phase_ticks");
-        hold = tag.getInt("hold");
-        energyPerTick = tag.getInt("energy_per_tick");
-        irradiateTicks = tag.contains("irradiate_ticks") ? Math.max(1, tag.getInt("irradiate_ticks")) : 1200;
-        working = tag.contains("working") ? ItemStack.parseOptional(registries, tag.getCompound("working")) : ItemStack.EMPTY;
-        result = tag.contains("result") ? ItemStack.parseOptional(registries, tag.getCompound("result")) : ItemStack.EMPTY;
+        phase = tag.getIntOr("phase", 0);
+        parallelUpgrade = tag.getBooleanOr("parallel_upgrade", false);
+        batchSize = tag.contains("batch_size") ? Math.max(1, Math.min(4, tag.getIntOr("batch_size", 0))) : 1;
+        phaseTicks = tag.getIntOr("phase_ticks", 0);
+        hold = tag.getIntOr("hold", 0);
+        energyPerTick = tag.getIntOr("energy_per_tick", 0);
+        irradiateTicks = tag.contains("irradiate_ticks") ? Math.max(1, tag.getIntOr("irradiate_ticks", 0)) : 1200;
+        working = tag.contains("working") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("working")) : ItemStack.EMPTY;
+        result = tag.contains("result") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("result")) : ItemStack.EMPTY;
         int was = bh;
-        bh = tag.getInt("bh");
-        if (level != null && level.isClientSide && clientSynchronized && was != BH_ACTIVE && bh == BH_ACTIVE) {
+        bh = tag.getIntOr("bh", 0);
+        if (level != null && level.isClientSide() && clientSynchronized && was != BH_ACTIVE && bh == BH_ACTIVE) {
             clientFormedAt = clientTicks;                 // できた瞬間の閃光（描画）
         }
-        ignitionElapsed = tag.getInt("ignition_elapsed");
-        ignitionCharged = tag.getBoolean("ignition_charged");
+        ignitionElapsed = tag.getIntOr("ignition_elapsed", 0);
+        ignitionCharged = tag.getBooleanOr("ignition_charged", false);
         // 向きは保存する（形が崩れていても、ブラックホールの位置と引力のため）
-        int b = tag.contains("back") ? tag.getInt("back") : -1;
+        int b = tag.contains("back") ? tag.getIntOr("back", 0) : -1;
         back = b >= 2 && b < 6 ? Direction.from3DDataValue(b) : null;
         if (tag.contains("sync")) {
             clientSynchronized = true;
             // クライアントへの同期（形・コアの有無）
-            formed = tag.getBoolean("formed");
-            clientCore = tag.getBoolean("core");
+            formed = tag.getBooleanOr("formed", false);
+            clientCore = tag.getBooleanOr("core", false);
         }
     }
 
@@ -1528,7 +1489,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** クライアントで、炉心にブラックホールがあるか（更新のときに受け取る）。 */
     public boolean shownCore() {
-        return level != null && level.isClientSide ? clientCore : hasCore();
+        return level != null && level.isClientSide() ? clientCore : hasCore();
     }
 
     @Override
@@ -1562,6 +1523,8 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     }
 
     static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> slot < SLOT_OUT, (slot,r) -> slot >= SLOT_OUT); }
 }

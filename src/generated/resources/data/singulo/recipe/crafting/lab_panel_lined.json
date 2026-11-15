@@ -6,15 +6,9 @@
     "PBP"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_building"
-    },
-    "P": {
-      "item": "singulo:lab_panel"
-    },
-    "L": {
-      "tag": "c:gems/lapis"
-    }
+    "B": "singulo:blueprint_lab_building",
+    "P": "singulo:lab_panel",
+    "L": "#c:gems/lapis"
   },
   "result": {
     "id": "singulo:lab_panel_lined",

@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:zinc_dust"
-      },
+      "ingredient": "singulo:zinc_dust",
       "count": 1
     }
   ],

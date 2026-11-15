@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 1
     }
   ],

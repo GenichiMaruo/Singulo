@@ -7,12 +7,8 @@
     "WGW"
   ],
   "key": {
-    "W": {
-      "tag": "minecraft:wool"
-    },
-    "G": {
-      "tag": "c:nuggets/gold"
-    }
+    "W": "#minecraft:wool",
+    "G": "#c:nuggets/gold"
   },
   "result": {
     "id": "singulo:android_witch_hat",

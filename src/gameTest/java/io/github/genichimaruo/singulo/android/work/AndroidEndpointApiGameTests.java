@@ -1,4 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import net.minecraft.world.entity.EntitySpawnReason;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
 import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints;
@@ -15,22 +18,20 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.resources.Identifier;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class AndroidEndpointApiGameTests {
     private static final BlockPos CONSOLE=new BlockPos(0,1,0), SUPPLY=new BlockPos(1,1,0), CHEST=new BlockPos(1,1,1),
             DELIVERY=new BlockPos(3,1,0), RACK=new BlockPos(4,1,0), TABLE=new BlockPos(4,1,3);
-    private static Item item(String name) { return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("singulo",name)); }
+    private static Item item(String name) { return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("singulo",name)); }
     private static ItemStack recipeCard(GameTestHelper h,List<ItemStack> grid,ItemStack output) {
         var card=new ItemStack(item("recipe_card")); new RecipeData(grid,output).write(card,h.getLevel().registryAccess()); return card;
     }
@@ -42,20 +43,20 @@ public final class AndroidEndpointApiGameTests {
         helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
         helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
-            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = helper.getBlockEntity(p);
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, p);
             b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         ItemStack table = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
                 net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, RACK);
         java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -64,14 +65,14 @@ public final class AndroidEndpointApiGameTests {
         rack.items().setStackInSlot(0, table);
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
-        return helper.getBlockEntity(CONSOLE);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CONSOLE);
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
         var c=workshop(h,32); c.setOwner(TestScope.player(h).getUUID());
-        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
-        a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
+        a.snapTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
         a.setNoAi(!moving); h.getLevel().addFreshEntity(a); return c;
     }
     private static final BlockPos ENDPOINT = new BlockPos(6,1,0);
@@ -119,7 +120,7 @@ public final class AndroidEndpointApiGameTests {
     public static void linkPersistsAndReplacementCannotInheritSupply(GameTestHelper h) {
         var c=setup(h,false); var e=endpoint(h,c.owner()); e.supply.setStackInSlot(0,new ItemStack(Items.DIAMOND,5));
         h.assertTrue(link(h,c)==AndroidWorkEndpoints.Result.LINKED,"Link rejected");
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         h.assertTrue(c.workEndpoint(e.getBlockPos())==e && c.storages().contains(e.supply),"Link did not persist");
         var replacement=endpoint(h,c.owner()); replacement.supply.setStackInSlot(0,new ItemStack(Items.DIAMOND,7));
         h.assertTrue(c.workEndpoint(replacement.getBlockPos())==null && !c.storages().contains(replacement.supply),"Replacement inherited access");
@@ -131,7 +132,7 @@ public final class AndroidEndpointApiGameTests {
         h.assertTrue(receipt.state()==State.RUNNING,"Endpoint order rejected: "+receipt.reason());
         h.assertTrue(submit(h,c,id).orderId()==receipt.orderId() && c.orders().size()==1,"Replay duplicated order");
         h.assertTrue(AndroidWorkEndpoints.unlink(h.getLevel(),c.getBlockPos(),c.owner(),e.getBlockPos())==AndroidWorkEndpoints.Result.BUSY,"Active endpoint unlinked");
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         h.assertTrue(e.identity.equals(c.orders().getFirst().deliveryEndpointId),"Destination identity lost on reload");
         endpoint(h,c.owner());
         h.assertTrue(c.workEndpoint(e.getBlockPos())==null,"Replacement inherited active destination");
@@ -149,7 +150,7 @@ public final class AndroidEndpointApiGameTests {
     }
     @GameTest(template="empty",timeoutTicks=2400)
     public static void actualEndpointCraftWaitsForSpaceAndDeliversExactlyOnce(GameTestHelper h) {
-        var c=setup(h,true); ChestBlockEntity shared=h.getBlockEntity(CHEST); shared.clearContent();
+        var c=setup(h,true); ChestBlockEntity shared=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CHEST); shared.clearContent();
         var e=endpoint(h,c.owner()); e.supply.setStackInSlot(0,new ItemStack(Items.OAK_LOG,32));
         e.delivery.setStackInSlot(0,new ItemStack(Items.STICK,60)); link(h,c);
         var id=UUID.randomUUID(); var first=submit(h,c,id);
@@ -184,7 +185,7 @@ public final class AndroidEndpointApiGameTests {
         var id=UUID.randomUUID();
         var first=AndroidOrders.submitFromEndpoint(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.OAK_PLANKS),4,List.of(),null,e.getBlockPos());
         h.assertTrue(first.state()==State.RUNNING,"Restricted order rejected");
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         var o=c.orders().getFirst();
         h.assertTrue(e.getBlockPos().equals(o.materialSource) && e.identity.equals(o.materialEndpointId),"Source binding lost on reload");
         h.assertTrue(AndroidOrders.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.OAK_PLANKS),4,List.of(),null).state()==State.REJECTED,"Unrestricted replay accepted");

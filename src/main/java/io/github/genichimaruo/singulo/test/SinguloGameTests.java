@@ -11,7 +11,7 @@ import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 段階1の装置の動作確認。`./gradlew runGameTestServer` で実行する。 */
 @GameTestHolder(Singulo.MODID)
@@ -33,12 +33,12 @@ public final class SinguloGameTests {
     private SinguloGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static MachineBlockEntity machine(GameTestHelper helper, MachineType type) {
         helper.setBlock(MACHINE, SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity be = helper.getBlockEntity(MACHINE);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,MACHINE);
         be.energy().setEnergy(MachineType.ENERGY_CAPACITY);
         return be;
     }
@@ -323,7 +323,7 @@ public final class SinguloGameTests {
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.CAMPFIRE);
         helper.setBlock(MACHINE.east(), Blocks.BLUE_ICE);
-        ThermoelectricGeneratorBlockEntity gen = helper.getBlockEntity(MACHINE);
+        ThermoelectricGeneratorBlockEntity gen = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,MACHINE);
         helper.runAtTickTime(60, () -> {
             // 焚き火 800 K と青氷 243 K → ΔT 557 K、0.10 × 557 ≈ 55.7 FE/t。最初の走査まで（テスト開始のずれを含めて）最大20 tick かかる
             int energy = gen.energy().getEnergyStored();
@@ -353,7 +353,7 @@ public final class SinguloGameTests {
         }
         BlockPos kilnPos = new BlockPos(5, 1, 1);
         helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = helper.getBlockEntity(kilnPos);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,kilnPos);
         helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() > 200,
                 "導線の先の焼成炉に電力が届かない: " + kiln.energy().getEnergyStored()));
     }
@@ -362,7 +362,7 @@ public final class SinguloGameTests {
     public static void fuelCellKeepsUnpairedHydrogenUntilOxygenPairIsComplete(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
-        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = helper.getBlockEntity(pos);
+        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 3), IFluidHandler.FluidAction.EXECUTE);
         cell.fluids().fill(new FluidStack(SinguloFluids.get("oxygen"), 2), IFluidHandler.FluidAction.EXECUTE);
         helper.runAtTickTime(5, () -> {
@@ -383,9 +383,9 @@ public final class SinguloGameTests {
     /** 張り替えで余った下位のケーブル: 銅導線は焼成炉で銅に戻り、超伝導ケーブル・トポロジカル導線の材料にもなる。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void spareCablesAreRecycled(GameTestHelper helper) {
-        var recipes = helper.getLevel().getRecipeManager();
-        helper.assertTrue(recipes.byKey(Singulo.id("crafting/superconducting_cable_from_copper_wire")).isPresent(), "銅導線で超伝導ケーブルを作れない");
-        helper.assertTrue(recipes.byKey(Singulo.id("cryogenic_cooling_tower/topological_wire_from_superconducting_cable")).isPresent(),
+        var recipes = helper.getLevel().getServer().getRecipeManager();
+        helper.assertTrue(recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,Singulo.id("crafting/superconducting_cable_from_copper_wire"))).isPresent(), "銅導線で超伝導ケーブルを作れない");
+        helper.assertTrue(recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,Singulo.id("cryogenic_cooling_tower/topological_wire_from_superconducting_cable"))).isPresent(),
                 "超伝導ケーブルでトポロジカル導線を作れない");
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));

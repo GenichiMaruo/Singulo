@@ -6,33 +6,23 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:basic_frame"
-      },
+      "ingredient": "singulo:basic_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:ceramic_substrate"
-      },
+      "ingredient": "singulo:ceramic_substrate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:glass_blocks/colorless"
-      },
+      "ingredient": "#c:glass_blocks/colorless",
       "count": 2
     }
   ],

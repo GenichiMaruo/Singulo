@@ -7,15 +7,15 @@ import io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 
 /**
  * 測量メガネで見る液体パイプ: 流れている向きへ、液体の色の山形の光がパイプの表面を走る。止まっているパイプは琥珀の輪で脈打つ。
@@ -37,10 +37,7 @@ final class PipeSurveyRenderer {
         }
     }
 
-    static void render(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            return;
-        }
+    static void extract(ExtractLevelRenderStateEvent event, PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || !SurveyGlassesItem.wearing(mc.player)) {
             return;
@@ -55,13 +52,11 @@ final class PipeSurveyRenderer {
                     .sorted(Comparator.comparingDouble(p -> p.getBlockPos().distToCenterSqr(mc.player.position())))
                     .limit(128).toList();
         }
-        float time = (now % 24000 + event.getPartialTick().getGameTimeDeltaPartialTick(false)) / 20F;
-        PoseStack pose = event.getPoseStack();
-        Vec3 camera = event.getCamera().getPosition();
+        float time = (now % 24000 + event.getDeltaTracker().getGameTimeDeltaPartialTick(false)) / 20F;
+        Vec3 camera = event.getCamera().position();
         pose.pushPose();
         pose.translate(-camera.x, -camera.y, -camera.z);
-        var buffers = mc.renderBuffers().bufferSource();
-        RenderType type = RenderType.entityTranslucentEmissive(FxDraw.WHITE);
+        RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(FxDraw.WHITE);
         VertexConsumer vc = buffers.getBuffer(type);
         for (FluidPipeBlockEntity pipe : cached) {
             if (pipe.isRemoved() || !pipe.fresh()) {
@@ -83,7 +78,6 @@ final class PipeSurveyRenderer {
             }
         }
         pose.popPose();
-        buffers.endBatch(type);
     }
 
     /** 液体の色を、暗い液体でも見えるよう少し明るくする。 */
@@ -93,7 +87,7 @@ final class PipeSurveyRenderer {
 
     /** パイプの中心と面の間を、流れの向きへ走る山形の光。 */
     private static void chevrons(PoseStack pose, VertexConsumer vc, Vec3 center, Direction side, boolean incoming, float time, int rgb, Vec3 camera) {
-        Vec3 d = Vec3.atLowerCornerOf(side.getNormal());
+        Vec3 d = Vec3.atLowerCornerOf(side.getUnitVec3i());
         Vec3 along = incoming ? d.scale(-1) : d;
         Vec3 up = side.getAxis() == Direction.Axis.Y ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
         Vec3 across = along.cross(up).normalize();
@@ -155,9 +149,9 @@ final class PipeSurveyRenderer {
         if (flowing && !pipe.mixed() && !pipe.visualFluid().isEmpty()) {
             FluidDraw.fill(g, pipe.visualFluid().getFluid(), x, y, 12, 12);
         }
-        g.drawWordWrap(font, text, textX, y, width, skin.text());
+        g.textWithWordWrap(font, text, textX, y, width, skin.text());
         if (detail != null) {
-            g.drawWordWrap(font, detail, textX, y + textHeight + 2, width, skin.dim());
+            g.textWithWordWrap(font, detail, textX, y + textHeight + 2, width, skin.dim());
         }
     }
 }

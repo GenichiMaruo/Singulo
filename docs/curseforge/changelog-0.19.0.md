@@ -1,29 +1,27 @@
-# Singulo 0.19.0 — Minecraft 1.21.1 / NeoForge
+# Singulo 0.19.0 — Minecraft 26.1.2 / NeoForge
 
-## Features
+## 26.1.2 port
 
-- Reorganize the creative inventory and JEI item order by type. Ingots, plates, circuit components, intermediate materials, devices, multiblock parts and building blocks each stay together. Android and drone facilities, the Food Printer, RGB Dye Station and newer cosmic devices join the device group. All spawn eggs are at the end.
-- Add guarded Android Work Console endpoints and recipe snapshots for addon integration. Endpoint identities and owners are checked before external orders access a console.
-- Add private crafting requests through `AndroidEscrows`. Each request tracks its own supplied materials, intermediate products, completed products and returns; repeated submissions are idempotent, and cancellation waits for carried materials to be recovered before refunds become available.
-- Private requests support chains of ordinary crafting steps. Machine processing is rejected before taking supplied materials because external machine inputs and outputs cannot yet be reserved and recovered safely across cancellation or reload. Normal Android machine orders and recipe discovery remain available.
-- Add `AndroidSharedStorage` so addons can identify several access blocks that expose the same storage. Android stock counting and extraction visit the shared storage once.
+- Port Singulo 0.19.0 to Minecraft 26.1.2 and NeoForge 26.1.2.126. Requires Java 25. This JAR is not for 1.21.1 or 1.20.1.
+- Preserve the organized creative inventory, Android Work Console/addon APIs, private crafting requests, shared storage and cosmic machines from 0.19.0.
+- Update item, fluid and energy transfer to the transactional NeoForge API, including rollback and commit notifications.
+- Migrate saved data, attachments, recipes, models, screens and the new rendering pipeline. Existing-world upgrades still require a backup; focused migration tests do not guarantee every old modpack/world is compatible.
+- Fix non-square lens mip generation, keep foreground occlusion correct, and update artificial sunlight and Distant Horizons/Sodium lightmap integration.
 
-## Fixes
+## Compatibility and known limits
 
-- Androids can continue taking materials from a storage slot that holds more than one normal stack.
-- Private crafting sizes each trip to the android's actual carrying space and compacts remaining materials before inserting products.
-- Fluid claims now preview the same amount they withdraw, combine matching fluid slots when draining, and preserve large totals without integer overflow. Recovery also retains fluid cargo when a request owner cannot be identified.
+- NeoForge only. Mekanism integration is not included in this Minecraft port.
+- JEI is optional. Tested optional rendering versions: Sodium 0.9.2 and Distant Horizons 3.3.3.
+- Create/Ponder integration is not supported on 26.1.2 because no official compatible dependency has been verified. No Ponder compatibility claim is made.
+- The tested Iris/Complementary combinations can fail with `Missing sampler Sampler1`. This also reproduces without Singulo or Arsenal when a vanilla diamond sword is dropped. Shader-pack compatibility is therefore not guaranteed; the standard renderer and the tested Sodium/Distant Horizons path are recommended for this release.
 
-## 追加
+## Validation
 
-- クリエイティブタブと JEI のアイテム順を種類ごとに整理しました。インゴット、プレート、基板と回路、中間素材、装置、マルチブロック部材、建材をそれぞれまとめました。アンドロイドやドローンの設備、フードプリンター、RGB 染色台、新しい宇宙設備も装置のまとまりに置き、すべてのスポーンエッグを最後に移しました。
-- アドオン向けに、所有者と装置の識別子を検証するアンドロイド作業指令台 API と、利用可能なレシピを取得する API を追加しました。
-- `AndroidEscrows` による依頼ごとの独立したクラフト材料管理を追加しました。提供材料、中間素材、完成品、返却品を依頼別に保管します。同じ依頼の再送で材料を二重に受け取らず、取消時は運搬中の材料を回収してから返却を許可します。
-- 独立した依頼では通常のクラフトを連続して実行できます。機械加工は、取消や再読込をまたいで外部装置の材料・成果物を安全に予約・回収する仕組みがまだないため、材料を受け取る前に拒否します。通常のアンドロイドの機械加工依頼とレシピ取得は引き続き利用できます。
-- `AndroidSharedStorage` を追加しました。同じ共有ストレージを複数のブロックから接続するアドオンでも、在庫の二重計上や重複した取り出しを防げます。
+- 815 Singulo GameTests plus the vanilla smoke test, 140 Python checks and 111 standalone Java assertions passed locally.
+- Real-client GUI, cosmic devices, fifteen simultaneous lenses, foreground occlusion, lighting pixel comparisons and repeated world re-entry were checked.
 
-## 修正
+## 日本語概要
 
-- 通常のスタック上限を超える量を保持するストレージの同じ欄から、アンドロイドが続けて材料を取り出せるようにしました。
-- 独立したクラフト依頼では、一度に運ぶ量をアンドロイドの運搬容量に合わせ、完成品をしまう前に残りの材料をまとめるようにしました。
-- 流体の受け取りの事前確認と実処理で量が一致するようにし、複数の欄に分かれた同じ流体をまとめて取り出せるようにしました。大容量の合計で整数あふれを起こさず、依頼の所有者を特定できない場合も運搬中の流体を回収記録に保持します。
+Minecraft 26.1.2・NeoForge専用の移植版です。Java 25が必要です。0.19.0のアイテム分類、アンドロイドの外部連携API、独立したクラフト依頼、各種装置を引き継ぎ、転送・保存・描画を新しいAPIへ対応しました。
+
+Mekanism連携とCreate/Ponder連携はこの版では非対応です。Irisと一部シェーダーパックでは、Singuloを外した状態でも再現する描画エラーを確認しているため、シェーダーパック動作は保証しません。旧ワールドを移す場合は必ずバックアップしてください。

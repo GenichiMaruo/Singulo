@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.storage;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
@@ -32,7 +32,7 @@ import net.neoforged.neoforge.items.IItemHandler;
  * </ul>
  * 見た目（中のブラックホールの大きさ・回る見本・正面の個数）はクライアントへ、変わったときだけ（10 tick に1回まで）送る。
  */
-public class HorizonVaultBlockEntity extends BlockEntity {
+public class HorizonVaultBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     /** しまえる個数（long の上限、約922京。事実上無制限）。 */
     public static final long CAPACITY = Long.MAX_VALUE;
     /** 見た目（中のブラックホールの大きさ・柱の光の帯）の目盛りの上端（1兆個でいっぱいに見える）。 */
@@ -236,7 +236,7 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         var held = input.get(SinguloComponents.VAULT_ITEM.get());
         ItemStack t = held == null ? ItemStack.EMPTY : held.copyOne();
@@ -248,9 +248,9 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("type");
-        tag.remove("count");
+    public void removeComponentsFromTag(net.minecraft.world.level.storage.ValueOutput tag) {
+        tag.discard("type");
+        tag.discard("count");
     }
 
     // ------------------------------------------------------------------ 保存
@@ -263,7 +263,7 @@ public class HorizonVaultBlockEntity extends BlockEntity {
 
     private void write(CompoundTag tag, HolderLookup.Provider registries) {
         if (!type.isEmpty() && count > 0) {
-            tag.put("type", type.save(registries));
+            tag.put("type", io.github.genichimaruo.singulo.compat.NbtCompat.save(type, registries));
             tag.putLong("count", count);
         }
     }
@@ -271,8 +271,8 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        type = tag.contains("type") ? ItemStack.parseOptional(registries, tag.getCompound("type")).copyWithCount(1) : ItemStack.EMPTY;
-        count = Math.max(0, Math.min(CAPACITY, tag.getLong("count")));
+        type = tag.contains("type") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("type")).copyWithCount(1) : ItemStack.EMPTY;
+        count = Math.max(0, Math.min(CAPACITY, tag.getLongOr("count", 0L)));
         if (type.isEmpty() || count <= 0) {
             type = ItemStack.EMPTY;
             count = 0;
@@ -292,4 +292,34 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    private record TransferState(ItemStack type, long count) {}
+    private final class TransferStorage extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<TransferState>
+            implements net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> {
+        private void checkSlot(int slot) { if (slot != 0) throw new IndexOutOfBoundsException(slot); }
+        @Override protected TransferState createSnapshot() { return new TransferState(type.copy(), count); }
+        @Override protected void revertToSnapshot(TransferState state) { type = state.type().copy(); count = state.count(); }
+        @Override protected void onRootCommit(TransferState state) { changed(); }
+        public int size() { return 1; }
+        public net.neoforged.neoforge.transfer.item.ItemResource getResource(int slot) { checkSlot(slot); return count <= 0 ? net.neoforged.neoforge.transfer.item.ItemResource.EMPTY : net.neoforged.neoforge.transfer.item.ItemResource.of(type); }
+        public long getAmountAsLong(int slot) { checkSlot(slot); return Math.max(0, count); }
+        public long getCapacityAsLong(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource) { checkSlot(slot); return resource.isEmpty() || accepts(resource.toStack()) ? CAPACITY : 0; }
+        public boolean isValid(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource) { checkSlot(slot); return !resource.isEmpty() && accepts(resource.toStack()); }
+        public int insert(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            checkSlot(slot); net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            if (!isValid(slot, resource)) return 0;
+            int inserted = (int) Math.min(amount, CAPACITY - count);
+            if (inserted > 0) { updateSnapshots(tx); if (type.isEmpty()) type = resource.toStack(); count += inserted; }
+            return inserted;
+        }
+        public int extract(int slot, net.neoforged.neoforge.transfer.item.ItemResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            checkSlot(slot); net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            if (type.isEmpty() || !resource.matches(type)) return 0;
+            int extracted = (int) Math.min(Math.min(amount, type.getMaxStackSize()), count);
+            if (extracted > 0) { updateSnapshots(tx); count -= extracted; if (count == 0) type = ItemStack.EMPTY; }
+            return extracted;
+        }
+    }
+    private final TransferStorage transferStorage = new TransferStorage();
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return transferStorage; }
 }

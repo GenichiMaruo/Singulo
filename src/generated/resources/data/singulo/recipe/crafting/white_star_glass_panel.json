@@ -7,12 +7,8 @@
     "LLL"
   ],
   "key": {
-    "L": {
-      "item": "singulo:white_glass_panel"
-    },
-    "Q": {
-      "tag": "c:gems/quartz"
-    }
+    "L": "singulo:white_glass_panel",
+    "Q": "#c:gems/quartz"
   },
   "result": {
     "id": "singulo:white_star_glass_panel",

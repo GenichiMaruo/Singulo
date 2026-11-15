@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -200,7 +200,7 @@ final class MachineSounds {
     /** 左クリックで操っている間の音と、右クリックでためている間の音（ためるほど高くなる）。 */
     private static void tickHeld(Minecraft mc, LocalPlayer player) {
         boolean holding = mc.screen == null && player.getMainHandItem().getItem() instanceof GravitonManipulatorItem;
-        boolean cooldown = holding && player.getCooldowns().isOnCooldown(player.getMainHandItem().getItem());
+        boolean cooldown = holding && player.getCooldowns().isOnCooldown(player.getMainHandItem());
         boolean operating = holding && !cooldown && mc.options.keyAttack.isDown();
         boolean charging = holding && !cooldown && mc.options.keyUse.isDown() && !player.isShiftKeyDown()
                 && player.getMainHandItem().getItem() instanceof GravitonManipulatorItem m

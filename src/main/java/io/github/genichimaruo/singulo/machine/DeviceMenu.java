@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.item.ExoticCharge;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -191,7 +191,7 @@ public class DeviceMenu extends AbstractContainerMenu {
     }
 
     private static boolean isCassette(ItemStack stack) {
-        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("collapsar_parallel_cassette")));
+        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("collapsar_parallel_cassette")));
     }
 
     public Kind kind() {

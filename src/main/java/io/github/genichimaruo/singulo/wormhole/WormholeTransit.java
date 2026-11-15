@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.wormhole;
 
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -69,7 +69,7 @@ public final class WormholeTransit {
             Arrival a=arrival(mouth,other,target,player);
             if(a==null)continue;
             player.closeContainer();
-            player.teleportTo(target,a.pos().x,a.pos().y,a.pos().z,a.yRot(),player.getXRot());
+            player.teleportTo(target,a.pos().x,a.pos().y,a.pos().z,java.util.Set.of(),a.yRot(),player.getXRot(),false);
             player.setDeltaMovement(a.motion());
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
             player.fallDistance=0;player.setPortalCooldown();
@@ -136,7 +136,7 @@ public final class WormholeTransit {
         // 向こうの開口部の面の少し先（出ていく向き）に、体の中ほどを合わせて置く
         Vec3 out=center(other).add(rotate(rel,turns)).add(motion.normalize().scale(0.05)).subtract(0,shot.getBbHeight()/2,0);
         float yRot=(float)(Mth.atan2(motion.x,motion.z)*(180F/Math.PI));
-        shot.changeDimension(new DimensionTransition(target,out,motion,yRot,shot.getXRot(),DimensionTransition.PLACE_PORTAL_TICKET));
+        shot.teleport(new TeleportTransition(target,out,motion,yRot,shot.getXRot(),TeleportTransition.PLACE_PORTAL_TICKET));
         event.setCanceled(true);
     }
 
@@ -188,7 +188,7 @@ public final class WormholeTransit {
     private static boolean clear(ServerLevel level,Player player,Vec3 at,boolean needFloor){
         double half=player.getBbWidth()/2.0;
         AABB box=new AABB(at.x-half,at.y,at.z-half,at.x+half,at.y+player.getBbHeight(),at.z+half);
-        if(!level.getWorldBorder().isWithinBounds(box)||box.minY<level.getMinBuildHeight()||box.maxY>=level.getMaxBuildHeight())return false;
+        if(!level.getWorldBorder().isWithinBounds(box)||box.minY<level.getMinY()||box.maxY>=(level.getMaxY() + 1))return false;
         for(BlockPos p:BlockPos.betweenClosed(BlockPos.containing(box.minX,box.minY,box.minZ),BlockPos.containing(box.maxX,box.maxY,box.maxZ))){
             if(!level.isLoaded(p)||hazard(level.getBlockState(p))||level.getFluidState(p).is(net.minecraft.tags.FluidTags.LAVA))return false;
         }
@@ -212,7 +212,7 @@ public final class WormholeTransit {
     }
 
     private static boolean safe(ServerLevel level,Player player,BlockPos feet,AABB box){
-        if(!level.getWorldBorder().isWithinBounds(box)||box.minY<level.getMinBuildHeight()||box.maxY>=level.getMaxBuildHeight())return false;
+        if(!level.getWorldBorder().isWithinBounds(box)||box.minY<level.getMinY()||box.maxY>=(level.getMaxY() + 1))return false;
         BlockPos min=BlockPos.containing(box.minX,box.minY-1,box.minZ),max=BlockPos.containing(box.maxX,box.maxY,box.maxZ);
         for(BlockPos p:BlockPos.betweenClosed(min,max)){
             if(!level.isLoaded(p))return false;

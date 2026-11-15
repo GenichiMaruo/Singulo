@@ -2,10 +2,10 @@ package io.github.genichimaruo.singulo.test;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)

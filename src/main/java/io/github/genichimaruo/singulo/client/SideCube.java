@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.ToIntFunction;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
@@ -84,8 +84,7 @@ final class SideCube {
     }
 
     /** マウスの下のいちばん手前の面。なければ null。 */
-    @Nullable
-    SideConfig.Face pick(List<Quad> quads, double mx, double my) {
+    SideConfig.@Nullable Face pick(List<Quad> quads, double mx, double my) {
         SideConfig.Face hit = null;
         for (Quad q : quads) {
             if (q.contains(mx, my)) {
@@ -96,10 +95,10 @@ final class SideCube {
     }
 
     /** 面を色で塗り、縁と、面の頭文字・自動排出の印を描く。 */
-    void draw(GuiGraphics g, Font font, List<Quad> quads, ToIntFunction<SideConfig.Face> color, java.util.function.Predicate<SideConfig.Face> eject,
-              java.util.function.Function<SideConfig.Face, String> label, @Nullable SideConfig.Face hovered) {
-        var vc = g.bufferSource().getBuffer(RenderType.gui());
-        Matrix4f pose = g.pose().last().pose();
+    void draw(GuiGraphicsExtractor g, Font font, List<Quad> quads, ToIntFunction<SideConfig.Face> color, java.util.function.Predicate<SideConfig.Face> eject,
+              java.util.function.Function<SideConfig.Face, String> label, SideConfig.@Nullable Face hovered) {
+
+
         for (Quad q : quads) {
             int c = color.applyAsInt(q.face());
             float shade = q.light() * (q.face() == hovered ? 1.15F : 1F);
@@ -107,25 +106,23 @@ final class SideCube {
             int gr = Math.min(255, (int) (((c >> 8) & 0xFF) * shade));
             int b = Math.min(255, (int) ((c & 0xFF) * shade));
             // 裏表のどちらから描いても見えるよう、両方の巻き順で描く
-            for (int i : new int[]{0, 3, 2, 1, 0, 1, 2, 3}) {
-                vc.addVertex(pose, q.xs()[i], q.ys()[i], 0).setColor(r, gr, b, 255);
-            }
+            g.submitGuiElementRenderState(new GuiQuadState(g, q.xs(), q.ys(), 0xFF000000 | (r << 16) | (gr << 8) | b));
         }
-        g.flush();
+
         for (Quad q : quads) {
             for (int i = 0; i < 4; i++) {
                 int j = (i + 1) % 4;
                 line(g, q.xs()[i], q.ys()[i], q.xs()[j], q.ys()[j], q.face() == hovered ? 0xFFFFFFFF : 0xFF39424A);
             }
             String s = label.apply(q.face());
-            g.drawString(font, s, (int) (q.cx() - font.width(s) / 2F), (int) (q.cy() - 4), 0xFFFFFFFF, true);
+            g.text(font, s, (int) (q.cx() - font.width(s) / 2F), (int) (q.cy() - 4), 0xFFFFFFFF, true);
             if (eject.test(q.face())) {
                 g.fill((int) q.cx() + 3, (int) q.cy() - 6, (int) q.cx() + 6, (int) q.cy() - 3, 0xFFFFFFFF);
             }
         }
     }
 
-    private static void line(GuiGraphics g, float x0, float y0, float x1, float y1, int color) {
+    private static void line(GuiGraphicsExtractor g, float x0, float y0, float x1, float y1, int color) {
         int steps = (int) Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
         for (int k = 0; k <= steps; k++) {
             float t = steps == 0 ? 0 : k / (float) steps;

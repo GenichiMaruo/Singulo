@@ -12,27 +12,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "mekanism:basic_chemical_tank"
-      },
+      "ingredient": "mekanism:basic_chemical_tank",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:ingots/osmium"
-      },
+      "ingredient": "#c:ingots/osmium",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     }
   ],

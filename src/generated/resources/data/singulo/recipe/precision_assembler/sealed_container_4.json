@@ -6,21 +6,15 @@
   "energy": 200000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:sealed_container_3"
-      },
+      "ingredient": "singulo:sealed_container_3",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:gravity_field_stabilizer"
-      },
+      "ingredient": "singulo:gravity_field_stabilizer",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:ergosphere_ring"
-      },
+      "ingredient": "singulo:ergosphere_ring",
       "count": 1
     }
   ],

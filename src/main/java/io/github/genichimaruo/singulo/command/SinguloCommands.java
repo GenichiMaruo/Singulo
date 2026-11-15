@@ -35,14 +35,14 @@ public final class SinguloCommands {
 
     static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("singulo")
-                .then(Commands.literal("build").requires(s -> s.hasPermission(2))
+                .then(Commands.literal("build").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("multiblock", StringArgumentType.word())
                                 .suggests((c, b) -> SharedSuggestionProvider.suggest(
                                         Arrays.stream(Blueprints.Kind.values()).map(Blueprints.Kind::id), b))
                                 .executes(c -> build(c, -1))
                                 .then(Commands.argument("size", IntegerArgumentType.integer(1, 64))
                                         .executes(c -> build(c, IntegerArgumentType.getInteger(c, "size"))))))
-                .then(Commands.literal("blackhole").requires(s -> s.hasPermission(2))
+                .then(Commands.literal("blackhole").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .executes(c -> blackHole(c, null, DEFAULT_BLACK_HOLE_MASS))
                         .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
                                 .executes(c -> blackHole(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(c, "pos"),
@@ -50,7 +50,7 @@ public final class SinguloCommands {
                                 .then(Commands.argument("mass", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(100, 20000))
                                         .executes(c -> blackHole(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(c, "pos"),
                                                 com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c, "mass"))))))
-                .then(Commands.literal("ruin").requires(s -> s.hasPermission(2))
+                .then(Commands.literal("ruin").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("ruin", StringArgumentType.word())
                                 .suggests((c, b) -> SharedSuggestionProvider.suggest(RUINS, b))
                                 .executes(c -> ruin(c, null))
@@ -85,8 +85,7 @@ public final class SinguloCommands {
     }
 
     /** 遺構の構造物を、床の中心が center に来るように置く。置いた大きさを返す（構造物がなければ null）。 */
-    @javax.annotation.Nullable
-    public static net.minecraft.core.Vec3i placeRuin(ServerLevel level, String id, BlockPos center) {
+    public static net.minecraft.core.@org.jspecify.annotations.Nullable Vec3i placeRuin(ServerLevel level, String id, BlockPos center) {
         var template = level.getStructureManager().get(io.github.genichimaruo.singulo.Singulo.id("ruins/" + id));
         if (template.isEmpty()) {
             return null;

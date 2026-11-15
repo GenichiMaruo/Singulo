@@ -6,21 +6,15 @@
   "energy": 50000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:strange_matter"
-      },
+      "ingredient": "singulo:strange_matter",
       "count": 32
     },
     {
-      "ingredient": {
-        "item": "singulo:compressed_metal_block_2"
-      },
+      "ingredient": "singulo:compressed_metal_block_2",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
+      "ingredient": "singulo:entangled_element",
       "count": 1
     }
   ],

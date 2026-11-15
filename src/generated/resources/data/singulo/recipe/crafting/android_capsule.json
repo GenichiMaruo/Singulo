@@ -7,18 +7,10 @@
     "FD "
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_furniture"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "F": {
-      "item": "singulo:lab_frame"
-    },
-    "D": {
-      "tag": "singulo:ceramic_flux"
-    }
+    "B": "singulo:blueprint_lab_furniture",
+    "G": "#c:glass_blocks/colorless",
+    "F": "singulo:lab_frame",
+    "D": "#singulo:ceramic_flux"
   },
   "result": {
     "id": "singulo:android_capsule",

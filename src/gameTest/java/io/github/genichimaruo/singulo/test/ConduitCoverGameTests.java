@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
@@ -74,7 +74,7 @@ public final class ConduitCoverGameTests {
         var collision = framed.getCollisionShape(level, pos);
         h.assertTrue(collision.bounds().equals(new AABB(0, 0, 0, 1, 1, 1)) && !framed.isCollisionShapeFullBlock(level, pos)
                 && !collision.isEmpty(), "Empty frame collision was not a hollow full-size box: " + collision.bounds());
-        h.assertTrue(!framed.isSolidRender(level, pos) && framed.getLightBlock(level, pos) == 0 && framed.propagatesSkylightDown(level, pos)
+        h.assertTrue(!framed.isSolidRender() && framed.getLightDampening() == 0 && framed.propagatesSkylightDown()
                 && !framed.isSuffocating(level, pos), "Empty frame did not let light through like glass");
 
         ItemStack glass = new ItemStack(Items.GLASS, 3);
@@ -88,10 +88,10 @@ public final class ConduitCoverGameTests {
         h.assertTrue(holder.coverState() != null && holder.coverState().is(Blocks.OAK_LOG)
                 && holder.coverState().getValue(RotatedPillarBlock.AXIS) == Direction.Axis.X, "Log did not keep the clicked axis: " + holder.coverState());
         var covered = h.getBlockState(AT);
-        h.assertTrue(covered.isSolidRender(level, pos) && covered.getLightBlock(level, pos) > 0 && covered.isCollisionShapeFullBlock(level, pos),
+        h.assertTrue(covered.isSolidRender() && covered.getLightDampening() > 0 && covered.isCollisionShapeFullBlock(level, pos),
                 "Covered cable did not act as a solid block");
         // 爆発への強さは、はめ込んだ丸太と同じ（ケーブルだけより強い）
-        var blast = new net.minecraft.world.level.Explosion(level, null, pos.getX(), pos.getY(), pos.getZ(), 4, false,
+        var blast = new net.minecraft.world.level.ServerExplosion(level, null, null, null, net.minecraft.world.phys.Vec3.atLowerCornerOf(pos), 4, false,
                 net.minecraft.world.level.Explosion.BlockInteraction.DESTROY);
         float coveredResistance = covered.getExplosionResistance(level, pos, blast);
         float logResistance = Blocks.OAK_LOG.defaultBlockState().getExplosionResistance(level, pos, blast);
@@ -104,7 +104,7 @@ public final class ConduitCoverGameTests {
         var be = level.getBlockEntity(pos);
         var tag = be.saveWithFullMetadata(level.registryAccess());
         holder.setCoverState(null);
-        be.loadWithComponents(tag, level.registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(be,tag, level.registryAccess());
         h.assertTrue(holder.coverState() != null && holder.coverState().getValue(RotatedPillarBlock.AXIS) == Direction.Axis.X,
                 "Reload lost the log or its axis");
 
@@ -129,7 +129,7 @@ public final class ConduitCoverGameTests {
         h.setBlock(AT, SinguloBlocks.COVER_FRAME.get());
         h.setBlock(AT.east(), SinguloBlocks.COPPER_WIRE.get());
         var frame = h.getBlockState(AT);
-        h.assertTrue(frame.getLightBlock(level, pos) == 0 && !frame.isCollisionShapeFullBlock(level, pos)
+        h.assertTrue(frame.getLightDampening() == 0 && !frame.isCollisionShapeFullBlock(level, pos)
                 && frame.getCollisionShape(level, pos).bounds().equals(new AABB(0, 0, 0, 1, 1, 1)), "Placed frame was not a light-passing hollow box");
 
         BlockHitResult hit = new BlockHitResult(pos.getCenter().relative(Direction.UP, 0.5), Direction.UP, pos, false);
@@ -172,9 +172,9 @@ public final class ConduitCoverGameTests {
         h.assertTrue(cover(h) == ConduitCover.State.BLOCK, "Pipe cover was not set");
         // プレイヤーが壊すと、パイプは残して木材 → 枠の順に外れて落ちる
         var fluid = level.getFluidState(pos);
-        h.assertFalse(h.getBlockState(AT).onDestroyedByPlayer(level, pos, player, true, fluid), "Breaking removed the pipe with its cover");
+        h.assertFalse(h.getBlockState(AT).onDestroyedByPlayer(level, pos, player, player.getMainHandItem(), true, fluid), "Breaking removed the pipe with its cover");
         h.assertTrue(cover(h) == ConduitCover.State.FRAME, "First break did not take off the planks");
-        h.assertFalse(h.getBlockState(AT).onDestroyedByPlayer(level, pos, player, true, fluid), "Breaking removed the framed pipe");
+        h.assertFalse(h.getBlockState(AT).onDestroyedByPlayer(level, pos, player, player.getMainHandItem(), true, fluid), "Breaking removed the framed pipe");
         h.assertTrue(cover(h) == ConduitCover.State.NONE && h.getBlockState(AT).is(SinguloBlocks.FLUID_PIPE.get()),
                 "Second break did not take off the frame and keep the pipe");
         var broken = level.getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(2));

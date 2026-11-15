@@ -6,21 +6,15 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:amethyst_shard"
-      },
+      "ingredient": "minecraft:amethyst_shard",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:cold_atoms"
-      },
+      "ingredient": "singulo:cold_atoms",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 1
     }
   ],

@@ -1,9 +1,7 @@
 {
   "type": "minecraft:blasting",
   "category": "misc",
-  "ingredient": {
-    "item": "singulo:raw_meteoric_iron"
-  },
+  "ingredient": "singulo:raw_meteoric_iron",
   "result": {
     "id": "singulo:meteoric_iron_ingot",
     "count": 1

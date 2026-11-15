@@ -9,11 +9,14 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 /** 掘り出された隕石の核の場所（ワールドごと）。隕石コンパスは、ここにある核をもう指さない。 */
 public class MeteorCores extends SavedData {
+    private static final net.minecraft.world.level.saveddata.SavedDataType<MeteorCores> TYPE =
+        io.github.genichimaruo.singulo.compat.LegacySavedDataTypes.create("singulo_meteor_cores", MeteorCores::new, MeteorCores::load, MeteorCores::save);
+
     static final String NAME = "singulo_meteor_cores";
     private final LongOpenHashSet mined = new LongOpenHashSet();
 
     public static MeteorCores get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(MeteorCores::new, MeteorCores::load, null), NAME);
+        return level.getDataStorage().computeIfAbsent(TYPE);
     }
 
     /** その核がもう掘り出されたか。読み込まれている場所なら、置かれているブロックも確かめる。 */
@@ -30,7 +33,6 @@ public class MeteorCores extends SavedData {
         }
     }
 
-    @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putLongArray("mined", mined.toLongArray());
         return tag;
@@ -38,7 +40,7 @@ public class MeteorCores extends SavedData {
 
     static MeteorCores load(CompoundTag tag, HolderLookup.Provider registries) {
         MeteorCores cores = new MeteorCores();
-        for (long p : tag.getLongArray("mined")) {
+        for (long p : tag.getLongArray("mined").orElseGet(() -> new long[0])) {
             cores.mined.add(p);
         }
         return cores;

@@ -9,13 +9,13 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -25,11 +25,11 @@ import net.minecraft.world.phys.Vec3;
  * 円盤は観測者に近づいてくる側が明るい（ドップラー・ビーミング）。大きさは炉心質量に比例し、回転の速さはスピンに比例する。
  * 画面空間の重力レンズは GravitationalLensing が掛ける。
  */
-public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReactorBlockEntity> {
+public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactorBlockEntity> {
     /** 描くときの地平線の半径: 判定の地平線が最小（0.6）のときの大きさと、判定が 1 増えるごとの増え方（炉心と野良ブラックホールで共通）。 */
     private static final float VISIBLE_HORIZON_BASE = 0.39F;
     private static final float VISIBLE_HORIZON_GROWTH = 0.45F;
-    private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
+    private static final Identifier WHITE = Singulo.id("textures/misc/white.png");
     private static final int SPHERE_LAT = 12;
     private static final int SPHERE_LON = 16;
     private static final int DISK_SEGMENTS = 64;
@@ -100,17 +100,17 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             return;
         }
         // レンズを掛けない（設定で切っている・シェーダーパック使用時）: 影と円盤をワールドに描く
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE));
         drawSphere(pose, solid, horizon);
         // 影: 光子球に捕まる光の範囲（地平線の約2.6倍）を、カメラに向いた黒い円板として中心の面に描く。
         // 円盤の手前側は影の上に、奥側は影の後ろになる
         pose.pushPose();
-        pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation());
         drawShadow(pose, solid, shadow);
         pose.popPose();
         // 降着円盤: スピンに比例した速さで回す
         float angle = time * (0.5F + 4.0F * spin);
-        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().position();
         Vec3 toCamera = camera.subtract(worldCenter).normalize();
         pose.pushPose();
         pose.mulPose(Axis.XP.rotation(tilt));
@@ -140,7 +140,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             return 0;
         }
         VertexConsumer glow = GlowDepth.additive(buffers).getBuffer(JetForgeRenderTypes.GLOW);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         double c = Structures.REACTOR_RADIUS * Math.sqrt(0.5) - 0.6;
         float seen = VISIBLE_HORIZON_BASE + (horizon - 0.6F) * VISIBLE_HORIZON_GROWTH;
         float tilt = 12 * Mth.DEG_TO_RAD;
@@ -245,7 +245,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         var blocks = be.collapseBlocks();
         int n = blocks.size();
         float t = time - be.collapseStart();
-        var dispatcher = Minecraft.getInstance().getBlockRenderer();
+        var dispatcher = BlockDraw.get();
         BlockPos origin = be.getBlockPos();
         int fly = 24;
         for (int i = 0; i < n; i++) {
@@ -265,13 +265,13 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             pose.mulPose(Axis.XP.rotationDegrees(k * 360 + i * 11));
             pose.scale(scale, scale, scale);
             pose.translate(-0.5, -0.5, -0.5);
-            dispatcher.renderSingleBlock(be.collapseState(i), pose, buffers, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,
+            dispatcher.renderSingleBlock(be.collapseState(i), pose, buffers, net.minecraft.util.LightCoordsUtil.FULL_BRIGHT,
                     net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
             pose.popPose();
         }
         var level = be.getLevel();
-        if (level != null && level.random.nextInt(2) == 0 && n > 0) {
-            BlockPos p = blocks.get(level.random.nextInt(n));
+        if (level != null && level.getRandom().nextInt(2) == 0 && n > 0) {
+            BlockPos p = blocks.get(level.getRandom().nextInt(n));
             Vec3 v = center.subtract(Vec3.atCenterOf(p)).scale(0.06);
             level.addParticle(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
                     v.x, v.y, v.z);
@@ -286,7 +286,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     private static final int FLASH_TICKS = 40;
 
     /** 点火から稼働に変わった瞬間を見つけ、光と粒を出す。光っている間はその時刻を返す。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private static Long trackFormation(PenroseReactorBlockEntity be, PenroseReactorBlockEntity.State state) {
         long now = be.getLevel().getGameTime();
         PenroseReactorBlockEntity.State last = LAST_STATE.put(be, state);
@@ -294,7 +294,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             FORMED_AT.put(be, now);
             Vec3 c = be.coreCenter();
             var level = be.getLevel();
-            var rnd = level.random;
+            var rnd = level.getRandom();
             for (int i = 0; i < 120; i++) {
                 Vec3 d = new Vec3(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).normalize().scale(0.4 + rnd.nextDouble() * 0.6);
                 level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, c.x, c.y, c.z, d.x, d.y, d.z);
@@ -331,7 +331,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         float power = 0.25F * wake + 0.75F * inject;
         Vec3 center = be.coreCenter();
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         int beamRgb = lerpRgb(0x64DCFF, 0xFFFFFF, power + collapse);
         // 電力が満ちていないうちは、流れ込む光がちらつく
         float flicker = charge >= 1F ? 1F : 0.55F + 0.45F * Mth.sin(t * 2.3F) * Mth.sin(t * 0.7F);
@@ -426,15 +426,15 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         if (collapse > 0.55F) {
             // 黒い地平線が生まれかける
             float k = (collapse - 0.55F) / 0.45F;
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(WHITE)), 0.15F + 0.45F * k * k, 0x000000,
-                    net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE)), 0.15F + 0.45F * k * k, 0x000000,
+                    net.minecraft.util.LightCoordsUtil.FULL_BRIGHT);
         }
         pose.popPose();
 
         // 崩壊: 渦を巻いて吸い込まれる粒
         var level = be.getLevel();
         if (level != null && (inject > 0.5F || collapse > 0)) {
-            var rnd = level.random;
+            var rnd = level.getRandom();
             int n = collapse > 0 ? 6 : 1;
             for (int k = 0; k < n; k++) {
                 if (rnd.nextFloat() > 0.5F + 0.5F * collapse) {
@@ -456,7 +456,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     private static void renderFormationFlash(PenroseReactorBlockEntity be, float age, PoseStack pose, MultiBufferSource buffers) {
         float k = Mth.clamp(age / FLASH_TICKS, 0, 1);
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-        var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(0.5, 0.5 + Structures.CONTROLLER_BELOW_CENTER, 0.5);
         FxDraw.billboard(pose, glow, camera, 9 * (1 - k) + 0.5F, 0xFFFFFF, (int) (255 * (1 - k)));
@@ -581,11 +581,11 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     private static void diskVertex(VertexConsumer vc, PoseStack.Pose last, float x, float z, int r, int g, int b, int a,
                                    float ny) {
         vc.addVertex(last, x, 0, z).setColor(r, g, b, a).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, ny, 0);
+                .setLight(LightCoordsUtil.FULL_BRIGHT).setNormal(last, 0, ny, 0);
     }
 
     @Override
-    public boolean shouldRenderOffScreen(PenroseReactorBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

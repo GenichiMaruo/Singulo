@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity;
 import io.github.genichimaruo.singulo.android.work.RecipeRackMenu;
 import io.github.genichimaruo.singulo.android.work.WorkLocationCardItem;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,19 +20,19 @@ public class RecipeRackScreen extends FramedScreen<RecipeRackMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         renderFrameTooltips(g, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos;
         int y = topPos;
         drawFrame(g, mouseX, mouseY);
-        ItemStack location = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("work_location_card")));
-        ItemStack recipe = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("recipe_card")));
+        ItemStack location = new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("work_location_card")));
+        ItemStack recipe = new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("recipe_card")));
         for (int i = 0; i < RecipeRackBlockEntity.SLOTS; i++) {
             Slot s = menu.getSlot(i);
             ghostSlot(g, x + s.x, y + s.y, s, i % RecipeRackBlockEntity.COLS == 0 ? location : recipe);
@@ -51,21 +51,21 @@ public class RecipeRackScreen extends FramedScreen<RecipeRackMenu> {
 
     /** 作業位置カードは、記録したブロックの絵（右下に小さな印）で見せる。 */
     @Override
-    protected void renderSlot(GuiGraphics g, Slot slot) {
+    protected void extractSlot(GuiGraphicsExtractor g, Slot slot, int mouseX, int mouseY) {
         ItemStack stack = slot.getItem();
         if (slot.index < RecipeRackBlockEntity.SLOTS && slot.index % RecipeRackBlockEntity.COLS == 0 && WorkLocationCardItem.isCard(stack)
                 && WorkLocationCardItem.pos(stack) != null) {
             ItemStack block = new ItemStack(WorkLocationCardItem.block(stack));
             if (!block.isEmpty()) {
-                g.renderItem(block, slot.x, slot.y);
-                g.pose().pushPose();
-                g.pose().translate(0, 0, 200);
+                g.item(block, slot.x, slot.y);
+                g.pose().pushMatrix();
+                g.nextStratum();
                 g.fill(slot.x + 11, slot.y + 11, slot.x + 16, slot.y + 16, 0xFF3A8FB0);
                 g.fill(slot.x + 12, slot.y + 12, slot.x + 15, slot.y + 15, 0xFFBFEFFF);
-                g.pose().popPose();
+                g.pose().popMatrix();
                 return;
             }
         }
-        super.renderSlot(g, slot);
+        super.extractSlot(g, slot, mouseX, mouseY);
     }
 }

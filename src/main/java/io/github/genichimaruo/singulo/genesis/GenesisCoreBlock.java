@@ -2,14 +2,14 @@ package io.github.genichimaruo.singulo.genesis;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -49,38 +49,38 @@ public class GenesisCoreBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return createTickerHelper(type, SinguloBlockEntities.GENESIS_CORE.get(), GenesisCoreBlockEntity::clientTick);
         }
         return createTickerHelper(type, SinguloBlockEntities.GENESIS_CORE.get(), GenesisCoreBlockEntity::serverTick);
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (stack.getItem() instanceof io.github.genichimaruo.singulo.item.HoloProjectorItem
                 || stack.getItem() instanceof io.github.genichimaruo.singulo.item.BuilderWandItem) {
-            return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;   // 形の投影・組み立ては道具の側で
+            return InteractionResult.PASS;   // 形の投影・組み立ては道具の側で
         }
         if (stack.isEmpty() || !(level.getBlockEntity(pos) instanceof GenesisCoreBlockEntity core)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;   // 素手は画面を開く（useWithoutItem）
+            return InteractionResult.TRY_WITH_EMPTY_HAND;   // 素手は画面を開く（useWithoutItem）
         }
-        if (level.isClientSide) {
-            return core.wouldUseItem(stack) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide()) {
+            return core.wouldUseItem(stack) ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (player instanceof ServerPlayer sp && !sp.isSpectator() && core.useItem(sp, stack)) {
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && player instanceof ServerPlayer sp && !sp.isSpectator()
+        if (!level.isClientSide() && player instanceof ServerPlayer sp && !sp.isSpectator()
                 && level.getBlockEntity(pos) instanceof GenesisCoreBlockEntity core) {
             core.useEmpty(sp);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     /** 動き出した炉は、宇宙が生まれるまでつるはしでは崩せない（創造モードなら壊せる）。宇宙を生んだ後は壊して運べる。 */

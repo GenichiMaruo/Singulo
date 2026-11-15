@@ -7,10 +7,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Equipable;
+import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -23,40 +24,38 @@ import net.minecraft.world.level.Level;
  * <p>掛ける高さはピクセル単位で上下に変えられる（持ってスニークして使うと、高さを決める画面が開く）。高さはメガネに残り、
  * 頭に掛けた模型を高さごとに切り替える（アイテムの絵の切り替え {@code singulo:height}）ので、ほかの人にも同じ高さで見える。
  */
-public class SurveyGlassesItem extends Item implements Equipable {
+public class SurveyGlassesItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     /** 掛ける高さの範囲（ピクセル。上が正）。 */
     public static final int MIN_HEIGHT = -4, MAX_HEIGHT = 4;
     private static final String HEIGHT_KEY = "glasses_height";
 
     public SurveyGlassesItem(Properties properties) {
-        super(properties.stacksTo(1));
+        super(properties.stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).setDamageOnHurt(false).build()));
     }
 
-    @Override
     public EquipmentSlot getEquipmentSlot() {
         return EquipmentSlot.HEAD;
     }
 
-    @Override
     public Holder<SoundEvent> getEquipSound() {
         return SoundEvents.ARMOR_EQUIP_GENERIC;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (player.isSecondaryUseActive()) {
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 io.github.genichimaruo.singulo.client.GlassesHeightScreen.open(hand);
             }
-            return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
         }
-        return swapWithEquipmentSlot(this, level, player, hand);
+        return player.getItemInHand(hand).get(DataComponents.EQUIPPABLE).swapWithEquipmentSlot(player.getItemInHand(hand), player);
     }
 
     /** 掛ける高さ（ピクセル。上が正）。 */
     public static int height(ItemStack stack) {
         var data = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
-        int h = data == null ? 0 : data.copyTag().getInt(HEIGHT_KEY);
+        int h = data == null ? 0 : data.copyTag().getIntOr(HEIGHT_KEY, 0);
         return Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, h));
     }
 

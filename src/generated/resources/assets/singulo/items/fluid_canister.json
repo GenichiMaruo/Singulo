@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "singulo:item/fluid_canister",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 16777215
+      },
+      {
+        "type": "singulo:dynamic",
+        "kind": "fluid_canister"
+      }
+    ]
+  }
+}

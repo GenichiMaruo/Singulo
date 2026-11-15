@@ -1,4 +1,6 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
@@ -7,13 +9,11 @@ import io.github.genichimaruo.singulo.machine.RecipeSelection;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
  * 精密組立台の作るものの指定（{@link RecipeSelection}）。材料を入れている途中で、その一部だけでできる別のものが
@@ -27,12 +27,12 @@ public final class RecipeSelectionGameTests {
     private RecipeSelectionGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     private static MachineBlockEntity assembler(GameTestHelper helper, BlockPos pos) {
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, pos);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
         return m;
     }
@@ -60,7 +60,7 @@ public final class RecipeSelectionGameTests {
             var absolute = helper.absolutePos(pos);
             var state = level.getBlockState(absolute);
             MachineBlockEntity restored = new MachineBlockEntity(absolute, state);
-            restored.loadWithComponents(tag, level.registryAccess());
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, tag, level.registryAccess());
             restored.setLevel(level);
             restored.onLoad();
             restored.energy().setEnergy(restored.energy().getMaxEnergyStored());
@@ -125,17 +125,17 @@ public final class RecipeSelectionGameTests {
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
         m.selectRecipe(indexOf(helper, "tipler_bearing"));
         var tag = m.saveWithoutMetadata(helper.getLevel().registryAccess());
-        helper.assertTrue("singulo:precision_assembler/tipler_bearing".equals(tag.getString("selected_recipe")), "指定が保存されない");
+        helper.assertTrue("singulo:precision_assembler/tipler_bearing".equals(tag.getStringOr("selected_recipe", "")), "指定が保存されない");
         m.selectRecipe(-1);
         helper.assertTrue(m.selectedRecipe() == null, "指定が外れない");
-        m.loadWithComponents(tag, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(m, tag, helper.getLevel().registryAccess());
         helper.assertTrue(m.selectedRecipe() != null, "指定が読み込まれない");
         helper.succeed();
     }
     /** /reload replaces recipes in the same RecipeManager, rather than replacing the manager itself. */
     @GameTest(template = EMPTY, batch = "recipe_reload")
     public static void ambiguityCacheFollowsRecipeReload(GameTestHelper helper) {
-        var manager = helper.getLevel().getRecipeManager();
+        var manager = helper.getLevel().recipeAccess();
         var original = java.util.List.copyOf(manager.getRecipes());
         var toroid = RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "toroidal_magnetic_coil"));
         helper.assertTrue(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, toroid),
@@ -147,21 +147,21 @@ public final class RecipeSelectionGameTests {
         MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
         helper.assertTrue(m.status() == MachineBlockEntity.Status.IDLE, "Ambiguous fixture should be idle");
         try {
-            manager.replaceRecipes(java.util.List.of(toroid));
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, java.util.List.of(toroid));
             helper.assertFalse(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, toroid),
                     "Removed recipes still prevent automatic crafting after reload");
             MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             helper.assertTrue(m.status() == MachineBlockEntity.Status.RUNNING,
                     "Unchanged inputs do not resume after recipe reload removes ambiguity");
         } finally {
-            manager.replaceRecipes(original);
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original);
         }
         helper.succeed();
     }
 
     @GameTest(template = EMPTY, batch = "recipe_reload")
     public static void selectedIndexFollowsRecipeReload(GameTestHelper helper) {
-        var manager = helper.getLevel().getRecipeManager();
+        var manager = helper.getLevel().recipeAccess();
         var original = java.util.List.copyOf(manager.getRecipes());
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
         int before = indexOf(helper, "quantum_computing_module");
@@ -171,12 +171,12 @@ public final class RecipeSelectionGameTests {
         var menu = new io.github.genichimaruo.singulo.machine.MachineMenu(1, player.getInventory(), m);
         helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == before + 1, "Initial choice not synchronized");
         try {
-            manager.replaceRecipes(java.util.List.of(selected));
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, java.util.List.of(selected));
             helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == 1,
                     "Selected recipe keeps its obsolete GUI index after reload");
-            helper.assertTrue(m.selectedRecipe().equals(selected.id()), "Reload changed the selected recipe ID");
+            helper.assertTrue(m.selectedRecipe().equals(selected.id().identifier()), "Reload changed the selected recipe ID");
         } finally {
-            manager.replaceRecipes(original);
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original);
             player.discard();
         }
         helper.succeed();

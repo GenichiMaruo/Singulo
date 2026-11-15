@@ -65,7 +65,7 @@ public final class MachineGuiReviewHarness {
         if (mc.screen != fixture) throw new IllegalStateException("GUI fixture closed/replaced before capture");
         Path output = Path.of(System.getProperty("singulo.guiReviewOutput"));
         String name = (SELECTOR ? "selector-" : SIDES ? "sides-" : "machine-") + LANGUAGES[language] + "-" + String.format("%02d", screen);
-        try (var pixels = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+        try (var pixels = ReviewScreenshot.take(mc.getMainRenderTarget())) {
             pixels.writeToFile(output.resolve(name + ".png"));
         }
         Singulo.LOGGER.info("SINGULO_MACHINE_GUI_CAPTURE {}", name);
@@ -99,13 +99,13 @@ public final class MachineGuiReviewHarness {
             int kind=Math.min(screen,2);
             io.github.genichimaruo.singulo.energy.EnergyText.detail=()->screen>=3;
             hoverX=-1;
-            org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(),20,20);
+            org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().handle(),20,20);
             var data=SyncedInts.client(io.github.genichimaruo.singulo.cosmic.CosmicMenu.COUNT);
             int[] values={kind,0,kind==1?4_000_000:19_999,kind==1?8_000_000:20_000,500,250,kind==0?8_000_000:8_000,kind==0?16_000_000:16_000,600,1200,1,net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(net.minecraft.world.level.material.Fluids.WATER)+1,0,1};
             for(int i=0;i<values.length;i++)value(data,i,values[i]);
             var items=new ItemStackHandler(4);
             String[] ids={"collapsar_billet","exotic_matter","singularity_seed","tidal_filament"};
-            for(int i=0;i<4;i++)items.setStackInSlot(i,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(ids[i]))));
+            for(int i=0;i<4;i++)items.setStackInSlot(i,new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id(ids[i]))));
             var menu=new io.github.genichimaruo.singulo.cosmic.CosmicMenu(0,mc.player.getInventory(),BlockPos.ZERO,items,kind,data);
             String[] blocks={"suspension_reservoir","pasta_accumulator","tidal_spindle"};
             mc.setScreen(new CosmicScreen(menu,mc.player.getInventory(),Component.translatable("block.singulo."+blocks[kind])));
@@ -116,7 +116,7 @@ public final class MachineGuiReviewHarness {
             return;
         }
         hoverX = -1;
-        org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
+        org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().handle(), 20, 20);
         int extra = screen - MachineType.values().length;
         if (screen < MachineType.values().length || extra >= 4 && extra <= 6) {
             MachineType type = extra == 4 ? MachineType.CATALYTIC_REACTOR : extra == 5 ? MachineType.PARTICLE_ACCELERATOR
@@ -133,8 +133,8 @@ public final class MachineGuiReviewHarness {
                 value(data, MachineBlockEntity.D_TANKS, net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(net.minecraft.world.level.material.Fluids.WATER) + 1);
                 value(data, MachineBlockEntity.D_TANKS + 1, 250);
             } else if (extra == 5) {
-                items.setStackInSlot(0, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("zinc_ingot"))));
-                items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("bismuth_ingot"))));
+                items.setStackInSlot(0, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("zinc_ingot"))));
+                items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("bismuth_ingot"))));
             }
             var ctor = MachineMenu.class.getDeclaredConstructor(int.class, net.minecraft.world.entity.player.Inventory.class,
                     MachineType.class, BlockPos.class, IItemHandler.class, SyncedInts.class, MachineBlockEntity.class);
@@ -310,7 +310,7 @@ public final class MachineGuiReviewHarness {
             value(data, io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu.D_ENERGY, 600_000);
             value(data, io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu.D_CAPACITY, 1_000_000);
             ItemStackHandler items = new ItemStackHandler(io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity.SLOTS);
-            items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("unstable_wormhole_mouth"))));
+            items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("unstable_wormhole_mouth"))));
             var menu = new io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu(0, mc.player.getInventory(), BlockPos.ZERO, items, data, null);
             mc.setScreen(new WormholeStabilizerScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.wormhole_stabilizer")));
             metrics.add(LANGUAGES[language] + "\tstabilizer\t0\t0\t212");
@@ -398,9 +398,9 @@ public final class MachineGuiReviewHarness {
             value(data, DeviceMenu.Forge.IGNITION_GFE, 25);
             ItemStackHandler items = new ItemStackHandler(kind.slots);
             if (state < 2) items.setStackInSlot(0, new net.minecraft.world.item.ItemStack(
-                    net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("singularity_seed"))));
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("singularity_seed"))));
             if (state == 3) items.setStackInSlot(4, new net.minecraft.world.item.ItemStack(
-                    net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("collapsar_ingot")), 64));
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Singulo.id("collapsar_ingot")), 64));
             var menu = new DeviceMenu(0, mc.player.getInventory(), kind, BlockPos.ZERO, items, data, null);
             mc.setScreen(new DeviceScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.jet_forge_core")));
             metrics.add(LANGUAGES[language] + "\tjet-forge-" + state + "\t0\t0\t" + DeviceMenu.WIDTH);
@@ -468,15 +468,15 @@ public final class MachineGuiReviewHarness {
             return;
         }
         if (event.getScreen() instanceof MachineScreen screen) {
-            var method = MachineScreen.class.getDeclaredMethod(SIDES ? "renderSides" : "renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);
+            var method = MachineScreen.class.getDeclaredMethod(SIDES ? "renderSides" : "renderOwnTooltips", net.minecraft.client.gui.GuiGraphicsExtractor.class, int.class, int.class);
             method.setAccessible(true);
             method.invoke(screen, event.getGuiGraphics(), hoverX, hoverY);
         } else if (event.getScreen() instanceof SupplyPortScreen screen) {
-            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
+            screen.extractRenderState(event.getGuiGraphics(), hoverX, hoverY, 0);
         } else if (event.getScreen() instanceof GeneratorSlotsScreen screen) {
-            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
+            screen.extractRenderState(event.getGuiGraphics(), hoverX, hoverY, 0);
         } else if (event.getScreen() instanceof CatalystDeviceScreen screen) {
-            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
+            screen.extractRenderState(event.getGuiGraphics(), hoverX, hoverY, 0);
         }
     }
 

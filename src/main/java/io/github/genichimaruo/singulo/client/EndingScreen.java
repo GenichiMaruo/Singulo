@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -102,15 +102,15 @@ public class EndingScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         float t = ticks + partialTick;
         int a = (int) (255 * Mth.clamp(t / FADE_IN, 0, 1));
         g.fill(0, 0, width, height, a << 24);
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        renderBackground(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        extractBackground(g, mouseX, mouseY, partialTick);
         float t = ticks + partialTick;
         float dawn = Mth.clamp((t - FADE_IN * 0.6F) / 60F, 0, 1);
         // 遠くの星
@@ -131,12 +131,12 @@ public class EndingScreen extends Screen {
         if (ticks > 100) {
             int alpha = (int) (120 * Mth.clamp((t - 100) / 40F, 0, 1));
             Component hint = Component.translatable(showingSupporters() ? "ending.singulo.supporter_controls" : "ending.singulo.skip");
-            g.drawString(font, hint, width - font.width(hint) - 8, height - 14, (Math.max(4, alpha) << 24) | 0xA0A0A8);
+            g.text(font, hint, width - font.width(hint) - 8, height - 14, (Math.max(4, alpha) << 24) | 0xA0A0A8);
         }
         // 部品はないので Screen#render は呼ばない（呼ぶと背景がもう一度、上から塗られる）
     }
 
-    private void renderStory(GuiGraphics g, float t) {
+    private void renderStory(GuiGraphicsExtractor g, float t) {
         // 言葉
         int maxWidth = Math.min(width - 40, 360);
         int y = height / 2 + 34;
@@ -151,7 +151,7 @@ public class EndingScreen extends Screen {
             List<FormattedCharSequence> wrapped = font.split(lines.get(i), maxWidth);
             if (visibleLines(t) - i <= 2) {
                 for (FormattedCharSequence seq : wrapped) {
-                    g.drawCenteredString(font, seq, width / 2, y, (alpha << 24) | 0xF2EEE4);
+                    g.centeredText(font, seq, width / 2, y, (alpha << 24) | 0xF2EEE4);
                     y += 11;
                 }
                 y += 6;
@@ -160,24 +160,24 @@ public class EndingScreen extends Screen {
         float thanks = Mth.clamp((t - thanksAt()) / 60F, 0, 1);
         if (thanks > 0) {
             int alpha = Math.max(4, (int) (255 * thanks));
-            g.pose().pushPose();
-            g.pose().translate(width / 2F, height / 2F - 70, 0);
-            g.pose().scale(2, 2, 1);
-            g.drawCenteredString(font, Component.translatable("ending.singulo.thanks"), 0, 0, (alpha << 24) | 0xFFE6B8);
-            g.pose().popPose();
-            g.drawCenteredString(font, Component.translatable("ending.singulo.credit"), width / 2, height / 2 - 44,
+            g.pose().pushMatrix();
+            g.pose().translate(width / 2F, height / 2F - 70);
+            g.pose().scale(2, 2);
+            g.centeredText(font, Component.translatable("ending.singulo.thanks"), 0, 0, (alpha << 24) | 0xFFE6B8);
+            g.pose().popMatrix();
+            g.centeredText(font, Component.translatable("ending.singulo.credit"), width / 2, height / 2 - 44,
                     (Math.max(4, (int) (180 * thanks)) << 24) | 0xC8C8D8);
         }
     }
 
-    private void renderSupporters(GuiGraphics g, int mx, int my, float time) {
-        g.pose().pushPose();
-        g.pose().translate(width / 2F, 16, 0);
-        g.pose().scale(1.5F, 1.5F, 1);
-        g.drawCenteredString(font, Component.translatable("ending.singulo.thanks"), 0, 0, 0xFFFFE6B8);
-        g.pose().popPose();
-        g.drawCenteredString(font, Component.translatable("ending.singulo.credit"), width / 2, 36, 0xFFCACAE0);
-        g.drawCenteredString(font, Component.translatable("ending.singulo.supporters"), width / 2, 55, 0xFFE3D8C3);
+    private void renderSupporters(GuiGraphicsExtractor g, int mx, int my, float time) {
+        g.pose().pushMatrix();
+        g.pose().translate(width / 2F, 16);
+        g.pose().scale(1.5F, 1.5F);
+        g.centeredText(font, Component.translatable("ending.singulo.thanks"), 0, 0, 0xFFFFE6B8);
+        g.pose().popMatrix();
+        g.centeredText(font, Component.translatable("ending.singulo.credit"), width / 2, 36, 0xFFCACAE0);
+        g.centeredText(font, Component.translatable("ending.singulo.supporters"), width / 2, 55, 0xFFE3D8C3);
 
         int to = Math.min(supporters.size(), supporterStart + supporterCapacity());
         int rows = (to - supporterStart + supporterColumns - 1) / supporterColumns;
@@ -199,10 +199,10 @@ public class EndingScreen extends Screen {
                 hover = entry;
             }
         }
-        g.drawCenteredString(font, Component.translatable("ending.singulo.supporter_range", supporterStart + 1, to, supporters.size()),
+        g.centeredText(font, Component.translatable("ending.singulo.supporter_range", supporterStart + 1, to, supporters.size()),
                 width / 2, height - 34, 0xFFC7C8D4);
         if (hover != null) {
-            g.renderTooltip(font, font.split(SupporterPlaque.tooltip(hover), 220), mx, my);
+            g.setTooltipForNextFrame(font, font.split(SupporterPlaque.tooltip(hover), 220), mx, my);
         }
     }
 
@@ -220,11 +220,12 @@ public class EndingScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int key, int scan, int mods) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key(), scan = event.scancode(), mods = event.modifiers();
         if ((key == 262 && turnSupporters(1)) || (key == 263 && turnSupporters(-1))) {
             return true;
         }
-        return super.keyPressed(key, scan, mods);
+        return super.keyPressed(event);
     }
 
     @Override
@@ -243,7 +244,7 @@ public class EndingScreen extends Screen {
         return n;
     }
 
-    private void galaxy(GuiGraphics g, float t, float dawn) {
+    private void galaxy(GuiGraphicsExtractor g, float t, float dawn) {
         if (dawn <= 0) {
             return;
         }

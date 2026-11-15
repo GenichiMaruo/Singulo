@@ -37,7 +37,7 @@ public final class MachineDiagnosis {
 
     /** @param selected 指定した作るもの（{@link RecipeSelection}）。null なら自動 */
     public static Result idle(Level level, MachineType type, List<ItemStack> inputs, List<FluidStack> tanks, int structureSize,
-                              @javax.annotation.Nullable RecipeHolder<MachineRecipe> selected) {
+                              @org.jspecify.annotations.Nullable RecipeHolder<MachineRecipe> selected) {
         boolean anything = inputs.stream().anyMatch(s -> !s.isEmpty());
         for (int i = 0; i < type.fluidInputs() && i < tanks.size(); i++) {
             anything |= !tanks.get(i).isEmpty();
@@ -97,7 +97,7 @@ public final class MachineDiagnosis {
                 ? best.fluidResults().get(0).getHoverName() : best.result().getHoverName()));
         Kind kind = Kind.MISSING;
         for (MachineRecipe.ItemInput in : best.ingredients()) {
-            ItemStack[] options = in.ingredient().getItems();
+            ItemStack[] options = in.ingredient().items().map(holder -> new ItemStack(holder)).toArray(ItemStack[]::new);
             Component name = options.length > 0 ? options[0].getHoverName() : Component.literal("?");
             if (in.uses() > 0) {
                 if (inputs.stream().noneMatch(s -> in.usesFrom(s) > 0)) {

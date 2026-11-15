@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.food;
 
 import io.github.genichimaruo.singulo.Singulo;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
@@ -33,7 +33,7 @@ public enum PrintedFood {
             {".SGSgS.", "SgSSgSS", "SSgSSgS", "GSSgSSg", ".SgSSS."}},
             Map.of('s', 0x5A2C1C, 'r', 0xB04038, 'm', 0xD06A60, 'f', 0xF0D8CC, 'S', 0x8C4A2C, 'g', 0x3C1E12, 'G', 0xB8764A)),
     /** らせんパスタ: ねじれたパスタ（明暗の筋）を丸く盛り、上にトマトソースの山、バジルと粉チーズ。食べると採掘速度上昇（1分）。 */
-    SPIRAL_PASTA("spiral_pasta", new int[] {2, 6, 0}, 180, 8, 0.7F, false, false, MobEffects.DIG_SPEED, 20 * 60, new String[][] {
+    SPIRAL_PASTA("spiral_pasta", new int[] {2, 6, 0}, 180, 8, 0.7F, false, false, MobEffects.HASTE, 20 * 60, new String[][] {
             {"..pqp..", ".pqpqp.", "pqpqpqp", "qpqpqpq", "pqpqpqp", ".pqpqp.", "..pqp.."},
             {"..qpq..", ".qPqPq.", "qPqpqPq", "pqrrrqp", "qPqrqPq", ".qPqPq.", "..qpq.."},
             {".......", "..pPp..", ".prRrp.", ".PrRsP.", ".prsrp.", "..pPp..", "......."},
@@ -41,7 +41,7 @@ public enum PrintedFood {
             Map.of('p', 0xF0C870, 'q', 0xD8A850, 'P', 0xFAE0A0, 'r', 0xC83228, 'R', 0xE85840, 's', 0x962018,
                     'v', 0x48A040, 'c', 0xFFF6DC)),
     /** ハニカムケーキ: スポンジ・クリーム・スポンジの層に、ハチミツの六角形のつや。食べると移動速度上昇（1分）。 */
-    HONEYCOMB_CAKE("honeycomb_cake", new int[] {0, 3, 4}, 200, 7, 0.5F, false, false, MobEffects.MOVEMENT_SPEED, 20 * 60, new String[][] {
+    HONEYCOMB_CAKE("honeycomb_cake", new int[] {0, 3, 4}, 200, 7, 0.5F, false, false, MobEffects.SPEED, 20 * 60, new String[][] {
             {".kKkk.", "kkKkkK", "KkkkKk", "kKkkkk", ".kkKk."},
             {".mmmm.", "mmmmmm", "mmmmmm", "mmmmmm", ".mmmm."},
             {".KkkK.", "kKkkKk", "kkKkkK", "KkkKkk", ".kKkk."},
@@ -153,21 +153,22 @@ public enum PrintedFood {
     }
 
     public Item item() {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     public FoodProperties food() {
         FoodProperties.Builder b = new FoodProperties.Builder().nutrition(nutrition).saturationModifier(saturation);
-        if (fast) {
-            b.fast();
-        }
         if (alwaysEdible) {
             b.alwaysEdible();
         }
-        if (effect != null) {
-            Holder<MobEffect> e = effect;
-            b.effect(() -> new MobEffectInstance(e, effectTicks, 0), 1.0F);
-        }
+        return b.build();
+    }
+
+    public net.minecraft.world.item.component.Consumable consumable() {
+        var b = net.minecraft.world.item.component.Consumables.defaultFood();
+        if (fast) b.consumeSeconds(0.8F);
+        if (effect != null) b.onConsume(new net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(
+                new MobEffectInstance(effect, effectTicks, 0), 1.0F));
         return b.build();
     }
 

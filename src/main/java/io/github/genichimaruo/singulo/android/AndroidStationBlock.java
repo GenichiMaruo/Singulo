@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android;
 
 import io.github.genichimaruo.singulo.machine.SimpleMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +23,7 @@ public class AndroidStationBlock extends SimpleMachineBlock<AndroidStationBlockE
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, net.minecraft.core.Direction direction) {
         return level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station ? station.signal() : 0;
     }
 
@@ -41,7 +41,7 @@ public class AndroidStationBlock extends SimpleMachineBlock<AndroidStationBlockE
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station) {
+        if (!level.isClientSide() && placer instanceof Player player && level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station) {
             station.setOwner(player.getUUID());
         }
     }

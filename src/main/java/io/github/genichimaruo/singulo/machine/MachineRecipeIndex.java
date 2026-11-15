@@ -11,12 +11,12 @@ import net.minecraft.world.level.Level;
 /** Immutable station lists shared by machines and menus, rebuilt after recipe/configuration changes. */
 public final class MachineRecipeIndex {
     private MachineRecipeIndex() {}
-    private static final Map<RecipeManager, Snapshot> CACHE = new WeakHashMap<>();
+    private static final Map<Level, Snapshot> CACHE = new WeakHashMap<>();
     private record Lists(List<RecipeHolder<MachineRecipe>> station, List<RecipeHolder<MachineRecipe>> mass,
                          List<RecipeHolder<MachineRecipe>> selectable) {}
     // Values contain recipes only: never keep the weak key (or a Level) alive through the value.
     private record Snapshot(Object recipes, long revision, Map<MachineType, Lists> lists) {}
-    private static final Comparator<RecipeHolder<MachineRecipe>> ID_ORDER = Comparator.comparing(h -> h.id().toString());
+    private static final Comparator<RecipeHolder<MachineRecipe>> ID_ORDER = Comparator.comparing(h -> h.id().identifier().toString());
     private static final Comparator<RecipeHolder<MachineRecipe>> STATION_ORDER = Comparator
             .comparingInt((RecipeHolder<MachineRecipe> h) -> -h.value().priority())
             .thenComparingInt(h -> -(h.value().ingredients().size() + h.value().fluidIngredients().size()
@@ -25,13 +25,13 @@ public final class MachineRecipeIndex {
     static synchronized Object snapshot(Level level) { return cached(level); }
 
     private static Snapshot cached(Level level) {
-        RecipeManager manager = level.getRecipeManager();
-        Object recipes = manager.getRecipes();
+        var recipes = level instanceof net.minecraft.server.level.ServerLevel server
+                ? server.recipeAccess().recipeMap() : io.github.genichimaruo.singulo.recipe.SyncedRecipes.recipes();
         long revision = RecipeTweaks.revision();
-        Snapshot known = CACHE.get(manager);
+        Snapshot known = CACHE.get(level);
         if (known != null && known.recipes == recipes && known.revision == revision) return known;
         Map<String, List<RecipeHolder<MachineRecipe>>> byStation = new HashMap<>();
-        for (var h : manager.getAllRecipesFor(SinguloRecipes.MACHINE.get()))
+        for (var h : recipes.byType(SinguloRecipes.MACHINE.get()))
             byStation.computeIfAbsent(h.value().station(), k -> new ArrayList<>()).add(h);
         Map<MachineType, Lists> lists = new EnumMap<>(MachineType.class);
         for (MachineType type : MachineType.values()) {
@@ -47,7 +47,7 @@ public final class MachineRecipeIndex {
             lists.put(type, new Lists(List.copyOf(station), List.copyOf(mass), List.copyOf(selectable)));
         }
         known = new Snapshot(recipes, revision, lists);
-        CACHE.put(manager, known);
+        CACHE.put(level, known);
         return known;
     }
 

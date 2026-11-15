@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.dye.RgbDyeStationBlockEntity;
 import io.github.genichimaruo.singulo.dye.RgbDyeStationMenu;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -159,7 +159,8 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         // 入力中は文字のキー（E など）で画面を閉じない。Enter で入力を終える
         if (hex != null && hex.isFocused()) {
             if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER || keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER) {
@@ -168,15 +169,16 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
                 return true;
             }
             if (keyCode != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
-                hex.keyPressed(keyCode, scanCode, modifiers);
+                hex.keyPressed(event);
                 return true;
             }
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public boolean mouseClicked(double mx, double my, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mx = event.x(), my = event.y(); int button = event.button();
         if (hex != null && hex.isFocused() && !hex.isMouseOver(mx, my)) {
             hex.setFocused(false);
             refreshHex();
@@ -195,11 +197,12 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, RgbDyeStationMenu.APPLY);
             return true;
         }
-        return super.mouseClicked(mx, my, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dx, double dy) {
+        double mx = event.x(), my = event.y(); int button = event.button();
         if (dragWheel) {
             pickWheel(mx, my);
             return true;
@@ -208,13 +211,14 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
             pickSlider(my);
             return true;
         }
-        return super.mouseDragged(mx, my, button, dx, dy);
+        return super.mouseDragged(event, dx, dy);
     }
 
     @Override
-    public boolean mouseReleased(double mx, double my, int button) {
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double mx = event.x(), my = event.y(); int button = event.button();
         dragWheel = dragSlider = false;
-        return super.mouseReleased(mx, my, button);
+        return super.mouseReleased(event);
     }
 
     /** 画面の値で染められるか（染める物があって、インクが足りる）。 */
@@ -235,7 +239,7 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     // ------------------------------------------------------------------ 描画
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         drawFrame(g, mouseX, mouseY);
         int x = leftPos, y = topPos;
         int wx = x + RgbDyeStationMenu.WHEEL_X, wy = y + RgbDyeStationMenu.WHEEL_Y, size = RgbDyeStationMenu.WHEEL_SIZE;
@@ -300,30 +304,30 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         if (overApply(mouseX, mouseY)) {
-            g.renderComponentTooltip(font, applyTooltip(), mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, applyTooltip(), mouseX, mouseY);
             return;
         }
         int qx = leftPos + RgbDyeStationMenu.SWATCH_X, qy = topPos + RgbDyeStationMenu.SWATCH_Y;
         if (Panel.inside(mouseX, mouseY, qx, qy, RgbDyeStationMenu.SWATCH_SIZE, RgbDyeStationMenu.SWATCH_SIZE)) {
-            g.renderTooltip(font, Component.literal(String.format("#%06X", rgb())), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.literal(String.format("#%06X", rgb())), mouseX, mouseY);
             return;
         }
         if (overWheel(mouseX, mouseY)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.rgb_dye_station.wheel"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.rgb_dye_station.wheel"), mouseX, mouseY);
             return;
         }
         if (overSlider(mouseX, mouseY)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.rgb_dye_station.brightness"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.rgb_dye_station.brightness"), mouseX, mouseY);
             return;
         }
         for (int i = 0; i < RgbDyeStationBlockEntity.INKS; i++) {
             var s = menu.getSlot(i);
             if (Panel.inside(mouseX, mouseY, leftPos + s.x - 1, topPos + s.y + 18, 18, 6)) {
-                g.renderTooltip(font, Component.translatable("gui.singulo.rgb_dye_station.ink." + i, menu.ink(i), RgbDyeStationBlockEntity.MAX_INK),
+                g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.rgb_dye_station.ink." + i, menu.ink(i), RgbDyeStationBlockEntity.MAX_INK),
                         mouseX, mouseY);
                 return;
             }
@@ -349,8 +353,8 @@ public class RgbDyeStationScreen extends FramedScreen<RgbDyeStationMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         AndroidStationScreen.fit(g, font, title, titleLabelX, titleLabelY, titleWidth(), skin.text());
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
     }
 }

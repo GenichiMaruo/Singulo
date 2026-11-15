@@ -1,4 +1,4 @@
-"""Compare the same unobstructed floor under natural noon and artificial noon at rainy midnight."""
+"""Compare lighting under identical fog-free near-range conditions; retain real rain fog separately."""
 import argparse
 import json
 from pathlib import Path
@@ -11,6 +11,9 @@ names = ['01-clear-noon-reference', '02-powered-rainy-night', '03-unpowered-rain
 images = [Image.open(a.directory / (name + '.png')).convert('RGB') for name in names]
 if any(image.size != (1280, 800) for image in images):
     raise SystemExit('Expected four full-size 1280 x 800 captures')
+rain_fog = Image.open(a.directory / "05-powered-natural-rain-fog.png").convert("RGB")
+if rain_fog.size != (1280, 800):
+    raise SystemExit("Expected additional full-size unmodified rainy-fog capture")
 region = (500, 350, 780, 650)
 crops = [image.crop(region) for image in images]
 if ImageChops.difference(crops[0], crops[1]).getbbox() or ImageChops.difference(crops[1], crops[3]).getbbox():
@@ -18,7 +21,8 @@ if ImageChops.difference(crops[0], crops[1]).getbbox() or ImageChops.difference(
 darkening = [x - y for x, y in zip(ImageStat.Stat(crops[1]).mean, ImageStat.Stat(crops[2]).mean)]
 if min(darkening) < 100:
     raise SystemExit('Power-off capture did not become dark')
-result = {'region': region, 'compared_pixels': 84000, 'different_RGB_channels_noon_vs_rainy_night': 0,
+result = {'region': region, 'lighting_fixture_environmental_fog': [32, 1024],
+          'unmodified_rain_fog_evidence': '05-powered-natural-rain-fog.png', 'compared_pixels': 84000, 'different_RGB_channels_noon_vs_rainy_night': 0,
           'different_RGB_channels_powered_vs_repowered': 0, 'power_off_mean_RGB_drop': darkening}
 (a.directory / 'pixels.json').write_text(json.dumps(result, indent=2) + '\n')
 canvas = Image.new('RGB', (1120, 330), '#20252b')

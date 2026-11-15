@@ -14,7 +14,7 @@ import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -50,7 +50,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * <li>指令台そのものも資材口を兼ねる（隣のストレージも素材置き場）。レシピカードへの記録も、指令台の画面でできる。</li>
  * </ul>
  */
-public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+public class WorkConsoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         MenuProvider, AndroidEyes.Holder {
     final AdjacentItemStores adjacentItems = new AdjacentItemStores(this);
 
@@ -182,7 +182,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private final Set<BlockPos> links = new LinkedHashSet<>();
     private UUID escrowConsoleIdentity = UUID.randomUUID();
     public UUID escrowConsoleIdentity() { return escrowConsoleIdentity; }
-    @Nullable private AndroidEscrowData.Entry escrowEntry(WorkOrder order) {
+    private AndroidEscrowData.@Nullable Entry escrowEntry(WorkOrder order) {
         if (order == null || order.escrowRequest == null || !(level instanceof ServerLevel server)) return null;
         var e = AndroidEscrowData.get(server).find(order.escrowRequest);
         return e != null && e.consoleIdentity.equals(escrowConsoleIdentity) && e.console.equals(worldPosition)
@@ -616,7 +616,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (ItemStack out : r.outputs()) if (ChemicalSamples.is(out) || !escrow && FluidSamples.liquid(out)) return false;
         for (ItemCount in : r.inputs()) {
             if (unsupportedMaterial(in.item, escrow)) return false;
-            if (in.alt != null) for (ItemStack a : in.alt.getItems()) if (unsupportedMaterial(a, escrow)) return false;
+            if (in.alt != null) for (ItemStack a : in.alt.items().map(holder -> new ItemStack(holder)).toList()) if (unsupportedMaterial(a, escrow)) return false;
         }
         return true;
     }
@@ -1027,7 +1027,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** その面から、物か流体を出し入れできるか。 */
     private boolean handles(BlockPos pos, net.minecraft.core.Direction face) {
-        return level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, face) != null
+        return io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, pos, face) != null
                 || LiquidStores.handles(level, pos, face);
     }
 
@@ -1127,8 +1127,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             for (ItemCount in : inputs) {
                 ItemCount.add(now, in.item, in.count * (crafts - done));
-                if (in.item.hasCraftingRemainingItem()) {
-                    ItemCount.add(now, in.item.getCraftingRemainingItem(), in.count * done);   // バケツなど、作ると残る物
+                if (in.item.getItem().getCraftingRemainder(in.item) != null) {
+                    ItemCount.add(now, in.item.getItem().getCraftingRemainder(in.item).create(), in.count * done);   // バケツなど、作ると残る物
                 }
             }
             ItemCount.add(now, recipe.output(), (long) recipe.outputCount() * done);
@@ -1153,8 +1153,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     // ------------------------------------------------------------------ 作業の受け渡し（アンドロイドから）
 
     /** 注文の作業で、ブロックを壊してよいか確かめるときの「だれとして」（注文した人。いなければ持ち主）。 */
-    @Nullable
-    public java.util.UUID actorFor(int orderId) {
+    public java.util.@Nullable UUID actorFor(int orderId) {
         WorkOrder o = order(orderId);
         return o != null && o.orderer != null ? o.orderer : owner;
     }
@@ -1569,8 +1568,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             peak = Math.max(peak, peakStacks(b.recipe(), b.crafts(), rest(carry, b.recipe(), b.crafts())));
             for (ItemCount in : b.recipe().inputs()) {
                 ItemCount.add(carry, in.item, -in.count * b.crafts());
-                if (in.item.hasCraftingRemainingItem()) {
-                    ItemCount.add(carry, in.item.getCraftingRemainingItem(), in.count * b.crafts());     // 残る物は、このあとも持っている
+                if (in.item.getItem().getCraftingRemainder(in.item) != null) {
+                    ItemCount.add(carry, in.item.getItem().getCraftingRemainder(in.item).create(), in.count * b.crafts());     // 残る物は、このあとも持っている
                 }
             }
             ItemCount.add(carry, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
@@ -1668,13 +1667,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return new BusyLocations(parked, leased);
     }
 
-    private static boolean locationBusy(BusyLocations busy, BlockPos pos, @Nullable WorkOrder.StepState self) {
+    private static boolean locationBusy(BusyLocations busy, BlockPos pos, WorkOrder.@Nullable StepState self) {
         int own = self != null && self.parked > 0 && pos.equals(self.location) ? 1 : 0;
         return busy.leased.contains(pos) || busy.parked.getOrDefault(pos, 0) > own;
     }
 
-    @Nullable
-    private WorkJob.Lease lease(int jobId) {
+    private WorkJob.@Nullable Lease lease(int jobId) {
         for (WorkJob.Lease l : leases) {
             if (l.job.jobId() == jobId) {
                 return l;
@@ -2429,7 +2427,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 持ち物を point へ戻す。candidates があれば、そのうちのほかの場所の方が返却の優先度が高い物は戻さずに持っておく
      * （その物の分は false になる。あとでその場所へ戻しに行く）。
      */
-    public boolean depositAt(RuinAndroid a, @Nullable WorkJob job, BlockPos point, @Nullable java.util.Collection<BlockPos> candidates) {
+    public boolean depositAt(RuinAndroid a, @Nullable WorkJob job, BlockPos point, java.util.@Nullable Collection<BlockPos> candidates) {
         WorkOrder o = job == null ? null : order(job.orderId());
         if (a.escrowRequest() != null) {
             var data = AndroidEscrowData.get((ServerLevel) level); var e = data.find(a.escrowRequest());
@@ -2795,8 +2793,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             grid.set(i, encoder.getItem(i).copyWithCount(1));
         }
         net.minecraft.world.item.crafting.CraftingInput input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, grid);
-        ItemStack result = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
-                .map(r -> r.value().assemble(input, server.registryAccess())).orElse(ItemStack.EMPTY);
+        ItemStack result = server.recipeAccess().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
+                .map(r -> r.value().assemble(input)).orElse(ItemStack.EMPTY);
         encoder.setItem(RESULT, result);
     }
 
@@ -2993,7 +2991,6 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 手順を足す: 場所は作業位置カード A（採掘なら B があれば、A と B で囲った範囲）、物は見本の欄（採掘で空なら、カードの完成品）。
      * 足せなければ、その理由。
      */
-    @Nullable
     /** 同じ種類の別の物も使うかを、全部の欄でまとめて切り替える（作業台モード。全部オンなら全部オフ、そうでなければ全部オン）。 */
     public void toggleVariants() {
         variantMask = variantMask == ALL_VARIANTS ? 0 : ALL_VARIANTS;
@@ -3027,7 +3024,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 g.set(i, grid.get(i).copyWithCount(1));
             }
             var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, g);
-            matched = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
+            matched = server.recipeAccess().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
                     .map(h -> h.value()).orElse(null);
         }
         var assigned = alternativeSlots(matched, grid);
@@ -3035,13 +3032,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             ItemStack s = grid.get(i);
             String alt = "";
             if (!s.isEmpty() && (variantMask >> i & 1) != 0) {
-                for (var ing : List.of(assigned.get(i))) {
-                    if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1
-                            && validAlternatives(matched, grid, i, ing)) {
-                        alt = ItemCount.key(ing);
-                        break;
-                    }
-                }
+                var ing = assigned.get(i);
+                if (ing != null && !ing.isEmpty() && ing.test(s) && ing.items().limit(2).count() > 1
+                        && validAlternatives(matched, grid, i, ing)) alt = ItemCount.key(ing);
             }
             out.add(alt);
         }
@@ -3051,8 +3044,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** Assign each physical slot once, including the chosen shaped orientation. */
     private static List<net.minecraft.world.item.crafting.Ingredient> alternativeSlots(
             net.minecraft.world.item.crafting.CraftingRecipe recipe, List<ItemStack> grid) {
-        var empty = net.minecraft.world.item.crafting.Ingredient.EMPTY;
+        net.minecraft.world.item.crafting.Ingredient empty = null;
         List<net.minecraft.world.item.crafting.Ingredient> out = new ArrayList<>(java.util.Collections.nCopies(grid.size(), empty));
+        if (recipe instanceof io.github.genichimaruo.singulo.recipe.SmesUpgradeRecipe upgrade) recipe = upgrade.shapedRecipe();
         if (recipe instanceof net.minecraft.world.item.crafting.ShapedRecipe shaped) {
             int left = 3, top = 3;
             for (int i = 0; i < grid.size(); i++) if (!grid.get(i).isEmpty()) {
@@ -3063,8 +3057,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 for (int y = 0; y < shaped.getHeight(); y++) for (int x = 0; x < shaped.getWidth(); x++) {
                     int index = (top + y) * 3 + left + x;
                     var ingredient = shaped.getIngredients().get(y * shaped.getWidth() + (mirror ? shaped.getWidth() - 1 - x : x));
-                    if (index >= grid.size() || !ingredient.test(grid.get(index))) matches = false;
-                    else out.set(index, ingredient);
+                    if (index >= grid.size() || !net.minecraft.world.item.crafting.Ingredient.testOptionalIngredient(ingredient, grid.get(index))) matches = false;
+                    else out.set(index, ingredient.orElse(null));
                 }
                 if (matches) return out;
                 java.util.Collections.fill(out, empty);
@@ -3073,8 +3067,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             List<Integer> slots = new ArrayList<>();
             List<ItemStack> inputs = new ArrayList<>();
             for (int i = 0; i < grid.size(); i++) if (!grid.get(i).isEmpty()) { slots.add(i); inputs.add(grid.get(i)); }
-            int[] mapping = net.neoforged.neoforge.common.util.RecipeMatcher.findMatches(inputs, recipe.getIngredients());
-            if (mapping != null) for (int i = 0; i < mapping.length; i++) out.set(slots.get(i), recipe.getIngredients().get(mapping[i]));
+            int[] mapping = net.neoforged.neoforge.common.util.RecipeMatcher.findMatches(inputs, recipe.placementInfo().ingredients());
+            if (mapping != null) for (int i = 0; i < mapping.length; i++) out.set(slots.get(i), recipe.placementInfo().ingredients().get(mapping[i]));
         }
         return out;
     }
@@ -3085,7 +3079,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                                       net.minecraft.world.item.crafting.Ingredient ingredient) {
         if (recipe == null || level == null) return false;
         List<ItemStack> probe = new ArrayList<>(grid);
-        for (ItemStack candidate : ingredient.getItems()) {
+        for (ItemStack candidate : ingredient.items().map(holder -> new ItemStack(holder)).toList()) {
             probe.set(slot, candidate.copyWithCount(1));
             if (!recipe.matches(net.minecraft.world.item.crafting.CraftingInput.of(3, 3, probe), level)) return false;
         }
@@ -3268,7 +3262,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             setOwner(player.getUUID());
         }
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return;
         }
         player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
@@ -3316,21 +3310,21 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putUUID("escrow_console_identity", escrowConsoleIdentity);
+        tag.store("escrow_console_identity", net.minecraft.core.UUIDUtil.CODEC, escrowConsoleIdentity);
         if (owner != null) {
-            tag.putUUID("owner", owner);
+            tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
         }
-        tag.put("permit", permit.serializeNBT(registries));
-        tag.put("routes", routes.serializeNBT(registries));
+        tag.put("permit", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(permit, registries));
+        tag.put("routes", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(routes, registries));
         ListTag ls = new ListTag();
         for (BlockPos p : links) {
-            ls.add(NbtUtils.writeBlockPos(p));
+            ls.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(p));
         }
         tag.put("links", ls);
         ListTag endpoints = new ListTag();
         endpointLinks.forEach((p, link) -> {
             CompoundTag e = new CompoundTag(); e.putLong("pos", p.asLong());
-            e.putUUID("identity", link.identity()); e.putUUID("owner", link.owner()); endpoints.add(e);
+            e.store("identity", net.minecraft.core.UUIDUtil.CODEC, link.identity()); e.store("owner", net.minecraft.core.UUIDUtil.CODEC, link.owner()); endpoints.add(e);
         });
         tag.put("work_endpoints_v1", endpoints);
         ListTag os = new ListTag();
@@ -3347,7 +3341,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (WorkJob.Lease lease : leases) {
             CompoundTag job = new CompoundTag();
             job.put("job", lease.job.save(registries));
-            job.putUUID("worker", lease.worker);
+            job.store("worker", net.minecraft.core.UUIDUtil.CODEC, lease.worker);
             job.putLong("last_beat", lease.lastBeat);
             job.putLong("remaining_delivery", lease.remainingDelivery);
             jobs.add(job);
@@ -3364,7 +3358,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (int i = 0; i < ENCODER_SLOTS; i++) {
             enc.set(i, encoder.getItem(i));
         }
-        tag.put("encoder", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), enc, registries));
+        tag.put("encoder", io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(new CompoundTag(), enc, registries));
         tag.putInt("encoder_mode", mode);
         tag.putInt("step_kind", stepKind);
         tag.putInt("step_option", stepOption);
@@ -3379,57 +3373,57 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (int i = 0; i < OUTBOX_SLOTS; i++) {
             box.set(i, outbox.getItem(i));
         }
-        tag.put("outbox", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), box, registries));
+        tag.put("outbox", io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(new CompoundTag(), box, registries));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        escrowConsoleIdentity = tag.hasUUID("escrow_console_identity") ? tag.getUUID("escrow_console_identity") : UUID.randomUUID();
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        escrowConsoleIdentity = tag.read("escrow_console_identity", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("escrow_console_identity", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : UUID.randomUUID();
+        owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         if (tag.contains("permit")) {
-            permit.deserializeNBT(registries, tag.getCompound("permit"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(permit, registries, tag.getCompoundOrEmpty("permit"));
         }
-        CompoundTag rt = tag.getCompound("routes");
+        CompoundTag rt = tag.getCompoundOrEmpty("routes");
         rt.putInt("Size", PathRule.SLOTS);
-        routes.deserializeNBT(registries, rt);
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(routes, registries, rt);
         links.clear();
         endpointLinks.clear();
-        for (Tag entry : tag.getList("work_endpoints_v1", Tag.TAG_COMPOUND)) {
+        for (Tag entry : tag.getListOrEmpty("work_endpoints_v1")) {
             CompoundTag e = (CompoundTag) entry;
-            BlockPos p = BlockPos.of(e.getLong("pos"));
-            if (endpointLinks.size() < 64 && e.hasUUID("identity") && e.hasUUID("owner")
+            BlockPos p = BlockPos.of(e.getLongOr("pos", 0L));
+            if (endpointLinks.size() < 64 && e.read("identity", net.minecraft.core.UUIDUtil.CODEC).isPresent() && e.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent()
                     && !p.equals(worldPosition) && p.closerThan(worldPosition, LINK_RANGE))
-                endpointLinks.putIfAbsent(p, new EndpointLink(e.getUUID("identity"), e.getUUID("owner")));
+                endpointLinks.putIfAbsent(p, new EndpointLink(e.read("identity", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(), e.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow()));
         }
-        for (Tag t : tag.getList("links", Tag.TAG_INT_ARRAY)) {
-            NbtUtils.readBlockPos(wrap(t), "p").ifPresent(links::add);
+        for (Tag t : tag.getListOrEmpty("links")) {
+            io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(wrap(t), "p").ifPresent(links::add);
         }
         orders.clear();
-        for (Tag t : tag.getList("orders", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("orders")) {
             WorkOrder o = WorkOrder.load((CompoundTag) t, registries);
             if (o != null) {
                 orders.add(o);
             }
         }
         externalOrders.clear();
-        for (Tag t : tag.getList("external_orders_v1", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("external_orders_v1")) {
             var entry = ExternalOrderLedger.load((CompoundTag) t, registries);
             if (entry != null && externalOrders.size() < AndroidOrders.MAX_RECEIPTS) externalOrders.putIfAbsent(entry.request, entry);
         }
-        nextOrderId = Math.max(1, tag.getInt("next_order"));
-        nextJobId = Math.max(1, tag.getInt("next_job"));
+        nextOrderId = Math.max(1, tag.getIntOr("next_order", 0));
+        nextJobId = Math.max(1, tag.getIntOr("next_job", 0));
         leases.clear();
         restoredLeases = true;
-        for (Tag element : tag.getList("leases", Tag.TAG_COMPOUND)) {
+        for (Tag element : tag.getListOrEmpty("leases")) {
             CompoundTag t = (CompoundTag) element;
-            WorkJob job = WorkJob.load(t.getCompound("job"), registries);
+            WorkJob job = WorkJob.load(t.getCompoundOrEmpty("job"), registries);
             WorkOrder order = job == null ? null : order(job.orderId());
-            if (job == null || order == null || !t.hasUUID("worker")) {
+            if (job == null || order == null || !t.read("worker", net.minecraft.core.UUIDUtil.CODEC).isPresent()) {
                 continue;
             }
-            var lease = new WorkJob.Lease(job, t.getUUID("worker"), t.getLong("last_beat"));
-            lease.remainingDelivery = Math.max(0, Math.min(job.amount(), t.getLong("remaining_delivery")));
+            var lease = new WorkJob.Lease(job, t.read("worker", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(), t.getLongOr("last_beat", 0L));
+            lease.remainingDelivery = Math.max(0, Math.min(job.amount(), t.getLongOr("remaining_delivery", 0L)));
             leases.add(lease);
             nextJobId = Math.max(nextJobId, job.jobId() + 1);
             if (job.type() == WorkJob.Type.CRAFT) {
@@ -3443,25 +3437,25 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         standing.clear();
-        for (Tag t : tag.getList("standing", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("standing")) {
             StandingOrder s = StandingOrder.load((CompoundTag) t, registries);
             if (s != null) {
                 standing.add(s);
             }
         }
-        nextStandingId = Math.max(1, tag.getInt("next_standing"));
-        powered = tag.getBoolean("powered");
+        nextStandingId = Math.max(1, tag.getIntOr("next_standing", 0));
+        powered = tag.getBooleanOr("powered", false);
         net.minecraft.core.NonNullList<ItemStack> enc = net.minecraft.core.NonNullList.withSize(ENCODER_SLOTS, ItemStack.EMPTY);
-        net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("encoder"), enc, registries);
-        mode = Math.floorMod(tag.getInt("encoder_mode"), MODES);
-        stepKind = Math.floorMod(tag.getInt("step_kind"), ProcedureStep.KINDS);
-        stepOption = tag.contains("step_option") ? tag.getInt("step_option") : ProcedureStep.defaultOption(stepKind);
-        faces = tag.contains("faces") ? tag.getInt("faces") : RecipeData.DEFAULT_FACES;
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag.getCompoundOrEmpty("encoder"), enc, registries);
+        mode = Math.floorMod(tag.getIntOr("encoder_mode", 0), MODES);
+        stepKind = Math.floorMod(tag.getIntOr("step_kind", 0), ProcedureStep.KINDS);
+        stepOption = tag.contains("step_option") ? tag.getIntOr("step_option", 0) : ProcedureStep.defaultOption(stepKind);
+        faces = tag.contains("faces") ? tag.getIntOr("faces", 0) : RecipeData.DEFAULT_FACES;
         // 0.11 までは全部の欄でまとめた切り替えだった
-        variantMask = tag.contains("variant_mask") ? tag.getInt("variant_mask") & ALL_VARIANTS
-                : tag.getBoolean("variants") ? ALL_VARIANTS : 0;
+        variantMask = tag.contains("variant_mask") ? tag.getIntOr("variant_mask", 0) & ALL_VARIANTS
+                : tag.getBooleanOr("variants", false) ? ALL_VARIANTS : 0;
         procSteps.clear();
-        for (Tag t : tag.getList("proc_steps", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("proc_steps")) {
             if (procSteps.size() < RecipeData.MAX_STEPS) {
                 procSteps.add(ProcedureStep.load((CompoundTag) t, registries));
             }
@@ -3470,7 +3464,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             encoder.setItem(i, enc.get(i));
         }
         net.minecraft.core.NonNullList<ItemStack> box = net.minecraft.core.NonNullList.withSize(OUTBOX_SLOTS, ItemStack.EMPTY);
-        net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("outbox"), box, registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag.getCompoundOrEmpty("outbox"), box, registries);
         for (int i = 0; i < OUTBOX_SLOTS; i++) {
             outbox.setItem(i, box.get(i));
         }
@@ -3480,5 +3474,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         CompoundTag c = new CompoundTag();
         c.put("p", t);
         return c;
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return net.neoforged.neoforge.transfer.item.VanillaContainerWrapper.of(outbox);
     }
 }

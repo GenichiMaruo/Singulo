@@ -2,7 +2,6 @@ package io.github.genichimaruo.singulo.client;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -10,20 +9,22 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import io.github.genichimaruo.singulo.Singulo;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.RegisterShadersEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import com.mojang.blaze3d.pipeline.*;
+import com.mojang.blaze3d.platform.CompareOp;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.Optional;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4fStack;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
 /**
  * ワールドの光（entityTranslucentEmissive の白い絵）の描き方を2つ直す。どちらもブロックエンティティをすべて描き終えた時点にまとめて描く。
@@ -36,51 +37,35 @@ import org.lwjgl.opengl.GL30;
  * 鍛造炉のジェットとビームだけは、ワールドを描き終えたあとで足す（{@link #additive}）。
  * シェーダーパック使用時は深度の扱いが違うので何もしない。
  */
-final class GlowDepth extends RenderType {
-    @Nullable
-    private static ShaderInstance shader;
-
-    private static final RenderType TYPE = create("singulo_glow_depth", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
-            1536, false, false, CompositeState.builder()
-                    .setShaderState(new ShaderStateShard(() -> shader))
-                    .setWriteMaskState(DEPTH_WRITE)
-                    .setCullState(NO_CULL)
-                    .createCompositeState(false));
-
-    /** 光そのもの（entityTranslucentEmissive と同じ描き方で、面を遠い順に並べ替える）。 */
-    private static final RenderType COLOR = create("singulo_glow_sorted", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
-            1536, false, true, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                    .setTextureState(new TextureStateShard(FxDraw.WHITE, false, false))
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setCullState(NO_CULL)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .setOverlayState(OVERLAY)
-                    .createCompositeState(false));
-
-    /**
-     * 管の中の液体（液体パイプ）の色。深度は書かず、面を遠い順に並べて重ねる。深度を書くと、並べ替えの順がずれた所で手前の面が
-     * 奥の面をはじいて、面が抜けて見える（中心の箱・腕・流れの帯が重なり合うため）。
-     */
-    private static final RenderType FLUID_COLOR = create("singulo_pipe_fluid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
-            1536, false, true, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
-                    .setTextureState(new TextureStateShard(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS, false, false))
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false));
-
-    /** 管の中の液体の深度（色のあとに、同じ形を深度だけ書く。あとから描く窓のガラスや水が、液体の手前に割り込まないように）。 */
-    private static final RenderType FLUID_DEPTH = create("singulo_pipe_fluid_depth", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
-            1536, false, false, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
-                    .setTextureState(new TextureStateShard(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS, false, false))
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY)
-                    .setWriteMaskState(DEPTH_WRITE)
-                    .createCompositeState(false));
+final class GlowDepth {
+    private static final RenderPipeline DEPTH_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withLocation(Singulo.id("pipeline/glow_depth")).withVertexShader(Singulo.id("core/glow_depth"))
+            .withFragmentShader(Singulo.id("core/glow_depth"))
+            .withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.QUADS)
+            .withColorTargetState(new ColorTargetState(Optional.empty(), ColorTargetState.WRITE_NONE))
+            .withDepthStencilState(DepthStencilState.DEFAULT).withCull(false).build();
+    private static final RenderPipeline COLOR_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
+            .withLocation(Singulo.id("pipeline/glow_sorted")).withSampler("Sampler1")
+            .withShaderDefine("ALPHA_CUTOUT",0.1F).withShaderDefine("PER_FACE_LIGHTING")
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL,false)).withCull(false).build();
+    private static RenderPipeline fluidPipeline(boolean depth) {
+        return RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET).withLocation(Singulo.id("pipeline/pipe_fluid_"+depth))
+                .withSampler("Sampler1").withShaderDefine("ALPHA_CUTOUT",0.1F)
+                .withColorTargetState(depth ? new ColorTargetState(Optional.empty(),ColorTargetState.WRITE_NONE) : new ColorTargetState(BlendFunction.TRANSLUCENT))
+                .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL,depth)).withCull(true).build();
+    }
+    private static final RenderPipeline FLUID_COLOR_PIPELINE=fluidPipeline(false), FLUID_DEPTH_PIPELINE=fluidPipeline(true);
+    private static final RenderType TYPE=RenderType.create("singulo_glow_depth",RenderSetup.builder(DEPTH_PIPELINE).createRenderSetup());
+    private static final RenderType COLOR=RenderType.create("singulo_glow_sorted",RenderSetup.builder(COLOR_PIPELINE)
+            .withTexture("Sampler0",FxDraw.WHITE).useOverlay().sortOnUpload().createRenderSetup());
+    private static RenderType fluidType(String name,RenderPipeline pipeline,boolean sort) {
+        var setup=RenderSetup.builder(pipeline).withTexture("Sampler0",net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay();
+        if(sort)setup.sortOnUpload();
+        return RenderType.create(name,setup.createRenderSetup());
+    }
+    private static final RenderType FLUID_COLOR=fluidType("singulo_pipe_fluid",FLUID_COLOR_PIPELINE,true);
+    private static final RenderType FLUID_DEPTH=fluidType("singulo_pipe_fluid_depth",FLUID_DEPTH_PIPELINE,false);
 
     private static final MultiBufferSource.BufferSource FLUID_SOURCE = fluidSource();
 
@@ -96,10 +81,10 @@ final class GlowDepth extends RenderType {
      * 深度の順にまとめて描く。ワールドの外やシェーダーパック使用時は、これまでどおりの描き方（{@link FluidLook#buffer}）。
      */
     static VertexConsumer fluid(MultiBufferSource buffers) {
-        if (!active || GravitationalLensing.shaderPackInUse()) {
+        if (!isActive() || GravitationalLensing.shaderPackInUse()) {
             return FluidLook.buffer(buffers);
         }
-        return VertexMultiConsumer.create(FLUID_SOURCE.getBuffer(FLUID_COLOR), FLUID_SOURCE.getBuffer(FLUID_DEPTH));
+        return VertexMultiConsumer.create(route(buffers, FLUID_SOURCE, FLUID_COLOR), route(buffers, FLUID_SOURCE, FLUID_DEPTH));
     }
 
     private static final MultiBufferSource.BufferSource SOURCE = MultiBufferSource.immediate(new ByteBufferBuilder(1 << 18));
@@ -134,12 +119,12 @@ final class GlowDepth extends RenderType {
      */
     static MultiBufferSource additive(MultiBufferSource buffers) {
         return type -> {
-            if (!active || GravitationalLensing.shaderPackInUse()
+            if (!isActive() || GravitationalLensing.shaderPackInUse()
                     || type != JetForgeRenderTypes.GLOW && type != JetForgeRenderTypes.BEAM_TYPE) {
                 return buffers.getBuffer(type);
             }
             jetsPending = true;
-            return JET_SOURCE.getBuffer(type);
+            return route(buffers, JET_SOURCE, type);
         };
     }
 
@@ -177,7 +162,7 @@ final class GlowDepth extends RenderType {
     /** 炉心 core の炉のジェットの組を、このフレームに作る。ワールドの外やシェーダーパック使用時は null（ふつうの入れ物に描く）。 */
     @Nullable
     static JetGroup group(Vec3 core) {
-        if (!active || GravitationalLensing.shaderPackInUse()) {
+        if (!isActive() || GravitationalLensing.shaderPackInUse()) {
             return null;
         }
         JetGroup g = new JetGroup(core, pooledSource(), pooledSource());
@@ -196,10 +181,10 @@ final class GlowDepth extends RenderType {
             }
             if (near) {
                 group.nearPending = true;
-                return group.near.getBuffer(type);
+                return route(buffers, group.near, type);
             }
             group.farPending = true;
-            return group.far.getBuffer(type);
+            return route(buffers, group.far, type);
         };
     }
 
@@ -218,12 +203,12 @@ final class GlowDepth extends RenderType {
     /** 重力レンズのあとで足す光の入れ物（ワールドの外やシェーダーパック使用時は、ふつうの入れ物）。 */
     static MultiBufferSource afterLensing(MultiBufferSource buffers) {
         return type -> {
-            if (!active || GravitationalLensing.shaderPackInUse()
+            if (!isActive() || GravitationalLensing.shaderPackInUse()
                     || type != JetForgeRenderTypes.GLOW && type != JetForgeRenderTypes.BEAM_TYPE) {
                 return buffers.getBuffer(type);
             }
             latePending = true;
-            return LATE_SOURCE.getBuffer(type);
+            return route(buffers, LATE_SOURCE, type);
         };
     }
 
@@ -248,7 +233,7 @@ final class GlowDepth extends RenderType {
 
     /** このフレームのジェットの通り道を覚える（レンズとの前後を決めるのに使う）。 */
     static void jetPath(Vec3 core, Vec3 from, Vec3 to) {
-        if (active && !GravitationalLensing.shaderPackInUse()) {
+        if (isActive() && !GravitationalLensing.shaderPackInUse()) {
             JET_PATHS.add(new JetPath(core, from, to));
         }
     }
@@ -283,46 +268,64 @@ final class GlowDepth extends RenderType {
     /** ワールドの中で光を描いている間だけ true（手に持った物や画面の絵は対象にしない）。 */
     private static boolean active;
 
-    private GlowDepth(String name, VertexFormat format, VertexFormat.Mode mode, int size, boolean crumbling, boolean sort,
-                      Runnable setup, Runnable clear) {
-        super(name, format, mode, size, crumbling, sort, setup, clear);
+    private GlowDepth() {}
+    private static int extractionDepth;
+    static void beginExtract() { extractionDepth++; }
+    static void endExtract() { extractionDepth--; }
+    private static boolean isActive() { return active || extractionDepth > 0; }
+    private record Route(MultiBufferSource.BufferSource source, RenderType actual) {}
+    private static final java.util.Map<RenderType,Route> ROUTES = new java.util.IdentityHashMap<>();
+    private static VertexConsumer route(MultiBufferSource buffers, MultiBufferSource.BufferSource source, RenderType actual) {
+        if (extractionDepth == 0) return source.getBuffer(actual);
+        for (var e : ROUTES.entrySet()) if (e.getValue().source == source && e.getValue().actual == actual) return buffers.getBuffer(e.getKey());
+        RenderType marker=RenderType.create("singulo_deferred_"+ROUTES.size(),RenderSetup.builder(actual.pipeline()).createRenderSetup());
+        ROUTES.put(marker,new Route(source,actual));
+        return buffers.getBuffer(marker);
+    }
+    static boolean submitDeferred(SnapshotBlockRenderer.Batch batch, PoseStack pose) {
+        Route route=ROUTES.get(batch.type());
+        if(route==null)return false;
+        VertexConsumer output=route.source.getBuffer(route.actual);
+        var transform=pose.last();
+        for(var v:batch.vertices()) output.addVertex(transform,v.x(),v.y(),v.z()).setColor(v.color()).setUv(v.u(),v.v())
+                .setOverlay(v.overlay()).setLight(v.light()).setNormal(transform,v.nx(),v.ny(),v.nz()).setLineWidth(v.width());
+        return true;
     }
 
     /** 光の入れ物。白い絵の光だけまとめて描く（模様のある絵は透ける所まで深度に書いてしまうので、これまでどおり）。 */
-    static VertexConsumer of(MultiBufferSource buffers, ResourceLocation texture) {
-        if (!active || shader == null || !FxDraw.WHITE.equals(texture) || GravitationalLensing.shaderPackInUse()) {
-            return buffers.getBuffer(RenderType.entityTranslucentEmissive(texture));
+    static VertexConsumer of(MultiBufferSource buffers, Identifier texture) {
+        if (!isActive() || !FxDraw.WHITE.equals(texture) || GravitationalLensing.shaderPackInUse()) {
+            return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(texture));
         }
-        return VertexMultiConsumer.create(SOURCE.getBuffer(TYPE), COLOR_SOURCE.getBuffer(COLOR));
+        return VertexMultiConsumer.create(route(buffers, SOURCE, TYPE), route(buffers, COLOR_SOURCE, COLOR));
     }
 
-    static void registerShaders(RegisterShadersEvent event) {
-        try {
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), Singulo.id("glow_depth"), DefaultVertexFormat.NEW_ENTITY),
-                    s -> shader = s);
-        } catch (IOException e) {
-            // 読めなければ深度を書かない（これまでどおりの見た目）で続ける
-            Singulo.LOGGER.error("光の深度のシェーダーを読めなかった", e);
-        }
+    static void registerShaders(RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(DEPTH_PIPELINE);event.registerPipeline(COLOR_PIPELINE);
+        event.registerPipeline(FLUID_COLOR_PIPELINE);event.registerPipeline(FLUID_DEPTH_PIPELINE);
     }
 
     static void onRenderStage(RenderLevelStageEvent event) {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY) {
+        if (event instanceof RenderLevelStageEvent.AfterSky) {
             active = true;
-        } else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
+        } else if (event instanceof RenderLevelStageEvent.AfterTranslucentFeatures) {
             active = false;
             // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
             net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
             // 管の中の液体: 色を遠い順に重ねてから、深度を書く
-            FLUID_SOURCE.endBatch(FLUID_COLOR);
-            FLUID_SOURCE.endBatch(FLUID_DEPTH);
-            COLOR_SOURCE.endBatch();
-            SOURCE.endBatch();
+            Matrix4fStack modelView=RenderSystem.getModelViewStack();
+            modelView.pushMatrix();
+            try {
+                modelView.set(event.getModelViewMatrix());
+                FLUID_SOURCE.endBatch(FLUID_COLOR);
+                FLUID_SOURCE.endBatch(FLUID_DEPTH);
+                COLOR_SOURCE.endBatch();
+                SOURCE.endBatch();
+            } finally { modelView.popMatrix(); }
             if (anyPending()) {
                 RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
                 solidDepth = sized(solidDepth, main);
                 copyDepth(main, solidDepth);
-                main.bindWrite(false);
             }
         }
     }
@@ -354,6 +357,7 @@ final class GlowDepth extends RenderType {
             drawJets(event, g, false);
             drawJets(event, g, true);
         }
+        ROUTES.clear();
         GROUPS.clear();
         pooled = 0;
         JET_PATHS.clear();
@@ -372,37 +376,22 @@ final class GlowDepth extends RenderType {
         laterDepth = sized(laterDepth, main);
         copyDepth(main, laterDepth);
         copyDepth(solidDepth, main);
-        main.bindWrite(false);
         Matrix4fStack modelView = RenderSystem.getModelViewStack();
         modelView.pushMatrix();
-        modelView.set(event.getModelViewMatrix());
-        RenderSystem.applyModelViewMatrix();
-        source.endBatch();
-        modelView.popMatrix();
-        RenderSystem.applyModelViewMatrix();
-        copyDepth(laterDepth, main);
-        main.bindWrite(false);
+        try {
+            modelView.set(event.getModelViewMatrix());
+            source.endBatch();
+        } finally {
+            modelView.popMatrix();
+            copyDepth(laterDepth, main);
+        }
     }
 
     /** main と同じ大きさ・形式の深度の置き場。 */
     private static TextureTarget sized(@Nullable TextureTarget target, RenderTarget main) {
-        if (target != null && target.width == main.width && target.height == main.height
-                && target.isStencilEnabled() == main.isStencilEnabled()) {
-            return target;
-        }
-        if (target != null) {
-            target.destroyBuffers();
-        }
-        TextureTarget created = new TextureTarget(main.width, main.height, true, net.minecraft.client.Minecraft.ON_OSX);
-        if (main.isStencilEnabled()) {
-            created.enableStencil();
-        }
-        return created;
+        if(target!=null && target.width==main.width && target.height==main.height && target.useStencil==main.useStencil)return target;
+        if(target!=null)target.destroyBuffers();
+        return new TextureTarget("Singulo deferred depth",main.width,main.height,true,main.useStencil);
     }
-
-    private static void copyDepth(RenderTarget from, RenderTarget to) {
-        GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, from.frameBufferId);
-        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, to.frameBufferId);
-        GlStateManager._glBlitFrameBuffer(0, 0, from.width, from.height, 0, 0, to.width, to.height, GL11.GL_DEPTH_BUFFER_BIT, GL11.GL_NEAREST);
-    }
+    private static void copyDepth(RenderTarget from, RenderTarget to) { to.copyDepthFrom(from); }
 }

@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.ruin.lab;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.Singulo;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -76,24 +76,24 @@ public class VendingMachineBlock extends AndroidCapsuleBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
                                               BlockHitResult hit) {
         if (!stack.is(Items.EMERALD)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             buy(state, level, pos, player, stack, hit);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide) {
-            player.displayClientMessage(Component.translatable(state.getValue(POWERED) ? "lab.singulo.vending.how" : "lab.singulo.vending"), true);
+        if (!level.isClientSide()) {
+            player.sendOverlayMessage(Component.translatable(state.getValue(POWERED) ? "lab.singulo.vending.how" : "lab.singulo.vending"));
             level.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.6F, 1.2F);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     /** エメラルドで、押した列の飲み物を買う。買えたら飲み物を返す（止まっている・足りない・正面以外なら null）。 */
@@ -103,12 +103,12 @@ public class VendingMachineBlock extends AndroidCapsuleBlock {
         String fail = !state.getValue(POWERED) ? "lab.singulo.vending" : col < 0 ? "lab.singulo.vending.how"
                 : emeralds.getCount() < PRICES[col] ? "lab.singulo.vending.short" : null;
         if (fail != null) {
-            player.displayClientMessage(col >= 0 && fail.endsWith("short") ? Component.translatable(fail, PRICES[col]) : Component.translatable(fail), true);
+            player.sendOverlayMessage(col >= 0 && fail.endsWith("short") ? Component.translatable(fail, PRICES[col]) : Component.translatable(fail));
             level.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.6F, 1.2F);
             return null;
         }
         emeralds.consume(PRICES[col], player);
-        ItemStack drink = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(DRINKS[col])));
+        ItemStack drink = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(DRINKS[col])));
         // 下半分の取り出し口から、正面へ出す
         BlockPos lower = state.getValue(HALF) == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER ? pos : pos.below();
         Block.popResourceFromFace(level, lower, state.getValue(FACING), drink.copy());

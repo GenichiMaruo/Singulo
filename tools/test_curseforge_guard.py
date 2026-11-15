@@ -6,6 +6,20 @@ import curseforge_guard as guard
 
 
 class GuardTests(unittest.TestCase):
+    def test_2612_neoforge_lock_is_version_scoped_and_revision_independent(self):
+        tag = 'v0.19.0-26.1.2N'
+        self.assertEqual(guard.ref_name(tag), guard.PREFIX + tag)
+        self.assertEqual(guard.ref_name(tag + '-r2'), guard.ref_name(tag))
+        self.assertNotEqual(guard.ref_name(tag), guard.ref_name('v0.19.0'))
+        for invalid in ['v0.19.0-26.1.2F', 'v0.19.0-26.1.1N', 'v0.19.0-26.1.2', 'v0.19.0-26.1.2N/other']:
+            with self.subTest(invalid=invalid), self.assertRaises(guard.GuardError): guard.ref_name(invalid)
+
+    def test_2612_workflow_digest_matches_exact_reviewed_bytes(self):
+        import hashlib
+        root = Path(__file__).resolve().parent.parent
+        digest = hashlib.sha256((root / '.github/workflows/publish-curseforge.yml').read_bytes().replace(b'\r\n',b'\n')).hexdigest()
+        self.assertEqual(guard.WORKFLOW_DIGESTS['26.1.2'], digest)
+
     def test_complete_paginated_listing_finds_multiple_drafts_for_same_tag(self):
         calls = []
         def api(endpoint):
@@ -67,6 +81,7 @@ class GuardTests(unittest.TestCase):
 
     def test_protocol_not_deployed_or_changed_is_not_ready(self):
         root = Path(guard.__file__).resolve().parent.parent
+        # The reviewed 26.1.2 publisher now has a pinned permanent-lock protocol.
         self.assertTrue(guard.workflow_ready(root))
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp)
@@ -76,7 +91,7 @@ class GuardTests(unittest.TestCase):
             helper = dest / 'tools/curseforge_guard.py'
             helper.write_bytes(Path(guard.__file__).read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n'))
             workflow = dest / '.github/workflows/publish-curseforge.yml'
-            (dest / 'gradle.properties').write_bytes((root / 'gradle.properties').read_bytes())
+            (dest / 'gradle.properties').write_text('minecraft_version=26.1.2\n')
             workflow.write_bytes((root / '.github/workflows/publish-curseforge.yml').read_bytes())
             self.assertTrue(guard.workflow_ready(dest))
             workflow.write_text(workflow.read_text().replace('      - name: Acquire permanent', '      - if: false\n        name: Acquire permanent'))

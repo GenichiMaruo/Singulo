@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:reactor_shell"
-      },
+      "ingredient": "singulo:reactor_shell",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:degenerate_matter_shell"
-      },
+      "ingredient": "singulo:degenerate_matter_shell",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     }
   ],

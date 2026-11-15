@@ -8,7 +8,7 @@ parser.add_argument('--build-dir', default='build')
 build = Path(parser.parse_args().build_dir).resolve()
 if build == Path.cwd().resolve() or not build.is_relative_to(Path.cwd().resolve()):
     raise SystemExit('The disposable build directory must be inside this checkout')
-source = build / 'gametest/world/level.dat'
+source = build / 'gametest/gametestserver/gametestworld/level.dat'
 if not source.is_file():
     raise SystemExit('Run GameTests before preparing the preview world')
 root = build / 'occlusion-review'
@@ -17,6 +17,11 @@ for target in (root / 'saves/Review', root / 'screenshots'):
         shutil.rmtree(target)
 (root / 'saves/Review').mkdir(parents=True)
 shutil.copy2(source, root / 'saves/Review/level.dat')
-(root / 'options.txt').write_text('tutorialStep:none\nlang:en_us\nguiScale:2\nmaxFps:120\nenableVsync:false\nrenderDistance:6\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nonboardAccessibility:false\ngraphicsMode:1\nbobView:false\n', encoding='utf-8')
+# Since 26.1, dimensions/world-generation metadata is stored outside level.dat.
+worldgen = source.parent / 'data/minecraft/world_gen_settings.dat'
+if not worldgen.is_file():
+    raise SystemExit('Missing 26.1 world generation metadata; run GameTests first')
+shutil.copytree(source.parent / 'data', root / 'saves/Review/data')
+(root / 'options.txt').write_text('tutorialStep:none\nlang:en_us\nguiScale:2\nmaxFps:120\nenableVsync:false\nrenderDistance:6\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nsoundCategory_master:0.0\nonboardAccessibility:false\ngraphicsMode:1\nbobView:false\n', encoding='utf-8')
 (root / 'config').mkdir(exist_ok=True)
 (root / 'config/fml.toml').write_text('earlyWindowControl = false\n', encoding='utf-8')

@@ -25,7 +25,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * <p>段階（{@link #tier}）が上の台ほど速く作り、預かり箱も大きく、アンドロイドの充電の減りも少ない: 段階2 は4倍速・27枠、
  * 段階3（改良型）は8倍速・54枠・減り6割、段階4（量子）は20倍速・81枠・減り3割。上の段階の台は、前の段階の台を素材にして作る。
  */
-public class AndroidWorkbenchBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+public class AndroidWorkbenchBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         AndroidEyes.Holder {
     /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
     protected final AndroidEyes eyes = new AndroidEyes();
@@ -114,7 +114,7 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
         // 空のデータはクライアントで読まれない（前に見せた物が残る）ので、空になったときも印を送る
         tag.putBoolean("sync", true);
         if (!firstStored().isEmpty()) {
-            tag.put("shown", firstStored().copyWithCount(1).save(registries));
+            tag.put("shown", io.github.genichimaruo.singulo.compat.NbtCompat.save(firstStored().copyWithCount(1), registries));
         }
         return tag;
     }
@@ -131,7 +131,7 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
             protected void onContentsChanged(int slot) {
                 setChanged();
                 ItemStack now = firstStored();
-                if (level != null && !level.isClientSide && !ItemStack.isSameItemSameComponents(now, shown)) {
+                if (level != null && !level.isClientSide() && !ItemStack.isSameItemSameComponents(now, shown)) {
                     shown = now.copyWithCount(1);
                     level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
                 }
@@ -156,7 +156,7 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
     @Override
     public void openMenu(ServerPlayer player) {
         if (bufferEmpty()) {
-            player.displayClientMessage(Component.translatable("message.singulo.android_workbench.hint"), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.android_workbench.hint"));
             return;
         }
         // 預かっている物を渡す（取りに来られなくなった物を取り出すため）
@@ -166,7 +166,7 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
                 player.drop(s, false);
             }
         }
-        player.displayClientMessage(Component.translatable("message.singulo.android_workbench.buffer_taken"), true);
+        player.sendOverlayMessage(Component.translatable("message.singulo.android_workbench.buffer_taken"));
     }
 
     @Override
@@ -179,15 +179,15 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("buffer", buffer.serializeNBT(registries));
+        tag.put("buffer", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(buffer, registries));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("buffer")) {
-            buffer.deserializeNBT(registries, tag.getCompound("buffer"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(buffer, registries, tag.getCompoundOrEmpty("buffer"));
         }
-        shown = tag.contains("shown") ? ItemStack.parseOptional(registries, tag.getCompound("shown")) : firstStored().copyWithCount(1);
+        shown = tag.contains("shown") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("shown")) : firstStored().copyWithCount(1);
     }
 }

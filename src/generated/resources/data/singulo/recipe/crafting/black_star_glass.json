@@ -7,12 +7,8 @@
     "LLL"
   ],
   "key": {
-    "L": {
-      "item": "singulo:black_reinforced_glass"
-    },
-    "Q": {
-      "tag": "c:gems/quartz"
-    }
+    "L": "singulo:black_reinforced_glass",
+    "Q": "#c:gems/quartz"
   },
   "result": {
     "id": "singulo:black_star_glass",

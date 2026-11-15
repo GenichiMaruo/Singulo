@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -18,8 +18,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class BlackHoleBomb extends ThrowableItemProjectile {
     /** 捕らえて吸い込もうとしている最後の記録者（いる間は開かない）。 */
-    @javax.annotation.Nullable
-    private java.util.UUID captor;
+    private java.util.@org.jspecify.annotations.Nullable UUID captor;
 
     /** 最後の記録者に捕らえられる（着弾せず、記録者の頭の特異点へ吸い込まれていく）。 */
     public void capture(net.minecraft.world.entity.Entity by) {
@@ -32,15 +31,14 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
     }
 
     /** 打ち返したウォーデン。 */
-    @javax.annotation.Nullable
-    private java.util.UUID deflector;
+    private java.util.@org.jspecify.annotations.Nullable UUID deflector;
 
     public BlackHoleBomb(EntityType<? extends BlackHoleBomb> type, Level level) {
         super(type, level);
     }
 
     public BlackHoleBomb(Level level, LivingEntity owner) {
-        super(SinguloEntities.BLACK_HOLE_BOMB.get(), owner, level);
+        super(SinguloEntities.BLACK_HOLE_BOMB.get(), owner, level, new net.minecraft.world.item.ItemStack(SinguloItems.BLACK_HOLE_BOMB.get()));
     }
 
     /** ウォーデンが打ち返した印をつける（同じウォーデンはもう打ち返さない）。 */
@@ -80,13 +78,13 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
             double speed = Math.min(0.9, 0.25 + tickCount * 0.02);
             setDeltaMovement(dir.scale(speed).add(side.scale(Math.min(0.5, d * 0.06))));
             setPos(position().add(getDeltaMovement()));
-            hasImpulse = true;
+            needsSync = true;
             server.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY(), getZ(), 3, 0.1, 0.1, 0.1, 0.05);
             server.sendParticles(ParticleTypes.END_ROD, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
             return;
         }
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             level().addParticle(ParticleTypes.REVERSE_PORTAL, getX(), getY(), getZ(), 0, 0, 0);
         }
     }
@@ -97,13 +95,13 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
             return;                                     // 捕らえられている間は、何に当たっても開かない
         }
         super.onHit(result);
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         Vec3 at = result.getLocation();
         if (result instanceof BlockHitResult block) {
             // ブロックに当たったら、面から少し離れた所に開く
-            at = at.add(Vec3.atLowerCornerOf(block.getDirection().getNormal()).scale(0.6));
+            at = at.add(Vec3.atLowerCornerOf(block.getDirection().getUnitVec3i()).scale(0.6));
         }
         if (deflector != null && level() instanceof net.minecraft.server.level.ServerLevel server
                 && server.getEntity(deflector) instanceof io.github.genichimaruo.singulo.ruin.HorizonWarden warden
@@ -111,7 +109,7 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
                 * io.github.genichimaruo.singulo.ruin.HorizonWarden.BOMB_SAFE_DISTANCE) {
             // ウォーデンの近くでは開かせない（打ち返しが壁に当たった場合など）。光って消える
             server.sendParticles(ParticleTypes.REVERSE_PORTAL, at.x, at.y, at.z, 40, 0.4, 0.4, 0.4, 0.3);
-            server.sendParticles(ParticleTypes.FLASH, at.x, at.y, at.z, 1, 0, 0, 0, 0);
+            server.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), at.x, at.y, at.z, 1, 0, 0, 0, 0);
             level().playSound(null, at.x, at.y, at.z, net.minecraft.sounds.SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(),
                     net.minecraft.sounds.SoundSource.HOSTILE, 1.5F, 1.4F);
             discard();

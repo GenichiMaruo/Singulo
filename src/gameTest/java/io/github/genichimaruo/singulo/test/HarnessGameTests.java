@@ -1,10 +1,11 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.gametest.framework.*;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)

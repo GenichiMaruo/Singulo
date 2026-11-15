@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** スライドドアの扉の位置（クライアントだけで動かす。0 閉 〜 1 開）。読み込んだときは、今の開け閉めの位置から始める。 */
-public class SlidingDoorBlockEntity extends BlockEntity {
+public class SlidingDoorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     /** 1 tick に動く分（約5 tick で開ききる）。 */
     static final float SPEED = 0.2F;
     private float slide, previous;

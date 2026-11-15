@@ -26,7 +26,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * 1 tick に1層ずつ調べ続ける。右クリックで表示を入れると、近くのプレイヤー全員に、見つけたものの輪郭が浮かび上がり続ける。
  * 映る鉱石はスキャナーと同じく感度の段階で決まり、ニュートリノ感度モジュールを使って上げる。
  */
-public class NeutrinoObservatoryBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class NeutrinoObservatoryBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int RADIUS = 48;
     public static final int SHOW_RANGE = 48;
     public static final int FE_PER_TICK = 1_000;
@@ -130,8 +130,8 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
     public void openMenu(ServerPlayer player) {
         display = !display;
         setChanged();
-        player.displayClientMessage(Component.translatable(display ? "gui.singulo.observatory.on" : "gui.singulo.observatory.off",
-                lastOres, lastRuins).append(Component.translatable("gui.singulo.observatory.tier", tier)), true);
+        player.sendOverlayMessage(Component.translatable(display ? "gui.singulo.observatory.on" : "gui.singulo.observatory.off",
+                lastOres, lastRuins).append(Component.translatable("gui.singulo.observatory.tier", tier)));
         player.level().playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.0F, display ? 0.9F : 0.6F);
     }
 
@@ -146,10 +146,10 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
         if (tag.contains("display")) {
-            display = tag.getBoolean("display");
+            display = tag.getBooleanOr("display", false);
         }
-        tier = Math.max(1, tag.getInt("tier"));
+        tier = Math.max(1, tag.getIntOr("tier", 0));
     }
 }

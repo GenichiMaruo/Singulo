@@ -8,27 +8,29 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 /** キー割り当て。重力操作道具の範囲切り替え（既定 G）。 */
 public final class SinguloKeys {
+    private static final KeyMapping.Category CATEGORY = new KeyMapping.Category(io.github.genichimaruo.singulo.Singulo.id("singulo"));
     public static final KeyMapping TOGGLE_AREA = new KeyMapping("key.singulo.toggle_area", InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_G, "key.categories.singulo");
+            GLFW.GLFW_KEY_G, CATEGORY);
     /** カーソルを合わせた物（画面の外では手に持った物）の、ハンドブックのページを開く。 */
     public static final KeyMapping HANDBOOK = new KeyMapping("key.singulo.handbook_lookup", InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_H, "key.categories.singulo");
+            GLFW.GLFW_KEY_H, CATEGORY);
 
     private SinguloKeys() {}
 
     static void register(RegisterKeyMappingsEvent event) {
+        event.registerCategory(CATEGORY);
         event.register(TOGGLE_AREA);
         event.register(HANDBOOK);
     }
 
     /** 持ち物などの画面で、カーソルを合わせた Singulo の物のハンドブックのページを開く。 */
     static void onScreenKey(net.neoforged.neoforge.client.event.ScreenEvent.KeyPressed.Pre event) {
-        if (!HANDBOOK.isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))
+        if (!HANDBOOK.isActiveAndMatches(InputConstants.getKey(new net.minecraft.client.input.KeyEvent(event.getKeyCode(), event.getScanCode(), event.getModifiers())))
                 || !(event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen)
                 || screen.getFocused() instanceof net.minecraft.client.gui.components.EditBox) {
             return;                                    // 文字を打っている間は、ふつうの文字として打てるように
@@ -66,12 +68,12 @@ public final class SinguloKeys {
         boolean down = holding && mc.options.keyAttack.isDown();
         if (down != leftDown && mc.getConnection() != null) {
             leftDown = down;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
+            ClientPacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
         }
         boolean right = holding && mc.options.keyUse.isDown() && !mc.player.isShiftKeyDown();
         if (right != rightDown && mc.getConnection() != null) {
             rightDown = right;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
+            ClientPacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
         }
         while (HANDBOOK.consumeClick()) {
             if (mc.player != null && mc.screen == null) {
@@ -84,7 +86,7 @@ public final class SinguloKeys {
             }
             for (InteractionHand hand : InteractionHand.values()) {
                 if (mc.player.getItemInHand(hand).getItem() instanceof GravityGauntletItem g && g.supportsCone()) {
-                    PacketDistributor.sendToServer(ToggleAreaPayload.INSTANCE);
+                    ClientPacketDistributor.sendToServer(ToggleAreaPayload.INSTANCE);
                     break;
                 }
             }

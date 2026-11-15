@@ -6,40 +6,28 @@
   "energy": 1000000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:degenerate_matter_shell"
-      },
+      "ingredient": "singulo:degenerate_matter_shell",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_catalyst"
-      },
+      "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 54000
     },
     {
-      "ingredient": {
-        "tag": "singulo:star_core"
-      },
+      "ingredient": "#singulo:star_core",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:anomaly_sample"
-      },
+      "ingredient": "singulo:anomaly_sample",
       "uses": 1
     }
   ],

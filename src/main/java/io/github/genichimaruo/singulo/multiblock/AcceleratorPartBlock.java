@@ -48,16 +48,15 @@ public class AcceleratorPartBlock extends PartBlock {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
         super.onPlace(state, level, pos, oldState, moved);
-        if (!level.isClientSide && !oldState.is(state.getBlock())) {
+        if (!level.isClientSide() && !oldState.is(state.getBlock())) {
             level.scheduleTick(pos, this, 1);
         }
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
-            LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighbor, net.minecraft.util.RandomSource random) {
         if (direction.getAxis().isHorizontal()) {
-            level.scheduleTick(pos, this, 1);
+            ticks.scheduleTick(pos, this, 1);
         }
         return state;
     }

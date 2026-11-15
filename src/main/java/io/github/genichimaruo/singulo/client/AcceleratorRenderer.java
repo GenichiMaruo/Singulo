@@ -8,18 +8,18 @@ import io.github.genichimaruo.singulo.multiblock.AcceleratorControllerBlockEntit
 import io.github.genichimaruo.singulo.multiblock.AcceleratorRing;
 import java.util.Map;
 import java.util.WeakHashMap;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 
 /** A textured cyan pulse travels around the assembled track only while processing. */
-public class AcceleratorRenderer implements BlockEntityRenderer<AcceleratorControllerBlockEntity> {
-    private static final ResourceLocation PULSE = Singulo.id("textures/misc/accelerator_pulse.png");
+public class AcceleratorRenderer extends SnapshotBlockRenderer<AcceleratorControllerBlockEntity> {
+    private static final Identifier PULSE = Singulo.id("textures/misc/accelerator_pulse.png");
     private record Cached(long checked, AcceleratorRing ring) {}
     private final Map<AcceleratorControllerBlockEntity, Cached> rings = new WeakHashMap<>();
 
@@ -81,12 +81,12 @@ public class AcceleratorRenderer implements BlockEntityRenderer<AcceleratorContr
         buffer.addVertex(pose, (float) (point.x() - point.tangentZ() * width), y,
                         (float) (point.z() + point.tangentX() * width))
                 .setColor((rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, alpha).setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightCoordsUtil.FULL_BRIGHT)
                 .setNormal(pose, 0, normalY, 0);
     }
 
     @Override
-    public boolean shouldRenderOffScreen(AcceleratorControllerBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

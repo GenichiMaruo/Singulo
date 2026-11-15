@@ -14,20 +14,20 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /**
  * 廃アンドロイド工場のボス（製造統括AI「ファウンドリ」）と、工場のブロック・工場式印刷ユニット。
@@ -50,13 +50,13 @@ public final class FactoryGameTests {
     private FactoryGameTests() {}
 
     private static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     /** 中央管制ホールを小さく再現する: 封鎖された保管庫・封印核・4つの製造ライン・床のコンベアの列。 */
     private static GuardianCoreBlockEntity hall(GameTestHelper helper) {
         helper.setBlock(VAULT, SinguloBlocks.RUIN_CACHE.get().defaultBlockState().setValue(RuinCacheBlock.SEALED, true));
-        ((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).setRuin("android_lab");
+        ((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).setRuin("android_lab");
         for (int i = 0; i < LINES.size(); i++) {
             helper.setBlock(LINES.get(i), SinguloBlocks.FACTORY_LINE.get().defaultBlockState().setValue(FactoryLineBlock.FACING, FACING.get(i)));
         }
@@ -65,12 +65,12 @@ public final class FactoryGameTests {
                     .setValue(FactoryConveyorBlock.FACING, Direction.EAST));
         }
         helper.setBlock(CORE, SinguloBlocks.GUARDIAN_CORE.get());
-        GuardianCoreBlockEntity be = helper.getBlockEntity(CORE);
+        GuardianCoreBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,CORE);
         be.scan(helper.getLevel());
         // ほかの組のテストが残した仕掛けを数えないように、このテストの場所の中のものだけにする
         AABB bounds = helper.getBounds();
-        be.lines().removeIf(p -> !bounds.contains(Vec3.atCenterOf(p)));
-        be.conveyors().removeIf(p -> !bounds.contains(Vec3.atCenterOf(p)));
+        be.retainPropsWithin(bounds);
+
         return be;
     }
 
@@ -111,7 +111,7 @@ public final class FactoryGameTests {
         helper.assertTrue(f.lineCount() == 4, "製造ラインを4つ数えない: " + f.lineCount());
         helper.assertTrue(core.awaken(helper.getLevel()) == null, "2体目が現れた");
         float before = f.getHealth();
-        f.hurt(helper.getLevel().damageSources().generic(), 10);
+        f.hurtOrSimulate(helper.getLevel().damageSources().generic(), 10);
         float shielded = before - f.getHealth();
         helper.assertTrue(Math.abs(shielded - 2) < 0.01, "4つのラインで受けるダメージが2割にならない: " + shielded);
         for (BlockPos p : LINES) {
@@ -120,7 +120,7 @@ public final class FactoryGameTests {
         helper.runAtTickTime(30, () -> {
             helper.assertTrue(f.lineCount() == 0, "ラインを壊しても数が減らない: " + f.lineCount());
             float h = f.getHealth();
-            f.hurt(helper.getLevel().damageSources().generic(), 10);
+            f.hurtOrSimulate(helper.getLevel().damageSources().generic(), 10);
             helper.assertTrue(Math.abs(h - f.getHealth() - 10) < 0.01, "ラインがないのにダメージが減る: " + (h - f.getHealth()));
             core.restoreProps(helper.getLevel());
             helper.assertTrue(helper.getBlockState(LINES.get(0)).is(SinguloBlocks.FACTORY_LINE.get())
@@ -143,9 +143,9 @@ public final class FactoryGameTests {
                 .setValue(io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock.SEALED, true));
         core.setFacility(net.minecraft.world.level.levelgen.structure.BoundingBox.fromCorners(helper.absolutePos(BlockPos.ZERO),
                 helper.absolutePos(new BlockPos(14, 14, 14))));
-        f.kill();
+        f.kill((net.minecraft.server.level.ServerLevel)f.level());
         helper.runAtTickTime(FoundryOverseer.DEATH_TICKS + 10, () -> {
-            helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT)).isSealed(), "倒しても保管庫が開かない");
             int n = dropped(helper, item("precision_actuator"));
             helper.assertTrue(n >= 3 && n <= 4, "精密アクチュエーターを3〜4個落とさない: " + n);
             // 部屋に挑戦者がいないときは、試作機の設計メモリをどちらか1つ
@@ -215,7 +215,7 @@ public final class FactoryGameTests {
         Zombie out = dummy(helper, new BlockPos(11, 1, 3));
         f.startPress(in);
         helper.runAtTickTime(FoundryOverseer.PRESS_WINDUP + 5, () -> {
-            helper.assertTrue(in.getHealth() < in.getMaxHealth() && in.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "プレスが叩かない・鈍らせない");
+            helper.assertTrue(in.getHealth() < in.getMaxHealth() && in.hasEffect(MobEffects.SLOWNESS), "プレスが叩かない・鈍らせない");
             helper.assertTrue(out.getHealth() >= out.getMaxHealth(), "丸の外の相手にプレスが当たった");
             in.discard();
             out.discard();
@@ -282,7 +282,7 @@ public final class FactoryGameTests {
     @GameTest(template = HUGE, batch = BATCH + "_8", timeoutTicks = 40)
     public static void foundryCoreSummonsAwakened(GameTestHelper helper) {
         GuardianCoreBlockEntity core = hall(helper);
-        RuinCacheBlockEntity vault = helper.getBlockEntity(VAULT);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,VAULT);
         vault.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
         vault.setSealed(false);
         helper.assertTrue(core.awaken(helper.getLevel()) == null, "保管庫が開いているのに普通の番人が現れた");

@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 3
     },
     {
-      "ingredient": {
-        "tag": "c:obsidians"
-      },
+      "ingredient": "#c:obsidians",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_catalyst"
-      },
+      "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
     }

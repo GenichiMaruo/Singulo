@@ -6,27 +6,19 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:capacity_upgrade_2"
-      },
+      "ingredient": "singulo:capacity_upgrade_2",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_module"
-      },
+      "ingredient": "singulo:time_crystal_module",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 4
     }
   ],

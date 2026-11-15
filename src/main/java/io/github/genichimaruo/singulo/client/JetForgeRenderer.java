@@ -7,11 +7,11 @@ import io.github.genichimaruo.singulo.forge.JetForgeBlockEntity;
 import io.github.genichimaruo.singulo.forge.JetForgeLayout;
 import java.util.Map;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -38,7 +38,7 @@ import net.minecraft.world.phys.Vec3;
  * </ul>
  * 遠いと細部（稲妻・破片・亀裂）を省き、ジェットの分割を減らす。
  */
-public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity> {
+public class JetForgeRenderer extends SnapshotBlockRenderer<JetForgeBlockEntity> {
     /** 影の半径（ブロック）。地平線はこの 1/2.598、重力レンズに渡す半径（アインシュタイン半径）は地平線の 2.2 倍。 */
     static final float SHADOW = 0.85F;
     static final float DISK_OUTER = 3.6F;
@@ -58,7 +58,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     public JetForgeRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public boolean shouldRenderOffScreen(JetForgeBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
@@ -107,6 +107,8 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
                     - SHADOW / GravitationalLensing.SHADOW_PER_HORIZON;
         }
 
+        @Override public VertexConsumer setColor(int color) { return setColor((color >> 16) & 255, (color >> 8) & 255, color & 255, (color >>> 24)); }
+        @Override public VertexConsumer setLineWidth(float width) { current.setLineWidth(width); return this; }
         @Override
         public VertexConsumer addVertex(float x, float y, float z) {
             if (vertex++ % 4 == 0) {
@@ -173,7 +175,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         Vec3 axis = JetForgeLayout.axis(back);
         Vec3 coreW = JetForgeLayout.core(pos, back);
         Vec3 core = coreW.subtract(corner);
-        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition().subtract(corner);
+        Vec3 cam = mc.gameRenderer.getMainCamera().position().subtract(corner);
         float time = (be.getLevel().getGameTime() % 24000L + partialTick) / 20F;
         float dist = (float) cam.distanceTo(core);
         JetForgeTimeline tl = JetForgeTimeline.of(be, partialTick);
@@ -196,7 +198,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         Sides sides = cam.subtract(core).dot(axis) >= 0 ? new Sides(nearGlow, nearBeam, glow, beam) : new Sides(glow, beam, nearGlow, nearBeam);
         // リング・コイル・杯などの光は、まわりのブロックと同じ所で歪むよう、カメラからの距離で四角形ごとに分ける
         VertexConsumer placed = new DepthSplit(glow, nearGlow, core.subtract(cam), mc.gameRenderer.getMainCamera().rotation());
-        boolean fancy = mc.options.graphicsMode().get() != net.minecraft.client.GraphicsStatus.FAST;
+        boolean fancy = mc.options.graphicsPreset().get() != net.minecraft.client.GraphicsPreset.FAST;
 
         if (be.shownCore()) {
             drawCore(be, f, tl, coreW, buffers, glow);
@@ -254,7 +256,7 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             ps.last().pose().set(f.pose().pose());
             ps.last().normal().set(f.pose().normal());
             ps.translate(f.origin().x, f.origin().y, f.origin().z);
-            FxDraw.sphere(ps.last(), solid, SHADOW * 0.75F, 0x000000, LightTexture.FULL_BRIGHT);
+            FxDraw.sphere(ps.last(), solid, SHADOW * 0.75F, 0x000000, LightCoordsUtil.FULL_BRIGHT);
             float a = Mth.clamp(0.25F + 0.5F * tl.power(), 0, 1);
             disc(f, glow, f.origin(), f.axis(), SHADOW * 1.1F, DISK_OUTER, 48, WARM, (int) (220 * a), 0, 0);
             GravitationalLensing.add(coreW, radius, 1, LENS_REGION);
@@ -915,8 +917,8 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             ps.last().pose().set(f.pose().pose());
             ps.last().normal().set(f.pose().normal());
             ps.translate(c.x, c.y, c.z);
-            FxDraw.sphere(ps.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 0.1F + 0.3F * k * k, 0x000000,
-                    LightTexture.FULL_BRIGHT);
+            FxDraw.sphere(ps.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 0.1F + 0.3F * k * k, 0x000000,
+                    LightCoordsUtil.FULL_BRIGHT);
         }
         GravitationalLensing.addDistortion(coreW, 0.1F + 0.4F * power * power + 0.8F * collapse, 0.3F + 0.5F * power + 0.3F * collapse, 4.5F);
     }
@@ -1037,22 +1039,22 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         // 赤熱の絵がある素材は、絵そのものを熱の段階の絵に替える（段階の間は次の段階の絵を重ねて少しずつ移る）
         boolean textured = renderHeated(mc, stack, h, pose, buffers, be);
         if (!textured) {
-            MultiBufferSource solid = type -> buffers.getBuffer(RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS));
-            mc.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, pose,
+            MultiBufferSource solid = type -> buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS));
+            ItemDraw.get().renderStatic(stack, ItemDisplayContext.FIXED, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, pose,
                     solid, be.getLevel(), 0);
         }
         // 熱の光: 同じ形を加算で重ねる（素材の絵の明るい所ほど光る）
         if (h > 0.02F) {
             int hc = heatColor(h);
             float k = Math.min(1, 0.4F + h) * (textured ? 0.45F : 1);
-            MultiBufferSource hot = type -> new Tinted(buffers.getBuffer(RenderType.eyes(TextureAtlas.LOCATION_BLOCKS)),
+            MultiBufferSource hot = type -> new Tinted(buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.eyes(TextureAtlas.LOCATION_BLOCKS)),
                     (hc >> 16 & 255) * k / 255F, (hc >> 8 & 255) * k / 255F, (hc & 255) * k / 255F, 1);
             // 暗い素材でも赤熱して見えるよう、少しずつ大きくして重ねる（加算なので明るさが積み上がり、縁がにじむ。絵ごと焼いた素材は1回）
             for (int layer = 0; layer < (textured ? 1 : 3); layer++) {
                 float sc = 1.02F + 0.035F * layer;
                 pose.pushPose();
                 pose.scale(sc, sc, 1.2F + 0.15F * layer);
-                mc.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, pose,
+                ItemDraw.get().renderStatic(stack, ItemDisplayContext.FIXED, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, pose,
                         hot, be.getLevel(), 0);
                 pose.popPose();
             }
@@ -1290,6 +1292,8 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             this.type = type;
         }
 
+        @Override public VertexConsumer setColor(int color) { return setColor((color >> 16) & 255, (color >> 8) & 255, color & 255, (color >>> 24)); }
+        @Override public VertexConsumer setLineWidth(float width) { current.setLineWidth(width); return this; }
         @Override
         public VertexConsumer addVertex(float x, float y, float z) {
             current = buffers.getBuffer(type);
@@ -1333,17 +1337,28 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
     static final int HEAT_STAGES = 4;
 
     /** 赤熱の絵のモデル（ModelEvent.RegisterAdditional で読む）。 */
-    static net.minecraft.client.resources.model.ModelResourceLocation heatModel(String id, int stage) {
-        return net.minecraft.client.resources.model.ModelResourceLocation.standalone(
-                io.github.genichimaruo.singulo.Singulo.id("item/" + id + "_heat_" + stage));
+    private record HeatModel(net.minecraft.client.resources.model.geometry.QuadCollection quads,
+                             net.minecraft.client.resources.model.cuboid.ItemTransform transform) {}
+    private static final java.util.Map<String,net.neoforged.neoforge.client.model.standalone.StandaloneModelKey<HeatModel>> HEAT_MODELS = new java.util.HashMap<>();
+    static net.neoforged.neoforge.client.model.standalone.StandaloneModelKey<HeatModel> heatModel(String id,int stage) {
+        String key=id+"_heat_"+stage;
+        return HEAT_MODELS.computeIfAbsent(key,k->new net.neoforged.neoforge.client.model.standalone.StandaloneModelKey<>(()->"singulo:item/"+k));
     }
-
-    static void registerModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) {
-        for (String id : HEATED_ITEMS) {
-            for (int s = 1; s <= HEAT_STAGES; s++) {
-                event.register(heatModel(id, s));
-            }
+    static void registerModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterStandalone event) {
+        for(String id:HEATED_ITEMS)for(int stage=1;stage<=HEAT_STAGES;stage++) {
+            event.register(heatModel(id,stage),new net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel<>(
+                io.github.genichimaruo.singulo.Singulo.id("item/"+id+"_heat_"+stage), (model,baker,name)->new HeatModel(
+                    model.bakeTopGeometry(model.getTopTextureSlots(),baker,net.minecraft.client.renderer.block.dispatch.BlockModelRotation.IDENTITY),
+                    model.getTopTransforms().getTransform(ItemDisplayContext.FIXED))));
         }
+    }
+    private static void drawHeat(HeatModel model,PoseStack pose,MultiBufferSource buffers,float alpha) {
+        pose.pushPose();model.transform().apply(false,pose.last());
+        var out=buffers.getBuffer(alpha>=.999F?net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS):net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentCullItemTarget(TextureAtlas.LOCATION_BLOCKS));
+        var instance=new com.mojang.blaze3d.vertex.QuadInstance();instance.setColor(net.minecraft.util.ARGB.colorFromFloat(alpha,1,1,1));
+        instance.setLightCoords(LightCoordsUtil.FULL_BRIGHT);instance.setOverlayCoords(OverlayTexture.NO_OVERLAY);
+        for(var quad:model.quads().getAll())out.putBakedQuad(pose.last(),quad,instance);
+        pose.popPose();
     }
 
     /**
@@ -1359,32 +1374,14 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
         float s = Mth.clamp(h, 0, 1) * HEAT_STAGES;
         int lo = Math.min(HEAT_STAGES, (int) Math.floor(s));
         float frac = s - lo;
-        var models = mc.getModelManager();
-        var missing = models.getMissingModel();
-        var base = lo == 0 ? null : models.getModel(heatModel(id, lo));
-        if (base == missing) {
-            return false;
-        }
-        // 素材は、焼けた絵もそうでない絵も不透明の切り抜きで描く（半透明の描き方では、重ねた光や膜と混ざって透けて見えることがある）
-        MultiBufferSource solid = type -> buffers.getBuffer(RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS));
-        if (base == null) {
-            mc.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, pose,
-                    solid, be.getLevel(), 0);
-        } else {
-            mc.getItemRenderer().render(stack, ItemDisplayContext.FIXED, false, pose, solid, LightTexture.FULL_BRIGHT,
-                    OverlayTexture.NO_OVERLAY, base);
-        }
-        if (lo < HEAT_STAGES && frac > 0.01F) {
-            var next = models.getModel(heatModel(id, lo + 1));
-            if (next != missing) {
-                MultiBufferSource fade = type -> new Tinted(buffers.getBuffer(RenderType.itemEntityTranslucentCull(TextureAtlas.LOCATION_BLOCKS)),
-                        1, 1, 1, frac);
-                pose.pushPose();
-                pose.scale(1.002F, 1.002F, 1.02F);
-                mc.getItemRenderer().render(stack, ItemDisplayContext.FIXED, false, pose, fade, LightTexture.FULL_BRIGHT,
-                        OverlayTexture.NO_OVERLAY, next);
-                pose.popPose();
-            }
+        var models=mc.getModelManager();
+        var base=lo==0?null:models.getStandaloneModel(heatModel(id,lo));
+        if(lo!=0&&base==null)return false;
+        if(base==null)ItemDraw.get().renderStatic(stack,ItemDisplayContext.FIXED,LightCoordsUtil.FULL_BRIGHT,OverlayTexture.NO_OVERLAY,pose,buffers,be.getLevel(),0);
+        else drawHeat(base,pose,buffers,1);
+        if(lo<HEAT_STAGES&&frac>.01F) {
+            var next=models.getStandaloneModel(heatModel(id,lo+1));
+            if(next!=null){pose.pushPose();pose.scale(1.002F,1.002F,1.02F);drawHeat(next,pose,buffers,frac);pose.popPose();}
         }
         return true;
     }
@@ -1402,6 +1399,8 @@ public class JetForgeRenderer implements BlockEntityRenderer<JetForgeBlockEntity
             this.a = a;
         }
 
+        @Override public VertexConsumer setColor(int color) { return setColor((color >> 16) & 255, (color >> 8) & 255, color & 255, (color >>> 24)); }
+        @Override public VertexConsumer setLineWidth(float width) { inner.setLineWidth(width); return this; }
         @Override
         public VertexConsumer addVertex(float x, float y, float z) {
             inner.addVertex(x, y, z);

@@ -38,7 +38,7 @@ public final class RelocationWrenchItem extends SinguloItem {
 
     public static int mode(ItemStack wrench) {
         var data = wrench.get(DataComponents.CUSTOM_DATA);
-        return data != null && data.copyTag().getInt(MODE_KEY) == MODE_CABLE ? MODE_CABLE : MODE_RELOCATE;
+        return data != null && data.copyTag().getIntOr(MODE_KEY, 0) == MODE_CABLE ? MODE_CABLE : MODE_RELOCATE;
     }
 
     public static void setMode(ItemStack wrench, int mode) {
@@ -47,18 +47,18 @@ public final class RelocationWrenchItem extends SinguloItem {
 
     /** Sneak-use in the air switches the mode. */
     @Override
-    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level,
+    public net.minecraft.world.InteractionResult use(net.minecraft.world.level.Level level,
             net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
         ItemStack wrench = player.getItemInHand(hand);
-        if (!player.isSecondaryUseActive()) return net.minecraft.world.InteractionResultHolder.pass(wrench);
-        if (!level.isClientSide) {
+        if (!player.isSecondaryUseActive()) return io.github.genichimaruo.singulo.compat.Interactions.pass(wrench);
+        if (!level.isClientSide()) {
             int next = mode(wrench) == MODE_CABLE ? MODE_RELOCATE : MODE_CABLE;
             setMode(wrench, next);
-            player.displayClientMessage(Component.translatable("item.singulo.relocation_wrench.mode." + next), true);
+            player.sendOverlayMessage(Component.translatable("item.singulo.relocation_wrench.mode." + next));
             level.playSound(null, player.blockPosition(), net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value(),
                     net.minecraft.sounds.SoundSource.PLAYERS, 0.4F, next == MODE_CABLE ? 1.4F : 1.0F);
         }
-        return net.minecraft.world.InteractionResultHolder.sidedSuccess(wrench, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(wrench, level.isClientSide());
     }
 
     /** Cable mode breaks cables instantly with a left click. */
@@ -94,7 +94,7 @@ public final class RelocationWrenchItem extends SinguloItem {
                 || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)) return InteractionResult.FAIL;
         ItemStack packed = new ItemStack(state.getBlock());
         if (packed.isEmpty()) return InteractionResult.FAIL;
-        if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
                 || net.neoforged.neoforge.common.CommonHooks.fireBlockBreak(level,
                         serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, state).isCanceled()) {
@@ -118,7 +118,7 @@ public final class RelocationWrenchItem extends SinguloItem {
             tag.putInt("radius", -1);
             anchor.prepareForRelocation();
         }
-        BlockItem.setBlockEntityData(packed, be.getType(), tag);
+        packed.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(be.getType(), tag));
         packed.set(DataComponents.MAX_STACK_SIZE, 1);
         // setRemoved disconnects multiblock ports. Removing the BE before the block prevents
         // AbstractMachineBlock.onRemove from also dropping the serialized inventory.
@@ -132,7 +132,7 @@ public final class RelocationWrenchItem extends SinguloItem {
         } else {
             player.drop(packed, false);
         }
-        player.displayClientMessage(Component.translatable("item.singulo.relocation_wrench.packed"), true);
+        player.sendOverlayMessage(Component.translatable("item.singulo.relocation_wrench.packed"));
         return InteractionResult.CONSUME;
     }
 
@@ -150,7 +150,7 @@ public final class RelocationWrenchItem extends SinguloItem {
         Block cable = state.getBlock();
         if (!player.mayBuild() || !level.mayInteract(player, start)
                 || !player.mayUseItemAt(start, context.getClickedFace(), wrench)) return InteractionResult.FAIL;
-        if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
         java.util.List<net.minecraft.core.BlockPos> run = player.isSecondaryUseActive()
                 ? connectedRun(level, start, cable) : java.util.List.of(start);
         int removed = 0;
@@ -181,7 +181,7 @@ public final class RelocationWrenchItem extends SinguloItem {
             }
         }
         if (run.size() > 1) {
-            player.displayClientMessage(Component.translatable("item.singulo.relocation_wrench.cables_removed", removed), true);
+            player.sendOverlayMessage(Component.translatable("item.singulo.relocation_wrench.cables_removed", removed));
         }
         return InteractionResult.CONSUME;
     }
@@ -198,7 +198,7 @@ public final class RelocationWrenchItem extends SinguloItem {
                 == io.github.genichimaruo.singulo.cable.ConduitCover.State.NONE) return InteractionResult.PASS;
         if (!player.mayBuild() || !level.mayInteract(player, pos)
                 || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)) return InteractionResult.FAIL;
-        if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
         ItemStack back = io.github.genichimaruo.singulo.cable.ConduitCover.takeOne(level, pos);
         if (back.isEmpty()) return InteractionResult.FAIL;
         level.playSound(null, pos, net.minecraft.sounds.SoundEvents.CHAIN_BREAK, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.1F);

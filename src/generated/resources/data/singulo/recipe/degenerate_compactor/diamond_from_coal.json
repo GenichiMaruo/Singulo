@@ -6,9 +6,7 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:storage_blocks/coal"
-      },
+      "ingredient": "#c:storage_blocks/coal",
       "count": 8
     }
   ],

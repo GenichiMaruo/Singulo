@@ -82,16 +82,14 @@ public final class BossCombatLog {
         Mob attacker = boss(source.getEntity());
         Slam slam = attacker == null ? slamFor(victim, source) : null;
         if (victim instanceof Player player && slam != null) {
-            if (player.getHealth() > 0) {
-                // 倒れなかった: この叩きつけの記録はここまで（倒れたときは、死亡の記録で使ってから消す）
-                SLAMS.remove(player.getUUID());
-            }
-            write("hit_player", slam.boss(), slam.attack(), event.getOriginalDamage(), event.getNewDamage(), event.getBlockedDamage(), player);
+            // Both fatal Death and nonfatal hit attribution have now been consumed.
+            SLAMS.remove(player.getUUID());
+            write("hit_player", slam.boss(), slam.attack(), event.getOriginalDamage(), event.getInflictedDamage(), event.getBlockedDamage(), player);
         } else if (victim instanceof Player player && attacker != null) {
-            write("hit_player", attacker, attackName(attacker, source), event.getOriginalDamage(), event.getNewDamage(),
+            write("hit_player", attacker, attackName(attacker, source), event.getOriginalDamage(), event.getInflictedDamage(),
                     event.getBlockedDamage(), player);
         } else if (boss(victim) != null && source.getEntity() instanceof Player player) {
-            write("hit_boss", (Mob) victim, source.getMsgId(), event.getOriginalDamage(), event.getNewDamage(), event.getBlockedDamage(), player);
+            write("hit_boss", (Mob) victim, source.getMsgId(), event.getOriginalDamage(), event.getInflictedDamage(), event.getBlockedDamage(), player);
         }
     }
 
@@ -103,7 +101,7 @@ public final class BossCombatLog {
         Mob attacker = boss(event.getSource().getEntity());
         Slam slam = attacker == null ? slamFor(dead, event.getSource()) : null;
         if (dead instanceof Player player && slam != null) {
-            SLAMS.remove(player.getUUID());
+            // Death precedes Post damage in 26.1.2; keep attribution for both records.
             write("player_died", slam.boss(), slam.attack(), 0, 0, 0, player);
         } else if (dead instanceof Player player && attacker != null) {
             write("player_died", attacker, attackName(attacker, event.getSource()), 0, 0, 0, player);
@@ -141,7 +139,7 @@ public final class BossCombatLog {
                 String.format(Locale.ROOT, "%.2f", raw),
                 String.format(Locale.ROOT, "%.2f", dealt),
                 String.format(Locale.ROOT, "%.2f", blocked),
-                player == null ? "-" : player.getGameProfile().getName(),
+                player == null ? "-" : player.getGameProfile().name(),
                 player == null ? "-" : String.format(Locale.ROOT, "%.1f/%.1f", player.getHealth(), player.getMaxHealth()),
                 player == null ? "-" : String.format(Locale.ROOT, "%.0f", player.getAttributeValue(Attributes.ARMOR)),
                 player == null ? "-" : String.format(Locale.ROOT, "%.0f", player.getAttributeValue(Attributes.ARMOR_TOUGHNESS)),

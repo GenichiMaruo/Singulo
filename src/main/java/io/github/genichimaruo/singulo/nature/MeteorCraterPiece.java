@@ -66,7 +66,7 @@ public class MeteorCraterPiece extends StructurePiece {
     }
 
     public MeteorCraterPiece(StructurePieceSerializationContext context, CompoundTag tag) {
-        this(new BlockPos(tag.getInt("cx"), tag.getInt("cy"), tag.getInt("cz")), tag.getLong("seed"));
+        this(new BlockPos(tag.getIntOr("cx", 0), tag.getIntOr("cy", 0), tag.getIntOr("cz", 0)), tag.getLongOr("seed", 0L));
     }
 
     private static BoundingBox box(BlockPos c) {
@@ -158,7 +158,7 @@ public class MeteorCraterPiece extends StructurePiece {
         // 生成中は WG の高さ、出来上がったチャンク（/place など）では今の高さが正しい。どちらかが古くなっていても、
         // 大きいほうから下へ、地面の上に乗っているだけのもの（空気を含む）を飛ばして探すので、本当の地面に行き着く
         int y = Math.max(level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z), level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z)) - 1;
-        int bottom = level.getMinBuildHeight();
+        int bottom = level.getMinY();
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(x, y, z);
         while (y > bottom) {
             BlockState s = level.getBlockState(p.setY(y));

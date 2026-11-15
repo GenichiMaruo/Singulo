@@ -5,11 +5,11 @@ import io.github.genichimaruo.singulo.command.SinguloCommands;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 /** 設計図（組み立てコマンドとホロ投影機が使う）どおりに組むと、形の判定が通ること。向きも変えて確かめる。 */
 @GameTestHolder(Singulo.MODID)

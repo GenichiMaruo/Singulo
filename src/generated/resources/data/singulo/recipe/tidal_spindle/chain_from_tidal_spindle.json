@@ -6,14 +6,12 @@
   "energy": 1000000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/iron"
-      },
+      "ingredient": "#c:ingots/iron",
       "count": 1
     }
   ],
   "result": {
-    "id": "minecraft:chain",
+    "id": "minecraft:iron_chain",
     "count": 2
   }
 }

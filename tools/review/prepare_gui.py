@@ -12,7 +12,7 @@ import shutil
 
 root = pathlib.Path(_build) / ('cosmic-review' if _args.cosmic_world else 'cosmic-gui-review' if _args.cosmic else 'gui-review')
 root.mkdir(parents=True, exist_ok=True)
-source = pathlib.Path(_build + "/gametest/world")
+source = pathlib.Path(_build + "/gametest/gametestserver/gametestworld")
 if not (source / "level.dat").is_file():
     raise SystemExit("GameTest world was not saved; cannot start GUI review")
 target = root / "saves/Review"
@@ -26,6 +26,6 @@ for name in ("inventory-pixels.json", "machine-pixels.json", "machine-font-metri
     (root / name).unlink(missing_ok=True)
 shutil.copytree(source, target)
 (root / "options.txt").write_text(
-    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:" + ('4' if _args.cosmic_world else '2') + "\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\n",
+    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:" + ('4' if _args.cosmic_world else '2') + "\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nsoundCategory_master:0.0\n",
     encoding="utf-8",
 )

@@ -1,23 +1,13 @@
 package io.github.genichimaruo.singulo.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-
-/** A render-thread scope: virtual scenes use the vanilla-sized copy, never the world's noon banks. */
+/** Extraction scope for virtual previews. New vanilla GUI submissions use UiLightmap,
+ * while synchronous third-party lightmap lookups receive the unmodified natural texture. */
 public final class PreviewLighting {
-    private static int depth;
+    private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 0);
     private PreviewLighting() {}
-    public static boolean active() { return depth != 0; }
+    public static boolean active() { return DEPTH.get() != 0; }
     public static void render(Runnable draw) {
-        RenderSystem.assertOnRenderThread();
-        int previous = RenderSystem.getShaderTexture(2);
-        depth++;
-        try {
-            Minecraft.getInstance().gameRenderer.lightTexture().turnOnLightLayer();
-            draw.run();
-        } finally {
-            depth--;
-            RenderSystem.setShaderTexture(2, previous);
-        }
+        DEPTH.set(DEPTH.get() + 1);
+        try { draw.run(); } finally { int depth = DEPTH.get() - 1; if (depth == 0) DEPTH.remove(); else DEPTH.set(depth); }
     }
 }

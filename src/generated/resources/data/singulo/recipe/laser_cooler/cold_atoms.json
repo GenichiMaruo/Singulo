@@ -6,21 +6,15 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:stardust"
-      },
+      "ingredient": "singulo:stardust",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:gems/quartz"
-      },
+      "ingredient": "#c:gems/quartz",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:cold_atom_trap"
-      },
+      "ingredient": "singulo:cold_atom_trap",
       "uses": 1
     }
   ],

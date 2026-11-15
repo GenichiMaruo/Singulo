@@ -7,14 +7,14 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.Arrays;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
@@ -36,7 +36,7 @@ public final class DyeStationGameTests {
     @GameTest(template = "empty", timeoutTicks = 60)
     public static void dyeStationTurnsDyesIntoInkAndDyes(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.RGB_DYE_STATION.get());
-        RgbDyeStationBlockEntity station = h.getBlockEntity(AT);
+        RgbDyeStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,AT);
         var items = station.items();
         h.assertFalse(RgbDyeStationBlockEntity.accepts(RgbDyeStationBlockEntity.RED, new ItemStack(Items.BLUE_DYE)), "Red slot accepted blue dye");
         h.assertFalse(RgbDyeStationBlockEntity.accepts(RgbDyeStationBlockEntity.TARGET, new ItemStack(Items.STONE)), "Target accepted stone");

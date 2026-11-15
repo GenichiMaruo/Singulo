@@ -20,7 +20,7 @@ def inventory(root=ROOT):
             # Preserve strings and newlines while ignoring comments containing annotation examples.
             text = re.sub(r'"(?:\\.|[^"\\])*"|/\*.*?\*/|//[^\n]*',
                           lambda m: m[0] if m[0].startswith('"') else '\n' * m[0].count('\n'), text, flags=re.S)
-            text = text.replace('@net.neoforged.neoforge.gametest.', '@')
+            text = text.replace('@net.neoforged.neoforge.gametest.', '@').replace('@io.github.genichimaruo.singulo.test.harness.', '@')
             if '@GameTest(' not in text:
                 continue
             if not path.name.endswith('GameTests.java'):
@@ -50,7 +50,7 @@ def inventory(root=ROOT):
                 if attrs.get('attempts', '1').strip() != '1' or attrs.get('requiredSuccesses', '1').strip() != '1':
                     raise RuntimeError('Retries must not hide unstable tests: ' + m[2])
                 ns = string(attrs['templateNamespace']) if 'templateNamespace' in attrs else namespace
-                entries.append({'name': m[2].lower(), 'namespace': ns,
+                entries.append({'name': f'{namespace}:{path.stem.lower()}.{m[2].lower()}', 'namespace': ns,
                                 'source': str(path.relative_to(root))})
     if not entries:
         raise RuntimeError('No GameTests found')

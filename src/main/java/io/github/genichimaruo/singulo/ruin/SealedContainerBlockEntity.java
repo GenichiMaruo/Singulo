@@ -52,6 +52,18 @@ import net.minecraft.world.phys.Vec3;
 public class SealedContainerBlockEntity extends BaseContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
     private static final int[] NO_SLOTS = new int[0];
 
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        // BaseContainerBlockEntity would always drop its inventory. A sealed box
+        // intentionally destroys it instead, while an open box drops exactly once.
+        if (level != null && state.getBlock() instanceof io.github.genichimaruo.singulo.compat.RemovalAwareBlock aware) {
+            aware.beforeEntityRemoval(state, level, pos, level.getBlockState(pos), false);
+        } else {
+            super.preRemoveSideEffects(pos, state);
+        }
+    }
+
+
     /** ホッパーなどからは、どの面からも出し入れできない（開けて手で取り出す）。 */
     @Override
     public int[] getSlotsForFace(net.minecraft.core.Direction side) {
@@ -59,7 +71,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
         return false;
     }
 
@@ -109,7 +121,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     public static Item keyItem(int tier) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(KEYS[Math.max(1, Math.min(4, tier)) - 1]));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(KEYS[Math.max(1, Math.min(4, tier)) - 1]));
     }
 
     public static boolean isKey(ItemStack stack, int tier) {
@@ -121,15 +133,15 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     /** 使われた（stack は手に持っているもの。空でもよい）。 */
     public void interact(Player player, ItemStack stack) {
         switch (phase) {
-            case UNSEALING, SEALING -> player.displayClientMessage(Component.translatable("message.singulo.sealed.busy"), true);
+            case UNSEALING, SEALING -> player.sendOverlayMessage(Component.translatable("message.singulo.sealed.busy"));
             case SEALED -> {
                 if (isKey(stack, tier())) {
                     useKey(player, stack);
                     start(Phase.UNSEALING);
                 } else {
                     play("sealed_container.denied", 1.0F);
-                    player.displayClientMessage(Component.translatable("message.singulo.sealed.need_key",
-                            keyItem(tier()).getDescription()), true);
+                    player.sendOverlayMessage(Component.translatable("message.singulo.sealed.need_key",
+                            keyItem(tier()).getDefaultInstance().getHoverName()));
                 }
             }
             case OPEN -> {
@@ -212,7 +224,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
             return;
         }
         long t = level.getGameTime() - be.phaseStart;
-        var rnd = level.random;
+        var rnd = level.getRandom();
         if (t >= T_VENT && t < T_VENT + 12) {
             for (int i = 0; i < 4; i++) {
                 double a = rnd.nextDouble() * Math.PI * 2;
@@ -250,7 +262,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     void shatter(ServerLevel level) {
         items.clear();
         Vec3 c = Vec3.atCenterOf(worldPosition);
-        level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.CLOUD, c.x, c.y, c.z, 20, 0.3, 0.3, 0.3, 0.05);
         level.playSound(null, worldPosition, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 0.6F);
     }
@@ -282,7 +294,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     public void setChanged() {
         super.setChanged();
-        if (level != null && !level.isClientSide && phase == Phase.OPEN) {
+        if (level != null && !level.isClientSide() && phase == Phase.OPEN) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
@@ -315,34 +327,38 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     // ------------------------------------------------------------------ 保存・同期
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, items, registries);
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
+        io.github.genichimaruo.singulo.compat.ValueIoCompat.write(output, (tag, registries) -> {
+        io.github.genichimaruo.singulo.compat.NbtCompat.saveAllItems(tag, items, registries);
         tag.putString("Phase", phase.name());
         tag.putLong("PhaseStart", phaseStart);
         tag.putBoolean("Loot", lootPending);
+        });
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(input);
+        HolderLookup.Provider registries = input.lookup();
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, items, registries);
-        lootPending = tag.getBoolean("Loot");
+        io.github.genichimaruo.singulo.compat.NbtCompat.loadAllItems(tag, items, registries);
+        lootPending = tag.getBooleanOr("Loot", false);
         if (tag.contains("Phase")) {
             try {
-                phase = Phase.valueOf(tag.getString("Phase"));
+                phase = Phase.valueOf(tag.getStringOr("Phase", ""));
             } catch (IllegalArgumentException e) {
                 phase = Phase.SEALED;
             }
         } else if (lootPending) {
             phase = Phase.SEALED;                    // 遺構の構造物から置かれたばかり
         }
-        phaseStart = tag.getLong("PhaseStart");
+        phaseStart = tag.getLongOr("PhaseStart", 0L);
         shown.clear();
-        ListTag list = tag.getList("Shown", Tag.TAG_COMPOUND);
+        ListTag list = tag.getListOrEmpty("Shown");
         for (int i = 0; i < list.size(); i++) {
-            ItemStack.parse(registries, list.getCompound(i)).ifPresent(shown::add);
+            io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, list.getCompoundOrEmpty(i)).ifPresent(shown::add);
         }
     }
 
@@ -356,7 +372,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
         if (phase == Phase.OPEN || phase == Phase.SEALING) {
             for (ItemStack stack : items) {
                 if (!stack.isEmpty() && list.size() < 3) {
-                    list.add(stack.copyWithCount(1).save(registries));
+                    list.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(stack.copyWithCount(1), registries));
                 }
             }
         }

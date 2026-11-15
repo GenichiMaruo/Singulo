@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.lab.*;
@@ -9,7 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DaylightDetectorBlock;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 
 @GameTestHolder("singulo_rayleigh")
 @PrefixGameTestTemplate(false)
@@ -33,7 +34,7 @@ public final class RayleighSunlightGameTests {
         // must finish chunk initialization. Both worker notifications must return anyway.
         synchronized (rebuilding) {
             var block = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.changed(h.getLevel(), h.absolutePos(SAMPLE)));
-            var chunk = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.chunkChanged(h.getLevel(), new net.minecraft.world.level.ChunkPos(h.absolutePos(SAMPLE))));
+            var chunk = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.chunkChanged(h.getLevel(), net.minecraft.world.level.ChunkPos.containing(h.absolutePos(SAMPLE))));
             java.util.concurrent.CompletableFuture.allOf(block, chunk).get(2, java.util.concurrent.TimeUnit.SECONDS);
         }
         h.assertTrue(sunlight(h, SAMPLE) == 15, "Worker notification broke rebuilt sunlight");
@@ -105,7 +106,7 @@ public final class RayleighSunlightGameTests {
         h.assertTrue(RayleighSky.snapshot(h.getLevel()).light(sample.getX(), sample.getY(), sample.getZ()) == 0,
                 "A new renderer snapshot retained disabled sunlight");
         h.setBlock(panel, SinguloBlocks.LAB_RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, true));
-        var be = (RayleighPanelBlockEntity) h.getBlockEntity(panel);
+        var be = (RayleighPanelBlockEntity) io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,panel);
         be.onChunkUnloaded();
         h.assertTrue(sunlight(h, SAMPLE) == 0, "Unloaded panel retains its sunlight field");
         be.onLoad();
@@ -126,15 +127,20 @@ public final class RayleighSunlightGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", timeoutTicks = 400)
     public static void detectorUsesAttenuatedNoonLightAndCorrectInversion(GameTestHelper h) {
         room(h, 6);
         h.setBlock(SAMPLE.east(), Blocks.DAYLIGHT_DETECTOR);
         h.setBlock(SAMPLE.west(), Blocks.DAYLIGHT_DETECTOR.defaultBlockState().setValue(DaylightDetectorBlock.INVERTED, true));
-        h.runAtTickTime(30, () -> {
-            h.assertTrue(h.getBlockState(SAMPLE.east()).getValue(DaylightDetectorBlock.POWER) == 14, "Shadowed detector is forced to full 15");
-            h.assertTrue(h.getBlockState(SAMPLE.west()).getValue(DaylightDetectorBlock.POWER) == 1, "Inverted detector ignores attenuated daylight");
-            h.succeed();
+        // Native light propagation runs asynchronously; the detector also updates only
+        // every 20 world ticks. A fixed test tick is not a lighting-completion barrier,
+        // especially in the small CI namespace batch. Require the same exact final
+        // signals after both engines settle, with a bounded timeout and actual values.
+        h.succeedWhen(() -> {
+            h.assertTrue(sunlight(h, SAMPLE.east()) == 14 && sunlight(h, SAMPLE.west()) == 14,
+                    "Fixture must retain attenuated artificial skylight 14 on both sides");
+            h.assertTrue(h.getBlockState(SAMPLE.east()).getValue(DaylightDetectorBlock.POWER) == 14, "Shadowed detector expected14 actual=" + h.getBlockState(SAMPLE.east()).getValue(DaylightDetectorBlock.POWER) + " artificial=" + sunlight(h,SAMPLE.east()) + " native=" + h.getLevel().getEffectiveSkyBrightness(h.absolutePos(SAMPLE.east())));
+            h.assertTrue(h.getBlockState(SAMPLE.west()).getValue(DaylightDetectorBlock.POWER) == 1, "Inverted detector ignores attenuated daylight: " + h.getBlockState(SAMPLE.west()).getValue(DaylightDetectorBlock.POWER));
         });
     }
 
@@ -142,26 +148,26 @@ public final class RayleighSunlightGameTests {
     public static void artificialSunBurnsUndeadAtNightWithoutChangingWorldTimeOrWeather(GameTestHelper h) {
         room(h, 6);
         var level = h.getLevel();
-        long time = level.getDayTime();
-        boolean rain = level.getLevelData().isRaining(), thunder = level.getLevelData().isThundering();
+        long time = level.getDefaultClockTime();
+        boolean rain = level.getServer().getWeatherData().isRaining(), thunder = level.getServer().getWeatherData().isThundering();
         float rainStrength = level.getRainLevel(1), thunderStrength = level.getThunderLevel(1);
-        var zombie = EntityType.ZOMBIE.create(level);
+        var zombie = EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         try {
-            level.setDayTime(18000); level.getLevelData().setRaining(true); ((net.minecraft.world.level.storage.ServerLevelData) level.getLevelData()).setThundering(true);
+            level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 18000); level.getServer().getWeatherData().setRaining(true); level.getServer().getWeatherData().setThundering(true);
             level.setRainLevel(1); level.setThunderLevel(1); level.updateSkyBrightness();
             var p = h.absolutePos(SAMPLE);
-            zombie.moveTo(p.getX() + .5, p.getY(), p.getZ() + .5, 0, 0);
+            zombie.snapTo(p.getX() + .5, p.getY(), p.getZ() + .5, 0, 0);
             var method = Mob.class.getDeclaredMethod("isSunBurnTick"); method.setAccessible(true);
             boolean exposed = false;
             for (int i = 0; i < 4096 && !exposed; i++) exposed = (boolean) method.invoke(zombie);
             h.assertTrue(exposed, "Undead do not recognize artificial noon during a rainy night");
             h.assertFalse(level.isRainingAt(p), "Artificial sun is treated as rain exposure");
-            zombie.moveTo(p.getX() + 2.5, p.getY(), p.getZ() + .5, 0, 0); // Solid wall, no source light.
+            zombie.snapTo(p.getX() + 2.5, p.getY(), p.getZ() + .5, 0, 0); // Solid wall, no source light.
             h.assertFalse((boolean) method.invoke(zombie), "Night outside the lit area is treated as day");
-            h.assertTrue(level.getDayTime() == 18000 && !level.isDay() && level.isRaining() && level.isThundering(), "Local noon changes global time/weather");
+            h.assertTrue(level.getDefaultClockTime() == 18000 && !level.isBrightOutside() && level.isRaining() && level.isThundering(), "Local noon changes global time/weather");
         } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
         finally {
-            zombie.discard(); level.setDayTime(time); level.getLevelData().setRaining(rain); ((net.minecraft.world.level.storage.ServerLevelData) level.getLevelData()).setThundering(thunder);
+            zombie.discard(); level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), time); level.getServer().getWeatherData().setRaining(rain); level.getServer().getWeatherData().setThundering(thunder);
             level.setRainLevel(rainStrength); level.setThunderLevel(thunderStrength); level.updateSkyBrightness();
         }
         h.succeed();

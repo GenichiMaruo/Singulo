@@ -22,7 +22,7 @@ import net.minecraft.world.phys.AABB;
  * </ul>
  * どの面から入って出たか・量・液体は、ネットワークが20 tick ごとに決めて送ってくる（{@link FluidPipeBlockEntity}）。
  */
-public class FluidPipeRenderer implements BlockEntityRenderer<FluidPipeBlockEntity> {
+public class FluidPipeRenderer extends SnapshotBlockRenderer<FluidPipeBlockEntity> {
     /** 帯の長さ・間隔（ブロック）と、流れの速さ（ブロック/秒）。 */
     private static final float STREAK = 0.18F, SPACING = 0.75F, SPEED = 1.6F;
     /** 管の内側から少し離す（ガラスの面と重ならないように）。 */

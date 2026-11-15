@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.generated.ServerConfig;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -72,7 +72,7 @@ public abstract class RuinBoss extends Monster {
 
     protected RuinBoss(EntityType<? extends RuinBoss> type, Level level, BossEvent.BossBarColor color) {
         super(type, level);
-        bossBar = new ServerBossEvent(getDisplayName(), color, BossEvent.BossBarOverlay.NOTCHED_10);
+        bossBar = new ServerBossEvent(java.util.UUID.randomUUID(), getDisplayName(), color, BossEvent.BossBarOverlay.NOTCHED_10);
         setPersistenceRequired();
     }
 
@@ -96,7 +96,7 @@ public abstract class RuinBoss extends Monster {
     protected boolean hurtWith(String attack, net.minecraft.world.entity.LivingEntity target, net.minecraft.world.damagesource.DamageSource source, float amount) {
         combatAttack = attack;
         try {
-            return target.hurt(source, amount);
+            return target.hurtOrSimulate(source, amount);
         } finally {
             combatAttack = null;
         }
@@ -189,20 +189,23 @@ public abstract class RuinBoss extends Monster {
         return home != null ? net.minecraft.world.phys.Vec3.atBottomCenterOf(home.above()).add(0, 0.2, 0) : position();
     }
 
-    @Override
     public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(net.minecraft.world.item.ItemStack stack, float offsetY) {
+        return level() instanceof ServerLevel server ? spawnAtLocation(server, stack, new Vec3(0, offsetY, 0)) : null;
+    }
+    @Override
+    public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(ServerLevel serverLevel, net.minecraft.world.item.ItemStack stack, net.minecraft.world.phys.Vec3 offset) {
         if (isDeadOrDying() || isRemoved()) {
             return BossLoot.drop(this, lootPos(), stack);
         }
-        return super.spawnAtLocation(stack, offsetY);
+        return super.spawnAtLocation(serverLevel, stack, offset);
     }
 
     @Override
-    protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
+    protected void dropExperience(ServerLevel rewardLevel, net.minecraft.world.entity.@Nullable Entity killer) {
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
-                || lastHurtByPlayerTime > 0 && shouldDropExperience()
-                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
-            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
+                || lastHurtByPlayerMemoryTime > 0 && shouldDropExperience()
+                && server.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.MOB_DROPS))) {
+            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, getLastHurtByPlayer(), getExperienceReward(server, killer));
             BossLoot.experience(server, lootPos(), reward, rewardPlayers(server));
         }
     }
@@ -274,7 +277,7 @@ public abstract class RuinBoss extends Monster {
 
     /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。設定 bossXpMultiplier を掛ける。 */
     @Override
-    protected int getBaseExperienceReward() {
+    protected int getBaseExperienceReward(ServerLevel rewardLevel) {
         return BossScaling.xp(xpReward, rewardParticipants());
     }
 
@@ -348,7 +351,7 @@ public abstract class RuinBoss extends Monster {
     /** 起こした核を覚え、その周りから離れないようにする。 */
     public void awaken(BlockPos core) {
         this.home = core;
-        restrictTo(core, arenaRadius());
+        setHomeTo(core, arenaRadius());
     }
 
     /** 守る広さ（核からのブロック数）。挑戦者がこの外（＋4）へ出ると戻る。 */
@@ -376,7 +379,7 @@ public abstract class RuinBoss extends Monster {
     public void tick() {
         super.tick();
         hurtWindows.tick();
-        if (!level().isClientSide && emergeTicks() > 0) {
+        if (!level().isClientSide() && emergeTicks() > 0) {
             ServerLevel level = (ServerLevel) level();
             int left = emergeTicks() - 1;
             entityData.set(EMERGE, left);
@@ -405,8 +408,8 @@ public abstract class RuinBoss extends Monster {
     protected void onEmerged(ServerLevel level) {}
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         bossBar.setProgress(getHealth() / getMaxHealth());
         if (tickCount % 20 == 0 && !isMinion()) {
             checkChallengers((ServerLevel) level());
@@ -474,12 +477,12 @@ public abstract class RuinBoss extends Monster {
     }
 
     @Override
-    public boolean isAlliedTo(Entity other) {
-        return RuinGuards.isGuard(other) || super.isAlliedTo(other);
+    protected boolean considersEntityAsAlly(Entity other) {
+        return RuinGuards.isGuard(other) || super.considersEntityAsAlly(other);
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
         if (emergeTicks() > 0 && !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;            // 出現の演出のあいだは傷つかない
         }
@@ -489,7 +492,7 @@ public abstract class RuinBoss extends Monster {
         if (!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             amount *= damageScale;
         }
-        return hurtWindows.hurt(this, source, amount, super::hurt, () -> lastHurt, v -> lastHurt = v);
+        return hurtWindows.hurt(this, source, amount, (s,a) -> super.hurtServer(damageLevel,s,a), () -> lastHurt, v -> lastHurt = v);
     }
 
     /** source の攻撃が、いまその攻撃者の無敵時間（同じ強さ以下は通らない間）の中か。プレイヤーごとに分けて数える。 */
@@ -520,7 +523,7 @@ public abstract class RuinBoss extends Monster {
     private void dropAwakenedRewards(ServerLevel level) {
         for (int roll = 0; roll < BossScaling.lootRolls(rewardParticipants()); roll++) {
             for (String[] r : awakenedRewards()) {
-                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
+                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(r[0]));
                 spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
             }
         }
@@ -529,7 +532,7 @@ public abstract class RuinBoss extends Monster {
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), arenaRadius() + 16, "awakened_" + id);
         Component msg = Component.translatable("gui.singulo.guardian.awakened_defeated");
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(arenaRadius() + 16))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -561,16 +564,16 @@ public abstract class RuinBoss extends Monster {
 
     /** 落とす物（大勢で挑んだら人数ぶん）。分身は落とさない。 */
     @Override
-    protected void dropFromLootTable(DamageSource source, boolean recentlyHit) {
+    protected void dropFromLootTable(ServerLevel lootLevel, DamageSource source, boolean recentlyHit) {
         if (!isMinion()) {
             for (int roll = 0; roll < BossScaling.lootRolls(rewardParticipants()); roll++) {
-                super.dropFromLootTable(source, recentlyHit);
+                super.dropFromLootTable(lootLevel, source, recentlyHit);
             }
         }
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(double distance, float multiplier, DamageSource source) {
         return false;
     }
 
@@ -580,7 +583,7 @@ public abstract class RuinBoss extends Monster {
     }
 
     @Override
-    public boolean canChangeDimensions(Level from, Level to) {
+    public boolean canTeleport(Level from, Level to) {
         return false;
     }
 
@@ -599,33 +602,37 @@ public abstract class RuinBoss extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("participants", participants);
         tag.putInt("reward_participants", rewardParticipants);
         if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(home));
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        entityData.set(EMERGE, tag.getInt("emerge"));
-        entityData.set(AWAKENED, tag.getBoolean("awakened"));
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        entityData.set(EMERGE, tag.getIntOr("emerge", 0));
+        entityData.set(AWAKENED, tag.getBooleanOr("awakened", false));
         if (tag.contains("damage_scale")) {
-            damageScale = BossScaling.validDamageScale(tag.getFloat("damage_scale"));
+            damageScale = BossScaling.validDamageScale(tag.getFloatOr("damage_scale", 0.0F));
         }
-        participants = Math.max(1, tag.getInt("participants"));
+        participants = Math.max(1, tag.getIntOr("participants", 0));
         // 以前の版で保存された戦い（報酬の人数を持たない）は、そのときの人数で決める
-        rewardParticipants = tag.contains("reward_participants") ? tag.getInt("reward_participants")
+        rewardParticipants = tag.contains("reward_participants") ? tag.getIntOr("reward_participants", 0)
                 : emergeTicks() <= 0 ? participants : 0;
-        home = NbtUtils.readBlockPos(tag, "home").orElse(null);
+        home = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").orElse(null);
         if (home != null) {
-            restrictTo(home, arenaRadius());
+            setHomeTo(home, arenaRadius());
         }
         setBarName(getDisplayName());
         if (awakened()) {

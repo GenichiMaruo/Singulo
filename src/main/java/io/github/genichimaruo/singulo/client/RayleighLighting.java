@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.ruin.lab.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
@@ -14,11 +14,11 @@ public final class RayleighLighting {
     public static final int NOON = 0x0F000000;
     private RayleighLighting() {}
 
-    public static Level level(BlockAndTintGetter view) {
+    public static Level level(BlockAndLightGetter view) {
         // Renderer snapshots (notably Sodium's LevelSlice) deliberately do not expose a
         // light engine. Only the vanilla world/region views support our lightmap banks;
         // leave other renderers' packed lighting untouched, without probing their engine.
-        if (!(view instanceof Level) && !(view instanceof net.minecraft.client.renderer.chunk.RenderChunkRegion)) return null;
+        if (!(view instanceof Level) && !(view instanceof net.minecraft.client.renderer.chunk.RenderSectionRegion)) return null;
         Level owner = view.getLightEngine() instanceof RayleighLightAccess access ? access.singulo$level() : null;
         // Virtual levels (Ponder/schematic previews) can borrow the real world's light engine.
         // Its sunlight belongs to the real world, not to blocks at the same preview coordinates.
@@ -26,7 +26,7 @@ public final class RayleighLighting {
         return owner;
     }
     /** Convert a public combined SKY query back to its two independent render contributions. */
-    public static int pack(BlockAndTintGetter view, BlockPos pos, int packed) {
+    public static int pack(BlockAndLightGetter view, BlockPos pos, int packed) {
         Level level = level(view);
         if (level == null) return packed;
         int sunlight = RayleighSky.light(level, pos);
@@ -36,7 +36,7 @@ public final class RayleighLighting {
         return (packed & 0xFFFF) | natural << 20 | sunlight << 24;
     }
     /** Preserve an interpolated natural-light coordinate and add the face's artificial contribution. */
-    public static int tag(BlockAndTintGetter view, BlockPos pos, int packed) {
+    public static int tag(BlockAndLightGetter view, BlockPos pos, int packed) {
         Level level = level(view);
         return level == null ? packed : (packed & ~NOON) | RayleighSky.light(level, pos) << 24;
     }

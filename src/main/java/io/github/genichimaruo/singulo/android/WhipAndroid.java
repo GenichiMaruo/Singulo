@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.android;
 
 import java.util.EnumSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -208,7 +208,7 @@ public class WhipAndroid extends RuinAndroid {
                     hold(target);
                     if (stateTicks == 2) {
                         LivingEntity hit = lineTarget(REACH, 14);
-                        if (hit != null && hit.hurt(damageSources().mobAttack(WhipAndroid.this), LASH_DAMAGE)) {
+                        if (hit != null && hit.hurtOrSimulate(damageSources().mobAttack(WhipAndroid.this), LASH_DAMAGE)) {
                             Vec3 push = hit.position().subtract(position()).multiply(1, 0, 1).normalize().scale(0.45);
                             hit.setDeltaMovement(hit.getDeltaMovement().add(push.x, 0.15, push.z));
                             hit.hurtMarked = true;
@@ -225,8 +225,8 @@ public class WhipAndroid extends RuinAndroid {
                     if (stateTicks == BIND_THROW) {
                         LivingEntity hit = lineTarget(REACH + 0.8, 16);
                         if (hit != null) {
-                            hit.hurt(damageSources().mobAttack(WhipAndroid.this), BIND_DAMAGE);
-                            hit.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 50, 1));
+                            hit.hurtOrSimulate(damageSources().mobAttack(WhipAndroid.this), BIND_DAMAGE);
+                            hit.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 1));
                             setLinked(hit);
                             playSound(SoundEvents.CHAIN_PLACE, 1.0F, 0.8F);
                         } else {
@@ -296,7 +296,7 @@ public class WhipAndroid extends RuinAndroid {
                     continue;
                 }
                 waveHit.add(e.getUUID());
-                if (e.hurt(damageSources().mobAttack(WhipAndroid.this), WAVE_DAMAGE)) {
+                if (e.hurtOrSimulate(damageSources().mobAttack(WhipAndroid.this), WAVE_DAMAGE)) {
                     e.setDeltaMovement(e.getDeltaMovement().add(waveDir.x * 0.4, 0.45, waveDir.z * 0.4));
                     e.hurtMarked = true;
                 }

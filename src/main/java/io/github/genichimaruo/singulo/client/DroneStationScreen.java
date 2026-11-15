@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.drone.DroneStationBlockEntity;
 import io.github.genichimaruo.singulo.drone.DroneStationMenu;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,7 +32,7 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
     }
 
     private static ItemStack ghost(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     private int unitStatus(int unit) {
@@ -71,15 +71,15 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (!renderFrameTooltips(g, mouseX, mouseY) && !renderStatTooltips(g, mouseX, mouseY)) {
-            renderTooltip(g, mouseX, mouseY);
+            extractTooltip(g, mouseX, mouseY);
         }
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int x = leftPos;
@@ -159,11 +159,12 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
     }
 
     private boolean armed(int unit) {
-        return armedUnit == unit && net.minecraft.Util.getMillis() - armedAt < 3000;
+        return armedUnit == unit && net.minecraft.util.Util.getMillis() - armedAt < 3000;
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (clickFrame(mouseX, mouseY, button)) {
             return true;
         }
@@ -180,11 +181,11 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
                 armedUnit = -1;
             } else {
                 armedUnit = i;
-                armedAt = net.minecraft.Util.getMillis();
+                armedAt = net.minecraft.util.Util.getMillis();
             }
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     private void press(int id) {
@@ -206,7 +207,7 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
     }
 
     @Override
-    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {}
+    protected void drawRail(GuiGraphicsExtractor g, int row, int x, int y, boolean hover) {}
 
     @Override
     protected Component railTooltip(int row) {
@@ -214,12 +215,12 @@ public class DroneStationScreen extends FramedScreen<DroneStationMenu> {
     }
 
     /** 小さなドローンの印（8×7）: 4つのローターと胴。 */
-    static void droneGlyph(GuiGraphics g, int x, int y, int c) {
+    static void droneGlyph(GuiGraphicsExtractor g, int x, int y, int c) {
         Panel.sprite(g, x, y, new String[]{"xx....xx", "xx....xx", "..xxxx..", "..xxxx..", "xx....xx", "xx....xx", "........"}, c);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         drawLabels(g);
     }
 }

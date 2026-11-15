@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:snow_block"
-      },
+      "ingredient": "minecraft:snow_block",
       "count": 4
     }
   ],

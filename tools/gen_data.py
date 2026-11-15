@@ -46,7 +46,40 @@ def warn(msg):
     warnings.append(msg)
 
 
+def ingredient_26(value):
+    if isinstance(value, list):
+        return [ingredient_26(v) for v in value]
+    if isinstance(value, dict):
+        if value.get('type') == 'neoforge:components':
+            out = dict(value)
+            out['neoforge:ingredient_type'] = out.pop('type')
+            return out
+        if set(value) == {'item'}:
+            return value['item']
+        if set(value) == {'tag'}:
+            return '#' + value['tag']
+    # Custom ingredient schemas/components must not be rewritten recursively.
+    return value
+
+
+def recipe_26(value):
+    """Upgrade ingredient fields only, never custom component predicates or result NBT."""
+    out = dict(value)
+    for key in ('ingredient', 'restore'):
+        if key in out:
+            out[key] = ingredient_26(out[key])
+    if 'key' in out:
+        out['key'] = {symbol: ingredient_26(v) for symbol, v in out['key'].items()}
+    if 'ingredients' in out:
+        out['ingredients'] = [dict(v, ingredient=ingredient_26(v['ingredient']))
+                              if isinstance(v, dict) and 'ingredient' in v else ingredient_26(v)
+                              for v in out['ingredients']]
+    return out
+
+
 def write_json(path: Path, obj):
+    if 'recipe' in path.parts:
+        obj = recipe_26(obj)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
@@ -798,6 +831,7 @@ UI_LANG = {
     'key.singulo.toggle_area': ('重力操作の範囲を切り替え', 'Toggle gravity tool area'),
     'key.singulo.handbook_lookup': ('ハンドブックで調べる', 'Look up in Handbook'),
     'key.categories.singulo': ('Singulo', 'Singulo'),
+    'key.category.singulo.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.dark_matter': ('ダークマター: %s mB', 'Dark matter: %s mB'),
     'gui.singulo.containment.status': ('ダークマター %s / %s mB', 'Dark matter %s / %s mB'),
     'gui.singulo.containment.leaking': ('ダークマター %s / %s mB　漏れている', 'Dark matter %s / %s mB · leaking'),
@@ -2251,7 +2285,7 @@ def art_textures():
     import accelerator_assets
     accelerator_assets.textures(tb, 16)
     accelerator_assets.textures(hb, 32)
-    write_json(hd / 'pack.mcmeta', {'pack': {'description': 'Singulo HD (32x32)', 'pack_format': 34}})
+    write_json(hd / 'pack.mcmeta', {'pack': {'description': 'Singulo HD (32x32)', 'pack_format': 84, 'min_format': 84, 'max_format': 84}})
     for stage in range(1, 6):
         for face in ('side', 'top', 'bottom'):
             art16.save(art16.casing(stage, face), tb / f'machine_{face}_t{stage}.png')
@@ -4379,7 +4413,7 @@ def main():
     # Sodium ignores the vanilla include and uses our dedicated terrain shader integration.
     # Acknowledge only this known-compatible override; keep warnings for other shader files.
     write_json(RES / 'pack.mcmeta', {
-        'pack': {'description': 'Singulo generated resources', 'pack_format': 34},
+        'pack': {'description': 'Singulo generated resources', 'min_format': 84, 'max_format': [101, 1]},
         'sodium': {'ignored_shaders': ['light.glsl']},
     })
     # レシピの画像と一覧（docs/recipes）
@@ -4399,3 +4433,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    import gen_item_definitions
+    gen_item_definitions.main()

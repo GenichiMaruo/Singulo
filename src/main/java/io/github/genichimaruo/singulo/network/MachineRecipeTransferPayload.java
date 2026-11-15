@@ -10,16 +10,16 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /** Only the recipe ID is trusted as a lookup key; the server computes all item movements. */
-public record MachineRecipeTransferPayload(int containerId, ResourceLocation recipeId, boolean maxTransfer)
+public record MachineRecipeTransferPayload(int containerId, Identifier recipeId, boolean maxTransfer)
         implements CustomPacketPayload {
     public static final Type<MachineRecipeTransferPayload> TYPE = new Type<>(Singulo.id("machine_recipe_transfer"));
     public static final StreamCodec<RegistryFriendlyByteBuf, MachineRecipeTransferPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, MachineRecipeTransferPayload::containerId,
-            ResourceLocation.STREAM_CODEC, MachineRecipeTransferPayload::recipeId,
+            Identifier.STREAM_CODEC, MachineRecipeTransferPayload::recipeId,
             ByteBufCodecs.BOOL, MachineRecipeTransferPayload::maxTransfer,
             MachineRecipeTransferPayload::new);
 
@@ -42,7 +42,9 @@ public record MachineRecipeTransferPayload(int containerId, ResourceLocation rec
                     || !menu.stillValid(player)) return;
             if (!(player.level().getBlockEntity(menu.pos()) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine)
                     || machine.type() != menu.type()) return;
-            var holder = player.level().getRecipeManager().byKey(payload.recipeId()).orElse(null);
+            if (!(player.level() instanceof net.minecraft.server.level.ServerLevel server)) return;
+            var holder = server.recipeAccess().byKey(net.minecraft.resources.ResourceKey.create(
+                    net.minecraft.core.registries.Registries.RECIPE, payload.recipeId())).orElse(null);
             if (holder == null || !(holder.value() instanceof MachineRecipe original)) return;
             MachineRecipe recipe = RecipeTweaks.adjust(payload.recipeId(), original);
             if (recipe == null) return;

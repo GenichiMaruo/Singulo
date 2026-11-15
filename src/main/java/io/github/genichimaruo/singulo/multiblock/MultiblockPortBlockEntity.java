@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.multiblock;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -58,12 +58,12 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         if (controller == null || !level.isLoaded(controller)) {
             return;
         }
-        IEnergyStorage energy = port.delegate(Capabilities.EnergyStorage.BLOCK);
+        net.neoforged.neoforge.transfer.energy.EnergyHandler energy = port.delegate(Capabilities.Energy.BLOCK);
         boolean slow = (level.getGameTime() + pos.asLong()) % ITEM_INTERVAL == 0;
         Outputs outputs = slow && level.getBlockEntity(controller) instanceof Outputs o ? o : null;
         IItemHandler items = outputs == null ? null : outputs.ejectItems(pos);
         IFluidHandler fluids = outputs == null ? null : outputs.ejectFluids(pos);
-        if ((energy == null || !energy.canExtract()) && items == null && fluids == null) {
+        if (energy == null && items == null && fluids == null) {
             return;
         }
         for (Direction dir : Direction.values()) {
@@ -79,7 +79,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
                 continue;
             }
             Direction from = dir.getOpposite();
-            if (energy != null && energy.canExtract()) {
+            if (energy != null) {
                 pushEnergy(level, target, from, energy);
             }
             if (items != null) {
@@ -91,22 +91,13 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         }
     }
 
-    private static void pushEnergy(Level level, BlockPos target, Direction from, IEnergyStorage source) {
-        IEnergyStorage dest = level.getCapability(Capabilities.EnergyStorage.BLOCK, target, from);
-        if (dest == null || !dest.canReceive()) {
-            return;
-        }
-        int offer = source.extractEnergy(Integer.MAX_VALUE, true);
-        if (offer > 0) {
-            int taken = dest.receiveEnergy(offer, false);
-            if (taken > 0) {
-                source.extractEnergy(taken, false);
-            }
-        }
+    private static void pushEnergy(Level level, BlockPos target, Direction from, net.neoforged.neoforge.transfer.energy.EnergyHandler source) {
+        var destination=level.getCapability(Capabilities.Energy.BLOCK,target,from);
+        if(destination!=null)io.github.genichimaruo.singulo.energy.EnergyTransfers.move(source,destination,Integer.MAX_VALUE);
     }
 
     private static void pushItems(Level level, BlockPos target, Direction from, IItemHandler source) {
-        IItemHandler dest = level.getCapability(Capabilities.ItemHandler.BLOCK, target, from);
+        IItemHandler dest = io.github.genichimaruo.singulo.compat.ItemResourceView.find(level, target, from);
         if (dest == null) {
             return;
         }
@@ -124,7 +115,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
     }
 
     private static void pushFluids(Level level, BlockPos target, Direction from, IFluidHandler source) {
-        IFluidHandler dest = level.getCapability(Capabilities.FluidHandler.BLOCK, target, from);
+        IFluidHandler dest = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, target, from);
         if (dest == null) {
             return;
         }

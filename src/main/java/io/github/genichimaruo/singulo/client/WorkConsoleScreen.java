@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import net.minecraft.client.gui.GuiGraphics;
+import org.jspecify.annotations.Nullable;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -22,7 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * アンドロイド作業指令台の画面。幅はインベントリに合わせた 176 で、高さは注文の一覧の行数（設定）に合わせて伸び縮みする。
@@ -146,7 +146,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** タブを描く（connected: 開いているページと許可証の段。枠とつながった形）。枠の前後で2回呼ぶ。 */
-    private void drawOuterTabs(GuiGraphics g, int mouseX, int mouseY, boolean connected) {
+    private void drawOuterTabs(GuiGraphicsExtractor g, int mouseX, int mouseY, boolean connected) {
         for (int i = 0; i <= WorkConsoleMenu.PAGE_TABS; i++) {
             boolean popupTab = i < WorkConsoleMenu.PAGE_TABS && TAB_ORDER[i] == TAB_RECORD;
             boolean on = i == WorkConsoleMenu.PAGE_TABS || TAB_ORDER[i] == tab && !popupTab;
@@ -165,7 +165,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 }
                 if (permit.isActive()) {
                     ghostSlot(g, leftPos + WorkConsoleMenu.PERMIT_X, topPos + WorkConsoleMenu.PERMIT_Y, permit,
-                            new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("shield_permit"))));
+                            new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("shield_permit"))));
                 }
                 continue;
             }
@@ -175,7 +175,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** ページの記号（8×8 ほど）: 注文は箱、登録はくり返し、進行中は再生、つながりは人、経路は照準、記録はカード、納品箱は送り出し。 */
-    private void pageIcon(GuiGraphics g, int page, int x, int y, int c) {
+    private void pageIcon(GuiGraphicsExtractor g, int page, int x, int y, int c) {
         switch (page) {
             case 0 -> Panel.icon(g, x, y, Panel.Icon.BOX, c);
             case TAB_STANDING -> Panel.autoIcon(g, x - 1, y - 1, c);
@@ -322,22 +322,24 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dx, double dy) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         for (Popup p : stack) {
             if (p.drag(leftPos, topPos, mouseX, mouseY)) {
                 return true;
             }
         }
-        return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+        return super.mouseDragged(event, dx, dy);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         boolean dragged = false;
         for (Popup p : stack) {
             dragged |= p.release();
         }
-        return dragged || super.mouseReleased(mouseX, mouseY, button);
+        return dragged || super.mouseReleased(event);
     }
 
     /** 見た目の確認用: 窓の中や下の段の部品の、画面の座標（x, y, 幅, 高さ）。 */
@@ -444,9 +446,9 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 minecraft.getLanguageManager().getSelected().replace('_', '-')));
         java.util.Comparator<CompoundTag> order = switch (sortMode()) {
             case "name" -> java.util.Comparator.comparing(e -> stacks.get(e).getHoverName().getString(), collator);
-            case "count" -> java.util.Comparator.comparingLong((CompoundTag e) -> e.getLong("count")).reversed();
+            case "count" -> java.util.Comparator.comparingLong((CompoundTag e) -> e.getLongOr("count", 0L)).reversed();
             case "mod" -> java.util.Comparator.comparing(e -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stacks.get(e).getItem()).getNamespace());
-            case "craftable" -> java.util.Comparator.comparing((CompoundTag e) -> !e.getBoolean("craft"));
+            case "craftable" -> java.util.Comparator.comparing((CompoundTag e) -> !e.getBooleanOr("craft", false));
             default -> null;                            // 指令台の順のまま
         };
         if (order != null) {
@@ -464,7 +466,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (words.length == 0) {
             return true;
         }
-        net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item.getItem());
+        net.minecraft.resources.Identifier id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item.getItem());
         String name = item.getHoverName().getString().toLowerCase(java.util.Locale.ROOT);
         for (String w : words) {
             if (w.startsWith("@")) {
@@ -491,7 +493,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         List<CompoundTag> out = new ArrayList<>();
         CompoundTag v = menu.view();
         if (v != null) {
-            for (Tag t : v.getList(key, Tag.TAG_COMPOUND)) {
+            for (Tag t : v.getListOrEmpty(key)) {
                 out.add((CompoundTag) t);
             }
         }
@@ -499,16 +501,16 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     private ItemStack stack(CompoundTag t, String key) {
-        return ItemStack.parseOptional(reg(), t.getCompound(key));
+        return ItemStack.OPTIONAL_CODEC.parse(reg().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), t.getCompoundOrEmpty(key)).result().orElse(ItemStack.EMPTY);
     }
 
     private Component text(CompoundTag t, String key) {
-        Component c = t.contains(key) ? Component.Serializer.fromJson(t.getString(key), reg()) : null;
+        Component c = t.contains(key) ? net.minecraft.network.chat.ComponentSerialization.CODEC.parse(reg().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE), com.google.gson.JsonParser.parseString(t.getStringOr(key, ""))).result().orElse(null) : null;
         return c == null ? Component.empty() : c;
     }
 
     private void send(CompoundTag action) {
-        PacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId, action));
+        ClientPacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId, action));
     }
 
     @Override
@@ -518,9 +520,9 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             seenVersion = menu.viewVersion();
             CompoundTag v = menu.view();
             if (v != null && v.contains("plan")) {
-                CompoundTag p = v.getCompound("plan");
+                CompoundTag p = v.getCompoundOrEmpty("plan");
                 if (p.contains("started")) {
-                    if (p.getBoolean("started")) {
+                    if (p.getBooleanOr("started", false)) {
                         closePicking();
                         tab = registering ? TAB_STANDING : 1;
                     } else {
@@ -569,16 +571,16 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** スロットの右下に、数を小さな字で書く（5桁まで収まる大きさ）。 */
-    private void drawCount(GuiGraphics g, int x, int y, String text) {
+    private void drawCount(GuiGraphicsExtractor g, int x, int y, String text) {
         if (text.isEmpty()) {
             return;
         }
         float k = Math.min(0.6F, 17F / font.width(text));
-        g.pose().pushPose();
-        g.pose().translate(x + 17 - font.width(text) * k, y + 17 - font.lineHeight * k, 300);
-        g.pose().scale(k, k, 1);
-        g.drawString(font, text, 0, 0, 0xFFFFFFFF, true);
-        g.pose().popPose();
+        g.pose().pushMatrix();
+        g.pose().translate(x + 17 - font.width(text) * k, y + 17 - font.lineHeight * k);
+        g.pose().scale(k, k);
+        g.text(font, text, 0, 0, 0xFFFFFFFF, true);
+        g.pose().popMatrix();
     }
 
     // ------------------------------------------------------------------ 注文の確認
@@ -641,7 +643,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     // ------------------------------------------------------------------ 入力
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         if (picking != null && keyCode == 256) {        // Esc: 確認をやめる（画面は閉じない）
             closePicking();
             return true;
@@ -652,16 +655,16 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 setFocused(null);
                 return true;
             }
-            searchBox.keyPressed(keyCode, scanCode, modifiers);
+            searchBox.keyPressed(event);
             return true;                                // 打っている間は、E などで画面を閉じない
         }
-        if (countBox != null && countBox.isFocused() && countBox.keyPressed(keyCode, scanCode, modifiers)) {
+        if (countBox != null && countBox.isFocused() && countBox.keyPressed(event)) {
             return true;
         }
-        if (countBox != null && countBox.isFocused() && minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+        if (countBox != null && countBox.isFocused() && minecraft.options.keyInventory.matches(event)) {
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
@@ -672,11 +675,11 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (top == recordPop) {
             if (optionShown() && Panel.inside(mouseX, mouseY, recordX() + WorkConsoleMenu.OPTION_X, recordY() + WorkConsoleMenu.OPTION_Y,
                     WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H)) {
-                adjustOption(dy > 0, hasShiftDown());
+                adjustOption(dy > 0, net.minecraft.client.Minecraft.getInstance().hasShiftDown());
                 return true;
             }
             // 加工モードの見本: ホイールで数を変える（シフトで10ずつ）
-            adjustHovered(dy > 0, hasShiftDown());
+            adjustHovered(dy > 0, net.minecraft.client.Minecraft.getInstance().hasShiftDown());
             return true;
         }
         if (top == detailPop) {
@@ -701,7 +704,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         layoutPopups();
         Popup top = popupAt(mouseX, mouseY);
         if (top != null) {
@@ -716,10 +720,10 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 return true;
             }
             if (top == orderPop) {
-                return clickPicking(mouseX, mouseY, button);
+                return clickPicking(event, doubleClick);
             }
             if (top == recordPop) {
-                return clickRecord(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+                return clickRecord(mouseX, mouseY, button) || super.mouseClicked(event, doubleClick);
             }
             return true;                               // 詳しい様子の窓: 見るだけ
         }
@@ -743,13 +747,13 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 if (button == 1) {
                     searchBox.setValue("");               // 右クリック: 消す
                 } else {
-                    searchBox.mouseClicked(mouseX, mouseY, button);
+                    searchBox.mouseClicked(event, doubleClick);
                 }
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + SORT_X, y + searchY(), SORT_W, SEARCH_H)) {
                 int i = java.util.Arrays.asList(SORTS).indexOf(sortMode());
-                int next = Math.floorMod(i + (Screen.hasShiftDown() || button == 1 ? -1 : 1), SORTS.length);
+                int next = Math.floorMod(i + (net.minecraft.client.Minecraft.getInstance().hasShiftDown() || button == 1 ? -1 : 1), SORTS.length);
                 saveConfig(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT, SORTS[next]);
                 scroll = 0;
                 return true;
@@ -798,17 +802,17 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 int idx = i + scroll;
                 int ry = y + TOP + i * ROW_H;
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + CANCEL_X, ry + 3, ROW_BTN, ROW_BTN)) {
-                    send(WorkConsoleActionPayload.cancel(orders.get(idx).getInt("id")));
+                    send(WorkConsoleActionPayload.cancel(orders.get(idx).getIntOr("id", 0)));
                     return true;
                 }
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + AGAIN_X, ry + 3, ROW_BTN, ROW_BTN)) {
                     // 同じ物を、もう一度注文する（数はこの注文と同じから。確認の窓で変えられる）
                     CompoundTag o = orders.get(idx);
-                    openPicking(stack(o, "target"), o.getLong("count"));
+                    openPicking(stack(o, "target"), o.getLongOr("count", 0L));
                     return true;
                 }
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, ry, AGAIN_X - 10, ROW_H - 1)) {
-                    detail = orders.get(idx).getInt("id");     // 行をクリック: 詳しい様子の窓を開く
+                    detail = orders.get(idx).getIntOr("id", 0);     // 行をクリック: 詳しい様子の窓を開く
                     detailScroll = workerScroll = 0;
                     detailPop.open = true;
                     toFront(detailPop);
@@ -820,7 +824,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             for (int i = 0; i < orderRows(); i++) {
                 int idx = i + scroll;
                 if (idx < rows.size() && Panel.inside(mouseX, mouseY, x + CANCEL_X, y + TOP + i * ROW_H + 3, ROW_BTN, ROW_BTN)) {
-                    send(WorkConsoleActionPayload.unregister(rows.get(idx).getInt("id")));
+                    send(WorkConsoleActionPayload.unregister(rows.get(idx).getIntOr("id", 0)));
                     return true;
                 }
             }
@@ -829,22 +833,24 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             for (int i = 0; i < linkRows(); i++) {
                 int idx = i + scroll;
                 if (idx < links.size() && Panel.inside(mouseX, mouseY, x + CANCEL_X, y + TOP + i * LINK_H, ROW_BTN, ROW_BTN)) {
-                    send(WorkConsoleActionPayload.unlink(BlockPos.of(links.get(idx).getLong("pos"))));
+                    send(WorkConsoleActionPayload.unlink(BlockPos.of(links.get(idx).getLongOr("pos", 0L))));
                     return true;
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     /** 注文の確認の窓の中のクリック（窓の中は下の画面に届かない）。 */
-    private boolean clickPicking(double mouseX, double mouseY, int button) {
+    private boolean clickPicking(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX=event.x(), mouseY=event.y();
+        int button=event.button();
         int x = pickX(), y = pickY();
-        if (countBox != null && countBox.mouseClicked(mouseX, mouseY, button)) {
+        if (countBox != null && countBox.mouseClicked(event, doubleClick)) {
             setFocused(countBox);
             return true;
         }
-        long step = Screen.hasShiftDown() ? 10 : Screen.hasControlDown() ? 64 : 1;
+        long step = net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? 10 : net.minecraft.client.Minecraft.getInstance().hasControlDown() ? 64 : 1;
         if (Panel.inside(mouseX, mouseY, x + 8, y + 27, 14, 14)) {
             addCount(-step);
             return true;
@@ -858,7 +864,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             int idx = i + androidScroll;
             if (idx < androids.size() && Panel.inside(mouseX, mouseY, x + 128, y + LIST_Y + i * LIST_H, 112, LIST_H)) {
                 CompoundTag a = androids.get(idx);
-                UUID id = a.getUUID("id");
+                UUID id = a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0));
                 if (selectable(a) && !chosen.remove(id)) {
                     chosen.add(id);
                 }
@@ -892,7 +898,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && canStart()) {
             error = null;
             BlockPos dest = deliveries.isEmpty() ? menu.pos()
-                    : BlockPos.of(deliveries.get(Math.min(destination, deliveries.size() - 1)).getLong("pos"));
+                    : BlockPos.of(deliveries.get(Math.min(destination, deliveries.size() - 1)).getLongOr("pos", 0L));
             registering = trigger >= 0;
             if (registering) {
                 List<UUID> picked = new ArrayList<>(chosen);
@@ -911,7 +917,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             return false;
         }
         int x = recordX(), y = recordY();
-        if (button == 2 && adjustHovered(!hasShiftDown(), false)) {
+        if (button == 2 && adjustHovered(!net.minecraft.client.Minecraft.getInstance().hasShiftDown(), false)) {
             return true;                   // ミドルクリックで1つ増やす（シフトで減らす）
         }
         if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.MODE_X, y + WorkConsoleMenu.MODE_Y, WorkConsoleMenu.BUTTON_W,
@@ -948,7 +954,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             }
             if (optionShown() && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y,
                     WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H)) {
-                adjustOption(button != 1, hasShiftDown());
+                adjustOption(button != 1, net.minecraft.client.Minecraft.getInstance().hasShiftDown());
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.ADD_X, y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.ADD_W,
@@ -978,22 +984,22 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (trigger >= 0) {
             return picking != null;                // 登録は、今そろっていなくてもできる（そろったら始める）
         }
-        return plan != null && plan.getBoolean("ok") && plan.getLong("count") == count
+        return plan != null && plan.getBooleanOr("ok", false) && plan.getLongOr("count", 0L) == count
                 && picking != null && ItemStack.isSameItemSameComponents(stack(plan, "target"), picking)
                 && !startAndroids().isEmpty() && planDelay == 0;
     }
 
     /** 選べるアンドロイドか（作業中でなく、採掘の工程があれば採掘アップグレードを積んでいる）。 */
     private boolean selectable(CompoundTag a) {
-        return !a.getBoolean("busy") && (plan == null || !plan.getBoolean("mining") || a.getBoolean("miner"))
-                && (plan == null || !plan.getBoolean("felling") || a.getBoolean("feller"))
-                && (plan == null || !plan.getBoolean("fluids") || a.getBoolean("tank"))
-                && (plan == null || !plan.getBoolean("chemicals") || a.getBoolean("chem_tank"));
+        return !a.getBooleanOr("busy", false) && (plan == null || !plan.getBooleanOr("mining", false) || a.getBooleanOr("miner", false))
+                && (plan == null || !plan.getBooleanOr("felling", false) || a.getBooleanOr("feller", false))
+                && (plan == null || !plan.getBooleanOr("fluids", false) || a.getBooleanOr("tank", false))
+                && (plan == null || !plan.getBooleanOr("chemicals", false) || a.getBooleanOr("chem_tank", false));
     }
 
     /** だれも選んでいない（選べる候補をみな送り、指令台が作業量に見合う人数だけを招集する）。 */
     private boolean autoAndroids() {
-        return chosen.stream().noneMatch(id -> list("androids").stream().anyMatch(a -> a.getUUID("id").equals(id) && selectable(a)));
+        return chosen.stream().noneMatch(id -> list("androids").stream().anyMatch(a -> a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)).equals(id) && selectable(a)));
     }
 
     /** 作業を始めるアンドロイド: 選んだうちの選べるもの。だれも選んでいなければ、選べるもの全部。 */
@@ -1001,9 +1007,9 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         List<UUID> picked = new ArrayList<>(), all = new ArrayList<>();
         for (CompoundTag a : list("androids")) {
             if (selectable(a)) {
-                all.add(a.getUUID("id"));
-                if (chosen.contains(a.getUUID("id"))) {
-                    picked.add(a.getUUID("id"));
+                all.add(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)));
+                if (chosen.contains(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)))) {
+                    picked.add(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)));
                 }
             }
         }
@@ -1013,18 +1019,18 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     // ------------------------------------------------------------------ 描画
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         layoutPopups();
         tips.clear();
-        super.render(g, mouseX, mouseY, partialTick);
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         // 窓は下の画面（スロットの物の数は z 300 あたり）より手前に、後ろに積んだものほど手前に描く
         int z = POPUP_Z;
         for (Popup p : List.copyOf(stack)) {
             if (!p.open) {
                 continue;
             }
-            g.pose().pushPose();
-            g.pose().translate(0, 0, z);
+            g.pose().pushMatrix();
+            g.nextStratum();
             p.draw(g, skin, mouseX, mouseY);
             if (p == orderPop && picking != null) {
                 renderPickingPopup(g, mouseX, mouseY, partialTick);
@@ -1033,16 +1039,16 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             } else if (p == recordPop) {
                 renderRecordPopup(g, mouseX, mouseY);
             }
-            g.pose().popPose();
+            g.pose().popMatrix();
             z += 300;
         }
         Popup top = popupAt(mouseX, mouseY);
-        g.pose().pushPose();
-        g.pose().translate(0, 0, z);
+        g.pose().pushMatrix();
+        g.nextStratum();
         ItemStack carried = menu.getCarried();
         if (!carried.isEmpty() && z > POPUP_Z) {
-            g.renderItem(carried, mouseX - 8, mouseY - 8);          // 持っている物は、窓の上でも手前に
-            g.renderItemDecorations(font, carried, mouseX - 8, mouseY - 8);
+            g.item(carried, mouseX - 8, mouseY - 8);          // 持っている物は、窓の上でも手前に
+            g.itemDecorations(font, carried, mouseX - 8, mouseY - 8);
         }
         if (top == orderPop) {
             if (!showTip(g, orderPop, mouseX, mouseY)) {
@@ -1051,17 +1057,17 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         } else if (top == detailPop) {
             showTip(g, detailPop, mouseX, mouseY);
         } else if (top == recordPop) {
-            renderTooltip(g, mouseX, mouseY);
+            extractTooltip(g, mouseX, mouseY);
             if (hoveredSlot == null || !hoveredSlot.hasItem() || variantMarkAt(mouseX, mouseY) >= 0) {
                 renderRecordTooltips(g, mouseX, mouseY);   // アイテムの説明が出ている間は、ほかの説明を重ねない
             }
         } else if (top == null) {
-            renderTooltip(g, mouseX, mouseY);
+            extractTooltip(g, mouseX, mouseY);
             if ((hoveredSlot == null || !hoveredSlot.hasItem()) && !showTip(g, null, mouseX, mouseY)) {
                 renderMainTooltips(g, mouseX, mouseY);
             }
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     // ------------------------------------------------------------------ 長い文字とアイコンの説明
@@ -1072,32 +1078,32 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private final List<Tip> tips = new ArrayList<>();
 
     /** 幅 w に収まらなければ、字を縮めずに「…」で切って書く。切ったら true。 */
-    private boolean clipped(GuiGraphics g, Component text, int x, int y, int w, int color) {
+    private boolean clipped(GuiGraphicsExtractor g, Component text, int x, int y, int w, int color) {
         if (font.width(text) <= w) {
-            g.drawString(font, text, x, y, color, false);
+            g.text(font, text, x, y, color, false);
             return false;
         }
         net.minecraft.network.chat.FormattedText cut = font.substrByWidth(text, w - font.width("…"));
-        g.drawString(font, net.minecraft.locale.Language.getInstance().getVisualOrder(
+        g.text(font, net.minecraft.locale.Language.getInstance().getVisualOrder(
                 net.minecraft.network.chat.FormattedText.composite(cut, Component.literal("…"))), x, y, color, false);
         return true;
     }
 
     /** clipped と同じで、切ったときは全文をマウスを重ねたときに出す。ox, oy: 今の座標の原点（画面の座標）。 */
-    private void clip(GuiGraphics g, @Nullable Popup owner, Component text, int x, int y, int w, int color, int ox, int oy) {
+    private void clip(GuiGraphicsExtractor g, @Nullable Popup owner, Component text, int x, int y, int w, int color, int ox, int oy) {
         if (clipped(g, text, x, y, w, color)) {
             tips.add(new Tip(owner, ox + x, oy + y - 1, w, 10, List.of(text)));
         }
     }
 
     /** 文字の代わりのアイコン。説明はマウスを重ねたときに出す。 */
-    private void iconTip(GuiGraphics g, @Nullable Popup owner, Panel.Icon icon, int x, int y, int color, int ox, int oy, Component... lines) {
+    private void iconTip(GuiGraphicsExtractor g, @Nullable Popup owner, Panel.Icon icon, int x, int y, int color, int ox, int oy, Component... lines) {
         Panel.icon(g, x, y, icon, color);
         tips.add(new Tip(owner, ox + x - 1, oy + y - 1, 10, 10, List.of(lines)));
     }
 
     /** マウスの下の説明を出す（出したら true）。 */
-    private boolean showTip(GuiGraphics g, @Nullable Popup owner, int mouseX, int mouseY) {
+    private boolean showTip(GuiGraphicsExtractor g, @Nullable Popup owner, int mouseX, int mouseY) {
         for (int i = tips.size() - 1; i >= 0; i--) {
             Tip t = tips.get(i);
             if (t.owner() == owner && Panel.inside(mouseX, mouseY, t.x(), t.y(), t.w(), t.h())) {
@@ -1111,7 +1117,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     /**
      * 今の並びのアイコン（8×7）: 指令台の順は同じ長さの3本線、名前は「A」、数は高さの違う棒、mod は箱、作れる物は光る印。
      */
-    private static void sortIcon(GuiGraphics g, String mode, int x, int y, int c, int accent) {
+    private static void sortIcon(GuiGraphicsExtractor g, String mode, int x, int y, int c, int accent) {
         switch (mode) {
             case "name" -> {
                 g.fill(x + 2, y, x + 5, y + 1, c);                  // A
@@ -1139,7 +1145,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** ごみ箱の記号（7×8）。 */
-    private static void trashIcon(GuiGraphics g, int x, int y, int c) {
+    private static void trashIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         g.fill(x + 2, y, x + 5, y + 1, c);
         g.fill(x, y + 1, x + 7, y + 2, c);
         g.fill(x + 1, y + 3, x + 6, y + 4, c);
@@ -1153,24 +1159,24 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private Component orderState(CompoundTag o) {
         List<CompoundTag> missing = tags(o, "missing");
         if (missing.isEmpty()) {
-            return Component.translatable("gui.singulo.work_console.status." + o.getInt("status"), o.getInt("workers"));
+            return Component.translatable("gui.singulo.work_console.status." + o.getIntOr("status", 0), o.getIntOr("workers", 0));
         }
         // 足りない物（1つめと、ほかの種類の数）
         CompoundTag m = missing.get(0);
         return Component.translatable(missing.size() > 1 ? "gui.singulo.work_console.missing.more" : "gui.singulo.work_console.missing.one",
-                stack(m, "item").getHoverName(), compact(m.getLong("count")), missing.size() - 1);
+                stack(m, "item").getHoverName(), compact(m.getLongOr("count", 0L)), missing.size() - 1);
     }
 
     /** 登録の行の1行目と2行目（きっかけはアクセントの色）。 */
     private Component[] standingLines(CompoundTag s) {
-        int trig = s.getInt("trigger");
-        Component head = stack(s, "item").getHoverName().copy().append(" ×" + compact(s.getLong("count")));
-        int state = s.getInt("state");
+        int trig = s.getIntOr("trigger", 0);
+        Component head = stack(s, "item").getHoverName().copy().append(" ×" + compact(s.getLongOr("count", 0L)));
+        int state = s.getIntOr("state", 0);
         Component line = state == io.github.genichimaruo.singulo.android.work.StandingOrder.WAITING && s.contains("reason")
                 ? Component.translatable("gui.singulo.work_console.standing.waiting", text(s, "reason"))
                 : Component.translatable("gui.singulo.work_console.standing.state." + state);
         if (trig != io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE) {
-            line = line.copy().append(Component.translatable("gui.singulo.work_console.standing.stock", compact(s.getLong("stock"))));
+            line = line.copy().append(Component.translatable("gui.singulo.work_console.standing.stock", compact(s.getLongOr("stock", 0L))));
         }
         Component trigger = Component.translatable("gui.singulo.work_console.trigger."
                 + io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGER_KEYS[trig]).withColor(skin.accent() & 0xFFFFFF);
@@ -1179,31 +1185,31 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
 
     /** つながりの行の文字（種類と座標）。 */
     private static Component linkLine(CompoundTag l) {
-        BlockPos p = BlockPos.of(l.getLong("pos"));
-        int kind = l.getInt("kind");
+        BlockPos p = BlockPos.of(l.getLongOr("pos", 0L));
+        int kind = l.getIntOr("kind", 0);
         Component name = Component.translatable(kind < 0 ? "gui.singulo.work_console.link.lost" : "gui.singulo.work_console.link." + kind);
         return name.copy().append("  " + p.getX() + ", " + p.getY() + ", " + p.getZ());
     }
 
     /** 窓の上の帯の左に、名前（と物の小さな絵）を書く（帯の中ほどのつまみの印にはかからない幅で）。 */
-    private void popupTitle(GuiGraphics g, Popup p, Component name, @Nullable ItemStack icon) {
+    private void popupTitle(GuiGraphicsExtractor g, Popup p, Component name, @Nullable ItemStack icon) {
         int tx = p.x + 4;
         if (icon != null && !icon.isEmpty()) {
-            g.pose().pushPose();
-            g.pose().translate(tx, p.y + 3, 0);
-            g.pose().scale(0.5F, 0.5F, 1);
-            g.renderItem(icon, 0, 0);
-            g.pose().popPose();
+            g.pose().pushMatrix();
+            g.pose().translate(tx, p.y + 3);
+            g.pose().scale(0.5F, 0.5F);
+            g.item(icon, 0, 0);
+            g.pose().popMatrix();
             tx += 11;
         }
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 200);
+        g.pose().pushMatrix();
+        g.nextStratum();
         AndroidStationScreen.fit(g, font, name, tx, p.y + 3, p.x + p.w / 2 - 12 - tx, skin.text());
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** レシピ登録の窓の中身: スロットの地と物、見本の囲み・ボタン、文字。 */
-    private void renderRecordPopup(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderRecordPopup(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = recordX(), y = recordY();
         popupTitle(g, recordPop, Component.translatable("gui.singulo.work_console.tab.record"), null);
         for (int i = WorkConsoleMenu.SLOT_GRID; i < WorkConsoleMenu.SLOT_OUTBOX; i++) {
@@ -1221,53 +1227,53 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         for (int i = WorkConsoleMenu.SLOT_GRID; i < WorkConsoleMenu.SLOT_OUTBOX; i++) {
             net.minecraft.world.inventory.Slot s = menu.getSlot(i);
             if (s.isActive() && s.hasItem()) {
-                g.renderItem(s.getItem(), leftPos + s.x, topPos + s.y);
-                g.renderItemDecorations(font, s.getItem(), leftPos + s.x, topPos + s.y);
+                g.item(s.getItem(), leftPos + s.x, topPos + s.y);
+                g.itemDecorations(font, s.getItem(), leftPos + s.x, topPos + s.y);
             }
         }
         if (hoveredSlot != null && isRecordSlot(hoveredSlot.index) && popupAt(mouseX, mouseY) == recordPop) {
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 250);
+            g.pose().pushMatrix();
+            g.nextStratum();
             g.fill(leftPos + hoveredSlot.x, topPos + hoveredSlot.y, leftPos + hoveredSlot.x + 16, topPos + hoveredSlot.y + 16, 0x80FFFFFF);
-            g.pose().popPose();
+            g.pose().popMatrix();
         }
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
+        g.pose().pushMatrix();
+        g.pose().translate(x, y);
         renderRecordLabels(g, mouseX, mouseY);
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** 注文の確認の窓の中身。 */
-    private void renderPickingPopup(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    private void renderPickingPopup(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = pickX(), y = pickY();
         popupTitle(g, orderPop, picking.getHoverName(), picking);
         renderPicking(g, x, y, mouseX, mouseY);
         if (countBox != null) {
-            countBox.render(g, mouseX, mouseY, partialTick);
+            countBox.extractRenderState(g, mouseX, mouseY, partialTick);
         }
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
+        g.pose().pushMatrix();
+        g.pose().translate(x, y);
         renderPickingLabels(g);
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** 注文の詳しい様子の窓の中身。 */
-    private void renderDetailPopup(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderDetailPopup(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         CompoundTag o = detailOrder();
         if (o == null) {
             return;
         }
         ItemStack target = stack(o, "target");
-        popupTitle(g, detailPop, target.getHoverName().copy().append(" ×" + compact(o.getLong("count"))), target);
+        popupTitle(g, detailPop, target.getHoverName().copy().append(" ×" + compact(o.getLongOr("count", 0L))), target);
         renderDetail(g, detailX(), detailY(), mouseX, mouseY);
-        g.pose().pushPose();
-        g.pose().translate(detailX(), detailY(), 0);
+        g.pose().pushMatrix();
+        g.pose().translate(detailX(), detailY());
         renderDetailLabels(g, o);
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** 窓の外（下の画面）の説明。 */
-    private void renderMainTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderMainTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         if (renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
@@ -1275,7 +1281,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (tab == TAB_ROUTE && hoveredSlot != null && !hoveredSlot.hasItem() && hoveredSlot.index >= WorkConsoleMenu.SLOT_ROUTE
                 && hoveredSlot.index < WorkConsoleMenu.OWN) {
             int col = (hoveredSlot.index - WorkConsoleMenu.SLOT_ROUTE) % io.github.genichimaruo.singulo.android.work.PathRule.COLS;
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.route." + ROUTE_COL_KEYS[col] + ".hint"), 180), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.route." + ROUTE_COL_KEYS[col] + ".hint"), 180), mouseX, mouseY);
         }
         if (searchShown()) {
             Component help = null;
@@ -1294,7 +1300,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 help = Component.translatable("gui.singulo.select.rows_more");
             }
             if (help != null) {
-                g.renderTooltip(font, font.split(help, 200), mouseX, mouseY);
+                g.setTooltipForNextFrame(font, font.split(help, 200), mouseX, mouseY);
             }
         }
         if (tab == 0) {
@@ -1306,14 +1312,14 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                     CompoundTag e = entries.get(idx);
                     ItemStack s = stack(e, "item");
                     List<Component> lines = new ArrayList<>(getTooltipFromContainerItem(s));
-                    lines.add(Component.translatable("gui.singulo.work_console.stock", e.getLong("count")).withStyle(net.minecraft.ChatFormatting.GRAY));
-                    if (e.getBoolean("craft")) {
+                    lines.add(Component.translatable("gui.singulo.work_console.stock", e.getLongOr("count", 0L)).withStyle(net.minecraft.ChatFormatting.GRAY));
+                    if (e.getBooleanOr("craft", false)) {
                         lines.add(Component.translatable("gui.singulo.work_console.craftable").withStyle(net.minecraft.ChatFormatting.AQUA));
                     }
-                    if (e.getLong("making") > 0) {
-                        lines.add(Component.translatable("gui.singulo.work_console.making", e.getLong("making")).withStyle(net.minecraft.ChatFormatting.GOLD));
+                    if (e.getLongOr("making", 0L) > 0) {
+                        lines.add(Component.translatable("gui.singulo.work_console.making", e.getLongOr("making", 0L)).withStyle(net.minecraft.ChatFormatting.GOLD));
                     }
-                    g.renderComponentTooltip(font, lines, mouseX, mouseY);
+                    g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
                 }
             }
         } else if (tab == 1) {
@@ -1322,31 +1328,31 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 int idx = i + scroll;
                 int ry = y + TOP + i * ROW_H;
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + CANCEL_X, ry + 3, ROW_BTN, ROW_BTN)) {
-                    g.renderTooltip(font, Component.translatable("gui.singulo.work_console.cancel"), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.work_console.cancel"), mouseX, mouseY);
                 } else if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + AGAIN_X, ry + 3, ROW_BTN, ROW_BTN)) {
-                    g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.again"), 180), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.work_console.again"), 180), mouseX, mouseY);
                 } else if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, ry, AGAIN_X - 10, ROW_H - 1)) {
                     // 素材を待っている注文: 足りない物を全部並べる
                     List<Component> lines = new ArrayList<>();
                     CompoundTag o = orders.get(idx);
-                    lines.add(stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLong("count"))));
+                    lines.add(stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLongOr("count", 0L))));
                     lines.add(orderState(o).copy().withStyle(net.minecraft.ChatFormatting.GRAY));
                     List<CompoundTag> missing = tags(o, "missing");
                     if (!missing.isEmpty()) {
                         lines.add(Component.translatable("gui.singulo.work_console.missing").withStyle(net.minecraft.ChatFormatting.GOLD));
                         for (CompoundTag m : missing) {
-                            lines.add(Component.literal(" ").append(stack(m, "item").getHoverName()).append(" ×" + compact(m.getLong("count"))));
+                            lines.add(Component.literal(" ").append(stack(m, "item").getHoverName()).append(" ×" + compact(m.getLongOr("count", 0L))));
                         }
                     }
                     lines.add(Component.translatable("gui.singulo.work_console.detail.hint").withStyle(net.minecraft.ChatFormatting.GRAY));
-                    g.renderComponentTooltip(font, lines, mouseX, mouseY);
+                    g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
                 }
             }
         } else if (tab == TAB_STANDING) {
             List<CompoundTag> rows = list("standing");
             for (int i = 0; i < orderRows() && i + scroll < rows.size(); i++) {
                 if (Panel.inside(mouseX, mouseY, x + CANCEL_X, y + TOP + i * ROW_H + 3, ROW_BTN, ROW_BTN)) {
-                    g.renderTooltip(font, Component.translatable("gui.singulo.work_console.cancel"), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.work_console.cancel"), mouseX, mouseY);
                 } else if (Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, CANCEL_X - 10, ROW_H - 1)) {
                     Panel.tooltip(g, font, List.of(standingLines(rows.get(i + scroll))), 220, mouseX, mouseY);
                 }
@@ -1355,63 +1361,63 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             List<CompoundTag> links = list("links");
             for (int i = 0; i < linkRows() && i + scroll < links.size(); i++) {
                 if (Panel.inside(mouseX, mouseY, x + CANCEL_X, y + TOP + i * LINK_H, ROW_BTN, ROW_BTN)) {
-                    g.renderTooltip(font, Component.translatable("gui.singulo.work_console.unlink"), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.work_console.unlink"), mouseX, mouseY);
                 } else if (Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * LINK_H, CANCEL_X - 10, LINK_H - 1)) {
-                    g.renderTooltip(font, linkLine(links.get(i + scroll)), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, linkLine(links.get(i + scroll)), mouseX, mouseY);
                 }
             }
         }
     }
 
     /** レシピ登録の窓の説明。 */
-    private void renderRecordTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderRecordTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = recordX(), y = recordY();
         if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.ENCODE_X, y + WorkConsoleMenu.ENCODE_Y, WorkConsoleMenu.BUTTON_W,
                 WorkConsoleMenu.BUTTON_H)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.encode.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.encode.hint"), 160), mouseX, mouseY);
         } else if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.CLEAR_X, y + WorkConsoleMenu.CLEAR_Y, WorkConsoleMenu.BUTTON_W,
                 WorkConsoleMenu.BUTTON_H)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.recipe_encoder.clear"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.recipe_encoder.clear"), mouseX, mouseY);
         } else if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.CLEAR_CARD_X, y + WorkConsoleMenu.CLEAR_CARD_Y, WorkConsoleMenu.ICON_W,
                 WorkConsoleMenu.BUTTON_H)) {
-            g.renderComponentTooltip(font, List.of(Component.translatable("gui.singulo.recipe_encoder.clear_card"),
+            g.setComponentTooltipForNextFrame(font, List.of(Component.translatable("gui.singulo.recipe_encoder.clear_card"),
                     Component.translatable("gui.singulo.recipe_encoder.clear_card.hint").withStyle(net.minecraft.ChatFormatting.GRAY)), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_CARD && !hoveredSlot.hasItem()) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.recipe_encoder.card"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.recipe_encoder.card"), mouseX, mouseY);
         } else if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.MODE_X, y + WorkConsoleMenu.MODE_Y, WorkConsoleMenu.BUTTON_W,
                 WorkConsoleMenu.BUTTON_H)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.mode.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.mode.hint"), 160), mouseX, mouseY);
         } else if (hoveredStep(mouseX, mouseY) >= 0) {
             io.github.genichimaruo.singulo.android.work.ProcedureStep s = io.github.genichimaruo.singulo.android.work.ProcedureStep.load(list("proc").get(hoveredStep(mouseX, mouseY)),
                     minecraft.level.registryAccess());
-            g.renderTooltip(font, java.util.List.of(io.github.genichimaruo.singulo.android.work.ProcedureCardItem.describe(s).getVisualOrderText(),
+            g.setTooltipForNextFrame(font, java.util.List.of(io.github.genichimaruo.singulo.android.work.ProcedureCardItem.describe(s).getVisualOrderText(),
                     Component.translatable("gui.singulo.recipe_encoder.step.remove").withStyle(net.minecraft.ChatFormatting.GRAY)
                             .getVisualOrderText()), mouseX, mouseY);
         } else if (optionShown() && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y, WorkConsoleMenu.OPTION_W,
                 WorkConsoleMenu.OPTION_H)) {
-            g.renderTooltip(font, font.split(Component.translatable(menu.stepKind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE
+            g.setTooltipForNextFrame(font, font.split(Component.translatable(menu.stepKind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE
                     ? "gui.singulo.recipe_encoder.use.hint" : "gui.singulo.recipe_encoder.limit.hint"), 180), mouseX, mouseY);
         } else if (menu.mode() == WorkConsoleBlockEntity.MODE_PROCEDURE && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.KIND_X,
                 y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.KIND_W, WorkConsoleMenu.SMALL_H)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.kind.hint"), 180), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.kind.hint"), 180), mouseX, mouseY);
         } else if (menu.mode() == WorkConsoleBlockEntity.MODE_PROCEDURE && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.ADD_X,
                 y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.ADD_W, WorkConsoleMenu.SMALL_H)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.step.add.hint"), 180), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.step.add.hint"), 180), mouseX, mouseY);
         } else if (hoveredSlot != null && !hoveredSlot.hasItem() && (hoveredSlot.index == WorkConsoleMenu.SLOT_LOC_A
                 || hoveredSlot.index == WorkConsoleMenu.SLOT_LOC_B || hoveredSlot.index == WorkConsoleMenu.SLOT_PITEM)) {
             String key = hoveredSlot.index == WorkConsoleMenu.SLOT_LOC_A ? "loc_a" : hoveredSlot.index == WorkConsoleMenu.SLOT_LOC_B ? "loc_b" : "item";
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.step." + key + ".hint"), 180), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.step." + key + ".hint"), 180), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_RESULT && !hoveredSlot.hasItem()
                 && menu.mode() == WorkConsoleBlockEntity.MODE_PROCEDURE) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.product.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.product.hint"), 160), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index >= WorkConsoleMenu.SLOT_EXTRA && hoveredSlot.index < WorkConsoleMenu.SLOT_LOC_A
                 && !hoveredSlot.hasItem()) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.extra.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.extra.hint"), 160), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_RESULT && !hoveredSlot.hasItem() && menu.processing()) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.output.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.output.hint"), 160), mouseX, mouseY);
         } else if (variantMarkAt(mouseX, mouseY) >= 0) {
             int i = variantMarkAt(mouseX, mouseY);
-            g.renderComponentTooltip(font, List.of(Component.translatable(menu.variant(i) ? "gui.singulo.recipe_encoder.variant_slot.on"
+            g.setComponentTooltipForNextFrame(font, List.of(Component.translatable(menu.variant(i) ? "gui.singulo.recipe_encoder.variant_slot.on"
                     : "gui.singulo.recipe_encoder.variant_slot.off"), Component.translatable("gui.singulo.recipe_encoder.variant_slot.hint")
                     .withStyle(net.minecraft.ChatFormatting.GRAY)), mouseX, mouseY);
         } else if (menu.mode() == WorkConsoleBlockEntity.MODE_CRAFTING && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.VARIANTS_X,
@@ -1423,7 +1429,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             Panel.tooltip(g, font, List.of(state, Component.translatable("gui.singulo.recipe_encoder.variants.hint")
                     .withStyle(net.minecraft.ChatFormatting.GRAY)), 180, mouseX, mouseY);
         } else if (fuelModeHovered(mouseX, mouseY)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel_mode.hint"), 180), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel_mode.hint"), 180), mouseX, mouseY);
         } else if (hoveredFace(mouseX, mouseY) >= 0) {
             String[] keys = {"in", "out", "fuel"};
             int i = hoveredFace(mouseX, mouseY);
@@ -1431,12 +1437,12 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                     Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[i] + ".hint").withStyle(net.minecraft.ChatFormatting.GRAY)),
                     200, mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_FUEL && !hoveredSlot.hasItem()) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel.hint"), 180), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel.hint"), 180), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_STOCK && !hoveredSlot.hasItem()) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.stock.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.stock.hint"), 160), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index >= WorkConsoleMenu.SLOT_GRID && hoveredSlot.index < WorkConsoleMenu.SLOT_RESULT
                 && !hoveredSlot.hasItem()) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.grid.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.recipe_encoder.grid.hint"), 160), mouseX, mouseY);
         }
     }
 
@@ -1494,10 +1500,10 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         return true;
     }
 
-    private void renderPickingTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderPickingTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = pickX(), y = pickY();
         if (trigger < 0 && Panel.inside(mouseX, mouseY, x + FRESH_X, y + FRESH_Y, FRESH_W, FRESH_H)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.fresh.hint"), 200), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.work_console.fresh.hint"), 200), mouseX, mouseY);
             return;
         }
         if (Panel.inside(mouseX, mouseY, x + TRIGGER_X, y + BUTTON_Y, TRIGGER_W, BUTTON_H)) {
@@ -1511,11 +1517,11 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             int idx = i + androidScroll;
             if (idx < androids.size() && Panel.inside(mouseX, mouseY, x + 128, y + LIST_Y + i * LIST_H, 112, LIST_H)) {
                 CompoundTag a = androids.get(idx);
-                if (!a.getBoolean("busy") && !selectable(a)) {
-                    boolean axe = plan != null && plan.getBoolean("felling") && !a.getBoolean("feller");
-                    boolean tank = plan != null && plan.getBoolean("fluids") && !a.getBoolean("tank");
-                    boolean chem = plan != null && plan.getBoolean("chemicals") && !a.getBoolean("chem_tank");
-                    g.renderTooltip(font, font.split(Component.translatable(chem ? "gui.singulo.work_console.needs_chem_tank"
+                if (!a.getBooleanOr("busy", false) && !selectable(a)) {
+                    boolean axe = plan != null && plan.getBooleanOr("felling", false) && !a.getBooleanOr("feller", false);
+                    boolean tank = plan != null && plan.getBooleanOr("fluids", false) && !a.getBooleanOr("tank", false);
+                    boolean chem = plan != null && plan.getBooleanOr("chemicals", false) && !a.getBooleanOr("chem_tank", false);
+                    g.setTooltipForNextFrame(font, font.split(Component.translatable(chem ? "gui.singulo.work_console.needs_chem_tank"
                             : tank ? "gui.singulo.work_console.needs_tank"
                             : axe ? "gui.singulo.work_console.needs_feller" : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
                     return;
@@ -1523,13 +1529,13 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             }
         }
         if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && canStart() && chosen.stream().noneMatch(
-                id -> androids.stream().anyMatch(a -> a.getUUID("id").equals(id) && selectable(a)))) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.auto_android", startAndroids().size()), 160),
+                id -> androids.stream().anyMatch(a -> a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)).equals(id) && selectable(a)))) {
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.work_console.auto_android", startAndroids().size()), 160),
                     mouseX, mouseY);
             return;
         }
         if (Panel.inside(mouseX, mouseY, x + 8, y + 27, 14, 14) || Panel.inside(mouseX, mouseY, x + 76, y + 27, 14, 14)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.count.hint"), 160), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.work_console.count.hint"), 160), mouseX, mouseY);
         }
         List<CompoundTag> deliveries = list("deliveries");
         if (Panel.inside(mouseX, mouseY, x + DEST_X, y + DEST_Y, DEST_W, DEST_H) && !deliveries.isEmpty()) {
@@ -1546,11 +1552,11 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 lines.add(stack(m, "item").getHoverName());
                 lines.add(Component.translatable(m.contains("surplus") ? "gui.singulo.work_console.crafted.hint"
                         : "gui.singulo.work_console.material.hint").withStyle(net.minecraft.ChatFormatting.GRAY));
-                g.renderComponentTooltip(font, lines, mouseX, mouseY);
+                g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
             }
         }
         if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && !canStart()) {
-            g.renderTooltip(font, font.split(Component.translatable(startAndroids().isEmpty() ? "gui.singulo.work_console.choose_android"
+            g.setTooltipForNextFrame(font, font.split(Component.translatable(startAndroids().isEmpty() ? "gui.singulo.work_console.choose_android"
                     : "gui.singulo.work_console.cannot_start"), 160), mouseX, mouseY);
         }
     }
@@ -1571,7 +1577,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private List<CompoundTag> planList(String key) {
         List<CompoundTag> out = new ArrayList<>();
         if (plan != null) {
-            for (Tag t : plan.getList(key, Tag.TAG_COMPOUND)) {
+            for (Tag t : plan.getListOrEmpty(key)) {
                 out.add((CompoundTag) t);
             }
         }
@@ -1579,7 +1585,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos, y = topPos;
         clearStats();
         drawOuterTabs(g, mouseX, mouseY, false);
@@ -1608,19 +1614,19 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
      * 経路の欄の見出し（列の名前・行の番号）と、下の説明。colX は列の左端、y は1行目の欄の上端、row は行の間隔、left は行の番号の左端。
      * 作業指令台とステーションの経路のページで共通。
      */
-    static void routeLabels(GuiGraphics g, net.minecraft.client.gui.Font font, int[] colX, int y, int row, int left, int muted) {
+    static void routeLabels(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int[] colX, int y, int row, int left, int muted) {
         routeLabels(g, font, colX, y, row, left, muted, colX[3] + 58 - left);
     }
 
     /** hintWidth: 下の説明の幅。 */
-    static void routeLabels(GuiGraphics g, net.minecraft.client.gui.Font font, int[] colX, int y, int row, int left, int muted, int hintWidth) {
+    static void routeLabels(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int[] colX, int y, int row, int left, int muted, int hintWidth) {
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.route.via"), colX[0] - 12, y - 11, 40, Panel.TEXT);
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.route.scope"), colX[1] - 12, y - 11, 40, Panel.TEXT);
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.route.zone"), colX[2] - 4, y - 11, colX[3] - colX[2] + 24,
                 0xFFB04040);
         for (int r = 0; r < io.github.genichimaruo.singulo.android.work.PathRule.ROWS; r++) {
-            g.drawString(font, String.valueOf(r + 1), left, y + r * row + 4, Panel.TEXT, false);
-            g.drawString(font, "→", colX[0] + 21, y + r * row + 4, muted, false);
+            g.text(font, String.valueOf(r + 1), left, y + r * row + 4, Panel.TEXT, false);
+            g.text(font, "→", colX[0] + 21, y + r * row + 4, muted, false);
         }
         int bottom = y + io.github.genichimaruo.singulo.android.work.PathRule.ROWS * row;
         for (int i = 0; i < 2 && hintWidth > 0; i++) {
@@ -1629,21 +1635,21 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 記録のページ: 見本の欄を光る線で囲み（物は減らない目印）、矢印と、記録・消去のボタン。 */
-    private void renderRecord(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderRecord(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         boolean procedure = menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_PROCEDURE;
         if (procedure) {
             renderSteps(g, x, y, mouseX, mouseY);
         } else {
-            g.renderOutline(x + WorkConsoleMenu.GRID_X - 3, y + WorkConsoleMenu.GRID_Y - 3, 3 * 18 + 4, 3 * 18 + 4, Panel.GLOW);
+            g.outline(x + WorkConsoleMenu.GRID_X - 3, y + WorkConsoleMenu.GRID_Y - 3, 3 * 18 + 4, 3 * 18 + 4, Panel.GLOW);
             Panel.arrow(g, x + WorkConsoleMenu.GRID_X + 62, y + WorkConsoleMenu.RESULT_Y + 1,
                     menu.getSlot(WorkConsoleMenu.SLOT_RESULT).hasItem() ? 1 : 0);
         }
         if (menu.processing()) {
             // 作る物とほかに出てくる物も、自分で置く欄（光る線で囲む）
-            g.renderOutline(x + WorkConsoleMenu.RESULT_X - 3, y + WorkConsoleMenu.RESULT_Y - 3, 22, 22, Panel.GLOW);
-            g.renderOutline(x + WorkConsoleMenu.EXTRA_X - 3, y + WorkConsoleMenu.EXTRA_Y - 3,
+            g.outline(x + WorkConsoleMenu.RESULT_X - 3, y + WorkConsoleMenu.RESULT_Y - 3, 22, 22, Panel.GLOW);
+            g.outline(x + WorkConsoleMenu.EXTRA_X - 3, y + WorkConsoleMenu.EXTRA_Y - 3,
                     18 * io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.EXTRAS + 4, 22, Panel.GLOW);
-            g.renderOutline(x + WorkConsoleMenu.FUEL_X - 3, y + WorkConsoleMenu.FUEL_Y - 3, 22, 22, 0xFFE0A050);   // 燃料（橙）
+            g.outline(x + WorkConsoleMenu.FUEL_X - 3, y + WorkConsoleMenu.FUEL_Y - 3, 22, 22, 0xFFE0A050);   // 燃料（橙）
         }
         button(g, x + WorkConsoleMenu.ENCODE_X, y + WorkConsoleMenu.ENCODE_Y, WorkConsoleMenu.BUTTON_W, WorkConsoleMenu.BUTTON_H, true, mouseX, mouseY);
         button(g, x + WorkConsoleMenu.MODE_X, y + WorkConsoleMenu.MODE_Y, WorkConsoleMenu.BUTTON_W, WorkConsoleMenu.BUTTON_H, false, mouseX, mouseY);
@@ -1684,7 +1690,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             // 同じ種類も使う欄は、アクセントの縁で囲む
             for (int i = 0; i < io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.GRID; i++) {
                 if (menu.variant(i) && menu.getSlot(WorkConsoleMenu.SLOT_GRID + i).hasItem()) {
-                    g.renderOutline(x + gridSlotX(i) - 1, y + gridSlotY(i) - 1, 18, 18, skin.accent());   // 欄の縁の内側（隣の欄に重ねない）
+                    g.outline(x + gridSlotX(i) - 1, y + gridSlotY(i) - 1, 18, 18, skin.accent());   // 欄の縁の内側（隣の欄に重ねない）
                 }
             }
         }
@@ -1694,13 +1700,13 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
     }
 
-    private static void button(GuiGraphics g, int bx, int by, int w, int h, boolean primary, int mouseX, int mouseY) {
+    private static void button(GuiGraphicsExtractor g, int bx, int by, int w, int h, boolean primary, int mouseX, int mouseY) {
         boolean hover = Panel.inside(mouseX, mouseY, bx, by, w, h);
         Panel.button(g, GuiSkin.STANDARD, bx, by, w, h, primary ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
     }
 
     /** 手順モード: 並べた手順の一覧（番号・物・種類と数。右端の × で消す）。物と作る物の欄は光る線で囲む。 */
-    private void renderSteps(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderSteps(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         int lx = x + WorkConsoleMenu.STEPS_X, ly = y + WorkConsoleMenu.STEPS_Y;
         Panel.well(g, lx, ly, WorkConsoleMenu.STEPS_W, WorkConsoleMenu.STEP_H * io.github.genichimaruo.singulo.android.work.RecipeData.MAX_STEPS);
         List<CompoundTag> steps = list("proc");
@@ -1710,33 +1716,33 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             if (Panel.inside(mouseX, mouseY, lx, ry, WorkConsoleMenu.STEPS_W, WorkConsoleMenu.STEP_H)) {
                 g.fill(lx, ry, lx + WorkConsoleMenu.STEPS_W, ry + WorkConsoleMenu.STEP_H, 0xFF52606C);
             }
-            g.drawString(font, String.valueOf(i + 1), lx + 2, ry + 1, 0xFFE8EEF2, false);
+            g.text(font, String.valueOf(i + 1), lx + 2, ry + 1, 0xFFE8EEF2, false);
             if (!s.item().isEmpty()) {
-                g.pose().pushPose();
-                g.pose().translate(lx + 9, ry + 1, 0);
-                g.pose().scale(0.5F, 0.5F, 1);
-                g.renderItem(s.item(), 0, 0);
-                g.pose().popPose();
+                g.pose().pushMatrix();
+                g.pose().translate(lx + 9, ry + 1);
+                g.pose().scale(0.5F, 0.5F);
+                g.item(s.item(), 0, 0);
+                g.pose().popMatrix();
             }
             String count = s.item().isEmpty() ? "" : " ×" + s.item().getCount();
             Component opt = io.github.genichimaruo.singulo.android.work.ProcedureCardItem.option(s.kind(), s.option());
             AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.recipe_encoder.kind." + io.github.genichimaruo.singulo.android.work.ProcedureStep.KEYS[s.kind()])
                     .append(count).append(opt.getString().isEmpty() ? Component.empty() : Component.literal(" ").append(opt)), lx + 19, ry + 1,
                     WorkConsoleMenu.STEPS_W - 28, 0xFFE8EEF2);
-            g.drawString(font, "×", lx + WorkConsoleMenu.STEPS_W - 7, ry + 1, 0xFFE07070, false);
+            g.text(font, "×", lx + WorkConsoleMenu.STEPS_W - 7, ry + 1, 0xFFE07070, false);
         }
-        g.renderOutline(x + WorkConsoleMenu.PITEM_X - 3, y + WorkConsoleMenu.PITEM_Y - 3, 22, 22, Panel.GLOW);
-        g.renderOutline(x + WorkConsoleMenu.RESULT_PROC_X - 3, y + WorkConsoleMenu.RESULT_PROC_Y - 3, 22, 22, Panel.GLOW);
+        g.outline(x + WorkConsoleMenu.PITEM_X - 3, y + WorkConsoleMenu.PITEM_Y - 3, 22, 22, Panel.GLOW);
+        g.outline(x + WorkConsoleMenu.RESULT_PROC_X - 3, y + WorkConsoleMenu.RESULT_PROC_Y - 3, 22, 22, Panel.GLOW);
     }
 
     /** 小さめの文字（3/4）を、cx を中心に、幅 maxWidth に収めて描く。 */
-    private void small(GuiGraphics g, Component text, int cx, int y, int maxWidth, int color) {
+    private void small(GuiGraphicsExtractor g, Component text, int cx, int y, int maxWidth, int color) {
         float k = Math.min(0.75F, (float) maxWidth / Math.max(1, font.width(text)));
-        g.pose().pushPose();
-        g.pose().translate(cx - font.width(text) * k / 2, y, 0);
-        g.pose().scale(k, k, 1);
-        g.drawString(font, text, 0, 0, color, false);
-        g.pose().popPose();
+        g.pose().pushMatrix();
+        g.pose().translate(cx - font.width(text) * k / 2, y);
+        g.pose().scale(k, k);
+        g.text(font, text, 0, 0, color, false);
+        g.pose().popMatrix();
     }
 
     /** 手順モードで、指している手順の番号（なければ -1）。 */
@@ -1752,7 +1758,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         return i < list("proc").size() ? i : -1;
     }
 
-    private void renderEntries(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderEntries(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         renderSearchRow(g, x, y, mouseX, mouseY);
         List<CompoundTag> entries = visibleEntries();
         int maxScroll = Math.max(0, (entries.size() + COLS - 1) / COLS - rows());
@@ -1769,20 +1775,20 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 g.fill(cx, cy, cx + CELL, cy + CELL, 0xFF52606C);
             }
             ItemStack s = stack(e, "item");
-            g.renderItem(s, cx + 1, cy + 1);
-            long n = e.getLong("count");
-            g.renderItemDecorations(font, s, cx + 1, cy + 1, "");
+            g.item(s, cx + 1, cy + 1);
+            long n = e.getLongOr("count", 0L);
+            g.itemDecorations(font, s, cx + 1, cy + 1, "");
             drawCount(g, cx + 1, cy + 1, n <= 0 ? "" : compact(n));
-            if (e.getBoolean("craft") || e.getLong("making") > 0) {
-                g.pose().pushPose();
-                g.pose().translate(0, 0, 250);
-                if (e.getBoolean("craft")) {
+            if (e.getBooleanOr("craft", false) || e.getLongOr("making", 0L) > 0) {
+                g.pose().pushMatrix();
+                g.nextStratum();
+                if (e.getBooleanOr("craft", false)) {
                     g.fill(cx + 1, cy + 1, cx + 4, cy + 4, 0xFF78D2F0);     // 作れる印
                 }
-                if (e.getLong("making") > 0) {
-                    g.renderOutline(cx, cy, CELL, CELL, MAKING);             // 作っている最中の枠
+                if (e.getLongOr("making", 0L) > 0) {
+                    g.outline(cx, cy, CELL, CELL, MAKING);             // 作っている最中の枠
                 }
-                g.pose().popPose();
+                g.pose().popMatrix();
             }
         }
         if (maxScroll > 0) {
@@ -1796,11 +1802,11 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 注文タブの下の段: 検索欄の地（打っている間は縁が光る）・並びのボタン・逆順のボタン・JEI 連携のボタン。 */
-    private void renderSearchRow(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderSearchRow(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         boolean typing = searchBox != null && searchBox.isFocused();
         Panel.inset(g, skin, x + SEARCH_X, y + searchY(), SEARCH_W, SEARCH_H, skin.fill());
         if (typing) {
-            g.renderOutline(x + SEARCH_X - 1, y + searchY() - 1, SEARCH_W + 2, SEARCH_H + 2, skin.accent());
+            g.outline(x + SEARCH_X - 1, y + searchY() - 1, SEARCH_W + 2, SEARCH_H + 2, skin.accent());
         }
         // 一覧の行を減らす・増やす
         boolean canLess = rows() > MIN_ROWS;
@@ -1885,7 +1891,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 波の記号（「いろいろ」。7×3）。 */
-    private static void wave(GuiGraphics g, int x, int y, int c) {
+    private static void wave(GuiGraphicsExtractor g, int x, int y, int c) {
         g.fill(x, y + 1, x + 1, y + 2, c);
         g.fill(x + 1, y, x + 2, y + 1, c);
         g.fill(x + 2, y + 1, x + 3, y + 2, c);
@@ -1896,9 +1902,9 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 見本の欄の右上の小さな印（オンはアクセントの丸に白い波、オフは薄い丸）。renderLabels の座標で描く。 */
-    private void drawVariantMarks(GuiGraphics g, int mouseX, int mouseY) {
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 300);
+    private void drawVariantMarks(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        g.pose().pushMatrix();
+        g.nextStratum();
         for (int i = 0; i < io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.GRID; i++) {
             if (!markShown(i, mouseX, mouseY)) {
                 continue;
@@ -1919,18 +1925,18 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             g.fill(mx + 4, my + 2, mx + 5, my + 3, c);
             g.fill(mx + 5, my + 3, mx + 6, my + 4, c);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** 下の段の小さなボタン（on: 押されている色）。 */
-    private void button(GuiGraphics g, int bx, int by, int bw, int mouseX, int mouseY, boolean on, Component label) {
+    private void button(GuiGraphicsExtractor g, int bx, int by, int bw, int mouseX, int mouseY, boolean on, Component label) {
         boolean hover = Panel.inside(mouseX, mouseY, bx, by, bw, SEARCH_H);
         Panel.button(g, skin, bx, by, bw, SEARCH_H, on ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
         AndroidStationScreen.fitCentered(g, font, label, bx + 1, by + 2, bw - 2, on ? skin.onAccent() : skin.text());
     }
 
     /** 進行中の行: 進み具合は行の地の色で（左から満ちる）、右端に もう一度注文・取り消し のボタン。 */
-    private void renderOrders(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderOrders(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         List<CompoundTag> orders = list("orders");
         scroll = Math.min(scroll, Math.max(0, orders.size() - orderRows()));
         for (int i = 0; i < orderRows(); i++) {
@@ -1941,26 +1947,26 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             CompoundTag o = orders.get(idx);
             int ry = y + TOP + i * ROW_H;
             rowBackground(g, x, ry, ROW_H - 1);
-            int done = (AGAIN_X - 4 - 8) * Math.max(0, Math.min(1000, o.getInt("progress"))) / 1000;
+            int done = (AGAIN_X - 4 - 8) * Math.max(0, Math.min(1000, o.getIntOr("progress", 0))) / 1000;
             g.fill(x + 8, ry + ROW_H - 2, x + 8 + done, ry + ROW_H - 1, GREEN);
-            g.renderItem(stack(o, "target"), x + 9, ry + 1);
+            g.item(stack(o, "target"), x + 9, ry + 1);
             rowButton(g, x + AGAIN_X, ry + 3, mouseX, mouseY, "↻", skin.text());
             rowButton(g, x + CANCEL_X, ry + 3, mouseX, mouseY, "×", GuiSkin.BAD);
         }
     }
 
     /** 一覧の行の地（少し浮いた板）。 */
-    private void rowBackground(GuiGraphics g, int x, int ry, int h) {
+    private void rowBackground(GuiGraphicsExtractor g, int x, int ry, int h) {
         g.fill(x + 8, ry, x + 168, ry + h, skin.button());
         g.fill(x + 8, ry, x + 168, ry + 1, skin.hi());
         g.fill(x + 8, ry + h - 1, x + 168, ry + h, skin.lo());
     }
 
     /** 行の右端の小さなボタン（記号1文字）。 */
-    private void rowButton(GuiGraphics g, int bx, int by, int mouseX, int mouseY, String glyph, int color) {
+    private void rowButton(GuiGraphicsExtractor g, int bx, int by, int mouseX, int mouseY, String glyph, int color) {
         boolean hover = Panel.inside(mouseX, mouseY, bx, by, ROW_BTN, ROW_BTN);
         int d = Panel.button(g, skin, bx, by, ROW_BTN, ROW_BTN, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
-        g.drawString(font, glyph, bx + (ROW_BTN - font.width(glyph) + 1) / 2, by + 2 + d, color, false);
+        g.text(font, glyph, bx + (ROW_BTN - font.width(glyph) + 1) / 2, by + 2 + d, color, false);
     }
 
     /** 詳しく見ている注文（終わった・ほかのページへ移ったら null）。 */
@@ -1970,7 +1976,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             return null;
         }
         for (CompoundTag o : list("orders")) {
-            if (o.getInt("id") == detail) {
+            if (o.getIntOr("id", 0) == detail) {
                 return o;
             }
         }
@@ -1979,30 +1985,30 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 注文の詳しい様子: 左に工程ごとの回数（最後に納品）、右に受け持っているアンドロイドと、今していること。 */
-    private void renderDetail(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderDetail(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         CompoundTag o = detailOrder();
         Panel.well(g, x + 8, y + TOP, 116, DETAIL_ROWS * DETAIL_H);
         Panel.well(g, x + 128, y + TOP, 112, DETAIL_ROWS * DETAIL_H);
         List<CompoundTag> steps = tags(o, "steps");
         detailScroll = Math.min(detailScroll, Math.max(0, steps.size() - (DETAIL_ROWS - 1)));
         for (int i = 0; i + detailScroll < steps.size() && i < DETAIL_ROWS - 1; i++) {
-            g.renderItem(stack(steps.get(i + detailScroll), "item"), x + 9, y + TOP + i * DETAIL_H);
+            g.item(stack(steps.get(i + detailScroll), "item"), x + 9, y + TOP + i * DETAIL_H);
         }
         int last = Math.min(steps.size(), DETAIL_ROWS - 1);
-        g.renderItem(stack(o, "target"), x + 9, y + TOP + last * DETAIL_H);
+        g.item(stack(o, "target"), x + 9, y + TOP + last * DETAIL_H);
         List<CompoundTag> workers = tags(o, "worker_list");
         workerScroll = Math.min(workerScroll, Math.max(0, workers.size() - DETAIL_ROWS));
         for (int i = 0; i + workerScroll < workers.size() && i < DETAIL_ROWS; i++) {
             int ry = y + TOP + i * DETAIL_H;
             CompoundTag worker = workers.get(i + workerScroll);
-            g.fill(x + 131, ry + 4, x + 139, ry + 12, worker.getInt("activity") < 0 ? 0xFF8A949E
-                    : 0xFF000000 | worker.getInt("accent"));
+            g.fill(x + 131, ry + 4, x + 139, ry + 12, worker.getIntOr("activity", 0) < 0 ? 0xFF8A949E
+                    : 0xFF000000 | worker.getIntOr("accent", 0));
         }
         detailScrollbar(g, x + 122, y + TOP, DETAIL_ROWS - 1, steps.size(), detailScroll);
         detailScrollbar(g, x + 238, y + TOP, DETAIL_ROWS, workers.size(), workerScroll);
     }
 
-    private static void detailScrollbar(GuiGraphics g, int x, int y, int rows, int total, int offset) {
+    private static void detailScrollbar(GuiGraphicsExtractor g, int x, int y, int rows, int total, int offset) {
         if (total <= rows) {
             return;
         }
@@ -2015,14 +2021,14 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
 
     private static List<CompoundTag> tags(CompoundTag t, String key) {
         List<CompoundTag> out = new ArrayList<>();
-        for (Tag e : t.getList(key, Tag.TAG_COMPOUND)) {
+        for (Tag e : t.getListOrEmpty(key)) {
             out.add((CompoundTag) e);
         }
         return out;
     }
 
     /** 登録のページ: 登録した注文の行（物・きっかけ・様子、右端の × で消す）。 */
-    private void renderStanding(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderStanding(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         List<CompoundTag> rows = list("standing");
         scroll = Math.min(scroll, Math.max(0, rows.size() - orderRows()));
         for (int i = 0; i < orderRows(); i++) {
@@ -2032,12 +2038,12 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             }
             int ry = y + TOP + i * ROW_H;
             rowBackground(g, x, ry, ROW_H - 1);
-            g.renderItem(stack(rows.get(idx), "item"), x + 9, ry + 1);
+            g.item(stack(rows.get(idx), "item"), x + 9, ry + 1);
             rowButton(g, x + CANCEL_X, ry + 3, mouseX, mouseY, "×", GuiSkin.BAD);
         }
     }
 
-    private void renderLinks(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderLinks(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         List<CompoundTag> links = list("links");
         scroll = Math.min(scroll, Math.max(0, links.size() - linkRows()));
         for (int i = 0; i < linkRows(); i++) {
@@ -2051,12 +2057,12 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
     }
 
-    private void renderPicking(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+    private void renderPicking(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
         int dm = Panel.button(g, skin, x + 8, y + 27, 14, 14, Panel.inside(mouseX, mouseY, x + 8, y + 27, 14, 14) ? Panel.Press.HOVER : Panel.Press.NORMAL);
         Panel.minusIcon(g, x + 13, y + 32 + dm, skin.text());
         Panel.inset(g, skin, x + 25, y + 27, 48, 14, skin.fill());
         if (countBox != null && countBox.isFocused()) {
-            g.renderOutline(x + 24, y + 26, 50, 16, skin.accent());
+            g.outline(x + 24, y + 26, 50, 16, skin.accent());
         }
         int dp = Panel.button(g, skin, x + 76, y + 27, 14, 14, Panel.inside(mouseX, mouseY, x + 76, y + 27, 14, 14) ? Panel.Press.HOVER : Panel.Press.NORMAL);
         Panel.plusIcon(g, x + 81, y + 32 + dp, skin.text());
@@ -2077,7 +2083,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             if (idx >= mats.size()) {
                 break;
             }
-            g.renderItem(stack(mats.get(idx), "item"), x + 9, y + LIST_Y + i * LIST_H);
+            g.item(stack(mats.get(idx), "item"), x + 9, y + LIST_Y + i * LIST_H);
         }
         List<CompoundTag> androids = list("androids");
         androidScroll = Math.min(androidScroll, Math.max(0, androids.size() - LIST_ROWS));
@@ -2089,8 +2095,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             CompoundTag a = androids.get(idx);
             int ry = y + LIST_Y + i * LIST_H;
             boolean can = selectable(a);
-            boolean on = can && chosen.contains(a.getUUID("id"));
-            int accent = 0xFF000000 | a.getInt("accent");
+            boolean on = can && chosen.contains(a.read("id", net.minecraft.core.UUIDUtil.CODEC).orElse(new UUID(0,0)));
+            int accent = 0xFF000000 | a.getIntOr("accent", 0);
             Panel.inset(g, skin, x + 130, ry + 3, 10, 10, on ? accent : can ? 0xFFF4F6F8 : skin.dim());
         }
         boolean start = canStart();
@@ -2098,7 +2104,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         drawLabels(g);
         CompoundTag v = menu.view();
         Component message = v != null && v.contains("message") ? text(v, "message") : null;
@@ -2129,8 +2135,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 CompoundTag o = orders.get(idx);
                 int ry = TOP + i * ROW_H;
                 // 収まらない文字は「…」で切る（全文は行に重ねたときの説明に）
-                clipped(g, stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLong("count"))), 28, ry + 1, AGAIN_X - 32, Panel.TEXT);
-                clipped(g, orderState(o), 28, ry + 9, AGAIN_X - 32, o.getInt("status") == WorkOrder.RUNNING ? GREEN : 0xFFC08020);
+                clipped(g, stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLongOr("count", 0L))), 28, ry + 1, AGAIN_X - 32, Panel.TEXT);
+                clipped(g, orderState(o), 28, ry + 9, AGAIN_X - 32, o.getIntOr("status", 0) == WorkOrder.RUNNING ? GREEN : 0xFFC08020);
             }
             if (message != null) {
                 clip(g, null, message, 8, bottomLine, 160, MUTED, leftPos, topPos);
@@ -2147,7 +2153,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 }
                 CompoundTag s = rows.get(idx);
                 int ry = TOP + i * ROW_H;
-                int state = s.getInt("state");
+                int state = s.getIntOr("state", 0);
                 Component[] lines = standingLines(s);         // 全文は行に重ねたときの説明に
                 clipped(g, lines[0], 28, ry + 1, CANCEL_X - 32, Panel.TEXT);
                 clipped(g, lines[1], 28, ry + 9, CANCEL_X - 32,
@@ -2156,7 +2162,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             }
             // レッドストーン信号: 文字の代わりに、色の付いた稲妻（説明は重ねたときに）
             CompoundTag view = menu.view();
-            boolean on = view != null && view.getBoolean("powered");
+            boolean on = view != null && view.getBooleanOr("powered", false);
             iconTip(g, null, Panel.Icon.BOLT, 8, bottomLine, on ? 0xFFD04848 : MUTED, leftPos, topPos,
                     Component.translatable(on ? "gui.singulo.work_console.signal.on" : "gui.singulo.work_console.signal.off"));
         } else if (tab == TAB_OUTBOX) {
@@ -2177,7 +2183,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                     break;
                 }
                 CompoundTag l = links.get(idx);
-                clipped(g, linkLine(l), 10, TOP + i * LINK_H + 2, CANCEL_X - 14, l.getInt("kind") < 0 ? RED : Panel.TEXT);
+                clipped(g, linkLine(l), 10, TOP + i * LINK_H + 2, CANCEL_X - 14, l.getIntOr("kind", 0) < 0 ? RED : Panel.TEXT);
             }
             iconTip(g, null, Panel.Icon.INFO, 8, TOP + linkRows() * LINK_H + 3, MUTED, leftPos, topPos,
                     Component.translatable("gui.singulo.work_console.link.hint"));
@@ -2185,19 +2191,19 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** 詳しい様子の窓の文字（窓の中身の原点からの座標）: 工程ごとの回数（最後に納品）と、アンドロイドごとの今していること。 */
-    private void renderDetailLabels(GuiGraphics g, CompoundTag o) {
+    private void renderDetailLabels(GuiGraphicsExtractor g, CompoundTag o) {
         List<CompoundTag> steps = tags(o, "steps");
         int light = 0xFFE9EDF0;
         for (int i = 0; i + detailScroll < steps.size() && i < DETAIL_ROWS - 1; i++) {
             CompoundTag st = steps.get(i + detailScroll);
-            long done = st.getLong("done"), total = st.getLong("total"), doing = st.getLong("doing");
+            long done = st.getLongOr("done", 0L), total = st.getLongOr("total", 0L), doing = st.getLongOr("doing", 0L);
             Component line = Component.literal(compact(done) + " / " + compact(total));
             if (doing > 0) {
                 line = line.copy().append(Component.translatable("gui.singulo.work_console.detail.doing", compact(doing)));
             }
-            long parked = st.getLong("parked");
+            long parked = st.getLongOr("parked", 0L);
             if (parked > 0) {
-                int eta = st.getInt("eta");
+                int eta = st.getIntOr("eta", 0);
                 line = line.copy().append(eta >= 0
                         ? Component.translatable("gui.singulo.work_console.detail.machine_eta", compact(parked), (eta + 19) / 20)
                         : Component.translatable("gui.singulo.work_console.detail.machine", compact(parked)));
@@ -2205,15 +2211,15 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             clip(g, detailPop, line, 27, TOP + i * DETAIL_H + 4, 95, done >= total ? 0xFF78D2F0 : light, detailX(), detailY());
         }
         int last = Math.min(steps.size(), DETAIL_ROWS - 1);
-        Component deliver = o.getBoolean("to_stock")
-                ? Component.translatable("gui.singulo.work_console.detail.to_stock", compact(o.getLong("delivered")), compact(o.getLong("count")))
-                : Component.translatable("gui.singulo.work_console.detail.delivered", compact(o.getLong("delivered")), compact(o.getLong("count")));
+        Component deliver = o.getBooleanOr("to_stock", false)
+                ? Component.translatable("gui.singulo.work_console.detail.to_stock", compact(o.getLongOr("delivered", 0L)), compact(o.getLongOr("count", 0L)))
+                : Component.translatable("gui.singulo.work_console.detail.delivered", compact(o.getLongOr("delivered", 0L)), compact(o.getLongOr("count", 0L)));
         clip(g, detailPop, deliver, 27, TOP + last * DETAIL_H + 4, 95, light, detailX(), detailY());
         List<CompoundTag> workers = tags(o, "worker_list");
         for (int i = 0; i + workerScroll < workers.size() && i < DETAIL_ROWS; i++) {
             CompoundTag w = workers.get(i + workerScroll);
-            int act = w.getInt("activity");
-            int stall = w.getInt("stall");
+            int act = w.getIntOr("activity", 0);
+            int stall = w.getIntOr("stall", 0);
             Component line = text(w, "name").copy();
             if (stall > io.github.genichimaruo.singulo.android.RuinAndroid.STALL_NONE
                     && stall < io.github.genichimaruo.singulo.android.RuinAndroid.STALL_KEYS.length) {
@@ -2234,7 +2240,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     }
 
     /** レシピ登録の窓の文字（窓の中身の原点からの座標）。 */
-    private void renderRecordLabels(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderRecordLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.recipe_encoder.encode"), WorkConsoleMenu.ENCODE_X + 2,
                 WorkConsoleMenu.ENCODE_Y + 3, WorkConsoleMenu.BUTTON_W - 4, 0xFFFFFFFF);
         String[] modes = {"crafting", "processing", "procedure"};
@@ -2267,7 +2273,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
     }
 
-    private void renderPickingLabels(GuiGraphics g) {
+    private void renderPickingLabels(GuiGraphicsExtractor g) {
         if (trigger < 0) {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.fresh"), FRESH_X + 1, FRESH_Y + 3, FRESH_W - 2,
                     fresh ? 0xFFFFFFFF : Panel.TEXT);
@@ -2292,15 +2298,15 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             CompoundTag m = mats.get(idx);
             if (m.contains("surplus")) {
                 // 作る物: 作る数と、余り
-                long surplus = m.getLong("surplus");
+                long surplus = m.getLongOr("surplus", 0L);
                 Component made = surplus > 0
-                        ? Component.translatable("gui.singulo.work_console.crafted.surplus", compact(m.getLong("count")), compact(surplus))
-                        : Component.translatable("gui.singulo.work_console.crafted", compact(m.getLong("count")));
+                        ? Component.translatable("gui.singulo.work_console.crafted.surplus", compact(m.getLongOr("count", 0L)), compact(surplus))
+                        : Component.translatable("gui.singulo.work_console.crafted", compact(m.getLongOr("count", 0L)));
                 clip(g, orderPop, made, 27, LIST_Y + i * LIST_H + 4, 95, 0xFF78D2F0, ox, oy);
                 continue;
             }
-            boolean short_ = m.getLong("missing") > 0;
-            clip(g, orderPop, Component.literal(compact(m.getLong("count")) + " / " + compact(m.getLong("have"))), 27, LIST_Y + i * LIST_H + 4, 95,
+            boolean short_ = m.getLongOr("missing", 0L) > 0;
+            clip(g, orderPop, Component.literal(compact(m.getLongOr("count", 0L)) + " / " + compact(m.getLongOr("have", 0L))), 27, LIST_Y + i * LIST_H + 4, 95,
                     short_ ? RED : 0xFFE9EDF0, ox, oy);
         }
         List<CompoundTag> androids = list("androids");
@@ -2313,8 +2319,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 break;
             }
             CompoundTag a = androids.get(idx);
-            Component name = text(a, "name").copy().append(" (" + a.getInt("slots") + ")");
-            if (a.getBoolean("busy")) {
+            Component name = text(a, "name").copy().append(" (" + a.getIntOr("slots", 0) + ")");
+            if (a.getBooleanOr("busy", false)) {
                 name = Component.translatable("gui.singulo.work_console.busy", name);
             }
             clip(g, orderPop, name, 144, LIST_Y + i * LIST_H + 4, 94, selectable(a) ? 0xFFE9EDF0 : MUTED, ox, oy);
@@ -2326,12 +2332,12 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             color = RED;
         } else if (plan == null || planDelay > 0) {
             status = Component.translatable("gui.singulo.work_console.planning");
-        } else if (!plan.getBoolean("ok")) {
-            status = Component.translatable(plan.getBoolean("limited") ? "gui.singulo.work_console.error.limit"
-                    : plan.getBoolean("loop") ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
+        } else if (!plan.getBooleanOr("ok", false)) {
+            status = Component.translatable(plan.getBooleanOr("limited", false) ? "gui.singulo.work_console.error.limit"
+                    : plan.getBooleanOr("loop", false) ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
             color = RED;
         } else {
-            status = Component.translatable("gui.singulo.work_console.plan", plan.getInt("steps"), plan.getLong("crafts"));
+            status = Component.translatable("gui.singulo.work_console.plan", plan.getIntOr("steps", 0), plan.getLongOr("crafts", 0L));
             color = GREEN;
         }
         clip(g, orderPop, status, 8, LIST_Y + LIST_ROWS * LIST_H + 6, 232, color, ox, oy);

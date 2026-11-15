@@ -34,15 +34,15 @@ public final class ShieldPermits {
 
     private static boolean deny(Level level, BlockPos pos, Player player) {
         if (ShieldTowerBlockEntity.locked(level, pos, player)) {
-            if (!level.isClientSide) {
-                player.displayClientMessage(Component.translatable("gui.singulo.shield.locked"), true);
+            if (!level.isClientSide()) {
+                player.sendOverlayMessage(Component.translatable("gui.singulo.shield.locked"));
             }
             return true;
         }
         return false;
     }
 
-    private static void onBreak(BlockEvent.BreakEvent event) {
+    private static void onBreak(net.neoforged.neoforge.event.level.block.BreakBlockEvent event) {
         if (!(event.getLevel() instanceof Level level)) {
             return;
         }

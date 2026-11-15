@@ -27,7 +27,7 @@ public abstract class DaylightDetectorBlockMixin {
     @Inject(method = "getTicker", at = @At("RETURN"), cancellable = true)
     private <T extends BlockEntity> void singulo$skylessTicker(Level level, BlockState state, BlockEntityType<T> type,
             CallbackInfoReturnable<BlockEntityTicker<T>> ci) {
-        if (!level.isClientSide && !level.dimensionType().hasSkyLight() && type == BlockEntityType.DAYLIGHT_DETECTOR) {
+        if (!level.isClientSide() && !level.dimensionType().hasSkyLight() && type == BlockEntityType.DAYLIGHT_DETECTOR) {
             ci.setReturnValue((l, p, s, be) -> {
                 if (l.getGameTime() % 20L == 0L) updateSignalStrength(s, l, p);
             });
@@ -41,10 +41,10 @@ public abstract class DaylightDetectorBlockMixin {
         int daylight = RayleighSky.light(level, pos);
         if (daylight == 0) return;
         boolean inverted = state.getValue(DaylightDetectorBlock.INVERTED);
-        int natural = level.getBrightness(net.minecraft.world.level.LightLayer.SKY, pos) - level.getSkyDarken();
+        int natural = level.getEffectiveSkyBrightness(pos);
         if (inverted) natural = 15 - natural;
         else if (natural > 0) {
-            float angle = level.getSunAngle(1.0F);
+            float angle = level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SUN_ANGLE, pos) * ((float) Math.PI / 180.0F);
             angle += ((angle < Math.PI ? 0 : (float) (Math.PI * 2)) - angle) * .2F;
             natural = Math.round(natural * net.minecraft.util.Mth.cos(angle));
         }

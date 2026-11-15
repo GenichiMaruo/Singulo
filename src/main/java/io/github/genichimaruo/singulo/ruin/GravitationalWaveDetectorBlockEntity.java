@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
  * 重力波検出器（段階3）。最終実験施設（重力異常点）が出す重力波をとらえ、おおよその方角と距離帯を示す。
  * 1回の観測に OBSERVATION_COST FE 使う。正確な位置まではわからない。
  */
-public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class GravitationalWaveDetectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int OBSERVATION_COST = 50_000;
     public static final int SEARCH_RADIUS_CHUNKS = 160;
     public static final TagKey<Structure> GRAVITY_ANOMALIES =
@@ -92,7 +92,7 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
     /** 観測: 電力を使って、いちばん近い重力異常点の方角と距離帯を調べる（画面に出し、チャットにも残す）。 */
     public boolean observe(ServerPlayer player) {
         if (!energy.consume(OBSERVATION_COST)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.detector.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(OBSERVATION_COST)), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.detector.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(OBSERVATION_COST)));
             return false;
         }
         Level level = player.level();
@@ -107,7 +107,7 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
             lastBand = band(Math.sqrt((double) dx * dx + (double) dz * dz));
         }
         setChanged();
-        player.displayClientMessage(describe(worldPosition, target), false);
+        player.sendSystemMessage(describe(worldPosition, target));
         io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "gravitational_wave_detector_ping", 1.0F, 1.0F);
         return true;
     }
@@ -127,6 +127,6 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
     }
 }

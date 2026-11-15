@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 
 /**
  * ハロー捕集器（段階5）。ペンローズ・リアクターの炉心から RANGE ブロック以内に置くと、炉心の重力で集まった
@@ -26,20 +26,23 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
  * ダークマターは重力以外ほとんど相互作用しないので、捕集器の小さなタンクからは毎秒2%ずつ漏れる。
  * 毎秒、隣の液体の入れ物（重力閉じ込めタンクや、炉心制御装置・抽出ポート）へ押し出す。
  */
-public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int RANGE = 16;
     public static final int FE_PER_TICK = 2000;
     public static final int BUFFER = 4000;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(BUFFER, ContainmentTankBlockEntity::isDarkMatter) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(BUFFER, ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
         }
     };
     /** 外からは取り出すだけ。 */
-    private final IFluidHandler output = new IFluidHandler() {
+    private final io.github.genichimaruo.singulo.compat.TankFluidAccess output = new io.github.genichimaruo.singulo.compat.TankFluidAccess() {
+        @Override public TransactionalFluidTank tankAt(int index) { java.util.Objects.checkIndex(index, 1); return tank; }
+        @Override public boolean allowsInsert(int index) { return false; }
+        @Override public boolean allowsExtract(int index) { return true; }
         @Override
         public int getTanks() {
             return 1;
@@ -83,11 +86,11 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
         super(SinguloBlockEntities.HALO_COLLECTOR.get(), pos, state);
     }
 
-    public FluidTank tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
-    public IFluidHandler automationFluids() {
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess automationFluids() {
         return output;
     }
 
@@ -134,7 +137,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
             if (tank.isEmpty()) {
                 return;
             }
-            IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(dir), dir.getOpposite());
+            IFluidHandler target = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, pos.relative(dir), dir.getOpposite());
             if (target != null) {
                 int moved = target.fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
                 if (moved > 0) {
@@ -164,7 +167,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("carry", carry);
     }
@@ -172,8 +175,8 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompound("tank"));
-        energy.setEnergy(tag.getInt("energy"));
-        carry = tag.getDouble("carry");
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        carry = tag.getDoubleOr("carry", 0.0D);
     }
 }

@@ -120,7 +120,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
     @Override
     protected boolean openScreen(ServerPlayer player) {
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return true;
         }
         player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new SupplyPortMenu(id, inv, worldPosition, entries, data),
@@ -139,7 +139,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
             }
             net.minecraft.nbt.CompoundTag t = new net.minecraft.nbt.CompoundTag();
             t.putInt("slot", i);
-            t.put("item", e.save(registries));
+            t.put("item", io.github.genichimaruo.singulo.compat.NbtCompat.save(e, registries));
             t.putInt("rank", ranks[i]);
             t.putInt("mode", modes[i]);
             list.add(t);
@@ -155,16 +155,16 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
         for (int i = 0; i < ENTRIES; i++) {
             entries.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
         }
-        net.minecraft.nbt.ListTag list = tag.getList("priorities", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        net.minecraft.nbt.ListTag list = tag.getListOrEmpty("priorities");
         for (int k = 0; k < list.size(); k++) {
-            net.minecraft.nbt.CompoundTag t = list.getCompound(k);
-            int i = t.getInt("slot");
+            net.minecraft.nbt.CompoundTag t = list.getCompoundOrEmpty(k);
+            int i = t.getIntOr("slot", 0);
             if (i < 0 || i >= ENTRIES) {
                 continue;
             }
-            entries.setItem(i, net.minecraft.world.item.ItemStack.parseOptional(registries, t.getCompound("item")));
-            ranks[i] = Math.max(1, Math.min(MAX_RANK, t.getInt("rank")));
-            modes[i] = Math.floorMod(t.getInt("mode"), MODES);
+            entries.setItem(i, io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t.getCompoundOrEmpty("item")));
+            ranks[i] = Math.max(1, Math.min(MAX_RANK, t.getIntOr("rank", 0)));
+            modes[i] = Math.floorMod(t.getIntOr("mode", 0), MODES);
         }
     }
 
@@ -191,7 +191,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
-            var h = level.getCapability(Capabilities.FluidHandler.BLOCK, p, d.getOpposite());
+            var h = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, p, d.getOpposite());
             if (h != null && h.getTanks() > 0 && seen.add(p)) {
                 out.add(h);
             }
@@ -251,7 +251,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                 continue;
             }
             IItemHandler h = cache != null ? cache.get(d)
-                    : AdjacentItemStores.androidView(level, p, d.getOpposite(), level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite()));
+                    : AdjacentItemStores.androidView(level, p, d.getOpposite(), io.github.genichimaruo.singulo.compat.ItemResourceView.findAndroid(level, p, d.getOpposite()));
             if (h == null) {
                 // リンク済みの QIO ダッシュボードの裏が接していれば、その周波数の中身をチェストと同じように使う（Mekanism があるときだけ）。
                 // 同じ周波数のダッシュボードは同じ入れ物なので、もう集めていれば数えない（何枚つないでも1回）
@@ -295,7 +295,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
         }
         List<IItemHandler> list = new java.util.ArrayList<>();
         storages(player.level(), new java.util.HashSet<>(), list);
-        player.displayClientMessage(Component.translatable("message.singulo.work_link.info", c.getX(), c.getY(), c.getZ())
-                .append(Component.translatable("message.singulo.supply_port.storages", list.size())), true);
+        player.sendOverlayMessage(Component.translatable("message.singulo.work_link.info", c.getX(), c.getY(), c.getZ())
+                .append(Component.translatable("message.singulo.supply_port.storages", list.size())));
     }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
@@ -52,7 +52,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  *   <li>口は周りのエンティティをわずかに引き寄せる</li>
  * </ul>
  */
-public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class WormholeMouthBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener {
     public static final int TICKS_PER_MATTER = 18_000;
     /** 向こう側が別のディメンションのときの維持費の倍率。 */
@@ -118,7 +118,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         return droneGate;
     }
 
-    private final ItemStackHandler fuel = new ItemStackHandler(1) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler fuel = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return ExoticCharge.isExoticMatter(stack);
@@ -145,7 +145,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     private boolean farPassable;
     public int passageState() {
         if(!traversable)return 0;
-        if(level!=null&&level.isClientSide)return clientPassage;
+        if(level!=null&&level.isClientSide())return clientPassage;
         var other=partner();
         if(other==null)return size>0&&partnerPos()!=null&&farPassable?2:1;
         boolean passable=other.open()&&other.traversable();
@@ -154,7 +154,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     }
 
     private boolean installSeam(ServerPlayer player, ItemStack stack) {
-        if (!traversable && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+        if (!traversable && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(
                 io.github.genichimaruo.singulo.Singulo.id("wormhole_seam_upgrade")))) {
             traversable = true;
             if (!player.isCreative()) stack.shrink(1);
@@ -325,6 +325,27 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         return left == UNLIMITED ? UNLIMITED : Math.max(0, left - amount);
     }
 
+    private record TransferBudget(long tick, long items, long energy, long fluid) {}
+    private final net.neoforged.neoforge.transfer.transaction.SnapshotJournal<TransferBudget> budgetJournal =
+            new net.neoforged.neoforge.transfer.transaction.SnapshotJournal<>() {
+        @Override protected TransferBudget createSnapshot() {
+            return new TransferBudget(budgetTick, itemsLeft, energyLeft, fluidLeft);
+        }
+        @Override protected void revertToSnapshot(TransferBudget original) {
+            budgetTick = original.tick(); itemsLeft = original.items();
+            energyLeft = original.energy(); fluidLeft = original.fluid();
+        }
+    };
+
+    public void useItems(int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+        refreshBudget(); budgetJournal.updateSnapshots(tx); itemsLeft = spend(itemsLeft, amount);
+    }
+    public void useEnergy(long amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+        refreshBudget(); budgetJournal.updateSnapshots(tx); energyLeft = spend(energyLeft, amount);
+    }
+    public void useFluid(int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+        refreshBudget(); budgetJournal.updateSnapshots(tx); fluidLeft = spend(fluidLeft, amount);
+    }
     public int itemBudget() {
         refreshBudget();
         return (int) Math.min(Integer.MAX_VALUE, itemsLeft);
@@ -487,9 +508,9 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
             // この口へ向かう行きの便は発送元へ戻し、この口から帰るはずだったドローンは口を通らずに家へ帰す（荷物は失わない）
             io.github.genichimaruo.singulo.drone.DroneWormhole.mouthRemoved(server, worldPosition);
         }
-        if (traversable && !level.isClientSide) {
+        if (traversable && !level.isClientSide()) {
             traversable=false;
-            Block.popResource(level,worldPosition,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+            Block.popResource(level,worldPosition,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(
                     io.github.genichimaruo.singulo.Singulo.id("wormhole_seam_upgrade"))));
         }
         unregister(level);
@@ -564,7 +585,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         WormholeData placed = input.get(SinguloComponents.WORMHOLE.get());
         if (placed != null && !placed.placed()) {
@@ -579,9 +600,9 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("pair");
-        tag.remove("created");
+    public void removeComponentsFromTag(net.minecraft.world.level.storage.ValueOutput tag) {
+        tag.discard("pair");
+        tag.discard("created");
     }
 
     @Override
@@ -612,28 +633,30 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         tag.putDouble("burn", burn);
         tag.putInt("grace", grace);
         tag.putInt("starve", starve);
-        tag.put("fuel", fuel.serializeNBT(registries));
+        tag.put("fuel", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(fuel, registries));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("pair")) {
-            data = new WormholeData(tag.getLong("pair"), tag.getLong("created"), true);
+            data = new WormholeData(tag.getLongOr("pair", 0L), tag.getLongOr("created", 0L), true);
         }
-        size = tag.contains("size") ? tag.getInt("size") : 1;
-        traversable=tag.getBoolean("traversable");
-        farPassable=tag.getBoolean("far_passable");
-        clientPassage=tag.getInt("passage_state");
+        size = tag.contains("size") ? tag.getIntOr("size", 0) : 1;
+        traversable=tag.getBooleanOr("traversable", false);
+        farPassable=tag.getBooleanOr("far_passable", false);
+        clientPassage=tag.getIntOr("passage_state", 0);
         if (tag.contains("target")) {
-            target = tag.getInt("target");
+            target = tag.getIntOr("target", 0);
         }
-        burn = tag.getDouble("burn");
-        grace = tag.getInt("grace");
-        starve = tag.getInt("starve");
+        burn = tag.getDoubleOr("burn", 0.0D);
+        grace = tag.getIntOr("grace", 0);
+        starve = tag.getIntOr("starve", 0);
         if (tag.contains("fuel")) {
-            fuel.deserializeNBT(registries, tag.getCompound("fuel"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(fuel, registries, tag.getCompoundOrEmpty("fuel"));
         }
     }
 
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(fuel, (slot,r) -> true, (slot,r) -> true); }
 }

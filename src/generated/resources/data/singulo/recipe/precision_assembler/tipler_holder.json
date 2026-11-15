@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "minecraft:amethyst_shard"
-      },
+      "ingredient": "minecraft:amethyst_shard",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:time_crystal_module"
-      },
+      "ingredient": "singulo:time_crystal_module",
       "count": 1
     }
   ],

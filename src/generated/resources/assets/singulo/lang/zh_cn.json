@@ -3690,5 +3690,6 @@
   "uses.singulo.wormhole_mouth_casing": "用于：虫洞入口",
   "uses.singulo.zero_gravity_block": "用途：重力悬吊储罐、悬吊冠",
   "uses.singulo.zinc_dust": "用于：锌锭、未烧制荧光体",
-  "uses.singulo.zinc_ingot": "用于：鿭"
+  "uses.singulo.zinc_ingot": "用于：鿭",
+  "key.category.singulo.singulo": "Singulo"
 }

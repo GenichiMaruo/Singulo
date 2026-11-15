@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.ruin.lab;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
  * （{@link LabPower#restore}）。そのとき、眠っていた統括AIが目を覚ます（施設の中の挑戦者へ放送が流れる）。
  * 施設の範囲は、研究所を生成したときに LabStructure が書き込む。範囲がなければ（自分で置いたときなど）、まわり {@value #FALLBACK} ブロック。
  */
-public class ReactorConsoleBlockEntity extends BlockEntity {
+public class ReactorConsoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public static final int STARTUP = 100;
     static final int FALLBACK = 16;
 
@@ -60,7 +60,7 @@ public class ReactorConsoleBlockEntity extends BlockEntity {
     public void start(ServerLevel level, @Nullable ServerPlayer player) {
         if (powered || startup > 0) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable(powered ? "lab.singulo.reactor.online" : "lab.singulo.reactor.starting"), true);
+                player.sendOverlayMessage(Component.translatable(powered ? "lab.singulo.reactor.online" : "lab.singulo.reactor.starting"));
             }
             return;
         }
@@ -150,9 +150,9 @@ public class ReactorConsoleBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        int[] a = tag.getIntArray("facility");
+        int[] a = tag.getIntArray("facility").orElseGet(() -> new int[0]);
         facility = a.length == 6 ? LabPower.read(a) : null;
-        powered = tag.getBoolean("powered");
-        startup = tag.getInt("startup");
+        powered = tag.getBooleanOr("powered", false);
+        startup = tag.getIntOr("startup", 0);
     }
 }

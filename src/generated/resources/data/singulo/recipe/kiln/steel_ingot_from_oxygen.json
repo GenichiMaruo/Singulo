@@ -6,15 +6,11 @@
   "energy": 60,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/iron"
-      },
+      "ingredient": "#c:ingots/iron",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "singulo:carbon"
-      },
+      "ingredient": "#singulo:carbon",
       "count": 1
     }
   ],

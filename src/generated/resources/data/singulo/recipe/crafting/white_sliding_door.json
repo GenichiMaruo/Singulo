@@ -7,15 +7,9 @@
     "LL"
   ],
   "key": {
-    "L": {
-      "item": "singulo:white_panel"
-    },
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "L": "singulo:white_panel",
+    "P": "#c:plates/steel",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "singulo:white_sliding_door",

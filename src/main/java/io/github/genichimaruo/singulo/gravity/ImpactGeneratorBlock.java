@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.gravity;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -45,13 +45,13 @@ public class ImpactGeneratorBlock extends GravityReceiverBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.IMPACT_GENERATOR.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.IMPACT_GENERATOR.get(),
                 GravityReceiverBlockEntity::serverTick);
     }
 
     /** 落ちてきた: 落下ダメージを与えず（標準の処理を呼ばない）、高さに応じて発電する。 */
     @Override
-    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
         if (level instanceof ServerLevel server && entity instanceof LivingEntity
                 && level.getBlockEntity(pos) instanceof ImpactGeneratorBlockEntity be && be.absorb(fallDistance) > 0) {
             server.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 1.02, pos.getZ() + 0.5,
@@ -63,10 +63,10 @@ public class ImpactGeneratorBlock extends GravityReceiverBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ImpactGeneratorBlockEntity be) {
-            player.displayClientMessage(Component.translatable("message.singulo.impact_generator.status",
-                    be.stored(), ImpactGeneratorBlockEntity.CAPACITY, be.activePanels(), be.panels(), be.supplyingPanels(), be.surplus()), true);
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ImpactGeneratorBlockEntity be) {
+            player.sendOverlayMessage(Component.translatable("message.singulo.impact_generator.status",
+                    be.stored(), ImpactGeneratorBlockEntity.CAPACITY, be.activePanels(), be.panels(), be.supplyingPanels(), be.surplus()));
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 }

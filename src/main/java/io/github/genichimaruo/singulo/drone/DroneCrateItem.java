@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
  * 梱包箱（3段階）。空の箱は重なり、梱包すると中身（9枠）を持つ1個だけの箱になる。段階が上がるほどバッテリーが大きく、遠くへ送れる。
  * 発送の電力は梱包のときにポートが払い、その便で使い切る（箱には電力をためない）。梱包済みの箱は右クリックで開梱できる。
  */
-public class DroneCrateItem extends Item {
+public class DroneCrateItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public static final int SLOTS = 9;
     /** 発送の電力 = BASE_FE + 直線距離 × FE_PER_BLOCK。 */
     public static final int BASE_FE = 2_000, FE_PER_BLOCK = 50;
@@ -121,12 +121,12 @@ public class DroneCrateItem extends Item {
 
     /** 梱包済みの箱を右クリック: 中身を持ち物へ移す（入りきらない分は箱に残す）。 */
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!packed(stack)) {
-            return InteractionResultHolder.pass(stack);
+            return io.github.genichimaruo.singulo.compat.Interactions.pass(stack);
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             NonNullList<ItemStack> items = contents(stack);
             ItemStack crate = stack.copyWithCount(1);
             // Inventory#add は、クリエイティブで入りきらないと残りを消してしまう。入った分だけ減らし、残りは箱に残す
@@ -140,7 +140,7 @@ public class DroneCrateItem extends Item {
             player.setItemInHand(hand, crate);
             level.playSound(null, player.blockPosition(), SoundEvents.BARREL_OPEN, SoundSource.PLAYERS, 0.7F, 1.3F);
         }
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
     @Override

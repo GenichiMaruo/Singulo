@@ -6,9 +6,7 @@
   "energy": 2000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "minecraft:logs"
-      },
+      "ingredient": "#minecraft:logs",
       "count": 4
     }
   ],

@@ -7,11 +7,11 @@ import io.github.genichimaruo.singulo.ruin.LastArchivist;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -31,7 +31,7 @@ import org.joml.Quaternionf;
  *       特異点がふくらんでからつぶれて閃光</li>
  * </ul>
  */
-public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
+public class LastArchivistRenderer extends SnapshotEntityRenderer<LastArchivist> {
     static final int IVORY = 0xECE4D2;
     static final int GOLD = 0xFFD27A;
     static final int PALE = 0xFFF2C8;
@@ -49,8 +49,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(LastArchivist entity) {
+     public Identifier getTextureLocation(LastArchivist entity) {
         return FxDraw.WHITE;
     }
 
@@ -148,7 +147,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
             FxDraw.ring(pose.last(), glow, 1 + 12 * c, 1.6F + 12 * c, PALE, (int) (220 * (1 - c)), 0);
             pose.popPose();
         }
-        super.render(e, yaw, partialTick, pose, buffers, light);
+        // Vanilla label and leash submission is handled by SnapshotEntityRenderer.submit.
     }
 
     static VertexConsumer glow(MultiBufferSource buffers) {
@@ -178,7 +177,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
 
     /** 衣: 裾から肩へすぼまる筒（裾がゆらぐ）、胴、金の縁取り。from より下は描かない（編まれていない／塵になった）。 */
     private static void renderRobe(LastArchivist e, int phase, float from, float t, PoseStack pose, MultiBufferSource buffers, int light) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(FxDraw.WHITE));
         int seg = 18;
         // 衣の下半分（裾は闇へ溶ける）
         frustum(pose, vc, seg, HEM_Y, 0.88F, SHOULDER_Y, 0.42F, from, t, 0.09F, 0x2A1E3A, 120, IVORY, 255, light);
@@ -288,7 +287,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         pose.translate(0, 0.15F, 0);
         pose.pushPose();
         pose.scale(1, 0.18F, 1);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 0.75F * size, 0x000000, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 0.75F * size, 0x000000, 0);
         pose.popPose();
         VertexConsumer glow = glow(buffers);
         pose.mulPose(Axis.ZP.rotationDegrees(14));
@@ -627,7 +626,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         }
         pose.pushPose();
         pose.translate(0, LastArchivist.HEAD_Y, 0);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
         VertexConsumer glow = glow(buffers);
         // 光子の環（いつもこちらを向く）
         pose.pushPose();
@@ -850,7 +849,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         pose.translate(0, LastArchivist.HEAD_Y, 0);
         float gulp = p < 0.15F ? p / 0.15F : Math.max(0, 1 - (p - 0.15F) / 0.25F);
         if (gulp > 0) {
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 0.45F + 0.5F * gulp, 0x000000, 0);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 0.45F + 0.5F * gulp, 0x000000, 0);
         }
         VertexConsumer glow = glow(buffers);
         FxDraw.billboard(pose, glow, camera, 1.5F + 3 * gulp, 0xFFFFFF, (int) (220 * gulp));
@@ -920,7 +919,7 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
         pose.translate(off.x, off.y, off.z);
         // 終焉: 部屋を暗くする（内側から見る黒い膜）。先に描いて、ほかの光をその上に重ねる
         if (phase == 3 && live > 0.01F) {
-            sphereShell(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), 14.6F, 0x05030A, (int) (110 * live), ARENA_FLOOR);
+            sphereShell(pose, buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(FxDraw.WHITE)), 14.6F, 0x05030A, (int) (110 * live), ARENA_FLOOR);
         }
         VertexConsumer glow = glow(buffers);
         if (live > 0.01F) {

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "tag": "c:ingots/steel"
-    },
-    {
-      "tag": "c:ingots/steel"
-    }
+    "#c:ingots/steel",
+    "#c:ingots/steel"
   ],
   "result": {
     "id": "singulo:steel_plate",

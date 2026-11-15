@@ -14,7 +14,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** 置いたティーカップの色（染めていなければ白）。壊すとルートテーブルの copy_components で、この色ごとアイテムに戻る。 */
-public class TeacupBlockEntity extends BlockEntity {
+public class TeacupBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
+    public static final net.neoforged.neoforge.model.data.ModelProperty<Integer> MODEL_COLOR = new net.neoforged.neoforge.model.data.ModelProperty<>();
+    @Override public net.neoforged.neoforge.model.data.ModelData getModelData() {
+        return net.neoforged.neoforge.model.data.ModelData.builder().with(MODEL_COLOR, color).build();
+    }
     public static final int DEFAULT_COLOR = 0xFFFFFF;
     private int color = DEFAULT_COLOR;
 
@@ -29,6 +33,7 @@ public class TeacupBlockEntity extends BlockEntity {
     public void setColor(int color) {
         this.color = color & 0xFFFFFF;
         setChanged();
+        requestModelDataUpdate();
         if (level != null) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
         }
@@ -36,7 +41,7 @@ public class TeacupBlockEntity extends BlockEntity {
 
     /** アイテムの染めた色を受け取る（置いたとき）。 */
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         DyedItemColor dyed = input.get(DataComponents.DYED_COLOR);
         color = dyed != null ? dyed.rgb() & 0xFFFFFF : DEFAULT_COLOR;
@@ -47,7 +52,7 @@ public class TeacupBlockEntity extends BlockEntity {
     protected void collectImplicitComponents(DataComponentMap.Builder builder) {
         super.collectImplicitComponents(builder);
         if (color != DEFAULT_COLOR) {
-            builder.set(DataComponents.DYED_COLOR, new DyedItemColor(color, true));
+            builder.set(DataComponents.DYED_COLOR, new DyedItemColor(color));
         }
     }
 
@@ -60,8 +65,8 @@ public class TeacupBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        color = tag.contains("color") ? tag.getInt("color") : DEFAULT_COLOR;
-        if (level != null && level.isClientSide) {
+        color = tag.contains("color") ? tag.getIntOr("color", 0) : DEFAULT_COLOR;
+        if (level != null && level.isClientSide()) {
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
         }

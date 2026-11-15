@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:diamond_pickaxe"
-      },
+      "ingredient": "minecraft:diamond_pickaxe",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     }
   ],

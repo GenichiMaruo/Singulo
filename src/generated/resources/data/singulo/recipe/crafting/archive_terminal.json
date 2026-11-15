@@ -7,18 +7,10 @@
     " B "
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "Y": {
-      "tag": "c:dusts/glowstone"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "Y": "#c:dusts/glowstone",
+    "F": "singulo:basic_frame",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:archive_terminal",

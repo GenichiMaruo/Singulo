@@ -23,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
  * 空気・液体・壊せないブロック・イベントホライズン・シールドの範囲には広がらない。止まると自分もストレンジ物質になる。
  * 磁気瓶で封じ込めて回収できる。
  */
-public class StrangeletBlockEntity extends BlockEntity {
+public class StrangeletBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     static final int INTERVAL = 20;
     static final int TRIES = 8;
 
@@ -74,8 +74,8 @@ public class StrangeletBlockEntity extends BlockEntity {
     public boolean spread(ServerLevel level) {
         int r = Math.min(maxRadius(), 1 + converted / 6);
         for (int i = 0; i < TRIES; i++) {
-            BlockPos p = worldPosition.offset(level.random.nextInt(2 * r + 1) - r, level.random.nextInt(2 * r + 1) - r,
-                    level.random.nextInt(2 * r + 1) - r);
+            BlockPos p = worldPosition.offset(level.getRandom().nextInt(2 * r + 1) - r, level.getRandom().nextInt(2 * r + 1) - r,
+                    level.getRandom().nextInt(2 * r + 1) - r);
             if (p.equals(worldPosition) || worldPosition.distSqr(p) > (double) r * r || !canConvert(level, p)) {
                 continue;
             }
@@ -111,6 +111,6 @@ public class StrangeletBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        converted = tag.getInt("converted");
+        converted = tag.getIntOr("converted", 0);
     }
 }

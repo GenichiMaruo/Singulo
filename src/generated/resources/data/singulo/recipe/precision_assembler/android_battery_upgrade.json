@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:ingots/copper"
-      },
+      "ingredient": "#c:ingots/copper",
       "count": 4
     },
     {
-      "ingredient": {
-        "tag": "c:dusts/redstone"
-      },
+      "ingredient": "#c:dusts/redstone",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     }
   ],

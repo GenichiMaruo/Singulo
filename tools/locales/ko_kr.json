@@ -14766,5 +14766,9 @@
   "message.singulo.work_link.endpoint_result": {
     "source": "Endpoint link: %s",
     "translation": "엔드포인트 연결: %s"
+  },
+  "key.category.singulo.singulo": {
+    "source": "Singulo",
+    "translation": "Singulo"
   }
 }

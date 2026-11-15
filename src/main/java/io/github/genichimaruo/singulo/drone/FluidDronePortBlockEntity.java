@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.drone;
 
 import io.github.genichimaruo.singulo.machine.SideConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -15,7 +15,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 
 /**
  * 液体のドローン発着ポート。物の発着ポートと同じ扉・昇降台・ドローンの受け渡しで、荷物の代わりに液体を送る。
@@ -32,13 +32,13 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     /** 自動発送のしきい値（AUTO_THRESHOLDS の番号ごと、mB）: しない・1バケツ・16・32バケツ・満杯（カプセル1つぶん）。 */
     private static final int[] AUTO_FLUID = {0, 1_000, 16_000, 32_000, SEND_CAPACITY};
 
-    private final FluidTank send = new FluidTank(SEND_CAPACITY) {
+    private final TransactionalFluidTank send = new TransactionalFluidTank(SEND_CAPACITY) {
         @Override
         protected void onContentsChanged() {
             cargoChanged();
         }
     };
-    private final FluidTank receive = new FluidTank(RECEIVE_CAPACITY) {
+    private final TransactionalFluidTank receive = new TransactionalFluidTank(RECEIVE_CAPACITY) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -54,11 +54,11 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
         return AUTO_FLUID[Math.floorMod(mode, AUTO_FLUID.length)];
     }
 
-    public FluidTank sendTank() {
+    public TransactionalFluidTank sendTank() {
         return send;
     }
 
-    public FluidTank receiveTank() {
+    public TransactionalFluidTank receiveTank() {
         return receive;
     }
 
@@ -140,7 +140,7 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
         if (receive.isEmpty()) {
             return;
         }
-        IFluidHandler dest = level.getCapability(Capabilities.FluidHandler.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
+        IFluidHandler dest = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, getBlockPos().relative(dir), dir.getOpposite());
         if (dest != null) {
             FluidUtil.tryFluidTransfer(dest, receive, Integer.MAX_VALUE, true);
         }
@@ -152,7 +152,7 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
      * 面から見たタンク: 「入力」の面からは送るタンクへ入れられ、「出力」の面からは受け取りのタンクを取り出せる。
      * side が null（手のバケツなど、面を問わない出し入れ）なら両方。
      */
-    public IFluidHandler sidedFluids(@Nullable Direction side) {
+    public io.github.genichimaruo.singulo.compat.TankFluidAccess sidedFluids(@Nullable Direction side) {
         SideConfig.Face face = side == null ? null : SideConfig.faceOf(facing(), side);
         boolean in = face == null || sides().canInsert(face);
         boolean out = face == null || sides().canExtract(face);
@@ -160,7 +160,9 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     }
 
     /** 面から見たタンク（送るタンクと受け取りのタンクは別なので、パイプからは「タンク」と見なさない）。 */
-    private final class SidedTanks implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeSplitTanks {
+    private final class SidedTanks implements io.github.genichimaruo.singulo.compat.TankFluidAccess, io.github.genichimaruo.singulo.pipe.PipeSplitTanks {
+        public TransactionalFluidTank tankAt(int index) { return index == 0 ? send : receive; }
+        public boolean allowsExtract(int index) { return out && index == 1; }
         private final boolean in, out;
 
         SidedTanks(boolean in, boolean out) {
@@ -226,7 +228,7 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         var empty = net.neoforged.neoforge.fluids.SimpleFluidContent.EMPTY;
         FluidStack s = input.getOrDefault(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_SEND_FLUID.get(), empty).copy();
@@ -236,9 +238,9 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     }
 
     @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("send_tank");
-        tag.remove("receive_tank");
+    public void removeComponentsFromTag(net.minecraft.world.level.storage.ValueOutput tag) {
+        tag.discard("send_tank");
+        tag.discard("receive_tank");
     }
 
     // ------------------------------------------------------------------ 保存
@@ -246,18 +248,18 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("send_tank", send.writeToNBT(registries, new CompoundTag()));
-        tag.put("receive_tank", receive.writeToNBT(registries, new CompoundTag()));
+        tag.put("send_tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(send, registries, new CompoundTag()));
+        tag.put("receive_tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(receive, registries, new CompoundTag()));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("send_tank")) {
-            send.readFromNBT(registries, tag.getCompound("send_tank"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.readTank(send, registries, tag.getCompoundOrEmpty("send_tank"));
         }
         if (tag.contains("receive_tank")) {
-            receive.readFromNBT(registries, tag.getCompound("receive_tank"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.readTank(receive, registries, tag.getCompoundOrEmpty("receive_tank"));
         }
     }
 }

@@ -7,21 +7,11 @@
     "CIC"
   ],
   "key": {
-    "C": {
-      "item": "singulo:superconducting_coil"
-    },
-    "Q": {
-      "item": "singulo:gravity_field_stabilizer"
-    },
-    "S": {
-      "item": "singulo:collapsar_ingot"
-    },
-    "F": {
-      "item": "singulo:nihonium_frame"
-    },
-    "I": {
-      "item": "singulo:exotic_matter"
-    }
+    "C": "singulo:superconducting_coil",
+    "Q": "singulo:gravity_field_stabilizer",
+    "S": "singulo:collapsar_ingot",
+    "F": "singulo:nihonium_frame",
+    "I": "singulo:exotic_matter"
   },
   "result": {
     "id": "singulo:tidal_spindle",

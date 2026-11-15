@@ -6,10 +6,10 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -30,16 +30,16 @@ import org.joml.Vector3f;
  *   <li>完成: 小さな銀河が核の上で回り、その上に作る物の像と進み具合の輪</li>
  * </ul>
  */
-public class GenesisCoreRenderer implements BlockEntityRenderer<GenesisCoreBlockEntity> {
+public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockEntity> {
     static final int PALE = 0xFFF2D8, GOLD = 0xFFD27A, BLUE = 0x8FD0FF, VIOLET = 0xB48CFF, RED = 0xFF3A2A, AQUA = 0x7FFFF0;
     private static final float Y = (float) GenesisCoreBlockEntity.LENS_Y;
     /** 柱の先（核の中心から）。 */
     private static final Vec3[] TOPS = {new Vec3(2, 4.05, 2), new Vec3(-2, 4.05, 2), new Vec3(2, 4.05, -2), new Vec3(-2, 4.05, -2)};
 
-    private final ItemRenderer items;
+    private final ItemDraw items;
 
     public GenesisCoreRenderer(BlockEntityRendererProvider.Context context) {
-        this.items = context.getItemRenderer();
+        this.items = ItemDraw.get();
     }
 
     private static VertexConsumer glow(MultiBufferSource buffers) {
@@ -52,7 +52,7 @@ public class GenesisCoreRenderer implements BlockEntityRenderer<GenesisCoreBlock
             return;
         }
         float time = be.clientTicks() + pt;
-        Quaternionf camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        Quaternionf camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         pose.pushPose();
         pose.translate(0.5, 0, 0.5);
         switch (be.stage()) {
@@ -367,7 +367,7 @@ public class GenesisCoreRenderer implements BlockEntityRenderer<GenesisCoreBlock
     }
 
     @Override
-    public boolean shouldRenderOffScreen(GenesisCoreBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

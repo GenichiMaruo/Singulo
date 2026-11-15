@@ -15,15 +15,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 /** A normal shaped upgrade that transfers only the single consumed cell's stored energy. */
-public final class SmesUpgradeRecipe extends ShapedRecipe {
+public final class SmesUpgradeRecipe extends NormalCraftingRecipe {
+    private final ShapedRecipe delegate;
     private SmesUpgradeRecipe(ShapedRecipe recipe) {
         // Vanilla's result accessor does not inspect the registry provider.
-        super(recipe.getGroup(), recipe.category(), recipe.pattern, recipe.getResultItem(null).copy(), recipe.showNotification());
+        super(new Recipe.CommonInfo(recipe.showNotification()), new CraftingRecipe.CraftingBookInfo(recipe.category(), recipe.group()));
+        this.delegate = recipe;
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        ItemStack result = super.assemble(input, registries);
+    public ItemStack assemble(CraftingInput input) {
+        ItemStack result = delegate.assemble(input);
         if (!result.is(SinguloBlocks.SMES_MODULE.get().asItem()) || result.getCount() != 1) return ItemStack.EMPTY;
         ItemStack cell = ItemStack.EMPTY;
         for (ItemStack stack : input.items()) {
@@ -35,20 +37,22 @@ public final class SmesUpgradeRecipe extends ShapedRecipe {
         var data = cell.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null) {
             var tag = new CompoundTag();
-            tag.putInt("energy", Math.clamp(data.copyTag().getInt("energy"), 0, SmesCellBlockEntity.CAPACITY));
-            BlockItem.setBlockEntityData(result, SinguloBlockEntities.SMES_MODULE.get(), tag);
+            tag.putInt("energy", Math.clamp(data.copyTagWithoutId().getIntOr("energy", 0), 0, SmesCellBlockEntity.CAPACITY));
+            result.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(SinguloBlockEntities.SMES_MODULE.get(), tag));
         }
         return result;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() { return SinguloRecipes.SMES_UPGRADE.get(); }
+    public RecipeSerializer<SmesUpgradeRecipe> getSerializer() { return SinguloRecipes.SMES_UPGRADE.get(); }
 
-    public static final class Serializer implements RecipeSerializer<SmesUpgradeRecipe> {
-        private static final MapCodec<SmesUpgradeRecipe> CODEC = ShapedRecipe.Serializer.CODEC.xmap(SmesUpgradeRecipe::new, r -> r);
-        private static final StreamCodec<RegistryFriendlyByteBuf, SmesUpgradeRecipe> STREAM =
-                ShapedRecipe.Serializer.STREAM_CODEC.map(SmesUpgradeRecipe::new, r -> r);
-        @Override public MapCodec<SmesUpgradeRecipe> codec() { return CODEC; }
-        @Override public StreamCodec<RegistryFriendlyByteBuf, SmesUpgradeRecipe> streamCodec() { return STREAM; }
+    public ShapedRecipe shapedRecipe() { return delegate; }
+    @Override public boolean matches(CraftingInput input, net.minecraft.world.level.Level level) {
+        return delegate.matches(input, level);
     }
+    @Override protected PlacementInfo createPlacementInfo() { return delegate.placementInfo(); }
+    @Override public java.util.List<net.minecraft.world.item.crafting.display.RecipeDisplay> display() { return delegate.display(); }
+    public static final MapCodec<SmesUpgradeRecipe> CODEC = ShapedRecipe.MAP_CODEC.xmap(SmesUpgradeRecipe::new, r -> r.delegate);
+    public static final StreamCodec<RegistryFriendlyByteBuf, SmesUpgradeRecipe> STREAM_CODEC = ShapedRecipe.STREAM_CODEC.map(SmesUpgradeRecipe::new, r -> r.delegate);
+    public static final RecipeSerializer<SmesUpgradeRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
 }

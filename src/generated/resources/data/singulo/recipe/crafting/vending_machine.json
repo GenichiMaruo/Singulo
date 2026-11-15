@@ -7,21 +7,11 @@
     "DKG"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_lab_furniture"
-    },
-    "S": {
-      "tag": "c:plates/steel"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "D": {
-      "tag": "c:dyes/red"
-    },
-    "K": {
-      "item": "singulo:basic_circuit"
-    }
+    "B": "singulo:blueprint_lab_furniture",
+    "S": "#c:plates/steel",
+    "G": "#c:glass_blocks/colorless",
+    "D": "#c:dyes/red",
+    "K": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:vending_machine",

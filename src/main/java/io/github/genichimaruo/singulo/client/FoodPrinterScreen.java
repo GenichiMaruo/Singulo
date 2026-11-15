@@ -9,7 +9,7 @@ import io.github.genichimaruo.singulo.food.PrintedFoodItem;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -124,18 +124,18 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
     // ------------------------------------------------------------------ 描画
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         layoutSelector();
-        super.render(g, mouseX, mouseY, partialTick);
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (selector.open) {
             renderSelector(g, mouseX, mouseY);
         }
         if (overPopup(mouseX, mouseY)) {
             return;
         }
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
-        renderTooltip(g, mouseX, mouseY);
+        g.pose().pushMatrix();
+        g.nextStratum();
+        extractTooltip(g, mouseX, mouseY);
         if (!(hoveredSlot != null && hoveredSlot.hasItem()) && !renderFrameTooltips(g, mouseX, mouseY)) {
             if (overSelect(mouseX, mouseY)) {
                 Panel.tooltip(g, font, selectTooltip(), 220, mouseX, mouseY);
@@ -143,11 +143,11 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
                 renderStatTooltips(g, mouseX, mouseY);
             }
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int x = leftPos, y = topPos;
@@ -197,7 +197,7 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
      * 食材の枠とカートリッジの間の小さな矢印（5×7）。食材が入っていて、カートリッジにその種類のペーストを足せるときは、
      * ペーストの色で光る。
      */
-    private void drawFlow(GuiGraphics g, int kind, boolean hasIngredient) {
+    private void drawFlow(GuiGraphicsExtractor g, int kind, boolean hasIngredient) {
         ItemStack cartridge = menu.cartridge(kind);
         boolean flowing = hasIngredient && FoodPaste.fitsSlot(cartridge, kind) && FoodPaste.amount(cartridge) < FoodPaste.CAPACITY;
         int color = flowing ? 0xFF000000 | FoodPaste.COLORS[kind] : skin.dim();
@@ -209,7 +209,7 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
     }
 
     /** カートリッジの右の縦長のペーストの目盛り（スロットと同じ高さ。選んだ食品の1個に使う分の印つき）。 */
-    private void pasteGauge(GuiGraphics g, int kind, int gy) {
+    private void pasteGauge(GuiGraphicsExtractor g, int kind, int gy) {
         int gx = leftPos + FoodPrinterMenu.PASTE_X, w = FoodPrinterMenu.PASTE_W, h = 18;
         int top = topPos + gy;
         Panel.well(g, skin, gx, top, w, h);
@@ -232,7 +232,7 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
     }
 
     /** 印刷室の窓: 暗い室と台に、食品の絵（2倍）を、進んだ分だけ下から見せる。上の分はうすい影、いまの高さにノズルの線。 */
-    private void drawBed(GuiGraphics g) {
+    private void drawBed(GuiGraphicsExtractor g) {
         int bx = leftPos + FoodPrinterMenu.BED_X, by = topPos + FoodPrinterMenu.BED_Y, w = FoodPrinterMenu.BED_W, h = FoodPrinterMenu.BED_H;
         Panel.well(g, skin, bx, by, w, h);
         g.fill(bx, by, bx + w, by + h, 0xFF22262E);
@@ -252,21 +252,21 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
             // 影（まだ印刷していない形）
             drawLarge(g, stack, ix, iy);
             if (done < 32) {
-                g.pose().pushPose();
-                g.pose().translate(0, 0, 200);
+                g.pose().pushMatrix();
+                g.nextStratum();
                 g.fill(ix, iy, ix + 32, iy + 32 - done, 0xC022262E);
-                g.pose().popPose();
+                g.pose().popMatrix();
             }
             // ノズル（いま印刷している高さ）
             if (printing && done < 32) {
                 int ny = iy + 32 - done;
-                g.pose().pushPose();
-                g.pose().translate(0, 0, 250);
+                g.pose().pushMatrix();
+                g.nextStratum();
                 g.fill(bx + 2, ny - 1, bx + w - 2, ny, 0xFF000000 | pasteColor(food));
                 int nx = bx + w / 2;
                 g.fill(nx - 1, by + 4, nx + 1, ny - 2, 0xFFAEB4BE);
                 g.fill(nx - 2, ny - 3, nx + 2, ny - 1, 0xFFCE7E4E);
-                g.pose().popPose();
+                g.pose().popMatrix();
             }
             area(FoodPrinterMenu.BED_X, FoodPrinterMenu.BED_Y, w, h, printing
                     ? List.of(stack.getHoverName(), Component.translatable("gui.singulo.food_printer.progress", Math.round(100 * progress()))
@@ -276,12 +276,12 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
         Panel.glass(g, bx, by, w, h);
     }
 
-    private static void drawLarge(GuiGraphics g, ItemStack stack, int x, int y) {
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
-        g.pose().scale(2, 2, 1);
-        g.renderItem(stack, 0, 0);
-        g.pose().popPose();
+    private static void drawLarge(GuiGraphicsExtractor g, ItemStack stack, int x, int y) {
+        g.pose().pushMatrix();
+        g.pose().translate(x, y);
+        g.pose().scale(2, 2);
+        g.item(stack, 0, 0);
+        g.pose().popMatrix();
     }
 
     private static int pasteColor(PrintedFood food) {
@@ -300,14 +300,14 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
         return !overPopup(mx, my) && Panel.inside(mx, my, leftPos + FoodPrinterMenu.SELECT_X - 2, topPos + FoodPrinterMenu.SELECT_Y - 2, 20, 20);
     }
 
-    private void drawSelectButton(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawSelectButton(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int sx = leftPos + FoodPrinterMenu.SELECT_X, sy = topPos + FoodPrinterMenu.SELECT_Y;
         PrintedFood food = selected();
         Panel.button(g, skin, sx - 2, sy - 2, 20, 20, food != null ? Panel.Press.ON : overSelect(mouseX, mouseY) ? Panel.Press.HOVER
                 : Panel.Press.NORMAL);
         Panel.slot(g, skin, sx, sy);
         if (food != null) {
-            g.renderItem(new ItemStack(food.item()), sx, sy);
+            g.item(new ItemStack(food.item()), sx, sy);
         } else {
             Panel.autoIcon(g, sx + 4, sy + 3, 0xFFB8C2CC);
         }
@@ -362,9 +362,9 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
         return -1;
     }
 
-    private void renderSelector(GuiGraphics g, int mouseX, int mouseY) {
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+    private void renderSelector(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        g.pose().pushMatrix();
+        g.nextStratum();
         selector.draw(g, skin, mouseX, mouseY);
         List<PrintedFood> entries = entries();
         PrintedFood selected = selected();
@@ -375,12 +375,12 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
             Panel.slot(g, skin, c[0] + 1, c[1] + 1);
             int ring = food == selected ? skin.accent() : i == hovered ? Panel.GLOW : food != null && hasPaste(food) ? GuiSkin.OK : 0;
             if (ring != 0) {
-                g.renderOutline(c[0], c[1], 18, 18, ring);
+                g.outline(c[0], c[1], 18, 18, ring);
             }
             if (food == null) {
                 Panel.autoIcon(g, c[0] + 5, c[1] + 4, 0xFFE9EDF0);
             } else {
-                g.renderItem(new ItemStack(food.item()), c[0] + 1, c[1] + 1);
+                g.item(new ItemStack(food.item()), c[0] + 1, c[1] + 1);
             }
         }
         if (hovered >= 0) {
@@ -389,7 +389,7 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
                     Component.translatable("gui.singulo.food_printer.auto.hint").withStyle(s -> s.withColor(GREY))) : entryTooltip(food), 220,
                     mouseX, mouseY);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** 画面に見えているカートリッジで、ペーストが足りるか。 */
@@ -432,7 +432,8 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
     // ------------------------------------------------------------------ 操作
 
     @Override
-    public boolean mouseClicked(double mx, double my, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mx = event.x(), my = event.y(); int button = event.button();
         layoutSelector();
         // 窓の中のクリックは下の画面に届かない
         if (selector.open && (selector.clickChrome(mx, my) || selector.contains(mx, my))) {
@@ -456,7 +457,7 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
             playClick();
             return true;
         }
-        return super.mouseClicked(mx, my, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     private void playClick() {
@@ -467,12 +468,14 @@ public class FoodPrinterScreen extends FramedScreen<FoodPrinterMenu> {
     }
 
     @Override
-    public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
-        return selector.drag(leftPos, topPos, mx, my) || super.mouseDragged(mx, my, button, dx, dy);
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dx, double dy) {
+        double mx = event.x(), my = event.y(); int button = event.button();
+        return selector.drag(leftPos, topPos, mx, my) || super.mouseDragged(event, dx, dy);
     }
 
     @Override
-    public boolean mouseReleased(double mx, double my, int button) {
-        return selector.release() || super.mouseReleased(mx, my, button);
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double mx = event.x(), my = event.y(); int button = event.button();
+        return selector.release() || super.mouseReleased(event);
     }
 }

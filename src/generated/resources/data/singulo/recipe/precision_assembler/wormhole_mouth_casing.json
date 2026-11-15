@@ -6,27 +6,19 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:void_dust"
-      },
+      "ingredient": "singulo:void_dust",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:obsidians"
-      },
+      "ingredient": "#c:obsidians",
       "count": 2
     }
   ],

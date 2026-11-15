@@ -6,15 +6,9 @@
     " O "
   ],
   "key": {
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "M": {
-      "item": "singulo:magnetic_monopole"
-    },
-    "O": {
-      "item": "singulo:superconducting_coil"
-    }
+    "P": "#c:plates/steel",
+    "M": "singulo:magnetic_monopole",
+    "O": "singulo:superconducting_coil"
   },
   "result": {
     "id": "singulo:monopole_upgrade",

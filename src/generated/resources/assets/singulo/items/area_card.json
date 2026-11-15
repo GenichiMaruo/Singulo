@@ -1,0 +1,27 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "singulo:dynamic",
+    "kind": "area_card",
+    "entries": [
+      {
+        "threshold": 0.5,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/area_card_first"
+        }
+      },
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "singulo:item/area_card_recorded"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "singulo:item/area_card"
+    }
+  }
+}

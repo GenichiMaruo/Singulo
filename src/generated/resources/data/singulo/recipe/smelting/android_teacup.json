@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "singulo:unfired_teacup"
-  },
+  "ingredient": "singulo:unfired_teacup",
   "result": {
     "id": "singulo:android_teacup",
     "count": 1

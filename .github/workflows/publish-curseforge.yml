@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       verified_run_id:
-        description: 'Successful PR validation with NeoForge, GUI, Mekanism and Sodium lighting'
+        description: 'Successful PR validation with NeoForge, complete GUI and Sodium/DH lighting'
         required: true
         type: string
       release_tag:
@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/1.21.1'
+    if: github.ref == 'refs/heads/26.1.2'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: curseforge
@@ -58,7 +58,7 @@ jobs:
           version=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')
           mod_name=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')
           minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
-          [[ "$RELEASE_TAG" == "v$version" && "$minecraft" == 1.21.1 ]] || exit 1
+          [[ "$RELEASE_TAG" == "v$version-26.1.2N" && "$minecraft" == 26.1.2 ]] || exit 1
           test -f "docs/curseforge/changelog-$version.md"
           type="$REQUESTED_TYPE"
           if [[ "$type" == auto ]]; then
@@ -72,17 +72,17 @@ jobs:
         id: verified
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 tools/verified_release_1211.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.verified_run_id }}
-          name: ${{ steps.verified.outputs.neoforge_artifact }}
-          path: verified-artifacts/${{ steps.verified.outputs.neoforge_artifact }}
+        run: python3 tools/verified_release_2612.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+      - name: Download both digest-verified CI evidence archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/verified_release_2612.py download --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+      - name: Install trusted PNG checker dependency
+        run: python3 -m pip install -r tools/review/requirements.txt
       - name: Promote the validated production JAR without rebuilding
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 tools/verified_release_1211.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+        run: python3 tools/verified_release_2612.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
       - name: Acquire permanent shared CurseForge upload lock
         env:
           GH_TOKEN: ${{ github.token }}
@@ -104,10 +104,11 @@ jobs:
           gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft "$prerelease" --latest=false --title "Singulo $VERSION" --notes-file release-notes.md
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: verified-release-${{ steps.version.outputs.version }}-1.21.1
+          name: verified-release-${{ steps.version.outputs.version }}-26.1.2
           path: release-artifacts/
           if-no-files-found: error
       - name: Publish NeoForge to CurseForge
+        id: publish_cf
         uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3
         with:
           curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID || vars.CURSEFORGE_PROJECT_ID }}
@@ -118,14 +119,30 @@ jobs:
           version-type: ${{ steps.version.outputs.type }}
           changelog-file: release-source/docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
           loaders: neoforge
-          game-versions: '1.21.1'
-          java: '21'
+          game-versions: '26.1.2'
+          java: '25'
           dependencies: |
             jei(optional)
-            mekanism(optional)
           # An accepted upload can still return 5xx; never retry that POST automatically.
           retry-attempts: 1
           fail-mode: fail
+      - name: Record accepted or uncertain CurseForge publication
+        if: always()
+        env:
+          PUBLISH_OUTCOME: ${{ steps.publish_cf.outcome }}
+          CF_PROJECT: ${{ steps.publish_cf.outputs.curseforge-id }}
+          CF_VERSION: ${{ steps.publish_cf.outputs.curseforge-version }}
+          CF_URL: ${{ steps.publish_cf.outputs.curseforge-url }}
+          CF_FILES: ${{ steps.publish_cf.outputs.curseforge-files }}
+          EXPECTED_FILE: ${{ steps.version.outputs.neo_name }}.jar
+        run: python3 tools/cf_publication_receipt.py
+      - name: Retain CurseForge publication receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cf-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cf-publication-receipt.json
+          if-no-files-found: error
       - name: Publish release notes with CurseForge links only
         env:
           GH_TOKEN: ${{ github.token }}

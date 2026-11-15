@@ -6,9 +6,7 @@
   "energy": 20,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "minecraft:iron_helmet"
-      },
+      "ingredient": "minecraft:iron_helmet",
       "count": 1
     }
   ],

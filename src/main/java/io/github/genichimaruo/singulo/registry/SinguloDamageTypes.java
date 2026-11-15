@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.registry;
 
 import io.github.genichimaruo.singulo.Singulo;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,14 +22,14 @@ public final class SinguloDamageTypes {
     private SinguloDamageTypes() {}
 
     public static DamageSource jetBeam(Level level) {
-        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(JET_BEAM));
+        return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(JET_BEAM));
     }
 
     public static DamageSource eventHorizon(Level level) {
-        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(EVENT_HORIZON));
+        return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(EVENT_HORIZON));
     }
 
     public static DamageSource tidal(Level level, @Nullable Entity attacker) {
-        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TIDAL), attacker);
+        return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(TIDAL), attacker);
     }
 }

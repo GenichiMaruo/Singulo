@@ -19,7 +19,7 @@ public final class ExoticCharge {
     }
 
     public static boolean isExoticMatter(ItemStack stack) {
-        return stack.is(BuiltInRegistries.ITEM.get(Singulo.id("exotic_matter")));
+        return stack.is(BuiltInRegistries.ITEM.getValue(Singulo.id("exotic_matter")));
     }
 
     /**
@@ -50,7 +50,7 @@ public final class ExoticCharge {
         if (player.getAbilities().instabuild || get(stack) > 0) {
             return true;
         }
-        for (ItemStack s : player.getInventory().items) {
+        for (ItemStack s : player.getInventory().getNonEquipmentItems()) {
             if (isExoticMatter(s)) {
                 return true;
             }
@@ -62,7 +62,7 @@ public final class ExoticCharge {
     public static final int DARK_MATTER_PER_CHARGE = 250;
 
     private static boolean consumeDarkMatter(Player player) {
-        for (ItemStack s : player.getInventory().items) {
+        for (ItemStack s : player.getInventory().getNonEquipmentItems()) {
             int amount = s.getOrDefault(SinguloComponents.DARK_MATTER.get(), 0);
             if (amount >= DARK_MATTER_PER_CHARGE && s.getCount() == 1) {
                 int left = amount - DARK_MATTER_PER_CHARGE;
@@ -78,7 +78,7 @@ public final class ExoticCharge {
     }
 
     private static boolean consumeMatter(Player player) {
-        for (ItemStack s : player.getInventory().items) {
+        for (ItemStack s : player.getInventory().getNonEquipmentItems()) {
             if (isExoticMatter(s)) {
                 s.shrink(1);
                 return true;

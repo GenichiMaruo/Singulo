@@ -52,7 +52,7 @@ public class UsesItem extends SinguloItem {
         UsesData data = UsesHelper.get(stack);
         float f = data.max() <= 0 ? 0 : (float) data.remaining() / data.max();
         // 残りが多いほど水色、少ないほど琥珀色（発光ラインの状態色に合わせる）
-        return Mth.color(Mth.lerp(f, 1.0F, 0.47F), Mth.lerp(f, 0.7F, 0.82F), Mth.lerp(f, 0.2F, 0.94F));
+        return net.minecraft.util.ARGB.colorFromFloat(1.0F,Mth.lerp(f, 1.0F, 0.47F), Mth.lerp(f, 0.7F, 0.82F), Mth.lerp(f, 0.2F, 0.94F));
     }
 
     @Override

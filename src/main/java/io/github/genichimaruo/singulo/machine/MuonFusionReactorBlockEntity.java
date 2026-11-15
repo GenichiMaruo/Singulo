@@ -25,7 +25,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -40,7 +40,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * </ul>
  * 電力の元は使い捨てる触媒（銅・レッドストーン・セラミック・観測ログとミュオン）なので、電力だけを回して増やすことはできない。
  */
-public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class MuonFusionReactorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner, io.github.genichimaruo.singulo.pipe.PipeInputOnly {
     /** 触媒の使用回数を1 tickに使う回数（核融合炉は触媒を2倍の速さで消耗する）。 */
     public static final int USES_PER_TICK = 2;
@@ -49,14 +49,14 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     static final int PUSH_PER_TICK = 20_000;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(400_000, 0, PUSH_PER_TICK, this::setChanged);
-    private final FluidTank tank = new FluidTank(MachineType.TANK_CAPACITY, f -> f.getFluid().isSame(Fluids.WATER)) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(MachineType.TANK_CAPACITY, f -> f.getFluid().isSame(Fluids.WATER)) {
         @Override
         protected void onContentsChanged() {
             setChanged();
         }
     };
     /** 入口（ミュオン触媒）と出口（失活したミュオン触媒）。 */
-    private final ItemStackHandler items = new ItemStackHandler(2) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return stack.is(slot == 0 ? catalyst() : spent());
@@ -110,18 +110,18 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     }
 
     static Item catalyst() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst"));
     }
 
     static Item spent() {
-        return BuiltInRegistries.ITEM.get(Singulo.id("spent_muon_catalyst"));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id("spent_muon_catalyst"));
     }
 
     public SinguloEnergyStorage energy() {
         return energy;
     }
 
-    public IFluidHandler tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
@@ -181,12 +181,9 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
             if (energy.getEnergyStored() <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            var target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), PUSH_PER_TICK));
             }
         }
         boolean active = rate > 0;
@@ -238,8 +235,8 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         tag.putInt("burn", burn);
         tag.putInt("burn_total", burnTotal);
     }
@@ -247,12 +244,16 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
-        burn = tag.getInt("burn");
-        burnTotal = tag.contains("burn_total") ? tag.getInt("burn_total") : Math.max(burn, 12_000);
+        burn = tag.getIntOr("burn", 0);
+        burnTotal = tag.contains("burn_total") ? tag.getIntOr("burn_total", 0) : Math.max(burn, 12_000);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot, resource) -> slot == 0, (slot, resource) -> slot == 1);
     }
 }

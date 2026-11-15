@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 root = Path('build/stage6-review')
-source = Path('build/gametest/world')
+source = Path('build/gametest/gametestserver/gametestworld')
 if not (source / 'level.dat').is_file():
     raise SystemExit('Run GameTests first to create a disposable world')
 root.mkdir(parents=True, exist_ok=True)
@@ -12,4 +12,4 @@ for target in (root / 'saves/Review', root / 'screenshots'):
         shutil.rmtree(target)
 shutil.copytree(source, root / 'saves/Review')
 (root / 'options.txt').write_text(
-    'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:3\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\n', encoding='utf-8')
+    'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:3\nsimulationDistance:5\npauseOnLostFocus:false\nsoundCategory_music:0.0\nsoundCategory_master:0.0\n', encoding='utf-8')

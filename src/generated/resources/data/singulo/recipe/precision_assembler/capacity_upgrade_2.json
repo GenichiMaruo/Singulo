@@ -6,21 +6,15 @@
   "energy": 2000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:capacity_upgrade_1"
-      },
+      "ingredient": "singulo:capacity_upgrade_1",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 4
     }
   ],

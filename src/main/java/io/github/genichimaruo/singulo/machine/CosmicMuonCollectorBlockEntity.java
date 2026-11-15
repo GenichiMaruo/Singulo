@@ -22,11 +22,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 空が見える場所でだけ動き、Y=100以下ではゼロ、Y=200以上で最大（1分に1束）。電力は要らない。
  * 右クリックで溜まったミュオン束を受け取り、今の収集速度を表示する。
  */
-public class CosmicMuonCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class CosmicMuonCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     static final int TICKS_PER_BUNDLE_AT_MAX = 1200;
     static final int CHECK_INTERVAL = 20;
 
-    private final ItemStackHandler output = new ItemStackHandler(1) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler output = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -68,7 +68,7 @@ public class CosmicMuonCollectorBlockEntity extends BlockEntity implements Abstr
         be.rate = rateAt(level, pos);
         be.progress += be.rate * CHECK_INTERVAL / TICKS_PER_BUNDLE_AT_MAX;
         while (be.progress >= 1) {
-            ItemStack bundle = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_bundle")));
+            ItemStack bundle = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_bundle")));
             if (!be.output.insertItem(0, bundle, false).isEmpty()) {
                 be.progress = 1;
                 break;
@@ -96,14 +96,19 @@ public class CosmicMuonCollectorBlockEntity extends BlockEntity implements Abstr
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
         tag.putDouble("progress", progress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
-        progress = tag.getDouble("progress");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
+        progress = tag.getDoubleOr("progress", 0.0D);
+    }
+
+    /** Native platform automation, sharing owned storage and commit-only notifications. */
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(output, (slot, resource) -> false, (slot, resource) -> true);
     }
 }

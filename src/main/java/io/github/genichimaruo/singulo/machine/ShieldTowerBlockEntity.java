@@ -154,7 +154,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         int r = radius();
         Vec3 c = Vec3.atCenterOf(axis());
         for (Mob mob : world.getEntitiesOfClass(Mob.class, new AABB(axis()).inflate(r),
-                m -> m instanceof Enemy && !m.getType().is(Tags.EntityTypes.BOSSES) && m.position().distanceToSqr(c) <= (double) r * r)) {
+                m -> m instanceof Enemy && !m.getType().builtInRegistryHolder().is(Tags.EntityTypes.BOSSES) && m.position().distanceToSqr(c) <= (double) r * r)) {
             Vec3 out = mob.position().subtract(c).multiply(1, 0, 1);
             out = out.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : out.normalize();
             mob.setDeltaMovement(out.scale(0.8).add(0, 0.2, 0));
@@ -227,17 +227,17 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         super.loadAdditional(tag, registries);
         firstCheck = true;
         if (tag.contains("permit")) {
-            permit.deserializeNBT(registries, tag.getCompound("permit"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(permit, registries, tag.getCompoundOrEmpty("permit"));
         }
         if (tag.contains("protection")) {
-            int p = tag.getInt("protection");
+            int p = tag.getIntOr("protection", 0);
             if (shownProtection == 0 && p > 0 && getLevel() != null) {
                 activatedAt = getLevel().getGameTime();
             }
             shownProtection = p;
-            shownRadius = tag.getInt("radius");
-            axis = BlockPos.of(tag.getLong("axis"));
-            formed = tag.getBoolean("formed");
+            shownRadius = tag.getIntOr("radius", 0);
+            axis = BlockPos.of(tag.getLongOr("axis", 0L));
+            formed = tag.getBooleanOr("formed", false);
         }
     }
 
@@ -393,7 +393,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("permit", permit.serializeNBT(registries));
+        tag.put("permit", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(permit, registries));
     }
 
     @Override

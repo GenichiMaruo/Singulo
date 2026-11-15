@@ -3,9 +3,9 @@ package io.github.genichimaruo.singulo.client;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import org.joml.Vector3f;
+import org.joml.Vector2f;
 
 /**
  * GUIの部品を描く（テクスチャ画像を使わない）。光は左上から、段差は1pxまで。
@@ -29,10 +29,10 @@ final class Panel {
     static final List<int[]> CLICKABLE = new ArrayList<>();
 
     /** 押せるものを描いた場所を覚える（renderLabels の中のように、ずらした座標で描いていても画面の座標に直す）。 */
-    static void clickable(GuiGraphics g, int x, int y, int w, int h) {
-        var m = g.pose().last().pose();
-        Vector3f a = m.transformPosition(x, y, 0, new Vector3f());
-        Vector3f b = m.transformPosition(x + w, y + h, 0, new Vector3f());
+    static void clickable(GuiGraphicsExtractor g, int x, int y, int w, int h) {
+        var m = g.pose();
+        Vector2f a = m.transformPosition(x, y, new Vector2f());
+        Vector2f b = m.transformPosition(x + w, y + h, new Vector2f());
         CLICKABLE.add(new int[]{Math.round(a.x), Math.round(a.y), Math.round(b.x), Math.round(b.y)});
     }
 
@@ -43,7 +43,7 @@ final class Panel {
     // ------------------------------------------------------------------ 骨格
 
     /** 枠: 右下に2段の落ち影、角を欠いた輪郭、上が少し明るい面、左上の明るい線と右下の暗い線。 */
-    static void frame(GuiGraphics g, GuiSkin s, int x, int y, int w, int h) {
+    static void frame(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w, int h) {
         g.fill(x + 2, y + h, x + w + 1, y + h + 1, SHADOW);
         g.fill(x + w, y + 2, x + w + 1, y + h, SHADOW);
         g.fill(x + 3, y + h + 1, x + w + 1, y + h + 2, SHADOW_SOFT);
@@ -70,10 +70,10 @@ final class Panel {
     }
 
     /** 宇宙スキンの地の星（位置は枠の大きさで決まり、明るさだけゆっくり瞬く）。 */
-    private static void stars(GuiGraphics g, int x, int y, int w, int h) {
+    private static void stars(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         int top = 20;
         int span = Math.max(10, h - 120);
-        float t = (net.minecraft.Util.getMillis() % 100_000L) / 1000F;
+        float t = (net.minecraft.util.Util.getMillis() % 100_000L) / 1000F;
         int seed = 7;
         for (int i = 0; i < 26; i++) {
             seed = (seed * 9301 + 49297) % 233280;
@@ -87,14 +87,14 @@ final class Panel {
     }
 
     /** ヘッダーの板（装置名・状態・電源を載せる）と、その下の彫り込み。上端の発光ラインは今までの印として残す。 */
-    static void header(GuiGraphics g, GuiSkin s, int x, int y, int w) {
+    static void header(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w) {
         g.fillGradient(x + 3, y + 3, x + w - 3, y + 16, s.plate(), s.plate2());
         g.fill(x + 3, y + 16, x + w - 3, y + 17, s.seam());
         g.fill(x + 3, y + 17, x + w - 3, y + 18, s.seamHi());
         glowLine(g, s, x + 5, y + 3, w - 10);
     }
 
-    static void glowLine(GuiGraphics g, GuiSkin s, int x, int y, int w) {
+    static void glowLine(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w) {
         if (s.glow() == s.glow2()) {
             g.fill(x, y, x + w, y + 1, s.glow());
             return;
@@ -105,13 +105,13 @@ final class Panel {
     }
 
     /** 区切りの溝（暗い1pxと明るい1px）。 */
-    static void groove(GuiGraphics g, GuiSkin s, int x, int y, int w) {
+    static void groove(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w) {
         g.fill(x, y, x + w, y + 1, s.seam());
         g.fill(x, y + 1, x + w, y + 2, s.seamHi());
     }
 
     /** 浮いた板（設定やレシピ選択など、装置の部分にかぶせる画面）。 */
-    static void sheet(GuiGraphics g, GuiSkin s, int x, int y, int w, int h) {
+    static void sheet(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w, int h) {
         g.fill(x + 1, y + h, x + w + 1, y + h + 1, SHADOW);
         g.fill(x + w, y + 1, x + w + 1, y + h, SHADOW);
         g.fill(x, y, x + w, y + h, s.outline());
@@ -123,7 +123,7 @@ final class Panel {
     // ------------------------------------------------------------------ 凹
 
     /** 凹んだ入れ物。x, y, w, h は縁を含む外側。 */
-    static void inset(GuiGraphics g, GuiSkin s, int x, int y, int w, int h, int fill) {
+    static void inset(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w, int h, int fill) {
         g.fill(x, y, x + w, y + 1, s.dark());
         g.fill(x, y, x + 1, y + h, s.dark());
         g.fill(x + 1, y + h - 1, x + w, y + h, s.slotHi());
@@ -131,19 +131,19 @@ final class Panel {
         g.fill(x + 1, y + 1, x + w - 1, y + h - 1, fill);
     }
 
-    static void slot(GuiGraphics g, GuiSkin s, int x, int y) {
+    static void slot(GuiGraphicsExtractor g, GuiSkin s, int x, int y) {
         inset(g, s, x - 1, y - 1, 18, 18, s.fill());
         g.fill(x, y, x + 16, y + 1, s.shade());
         g.fill(x, y, x + 1, y + 16, s.shade());
     }
 
     /** 中身（x, y, w, h）の周りに1pxの縁をつけた凹み。 */
-    static void well(GuiGraphics g, GuiSkin s, int x, int y, int w, int h) {
+    static void well(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w, int h) {
         inset(g, s, x - 1, y - 1, w + 2, h + 2, s.fill());
     }
 
     /** 充填部をガラス越しに見せる（左と上を明るく、右を暗く）。 */
-    static void glass(GuiGraphics g, int x, int y, int w, int h) {
+    static void glass(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         if (w <= 0 || h <= 0) {
             return;
         }
@@ -155,7 +155,7 @@ final class Panel {
     }
 
     /** 下から fraction の割合だけ塗る縦のゲージ（上が明るいグラデ、ガラス、右に目盛り）。 */
-    static void gauge(GuiGraphics g, GuiSkin s, int x, int y, int w, int h, double fraction, int color) {
+    static void gauge(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w, int h, double fraction, int color) {
         well(g, s, x, y, w, h);
         int filled = (int) Math.round(h * Math.max(0, Math.min(1, fraction)));
         if (filled > 0) {
@@ -169,7 +169,7 @@ final class Panel {
     }
 
     /** 彫り込んだ進捗の矢印（下に明るい線）。進んだ分だけ発光色で埋める。 */
-    static void arrow(GuiGraphics g, GuiSkin s, int x, int y, double fraction) {
+    static void arrow(GuiGraphicsExtractor g, GuiSkin s, int x, int y, double fraction) {
         arrowShape(g, x, y + 1, s.arrowHi(), 22);
         arrowShape(g, x, y, s.arrow(), 22);
         int filled = (int) Math.round(22 * Math.max(0, Math.min(1, fraction)));
@@ -183,7 +183,7 @@ final class Panel {
         return (inX + 17 + outX - 1 - 22) / 2;
     }
 
-    private static void arrowShape(GuiGraphics g, int x, int y, int color, int limit) {
+    private static void arrowShape(GuiGraphicsExtractor g, int x, int y, int color, int limit) {
         g.fill(x, y + 6, x + Math.min(limit, 16), y + 10, color);
         for (int i = 0; i < 8 && 14 + i < limit; i++) {
             g.fill(x + 14 + i, y + i, x + 15 + i, y + 16 - i, color);
@@ -196,7 +196,7 @@ final class Panel {
     static final int CHIP_WIDTH = 19;
 
     /** 状態の表示窓（LEDと記号）。right は右端、返り値は左端。 */
-    static int chip(GuiGraphics g, GuiSkin s, int right, int y, Status status, int color) {
+    static int chip(GuiGraphicsExtractor g, GuiSkin s, int right, int y, Status status, int color) {
         int left = right - CHIP_WIDTH;
         inset(g, s, left, y, CHIP_WIDTH, 11, s.chip());
         g.fill(left + 3, y + 4, left + 6, y + 7, color);
@@ -206,7 +206,7 @@ final class Panel {
     }
 
     /** 7×7 の状態の記号。 */
-    static void statusGlyph(GuiGraphics g, int x, int y, Status status, int c) {
+    static void statusGlyph(GuiGraphicsExtractor g, int x, int y, Status status, int c) {
         switch (status) {
             case RUN -> {
                 for (int i = 0; i < 4; i++) {
@@ -224,7 +224,7 @@ final class Panel {
             }
             case NO_POWER -> boltIcon(g, x, y - 1, c);
             case FULL -> {
-                g.renderOutline(x, y, 7, 7, c);
+                g.outline(x, y, 7, 7, c);
                 g.fill(x + 2, y + 2, x + 5, y + 5, c);
             }
             case BROKEN -> {
@@ -243,7 +243,7 @@ final class Panel {
     // ------------------------------------------------------------------ 凸
 
     /** ボタン。押している間は明暗が逆になり、返り値（中身を下げる量）が1になる。 */
-    static int button(GuiGraphics g, GuiSkin s, int x, int y, int w, int h, Press state) {
+    static int button(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int w, int h, Press state) {
         if (state != Press.DISABLED) {
             clickable(g, x, y, w, h);
         }
@@ -283,14 +283,14 @@ final class Panel {
     }
 
     /** 文字のボタン。選択中の文字色はスキンが決める（明るいアクセントでは濃い色）。 */
-    static void labelButton(GuiGraphics g, Font font, GuiSkin s, int x, int y, int w, int h, Component label, Press state) {
+    static void labelButton(GuiGraphicsExtractor g, Font font, GuiSkin s, int x, int y, int w, int h, Component label, Press state) {
         int d = button(g, s, x, y, w, h, state);
         int color = state == Press.ON ? s.onAccent() : state == Press.DISABLED ? s.dim() : s.text();
         AndroidStationScreen.fitCentered(g, font, label, x + 2, y + (h - 8) / 2 + d, w - 4, color);
     }
 
     /** 電源ボタン。印の色は稼働中が緑、停止中が赤（スキンに関係なく共通）。 */
-    static void power(GuiGraphics g, GuiSkin s, int x, int y, int size, boolean on, boolean hover) {
+    static void power(GuiGraphicsExtractor g, GuiSkin s, int x, int y, int size, boolean on, boolean hover) {
         int d = button(g, s, x, y, size, size, hover ? Press.HOVER : Press.NORMAL);
         int c = on ? 0xFF3DBE66 : 0xFFD85050;
         int gx = x + (size - 7) / 2;
@@ -309,7 +309,7 @@ final class Panel {
      * 右レールのタブ。connected のタブは枠と同じ面の色で枠の縁を上書きし、枠から引き出したように見せる。
      * frameY, frameH は枠の上端と高さ（面のグラデーションを枠と合わせる）。
      */
-    static void railTab(GuiGraphics g, GuiSkin s, int x, int y, boolean connected, boolean hover, int frameY, int frameH) {
+    static void railTab(GuiGraphicsExtractor g, GuiSkin s, int x, int y, boolean connected, boolean hover, int frameY, int frameH) {
         int tw = connected ? 23 : 21;
         int h = 22;
         clickable(g, x, y, tw, h);
@@ -334,7 +334,7 @@ final class Panel {
     // ------------------------------------------------------------------ アイコン
 
     /** 面の設定のアイコン（上・左・右の3面が色分けされた立方体、16×16）。 */
-    static void sidesIcon(GuiGraphics g, int x, int y) {
+    static void sidesIcon(GuiGraphicsExtractor g, int x, int y) {
         int top = 0xFF5AA9E6;
         int left = 0xFFF0A040;
         int right = 0xFF58C27A;
@@ -350,7 +350,7 @@ final class Panel {
     }
 
     /** 文字列の点絵（x の位置を塗る）。 */
-    static void sprite(GuiGraphics g, int x, int y, String[] rows, int c) {
+    static void sprite(GuiGraphicsExtractor g, int x, int y, String[] rows, int c) {
         for (int j = 0; j < rows.length; j++) {
             for (int i = 0; i < rows[j].length(); i++) {
                 if (rows[j].charAt(i) == 'x') {
@@ -405,7 +405,7 @@ final class Panel {
     private static final String[] ORB = {"..xxx..", ".xxxxx.", "xx.xxxx", "xxxxxxx", "xxxxxxx", ".xxxxx.", "..xxx.."};
     private static final String[] PERSON = {"..xxx..", "..xxx..", "...x...", ".xxxxx.", "x.xxx.x", "..x.x..", "..x.x.."};
 
-    static void icon(GuiGraphics g, int x, int y, Icon icon, int c) {
+    static void icon(GuiGraphicsExtractor g, int x, int y, Icon icon, int c) {
         switch (icon) {
             case FLAME -> sprite(g, x, y, FLAME, c);
             case SNOW -> sprite(g, x, y, SNOW, c);
@@ -427,7 +427,7 @@ final class Panel {
     }
 
     /** 彫り込んだ下向きの矢印（入口から出口へ、9×9）。 */
-    static void downArrow(GuiGraphics g, GuiSkin s, int x, int y) {
+    static void downArrow(GuiGraphicsExtractor g, GuiSkin s, int x, int y) {
         for (int pass = 0; pass < 2; pass++) {
             int c = pass == 0 ? s.arrowHi() : s.arrow();
             int oy = pass == 0 ? 1 : 0;
@@ -439,22 +439,22 @@ final class Panel {
     }
 
     /** 自動（ぐるりと回る矢印、9×10）。 */
-    static void autoIcon(GuiGraphics g, int x, int y, int c) {
+    static void autoIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, AUTO, c);
     }
 
     /** 自動の印の小さい版（7×7）。 */
-    static void autoIconSmall(GuiGraphics g, int x, int y, int c) {
+    static void autoIconSmall(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, AUTO_SMALL, c);
     }
 
     /** アイテム（箱、9×7）。 */
-    static void boxIcon(GuiGraphics g, int x, int y, int c) {
+    static void boxIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, BOX, c);
     }
 
     /** 液体（しずく、7×8）。入れるタンクは下向き、出すタンクは上向きの白い矢印。 */
-    static void dropIcon(GuiGraphics g, int x, int y, int c, boolean input) {
+    static void dropIcon(GuiGraphicsExtractor g, int x, int y, int c, boolean input) {
         sprite(g, x, y, DROP, c);
         int w = 0xFFFFFFFF;
         g.fill(x + 3, y + 3, x + 4, y + 6, w);
@@ -463,20 +463,20 @@ final class Panel {
     }
 
     /** 自動排出（壁から外へ出る矢印、10×9）。 */
-    static void ejectIcon(GuiGraphics g, int x, int y, int c) {
+    static void ejectIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, EJECT, c);
     }
 
-    static void plusIcon(GuiGraphics g, int x, int y, int c) {
+    static void plusIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, PLUS, c);
     }
 
-    static void minusIcon(GuiGraphics g, int x, int y, int c) {
+    static void minusIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y + 2, MINUS, c);
     }
 
     /** マルチブロックの大きさ（格子、7×7）。 */
-    static void structureIcon(GuiGraphics g, int x, int y, int c) {
+    static void structureIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, STRUCTURE, c);
     }
 
@@ -485,12 +485,12 @@ final class Panel {
             "..xxxxxxx..", ".xxxxxxxxx.", ".xx.xxx.xx.", "....xxx...."};
 
     /** 歯車（設定、11×11）。 */
-    static void gearIcon(GuiGraphics g, int x, int y, int c) {
+    static void gearIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         sprite(g, x, y, GEAR, c);
     }
 
     /** 稲妻の印（電力だけで作るスイッチ）。 */
-    static void boltIcon(GuiGraphics g, int x, int y, int c) {
+    static void boltIcon(GuiGraphicsExtractor g, int x, int y, int c) {
         g.fill(x + 4, y, x + 6, y + 2, c);
         g.fill(x + 3, y + 2, x + 5, y + 4, c);
         g.fill(x + 2, y + 4, x + 6, y + 5, c);
@@ -501,36 +501,36 @@ final class Panel {
     // ------------------------------------------------------------------ まだ骨格に移していない画面用（標準スキン）
 
     /** 画面の地（枠と、上の発光ライン）。 */
-    static void background(GuiGraphics g, int x, int y, int w, int h) {
+    static void background(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         frame(g, GuiSkin.STANDARD, x, y, w, h);
         glowLine(g, GuiSkin.STANDARD, x + 4, y + 2, w - 8);
     }
 
     /** 空のスロットに、入れる物のグレーの影を描く（textures/gui/ghost/<id>.png。データ生成で作る）。 */
-    static void ghost(GuiGraphics g, int x, int y, String id) {
-        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
-        g.blit(io.github.genichimaruo.singulo.Singulo.id("textures/gui/ghost/" + id + ".png"), x, y, 0, 0, 16, 16, 16, 16);
-        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    static void ghost(GuiGraphicsExtractor g, int x, int y, String id) {
+
+        g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, io.github.genichimaruo.singulo.Singulo.id("textures/gui/ghost/" + id + ".png"), x, y, 0, 0, 16, 16, 16, 16);
+
     }
 
-    static void slot(GuiGraphics g, int x, int y) {
+    static void slot(GuiGraphicsExtractor g, int x, int y) {
         slot(g, GuiSkin.STANDARD, x, y);
     }
 
-    static void well(GuiGraphics g, int x, int y, int w, int h) {
+    static void well(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         well(g, GuiSkin.STANDARD, x, y, w, h);
     }
 
-    static void verticalBar(GuiGraphics g, int x, int y, int w, int h, double fraction, int color) {
+    static void verticalBar(GuiGraphicsExtractor g, int x, int y, int w, int h, double fraction, int color) {
         gauge(g, GuiSkin.STANDARD, x, y, w, h, fraction, color);
     }
 
-    static void arrow(GuiGraphics g, int x, int y, double fraction) {
+    static void arrow(GuiGraphicsExtractor g, int x, int y, double fraction) {
         arrow(g, GuiSkin.STANDARD, x, y, fraction);
     }
 
     /** 電源スイッチ（10×10）。 */
-    static void powerButton(GuiGraphics g, int x, int y, boolean on, boolean hover) {
+    static void powerButton(GuiGraphicsExtractor g, int x, int y, boolean on, boolean hover) {
         power(g, GuiSkin.STANDARD, x, y, 10, on, hover);
     }
 
@@ -549,16 +549,16 @@ final class Panel {
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
     /** Keep wrapped explanatory tooltips, including their border, inside small windows. */
-    static void tooltip(GuiGraphics g, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> text,
+    static void tooltip(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> text,
                         int maxWidth, int mouseX, int mouseY) {
         var lines = new java.util.ArrayList<net.minecraft.util.FormattedCharSequence>();
         for (var line : text) lines.addAll(font.split(line, Math.min(maxWidth, g.guiWidth() - 8)));
-        g.renderTooltip(font, lines, (screenWidth, screenHeight, x, y, width, height) -> {
+        g.setTooltipForNextFrame(font, lines, (screenWidth, screenHeight, x, y, width, height) -> {
             var preferred = net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE
                     .positionTooltip(screenWidth, screenHeight, x, y, width, height);
             return new org.joml.Vector2i(Math.max(4, Math.min(preferred.x(), screenWidth - width - 4)),
                     Math.max(4, Math.min(preferred.y(), screenHeight - height - 4)));
-        }, mouseX, mouseY);
+        }, mouseX, mouseY, false);
     }
 
 }

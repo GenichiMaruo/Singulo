@@ -1,7 +1,6 @@
 package io.github.genichimaruo.singulo.test.harness;
 
 import com.google.gson.GsonBuilder;
-import io.github.genichimaruo.singulo.Singulo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +15,7 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /** Development-only, per-test evidence. Missing/duplicate results fail validation. */
-@EventBusSubscriber(modid = Singulo.MODID)
+@EventBusSubscriber(modid = "singulo")
 public final class TestReports implements TestReporter {
     private static TestReports active;
     private long lastProgress = System.nanoTime();
@@ -28,7 +27,7 @@ public final class TestReports implements TestReporter {
 
     private TestReports(Path output) {
         this.output = output;
-        expected = GameTestRegistry.getAllTestFunctions().stream().map(TestFunction::testName).sorted().toList();
+        expected = PortGameTests.definitions().stream().map(d -> d.id().toString()).sorted().toList();
     }
 
     @SubscribeEvent
@@ -62,7 +61,16 @@ public final class TestReports implements TestReporter {
 
     private void record(GameTestInfo test, String status) {
         lastProgress = System.nanoTime();
-        results.add(new Result(test.getTestName(), test.getTestFunction().batchName(), test.getStructureName(),
+        var definition = PortGameTests.definitions().stream().filter(d -> d.id().equals(test.getTestHolder().key().identifier())).findFirst();
+        // Vanilla also runs its own built-in tests. Keep delegating their reports, but
+        // this mod-specific evidence file must only contain the expected Singulo suite.
+        if (definition.isEmpty()) {
+            io.github.genichimaruo.singulo.Singulo.LOGGER.info("SINGULO_VANILLA_TEST {} {} required={}", test.getTestHolder().key().identifier(), status, test.isRequired());
+            return;
+        }
+        results.add(new Result(test.getTestHolder().key().identifier().toString(),
+                definition.orElseThrow().batch(),
+                test.getTest().structure().toString(),
                 test.isRequired(), status, test.getRunTime(), test.getTimeoutTicks()));
     }
 

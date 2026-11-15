@@ -7,15 +7,9 @@
     "GAG"
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "A": "minecraft:amethyst_shard",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:android_gate_glass",

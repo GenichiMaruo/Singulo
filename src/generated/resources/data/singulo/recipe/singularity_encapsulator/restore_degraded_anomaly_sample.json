@@ -6,21 +6,15 @@
   "energy": 200000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 2
     }
   ],
-  "restore": {
-    "item": "singulo:degraded_anomaly_sample"
-  },
+  "restore": "singulo:degraded_anomaly_sample",
   "result": {
     "id": "singulo:anomaly_sample",
     "count": 1

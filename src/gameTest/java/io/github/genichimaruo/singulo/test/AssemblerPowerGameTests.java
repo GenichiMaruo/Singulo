@@ -8,12 +8,12 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -21,7 +21,7 @@ public final class AssemblerPowerGameTests {
     private static MachineBlockEntity assembler(GameTestHelper h) {
         var pos = new BlockPos(1, 1, 1);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
     }
 
     private static void craft(GameTestHelper h, String path, boolean overclock) {
@@ -34,12 +34,12 @@ public final class AssemblerPowerGameTests {
             machine.items().setStackInSlot(machine.type().capacitySlot(), io.github.genichimaruo.singulo.machine.CapacityUpgrades.item(1));
         for (int i = 0; i < recipe.ingredients().size(); i++) {
             var input = recipe.ingredients().get(i);
-            machine.items().setStackInSlot(i, input.ingredient().getItems()[0].copyWithCount(input.count()));
+            machine.items().setStackInSlot(i, new ItemStack(input.ingredient().items().findFirst().orElseThrow(), input.count()));
         }
         if (overclock) machine.items().setStackInSlot(machine.type().upgradeSlot(),
-                new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("overclock_chip"))));
+                new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("overclock_chip"))));
         machine.selectRecipe(index);
-        var input = h.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, machine.getBlockPos(), Direction.NORTH);
+        var input = io.github.genichimaruo.singulo.energy.EnergyResourceView.of(h.getLevel().getCapability(Capabilities.Energy.BLOCK, machine.getBlockPos(), Direction.NORTH));
         h.assertTrue(input != null, "Assembler has no energy input capability");
         int demand = recipe.energy() * (overclock ? 4 : 1);
         h.assertTrue(input.receiveEnergy(demand, true) == demand && machine.energy().getEnergyStored() == 0,
@@ -85,7 +85,7 @@ public final class AssemblerPowerGameTests {
         for (int stored : new int[]{73_421, 20_000_000}) {
             saved.putInt("energy", stored);
             var restored = new MachineBlockEntity(machine.getBlockPos(), machine.getBlockState());
-            restored.loadWithComponents(saved, h.getLevel().registryAccess());
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,saved, h.getLevel().registryAccess());
             h.assertTrue(restored.energy().getEnergyStored() == stored, "Reload changed stored energy");
             int free = restored.energy().getMaxEnergyStored() - stored;
             int accepted = restored.energy().receiveEnergy(Integer.MAX_VALUE, false);

@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.TransactionalFluidTank;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -35,7 +35,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 出力は cryoTurbineOutput（既定 4.5 kFE/t）まで。液体窒素はそれに見合う量だけ使う。蓄電がほぼいっぱいの間は待機して、窒素を減らさない。
  * 液体窒素は、パイプのほか、冷媒カートリッジを入口に入れても（空のカートリッジは出口へ）、カートリッジで右クリックしても入る。
  */
-public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner, io.github.genichimaruo.singulo.pipe.PipeInputOnly {
     static final int COOLANT_TEMPERATURE = 77;
     static final int REFERENCE_HOT = 1300;
@@ -47,14 +47,14 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     static final int TANK = 32_000;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(200_000, 0, PUSH_PER_TICK, this::setChanged);
-    private final FluidTank tank = new FluidTank(TANK, f -> f.getFluid().isSame(SinguloFluids.get("liquid_nitrogen"))) {
+    private final TransactionalFluidTank tank = new TransactionalFluidTank(TANK, f -> f.getFluid().isSame(SinguloFluids.get("liquid_nitrogen"))) {
         @Override
         protected void onContentsChanged() {
             setChanged();
         }
     };
     /** 入口（冷媒カートリッジ）と出口（空のカートリッジ）。 */
-    private final ItemStackHandler items = new ItemStackHandler(2) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return slot == 0 ? CoolantCartridges.isFilled(stack) : CoolantCartridges.isEmptyCartridge(stack);
@@ -111,7 +111,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         return energy;
     }
 
-    public IFluidHandler tank() {
+    public TransactionalFluidTank tank() {
         return tank;
     }
 
@@ -180,12 +180,9 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
             if (energy.getEnergyStored() <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
+            var target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null) {
+                io.github.genichimaruo.singulo.energy.EnergyTransfers.move(energy, target, Math.min(energy.getEnergyStored(), PUSH_PER_TICK));
             }
         }
         boolean active = rate > 0;
@@ -249,8 +246,8 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (legacyNotice) {
             tag.putBoolean("legacy_notice", true);
         }
@@ -264,12 +261,16 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
         // 前の版はスロットを持たなかった（タンクだけを書いていた）
-        legacyNotice = tag.getBoolean("legacy_notice") || tag.contains("tank") && !tag.contains("items");
+        legacyNotice = tag.getBooleanOr("legacy_notice", false) || tag.contains("tank") && !tag.contains("items");
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot, resource) -> slot == 0, (slot, resource) -> slot == 1);
     }
 }

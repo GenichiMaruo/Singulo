@@ -6,39 +6,27 @@
   "energy": 500000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:echo_chapter"
-      },
+      "ingredient": "singulo:echo_chapter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:gravity_chapter"
-      },
+      "ingredient": "singulo:gravity_chapter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:horizon_chapter"
-      },
+      "ingredient": "singulo:horizon_chapter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:ergosphere_chapter"
-      },
+      "ingredient": "singulo:ergosphere_chapter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:hawking_condensate"
-      },
+      "ingredient": "singulo:hawking_condensate",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 8
     }
   ],

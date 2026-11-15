@@ -7,15 +7,9 @@
     "NPN"
   ],
   "key": {
-    "N": {
-      "item": "singulo:nihonium_plate"
-    },
-    "P": {
-      "tag": "c:plates/steel"
-    },
-    "C": {
-      "item": "singulo:collapsar_ingot"
-    }
+    "N": "singulo:nihonium_plate",
+    "P": "#c:plates/steel",
+    "C": "singulo:collapsar_ingot"
   },
   "result": {
     "id": "singulo:collapsar_lining",

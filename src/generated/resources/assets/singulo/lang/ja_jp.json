@@ -3690,5 +3690,6 @@
   "uses.singulo.wormhole_mouth_casing": "使い道: ワームホールの口",
   "uses.singulo.zero_gravity_block": "使い道: 重力懸垂タンク、重力懸垂冠",
   "uses.singulo.zinc_dust": "使い道: 亜鉛インゴット、未焼成の蛍光体",
-  "uses.singulo.zinc_ingot": "使い道: ニホニウム"
+  "uses.singulo.zinc_ingot": "使い道: ニホニウム",
+  "key.category.singulo.singulo": "Singulo"
 }

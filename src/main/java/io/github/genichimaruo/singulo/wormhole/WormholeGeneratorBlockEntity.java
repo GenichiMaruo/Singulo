@@ -27,7 +27,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 口は出力に置かれ、空の手で右クリックするか搬出して受け取る。60秒以内に固定化しないと消える。
  * 外殻の代わりに置いた搬入出ポート（マルチブロック搬入出ポートか、ワームホール生成器ポート）から電力を入れ、できた口を押し出す。
  */
-public class WormholeGeneratorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class WormholeGeneratorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     /** 毎tick必要な電力の既定値（設定 wormholeGeneratorPower）。 */
     public static final int DEFAULT_REQUIRED_PER_TICK = 100_000_000;
@@ -40,7 +40,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     public static final int GENERATE_TICKS = 200;
     static final int CHECK_INTERVAL = 40;
 
-    private final ItemStackHandler output = new ItemStackHandler(2) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler output = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         protected void onContentsChanged(int s) {
             setChanged();
@@ -52,44 +52,23 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
             return stack;
         }
     };
-    private final IEnergyStorage energy = new IEnergyStorage() {
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            if (!formed || !outputEmpty()) {
-                return 0;
-            }
-            int take = Math.max(0, Math.min(amount, requiredPerTick() - received));
-            if (!simulate) {
-                received += take;
-            }
-            return take;
+    private final io.github.genichimaruo.singulo.energy.LongEnergyHandler energy = new Energy();
+    private final class Energy extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<Integer> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        protected Integer createSnapshot(){return received;}
+        protected void revertToSnapshot(Integer previous){received=previous;}
+        protected void onRootCommit(Integer previous){if(received!=previous)setChanged();}
+        public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");
+            if(!formed||!outputEmpty())return 0;
+            int take=(int)Math.max(0,Math.min(amount,requiredPerTick()-received));
+            if(take>0){updateSnapshots(tx);received+=take;}return take;
         }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return 0;
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return received;
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return requiredPerTick();
-        }
-
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return formed && outputEmpty();
-        }
-    };
+        public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){if(amount<0)throw new IllegalArgumentException("Negative energy extraction");return 0;}
+        public long getAmountAsLong(){return received;}
+        public long getCapacityAsLong(){return requiredPerTick();}
+        public boolean canExtract(){return false;}
+        public boolean canReceive(){return formed&&outputEmpty();}
+    }
     /** 前の tick の処理のあとに受け取った電力。 */
     private int received;
     /** 直前の tick に受け取った電力（画面に出す）。 */
@@ -104,7 +83,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         super(SinguloBlockEntities.WORMHOLE_GENERATOR.get(), pos, state);
     }
 
-    public IEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energy;
     }
 
@@ -239,7 +218,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
     }
 
     @Override
@@ -247,12 +226,12 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         super.loadAdditional(tag, registries);
         firstCheck = true;
         if (tag.contains("output")) {
-            output.deserializeNBT(registries, tag.getCompound("output"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
         }
         if (tag.contains("core")) {
-            core = BlockPos.of(tag.getLong("core"));
-            clientProgress = tag.getInt("progress");
-            clientReady = tag.getBoolean("ready");
+            core = BlockPos.of(tag.getLongOr("core", 0L));
+            clientProgress = tag.getIntOr("progress", 0);
+            clientReady = tag.getBooleanOr("ready", false);
         }
     }
 
@@ -265,13 +244,13 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
 
     /** 口ができるまでの進み（0〜1。クライアントでは同期された値）。 */
     public float shownProgress() {
-        int p = level != null && level.isClientSide ? clientProgress : progress;
+        int p = level != null && level.isClientSide() ? clientProgress : progress;
         return Math.min(1F, p / (float) GENERATE_TICKS);
     }
 
     /** できた口が出力に入っているか（渦が開いたまま待つ）。 */
     public boolean shownReady() {
-        return level != null && level.isClientSide ? clientReady : !outputEmpty();
+        return level != null && level.isClientSide() ? clientReady : !outputEmpty();
     }
 
     @Override
@@ -286,5 +265,9 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     @Override
     public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
         return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() {
+        return new io.github.genichimaruo.singulo.compat.ItemTransferView(output, (slot, resource) -> false, (slot, resource) -> true);
     }
 }

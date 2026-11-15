@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -39,7 +39,7 @@ public final class Structures {
     }
 
     /** コントローラからリングへの向き（形成できていなければ null）。搬入出ポートはコントローラの左右に置く。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     public static Direction ringDirection(Level level, BlockPos controller) {
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             BlockPos start = controller.relative(dir);
@@ -229,8 +229,7 @@ public final class Structures {
         return out;
     }
 
-    @Nullable
-    static MultiblockPart.Role role(BlockState state) {
+    static MultiblockPart.@Nullable Role role(BlockState state) {
         return state.getBlock() instanceof MultiblockPart part ? part.role() : null;
     }
 }

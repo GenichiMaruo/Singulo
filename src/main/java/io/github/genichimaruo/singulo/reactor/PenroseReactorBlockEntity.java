@@ -14,7 +14,7 @@ import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -68,7 +68,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  *   <li>危険: 引力帯（半径 blackHolePullRadius）と潮汐帯（半径 tidalDamageRadius、防具を無視）</li>
  * </ul>
  */
-public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
     public enum State { UNFORMED, DORMANT, IGNITING, RUNNING }
 
     /** SHEDDING: 回収運転で、育ちすぎた炉心からジェットで質量を放出している（番号で同期するので後ろに足す）。 */
@@ -118,7 +118,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     /** 0 種, 1 燃料, 2 ジェット・コレクター, 3 ホーキング・コレクター, 4 エルゴスフィア・リング, 5〜8 副産物。 */
     public static final int SLOT_SEED = 0, SLOT_FUEL = 1, SLOT_JET = 2, SLOT_HAWKING = 3, SLOT_ERGO = 4, SLOT_OUT = 5, SLOTS = 9;
 
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {
@@ -141,8 +141,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             setChanged();
         }
     };
-    private final IEnergyStorage energyPort = new EnergyPort();
-    private final net.neoforged.neoforge.fluids.capability.IFluidHandler darkMatterPort = new DarkMatterPort();
+    private final EnergyPort energyPort = new EnergyPort();
+    private final DarkMatterPort darkMatterPort = new DarkMatterPort();
 
     /** ダークマター 1 mB で炉心に加わる質量。 */
     public static final double DARK_MATTER_MASS_PER_MB = 0.01;
@@ -214,7 +214,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     static Item item(String id) {
-        return BuiltInRegistries.ITEM.get(Singulo.id(id));
+        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
     }
 
     // ------------------------------------------------------------------ 物理
@@ -408,7 +408,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 点火の電力がどれだけ満ちたか（0〜1。クライアントでは同期された値）。 */
     public float ignitionCharge() {
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             return clientCharge;
         }
         return ignitionCharged ? 1F : (float) Math.min(1.0, ignitionStored / (double) Math.max(1, ignitionEnergy()));
@@ -676,7 +676,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (tidal > 0 && level.getGameTime() % 10 < interval && level.getGameTime() % interval == 0) {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(center).inflate(tidal),
                     e -> e.position().distanceTo(c) <= tidal && EventHorizonTargets.affected(e))) {
-                e.hurt(SinguloDamageTypes.tidal(level, null), 4.0F);
+                e.hurtOrSimulate(SinguloDamageTypes.tidal(level, null), 4.0F);
             }
         }
     }
@@ -746,7 +746,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             // 崩れる粒と、引きはがされた塊が渦を巻いて炉心へ落ちていく
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, s), from.x, from.y, from.z, 10, 0.3, 0.3, 0.3, 0.05);
             level.addFreshEntity(new InfallingBlock(level, from, s, c, horizon));
-            level.playSound(null, p, SinguloSounds.get("black_hole.devour"), SoundSource.BLOCKS, 1.4F, 0.85F + level.random.nextFloat() * 0.3F);
+            level.playSound(null, p, SinguloSounds.get("black_hole.devour"), SoundSource.BLOCKS, 1.4F, 0.85F + level.getRandom().nextFloat() * 0.3F);
         }
     }
 
@@ -816,12 +816,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public static void returnRecord(ServerLevel level, Entity swallowed, Vec3 c, double horizon) {
         double chance = swallowed instanceof LivingEntity ? RECORD_FROM_MOB
                 : swallowed instanceof net.minecraft.world.entity.item.ItemEntity item && !EventHorizonTargets.isReturnedRecord(item)
-                        && !item.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
+                        && !item.getPersistentData().getBooleanOr(EventHorizonTargets.PROTECTED, false)
                 ? RECORD_FROM_ITEM : 0;
-        if (chance <= 0 || level.random.nextDouble() >= chance) {
+        if (chance <= 0 || level.getRandom().nextDouble() >= chance) {
             return;
         }
-        Vec3 dir = new Vec3(level.random.nextGaussian(), Math.abs(level.random.nextGaussian()) + 0.5, level.random.nextGaussian()).normalize();
+        Vec3 dir = new Vec3(level.getRandom().nextGaussian(), Math.abs(level.getRandom().nextGaussian()) + 0.5, level.getRandom().nextGaussian()).normalize();
         Vec3 at = c.add(dir.scale(horizon + 0.6));
         var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("record_fragment")));
         record.setDeltaMovement(dir.scale(0.7));
@@ -965,7 +965,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (t % 12 == 0) {
             Vec3 core = coreCenter();
             level.playSound(null, core.x, core.y, core.z, net.minecraft.sounds.SoundEvents.DEEPSLATE_BREAK,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 0.5F + level.random.nextFloat() * 0.3F);
+                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 0.5F + level.getRandom().nextFloat() * 0.3F);
         }
         if (t >= COLLAPSE_TICKS) {
             finishCollapse(level);
@@ -1007,20 +1007,20 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     private void readCollapse(CompoundTag tag) {
         if (!tag.contains("collapse_start")) {
-            if (level != null && level.isClientSide && tag.getBoolean("sync")) {
+            if (level != null && level.isClientSide() && tag.getBooleanOr("sync", false)) {
                 collapseStart = -1;
             }
             return;
         }
-        collapseStart = tag.getLong("collapse_start");
-        long[] ps = tag.getLongArray("collapse_pos");
+        collapseStart = tag.getLongOr("collapse_start", 0L);
+        long[] ps = tag.getLongArray("collapse_pos").orElseGet(() -> new long[0]);
         List<BlockPos> list = new ArrayList<>(ps.length);
         for (long p : ps) {
             list.add(BlockPos.of(p));
         }
         collapseBlocks = List.copyOf(list);
-        collapseStates = tag.getIntArray("collapse_state");
-        collapseDone = tag.getInt("collapse_done");
+        collapseStates = tag.getIntArray("collapse_state").orElseGet(() -> new int[0]);
+        collapseDone = tag.getIntOr("collapse_done", 0);
     }
 
     // ------------------------------------------------------------------ ペレットを飲み込む様子（クライアント）
@@ -1045,10 +1045,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     public boolean triggerEvent(int id, int param) {
         if (id == EVENT_PELLETS) {
-            if (level != null && level.isClientSide && clientPellets.size() < 64) {
+            if (level != null && level.isClientSide() && clientPellets.size() < 64) {
                 for (int i = 0; i < param; i++) {
-                    clientPellets.addLast(new PelletFlight(level.getGameTime() + i * 3L, level.random.nextInt(12),
-                            level.random.nextFloat() * 2 - 1));
+                    clientPellets.addLast(new PelletFlight(level.getGameTime() + i * 3L, level.getRandom().nextInt(12),
+                            level.getRandom().nextFloat() * 2 - 1));
                 }
             }
             return true;
@@ -1065,7 +1065,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             CLIENT_LOADED.add(this);
         }
     }
@@ -1106,12 +1106,11 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 if (n.equals(worldPosition) || Structures.isReactorPart(level.getBlockState(n))) {
                     continue;
                 }
-                IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
-                if (target != null && target.canReceive()) {
+                var target = level.getCapability(Capabilities.Energy.BLOCK, n, dir.getOpposite());
+                if (target != null) {
                     // ケーブルなど mod の口へは int を超えて渡す
-                    long sent = io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, budget, false);
+                    long sent = io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(energyPort, target, budget);
                     budget -= sent;
-                    buffer -= sent;
                     lastOutput += sent;
                 }
             }
@@ -1120,13 +1119,13 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     private void broadcast(ServerLevel level, String key, Object... args) {
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(32))) {
-            p.displayClientMessage(Component.translatable(key, args), false);
+            p.sendSystemMessage(Component.translatable(key, args));
         }
     }
 
     // ------------------------------------------------------------------ 外から見えるもの
 
-    public IEnergyStorage energy() {
+    public io.github.genichimaruo.singulo.energy.LongEnergyHandler energy() {
         return energyPort;
     }
 
@@ -1135,11 +1134,36 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     /** ダークマターの投入口。光を出さないのでエディントン限界を受けず、そのまま炉心の質量になる（発電はしない）。 */
-    public net.neoforged.neoforge.fluids.capability.IFluidHandler darkMatterInput() {
+    public DarkMatterPort darkMatterInput() {
         return darkMatterPort;
     }
 
-    private final class DarkMatterPort implements net.neoforged.neoforge.fluids.capability.IFluidHandler {
+    public final class DarkMatterPort extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<Double>
+            implements net.neoforged.neoforge.fluids.capability.IFluidHandler,
+            net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> {
+        protected Double createSnapshot() { return mass; }
+        protected void revertToSnapshot(Double snapshot) { mass = snapshot; }
+        protected void onRootCommit(Double original) { setChanged(); }
+        public int size() { return 1; }
+        public net.neoforged.neoforge.transfer.fluid.FluidResource getResource(int index) { java.util.Objects.checkIndex(index, 1); return net.neoforged.neoforge.transfer.fluid.FluidResource.EMPTY; }
+        public long getAmountAsLong(int index) { java.util.Objects.checkIndex(index, 1); return 0; }
+        public boolean isValid(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource) {
+            java.util.Objects.checkIndex(index, 1); return !resource.isEmpty() && isFluidValid(index, resource.toStack(1));
+        }
+        public long getCapacityAsLong(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource) {
+            java.util.Objects.checkIndex(index, 1); return resource.isEmpty() || isValid(index, resource) ? 1000 : 0;
+        }
+        public int insert(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+            if (!isValid(index, resource) || state != State.RUNNING || !formed) return 0;
+            int room = (int) Math.floor((MAX_MASS - mass) / DARK_MATTER_MASS_PER_MB);
+            int taken = Math.max(0, Math.min(amount, room));
+            if (taken > 0) { updateSnapshots(tx); mass = Math.min(MAX_MASS, mass + taken * DARK_MATTER_MASS_PER_MB); }
+            return taken;
+        }
+        public int extract(int index, net.neoforged.neoforge.transfer.fluid.FluidResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext tx) {
+            java.util.Objects.checkIndex(index, 1); net.neoforged.neoforge.transfer.TransferPreconditions.checkNonEmptyNonNegative(resource, amount); return 0;
+        }
         @Override
         public int getTanks() {
             return 1;
@@ -1162,6 +1186,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
         @Override
         public int fill(net.neoforged.neoforge.fluids.FluidStack resource, FluidAction action) {
+            if (action.execute() && isInTransaction()) throw new IllegalStateException("Legacy mass mutation during fluid transaction");
             if (!isFluidValid(0, resource) || state != State.RUNNING || !formed) {
                 return 0;
             }
@@ -1229,58 +1254,23 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     /** 点火中は点火エネルギーを受け取り、稼働中は蓄電から取り出せる。 */
-    private final class EnergyPort implements io.github.genichimaruo.singulo.energy.LongEnergyStorage {
-        @Override
-        public long receiveLong(long amount, boolean simulate) {
-            if (state != State.IGNITING) {
-                return 0;
-            }
-            long take = Math.min(amount, Math.max(0, ignitionEnergy() - ignitionStored));
-            if (!simulate) {
-                ignitionStored += take;
-                receivedThisTick += take;
-            }
-            return take;
+    private final class EnergyPort extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
+        @Override protected long[] createSnapshot(){return new long[]{buffer,ignitionStored,receivedThisTick};}
+        @Override protected void revertToSnapshot(long[] s){buffer=s[0];ignitionStored=s[1];receivedThisTick=s[2];}
+        @Override protected void onRootCommit(long[] s){setChanged();}
+        @Override public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy insertion");if(state!=State.IGNITING)return 0;
+            long take=Math.min(amount,Math.max(0,ignitionEnergy()-ignitionStored));
+            if(take>0){updateSnapshots(tx);ignitionStored+=take;receivedThisTick+=take;}return take;
         }
-
-        @Override
-        public int receiveEnergy(int amount, boolean simulate) {
-            return (int) receiveLong(amount, simulate);
+        @Override public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
+            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");if(state!=State.RUNNING)return 0;
+            long take=Math.min(amount,buffer);if(take>0){updateSnapshots(tx);buffer-=take;}return take;
         }
-
-        @Override
-        public long extractLong(long amount, boolean simulate) {
-            long take = Math.min(amount, buffer);
-            if (!simulate) {
-                buffer -= take;
-            }
-            return take;
-        }
-
-        @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            return (int) extractLong(amount, simulate);
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, buffer);
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public boolean canExtract() {
-            return state == State.RUNNING;
-        }
-
-        @Override
-        public boolean canReceive() {
-            return state == State.IGNITING;
-        }
+        @Override public long getAmountAsLong(){return buffer;}
+        @Override public long getCapacityAsLong(){return Math.max(buffer,Integer.MAX_VALUE);}
+        @Override public boolean canExtract(){return state==State.RUNNING;}
+        @Override public boolean canReceive(){return state==State.IGNITING;}
     }
 
     /** 搬入は種・燃料・抽出装置、搬出は副産物だけ。 */
@@ -1395,7 +1385,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         writeCore(tag);
         tag.putLong("buffer", buffer);
         tag.putInt("spin_target", spinTarget);
@@ -1423,7 +1413,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 点火の進み（0〜1）。サーバーでは注がれた電力の割合、クライアントでは同期された値。 */
     public float ignitionProgress() {
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             // 同期の合間は時刻で進める（なめらかに）
             if (state != State.IGNITING) {
                 return clientIgnition;
@@ -1439,33 +1429,33 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         super.loadAdditional(tag, registries);
         firstCheck = true;
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
         try {
-            state = State.valueOf(tag.getString("state"));
+            state = State.valueOf(tag.getStringOr("state", ""));
         } catch (IllegalArgumentException e) {
             state = State.UNFORMED;
         }
         // 保存から読み込むとき、点火の途中だったものは止まった状態に戻す（描画のための同期では戻さない）
-        if (state == State.IGNITING && !tag.getBoolean("sync")) {
+        if (state == State.IGNITING && !tag.getBooleanOr("sync", false)) {
             state = State.DORMANT;
         }
-        clientIgnition = tag.getFloat("ignition");
-        clientCharge = tag.getFloat("charge");
+        clientIgnition = tag.getFloatOr("ignition", 0.0F);
+        clientCharge = tag.getFloatOr("charge", 0.0F);
         clientIgnitionAt = level != null ? level.getGameTime() : 0;
-        mass = tag.getDouble("mass");
-        spin = tag.getDouble("spin");
-        buffer = tag.getLong("buffer");
-        spinTarget = tag.getInt("spin_target");
-        jetTimer = tag.getInt("jet");
-        hawkingTimer = tag.getInt("hawking");
-        ergoTimer = tag.getInt("ergo");
-        ignitedBefore = tag.getBoolean("ignited_before");
+        mass = tag.getDoubleOr("mass", 0.0D);
+        spin = tag.getDoubleOr("spin", 0.0D);
+        buffer = tag.getLongOr("buffer", 0L);
+        spinTarget = tag.getIntOr("spin_target", 0);
+        jetTimer = tag.getIntOr("jet", 0);
+        hawkingTimer = tag.getIntOr("hawking", 0);
+        ergoTimer = tag.getIntOr("ergo", 0);
+        ignitedBefore = tag.getBooleanOr("ignited_before", false);
         if (tag.contains("feed_interval")) {
-            feedInterval = tag.getInt("feed_interval");
+            feedInterval = tag.getIntOr("feed_interval", 0);
         }
         // この版より前に点火していたリアクターは、これまでどおり発電運転のまま
-        harvestMode = tag.contains("harvest_mode") ? tag.getBoolean("harvest_mode") : !ignitedBefore;
+        harvestMode = tag.contains("harvest_mode") ? tag.getBooleanOr("harvest_mode", false) : !ignitedBefore;
         readCollapse(tag);
     }
 
@@ -1488,4 +1478,6 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> slot < SLOT_OUT, (slot,r) -> slot >= SLOT_OUT); }
 }

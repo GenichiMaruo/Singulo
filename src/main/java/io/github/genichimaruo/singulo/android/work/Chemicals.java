@@ -1,11 +1,11 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -39,8 +39,7 @@ public final class Chemicals {
         Store store(Level level, BlockPos pos, @Nullable Direction side);
 
         /** 物（ケミカルタンクなど）に入っている化学物質（ID と量。なければ null）。 */
-        @Nullable
-        Map.Entry<String, Long> contained(ItemStack stack);
+        Map.@Nullable Entry<String, Long> contained(ItemStack stack);
 
         /** 物（ケミカルタンクなど）の化学物質の入れ口（なければ null。stack は1個の写し）。 */
         @Nullable
@@ -55,7 +54,7 @@ public final class Chemicals {
 
         /** 絵（ブロックの絵の束の中。なければ null）。 */
         @Nullable
-        ResourceLocation icon(String id);
+        Identifier icon(String id);
 
         /** 空気より軽い（ガス）か。 */
         boolean gaseous(String id);
@@ -85,8 +84,7 @@ public final class Chemicals {
         return ACCESS == null ? null : ACCESS.store(level, pos, side);
     }
 
-    @Nullable
-    public static Map.Entry<String, Long> contained(ItemStack stack) {
+    public static Map.@Nullable Entry<String, Long> contained(ItemStack stack) {
         return ACCESS == null || stack.isEmpty() ? null : ACCESS.contained(stack);
     }
 
@@ -108,7 +106,7 @@ public final class Chemicals {
     }
 
     @Nullable
-    public static ResourceLocation icon(String id) {
+    public static Identifier icon(String id) {
         return ACCESS == null ? null : ACCESS.icon(id);
     }
 

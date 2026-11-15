@@ -6,9 +6,7 @@
   "energy": 400,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:spent_bose_condensate_catalyst"
-      },
+      "ingredient": "singulo:spent_bose_condensate_catalyst",
       "count": 4
     }
   ],

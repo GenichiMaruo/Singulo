@@ -6,21 +6,15 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:exotic_matter"
-      },
+      "ingredient": "singulo:exotic_matter",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:data_card_culture_data"
-      },
+      "ingredient": "singulo:data_card_culture_data",
       "count": 1
     }
   ],

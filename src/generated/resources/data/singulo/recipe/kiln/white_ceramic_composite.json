@@ -6,9 +6,7 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:unfired_ceramic"
-      },
+      "ingredient": "singulo:unfired_ceramic",
       "count": 1
     }
   ],

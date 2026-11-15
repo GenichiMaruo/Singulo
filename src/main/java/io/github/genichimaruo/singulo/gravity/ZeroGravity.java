@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -27,7 +27,7 @@ public final class ZeroGravity {
     /** 高さ {@value #DEFAULT_HEIGHT} のときの、無重力ブロック1つの電力（FE/t）と、高さ1ブロックごとの倍率。 */
     public static final long BASE_COST = 30;
     public static final double GROWTH = 1.4;
-    static final ResourceLocation ID = Singulo.id("zero_gravity");
+    static final Identifier ID = Singulo.id("zero_gravity");
 
     /** ワールドごとの一覧: 列（x, z） → その列の無重力ブロック（y と高さを1つの long に）。 */
     private static final Map<Level, Long2ObjectOpenHashMap<LongArrayList>> ZONES = Collections.synchronizedMap(new WeakHashMap<>());
@@ -55,7 +55,7 @@ public final class ZeroGravity {
 
     /** 働いている無重力ブロックを一覧に入れる（同じ位置なら高さを書き換える）。 */
     static void put(Level level, BlockPos pos, int height) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
         Long2ObjectOpenHashMap<LongArrayList> zones = ZONES.computeIfAbsent(level, l -> new Long2ObjectOpenHashMap<>());
@@ -115,7 +115,7 @@ public final class ZeroGravity {
 
     /** 生き物ごとに、無重力の空間にいるあいだ重力を0にする（サーバーだけ。属性はプレイヤーの手元にも伝わる）。 */
     static void update(LivingEntity living) {
-        if (living.level().isClientSide) {
+        if (living.level().isClientSide()) {
             return;
         }
         AttributeInstance gravity = living.getAttribute(Attributes.GRAVITY);
@@ -138,7 +138,7 @@ public final class ZeroGravity {
     /** A fast fall can enter and land within one tick, before the post-tick distance reset. */
     public static void onFall(net.neoforged.neoforge.event.entity.living.LivingFallEvent event) {
         LivingEntity living = event.getEntity();
-        if (!living.level().isClientSide && inZone(living.level(), living.getX(), living.getY(), living.getZ())) {
+        if (!living.level().isClientSide() && inZone(living.level(), living.getX(), living.getY(), living.getZ())) {
             event.setCanceled(true);
             living.resetFallDistance();
         }

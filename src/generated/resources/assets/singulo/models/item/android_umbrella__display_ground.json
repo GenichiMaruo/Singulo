@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "singulo:item/android_umbrella",
+    "layer1": "singulo:item/android_umbrella_detail"
+  }
+}

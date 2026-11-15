@@ -6,15 +6,11 @@
   "energy": 20000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:compressed_block_2"
-      },
+      "ingredient": "singulo:compressed_block_2",
       "count": 6
     },
     {
-      "ingredient": {
-        "item": "singulo:pressure_crystal"
-      },
+      "ingredient": "singulo:pressure_crystal",
       "count": 1
     }
   ],

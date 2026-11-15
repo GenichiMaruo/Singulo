@@ -66,7 +66,7 @@ public class LastArchivist extends RuinBoss {
     private static final EntityDataAccessor<Integer> FLASH = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
     /** 裁きの光の狙い（挑戦者ひとりにつき1本。x, y, z を並べた float のビット列）。 */
     private static final EntityDataAccessor<net.minecraft.nbt.CompoundTag> JUDGE_POINTS = SynchedEntityData.defineId(LastArchivist.class,
-            EntityDataSerializers.COMPOUND_TAG);
+            io.github.genichimaruo.singulo.registry.SinguloDataSerializers.COMPOUND_TAG);
     /** 裁きの光の狙いの数の上限（大人数でも重くなりすぎないように）。 */
     public static final int JUDGE_MAX = 16;
     /** 部屋の中心（封印コンソール）。部屋全体の演出をクライアントで描くのに使う。 */
@@ -149,8 +149,8 @@ public class LastArchivist extends RuinBoss {
     public static final int TIDE_LIFT = 40, TIDE_LIFT_FINAL = 55, TIDE_LOW = 120, TIDE_GRACE = 50;
     /** 低重力のときの重力の倍率。 */
     public static final double TIDE_GRAVITY = 0.15;
-    static final net.minecraft.resources.ResourceLocation TIDE_GRAVITY_ID = Singulo.id("archivist_tide_gravity");
-    static final net.minecraft.resources.ResourceLocation TIDE_FALL_ID = Singulo.id("archivist_tide_fall");
+    static final net.minecraft.resources.Identifier TIDE_GRAVITY_ID = Singulo.id("archivist_tide_gravity");
+    static final net.minecraft.resources.Identifier TIDE_FALL_ID = Singulo.id("archivist_tide_fall");
     /** 守る床（コンソールの3ブロック下の段）の半径。最終実験施設の床の円に合わせる。 */
     public static final double FLOOR_RADIUS = 15.4;
     /** ブラックホール爆弾を吸い込んだとき回復する、最大体力の割合。 */
@@ -282,7 +282,7 @@ public class LastArchivist extends RuinBoss {
     /** 裁きの光の狙い（挑戦者ひとりにつき1つ。1人のときは、その人と左右）。 */
     public List<Vec3> judgePoints() {
         List<Vec3> out = new ArrayList<>();
-        int[] v = entityData.get(JUDGE_POINTS).getIntArray("p");
+        int[] v = entityData.get(JUDGE_POINTS).getIntArray("p").orElseGet(() -> new int[0]);
         for (int i = 0; i + 2 < v.length; i += 3) {
             out.add(new Vec3(Float.intBitsToFloat(v[i]), Float.intBitsToFloat(v[i + 1]), Float.intBitsToFloat(v[i + 2])));
         }
@@ -421,7 +421,7 @@ public class LastArchivist extends RuinBoss {
         }
         if (t == 185) {
             playSound(SinguloSounds.get("last_archivist.nova"), 4.0F, 0.8F);   // 目覚めの閃光と、床を走る衝撃波
-            level.sendParticles(ParticleTypes.FLASH, c.x, c.y + CHEST_Y, c.z, 2, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y + CHEST_Y, c.z, 2, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y + CHEST_Y, c.z, 100, 0.3, 0.3, 0.3, 0.5);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(10), e -> e != this && !RuinGuards.isGuard(e))) {
                 Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
@@ -436,8 +436,8 @@ public class LastArchivist extends RuinBoss {
     // ------------------------------------------------------------------ 戦闘
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel) {
+        super.customServerAiStep(aiLevel);
         if (isDeadOrDying() || home == null) {
             return;
         }
@@ -708,7 +708,7 @@ public class LastArchivist extends RuinBoss {
     private void actionBar(ServerLevel level, String key) {
         Component msg = Component.translatable(key);
         for (Player p : challengers(level)) {
-            p.displayClientMessage(msg, true);
+            p.sendOverlayMessage(msg);
         }
     }
 
@@ -770,7 +770,7 @@ public class LastArchivist extends RuinBoss {
     }
 
     /** 裁きの光の狙いを、いまの挑戦者の位置に合わせる（全員に1本ずつ。相手が1人なら、その左右も）。 */
-    private void aimJudgment(ServerLevel level, @javax.annotation.Nullable LivingEntity target) {
+    private void aimJudgment(ServerLevel level, @org.jspecify.annotations.Nullable LivingEntity target) {
         List<Vec3> points = new ArrayList<>();
         List<Player> players = challengers(level);
         for (Player p : players) {
@@ -820,7 +820,7 @@ public class LastArchivist extends RuinBoss {
                 Vec3 q = from.lerp(end, i / 20.0);
                 level.sendParticles(ParticleTypes.END_ROD, q.x, q.y, q.z, 1, 0.05, 0.05, 0.05, 0.02);
             }
-            level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), end.x, end.y, end.z, 1, 0, 0, 0, 0);
             // 着いた所: 光が弾けて、まわりも焼く
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(end, end).inflate(JUDGE_SPLASH),
                     e -> e.isAlive() && e != this && !RuinGuards.isGuard(e) && e.distanceToSqr(end) <= JUDGE_SPLASH * JUDGE_SPLASH)) {
@@ -1014,7 +1014,7 @@ public class LastArchivist extends RuinBoss {
         }
         if (left == NOVA_SPREAD) {
             playSound(SinguloSounds.get("last_archivist.nova"), 5.0F, 1.0F);
-            level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 2, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 2, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y, c.z, 200, 0.3, 0.3, 0.3, 0.9);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y, c.z, 1, 0, 0, 0, 0);
         }
@@ -1233,7 +1233,7 @@ public class LastArchivist extends RuinBoss {
         entityData.set(ABSORB, ABSORB_TICKS);
         Vec3 head = position().add(0, HEAD_Y, 0);
         Vec3 chest = chest();
-        level.sendParticles(ParticleTypes.FLASH, head.x, head.y, head.z, 1, 0, 0, 0, 0);
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), head.x, head.y, head.z, 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, head.x, head.y, head.z, 60, 0.1, 0.1, 0.1, 0.6);
         level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, chest.x, chest.y, chest.z, 120, 0.6, 1.0, 0.6, 0.6);
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, chest.x, chest.y, chest.z, 40, 0.9, 1.4, 0.9, 0.1);
@@ -1401,8 +1401,8 @@ public class LastArchivist extends RuinBoss {
         setModifier(p.getAttribute(Attributes.FALL_DAMAGE_MULTIPLIER), TIDE_FALL_ID, safe, -1);
     }
 
-    private static void setModifier(@javax.annotation.Nullable net.minecraft.world.entity.ai.attributes.AttributeInstance attribute,
-                                    net.minecraft.resources.ResourceLocation id, boolean on, double amount) {
+    private static void setModifier(net.minecraft.world.entity.ai.attributes.@org.jspecify.annotations.Nullable AttributeInstance attribute,
+                                    net.minecraft.resources.Identifier id, boolean on, double amount) {
         if (attribute == null) {
             return;
         }
@@ -1513,7 +1513,7 @@ public class LastArchivist extends RuinBoss {
             level.playSound(null, blockPosition(), SinguloSounds.get("last_archivist.death_flash"), SoundSource.HOSTILE, 4.0F, 1.0F);
         }
         if (t == 185) {
-            level.sendParticles(ParticleTypes.FLASH, head.x, head.y, head.z, 3, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, 0xFFFFFFFF), head.x, head.y, head.z, 3, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.END_ROD, head.x, head.y, head.z, 160, 0.2, 0.2, 0.2, 0.45);
             level.sendParticles(ParticleTypes.ENCHANT, head.x, head.y, head.z, 120, 2, 2, 2, 1.5);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(10), e -> e != this && !RuinGuards.isGuard(e))) {
@@ -1535,7 +1535,7 @@ public class LastArchivist extends RuinBoss {
         // 大勢で挑んだら、光輪と翼も人数ぶん（それぞれが持ち帰れるように）
         for (int roll = 0; roll < BossScaling.lootRolls(rewardParticipants()); roll++) {
             for (String[] r : new String[][] {{"archivist_halo", "1"}, {"afterglow_wings", "1"}, {"overclock_chip", "4"}, {"hawking_condensate", "3"}}) {
-                Item item = BuiltInRegistries.ITEM.get(Singulo.id(r[0]));
+                Item item = BuiltInRegistries.ITEM.getValue(Singulo.id(r[0]));
                 spawnAtLocation(new ItemStack(item, Integer.parseInt(r[1])), (float) HEAD_Y);
             }
         }
@@ -1548,7 +1548,7 @@ public class LastArchivist extends RuinBoss {
     private void broadcastLine(ServerLevel level, String key) {
         Component msg = Component.translatable(key).withStyle(net.minecraft.ChatFormatting.GOLD, net.minecraft.ChatFormatting.ITALIC);
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(ARENA + 16))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -1568,8 +1568,9 @@ public class LastArchivist extends RuinBoss {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("phase", phase());
         tag.putInt("cycle", cycle);
         tag.putBoolean("shield", shieldUp);
@@ -1583,42 +1584,45 @@ public class LastArchivist extends RuinBoss {
         tag.put("floor", floor);
         net.minecraft.nbt.ListTag inside = new net.minecraft.nbt.ListTag();
         for (UUID id : insiders) {
-            inside.add(net.minecraft.nbt.NbtUtils.createUUID(id));
+            inside.add(io.github.genichimaruo.singulo.compat.NbtCompat.createUUID(id));
         }
         tag.put("insiders", inside);
         tag.putBoolean("legacy_insiders", legacyInsiders);
         tag.putInt("tide", tideTicks());
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        entityData.set(PHASE, Math.max(1, tag.getInt("phase")));
-        cycle = tag.getInt("cycle");
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        entityData.set(PHASE, Math.max(1, tag.getIntOr("phase", 0)));
+        cycle = tag.getIntOr("cycle", 0);
         if (home != null) {
             entityData.set(HOME, java.util.Optional.of(home));
         }
-        shieldUp = tag.getBoolean("shield");
+        shieldUp = tag.getBooleanOr("shield", false);
         hologram.clear();
         var blocks = level().holderLookup(net.minecraft.core.registries.Registries.BLOCK);
-        for (net.minecraft.nbt.Tag t : tag.getList("floor", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+        for (net.minecraft.nbt.Tag t : tag.getListOrEmpty("floor")) {
             CompoundTag e = (CompoundTag) t;
-            hologram.put(BlockPos.of(e.getLong("pos")), net.minecraft.nbt.NbtUtils.readBlockState(blocks, e.getCompound("was")));
+            hologram.put(BlockPos.of(e.getLongOr("pos", 0L)), net.minecraft.nbt.NbtUtils.readBlockState(blocks, e.getCompoundOrEmpty("was")));
         }
-        for (long l : tag.getLongArray("hologram")) {
+        for (long l : tag.getLongArray("hologram").orElse(new long[0])) {
             // 以前の版の保存（もとのものを覚えていない）: 空気に戻す
             hologram.putIfAbsent(BlockPos.of(l), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
         }
         insiders.clear();
         if (tag.contains("insiders")) {
-            for (net.minecraft.nbt.Tag t : tag.getList("insiders", net.minecraft.nbt.Tag.TAG_INT_ARRAY)) {
-                insiders.add(net.minecraft.nbt.NbtUtils.loadUUID(t));
+            for (net.minecraft.nbt.Tag t : tag.getListOrEmpty("insiders")) {
+                insiders.add(io.github.genichimaruo.singulo.compat.NbtCompat.loadUUID(t));
             }
         }
-        adoptInsiders = tag.getBoolean("shield") && !tag.contains("insiders");
-        legacyInsiders = adoptInsiders || tag.getBoolean("legacy_insiders");
+        adoptInsiders = tag.getBooleanOr("shield", false) && !tag.contains("insiders");
+        legacyInsiders = adoptInsiders || tag.getBooleanOr("legacy_insiders", false);
         entityData.set(SHIELD, shieldUp ? SHIELD_RISE + 2 : 0);
-        entityData.set(TIDE, tag.getInt("tide"));
+        entityData.set(TIDE, tag.getIntOr("tide", 0));
         int p = phase();
         bossBar.setColor(p == 1 ? BossEvent.BossBarColor.YELLOW : p == 2 ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.WHITE);
     }

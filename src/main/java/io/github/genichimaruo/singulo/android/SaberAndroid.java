@@ -94,10 +94,10 @@ public class SaberAndroid extends RuinAndroid {
 
     /** 構えのあいだ、正面からの攻撃を光の盾で受ける。受けたら斬り返す。 */
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || source.getEntity() == null || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)
-                || isInvulnerableTo(source)) {
-            return super.hurt(source, amount);
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel damageLevel, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (level().isClientSide() || source.getEntity() == null || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)
+                || isInvulnerableTo(damageLevel, source)) {
+            return super.hurtServer(damageLevel, source, amount);
         }
         boolean reactive = false;
         if (state() != STATE_GUARD && active() && level().getGameTime() >= nextReactiveGuard && charge() >= COST_GUARD
@@ -118,7 +118,7 @@ public class SaberAndroid extends RuinAndroid {
             Vec3 look = Vec3.directionFromRotation(0, yBodyRot);
             if (from.lengthSqr() > 1e-4 && from.normalize().dot(look) > 0.35) {
                 amount *= GUARD_FACTOR;
-                playSound(SoundEvents.SHIELD_BLOCK, 1.0F, 1.3F);
+                playSound(SoundEvents.SHIELD_BLOCK.value(), 1.0F, 1.3F);
                 if (level() instanceof ServerLevel level) {
                     sparks(level, position().add(look.scale(0.7)).add(0, 1.0, 0), 10, 0.35);
                 }
@@ -127,7 +127,7 @@ public class SaberAndroid extends RuinAndroid {
                 }
             }
         }
-        return super.hurt(source, amount);
+        return super.hurtServer(damageLevel, source, amount);
     }
 
     private final class CombatGoal extends Goal {

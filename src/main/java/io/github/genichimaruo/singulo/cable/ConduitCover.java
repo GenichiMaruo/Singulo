@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.pipe.FluidPipeBlock;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -15,7 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelProperty;
 
 /**
  * ケーブル・パイプのカバー。カバーの枠をケーブルに取り付け、枠に本物のブロックをはめ込むと、その場所がそのブロックの見た目になる
@@ -122,7 +122,7 @@ public final class ConduitCover {
         }
         var level = EmptyBlockGetter.INSTANCE;
         return s.getRenderShape() == RenderShape.MODEL && s.canOcclude()
-                && s.isSolidRender(level, BlockPos.ZERO) && s.isCollisionShapeFullBlock(level, BlockPos.ZERO);
+                && s.isSolidRender() && s.isCollisionShapeFullBlock(level, BlockPos.ZERO);
     }
 
     /** ブロックエンティティに保存する。 */
@@ -135,10 +135,10 @@ public final class ConduitCover {
     /** 保存から読む（はめ込めなくなったブロックでも、外すときに返せるよう、そのまま読む）。 */
     @Nullable
     public static BlockState load(CompoundTag tag, HolderLookup.Provider registries) {
-        if (!tag.contains(TAG, CompoundTag.TAG_COMPOUND)) {
+        if (tag.getCompound(TAG).isEmpty()) {
             return null;
         }
-        BlockState state = NbtUtils.readBlockState(registries.lookupOrThrow(Registries.BLOCK), tag.getCompound(TAG));
+        BlockState state = NbtUtils.readBlockState(registries.lookupOrThrow(Registries.BLOCK), tag.getCompoundOrEmpty(TAG));
         return state.isAir() ? null : state;
     }
 
@@ -147,29 +147,29 @@ public final class ConduitCover {
      * （向きは、右クリックした面とプレイヤーの向きで、ふつうに置いたときと同じに決める）。
      * それ以外はふつうの右クリック（ブロック入りのカバーにブロックを向けたときは、ふつうに隣へ置ける）。
      */
-    public static ItemInteractionResult use(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+    public static InteractionResult use(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
                                             BlockHitResult hit) {
         State cover = of(state);
         if (cover == State.NONE && stack.is(SinguloItems.COVER_FRAME.get())) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 level.setBlock(pos, state.setValue(PROPERTY, State.FRAME), Block.UPDATE_ALL);
                 stack.consume(1, player);
                 level.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.BLOCKS, 1.0F, 1.1F);
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
         }
         if (cover == State.FRAME && stack.getItem() instanceof BlockItem item) {
             if (level.getBlockEntity(pos) instanceof Holder pending && pending.coverState() != null) {
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);       // はめ込み中（次の tick にブロック入りになる）
+                return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());       // はめ込み中（次の tick にブロック入りになる）
             }
             BlockState inlay = item.getBlock().getStateForPlacement(new BlockPlaceContext(player, hand, stack, hit));
             if (!allowed(inlay)) {
-                if (!level.isClientSide) {
-                    player.displayClientMessage(Component.translatable("message.singulo.cover.not_allowed", stack.getHoverName()), true);
+                if (!level.isClientSide()) {
+                    player.sendOverlayMessage(Component.translatable("message.singulo.cover.not_allowed", stack.getHoverName()));
                 }
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
             }
-            if (!level.isClientSide && level.getBlockEntity(pos) instanceof Holder holder) {
+            if (!level.isClientSide() && level.getBlockEntity(pos) instanceof Holder holder) {
                 // はめ込んだブロックを先にクライアントへ送り、ブロック入りの状態にするのは次の tick（settle）。同じ tick で状態を変えると、
                 // クライアントは隣（地面など）の面を隠すのに、まだはめ込んだブロックを知らずに枠だけを描き、一瞬向こうが透けて見える
                 holder.setCoverState(inlay);
@@ -179,9 +179,9 @@ public final class ConduitCover {
                 var sound = inlay.getSoundType();
                 level.playSound(null, pos, sound.getPlaceSound(), SoundSource.BLOCKS, (sound.getVolume() + 1) / 2, sound.getPitch() * 0.8F);
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     /** はめ込んだブロックを、持ち物に戻す形にする。 */
@@ -252,7 +252,7 @@ public final class ConduitCover {
         if (of(state) == State.NONE || removesWholeConduit(player)) {
             return false;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             ItemStack off = takeOne(level, pos);
             if (!off.isEmpty() && !player.getAbilities().instabuild) {
                 Block.popResource(level, pos, off);
@@ -305,7 +305,7 @@ public final class ConduitCover {
 
     /** ケーブルが別のブロックに変わる（壊された）とき、カバーの枠とはめ込んだブロックを落とす。 */
     public static void dropOnRemove(BlockState state, Level level, BlockPos pos, BlockState newState) {
-        if (level.isClientSide || state.is(newState.getBlock())) {
+        if (level.isClientSide() || state.is(newState.getBlock())) {
             return;
         }
         for (ItemStack s : takeAll(level, pos, state)) {

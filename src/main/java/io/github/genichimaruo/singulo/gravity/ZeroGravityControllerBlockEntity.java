@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * すでにあるボックスの高さに合わせる）。壊すと高さはアイテムに残り、置き直すとその高さに戻る（壊して置き直すだけで、
  * 電力の安い高さ5に戻ることはない）。
  */
-public class ZeroGravityControllerBlockEntity extends BlockEntity {
+public class ZeroGravityControllerBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     private int height = ZeroGravity.DEFAULT_HEIGHT;
 
     public ZeroGravityControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -102,8 +102,8 @@ public class ZeroGravityControllerBlockEntity extends BlockEntity {
         super.collectImplicitComponents(components);
         CompoundTag tag = new CompoundTag();
         tag.putInt("height", height);
-        net.minecraft.world.level.block.entity.BlockEntity.addEntityType(tag, getType());
-        components.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.CustomData.of(tag));
+
+        components.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(getType(), tag));
     }
 
     /** 接している無重力ブロックの集まりにつながった受電器へ、調べ直しを頼む（集まりをたどる。大きくても1回だけ）。 */
@@ -142,6 +142,6 @@ public class ZeroGravityControllerBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        height = tag.contains("height") ? Math.max(1, tag.getInt("height")) : ZeroGravity.DEFAULT_HEIGHT;
+        height = tag.contains("height") ? Math.max(1, tag.getIntOr("height", 0)) : ZeroGravity.DEFAULT_HEIGHT;
     }
 }

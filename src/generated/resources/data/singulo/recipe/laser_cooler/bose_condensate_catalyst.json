@@ -6,21 +6,15 @@
   "energy": 8000,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:cold_atoms"
-      },
+      "ingredient": "singulo:cold_atoms",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_wire"
-      },
+      "ingredient": "singulo:superconducting_wire",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "singulo:muon_catalysts"
-      },
+      "ingredient": "#singulo:muon_catalysts",
       "count": 1
     }
   ],

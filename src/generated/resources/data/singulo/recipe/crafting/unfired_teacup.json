@@ -6,9 +6,7 @@
     " C "
   ],
   "key": {
-    "C": {
-      "item": "minecraft:clay_ball"
-    }
+    "C": "minecraft:clay_ball"
   },
   "result": {
     "id": "singulo:unfired_teacup",

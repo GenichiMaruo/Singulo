@@ -7,21 +7,11 @@
     " B "
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "V": {
-      "item": "minecraft:bucket"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "V": "minecraft:bucket",
+    "C": "#c:ingots/copper",
+    "F": "singulo:basic_frame",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:electrolyzer",

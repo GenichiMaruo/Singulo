@@ -6,15 +6,9 @@
     "PBP"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_panels"
-    },
-    "P": {
-      "item": "singulo:ruin_panel"
-    },
-    "X": {
-      "item": "minecraft:iron_bars"
-    }
+    "B": "singulo:blueprint_ruin_panels",
+    "P": "singulo:ruin_panel",
+    "X": "minecraft:iron_bars"
   },
   "result": {
     "id": "singulo:vented_ruin_panel",

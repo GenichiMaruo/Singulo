@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.android.AndroidKind;
 import io.github.genichimaruo.singulo.android.AndroidStationBlockEntity;
 import io.github.genichimaruo.singulo.android.AndroidStationMenu;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -108,7 +108,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     }
 
     @Override
-    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {
+    protected void drawRail(GuiGraphicsExtractor g, int row, int x, int y, boolean hover) {
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
             Panel.gearIcon(g, x + 2, y + 2, menu.ruleView() ? skin.accent() : skin.text());
         }
@@ -132,9 +132,9 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
@@ -142,37 +142,37 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             if (hoveredSlot != null && !hoveredSlot.hasItem() && hoveredSlot.index >= AndroidStationBlockEntity.SLOT_RULES
                     && hoveredSlot.index < AndroidStationBlockEntity.SLOTS) {
                 int col = (hoveredSlot.index - AndroidStationBlockEntity.SLOT_RULES) % io.github.genichimaruo.singulo.android.work.PathRule.COLS;
-                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.route." + WorkConsoleScreen.ROUTE_COL_KEYS[col] + ".hint"), 180),
+                g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.route." + WorkConsoleScreen.ROUTE_COL_KEYS[col] + ".hint"), 180),
                         mouseX, mouseY);
             }
             return;                                      // 経路のページでは、様子・動き方の段は出していない
         }
         if (Panel.inside(mouseX, mouseY, leftPos + BAR_X, topPos + ENERGY_Y, 10, ENERGY_H)) {
-            g.renderComponentTooltip(font, Panel.energyLines(menu.value(AndroidStationBlockEntity.D_ENERGY),
+            g.setComponentTooltipForNextFrame(font, Panel.energyLines(menu.value(AndroidStationBlockEntity.D_ENERGY),
                     menu.value(AndroidStationBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
         for (int i = 0; i < MODES; i++) {
             if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, modeW(i), 16)) {
-                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.mode." + i + ".hint"), 180),
+                g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.android_station.mode." + i + ".hint"), 180),
                         mouseX, mouseY);
             }
         }
         if (menu.patrolling()) {
             for (int i = 0; i < 3; i++) {
                 if (Panel.inside(mouseX, mouseY, patrolX(i), topPos + LEADER_Y, PATROL_W, 16)) {
-                    g.renderTooltip(font, font.split(Component.translatable(PATROL_KEYS[i] + ".hint"), 180), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, font.split(Component.translatable(PATROL_KEYS[i] + ".hint"), 180), mouseX, mouseY);
                 }
             }
             if (hoveredSlot != null && !hoveredSlot.hasItem() && hoveredSlot.index >= AndroidStationBlockEntity.SLOT_ROUTE
                     && hoveredSlot.index < AndroidStationBlockEntity.SLOT_ROUTE + AndroidStationBlockEntity.ROUTE_SLOTS) {
-                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.route.hint"), 180), mouseX, mouseY);
+                g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.android_station.route.hint"), 180), mouseX, mouseY);
             }
         }
         if (named() && Panel.inside(mouseX, mouseY, leftPos + INFO_X + INFO_W - 11, topPos + NAME_Y - 1, 11, 11)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
         } else if (!names.editing() && Panel.inside(mouseX, mouseY, leftPos + nameX(), topPos + NAME_Y, nameW() - 12, 11)
                 && menu.value(AndroidStationBlockEntity.D_KIND) >= 0) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         }
         if (Panel.inside(mouseX, mouseY, leftPos + MINUS_X + 16, topPos + RETREAT_Y, PLUS_X - MINUS_X - 18, 16)) {
             java.util.List<net.minecraft.util.FormattedCharSequence> lines = new java.util.ArrayList<>(
@@ -182,10 +182,10 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 lines.addAll(font.split(Component.translatable("gui.singulo.android_station.retreat.now", menu.value(AndroidStationBlockEntity.D_HP),
                         menu.value(AndroidStationBlockEntity.D_CHARGE)).withStyle(net.minecraft.ChatFormatting.AQUA), 180));
             }
-            g.renderTooltip(font, lines, mouseX, mouseY);
+            g.setTooltipForNextFrame(font, lines, mouseX, mouseY);
         }
         if (!orphanWaiting() && Panel.inside(mouseX, mouseY, leftPos + RECALL_X, topPos + RETREAT_Y, RECALL_W, 16)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.recall.hint", AndroidStationBlockEntity.RECALL_ALL_RANGE), 180),
+            g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.android_station.recall.hint", AndroidStationBlockEntity.RECALL_ALL_RANGE), 180),
                     mouseX, mouseY);
         }
         if (menu.patrolling()) {
@@ -193,7 +193,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         }
         for (int i = 0; i < 2; i++) {
             if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, escortW(i), 16)) {
-                g.renderTooltip(font, font.split(Component.translatable(ESCORT_KEYS[i] + ".hint"), 180), mouseX, mouseY);
+                g.setTooltipForNextFrame(font, font.split(Component.translatable(ESCORT_KEYS[i] + ".hint"), 180), mouseX, mouseY);
             }
         }
         if (Panel.inside(mouseX, mouseY, leftPos + INFO_X, topPos + LEADER_Y, INFO_W, 16)) {
@@ -212,9 +212,9 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 }
                 lines.addAll(font.split(Component.translatable("gui.singulo.android_station.permit.others").withStyle(net.minecraft.ChatFormatting.GOLD), 180));
                 lines.addAll(font.split(Component.translatable("gui.singulo.android_station.leader.hint"), 180));
-                g.renderTooltip(font, lines, mouseX, mouseY);
+                g.setTooltipForNextFrame(font, lines, mouseX, mouseY);
             } else {
-                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.permit.hint"), 180), mouseX, mouseY);
+                g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.android_station.permit.hint"), 180), mouseX, mouseY);
             }
         }
     }
@@ -320,7 +320,8 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         switch (names.key(keyCode, scanCode, modifiers)) {
             case 1 -> {
                 removeWidget(names.commit(menu.containerId));
@@ -334,26 +335,27 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 return true;
             }
             default -> {
-                return super.keyPressed(keyCode, scanCode, modifiers);
+                return super.keyPressed(event);
             }
         }
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (names.editing()) {
             var box = names.box();
             if (box != null && !box.isMouseOver(mouseX, mouseY)) {
                 removeWidget(names.commit(menu.containerId));
                 return true;
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
         if (clickFrame(mouseX, mouseY, button)) {
             return true;
         }
         if (menu.ruleView()) {
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
         if (named() && Panel.inside(mouseX, mouseY, leftPos + INFO_X + INFO_W - 11, topPos + NAME_Y - 1, 11, 11)) {
             NameEditor.reset(menu.containerId);
@@ -389,7 +391,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 id = AndroidStationBlockEntity.BUTTON_RETREAT_UP;
             } else if (Panel.inside(mouseX, mouseY, leftPos + RECALL_X, topPos + RETREAT_Y, RECALL_W, 16)) {
                 id = orphanWaiting() ? AndroidStationBlockEntity.BUTTON_LINK
-                        : hasShiftDown() ? AndroidStationBlockEntity.BUTTON_RECALL_ALL : AndroidStationBlockEntity.BUTTON_RECALL;
+                        : net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? AndroidStationBlockEntity.BUTTON_RECALL_ALL : AndroidStationBlockEntity.BUTTON_RECALL;
             }
             if (menu.patrolling()) {
                 for (int i = 0; i < 3; i++) {
@@ -412,11 +414,11 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     private static net.minecraft.world.item.ItemStack item(String id) {
-        return new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)));
+        return new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id(id)));
     }
 
     /** 左の列の専用スロット（空のときは入れる物の見本と、重ねると名前）。 */
@@ -430,7 +432,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             "gui.singulo.android_station.stock", "gui.singulo.android_station.permit"};
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         skin = GuiSkin.android(accent());
         clearStats();
         drawFrame(g, mouseX, mouseY);
@@ -487,7 +489,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         if (menu.patrolling()) {
             // 巡回: 巡回路の欄（スロット）と、その下に巡回の設定のボタン。警報中は欄の枠を赤く
             if ((menu.value(AndroidStationBlockEntity.D_PATROL) & AndroidStationBlockEntity.PATROL_ALARM) != 0) {
-                g.renderOutline(x + AndroidStationMenu.ROUTE_X - 2, y + AndroidStationMenu.ROUTE_Y - 2,
+                g.outline(x + AndroidStationMenu.ROUTE_X - 2, y + AndroidStationMenu.ROUTE_Y - 2,
                         AndroidStationBlockEntity.ROUTE_SLOTS * 18 + 2, 20, GuiSkin.BAD);
             }
             int flags = menu.value(AndroidStationBlockEntity.D_PATROL);
@@ -513,33 +515,33 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         }
     }
 
-    private void button(GuiGraphics g, int x, int y, int w, int h, boolean on, boolean hover) {
+    private void button(GuiGraphicsExtractor g, int x, int y, int w, int h, boolean on, boolean hover) {
         Panel.button(g, skin, x, y, w, h, on ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
     }
 
     /** 幅 maxWidth に収まらなければ縮めて描く（左寄せ）。 */
-    static void fit(GuiGraphics g, Font font, Component text, int x, int y, int maxWidth, int color) {
+    static void fit(GuiGraphicsExtractor g, Font font, Component text, int x, int y, int maxWidth, int color) {
         int w = font.width(text);
         if (w <= maxWidth) {
-            g.drawString(font, text, x, y, color, false);
+            g.text(font, text, x, y, color, false);
             return;
         }
         float k = (float) maxWidth / w;
-        g.pose().pushPose();
-        g.pose().translate(x, y + (1 - k) * font.lineHeight / 2, 0);
-        g.pose().scale(k, k, 1);
-        g.drawString(font, text, 0, 0, color, false);
-        g.pose().popPose();
+        g.pose().pushMatrix();
+        g.pose().translate(x, y + (1 - k) * font.lineHeight / 2);
+        g.pose().scale(k, k);
+        g.text(font, text, 0, 0, color, false);
+        g.pose().popMatrix();
     }
 
     /** 幅 width の中央に、収まらなければ縮めて描く。 */
-    static void fitCentered(GuiGraphics g, Font font, Component text, int x, int y, int width, int color) {
+    static void fitCentered(GuiGraphicsExtractor g, Font font, Component text, int x, int y, int width, int color) {
         int w = Math.min(font.width(text), width);
         fit(g, font, text, x + (width - w) / 2, y, width, color);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         drawLabels(g);
         if (menu.ruleView()) {
             WorkConsoleScreen.routeLabels(g, font, AndroidStationMenu.RULE_COL_X, AndroidStationMenu.RULE_Y, AndroidStationMenu.RULE_ROW, INFO_X,

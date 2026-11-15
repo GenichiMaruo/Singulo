@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.drone;
 
 import io.github.genichimaruo.singulo.machine.SimpleMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -23,14 +23,14 @@ public final class DroneBlocks {
         @Override
         public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
             super.setPlacedBy(level, pos, state, placer, stack);
-            if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof DroneStationBlockEntity station) {
+            if (!level.isClientSide() && placer instanceof Player player && level.getBlockEntity(pos) instanceof DroneStationBlockEntity station) {
                 station.setOwner(player.getUUID());
             }
         }
     }
 
     /** 液体のドローン発着ポート。コンパレーターに、受け取りのタンクの埋まり具合を出す。 */
-    public static class FluidPort extends SimpleMachineBlock<FluidDronePortBlockEntity> {
+    public static class FluidPort extends SimpleMachineBlock<FluidDronePortBlockEntity> implements io.github.genichimaruo.singulo.compat.BlockTooltip {
         public FluidPort(Properties properties) {
             super(properties, SinguloBlockEntities.FLUID_DRONE_PORT, FluidDronePortBlockEntity::new, DronePortBlockEntity::serverTick);
         }
@@ -38,7 +38,7 @@ public final class DroneBlocks {
         @Override
         public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
             super.setPlacedBy(level, pos, state, placer, stack);
-            if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof FluidDronePortBlockEntity port) {
+            if (!level.isClientSide() && placer instanceof Player player && level.getBlockEntity(pos) instanceof FluidDronePortBlockEntity port) {
                 port.setOwner(player.getUUID());
             }
         }
@@ -52,7 +52,6 @@ public final class DroneBlocks {
         @Override
         public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
                                     java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
-            super.appendHoverText(stack, context, lines, flag);
             var send = stack.get(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_SEND_FLUID.get());
             var receive = stack.get(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_RECEIVE_FLUID.get());
             for (var e : new Object[][]{{"send", send}, {"receive", receive}}) {
@@ -65,7 +64,7 @@ public final class DroneBlocks {
         }
 
         @Override
-        protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, net.minecraft.core.Direction direction) {
             if (!(level.getBlockEntity(pos) instanceof FluidDronePortBlockEntity port) || port.receiveTank().isEmpty()) {
                 return 0;
             }
@@ -82,7 +81,7 @@ public final class DroneBlocks {
         @Override
         public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
             super.setPlacedBy(level, pos, state, placer, stack);
-            if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof DronePortBlockEntity port) {
+            if (!level.isClientSide() && placer instanceof Player player && level.getBlockEntity(pos) instanceof DronePortBlockEntity port) {
                 port.setOwner(player.getUUID());
             }
         }
@@ -93,7 +92,7 @@ public final class DroneBlocks {
         }
 
         @Override
-        protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, net.minecraft.core.Direction direction) {
             if (!(level.getBlockEntity(pos) instanceof DronePortBlockEntity port)) {
                 return 0;
             }

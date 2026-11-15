@@ -7,21 +7,11 @@
     " B "
   ],
   "key": {
-    "X": {
-      "item": "minecraft:piston"
-    },
-    "O": {
-      "item": "singulo:superconducting_coil"
-    },
-    "K": {
-      "item": "singulo:ceramic_substrate"
-    },
-    "F": {
-      "item": "singulo:basic_frame"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "X": "minecraft:piston",
+    "O": "singulo:superconducting_coil",
+    "K": "singulo:ceramic_substrate",
+    "F": "singulo:basic_frame",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:precision_assembler",

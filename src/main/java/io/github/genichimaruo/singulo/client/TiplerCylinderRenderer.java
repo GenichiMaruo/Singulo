@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 
@@ -19,8 +19,8 @@ import net.minecraft.world.phys.AABB;
  * ティプラー・シリンダーの円柱: コアの上（高さ1〜6）で縦に回る白い円柱。縞の濃淡で回転が見える。
  * 動いている間は縞が明るく光る。
  */
-public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinderBlockEntity> {
-    private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
+public class TiplerCylinderRenderer extends SnapshotBlockRenderer<TiplerCylinderBlockEntity> {
+    private static final Identifier WHITE = Singulo.id("textures/misc/white.png");
     private static final int SIDES = 16;
     /** 円柱の半径と、軸の根元（格納筒の底の内側）からの下端・上端の高さ。中の 3×3×7 に収まる。 */
     private static final float RADIUS = 1.1F;
@@ -44,9 +44,9 @@ public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinde
             timeMotes(be, pose, buffers, partialTick, spin);
         }
         pose.mulPose(Axis.YP.rotationDegrees(be.angle(partialTick)));
-        VertexConsumer vc = buffers.getBuffer(RenderType.entitySolid(WHITE));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE));
         PoseStack.Pose last = pose.last();
-        int lit = spin > 0.05F ? LightTexture.FULL_BRIGHT : light;
+        int lit = spin > 0.05F ? LightCoordsUtil.FULL_BRIGHT : light;
         for (int i = 0; i < SIDES; i++) {
             float a0 = Mth.TWO_PI * i / SIDES;
             float a1 = Mth.TWO_PI * (i + 1) / SIDES;
@@ -89,7 +89,7 @@ public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinde
     private static void timeMotes(TiplerCylinderBlockEntity be, PoseStack pose, MultiBufferSource buffers, float partialTick, float spin) {
         float time = be.getLevel().getGameTime() + partialTick;
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
-        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
         for (int i = 0; i < 18; i++) {
             float f = (time * 0.015F * (1 + spin) + i / 18F) % 1F;
             float ang = time * 0.12F * (1 + spin) + i * 2.4F;
@@ -109,7 +109,7 @@ public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinde
     }
 
     @Override
-    public boolean shouldRenderOffScreen(TiplerCylinderBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

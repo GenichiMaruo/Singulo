@@ -8,7 +8,7 @@ import io.github.genichimaruo.singulo.registry.SinguloTriggers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -26,7 +26,7 @@ public final class AncientRecords {
 
     public static final Supplier<AttachmentType<List<String>>> DECODED = REGISTER.register("records",
             () -> AttachmentType.<List<String>>builder(() -> List.of())
-                    .serialize(Codec.STRING.listOf()).copyOnDeath().build());
+                    .serialize(Codec.STRING.listOf().fieldOf("entries")).copyOnDeath().build());
 
     private AncientRecords() {}
 

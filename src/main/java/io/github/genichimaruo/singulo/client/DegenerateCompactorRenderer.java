@@ -11,14 +11,14 @@ import java.util.WeakHashMap;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -29,10 +29,10 @@ import net.minecraft.world.phys.Vec3;
  * 打った瞬間に塊が紫に閃き、衝撃の輪が床を走り、火花が散る。塊は打たれるたびに少しずつ縮んで暗く締まっていく。
  * 止まっている間はラムが上がったまま。中は観察窓から見える。
  */
-public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedShapeControllerBlockEntity.Compactor> {
-    private static final ResourceLocation RAM = Singulo.id("textures/block/degenerate_compactor_ram.png");
-    private static final ResourceLocation ROD = Singulo.id("textures/block/degenerate_compactor_frame.png");
-    private static final ResourceLocation ANVIL = Singulo.id("textures/block/degenerate_compactor_anvil.png");
+public class DegenerateCompactorRenderer extends SnapshotBlockRenderer<FixedShapeControllerBlockEntity.Compactor> {
+    private static final Identifier RAM = Singulo.id("textures/block/degenerate_compactor_ram.png");
+    private static final Identifier ROD = Singulo.id("textures/block/degenerate_compactor_frame.png");
+    private static final Identifier ANVIL = Singulo.id("textures/block/degenerate_compactor_anvil.png");
     private static final float STROKE = 40F;
     private static final float SLAM = 6F;
     /** 部屋の中心から天井・床までの距離。 */
@@ -69,8 +69,8 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         float tip = ramTip(phase, lumpTop);
         float flash = running ? flash(phase) : 0F;
 
-        int sky = LightTexture.sky(LevelRenderer.getLightColor(level, center));
-        int lit = LightTexture.pack(Math.min(15, (int) (4 + 11 * Math.max(flash, running ? 0.35F : 0F))), sky);
+        int sky = LightCoordsUtil.sky(LevelRenderer.getLightCoords(level, center));
+        int lit = LightCoordsUtil.pack(Math.min(15, (int) (4 + 11 * Math.max(flash, running ? 0.35F : 0F))), sky);
 
         if (running) {
             sparks(be, level, Vec3.atCenterOf(center).add(0, lumpTop, 0), time);
@@ -79,14 +79,14 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         pose.translate(offset.x, offset.y, offset.z);
         // ラム（棒と頭）。絵はドット等倍で貼る。棒の絵は頭に固定して、棒ごと天井の穴を滑って見えるようにする
         float rodBottom = tip + HEAD_HEIGHT;
-        VertexConsumer rod = buffers.getBuffer(RenderType.entitySolid(ROD));
+        VertexConsumer rod = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(ROD));
         FxDraw.pixelBox(pose, rod, -ROD_HALF, rodBottom, -ROD_HALF, ROD_HALF, WALL, ROD_HALF,
                 5, 0, 5, 11, (WALL - rodBottom) * 16, 11, lit, 0xFFFFFF);
-        VertexConsumer ram = buffers.getBuffer(RenderType.entitySolid(RAM));
+        VertexConsumer ram = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(RAM));
         FxDraw.pixelBox(pose, ram, -HEAD_HALF, tip, -HEAD_HALF, HEAD_HALF, rodBottom, HEAD_HALF,
                 1, 5, 1, 15, 11, 15, lit, 0xFFFFFF);
         // アンビルの上の塊（打たれて締まっていく縮退物質）。大きさが変わっても絵は伸ばさず、中心から切り出す
-        VertexConsumer anvil = buffers.getBuffer(RenderType.entitySolid(ANVIL));
+        VertexConsumer anvil = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(ANVIL));
         float half = 0.26F + (running ? 0.02F * (1 - flash) : 0.04F);
         int lump = FxDraw.lerpRgb(0x8A80A8, 0xE8D8FF, flash);
         float lumpDots = (lumpTop + WALL) * 8;
@@ -94,7 +94,7 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
                 8 - half * 16, 8 - lumpDots, 8 - half * 16, 8 + half * 16, 8 + lumpDots, 8 + half * 16, lit, lump);
         if (running) {
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-            var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+            var camera = Minecraft.getInstance().getEntityRenderDispatcher().camera.rotation();
             // 打った瞬間の閃きと、床を走る衝撃の輪
             pose.pushPose();
             pose.translate(0, lumpTop, 0);
@@ -146,7 +146,7 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         if (last != null && last == cycle) {
             return;
         }
-        var rnd = level.random;
+        var rnd = level.getRandom();
         for (int i = 0; i < 12; i++) {
             double a = rnd.nextDouble() * Math.PI * 2;
             double v = 0.05 + rnd.nextDouble() * 0.1;
@@ -160,7 +160,7 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
     }
 
     @Override
-    public boolean shouldRenderOffScreen(FixedShapeControllerBlockEntity.Compactor be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

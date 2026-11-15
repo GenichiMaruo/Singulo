@@ -6,21 +6,15 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:confinement_ring"
-      },
+      "ingredient": "singulo:confinement_ring",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
-      },
+      "ingredient": "singulo:optical_lattice_substrate",
       "count": 1
     }
   ],

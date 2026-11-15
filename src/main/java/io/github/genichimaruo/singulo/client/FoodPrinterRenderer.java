@@ -8,9 +8,9 @@ import io.github.genichimaruo.singulo.food.FoodPrinterBlockEntity;
 import io.github.genichimaruo.singulo.food.PrintedFood;
 import io.github.genichimaruo.singulo.food.PrintedFoodItem;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
  *   <li>背面の3つの窓（x 3〜5・7〜9・11〜13、y 4〜10）に、カートリッジのペーストの量だけ光る柱。</li>
  * </ul>
  */
-public class FoodPrinterRenderer implements BlockEntityRenderer<FoodPrinterBlockEntity> {
+public class FoodPrinterRenderer extends SnapshotBlockRenderer<FoodPrinterBlockEntity> {
     private static final float PX = 1 / 16F;
     private static final int STEEL = 0xAEB4BE, WHITE = 0xE2E6EA, COPPER = 0xCE7E4E, DARK = 0x2A2E36;
     private static final float BED_TOP = 4, BED_CX = 8, BED_CZ = 6;
@@ -49,7 +49,7 @@ public class FoodPrinterRenderer implements BlockEntityRenderer<FoodPrinterBlock
         pose.mulPose(Axis.YP.rotationDegrees(180 - facing.toYRot()));
         pose.translate(-0.5, 0, -0.5);
         pose.scale(PX, PX, PX);
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
 
         PrintedFood food = PrintedFood.byIndex(be.printing());
         float nx = PARK_X, nz = PARK_Z, tip = PARK_TIP;
@@ -78,7 +78,7 @@ public class FoodPrinterRenderer implements BlockEntityRenderer<FoodPrinterBlock
             if (working) {
                 // 銅の先（±0.45）より少し大きく包む（同じ面に重ねると、ちらつく）
                 FxDraw.box(pose, FxDraw.glow(buffers), nx - 0.55F, tip - 0.45F, nz - 0.55F, nx + 0.55F, tip + 0.2F, nz + 0.55F,
-                        LightTexture.FULL_BRIGHT, pasteColor(food), 220);
+                        LightCoordsUtil.FULL_BRIGHT, pasteColor(food), 220);
             }
         } else {
             ItemStack out = be.items().getStackInSlot(FoodPrinterBlockEntity.OUTPUT);
@@ -125,7 +125,7 @@ public class FoodPrinterRenderer implements BlockEntityRenderer<FoodPrinterBlock
             FxDraw.box(pose, vc, x0, 4, 14, x1, 10, 14.9F, light, DARK);
             float fill = 6F * amount / FoodPaste.CAPACITY;
             if (fill > 0) {
-                FxDraw.box(pose, vc, x0 + 0.25F, 4, 14.9F, x1 - 0.25F, 4 + fill, 14.95F, LightTexture.FULL_BRIGHT, FoodPaste.COLORS[k]);
+                FxDraw.box(pose, vc, x0 + 0.25F, 4, 14.9F, x1 - 0.25F, 4 + fill, 14.95F, LightCoordsUtil.FULL_BRIGHT, FoodPaste.COLORS[k]);
             }
         }
     }

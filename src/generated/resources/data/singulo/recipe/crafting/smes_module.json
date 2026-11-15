@@ -7,18 +7,10 @@
     " M "
   ],
   "key": {
-    "T": {
-      "item": "singulo:toroidal_magnetic_coil"
-    },
-    "C": {
-      "item": "singulo:coolant_cartridge"
-    },
-    "Q": {
-      "item": "singulo:entangled_element"
-    },
-    "M": {
-      "item": "singulo:time_crystal_module"
-    }
+    "T": "singulo:toroidal_magnetic_coil",
+    "C": "singulo:coolant_cartridge",
+    "Q": "singulo:entangled_element",
+    "M": "singulo:time_crystal_module"
   },
   "result": {
     "id": "singulo:smes_module",

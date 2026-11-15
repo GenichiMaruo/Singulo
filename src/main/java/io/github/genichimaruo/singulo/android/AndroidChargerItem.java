@@ -22,7 +22,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * （印刷台と同じ5秒で満タン）。満充電の充電器で、アンドロイドを約30回満タンにできる。
  * 電力を蓄えたブロック（蓄電池・発電機・ケーブルの先など）を右クリックすると、そこから充電する。
  */
-public class AndroidChargerItem extends Item {
+public class AndroidChargerItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     /** 蓄えられる電力（アンドロイドの満充電 {@link #PER_ANDROID} の30回分）。 */
     public static final int CAPACITY = 300_000;
     /** アンドロイドを0から満タンにするのに使う電力。 */
@@ -34,13 +34,13 @@ public class AndroidChargerItem extends Item {
         super(properties.stacksTo(1));
     }
 
-    public static IEnergyStorage energy(ItemStack stack) {
-        return new ComponentEnergyStorage(stack, SinguloComponents.ENERGY.get(), CAPACITY);
+    public static io.github.genichimaruo.singulo.energy.SinguloItemEnergy energy(ItemStack stack) {
+        return new io.github.genichimaruo.singulo.energy.SinguloItemEnergy(stack, CAPACITY);
     }
 
     /** プレイヤーの持ち物の中で、電力の残っている充電器（なければ空）。 */
     public static ItemStack find(Player player) {
-        for (ItemStack s : player.getInventory().items) {
+        for (ItemStack s : player.getInventory().getNonEquipmentItems()) {
             if (s.getItem() instanceof AndroidChargerItem && energy(s).getEnergyStored() > 0) {
                 return s;
             }
@@ -54,21 +54,20 @@ public class AndroidChargerItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getLevel().isClientSide) {
+        if (context.getLevel().isClientSide()) {
             return InteractionResult.SUCCESS;
         }
-        IEnergyStorage source = context.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, context.getClickedPos(),
+        net.neoforged.neoforge.transfer.energy.EnergyHandler source = context.getLevel().getCapability(Capabilities.Energy.BLOCK, context.getClickedPos(),
                 context.getClickedFace());
-        if (source == null || !source.canExtract()) {
+        if (source == null) {
             return InteractionResult.PASS;
         }
-        IEnergyStorage own = energy(context.getItemInHand());
+        var own = energy(context.getItemInHand());
         int want = Math.min(PULL, own.getMaxEnergyStored() - own.getEnergyStored());
-        int got = source.extractEnergy(want, false);
-        own.receiveEnergy(got, false);
+        int got = io.github.genichimaruo.singulo.energy.EnergyTransfers.move(source, own, want);
         if (context.getPlayer() instanceof ServerPlayer sp) {
-            sp.displayClientMessage(Component.translatable("message.singulo.android_charger.charged", got, own.getEnergyStored(),
-                    CAPACITY), true);
+            sp.sendOverlayMessage(Component.translatable("message.singulo.android_charger.charged", got, own.getEnergyStored(),
+                    CAPACITY));
         }
         if (got > 0) {
             context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.6F, 1.6F);

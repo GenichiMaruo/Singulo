@@ -7,21 +7,11 @@
     "MQM"
   ],
   "key": {
-    "G": {
-      "item": "singulo:gravity_field_stabilizer"
-    },
-    "Q": {
-      "item": "singulo:quantum_computing_module"
-    },
-    "R": {
-      "item": "singulo:confinement_ring"
-    },
-    "N": {
-      "item": "singulo:nihonium_frame"
-    },
-    "M": {
-      "item": "singulo:time_crystal_module"
-    }
+    "G": "singulo:gravity_field_stabilizer",
+    "Q": "singulo:quantum_computing_module",
+    "R": "singulo:confinement_ring",
+    "N": "singulo:nihonium_frame",
+    "M": "singulo:time_crystal_module"
   },
   "result": {
     "id": "singulo:jet_forge_core",

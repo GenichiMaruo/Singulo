@@ -134,7 +134,7 @@ final class JetForgeEffects {
 
     /** 突き抜けの火花: リングの縁から外へ放射状に飛ぶ光の粒と、ジェットの向きへ噴き出す粒（粒子の設定で減る）。 */
     private static void burst(Minecraft mc, Vec3 c, Vec3 axis, float radius, int ring) {
-        RandomSource rnd = mc.level.random;
+        RandomSource rnd = mc.level.getRandom();
         Vec3 a = Math.abs(axis.y) < 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
         Vec3 e1 = axis.cross(a).normalize();
         Vec3 e2 = axis.cross(e1).normalize();
@@ -181,11 +181,11 @@ final class JetForgeEffects {
     }
 
     private static void particles(Minecraft mc, JetForgeBlockEntity be, JetForgeTimeline tl, Direction back, double d) {
-        if (d > 48 || mc.options.particles().get() == net.minecraft.client.ParticleStatus.MINIMAL || mc.isPaused()) {
+        if (d > 48 || mc.options.particles().get() == net.minecraft.server.level.ParticleStatus.MINIMAL || mc.isPaused()) {
             return;
         }
-        int scale = mc.options.particles().get() == net.minecraft.client.ParticleStatus.DECREASED ? 1 : 2;
-        RandomSource rnd = mc.level.random;
+        int scale = mc.options.particles().get() == net.minecraft.server.level.ParticleStatus.DECREASED ? 1 : 2;
+        RandomSource rnd = mc.level.getRandom();
         Vec3 axis = JetForgeLayout.axis(back);
         Vec3 target = JetForgeLayout.target(be.getBlockPos(), back);
         if (tl.phase() == JetForgeBlockEntity.IRRADIATE && !tl.stalled()) {
@@ -270,7 +270,7 @@ final class JetForgeEffects {
             }
             Vec3 a = core.add(axis.scale(rear));
             Vec3 b = core.add(axis.scale(front));
-            Vec3 ear = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+            Vec3 ear = Minecraft.getInstance().gameRenderer.getMainCamera().position();
             Vec3 ab = b.subtract(a);
             double t = Mth.clamp(ear.subtract(a).dot(ab) / Math.max(1e-6, ab.lengthSqr()), 0, 1);
             Vec3 at = a.add(ab.scale(t));

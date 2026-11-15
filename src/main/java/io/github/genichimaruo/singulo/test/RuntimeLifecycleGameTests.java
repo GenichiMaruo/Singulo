@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.data.RuntimeLifecycle;
@@ -20,7 +21,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)

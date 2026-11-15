@@ -6,45 +6,31 @@
   "energy": 100,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:basic_frame"
-      },
+      "ingredient": "singulo:basic_frame",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_coil"
-      },
+      "ingredient": "singulo:superconducting_coil",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "minecraft:lightning_rod"
-      },
+      "ingredient": "minecraft:lightning_rod",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:ingots/copper"
-      },
+      "ingredient": "#c:ingots/copper",
       "count": 4
     },
     {
-      "ingredient": {
-        "item": "singulo:basic_circuit"
-      },
+      "ingredient": "singulo:basic_circuit",
       "count": 1
     },
     {
-      "ingredient": {
-        "tag": "c:plates/steel"
-      },
+      "ingredient": "#c:plates/steel",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "singulo:muon_catalyst"
-      },
+      "ingredient": "singulo:muon_catalyst",
       "tier": 2,
       "uses": 24000
     }

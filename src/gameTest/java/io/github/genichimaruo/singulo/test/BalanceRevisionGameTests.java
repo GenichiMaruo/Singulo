@@ -1,4 +1,5 @@
 package io.github.genichimaruo.singulo.test;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.item.UsesHelper;
@@ -11,19 +12,19 @@ import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.*;
-import net.neoforged.neoforge.gametest.*;
+import io.github.genichimaruo.singulo.test.harness.*;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class BalanceRevisionGameTests {
     private static ItemStack item(String id) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id(id)));
     }
 
     private static ProbeStationBlockEntity station(GameTestHelper h, int x) {
         var pos = new BlockPos(x, 1, 1);
         h.setBlock(pos, SinguloBlocks.PROBE_STATION.get());
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,pos);
     }
 
     private static void tick(GameTestHelper h, ProbeStationBlockEntity station) {
@@ -40,14 +41,14 @@ public final class BalanceRevisionGameTests {
         long now = h.getLevel().getGameTime();
         first.completeMission(h.getLevel(), now);
         var saved = first.saveWithoutMetadata(h.getLevel().registryAccess());
-        var cargo = saved.getList("pending", Tag.TAG_COMPOUND);
+        var cargo = saved.getList("pending").orElseThrow();
         h.assertTrue(!cargo.isEmpty(), "Blocked output lost the returned loot");
         int expected = 0;
-        for (var entry : cargo) expected += ItemStack.parse(h.getLevel().registryAccess(), entry).orElseThrow().getCount();
+        for (var entry : cargo) expected += ItemStack.CODEC.parse(h.getLevel().registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), entry).getOrThrow().getCount();
         var restored = station(h, 5);
-        restored.loadWithComponents(saved, h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,saved, h.getLevel().registryAccess());
         restored.completeMission(h.getLevel(), now);
-        h.assertTrue(restored.saveWithoutMetadata(h.getLevel().registryAccess()).getList("pending", Tag.TAG_COMPOUND).equals(cargo),
+        h.assertTrue(restored.saveWithoutMetadata(h.getLevel().registryAccess()).getList("pending").orElseThrow().equals(cargo),
                 "A blocked retry rerolled or discarded the loot");
         for (int i = 0; i < restored.output().getSlots(); i++) restored.output().setStackInSlot(i, ItemStack.EMPTY);
         tick(h, restored);
@@ -94,8 +95,8 @@ public final class BalanceRevisionGameTests {
         for (int completed = 1; completed <= 3; completed++) {
             probe.completeMission(h.getLevel(), now);
             int visited = 0;
-            for (var entry : probe.saveWithoutMetadata(h.getLevel().registryAccess()).getList("targets", Tag.TAG_COMPOUND))
-                if (((net.minecraft.nbt.CompoundTag) entry).getLong("next") > now) visited++;
+            for (var entry : probe.saveWithoutMetadata(h.getLevel().registryAccess()).getList("targets").orElseThrow())
+                if (((net.minecraft.nbt.CompoundTag) entry).getLong("next").orElseThrow() > now) visited++;
             h.assertTrue(visited == completed, "A mission visited multiple targets or starved another target");
         }
         h.succeed();
@@ -119,7 +120,7 @@ public final class BalanceRevisionGameTests {
         high.energy().setEnergy(50_000);
         tick(h, high);
         high.completeMission(h.getLevel(), h.getLevel().getGameTime());
-        int next = high.saveWithoutMetadata(h.getLevel().registryAccess()).getList("targets", Tag.TAG_COMPOUND).getCompound(0).getLong("next") > 0 ? 1 : 0;
+        int next = high.saveWithoutMetadata(h.getLevel().registryAccess()).getList("targets").orElseThrow().getCompound(0).orElseThrow().getLong("next").orElseThrow() > 0 ? 1 : 0;
         h.assertTrue(next == 1 && high.status() == CatalystDeviceBlockEntity.Status.RUNNING, "Core did not unlock research collection");
         h.succeed();
     }
@@ -129,8 +130,8 @@ public final class BalanceRevisionGameTests {
         stacks.set(0, item("toroidal_magnetic_coil")); stacks.set(2, item("toroidal_magnetic_coil"));
         stacks.set(3, item("coolant_cartridge")); stacks.set(5, item("coolant_cartridge"));
         stacks.set(4, item("entangled_element")); stacks.set(7, item("time_crystal_module"));
-        var recipe = h.getLevel().getRecipeManager().getAllRecipesFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING)
-                .stream().filter(r -> r.id().equals(Singulo.id("crafting/smes_module"))).findFirst().orElseThrow().value();
+        var recipe = h.getLevel().recipeAccess().recipeMap().byType(net.minecraft.world.item.crafting.RecipeType.CRAFTING)
+                .stream().filter(r -> r.id().identifier().equals(Singulo.id("crafting/smes_module"))).findFirst().orElseThrow().value();
         h.assertTrue(recipe instanceof net.minecraft.world.item.crafting.ShapedRecipe, "Module is not shaped");
         h.assertTrue(recipe.matches(net.minecraft.world.item.crafting.CraftingInput.of(3, 3, stacks), h.getLevel()), "Correct layout rejected");
         java.util.Collections.swap(stacks, 4, 7);
@@ -148,20 +149,20 @@ public final class BalanceRevisionGameTests {
         stacks.set(3, item("coolant_cartridge")); stacks.set(5, item("coolant_cartridge"));
         stacks.set(4, item("smes_cell")); stacks.set(7, item("time_crystal_module"));
         var data = new net.minecraft.nbt.CompoundTag(); data.putInt("energy", 7_500_000);
-        net.minecraft.world.item.BlockItem.setBlockEntityData(stacks.get(4),
-                io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SMES_CELL.get(), data);
-        var recipe = h.getLevel().getRecipeManager().getAllRecipesFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING)
-                .stream().filter(r -> r.id().equals(Singulo.id("crafting/smes_module_from_cell"))).findFirst().orElseThrow().value();
+        stacks.get(4).set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(
+                io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SMES_CELL.get(), data));
+        var recipe = h.getLevel().recipeAccess().recipeMap().byType(net.minecraft.world.item.crafting.RecipeType.CRAFTING)
+                .stream().filter(r -> r.id().identifier().equals(Singulo.id("crafting/smes_module_from_cell"))).findFirst().orElseThrow().value();
         var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, stacks);
         h.assertTrue(recipe instanceof io.github.genichimaruo.singulo.recipe.SmesUpgradeRecipe && recipe.matches(input, h.getLevel()),
                 "Upgrade was not decoded as a shaped charge-preserving recipe");
-        var result = recipe.assemble(input, h.getLevel().registryAccess());
-        var tag = result.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).copyTag();
-        h.assertTrue(result.is(item("smes_module").getItem()) && result.getCount() == 1 && tag.getInt("energy") == 7_500_000,
+        var result = recipe.assemble(input);
+        var tag = result.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId();
+        h.assertTrue(result.is(item("smes_module").getItem()) && result.getCount() == 1 && tag.getInt("energy").orElseThrow() == 7_500_000,
                 "Upgrade lost or multiplied stored charge");
-        h.assertTrue(tag.getString("id").equals("singulo:smes_module"), "Old block entity type was copied into a module");
+        h.assertTrue(net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(result.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).type()).equals(Singulo.id("smes_module")), "Old block entity type was copied into a module");
         h.assertTrue(recipe.getRemainingItems(input).stream().noneMatch(s -> s.is(item("smes_cell").getItem())), "Consumed cell was returned");
-        h.assertTrue(stacks.get(4).get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).copyTag().getInt("energy") == 7_500_000,
+        h.assertTrue(stacks.get(4).get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId().getInt("energy").orElseThrow() == 7_500_000,
                 "Recipe preview mutated the source item");
         h.succeed();
     }
@@ -174,14 +175,14 @@ public final class BalanceRevisionGameTests {
         probe.registerFrom(player);
         var saved = probe.saveWithoutMetadata(h.getLevel().registryAccess());
         saved.putInt("progress", ProbeStationBlockEntity.MISSION_TICKS - 1);
-        probe.loadWithComponents(saved, h.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(probe,saved, h.getLevel().registryAccess());
         var core = item("singularity_core");
         core.set(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
                 new io.github.genichimaruo.singulo.item.UsesData(1, UsesHelper.get(core).max(), 0));
         probe.catalystSlot().setStackInSlot(0, core);
         probe.energy().setEnergy(50_000);
         tick(h, probe);
-        var next = probe.saveWithoutMetadata(h.getLevel().registryAccess()).getList("targets", Tag.TAG_COMPOUND).getCompound(0).getLong("next");
+        var next = probe.saveWithoutMetadata(h.getLevel().registryAccess()).getList("targets").orElseThrow().getCompound(0).orElseThrow().getLong("next").orElseThrow();
         h.assertTrue(next > h.getLevel().getGameTime(), "Last core use paid for a mission but lost the research visit");
         h.succeed();
     }
@@ -196,12 +197,12 @@ public final class BalanceRevisionGameTests {
         probe.energy().setEnergy(100_000);
         for (int i = 0; i < 20; i++) tick(h, probe);
         var saved = probe.saveWithoutMetadata(h.getLevel().registryAccess());
-        h.assertTrue(saved.getDouble("progress") == 10, "Lower-tier catalyst ignored its half-speed penalty");
+        h.assertTrue(saved.getDouble("progress").orElseThrow() == 10, "Lower-tier catalyst ignored its half-speed penalty");
         h.assertTrue(UsesHelper.remaining(probe.catalyst()) == 36_000 - 40, "Lower-tier wear was not doubled");
         var restored = station(h, 5);
         saved.putDouble("progress", 10.5);
-        restored.loadWithComponents(saved, h.getLevel().registryAccess());
-        h.assertTrue(restored.saveWithoutMetadata(h.getLevel().registryAccess()).getDouble("progress") == 10.5,
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,saved, h.getLevel().registryAccess());
+        h.assertTrue(restored.saveWithoutMetadata(h.getLevel().registryAccess()).getDouble("progress").orElseThrow() == 10.5,
                 "Reload rounded away fractional mission progress");
         h.succeed();
     }
@@ -209,7 +210,7 @@ public final class BalanceRevisionGameTests {
     @GameTest(template = "empty")
     public static void reconstructedPartsAndPrimordialSeedKeepTheirUnlockInputs(GameTestHelper h) {
         var coreRecipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER).stream()
-                .filter(r -> r.id().equals(Singulo.id("precision_assembler/sentinel_core_reconstructed"))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().identifier().equals(Singulo.id("precision_assembler/sentinel_core_reconstructed"))).findFirst().orElseThrow().value();
         var parts = new java.util.ArrayList<ItemStack>(java.util.List.of(item("quantum_computing_module"),
                 item("optical_lattice_substrate").copyWithCount(2), item("meteoric_iron_ingot").copyWithCount(2)));
         h.assertTrue(coreRecipe.plan(parts) == null, "Reconstruction bypassed its BE unlock");
@@ -218,7 +219,7 @@ public final class BalanceRevisionGameTests {
         parts.set(3, item("bose_condensate_catalyst"));
         h.assertTrue(coreRecipe.plan(parts) != null, "Reconstruction remains blocked after BE unlock");
         var seedRecipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.SINGULARITY_ENCAPSULATOR).stream()
-                .filter(r -> r.id().equals(Singulo.id("singularity_encapsulator/primordial_seed"))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().identifier().equals(Singulo.id("singularity_encapsulator/primordial_seed"))).findFirst().orElseThrow().value();
         var seedInputs = new java.util.ArrayList<ItemStack>(java.util.List.of(item("ergosphere_chapter"),
                 item("hawking_condensate").copyWithCount(4), item("artificial_star_core"), item("exotic_matter").copyWithCount(8)));
         h.assertTrue(seedRecipe.plan(seedInputs) == null, "Sea loot bypassed the final lab");

@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "singulo:item/colored_spawn_egg",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 2763318
+      },
+      {
+        "type": "minecraft:constant",
+        "value": 16739012
+      }
+    ]
+  }
+}

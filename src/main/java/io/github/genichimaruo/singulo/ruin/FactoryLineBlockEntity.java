@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** 製造ライン（描画のためだけにある。ファウンドリへ伸びる給電の光は FactoryLineRenderer が描く）。 */
-public class FactoryLineBlockEntity extends BlockEntity {
+public class FactoryLineBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public FactoryLineBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.FACTORY_LINE.get(), pos, state);
     }

@@ -6,15 +6,11 @@
   "energy": 40,
   "ingredients": [
     {
-      "ingredient": {
-        "item": "singulo:culture_data"
-      },
+      "ingredient": "singulo:culture_data",
       "uses": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:blank_data_card"
-      },
+      "ingredient": "singulo:blank_data_card",
       "count": 1
     }
   ],

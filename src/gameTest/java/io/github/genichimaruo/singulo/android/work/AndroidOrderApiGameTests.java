@@ -1,4 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
+import net.minecraft.world.entity.EntitySpawnReason;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders.State;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
@@ -9,22 +12,20 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.resources.Identifier;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class AndroidOrderApiGameTests {
     private static final BlockPos CONSOLE=new BlockPos(0,1,0), SUPPLY=new BlockPos(1,1,0), CHEST=new BlockPos(1,1,1),
             DELIVERY=new BlockPos(3,1,0), RACK=new BlockPos(4,1,0), TABLE=new BlockPos(4,1,3);
-    private static Item item(String name) { return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("singulo",name)); }
+    private static Item item(String name) { return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("singulo",name)); }
     private static ItemStack recipeCard(GameTestHelper h,List<ItemStack> grid,ItemStack output) {
         var card=new ItemStack(item("recipe_card")); new RecipeData(grid,output).write(card,h.getLevel().registryAccess()); return card;
     }
@@ -36,20 +37,20 @@ public final class AndroidOrderApiGameTests {
         helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
         helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
-            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = helper.getBlockEntity(p);
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, p);
             b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         ItemStack table = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
                 net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, RACK);
         java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -58,22 +59,22 @@ public final class AndroidOrderApiGameTests {
         rack.items().setStackInSlot(0, table);
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
-        return helper.getBlockEntity(CONSOLE);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, CONSOLE);
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
         var c=workshop(h,32); c.setOwner(TestScope.player(h).getUUID());
-        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+        var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel(), EntitySpawnReason.TRIGGERED);
         a.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
-        a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
+        a.snapTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(2,1,2))));
         a.setNoAi(!moving); h.getLevel().addFreshEntity(a); return c;
     }
     private static AndroidOrders.Receipt submit(GameTestHelper h, UUID id,long count) {
-        return AndroidOrders.submit(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)h.getBlockEntity(CONSOLE)).owner(),id,
+        return AndroidOrders.submit(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CONSOLE)).owner(),id,
                 new ItemStack(Items.STICK),count,List.of(),h.absolutePos(DELIVERY));
     }
     private static AndroidOrders.Receipt status(GameTestHelper h,UUID id) {
-        return AndroidOrders.status(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)h.getBlockEntity(CONSOLE)).owner(),id);
+        return AndroidOrders.status(h.getLevel(),h.absolutePos(CONSOLE),((WorkConsoleBlockEntity)io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, CONSOLE)).owner(),id);
     }
     @GameTest(template="empty")
     public static void ownerCountsAndDestinationsAreChecked(GameTestHelper h) {
@@ -98,7 +99,7 @@ public final class AndroidOrderApiGameTests {
         h.assertTrue(AndroidOrders.cancel(h.getLevel(),c.getBlockPos(),UUID.randomUUID(),id).state()==State.REJECTED,"Non-owner cancelled");
         var cancelled=AndroidOrders.cancel(h.getLevel(),c.getBlockPos(),c.owner(),id);
         h.assertTrue(cancelled.state()==State.CANCELLED && c.orders().isEmpty(),"Cancellation not tracked");
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         h.assertTrue(status(h,id).state()==State.CANCELLED && submit(h,id,8).state()==State.CANCELLED,"Reload/replay restarted cancelled job");
         h.assertTrue(!AndroidOrders.acknowledge(h.getLevel(),c.getBlockPos(),UUID.randomUUID(),id),"Non-owner acknowledged");
         h.assertTrue(AndroidOrders.acknowledge(h.getLevel(),c.getBlockPos(),c.owner(),id) && status(h,id).state()==State.UNKNOWN,"Receipt acknowledgement failed"); h.succeed();
@@ -107,13 +108,13 @@ public final class AndroidOrderApiGameTests {
     public static void runningReceiptSurvivesReloadWithoutDuplicatingWork(GameTestHelper h) {
         var c=setup(h,false); var id=UUID.randomUUID(); var first=submit(h,id,8);
         h.assertTrue(first.state()==State.RUNNING,"No order");
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         var again=submit(h,id,8); h.assertTrue(again.state()==State.RUNNING && again.orderId()==first.orderId() && c.orders().size()==1,"Reload duplicated or lost order"); h.succeed();
     }
     @GameTest(template="empty")
     public static void missingOrderNeverMeansCompleted(GameTestHelper h) {
         var c=setup(h,false); var id=UUID.randomUUID(); submit(h,id,8);
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); tag.put("orders",new ListTag()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); tag.put("orders",new ListTag()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         h.assertTrue(status(h,id).state()==State.FAILED,"Missing order reported success");
         h.assertTrue(status(h,UUID.randomUUID()).state()==State.UNKNOWN,"Unknown ID reported success");
         h.assertTrue(AndroidOrders.status(h.getLevel(),c.getBlockPos().above(),c.owner(),id).state()==State.UNAVAILABLE,"Missing console reported success"); h.succeed();
@@ -126,7 +127,7 @@ public final class AndroidOrderApiGameTests {
             var e=new ExternalOrderLedger(id,c.owner(),i+1,new ItemStack(Items.STICK),8,List.of(),h.absolutePos(DELIVERY));
             e.state=State.CANCELLED; list.add(e.save(h.getLevel().registryAccess()));
         }
-        tag.put("external_orders_v1",list); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        tag.put("external_orders_v1",list); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         var rejected=submit(h,UUID.randomUUID(),8); h.assertTrue(rejected.state()==State.REJECTED && rejected.reason().startsWith("receipt_limit"),"History cap not enforced");
         h.assertTrue(status(h,oldest).state()==State.CANCELLED,"Old receipt silently evicted");
         h.assertTrue(AndroidOrders.acknowledge(h.getLevel(),c.getBlockPos(),c.owner(),oldest),"Cannot clear terminal receipt");
@@ -150,7 +151,7 @@ public final class AndroidOrderApiGameTests {
         boolean immutable=false; try { snap.receipts().clear(); } catch(UnsupportedOperationException expected) { immutable=true; }
         h.assertTrue(immutable,"Mutable receipt list");
         AndroidOrders.cancel(h.getLevel(),c.getBlockPos(),c.owner(),id);
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         var after=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
         h.assertTrue(after.activeCount()==0 && after.historyCount()==1 && after.receipts().getFirst().state()==State.CANCELLED,"History lost on reload");
         h.assertTrue(snap.receipts().getFirst().state()==State.RUNNING,"Snapshot changed after cancellation");
@@ -168,7 +169,7 @@ public final class AndroidOrderApiGameTests {
             var e=new ExternalOrderLedger(UUID.randomUUID(),i==0?c.owner():UUID.randomUUID(),i+1,new ItemStack(Items.STICK),8,List.of(),null);
             e.state=State.CANCELLED; list.add(e.save(h.getLevel().registryAccess()));
         }
-        tag.put("external_orders_v1",list); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        tag.put("external_orders_v1",list); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         var snap=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
         h.assertTrue(snap.receipts().size()==1 && snap.historyCount()==1 && snap.remainingReceiptCapacity()==0,"Foreign receipt leak or false capacity");
         AndroidOrders.acknowledge(h.getLevel(),c.getBlockPos(),c.owner(),snap.receipts().getFirst().requestId());
@@ -177,7 +178,7 @@ public final class AndroidOrderApiGameTests {
     @GameTest(template="empty")
     public static void snapshotMissingOrderIsReadOnlyFailure(GameTestHelper h) {
         var c=setup(h,false); var id=UUID.randomUUID(); submit(h,id,8);
-        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); tag.put("orders",new ListTag()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+        var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); tag.put("orders",new ListTag()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
         var before=c.saveWithoutMetadata(h.getLevel().registryAccess());
         var snap=AndroidOrders.snapshot(h.getLevel(),c.getBlockPos(),c.owner());
         h.assertTrue(snap.activeCount()==0 && snap.historyCount()==1 && snap.receipts().getFirst().state()==State.FAILED,"Missing order is not failure");
@@ -205,10 +206,10 @@ public final class AndroidOrderApiGameTests {
         h.succeedWhen(()->{
             var receipt=status(h,id); h.assertTrue(receipt.state()==State.COMPLETED,"Not completed: "+receipt.state());
             h.assertTrue(receipt.delivered()==8 && c.orders().isEmpty(),"Completion before delivery");
-            DeliveryPortBlockEntity port=h.getBlockEntity(DELIVERY); int count=0;
+            DeliveryPortBlockEntity port=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, DELIVERY); int count=0;
             for(int i=0;i<port.handler().getSlots();i++)if(port.handler().getStackInSlot(i).is(Items.STICK))count+=port.handler().getStackInSlot(i).getCount();
             h.assertTrue(count==8,"Wrong physical output count");
-            var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); c.loadWithComponents(tag,h.getLevel().registryAccess());
+            var tag=c.saveWithoutMetadata(h.getLevel().registryAccess()); io.github.genichimaruo.singulo.test.harness.TestNbt.load(c, tag,h.getLevel().registryAccess());
             h.assertTrue(status(h,id).state()==State.COMPLETED && submit(h,id,8).state()==State.COMPLETED,"Terminal receipt lost");
         });
     }

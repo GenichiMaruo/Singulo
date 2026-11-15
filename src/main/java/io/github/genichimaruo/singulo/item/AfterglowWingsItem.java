@@ -13,8 +13,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -33,21 +33,24 @@ import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
  * 翼の見た目は AfterglowWingsLayer が描く（記録者の象牙と金の羽根とはちがい、水色の結晶の羽根で先が菫に光る）。
  * クリエイティブのタブにも JEI にも出さない。
  */
-public class AfterglowWingsItem extends ArmorItem {
+public class AfterglowWingsItem extends io.github.genichimaruo.singulo.compat.LegacyItem {
     public static final int FLAP_COOLDOWN = 30;
     public static final double FLAP_SPEED = 0.85;
 
     /** 防御はダイヤモンドの胸当てと同じ。鎧の絵は描かない（翼は別に描く）。 */
-    public static final Holder<ArmorMaterial> MATERIAL = GravityBootsItem.MATERIALS.register("afterglow", () -> {
-        EnumMap<ArmorItem.Type, Integer> defense = new EnumMap<>(ArmorItem.Type.class);
-        for (ArmorItem.Type t : ArmorItem.Type.values()) {
-            defense.put(t, t == ArmorItem.Type.CHESTPLATE ? 8 : 0);
-        }
-        return new ArmorMaterial(defense, 20, SoundEvents.ARMOR_EQUIP_ELYTRA, () -> Ingredient.EMPTY, List.of(), 2.0F, 0.0F);
-    });
+    public static final ArmorMaterial MATERIAL = new ArmorMaterial(0,
+            java.util.Map.of(net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 8), 20,
+            SoundEvents.ARMOR_EQUIP_ELYTRA, 2.0F, 0.0F,
+            net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, io.github.genichimaruo.singulo.Singulo.id("non_repairable")),
+            net.minecraft.resources.ResourceKey.create(net.minecraft.world.item.equipment.EquipmentAssets.ROOT_ID, io.github.genichimaruo.singulo.Singulo.id("afterglow")));
 
     public AfterglowWingsItem(Properties properties) {
-        super(MATERIAL, ArmorItem.Type.CHESTPLATE, properties.stacksTo(1).fireResistant());
+        super(properties.stacksTo(1).fireResistant()
+                .attributes(MATERIAL.createAttributes(net.minecraft.world.item.equipment.ArmorType.CHESTPLATE))
+                .enchantable(20)
+                .component(net.minecraft.core.component.DataComponents.EQUIPPABLE,
+                        net.minecraft.world.item.equipment.Equippable.builder(EquipmentSlot.CHEST).setEquipSound(SoundEvents.ARMOR_EQUIP_ELYTRA).setDamageOnHurt(false).build())
+                .component(net.minecraft.core.component.DataComponents.GLIDER, net.minecraft.util.Unit.INSTANCE));
     }
 
     /** クラスを読み込んで、鎧の素材を登録に間に合わせる（Singulo の初期化から呼ぶ）。 */
@@ -56,16 +59,6 @@ public class AfterglowWingsItem extends ArmorItem {
 
     public static boolean wearing(LivingEntity entity) {
         return entity.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof AfterglowWingsItem;
-    }
-
-    @Override
-    public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
-        return true;
-    }
-
-    @Override
-    public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
-        return true;                                    // 壊れない
     }
 
     @Override
@@ -79,7 +72,7 @@ public class AfterglowWingsItem extends ArmorItem {
         if (!(entity instanceof Player player) || player.getItemBySlot(EquipmentSlot.CHEST) != stack || !player.isFallFlying()) {
             return;
         }
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (player.tickCount % 2 == 0) {
                 Vec3 back = player.getLookAngle().scale(-0.6);
                 for (int side = -1; side <= 1; side += 2) {
@@ -91,11 +84,11 @@ public class AfterglowWingsItem extends ArmorItem {
             }
             return;
         }
-        if (player.isShiftKeyDown() && !player.getCooldowns().isOnCooldown(this)) {
+        if (player.isShiftKeyDown() && !player.getCooldowns().isOnCooldown(stack)) {
             Vec3 look = player.getLookAngle();
             player.setDeltaMovement(player.getDeltaMovement().add(look.scale(FLAP_SPEED)).add(0, 0.15, 0));
             player.hurtMarked = true;
-            player.getCooldowns().addCooldown(this, FLAP_COOLDOWN);
+            player.getCooldowns().addCooldown(stack, FLAP_COOLDOWN);
             level.playSound(null, player.blockPosition(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.8F, 1.6F);
             level.playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 1.4F);
             if (level instanceof ServerLevel server) {
@@ -117,5 +110,15 @@ public class AfterglowWingsItem extends ArmorItem {
         tooltip.add(Component.translatable("item.singulo.afterglow_wings.tip_1").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.singulo.afterglow_wings.tip_2").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.singulo.afterglow_wings.tip_3").withStyle(ChatFormatting.GRAY));
+    }
+
+    /** Client-only plume animation; gameplay ticking remains in Item.inventoryTick. */
+    public static void onEntityTick(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event) {
+        var entity = event.getEntity();
+        if (!entity.level().isClientSide() || !(entity instanceof Player player)) return;
+        ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
+        if (chest.getItem() instanceof AfterglowWingsItem wings) {
+            wings.inventoryTick(chest, entity.level(), entity, -1, false);
+        }
     }
 }

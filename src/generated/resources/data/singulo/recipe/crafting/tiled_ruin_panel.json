@@ -6,15 +6,9 @@
     "PBP"
   ],
   "key": {
-    "B": {
-      "item": "singulo:blueprint_ruin_panels"
-    },
-    "P": {
-      "item": "singulo:ruin_panel"
-    },
-    "X": {
-      "item": "singulo:white_ceramic_composite"
-    }
+    "B": "singulo:blueprint_ruin_panels",
+    "P": "singulo:ruin_panel",
+    "X": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:tiled_ruin_panel",

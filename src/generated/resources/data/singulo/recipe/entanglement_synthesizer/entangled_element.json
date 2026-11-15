@@ -6,33 +6,23 @@
   "energy": 4000,
   "ingredients": [
     {
-      "ingredient": {
-        "tag": "c:gems/quartz"
-      },
+      "ingredient": "#c:gems/quartz",
       "count": 2
     },
     {
-      "ingredient": {
-        "item": "minecraft:amethyst_shard"
-      },
+      "ingredient": "minecraft:amethyst_shard",
       "count": 2
     },
     {
-      "ingredient": {
-        "tag": "c:gems/diamond"
-      },
+      "ingredient": "#c:gems/diamond",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:superconducting_wire"
-      },
+      "ingredient": "singulo:superconducting_wire",
       "count": 1
     },
     {
-      "ingredient": {
-        "item": "singulo:data_card_quantum_fragment"
-      },
+      "ingredient": "singulo:data_card_quantum_fragment",
       "count": 1
     }
   ],

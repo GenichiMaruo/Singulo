@@ -5,27 +5,22 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.android.AndroidLaser;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * 床から立つ光の柱。予告: 外から縮んでくる輪と、満ちていく円、回る刻み。柱: 白い芯と色の外殻、根元に広がる輪。
  */
-public class AndroidLaserRenderer extends EntityRenderer<AndroidLaser> {
+public class AndroidLaserRenderer extends SnapshotEntityRenderer<AndroidLaser> {
     public AndroidLaserRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(AndroidLaser laser) {
-        return FxDraw.WHITE;
-    }
-
-    @Override
+@Override
     public void render(AndroidLaser laser, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float t = laser.tickCount + partialTick;
         int rgb = laser.color();

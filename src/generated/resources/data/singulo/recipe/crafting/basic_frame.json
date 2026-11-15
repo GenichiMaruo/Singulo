@@ -7,15 +7,9 @@
     "SWS"
   ],
   "key": {
-    "S": {
-      "tag": "c:ingots/steel"
-    },
-    "W": {
-      "item": "singulo:white_ceramic_composite"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "S": "#c:ingots/steel",
+    "W": "singulo:white_ceramic_composite",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "singulo:basic_frame",

@@ -7,7 +7,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,7 +35,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * ドローン・ステーション。ドローン用クリスタルメモリ（減らない）とドローンキット（印刷ごとに1つ）を入れて電力を送ると、
  * 上にドローンを印刷する（生産アップグレード1枚につき1機増え、2枚で3機まで）。ドローンは上空で待機し、半径 DISPATCH_RANGE の発着ポートに呼ばれて荷物を運ぶ。
  */
-public class DroneStationBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, MenuProvider {
     public static final int CAPACITY = 200_000;
     public static final int MAX_RECEIVE = 4_000;
@@ -58,7 +58,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     public static final int BUTTON_DISMANTLE = 0, BUTTON_RESUME = 10;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
-    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
+    private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -216,7 +216,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     // ------------------------------------------------------------------ 呼び出し
 
     /** 呼べるドローン: 待機中のドローン（ステーションの枠）か、荷物を届け終えて帰りかけのドローン（その便）。 */
-    private record Candidate(@Nullable DroneStationBlockEntity station, int unit, @Nullable DroneNetwork.Flight returning, double distSqr) {}
+    private record Candidate(@Nullable DroneStationBlockEntity station, int unit, DroneNetwork.@Nullable Flight returning, double distSqr) {}
 
     /**
      * port に呼べるドローン（port に近い順）。読み込まれているものだけ。調べるのは、持ち主の読み込まれたステーションと、
@@ -291,8 +291,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     /**
      * port に近い、owner のドローン（待機中か、帰りかけ）を1機呼ぶ。呼べたら便の記録。
      */
-    @Nullable
-    public static DroneNetwork.Flight call(ServerLevel level, BlockPos port, @Nullable UUID owner, BlockPos to) {
+    public static DroneNetwork.@Nullable Flight call(ServerLevel level, BlockPos port, @Nullable UUID owner, BlockPos to) {
         DroneNetwork net = DroneNetwork.get(level);
         for (Candidate c : candidates(level, port, owner)) {
             if (c.returning() != null) {
@@ -339,7 +338,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
         }
         drones[unit] = null;
         stopped[unit] = true;
-        ItemStack kit = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit")));
+        ItemStack kit = new ItemStack(BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("drone_kit")));
         ItemStack rest = items.insertItem(SLOT_KIT, kit, false);
         if (!rest.isEmpty()) {
             Block.popResource(level, worldPosition.above(), rest);
@@ -472,7 +471,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
             setOwner(player.getUUID());
         }
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.android_station.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.android_station.locked"));
             return;
         }
         player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
@@ -500,7 +499,7 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
             return;
         }
         DroneNetwork net = DroneNetwork.get(server);
-        var kit = BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
+        var kit = BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("drone_kit"));
         // ドローンは1機ごとにキットを1つ返す（帰りかけ・運搬中のものも。運搬中のドローンは届け終えたら消える）
         for (int i = 0; i < MAX_UNITS; i++) {
             if (net.clearAway(worldPosition, i)) {
@@ -561,13 +560,13 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (owner != null) {
-            tag.putUUID("owner", owner);
+            tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
         }
         for (int i = 0; i < MAX_UNITS; i++) {
             if (drones[i] != null) {
-                tag.putUUID("drone" + i, drones[i]);
+                tag.store("drone" + i, net.minecraft.core.UUIDUtil.CODEC, drones[i]);
             }
             tag.putBoolean("stopped" + i, stopped[i]);
             tag.putInt("kind" + i, kinds[i].ordinal());
@@ -577,15 +576,17 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        CompoundTag inv = tag.getCompound("items");
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        CompoundTag inv = tag.getCompoundOrEmpty("items");
         inv.putInt("Size", SLOTS);
-        items.deserializeNBT(registries, inv);
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, inv);
+        owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         for (int i = 0; i < MAX_UNITS; i++) {
-            drones[i] = tag.hasUUID("drone" + i) ? tag.getUUID("drone" + i) : null;
-            stopped[i] = tag.getBoolean("stopped" + i);
-            kinds[i] = DroneKind.byId(tag.getInt("kind" + i));
+            drones[i] = tag.read("drone" + i, net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("drone" + i, net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            stopped[i] = tag.getBooleanOr("stopped" + i, false);
+            kinds[i] = DroneKind.byId(tag.getIntOr("kind" + i, 0));
         }
     }
+
+    public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> transferItems() { return new io.github.genichimaruo.singulo.compat.ItemTransferView(items, (slot,r) -> slot == SLOT_KIT, (slot,r) -> false); }
 }

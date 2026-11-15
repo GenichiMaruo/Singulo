@@ -7,12 +7,12 @@ import io.github.genichimaruo.singulo.machine.SmesCellBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
+import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
@@ -26,7 +26,7 @@ public final class ChargeSlotGameTests {
     @GameTest(template = "empty", timeoutTicks = 60)
     public static void smesChargesItemsInItsChargeSlots(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.SMES_CELL.get());
-        SmesCellBlockEntity smes = h.getBlockEntity(AT);
+        SmesCellBlockEntity smes = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,AT);
         smes.energy().setEnergy(1_000_000);
         var slots = smes.chargeSlots();
         var automation = smes.chargeAutomation();

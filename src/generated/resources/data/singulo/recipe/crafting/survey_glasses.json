@@ -7,15 +7,9 @@
     "I  "
   ],
   "key": {
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "G": {
-      "tag": "c:glass_panes/colorless"
-    },
-    "B": {
-      "item": "singulo:basic_circuit"
-    }
+    "I": "#c:ingots/iron",
+    "G": "#c:glass_panes/colorless",
+    "B": "singulo:basic_circuit"
   },
   "result": {
     "id": "singulo:survey_glasses",

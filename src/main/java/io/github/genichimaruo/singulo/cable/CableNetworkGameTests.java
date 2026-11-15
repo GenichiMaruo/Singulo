@@ -6,23 +6,23 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-@net.neoforged.neoforge.gametest.GameTestHolder("singulo_cable")
-@net.neoforged.neoforge.gametest.PrefixGameTestTemplate(false)
+@io.github.genichimaruo.singulo.test.harness.GameTestHolder("singulo_cable")
+@io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate(false)
 public final class CableNetworkGameTests {
     private record Setup(SmesCellBlockEntity far, SmesCellBlockEntity near, SmesCellBlockEntity sink,
                          IEnergyStorage farPort, IEnergyStorage nearPort) {}
     private static SmesCellBlockEntity storage(GameTestHelper h, BlockPos pos, Direction front) {
         h.setBlock(pos,SinguloBlocks.SMES_MODULE.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,front));
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
     }
     private static IEnergyStorage port(GameTestHelper h, BlockPos pos, Direction side) {
-        var cap=h.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,h.absolutePos(pos),side);
+        var cap=io.github.genichimaruo.singulo.energy.EnergyResourceView.of(h.getLevel().getCapability(Capabilities.Energy.BLOCK,h.absolutePos(pos),side));
         h.assertTrue(cap!=null,"Missing cable capability");
         return cap;
     }
@@ -109,7 +109,7 @@ public final class CableNetworkGameTests {
         source.energy().setEnergy(100_000_000);
         for(int x=2;x<=5;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         var sink=storage(h,new BlockPos(6,1,2),Direction.SOUTH);
-        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(5,1,2));
+        CableBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2)), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(5,1,2));
         var removedPort=port(h,new BlockPos(3,1,2),Direction.NORTH);
         int[] afterCut={0};
         h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
@@ -128,7 +128,7 @@ public final class CableNetworkGameTests {
         source.energy().setEnergy(100_000_000);
         for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         storage(h,new BlockPos(5,1,2),Direction.SOUTH);
-        CableBlockEntity cable=h.getBlockEntity(new BlockPos(2,1,2));
+        CableBlockEntity cable=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2));
         h.startSequence().thenWaitUntil(()->h.assertTrue(cable.flow()>0,"Cable display not active"))
                 .thenExecute(()->{
                     EnergyNetwork before=cable.network;
@@ -145,7 +145,7 @@ public final class CableNetworkGameTests {
         source.energy().setEnergy(100_000_000);
         for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         storage(h,new BlockPos(5,1,2),Direction.SOUTH);
-        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(4,1,2));
+        CableBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2)), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(4,1,2));
         int[] watched={0};
         h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
                 .thenExecute(()->{
@@ -174,7 +174,7 @@ public final class CableNetworkGameTests {
         for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         h.setBlock(new BlockPos(3,2,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         storage(h,new BlockPos(5,1,2),Direction.SOUTH);
-        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(4,1,2));
+        CableBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2)), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(4,1,2));
         h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
                 .thenExecute(()->{
                     h.setBlock(new BlockPos(3,1,3),SinguloBlocks.FLUID_PIPE.get());
@@ -189,7 +189,7 @@ public final class CableNetworkGameTests {
         source.energy().setEnergy(100_000_000);
         for(int x=2;x<=4;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         storage(h,new BlockPos(5,1,2),Direction.SOUTH);
-        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(4,1,2));
+        CableBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2)), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(4,1,2));
         h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
                 .thenExecute(()->{
                     source.energy().setEnergy(0);
@@ -211,7 +211,7 @@ public final class CableNetworkGameTests {
         source.energy().setEnergy(100_000_000);
         for(int x=2;x<=5;x++) h.setBlock(new BlockPos(x,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         storage(h,new BlockPos(6,1,2),Direction.SOUTH);
-        CableBlockEntity a=h.getBlockEntity(new BlockPos(2,1,2)), b=h.getBlockEntity(new BlockPos(5,1,2));
+        CableBlockEntity a=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2)), b=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(5,1,2));
         h.startSequence().thenWaitUntil(()->h.assertTrue(a.flow()>0 && b.flow()>0,"Cable display not active"))
                 .thenExecute(()->{
                     CableBlockEntity.clearConnectedDisplay(h.getLevel(),h.absolutePos(new BlockPos(3,1,2)));
@@ -225,7 +225,7 @@ public final class CableNetworkGameTests {
         var sink=storage(h,new BlockPos(6,1,2),Direction.SOUTH);
         var first=port(h,new BlockPos(1,1,2),Direction.DOWN);
         h.assertTrue(first.receiveEnergy(900_000,false)==900_000,"Initial route not supplied");
-        CableBlockEntity cable=h.getBlockEntity(new BlockPos(1,1,2));
+        CableBlockEntity cable=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(1,1,2));
         EnergyNetwork before=cable.network;
         var interior=port(h,new BlockPos(2,1,2),Direction.DOWN);
         h.assertTrue(interior.receiveEnergy(200_000,true)==100_000,"Interior simulation reset shared budget");
@@ -240,7 +240,7 @@ public final class CableNetworkGameTests {
     public static void longStraightRunUsesOneSegmentAndNoPerCableTicker(GameTestHelper h) {
         for(int y=1;y<=256;y++) h.setBlock(new BlockPos(2,y,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         var sink=storage(h,new BlockPos(3,256,2),Direction.SOUTH);
-        CableBlockEntity cable=h.getBlockEntity(new BlockPos(2,1,2));
+        CableBlockEntity cable=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, new BlockPos(2,1,2));
         var cap=port(h,new BlockPos(2,1,2),Direction.DOWN);
         for(int i=0;i<100;i++) h.assertTrue(cap.receiveEnergy(1_000,false)==1_000,"Long route stopped supplying");
         EnergyNetwork n=cable.network;
