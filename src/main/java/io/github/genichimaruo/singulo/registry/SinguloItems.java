@@ -315,8 +315,10 @@ public final class SinguloItems {
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
-    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテムと隠しボスの報酬。 */
-    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings");
+    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテム、隠しボスの報酬、ボスのスポーンエッグ（コマンドでだけ渡す）。 */
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
+            "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg", "ergosphere_leviathan_spawn_egg",
+            "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");
     /** 段階に関係なく、名前を紫（エピック）にするアイテム（とても珍しい物）。 */
     private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
 
@@ -458,7 +460,7 @@ public final class SinguloItems {
         block(SinguloBlocks.HALO_COLLECTOR, 5);
         block(SinguloBlocks.CONTAINMENT_TANK, 5);
         block(SinguloBlocks.WORMHOLE_GENERATOR_CORE, 5);
-        TAB_ORDER.add(UNSTABLE_WORMHOLE_MOUTH);
+        // 不安定なワームホールの口はタブに出さない（取り出すとすぐ消え、生成器が作る対でないと使えない）
         block(SinguloBlocks.WORMHOLE_STABILIZER, 5);
         TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
                 new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
@@ -576,12 +578,7 @@ public final class SinguloItems {
         block(SinguloBlocks.CREATIVE_ENERGY_SOURCE, 6);
         TAB_ORDER.add(CREATIVE_CATALYST);
         TAB_ORDER.add(BUILDER_WAND);
-        TAB_ORDER.add(HORIZON_WARDEN_SPAWN_EGG);
-        TAB_ORDER.add(ECHO_SENTINEL_SPAWN_EGG);
-        TAB_ORDER.add(GRAVITY_REMNANT_SPAWN_EGG);
-        TAB_ORDER.add(ERGOSPHERE_LEVIATHAN_SPAWN_EGG);
-        TAB_ORDER.add(LAST_ARCHIVIST_SPAWN_EGG);
-        TAB_ORDER.add(FOUNDRY_OVERSEER_SPAWN_EGG);
+        // ボスのスポーンエッグはタブにも JEI にも出さない（/give でだけ渡す。HIDDEN を参照）
         for (BlockDef def : GeneratedContent.BLOCKS) {
             block(SinguloBlocks.SIMPLE.get(def.id()), def.stage());
         }
