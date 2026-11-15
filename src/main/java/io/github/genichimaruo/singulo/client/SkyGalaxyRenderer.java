@@ -7,7 +7,7 @@ import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -51,7 +51,7 @@ final class SkyGalaxyRenderer {
         pose.mulPose(event.getModelViewMatrix());
         pose.mulPose(sky);
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        RenderType type = RenderType.eyes(FxDraw.WHITE);
+        RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.eyes(FxDraw.WHITE);
         VertexConsumer vc = buffers.getBuffer(type);
         for (long seed : seeds) {
             Random rnd = new Random(seed ^ 0x51D3A1L);

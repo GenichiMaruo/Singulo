@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 設計図から作ったものはパネル受電器から電力を受けて点く（GravityReceiverBlockEntity。1枚 20 FE/t、つながったパネル全体へ配る）。
  * 研究所の天井のものは研究所の中央動力炉で点く。
  */
-public class RayleighPanelBlockEntity extends BlockEntity {
+public class RayleighPanelBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public RayleighPanelBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.RAYLEIGH_PANEL.get(), pos, state);
     }

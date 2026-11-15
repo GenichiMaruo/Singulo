@@ -35,7 +35,7 @@ public final class SmesUpgradeRecipe extends ShapedRecipe {
         var data = cell.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null) {
             var tag = new CompoundTag();
-            tag.putInt("energy", Math.clamp(data.copyTag().getInt("energy"), 0, SmesCellBlockEntity.CAPACITY));
+            tag.putInt("energy", Math.clamp(data.copyTag().getIntOr("energy", 0), 0, SmesCellBlockEntity.CAPACITY));
             BlockItem.setBlockEntityData(result, SinguloBlockEntities.SMES_MODULE.get(), tag);
         }
         return result;

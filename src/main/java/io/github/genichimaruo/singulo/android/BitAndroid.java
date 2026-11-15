@@ -192,7 +192,7 @@ public class BitAndroid extends RuinAndroid {
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if (key == DEPLOYED && level().isClientSide) {
+        if (key == DEPLOYED && level().isClientSide()) {
             int n = deployed();
             if (n < seenDeployed) {
                 recallFrom = Math.max(seenDeployed, recalling(0) ? recallFrom : 0);

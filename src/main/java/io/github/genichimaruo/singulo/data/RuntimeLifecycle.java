@@ -27,7 +27,7 @@ public final class RuntimeLifecycle {
     public static void unload(LevelEvent.Unload event) {
         if (!(event.getLevel() instanceof Level level)) return;
         io.github.genichimaruo.singulo.ruin.lab.RayleighSky.forgetLevel(level);
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
         io.github.genichimaruo.singulo.gravity.ZeroGravity.forgetLevel(level);
         InertialStabilizerBlockEntity.forgetLevel(level);
         ShieldTowerBlockEntity.forgetLevel(level);
@@ -43,7 +43,7 @@ public final class RuntimeLifecycle {
 
     @SubscribeEvent
     public static void chunkUnloaded(net.neoforged.neoforge.event.level.ChunkEvent.Unload event) {
-        if (event.getLevel() instanceof Level level && !level.isClientSide) {
+        if (event.getLevel() instanceof Level level && !level.isClientSide()) {
             io.github.genichimaruo.singulo.gravity.ZeroGravity.forgetChunk(level, event.getChunk().getPos());
         }
     }

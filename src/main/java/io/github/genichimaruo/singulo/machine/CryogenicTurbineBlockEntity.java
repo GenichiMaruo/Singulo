@@ -35,7 +35,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 出力は cryoTurbineOutput（既定 4.5 kFE/t）まで。液体窒素はそれに見合う量だけ使う。蓄電がほぼいっぱいの間は待機して、窒素を減らさない。
  * 液体窒素は、パイプのほか、冷媒カートリッジを入口に入れても（空のカートリッジは出口へ）、カートリッジで右クリックしても入る。
  */
-public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class CryogenicTurbineBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner, io.github.genichimaruo.singulo.pipe.PipeInputOnly {
     static final int COOLANT_TEMPERATURE = 77;
     static final int REFERENCE_HOT = 1300;
@@ -250,7 +250,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
         tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (legacyNotice) {
             tag.putBoolean("legacy_notice", true);
         }
@@ -264,12 +264,12 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
         // 前の版はスロットを持たなかった（タンクだけを書いていた）
-        legacyNotice = tag.getBoolean("legacy_notice") || tag.contains("tank") && !tag.contains("items");
+        legacyNotice = tag.getBooleanOr("legacy_notice", false) || tag.contains("tank") && !tag.contains("items");
     }
 }

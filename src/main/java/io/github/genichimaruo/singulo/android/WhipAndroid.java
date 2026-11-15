@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.android;
 
 import java.util.EnumSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;

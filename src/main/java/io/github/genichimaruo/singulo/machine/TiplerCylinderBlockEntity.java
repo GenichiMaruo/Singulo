@@ -17,7 +17,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BambooSaplingBlock;
 import net.minecraft.world.level.block.BambooStalkBlock;
@@ -223,13 +223,13 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         int count = (int) randomTickCarry;
         randomTickCarry -= count;
         for (int i = 0; i < count; i++) {
-            BlockPos p = c.offset(level.random.nextInt(side) - r, level.random.nextInt(side) - r, level.random.nextInt(side) - r);
+            BlockPos p = c.offset(level.getRandom().nextInt(side) - r, level.getRandom().nextInt(side) - r, level.getRandom().nextInt(side) - r);
             if (!level.isLoaded(p) || c.distSqr(p) > (double) r * r) {
                 continue;
             }
             BlockState s = level.getBlockState(p);
             if (s.isRandomlyTicking() && isGrowing(s) && TimeFields.state(level, p) == 1) {
-                s.randomTick(level, p, level.random);
+                s.randomTick(level, p, level.getRandom());
             }
         }
     }
@@ -273,10 +273,10 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     public static void clientTick(Level level, BlockPos pos, BlockState state, TiplerCylinderBlockEntity be) {
         be.spin = be.running ? Math.min(1, be.spin + 0.01F) : Math.max(0, be.spin - 0.005F);
         be.angle += be.spin * 24;
-        if (be.spin > 0.2F && level.random.nextFloat() < be.spin * 0.6F) {
-            double a = level.random.nextDouble() * Math.PI * 2;
-            double d = 1.5 + level.random.nextDouble() * 4;
-            double y = pos.getY() + 1 + level.random.nextDouble() * 5;
+        if (be.spin > 0.2F && level.getRandom().nextFloat() < be.spin * 0.6F) {
+            double a = level.getRandom().nextDouble() * Math.PI * 2;
+            double d = 1.5 + level.getRandom().nextDouble() * 4;
+            double y = pos.getY() + 1 + level.getRandom().nextDouble() * 5;
             double x = pos.getX() + 0.5 + Math.cos(a) * d;
             double z = pos.getZ() + 0.5 + Math.sin(a) * d;
             // 円柱の回りを速く流れる粒子
@@ -333,7 +333,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("fuel", fuel.serializeNBT(registries));
+        tag.put("fuel", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(fuel, registries));
         tag.putInt("burn", burn);
         tag.putBoolean("running", running);
     }
@@ -342,12 +342,12 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         firstCheck = true;
-        fuel.deserializeNBT(registries, tag.getCompound("fuel"));
-        burn = tag.getInt("burn");
-        running = tag.getBoolean("running");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(fuel, registries, tag.getCompoundOrEmpty("fuel"));
+        burn = tag.getIntOr("burn", 0);
+        running = tag.getBooleanOr("running", false);
         if (tag.contains("axis")) {
-            axis = BlockPos.of(tag.getLong("axis"));
-            formed = tag.getBoolean("formed");
+            axis = BlockPos.of(tag.getLongOr("axis", 0L));
+            formed = tag.getBooleanOr("formed", false);
         }
     }
 }

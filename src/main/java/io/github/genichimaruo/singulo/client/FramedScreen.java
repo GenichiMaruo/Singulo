@@ -3,8 +3,8 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.machine.GuiFrame;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-import net.minecraft.client.gui.GuiGraphics;
+import org.jspecify.annotations.Nullable;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
@@ -46,7 +46,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     /** 段の中身（アイコンやスロットの凹み）。x, y はタブの左上。 */
-    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {}
+    protected void drawRail(GuiGraphicsExtractor g, int row, int x, int y, boolean hover) {}
 
     protected boolean clickRail(int row, int button) {
         return false;
@@ -64,7 +64,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
      * 触媒スロット（sx, sy）の下の細いゲージに、装填中の触媒の残りを出す。予備が空なら、スロットに装填中の触媒を薄く出す。
      * fillPermille は残りの千分率。
      */
-    protected void drawLoadedCatalyst(GuiGraphics g, int sx, int sy, int itemId, int fillPermille, boolean supplyEmpty) {
+    protected void drawLoadedCatalyst(GuiGraphicsExtractor g, int sx, int sy, int itemId, int fillPermille, boolean supplyEmpty) {
         net.minecraft.world.item.ItemStack loaded = loadedCatalyst(itemId);
         Panel.well(g, skin, sx, sy + 19, 16, 2);
         if (loaded.isEmpty()) {
@@ -76,11 +76,11 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
             Panel.glass(g, sx, sy + 19, w, 2);
         }
         if (supplyEmpty) {
-            g.pose().pushPose();
-            g.renderItem(loaded, sx, sy);
-            g.pose().translate(0, 0, 200);
+            g.pose().pushMatrix();
+            g.item(loaded, sx, sy);
+            g.nextStratum();
             g.fill(sx, sy, sx + 16, sy + 16, 0x80000000 | (skin.fill() & 0xFFFFFF));
-            g.pose().popPose();
+            g.pose().popMatrix();
         }
     }
 
@@ -215,7 +215,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     // ------------------------------------------------------------------ 描画
 
     /** 枠・ヘッダー・右レール・溝・インベントリの凹み・電源（画面の座標で描く）。 */
-    protected void drawFrame(GuiGraphics g, int mouseX, int mouseY) {
+    protected void drawFrame(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = frameX();
         int y = topPos;
         int w = frameWidth();
@@ -251,7 +251,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
         }
     }
 
-    private void drawRailTab(GuiGraphics g, int row, int mouseX, int mouseY) {
+    private void drawRailTab(GuiGraphicsExtractor g, int row, int mouseX, int mouseY) {
         int[] r = railRect(row);
         boolean hover = Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3]);
         boolean connected = railConnected(row);
@@ -260,14 +260,14 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     /** 装置名・状態・「インベントリ」の見出し（renderLabels の座標で描く）。 */
-    protected void drawLabels(GuiGraphics g) {
+    protected void drawLabels(GuiGraphicsExtractor g) {
         AndroidStationScreen.fit(g, font, title, titleLabelX, titleLabelY, titleWidth(), skin.text());
         Panel.Status status = status();
         if (status != null) {
             Panel.chip(g, skin, headerRight(), GuiFrame.POWER_Y, status, statusColor());
         }
         if (hasInventory()) {
-            g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+            g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
         }
     }
 
@@ -306,14 +306,14 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     /** アイコンと短い値（文の代わり）。x, y は枠の左上からの位置。重ねると tooltip を出す。 */
-    protected void stat(GuiGraphics g, int x, int y, Panel.Icon icon, int iconColor, String value, int color, List<Component> tooltip) {
+    protected void stat(GuiGraphicsExtractor g, int x, int y, Panel.Icon icon, int iconColor, String value, int color, List<Component> tooltip) {
         Panel.icon(g, leftPos + x, topPos + y, icon, iconColor);
-        g.drawString(font, value, leftPos + x + 10, topPos + y, color, false);
+        g.text(font, value, leftPos + x + 10, topPos + y, color, false);
         stats.add(new Stat(leftPos + x, topPos + y - 1, 10 + font.width(value), 10, tooltip));
     }
 
     /** アイコンと小さな横長のゲージ（液体の量など。数は重ねると出る）。 */
-    protected void statBar(GuiGraphics g, int x, int y, Panel.Icon icon, int iconColor, int width, double fraction, int color,
+    protected void statBar(GuiGraphicsExtractor g, int x, int y, Panel.Icon icon, int iconColor, int width, double fraction, int color,
                            List<Component> tooltip) {
         Panel.icon(g, leftPos + x, topPos + y, icon, iconColor);
         int bx = leftPos + x + 11;
@@ -333,7 +333,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     /** 重ねている「アイコンと値」と範囲のツールチップ。出したら true。 */
-    protected boolean renderStatTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    protected boolean renderStatTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         for (Stat s : stats) {
             if (!s.tooltip().isEmpty() && Panel.inside(mouseX, mouseY, s.x(), s.y(), s.w(), s.h())) {
                 Panel.tooltip(g, font, s.tooltip(), 200, mouseX, mouseY);
@@ -344,24 +344,24 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     /** 専用スロットの凹みと、空のときに入れる物のグレーの見本。 */
-    protected void ghostSlot(GuiGraphics g, int x, int y, net.minecraft.world.inventory.Slot slot, net.minecraft.world.item.ItemStack ghost) {
+    protected void ghostSlot(GuiGraphicsExtractor g, int x, int y, net.minecraft.world.inventory.Slot slot, net.minecraft.world.item.ItemStack ghost) {
         Panel.slot(g, skin, x, y);
         if (!slot.hasItem() && !ghost.isEmpty()) {
-            g.pose().pushPose();
-            g.renderItem(ghost, x, y);
-            g.pose().translate(0, 0, 200);
+            g.pose().pushMatrix();
+            g.item(ghost, x, y);
+            g.nextStratum();
             g.fill(x, y, x + 16, y + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
-            g.pose().popPose();
+            g.pose().popMatrix();
         }
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         drawLabels(g);
     }
 
     /** 骨格の部品のツールチップ。出したら true。 */
-    protected boolean renderFrameTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    protected boolean renderFrameTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
         if (Panel.inside(mouseX, mouseY, x + titleLabelX, y + titleLabelY - 1, titleWidth(), 10) && font.width(title) > titleWidth()) {
@@ -385,7 +385,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
             if (railUsed(row) && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
                 Component tip = railTooltip(row);
                 if (tip != null) {
-                    g.renderTooltip(font, tip, mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, tip, mouseX, mouseY);
                     return true;
                 }
             }
@@ -399,8 +399,9 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
      * 電源と右レールのクリックは、どの画面でも受け付ける（自分で mouseClicked を書く画面は、先に clickFrame を呼ぶ）。
      */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return clickFrame(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
+        return clickFrame(mouseX, mouseY, button) || super.mouseClicked(event, doubleClick);
     }
 
     /** 電源と右レールのクリック。扱ったら true。 */

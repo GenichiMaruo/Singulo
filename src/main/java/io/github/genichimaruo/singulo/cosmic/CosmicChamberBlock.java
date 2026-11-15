@@ -18,7 +18,7 @@ public final class CosmicChamberBlock extends SimpleMachineBlock<CosmicChamberBl
     }
     @Override
     protected void onRemove(BlockState state,net.minecraft.world.level.Level level,net.minecraft.core.BlockPos pos,BlockState replacement,boolean movedByPiston){
-        if(!state.is(replacement.getBlock())&&!level.isClientSide&&level.getBlockEntity(pos) instanceof CosmicChamberBlockEntity be)
+        if(!state.is(replacement.getBlock())&&!level.isClientSide()&&level.getBlockEntity(pos) instanceof CosmicChamberBlockEntity be)
             be.retireForRemoval();
         super.onRemove(state,level,pos,replacement,movedByPiston);
     }

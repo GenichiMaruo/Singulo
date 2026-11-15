@@ -27,7 +27,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 口は出力に置かれ、空の手で右クリックするか搬出して受け取る。60秒以内に固定化しないと消える。
  * 外殻の代わりに置いた搬入出ポート（マルチブロック搬入出ポートか、ワームホール生成器ポート）から電力を入れ、できた口を押し出す。
  */
-public class WormholeGeneratorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class WormholeGeneratorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     /** 毎tick必要な電力の既定値（設定 wormholeGeneratorPower）。 */
     public static final int DEFAULT_REQUIRED_PER_TICK = 100_000_000;
@@ -239,7 +239,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
     }
 
     @Override
@@ -247,12 +247,12 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         super.loadAdditional(tag, registries);
         firstCheck = true;
         if (tag.contains("output")) {
-            output.deserializeNBT(registries, tag.getCompound("output"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
         }
         if (tag.contains("core")) {
-            core = BlockPos.of(tag.getLong("core"));
-            clientProgress = tag.getInt("progress");
-            clientReady = tag.getBoolean("ready");
+            core = BlockPos.of(tag.getLongOr("core", 0L));
+            clientProgress = tag.getIntOr("progress", 0);
+            clientReady = tag.getBooleanOr("ready", false);
         }
     }
 
@@ -265,13 +265,13 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
 
     /** 口ができるまでの進み（0〜1。クライアントでは同期された値）。 */
     public float shownProgress() {
-        int p = level != null && level.isClientSide ? clientProgress : progress;
+        int p = level != null && level.isClientSide() ? clientProgress : progress;
         return Math.min(1F, p / (float) GENERATE_TICKS);
     }
 
     /** できた口が出力に入っているか（渦が開いたまま待つ）。 */
     public boolean shownReady() {
-        return level != null && level.isClientSide ? clientReady : !outputEmpty();
+        return level != null && level.isClientSide() ? clientReady : !outputEmpty();
     }
 
     @Override

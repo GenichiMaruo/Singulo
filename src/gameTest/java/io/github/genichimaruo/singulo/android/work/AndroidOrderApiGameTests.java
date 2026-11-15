@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.ListTag;
@@ -24,7 +24,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public final class AndroidOrderApiGameTests {
     private static final BlockPos CONSOLE=new BlockPos(0,1,0), SUPPLY=new BlockPos(1,1,0), CHEST=new BlockPos(1,1,1),
             DELIVERY=new BlockPos(3,1,0), RACK=new BlockPos(4,1,0), TABLE=new BlockPos(4,1,3);
-    private static Item item(String name) { return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("singulo",name)); }
+    private static Item item(String name) { return BuiltInRegistries.ITEM.get(Identifier.fromNamespaceAndPath("singulo",name)); }
     private static ItemStack recipeCard(GameTestHelper h,List<ItemStack> grid,ItemStack output) {
         var card=new ItemStack(item("recipe_card")); new RecipeData(grid,output).write(card,h.getLevel().registryAccess()); return card;
     }

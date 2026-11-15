@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.drone;
 
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -123,7 +123,7 @@ public class CargoDrone extends Mob {
         d.station = station;
         d.unit = unit;
         d.entityData.set(KIND, kind.ordinal());
-        d.moveTo(at.x, at.y, at.z, level.random.nextFloat() * 360, 0);
+        d.moveTo(at.x, at.y, at.z, level.getRandom().nextFloat() * 360, 0);
         if (printing) {
             d.entityData.set(PRINT, 0);
         }
@@ -681,10 +681,11 @@ public class CargoDrone extends Mob {
     // ------------------------------------------------------------------ 保存
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         if (station != null) {
-            tag.put("station", NbtUtils.writeBlockPos(station));
+            tag.put("station", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(station));
         }
         tag.putInt("unit", unit);
         tag.putInt("print", entityData.get(PRINT));
@@ -694,18 +695,21 @@ public class CargoDrone extends Mob {
         if (home != null) {
             tag.putString("home", home.location().toString());
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        station = NbtUtils.readBlockPos(tag, "station").orElse(null);
-        unit = Mth.clamp(tag.getInt("unit"), 0, DroneStationBlockEntity.MAX_UNITS - 1);
-        entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
-        flightId = tag.getLong("flight");
-        phase = tag.getBoolean("phase");
-        entityData.set(KIND, DroneKind.byId(tag.getInt("kind")).ordinal());
-        var loc = tag.contains("home") ? net.minecraft.resources.ResourceLocation.tryParse(tag.getString("home")) : null;
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        station = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "station").orElse(null);
+        unit = Mth.clamp(tag.getIntOr("unit", 0), 0, DroneStationBlockEntity.MAX_UNITS - 1);
+        entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getIntOr("print", 0), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
+        flightId = tag.getLongOr("flight", 0L);
+        phase = tag.getBooleanOr("phase", false);
+        entityData.set(KIND, DroneKind.byId(tag.getIntOr("kind", 0)).ordinal());
+        var loc = tag.contains("home") ? net.minecraft.resources.Identifier.tryParse(tag.getStringOr("home", "")) : null;
         home = loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 }

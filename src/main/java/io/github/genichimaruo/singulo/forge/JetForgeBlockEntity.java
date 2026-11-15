@@ -15,7 +15,7 @@ import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,7 +26,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -66,7 +66,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 完成品の入る所がなくなっていれば、冷却の終わりで待つ。形の判定は毎 tick {@value #VERIFY_PER_TICK} か所ずつ確かめる
  * （全体を一度に読まない）。保存するのは段階・進み具合・素材・完成品・電力で、読み込み直すと続きから進む。
  */
-public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         MultiblockPortBlockEntity.Outputs, DeviceMenu.Host {
     public static final String STATION = "accretion_jet_forge";
     public static final int IDLE = 0, PRIME = 1, IGNITE = 2, FOCUS = 3, IRRADIATE = 4, FINISH = 5, COOL = 6;
@@ -173,7 +173,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     public int batchSize() { return batchSize; }
     public boolean parallelUpgrade() { return parallelUpgrade; }
     @Nullable
-    private ResourceLocation recipeId;
+    private Identifier recipeId;
 
     // 炉心のブラックホール
     private int bh = BH_NONE;
@@ -679,7 +679,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** 画面の「点火」。形ができていて、ブラックホールがなく、コアが入っていれば始める。 */
     public boolean ignite() {
-        if (!formed || bh != BH_NONE || !hasSeed() || level == null || level.isClientSide) {
+        if (!formed || bh != BH_NONE || !hasSeed() || level == null || level.isClientSide()) {
             return false;
         }
         bh = BH_IGNITING;
@@ -746,7 +746,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         net.minecraft.network.chat.Component msg = net.minecraft.network.chat.Component.translatable(key)
                 .withStyle(net.minecraft.ChatFormatting.GOLD);
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(48))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -1347,7 +1347,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     @Override
     public void onBroken(Level level) {
-        if (parallelUpgrade && !level.isClientSide) {
+        if (parallelUpgrade && !level.isClientSide()) {
             parallelUpgrade = false;
             Block.popResource(level, worldPosition, new ItemStack(item("collapsar_parallel_cassette")));
         }
@@ -1399,7 +1399,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             JetForgeClientIndex.add(this);
         }
     }
@@ -1413,7 +1413,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     public void setRemoved() {
         ports.onRemoved(level);
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             JetForgeClientIndex.remove(this);
         }
         super.setRemoved();
@@ -1424,7 +1424,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
         tag.putLong("buffer", buffer);
         tag.putLong("consumed", consumedTotal);
@@ -1470,50 +1470,50 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
         super.loadAdditional(tag, registries);
         if (tag.contains("items")) {
             ItemStackHandler saved = new ItemStackHandler();
-            saved.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(saved, registries, tag.getCompoundOrEmpty("items"));
             for (int i = 0; i < SLOTS; i++) {
                 items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
             }
-            tank.readFromNBT(registries, tag.getCompound("tank"));
-            buffer = tag.getLong("buffer");
-            consumedTotal = tag.getLong("consumed");
+            tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+            buffer = tag.getLongOr("buffer", 0L);
+            consumedTotal = tag.getLongOr("consumed", 0L);
             charged.clear();
-            for (Tag t : tag.getList("charged", Tag.TAG_COMPOUND)) {
-                ItemStack s = ItemStack.parseOptional(registries, (CompoundTag) t);
+            for (Tag t : tag.getListOrEmpty("charged")) {
+                ItemStack s = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, (CompoundTag) t);
                 if (!s.isEmpty()) {
                     charged.add(s);
                 }
             }
-            recipeId = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
-            ignitionStored = tag.getLong("ignition_stored");
-            ignitionLeft = tag.getInt("ignition_left");
-            bhMass = tag.contains("bh_mass") ? tag.getDouble("bh_mass") : CORE_MASS;
+            recipeId = tag.contains("recipe") ? Identifier.tryParse(tag.getStringOr("recipe", "")) : null;
+            ignitionStored = tag.getLongOr("ignition_stored", 0L);
+            ignitionLeft = tag.getIntOr("ignition_left", 0);
+            bhMass = tag.contains("bh_mass") ? tag.getDoubleOr("bh_mass", 0.0D) : CORE_MASS;
             firstCheck = true;
         }
-        phase = tag.getInt("phase");
-        parallelUpgrade = tag.getBoolean("parallel_upgrade");
-        batchSize = tag.contains("batch_size") ? Math.max(1, Math.min(4, tag.getInt("batch_size"))) : 1;
-        phaseTicks = tag.getInt("phase_ticks");
-        hold = tag.getInt("hold");
-        energyPerTick = tag.getInt("energy_per_tick");
-        irradiateTicks = tag.contains("irradiate_ticks") ? Math.max(1, tag.getInt("irradiate_ticks")) : 1200;
-        working = tag.contains("working") ? ItemStack.parseOptional(registries, tag.getCompound("working")) : ItemStack.EMPTY;
-        result = tag.contains("result") ? ItemStack.parseOptional(registries, tag.getCompound("result")) : ItemStack.EMPTY;
+        phase = tag.getIntOr("phase", 0);
+        parallelUpgrade = tag.getBooleanOr("parallel_upgrade", false);
+        batchSize = tag.contains("batch_size") ? Math.max(1, Math.min(4, tag.getIntOr("batch_size", 0))) : 1;
+        phaseTicks = tag.getIntOr("phase_ticks", 0);
+        hold = tag.getIntOr("hold", 0);
+        energyPerTick = tag.getIntOr("energy_per_tick", 0);
+        irradiateTicks = tag.contains("irradiate_ticks") ? Math.max(1, tag.getIntOr("irradiate_ticks", 0)) : 1200;
+        working = tag.contains("working") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("working")) : ItemStack.EMPTY;
+        result = tag.contains("result") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("result")) : ItemStack.EMPTY;
         int was = bh;
-        bh = tag.getInt("bh");
-        if (level != null && level.isClientSide && clientSynchronized && was != BH_ACTIVE && bh == BH_ACTIVE) {
+        bh = tag.getIntOr("bh", 0);
+        if (level != null && level.isClientSide() && clientSynchronized && was != BH_ACTIVE && bh == BH_ACTIVE) {
             clientFormedAt = clientTicks;                 // できた瞬間の閃光（描画）
         }
-        ignitionElapsed = tag.getInt("ignition_elapsed");
-        ignitionCharged = tag.getBoolean("ignition_charged");
+        ignitionElapsed = tag.getIntOr("ignition_elapsed", 0);
+        ignitionCharged = tag.getBooleanOr("ignition_charged", false);
         // 向きは保存する（形が崩れていても、ブラックホールの位置と引力のため）
-        int b = tag.contains("back") ? tag.getInt("back") : -1;
+        int b = tag.contains("back") ? tag.getIntOr("back", 0) : -1;
         back = b >= 2 && b < 6 ? Direction.from3DDataValue(b) : null;
         if (tag.contains("sync")) {
             clientSynchronized = true;
             // クライアントへの同期（形・コアの有無）
-            formed = tag.getBoolean("formed");
-            clientCore = tag.getBoolean("core");
+            formed = tag.getBooleanOr("formed", false);
+            clientCore = tag.getBooleanOr("core", false);
         }
     }
 
@@ -1528,7 +1528,7 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     /** クライアントで、炉心にブラックホールがあるか（更新のときに受け取る）。 */
     public boolean shownCore() {
-        return level != null && level.isClientSide ? clientCore : hasCore();
+        return level != null && level.isClientSide() ? clientCore : hasCore();
     }
 
     @Override

@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class BlackHoleBomb extends ThrowableItemProjectile {
     /** 捕らえて吸い込もうとしている最後の記録者（いる間は開かない）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private java.util.UUID captor;
 
     /** 最後の記録者に捕らえられる（着弾せず、記録者の頭の特異点へ吸い込まれていく）。 */
@@ -32,7 +32,7 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
     }
 
     /** 打ち返したウォーデン。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private java.util.UUID deflector;
 
     public BlackHoleBomb(EntityType<? extends BlackHoleBomb> type, Level level) {
@@ -86,7 +86,7 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
             return;
         }
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             level().addParticle(ParticleTypes.REVERSE_PORTAL, getX(), getY(), getZ(), 0, 0, 0);
         }
     }
@@ -97,7 +97,7 @@ public class BlackHoleBomb extends ThrowableItemProjectile {
             return;                                     // 捕らえられている間は、何に当たっても開かない
         }
         super.onHit(result);
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         Vec3 at = result.getLocation();

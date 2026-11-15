@@ -4,12 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -93,7 +93,7 @@ public final class HologramRenderer {
             wrong++;
             pose.pushPose();
             pose.translate(p.getX() - cam.x, p.getY() - cam.y, p.getZ() - cam.z);
-            VertexConsumer lines = buffers.getBuffer(RenderType.lines());
+            VertexConsumer lines = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
             if (want.isAir() || !have.isAir()) {
                 LevelRenderer.renderLineBox(pose, lines, new AABB(0.02, 0.02, 0.02, 0.98, 0.98, 0.98), 1.0F, 0.3F, 0.3F, 1.0F);
             } else {
@@ -102,7 +102,7 @@ public final class HologramRenderer {
             if (!want.isAir()) {
                 pose.translate(0.25, 0.25, 0.25);
                 pose.scale(0.5F, 0.5F, 0.5F);
-                mc.getBlockRenderer().renderSingleBlock(want, pose, buffers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                mc.getBlockRenderer().renderSingleBlock(want, pose, buffers, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
             }
             pose.popPose();
         }
@@ -137,22 +137,22 @@ public final class HologramRenderer {
         open = openSlots.size();
         // 光る箱（その場で描く半透明の発光。光をまとめて描く GlowDepth はブロックエンティティの段階で描き終わるので使わない）。
         // 替えられる外装板はブロックより一回り大きい箱が脈打ち、内張り済みはうすい金の箱。描き方ごとにまとめて描く
-        VertexConsumer fill = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        VertexConsumer fill = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(FxDraw.WHITE));
         for (BlockPos p : openSlots) {
             pose.pushPose();
             pose.translate(p.getX() - cam.x, p.getY() - cam.y, p.getZ() - cam.z);
-            FxDraw.box(pose, fill, -0.06F, -0.06F, -0.06F, 1.06F, 1.06F, 1.06F, LightTexture.FULL_BRIGHT, rgb, (int) (70 + 90 * pulse));
+            FxDraw.box(pose, fill, -0.06F, -0.06F, -0.06F, 1.06F, 1.06F, 1.06F, LightCoordsUtil.FULL_BRIGHT, rgb, (int) (70 + 90 * pulse));
             pose.popPose();
         }
         for (BlockPos p : doneSlots) {
             pose.pushPose();
             pose.translate(p.getX() - cam.x, p.getY() - cam.y, p.getZ() - cam.z);
-            FxDraw.box(pose, fill, -0.03F, -0.03F, -0.03F, 1.03F, 1.03F, 1.03F, LightTexture.FULL_BRIGHT, 0xC8A050, 45);
+            FxDraw.box(pose, fill, -0.03F, -0.03F, -0.03F, 1.03F, 1.03F, 1.03F, LightCoordsUtil.FULL_BRIGHT, 0xC8A050, 45);
             pose.popPose();
         }
-        buffers.endBatch(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        buffers.endBatch(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(FxDraw.WHITE));
         // 外側の脈打つ枠
-        VertexConsumer lines = buffers.getBuffer(RenderType.lines());
+        VertexConsumer lines = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
         float r = (rgb >> 16 & 255) / 255F, g = (rgb >> 8 & 255) / 255F, b = (rgb & 255) / 255F;
         for (BlockPos p : openSlots) {
             pose.pushPose();

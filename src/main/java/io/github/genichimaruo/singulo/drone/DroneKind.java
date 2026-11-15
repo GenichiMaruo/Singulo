@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.drone;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ public enum DroneKind {
         if (stack.isEmpty()) {
             return null;
         }
-        net.minecraft.resources.ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        net.minecraft.resources.Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         for (DroneKind k : values()) {
             if (id.equals(io.github.genichimaruo.singulo.Singulo.id(k.memoryId))) {
                 return k;

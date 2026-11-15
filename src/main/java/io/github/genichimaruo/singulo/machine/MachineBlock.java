@@ -3,10 +3,10 @@ package io.github.genichimaruo.singulo.machine;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -51,7 +51,7 @@ public class MachineBlock extends AbstractMachineBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> beType) {
-        return level.isClientSide ? null : withBoost((l, p, s, be) -> {
+        return level.isClientSide() ? null : withBoost((l, p, s, be) -> {
             if (be instanceof MachineBlockEntity machine) {
                 MachineBlockEntity.serverTick(l, p, s, machine);
             }
@@ -60,11 +60,11 @@ public class MachineBlock extends AbstractMachineBlock {
 
     /** バケツなどの液体容器で右クリックすると、タンクに直接出し入れする。 */
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (type.tanks() > 0 && FluidUtil.getFluidHandler(stack).isPresent()
                 && FluidUtil.interactWithFluidHandler(player, hand, level, pos, hit.getDirection())) {
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }

@@ -6,11 +6,11 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -37,7 +37,7 @@ public class MetricDriveItem extends SinguloItem {
 
     public static final int CHARGE_PER_MATTER = 12_000;
 
-    private static final ResourceLocation MODIFIER = Singulo.id("metric_drive");
+    private static final Identifier MODIFIER = Singulo.id("metric_drive");
     private record Effect(Holder<Attribute> attribute, double amount, AttributeModifier.Operation op) {}
 
     public MetricDriveItem(Properties properties, int stage) {
@@ -69,14 +69,14 @@ public class MetricDriveItem extends SinguloItem {
             NeoForgeMod.CREATIVE_FLIGHT, Attributes.KNOCKBACK_RESISTANCE, Attributes.EXPLOSION_KNOCKBACK_RESISTANCE);
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             Mode next = Mode.values()[(mode(stack).ordinal() + 1) % Mode.values().length];
             stack.set(SinguloComponents.GRAVITY_MODE.get(), next.ordinal());
-            player.displayClientMessage(Component.translatable("tooltip.singulo.gauntlet.mode", modeName(next)), true);
+            player.sendOverlayMessage(Component.translatable("tooltip.singulo.gauntlet.mode", modeName(next)));
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     static Component modeName(Mode mode) {
@@ -109,7 +109,7 @@ public class MetricDriveItem extends SinguloItem {
             if (ExoticCharge.draw(player, drive, CHARGE_PER_MATTER)) {
                 mode = mode(drive);
             } else if (player.tickCount % 100 == 0) {
-                player.displayClientMessage(Component.translatable("metric_drive.singulo.no_exotic"), true);
+                player.sendOverlayMessage(Component.translatable("metric_drive.singulo.no_exotic"));
             }
         }
         apply(player, mode);

@@ -124,7 +124,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
             // 上下のピストンが打ち込む音（描画の打ち込みと同じ時刻）
             if (level.getGameTime() % STROKE_TICKS == SLAM_TICK) {
                 io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition.above(2), "degenerate_furnace_press", 1.2F,
-                        0.9F + level.random.nextFloat() * 0.2F);
+                        0.9F + level.getRandom().nextFloat() * 0.2F);
             }
             burn--;
             output = (int) Math.min(Integer.MAX_VALUE, Math.round(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()
@@ -187,7 +187,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("fuel", fuel.serializeNBT(registries));
+        tag.put("fuel", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(fuel, registries));
         tag.putInt("burn", burn);
     }
 
@@ -195,7 +195,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         firstCheck = true;
-        fuel.deserializeNBT(registries, tag.getCompound("fuel"));
-        burn = tag.getInt("burn");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(fuel, registries, tag.getCompoundOrEmpty("fuel"));
+        burn = tag.getIntOr("burn", 0);
     }
 }

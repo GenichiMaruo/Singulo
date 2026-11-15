@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -103,10 +103,14 @@ public class WardenSingularity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {}
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {}
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        values.store(tag);
+    }
 
     @Override
     public boolean isPickable() {

@@ -36,19 +36,19 @@ public class BuilderWandItem extends Item {
         ItemStack stack = context.getItemInHand();
         if (player.isShiftKeyDown()) {
             stack.set(SinguloComponents.HOLO_SIZE.get(), HoloProjectorItem.sizeIndex(stack) + 1);
-            if (!context.getLevel().isClientSide) {
-                player.displayClientMessage(Component.translatable("tooltip.singulo.builder_wand.size",
-                        HoloProjectorItem.size(stack, kind)), true);
+            if (!context.getLevel().isClientSide()) {
+                player.sendOverlayMessage(Component.translatable("tooltip.singulo.builder_wand.size",
+                        HoloProjectorItem.size(stack, kind)));
             }
-            return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(context.getLevel().isClientSide());
         }
         if (context.getLevel() instanceof ServerLevel level && player.getAbilities().instabuild) {
             int size = HoloProjectorItem.size(stack, kind);
             int n = SinguloCommands.place(level, kind, context.getClickedPos(), HoloProjectorItem.backOf(state), size);
-            player.displayClientMessage(Component.translatable("command.singulo.build.done",
-                    Component.translatable("multiblock.singulo." + kind.id()), size, n), true);
+            player.sendOverlayMessage(Component.translatable("command.singulo.build.done",
+                    Component.translatable("multiblock.singulo." + kind.id()), size, n));
         }
-        return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(context.getLevel().isClientSide());
     }
 
     @Override

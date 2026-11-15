@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -321,7 +321,7 @@ public class HorizonWarden extends Monster {
     public void tick() {
         super.tick();
         hurtWindows.tick();
-        if (!level().isClientSide && emergeTicks() > 0) {
+        if (!level().isClientSide() && emergeTicks() > 0) {
             tickEmerge((ServerLevel) level());
         }
     }
@@ -394,7 +394,7 @@ public class HorizonWarden extends Monster {
     protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
                 || lastHurtByPlayerTime > 0 && shouldDropExperience()
-                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
+                && server.getGameRules().getBoolean(net.minecraft.world.level.gamerules.GameRules.RULE_DOMOBLOOT))) {
             int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
             BossLoot.experience(server, lootPos(), reward, rewardPlayers(server));
         }
@@ -1140,11 +1140,11 @@ public class HorizonWarden extends Monster {
             proj.xRotO = proj.getXRot();
             proj.hasImpulse = true;
             proj.hurtMarked = true;
-            if (proj instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
+            if (proj instanceof net.minecraft.world.entity.projectile.arrow.AbstractArrow arrow) {
                 arrow.setBaseDamage(arrow.getBaseDamage() * REFLECT_ARROW_DAMAGE);
                 arrow.setCritArrow(true);
             }
-            if (proj instanceof net.minecraft.world.entity.projectile.AbstractHurtingProjectile hurting) {
+            if (proj instanceof net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile hurting) {
                 hurting.accelerationPower = Math.max(hurting.accelerationPower, 0.1);
             }
         }, this, this, false);
@@ -1328,7 +1328,7 @@ public class HorizonWarden extends Monster {
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), ARENA_RADIUS + 16, "awakened_warden");
         Component msg = Component.translatable("gui.singulo.console.awakened_defeated");
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(ARENA_RADIUS + 16))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -1431,8 +1431,9 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("phase", phase());
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("emerge", emergeTicks());
@@ -1440,32 +1441,35 @@ public class HorizonWarden extends Monster {
         tag.putInt("participants", participants);
         tag.putInt("reward_participants", rewardParticipants);
         if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(home));
         }
         if (console != null) {
-            tag.put("console", NbtUtils.writeBlockPos(console));
+            tag.put("console", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(console));
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        entityData.set(PHASE, Math.max(1, tag.getInt("phase")));
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        entityData.set(PHASE, Math.max(1, tag.getIntOr("phase", 0)));
         if (tag.contains("damage_scale")) {
-            damageScale = BossScaling.validDamageScale(tag.getFloat("damage_scale"));
+            damageScale = BossScaling.validDamageScale(tag.getFloatOr("damage_scale", 0.0F));
         }
-        entityData.set(EMERGE, tag.getInt("emerge"));
-        entityData.set(AWAKENED, tag.getBoolean("awakened"));
+        entityData.set(EMERGE, tag.getIntOr("emerge", 0));
+        entityData.set(AWAKENED, tag.getBooleanOr("awakened", false));
         if (awakened()) {
             xpReward = 4500;
         }
-        home = NbtUtils.readBlockPos(tag, "home").orElse(null);
-        console = NbtUtils.readBlockPos(tag, "console").orElse(null);
+        home = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").orElse(null);
+        console = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "console").orElse(null);
         if (home != null) {
             restrictTo(home, ARENA_RADIUS);
         }
-        participants = Math.max(1, tag.getInt("participants"));
-        rewardParticipants = tag.contains("reward_participants") ? tag.getInt("reward_participants")
+        participants = Math.max(1, tag.getIntOr("participants", 0));
+        rewardParticipants = tag.contains("reward_participants") ? tag.getIntOr("reward_participants", 0)
                 : emergeTicks() <= 0 ? participants : 0;
         if (hasCustomName()) {
             setBarName(getDisplayName());

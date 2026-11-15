@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -24,7 +24,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
  * 見た目のための流れ（状態・入ってきた面・出ていった面・量・液体）だけを持つ。ネットワークが {@link FluidPipeNetwork#DISPLAY} tick ごとに
  * 決め、変わったときだけクライアントへ送る（量は桁の段階が変わったときだけ）。描くのは FluidPipeRenderer と測量メガネ。
  */
-public class FluidPipeBlockEntity extends BlockEntity implements io.github.genichimaruo.singulo.cable.ConduitCover.Holder {
+public class FluidPipeBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements io.github.genichimaruo.singulo.cable.ConduitCover.Holder {
     /** 状態: 流れていない・流れている・詰まっている（出せる液体があるのに受け手がない。測量メガネをかけた人が近いときだけ）。 */
     public static final int IDLE = 0, FLOWING = 1, BLOCKED = 2;
 
@@ -103,7 +103,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         visualAmount = amount;
         visualFluid = fluid.isEmpty() ? FluidStack.EMPTY : fluid.copyWithAmount(1);
         this.mixed = mixed;
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
@@ -132,12 +132,12 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         // 流れの見た目は保存しない（クライアントへの更新でだけ届く。読み込み直したら流れていない状態から始める）。保存するのはカバーだけ
-        visualState = tag.getInt("state");
-        inMask = tag.getInt("in");
-        outMask = tag.getInt("out");
-        visualAmount = tag.getInt("amount");
-        mixed = tag.getBoolean("mixed");
-        visualFluid = tag.contains("fluid") ? FluidStack.parseOptional(registries, tag.getCompound("fluid")) : FluidStack.EMPTY;
+        visualState = tag.getIntOr("state", 0);
+        inMask = tag.getIntOr("in", 0);
+        outMask = tag.getIntOr("out", 0);
+        visualAmount = tag.getIntOr("amount", 0);
+        mixed = tag.getBooleanOr("mixed", false);
+        visualFluid = tag.contains("fluid") ? FluidStack.parseOptional(registries, tag.getCompoundOrEmpty("fluid")) : FluidStack.EMPTY;
         loadCover(tag, registries);
     }
 
@@ -169,7 +169,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
     private void loadCover(CompoundTag tag, HolderLookup.Provider registries) {
         BlockState before = coverState;
         coverState = io.github.genichimaruo.singulo.cable.ConduitCover.load(tag, registries);
-        if (before != coverState && level != null && level.isClientSide) {
+        if (before != coverState && level != null && level.isClientSide()) {
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
         }
@@ -196,7 +196,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
 
     /** ネットワークはサーバーのものだけ（一人プレイではクライアントのスレッドから触らない）。 */
     private void leaveNetwork() {
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             invalidateNetwork();
             FluidPipeNetwork.forget(this);
         }
@@ -211,10 +211,10 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             CLIENT.add(this);
         }
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             FluidPipeNetwork.schedule(this);
             for (Direction d : Direction.values()) {
                 BlockPos next = worldPosition.relative(d);
@@ -227,7 +227,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
 
     @Override
     public void onChunkUnloaded() {
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             CLIENT.remove(this);
         }
         leaveNetwork();
@@ -236,7 +236,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
 
     @Override
     public void setRemoved() {
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             CLIENT.remove(this);
         }
         leaveNetwork();

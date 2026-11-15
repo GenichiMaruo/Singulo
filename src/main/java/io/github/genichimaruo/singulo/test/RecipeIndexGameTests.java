@@ -37,7 +37,7 @@ public final class RecipeIndexGameTests {
         var stable = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER);
         for (int i = 0; i < 3; i++) h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER) == stable,
                 "Repeated queries rebuild lists");
-        if (Boolean.getBoolean("singulo.testBenchmarks")) {
+        if (Boolean.getBooleanOr("singulo.testBenchmarks", false)) {
             var type = MachineType.PRECISION_ASSEMBLER;
             var cached = MachineBlockEntity.stationRecipes(h.getLevel(), type);
             long start = System.nanoTime();

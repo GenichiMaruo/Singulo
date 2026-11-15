@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -20,30 +20,30 @@ public class CatalystStabilizerItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stabilizer = player.getItemInHand(hand);
         ItemStack catalyst = player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
         if (CatalystHelper.tierOf(catalyst) <= 0 || !UsesHelper.hasUses(catalyst) || catalyst.getItem() instanceof CreativeCatalystItem) {
-            if (!level.isClientSide) {
-                player.displayClientMessage(Component.translatable("message.singulo.stabilizer.need_catalyst"), true);
+            if (!level.isClientSide()) {
+                player.sendOverlayMessage(Component.translatable("message.singulo.stabilizer.need_catalyst"));
             }
-            return InteractionResultHolder.fail(stabilizer);
+            return io.github.genichimaruo.singulo.compat.Interactions.fail(stabilizer);
         }
         if (stabilized(catalyst)) {
-            if (!level.isClientSide) {
-                player.displayClientMessage(Component.translatable("message.singulo.stabilizer.already"), true);
+            if (!level.isClientSide()) {
+                player.sendOverlayMessage(Component.translatable("message.singulo.stabilizer.already"));
             }
-            return InteractionResultHolder.fail(stabilizer);
+            return io.github.genichimaruo.singulo.compat.Interactions.fail(stabilizer);
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             stabilize(catalyst);
             if (!player.getAbilities().instabuild) {
                 stabilizer.shrink(1);
             }
-            player.displayClientMessage(Component.translatable("message.singulo.stabilizer.done"), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.stabilizer.done"));
             level.playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.4F);
         }
-        return InteractionResultHolder.sidedSuccess(stabilizer, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stabilizer, level.isClientSide());
     }
 
     public static boolean stabilized(ItemStack catalyst) {

@@ -59,7 +59,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
         return false;
     }
 
@@ -121,15 +121,15 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     /** 使われた（stack は手に持っているもの。空でもよい）。 */
     public void interact(Player player, ItemStack stack) {
         switch (phase) {
-            case UNSEALING, SEALING -> player.displayClientMessage(Component.translatable("message.singulo.sealed.busy"), true);
+            case UNSEALING, SEALING -> player.sendOverlayMessage(Component.translatable("message.singulo.sealed.busy"));
             case SEALED -> {
                 if (isKey(stack, tier())) {
                     useKey(player, stack);
                     start(Phase.UNSEALING);
                 } else {
                     play("sealed_container.denied", 1.0F);
-                    player.displayClientMessage(Component.translatable("message.singulo.sealed.need_key",
-                            keyItem(tier()).getDescription()), true);
+                    player.sendOverlayMessage(Component.translatable("message.singulo.sealed.need_key",
+                            keyItem(tier()).getDescription()));
                 }
             }
             case OPEN -> {
@@ -212,7 +212,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
             return;
         }
         long t = level.getGameTime() - be.phaseStart;
-        var rnd = level.random;
+        var rnd = level.getRandom();
         if (t >= T_VENT && t < T_VENT + 12) {
             for (int i = 0; i < 4; i++) {
                 double a = rnd.nextDouble() * Math.PI * 2;
@@ -282,7 +282,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     public void setChanged() {
         super.setChanged();
-        if (level != null && !level.isClientSide && phase == Phase.OPEN) {
+        if (level != null && !level.isClientSide() && phase == Phase.OPEN) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
@@ -328,21 +328,21 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
         super.loadAdditional(tag, registries);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items, registries);
-        lootPending = tag.getBoolean("Loot");
+        lootPending = tag.getBooleanOr("Loot", false);
         if (tag.contains("Phase")) {
             try {
-                phase = Phase.valueOf(tag.getString("Phase"));
+                phase = Phase.valueOf(tag.getStringOr("Phase", ""));
             } catch (IllegalArgumentException e) {
                 phase = Phase.SEALED;
             }
         } else if (lootPending) {
             phase = Phase.SEALED;                    // 遺構の構造物から置かれたばかり
         }
-        phaseStart = tag.getLong("PhaseStart");
+        phaseStart = tag.getLongOr("PhaseStart", 0L);
         shown.clear();
-        ListTag list = tag.getList("Shown", Tag.TAG_COMPOUND);
+        ListTag list = tag.getListOrEmpty("Shown");
         for (int i = 0; i < list.size(); i++) {
-            ItemStack.parse(registries, list.getCompound(i)).ifPresent(shown::add);
+            io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, list.getCompoundOrEmpty(i)).ifPresent(shown::add);
         }
     }
 

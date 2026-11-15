@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.compat.mekanism;
 import io.github.genichimaruo.singulo.android.work.Chemicals;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
@@ -12,7 +12,7 @@ import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.BlockCapability;
@@ -23,7 +23,7 @@ import net.neoforged.neoforge.capabilities.ItemCapability;
  * 化学物質の入れ口は、Mekanism と同じ名前（{@code mekanism:chemical_handler}）の能力で取る（同じ名前・型なら同じ能力になる）。
  */
 public final class MekanismChemicals implements Chemicals.Access {
-    private static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("mekanism", "chemical_handler");
+    private static final Identifier NAME = Identifier.fromNamespaceAndPath("mekanism", "chemical_handler");
     private static final BlockCapability<IChemicalHandler, Direction> BLOCK = BlockCapability.createSided(NAME, IChemicalHandler.class);
     private static final ItemCapability<IChemicalHandler, Void> ITEM = ItemCapability.createVoid(NAME, IChemicalHandler.class);
 
@@ -31,7 +31,7 @@ public final class MekanismChemicals implements Chemicals.Access {
 
     @Nullable
     private static Chemical chemical(String id) {
-        ResourceLocation rl = ResourceLocation.tryParse(id);
+        Identifier rl = Identifier.tryParse(id);
         if (rl == null) {
             return null;
         }
@@ -40,7 +40,7 @@ public final class MekanismChemicals implements Chemicals.Access {
     }
 
     private static String id(Chemical c) {
-        ResourceLocation rl = MekanismAPI.CHEMICAL_REGISTRY.getKey(c);
+        Identifier rl = MekanismAPI.CHEMICAL_REGISTRY.getKey(c);
         return rl == null ? "" : rl.toString();
     }
 
@@ -141,7 +141,7 @@ public final class MekanismChemicals implements Chemicals.Access {
 
     @Override
     @Nullable
-    public ResourceLocation icon(String id) {
+    public Identifier icon(String id) {
         Chemical c = chemical(id);
         return c == null ? null : c.getIcon();
     }

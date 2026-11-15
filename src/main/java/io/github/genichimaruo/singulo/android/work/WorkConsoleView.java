@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.android.RuinAndroid;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -182,7 +182,7 @@ public final class WorkConsoleView {
         ListTag as = new ListTag();
         for (RuinAndroid a : c.candidates(player)) {
             CompoundTag at = new CompoundTag();
-            at.putUUID("id", a.getUUID());
+            at.store("id", net.minecraft.core.UUIDUtil.CODEC, a.getUUID());
             at.putString("name", Component.Serializer.toJson(a.nickname(), reg));
             at.putBoolean("busy", c.busy(a));
             at.putInt("slots", a.isWorking() ? a.carryCapacity() : a.freeCarry());

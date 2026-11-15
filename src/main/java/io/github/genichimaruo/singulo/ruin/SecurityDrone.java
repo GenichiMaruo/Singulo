@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -288,25 +288,29 @@ public class SecurityDrone extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("tier", tier());
         tag.putBoolean("facility_spawned", facilitySpawned);
         // 出撃したドックと行動範囲（バニラは保存しないので、読み込み直すとドックに撃破を知らせられなくなる）
         if (hasRestriction()) {
-            tag.put("home", net.minecraft.nbt.NbtUtils.writeBlockPos(getRestrictCenter()));
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(getRestrictCenter()));
             tag.putFloat("home_radius", getRestrictRadius());
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        facilitySpawned = tag.getBoolean("facility_spawned");
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        facilitySpawned = tag.getBooleanOr("facility_spawned", false);
         if (tag.contains("tier")) {
-            entityData.set(TIER, Mth.clamp(tag.getInt("tier"), 1, 3));
+            entityData.set(TIER, Mth.clamp(tag.getIntOr("tier", 0), 1, 3));
         }
-        net.minecraft.nbt.NbtUtils.readBlockPos(tag, "home").ifPresent(home -> restrictTo(home, (int) tag.getFloat("home_radius")));
+        io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").ifPresent(home -> restrictTo(home, (int) tag.getFloatOr("home_radius", 0.0F)));
     }
 
     /**

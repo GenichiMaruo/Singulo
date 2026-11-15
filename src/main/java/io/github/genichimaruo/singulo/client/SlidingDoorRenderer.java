@@ -6,11 +6,11 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock;
 import io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlockEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.AABB;
@@ -19,7 +19,7 @@ import net.minecraft.world.phys.AABB;
  * スライドドアの2枚の扉。閉じていると真ん中で合わさり、開くと左右の壁の中へ7ピクセルずつ滑り込む（先の1ピクセルは枠の陰に残る）。
  * 絵は {ブロックID}_leaf_lower / _leaf_upper（左半分が左の扉、右半分が右の扉）。扉の小口は、絵のいちばん外の列を引き伸ばす。
  */
-public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlockEntity> {
+public class SlidingDoorRenderer extends SnapshotBlockRenderer<SlidingDoorBlockEntity> {
     /** 扉の厚さ（z 6.5〜9.5）と、開いたときに滑る分（ピクセル）。 */
     private static final float Z0 = 6.5F / 16, Z1 = 9.5F / 16, TRAVEL = 7F / 16;
     /**
@@ -37,9 +37,9 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
             return;
         }
         boolean lower = state.getValue(SlidingDoorBlock.HALF) == DoubleBlockHalf.LOWER;
-        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-        ResourceLocation tex = id.withPath(p -> "textures/block/" + p + "_leaf_" + (lower ? "lower" : "upper") + ".png");
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(tex));
+        Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+        Identifier tex = id.withPath(p -> "textures/block/" + p + "_leaf_" + (lower ? "lower" : "upper") + ".png");
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(tex));
         float s = be.slide(partialTick) * TRAVEL;
         pose.pushPose();
         pose.rotateAround(Axis.YP.rotationDegrees(-state.getValue(SlidingDoorBlock.FACING).toYRot() + 180), 0.5F, 0, 0.5F);

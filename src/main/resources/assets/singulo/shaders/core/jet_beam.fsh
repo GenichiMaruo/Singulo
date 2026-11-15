@@ -1,12 +1,12 @@
-#version 150
+#version 330
 
 // 降着ジェット鍛造炉のジェットとビーム（加算で重ねる）。
 // texCoord0.x は軸に沿った位置（ブロック）、texCoord0.y は横方向の位置 v（-1〜1）に 4 × 種類 を足したもの。
 // 種類: 0 プラズマ（太く荒れたジェット）・1 芯（白く細いビーム。速い波が流れる）・2 光暈（やわらかな外側の光）・
 //       3 力場（照射室の安全の膜。u・v は面の上の位置）・4 流れ込む物質（降着円盤へ落ちる流れ）
 // 頂点の色の a は明るさ。
-uniform vec4 ColorModulator;
-uniform float GameTime;
+#moj_import <minecraft:dynamictransforms.glsl>
+#moj_import <minecraft:globals.glsl>
 
 in vec4 vertexColor;
 in vec2 texCoord0;

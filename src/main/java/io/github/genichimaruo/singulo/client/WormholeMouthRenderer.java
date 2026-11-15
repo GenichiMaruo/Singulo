@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -21,8 +21,8 @@ import net.minecraft.world.phys.Vec3;
  * 喉の大きさに比例して大きくなるが、いちばん大きくても輪まで筐体の内側（枠の2ドットの内側）に収まる。
  * 重力レンズを小さく掛けて、周りの景色をゆがめる。
  */
-public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthBlockEntity> {
-    private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
+public class WormholeMouthRenderer extends SnapshotBlockRenderer<WormholeMouthBlockEntity> {
+    private static final Identifier WHITE = Singulo.id("textures/misc/white.png");
     private static final int LAT = 10;
     private static final int LON = 16;
 
@@ -44,7 +44,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         float time = be.getLevel().getGameTime() + partialTick;
         pose.pushPose();
         pose.translate(0.5, WormholeMouthBlockEntity.MOUTH_HEIGHT, 0.5);
-        sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(WHITE)), r);
+        sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE)), r);
         pose.mulPose(Axis.YP.rotationDegrees(time * 4));
         pose.mulPose(Axis.XP.rotationDegrees(20));
         VertexConsumer glow = GlowDepth.of(buffers, WHITE);
@@ -56,7 +56,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
 
     private static void membraneVertex(VertexConsumer vc, PoseStack pose, float x, float y, int alpha) {
         vc.addVertex(pose.last(), x, y, 0).setColor(0x0A, 0x06, 0x18, alpha).setUv(0.5F, 0.5F).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), 0, 0, 1);
+                .setLight(LightCoordsUtil.FULL_BRIGHT).setNormal(pose.last(), 0, 0, 1);
     }
 
     /**
@@ -82,7 +82,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         float reach = open ? 0.34F : 0.46F;
         // 糸・縁・星は不透明の固体で描く。半透明の細長い面は、斜めから見ると前後の順が毎フレーム入れ替わってちらつくため。
         // 固体なら奥行きは画素ごとに決まる。半透明で描くのは、あとの暗い膜だけ
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE));
         float[] widths = new float[rows];
         for (int i = 0; i < rows; i++) {
             float y0 = -halfY + 2 * halfY * i / rows;
@@ -95,24 +95,24 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
             for (int side = -1; side <= 1; side += 2) {
                 float x0 = side > 0 ? w - 0.09F : -w;
                 float x1 = side > 0 ? w : -w + 0.09F;
-                FxDraw.box(pose, solid, x0, y0, -0.04F, x1, y1, 0.04F, LightTexture.FULL_BRIGHT, rim);
+                FxDraw.box(pose, solid, x0, y0, -0.04F, x1, y1, 0.04F, LightCoordsUtil.FULL_BRIGHT, rim);
             }
             // 縫い目: 閉じているときは裂け目を横切って綴じ、開いているときは縁をまたいで外へ張る。
             // 四角い棒で描く（板を十字に組むと、1枚が膜と同じ面に入ってちらつくため）
             if (open) {
                 for (int side = -1; side <= 1; side += 2) {
-                    FxDraw.rod(pose.last(), solid, new Vec3(side * (w - reach), y0 + 0.02F, 0), new Vec3(side * (w + reach), y1 - 0.02F, 0), THREAD_WIDTH, thread, LightTexture.FULL_BRIGHT);
+                    FxDraw.rod(pose.last(), solid, new Vec3(side * (w - reach), y0 + 0.02F, 0), new Vec3(side * (w + reach), y1 - 0.02F, 0), THREAD_WIDTH, thread, LightCoordsUtil.FULL_BRIGHT);
                 }
             } else {
                 float side = i % 2 == 0 ? 1 : -1;
-                FxDraw.rod(pose.last(), solid, new Vec3(-side * (w + reach), y0, 0), new Vec3(side * (w + reach), y1, 0), THREAD_WIDTH, thread, LightTexture.FULL_BRIGHT);
+                FxDraw.rod(pose.last(), solid, new Vec3(-side * (w + reach), y0, 0), new Vec3(side * (w + reach), y1, 0), THREAD_WIDTH, thread, LightCoordsUtil.FULL_BRIGHT);
             }
         }
         if (open) {
             // 上下の縁
             for (int side = -1; side <= 1; side += 2) {
                 float y = side * (halfY + 0.02F);
-                FxDraw.box(pose, solid, -1.2F, y - 0.03F, -0.04F, 1.2F, y + 0.03F, 0.04F, LightTexture.FULL_BRIGHT, rim);
+                FxDraw.box(pose, solid, -1.2F, y - 0.03F, -0.04F, 1.2F, y + 0.03F, 0.04F, LightCoordsUtil.FULL_BRIGHT, rim);
             }
             // 向こう側の星（ゆっくり色が移ろう。膜の中に浮かぶ）
             for (int i = 0; i < 36; i++) {
@@ -123,7 +123,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
                 float y = sy * 1.28F;
                 float size = 0.018F + 0.02F * Mth.frac(i * 0.27F);
                 int star = FxDraw.lerpRgb(0x5A5A90, i % 3 == 0 ? 0xE0C8FF : 0xB8C8FF, twinkle);
-                FxDraw.box(pose, solid, x - size, y - size, -size, x + size, y + size, size, LightTexture.FULL_BRIGHT, star);
+                FxDraw.box(pose, solid, x - size, y - size, -size, x + size, y + size, size, LightCoordsUtil.FULL_BRIGHT, star);
             }
         }
         // 向こう側が透ける暗い膜
@@ -173,7 +173,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
     }
 
     @Override
-    public boolean shouldRenderOffScreen(WormholeMouthBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 }

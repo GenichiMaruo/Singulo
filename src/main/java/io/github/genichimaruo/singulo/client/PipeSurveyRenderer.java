@@ -7,8 +7,8 @@ import io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -61,7 +61,7 @@ final class PipeSurveyRenderer {
         pose.pushPose();
         pose.translate(-camera.x, -camera.y, -camera.z);
         var buffers = mc.renderBuffers().bufferSource();
-        RenderType type = RenderType.entityTranslucentEmissive(FxDraw.WHITE);
+        RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(FxDraw.WHITE);
         VertexConsumer vc = buffers.getBuffer(type);
         for (FluidPipeBlockEntity pipe : cached) {
             if (pipe.isRemoved() || !pipe.fresh()) {
@@ -140,7 +140,7 @@ final class PipeSurveyRenderer {
                 : flowing ? Component.translatable("gui.singulo.pipe.flow", pipe.visualAmount())
                 : Component.translatable("gui.singulo.pipe." + (stopped ? "blocked" : "idle"));
         Component detail = flowing ? (pipe.mixed() ? Component.translatable("gui.singulo.pipe.mixed") : pipe.visualFluid().getHoverName()) : null;
-        var g = event.getGuiGraphics();
+        var g = event.getGuiGraphicsExtractor();
         var font = mc.font;
         int x = mc.getWindow().getGuiScaledWidth() / 2 + 14;
         int y = mc.getWindow().getGuiScaledHeight() / 2 + 10;

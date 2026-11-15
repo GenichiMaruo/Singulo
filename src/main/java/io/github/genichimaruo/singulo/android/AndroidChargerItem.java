@@ -54,7 +54,7 @@ public class AndroidChargerItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getLevel().isClientSide) {
+        if (context.getLevel().isClientSide()) {
             return InteractionResult.SUCCESS;
         }
         IEnergyStorage source = context.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, context.getClickedPos(),
@@ -67,8 +67,8 @@ public class AndroidChargerItem extends Item {
         int got = source.extractEnergy(want, false);
         own.receiveEnergy(got, false);
         if (context.getPlayer() instanceof ServerPlayer sp) {
-            sp.displayClientMessage(Component.translatable("message.singulo.android_charger.charged", got, own.getEnergyStored(),
-                    CAPACITY), true);
+            sp.sendOverlayMessage(Component.translatable("message.singulo.android_charger.charged", got, own.getEnergyStored(),
+                    CAPACITY));
         }
         if (got > 0) {
             context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.6F, 1.6F);

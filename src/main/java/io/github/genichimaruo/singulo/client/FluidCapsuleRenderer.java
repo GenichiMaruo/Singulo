@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.ModelIdentifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -41,8 +41,8 @@ public final class FluidCapsuleRenderer extends BlockEntityWithoutLevelRenderer 
     }
 
     /** 段階ごとの殻のモデル（ModelEvent.RegisterAdditional で読む）。 */
-    static ModelResourceLocation shell(int tier) {
-        return ModelResourceLocation.standalone(Singulo.id("item/fluid_capsule_shell_" + Mth.clamp(tier, 1, 3)));
+    static ModelIdentifier shell(int tier) {
+        return ModelIdentifier.standalone(Singulo.id("item/fluid_capsule_shell_" + Mth.clamp(tier, 1, 3)));
     }
 
     static void registerModels(ModelEvent.RegisterAdditional event) {

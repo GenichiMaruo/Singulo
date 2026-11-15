@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.mixin;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "net.caffeinemc.mods.sodium.client.gl.shader.ShaderLoader", remap = false)
 public abstract class SodiumRayleighShaderMixin {
     @Inject(method = "getShaderSource", at = @At("RETURN"), cancellable = true)
-    private static void singulo$sampleNoon(ResourceLocation name, CallbackInfoReturnable<String> ci) {
+    private static void singulo$sampleNoon(Identifier name, CallbackInfoReturnable<String> ci) {
         if (!name.getNamespace().equals("sodium") || !name.getPath().equals("blocks/block_layer_opaque.vsh")) return;
         String original = "v_Color = _vert_color * texture(u_LightTex, _vert_tex_light_coord);";
         String replacement = """

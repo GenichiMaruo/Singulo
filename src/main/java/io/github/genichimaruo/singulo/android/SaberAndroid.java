@@ -95,7 +95,7 @@ public class SaberAndroid extends RuinAndroid {
     /** 構えのあいだ、正面からの攻撃を光の盾で受ける。受けたら斬り返す。 */
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || source.getEntity() == null || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)
+        if (level().isClientSide() || source.getEntity() == null || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)
                 || isInvulnerableTo(source)) {
             return super.hurt(source, amount);
         }

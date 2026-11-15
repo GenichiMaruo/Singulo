@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.machine;
 import com.mojang.serialization.MapCodec;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -53,7 +53,7 @@ public class SimpleMachineBlock<T extends BlockEntity> extends AbstractMachineBl
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
                             net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (!level.isClientSide && placer instanceof net.minecraft.world.entity.player.Player player
+        if (!level.isClientSide() && placer instanceof net.minecraft.world.entity.player.Player player
                 && level.getBlockEntity(pos) instanceof WorldlineAnchorBlockEntity anchor) {
             anchor.setOwner(player.getUUID());
         }
@@ -72,11 +72,11 @@ public class SimpleMachineBlock<T extends BlockEntity> extends AbstractMachineBl
         if (beType != type.get()) {
             return null;
         }
-        Ticker<T> t = level.isClientSide ? clientTicker : ticker;
+        Ticker<T> t = level.isClientSide() ? clientTicker : ticker;
         if (t == null) {
             return null;
         }
         BlockEntityTicker<E> inner = (l, p, s, be) -> t.tick(l, p, s, (T) be);
-        return level.isClientSide ? inner : withBoost(inner);
+        return level.isClientSide() ? inner : withBoost(inner);
     }
 }

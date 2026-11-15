@@ -7,9 +7,9 @@ import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.multiblock.CoolingTowerControllerBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Shapes;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -23,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
  * 極低温冷却塔: 稼働中は中心の熱交換コアのまわりを冷たい青い光が包み、霜の帯がゆっくり昇っていく（くびれの窓から見える）。
  * てっぺんの格子からは冷えた蒸気が白く立ちのぼり、ふくらみながら風に流れる。
  */
-public class CoolingTowerRenderer implements BlockEntityRenderer<CoolingTowerControllerBlockEntity> {
+public class CoolingTowerRenderer extends SnapshotBlockRenderer<CoolingTowerControllerBlockEntity> {
     public CoolingTowerRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
@@ -48,12 +48,12 @@ public class CoolingTowerRenderer implements BlockEntityRenderer<CoolingTowerCon
         pose.translate(base.x, base.y, base.z);
         // コアを包む青い光（コアより少し外側の薄い殻）
         float breathe = 0.5F + 0.5F * Mth.sin(time * 0.05F);
-        FxDraw.box(pose, glow, -0.53F, 0, -0.53F, 0.53F, top, 0.53F, LightTexture.FULL_BRIGHT, 0x7FD8FF, (int) (40 + 30 * breathe));
+        FxDraw.box(pose, glow, -0.53F, 0, -0.53F, 0.53F, top, 0.53F, LightCoordsUtil.FULL_BRIGHT, 0x7FD8FF, (int) (40 + 30 * breathe));
         // 昇っていく霜の帯
         for (int i = 0; i < 3; i++) {
             float y = ((time * 0.04F + i / 3F) % 1F) * top;
             float a = Mth.sin((y / top) * Mth.PI);
-            FxDraw.box(pose, glow, -0.6F, y, -0.6F, 0.6F, y + 0.18F, 0.6F, LightTexture.FULL_BRIGHT, 0xDAF6FF, (int) (110 * a));
+            FxDraw.box(pose, glow, -0.6F, y, -0.6F, 0.6F, y + 0.18F, 0.6F, LightCoordsUtil.FULL_BRIGHT, 0xDAF6FF, (int) (110 * a));
         }
         // てっぺんの上に立つ蒸気（ふくらみながら昇る、やわらかい白）
         for (int i = 0; i < 6; i++) {
@@ -74,7 +74,7 @@ public class CoolingTowerRenderer implements BlockEntityRenderer<CoolingTowerCon
     }
 
     @Override
-    public boolean shouldRenderOffScreen(CoolingTowerControllerBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

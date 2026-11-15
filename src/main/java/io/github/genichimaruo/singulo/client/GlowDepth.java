@@ -13,11 +13,11 @@ import io.github.genichimaruo.singulo.Singulo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -289,9 +289,9 @@ final class GlowDepth extends RenderType {
     }
 
     /** 光の入れ物。白い絵の光だけまとめて描く（模様のある絵は透ける所まで深度に書いてしまうので、これまでどおり）。 */
-    static VertexConsumer of(MultiBufferSource buffers, ResourceLocation texture) {
+    static VertexConsumer of(MultiBufferSource buffers, Identifier texture) {
         if (!active || shader == null || !FxDraw.WHITE.equals(texture) || GravitationalLensing.shaderPackInUse()) {
-            return buffers.getBuffer(RenderType.entityTranslucentEmissive(texture));
+            return buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(texture));
         }
         return VertexMultiConsumer.create(SOURCE.getBuffer(TYPE), COLOR_SOURCE.getBuffer(COLOR));
     }

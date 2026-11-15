@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.hazard;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
@@ -41,7 +41,7 @@ public class StrangeletBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.STRANGELET.get(), StrangeletBlockEntity::serverTick);
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.STRANGELET.get(), StrangeletBlockEntity::serverTick);
     }
 
     @Override

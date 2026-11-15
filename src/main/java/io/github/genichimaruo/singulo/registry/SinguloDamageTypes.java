@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.registry;
 
 import io.github.genichimaruo.singulo.Singulo;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;

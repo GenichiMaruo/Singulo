@@ -12,9 +12,9 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -46,7 +46,7 @@ public final class RecipeTweaks {
 
     /** 設定を当てはめたレシピ。設定で無効になったレシピは null。 */
     @Nullable
-    public static synchronized MachineRecipe adjust(ResourceLocation id, MachineRecipe recipe) {
+    public static synchronized MachineRecipe adjust(Identifier id, MachineRecipe recipe) {
         if (!ServerConfig.SPEC.isLoaded()) {
             return recipe;
         }
@@ -135,7 +135,7 @@ public final class RecipeTweaks {
     }
 
     @Nullable
-    private static MachineRecipe compute(ResourceLocation id, MachineRecipe r) {
+    private static MachineRecipe compute(Identifier id, MachineRecipe r) {
         if (!Singulo.MODID.equals(id.getNamespace())) {
             return r;
         }

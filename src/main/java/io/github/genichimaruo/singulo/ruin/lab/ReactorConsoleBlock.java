@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.ruin.lab;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -77,14 +77,14 @@ public class ReactorConsoleBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.REACTOR_CONSOLE.get(), ReactorConsoleBlockEntity::serverTick);
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.REACTOR_CONSOLE.get(), ReactorConsoleBlockEntity::serverTick);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorConsoleBlockEntity be) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ReactorConsoleBlockEntity be) {
             be.start((ServerLevel) level, player instanceof ServerPlayer sp ? sp : null);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 }

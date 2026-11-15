@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

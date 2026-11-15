@@ -82,7 +82,7 @@ public final class BossRewardGameTests {
         boss.setHealth(0);
         ItemEntity loot = boss.spawnAtLocation(new ItemStack(Items.DIAMOND), 0);
         helper.assertTrue(loot != null, "落とし物が出ない");
-        helper.assertTrue(loot.saveWithoutId(new CompoundTag()).getShort("Age") == -32768, "落とし物が時間で消える（無期限でない）");
+        helper.assertTrue(loot.saveWithoutId(new CompoundTag()).getShortOr("Age", (short) 0) == -32768, "落とし物が時間で消える（無期限でない）");
         ItemEntity ordinary = new ItemEntity(helper.getLevel(), loot.getX(), loot.getY(), loot.getZ(), new ItemStack(Items.DIAMOND, 10));
         helper.getLevel().addFreshEntity(ordinary);
         helper.runAtTickTime(40, () -> {
@@ -220,7 +220,7 @@ public final class BossRewardGameTests {
             int total = 0;
             for (ExperienceOrb orb : orbs) {
                 helper.assertTrue(orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED), "オーブにブラックホールよけの印がない");
-                helper.assertTrue(orb.saveWithoutId(new CompoundTag()).getShort("Age") < 0, "オーブがふつうの寿命のまま");
+                helper.assertTrue(orb.saveWithoutId(new CompoundTag()).getShortOr("Age", (short) 0) < 0, "オーブがふつうの寿命のまま");
                 total += orb.getValue();
                 orb.discard();
             }
@@ -281,14 +281,14 @@ public final class BossRewardGameTests {
             int ordinaryXp = 0;
             for (ExperienceOrb orb : helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around)) {
                 CompoundTag tag = orb.saveWithoutId(new CompoundTag());
-                int xp = orb.getValue() * Math.max(1, tag.getInt("Count"));
+                int xp = orb.getValue() * Math.max(1, tag.getIntOr("Count", 0));
                 if (orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)) {
                     protectedXp += xp;
-                    helper.assertTrue(tag.getShort("Age") < 0, "保護されたオーブの寿命がふつうに戻った");
+                    helper.assertTrue(tag.getShortOr("Age", (short) 0) < 0, "保護されたオーブの寿命がふつうに戻った");
                     ExperienceOrb restored = new ExperienceOrb(net.minecraft.world.entity.EntityType.EXPERIENCE_ORB, helper.getLevel());
                     restored.load(tag);
                     helper.assertTrue(restored.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
-                            && restored.saveWithoutId(new CompoundTag()).getShort("Age") < 0, "保存し直すと印か寿命を失う");
+                            && restored.saveWithoutId(new CompoundTag()).getShortOr("Age", (short) 0) < 0, "保存し直すと印か寿命を失う");
                 } else {
                     ordinaryXp += xp;
                 }

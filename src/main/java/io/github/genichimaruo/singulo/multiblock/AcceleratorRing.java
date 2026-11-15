@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.multiblock;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

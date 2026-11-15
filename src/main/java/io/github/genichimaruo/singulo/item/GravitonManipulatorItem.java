@@ -174,7 +174,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
                 return;
             }
             if (item.mode(stack) != Mode.LEVITATE) {
-                player.displayClientMessage(Component.translatable("gauntlet.singulo.left_click"), true);
+                player.sendOverlayMessage(Component.translatable("gauntlet.singulo.left_click"));
                 return;
             }
             CHARGING.put(id, player.level().getGameTime());
@@ -235,7 +235,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
                 }
             }
             if (charged % 5 == 0) {
-                player.displayClientMessage(Component.translatable("gauntlet.singulo.charging", charged * 100 / MAX_CHARGE), true);
+                player.sendOverlayMessage(Component.translatable("gauntlet.singulo.charging", charged * 100 / MAX_CHARGE));
             }
             return;
         }
@@ -249,7 +249,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     void fling(ServerPlayer player, ItemStack stack, int charged) {
         java.util.List<Entity> held = lifted(player);
         if (held.isEmpty()) {
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.nothing_held"), true);
+            player.sendOverlayMessage(Component.translatable("gauntlet.singulo.nothing_held"));
             return;
         }
         // 電力が足りなければ、ある分だけの力で投げる（投げられないことはない）
@@ -269,19 +269,19 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             ids.add(e.getId());
         }
         THROWN.put(player.getUUID(), new Thrown(ids, velocity, new int[]{THROW_HOLD_TICKS}));
-        player.displayClientMessage(Component.translatable("gauntlet.singulo.thrown", power * 100 / MAX_CHARGE), true);
+        player.sendOverlayMessage(Component.translatable("gauntlet.singulo.thrown", power * 100 / MAX_CHARGE));
         player.level().playSound(null, player.getX(), player.getEyeY(), player.getZ(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("graviton_manipulator_throw"),
                 net.minecraft.sounds.SoundSource.PLAYERS, 1.2F, 0.85F + power / 160.0F);
     }
 
     /** 右クリック: スニーク中はモード切替。それ以外（ため）はキーの状態をクライアントから受け取って扱う。 */
     @Override
-    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level, Player player,
+    public net.minecraft.world.InteractionResult use(net.minecraft.world.level.Level level, Player player,
                                                                        net.minecraft.world.InteractionHand hand) {
         if (player.isShiftKeyDown()) {
             return super.use(level, player, hand);
         }
-        return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
+        return io.github.genichimaruo.singulo.compat.Interactions.pass(player.getItemInHand(hand));
     }
 
     /** 対象に速さを与える（モブなら移動の AI を止めて、すぐ打ち消されないようにする）。 */
@@ -354,7 +354,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         if (ExoticCharge.draw(player, stack, CHARGE_PER_MATTER, true)) {
             return true;
         }
-        player.displayClientMessage(Component.translatable("gauntlet.singulo.no_exotic"), true);
+        player.sendOverlayMessage(Component.translatable("gauntlet.singulo.no_exotic"));
         return false;
     }
 

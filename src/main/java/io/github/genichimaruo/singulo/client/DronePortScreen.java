@@ -9,14 +9,14 @@ import io.github.genichimaruo.singulo.network.SideConfigPayload;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * ドローン発着ポートの画面。ヘッダーの名前をクリックすると変えられる（行き先の一覧に出る名前）。
@@ -177,7 +177,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     @Override
-    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {
+    protected void drawRail(GuiGraphicsExtractor g, int row, int x, int y, boolean hover) {
         if (row == GuiFrame.RAIL_SETTINGS) {
             Panel.sidesIcon(g, x, y);
             return;
@@ -264,9 +264,9 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         return new int[]{sides.x + sides.w - 15, sides.bodyY() + 20 + index * 11, 9, 9};
     }
 
-    private void renderSides(GuiGraphics g, int mouseX, int mouseY) {
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+    private void renderSides(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        g.pose().pushMatrix();
+        g.nextStratum();
         sides.draw(g, skin, mouseX, mouseY);
         int packed = sidesPacked();
         var quads = cubeQuads();
@@ -334,7 +334,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         if (!tip.isEmpty()) {
             Panel.tooltip(g, font, tip, 230, mouseX, mouseY);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     private boolean clickSides(double mouseX, double mouseY, int button) {
@@ -348,7 +348,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         int packed = sidesPacked();
         int[] mp = masterPos();
         if (Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
-            PacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), sidesChannel, SideConfigPayload.MASTER_FACE,
+            ClientPacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), sidesChannel, SideConfigPayload.MASTER_FACE,
                     SideConfig.ejectEnabled(packed) ? 0 : 4));
             return true;
         }
@@ -369,36 +369,36 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         boolean eject = SideConfig.eject(packed, f);
         if (button == 1) eject = !eject;
         else mode = (mode + 1) % 4;
-        PacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
+        ClientPacketDistributor.sendToServer(new SideConfigPayload(menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
     }
 
     // ------------------------------------------------------------------ 描画
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         layoutPopups();
-        super.render(g, mouseX, mouseY, partialTick);
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (sides.open) {
             renderSides(g, mouseX, mouseY);
         }
         if (overPopup(mouseX, mouseY)) {
             return;
         }
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+        g.pose().pushMatrix();
+        g.nextStratum();
         int[] r = resetRect();
         if (named() && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
         } else if (!names.editing() && overName(mouseX, mouseY)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         } else if (!renderFrameTooltips(g, mouseX, mouseY) && !renderStatTooltips(g, mouseX, mouseY)) {
-            renderTooltip(g, mouseX, mouseY);
+            extractTooltip(g, mouseX, mouseY);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int x = leftPos;
@@ -421,7 +421,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     /** 荷物のページ: 空き箱（見本つき）と荷物、蓄電、着荷箱 → 受け取り。 */
-    private void drawCargo(GuiGraphics g) {
+    private void drawCargo(GuiGraphicsExtractor g) {
         int x = leftPos;
         int y = topPos;
         var crate = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(menu.fluid() ? "fluid_capsule" : "packing_crate")));
@@ -457,7 +457,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     /** 液体のポートのタンク（荷物・受け取りの 3×3 の欄の場所に、同じ大きさで）。説明は液体と量。 */
-    private void drawTank(GuiGraphics g, int px, int py, int fluidIndex, int amountIndex, int capacity, String key) {
+    private void drawTank(GuiGraphicsExtractor g, int px, int py, int fluidIndex, int amountIndex, int capacity, String key) {
         int w = 3 * 18 - 2, h = 3 * 18 - 2;
         int fluidId = menu.value(fluidIndex);
         int amount = menu.value(amountIndex);
@@ -479,7 +479,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     /** 行き先の一覧: 名前と距離。選んだ行は光り、今の箱で届かない行は距離が赤い。 */
-    private void drawList(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawList(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = leftPos + DronePortMenu.LIST_X;
         int y = topPos + DronePortMenu.LIST_Y;
         int h = DronePortMenu.ROWS * DronePortMenu.ROW_H;
@@ -519,11 +519,11 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             }
             if (remote) {
                 // ワームホールの先の行き先の印（紫の渦）
-                g.drawString(font, "⦿", nx, ry + 3, selected ? skin.onAccent() : 0xFFB48CFF, false);
+                g.text(font, "⦿", nx, ry + 3, selected ? skin.onAccent() : 0xFFB48CFF, false);
                 nx += 9;
             }
             AndroidStationScreen.fit(g, font, placeName(menu.names().get(i), to), nx, ry + 3, x + textW - dw - 6 - nx, text);
-            g.drawString(font, dist, x + textW - dw - 2, ry + 3, reach ? text : GuiSkin.BAD, false);
+            g.text(font, dist, x + textW - dw - 2, ry + 3, reach ? text : GuiSkin.BAD, false);
             List<Component> tip = new ArrayList<>();
             tip.add(placeName(menu.names().get(i), to));
             tip.add(Component.translatable("gui.singulo.drone_port.target", to.getX(), to.getY(), to.getZ()).withStyle(st -> st.withColor(0xFF8A949E)));
@@ -549,7 +549,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         }
     }
 
-    private void drawButtons(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawButtons(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         boolean free = !overPopup(mouseX, mouseY);
         int[] s = sendRect();
         Panel.labelButton(g, font, skin, s[0], s[1], s[2], s[3], Component.translatable("gui.singulo.drone_port.send"),
@@ -582,7 +582,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     /** 自動発送: しきい値のボタン（押すたびに次へ）と登録のボタン。登録した行き先は、一覧の行の印とボタンの説明に出す。 */
-    private void drawAuto(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawAuto(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         boolean free = !overPopup(mouseX, mouseY);
         int mode = Mth.clamp(menu.value(DronePortBlockEntity.D_AUTO), 0, DronePortBlockEntity.AUTO_THRESHOLDS.length - 1);
         int threshold = DronePortBlockEntity.AUTO_THRESHOLDS[mode];
@@ -608,7 +608,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     /** 輸送中の便: 向きの印・相手の名前・進みのバー（荷降ろしが済むまで）・段階の短い言葉。 */
-    private void drawShipments(GuiGraphics g) {
+    private void drawShipments(GuiGraphicsExtractor g) {
         int x = leftPos + DronePortMenu.SHIP_X;
         int y = topPos + DronePortMenu.SHIP_Y;
         int h = DronePortMenu.SHIP_ROWS * DronePortMenu.SHIP_ROW + 2;
@@ -653,11 +653,11 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         if (!names.editing()) {
             AndroidStationScreen.fit(g, font, placeName(portName(), menu.pos()), titleLabelX, titleLabelY, titleWidth(), skin.text());
         }
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
     }
 
     // ------------------------------------------------------------------ 操作
@@ -680,7 +680,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         switch (names.key(keyCode, scanCode, modifiers)) {
             case 1 -> {
                 removeWidget(names.commit(menu.containerId));
@@ -694,13 +695,14 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 return true;
             }
             default -> {
-                return super.keyPressed(keyCode, scanCode, modifiers);
+                return super.keyPressed(event);
             }
         }
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dx, double dy) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (sides.drag(leftPos, topPos, mouseX, mouseY)) {
             return true;
         }
@@ -713,11 +715,12 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             }
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+        return super.mouseDragged(event, dx, dy);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (sides.release()) {
             return true;
         }
@@ -731,11 +734,12 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             cubePress = -1;
             return true;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         layoutPopups();
         // 窓の中のクリックは下の画面に届かない
         if (sides.open && (sides.clickChrome(mouseX, mouseY) || sides.contains(mouseX, mouseY))) {
@@ -750,7 +754,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 removeWidget(names.commit(menu.containerId));
                 return true;
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
         if (clickFrame(mouseX, mouseY, button)) {
             return true;
@@ -767,7 +771,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             return true;
         }
         if (menu.page() != DronePortMenu.PAGE_SEND) {
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
         int lx = leftPos + DronePortMenu.LIST_X;
         int ly = topPos + DronePortMenu.LIST_Y;
@@ -804,6 +808,6 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             }
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 }

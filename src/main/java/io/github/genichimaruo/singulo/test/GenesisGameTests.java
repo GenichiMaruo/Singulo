@@ -129,16 +129,16 @@ public final class GenesisGameTests {
         ItemStack held = new ItemStack(Items.DIAMOND, 3);
         menu.setCarried(held);
         menu.clicked(io.github.genichimaruo.singulo.genesis.GenesisCoreMenu.TEMPLATE_SLOT, 0,
-                net.minecraft.world.inventory.ClickType.PICKUP, player);
+                net.minecraft.world.inventory.ContainerInput.PICKUP, player);
         helper.assertTrue(core.template().is(Items.DIAMOND), "枠に置いた物が作る物になる");
         helper.assertTrue(menu.getCarried().getCount() == 3, "持っている物は減らない");
         menu.setCarried(ItemStack.EMPTY);
         menu.clicked(io.github.genichimaruo.singulo.genesis.GenesisCoreMenu.TEMPLATE_SLOT, 0,
-                net.minecraft.world.inventory.ClickType.PICKUP, player);
+                net.minecraft.world.inventory.ContainerInput.PICKUP, player);
         helper.assertTrue(core.template().isEmpty(), "素手でクリックすると外れる");
         menu.setCarried(new ItemStack(Items.BEDROCK));
         menu.clicked(io.github.genichimaruo.singulo.genesis.GenesisCoreMenu.TEMPLATE_SLOT, 0,
-                net.minecraft.world.inventory.ClickType.PICKUP, player);
+                net.minecraft.world.inventory.ContainerInput.PICKUP, player);
         helper.assertTrue(core.template().isEmpty(), "表にない物は置けない");
         core.chooseTemplate(player, new ItemStack(Items.EMERALD));
         // 壊すと記憶を宿した核が落ち、別の場所に置くと完成のまま

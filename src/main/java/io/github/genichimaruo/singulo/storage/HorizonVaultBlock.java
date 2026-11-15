@@ -4,14 +4,14 @@ import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,12 +26,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** 事象の地平線倉庫のブロック。正面（個数を出す台の向き）は置いた人のほう。使い方は {@link HorizonVaultBlockEntity}。 */
 public class HorizonVaultBlock extends BaseEntityBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<net.minecraft.core.Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** 下に倉庫があるか（積んだ倉庫は下の金の板をなくして、下の倉庫とつながった形になる）。 */
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty DOWN = BlockStateProperties.DOWN;
     private static final MapCodec<HorizonVaultBlock> CODEC = simpleCodec(HorizonVaultBlock::new);
@@ -70,30 +70,30 @@ public class HorizonVaultBlock extends BaseEntityBlock {
 
     /** 物を持って使う: 入れる（すばやく2回で、持ち物の同じ物を全部）。 */
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (stack.isEmpty()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (!(level.getBlockEntity(pos) instanceof HorizonVaultBlockEntity vault)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         // しまえない物を持っていても、すばやく2回使えば持ち物の同じ物を全部入れられる（手の物は入れない）
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             vault.insertFromPlayer(player, vault.accepts(stack) ? stack : ItemStack.EMPTY);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     /** 素手で使う: 1スタック取り出す（スニークなら1個）。 */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (level.getBlockEntity(pos) instanceof HorizonVaultBlockEntity vault && !level.isClientSide) {
+        if (level.getBlockEntity(pos) instanceof HorizonVaultBlockEntity vault && !level.isClientSide()) {
             if (player.isShiftKeyDown() || !vault.insertRemainingOnDoubleUse(player)) {
                 vault.takeForPlayer(player, player.isShiftKeyDown());
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -131,6 +131,6 @@ public class HorizonVaultBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.HORIZON_VAULT.get(), HorizonVaultBlockEntity::serverTick);
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.HORIZON_VAULT.get(), HorizonVaultBlockEntity::serverTick);
     }
 }

@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.storage;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
@@ -32,7 +32,7 @@ import net.neoforged.neoforge.items.IItemHandler;
  * </ul>
  * 見た目（中のブラックホールの大きさ・回る見本・正面の個数）はクライアントへ、変わったときだけ（10 tick に1回まで）送る。
  */
-public class HorizonVaultBlockEntity extends BlockEntity {
+public class HorizonVaultBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     /** しまえる個数（long の上限、約922京。事実上無制限）。 */
     public static final long CAPACITY = Long.MAX_VALUE;
     /** 見た目（中のブラックホールの大きさ・柱の光の帯）の目盛りの上端（1兆個でいっぱいに見える）。 */
@@ -236,7 +236,7 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         var held = input.get(SinguloComponents.VAULT_ITEM.get());
         ItemStack t = held == null ? ItemStack.EMPTY : held.copyOne();
@@ -271,8 +271,8 @@ public class HorizonVaultBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        type = tag.contains("type") ? ItemStack.parseOptional(registries, tag.getCompound("type")).copyWithCount(1) : ItemStack.EMPTY;
-        count = Math.max(0, Math.min(CAPACITY, tag.getLong("count")));
+        type = tag.contains("type") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("type")).copyWithCount(1) : ItemStack.EMPTY;
+        count = Math.max(0, Math.min(CAPACITY, tag.getLongOr("count", 0L)));
         if (type.isEmpty() || count <= 0) {
             type = ItemStack.EMPTY;
             count = 0;

@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.machine.ThermoelectricGeneratorBlockEntity;
 import io.github.genichimaruo.singulo.machine.ThermoelectricGeneratorMenu;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -68,19 +68,19 @@ public class ThermoelectricGeneratorScreen extends FramedScreen<ThermoelectricGe
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + barY(), 8, BAR_H)) {
-            g.renderComponentTooltip(font, Panel.energyLines(value(ThermoelectricGeneratorBlockEntity.D_ENERGY),
+            g.setComponentTooltipForNextFrame(font, Panel.energyLines(value(ThermoelectricGeneratorBlockEntity.D_ENERGY),
                     value(ThermoelectricGeneratorBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int capacity = Math.max(1, value(ThermoelectricGeneratorBlockEntity.D_CAPACITY));

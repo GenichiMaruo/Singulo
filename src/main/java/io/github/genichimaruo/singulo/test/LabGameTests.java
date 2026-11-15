@@ -175,7 +175,7 @@ public final class LabGameTests {
         helper.assertTrue(sizes.size() >= 10, "部屋の大きさの種類が少ない: " + sizes);
         StructureTemplate boss = template(helper, LabLayout.BOSS).orElseThrow();
         var caches = boss.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), SinguloBlocks.RUIN_CACHE.get());
-        helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null && "android_lab".equals(caches.get(0).nbt().getString("ruin")),
+        helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null && "android_lab".equals(caches.get(0).nbt().getStringOr("ruin", "")),
                 "ボス部屋に研究所の保管庫が1つない");
         helper.assertTrue(count(boss, SinguloBlocks.GUARDIAN_CORE.get()) == 1, "ボス部屋に封印核がない");
         helper.assertTrue(boss.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
@@ -359,13 +359,13 @@ public final class LabGameTests {
             var chests = t.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), net.minecraft.world.level.block.Blocks.CHEST);
             helper.assertFalse(chests.isEmpty(), room.getKey() + " にチェストがない");
             for (var info : chests) {
-                helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").equals(Singulo.MODID + ":chests/" + room.getValue()),
+                helper.assertTrue(info.nbt() != null && info.nbt().getStringOr("LootTable", "").equals(Singulo.MODID + ":chests/" + room.getValue()),
                         room.getKey() + " のチェストの中身が " + room.getValue() + " でない");
             }
         }
         for (var info : template(helper, "private_rooms").orElseThrow().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
                 net.minecraft.world.level.block.Blocks.BARREL)) {
-            helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").endsWith("chests/lab_locker"), "個室のロッカーが空");
+            helper.assertTrue(info.nbt() != null && info.nbt().getStringOr("LootTable", "").endsWith("chests/lab_locker"), "個室のロッカーが空");
         }
         helper.succeed();
     }

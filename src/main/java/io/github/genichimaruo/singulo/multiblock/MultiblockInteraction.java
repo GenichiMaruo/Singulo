@@ -24,7 +24,7 @@ public final class MultiblockInteraction {
             return;
         }
         event.setCanceled(true);
-        event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+        event.setCancellationResult(io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide()));
         if (event.getEntity() instanceof ServerPlayer player
                 && level.getBlockEntity(controller) instanceof AbstractMachineBlock.MenuOpener opener
                 && !opener.useItem(player, event.getItemStack(), event.getHand())) {

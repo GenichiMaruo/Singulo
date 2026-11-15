@@ -33,7 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * （どの受電器がいちばん近いかも同じ探索で決まる）。どの受電器も自分の受け持ちを払えるふつうの tick は、受電器の数だけの計算で済み、
  * パネルには触らない。電力が足りなくなったときや形が変わったときだけパネルを1枚ずつ見直し、状態が変わるパネルだけを書き換える。
  */
-public class GravityReceiverBlockEntity extends BlockEntity {
+public class GravityReceiverBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     /** 毎tick必要な電力の既定値（設定 gravityPanelPower）。 */
     public static final int DEFAULT_PER_PANEL = 40;
     /** レイリー散乱パネル1枚の電力（FE/t）。 */
@@ -552,7 +552,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
 
     @Override
     public void onChunkUnloaded() {
-        if (level != null && !level.isClientSide) onBroken(level);
+        if (level != null && !level.isClientSide()) onBroken(level);
         super.onChunkUnloaded();
     }
 
@@ -573,6 +573,6 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        stored = buffered() ? Math.max(0, tag.getLong("energy")) : 0;      // 受電器はためないので、前の分は持ち越さない
+        stored = buffered() ? Math.max(0, tag.getLongOr("energy", 0L)) : 0;      // 受電器はためないので、前の分は持ち越さない
     }
 }

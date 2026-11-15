@@ -5,11 +5,11 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.GravityDebris;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 
 /** 重力の澱の瓦礫: 回りながら飛ぶ建材の塊と、うしろに引く菫色の光。 */
@@ -19,7 +19,7 @@ public class GravityDebrisRenderer extends EntityRenderer<GravityDebris> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(GravityDebris entity) {
+    public Identifier getTextureLocation(GravityDebris entity) {
         return FxDraw.WHITE;
     }
 

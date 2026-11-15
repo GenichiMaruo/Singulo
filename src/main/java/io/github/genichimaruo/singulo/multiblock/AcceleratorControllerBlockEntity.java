@@ -87,7 +87,7 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
     @Override
     protected void onCrafted(Level level, MachineRecipe recipe) {
         double chance = MONOPOLE_CHANCE_AT_MAX * side / Structures.RING_MAX_SIDE;
-        if (level.random.nextDouble() < chance) {
+        if (level.getRandom().nextDouble() < chance) {
             insertOutput(new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("magnetic_monopole"))), false);
         }
         maybeLeakStrangelet(level);
@@ -99,11 +99,11 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
 
     private void maybeLeakStrangelet(Level level) {
         if (side < STRANGELET_MIN_SIDE || !io.github.genichimaruo.singulo.hazard.StrangeletBlockEntity.enabled()
-                || energy().getEnergyStored() >= energy().getMaxEnergyStored() / 5 || level.random.nextDouble() >= STRANGELET_CHANCE) {
+                || energy().getEnergyStored() >= energy().getMaxEnergyStored() / 5 || level.getRandom().nextDouble() >= STRANGELET_CHANCE) {
             return;
         }
         for (int i = 0; i < 16; i++) {
-            net.minecraft.core.BlockPos p = worldPosition.offset(level.random.nextInt(9) - 4, level.random.nextInt(3), level.random.nextInt(9) - 4);
+            net.minecraft.core.BlockPos p = worldPosition.offset(level.getRandom().nextInt(9) - 4, level.getRandom().nextInt(3), level.getRandom().nextInt(9) - 4);
             if (level.getBlockState(p).isAir()) {
                 level.setBlock(p, io.github.genichimaruo.singulo.registry.SinguloBlocks.STRANGELET.get().defaultBlockState(), 3);
                 io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, p, 32, "strangelet");

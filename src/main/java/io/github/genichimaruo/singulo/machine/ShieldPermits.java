@@ -34,8 +34,8 @@ public final class ShieldPermits {
 
     private static boolean deny(Level level, BlockPos pos, Player player) {
         if (ShieldTowerBlockEntity.locked(level, pos, player)) {
-            if (!level.isClientSide) {
-                player.displayClientMessage(Component.translatable("gui.singulo.shield.locked"), true);
+            if (!level.isClientSide()) {
+                player.sendOverlayMessage(Component.translatable("gui.singulo.shield.locked"));
             }
             return true;
         }

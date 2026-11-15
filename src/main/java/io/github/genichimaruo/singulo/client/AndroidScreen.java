@@ -5,8 +5,8 @@ import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.machine.GuiFrame;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Util;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -158,7 +158,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     private static final String[] PAGE_KEYS = {"gui.singulo.android.page.status", "gui.singulo.android.page.gear",
             "gui.singulo.android.page.decor", "gui.singulo.android.page.log"};
 
-    private void drawTabs(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawTabs(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         for (int p = 0; p < AndroidMenu.PAGES; p++) {
             int[] t = tabRect(p);
             boolean on = menu.page() == p;
@@ -177,7 +177,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** ページの絵（12×12 の中）: 様子はハート、装備はバックパック、装飾はリボン、記録は日誌。 */
-    private void pageIcon(GuiGraphics g, int x, int y, int page, boolean on) {
+    private void pageIcon(GuiGraphicsExtractor g, int x, int y, int page, boolean on) {
         int ink = on ? skin.onAccent() : skin.text();
         int tint = on ? skin.onAccent() : GuiSkin.mix(skin.accent(), 0xFF3C4350, 0.4F);
         switch (page) {
@@ -216,14 +216,15 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (names.editing()) {
             EditBox box = names.box();
             if (box != null && !box.isMouseOver(mouseX, mouseY)) {
                 removeWidget(names.commit(menu.containerId));
                 return true;
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
         int[] r = resetRect();
         if (named() && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
@@ -293,11 +294,12 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         switch (names.key(keyCode, scanCode, modifiers)) {
             case 1 -> {
                 removeWidget(names.commit(menu.containerId));
@@ -311,21 +313,21 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                 return true;
             }
             default -> {
-                return super.keyPressed(keyCode, scanCode, modifiers);
+                return super.keyPressed(event);
             }
         }
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         // アイテムの説明が出ている間は、ほかの説明を重ねない
         if (hoveredSlot != null && hoveredSlot.hasItem() || renderStatTooltips(g, mouseX, mouseY) || !menu.getCarried().isEmpty()) {
             return;
         }
         if (!names.editing() && overName(mouseX, mouseY)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
             return;
         }
         // 隠し機能: Shift を押しながら姿の絵に重ねると、髪のメインの色（付け毛と同じ。染色台で色を合わせるのに使う）
@@ -333,7 +335,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         if (shown != null && hasShiftDown()
                 && Panel.inside(mouseX, mouseY, leftPos + PORTRAIT_X, topPos + PORTRAIT_Y, PORTRAIT_W, PORTRAIT_H)) {
             int hair = AndroidRenderer.Accessories.hairColor(shown.kind());
-            g.renderTooltip(font, Component.literal("\u25A0 ").withStyle(st -> st.withColor(hair))
+            g.setTooltipForNextFrame(font, Component.literal("\u25A0 ").withStyle(st -> st.withColor(hair))
                     .append(Component.translatable("gui.singulo.android.hair_color", String.format("#%06X", hair))
                             .withStyle(st -> st.withColor(0xFFFFFFFF))), mouseX, mouseY);
             return;
@@ -343,7 +345,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         }
     }
 
-    private void renderTankTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderTankTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         RuinAndroid android = menu.android();
         for (TankRow row : android == null ? List.<TankRow>of() : tankRows()) {
             for (int i = 0; i < RuinAndroid.TANKS; i++) {
@@ -365,11 +367,11 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                     }
                     lines.add(Component.translatable(menu.working() ? "gui.singulo.android.tank.locked"
                             : row.chem() ? "gui.singulo.android.chem.hint" : "gui.singulo.android.tank.hint").withStyle(net.minecraft.ChatFormatting.GRAY));
-                    g.renderComponentTooltip(font, lines, mouseX, mouseY);
+                    g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
                     return;
                 }
                 if (Panel.inside(mouseX, mouseY, tx + BAR_W + 1, topPos + row.y(), CLEAR_W, row.h())) {
-                    g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.tank.clear"), 160), mouseX, mouseY);
+                    g.setTooltipForNextFrame(font, font.split(Component.translatable("gui.singulo.android.tank.clear"), 160), mouseX, mouseY);
                     return;
                 }
             }
@@ -379,12 +381,12 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     // ------------------------------------------------------------------ 描画
 
     /** 区切りの薄い面（色を少しだけ差した、わずかに凹んだ板）。 */
-    private void section(GuiGraphics g, int x, int y, int w, int h) {
+    private void section(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         Panel.inset(g, skin, leftPos + x, topPos + y, w, h, GuiSkin.mix(skin.face(), skin.accent(), 0.08F));
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         skin = GuiSkin.android(accent());
         clearStats();
         drawFrame(g, mouseX, mouseY);
@@ -427,7 +429,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** 様子のページ: 体力・電池・動き方・装甲（数は重ねると出る）と、修理・装甲板のスロット、解体のボタン。 */
-    private void renderStatus(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderStatus(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
         int hp = menu.value(AndroidMenu.D_HP);
@@ -460,7 +462,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             area(MODE_X, MODE_Y, MODE_W, MODE_H, List.of(Component.translatable("gui.singulo.android.follow.hint")));
         }
         shield(g, x + RIGHT_X + 84, y + MODE_Y + 2, skin.outline());
-        g.drawString(font, String.valueOf(menu.value(AndroidMenu.D_ARMOR)), x + RIGHT_X + 97, y + MODE_Y + 3, skin.text(), false);
+        g.text(font, String.valueOf(menu.value(AndroidMenu.D_ARMOR)), x + RIGHT_X + 97, y + MODE_Y + 3, skin.text(), false);
         area(RIGHT_X + 82, MODE_Y, 28, MODE_H, List.of(Component.translatable("gui.singulo.android.armor")));
         // 修理キット・装甲板（空のときは見本）
         Slot repair = menu.getSlot(RuinAndroid.SLOT_REPAIR);
@@ -488,7 +490,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** 装備と持ち物のページ: アップグレードの列、作業のオン／オフ、バックパック（ないときは覆う）、持ち物の列。 */
-    private void renderGear(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderGear(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
         section(g, 5, 21, 46, 70);
@@ -565,7 +567,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** タンク: 中身そのものの絵で、入っている割合まで（流れるアニメーションも動く）。液体と化学物質（Mekanism）の段。 */
-    private void drawTanks(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawTanks(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         RuinAndroid android = menu.android();
         for (TankRow row : android == null ? List.<TankRow>of() : tankRows()) {
             int ty = topPos + row.y(), th = row.h();
@@ -608,7 +610,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** 姿の枠: アンドロイドの姿（マウスの方を向く）と、下の吹き出し。 */
-    private void portrait(GuiGraphics g, int mouseX, int mouseY) {
+    private void portrait(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int px = leftPos + PORTRAIT_X;
         int py = topPos + PORTRAIT_Y;
         Panel.inset(g, skin, px - 1, py - 1, PORTRAIT_W + 2, PORTRAIT_H + 2, skin.face());
@@ -633,11 +635,11 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         if (!names.editing()) {
             AndroidStationScreen.fit(g, font, name(), titleLabelX, titleLabelY, titleWidth(), skin.text());
         }
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
         if (gearPage()) {
             return;
         }
@@ -681,7 +683,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         }
     }
 
-    private void speech(GuiGraphics g, Component text, int color) {
+    private void speech(GuiGraphicsExtractor g, Component text, int color) {
         AndroidStationScreen.fitCentered(g, font, text, PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13, PORTRAIT_W - 8, color);
     }
 
@@ -728,7 +730,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
      * 電池（60×12 と右の太い＋極）。濃い紺の縁と暗い窓に、水色から青の丸いブロック5つで残りを出す
      * （最後のブロックは途中まで。2割を切るとピンク）。角を丸め、左上にきらめき。
      */
-    private void battery(GuiGraphics g, int x, int y, int charge) {
+    private void battery(GuiGraphicsExtractor g, int x, int y, int charge) {
         int edge = 0xFF2A3F66;
         // 縁（角を1px落とす）と、太めの＋極
         g.fill(x + 1, y, x + 59, y + 12, edge);
@@ -764,14 +766,14 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** 小さな星（5×5）。 */
-    private static void star(GuiGraphics g, int x, int y, int color) {
+    private static void star(GuiGraphicsExtractor g, int x, int y, int color) {
         g.fill(x + 2, y, x + 3, y + 5, color);
         g.fill(x, y + 2, x + 5, y + 3, color);
         g.fill(x + 1, y + 1, x + 4, y + 4, color);
     }
 
     /** ドット絵のハート（9×8）。fill の割合だけ左から赤く塗る。 */
-    private static void heart(GuiGraphics g, int x, int y, float fill) {
+    private static void heart(GuiGraphicsExtractor g, int x, int y, float fill) {
         int[] rows = {0b011000110, 0b111101111, 0b111111111, 0b111111111, 0b011111110, 0b001111100, 0b000111000, 0b000010000};
         for (int r = 0; r < rows.length; r++) {
             for (int c = 0; c < 9; c++) {
@@ -786,7 +788,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** 盾の形（装甲の値の目印）。 */
-    private static void shield(GuiGraphics g, int x, int y, int color) {
+    private static void shield(GuiGraphicsExtractor g, int x, int y, int color) {
         g.fill(x, y, x + 9, y + 7, color);
         g.fill(x + 1, y + 7, x + 8, y + 9, color);
         g.fill(x + 3, y + 9, x + 6, y + 11, color);
@@ -795,7 +797,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     }
 
     /** つるはし（作業のトグル、9×8）。 */
-    private static void pickaxe(GuiGraphics g, int x, int y, int color) {
+    private static void pickaxe(GuiGraphicsExtractor g, int x, int y, int color) {
         Panel.sprite(g, x, y, new String[]{".xxxxxxx.", "x...x...x", "....x....", "....x....", "....x....", "....x....", "....x...."}, color);
     }
 }

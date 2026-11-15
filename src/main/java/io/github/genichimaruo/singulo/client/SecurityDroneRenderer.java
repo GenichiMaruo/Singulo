@@ -13,13 +13,13 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 /**
@@ -28,11 +28,11 @@ import net.minecraft.util.Mth;
  */
 public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDroneRenderer.Model> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Singulo.id("security_drone"), "main");
-    private static final ResourceLocation TEXTURE = Singulo.id("textures/entity/security_drone.png");
+    private static final Identifier TEXTURE = Singulo.id("textures/entity/security_drone.png");
     private static final RenderType[] GLOW = {
-            RenderType.eyes(Singulo.id("textures/entity/security_drone_glow_1.png")),
-            RenderType.eyes(Singulo.id("textures/entity/security_drone_glow_2.png")),
-            RenderType.eyes(Singulo.id("textures/entity/security_drone_glow_3.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/security_drone_glow_1.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/security_drone_glow_2.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/security_drone_glow_3.png")),
     };
 
     public SecurityDroneRenderer(EntityRendererProvider.Context context) {
@@ -41,7 +41,7 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
     }
 
     @Override
-    public ResourceLocation getTextureLocation(SecurityDrone drone) {
+    public Identifier getTextureLocation(SecurityDrone drone) {
         return TEXTURE;
     }
 

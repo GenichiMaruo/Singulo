@@ -172,7 +172,7 @@ public class AndroidStationMenu extends AbstractContainerMenu {
                 for (AndroidStationBlockEntity s : AndroidStationBlockEntity.nearby(player.level(), pos, AndroidStationBlockEntity.RECALL_ALL_RANGE, player)) {
                     n += s.recallAll();
                 }
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("gui.singulo.android_station.recall_all.done", n), true);
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("gui.singulo.android_station.recall_all.done", n));
                 return true;
             }
             station.press(id);

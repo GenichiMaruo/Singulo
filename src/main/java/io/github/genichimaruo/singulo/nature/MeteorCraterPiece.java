@@ -66,7 +66,7 @@ public class MeteorCraterPiece extends StructurePiece {
     }
 
     public MeteorCraterPiece(StructurePieceSerializationContext context, CompoundTag tag) {
-        this(new BlockPos(tag.getInt("cx"), tag.getInt("cy"), tag.getInt("cz")), tag.getLong("seed"));
+        this(new BlockPos(tag.getIntOr("cx", 0), tag.getIntOr("cy", 0), tag.getIntOr("cz", 0)), tag.getLongOr("seed", 0L));
     }
 
     private static BoundingBox box(BlockPos c) {

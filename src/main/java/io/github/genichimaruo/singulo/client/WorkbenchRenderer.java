@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 /**
  * アンドロイド作業台: 預かり箱に物がたまっている間、台の上にその物を浮かべて回す（右クリックで受け取れる、の目印）。
  */
-public class WorkbenchRenderer implements BlockEntityRenderer<AndroidWorkbenchBlockEntity> {
+public class WorkbenchRenderer extends SnapshotBlockRenderer<AndroidWorkbenchBlockEntity> {
     private final BlockEntityRendererProvider.Context context;
 
     public WorkbenchRenderer(BlockEntityRendererProvider.Context context) {

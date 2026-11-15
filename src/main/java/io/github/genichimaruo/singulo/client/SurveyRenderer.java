@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ final class SurveyRenderer {
         PoseStack pose = event.getPoseStack();
         Vec3 cam = event.getCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        VertexConsumer lines = buffers.getBuffer(RenderType.lines());
+        VertexConsumer lines = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
         for (InteractionHand hand : InteractionHand.values()) {
@@ -67,7 +67,7 @@ final class SurveyRenderer {
             }
         }
         pose.popPose();
-        buffers.endBatch(RenderType.lines());
+        buffers.endBatch(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
     }
 
     /** ブロックの範囲を、枠を描く箱にする（少しだけ外へ広げて、ブロックの面と重ならないように）。 */

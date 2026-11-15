@@ -6,12 +6,12 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.GravityRemnant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -37,7 +37,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(GravityRemnant entity) {
+    public Identifier getTextureLocation(GravityRemnant entity) {
         return FxDraw.WHITE;
     }
 
@@ -65,7 +65,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         pose.pushPose();
         pose.translate(0, cy, 0);
         if (r > 0.02F) {
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
             // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
             glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, r * 3.4F, RIM, (int) (150 * grow));
@@ -156,7 +156,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
                 pose.scale(0.38F, 0.38F, 0.38F);
                 pose.translate(-0.5, -0.5, -0.5);
                 blocks.renderSingleBlock(net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN.defaultBlockState(), pose, buffers,
-                        net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                        net.minecraft.util.LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
                 pose.popPose();
             }
             VertexConsumer g = GlowDepth.of(buffers, FxDraw.WHITE);

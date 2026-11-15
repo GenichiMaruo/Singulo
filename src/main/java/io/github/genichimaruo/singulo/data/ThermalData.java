@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import io.github.genichimaruo.singulo.Singulo;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -36,7 +36,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
         Map<Block, Hot> newHot = new HashMap<>();
         Map<Block, Cold> newCold = new HashMap<>();
         files.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(file -> {
@@ -52,7 +52,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
                 if (root.has("cold")) {
                     for (JsonElement e : root.getAsJsonArray("cold")) {
                         JsonObject o = e.getAsJsonObject();
-                        Block becomes = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(o.get("becomes").getAsString()));
+                        Block becomes = BuiltInRegistries.BLOCK.get(Identifier.parse(o.get("becomes").getAsString()));
                         block(o).ifPresent(b -> newCold.put(b, new Cold(o.get("temperature").getAsInt(),
                                 o.get("tolerance").getAsInt(), becomes)));
                     }
@@ -66,7 +66,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
     }
 
     private static java.util.Optional<Block> block(JsonObject o) {
-        return BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse(o.get("block").getAsString()));
+        return BuiltInRegistries.BLOCK.getOptional(Identifier.parse(o.get("block").getAsString()));
     }
 
     @Nullable

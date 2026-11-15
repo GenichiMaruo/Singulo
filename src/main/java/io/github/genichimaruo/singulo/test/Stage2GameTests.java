@@ -311,7 +311,7 @@ public final class Stage2GameTests {
         old.setStackInSlot(5, new ItemStack(item("muon_catalyst"), 2));
         old.setStackInSlot(6, new ItemStack(item("monopole_upgrade")));
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        tag.put("items", old.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(old, registries));
         reactor.loadCustomOnly(tag, registries);
         helper.assertTrue(reactor.items().getStackInSlot(0).getCount() == 3, "入力が残らない");
         helper.assertTrue(reactor.items().getStackInSlot(5).is(item("muon_catalyst")), "出力が1つめの出口に残らない");

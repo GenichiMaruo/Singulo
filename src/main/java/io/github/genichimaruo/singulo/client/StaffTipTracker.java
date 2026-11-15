@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.genichimaruo.singulo.Singulo;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.ModelIdentifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
@@ -41,7 +41,7 @@ public final class StaffTipTracker {
     /** モデルの読み込みのあと、杖のモデルを包んで、描く位置を覚えられるようにする。 */
     static void wrapModel(ModelEvent.ModifyBakingResult event) {
         for (var e : TIPS.entrySet()) {
-            ModelResourceLocation key = ModelResourceLocation.inventory(Singulo.id(e.getKey()));
+            ModelIdentifier key = ModelIdentifier.inventory(Singulo.id(e.getKey()));
             BakedModel original = event.getModels().get(key);
             if (original != null) {
                 event.getModels().put(key, new Tracking(original, e.getValue()[0], e.getValue()[1]));

@@ -15,13 +15,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -50,7 +50,7 @@ public class HandbookScreen extends Screen {
 
     /** 本文の1行（色つき）。 */
     /** 本文の1行。link があれば、押すとそのページへ移る（"章のid/ページのid"）。 */
-    private record Line(Component text, int color, @javax.annotation.Nullable String link) {
+    private record Line(Component text, int color, @org.jspecify.annotations.Nullable String link) {
         Line(Component text, int color) {
             this(text, color, null);
         }
@@ -69,7 +69,7 @@ public class HandbookScreen extends Screen {
 
     private final List<Chapter> chapters = new ArrayList<>();
     /** 検索欄（文字があれば、左の一覧は章の代わりに、合うページの一覧になる）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private net.minecraft.client.gui.components.EditBox searchBox;
     /** 検索で合ったページ（章の番号・ページの番号。よく合う順）。 */
     private final List<int[]> results = new ArrayList<>();
@@ -91,7 +91,7 @@ public class HandbookScreen extends Screen {
     }
 
     /** 開いたときに探す物の名前（なければ null）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private String focus;
 
     /**
@@ -236,7 +236,7 @@ public class HandbookScreen extends Screen {
     }
 
     private static ItemStack icon(String id) {
-        ResourceLocation rl = ResourceLocation.tryParse(id);
+        Identifier rl = Identifier.tryParse(id);
         return rl == null ? new ItemStack(Items.BOOK) : new ItemStack(BuiltInRegistries.ITEM.get(rl));
     }
 
@@ -367,10 +367,10 @@ public class HandbookScreen extends Screen {
     // ------------------------------------------------------------------ 描画
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         Panel.background(g, left, top, W, H);
-        g.drawString(font, title, left + 8, top + 7, Panel.TEXT, false);
+        g.text(font, title, left + 8, top + 7, Panel.TEXT, false);
         drawSupport(g, mouseX, mouseY);
         // 検索欄と、章の一覧（検索しているときは、合うページの一覧）
         Panel.well(g, left + 6, top + 20, LIST_W, SEARCH_H - 2);
@@ -391,16 +391,16 @@ public class HandbookScreen extends Screen {
             } else if (hover) {
                 g.fill(left + 6, y, left + 6 + LIST_W, y + ROW, 0xFF4A535C);
             }
-            g.pose().pushPose();
-            g.pose().translate(left + 8, y + 2, 0);
-            g.pose().scale(0.75F, 0.75F, 1);
-            g.renderItem(c.icon, 0, 0);
-            g.pose().popPose();
+            g.pose().pushMatrix();
+            g.pose().translate(left + 8, y + 2);
+            g.pose().scale(0.75F, 0.75F);
+            g.item(c.icon, 0, 0);
+            g.pose().popMatrix();
             String label = searching() ? c.pages.get(results.get(i)[1]).title().getString() : c.title.getString();
-            g.drawString(font, font.plainSubstrByWidth(label, LIST_W - 22), left + 22, y + 4, 0xFFECEEF0, false);
+            g.text(font, font.plainSubstrByWidth(label, LIST_W - 22), left + 22, y + 4, 0xFFECEEF0, false);
         }
         if (searching() && results.isEmpty()) {
-            g.drawString(font, font.plainSubstrByWidth(Component.translatable("gui.singulo.handbook.search.none").getString(), LIST_W - 8),
+            g.text(font, font.plainSubstrByWidth(Component.translatable("gui.singulo.handbook.search.none").getString(), LIST_W - 8),
                     left + 10, listTop + 4, 0xFFBFC8D0, false);
         }
         g.disableScissor();
@@ -410,7 +410,7 @@ public class HandbookScreen extends Screen {
         Page p = c.pages.get(page);
         int px = left + LIST_W + 14;
         int pw = W - LIST_W - 22;
-        g.drawString(font, p.title, px, top + 22, 0xFF1E5A73, false);
+        g.text(font, p.title, px, top + 22, 0xFF1E5A73, false);
         g.fill(px, top + 33, px + pw, top + 34, Panel.SEAM);
         int bodyTop = top + 38;
         int bodyH = H - 38 - 22;
@@ -425,7 +425,7 @@ public class HandbookScreen extends Screen {
                     && mouseY >= bodyTop && mouseY < bodyTop + bodyH;
             Component text = link ? line.text.copy().withStyle(hover ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) : line.text;
             for (FormattedCharSequence seq : font.split(text, pw)) {
-                g.drawString(font, seq, px, y, hover ? 0xFF1E5A73 : line.color, false);
+                g.text(font, seq, px, y, hover ? 0xFF1E5A73 : line.color, false);
                 y += 10;
             }
             if (link) {
@@ -433,7 +433,7 @@ public class HandbookScreen extends Screen {
             }
             y += 3;
         }
-        float animation = (net.minecraft.Util.getMillis() % 800_000L) / 50F;
+        float animation = (net.minecraft.util.Util.getMillis() % 800_000L) / 50F;
         for (SupporterCredits.Entry supporter : p.supporters) {
             SupporterPlaque.draw(g, font, supporter, px, y, pw - 2, SupporterPlaque.HEIGHT, animation);
             if (Panel.inside(mouseX, mouseY, px, y, pw - 2, SupporterPlaque.HEIGHT)
@@ -446,11 +446,11 @@ public class HandbookScreen extends Screen {
         // ページ送り
         int navY = top + H - 18;
         String count = Component.translatable("gui.singulo.handbook.page", page + 1, c.pages.size()).getString();
-        g.drawCenteredString(font, count, px + pw / 2, navY + 2, Panel.TEXT);
+        g.centeredText(font, count, px + pw / 2, navY + 2, Panel.TEXT);
         drawArrow(g, px + pw / 2 - 40, navY, "<", page > 0, mouseX, mouseY);
         drawArrow(g, px + pw / 2 + 28, navY, ">", page < c.pages.size() - 1, mouseX, mouseY);
         if (hoveredSupporter != null) {
-            g.renderTooltip(font, font.split(SupporterPlaque.tooltip(hoveredSupporter), 220), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(SupporterPlaque.tooltip(hoveredSupporter), 220), mouseX, mouseY);
         }
     }
 
@@ -460,7 +460,7 @@ public class HandbookScreen extends Screen {
         return new int[]{left + W - 6 - w, top + 4, w, 12};
     }
 
-    private void drawSupport(GuiGraphics g, int mx, int my) {
+    private void drawSupport(GuiGraphicsExtractor g, int mx, int my) {
         int[] b = supportPos();
         boolean hover = Panel.inside(mx, my, b[0], b[1], b[2], b[3]);
         g.fill(b[0], b[1], b[0] + b[2], b[1] + b[3], hover ? 0xFFFF7A86 : 0xFFE8D6D8);
@@ -473,28 +473,29 @@ public class HandbookScreen extends Screen {
         g.fill(hx, hy + 1, hx + 5, hy + 3, c);
         g.fill(hx + 1, hy + 3, hx + 4, hy + 4, c);
         g.fill(hx + 2, hy + 4, hx + 3, hy + 5, c);
-        g.drawString(font, Component.translatable("gui.singulo.handbook.support"), b[0] + 11, b[1] + 2,
+        g.text(font, Component.translatable("gui.singulo.handbook.support"), b[0] + 11, b[1] + 2,
                 hover ? 0xFFFFFFFF : 0xFF8A3A44, false);
         if (hover) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.handbook.support_hint"), mx, my);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.handbook.support_hint"), mx, my);
         }
     }
 
-    private void drawArrow(GuiGraphics g, int x, int y, String s, boolean enabled, int mx, int my) {
+    private void drawArrow(GuiGraphicsExtractor g, int x, int y, String s, boolean enabled, int mx, int my) {
         int color = !enabled ? Panel.SEAM : Panel.inside(mx, my, x, y, 12, 12) ? Panel.GLOW : Panel.TEXT;
         g.fill(x, y, x + 12, y + 12, enabled ? Panel.SHADE : Panel.BACKGROUND);
-        g.drawCenteredString(font, s, x + 6, y + 2, color);
+        g.centeredText(font, s, x + 6, y + 2, color);
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         renderTransparentBackground(g);
     }
 
     // ------------------------------------------------------------------ 操作
 
     @Override
-    public boolean mouseClicked(double mx, double my, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mx = event.x(), my = event.y(); int button = event.button();
         int[] b = supportPos();
         if (Panel.inside(mx, my, b[0], b[1], b[2], b[3])) {
             net.minecraft.client.gui.screens.ConfirmLinkScreen.confirmLinkNow(this, SUPPORT_URL);
@@ -548,7 +549,7 @@ public class HandbookScreen extends Screen {
             select(chapter, page + 1);
             return true;
         }
-        return super.mouseClicked(mx, my, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -576,7 +577,8 @@ public class HandbookScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int key, int scan, int mods) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key(), scan = event.scancode(), mods = event.modifiers();
         if (searchBox != null && searchBox.isFocused() && key != 256) {
             return searchBox.keyPressed(key, scan, mods) || searchBox.canConsumeInput();   // 打っている間は、ページ送りや画面を閉じるキーにしない
         }
@@ -588,7 +590,7 @@ public class HandbookScreen extends Screen {
             select(chapter, page - 1);
             return true;
         }
-        return super.keyPressed(key, scan, mods);
+        return super.keyPressed(event);
     }
 
     private void select(int c, int p) {

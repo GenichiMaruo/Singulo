@@ -29,7 +29,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 毎tick、触媒のティアと残量から効き方と必要電力を決め、触媒を1 tick ぶん（×消費倍率）減らす。
  * 必要電力が足りないと不完全反応で減りが速くなり、まったくなければ止まる。使い切ると失活触媒が残る。
  */
-public abstract class CatalystDeviceBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public abstract class CatalystDeviceBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
     /**
      * STANDBY: 発電機の蓄電がいっぱいなので待機中（燃料・触媒を使わない）。LIMITED: 持ち主のアンカーが上限に達している。
      * 番号で同期するので、新しい値は後ろに足す。
@@ -41,7 +41,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         WORLDLINE_ANCHOR, INERTIAL_STABILIZER, QUANTUM_HEAT_ENGINE, DEGENERATE_FURNACE, PROBE_STATION, SHIELD_TOWER, TIPLER_CYLINDER;
 
         /** 触媒のほかにもう1つあるスロットの名前（燃料・許可証）。なければ null。 */
-        @javax.annotation.Nullable
+        @org.jspecify.annotations.Nullable
         public String extraSlot() {
             return switch (this) {
                 case DEGENERATE_FURNACE, TIPLER_CYLINDER -> "gui.singulo.slot.fuel";
@@ -174,7 +174,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     /** 動ける状態でなければその理由（未形成・燃料なしなど）。動けるなら null。触媒は減らない。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     protected Status readiness(ServerLevel level) {
         return null;
     }
@@ -205,7 +205,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     /**
      * 触媒も電力も使わずに動く場合の効き方（シンギュラリティ・コアを埋め込んだアンカー）。普通は null。
      */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     protected CatalystHelper.Effect permanentEffect() {
         return null;
     }
@@ -342,9 +342,9 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("catalyst", slot.serializeNBT(registries));
+        tag.put("catalyst", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(slot, registries));
         tag.put("magazine", magazine.save(registries));
-        tag.put("spent", spent.serializeNBT(registries));
+        tag.put("spent", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(spent, registries));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("wear", wear);
         tag.putBoolean("enabled", enabled);
@@ -353,11 +353,11 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        slot.deserializeNBT(registries, tag.getCompound("catalyst"));
-        magazine.load(tag.getCompound("magazine"), registries);
-        spent.deserializeNBT(registries, tag.getCompound("spent"));
-        energy.setEnergy(tag.getInt("energy"));
-        wear = tag.getDouble("wear");
-        enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(slot, registries, tag.getCompoundOrEmpty("catalyst"));
+        magazine.load(tag.getCompoundOrEmpty("magazine"), registries);
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(spent, registries, tag.getCompoundOrEmpty("spent"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        wear = tag.getDoubleOr("wear", 0.0D);
+        enabled = !tag.contains("enabled") || tag.getBooleanOr("enabled", false);
     }
 }

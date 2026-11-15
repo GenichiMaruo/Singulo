@@ -19,7 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.Block;
 @JeiPlugin
 public class SinguloJeiPlugin implements IModPlugin {
     static final Map<MachineType, RecipeType<MachineRecipe>> TYPES = new EnumMap<>(MachineType.class);
-    static final Map<MachineRecipe, ResourceLocation> RECIPE_IDS = new java.util.IdentityHashMap<>();
+    static final Map<MachineRecipe, Identifier> RECIPE_IDS = new java.util.IdentityHashMap<>();
     /** 降着ジェット鍛造炉のレシピ（同じ singulo:machine のレシピで、station が accretion_jet_forge のもの）。 */
     static final RecipeType<MachineRecipe> JET_FORGE = RecipeType.create(Singulo.MODID, "accretion_jet_forge", MachineRecipe.class);
     static final RecipeType<MachineRecipe> TIDAL_SPINDLE = RecipeType.create(Singulo.MODID, "tidal_spindle", MachineRecipe.class);
@@ -44,7 +44,7 @@ public class SinguloJeiPlugin implements IModPlugin {
     }
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return Singulo.id("jei");
     }
 
@@ -148,7 +148,7 @@ public class SinguloJeiPlugin implements IModPlugin {
             }
         }
         for (Item item : BuiltInRegistries.ITEM) {
-            ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+            Identifier id = BuiltInRegistries.ITEM.getKey(item);
             if (!Singulo.MODID.equals(id.getNamespace())) {
                 continue;
             }

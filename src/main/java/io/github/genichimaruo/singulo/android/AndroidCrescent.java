@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -66,7 +66,7 @@ public class AndroidCrescent extends Entity {
         super.tick();
         Vec3 from = position();
         Vec3 to = from.add(getDeltaMovement());
-        if (!level().isClientSide && level() instanceof ServerLevel level) {
+        if (!level().isClientSide() && level() instanceof ServerLevel level) {
             if (level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType()
                     != HitResult.Type.MISS || tickCount * SPEED > RANGE) {
                 discard();
@@ -97,8 +97,12 @@ public class AndroidCrescent extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {}
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {}
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        values.store(tag);
+    }
 }

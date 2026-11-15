@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.genichimaruo.singulo.machine.MachineBlock;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineType;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -46,7 +46,7 @@ public class MultiblockControllerBlock extends MachineBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> beType) {
-        return level.isClientSide ? null : withBoost((l, p, s, be) -> {
+        return level.isClientSide() ? null : withBoost((l, p, s, be) -> {
             if (be instanceof MachineBlockEntity machine) {
                 MachineBlockEntity.serverTick(l, p, s, machine);
             }

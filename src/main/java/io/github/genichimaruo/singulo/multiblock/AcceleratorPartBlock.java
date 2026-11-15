@@ -48,7 +48,7 @@ public class AcceleratorPartBlock extends PartBlock {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
         super.onPlace(state, level, pos, oldState, moved);
-        if (!level.isClientSide && !oldState.is(state.getBlock())) {
+        if (!level.isClientSide() && !oldState.is(state.getBlock())) {
             level.scheduleTick(pos, this, 1);
         }
     }

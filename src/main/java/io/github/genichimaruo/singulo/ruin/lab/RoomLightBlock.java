@@ -35,7 +35,7 @@ public class RoomLightBlock extends Block {
 
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos from, boolean moving) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
         boolean powered = level.hasNeighborSignal(pos);

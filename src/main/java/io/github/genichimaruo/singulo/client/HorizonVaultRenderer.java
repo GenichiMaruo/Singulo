@@ -6,9 +6,9 @@ import io.github.genichimaruo.singulo.storage.HorizonVaultBlock;
 import io.github.genichimaruo.singulo.storage.HorizonVaultBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
  * 事象の地平線倉庫の中: ガラスの室の真ん中に浮かぶ小さなブラックホール（入っている量の桁で大きくなる）と、その周りを回る橙の降着円盤、
  * 円盤の上を回りながら吸い込まれていく、しまっている物の見本。正面の台に個数（K・M・G で短く）を出す。空なら、かすかな光の点だけ。
  */
-public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlockEntity> {
+public class HorizonVaultRenderer extends SnapshotBlockRenderer<HorizonVaultBlockEntity> {
     /** 室の中心（ブロック）。 */
     private static final float CY = 9.5F / 16;
     private final Font font;
@@ -48,7 +48,7 @@ public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlo
             return;
         }
         // 影の球（黒）と、少し傾いて回る降着円盤（加算の光）
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, LightTexture.FULL_BRIGHT);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, LightCoordsUtil.FULL_BRIGHT);
         pose.pushPose();
         pose.mulPose(Axis.ZP.rotationDegrees(18));
         pose.mulPose(Axis.YP.rotationDegrees(time * 90));
@@ -75,7 +75,7 @@ public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlo
             pose.mulPose(Axis.YP.rotationDegrees(time * 120));
             float s = 0.14F * (0.6F + 0.4F * spiral);
             pose.scale(s, s, s);
-            Minecraft.getInstance().getItemRenderer().renderStatic(type, ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT,
+            Minecraft.getInstance().getItemRenderer().renderStatic(type, ItemDisplayContext.FIXED, LightCoordsUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, pose, buffers, be.getLevel(), (int) be.getBlockPos().asLong());
             pose.popPose();
         }
@@ -102,9 +102,9 @@ public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlo
             float px = c[0] - sx / 16F, pz = c[1] - sz / 16F;
             float fx = c[0] + sx * e, fz = c[1] + sz * e;
             FxDraw.box(pose, glow, Math.min(fx, fx + sx * t), y0, pz - w / 2, Math.max(fx, fx + sx * t), y1, pz + w / 2,
-                    LightTexture.FULL_BRIGHT, 0xA070FF, 200);
+                    LightCoordsUtil.FULL_BRIGHT, 0xA070FF, 200);
             FxDraw.box(pose, glow, px - w / 2, y0, Math.min(fz, fz + sz * t), px + w / 2, y1, Math.max(fz, fz + sz * t),
-                    LightTexture.FULL_BRIGHT, 0xA070FF, 200);
+                    LightCoordsUtil.FULL_BRIGHT, 0xA070FF, 200);
         }
     }
 
@@ -130,7 +130,7 @@ public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlo
             pose.pushPose();
             pose.translate(3.8F / 16, 0, 0);
             pose.scale(1.4F / 16, 1.4F / 16, 0.002F);
-            Minecraft.getInstance().getItemRenderer().renderStatic(type, ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT,
+            Minecraft.getInstance().getItemRenderer().renderStatic(type, ItemDisplayContext.GUI, LightCoordsUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, pose, buffers, be.getLevel(), 0);
             pose.popPose();
         }
@@ -138,7 +138,7 @@ public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlo
         pose.scale(s, -s, s);
         float shift = type.isEmpty() ? 0 : -0.9F / 16 / s;
         font.drawInBatch(text, -font.width(text) / 2F + shift, -4, 0xFFE8C070, false, pose.last().pose(), buffers,
-                Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+                Font.DisplayMode.POLYGON_OFFSET, 0, LightCoordsUtil.FULL_BRIGHT);
         pose.popPose();
     }
 
@@ -158,7 +158,7 @@ public class HorizonVaultRenderer implements BlockEntityRenderer<HorizonVaultBlo
     }
 
     @Override
-    public boolean shouldRenderOffScreen(HorizonVaultBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return false;
     }
 }

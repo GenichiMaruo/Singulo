@@ -5,9 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
  * ワームホール生成器の球の中: 電力を受けている間、中心に渦が生まれて育つ。渦の腕は速く回りながら広がり、
  * 上下の収束器から光が中心へ注ぎ、まわりの景色がだんだん歪む。口ができると、渦は開いたまま静かに回って待つ。
  */
-public class WormholeGeneratorRenderer implements BlockEntityRenderer<WormholeGeneratorBlockEntity> {
+public class WormholeGeneratorRenderer extends SnapshotBlockRenderer<WormholeGeneratorBlockEntity> {
     public WormholeGeneratorRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
@@ -69,15 +69,15 @@ public class WormholeGeneratorRenderer implements BlockEntityRenderer<WormholeGe
         // 中心: 向こう側へ抜ける暗い喉と、その縁の光
         FxDraw.billboard(pose, glow, camera, size * 1.5F, 0x9040E0, (int) (40 + 80 * p));
         pose.pushPose();
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 0.08F + 0.32F * p, 0x07020F,
-                LightTexture.FULL_BRIGHT);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 0.08F + 0.32F * p, 0x07020F,
+                LightCoordsUtil.FULL_BRIGHT);
         pose.popPose();
         pose.popPose();
         GravitationalLensing.addDistortion(Vec3.atCenterOf(core), 0.08F + 0.45F * p, 0.25F + 0.55F * p, 1.9F);
     }
 
     @Override
-    public boolean shouldRenderOffScreen(WormholeGeneratorBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

@@ -36,7 +36,7 @@ import net.neoforged.neoforge.common.Tags;
  * 白 = 3色の最小、黒 = 1 − 3色の最大、赤・緑・青 = それぞれから白を引いた分。純色なら色みだけ、灰色なら白と黒だけを使う。
  * 壊すと、中の染料と、インクを染料に戻せる分（目盛りの端数は失う）を落とす。
  */
-public class RgbDyeStationBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
+public class RgbDyeStationBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
     /** 枠: 赤・緑・青・白・黒の染料と、染める物。 */
     public static final int RED = 0, GREEN = 1, BLUE = 2, WHITE = 3, BLACK = 4, TARGET = 5, SLOTS = 6, INKS = 5;
     public static final int PER_DYE = 8, MAX_INK = 64, MAX_COST = 4;
@@ -217,7 +217,7 @@ public class RgbDyeStationBlockEntity extends BlockEntity implements AbstractMac
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         NonNullList<ItemStack> list = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag.getCompound("items"), list, registries);
+        ContainerHelper.loadAllItems(tag.getCompoundOrEmpty("items"), list, registries);
         for (int i = 0; i < SLOTS; i++) {
             items.setItem(i, list.get(i));
         }
@@ -226,7 +226,7 @@ public class RgbDyeStationBlockEntity extends BlockEntity implements AbstractMac
             ink[i] = i < saved.length ? Math.max(0, Math.min(MAX_INK, saved[i])) : 0;
         }
         if (tag.contains("color")) {
-            color = tag.getInt("color") & 0xFFFFFF;
+            color = tag.getIntOr("color", 0) & 0xFFFFFF;
         }
     }
 }

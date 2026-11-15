@@ -38,7 +38,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * <p>
  * 中身はクライアントにも送り、印刷の動き（{@code FoodPrinterRenderer}）と背面の窓のペーストの量に使う。
  */
-public class FoodPrinterBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
+public class FoodPrinterBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
     /** 枠: タンパク質・炭水化物・甘味の食材、同じ順のカートリッジ、印刷した食品。 */
     public static final int INGREDIENT = 0, CARTRIDGE = 3, OUTPUT = 6, SLOTS = 7;
     public static final int ENERGY_CAPACITY = 20_000, MAX_RECEIVE = 200;
@@ -391,7 +391,7 @@ public class FoodPrinterBlockEntity extends BlockEntity implements AbstractMachi
     /** 保存し、見た目（印刷の進み・カートリッジ・出口の食品）をクライアントへ送る。 */
     private void sync() {
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
@@ -416,7 +416,7 @@ public class FoodPrinterBlockEntity extends BlockEntity implements AbstractMachi
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putInt("selected", selected);
         tag.putInt("printing", printing);
@@ -429,7 +429,7 @@ public class FoodPrinterBlockEntity extends BlockEntity implements AbstractMachi
         super.loadAdditional(tag, registries);
         if (tag.contains("items")) {
             ItemStackHandler loaded = new ItemStackHandler();
-            loaded.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(loaded, registries, tag.getCompoundOrEmpty("items"));
             loading = true;
             if (loaded.getSlots() == SLOTS) {
                 for (int i = 0; i < SLOTS; i++) {
@@ -440,17 +440,17 @@ public class FoodPrinterBlockEntity extends BlockEntity implements AbstractMachi
             }
             loading = false;
         }
-        energy.setEnergy(tag.getInt("energy"));
-        selected = tag.contains("selected") ? tag.getInt("selected") : AUTO;
-        printing = tag.contains("printing") ? tag.getInt("printing") : -1;
-        enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        selected = tag.contains("selected") ? tag.getIntOr("selected", 0) : AUTO;
+        printing = tag.contains("printing") ? tag.getIntOr("printing", 0) : -1;
+        enabled = !tag.contains("enabled") || tag.getBooleanOr("enabled", false);
         if (PrintedFood.byIndex(selected) == null) {
             selected = AUTO;
         }
         if (PrintedFood.byIndex(printing) == null) {
             printing = -1;
         }
-        progress = Math.max(0, tag.getInt("progress"));
+        progress = Math.max(0, tag.getIntOr("progress", 0));
     }
 
     /**

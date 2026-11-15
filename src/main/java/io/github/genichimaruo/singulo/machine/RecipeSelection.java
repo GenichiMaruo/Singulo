@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -40,7 +40,7 @@ public final class RecipeSelection {
     }
 
     /** 選べるレシピの並びでの番号（なければ -1）。 */
-    public static int indexOf(Level level, MachineType type, @Nullable ResourceLocation id) {
+    public static int indexOf(Level level, MachineType type, @Nullable Identifier id) {
         if (id == null) {
             return -1;
         }
@@ -71,7 +71,7 @@ public final class RecipeSelection {
     }
 
     /** レシピマネージャーごとの「ほかのレシピの途中になりうるか」の結果（レシピの再読み込みで作り直す）。 */
-    private record AmbiguityCache(Object recipes, Map<ResourceLocation, Boolean> values) {}
+    private record AmbiguityCache(Object recipes, Map<Identifier, Boolean> values) {}
     private static final Map<RecipeManager, AmbiguityCache> AMBIGUOUS = new WeakHashMap<>();
 
     public static synchronized void clear() {
@@ -83,7 +83,7 @@ public final class RecipeSelection {
      * 材料を入れている途中でも同じ状態になるので、自動では作らない（作るものの指定が要る）。
      */
     public static boolean ambiguous(Level level, MachineType type, RecipeHolder<MachineRecipe> recipe) {
-        Map<ResourceLocation, Boolean> cache;
+        Map<Identifier, Boolean> cache;
         synchronized (AMBIGUOUS) {
             RecipeManager manager = level.getRecipeManager();
             Object snapshot = MachineRecipeIndex.snapshot(level);

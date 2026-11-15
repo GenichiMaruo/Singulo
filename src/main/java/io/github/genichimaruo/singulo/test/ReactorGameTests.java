@@ -15,7 +15,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -228,7 +228,7 @@ public final class ReactorGameTests {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
         // 日の光で燃えないハスク（テストの時刻によって死なないように）
-        net.minecraft.world.entity.monster.Husk zombie = helper.spawn(EntityType.HUSK, new BlockPos(0, 1, 0));
+        net.minecraft.world.entity.monster.zombie.Husk zombie = helper.spawn(EntityType.HUSK, new BlockPos(0, 1, 0));
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(CENTER));
         helper.runAtTickTime(80, () -> {
             helper.assertTrue(zombie.isAlive(), "リングの外で死んだ");

@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.cable.CableProfile;
 import io.github.genichimaruo.singulo.cable.ConduitCover;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -95,7 +95,7 @@ public class FluidPipeBlock extends BaseEntityBlock {
     // ------------------------------------------------------------------ カバー（{@link ConduitCover}）
 
     @Override
-    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+    protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
             BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
             net.minecraft.world.phys.BlockHitResult hit) {
         return ConduitCover.use(stack, state, level, pos, player, hand, hit);
@@ -200,7 +200,7 @@ public class FluidPipeBlock extends BaseEntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         ConduitCover.dropOnRemove(state, level, pos, newState);
         // 別の段階のパイプに置き換えたときも、ネットワークを作り直す（区間の容量が変わる）
-        if (!state.is(newState.getBlock()) && !level.isClientSide && level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
+        if (!state.is(newState.getBlock()) && !level.isClientSide() && level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
             pipe.invalidateNetwork();
         }
         super.onRemove(state, level, pos, newState, moving);

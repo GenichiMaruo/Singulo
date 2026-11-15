@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -23,7 +23,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * 満タンになったら「充電済みの物が出てくる枠」へ移す。ホッパーなどからも、入れる枠へ入れ、出てくる枠から取り出せる。
  * 壊すと枠の物を落とす。
  */
-public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         net.minecraft.world.MenuProvider, AbstractMachineBlock.BreakListener {
     /** 充電の枠: 0 は入れる枠、1 は充電済みの物が出てくる枠。 */
     public static final int CHARGE_IN = 0, CHARGE_OUT = 1;
@@ -196,15 +196,15 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("charge", charge.serializeNBT(registries));
+        tag.put("charge", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(charge, registries));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
         if (tag.contains("charge")) {
-            charge.deserializeNBT(registries, tag.getCompound("charge"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(charge, registries, tag.getCompoundOrEmpty("charge"));
         }
     }
 

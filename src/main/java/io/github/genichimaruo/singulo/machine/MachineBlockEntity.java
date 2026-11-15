@@ -10,7 +10,7 @@ import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,7 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -40,7 +40,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 /**
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
  */
-public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder {
     public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED, OFF }
 
@@ -77,7 +77,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private RecipeHolder<MachineRecipe> current;
     /** 保存されていた処理途中のレシピ。読み込み後に同じレシピが選ばれたら進捗を引き継ぐ。 */
     @Nullable
-    private ResourceLocation resumeRecipe;
+    private Identifier resumeRecipe;
     private boolean dirty = true;
     private int underpoweredTicks;
     /** 時間の場（TimeFields）で進む tick の端数。 */
@@ -92,7 +92,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private boolean hasFree;
     /** 指定した作るもの（{@link MachineType#selectsRecipe()} の装置だけ）。null なら自動で選ぶ。 */
     @Nullable
-    private ResourceLocation selectedRecipe;
+    private Identifier selectedRecipe;
 
     public MachineBlockEntity(BlockPos pos, BlockState state) {
         this(SinguloBlockEntities.MACHINE.get(), pos, state);
@@ -349,8 +349,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** 面ごとの設定に従うアイテムの入れ物（side が null なら制限なし）。無効の面は null。 */
-    @javax.annotation.Nullable
-    public IItemHandler itemsFor(@javax.annotation.Nullable net.minecraft.core.Direction side) {
+    @org.jspecify.annotations.Nullable
+    public IItemHandler itemsFor(@org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
         if (side == null || !usesSideConfig()) {
             return automationItems;
         }
@@ -364,8 +364,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** 面ごとの設定に従う液体の入れ物。無効の面は null。 */
-    @javax.annotation.Nullable
-    public IFluidHandler fluidsFor(@javax.annotation.Nullable net.minecraft.core.Direction side) {
+    @org.jspecify.annotations.Nullable
+    public IFluidHandler fluidsFor(@org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
         if (type.tanks() == 0) {
             return null;
         }
@@ -644,7 +644,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 found = blocked;
             }
         }
-        ResourceLocation previous = current != null ? current.id() : resumeRecipe;
+        Identifier previous = current != null ? current.id() : resumeRecipe;
         resumeRecipe = null;
         if (found == null || !found.id().equals(previous)) {
             progress = 0;
@@ -780,7 +780,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** 設定カードから: 指定を貼る（同じ種類の装置でなければ何もしない）。 */
-    public void pasteSelectedRecipe(@Nullable ResourceLocation id) {
+    public void pasteSelectedRecipe(@Nullable Identifier id) {
         if (type.selectsRecipe()) {
             selectedRecipe = id;
             selectedIndex = -2;
@@ -789,7 +789,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     @Nullable
-    public ResourceLocation selectedRecipe() {
+    public Identifier selectedRecipe() {
         return selectedRecipe;
     }
 
@@ -1200,7 +1200,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * （設定 hydrogenLeakExplosion で無効にできる）。
      */
     private void hydrogenLeak(Level level, BlockPos pos) {
-        if (level.isClientSide || ServerConfig.SPEC.isLoaded() && !ServerConfig.HYDROGEN_LEAK_EXPLOSION.get()) {
+        if (level.isClientSide() || ServerConfig.SPEC.isLoaded() && !ServerConfig.HYDROGEN_LEAK_EXPLOSION.get()) {
             return;
         }
         int hydrogen = 0;
@@ -1232,7 +1232,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("inputs_changed_at", inputsChangedAt);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
         tag.put("magazine", magazine.save(registries));
         tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
@@ -1278,10 +1278,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        magazine.load(tag.getCompound("magazine"), registries);
+        magazine.load(tag.getCompoundOrEmpty("magazine"), registries);
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
         ItemStackHandler loaded = new ItemStackHandler();
-        loaded.deserializeNBT(registries, tag.getCompound("items"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(loaded, registries, tag.getCompoundOrEmpty("items"));
         int[] layout = tag.getIntArray("slot_layout");
         if (layout.length != 2) {
             layout = type.legacyLayout();
@@ -1303,7 +1303,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
         }
         if (tag.contains("item_sides")) {
-            itemSides.setPacked(tag.getInt("item_sides"));
+            itemSides.setPacked(tag.getIntOr("item_sides", 0));
             if (!tag.contains("eject_master")) {
                 itemSides.setEjectEnabled(true);
             }
@@ -1316,7 +1316,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         } else if (tag.contains("fluid_sides")) {
             // 古いデータ: 液体の設定が1つだけ。入力タンクは「入力」の面、出力タンクは「出力」の面と自動排出を引き継ぐ
             SideConfig old = new SideConfig();
-            old.setPacked(tag.getInt("fluid_sides"));
+            old.setPacked(tag.getIntOr("fluid_sides", 0));
             for (int i = 0; i < tankSides.length; i++) {
                 boolean input = i < type.fluidInputs();
                 for (SideConfig.Face f : SideConfig.Face.values()) {
@@ -1327,23 +1327,23 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 tankSides[i].setEjectEnabled(!tag.contains("eject_master") || old.ejectEnabled());
             }
         }
-        enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
-        makeFree = !tag.contains("make_free") || tag.getBoolean("make_free");
-        ListTag tankList = tag.getList("tanks", Tag.TAG_COMPOUND);
+        enabled = !tag.contains("enabled") || tag.getBooleanOr("enabled", false);
+        makeFree = !tag.contains("make_free") || tag.getBooleanOr("make_free", false);
+        ListTag tankList = tag.getListOrEmpty("tanks");
         for (int i = 0; i < tanks.length && i < tankList.size(); i++) {
-            tanks[i].readFromNBT(registries, tankList.getCompound(i));
+            tanks[i].readFromNBT(registries, tankList.getCompoundOrEmpty(i));
         }
         refreshEnergyCapacity();
-        energy.restoreEnergy(tag.getInt("energy"));
-        progress = tag.getInt("progress");
-        mode = tag.getInt("mode");
-        selectedRecipe = tag.contains("selected_recipe") ? ResourceLocation.tryParse(tag.getString("selected_recipe")) : null;
+        energy.restoreEnergy(tag.getIntOr("energy", 0));
+        progress = tag.getIntOr("progress", 0);
+        mode = tag.getIntOr("mode", 0);
+        selectedRecipe = tag.contains("selected_recipe") ? Identifier.tryParse(tag.getStringOr("selected_recipe", "")) : null;
         selectedIndex = -2;
-        mass = tag.getDouble("mass");
-        metalMass = tag.getDouble("metal_mass");
-        resumeRecipe = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
+        mass = tag.getDoubleOr("mass", 0.0D);
+        metalMass = tag.getDoubleOr("metal_mass", 0.0D);
+        resumeRecipe = tag.contains("recipe") ? Identifier.tryParse(tag.getStringOr("recipe", "")) : null;
         // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
-        inputsChangedAt = tag.getLong("inputs_changed_at");
+        inputsChangedAt = tag.getLongOr("inputs_changed_at", 0L);
         dirty = true;
     }
 

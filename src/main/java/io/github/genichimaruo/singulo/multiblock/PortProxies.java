@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.multiblock;
 
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;

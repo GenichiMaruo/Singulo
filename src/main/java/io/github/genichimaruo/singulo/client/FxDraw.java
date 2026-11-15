@@ -3,9 +3,9 @@ package io.github.genichimaruo.singulo.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.Singulo;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -25,8 +25,8 @@ final class FxDraw {
         return new Quaternionf().rotateY(yaw).rotateX(pitch);
     }
 
-    static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
-    static final int FULL_BRIGHT = LightTexture.FULL_BRIGHT;
+    static final Identifier WHITE = Singulo.id("textures/misc/white.png");
+    static final int FULL_BRIGHT = LightCoordsUtil.FULL_BRIGHT;
 
     private FxDraw() {}
 

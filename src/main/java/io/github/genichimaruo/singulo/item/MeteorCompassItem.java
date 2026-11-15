@@ -17,7 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -45,24 +45,24 @@ public class MeteorCompassItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (level.isClientSide) {
-            return InteractionResultHolder.success(stack);
+        if (level.isClientSide()) {
+            return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
         }
         ServerLevel server = (ServerLevel) level;
         player.getCooldowns().addCooldown(this, 60);
         BlockPos core = nearestCore(server, player.blockPosition());
         if (core == null) {
             stack.remove(DataComponents.LODESTONE_TRACKER);
-            player.displayClientMessage(Component.translatable("compass.singulo.meteor.not_found"), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendOverlayMessage(Component.translatable("compass.singulo.meteor.not_found"));
+            return io.github.genichimaruo.singulo.compat.Interactions.fail(stack);
         }
         stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), core)), false));
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(core.getX(), player.getBlockY(), core.getZ())));
-        player.displayClientMessage(Component.translatable("compass.singulo.meteor.found", dist), true);
+        player.sendOverlayMessage(Component.translatable("compass.singulo.meteor.found", dist));
         level.playSound(null, player.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 1.2F);
-        return InteractionResultHolder.success(stack);
+        return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
     }
 
     /** 指している核が掘り出されたら、針を外す。 */
@@ -78,7 +78,7 @@ public class MeteorCompassItem extends SinguloItem {
         if (MeteorCores.mined(server, target.pos())) {
             stack.remove(DataComponents.LODESTONE_TRACKER);
             if (entity instanceof Player player && selected) {
-                player.displayClientMessage(Component.translatable("compass.singulo.meteor.mined"), true);
+                player.sendOverlayMessage(Component.translatable("compass.singulo.meteor.mined"));
             }
         }
     }

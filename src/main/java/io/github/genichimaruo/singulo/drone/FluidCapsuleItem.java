@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -59,8 +59,8 @@ public class FluidCapsuleItem extends DroneCrateItem {
 
     /** 梱包済みのカプセルの中身は、手に持って開けられない（タンクなどに使って注ぐ）。 */
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        return InteractionResultHolder.pass(player.getItemInHand(hand));
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        return io.github.genichimaruo.singulo.compat.Interactions.pass(player.getItemInHand(hand));
     }
 
     /** タンクの画面を開くブロック操作より先に注ぐ（スニークを要求しない）。 */
@@ -82,7 +82,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
         if (target == null || target.fill(inside, IFluidHandler.FluidAction.SIMULATE) <= 0) {
             return InteractionResult.PASS;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             int filled = target.fill(inside, IFluidHandler.FluidAction.EXECUTE);
             if (filled > 0) {
                 ItemStack next = stack.copyWithCount(1);
@@ -93,7 +93,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
                 level.playSound(null, context.getClickedPos(), SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 0.8F, 0.9F);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override

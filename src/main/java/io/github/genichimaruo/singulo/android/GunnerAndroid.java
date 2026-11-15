@@ -112,7 +112,7 @@ public class GunnerAndroid extends RuinAndroid {
 
     /** 珍しい型の強み: 作業の速さ（作る・掘る・収穫・家畜の世話と、作業中に歩く速さの倍率）。 */
     public static final float WORK_PACE = 1.5F;
-    private static final net.minecraft.resources.ResourceLocation WORK_SPEED_ID = io.github.genichimaruo.singulo.Singulo.id("gunner_work_speed");
+    private static final net.minecraft.resources.Identifier WORK_SPEED_ID = io.github.genichimaruo.singulo.Singulo.id("gunner_work_speed");
 
     /** 珍しい型の強み: 遠距離の護衛（敵を探す範囲がほかの型の2倍）。 */
     @Override

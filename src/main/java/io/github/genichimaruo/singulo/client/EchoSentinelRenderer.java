@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -46,7 +46,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(EchoSentinel entity) {
+    public Identifier getTextureLocation(EchoSentinel entity) {
         return FxDraw.WHITE;
     }
 
@@ -83,7 +83,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
             jitter += Mth.sin(t * 7.1F) * Mth.cos(t * 3.3F) * 0.18F * death;
         }
         VertexConsumer vc = GlowDepth.of(buffers, FxDraw.WHITE);
-        int full = LightTexture.FULL_BRIGHT;
+        int full = LightCoordsUtil.FULL_BRIGHT;
 
         pose.pushPose();
         float bob = Mth.sin(t * 0.08F) * 0.06F;
@@ -244,7 +244,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
             for (int i = 0; i < 8; i++) {
                 pose.pushPose();
                 pose.mulPose(Axis.YP.rotationDegrees(i * 45));
-                FxDraw.box(pose, vc, r - 0.5F, 0, -0.07F, r - 0.3F, 0.02F, 0.07F, LightTexture.FULL_BRIGHT, 0xFFFFFF, a);
+                FxDraw.box(pose, vc, r - 0.5F, 0, -0.07F, r - 0.3F, 0.02F, 0.07F, LightCoordsUtil.FULL_BRIGHT, 0xFFFFFF, a);
                 pose.popPose();
             }
             pose.popPose();

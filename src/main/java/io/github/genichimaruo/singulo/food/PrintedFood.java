@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.food;
 
 import io.github.genichimaruo.singulo.Singulo;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;

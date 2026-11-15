@@ -7,7 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -71,7 +71,7 @@ public final class CosmicMenu extends AbstractContainerMenu {
     public int value(int i){return data.getInt(i);}
     public boolean ownedBy(CosmicChamberBlockEntity be){return owner==be;}
     @Override public boolean stillValid(Player player){
-        return player.level().isClientSide || owner!=null&&owner.menuActive()&&owner.getLevel()==player.level()
+        return player.level().isClientSide() || owner!=null&&owner.menuActive()&&owner.getLevel()==player.level()
                 &&player.level().getBlockEntity(pos)==owner&&io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player,pos);
     }
     /** 画面のボタン: ポートの向きを切り替える（0 が左、1 が右）。 */
@@ -79,7 +79,7 @@ public final class CosmicMenu extends AbstractContainerMenu {
         if(owner==null||!stillValid(player)||id<0||id>1)return false;
         owner.cyclePort(id);return true;
     }
-    @Override public void clicked(int slot,int button,ClickType type,Player player){
+    @Override public void clicked(int slot,int button,ContainerInput type,Player player){
         if(stillValid(player))super.clicked(slot,button,type,player);
     }
     @Override public ItemStack quickMoveStack(Player player,int index){

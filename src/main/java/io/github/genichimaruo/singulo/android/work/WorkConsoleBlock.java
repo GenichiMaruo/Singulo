@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.machine.SimpleMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +20,7 @@ public class WorkConsoleBlock extends SimpleMachineBlock<WorkConsoleBlockEntity>
     protected void neighborChanged(net.minecraft.world.level.block.state.BlockState state, Level level, net.minecraft.core.BlockPos pos,
                                    net.minecraft.world.level.block.Block block, net.minecraft.core.BlockPos from, boolean moving) {
         super.neighborChanged(state, level, pos, block, from, moving);
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity console) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity console) {
             console.onSignal(level.hasNeighborSignal(pos));
         }
     }
@@ -39,7 +39,7 @@ public class WorkConsoleBlock extends SimpleMachineBlock<WorkConsoleBlockEntity>
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity console) {
+        if (!level.isClientSide() && placer instanceof Player player && level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity console) {
             console.setOwner(player.getUUID());
         }
     }

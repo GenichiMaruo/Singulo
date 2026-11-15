@@ -37,7 +37,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /** Finite storage and a reserved-work spindle, with no runtime chunk loading. */
-public final class CosmicChamberBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
+public final class CosmicChamberBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
         io.github.genichimaruo.singulo.multiblock.PortAccess, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     public static final int RESERVOIR=0, ACCUMULATOR=1, SPINDLE=2;
     public static final int FLUID_CAPACITY=16_000_000;
@@ -117,7 +117,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public void retireForRemoval(){
         if(retired)return;
         retired=true;
-        if(level!=null&&!level.isClientSide)linkPorts(false);
+        if(level!=null&&!level.isClientSide())linkPorts(false);
         if(level instanceof ServerLevel server)for(var player:java.util.List.copyOf(server.players()))
             if(player.containerMenu instanceof CosmicMenu menu&&menu.ownedBy(this))player.closeContainer();
     }
@@ -135,7 +135,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
 
     /** Every external mutation checks the loaded structure, including changes in this tick. */
     public boolean ready() {
-        if(level==null || level.isClientSide || isRemoved())return false;
+        if(level==null || level.isClientSide() || isRemoved())return false;
         var shape=CosmicLayouts.of(kind());
         for(int x=0;x<shape.width();x++) for(int z=0;z<shape.depth();z++)
             if(!level.isLoaded(shape.pos(worldPosition,back(),x,0,z))){status=2;return false;}
@@ -284,7 +284,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public void cyclePort(int index){
         portModes[index]=(portModes[index]+1)%3;
         setChanged();
-        if(level!=null&&!level.isClientSide){
+        if(level!=null&&!level.isClientSide()){
             level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
             // つないだパイプにつなぎ直させる（出し入れできる物が変わった）
             level.updateNeighborsAt(portPos(index),level.getBlockState(portPos(index)).getBlock());
@@ -334,7 +334,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         }),this);
     }
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider registries){
-        super.saveAdditional(tag,registries);tag.put("items",items.serializeNBT(registries));write(tag,registries);
+        super.saveAdditional(tag,registries);tag.put("items",io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));write(tag,registries);
     }
     private void write(CompoundTag tag,HolderLookup.Provider registries){
         tag.putLong("stored",stored);tag.put("tank",tank.writeToNBT(registries,new CompoundTag()));
@@ -344,14 +344,14 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider registries){
         super.loadAdditional(tag,registries);
         if(tag.contains("items")){checked=false;}                 // 保存データから読み込んだ: 最初の判定では演出しない
-        if(tag.contains("items"))items.deserializeNBT(registries,tag.getCompound("items"));
-        stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(registries,tag.getCompound("tank"));
+        if(tag.contains("items"))io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries,tag.getCompoundOrEmpty("items"));
+        stored=Math.max(0,Math.min(capacity(),tag.getLongOr("stored", 0L)));tank.readFromNBT(registries,tag.getCompoundOrEmpty("tank"));
         if(tank.getFluidAmount()>tankCapacity())tank.setFluid(tank.getFluid().copyWithAmount(tankCapacity()));
-        duration=Math.max(0,tag.getInt("duration"));progress=Math.max(0,Math.min(duration,tag.getInt("progress")));cost=Math.max(0,tag.getInt("cost"));core=tag.getBoolean("core");
-        status=tag.getInt("status");lastIn=tag.getInt("in");lastOut=tag.getInt("out");
+        duration=Math.max(0,tag.getIntOr("duration", 0));progress=Math.max(0,Math.min(duration,tag.getIntOr("progress", 0)));cost=Math.max(0,tag.getIntOr("cost", 0));core=tag.getBooleanOr("core", false);
+        status=tag.getIntOr("status", 0);lastIn=tag.getIntOr("in", 0);lastOut=tag.getIntOr("out", 0);
         int[] ports=tag.getIntArray("ports");
         if(ports.length==2)for(int i=0;i<2;i++)portModes[i]=Math.floorMod(ports[i],3);
-        reserved=tag.contains("reserved")?ItemStack.parseOptional(registries,tag.getCompound("reserved")):ItemStack.EMPTY;
+        reserved=tag.contains("reserved")?io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries,tag.getCompoundOrEmpty("reserved")):ItemStack.EMPTY;
     }
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries){CompoundTag tag=new CompoundTag();write(tag,registries);return tag;}
     @Override public Packet<ClientGamePacketListener> getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}

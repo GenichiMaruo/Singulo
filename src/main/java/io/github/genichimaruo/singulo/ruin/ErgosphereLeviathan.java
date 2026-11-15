@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -499,7 +499,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     /** 体力は、今の姿の境目より下へは減らない（境目で姿を変える）。とどめは別。 */
     @Override
     public void setHealth(float health) {
-        boolean guard = !finishing && !loading && !level().isClientSide && emergeTicks() <= 0 && form() < 3;
+        boolean guard = !finishing && !loading && !level().isClientSide() && emergeTicks() <= 0 && form() < 3;
         if (guard && health > 0) {
             float floor = getMaxHealth() * (form() == 1 ? 2F / 3 : 1F / 3) - 0.01F;
             health = Math.max(health, Math.min(getHealth(), floor));
@@ -1220,7 +1220,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     private void actionBar(ServerLevel level, String key) {
         Component msg = Component.translatable(key);
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(arenaCenter(), arenaCenter()).inflate(ARENA + 16))) {
-            p.displayClientMessage(msg, true);
+            p.sendOverlayMessage(msg);
         }
     }
 
@@ -1782,7 +1782,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     private void broadcastLine(ServerLevel level, String key) {
         Component msg = Component.translatable(key);
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(arenaCenter(), arenaCenter()).inflate(ARENA + 16))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -1890,22 +1890,26 @@ public class ErgosphereLeviathan extends RuinBoss {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putDouble("orbit", orbitAngle);
         tag.putInt("form", form());
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
         loading = true;
         try {
-            super.readAdditionalSaveData(tag);
+            super.readAdditionalSaveData(values);
         } finally {
             loading = false;
         }
-        orbitAngle = tag.getDouble("orbit");
-        entityData.set(FORM, Mth.clamp(tag.getInt("form"), 1, 3));
+        orbitAngle = tag.getDoubleOr("orbit", 0.0D);
+        entityData.set(FORM, Mth.clamp(tag.getIntOr("form", 0), 1, 3));
         if (home != null) {
             entityData.set(HOME, home);
         }

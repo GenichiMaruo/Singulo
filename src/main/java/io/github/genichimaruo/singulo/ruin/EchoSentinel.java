@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -146,7 +146,7 @@ public class EchoSentinel extends RuinBoss {
         this.xpReward = 500;
         setNoGravity(true);
         orbitAngle = random.nextDouble() * Math.PI * 2;
-        if (!level.isClientSide && !BossScaling.hardMode()) {
+        if (!level.isClientSide() && !BossScaling.hardMode()) {
             // 読み込むときは、このあと保存した体力で上書きされる
             setEffectiveHealth(HEALTH_NORMAL);
         }
@@ -696,7 +696,7 @@ public class EchoSentinel extends RuinBoss {
             return super.hurt(source, amount);
         }
         if (isMinion()) {
-            if (amount > 0 && !level().isClientSide && !isInvulnerableTo(source)) {
+            if (amount > 0 && !level().isClientSide() && !isInvulnerableTo(source)) {
                 vanish((ServerLevel) level());
                 return true;
             }
@@ -782,31 +782,35 @@ public class EchoSentinel extends RuinBoss {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putBoolean("minion", isMinion());
         tag.putInt("life", life);
         tag.putBoolean("reprojected", reprojected);
         ListTag list = new ListTag();
         for (BlockPos p : projectors) {
-            list.add(NbtUtils.writeBlockPos(p));
+            list.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(p));
         }
         tag.put("projectors", list);
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        if (tag.getBoolean("minion")) {
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        if (tag.getBooleanOr("minion", false)) {
             makeMinion();
         }
-        life = tag.getInt("life");
-        reprojected = tag.getBoolean("reprojected");
+        life = tag.getIntOr("life", 0);
+        reprojected = tag.getBooleanOr("reprojected", false);
         projectors.clear();
         for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
             CompoundTag c = new CompoundTag();
             c.put("p", t);
-            NbtUtils.readBlockPos(c, "p").ifPresent(projectors::add);
+            io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "p").ifPresent(projectors::add);
         }
     }
 }

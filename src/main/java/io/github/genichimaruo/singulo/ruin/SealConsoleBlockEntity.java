@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.ruin;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
  * <p>
  * 隠しボス: 終焉の記録を手に持って使うと、最後の記録者が目覚める（{@link #activateArchivist}）。
  */
-public class SealConsoleBlockEntity extends BlockEntity {
+public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public static final int VAULT_SEARCH_RADIUS = 12;
     public static final int MESSAGE_RADIUS = 32;
 
@@ -256,13 +256,13 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     private void broadcast(ServerLevel level, String key) {
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(MESSAGE_RADIUS))) {
-            p.displayClientMessage(Component.translatable(key), false);
+            p.sendSystemMessage(Component.translatable(key));
         }
     }
 
     private static void tell(@Nullable ServerPlayer player, String key) {
         if (player != null) {
-            player.displayClientMessage(Component.translatable(key), true);
+            player.sendOverlayMessage(Component.translatable(key));
         }
     }
 
@@ -270,10 +270,10 @@ public class SealConsoleBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (warden != null) {
-            tag.putUUID("warden", warden);
+            tag.store("warden", net.minecraft.core.UUIDUtil.CODEC, warden);
         }
         if (archivist != null) {
-            tag.putUUID("archivist", archivist);
+            tag.store("archivist", net.minecraft.core.UUIDUtil.CODEC, archivist);
         }
         tag.putLong("anomaly_changed", anomalyChangedAt);
     }
@@ -281,8 +281,8 @@ public class SealConsoleBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        warden = tag.hasUUID("warden") ? tag.getUUID("warden") : null;
-        archivist = tag.hasUUID("archivist") ? tag.getUUID("archivist") : null;
-        anomalyChangedAt = tag.getLong("anomaly_changed");
+        warden = tag.read("warden", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("warden", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        archivist = tag.read("archivist", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("archivist", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        anomalyChangedAt = tag.getLongOr("anomaly_changed", 0L);
     }
 }

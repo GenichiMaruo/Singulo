@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.ruin.lab;
 
 import com.mojang.serialization.MapCodec;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -80,7 +80,7 @@ public class AndroidCapsuleBlock extends HorizontalDirectionalBlock {
     /** 上半分を壊したときは、下半分を（落とし物つきで）壊す。 */
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
+        if (!level.isClientSide() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
             BlockPos below = pos.below();
             if (level.getBlockState(below).is(this)) {
                 level.destroyBlock(below, !player.isCreative(), player);

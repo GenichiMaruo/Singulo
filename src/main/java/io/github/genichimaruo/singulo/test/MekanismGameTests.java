@@ -13,7 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -44,7 +44,7 @@ public final class MekanismGameTests {
         helper.assertTrue(Chemicals.present(), "Mekanism が入っていない（-PwithMekanism で走らせる）");
         BlockPos consolePos = new BlockPos(1, 1, 1), tankPos = consolePos.above();
         helper.setBlock(consolePos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        var tankBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_chemical_tank"));
+        var tankBlock = BuiltInRegistries.BLOCK.get(Identifier.parse("mekanism:basic_chemical_tank"));
         helper.setBlock(tankPos, tankBlock);
         // Mekanism の装置は、面ごとの設定の既定値をアイテムが持っている（手で置いたときと同じにする）
         helper.getLevel().getBlockEntity(helper.absolutePos(tankPos)).applyComponentsFromItemStack(new ItemStack(tankBlock));

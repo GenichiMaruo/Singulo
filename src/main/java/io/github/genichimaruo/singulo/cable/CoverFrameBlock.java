@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -37,17 +37,17 @@ public class CoverFrameBlock extends Block {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (!(stack.getItem() instanceof BlockItem item) || !ConduitCover.isConduit(item.getBlock())) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             // 枠の場所に置いたとして、つながりを決める
             BlockPlaceContext ctx = BlockPlaceContext.at(new BlockPlaceContext(player, hand, stack, hit), pos, hit.getDirection());
             BlockState conduit = item.getBlock().getStateForPlacement(ctx);
             if (conduit == null) {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
             level.setBlock(pos, conduit.setValue(ConduitCover.PROPERTY, ConduitCover.State.FRAME), Block.UPDATE_ALL);
             level.gameEvent(GameEvent.BLOCK_PLACE, pos, GameEvent.Context.of(player, conduit));
@@ -55,7 +55,7 @@ public class CoverFrameBlock extends Block {
             level.playSound(null, pos, sound.getPlaceSound(), SoundSource.BLOCKS, (sound.getVolume() + 1) / 2, sound.getPitch() * 0.8F);
             stack.consume(1, player);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override

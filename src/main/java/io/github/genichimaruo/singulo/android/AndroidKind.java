@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android;
 
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.world.entity.EntityType;
 
 /** アンドロイドの型（印刷台や設計メモリが、どの型を印刷するか）。並びの位置を保存に使うので、新しい型は最後に足す。 */

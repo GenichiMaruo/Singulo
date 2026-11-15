@@ -60,7 +60,7 @@ public final class AndroidEscrowData extends SavedData {
     public boolean quarantineCargo(UUID request, UUID owner, UUID worker, List<ItemStack> actualCargo) {
         if(request==null || worker==null || registriesForRecovery==null || actualCargo==null)return false;
         for(ItemStack s:actualCargo)if(s==null)return false;
-        CompoundTag t=new CompoundTag();t.putUUID("request",request);if(owner!=null)t.putUUID("owner",owner);t.putUUID("worker",worker);
+        CompoundTag t=new CompoundTag();t.store("request", net.minecraft.core.UUIDUtil.CODEC, request);if(owner!=null)t.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);t.store("worker", net.minecraft.core.UUIDUtil.CODEC, worker);
         t.put("actual_cargo",stacks(actualCargo,registriesForRecovery));salvage.add(t);setDirty();return true;
     }
     public List<ItemStack> inputs(Entry e) { return valid(e) ? copy(e.inputs) : List.of(); }
@@ -224,10 +224,10 @@ public final class AndroidEscrowData extends SavedData {
     }
     private static List<ItemStack> readStacks(CompoundTag t,String key,HolderLookup.Provider registries,boolean allowEmpty) {
         if(!t.contains(key,Tag.TAG_LIST))throw new IllegalArgumentException("Missing inventory");
-        ListTag list=t.getList(key,Tag.TAG_COMPOUND);
+        ListTag list=t.getListOrEmpty(key);
         if(list.size()!=((ListTag)t.get(key)).size())throw new IllegalArgumentException("Invalid inventory tags");
         List<ItemStack> out=new ArrayList<>();
-        for(Tag raw:list){CompoundTag st=(CompoundTag)raw; ItemStack s=st.isEmpty()?ItemStack.EMPTY:ItemStack.parseOptional(registries,st);
+        for(Tag raw:list){CompoundTag st=(CompoundTag)raw; ItemStack s=st.isEmpty()?ItemStack.EMPTY:io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries,st);
             if((s.isEmpty() && (!allowEmpty || !st.isEmpty())) || !s.isEmpty() && (s.getCount()<1 || s.getCount()>s.getMaxStackSize()))throw new IllegalArgumentException("Invalid stack");out.add(s);}
         return out;
     }
@@ -236,10 +236,10 @@ public final class AndroidEscrowData extends SavedData {
         tag.put("recovery_salvage_v1",salvage.copy());
         tag.putInt("schema",1); ListTag list=new ListTag();
         for(Entry e:records.values()){
-            CompoundTag t=new CompoundTag();t.putUUID("request",e.request);t.putUUID("owner",e.owner);t.putUUID("identity",e.consoleIdentity);
-            t.put("console",NbtUtils.writeBlockPos(e.console));t.put("target",e.target.save(registries));t.putLong("count",e.count);
-            t.putInt("order",e.orderId);t.putString("state",e.state.name());if(e.worker!=null)t.putUUID("worker",e.worker);
-            if(e.requestedWorker!=null)t.putUUID("requested_worker",e.requestedWorker);
+            CompoundTag t=new CompoundTag();t.store("request", net.minecraft.core.UUIDUtil.CODEC, e.request);t.store("owner", net.minecraft.core.UUIDUtil.CODEC, e.owner);t.store("identity", net.minecraft.core.UUIDUtil.CODEC, e.consoleIdentity);
+            t.put("console",io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(e.console));t.put("target",e.target.save(registries));t.putLong("count",e.count);
+            t.putInt("order",e.orderId);t.putString("state",e.state.name());if(e.worker!=null)t.store("worker", net.minecraft.core.UUIDUtil.CODEC, e.worker);
+            if(e.requestedWorker!=null)t.store("requested_worker", net.minecraft.core.UUIDUtil.CODEC, e.requestedWorker);
             if(e.outcome!=null)t.putString("outcome",e.outcome.name());t.putLong("delivered",e.delivered);
             t.put("offer",stacks(e.originalOffer,registries));t.put("inputs",stacks(e.inputs,registries));t.put("products",stacks(e.products,registries));list.add(t);
         }
@@ -247,32 +247,32 @@ public final class AndroidEscrowData extends SavedData {
     }
     public static AndroidEscrowData load(CompoundTag tag,HolderLookup.Provider registries) {
         AndroidEscrowData data=new AndroidEscrowData();data.registriesForRecovery=registries;
-        if(tag.contains("recovery_salvage_extra_v1",Tag.TAG_LIST)) for(Tag raw:tag.getList("recovery_salvage_extra_v1",Tag.TAG_COMPOUND))data.salvage.add(raw.copy());
+        if(tag.contains("recovery_salvage_extra_v1",Tag.TAG_LIST)) for(Tag raw:tag.getListOrEmpty("recovery_salvage_extra_v1"))data.salvage.add(raw.copy());
 
-        if(tag.getInt("schema")!=1 || !tag.contains("records",Tag.TAG_LIST) || ((ListTag)tag.get("records")).getElementType()!=Tag.TAG_COMPOUND && !((ListTag)tag.get("records")).isEmpty()) {
+        if(tag.getIntOr("schema", 0)!=1 || !tag.contains("records",Tag.TAG_LIST) || ((ListTag)tag.get("records")).getElementType()!=Tag.TAG_COMPOUND && !((ListTag)tag.get("records")).isEmpty()) {
             data.invalidRoot=true;data.rawRoot=tag.copy();return data;
         }
-        if(tag.contains("recovery_salvage_v1",Tag.TAG_LIST)) for(Tag raw:tag.getList("recovery_salvage_v1",Tag.TAG_COMPOUND))data.salvage.add(raw.copy());
-        for(Tag raw:tag.getList("records",Tag.TAG_COMPOUND)){
-            CompoundTag t=(CompoundTag)raw; UUID id=t.hasUUID("request")?t.getUUID("request"):null;
+        if(tag.contains("recovery_salvage_v1",Tag.TAG_LIST)) for(Tag raw:tag.getListOrEmpty("recovery_salvage_v1"))data.salvage.add(raw.copy());
+        for(Tag raw:tag.getListOrEmpty("records")){
+            CompoundTag t=(CompoundTag)raw; UUID id=t.read("request", net.minecraft.core.UUIDUtil.CODEC).isPresent()?t.read("request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow():null;
             try {
-                if(id==null || data.blocked.contains(id) || !t.hasUUID("owner") || !t.hasUUID("identity"))throw new IllegalArgumentException();
+                if(id==null || data.blocked.contains(id) || !t.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() || !t.read("identity", net.minecraft.core.UUIDUtil.CODEC).isPresent())throw new IllegalArgumentException();
                 if(data.records.containsKey(id)){
                     // Preserve both conflicting records and disable access, rather than pick a winner.
                     Entry old=data.records.remove(id); CompoundTag previous=new CompoundTag();
-                    AndroidEscrowData temp=new AndroidEscrowData();temp.records.put(id,old);previous=(CompoundTag)temp.save(new CompoundTag(),registries).getList("records",Tag.TAG_COMPOUND).get(0);
+                    AndroidEscrowData temp=new AndroidEscrowData();temp.records.put(id,old);previous=(CompoundTag)temp.save(new CompoundTag(),registries).getListOrEmpty("records").get(0);
                     data.quarantined.add(previous);throw new IllegalArgumentException();
                 }
-                BlockPos pos=NbtUtils.readBlockPos(t,"console").orElseThrow();ItemStack target=ItemStack.parseOptional(registries,t.getCompound("target"));
-                long count=t.getLong("count");List<ItemStack> offer=readStacks(t,"offer",registries,false);
+                BlockPos pos=io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t,"console").orElseThrow();ItemStack target=io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries,t.getCompoundOrEmpty("target"));
+                long count=t.getLongOr("count", 0L);List<ItemStack> offer=readStacks(t,"offer",registries,false);
                 if(target.isEmpty() || FluidSamples.liquid(target) || count<1 || count>WorkConsoleBlockEntity.MAX_COUNT || offer.isEmpty() || offer.size()>MAX_OFFER_STACKS || offer.stream().anyMatch(ChemicalSamples::is))throw new IllegalArgumentException();
-                Entry e=new Entry(id,t.getUUID("owner"),pos,t.getUUID("identity"),target,count,offer);
+                Entry e=new Entry(id,t.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(),pos,t.read("identity", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(),target,count,offer);
                 e.inputs.addAll(readStacks(t,"inputs",registries,true));e.products.addAll(readStacks(t,"products",registries,true));
-                e.state=State.valueOf(t.getString("state"));e.orderId=t.getInt("order");
-                if(t.contains("worker")&&!t.hasUUID("worker"))throw new IllegalArgumentException();e.worker=t.hasUUID("worker")?t.getUUID("worker"):null;
-                if(t.contains("requested_worker")&&!t.hasUUID("requested_worker"))throw new IllegalArgumentException();
-                e.requestedWorker=t.hasUUID("requested_worker")?t.getUUID("requested_worker"):null;
-                if(t.contains("outcome"))e.outcome=AndroidOrders.State.valueOf(t.getString("outcome"));e.delivered=t.getLong("delivered");
+                e.state=State.valueOf(t.getStringOr("state", ""));e.orderId=t.getIntOr("order", 0);
+                if(t.contains("worker")&&!t.read("worker", net.minecraft.core.UUIDUtil.CODEC).isPresent())throw new IllegalArgumentException();e.worker=t.read("worker", net.minecraft.core.UUIDUtil.CODEC).isPresent()?t.read("worker", net.minecraft.core.UUIDUtil.CODEC).orElseThrow():null;
+                if(t.contains("requested_worker")&&!t.read("requested_worker", net.minecraft.core.UUIDUtil.CODEC).isPresent())throw new IllegalArgumentException();
+                e.requestedWorker=t.read("requested_worker", net.minecraft.core.UUIDUtil.CODEC).isPresent()?t.read("requested_worker", net.minecraft.core.UUIDUtil.CODEC).orElseThrow():null;
+                if(t.contains("outcome"))e.outcome=AndroidOrders.State.valueOf(t.getStringOr("outcome", ""));e.delivered=t.getLongOr("delivered", 0L);
                 if(e.state==State.QUARANTINED || e.delivered<0 || e.outcome!=AndroidOrders.State.RUNNING&&!terminal(e)
                         || e.state==State.RUNNING&&(e.orderId<1 || e.worker==null || terminal(e))
                         || e.state==State.RETURNING&&(!terminal(e)||e.worker==null)
@@ -284,7 +284,7 @@ public final class AndroidEscrowData extends SavedData {
                         }catch(RuntimeException ex){
                 if(id!=null && data.records.containsKey(id)) {
                     Entry prior=data.records.remove(id);AndroidEscrowData temporary=new AndroidEscrowData();temporary.records.put(id,prior);
-                    data.quarantined.add(temporary.save(new CompoundTag(),registries).getList("records",Tag.TAG_COMPOUND).get(0).copy());
+                    data.quarantined.add(temporary.save(new CompoundTag(),registries).getListOrEmpty("records").get(0).copy());
                 }
                 data.quarantined.add(raw.copy());if(id!=null)data.blocked.add(id);
             }

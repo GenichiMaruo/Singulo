@@ -20,7 +20,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -80,7 +80,7 @@ public final class BugFix0111GameTests {
         var template = level.getStructureManager().getOrCreate(Singulo.id("lab/private_rooms"));
         BlockPos origin = helper.absolutePos(new BlockPos(0, 40, 0));
         var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings();
-        template.placeInWorld(level, origin, origin, settings, level.random, 2);
+        template.placeInWorld(level, origin, origin, settings, level.getRandom(), 2);
         var lights = template.filterBlocks(origin, settings, SinguloBlocks.ROOM_LIGHT.get());
         helper.assertTrue(lights.size() == 8, "Expected a light in every private room");
         for (var light : lights) {
@@ -133,7 +133,7 @@ public final class BugFix0111GameTests {
         helper.assertTrue(drops.size() == 1, "コントロールボックスが落ちない");
         ItemStack dropped = drops.get(0);
         var data = dropped.get(DataComponents.BLOCK_ENTITY_DATA);
-        helper.assertTrue(data != null && data.copyTag().getInt("height") == 9, "壊したアイテムに高さが残らない");
+        helper.assertTrue(data != null && data.copyTag().getIntOr("height", 0) == 9, "壊したアイテムに高さが残らない");
         // 両方壊して、ひとつだけ置き直す: 残っていた高さ 9 のまま
         helper.setBlock(boxA, Blocks.AIR);
         helper.setBlock(boxB, Blocks.AIR);
@@ -393,7 +393,7 @@ public final class BugFix0111GameTests {
         // 保存しても印は残る
         var tag = new net.minecraft.nbt.CompoundTag();
         printed.addAdditionalSaveData(tag);
-        helper.assertTrue(tag.getBoolean("facility_spawned"), "印が保存されない");
+        helper.assertTrue(tag.getBooleanOr("facility_spawned", false), "印が保存されない");
         helper.succeed();
     }
 

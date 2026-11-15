@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -23,7 +23,7 @@ import org.joml.Quaternionf;
  *   <li>撃った瞬間: 球から避雷針の先へ、ぎざぎざに折れた太い雷が走り、枝分かれする（2 tick ごとに形が変わる）</li>
  * </ul>
  */
-public class KeraunosTowerRenderer implements BlockEntityRenderer<KeraunosTowerBlockEntity> {
+public class KeraunosTowerRenderer extends SnapshotBlockRenderer<KeraunosTowerBlockEntity> {
     private static final int CORE = 0xEAF6FF;
     private static final int GLOW = 0x78C8FF;
     private static final int ARC = 0xB4E4FF;
@@ -114,7 +114,7 @@ public class KeraunosTowerRenderer implements BlockEntityRenderer<KeraunosTowerB
     }
 
     @Override
-    public boolean shouldRenderOffScreen(KeraunosTowerBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 }

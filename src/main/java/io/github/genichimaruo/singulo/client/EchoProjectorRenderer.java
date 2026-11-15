@@ -6,7 +6,7 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.EchoProjectorBlockEntity;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.phys.AABB;
@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
  * 投影槍の前触れでは、レンズから狙いの場所へ細い金色の線が伸びて強まり、撃つと太い光の槍になる。
  * 番人が倒されると、投影の光はちらつきながら消えていく。
  */
-public class EchoProjectorRenderer implements BlockEntityRenderer<EchoProjectorBlockEntity> {
+public class EchoProjectorRenderer extends SnapshotBlockRenderer<EchoProjectorBlockEntity> {
     static final double RANGE = 24;
     static final int LANCE = 0xFFE9A0;
 
@@ -87,7 +87,7 @@ public class EchoProjectorRenderer implements BlockEntityRenderer<EchoProjectorB
     }
 
     @Override
-    public boolean shouldRenderOffScreen(EchoProjectorBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.cable.CableBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.Block;
  *   <li>{@link #FRAME_FLOW} 以上: 被膜の外に、半透明の四角い箱の枠が流れに乗って次々と通り過ぎる。</li>
  * </ul>
  */
-public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
+public class CableRenderer extends SnapshotBlockRenderer<CableBlockEntity> {
     /** 波の長さ（ブロック）と速さ（ブロック/秒）。 */
     private static final float WAVELENGTH = 3.0F;
     private static final float SPEED = 4.0F;

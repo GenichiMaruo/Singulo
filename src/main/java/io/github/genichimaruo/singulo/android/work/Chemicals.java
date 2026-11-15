@@ -1,11 +1,11 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -55,7 +55,7 @@ public final class Chemicals {
 
         /** 絵（ブロックの絵の束の中。なければ null）。 */
         @Nullable
-        ResourceLocation icon(String id);
+        Identifier icon(String id);
 
         /** 空気より軽い（ガス）か。 */
         boolean gaseous(String id);
@@ -108,7 +108,7 @@ public final class Chemicals {
     }
 
     @Nullable
-    public static ResourceLocation icon(String id) {
+    public static Identifier icon(String id) {
         return ACCESS == null ? null : ACCESS.icon(id);
     }
 

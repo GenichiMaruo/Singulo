@@ -45,7 +45,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @org.jspecify.annotations.Nullable net.minecraft.core.Direction side) {
         return false;
     }
 
@@ -162,7 +162,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
                 free.add(i);
             }
         }
-        java.util.Collections.shuffle(free, new java.util.Random(level.random.nextLong()));
+        java.util.Collections.shuffle(free, new java.util.Random(level.getRandom().nextLong()));
         int next = 0;
         for (ItemStack stack : loot) {
             int count = Math.max(1, (int) Math.round(stack.getCount() * mult));
@@ -244,9 +244,9 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
         super.loadAdditional(tag, registries);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items, registries);
-        ruin = tag.getString("ruin");
-        filledOnce = tag.getBoolean("filled");
-        emptiedAt = tag.contains("emptied_at") ? tag.getLong("emptied_at") : -1;
-        placedByPlayer = tag.getBoolean("placed");
+        ruin = tag.getStringOr("ruin", "");
+        filledOnce = tag.getBooleanOr("filled", false);
+        emptiedAt = tag.contains("emptied_at") ? tag.getLongOr("emptied_at", 0L) : -1;
+        placedByPlayer = tag.getBooleanOr("placed", false);
     }
 }

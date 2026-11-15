@@ -29,7 +29,7 @@ public final class UsesStackGameTests {
             h.assertFalse(UsesHelper.canUse(fresh,1),"Whole stack must not be consumed as one original");
             ItemStack used = UsesHelper.consume(fresh.copyWithCount(1),1);
             h.assertTrue(used.getCount()==1 && used.getMaxStackSize()==1,"Used item can stack: "+id);
-            ItemStack loaded = ItemStack.parse(h.getLevel().registryAccess(), used.save(h.getLevel().registryAccess())).orElseThrow();
+            ItemStack loaded = io.github.genichimaruo.singulo.compat.NbtCompat.parse(h.getLevel().registryAccess(), used.save(h.getLevel().registryAccess())).orElseThrow();
             h.assertTrue(loaded.getMaxStackSize()==1 && UsesHelper.remaining(loaded)==UsesHelper.remaining(used),"Usage state lost after save: "+id);
             ItemStack exhausted = UsesHelper.consume(fresh.copyWithCount(1),UsesHelper.remaining(fresh));
             ItemStack repaired = UsesHelper.restore(exhausted,fresh.copyWithCount(1));

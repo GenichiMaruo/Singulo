@@ -37,7 +37,7 @@ public class SettingsCardItem extends SinguloItem {
         if (kind == null) {
             return InteractionResult.PASS;
         }
-        if (context.getLevel().isClientSide) {
+        if (context.getLevel().isClientSide()) {
             return InteractionResult.SUCCESS;
         }
         ItemStack stack = context.getItemInHand();
@@ -56,30 +56,30 @@ public class SettingsCardItem extends SinguloItem {
                 tag.putInt("feed_interval", r.feedInterval());
             }
             CustomData.update(DataComponents.CUSTOM_DATA, stack, t -> t.put(KEY, tag));
-            player.displayClientMessage(Component.translatable("item.singulo.settings_card.copied"), true);
+            player.sendOverlayMessage(Component.translatable("item.singulo.settings_card.copied"));
             return InteractionResult.SUCCESS;
         }
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        CompoundTag tag = data == null ? null : data.copyTag().getCompound(KEY);
+        CompoundTag tag = data == null ? null : data.copyTag().getCompoundOrEmpty(KEY);
         if (tag == null || tag.isEmpty()) {
-            player.displayClientMessage(Component.translatable("item.singulo.settings_card.empty"), true);
+            player.sendOverlayMessage(Component.translatable("item.singulo.settings_card.empty"));
             return InteractionResult.FAIL;
         }
-        if (!kind.equals(tag.getString("kind"))) {
-            player.displayClientMessage(Component.translatable("item.singulo.settings_card.mismatch"), true);
+        if (!kind.equals(tag.getStringOr("kind", ""))) {
+            player.sendOverlayMessage(Component.translatable("item.singulo.settings_card.mismatch"));
             return InteractionResult.FAIL;
         }
         if (be instanceof MachineBlockEntity m) {
-            m.pasteSides(tag.getInt("item_sides"), tag.getIntArray("tank_sides"));
-            if (m.type().id().equals(tag.getString("machine_type"))) {
+            m.pasteSides(tag.getIntOr("item_sides", 0), tag.getIntArray("tank_sides"));
+            if (m.type().id().equals(tag.getStringOr("machine_type", ""))) {
                 m.pasteSelectedRecipe(tag.contains("selected_recipe")
-                        ? net.minecraft.resources.ResourceLocation.tryParse(tag.getString("selected_recipe")) : null);
+                        ? net.minecraft.resources.Identifier.tryParse(tag.getStringOr("selected_recipe", "")) : null);
             }
         } else if (be instanceof PenroseReactorBlockEntity r) {
-            r.setSpinTargetIndex(tag.getInt("spin_target"));
-            r.setFeedInterval(tag.getInt("feed_interval"));
+            r.setSpinTargetIndex(tag.getIntOr("spin_target", 0));
+            r.setFeedInterval(tag.getIntOr("feed_interval", 0));
         }
-        player.displayClientMessage(Component.translatable("item.singulo.settings_card.pasted"), true);
+        player.sendOverlayMessage(Component.translatable("item.singulo.settings_card.pasted"));
         return InteractionResult.SUCCESS;
     }
 
@@ -95,7 +95,7 @@ public class SettingsCardItem extends SinguloItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        String kind = data == null ? "" : data.copyTag().getCompound(KEY).getString("kind");
+        String kind = data == null ? "" : data.copyTag().getCompoundOrEmpty(KEY).getStringOr("kind", "");
         tooltip.add(Component.translatable(kind.isEmpty() ? "item.singulo.settings_card.blank" : "item.singulo.settings_card.holds." + kind)
                 .withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.singulo.settings_card.hint").withStyle(ChatFormatting.DARK_GRAY));

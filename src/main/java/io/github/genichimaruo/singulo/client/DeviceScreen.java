@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.machine.DeviceMenu;
 import io.github.genichimaruo.singulo.machine.DeviceMenu.Kind;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -171,25 +171,25 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     }
 
     /** アイコンと値（中身の座標）。 */
-    private void value(GuiGraphics g, int x, int y, Panel.Icon icon, int iconColor, String text, int color, Component... tooltip) {
+    private void value(GuiGraphicsExtractor g, int x, int y, Panel.Icon icon, int iconColor, String text, int color, Component... tooltip) {
         stat(g, OX + x, y, icon, iconColor, text, color, List.of(tooltip));
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
         if (hasEnergyBar() && Panel.inside(mouseX, mouseY, cx(BAR_X), cy(BAR_Y), BAR_W, BAR_H)) {
             int[] e = energy();
-            g.renderComponentTooltip(font, Panel.energyLines(e[0], e[1]), mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, Panel.energyLines(e[0], e[1]), mouseX, mouseY);
         }
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         float t = time(partialTick);
@@ -212,7 +212,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     // ------------------------------------------------------------------ 絵の部品
 
     /** 渦（ワームホール）。r は大きさ、speed は回る速さ、bright は明るさ（0〜1）。 */
-    private static void vortex(GuiGraphics g, int cx, int cy, float r, float t, float speed, float bright) {
+    private static void vortex(GuiGraphicsExtractor g, int cx, int cy, float r, float t, float speed, float bright) {
         int arms = 4;
         int steps = (int) (r * 1.8F);
         for (int a = 0; a < arms; a++) {
@@ -234,7 +234,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     }
 
     /** 円い進み具合（点の輪）。 */
-    private static void ring(GuiGraphics g, int cx, int cy, int r, float fraction, int on, int off, int dots) {
+    private static void ring(GuiGraphicsExtractor g, int cx, int cy, int r, float fraction, int on, int off, int dots) {
         int lit = Math.round(fraction * dots);
         for (int i = 0; i < dots; i++) {
             float ang = -Mth.HALF_PI + i * Mth.TWO_PI / dots;
@@ -249,7 +249,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     }
 
     /** 横のゲージ（左から fraction だけ満ちる。色は from から to へ）。 */
-    private void bar(GuiGraphics g, int x, int y, int w, int h, float fraction, int from, int to) {
+    private void bar(GuiGraphicsExtractor g, int x, int y, int w, int h, float fraction, int from, int to) {
         Panel.well(g, skin, x, y, w, h);
         int f = Math.round(w * Mth.clamp(fraction, 0, 1));
         for (int i = 0; i < f; i++) {
@@ -304,7 +304,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                 && v(DeviceMenu.Forge.FORMED) != 0;
     }
 
-    private void drawForge(GuiGraphics g, float t, int mouseX, int mouseY) {
+    private void drawForge(GuiGraphicsExtractor g, float t, int mouseX, int mouseY) {
         int phase = v(DeviceMenu.Forge.PHASE);
         int hold = v(DeviceMenu.Forge.HOLD);
         boolean stalled = hold != F_OK;
@@ -352,7 +352,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             g.fill(cx(rings[i]), cy(ay + 3), cx(rings[i] + 2), cy(ay + ringH[i] + 1), c);
         }
         // 照射室の枠
-        g.renderOutline(cx(cage0), cy(ay - 8), cage1 - cage0 + 1, 17, phase >= 1 && phase <= 5 ? 0xFF7FD0FF : 0xFF3A4660);
+        g.outline(cx(cage0), cy(ay - 8), cage1 - cage0 + 1, 17, phase >= 1 && phase <= 5 ? 0xFF7FD0FF : 0xFF3A4660);
         // ジェットとビーム
         float flicker = stalled ? 0.4F + 0.3F * Mth.sin(t * 2.3F) : 1;
         if (phase >= 2 && phase <= 5) {
@@ -379,7 +379,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                 int half = (int) Math.round(Math.sqrt(Math.max(0, 10 - dy * dy)));
                 g.fill(cx(bh) - half + 1, cy(ay + dy), cx(bh) + half + 1, cy(ay + dy + 1), 0xFF000000);
             }
-            g.renderOutline(cx(bh) - 3, cy(ay - 4), 8, 9, lerp(0xFF402010, 0xFFFFB070, power));
+            g.outline(cx(bh) - 3, cy(ay - 4), 8, 9, lerp(0xFF402010, 0xFFFFB070, power));
         }
         // 素材（熱を帯びる）
         if (phase != 0) {
@@ -405,8 +405,8 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         for (int[] a : at) {
             Panel.slot(g, skin, leftPos + a[0], topPos + a[1]);
         }
-        g.renderOutline(leftPos + at[0][0] - 2, topPos + at[0][1] - 2, 20, 20, core ? 0xFFFFB070 : MAGENTA);
-        g.renderOutline(leftPos + at[4][0] - 2, topPos + at[4][1] - 2, 20, 20, CYAN);
+        g.outline(leftPos + at[0][0] - 2, topPos + at[0][1] - 2, 20, 20, core ? 0xFFFFB070 : MAGENTA);
+        g.outline(leftPos + at[4][0] - 2, topPos + at[4][1] - 2, 20, 20, CYAN);
         // スロットの説明は空のときだけ（物が入っていれば、その物の説明と重ならないように出さない）
         Component[] slotHints = {tr("forge.core"), tr("forge.inputs"), tr("forge.inputs"), tr("forge.inputs"), tr("forge.output"),
                 tr("forge.empties"), tr("forge.cassette")};
@@ -447,7 +447,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ ワームホール生成器
 
-    private void drawGenerator(GuiGraphics g, float t) {
+    private void drawGenerator(GuiGraphicsExtractor g, float t) {
         float p = v(DeviceMenu.Gen.PROGRESS) / (float) io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity.GENERATE_TICKS;
         boolean running = p > 0;
         vortex(g, cx(100), cy(46), 20, t, running ? 0.05F + 0.25F * p : 0.02F, running ? 0.5F + 0.5F * p : 0.3F);
@@ -460,7 +460,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         for (int i = 0; i < 2; i++) {
             Slot s = menu.slots.get(i);
             Panel.slot(g, skin, leftPos + at[i][0], topPos + at[i][1]);
-            g.renderOutline(leftPos + at[i][0] - 2, topPos + at[i][1] - 2, 20, 20, i == 0 ? CYAN : MAGENTA);
+            g.outline(leftPos + at[i][0] - 2, topPos + at[i][1] - 2, 20, 20, i == 0 ? CYAN : MAGENTA);
             int remain = v(i == 0 ? DeviceMenu.Gen.REMAIN_0 : DeviceMenu.Gen.REMAIN_1);
             if (s.hasItem() && remain > 0) {
                 stat(g, at[i][0] - 2, at[i][1] + 20, Panel.Icon.HOURGLASS, skin.dim(), remain / 20 + "s",
@@ -476,7 +476,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     private static final int MOUTH_PLUS_X = 174;
     private static final int BTN = 16;
 
-    private void drawMouth(GuiGraphics g, float t, int mouseX, int mouseY) {
+    private void drawMouth(GuiGraphicsExtractor g, float t, int mouseX, int mouseY) {
         int passage=v(DeviceMenu.Mouth.PASSAGE);
         if (passage > 0) {
             // 縫合した口: 渦のまわりを、光る糸の縫い目が四隅から囲む
@@ -503,7 +503,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         int goal = 2 * target + 1;
         // 目標の大きさ（ボタンの間）
         String goalText = goal + "×" + goal;
-        g.drawString(font, goalText, cx(MOUTH_MINUS_X + BTN + (MOUTH_PLUS_X - MOUTH_MINUS_X - BTN - font.width(goalText)) / 2),
+        g.text(font, goalText, cx(MOUTH_MINUS_X + BTN + (MOUTH_PLUS_X - MOUTH_MINUS_X - BTN - font.width(goalText)) / 2),
                 cy(MOUTH_BTN_Y + 4), skin.text(), false);
         hint(MOUTH_MINUS_X, MOUTH_BTN_Y, MOUTH_PLUS_X + BTN - MOUTH_MINUS_X, BTN, tr("mouth.size", side, side, goal, goal));
         int s = Math.max(0, Math.min(3, size));
@@ -525,7 +525,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         // 燃料のスロットと、もつ時間（猶予・燃料切れ）
         int[] f = DeviceMenu.slotPos(kind)[0];
         Panel.slot(g, skin, leftPos + f[0], topPos + f[1]);
-        g.renderOutline(leftPos + f[0] - 2, topPos + f[1] - 2, 20, 20, MAGENTA);
+        g.outline(leftPos + f[0] - 2, topPos + f[1] - 2, 20, 20, MAGENTA);
         int tpm = v(DeviceMenu.Mouth.TICKS_PER_MATTER);
         stat(g, f[0] + 22, f[1] + 4, Panel.Icon.HOURGLASS, skin.dim(), tpm > 0 ? String.format("%.1fm", tpm / 1200.0) : "-", skin.text(),
                 List.of(tpm > 0 ? tr("mouth.upkeep", String.format("%.1f", tpm / 1200.0)) : tr("mouth.upkeep_none")));
@@ -541,7 +541,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     }
 
     /** アイコンのボタン（16×16、−か＋）。 */
-    private void iconButton(GuiGraphics g, int bx, int by, boolean plus, int mouseX, int mouseY, boolean enabled) {
+    private void iconButton(GuiGraphicsExtractor g, int bx, int by, boolean plus, int mouseX, int mouseY, boolean enabled) {
         boolean hover = enabled && Panel.inside(mouseX, mouseY, bx, by, BTN, BTN);
         int d = Panel.button(g, skin, bx, by, BTN, BTN, !enabled ? Panel.Press.DISABLED : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
         int c = enabled ? skin.text() : skin.dim();
@@ -570,7 +570,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     }
 
     /** 丸いボタン（12×12）。オンなら光る。 */
-    private void roundButton(GuiGraphics g, int bx, int by, boolean on, boolean hover) {
+    private void roundButton(GuiGraphicsExtractor g, int bx, int by, boolean on, boolean hover) {
         int edge = hover ? 0xFFFFFFFF : on ? CYAN : skin.hi();
         int fill = on ? CYAN : skin.button();
         int[] rows = {4, 2, 1, 1, 0, 0, 0, 0, 1, 1, 2, 4};
@@ -587,7 +587,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
     }
 
-    private void drawPort(GuiGraphics g, float t, int mouseX, int mouseY) {
+    private void drawPort(GuiGraphicsExtractor g, float t, int mouseX, int mouseY) {
         int state = v(DeviceMenu.Port.STATE);
         vortex(g, cx(40), cy(56), 18, t, state == 2 ? 0.06F : 0.015F, state == 2 ? 0.9F : 0.3F);
         if (state == DeviceMenu.Port.STATE_OVER_LIMIT) {
@@ -626,14 +626,14 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             roundButton(g, bx, cy(BIT_Y), on, Panel.inside(mouseX, mouseY, bx, cy(BIT_Y), BIT_SIZE, BIT_SIZE));
         }
         String number = "#" + channel;
-        g.drawString(font, number, cx(bitX(DeviceMenu.Port.BITS)), cy(BIT_Y + 2), skin.text(), false);
+        g.text(font, number, cx(bitX(DeviceMenu.Port.BITS)), cy(BIT_Y + 2), skin.text(), false);
         hint(BIT_X, BIT_Y, bitX(DeviceMenu.Port.BITS) + font.width(number) - BIT_X, BIT_SIZE,
                 tr("port.channel", channel), tr("port.channel_hint").copy().withStyle(st -> st.withColor(0xFF8A949E)));
     }
 
     // ------------------------------------------------------------------ 重力閉じ込めタンク
 
-    private void drawTank(GuiGraphics g, float t) {
+    private void drawTank(GuiGraphicsExtractor g, float t) {
         int amount = v(DeviceMenu.Tank.AMOUNT);
         int cap = Math.max(1, v(DeviceMenu.Tank.CAPACITY));
         // 大きな縦のタンク: ゆっくり渦を巻くダークマター
@@ -669,7 +669,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ ハロー捕集器
 
-    private void drawHalo(GuiGraphics g, float t) {
+    private void drawHalo(GuiGraphicsExtractor g, float t) {
         boolean core = v(DeviceMenu.Halo.CORE) != 0;
         int x0 = cx(40);
         int y0 = cy(56);
@@ -696,7 +696,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ 宇宙線ミュオン収集器
 
-    private void drawMuon(GuiGraphics g, float t) {
+    private void drawMuon(GuiGraphicsExtractor g, float t) {
         // 高さの目盛り（Y=100 で0、Y=200 で最大）と、今の高さの印
         int bx = cx(24);
         int by = cy(20);
@@ -736,7 +736,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     private static final int OBSERVE_W = 40;
     private static final int OBSERVE_H = 18;
 
-    private void drawDetector(GuiGraphics g, float t, int mouseX, int mouseY) {
+    private void drawDetector(GuiGraphicsExtractor g, float t, int mouseX, int mouseY) {
         int x0 = cx(52);
         int y0 = cy(60);
         // 方位の盤（北が上）
@@ -777,7 +777,8 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
     // ------------------------------------------------------------------ ボタン
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (clickFrame(mouseX, mouseY, button)) {
             return true;
         }
@@ -807,6 +808,6 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 }

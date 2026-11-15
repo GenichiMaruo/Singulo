@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.phys.AABB;
 
 /** 野良ブラックホール: 炉心と同じ黒い地平線と降着円盤。景色の歪む範囲は、質量とともに少しずつ広がる。 */
-public class RogueBlackHoleRenderer implements BlockEntityRenderer<RogueBlackHoleBlockEntity> {
+public class RogueBlackHoleRenderer extends SnapshotBlockRenderer<RogueBlackHoleBlockEntity> {
     public RogueBlackHoleRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
@@ -26,7 +26,7 @@ public class RogueBlackHoleRenderer implements BlockEntityRenderer<RogueBlackHol
     }
 
     @Override
-    public boolean shouldRenderOffScreen(RogueBlackHoleBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

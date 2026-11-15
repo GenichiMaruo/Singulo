@@ -16,7 +16,7 @@ import io.github.genichimaruo.singulo.ruin.AncientRecords;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
 import io.github.genichimaruo.singulo.ruin.WardenSingularity;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -59,7 +59,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
  *       電力を注ぐと作り、画面の出来上がりスロットから受け取れる（下からホッパーなどでも取り出せる）</li>
  * </ol>
  */
-public class GenesisCoreBlockEntity extends BlockEntity {
+public class GenesisCoreBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public static final int UNFORMED = 0, CRADLE = 1, KINDLING = 2, STABILIZING = 3, BIRTH = 4, COMPLETE = 5;
 
     /** 枠の位置（核と同じ高さ、八角形）。 */
@@ -351,7 +351,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             instability += feeding ? 0.008F : -0.05F;
             if (--nextSurge <= 0) {
                 surgeTicks = SURGE_WARN + SURGE_ACTIVE;
-                nextSurge = 600 + level.random.nextInt(300);
+                nextSurge = 600 + level.getRandom().nextInt(300);
                 level.playSound(null, worldPosition.above(5), SinguloSounds.get("genesis.alarm"), SoundSource.BLOCKS, 3.0F, 1.0F);
                 tellNear(level, "gui.singulo.genesis.surge", 48);
                 markSync();
@@ -367,7 +367,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             progress += TimeFields.state(level, worldPosition.above(5)) > 0 ? 1.5 : 1.0;
         }
         if (--nextEvent <= 0) {
-            nextEvent = (shield ? 900 : 600) + level.random.nextInt(300);
+            nextEvent = (shield ? 900 : 600) + level.getRandom().nextInt(300);
             randomEvent(level);
         }
         if (progress >= STABILIZE_TICKS) {
@@ -413,7 +413,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         if (players.isEmpty()) {
             return;
         }
-        switch (level.random.nextInt(3)) {
+        switch (level.getRandom().nextInt(3)) {
             case 0 -> {
                 spawnLeak(level);
                 spawnLeak(level);
@@ -421,13 +421,13 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             }
             case 1 -> {
                 for (int i = 0; i < 3; i++) {
-                    Player target = players.get(level.random.nextInt(players.size()));
+                    Player target = players.get(level.getRandom().nextInt(players.size()));
                     EchoSentinel echo = SinguloEntities.ECHO_SENTINEL.get().create(level);
                     if (echo == null) {
                         continue;
                     }
                     echo.makeMinion();
-                    double a = level.random.nextDouble() * Math.PI * 2;
+                    double a = level.getRandom().nextDouble() * Math.PI * 2;
                     echo.moveTo(target.getX() + Math.cos(a) * 6, target.getY() + 2, target.getZ() + Math.sin(a) * 6, 0, 0);
                     echo.setTarget(target);
                     level.addFreshEntity(echo);
@@ -450,8 +450,8 @@ public class GenesisCoreBlockEntity extends BlockEntity {
     }
 
     private void spawnLeak(ServerLevel level) {
-        double a = level.random.nextDouble() * Math.PI * 2;
-        double r = 4 + level.random.nextDouble() * 4;
+        double a = level.getRandom().nextDouble() * Math.PI * 2;
+        double r = 4 + level.getRandom().nextDouble() * 4;
         Vec3 at = Vec3.atBottomCenterOf(worldPosition).add(Math.cos(a) * r, 1.2, Math.sin(a) * r);
         level.addFreshEntity(new WardenSingularity(level, null, at));
     }
@@ -484,9 +484,9 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         }
         if (t < BIRTH_COLLAPSE) {
             for (int i = 0; i < 8; i++) {
-                double a = level.random.nextDouble() * Math.PI * 2;
-                double b = (level.random.nextDouble() - 0.5) * Math.PI;
-                double r = 6 + level.random.nextDouble() * 10;
+                double a = level.getRandom().nextDouble() * Math.PI * 2;
+                double b = (level.getRandom().nextDouble() - 0.5) * Math.PI;
+                double r = 6 + level.getRandom().nextDouble() * 10;
                 Vec3 d = new Vec3(Math.cos(a) * Math.cos(b), Math.sin(b), Math.sin(a) * Math.cos(b));
                 level.sendParticles(ParticleTypes.END_ROD, c.x + d.x * r, c.y + d.y * r, c.z + d.z * r, 0, -d.x, -d.y, -d.z, 0.8);
             }
@@ -514,7 +514,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             for (int arm = 0; arm < 3; arm++) {
                 double a = t * 0.08 + arm * Math.PI * 2 / 3 + k * 4;
                 double r = 1 + 7 * k;
-                level.sendParticles(ParticleTypes.END_ROD, c.x + Math.cos(a) * r, c.y + (level.random.nextDouble() - 0.5) * 0.5,
+                level.sendParticles(ParticleTypes.END_ROD, c.x + Math.cos(a) * r, c.y + (level.getRandom().nextDouble() - 0.5) * 0.5,
                         c.z + Math.sin(a) * r, 1, 0.1, 0.1, 0.1, 0.01);
             }
         }
@@ -628,8 +628,8 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             template = plain;
             synthProgress = 0;
         }
-        player.displayClientMessage(Component.translatable("gui.singulo.genesis.template", stack.getHoverName(),
-                formatFe(MassSynthesis.cost(e)), e.tier()), true);
+        player.sendOverlayMessage(Component.translatable("gui.singulo.genesis.template", stack.getHoverName(),
+                formatFe(MassSynthesis.cost(e)), e.tier()));
         markSync();
         return true;
     }
@@ -683,7 +683,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
     /** 宇宙の記憶を宿した核のアイテムか（説明に使う）。 */
     public static boolean remembersUniverse(ItemStack stack) {
         net.minecraft.world.item.component.CustomData data = stack.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA);
-        return data != null && data.copyTag().getInt("stage") == COMPLETE;
+        return data != null && data.copyTag().getIntOr("stage", 0) == COMPLETE;
     }
 
     /** クライアント側の見込み（腕を振るかどうか）。 */
@@ -788,7 +788,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             msg = Component.translatable("gui.singulo.genesis.bar.paused", msg);
         }
         for (ServerPlayer p : serverPlayers(level, 14)) {
-            p.displayClientMessage(msg, true);
+            p.sendOverlayMessage(msg);
         }
     }
 
@@ -825,12 +825,12 @@ public class GenesisCoreBlockEntity extends BlockEntity {
     private void tellNear(ServerLevel level, String key, double r) {
         Component msg = Component.translatable(key).withStyle(ChatFormatting.GOLD);
         for (ServerPlayer p : serverPlayers(level, r)) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
     private static void tell(ServerPlayer player, String key) {
-        player.displayClientMessage(Component.translatable(key), true);
+        player.sendOverlayMessage(Component.translatable(key));
     }
 
     // ------------------------------------------------------------------ 電力と取り出し口
@@ -972,26 +972,26 @@ public class GenesisCoreBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        stage = tag.getInt("stage");
-        formed = tag.getBoolean("formed");
-        buffer = tag.getLong("buffer");
-        intake = tag.getDouble("intake");
-        charge = tag.getDouble("charge");
-        progress = tag.getDouble("progress");
-        instability = tag.getFloat("instability");
-        surgeTicks = tag.getInt("surge");
-        nextSurge = tag.contains("next_surge") ? tag.getInt("next_surge") : 700;
-        nextEvent = tag.contains("next_event") ? tag.getInt("next_event") : 500;
-        manualStop = tag.getBoolean("manual_stop");
-        feeding = !tag.contains("feeding") || tag.getBoolean("feeding");
-        birthTicks = tag.getInt("birth");
-        galaxySeed = tag.getLong("galaxy");
-        synthProgress = tag.getDouble("synth");
+        stage = tag.getIntOr("stage", 0);
+        formed = tag.getBooleanOr("formed", false);
+        buffer = tag.getLongOr("buffer", 0L);
+        intake = tag.getDoubleOr("intake", 0.0D);
+        charge = tag.getDoubleOr("charge", 0.0D);
+        progress = tag.getDoubleOr("progress", 0.0D);
+        instability = tag.getFloatOr("instability", 0.0F);
+        surgeTicks = tag.getIntOr("surge", 0);
+        nextSurge = tag.contains("next_surge") ? tag.getIntOr("next_surge", 0) : 700;
+        nextEvent = tag.contains("next_event") ? tag.getIntOr("next_event", 0) : 500;
+        manualStop = tag.getBooleanOr("manual_stop", false);
+        feeding = !tag.contains("feeding") || tag.getBooleanOr("feeding", false);
+        birthTicks = tag.getIntOr("birth", 0);
+        galaxySeed = tag.getLongOr("galaxy", 0L);
+        synthProgress = tag.getDoubleOr("synth", 0.0D);
         // 見本は素の形で持つ（以前の版で保存されたエンチャント・名前・損傷つきの見本も、ここで素に戻す。
         // 出来上がった物はプレイヤーの物なので、そのまま残す）
-        ItemStack saved = tag.contains("template") ? ItemStack.parseOptional(registries, tag.getCompound("template")) : ItemStack.EMPTY;
+        ItemStack saved = tag.contains("template") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("template")) : ItemStack.EMPTY;
         template = saved.isEmpty() ? ItemStack.EMPTY : new ItemStack(saved.getItem());
-        output = tag.contains("output") ? ItemStack.parseOptional(registries, tag.getCompound("output")) : ItemStack.EMPTY;
+        output = tag.contains("output") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("output")) : ItemStack.EMPTY;
     }
 
     @Override

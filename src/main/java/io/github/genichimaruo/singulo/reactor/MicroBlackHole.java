@@ -41,7 +41,7 @@ public class MicroBlackHole extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (random.nextInt(2) == 0) {
                 Vec3 d = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize().scale(2.5);
                 level().addParticle(ParticleTypes.REVERSE_PORTAL, getX() + d.x, getY() + d.y, getZ() + d.z, -d.x * 0.08, -d.y * 0.08, -d.z * 0.08);
@@ -115,11 +115,15 @@ public class MicroBlackHole extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+
+        values.store(tag);
     }
 
     @Override

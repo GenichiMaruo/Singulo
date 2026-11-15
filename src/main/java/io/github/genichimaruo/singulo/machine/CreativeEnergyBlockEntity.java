@@ -16,7 +16,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * int の上限を超えて、ほかの mod の装置へは1面あたり int まで）、
  * ケーブルや装置から取り出すこともできる。検証用。
  */
-public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class CreativeEnergyBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     private final io.github.genichimaruo.singulo.energy.LongEnergyStorage infinite = new io.github.genichimaruo.singulo.energy.LongEnergyStorage() {
         @Override
         public long receiveLong(long amount, boolean simulate) { return amount; }
@@ -74,6 +74,6 @@ public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMa
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.displayClientMessage(Component.translatable("tooltip.singulo.creative_energy.hint"), true);
+        player.sendOverlayMessage(Component.translatable("tooltip.singulo.creative_energy.hint"));
     }
 }

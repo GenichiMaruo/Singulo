@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -11,7 +11,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -321,17 +321,17 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
      * （右クリックなら1個）。加工モードでは、作る物・ほかに出てくる物の欄にも置ける。
      */
     @Override
-    public void clicked(int slotId, int button, ClickType type, Player player) {
+    public void clicked(int slotId, int button, ContainerInput type, Player player) {
         boolean grid = slotId >= SLOT_GRID && slotId < SLOT_GRID + WorkConsoleBlockEntity.GRID;
         if (grid || isGhost(slotId)) {
             boolean counted = mode() != WorkConsoleBlockEntity.MODE_CRAFTING;
-            if ((grid || counted) && (type == ClickType.PICKUP || type == ClickType.QUICK_MOVE)) {
+            if ((grid || counted) && (type == ContainerInput.PICKUP || type == ContainerInput.QUICK_MOVE)) {
                 ItemStack carried = getCarried();
                 int count = counted && button == 0 ? carried.getCount() : 1;
                 ItemStack fluid = counted ? FluidSamples.fromContainer(carried) : ItemStack.EMPTY;
                 encoder.setItem(encoderIndex(slotId), carried.isEmpty() ? ItemStack.EMPTY
                         : FluidSamples.liquid(fluid) ? fluid : carried.copyWithCount(count));
-                if (!player.level().isClientSide && player.level().getBlockEntity(pos) instanceof WorkConsoleBlockEntity c) {
+                if (!player.level().isClientSide() && player.level().getBlockEntity(pos) instanceof WorkConsoleBlockEntity c) {
                     c.updateResult();
                 }
                 broadcastChanges();
@@ -390,7 +390,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             if (id == BUTTON_ADD) {
                 net.minecraft.network.chat.Component why = c.addStep();
                 if (why != null) {
-                    player.displayClientMessage(why, true);
+                    player.sendOverlayMessage(why);
                 }
             } else {
                 c.removeStep(id - BUTTON_REMOVE_STEP);

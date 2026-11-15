@@ -18,7 +18,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -263,13 +263,13 @@ public final class BossGameTests {
         warden.skipEmerging();
         warden.setNoAi(false);
         warden.setHealth(500);
-        net.minecraft.world.entity.monster.Skeleton skeleton = helper.spawn(EntityType.SKELETON, new BlockPos(4, 1, 13));
+        net.minecraft.world.entity.monster.skeleton.Skeleton skeleton = helper.spawn(EntityType.SKELETON, new BlockPos(4, 1, 13));
         skeleton.setNoAi(true);
         float[] wardenHealth = new float[1];
         helper.runAtTickTime(5, () -> {
             helper.assertTrue(warden.phase() == 2, "フェーズ2にならない");
             wardenHealth[0] = warden.getHealth();
-            net.minecraft.world.entity.projectile.Arrow arrow = new net.minecraft.world.entity.projectile.Arrow(
+            net.minecraft.world.entity.projectile.arrow.Arrow arrow = new net.minecraft.world.entity.projectile.arrow.Arrow(
                     EntityType.ARROW, helper.getLevel());
             arrow.setOwner(skeleton);
             arrow.setPos(skeleton.getX(), skeleton.getEyeY() - 0.1, skeleton.getZ());

@@ -46,10 +46,10 @@ public class MagneticBottleItem extends SinguloItem {
             if (player != null) {
                 context.getItemInHand().hurtAndBreak(1, player, context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND
                         ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
-                player.displayClientMessage(Component.translatable("message.singulo.strangelet_contained"), true);
+                player.sendOverlayMessage(Component.translatable("message.singulo.strangelet_contained"));
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override

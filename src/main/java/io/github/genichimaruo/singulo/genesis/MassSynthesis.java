@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
@@ -45,7 +45,7 @@ public final class MassSynthesis extends SimpleJsonResourceReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
         Map<Item, Entry> newItems = new HashMap<>();
         List<TagEntry> newTags = new ArrayList<>();
         files.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(file -> {
@@ -55,10 +55,10 @@ public final class MassSynthesis extends SimpleJsonResourceReloadListener {
                     Entry entry = new Entry(o.get("mass").getAsDouble(),
                             Math.max(0, Math.min(MAX_TIER, o.get("tier").getAsInt())));
                     if (o.has("item")) {
-                        ResourceLocation id = ResourceLocation.parse(o.get("item").getAsString());
+                        Identifier id = Identifier.parse(o.get("item").getAsString());
                         BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> newItems.put(item, entry));
                     } else if (o.has("tag")) {
-                        newTags.add(new TagEntry(TagKey.create(Registries.ITEM, ResourceLocation.parse(o.get("tag").getAsString())), entry));
+                        newTags.add(new TagEntry(TagKey.create(Registries.ITEM, Identifier.parse(o.get("tag").getAsString())), entry));
                     }
                 }
             } catch (RuntimeException ex) {

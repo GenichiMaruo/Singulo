@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
  * 近くにプレイヤー（クリエイティブ・観戦を除く）が来ると、2〜3体を1体ずつ台の上に印刷する。
  * アンドロイドは充電が切れるとこの台へ戻って充電する。全部倒すと、半分の確率でその型の設計メモリが出て、1日（24000 tick）休む。
  */
-public class AndroidFabricatorBlockEntity extends BlockEntity {
+public class AndroidFabricatorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     public static final int DETECT_RANGE = 16;
     public static final long COOLDOWN = 24_000;
     /** 1体の印刷が終わってから、次の印刷を始めるまで（台の上が空いていれば、すぐ）。 */
@@ -82,7 +82,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     private void tick(ServerLevel level) {
         if (kind == null) {
             AndroidKind[] all = AndroidKind.ruinKinds();
-            setKind(all[level.random.nextInt(all.length)]);
+            setKind(all[level.getRandom().nextInt(all.length)]);
         }
         // 見つからない（読み込まれていない）だけのものは、倒されたとは限らないので残す。消えたものは forget で外れる
         androids.removeIf(id -> level.getEntity(id) instanceof RuinAndroid a && !a.isAlive());
@@ -124,7 +124,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
                 DETECT_RANGE, p -> !p.isSpectator() && !((Player) p).isCreative());
         if (player != null) {
             waveActive = true;
-            waveSize = 2 + level.random.nextInt(2);
+            waveSize = 2 + level.getRandom().nextInt(2);
             printed = 0;
             lost = false;
             missing = 0;
@@ -163,7 +163,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
             return;
         }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
-        a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
+        a.moveTo(top.x, top.y, top.z, level.getRandom().nextFloat() * 360, 0);
         a.setHome(worldPosition);
         a.markFacilitySpawned();                                   // 倒すと部品を少し落とす（印刷台の個体だけ）
         a.startPrinting();
@@ -182,7 +182,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     /** 全部倒されたとき: MEMORY_CHANCE の確率で、この型の設計メモリ（小型クリスタルメモリ）が台の上に出る。 */
     private void cleared(ServerLevel level) {
         level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.0F, 1.2F);
-        if (kind == null || level.random.nextFloat() >= memoryChance) {
+        if (kind == null || level.getRandom().nextFloat() >= memoryChance) {
             return;
         }
         var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(kind.memoryId()));
@@ -216,16 +216,16 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        kind = tag.contains("kind") ? AndroidKind.byId(tag.getString("kind")) : null;
+        kind = tag.contains("kind") ? AndroidKind.byId(tag.getStringOr("kind", "")) : null;
         androids.clear();
         for (Tag t : tag.getList("androids", Tag.TAG_INT_ARRAY)) {
             androids.add(NbtUtils.loadUUID(t));
         }
-        waveActive = tag.getBoolean("wave");
-        waveSize = tag.getInt("wave_size");
-        printed = tag.getInt("printed");
-        lastPrint = tag.getLong("last_print");
-        nextWave = tag.getLong("next_wave");
-        lost = tag.getBoolean("lost");
+        waveActive = tag.getBooleanOr("wave", false);
+        waveSize = tag.getIntOr("wave_size", 0);
+        printed = tag.getIntOr("printed", 0);
+        lastPrint = tag.getLongOr("last_print", 0L);
+        nextWave = tag.getLongOr("next_wave", 0L);
+        lost = tag.getBooleanOr("lost", false);
     }
 }

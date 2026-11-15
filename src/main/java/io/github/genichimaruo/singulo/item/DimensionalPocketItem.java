@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +37,7 @@ public class DimensionalPocketItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player instanceof ServerPlayer sp) {
             Pocket pocket = new Pocket(sp);
@@ -45,7 +45,7 @@ public class DimensionalPocketItem extends SinguloItem {
                     Component.translatable("container.singulo.dimensional_pocket")));
             level.playSound(null, player.blockPosition(), SinguloSounds.get("dimensional_pocket.open"), SoundSource.PLAYERS, 0.8F, 1.0F);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     /** プレイヤーに付いた中身を写した入れ物。変わるたびに書き戻す。 */

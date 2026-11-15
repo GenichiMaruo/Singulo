@@ -128,7 +128,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
     private static List<ItemStack> items(net.minecraft.nbt.ListTag list, net.minecraft.core.HolderLookup.Provider reg) {
         List<ItemStack> out = new ArrayList<>();
         for (Tag t : list) {
-            ItemStack s = ItemStack.parseOptional(reg, (CompoundTag) t);
+            ItemStack s = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(reg, (CompoundTag) t);
             if (!s.isEmpty()) {
                 out.add(s);
             }
@@ -152,13 +152,13 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
             }
             CompoundTag a = payload.action();
             var reg = player.level().registryAccess();
-            ItemStack item = ItemStack.parseOptional(reg, a.getCompound("item"));
-            long count = Math.max(1, Math.min(WorkConsoleBlockEntity.MAX_COUNT, a.getLong("count")));
+            ItemStack item = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(reg, a.getCompoundOrEmpty("item"));
+            long count = Math.max(1, Math.min(WorkConsoleBlockEntity.MAX_COUNT, a.getLongOr("count", 0L)));
             CompoundTag plan = null;
-            switch (a.getString("type")) {
+            switch (a.getStringOr("type", "")) {
                 case PLAN -> {
                     if (!item.isEmpty()) {
-                        plan = WorkConsoleView.plan(console, console.plan(item, count, a.getBoolean("fresh")), reg);
+                        plan = WorkConsoleView.plan(console, console.plan(item, count, a.getBooleanOr("fresh", false)), reg);
                     }
                 }
                 case START -> {
@@ -166,9 +166,9 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     for (Tag t : a.getList("androids", Tag.TAG_INT_ARRAY)) {
                         ids.add(NbtUtils.loadUUID(t));
                     }
-                    BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLong("destination")) : null;
+                    BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLongOr("destination", 0L)) : null;
                     Component error = item.isEmpty() ? Component.literal("?")
-                            : console.start(player, item, count, ids, a.getBoolean("auto"), destination, a.getBoolean("fresh"));
+                            : console.start(player, item, count, ids, a.getBooleanOr("auto", false), destination, a.getBooleanOr("fresh", false));
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {
@@ -180,9 +180,9 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     for (Tag t : a.getList("androids", Tag.TAG_INT_ARRAY)) {
                         ids.add(NbtUtils.loadUUID(t));
                     }
-                    BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLong("destination")) : null;
+                    BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLongOr("destination", 0L)) : null;
                     Component error = item.isEmpty() ? Component.literal("?")
-                            : console.register(player, item, count, a.getInt("trigger"), destination, ids);
+                            : console.register(player, item, count, a.getIntOr("trigger", 0), destination, ids);
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {
@@ -191,21 +191,21 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                 }
                 case UNREGISTER -> {
                     if (console.mayOperate(player)) {
-                        console.unregister(a.getInt("id"));
+                        console.unregister(a.getIntOr("id", 0));
                     }
                 }
-                case CANCEL -> console.cancel(a.getInt("id"), null);
-                case UNLINK -> console.unlink(BlockPos.of(a.getLong("pos")));
+                case CANCEL -> console.cancel(a.getIntOr("id", 0), null);
+                case UNLINK -> console.unlink(BlockPos.of(a.getLongOr("pos", 0L)));
                 case GRID -> {
                     List<ItemStack> grid = new ArrayList<>();
-                    for (Tag t : a.getList("grid", Tag.TAG_COMPOUND)) {
-                        grid.add(((CompoundTag) t).isEmpty() ? ItemStack.EMPTY : ItemStack.parseOptional(reg, (CompoundTag) t));
+                    for (Tag t : a.getListOrEmpty("grid")) {
+                        grid.add(((CompoundTag) t).isEmpty() ? ItemStack.EMPTY : io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(reg, (CompoundTag) t));
                     }
                     menu.setGrid(player, grid);
                     return;
                 }
                 case PROCESS -> {
-                    menu.setProcess(player, items(a.getList("inputs", Tag.TAG_COMPOUND), reg), items(a.getList("outputs", Tag.TAG_COMPOUND), reg));
+                    menu.setProcess(player, items(a.getListOrEmpty("inputs"), reg), items(a.getListOrEmpty("outputs"), reg));
                     return;
                 }
                 default -> {

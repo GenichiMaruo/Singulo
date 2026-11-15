@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.ruin;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -107,7 +107,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
 
     @Override
     public void tick() {
-        if (!level().isClientSide && homingTarget != null && homingTarget.isAlive()) {
+        if (!level().isClientSide() && homingTarget != null && homingTarget.isAlive()) {
             Vec3 v = getDeltaMovement();
             double speed = v.length();
             Vec3 want = homingTarget.getBoundingBox().getCenter().subtract(position()).normalize().scale(speed);
@@ -115,7 +115,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
             hasImpulse = true;
         }
         super.tick();
-        if (!level().isClientSide && tickCount > LIFETIME) {
+        if (!level().isClientSide() && tickCount > LIFETIME) {
             discard();
         }
         if (level() instanceof ServerLevel server && tickCount % 2 == 0) {
@@ -137,10 +137,10 @@ public class HorizonBolt extends ThrowableItemProjectile {
         super.readAdditionalSaveData(tag);
         // 0.5.0 より前に保存された光弾は、ダメージを持たない（既定の値のまま）
         if (tag.contains("damage")) {
-            damage = tag.getFloat("damage");
+            damage = tag.getFloatOr("damage", 0.0F);
         }
-        armored = tag.getBoolean("armored");
-        piercing = tag.getBoolean("piercing");
+        armored = tag.getBooleanOr("armored", false);
+        piercing = tag.getBooleanOr("piercing", false);
     }
 
     public float damage() {
@@ -173,7 +173,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             if (level() instanceof ServerLevel server) {
                 server.sendParticles(ParticleTypes.FLASH, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
                 server.playSound(null, getX(), getY(), getZ(), SinguloSounds.get("horizon_warden.bolt_hit"),

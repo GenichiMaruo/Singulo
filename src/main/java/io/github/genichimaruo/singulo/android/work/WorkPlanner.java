@@ -92,7 +92,7 @@ public final class WorkPlanner {
 
     /** 実際の在庫と、先に計画した工程の余りを分けて使う（予約するのは実際の在庫だけ）。 */
     private static void need(Plan plan, ItemStack item, long amount,
-                             @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt,
+                             @org.jspecify.annotations.Nullable net.minecraft.world.item.crafting.Ingredient alt,
                              Context context, List<Key> path) {
         if (plan.limited) {
             return;
@@ -150,7 +150,7 @@ public final class WorkPlanner {
     }
 
     /** stock のうち alt に合う物を、取り出しの優先度の高い順（同じなら、触媒は寿命の短い順、ほかは見本と同じ物から）に取る。 */
-    private static long takeRanked(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved, ItemStack item,
+    private static long takeRanked(List<ItemCount> stock, @org.jspecify.annotations.Nullable List<ItemCount> reserved, ItemStack item,
                                    long amount, net.minecraft.world.item.crafting.Ingredient alt) {
         List<ItemCount> found = new java.util.ArrayList<>();
         for (ItemCount c : stock) {
@@ -176,7 +176,7 @@ public final class WorkPlanner {
     }
 
     /** stock のうち item と同じ物を取る。 */
-    private static long take(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved,
+    private static long take(List<ItemCount> stock, @org.jspecify.annotations.Nullable List<ItemCount> reserved,
                              ItemStack item, long amount) {
         for (ItemCount c : stock) {
             if (amount <= 0) {

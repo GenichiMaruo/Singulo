@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * すでにあるボックスの高さに合わせる）。壊すと高さはアイテムに残り、置き直すとその高さに戻る（壊して置き直すだけで、
  * 電力の安い高さ5に戻ることはない）。
  */
-public class ZeroGravityControllerBlockEntity extends BlockEntity {
+public class ZeroGravityControllerBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     private int height = ZeroGravity.DEFAULT_HEIGHT;
 
     public ZeroGravityControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -142,6 +142,6 @@ public class ZeroGravityControllerBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        height = tag.contains("height") ? Math.max(1, tag.getInt("height")) : ZeroGravity.DEFAULT_HEIGHT;
+        height = tag.contains("height") ? Math.max(1, tag.getIntOr("height", 0)) : ZeroGravity.DEFAULT_HEIGHT;
     }
 }

@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemStack;
 
 import io.github.genichimaruo.singulo.ruin.RuinGuards;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -186,7 +186,7 @@ public abstract class RuinAndroid extends Monster {
                 // 留守のあいだに巡回で変わったことがあれば、一言知らせる
                 Component report = seen == null ? null : patrol.report();
                 if (report != null) {
-                    p.displayClientMessage(report, true);
+                    p.sendOverlayMessage(report);
                 }
                 return;
             }
@@ -325,7 +325,7 @@ public abstract class RuinAndroid extends Monster {
     @Nullable private String escrowDimension;
     @Nullable public ServerLevel escrowLevel() {
         if (!(level() instanceof ServerLevel current) || escrowDimension==null) return null;
-        var id=net.minecraft.resources.ResourceLocation.tryParse(escrowDimension);
+        var id=net.minecraft.resources.Identifier.tryParse(escrowDimension);
         return id==null ? null : current.getServer().getLevel(net.minecraft.resources.ResourceKey.create(
                 net.minecraft.core.registries.Registries.DIMENSION,id));
     }
@@ -424,7 +424,7 @@ public abstract class RuinAndroid extends Monster {
         // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
         inventory.addListener(c -> {
             setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
-            if (!level().isClientSide) {
+            if (!level().isClientSide()) {
                 net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
                 entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
                 entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
@@ -940,7 +940,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** タンクの見た目を、クライアントへ知らせる。 */
     private void syncTanks() {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         boolean on = hasTank();
@@ -1094,8 +1094,8 @@ public abstract class RuinAndroid extends Monster {
     public CompoundTag saveWorkState() {
         CompoundTag t = workGoal.saveWork();
         t.putInt("personal", personal);
-        if (escrowRequest != null) t.putUUID("escrow_request",escrowRequest);
-        if (escrowOwner != null) t.putUUID("escrow_owner",escrowOwner);
+        if (escrowRequest != null) t.store("escrow_request", net.minecraft.core.UUIDUtil.CODEC, escrowRequest);
+        if (escrowOwner != null) t.store("escrow_owner", net.minecraft.core.UUIDUtil.CODEC, escrowOwner);
         if (escrowDimension != null) t.putString("escrow_dimension",escrowDimension);
         var fluids = new net.minecraft.nbt.ListTag();
         for (var tank : tanks) {
@@ -1120,23 +1120,23 @@ public abstract class RuinAndroid extends Monster {
 
     private void loadChems(net.minecraft.nbt.ListTag list) {
         for (int i = 0; i < TANKS; i++) {
-            CompoundTag c = i < list.size() ? list.getCompound(i) : new CompoundTag();
-            chemIds[i] = c.getString("id");
-            chemAmounts[i] = chemIds[i].isEmpty() ? 0 : Math.max(0, c.getLong("amount"));
+            CompoundTag c = i < list.size() ? list.getCompoundOrEmpty(i) : new CompoundTag();
+            chemIds[i] = c.getStringOr("id", "");
+            chemAmounts[i] = chemIds[i].isEmpty() ? 0 : Math.max(0, c.getLongOr("amount", 0L));
         }
     }
 
     public void restoreWorkState(CompoundTag t) {
-        if (t.hasUUID("escrow_request")) escrowRequest=t.getUUID("escrow_request");
-        if (t.hasUUID("escrow_owner")) escrowOwner=t.getUUID("escrow_owner");
-        if (t.contains("escrow_dimension")) escrowDimension=t.getString("escrow_dimension");
-        personal = t.getInt("personal");
+        if (t.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).isPresent()) escrowRequest=t.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
+        if (t.read("escrow_owner", net.minecraft.core.UUIDUtil.CODEC).isPresent()) escrowOwner=t.read("escrow_owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
+        if (t.contains("escrow_dimension")) escrowDimension=t.getStringOr("escrow_dimension", "");
+        personal = t.getIntOr("personal", 0);
         workGoal.loadWork(t);
         var fluids = t.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < TANKS; i++) {
             tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);
             if (i < fluids.size()) {
-                tanks[i].readFromNBT(registryAccess(), fluids.getCompound(i));
+                tanks[i].readFromNBT(registryAccess(), fluids.getCompoundOrEmpty(i));
             }
         }
         loadChems(t.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
@@ -1543,7 +1543,7 @@ public abstract class RuinAndroid extends Monster {
             sp.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new AndroidMenu(id, inv, this), getDisplayName()),
                     buf -> buf.writeVarInt(getId()));
         }
-        return net.minecraft.world.InteractionResult.sidedSuccess(level().isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level().isClientSide());
     }
 
     /** 倒れたら、持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）をその場に落とす。 */
@@ -1611,7 +1611,7 @@ public abstract class RuinAndroid extends Monster {
         if (tag.contains("items")) {
             net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
                     net.minecraft.world.item.ItemStack.EMPTY);
-            net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("items"), items, registryAccess());
+            net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompoundOrEmpty("items"), items, registryAccess());
             for (int i = 0; i < INVENTORY_SIZE; i++) {
                 inventory.setItem(i, items.get(i));
             }
@@ -1619,7 +1619,7 @@ public abstract class RuinAndroid extends Monster {
             return;
         }
         for (net.minecraft.nbt.Tag t : tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-            net.minecraft.world.item.ItemStack.parse(registryAccess(), t).ifPresent(stack ->
+            io.github.genichimaruo.singulo.compat.NbtCompat.parse(registryAccess(), t).ifPresent(stack ->
                     inventory.setItem(isArmorPlate(stack) ? SLOT_PLATE : SLOT_REPAIR, stack));
         }
     }
@@ -1903,7 +1903,7 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public boolean isGuard() {
-        return level().isClientSide ? entityData.get(GUARD) : guard;
+        return level().isClientSide() ? entityData.get(GUARD) : guard;
     }
 
     /** 廃アンドロイド工場の製造ラインが印刷した個体（何も落とさず、経験値もない）と、そのうちの試作機（体力はそのまま）。 */
@@ -2136,7 +2136,7 @@ public abstract class RuinAndroid extends Monster {
      */
     public static void onChangeTarget(net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent event) {
         if (event.getNewAboutToBeSetTarget() instanceof RuinAndroid a && a.isGuard()
-                && (event.getEntity() instanceof net.minecraft.world.entity.animal.AbstractGolem
+                && (event.getEntity() instanceof net.minecraft.world.entity.animal.golem.AbstractGolem
                 || event.getEntity() instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame())) {
             event.setCanceled(true);
         }
@@ -2284,7 +2284,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public net.minecraft.world.entity.SpawnGroupData finalizeSpawn(net.minecraft.world.level.ServerLevelAccessor level,
                                                                    net.minecraft.world.DifficultyInstance difficulty,
-                                                                   net.minecraft.world.entity.MobSpawnType reason,
+                                                                   net.minecraft.world.entity.EntitySpawnReason reason,
                                                                    @Nullable net.minecraft.world.entity.SpawnGroupData data) {
         startPrinting();
         return super.finalizeSpawn(level, difficulty, reason, data);
@@ -2310,10 +2310,10 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if (GESTURE.equals(key) && level().isClientSide) {
+        if (GESTURE.equals(key) && level().isClientSide()) {
             clientGestureStart = tickCount;
         }
-        if (STATE.equals(key) && level().isClientSide) {
+        if (STATE.equals(key) && level().isClientSide()) {
             int s = state();
             if (s != clientPrevState) {
                 clientPrevState = s;
@@ -2369,7 +2369,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             tickThrusters();
             return;
         }
@@ -2539,7 +2539,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 無重力の空間で、宙を飛んで動いているか（手元でも分かる）。 */
     public boolean floating() {
-        return level().isClientSide ? entityData.get(FLOATING) : floating;
+        return level().isClientSide() ? entityData.get(FLOATING) : floating;
     }
 
     /** スラスターの開き具合（0〜1。たたむ・開くのに 6 tick）。 */
@@ -2753,7 +2753,7 @@ public abstract class RuinAndroid extends Monster {
         if (guard) {
             // 護衛はプレイヤー（許可証に載っていない人は除く）とほかの護衛の味方
             return other instanceof Player p && !intruder(p) || other instanceof RuinAndroid a && a.isGuard()
-                    || other instanceof net.minecraft.world.entity.animal.AbstractGolem
+                    || other instanceof net.minecraft.world.entity.animal.golem.AbstractGolem
                     || other instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame() || super.isAlliedTo(other);
         }
         return RuinGuards.isGuard(other) || super.isAlliedTo(other);
@@ -2769,7 +2769,7 @@ public abstract class RuinAndroid extends Monster {
         }
         Entity by = source.getEntity();
         if (guard ? by instanceof Player p && !intruder(p) || by instanceof RuinAndroid a && a.isGuard() || isBoss(by)
-                || by instanceof net.minecraft.world.entity.animal.AbstractGolem : RuinGuards.isGuard(by)) {
+                || by instanceof net.minecraft.world.entity.animal.golem.AbstractGolem : RuinGuards.isGuard(by)) {
             return false;
         }
         // ボスの叩きつけ・投げ飛ばしの落下も受けない（落下のダメージには、誰の技かが付かないので、近くにボスがいるかで見る）
@@ -2881,13 +2881,14 @@ public abstract class RuinAndroid extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putBoolean("facility_spawned", facilitySpawned);
         tag.putInt("charge", charge());
         tag.putInt("print", entityData.get(PRINT));
         if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(home));
         }
         if (factoryMade) {
             tag.putBoolean("factory_made", true);
@@ -2907,13 +2908,13 @@ public abstract class RuinAndroid extends Monster {
         tag.put("chem_tanks", saveChems());
         tag.putBoolean("work", workEnabled);
         if (escrowRequest != null) {
-            tag.putUUID("escrow_request",escrowRequest);
+            tag.store("escrow_request", net.minecraft.core.UUIDUtil.CODEC, escrowRequest);
             tag.putInt("work_personal",personal);
         }
-        if (escrowOwner != null) tag.putUUID("escrow_owner",escrowOwner);
+        if (escrowOwner != null) tag.store("escrow_owner", net.minecraft.core.UUIDUtil.CODEC, escrowOwner);
         if (escrowDimension != null) tag.putString("escrow_dimension",escrowDimension);
         if (workConsole != null) {
-            tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
+            tag.put("work_console", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(workConsole));
             tag.putInt("work_order", workOrder);
             tag.putInt("work_personal", personal);
             tag.put("work_state", saveWorkState());
@@ -2922,7 +2923,7 @@ public abstract class RuinAndroid extends Monster {
             tag.putBoolean("guard", true);
             tag.putBoolean("dismantling", dismantling);
             if (owner != null) {
-                tag.putUUID("owner", owner);
+                tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
             }
             tag.putInt("mode", mode);
             tag.putInt("retreat", retreatPercent);
@@ -2938,27 +2939,30 @@ public abstract class RuinAndroid extends Monster {
             }
             tag.put("members", list);
             if (leader != null) {
-                tag.putUUID("leader", leader);
+                tag.store("leader", net.minecraft.core.UUIDUtil.CODEC, leader);
             }
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        facilitySpawned = tag.getBoolean("facility_spawned");
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        facilitySpawned = tag.getBooleanOr("facility_spawned", false);
 
         if (tag.contains("charge")) {
-            setCharge(tag.getInt("charge"));
+            setCharge(tag.getIntOr("charge", 0));
         }
         if (tag.contains("print")) {
-            entityData.set(PRINT, Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS));
+            entityData.set(PRINT, Mth.clamp(tag.getIntOr("print", 0), 0, PRINT_TICKS));
         }
-        NbtUtils.readBlockPos(tag, "home").ifPresent(this::setHome);
-        guard = tag.getBoolean("guard");
-        dismantling = tag.getBoolean("dismantling");
-        factoryMade = tag.getBoolean("factory_made");
-        prototype = tag.getBoolean("prototype");
+        io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").ifPresent(this::setHome);
+        guard = tag.getBooleanOr("guard", false);
+        dismantling = tag.getBooleanOr("dismantling", false);
+        factoryMade = tag.getBooleanOr("factory_made", false);
+        prototype = tag.getBooleanOr("prototype", false);
         if (factoryMade) {
             xpReward = 0;
         }
@@ -2968,41 +2972,41 @@ public abstract class RuinAndroid extends Monster {
         for (int i = 0; i < TANKS; i++) {
             tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);
             if (i < tl.size()) {
-                tanks[i].readFromNBT(registryAccess(), tl.getCompound(i));
+                tanks[i].readFromNBT(registryAccess(), tl.getCompoundOrEmpty(i));
             }
         }
         loadChems(tag.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
-        workEnabled = !tag.contains("work") || tag.getBoolean("work");
-        NbtUtils.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
-            assignWork(p, tag.getInt("work_order"));
-            personal = tag.getInt("work_personal");          // 作業を始めたときの持ち主の物の場所（読み込み直しても変えない）
+        workEnabled = !tag.contains("work") || tag.getBooleanOr("work", false);
+        io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
+            assignWork(p, tag.getIntOr("work_order", 0));
+            personal = tag.getIntOr("work_personal", 0);          // 作業を始めたときの持ち主の物の場所（読み込み直しても変えない）
             if (tag.contains("work_state")) {
-                restoreWorkState(tag.getCompound("work_state"));
+                restoreWorkState(tag.getCompoundOrEmpty("work_state"));
             }
         }, this::clearWork);
-        if (tag.hasUUID("escrow_request")) {
-            escrowRequest=tag.getUUID("escrow_request");
-            personal=tag.getInt("work_personal");
+        if (tag.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).isPresent()) {
+            escrowRequest=tag.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
+            personal=tag.getIntOr("work_personal", 0);
         }
-        if (tag.hasUUID("escrow_owner")) escrowOwner=tag.getUUID("escrow_owner");
-        if (tag.contains("escrow_dimension")) escrowDimension=tag.getString("escrow_dimension");
+        if (tag.read("escrow_owner", net.minecraft.core.UUIDUtil.CODEC).isPresent()) escrowOwner=tag.read("escrow_owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
+        if (tag.contains("escrow_dimension")) escrowDimension=tag.getStringOr("escrow_dimension", "");
         if (tag.contains("charge")) {
-            setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す
+            setCharge(tag.getIntOr("charge", 0));                // バッテリーの数が分かってから、満タンに合わせて戻す
         }
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         if (guard) {
-            configure(tag.getInt("mode"), tag.contains("retreat") ? tag.getInt("retreat") : 30);
-            escort = !tag.contains("escort") || tag.getBoolean("escort");
-            escortPending = tag.getBoolean("escort_pending");
+            configure(tag.getIntOr("mode", 0), tag.contains("retreat") ? tag.getIntOr("retreat", 0) : 30);
+            escort = !tag.contains("escort") || tag.getBooleanOr("escort", false);
+            escortPending = tag.getBooleanOr("escort_pending", false);
             members.clear();
             for (net.minecraft.nbt.Tag t : tag.getList("members", net.minecraft.nbt.Tag.TAG_INT_ARRAY)) {
                 members.add(NbtUtils.loadUUID(t));
             }
-            leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
-            patrol.load(tag.getCompound("patrol"));
+            leader = tag.read("leader", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("leader", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            patrol.load(tag.getCompoundOrEmpty("patrol"));
             if (life != null) {
-                life.load(tag.getCompound("life"));
+                life.load(tag.getCompoundOrEmpty("life"));
             }
             syncPatrolLog();
         }

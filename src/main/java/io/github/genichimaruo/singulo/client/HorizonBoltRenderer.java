@@ -4,10 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.genichimaruo.singulo.ruin.HorizonBolt;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 /** 光弾: 白く光る芯と、撃った側の色のにじみ（脈打つ）。 */
@@ -36,7 +36,7 @@ public class HorizonBoltRenderer extends EntityRenderer<HorizonBolt> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(HorizonBolt bolt) {
+    public Identifier getTextureLocation(HorizonBolt bolt) {
         return FxDraw.WHITE;
     }
 }

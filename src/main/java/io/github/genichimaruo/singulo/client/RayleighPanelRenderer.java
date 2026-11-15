@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock;
 import io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  *
  * <p>縁（1ドット）はブロックのモデルの下の面の絵。同じ種類のパネルが隣にある辺は、投影面を縁の上まで広げて縁を隠す。
  */
-public class RayleighPanelRenderer implements BlockEntityRenderer<RayleighPanelBlockEntity> {
+public class RayleighPanelRenderer extends SnapshotBlockRenderer<RayleighPanelBlockEntity> {
     /** 真昼の空（真上・地平線の近く）と、真夜中（真上・地平線の近く）の色。アイコンの絵（tools/lab_blocks.py）と同じ色。 */
     static final int NOON_ZENITH = 0x3F7FE4, NOON_HORIZON = 0xBCD9F8, NIGHT_ZENITH = 0x03050B, NIGHT_HORIZON = 0x0C1426;
     /** 縁の色（研究所のもの・作ったもの）。モデルの下の面の絵の縁と同じ色。 */
@@ -70,7 +70,7 @@ public class RayleighPanelRenderer implements BlockEntityRenderer<RayleighPanelB
         float x1 = panel.connects(be.getLevel(), pos, Direction.EAST) ? 1 : 1 - FRAME;
         float z0 = panel.connects(be.getLevel(), pos, Direction.NORTH) ? 0 : FRAME;
         float z1 = panel.connects(be.getLevel(), pos, Direction.SOUTH) ? 1 : 1 - FRAME;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
         PoseStack.Pose last = pose.last();
         // 点いている間は自分で光る（周りの暗さに関係なく真昼の色）。消えていれば周りの明るさのまま
         int packed = lit ? FxDraw.FULL_BRIGHT : light;

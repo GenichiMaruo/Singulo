@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -101,7 +101,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
     @Override
     protected boolean openScreen(ServerPlayer player) {
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return true;
         }
         player.openMenu(new SimpleMenuProvider((id, inv, p) -> new RecipeRackMenu(id, inv, worldPosition, items),
@@ -120,15 +120,15 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        CompoundTag inv = tag.getCompound("items");
+        CompoundTag inv = tag.getCompoundOrEmpty("items");
         inv.putInt("Size", SLOTS);
-        items.deserializeNBT(registries, inv);
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, inv);
         java.util.Arrays.fill(decodedCards, null);
         java.util.Arrays.fill(decodedRecipes, null);
     }

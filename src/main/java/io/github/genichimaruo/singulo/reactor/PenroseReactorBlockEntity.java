@@ -14,7 +14,7 @@ import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -68,7 +68,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  *   <li>危険: 引力帯（半径 blackHolePullRadius）と潮汐帯（半径 tidalDamageRadius、防具を無視）</li>
  * </ul>
  */
-public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
     public enum State { UNFORMED, DORMANT, IGNITING, RUNNING }
 
     /** SHEDDING: 回収運転で、育ちすぎた炉心からジェットで質量を放出している（番号で同期するので後ろに足す）。 */
@@ -408,7 +408,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 点火の電力がどれだけ満ちたか（0〜1。クライアントでは同期された値）。 */
     public float ignitionCharge() {
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             return clientCharge;
         }
         return ignitionCharged ? 1F : (float) Math.min(1.0, ignitionStored / (double) Math.max(1, ignitionEnergy()));
@@ -746,7 +746,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             // 崩れる粒と、引きはがされた塊が渦を巻いて炉心へ落ちていく
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, s), from.x, from.y, from.z, 10, 0.3, 0.3, 0.3, 0.05);
             level.addFreshEntity(new InfallingBlock(level, from, s, c, horizon));
-            level.playSound(null, p, SinguloSounds.get("black_hole.devour"), SoundSource.BLOCKS, 1.4F, 0.85F + level.random.nextFloat() * 0.3F);
+            level.playSound(null, p, SinguloSounds.get("black_hole.devour"), SoundSource.BLOCKS, 1.4F, 0.85F + level.getRandom().nextFloat() * 0.3F);
         }
     }
 
@@ -818,10 +818,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 : swallowed instanceof net.minecraft.world.entity.item.ItemEntity item && !EventHorizonTargets.isReturnedRecord(item)
                         && !item.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
                 ? RECORD_FROM_ITEM : 0;
-        if (chance <= 0 || level.random.nextDouble() >= chance) {
+        if (chance <= 0 || level.getRandom().nextDouble() >= chance) {
             return;
         }
-        Vec3 dir = new Vec3(level.random.nextGaussian(), Math.abs(level.random.nextGaussian()) + 0.5, level.random.nextGaussian()).normalize();
+        Vec3 dir = new Vec3(level.getRandom().nextGaussian(), Math.abs(level.getRandom().nextGaussian()) + 0.5, level.getRandom().nextGaussian()).normalize();
         Vec3 at = c.add(dir.scale(horizon + 0.6));
         var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("record_fragment")));
         record.setDeltaMovement(dir.scale(0.7));
@@ -965,7 +965,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (t % 12 == 0) {
             Vec3 core = coreCenter();
             level.playSound(null, core.x, core.y, core.z, net.minecraft.sounds.SoundEvents.DEEPSLATE_BREAK,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 0.5F + level.random.nextFloat() * 0.3F);
+                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 0.5F + level.getRandom().nextFloat() * 0.3F);
         }
         if (t >= COLLAPSE_TICKS) {
             finishCollapse(level);
@@ -1007,12 +1007,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     private void readCollapse(CompoundTag tag) {
         if (!tag.contains("collapse_start")) {
-            if (level != null && level.isClientSide && tag.getBoolean("sync")) {
+            if (level != null && level.isClientSide() && tag.getBooleanOr("sync", false)) {
                 collapseStart = -1;
             }
             return;
         }
-        collapseStart = tag.getLong("collapse_start");
+        collapseStart = tag.getLongOr("collapse_start", 0L);
         long[] ps = tag.getLongArray("collapse_pos");
         List<BlockPos> list = new ArrayList<>(ps.length);
         for (long p : ps) {
@@ -1020,7 +1020,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
         collapseBlocks = List.copyOf(list);
         collapseStates = tag.getIntArray("collapse_state");
-        collapseDone = tag.getInt("collapse_done");
+        collapseDone = tag.getIntOr("collapse_done", 0);
     }
 
     // ------------------------------------------------------------------ ペレットを飲み込む様子（クライアント）
@@ -1045,10 +1045,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     public boolean triggerEvent(int id, int param) {
         if (id == EVENT_PELLETS) {
-            if (level != null && level.isClientSide && clientPellets.size() < 64) {
+            if (level != null && level.isClientSide() && clientPellets.size() < 64) {
                 for (int i = 0; i < param; i++) {
-                    clientPellets.addLast(new PelletFlight(level.getGameTime() + i * 3L, level.random.nextInt(12),
-                            level.random.nextFloat() * 2 - 1));
+                    clientPellets.addLast(new PelletFlight(level.getGameTime() + i * 3L, level.getRandom().nextInt(12),
+                            level.getRandom().nextFloat() * 2 - 1));
                 }
             }
             return true;
@@ -1065,7 +1065,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             CLIENT_LOADED.add(this);
         }
     }
@@ -1120,7 +1120,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     private void broadcast(ServerLevel level, String key, Object... args) {
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(32))) {
-            p.displayClientMessage(Component.translatable(key, args), false);
+            p.sendSystemMessage(Component.translatable(key, args));
         }
     }
 
@@ -1395,7 +1395,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         writeCore(tag);
         tag.putLong("buffer", buffer);
         tag.putInt("spin_target", spinTarget);
@@ -1423,7 +1423,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 点火の進み（0〜1）。サーバーでは注がれた電力の割合、クライアントでは同期された値。 */
     public float ignitionProgress() {
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             // 同期の合間は時刻で進める（なめらかに）
             if (state != State.IGNITING) {
                 return clientIgnition;
@@ -1439,33 +1439,33 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         super.loadAdditional(tag, registries);
         firstCheck = true;
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
         try {
-            state = State.valueOf(tag.getString("state"));
+            state = State.valueOf(tag.getStringOr("state", ""));
         } catch (IllegalArgumentException e) {
             state = State.UNFORMED;
         }
         // 保存から読み込むとき、点火の途中だったものは止まった状態に戻す（描画のための同期では戻さない）
-        if (state == State.IGNITING && !tag.getBoolean("sync")) {
+        if (state == State.IGNITING && !tag.getBooleanOr("sync", false)) {
             state = State.DORMANT;
         }
-        clientIgnition = tag.getFloat("ignition");
-        clientCharge = tag.getFloat("charge");
+        clientIgnition = tag.getFloatOr("ignition", 0.0F);
+        clientCharge = tag.getFloatOr("charge", 0.0F);
         clientIgnitionAt = level != null ? level.getGameTime() : 0;
-        mass = tag.getDouble("mass");
-        spin = tag.getDouble("spin");
-        buffer = tag.getLong("buffer");
-        spinTarget = tag.getInt("spin_target");
-        jetTimer = tag.getInt("jet");
-        hawkingTimer = tag.getInt("hawking");
-        ergoTimer = tag.getInt("ergo");
-        ignitedBefore = tag.getBoolean("ignited_before");
+        mass = tag.getDoubleOr("mass", 0.0D);
+        spin = tag.getDoubleOr("spin", 0.0D);
+        buffer = tag.getLongOr("buffer", 0L);
+        spinTarget = tag.getIntOr("spin_target", 0);
+        jetTimer = tag.getIntOr("jet", 0);
+        hawkingTimer = tag.getIntOr("hawking", 0);
+        ergoTimer = tag.getIntOr("ergo", 0);
+        ignitedBefore = tag.getBooleanOr("ignited_before", false);
         if (tag.contains("feed_interval")) {
-            feedInterval = tag.getInt("feed_interval");
+            feedInterval = tag.getIntOr("feed_interval", 0);
         }
         // この版より前に点火していたリアクターは、これまでどおり発電運転のまま
-        harvestMode = tag.contains("harvest_mode") ? tag.getBoolean("harvest_mode") : !ignitedBefore;
+        harvestMode = tag.contains("harvest_mode") ? tag.getBooleanOr("harvest_mode", false) : !ignitedBefore;
         readCollapse(tag);
     }
 

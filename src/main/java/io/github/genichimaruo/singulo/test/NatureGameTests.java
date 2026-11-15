@@ -213,7 +213,7 @@ public final class NatureGameTests {
             for (int cz = box.minZ() >> 4; cz <= box.maxZ() >> 4; cz++) {
                 var chunkBox = new net.minecraft.world.level.levelgen.structure.BoundingBox(cx * 16, level.getMinBuildHeight(), cz * 16,
                         cx * 16 + 15, level.getMaxBuildHeight(), cz * 16 + 15);
-                piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random, chunkBox,
+                piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(), chunkBox,
                         new net.minecraft.world.level.ChunkPos(cx, cz), center);
             }
         }

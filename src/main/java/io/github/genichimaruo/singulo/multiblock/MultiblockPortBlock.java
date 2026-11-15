@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.multiblock;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -31,7 +31,7 @@ public class MultiblockPortBlock extends PortBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
                 MultiblockPortBlockEntity::serverTick);
     }
 }

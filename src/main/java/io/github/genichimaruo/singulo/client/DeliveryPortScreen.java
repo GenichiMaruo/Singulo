@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity;
 import io.github.genichimaruo.singulo.android.work.DeliveryPortMenu;
 import io.github.genichimaruo.singulo.machine.GuiFrame;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -49,19 +49,20 @@ public class DeliveryPortScreen extends FramedScreen<DeliveryPortMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         int[] r = resetRect();
         if (named() && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
         } else if (!names.editing() && overName(mouseX, mouseY)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         }
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         switch (names.key(keyCode, scanCode, modifiers)) {
             case 1 -> {
                 removeWidget(names.commit(menu.containerId));
@@ -75,20 +76,21 @@ public class DeliveryPortScreen extends FramedScreen<DeliveryPortMenu> {
                 return true;
             }
             default -> {
-                return super.keyPressed(keyCode, scanCode, modifiers);
+                return super.keyPressed(event);
             }
         }
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (names.editing()) {
             var box = names.box();
             if (box != null && !box.isMouseOver(mouseX, mouseY)) {
                 removeWidget(names.commit(menu.containerId));
                 return true;
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
         int[] r = resetRect();
         if (named() && Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
@@ -101,11 +103,11 @@ public class DeliveryPortScreen extends FramedScreen<DeliveryPortMenu> {
             setFocused(box);
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         drawFrame(g, mouseX, mouseY);
         for (int i = 0; i < 27; i++) {
             var s = menu.getSlot(i);
@@ -120,10 +122,10 @@ public class DeliveryPortScreen extends FramedScreen<DeliveryPortMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         if (!names.editing()) {
             AndroidStationScreen.fit(g, font, displayName(), titleLabelX, titleLabelY, titleWidth(), skin.text());
         }
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
     }
 }

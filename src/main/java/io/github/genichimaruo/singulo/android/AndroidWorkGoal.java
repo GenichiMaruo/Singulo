@@ -11,7 +11,7 @@ import io.github.genichimaruo.singulo.android.work.WorkJob;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -175,14 +175,14 @@ final class AndroidWorkGoal extends Goal {
 
     /** 移動経路は探し直すが、消費・製作・受取済みの数は巻き戻さない。 */
     void loadWork(net.minecraft.nbt.CompoundTag t) {
-        android.workJob = WorkJob.load(t.getCompound("job"), android.registryAccess());
-        phase = t.getInt("phase");
-        returning = t.getBoolean("returning");
-        crafted = t.getLong("crafted");
-        inserted = t.getLong("inserted");
-        collected = t.getLong("collected");
+        android.workJob = WorkJob.load(t.getCompoundOrEmpty("job"), android.registryAccess());
+        phase = t.getIntOr("phase", 0);
+        returning = t.getBooleanOr("returning", false);
+        crafted = t.getLongOr("crafted", 0L);
+        inserted = t.getLongOr("inserted", 0L);
+        collected = t.getLongOr("collected", 0L);
         processingPending = null;
-        processingPaid = t.getBoolean("processing_paid");
+        processingPaid = t.getBooleanOr("processing_paid", false);
         processingMoved = false;
         if (t.contains("processing_pending")) {
             processingPending = new java.util.ArrayList<>();
@@ -190,11 +190,11 @@ final class AndroidWorkGoal extends Goal {
                 processingPending.add(ItemCount.load((net.minecraft.nbt.CompoundTag) input, android.registryAccess()));
             }
         }
-        batchIndex = t.getInt("batch");
-        procIndex = t.getInt("procedure");
-        progress = t.getLong("progress");
-        depositFirst = t.getBoolean("deposit_first");
-        leftoverOrder = t.contains("leftover_order") ? t.getInt("leftover_order") : android.workOrder();
+        batchIndex = t.getIntOr("batch", 0);
+        procIndex = t.getIntOr("procedure", 0);
+        progress = t.getLongOr("progress", 0L);
+        depositFirst = t.getBooleanOr("deposit_first", false);
+        leftoverOrder = t.contains("leftover_order") ? t.getIntOr("leftover_order", 0) : android.workOrder();
         pickups = null;
         pickupIndex = 0;
         if (t.contains("pickups")) {
@@ -208,7 +208,7 @@ final class AndroidWorkGoal extends Goal {
                         items.add(count);
                     }
                 }
-                pickups.add(new WorkConsoleBlockEntity.Pickup(BlockPos.of(pt.getLong("point")), items));
+                pickups.add(new WorkConsoleBlockEntity.Pickup(BlockPos.of(pt.getLongOr("point", 0L)), items));
             }
         }
         travel = wait = craftTimer = craftBank = stalled = mineIdle = machineWait = 0;
@@ -1366,7 +1366,7 @@ final class AndroidWorkGoal extends Goal {
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
                 return !level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, pen(ps),
-                        a -> a.isAlive() && (a.isBaby() || ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR && a instanceof net.minecraft.world.entity.animal.Sheep s
+                        a -> a.isAlive() && (a.isBaby() || ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR && a instanceof net.minecraft.world.entity.animal.sheep.Sheep s
                                 && s.isSheared())).isEmpty();
             }
             default -> {
@@ -1592,7 +1592,7 @@ final class AndroidWorkGoal extends Goal {
         net.minecraft.world.level.block.Block b = s.getBlock();
         if (b instanceof net.minecraft.world.level.block.SweetBerryBushBlock) {
             int age = s.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE);
-            int n = (age >= 3 ? 2 : 1) + level.random.nextInt(2);
+            int n = (age >= 3 ? 2 : 1) + level.getRandom().nextInt(2);
             return new Harvest(new java.util.ArrayList<>(java.util.List.of(new ItemStack(net.minecraft.world.item.Items.SWEET_BERRIES, n))), () -> {
                 level.setBlock(p, s.setValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE, 1), 2);
                 level.playSound(null, p, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
@@ -1904,7 +1904,7 @@ final class AndroidWorkGoal extends Goal {
         }
         switch (ps.kind()) {
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> {
-                if (target instanceof net.minecraft.world.entity.animal.Sheep sheep) {
+                if (target instanceof net.minecraft.world.entity.animal.sheep.Sheep sheep) {
                     sheep.shear(net.minecraft.sounds.SoundSource.PLAYERS);        // 毛は足元に落ちる（拾う）
                 }
             }
@@ -1931,8 +1931,8 @@ final class AndroidWorkGoal extends Goal {
             return false;
         }
         return switch (ps.kind()) {
-            case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> a instanceof net.minecraft.world.entity.animal.Sheep sheep && sheep.readyForShearing();
-            case io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK -> a instanceof net.minecraft.world.entity.animal.Cow
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> a instanceof net.minecraft.world.entity.animal.sheep.Sheep sheep && sheep.readyForShearing();
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK -> a instanceof net.minecraft.world.entity.animal.cow.Cow
                     && carriedCount(net.minecraft.world.item.Items.BUCKET) > 0;
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, area,
                     o -> o.getType() == a.getType() && tendable(o)).size() > ps.option();

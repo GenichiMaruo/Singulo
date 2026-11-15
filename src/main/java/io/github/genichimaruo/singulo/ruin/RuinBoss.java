@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.generated.ServerConfig;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -201,7 +201,7 @@ public abstract class RuinBoss extends Monster {
     protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
                 || lastHurtByPlayerTime > 0 && shouldDropExperience()
-                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
+                && server.getGameRules().getBoolean(net.minecraft.world.level.gamerules.GameRules.RULE_DOMOBLOOT))) {
             int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
             BossLoot.experience(server, lootPos(), reward, rewardPlayers(server));
         }
@@ -376,7 +376,7 @@ public abstract class RuinBoss extends Monster {
     public void tick() {
         super.tick();
         hurtWindows.tick();
-        if (!level().isClientSide && emergeTicks() > 0) {
+        if (!level().isClientSide() && emergeTicks() > 0) {
             ServerLevel level = (ServerLevel) level();
             int left = emergeTicks() - 1;
             entityData.set(EMERGE, left);
@@ -529,7 +529,7 @@ public abstract class RuinBoss extends Monster {
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), arenaRadius() + 16, "awakened_" + id);
         Component msg = Component.translatable("gui.singulo.guardian.awakened_defeated");
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(arenaRadius() + 16))) {
-            p.displayClientMessage(msg, false);
+            p.sendSystemMessage(msg);
         }
     }
 
@@ -599,31 +599,35 @@ public abstract class RuinBoss extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("participants", participants);
         tag.putInt("reward_participants", rewardParticipants);
         if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+            tag.put("home", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(home));
         }
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        entityData.set(EMERGE, tag.getInt("emerge"));
-        entityData.set(AWAKENED, tag.getBoolean("awakened"));
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
+        entityData.set(EMERGE, tag.getIntOr("emerge", 0));
+        entityData.set(AWAKENED, tag.getBooleanOr("awakened", false));
         if (tag.contains("damage_scale")) {
-            damageScale = BossScaling.validDamageScale(tag.getFloat("damage_scale"));
+            damageScale = BossScaling.validDamageScale(tag.getFloatOr("damage_scale", 0.0F));
         }
-        participants = Math.max(1, tag.getInt("participants"));
+        participants = Math.max(1, tag.getIntOr("participants", 0));
         // 以前の版で保存された戦い（報酬の人数を持たない）は、そのときの人数で決める
-        rewardParticipants = tag.contains("reward_participants") ? tag.getInt("reward_participants")
+        rewardParticipants = tag.contains("reward_participants") ? tag.getIntOr("reward_participants", 0)
                 : emergeTicks() <= 0 ? participants : 0;
-        home = NbtUtils.readBlockPos(tag, "home").orElse(null);
+        home = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "home").orElse(null);
         if (home != null) {
             restrictTo(home, arenaRadius());
         }

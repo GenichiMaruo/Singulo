@@ -8,7 +8,7 @@ import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -22,8 +22,8 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 @Mod(value = Singulo.MODID, dist = Dist.CLIENT)
 public final class SinguloClient {
-    private static final ResourceLocation STILL = ResourceLocation.withDefaultNamespace("block/water_still");
-    private static final ResourceLocation FLOWING = ResourceLocation.withDefaultNamespace("block/water_flow");
+    private static final Identifier STILL = Identifier.withDefaultNamespace("block/water_still");
+    private static final Identifier FLOWING = Identifier.withDefaultNamespace("block/water_flow");
 
     public SinguloClient(IEventBus modBus) {
         modBus.addListener(SinguloClient::registerScreens);
@@ -35,7 +35,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(SinguloClient::addWingLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
-        modBus.addListener(JetForgeRenderTypes::registerShaders);
+        modBus.addListener(JetForgeRenderTypes::registerPipelines);
         modBus.addListener(GlowDepth::registerShaders);
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(FluidCapsuleRenderer::registerModels);
@@ -362,11 +362,11 @@ public final class SinguloClient {
                 io.github.genichimaruo.singulo.registry.SinguloItems.RELOCATION_WRENCH.get(), Singulo.id("mode"),
                 (stack, level, entity, seed) -> io.github.genichimaruo.singulo.item.RelocationWrenchItem.mode(stack)));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
+                io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), Identifier.withDefaultNamespace("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
+                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), Identifier.withDefaultNamespace("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
     }
@@ -376,7 +376,7 @@ public final class SinguloClient {
      * Shift を押している間は、説明の全文と作り方・使い道を出す（詳しく見られるものには「Shift: 詳しく見る」を添える）。
      */
     private static void describe(ItemTooltipEvent event) {
-        net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.ITEM
+        net.minecraft.resources.Identifier id = net.minecraft.core.registries.BuiltInRegistries.ITEM
                 .getKey(event.getItemStack().getItem());
         if (!Singulo.MODID.equals(id.getNamespace())) {
             return;
@@ -439,12 +439,12 @@ public final class SinguloClient {
             int color = entry.def().color();
             event.registerFluidType(new IClientFluidTypeExtensions() {
                 @Override
-                public ResourceLocation getStillTexture() {
+                public Identifier getStillTexture() {
                     return STILL;
                 }
 
                 @Override
-                public ResourceLocation getFlowingTexture() {
+                public Identifier getFlowingTexture() {
                     return FLOWING;
                 }
 

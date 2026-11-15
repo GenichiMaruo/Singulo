@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 /** キー割り当て。重力操作道具の範囲切り替え（既定 G）。 */
@@ -66,12 +66,12 @@ public final class SinguloKeys {
         boolean down = holding && mc.options.keyAttack.isDown();
         if (down != leftDown && mc.getConnection() != null) {
             leftDown = down;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
+            ClientPacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
         }
         boolean right = holding && mc.options.keyUse.isDown() && !mc.player.isShiftKeyDown();
         if (right != rightDown && mc.getConnection() != null) {
             rightDown = right;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
+            ClientPacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
         }
         while (HANDBOOK.consumeClick()) {
             if (mc.player != null && mc.screen == null) {
@@ -84,7 +84,7 @@ public final class SinguloKeys {
             }
             for (InteractionHand hand : InteractionHand.values()) {
                 if (mc.player.getItemInHand(hand).getItem() instanceof GravityGauntletItem g && g.supportsCone()) {
-                    PacketDistributor.sendToServer(ToggleAreaPayload.INSTANCE);
+                    ClientPacketDistributor.sendToServer(ToggleAreaPayload.INSTANCE);
                     break;
                 }
             }

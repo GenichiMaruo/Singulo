@@ -30,7 +30,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
  * </ul>
  * 画面は持たず、素手で右クリックすると状態を表示する。
  */
-public class HydrogenFuelCellBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class HydrogenFuelCellBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     /** 電解槽が水素1 mB を作る電力（水200 mB → 水素200 mB に 80 FE/t × 20 tick）。 */
     public static final double ELECTROLYSIS_FE_PER_MB = 8.0;
     public static final double EFFICIENCY = 0.6;
@@ -184,9 +184,9 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     public void openMenu(ServerPlayer player) {
         Component status = standby ? Component.translatable("message.singulo.fuel_cell.standby")
                 : Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(rate));
-        player.displayClientMessage(Component.translatable("message.singulo.fuel_cell.status",
+        player.sendOverlayMessage(Component.translatable("message.singulo.fuel_cell.status",
                 hydrogen.getFluidAmount(), HYDROGEN_TANK, oxygen.getFluidAmount(), OXYGEN_TANK,
-                energy.getEnergyStored(), energy.getMaxEnergyStored(), status), true);
+                energy.getEnergyStored(), energy.getMaxEnergyStored(), status));
     }
 
     @Override
@@ -201,9 +201,9 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        hydrogen.readFromNBT(registries, tag.getCompound("hydrogen"));
-        oxygen.readFromNBT(registries, tag.getCompound("oxygen"));
-        carry = tag.getDouble("carry");
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        hydrogen.readFromNBT(registries, tag.getCompoundOrEmpty("hydrogen"));
+        oxygen.readFromNBT(registries, tag.getCompoundOrEmpty("oxygen"));
+        carry = tag.getDoubleOr("carry", 0.0D);
     }
 }

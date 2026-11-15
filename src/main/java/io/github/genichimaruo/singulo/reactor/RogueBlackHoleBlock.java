@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.reactor;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -46,7 +46,7 @@ public class RogueBlackHoleBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.ROGUE_BLACK_HOLE.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.ROGUE_BLACK_HOLE.get(),
                 RogueBlackHoleBlockEntity::serverTick);
     }
 }

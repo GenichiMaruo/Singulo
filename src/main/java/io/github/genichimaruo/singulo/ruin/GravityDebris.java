@@ -49,7 +49,7 @@ public class GravityDebris extends ThrowableProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && tickCount > LIFETIME) {
+        if (!level().isClientSide() && tickCount > LIFETIME) {
             discard();
         }
     }

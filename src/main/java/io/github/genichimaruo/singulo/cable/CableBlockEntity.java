@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.cable;
 
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -21,7 +21,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * 実際に電力が通っているあいだは、通った面（入ってきた面と出ていった面）と量をクライアントへ送る（光り方に使う）。
  * 通電表示はネットワークがまとめて更新する。切断は周期を待たず、クライアント側でも直ちに消す。
  */
-public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder {
+public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements ConduitCover.Holder {
     static final int WINDOW = 10;
 
     @Nullable
@@ -72,7 +72,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
 
     /** 通っている量（FE/t、通っていなければ0）。 */
     public long flow() {
-        if (predictedCut != null && level != null && level.isClientSide) {
+        if (predictedCut != null && level != null && level.isClientSide()) {
             // A rejected/predicted break may be rolled back without fresh packets for every other cable.
             if (level.getBlockState(predictedCut).getBlock() instanceof CableBlock) predictedCut = null;
             else return 0;
@@ -115,13 +115,13 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        long generation = tag.getLong("FlowGeneration");
-        if (tag.getLong("Flow") == 0 || generation != predictedGeneration) predictedCut = null;
+        long generation = tag.getLongOr("FlowGeneration", 0L);
+        if (tag.getLongOr("Flow", 0L) == 0 || generation != predictedGeneration) predictedCut = null;
         shownGeneration = generation;
-        shownFlow = tag.getLong("Flow");
-        shownIn = tag.getInt("In");
-        shownOut = tag.getInt("Out");
-        shownDist = tag.getInt("Dist");
+        shownFlow = tag.getLongOr("Flow", 0L);
+        shownIn = tag.getIntOr("In", 0);
+        shownOut = tag.getIntOr("Out", 0);
+        shownDist = tag.getIntOr("Dist", 0);
         loadCover(tag, registries);
     }
 
@@ -153,7 +153,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
     private void loadCover(CompoundTag tag, HolderLookup.Provider registries) {
         BlockState before = coverState;
         coverState = ConduitCover.load(tag, registries);
-        if (before != coverState && level != null && level.isClientSide) {
+        if (before != coverState && level != null && level.isClientSide()) {
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
         }
@@ -188,7 +188,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
         while (!queue.isEmpty()) {
             BlockPos p = queue.remove();
             if (!level.isLoaded(p) || !(level.getBlockEntity(p) instanceof CableBlockEntity cable)) continue;
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 if (cable.shownFlow > 0) {
                     cable.predictedCut = removed;
                     cable.predictedGeneration = cable.shownGeneration;
@@ -227,7 +227,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             invalidateNetwork();
             for (Direction direction : Direction.values()) {
                 BlockPos next = worldPosition.relative(direction);
@@ -248,7 +248,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
     public void setRemoved() {
         // Client chunk replacement does not invoke Block.onRemove; BE removal is the local hook.
         // Unloading an unchanged cable chunk must not flood-fill the component once per cable.
-        if (level != null && level.isClientSide && level.isLoaded(worldPosition)
+        if (level != null && level.isClientSide() && level.isLoaded(worldPosition)
                 && level.getBlockState(worldPosition).getBlock() != getBlockState().getBlock()) {
             clearConnectedDisplay(level,worldPosition);
         }
@@ -258,7 +258,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
 
     @Nullable
     public IEnergyStorage energyFor(@Nullable Direction side) {
-        if (level == null || level.isClientSide) {
+        if (level == null || level.isClientSide()) {
             return null;
         }
         return new Port(side);

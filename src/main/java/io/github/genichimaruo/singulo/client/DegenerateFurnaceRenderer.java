@@ -11,15 +11,15 @@ import java.util.WeakHashMap;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -30,10 +30,10 @@ import net.minecraft.world.phys.Vec3;
  * 稼働中は STROKE_TICKS ごとに1回、ゆっくり離れてから一気に打ち込み、そのたびに炉心が閃き、熱の輪が広がり、火花が散る。
  * 四隅の熱交換管には熱が流れ上がる。中は観察窓から見える。止まっている間は押し込み棒が離れたまま、炉心は暗い。
  */
-public class DegenerateFurnaceRenderer implements BlockEntityRenderer<DegenerateFurnaceBlockEntity> {
-    private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
-    private static final ResourceLocation RAM = Singulo.id("textures/block/degenerate_furnace_piston.png");
-    private static final ResourceLocation ROD = Singulo.id("textures/block/degenerate_furnace_frame.png");
+public class DegenerateFurnaceRenderer extends SnapshotBlockRenderer<DegenerateFurnaceBlockEntity> {
+    private static final Identifier WHITE = Singulo.id("textures/misc/white.png");
+    private static final Identifier RAM = Singulo.id("textures/block/degenerate_furnace_piston.png");
+    private static final Identifier ROD = Singulo.id("textures/block/degenerate_furnace_frame.png");
     /** 炉の部屋の中心から、上下のピストンの内側の面までの距離。 */
     private static final float WALL = 2.5F;
     /** 押し込み棒の先が離れているとき・打ち込んだときの、中心からの距離。 */
@@ -73,13 +73,13 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);
         // 押し込み棒（上下）。炉心の明かりで照らされる
-        int block = Math.max(LightTexture.block(LevelRenderer.getLightColor(level, center)), (int) (3 + 12 * heat));
-        int lit = LightTexture.pack(Math.min(15, block), LightTexture.sky(LevelRenderer.getLightColor(level, center)));
+        int block = Math.max(LightCoordsUtil.block(LevelRenderer.getLightColor(level, center)), (int) (3 + 12 * heat));
+        int lit = LightCoordsUtil.pack(Math.min(15, block), LightCoordsUtil.sky(LevelRenderer.getLightColor(level, center)));
         float shake = flash > 0.6F ? (float) Math.sin(time * 9.0) * 0.015F * flash : 0F;
-        VertexConsumer rod = buffers.getBuffer(RenderType.entitySolid(ROD));
+        VertexConsumer rod = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(ROD));
         FxDraw.box(pose, rod, -0.2F, gap + 0.3F, -0.2F, 0.2F, WALL, 0.2F, lit, 0xFFFFFF);
         FxDraw.box(pose, rod, -0.2F, -WALL, -0.2F, 0.2F, -gap - 0.3F, 0.2F, lit, 0xFFFFFF);
-        VertexConsumer ram = buffers.getBuffer(RenderType.entitySolid(RAM));
+        VertexConsumer ram = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(RAM));
         int hot = FxDraw.lerpRgb(0xFFFFFF, 0xFFB070, heat * 0.7F);
         FxDraw.box(pose, ram, -0.45F + shake, gap, -0.45F, 0.45F + shake, gap + 0.32F, 0.45F, lit, hot);
         FxDraw.box(pose, ram, -0.45F - shake, -gap - 0.32F, -0.45F, 0.45F - shake, -gap, 0.45F, lit, hot);
@@ -89,13 +89,13 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
             var camera = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
             // 押し込み棒の先の、赤熱した面
             int face = FxDraw.lerpRgb(0xFF5A1E, 0xFFE6B0, flash);
-            FxDraw.box(pose, glow, -0.43F, gap - 0.01F, -0.43F, 0.43F, gap + 0.02F, 0.43F, LightTexture.FULL_BRIGHT, face, (int) (90 + 150 * heat));
-            FxDraw.box(pose, glow, -0.43F, -gap - 0.02F, -0.43F, 0.43F, -gap + 0.01F, 0.43F, LightTexture.FULL_BRIGHT, face, (int) (90 + 150 * heat));
+            FxDraw.box(pose, glow, -0.43F, gap - 0.01F, -0.43F, 0.43F, gap + 0.02F, 0.43F, LightCoordsUtil.FULL_BRIGHT, face, (int) (90 + 150 * heat));
+            FxDraw.box(pose, glow, -0.43F, -gap - 0.02F, -0.43F, 0.43F, -gap + 0.01F, 0.43F, LightCoordsUtil.FULL_BRIGHT, face, (int) (90 + 150 * heat));
             // 炉心: 挟まれて平たくつぶれる燃料の塊と、そのまわりの光
             float squash = 0.25F * flash;
             pose.pushPose();
             pose.scale(1 + squash, Math.min(1 - squash * 1.2F, gap / 0.42F), 1 + squash);
-            FxDraw.sphere(pose.last(), glow, 0.3F, FxDraw.lerpRgb(0xFF7A2A, 0xFFF6E0, 0.4F + 0.6F * flash), LightTexture.FULL_BRIGHT);
+            FxDraw.sphere(pose.last(), glow, 0.3F, FxDraw.lerpRgb(0xFF7A2A, 0xFFF6E0, 0.4F + 0.6F * flash), LightCoordsUtil.FULL_BRIGHT);
             pose.popPose();
             float breathe = 1 + 0.06F * Mth.sin(time * 0.35F);
             FxDraw.billboard(pose, glow, camera, (1.3F + 1.4F * flash) * breathe, 0xFF8A3A, (int) (70 + 120 * flash));
@@ -182,7 +182,7 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
     }
 
     @Override
-    public boolean shouldRenderOffScreen(DegenerateFurnaceBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

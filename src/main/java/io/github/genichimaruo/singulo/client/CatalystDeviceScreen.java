@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.machine.CatalystDeviceBlockEntity;
 import io.github.genichimaruo.singulo.machine.CatalystDeviceMenu;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,7 +38,8 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (menu.getCarried().isEmpty() && !menu.getSlot(0).hasItem() && value(CatalystDeviceBlockEntity.D_LOADED_ITEM) >= 0
                 && minecraft != null && minecraft.gameMode != null
                 && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
@@ -46,7 +47,7 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, CatalystDeviceMenu.BUTTON_EJECT);
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -112,9 +113,9 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY) || !menu.getCarried().isEmpty()) {
             return;
         }
@@ -122,23 +123,23 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
         List<Component> loaded = loadedCatalystLines(value(CatalystDeviceBlockEntity.D_LOADED_ITEM), value(CatalystDeviceBlockEntity.D_LOADED_FILL), empty);
         if (Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 22)
                 && loaded != null && (empty || mouseY >= topPos + CatalystDeviceMenu.SLOT_Y + 17)) {
-            g.renderComponentTooltip(font, loaded, mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, loaded, mouseX, mouseY);
         } else if (empty && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.catalyst.none"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.catalyst.none"), mouseX, mouseY);
         } else if (!menu.getSlot(menu.spentIndex()).hasItem()
                 && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SPENT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.catalyst.spent_slot"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.catalyst.spent_slot"), mouseX, mouseY);
         } else if (menu.kind().extraSlot() != null && !menu.getSlot(1).hasItem()
                 && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
-            g.renderTooltip(font, Component.translatable(menu.kind().extraSlot()), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable(menu.kind().extraSlot()), mouseX, mouseY);
         } else if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + centeredY(BAR_H + 2) + 1, 8, BAR_H)) {
-            g.renderComponentTooltip(font, Panel.energyLines(value(CatalystDeviceBlockEntity.D_ENERGY),
+            g.setComponentTooltipForNextFrame(font, Panel.energyLines(value(CatalystDeviceBlockEntity.D_ENERGY),
                     value(CatalystDeviceBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int capacity = Math.max(1, value(CatalystDeviceBlockEntity.D_CAPACITY));
@@ -168,7 +169,7 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
     }
 
     /** 動いているときの効果（アイコンと値）。 */
-    private void drawStats(GuiGraphics g) {
+    private void drawStats(GuiGraphicsExtractor g) {
         int v = value(CatalystDeviceBlockEntity.D_VALUE);
         int extra = value(CatalystDeviceBlockEntity.D_EXTRA);
         rows.clear();
@@ -229,7 +230,7 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
     /** 左の列の行（数えてから上下中央に並べる）。 */
     private final List<Row> rows = new java.util.ArrayList<>();
 
-    private void row(GuiGraphics g, Panel.Icon icon, int color, String value, Component tooltip) {
+    private void row(GuiGraphicsExtractor g, Panel.Icon icon, int color, String value, Component tooltip) {
         rows.add(new Row(icon, color, value, tooltip));
     }
 

@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 作業指令台を記録した作業位置カードで右クリックすると、その指令台につながる（同じ指令台なら外れる）。
  * 何も持たずにシフト右クリックすると、どの指令台につながっているかをアクションバーに出す。
  */
-public abstract class WorkLinkedBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+public abstract class WorkLinkedBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         AndroidEyes.Holder {
     final AdjacentItemStores adjacentItems = new AdjacentItemStores(this);
 
@@ -65,7 +65,7 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
 
     /** 開いた後の許可証変更と、指令台未読込の間も権限を維持する。 */
     public boolean mayOperate(net.minecraft.world.entity.player.Player player) {
-        if (player.level().isClientSide || console == null) {
+        if (player.level().isClientSide() || console == null) {
             return true;
         }
         if (level != null && level.isLoaded(console) && !(level.getBlockEntity(console) instanceof WorkConsoleBlockEntity)) {
@@ -90,27 +90,27 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
             return false;
         }
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return true;
         }
         BlockPos target = WorkLocationCardItem.pos(stack);
         if (target == null || !WorkLocationCardItem.sameDimension(stack, player.level())
                 || !(player.level().getBlockEntity(target) instanceof WorkConsoleBlockEntity c)) {
-            player.displayClientMessage(Component.translatable("message.singulo.work_link.not_console"), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.work_link.not_console"));
             return true;
         }
         if (!c.mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return true;
         }
         if (target.equals(console)) {
             c.removeLink(worldPosition);
             setConsole(null);
-            player.displayClientMessage(Component.translatable("message.singulo.work_link.removed"), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.work_link.removed"));
             return true;
         }
         if (!target.closerThan(worldPosition, WorkConsoleBlockEntity.LINK_RANGE)) {
-            player.displayClientMessage(Component.translatable("message.singulo.work_link.too_far", (int) WorkConsoleBlockEntity.LINK_RANGE), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.work_link.too_far", (int) WorkConsoleBlockEntity.LINK_RANGE));
             return true;
         }
         WorkConsoleBlockEntity old = consoleEntity();
@@ -119,7 +119,7 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
         }
         setConsole(target);
         c.addLink(worldPosition);
-        player.displayClientMessage(Component.translatable("message.singulo.work_link.added", target.getX(), target.getY(), target.getZ()), true);
+        player.sendOverlayMessage(Component.translatable("message.singulo.work_link.added", target.getX(), target.getY(), target.getZ()));
         return true;
     }
 
@@ -136,8 +136,8 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
     }
 
     protected void showLink(ServerPlayer player) {
-        player.displayClientMessage(console == null ? Component.translatable("message.singulo.work_link.none")
-                : Component.translatable("message.singulo.work_link.info", console.getX(), console.getY(), console.getZ()), true);
+        player.sendOverlayMessage(console == null ? Component.translatable("message.singulo.work_link.none")
+                : Component.translatable("message.singulo.work_link.info", console.getX(), console.getY(), console.getZ()));
     }
 
     /** 壊されたら、指令台の一覧から外れる。 */
@@ -153,13 +153,13 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (console != null) {
-            tag.put("console", NbtUtils.writeBlockPos(console));
+            tag.put("console", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(console));
         }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        console = NbtUtils.readBlockPos(tag, "console").orElse(null);
+        console = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "console").orElse(null);
     }
 }

@@ -23,7 +23,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
  * 中身があると場の維持に FE_PER_TICK を使い、電力が切れると毎秒1%（最低1 mB）ずつ漏れていく。
  * 壊すと中身ごとアイテムになり（タンクごと運ぶ）、置き直すと戻る。アイテムの間は漏れない。
  */
-public class ContainmentTankBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int CAPACITY = 64_000;
     public static final int FE_PER_TICK = 500;
     static final int INTERVAL = 20;
@@ -103,7 +103,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         int amount = input.getOrDefault(SinguloComponents.DARK_MATTER.get(), 0);
         tank.setFluid(amount > 0 ? darkMatter(Math.min(CAPACITY, amount)) : FluidStack.EMPTY);
@@ -124,7 +124,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompound("tank"));
-        energy.setEnergy(tag.getInt("energy"));
+        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
     }
 }

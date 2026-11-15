@@ -22,7 +22,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 場所のよさ（0〜1）に比例して進み、最大のとき ticksAtMax() tick に1個できる。
  * 右クリックで、たまったものを受け取り、今の集まり具合を知らせる。搬出（ホッパーやパイプ）でも取り出せる。
  */
-public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public abstract class EnvironmentCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     static final int CHECK_INTERVAL = 20;
 
     private final ItemStackHandler output = new ItemStackHandler(1) {
@@ -102,24 +102,24 @@ public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implem
         }
         double r = level == null ? 0 : rateAt(level, worldPosition);
         if (r <= 0) {
-            player.displayClientMessage(Component.translatable(messageKey() + ".idle"), true);
+            player.sendOverlayMessage(Component.translatable(messageKey() + ".idle"));
         } else {
             int seconds = (int) Math.round(ticksAtMax() / r / 20);
-            player.displayClientMessage(Component.translatable(messageKey() + ".rate", Math.round(r * 100), seconds), true);
+            player.sendOverlayMessage(Component.translatable(messageKey() + ".rate", Math.round(r * 100), seconds));
         }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
         tag.putDouble("progress", progress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
-        progress = tag.getDouble("progress");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
+        progress = tag.getDoubleOr("progress", 0.0D);
     }
 }

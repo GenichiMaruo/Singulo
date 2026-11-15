@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -31,8 +31,8 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class BossFairnessGameTests {
     private static final String EMPTY = "empty";
-    private static final ResourceLocation TIDE_GRAVITY = Singulo.id("archivist_tide_gravity");
-    private static final ResourceLocation TIDE_FALL = Singulo.id("archivist_tide_fall");
+    private static final Identifier TIDE_GRAVITY = Singulo.id("archivist_tide_gravity");
+    private static final Identifier TIDE_FALL = Singulo.id("archivist_tide_fall");
 
     private BossFairnessGameTests() {}
 

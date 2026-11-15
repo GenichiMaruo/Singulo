@@ -8,7 +8,7 @@ import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;

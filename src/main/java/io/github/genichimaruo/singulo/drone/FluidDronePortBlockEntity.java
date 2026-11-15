@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.drone;
 
 import io.github.genichimaruo.singulo.machine.SideConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -226,7 +226,7 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         var empty = net.neoforged.neoforge.fluids.SimpleFluidContent.EMPTY;
         FluidStack s = input.getOrDefault(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_SEND_FLUID.get(), empty).copy();
@@ -254,10 +254,10 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("send_tank")) {
-            send.readFromNBT(registries, tag.getCompound("send_tank"));
+            send.readFromNBT(registries, tag.getCompoundOrEmpty("send_tank"));
         }
         if (tag.contains("receive_tank")) {
-            receive.readFromNBT(registries, tag.getCompound("receive_tank"));
+            receive.readFromNBT(registries, tag.getCompoundOrEmpty("receive_tank"));
         }
     }
 }

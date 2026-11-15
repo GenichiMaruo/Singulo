@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -94,13 +94,13 @@ public class NeutrinoScannerItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player instanceof ServerPlayer sp) {
             IEnergyStorage e = energy(stack);
             if (!sp.getAbilities().instabuild && e.extractEnergy(FE_PER_SCAN, true) < FE_PER_SCAN) {
-                sp.displayClientMessage(Component.translatable("gauntlet.singulo.no_energy"), true);
-                return InteractionResultHolder.fail(stack);
+                sp.sendOverlayMessage(Component.translatable("gauntlet.singulo.no_energy"));
+                return io.github.genichimaruo.singulo.compat.Interactions.fail(stack);
             }
             if (!sp.getAbilities().instabuild) {
                 e.extractEnergy(FE_PER_SCAN, false);
@@ -113,11 +113,11 @@ public class NeutrinoScannerItem extends SinguloItem {
             if (found.hidden() > 0) {
                 message.append(Component.translatable("message.singulo.neutrino_hidden", found.hidden()));
             }
-            sp.displayClientMessage(message, true);
+            sp.sendOverlayMessage(message);
             ((ServerLevel) level).playSound(null, sp.blockPosition(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 0.7F);
             sp.getCooldowns().addCooldown(this, 40);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     /** スニークして電力を持つブロックを右クリックすると、そこから充電する。 */
@@ -132,13 +132,13 @@ public class NeutrinoScannerItem extends SinguloItem {
         if (source == null || !source.canExtract()) {
             return InteractionResult.PASS;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             IEnergyStorage own = energy(context.getItemInHand());
             int got = source.extractEnergy(own.receiveEnergy(Integer.MAX_VALUE, true), false);
             own.receiveEnergy(got, false);
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.charged", got), true);
+            player.sendOverlayMessage(Component.translatable("gauntlet.singulo.charged", got));
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override

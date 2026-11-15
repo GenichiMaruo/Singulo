@@ -85,7 +85,7 @@ public final class SinguloCommands {
     }
 
     /** 遺構の構造物を、床の中心が center に来るように置く。置いた大きさを返す（構造物がなければ null）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     public static net.minecraft.core.Vec3i placeRuin(ServerLevel level, String id, BlockPos center) {
         var template = level.getStructureManager().get(io.github.genichimaruo.singulo.Singulo.id("ruins/" + id));
         if (template.isEmpty()) {

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -33,7 +33,7 @@ import net.neoforged.neoforge.items.IItemHandler;
  * 1つの口で働けるポートは喉の大きさで決まる数（口に近い順）まで。通せる量も喉の大きさで決まり、いちばん大きい喉では上限なし
  * （mod のケーブルからは 1 tick に int を超えて送れる）。番号は0〜127（画面の7つの丸のオンオフ）。
  */
-public class WormholePortBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     private static final Map<Level, Set<WormholePortBlockEntity>> LOADED = new WeakHashMap<>();
 
     /** Release runtime references when this level closes. */
@@ -87,7 +87,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             LOADED.computeIfAbsent(level, l -> Collections.newSetFromMap(new WeakHashMap<>())).add(this);
         }
     }
@@ -107,7 +107,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     /** 1 tick に1回、手前の口と、向こう側のポートの隣の入れ物を調べ直す。 */
     private void refresh() {
-        if (level == null || level.isClientSide) {
+        if (level == null || level.isClientSide()) {
             return;
         }
         long now = level.getGameTime();
@@ -442,7 +442,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     @Override
     protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        channel = tag.getInt("channel");
+        channel = tag.getIntOr("channel", 0);
     }
 
     // ------------------------------------------------------------------ 液体

@@ -22,7 +22,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 空が見える場所でだけ動き、Y=100以下ではゼロ、Y=200以上で最大（1分に1束）。電力は要らない。
  * 右クリックで溜まったミュオン束を受け取り、今の収集速度を表示する。
  */
-public class CosmicMuonCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class CosmicMuonCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     static final int TICKS_PER_BUNDLE_AT_MAX = 1200;
     static final int CHECK_INTERVAL = 20;
 
@@ -96,14 +96,14 @@ public class CosmicMuonCollectorBlockEntity extends BlockEntity implements Abstr
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
         tag.putDouble("progress", progress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
-        progress = tag.getDouble("progress");
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
+        progress = tag.getDoubleOr("progress", 0.0D);
     }
 }

@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.ruin;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -116,7 +116,7 @@ public class GravityRemnant extends RuinBoss {
         super(type, level, BossEvent.BossBarColor.PURPLE);
         this.xpReward = 800;
         setNoGravity(true);
-        if (!level.isClientSide && !BossScaling.hardMode()) {
+        if (!level.isClientSide() && !BossScaling.hardMode()) {
             // 読み込むときは、このあと保存した体力で上書きされる
             setEffectiveHealth(HEALTH_NORMAL);
         }
@@ -600,16 +600,20 @@ public class GravityRemnant extends RuinBoss {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.putInt("shell", shell());
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
         if (tag.contains("shell")) {
-            setShell(tag.getInt("shell"));
+            setShell(tag.getIntOr("shell", 0));
         }
     }
 }

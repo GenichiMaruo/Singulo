@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.client;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * 画面の上に浮かぶ小さな窓（レシピの選択や面の設定）。上の帯をつかむと動かせ、右上の×で閉じる。
@@ -60,7 +60,7 @@ final class Popup {
     }
 
     /** 枠・帯（つまみの印）・閉じるボタン。 */
-    void draw(GuiGraphics g, GuiSkin s, int mouseX, int mouseY) {
+    void draw(GuiGraphicsExtractor g, GuiSkin s, int mouseX, int mouseY) {
         Panel.sheet(g, s, x, y, w, h);
         g.fillGradient(x + 1, y + 1, x + w - 1, y + BAR, s.plate(), s.plate2());
         g.fill(x + 1, y + BAR, x + w - 1, y + BAR + 1, s.seam());

@@ -5,11 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -472,7 +472,7 @@ public class DroneNetwork extends SavedData {
             CompoundTag p = new CompoundTag();
             p.putLong("pos", e.getKey());
             if (e.getValue().owner() != null) {
-                p.putUUID("owner", e.getValue().owner());
+                p.store("owner", net.minecraft.core.UUIDUtil.CODEC, e.getValue().owner());
             }
             p.putString("name", e.getValue().name());
             p.putBoolean("fluid", e.getValue().fluid());
@@ -484,14 +484,14 @@ public class DroneNetwork extends SavedData {
             CompoundTag t = new CompoundTag();
             t.putLong("id", f.id);
             if (f.station != null) {
-                t.put("station", NbtUtils.writeBlockPos(f.station));
+                t.put("station", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.station));
             }
             t.putInt("unit", f.unit);
             if (f.drone != null) {
-                t.putUUID("drone", f.drone);
+                t.store("drone", net.minecraft.core.UUIDUtil.CODEC, f.drone);
             }
-            t.put("from", NbtUtils.writeBlockPos(f.from));
-            t.put("to", NbtUtils.writeBlockPos(f.to));
+            t.put("from", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.from));
+            t.put("to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.to));
             if (!f.crate.isEmpty()) {
                 t.put("crate", f.crate.save(registries));
             }
@@ -502,7 +502,7 @@ public class DroneNetwork extends SavedData {
             t.putDouble("z", f.last.z);
             t.putLong("arrive_at", f.arriveAt);
             if (f.owner != null) {
-                t.putUUID("owner", f.owner);
+                t.store("owner", net.minecraft.core.UUIDUtil.CODEC, f.owner);
             }
             t.putFloat("progress", f.progress);
             t.putBoolean("phase", f.phase);
@@ -511,12 +511,12 @@ public class DroneNetwork extends SavedData {
             t.putLong("virtual_at", f.virtualAt);
             if (f.relayDim != null && f.relayTo != null) {
                 t.putString("relay_dim", f.relayDim.location().toString());
-                t.put("relay_to", NbtUtils.writeBlockPos(f.relayTo));
+                t.put("relay_to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.relayTo));
             }
             if (f.homeDim != null && f.homeGate != null) {
                 t.putString("home_dim", f.homeDim.location().toString());
-                t.put("home_gate", NbtUtils.writeBlockPos(f.homeGate));
-                if (f.homeFrom != null) t.put("home_from", NbtUtils.writeBlockPos(f.homeFrom));
+                t.put("home_gate", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.homeGate));
+                if (f.homeFrom != null) t.put("home_from", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(f.homeFrom));
             }
             fl.add(t);
         }
@@ -535,49 +535,49 @@ public class DroneNetwork extends SavedData {
 
     static DroneNetwork load(CompoundTag tag, HolderLookup.Provider registries) {
         DroneNetwork net = new DroneNetwork();
-        for (Tag t : tag.getList("ports", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("ports")) {
             CompoundTag p = (CompoundTag) t;
-            net.ports.put(p.getLong("pos"), new Port(p.hasUUID("owner") ? p.getUUID("owner") : null, p.getString("name"), p.getBoolean("fluid")));
+            net.ports.put(p.getLongOr("pos", 0L), new Port(p.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? p.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null, p.getStringOr("name", ""), p.getBooleanOr("fluid", false)));
         }
-        for (Tag t : tag.getList("flights", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("flights")) {
             CompoundTag c = (CompoundTag) t;
-            Flight f = new Flight(c.getLong("id"), NbtUtils.readBlockPos(c, "station").orElse(null), c.getInt("unit"));
-            f.drone = c.hasUUID("drone") ? c.getUUID("drone") : null;
-            f.from = NbtUtils.readBlockPos(c, "from").orElse(BlockPos.ZERO);
-            f.to = NbtUtils.readBlockPos(c, "to").orElse(BlockPos.ZERO);
-            f.crate = c.contains("crate") ? ItemStack.parse(registries, c.getCompound("crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
-            f.stage = c.getInt("stage");
-            f.virtual = c.getBoolean("virtual");
-            f.last = new Vec3(c.getDouble("x"), c.getDouble("y"), c.getDouble("z"));
-            f.arriveAt = c.getLong("arrive_at");
-            f.owner = c.hasUUID("owner") ? c.getUUID("owner") : null;
-            f.progress = c.getFloat("progress");
-            f.phase = c.getBoolean("phase");
-            f.kind = DroneKind.byId(c.getInt("kind"));
-            f.virtualFrom = c.getFloat("virtual_from");
-            f.virtualAt = c.getLong("virtual_at");
+            Flight f = new Flight(c.getLongOr("id", 0L), io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "station").orElse(null), c.getIntOr("unit", 0));
+            f.drone = c.read("drone", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? c.read("drone", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            f.from = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "from").orElse(BlockPos.ZERO);
+            f.to = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "to").orElse(BlockPos.ZERO);
+            f.crate = c.contains("crate") ? io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, c.getCompoundOrEmpty("crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
+            f.stage = c.getIntOr("stage", 0);
+            f.virtual = c.getBooleanOr("virtual", false);
+            f.last = new Vec3(c.getDoubleOr("x", 0.0D), c.getDoubleOr("y", 0.0D), c.getDoubleOr("z", 0.0D));
+            f.arriveAt = c.getLongOr("arrive_at", 0L);
+            f.owner = c.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? c.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            f.progress = c.getFloatOr("progress", 0.0F);
+            f.phase = c.getBooleanOr("phase", false);
+            f.kind = DroneKind.byId(c.getIntOr("kind", 0));
+            f.virtualFrom = c.getFloatOr("virtual_from", 0.0F);
+            f.virtualAt = c.getLongOr("virtual_at", 0L);
             if (c.contains("relay_dim")) {
-                var loc = ResourceLocation.tryParse(c.getString("relay_dim"));
+                var loc = Identifier.tryParse(c.getStringOr("relay_dim", ""));
                 f.relayDim = loc == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
-                f.relayTo = NbtUtils.readBlockPos(c, "relay_to").orElse(null);
+                f.relayTo = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "relay_to").orElse(null);
             }
             if (c.contains("home_dim")) {
-                var loc = ResourceLocation.tryParse(c.getString("home_dim"));
-                f.homeGate = NbtUtils.readBlockPos(c, "home_gate").orElse(null);
-                f.homeFrom = NbtUtils.readBlockPos(c, "home_from").orElse(null);
+                var loc = Identifier.tryParse(c.getStringOr("home_dim", ""));
+                f.homeGate = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "home_gate").orElse(null);
+                f.homeFrom = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "home_from").orElse(null);
                 f.homeDim = loc == null || f.homeGate == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
             }
             net.flights.put(f.id, f);
             net.forgetIndex();
         }
-        for (Tag t : tag.getList("away", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("away")) {
             CompoundTag c = (CompoundTag) t;
-            var loc = ResourceLocation.tryParse(c.getString("dim"));
+            var loc = Identifier.tryParse(c.getStringOr("dim", ""));
             if (loc != null) {
-                net.away.put(c.getLong("unit"), ResourceKey.create(Registries.DIMENSION, loc));
+                net.away.put(c.getLongOr("unit", 0L), ResourceKey.create(Registries.DIMENSION, loc));
             }
         }
-        net.nextId = Math.max(tag.getLong("next_id"), 1);
+        net.nextId = Math.max(tag.getLongOr("next_id", 0L), 1);
         for (long id : net.flights.keySet()) {
             net.nextId = Math.max(net.nextId, id + 1);
         }

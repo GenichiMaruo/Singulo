@@ -14,7 +14,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -79,7 +79,7 @@ public class AfterglowWingsItem extends ArmorItem {
         if (!(entity instanceof Player player) || player.getItemBySlot(EquipmentSlot.CHEST) != stack || !player.isFallFlying()) {
             return;
         }
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (player.tickCount % 2 == 0) {
                 Vec3 back = player.getLookAngle().scale(-0.6);
                 for (int side = -1; side <= 1; side += 2) {

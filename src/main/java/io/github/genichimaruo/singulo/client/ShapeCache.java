@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.multiblock.Shapes;
 import java.util.LinkedHashMap;
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 

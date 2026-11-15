@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**
@@ -29,7 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * 外装にエネルギーの流れの模様が浮かび上がる。
  */
 public abstract class AbstractMachineBlock extends BaseEntityBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<net.minecraft.core.Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty BOOSTED = BooleanProperty.create("boosted");
 
@@ -100,35 +100,35 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
         // マルチブロックのコントローラーは、完成するまで画面を開かない（未完成と知らせる）
         var kind = io.github.genichimaruo.singulo.multiblock.Blueprints.kindOf(state.getBlock());
         if (kind != null && io.github.genichimaruo.singulo.multiblock.Blueprints.formedSize(level, pos, kind) <= 0) {
-            if (!level.isClientSide && player.getMainHandItem().isEmpty()) {
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.singulo.multiblock.not_formed",
-                        net.minecraft.network.chat.Component.translatable(state.getBlock().getDescriptionId())), true);
+            if (!level.isClientSide() && player.getMainHandItem().isEmpty()) {
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.singulo.multiblock.not_formed",
+                        net.minecraft.network.chat.Component.translatable(state.getBlock().getDescriptionId())));
             }
-            return player.getMainHandItem().isEmpty() ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
+            return player.getMainHandItem().isEmpty() ? io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide()) : InteractionResult.PASS;
         }
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
+        if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof MenuOpener opener) {
             opener.openMenu(serverPlayer);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     /** 手に持ったアイテムで右クリックしたとき、ブロックエンティティが受け取れば使う（触媒を入れるなど）。 */
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         // 液体の容器（バケツ・冷媒カートリッジ）: タンクを持つブロックなら、直接出し入れする（加工装置は MachineBlock が受け持つ）
         if (!(this instanceof MachineBlock) && net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(stack).isPresent()
                 && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, hit.getDirection()) != null
                 && net.neoforged.neoforge.fluids.FluidUtil.interactWithFluidHandler(player, hand, level, pos, hit.getDirection())) {
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
         }
         // クライアントは素通しし、使うかどうかはサーバーが決める（使わなければ通常どおりGUIを開く）
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
+        if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof MenuOpener opener && opener.useItem(serverPlayer, stack, hand)) {
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override

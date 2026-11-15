@@ -15,7 +15,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +47,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     public static final ModelLayerLocation GRAVITY_LAYER = new ModelLayerLocation(Singulo.id("cargo_drone_gravity"), "main");
     /** 型ごとの絵の名前（textures/entity/ の下。光る線は _glow）。 */
     private static final String[] SKINS = {"cargo_drone", "cargo_drone_jet", "cargo_drone_gravity"};
-    private static final ResourceLocation[] TEXTURES = new ResourceLocation[SKINS.length];
+    private static final Identifier[] TEXTURES = new Identifier[SKINS.length];
     private static final RenderType[] GLOWS = new RenderType[SKINS.length];
     private static final RenderType[] SHELLS = new RenderType[SKINS.length];
     /** 箱の番号（DroneCrateItem.displayTier）ごとのアイテム: 梱包箱3段階と、液体カプセル3段階。 */
@@ -59,7 +59,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     static {
         for (int i = 0; i < SKINS.length; i++) {
             TEXTURES[i] = Singulo.id("textures/entity/" + SKINS[i] + ".png");
-            GLOWS[i] = RenderType.eyes(Singulo.id("textures/entity/" + SKINS[i] + "_glow.png"));
+            GLOWS[i] = net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/" + SKINS[i] + "_glow.png"));
             SHELLS[i] = PhaseShellType.of(SKINS[i], TEXTURES[i]);
         }
     }
@@ -79,7 +79,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     }
 
     @Override
-    public ResourceLocation getTextureLocation(CargoDrone drone) {
+    public Identifier getTextureLocation(CargoDrone drone) {
         return TEXTURES[drone.kind().ordinal()];
     }
 
@@ -175,7 +175,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
     private void renderPrintArm(CargoDrone drone, float top, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float t = drone.tickCount + partialTick;
         float cx = -0.44F, cz = -0.44F, rod = 0.03F;
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
         // 上面の隅の受け口と、伸びる棒
         FxDraw.box(pose, solid, cx - 0.06F, 0, cz - 0.06F, cx + 0.06F, 0.03F, cz + 0.06F, light, 0x4E5560);
         if (top + 0.02F > 0) {
@@ -249,7 +249,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
             if (!flying(drone) || !(getParentModel() instanceof RotorModel rotor)) {
                 return;
             }
-            VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+            VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
             float u = 1 / 16F;
             for (int i = 0; i < 4; i++) {
                 pose.pushPose();
@@ -450,7 +450,7 @@ public class CargoDroneRenderer extends MobRenderer<CargoDrone, CargoDroneRender
 
     /** 位相透過の姿の描き方: ドローンの絵を光らせて半透明で重ね、奥行きを比べない・書かない（壁越しに見える）。 */
     private static final class PhaseShellType extends RenderType {
-        static RenderType of(String name, ResourceLocation texture) {
+        static RenderType of(String name, Identifier texture) {
             return create("singulo_" + name + "_phase", com.mojang.blaze3d.vertex.DefaultVertexFormat.NEW_ENTITY,
                     com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, true, true, CompositeState.builder()
                             .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)

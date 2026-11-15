@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.android;
 
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -311,7 +311,7 @@ public class AndroidMenu extends AbstractContainerMenu {
         }
         if (id == BUTTON_STASH) {
             net.minecraft.network.chat.Component why = android.requestStash();
-            player.displayClientMessage(why != null ? why : net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.going"), true);
+            player.sendOverlayMessage(why != null ? why : net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.going"));
             if (why == null) {
                 player.closeContainer();               // 歩いて箱へ行くので、画面を閉じる
             }

@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -25,14 +25,14 @@ public class CreativeCatalystItem extends UsesItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             int next = tier(stack) >= 5 ? 2 : tier(stack) + 1;
             stack.set(SinguloComponents.CATALYST_TIER.get(), next);
-            player.displayClientMessage(Component.translatable("tooltip.singulo.creative_catalyst.tier", next), true);
+            player.sendOverlayMessage(Component.translatable("tooltip.singulo.creative_catalyst.tier", next));
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override

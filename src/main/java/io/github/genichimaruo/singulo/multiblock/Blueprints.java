@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;

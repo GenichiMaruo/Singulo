@@ -20,7 +20,7 @@ import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import io.github.genichimaruo.singulo.ruin.RuinDiscovery;
 import io.github.genichimaruo.singulo.ruin.RuinSelfCheck;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -127,7 +127,7 @@ public final class Singulo {
         }
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }

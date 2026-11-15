@@ -60,7 +60,7 @@ public class AndroidAccessoryItem extends Item {
         if (state == null || !state.canSurvive(level, pos)) {
             return net.minecraft.world.InteractionResult.FAIL;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.setBlock(pos, state, net.minecraft.world.level.block.Block.UPDATE_ALL_IMMEDIATE);
             ItemStack stack = context.getItemInHand();
             if (level.getBlockEntity(pos) instanceof TeacupBlockEntity cup) {
@@ -71,7 +71,7 @@ public class AndroidAccessoryItem extends Item {
                     (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
             stack.consume(1, context.getPlayer());
         }
-        return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     public static boolean isAccessory(ItemStack stack, int part) {

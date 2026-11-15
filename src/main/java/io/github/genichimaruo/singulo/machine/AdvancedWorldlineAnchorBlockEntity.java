@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -89,13 +89,13 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
             return false;
         }
         if (embedded) {
-            player.displayClientMessage(Component.translatable("gui.singulo.anchor.already_embedded"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.anchor.already_embedded"));
             return true;
         }
         long now = player.level().getGameTime();
         if (now > confirmUntil) {
             confirmUntil = now + CONFIRM_TICKS;
-            player.displayClientMessage(Component.translatable("gui.singulo.anchor.confirm_embed"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.anchor.confirm_embed"));
             return true;
         }
         confirmUntil = 0;
@@ -104,7 +104,7 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
             stack.shrink(1);
         }
         io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(player.level(), worldPosition, "advanced_worldline_anchor_embed", 1.5F, 1.0F);
-        player.displayClientMessage(Component.translatable("gui.singulo.anchor.embedded"), true);
+        player.sendOverlayMessage(Component.translatable("gui.singulo.anchor.embedded"));
         return true;
     }
 
@@ -117,6 +117,6 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        embedded = tag.getBoolean("embedded");
+        embedded = tag.getBooleanOr("embedded", false);
     }
 }

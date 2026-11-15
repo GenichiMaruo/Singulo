@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.machine.SmesMenu;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -30,9 +30,9 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        extractTooltip(g, mouseX, mouseY);
         if (hoveredSlot != null && hoveredSlot.hasItem() || renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
             return;
         }
@@ -44,7 +44,7 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         clearStats();
         drawFrame(g, mouseX, mouseY);
         int stored = menu.value(SmesMenu.D_STORED);
@@ -63,9 +63,9 @@ public class SmesScreen extends FramedScreen<SmesMenu> {
             g.fill(bx + bw * i / 10, by + BAR_H - 3, bx + bw * i / 10 + 1, by + BAR_H, 0x73FFFFFF);
         }
         String amount = EnergyText.of(stored) + " / " + EnergyText.of(cap) + " FE";
-        g.drawString(font, amount, bx, by + BAR_H + 5, skin.text(), false);
+        g.text(font, amount, bx, by + BAR_H + 5, skin.text(), false);
         String pct = String.format("%.1f%%", 100.0 * stored / cap);
-        g.drawString(font, pct, bx + bw - font.width(pct), by + BAR_H + 5, 0xFF2A8FB8, false);
+        g.text(font, pct, bx + bw - font.width(pct), by + BAR_H + 5, 0xFF2A8FB8, false);
         int y = by + BAR_H + 18 - topPos;
         stat(g, BAR_X, y, Panel.Icon.IN, 0xFF3C9A5A, EnergyText.of(menu.value(SmesMenu.D_IN)) + " FE/t", skin.text(),
                 List.of(Component.translatable("gui.singulo.smes.in", EnergyText.of(menu.value(SmesMenu.D_IN)))));

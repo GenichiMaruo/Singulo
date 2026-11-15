@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -631,7 +631,7 @@ final class AndroidLife extends Goal {
     }
 
     void load(CompoundTag t) {
-        held = t.contains("held") ? ItemStack.parseOptional(android.registryAccess(), t.getCompound("held")) : ItemStack.EMPTY;
+        held = t.contains("held") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(android.registryAccess(), t.getCompoundOrEmpty("held")) : ItemStack.EMPTY;
         if (!held.isEmpty()) {
             android.spawnAtLocation(held);                  // 読み込み直したら、足元に置き直す
             held = ItemStack.EMPTY;

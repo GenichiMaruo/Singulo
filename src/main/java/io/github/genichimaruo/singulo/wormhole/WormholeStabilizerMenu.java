@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.item.ExoticCharge;
 import io.github.genichimaruo.singulo.machine.NotifyingItemSlot;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;

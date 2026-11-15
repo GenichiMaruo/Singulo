@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.item.SinguloItem;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -26,7 +26,7 @@ public class UnstableMouthItem extends SinguloItem {
 
     /** 新しい対の口を2個作る。 */
     public static ItemStack[] createPair(Level level) {
-        long pair = level.random.nextLong();
+        long pair = level.getRandom().nextLong();
         ItemStack[] out = new ItemStack[2];
         for (int i = 0; i < 2; i++) {
             out[i] = new ItemStack(SinguloItems.UNSTABLE_WORMHOLE_MOUTH.get());
@@ -50,17 +50,17 @@ public class UnstableMouthItem extends SinguloItem {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (!level.isClientSide && expired(stack, level)) {
+        if (!level.isClientSide() && expired(stack, level)) {
             stack.setCount(0);
             if (entity instanceof Player player) {
-                player.displayClientMessage(Component.translatable("gui.singulo.wormhole.mouth_collapsed"), true);
+                player.sendOverlayMessage(Component.translatable("gui.singulo.wormhole.mouth_collapsed"));
             }
         }
     }
 
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-        if (!entity.level().isClientSide && expired(stack, entity.level())) {
+        if (!entity.level().isClientSide() && expired(stack, entity.level())) {
             entity.discard();
             return true;
         }

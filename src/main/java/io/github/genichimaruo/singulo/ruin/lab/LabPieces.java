@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -145,7 +145,7 @@ public final class LabPieces {
         private final Rotation rotation;
         private final BoundingBox facility;
         /** 搬入出の立坑の範囲（ボスを倒すと、ここの溶接も解く）。なければ null。 */
-        @javax.annotation.Nullable
+        @org.jspecify.annotations.Nullable
         private final BoundingBox access;
 
         public Room(StructureTemplateManager templates, String name, BlockPos min, Rotation rotation, BoundingBox facility) {
@@ -153,7 +153,7 @@ public final class LabPieces {
         }
 
         public Room(StructureTemplateManager templates, String name, BlockPos min, Rotation rotation, BoundingBox facility,
-                    @javax.annotation.Nullable BoundingBox access) {
+                    @org.jspecify.annotations.Nullable BoundingBox access) {
             super(SinguloWorldgen.LAB_ROOM.get(), 0, place(templates, name, min, rotation));
             this.name = name;
             this.rotation = rotation;
@@ -164,15 +164,15 @@ public final class LabPieces {
 
         public Room(StructurePieceSerializationContext context, CompoundTag tag) {
             super(SinguloWorldgen.LAB_ROOM.get(), tag);
-            this.name = tag.getString("name");
-            this.pos = new BlockPos(tag.getInt("px"), tag.getInt("py"), tag.getInt("pz"));
-            this.rotation = Rotation.values()[tag.getInt("rot") & 3];
+            this.name = tag.getStringOr("name", "");
+            this.pos = new BlockPos(tag.getIntOr("px", 0), tag.getIntOr("py", 0), tag.getIntOr("pz", 0));
+            this.rotation = Rotation.values()[tag.getIntOr("rot", 0) & 3];
             this.facility = LabPower.read(tag.getIntArray("facility"));
             int[] a = tag.getIntArray("access");
             this.access = a.length == 6 ? LabPower.read(a) : null;
         }
 
-        public static ResourceLocation id(String name) {
+        public static Identifier id(String name) {
             return Singulo.id("lab/" + name);
         }
 
@@ -251,7 +251,7 @@ public final class LabPieces {
 
         public Corridor(StructurePieceSerializationContext context, CompoundTag tag) {
             super(SinguloWorldgen.LAB_CORRIDOR.get(), tag);
-            this.floor = tag.getInt("floor");
+            this.floor = tag.getIntOr("floor", 0);
             this.points = new ArrayList<>();
             for (Tag t : tag.getList("points", Tag.TAG_INT_ARRAY)) {
                 int[] p = ((IntArrayTag) t).getAsIntArray();
@@ -343,7 +343,7 @@ public final class LabPieces {
 
         public Doors(StructurePieceSerializationContext context, CompoundTag tag) {
             super(SinguloWorldgen.LAB_DOOR.get(), tag);
-            this.floor = tag.getInt("floor");
+            this.floor = tag.getIntOr("floor", 0);
             this.walls = new ArrayList<>();
             for (Tag t : tag.getList("walls", Tag.TAG_INT_ARRAY)) {
                 walls.add(((IntArrayTag) t).getAsIntArray());
@@ -487,10 +487,10 @@ public final class LabPieces {
 
         public Entrance(StructurePieceSerializationContext context, CompoundTag tag) {
             super(SinguloWorldgen.LAB_ENTRANCE.get(), tag);
-            this.sx = tag.getInt("sx");
-            this.sz = tag.getInt("sz");
-            this.floorY = tag.getInt("floor");
-            this.seed = tag.getLong("seed");
+            this.sx = tag.getIntOr("sx", 0);
+            this.sz = tag.getIntOr("sz", 0);
+            this.floorY = tag.getIntOr("floor", 0);
+            this.seed = tag.getLongOr("seed", 0L);
         }
 
         @Override
@@ -626,11 +626,11 @@ public final class LabPieces {
 
         public Shaft(StructurePieceSerializationContext context, CompoundTag tag) {
             super(SinguloWorldgen.LAB_SHAFT.get(), tag);
-            this.sx = tag.getInt("sx");
-            this.sz = tag.getInt("sz");
-            this.floor = tag.getInt("floor");
-            this.surface = tag.getInt("surface");
-            this.seed = tag.getLong("seed");
+            this.sx = tag.getIntOr("sx", 0);
+            this.sz = tag.getIntOr("sz", 0);
+            this.floor = tag.getIntOr("floor", 0);
+            this.surface = tag.getIntOr("surface", 0);
+            this.seed = tag.getLongOr("seed", 0L);
         }
 
         @Override

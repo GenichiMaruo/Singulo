@@ -18,7 +18,7 @@ public final class BossLoot {
 
     /** 落とし物を1つ、安全な場所に出す（死んだときの取りまとめ中なら、そこへ加える）。 */
     static ItemEntity drop(LivingEntity boss, Vec3 at, ItemStack stack) {
-        if (stack.isEmpty() || boss.level().isClientSide) {
+        if (stack.isEmpty() || boss.level().isClientSide()) {
             return null;
         }
         ItemEntity item = new ItemEntity(boss.level(), at.x, at.y, at.z, stack, 0, 0.15, 0);

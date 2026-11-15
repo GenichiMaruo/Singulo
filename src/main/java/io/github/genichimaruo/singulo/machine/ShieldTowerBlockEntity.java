@@ -227,17 +227,17 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         super.loadAdditional(tag, registries);
         firstCheck = true;
         if (tag.contains("permit")) {
-            permit.deserializeNBT(registries, tag.getCompound("permit"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(permit, registries, tag.getCompoundOrEmpty("permit"));
         }
         if (tag.contains("protection")) {
-            int p = tag.getInt("protection");
+            int p = tag.getIntOr("protection", 0);
             if (shownProtection == 0 && p > 0 && getLevel() != null) {
                 activatedAt = getLevel().getGameTime();
             }
             shownProtection = p;
-            shownRadius = tag.getInt("radius");
-            axis = BlockPos.of(tag.getLong("axis"));
-            formed = tag.getBoolean("formed");
+            shownRadius = tag.getIntOr("radius", 0);
+            axis = BlockPos.of(tag.getLongOr("axis", 0L));
+            formed = tag.getBooleanOr("formed", false);
         }
     }
 
@@ -393,7 +393,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("permit", permit.serializeNBT(registries));
+        tag.put("permit", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(permit, registries));
     }
 
     @Override

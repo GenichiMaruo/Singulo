@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.ruin.lab;
 
 import com.mojang.serialization.MapCodec;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -67,12 +67,12 @@ public class LabDecorBlock extends HorizontalDirectionalBlock {
         if (useMessage == null) {
             return InteractionResult.PASS;
         }
-        if (!level.isClientSide) {
-            player.displayClientMessage(Component.translatable(useMessage), true);
+        if (!level.isClientSide()) {
+            player.sendOverlayMessage(Component.translatable(useMessage));
             if (useSound != null) {
                 level.playSound(null, pos, useSound, SoundSource.BLOCKS, 0.8F, 1.0F);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 }

@@ -33,7 +33,7 @@ sourceSets {
         runtimeClasspath += sourceSets.main.output
     }
 }
-sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java')
+sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java', '**/compat/mekanism/**')
 configurations {
     gameTestImplementation.extendsFrom implementation
     gameTestCompileOnly.extendsFrom compileOnly
@@ -73,17 +73,13 @@ tasks.named('jar', Jar) {
     }
 }
 
-// Minecraft 1.21.1 ships Java 21, so compile and run with a Java 21 toolchain.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Minecraft 26.1.2 requires Java 25; this branch is an unfinished port.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
     version = project.neo_version
     addModdingDependenciesTo(sourceSets.gameTest)
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
 
     runs {
         client {
@@ -154,14 +150,7 @@ repositories {
             includeGroup 'net.mezzdev.config'
         }
     }
-    // Mekanism（化学物質のタンクアップグレード。任意の連携）
-    maven {
-        name = 'ModMaven'
-        url = 'https://modmaven.dev/'
-        content {
-            includeGroup 'mekanism'
-        }
-    }
+
 }
 
 dependencies {
@@ -171,12 +160,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-    // Mekanism も任意の連携（入っていなくても遊べる。依存関係には書かない）。API だけでコンパイルし、
-    // -PwithMekanism を付けたときだけ、開発中の起動（クライアント・GameTest）に本体を入れる
-    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
-    if (providers.gradleProperty('withMekanism').isPresent()) {
-        localRuntime "mekanism:Mekanism:${mekanism_version}"
-    }
+
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -201,6 +185,7 @@ neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs.addAll(['-Xmaxerrs', '10000'])
 }
 
 idea {

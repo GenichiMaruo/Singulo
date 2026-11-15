@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.genesis;
 
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -95,7 +95,7 @@ public class GenesisCoreMenu extends AbstractContainerMenu {
 
     /** 作る物の枠: 物を持ってクリックするとそれを作る物に決め（持っている物は減らない）、素手でクリックすると外す。 */
     @Override
-    public void clicked(int slotId, int button, net.minecraft.world.inventory.ClickType type, Player player) {
+    public void clicked(int slotId, int button, net.minecraft.world.inventory.ContainerInput type, Player player) {
         if (slotId == TEMPLATE_SLOT) {
             if (player instanceof ServerPlayer sp && core(player) instanceof GenesisCoreBlockEntity core && complete(player)) {
                 if (getCarried().isEmpty()) {

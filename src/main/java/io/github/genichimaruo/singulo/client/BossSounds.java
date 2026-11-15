@@ -13,7 +13,7 @@ import io.github.genichimaruo.singulo.ruin.WardenSingularity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -120,7 +120,7 @@ public class FoundryOverseer extends RuinBoss {
         super(type, level, BossEvent.BossBarColor.YELLOW);
         this.xpReward = 600;
         setNoGravity(true);
-        if (!level.isClientSide && !BossScaling.hardMode()) {
+        if (!level.isClientSide() && !BossScaling.hardMode()) {
             setEffectiveHealth(HEALTH_NORMAL);
         }
     }
@@ -789,7 +789,7 @@ public class FoundryOverseer extends RuinBoss {
 
     @Override
     public void remove(RemovalReason reason) {
-        if (!level().isClientSide && reason.shouldDestroy()) {
+        if (!level().isClientSide() && reason.shouldDestroy()) {
             setConveyors(false);
             if (reason == RemovalReason.DISCARDED && level() instanceof ServerLevel level) {
                 for (RuinAndroid a : factoryMade(level)) {
@@ -816,29 +816,33 @@ public class FoundryOverseer extends RuinBoss {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput values) {
+        CompoundTag tag = new CompoundTag();
+        super.addAdditionalSaveData(values);
         tag.put("lines", writeList(lines));
         tag.put("conveyors", writeList(conveyors));
         tag.putBoolean("conveyors_on", conveyorsOn);
         tag.putBoolean("prototypes", prototypesCalled);
         tag.putBoolean("reprinted", reprinted);
+
+        values.store(tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput values) {
+        CompoundTag tag = io.github.genichimaruo.singulo.compat.ValueIoCompat.read(values);
+        super.readAdditionalSaveData(values);
         readList(tag.getList("lines", Tag.TAG_INT_ARRAY), lines);
         readList(tag.getList("conveyors", Tag.TAG_INT_ARRAY), conveyors);
-        conveyorsOn = tag.getBoolean("conveyors_on");
-        prototypesCalled = tag.getBoolean("prototypes");
-        reprinted = tag.getBoolean("reprinted");
+        conveyorsOn = tag.getBooleanOr("conveyors_on", false);
+        prototypesCalled = tag.getBooleanOr("prototypes", false);
+        reprinted = tag.getBooleanOr("reprinted", false);
     }
 
     private static ListTag writeList(List<BlockPos> list) {
         ListTag out = new ListTag();
         for (BlockPos p : list) {
-            out.add(NbtUtils.writeBlockPos(p));
+            out.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(p));
         }
         return out;
     }
@@ -848,7 +852,7 @@ public class FoundryOverseer extends RuinBoss {
         for (Tag t : in) {
             CompoundTag c = new CompoundTag();
             c.put("p", t);
-            NbtUtils.readBlockPos(c, "p").ifPresent(out::add);
+            io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "p").ifPresent(out::add);
         }
     }
 }

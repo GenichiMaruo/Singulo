@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.cable;
 import com.mojang.serialization.MapCodec;
 import java.util.EnumMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -123,7 +123,7 @@ public class CableBlock extends BaseEntityBlock {
     // ------------------------------------------------------------------ カバー（{@link ConduitCover}）
 
     @Override
-    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+    protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
             BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
             net.minecraft.world.phys.BlockHitResult hit) {
         return ConduitCover.use(stack, state, level, pos, player, hand, hit);
@@ -229,7 +229,7 @@ public class CableBlock extends BaseEntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         ConduitCover.dropOnRemove(state, level, pos, newState);
         if (!state.is(newState.getBlock())) {
-            if (level.isClientSide) CableBlockEntity.clearConnectedDisplay(level,pos);
+            if (level.isClientSide()) CableBlockEntity.clearConnectedDisplay(level,pos);
             else if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) cable.invalidateNetwork();
         }
         super.onRemove(state, level, pos, newState, moving);

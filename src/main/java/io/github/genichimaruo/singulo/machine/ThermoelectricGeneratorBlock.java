@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -32,7 +32,7 @@ public class ThermoelectricGeneratorBlock extends AbstractMachineBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return null;
         }
         BlockEntityTicker<T> inner = createTickerHelper(type, SinguloBlockEntities.THERMOELECTRIC_GENERATOR.get(),

@@ -13,11 +13,11 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 置いたティーカップ（受け皿にのったカップ。中に紅茶）。アンドロイドの装飾のティーカップを右クリックで置く。
@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  */
 public class TeacupBlock extends BaseEntityBlock {
     public static final MapCodec<TeacupBlock> CODEC = simpleCodec(TeacupBlock::new);
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<net.minecraft.core.Direction> FACING = HorizontalDirectionalBlock.FACING;
     private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 8, 13);
 
     public TeacupBlock(Properties properties) {

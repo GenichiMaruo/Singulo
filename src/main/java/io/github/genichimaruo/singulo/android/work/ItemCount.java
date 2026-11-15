@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -109,8 +109,8 @@ public final class ItemCount {
     }
 
     public static ItemCount load(CompoundTag t, HolderLookup.Provider registries) {
-        Ingredient alt = t.contains("alt") ? parse(t.getString("alt")) : null;
-        return new ItemCount(ItemStack.parseOptional(registries, t.getCompound("item")), t.getLong("count"), alt);
+        Ingredient alt = t.contains("alt") ? parse(t.getStringOr("alt", "")) : null;
+        return new ItemCount(io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t.getCompoundOrEmpty("item")), t.getLongOr("count", 0L), alt);
     }
 
     /** 文字から材料を読む（読めなければ null）。 */

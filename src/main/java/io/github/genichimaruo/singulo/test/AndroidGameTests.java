@@ -2106,7 +2106,7 @@ public final class AndroidGameTests {
         BladeAndroid a = worker(helper, false);
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
-        net.minecraft.world.entity.monster.Zombie[] attacker = {null};
+        net.minecraft.world.entity.monster.zombie.Zombie[] attacker = {null};
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(a.tickCount >= 5 && a.active(), "個体のAIが動き始めるのを待つ"))
                 .thenExecute(() -> {
@@ -2371,8 +2371,8 @@ public final class AndroidGameTests {
         var plan = console.plan(io.github.genichimaruo.singulo.android.work.FluidSamples.key(water), 1500);
         helper.assertTrue(plan.ok(), "流体の計画を作れない");
         var view = io.github.genichimaruo.singulo.android.work.WorkConsoleView.plan(console, plan, level.registryAccess());
-        var made = view.getList("crafted", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0);
-        helper.assertTrue(made.getLong("count") == 2000 && made.getLong("surplus") == 500, "mBで表示していない");
+        var made = view.getList("crafted", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompoundOrEmpty(0);
+        helper.assertTrue(made.getLongOr("count", 0L) == 2000 && made.getLongOr("surplus", 0L) == 500, "mBで表示していない");
         helper.succeed();
     }
 
@@ -2533,7 +2533,7 @@ public final class AndroidGameTests {
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない");
         helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(a.saveWorkState().getLong("crafted") > 0, "一部製作済みになるのを待つ"))
+                .thenWaitUntil(() -> helper.assertTrue(a.saveWorkState().getLongOr("crafted", 0L) > 0, "一部製作済みになるのを待つ"))
                 .thenExecute(() -> {
                     CompoundTag saved = a.saveWithoutId(new CompoundTag());
                     CompoundTag controller = console.saveWithFullMetadata(helper.getLevel().registryAccess());
@@ -2709,7 +2709,7 @@ public final class AndroidGameTests {
         for (int slot : slots) {
             kept |= a.inventory().getItem(slot).is(net.minecraft.world.item.Items.DIAMOND);
         }
-        helper.assertTrue(kept && a.saveWorkState().getLong("progress") == 1, "目的の品を持たずに進捗を数えた");
+        helper.assertTrue(kept && a.saveWorkState().getLongOr("progress", 0L) == 1, "目的の品を持たずに進捗を数えた");
         // 全枠が必要な材料で埋まるときは、装置に残して待つ。
         for (int slot : slots) {
             a.inventory().setItem(slot, input.copyWithCount(64));
@@ -2722,7 +2722,7 @@ public final class AndroidGameTests {
         long moved = (Long) extract.invoke(goal, handler, target, 1L);
         helper.assertTrue(moved == 0 && handler.getStackInSlot(0).getCount() == 1, "持てない完成品を装置から抜き捨てた");
         collect.invoke(goal, List.of(target.copy()), target);
-        helper.assertTrue(a.saveWorkState().getLong("progress") == 1, "足元に落ちた品を取得済みと数えた");
+        helper.assertTrue(a.saveWorkState().getLongOr("progress", 0L) == 1, "足元に落ちた品を取得済みと数えた");
         a.discard();
         helper.succeed();
     }

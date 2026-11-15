@@ -49,14 +49,14 @@ public record WorkJob(Type type, int orderId, int jobId, long amount, List<ItemC
         return tag;
     }
 
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     public static WorkJob load(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         if (!tag.contains("type")) {
             return null;
         }
         Type type;
         try {
-            type = Type.valueOf(tag.getString("type"));
+            type = Type.valueOf(tag.getStringOr("type", ""));
         } catch (IllegalArgumentException ex) {
             return null;
         }
@@ -65,14 +65,14 @@ public record WorkJob(Type type, int orderId, int jobId, long amount, List<ItemC
         var batch = new java.util.ArrayList<Batch>();
         for (var element : tag.getList("batch", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
             var t = (net.minecraft.nbt.CompoundTag) element;
-            var recipe = RecipeData.load(t.getCompound("recipe"), registries);
-            if (recipe == null || t.getInt("step") < 0 || t.getLong("crafts") <= 0) {
+            var recipe = RecipeData.load(t.getCompoundOrEmpty("recipe"), registries);
+            if (recipe == null || t.getIntOr("step", 0) < 0 || t.getLongOr("crafts", 0L) <= 0) {
                 return null;
             }
-            batch.add(new Batch(t.getInt("step"), t.getLong("crafts"), BlockPos.of(t.getLong("location")), recipe));
+            batch.add(new Batch(t.getIntOr("step", 0), t.getLongOr("crafts", 0L), BlockPos.of(t.getLongOr("location", 0L)), recipe));
         }
-        return new WorkJob(type, tag.getInt("order"), tag.getInt("job"), Math.max(0, tag.getLong("amount")),
-                fetch, batch, tag.getBoolean("carried"));
+        return new WorkJob(type, tag.getIntOr("order", 0), tag.getIntOr("job", 0), Math.max(0, tag.getLongOr("amount", 0L)),
+                fetch, batch, tag.getBooleanOr("carried", false));
     }
 
     /** 作業指令台が覚えておく、渡した作業（だれが、いつまで）。 */

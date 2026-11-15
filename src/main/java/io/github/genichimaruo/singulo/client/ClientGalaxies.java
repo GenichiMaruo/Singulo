@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.client;
 
 import java.util.List;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 
 /** 夜空の銀河（サーバーの GenesisGalaxies から受け取る）。新しく生まれた銀河は、しばらくかけて現れる。 */
 public final class ClientGalaxies {

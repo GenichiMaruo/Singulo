@@ -1,11 +1,11 @@
 package io.github.genichimaruo.singulo.client;
 
 import io.github.genichimaruo.singulo.network.RenameAndroidPayload;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -41,7 +41,7 @@ final class NameEditor {
     EditBox commit(int containerId) {
         EditBox b = box;
         if (b != null) {
-            PacketDistributor.sendToServer(new RenameAndroidPayload(containerId, b.getValue()));
+            ClientPacketDistributor.sendToServer(new RenameAndroidPayload(containerId, b.getValue()));
         }
         box = null;
         return b;
@@ -56,11 +56,11 @@ final class NameEditor {
 
     /** 名前を元に戻す（型の愛称へ）。 */
     static void reset(int containerId) {
-        PacketDistributor.sendToServer(new RenameAndroidPayload(containerId, ""));
+        ClientPacketDistributor.sendToServer(new RenameAndroidPayload(containerId, ""));
     }
 
     /** 小さな「元に戻す」ボタン（10×10。丸い矢印）。 */
-    static void drawReset(net.minecraft.client.gui.GuiGraphics g, int x, int y, boolean hover, int face, int ink) {
+    static void drawReset(net.minecraft.client.gui.GuiGraphicsExtractor g, int x, int y, boolean hover, int face, int ink) {
         g.fill(x, y + 1, x + 10, y + 9, face);
         g.fill(x + 1, y, x + 9, y + 10, face);
         int c = hover ? 0xFFFFFFFF : ink;
@@ -84,7 +84,7 @@ final class NameEditor {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             return 2;
         }
-        box.keyPressed(keyCode, scanCode, modifiers);
+        box.keyPressed(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, modifiers));
         return 3;
     }
 }

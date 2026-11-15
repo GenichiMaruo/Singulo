@@ -6,10 +6,10 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.ruin.FoundryOverseer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -40,7 +40,7 @@ public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(FoundryOverseer entity) {
+    public Identifier getTextureLocation(FoundryOverseer entity) {
         return FxDraw.WHITE;
     }
 
@@ -57,7 +57,7 @@ public class FoundryOverseerRenderer extends EntityRenderer<FoundryOverseer> {
         Vec3 origin = e.getPosition(partialTick);
 
         // ---- 不透明な部分（ケーブル・コア・檻・爪・プレス）
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
         pose.pushPose();
         pose.translate(0, CY + lift, 0);
         for (int k = 0; k < 4; k++) {

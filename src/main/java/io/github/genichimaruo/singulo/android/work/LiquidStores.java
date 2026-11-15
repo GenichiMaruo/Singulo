@@ -66,7 +66,7 @@ public final class LiquidStores {
      * 入れる・出すの設定があるので（ケミカルタンクの既定は、前だけが出口）、数えるのは最初に見つかった面で（同じ中身を何度も数えない）、
      * 出し入れはできる面を順に試す。数えるのは、どこかの面から取り出せる量だけ（入れるだけの欄の中身を在庫にしない）。
      */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private static Chemicals.Store anySide(Level level, BlockPos p) {
         java.util.List<Chemicals.Store> sides = new ArrayList<>();
         for (Direction d : Direction.values()) {

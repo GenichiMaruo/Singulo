@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -81,12 +81,12 @@ public class WormholeNetwork extends SavedData {
 
     static WormholeNetwork load(CompoundTag tag, HolderLookup.Provider registries) {
         WormholeNetwork net = new WormholeNetwork();
-        for (Tag t : tag.getList("mouths", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("mouths")) {
             CompoundTag e = (CompoundTag) t;
-            ResourceLocation dim = ResourceLocation.tryParse(e.getString("dim"));
+            Identifier dim = Identifier.tryParse(e.getStringOr("dim", ""));
             if (dim != null) {
-                net.mouths.computeIfAbsent(e.getLong("pair"), p -> new ArrayList<>())
-                        .add(GlobalPos.of(ResourceKey.create(Registries.DIMENSION, dim), BlockPos.of(e.getLong("pos"))));
+                net.mouths.computeIfAbsent(e.getLongOr("pair", 0L), p -> new ArrayList<>())
+                        .add(GlobalPos.of(ResourceKey.create(Registries.DIMENSION, dim), BlockPos.of(e.getLongOr("pos", 0L))));
             }
         }
         return net;

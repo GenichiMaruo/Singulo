@@ -3,18 +3,18 @@ package io.github.genichimaruo.singulo.compat.mekanism;
 import io.github.genichimaruo.singulo.android.work.QioStores;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import mekanism.api.Action;
 import mekanism.api.inventory.qio.IQIOComponent;
 import mekanism.api.inventory.qio.IQIOFrequency;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /**
@@ -28,7 +28,7 @@ import net.neoforged.neoforge.items.IItemHandler;
  * </ul>
  */
 public final class MekanismQio implements QioStores.Access {
-    private static final ResourceLocation DASHBOARD = ResourceLocation.fromNamespaceAndPath("mekanism", "qio_dashboard");
+    private static final Identifier DASHBOARD = Identifier.fromNamespaceAndPath("mekanism", "qio_dashboard");
     /**
      * 周波数ごとの入れ物（同じ周波数のダッシュボードを何枚つないでも、同じ入れ物を返す。集める側は同じ入れ物を1回だけ数える）。
      * 周波数が消えたら忘れる。
@@ -66,7 +66,7 @@ public final class MekanismQio implements QioStores.Access {
     static boolean publicAccess(Level level, BlockPos pos) {
         var security = mekanism.api.security.IBlockSecurityUtils.INSTANCE.securityCapability(level, pos);
         return security != null && mekanism.api.security.ISecurityUtils.INSTANCE
-                .getEffectiveSecurityMode(security, level.isClientSide) == mekanism.api.security.SecurityMode.PUBLIC;
+                .getEffectiveSecurityMode(security, level.isClientSide()) == mekanism.api.security.SecurityMode.PUBLIC;
     }
 
     // Weak values are essential: a Handler itself holds its frequency and world.
@@ -84,7 +84,7 @@ public final class MekanismQio implements QioStores.Access {
     @Nullable
     private static Direction facing(BlockState state) {
         for (var property : state.getProperties()) {
-            if (property instanceof DirectionProperty d && "facing".equals(d.getName())) {
+            if (property instanceof EnumProperty<net.minecraft.core.Direction> d && "facing".equals(d.getName())) {
                 return state.getValue(d);
             }
         }

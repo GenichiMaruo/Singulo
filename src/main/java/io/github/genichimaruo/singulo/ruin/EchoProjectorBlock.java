@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.ruin;
 
 import com.mojang.serialization.MapCodec;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;

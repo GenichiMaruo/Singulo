@@ -8,7 +8,7 @@ import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -43,7 +43,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     /** 待機している理由（待機中だけ、何 tick かごとに調べ直す）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private io.github.genichimaruo.singulo.machine.MachineDiagnosis.Result idleReason;
     private int reasonTimer;
 
@@ -170,9 +170,9 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         layoutPopups();
-        super.render(g, mouseX, mouseY, partialTick);
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (sides.open) {
             renderSides(g, mouseX, mouseY);
         }
@@ -181,11 +181,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         if (!overPopup(mouseX, mouseY)) {
             // 窓より手前に出す
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 400);
-            renderTooltip(g, mouseX, mouseY);
+            g.pose().pushMatrix();
+            g.nextStratum();
+            extractTooltip(g, mouseX, mouseY);
             renderOwnTooltips(g, mouseX, mouseY);
-            g.pose().popPose();
+            g.pose().popMatrix();
         }
     }
 
@@ -305,7 +305,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     /** 稲妻の印（電力だけで作る）。作らないときは斜線を重ねる。 */
-    private void drawFreeSwitch(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawFreeSwitch(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         if (!showsFreeSwitch()) {
             return;
         }
@@ -337,7 +337,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     @Override
-    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {
+    protected void drawRail(GuiGraphicsExtractor g, int row, int x, int y, boolean hover) {
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
             Panel.sidesIcon(g, x, y);
             return;
@@ -381,9 +381,9 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return menu.value(MachineBlockEntity.sidesIndex(type()) + sidesChannel);
     }
 
-    private void renderSides(GuiGraphics g, int mouseX, int mouseY) {
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+    private void renderSides(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        g.pose().pushMatrix();
+        g.nextStratum();
         sides.draw(g, skin, mouseX, mouseY);
         // タブ: アイテムは箱、タンクはそのタンクの色のしずく（入れるタンクは下向き、出すタンクは上向きの矢印）
         int tabs = sideTabs().size();
@@ -443,7 +443,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             lines.add(Component.translatable("gui.singulo.sides.hint").withStyle(s -> s.withColor(0xFF8A949E)));
             Panel.tooltip(g, font, lines, 230, mouseX, mouseY);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
     /** 面の設定の板の記号に重ねたときの名前。 */
@@ -482,7 +482,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         int[] mp = masterPos();
         if (!channelIsInputTank() && Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
             boolean master = io.github.genichimaruo.singulo.machine.SideConfig.ejectEnabled(packed);
-            net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
+            net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
                     menu.pos(), sidesChannel, io.github.genichimaruo.singulo.network.SideConfigPayload.MASTER_FACE, master ? 0 : 4));
             return true;
         }
@@ -510,12 +510,13 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         } else {
             mode = nextMode(mode);
         }
-        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
+        net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
                 menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dx, double dy) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (selector.drag(leftPos, topPos, mouseX, mouseY) || sides.drag(leftPos, topPos, mouseX, mouseY)) {
             return true;
         }
@@ -528,11 +529,12 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             }
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+        return super.mouseDragged(event, dx, dy);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         if (selector.release() | sides.release()) {
             return true;
         }
@@ -546,11 +548,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             cubePress = -1;
             return true;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos;
         int y = topPos;
         drawFrame(g, mouseX, mouseY);
@@ -580,7 +582,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             if (!empty || loaded < 0) {
                 drawSpecialSlot(g, x + l.catalystX, y + l.catalystY, Panel.AMBER, type().catalystSlot(), "time_crystal_catalyst");
             } else {
-                g.renderOutline(x + l.catalystX - 2, y + l.catalystY - 2, 20, 20, Panel.AMBER);
+                g.outline(x + l.catalystX - 2, y + l.catalystY - 2, 20, 20, Panel.AMBER);
                 Panel.slot(g, skin, x + l.catalystX, y + l.catalystY);
             }
             drawLoadedCatalyst(g, x + l.catalystX, y + l.catalystY, loaded, menu.value(MachineBlockEntity.D_LOADED_FILL), empty);
@@ -594,7 +596,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             int by = y + l.modeY;
             boolean hover = Panel.inside(mouseX, mouseY, bx, by, MODE_SIZE, MODE_SIZE);
             Panel.button(g, skin, bx - 1, by - 1, MODE_SIZE + 2, MODE_SIZE + 2, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
-            g.renderItem(modeIcon(), bx, by);
+            g.item(modeIcon(), bx, by);
             int target = menu.value(MachineBlockEntity.D_MASS_TARGET);
             if (target > 0) {
                 int mx = x + l.massBarX;
@@ -641,7 +643,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         value.save();
     }
 
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private RecipeHolder<MachineRecipe> selectedHolder() {
         var level = Minecraft.getInstance().level;
         return level == null ? null : io.github.genichimaruo.singulo.machine.RecipeSelection.byIndex(level, type(),
@@ -656,14 +658,14 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return inputs;
     }
 
-    private void drawSelectButton(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawSelectButton(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int[] p = selectPos();
         boolean hover = Panel.inside(mouseX, mouseY, p[0], p[1], p[2], p[3]);
         RecipeHolder<MachineRecipe> selected = selectedHolder();
         Panel.button(g, skin, p[0] - 2, p[1] - 2, 20, 20, selected != null ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
         Panel.slot(g, skin, p[0], p[1]);
         if (selected != null) {
-            g.renderItem(selected.value().result(), p[0], p[1]);
+            g.item(selected.value().result(), p[0], p[1]);
         } else {
             Panel.autoIcon(g, p[0] + 4, p[1] + 3, 0xFFB8C2CC);
         }
@@ -679,7 +681,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         List<ItemStack> inputs = recipeInputs();
         List<RecipeHolder<MachineRecipe>> all = new ArrayList<>(io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(level, type()));
-        java.util.Map<net.minecraft.resources.ResourceLocation, Integer> score = new java.util.HashMap<>();
+        java.util.Map<net.minecraft.resources.Identifier, Integer> score = new java.util.HashMap<>();
         for (RecipeHolder<MachineRecipe> h : all) {
             score.put(h.id(), matchScore(h.value(), inputs));
         }
@@ -741,9 +743,9 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return -1;
     }
 
-    private void renderSelector(GuiGraphics g, int mouseX, int mouseY) {
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+    private void renderSelector(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        g.pose().pushMatrix();
+        g.nextStratum();
         int[] box = selectorBox();
         selector.draw(g, skin, mouseX, mouseY);
         List<RecipeHolder<MachineRecipe>> entries = selectorEntries();
@@ -789,26 +791,26 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             Panel.slot(g, skin, c[0] + 1, c[1] + 1);
             int ring = isSelected ? skin.accent() : index == hovered ? Panel.GLOW : ready ? GuiSkin.OK : 0;
             if (ring != 0) {
-                g.renderOutline(c[0], c[1], 18, 18, ring);
+                g.outline(c[0], c[1], 18, 18, ring);
             }
             if (h == null) {
                 Panel.autoIcon(g, c[0] + 5, c[1] + 4, 0xFFE9EDF0);
             } else {
-                g.renderItem(h.value().result(), c[0] + 1, c[1] + 1);
-                g.renderItemDecorations(font, h.value().result(), c[0] + 1, c[1] + 1);
+                g.item(h.value().result(), c[0] + 1, c[1] + 1);
+                g.itemDecorations(font, h.value().result(), c[0] + 1, c[1] + 1);
             }
         }
         if (hovered >= 0) {
             Panel.tooltip(g, font, selectorTooltip(entries.get(hovered)), 230, mouseX, mouseY);
         } else if (canMore && Panel.inside(mouseX, mouseY, more[0], more[1], more[2], more[3])) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.select.rows_more"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.select.rows_more"), mouseX, mouseY);
         } else if (canLess && Panel.inside(mouseX, mouseY, less[0], less[1], less[2], less[3])) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.select.rows_less"), mouseX, mouseY);
+            g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.select.rows_less"), mouseX, mouseY);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
-    private List<Component> selectorTooltip(@javax.annotation.Nullable RecipeHolder<MachineRecipe> h) {
+    private List<Component> selectorTooltip(@org.jspecify.annotations.Nullable RecipeHolder<MachineRecipe> h) {
         List<Component> lines = new ArrayList<>();
         if (h == null) {
             lines.add(Component.translatable("gui.singulo.select.auto"));
@@ -873,17 +875,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         drawLabels(g);
         int[] r = structureRect();
         if (r != null) {
             Panel.structureIcon(g, r[0] - leftPos, r[1] - topPos + 1, skin.dim());
-            g.drawString(font, String.valueOf(menu.value(MachineBlockEntity.D_STRUCTURE)), r[0] - leftPos + 10, inventoryLabelY, skin.dim(), false);
+            g.text(font, String.valueOf(menu.value(MachineBlockEntity.D_STRUCTURE)), r[0] - leftPos + 10, inventoryLabelY, skin.dim(), false);
         }
     }
 
     /** マルチブロックの大きさ（格子の記号と数。見出しの行の右端。説明はツールチップ）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private int[] structureRect() {
         int size = menu.value(MachineBlockEntity.D_STRUCTURE);
         if (size <= 0) {
@@ -894,7 +896,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     /** この装置がコラプサー内張りを受け付けるマルチブロックなら、その種類（そうでなければ null）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private io.github.genichimaruo.singulo.multiblock.Blueprints.Kind liningKind() {
         var block = net.minecraft.client.Minecraft.getInstance().level == null ? null
                 : net.minecraft.client.Minecraft.getInstance().level.getBlockState(menu.pos()).getBlock();
@@ -902,12 +904,12 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return kind != null && io.github.genichimaruo.singulo.multiblock.Shapes.acceptsLining(kind) ? kind : null;
     }
 
-    private void drawTank(GuiGraphics g, int x, int y, int tank) {
+    private void drawTank(GuiGraphicsExtractor g, int x, int y, int tank) {
         int fluidId = menu.value(MachineBlockEntity.D_TANKS + tank * 2);
         int amount = menu.value(MachineBlockEntity.D_TANKS + tank * 2 + 1);
         if (hasSides()) {
             // 面の設定のタブと同じ色の縁（このタンクがどの面を使うかを色で対応させる）
-            g.renderOutline(x - 2, y - 2, MachineLayout.TANK_WIDTH + 4, MachineLayout.BAR_HEIGHT + 4, tankColor(tank));
+            g.outline(x - 2, y - 2, MachineLayout.TANK_WIDTH + 4, MachineLayout.BAR_HEIGHT + 4, tankColor(tank));
         }
         if (fluidId > 0) {
             Fluid fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
@@ -934,7 +936,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return new ItemStack(Items.PISTON);
     }
 
-    private void renderOwnTooltips(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderOwnTooltips(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         MachineLayout l = layout();
         int x = leftPos;
         int y = topPos;
@@ -953,7 +955,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
                         .withStyle(st -> st.withColor(0xFFE0B860)));
                 lines.add(Component.translatable("gui.singulo.lining.hint").withStyle(st -> st.withColor(0xFF8A949E)));
             }
-            g.renderComponentTooltip(font, lines, mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
             return;
         }
         int[] sp = selectPos();
@@ -970,7 +972,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         int[] fp = freePos();
         if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3])) {
-            g.renderTooltip(font, Component.translatable((flags() & MachineBlockEntity.FLAG_MAKE_FREE) != 0
+            g.setTooltipForNextFrame(font, Component.translatable((flags() & MachineBlockEntity.FLAG_MAKE_FREE) != 0
                     ? "gui.singulo.make_free.on" : "gui.singulo.make_free.off"), mouseX, mouseY);
             return;
         }
@@ -978,11 +980,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             boolean empty = menu.getSlot(menuIndexOf(type().catalystSlot())).getItem().isEmpty();
             List<Component> loaded = loadedCatalystLines(menu.value(MachineBlockEntity.D_LOADED_ITEM), menu.value(MachineBlockEntity.D_LOADED_FILL), empty);
             if (loaded != null && (empty || mouseY >= y + l.catalystY + 17)) {
-                g.renderComponentTooltip(font, loaded, mouseX, mouseY);
+                g.setComponentTooltipForNextFrame(font, loaded, mouseX, mouseY);
                 return;
             }
             if (empty) {
-                g.renderTooltip(font, Component.translatable("gui.singulo.slot.catalyst"), mouseX, mouseY);
+                g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.slot.catalyst"), mouseX, mouseY);
                 return;
             }
         }
@@ -993,7 +995,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             if (usage > 0) {
                 lines.add(1, Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(usage)));
             }
-            g.renderComponentTooltip(font, lines, mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
             return;
         }
         for (int i = 0; i < type().tanks(); i++) {
@@ -1004,7 +1006,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
                 Component name = fluidId > 0
                         ? BuiltInRegistries.FLUID.byId(fluidId - 1).getFluidType().getDescription()
                         : Component.translatable("gui.singulo.empty_tank");
-                g.renderTooltip(font, Component.translatable("gui.singulo.fluid", name, amount, MachineType.TANK_CAPACITY),
+                g.setTooltipForNextFrame(font, Component.translatable("gui.singulo.fluid", name, amount, MachineType.TANK_CAPACITY),
                         mouseX, mouseY);
                 return;
             }
@@ -1023,22 +1025,22 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
                         String.format("%.0f", target / 100.0)));
             }
             lines.add(Component.translatable("gui.singulo.mode.hint").withStyle(s -> s.withColor(0xFF8A949E)));
-            g.renderComponentTooltip(font, lines, mouseX, mouseY);
+            g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
         }
     }
 
     /** 専用スロット: 色つきの縁（frame が 0 なら縁なし）と、空のときは薄い見本のアイコン。 */
-    private void drawSpecialSlot(GuiGraphics g, int sx, int sy, int frame, int slotIndex, String ghost) {
+    private void drawSpecialSlot(GuiGraphicsExtractor g, int sx, int sy, int frame, int slotIndex, String ghost) {
         if (frame != 0) {
-            g.renderOutline(sx - 2, sy - 2, 20, 20, frame);
+            g.outline(sx - 2, sy - 2, 20, 20, frame);
         }
         Panel.slot(g, skin, sx, sy);
         if (menu.getSlot(menuIndexOf(slotIndex)).getItem().isEmpty()) {
-            g.pose().pushPose();
-            g.renderItem(new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), sx, sy);
-            g.pose().translate(0, 0, 200);
+            g.pose().pushMatrix();
+            g.item(new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), sx, sy);
+            g.nextStratum();
             g.fill(sx, sy, sx + 16, sy + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
-            g.pose().popPose();
+            g.pose().popMatrix();
         }
     }
 
@@ -1048,7 +1050,8 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x(), mouseY = event.y(); int button = event.button();
         layoutPopups();
         // 窓の中のクリックは下の画面に届かない（手前の窓から順に）
         if (selector.open && (selector.clickChrome(mouseX, mouseY) || selector.contains(mouseX, mouseY))) {
@@ -1096,6 +1099,6 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_CYCLE_MODE);
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 }

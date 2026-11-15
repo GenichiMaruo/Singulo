@@ -26,7 +26,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
  * ダークマターは重力以外ほとんど相互作用しないので、捕集器の小さなタンクからは毎秒2%ずつ漏れる。
  * 毎秒、隣の液体の入れ物（重力閉じ込めタンクや、炉心制御装置・抽出ポート）へ押し出す。
  */
-public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
+public class HaloCollectorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int RANGE = 16;
     public static final int FE_PER_TICK = 2000;
     public static final int BUFFER = 4000;
@@ -172,8 +172,8 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompound("tank"));
-        energy.setEnergy(tag.getInt("energy"));
-        carry = tag.getDouble("carry");
+        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        carry = tag.getDoubleOr("carry", 0.0D);
     }
 }

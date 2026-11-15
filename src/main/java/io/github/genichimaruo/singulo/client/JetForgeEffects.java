@@ -223,7 +223,7 @@ final class JetForgeEffects {
         if (a <= 0.004F) {
             return;
         }
-        var g = event.getGuiGraphics();
+        var g = event.getGuiGraphicsExtractor();
         int alpha = (int) (Math.min(0.9F, a) * 255);
         g.fill(0, 0, g.guiWidth(), g.guiHeight(), alpha << 24 | 0xF4F8FF);
     }

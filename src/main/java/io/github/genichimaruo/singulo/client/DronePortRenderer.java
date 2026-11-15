@@ -6,12 +6,12 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.drone.DronePortBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -24,9 +24,9 @@ import net.minecraft.world.item.ItemStack;
  * 閉じるときは逆に、扉が壁ぎわからせり上がってから、真ん中へ倒れて閉じる（〜ANIM_TICKS）。荷降ろしは、空の台が上がり、
  * ANIM_HANDOFF で箱が台に載って下がる。時刻は DronePortBlockEntity の ANIM_* と同じ。
  */
-public class DronePortRenderer implements BlockEntityRenderer<DronePortBlockEntity> {
-    private static final ResourceLocation HATCH = Singulo.id("textures/block/drone_port_hatch.png");
-    private static final ResourceLocation PLATFORM = Singulo.id("textures/block/drone_port_platform.png");
+public class DronePortRenderer extends SnapshotBlockRenderer<DronePortBlockEntity> {
+    private static final Identifier HATCH = Singulo.id("textures/block/drone_port_hatch.png");
+    private static final Identifier PLATFORM = Singulo.id("textures/block/drone_port_platform.png");
     /** 開口部（ドット）と、台のいちばん下・いちばん上の天板の高さ。 */
     static final float HOLE0 = 2, HOLE1 = 14, FLOOR = 4, TOP = 16;
     /** 扉の幅（ドット）と、立てた扉を引っ込める深さ。 */
@@ -109,7 +109,7 @@ public class DronePortRenderer implements BlockEntityRenderer<DronePortBlockEnti
      * sink で立ったまま SINK ドット沈む（壁ぎわに沿って開口部の中へ）。壁の面と重ならないよう、軸を少し内側に寄せる。
      */
     private static void drawDoors(PoseStack pose, MultiBufferSource buffers, float hinge, float sink, int light) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(HATCH));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(HATCH));
         float down = sink * SINK / 16;
         for (int side = -1; side <= 1; side += 2) {
             pose.pushPose();
@@ -126,7 +126,7 @@ public class DronePortRenderer implements BlockEntityRenderer<DronePortBlockEnti
     }
     /** 昇降台（立てた扉の内側に収まる天板）と、その下の伸びる柱。 */
     private static void drawPlatform(PoseStack pose, MultiBufferSource buffers, float top, int light) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(PLATFORM));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(PLATFORM));
         float a = 3.2F, b = 12.8F;
         FxDraw.pixelBox(pose, vc, a / 16, (top - 1) / 16, a / 16, b / 16, top / 16, b / 16, a, 15, a, b, 16, b, light, 0xFFFFFF);
         if (top - 1 > 3) {

@@ -40,7 +40,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * </ul>
  * 電力の元は使い捨てる触媒（銅・レッドストーン・セラミック・観測ログとミュオン）なので、電力だけを回して増やすことはできない。
  */
-public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class MuonFusionReactorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner, io.github.genichimaruo.singulo.pipe.PipeInputOnly {
     /** 触媒の使用回数を1 tickに使う回数（核融合炉は触媒を2倍の速さで消耗する）。 */
     public static final int USES_PER_TICK = 2;
@@ -239,7 +239,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
         tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         tag.putInt("burn", burn);
         tag.putInt("burn_total", burnTotal);
     }
@@ -247,12 +247,12 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        tank.readFromNBT(registries, tag.getCompoundOrEmpty("tank"));
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, tag.getCompoundOrEmpty("items"));
         }
-        burn = tag.getInt("burn");
-        burnTotal = tag.contains("burn_total") ? tag.getInt("burn_total") : Math.max(burn, 12_000);
+        burn = tag.getIntOr("burn", 0);
+        burnTotal = tag.contains("burn_total") ? tag.getIntOr("burn_total", 0) : Math.max(burn, 12_000);
     }
 }

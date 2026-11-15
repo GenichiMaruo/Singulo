@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
@@ -36,7 +36,7 @@ public final class MassValues extends SimpleJsonResourceReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
         Map<Item, Double> newItems = new HashMap<>();
         List<TagEntry> newTags = new ArrayList<>();
         files.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(file -> {
@@ -45,11 +45,11 @@ public final class MassValues extends SimpleJsonResourceReloadListener {
                     JsonObject o = e.getAsJsonObject();
                     double mass = o.get("mass").getAsDouble();
                     if (o.has("item")) {
-                        ResourceLocation id = ResourceLocation.parse(o.get("item").getAsString());
+                        Identifier id = Identifier.parse(o.get("item").getAsString());
                         BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> newItems.put(item, mass));
                     } else if (o.has("tag")) {
                         newTags.add(new TagEntry(TagKey.create(Registries.ITEM,
-                                ResourceLocation.parse(o.get("tag").getAsString())), mass));
+                                Identifier.parse(o.get("tag").getAsString())), mass));
                     }
                 }
             } catch (RuntimeException ex) {

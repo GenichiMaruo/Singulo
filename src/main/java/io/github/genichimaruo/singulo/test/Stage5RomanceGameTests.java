@@ -23,8 +23,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -175,7 +175,7 @@ public final class Stage5RomanceGameTests {
             net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, card, tag -> {
                 net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
                 net.minecraft.nbt.CompoundTag other = new net.minecraft.nbt.CompoundTag();
-                other.putUUID("id", java.util.UUID.randomUUID());
+                other.store("id", net.minecraft.core.UUIDUtil.CODEC, java.util.UUID.randomUUID());
                 other.putString("name", "someone");
                 list.add(other);
                 tag.put("permit_members", list);

@@ -157,7 +157,7 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
             if (same == null) totals.add(stack.copy()); else same.grow(stack.getCount());
         }
         for (ItemStack total : totals) {
-            int count = (int) Math.floor(total.getCount() * yield + level.random.nextDouble());
+            int count = (int) Math.floor(total.getCount() * yield + level.getRandom().nextDouble());
             while (count > 0) {
                 int chunk = Math.min(count, total.getMaxStackSize());
                 pending.add(total.copyWithCount(chunk));
@@ -245,7 +245,7 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+        tag.put("output", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(output, registries));
         tag.putDouble("progress", progress);
         ListTag cargo = new ListTag();
         for (ItemStack stack : pending) cargo.add(stack.save(registries));
@@ -254,7 +254,7 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
         for (Target t : targets) {
             CompoundTag c = new CompoundTag();
             c.putString("ruin", t.ruin());
-            c.put("pos", NbtUtils.writeBlockPos(t.pos()));
+            c.put("pos", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(t.pos()));
             c.putLong("next", t.nextVisit());
             list.add(c);
         }
@@ -264,17 +264,17 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
-        progress = Math.clamp(tag.getDouble("progress"), 0, MISSION_TICKS - 1);
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(output, registries, tag.getCompoundOrEmpty("output"));
+        progress = Math.clamp(tag.getDoubleOr("progress", 0.0D), 0, MISSION_TICKS - 1);
         pending.clear();
-        for (Tag entry : tag.getList("pending", Tag.TAG_COMPOUND))
-            ItemStack.parse(registries, entry).filter(stack -> !stack.isEmpty()).ifPresent(pending::add);
+        for (Tag entry : tag.getListOrEmpty("pending"))
+            io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, entry).filter(stack -> !stack.isEmpty()).ifPresent(pending::add);
         flushNeeded = true;
         cachedTier = -1;
         targets.clear();
-        for (Tag t : tag.getList("targets", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("targets")) {
             CompoundTag c = (CompoundTag) t;
-            NbtUtils.readBlockPos(c, "pos").ifPresent(p -> targets.add(new Target(c.getString("ruin"), p, c.getLong("next"))));
+            io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "pos").ifPresent(p -> targets.add(new Target(c.getStringOr("ruin", ""), p, c.getLongOr("next", 0L))));
         }
     }
 }

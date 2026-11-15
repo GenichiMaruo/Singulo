@@ -120,7 +120,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
     @Override
     protected boolean openScreen(ServerPlayer player) {
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.work_console.locked"));
             return true;
         }
         player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new SupplyPortMenu(id, inv, worldPosition, entries, data),
@@ -157,14 +157,14 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
         }
         net.minecraft.nbt.ListTag list = tag.getList("priorities", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int k = 0; k < list.size(); k++) {
-            net.minecraft.nbt.CompoundTag t = list.getCompound(k);
-            int i = t.getInt("slot");
+            net.minecraft.nbt.CompoundTag t = list.getCompoundOrEmpty(k);
+            int i = t.getIntOr("slot", 0);
             if (i < 0 || i >= ENTRIES) {
                 continue;
             }
-            entries.setItem(i, net.minecraft.world.item.ItemStack.parseOptional(registries, t.getCompound("item")));
-            ranks[i] = Math.max(1, Math.min(MAX_RANK, t.getInt("rank")));
-            modes[i] = Math.floorMod(t.getInt("mode"), MODES);
+            entries.setItem(i, io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t.getCompoundOrEmpty("item")));
+            ranks[i] = Math.max(1, Math.min(MAX_RANK, t.getIntOr("rank", 0)));
+            modes[i] = Math.floorMod(t.getIntOr("mode", 0), MODES);
         }
     }
 
@@ -295,7 +295,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
         }
         List<IItemHandler> list = new java.util.ArrayList<>();
         storages(player.level(), new java.util.HashSet<>(), list);
-        player.displayClientMessage(Component.translatable("message.singulo.work_link.info", c.getX(), c.getY(), c.getZ())
-                .append(Component.translatable("message.singulo.supply_port.storages", list.size())), true);
+        player.sendOverlayMessage(Component.translatable("message.singulo.work_link.info", c.getX(), c.getY(), c.getZ())
+                .append(Component.translatable("message.singulo.supply_port.storages", list.size())));
     }
 }

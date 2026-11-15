@@ -6,21 +6,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -116,8 +116,7 @@ public class GravityGauntletItem extends SinguloItem {
         }
         boolean next = !cone(stack);
         stack.set(SinguloComponents.CONE.get(), next);
-        player.displayClientMessage(Component.translatable(next ? "gauntlet.singulo.area.cone" : "gauntlet.singulo.area.single"),
-                true);
+        player.sendOverlayMessage(Component.translatable(next ? "gauntlet.singulo.area.cone" : "gauntlet.singulo.area.single"));
     }
 
     /** 前方の円錐（半角 CONE_HALF_ANGLE、射程 range）の中の対象。近い順に CONE_MAX_TARGETS 体まで。 */
@@ -164,10 +163,10 @@ public class GravityGauntletItem extends SinguloItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 Mode[] modes = modes();
                 int index = 0;
                 for (int i = 0; i < modes.length; i++) {
@@ -177,16 +176,16 @@ public class GravityGauntletItem extends SinguloItem {
                 }
                 Mode next = modes[(index + 1) % modes.length];
                 stack.set(SinguloComponents.GRAVITY_MODE.get(), next.ordinal());
-                player.displayClientMessage(Component.translatable("tooltip.singulo.gauntlet.mode", modeName(next)), true);
+                player.sendOverlayMessage(Component.translatable("tooltip.singulo.gauntlet.mode", modeName(next)));
             }
-            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+            return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(stack, level.isClientSide());
         }
         if (energy(stack).getEnergyStored() < fePerTick()) {
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.no_energy"), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendOverlayMessage(Component.translatable("gauntlet.singulo.no_energy"));
+            return io.github.genichimaruo.singulo.compat.Interactions.fail(stack);
         }
         player.startUsingItem(hand);
-        return InteractionResultHolder.consume(stack);
+        return io.github.genichimaruo.singulo.compat.Interactions.consume(stack);
     }
 
     static Component modeName(Mode mode) {
@@ -206,14 +205,14 @@ public class GravityGauntletItem extends SinguloItem {
         if (source == null || !source.canExtract()) {
             return InteractionResult.PASS;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             IEnergyStorage own = energy(context.getItemInHand());
             int want = own.receiveEnergy(Integer.MAX_VALUE, true);
             int got = source.extractEnergy(want, false);
             own.receiveEnergy(got, false);
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.charged", got), true);
+            player.sendOverlayMessage(Component.translatable("gauntlet.singulo.charged", got));
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -222,13 +221,13 @@ public class GravityGauntletItem extends SinguloItem {
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
     public void onUseTick(Level level, LivingEntity user, ItemStack stack, int remaining) {
-        if (level.isClientSide || !(user instanceof ServerPlayer player)) {
+        if (level.isClientSide() || !(user instanceof ServerPlayer player)) {
             return;
         }
         if (!operate(player, stack, remaining)) {
@@ -245,7 +244,7 @@ public class GravityGauntletItem extends SinguloItem {
         int remaining = tick;
         IEnergyStorage energy = energy(stack);
         if (energy.extractEnergy(fePerTick(), true) < fePerTick()) {
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.no_energy"), true);
+            player.sendOverlayMessage(Component.translatable("gauntlet.singulo.no_energy"));
             return false;
         }
         Mode mode = mode(stack);
@@ -261,14 +260,14 @@ public class GravityGauntletItem extends SinguloItem {
             List<Entity> targets = coneTargets(level, player, mode);
             if (targets.isEmpty()) {
                 if (remaining % 20 == 0) {
-                    player.displayClientMessage(Component.translatable(noTargetKey(), (int) range()), true);
+                    player.sendOverlayMessage(Component.translatable(noTargetKey(), (int) range()));
                 }
                 return true;
             }
             // 円錐では対象の数だけ電力を使う
             int cost = fePerTick() * targets.size();
             if (energy.extractEnergy(cost, true) < cost) {
-                player.displayClientMessage(Component.translatable("gauntlet.singulo.no_energy"), true);
+                player.sendOverlayMessage(Component.translatable("gauntlet.singulo.no_energy"));
                 return false;
             }
             if (!payExtra(player, stack)) {
@@ -283,7 +282,7 @@ public class GravityGauntletItem extends SinguloItem {
         Entity target = currentTarget((ServerLevel) level, player, mode);
         if (target == null) {
             if (remaining % 20 == 0) {
-                player.displayClientMessage(Component.translatable(noTargetKey(), (int) range()), true);
+                player.sendOverlayMessage(Component.translatable(noTargetKey(), (int) range()));
             }
             return true;
         }

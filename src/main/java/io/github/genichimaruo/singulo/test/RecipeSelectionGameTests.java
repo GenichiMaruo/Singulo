@@ -125,7 +125,7 @@ public final class RecipeSelectionGameTests {
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
         m.selectRecipe(indexOf(helper, "tipler_bearing"));
         var tag = m.saveWithoutMetadata(helper.getLevel().registryAccess());
-        helper.assertTrue("singulo:precision_assembler/tipler_bearing".equals(tag.getString("selected_recipe")), "指定が保存されない");
+        helper.assertTrue("singulo:precision_assembler/tipler_bearing".equals(tag.getStringOr("selected_recipe", "")), "指定が保存されない");
         m.selectRecipe(-1);
         helper.assertTrue(m.selectedRecipe() == null, "指定が外れない");
         m.loadWithComponents(tag, helper.getLevel().registryAccess());

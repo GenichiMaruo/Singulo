@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.android.work.RecipeData;
 import io.github.genichimaruo.singulo.android.work.WorkLocationCardItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.IItemDecorator;
@@ -23,7 +23,7 @@ final class WorkCardDecorator implements IItemDecorator {
     }
 
     @Override
-    public boolean render(GuiGraphics g, Font font, ItemStack stack, int x, int y) {
+    public boolean render(GuiGraphicsExtractor g, Font font, ItemStack stack, int x, int y) {
         if (!Screen.hasShiftDown()) {
             return false;
         }
@@ -41,14 +41,14 @@ final class WorkCardDecorator implements IItemDecorator {
         if (shown.isEmpty()) {
             return false;
         }
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 160);
+        g.pose().pushMatrix();
+        g.nextStratum();
         g.fill(x, y, x + 16, y + 16, 0xC0E9EDF0);           // カードの絵を薄く隠して、中身を見せる
-        g.pose().popPose();
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 100);
-        g.renderItem(shown, x, y);
-        g.pose().popPose();
+        g.pose().popMatrix();
+        g.pose().pushMatrix();
+        g.nextStratum();
+        g.item(shown, x, y);
+        g.pose().popMatrix();
         return true;
     }
 }

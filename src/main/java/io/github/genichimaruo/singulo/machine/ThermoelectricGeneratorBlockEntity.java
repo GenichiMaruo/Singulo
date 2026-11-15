@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.data.ThermalData;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -28,7 +28,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * P = thermoelectricCoefficient × ΔT FE/t を出す。
  * ΔT が低温源の「維持できる温度差」を超えると、超えた分に比例した速さで低温源が溶けて劣化する。
  */
-public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+public class ThermoelectricGeneratorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         GeneratorInfo {
     /** 維持できる温度差を 1 K 超えたまま、低温源が1段階劣化するまでの tick 数。100 K 超過なら約1分。 */
     static final double MELT_THRESHOLD = 120_000;
@@ -191,7 +191,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
-        meltProgress = tag.getDouble("melt");
+        energy.setEnergy(tag.getIntOr("energy", 0));
+        meltProgress = tag.getDoubleOr("melt", 0.0D);
     }
 }

@@ -3,14 +3,14 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.cable.ConduitCover;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.ModelIdentifier;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
@@ -38,7 +38,7 @@ final class CoverModel extends BakedModelWrapper<BakedModel> {
                 if (ConduitCover.of(state) != ConduitCover.State.BLOCK) {
                     continue;
                 }
-                ModelResourceLocation key = BlockModelShaper.stateToModelLocation(state);
+                ModelIdentifier key = BlockModelShaper.stateToModelLocation(state);
                 event.getModels().computeIfPresent(key, (k, model) -> new CoverModel(model));
             }
         }

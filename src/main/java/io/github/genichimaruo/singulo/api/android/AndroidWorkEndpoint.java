@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.api.android;
 
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /** Optional addon block-entity contract, server thread only (0.19.0).

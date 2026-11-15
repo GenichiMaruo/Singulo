@@ -8,12 +8,12 @@ import io.github.genichimaruo.singulo.ruin.LeviathanSegment;
 import java.util.Iterator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -52,7 +52,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
     }
 
     @Override
-    public ResourceLocation getTextureLocation(ErgosphereLeviathan entity) {
+    public Identifier getTextureLocation(ErgosphereLeviathan entity) {
         return FxDraw.WHITE;
     }
 
@@ -186,7 +186,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         pose.translate(local.x, local.y, local.z);
         pose.mulPose(q);
         pose.mulPose(Axis.ZP.rotationDegrees(roll));
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r * 0.62F, 0x050208, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r * 0.62F, 0x050208, 0);
         if (peel < 1) {
             float s = 1 - peel;
             for (int k = 0; k < 4; k++) {
@@ -250,7 +250,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         pose.pushPose();
         pose.translate(local.x, local.y, local.z);
         pose.mulPose(q);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r * 0.35F * s, 0x020104, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r * 0.35F * s, 0x020104, 0);
         VertexConsumer glow = glow(buffers);
         float pulse = 0.75F + 0.25F * Mth.sin(t * 0.3F - i * 0.7F);
         for (int k = -1; k <= 1; k += 2) {
@@ -285,7 +285,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         Quaternionf q = orient(fwd);
         pose.pushPose();
         pose.translate(local.x, local.y, local.z);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r * 0.8F * s, 0x000000, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r * 0.8F * s, 0x000000, 0);
         VertexConsumer glow = glow(buffers);
         FxDraw.billboard(pose, glow, camera, r * 3.0F * s, 0x3A1670, (int) (120 * alpha));
         pose.mulPose(q);
@@ -300,7 +300,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             pose.translate(local.x, local.y, local.z);
             pose.mulPose(q);
             pose.translate(0, 0, -r * 1.4F);
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 0.45F * s, 0x000000, 0);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 0.45F * s, 0x000000, 0);
             VertexConsumer g = glow(buffers);
             pose.mulPose(Axis.XP.rotationDegrees(70));
             pose.mulPose(Axis.YP.rotationDegrees(t * 9));
@@ -375,7 +375,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         pose.pushPose();
         pose.translate(local.x, local.y, local.z);
         pose.mulPose(q);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), (form == 2 ? 0.6F : 0.78F) * s,
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), (form == 2 ? 0.6F : 0.78F) * s,
                 form == 3 ? 0x000000 : 0x050208, 0);
         if (form == 1 && peel < 1) {
             headPlates(pose, buffers, blocks, plate, light, 0.55F + 0.25F * mouthOpen, -6 - 18 * mouthOpen, peel);
@@ -410,7 +410,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         float mouthR = (0.32F + 0.45F * mouthOpen) * s;
         pose.pushPose();
         pose.translate(0, -0.05F, form == 2 ? 0.7F : 1.0F);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), mouthR, 0x000000, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), mouthR, 0x000000, 0);
         glow = glow(buffers);
         pose.mulPose(Axis.XP.rotationDegrees(90));
         pose.mulPose(Axis.YP.rotationDegrees(t * (6 + 20 * mouthOpen)));
@@ -533,7 +533,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         }
         FxDraw.ring(pose.last(), glow, 0, (float) ErgosphereLeviathan.TIDE_CORE_RADIUS, 0xFF5AD8, (int) (90 * in), (int) (200 * in));
         pose.translate(0, 1.6, 0);
-        FxDraw.sphere(pose.last(), glow, 1.2F + 0.2F * Mth.sin(t * 0.4F), 0x1A0030, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
+        FxDraw.sphere(pose.last(), glow, 1.2F + 0.2F * Mth.sin(t * 0.4F), 0x1A0030, net.minecraft.util.LightCoordsUtil.FULL_BRIGHT);
         pose.popPose();
         // 天井へ伸びる渦の柱（ねじれながら細くなる）
         for (int i = 0; i < 6; i++) {
@@ -732,7 +732,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         float jaw = 0.5F + 0.5F * Mth.sin(t * 0.35F);
 
         // ---- 黒い体と鱗の板
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE));
         for (int k = HATCH_SEGMENTS - 1; k >= 1; k--) {
             Vec3 local = at[k].subtract(origin);
             float r = radius[k];
@@ -902,7 +902,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             GravitationalLensing.add(core.add(0, 0.6, 0), 1.2F + 2.2F * size, 0.5F + 0.4F * Math.min(1, size));
             pose.pushPose();
             pose.scale(1, 0.2F, 1);
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 1.6F * size, 0x000000, 0);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 1.6F * size, 0x000000, 0);
             pose.popPose();
         }
         VertexConsumer glow = glow(buffers);

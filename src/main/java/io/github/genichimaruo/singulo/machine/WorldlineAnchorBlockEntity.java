@@ -34,7 +34,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
 
     private int loadedRadius = -1;
     /** 置いた人（設定 maxAnchorsPerPlayer の数え先）。旧版で置いたものや、人以外が置いたものは null（上限の対象外）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private java.util.UUID owner;
 
     /**
@@ -241,14 +241,14 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     public void onLoad() {
         super.onLoad();
         // 読み込み直したとき、動いていたアンカーは枠を取り直す（再起動しても数が合うように）
-        if (level != null && !level.isClientSide && loadedRadius >= 0) {
+        if (level != null && !level.isClientSide() && loadedRadius >= 0) {
             claim(true);
         }
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             unregister();
         }
         super.setRemoved();
@@ -260,15 +260,15 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
         tag.putInt("radius", loadedRadius);
         tag.putLong("started_at", startedAt);
         if (owner != null) {
-            tag.putUUID("owner", owner);
+            tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
         }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        loadedRadius = tag.contains("radius") ? tag.getInt("radius") : -1;
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
-        startedAt = tag.contains("started_at") ? tag.getLong("started_at") : (loadedRadius >= 0 ? 0 : -1);
+        loadedRadius = tag.contains("radius") ? tag.getIntOr("radius", 0) : -1;
+        owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        startedAt = tag.contains("started_at") ? tag.getLongOr("started_at", 0L) : (loadedRadius >= 0 ? 0 : -1);
     }
 }

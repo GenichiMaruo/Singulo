@@ -6,7 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -38,7 +38,7 @@ import net.minecraft.world.phys.AABB;
  *       覚醒した番人を起こす（{@link #awakenAwakened}）</li>
  * </ul>
  */
-public class GuardianCoreBlockEntity extends BlockEntity {
+public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
     /** 保管庫を探す広さ。 */
     public static final int VAULT_SEARCH_RADIUS = 16;
     /** 挑戦者に気づく広さ（核からの水平距離）と高さ。 */
@@ -442,13 +442,13 @@ public class GuardianCoreBlockEntity extends BlockEntity {
 
     private static void tell(@Nullable ServerPlayer player, String key) {
         if (player != null) {
-            player.displayClientMessage(Component.translatable(key), true);
+            player.sendOverlayMessage(Component.translatable(key));
         }
     }
 
     private void broadcast(ServerLevel level, String key) {
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(MESSAGE_RADIUS))) {
-            p.displayClientMessage(Component.translatable(key), false);
+            p.sendSystemMessage(Component.translatable(key));
         }
     }
 
@@ -456,18 +456,18 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (boss != null) {
-            tag.putUUID("boss", boss);
+            tag.store("boss", net.minecraft.core.UUIDUtil.CODEC, boss);
         }
         tag.putBoolean("scanned", scanned);
         ListTag props = new ListTag();
         for (BlockPos p : projectors) {
-            props.add(NbtUtils.writeBlockPos(p));
+            props.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(p));
         }
         tag.put("projectors", props);
         ListTag tank = new ListTag();
         for (int i = 0; i < tankPos.size(); i++) {
             CompoundTag t = new CompoundTag();
-            t.put("pos", NbtUtils.writeBlockPos(tankPos.get(i)));
+            t.put("pos", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(tankPos.get(i)));
             t.put("state", NbtUtils.writeBlockState(tankState.get(i)));
             tank.add(t);
         }
@@ -486,7 +486,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         ListTag out = new ListTag();
         for (int i = 0; i < pos.size(); i++) {
             CompoundTag t = new CompoundTag();
-            t.put("pos", NbtUtils.writeBlockPos(pos.get(i)));
+            t.put("pos", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(pos.get(i)));
             t.put("state", NbtUtils.writeBlockState(states.get(i)));
             out.add(t);
         }
@@ -499,9 +499,9 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         var blocks = registries.lookupOrThrow(Registries.BLOCK);
         for (Tag t : in) {
             CompoundTag c = (CompoundTag) t;
-            BlockState s = NbtUtils.readBlockState(blocks, c.getCompound("state"));
+            BlockState s = NbtUtils.readBlockState(blocks, c.getCompoundOrEmpty("state"));
             if (!s.isAir()) {
-                pos.add(NbtUtils.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
+                pos.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
                 states.add(s);
             }
         }
@@ -510,30 +510,30 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        boss = tag.hasUUID("boss") ? tag.getUUID("boss") : null;
-        scanned = tag.getBoolean("scanned");
+        boss = tag.read("boss", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("boss", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        scanned = tag.getBooleanOr("scanned", false);
         projectors.clear();
         for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
-            projectors.add(NbtUtils.readBlockPos(wrap(t), "p").orElse(BlockPos.ZERO));
+            projectors.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(wrap(t), "p").orElse(BlockPos.ZERO));
         }
         tankPos.clear();
         tankState.clear();
         var blocks = registries.lookupOrThrow(Registries.BLOCK);
-        for (Tag t : tag.getList("tank", Tag.TAG_COMPOUND)) {
+        for (Tag t : tag.getListOrEmpty("tank")) {
             CompoundTag c = (CompoundTag) t;
-            BlockState s = NbtUtils.readBlockState(blocks, c.getCompound("state"));
+            BlockState s = NbtUtils.readBlockState(blocks, c.getCompoundOrEmpty("state"));
             if (s.isAir()) {
                 s = Blocks.GLASS.defaultBlockState();
             }
-            tankPos.add(NbtUtils.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
+            tankPos.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
             tankState.add(s);
         }
-        readStates(tag.getList("lines", Tag.TAG_COMPOUND), registries, linePos, lineState);
+        readStates(tag.getListOrEmpty("lines"), registries, linePos, lineState);
         int[] f = tag.getIntArray("facility");
         facility = f.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(f) : null;
         int[] a = tag.getIntArray("access");
         access = a.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(a) : null;
-        readStates(tag.getList("conveyors", Tag.TAG_COMPOUND), registries, conveyorPos, conveyorState);
+        readStates(tag.getListOrEmpty("conveyors"), registries, conveyorPos, conveyorState);
     }
 
     private static CompoundTag wrap(Tag t) {

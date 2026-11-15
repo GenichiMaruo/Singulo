@@ -9,11 +9,11 @@ import io.github.genichimaruo.singulo.ruin.SealedContainerBlockEntity.Phase;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -26,10 +26,10 @@ import net.minecraft.world.phys.AABB;
  * 蓋の板が少し浮いてから、花びらのように外へ倒れながら回る（OPEN）。中から台がせり上がり、中身が光の柱の中で回る（RISE）。
  * 封印はその逆（台が沈み、板が戻り、継ぎ目の光が落ち着く）。時刻は SealedContainerBlockEntity の T_* と同じ。
  */
-public class SealedContainerRenderer implements BlockEntityRenderer<SealedContainerBlockEntity> {
+public class SealedContainerRenderer extends SnapshotBlockRenderer<SealedContainerBlockEntity> {
     /** 段階の色（art16.SEAL_COLORS と同じ）。 */
     static final int[] COLORS = {0x6ECDEE, 0xBEA0FF, 0xFAB654, 0xFF6E96};
-    private static final ResourceLocation BASE = Singulo.id("textures/block/sealed_container_base.png");
+    private static final Identifier BASE = Singulo.id("textures/block/sealed_container_base.png");
 
     public SealedContainerRenderer(BlockEntityRendererProvider.Context context) {}
 
@@ -135,7 +135,7 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
 
     /** 蓋の4枚の板。lid が 0 で閉、1 で開（少し浮く → 外へ倒れながら回る）。 */
     private static void drawPlates(PoseStack pose, MultiBufferSource buffers, int tier, float lid, int light) {
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(Singulo.id("textures/block/sealed_container_lid_" + tier + ".png")));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(Singulo.id("textures/block/sealed_container_lid_" + tier + ".png")));
         float lift = ease(lid * 3) * 1.5F / 16F;
         float out = ease((lid - 0.3F) / 0.7F);
         for (int sx = -1; sx <= 1; sx += 2) {
@@ -166,7 +166,7 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
             return;
         }
         float top = (4 + 7 * rise) / 16F;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(BASE));
+        VertexConsumer vc = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(BASE));
         FxDraw.pixelBox(pose, vc, 5.5F / 16F, 4 / 16F, 5.5F / 16F, 10.5F / 16F, top, 10.5F / 16F, 5.5F, 4, 5.5F, 10.5F, top * 16, 10.5F,
                 light, 0xFFFFFF);
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);

@@ -119,7 +119,7 @@ public final class GuideGameTests {
         var data = io.github.genichimaruo.singulo.registry.PendingMilestones.get(server);
         var saved = data.save(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess());
         helper.assertTrue(saved.getList("pending", net.minecraft.nbt.Tag.TAG_COMPOUND).stream().anyMatch(t ->
-                ((net.minecraft.nbt.CompoundTag) t).getUUID("owner").equals(owner)), "オフラインの注文者を保存していない");
+                ((net.minecraft.nbt.CompoundTag) t).read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow().equals(owner)), "オフラインの注文者を保存していない");
         var restored = io.github.genichimaruo.singulo.registry.PendingMilestones.load(saved, helper.getLevel().registryAccess());
         ServerPlayer player = player(helper, owner);
         try {
@@ -131,7 +131,7 @@ public final class GuideGameTests {
             helper.assertFalse(done(player, "android_printed"), "注文だけで印刷まで達成した");
             helper.assertFalse(restored.save(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess())
                     .getList("pending", net.minecraft.nbt.Tag.TAG_COMPOUND).stream().anyMatch(t ->
-                            ((net.minecraft.nbt.CompoundTag) t).getUUID("owner").equals(owner)), "通知後にも本人の保留データが残った");
+                            ((net.minecraft.nbt.CompoundTag) t).read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow().equals(owner)), "通知後にも本人の保留データが残った");
             helper.succeed();
         } finally {
             server.getPlayerList().remove(player);

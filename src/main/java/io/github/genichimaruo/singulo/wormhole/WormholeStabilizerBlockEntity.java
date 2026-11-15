@@ -28,7 +28,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 口は2つまで同時に扱える。固定化を始める前の口は時間切れで消える（始まれば装置が支える）。
  * 口・エキゾチック物質・筐体は手に持って右クリックか搬入で入れ、できた口は空の手で右クリックか搬出で受け取る。
  */
-public class WormholeStabilizerBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
+public class WormholeStabilizerBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, net.minecraft.world.MenuProvider {
     public static final int STABILIZE_TICKS = 100;
     public static final int MATTER_PER_MOUTH = 2;
@@ -215,7 +215,7 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putIntArray("progress", progress);
     }
@@ -225,11 +225,11 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
         super.loadAdditional(tag, registries);
         // 筐体の枠がなかった頃の保存（3枠）も読めるように、一度別の入れ物に読んでから移す
         ItemStackHandler saved = new ItemStackHandler(SLOTS);
-        saved.deserializeNBT(registries, tag.getCompound("items"));
+        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(saved, registries, tag.getCompoundOrEmpty("items"));
         for (int i = 0; i < SLOTS; i++) {
             items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
         }
-        energy.setEnergy(tag.getInt("energy"));
+        energy.setEnergy(tag.getIntOr("energy", 0));
         int[] p = tag.getIntArray("progress");
         for (int i = 0; i < Math.min(2, p.length); i++) {
             progress[i] = p[i];

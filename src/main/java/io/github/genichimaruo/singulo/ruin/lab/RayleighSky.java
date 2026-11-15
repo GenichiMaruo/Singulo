@@ -51,7 +51,7 @@ public final class RayleighSky {
     public static void register(Level level, BlockPos pos) {
         Field field = FIELDS.computeIfAbsent(level, ignored -> new Field());
         synchronized (field) {
-            if (level.isClientSide) field.ownerThread = Thread.currentThread();
+            if (level.isClientSide()) field.ownerThread = Thread.currentThread();
             if (field.panels.add(pos.asLong())) { index(field, pos, 1); field.invalidations.incrementAndGet(); }
         }
     }
@@ -91,7 +91,7 @@ public final class RayleighSky {
         if (field == null) return 0;
         // Render/light workers only read a completed immutable snapshot. Never make a server
         // light worker wait for main-thread chunk access while holding the field lock.
-        if (field.builtVersion != field.invalidations.get() && (level.isClientSide ? field.ownerThread == Thread.currentThread()
+        if (field.builtVersion != field.invalidations.get() && (level.isClientSide() ? field.ownerThread == Thread.currentThread()
                 : level.getServer() != null && level.getServer().isSameThread())) {
             synchronized (field) { refresh(level, field); }
         }
@@ -162,7 +162,7 @@ public final class RayleighSky {
                     }
                 }
             }
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 for (var entry : field.light.long2ByteEntrySet()) {
                     if (entry.getByteValue() != light.get(entry.getLongKey())) field.changedSections.add(SectionPos.blockToSection(entry.getLongKey()));
                 }

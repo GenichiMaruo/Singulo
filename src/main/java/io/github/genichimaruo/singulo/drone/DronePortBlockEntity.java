@@ -7,7 +7,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.github.genichimaruo.singulo.machine.SideConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +40,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * <p>
  * 積み込み・荷降ろしの時間はポートが進める（ドローンは真上で止まって待つ）。時刻は ANIM_* と同じで、描くのは DronePortRenderer。
  */
-public class DronePortBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+public class DronePortBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         MenuProvider, SideConfig.Holder, io.github.genichimaruo.singulo.android.work.AndroidStorageView {
     public static final int CAPACITY = 400_000;
     public static final int MAX_RECEIVE = 8_000;
@@ -1141,7 +1141,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             setOwner(player.getUUID());
         }
         if (!mayOperate(player)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.drone_port.locked"), true);
+            player.sendOverlayMessage(Component.translatable("gui.singulo.drone_port.locked"));
             return;
         }
         List<Target> targets = menuTargets();
@@ -1236,7 +1236,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     private void changedVisible() {
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
             if (level instanceof ServerLevel server) {
                 DroneNetwork.get(server).putPort(worldPosition, owner, name, fluidPort());
@@ -1258,17 +1258,17 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
         if (!staged.isEmpty()) {
             tag.put("staged", staged.save(registries));
         }
         if (stagedTo != null) {
-            tag.put("staged_to", NbtUtils.writeBlockPos(stagedTo));
+            tag.put("staged_to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(stagedTo));
         }
         tag.putInt("staged_cost", stagedCost);
         tag.putLong("flight", flightId);
         if (destination != null) {
-            tag.put("destination", NbtUtils.writeBlockPos(destination));
+            tag.put("destination", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(destination));
         }
         tag.putInt("sides", sides.packed());
         tag.putInt("crate_sides", crateSides.packed());
@@ -1277,7 +1277,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         putDim(tag, "staged_dim", stagedDim);
         putDim(tag, "auto_dim", autoDim);
         if (autoTo != null) {
-            tag.put("auto_to", NbtUtils.writeBlockPos(autoTo));
+            tag.put("auto_to", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(autoTo));
         }
         saveVisible(tag, registries);
     }
@@ -1293,14 +1293,14 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (!tag.contains(key)) {
             return null;
         }
-        var loc = net.minecraft.resources.ResourceLocation.tryParse(tag.getString(key));
+        var loc = net.minecraft.resources.Identifier.tryParse(tag.getString(key));
         return loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 
     /** クライアントにも送るもの（名前・持ち主・扉の動き）。 */
     private void saveVisible(CompoundTag tag, HolderLookup.Provider registries) {
         if (owner != null) {
-            tag.putUUID("owner", owner);
+            tag.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
         }
         tag.putString("name", name);
         tag.putInt("anim", anim);
@@ -1329,34 +1329,34 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("items")) {
-            energy.restoreEnergy(tag.getInt("energy"));
-            CompoundTag inv = tag.getCompound("items");
+            energy.restoreEnergy(tag.getIntOr("energy", 0));
+            CompoundTag inv = tag.getCompoundOrEmpty("items");
             inv.putInt("Size", SLOTS);
-            items.deserializeNBT(registries, inv);
-            staged = tag.contains("staged") ? ItemStack.parse(registries, tag.getCompound("staged")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
-            stagedTo = NbtUtils.readBlockPos(tag, "staged_to").orElse(null);
-            stagedCost = tag.getInt("staged_cost");
-            flightId = tag.getLong("flight");
-            destination = NbtUtils.readBlockPos(tag, "destination").orElse(null);
-            autoMode = Math.floorMod(tag.getInt("auto"), AUTO_THRESHOLDS.length);
-            autoTo = NbtUtils.readBlockPos(tag, "auto_to").orElse(null);
+            io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, inv);
+            staged = tag.contains("staged") ? io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, tag.getCompoundOrEmpty("staged")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
+            stagedTo = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "staged_to").orElse(null);
+            stagedCost = tag.getIntOr("staged_cost", 0);
+            flightId = tag.getLongOr("flight", 0L);
+            destination = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "destination").orElse(null);
+            autoMode = Math.floorMod(tag.getIntOr("auto", 0), AUTO_THRESHOLDS.length);
+            autoTo = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "auto_to").orElse(null);
             destinationDim = readDim(tag, "destination_dim");
             stagedDim = readDim(tag, "staged_dim");
             autoDim = readDim(tag, "auto_dim");
             if (tag.contains("crate_sides")) {
-                crateSides.setPacked(tag.getInt("crate_sides"));
+                crateSides.setPacked(tag.getIntOr("crate_sides", 0));
             }
             if (tag.contains("sides")) {
-                sides.setPacked(tag.getInt("sides"));
+                sides.setPacked(tag.getIntOr("sides", 0));
             }
         }
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
-        name = tag.getString("name");
-        anim = tag.getInt("anim");
-        animStart = tag.getLong("anim_start");
-        animTier = tag.getInt("anim_tier");
-        animCrate = tag.contains("anim_crate") ? ItemStack.parse(registries, tag.getCompound("anim_crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
-        animFlight = tag.getLong("anim_flight");
-        handed = tag.getBoolean("handed");
+        owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        name = tag.getStringOr("name", "");
+        anim = tag.getIntOr("anim", 0);
+        animStart = tag.getLongOr("anim_start", 0L);
+        animTier = tag.getIntOr("anim_tier", 0);
+        animCrate = tag.contains("anim_crate") ? io.github.genichimaruo.singulo.compat.NbtCompat.parse(registries, tag.getCompoundOrEmpty("anim_crate")).orElse(ItemStack.EMPTY) : ItemStack.EMPTY;
+        animFlight = tag.getLongOr("anim_flight", 0L);
+        handed = tag.getBooleanOr("handed", false);
     }
 }

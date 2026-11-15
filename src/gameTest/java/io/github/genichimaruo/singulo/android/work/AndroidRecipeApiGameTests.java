@@ -55,12 +55,12 @@ public final class AndroidRecipeApiGameTests {
         WorkConsoleBlockEntity c = h.getBlockEntity(cp); c.setOwner(player.getUUID());
         RecipeRackBlockEntity rack = h.getBlockEntity(rp);
         var registry = net.minecraft.core.registries.BuiltInRegistries.ITEM;
-        var link = new ItemStack(registry.get(net.minecraft.resources.ResourceLocation.parse("singulo:work_location_card")));
+        var link = new ItemStack(registry.get(net.minecraft.resources.Identifier.parse("singulo:work_location_card")));
         WorkLocationCardItem.record(link, h.getLevel(), c.getBlockPos(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         rack.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         var location = link.copy();
         WorkLocationCardItem.record(location, h.getLevel(), c.getBlockPos().above(), net.minecraft.world.level.block.Blocks.FURNACE);
-        var card = new ItemStack(registry.get(net.minecraft.resources.ResourceLocation.parse("singulo:recipe_card")));
+        var card = new ItemStack(registry.get(net.minecraft.resources.Identifier.parse("singulo:recipe_card")));
         RecipeData.processing(List.of(new ItemStack(Items.IRON_ORE, 2)), new ItemStack(Items.IRON_INGOT, 2),
                 List.of(new ItemStack(Items.STONE)), new ItemStack(Items.COAL, 3)).write(card, h.getLevel().registryAccess());
         rack.items().setStackInSlot(0, location); rack.items().setStackInSlot(1, card);

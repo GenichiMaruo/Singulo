@@ -66,7 +66,7 @@ public final class PendingMilestones extends SavedData {
         ListTag list = new ListTag();
         pending.forEach((owner, ids) -> ids.forEach(id -> {
             CompoundTag entry = new CompoundTag();
-            entry.putUUID("owner", owner);
+            entry.store("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
             entry.putString("id", id);
             list.add(entry);
         }));
@@ -76,11 +76,11 @@ public final class PendingMilestones extends SavedData {
 
     public static PendingMilestones load(CompoundTag tag, HolderLookup.Provider registries) {
         PendingMilestones data = new PendingMilestones();
-        for (Tag element : tag.getList("pending", Tag.TAG_COMPOUND)) {
+        for (Tag element : tag.getListOrEmpty("pending")) {
             CompoundTag entry = (CompoundTag) element;
-            String id = entry.getString("id");
-            if (entry.hasUUID("owner") && ALLOWED.contains(id)) {
-                data.pending.computeIfAbsent(entry.getUUID("owner"), key -> new HashSet<>()).add(id);
+            String id = entry.getStringOr("id", "");
+            if (entry.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() && ALLOWED.contains(id)) {
+                data.pending.computeIfAbsent(entry.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow(), key -> new HashSet<>()).add(id);
             }
         }
         return data;

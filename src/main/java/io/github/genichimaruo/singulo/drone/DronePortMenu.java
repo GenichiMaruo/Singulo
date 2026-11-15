@@ -113,7 +113,7 @@ public class DronePortMenu extends AbstractContainerMenu {
 
             @Override
             public int get() {
-                if (inventory.player.level().isClientSide) {
+                if (inventory.player.level().isClientSide()) {
                     return value;
                 }
                 return inventory.player.level().getBlockEntity(pos) instanceof DronePortBlockEntity port
@@ -131,7 +131,7 @@ public class DronePortMenu extends AbstractContainerMenu {
 
             @Override
             public int get() {
-                if (inventory.player.level().isClientSide) {
+                if (inventory.player.level().isClientSide()) {
                     return value;
                 }
                 return inventory.player.level().getBlockEntity(pos) instanceof DronePortBlockEntity port
@@ -143,7 +143,7 @@ public class DronePortMenu extends AbstractContainerMenu {
                 value = v;
             }
         });
-        ships = inventory.player.level().isClientSide ? SyncedInts.client(SHIP_ROWS * SHIP_INTS)
+        ships = inventory.player.level().isClientSide() ? SyncedInts.client(SHIP_ROWS * SHIP_INTS)
                 : SyncedInts.server(SHIP_ROWS * SHIP_INTS, i -> shipSnapshot(inventory.player.level())[i]);
         addDataSlots(ships);
     }
@@ -271,16 +271,16 @@ public class DronePortMenu extends AbstractContainerMenu {
     }
 
     /** 一覧の index の次元（この次元なら null）。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimKey(int index) {
         String d = index >= 0 && index < dims.size() ? dims.get(index) : "";
-        var loc = d.isEmpty() ? null : net.minecraft.resources.ResourceLocation.tryParse(d);
+        var loc = d.isEmpty() ? null : net.minecraft.resources.Identifier.tryParse(d);
         return loc == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, loc);
     }
 
     /** 行き先（位置と次元）の一覧の番号（なければ -1）。 */
-    public int indexOf(@javax.annotation.Nullable BlockPos to,
-                       @javax.annotation.Nullable net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim) {
+    public int indexOf(@org.jspecify.annotations.Nullable BlockPos to,
+                       @org.jspecify.annotations.Nullable net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim) {
         if (to == null) {
             return -1;
         }

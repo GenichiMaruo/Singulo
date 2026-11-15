@@ -272,10 +272,10 @@ public final class CatalystMagazine {
     }
 
     public void load(CompoundTag tag, HolderLookup.Provider registries) {
-        loaded = tag.contains("loaded") ? ItemStack.parseOptional(registries, tag.getCompound("loaded")) : ItemStack.EMPTY;
+        loaded = tag.contains("loaded") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("loaded")) : ItemStack.EMPTY;
         returns.clear();
-        for (Tag t : tag.getList("returns", Tag.TAG_COMPOUND)) {
-            ItemStack r = ItemStack.parseOptional(registries, (CompoundTag) t);
+        for (Tag t : tag.getListOrEmpty("returns")) {
+            ItemStack r = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, (CompoundTag) t);
             if (!r.isEmpty()) {
                 returns.add(r);
             }

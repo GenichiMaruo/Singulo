@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.gravity;
 
 import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -57,17 +57,17 @@ public class GravityReceiverBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, SinguloBlockEntities.GRAVITY_RECEIVER.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, SinguloBlockEntities.GRAVITY_RECEIVER.get(),
                 GravityReceiverBlockEntity::serverTick);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
-            player.displayClientMessage(Component.translatable("message.singulo.gravity_receiver.status",
-                    be.activePanels(), be.panels(), io.github.genichimaruo.singulo.energy.EnergyText.of(be.demand())), true);
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
+            player.sendOverlayMessage(Component.translatable("message.singulo.gravity_receiver.status",
+                    be.activePanels(), be.panels(), io.github.genichimaruo.singulo.energy.EnergyText.of(be.demand())));
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override

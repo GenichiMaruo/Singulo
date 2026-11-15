@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -21,7 +21,7 @@ public class InfallingBlockRenderer extends EntityRenderer<InfallingBlock> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(InfallingBlock entity) {
+    public Identifier getTextureLocation(InfallingBlock entity) {
         return FxDraw.WHITE;
     }
 

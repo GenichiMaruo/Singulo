@@ -129,7 +129,7 @@ public final class MachineWatch {
      * できた物を今取り出す面: 記録した面か、自動なら、かまどの仲間は下（横は燃料の欄なので）、ほかの装置は下・横・上の順に、
      * 主な物か副産物を今取り出せる最初の面（まだ何もできていなければ null）。
      */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     public static net.minecraft.core.Direction outputFace(Level level, BlockPos at, RecipeData r) {
         if (!r.outputAuto()) {
             return r.outputFace(level.getBlockState(at));
@@ -187,7 +187,7 @@ public final class MachineWatch {
      * 素材 item（流体の見本なら流体）を今入れる面: 記録した面か、自動なら上・横・下の順に、今その物を受け付ける面
      * （どこも受け付けなければ null。いっぱいなど）。かまどなら、焼く物は上、燃料にもなる物でも上から（焼く物の欄）入る。
      */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     public static net.minecraft.core.Direction inputFace(Level level, BlockPos at, RecipeData r, ItemStack item) {
         if (!r.inputAuto()) {
             return r.inputFace(level.getBlockState(at));

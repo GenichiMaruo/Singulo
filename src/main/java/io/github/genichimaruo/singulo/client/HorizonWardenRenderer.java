@@ -14,13 +14,13 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,11 +38,11 @@ import net.minecraft.world.phys.Vec3;
 public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWardenRenderer.Model> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Singulo.id("horizon_warden"), "main");
     static final float SCALE = 1.6F;
-    private static final ResourceLocation TEXTURE = Singulo.id("textures/entity/horizon_warden.png");
+    private static final Identifier TEXTURE = Singulo.id("textures/entity/horizon_warden.png");
     private static final RenderType[] GLOW = {
-            RenderType.eyes(Singulo.id("textures/entity/horizon_warden_glow_1.png")),
-            RenderType.eyes(Singulo.id("textures/entity/horizon_warden_glow_2.png")),
-            RenderType.eyes(Singulo.id("textures/entity/horizon_warden_glow_3.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/horizon_warden_glow_1.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/horizon_warden_glow_2.png")),
+            net.minecraft.client.renderer.rendertype.RenderTypes.eyes(Singulo.id("textures/entity/horizon_warden_glow_3.png")),
     };
     /** フェーズごとの光の色（光輪・炉心の輪・ビーム）。 */
     private static final int[] GLOW_RGB = {0x9BE6FF, 0x6FD8FF, 0xFF5050};
@@ -53,7 +53,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
     }
 
     @Override
-    public ResourceLocation getTextureLocation(HorizonWarden warden) {
+    public Identifier getTextureLocation(HorizonWarden warden) {
         return TEXTURE;
     }
 
@@ -157,7 +157,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
             float sink = Mth.clamp((e - 0.3F) / 0.45F, 0, 1);
             float r = (0.15F + 0.55F * open) * (1 - sink);
             if (r > 0.01F) {
-                FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+                FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
                 // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
                 glow = GlowDepth.of(buffers, FxDraw.WHITE);
                 FxDraw.billboard(pose, glow, camera, r * 5 + 0.5F, rgb, (int) (140 * open));
@@ -209,7 +209,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
         } else if (d < DEATH_COLLAPSE) {
             float g = (d - DEATH_GROW) / (DEATH_COLLAPSE - DEATH_GROW);
             float r = 0.2F + 1.4F * (g < 0.7F ? g / 0.7F : 1 - (g - 0.7F) / 0.3F * 0.85F);
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, r * 3.2F, rgb, 170);
             FxDraw.gyroRings(pose, glow, r * 2.4F + 2.5F * (1 - g), 0.06F, t * (6 + 20 * g), rgb, 220);
@@ -308,7 +308,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
         pose.pushPose();
         pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
         pose.translate(0, 2.2, -0.5);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), 0.13F, 0x000000, 0);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(FxDraw.WHITE)), 0.13F, 0x000000, 0);
         pose.mulPose(Axis.XP.rotationDegrees(70));
         pose.mulPose(Axis.YP.rotationDegrees(t * 12));
         // 別の描き方（黒い球）を挟んだので、光る描き方を取り直す（前のものは閉じられている）

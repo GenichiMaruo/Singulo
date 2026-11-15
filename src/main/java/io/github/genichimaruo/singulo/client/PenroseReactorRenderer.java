@@ -9,13 +9,13 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -25,11 +25,11 @@ import net.minecraft.world.phys.Vec3;
  * 円盤は観測者に近づいてくる側が明るい（ドップラー・ビーミング）。大きさは炉心質量に比例し、回転の速さはスピンに比例する。
  * 画面空間の重力レンズは GravitationalLensing が掛ける。
  */
-public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReactorBlockEntity> {
+public class PenroseReactorRenderer extends SnapshotBlockRenderer<PenroseReactorBlockEntity> {
     /** 描くときの地平線の半径: 判定の地平線が最小（0.6）のときの大きさと、判定が 1 増えるごとの増え方（炉心と野良ブラックホールで共通）。 */
     private static final float VISIBLE_HORIZON_BASE = 0.39F;
     private static final float VISIBLE_HORIZON_GROWTH = 0.45F;
-    private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
+    private static final Identifier WHITE = Singulo.id("textures/misc/white.png");
     private static final int SPHERE_LAT = 12;
     private static final int SPHERE_LON = 16;
     private static final int DISK_SEGMENTS = 64;
@@ -100,7 +100,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             return;
         }
         // レンズを掛けない（設定で切っている・シェーダーパック使用時）: 影と円盤をワールドに描く
-        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(WHITE));
+        VertexConsumer solid = buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE));
         drawSphere(pose, solid, horizon);
         // 影: 光子球に捕まる光の範囲（地平線の約2.6倍）を、カメラに向いた黒い円板として中心の面に描く。
         // 円盤の手前側は影の上に、奥側は影の後ろになる
@@ -265,7 +265,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             pose.mulPose(Axis.XP.rotationDegrees(k * 360 + i * 11));
             pose.scale(scale, scale, scale);
             pose.translate(-0.5, -0.5, -0.5);
-            dispatcher.renderSingleBlock(be.collapseState(i), pose, buffers, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,
+            dispatcher.renderSingleBlock(be.collapseState(i), pose, buffers, net.minecraft.util.LightCoordsUtil.FULL_BRIGHT,
                     net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
             pose.popPose();
         }
@@ -286,7 +286,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     private static final int FLASH_TICKS = 40;
 
     /** 点火から稼働に変わった瞬間を見つけ、光と粒を出す。光っている間はその時刻を返す。 */
-    @javax.annotation.Nullable
+    @org.jspecify.annotations.Nullable
     private static Long trackFormation(PenroseReactorBlockEntity be, PenroseReactorBlockEntity.State state) {
         long now = be.getLevel().getGameTime();
         PenroseReactorBlockEntity.State last = LAST_STATE.put(be, state);
@@ -426,8 +426,8 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         if (collapse > 0.55F) {
             // 黒い地平線が生まれかける
             float k = (collapse - 0.55F) / 0.45F;
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(WHITE)), 0.15F + 0.45F * k * k, 0x000000,
-                    net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.entitySolid(WHITE)), 0.15F + 0.45F * k * k, 0x000000,
+                    net.minecraft.util.LightCoordsUtil.FULL_BRIGHT);
         }
         pose.popPose();
 
@@ -581,11 +581,11 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     private static void diskVertex(VertexConsumer vc, PoseStack.Pose last, float x, float z, int r, int g, int b, int a,
                                    float ny) {
         vc.addVertex(last, x, 0, z).setColor(r, g, b, a).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, ny, 0);
+                .setLight(LightCoordsUtil.FULL_BRIGHT).setNormal(last, 0, ny, 0);
     }
 
     @Override
-    public boolean shouldRenderOffScreen(PenroseReactorBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 

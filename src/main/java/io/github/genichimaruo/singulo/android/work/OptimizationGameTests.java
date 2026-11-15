@@ -47,7 +47,7 @@ public final class OptimizationGameTests {
         h.assertTrue(first != null && first.getStackInSlot(0).getCount() == 3, "Initial storage missing");
         for (int i = 0; i < 100; i++) h.assertTrue(port.adjacentItems.get(Direction.EAST) == first, "Connection was unnecessarily rebuilt");
         BlockPos absoluteTarget = h.absolutePos(target);
-        if (Boolean.getBoolean("singulo.testBenchmarks")) {
+        if (Boolean.getBooleanOr("singulo.testBenchmarks", false)) {
             for (int i = 0; i < 1000; i++) {
                 h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST);
                 port.adjacentItems.get(Direction.EAST);
@@ -88,7 +88,7 @@ public final class OptimizationGameTests {
             else for (int j = 0; j < 256; j++) step.after.add(j);
             order.steps.add(step);
         }
-        int workers = Boolean.getBoolean("singulo.testBenchmarks") ? 100 : 2;
+        int workers = Boolean.getBooleanOr("singulo.testBenchmarks", false) ? 100 : 2;
         long start = System.nanoTime();
         int baseline = 0;
         for (int worker = 0; worker < workers; worker++) for (var step : order.steps) {
@@ -143,7 +143,7 @@ public final class OptimizationGameTests {
         CompoundTag common = WorkConsoleView.common(console);
         for (int i = 0; i < 20; i++) {
             var view = WorkConsoleView.forPlayer(console, i % 2 == 0 ? alice : bob, null, common);
-            h.assertTrue(view.getList("androids", 10).size() == (i % 2 == 0 ? 1 : 0), "Shared snapshot leaked viewer-specific candidates");
+            h.assertTrue(view.getListOrEmpty("androids").size() == (i % 2 == 0 ? 1 : 0), "Shared snapshot leaked viewer-specific candidates");
         }
         h.assertTrue(reads[0] == 1 && !common.contains("androids"), "Common view was rebuilt or mutated");
         var menu = (WorkConsoleMenu) console.createMenu(1, alice.getInventory(), alice);

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -286,13 +286,13 @@ public final class WorkOrder {
         t.put("target", target.save(registries));
         t.putLong("count", count);
         if (orderer != null) {
-            t.putUUID("orderer", orderer);
+            t.store("orderer", net.minecraft.core.UUIDUtil.CODEC, orderer);
         }
         ListTag list = new ListTag();
         for (StepState s : steps) {
             CompoundTag st = new CompoundTag();
             st.put("recipe", s.recipe.save(registries));
-            st.put("location", NbtUtils.writeBlockPos(s.location));
+            st.put("location", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(s.location));
             st.putString("block", BuiltInRegistries.BLOCK.getKey(s.block).toString());
             st.putLong("total", s.total);
             st.putLong("done", s.done);
@@ -305,13 +305,13 @@ public final class WorkOrder {
         t.put("steps", list);
         t.putLong("delivered", delivered);
         if (destination != null) {
-            t.put("destination", NbtUtils.writeBlockPos(destination));
+            t.put("destination", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(destination));
         }
-        if (deliveryEndpointId != null) t.putUUID("delivery_endpoint_id", deliveryEndpointId);
-        if (escrowRequest != null) t.putUUID("escrow_request", escrowRequest);
+        if (deliveryEndpointId != null) t.store("delivery_endpoint_id", net.minecraft.core.UUIDUtil.CODEC, deliveryEndpointId);
+        if (escrowRequest != null) t.store("escrow_request", net.minecraft.core.UUIDUtil.CODEC, escrowRequest);
         if (materialSource != null) {
-            t.put("material_source", NbtUtils.writeBlockPos(materialSource));
-            if (materialEndpointId != null) t.putUUID("material_endpoint_id", materialEndpointId);
+            t.put("material_source", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(materialSource));
+            if (materialEndpointId != null) t.store("material_endpoint_id", net.minecraft.core.UUIDUtil.CODEC, materialEndpointId);
         }
         t.putBoolean("to_stock", toStock);
         t.putBoolean("notify", notify);
@@ -323,7 +323,7 @@ public final class WorkOrder {
         ListTag hs = new ListTag();
         for (Holding h : held) {
             CompoundTag ht = new CompoundTag();
-            ht.put("point", NbtUtils.writeBlockPos(h.point));
+            ht.put("point", io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(h.point));
             ht.put("item", h.item.save(registries));
             ht.putLong("count", h.count);
             hs.add(ht);
@@ -339,49 +339,49 @@ public final class WorkOrder {
 
     @Nullable
     public static WorkOrder load(CompoundTag t, HolderLookup.Provider registries) {
-        if (t.contains("escrow_request") && !t.hasUUID("escrow_request")) return null;
+        if (t.contains("escrow_request") && !t.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).isPresent()) return null;
         if ((t.contains("material_source") || t.contains("material_endpoint_id"))
-                && (!t.hasUUID("material_endpoint_id") || NbtUtils.readBlockPos(t, "material_source").isEmpty())) return null;
-        if (t.contains("delivery_endpoint_id") && (!t.hasUUID("delivery_endpoint_id")
-                || NbtUtils.readBlockPos(t, "destination").isEmpty())) return null;
-        ItemStack target = ItemStack.parseOptional(registries, t.getCompound("target"));
+                && (!t.read("material_endpoint_id", net.minecraft.core.UUIDUtil.CODEC).isPresent() || io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t, "material_source").isEmpty())) return null;
+        if (t.contains("delivery_endpoint_id") && (!t.read("delivery_endpoint_id", net.minecraft.core.UUIDUtil.CODEC).isPresent()
+                || io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t, "destination").isEmpty())) return null;
+        ItemStack target = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, t.getCompoundOrEmpty("target"));
         if (target.isEmpty()) {
             return null;
         }
-        WorkOrder o = new WorkOrder(t.getInt("id"), target, t.getLong("count"), t.hasUUID("orderer") ? t.getUUID("orderer") : null);
-        for (Tag tag : t.getList("steps", Tag.TAG_COMPOUND)) {
+        WorkOrder o = new WorkOrder(t.getIntOr("id", 0), target, t.getLongOr("count", 0L), t.read("orderer", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? t.read("orderer", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null);
+        for (Tag tag : t.getListOrEmpty("steps")) {
             CompoundTag st = (CompoundTag) tag;
-            RecipeData r = RecipeData.load(st.getCompound("recipe"), registries);
+            RecipeData r = RecipeData.load(st.getCompoundOrEmpty("recipe"), registries);
             if (r == null) {
                 return null;
             }
-            ResourceLocation bid = ResourceLocation.tryParse(st.getString("block"));
-            StepState s = new StepState(r, NbtUtils.readBlockPos(st, "location").orElse(BlockPos.ZERO),
-                    bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(bid), st.getLong("total"));
-            s.done = st.getLong("done");
-            s.parked = Math.max(0, st.getLong("parked"));
-            s.parkedOut = Math.max(0, st.getLong("parked_out"));
+            Identifier bid = Identifier.tryParse(st.getStringOr("block", ""));
+            StepState s = new StepState(r, io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(st, "location").orElse(BlockPos.ZERO),
+                    bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(bid), st.getLongOr("total", 0L));
+            s.done = st.getLongOr("done", 0L);
+            s.parked = Math.max(0, st.getLongOr("parked", 0L));
+            s.parkedOut = Math.max(0, st.getLongOr("parked_out", 0L));
             o.steps.add(s);
         }
-        o.delivered = t.getLong("delivered");
-        o.destination = NbtUtils.readBlockPos(t, "destination").orElse(null);
-        o.deliveryEndpointId = t.hasUUID("delivery_endpoint_id") ? t.getUUID("delivery_endpoint_id") : null;
-        o.escrowRequest = t.hasUUID("escrow_request") ? t.getUUID("escrow_request") : null;
-        o.materialSource = NbtUtils.readBlockPos(t, "material_source").orElse(null);
+        o.delivered = t.getLongOr("delivered", 0L);
+        o.destination = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t, "destination").orElse(null);
+        o.deliveryEndpointId = t.read("delivery_endpoint_id", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? t.read("delivery_endpoint_id", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        o.escrowRequest = t.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? t.read("escrow_request", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        o.materialSource = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(t, "material_source").orElse(null);
         // Invalid identity remains restricted/unavailable, never silently becomes shared.
-        o.materialEndpointId = t.hasUUID("material_endpoint_id") ? t.getUUID("material_endpoint_id") : null;
-        o.toStock = t.getBoolean("to_stock");
-        o.notify = t.getBoolean("notify");
-        for (Tag p : t.getList("pending_reserve", Tag.TAG_COMPOUND)) {
+        o.materialEndpointId = t.read("material_endpoint_id", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? t.read("material_endpoint_id", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+        o.toStock = t.getBooleanOr("to_stock", false);
+        o.notify = t.getBooleanOr("notify", false);
+        for (Tag p : t.getListOrEmpty("pending_reserve")) {
             ItemCount c = ItemCount.load((CompoundTag) p, registries);
             if (c != null) {
                 o.pendingReserve.add(c);
             }
         }
-        for (Tag tag : t.getList("held", Tag.TAG_COMPOUND)) {
+        for (Tag tag : t.getListOrEmpty("held")) {
             CompoundTag ht = (CompoundTag) tag;
-            ItemStack item = ItemStack.parseOptional(registries, ht.getCompound("item"));
-            NbtUtils.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, item, ht.getLong("count")));
+            ItemStack item = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, ht.getCompoundOrEmpty("item"));
+            io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, item, ht.getLongOr("count", 0L)));
         }
         for (Tag w : t.getList("workers", Tag.TAG_INT_ARRAY)) {
             o.workers.add(NbtUtils.loadUUID(w));

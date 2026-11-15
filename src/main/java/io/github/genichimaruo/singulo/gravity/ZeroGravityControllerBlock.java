@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.gravity;
 
 import com.mojang.serialization.MapCodec;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -42,19 +42,19 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
             be.setHeight(player.isSecondaryUseActive() ? be.height() - 1
                     : be.height() == Integer.MAX_VALUE ? Integer.MAX_VALUE : be.height() + 1);
-            player.displayClientMessage(Component.translatable("message.singulo.zero_gravity_controller.height", be.height(),
-                    io.github.genichimaruo.singulo.energy.EnergyText.of(ZeroGravity.costPerBlock(be.height()))), true);
+            player.sendOverlayMessage(Component.translatable("message.singulo.zero_gravity_controller.height", be.height(),
+                    io.github.genichimaruo.singulo.energy.EnergyText.of(ZeroGravity.costPerBlock(be.height()))));
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());
     }
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moving) {
         super.onPlace(state, level, pos, oldState, moving);
-        if (!level.isClientSide && !oldState.is(state.getBlock())) {
+        if (!level.isClientSide() && !oldState.is(state.getBlock())) {
             ZeroGravityControllerBlockEntity.notifyReceivers(level, pos);
         }
     }
@@ -64,7 +64,7 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
                             net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
             be.adoptGroupHeight();
             ZeroGravityControllerBlockEntity.notifyReceivers(level, pos);
         }
@@ -74,7 +74,7 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         boolean removed = !state.is(newState.getBlock());
         super.onRemove(state, level, pos, newState, moving);
-        if (removed && !level.isClientSide) {
+        if (removed && !level.isClientSide()) {
             ZeroGravityControllerBlockEntity.notifyReceivers(level, pos);
         }
     }

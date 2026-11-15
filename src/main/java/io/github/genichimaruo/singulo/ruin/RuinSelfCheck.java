@@ -26,7 +26,7 @@ public final class RuinSelfCheck {
     private RuinSelfCheck() {}
 
     public static boolean enabled() {
-        return Boolean.getBoolean("singulo.ruinSelfCheck");
+        return Boolean.getBooleanOr("singulo.ruinSelfCheck", false);
     }
 
     public static void onServerStarted(ServerStartedEvent event) {
