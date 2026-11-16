@@ -2196,8 +2196,8 @@
     "translation": "能層巨蛇沉入漩渦後浮現的一段記錄：第二座反應爐運轉記錄的後續。也用於覺醒渦核。"
   },
   "desc.singulo.ergosphere_ring": {
-    "source": "Extracts exotic matter from a fast-spinning core.",
-    "translation": "從高速自旋的爐心中提取奇異物質。"
+    "source": "Goes in a slot of the P-Reactor core controller and extracts exotic matter from a fast-spinning core.",
+    "translation": "放入彭羅斯反應爐爐心控制器介面的槽位後，從高速自旋的爐心中提取奇異物質。"
   },
   "desc.singulo.event_horizon_shield": {
     "source": "Protects a 32-block radius from explosions, griefing and hostile spawns.",
@@ -2304,8 +2304,8 @@
     "translation": "右鍵開啟。說明目標、機器與多方塊結構，並顯示你的進度。"
   },
   "desc.singulo.hawking_collector": {
-    "source": "Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
-    "translation": "爐心質量較小時（催化劑模式；開啟回收運轉即可保持），每5分鐘收集1個霍金凝聚體。"
+    "source": "Goes in a slot of the P-Reactor core controller. Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
+    "translation": "放入彭羅斯反應爐爐心控制器介面的槽位。爐心質量較小時（催化劑模式；開啟回收運轉即可保持），每5分鐘收集1個霍金凝聚體。"
   },
   "desc.singulo.hawking_condensate": {
     "source": "Condensed Hawking radiation.",
@@ -2356,8 +2356,8 @@
     "translation": "完好保存的古代窗戶，與廢墟面板一樣堅固且耐爆炸。"
   },
   "desc.singulo.jet_collector": {
-    "source": "Collects jet condensate from the reactor.",
-    "translation": "從反應爐收集噴流凝聚體。"
+    "source": "Goes in a slot of the P-Reactor core controller and collects jet condensate from the core’s jets.",
+    "translation": "放入彭羅斯反應爐爐心控制器介面的槽位後，從爐心的噴流中收集噴流凝聚體。"
   },
   "desc.singulo.jet_condensate": {
     "source": "Condensed particles from a relativistic jet.",
@@ -2820,8 +2820,8 @@
     "translation": "用於打開或封印奇點鎖容器。每次使用都會消耗。"
   },
   "desc.singulo.singularity_seed": {
-    "source": "Becomes a black hole core when ignited.",
-    "translation": "被點燃後成為黑洞核心。"
+    "source": "Put it in a slot of the P-Reactor core controller and ignite it to make a black hole core. It also ignites the Accretion Jet Forge and opens the core of the Suspension Reservoir, Nuclear Pasta Accumulator and Tidal Spindle.",
+    "translation": "放入彭羅斯反應爐爐心控制器介面的槽位並點火後，會成為黑洞爐心。也可用於點燃吸積噴流鍛造爐，以及開啟重力懸吊儲槽、核義大利麵積層儲能庫和潮汐紡絲機的爐心。"
   },
   "desc.singulo.smes_cell": {
     "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
@@ -13194,6 +13194,18 @@
   "summary.singulo.hawking_collector": {
     "source": "Collects H-Condensate while the reactor core is light.",
     "translation": "在爐心較輕時收集 H 凝聚體。"
+  },
+  "summary.singulo.jet_collector": {
+    "source": "Goes in the P-Reactor and collects jet condensate.",
+    "translation": "放入彭羅斯反應爐，收集噴流凝聚體。"
+  },
+  "summary.singulo.ergosphere_ring": {
+    "source": "Goes in the P-Reactor and extracts exotic matter.",
+    "translation": "放入彭羅斯反應爐，提取奇異物質。"
+  },
+  "summary.singulo.singularity_seed": {
+    "source": "Ignite it in the P-Reactor to make a black hole core.",
+    "translation": "在彭羅斯反應爐中點火後成為黑洞爐心。"
   },
   "summary.singulo.helium_cartridge": {
     "source": "Carries 250 mB of liquid helium as an item.",

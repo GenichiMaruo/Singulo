@@ -2196,8 +2196,8 @@
     "translation": "에르고구의 거대 뱀이 소용돌이 바닥으로 가라앉은 뒤 떠오르는 기록의 한 구절입니다. 두 번째 반응로 운전 기록의 뒷부분입니다. 각성의 소용돌이핵의 재료로도 쓰입니다."
   },
   "desc.singulo.ergosphere_ring": {
-    "source": "Extracts exotic matter from a fast-spinning core.",
-    "translation": "고속 회전하는 노심에서 특이 물질을 추출합니다."
+    "source": "Goes in a slot of the P-Reactor core controller and extracts exotic matter from a fast-spinning core.",
+    "translation": "펜로즈 반응로 노심 제어기 화면의 칸에 넣으면 고속 회전하는 노심에서 특이 물질을 추출합니다."
   },
   "desc.singulo.event_horizon_shield": {
     "source": "Protects a 32-block radius from explosions, griefing and hostile spawns.",
@@ -2304,8 +2304,8 @@
     "translation": "우클릭으로 엽니다. 목표, 장치, 멀티블록을 설명하고 진행 상황을 보여 줍니다."
   },
   "desc.singulo.hawking_collector": {
-    "source": "Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
-    "translation": "노심 질량이 작을 때(촉매 모드, 회수 운전으로 유지 가능) 5분마다 호킹 응축물를 1개 모읍니다."
+    "source": "Goes in a slot of the P-Reactor core controller. Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
+    "translation": "펜로즈 반응로 노심 제어기 화면의 칸에 넣습니다. 노심 질량이 작을 때(촉매 모드, 회수 운전으로 유지 가능) 5분마다 호킹 응축물을 1개 모읍니다."
   },
   "desc.singulo.hawking_condensate": {
     "source": "Condensed Hawking radiation.",
@@ -2356,8 +2356,8 @@
     "translation": "온전하게 남은 고대의 창문으로, 폐허 패널만큼 단단하고 폭발에 강합니다."
   },
   "desc.singulo.jet_collector": {
-    "source": "Collects jet condensate from the reactor.",
-    "translation": "반응로의 제트에서 제트 응축물을 수집합니다."
+    "source": "Goes in a slot of the P-Reactor core controller and collects jet condensate from the core’s jets.",
+    "translation": "펜로즈 반응로 노심 제어기 화면의 칸에 넣으면 노심의 제트에서 제트 응축물을 수집합니다."
   },
   "desc.singulo.jet_condensate": {
     "source": "Condensed particles from a relativistic jet.",
@@ -2820,8 +2820,8 @@
     "translation": "특이점 잠금 컨테이너를 열거나 봉인합니다. 쓸 때마다 소모됩니다."
   },
   "desc.singulo.singularity_seed": {
-    "source": "Becomes a black hole core when ignited.",
-    "translation": "반응로에 넣고 점화하면 블랙홀 노심이 됩니다."
+    "source": "Put it in a slot of the P-Reactor core controller and ignite it to make a black hole core. It also ignites the Accretion Jet Forge and opens the core of the Suspension Reservoir, Nuclear Pasta Accumulator and Tidal Spindle.",
+    "translation": "펜로즈 반응로 노심 제어기 화면의 칸에 넣고 점화하면 블랙홀 노심이 됩니다. 강착 제트 단조로의 점화와, 중력 현수 저장 탱크·핵 파스타 적층 축전고·조석 방사기의 노심을 여는 데에도 씁니다."
   },
   "desc.singulo.smes_cell": {
     "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
@@ -13194,6 +13194,18 @@
   "summary.singulo.hawking_collector": {
     "source": "Collects H-Condensate while the reactor core is light.",
     "translation": "노심이 가벼운 동안 H 응축체를 모은다."
+  },
+  "summary.singulo.jet_collector": {
+    "source": "Goes in the P-Reactor and collects jet condensate.",
+    "translation": "펜로즈 반응로에 넣어 제트 응축물을 모은다."
+  },
+  "summary.singulo.ergosphere_ring": {
+    "source": "Goes in the P-Reactor and extracts exotic matter.",
+    "translation": "펜로즈 반응로에 넣어 특이 물질을 추출한다."
+  },
+  "summary.singulo.singularity_seed": {
+    "source": "Ignite it in the P-Reactor to make a black hole core.",
+    "translation": "펜로즈 반응로에서 점화하면 블랙홀 노심이 된다."
   },
   "summary.singulo.helium_cartridge": {
     "source": "Carries 250 mB of liquid helium as an item.",
