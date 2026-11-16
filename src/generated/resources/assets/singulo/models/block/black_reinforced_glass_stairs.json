@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "singulo:block/black_reinforced_glass",
+    "top": "singulo:block/black_reinforced_glass",
+    "side": "singulo:block/black_reinforced_glass"
+  },
+  "render_type": "minecraft:translucent"
+}

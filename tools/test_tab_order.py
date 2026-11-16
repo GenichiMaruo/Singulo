@@ -126,7 +126,8 @@ class CreativeTabOrderTests(unittest.TestCase):
     def test_building_variants_follow_their_base(self):
         for base in {b for b, _ in building_variants.VARIANTS.values()}:
             i = self.order.index(base)
-            self.assertEqual([v.rsplit('_', 1)[1] for v in self.order[i + 1:i + 4]], ['stairs', 'slab', 'wall'], base)
+            shapes = [s for b, s in building_variants.VARIANTS.values() if b == base]
+            self.assertEqual([v.rsplit('_', 1)[1] for v in self.order[i + 1:i + 1 + len(shapes)]], shapes, base)
 
     def test_new_unclassified_device_stops_generation(self):
         with patch.dict(data.MOD, {'Test device': ('test_device', 'Test device', 'machine')}):

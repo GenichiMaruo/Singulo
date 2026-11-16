@@ -10,6 +10,8 @@
     "singulo:pristine_ruin_panel_stairs",
     "singulo:pristine_ruin_tile_stairs",
     "singulo:lab_panel_stairs",
-    "singulo:lab_tile_stairs"
+    "singulo:lab_tile_stairs",
+    "singulo:white_glass_panel_stairs",
+    "singulo:black_reinforced_glass_stairs"
   ]
 }

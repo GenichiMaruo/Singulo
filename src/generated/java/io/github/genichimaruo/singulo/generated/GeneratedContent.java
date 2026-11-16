@@ -201,7 +201,9 @@ public final class GeneratedContent {
             new BlockVariant("lab_panel_wall", "lab_panel", "wall", 1),
             new BlockVariant("lab_tile_stairs", "lab_tiles", "stairs", 1),
             new BlockVariant("lab_tile_slab", "lab_tiles", "slab", 1),
-            new BlockVariant("lab_tile_wall", "lab_tiles", "wall", 1)
+            new BlockVariant("lab_tile_wall", "lab_tiles", "wall", 1),
+            new BlockVariant("white_glass_panel_stairs", "white_glass_panel", "stairs", 1),
+            new BlockVariant("black_reinforced_glass_stairs", "black_reinforced_glass", "stairs", 1)
     );
 
     /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */
@@ -529,6 +531,7 @@ public final class GeneratedContent {
             "white_panel_wall",
             "white_light_panel",
             "white_glass_panel",
+            "white_glass_panel_stairs",
             "white_star_glass_panel",
             "white_sliding_door",
             "black_reinforced_panel",
@@ -536,6 +539,7 @@ public final class GeneratedContent {
             "black_reinforced_panel_slab",
             "black_reinforced_panel_wall",
             "black_reinforced_glass",
+            "black_reinforced_glass_stairs",
             "black_star_glass",
             "bismuth_crystal_block",
             "glowing_bismuth_crystal",
@@ -923,6 +927,8 @@ public final class GeneratedContent {
             Map.entry("lab_panel_wall", 1),
             Map.entry("lab_tile_stairs", 1),
             Map.entry("lab_tile_slab", 1),
-            Map.entry("lab_tile_wall", 1)
+            Map.entry("lab_tile_wall", 1),
+            Map.entry("white_glass_panel_stairs", 1),
+            Map.entry("black_reinforced_glass_stairs", 1)
     );
 }

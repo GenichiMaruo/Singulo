@@ -28,7 +28,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public final class BuildingVariantGameTests {
     @GameTest(template = "empty")
     public static void variantsCopyTheirBaseAndAppearInNewStructures(GameTestHelper helper) {
-        helper.assertTrue(GeneratedContent.BLOCK_VARIANTS.size() == 30, "Expected 30 building variants");
+        helper.assertTrue(GeneratedContent.BLOCK_VARIANTS.size() == 32, "Expected 32 building variants");
         for (GeneratedContent.BlockVariant v : GeneratedContent.BLOCK_VARIANTS) {
             Block block = SinguloBlocks.VARIANTS.get(v.id()).get();
             Block base = BuiltInRegistries.BLOCK.get(Singulo.id(v.base()));

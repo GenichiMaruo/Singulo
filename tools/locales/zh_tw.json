@@ -11540,8 +11540,8 @@
     "translation": "用於：鉨、鉍晶體方塊"
   },
   "uses.singulo.black_reinforced_glass": {
-    "source": "Used in: Starred Black Reinforced Glass",
-    "translation": "用於：四芒星黑色強化玻璃"
+    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs",
+    "translation": "用於：四芒星黑色強化玻璃、黑色強化玻璃樓梯"
   },
   "uses.singulo.black_reinforced_panel": {
     "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall",
@@ -12144,8 +12144,8 @@
     "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 26 個"
   },
   "uses.singulo.white_glass_panel": {
-    "source": "Used in: Starred White Glass Panel",
-    "translation": "用於：四芒星白色玻璃面板"
+    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs",
+    "translation": "用於：四芒星白色玻璃面板、白色玻璃面板樓梯"
   },
   "uses.singulo.white_panel": {
     "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
@@ -15238,5 +15238,29 @@
   "howto.singulo.android_farming_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製作：精密組裝台（階段2）"
+  },
+  "block.singulo.white_glass_panel_stairs": {
+    "source": "White Glass Panel Stairs",
+    "translation": "白色玻璃面板樓梯"
+  },
+  "block.singulo.black_reinforced_glass_stairs": {
+    "source": "Black Reinforced Glass Stairs",
+    "translation": "黑色強化玻璃樓梯"
+  },
+  "desc.singulo.white_glass_panel_stairs": {
+    "source": "Stairs made from White Glass Panel.",
+    "translation": "用白色玻璃面板製成的樓梯。"
+  },
+  "howto.singulo.white_glass_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "desc.singulo.black_reinforced_glass_stairs": {
+    "source": "Stairs made from Black Reinforced Glass.",
+    "translation": "用黑色強化玻璃製成的樓梯。"
+  },
+  "howto.singulo.black_reinforced_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
   }
 }

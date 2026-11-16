@@ -11540,8 +11540,8 @@
     "translation": "사용처: 니호늄, 비스무트 결정 블록"
   },
   "uses.singulo.black_reinforced_glass": {
-    "source": "Used in: Starred Black Reinforced Glass",
-    "translation": "사용처: 사방별 검은 강화 유리"
+    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs",
+    "translation": "사용처: 사방별 검은 강화 유리, 검은 강화 유리 계단"
   },
   "uses.singulo.black_reinforced_panel": {
     "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall",
@@ -12144,8 +12144,8 @@
     "translation": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 26개"
   },
   "uses.singulo.white_glass_panel": {
-    "source": "Used in: Starred White Glass Panel",
-    "translation": "사용처: 사방별 흰색 유리 패널"
+    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs",
+    "translation": "사용처: 사방별 흰색 유리 패널, 흰색 유리 패널 계단"
   },
   "uses.singulo.white_panel": {
     "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
@@ -15238,5 +15238,29 @@
   "howto.singulo.android_farming_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "block.singulo.white_glass_panel_stairs": {
+    "source": "White Glass Panel Stairs",
+    "translation": "흰색 유리 패널 계단"
+  },
+  "block.singulo.black_reinforced_glass_stairs": {
+    "source": "Black Reinforced Glass Stairs",
+    "translation": "검은 강화 유리 계단"
+  },
+  "desc.singulo.white_glass_panel_stairs": {
+    "source": "Stairs made from White Glass Panel.",
+    "translation": "흰색 유리 패널 재질의 계단입니다."
+  },
+  "howto.singulo.white_glass_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.black_reinforced_glass_stairs": {
+    "source": "Stairs made from Black Reinforced Glass.",
+    "translation": "검은 강화 유리 재질의 계단입니다."
+  },
+  "howto.singulo.black_reinforced_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   }
 }

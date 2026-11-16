@@ -2,7 +2,7 @@
 
 ## Features
 
-- Add stairs, slabs and walls for ten building blocks: White and Black Reinforced Panels, Ruin Panels (plain, cracked, mossy and tiled), Pristine Ruin Panels and Tiles, and Lab Panels and Floor Tiles. Craft them in the vanilla shapes or on a stonecutter. Ruins and laboratories generated from this version on use them, and ruin stairs and slabs crack and gather moss like the panels.
+- Add stairs, slabs and walls for ten building blocks: White and Black Reinforced Panels, Ruin Panels (plain, cracked, mossy and tiled), Pristine Ruin Panels and Tiles, and Lab Panels and Floor Tiles. Craft them in the vanilla shapes or on a stonecutter. Ruins and laboratories generated from this version on use them, and ruin stairs and slabs crack and gather moss like the panels. White Glass Panels and Black Reinforced Glass get translucent stairs.
 - Add the Fishing Upgrade and the Farming Upgrade for androids. Procedure cards gain a Fish step (fish in an area of water until enough is caught) and a Farm step (till soil and plant the supplied seeds, or give bone meal to growing crops). Both tool slots now accept any of the Mining, Felling, Fishing and Farming Upgrades.
 - Players on the owner's vanilla team (/team) can use android stations, androids, drone stations, drone ports and work consoles without being registered on a Shield Permit. The server setting `shareWithTeam` turns this off.
 - Add the client settings `flashIntensity` and `screenShake` to soften every large flash and screen shake, including bosses, the Genesis Core and the Accretion Jet Forge.
@@ -15,6 +15,7 @@
 - The Unstable Wormhole Mouth and boss spawn eggs no longer appear in the creative inventory. Boss spawn eggs are available only through commands.
 - The Body Capsule recipe now follows its shape: a lab frame canopy with the blueprint, glass around a white ceramic body, and a lab frame base. Its inventory icon fills the slot.
 - Kitchen chests and barrels in the Underground Android Laboratory cafeteria now also hold printed space food and vending machine and coffee maker drinks.
+- The four-pointed star on Starred White Glass Panels and Starred Black Reinforced Glass is now symmetric about the centre.
 - Bosses ignore harmful effects. Both Instant Damage and Instant Health heal them, whether splashed, lingering, on arrows or applied by command.
 
 - Registry IDs are made consistent ahead of 1.0.0. Existing worlds keep their items, placed blocks, machine contents and selected recipes; old IDs load as the new ones. Datapacks, scripts and commands that name the old IDs need updating:
@@ -31,7 +32,7 @@
 
 ## 追加
 
-- ホワイトパネル・黒色強化パネル・遺構パネル（無地・ひび割れ・苔むし・タイル）・無垢の遺構パネルとタイル・研究所の白いパネルと床タイルの、階段・ハーフブロック・塀を追加しました。作業台でバニラと同じ形に並べるか、石切台で作れます。この版から新しく生まれる遺構と研究所ではこれらが置かれ、遺構の階段とハーフブロックもパネルと同じようにひび割れ、苔むします。
+- ホワイトパネル・黒色強化パネル・遺構パネル（無地・ひび割れ・苔むし・タイル）・無垢の遺構パネルとタイル・研究所の白いパネルと床タイルの、階段・ハーフブロック・塀を追加しました。作業台でバニラと同じ形に並べるか、石切台で作れます。この版から新しく生まれる遺構と研究所ではこれらが置かれ、遺構の階段とハーフブロックもパネルと同じようにひび割れ、苔むします。ホワイトガラスパネルと黒色強化ガラスには、透ける階段を追加しました。
 - アンドロイドの釣りアップグレードと農業アップグレードを追加しました。手順カードに、釣り（範囲の水で、そろうまで釣る）と畑づくり（土を耕して持ってきた種・苗を植える、骨粉なら育ちかけの作物に与える）の手順が加わります。2つの道具の枠には、採掘・伐採・釣り・農業のどのアップグレードでも積めるようにしました。
 - 持ち主と同じバニラのチーム（/team）の人は、シールド許可証に登録しなくても、アンドロイドの組立ステーション・アンドロイド・ドローンのステーションと発着ポート・作業指令台を使えるようにしました。サーバー設定 `shareWithTeam` で切れます。
 - ボス・創世炉・降着ジェット鍛造炉などの大きな閃光と画面の揺れをまとめて弱めるクライアント設定 `flashIntensity`・`screenShake` を追加しました。
@@ -44,6 +45,7 @@
 - 不安定なワームホールの口とボスのスポーンエッグをクリエイティブタブから外しました。ボスのスポーンエッグはコマンドでのみ入手できます。
 - 素体カプセルのレシピを形に合わせ、構造材の天蓋と設計図、ガラスに囲まれた白いセラミックの素体、構造材の台座にしました。持ち物欄のアイコンも欄いっぱいの大きさにしました。
 - 地下アンドロイド研究所の食堂の厨房の箱と樽に、フードプリンターの印刷食品と、自動販売機・コーヒーメーカーの飲み物も入るようにしました。
+- 四芒星ホワイトガラスパネルと四芒星黒色強化ガラスの星の模様を、中心について対称にしました。
 - ボスは悪い効果を受けなくなりました。負傷と即時回復のポーションは、投げても、残留でも、矢でも、コマンドでも、どちらもボスを回復します。
 
 - 1.0.0 に向けて登録 ID の表記揺れをそろえました。既存のワールドのアイテム・置いたブロック・機械の中身・選んでいたレシピはそのまま引き継がれ、古い ID は新しい ID として読み込まれます。古い ID を書いたデータパック・スクリプト・コマンドは書き換えが必要です（変更の一覧は英語の項目を参照）。

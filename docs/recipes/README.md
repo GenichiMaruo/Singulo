@@ -892,6 +892,14 @@ Pリアクターの燃料
 
 ![研究所の床タイルの塀](465_lab_tile_wall.png)
 
+### ホワイトガラスパネルの階段
+
+![ホワイトガラスパネルの階段](468_white_glass_panel_stairs.png)
+
+### 黒色強化ガラスの階段
+
+![黒色強化ガラスの階段](469_black_reinforced_glass_stairs.png)
+
 ## 段階2　極低温
 
 ### 隕石コンパス

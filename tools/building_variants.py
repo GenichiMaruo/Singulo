@@ -29,11 +29,20 @@ SHAPES = (
     ('slab', 'ハーフブロック', 'Slab', ('BBB',), 3, 6),
     ('wall', '塀', 'Wall', ('BBB', 'BBB'), 6, 6),
 )
+# 透けるガラスは階段だけ（0.20.0 で足した。レシピは一覧の番号がずれないよう recipes.py の最後で glass_recipes を呼ぶ）
+GLASS_BASES = (
+    ('ホワイトガラスパネル', 'white_glass_panel', 'white_glass_panel', 'White Glass Panel'),
+    ('黒色強化ガラス', 'black_reinforced_glass', 'black_reinforced_glass', 'Black Reinforced Glass'),
+)
+GLASS_SHAPES = tuple(s for s in SHAPES if s[0] == 'stairs')
 # 石切台で元の建材1個からできる数
 STONECUT = {'stairs': 1, 'slab': 2, 'wall': 1}
 
 # 変種の ID → (元の ID, 形)
 VARIANTS = {f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in BASES for shape, *_ in SHAPES}
+VARIANTS.update({f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in GLASS_BASES for shape, *_ in GLASS_SHAPES})
+# 半透明で描く変種（ガラス）
+GLASS_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base in {b for _, b, _, _ in GLASS_BASES}}
 # 遺構の建材（ニュートリノの探知で遺構と見なす）
 RUIN_VARIANTS = {v for v, (base, _) in VARIANTS.items() if 'ruin' in base}
 # 鉄以上のツルハシで掘る（元の建材と同じ）
@@ -41,8 +50,8 @@ IRON_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base.startswith(('pri
 
 IDS = {}
 DESC = {}
-for _ja, _base, _prefix, _en in BASES:
-    for _shape, _sja, _sen, *_ in SHAPES:
+for _ja, _base, _prefix, _en, _shapes in [b + (SHAPES,) for b in BASES] + [b + (GLASS_SHAPES,) for b in GLASS_BASES]:
+    for _shape, _sja, _sen, *_ in _shapes:
         _name = f'{_ja}の{_sja}'
         IDS[_name] = (f'{_prefix}_{_shape}', f'{_en} {_sen}', 'variant')
         DESC[_name] = {
@@ -52,10 +61,10 @@ for _ja, _base, _prefix, _en in BASES:
         }[_shape]
 
 
-def recipes(R, shaped, stage_of):
+def recipes(R, shaped, stage_of, bases=BASES, shapes=SHAPES):
     """作業台のレシピ（元の建材をバニラと同じ形に並べる）。stage_of(元の名前) で元の建材の段階を得る。"""
-    for ja, _base, _prefix, _en in BASES:
-        for shape, sja, _sen, rows, count, out in SHAPES:
+    for ja, _base, _prefix, _en in bases:
+        for shape, sja, _sen, rows, count, out in shapes:
             name = f'{ja}の{sja}'
             R(name, stage_of(ja), '作業台', {ja: count}, out=out, cat='part')
             shaped[name] = (rows, {'B': ja})
@@ -79,8 +88,10 @@ def models(write_json, assets):
         m = f'{MODID}:block/{variant}'
         if shape == 'stairs':
             for suffix, parent in (('', 'stairs'), ('_inner', 'inner_stairs'), ('_outer', 'outer_stairs')):
-                write_json(mb / f'{variant}{suffix}.json', {'parent': f'minecraft:block/{parent}',
-                                                           'textures': {'bottom': tex, 'top': tex, 'side': tex}})
+                model = {'parent': f'minecraft:block/{parent}', 'textures': {'bottom': tex, 'top': tex, 'side': tex}}
+                if variant in GLASS_VARIANTS:
+                    model['render_type'] = 'minecraft:translucent'      # 元のガラスと同じく透ける
+                write_json(mb / f'{variant}{suffix}.json', model)
             write_json(bs / f'{variant}.json', {'variants': stairs_variants(m)})
             write_json(mi / f'{variant}.json', {'parent': m})
         elif shape == 'slab':

@@ -1078,3 +1078,13 @@ R('釣りアップグレード', 2, '精密組立台', {'釣り竿': 1, '鋼板'
   cat='tool', note='アンドロイドが釣りをできる。釣り竿のエンチャントを付けられる')
 R('農業アップグレード', 2, '精密組立台', {'ダイヤモンドのクワ': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,
   cat='tool', note='アンドロイドが土を耕して種・苗を植え、骨粉を与えられる')
+
+# 0.20.0 ガラスの階段（一覧の番号がずれないよう、最後に足す）
+from building_variants import GLASS_BASES as _GLASS_BASES, GLASS_SHAPES as _GLASS_SHAPES
+_glass_shaped = {}
+_variant_recipes(R, _glass_shaped, lambda base: RECIPES[base]['stage'], _GLASS_BASES, _GLASS_SHAPES)
+for _name, _shape in _glass_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape

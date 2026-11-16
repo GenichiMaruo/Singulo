@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "singulo:block/white_glass_panel",
+    "top": "singulo:block/white_glass_panel",
+    "side": "singulo:block/white_glass_panel"
+  },
+  "render_type": "minecraft:translucent"
+}

@@ -600,7 +600,7 @@ def textures(tb, save_plain):
         front = console_front(on)
         save(front, tb / f'reactor_console_front_{tag}.png')
         save_plain(glow_layer(front, CONSOLE_SCREEN), tb / f'reactor_console_front_{tag}_glow.png')
-        save(lab_reactor_core(on), tb / f'reactor_core_{tag}.png')
+        save(lab_reactor_core(on), tb / f'lab_reactor_core_{tag}.png')
         save(power_conduit(on), tb / f'power_conduit_{tag}.png')
     save(pressure_hull(), tb / 'pressure_hull.png')
     save(welded_hatch(), tb / 'welded_hatch.png')
