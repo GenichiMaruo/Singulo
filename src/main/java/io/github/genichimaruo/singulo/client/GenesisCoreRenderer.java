@@ -204,7 +204,7 @@ public class GenesisCoreRenderer implements BlockEntityRenderer<GenesisCoreBlock
         if (b < 50) {
             float f = b / 50F;
             at(pose, Y, () -> {
-                FxDraw.billboard(pose, vc, camera, 3 + b * 1.6F, 0xFFFFFF, (int) (255 * (1 - f)));
+                FxDraw.billboard(pose, vc, camera, 3 + b * 1.6F, 0xFFFFFF, FxSettings.flash((int) (255 * (1 - f))));
                 FxDraw.ring(pose.last(), vc, b * 0.7F, b * 0.7F + 0.8F + b * 0.05F, PALE, (int) (230 * (1 - f)), 0);
                 pose.mulPose(Axis.XP.rotationDegrees(90));
                 FxDraw.ring(pose.last(), vc, b * 0.5F, b * 0.5F + 0.6F, GOLD, (int) (160 * (1 - f)), 0);

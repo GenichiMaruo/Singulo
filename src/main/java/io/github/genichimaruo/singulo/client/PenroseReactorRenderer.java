@@ -154,8 +154,8 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             // 発射の閃光
             if (k < 0.2F) {
                 float m = 1 - k / 0.2F;
-                billboardAt(pose, glow, camera, from, 0.4F + 1.4F * m, 0xFFFFFF, (int) (255 * m));
-                billboardAt(pose, glow, camera, from, 0.8F + 2.6F * m, 0xFFB060, (int) (170 * m));
+                billboardAt(pose, glow, camera, from, 0.4F + 1.4F * m, 0xFFFFFF, FxSettings.flash((int) (255 * m)));
+                billboardAt(pose, glow, camera, from, 0.8F + 2.6F * m, 0xFFB060, FxSettings.flash((int) (170 * m)));
                 FxDraw.beam(pose.last(), glow, from, from.scale(1 - 0.35 * (1 - m)), 0.25F * m, 0xFFE8C0, (int) (200 * m));
             }
             if (k <= 1) {
@@ -192,8 +192,8 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
                 // 飲み込み: 地平線の縁の閃光と、円盤の面に広がる衝撃波の輪
                 float g = Mth.clamp((k - 0.88F) / (0.12F + PELLET_AFTERGLOW), 0, 1);
                 Vec3 edge = pelletPos(from, 1, f.twist(), horizon).normalize().scale(seen * 1.3);
-                billboardAt(pose, glow, camera, edge, 0.6F + 2.2F * g, 0xFFF0D8, (int) (240 * (1 - g)));
-                billboardAt(pose, glow, camera, edge, 1.2F + 3.5F * g, 0xFF8040, (int) (120 * (1 - g)));
+                billboardAt(pose, glow, camera, edge, 0.6F + 2.2F * g, 0xFFF0D8, FxSettings.flash((int) (240 * (1 - g))));
+                billboardAt(pose, glow, camera, edge, 1.2F + 3.5F * g, 0xFF8040, FxSettings.flash((int) (120 * (1 - g))));
                 pose.pushPose();
                 pose.mulPose(Axis.XP.rotation(tilt));
                 float r = seen * 1.4F + 3.2F * g;

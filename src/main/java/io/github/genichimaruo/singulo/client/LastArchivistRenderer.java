@@ -896,8 +896,8 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
                 // 弾けた瞬間: 部屋じゅうを白く染める閃光
                 if (k < 0.35F) {
                     float f = 1 - k / 0.35F;
-                    FxDraw.billboard(pose, glow, camera, 40, 0xFFFFFF, (int) (170 * f));
-                    FxDraw.billboard(pose, glow, camera, 12, GOLD, (int) (220 * f));
+                    FxDraw.billboard(pose, glow, camera, 40, 0xFFFFFF, FxSettings.flash((int) (170 * f)));
+                    FxDraw.billboard(pose, glow, camera, 12, GOLD, FxSettings.flash((int) (220 * f)));
                 }
                 for (int i = -3; i <= 3; i++) {
                     float y = r * i / 4F;
