@@ -6,6 +6,7 @@
 - Restored salvage is listed before the matching degraded items, awakening cores follow the order the bosses are fought, and the Last Archivist's chapters, record and halo follow them.
 - The Unstable Wormhole Mouth and boss spawn eggs no longer appear in the creative inventory. Boss spawn eggs are available only through commands.
 - The Body Capsule recipe now follows its shape: a lab frame canopy with the blueprint, glass around a white ceramic body, and a lab frame base. Its inventory icon fills the slot.
+- Kitchen chests and barrels in the Underground Android Laboratory cafeteria now also hold printed space food and vending machine and coffee maker drinks.
 - Bosses ignore harmful effects. Both Instant Damage and Instant Health heal them, whether splashed, lingering, on arrows or applied by command.
 
 - Registry IDs are made consistent ahead of 1.0.0. Existing worlds keep their items, placed blocks, machine contents and selected recipes; old IDs load as the new ones. Datapacks, scripts and commands that name the old IDs need updating:
@@ -26,6 +27,7 @@
 - 復元品のあとに対応する劣化品を同じ順に並べ、覚醒の核はボスを倒す順に、そのあとに最後の記録者の断章・終焉の記録・光輪を置きました。
 - 不安定なワームホールの口とボスのスポーンエッグをクリエイティブタブから外しました。ボスのスポーンエッグはコマンドでのみ入手できます。
 - 素体カプセルのレシピを形に合わせ、構造材の天蓋と設計図、ガラスに囲まれた白いセラミックの素体、構造材の台座にしました。持ち物欄のアイコンも欄いっぱいの大きさにしました。
+- 地下アンドロイド研究所の食堂の厨房の箱と樽に、フードプリンターの印刷食品と、自動販売機・コーヒーメーカーの飲み物も入るようにしました。
 - ボスは悪い効果を受けなくなりました。負傷と即時回復のポーションは、投げても、残留でも、矢でも、コマンドでも、どちらもボスを回復します。
 
 - 1.0.0 に向けて登録 ID の表記揺れをそろえました。既存のワールドのアイテム・置いたブロック・機械の中身・選んでいたレシピはそのまま引き継がれ、古い ID は新しい ID として読み込まれます。古い ID を書いたデータパック・スクリプト・コマンドは書き換えが必要です（変更の一覧は英語の項目を参照）。

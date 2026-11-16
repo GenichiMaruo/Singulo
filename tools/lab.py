@@ -1186,8 +1186,11 @@ def chest_loot(write_json, data, mid):
         v('leather_boots', 1, 1, 2), v('leather_chestplate', 1, 1, 1), v('white_wool', 1, 2, 3), v('string', 1, 3, 3),
         v('paper', 1, 4, 3), v('book', 1, 1, 2), v('cookie', 1, 3, 3), v('white_candle', 1, 2, 2), v('stick', 1, 3, 2),
         v('gold_nugget', 1, 3, 2), v('name_tag', 1, 1, 1)])
-    # 厨房・食堂: 食料と調理の道具
-    table('lab_kitchen', None, None, (6, 9), [
+    # 厨房・食堂: 食料と調理の道具。研究所の宇宙食（フードプリンターの印刷食品）と、自販機・コーヒーメーカーの飲み物も残っている
+    table('lab_kitchen', (1, 3), [
+        entry('栄養バー', 1, 4, 6), entry('積層ステーキ', 1, 3, 5), entry('らせんパスタ', 1, 2, 4), entry('ハニカムケーキ', 1, 2, 3),
+        entry('フルーツゼリーキューブ', 1, 3, 3), entry('缶ソーダ', 1, 3, 4), entry('スポーツドリンク', 1, 3, 4), entry('コーヒー', 1, 2, 3),
+        entry('エナジードリンク', 1, 1, 1)], (6, 9), [
         v('bread', 2, 6, 6), v('wheat', 3, 8, 4), v('sugar', 2, 6, 4), v('egg', 1, 4, 4), v('apple', 2, 5, 4), v('carrot', 2, 5, 4),
         v('potato', 2, 6, 4), v('baked_potato', 1, 4, 3), v('beetroot', 2, 5, 3), v('cookie', 2, 8, 4), v('pumpkin_pie', 1, 2, 2),
         v('honey_bottle', 1, 2, 2), v('bowl', 1, 4, 3), v('mushroom_stew', 1, 1, 1), v('glass_bottle', 1, 3, 2), v('milk_bucket', 1, 1, 1),
