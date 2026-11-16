@@ -299,11 +299,13 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     }
 
     /**
-     * この人がステーションを使えるか。許可証にだれかが登録されていれば、持ち主と登録された人だけ。なければだれでも。
+     * この人がステーションを使えるか。許可証にだれかが登録されていれば、持ち主と登録された人と、持ち主と同じチームの人だけ。
+     * なければだれでも。
      */
     public boolean mayOperate(Player player) {
         java.util.List<UUID> members = members();
-        return members.isEmpty() || owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID());
+        return members.isEmpty() || owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID())
+                || io.github.genichimaruo.singulo.item.TeamSharing.sameTeam(level, owner, player);
     }
 
     /** 追従する人に選べる、持ち主のほかの登録者（許可証の順）。 */

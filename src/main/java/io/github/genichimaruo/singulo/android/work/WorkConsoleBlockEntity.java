@@ -351,10 +351,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return outboxHandler;
     }
 
-    /** 許可証にだれかが登録されていれば、持ち主と登録した人だけ。なければだれでも。 */
+    /** 許可証にだれかが登録されていれば、持ち主と登録した人と、持ち主と同じチームの人だけ。なければだれでも。 */
     public boolean mayOperate(Player player) {
         List<ShieldPermitItem.Member> members = ShieldPermitItem.members(permit.getStackInSlot(0));
-        if (members.isEmpty() || owner == null || owner.equals(player.getUUID())) {
+        if (members.isEmpty() || owner == null || owner.equals(player.getUUID()) || io.github.genichimaruo.singulo.item.TeamSharing.sameTeam(level, owner, player)) {
             return true;
         }
         for (ShieldPermitItem.Member m : members) {

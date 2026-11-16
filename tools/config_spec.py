@@ -135,6 +135,9 @@ SERVER = [
     ('performance', 'pullCheckIntervalTicks', '5', '1〜100（tick）', '引力判定の間隔'),
     ('performance', 'maxAnchorChunkRadius', '5', '0〜16（チャンク）', 'ワールドライン・アンカーの最大半径'),
     ('performance', 'maxAnchorsPerPlayer', '8', '0〜1000', '1人が同時に動かせるワールドライン・アンカー（小・上位の合計）の数。0で無制限。上限を超えたアンカーは置けるが動かない（先に動き出したものが優先）。この版より前に置いたアンカーは、置き直すまで数えない'),
+
+    # 共有
+    ('sharing', 'shareWithTeam', 'true', 'true / false', '持ち主と同じバニラのチーム（/team）の人も、アンドロイド・ドローン・作業指令台を使える（許可証で人を絞っていても、チームの人は登録しなくてよい）。ドローン発着ポートは持ち主とチームの人だけ'),
 ]
 
 CLIENT = [

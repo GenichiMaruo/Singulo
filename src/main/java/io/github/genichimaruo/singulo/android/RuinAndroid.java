@@ -2048,9 +2048,10 @@ public abstract class RuinAndroid extends Monster {
         this.leader = leader;
     }
 
-    /** この人が画面を開けるか（持ち主か、許可証に登録された人。持ち主がいなければだれでも）。 */
+    /** この人が画面を開けるか（持ち主か、許可証に登録された人か、持ち主と同じチームの人。持ち主がいなければだれでも）。 */
     public boolean mayOperate(Player player) {
-        return owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID());
+        return owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID())
+                || io.github.genichimaruo.singulo.item.TeamSharing.sameTeam(level(), owner, player);
     }
 
     /**
