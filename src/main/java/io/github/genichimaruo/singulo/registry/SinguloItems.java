@@ -582,6 +582,10 @@ public final class SinguloItems {
         for (BlockDef def : GeneratedContent.BLOCKS) {
             block(SinguloBlocks.SIMPLE.get(def.id()), def.stage());
         }
+        // 建材の階段・ハーフブロック・塀
+        for (GeneratedContent.BlockVariant v : GeneratedContent.BLOCK_VARIANTS) {
+            block(SinguloBlocks.VARIANTS.get(v.id()), v.stage());
+        }
         // 素材・部品・回収物（生成表から）
         for (ItemDef def : GeneratedContent.ITEMS) {
             DeferredItem<Item> item = ITEMS.register(def.id(), () -> create(def));

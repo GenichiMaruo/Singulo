@@ -59,7 +59,7 @@ def mid(name):
 
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
-BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
+BLOCK_KINDS = ('variant', 'block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
                'boss_block', 'genesis', 'lab')
 # World hazards have a block registration but no obtainable BlockItem.
 ITEMLESS_BLOCKS = {'strangelet'}
@@ -1753,7 +1753,7 @@ def models():
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
-        if kind in ('gravity', 'nature', 'boss_block', 'genesis', 'lab'):
+        if kind in ('gravity', 'nature', 'boss_block', 'genesis', 'lab', 'variant'):
             continue                                           # 重力パネル・受電器・自然物・ボス部屋の仕掛けは blocks_extra・blocks_extra4・blocks_extra5 が作る
         if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'deco', 'deco_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
@@ -3408,7 +3408,8 @@ def tags():
     write_json(DATA / 'tags' / 'item' / 'helium_bearing_stone.json', {'values': [
         'minecraft:deepslate', 'minecraft:cobbled_deepslate', 'minecraft:basalt', 'minecraft:smooth_basalt']})
     write_json(DATA / 'tags' / 'block' / 'ruin_blocks.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] in ('ruin_block', 'ruin_glass', 'boss_block')]})
+               {'values': [mid(n) for n, v in MOD.items() if v[2] in ('ruin_block', 'ruin_glass', 'boss_block')
+                           or v[0] in __import__('building_variants').RUIN_VARIANTS]})
     write_json(DATA / 'tags' / 'entity_type' / 'gravity_immune.json', {'values': [
         'minecraft:ender_dragon', 'minecraft:wither', 'minecraft:warden', 'minecraft:elder_guardian',
         'minecraft:enderman', 'minecraft:shulker', mid_entity('horizon_warden'), mid_entity('gravity_remnant')]})
@@ -3439,7 +3440,7 @@ def tags():
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                   or v[0].startswith('pristine_'))]})
+                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
@@ -3469,6 +3470,10 @@ def tags():
     blocks_extra6.loot(write_json, DATA)
     import lab_blocks
     lab_blocks.loot(write_json, DATA)
+    import building_variants
+    building_variants.loot(write_json, DATA)
+    building_variants.stonecutting(write_json, DATA)
+    building_variants.tags(write_json, DATA)
     boss_loot()
 
 
@@ -4008,7 +4013,8 @@ def tab_order():
     explicit = [iid for _, ids in TAB_GROUPS if ids for iid in ids]
     if len(explicit) != len(set(explicit)):
         raise ValueError('Duplicate creative-tab classification')
-    placed = set(explicit)
+    import building_variants
+    placed = set(explicit) | set(building_variants.VARIANTS)
     data_originals = [n for n in EXPLORE if EXPLORE[n]['kind'] == 'data']
     degraded = list(RESTORED.values())
     salvage_names = data_originals + [n for n in MOD if MOD[n][0] in ('crystal_memory', 'sealed_record')] \
@@ -4034,7 +4040,11 @@ def tab_order():
     out = []
     for title, ids in TAB_GROUPS:
         out += ids if ids is not None else materials if title == '中間素材' else salvage
-    return out
+    # 建材の階段・ハーフブロック・塀は、元の建材のすぐ後ろ
+    after = {}
+    for variant, (base, _shape) in building_variants.VARIANTS.items():
+        after.setdefault(base, []).append(variant)
+    return [i for iid in out for i in [iid] + after.get(iid, [])]
 
 
 def java_content():
@@ -4065,6 +4075,8 @@ def java_content():
     lines.append('    /** kind: item / planned / uses / catalyst。maxUses は使用回数（触媒は寿命tick）。 */')
     lines.append('    public record ItemDef(String id, String kind, int stage, int maxUses) {}')
     lines.append('    public record BlockDef(String id, int stage) {}')
+    lines.append('    /** 建材の変種（shape: stairs / slab / wall）。元の建材の性質を写して登録する。 */')
+    lines.append('    public record BlockVariant(String id, String base, String shape, int stage) {}')
     lines.append('    public record FluidDef(String id, int stage, int color, boolean gas) {}')
     lines.append('')
     lines.append('    public static final List<ItemDef> ITEMS = List.of(')
@@ -4073,6 +4085,12 @@ def java_content():
     lines.append('')
     lines.append('    public static final List<BlockDef> BLOCKS = List.of(')
     lines.append(',\n'.join(f'            new BlockDef("{i}", {s})' for i, s in blocks))
+    lines.append('    );')
+    lines.append('')
+    import building_variants
+    lines.append('    public static final List<BlockVariant> BLOCK_VARIANTS = List.of(')
+    lines.append(',\n'.join(f'            new BlockVariant("{v}", "{b}", "{sh}", {stage_of(next(n for n in MOD if MOD[n][0] == v))})'
+                             for v, (b, sh) in building_variants.VARIANTS.items()))
     lines.append('    );')
     lines.append('')
     lines.append('    /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */')
@@ -4108,7 +4126,7 @@ def java_content():
     lines.append('    );')
     lines.append('')
     machines = [(iid, stage_of(n)) for n, (iid, _, kind) in MOD.items()
-                if kind in ('machine', 'part_block', 'part_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature')]
+                if kind in ('machine', 'part_block', 'part_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature', 'variant')]
     lines.append('    /** 実装済み装置ブロックの段階（ツールチップ用）。 */')
     lines.append('    public static final Map<String, Integer> BLOCK_STAGES = Map.ofEntries(')
     lines.append(',\n'.join(f'            Map.entry("{i}", {s})' for i, s in machines))
@@ -4405,6 +4423,8 @@ def main():
     food_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     import cover_content
     cover_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import building_variants
+    building_variants.models(write_json, ASSETS)
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

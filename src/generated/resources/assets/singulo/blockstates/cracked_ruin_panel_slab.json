@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "singulo:block/cracked_ruin_panel_slab"
+    },
+    "type=top": {
+      "model": "singulo:block/cracked_ruin_panel_slab_top"
+    },
+    "type=double": {
+      "model": "singulo:block/cracked_ruin_panel"
+    }
+  }
+}

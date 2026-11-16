@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:white_panel"
+    }
+  },
+  "result": {
+    "id": "singulo:white_panel_wall",
+    "count": 6
+  }
+}

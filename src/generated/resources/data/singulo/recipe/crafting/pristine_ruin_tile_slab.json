@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:pristine_ruin_tiles"
+    }
+  },
+  "result": {
+    "id": "singulo:pristine_ruin_tile_slab",
+    "count": 6
+  }
+}

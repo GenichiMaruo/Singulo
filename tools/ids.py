@@ -814,3 +814,7 @@ MOD.update(_FOOD_IDS)
 VANILLA.update(_FOOD_VANILLA)
 from cover_content import IDS as _COVER_IDS
 MOD.update(_COVER_IDS)
+
+# 0.20.0 建材の階段・ハーフブロック・塀
+from building_variants import IDS as _VARIANT_IDS
+MOD.update(_VARIANT_IDS)

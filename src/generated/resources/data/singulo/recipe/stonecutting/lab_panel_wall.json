@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:lab_panel"
+  },
+  "result": {
+    "id": "singulo:lab_panel_wall",
+    "count": 1
+  }
+}

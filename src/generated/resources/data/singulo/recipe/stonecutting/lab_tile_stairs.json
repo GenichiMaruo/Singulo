@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:lab_tiles"
+  },
+  "result": {
+    "id": "singulo:lab_tile_stairs",
+    "count": 1
+  }
+}

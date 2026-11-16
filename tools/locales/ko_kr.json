@@ -11544,8 +11544,8 @@
     "translation": "사용처: 사방별 검은 강화 유리"
   },
   "uses.singulo.black_reinforced_panel": {
-    "source": "Used in: High-Gravity Panel",
-    "translation": "사용처: 고중력 패널"
+    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall",
+    "translation": "사용처: 고중력 패널, 검은 강화 패널 계단, 검은 강화 패널 반 블록, 검은 강화 패널 담장"
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
@@ -11900,8 +11900,8 @@
     "translation": "사용처: 동력 도관, 소체 캡슐"
   },
   "uses.singulo.lab_panel": {
-    "source": "Used in: Lined Lab Panel, Lab Floor Tiles",
-    "translation": "사용처: 연구소 띠 패널, 연구소 바닥 타일"
+    "source": "Used in: Lined Lab Panel, Lab Floor Tiles, Lab Panel Stairs, Lab Panel Slab, Lab Panel Wall",
+    "translation": "사용처: 연구소 띠 패널, 연구소 바닥 타일, 연구소 흰 패널 계단, 연구소 흰 패널 반 블록, 연구소 흰 패널 담장"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -11972,8 +11972,8 @@
     "translation": "사용처: 축퇴 압축로 앤빌, 축퇴 전구체"
   },
   "uses.singulo.pristine_ruin_panel": {
-    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip",
-    "translation": "사용처: 온전한 폐허 타일, 온전한 폐허 기둥, 온전한 폐허 도광판"
+    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip, Pristine Ruin Panel Stairs, Pristine Ruin Panel Slab and 1 more",
+    "translation": "사용처: 온전한 폐허 타일, 온전한 폐허 기둥, 온전한 폐허 도광판, 온전한 폐허 패널 계단, 온전한 폐허 패널 반 블록 외 1개"
   },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
@@ -12004,8 +12004,8 @@
     "translation": "사용처: 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색)"
   },
   "uses.singulo.ruin_panel": {
-    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
-    "translation": "사용처: 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널, 띠 무늬 폐허 패널 외 1개"
+    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 4 more",
+    "translation": "사용처: 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널, 띠 무늬 폐허 패널 외 4개"
   },
   "uses.singulo.neutrino_scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
@@ -12148,8 +12148,8 @@
     "translation": "사용처: 사방별 흰색 유리 패널"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
-    "translation": "사용처: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널, 무중력 블록"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
+    "translation": "사용처: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널, 무중력 블록, 흰색 패널 계단 외 2개"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",
@@ -14778,5 +14778,385 @@
   "message.singulo.work_link.endpoint_result": {
     "source": "Endpoint link: %s",
     "translation": "엔드포인트 연결: %s"
+  },
+  "block.singulo.white_panel_stairs": {
+    "source": "White Panel Stairs",
+    "translation": "흰색 패널 계단"
+  },
+  "block.singulo.white_panel_slab": {
+    "source": "White Panel Slab",
+    "translation": "흰색 패널 반 블록"
+  },
+  "block.singulo.white_panel_wall": {
+    "source": "White Panel Wall",
+    "translation": "흰색 패널 담장"
+  },
+  "block.singulo.black_reinforced_panel_stairs": {
+    "source": "Black Reinforced Panel Stairs",
+    "translation": "검은 강화 패널 계단"
+  },
+  "block.singulo.black_reinforced_panel_slab": {
+    "source": "Black Reinforced Panel Slab",
+    "translation": "검은 강화 패널 반 블록"
+  },
+  "block.singulo.black_reinforced_panel_wall": {
+    "source": "Black Reinforced Panel Wall",
+    "translation": "검은 강화 패널 담장"
+  },
+  "block.singulo.ruin_panel_stairs": {
+    "source": "Ruin Panel Stairs",
+    "translation": "폐허 패널 계단"
+  },
+  "block.singulo.ruin_panel_slab": {
+    "source": "Ruin Panel Slab",
+    "translation": "폐허 패널 반 블록"
+  },
+  "block.singulo.ruin_panel_wall": {
+    "source": "Ruin Panel Wall",
+    "translation": "폐허 패널 담장"
+  },
+  "block.singulo.cracked_ruin_panel_stairs": {
+    "source": "Cracked Ruin Panel Stairs",
+    "translation": "깨진 폐허 패널 계단"
+  },
+  "block.singulo.cracked_ruin_panel_slab": {
+    "source": "Cracked Ruin Panel Slab",
+    "translation": "깨진 폐허 패널 반 블록"
+  },
+  "block.singulo.cracked_ruin_panel_wall": {
+    "source": "Cracked Ruin Panel Wall",
+    "translation": "깨진 폐허 패널 담장"
+  },
+  "block.singulo.mossy_ruin_panel_stairs": {
+    "source": "Mossy Ruin Panel Stairs",
+    "translation": "이끼 낀 폐허 패널 계단"
+  },
+  "block.singulo.mossy_ruin_panel_slab": {
+    "source": "Mossy Ruin Panel Slab",
+    "translation": "이끼 낀 폐허 패널 반 블록"
+  },
+  "block.singulo.mossy_ruin_panel_wall": {
+    "source": "Mossy Ruin Panel Wall",
+    "translation": "이끼 낀 폐허 패널 담장"
+  },
+  "block.singulo.tiled_ruin_panel_stairs": {
+    "source": "Tiled Ruin Panel Stairs",
+    "translation": "타일 폐허 패널 계단"
+  },
+  "block.singulo.tiled_ruin_panel_slab": {
+    "source": "Tiled Ruin Panel Slab",
+    "translation": "타일 폐허 패널 반 블록"
+  },
+  "block.singulo.tiled_ruin_panel_wall": {
+    "source": "Tiled Ruin Panel Wall",
+    "translation": "타일 폐허 패널 담장"
+  },
+  "block.singulo.pristine_ruin_panel_stairs": {
+    "source": "Pristine Ruin Panel Stairs",
+    "translation": "온전한 폐허 패널 계단"
+  },
+  "block.singulo.pristine_ruin_panel_slab": {
+    "source": "Pristine Ruin Panel Slab",
+    "translation": "온전한 폐허 패널 반 블록"
+  },
+  "block.singulo.pristine_ruin_panel_wall": {
+    "source": "Pristine Ruin Panel Wall",
+    "translation": "온전한 폐허 패널 담장"
+  },
+  "block.singulo.pristine_ruin_tile_stairs": {
+    "source": "Pristine Ruin Tile Stairs",
+    "translation": "온전한 폐허 타일 계단"
+  },
+  "block.singulo.pristine_ruin_tile_slab": {
+    "source": "Pristine Ruin Tile Slab",
+    "translation": "온전한 폐허 타일 반 블록"
+  },
+  "block.singulo.pristine_ruin_tile_wall": {
+    "source": "Pristine Ruin Tile Wall",
+    "translation": "온전한 폐허 타일 담장"
+  },
+  "block.singulo.lab_panel_stairs": {
+    "source": "Lab Panel Stairs",
+    "translation": "연구소 흰 패널 계단"
+  },
+  "block.singulo.lab_panel_slab": {
+    "source": "Lab Panel Slab",
+    "translation": "연구소 흰 패널 반 블록"
+  },
+  "block.singulo.lab_panel_wall": {
+    "source": "Lab Panel Wall",
+    "translation": "연구소 흰 패널 담장"
+  },
+  "block.singulo.lab_tile_stairs": {
+    "source": "Lab Floor Tile Stairs",
+    "translation": "연구소 바닥 타일 계단"
+  },
+  "block.singulo.lab_tile_slab": {
+    "source": "Lab Floor Tile Slab",
+    "translation": "연구소 바닥 타일 반 블록"
+  },
+  "block.singulo.lab_tile_wall": {
+    "source": "Lab Floor Tile Wall",
+    "translation": "연구소 바닥 타일 담장"
+  },
+  "uses.singulo.cracked_ruin_panel": {
+    "source": "Used in: Cracked Ruin Panel Stairs, Cracked Ruin Panel Slab, Cracked Ruin Panel Wall",
+    "translation": "사용처: 깨진 폐허 패널 계단, 깨진 폐허 패널 반 블록, 깨진 폐허 패널 담장"
+  },
+  "uses.singulo.mossy_ruin_panel": {
+    "source": "Used in: Mossy Ruin Panel Stairs, Mossy Ruin Panel Slab, Mossy Ruin Panel Wall",
+    "translation": "사용처: 이끼 낀 폐허 패널 계단, 이끼 낀 폐허 패널 반 블록, 이끼 낀 폐허 패널 담장"
+  },
+  "uses.singulo.tiled_ruin_panel": {
+    "source": "Used in: Tiled Ruin Panel Stairs, Tiled Ruin Panel Slab, Tiled Ruin Panel Wall",
+    "translation": "사용처: 타일 폐허 패널 계단, 타일 폐허 패널 반 블록, 타일 폐허 패널 담장"
+  },
+  "uses.singulo.pristine_ruin_tiles": {
+    "source": "Used in: Pristine Ruin Tile Stairs, Pristine Ruin Tile Slab, Pristine Ruin Tile Wall",
+    "translation": "사용처: 온전한 폐허 타일 계단, 온전한 폐허 타일 반 블록, 온전한 폐허 타일 담장"
+  },
+  "uses.singulo.lab_tiles": {
+    "source": "Used in: Lab Floor Tile Stairs, Lab Floor Tile Slab, Lab Floor Tile Wall",
+    "translation": "사용처: 연구소 바닥 타일 계단, 연구소 바닥 타일 반 블록, 연구소 바닥 타일 담장"
+  },
+  "desc.singulo.white_panel_stairs": {
+    "source": "Stairs made from White Panel.",
+    "translation": "흰색 패널 재질의 계단입니다."
+  },
+  "howto.singulo.white_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.white_panel_slab": {
+    "source": "A half-height White Panel. Two make a full block.",
+    "translation": "높이가 절반인 흰색 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.white_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.white_panel_wall": {
+    "source": "A White Panel wall that connects like a fence.",
+    "translation": "흰색 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.white_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.black_reinforced_panel_stairs": {
+    "source": "Stairs made from Black Reinforced Panel.",
+    "translation": "검은 강화 패널 재질의 계단입니다."
+  },
+  "howto.singulo.black_reinforced_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.black_reinforced_panel_slab": {
+    "source": "A half-height Black Reinforced Panel. Two make a full block.",
+    "translation": "높이가 절반인 검은 강화 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.black_reinforced_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.black_reinforced_panel_wall": {
+    "source": "A Black Reinforced Panel wall that connects like a fence.",
+    "translation": "검은 강화 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.black_reinforced_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.ruin_panel_stairs": {
+    "source": "Stairs made from Ruin Panel.",
+    "translation": "폐허 패널 재질의 계단입니다."
+  },
+  "howto.singulo.ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.ruin_panel_slab": {
+    "source": "A half-height Ruin Panel. Two make a full block.",
+    "translation": "높이가 절반인 폐허 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.ruin_panel_wall": {
+    "source": "A Ruin Panel wall that connects like a fence.",
+    "translation": "폐허 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.cracked_ruin_panel_stairs": {
+    "source": "Stairs made from Cracked Ruin Panel.",
+    "translation": "깨진 폐허 패널 재질의 계단입니다."
+  },
+  "howto.singulo.cracked_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.cracked_ruin_panel_slab": {
+    "source": "A half-height Cracked Ruin Panel. Two make a full block.",
+    "translation": "높이가 절반인 깨진 폐허 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.cracked_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.cracked_ruin_panel_wall": {
+    "source": "A Cracked Ruin Panel wall that connects like a fence.",
+    "translation": "깨진 폐허 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.cracked_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.mossy_ruin_panel_stairs": {
+    "source": "Stairs made from Mossy Ruin Panel.",
+    "translation": "이끼 낀 폐허 패널 재질의 계단입니다."
+  },
+  "howto.singulo.mossy_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.mossy_ruin_panel_slab": {
+    "source": "A half-height Mossy Ruin Panel. Two make a full block.",
+    "translation": "높이가 절반인 이끼 낀 폐허 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.mossy_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.mossy_ruin_panel_wall": {
+    "source": "A Mossy Ruin Panel wall that connects like a fence.",
+    "translation": "이끼 낀 폐허 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.mossy_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.tiled_ruin_panel_stairs": {
+    "source": "Stairs made from Tiled Ruin Panel.",
+    "translation": "타일 폐허 패널 재질의 계단입니다."
+  },
+  "howto.singulo.tiled_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.tiled_ruin_panel_slab": {
+    "source": "A half-height Tiled Ruin Panel. Two make a full block.",
+    "translation": "높이가 절반인 타일 폐허 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.tiled_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.tiled_ruin_panel_wall": {
+    "source": "A Tiled Ruin Panel wall that connects like a fence.",
+    "translation": "타일 폐허 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.tiled_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.pristine_ruin_panel_stairs": {
+    "source": "Stairs made from Pristine Ruin Panel.",
+    "translation": "온전한 폐허 패널 재질의 계단입니다."
+  },
+  "howto.singulo.pristine_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.pristine_ruin_panel_slab": {
+    "source": "A half-height Pristine Ruin Panel. Two make a full block.",
+    "translation": "높이가 절반인 온전한 폐허 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.pristine_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.pristine_ruin_panel_wall": {
+    "source": "A Pristine Ruin Panel wall that connects like a fence.",
+    "translation": "온전한 폐허 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.pristine_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.pristine_ruin_tile_stairs": {
+    "source": "Stairs made from Pristine Ruin Tile.",
+    "translation": "온전한 폐허 타일 재질의 계단입니다."
+  },
+  "howto.singulo.pristine_ruin_tile_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.pristine_ruin_tile_slab": {
+    "source": "A half-height Pristine Ruin Tile. Two make a full block.",
+    "translation": "높이가 절반인 온전한 폐허 타일입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.pristine_ruin_tile_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.pristine_ruin_tile_wall": {
+    "source": "A Pristine Ruin Tile wall that connects like a fence.",
+    "translation": "온전한 폐허 타일 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.pristine_ruin_tile_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.lab_panel_stairs": {
+    "source": "Stairs made from Lab Panel.",
+    "translation": "연구소 흰 패널 재질의 계단입니다."
+  },
+  "howto.singulo.lab_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.lab_panel_slab": {
+    "source": "A half-height Lab Panel. Two make a full block.",
+    "translation": "높이가 절반인 연구소 흰 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.lab_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.lab_panel_wall": {
+    "source": "A Lab Panel wall that connects like a fence.",
+    "translation": "연구소 흰 패널 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.lab_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.lab_tile_stairs": {
+    "source": "Stairs made from Lab Floor Tile.",
+    "translation": "연구소 바닥 타일 재질의 계단입니다."
+  },
+  "howto.singulo.lab_tile_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.lab_tile_slab": {
+    "source": "A half-height Lab Floor Tile. Two make a full block.",
+    "translation": "높이가 절반인 연구소 바닥 타일입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.lab_tile_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.lab_tile_wall": {
+    "source": "A Lab Floor Tile wall that connects like a fence.",
+    "translation": "연구소 바닥 타일 재질의 담장으로, 울타리처럼 옆과 이어집니다."
+  },
+  "howto.singulo.lab_tile_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   }
 }

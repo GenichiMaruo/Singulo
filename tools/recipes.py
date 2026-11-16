@@ -1062,3 +1062,13 @@ for _name, _shape in _cover_shaped.items():
     assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
     SHAPED[_name] = _shape
     RECIPES[_name]['shape'] = _shape
+
+# 0.20.0 建材の階段・ハーフブロック・塀（一覧の番号がずれないよう、最後に足す）
+from building_variants import recipes as _variant_recipes
+_variant_shaped = {}
+_variant_recipes(R, _variant_shaped, lambda base: RECIPES[base]['stage'])
+for _name, _shape in _variant_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape

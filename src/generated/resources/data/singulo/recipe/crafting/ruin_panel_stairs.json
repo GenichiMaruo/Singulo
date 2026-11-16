@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:ruin_panel"
+    }
+  },
+  "result": {
+    "id": "singulo:ruin_panel_stairs",
+    "count": 4
+  }
+}

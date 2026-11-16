@@ -260,6 +260,8 @@ Without a chosen recipe, the Precision Assembler starts crafting when the kinds 
 
 Ruin and laboratory chests hold **blueprints**: Ruin Panel, Pristine Ruin Material, Ruin Glass, Lighting, Laboratory Material, Laboratory Furnishing and Rayleigh Sky Panel. Arrange a blueprint and materials in its shape on a crafting table to make building blocks; the blueprint stays in the grid. Tooltips and JEI show where each is found and its recipes. Lab doors and the Lab Rayleigh Sky Panels in lab ceilings cannot be collected or crafted.
 
+White Panels, Black Reinforced Panels, Ruin Panels (including cracked, mossy and tiled), Pristine Ruin Panels and Tiles, and Lab Panels and Floor Tiles have **stairs, slabs and walls**. Craft them in the vanilla shapes, or one at a time on a stonecutter; no blueprint is needed. Ruins and laboratories generated from 0.20.0 on use them.
+
 ## Sky and gravity panels
 
 A **Panel Receiver** powers connected low-gravity, high-gravity and zero-gravity panels and crafted Rayleigh Sky Panels. The nearest receivers pay first, and other receivers cover what they cannot. One receiver can handle thousands of panels.

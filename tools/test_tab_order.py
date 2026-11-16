@@ -3,6 +3,7 @@ import re
 import unittest
 from unittest.mock import patch
 
+import building_variants
 import gen_data as data
 
 
@@ -30,7 +31,9 @@ class CreativeTabOrderTests(unittest.TestCase):
         self.assertEqual(indices, list(range(indices[0], indices[-1] + 1)))
 
     def span(self, *titles):
+        # 建材の階段・ハーフブロック・塀は、元の建材と同じまとまりに入る
         ids = [i for t in titles for i in self.groups[t]]
+        ids += [v for v, (base, _shape) in building_variants.VARIANTS.items() if base in ids]
         self.contiguous(ids)
         return ids
 
@@ -119,6 +122,11 @@ class CreativeTabOrderTests(unittest.TestCase):
         self.assertEqual(set(self.order[alarm + 1:alarm + 8]),
                          {'gravity_field_stabilizer', 'confinement_ring', 'singularity_seed', 'mass_pellet',
                           'jet_collector', 'hawking_collector', 'ergosphere_ring'})
+
+    def test_building_variants_follow_their_base(self):
+        for base in {b for b, _ in building_variants.VARIANTS.values()}:
+            i = self.order.index(base)
+            self.assertEqual([v.rsplit('_', 1)[1] for v in self.order[i + 1:i + 4]], ['stairs', 'slab', 'wall'], base)
 
     def test_new_unclassified_device_stops_generation(self):
         with patch.dict(data.MOD, {'Test device': ('test_device', 'Test device', 'machine')}):

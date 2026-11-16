@@ -694,5 +694,29 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> TIDAL_SPINDLE =
             BLOCKS.register("tidal_spindle", () -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties()));
 
+    /**
+     * 建材の階段・ハーフブロック・塀（GeneratedContent.BLOCK_VARIANTS。tools/building_variants.py）。
+     * 元の建材と同じ硬さ・音・光・掘る道具。元の建材より後に登録するので、ここはクラスの最後に置く。
+     */
+    public static final Map<String, DeferredBlock<Block>> VARIANTS = new LinkedHashMap<>();
+
+    static {
+        for (GeneratedContent.BlockVariant v : GeneratedContent.BLOCK_VARIANTS) {
+            VARIANTS.put(v.id(), BLOCKS.register(v.id(), () -> variant(v)));
+        }
+    }
+
+    private static Block variant(GeneratedContent.BlockVariant v) {
+        Block base = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(Singulo.id(v.base()));
+        // ofFullCopy はドロップ（元の建材の落とす物）まで写すので、バニラの階段と同じ ofLegacyCopy
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.ofLegacyCopy(base);
+        return switch (v.shape()) {
+            case "stairs" -> new net.minecraft.world.level.block.StairBlock(base.defaultBlockState(), properties);
+            case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
+            case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
+            default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());
+        };
+    }
+
     private SinguloBlocks() {}
 }

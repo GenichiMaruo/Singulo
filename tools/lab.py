@@ -29,7 +29,10 @@ REACTOR_CORE = (f'{MODID}:lab_reactor_core', {'powered': 'false'})
 CONDUIT = (f'{MODID}:power_conduit', {'powered': 'false'})
 DOOR = f'{MODID}:lab_door'
 DARK = 'minecraft:polished_deepslate'
-SLAB_TOP = ('minecraft:smooth_quartz_slab', {'type': 'top', 'waterlogged': 'false'})
+# 研究所の白いパネルの階段・ハーフブロック（0.20.0。それまではバニラのクォーツで代用していた）
+PANEL_STAIRS = f'{MODID}:lab_panel_stairs'
+PANEL_SLAB = f'{MODID}:lab_panel_slab'
+SLAB_TOP = (PANEL_SLAB, {'type': 'top', 'waterlogged': 'false'})
 CATWALK = ('minecraft:polished_deepslate_slab', {'type': 'top', 'waterlogged': 'false'})
 STRIPE_Y, STRIPE_K = 'minecraft:yellow_concrete', 'minecraft:black_concrete'
 
@@ -53,7 +56,7 @@ TEST_HUT = f'{MODID}:chests/lab_test_hut'
 
 
 def stairs(facing):
-    return ('minecraft:quartz_stairs', {'facing': facing, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
+    return (PANEL_STAIRS, {'facing': facing, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
 
 
 class Room(Builder):
@@ -442,7 +445,7 @@ def boss_hall():
         for k in range(3):
             xs = ex + sx * k
             for zz in (z0 + 1, z0 + 2):
-                b.set(xs, up + 2 - k, zz, 'minecraft:quartz_stairs',
+                b.set(xs, up + 2 - k, zz, PANEL_STAIRS,
                       {'facing': 'west' if sx > 0 else 'east', 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
                 for yy in range(up, up + 2 - k):
                     b.set(xs, yy, zz, PANEL)
@@ -981,7 +984,7 @@ def solarium():
     # デッキチェア（階段とハーフ）とパラソル（柵と旗の代わりの羊毛）
     for x0 in (5, 9):
         b.put(x0, 1, 11, *stairs('north'))                          # 背もたれ
-        b.put(x0, 1, 12, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})   # 座面
+        b.put(x0, 1, 12, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})   # 座面
         b.put(x0 + 1, 1, 11, *SLAB_TOP)
         for y in (1, 2, 3):
             b.set(x0 + 2, y, 12, 'minecraft:birch_fence', {'east': 'false', 'north': 'false', 'south': 'false', 'west': 'false',

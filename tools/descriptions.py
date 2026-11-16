@@ -1020,3 +1020,6 @@ SUMMARY.update(_FOOD_SUMMARY)
 from cover_content import DESC as _COVER_DESC, SUMMARY as _COVER_SUMMARY
 DESC.update(_COVER_DESC)
 SUMMARY.update(_COVER_SUMMARY)
+# 0.20.0 建材の階段・ハーフブロック・塀
+from building_variants import DESC as _VARIANT_DESC
+DESC.update(_VARIANT_DESC)

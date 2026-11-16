@@ -11544,8 +11544,8 @@
     "translation": "用于：四芒星黑色强化玻璃"
   },
   "uses.singulo.black_reinforced_panel": {
-    "source": "Used in: High-Gravity Panel",
-    "translation": "用于：高重力面板"
+    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall",
+    "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙"
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
@@ -11900,8 +11900,8 @@
     "translation": "用于：动力导管、素体舱"
   },
   "uses.singulo.lab_panel": {
-    "source": "Used in: Lined Lab Panel, Lab Floor Tiles",
-    "translation": "用于：研究所条纹面板、研究所地砖"
+    "source": "Used in: Lined Lab Panel, Lab Floor Tiles, Lab Panel Stairs, Lab Panel Slab, Lab Panel Wall",
+    "translation": "用于：研究所条纹面板、研究所地砖、研究所白色面板楼梯、研究所白色面板台阶、研究所白色面板墙"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -11972,8 +11972,8 @@
     "translation": "用于：简并压缩炉砧座、简并前驱体"
   },
   "uses.singulo.pristine_ruin_panel": {
-    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip",
-    "translation": "用于：无瑕废墟瓷砖、无瑕废墟柱、无瑕废墟导光板"
+    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip, Pristine Ruin Panel Stairs, Pristine Ruin Panel Slab and 1 more",
+    "translation": "用于：无瑕废墟瓷砖、无瑕废墟柱、无瑕废墟导光板、无瑕废墟面板楼梯、无瑕废墟面板台阶 等 1 个"
   },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
@@ -12004,8 +12004,8 @@
     "translation": "用于：废墟灯（琥珀）、废墟灯（翠绿）、废墟灯（紫罗兰）、废墟灯（深红）"
   },
   "uses.singulo.ruin_panel": {
-    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
-    "translation": "用于：破裂的废墟面板、长满青苔的废墟面板、瓷砖废墟面板、通风废墟面板、带状废墟面板 等 1 个"
+    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 4 more",
+    "translation": "用于：破裂的废墟面板、长满青苔的废墟面板、瓷砖废墟面板、通风废墟面板、带状废墟面板 等 4 个"
   },
   "uses.singulo.neutrino_scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
@@ -12148,8 +12148,8 @@
     "translation": "用于：四芒星白色玻璃面板"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
-    "translation": "用于：发光白色面板、白色滑动门、低重力面板、无重力方块"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
+    "translation": "用于：发光白色面板、白色滑动门、低重力面板、无重力方块、白色面板楼梯 等 2 个"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",
@@ -14778,5 +14778,385 @@
   "message.singulo.work_link.endpoint_result": {
     "source": "Endpoint link: %s",
     "translation": "端点连接: %s"
+  },
+  "block.singulo.white_panel_stairs": {
+    "source": "White Panel Stairs",
+    "translation": "白色面板楼梯"
+  },
+  "block.singulo.white_panel_slab": {
+    "source": "White Panel Slab",
+    "translation": "白色面板台阶"
+  },
+  "block.singulo.white_panel_wall": {
+    "source": "White Panel Wall",
+    "translation": "白色面板墙"
+  },
+  "block.singulo.black_reinforced_panel_stairs": {
+    "source": "Black Reinforced Panel Stairs",
+    "translation": "黑色强化面板楼梯"
+  },
+  "block.singulo.black_reinforced_panel_slab": {
+    "source": "Black Reinforced Panel Slab",
+    "translation": "黑色强化面板台阶"
+  },
+  "block.singulo.black_reinforced_panel_wall": {
+    "source": "Black Reinforced Panel Wall",
+    "translation": "黑色强化面板墙"
+  },
+  "block.singulo.ruin_panel_stairs": {
+    "source": "Ruin Panel Stairs",
+    "translation": "废墟面板楼梯"
+  },
+  "block.singulo.ruin_panel_slab": {
+    "source": "Ruin Panel Slab",
+    "translation": "废墟面板台阶"
+  },
+  "block.singulo.ruin_panel_wall": {
+    "source": "Ruin Panel Wall",
+    "translation": "废墟面板墙"
+  },
+  "block.singulo.cracked_ruin_panel_stairs": {
+    "source": "Cracked Ruin Panel Stairs",
+    "translation": "破裂的废墟面板楼梯"
+  },
+  "block.singulo.cracked_ruin_panel_slab": {
+    "source": "Cracked Ruin Panel Slab",
+    "translation": "破裂的废墟面板台阶"
+  },
+  "block.singulo.cracked_ruin_panel_wall": {
+    "source": "Cracked Ruin Panel Wall",
+    "translation": "破裂的废墟面板墙"
+  },
+  "block.singulo.mossy_ruin_panel_stairs": {
+    "source": "Mossy Ruin Panel Stairs",
+    "translation": "长满青苔的废墟面板楼梯"
+  },
+  "block.singulo.mossy_ruin_panel_slab": {
+    "source": "Mossy Ruin Panel Slab",
+    "translation": "长满青苔的废墟面板台阶"
+  },
+  "block.singulo.mossy_ruin_panel_wall": {
+    "source": "Mossy Ruin Panel Wall",
+    "translation": "长满青苔的废墟面板墙"
+  },
+  "block.singulo.tiled_ruin_panel_stairs": {
+    "source": "Tiled Ruin Panel Stairs",
+    "translation": "瓷砖废墟面板楼梯"
+  },
+  "block.singulo.tiled_ruin_panel_slab": {
+    "source": "Tiled Ruin Panel Slab",
+    "translation": "瓷砖废墟面板台阶"
+  },
+  "block.singulo.tiled_ruin_panel_wall": {
+    "source": "Tiled Ruin Panel Wall",
+    "translation": "瓷砖废墟面板墙"
+  },
+  "block.singulo.pristine_ruin_panel_stairs": {
+    "source": "Pristine Ruin Panel Stairs",
+    "translation": "无瑕废墟面板楼梯"
+  },
+  "block.singulo.pristine_ruin_panel_slab": {
+    "source": "Pristine Ruin Panel Slab",
+    "translation": "无瑕废墟面板台阶"
+  },
+  "block.singulo.pristine_ruin_panel_wall": {
+    "source": "Pristine Ruin Panel Wall",
+    "translation": "无瑕废墟面板墙"
+  },
+  "block.singulo.pristine_ruin_tile_stairs": {
+    "source": "Pristine Ruin Tile Stairs",
+    "translation": "无瑕废墟瓷砖楼梯"
+  },
+  "block.singulo.pristine_ruin_tile_slab": {
+    "source": "Pristine Ruin Tile Slab",
+    "translation": "无瑕废墟瓷砖台阶"
+  },
+  "block.singulo.pristine_ruin_tile_wall": {
+    "source": "Pristine Ruin Tile Wall",
+    "translation": "无瑕废墟瓷砖墙"
+  },
+  "block.singulo.lab_panel_stairs": {
+    "source": "Lab Panel Stairs",
+    "translation": "研究所白色面板楼梯"
+  },
+  "block.singulo.lab_panel_slab": {
+    "source": "Lab Panel Slab",
+    "translation": "研究所白色面板台阶"
+  },
+  "block.singulo.lab_panel_wall": {
+    "source": "Lab Panel Wall",
+    "translation": "研究所白色面板墙"
+  },
+  "block.singulo.lab_tile_stairs": {
+    "source": "Lab Floor Tile Stairs",
+    "translation": "研究所地砖楼梯"
+  },
+  "block.singulo.lab_tile_slab": {
+    "source": "Lab Floor Tile Slab",
+    "translation": "研究所地砖台阶"
+  },
+  "block.singulo.lab_tile_wall": {
+    "source": "Lab Floor Tile Wall",
+    "translation": "研究所地砖墙"
+  },
+  "uses.singulo.cracked_ruin_panel": {
+    "source": "Used in: Cracked Ruin Panel Stairs, Cracked Ruin Panel Slab, Cracked Ruin Panel Wall",
+    "translation": "用于：破裂的废墟面板楼梯、破裂的废墟面板台阶、破裂的废墟面板墙"
+  },
+  "uses.singulo.mossy_ruin_panel": {
+    "source": "Used in: Mossy Ruin Panel Stairs, Mossy Ruin Panel Slab, Mossy Ruin Panel Wall",
+    "translation": "用于：长满青苔的废墟面板楼梯、长满青苔的废墟面板台阶、长满青苔的废墟面板墙"
+  },
+  "uses.singulo.tiled_ruin_panel": {
+    "source": "Used in: Tiled Ruin Panel Stairs, Tiled Ruin Panel Slab, Tiled Ruin Panel Wall",
+    "translation": "用于：瓷砖废墟面板楼梯、瓷砖废墟面板台阶、瓷砖废墟面板墙"
+  },
+  "uses.singulo.pristine_ruin_tiles": {
+    "source": "Used in: Pristine Ruin Tile Stairs, Pristine Ruin Tile Slab, Pristine Ruin Tile Wall",
+    "translation": "用于：无瑕废墟瓷砖楼梯、无瑕废墟瓷砖台阶、无瑕废墟瓷砖墙"
+  },
+  "uses.singulo.lab_tiles": {
+    "source": "Used in: Lab Floor Tile Stairs, Lab Floor Tile Slab, Lab Floor Tile Wall",
+    "translation": "用于：研究所地砖楼梯、研究所地砖台阶、研究所地砖墙"
+  },
+  "desc.singulo.white_panel_stairs": {
+    "source": "Stairs made from White Panel.",
+    "translation": "用白色面板制成的楼梯。"
+  },
+  "howto.singulo.white_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.white_panel_slab": {
+    "source": "A half-height White Panel. Two make a full block.",
+    "translation": "半格高的白色面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.white_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.white_panel_wall": {
+    "source": "A White Panel wall that connects like a fence.",
+    "translation": "白色面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.white_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_panel_stairs": {
+    "source": "Stairs made from Black Reinforced Panel.",
+    "translation": "用黑色强化面板制成的楼梯。"
+  },
+  "howto.singulo.black_reinforced_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_panel_slab": {
+    "source": "A half-height Black Reinforced Panel. Two make a full block.",
+    "translation": "半格高的黑色强化面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.black_reinforced_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_panel_wall": {
+    "source": "A Black Reinforced Panel wall that connects like a fence.",
+    "translation": "黑色强化面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.black_reinforced_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.ruin_panel_stairs": {
+    "source": "Stairs made from Ruin Panel.",
+    "translation": "用废墟面板制成的楼梯。"
+  },
+  "howto.singulo.ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.ruin_panel_slab": {
+    "source": "A half-height Ruin Panel. Two make a full block.",
+    "translation": "半格高的废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.ruin_panel_wall": {
+    "source": "A Ruin Panel wall that connects like a fence.",
+    "translation": "废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.cracked_ruin_panel_stairs": {
+    "source": "Stairs made from Cracked Ruin Panel.",
+    "translation": "用破裂的废墟面板制成的楼梯。"
+  },
+  "howto.singulo.cracked_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.cracked_ruin_panel_slab": {
+    "source": "A half-height Cracked Ruin Panel. Two make a full block.",
+    "translation": "半格高的破裂的废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.cracked_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.cracked_ruin_panel_wall": {
+    "source": "A Cracked Ruin Panel wall that connects like a fence.",
+    "translation": "破裂的废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.cracked_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.mossy_ruin_panel_stairs": {
+    "source": "Stairs made from Mossy Ruin Panel.",
+    "translation": "用长满青苔的废墟面板制成的楼梯。"
+  },
+  "howto.singulo.mossy_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.mossy_ruin_panel_slab": {
+    "source": "A half-height Mossy Ruin Panel. Two make a full block.",
+    "translation": "半格高的长满青苔的废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.mossy_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.mossy_ruin_panel_wall": {
+    "source": "A Mossy Ruin Panel wall that connects like a fence.",
+    "translation": "长满青苔的废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.mossy_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.tiled_ruin_panel_stairs": {
+    "source": "Stairs made from Tiled Ruin Panel.",
+    "translation": "用瓷砖废墟面板制成的楼梯。"
+  },
+  "howto.singulo.tiled_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.tiled_ruin_panel_slab": {
+    "source": "A half-height Tiled Ruin Panel. Two make a full block.",
+    "translation": "半格高的瓷砖废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.tiled_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.tiled_ruin_panel_wall": {
+    "source": "A Tiled Ruin Panel wall that connects like a fence.",
+    "translation": "瓷砖废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.tiled_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_panel_stairs": {
+    "source": "Stairs made from Pristine Ruin Panel.",
+    "translation": "用无瑕废墟面板制成的楼梯。"
+  },
+  "howto.singulo.pristine_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_panel_slab": {
+    "source": "A half-height Pristine Ruin Panel. Two make a full block.",
+    "translation": "半格高的无瑕废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.pristine_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_panel_wall": {
+    "source": "A Pristine Ruin Panel wall that connects like a fence.",
+    "translation": "无瑕废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.pristine_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_tile_stairs": {
+    "source": "Stairs made from Pristine Ruin Tile.",
+    "translation": "用无瑕废墟瓷砖制成的楼梯。"
+  },
+  "howto.singulo.pristine_ruin_tile_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_tile_slab": {
+    "source": "A half-height Pristine Ruin Tile. Two make a full block.",
+    "translation": "半格高的无瑕废墟瓷砖。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.pristine_ruin_tile_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_tile_wall": {
+    "source": "A Pristine Ruin Tile wall that connects like a fence.",
+    "translation": "无瑕废墟瓷砖制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.pristine_ruin_tile_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_panel_stairs": {
+    "source": "Stairs made from Lab Panel.",
+    "translation": "用研究所白色面板制成的楼梯。"
+  },
+  "howto.singulo.lab_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_panel_slab": {
+    "source": "A half-height Lab Panel. Two make a full block.",
+    "translation": "半格高的研究所白色面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.lab_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_panel_wall": {
+    "source": "A Lab Panel wall that connects like a fence.",
+    "translation": "研究所白色面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.lab_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_tile_stairs": {
+    "source": "Stairs made from Lab Floor Tile.",
+    "translation": "用研究所地砖制成的楼梯。"
+  },
+  "howto.singulo.lab_tile_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_tile_slab": {
+    "source": "A half-height Lab Floor Tile. Two make a full block.",
+    "translation": "半格高的研究所地砖。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.lab_tile_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_tile_wall": {
+    "source": "A Lab Floor Tile wall that connects like a fence.",
+    "translation": "研究所地砖制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.lab_tile_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
   }
 }

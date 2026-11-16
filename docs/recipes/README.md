@@ -772,6 +772,126 @@ Pリアクターの燃料
 
 ケーブル・パイプに取り付け、ブロックをはめ込んで、そのブロックの見た目にする
 
+### ホワイトパネルの階段
+
+![ホワイトパネルの階段](436_white_panel_stairs.png)
+
+### ホワイトパネルのハーフブロック
+
+![ホワイトパネルのハーフブロック](437_white_panel_slab.png)
+
+### ホワイトパネルの塀
+
+![ホワイトパネルの塀](438_white_panel_wall.png)
+
+### 黒色強化パネルの階段
+
+![黒色強化パネルの階段](439_black_reinforced_panel_stairs.png)
+
+### 黒色強化パネルのハーフブロック
+
+![黒色強化パネルのハーフブロック](440_black_reinforced_panel_slab.png)
+
+### 黒色強化パネルの塀
+
+![黒色強化パネルの塀](441_black_reinforced_panel_wall.png)
+
+### 遺構パネルの階段
+
+![遺構パネルの階段](442_ruin_panel_stairs.png)
+
+### 遺構パネルのハーフブロック
+
+![遺構パネルのハーフブロック](443_ruin_panel_slab.png)
+
+### 遺構パネルの塀
+
+![遺構パネルの塀](444_ruin_panel_wall.png)
+
+### ひび割れた遺構パネルの階段
+
+![ひび割れた遺構パネルの階段](445_cracked_ruin_panel_stairs.png)
+
+### ひび割れた遺構パネルのハーフブロック
+
+![ひび割れた遺構パネルのハーフブロック](446_cracked_ruin_panel_slab.png)
+
+### ひび割れた遺構パネルの塀
+
+![ひび割れた遺構パネルの塀](447_cracked_ruin_panel_wall.png)
+
+### 苔むした遺構パネルの階段
+
+![苔むした遺構パネルの階段](448_mossy_ruin_panel_stairs.png)
+
+### 苔むした遺構パネルのハーフブロック
+
+![苔むした遺構パネルのハーフブロック](449_mossy_ruin_panel_slab.png)
+
+### 苔むした遺構パネルの塀
+
+![苔むした遺構パネルの塀](450_mossy_ruin_panel_wall.png)
+
+### 遺構のタイルパネルの階段
+
+![遺構のタイルパネルの階段](451_tiled_ruin_panel_stairs.png)
+
+### 遺構のタイルパネルのハーフブロック
+
+![遺構のタイルパネルのハーフブロック](452_tiled_ruin_panel_slab.png)
+
+### 遺構のタイルパネルの塀
+
+![遺構のタイルパネルの塀](453_tiled_ruin_panel_wall.png)
+
+### 無垢の遺構パネルの階段
+
+![無垢の遺構パネルの階段](454_pristine_ruin_panel_stairs.png)
+
+### 無垢の遺構パネルのハーフブロック
+
+![無垢の遺構パネルのハーフブロック](455_pristine_ruin_panel_slab.png)
+
+### 無垢の遺構パネルの塀
+
+![無垢の遺構パネルの塀](456_pristine_ruin_panel_wall.png)
+
+### 無垢の遺構タイルの階段
+
+![無垢の遺構タイルの階段](457_pristine_ruin_tile_stairs.png)
+
+### 無垢の遺構タイルのハーフブロック
+
+![無垢の遺構タイルのハーフブロック](458_pristine_ruin_tile_slab.png)
+
+### 無垢の遺構タイルの塀
+
+![無垢の遺構タイルの塀](459_pristine_ruin_tile_wall.png)
+
+### 研究所の白いパネルの階段
+
+![研究所の白いパネルの階段](460_lab_panel_stairs.png)
+
+### 研究所の白いパネルのハーフブロック
+
+![研究所の白いパネルのハーフブロック](461_lab_panel_slab.png)
+
+### 研究所の白いパネルの塀
+
+![研究所の白いパネルの塀](462_lab_panel_wall.png)
+
+### 研究所の床タイルの階段
+
+![研究所の床タイルの階段](463_lab_tile_stairs.png)
+
+### 研究所の床タイルのハーフブロック
+
+![研究所の床タイルのハーフブロック](464_lab_tile_slab.png)
+
+### 研究所の床タイルの塀
+
+![研究所の床タイルの塀](465_lab_tile_wall.png)
+
 ## 段階2　極低温
 
 ### 隕石コンパス
