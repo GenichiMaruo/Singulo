@@ -5444,8 +5444,8 @@
     "translation": "수확"
   },
   "gui.singulo.recipe_encoder.kind.hint": {
-    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Use: flip levers, press buttons and the like",
-    "translation": "추가할 절차의 종류를 전환합니다(우클릭으로 역순). 투입/꺼내기: 장치에 넣거나 꺼내기. 채굴/벌목: 범위를 캐거나 나무를 베기(업그레이드 필요). 수확: 작물을 거두고 다시 심기. 번식/털 깎기/우유 짜기/처리: 범위의 동물 돌보기. 조작: 레버·버튼 등 사용"
+    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Farm: till an area and plant seeds, or give bone meal (needs an upgrade). Fish: fish in an area of water (needs an upgrade). Use: flip levers, press buttons and the like",
+    "translation": "추가할 절차의 종류를 전환합니다(우클릭으로 역순). 투입/꺼내기: 장치에 넣거나 꺼내기. 채굴/벌목: 범위를 캐거나 나무를 베기(업그레이드 필요). 수확: 작물을 거두고 다시 심기. 번식/털 깎기/우유 짜기/처리: 범위의 동물 돌보기. 밭 일구기: 범위의 흙을 갈고 씨앗·묘목 심기, 뼛가루 주기(업그레이드 필요). 낚시: 범위의 물에서 낚시(업그레이드 필요). 조작: 레버·버튼 등 사용"
   },
   "gui.singulo.recipe_encoder.kind.insert": {
     "source": "Insert",
@@ -6564,8 +6564,8 @@
     "translation": "안드로이드의 장식"
   },
   "guide.singulo.androids.farm.body": {
-    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
-    "translation": "・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다. 만든 물건이 안드로이드 소지품에 다 들어가지 않으면 발밑에 떨어뜨리지 않고 작업대의 보관함에 넣었다가 나중에 가지러 옵니다(가지러 올 수 없게 된 물건은 우클릭으로 받을 수 있습니다). 보관함에 물건이 있는 동안에는 작업대 위에 그 물건이 떠 있습니다. 상위의 개량형(8배속·54칸·충전 소모 60%)과 양자형(20배속·81칸·충전 소모 30%)은 이전 단계의 작업대를 재료로 만듭니다."
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Farm (tills soil and plants seeds, or gives bone meal to growing crops; needs a Farming Upgrade), Fish (fishes in an area of water; needs a Fishing Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
+    "translation": "・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 밭 일구기(흙을 갈고 씨앗·묘목 심기. 뼛가루라면 자라는 작물에 주기. 농업 업그레이드 필요), 낚시(범위의 물에서 낚시. 낚시 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다. 만든 물건이 안드로이드 소지품에 다 들어가지 않으면 발밑에 떨어뜨리지 않고 작업대의 보관함에 넣었다가 나중에 가지러 옵니다(가지러 올 수 없게 된 물건은 우클릭으로 받을 수 있습니다). 보관함에 물건이 있는 동안에는 작업대 위에 그 물건이 떠 있습니다. 상위의 개량형(8배속·54칸·충전 소모 60%)과 양자형(20배속·81칸·충전 소모 30%)은 이전 단계의 작업대를 재료로 만듭니다."
   },
   "guide.singulo.androids.farm.title": {
     "source": "Farming, fluids and fuel",
@@ -6580,8 +6580,8 @@
     "translation": "첫 작업 주문"
   },
   "guide.singulo.androids.gear.body": {
-    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
-    "translation": "- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩 칸이 더해집니다. 3단계가 있으며 백팩 12칸, 강화 백팩 18칸, 대형 백팩 24칸이고, 각 단계는 한 단계 아래 백팩으로 만듭니다. 안에 물건이 있으면 뺄 수 없지만, 내용물이 그대로 들어가는 더 큰 백팩으로는 바꿔 낄 수 있습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다.\n- 정리・맡기기: 백팩 칸 오른쪽 위의 버튼으로 소지품과 백팩 안을 정리하거나, 근처 상자(12블록 이내의 상자・통・셜커 상자・자재구)에 걸어가서 맡기게 할 수 있습니다."
+    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Fishing Upgrade: lets the android fish. Takes Luck of the Sea and Lure.\n- Farming Upgrade: lets the android farm (till soil and plant seeds, or give bone meal).\n- Mining, Felling, Fishing and Farming Upgrades fit either of the two tool slots (one of each kind).\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
+    "translation": "- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩 칸이 더해집니다. 3단계가 있으며 백팩 12칸, 강화 백팩 18칸, 대형 백팩 24칸이고, 각 단계는 한 단계 아래 백팩으로 만듭니다. 안에 물건이 있으면 뺄 수 없지만, 내용물이 그대로 들어가는 더 큰 백팩으로는 바꿔 낄 수 있습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 낚시 업그레이드: 낚시 작업을 할 수 있게 됩니다. 바다의 행운·미끼를 부여할 수 있습니다.\n- 농업 업그레이드: 밭 일구기 작업(흙을 갈고 씨앗·묘목 심기, 뼛가루 주기)을 할 수 있게 됩니다.\n- 채굴·벌목·낚시·농업 업그레이드는 도구 칸(2개) 어느 쪽에도 달 수 있습니다(같은 도구는 1개까지).\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다.\n- 정리・맡기기: 백팩 칸 오른쪽 위의 버튼으로 소지품과 백팩 안을 정리하거나, 근처 상자(12블록 이내의 상자・통・셜커 상자・자재구)에 걸어가서 맡기게 할 수 있습니다."
   },
   "guide.singulo.androids.gear.title": {
     "source": "Android upgrades",
@@ -11520,8 +11520,8 @@
     "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
-    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 53개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 55 more",
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 55개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -12064,12 +12064,12 @@
     "translation": "사용처: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
-    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 97개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
+    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 99개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
-    "translation": "사용처: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 80개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 82 more",
+    "translation": "사용처: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 82개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 4 more",
@@ -15158,5 +15158,85 @@
   "howto.singulo.lab_tile_wall": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
+  },
+  "item.singulo.android_fishing_upgrade": {
+    "source": "Fishing Upgrade",
+    "translation": "낚시 업그레이드"
+  },
+  "item.singulo.android_farming_upgrade": {
+    "source": "Farming Upgrade",
+    "translation": "농업 업그레이드"
+  },
+  "tooltip.singulo.android_fishing_upgrade": {
+    "source": "Fishes in an area of water. Takes Luck of the Sea and Lure",
+    "translation": "범위의 물에서 낚시합니다. 바다의 행운·미끼를 부여할 수 있습니다"
+  },
+  "tooltip.singulo.android_farming_upgrade": {
+    "source": "Tills soil, plants seeds and gives bone meal",
+    "translation": "흙을 갈고 씨앗·묘목을 심고 뼛가루를 줍니다"
+  },
+  "gui.singulo.recipe_encoder.kind.plant": {
+    "source": "Farm",
+    "translation": "밭 일구기"
+  },
+  "gui.singulo.recipe_encoder.kind.fish": {
+    "source": "Fish",
+    "translation": "낚시"
+  },
+  "tooltip.singulo.procedure_card.plant": {
+    "source": "Plant %s (%s)",
+    "translation": "밭 일구기: %s 심기 (%s)"
+  },
+  "tooltip.singulo.procedure_card.fish": {
+    "source": "Fish until %s (%s)",
+    "translation": "낚시: %s 모일 때까지 (%s)"
+  },
+  "gui.singulo.work_console.error.no_fisher": {
+    "source": "%s needs fishing, but no chosen android has a Fishing Upgrade",
+    "translation": "%s 에는 낚시가 필요하지만, 선택한 안드로이드 중 낚시 업그레이드를 단 것이 없습니다"
+  },
+  "gui.singulo.work_console.error.no_farmer": {
+    "source": "%s needs farming, but no chosen android has a Farming Upgrade",
+    "translation": "%s 에는 밭 일구기가 필요하지만, 선택한 안드로이드 중 농업 업그레이드를 단 것이 없습니다"
+  },
+  "gui.singulo.work_console.needs_fisher": {
+    "source": "This order includes fishing, so only androids with a Fishing Upgrade can be chosen",
+    "translation": "이 주문에는 낚시 공정이 있어서, 낚시 업그레이드를 단 안드로이드만 고를 수 있습니다"
+  },
+  "gui.singulo.work_console.needs_farmer": {
+    "source": "This order includes farming, so only androids with a Farming Upgrade can be chosen",
+    "translation": "이 주문에는 밭 일구기 공정이 있어서, 농업 업그레이드를 단 안드로이드만 고를 수 있습니다"
+  },
+  "gui.singulo.work_console.activity.fish": {
+    "source": "Fishing",
+    "translation": "낚시 중"
+  },
+  "gui.singulo.work_console.activity.plant": {
+    "source": "Farming",
+    "translation": "밭 일구기 중"
+  },
+  "desc.singulo.android_fishing_upgrade": {
+    "source": "Lets a guard android do fishing steps on procedure cards (fishing in the water of an area). Takes Luck of the Sea and Lure.",
+    "translation": "호위 안드로이드의 도구 칸에 달면 절차 카드의 낚시(범위의 물에서 낚시)를 할 수 있습니다. 바다의 행운·미끼를 부여할 수 있습니다."
+  },
+  "summary.singulo.android_fishing_upgrade": {
+    "source": "Lets an android fish in an area of water.",
+    "translation": "안드로이드가 범위의 물에서 낚시합니다."
+  },
+  "howto.singulo.android_fishing_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "desc.singulo.android_farming_upgrade": {
+    "source": "Lets a guard android do farming steps on procedure cards: tilling soil and planting seeds, or giving bone meal to growing crops.",
+    "translation": "호위 안드로이드의 도구 칸에 달면 절차 카드의 밭 일구기를 할 수 있습니다. 흙을 갈고 씨앗·묘목을 심거나, 자라는 작물에 뼛가루를 줍니다."
+  },
+  "summary.singulo.android_farming_upgrade": {
+    "source": "Lets an android till soil and plant seeds.",
+    "translation": "안드로이드가 흙을 갈고 씨앗을 심습니다."
+  },
+  "howto.singulo.android_farming_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
   }
 }

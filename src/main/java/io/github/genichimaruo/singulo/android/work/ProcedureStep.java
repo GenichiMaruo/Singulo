@@ -17,14 +17,18 @@ import net.minecraft.world.item.ItemStack;
  * <li>繁殖（BREED）: 範囲の動物に、item（えさ）を与えて増やす（大人の数が option まで）。1回通りやって終わる。</li>
  * <li>毛刈り（SHEAR）・搾乳（MILK）: 範囲の羊の毛を刈る・牛から牛乳を取る（空のバケツを持っていく）。そろうまで続ける。</li>
  * <li>処理（CULL）: 範囲の動物のうち、大人の数が option を超えた分を処理して、落ちた物を拾う。そろうまで続ける。</li>
+ * <li>畑づくり（PLANT）: 範囲の土を耕し、item（種・苗）を植える。item が骨粉なら、育ちかけの作物に与える。1回通りやって終わる。農業アップグレードが要る（0.20.0）。</li>
+ * <li>釣り（FISH）: 範囲の水で釣り、item（空ならカードの完成品）がそろうまで続ける。釣りアップグレードが要る（0.20.0）。</li>
  * <li>操作（USE）: pos のブロックを使う。レバーは option（0 切り替え・1 オン・2 オフ）。ボタン・ドアなどは右クリックと同じ。</li>
  * </ul>
  * 範囲の手順は、pos だけなら1か所、corner があれば2点で囲った範囲。
  */
 public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, ItemStack item, int option) {
+    /** 番号は保存されるので、新しい手順は最後に足す。 */
     public static final int INSERT = 0, EXTRACT = 1, MINE = 2, HARVEST = 3, FELL = 4, BREED = 5, SHEAR = 6, MILK = 7, CULL = 8, USE = 9,
-            KINDS = 10;
-    public static final String[] KEYS = {"insert", "extract", "mine", "harvest", "fell", "breed", "shear", "milk", "cull", "use"};
+            PLANT = 10, FISH = 11, KINDS = 12;
+    public static final String[] KEYS = {"insert", "extract", "mine", "harvest", "fell", "breed", "shear", "milk", "cull", "use",
+            "plant", "fish"};
     /** 繁殖・処理の、大人の数の既定の上限。 */
     public static final int DEFAULT_LIMIT = 8;
     /** 操作のレバーの扱い。 */
@@ -40,12 +44,13 @@ public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, I
 
     /** 範囲（2点目）を使う手順か。 */
     public static boolean usesArea(int kind) {
-        return kind == MINE || kind == HARVEST || kind == FELL || kind == BREED || kind == SHEAR || kind == MILK || kind == CULL;
+        return kind == MINE || kind == HARVEST || kind == FELL || kind == BREED || kind == SHEAR || kind == MILK || kind == CULL
+                || kind == PLANT || kind == FISH;
     }
 
-    /** 物の欄が要る手順か（投入・取り出しの物、繁殖のえさ）。 */
+    /** 物の欄が要る手順か（投入・取り出しの物、繁殖のえさ、畑づくりの種・苗・骨粉）。 */
     public static boolean needsItem(int kind) {
-        return kind == INSERT || kind == EXTRACT || kind == BREED;
+        return kind == INSERT || kind == EXTRACT || kind == BREED || kind == PLANT;
     }
 
     /** 数の上限（繁殖・処理）か、レバーの扱い（操作）を持つ手順か。 */

@@ -244,6 +244,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             case RuinAndroid.ACT_RANCH -> net.minecraft.world.item.Items.SHEARS;
             case RuinAndroid.ACT_FELL -> net.minecraft.world.item.Items.DIAMOND_AXE;
             case RuinAndroid.ACT_USE -> net.minecraft.world.item.Items.LEVER;
+            case RuinAndroid.ACT_FISH -> net.minecraft.world.item.Items.FISHING_ROD;
+            case RuinAndroid.ACT_PLANT -> net.minecraft.world.item.Items.WHEAT_SEEDS;
             default -> net.minecraft.world.item.Items.AIR;
         });
         if (icon.isEmpty()) {

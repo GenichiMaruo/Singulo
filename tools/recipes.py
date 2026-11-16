@@ -1072,3 +1072,9 @@ for _name, _shape in _variant_shaped.items():
     assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
     SHAPED[_name] = _shape
     RECIPES[_name]['shape'] = _shape
+
+# 0.20.0 アンドロイドの釣り・農業アップグレード（一覧の番号がずれないよう、最後に足す）
+R('釣りアップグレード', 2, '精密組立台', {'釣り竿': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,
+  cat='tool', note='アンドロイドが釣りをできる。釣り竿のエンチャントを付けられる')
+R('農業アップグレード', 2, '精密組立台', {'ダイヤモンドのクワ': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,
+  cat='tool', note='アンドロイドが土を耕して種・苗を植え、骨粉を与えられる')

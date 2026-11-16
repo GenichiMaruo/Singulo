@@ -105,6 +105,11 @@ public final class SinguloItems {
             "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem> ANDROID_FELLING_UPGRADE = ITEMS.register(
             "android_felling_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem(new Item.Properties()));
+    /** 釣りアップグレード（釣り竿のエンチャントを付けられる）と農業アップグレード（0.20.0）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFishingUpgradeItem> ANDROID_FISHING_UPGRADE = ITEMS.register(
+            "android_fishing_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFishingUpgradeItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFarmingUpgradeItem> ANDROID_FARMING_UPGRADE = ITEMS.register(
+            "android_farming_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFarmingUpgradeItem(new Item.Properties()));
     /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
             "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
@@ -291,6 +296,8 @@ public final class SinguloItems {
             Map.entry("android_armor_plate", 2),
             Map.entry("android_mining_upgrade", 2),
             Map.entry("android_felling_upgrade", 2),
+            Map.entry("android_fishing_upgrade", 2),
+            Map.entry("android_farming_upgrade", 2),
             Map.entry("android_ribbon", 1),
             Map.entry("android_hair_flower", 1),
             Map.entry("android_beret", 1),
@@ -430,6 +437,8 @@ public final class SinguloItems {
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
+        TAB_ORDER.add(ANDROID_FISHING_UPGRADE);
+        TAB_ORDER.add(ANDROID_FARMING_UPGRADE);
         TAB_ORDER.add(WORK_LOCATION_CARD);
         TAB_ORDER.add(AREA_CARD);
         TAB_ORDER.add(SURVEY_GLASSES);

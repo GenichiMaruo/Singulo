@@ -702,6 +702,8 @@ def item_textures(ti, save):
         save(wear(detail, 59 + n), ti / f'{iid}_detail.png')
     save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
+    save(wear(fishing_icon(Image), 31), ti / 'android_fishing_upgrade.png')
+    save(wear(farming_icon(Image), 37), ti / 'android_farming_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
     save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
     save(area_card_icon(Image, 0), ti / 'area_card.png')
@@ -1290,6 +1292,32 @@ def felling_icon(Image):
         px[x, y] = (150, 236, 255, 255)
     for (x, y) in ((12, 4), (12, 5), (12, 6)):
         px[x, y] = (210, 248, 255, 255)
+    return im
+
+
+
+def fishing_icon(Image):
+    """釣りアップグレード: 基板の上に、光る釣り竿（竿は実体の色、糸と針は水色に光る）。"""
+    im, px = upgrade_board(Image)
+    for i in range(8):
+        px[4 + i, 12 - i] = (120, 88, 60, 255)        # 竿（左下から右上へ）
+    for y in range(5, 11):
+        px[12, y] = (150, 236, 255, 255)              # 糸
+    for (x, y) in ((11, 11), (11, 12), (12, 12)):
+        px[x, y] = (210, 248, 255, 255)               # 針
+    return im
+
+
+def farming_icon(Image):
+    """農業アップグレード: 基板の上に、光るクワ（持ち手は実体の色、刃は水色に光る）と、芽。"""
+    im, px = upgrade_board(Image)
+    for i in range(7):
+        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手
+    for (x, y) in ((9, 3), (10, 3), (11, 3), (12, 3), (12, 4)):
+        px[x, y] = (150, 236, 255, 255)               # 刃
+    px[12, 3] = (210, 248, 255, 255)
+    for (x, y) in ((4, 12), (4, 11), (3, 10), (5, 10)):
+        px[x, y] = (110, 200, 90, 255)                # 芽
     return im
 
 

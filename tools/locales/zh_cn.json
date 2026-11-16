@@ -5444,8 +5444,8 @@
     "translation": "收获"
   },
   "gui.singulo.recipe_encoder.kind.hint": {
-    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Use: flip levers, press buttons and the like",
-    "translation": "切换要添加的步骤种类（右键反向）。放入/取出：放入或取出装置。采掘/伐木：挖掘范围或砍树（需要升级）。收获：收取作物并补种。繁殖/剪毛/挤奶/处理：照料范围内的动物。操作：使用拉杆、按钮等"
+    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Farm: till an area and plant seeds, or give bone meal (needs an upgrade). Fish: fish in an area of water (needs an upgrade). Use: flip levers, press buttons and the like",
+    "translation": "切换要添加的步骤种类（右键反向）。放入/取出：放入或取出装置。采掘/伐木：挖掘范围或砍树（需要升级）。收获：收取作物并补种。繁殖/剪毛/挤奶/处理：照料范围内的动物。耕种：翻土并种下种子或树苗，或施骨粉（需要升级）。钓鱼：在范围内的水中钓鱼（需要升级）。操作：使用拉杆、按钮等"
   },
   "gui.singulo.recipe_encoder.kind.insert": {
     "source": "Insert",
@@ -6564,8 +6564,8 @@
     "translation": "仿生人的装饰"
   },
   "guide.singulo.androids.farm.body": {
-    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
-    "translation": "・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。作出的物品装不进仿生人的物品栏时，不会掉在脚下，而是放进作业台的暂存箱，之后再来取（取不了的物品可以右键取出）。暂存箱里有物品时，工作台上方会浮现其中一件。上位的改良型（8倍速·54格·电量消耗6成）和量子型（20倍速·81格·电量消耗3成）以前一阶段的工作台为材料制作。"
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Farm (tills soil and plants seeds, or gives bone meal to growing crops; needs a Farming Upgrade), Fish (fishes in an area of water; needs a Fishing Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
+    "translation": "・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、耕种（翻土并种下种子或树苗。若是骨粉则施给正在生长的作物。需要农业升级）、钓鱼（在范围内的水中钓鱼。需要钓鱼升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。作出的物品装不进仿生人的物品栏时，不会掉在脚下，而是放进作业台的暂存箱，之后再来取（取不了的物品可以右键取出）。暂存箱里有物品时，工作台上方会浮现其中一件。上位的改良型（8倍速·54格·电量消耗6成）和量子型（20倍速·81格·电量消耗3成）以前一阶段的工作台为材料制作。"
   },
   "guide.singulo.androids.farm.title": {
     "source": "Farming, fluids and fuel",
@@ -6580,8 +6580,8 @@
     "translation": "第一次作业订单"
   },
   "guide.singulo.androids.gear.body": {
-    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
-    "translation": "- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外加上背包的格子。共 3 个等级：背包 12 格、强化背包 18 格、大型背包 24 格，每级都用低一级的背包制作。背包里有物品时无法取下，但可以直接换成装得下这些物品的更大背包。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 伐木升级：使仿生人能进行伐木作业（相当于钻石斧）。可附上效率、时运和精准采集。\n- 储罐升级：2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。腰部会出现储罐。储罐里还有东西时无法取下。用桶等点击界面中的储罐可以取放，按住 Shift 点击旁边的 × 会倒掉内容物。\n- 气体储罐升级・气体与液体升级（仅在安装了 Mekanism 时）：可搬运 Mekanism 化学品（气体、灌注物、颜料、浆液）的储罐。气体储罐可装 2 种化学品（各 32,000 mB），气体与液体可装液体和化学品各 2 种（各 16,000 mB）。腰部会出现气瓶。用化学品储罐等点击界面中的储罐可以取放。作业时，资材口旁的化学品储罐会成为资材存放处，仿生人会把化学品运到装置。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。\n- 整理・存放：背包栏右上角的按钮可以整理携带物品和背包内的物品，或让仿生人走去把它们放进附近的箱子（12 格以内的箱子、木桶、潜影盒、资材口）。"
+    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Fishing Upgrade: lets the android fish. Takes Luck of the Sea and Lure.\n- Farming Upgrade: lets the android farm (till soil and plant seeds, or give bone meal).\n- Mining, Felling, Fishing and Farming Upgrades fit either of the two tool slots (one of each kind).\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
+    "translation": "- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外加上背包的格子。共 3 个等级：背包 12 格、强化背包 18 格、大型背包 24 格，每级都用低一级的背包制作。背包里有物品时无法取下，但可以直接换成装得下这些物品的更大背包。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 伐木升级：使仿生人能进行伐木作业（相当于钻石斧）。可附上效率、时运和精准采集。\n- 钓鱼升级：使仿生人能进行钓鱼作业。可附上海之眷顾和饵钓。\n- 农业升级：使仿生人能进行耕种作业（翻土并种下种子或树苗、施骨粉）。\n- 采掘、伐木、钓鱼和农业升级可以装在两个工具槽中的任意一个（同种工具只能装一个）。\n- 储罐升级：2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。腰部会出现储罐。储罐里还有东西时无法取下。用桶等点击界面中的储罐可以取放，按住 Shift 点击旁边的 × 会倒掉内容物。\n- 气体储罐升级・气体与液体升级（仅在安装了 Mekanism 时）：可搬运 Mekanism 化学品（气体、灌注物、颜料、浆液）的储罐。气体储罐可装 2 种化学品（各 32,000 mB），气体与液体可装液体和化学品各 2 种（各 16,000 mB）。腰部会出现气瓶。用化学品储罐等点击界面中的储罐可以取放。作业时，资材口旁的化学品储罐会成为资材存放处，仿生人会把化学品运到装置。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。\n- 整理・存放：背包栏右上角的按钮可以整理携带物品和背包内的物品，或让仿生人走去把它们放进附近的箱子（12 格以内的箱子、木桶、潜影盒、资材口）。"
   },
   "guide.singulo.androids.gear.title": {
     "source": "Android upgrades",
@@ -11520,8 +11520,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 53 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 55 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 55 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -12064,12 +12064,12 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 97 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 99 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
-    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 80 项"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 82 more",
+    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 82 项"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 4 more",
@@ -15158,5 +15158,85 @@
   "howto.singulo.lab_tile_wall": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
+  },
+  "item.singulo.android_fishing_upgrade": {
+    "source": "Fishing Upgrade",
+    "translation": "钓鱼升级"
+  },
+  "item.singulo.android_farming_upgrade": {
+    "source": "Farming Upgrade",
+    "translation": "农业升级"
+  },
+  "tooltip.singulo.android_fishing_upgrade": {
+    "source": "Fishes in an area of water. Takes Luck of the Sea and Lure",
+    "translation": "在范围内的水中钓鱼。可附上海之眷顾和饵钓"
+  },
+  "tooltip.singulo.android_farming_upgrade": {
+    "source": "Tills soil, plants seeds and gives bone meal",
+    "translation": "翻土、种下种子或树苗并施骨粉"
+  },
+  "gui.singulo.recipe_encoder.kind.plant": {
+    "source": "Farm",
+    "translation": "耕种"
+  },
+  "gui.singulo.recipe_encoder.kind.fish": {
+    "source": "Fish",
+    "translation": "钓鱼"
+  },
+  "tooltip.singulo.procedure_card.plant": {
+    "source": "Plant %s (%s)",
+    "translation": "耕种：种下 %s（%s）"
+  },
+  "tooltip.singulo.procedure_card.fish": {
+    "source": "Fish until %s (%s)",
+    "translation": "钓鱼：直到收集到 %s（%s）"
+  },
+  "gui.singulo.work_console.error.no_fisher": {
+    "source": "%s needs fishing, but no chosen android has a Fishing Upgrade",
+    "translation": "%s 的步骤包含钓鱼，但所选仿生人都没有钓鱼升级"
+  },
+  "gui.singulo.work_console.error.no_farmer": {
+    "source": "%s needs farming, but no chosen android has a Farming Upgrade",
+    "translation": "%s 的步骤包含耕种，但所选仿生人都没有农业升级"
+  },
+  "gui.singulo.work_console.needs_fisher": {
+    "source": "This order includes fishing, so only androids with a Fishing Upgrade can be chosen",
+    "translation": "此订单包含钓鱼工序，只能选择装有钓鱼升级的仿生人"
+  },
+  "gui.singulo.work_console.needs_farmer": {
+    "source": "This order includes farming, so only androids with a Farming Upgrade can be chosen",
+    "translation": "此订单包含耕种工序，只能选择装有农业升级的仿生人"
+  },
+  "gui.singulo.work_console.activity.fish": {
+    "source": "Fishing",
+    "translation": "钓鱼中"
+  },
+  "gui.singulo.work_console.activity.plant": {
+    "source": "Farming",
+    "translation": "耕种中"
+  },
+  "desc.singulo.android_fishing_upgrade": {
+    "source": "Lets a guard android do fishing steps on procedure cards (fishing in the water of an area). Takes Luck of the Sea and Lure.",
+    "translation": "装在护卫仿生人的工具槽后，可执行步骤卡的钓鱼（在范围内的水中钓鱼）。可附上海之眷顾和饵钓。"
+  },
+  "summary.singulo.android_fishing_upgrade": {
+    "source": "Lets an android fish in an area of water.",
+    "translation": "让仿生人在范围内的水中钓鱼。"
+  },
+  "howto.singulo.android_fishing_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制作：精密组装台（阶段2）"
+  },
+  "desc.singulo.android_farming_upgrade": {
+    "source": "Lets a guard android do farming steps on procedure cards: tilling soil and planting seeds, or giving bone meal to growing crops.",
+    "translation": "装在护卫仿生人的工具槽后，可执行步骤卡的耕种：翻土并种下种子或树苗，或给正在生长的作物施骨粉。"
+  },
+  "summary.singulo.android_farming_upgrade": {
+    "source": "Lets an android till soil and plant seeds.",
+    "translation": "让仿生人翻土并种下种子。"
+  },
+  "howto.singulo.android_farming_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制作：精密组装台（阶段2）"
   }
 }

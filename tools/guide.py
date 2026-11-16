@@ -967,6 +967,9 @@ CHAPTERS = [
          'るうちは外せないが、中身がそのまま入る大きいバックパックへは付け替えられる。\n'
          '・採掘アップグレード: 採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。\n'
          '・伐採アップグレード: 伐採の作業ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。\n'
+         '・釣りアップグレード: 釣りの作業ができるようになる。宝釣り・入れ食いを付けられる。\n'
+         '・農業アップグレード: 畑づくりの作業（土を耕して種・苗を植える、骨粉を与える）ができるようになる。\n'
+         '・採掘・伐採・釣り・農業のアップグレードは、道具の枠（2つ）のどちらにも積める（同じ道具は1つまで）。\n'
          '・タンクアップグレード: 液体・ガスを運べるタンクが2つ（各32,000 mB、1つに1種類）。腰にタンクが見える。中身が残っている間は外せない。画面のタンクをバケツなどでクリックすると出し入れでき、横の × をシフト＋'
          'クリックすると中身を捨てる。\n'
          '・ガスタンクアップグレード・ガス・液体アップグレード（Mekanism が入っているときだけ）: Mekanism の化学物質（ガス・注入材・顔料・スラリー）を運べるタンク。ガスタンクは化学物質を2種類（各32,000 '
@@ -985,6 +988,9 @@ CHAPTERS = [
          ' Touch.\n'
          '- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.'
          '\n'
+         '- Fishing Upgrade: lets the android fish. Takes Luck of the Sea and Lure.\n'
+         '- Farming Upgrade: lets the android farm (till soil and plant seeds, or give bone meal).\n'
+         '- Mining, Felling, Fishing and Farming Upgrades fit either of the two tool slots (one of each kind).\n'
          '- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It c'
          'annot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill'
          ' or draw; shift-click the × beside it to dump the contents.\n'
@@ -1058,7 +1064,7 @@ CHAPTERS = [
          'akable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 '
          'seconds, the order is cancelled.'),
         ('farm', '農作業・液体・燃料',
-         '・農作業: 収穫（育ちきった作物を取って植え直す。サトウキビ・サボテンは根元を残す）、伐採（木を丸ごと切って苗木を植え直す。伐採アップグレードが要る）、繁殖（えさを与えて、決めた数まで増やす）、毛刈り・搾乳（空のバケツを'
+         '・農作業: 収穫（育ちきった作物を取って植え直す。サトウキビ・サボテンは根元を残す）、伐採（木を丸ごと切って苗木を植え直す。伐採アップグレードが要る）、畑づくり（土を耕して種・苗を植える。骨粉なら育ちかけの作物に与える。農業アップグレードが要る）、釣り（範囲の水で釣る。釣りアップグレードが要る）、繁殖（えさを与えて、決めた数まで増やす）、毛刈り・搾乳（空のバケツを'
          '持っていく）、処理（決めた数を超えた分）。名前付き・つながれた・飼われている動物と子どもには手を出さない。\n'
          '・操作: レバー（オン・オフ・切り替え）、ボタン、ドアなどを使う。仕掛けを動かす合図に。\n'
          '・液体・ガス: 資材口や指令台の隣のタンクも素材置き場になる。加工モードや手順の見本の欄を、バケツなどの入れ物でクリックするか JEI の「+」で、流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB '
@@ -1070,7 +1076,9 @@ CHAPTERS = [
          '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。作った物がアンドロイドの持ち物に入りきらないときは、足元に落とさずに台の預かり箱へ入れ、あとで取りに来る（取りに来られなくなった物は、右クリックで受け取れる）。預かり箱に物があるあいだは、台の上にその物が浮かぶ。上位の改良型（8倍速・54枠・充電の減り6割）と量子（20倍速・81枠・充電の減り3割）は、前の段階の台を素材にして作る。',
          'Farming, fluids and fuel',
          '- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole tr'
-         'ees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk '
+         'ees and replants saplings; needs a Felling Upgrade), Farm (tills soil and plants seeds, or gives bone meal to gr'
+         'owing crops; needs a Farming Upgrade), Fish (fishes in an area of water; needs a Fishing Upgrade), Breed (fee'
+         'ds animals up to a set number), Shear and Milk '
          '(empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and b'
          'abies are left alone.\n'
          '- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n'

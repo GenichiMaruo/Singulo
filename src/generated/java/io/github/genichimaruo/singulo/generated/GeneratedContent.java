@@ -396,6 +396,8 @@ public final class GeneratedContent {
             "android_dual_tank_upgrade",
             "android_mining_upgrade",
             "android_felling_upgrade",
+            "android_fishing_upgrade",
+            "android_farming_upgrade",
             "rgb_dye_station",
             "android_ribbon",
             "android_hair_flower",

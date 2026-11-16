@@ -395,6 +395,8 @@ final class AndroidWorkGoal extends Goal {
                         case io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE -> RuinAndroid.ACT_MINE;
                         case io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST -> RuinAndroid.ACT_FARM;
                         case io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> RuinAndroid.ACT_FELL;
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.PLANT -> RuinAndroid.ACT_PLANT;
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.FISH -> RuinAndroid.ACT_FISH;
                         case io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED, io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> RuinAndroid.ACT_RANCH;
                         case io.github.genichimaruo.singulo.android.work.ProcedureStep.USE -> RuinAndroid.ACT_USE;
                         default -> RuinAndroid.ACT_PROCESS;
@@ -966,6 +968,14 @@ final class AndroidWorkGoal extends Goal {
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> {
                 fell(level, c, job, ps, what);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.PLANT -> {
+                plant(level, c, job, ps, want);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.FISH -> {
+                fish(level, c, job, ps, what);
                 return;
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED -> {
@@ -1632,12 +1642,220 @@ final class AndroidWorkGoal extends Goal {
         return false;
     }
 
+    // ---------------- 畑づくり（0.20.0。農業アップグレードが要る）
+
+    /** 1マスを耕して植える・骨粉を与える時間。 */
+    private static final int PLANT_TICKS = 8;
+
+    /**
+     * 畑づくり: 範囲の土を耕して、持ってきた種・苗を植える（骨粉なら、育ちかけの作物に与える）。植える所がなくなるか、
+     * 持ってきた物がなくなったら終わり（1回通り）。範囲は土の段でも作物の段でもよい（1つ上の段まで見る）。
+     */
+    private void plant(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps, long want) {
+        ItemStack seed = ps.item();
+        if (!android.canFarm() || seed.isEmpty() || carriedCount(seed.getItem()) <= 0) {
+            progress = want;
+            return;
+        }
+        boolean fertilize = seed.is(net.minecraft.world.item.Items.BONE_MEAL);
+        java.util.function.Predicate<BlockPos> ok = fertilize ? p -> fertilizable(level, p) : p -> plantable(level, p, seed);
+        if (mineTarget != null && !ok.test(mineTarget)) {
+            stopMining();
+        }
+        if (mineTarget == null) {
+            net.minecraft.world.level.levelgen.structure.BoundingBox a = ps.area();
+            mineTarget = nearestInArea(new net.minecraft.world.level.levelgen.structure.BoundingBox(a.minX(), a.minY(), a.minZ(),
+                    a.maxX(), a.maxY() + 1, a.maxZ()), ok);
+            travel = 0;
+            if (mineTarget == null) {
+                if (!areaSearch.pending()) {
+                    progress = want;                      // 植える所がもうない: 終わり
+                }
+                return;
+            }
+        }
+        BlockPos target = mineTarget;
+        Boolean at = reachBlock(target);
+        if (at == null) {
+            mineSkip.add(target);
+            stopMining();
+            return;
+        }
+        if (!at) {
+            return;
+        }
+        Vec3 look = Vec3.atCenterOf(target);
+        android.getLookControl().setLookAt(look.x, look.y, look.z, 90, 90);
+        if (android.state() != RuinAndroid.STATE_CRAFTING) {
+            android.setState(RuinAndroid.STATE_CRAFTING);
+        }
+        if (++mineTimer < android.workTicks(PLANT_TICKS)) {
+            return;
+        }
+        stopMining();
+        if (!canPay(CRAFT_COST)) {
+            return;
+        }
+        if (!mayBreak(level, c, target)) {
+            android.setStall(RuinAndroid.STALL_PROTECTED);   // 守られていて手を入れられない
+            mineSkip.add(target);
+            return;
+        }
+        if (fertilize) {
+            if (android.takeFromCarry(seed, 1)) {
+                if (net.minecraft.world.item.BoneMealItem.growCrop(new ItemStack(net.minecraft.world.item.Items.BONE_MEAL), level, target)) {
+                    level.levelEvent(1505, target, 15);          // 骨粉の粒
+                }
+                progress++;
+                android.spend(CRAFT_COST);
+            }
+            return;
+        }
+        BlockState crop = ((net.minecraft.world.item.BlockItem) seed.getItem()).getBlock().defaultBlockState();
+        BlockPos ground = target.below();
+        if (!crop.canSurvive(level, target) && tillable(level.getBlockState(ground))) {
+            level.setBlock(ground, net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState(), 11);
+            level.playSound(null, ground, SoundEvents.HOE_TILL, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
+        }
+        if (crop.canSurvive(level, target) && android.takeFromCarry(seed, 1)) {
+            level.setBlock(target, crop, 3);
+            level.playSound(null, target, crop.getSoundType(level, target, android).getPlaceSound(),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
+            progress++;
+            android.spend(CRAFT_COST);
+        } else {
+            mineSkip.add(target);                          // 暗いなどで植えても育たない
+        }
+    }
+
+    /** 耕して畑にできる土。 */
+    private static boolean tillable(BlockState ground) {
+        return ground.is(net.minecraft.world.level.block.Blocks.DIRT) || ground.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
+                || ground.is(net.minecraft.world.level.block.Blocks.DIRT_PATH);
+    }
+
+    /** p に seed を植えられるか（空いていて、そのままか、下の土を耕せば育つ）。 */
+    private static boolean plantable(ServerLevel level, BlockPos p, ItemStack seed) {
+        if (!(seed.getItem() instanceof net.minecraft.world.item.BlockItem bi) || !level.getBlockState(p).isAir()) {
+            return false;
+        }
+        net.minecraft.world.level.block.Block b = bi.getBlock();
+        BlockState crop = b.defaultBlockState();
+        if (crop.canSurvive(level, p)) {
+            return !(b instanceof net.minecraft.world.level.block.CropBlock || b instanceof net.minecraft.world.level.block.StemBlock)
+                    || level.getBlockState(p.below()).is(net.minecraft.world.level.block.Blocks.FARMLAND);
+        }
+        return (b instanceof net.minecraft.world.level.block.CropBlock || b instanceof net.minecraft.world.level.block.StemBlock)
+                && tillable(level.getBlockState(p.below()));
+    }
+
+    /** 骨粉を与えて育つ作物・苗木（芝や花には与えない）。 */
+    private static boolean fertilizable(ServerLevel level, BlockPos p) {
+        BlockState s = level.getBlockState(p);
+        net.minecraft.world.level.block.Block b = s.getBlock();
+        boolean crop = b instanceof net.minecraft.world.level.block.CropBlock || b instanceof net.minecraft.world.level.block.StemBlock
+                || b instanceof net.minecraft.world.level.block.SweetBerryBushBlock || b instanceof net.minecraft.world.level.block.CocoaBlock
+                || b instanceof net.minecraft.world.level.block.SaplingBlock;
+        return crop && b instanceof net.minecraft.world.level.block.BonemealableBlock bm && bm.isValidBonemealTarget(level, p, s);
+    }
+
+    // ---------------- 釣り（0.20.0。釣りアップグレードが要る）
+
+    /** 1回釣れるまでの時間（5〜15秒。入れ食いで短くなる）。 */
+    private static final int FISH_TICKS_MIN = 100, FISH_TICKS_RANGE = 200;
+    /** 今の1回の待ち時間（0 は、まだ決めていない）。 */
+    private int fishWait;
+
+    /** 釣り: 範囲の水のそばで釣り、ほしい物がそろうまで続ける。釣れる物はバニラの釣りと同じ（宝は釣れない）。 */
+    private void fish(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps, ItemStack what) {
+        if (!android.canFish()) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
+            return;
+        }
+        if (!canPay(CRAFT_COST)) {
+            return;
+        }
+        if (mineTarget != null && !fishable(level, mineTarget)) {
+            stopMining();
+        }
+        if (mineTarget == null) {
+            mineTarget = nearestInArea(ps.area(), p -> fishable(level, p));
+            travel = 0;
+            fishWait = 0;
+            if (mineTarget == null) {
+                if (areaSearch.pending()) {
+                    return;
+                }
+                idleNear(c, job, ps, FARM_IDLE_TICKS);       // 範囲に釣れる水がない
+                return;
+            }
+        }
+        mineIdle = 0;
+        BlockPos target = mineTarget;
+        Boolean at = reachBlock(target);
+        if (at == null) {
+            mineSkip.add(target);
+            stopMining();
+            return;
+        }
+        if (!at) {
+            return;
+        }
+        Vec3 look = Vec3.atCenterOf(target);
+        android.getLookControl().setLookAt(look.x, look.y, look.z, 90, 90);
+        if (android.state() != RuinAndroid.STATE_CRAFTING) {
+            android.setState(RuinAndroid.STATE_CRAFTING);
+        }
+        ItemStack rod = fishingRod();
+        if (fishWait == 0) {
+            int lure = (int) (net.minecraft.world.item.enchantment.EnchantmentHelper.getFishingTimeReduction(level, rod, android) * 20);
+            fishWait = Math.max(20, FISH_TICKS_MIN + level.random.nextInt(FISH_TICKS_RANGE) - lure);
+        }
+        if (++mineTimer < android.workTicks(fishWait)) {
+            return;
+        }
+        mineTimer = 0;
+        fishWait = 0;
+        int luck = net.minecraft.world.item.enchantment.EnchantmentHelper.getFishingLuckBonus(level, rod, android);
+        var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(level)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, look)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL, rod)
+                .withLuck(luck)
+                .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.FISHING);
+        java.util.List<ItemStack> drops = level.getServer().reloadableRegistries()
+                .getLootTable(net.minecraft.world.level.storage.loot.BuiltInLootTables.FISHING).getRandomItems(params);
+        if (!fitsInCarry(drops)) {
+            endFull(c, job, what);                         // 持ち物からあふれる: ここまでの分で置きに戻る
+            return;
+        }
+        collect(drops, what);
+        level.playSound(null, target, SoundEvents.FISHING_BOBBER_SPLASH, net.minecraft.sounds.SoundSource.NEUTRAL, 0.25F,
+                1 + (level.random.nextFloat() - level.random.nextFloat()) * 0.4F);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.FISHING, look.x, target.getY() + 1.0, look.z, 6, 0.2, 0, 0.2, 0.02);
+        android.spend(CRAFT_COST);
+    }
+
+    /** 釣れる水: 水源で、上が空いている。 */
+    private static boolean fishable(ServerLevel level, BlockPos p) {
+        net.minecraft.world.level.material.FluidState f = level.getFluidState(p);
+        return f.is(net.minecraft.tags.FluidTags.WATER) && f.isSource() && level.getBlockState(p.above()).isAir();
+    }
+
+    /** 釣りの道具: 釣り竿に、釣りアップグレードのエンチャントを付けたもの。 */
+    private ItemStack fishingRod() {
+        ItemStack rod = new ItemStack(net.minecraft.world.item.Items.FISHING_ROD);
+        rod.set(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
+                android.tool(RuinAndroid::isFishingUpgrade).getOrDefault(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
+                        net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY));
+        return rod;
+    }
+
     // ---------------- 伐採
 
     /** 伐採の道具: ダイヤの斧に、伐採アップグレードのエンチャントを付けたもの。 */
     private ItemStack fellingTool() {
         ItemStack tool = new ItemStack(net.minecraft.world.item.Items.DIAMOND_AXE);
-        ItemStack upgrade = android.inventory().getItem(RuinAndroid.SLOT_FELLING);
+        ItemStack upgrade = android.tool(RuinAndroid::isFellingUpgrade);
         tool.set(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
                 upgrade.getOrDefault(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
                         net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY));
@@ -2109,7 +2327,7 @@ final class AndroidWorkGoal extends Goal {
     /** 採掘に使う道具: ダイヤのツルハシに、採掘アップグレードのエンチャントを付けたもの。 */
     private ItemStack miningTool() {
         ItemStack tool = new ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE);
-        ItemStack upgrade = android.inventory().getItem(RuinAndroid.SLOT_MINING);
+        ItemStack upgrade = android.tool(RuinAndroid::isMiningUpgrade);
         tool.set(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
                 upgrade.getOrDefault(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
                         net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY));

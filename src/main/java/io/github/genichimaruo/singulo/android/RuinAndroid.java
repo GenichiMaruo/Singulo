@@ -267,9 +267,10 @@ public abstract class RuinAndroid extends Monster {
     private static final int STALL_SHOW_TICKS = 20 * 10;
     private int stallUntil;
     public static final int ACT_NONE = 0, ACT_FETCH = 1, ACT_CRAFT = 2, ACT_PROCESS = 3, ACT_MINE = 4, ACT_DELIVER = 5, ACT_RETURN = 6,
-            ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9, ACT_FARM = 10, ACT_RANCH = 11, ACT_FELL = 12, ACT_USE = 13;
+            ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9, ACT_FARM = 10, ACT_RANCH = 11, ACT_FELL = 12, ACT_USE = 13, ACT_FISH = 14,
+            ACT_PLANT = 15;
     public static final String[] ACTIVITY_KEYS = {"none", "fetch", "craft", "process", "mine", "deliver", "return", "wait", "charge", "fight",
-            "farm", "ranch", "fell", "use"};
+            "farm", "ranch", "fell", "use", "fish", "plant"};
     /** バックパックアップグレードを積んでいるか（見た目のため）。 */
     private static final EntityDataAccessor<Boolean> BACKPACK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
 
@@ -473,6 +474,33 @@ public abstract class RuinAndroid extends Monster {
 
     public static boolean isFellingUpgrade(net.minecraft.world.item.ItemStack stack) {
         return stack.getItem() instanceof AndroidFellingUpgradeItem;
+    }
+
+    public static boolean isFishingUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidFishingUpgradeItem;
+    }
+
+    public static boolean isFarmingUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidFarmingUpgradeItem;
+    }
+
+    /** 道具の枠（2つ）に積めるアップグレード: 採掘・伐採・釣り・農業。どちらの枠にも入る（同じ道具は1つまで）。 */
+    public static boolean isToolUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isMiningUpgrade(stack) || isFellingUpgrade(stack) || isFishingUpgrade(stack) || isFarmingUpgrade(stack);
+    }
+
+    /** 道具の枠の2つ（{@link #SLOT_MINING} と {@link #SLOT_FELLING}。名前は最初に入れていた道具のなごり）。 */
+    public static final int[] TOOL_SLOTS = {SLOT_MINING, SLOT_FELLING};
+
+    /** 道具の枠に積んだ、kind に合うアップグレード（なければ空）。 */
+    public net.minecraft.world.item.ItemStack tool(java.util.function.Predicate<net.minecraft.world.item.ItemStack> kind) {
+        for (int slot : TOOL_SLOTS) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (kind.test(s)) {
+                return s;
+            }
+        }
+        return net.minecraft.world.item.ItemStack.EMPTY;
     }
 
     /** 手に持つ装飾を見せるか: 待機していて（戦い・作業・充電をしていない）、挨拶の仕草もしていない。 */
@@ -1003,7 +1031,17 @@ public abstract class RuinAndroid extends Monster {
 
     /** 伐採アップグレードを積んでいるか。 */
     public boolean canFell() {
-        return isFellingUpgrade(inventory.getItem(SLOT_FELLING));
+        return !tool(RuinAndroid::isFellingUpgrade).isEmpty();
+    }
+
+    /** 釣りアップグレードを積んでいるか。 */
+    public boolean canFish() {
+        return !tool(RuinAndroid::isFishingUpgrade).isEmpty();
+    }
+
+    /** 農業アップグレードを積んでいるか。 */
+    public boolean canFarm() {
+        return !tool(RuinAndroid::isFarmingUpgrade).isEmpty();
     }
 
     /** 積んでいるバッテリーアップグレードの数（クライアントでも見える）。 */
@@ -1018,7 +1056,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 採掘アップグレードを積んでいるか。 */
     public boolean canMine() {
-        return isMiningUpgrade(inventory.getItem(SLOT_MINING));
+        return !tool(RuinAndroid::isMiningUpgrade).isEmpty();
     }
 
     /** 充電の満タン（バッテリーアップグレード1個につき +50%。内蔵のバッテリーも同じだけ）。 */
