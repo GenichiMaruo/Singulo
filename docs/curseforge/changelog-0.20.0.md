@@ -1,5 +1,13 @@
 # Singulo 0.20.0 — Minecraft 1.21.1 / NeoForge
 
+## Features
+
+- Add stairs, slabs and walls for ten building blocks: White and Black Reinforced Panels, Ruin Panels (plain, cracked, mossy and tiled), Pristine Ruin Panels and Tiles, and Lab Panels and Floor Tiles. Craft them in the vanilla shapes or on a stonecutter. Ruins and laboratories generated from this version on use them, and ruin stairs and slabs crack and gather moss like the panels.
+- Add the Fishing Upgrade and the Farming Upgrade for androids. Procedure cards gain a Fish step (fish in an area of water until enough is caught) and a Farm step (till soil and plant the supplied seeds, or give bone meal to growing crops). Both tool slots now accept any of the Mining, Felling, Fishing and Farming Upgrades.
+- Players on the owner's vanilla team (/team) can use android stations, androids, drone stations, drone ports and work consoles without being registered on a Shield Permit. The server setting `shareWithTeam` turns this off.
+- Add the client settings `flashIntensity` and `screenShake` to soften every large flash and screen shake, including bosses, the Genesis Core and the Accretion Jet Forge.
+- JEI shows how to use items that go into machine slots rather than recipes, such as the collectors, the singularity seed, coolant cartridges and machine upgrades.
+
 ## Changes
 
 - Reorder the creative inventory and JEI by function and progression. Machines come before materials, each multiblock controller is followed by its parts, and android and drone kits, memories, upgrades and decorations stay with their devices.
@@ -20,6 +28,14 @@
 
 - The Last Archivist's wing bones no longer flicker. They are now shaded, slightly translucent bones with joints.
 - Glowing beams no longer alternate between bright and dark faces as the camera moves.
+
+## 追加
+
+- ホワイトパネル・黒色強化パネル・遺構パネル（無地・ひび割れ・苔むし・タイル）・無垢の遺構パネルとタイル・研究所の白いパネルと床タイルの、階段・ハーフブロック・塀を追加しました。作業台でバニラと同じ形に並べるか、石切台で作れます。この版から新しく生まれる遺構と研究所ではこれらが置かれ、遺構の階段とハーフブロックもパネルと同じようにひび割れ、苔むします。
+- アンドロイドの釣りアップグレードと農業アップグレードを追加しました。手順カードに、釣り（範囲の水で、そろうまで釣る）と畑づくり（土を耕して持ってきた種・苗を植える、骨粉なら育ちかけの作物に与える）の手順が加わります。2つの道具の枠には、採掘・伐採・釣り・農業のどのアップグレードでも積めるようにしました。
+- 持ち主と同じバニラのチーム（/team）の人は、シールド許可証に登録しなくても、アンドロイドの組立ステーション・アンドロイド・ドローンのステーションと発着ポート・作業指令台を使えるようにしました。サーバー設定 `shareWithTeam` で切れます。
+- ボス・創世炉・降着ジェット鍛造炉などの大きな閃光と画面の揺れをまとめて弱めるクライアント設定 `flashIntensity`・`screenShake` を追加しました。
+- コレクターや特異点の種、冷媒カートリッジ、装置のアップグレードなど、レシピではなく装置の枠に入れて使う物の使い方を、JEI に表示するようにしました。
 
 ## 変更
 
