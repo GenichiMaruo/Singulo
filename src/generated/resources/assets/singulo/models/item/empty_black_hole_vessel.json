@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "singulo:item/empty_black_hole_vessel"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:black_reinforced_panel"
+  },
+  "result": {
+    "id": "singulo:black_reinforced_panel_wall",
+    "count": 1
+  }
+}

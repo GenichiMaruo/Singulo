@@ -987,6 +987,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private boolean selectable(CompoundTag a) {
         return !a.getBoolean("busy") && (plan == null || !plan.getBoolean("mining") || a.getBoolean("miner"))
                 && (plan == null || !plan.getBoolean("felling") || a.getBoolean("feller"))
+                && (plan == null || !plan.getBoolean("fishing") || a.getBoolean("fisher"))
+                && (plan == null || !plan.getBoolean("farming") || a.getBoolean("farmer"))
                 && (plan == null || !plan.getBoolean("fluids") || a.getBoolean("tank"))
                 && (plan == null || !plan.getBoolean("chemicals") || a.getBoolean("chem_tank"));
     }
@@ -1513,11 +1515,14 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 CompoundTag a = androids.get(idx);
                 if (!a.getBoolean("busy") && !selectable(a)) {
                     boolean axe = plan != null && plan.getBoolean("felling") && !a.getBoolean("feller");
+                    boolean rod = plan != null && plan.getBoolean("fishing") && !a.getBoolean("fisher");
+                    boolean hoe = plan != null && plan.getBoolean("farming") && !a.getBoolean("farmer");
                     boolean tank = plan != null && plan.getBoolean("fluids") && !a.getBoolean("tank");
                     boolean chem = plan != null && plan.getBoolean("chemicals") && !a.getBoolean("chem_tank");
                     g.renderTooltip(font, font.split(Component.translatable(chem ? "gui.singulo.work_console.needs_chem_tank"
                             : tank ? "gui.singulo.work_console.needs_tank"
-                            : axe ? "gui.singulo.work_console.needs_feller" : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
+                            : axe ? "gui.singulo.work_console.needs_feller" : rod ? "gui.singulo.work_console.needs_fisher"
+                            : hoe ? "gui.singulo.work_console.needs_farmer" : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
                     return;
                 }
             }

@@ -7,7 +7,7 @@ from PIL import Image
 
 SEGMENTS = ('north', 'east', 'south', 'west',
             'north_west', 'north_east', 'south_east', 'south_west')
-PARTS = ('accelerator_tube', 'focusing_magnet')
+PARTS = ('accelerator_tube', 'accelerator_focusing_magnet')
 
 
 def track(size, magnet=False, corner=False):
@@ -106,7 +106,7 @@ def textures(block_root, size):
     block_root.mkdir(parents=True, exist_ok=True)
     pulse_texture(block_root.parent / 'misc', size * 2, max(8, size // 2))
     for part in PARTS:
-        magnet = part == 'focusing_magnet'
+        magnet = part == 'accelerator_focusing_magnet'
         straight, corner = track(size, magnet), track(size, magnet, True)
         for index, segment in enumerate(SEGMENTS):
             image = straight if index < 4 else corner

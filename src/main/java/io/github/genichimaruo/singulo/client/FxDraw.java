@@ -269,6 +269,11 @@ final class FxDraw {
             double a = Math.PI / 4 * k;
             Vec3 o = side.scale(Math.cos(a)).add(side2.scale(Math.sin(a))).scale(width / 2);
             Vec3 n = side2.scale(Math.cos(a)).subtract(side.scale(Math.sin(a)));
+            if (n.y < 0) {
+                n = n.scale(-1);    // 上向きにそろえる（下向きの法線は暗く塗られる）
+            }
+            // 表と裏は同じ位置の面なので、同じ法線にする。違う法線だと明るさが違い、遠い順の並べ替えで
+            // どちらが上に来るかが視点で入れ替わって、明るい面と暗い面がちらつく（最後の記録者の翼の骨など）
             float nx = (float) n.x;
             float ny = (float) n.y;
             float nz = (float) n.z;
@@ -276,10 +281,10 @@ final class FxDraw {
             vertex(vc, last, (float) (from.x + o.x), (float) (from.y + o.y), (float) (from.z + o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
             vertex(vc, last, (float) (to.x + o.x), (float) (to.y + o.y), (float) (to.z + o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
             vertex(vc, last, (float) (to.x - o.x), (float) (to.y - o.y), (float) (to.z - o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
-            vertex(vc, last, (float) (to.x - o.x), (float) (to.y - o.y), (float) (to.z - o.z), rgb, alpha, FULL_BRIGHT, -nx, -ny, -nz);
-            vertex(vc, last, (float) (to.x + o.x), (float) (to.y + o.y), (float) (to.z + o.z), rgb, alpha, FULL_BRIGHT, -nx, -ny, -nz);
-            vertex(vc, last, (float) (from.x + o.x), (float) (from.y + o.y), (float) (from.z + o.z), rgb, alpha, FULL_BRIGHT, -nx, -ny, -nz);
-            vertex(vc, last, (float) (from.x - o.x), (float) (from.y - o.y), (float) (from.z - o.z), rgb, alpha, FULL_BRIGHT, -nx, -ny, -nz);
+            vertex(vc, last, (float) (to.x - o.x), (float) (to.y - o.y), (float) (to.z - o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
+            vertex(vc, last, (float) (to.x + o.x), (float) (to.y + o.y), (float) (to.z + o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
+            vertex(vc, last, (float) (from.x + o.x), (float) (from.y + o.y), (float) (from.z + o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
+            vertex(vc, last, (float) (from.x - o.x), (float) (from.y - o.y), (float) (from.z - o.z), rgb, alpha, FULL_BRIGHT, nx, ny, nz);
         }
     }
 

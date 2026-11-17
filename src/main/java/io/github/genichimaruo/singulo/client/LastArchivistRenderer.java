@@ -317,6 +317,8 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
      */
     private static void renderWings(int phase, float unfold, float d, float t, PoseStack pose, MultiBufferSource buffers) {
         VertexConsumer glow = glow(buffers);
+        // 骨は少し透ける固体。羽根（光）を描き終えてから描くので、羽根との前後は深度で決まり、並べ替えの揺れでちらつかない
+        VertexConsumer solid = GlowDepth.glazed(buffers, FxDraw.WHITE);
         float beat = Mth.sin(t * 0.05F);
         float flicker = d > 0 ? (((int) (t * 2)) % 3 == 0 ? 0.55F : 1) : 1;
         // 開いたとき: 少し後ろへ流し、羽ばたきで上下する。畳んだとき: 背に沿って下へ
@@ -329,13 +331,14 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
             pose.mulPose(Axis.YP.rotationDegrees(sweep));
             pose.mulPose(Axis.ZP.rotationDegrees(roll));
             pose.scale(WING_SCALE, WING_SCALE, WING_SCALE);
-            drawWing(phase, unfold, d, beat, flicker, pose, glow);
+            drawWing(phase, unfold, d, beat, flicker, pose, glow, solid);
             pose.popPose();
         }
     }
 
     /** 右の翼を、付け根を原点に描く（X が外、Y が上、Z が前）。 */
-    private static void drawWing(int phase, float unfold, float d, float beat, float flicker, PoseStack pose, VertexConsumer vc) {
+    private static void drawWing(int phase, float unfold, float d, float beat, float flicker, PoseStack pose, VertexConsumer vc,
+                                 VertexConsumer solid) {
         int k = 0;
         float open = 0.35F + 0.65F * unfold;
         // 初列風切（手首 → 手の先、10枚）
@@ -370,15 +373,95 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
             float[] at = alongArm(u * 0.8F);
             feather(phase, k++, d, flicker, pose, vc, at[0], at[1] + 0.02F, 0.0F, -85 + 25 * u + jitter(i + 60, 6), 0.55F, 0.3F);
         }
-        // 光る前縁（骨）
+        // 骨（肩→肘→手首→手の先）。少し透ける。倒されるときは細くなって消える
         if (d < 0.5F) {
-            int a = (int) (230 * flicker * (1 - d * 2));
-            int edge = phase == 3 ? GOLD : 0xFFFFFF;
+            float thin = 1 - d * 2;
+            int rgb = phase == 3 ? GOLD : BONE_RGB;
+            PoseStack.Pose last = pose.last();
+            // 左の翼は鏡写しなので、面の向き（表になる回り方）が逆になる
+            boolean mirrored = last.pose().determinant() < 0;
             for (int b = 0; b < 3; b++) {
-                Vec3 from = new Vec3(WING_BONE[b][0], WING_BONE[b][1] + 0.05, 0.01);
-                Vec3 to = new Vec3(WING_BONE[b + 1][0], WING_BONE[b + 1][1] + 0.05, 0.01);
-                FxDraw.beam(pose.last(), vc, from, to, 0.16F - 0.04F * b, edge, a);
+                bone(last, solid, mirrored, WING_BONE[b][0], WING_BONE[b][1] + 0.05F, WING_BONE[b + 1][0], WING_BONE[b + 1][1] + 0.05F,
+                        BONE_RADIUS[b] * thin, BONE_RADIUS[b + 1] * thin, b == 2, rgb);
             }
+            for (int b = 0; b < 3; b++) {
+                knuckle(last, solid, mirrored, WING_BONE[b][0], WING_BONE[b][1] + 0.05F, BONE_RADIUS[b] * 1.3F * thin, rgb);
+            }
+        }
+    }
+
+    /** 骨の色（象牙より少し明るい白）。 */
+    static final int BONE_RGB = 0xF4EFE4;
+    /** 骨の不透明度（少し透ける）。 */
+    static final int BONE_ALPHA = 185;
+    /** 骨の太さ（肩・肘・手首・手の先での半径。先へ細くなる）。 */
+    static final float[] BONE_RADIUS = {0.07F, 0.055F, 0.04F, 0.012F};
+    /** 骨の中心の前後の位置（羽根の付け根を包む）。 */
+    static final float BONE_Z = -0.02F;
+    /** 骨の断面の角の数。 */
+    static final int BONE_SIDES = 8;
+
+    /**
+     * 骨1本: 翼の面の中の (x0, y0) から (x1, y1) へ、半径 r0 から r1 へ細くなる八角柱（外向きの法線で陰影がつく）。cap なら先を閉じる。
+     * 外向きの面だけを、光（羽根）を描き終えたあとで描く（{@link GlowDepth#glazed}）。羽根との前後は深度で決まるのでちらつかない
+     * （光と一緒に並べ替えると、長い面と小さな羽根の前後が視点で入れ替わる）。
+     */
+    private static void bone(PoseStack.Pose last, VertexConsumer vc, boolean mirrored, float x0, float y0, float x1, float y1,
+                             float r0, float r1, boolean cap, int rgb) {
+        float dx = x1 - x0, dy = y1 - y0;
+        float len = Mth.sqrt(dx * dx + dy * dy);
+        if (len < 1e-4F) {
+            return;
+        }
+        float ax = dx / len, ay = dy / len;           // 骨の向き
+        float px = -ay, py = ax;                       // 翼の面の中で骨に直角な向き（もう一つは Z）
+        for (int i = 0; i < BONE_SIDES; i++) {
+            float t0 = Mth.TWO_PI * i / BONE_SIDES, t1 = Mth.TWO_PI * (i + 1) / BONE_SIDES;
+            float c0 = Mth.cos(t0), s0 = Mth.sin(t0), c1 = Mth.cos(t1), s1 = Mth.sin(t1);
+            // 外向きの向き（翼の面の直角方向 × cos + Z × sin）
+            float[] n0 = {px * c0, py * c0, s0}, n1 = {px * c1, py * c1, s1};
+            // 側面（この順だと内向きに回るので、鏡写しでないときに逆にする）
+            solidQuad(vc, last, !mirrored, rgb,
+                    new float[] {x0 + n0[0] * r0, y0 + n0[1] * r0, BONE_Z + n0[2] * r0, n0[0], n0[1], n0[2]},
+                    new float[] {x1 + n0[0] * r1, y1 + n0[1] * r1, BONE_Z + n0[2] * r1, n0[0], n0[1], n0[2]},
+                    new float[] {x1 + n1[0] * r1, y1 + n1[1] * r1, BONE_Z + n1[2] * r1, n1[0], n1[1], n1[2]},
+                    new float[] {x0 + n1[0] * r0, y0 + n1[1] * r0, BONE_Z + n1[2] * r0, n1[0], n1[1], n1[2]});
+            if (cap) {
+                // 手の先のふた（この順で外向きに回る）
+                solidQuad(vc, last, mirrored, rgb,
+                        new float[] {x1, y1, BONE_Z, ax, ay, 0},
+                        new float[] {x1 + n0[0] * r1, y1 + n0[1] * r1, BONE_Z + n0[2] * r1, ax, ay, 0},
+                        new float[] {x1 + n1[0] * r1, y1 + n1[1] * r1, BONE_Z + n1[2] * r1, ax, ay, 0},
+                        new float[] {x1, y1, BONE_Z, ax, ay, 0});
+            }
+        }
+    }
+
+    /** 関節の節（中心 (x, y, BONE_Z)、半径 r の球）。 */
+    private static void knuckle(PoseStack.Pose last, VertexConsumer vc, boolean mirrored, float x, float y, float r, int rgb) {
+        int lat = 6, lon = 10;
+        for (int i = 0; i < lat; i++) {
+            float t0 = Mth.PI * i / lat - Mth.HALF_PI, t1 = Mth.PI * (i + 1) / lat - Mth.HALF_PI;
+            for (int j = 0; j < lon; j++) {
+                float p0 = Mth.TWO_PI * j / lon, p1 = Mth.TWO_PI * (j + 1) / lon;
+                // 緯度・経度の順（この順で外向きに回る）
+                solidQuad(vc, last, mirrored, rgb, sphereAt(x, y, r, t0, p0), sphereAt(x, y, r, t1, p0),
+                        sphereAt(x, y, r, t1, p1), sphereAt(x, y, r, t0, p1));
+            }
+        }
+    }
+
+    private static float[] sphereAt(float x, float y, float r, float theta, float phi) {
+        float nx = Mth.cos(theta) * Mth.cos(phi), ny = Mth.sin(theta), nz = Mth.cos(theta) * Mth.sin(phi);
+        return new float[] {x + nx * r, y + ny * r, BONE_Z + nz * r, nx, ny, nz};
+    }
+
+    /** 骨の面1枚（各点は {x, y, z, 法線x, 法線y, 法線z}）。reverse なら逆の順に置く。 */
+    private static void solidQuad(VertexConsumer vc, PoseStack.Pose last, boolean reverse, int rgb, float[]... points) {
+        int L = FxDraw.FULL_BRIGHT;
+        for (int i = 0; i < 4; i++) {
+            float[] v = points[reverse ? 3 - i : i];
+            vertex(vc, last, v[0], v[1], v[2], rgb, BONE_ALPHA, L, v[3], v[4], v[5]);
         }
     }
 
@@ -813,8 +896,8 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
                 // 弾けた瞬間: 部屋じゅうを白く染める閃光
                 if (k < 0.35F) {
                     float f = 1 - k / 0.35F;
-                    FxDraw.billboard(pose, glow, camera, 40, 0xFFFFFF, (int) (170 * f));
-                    FxDraw.billboard(pose, glow, camera, 12, GOLD, (int) (220 * f));
+                    FxDraw.billboard(pose, glow, camera, 40, 0xFFFFFF, FxSettings.flash((int) (170 * f)));
+                    FxDraw.billboard(pose, glow, camera, 12, GOLD, FxSettings.flash((int) (220 * f)));
                 }
                 for (int i = -3; i <= 3; i++) {
                     float y = r * i / 4F;

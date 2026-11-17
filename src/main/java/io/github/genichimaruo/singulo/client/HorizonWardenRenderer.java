@@ -180,7 +180,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
             pose.translate(0, 0.05, 0);
             FxDraw.ring(pose.last(), glow, 1 + 9 * c, 1.7F + 9 * c, rgb, (int) (230 * (1 - c)), 0);
             pose.translate(0, 2.15, 0);
-            FxDraw.billboard(pose, glow, camera, 7 * (1 - c) + 0.5F, 0xFFFFFF, (int) (220 * (1 - c)));
+            FxDraw.billboard(pose, glow, camera, 7 * (1 - c) + 0.5F, 0xFFFFFF, FxSettings.flash((int) (220 * (1 - c))));
             pose.popPose();
         }
     }
@@ -217,8 +217,8 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
         } else {
             float c = (d - DEATH_COLLAPSE) / (1 - DEATH_COLLAPSE);
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
-            FxDraw.billboard(pose, glow, camera, 1 + 9 * c, 0xFFFFFF, (int) (255 * (1 - c)));
-            FxDraw.billboard(pose, glow, camera, 2 + 13 * c, rgb, (int) (200 * (1 - c)));
+            FxDraw.billboard(pose, glow, camera, 1 + 9 * c, 0xFFFFFF, FxSettings.flash((int) (255 * (1 - c))));
+            FxDraw.billboard(pose, glow, camera, 2 + 13 * c, rgb, FxSettings.flash((int) (200 * (1 - c))));
             pose.translate(0, -(2.2 - 0.75 * kneel) + 0.05, 0);
             FxDraw.ring(pose.last(), glow, 1 + 12 * c, 1.8F + 12 * c, rgb, (int) (230 * (1 - c)), 0);
         }

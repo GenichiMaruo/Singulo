@@ -50,11 +50,11 @@ final class JetForgeEffects {
     private JetForgeEffects() {}
 
     static float flashSetting() {
-        return ClientConfig.SPEC.isLoaded() ? ClientConfig.JET_FORGE_FLASH.get().floatValue() : 1;
+        return (ClientConfig.SPEC.isLoaded() ? ClientConfig.JET_FORGE_FLASH.get().floatValue() : 1) * FxSettings.flash();
     }
 
     static float shakeSetting() {
-        return ClientConfig.SPEC.isLoaded() ? ClientConfig.JET_FORGE_SHAKE.get().floatValue() : 1;
+        return (ClientConfig.SPEC.isLoaded() ? ClientConfig.JET_FORGE_SHAKE.get().floatValue() : 1) * FxSettings.shake();
     }
 
     static void onClientTick(ClientTickEvent.Post event) {

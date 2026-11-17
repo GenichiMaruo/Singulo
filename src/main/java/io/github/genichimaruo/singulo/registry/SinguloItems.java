@@ -105,6 +105,11 @@ public final class SinguloItems {
             "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem> ANDROID_FELLING_UPGRADE = ITEMS.register(
             "android_felling_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem(new Item.Properties()));
+    /** 釣りアップグレード（釣り竿のエンチャントを付けられる）と農業アップグレード（0.20.0）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFishingUpgradeItem> ANDROID_FISHING_UPGRADE = ITEMS.register(
+            "android_fishing_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFishingUpgradeItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFarmingUpgradeItem> ANDROID_FARMING_UPGRADE = ITEMS.register(
+            "android_farming_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFarmingUpgradeItem(new Item.Properties()));
     /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
             "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
@@ -197,11 +202,16 @@ public final class SinguloItems {
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_BROOCH = ITEMS.register(
             "android_diamond_brooch", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "diamond_brooch", 0xE0B850));
+    /** 猫のしっぽ（0.20.0。腰の後ろで揺れる。猫耳カチューシャと同じ色）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAT_TAIL = ITEMS.register(
+            "android_cat_tail", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "cat_tail", 0x3A3440));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
             ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA,
             ANDROID_CAT_EARS, ANDROID_WITCH_HAT, ANDROID_STRAW_HAT, ANDROID_PONYTAIL, ANDROID_TWIN_TAILS, ANDROID_MONOCLE, ANDROID_FAIRY_WINGS, ANDROID_APRON, ANDROID_LANTERN, ANDROID_BROOM,
-            ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH);
+            ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH,
+            ANDROID_CAT_TAIL);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
@@ -251,12 +261,12 @@ public final class SinguloItems {
             "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_2 = ITEMS.register(
-            "scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
+            "neutrino_scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_3 = ITEMS.register(
-            "scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
+            "neutrino_scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
     private static final Map<String, Integer> TOOL_STAGES = Map.ofEntries(
-            Map.entry("scanner_module_2", 4),
-            Map.entry("scanner_module_3", 5),
+            Map.entry("neutrino_scanner_module_2", 4),
+            Map.entry("neutrino_scanner_module_3", 5),
             Map.entry("gravity_boots", 3),
             Map.entry("catalyst_stabilizer", 4),
             Map.entry("dimensional_pocket", 5),
@@ -291,6 +301,8 @@ public final class SinguloItems {
             Map.entry("android_armor_plate", 2),
             Map.entry("android_mining_upgrade", 2),
             Map.entry("android_felling_upgrade", 2),
+            Map.entry("android_fishing_upgrade", 2),
+            Map.entry("android_farming_upgrade", 2),
             Map.entry("android_ribbon", 1),
             Map.entry("android_hair_flower", 1),
             Map.entry("android_beret", 1),
@@ -315,8 +327,10 @@ public final class SinguloItems {
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
-    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテムと隠しボスの報酬。 */
-    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings");
+    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテム、隠しボスの報酬、ボスのスポーンエッグ（コマンドでだけ渡す）。 */
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
+            "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg", "ergosphere_leviathan_spawn_egg",
+            "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");
     /** 段階に関係なく、名前を紫（エピック）にするアイテム（とても珍しい物）。 */
     private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
 
@@ -428,6 +442,8 @@ public final class SinguloItems {
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
+        TAB_ORDER.add(ANDROID_FISHING_UPGRADE);
+        TAB_ORDER.add(ANDROID_FARMING_UPGRADE);
         TAB_ORDER.add(WORK_LOCATION_CARD);
         TAB_ORDER.add(AREA_CARD);
         TAB_ORDER.add(SURVEY_GLASSES);
@@ -458,7 +474,7 @@ public final class SinguloItems {
         block(SinguloBlocks.HALO_COLLECTOR, 5);
         block(SinguloBlocks.CONTAINMENT_TANK, 5);
         block(SinguloBlocks.WORMHOLE_GENERATOR_CORE, 5);
-        TAB_ORDER.add(UNSTABLE_WORMHOLE_MOUTH);
+        // 不安定なワームホールの口はタブに出さない（取り出すとすぐ消え、生成器が作る対でないと使えない）
         block(SinguloBlocks.WORMHOLE_STABILIZER, 5);
         TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
                 new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
@@ -511,6 +527,7 @@ public final class SinguloItems {
         block(SinguloBlocks.BISMUTH_CRYSTAL_BLOCK, 2);
         block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
         block(SinguloBlocks.BLACK_REINFORCED_PANEL, 1);
+        block(SinguloBlocks.BLACK_REINFORCED_LIGHT_PANEL, 1);
         block(SinguloBlocks.WHITE_GLASS_PANEL, 1);
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);
@@ -576,14 +593,13 @@ public final class SinguloItems {
         block(SinguloBlocks.CREATIVE_ENERGY_SOURCE, 6);
         TAB_ORDER.add(CREATIVE_CATALYST);
         TAB_ORDER.add(BUILDER_WAND);
-        TAB_ORDER.add(HORIZON_WARDEN_SPAWN_EGG);
-        TAB_ORDER.add(ECHO_SENTINEL_SPAWN_EGG);
-        TAB_ORDER.add(GRAVITY_REMNANT_SPAWN_EGG);
-        TAB_ORDER.add(ERGOSPHERE_LEVIATHAN_SPAWN_EGG);
-        TAB_ORDER.add(LAST_ARCHIVIST_SPAWN_EGG);
-        TAB_ORDER.add(FOUNDRY_OVERSEER_SPAWN_EGG);
+        // ボスのスポーンエッグはタブにも JEI にも出さない（/give でだけ渡す。HIDDEN を参照）
         for (BlockDef def : GeneratedContent.BLOCKS) {
             block(SinguloBlocks.SIMPLE.get(def.id()), def.stage());
+        }
+        // 建材の階段・ハーフブロック・塀
+        for (GeneratedContent.BlockVariant v : GeneratedContent.BLOCK_VARIANTS) {
+            block(SinguloBlocks.VARIANTS.get(v.id()), v.stage());
         }
         // 素材・部品・回収物（生成表から）
         for (ItemDef def : GeneratedContent.ITEMS) {

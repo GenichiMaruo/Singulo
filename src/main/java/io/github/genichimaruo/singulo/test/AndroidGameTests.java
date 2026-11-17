@@ -2240,6 +2240,70 @@ public final class AndroidGameTests {
     }
 
     /**
+     * 畑づくり（0.20.0）: 農業アップグレードを道具の枠（どちらでもよい）に積んだアンドロイドが、土を耕して種をまき、骨粉で育て、
+     * 収穫して小麦を届ける。アップグレードがないと注文できない。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidTillsSowsAndFertilizes(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.WHEAT_SEEDS, 2));
+        chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.BONE_MEAL, 32));
+        for (int x = 0; x < 2; x++) {
+            helper.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.DIRT);
+        }
+        BlockPos from = helper.absolutePos(new BlockPos(0, 2, 5)), to = helper.absolutePos(new BlockPos(1, 2, 5));
+        procedureCard(helper, List.of(
+                new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.PLANT, from, to, new ItemStack(net.minecraft.world.item.Items.WHEAT_SEEDS, 2)),
+                new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.PLANT, from, to, new ItemStack(net.minecraft.world.item.Items.BONE_MEAL, 16)),
+                new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, from, to, ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        BladeAndroid plain = worker(helper, false);
+        helper.assertTrue(console.start(player, new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(plain.getUUID()), helper.absolutePos(DELIVERY)) != null,
+                "農業アップグレードなしで畑づくりの注文ができた");
+        plain.discard();
+        BladeAndroid a = worker(helper, false);
+        a.inventory().setItem(RuinAndroid.SLOT_MINING, new ItemStack(item("android_farming_upgrade")));     // 1つ目の道具の枠
+        helper.assertTrue(a.canFarm() && !a.canMine(), "道具の枠の農業アップグレードが効かない");
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない");
+            for (int x = 0; x < 2; x++) {
+                helper.assertTrue(helper.getBlockState(new BlockPos(x, 1, 5)).is(net.minecraft.world.level.block.Blocks.FARMLAND), "土を耕していない");
+                helper.assertTrue(helper.getBlockState(new BlockPos(x, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
+            }
+            a.discard();
+        });
+    }
+
+    /** 釣り（0.20.0）: 釣りアップグレードを積んだアンドロイドが、範囲の水で鱈が釣れるまで釣って届ける。アップグレードがないと注文できない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 6000)
+    public static void androidFishesUntilCaught(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        for (int x = 0; x < 3; x++) {
+            for (int z = 5; z < 8; z++) {
+                helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.WATER);
+            }
+        }
+        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.FISH, helper.absolutePos(new BlockPos(0, 0, 5)),
+                helper.absolutePos(new BlockPos(2, 0, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.COD));
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        BladeAndroid plain = worker(helper, false);
+        helper.assertTrue(console.start(player, new ItemStack(net.minecraft.world.item.Items.COD), 1, List.of(plain.getUUID()), helper.absolutePos(DELIVERY)) != null,
+                "釣りアップグレードなしで釣りの注文ができた");
+        plain.discard();
+        BladeAndroid a = worker(helper, false);
+        a.inventory().setItem(RuinAndroid.SLOT_FELLING, new ItemStack(item("android_fishing_upgrade")));    // 2つ目の道具の枠
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.COD), 1, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COD) >= 1, "鱈が届かない");
+            a.discard();
+        });
+    }
+
+    /**
      * 装飾の枠は頭・首/背中・手・顔・腰の5つで、5つ同時に着けられ、どれもクライアントへ伝わる（描くため）。
      * どの装飾も着ける所が決まっていて、その枠にだけ入り、染められる。染めた色が描く色になる。
      * 装飾を増やしたら、ここの一覧にも足す（足し忘れると失敗する）。
@@ -2256,7 +2320,7 @@ public final class AndroidGameTests {
                 {"android_cape", "android_scarf", "android_fairy_wings", "android_necktie", "android_diamond_necklace"},
                 {"android_book", "android_bouquet", "android_teacup", "android_umbrella", "android_broom", "android_lantern"},
                 {"android_glasses", "android_monocle", "android_diamond_earrings"},
-                {"android_waist_ribbon", "android_apron", "android_diamond_brooch"}};
+                {"android_waist_ribbon", "android_apron", "android_diamond_brooch", "android_cat_tail"}};
         long listed = java.util.Arrays.stream(wear).mapToLong(p -> p.length).sum();
         long registered = net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
                 .filter(i -> i instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem).count();

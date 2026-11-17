@@ -333,8 +333,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         return mayOperate(player);
     }
 
+    /** 持ち主と、持ち主と同じチームの人（網は持ち主のまま）。持ち主がいなければだれでも。 */
     public boolean mayOperate(Player player) {
-        return owner == null || owner.equals(player.getUUID());
+        return owner == null || owner.equals(player.getUUID()) || io.github.genichimaruo.singulo.item.TeamSharing.sameTeam(level, owner, player);
     }
 
     /** 外（ホッパー・パイプ）から見た中身: 空き箱と荷物へ入れられ、着荷箱と受け取りから取り出せる。 */

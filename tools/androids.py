@@ -702,6 +702,8 @@ def item_textures(ti, save):
         save(wear(detail, 59 + n), ti / f'{iid}_detail.png')
     save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
+    save(wear(fishing_icon(Image), 31), ti / 'android_fishing_upgrade.png')
+    save(wear(farming_icon(Image), 37), ti / 'android_farming_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
     save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
     save(area_card_icon(Image, 0), ti / 'area_card.png')
@@ -1180,12 +1182,12 @@ def mining_icon(Image):
     """採掘アップグレード: 基板の上に、光るツルハシ（持ち手だけ実体の色、頭は水色に光る）。"""
     im, px = upgrade_board(Image)
     for i in range(7):
-        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手（左下から右上へ）
+        px[5 + i, 11 - i] = (104, 74, 48, 255)        # 持ち手（左下から右上へ）
     head = [(4, 5), (5, 4), (6, 3), (7, 3), (8, 3), (9, 4), (10, 5), (11, 6), (12, 7)]
     for (x, y) in head:
-        px[x, y] = (150, 236, 255, 255)
+        px[x, y] = (66, 178, 240, 255)
     for (x, y) in ((6, 4), (7, 4), (8, 4), (9, 5), (10, 6)):
-        px[x, y] = (210, 248, 255, 255)
+        px[x, y] = (128, 208, 250, 255)
     return im
 
 
@@ -1284,12 +1286,38 @@ def felling_icon(Image):
     """伐採アップグレード: 基板の上に、光る斧（持ち手だけ実体の色、刃は水色に光る）。"""
     im, px = upgrade_board(Image)
     for i in range(7):
-        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手（左下から右上へ）
+        px[5 + i, 11 - i] = (104, 74, 48, 255)        # 持ち手（左下から右上へ）
     blade = [(9, 3), (10, 3), (11, 3), (8, 4), (9, 4), (10, 4), (11, 4), (12, 4), (9, 5), (10, 5), (11, 5), (12, 5), (12, 6), (11, 6)]
     for (x, y) in blade:
-        px[x, y] = (150, 236, 255, 255)
+        px[x, y] = (66, 178, 240, 255)
     for (x, y) in ((12, 4), (12, 5), (12, 6)):
-        px[x, y] = (210, 248, 255, 255)
+        px[x, y] = (128, 208, 250, 255)
+    return im
+
+
+
+def fishing_icon(Image):
+    """釣りアップグレード: 基板の上に、光る釣り竿（竿は実体の色、糸と針は水色に光る）。"""
+    im, px = upgrade_board(Image)
+    for i in range(8):
+        px[4 + i, 12 - i] = (104, 74, 48, 255)        # 竿（左下から右上へ）
+    for y in range(5, 11):
+        px[12, y] = (66, 178, 240, 255)              # 糸
+    for (x, y) in ((11, 11), (11, 12), (12, 12)):
+        px[x, y] = (128, 208, 250, 255)               # 針
+    return im
+
+
+def farming_icon(Image):
+    """農業アップグレード: 基板の上に、光るクワ（持ち手は実体の色、刃は水色に光る）と、芽。"""
+    im, px = upgrade_board(Image)
+    for i in range(7):
+        px[5 + i, 11 - i] = (104, 74, 48, 255)        # 持ち手
+    for (x, y) in ((11, 4), (12, 4), (12, 5), (12, 6), (12, 7)):     # 刃: 棒の先から下へ垂れる
+        px[x, y] = (66, 178, 240, 255)
+    px[12, 4] = (128, 208, 250, 255)              # 刃の付け根の光
+    for (x, y) in ((4, 12), (4, 11), (3, 10), (5, 10)):
+        px[x, y] = (92, 182, 74, 255)                # 芽
     return im
 
 
@@ -1300,7 +1328,9 @@ ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'andr
                  # 0.18.0
                  'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail', 'android_twin_tails',
                  'android_monocle', 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom',
-                 'android_necktie', 'android_diamond_necklace', 'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch')
+                 'android_necktie', 'android_diamond_necklace', 'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch',
+                 # 0.20.0
+                 'android_cat_tail')
 
 
 # 2枚の層を合わせた外形で、上下中央に寄せる装飾
@@ -1790,6 +1820,29 @@ def accessory_icons(Image):
     d.load()[11, 2] = (255, 255, 255, 160)
     d.load()[13, 2] = (255, 255, 255, 160)
     out['android_diamond_brooch'] = (b, d)
+    # 猫のしっぽ（0.20.0。絵の並びで模様が決まるので、最後に足す）: J の字の形。上からまっすぐ下り、下で左へ巻いて先が少し上がる（E: 縁 W: 光 S: 陰）
+    b, d = new(), new()
+    tail = {
+        1: '.........EEEE...',
+        2: '.........EWSE...',
+        3: '.........EWSE...',
+        4: '.........EWSE...',
+        5: '.........EWSE...',
+        6: '.........EWSE...',
+        7: '.........EWSE...',
+        8: '..EEE....EWSE...',
+        9: '..EWSE...EWSE...',
+        10: '..EWSE..EWWSE...',
+        11: '..EWWSEEWWSE....',
+        12: '...EWWWWWSE.....',
+        13: '....ESSSSE......',
+        14: '.....EEEE.......',
+    }
+    for y, row in tail.items():
+        for x, ch in enumerate(row):
+            if ch in tone:
+                b.load()[x, y] = tone[ch]
+    out['android_cat_tail'] = (b, d)
     return out
 
 

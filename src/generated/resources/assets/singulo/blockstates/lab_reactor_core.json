@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=true": {
+      "model": "singulo:block/lab_reactor_core_on"
+    },
+    "powered=false": {
+      "model": "singulo:block/lab_reactor_core_off"
+    }
+  }
+}

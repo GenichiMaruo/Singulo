@@ -308,16 +308,16 @@ MACHINE_ICONS = {
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
     'muon_fusion_reactor': ('fusion', (200, 150, 255)),
     'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
-    'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
+    'worldline_anchor': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),
     'smes_module': ('battery', None), 'singularity_encapsulator': ('sphere', None), 'halo_collector': ('halo', (200, 160, 255)),
-    'gravitational_containment_tank': ('tank', (200, 160, 255)), 'worldline_anchor_advanced': ('anchor', None),
+    'gravitational_containment_tank': ('tank', (200, 160, 255)), 'advanced_worldline_anchor': ('anchor', None),
     'shield_tower_core': ('dome', (180, 230, 255)), 'tipler_core': ('cylinder', None), 'wormhole_generator_core': ('swirl', (200, 160, 255)),
     'wormhole_stabilizer': ('swirl', None), 'wormhole_mouth': ('blackhole', (200, 160, 255)), 'wormhole_port': ('port', (200, 160, 255)),
     'cooling_tower_controller': ('snow', None), 'accelerator_controller': ('ring', None),
     'degenerate_compactor_controller': ('inward', None), 'casimir_cavity_controller': ('mirrors', None),
-    'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'core_controller': ('blackhole', (255, 200, 140)),
+    'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'reactor_core_controller': ('blackhole', (255, 200, 140)),
     'creative_energy_source': ('star', (255, 120, 255)),
     'neutrino_observatory': ('dish', (190, 150, 255)),
     'deep_sea_collector': ('bubbles', (90, 150, 255)), 'void_collector': ('halo', (170, 120, 240)),
@@ -1110,7 +1110,7 @@ def part_texture(iid):
         return fp
     if iid == 'multiblock_port':
         return multiblock_port()
-    if iid == 'heat_exchange_core':
+    if iid == 'cooling_tower_heat_exchange_core':
         im = weathered((128, 82, 54), seed=11)
         d = ImageDraw.Draw(im)
         for x in range(1, S - 1, 2):
@@ -1128,14 +1128,14 @@ def part_texture(iid):
         for x in (1, S - 2):
             d.line([(x, 0), (x, S - 1)], fill=(156, 166, 178, 255))
         return im
-    if iid == 'focusing_magnet':
+    if iid == 'accelerator_focusing_magnet':
         im = weathered((200, 206, 214), seed=13)
         d = ImageDraw.Draw(im)
         d.rectangle([2, 2, 6, S - 3], fill=(206, 72, 72, 255))
         d.rectangle([9, 2, S - 3, S - 3], fill=(72, 110, 206, 255))
         d.line([(7, 1), (8, S - 2)], fill=(255, 255, 255, 255))
         return im
-    if iid == 'mirror_plate':
+    if iid == 'casimir_cavity_mirror_plate':
         im, d = new()
         for y in range(S):
             for x in range(S):
@@ -1158,7 +1158,7 @@ def part_texture(iid):
                 d.line([(x, y), (x + 2, y)], fill=(66, 68, 86, 255))
         edge_line(d, 0, (236, 238, 240, 255), gap=0)
         return im
-    if iid == 'gyro_drive':
+    if iid == 'reactor_gyro_drive':
         im = weathered((32, 32, 42), seed=17)
         d = ImageDraw.Draw(im)
         d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
@@ -1168,7 +1168,7 @@ def part_texture(iid):
         d.point((7, 7), fill=(255, 255, 255, 255))
         d.point((8, 8), fill=(255, 255, 255, 255))
         return im
-    if iid == 'extraction_port':
+    if iid == 'reactor_extraction_port':
         im = weathered((32, 32, 42), seed=18)
         d = ImageDraw.Draw(im)
         d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
@@ -1199,21 +1199,46 @@ def strange_matter():
 
 
 def compressed_block(level, metal):
+    """角金具で締めた塊（0.20.0）。くぼんだ中の板に斜めの押さえ、下の縁の灯りの数（1〜3）で段が読める。金属は真鍮の金具。"""
     base = (128, 132, 140) if not metal else (158, 146, 122)
-    b = tuple(int(c * (1 - 0.2 * (level - 1))) for c in base)
-    im = weathered(b, seed=20 + level + (10 if metal else 0), strength=1.4)
+    b = tuple(int(c * (1 - 0.17 * (level - 1))) for c in base)
+    im = weathered(b, seed=70 + level + (10 if metal else 0), edge=False, strength=1.1)
     d = ImageDraw.Draw(im)
-    step = {1: 8, 2: 4, 3: 2}.get(level, 8)
-    for p in range(0, S, step):
-        d.line([(p, 0), (p, S - 1)], fill=rgba(darken(b, 0.22)))
-        d.line([(0, p), (S - 1, p)], fill=rgba(darken(b, 0.22)))
-    if level >= 2:
-        for p in range(step, S, step):
-            for q in range(step, S, step):
-                d.point((p, q), fill=(200, 230, 255, 255))
-    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((236, 238, 240) if level < 3 else (150, 232, 255)))
+    put = lambda x, y, c: im.putpixel((x, y), rgba(c))
+    trim = (176, 182, 190) if not metal else (206, 170, 92)
+    glow = (150, 232, 255)
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(b, 0.45)))
+    d.rectangle([1, 1, S - 2, S - 2], outline=rgba(lighten(b, 0.10)))
+    # 出っ張った縁: 左上を明るく、右下を暗く
+    for i in range(1, S - 1):
+        put(i, 1, lighten(im.getpixel((i, 1))[:3], 0.18))
+        put(1, i, lighten(im.getpixel((1, i))[:3], 0.18))
+        put(i, S - 2, darken(im.getpixel((i, S - 2))[:3], 0.25))
+        put(S - 2, i, darken(im.getpixel((S - 2, i))[:3], 0.25))
+    # 内側のくぼんだ板（逆の陰）
+    for i in range(4, 12):
+        put(i, 4, darken(b, 0.25))
+        put(4, i, darken(b, 0.25))
+        put(i, 11, lighten(b, 0.12))
+        put(11, i, lighten(b, 0.12))
+    # 斜めの押さえ（Lv2 から太く）
+    for i in range(5, 11):
+        put(i, i, darken(b, 0.18))
+        put(15 - i, i, darken(b, 0.18))
+        if level >= 2:
+            put(i + 1 if i < 10 else i, i, darken(b, 0.10))
+    # 角金具
+    for cx, cy, sx, sy in ((0, 0, 1, 1), (15, 0, -1, 1), (0, 15, 1, -1), (15, 15, -1, -1)):
+        for k in range(4):
+            put(cx + sx * k, cy, trim)
+            put(cx, cy + sy * k, trim)
+        put(cx + sx, cy + sy, darken(trim, 0.25))
+        put(cx + sx * 2, cy + sy * 2, lighten(trim, 0.3))
+    # 段の灯り（下の縁に 1〜3 つ）
+    for x in {1: [7], 2: [5, 9], 3: [4, 7, 10]}.get(level, [7]):
+        put(x, 13, glow)
+        put(x + 1, 13, lighten(glow, 0.3))
     return im
-
 
 # ---------------------------------------------------------------- アイテム（16×16）
 
@@ -1410,6 +1435,28 @@ def module(body, lamp):
         for x in (5, 7, 9):
             d.point((x, 6), fill=rgba(lamp))
         d.line([(4, 10), (11, 10)], fill=rgba(lamp))
+    return outlined(f)
+
+
+def neutrino_module(tier):
+    """ニュートリノ感度モジュール（0.20.0）: 縦長の差し込み札に ν の字、下に金の端子。ほかの四角いモジュールと形で見分けられる。
+    札は検出器と同じ紫。字と下の印は段の色（Mk2 は金、Mk3 は水色）で、印の数（2・3）で段が読める。"""
+    body, lamp = (60, 54, 90), {2: (250, 200, 90), 3: (120, 230, 255)}[tier]
+    nu = ('XX..X', '.X..X', '.X.X.', '.XX..', '.X...')
+
+    def f(d):
+        d.rectangle([4, 2, 11, 12], fill=rgba(body))
+        d.line([(4, 2), (11, 2)], fill=rgba(lighten(body, 0.3)))
+        d.line([(4, 2), (4, 12)], fill=rgba(lighten(body, 0.18)))
+        d.rectangle([5, 3, 10, 9], fill=(24, 28, 42, 255))
+        for y, row in enumerate(nu):
+            for x, ch in enumerate(row):
+                if ch == 'X':
+                    d.point((5 + x, 4 + y), fill=rgba(lamp))
+        for i in range(tier):
+            d.point((6 + i * 2, 11), fill=rgba(lamp))
+        for x in (5, 7, 8, 10):
+            d.point((x, 13), fill=(214, 180, 90, 255))
     return outlined(f)
 
 
@@ -2252,19 +2299,19 @@ ITEM_ART = {
     'degraded_anomaly_sample': lambda: vial((90, 80, 100)),
     'anomaly_sample': lambda: vial((60, 20, 80), glow=True),
     'magnetic_monopole': magnet,
-    'record_fragment': crystal_memory,
+    'crystal_memory': crystal_memory,
     'decoded_record': lambda: tablet(T1),
     'creative_catalyst': lambda: crystal_cluster((255, 120, 255), mark=(255, 255, 255)),
     'shield_permit': lambda: permit_card(),
-    'bh_container': lambda: vessel(None),
-    'micro_black_hole': lambda: vessel((200, 140, 255)),
+    'empty_black_hole_vessel': lambda: vessel(None),
+    'micro_black_hole_vessel': lambda: vessel((200, 140, 255)),
     'black_hole_bomb': lambda: bomb_item(),
     'settings_card': lambda: settings_card(),
     'relocation_wrench': lambda: relocation_wrench(),
     'builder_wand': lambda: outlined(lambda d: (d.line([(3, 12), (10, 5)], fill=(150, 110, 70, 255), width=2),
                                                d.ellipse([10, 2, 13, 5], fill=(255, 120, 255, 255)))),
-    'scanner_module_2': lambda: module((60, 54, 90), (250, 200, 90)),
-    'scanner_module_3': lambda: module((40, 36, 60), (120, 230, 255)),
+    'neutrino_scanner_module_2': lambda: neutrino_module(2),
+    'neutrino_scanner_module_3': lambda: neutrino_module(3),
     'magnetic_key': lambda: seal_key(1),
     'quantum_key': lambda: seal_key(2),
     'temporal_key': lambda: seal_key(3),
@@ -2619,7 +2666,7 @@ def anim_pocket(t):
 
 # ID: (コマを描く関数（t は 0〜1）, コマ数, 1コマの tick 数)
 ANIMATED_ITEMS = {
-    'micro_black_hole': (anim_micro_black_hole, 12, 2),
+    'micro_black_hole_vessel': (anim_micro_black_hole, 12, 2),
     'exotic_matter': (anim_exotic_matter, 12, 3),
     'jet_condensate': (lambda t: _anim_vial(t, (120, 220, 255), True), 8, 3),
     'hawking_condensate': (lambda t: _anim_vial(t, (255, 140, 80), True), 8, 3),

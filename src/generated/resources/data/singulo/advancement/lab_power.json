@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "id": "singulo:reactor_console"
+      "id": "singulo:lab_reactor_console"
     },
     "title": {
       "translate": "advancement.singulo.lab_power.title"

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "singulo:block/lab_tile_slab"
+    },
+    "type=top": {
+      "model": "singulo:block/lab_tile_slab_top"
+    },
+    "type=double": {
+      "model": "singulo:block/lab_tiles"
+    }
+  }
+}

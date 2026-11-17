@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:mossy_ruin_panel"
+  },
+  "result": {
+    "id": "singulo:mossy_ruin_panel_wall",
+    "count": 1
+  }
+}

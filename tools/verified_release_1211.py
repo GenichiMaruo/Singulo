@@ -96,7 +96,7 @@ def main():
     p.add_argument('--artifacts', type=Path, default=Path('verified-artifacts'))
     p.add_argument('--output', type=Path, default=Path('release-artifacts'))
     a = p.parse_args()
-    if a.run <= 0 or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', a.tag):
+    if a.run <= 0 or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?', a.tag):
         raise RuntimeError('Invalid release tag/run')
     metadata = inspect(a.repo, a.run, a.tag, a.source)
     if a.mode == 'promote':

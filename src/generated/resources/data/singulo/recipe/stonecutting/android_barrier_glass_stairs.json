@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:android_barrier_glass"
+  },
+  "result": {
+    "id": "singulo:android_barrier_glass_stairs",
+    "count": 1
+  }
+}

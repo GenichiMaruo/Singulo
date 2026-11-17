@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "singulo:block/pristine_ruin_tiles",
+    "top": "singulo:block/pristine_ruin_tiles",
+    "side": "singulo:block/pristine_ruin_tiles"
+  }
+}

@@ -59,13 +59,13 @@ def positive(value):
 
 
 def target(tag, channel='auto'):
-    match = re.fullmatch(r'v([0-9]+\.[0-9]+\.[0-9]+)(?:-1\.20\.1([FN]))?', tag)
+    match = re.fullmatch(r'v([0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?)(?:-1\.20\.1([FN]))?', tag)
     if not match or channel not in {'auto', 'alpha', 'beta', 'release'}:
         raise Stop('Invalid canonical Singulo release tag or channel')
     version, suffix = match.groups()
     mc = '1.20.1' if suffix else '1.21.1'
     loader = 'forge' if suffix == 'F' else 'neoforge'
-    kind = ('beta' if int(version.split('.')[0]) == 0 else 'release') if channel == 'auto' else channel
+    kind = ('beta' if int(version.split('.')[0]) == 0 or '-rc' in version else 'release') if channel == 'auto' else channel
     name = f'Singulo-{version}-{mc}{suffix or "N"}.jar'
     return {'version': version, 'minecraft': mc, 'loader': loader,
             'java': 17 if suffix else 21, 'filename': name, 'channel': kind}
