@@ -2664,9 +2664,9 @@ final class AndroidWorkGoal extends Goal {
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             for (int dy = 0; dy >= -1; dy--) {
                 BlockPos p = target.relative(dir).above(dy);
-                boolean free = level.getBlockState(p).getCollisionShape(level, p).isEmpty()
-                        && level.getBlockState(p.above()).getCollisionShape(level, p.above()).isEmpty();
-                boolean floor = !level.getBlockState(p.below()).getCollisionShape(level, p.below()).isEmpty();
+                // アンドロイドとしてのぶつかり方で見る（透過ガラスは床にならず、遮断ガラスは床になる）
+                boolean free = !AndroidPathing.blocks(level, p, android) && !AndroidPathing.blocks(level, p.above(), android);
+                boolean floor = AndroidPathing.blocks(level, p.below(), android);
                 if (free && floor) {
                     spots.add(p.immutable());
                     break;

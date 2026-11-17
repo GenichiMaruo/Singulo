@@ -55,6 +55,15 @@ final class AndroidPathing {
         return null;
     }
 
+    /**
+     * mob にとって、pos のブロックがぶつかる所か（0.21.0）。アンドロイド用のガラスはぶつかる相手で形が変わる
+     * （透過ガラスはアンドロイドだけが通り抜け、遮断ガラスはアンドロイドだけが止まる）ので、立つ所・空いた所を探すときは
+     * 生き物を問わない形（{@code getCollisionShape(level, pos)}）ではなく、これで見る。
+     */
+    static boolean blocks(BlockGetter level, BlockPos pos, net.minecraft.world.entity.Entity mob) {
+        return !level.getBlockState(pos).getCollisionShape(level, pos, CollisionContext.of(mob)).isEmpty();
+    }
+
     /** 足もとがガラスなら、アンドロイドとしてのぶつかり方で床の高さを求める（透過ガラスは床にならない）。ほかは NaN。 */
     static double floorLevel(BlockGetter level, BlockPos pos, Mob mob) {
         BlockPos below = pos.below();

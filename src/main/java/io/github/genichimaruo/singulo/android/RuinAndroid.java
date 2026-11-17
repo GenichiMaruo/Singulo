@@ -2788,7 +2788,7 @@ public abstract class RuinAndroid extends Monster {
         for (int i = 0; i < 96 && p.getY() < level().getMaxBuildHeight(); i++) {
             p.move(net.minecraft.core.Direction.UP);
             if (!level().getFluidState(p).is(net.minecraft.tags.FluidTags.WATER)) {
-                return level().getBlockState(p).getCollisionShape(level(), p).isEmpty();
+                return !AndroidPathing.blocks(level(), p, this);         // 透過ガラスのふたは抜けられる
             }
         }
         return false;
@@ -2808,8 +2808,7 @@ public abstract class RuinAndroid extends Monster {
                 || level().getFluidState(new BlockPos(x, y, z)).is(net.minecraft.tags.FluidTags.WATER)) {
             return true;
         }
-        BlockPos below = new BlockPos(x, y - 1, z);
-        return !level().getBlockState(below).getCollisionShape(level(), below).isEmpty();
+        return AndroidPathing.blocks(level(), new BlockPos(x, y - 1, z), this);   // 透過ガラスは床にならない
     }
 
     @Override
@@ -3490,9 +3489,9 @@ public abstract class RuinAndroid extends Monster {
 
         private boolean standable(ServerLevel level, BlockPos p) {
             BlockPos below = p.below();
-            return level.getFluidState(p).isEmpty() && level.getBlockState(p).getCollisionShape(level, p).isEmpty()
-                    && level.getBlockState(p.above()).getCollisionShape(level, p.above()).isEmpty() && level.getFluidState(below).isEmpty()
-                    && !level.getBlockState(below).getCollisionShape(level, below).isEmpty();
+            return level.getFluidState(p).isEmpty() && !AndroidPathing.blocks(level, p, RuinAndroid.this)
+                    && !AndroidPathing.blocks(level, p.above(), RuinAndroid.this) && level.getFluidState(below).isEmpty()
+                    && AndroidPathing.blocks(level, below, RuinAndroid.this);
         }
 
         /** ステーションの上で、ほかのアンドロイドが充電・印刷されているか。 */
