@@ -1548,6 +1548,7 @@
   "gui.singulo.guardian.defeated.foundry_overseer": "ファウンドリの単眼が消えた。製造ラインが止まり、保管庫の力場が消えた",
   "gui.singulo.guardian.defeated.gravity_remnant": "重力の澱の核が潰れた。保管庫の力場が消えた",
   "gui.singulo.guardian.no_vault": "番人に守られた保管庫が近くにない",
+  "gui.singulo.guardian.peaceful": "ピースフルでは遺構のボスを呼び出せません",
   "gui.singulo.guardian.reset.echo_sentinel": "挑戦者がいなくなり、残響の番人は記録の中へ還っていった",
   "gui.singulo.guardian.reset.ergosphere_leviathan": "挑戦者がいなくなり、エルゴ球の大蛇は炉心の渦へ帰っていった",
   "gui.singulo.guardian.reset.foundry_overseer": "挑戦者がいなくなり、ファウンドリは製造ラインを止めて眠りについた",

@@ -12,6 +12,11 @@
 
 ## Fixes
 
+- Upgrading a packed SMES Cell preserves the items in both charging slots and their individual charge levels.
+- An Android Assembly Station with a Transfer Upgrade restores an idle android's tank contents when it reprints the android. Cargo drones finish dismantling and return their kit after a world reload.
+- Singulo fluid pipes now respect each remote machine's fluid filter and input-only fuel tanks when connected through a wormhole.
+- Each player must confirm their own permanent core installation in an Advanced Worldline Anchor. On Peaceful difficulty, ruin consoles keep boss summoning items in the player's hand.
+- Probe expeditions now apply the server's loot count multiplier before calculating their share of a manual expedition's yield.
 - Automatic deposits move only the items a guard picked up. Cargo from older saves stays with the guard until you use the manual deposit button.
 - Upgrading a Portable Android Printer to Mk2 keeps its loaded supplies and charge. Changing to a lower-cost memory preserves excess charge for later prints. Opening the printer and dismantling a guard now keep self-repair kit counts consistent.
 - The Time Crystal Incubator waits for output space when a new catalyst has a different lifetime from the one in its output slot. Reloading a world preserves the low-power growth history and the mix of materials already fed into a compressor.
@@ -32,6 +37,11 @@
 
 ## 修正
 
+- 移設レンチで梱包したSMESセルを強化すると、充電中・充電済みの両方の枠にある装備と、それぞれの充電量を引き継ぎます。
+- 転送アップグレード付きの組立ステーションは、作業をしていなかったアンドロイドもタンクの中身ごと再印刷します。輸送ドローンは解体途中でワールドを読み込み直しても解体を続け、キットを返却します。
+- ワームホール経由でつないだ液体パイプが、遠隔の装置ごとに搬入できる液体を判定し、入力専用の燃料タンクからの吸い出しを防ぐようになりました。
+- 上位ワールドライン・アンカーへのコアの永久埋め込みには、使うプレイヤー本人の確認が必要になりました。ピースフルでは遺構のボスを呼ぶアイテムが手元に残ります。
+- 自動探査機は、遠征の回収量倍率を反映したうえで、手動遠征に対する割合から回収数を計算します。
 - 護衛が自動で預けるのは自分で拾った分だけです。以前のセーブで持っていた荷物は護衛に残り、手動の「近くの箱へ預ける」でまとめて移せます。
 - 携帯型アンドロイド印刷機をMk2に強化すると、装填した物と電力を引き継ぎます。消費電力の少ない型に替えても、余った電力は次の印刷に使えます。印刷機の画面操作中や護衛の解体中に、自己修理キットが増減する問題も修正しました。
 - 時間結晶育成槽は、完成する触媒の寿命が出力枠の触媒と異なるとき、取り出すまで待機します。ワールドを再読み込みしても、育成中の電力不足と、圧縮機が取り込んだ素材の種類を引き継ぎます。

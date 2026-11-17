@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.pipe;
 
 import io.github.genichimaruo.singulo.android.work.SurveyGlassesItem;
+import io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -360,7 +361,11 @@ public final class FluidPipeNetwork {
             }
             IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, e.pos, e.side);
             if (handler != null) {
-                ports.add(new Port(e, handler, !(level.getBlockEntity(e.pos) instanceof PipeInputOnly)));
+                var blockEntity = level.getBlockEntity(e.pos);
+                if (blockEntity instanceof WormholePortBlockEntity wormhole && handler == wormhole.fluids()) {
+                    handler = wormhole.pipeFluids();
+                }
+                ports.add(new Port(e, handler, !(blockEntity instanceof PipeInputOnly)));
             } else if (isSource(level.getBlockState(e.pos))) {
                 sources.add(e);
             }
@@ -404,7 +409,7 @@ public final class FluidPipeNetwork {
         List<Port> takers = new ArrayList<>();
         for (Port port : ports) {
             boolean gives = port.drainable && !port.handler.drain(probe, FluidAction.SIMULATE).isEmpty();
-            boolean takes = accepts(port.handler, fluid) && port.handler.fill(probe, FluidAction.SIMULATE) > 0;
+            boolean takes = PipeFluidFilter.accepts(port.handler, fluid) && port.handler.fill(probe, FluidAction.SIMULATE) > 0;
             if (gives && takes && port.handler instanceof PipeSplitTanks) {
                 pureGivers.add(port);                      // 送るタンクと受け取りのタンクが別: 出す口でも受ける口でもある
                 takers.add(port);
@@ -477,7 +482,7 @@ public final class FluidPipeNetwork {
         rotate(takers);
         for (Port taker : takers) {
             Path path = path(source.node, taker.endpoint.node);
-            if (!accepts(taker.handler, fluid) || available(path) < fluid.getAmount()
+            if (!PipeFluidFilter.accepts(taker.handler, fluid) || available(path) < fluid.getAmount()
                     || taker.handler.fill(fluid, FluidAction.SIMULATE) < fluid.getAmount()) {
                 continue;
             }
@@ -491,10 +496,6 @@ public final class FluidPipeNetwork {
             }
             return;
         }
-    }
-
-    private static boolean accepts(IFluidHandler handler, FluidStack fluid) {
-        return !(handler instanceof PipeFluidFilter filter) || filter.pipeAccepts(fluid);
     }
 
     private void rotate(List<Port> list) {

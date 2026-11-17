@@ -193,6 +193,7 @@ public final class AndroidGameTests {
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 2);
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_UPGRADE, new ItemStack(item("android_transfer_upgrade")));
+        var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000);
         boolean[] transferred = {false};
         helper.onEachTick(() -> {
             List<RuinAndroid> current = androids(helper);
@@ -205,7 +206,18 @@ public final class AndroidGameTests {
             RuinAndroid first = current.get(0);
             transferred[0] = true;
             first.inventory().setItem(RuinAndroid.SLOT_REPAIR, new ItemStack(item("android_repair_kit"), 5));
+            first.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_dual_tank_upgrade")));
+            helper.assertTrue(first.fillTanks(water, false) == 1000, "護衛のタンクに水が入らない");
+            // Mekanism を外したワールドでも、以前に積んだ化学物質は保存される。
+            CompoundTag saved = first.saveWithoutId(new CompoundTag());
+            CompoundTag chemical = saved.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(1);
+            chemical.putString("id", "mekanism:oxygen");
+            chemical.putLong("amount", 725);
+            first.load(saved);
+            helper.assertTrue(first.workConsole() == null && first.chemAmount("mekanism:oxygen") == 725, "待機中の護衛のタンクを復元できない");
             first.kill();
+            var registries = helper.getLevel().registryAccess();
+            s.loadWithComponents(s.saveWithFullMetadata(registries), registries);
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(STATION)).inflate(8), e -> e.getItem().is(item("android_repair_kit"))).isEmpty(),
                     "転送アップグレードがあるのに持ち物が落ちた");
@@ -216,9 +228,14 @@ public final class AndroidGameTests {
             List<RuinAndroid> list = androids(helper).stream()
                     .filter(a -> a.isAlive() && helper.absolutePos(STATION).equals(a.home())).toList();
             helper.assertTrue(list.size() == 1, "印刷し直されない: " + list.size());
-            ItemStack kits = list.get(0).inventory().getItem(RuinAndroid.SLOT_REPAIR);
+            RuinAndroid next = list.get(0);
+            ItemStack kits = next.inventory().getItem(RuinAndroid.SLOT_REPAIR);
             helper.assertTrue(kits.getCount() == 5, "持ち物が次の護衛に渡らない: " + kits);
-            list.get(0).discard();
+            helper.assertTrue(next.workConsole() == null && next.inventory().getItem(RuinAndroid.SLOT_TANK).is(item("android_dual_tank_upgrade")),
+                    "次の待機中の護衛にタンクが渡らない");
+            helper.assertTrue(next.tankAmount(water) == 1000 && next.chemAmount("mekanism:oxygen") == 725,
+                    "ステーションの再読込後に流体か化学物質を失った");
+            next.discard();
         });
     }
 

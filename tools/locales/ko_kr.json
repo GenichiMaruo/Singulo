@@ -4851,6 +4851,10 @@
     "source": "No guarded vault nearby",
     "translation": "근처에 수호자가 지키는 보관고가 없습니다"
   },
+  "gui.singulo.guardian.peaceful": {
+    "source": "Ruin bosses cannot be summoned on Peaceful difficulty",
+    "translation": "평화로움 난이도에서는 유적 보스를 소환할 수 없습니다"
+  },
   "gui.singulo.guardian.reset.echo_sentinel": {
     "source": "No challenger remains. The Echo Sentinel returns to the records",
     "translation": "도전자가 남지 않았다. 메아리 파수꾼은 기록 속으로 돌아갔다"

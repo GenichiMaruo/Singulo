@@ -1548,6 +1548,7 @@
   "gui.singulo.guardian.defeated.foundry_overseer": "The Foundry's eye goes dark. The lines halt and the vault field dissipates",
   "gui.singulo.guardian.defeated.gravity_remnant": "The Gravity Remnant collapses. The vault field dissipates",
   "gui.singulo.guardian.no_vault": "No guarded vault nearby",
+  "gui.singulo.guardian.peaceful": "Ruin bosses cannot be summoned on Peaceful difficulty",
   "gui.singulo.guardian.reset.echo_sentinel": "No challenger remains. The Echo Sentinel returns to the records",
   "gui.singulo.guardian.reset.ergosphere_leviathan": "No challenger remains. The Ergosphere Leviathan returns to the core",
   "gui.singulo.guardian.reset.foundry_overseer": "No challenger remains. The Foundry halts its lines and powers down",

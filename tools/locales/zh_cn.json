@@ -4851,6 +4851,10 @@
     "source": "No guarded vault nearby",
     "translation": "附近没有受守卫保护的保管库"
   },
+  "gui.singulo.guardian.peaceful": {
+    "source": "Ruin bosses cannot be summoned on Peaceful difficulty",
+    "translation": "和平难度下无法召唤遗迹首领"
+  },
   "gui.singulo.guardian.reset.echo_sentinel": {
     "source": "No challenger remains. The Echo Sentinel returns to the records",
     "translation": "没有挑战者留下。回响守卫回到了记录之中"

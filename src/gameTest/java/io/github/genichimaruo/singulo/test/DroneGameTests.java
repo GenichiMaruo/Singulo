@@ -782,10 +782,23 @@ public final class DroneGameTests {
                 step[0] = 1;
             }
             if (step[0] == 1) {
+                CargoDrone drone = drones.getFirst();
+                h.assertTrue(drone.dismantling() && drone.printTicks() < CargoDrone.PRINT_TICKS, "Waiting for dismantling to progress");
+                var saved = drone.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+                var reloaded = io.github.genichimaruo.singulo.registry.SinguloEntities.CARGO_DRONE.get().create(h.getLevel());
+                reloaded.load(saved);
+                h.assertTrue(reloaded.dismantling() && reloaded.printTicks() == drone.printTicks(), "Lost dismantling progress on reload");
+                saved.remove("dismantling"); // 古い保存では、ステーションの停止指示から解体を再開する。
+                reloaded.load(saved);
+                drone.discard();
+                h.getLevel().addFreshEntity(reloaded);
+                step[0] = 2;
+            }
+            if (step[0] == 2) {
                 h.assertTrue(drones.isEmpty() && station.status(0) == DroneStationBlockEntity.S_STOPPED, "Not dismantled yet");
                 h.assertTrue(station.items().getStackInSlot(DroneStationBlockEntity.SLOT_KIT).getCount() == 2, "Kit not returned");
                 station.press(DroneStationBlockEntity.BUTTON_RESUME);
-                step[0] = 2;
+                step[0] = 3;
             }
             h.assertTrue(drones.size() == 1 && station.items().getStackInSlot(DroneStationBlockEntity.SLOT_KIT).getCount() == 1,
                     "Not printed again");

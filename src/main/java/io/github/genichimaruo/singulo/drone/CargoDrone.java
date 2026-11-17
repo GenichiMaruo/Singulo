@@ -285,10 +285,14 @@ public class CargoDrone extends Mob {
         return entityData.get(DISMANTLE);
     }
 
+    void resumeDismantle() {
+        entityData.set(DISMANTLE, true);
+    }
+
     /** 解体を始める（ステーションの GUI から。待機中だけ）。 */
     public void startDismantle() {
         if (printed() && !dismantling()) {
-            entityData.set(DISMANTLE, true);
+            resumeDismantle();
             entityData.set(PRINT, PRINT_TICKS + RETRACT_TICKS);
             playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.dismantle"), 0.8F, 1.0F);
         }
@@ -688,6 +692,7 @@ public class CargoDrone extends Mob {
         }
         tag.putInt("unit", unit);
         tag.putInt("print", entityData.get(PRINT));
+        tag.putBoolean("dismantling", dismantling());
         tag.putLong("flight", flightId);
         tag.putBoolean("phase", phase);
         tag.putInt("kind", entityData.get(KIND));
@@ -702,6 +707,7 @@ public class CargoDrone extends Mob {
         station = NbtUtils.readBlockPos(tag, "station").orElse(null);
         unit = Mth.clamp(tag.getInt("unit"), 0, DroneStationBlockEntity.MAX_UNITS - 1);
         entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
+        entityData.set(DISMANTLE, tag.getBoolean("dismantling"));
         flightId = tag.getLong("flight");
         phase = tag.getBoolean("phase");
         entityData.set(KIND, DroneKind.byId(tag.getInt("kind")).ordinal());

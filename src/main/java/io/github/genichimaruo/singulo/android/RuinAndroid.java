@@ -1857,8 +1857,8 @@ public abstract class RuinAndroid extends Monster {
         AndroidStationBlockEntity station = home != null
                 && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
         boolean sent = false;
-        if (station != null && workConsole != null) {
-            station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());    // 印刷し直したアンドロイドが、同じ注文の作業を続ける
+        if (station != null && (workConsole != null || !tanksEmpty())) {
+            station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());
         }
         if (station == null && workConsole != null && level.isLoaded(workConsole)
                 && level.getBlockEntity(workConsole) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity c) {

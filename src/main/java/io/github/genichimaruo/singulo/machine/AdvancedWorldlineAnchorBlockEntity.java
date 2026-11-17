@@ -2,6 +2,9 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -29,7 +32,7 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
     static final int CONFIRM_TICKS = 100;
 
     private boolean embedded;
-    private long confirmUntil;
+    private final Map<UUID, Long> confirmUntil = new HashMap<>();
 
     public AdvancedWorldlineAnchorBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.WORLDLINE_ANCHOR_ADVANCED.get(), pos, state);
@@ -75,6 +78,7 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
             return false;
         }
         embedded = true;
+        confirmUntil.clear();
         // 入っていた触媒（予備と装填中のもの）は外に出す（埋め込み後は使わない）
         net.minecraft.world.level.block.Block.popResource(level, worldPosition, slot.getStackInSlot(0));
         slot.setStackInSlot(0, ItemStack.EMPTY);
@@ -93,12 +97,11 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
             return true;
         }
         long now = player.level().getGameTime();
-        if (now > confirmUntil) {
-            confirmUntil = now + CONFIRM_TICKS;
+        confirmUntil.values().removeIf(deadline -> now > deadline);
+        if (confirmUntil.putIfAbsent(player.getUUID(), now + CONFIRM_TICKS) == null) {
             player.displayClientMessage(Component.translatable("gui.singulo.anchor.confirm_embed"), true);
             return true;
         }
-        confirmUntil = 0;
         embed(player.level());
         if (!player.getAbilities().instabuild) {
             stack.shrink(1);

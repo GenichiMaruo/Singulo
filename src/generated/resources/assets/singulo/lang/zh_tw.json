@@ -1548,6 +1548,7 @@
   "gui.singulo.guardian.defeated.foundry_overseer": "鑄造廠的獨眼熄滅了。生產線停止，保管庫的力場消失了",
   "gui.singulo.guardian.defeated.gravity_remnant": "重力殘渣的核心坍縮了。保管庫的力場消失了",
   "gui.singulo.guardian.no_vault": "附近沒有受守衛保護的保管庫",
+  "gui.singulo.guardian.peaceful": "和平難度下無法召喚遺構首領",
   "gui.singulo.guardian.reset.echo_sentinel": "挑戰者已離開，回聲守衛回到了記錄之中",
   "gui.singulo.guardian.reset.ergosphere_leviathan": "挑戰者已離開，能層巨蛇回到了爐心的漩渦中",
   "gui.singulo.guardian.reset.foundry_overseer": "挑戰者已離開，鑄造廠停下生產線，進入了休眠",

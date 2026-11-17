@@ -71,15 +71,21 @@ public class SealConsoleBlockEntity extends BlockEntity {
         return e instanceof HorizonWarden w && w.isAlive() ? w : null;
     }
 
+    private boolean canActivate(ServerLevel level, @Nullable ServerPlayer player) {
+        if (!RuinGuards.canSummon(level, player)) return false;
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
+            tell(player, "gui.singulo.console.active");
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 触れたとき。守護機を起こせたらそれを返す。player は知らせる相手（null でもよい）。
      */
     @Nullable
     public HorizonWarden activate(ServerLevel level, @Nullable ServerPlayer player) {
-        if (activeWarden(level) != null || activeArchivist(level) != null) {
-            tell(player, "gui.singulo.console.active");
-            return null;
-        }
+        if (!canActivate(level, player)) return null;
         RuinCacheBlockEntity vault = vault(level);
         if (vault == null) {
             tell(player, "gui.singulo.console.no_vault");
@@ -99,7 +105,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition);
         w.startEmerging();
-        level.addFreshEntity(w);
+        if (!level.addFreshEntity(w)) return null;
         warden = w.getUUID();
         anomalyChanged();
         broadcast(level, "gui.singulo.console.awakened");
@@ -117,10 +123,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
      */
     @Nullable
     public HorizonWarden activateAwakened(ServerLevel level, @Nullable ServerPlayer player) {
-        if (activeWarden(level) != null || activeArchivist(level) != null) {
-            tell(player, "gui.singulo.console.active");
-            return null;
-        }
+        if (!canActivate(level, player)) return null;
         RuinCacheBlockEntity vault = vault(level);
         if (vault == null) {
             tell(player, "gui.singulo.console.no_vault");
@@ -137,7 +140,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition, true);
         w.startEmerging();
-        level.addFreshEntity(w);
+        if (!level.addFreshEntity(w)) return null;
         warden = w.getUUID();
         anomalyChanged();
         broadcast(level, "gui.singulo.console.awakened_rematch");
@@ -166,10 +169,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
      */
     @Nullable
     public LastArchivist activateArchivist(ServerLevel level, @Nullable ServerPlayer player) {
-        if (activeWarden(level) != null || activeArchivist(level) != null) {
-            tell(player, "gui.singulo.console.active");
-            return null;
-        }
+        if (!canActivate(level, player)) return null;
         if (vault(level) == null) {
             tell(player, "gui.singulo.console.no_vault");
             return null;
@@ -182,7 +182,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         a.moveTo(at.x, at.y, at.z, 180, 0);
         a.awaken(worldPosition);
         a.startEmerging();
-        level.addFreshEntity(a);
+        if (!level.addFreshEntity(a)) return null;
         archivist = a.getUUID();
         anomalyChanged();
         return a;

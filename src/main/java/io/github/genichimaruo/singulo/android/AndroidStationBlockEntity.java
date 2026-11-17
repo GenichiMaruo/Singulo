@@ -272,7 +272,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     private final int[] keptOrder = new int[MAX_UNITS];
     private final CompoundTag[] keptWork = new CompoundTag[MAX_UNITS];
 
-    /** 倒れたアンドロイドの作業を預かる。 */
+    /** 倒れたアンドロイドの作業とタンクの中身を預かる。待機中は指令台がない。 */
     public void keepWork(UUID id, @Nullable BlockPos console, int order, CompoundTag state) {
         int unit = unitOf(id);
         if (unit >= 0) {
@@ -707,10 +707,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         a.setCharge(a.maxCharge());
         if (keptConsole[unit] != null) {
             a.assignWork(keptConsole[unit], keptOrder[unit]);
-            if (keptWork[unit] != null) {
-                a.restoreWorkState(keptWork[unit]);
-            }
             keptConsole[unit] = null;
+        }
+        if (keptWork[unit] != null) {
+            a.restoreWorkState(keptWork[unit]);
             keptWork[unit] = null;
         }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
@@ -880,9 +880,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             if (keptConsole[i] != null) {
                 tag.put("kept_console" + i, net.minecraft.nbt.NbtUtils.writeBlockPos(keptConsole[i]));
                 tag.putInt("kept_order" + i, keptOrder[i]);
-                if (keptWork[i] != null) {
-                    tag.put("kept_work" + i, keptWork[i]);
-                }
+            }
+            if (keptWork[i] != null) {
+                tag.put("kept_work" + i, keptWork[i]);
             }
         }
         tag.putInt("mode", mode);

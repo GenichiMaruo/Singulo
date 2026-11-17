@@ -1547,6 +1547,7 @@ UI_LANG = {
                                                'The awakened guardian is defeated. Fine fragments spill out'),
     'gui.singulo.boss.party': ('%s ［挑戦者 %s人］', '%s [%s challengers]'),
     'gui.singulo.guardian.active': ('番人はすでに目覚めている', 'The guardian is already awake'),
+    'gui.singulo.guardian.peaceful': ('ピースフルでは遺構のボスを呼び出せません', 'Ruin bosses cannot be summoned on Peaceful difficulty'),
     'gui.singulo.guardian.no_vault': ('番人に守られた保管庫が近くにない', 'No guarded vault nearby'),
     'gui.singulo.guardian.wrong_core': ('これは、この遺構の番人の覚醒核ではない', "This is not the awakening core for this ruin's guardian"),
     'gui.singulo.guardian.awakened.gravity_remnant': ('封じ込め槽が砕けた。重力の澱が這い出してきた',
