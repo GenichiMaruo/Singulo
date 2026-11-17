@@ -169,11 +169,28 @@ def id_icon(full_id):
 
 
 def mod_icon(iid, kind):
+    if kind == 'variant':
+        return variant_icon(iid)
     if kind == 'machine':
         return mod_texture(f'block/{iid}_front') or mod_texture(f'block/{iid}')
     if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass'):
         return mod_texture(f'block/{iid}')
     return mod_texture(f'item/{iid}') or mod_texture(f'item/{iid}_00') or mod_texture(f'block/{iid}')
+
+
+def variant_icon(iid):
+    """建材の階段・ハーフブロック・塀: 元の建材の絵を、その形（横から見た形）に切り抜く。"""
+    from building_variants import VARIANTS
+    base, shape = VARIANTS[iid]
+    im = mod_texture(f'block/{base}')
+    if im is None:
+        return None
+    im = im.convert('RGBA').resize((16, 16))
+    keep = {'stairs': [(0, 8, 16, 16), (0, 0, 8, 8)], 'slab': [(0, 8, 16, 16)], 'wall': [(4, 0, 12, 16)]}[shape]
+    out = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    for box in keep:
+        out.paste(im.crop(box), box[:2])
+    return out
 
 
 def fluid_icon(rgb):

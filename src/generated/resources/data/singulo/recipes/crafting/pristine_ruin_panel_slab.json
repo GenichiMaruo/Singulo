@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:pristine_ruin_panel"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "singulo:pristine_ruin_panel_slab"
+  }
+}

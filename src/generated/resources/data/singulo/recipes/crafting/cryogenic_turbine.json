@@ -11,7 +11,7 @@
       "tag": "forge:plates/steel"
     },
     "H": {
-      "item": "singulo:heat_exchange_core"
+      "item": "singulo:cooling_tower_heat_exchange_core"
     },
     "O": {
       "item": "singulo:superconducting_coil"

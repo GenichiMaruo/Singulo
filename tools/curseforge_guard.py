@@ -26,7 +26,7 @@ class GuardError(RuntimeError):
 
 
 def ref_name(tag):
-    match = re.fullmatch(r'(v[0-9]+\.[0-9]+\.[0-9]+(?:-1\.20\.1[FN])?)(?:-r[1-9][0-9]*)?', tag)
+    match = re.fullmatch(r'(v[0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?(?:-1\.20\.1[FN])?)(?:-r[1-9][0-9]*)?', tag)
     if not match:
         raise GuardError('Invalid release tag')
     # Revised tags must not evade the lock for the same release filename.

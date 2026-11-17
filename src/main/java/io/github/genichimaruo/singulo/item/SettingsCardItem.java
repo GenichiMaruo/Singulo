@@ -71,7 +71,7 @@ public class SettingsCardItem extends SinguloItem {
             m.pasteSides(tag.getInt("item_sides"), tag.getIntArray("tank_sides"));
             if (m.type().id().equals(tag.getString("machine_type"))) {
                 m.pasteSelectedRecipe(tag.contains("selected_recipe")
-                        ? net.minecraft.resources.ResourceLocation.tryParse(tag.getString("selected_recipe")) : null);
+                        ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(net.minecraft.resources.ResourceLocation.tryParse(tag.getString("selected_recipe"))) : null);
             }
         } else if (be instanceof PenroseReactorBlockEntity r) {
             r.setSpinTargetIndex(tag.getInt("spin_target"));

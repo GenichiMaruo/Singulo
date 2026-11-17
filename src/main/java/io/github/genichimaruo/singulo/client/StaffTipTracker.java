@@ -20,7 +20,7 @@ public final class StaffTipTracker {
     /** 歪みを置くアイテムと、モデルの中での歪みの中心の高さと半径（1 = 1ブロック。モデルは中心が原点になるよう 0.5 ずらして描かれる）。 */
     private static final java.util.Map<String, float[]> TIPS = java.util.Map.of(
             "graviton_manipulator", new float[]{13F / 16F - 0.5F, 3F / 16F},
-            "micro_black_hole", new float[]{0F, 4F / 16F},
+            "micro_black_hole_vessel", new float[]{0F, 4F / 16F},
             "black_hole_bomb", new float[]{0F, 3F / 16F});
 
     /** 歪みを置くアイテムか。 */

@@ -65,17 +65,17 @@ public final class AssemblerPowerGameTests {
 
     @GameTest(template = "empty", batch = "assembler_power")
     public static void assemblerMk2RunsContinuouslyWithExternalPower(GameTestHelper h) {
-        craft(h, "scanner_module_2", false);
+        craft(h, "neutrino_scanner_module_2", false);
     }
 
     @GameTest(template = "empty", batch = "assembler_power")
     public static void assemblerMk3RunsContinuouslyWithExternalPower(GameTestHelper h) {
-        craft(h, "scanner_module_3", false);
+        craft(h, "neutrino_scanner_module_3", false);
     }
 
     @GameTest(template = "empty", batch = "assembler_power")
     public static void assemblerOverclockedMk3RunsContinuouslyWithExternalPower(GameTestHelper h) {
-        craft(h, "scanner_module_3", true);
+        craft(h, "neutrino_scanner_module_3", true);
     }
 
     @GameTest(template = "empty", batch = "assembler_power")

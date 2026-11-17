@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "GFG",
-    "GBG",
-    "FD "
+    "FBF",
+    "GWG",
+    "FFF"
   ],
   "key": {
     "B": {
@@ -16,8 +16,8 @@
     "F": {
       "item": "singulo:lab_frame"
     },
-    "D": {
-      "tag": "singulo:ceramic_flux"
+    "W": {
+      "item": "singulo:white_ceramic_composite"
     }
   },
   "result": {

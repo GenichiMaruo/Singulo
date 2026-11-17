@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:pristine_ruin_tiles"
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:pristine_ruin_tile_wall"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "singulo:record_fragment"
+      "item": "singulo:crystal_memory"
     },
     "title": {
       "translate": "advancement.singulo.records.title"

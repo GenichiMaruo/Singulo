@@ -8,6 +8,7 @@
     "ProjectileAccessor",
     "WormholeProjectileTickMixin",
     "DaylightDetectorBlockMixin",
+    "HealOrHarmMobEffectMixin",
     "RayleighLightEngineMixin",
     "RayleighWeatherMixin",
     "RayleighSunBurnMixin",

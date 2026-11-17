@@ -197,6 +197,13 @@ public abstract class RuinBoss extends Monster {
         return super.spawnAtLocation(stack, offsetY);
     }
 
+    /** 悪い効果は受けない（{@link BossEffects}）。NeoForge では上書き専用（呼ぶのは MobEffectEvent.Applicable）。 */
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean canBeAffected(net.minecraft.world.effect.MobEffectInstance effect) {
+        return BossEffects.accepts(effect) && super.canBeAffected(effect);
+    }
+
     @Override
     protected void dropExperience() {
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()

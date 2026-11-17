@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "singulo:worldline_anchor_small"
+      "item": "singulo:worldline_anchor"
     },
     "title": {
       "translate": "advancement.singulo.anchor.title"
@@ -21,7 +21,7 @@
         "items": [
           {
             "items": [
-              "singulo:worldline_anchor_small"
+              "singulo:worldline_anchor"
             ]
           }
         ]

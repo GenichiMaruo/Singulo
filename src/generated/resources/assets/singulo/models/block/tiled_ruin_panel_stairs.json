@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "singulo:block/tiled_ruin_panel",
+    "top": "singulo:block/tiled_ruin_panel",
+    "side": "singulo:block/tiled_ruin_panel"
+  }
+}

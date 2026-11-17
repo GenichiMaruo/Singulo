@@ -823,7 +823,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
         Vec3 dir = new Vec3(level.random.nextGaussian(), Math.abs(level.random.nextGaussian()) + 0.5, level.random.nextGaussian()).normalize();
         Vec3 at = c.add(dir.scale(horizon + 0.6));
-        var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("record_fragment")));
+        var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("crystal_memory")));
         record.setDeltaMovement(dir.scale(0.7));
         record.getPersistentData().putLong(EventHorizonTargets.RETURNED, level.getGameTime());
         level.addFreshEntity(record);

@@ -70,7 +70,7 @@ public final class BalanceGameTests {
         insert(helper, auto, new ItemStack(item("quantum_computing_module"), 2));
         insert(helper, auto, new ItemStack(item("time_crystal_module"), 4));
         insert(helper, auto, new ItemStack(item("gravity_field_stabilizer"), 2));
-        helper.succeedWhen(() -> helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).is(item("core_controller")),
+        helper.succeedWhen(() -> helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).is(item("reactor_core_controller")),
                 "時間結晶モジュール4個を普通に入れて炉心制御装置ができない"));
     }
 
