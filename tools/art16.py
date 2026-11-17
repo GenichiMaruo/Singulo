@@ -1615,8 +1615,31 @@ def tablet(glow):
                                d.rectangle([3, 2, 12, 13], outline=(236, 238, 240, 255))))
 
 
-def pellet(c):
-    return outlined(lambda d: (d.ellipse([4, 4, 11, 11], fill=rgba(c)), d.ellipse([5, 5, 7, 7], fill=rgba(lighten(c, 0.35)))))
+def steel_blend():
+    """鋼の素（0.21.0。質量ペレットと見分けるため玉から変えた）: 銀灰色の粉の小山（左右対称）に、石炭の黒い粒が混ざる。"""
+    iron, coal = (150, 152, 160), (40, 40, 46)
+
+    def f(d):
+        d.polygon([(2, 12), (5, 8), (7, 6), (8, 6), (10, 8), (13, 12), (8, 13), (7, 13)], fill=rgba(iron))
+        d.polygon([(5, 8), (7, 6), (8, 6), (6, 9), (4, 10)], fill=rgba(lighten(iron, 0.3)))
+        d.polygon([(10, 8), (13, 12), (11, 12)], fill=rgba(darken(iron, 0.2)))
+        for x, y in ((5, 11), (8, 9), (10, 11), (7, 12), (11, 10), (6, 10), (9, 7)):
+            d.point((x, y), fill=rgba(coal))
+        d.point((7, 7), fill=(230, 232, 238, 255))
+    return vcenter(outlined(f, **SOFT_EDGE))
+
+
+def mass_pellet():
+    """質量ペレット（0.21.0。鋼の素と見分けるため玉から変えた）: 濃い黒の玉を、空間のゆがみの菫色の輪が斜めに巡る（輪の奥側は玉に隠れる）。"""
+    dense, glow = (52, 50, 70), (170, 120, 255)
+
+    def f(d):
+        d.ellipse([1, 6, 14, 12], outline=rgba(darken(glow, 0.35)))
+        d.ellipse([4, 3, 11, 10], fill=rgba(dense))
+        d.ellipse([5, 4, 8, 6], fill=rgba(lighten(dense, 0.25)))
+        d.arc([1, 6, 14, 12], 20, 160, fill=rgba(glow))
+        d.point((5, 5), fill=rgba(lighten(glow, 0.5)))
+    return vcenter(outlined(f))
 
 
 # ---------------------------------------------------------------- 隕石・雷・深海・虚空の素材と、中間素材
@@ -2198,7 +2221,7 @@ ITEM_ART = {
     'sports_drink': lambda: drink_can((240, 244, 248), (60, 120, 220), (240, 244, 248)),
     'energy_drink': lambda: drink_can((250, 206, 40), (40, 40, 44), (250, 206, 40)),
     'coffee': lambda: coffee_bottle(),
-    'steel_blend': lambda: pellet((92, 92, 104)),
+    'steel_blend': steel_blend,
     'steel_ingot': lambda: vcenter(ingot(STEEL)),
     'unfired_ceramic': lambda: plate((190, 178, 164)),
     'white_ceramic_composite': lambda: plate((236, 238, 240)),
@@ -2243,7 +2266,7 @@ ITEM_ART = {
     'data_card_observation_log': lambda: card(T1),
     'data_card_quantum_fragment': lambda: card(T3),
     'data_card_culture_data': lambda: card(T4),
-    'mass_pellet': lambda: pellet((82, 86, 98)),
+    'mass_pellet': mass_pellet,
     'superconducting_coil': lambda: coil(COPPER, (200, 230, 250)),
     'superconducting_wire': lambda: spool((150, 210, 240)),
     'muon_bundle': lambda: tracks(T2),
