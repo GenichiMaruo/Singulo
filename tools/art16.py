@@ -1438,6 +1438,28 @@ def module(body, lamp):
     return outlined(f)
 
 
+def neutrino_module(tier):
+    """ニュートリノ感度モジュール（0.20.0）: 縦長の差し込み札に ν の字、下に金の端子。ほかの四角いモジュールと形で見分けられる。
+    札は検出器と同じ紫。字と下の印は段の色（Mk2 は金、Mk3 は水色）で、印の数（2・3）で段が読める。"""
+    body, lamp = (60, 54, 90), {2: (250, 200, 90), 3: (120, 230, 255)}[tier]
+    nu = ('XX..X', '.X..X', '.X.X.', '.XX..', '.X...')
+
+    def f(d):
+        d.rectangle([4, 2, 11, 12], fill=rgba(body))
+        d.line([(4, 2), (11, 2)], fill=rgba(lighten(body, 0.3)))
+        d.line([(4, 2), (4, 12)], fill=rgba(lighten(body, 0.18)))
+        d.rectangle([5, 3, 10, 9], fill=(24, 28, 42, 255))
+        for y, row in enumerate(nu):
+            for x, ch in enumerate(row):
+                if ch == 'X':
+                    d.point((5 + x, 4 + y), fill=rgba(lamp))
+        for i in range(tier):
+            d.point((6 + i * 2, 11), fill=rgba(lamp))
+        for x in (5, 7, 8, 10):
+            d.point((x, 13), fill=(214, 180, 90, 255))
+    return outlined(f)
+
+
 def card(stripe, blank=False):
     def f(d):
         d.rectangle([2, 4, 13, 11], fill=(236, 238, 240, 255))
@@ -2288,8 +2310,8 @@ ITEM_ART = {
     'relocation_wrench': lambda: relocation_wrench(),
     'builder_wand': lambda: outlined(lambda d: (d.line([(3, 12), (10, 5)], fill=(150, 110, 70, 255), width=2),
                                                d.ellipse([10, 2, 13, 5], fill=(255, 120, 255, 255)))),
-    'neutrino_scanner_module_2': lambda: module((60, 54, 90), (250, 200, 90)),
-    'neutrino_scanner_module_3': lambda: module((40, 36, 60), (120, 230, 255)),
+    'neutrino_scanner_module_2': lambda: neutrino_module(2),
+    'neutrino_scanner_module_3': lambda: neutrino_module(3),
     'magnetic_key': lambda: seal_key(1),
     'quantum_key': lambda: seal_key(2),
     'temporal_key': lambda: seal_key(3),
