@@ -31,6 +31,7 @@
     "SodiumRayleighVertexMixin",
     "SodiumRayleighColorMixin",
     "SodiumRayleighShaderMixin",
-    "DistantHorizonsLightmapMixin"
+    "DistantHorizonsLightmapMixin",
+    "GlassStairsWaterMixin"
   ]
 }
