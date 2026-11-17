@@ -22,7 +22,9 @@ import net.minecraftforge.registries.DeferredRegister;
 
 public final class SinguloItems {
     private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
-    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings");
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
+            "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg",
+            "ergosphere_leviathan_spawn_egg", "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(net.minecraft.core.registries.Registries.ITEM, Singulo.MODID);
 
     /** 手持ちの道具（生成表ではなく専用クラスで作る）。 */

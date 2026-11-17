@@ -83,6 +83,9 @@ public final class LegacyIdGameTests {
         });
         snapshot.aliases.clear();
         var stagingManager = new net.minecraftforge.registries.RegistryManager("STAGING");
+        // Item registry creation shares the block registry's block-to-item slave map.
+        stagingManager.getRegistry(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getRegistryName(),
+                net.minecraftforge.registries.RegistryManager.ACTIVE);
         net.minecraftforge.registries.ForgeRegistry<T> staging = stagingManager.getRegistry(active.getRegistryName(),
                 net.minecraftforge.registries.RegistryManager.ACTIVE);
         var missing = new it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap<net.minecraft.resources.ResourceLocation>();

@@ -53,6 +53,12 @@ public final class BuildingVariantGameTests {
         var drops = slab.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE).getDrops(params);
         helper.assertTrue(drops.size() == 1 && drops.get(0).is(slab.asItem()) && drops.get(0).getCount() == 2,
                 "Double slab should drop two slabs: " + drops);
+        var singleDrops = slab.defaultBlockState().getDrops(new LootParams.Builder(level)
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(helper.absolutePos(new BlockPos(1, 1, 1))))
+                .withParameter(LootContextParams.TOOL, new ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE))
+                .withParameter(LootContextParams.BLOCK_STATE, slab.defaultBlockState()));
+        helper.assertTrue(singleDrops.size() == 1 && singleDrops.get(0).is(slab.asItem()) && singleDrops.get(0).getCount() == 1,
+                "Single slab should drop only one slab: " + singleDrops);
 
         // 同じガラスどうしの境目は描かない（階段の部分だけの面に接する所は、穴が見えるので描く）
         var glass = SinguloBlocks.WHITE_GLASS_PANEL.get().defaultBlockState();

@@ -2367,6 +2367,8 @@ public final class AndroidGameTests {
         chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.BONE_MEAL, 32));
         for (int x = 0; x < 2; x++) {
             helper.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.DIRT);
+            // The legacy template can retain structure cells above the raised field.
+            for (int y = 2; y <= 5; y++) helper.setBlock(new BlockPos(x, y, 5), net.minecraft.world.level.block.Blocks.AIR);
         }
         BlockPos from = helper.absolutePos(new BlockPos(0, 2, 5)), to = helper.absolutePos(new BlockPos(1, 2, 5));
         procedureCard(helper, List.of(
@@ -2384,7 +2386,7 @@ public final class AndroidGameTests {
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: ground=" + helper.getBlockState(new BlockPos(0, 1, 5)) + ", crop=" + helper.getBlockState(new BlockPos(0, 2, 5)) + ", state=" + a.state() + ", stall=" + a.stall() + ", charge=" + a.charge());
             for (int x = 0; x < 2; x++) {
                 helper.assertTrue(helper.getBlockState(new BlockPos(x, 1, 5)).is(net.minecraft.world.level.block.Blocks.FARMLAND), "土を耕していない");
                 helper.assertTrue(helper.getBlockState(new BlockPos(x, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");

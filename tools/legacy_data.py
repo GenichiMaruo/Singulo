@@ -48,7 +48,7 @@ def convert(path: Path, obj):
             if pool.get('rolls') == 1 and len(entries) == 1:
                 functions = entries[0].get('functions', [])
                 count = next((f for f in functions if f.get('function') == 'minecraft:set_count'), None)
-                if count is not None:
+                if count is not None and not count.get('conditions'):
                     pool['rolls'] = count['count']
                     functions.remove(count)
     if 'recipes' in parts and (obj.get('type', '').startswith('minecraft:') or obj.get('type') == 'singulo:smes_upgrade'):
