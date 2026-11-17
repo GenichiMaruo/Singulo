@@ -492,24 +492,10 @@ def strange_matter():
 
 
 def compressed_block(level, metal):
-    im, d = new()
-    base = (126, 130, 138) if not metal else (156, 144, 120)
-    k = 1 - 0.2 * (level - 1)
-    b = tuple(int(c * k) for c in base)
-    d.rectangle([0, 0, S - 1, S - 1], fill=rgba(b))
-    step = {1: 16, 2: 8, 3: 4}.get(level, 16)
-    seam = (200, 230, 255) if level >= 2 else lighten(b, 0.3)
-    for p in range(0, S, step):
-        d.line([(p, 0), (p, S - 1)], fill=rgba(darken(b, 0.25)))
-        d.line([(0, p), (S - 1, p)], fill=rgba(darken(b, 0.25)))
-    for p in range(step, S, step):
-        for q in range(step, S, step):
-            d.point((p, q), fill=rgba(seam))
-    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((236, 238, 240) if level < 3 else (150, 232, 255)))
-    if metal:
-        d.line([(2, 2), (S // 2, 2)], fill=rgba(lighten(b, 0.45)))
-    return im
-
+    """16×16 の絵（art16.compressed_block）をそのまま2倍にする（0.20.0。ドットの形をそろえる）。"""
+    import art16
+    from PIL import Image
+    return art16.compressed_block(level, metal).resize((S, S), Image.NEAREST)
 
 # ---------------------------------------------------------------- アイテム
 

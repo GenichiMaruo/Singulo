@@ -1199,21 +1199,46 @@ def strange_matter():
 
 
 def compressed_block(level, metal):
+    """角金具で締めた塊（0.20.0）。くぼんだ中の板に斜めの押さえ、下の縁の灯りの数（1〜3）で段が読める。金属は真鍮の金具。"""
     base = (128, 132, 140) if not metal else (158, 146, 122)
-    b = tuple(int(c * (1 - 0.2 * (level - 1))) for c in base)
-    im = weathered(b, seed=20 + level + (10 if metal else 0), strength=1.4)
+    b = tuple(int(c * (1 - 0.17 * (level - 1))) for c in base)
+    im = weathered(b, seed=70 + level + (10 if metal else 0), edge=False, strength=1.1)
     d = ImageDraw.Draw(im)
-    step = {1: 8, 2: 4, 3: 2}.get(level, 8)
-    for p in range(0, S, step):
-        d.line([(p, 0), (p, S - 1)], fill=rgba(darken(b, 0.22)))
-        d.line([(0, p), (S - 1, p)], fill=rgba(darken(b, 0.22)))
-    if level >= 2:
-        for p in range(step, S, step):
-            for q in range(step, S, step):
-                d.point((p, q), fill=(200, 230, 255, 255))
-    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((236, 238, 240) if level < 3 else (150, 232, 255)))
+    put = lambda x, y, c: im.putpixel((x, y), rgba(c))
+    trim = (176, 182, 190) if not metal else (206, 170, 92)
+    glow = (150, 232, 255)
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(b, 0.45)))
+    d.rectangle([1, 1, S - 2, S - 2], outline=rgba(lighten(b, 0.10)))
+    # 出っ張った縁: 左上を明るく、右下を暗く
+    for i in range(1, S - 1):
+        put(i, 1, lighten(im.getpixel((i, 1))[:3], 0.18))
+        put(1, i, lighten(im.getpixel((1, i))[:3], 0.18))
+        put(i, S - 2, darken(im.getpixel((i, S - 2))[:3], 0.25))
+        put(S - 2, i, darken(im.getpixel((S - 2, i))[:3], 0.25))
+    # 内側のくぼんだ板（逆の陰）
+    for i in range(4, 12):
+        put(i, 4, darken(b, 0.25))
+        put(4, i, darken(b, 0.25))
+        put(i, 11, lighten(b, 0.12))
+        put(11, i, lighten(b, 0.12))
+    # 斜めの押さえ（Lv2 から太く）
+    for i in range(5, 11):
+        put(i, i, darken(b, 0.18))
+        put(15 - i, i, darken(b, 0.18))
+        if level >= 2:
+            put(i + 1 if i < 10 else i, i, darken(b, 0.10))
+    # 角金具
+    for cx, cy, sx, sy in ((0, 0, 1, 1), (15, 0, -1, 1), (0, 15, 1, -1), (15, 15, -1, -1)):
+        for k in range(4):
+            put(cx + sx * k, cy, trim)
+            put(cx, cy + sy * k, trim)
+        put(cx + sx, cy + sy, darken(trim, 0.25))
+        put(cx + sx * 2, cy + sy * 2, lighten(trim, 0.3))
+    # 段の灯り（下の縁に 1〜3 つ）
+    for x in {1: [7], 2: [5, 9], 3: [4, 7, 10]}.get(level, [7]):
+        put(x, 13, glow)
+        put(x + 1, 13, lighten(glow, 0.3))
     return im
-
 
 # ---------------------------------------------------------------- アイテム（16×16）
 
