@@ -35,6 +35,14 @@ public final class PortablePrinterGameTests {
         ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         ItemStack printer = new ItemStack(SinguloItems.PORTABLE_ANDROID_PRINTER.get());
         PortableAndroidPrinterItem.energy(printer).receiveEnergy(PortableAndroidPrinterItem.CAPACITY, false);
+        // 容量は、入れたメモリの型の1体分（倍率3の型なら3倍）
+        java.util.List<ItemStack> heavy = java.util.List.of(item("android_memory_gunner", 1), item("android_kit", 1));
+        ItemStack probe = new ItemStack(SinguloItems.PORTABLE_ANDROID_PRINTER.get());
+        PortableAndroidPrinterItem.setContents(probe, heavy);
+        h.assertTrue(PortableAndroidPrinterItem.capacity(probe) == 3 * PortableAndroidPrinterItem.CAPACITY,
+                "The capacity does not follow the memory: " + PortableAndroidPrinterItem.capacity(probe));
+        PortableAndroidPrinterItem.energy(probe).receiveEnergy(Integer.MAX_VALUE, false);
+        h.assertTrue(PortableAndroidPrinterItem.problem(probe) == null, "Mk1 cannot print a costly type");
         // メモリがなければ印刷できない
         h.assertTrue("gui.singulo.portable_printer.no_memory".equals(PortableAndroidPrinterItem.problem(printer)), "Prints without a memory");
         PortableAndroidPrinterItem.setContents(printer, List.of(item("android_memory_blade", 1), item("android_kit", 2),

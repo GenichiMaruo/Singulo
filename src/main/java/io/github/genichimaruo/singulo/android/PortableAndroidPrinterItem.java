@@ -40,15 +40,16 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * <li>印刷: 地面に置くたびに、そろっている次の組（Mk2 は組を順に回る。{@link SinguloComponents#PRINTER_NEXT}）で1体印刷する</li>
  * <li>アンドロイド用装甲板: 印刷したアンドロイドに積む（胸当てとして装備する）</li>
  * <li>自己修理キット: 印刷したアンドロイドに持たせ（アンドロイドの枠に入るだけ）、持ち歩いている間は、近くの自分の身寄りのないアンドロイドのキットが減っていれば補充する</li>
- * <li>電力: 1組につき {@link #CAPACITY}（剣の型1体分）を蓄え、印刷ごとに組立ステーションの {@link #COST_FACTOR} 倍の電力（型の倍率つき）を使う。
- *     蓄電装置の充電の枠で充電する</li>
+ * <li>電力: 組ごとに、入れたメモリの型の1体分（{@link #printFe}。メモリがなければ {@link #CAPACITY}）を蓄えられ、印刷ごとに
+ *     組立ステーションの {@link #COST_FACTOR} 倍の電力（型の倍率つき）を使う。蓄電装置の充電の枠で充電する。メモリを替えて容量が
+ *     減っても、溜まっている電力は消さない（使い切るまで、それ以上は充電しない）</li>
  * <li>使い方: 空中で右クリックすると画面を開く。印刷の準備ができていれば、地面を右クリック（または画面の印刷ボタン）で、
  *     カバンを地面に置いて開き（{@link PortablePrinterEntity}）、中の印刷面で印刷する。終わると閉じて持ち物へ戻る</li>
  * <li>印刷したアンドロイドは、使った人について歩く（追従モード）身寄りのないアンドロイドになる（組立ステーションでリンクし直せる）</li>
  * </ul>
  */
 public class PortableAndroidPrinterItem extends Item {
-    /** 1組あたりに蓄えられる電力（剣の型1体分。印刷のたびに充電し直す）。 */
+    /** 1組あたりに蓄えられる電力の基準（倍率1の型の1体分。メモリのない組もこれだけ蓄えられる）。 */
     public static final int CAPACITY = 80_000;
     /** 1体の印刷に使う電力の、組立ステーションに対する倍率（持ち運べる分、高くつく）。 */
     public static final int COST_FACTOR = 2;
@@ -82,8 +83,17 @@ public class PortableAndroidPrinterItem extends Item {
         return unit * PER_UNIT + slot;
     }
 
+    /** 蓄えられる電力: 組ごとの、入れたメモリの型の1体分の合計（メモリがなければ {@link #CAPACITY}）。 */
     public static int capacity(ItemStack stack) {
-        return CAPACITY * Math.max(1, units(stack));
+        int n = units(stack);
+        if (n <= 0) {
+            return CAPACITY;
+        }
+        int sum = 0;
+        for (int u = 0; u < n; u++) {
+            sum += printFe(stack, u);
+        }
+        return sum;
     }
 
     public static IEnergyStorage energy(ItemStack stack) {
