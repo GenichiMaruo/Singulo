@@ -317,6 +317,13 @@ public abstract class RuinAndroid extends Monster {
     private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(INVENTORY_SIZE);
     /** 作業（自動化）に割り当ててよいか（アンドロイドの画面で切り替える）。 */
     private boolean workEnabled = true;
+    /** 床に落ちている物を拾うか（0.21.0。アンドロイドの画面で切り替える）。 */
+    private boolean collect = true;
+    /** 拾った物の預け先（{@link #STORE_CHEST} チェスト類を優先・{@link #STORE_WORK} 作業指令台と資材口を優先・{@link #STORE_OFF} 預けない）。 */
+    private int store = STORE_CHEST;
+    /** 拾った物を持っているか（預けに行くきっかけ）と、最後に拾った時刻。 */
+    private boolean collected;
+    private int lastCollect;
     /** 割り当てられた作業の、作業指令台と注文（なければ null と -1）。 */
     @Nullable
     private BlockPos workConsole;
@@ -1104,6 +1111,23 @@ public abstract class RuinAndroid extends Monster {
         this.workEnabled = enabled;
     }
 
+    public boolean collects() {
+        return collect;
+    }
+
+    public void setCollect(boolean collect) {
+        this.collect = collect;
+    }
+
+    public int storeMode() {
+        return store;
+    }
+
+    /** 預け先を次へ（チェスト優先 → 作業優先 → 預けない）。 */
+    public void cycleStoreMode() {
+        store = (store + 1) % 3;
+    }
+
     /** 作業指令台の注文を割り当てる（作業中は戦わず、持ち物を取り出せない）。 */
     public void assignWork(BlockPos console, int order) {
         if (escrowRequest != null && (!console.equals(workConsole) || order != workOrder)) return;
@@ -1280,6 +1304,193 @@ public abstract class RuinAndroid extends Monster {
         return true;
     }
 
+    /** 拾った物の預け先: チェスト類を優先・作業指令台と資材口を優先・預けない。 */
+    public static final int STORE_CHEST = 0, STORE_WORK = 1, STORE_OFF = 2;
+    /** 落ちている物を拾いに行く範囲（ブロック）と、最後に拾ってから預けに行くまで（tick）。 */
+    static final double COLLECT_RANGE = 8;
+    static final int STORE_AFTER = 60;
+
+    /** 拾ってよい物か: 置かれてすぐでない・プレイヤーが投げた物でない・持ち物かバックパックに入る。 */
+    private boolean collectable(net.minecraft.world.entity.item.ItemEntity e) {
+        if (!e.isAlive() || e.hasPickUpDelay() || e.getItem().isEmpty() || e.getOwner() instanceof Player) {
+            return false;
+        }
+        return canCarry(e.getItem());
+    }
+
+    /** 持ち物とバックパックに、この物が少しでも入るか。 */
+    private boolean canCarry(net.minecraft.world.item.ItemStack stack) {
+        for (int slot : allCarrySlots()) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (s.isEmpty() || net.minecraft.world.item.ItemStack.isSameItemSameComponents(s, stack) && s.getCount() < s.getMaxStackSize()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 持ち物とバックパックへ入れる（同じ物に重ね、残りを空いた枠へ。入りきらなかった分を返す）。 */
+    private net.minecraft.world.item.ItemStack carry(net.minecraft.world.item.ItemStack stack) {
+        net.minecraft.world.item.ItemStack rest = stack.copy();
+        int[] slots = allCarrySlots();
+        for (int slot : slots) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (!rest.isEmpty() && !s.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameComponents(s, rest)) {
+                int n = Math.min(rest.getCount(), s.getMaxStackSize() - s.getCount());
+                s.grow(n);
+                rest.shrink(n);
+            }
+        }
+        for (int slot : slots) {
+            if (!rest.isEmpty() && inventory.getItem(slot).isEmpty()) {
+                inventory.setItem(slot, rest);
+                rest = net.minecraft.world.item.ItemStack.EMPTY;
+            }
+        }
+        inventory.setChanged();
+        return rest;
+    }
+
+    /** 護衛として手が空いているか（戦い・作業・預けに行く途中・戻る・充電でない）。 */
+    private boolean idleGuard() {
+        return guard && printed() && active() && getTarget() == null && !isWorking() && stashTarget == null
+                && state() != STATE_RETREAT && !charging(state());
+    }
+
+    /** 落ちている物を拾いに行く（設定でオンのとき）。拾い終えて少したったら、預け先へ預けに行く（{@link #maybeStore}）。 */
+    private final class CollectGoal extends net.minecraft.world.entity.ai.goal.Goal {
+        @Nullable
+        private net.minecraft.world.entity.item.ItemEntity item;
+
+        CollectGoal() {
+            setFlags(java.util.EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            if (!collect || !idleGuard() || tickCount % 10 != 0) {
+                return false;
+            }
+            item = null;
+            double best = Double.MAX_VALUE;
+            for (var e : level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, getBoundingBox().inflate(COLLECT_RANGE),
+                    RuinAndroid.this::collectable)) {
+                double d = e.distanceToSqr(RuinAndroid.this);
+                if (d < best) {
+                    best = d;
+                    item = e;
+                }
+            }
+            return item != null;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return collect && item != null && collectable(item) && idleGuard()
+                    && item.distanceToSqr(RuinAndroid.this) < (COLLECT_RANGE + 4) * (COLLECT_RANGE + 4);
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void stop() {
+            item = null;
+            getNavigation().stop();
+        }
+
+        @Override
+        public void tick() {
+            if (item == null) {
+                return;
+            }
+            getLookControl().setLookAt(item);
+            if (item.distanceToSqr(RuinAndroid.this) > 1.6 * 1.6) {
+                if (tickCount % 10 == 0 || getNavigation().isDone()) {
+                    getNavigation().moveTo(item, 1.0);
+                }
+                return;
+            }
+            net.minecraft.world.item.ItemStack stack = item.getItem();
+            int before = stack.getCount();
+            net.minecraft.world.item.ItemStack rest = carry(stack);
+            if (rest.getCount() < before) {
+                take(item, before - rest.getCount());
+                playSound(net.minecraft.sounds.SoundEvents.ITEM_PICKUP, 0.3F, 1.4F);
+                collected = true;
+                lastCollect = tickCount;
+            }
+            if (rest.isEmpty()) {
+                item.discard();
+            } else {
+                item.setItem(rest);
+            }
+            item = null;
+        }
+    }
+
+    /** 拾った物を持っていて、近くにもう拾う物がない（か持ち物がいっぱい）なら、預け先へ預けに行く（1秒ごと）。 */
+    private void maybeStore() {
+        if (!collected || store == STORE_OFF || !idleGuard() || tickCount % 20 != 0) {
+            return;
+        }
+        boolean full = true;
+        for (int slot : allCarrySlots()) {
+            full &= !inventory.getItem(slot).isEmpty();
+        }
+        if (!full && tickCount - lastCollect < STORE_AFTER) {
+            return;
+        }
+        BlockPos depot = findDepot(store == STORE_WORK);
+        collected = false;                          // 預け先がなければ、次に拾うまで探さない
+        if (depot != null) {
+            stashTarget = depot;
+            stashTicks = STASH_TICKS;
+        }
+    }
+
+    /** 預け先の種類: 0 預けられない、1 チェスト類、2 作業指令台・資材口。 */
+    private int depotKind(BlockPos p) {
+        var be = level().getBlockEntity(p);
+        if (be == null) {
+            return 0;
+        }
+        if (be instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity
+                || be instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) {
+            return 2;
+        }
+        // まだ開けていない戦利品の箱（遺構・村など）には入れない
+        if (be instanceof net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity r && r.getLootTable() != null) {
+            return 0;
+        }
+        boolean box = be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity
+                || be instanceof net.minecraft.world.level.block.entity.BarrelBlockEntity
+                || be instanceof net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+        if (!box) {
+            // ほかの MOD の箱: ブロックの名前に箱らしい言葉があるもの
+            String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).getPath();
+            box = path.contains("chest") || path.contains("barrel") || path.contains("crate");
+        }
+        return box ? 1 : 0;
+    }
+
+    /** 預け先（work なら作業指令台と資材口を優先、でなければチェスト類を優先。なければもう一方）。なければ null。 */
+    @Nullable
+    private BlockPos findDepot(boolean work) {
+        BlockPos[] best = new BlockPos[3];
+        for (BlockPos p : BlockPos.betweenClosed(blockPosition().offset(-STASH_RANGE, -STASH_HEIGHT, -STASH_RANGE),
+                blockPosition().offset(STASH_RANGE, STASH_HEIGHT, STASH_RANGE))) {
+            int kind = depotKind(p);
+            if (kind > 0 && (best[kind] == null || p.distSqr(blockPosition()) < best[kind].distSqr(blockPosition())) && accepts(p)) {
+                best[kind] = p.immutable();
+            }
+        }
+        int first = work ? 2 : 1, second = work ? 1 : 2;
+        return best[first] != null ? best[first] : best[second];
+    }
+
     /** 預けに行く箱を探す範囲（横・上下、ブロック）と、たどり着くまで待つ時間（tick）。 */
     static final int STASH_RANGE = 12, STASH_HEIGHT = 4, STASH_TICKS = 20 * 30;
     /** 預けに行く箱（なければ null）と、残りの時間。 */
@@ -1318,24 +1529,13 @@ public abstract class RuinAndroid extends Monster {
         return null;
     }
 
-    /** 預ける箱にしてよい所か（入れ物のブロックで、物を入れられる）。かまどなどの装置には入れない。 */
+    /** 預ける箱にしてよい所か（入れ物のブロック・作業指令台・資材口で、物を入れられる）。かまどなどの装置には入れない。 */
     private boolean stashable(BlockPos p) {
-        var be = level().getBlockEntity(p);
-        if (be == null) {
-            return false;
-        }
-        boolean box = be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity
-                || be instanceof net.minecraft.world.level.block.entity.BarrelBlockEntity
-                || be instanceof net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity
-                || be instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity;
-        if (!box) {
-            // ほかの MOD の箱: ブロックの名前に箱らしい言葉があるもの
-            String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).getPath();
-            box = path.contains("chest") || path.contains("barrel") || path.contains("crate");
-        }
-        if (!box) {
-            return false;
-        }
+        return depotKind(p) > 0 && accepts(p);
+    }
+
+    /** 持ち物の何かを、そこへ入れられるか。 */
+    private boolean accepts(BlockPos p) {
         for (var handler : stashStorages(p)) {
             for (int slot : allCarrySlots()) {
                 var cargo = inventory.getItem(slot);
@@ -1351,6 +1551,8 @@ public abstract class RuinAndroid extends Monster {
         java.util.List<net.neoforged.neoforge.items.IItemHandler> out = new java.util.ArrayList<>();
         if (level().getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity port) {
             port.storages(level(), new java.util.HashSet<>(), out);
+        } else if (level().getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console) {
+            out.addAll(console.storages());               // 指令台の隣と、リンクした資材口の倉庫
         } else {
             var handler = level().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, null);
             if (handler != null) out.add(handler);
@@ -2391,6 +2593,7 @@ public abstract class RuinAndroid extends Monster {
         registerCombat();
         life = new AndroidLife(this);
         goalSelector.addGoal(3, new StashGoal());
+        goalSelector.addGoal(3, new CollectGoal());
         goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
@@ -2564,6 +2767,7 @@ public abstract class RuinAndroid extends Monster {
         if (!printed()) {
             getNavigation().stop();
         }
+        maybeStore();                                   // 拾った物を預けに行く（設定の預け先へ）
     }
 
     // ------------------------------------------------------------------ 無重力の中を飛ぶ
@@ -2969,6 +3173,8 @@ public abstract class RuinAndroid extends Monster {
         tag.put("tanks", tl);
         tag.put("chem_tanks", saveChems());
         tag.putBoolean("work", workEnabled);
+        tag.putBoolean("collect", collect);
+        tag.putInt("store", store);
         if (escrowRequest != null) {
             tag.putUUID("escrow_request",escrowRequest);
             tag.putInt("work_personal",personal);
@@ -3037,6 +3243,8 @@ public abstract class RuinAndroid extends Monster {
         loadChems(tag.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
         workEnabled = !tag.contains("work") || tag.getBoolean("work");
+        collect = !tag.contains("collect") || tag.getBoolean("collect");
+        store = tag.contains("store") ? Math.floorMod(tag.getInt("store"), 3) : STORE_CHEST;
         NbtUtils.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
             assignWork(p, tag.getInt("work_order"));
             personal = tag.getInt("work_personal");          // 作業を始めたときの持ち主の物の場所（読み込み直しても変えない）

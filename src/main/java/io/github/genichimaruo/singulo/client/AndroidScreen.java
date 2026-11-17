@@ -298,6 +298,14 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_STASH);
                 return true;
             }
+            if (Panel.inside(mouseX, mouseY, leftPos + TOOL_X, topPos + COLLECT_Y, TOOL_S, TOOL_S)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_COLLECT);
+                return true;
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + TOOL_X, topPos + STORE_Y, TOOL_S, TOOL_S)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_STORE);
+                return true;
+            }
             if (Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H)) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_WORK);
                 return true;
@@ -574,6 +582,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             area(TOOL_X, i == 0 ? SORT_Y : STASH_Y, TOOL_S, TOOL_S, List.of(Component.translatable(menu.working() ? "gui.singulo.android.stash.working"
                     : i == 0 ? "gui.singulo.android.sort.hint" : "gui.singulo.android.stash.hint")));
         }
+        drawCollectButtons(g, x, y, mouseX, mouseY);
         // 作業のオン／オフ（つるはしの記号のトグル）
         boolean on = menu.value(AndroidMenu.D_WORK) != 0;
         boolean hover = Panel.inside(mouseX, mouseY, x + AndroidMenu.WORK_X, y + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H);
@@ -585,13 +594,59 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                 Component.translatable("gui.singulo.android.work.hint").withStyle(st -> st.withColor(0xFF8A949E))));
     }
 
+    /**
+     * 落ちている物を拾うボタン（オンなら押し込んだ見た目で、磁石の印）と、拾った物の預け先のボタン
+     * （チェスト優先は箱、作業優先は画面のある指令台、預けないは箱に赤い斜線）。説明はツールチップ。
+     */
+    private void drawCollectButtons(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        boolean on = menu.value(AndroidMenu.D_COLLECT) != 0;
+        int bx = x + TOOL_X, by = y + COLLECT_Y;
+        boolean over = Panel.inside(mouseX, mouseY, bx, by, TOOL_S, TOOL_S);
+        int d = Panel.button(g, skin, bx, by, TOOL_S, TOOL_S, on ? Panel.Press.ON : over ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        int c = on ? skin.onAccent() : skin.dim();
+        by += d;
+        g.fill(bx + 2, by + 2, bx + 4, by + 6, c);                 // 磁石（U の字）
+        g.fill(bx + 6, by + 2, bx + 8, by + 6, c);
+        g.fill(bx + 2, by + 6, bx + 8, by + 8, c);
+        g.fill(bx + 2, by + 2, bx + 4, by + 3, on ? 0xFFFFFFFF : c);   // 極の先
+        g.fill(bx + 6, by + 2, bx + 8, by + 3, on ? 0xFFFFFFFF : c);
+        area(TOOL_X, COLLECT_Y, TOOL_S, TOOL_S, List.of(
+                Component.translatable(on ? "gui.singulo.android.collect.on" : "gui.singulo.android.collect.off"),
+                Component.translatable("gui.singulo.android.collect.hint").withStyle(st -> st.withColor(0xFF8A949E))));
+        int mode = menu.value(AndroidMenu.D_STORE);
+        bx = x + TOOL_X;
+        by = y + STORE_Y;
+        over = Panel.inside(mouseX, mouseY, bx, by, TOOL_S, TOOL_S);
+        d = Panel.button(g, skin, bx, by, TOOL_S, TOOL_S, over ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        c = skin.text();
+        by += d;
+        if (mode == RuinAndroid.STORE_WORK) {
+            g.fill(bx + 2, by + 2, bx + 8, by + 6, c);              // 指令台の画面
+            g.fill(bx + 3, by + 3, bx + 7, by + 5, skin.accent() | 0xFF000000);
+            g.fill(bx + 4, by + 6, bx + 6, by + 7, c);              // 台
+            g.fill(bx + 3, by + 7, bx + 7, by + 8, c);
+        } else {
+            g.fill(bx + 2, by + 3, bx + 8, by + 8, c);              // 箱
+            g.fill(bx + 3, by + 5, bx + 7, by + 7, skin.face());
+            g.fill(bx + 4, by + 4, bx + 6, by + 5, skin.accent() | 0xFF000000);   // 留め金
+            if (mode == RuinAndroid.STORE_OFF) {
+                for (int k = 0; k < 7; k++) {                      // 赤い斜線
+                    g.fill(bx + 1 + k, by + 8 - k, bx + 2 + k, by + 9 - k, GuiSkin.BAD);
+                }
+            }
+        }
+        area(TOOL_X, STORE_Y, TOOL_S, TOOL_S, List.of(
+                Component.translatable("gui.singulo.android.store." + mode),
+                Component.translatable("gui.singulo.android.store.hint").withStyle(st -> st.withColor(0xFF8A949E))));
+    }
+
     /** タンク: 中身そのものの絵で、入っている割合まで（流れるアニメーションも動く）。液体と化学物質（Mekanism）の段。 */
     private void drawTanks(GuiGraphics g, int mouseX, int mouseY) {
         RuinAndroid android = menu.android();
         for (TankRow row : android == null ? List.<TankRow>of() : tankRows()) {
             int ty = topPos + row.y(), th = row.h();
             for (int i = 0; i < RuinAndroid.TANKS; i++) {
-                int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                int tx = tankX(i);
                 // 捨てるボタン（小さな ×。シフト＋クリック）
                 int cx = tx + BAR_W + 1;
                 boolean ch = Panel.inside(mouseX, mouseY, cx, ty, CLEAR_W, th);

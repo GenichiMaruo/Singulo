@@ -1290,7 +1290,7 @@ UI_LANG = {
     'gui.singulo.generator_slots.standby': ('蓄電がいっぱい: 待機中', 'Storage full: standing by'),
     'gui.singulo.android.work.hint': ('作業（自動化）に割り当ててよいか。オフにすると、作業の候補に出ない。', 'Whether this android may be given work (automation). When off, it is never offered for work.'),
     'gui.singulo.android.sort.hint': ('持ち物とバックパックの中を並べ替える（同じ物はまとめる）', 'Sort the carried items and backpack contents (stacks the same items together)'),
-    'gui.singulo.android.stash.hint': ('持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口）へ預けに行く', 'Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box or supply port)'),
+    'gui.singulo.android.stash.hint': ('持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口・作業指令台）へ預けに行く', 'Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box, supply port or work console)'),
     'gui.singulo.android.stash.working': ('作業中はできない', 'Not while working'),
     'gui.singulo.android.stash.empty': ('預ける物がない', 'Nothing to put away'),
     'gui.singulo.android.stash.none': ('近くに預けられる箱がない（12ブロック以内）', 'No box nearby to put things in (within 12 blocks)'),
