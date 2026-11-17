@@ -16,7 +16,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
  * アンドロイドが落ちている物を拾い、預ける（0.21.0）: 拾った物は近くのチェストへ預ける。預け先を「預けない」にすると持ったまま。
- * プレイヤーが投げた物は拾わない。
+ * プレイヤーが投げた物は拾わない。アンドロイドは8ブロック先まで拾いに行くので、隣のテストの物を拾わないよう、テストごとに別の組で流す。
  */
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -25,13 +25,18 @@ public final class AndroidCollectGameTests {
 
     private static RuinAndroid guard(GameTestHelper h) {
         ServerLevel level = h.getLevel();
-        for (int x = 0; x < 8; x++) {
-            for (int z = 0; z < 8; z++) {
+        // 床（0〜8）を低い壁で囲み、ぶらついて場所の外へ出ないようにする
+        for (int x = -1; x <= 9; x++) {
+            for (int z = -1; z <= 9; z++) {
                 h.setBlock(new BlockPos(x, 0, z), Blocks.STONE);
+                if (x == -1 || x == 9 || z == -1 || z == 9) {
+                    h.setBlock(new BlockPos(x, 1, z), Blocks.STONE);
+                    h.setBlock(new BlockPos(x, 2, z), Blocks.STONE);
+                }
             }
         }
         RuinAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
-        BlockPos at = h.absolutePos(new BlockPos(1, 1, 1));
+        BlockPos at = h.absolutePos(new BlockPos(4, 1, 4));
         a.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
         a.makeGuard(null, at, RuinAndroid.MODE_GUARD, 30);
         level.addFreshEntity(a);
@@ -47,9 +52,12 @@ public final class AndroidCollectGameTests {
         return e;
     }
 
-    @GameTest(template = "empty", timeoutTicks = WAIT + 40)
+    @GameTest(template = "empty", timeoutTicks = WAIT + 40, batch = "android_collect_store")
     public static void androidsCollectDropsAndStoreThemInAChest(GameTestHelper h) {
         RuinAndroid a = guard(h);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);   // 離れた所に人がいる（いつもの遊び方と同じ）
+        BlockPos far = h.absolutePos(new BlockPos(7, 1, 0));
+        player.teleportTo(far.getX() + 0.5, far.getY(), far.getZ() + 0.5);
         h.setBlock(new BlockPos(6, 1, 6), Blocks.CHEST);
         drop(h, new BlockPos(4, 1, 2), new ItemStack(Items.ROTTEN_FLESH, 5));
         drop(h, new BlockPos(2, 1, 4), new ItemStack(Items.BONE, 3));
@@ -67,7 +75,7 @@ public final class AndroidCollectGameTests {
         });
     }
 
-    @GameTest(template = "empty", timeoutTicks = WAIT + 40)
+    @GameTest(template = "empty", timeoutTicks = WAIT + 40, batch = "android_collect_keep")
     public static void androidsKeepPickupsWhenStoringIsOffAndSkipThrownItems(GameTestHelper h) {
         RuinAndroid a = guard(h);
         a.cycleStoreMode();

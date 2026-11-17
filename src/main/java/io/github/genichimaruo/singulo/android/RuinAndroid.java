@@ -1309,11 +1309,22 @@ public abstract class RuinAndroid extends Monster {
     /** 落ちている物を拾いに行く範囲（ブロック）と、最後に拾ってから預けに行くまで（tick）。 */
     static final double COLLECT_RANGE = 8;
     static final int STORE_AFTER = 60;
+    /** 1つの物を拾いに行く時間の上限（tick）と、たどり着けなかった物をあきらめておく時間（tick）。 */
+    static final int COLLECT_GIVE_UP = 200, COLLECT_IGNORE = 600;
+    /** たどり着けなかった物（ItemEntity の UUID → あきらめるのをやめる時刻）。 */
+    private final java.util.Map<java.util.UUID, Integer> ignoredItems = new java.util.HashMap<>();
 
     /** 拾ってよい物か: 置かれてすぐでない・プレイヤーが投げた物でない・持ち物かバックパックに入る。 */
     private boolean collectable(net.minecraft.world.entity.item.ItemEntity e) {
         if (!e.isAlive() || e.hasPickUpDelay() || e.getItem().isEmpty() || e.getOwner() instanceof Player) {
             return false;
+        }
+        Integer until = ignoredItems.get(e.getUUID());
+        if (until != null) {
+            if (tickCount < until) {
+                return false;
+            }
+            ignoredItems.remove(e.getUUID());
         }
         return canCarry(e.getItem());
     }
@@ -1361,6 +1372,13 @@ public abstract class RuinAndroid extends Monster {
     private final class CollectGoal extends net.minecraft.world.entity.ai.goal.Goal {
         @Nullable
         private net.minecraft.world.entity.item.ItemEntity item;
+        /** 今の物を拾いに行ってからの時間（たどり着けなければ、あきらめる）。 */
+        private int ticks;
+        /**
+         * 落ちている物を探すまでの待ち（canUse の呼ばれた回数）。canUse は 2 tick に1回、それもエンティティの番号で決まる偶数・奇数の
+         * tick にしか呼ばれないので、tickCount で間引くと、番号によっては一度も探さない。
+         */
+        private int scanWait;
 
         CollectGoal() {
             setFlags(java.util.EnumSet.of(Flag.MOVE, Flag.LOOK));
@@ -1368,9 +1386,10 @@ public abstract class RuinAndroid extends Monster {
 
         @Override
         public boolean canUse() {
-            if (!collect || !idleGuard() || tickCount % 10 != 0) {
+            if (!collect || !idleGuard() || --scanWait > 0) {
                 return false;
             }
+            scanWait = 5;                                   // 約10 tick ごとに探す
             item = null;
             double best = Double.MAX_VALUE;
             for (var e : level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, getBoundingBox().inflate(COLLECT_RANGE),
@@ -1381,12 +1400,13 @@ public abstract class RuinAndroid extends Monster {
                     item = e;
                 }
             }
+            ticks = 0;
             return item != null;
         }
 
         @Override
         public boolean canContinueToUse() {
-            return collect && item != null && collectable(item) && idleGuard()
+            return collect && item != null && collectable(item) && idleGuard() && ticks < COLLECT_GIVE_UP
                     && item.distanceToSqr(RuinAndroid.this) < (COLLECT_RANGE + 4) * (COLLECT_RANGE + 4);
         }
 
@@ -1397,6 +1417,10 @@ public abstract class RuinAndroid extends Monster {
 
         @Override
         public void stop() {
+            if (item != null && ticks >= COLLECT_GIVE_UP) {
+                ignoredItems.put(item.getUUID(), tickCount + COLLECT_IGNORE);   // たどり着けない物は、しばらくあきらめる
+                ignoredItems.values().removeIf(t -> t < tickCount);
+            }
             item = null;
             getNavigation().stop();
         }
@@ -1406,6 +1430,7 @@ public abstract class RuinAndroid extends Monster {
             if (item == null) {
                 return;
             }
+            ticks++;
             getLookControl().setLookAt(item);
             if (item.distanceToSqr(RuinAndroid.this) > 1.6 * 1.6) {
                 if (tickCount % 10 == 0 || getNavigation().isDone()) {
