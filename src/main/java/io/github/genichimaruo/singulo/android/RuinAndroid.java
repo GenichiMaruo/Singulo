@@ -314,7 +314,7 @@ public abstract class RuinAndroid extends Monster {
     /** 追従する人（許可証に登録された人から選ぶ。null は持ち主）。 */
     @Nullable
     private java.util.UUID leader;
-    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(INVENTORY_SIZE);
+    private final AndroidCargoInventory inventory = new AndroidCargoInventory();
     /** 作業（自動化）に割り当ててよいか（アンドロイドの画面で切り替える）。 */
     private boolean workEnabled = true;
     /** 床に落ちている物を拾うか（0.21.0。アンドロイドの画面で切り替える）。 */
@@ -1126,6 +1126,10 @@ public abstract class RuinAndroid extends Monster {
     /** 預け先を次へ（チェスト優先 → 作業優先 → 預けない）。 */
     public void cycleStoreMode() {
         store = (store + 1) % 3;
+        if (stashPickupsOnly) {
+            stashTarget = null;
+        }
+        collected = hasPickups();
     }
 
     /** 作業指令台の注文を割り当てる（作業中は戦わず、持ち物を取り出せない）。 */
@@ -1275,31 +1279,25 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         int[] slots = allCarrySlots();
-        java.util.List<net.minecraft.world.item.ItemStack> items = new java.util.ArrayList<>();
+        compactCarry(slots);
+        record Cargo(ItemStack stack, int pickups) {}
+        java.util.List<Cargo> items = new java.util.ArrayList<>();
         for (int slot : slots) {
-            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
-            if (s.isEmpty()) {
-                continue;
-            }
-            s = s.copy();
-            for (net.minecraft.world.item.ItemStack have : items) {
-                if (s.isEmpty()) {
-                    break;
-                }
-                if (net.minecraft.world.item.ItemStack.isSameItemSameComponents(have, s) && have.getCount() < have.getMaxStackSize()) {
-                    int n = Math.min(s.getCount(), have.getMaxStackSize() - have.getCount());
-                    have.grow(n);
-                    s.shrink(n);
-                }
-            }
-            if (!s.isEmpty()) {
-                items.add(s);
+            ItemStack stack = inventory.getItem(slot);
+            if (!stack.isEmpty()) {
+                items.add(new Cargo(stack, inventory.pickups(slot)));
             }
         }
-        items.sort(java.util.Comparator.comparing((net.minecraft.world.item.ItemStack s) -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem()).toString())
-                .thenComparing(s -> s.getHoverName().getString()));
+        items.sort(java.util.Comparator.comparing((Cargo c) -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(c.stack().getItem()).toString())
+                .thenComparing(c -> c.stack().getHoverName().getString()));
         for (int i = 0; i < slots.length; i++) {
-            inventory.setItem(slots[i], i < items.size() ? items.get(i) : net.minecraft.world.item.ItemStack.EMPTY);
+            if (i < items.size()) {
+                Cargo cargo = items.get(i);
+                inventory.setItem(slots[i], cargo.stack());
+                inventory.setPickups(slots[i], cargo.pickups());
+            } else {
+                inventory.setItem(slots[i], ItemStack.EMPTY);
+            }
         }
         return true;
     }
@@ -1348,13 +1346,14 @@ public abstract class RuinAndroid extends Monster {
             net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
             if (!rest.isEmpty() && !s.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameComponents(s, rest)) {
                 int n = Math.min(rest.getCount(), s.getMaxStackSize() - s.getCount());
-                s.grow(n);
+                inventory.growCargo(slot, n, n);
                 rest.shrink(n);
             }
         }
         for (int slot : slots) {
             if (!rest.isEmpty() && inventory.getItem(slot).isEmpty()) {
                 inventory.setItem(slot, rest);
+                inventory.setPickups(slot, rest.getCount());
                 rest = net.minecraft.world.item.ItemStack.EMPTY;
             }
         }
@@ -1468,12 +1467,23 @@ public abstract class RuinAndroid extends Monster {
         if (!full && tickCount - lastCollect < STORE_AFTER) {
             return;
         }
-        BlockPos depot = findDepot(store == STORE_WORK);
         collected = false;                          // 預け先がなければ、次に拾うまで探さない
+        if (!hasPickups()) {
+            return;
+        }
+        BlockPos depot = findDepot(store == STORE_WORK);
         if (depot != null) {
             stashTarget = depot;
+            stashPickupsOnly = true;
             stashTicks = STASH_TICKS;
         }
+    }
+
+    private boolean hasPickups() {
+        for (int slot : allCarrySlots()) {
+            if (inventory.pickups(slot) > 0) return true;
+        }
+        return false;
     }
 
     /** 預け先の種類: 0 預けられない、1 チェスト類、2 作業指令台・資材口。 */
@@ -1508,7 +1518,7 @@ public abstract class RuinAndroid extends Monster {
         for (BlockPos p : BlockPos.betweenClosed(blockPosition().offset(-STASH_RANGE, -STASH_HEIGHT, -STASH_RANGE),
                 blockPosition().offset(STASH_RANGE, STASH_HEIGHT, STASH_RANGE))) {
             int kind = depotKind(p);
-            if (kind > 0 && (best[kind] == null || p.distSqr(blockPosition()) < best[kind].distSqr(blockPosition())) && accepts(p)) {
+            if (kind > 0 && (best[kind] == null || p.distSqr(blockPosition()) < best[kind].distSqr(blockPosition())) && accepts(p, true)) {
                 best[kind] = p.immutable();
             }
         }
@@ -1522,6 +1532,7 @@ public abstract class RuinAndroid extends Monster {
     @Nullable
     private BlockPos stashTarget;
     private int stashTicks;
+    private boolean stashPickupsOnly;
 
     /**
      * 持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口など、入れられる所）へ預けに行く。
@@ -1550,26 +1561,32 @@ public abstract class RuinAndroid extends Monster {
             return net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.none");
         }
         stashTarget = best;
+        stashPickupsOnly = false;
         stashTicks = STASH_TICKS;
         return null;
     }
 
     /** 預ける箱にしてよい所か（入れ物のブロック・作業指令台・資材口で、物を入れられる）。かまどなどの装置には入れない。 */
     private boolean stashable(BlockPos p) {
-        return depotKind(p) > 0 && accepts(p);
+        return depotKind(p) > 0 && accepts(p, false);
     }
 
     /** 持ち物の何かを、そこへ入れられるか。 */
-    private boolean accepts(BlockPos p) {
+    private boolean accepts(BlockPos p, boolean pickupsOnly) {
         for (var handler : stashStorages(p)) {
             for (int slot : allCarrySlots()) {
-                var cargo = inventory.getItem(slot);
-                if (!cargo.isEmpty() && net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, cargo.copy(), true).getCount() < cargo.getCount()) {
+                var cargo = stashOffer(slot, pickupsOnly);
+                if (!cargo.isEmpty() && net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, cargo, true).getCount() < cargo.getCount()) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private ItemStack stashOffer(int slot, boolean pickupsOnly) {
+        ItemStack stack = inventory.getItem(slot);
+        return pickupsOnly ? stack.copyWithCount(inventory.pickups(slot)) : stack.copy();
     }
 
     private java.util.List<net.neoforged.neoforge.items.IItemHandler> stashStorages(BlockPos pos) {
@@ -1609,6 +1626,7 @@ public abstract class RuinAndroid extends Monster {
         @Override
         public void stop() {
             stashTarget = null;
+            stashPickupsOnly = false;
             getNavigation().stop();
         }
 
@@ -1630,12 +1648,14 @@ public abstract class RuinAndroid extends Monster {
             var handlers = stashStorages(at);
             if (!handlers.isEmpty()) {
                 for (int slot : allCarrySlots()) {
-                    net.minecraft.world.item.ItemStack rest = inventory.getItem(slot).copy();
+                    ItemStack rest = stashOffer(slot, stashPickupsOnly);
+                    int offered = rest.getCount();
                     for (var handler : handlers) {
                         if (rest.isEmpty()) break;
                         rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, rest, false);
                     }
-                    inventory.setItem(slot, rest);
+                    int stored = offered - rest.getCount();
+                    if (stored > 0) inventory.removeItem(slot, stored);
                 }
                 playSound(net.minecraft.sounds.SoundEvents.CHEST_CLOSE, 0.5F, 1.3F);
                 gesture(GESTURE_NOD, null);
@@ -1750,7 +1770,10 @@ public abstract class RuinAndroid extends Monster {
      * 作業の計画は、同じ物は同じスタックにまとまるとして枠を数えるので、まとめないと、できた物が入りきらなくなる。
      */
     public void compactCarry() {
-        int[] slots = carrySlots();
+        compactCarry(carrySlots());
+    }
+
+    private void compactCarry(int[] slots) {
         boolean changed = false;
         for (int i = 0; i < slots.length; i++) {
             net.minecraft.world.item.ItemStack into = inventory.getItem(slots[i]);
@@ -1761,8 +1784,11 @@ public abstract class RuinAndroid extends Monster {
                 net.minecraft.world.item.ItemStack from = inventory.getItem(slots[j]);
                 if (!from.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameComponents(into, from)) {
                     int move = Math.min(from.getCount(), into.getMaxStackSize() - into.getCount());
-                    into.grow(move);
+                    int fromPickups = inventory.pickups(slots[j]);
+                    int movedPickups = Math.min(move, fromPickups);
+                    inventory.growCargo(slots[i], move, movedPickups);
                     from.shrink(move);
+                    inventory.setPickups(slots[j], fromPickups - movedPickups);
                     changed = true;
                 }
             }
@@ -1958,6 +1984,10 @@ public abstract class RuinAndroid extends Monster {
     /** ステーションを失った護衛か（新しいステーションでリンクし直せる）。 */
     public boolean orphan() {
         return guard && home == null;
+    }
+
+    boolean canReceivePortableRepairs(java.util.UUID printerOwner) {
+        return isAlive() && !dismantling && orphan() && printerOwner.equals(owner);
     }
 
     @Override
@@ -3191,6 +3221,7 @@ public abstract class RuinAndroid extends Monster {
             items.set(i, inventory.getItem(i));
         }
         tag.put("items", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), items, registryAccess()));
+        if (hasPickups()) tag.putIntArray("pickups", inventory.savePickups());
         net.minecraft.nbt.ListTag tl = new net.minecraft.nbt.ListTag();
         for (var t : tanks) {
             tl.add(t.writeToNBT(registryAccess(), new CompoundTag()));
@@ -3258,6 +3289,9 @@ public abstract class RuinAndroid extends Monster {
         }
         entityData.set(GUARD, guard);
         loadInventory(tag);
+        inventory.loadPickups(tag.getIntArray("pickups"));
+        collected = hasPickups();
+        lastCollect = tickCount;
         net.minecraft.nbt.ListTag tl = tag.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < TANKS; i++) {
             tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);

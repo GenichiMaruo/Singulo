@@ -12,6 +12,10 @@
 
 ## Fixes
 
+- Automatic deposits move only the items a guard picked up. Cargo from older saves stays with the guard until you use the manual deposit button.
+- Upgrading a Portable Android Printer to Mk2 keeps its loaded supplies and charge. Changing to a lower-cost memory preserves excess charge for later prints. Opening the printer and dismantling a guard now keep self-repair kit counts consistent.
+- The Time Crystal Incubator waits for output space when a new catalyst has a different lifetime from the one in its output slot. Reloading a world preserves the low-power growth history and the mix of materials already fed into a compressor.
+- The factory monitor lists a Genesis Engine with a missing structural part as stalled. Replacing the part restores its previous phase.
 - Androids no longer pick a spot on Android Gate Glass to stand on while working or when leaving water, and no longer treat it as a floor while flying or as a lid over water. Android Barrier Glass now counts as a floor for them.
 - Waterlogged glass stairs draw their water like other stairs but no longer show water inside the glass (not with Sodium).
 - A finished Genesis Engine no longer shows what it is synthesizing above the hotbar every time you walk near it. Its screen still shows the progress.
@@ -28,6 +32,10 @@
 
 ## 修正
 
+- 護衛が自動で預けるのは自分で拾った分だけです。以前のセーブで持っていた荷物は護衛に残り、手動の「近くの箱へ預ける」でまとめて移せます。
+- 携帯型アンドロイド印刷機をMk2に強化すると、装填した物と電力を引き継ぎます。消費電力の少ない型に替えても、余った電力は次の印刷に使えます。印刷機の画面操作中や護衛の解体中に、自己修理キットが増減する問題も修正しました。
+- 時間結晶育成槽は、完成する触媒の寿命が出力枠の触媒と異なるとき、取り出すまで待機します。ワールドを再読み込みしても、育成中の電力不足と、圧縮機が取り込んだ素材の種類を引き継ぎます。
+- 創世炉の部品を外すと工場モニターの停止一覧に載り、部品を戻すと元の段階に復帰します。
 - アンドロイドが、作業する立ち位置や水から上がる場所にアンドロイド透過ガラスの上を選ばないようにしました。飛ぶときの床や、水面のふたとしても扱いません。アンドロイド遮断ガラスの上は、アンドロイドの床として扱います。
 - 水に浸かったガラスの階段で、透けるガラスの中まで水が見えていたのを直しました。水はふつうの階段と同じに見え、ガラスの中には入っていないように見えます（Sodium を入れているときは除く）。
 - 宇宙を生んだ創世炉のそばを通るたびに、生成中の物が画面下に出ていたのをなくしました。進み具合は創世炉の画面で見られます。

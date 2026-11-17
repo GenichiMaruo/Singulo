@@ -78,7 +78,7 @@
 ## アンドロイドが落ちている物を拾い、預ける（android/RuinAndroid）
 
 - 護衛のアンドロイドは、手が空いているとき（戦い・作業・預けに行く途中・戻る・充電でない）、8ブロック以内に落ちている物を拾いに行く（`CollectGoal`、預けに行くゴールと同じ優先度）。拾うのは、置かれてすぐでなく、プレイヤーが投げたのでない（`ItemEntity.getOwner()` がプレイヤーでない）、持ち物かバックパックに入る物。同じ物に重ね、残りを空いた枠へ。
-- 拾った物を持っていて、最後に拾ってから3秒たつ（か持ち物がいっぱい）と、預け先へ預けに行く（`maybeStore`。行き先は「近くの箱へ預ける」と同じ `StashGoal`。中身は全部預ける）。預け先がなければ、次に拾うまで探さない。
+- 最後に拾ってから3秒たつか持ち物がいっぱいになると、拾った分だけを自動で預ける。持ち主が手渡した分は、同じアイテムに重ねていても手元に残る。手動の「近くの箱へ預ける」では、持ち主が手渡した分も預ける。預け先がなければ、次に拾うか預け先の設定を変えるまで待つ。
 - 預け先の種類: チェスト類（チェスト・樽・シュルカーボックス・ほかの MOD の chest/barrel/crate。まだ開けていない戦利品の箱は除く）と、作業（資材口と作業指令台。指令台は隣と、リンクした資材口の倉庫へ入れる）。設定でどちらを優先するか（なければもう一方）、または預けないかを選ぶ。範囲は「近くの箱へ預ける」と同じ（横12・上下4）。
 - 設定はアンドロイドごとに保存（`collect`・`store`。以前のアンドロイドは、拾う・チェスト優先）。装備のページの、並べ替え・預けるボタンの下に2つのボタン（拾う: 磁石、押し込みでオン。預け先: 箱・指令台の画面・赤い斜線の箱）。説明はツールチップ。
-- GameTest `androidsCollectDropsAndStoreThemInAChest`・`androidsKeepPickupsWhenStoringIsOffAndSkipThrownItems`。
+- GameTest `androidsCollectDropsAndStoreThemInAChest`・`androidsKeepPickupsWhenStoringIsOffAndSkipThrownItems`・`androidAutoStashKeepsEditedCargoAfterReload`。

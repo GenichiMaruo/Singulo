@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.genesis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.machine.MachineReport;
 import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
 import io.github.genichimaruo.singulo.machine.TimeFields;
 import io.github.genichimaruo.singulo.network.EndingPayload;
@@ -160,17 +161,23 @@ public class GenesisCoreBlockEntity extends BlockEntity implements io.github.gen
         return stage;
     }
 
+    /** 部品を戻すまで未形成と表示する。再開する段階は stage に残す。 */
+    public int statusStage() {
+        return formed ? stage : UNFORMED;
+    }
+
     /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
     @Override
-    public io.github.genichimaruo.singulo.machine.MachineReport report() {
-        io.github.genichimaruo.singulo.machine.MachineReport.State s = switch (stage) {
-            case UNFORMED -> io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN;
-            case CRADLE -> io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE;
-            case STABILIZING -> surgeTicks() > 0 ? io.github.genichimaruo.singulo.machine.MachineReport.State.WARN : io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
-            default -> io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+    public MachineReport report() {
+        int phase = statusStage();
+        MachineReport.State state = switch (phase) {
+            case UNFORMED -> MachineReport.State.BROKEN;
+            case CRADLE -> MachineReport.State.IDLE;
+            case STABILIZING -> surgeTicks() > 0 ? MachineReport.State.WARN : MachineReport.State.RUN;
+            default -> MachineReport.State.RUN;
         };
-        return new io.github.genichimaruo.singulo.machine.MachineReport(s, Component.translatable("gui.singulo.genesis.phase." + stage), List.of(), 0, 0, buffer,
-                energy.capacity(), (int) Math.min(Integer.MAX_VALUE, Math.round(intake)), 0, ItemStack.EMPTY, 0, List.of(), 0);
+        return new MachineReport(state, Component.translatable("gui.singulo.genesis.phase." + phase), List.of(), 0, 0, buffer,
+                energy.capacity(), formed ? (int) Math.min(Integer.MAX_VALUE, Math.round(intake)) : 0, 0, ItemStack.EMPTY, 0, List.of(), 0);
     }
 
     public boolean formed() {

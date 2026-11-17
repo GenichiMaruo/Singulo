@@ -1136,7 +1136,7 @@
   "gui.singulo.android.store.0": "拾った物の預け先: チェスト優先",
   "gui.singulo.android.store.1": "拾った物の預け先: 作業指令台・資材口優先",
   "gui.singulo.android.store.2": "拾った物の預け先: 預けない",
-  "gui.singulo.android.store.hint": "拾い終えたら、近くの預け先へ持ち物を預けに行く（なければもう一方へ）。押すと切り替える",
+  "gui.singulo.android.store.hint": "自動で預けるのは拾った分だけ。優先する預け先がなければ、もう一方へ。押すと切り替える",
   "gui.singulo.android.tank": "タンク%s: %s 約 %s / %s mB",
   "gui.singulo.android.tank.clear": "シフト＋クリックで、中身を捨てる",
   "gui.singulo.android.tank.empty": "タンク%s: 空",

@@ -5,12 +5,15 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
+import io.github.genichimaruo.singulo.registry.SinguloComponents;
+import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -253,7 +256,22 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     @Override
     public ItemStack assemble(Input input, HolderLookup.Provider registries) {
-        return result.copy();
+        return assemble(input.items(), plan(input.items()));
+    }
+
+    public ItemStack assemble(List<ItemStack> inputs, @Nullable Plan plan) {
+        ItemStack out = result.copy();
+        if (plan != null && out.is(SinguloItems.PORTABLE_ANDROID_PRINTER_2.get()) && out.getCount() == 1) {
+            for (int i = 0; i < inputs.size(); i++) {
+                ItemStack input = inputs.get(i);
+                if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
+                    // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
+                    out.copyFrom(input, DataComponents.CONTAINER, SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME);
+                    break;
+                }
+            }
+        }
+        return out;
     }
 
     @Override

@@ -46,7 +46,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
 
     private int stage() {
         GenesisCoreBlockEntity core = core();
-        return core == null ? GenesisCoreBlockEntity.UNFORMED : core.stage();
+        return core == null ? GenesisCoreBlockEntity.UNFORMED : core.statusStage();
     }
 
     private float time(float partialTick) {

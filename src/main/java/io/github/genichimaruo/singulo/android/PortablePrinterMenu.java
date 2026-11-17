@@ -3,8 +3,7 @@ package io.github.genichimaruo.singulo.android;
 import io.github.genichimaruo.singulo.machine.GuiFrame;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +17,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 
 /**
  * 携帯型アンドロイド印刷機の画面（0.21.0）。組ごとに1行（メモリ・キット、少しあけて自己修理キットのストックと装甲板）。
@@ -35,30 +35,24 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
 
     private final Player player;
     private final InteractionHand hand;
+    private final ItemStack openedPrinter;
     private final int units;
     private final SimpleContainer contents;
     private final ContainerData data;
-    private boolean loading;
+    private ItemContainerContents shownContents;
 
     public PortablePrinterMenu(int id, Inventory inventory, InteractionHand hand) {
         super(SinguloMenus.PORTABLE_PRINTER.get(), id);
         this.player = inventory.player;
         this.hand = hand;
-        this.units = Math.max(1, PortableAndroidPrinterItem.units(player.getItemInHand(hand)));
+        this.openedPrinter = player.getItemInHand(hand);
+        this.units = Math.max(1, PortableAndroidPrinterItem.units(openedPrinter));
         int slots = units * PortableAndroidPrinterItem.PER_UNIT;
-        this.contents = new SimpleContainer(slots) {
-            @Override
-            public void setChanged() {
-                super.setChanged();
-                save();
-            }
-        };
-        loading = true;
-        List<ItemStack> saved = PortableAndroidPrinterItem.contents(printer());
-        for (int i = 0; i < slots && i < saved.size(); i++) {
-            contents.setItem(i, saved.get(i));
+        this.contents = new SimpleContainer(slots);
+        refreshContents();
+        if (!player.level().isClientSide) {
+            contents.addListener(container -> save());
         }
-        loading = false;
         this.data = player.level().isClientSide ? new SimpleContainerData(COUNT) : new ContainerData() {
             @Override
             public int get(int index) {
@@ -173,20 +167,35 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
 
     /** 手に持った印刷機（持っていなければ空）。 */
     public ItemStack printer() {
-        ItemStack s = player.getItemInHand(hand);
-        return s.getItem() instanceof PortableAndroidPrinterItem ? s : ItemStack.EMPTY;
+        ItemStack held = player.getItemInHand(hand);
+        if (!(openedPrinter.getItem() instanceof PortableAndroidPrinterItem) || !held.is(openedPrinter.getItem())) {
+            return ItemStack.EMPTY;
+        }
+        // サーバーでは開いた現物にだけ書く。クライアントの持ち物は同期で新しいスタックに置き換わる。
+        return held == openedPrinter || player.level().isClientSide ? held : ItemStack.EMPTY;
+    }
+
+    private void refreshContents() {
+        ItemContainerContents stored = openedPrinter.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+        if (shownContents != stored) {
+            stored.copyInto(contents.getItems());
+            shownContents = stored;
+        }
     }
 
     private void save() {
-        ItemStack s = printer();
-        if (loading || s.isEmpty() || player.level().isClientSide) {
-            return;
+        if (!printer().isEmpty()) {
+            shownContents = ItemContainerContents.fromItems(contents.getItems());
+            openedPrinter.set(DataComponents.CONTAINER, shownContents);
         }
-        List<ItemStack> items = new ArrayList<>(contents.getContainerSize());
-        for (int i = 0; i < contents.getContainerSize(); i++) {
-            items.add(contents.getItem(i).copy());
+    }
+
+    @Override
+    public void broadcastChanges() {
+        if (!player.level().isClientSide) {
+            refreshContents();
         }
-        PortableAndroidPrinterItem.setContents(s, items);
+        super.broadcastChanges();
     }
 
     public int energy() {
@@ -212,7 +221,6 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
         if (!(p instanceof ServerPlayer sp)) {
             return false;
         }
-        save();
         ItemStack printer = printer();
         if (printer.isEmpty()) {
             return false;
@@ -236,15 +244,24 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
 
     @Override
     public void clicked(int slotId, int button, ClickType type, Player p) {
-        // 持っている印刷機を数字キーで入れ替えない
-        if (type == ClickType.SWAP && hand == InteractionHand.MAIN_HAND && button == p.getInventory().selected) {
+        int heldSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : p.getInventory().selected;
+        if (!stillValid(p) || type == ClickType.SWAP && button == heldSlot) {
             return;
+        }
+        if (!player.level().isClientSide) {
+            refreshContents();
         }
         super.clicked(slotId, button, type, p);
     }
 
     @Override
     public ItemStack quickMoveStack(Player p, int index) {
+        if (!stillValid(p)) {
+            return ItemStack.EMPTY;
+        }
+        if (!player.level().isClientSide) {
+            refreshContents();
+        }
         Slot slot = slots.get(index);
         if (!slot.hasItem() || !slot.mayPickup(p)) {
             return ItemStack.EMPTY;
@@ -284,6 +301,6 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player p) {
-        return !printer().isEmpty();
+        return p == player && !printer().isEmpty();
     }
 }

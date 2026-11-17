@@ -9,6 +9,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -356,6 +357,15 @@ public class AndroidMenu extends AbstractContainerMenu {
         }
         ItemStack there = items.getItem(other);
         return there.isEmpty() || there.getItem() != stack.getItem();
+    }
+
+    @Override
+    public void clicked(int slot, int button, ClickType type, Player player) {
+        if (type == ClickType.QUICK_CRAFT && getQuickcraftHeader(button) == 2 && items instanceof AndroidCargoInventory cargo) {
+            cargo.addByDrag(() -> super.clicked(slot, button, type, player));
+        } else {
+            super.clicked(slot, button, type, player);
+        }
     }
 
     @Override

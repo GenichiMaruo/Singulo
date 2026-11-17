@@ -1136,7 +1136,7 @@
   "gui.singulo.android.store.0": "撿到的物品存放處：箱子優先",
   "gui.singulo.android.store.1": "撿到的物品存放處：作業指令台・資材口優先",
   "gui.singulo.android.store.2": "撿到的物品存放處：不存放",
-  "gui.singulo.android.store.hint": "撿完後，把攜帶的物品存放到附近的存放處（沒有則存到另一種）。點擊切換",
+  "gui.singulo.android.store.hint": "只會自動存放撿到的物品。如果優先的存放處無法使用，就嘗試另一種。點擊切換。",
   "gui.singulo.android.tank": "儲罐%s：%s 約 %s / %s mB",
   "gui.singulo.android.tank.clear": "Shift＋點擊，倒掉內容物",
   "gui.singulo.android.tank.empty": "儲罐%s：空",

@@ -1136,7 +1136,7 @@
   "gui.singulo.android.store.0": "Store pickups: chests first",
   "gui.singulo.android.store.1": "Store pickups: work console and supply ports first",
   "gui.singulo.android.store.2": "Store pickups: keep them",
-  "gui.singulo.android.store.hint": "After picking up, the android stores its items nearby (or in the other kind of storage). Click to switch",
+  "gui.singulo.android.store.hint": "The android deposits only items it picks up. If the preferred storage is unavailable, it tries the other kind. Click to switch.",
   "gui.singulo.android.tank": "Tank %s: %s, about %s / %s mB",
   "gui.singulo.android.tank.clear": "Shift-click to dump the contents",
   "gui.singulo.android.tank.empty": "Tank %s: empty",

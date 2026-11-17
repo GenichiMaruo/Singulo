@@ -1136,7 +1136,7 @@
   "gui.singulo.android.store.0": "주운 물건 보관처: 상자 우선",
   "gui.singulo.android.store.1": "주운 물건 보관처: 작업 지령대·자재구 우선",
   "gui.singulo.android.store.2": "주운 물건 보관처: 보관하지 않음",
-  "gui.singulo.android.store.hint": "다 주우면 근처 보관처에 소지품을 맡기러 간다(없으면 다른 쪽에). 누르면 바꾼다",
+  "gui.singulo.android.store.hint": "주운 물건만 자동으로 맡깁니다. 우선 보관처를 이용할 수 없으면 다른 종류의 보관처를 찾습니다. 눌러서 전환합니다.",
   "gui.singulo.android.tank": "탱크%s: %s 약 %s / %s mB",
   "gui.singulo.android.tank.clear": "Shift+클릭으로 내용물을 버립니다",
   "gui.singulo.android.tank.empty": "탱크%s: 비어 있음",

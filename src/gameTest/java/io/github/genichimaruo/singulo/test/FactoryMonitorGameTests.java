@@ -1,16 +1,21 @@
 package io.github.genichimaruo.singulo.test;
 
+import io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineReport;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.monitor.FactoryMonitor;
+import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
+import io.github.genichimaruo.singulo.test.harness.TestScope;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -21,6 +26,38 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class FactoryMonitorGameTests {
     private static final BlockPos MONITOR = new BlockPos(1, 1, 1);
+
+    @GameTest(template = "large", timeoutTicks = 160)
+    public static void monitorTracksBrokenAndRepairedGenesisEngine(GameTestHelper h) {
+        BlockPos corePos = new BlockPos(4, 1, 4);
+        TestBuild.build(h, Blueprints.Kind.GENESIS_ENGINE, corePos, Direction.NORTH, 7);
+        h.setBlock(MONITOR, SinguloBlocks.DESK_MONITOR.get());
+        GenesisCoreBlockEntity core = h.getBlockEntity(corePos);
+        var player = TestScope.player(h);
+        BlockPos pylon = corePos.offset(GenesisCoreBlockEntity.PYLONS[0]);
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(core.formed(), "Genesis Engine has not formed"))
+                .thenExecute(() -> {
+                    h.assertTrue(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "Could not kindle engine");
+                    h.setBlock(pylon, Blocks.AIR);
+                })
+                .thenWaitUntil(() -> h.assertFalse(core.formed(), "Engine still formed after removing a pylon"))
+                .thenExecute(() -> {
+                    var snapshot = FactoryMonitor.scan(h.getLevel(), h.absolutePos(MONITOR));
+                    h.assertTrue(snapshot.stalled().stream().anyMatch(e -> e.pos().equals(core.getBlockPos())
+                            && e.state() == MachineReport.State.BROKEN), "Interrupted engine missing from monitor");
+                    h.setBlock(pylon, SinguloBlocks.SIMPLE.get("genesis_pylon").get());
+                })
+                .thenWaitUntil(() -> h.assertTrue(core.formed(), "Engine did not reform"))
+                .thenExecute(() -> {
+                    h.assertTrue(core.stage() == GenesisCoreBlockEntity.KINDLING && core.report().state() == MachineReport.State.RUN,
+                            "Repair did not resume kindling");
+                    var snapshot = FactoryMonitor.scan(h.getLevel(), h.absolutePos(MONITOR));
+                    h.assertFalse(snapshot.stalled().stream().anyMatch(e -> e.pos().equals(core.getBlockPos())),
+                            "Repaired engine still listed as stalled");
+                })
+                .thenSucceed();
+    }
 
     @GameTest(template = "empty", timeoutTicks = 100)
     public static void monitorListsStalledMachinesAndDrones(GameTestHelper h) {

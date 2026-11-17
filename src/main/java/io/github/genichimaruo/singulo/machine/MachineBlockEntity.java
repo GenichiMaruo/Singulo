@@ -16,6 +16,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -67,6 +68,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     private int progress;
     private int maxProgress;
+    /** Paid growth duration while the final product waits for a compatible output slot. */
+    private int completedDuration;
     private int usage;
     private Status status = Status.IDLE;
     /** 0 = 通常加工、1以上 = 質量レシピ（massRecipes の番号+1）。 */
@@ -83,7 +86,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     /** 時間の場（TimeFields）で進む tick の端数。 */
     private double timeCarry;
     /** 質量バッファに入れた元ブロックの種類（混成ボーナス用）。 */
-    private final java.util.Set<net.minecraft.world.item.Item> massSources = new java.util.HashSet<>();
+    private final java.util.Set<ResourceLocation> massSources = new java.util.HashSet<>();
     /** 電源スイッチ。切ると処理を止める（進み具合はそのまま残す）。 */
     private boolean enabled = true;
     /** 材料のいらないレシピ（電力だけで作るもの）も作るか。 */
@@ -518,6 +521,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             status = Status.OFF;
         } else if (!canOperate(level)) {
             progress = 0;
+            completedDuration = 0;
             usage = 0;
             current = null;
             dirty = true;
@@ -535,37 +539,45 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 usage = 0;
                 status = Status.IDLE;
             } else {
-                MachineRecipe recipe = current.value();
-                // 時間の場の中では1 tick に進む量が変わる（加速なら2 tick ぶん進み、電力も2倍使う）
-                timeCarry += TimeFields.speed(level, pos);
-                int steps = (int) timeCarry;
-                // 蓄電容量で1回に払える分だけ進む（加速の場でも、容量アップグレードが1 tick 分に足りていれば止まらない）
-                int done = affordableSteps(steps);
-                if (!canOutput(recipe)) {
-                    status = Status.OUTPUT_FULL;
-                    timeCarry = 0;
-                } else if (steps == 0) {
-                    active = true;
-                    status = Status.RUNNING;
-                } else if (energy.consume(usage * done) || runsUnderpowered(recipe) && drawPartial()) {
-                    timeCarry -= steps;
-                    active = true;
-                    status = Status.RUNNING;
-                    progress += done;
-                    if (progress >= maxProgress) {
-                        progress = 0;
-                        craft(level, recipe);
-                        dirty = true;
-                    }
-                } else {
-                    timeCarry = 0;
-                    status = Status.NO_POWER;
-                }
+                status = process(level, pos, current.value());
+                active = status == Status.RUNNING;
             }
         }
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
         }
+    }
+
+    private Status process(Level level, BlockPos pos, MachineRecipe recipe) {
+        if (progress < maxProgress) {
+            if (!canOutput(recipe)) {
+                timeCarry = 0;
+                return Status.OUTPUT_FULL;
+            }
+            // 時間の場で変わる進行量のうち、蓄電容量で1回に払える分だけ進める。
+            timeCarry += TimeFields.speed(level, pos);
+            int steps = (int) timeCarry;
+            if (steps == 0) return Status.RUNNING;
+            int done = affordableSteps(steps);
+            if (!energy.consume(usage * done) && !(runsUnderpowered(recipe) && drawPartial())) {
+                timeCarry = 0;
+                return Status.NO_POWER;
+            }
+            timeCarry -= steps;
+            progress = Math.min(maxProgress, progress + done);
+        }
+        if (progress >= maxProgress) {
+            if (!craft(level, recipe)) {
+                // 完成時の純度が違って重ならない場合、進捗と材料を保ち、電力を再請求せずに待つ。
+                completedDuration = maxProgress;
+                timeCarry = 0;
+                return Status.OUTPUT_FULL;
+            }
+            progress = 0;
+            completedDuration = 0;
+            dirty = true;
+        }
+        return Status.RUNNING;
     }
 
     /** 電力が足りないとき、ある分だけ使う。要求の80%未満なら不純な tick として数える。何もなければ false。 */
@@ -648,6 +660,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         resumeRecipe = null;
         if (found == null || !found.id().equals(previous)) {
             progress = 0;
+            completedDuration = 0;
             underpoweredTicks = 0;
         }
         current = found;
@@ -667,7 +680,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (plan != null) {
                 speed *= plan.speed();
             }
-            maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
+            maxProgress = completedDuration > 0 ? completedDuration : Math.max(1, (int) Math.round(found.value().time() / speed));
             if (fixedEnergyPerCraft(found.value())) {
                 // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ
                 usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
@@ -941,17 +954,17 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 metalMass += m;
             } else {
                 mass += m;
-                massSources.add(taken.getItem());
+                massSources.add(BuiltInRegistries.ITEM.getKey(taken.getItem()));
             }
             markDirty();
         }
     }
 
-    private ItemStack previewResult(MachineRecipe r, MachineRecipe.Plan plan) {
+    private ItemStack previewResult(MachineRecipe r, List<ItemStack> inputs, MachineRecipe.Plan plan) {
         if (plan.restoreSlot() >= 0) {
             return UsesHelper.restore(items.getStackInSlot(type.recipeSlot(plan.restoreSlot())), r.result());
         }
-        ItemStack out = r.result().copy();
+        ItemStack out = r.assemble(inputs, plan);
         markMixed(r, out);
         return out;
     }
@@ -961,11 +974,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (!type.hasOutput()) {
                 return false;
             }
-            MachineRecipe.Plan plan = r.plan(r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks());
+            List<ItemStack> inputs = r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks();
+            MachineRecipe.Plan plan = r.plan(inputs);
             if (plan == null) {
                 return false;
             }
-            if (!fitsOutputs(previewResult(r, plan), r.byproduct())) {
+            if (!fitsOutputs(previewResult(r, inputs, plan), r.byproduct(), runsUnderpowered(r))) {
                 return false;
             }
         }
@@ -973,7 +987,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** 成果物と副産物が、両方とも出力スロットに入り切るか（同じスロットを取り合う分も数える）。 */
-    private boolean fitsOutputs(ItemStack result, ItemStack byproduct) {
+    private boolean fitsOutputs(ItemStack result, ItemStack byproduct, boolean unknownPurity) {
         ItemStack[] slots = new ItemStack[type.outputSlots()];
         for (int i = 0; i < slots.length; i++) {
             slots[i] = items.getStackInSlot(type.outputSlot() + i).copy();
@@ -982,9 +996,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             int left = want.getCount();
             for (int i = 0; i < slots.length && left > 0 && !want.isEmpty(); i++) {
                 if (slots[i].isEmpty()) {
-                    slots[i] = want.copyWithCount(Math.min(left, want.getMaxStackSize()));
+                    int limit = Math.min(want.getMaxStackSize(), items.getSlotLimit(type.outputSlot() + i));
+                    slots[i] = want.copyWithCount(Math.min(left, limit));
                     left -= slots[i].getCount();
-                } else if (ItemStack.isSameItemSameComponents(slots[i], want)) {
+                } else if (ItemStack.isSameItemSameComponents(slots[i], want)
+                        || unknownPurity && want == result && ItemStack.isSameItem(slots[i], result)) {
                     int move = Math.min(left, Math.min(slots[i].getMaxStackSize(), items.getSlotLimit(type.outputSlot() + i)) - slots[i].getCount());
                     if (move > 0) {
                         slots[i].grow(move);
@@ -1035,23 +1051,27 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return true;
     }
 
-    private void craft(Level level, MachineRecipe r) {
+    private boolean craft(Level level, MachineRecipe r) {
         crafting = true;
         try {
-            craftNow(level, r);
+            return craftNow(level, r);
         } finally {
             crafting = false;
         }
     }
 
-    private void craftNow(Level level, MachineRecipe r) {
-        MachineRecipe.Plan plan = r.plan(r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks());
+    private boolean craftNow(Level level, MachineRecipe r) {
+        List<ItemStack> inputs = r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks();
+        MachineRecipe.Plan plan = r.plan(inputs);
         if (plan == null || !massAvailable(r) || !fluidsAvailable(r)) {
-            return;
+            return false;
         }
-        ItemStack out = previewResult(r, plan);
+        ItemStack out = previewResult(r, inputs, plan);
         if (!out.isEmpty()) {
             out = adjustResult(r, out, 1.0 - Math.min(1.0, underpoweredTicks / (double) Math.max(1, maxProgress)));
+        }
+        if (!fitsOutputs(out, r.byproduct(), false) || !assignFluidOutputs(r.fluidResults(), true)) {
+            return false;
         }
         underpoweredTicks = 0;
         if (r.isMassRecipe()) {
@@ -1107,6 +1127,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         flushReturns();
         assignFluidOutputs(r.fluidResults(), false);
         onCrafted(level, r);
+        return true;
     }
 
     /**
@@ -1300,14 +1321,22 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         tag.put("tanks", tankList);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putInt("progress", progress);
+        if (completedDuration > 0) tag.putInt("completed_duration", completedDuration);
+        tag.putInt("underpowered_ticks", underpoweredTicks);
         tag.putInt("mode", mode);
         if (selectedRecipe != null) {
             tag.putString("selected_recipe", selectedRecipe.toString());
         }
         tag.putDouble("mass", mass);
         tag.putDouble("metal_mass", metalMass);
-        if (current != null) {
-            tag.putString("recipe", current.id().toString());
+        if (!massSources.isEmpty()) {
+            ListTag sources = new ListTag();
+            massSources.stream().sorted().forEach(id -> sources.add(StringTag.valueOf(id.toString())));
+            tag.put("mass_sources", sources);
+        }
+        ResourceLocation recipe = current == null ? resumeRecipe : current.id();
+        if (recipe != null) {
+            tag.putString("recipe", recipe.toString());
         }
     }
 
@@ -1388,11 +1417,19 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         refreshEnergyCapacity();
         energy.restoreEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
+        completedDuration = Math.clamp(tag.getInt("completed_duration"), 0, Math.max(0, progress));
+        underpoweredTicks = Math.max(0, tag.getInt("underpowered_ticks"));
         mode = tag.getInt("mode");
         selectedRecipe = tag.contains("selected_recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(ResourceLocation.tryParse(tag.getString("selected_recipe"))) : null;
         selectedIndex = -2;
         mass = tag.getDouble("mass");
         metalMass = tag.getDouble("metal_mass");
+        massSources.clear();
+        for (Tag entry : tag.getList("mass_sources", Tag.TAG_STRING)) {
+            ResourceLocation source = ResourceLocation.tryParse(entry.getAsString());
+            if (source != null) massSources.add(source);
+        }
+        current = null;
         resumeRecipe = tag.contains("recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(ResourceLocation.tryParse(tag.getString("recipe"))) : null;
         // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
         inputsChangedAt = tag.getLong("inputs_changed_at");

@@ -97,7 +97,19 @@ public class PortableAndroidPrinterItem extends Item {
     }
 
     public static IEnergyStorage energy(ItemStack stack) {
-        return new ComponentEnergyStorage(stack, SinguloComponents.ENERGY.get(), capacity(stack));
+        // メモリの交換は充電の上限だけを変える。取り出すときは、以前の型で蓄えた分も使える。
+        return new ComponentEnergyStorage(stack, SinguloComponents.ENERGY.get(), Integer.MAX_VALUE) {
+            @Override
+            public int receiveEnergy(int amount, boolean simulate) {
+                int room = Math.max(0, capacity(stack) - getEnergyStored());
+                return super.receiveEnergy(Math.min(amount, room), simulate);
+            }
+
+            @Override
+            public int getMaxEnergyStored() {
+                return Math.max(capacity(stack), getEnergyStored());
+            }
+        };
     }
 
     // ------------------------------------------------------------------ 中身
@@ -252,7 +264,7 @@ public class PortableAndroidPrinterItem extends Item {
             return;
         }
         for (RuinAndroid a : server.getEntitiesOfClass(RuinAndroid.class, player.getBoundingBox().inflate(REFILL_RANGE),
-                a -> a.isAlive() && a.orphan() && player.getUUID().equals(a.owner()))) {
+                a -> a.canReceivePortableRepairs(player.getUUID()))) {
             refill(stack, a, -1);
             if (repairKits(stack) <= 0) {
                 return;
@@ -366,7 +378,7 @@ public class PortableAndroidPrinterItem extends Item {
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round(13.0F * energy(stack).getEnergyStored() / capacity(stack));
+        return Math.min(13, Math.round(13.0F * energy(stack).getEnergyStored() / capacity(stack)));
     }
 
     @Override

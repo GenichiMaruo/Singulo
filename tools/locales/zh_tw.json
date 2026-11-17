@@ -15744,7 +15744,7 @@
     "translation": "撿到的物品存放處：不存放"
   },
   "gui.singulo.android.store.hint": {
-    "source": "After picking up, the android stores its items nearby (or in the other kind of storage). Click to switch",
-    "translation": "撿完後，把攜帶的物品存放到附近的存放處（沒有則存到另一種）。點擊切換"
+    "source": "The android deposits only items it picks up. If the preferred storage is unavailable, it tries the other kind. Click to switch.",
+    "translation": "只會自動存放撿到的物品。如果優先的存放處無法使用，就嘗試另一種。點擊切換。"
   }
 }

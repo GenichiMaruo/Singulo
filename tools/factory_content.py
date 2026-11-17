@@ -87,8 +87,8 @@ UI = {
     'gui.singulo.android.store.0': ('拾った物の預け先: チェスト優先', 'Store pickups: chests first'),
     'gui.singulo.android.store.1': ('拾った物の預け先: 作業指令台・資材口優先', 'Store pickups: work console and supply ports first'),
     'gui.singulo.android.store.2': ('拾った物の預け先: 預けない', 'Store pickups: keep them'),
-    'gui.singulo.android.store.hint': ('拾い終えたら、近くの預け先へ持ち物を預けに行く（なければもう一方へ）。押すと切り替える',
-                                       'After picking up, the android stores its items nearby (or in the other kind of storage). Click to switch'),
+    'gui.singulo.android.store.hint': ('自動で預けるのは拾った分だけ。優先する預け先がなければ、もう一方へ。押すと切り替える',
+                                       'The android deposits only items it picks up. If the preferred storage is unavailable, it tries the other kind. Click to switch.'),
     # Jade・WTHIT の設定画面
     'config.jade.plugin_singulo.machine': ('Singulo の装置の様子', 'Singulo machine status'),
     'config.waila.plugin_singulo.machine': ('Singulo の装置の様子', 'Singulo machine status'),
