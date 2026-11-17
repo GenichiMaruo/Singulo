@@ -61,4 +61,49 @@ public final class LegacyIdGameTests {
         helper.assertTrue(Singulo.id("crafting/kiln").equals(LegacyIds.recipe(Singulo.id("crafting/kiln"))), "Unrenamed recipe changed");
         helper.succeed();
     }
+
+    @GameTest(template = "empty")
+    public static void oldWorldRegistrySnapshotsRemapWithoutLosingNumericIds(GameTestHelper helper) throws ReflectiveOperationException {
+        snapshot(helper, net.minecraftforge.registries.ForgeRegistries.BLOCKS, LegacyIds.BLOCKS);
+        var items = new java.util.HashMap<>(LegacyIds.BLOCKS);
+        items.putAll(LegacyIds.ITEMS);
+        snapshot(helper, net.minecraftforge.registries.ForgeRegistries.ITEMS, items);
+        snapshot(helper, net.minecraftforge.registries.ForgeRegistries.BLOCK_ENTITY_TYPES, LegacyIds.BLOCK_ENTITIES);
+        helper.succeed();
+    }
+
+    private static <T> void snapshot(GameTestHelper helper, net.minecraftforge.registries.IForgeRegistry<T> current,
+            Map<String, String> renames) throws ReflectiveOperationException {
+        var active = (net.minecraftforge.registries.ForgeRegistry<T>) current;
+        var snapshot = active.makeSnapshot();
+        // Reconstruct the pre-0.20 registry names in a saved snapshot, retaining numeric IDs.
+        renames.forEach((from, to) -> {
+            int id = snapshot.ids.remove(Singulo.id(to));
+            snapshot.ids.put(Singulo.id(from), id);
+        });
+        snapshot.aliases.clear();
+        var stagingManager = new net.minecraftforge.registries.RegistryManager("STAGING");
+        net.minecraftforge.registries.ForgeRegistry<T> staging = stagingManager.getRegistry(active.getRegistryName(),
+                net.minecraftforge.registries.RegistryManager.ACTIVE);
+        var missing = new it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap<net.minecraft.resources.ResourceLocation>();
+        var remaps = new java.util.HashMap<net.minecraft.resources.ResourceLocation, net.minecraftforge.registries.IdMappingEvent.IdRemapping>();
+        staging.loadIds(snapshot.ids, snapshot.overrides, missing, remaps, active, active.getRegistryName());
+        helper.assertTrue(missing.size() == renames.size(), "Old snapshot did not exercise the missing-mapping path");
+        var event = staging.getMissingEvent(active.getRegistryName(), missing);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+        var defaulted = new java.util.ArrayList<net.minecraft.resources.ResourceLocation>();
+        var failed = new java.util.ArrayList<net.minecraft.resources.ResourceLocation>();
+        var process = java.util.Arrays.stream(net.minecraftforge.registries.ForgeRegistry.class.getDeclaredMethods())
+                .filter(method -> method.getName().equals("processMissingEvent") && method.getParameterCount() == 8)
+                .findFirst().orElseThrow();
+        process.setAccessible(true);
+        process.invoke(staging, active.getRegistryName(), active, event.getAllMappings(active.getRegistryKey()),
+                missing, remaps, defaulted, failed, false);
+        helper.assertTrue(missing.isEmpty() && defaulted.isEmpty() && failed.isEmpty(), "Old world entries were lost or defaulted");
+        renames.forEach((from, to) -> {
+            T target = active.getValue(Singulo.id(to));
+            helper.assertTrue(staging.getValue(Singulo.id(from)) == target, "Old snapshot key does not resolve: " + from);
+            helper.assertTrue(staging.getID(target) == snapshot.ids.get(Singulo.id(from)), "Saved numeric ID changed: " + from);
+        });
+    }
 }

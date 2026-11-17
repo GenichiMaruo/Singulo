@@ -84,12 +84,33 @@ public final class LegacyIds {
     /** 各登録に別名を足す（登録の前、Singulo の初期化で呼ぶ）。 */
     public static void apply() {
         net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus().addListener(LegacyIds::register);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(LegacyIds::missing);
     }
 
     private static void register(net.minecraftforge.registries.RegisterEvent event) {
         if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.BLOCK)) alias(event, BLOCKS);
         if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.ITEM)) { alias(event, BLOCKS); alias(event, ITEMS); }
         if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE)) alias(event, BLOCK_ENTITIES);
+    }
+
+    private static void missing(net.minecraftforge.registries.MissingMappingsEvent event) {
+        remap(event, net.minecraft.core.registries.Registries.BLOCK, BLOCKS, net.minecraftforge.registries.ForgeRegistries.BLOCKS);
+        remap(event, net.minecraft.core.registries.Registries.ITEM, BLOCKS, net.minecraftforge.registries.ForgeRegistries.ITEMS);
+        remap(event, net.minecraft.core.registries.Registries.ITEM, ITEMS, net.minecraftforge.registries.ForgeRegistries.ITEMS);
+        remap(event, net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, BLOCK_ENTITIES, net.minecraftforge.registries.ForgeRegistries.BLOCK_ENTITY_TYPES);
+    }
+
+    private static <T> void remap(net.minecraftforge.registries.MissingMappingsEvent event,
+            net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<T>> key,
+            Map<String, String> renames, net.minecraftforge.registries.IForgeRegistry<T> registry) {
+        for (var mapping : event.getMappings(key, Singulo.MODID)) {
+            String renamed = renames.get(mapping.getKey().getPath());
+            if (renamed != null) {
+                T target = registry.getValue(Singulo.id(renamed));
+                if (target == null) throw new IllegalStateException("Missing migration target: " + renamed);
+                mapping.remap(target);
+            }
+        }
     }
 
     private static void alias(net.minecraftforge.registries.RegisterEvent event, Map<String, String> renames) {
