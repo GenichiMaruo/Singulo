@@ -1,6 +1,6 @@
 # ドキュメント案内
 
-現在の開発は **0.20.0 / Minecraft 1.21.1 / NeoForge**。
+現在の開発は **0.21.0 / Minecraft 1.21.1 / NeoForge**。
 
 | 目的 | 読むもの |
 |---|---|
@@ -59,6 +59,10 @@
 
 - [アドオン連携 API](0.19.0/android-integration.md)・[独立したクラフト依頼](0.19.0/android-escrow.md)・[変更履歴](curseforge/changelog-0.19.0.md)
 
-## 0.20.0（開発中）
+## 0.20.0
 
 - [変更履歴](curseforge/changelog-0.20.0.md)
+
+## 0.21.0（開発中）
+
+- [変更履歴](curseforge/changelog-0.21.0.md)
