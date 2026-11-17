@@ -1141,7 +1141,7 @@ UI_LANG = {
     'gui.singulo.work_console.notify.missing.more': ('%sの注文が、素材を待って止まっている（%sがあと%s個足りない。ほか%s種）', 'The order for %s is stuck waiting for materials (%s: %s more needed, and %s other kinds)'),
     'gui.singulo.work_console.stock': ('在庫: %s', 'In stock: %s'),
     'gui.singulo.work_console.craftable': ('作れる', 'Craftable'),
-    'gui.singulo.android.pack.builtin': ('内蔵', 'Built-in'),
+    'gui.singulo.android.pack.builtin': ('バックパック内蔵（アップグレード不要）', 'Built-in backpack (no upgrade needed)'),
     'gui.singulo.work_console.search.hint': ('検索', 'Search'),
     'gui.singulo.work_console.no_match': ('検索に合う物がない', 'Nothing matches the search'),
     'gui.singulo.work_console.search.help': ('名前で絞り込む。@ で始めると mod で絞り込む（例: @singulo）。空白で区切ると、すべてに合う物だけ。右クリックで消す',

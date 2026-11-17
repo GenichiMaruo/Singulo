@@ -31,12 +31,19 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     private static final int TAB = 12;
     /** バックパックの欄の左端（スロットの1マス手前）。 */
     private static final int PACK_X_FRAME = AndroidMenu.PACK_X - 4;
-    /** タンクの目盛り（装備のページ、バックパックの下に2本）。 */
-    private static final int TANK_Y = 101, TANK_W = 56, TANK_H = 8, TANK_GAP = 4;
+    /** バックパック欄の縁の大きさ: 中の6×4の枠のまわりの余白を、左右は2ドット・上下は1ドットずつにそろえる。左の装備の欄も同じ高さ。 */
+    private static final int PACK_FRAME_W = 114, PACK_FRAME_H = 76;
     /** タンクの目盛りの幅と、その右の「捨てる」ボタン（シフト＋クリック）。 */
-    private static final int BAR_W = 47, CLEAR_W = 8;
+    private static final int BAR_W = 44, CLEAR_W = 8;
+    /**
+     * タンクの目盛り（装備のページ、バックパックの下に2本）。1本の幅は目盛りの凹み（BAR_W + 縁2）・すき間1・捨てるボタン。
+     * 2本と間（TANK_GAP）で、バックパック欄の左右の端（PACK_FRAME_W）にちょうど収める。高さは左の作業のボタンと中心をそろえる。
+     */
+    private static final int TANK_W = BAR_W + 3 + CLEAR_W, TANK_GAP = 4, TANK_Y = 105, TANK_H = 8;
     /** 装備のページ: バックパックと持ち物の間の小さなボタン（並べ替え・近くの箱へ預ける）。 */
     private static final int TOOL_X = 170, SORT_Y = 24, STASH_Y = 36, TOOL_S = 10;
+    /** その下の、落ちている物を拾う（オン／オフ）と、拾った物の預け先（チェスト優先・作業優先・預けない）のボタン（0.21.0）。 */
+    private static final int COLLECT_Y = 54, STORE_Y = 66;
 
     /** 装備のページのタンクの段（chem: 化学物質のタンク。液体と化学物質の両方なら、2段に細く並べる）。 */
     private record TankRow(boolean chem, int y, int h) {}
@@ -51,6 +58,11 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             return List.of(new TankRow(false, TANK_Y - 3, 6), new TankRow(true, TANK_Y + 5, 6));
         }
         return fluid ? List.of(new TankRow(false, TANK_Y, TANK_H)) : chem ? List.of(new TankRow(true, TANK_Y, TANK_H)) : List.of();
+    }
+
+    /** タンク i の目盛りの左端（凹みの中。凹みの縁はその1つ左）。 */
+    private int tankX(int i) {
+        return leftPos + PACK_X_FRAME + 1 + i * (TANK_W + TANK_GAP);
     }
 
     /** 積んでいるタンクのアップグレード（画面の欄の中身。タンクの大きさを決める）。 */
@@ -127,6 +139,18 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
 
     private boolean armed() {
         return Util.getMillis() - dismantleArmed < 3000;
+    }
+
+    /** 使わない枠（x, y は枠の左上。16×16）に重ねる、型の色の太さ2ドットの×。見本の絵より手前に描く。 */
+    private void builtInCross(GuiGraphics g, int x, int y) {
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 250);
+        int c = skin.accent() | 0xFF000000;
+        for (int i = 1; i < 15; i++) {
+            g.fill(x + i, y + i, x + i + 2 > x + 16 ? x + 16 : x + i + 2, y + i + 1, c);
+            g.fill(x + 15 - i - 1 < x ? x : x + 15 - i - 1, y + i, x + 15 - i + 1, y + i + 1, c);
+        }
+        g.pose().popPose();
     }
 
     private static ItemStack item(String id) {
@@ -250,7 +274,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         if (gearPage() && minecraft != null && minecraft.gameMode != null) {
             for (TankRow row : tankRows()) {
                 for (int i = 0; i < RuinAndroid.TANKS; i++) {
-                    int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                    int tx = tankX(i);
                     if (Panel.inside(mouseX, mouseY, tx, topPos + row.y(), BAR_W, row.h()) && !menu.getCarried().isEmpty()) {
                         // バケツ・ケミカルタンクなどで、タンクに入れる・タンクから汲む
                         minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
@@ -347,7 +371,7 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         RuinAndroid android = menu.android();
         for (TankRow row : android == null ? List.<TankRow>of() : tankRows()) {
             for (int i = 0; i < RuinAndroid.TANKS; i++) {
-                int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                int tx = tankX(i);
                 if (Panel.inside(mouseX, mouseY, tx, topPos + row.y(), BAR_W, row.h())) {
                     List<Component> lines = new ArrayList<>();
                     if (row.chem()) {
@@ -491,8 +515,8 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
     private void renderGear(GuiGraphics g, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
-        section(g, 5, 21, 46, 70);
-        section(g, PACK_X_FRAME, 21, 116, 78);
+        section(g, 5, 21, 46, PACK_FRAME_H);                  // 装備の欄（右のバックパック欄と同じ高さ）
+        section(g, PACK_X_FRAME, 21, PACK_FRAME_W, PACK_FRAME_H);
         section(g, AndroidMenu.CARRY_X - 4, 21, 24, 96);
         area(AndroidMenu.CARRY_X - 4, 21, 24, 2, List.of(Component.translatable("gui.singulo.android.carry")));
         // 専用のスロット（空のときは見本）
@@ -515,11 +539,8 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
             }
         }
         if (menu.builtInPack()) {
-            // バックパックを内蔵している型: アップグレードの枠をアクセントの札で覆う（アップグレードは入らない）
-            int sx = x + AndroidMenu.BACKPACK_X;
-            int sy = y + AndroidMenu.BACKPACK_Y;
-            Panel.button(g, skin, sx - 1, sy - 1, 18, 18, Panel.Press.ON);
-            pageIcon(g, sx + 2, sy + 2, AndroidMenu.PAGE_GEAR, true);
+            // バックパックを内蔵している型: アップグレードの枠（入らない）に、型の色の×を重ねる。重ねると短い説明
+            builtInCross(g, x + AndroidMenu.BACKPACK_X, y + AndroidMenu.BACKPACK_Y);
             area(AndroidMenu.BACKPACK_X, AndroidMenu.BACKPACK_Y, 16, 16, List.of(Component.translatable("gui.singulo.android.pack.builtin")));
         }
         int openRows = menu.packSlots() / 6;

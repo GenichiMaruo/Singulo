@@ -28,13 +28,18 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int REPAIR_X = 96, REPAIR_Y = 98;
     public static final int PLATE_X = 134, PLATE_Y = 98;
     public static final int DISMANTLE_X = 172, DISMANTLE_Y = 100;
-    /** 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。上の段をそろえる。 */
-    public static final int UPGRADE_X = 22, BATTERY_Y = 24, BACKPACK_Y = 48, MINING_Y = 72;
+    /**
+     * 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。上の段をそろえる。
+     * 左の装備の欄（x 5〜50、バックパック欄と同じ高さ）の中は、左右の余白を3ドットずつにし、電池の段の上端をバックパックの1段目に、
+     * 道具の段の下端をバックパックの最後の段にそろえ、間の2つの隙間を等しくする。
+     */
+    public static final int UPGRADE_X = 20, BATTERY_Y = 24, BACKPACK_Y = 51, MINING_Y = 78;
     /** 道具の枠（採掘・伐採）と、収納の枠（バックパック・タンク）は、左右に並べる。 */
-    public static final int MINING_X = 12, FELLING_X = 32, BACKPACK_X = 12, TANK_X = 32;
+    public static final int MINING_X = 10, FELLING_X = 30, BACKPACK_X = 10, TANK_X = 30;
     public static final int PACK_X = 58, PACK_Y = 24;
     public static final int CARRY_X = 186, CARRY_Y = 24;
-    public static final int WORK_X = 8, WORK_Y = 96, WORK_W = 44, WORK_H = 14;
+    /** 作業のボタン（装備の欄の下。欄と左右の端をそろえる）。 */
+    public static final int WORK_X = 5, WORK_Y = 102, WORK_W = 46, WORK_H = 14;
     public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH);
     public static final int INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT);
     public static final int HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
