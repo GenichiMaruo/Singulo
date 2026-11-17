@@ -218,9 +218,9 @@ public final class GuiReviewHarness {
                 ((AndroidStationMenu) mc.player.containerMenu).setRuleView(false);
                 phase = 99;
                 mc.getLanguageManager().setSelected("en_us");
-                GlassModelReview.check(mc, "before-reload");
+                GlassModelReviewHarness.check(mc, "before-reload");
                 mc.reloadResourcePacks().thenRun(() -> mc.execute(() -> {
-                    GlassModelReview.check(mc, "after-reload");
+                    GlassModelReviewHarness.check(mc, "after-reload");
                     ready = 0;
                     phase = 18;
                 }));

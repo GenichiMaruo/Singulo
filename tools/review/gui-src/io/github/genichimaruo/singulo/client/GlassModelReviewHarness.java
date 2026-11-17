@@ -14,12 +14,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
 
 /** Development-only checks using the actual baked models and stitched client atlas. */
-final class GlassModelReview {
+final class GlassModelReviewHarness {
     private static int checks;
     private static List<BlockStateModelPart> parts(Minecraft mc, BlockState state, Map<BlockPos, BlockState> neighbors) {
         var model = mc.getModelManager().getBlockStateModelSet().get(state);
         if (!(model instanceof GlassModelBase)) throw new IllegalStateException("Glass model wrapper missing: " + state);
-        var world = (BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(GlassModelReview.class.getClassLoader(),
+        var world = (BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(GlassModelReviewHarness.class.getClassLoader(),
                 new Class<?>[]{BlockAndTintGetter.class}, (proxy, method, args) -> {
                     if (method.getName().equals("getBlockState")) {
                         BlockPos p=(BlockPos)args[0];
