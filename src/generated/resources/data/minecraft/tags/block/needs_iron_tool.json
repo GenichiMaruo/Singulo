@@ -78,6 +78,10 @@
     "singulo:lab_tile_slab",
     "singulo:lab_tile_wall",
     "singulo:white_glass_panel_stairs",
-    "singulo:black_reinforced_glass_stairs"
+    "singulo:black_reinforced_glass_stairs",
+    "singulo:android_gate_glass_stairs",
+    "singulo:android_gate_glass_patterned_stairs",
+    "singulo:android_barrier_glass_stairs",
+    "singulo:android_barrier_glass_patterned_stairs"
   ]
 }

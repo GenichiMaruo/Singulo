@@ -11484,16 +11484,16 @@
     "translation": "用於：強化背包升級"
   },
   "uses.singulo.android_barrier_glass": {
-    "source": "Used in: Patterned Android Barrier Glass",
-    "translation": "用於：花紋仿生人阻隔玻璃"
+    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs",
+    "translation": "用於：花紋仿生人阻隔玻璃、仿生人阻隔玻璃樓梯"
   },
   "uses.singulo.android_gas_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
     "translation": "用於：氣體與液體升級"
   },
   "uses.singulo.android_gate_glass": {
-    "source": "Used in: Patterned Android Gate Glass",
-    "translation": "用於：花紋仿生人透過玻璃"
+    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs",
+    "translation": "用於：花紋仿生人透過玻璃、仿生人透過玻璃樓梯"
   },
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
@@ -15262,5 +15262,61 @@
   "howto.singulo.black_reinforced_glass_stairs": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製作：工作台（階段1）"
+  },
+  "block.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Patterned Android Barrier Glass Stairs",
+    "translation": "花紋仿生人阻隔玻璃樓梯"
+  },
+  "block.singulo.android_barrier_glass_stairs": {
+    "source": "Android Barrier Glass Stairs",
+    "translation": "仿生人阻隔玻璃樓梯"
+  },
+  "block.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Patterned Android Gate Glass Stairs",
+    "translation": "花紋仿生人透過玻璃樓梯"
+  },
+  "block.singulo.android_gate_glass_stairs": {
+    "source": "Android Gate Glass Stairs",
+    "translation": "仿生人透過玻璃樓梯"
+  },
+  "desc.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Stairs made from Patterned Android Barrier Glass.",
+    "translation": "用花紋仿生人阻隔玻璃製成的樓梯。"
+  },
+  "desc.singulo.android_barrier_glass_stairs": {
+    "source": "Stairs made from Android Barrier Glass.",
+    "translation": "用仿生人阻隔玻璃製成的樓梯。"
+  },
+  "desc.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Stairs made from Patterned Android Gate Glass.",
+    "translation": "用花紋仿生人透過玻璃製成的樓梯。"
+  },
+  "desc.singulo.android_gate_glass_stairs": {
+    "source": "Stairs made from Android Gate Glass.",
+    "translation": "用仿生人透過玻璃製成的樓梯。"
+  },
+  "howto.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製作：工作台（階段2）"
+  },
+  "howto.singulo.android_barrier_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製作：工作台（階段2）"
+  },
+  "howto.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製作：工作台（階段2）"
+  },
+  "howto.singulo.android_gate_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製作：工作台（階段2）"
+  },
+  "uses.singulo.android_barrier_glass_patterned": {
+    "source": "Used in: Patterned Android Barrier Glass Stairs",
+    "translation": "用於：花紋仿生人阻隔玻璃樓梯"
+  },
+  "uses.singulo.android_gate_glass_patterned": {
+    "source": "Used in: Patterned Android Gate Glass Stairs",
+    "translation": "用於：花紋仿生人透過玻璃樓梯"
   }
 }

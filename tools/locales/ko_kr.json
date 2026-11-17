@@ -11484,16 +11484,16 @@
     "translation": "사용처: 강화 백팩 업그레이드"
   },
   "uses.singulo.android_barrier_glass": {
-    "source": "Used in: Patterned Android Barrier Glass",
-    "translation": "사용처: 무늬 안드로이드 차단 유리"
+    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs",
+    "translation": "사용처: 무늬 안드로이드 차단 유리, 안드로이드 차단 유리 계단"
   },
   "uses.singulo.android_gas_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
     "translation": "사용처: 가스·액체 업그레이드"
   },
   "uses.singulo.android_gate_glass": {
-    "source": "Used in: Patterned Android Gate Glass",
-    "translation": "사용처: 무늬 안드로이드 투과 유리"
+    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs",
+    "translation": "사용처: 무늬 안드로이드 투과 유리, 안드로이드 투과 유리 계단"
   },
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
@@ -15262,5 +15262,61 @@
   "howto.singulo.black_reinforced_glass_stairs": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
+  },
+  "block.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Patterned Android Barrier Glass Stairs",
+    "translation": "무늬 안드로이드 차단 유리 계단"
+  },
+  "block.singulo.android_barrier_glass_stairs": {
+    "source": "Android Barrier Glass Stairs",
+    "translation": "안드로이드 차단 유리 계단"
+  },
+  "block.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Patterned Android Gate Glass Stairs",
+    "translation": "무늬 안드로이드 투과 유리 계단"
+  },
+  "block.singulo.android_gate_glass_stairs": {
+    "source": "Android Gate Glass Stairs",
+    "translation": "안드로이드 투과 유리 계단"
+  },
+  "desc.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Stairs made from Patterned Android Barrier Glass.",
+    "translation": "무늬 안드로이드 차단 유리 재질의 계단입니다."
+  },
+  "desc.singulo.android_barrier_glass_stairs": {
+    "source": "Stairs made from Android Barrier Glass.",
+    "translation": "안드로이드 차단 유리 재질의 계단입니다."
+  },
+  "desc.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Stairs made from Patterned Android Gate Glass.",
+    "translation": "무늬 안드로이드 투과 유리 재질의 계단입니다."
+  },
+  "desc.singulo.android_gate_glass_stairs": {
+    "source": "Stairs made from Android Gate Glass.",
+    "translation": "안드로이드 투과 유리 재질의 계단입니다."
+  },
+  "howto.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_barrier_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_gate_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "uses.singulo.android_barrier_glass_patterned": {
+    "source": "Used in: Patterned Android Barrier Glass Stairs",
+    "translation": "사용처: 무늬 안드로이드 차단 유리 계단"
+  },
+  "uses.singulo.android_gate_glass_patterned": {
+    "source": "Used in: Patterned Android Gate Glass Stairs",
+    "translation": "사용처: 무늬 안드로이드 투과 유리 계단"
   }
 }

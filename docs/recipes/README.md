@@ -1400,6 +1400,22 @@ Pリアクターの燃料
 
 ### 冷却塔拡張（高さ10）
 
+### アンドロイド透過ガラスの階段
+
+![アンドロイド透過ガラスの階段](470_android_gate_glass_stairs.png)
+
+### 模様入りアンドロイド透過ガラスの階段
+
+![模様入りアンドロイド透過ガラスの階段](471_android_gate_glass_patterned_stairs.png)
+
+### アンドロイド遮断ガラスの階段
+
+![アンドロイド遮断ガラスの階段](472_android_barrier_glass_stairs.png)
+
+### 模様入りアンドロイド遮断ガラスの階段
+
+![模様入りアンドロイド遮断ガラスの階段](473_android_barrier_glass_patterned_stairs.png)
+
 ![冷却塔拡張（高さ10）](044_cooling_tower_extension.png)
 
 高さ7→10の増築分（くびれを3段のばす）

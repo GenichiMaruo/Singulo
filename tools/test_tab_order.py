@@ -74,6 +74,7 @@ class CreativeTabOrderTests(unittest.TestCase):
         android = set(self.span('アンドロイド', 'アンドロイドのアップグレード', 'アンドロイド装飾'))
         building = {'android_barrier_glass', 'android_barrier_glass_patterned', 'android_gate_glass',
                     'android_gate_glass_patterned', 'android_capsule'}
+        building |= {v for v, (b, _) in building_variants.VARIANTS.items() if b in building}     # 建材の階段も建材
         for iid in self.order:
             if iid.startswith('android_') and iid not in building:
                 self.assertIn(iid, android)

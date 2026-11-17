@@ -203,7 +203,11 @@ public final class GeneratedContent {
             new BlockVariant("lab_tile_slab", "lab_tiles", "slab", 1),
             new BlockVariant("lab_tile_wall", "lab_tiles", "wall", 1),
             new BlockVariant("white_glass_panel_stairs", "white_glass_panel", "stairs", 1),
-            new BlockVariant("black_reinforced_glass_stairs", "black_reinforced_glass", "stairs", 1)
+            new BlockVariant("black_reinforced_glass_stairs", "black_reinforced_glass", "stairs", 1),
+            new BlockVariant("android_gate_glass_stairs", "android_gate_glass", "stairs", 2),
+            new BlockVariant("android_gate_glass_patterned_stairs", "android_gate_glass_patterned", "stairs", 2),
+            new BlockVariant("android_barrier_glass_stairs", "android_barrier_glass", "stairs", 2),
+            new BlockVariant("android_barrier_glass_patterned_stairs", "android_barrier_glass_patterned", "stairs", 2)
     );
 
     /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */
@@ -545,9 +549,13 @@ public final class GeneratedContent {
             "glowing_bismuth_crystal",
             "android_barrier_glass",
             "android_barrier_glass_patterned",
+            "android_barrier_glass_stairs",
             "android_gate_glass",
+            "android_barrier_glass_patterned_stairs",
             "android_gate_glass_patterned",
+            "android_gate_glass_stairs",
             "ruin_panel",
+            "android_gate_glass_patterned_stairs",
             "ruin_panel_stairs",
             "ruin_panel_slab",
             "ruin_panel_wall",
@@ -929,6 +937,10 @@ public final class GeneratedContent {
             Map.entry("lab_tile_slab", 1),
             Map.entry("lab_tile_wall", 1),
             Map.entry("white_glass_panel_stairs", 1),
-            Map.entry("black_reinforced_glass_stairs", 1)
+            Map.entry("black_reinforced_glass_stairs", 1),
+            Map.entry("android_gate_glass_stairs", 2),
+            Map.entry("android_gate_glass_patterned_stairs", 2),
+            Map.entry("android_barrier_glass_stairs", 2),
+            Map.entry("android_barrier_glass_patterned_stairs", 2)
     );
 }

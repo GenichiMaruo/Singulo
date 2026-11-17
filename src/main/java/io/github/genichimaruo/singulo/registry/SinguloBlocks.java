@@ -351,11 +351,11 @@ public final class SinguloBlocks {
                     .sound(SoundType.NETHERITE_BLOCK));
 
     /** 透けるパネル（ホワイトパネルと黒色強化パネルの系統と、四芒星の模様入り）。音はそれぞれのパネルと同じ。 */
-    public static final DeferredBlock<TransparentBlock> WHITE_GLASS_PANEL = glass("white_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
+    public static final DeferredBlock<TransparentBlock> WHITE_GLASS_PANEL = joinedGlass("white_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
             SoundType.METAL);
     public static final DeferredBlock<TransparentBlock> WHITE_STAR_GLASS_PANEL = glass("white_star_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
             SoundType.METAL);
-    public static final DeferredBlock<TransparentBlock> BLACK_REINFORCED_GLASS = glass("black_reinforced_glass", MapColor.COLOR_BLACK,
+    public static final DeferredBlock<TransparentBlock> BLACK_REINFORCED_GLASS = joinedGlass("black_reinforced_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
     public static final DeferredBlock<TransparentBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
@@ -623,10 +623,20 @@ public final class SinguloBlocks {
 
     /** 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。 */
     private static DeferredBlock<TransparentBlock> glass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
-        return BLOCKS.register(id, () -> new TransparentBlock(BlockBehaviour.Properties.of().mapColor(color)
+        return BLOCKS.register(id, () -> new TransparentBlock(glassProperties(color, hardness, resistance, sound)));
+    }
+
+    /** 階段を持つガラス: 同じガラスの階段との間の面も描かない（{@link io.github.genichimaruo.singulo.block.GlassJoin}）。 */
+    private static DeferredBlock<TransparentBlock> joinedGlass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
+        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.block.GlassJoin.Glass(
+                glassProperties(color, hardness, resistance, sound)));
+    }
+
+    private static BlockBehaviour.Properties glassProperties(MapColor color, float hardness, float resistance, SoundType sound) {
+        return BlockBehaviour.Properties.of().mapColor(color)
                 .strength(hardness, resistance).requiresCorrectToolForDrops().sound(sound).noOcclusion()
                 .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
-                .isValidSpawn((s, l, p, e) -> false)));
+                .isValidSpawn((s, l, p, e) -> false);
     }
 
     private static BlockBehaviour.Properties androidGlassProperties() {
@@ -711,7 +721,12 @@ public final class SinguloBlocks {
         // ofFullCopy はドロップ（元の建材の落とす物）まで写すので、バニラの階段と同じ ofLegacyCopy
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.ofLegacyCopy(base);
         return switch (v.shape()) {
-            case "stairs" -> new net.minecraft.world.level.block.StairBlock(base.defaultBlockState(), properties);
+            // ガラスの階段は、元のガラスや同じガラスの階段との境目を描かない
+            case "stairs" -> base instanceof io.github.genichimaruo.singulo.android.AndroidGlassBlock
+                    ? new io.github.genichimaruo.singulo.android.AndroidGlassStairs(() -> base, properties)
+                    : base instanceof io.github.genichimaruo.singulo.block.GlassJoin.Glass
+                    ? new io.github.genichimaruo.singulo.block.GlassJoin.Stairs(() -> base, properties)
+                    : new net.minecraft.world.level.block.StairBlock(base.defaultBlockState(), properties);
             case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
             case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
             default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());

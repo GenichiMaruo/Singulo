@@ -28,7 +28,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public final class BuildingVariantGameTests {
     @GameTest(template = "empty")
     public static void variantsCopyTheirBaseAndAppearInNewStructures(GameTestHelper helper) {
-        helper.assertTrue(GeneratedContent.BLOCK_VARIANTS.size() == 32, "Expected 32 building variants");
+        helper.assertTrue(GeneratedContent.BLOCK_VARIANTS.size() == 36, "Expected 36 building variants");
         for (GeneratedContent.BlockVariant v : GeneratedContent.BLOCK_VARIANTS) {
             Block block = SinguloBlocks.VARIANTS.get(v.id()).get();
             Block base = BuiltInRegistries.BLOCK.get(Singulo.id(v.base()));
@@ -53,6 +53,36 @@ public final class BuildingVariantGameTests {
         var drops = slab.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE).getDrops(params);
         helper.assertTrue(drops.size() == 1 && drops.get(0).is(slab.asItem()) && drops.get(0).getCount() == 2,
                 "Double slab should drop two slabs: " + drops);
+
+        // 同じガラスどうしの境目は描かない（階段の部分だけの面に接する所は、穴が見えるので描く）
+        var glass = SinguloBlocks.WHITE_GLASS_PANEL.get().defaultBlockState();
+        var stairs = SinguloBlocks.VARIANTS.get("white_glass_panel_stairs").get().defaultBlockState()
+                .setValue(StairBlock.FACING, net.minecraft.core.Direction.EAST);     // 東が背面（全面）、西は下半分だけ
+        helper.assertTrue(stairs.skipRendering(glass, net.minecraft.core.Direction.WEST), "Stairs draw their face against the glass");
+        helper.assertTrue(glass.skipRendering(stairs, net.minecraft.core.Direction.WEST), "Glass draws its face against the stairs' full back");
+        helper.assertFalse(glass.skipRendering(stairs, net.minecraft.core.Direction.EAST), "Glass hid its face against the stairs' half face");
+        helper.assertFalse(SinguloBlocks.WHITE_PANEL.get().defaultBlockState().skipRendering(stairs, net.minecraft.core.Direction.WEST),
+                "Opaque panel changed");
+
+        // アンドロイド透過ガラスの階段: アンドロイドだけが通り抜け、ほかは階段の形でぶつかる。元のガラスとの境目は描かない
+        var gateGlass = SinguloBlocks.ANDROID_GATE_GLASS.get().defaultBlockState();
+        var gateStairs = SinguloBlocks.VARIANTS.get("android_gate_glass_stairs").get().defaultBlockState()
+                .setValue(StairBlock.FACING, net.minecraft.core.Direction.EAST);
+        var android = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(level);
+        BlockPos at = helper.absolutePos(new BlockPos(1, 1, 1));
+        helper.assertTrue(gateStairs.getCollisionShape(level, at, net.minecraft.world.phys.shapes.CollisionContext.of(android)).isEmpty(),
+                "An android bumps into gate glass stairs");
+        helper.assertFalse(gateStairs.getCollisionShape(level, at, net.minecraft.world.phys.shapes.CollisionContext.empty()).isEmpty(),
+                "Others pass through gate glass stairs");
+        helper.assertTrue(gateStairs.skipRendering(gateGlass, net.minecraft.core.Direction.WEST), "Gate stairs draw their face against the glass");
+        helper.assertTrue(gateGlass.skipRendering(gateStairs, net.minecraft.core.Direction.WEST), "Gate glass draws its face against the stairs");
+        // 遮断ガラスの階段は逆: アンドロイドだけがぶつかり、ほかはすり抜ける
+        var barrierStairs = SinguloBlocks.VARIANTS.get("android_barrier_glass_stairs").get().defaultBlockState();
+        helper.assertFalse(barrierStairs.getCollisionShape(level, at, net.minecraft.world.phys.shapes.CollisionContext.of(android)).isEmpty(),
+                "An android passes through barrier glass stairs");
+        helper.assertTrue(barrierStairs.getCollisionShape(level, at, net.minecraft.world.phys.shapes.CollisionContext.empty()).isEmpty(),
+                "Others bump into barrier glass stairs");
+        android.discard();
 
         // 新しく生まれる施設には新しい建材が置かれる（それまでのクォーツの代わり）
         var templates = level.getStructureManager();
