@@ -1631,7 +1631,6 @@ UI_LANG = {
     'gui.singulo.genesis.bar.stabilizing': ('安定化 %s　不安定度 %s', 'Stabilization %s  Instability %s'),
     'gui.singulo.genesis.bar.surge': ('⚠ 暴走中！投入を止めろ　不安定度 %s', '⚠ Surging: stop the feed!  Instability %s'),
     'gui.singulo.genesis.bar.surge_held': ('暴走を抑え込んでいる　不安定度 %s', 'Holding the surge  Instability %s'),
-    'gui.singulo.genesis.bar.synth': ('%s を生成中 %s　完成品 %s個', '%s %s  Ready: %s'),
     'gui.singulo.genesis.bar.paused': ('［投入停止中］ %s', '[Feed stopped] %s'),
     'gui.singulo.genesis.phase.0': ('未形成', 'Not formed'),
     'gui.singulo.genesis.phase.1': ('揺籃', 'Cradle'),

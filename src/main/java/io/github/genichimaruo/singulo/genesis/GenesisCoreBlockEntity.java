@@ -310,7 +310,8 @@ public class GenesisCoreBlockEntity extends BlockEntity implements io.github.gen
         if (slamTicks > 0 && --slamTicks == 0) {
             slamNearby(level);
         }
-        if (level.getGameTime() % 10 == 0 && (stage == KINDLING || stage == STABILIZING || stage == COMPLETE && !template.isEmpty())) {
+        // 宇宙を生むまで（種火・安定化）だけ、近くの人に様子を出す。完成した炉の生成は長く続くので出さない（画面で見る）
+        if (level.getGameTime() % 10 == 0 && (stage == KINDLING || stage == STABILIZING)) {
             showStatus(level);
         }
         if (stage >= KINDLING && level.getGameTime() % 80 == 0) {
@@ -842,17 +843,14 @@ public class GenesisCoreBlockEntity extends BlockEntity implements io.github.gen
         };
     }
 
-    /** 近くの人の画面下に、今の様子を出す。 */
+    /** 近くの人の画面下に、今の様子を出す（種火・安定化の間）。 */
     private void showStatus(ServerLevel level) {
-        Component msg = switch (stage) {
-            case KINDLING -> Component.translatable("gui.singulo.genesis.bar.kindling", percent(chargeFraction()), formatFe(intake));
-            case STABILIZING -> surgeTicks > 0
-                    ? Component.translatable(feeding ? "gui.singulo.genesis.bar.surge" : "gui.singulo.genesis.bar.surge_held",
-                    percent(instability / 100F)).withStyle(feeding ? ChatFormatting.RED : ChatFormatting.AQUA)
-                    : Component.translatable("gui.singulo.genesis.bar.stabilizing", percent(progressFraction()), percent(instability / 100F));
-            default -> Component.translatable("gui.singulo.genesis.bar.synth", template.getHoverName(), percent(synthFraction()),
-                    output.getCount());
-        };
+        Component msg = stage == KINDLING
+                ? Component.translatable("gui.singulo.genesis.bar.kindling", percent(chargeFraction()), formatFe(intake))
+                : surgeTicks > 0
+                ? Component.translatable(feeding ? "gui.singulo.genesis.bar.surge" : "gui.singulo.genesis.bar.surge_held",
+                percent(instability / 100F)).withStyle(feeding ? ChatFormatting.RED : ChatFormatting.AQUA)
+                : Component.translatable("gui.singulo.genesis.bar.stabilizing", percent(progressFraction()), percent(instability / 100F));
         if (!feeding && !(stage == STABILIZING && surgeTicks > 0)) {
             msg = Component.translatable("gui.singulo.genesis.bar.paused", msg);
         }
