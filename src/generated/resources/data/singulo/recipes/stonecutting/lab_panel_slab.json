@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:lab_panel"
   },
-  "result": {
-    "count": 2,
-    "item": "singulo:lab_panel_slab"
-  }
+  "result": "singulo:lab_panel_slab",
+  "count": 2
 }

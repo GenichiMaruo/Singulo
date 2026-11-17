@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:cracked_ruin_panel"
   },
-  "result": {
-    "count": 1,
-    "item": "singulo:cracked_ruin_panel_wall"
-  }
+  "result": "singulo:cracked_ruin_panel_wall",
+  "count": 1
 }

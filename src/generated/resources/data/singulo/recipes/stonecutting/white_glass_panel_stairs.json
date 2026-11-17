@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:white_glass_panel"
   },
-  "result": {
-    "count": 1,
-    "item": "singulo:white_glass_panel_stairs"
-  }
+  "result": "singulo:white_glass_panel_stairs",
+  "count": 1
 }

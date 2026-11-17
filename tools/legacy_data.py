@@ -54,6 +54,9 @@ def convert(path: Path, obj):
     if 'recipes' in parts and (obj.get('type', '').startswith('minecraft:') or obj.get('type') == 'singulo:smes_upgrade'):
         result = obj.get('result')
         if isinstance(result, dict) and 'id' in result: result['item'] = result.pop('id')
+        if obj.get('type') == 'minecraft:stonecutting' and isinstance(result, dict):
+            obj['result'] = result['item']
+            obj['count'] = result.get('count', 1)
     # 1.20.1 advancement item predicates use an array of item ids.
     if 'advancements' in parts:
         def predicates(value):

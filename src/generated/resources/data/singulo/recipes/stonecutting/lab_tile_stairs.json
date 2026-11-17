@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:lab_tiles"
   },
-  "result": {
-    "count": 1,
-    "item": "singulo:lab_tile_stairs"
-  }
+  "result": "singulo:lab_tile_stairs",
+  "count": 1
 }

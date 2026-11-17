@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:black_reinforced_panel"
   },
-  "result": {
-    "count": 2,
-    "item": "singulo:black_reinforced_panel_slab"
-  }
+  "result": "singulo:black_reinforced_panel_slab",
+  "count": 2
 }

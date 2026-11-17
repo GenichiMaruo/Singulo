@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:black_reinforced_glass"
   },
-  "result": {
-    "count": 1,
-    "item": "singulo:black_reinforced_glass_stairs"
-  }
+  "result": "singulo:black_reinforced_glass_stairs",
+  "count": 1
 }

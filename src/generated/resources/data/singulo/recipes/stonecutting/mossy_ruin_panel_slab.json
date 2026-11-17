@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:mossy_ruin_panel"
   },
-  "result": {
-    "count": 2,
-    "item": "singulo:mossy_ruin_panel_slab"
-  }
+  "result": "singulo:mossy_ruin_panel_slab",
+  "count": 2
 }

@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:white_panel"
   },
-  "result": {
-    "count": 2,
-    "item": "singulo:white_panel_slab"
-  }
+  "result": "singulo:white_panel_slab",
+  "count": 2
 }

@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:pristine_ruin_tiles"
   },
-  "result": {
-    "count": 2,
-    "item": "singulo:pristine_ruin_tile_slab"
-  }
+  "result": "singulo:pristine_ruin_tile_slab",
+  "count": 2
 }

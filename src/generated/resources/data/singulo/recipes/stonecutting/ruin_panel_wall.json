@@ -3,8 +3,6 @@
   "ingredient": {
     "item": "singulo:ruin_panel"
   },
-  "result": {
-    "count": 1,
-    "item": "singulo:ruin_panel_wall"
-  }
+  "result": "singulo:ruin_panel_wall",
+  "count": 1
 }
