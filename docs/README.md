@@ -1,6 +1,6 @@
 # ドキュメント案内
 
-現在の開発は **0.19.0 / Minecraft 1.20.1 / Forge・NeoForge**。
+現在の開発は **0.20.0 / Minecraft 1.20.1 / Forge・NeoForge**。
 
 | 目的 | 読むもの |
 |---|---|
@@ -59,3 +59,7 @@ Minecraft 1.20.1向けの差分と検証は[移植記録](0.13.0/port-1.20.1.md)
 ## 0.20.0（開発中）
 
 - [変更履歴](curseforge/changelog-0.20.0.md)
+
+## 0.20.0
+
+- [1.20.1移植・検証](0.20.0/port-1.20.1.md)・[変更履歴](curseforge/changelog-0.20.0.md)
