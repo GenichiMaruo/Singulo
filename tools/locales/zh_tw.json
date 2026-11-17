@@ -2144,8 +2144,8 @@
     "translation": "因長期休眠而變得不穩定的晶核。"
   },
   "desc.singulo.desk_monitor": {
-    "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
-    "translation": "研究所桌上的小顯示器。只有螢幕微微發光。"
+    "source": "A small monitor from a laboratory desk. Use it to open the factory monitor: power generated, used and stored by machines within 16 blocks, stalled machines and why, and how drones are doing. Each Server Rack placed beside it widens the range by 8 blocks (up to 4).",
+    "translation": "研究所桌上的小顯示器。使用後打開工廠監視器，可以查看周圍（16格）裝置的發電・消耗・儲能、停止的裝置及其原因、無人機的狀況。在旁邊放置伺服器機架，每台使範圍擴大8格（最多4台）。"
   },
   "desc.singulo.dimensional_pocket": {
     "source": "Right-click to open your own 27-slot storage from anywhere. The contents survive death.",
@@ -15350,5 +15350,221 @@
   "howto.singulo.android_cat_tail": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製作：工作台（階段1）"
+  },
+  "report.singulo.progress": {
+    "source": "Progress: %s%%",
+    "translation": "進度：%s%%"
+  },
+  "report.singulo.energy": {
+    "source": "Energy: %s / %s FE",
+    "translation": "儲能：%s / %s FE"
+  },
+  "report.singulo.consume": {
+    "source": "Using %s FE/t",
+    "translation": "耗電：%s FE/t"
+  },
+  "report.singulo.produce": {
+    "source": "Generating %s FE/t",
+    "translation": "發電：%s FE/t"
+  },
+  "report.singulo.catalyst": {
+    "source": "Catalyst: %s (%s%% left)",
+    "translation": "催化劑：%s（剩餘 %s%%）"
+  },
+  "report.singulo.missing": {
+    "source": "Missing parts:",
+    "translation": "缺少的部件："
+  },
+  "report.singulo.missing.line": {
+    "source": "  %s ×%s",
+    "translation": "  %s ×%s"
+  },
+  "report.singulo.missing.more": {
+    "source": "  %s more kinds, %s blocks",
+    "translation": "  另有 %s 種、%s 個"
+  },
+  "report.singulo.blocking": {
+    "source": "  Blocks in the way: %s",
+    "translation": "  擋住需留空位置的方塊：%s"
+  },
+  "config.jade.plugin_singulo.machine": {
+    "source": "Singulo machine status",
+    "translation": "Singulo 裝置狀態"
+  },
+  "config.waila.plugin_singulo.machine": {
+    "source": "Singulo machine status",
+    "translation": "Singulo 裝置狀態"
+  },
+  "gui.singulo.genesis.trait": {
+    "source": "The galaxy to be born: %s",
+    "translation": "將要誕生的星系：%s"
+  },
+  "gui.singulo.genesis.trait_same": {
+    "source": "Already set (%s)",
+    "translation": "已經是這樣了（%s）"
+  },
+  "gui.singulo.genesis.reseeded": {
+    "source": "A new seed sinks in. Kindle it again for the next galaxy",
+    "translation": "新的原初之種沉了下去。為了下一個星系，再次點燃火種吧"
+  },
+  "gui.singulo.genesis.screen.galaxy_next": {
+    "source": "Galaxy to be born: %s",
+    "translation": "將要誕生的星系：%s"
+  },
+  "gui.singulo.genesis.screen.galaxy_tip": {
+    "source": "Use materials on the core before birth: a dye sets the arm color; a blaze rod makes it barred, a slime ball elliptical, an eye of ender a ring, magma cream irregular; a nether star makes it grand",
+    "translation": "誕生前對核心使用材料即可改變：染料決定旋臂顏色，烈焰棒變為棒旋星系，史萊姆球變為橢圓星系，終界之眼變為環狀星系，岩漿球變為不規則星系，地獄之星使其變大"
+  },
+  "gui.singulo.genesis.screen.galaxy": {
+    "source": "Galaxy born: %s",
+    "translation": "誕生的星系：%s"
+  },
+  "gui.singulo.genesis.screen.galaxy_again": {
+    "source": "Use another Primordial Seed on the core to make the next galaxy",
+    "translation": "再次對核心使用原初之種，即可孕育下一個星系"
+  },
+  "galaxy.singulo.form.spiral": {
+    "source": "Spiral",
+    "translation": "漩渦星系"
+  },
+  "galaxy.singulo.form.barred": {
+    "source": "Barred spiral",
+    "translation": "棒旋星系"
+  },
+  "galaxy.singulo.form.elliptical": {
+    "source": "Elliptical",
+    "translation": "橢圓星系"
+  },
+  "galaxy.singulo.form.ring": {
+    "source": "Ring",
+    "translation": "環狀星系"
+  },
+  "galaxy.singulo.form.irregular": {
+    "source": "Irregular",
+    "translation": "不規則星系"
+  },
+  "galaxy.singulo.color.random": {
+    "source": "color left to chance",
+    "translation": "顏色隨種子而定"
+  },
+  "galaxy.singulo.grand": {
+    "source": "grand",
+    "translation": "巨大星系"
+  },
+  "galaxy.singulo.separator": {
+    "source": ", ",
+    "translation": "・"
+  },
+  "guide.singulo.genesis.galaxies.title": {
+    "source": "Choosing and adding galaxies",
+    "translation": "選擇與增加星系"
+  },
+  "guide.singulo.genesis.galaxies.body": {
+    "source": "Before birth (from before the seed until stabilizing ends), using materials on the core changes the galaxy to be born (one item each).\n- Dye: the color of the arms\n- Blaze Rod: barred spiral (arms from the ends of a bar across the center)\n- Slime Ball: elliptical (a swollen cloud of stars without arms)\n- Eye of Ender: ring (a small core and a bright ring)\n- Magma Cream: irregular (several star-forming clumps)\n- Nether Star: grand (1.5 times larger in the night sky)\nWith nothing used it is a spiral as before, with its color left to chance. Hover over the window on the screen to see the current choice.\nUse another Primordial Seed on an engine that has given birth to kindle it again for the next galaxy (the registered item and finished items stay). Up to eight galaxies line the night sky; beyond that the oldest fade away.",
+    "translation": "在誕生之前（從使用種子之前直到穩定化結束），對核心使用材料會改變將要誕生的星系（每次消耗1個）。\n・染料：旋臂的顏色\n・烈焰棒：棒旋星系（旋臂從橫貫中心的棒兩端伸出）\n・史萊姆球：橢圓星系（沒有旋臂、鼓起的星團）\n・終界之眼：環狀星系（小小的核心與明亮的環）\n・岩漿球：不規則星系（若干個孕育恆星的團塊）\n・地獄之星：巨大星系（在夜空中為1.5倍大）\n如果什麼都不使用，就是和以前一樣的漩渦星系，顏色隨種子而定。將游標移到介面的視窗上，即可查看目前的性質。\n對已經孕育出宇宙的創世爐再次使用原初之種，即可從火種重新開始，孕育下一個星系（登記的產物與已完成的物品保持不變）。夜空中最多排列8個星系，超過後最舊的星系會逐漸消失。"
+  },
+  "gui.singulo.monitor.title": {
+    "source": "Factory Monitor",
+    "translation": "工廠監視器"
+  },
+  "gui.singulo.monitor.range": {
+    "source": "Range %s",
+    "translation": "範圍 %s"
+  },
+  "gui.singulo.monitor.range.tip": {
+    "source": "Server racks nearby (within %4$s blocks): %1$s / %2$s. Each widens the range by %3$s",
+    "translation": "附近（%4$s 格以內）的伺服器機架 %1$s / %2$s 台。每台使範圍擴大 %3$s"
+  },
+  "gui.singulo.monitor.produce": {
+    "source": "Generating",
+    "translation": "發電"
+  },
+  "gui.singulo.monitor.consume": {
+    "source": "Using",
+    "translation": "消耗"
+  },
+  "gui.singulo.monitor.stored": {
+    "source": "Stored",
+    "translation": "儲能"
+  },
+  "gui.singulo.monitor.stalled": {
+    "source": "Stalled machines: %s",
+    "translation": "停止的裝置 %s"
+  },
+  "gui.singulo.monitor.machines": {
+    "source": "%s machines (%s running)",
+    "translation": "裝置 %s（運轉 %s）"
+  },
+  "gui.singulo.monitor.none": {
+    "source": "Nothing has stalled",
+    "translation": "沒有停止的裝置"
+  },
+  "gui.singulo.monitor.at": {
+    "source": "At %s, %s, %s",
+    "translation": "座標 %s, %s, %s"
+  },
+  "gui.singulo.monitor.no_drones": {
+    "source": "No drone stations in range",
+    "translation": "範圍內沒有無人機站"
+  },
+  "gui.singulo.monitor.drones": {
+    "source": "Drones: %s stations, %s delivering, %s standing by, %s in trouble",
+    "translation": "無人機：站 %s・運輸 %s・待命 %s・有問題 %s"
+  },
+  "gui.singulo.monitor.station": {
+    "source": "%s: %s delivering, %s standing by",
+    "translation": "%s：運輸 %s・待命 %s"
+  },
+  "gui.singulo.monitor.where": {
+    "source": "%sm %s",
+    "translation": "%sm %s"
+  },
+  "gui.singulo.monitor.up": {
+    "source": ", %s up",
+    "translation": "・上 %s"
+  },
+  "gui.singulo.monitor.down": {
+    "source": ", %s down",
+    "translation": "・下 %s"
+  },
+  "gui.singulo.monitor.dir.here": {
+    "source": "here",
+    "translation": "此處"
+  },
+  "gui.singulo.monitor.dir.n": {
+    "source": "N",
+    "translation": "北"
+  },
+  "gui.singulo.monitor.dir.ne": {
+    "source": "NE",
+    "translation": "東北"
+  },
+  "gui.singulo.monitor.dir.e": {
+    "source": "E",
+    "translation": "東"
+  },
+  "gui.singulo.monitor.dir.se": {
+    "source": "SE",
+    "translation": "東南"
+  },
+  "gui.singulo.monitor.dir.s": {
+    "source": "S",
+    "translation": "南"
+  },
+  "gui.singulo.monitor.dir.sw": {
+    "source": "SW",
+    "translation": "西南"
+  },
+  "gui.singulo.monitor.dir.w": {
+    "source": "W",
+    "translation": "西"
+  },
+  "gui.singulo.monitor.dir.nw": {
+    "source": "NW",
+    "translation": "西北"
+  },
+  "summary.singulo.desk_monitor": {
+    "source": "A factory monitor that shows how nearby machines are doing.",
+    "translation": "能查看周圍裝置狀況的工廠監視器。"
   }
 }

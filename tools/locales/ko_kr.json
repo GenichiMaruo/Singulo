@@ -2144,8 +2144,8 @@
     "translation": "오랜 휴면으로 불안정해진 결정핵."
   },
   "desc.singulo.desk_monitor": {
-    "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
-    "translation": "연구소 책상에 놓인 작은 모니터입니다. 화면만 은은하게 빛납니다."
+    "source": "A small monitor from a laboratory desk. Use it to open the factory monitor: power generated, used and stored by machines within 16 blocks, stalled machines and why, and how drones are doing. Each Server Rack placed beside it widens the range by 8 blocks (up to 4).",
+    "translation": "연구소 책상에 놓인 작은 모니터입니다. 사용하면 공장 모니터가 열려, 주변(16블록) 장치의 발전·소비·축전, 멈춘 장치와 그 이유, 드론의 상태를 알 수 있습니다. 옆에 서버 랙을 두면 1대마다 범위가 8블록 넓어집니다(4대까지)."
   },
   "desc.singulo.dimensional_pocket": {
     "source": "Right-click to open your own 27-slot storage from anywhere. The contents survive death.",
@@ -15350,5 +15350,221 @@
   "howto.singulo.android_cat_tail": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
+  },
+  "report.singulo.progress": {
+    "source": "Progress: %s%%",
+    "translation": "진행: %s%%"
+  },
+  "report.singulo.energy": {
+    "source": "Energy: %s / %s FE",
+    "translation": "축전: %s / %s FE"
+  },
+  "report.singulo.consume": {
+    "source": "Using %s FE/t",
+    "translation": "사용: %s FE/t"
+  },
+  "report.singulo.produce": {
+    "source": "Generating %s FE/t",
+    "translation": "발전: %s FE/t"
+  },
+  "report.singulo.catalyst": {
+    "source": "Catalyst: %s (%s%% left)",
+    "translation": "촉매: %s (남은 양 %s%%)"
+  },
+  "report.singulo.missing": {
+    "source": "Missing parts:",
+    "translation": "부족한 부품:"
+  },
+  "report.singulo.missing.line": {
+    "source": "  %s ×%s",
+    "translation": "  %s ×%s"
+  },
+  "report.singulo.missing.more": {
+    "source": "  %s more kinds, %s blocks",
+    "translation": "  그 밖에 %s종류·%s개"
+  },
+  "report.singulo.blocking": {
+    "source": "  Blocks in the way: %s",
+    "translation": "  비워 둘 곳을 막는 블록: %s"
+  },
+  "config.jade.plugin_singulo.machine": {
+    "source": "Singulo machine status",
+    "translation": "Singulo 장치 상태"
+  },
+  "config.waila.plugin_singulo.machine": {
+    "source": "Singulo machine status",
+    "translation": "Singulo 장치 상태"
+  },
+  "gui.singulo.genesis.trait": {
+    "source": "The galaxy to be born: %s",
+    "translation": "태어날 은하: %s"
+  },
+  "gui.singulo.genesis.trait_same": {
+    "source": "Already set (%s)",
+    "translation": "이미 그렇게 되어 있다 (%s)"
+  },
+  "gui.singulo.genesis.reseeded": {
+    "source": "A new seed sinks in. Kindle it again for the next galaxy",
+    "translation": "새 원초의 씨앗이 가라앉았다. 다음 은하를 위해 다시 불씨를 지펴라"
+  },
+  "gui.singulo.genesis.screen.galaxy_next": {
+    "source": "Galaxy to be born: %s",
+    "translation": "태어날 은하: %s"
+  },
+  "gui.singulo.genesis.screen.galaxy_tip": {
+    "source": "Use materials on the core before birth: a dye sets the arm color; a blaze rod makes it barred, a slime ball elliptical, an eye of ender a ring, magma cream irregular; a nether star makes it grand",
+    "translation": "태어나기 전에 핵에 재료를 사용하면 바뀐다: 염료는 나선팔의 색, 블레이즈 막대는 막대나선, 슬라임볼은 타원, 엔더의 눈은 고리, 마그마 크림은 불규칙, 네더의 별은 거대하게"
+  },
+  "gui.singulo.genesis.screen.galaxy": {
+    "source": "Galaxy born: %s",
+    "translation": "태어난 은하: %s"
+  },
+  "gui.singulo.genesis.screen.galaxy_again": {
+    "source": "Use another Primordial Seed on the core to make the next galaxy",
+    "translation": "원초의 씨앗을 핵에 다시 사용하면 다음 은하를 만들 수 있다"
+  },
+  "galaxy.singulo.form.spiral": {
+    "source": "Spiral",
+    "translation": "나선 은하"
+  },
+  "galaxy.singulo.form.barred": {
+    "source": "Barred spiral",
+    "translation": "막대나선 은하"
+  },
+  "galaxy.singulo.form.elliptical": {
+    "source": "Elliptical",
+    "translation": "타원 은하"
+  },
+  "galaxy.singulo.form.ring": {
+    "source": "Ring",
+    "translation": "고리 은하"
+  },
+  "galaxy.singulo.form.irregular": {
+    "source": "Irregular",
+    "translation": "불규칙 은하"
+  },
+  "galaxy.singulo.color.random": {
+    "source": "color left to chance",
+    "translation": "색은 씨앗에 맡김"
+  },
+  "galaxy.singulo.grand": {
+    "source": "grand",
+    "translation": "거대 은하"
+  },
+  "galaxy.singulo.separator": {
+    "source": ", ",
+    "translation": "·"
+  },
+  "guide.singulo.genesis.galaxies.title": {
+    "source": "Choosing and adding galaxies",
+    "translation": "은하 고르기·늘리기"
+  },
+  "guide.singulo.genesis.galaxies.body": {
+    "source": "Before birth (from before the seed until stabilizing ends), using materials on the core changes the galaxy to be born (one item each).\n- Dye: the color of the arms\n- Blaze Rod: barred spiral (arms from the ends of a bar across the center)\n- Slime Ball: elliptical (a swollen cloud of stars without arms)\n- Eye of Ender: ring (a small core and a bright ring)\n- Magma Cream: irregular (several star-forming clumps)\n- Nether Star: grand (1.5 times larger in the night sky)\nWith nothing used it is a spiral as before, with its color left to chance. Hover over the window on the screen to see the current choice.\nUse another Primordial Seed on an engine that has given birth to kindle it again for the next galaxy (the registered item and finished items stay). Up to eight galaxies line the night sky; beyond that the oldest fade away.",
+    "translation": "태어나기 전(씨앗을 사용하기 전부터 안정화가 끝날 때까지)에 핵에 재료를 사용하면 태어날 은하가 바뀝니다(1개씩 사용됩니다).\n・염료: 나선팔의 색\n・블레이즈 막대: 막대나선 은하(중심을 가로지르는 막대의 양 끝에서 팔이 뻗음)\n・슬라임볼: 타원 은하(팔이 없는, 부푼 별의 무리)\n・엔더의 눈: 고리 은하(작은 핵과 밝은 고리)\n・마그마 크림: 불규칙 은하(별이 태어나는 덩어리가 여럿)\n・네더의 별: 거대 은하(밤하늘에서 1.5배)\n아무것도 사용하지 않으면 지금까지처럼 나선 은하이며, 색은 씨앗에 맡깁니다. 화면의 창에 커서를 올리면 지금의 성질을 알 수 있습니다.\n우주를 낳은 창세로에 원초의 씨앗을 다시 사용하면 불씨부터 다시 시작해 다음 은하를 만들 수 있습니다(등록한 생성물과 완성된 물건은 그대로). 밤하늘에는 8개까지 늘어서며, 그보다 많아지면 오래된 은하부터 사라집니다."
+  },
+  "gui.singulo.monitor.title": {
+    "source": "Factory Monitor",
+    "translation": "공장 모니터"
+  },
+  "gui.singulo.monitor.range": {
+    "source": "Range %s",
+    "translation": "범위 %s"
+  },
+  "gui.singulo.monitor.range.tip": {
+    "source": "Server racks nearby (within %4$s blocks): %1$s / %2$s. Each widens the range by %3$s",
+    "translation": "가까이(%4$s블록 이내) 있는 서버 랙 %1$s / %2$s대. 1대마다 범위가 %3$s 넓어진다"
+  },
+  "gui.singulo.monitor.produce": {
+    "source": "Generating",
+    "translation": "발전"
+  },
+  "gui.singulo.monitor.consume": {
+    "source": "Using",
+    "translation": "소비"
+  },
+  "gui.singulo.monitor.stored": {
+    "source": "Stored",
+    "translation": "축전"
+  },
+  "gui.singulo.monitor.stalled": {
+    "source": "Stalled machines: %s",
+    "translation": "멈춘 장치 %s"
+  },
+  "gui.singulo.monitor.machines": {
+    "source": "%s machines (%s running)",
+    "translation": "장치 %s (가동 %s)"
+  },
+  "gui.singulo.monitor.none": {
+    "source": "Nothing has stalled",
+    "translation": "멈춘 장치가 없다"
+  },
+  "gui.singulo.monitor.at": {
+    "source": "At %s, %s, %s",
+    "translation": "좌표 %s, %s, %s"
+  },
+  "gui.singulo.monitor.no_drones": {
+    "source": "No drone stations in range",
+    "translation": "범위에 드론 스테이션이 없다"
+  },
+  "gui.singulo.monitor.drones": {
+    "source": "Drones: %s stations, %s delivering, %s standing by, %s in trouble",
+    "translation": "드론: 스테이션 %s·운반 %s·대기 %s·문제 %s"
+  },
+  "gui.singulo.monitor.station": {
+    "source": "%s: %s delivering, %s standing by",
+    "translation": "%s: 운반 %s·대기 %s"
+  },
+  "gui.singulo.monitor.where": {
+    "source": "%sm %s",
+    "translation": "%sm %s"
+  },
+  "gui.singulo.monitor.up": {
+    "source": ", %s up",
+    "translation": "·위 %s"
+  },
+  "gui.singulo.monitor.down": {
+    "source": ", %s down",
+    "translation": "·아래 %s"
+  },
+  "gui.singulo.monitor.dir.here": {
+    "source": "here",
+    "translation": "여기"
+  },
+  "gui.singulo.monitor.dir.n": {
+    "source": "N",
+    "translation": "북"
+  },
+  "gui.singulo.monitor.dir.ne": {
+    "source": "NE",
+    "translation": "북동"
+  },
+  "gui.singulo.monitor.dir.e": {
+    "source": "E",
+    "translation": "동"
+  },
+  "gui.singulo.monitor.dir.se": {
+    "source": "SE",
+    "translation": "남동"
+  },
+  "gui.singulo.monitor.dir.s": {
+    "source": "S",
+    "translation": "남"
+  },
+  "gui.singulo.monitor.dir.sw": {
+    "source": "SW",
+    "translation": "남서"
+  },
+  "gui.singulo.monitor.dir.w": {
+    "source": "W",
+    "translation": "서"
+  },
+  "gui.singulo.monitor.dir.nw": {
+    "source": "NW",
+    "translation": "북서"
+  },
+  "summary.singulo.desk_monitor": {
+    "source": "A factory monitor that shows how nearby machines are doing.",
+    "translation": "주변 장치의 상태를 알 수 있는 공장 모니터."
   }
 }

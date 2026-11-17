@@ -2144,8 +2144,8 @@
     "translation": "因长期休眠而变得不稳定的晶核。"
   },
   "desc.singulo.desk_monitor": {
-    "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
-    "translation": "研究所桌上的小显示器。只有屏幕微微发光。"
+    "source": "A small monitor from a laboratory desk. Use it to open the factory monitor: power generated, used and stored by machines within 16 blocks, stalled machines and why, and how drones are doing. Each Server Rack placed beside it widens the range by 8 blocks (up to 4).",
+    "translation": "研究所桌上的小显示器。使用后打开工厂监视器，可以查看周围（16格）装置的发电・消耗・储能、停止的装置及其原因、无人机的状况。在旁边放置服务器机架，每台使范围扩大8格（最多4台）。"
   },
   "desc.singulo.dimensional_pocket": {
     "source": "Right-click to open your own 27-slot storage from anywhere. The contents survive death.",
@@ -15350,5 +15350,221 @@
   "howto.singulo.android_cat_tail": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
+  },
+  "report.singulo.progress": {
+    "source": "Progress: %s%%",
+    "translation": "进度：%s%%"
+  },
+  "report.singulo.energy": {
+    "source": "Energy: %s / %s FE",
+    "translation": "储能：%s / %s FE"
+  },
+  "report.singulo.consume": {
+    "source": "Using %s FE/t",
+    "translation": "耗电：%s FE/t"
+  },
+  "report.singulo.produce": {
+    "source": "Generating %s FE/t",
+    "translation": "发电：%s FE/t"
+  },
+  "report.singulo.catalyst": {
+    "source": "Catalyst: %s (%s%% left)",
+    "translation": "催化剂：%s（剩余 %s%%）"
+  },
+  "report.singulo.missing": {
+    "source": "Missing parts:",
+    "translation": "缺少的部件："
+  },
+  "report.singulo.missing.line": {
+    "source": "  %s ×%s",
+    "translation": "  %s ×%s"
+  },
+  "report.singulo.missing.more": {
+    "source": "  %s more kinds, %s blocks",
+    "translation": "  另有 %s 种、%s 个"
+  },
+  "report.singulo.blocking": {
+    "source": "  Blocks in the way: %s",
+    "translation": "  挡住需留空位置的方块：%s"
+  },
+  "config.jade.plugin_singulo.machine": {
+    "source": "Singulo machine status",
+    "translation": "Singulo 装置状态"
+  },
+  "config.waila.plugin_singulo.machine": {
+    "source": "Singulo machine status",
+    "translation": "Singulo 装置状态"
+  },
+  "gui.singulo.genesis.trait": {
+    "source": "The galaxy to be born: %s",
+    "translation": "将要诞生的星系：%s"
+  },
+  "gui.singulo.genesis.trait_same": {
+    "source": "Already set (%s)",
+    "translation": "已经是这样了（%s）"
+  },
+  "gui.singulo.genesis.reseeded": {
+    "source": "A new seed sinks in. Kindle it again for the next galaxy",
+    "translation": "新的原初之种沉了下去。为了下一个星系，再次点燃火种吧"
+  },
+  "gui.singulo.genesis.screen.galaxy_next": {
+    "source": "Galaxy to be born: %s",
+    "translation": "将要诞生的星系：%s"
+  },
+  "gui.singulo.genesis.screen.galaxy_tip": {
+    "source": "Use materials on the core before birth: a dye sets the arm color; a blaze rod makes it barred, a slime ball elliptical, an eye of ender a ring, magma cream irregular; a nether star makes it grand",
+    "translation": "诞生前对核心使用材料即可改变：染料决定旋臂颜色，烈焰棒变为棒旋星系，黏液球变为椭圆星系，末影之眼变为环状星系，岩浆膏变为不规则星系，下界之星使其变大"
+  },
+  "gui.singulo.genesis.screen.galaxy": {
+    "source": "Galaxy born: %s",
+    "translation": "诞生的星系：%s"
+  },
+  "gui.singulo.genesis.screen.galaxy_again": {
+    "source": "Use another Primordial Seed on the core to make the next galaxy",
+    "translation": "再次对核心使用原初之种，即可孕育下一个星系"
+  },
+  "galaxy.singulo.form.spiral": {
+    "source": "Spiral",
+    "translation": "旋涡星系"
+  },
+  "galaxy.singulo.form.barred": {
+    "source": "Barred spiral",
+    "translation": "棒旋星系"
+  },
+  "galaxy.singulo.form.elliptical": {
+    "source": "Elliptical",
+    "translation": "椭圆星系"
+  },
+  "galaxy.singulo.form.ring": {
+    "source": "Ring",
+    "translation": "环状星系"
+  },
+  "galaxy.singulo.form.irregular": {
+    "source": "Irregular",
+    "translation": "不规则星系"
+  },
+  "galaxy.singulo.color.random": {
+    "source": "color left to chance",
+    "translation": "颜色随种子而定"
+  },
+  "galaxy.singulo.grand": {
+    "source": "grand",
+    "translation": "巨大星系"
+  },
+  "galaxy.singulo.separator": {
+    "source": ", ",
+    "translation": "・"
+  },
+  "guide.singulo.genesis.galaxies.title": {
+    "source": "Choosing and adding galaxies",
+    "translation": "选择与增加星系"
+  },
+  "guide.singulo.genesis.galaxies.body": {
+    "source": "Before birth (from before the seed until stabilizing ends), using materials on the core changes the galaxy to be born (one item each).\n- Dye: the color of the arms\n- Blaze Rod: barred spiral (arms from the ends of a bar across the center)\n- Slime Ball: elliptical (a swollen cloud of stars without arms)\n- Eye of Ender: ring (a small core and a bright ring)\n- Magma Cream: irregular (several star-forming clumps)\n- Nether Star: grand (1.5 times larger in the night sky)\nWith nothing used it is a spiral as before, with its color left to chance. Hover over the window on the screen to see the current choice.\nUse another Primordial Seed on an engine that has given birth to kindle it again for the next galaxy (the registered item and finished items stay). Up to eight galaxies line the night sky; beyond that the oldest fade away.",
+    "translation": "在诞生之前（从使用种子之前直到稳定化结束），对核心使用材料会改变将要诞生的星系（每次消耗1个）。\n・染料：旋臂的颜色\n・烈焰棒：棒旋星系（旋臂从横贯中心的棒两端伸出）\n・黏液球：椭圆星系（没有旋臂、鼓起的星团）\n・末影之眼：环状星系（小小的核心与明亮的环）\n・岩浆膏：不规则星系（若干个孕育恒星的团块）\n・下界之星：巨大星系（在夜空中为1.5倍大）\n如果什么都不使用，就是和以前一样的旋涡星系，颜色随种子而定。将光标移到界面的窗口上，即可查看当前的性质。\n对已经孕育出宇宙的创世炉再次使用原初之种，即可从火种重新开始，孕育下一个星系（登记的产物与已完成的物品保持不变）。夜空中最多排列8个星系，超过后最旧的星系会逐渐消失。"
+  },
+  "gui.singulo.monitor.title": {
+    "source": "Factory Monitor",
+    "translation": "工厂监视器"
+  },
+  "gui.singulo.monitor.range": {
+    "source": "Range %s",
+    "translation": "范围 %s"
+  },
+  "gui.singulo.monitor.range.tip": {
+    "source": "Server racks nearby (within %4$s blocks): %1$s / %2$s. Each widens the range by %3$s",
+    "translation": "附近（%4$s 格以内）的服务器机架 %1$s / %2$s 台。每台使范围扩大 %3$s"
+  },
+  "gui.singulo.monitor.produce": {
+    "source": "Generating",
+    "translation": "发电"
+  },
+  "gui.singulo.monitor.consume": {
+    "source": "Using",
+    "translation": "消耗"
+  },
+  "gui.singulo.monitor.stored": {
+    "source": "Stored",
+    "translation": "储能"
+  },
+  "gui.singulo.monitor.stalled": {
+    "source": "Stalled machines: %s",
+    "translation": "停止的装置 %s"
+  },
+  "gui.singulo.monitor.machines": {
+    "source": "%s machines (%s running)",
+    "translation": "装置 %s（运行 %s）"
+  },
+  "gui.singulo.monitor.none": {
+    "source": "Nothing has stalled",
+    "translation": "没有停止的装置"
+  },
+  "gui.singulo.monitor.at": {
+    "source": "At %s, %s, %s",
+    "translation": "坐标 %s, %s, %s"
+  },
+  "gui.singulo.monitor.no_drones": {
+    "source": "No drone stations in range",
+    "translation": "范围内没有无人机站"
+  },
+  "gui.singulo.monitor.drones": {
+    "source": "Drones: %s stations, %s delivering, %s standing by, %s in trouble",
+    "translation": "无人机：站 %s・运输 %s・待命 %s・有问题 %s"
+  },
+  "gui.singulo.monitor.station": {
+    "source": "%s: %s delivering, %s standing by",
+    "translation": "%s：运输 %s・待命 %s"
+  },
+  "gui.singulo.monitor.where": {
+    "source": "%sm %s",
+    "translation": "%sm %s"
+  },
+  "gui.singulo.monitor.up": {
+    "source": ", %s up",
+    "translation": "・上 %s"
+  },
+  "gui.singulo.monitor.down": {
+    "source": ", %s down",
+    "translation": "・下 %s"
+  },
+  "gui.singulo.monitor.dir.here": {
+    "source": "here",
+    "translation": "此处"
+  },
+  "gui.singulo.monitor.dir.n": {
+    "source": "N",
+    "translation": "北"
+  },
+  "gui.singulo.monitor.dir.ne": {
+    "source": "NE",
+    "translation": "东北"
+  },
+  "gui.singulo.monitor.dir.e": {
+    "source": "E",
+    "translation": "东"
+  },
+  "gui.singulo.monitor.dir.se": {
+    "source": "SE",
+    "translation": "东南"
+  },
+  "gui.singulo.monitor.dir.s": {
+    "source": "S",
+    "translation": "南"
+  },
+  "gui.singulo.monitor.dir.sw": {
+    "source": "SW",
+    "translation": "西南"
+  },
+  "gui.singulo.monitor.dir.w": {
+    "source": "W",
+    "translation": "西"
+  },
+  "gui.singulo.monitor.dir.nw": {
+    "source": "NW",
+    "translation": "西北"
+  },
+  "summary.singulo.desk_monitor": {
+    "source": "A factory monitor that shows how nearby machines are doing.",
+    "translation": "能查看周围装置状况的工厂监视器。"
   }
 }

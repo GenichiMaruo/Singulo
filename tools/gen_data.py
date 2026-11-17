@@ -1696,6 +1696,8 @@ def lang_files():
     UI_LANG.update(_COVER_UI)
     from decor_content import UI as _DECOR_UI
     UI_LANG.update(_DECOR_UI)
+    from factory_content import UI as _FACTORY_UI
+    UI_LANG.update(_FACTORY_UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
