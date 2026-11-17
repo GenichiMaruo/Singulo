@@ -51,6 +51,8 @@ public final class SinguloMenus {
             "food_printer", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.food.FoodPrinterMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.DeliveryPortMenu>> ANDROID_DELIVERY_PORT = REGISTER.register(
             "android_delivery_port", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.DeliveryPortMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.PortablePrinterMenu>> PORTABLE_PRINTER = REGISTER.register(
+            "portable_printer", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.PortablePrinterMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.SupplyPortMenu>> ANDROID_SUPPLY_PORT = REGISTER.register(
             "android_supply_port", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.SupplyPortMenu::client));
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.RecipeRackMenu>> ANDROID_RECIPE_RACK = REGISTER.register(

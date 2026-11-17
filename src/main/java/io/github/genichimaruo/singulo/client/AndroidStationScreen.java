@@ -53,10 +53,15 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     /** 設計メモリの型の色（なければ光刃型の色）。 */
     private int accent() {
         int kind = menu.value(AndroidStationBlockEntity.D_KIND);
-        if (kind < 0 || kind >= AndroidKind.values().length) {
+        return accentOf(kind < 0 || kind >= AndroidKind.values().length ? null : AndroidKind.values()[kind]);
+    }
+
+    /** 型の光の色（画面のアンドロイドの配色）。型がなければ光刃型の色。 */
+    static int accentOf(@javax.annotation.Nullable AndroidKind kind) {
+        if (kind == null) {
             return io.github.genichimaruo.singulo.android.BladeAndroid.ACCENT;
         }
-        return switch (AndroidKind.values()[kind]) {
+        return switch (kind) {
             case BLADE -> io.github.genichimaruo.singulo.android.BladeAndroid.ACCENT;
             case WHIP -> io.github.genichimaruo.singulo.android.WhipAndroid.ACCENT;
             case SABER -> io.github.genichimaruo.singulo.android.SaberAndroid.ACCENT;

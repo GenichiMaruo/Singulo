@@ -2068,6 +2068,10 @@ def textures():
     # 遺構のアンドロイド（128×64。tools/androids.py）
     androids.textures(te, save)
     drones.entity_textures(te, save)
+    # 地面に置いた携帯型アンドロイド印刷機（tools/portable_printer.py）
+    import portable_printer
+    save(portable_printer.entity_texture(), te / 'portable_printer.png')
+    save(portable_printer.entity_texture(portable_printer.MK2), te / 'portable_printer_2.png')
     for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
@@ -2338,6 +2342,12 @@ def art_textures():
         art16.save(art16.cable_end(iid, core), tb / f'{iid}_end.png')
     # アンドロイドの設計メモリ・キット・無線充電器（tools/androids.py）
     androids.item_textures(ti, art16.save)
+    # 携帯型アンドロイド印刷機（tools/portable_printer.py）
+    import portable_printer
+    art16.save(portable_printer.icon(), ti / 'portable_android_printer.png')
+    art16.save(portable_printer.icon(portable_printer.MK2), ti / 'portable_android_printer_2.png')
+    art16.save(portable_printer.bed_sheet(), tb / 'portable_printer_bed.png')        # 印刷面（ステーションの上面と同じ動き）
+    write_json(tb / 'portable_printer_bed.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
     androids.glass_textures(tb, art16.save)
     # ドローン輸送の装置の上面・昇降口・梱包箱・メモリ・キット（tools/drones.py）
     drones.textures(tb, ti, art16.save, write_json)
@@ -3897,7 +3907,7 @@ TAB_GROUPS = [
         'wormhole_port', 'wormhole_seam_upgrade',
     ]),
     ('アンドロイド', [
-        'android_station', 'android_kit', 'android_repair_kit', 'android_charger',
+        'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'portable_android_printer', 'portable_android_printer_2',
         'android_armor_plate', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
         'android_memory_axe', 'android_memory_bit', 'android_memory_gunner',
         'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',

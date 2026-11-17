@@ -97,6 +97,12 @@ public final class SinguloItems {
     /** アンドロイド用の無線充電器。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+    /** 携帯型アンドロイド印刷機（0.21.0。外出先でアンドロイドを1体ずつ印刷する、カバン型の印刷機）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem> PORTABLE_ANDROID_PRINTER = ITEMS.register(
+            "portable_android_printer", () -> new io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem(new Item.Properties(), 1));
+    /** 携帯型アンドロイド印刷機（Mk2）: 3組（型の違う3体）を積み、印刷するたびに次の組で1体ずつ印刷する。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem> PORTABLE_ANDROID_PRINTER_2 = ITEMS.register(
+            "portable_android_printer_2", () -> new io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem(new Item.Properties(), 3));
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
             "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
@@ -439,6 +445,8 @@ public final class SinguloItems {
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
         block(SinguloBlocks.QUANTUM_ANDROID_WORKBENCH, 4);
         TAB_ORDER.add(ANDROID_CHARGER);
+        TAB_ORDER.add(PORTABLE_ANDROID_PRINTER);
+        TAB_ORDER.add(PORTABLE_ANDROID_PRINTER_2);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);

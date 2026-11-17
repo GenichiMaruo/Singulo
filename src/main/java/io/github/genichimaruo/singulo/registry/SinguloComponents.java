@@ -19,6 +19,10 @@ public final class SinguloComponents {
     public static final Supplier<DataComponentType<Integer>> ENERGY = REGISTER.registerComponentType("energy",
             b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    /** 携帯型アンドロイド印刷機（Mk2）が次に印刷する組の番号（0.21.0）。 */
+    public static final Supplier<DataComponentType<Integer>> PRINTER_NEXT = REGISTER.registerComponentType("printer_next",
+            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
     /** 3種類以上の元ブロックから作った圧縮ブロックLv1（混成ボーナスの対象）。 */
     public static final Supplier<DataComponentType<Boolean>> MIXED_SOURCE = REGISTER.registerComponentType("mixed_source",
             b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));

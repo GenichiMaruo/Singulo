@@ -1036,3 +1036,16 @@ SUMMARY.update(_COVER_SUMMARY)
 # 0.20.0 建材の階段・ハーフブロック・塀
 from building_variants import DESC as _VARIANT_DESC
 DESC.update(_VARIANT_DESC)
+# 0.21.0 携帯型アンドロイド印刷機
+DESC['携帯型アンドロイド印刷機'] = (
+    'カバン型の印刷機。メモリとアンドロイドキットを入れて地面を右クリックすると、その場で開いてアンドロイドを1体印刷する。'
+    '印刷したアンドロイドはついて歩く。',
+    'A briefcase printer. Put in a memory and android kits, then right-click the ground to print an android there. '
+    'The android follows you.')
+SUMMARY['携帯型アンドロイド印刷機'] = ('外出先でアンドロイドを1体ずつ印刷する、カバン型の印刷機。', 'A briefcase printer that prints androids on the go.')
+DESC['携帯型アンドロイド印刷機（Mk2）'] = (
+    '携帯型アンドロイド印刷機の改良型。メモリとキットの組を3つ積め、印刷するたびに次の組で1体ずつ印刷する。次に印刷する組は画面で選べる。',
+    'An improved Portable Android Printer. It holds three sets of memory and kits, and each print uses the next set. '
+    'Choose the next set on its screen.')
+SUMMARY['携帯型アンドロイド印刷機（Mk2）'] = ('型の違う3体を順に印刷できる、携帯型アンドロイド印刷機の改良型。',
+                                         'An improved portable printer that prints three types in turn.')

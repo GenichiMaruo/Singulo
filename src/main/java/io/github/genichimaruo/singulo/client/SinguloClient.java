@@ -151,6 +151,7 @@ public final class SinguloClient {
                 SlidingDoorRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.CARGO_DRONE.get(), CargoDroneRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.PORTABLE_PRINTER.get(), PortablePrinterRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DRONE_PORT.get(),
                 DronePortRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_DRONE_PORT.get(),
@@ -240,6 +241,7 @@ public final class SinguloClient {
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityDroneRenderer.LAYER, SecurityDroneRenderer::createLayer);
         event.registerLayerDefinition(CargoDroneRenderer.LAYER, CargoDroneRenderer::createLayer);
+        event.registerLayerDefinition(PortablePrinterRenderer.LAYER, PortablePrinterRenderer::createLayer);
         event.registerLayerDefinition(CargoDroneRenderer.JET_LAYER, CargoDroneRenderer::createJetLayer);
         event.registerLayerDefinition(CargoDroneRenderer.GRAVITY_LAYER, CargoDroneRenderer::createGravityLayer);
         event.registerLayerDefinition(AndroidModel.BLADE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BLADE));
@@ -253,6 +255,7 @@ public final class SinguloClient {
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(SinguloMenus.COSMIC.get(), CosmicScreen::new);
+        event.register(SinguloMenus.PORTABLE_PRINTER.get(), PortablePrinterScreen::new);
         event.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
         event.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
         event.register(SinguloMenus.GENERATOR_SLOTS.get(), GeneratorSlotsScreen::new);
