@@ -81,7 +81,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<PartBlock> COOLING_TOWER_COOLANT_BAND = part("cooling_tower_coolant_band", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> COOLING_TOWER_RIM = part("cooling_tower_rim", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<GlassPartBlock> COOLING_TOWER_GRATE = glassPart("cooling_tower_grate");
-    public static final DeferredBlock<PartBlock> HEAT_EXCHANGE_CORE = part("heat_exchange_core", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> HEAT_EXCHANGE_CORE = part("cooling_tower_heat_exchange_core", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_FRAME = part("degenerate_compactor_frame", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_PLATE = part("degenerate_compactor_plate", MultiblockPart.Role.STRUCTURE);
     /** コラプサー内張り（加工するマルチブロックの外装板の位置に置くと速くなる。{@link io.github.genichimaruo.singulo.multiblock.CollapsarLining}）。 */
@@ -92,7 +92,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<GlassPartBlock> DEGENERATE_COMPACTOR_WINDOW = glassPart("degenerate_compactor_window");
     public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_FRAME = part("casimir_cavity_frame", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_PUMP = part("casimir_cavity_pump", MultiblockPart.Role.STRUCTURE);
-    public static final DeferredBlock<PartBlock> MIRROR_PLATE = part("mirror_plate", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> MIRROR_PLATE = part("casimir_cavity_mirror_plate", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_WALL = part("casimir_cavity_wall", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_SHIELD = part("casimir_cavity_shield", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<GlassPartBlock> CASIMIR_CAVITY_WINDOW = glassPart("casimir_cavity_window");
@@ -126,10 +126,10 @@ public final class SinguloBlocks {
     public static final DeferredBlock<PartBlock> JET_FORGE_COLLECTOR = part("jet_forge_collector", MultiblockPart.Role.STRUCTURE);
     // 粒子加速器・ペンローズ・リアクター
     public static final DeferredBlock<PartBlock> ACCELERATOR_TUBE = BLOCKS.register("accelerator_tube", registryId -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.ACCELERATOR_TUBE));
-    public static final DeferredBlock<PartBlock> FOCUSING_MAGNET = BLOCKS.register("focusing_magnet", registryId -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.FOCUSING_MAGNET));
+    public static final DeferredBlock<PartBlock> FOCUSING_MAGNET = BLOCKS.register("accelerator_focusing_magnet", registryId -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.FOCUSING_MAGNET));
     public static final DeferredBlock<PartBlock> REACTOR_SHELL = part("reactor_shell", MultiblockPart.Role.REACTOR_SHELL);
-    public static final DeferredBlock<PartBlock> GYRO_DRIVE = part("gyro_drive", MultiblockPart.Role.GYRO_DRIVE);
-    public static final DeferredBlock<PortBlock> EXTRACTION_PORT = BLOCKS.register("extraction_port",
+    public static final DeferredBlock<PartBlock> GYRO_DRIVE = part("reactor_gyro_drive", MultiblockPart.Role.GYRO_DRIVE);
+    public static final DeferredBlock<PortBlock> EXTRACTION_PORT = BLOCKS.register("reactor_extraction_port",
             registryId -> new PortBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)), MultiblockPart.Role.EXTRACTION_PORT));
     public static final DeferredBlock<PartBlock> REACTOR_STABILIZER = part("reactor_stabilizer", MultiblockPart.Role.REACTOR_STABILIZER);
     /** 炉心質量警報器（炉殻の代わりにどこにでも置ける。質量が上限に達すると赤石信号を出す）。 */
@@ -150,7 +150,7 @@ public final class SinguloBlocks {
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 炉心制御装置（ペンローズ・リアクターのコントローラ）。 */
     public static final DeferredBlock<SimpleMachineBlock<PenroseReactorBlockEntity>> CORE_CONTROLLER = BLOCKS.register(
-            "core_controller", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
+            "reactor_core_controller", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.PENROSE_REACTOR, PenroseReactorBlockEntity::new, PenroseReactorBlockEntity::serverTick));
 
     // ---- 1マスの装置（汎用加工装置以外）
@@ -238,12 +238,12 @@ public final class SinguloBlocks {
             "smes_module", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.SMES_MODULE, SmesCellBlockEntity.Module::new, SmesCellBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<WorldlineAnchorBlockEntity>> WORLDLINE_ANCHOR_SMALL = BLOCKS.register(
-            "worldline_anchor_small", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
+            "worldline_anchor", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORLDLINE_ANCHOR, WorldlineAnchorBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
 
     // ---- 段階5の特異点技術
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.AdvancedWorldlineAnchorBlockEntity>>
-            WORLDLINE_ANCHOR_ADVANCED = BLOCKS.register("worldline_anchor_advanced", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
+            WORLDLINE_ANCHOR_ADVANCED = BLOCKS.register("advanced_worldline_anchor", registryId -> new SimpleMachineBlock<>(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)),
                     SinguloBlockEntities.WORLDLINE_ANCHOR_ADVANCED,
                     io.github.genichimaruo.singulo.machine.AdvancedWorldlineAnchorBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
     /** イベントホライズン・シールド発生塔のコア（塔の底の中央に置く）。 */
@@ -301,7 +301,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> CRACKED_RUIN_PANEL = ruinPanel("cracked_ruin_panel");
     public static final DeferredBlock<Block> MOSSY_RUIN_PANEL = ruinPanel("mossy_ruin_panel");
     /** 割れた遺構ガラスと遺構ガラス（透けて見える。硬さ・爆発への強さ・音は遺構パネルと同じ）。 */
-    public static final DeferredBlock<TransparentBlock> RUIN_GLASS = glass("ruin_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.STONE);
+    public static final DeferredBlock<TransparentBlock> RUIN_GLASS = glass("broken_ruin_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.STONE);
     public static final DeferredBlock<TransparentBlock> INTACT_RUIN_GLASS = glass("intact_ruin_glass", MapColor.NONE, 4.0F, 9.0F,
             SoundType.STONE);
     /** 強化遺構ガラス（沈んだ炉心区画の封じ込め柱の窓。とても硬く、爆発では壊れない）。 */
@@ -349,13 +349,17 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> BLACK_REINFORCED_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_panel",
             () -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.NETHERITE_BLOCK));
+    /** 発光黒色強化パネル（0.20.0。黒色強化パネルと同じ硬さで、明るさ15）。 */
+    public static final DeferredBlock<Block> BLACK_REINFORCED_LIGHT_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_light_panel",
+            () -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 15));
 
     /** 透けるパネル（ホワイトパネルと黒色強化パネルの系統と、四芒星の模様入り）。音はそれぞれのパネルと同じ。 */
-    public static final DeferredBlock<TransparentBlock> WHITE_GLASS_PANEL = glass("white_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
+    public static final DeferredBlock<TransparentBlock> WHITE_GLASS_PANEL = joinedGlass("white_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
             SoundType.METAL);
     public static final DeferredBlock<TransparentBlock> WHITE_STAR_GLASS_PANEL = glass("white_star_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
             SoundType.METAL);
-    public static final DeferredBlock<TransparentBlock> BLACK_REINFORCED_GLASS = glass("black_reinforced_glass", MapColor.COLOR_BLACK,
+    public static final DeferredBlock<TransparentBlock> BLACK_REINFORCED_GLASS = joinedGlass("black_reinforced_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
     public static final DeferredBlock<TransparentBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
@@ -490,7 +494,7 @@ public final class SinguloBlocks {
             registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_RED)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 0 : 7)));
-    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> REACTOR_CORE = BLOCKS.register("reactor_core",
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> REACTOR_CORE = BLOCKS.register("lab_reactor_core",
             registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_LIGHT_BLUE)
                     .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 3)));
@@ -513,7 +517,7 @@ public final class SinguloBlocks {
             registryId -> new io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 動力炉の制御盤（壊せない）。 */
-    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock> REACTOR_CONSOLE = BLOCKS.register("reactor_console",
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock> REACTOR_CONSOLE = BLOCKS.register("lab_reactor_console",
             registryId -> new io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 5)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock> SERVER_RACK = BLOCKS.register("server_rack",
             registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.COLOR_BLACK)
@@ -623,10 +627,20 @@ public final class SinguloBlocks {
 
     /** 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。 */
     private static DeferredBlock<TransparentBlock> glass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
-        return BLOCKS.register(id, registryId -> new TransparentBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(color)
+        return BLOCKS.register(id, registryId -> new TransparentBlock(glassProperties(color, hardness, resistance, sound).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
+    }
+
+    /** 階段を持つガラス: 同じガラスの階段との間の面も描かない（{@link io.github.genichimaruo.singulo.block.GlassJoin}）。 */
+    private static DeferredBlock<TransparentBlock> joinedGlass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
+        return BLOCKS.register(id, registryId -> new io.github.genichimaruo.singulo.block.GlassJoin.Glass(
+                glassProperties(color, hardness, resistance, sound).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
+    }
+
+    private static BlockBehaviour.Properties glassProperties(MapColor color, float hardness, float resistance, SoundType sound) {
+        return BlockBehaviour.Properties.of().mapColor(color)
                 .strength(hardness, resistance).requiresCorrectToolForDrops().sound(sound).noOcclusion()
                 .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
-                .isValidSpawn((s, l, p, e) -> false)));
+                .isValidSpawn((s, l, p, e) -> false);
     }
 
     private static BlockBehaviour.Properties androidGlassProperties() {
@@ -686,13 +700,42 @@ public final class SinguloBlocks {
             registryId -> new io.github.genichimaruo.singulo.multiblock.ShapedPartBlock(partProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion(), MultiblockPart.Role.STRUCTURE,
                     net.minecraft.world.phys.shapes.Shapes.or(Block.box(4, 0, 4, 12, 16, 12), Block.box(2, 2, 2, 14, 5, 14), Block.box(2, 11, 2, 14, 14, 14))));
     public static final DeferredBlock<PartBlock> TIDAL_DRAW_RING = part("tidal_draw_ring", MultiblockPart.Role.STRUCTURE);
-    public static final DeferredBlock<PartBlock> SPINDLE_CRADLE = part("spindle_cradle", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> SPINDLE_CRADLE = part("tidal_spindle_cradle", MultiblockPart.Role.STRUCTURE);
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> SUSPENSION_RESERVOIR =
             BLOCKS.register("suspension_reservoir", registryId -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> PASTA_ACCUMULATOR =
             BLOCKS.register("pasta_accumulator", registryId -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
     public static final DeferredBlock<io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock> TIDAL_SPINDLE =
             BLOCKS.register("tidal_spindle", registryId -> new io.github.genichimaruo.singulo.cosmic.CosmicChamberBlock(machineProperties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId))));
+
+    /**
+     * 建材の階段・ハーフブロック・塀（GeneratedContent.BLOCK_VARIANTS。tools/building_variants.py）。
+     * 元の建材と同じ硬さ・音・光・掘る道具。元の建材より後に登録するので、ここはクラスの最後に置く。
+     */
+    public static final Map<String, DeferredBlock<Block>> VARIANTS = new LinkedHashMap<>();
+
+    static {
+        for (GeneratedContent.BlockVariant v : GeneratedContent.BLOCK_VARIANTS) {
+            VARIANTS.put(v.id(), BLOCKS.register(v.id(), registryId -> variant(v, registryId)));
+        }
+    }
+
+    private static Block variant(GeneratedContent.BlockVariant v, net.minecraft.resources.Identifier registryId) {
+        Block base = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(Singulo.id(v.base()));
+        // ofFullCopy はドロップ（元の建材の落とす物）まで写すので、バニラの階段と同じ ofLegacyCopy
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.ofLegacyCopy(base).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId));
+        return switch (v.shape()) {
+            // ガラスの階段は、元のガラスや同じガラスの階段との境目を描かない
+            case "stairs" -> base instanceof io.github.genichimaruo.singulo.android.AndroidGlassBlock
+                    ? new io.github.genichimaruo.singulo.android.AndroidGlassStairs(() -> base, properties)
+                    : base instanceof io.github.genichimaruo.singulo.block.GlassJoin.Glass
+                    ? new io.github.genichimaruo.singulo.block.GlassJoin.Stairs(() -> base, properties)
+                    : new net.minecraft.world.level.block.StairBlock(base.defaultBlockState(), properties);
+            case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
+            case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
+            default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());
+        };
+    }
 
     private SinguloBlocks() {}
 }

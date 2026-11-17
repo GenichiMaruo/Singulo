@@ -12,6 +12,8 @@ public final class ClientConfig {
     public static final ModConfigSpec.BooleanValue DOPPLER_BEAMING;
     public static final ModConfigSpec.ConfigValue<String> LENSING_QUALITY;
     public static final ModConfigSpec.BooleanValue FORMATION_EFFECTS;
+    public static final ModConfigSpec.DoubleValue FLASH_INTENSITY;
+    public static final ModConfigSpec.DoubleValue SCREEN_SHAKE;
     public static final ModConfigSpec.DoubleValue JET_FORGE_FLASH;
     public static final ModConfigSpec.DoubleValue JET_FORGE_SHAKE;
     public static final ModConfigSpec.BooleanValue ANDROID_WORK_ICONS;
@@ -29,6 +31,8 @@ public final class ClientConfig {
         ModConfigSpec.BooleanValue DOPPLER_BEAMING_;
         ModConfigSpec.ConfigValue<String> LENSING_QUALITY_;
         ModConfigSpec.BooleanValue FORMATION_EFFECTS_;
+        ModConfigSpec.DoubleValue FLASH_INTENSITY_;
+        ModConfigSpec.DoubleValue SCREEN_SHAKE_;
         ModConfigSpec.DoubleValue JET_FORGE_FLASH_;
         ModConfigSpec.DoubleValue JET_FORGE_SHAKE_;
         ModConfigSpec.BooleanValue ANDROID_WORK_ICONS_;
@@ -50,6 +54,10 @@ public final class ClientConfig {
         LENSING_QUALITY_ = b.defineInList("lensingQuality", "high", java.util.Arrays.asList("low", "medium", "high"));
         b.comment("マルチブロック形成時の光の演出", "範囲: true / false");
         FORMATION_EFFECTS_ = b.define("formationEffects", true);
+        b.comment("ボスの出現と最期・創世炉の誕生・降着ジェット鍛造炉・Pリアクターなどの、視界を白く染める閃光の強さ（すべてに掛かる。0で閃光を描かない。攻撃の予告の光はそのまま）", "範囲: 0.0〜1.0");
+        FLASH_INTENSITY_ = b.defineInRange("flashIntensity", 1.0, 0.0, 1.0);
+        b.comment("画面の揺れの強さ（すべての揺れに掛かる。0で揺れなし）", "範囲: 0.0〜1.0");
+        SCREEN_SHAKE_ = b.defineInRange("screenShake", 1.0, 0.0, 1.0);
         b.comment("降着ジェット鍛造炉の仕上げの閃光で、画面を白く光らせる強さ（0で画面の閃光なし。光の柱などの描画はそのまま）", "範囲: 0.0〜1.0");
         JET_FORGE_FLASH_ = b.defineInRange("jetForgeFlash", 1.0, 0.0, 1.0);
         b.comment("降着ジェット鍛造炉の照射と仕上げで、近くにいるときに画面を揺らす強さ（0で揺れなし）", "範囲: 0.0〜1.0");
@@ -78,6 +86,8 @@ public final class ClientConfig {
         DOPPLER_BEAMING = DOPPLER_BEAMING_;
         LENSING_QUALITY = LENSING_QUALITY_;
         FORMATION_EFFECTS = FORMATION_EFFECTS_;
+        FLASH_INTENSITY = FLASH_INTENSITY_;
+        SCREEN_SHAKE = SCREEN_SHAKE_;
         JET_FORGE_FLASH = JET_FORGE_FLASH_;
         JET_FORGE_SHAKE = JET_FORGE_SHAKE_;
         ANDROID_WORK_ICONS = ANDROID_WORK_ICONS_;

@@ -14,9 +14,11 @@ import org.joml.Vector4f;
 public final class StaffTipTracker {
     private static final java.util.Map<String, float[]> TIPS = java.util.Map.of(
             "graviton_manipulator", new float[]{13F / 16F, 3F / 16F},
-            "micro_black_hole", new float[]{0.5F, 4F / 16F},
+            "micro_black_hole_vessel", new float[]{0.5F, 4F / 16F},
             "black_hole_bomb", new float[]{0.5F, 3F / 16F});
     private static final float[] NDC_X = new float[2], NDC_Y = new float[2], RADIUS_UV = new float[2];
+    /** 歪みを置くアイテムか。 */
+
     private static final long[] FRAME = {-10, -10};
     private static long currentFrame;
     private static final Matrix4f HAND_PROJECTION = new Matrix4f();

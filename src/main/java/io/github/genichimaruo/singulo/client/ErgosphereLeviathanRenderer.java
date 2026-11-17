@@ -130,7 +130,7 @@ public class ErgosphereLeviathanRenderer extends SnapshotEntityRenderer<Ergosphe
                     Vec3 l = centers[i + 1].subtract(origin);
                     pose.pushPose();
                     pose.translate(l.x, l.y, l.z);
-                    FxDraw.billboard(pose, g, camera, 3 + 3 * (1 - k), 0xFFFFFF, (int) (220 * k));
+                    FxDraw.billboard(pose, g, camera, 3 + 3 * (1 - k), 0xFFFFFF, FxSettings.flash((int) (220 * k)));
                     pose.popPose();
                 }
             }
@@ -907,7 +907,7 @@ public class ErgosphereLeviathanRenderer extends SnapshotEntityRenderer<Ergosphe
         }
         VertexConsumer glow = glow(buffers);
         if (flash > 0) {
-            FxDraw.billboard(pose, glow, camera, 3 + 10 * (1 - flash), 0xFFFFFF, (int) (230 * flash));
+            FxDraw.billboard(pose, glow, camera, 3 + 10 * (1 - flash), 0xFFFFFF, FxSettings.flash((int) (230 * flash)));
             FxDraw.ring(pose.last(), glow, 1 + 12 * (1 - flash), 1.8F + 12 * (1 - flash), SEAM_HOT, (int) (220 * flash), 0);
         }
         pose.mulPose(Axis.YP.rotationDegrees(t * 8));

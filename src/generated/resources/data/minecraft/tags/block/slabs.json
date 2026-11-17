@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "singulo:white_panel_slab",
+    "singulo:black_reinforced_panel_slab",
+    "singulo:ruin_panel_slab",
+    "singulo:cracked_ruin_panel_slab",
+    "singulo:mossy_ruin_panel_slab",
+    "singulo:tiled_ruin_panel_slab",
+    "singulo:pristine_ruin_panel_slab",
+    "singulo:pristine_ruin_tile_slab",
+    "singulo:lab_panel_slab",
+    "singulo:lab_tile_slab"
+  ]
+}

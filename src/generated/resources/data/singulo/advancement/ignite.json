@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "id": "singulo:core_controller"
+      "id": "singulo:reactor_core_controller"
     },
     "title": {
       "translate": "advancement.singulo.ignite.title"

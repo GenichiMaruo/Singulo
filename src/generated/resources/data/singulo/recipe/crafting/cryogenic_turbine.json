@@ -8,7 +8,7 @@
   ],
   "key": {
     "P": "#c:plates/steel",
-    "H": "singulo:heat_exchange_core",
+    "H": "singulo:cooling_tower_heat_exchange_core",
     "O": "singulo:superconducting_coil",
     "F": "singulo:basic_frame"
   },

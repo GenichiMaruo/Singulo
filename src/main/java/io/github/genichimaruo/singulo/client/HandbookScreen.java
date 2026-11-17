@@ -343,7 +343,7 @@ public class HandbookScreen extends Screen {
             pages.add(textPage(Component.translatable("gui.singulo.handbook.records"),
                     Component.translatable("gui.singulo.handbook.no_records").getString()));
         }
-        return new Chapter(Component.translatable("gui.singulo.handbook.records"), icon("singulo:record_fragment"), pages);
+        return new Chapter(Component.translatable("gui.singulo.handbook.records"), icon("singulo:crystal_memory"), pages);
     }
 
     /** Four individually framed supporters per page; both tiers share the same roster. */

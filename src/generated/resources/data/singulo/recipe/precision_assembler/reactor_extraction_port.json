@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:reactor_shell",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:optical_lattice_substrate",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:entangled_element",
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:reactor_extraction_port",
+    "count": 1
+  }
+}

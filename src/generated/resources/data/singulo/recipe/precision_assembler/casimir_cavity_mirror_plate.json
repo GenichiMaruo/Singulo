@@ -1,0 +1,30 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "#c:plates/steel",
+      "count": 1
+    },
+    {
+      "ingredient": "#c:gems/quartz",
+      "count": 2
+    },
+    {
+      "ingredient": "#c:glass_blocks/colorless",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:bose_condensate_catalyst",
+      "tier": 3,
+      "uses": 750
+    }
+  ],
+  "result": {
+    "id": "singulo:casimir_cavity_mirror_plate",
+    "count": 1
+  }
+}

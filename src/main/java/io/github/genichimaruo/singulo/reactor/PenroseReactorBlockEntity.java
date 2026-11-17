@@ -823,7 +823,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         }
         Vec3 dir = new Vec3(level.getRandom().nextGaussian(), Math.abs(level.getRandom().nextGaussian()) + 0.5, level.getRandom().nextGaussian()).normalize();
         Vec3 at = c.add(dir.scale(horizon + 0.6));
-        var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("record_fragment")));
+        var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("crystal_memory")));
         record.setDeltaMovement(dir.scale(0.7));
         record.getPersistentData().putLong(EventHorizonTargets.RETURNED, level.getGameTime());
         level.addFreshEntity(record);

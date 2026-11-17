@@ -217,8 +217,8 @@ public class GravityRemnantRenderer extends SnapshotEntityRenderer<GravityRemnan
             return;
         }
         float k = (death - FLASH_AT) / (1 - FLASH_AT);
-        FxDraw.billboard(pose, glow, camera, 1 + 7 * k, 0xFFFFFF, (int) (255 * (1 - k)));
-        FxDraw.billboard(pose, glow, camera, 2 + 10 * k, RIM, (int) (200 * (1 - k)));
+        FxDraw.billboard(pose, glow, camera, 1 + 7 * k, 0xFFFFFF, FxSettings.flash((int) (255 * (1 - k))));
+        FxDraw.billboard(pose, glow, camera, 2 + 10 * k, RIM, FxSettings.flash((int) (200 * (1 - k))));
         pose.pushPose();
         pose.translate(0, -cy - 2.4F, 0);
         float rr = 1 + 12 * k;

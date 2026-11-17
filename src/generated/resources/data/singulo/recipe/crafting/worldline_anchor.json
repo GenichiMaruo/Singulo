@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EOE",
+    "WFW",
+    " B "
+  ],
+  "key": {
+    "E": "#c:ender_pearls",
+    "O": "singulo:superconducting_coil",
+    "W": "singulo:white_ceramic_composite",
+    "F": "singulo:basic_frame",
+    "B": "singulo:basic_circuit"
+  },
+  "result": {
+    "id": "singulo:worldline_anchor",
+    "count": 1
+  }
+}

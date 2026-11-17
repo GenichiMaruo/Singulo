@@ -25,11 +25,14 @@ LIGHT = (f'{MODID}:facility_light', {'powered': 'false'})
 RAYLEIGH = (f'{MODID}:lab_rayleigh_panel', {'lit': 'false'})
 ROOM_LIGHT = f'{MODID}:room_light'
 EMERGENCY = (f'{MODID}:emergency_light', {'powered': 'false'})
-REACTOR_CORE = (f'{MODID}:reactor_core', {'powered': 'false'})
+REACTOR_CORE = (f'{MODID}:lab_reactor_core', {'powered': 'false'})
 CONDUIT = (f'{MODID}:power_conduit', {'powered': 'false'})
 DOOR = f'{MODID}:lab_door'
 DARK = 'minecraft:polished_deepslate'
-SLAB_TOP = ('minecraft:smooth_quartz_slab', {'type': 'top', 'waterlogged': 'false'})
+# 研究所の白いパネルの階段・ハーフブロック（0.20.0。それまではバニラのクォーツで代用していた）
+PANEL_STAIRS = f'{MODID}:lab_panel_stairs'
+PANEL_SLAB = f'{MODID}:lab_panel_slab'
+SLAB_TOP = (PANEL_SLAB, {'type': 'top', 'waterlogged': 'false'})
 CATWALK = ('minecraft:polished_deepslate_slab', {'type': 'top', 'waterlogged': 'false'})
 STRIPE_Y, STRIPE_K = 'minecraft:yellow_concrete', 'minecraft:black_concrete'
 
@@ -53,7 +56,7 @@ TEST_HUT = f'{MODID}:chests/lab_test_hut'
 
 
 def stairs(facing):
-    return ('minecraft:quartz_stairs', {'facing': facing, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
+    return (PANEL_STAIRS, {'facing': facing, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
 
 
 class Room(Builder):
@@ -334,7 +337,7 @@ def reactor():
         b.set(c, y, c - 3, 'minecraft:ladder', {'facing': 'north', 'waterlogged': 'false'})
     b.set(c, 6, c - 4, AIR)                                    # はしごの上は、キャットウォークに開けておく
     # 操作卓（南）: 制御盤と、両わきの計器
-    b.put(c, 1, 14, f'{MODID}:reactor_console', {'facing': 'north', 'powered': 'false'})
+    b.put(c, 1, 14, f'{MODID}:lab_reactor_console', {'facing': 'north', 'powered': 'false'})
     for dx in (-2, -1, 1, 2):
         b.put(c + dx, 1, 14, *SLAB_TOP)
     b.put(c - 1, 2, 14, f'{MODID}:lab_terminal', {'facing': 'north', 'log': str(LOG_REACTOR)})
@@ -442,7 +445,7 @@ def boss_hall():
         for k in range(3):
             xs = ex + sx * k
             for zz in (z0 + 1, z0 + 2):
-                b.set(xs, up + 2 - k, zz, 'minecraft:quartz_stairs',
+                b.set(xs, up + 2 - k, zz, PANEL_STAIRS,
                       {'facing': 'west' if sx > 0 else 'east', 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
                 for yy in range(up, up + 2 - k):
                     b.set(xs, yy, zz, PANEL)
@@ -981,7 +984,7 @@ def solarium():
     # デッキチェア（階段とハーフ）とパラソル（柵と旗の代わりの羊毛）
     for x0 in (5, 9):
         b.put(x0, 1, 11, *stairs('north'))                          # 背もたれ
-        b.put(x0, 1, 12, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})   # 座面
+        b.put(x0, 1, 12, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})   # 座面
         b.put(x0 + 1, 1, 11, *SLAB_TOP)
         for y in (1, 2, 3):
             b.set(x0 + 2, y, 12, 'minecraft:birch_fence', {'east': 'false', 'north': 'false', 'south': 'false', 'west': 'false',
@@ -1161,7 +1164,7 @@ def chest_loot(write_json, data, mid):
         entry('鋼鉄インゴット', 2, 6, 6), entry('基礎回路', 1, 3, 5), entry('鋼板', 2, 4, 4), entry('超伝導コイル', 1, 2, 3),
         entry('自己修理キット', 1, 2, 3), entry('アンドロイドキット', 1, 1, 1)], (4, 7), [
         v('iron_ingot', 2, 6, 6), v('copper_ingot', 2, 8, 6), v('iron_nugget', 3, 9, 5), v('redstone', 2, 8, 5), v('glass', 2, 6, 4),
-        v('chain', 1, 3, 3), v('string', 1, 4, 3), v('quartz', 1, 4, 3), v('gunpowder', 1, 3, 2), v('paper', 2, 6, 3),
+        v('iron_chain', 1, 3, 3), v('string', 1, 4, 3), v('quartz', 1, 4, 3), v('gunpowder', 1, 3, 2), v('paper', 2, 6, 3),
         v('lever', 1, 2, 2), v('rail', 2, 6, 2), v('bucket', 1, 1, 1)])
     # 研究の資料（研究室・資料室・試作室・生体部品室・制御室）
     table('lab_research', (1, 3), [
@@ -1186,8 +1189,11 @@ def chest_loot(write_json, data, mid):
         v('leather_boots', 1, 1, 2), v('leather_chestplate', 1, 1, 1), v('white_wool', 1, 2, 3), v('string', 1, 3, 3),
         v('paper', 1, 4, 3), v('book', 1, 1, 2), v('cookie', 1, 3, 3), v('white_candle', 1, 2, 2), v('stick', 1, 3, 2),
         v('gold_nugget', 1, 3, 2), v('name_tag', 1, 1, 1)])
-    # 厨房・食堂: 食料と調理の道具
-    table('lab_kitchen', None, None, (6, 9), [
+    # 厨房・食堂: 食料と調理の道具。研究所の宇宙食（フードプリンターの印刷食品）と、自販機・コーヒーメーカーの飲み物も残っている
+    table('lab_kitchen', (1, 3), [
+        entry('栄養バー', 1, 4, 6), entry('積層ステーキ', 1, 3, 5), entry('らせんパスタ', 1, 2, 4), entry('ハニカムケーキ', 1, 2, 3),
+        entry('フルーツゼリーキューブ', 1, 3, 3), entry('缶ソーダ', 1, 3, 4), entry('スポーツドリンク', 1, 3, 4), entry('コーヒー', 1, 2, 3),
+        entry('エナジードリンク', 1, 1, 1)], (6, 9), [
         v('bread', 2, 6, 6), v('wheat', 3, 8, 4), v('sugar', 2, 6, 4), v('egg', 1, 4, 4), v('apple', 2, 5, 4), v('carrot', 2, 5, 4),
         v('potato', 2, 6, 4), v('baked_potato', 1, 4, 3), v('beetroot', 2, 5, 3), v('cookie', 2, 8, 4), v('pumpkin_pie', 1, 2, 2),
         v('honey_bottle', 1, 2, 2), v('bowl', 1, 4, 3), v('mushroom_stew', 1, 1, 1), v('glass_bottle', 1, 3, 2), v('milk_bucket', 1, 1, 1),

@@ -1,6 +1,6 @@
 # 26.1.2 validation and publication boundary
 
-This branch targets Minecraft 26.1.2, NeoForge 26.1.2.126 and Java 25. Mekanism integration is intentionally excluded, including its four optional tests. The standard suite remains mandatory: 815 Singulo tests with exact registered/result membership, plus the vanilla `minecraft:always_pass` test. `tools/check_release_2612.py` requires the 816-test completion and the explicit vanilla pass marker, then inspects the distribution JAR. A packaging-only check does not certify release readiness.
+This branch targets Minecraft 26.1.2, NeoForge 26.1.2.126 and Java 25. Mekanism integration is intentionally excluded, including its four optional tests. The standard suite remains mandatory: 825 Singulo tests with exact registered/result membership, plus the vanilla `minecraft:always_pass` test. `tools/check_release_2612.py` requires the 826-test completion and the explicit vanilla pass marker, then inspects the distribution JAR. A packaging-only check does not certify release readiness.
 
 The PR workflow validates pull requests targeting the maintained `26.1.2` branch. GUI, cosmic, occlusion, lensing, glowing mob outlines, standard lighting, Sodium and Distant Horizons evidence gates remain mandatory. Create/Ponder is explicitly unsupported and is not represented as a passing integration. Their screenshot counts and regression assertions are not relaxed. Development review sources and the common screenshot helper are never part of ordinary builds or distributable JARs. Test-world preparations use the 26.1.2 GameTest save directory `build/gametest/gametestserver/gametestworld`.
 
@@ -23,3 +23,9 @@ Create/Ponder has no verified 26.1.2 release at the time of this port. The Ponde
 All current review options set both master and music volume to zero. Review-only startup code sets clear weather and `advance_weather=false` only for the disposable `Review` save. Dedicated weather tests may explicitly set rain afterwards. Neither ordinary player worlds nor operating-system audio settings are changed. These helpers are rejected from distributable JARs.
 
 The supported visual matrix must pass in official PR CI before release. This matrix deliberately excludes unsupported Create/Ponder; no successful Ponder integration is claimed. Existing worlds also require separate backup-based migration testing.
+
+## 0.20.0 regression coverage
+
+The GUI smoke also validates the actual wrapped client models and stitched glass sprites before and after resource reload: isolated, same/different glass neighbors, every dry upper/lower and inner/outer stair state, all six contact faces, retained unculled interior geometry, finite vertices, and translucent material flags. Both `SINGULO_GLASS_MODELS_COMPLETE` markers are required by CI. These are geometry/material assertions, not a dedicated visual screenshot comparison of connected glass.
+
+Legacy-ID regression covers all registry aliases, one serialized item stack, one block-entity type, saved recipe mappings, and an old block ID through the chunk-palette decoder. This is not an exhaustive migration test of a real old world and every machine inventory/settings combination.

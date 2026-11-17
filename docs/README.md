@@ -1,6 +1,6 @@
 # ドキュメント案内
 
-現在の開発は **0.19.0 / Minecraft 1.21.1 / NeoForge**。
+現在の開発は **0.20.0 / Minecraft 1.21.1 / NeoForge**。
 
 | 目的 | 読むもの |
 |---|---|
@@ -55,6 +55,10 @@
 
 - [アンドロイドの装飾（5つの枠と10種類の追加）](0.18.0/README.md)・[変更履歴](curseforge/changelog-0.18.0.md)
 
-## 0.19.0（開発中）
+## 0.19.0
 
 - [アドオン連携 API](0.19.0/android-integration.md)・[独立したクラフト依頼](0.19.0/android-escrow.md)・[変更履歴](curseforge/changelog-0.19.0.md)
+
+## 0.20.0（開発中）
+
+- [変更履歴](curseforge/changelog-0.20.0.md)

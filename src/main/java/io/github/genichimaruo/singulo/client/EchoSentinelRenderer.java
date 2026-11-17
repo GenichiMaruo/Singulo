@@ -213,8 +213,8 @@ public class EchoSentinelRenderer extends SnapshotEntityRenderer<EchoSentinel> {
             pose.pushPose();
             pose.translate(0, 1.57, 0.24);
             org.joml.Quaternionf camera = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
-            FxDraw.billboard(pose, vc, camera, 0.6F + 3.5F * k, 0xFFFFFF, (int) (255 * (1 - k * 0.6F)));
-            FxDraw.billboard(pose, vc, camera, 1.0F + 5F * k, RGB, (int) (180 * (1 - k)));
+            FxDraw.billboard(pose, vc, camera, 0.6F + 3.5F * k, 0xFFFFFF, FxSettings.flash((int) (255 * (1 - k * 0.6F))));
+            FxDraw.billboard(pose, vc, camera, 1.0F + 5F * k, RGB, FxSettings.flash((int) (180 * (1 - k))));
             pose.popPose();
         }
     }

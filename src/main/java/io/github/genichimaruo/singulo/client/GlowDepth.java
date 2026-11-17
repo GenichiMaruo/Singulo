@@ -44,6 +44,13 @@ final class GlowDepth {
             .withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.QUADS)
             .withColorTargetState(new ColorTargetState(Optional.empty(), ColorTargetState.WRITE_NONE))
             .withDepthStencilState(DepthStencilState.DEFAULT).withCull(false).build();
+    private static final RenderPipeline GLAZED_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Singulo.id("pipeline/glazed"))
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F).withShaderDefine("PER_FACE_LIGHTING").withSampler("Sampler1")
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).withCull(true).build();
+    private static final java.util.function.Function<Identifier, RenderType> GLAZED = net.minecraft.util.Util.memoize(texture ->
+            RenderType.create("singulo_glazed", RenderSetup.builder(GLAZED_PIPELINE).withTexture("Sampler0", texture)
+                    .useLightmap().useOverlay().sortOnUpload().createRenderSetup()));
     private static final RenderPipeline COLOR_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
             .withLocation(Singulo.id("pipeline/glow_sorted")).withSampler("Sampler1")
             .withShaderDefine("ALPHA_CUTOUT",0.1F).withShaderDefine("PER_FACE_LIGHTING")
@@ -292,6 +299,21 @@ final class GlowDepth {
         return true;
     }
 
+    /** 光を描き終えてから描く、半透明の固体（最後の記録者の翼の骨）。 */
+    private static final MultiBufferSource.BufferSource GLAZED_SOURCE = MultiBufferSource.immediate(new ByteBufferBuilder(1 << 16));
+
+    /**
+     * 少し透ける固体の入れ物（外向きの面だけ・陰影つき）。光の色と深度を書き終えたあとで描くので、光との前後は深度で決まる:
+     * 手前の光（羽根）は上に重なり、奥の光は透けて見える。光と一緒に並べ替えると、長い面と小さな面の前後が視点で入れ替わってちらつく。
+     */
+    static VertexConsumer glazed(MultiBufferSource buffers, Identifier texture) {
+        RenderType type = GLAZED.apply(texture);
+        if (!isActive() || GravitationalLensing.shaderPackInUse()) {
+            return buffers.getBuffer(type);
+        }
+        return route(buffers, GLAZED_SOURCE, type);
+    }
+
     /** 光の入れ物。白い絵の光だけまとめて描く（模様のある絵は透ける所まで深度に書いてしまうので、これまでどおり）。 */
     static VertexConsumer of(MultiBufferSource buffers, Identifier texture) {
         if (!isActive() || !FxDraw.WHITE.equals(texture) || GravitationalLensing.shaderPackInUse()) {
@@ -301,7 +323,7 @@ final class GlowDepth {
     }
 
     static void registerShaders(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(DEPTH_PIPELINE);event.registerPipeline(COLOR_PIPELINE);
+        event.registerPipeline(DEPTH_PIPELINE);event.registerPipeline(COLOR_PIPELINE);event.registerPipeline(GLAZED_PIPELINE);
         event.registerPipeline(FLUID_COLOR_PIPELINE);event.registerPipeline(FLUID_DEPTH_PIPELINE);
     }
 
@@ -321,6 +343,7 @@ final class GlowDepth {
                 FLUID_SOURCE.endBatch(FLUID_DEPTH);
                 COLOR_SOURCE.endBatch();
                 SOURCE.endBatch();
+                GLAZED_SOURCE.endBatch();
             } finally { modelView.popMatrix(); }
             if (anyPending()) {
                 RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();

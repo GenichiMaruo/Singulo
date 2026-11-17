@@ -528,7 +528,7 @@ Pリアクターの燃料
 
 ### 割れた遺構ガラス
 
-![割れた遺構ガラス](335_ruin_glass.png)
+![割れた遺構ガラス](335_broken_ruin_glass.png)
 
 設計図は使ってもなくならない
 
@@ -772,6 +772,144 @@ Pリアクターの燃料
 
 ケーブル・パイプに取り付け、ブロックをはめ込んで、そのブロックの見た目にする
 
+### ホワイトパネルの階段
+
+![ホワイトパネルの階段](436_white_panel_stairs.png)
+
+### ホワイトパネルのハーフブロック
+
+![ホワイトパネルのハーフブロック](437_white_panel_slab.png)
+
+### ホワイトパネルの塀
+
+![ホワイトパネルの塀](438_white_panel_wall.png)
+
+### 黒色強化パネルの階段
+
+![黒色強化パネルの階段](439_black_reinforced_panel_stairs.png)
+
+### 黒色強化パネルのハーフブロック
+
+![黒色強化パネルのハーフブロック](440_black_reinforced_panel_slab.png)
+
+### 黒色強化パネルの塀
+
+![黒色強化パネルの塀](441_black_reinforced_panel_wall.png)
+
+### 遺構パネルの階段
+
+![遺構パネルの階段](442_ruin_panel_stairs.png)
+
+### 遺構パネルのハーフブロック
+
+![遺構パネルのハーフブロック](443_ruin_panel_slab.png)
+
+### 遺構パネルの塀
+
+![遺構パネルの塀](444_ruin_panel_wall.png)
+
+### ひび割れた遺構パネルの階段
+
+![ひび割れた遺構パネルの階段](445_cracked_ruin_panel_stairs.png)
+
+### ひび割れた遺構パネルのハーフブロック
+
+![ひび割れた遺構パネルのハーフブロック](446_cracked_ruin_panel_slab.png)
+
+### ひび割れた遺構パネルの塀
+
+![ひび割れた遺構パネルの塀](447_cracked_ruin_panel_wall.png)
+
+### 苔むした遺構パネルの階段
+
+![苔むした遺構パネルの階段](448_mossy_ruin_panel_stairs.png)
+
+### 苔むした遺構パネルのハーフブロック
+
+![苔むした遺構パネルのハーフブロック](449_mossy_ruin_panel_slab.png)
+
+### 苔むした遺構パネルの塀
+
+![苔むした遺構パネルの塀](450_mossy_ruin_panel_wall.png)
+
+### 遺構のタイルパネルの階段
+
+![遺構のタイルパネルの階段](451_tiled_ruin_panel_stairs.png)
+
+### 遺構のタイルパネルのハーフブロック
+
+![遺構のタイルパネルのハーフブロック](452_tiled_ruin_panel_slab.png)
+
+### 遺構のタイルパネルの塀
+
+![遺構のタイルパネルの塀](453_tiled_ruin_panel_wall.png)
+
+### 無垢の遺構パネルの階段
+
+![無垢の遺構パネルの階段](454_pristine_ruin_panel_stairs.png)
+
+### 無垢の遺構パネルのハーフブロック
+
+![無垢の遺構パネルのハーフブロック](455_pristine_ruin_panel_slab.png)
+
+### 無垢の遺構パネルの塀
+
+![無垢の遺構パネルの塀](456_pristine_ruin_panel_wall.png)
+
+### 無垢の遺構タイルの階段
+
+![無垢の遺構タイルの階段](457_pristine_ruin_tile_stairs.png)
+
+### 無垢の遺構タイルのハーフブロック
+
+![無垢の遺構タイルのハーフブロック](458_pristine_ruin_tile_slab.png)
+
+### 無垢の遺構タイルの塀
+
+![無垢の遺構タイルの塀](459_pristine_ruin_tile_wall.png)
+
+### 研究所の白いパネルの階段
+
+![研究所の白いパネルの階段](460_lab_panel_stairs.png)
+
+### 研究所の白いパネルのハーフブロック
+
+![研究所の白いパネルのハーフブロック](461_lab_panel_slab.png)
+
+### 研究所の白いパネルの塀
+
+![研究所の白いパネルの塀](462_lab_panel_wall.png)
+
+### 研究所の床タイルの階段
+
+![研究所の床タイルの階段](463_lab_tile_stairs.png)
+
+### 研究所の床タイルのハーフブロック
+
+![研究所の床タイルのハーフブロック](464_lab_tile_slab.png)
+
+### 研究所の床タイルの塀
+
+![研究所の床タイルの塀](465_lab_tile_wall.png)
+
+### ホワイトガラスパネルの階段
+
+![ホワイトガラスパネルの階段](468_white_glass_panel_stairs.png)
+
+### 黒色強化ガラスの階段
+
+![黒色強化ガラスの階段](469_black_reinforced_glass_stairs.png)
+
+### 発光黒色強化パネル
+
+![発光黒色強化パネル](474_black_reinforced_light_panel.png)
+
+### 猫のしっぽ
+
+![猫のしっぽ](475_android_cat_tail.png)
+
+アンドロイドの装飾。染料で染められる
+
 ## 段階2　極低温
 
 ### 隕石コンパス
@@ -794,7 +932,7 @@ Pリアクターの燃料
 
 ### 熱交換コア
 
-![熱交換コア](037_heat_exchange_core.png)
+![熱交換コア](037_cooling_tower_heat_exchange_core.png)
 
 ### 冷却塔冷却帯
 
@@ -868,7 +1006,7 @@ Pリアクターの燃料
 
 ### 収束磁石
 
-![収束磁石](053_focusing_magnet.png)
+![収束磁石](053_accelerator_focusing_magnet.png)
 
 隕鉄（鉄とニッケルの天然の合金）の磁極片で、超伝導コイルの磁場をビームに絞る。2個ずつできる
 
@@ -928,7 +1066,7 @@ Pリアクターの燃料
 
 ### ワールドライン・アンカー（小）
 
-![ワールドライン・アンカー（小）](064_worldline_anchor_small.png)
+![ワールドライン・アンカー（小）](064_worldline_anchor.png)
 
 ### アンドロイドキット
 
@@ -1255,6 +1393,34 @@ Pリアクターの燃料
 ![バッテリー付き液体カプセル](412_battery_fluid_capsule.png)
 
 760ブロックまで送れる
+
+### 釣りアップグレード
+
+![釣りアップグレード](466_android_fishing_upgrade.png)
+
+アンドロイドが釣りをできる。釣り竿のエンチャントを付けられる
+
+### 農業アップグレード
+
+![農業アップグレード](467_android_farming_upgrade.png)
+
+アンドロイドが土を耕して種・苗を植え、骨粉を与えられる
+
+### アンドロイド透過ガラスの階段
+
+![アンドロイド透過ガラスの階段](470_android_gate_glass_stairs.png)
+
+### 模様入りアンドロイド透過ガラスの階段
+
+![模様入りアンドロイド透過ガラスの階段](471_android_gate_glass_patterned_stairs.png)
+
+### アンドロイド遮断ガラスの階段
+
+![アンドロイド遮断ガラスの階段](472_android_barrier_glass_stairs.png)
+
+### 模様入りアンドロイド遮断ガラスの階段
+
+![模様入りアンドロイド遮断ガラスの階段](473_android_barrier_glass_patterned_stairs.png)
 
 ## 段階3　量子
 
@@ -1612,7 +1778,7 @@ Mk1を材料にする。蓄電容量を最低4,000,000 FEにする
 
 ### 鏡面プレート
 
-![鏡面プレート](149_mirror_plate.png)
+![鏡面プレート](149_casimir_cavity_mirror_plate.png)
 
 ### C空洞コントローラ
 
@@ -1748,7 +1914,7 @@ Mk1を材料にする。蓄電容量を最低4,000,000 FEにする
 
 ### ニュートリノ感度モジュール（Mk2）
 
-![ニュートリノ感度モジュール（Mk2）](237_scanner_module_2.png)
+![ニュートリノ感度モジュール（Mk2）](237_neutrino_scanner_module_2.png)
 
 段階2: 金・ダイヤモンド・エメラルドが映る
 
@@ -1854,13 +2020,13 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 ### ジャイロ駆動部
 
-![ジャイロ駆動部](179_gyro_drive.png)
+![ジャイロ駆動部](179_reactor_gyro_drive.png)
 
 ニホニウムの耐圧の支えと、隕鉄の磁極で回す
 
 ### 抽出ポート
 
-![抽出ポート](180_extraction_port.png)
+![抽出ポート](180_reactor_extraction_port.png)
 
 ### 重力場安定化ユニット
 
@@ -1870,7 +2036,7 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 ### 炉心制御装置
 
-![炉心制御装置](182_core_controller.png)
+![炉心制御装置](182_reactor_core_controller.png)
 
 ### 炉心安定化コイル
 
@@ -1896,11 +2062,11 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 ### 空のBH格納容器
 
-![空のBH格納容器](187_bh_container.png)
+![空のBH格納容器](187_empty_black_hole_vessel.png)
 
 ### 小型BH格納容器
 
-![小型BH格納容器](188_micro_black_hole.png)
+![小型BH格納容器](188_micro_black_hole_vessel.png)
 
 小さなブラックホールを閉じ込めた容器。爆弾やマニピュレーターの材料
 
@@ -2010,7 +2176,7 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 ### ワールドライン・アンカー（上位）
 
-![ワールドライン・アンカー（上位）](210_worldline_anchor_advanced.png)
+![ワールドライン・アンカー（上位）](210_advanced_worldline_anchor.png)
 
 ### メトリック・ドライブ
 
@@ -2112,7 +2278,7 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 ### ニュートリノ感度モジュール（Mk3）
 
-![ニュートリノ感度モジュール（Mk3）](238_scanner_module_3.png)
+![ニュートリノ感度モジュール（Mk3）](238_neutrino_scanner_module_3.png)
 
 段階3: 古代の残骸と、ダイヤモンドのツルハシが要る鉱石が映る
 
@@ -2324,7 +2490,7 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 ### スプール受け台
 
-![スプール受け台](406_spindle_cradle.png)
+![スプール受け台](406_tidal_spindle_cradle.png)
 
 ### ホライズン・ダクト
 
