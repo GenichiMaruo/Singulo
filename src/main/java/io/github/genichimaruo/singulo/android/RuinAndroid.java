@@ -420,6 +420,7 @@ public abstract class RuinAndroid extends Monster {
         super(type, level);
         this.xpReward = 8;
         setPersistenceRequired();
+        this.moveControl = new AndroidPathing.Move(this);   // 透過ガラスの中で跳ねない
         setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.WATER, 0);    // 水の中も自由に動ける
         setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
         // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
@@ -1883,6 +1884,18 @@ public abstract class RuinAndroid extends Monster {
             protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
                 this.nodeEvaluator = new net.minecraft.world.level.pathfinder.WalkNodeEvaluator() {
                     @Override
+                    public void prepare(net.minecraft.world.level.PathNavigationRegion region, net.minecraft.world.entity.Mob mob) {
+                        super.prepare(region, mob);
+                        this.currentContext = AndroidPathing.context(region, mob);   // 一時記憶はアンドロイドのガラスを逆に見るので
+                    }
+
+                    @Override
+                    protected double getFloorLevel(BlockPos pos) {
+                        double glass = AndroidPathing.floorLevel(this.currentContext.level(), pos, this.mob);
+                        return Double.isNaN(glass) ? super.getFloorLevel(pos) : glass;
+                    }
+
+                    @Override
                     public net.minecraft.world.level.pathfinder.PathType getPathTypeOfMob(
                             net.minecraft.world.level.pathfinder.PathfindingContext context, int x, int y, int z, net.minecraft.world.entity.Mob mob) {
                         return mob instanceof RuinAndroid a && a.forbidden(x, y, z) ? net.minecraft.world.level.pathfinder.PathType.BLOCKED
@@ -2719,6 +2732,18 @@ public abstract class RuinAndroid extends Monster {
             @Override
             protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
                 this.nodeEvaluator = new net.minecraft.world.level.pathfinder.FlyNodeEvaluator() {
+                    @Override
+                    public void prepare(net.minecraft.world.level.PathNavigationRegion region, net.minecraft.world.entity.Mob mob) {
+                        super.prepare(region, mob);
+                        this.currentContext = AndroidPathing.context(region, mob);   // 一時記憶はアンドロイドのガラスを逆に見るので
+                    }
+
+                    @Override
+                    protected double getFloorLevel(BlockPos pos) {
+                        double glass = AndroidPathing.floorLevel(this.currentContext.level(), pos, this.mob);
+                        return Double.isNaN(glass) ? super.getFloorLevel(pos) : glass;
+                    }
+
                     @Override
                     public net.minecraft.world.level.pathfinder.PathType getPathTypeOfMob(
                             net.minecraft.world.level.pathfinder.PathfindingContext context, int x, int y, int z, net.minecraft.world.entity.Mob mob) {
