@@ -62,7 +62,7 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(ArsenalNotice::onLogout);
         NeoForge.EVENT_BUS.addListener(ArsenalNotice::onClientTick);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
-            ClientGalaxies.set(java.util.List.of(), false);
+            ClientGalaxies.set(java.util.List.of(), java.util.List.of(), false);
             ClientRecords.set(java.util.List.of());
             clearWorldState();
         });

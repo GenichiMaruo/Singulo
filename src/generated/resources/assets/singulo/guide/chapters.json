@@ -157,7 +157,8 @@
       "pages": [
         "genesis.build",
         "genesis.birth",
-        "genesis.synth"
+        "genesis.synth",
+        "genesis.galaxies"
       ]
     },
     {

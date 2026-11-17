@@ -22,9 +22,9 @@ final class GalaxyDraw {
     /** 銀河の見た目（種ごとに一度だけ作る）。 */
     record Shape(Star[] stars, int coreRgb, int armRgb, float tilt) {}
 
-    private static final Map<Long, Shape> CACHE = new LinkedHashMap<>(16, 0.75F, true) {
+    private static final Map<Key, Shape> CACHE = new LinkedHashMap<>(16, 0.75F, true) {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Long, Shape> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Key, Shape> eldest) {
             return size() > 24;
         }
     };
@@ -35,17 +35,39 @@ final class GalaxyDraw {
 
     private GalaxyDraw() {}
 
+    /** 銀河の見た目の鍵: 種と性質（GalaxyTraits）。 */
+    private record Key(long seed, int traits) {}
+
     static Shape shape(long seed) {
-        return CACHE.computeIfAbsent(seed, GalaxyDraw::build);
+        return shape(seed, 0);
     }
 
-    private static Shape build(long seed) {
+    /** traits は GalaxyTraits（0.21.0。形・腕の色・大きさ）。0 ならそれまでの版と同じ形。 */
+    static Shape shape(long seed, int traits) {
+        return CACHE.computeIfAbsent(new Key(seed, traits), GalaxyDraw::build);
+    }
+
+    private static Shape build(Key key) {
+        long seed = key.seed();
+        int traits = key.traits();
         Random rnd = new Random(seed * 0x9E3779B97F4A7C15L + 7);
         int arms = 2 + rnd.nextInt(3);
         float twist = 3.4F + rnd.nextFloat() * 2.4F;
         float base = rnd.nextFloat() * Mth.TWO_PI;
         int armRgb = ARM_COLORS[rnd.nextInt(ARM_COLORS.length)];
         int coreRgb = FxDraw.lerpRgb(CORE, 0xFFFFFF, rnd.nextFloat() * 0.4F);
+        // 染料の色: 種で選んだ色の代わりに（乱数の並びは変えないので、ほかの形は種のまま）
+        net.minecraft.world.item.DyeColor dye = io.github.genichimaruo.singulo.genesis.GalaxyTraits.dye(traits);
+        if (dye != null) {
+            armRgb = FxDraw.lerpRgb(dye.getTextureDiffuseColor() & 0xFFFFFF, 0xFFFFFF, 0.35F);
+        }
+        int form = io.github.genichimaruo.singulo.genesis.GalaxyTraits.form(traits);
+        // 不規則な銀河の、星の生まれる塊（中心からの位置と広がり）
+        float[][] clumps = new float[form == io.github.genichimaruo.singulo.genesis.GalaxyTraits.IRREGULAR ? 6 : 0][];
+        for (int c = 0; c < clumps.length; c++) {
+            float cr = 0.15F + rnd.nextFloat() * 0.7F, ca = rnd.nextFloat() * Mth.TWO_PI;
+            clumps[c] = new float[] {Mth.cos(ca) * cr, Mth.sin(ca) * cr, 0.08F + rnd.nextFloat() * 0.14F};
+        }
         Star[] stars = new Star[STARS];
         for (int i = 0; i < STARS; i++) {
             float roll = rnd.nextFloat();
@@ -53,28 +75,110 @@ final class GalaxyDraw {
             float a;
             float y;
             int rgb;
-            if (roll < 0.24F) {
-                // 中心のふくらみ（暖かい色の星が密に集まる）
-                r = Math.min(0.32F, Math.abs((float) rnd.nextGaussian()) * 0.12F);
-                a = rnd.nextFloat() * Mth.TWO_PI;
-                y = (float) rnd.nextGaussian() * 0.06F * (1 - r * 2);
-                rgb = FxDraw.lerpRgb(coreRgb, 0xFFFFFF, rnd.nextFloat() * 0.5F);
-            } else if (roll < 0.9F) {
-                // 渦の腕（外へ行くほど腕の色に、ところどころ星の生まれる赤い雲）
-                r = 0.08F + (float) Math.pow(rnd.nextFloat(), 0.85) * 0.92F;
-                int arm = i % arms;
-                a = base + Mth.TWO_PI * arm / arms + r * twist + (float) rnd.nextGaussian() * 0.32F * (1.1F - r * 0.6F);
-                y = (float) rnd.nextGaussian() * 0.025F;
-                rgb = rnd.nextFloat() < 0.06F ? HII : FxDraw.lerpRgb(coreRgb, armRgb, Math.min(1, r * 1.6F));
-                if (rnd.nextFloat() < 0.25F) {
-                    rgb = FxDraw.lerpRgb(rgb, 0xFFFFFF, 0.6F);
+            switch (form) {
+                case io.github.genichimaruo.singulo.genesis.GalaxyTraits.BARRED -> {
+                    if (roll < 0.2F) {
+                        // 中心のふくらみ
+                        r = Math.min(0.28F, Math.abs((float) rnd.nextGaussian()) * 0.1F);
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.05F * (1 - r * 2);
+                        rgb = FxDraw.lerpRgb(coreRgb, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    } else if (roll < 0.42F) {
+                        // 中心を横切る棒（黄色みのある古い星）
+                        float along = Mth.clamp((float) rnd.nextGaussian() * 0.16F, -0.34F, 0.34F);
+                        float across = (float) rnd.nextGaussian() * 0.035F;
+                        r = Mth.sqrt(along * along + across * across);
+                        a = base + (float) Math.atan2(across, along);
+                        y = (float) rnd.nextGaussian() * 0.03F;
+                        rgb = FxDraw.lerpRgb(coreRgb, 0xFFD8B0, rnd.nextFloat() * 0.6F);
+                    } else if (roll < 0.9F) {
+                        // 棒の両端から伸びる2本の腕
+                        r = 0.32F + (float) Math.pow(rnd.nextFloat(), 0.85) * 0.68F;
+                        int arm = i % 2;
+                        a = base + Mth.PI * arm + (r - 0.32F) * twist + (float) rnd.nextGaussian() * 0.26F * (1.1F - r * 0.6F);
+                        y = (float) rnd.nextGaussian() * 0.025F;
+                        rgb = rnd.nextFloat() < 0.06F ? HII : FxDraw.lerpRgb(coreRgb, armRgb, Math.min(1, r * 1.6F));
+                    } else {
+                        r = rnd.nextFloat() * 1.05F;
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.04F;
+                        rgb = FxDraw.lerpRgb(0xFFD8B0, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    }
                 }
-            } else {
-                // 腕のあいだの古い星
-                r = rnd.nextFloat() * 1.05F;
-                a = rnd.nextFloat() * Mth.TWO_PI;
-                y = (float) rnd.nextGaussian() * 0.04F;
-                rgb = FxDraw.lerpRgb(0xFFD8B0, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                case io.github.genichimaruo.singulo.genesis.GalaxyTraits.ELLIPTICAL -> {
+                    // 腕のない、ふくらんだ古い星の集まり（中心ほど密。厚みもある）
+                    float x = (float) rnd.nextGaussian() * 0.3F, z = (float) rnd.nextGaussian() * 0.3F;
+                    r = Math.min(1.05F, Mth.sqrt(x * x + z * z));
+                    a = (float) Math.atan2(z, x);
+                    y = (float) rnd.nextGaussian() * 0.2F * (1 - r * 0.5F);
+                    rgb = FxDraw.lerpRgb(0xFFD0A0, coreRgb, rnd.nextFloat() * 0.6F);
+                    if (dye != null) {
+                        rgb = FxDraw.lerpRgb(rgb, armRgb, rnd.nextFloat() * 0.6F);
+                    }
+                }
+                case io.github.genichimaruo.singulo.genesis.GalaxyTraits.RING -> {
+                    if (roll < 0.18F) {
+                        // 小さな核
+                        r = Math.min(0.2F, Math.abs((float) rnd.nextGaussian()) * 0.07F);
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.04F;
+                        rgb = FxDraw.lerpRgb(coreRgb, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    } else if (roll < 0.86F) {
+                        // 明るい輪（ところどころ星の生まれる赤い雲）
+                        r = 0.72F + (float) rnd.nextGaussian() * 0.05F;
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.02F;
+                        rgb = rnd.nextFloat() < 0.08F ? HII : FxDraw.lerpRgb(armRgb, 0xFFFFFF, rnd.nextFloat() * 0.4F);
+                    } else {
+                        // 核と輪のあいだの、まばらな星
+                        r = rnd.nextFloat() * 0.95F;
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.03F;
+                        rgb = FxDraw.lerpRgb(0xFFD8B0, armRgb, rnd.nextFloat() * 0.5F);
+                    }
+                }
+                case io.github.genichimaruo.singulo.genesis.GalaxyTraits.IRREGULAR -> {
+                    float x, z;
+                    if (roll < 0.78F) {
+                        // 星の生まれる塊（若い青白い星と赤い雲）
+                        float[] c = clumps[i % clumps.length];
+                        x = c[0] + (float) rnd.nextGaussian() * c[2];
+                        z = c[1] + (float) rnd.nextGaussian() * c[2];
+                        rgb = rnd.nextFloat() < 0.12F ? HII : FxDraw.lerpRgb(armRgb, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    } else {
+                        x = (rnd.nextFloat() - 0.5F) * 1.6F;
+                        z = (rnd.nextFloat() - 0.5F) * 1.6F;
+                        rgb = FxDraw.lerpRgb(0xFFD8B0, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    }
+                    r = Math.min(1.05F, Mth.sqrt(x * x + z * z));
+                    a = (float) Math.atan2(z, x);
+                    y = (float) rnd.nextGaussian() * 0.05F;
+                }
+                default -> {
+                    if (roll < 0.24F) {
+                        // 中心のふくらみ（暖かい色の星が密に集まる）
+                        r = Math.min(0.32F, Math.abs((float) rnd.nextGaussian()) * 0.12F);
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.06F * (1 - r * 2);
+                        rgb = FxDraw.lerpRgb(coreRgb, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    } else if (roll < 0.9F) {
+                        // 渦の腕（外へ行くほど腕の色に、ところどころ星の生まれる赤い雲）
+                        r = 0.08F + (float) Math.pow(rnd.nextFloat(), 0.85) * 0.92F;
+                        int arm = i % arms;
+                        a = base + Mth.TWO_PI * arm / arms + r * twist + (float) rnd.nextGaussian() * 0.32F * (1.1F - r * 0.6F);
+                        y = (float) rnd.nextGaussian() * 0.025F;
+                        rgb = rnd.nextFloat() < 0.06F ? HII : FxDraw.lerpRgb(coreRgb, armRgb, Math.min(1, r * 1.6F));
+                        if (rnd.nextFloat() < 0.25F) {
+                            rgb = FxDraw.lerpRgb(rgb, 0xFFFFFF, 0.6F);
+                        }
+                    } else {
+                        // 腕のあいだの古い星
+                        r = rnd.nextFloat() * 1.05F;
+                        a = rnd.nextFloat() * Mth.TWO_PI;
+                        y = (float) rnd.nextGaussian() * 0.04F;
+                        rgb = FxDraw.lerpRgb(0xFFD8B0, 0xFFFFFF, rnd.nextFloat() * 0.5F);
+                    }
+                }
             }
             float size = 0.008F + rnd.nextFloat() * 0.014F;
             if (rnd.nextFloat() < 0.04F) {
@@ -89,12 +193,12 @@ final class GalaxyDraw {
      * 銀河を描く。円盤は今の PoseStack の原点が中心で、tilt で傾ける（星の位置だけを回し、星の形はカメラに向ける）。
      * right・up はカメラの右と上（今の PoseStack の座標で、長さ1）。heat は生まれたての熱さ（1で星がみな白く大きい）。
      */
-    static void draw(PoseStack.Pose last, VertexConsumer vc, Vector3f right, Vector3f up, Quaternionf tilt, long seed,
+    static void draw(PoseStack.Pose last, VertexConsumer vc, Vector3f right, Vector3f up, Quaternionf tilt, long seed, int traits,
                      float radius, float spin, float brightness, float time, float heat, boolean additive) {
         if (brightness <= 0.003F || radius <= 0.001F) {
             return;
         }
-        Shape shape = shape(seed);
+        Shape shape = shape(seed, traits);
         Vector3f p = new Vector3f();
         float starScale = radius * (1 + heat * 1.5F);
         for (Star s : shape.stars()) {
@@ -111,12 +215,12 @@ final class GalaxyDraw {
     }
 
     /** 中心のふくらみと、円盤のかすかな光（星の下に敷く）。 */
-    static void glow(PoseStack pose, VertexConsumer vc, Quaternionf camera, Quaternionf tilt, long seed, float radius,
+    static void glow(PoseStack pose, VertexConsumer vc, Quaternionf camera, Quaternionf tilt, long seed, int traits, float radius,
                      float brightness, float heat, boolean additive) {
         if (brightness <= 0.003F || radius <= 0.001F) {
             return;
         }
-        Shape shape = shape(seed);
+        Shape shape = shape(seed, traits);
         int core = FxDraw.lerpRgb(shape.coreRgb(), 0xFFFFFF, heat);
         softGlow(pose, vc, camera, radius * 0.75F, core, brightness * 0.55F, additive);
         softGlow(pose, vc, camera, radius * 0.28F, 0xFFFFFF, brightness * 0.8F, additive);

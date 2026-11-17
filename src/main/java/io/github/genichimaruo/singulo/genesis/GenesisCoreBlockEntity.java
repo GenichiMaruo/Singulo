@@ -29,6 +29,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -58,8 +59,11 @@ import net.neoforged.neoforge.network.PacketDistributor;
  *   <li><b>完成</b>: 質量生成。手に持った物を核に使うと、それを作る物に決める（{@link MassSynthesis} の表にある物だけ）。
  *       電力を注ぐと作り、画面の出来上がりスロットから受け取れる（下からホッパーなどでも取り出せる）</li>
  * </ol>
+ * 0.21.0: 生まれる前（揺籃・種火・安定化）の核に素材を使うと、生まれる銀河の形・腕の色・大きさが決まる（{@link GalaxyTraits}）。
+ * 完成した炉にもう一度原初の種を使うと、種火からやり直して次の銀河を生める（夜空には {@link GenesisGalaxies#MAX} 個まで並ぶ。
+ * 2つめからはエピローグを出さない）。
  */
-public class GenesisCoreBlockEntity extends BlockEntity {
+public class GenesisCoreBlockEntity extends BlockEntity implements io.github.genichimaruo.singulo.machine.MachineReport.Source {
     public static final int UNFORMED = 0, CRADLE = 1, KINDLING = 2, STABILIZING = 3, BIRTH = 4, COMPLETE = 5;
 
     /** 枠の位置（核と同じ高さ、八角形）。 */
@@ -113,6 +117,10 @@ public class GenesisCoreBlockEntity extends BlockEntity {
     private boolean feeding = true;
     private int birthTicks;
     private long galaxySeed;
+    /** 生まれる銀河の性質（GalaxyTraits。生まれる前に素材で決める）。 */
+    private int galaxyTraits;
+    /** 完成したあと、もう一度種を使ってやり直した炉か（エピローグを出さない）。 */
+    private boolean reborn;
     /** 質量生成: 作る物（1個）・注いだ電力・出来上がった物。 */
     private ItemStack template = ItemStack.EMPTY;
     private double synthProgress;
@@ -152,6 +160,19 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         return stage;
     }
 
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        io.github.genichimaruo.singulo.machine.MachineReport.State s = switch (stage) {
+            case UNFORMED -> io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN;
+            case CRADLE -> io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE;
+            case STABILIZING -> surgeTicks() > 0 ? io.github.genichimaruo.singulo.machine.MachineReport.State.WARN : io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+            default -> io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+        };
+        return new io.github.genichimaruo.singulo.machine.MachineReport(s, Component.translatable("gui.singulo.genesis.phase." + stage), List.of(), 0, 0, buffer,
+                energy.capacity(), (int) Math.min(Integer.MAX_VALUE, Math.round(intake)), 0, ItemStack.EMPTY, 0, List.of(), 0);
+    }
+
     public boolean formed() {
         return formed;
     }
@@ -188,6 +209,10 @@ public class GenesisCoreBlockEntity extends BlockEntity {
 
     public long galaxySeed() {
         return galaxySeed;
+    }
+
+    public int galaxyTraits() {
+        return galaxyTraits;
     }
 
     public ItemStack template() {
@@ -525,7 +550,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             tellNear(level, "gui.singulo.genesis.birth_3", 64);
         }
         if (t == BIRTH_SKY) {
-            GenesisGalaxies.add(level.getServer(), galaxySeed);
+            GenesisGalaxies.add(level.getServer(), galaxySeed, galaxyTraits);
             level.playSound(null, worldPosition.above(5), SinguloSounds.get("genesis.sky"), SoundSource.BLOCKS, 3.0F, 1.0F);
             tellNear(level, "gui.singulo.genesis.birth_sky", 64);
             SinguloTriggers.milestoneNear(level, worldPosition, 64, "genesis_birth");
@@ -536,7 +561,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
                 }
             }
         }
-        if (t == BIRTH_ENDING && endingScreen()) {
+        if (t == BIRTH_ENDING && endingScreen() && !reborn) {
             for (ServerPlayer p : serverPlayers(level, 64)) {
                 if (p.connection != null && p.connection.hasChannel(EndingPayload.TYPE)) {
                     PacketDistributor.sendToPlayer(p, new EndingPayload(AncientRecords.decoded(p).contains("x01")));
@@ -602,6 +627,48 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             charge = 0;
             level.playSound(null, worldPosition.above(5), SinguloSounds.get("genesis.seed"), SoundSource.BLOCKS, 2.5F, 1.0F);
             tellNear(level, "gui.singulo.genesis.seeded", 32);
+            markSync();
+            return true;
+        }
+        if (stage >= CRADLE && stage <= STABILIZING) {
+            int next = GalaxyTraits.apply(galaxyTraits, stack);
+            if (next >= 0) {
+                if (next == galaxyTraits) {
+                    player.displayClientMessage(Component.translatable("gui.singulo.genesis.trait_same", GalaxyTraits.describe(galaxyTraits)), true);
+                    return true;
+                }
+                galaxyTraits = next;
+                if (!player.getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
+                level.playSound(null, worldPosition.above(5), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.5F, 1.2F);
+                level.sendParticles(ParticleTypes.END_ROD, worldPosition.getX() + 0.5, worldPosition.getY() + LENS_Y, worldPosition.getZ() + 0.5,
+                        24, 0.6, 0.6, 0.6, 0.02);
+                player.displayClientMessage(Component.translatable("gui.singulo.genesis.trait", GalaxyTraits.describe(galaxyTraits))
+                        .withStyle(ChatFormatting.LIGHT_PURPLE), false);
+                markSync();
+                return true;
+            }
+        }
+        if (stage == COMPLETE && stack.is(primordialSeed())) {
+            // 次の銀河: 種火からやり直す（作る物と出来上がった物はそのまま）
+            if (!formed) {
+                tell(player, "gui.singulo.genesis.unformed");
+                return true;
+            }
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(1);
+            }
+            stage = KINDLING;
+            charge = 0;
+            progress = 0;
+            instability = 0;
+            surgeTicks = 0;
+            birthTicks = 0;
+            galaxyTraits = 0;
+            reborn = true;
+            level.playSound(null, worldPosition.above(5), SinguloSounds.get("genesis.seed"), SoundSource.BLOCKS, 2.5F, 1.0F);
+            tellNear(level, "gui.singulo.genesis.reseeded", 32);
             markSync();
             return true;
         }
@@ -672,6 +739,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         CompoundTag tag = new CompoundTag();
         tag.putInt("stage", COMPLETE);
         tag.putLong("galaxy", galaxySeed);
+        tag.putInt("galaxy_traits", galaxyTraits);
         if (!template.isEmpty() && level != null) {
             tag.put("template", template.save(level.registryAccess()));
         }
@@ -688,7 +756,8 @@ public class GenesisCoreBlockEntity extends BlockEntity {
 
     /** クライアント側の見込み（腕を振るかどうか）。 */
     public boolean wouldUseItem(ItemStack stack) {
-        return !stack.isEmpty() && (stage == CRADLE && stack.is(primordialSeed()) || stage == COMPLETE);
+        return !stack.isEmpty() && (stage == CRADLE && stack.is(primordialSeed()) || stage == COMPLETE
+                || stage >= CRADLE && stage <= STABILIZING && GalaxyTraits.apply(galaxyTraits, stack) >= 0);
     }
 
     /** 素手で使ったとき: 創世炉の画面を開く（段階・進み・不安定度・投入の切り替え・出来上がった物の受け取り）。 */
@@ -960,6 +1029,8 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         tag.putBoolean("feeding", feeding);
         tag.putInt("birth", birthTicks);
         tag.putLong("galaxy", galaxySeed);
+        tag.putInt("galaxy_traits", galaxyTraits);
+        tag.putBoolean("reborn", reborn);
         tag.putDouble("synth", synthProgress);
         if (!template.isEmpty()) {
             tag.put("template", template.save(registries));
@@ -986,6 +1057,8 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         feeding = !tag.contains("feeding") || tag.getBoolean("feeding");
         birthTicks = tag.getInt("birth");
         galaxySeed = tag.getLong("galaxy");
+        galaxyTraits = tag.getInt("galaxy_traits");
+        reborn = tag.getBoolean("reborn");
         synthProgress = tag.getDouble("synth");
         // 見本は素の形で持つ（以前の版で保存されたエンチャント・名前・損傷つきの見本も、ここで素に戻す。
         // 出来上がった物はプレイヤーの物なので、そのまま残す）

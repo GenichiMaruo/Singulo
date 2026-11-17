@@ -1303,6 +1303,30 @@ CHAPTERS = [
          'items cost orders of magnitude more power. A broken core keeps the memory of its universe and works '
          'again wherever you place it, but stored power and partial progress are lost, so do not break it in '
          'the middle of an expensive item. The list of items is a datapack (mass_synthesis).'),
+        ('galaxies', '銀河を選ぶ・増やす',
+         '生まれる前（種を使う前から安定化が終わるまで）に、素材を核に使うと、生まれる銀河が変わります（1個ずつ使われます）。\n'
+         '・染料: 腕の色\n'
+         '・ブレイズロッド: 棒渦巻銀河（中心を横切る棒の両端から腕が伸びる）\n'
+         '・スライムボール: 楕円銀河（腕のない、ふくらんだ星の集まり）\n'
+         '・エンダーアイ: 環状銀河（小さな核と明るい輪）\n'
+         '・マグマクリーム: 不規則銀河（星の生まれる塊がいくつも）\n'
+         '・ネザースター: 大きな銀河（夜空で1.5倍）\n'
+         '何も使わなければ、これまでどおりの渦巻銀河で、色は種まかせです。画面の窓にカーソルを重ねると、今の性質が分かります。\n'
+         '宇宙を生んだ炉に、もう一度原初の種を使うと、種火からやり直して次の銀河を生めます（作る物の登録と出来上がった物はそのまま）。'
+         '夜空には8個まで並び、それより多くなると古い銀河から消えていきます。',
+         'Choosing and adding galaxies',
+         'Before birth (from before the seed until stabilizing ends), using materials on the core changes the galaxy to be born '
+         '(one item each).\n'
+         '- Dye: the color of the arms\n'
+         '- Blaze Rod: barred spiral (arms from the ends of a bar across the center)\n'
+         '- Slime Ball: elliptical (a swollen cloud of stars without arms)\n'
+         '- Eye of Ender: ring (a small core and a bright ring)\n'
+         '- Magma Cream: irregular (several star-forming clumps)\n'
+         '- Nether Star: grand (1.5 times larger in the night sky)\n'
+         'With nothing used it is a spiral as before, with its color left to chance. Hover over the window on the screen to see the '
+         'current choice.\n'
+         'Use another Primordial Seed on an engine that has given birth to kindle it again for the next galaxy (the registered item and '
+         'finished items stay). Up to eight galaxies line the night sky; beyond that the oldest fade away.'),
     ]),
     ('hazards', 'minecraft:tnt', '危険', 'Hazards', [
         ('list', '気をつけること',
