@@ -36,6 +36,13 @@ public final class LegacyIdGameTests {
 
         // 持ち物・箱の中身（保存された ItemStack）
         var registries = helper.getLevel().registryAccess();
+        // The block-state palette decoder used by old chunks must resolve old block IDs too.
+        CompoundTag paletteEntry = new CompoundTag();
+        paletteEntry.putString("Name", "singulo:core_controller");
+        var oldState = net.minecraft.nbt.NbtUtils.readBlockState(
+                registries.lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK), paletteEntry);
+        helper.assertTrue(oldState.is(io.github.genichimaruo.singulo.registry.SinguloBlocks.CORE_CONTROLLER.get()),
+                "Old chunk palette block ID was not migrated");
         CompoundTag stackTag = new CompoundTag();
         stackTag.putString("id", "singulo:record_fragment");
         stackTag.putInt("count", 3);

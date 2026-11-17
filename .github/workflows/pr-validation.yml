@@ -61,6 +61,8 @@ jobs:
           grep -q 'SINGULO_SEARCH_COMPLETE' build/gui-review/logs/latest.log
           grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/gui-review/logs/latest.log
           grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/gui-review/logs/latest.log
+          grep -q 'SINGULO_GLASS_MODELS_COMPLETE before-reload' build/gui-review/logs/latest.log
+          grep -q 'SINGULO_GLASS_MODELS_COMPLETE after-reload' build/gui-review/logs/latest.log
       - name: Install PNG validation dependency
         run: python3 -m pip install -r tools/review/requirements.txt
       - name: Verify inventory pixels in exported PNGs
