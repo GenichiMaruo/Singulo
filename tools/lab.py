@@ -1164,7 +1164,7 @@ def chest_loot(write_json, data, mid):
         entry('鋼鉄インゴット', 2, 6, 6), entry('基礎回路', 1, 3, 5), entry('鋼板', 2, 4, 4), entry('超伝導コイル', 1, 2, 3),
         entry('自己修理キット', 1, 2, 3), entry('アンドロイドキット', 1, 1, 1)], (4, 7), [
         v('iron_ingot', 2, 6, 6), v('copper_ingot', 2, 8, 6), v('iron_nugget', 3, 9, 5), v('redstone', 2, 8, 5), v('glass', 2, 6, 4),
-        v('chain', 1, 3, 3), v('string', 1, 4, 3), v('quartz', 1, 4, 3), v('gunpowder', 1, 3, 2), v('paper', 2, 6, 3),
+        v('iron_chain', 1, 3, 3), v('string', 1, 4, 3), v('quartz', 1, 4, 3), v('gunpowder', 1, 3, 2), v('paper', 2, 6, 3),
         v('lever', 1, 2, 2), v('rail', 2, 6, 2), v('bucket', 1, 1, 1)])
     # 研究の資料（研究室・資料室・試作室・生体部品室・制御室）
     table('lab_research', (1, 3), [
