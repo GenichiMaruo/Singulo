@@ -840,7 +840,8 @@ _bp('自動販売機', 1, _LF, ('SGS', 'SBS', 'DKG'), {'S': _S, 'G': _G, 'D': '�
 _bp('書類の山', 1, _LF, ('PP', 'BP', 'P '), {'P': '紙'}, 1)
 _bp('ごみ箱', 1, _LF, ('IBI', ' I '), {'I': '鉄インゴット'}, 1)
 _bp('サーバーラック', 1, _LF, ('SRS', 'KBK'), {'S': _S, 'R': 'レッドストーン', 'K': '基礎回路'}, 1, note='置くと灯が瞬く')
-_bp('素体カプセル', 1, _LF, ('GFG', 'GBG', 'FD '), {'G': _G, 'F': '研究所の構造材', 'D': '骨粉'}, 1)
+# 模型どおり上から天蓋（構造材）・ガラスの筒と白い素体（アンドロイドキットと同じホワイトセラミック）・台座
+_bp('素体カプセル', 1, _LF, ('FBF', 'GWG', 'FFF'), {'G': _G, 'F': '研究所の構造材', 'W': _W}, 1)
 _bp('レイリー散乱パネル', 1, 'レイリー散乱パネルの設計図', ('GLG', 'YBY', 'SKS'),
     {'G': _G, 'L': 'ラピスラズリ', 'Y': 'グロウストーンダスト', 'S': _S, 'K': '基礎回路'}, 2,
     note='パネル受電器から電力（1枚 20 FE/t）を受けて点き、天井に真昼の空を映す')
@@ -1061,3 +1062,41 @@ for _name, _shape in _cover_shaped.items():
     assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
     SHAPED[_name] = _shape
     RECIPES[_name]['shape'] = _shape
+
+# 0.20.0 建材の階段・ハーフブロック・塀（一覧の番号がずれないよう、最後に足す）
+from building_variants import recipes as _variant_recipes
+_variant_shaped = {}
+_variant_recipes(R, _variant_shaped, lambda base: RECIPES[base]['stage'])
+for _name, _shape in _variant_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape
+
+# 0.20.0 アンドロイドの釣り・農業アップグレード（一覧の番号がずれないよう、最後に足す）
+R('釣りアップグレード', 2, '精密組立台', {'釣り竿': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,
+  cat='tool', note='アンドロイドが釣りをできる。釣り竿のエンチャントを付けられる')
+R('農業アップグレード', 2, '精密組立台', {'ダイヤモンドのクワ': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,
+  cat='tool', note='アンドロイドが土を耕して種・苗を植え、骨粉を与えられる')
+
+# 0.20.0 ガラスの階段（一覧の番号がずれないよう、最後に足す）
+from building_variants import GLASS_BASES as _GLASS_BASES, GLASS_SHAPES as _GLASS_SHAPES
+_glass_shaped = {}
+_variant_recipes(R, _glass_shaped, lambda base: RECIPES[base]['stage'], _GLASS_BASES, _GLASS_SHAPES)
+for _name, _shape in _glass_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape
+
+# 0.20.0 発光黒色強化パネル: パネルの輪の中心にグロウストーン（一覧の番号がずれないよう、最後に足す）
+R('発光黒色強化パネル', 1, '作業台', {'黒色強化パネル': 8, 'グロウストーンダスト': 1}, out=8, cat='part')
+_shape = (('LLL', 'LYL', 'LLL'), {'L': '黒色強化パネル', 'Y': 'グロウストーンダスト'})
+SHAPED['発光黒色強化パネル'] = _shape
+RECIPES['発光黒色強化パネル']['shape'] = _shape
+
+# 0.20.0 猫のしっぽ: 糸の根元から、羊毛が斜めに伸びる（一覧の番号がずれないよう、最後に足す）
+R('猫のしっぽ', 1, '作業台', {'羊毛': 2, '糸': 1}, cat='tool', note='アンドロイドの装飾。染料で染められる')
+_shape = (('  W', ' W ', 'S  '), {'W': '羊毛', 'S': '糸'})
+SHAPED['猫のしっぽ'] = _shape
+RECIPES['猫のしっぽ']['shape'] = _shape

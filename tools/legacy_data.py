@@ -48,12 +48,15 @@ def convert(path: Path, obj):
             if pool.get('rolls') == 1 and len(entries) == 1:
                 functions = entries[0].get('functions', [])
                 count = next((f for f in functions if f.get('function') == 'minecraft:set_count'), None)
-                if count is not None:
+                if count is not None and not count.get('conditions'):
                     pool['rolls'] = count['count']
                     functions.remove(count)
     if 'recipes' in parts and (obj.get('type', '').startswith('minecraft:') or obj.get('type') == 'singulo:smes_upgrade'):
         result = obj.get('result')
         if isinstance(result, dict) and 'id' in result: result['item'] = result.pop('id')
+        if obj.get('type') == 'minecraft:stonecutting' and isinstance(result, dict):
+            obj['result'] = result['item']
+            obj['count'] = result.get('count', 1)
     # 1.20.1 advancement item predicates use an array of item ids.
     if 'advancements' in parts:
         def predicates(value):

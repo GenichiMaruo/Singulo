@@ -24,7 +24,7 @@ PRISTINE_PILLAR = f'{MODID}:pristine_ruin_pillar'
 PRISTINE_LIGHT = f'{MODID}:pristine_ruin_light'
 GLASS = f'{MODID}:intact_ruin_glass'
 REINFORCED_GLASS = f'{MODID}:reinforced_ruin_glass'
-BROKEN_GLASS = f'{MODID}:ruin_glass'
+BROKEN_GLASS = f'{MODID}:broken_ruin_glass'
 LAMP = f'{MODID}:ruin_lamp'
 CACHE = f'{MODID}:ruin_cache'
 DOCK = f'{MODID}:ruin_guard_dock'
@@ -35,6 +35,16 @@ PROJECTOR = f'{MODID}:echo_projector'
 LINE = f'{MODID}:factory_line'
 CONVEYOR = f'{MODID}:factory_conveyor'
 STRIPED = f'{MODID}:striped_ruin_panel'
+# 遺構パネルの階段・ハーフブロック（0.20.0。それまではバニラのクォーツで代用していた）
+PANEL_STAIRS = f'{MODID}:ruin_panel_stairs'
+PANEL_SLAB = f'{MODID}:ruin_panel_slab'
+# 遺構パネルの塀の柱（隣とつながらない1本立ち）
+PANEL_WALL_POST = (f'{MODID}:ruin_panel_wall', {'up': 'true', 'north': 'none', 'east': 'none', 'south': 'none', 'west': 'none',
+                                                'waterlogged': 'false'})
+# 崩れ方: パネルと、その階段・ハーフブロックが、ひび割れ・苔むした同じ形になる
+DECAYED = {PANEL: (CRACKED, MOSSY),
+           PANEL_STAIRS: (f'{MODID}:cracked_ruin_panel_stairs', f'{MODID}:mossy_ruin_panel_stairs'),
+           PANEL_SLAB: (f'{MODID}:cracked_ruin_panel_slab', f'{MODID}:mossy_ruin_panel_slab')}
 AIR = 'minecraft:air'
 # 骨組み・装置の暗い部分
 FRAME = 'minecraft:polished_deepslate'
@@ -78,17 +88,17 @@ class Builder:
                         self.set(x, y, z, name, props)
 
     def decay(self, cracked=0.15, mossy=0.1, missing=0.0, only_above=0):
-        """パネルを確率でひび割れ・苔むし・欠けにする。"""
+        """パネル（と階段・ハーフブロック）を確率でひび割れ・苔むし・欠けにする。向きなどの状態はそのまま。"""
         for (x, y, z), (name, props, data) in list(self.blocks.items()):
-            if name != PANEL or y < only_above:
+            if name not in DECAYED or y < only_above:
                 continue
             r = self.rng.random()
             if r < missing:
                 self.blocks[(x, y, z)] = (AIR, {}, None)
             elif r < missing + cracked:
-                self.blocks[(x, y, z)] = (CRACKED, {}, None)
+                self.blocks[(x, y, z)] = (DECAYED[name][0], props, None)
             elif r < missing + cracked + mossy:
-                self.blocks[(x, y, z)] = (MOSSY, {}, None)
+                self.blocks[(x, y, z)] = (DECAYED[name][1], props, None)
 
     def vary(self, seed, weathered, pristine):
         """残ったパネルの一部を、朽ちた変わり種（weathered の割合）と、朽ちていない白い建材（pristine の割合）に替える。
@@ -214,8 +224,8 @@ def observation_post():
     b.each(lambda x, y, z: ring(x, z) and (x + z) % 3 == 0, 4, 4, LAMP)
     b.each(lambda x, y, z: octagon(x - c, z - c, 7), 1, 5, AIR)
     b.each(lambda x, y, z: octagon(x - c, z - c, 8), 6, 6, PANEL)
-    # 屋上の手すり（低い縁）
-    b.each(lambda x, y, z: ring(x, z) and (x + z) % 2 == 0, 7, 7, PANEL)
+    # 屋上の手すり（1つおきの塀の柱）
+    b.each(lambda x, y, z: ring(x, z) and (x + z) % 2 == 0, 7, 7, *PANEL_WALL_POST)
     # 観測ドーム（半径5のガラス、縦のリブはパネル）。下の観測室と吹き抜け
     for x in range(19):
         for z in range(19):
@@ -258,14 +268,14 @@ def observation_post():
     for x in range(c - 3, c + 4):
         b.set(x, 1, c - 6, PANEL)
         b.set(x, 2, c - 6, SCREEN if x % 2 else LAMP)
-        b.set(x, 1, c - 5, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+        b.set(x, 1, c - 5, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})
     for z in range(c - 2, c + 3):
         b.set(c - 6, 1, z, FRAME)
         b.set(c - 6, 2, z, 'minecraft:chiseled_bookshelf' if z % 2 else FRAME,
               {'facing': 'east', 'slot_0_occupied': 'false', 'slot_1_occupied': 'false', 'slot_2_occupied': 'false',
                'slot_3_occupied': 'false', 'slot_4_occupied': 'false', 'slot_5_occupied': 'false'} if z % 2 else None)
     b.cache(c + 5, 1, c, 'observation_post')
-    b.set(c + 5, 1, c + 2, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    b.set(c + 5, 1, c + 2, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})
     b.dock(c - 4, 1, c + 4, 1)
     b.sealed(c - 5, 1, c - 1, 1)
     b.fabricator(c + 3, 1, c - 4)
@@ -302,10 +312,10 @@ def research_building():
         b.set(x, 13, z, LAMP)
     for x in range(9, 18):
         for z in (6, 16):
-            b.set(x, 8, z, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+            b.set(x, 8, z, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})
     for z in range(7, 16):
         for x in (8, 18):
-            b.set(x, 8, z, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+            b.set(x, 8, z, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})
     # 1階の仕切り（ガラス張りの実験室）
     for x in (7, 19):
         b.fill(x, 1, 1, x, 6, Z - 1, PANEL)
@@ -334,7 +344,7 @@ def research_building():
     # 階段（南の壁ぎわ、西から東へ上る）と、2階の床の穴
     for i in range(6):
         for z in (Z - 2, Z - 1):
-            b.set(10 + i, 1 + i, z, 'minecraft:quartz_stairs', {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
+            b.set(10 + i, 1 + i, z, PANEL_STAIRS, {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
                                                                  'waterlogged': 'false'})
             b.fill(10 + i, 2 + i, z, 10 + i, 6 + i if i < 5 else 7, z, AIR)
     b.fill(10, 7, Z - 2, 15, 7, Z - 1, AIR)
@@ -352,7 +362,7 @@ def research_building():
     # 2階: 南西の事務区画（机と画面）
     for x in range(2, 7):
         for z in (14, 18):
-            b.set(x, 8, z, 'minecraft:smooth_quartz_slab', {'type': 'top', 'waterlogged': 'false'})
+            b.set(x, 8, z, PANEL_SLAB, {'type': 'top', 'waterlogged': 'false'})
             b.set(x, 9, z, SCREEN if x % 2 else AIR)
     # 照明（天井）
     for x in range(3, X, 5):
@@ -420,7 +430,7 @@ def archive_hall(b, X):
             b.set(x, 10, z, PANEL)
         # 棚の前の通路の手すり（低い板）
         for x in range(x0 + 2, x1 - 1, 2):
-            b.set(x, 1, z + side, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+            b.set(x, 1, z + side, PANEL_SLAB, {'type': 'bottom', 'waterlogged': 'false'})
         # 棚の真ん中: 割れた展示ケース（記録結晶の代わりにエンドロッド）
         for x in (cx - 1, cx, cx + 1):
             b.set(x, 1, z, FRAME)
@@ -441,10 +451,10 @@ def archive_hall(b, X):
     b.fill(x1 - 4, 1, cz - 3, x1 - 1, 1, cz + 3, PANEL)
     b.fill(x1 - 2, 2, cz - 2, x1 - 1, 2, cz + 2, PANEL)
     for dz in range(-3, 4):
-        b.set(x1 - 5, 1, cz + dz, 'minecraft:quartz_stairs', {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
+        b.set(x1 - 5, 1, cz + dz, PANEL_STAIRS, {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
                                                                 'waterlogged': 'false'})
     for dz in range(-2, 3):
-        b.set(x1 - 3, 2, cz + dz, 'minecraft:quartz_stairs', {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
+        b.set(x1 - 3, 2, cz + dz, PANEL_STAIRS, {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
                                                                 'waterlogged': 'false'})
     b.cache(x1 - 2, 3, cz, 'research_building', sealed=True)
     for dz in (-3, 3):
@@ -597,7 +607,7 @@ def containment_chamber(b, c):
             if disk(x, z, R - 0.6):
                 b.set(x, 1, z, PANEL)
     for dz in range(-2, 3):
-        b.set(cx + 7, 1, cz + dz, 'minecraft:quartz_stairs', {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
+        b.set(cx + 7, 1, cz + dz, PANEL_STAIRS, {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
                                                              'waterlogged': 'false'})
     b.cache(cx + 10, 2, cz, 'culture_facility', sealed=True)
     b.set(cx + 11, 2, cz, SCREEN)
@@ -662,7 +672,7 @@ def final_lab():
             if d <= 3.3:
                 b.set(x, 2, z, FRAME)
     for dx, dz, f in ((0, 5, 'north'), (0, -5, 'south'), (5, 0, 'west'), (-5, 0, 'east')):
-        b.set(c + dx, 1, c + dz, 'minecraft:quartz_stairs', {'facing': f, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
+        b.set(c + dx, 1, c + dz, PANEL_STAIRS, {'facing': f, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
     b.set(c, 3, c, CONSOLE)
     b.fill(c, 4, c, c, 9, c, AIR)
     for dx, dz in ((-2, -2), (2, -2), (-2, 2), (2, 2)):
@@ -762,7 +772,7 @@ def sunken_reactor():
                 b.set(x, FLOOR + 1, z, PANEL)
     for dx in range(-3, 4):
         if b.get(cx + dx, FLOOR + 1, vz + 2) == AIR:
-            b.set(cx + dx, FLOOR + 1, vz + 2, 'minecraft:quartz_stairs', {'facing': 'north', 'half': 'bottom', 'shape': 'straight',
+            b.set(cx + dx, FLOOR + 1, vz + 2, PANEL_STAIRS, {'facing': 'north', 'half': 'bottom', 'shape': 'straight',
                                                                       'waterlogged': 'false'})
     b.cache(cx, FLOOR + 2, vz, 'sunken_reactor', sealed=True)
     b.set(cx, FLOOR + 2, vz - 1, SCREEN)

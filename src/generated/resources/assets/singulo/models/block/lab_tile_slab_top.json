@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "singulo:block/lab_tiles",
+    "top": "singulo:block/lab_tiles",
+    "side": "singulo:block/lab_tiles"
+  }
+}

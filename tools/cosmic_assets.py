@@ -170,7 +170,7 @@ def cradle():
 
 
 PARTS = {'cosmic_frame': frame, 'pasta_laminate': laminate_side, 'suspension_crown': crown_side, 'suspension_strut': strut,
-         'pasta_conductor': conductor, 'tidal_draw_ring': draw_ring, 'spindle_cradle': cradle}
+         'pasta_conductor': conductor, 'tidal_draw_ring': draw_ring, 'tidal_spindle_cradle': cradle}
 
 
 def part(iid):
@@ -289,7 +289,7 @@ def models(ctx):
     def block(iid, model):
         write(assets / 'models/block' / f'{iid}.json', model)
 
-    for iid in ('cosmic_frame', 'tidal_draw_ring', 'spindle_cradle'):
+    for iid in ('cosmic_frame', 'tidal_draw_ring', 'tidal_spindle_cradle'):
         block(iid, {'parent': 'minecraft:block/cube_all', 'textures': {'all': tex(iid)}})
     block('pasta_laminate', {'parent': 'minecraft:block/cube_column',
                              'textures': {'side': tex('pasta_laminate'), 'end': tex('pasta_laminate_top')}})

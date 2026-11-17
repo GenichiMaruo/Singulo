@@ -53,7 +53,7 @@ RECESSES = {
     'archive_terminal': [SCREEN],
     'gravitational_wave_detector': [SCREEN],
     'probe_station': [SCREEN],
-    'core_controller': [SCREEN],
+    'reactor_core_controller': [SCREEN],
     'cooling_tower_controller': [SCREEN],
     'accelerator_controller': [SCREEN],
     'degenerate_compactor_controller': [SCREEN],

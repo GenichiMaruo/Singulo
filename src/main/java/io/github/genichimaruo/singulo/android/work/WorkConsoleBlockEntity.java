@@ -353,10 +353,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return outboxHandler;
     }
 
-    /** 許可証にだれかが登録されていれば、持ち主と登録した人だけ。なければだれでも。 */
+    /** 許可証にだれかが登録されていれば、持ち主と登録した人と、持ち主と同じチームの人だけ。なければだれでも。 */
     public boolean mayOperate(Player player) {
         List<ShieldPermitItem.Member> members = ShieldPermitItem.members(permit.getStackInSlot(0));
-        if (members.isEmpty() || owner == null || owner.equals(player.getUUID())) {
+        if (members.isEmpty() || owner == null || owner.equals(player.getUUID()) || io.github.genichimaruo.singulo.item.TeamSharing.sameTeam(level, owner, player)) {
             return true;
         }
         for (ShieldPermitItem.Member m : members) {
@@ -812,6 +812,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.recipe.needsFelling() && chosen.stream().noneMatch(RuinAndroid::canFell)) {
                 return Component.translatable("gui.singulo.work_console.error.no_feller", s.recipe.output().getHoverName());
             }
+            if (s.recipe.needsFishing() && chosen.stream().noneMatch(RuinAndroid::canFish)) {
+                return Component.translatable("gui.singulo.work_console.error.no_fisher", s.recipe.output().getHoverName());
+            }
+            if (s.recipe.needsFarming() && chosen.stream().noneMatch(RuinAndroid::canFarm)) {
+                return Component.translatable("gui.singulo.work_console.error.no_farmer", s.recipe.output().getHoverName());
+            }
         }
         if (escrowRequest == null && (androids.isEmpty() || auto)) {
             chosen = recruit(order, chosen);   // 選ばなかったとき: 作業量に見合う人数だけ招集する
@@ -1197,7 +1203,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** このアンドロイドにできる工程か（採掘の手順は、採掘アップグレードが要る）。 */
     private static boolean canDo(RuinAndroid a, RecipeData recipe) {
-        return (!recipe.needsMining() || a.canMine()) && (!recipe.needsFelling() || a.canFell()) && tankLimit(a, recipe) > 0;
+        return (!recipe.needsMining() || a.canMine()) && (!recipe.needsFelling() || a.canFell())
+                && (!recipe.needsFishing() || a.canFish()) && (!recipe.needsFarming() || a.canFarm()) && tankLimit(a, recipe) > 0;
     }
 
     /** 次の作業をもらう。 */

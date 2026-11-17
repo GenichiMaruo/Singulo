@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:white_panel"
+  },
+  "result": "singulo:white_panel_wall",
+  "count": 1
+}

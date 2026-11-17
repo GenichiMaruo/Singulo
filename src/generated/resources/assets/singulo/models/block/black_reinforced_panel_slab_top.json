@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "singulo:block/black_reinforced_panel",
+    "top": "singulo:block/black_reinforced_panel",
+    "side": "singulo:block/black_reinforced_panel"
+  }
+}

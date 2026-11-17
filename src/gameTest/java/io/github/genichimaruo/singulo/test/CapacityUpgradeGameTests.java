@@ -109,7 +109,7 @@ public final class CapacityUpgradeGameTests {
     @GameTest(template = "empty", batch = "capacity_upgrade")
     public static void capacityInsufficientStopsMk3WithoutConsumingMaterialsOrEnergy(GameTestHelper h) {
         var machine = machine(h);
-        int index = RecipeSelection.indexOf(h.getLevel(), machine.type(), Singulo.id("precision_assembler/scanner_module_3"));
+        int index = RecipeSelection.indexOf(h.getLevel(), machine.type(), Singulo.id("precision_assembler/neutrino_scanner_module_3"));
         var recipe = RecipeSelection.byIndex(h.getLevel(), machine.type(), index).value();
         for (int i = 0; i < recipe.ingredients().size(); i++) {
             var input = recipe.ingredients().get(i);

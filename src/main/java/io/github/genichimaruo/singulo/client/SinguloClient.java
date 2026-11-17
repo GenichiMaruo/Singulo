@@ -42,6 +42,8 @@ public final class SinguloClient {
         modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(CoverModel::wrap);
+        modBus.addListener(GlassJoinModel::wrap);     // ガラスの階段に接するガラスの面
+        modBus.addListener(ConnectedGlassModel::wrap);     // つながって見えるアンドロイド透過ガラスとその階段
         modBus.addListener(CoverModel::registerColors);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);

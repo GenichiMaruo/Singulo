@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:black_reinforced_glass"
+  },
+  "result": "singulo:black_reinforced_glass_stairs",
+  "count": 1
+}

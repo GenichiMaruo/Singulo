@@ -222,6 +222,13 @@ public class HorizonWarden extends Monster {
                 .add(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get(), 0.4);
     }
 
+    /** 悪い効果は受けない（{@link BossEffects}）。NeoForge では上書き専用（呼ぶのは MobEffectEvent.Applicable）。 */
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean canBeAffected(net.minecraft.world.effect.MobEffectInstance effect) {
+        return BossEffects.accepts(effect) && super.canBeAffected(effect);
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();

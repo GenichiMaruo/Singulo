@@ -13,7 +13,7 @@ IDS = {
     '懸垂支柱': ('suspension_strut', 'Suspension Strut', 'part_block'),
     '核パスタ導体': ('pasta_conductor', 'Pasta Conductor', 'part_block'),
     '潮汐絞りリング': ('tidal_draw_ring', 'Tidal Draw Ring', 'part_block'),
-    'スプール受け台': ('spindle_cradle', 'Spool Cradle', 'part_block'),
+    'スプール受け台': ('tidal_spindle_cradle', 'Spool Cradle', 'part_block'),
 }
 
 def recipes(R, shaped):

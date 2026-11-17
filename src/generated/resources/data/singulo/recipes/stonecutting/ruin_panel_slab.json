@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:ruin_panel"
+  },
+  "result": "singulo:ruin_panel_slab",
+  "count": 2
+}

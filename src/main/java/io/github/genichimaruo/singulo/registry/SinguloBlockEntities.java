@@ -63,7 +63,7 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get()));
 
     public static final Supplier<BlockEntityType<DegenerateFurnaceBlockEntity>> DEGENERATE_FURNACE =
-            REGISTER.register("degenerate_furnace", () -> build(DegenerateFurnaceBlockEntity::new,
+            REGISTER.register("degenerate_furnace_controller", () -> build(DegenerateFurnaceBlockEntity::new,
                     SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER.get()));
 
     public static final Supplier<BlockEntityType<ProbeStationBlockEntity>> PROBE_STATION =
@@ -84,7 +84,7 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.ROGUE_BLACK_HOLE.get()));
 
     public static final Supplier<BlockEntityType<PenroseReactorBlockEntity>> PENROSE_REACTOR = REGISTER.register(
-            "penrose_reactor", () -> build(PenroseReactorBlockEntity::new, SinguloBlocks.CORE_CONTROLLER.get()));
+            "reactor_core_controller", () -> build(PenroseReactorBlockEntity::new, SinguloBlocks.CORE_CONTROLLER.get()));
 
     public static final Supplier<BlockEntityType<ThermoelectricGeneratorBlockEntity>> THERMOELECTRIC_GENERATOR =
             REGISTER.register("thermoelectric_generator", () -> build(ThermoelectricGeneratorBlockEntity::new,
@@ -114,27 +114,27 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.AdvancedWorldlineAnchorBlockEntity>>
-            WORLDLINE_ANCHOR_ADVANCED = REGISTER.register("worldline_anchor_advanced", () -> build(
+            WORLDLINE_ANCHOR_ADVANCED = REGISTER.register("advanced_worldline_anchor", () -> build(
                     io.github.genichimaruo.singulo.machine.AdvancedWorldlineAnchorBlockEntity::new, SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity>> SHIELD_TOWER =
-            REGISTER.register("shield_tower", () -> build(io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity::new,
+            REGISTER.register("shield_tower_core", () -> build(io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity::new,
                     SinguloBlocks.SHIELD_TOWER_CORE.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity>> TIPLER_CYLINDER =
-            REGISTER.register("tipler_cylinder", () -> build(io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity::new,
+            REGISTER.register("tipler_core", () -> build(io.github.genichimaruo.singulo.machine.TiplerCylinderBlockEntity::new,
                     SinguloBlocks.TIPLER_CORE.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity>> HALO_COLLECTOR =
             REGISTER.register("halo_collector", () -> build(io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity::new, SinguloBlocks.HALO_COLLECTOR.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity>> CONTAINMENT_TANK =
-            REGISTER.register("containment_tank", () -> build(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::new,
+            REGISTER.register("gravitational_containment_tank", () -> build(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity::new,
                     SinguloBlocks.CONTAINMENT_TANK.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity>> WORMHOLE_GENERATOR =
-            REGISTER.register("wormhole_generator", () -> build(io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity::new,
+            REGISTER.register("wormhole_generator_core", () -> build(io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity::new,
                     SinguloBlocks.WORMHOLE_GENERATOR_CORE.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.forge.JetForgeBlockEntity>> JET_FORGE =
-            REGISTER.register("jet_forge", () -> build(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::new,
+            REGISTER.register("jet_forge_core", () -> build(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity::new,
                     SinguloBlocks.JET_FORGE_CORE.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity>> WORMHOLE_STABILIZER =
             REGISTER.register("wormhole_stabilizer", () -> build(io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity::new,
@@ -167,7 +167,7 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.STRANGELET.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity>> CREATIVE_ENERGY =
-            REGISTER.register("creative_energy", () -> build(io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity::new,
+            REGISTER.register("creative_energy_source", () -> build(io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity::new,
                     SinguloBlocks.CREATIVE_ENERGY_SOURCE.get()));
 
     public static final Supplier<BlockEntityType<QuantumHeatEngineBlockEntity>> QUANTUM_HEAT_ENGINE =
@@ -185,7 +185,7 @@ public final class SinguloBlockEntities {
             REGISTER.register("sealed_container", () -> build(io.github.genichimaruo.singulo.ruin.SealedContainerBlockEntity::new,
                     SinguloBlocks.SEALED_CONTAINERS.stream().map(b -> (Block) b.get()).toArray(Block[]::new)));
 
-    public static final Supplier<BlockEntityType<GuardDockBlockEntity>> GUARD_DOCK = REGISTER.register("guard_dock",
+    public static final Supplier<BlockEntityType<GuardDockBlockEntity>> GUARD_DOCK = REGISTER.register("ruin_guard_dock",
             () -> build(GuardDockBlockEntity::new, SinguloBlocks.RUIN_GUARD_DOCK.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidStationBlockEntity>> ANDROID_STATION =
@@ -226,7 +226,7 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.LAB_DOOR.get(), SinguloBlocks.WHITE_SLIDING_DOOR.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity>> ANDROID_FABRICATOR =
-            REGISTER.register("android_fabricator", () -> build(io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity::new,
+            REGISTER.register("ruin_android_fabricator", () -> build(io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity::new,
                     SinguloBlocks.RUIN_ANDROID_FABRICATOR.get()));
 
     public static final Supplier<BlockEntityType<SealConsoleBlockEntity>> SEAL_CONSOLE = REGISTER.register("seal_console",
@@ -245,7 +245,7 @@ public final class SinguloBlockEntities {
                     SinguloBlocks.FACTORY_LINE.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity>> REACTOR_CONSOLE =
-            REGISTER.register("reactor_console", () -> build(io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity::new,
+            REGISTER.register("lab_reactor_console", () -> build(io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity::new,
                     SinguloBlocks.REACTOR_CONSOLE.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =

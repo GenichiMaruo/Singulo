@@ -61,10 +61,12 @@ def mid(name):
 
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
-BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
+BLOCK_KINDS = ('variant', 'block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
                'boss_block', 'genesis', 'lab')
 # World hazards have a block registration but no obtainable BlockItem.
 ITEMLESS_BLOCKS = {'strangelet'}
+# アイテムはあるがクリエイティブタブに出さないもの（不安定なワームホールの口は取り出すとすぐ消え、対でないと使えない）
+TAB_EXCLUDED = {'unstable_wormhole_mouth'}
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 # 液体パイプ（4段階）: 絵とモデルは tools/logistics_content.py が書く（電線と見分けられる、継ぎ手のつばと窓のある管）
@@ -941,6 +943,8 @@ UI_LANG = {
     'gui.singulo.android.say.charging_follow.1': ('そばにいると安心する', 'I feel safe near you'),
     'tooltip.singulo.android_armor_plate': ('護衛のアンドロイドの胸当て（防御 +8、防具強度 +2）', 'Chestplate for a guard android (+8 armor, +2 toughness)'),
     'tooltip.singulo.android_felling_upgrade': ('ダイヤの斧相当で木を切る。効率強化・幸運・シルクタッチを付けられる', 'Fells trees like a diamond axe. Takes Efficiency, Fortune and Silk Touch'),
+    'tooltip.singulo.android_fishing_upgrade': ('範囲の水で釣りをする。宝釣り・入れ食いを付けられる', 'Fishes in an area of water. Takes Luck of the Sea and Lure'),
+    'tooltip.singulo.android_farming_upgrade': ('土を耕して種・苗を植え、骨粉を与える', 'Tills soil, plants seeds and gives bone meal'),
     'tooltip.singulo.android_mining_upgrade': ('ダイヤのツルハシ相当で掘る。効率強化・幸運・シルクタッチを付けられる', 'Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch'),
     'gui.singulo.android.page.gear': ('装備と持ち物', 'Gear and inventory'),
     'gui.singulo.android.page.decor': ('装飾', 'Decorations'),
@@ -967,7 +971,7 @@ UI_LANG = {
     'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘・ランタン・ほうき（待機している間だけ持つ）',
                                          'Paperback, bouquet, teacup, umbrella, lantern or broom (held only while idle)'),
     'gui.singulo.android.decor.3.hint': ('メガネ・モノクル・イヤリング', 'Glasses, monocle or earrings'),
-    'gui.singulo.android.decor.4.hint': ('腰リボン・エプロン・ブローチ', 'Waist ribbon, apron or brooch'),
+    'gui.singulo.android.decor.4.hint': ('腰リボン・エプロン・ブローチ・猫のしっぽ', 'Waist ribbon, apron, brooch or cat tail'),
     'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
     'gui.singulo.android.hair_color': ('髪の色 %s', 'Hair color %s'),
     'gui.singulo.charge.in': ('充電する物を入れる（電力を受け取れる物）', 'Put in something to charge'),
@@ -1056,13 +1060,15 @@ UI_LANG = {
     'gui.singulo.recipe_encoder.kind.milk': ('搾乳', 'Milk'),
     'gui.singulo.recipe_encoder.kind.cull': ('処理', 'Cull'),
     'gui.singulo.recipe_encoder.kind.use': ('操作', 'Use'),
+    'gui.singulo.recipe_encoder.kind.plant': ('畑づくり', 'Farm'),
+    'gui.singulo.recipe_encoder.kind.fish': ('釣り', 'Fish'),
     'gui.singulo.recipe_encoder.limit': ('%s 頭まで', 'up to %s'),
     'gui.singulo.recipe_encoder.limit.hint': ('動物の数。繁殖: 同じ種類がこの数に届くまで増やす。処理: この数を超えた分を処理する。クリック・ホイールで変える（シフトで10ずつ、右クリックで減らす）', 'Number of animals. Breed: increase each kind up to this many. Cull: cull any above this many. Click or scroll to change (Shift: 10 at a time, right-click to lower)'),
     'gui.singulo.recipe_encoder.use.0': ('切り替え', 'Toggle'),
     'gui.singulo.recipe_encoder.use.1': ('オンにする', 'Turn on'),
     'gui.singulo.recipe_encoder.use.2': ('オフにする', 'Turn off'),
     'gui.singulo.recipe_encoder.use.hint': ('レバーをどうするか（クリックで変える）。ボタン・ドア・トラップドアなどは、いつも右クリックと同じ', 'What to do with a lever (click to change). Buttons, doors, trapdoors and the like are always used like a right-click'),
-    'gui.singulo.recipe_encoder.kind.hint': ('足す手順の種類を切り替える（右クリックで逆順）。投入・取り出し: 装置に入れる・装置から出す。採掘・伐採: 範囲を掘る・木を切る（アップグレードが要る）。収穫: 作物を取って植え直す。繁殖・毛刈り・搾乳・処理: 範囲の動物の世話。操作: レバー・ボタンなどを使う', 'Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Use: flip levers, press buttons and the like'),
+    'gui.singulo.recipe_encoder.kind.hint': ('足す手順の種類を切り替える（右クリックで逆順）。投入・取り出し: 装置に入れる・装置から出す。採掘・伐採: 範囲を掘る・木を切る（アップグレードが要る）。収穫: 作物を取って植え直す。繁殖・毛刈り・搾乳・処理: 範囲の動物の世話。畑づくり: 範囲の土を耕して種・苗を植える、骨粉を与える（アップグレードが要る）。釣り: 範囲の水で釣る（アップグレードが要る）。操作: レバー・ボタンなどを使う', 'Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Farm: till an area and plant seeds, or give bone meal (needs an upgrade). Fish: fish in an area of water (needs an upgrade). Use: flip levers, press buttons and the like'),
     'gui.singulo.recipe_encoder.step.add': ('足す', 'Add'),
     'gui.singulo.recipe_encoder.step.add.hint': ('作業位置カードの場所と、物の欄の物で、手順を1つ足す（最大8つ）', 'Add a step at the place on the Work Location Card, with the item in the item slot (up to eight)'),
     'gui.singulo.recipe_encoder.step.remove': ('クリックで消す', 'Click to remove'),
@@ -1086,6 +1092,8 @@ UI_LANG = {
     'tooltip.singulo.procedure_card.cull': ('処理: %s がそろうまで、%s 頭を超えた分（%s）', 'Cull until %s, keeping %s (%s)'),
     'tooltip.singulo.procedure_card.use': ('操作: %s（%s）', 'Use: %s (%s)'),
     'tooltip.singulo.procedure_card.mine': ('採掘: %s がそろうまで（%s）', 'Mine until %s (%s)'),
+    'tooltip.singulo.procedure_card.plant': ('畑づくり: %s を植える（%s）', 'Plant %s (%s)'),
+    'tooltip.singulo.procedure_card.fish': ('釣り: %s がそろうまで（%s）', 'Fish until %s (%s)'),
     'gui.singulo.recipe_encoder.mode.hint': ('記録する種類を切り替える。作業台: 作業台で作る。加工: かまどや装置に上から入れ、下から取り出す。手順: 手順カードに投入・取り出し・採掘の手順を記録する', 'Switch what is recorded. Crafting: made at a crafting table. Processing: put into a furnace or machine from above and taken out from below. Procedure: insert, extract and mine steps on a Procedure Card'),
     'gui.singulo.recipe_encoder.output.hint': ('出てくる物（主な物）を置く', 'Place what comes out (the main product)'),
     'gui.singulo.recipe_encoder.extra.hint': ('ほかに出てくる物（副産物）。取り出して素材置き場へ戻す', 'Anything else that comes out (byproducts). It is taken out and returned to the stockpile'),
@@ -1113,7 +1121,11 @@ UI_LANG = {
     'gui.singulo.work_console.cancelled.recipe': ('%s の注文を取り消した（レシピが合わない）', 'Cancelled the order for %s (the recipe does not match)'),
     'gui.singulo.work_console.cancelled.stalled': ('%s の注文を取り消した（装置の加工が進まない）', 'Cancelled the order for %s (the machine stopped processing)'),
     'gui.singulo.work_console.error.no_feller': ('%s の手順に伐採があるが、伐採アップグレードを積んだアンドロイドを選んでいない', '%s needs felling, but no chosen android has a Felling Upgrade'),
+    'gui.singulo.work_console.error.no_fisher': ('%s の手順に釣りがあるが、釣りアップグレードを積んだアンドロイドを選んでいない', '%s needs fishing, but no chosen android has a Fishing Upgrade'),
+    'gui.singulo.work_console.error.no_farmer': ('%s の手順に畑づくりがあるが、農業アップグレードを積んだアンドロイドを選んでいない', '%s needs farming, but no chosen android has a Farming Upgrade'),
     'gui.singulo.work_console.needs_feller': ('この注文には伐採の工程があるので、伐採アップグレードを積んだアンドロイドだけ選べる', 'This order includes felling, so only androids with a Felling Upgrade can be chosen'),
+    'gui.singulo.work_console.needs_fisher': ('この注文には釣りの工程があるので、釣りアップグレードを積んだアンドロイドだけ選べる', 'This order includes fishing, so only androids with a Fishing Upgrade can be chosen'),
+    'gui.singulo.work_console.needs_farmer': ('この注文には畑づくりの工程があるので、農業アップグレードを積んだアンドロイドだけ選べる', 'This order includes farming, so only androids with a Farming Upgrade can be chosen'),
     'gui.singulo.work_console.error.no_miner': ('%s の手順に採掘があるが、採掘アップグレードを積んだアンドロイドを選んでいない', '%s needs mining, but no chosen android has a Mining Upgrade'),
     'gui.singulo.work_console.error.not_machine': ('%s のレシピの作業場所に、入れたり取り出したりできない', 'Items cannot be put into or taken from the work location for %s'),
     'gui.singulo.work_console.done': ('%s ×%s を納品した', 'Delivered %s ×%s'),
@@ -1201,6 +1213,8 @@ UI_LANG = {
     'gui.singulo.work_console.activity.ranch': ('動物の世話', 'Tending animals'),
     'gui.singulo.work_console.activity.fell': ('伐採中', 'Felling'),
     'gui.singulo.work_console.activity.use': ('操作', 'Using a block'),
+    'gui.singulo.work_console.activity.fish': ('釣り中', 'Fishing'),
+    'gui.singulo.work_console.activity.plant': ('畑づくり中', 'Farming'),
     'gui.singulo.work_console.empty': ('注文できる物がない（資材口とレシピ棚をつなぐ）', 'Nothing to order (link supply ports and recipe racks)'),
     'gui.singulo.work_console.no_orders': ('進行中の注文はない', 'No running orders'),
     'gui.singulo.work_console.status.0': ('作業中（%s体）', 'Working (%s androids)'),
@@ -1558,7 +1572,7 @@ UI_LANG = {
     'gui.singulo.console.awakened': ('封印が破れ、ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
     'gui.singulo.console.active': ('守護機はすでに起動している', 'The warden is already active'),
     'gui.singulo.console.open': ('保管庫の封鎖はすでに解かれている（覚醒の記録核を使えば、覚醒した守護機と再戦できる）',
-                                 'The vault is not sealed (use an Awakening Record Core to fight the awakened warden)'),
+                                 'The vault is not sealed (use an Awakened Record Core to fight the awakened warden)'),
     'gui.singulo.console.awakened_rematch': ('記録核が共鳴する。覚醒したホライズン・ウォーデンが目を覚ました',
                                              'The record core resonates. The Awakened Horizon Warden rises'),
     'gui.singulo.console.awakened_defeated': ('覚醒した守護機を退けた。残骸から上質な部品が転がり出た',
@@ -1753,7 +1767,7 @@ def models():
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
-        if kind in ('gravity', 'nature', 'boss_block', 'genesis', 'lab'):
+        if kind in ('gravity', 'nature', 'boss_block', 'genesis', 'lab', 'variant'):
             continue                                           # 重力パネル・受電器・自然物・ボス部屋の仕掛けは blocks_extra・blocks_extra4・blocks_extra5 が作る
         if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'deco', 'deco_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
@@ -1780,7 +1794,7 @@ def models():
             else:
                 write_json(ASSETS / 'blockstates' / f'{iid}.json', {'variants': {'': {'model': f'{MODID}:block/{iid}'}}})
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
-            if iid in ('accelerator_tube', 'focusing_magnet'):
+            if iid in ('accelerator_tube', 'accelerator_focusing_magnet'):
                 import accelerator_assets
                 accelerator_assets.models(ASSETS)
         elif kind == 'container':
@@ -2143,11 +2157,11 @@ def textures():
                 d.rectangle([0, 0, 15, 15], outline=white)
                 d.line([(0, 8), (15, 8)], fill=(70, 74, 84, 255))
                 d.point([(4, 4), (11, 11), (11, 4), (4, 11)], fill=glow)
-            elif iid == 'gyro_drive':
+            elif iid == 'reactor_gyro_drive':
                 d.ellipse([2, 2, 13, 13], fill=(57, 66, 74, 255), outline=glow)
                 d.line([(2, 7), (13, 7)], fill=white)
                 d.line([(7, 2), (7, 13)], fill=white)
-            elif iid == 'mirror_plate':
+            elif iid == 'casimir_cavity_mirror_plate':
                 for y in range(16):
                     c = 200 + int(50 * (1 - abs(y - 5) / 11))
                     d.line([(0, y), (15, y)], fill=(c, c, min(255, c + 8), 255))
@@ -3408,7 +3422,8 @@ def tags():
     write_json(DATA / 'tags' / 'item' / 'helium_bearing_stone.json', {'values': [
         'minecraft:deepslate', 'minecraft:cobbled_deepslate', 'minecraft:basalt', 'minecraft:smooth_basalt']})
     write_json(DATA / 'tags' / 'block' / 'ruin_blocks.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] in ('ruin_block', 'ruin_glass', 'boss_block')]})
+               {'values': [mid(n) for n, v in MOD.items() if v[2] in ('ruin_block', 'ruin_glass', 'boss_block')
+                           or v[0] in __import__('building_variants').RUIN_VARIANTS]})
     write_json(DATA / 'tags' / 'entity_type' / 'gravity_immune.json', {'values': [
         'minecraft:ender_dragon', 'minecraft:wither', 'minecraft:warden', 'minecraft:elder_guardian',
         'minecraft:enderman', 'minecraft:shulker', mid_entity('horizon_warden'), mid_entity('gravity_remnant')]})
@@ -3439,7 +3454,7 @@ def tags():
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                   or v[0].startswith('pristine_'))]})
+                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
@@ -3469,6 +3484,10 @@ def tags():
     blocks_extra6.loot(write_json, DATA)
     import lab_blocks
     lab_blocks.loot(write_json, DATA)
+    import building_variants
+    building_variants.loot(write_json, DATA)
+    building_variants.stonecutting(write_json, DATA)
+    building_variants.tags(write_json, DATA)
     boss_loot()
 
 
@@ -3805,13 +3824,128 @@ def thermal():
 
 
 # ---------------------------------------------------------------- クリエイティブタブ（と JEI）の並び
-# 用途ごとにまとめ、まとまりの中は段階順。未分類の通常アイテムだけを中間素材に置く。
-# 装置・建材・道具の追加時は必ず分類し、スポーンエッグは独立した末尾のグループに置く。
+# 機能ごとにまとめ、まとまりの中は進行順。マルチブロックはコントローラーの直後に部材を置き、
+# アンドロイドとドローンは設備・キット・メモリー・アップグレードを一か所に集める。素材は機械の後ろ。
+# 未分類の通常アイテムだけを中間素材に置く。装置・建材・道具の追加時は必ず分類し、スポーンエッグは末尾。
 TAB_GROUPS = [
     ('案内と設定', [
         'handbook', 'holo_projector', 'explorer_compass', 'meteor_compass',
-        'settings_card', 'relocation_wrench', 'decoded_record', 'work_location_card',
-        'area_card', 'recipe_card', 'procedure_card',
+        'settings_card', 'relocation_wrench', 'decoded_record',
+    ]),
+    ('発電と蓄電', [
+        'thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine',
+        'quantum_heat_engine', 'smes_cell', 'smes_module',
+    ]),
+    ('配線と配管', [
+        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
+        'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct',
+        'cover_frame',
+    ]),
+    ('加工機', [
+        'kiln', 'compressor', 'electrolyzer', 'peltier_cooler',
+        'archive_terminal', 'catalytic_reactor', 'precision_assembler', 'cosmic_muon_collector',
+        'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
+        'singularity_encapsulator',
+    ]),
+    ('機械のアップグレード', [
+        'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2',
+        'capacity_upgrade_3',
+    ]),
+    # コントローラー（核）ごとに、その部材と専用の品を続けて置く
+    ('マルチブロック', [
+        'multiblock_port', 'collapsar_lining',
+        'cooling_tower_controller', 'cooling_tower_base', 'cooling_tower_casing', 'cooling_tower_glass',
+        'cooling_tower_coolant_band', 'cooling_tower_rim', 'cooling_tower_grate', 'cooling_tower_heat_exchange_core',
+        'empty_coolant_cartridge', 'coolant_cartridge', 'helium_cartridge',
+        'accelerator_controller', 'accelerator_tube', 'accelerator_focusing_magnet',
+        'degenerate_compactor_controller', 'degenerate_compactor_frame', 'degenerate_compactor_plate',
+        'degenerate_compactor_ram', 'degenerate_compactor_anvil', 'degenerate_compactor_vent',
+        'degenerate_compactor_window',
+        'casimir_cavity_controller', 'casimir_cavity_frame', 'casimir_cavity_pump', 'casimir_cavity_wall',
+        'casimir_cavity_shield', 'casimir_cavity_window', 'casimir_cavity_mirror_plate',
+        'degenerate_furnace_controller', 'degenerate_furnace_frame', 'degenerate_furnace_shell',
+        'degenerate_furnace_piston', 'degenerate_furnace_fin', 'degenerate_furnace_tube',
+        'degenerate_furnace_window',
+        'reactor_core_controller', 'reactor_shell', 'reactor_gyro_drive', 'reactor_stabilizer',
+        'reactor_extraction_port', 'reactor_mass_alarm',
+        'gravity_field_stabilizer', 'confinement_ring', 'singularity_seed', 'mass_pellet',
+        'jet_collector', 'hawking_collector', 'ergosphere_ring',
+        'shield_tower_core', 'shield_tower_plinth', 'shield_tower_coil', 'shield_tower_body',
+        'shield_tower_waveguide', 'shield_tower_crown', 'shield_permit',
+        'tipler_core', 'tipler_frame', 'tipler_housing', 'tipler_bearing',
+        'tipler_window', 'tipler_holder',
+        'wormhole_generator_core', 'wormhole_generator_shell', 'wormhole_generator_coil',
+        'wormhole_generator_focuser', 'wormhole_generator_window', 'wormhole_generator_port',
+        'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed',
+        'jet_forge_core', 'jet_forge_foundation', 'jet_forge_confinement_coil', 'jet_forge_collimator',
+        'jet_forge_heat_sink', 'jet_forge_truss', 'jet_forge_levitator', 'jet_forge_collector',
+        'collapsar_parallel_cassette',
+        'cosmic_frame',
+        'suspension_reservoir', 'suspension_crown', 'suspension_strut',
+        'pasta_accumulator', 'pasta_laminate', 'pasta_conductor',
+        'tidal_spindle', 'tidal_draw_ring', 'tidal_spindle_cradle',
+    ]),
+    ('重力と宇宙の設備', [
+        'worldline_anchor', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel',
+        'keraunos_tower', 'deep_sea_collector', 'void_collector', 'low_gravity_panel',
+        'high_gravity_panel', 'zero_gravity_block', 'zero_gravity_controller', 'gravitational_wave_detector',
+        'neutrino_observatory', 'probe_station', 'advanced_worldline_anchor', 'halo_collector',
+        'gravitational_containment_tank',
+    ]),
+    ('ワームホール', [
+        'wormhole_stabilizer', 'wormhole_mouth_casing', 'wormhole_mouth',
+        'wormhole_port', 'wormhole_seam_upgrade',
+    ]),
+    ('アンドロイド', [
+        'android_station', 'android_kit', 'android_repair_kit', 'android_charger',
+        'android_armor_plate', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
+        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner',
+        'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',
+        'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench',
+        'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
+    ]),
+    ('アンドロイドのアップグレード', [
+        'android_production_upgrade', 'android_factory_print_unit', 'android_transfer_upgrade',
+        'android_battery_upgrade', 'android_backpack_upgrade', 'android_reinforced_backpack_upgrade',
+        'android_large_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade',
+        'android_dual_tank_upgrade', 'android_mining_upgrade', 'android_felling_upgrade', 'android_fishing_upgrade',
+        'android_farming_upgrade',
+    ]),
+    ('アンドロイド装飾', [
+        'rgb_dye_station',
+        'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress',
+        'android_glasses', 'android_cape', 'android_scarf', 'android_waist_ribbon',
+        'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
+        'android_cat_ears', 'android_cat_tail', 'android_witch_hat', 'android_straw_hat', 'android_ponytail',
+        'android_twin_tails', 'android_monocle', 'android_fairy_wings', 'android_apron',
+        'android_lantern', 'android_broom', 'android_necktie', 'android_diamond_necklace',
+        'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch',
+    ]),
+    ('ドローン', [
+        'drone_station', 'drone_kit', 'drone_memory', 'drone_memory_jet',
+        'drone_memory_gravity', 'drone_phase_upgrade',
+        'drone_port', 'packing_crate', 'battery_packing_crate', 'large_battery_packing_crate',
+        'fluid_drone_port', 'fluid_capsule', 'battery_fluid_capsule', 'large_battery_fluid_capsule',
+        'horizon_vault', 'wormhole_drone_beacon',
+    ]),
+    ('道具と装備', [
+        'fluid_canister', 'neutrino_scanner', 'neutrino_scanner_module_2', 'neutrino_scanner_module_3',
+        'inertial_control_gauntlet', 'magnetic_bottle', 'black_hole_bomb', 'graviton_manipulator',
+        'metric_drive', 'gravity_boots', 'dimensional_pocket', 'afterglow_wings',
+    ]),
+    ('触媒', [
+        'muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core',
+        'catalyst_stabilizer', 'spent_muon_catalyst', 'spent_bose_condensate_catalyst',
+        'spent_time_crystal_catalyst', 'spent_singularity_core',
+    ]),
+    ('自然のブロック', [
+        'meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core',
+        'fulgurite_block',
+    ]),
+    ('採集素材と粉末', [
+        'raw_meteoric_iron', 'limestone_powder', 'carbon_dust', 'zinc_dust',
+        'stardust', 'fulgurite', 'pressure_crystal', 'void_dust',
+        'nihonium', 'magnetic_monopole',
     ]),
     ('インゴット', [
         'steel_ingot', 'zinc_ingot', 'bismuth_ingot', 'meteoric_iron_ingot',
@@ -3824,157 +3958,84 @@ TAB_GROUPS = [
         'ceramic_substrate', 'optical_lattice_substrate', 'basic_circuit', 'thermocouple_module',
         'quantum_computing_module', 'time_crystal_module',
     ]),
-    ('採集素材と粉末', [
-        'raw_meteoric_iron', 'limestone_powder', 'carbon_dust', 'zinc_dust',
-        'stardust', 'fulgurite', 'pressure_crystal', 'void_dust',
-        'nihonium', 'magnetic_monopole',
-    ]),
     ('圧縮素材', [
         'compressed_block_1', 'compressed_block_2', 'compressed_block_3', 'compressed_metal_block_1',
         'compressed_metal_block_2', 'strange_matter',
     ]),
     ('中間素材', None),
-    ('触媒', [
-        'muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core',
-        'catalyst_stabilizer', 'spent_muon_catalyst', 'spent_bose_condensate_catalyst', 'spent_time_crystal_catalyst',
-        'spent_singularity_core',
+    ('白い建材', [
+        'white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel',
+        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_light_panel', 'black_reinforced_glass',
+        'black_star_glass',
+        'bismuth_crystal_block', 'glowing_bismuth_crystal',
+        'android_barrier_glass', 'android_barrier_glass_patterned', 'android_gate_glass',
+        'android_gate_glass_patterned',
     ]),
-    ('装置', [
-        'thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine',
-        'quantum_heat_engine', 'smes_cell', 'smes_module', 'kiln',
-        'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal',
-        'catalytic_reactor', 'precision_assembler', 'cosmic_muon_collector', 'entanglement_synthesizer',
-        'laser_cooler', 'echo_resonator', 'time_crystal_incubator', 'singularity_encapsulator',
-        'cooling_tower_controller', 'accelerator_controller', 'degenerate_compactor_controller', 'casimir_cavity_controller',
-        'degenerate_furnace_controller', 'core_controller', 'shield_tower_core', 'tipler_core',
-        'wormhole_generator_core', 'genesis_core', 'jet_forge_core', 'suspension_reservoir',
-        'pasta_accumulator', 'tidal_spindle', 'worldline_anchor_small', 'inertial_stabilizer',
-        'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector',
-        'void_collector', 'low_gravity_panel', 'high_gravity_panel', 'zero_gravity_block',
-        'zero_gravity_controller', 'gravitational_wave_detector', 'neutrino_observatory', 'probe_station',
-        'worldline_anchor_advanced', 'halo_collector', 'gravitational_containment_tank', 'wormhole_stabilizer',
-        'wormhole_mouth', 'wormhole_port', 'android_station', 'android_work_console',
-        'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
-        'advanced_android_workbench', 'quantum_android_workbench', 'rgb_dye_station', 'drone_station',
-        'drone_port', 'fluid_drone_port', 'horizon_vault', 'wormhole_drone_beacon',
-        'food_printer', 'coffee_maker', 'vending_machine',
-        'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator', 'seal_console',
-        'guardian_core', 'echo_projector', 'factory_line', 'factory_conveyor',
-    ]),
-    ('配線と配管', [
-        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
-        'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct',
-        'cover_frame',
-    ]),
-    ('マルチブロック部材', [
-        'multiblock_port', 'cooling_tower_base', 'cooling_tower_casing', 'cooling_tower_glass',
-        'cooling_tower_coolant_band', 'cooling_tower_rim', 'cooling_tower_grate', 'heat_exchange_core',
-        'accelerator_tube', 'focusing_magnet', 'degenerate_compactor_frame', 'degenerate_compactor_plate',
-        'degenerate_compactor_ram', 'degenerate_compactor_anvil', 'degenerate_compactor_vent', 'degenerate_compactor_window',
-        'casimir_cavity_frame', 'casimir_cavity_pump', 'casimir_cavity_wall', 'casimir_cavity_shield',
-        'casimir_cavity_window', 'mirror_plate', 'degenerate_furnace_frame', 'degenerate_furnace_shell',
-        'degenerate_furnace_piston', 'degenerate_furnace_fin', 'degenerate_furnace_tube', 'degenerate_furnace_window',
-        'reactor_shell', 'gyro_drive', 'reactor_stabilizer', 'extraction_port',
-        'reactor_mass_alarm', 'shield_tower_plinth', 'shield_tower_coil', 'shield_tower_body',
-        'shield_tower_waveguide', 'shield_tower_crown', 'tipler_frame', 'tipler_housing',
-        'tipler_bearing', 'tipler_window', 'tipler_holder', 'wormhole_generator_shell',
-        'wormhole_generator_coil', 'wormhole_generator_focuser', 'wormhole_generator_window', 'wormhole_generator_port',
-        'genesis_frame', 'genesis_pylon', 'jet_forge_foundation', 'jet_forge_confinement_coil',
-        'jet_forge_collimator', 'jet_forge_heat_sink', 'jet_forge_truss', 'jet_forge_levitator',
-        'jet_forge_collector', 'cosmic_frame', 'suspension_crown', 'suspension_strut',
-        'pasta_laminate', 'pasta_conductor', 'tidal_draw_ring', 'spindle_cradle',
-        'collapsar_lining',
-    ]),
-    ('建材', [
-        'white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal',
-        'white_glass_panel', 'white_star_glass_panel', 'white_sliding_door', 'black_reinforced_panel',
-        'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
-        'android_gate_glass', 'android_gate_glass_patterned',
+    ('遺構の建材', [
         'ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel',
         'vented_ruin_panel', 'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel',
-        'pristine_ruin_tiles', 'pristine_ruin_pillar', 'intact_ruin_glass', 'reinforced_ruin_glass',
-        'ruin_glass', 'lab_panel', 'lab_panel_lined', 'lab_tiles',
-        'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch',
-        'bulkhead', 'lab_door',
+        'pristine_ruin_tiles', 'pristine_ruin_pillar', 'pristine_ruin_light', 'intact_ruin_glass',
+        'reinforced_ruin_glass', 'broken_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber',
+        'ruin_lamp_verdant', 'ruin_lamp_violet', 'ruin_lamp_crimson',
     ]),
-    ('照明と家具', [
-        'pristine_ruin_light', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
-        'ruin_lamp_violet', 'ruin_lamp_crimson', 'facility_light', 'emergency_light',
-        'room_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit',
-        'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
-        'android_capsule', 'desk_monitor', 'paper_stack', 'trash_bin',
-    ]),
-    ('自然のブロック', [
-        'meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core',
-        'fulgurite_block',
-    ]),
-    ('封印コンテナ', [
-        'sealed_container_1', 'sealed_container_2', 'sealed_container_3', 'sealed_container_4',
-    ]),
-    ('道具と装備', [
-        'fluid_canister', 'neutrino_scanner', 'scanner_module_2', 'scanner_module_3',
-        'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
-        'graviton_manipulator', 'metric_drive', 'gravity_boots', 'dimensional_pocket',
-        'android_charger', 'android_armor_plate', 'survey_glasses', 'afterglow_wings',
-        'magnetic_key', 'quantum_key', 'temporal_key', 'singularity_key',
-        'unstable_wormhole_mouth',
-    ]),
-    ('アップグレード', [
-        'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2',
-        'capacity_upgrade_3', 'android_production_upgrade', 'android_factory_print_unit', 'android_transfer_upgrade',
-        'android_battery_upgrade', 'android_backpack_upgrade', 'android_reinforced_backpack_upgrade', 'android_large_backpack_upgrade',
-        'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade', 'android_mining_upgrade',
-        'android_felling_upgrade', 'drone_phase_upgrade', 'wormhole_seam_upgrade', 'collapsar_parallel_cassette',
-    ]),
-    ('輸送容器', [
-        'packing_crate', 'battery_packing_crate', 'large_battery_packing_crate', 'fluid_capsule',
-        'battery_fluid_capsule', 'large_battery_fluid_capsule',
-    ]),
-    ('アンドロイド装飾', [
-        'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress',
-        'android_glasses', 'android_cape', 'android_scarf', 'android_waist_ribbon',
-        'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
-        'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail',
-        'android_twin_tails', 'android_monocle', 'android_fairy_wings', 'android_apron',
-        'android_lantern', 'android_broom', 'android_necktie', 'android_diamond_necklace',
-        'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch',
-    ]),
-    ('食品と飲料', [
-        'canned_soda', 'sports_drink', 'energy_drink', 'coffee',
-        'food_cartridge', 'nutrient_bar', 'printed_steak', 'spiral_pasta',
-        'honeycomb_cake', 'fruit_gel_cube',
-    ]),
-    ('回収物と記録', None),
-    ('ボスの戦利品', [
-        'sentinel_core', 'degenerate_nucleus', 'precision_actuator', 'echo_chapter',
-        'gravity_chapter', 'horizon_chapter', 'ergosphere_chapter', 'terminus_record',
-        'archivist_halo', 'awakening_record_core', 'awakening_echo_core', 'awakening_gravity_core',
-        'awakening_foundry_core', 'awakening_ergosphere_core',
+    ('研究所の建材と調度品', [
+        'lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame',
+        'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead',
+        'lab_door', 'facility_light', 'emergency_light', 'room_light',
+        'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'lab_reactor_core',
+        'lab_reactor_console', 'server_rack', 'lab_terminal', 'android_capsule',
+        'desk_monitor', 'paper_stack', 'trash_bin',
     ]),
     ('設計図', [
         'blueprint_ruin_panels', 'blueprint_pristine_ruin', 'blueprint_ruin_glass', 'blueprint_lighting',
         'blueprint_lab_building', 'blueprint_lab_furniture', 'blueprint_rayleigh',
+    ]),
+    ('食品と飲料', [
+        'food_printer', 'food_cartridge', 'nutrient_bar', 'printed_steak',
+        'spiral_pasta', 'honeycomb_cake', 'fruit_gel_cube',
+        'coffee_maker', 'coffee', 'vending_machine', 'canned_soda',
+        'sports_drink', 'energy_drink',
+    ]),
+    ('遺跡の装置と封印', [
+        'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator', 'seal_console',
+        'guardian_core', 'echo_projector', 'factory_line', 'factory_conveyor',
+        'sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key',
+        'sealed_container_3', 'temporal_key', 'sealed_container_4', 'singularity_key',
+    ]),
+    ('回収物と記録', None),
+    ('ボスの戦利品', [
+        'sentinel_core', 'degenerate_nucleus', 'precision_actuator',
+        # 覚醒の核は、元のボスを倒す順（研究棟→封鎖培養施設→地下アンドロイド研究所→最終実験施設→沈んだ炉心区画）
+        'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_record_core',
+        'awakening_ergosphere_core',
+        # 最後の記録者: 覚醒したボスの断章 → 束ねた終焉の記録（呼び出し）→ 光輪（戦利品）
+        'echo_chapter', 'gravity_chapter', 'horizon_chapter', 'ergosphere_chapter',
+        'terminus_record', 'archivist_halo',
     ]),
     ('クリエイティブ専用', [
         'creative_energy_source', 'creative_catalyst', 'builder_wand',
     ]),
     ('スポーンエッグ', [
         'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
-        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'security_drone_spawn_egg', 'horizon_warden_spawn_egg',
-        'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg', 'last_archivist_spawn_egg',
-        'foundry_overseer_spawn_egg',
+        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'security_drone_spawn_egg',
+        # ボスのスポーンエッグはタブに出さない（/give でだけ渡す。Java の SinguloItems.HIDDEN）
     ]),
 ]
 
 
 def tab_order():
-    """種類ごとに並べる。中間素材は段階順、回収物は回収物・復元品・データカード順。"""
+    """機能ごとに並べる。中間素材は段階順。回収物はデータの原本・記録・復元品のあと、
+    復元品と同じ順に劣化品を並べ、残りの回収物とデータカードを続ける。"""
     explicit = [iid for _, ids in TAB_GROUPS if ids for iid in ids]
     if len(explicit) != len(set(explicit)):
         raise ValueError('Duplicate creative-tab classification')
-    placed = set(explicit)
-    salvage_names = list(EXPLORE) + [n for n in MOD if MOD[n][0] in ('record_fragment', 'sealed_record')] + list(RESTORED) + [n for n in MOD if n.startswith('データカード') or n == '白紙データカード'] \
-        + list(SPENT.values())
+    import building_variants
+    placed = set(explicit) | set(building_variants.VARIANTS)
+    data_originals = [n for n in EXPLORE if EXPLORE[n]['kind'] == 'data']
+    degraded = list(RESTORED.values())
+    salvage_names = data_originals + [n for n in MOD if MOD[n][0] in ('crystal_memory', 'sealed_record')] \
+        + list(RESTORED) + degraded + [n for n in EXPLORE if n not in data_originals and n not in degraded] \
+        + [n for n in MOD if n.startswith('データカード') or n == '白紙データカード'] + list(SPENT.values())
     salvage = []
     for n in salvage_names:
         iid = MOD[n][0] if n in MOD else None
@@ -3987,7 +4048,7 @@ def tab_order():
     stage_hint = {'strange_matter': 2}
     for n in sorted(names, key=lambda n: (stage_hint.get(MOD[n][0], stage_of(n)), names.index(n))):
         iid, _, kind = MOD[n]
-        if kind in ('fluid', 'structure') or iid in ITEMLESS_BLOCKS or iid in placed or iid in materials:
+        if kind in ('fluid', 'structure') or iid in ITEMLESS_BLOCKS or iid in TAB_EXCLUDED or iid in placed or iid in materials:
             continue
         if kind not in ('item', 'planned'):
             raise ValueError(f'Classify {iid} ({kind}) in TAB_GROUPS before generating')
@@ -3995,7 +4056,11 @@ def tab_order():
     out = []
     for title, ids in TAB_GROUPS:
         out += ids if ids is not None else materials if title == '中間素材' else salvage
-    return out
+    # 建材の階段・ハーフブロック・塀は、元の建材のすぐ後ろ
+    after = {}
+    for variant, (base, _shape) in building_variants.VARIANTS.items():
+        after.setdefault(base, []).append(variant)
+    return [i for iid in out for i in [iid] + after.get(iid, [])]
 
 
 def java_content():
@@ -4026,6 +4091,8 @@ def java_content():
     lines.append('    /** kind: item / planned / uses / catalyst。maxUses は使用回数（触媒は寿命tick）。 */')
     lines.append('    public record ItemDef(String id, String kind, int stage, int maxUses) {}')
     lines.append('    public record BlockDef(String id, int stage) {}')
+    lines.append('    /** 建材の変種（shape: stairs / slab / wall）。元の建材の性質を写して登録する。 */')
+    lines.append('    public record BlockVariant(String id, String base, String shape, int stage) {}')
     lines.append('    public record FluidDef(String id, int stage, int color, boolean gas) {}')
     lines.append('')
     lines.append('    public static final List<ItemDef> ITEMS = List.of(')
@@ -4034,6 +4101,12 @@ def java_content():
     lines.append('')
     lines.append('    public static final List<BlockDef> BLOCKS = List.of(')
     lines.append(',\n'.join(f'            new BlockDef("{i}", {s})' for i, s in blocks))
+    lines.append('    );')
+    lines.append('')
+    import building_variants
+    lines.append('    public static final List<BlockVariant> BLOCK_VARIANTS = List.of(')
+    lines.append(',\n'.join(f'            new BlockVariant("{v}", "{b}", "{sh}", {stage_of(next(n for n in MOD if MOD[n][0] == v))})'
+                             for v, (b, sh) in building_variants.VARIANTS.items()))
     lines.append('    );')
     lines.append('')
     lines.append('    /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */')
@@ -4069,7 +4142,7 @@ def java_content():
     lines.append('    );')
     lines.append('')
     machines = [(iid, stage_of(n)) for n, (iid, _, kind) in MOD.items()
-                if kind in ('machine', 'part_block', 'part_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature')]
+                if kind in ('machine', 'part_block', 'part_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature', 'variant')]
     lines.append('    /** 実装済み装置ブロックの段階（ツールチップ用）。 */')
     lines.append('    public static final Map<String, Integer> BLOCK_STAGES = Map.ofEntries(')
     lines.append(',\n'.join(f'            Map.entry("{i}", {s})' for i, s in machines))
@@ -4257,7 +4330,7 @@ def validate():
 
 
 # わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
-SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
+SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'broken_ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
                               'android_barrier_glass_item', 'android_barrier_glass_edge', 'android_gate_glass_item',
                               'android_gate_glass_edge',
                               'lab_glass', 'android_capsule_glass')   # 研究所のガラス・素体カプセルの筒
@@ -4366,6 +4439,8 @@ def main():
     food_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
     import cover_content
     cover_content.models({'ASSETS': ASSETS, 'RES': RES, 'write_json': write_json})
+    import building_variants
+    building_variants.models(write_json, ASSETS)
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()

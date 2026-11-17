@@ -7,7 +7,7 @@
   "ingredients": [
     {
       "ingredient": {
-        "item": "singulo:heat_exchange_core"
+        "item": "singulo:cooling_tower_heat_exchange_core"
       },
       "count": 1
     },

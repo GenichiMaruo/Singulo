@@ -228,7 +228,7 @@ public final class MachineGuiReviewHarness {
             value(data, CatalystDeviceBlockEntity.D_ENABLED, 1);
             var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO, kind, new ItemStackHandler(2), new ItemStackHandler(1), data);
             mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(),
-                    Component.translatable(shield ? "block.singulo.shield_tower_core" : "block.singulo.worldline_anchor_small")));
+                    Component.translatable(shield ? "block.singulo.shield_tower_core" : "block.singulo.worldline_anchor")));
             metrics.add(LANGUAGES[language] + "	catalyst-" + extra + "	0	0	176");
         } else if (extra >= 12 && extra <= 18) {
             // スロットの少ない装置（DeviceMenu）7種類。どれも動いている状態の値

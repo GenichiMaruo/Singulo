@@ -46,6 +46,7 @@ public final class Singulo {
         net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                 () -> io.github.genichimaruo.singulo.client.SinguloClient::init);
         SinguloFluids.FLUIDS.register(modBus);
+        io.github.genichimaruo.singulo.registry.LegacyIds.apply();   // 0.20.0 で改名した ID の引き継ぎ
         SinguloBlocks.BLOCKS.register(modBus);
         io.github.genichimaruo.singulo.registry.SinguloWorldgen.STRUCTURE_TYPES.register(modBus);
         io.github.genichimaruo.singulo.registry.SinguloWorldgen.PIECES.register(modBus);

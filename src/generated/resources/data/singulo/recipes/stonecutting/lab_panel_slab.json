@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:lab_panel"
+  },
+  "result": "singulo:lab_panel_slab",
+  "count": 2
+}

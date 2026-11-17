@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:white_panel"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "singulo:white_panel_slab"
+  }
+}

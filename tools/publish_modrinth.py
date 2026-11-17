@@ -106,7 +106,7 @@ def main():
     props = dict(line.split('=', 1) for line in (args.source / 'gradle.properties').read_text().splitlines()
                  if '=' in line and not line.startswith('#'))
     version, minecraft = props['mod_version'], props['minecraft_version']
-    if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', version):
+    if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?', version):
         raise RuntimeError('Expected semantic release version')
     if minecraft not in ('1.20.1', '1.21.1') or (minecraft == '1.21.1' and args.loader != 'neoforge'):
         raise RuntimeError('Unsupported Minecraft/loader combination')
@@ -114,7 +114,7 @@ def main():
     number = f'{version}-{minecraft}{suffix}'
     if args.jar.name != f'Singulo-{number}.jar':
         raise RuntimeError('Promoted JAR filename must match source version and loader')
-    release_type = args.type if args.type != 'auto' else ('beta' if version.split('.')[0] == '0' else 'release')
+    release_type = args.type if args.type != 'auto' else ('beta' if version.split('.')[0] == '0' or '-rc' in version else 'release')
     payload = {'project_id': os.environ.get('MODRINTH_PROJECT_ID'), 'name': args.jar.stem,
                'version_number': number, 'version_type': release_type, 'loaders': [args.loader],
                'game_versions': [minecraft], 'environment': 'client_and_server',

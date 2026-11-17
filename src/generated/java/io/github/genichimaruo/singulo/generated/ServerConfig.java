@@ -97,6 +97,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.IntValue PULL_CHECK_INTERVAL_TICKS;
     public static final ForgeConfigSpec.IntValue MAX_ANCHOR_CHUNK_RADIUS;
     public static final ForgeConfigSpec.IntValue MAX_ANCHORS_PER_PLAYER;
+    public static final ForgeConfigSpec.BooleanValue SHARE_WITH_TEAM;
     public static final ForgeConfigSpec SPEC;
 
     static {
@@ -190,6 +191,7 @@ public final class ServerConfig {
         ForgeConfigSpec.IntValue PULL_CHECK_INTERVAL_TICKS_;
         ForgeConfigSpec.IntValue MAX_ANCHOR_CHUNK_RADIUS_;
         ForgeConfigSpec.IntValue MAX_ANCHORS_PER_PLAYER_;
+        ForgeConfigSpec.BooleanValue SHARE_WITH_TEAM_;
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
         b.push("general");
         b.comment("難易度の倍率を個別の値の上に掛ける。casual: スター不要・触媒寿命×2・遺構の再生×0.5・ウォーデンHP×0.5・殻の圧縮量×0.5。expert: スター×2・触媒寿命×0.75・修復2回まで・殻の圧縮量×1.5・点火エネルギー×2。standard と custom は個別の値のまま", "範囲: \"casual\" / \"standard\" / \"expert\" / \"custom\"");
@@ -395,6 +397,10 @@ public final class ServerConfig {
         b.comment("1人が同時に動かせるワールドライン・アンカー（小・上位の合計）の数。0で無制限。上限を超えたアンカーは置けるが動かない（先に動き出したものが優先）。この版より前に置いたアンカーは、置き直すまで数えない", "範囲: 0〜1000");
         MAX_ANCHORS_PER_PLAYER_ = b.defineInRange("maxAnchorsPerPlayer", 8, 0, 1000);
         b.pop();
+        b.push("sharing");
+        b.comment("持ち主と同じバニラのチーム（/team）の人も、アンドロイド・ドローン・作業指令台を使える（許可証で人を絞っていても、チームの人は登録しなくてよい）。ドローン発着ポートは持ち主とチームの人だけ", "範囲: true / false");
+        SHARE_WITH_TEAM_ = b.define("shareWithTeam", true);
+        b.pop();
         PRESET = PRESET_;
         SETTINGS_VERSION = SETTINGS_VERSION_;
         STARS_PER_EXOTIC_BATCH = STARS_PER_EXOTIC_BATCH_;
@@ -485,6 +491,7 @@ public final class ServerConfig {
         PULL_CHECK_INTERVAL_TICKS = PULL_CHECK_INTERVAL_TICKS_;
         MAX_ANCHOR_CHUNK_RADIUS = MAX_ANCHOR_CHUNK_RADIUS_;
         MAX_ANCHORS_PER_PLAYER = MAX_ANCHORS_PER_PLAYER_;
+        SHARE_WITH_TEAM = SHARE_WITH_TEAM_;
         SPEC = b.build();
     }
 }

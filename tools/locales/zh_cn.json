@@ -775,7 +775,7 @@
     "source": "Fluid Pipe",
     "translation": "流体管道"
   },
-  "block.singulo.core_controller": {
+  "block.singulo.reactor_core_controller": {
     "source": "Core Controller",
     "translation": "炉心控制器"
   },
@@ -879,7 +879,7 @@
     "source": "Entanglement Synthesizer",
     "translation": "量子纠缠合成器"
   },
-  "block.singulo.extraction_port": {
+  "block.singulo.reactor_extraction_port": {
     "source": "Extraction Port",
     "translation": "提取端口"
   },
@@ -895,7 +895,7 @@
     "source": "Production Line",
     "translation": "生产线"
   },
-  "block.singulo.focusing_magnet": {
+  "block.singulo.accelerator_focusing_magnet": {
     "source": "Focusing Magnet",
     "translation": "聚焦磁体"
   },
@@ -935,7 +935,7 @@
     "source": "Guardian Seal Core",
     "translation": "守卫封印核心"
   },
-  "block.singulo.gyro_drive": {
+  "block.singulo.reactor_gyro_drive": {
     "source": "Gyro Drive",
     "translation": "陀螺驱动装置"
   },
@@ -943,7 +943,7 @@
     "source": "Halo Collector",
     "translation": "晕收集器"
   },
-  "block.singulo.heat_exchange_core": {
+  "block.singulo.cooling_tower_heat_exchange_core": {
     "source": "Heat Exchange Core",
     "translation": "热交换核心"
   },
@@ -1063,7 +1063,7 @@
     "source": "Meteorite Fusion Crust",
     "translation": "陨石熔壳"
   },
-  "block.singulo.mirror_plate": {
+  "block.singulo.casimir_cavity_mirror_plate": {
     "source": "Mirror Plate",
     "translation": "镜板"
   },
@@ -1135,11 +1135,11 @@
     "source": "Rayleigh Sky Panel",
     "translation": "瑞利散射面板"
   },
-  "block.singulo.reactor_console": {
+  "block.singulo.lab_reactor_console": {
     "source": "Reactor Control Panel",
     "translation": "动力炉控制台"
   },
-  "block.singulo.reactor_core": {
+  "block.singulo.lab_reactor_core": {
     "source": "Reactor Core",
     "translation": "炉心"
   },
@@ -1175,7 +1175,7 @@
     "source": "Ruin Cache",
     "translation": "废墟保管库"
   },
-  "block.singulo.ruin_glass": {
+  "block.singulo.broken_ruin_glass": {
     "source": "Broken Ruin Glass",
     "translation": "破碎的废墟玻璃"
   },
@@ -1375,11 +1375,11 @@
     "source": "Starred White Glass Panel",
     "translation": "四芒星白色玻璃面板"
   },
-  "block.singulo.worldline_anchor_advanced": {
+  "block.singulo.advanced_worldline_anchor": {
     "source": "Worldline Anchor (Advanced)",
     "translation": "世界线锚（高级）"
   },
-  "block.singulo.worldline_anchor_small": {
+  "block.singulo.worldline_anchor": {
     "source": "Worldline Anchor (Small)",
     "translation": "世界线锚（小型）"
   },
@@ -1775,7 +1775,7 @@
     "source": "The frame almost every machine is built on.",
     "translation": "几乎每台机器都建立在这个框架上。"
   },
-  "desc.singulo.bh_container": {
+  "desc.singulo.empty_black_hole_vessel": {
     "source": "A vessel for holding a tiny black hole.",
     "translation": "容纳微小黑洞的容器。"
   },
@@ -1999,7 +1999,7 @@
     "source": "A stage 1 pipe for fluids and gases: 2,000 mB per tick. Connects on its own, sends outputs to the machines that use them and draws from adjacent water and lava sources.",
     "translation": "输送液体和气体的阶段1管道：每 tick 2,000 mB。放置后自动连接，把产物送往需要它的机器，也会从相邻的水源和熔岩源抽取。"
   },
-  "desc.singulo.core_controller": {
+  "desc.singulo.reactor_core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
     "translation": "放在炉心中心正下方 5 格处。从其界面点燃反应堆。"
   },
@@ -2196,8 +2196,8 @@
     "translation": "能层巨蛇沉入漩涡后浮现的一段记录：第二座反应堆运行记录的后续。也用于觉醒涡核。"
   },
   "desc.singulo.ergosphere_ring": {
-    "source": "Extracts exotic matter from a fast-spinning core.",
-    "translation": "从高速自旋的炉心中提取奇异物质。"
+    "source": "Goes in a slot of the P-Reactor core controller and extracts exotic matter from a fast-spinning core.",
+    "translation": "放入彭罗斯反应堆炉心控制器界面的槽位后，从高速自旋的炉心中提取奇异物质。"
   },
   "desc.singulo.event_horizon_shield": {
     "source": "Protects a 32-block radius from explosions, griefing and hostile spawns.",
@@ -2211,7 +2211,7 @@
     "source": "Right-click to point at the nearest ruin of the chosen kind. Sneak-use to change the kind.",
     "translation": "右键指向所选类型中最近的废墟。潜行使用可切换类型。"
   },
-  "desc.singulo.extraction_port": {
+  "desc.singulo.reactor_extraction_port": {
     "source": "Power/fuel port for the reactor. Replaces any ring shell block (not the gyro drives).",
     "translation": "反应堆的电力/燃料端口。可替换环上任意外壳方块（陀螺驱动装置除外）。"
   },
@@ -2231,7 +2231,7 @@
     "source": "Holds up to 1,000 mB of any liquid or gas. Right-click a machine to fill it from the output tank or pour it into the input tank. Carries hydrogen (Electrolyzer to Particle Accelerator), helium (Compressor to Cooling Tower) and liquid helium without pipes.",
     "translation": "可装入任意液体或气体，最多 1,000 mB。右键机器时，会从输出储罐中灌装，或倒入输入储罐。无需流体管道即可搬运氢气（电解槽→粒子加速器）、氦气（压缩机→冷却塔）和液氦。"
   },
-  "desc.singulo.focusing_magnet": {
+  "desc.singulo.accelerator_focusing_magnet": {
     "source": "Magnet for the ring corners and at least 1/4 of the ring.",
     "translation": "放在环的四角，且至少占环的 1/4 的磁体。"
   },
@@ -2291,7 +2291,7 @@
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
     "translation": "埋在废墟首领房间地板中的封印。挑战者进入房间时，会唤醒该废墟的守卫。无法破坏。"
   },
-  "desc.singulo.gyro_drive": {
+  "desc.singulo.reactor_gyro_drive": {
     "source": "Placed where the reactor rings cross.",
     "translation": "放置在反应堆环交叉的地方。"
   },
@@ -2304,14 +2304,14 @@
     "translation": "右键打开。介绍目标、机器、多方块结构，并显示你的进度。"
   },
   "desc.singulo.hawking_collector": {
-    "source": "Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
-    "translation": "炉心质量较小时（催化剂模式；开启回收运转即可保持），每5分钟收集1个霍金凝聚体。"
+    "source": "Goes in a slot of the P-Reactor core controller. Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
+    "translation": "放入彭罗斯反应堆炉心控制器界面的槽位。炉心质量较小时（催化剂模式；开启回收运转即可保持），每5分钟收集1个霍金凝聚体。"
   },
   "desc.singulo.hawking_condensate": {
     "source": "Condensed Hawking radiation.",
     "translation": "汇聚霍金辐射的凝聚体。"
   },
-  "desc.singulo.heat_exchange_core": {
+  "desc.singulo.cooling_tower_heat_exchange_core": {
     "source": "Heat exchangers stacked up the middle of the tower.",
     "translation": "堆叠在塔中央的热交换器。"
   },
@@ -2356,8 +2356,8 @@
     "translation": "完好保存的古代窗户，与废墟面板一样坚固且耐爆炸。"
   },
   "desc.singulo.jet_collector": {
-    "source": "Collects jet condensate from the reactor.",
-    "translation": "从反应堆中收集喷流凝聚体。"
+    "source": "Goes in a slot of the P-Reactor core controller and collects jet condensate from the core’s jets.",
+    "translation": "放入彭罗斯反应堆炉心控制器界面的槽位后，从炉心的喷流中收集喷流凝聚体。"
   },
   "desc.singulo.jet_condensate": {
     "source": "Condensed particles from a relativistic jet.",
@@ -2487,11 +2487,11 @@
     "source": "Switch between low gravity, flight and high gravity.",
     "translation": "在低重力、飞行和高重力之间切换。"
   },
-  "desc.singulo.micro_black_hole": {
+  "desc.singulo.micro_black_hole_vessel": {
     "source": "Holds a tiny black hole. Bends light around it.",
     "translation": "封存着一个微小黑洞。会使周围的光线弯曲。"
   },
-  "desc.singulo.mirror_plate": {
+  "desc.singulo.casimir_cavity_mirror_plate": {
     "source": "Inner 3×3 of the cavity top and bottom: two facing mirrors.",
     "translation": "放在空腔顶面和底面内侧的 3×3，构成两面相对的镜子。"
   },
@@ -2651,11 +2651,11 @@
     "source": "A sky projection panel for ceilings. Powered by a panel receiver (20 FE/t each, shared across all joined panels), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
     "translation": "贴在天花板上的天空投影板。由面板受电器供电后（每块20 FE/t，分配给相连的全部面板），底面会映出没有云和太阳的正午蓝天，并像阳光一样照亮正下方（亮度15，正下方的阳光探测器始终输出正午的数值）。不会变成夜晚。断电后像午夜一样漆黑。并排放置时边框会消失，连成一片宽广的天空。用瑞利散射面板的设计图制作。"
   },
-  "desc.singulo.reactor_console": {
+  "desc.singulo.lab_reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",
     "translation": "中央动力炉的控制台。右键启动动力炉后，设施将恢复供电。"
   },
-  "desc.singulo.reactor_core": {
+  "desc.singulo.lab_reactor_core": {
     "source": "The central reactor core. It glows bright cyan once power returns.",
     "translation": "中央动力炉的炉心。恢复供电后会发出强烈的青光。"
   },
@@ -2675,7 +2675,7 @@
     "source": "Record a recipe on it in a work console's Record tab and place it in a recipe rack. Sneak-use on nothing to clear it. Hold Shift to see what it makes.",
     "translation": "在作业指令台的“记录”中记录配方，然后放进配方架。对着空处潜行右键会清除配方。按住 Shift 会显示制作的物品。"
   },
-  "desc.singulo.record_fragment": {
+  "desc.singulo.crystal_memory": {
     "source": "A storage medium with records etched in glass by light.",
     "translation": "以光在玻璃内部刻录信息的存储介质。"
   },
@@ -2699,7 +2699,7 @@
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
     "translation": "存放废墟回收物的保管库。清空数天后内容会恢复（被移动过的不会）。漏斗和管道无法从中取出物品。"
   },
-  "desc.singulo.ruin_glass": {
+  "desc.singulo.broken_ruin_glass": {
     "source": "A cracked ancient window, as tough and blast-resistant as a ruin panel.",
     "translation": "碎裂后残留下来的古代窗户，与废墟面板一样坚固且耐爆炸。"
   },
@@ -2731,11 +2731,11 @@
     "source": "Ancient building panel.",
     "translation": "古建筑板材。"
   },
-  "desc.singulo.scanner_module_2": {
+  "desc.singulo.neutrino_scanner_module_2": {
     "source": "Use with a Neutrino Scanner in your other hand, or on an observatory, to reach sensitivity 2: gold, diamond and emerald show up.",
     "translation": "另一只手持中微子扫描仪时使用，或对观测站使用，可将灵敏度提升到 2：金、钻石、绿宝石也会显示。"
   },
-  "desc.singulo.scanner_module_3": {
+  "desc.singulo.neutrino_scanner_module_3": {
     "source": "Raises sensitivity to 3: ancient debris and ores that need a diamond pickaxe show up.",
     "translation": "将灵敏度提升到 3：远古残骸和需要钻石镐的矿石也会显示。"
   },
@@ -2820,8 +2820,8 @@
     "translation": "用于打开或封印奇点锁容器。每次使用都会消耗。"
   },
   "desc.singulo.singularity_seed": {
-    "source": "Becomes a black hole core when ignited.",
-    "translation": "被点燃后成为黑洞核心。"
+    "source": "Put it in a slot of the P-Reactor core controller and ignite it to make a black hole core. It also ignites the Accretion Jet Forge and opens the core of the Suspension Reservoir, Nuclear Pasta Accumulator and Tidal Spindle.",
+    "translation": "放入彭罗斯反应堆炉心控制器界面的槽位并点火后，会成为黑洞炉心。也可用于点燃吸积喷流锻造炉，以及开启重力悬吊储罐、核面食层叠储能库和潮汐纺丝机的炉心。"
   },
   "desc.singulo.smes_cell": {
     "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen. Items that take power, placed in the charge slot of its screen, are charged and come out in the next slot when full.",
@@ -3039,11 +3039,11 @@
     "source": "Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.",
     "translation": "潜行右键方块来记录其位置（叠在一起时只分出一张来记录）。对着空处潜行右键会清除记录。用记录了作业指令台的卡右键资材口、交付口或配方架即可连接。按住 Shift 会显示记录的方块。"
   },
-  "desc.singulo.worldline_anchor_advanced": {
+  "desc.singulo.advanced_worldline_anchor": {
     "source": "Advanced chunk loader. Embedding a Singularity Core makes it free and maximal.",
     "translation": "高级区块加载器。嵌入奇点核心后无需消耗且范围最大。"
   },
-  "desc.singulo.worldline_anchor_small": {
+  "desc.singulo.worldline_anchor": {
     "source": "Keeps nearby chunks loaded while fed a catalyst.",
     "translation": "供给催化剂时，保持附近的区块加载。"
   },
@@ -4148,7 +4148,7 @@
     "translation": "附近没有被封锁的保管库"
   },
   "gui.singulo.console.open": {
-    "source": "The vault is not sealed (use an Awakening Record Core to fight the awakened warden)",
+    "source": "The vault is not sealed (use an Awakened Record Core to fight the awakened warden)",
     "translation": "保管库的封锁已解除（使用觉醒记录核可与觉醒的守卫再战）"
   },
   "gui.singulo.console.reset": {
@@ -5444,8 +5444,8 @@
     "translation": "收获"
   },
   "gui.singulo.recipe_encoder.kind.hint": {
-    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Use: flip levers, press buttons and the like",
-    "translation": "切换要添加的步骤种类（右键反向）。放入/取出：放入或取出装置。采掘/伐木：挖掘范围或砍树（需要升级）。收获：收取作物并补种。繁殖/剪毛/挤奶/处理：照料范围内的动物。操作：使用拉杆、按钮等"
+    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Farm: till an area and plant seeds, or give bone meal (needs an upgrade). Fish: fish in an area of water (needs an upgrade). Use: flip levers, press buttons and the like",
+    "translation": "切换要添加的步骤种类（右键反向）。放入/取出：放入或取出装置。采掘/伐木：挖掘范围或砍树（需要升级）。收获：收取作物并补种。繁殖/剪毛/挤奶/处理：照料范围内的动物。耕种：翻土并种下种子或树苗，或施骨粉（需要升级）。钓鱼：在范围内的水中钓鱼（需要升级）。操作：使用拉杆、按钮等"
   },
   "gui.singulo.recipe_encoder.kind.insert": {
     "source": "Insert",
@@ -6564,8 +6564,8 @@
     "translation": "仿生人的装饰"
   },
   "guide.singulo.androids.farm.body": {
-    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
-    "translation": "・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。作出的物品装不进仿生人的物品栏时，不会掉在脚下，而是放进作业台的暂存箱，之后再来取（取不了的物品可以右键取出）。暂存箱里有物品时，工作台上方会浮现其中一件。上位的改良型（8倍速·54格·电量消耗6成）和量子型（20倍速·81格·电量消耗3成）以前一阶段的工作台为材料制作。"
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Farm (tills soil and plants seeds, or gives bone meal to growing crops; needs a Farming Upgrade), Fish (fishes in an area of water; needs a Fishing Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
+    "translation": "・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、耕种（翻土并种下种子或树苗。若是骨粉则施给正在生长的作物。需要农业升级）、钓鱼（在范围内的水中钓鱼。需要钓鱼升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。作出的物品装不进仿生人的物品栏时，不会掉在脚下，而是放进作业台的暂存箱，之后再来取（取不了的物品可以右键取出）。暂存箱里有物品时，工作台上方会浮现其中一件。上位的改良型（8倍速·54格·电量消耗6成）和量子型（20倍速·81格·电量消耗3成）以前一阶段的工作台为材料制作。"
   },
   "guide.singulo.androids.farm.title": {
     "source": "Farming, fluids and fuel",
@@ -6580,8 +6580,8 @@
     "translation": "第一次作业订单"
   },
   "guide.singulo.androids.gear.body": {
-    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
-    "translation": "- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外加上背包的格子。共 3 个等级：背包 12 格、强化背包 18 格、大型背包 24 格，每级都用低一级的背包制作。背包里有物品时无法取下，但可以直接换成装得下这些物品的更大背包。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 伐木升级：使仿生人能进行伐木作业（相当于钻石斧）。可附上效率、时运和精准采集。\n- 储罐升级：2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。腰部会出现储罐。储罐里还有东西时无法取下。用桶等点击界面中的储罐可以取放，按住 Shift 点击旁边的 × 会倒掉内容物。\n- 气体储罐升级・气体与液体升级（仅在安装了 Mekanism 时）：可搬运 Mekanism 化学品（气体、灌注物、颜料、浆液）的储罐。气体储罐可装 2 种化学品（各 32,000 mB），气体与液体可装液体和化学品各 2 种（各 16,000 mB）。腰部会出现气瓶。用化学品储罐等点击界面中的储罐可以取放。作业时，资材口旁的化学品储罐会成为资材存放处，仿生人会把化学品运到装置。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。\n- 整理・存放：背包栏右上角的按钮可以整理携带物品和背包内的物品，或让仿生人走去把它们放进附近的箱子（12 格以内的箱子、木桶、潜影盒、资材口）。"
+    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Fishing Upgrade: lets the android fish. Takes Luck of the Sea and Lure.\n- Farming Upgrade: lets the android farm (till soil and plant seeds, or give bone meal).\n- Mining, Felling, Fishing and Farming Upgrades fit either of the two tool slots (one of each kind).\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
+    "translation": "- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外加上背包的格子。共 3 个等级：背包 12 格、强化背包 18 格、大型背包 24 格，每级都用低一级的背包制作。背包里有物品时无法取下，但可以直接换成装得下这些物品的更大背包。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 伐木升级：使仿生人能进行伐木作业（相当于钻石斧）。可附上效率、时运和精准采集。\n- 钓鱼升级：使仿生人能进行钓鱼作业。可附上海之眷顾和饵钓。\n- 农业升级：使仿生人能进行耕种作业（翻土并种下种子或树苗、施骨粉）。\n- 采掘、伐木、钓鱼和农业升级可以装在两个工具槽中的任意一个（同种工具只能装一个）。\n- 储罐升级：2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。腰部会出现储罐。储罐里还有东西时无法取下。用桶等点击界面中的储罐可以取放，按住 Shift 点击旁边的 × 会倒掉内容物。\n- 气体储罐升级・气体与液体升级（仅在安装了 Mekanism 时）：可搬运 Mekanism 化学品（气体、灌注物、颜料、浆液）的储罐。气体储罐可装 2 种化学品（各 32,000 mB），气体与液体可装液体和化学品各 2 种（各 16,000 mB）。腰部会出现气瓶。用化学品储罐等点击界面中的储罐可以取放。作业时，资材口旁的化学品储罐会成为资材存放处，仿生人会把化学品运到装置。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。\n- 整理・存放：背包栏右上角的按钮可以整理携带物品和背包内的物品，或让仿生人走去把它们放进附近的箱子（12 格以内的箱子、木桶、潜影盒、资材口）。"
   },
   "guide.singulo.androids.gear.title": {
     "source": "Android upgrades",
@@ -6888,7 +6888,7 @@
     "translation": "废墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
+    "source": "The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakened Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
     "translation": "研究楼、封闭培养设施、地下仿生人研究所、最终实验室和沉没的炉心区的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间后，守卫仍会停留 3 分钟（让倒下的人回来取装备），之后若无人返回才会复原。开启服务器设置 bossHardMode 后，守卫会变得更强。击败后的掉落物会出现在地板上的守卫封印核心（视界守卫为封印控制台）上方，经验则由房间内的挑战者平分并直接获得（经验修补依然有效）。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按战斗开始时的挑战者人数掉落（之后加入的人不会增加掉落）。多人攻击时，每个人的攻击都不会被他人挡住（同一个人连续攻击，仍需像以往一样稍作间隔）。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。重力井在拉扯之后会蓄力（有光和声音预兆），把附近的对手弹飞，然后漂移到房间的其他位置。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。最后形态在你脚下展开的奇点会先预警 1 秒再开始牵引，请立刻离开。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。"
   },
   "guide.singulo.ruins.bosses.title": {
@@ -7124,7 +7124,7 @@
     "translation": "副产品和奇点核心"
   },
   "guide.singulo.stage5.endgame.body": {
-    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
+    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakened Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
     "translation": "有了奇点核心和大量电力，就可以运行后期设备：护盾、蒂普勒圆柱和虫洞。人造星核让你不必再寻找下界之星。\n想要真正的战斗，就在奇点封装器中制作觉醒记录核，并在最终实验室的封印控制台上使用：觉醒的视界守卫拥有 2.5 倍生命和 1.5 倍伤害。击败它可获得超频芯片等奖励，可反复挑战。\n研究楼和封闭培养设施的守卫也能再战：在它们的守卫封印核心上使用觉醒回响核或觉醒重力核即可。\n攻略最终实验室后，调校探索罗盘去寻找沉没的炉心区：能层巨蛇栖息在停止运转的第二座反应堆中。\n据说觉醒的守卫倒下时会掉落记录的断章。集齐所有断章后，能读到什么呢？"
   },
   "guide.singulo.stage5.endgame.title": {
@@ -7391,7 +7391,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
   },
-  "howto.singulo.bh_container": {
+  "howto.singulo.empty_black_hole_vessel": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
@@ -7563,7 +7563,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制造地：工作台（第 1 阶段）"
   },
-  "howto.singulo.core_controller": {
+  "howto.singulo.reactor_core_controller": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
@@ -7743,7 +7743,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
   },
-  "howto.singulo.extraction_port": {
+  "howto.singulo.reactor_extraction_port": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
@@ -7755,7 +7755,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
   },
-  "howto.singulo.focusing_magnet": {
+  "howto.singulo.accelerator_focusing_magnet": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制作：工作台（阶段2）"
   },
@@ -7795,7 +7795,7 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "制作：精密组装台（阶段3）"
   },
-  "howto.singulo.gyro_drive": {
+  "howto.singulo.reactor_gyro_drive": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
@@ -7815,7 +7815,7 @@
     "source": "Made in: P-Reactor (catalyst mode) (stage 5)",
     "translation": "制作：彭罗斯反应堆（催化模式）（阶段5）"
   },
-  "howto.singulo.heat_exchange_core": {
+  "howto.singulo.cooling_tower_heat_exchange_core": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制作：工作台（阶段2）"
   },
@@ -7959,11 +7959,11 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
-  "howto.singulo.micro_black_hole": {
+  "howto.singulo.micro_black_hole_vessel": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "制作：奇点封装器（阶段5）"
   },
-  "howto.singulo.mirror_plate": {
+  "howto.singulo.casimir_cavity_mirror_plate": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "制作：精密组装台（阶段4）"
   },
@@ -8131,7 +8131,7 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
   },
-  "howto.singulo.ruin_glass": {
+  "howto.singulo.broken_ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
   },
@@ -8159,11 +8159,11 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作：工作台（阶段1）"
   },
-  "howto.singulo.scanner_module_2": {
+  "howto.singulo.neutrino_scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "制作：精密组装台（阶段4）"
   },
-  "howto.singulo.scanner_module_3": {
+  "howto.singulo.neutrino_scanner_module_3": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
@@ -8411,11 +8411,11 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制作：工作台（阶段2）"
   },
-  "howto.singulo.worldline_anchor_advanced": {
+  "howto.singulo.advanced_worldline_anchor": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制作：精密组装台（阶段5）"
   },
-  "howto.singulo.worldline_anchor_small": {
+  "howto.singulo.worldline_anchor": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制作：工作台（阶段2）"
   },
@@ -8664,7 +8664,7 @@
     "translation": "觉醒重力核"
   },
   "item.singulo.awakening_record_core": {
-    "source": "Awakening Record Core",
+    "source": "Awakened Record Core",
     "translation": "觉醒记录核"
   },
   "item.singulo.axe_android_spawn_egg": {
@@ -8679,7 +8679,7 @@
     "source": "Basic Frame",
     "translation": "基本框架"
   },
-  "item.singulo.bh_container": {
+  "item.singulo.empty_black_hole_vessel": {
     "source": "Empty BH Containment Vessel",
     "translation": "空黑洞容器"
   },
@@ -9007,7 +9007,7 @@
     "source": "Metric Drive",
     "translation": "度规驱动器"
   },
-  "item.singulo.micro_black_hole": {
+  "item.singulo.micro_black_hole_vessel": {
     "source": "Micro Black Hole Vessel",
     "translation": "微型黑洞容器"
   },
@@ -9095,7 +9095,7 @@
     "source": "Recipe Card",
     "translation": "配方卡"
   },
-  "item.singulo.record_fragment": {
+  "item.singulo.crystal_memory": {
     "source": "Crystal Memory",
     "translation": "水晶存储器"
   },
@@ -9135,11 +9135,11 @@
     "source": "Saber Android Spawn Egg",
     "translation": "光剑型仿生人刷怪蛋"
   },
-  "item.singulo.scanner_module_2": {
+  "item.singulo.neutrino_scanner_module_2": {
     "source": "Neutrino Sensitivity Module Mk2",
     "translation": "中微子灵敏度模块 Mk2"
   },
-  "item.singulo.scanner_module_3": {
+  "item.singulo.neutrino_scanner_module_3": {
     "source": "Neutrino Sensitivity Module Mk3",
     "translation": "中微子灵敏度模块 Mk3"
   },
@@ -11484,16 +11484,16 @@
     "translation": "用于：强化背包升级"
   },
   "uses.singulo.android_barrier_glass": {
-    "source": "Used in: Patterned Android Barrier Glass",
-    "translation": "用于：花纹仿生人阻隔玻璃"
+    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs",
+    "translation": "用于：花纹仿生人阻隔玻璃、仿生人阻隔玻璃楼梯"
   },
   "uses.singulo.android_gas_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
     "translation": "用于：气体与液体升级"
   },
   "uses.singulo.android_gate_glass": {
-    "source": "Used in: Patterned Android Gate Glass",
-    "translation": "用于：花纹仿生人透过玻璃"
+    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs",
+    "translation": "用于：花纹仿生人透过玻璃、仿生人透过玻璃楼梯"
   },
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
@@ -11520,14 +11520,14 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 53 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 53 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 55 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 55 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
     "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 29 个"
   },
-  "uses.singulo.bh_container": {
+  "uses.singulo.empty_black_hole_vessel": {
     "source": "Used in: Micro Black Hole Vessel",
     "translation": "用于：微型黑洞容器"
   },
@@ -11540,12 +11540,12 @@
     "translation": "用于：鿭、铋晶体块"
   },
   "uses.singulo.black_reinforced_glass": {
-    "source": "Used in: Starred Black Reinforced Glass",
-    "translation": "用于：四芒星黑色强化玻璃"
+    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs",
+    "translation": "用于：四芒星黑色强化玻璃、黑色强化玻璃楼梯"
   },
   "uses.singulo.black_reinforced_panel": {
-    "source": "Used in: High-Gravity Panel",
-    "translation": "用于：高重力面板"
+    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall, Glowing Black Reinforced Panel",
+    "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙、发光黑色强化面板"
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
@@ -11683,7 +11683,7 @@
     "source": "Used in: Cryogenic Cooling Tower",
     "translation": "用于：低温冷却塔"
   },
-  "uses.singulo.core_controller": {
+  "uses.singulo.reactor_core_controller": {
     "source": "Used in: P-Reactor",
     "translation": "用于：彭罗斯反应堆"
   },
@@ -11815,7 +11815,7 @@
     "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 35 more",
     "translation": "用途：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 35 项"
   },
-  "uses.singulo.focusing_magnet": {
+  "uses.singulo.accelerator_focusing_magnet": {
     "source": "Used in: Particle Accelerator",
     "translation": "用于：粒子加速器"
   },
@@ -11835,15 +11835,15 @@
     "source": "Used in: Impact Generator Panel",
     "translation": "用于：冲击发电面板"
   },
-  "uses.singulo.gyro_drive": {
+  "uses.singulo.reactor_gyro_drive": {
     "source": "Used in: P-Reactor",
     "translation": "用于：彭罗斯反应堆"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 6 more",
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakened Record Core, Awakened Echo Core and 6 more",
     "translation": "用于：微型黑洞容器、奇点核心、奇点锁钥匙、觉醒记录核、觉醒回响核 等 6 个"
   },
-  "uses.singulo.heat_exchange_core": {
+  "uses.singulo.cooling_tower_heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine, Jet Forge Heat Sink and 1 more",
     "translation": "用于：冷却塔控制器、低温冷却塔、冷却塔扩展、低温涡轮机、喷流锻造炉吸热板 等 1 个"
   },
@@ -11900,8 +11900,8 @@
     "translation": "用于：动力导管、素体舱"
   },
   "uses.singulo.lab_panel": {
-    "source": "Used in: Lined Lab Panel, Lab Floor Tiles",
-    "translation": "用于：研究所条纹面板、研究所地砖"
+    "source": "Used in: Lined Lab Panel, Lab Floor Tiles, Lab Panel Stairs, Lab Panel Slab, Lab Panel Wall",
+    "translation": "用于：研究所条纹面板、研究所地砖、研究所白色面板楼梯、研究所白色面板台阶、研究所白色面板墙"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -11915,11 +11915,11 @@
     "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 4 more",
     "translation": "用于：聚焦磁体、引力波探测器、C型腔磁屏蔽、磁瓶、陀螺驱动装置 等 4 个"
   },
-  "uses.singulo.micro_black_hole": {
+  "uses.singulo.micro_black_hole_vessel": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
     "translation": "用于：黑洞炸弹、引力子操控器、奇点锁钥匙"
   },
-  "uses.singulo.mirror_plate": {
+  "uses.singulo.casimir_cavity_mirror_plate": {
     "source": "Used in: C-Cavity",
     "translation": "用于：卡西米尔腔"
   },
@@ -11972,8 +11972,8 @@
     "translation": "用于：简并压缩炉砧座、简并前驱体"
   },
   "uses.singulo.pristine_ruin_panel": {
-    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip",
-    "translation": "用于：无瑕废墟瓷砖、无瑕废墟柱、无瑕废墟导光板"
+    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip, Pristine Ruin Panel Stairs, Pristine Ruin Panel Slab and 1 more",
+    "translation": "用于：无瑕废墟瓷砖、无瑕废墟柱、无瑕废墟导光板、无瑕废墟面板楼梯、无瑕废墟面板台阶 等 1 个"
   },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
@@ -11995,7 +11995,7 @@
     "source": "Used in: P-Reactor, Accretion Jet Forge",
     "translation": "用于：彭罗斯反应堆、吸积喷流锻造炉"
   },
-  "uses.singulo.record_fragment": {
+  "uses.singulo.crystal_memory": {
     "source": "Used in: Decoded Record",
     "translation": "用于：已解读的记录"
   },
@@ -12004,10 +12004,10 @@
     "translation": "用于：废墟灯（琥珀）、废墟灯（翠绿）、废墟灯（紫罗兰）、废墟灯（深红）"
   },
   "uses.singulo.ruin_panel": {
-    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
-    "translation": "用于：破裂的废墟面板、长满青苔的废墟面板、瓷砖废墟面板、通风废墟面板、带状废墟面板 等 1 个"
+    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 4 more",
+    "translation": "用于：破裂的废墟面板、长满青苔的废墟面板、瓷砖废墟面板、通风废墟面板、带状废墟面板 等 4 个"
   },
-  "uses.singulo.scanner_module_2": {
+  "uses.singulo.neutrino_scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
     "translation": "用于：中微子灵敏度模块 Mk3"
   },
@@ -12064,12 +12064,12 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 97 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 97 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 99 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 80 more",
-    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 80 项"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 82 more",
+    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 82 项"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 4 more",
@@ -12140,16 +12140,16 @@
     "translation": "用于：重力场稳定器、虫洞生成器聚焦器、虫洞入口外壳"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 25 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 25 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 26 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 26 个"
   },
   "uses.singulo.white_glass_panel": {
-    "source": "Used in: Starred White Glass Panel",
-    "translation": "用于：四芒星白色玻璃面板"
+    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs",
+    "translation": "用于：四芒星白色玻璃面板、白色玻璃面板楼梯"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
-    "translation": "用于：发光白色面板、白色滑动门、低重力面板、无重力方块"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
+    "translation": "用于：发光白色面板、白色滑动门、低重力面板、无重力方块、白色面板楼梯 等 2 个"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",
@@ -13123,11 +13123,11 @@
     "source": "Keeps showing ores and ruins in a wide area.",
     "translation": "持续向附近的人显示大范围内的矿石与遗迹。"
   },
-  "summary.singulo.scanner_module_2": {
+  "summary.singulo.neutrino_scanner_module_2": {
     "source": "Raises scanner sensitivity to show gold and diamonds.",
     "translation": "提高扫描仪灵敏度，也能显示金和钻石。"
   },
-  "summary.singulo.scanner_module_3": {
+  "summary.singulo.neutrino_scanner_module_3": {
     "source": "Maxes scanner sensitivity to show ancient debris.",
     "translation": "将扫描仪灵敏度提到最高，也能显示远古残骸。"
   },
@@ -13194,6 +13194,18 @@
   "summary.singulo.hawking_collector": {
     "source": "Collects H-Condensate while the reactor core is light.",
     "translation": "在堆芯较轻时收集 H 凝聚体。"
+  },
+  "summary.singulo.jet_collector": {
+    "source": "Goes in the P-Reactor and collects jet condensate.",
+    "translation": "放入彭罗斯反应堆，收集喷流凝聚体。"
+  },
+  "summary.singulo.ergosphere_ring": {
+    "source": "Goes in the P-Reactor and extracts exotic matter.",
+    "translation": "放入彭罗斯反应堆，提取奇异物质。"
+  },
+  "summary.singulo.singularity_seed": {
+    "source": "Ignite it in the P-Reactor to make a black hole core.",
+    "translation": "在彭罗斯反应堆中点火后成为黑洞炉心。"
   },
   "summary.singulo.helium_cartridge": {
     "source": "Carries 250 mB of liquid helium as an item.",
@@ -13683,7 +13695,7 @@
     "source": "Tidal Draw Ring",
     "translation": "潮汐拉丝环"
   },
-  "block.singulo.spindle_cradle": {
+  "block.singulo.tidal_spindle_cradle": {
     "source": "Spool Cradle",
     "translation": "线轴支座"
   },
@@ -13791,15 +13803,15 @@
     "source": "Made in: Crafting Table (stage 5)",
     "translation": "制造地：工作台（第 5 阶段）"
   },
-  "desc.singulo.spindle_cradle": {
+  "desc.singulo.tidal_spindle_cradle": {
     "source": "Bearing stands that hold the spool of the Tidal Spindle.",
     "translation": "支撑潮汐纺丝机线轴的轴承座。"
   },
-  "summary.singulo.spindle_cradle": {
+  "summary.singulo.tidal_spindle_cradle": {
     "source": "A stand that holds the spool.",
     "translation": "支撑线轴的底座。"
   },
-  "howto.singulo.spindle_cradle": {
+  "howto.singulo.tidal_spindle_cradle": {
     "source": "Made in: Crafting Table (stage 5)",
     "translation": "制造地：工作台（第 5 阶段）"
   },
@@ -14216,8 +14228,8 @@
     "translation": "眼镜、单片眼镜、耳环"
   },
   "gui.singulo.android.decor.4.hint": {
-    "source": "Waist ribbon, apron or brooch",
-    "translation": "腰部缎带、围裙、胸针"
+    "source": "Waist ribbon, apron, brooch or cat tail",
+    "translation": "腰部缎带、围裙、胸针、猫尾巴"
   },
   "tooltip.singulo.android_accessory.3": {
     "source": "Worn on an android's face (decoration page)",
@@ -14766,5 +14778,577 @@
   "message.singulo.work_link.endpoint_result": {
     "source": "Endpoint link: %s",
     "translation": "端点连接: %s"
+  },
+  "block.singulo.white_panel_stairs": {
+    "source": "White Panel Stairs",
+    "translation": "白色面板楼梯"
+  },
+  "block.singulo.white_panel_slab": {
+    "source": "White Panel Slab",
+    "translation": "白色面板台阶"
+  },
+  "block.singulo.white_panel_wall": {
+    "source": "White Panel Wall",
+    "translation": "白色面板墙"
+  },
+  "block.singulo.black_reinforced_panel_stairs": {
+    "source": "Black Reinforced Panel Stairs",
+    "translation": "黑色强化面板楼梯"
+  },
+  "block.singulo.black_reinforced_panel_slab": {
+    "source": "Black Reinforced Panel Slab",
+    "translation": "黑色强化面板台阶"
+  },
+  "block.singulo.black_reinforced_panel_wall": {
+    "source": "Black Reinforced Panel Wall",
+    "translation": "黑色强化面板墙"
+  },
+  "block.singulo.ruin_panel_stairs": {
+    "source": "Ruin Panel Stairs",
+    "translation": "废墟面板楼梯"
+  },
+  "block.singulo.ruin_panel_slab": {
+    "source": "Ruin Panel Slab",
+    "translation": "废墟面板台阶"
+  },
+  "block.singulo.ruin_panel_wall": {
+    "source": "Ruin Panel Wall",
+    "translation": "废墟面板墙"
+  },
+  "block.singulo.cracked_ruin_panel_stairs": {
+    "source": "Cracked Ruin Panel Stairs",
+    "translation": "破裂的废墟面板楼梯"
+  },
+  "block.singulo.cracked_ruin_panel_slab": {
+    "source": "Cracked Ruin Panel Slab",
+    "translation": "破裂的废墟面板台阶"
+  },
+  "block.singulo.cracked_ruin_panel_wall": {
+    "source": "Cracked Ruin Panel Wall",
+    "translation": "破裂的废墟面板墙"
+  },
+  "block.singulo.mossy_ruin_panel_stairs": {
+    "source": "Mossy Ruin Panel Stairs",
+    "translation": "长满青苔的废墟面板楼梯"
+  },
+  "block.singulo.mossy_ruin_panel_slab": {
+    "source": "Mossy Ruin Panel Slab",
+    "translation": "长满青苔的废墟面板台阶"
+  },
+  "block.singulo.mossy_ruin_panel_wall": {
+    "source": "Mossy Ruin Panel Wall",
+    "translation": "长满青苔的废墟面板墙"
+  },
+  "block.singulo.tiled_ruin_panel_stairs": {
+    "source": "Tiled Ruin Panel Stairs",
+    "translation": "瓷砖废墟面板楼梯"
+  },
+  "block.singulo.tiled_ruin_panel_slab": {
+    "source": "Tiled Ruin Panel Slab",
+    "translation": "瓷砖废墟面板台阶"
+  },
+  "block.singulo.tiled_ruin_panel_wall": {
+    "source": "Tiled Ruin Panel Wall",
+    "translation": "瓷砖废墟面板墙"
+  },
+  "block.singulo.pristine_ruin_panel_stairs": {
+    "source": "Pristine Ruin Panel Stairs",
+    "translation": "无瑕废墟面板楼梯"
+  },
+  "block.singulo.pristine_ruin_panel_slab": {
+    "source": "Pristine Ruin Panel Slab",
+    "translation": "无瑕废墟面板台阶"
+  },
+  "block.singulo.pristine_ruin_panel_wall": {
+    "source": "Pristine Ruin Panel Wall",
+    "translation": "无瑕废墟面板墙"
+  },
+  "block.singulo.pristine_ruin_tile_stairs": {
+    "source": "Pristine Ruin Tile Stairs",
+    "translation": "无瑕废墟瓷砖楼梯"
+  },
+  "block.singulo.pristine_ruin_tile_slab": {
+    "source": "Pristine Ruin Tile Slab",
+    "translation": "无瑕废墟瓷砖台阶"
+  },
+  "block.singulo.pristine_ruin_tile_wall": {
+    "source": "Pristine Ruin Tile Wall",
+    "translation": "无瑕废墟瓷砖墙"
+  },
+  "block.singulo.lab_panel_stairs": {
+    "source": "Lab Panel Stairs",
+    "translation": "研究所白色面板楼梯"
+  },
+  "block.singulo.lab_panel_slab": {
+    "source": "Lab Panel Slab",
+    "translation": "研究所白色面板台阶"
+  },
+  "block.singulo.lab_panel_wall": {
+    "source": "Lab Panel Wall",
+    "translation": "研究所白色面板墙"
+  },
+  "block.singulo.lab_tile_stairs": {
+    "source": "Lab Floor Tile Stairs",
+    "translation": "研究所地砖楼梯"
+  },
+  "block.singulo.lab_tile_slab": {
+    "source": "Lab Floor Tile Slab",
+    "translation": "研究所地砖台阶"
+  },
+  "block.singulo.lab_tile_wall": {
+    "source": "Lab Floor Tile Wall",
+    "translation": "研究所地砖墙"
+  },
+  "uses.singulo.cracked_ruin_panel": {
+    "source": "Used in: Cracked Ruin Panel Stairs, Cracked Ruin Panel Slab, Cracked Ruin Panel Wall",
+    "translation": "用于：破裂的废墟面板楼梯、破裂的废墟面板台阶、破裂的废墟面板墙"
+  },
+  "uses.singulo.mossy_ruin_panel": {
+    "source": "Used in: Mossy Ruin Panel Stairs, Mossy Ruin Panel Slab, Mossy Ruin Panel Wall",
+    "translation": "用于：长满青苔的废墟面板楼梯、长满青苔的废墟面板台阶、长满青苔的废墟面板墙"
+  },
+  "uses.singulo.tiled_ruin_panel": {
+    "source": "Used in: Tiled Ruin Panel Stairs, Tiled Ruin Panel Slab, Tiled Ruin Panel Wall",
+    "translation": "用于：瓷砖废墟面板楼梯、瓷砖废墟面板台阶、瓷砖废墟面板墙"
+  },
+  "uses.singulo.pristine_ruin_tiles": {
+    "source": "Used in: Pristine Ruin Tile Stairs, Pristine Ruin Tile Slab, Pristine Ruin Tile Wall",
+    "translation": "用于：无瑕废墟瓷砖楼梯、无瑕废墟瓷砖台阶、无瑕废墟瓷砖墙"
+  },
+  "uses.singulo.lab_tiles": {
+    "source": "Used in: Lab Floor Tile Stairs, Lab Floor Tile Slab, Lab Floor Tile Wall",
+    "translation": "用于：研究所地砖楼梯、研究所地砖台阶、研究所地砖墙"
+  },
+  "desc.singulo.white_panel_stairs": {
+    "source": "Stairs made from White Panel.",
+    "translation": "用白色面板制成的楼梯。"
+  },
+  "howto.singulo.white_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.white_panel_slab": {
+    "source": "A half-height White Panel. Two make a full block.",
+    "translation": "半格高的白色面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.white_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.white_panel_wall": {
+    "source": "A White Panel wall that connects like a fence.",
+    "translation": "白色面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.white_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_panel_stairs": {
+    "source": "Stairs made from Black Reinforced Panel.",
+    "translation": "用黑色强化面板制成的楼梯。"
+  },
+  "howto.singulo.black_reinforced_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_panel_slab": {
+    "source": "A half-height Black Reinforced Panel. Two make a full block.",
+    "translation": "半格高的黑色强化面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.black_reinforced_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_panel_wall": {
+    "source": "A Black Reinforced Panel wall that connects like a fence.",
+    "translation": "黑色强化面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.black_reinforced_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.ruin_panel_stairs": {
+    "source": "Stairs made from Ruin Panel.",
+    "translation": "用废墟面板制成的楼梯。"
+  },
+  "howto.singulo.ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.ruin_panel_slab": {
+    "source": "A half-height Ruin Panel. Two make a full block.",
+    "translation": "半格高的废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.ruin_panel_wall": {
+    "source": "A Ruin Panel wall that connects like a fence.",
+    "translation": "废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.cracked_ruin_panel_stairs": {
+    "source": "Stairs made from Cracked Ruin Panel.",
+    "translation": "用破裂的废墟面板制成的楼梯。"
+  },
+  "howto.singulo.cracked_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.cracked_ruin_panel_slab": {
+    "source": "A half-height Cracked Ruin Panel. Two make a full block.",
+    "translation": "半格高的破裂的废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.cracked_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.cracked_ruin_panel_wall": {
+    "source": "A Cracked Ruin Panel wall that connects like a fence.",
+    "translation": "破裂的废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.cracked_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.mossy_ruin_panel_stairs": {
+    "source": "Stairs made from Mossy Ruin Panel.",
+    "translation": "用长满青苔的废墟面板制成的楼梯。"
+  },
+  "howto.singulo.mossy_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.mossy_ruin_panel_slab": {
+    "source": "A half-height Mossy Ruin Panel. Two make a full block.",
+    "translation": "半格高的长满青苔的废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.mossy_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.mossy_ruin_panel_wall": {
+    "source": "A Mossy Ruin Panel wall that connects like a fence.",
+    "translation": "长满青苔的废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.mossy_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.tiled_ruin_panel_stairs": {
+    "source": "Stairs made from Tiled Ruin Panel.",
+    "translation": "用瓷砖废墟面板制成的楼梯。"
+  },
+  "howto.singulo.tiled_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.tiled_ruin_panel_slab": {
+    "source": "A half-height Tiled Ruin Panel. Two make a full block.",
+    "translation": "半格高的瓷砖废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.tiled_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.tiled_ruin_panel_wall": {
+    "source": "A Tiled Ruin Panel wall that connects like a fence.",
+    "translation": "瓷砖废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.tiled_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_panel_stairs": {
+    "source": "Stairs made from Pristine Ruin Panel.",
+    "translation": "用无瑕废墟面板制成的楼梯。"
+  },
+  "howto.singulo.pristine_ruin_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_panel_slab": {
+    "source": "A half-height Pristine Ruin Panel. Two make a full block.",
+    "translation": "半格高的无瑕废墟面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.pristine_ruin_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_panel_wall": {
+    "source": "A Pristine Ruin Panel wall that connects like a fence.",
+    "translation": "无瑕废墟面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.pristine_ruin_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_tile_stairs": {
+    "source": "Stairs made from Pristine Ruin Tile.",
+    "translation": "用无瑕废墟瓷砖制成的楼梯。"
+  },
+  "howto.singulo.pristine_ruin_tile_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_tile_slab": {
+    "source": "A half-height Pristine Ruin Tile. Two make a full block.",
+    "translation": "半格高的无瑕废墟瓷砖。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.pristine_ruin_tile_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.pristine_ruin_tile_wall": {
+    "source": "A Pristine Ruin Tile wall that connects like a fence.",
+    "translation": "无瑕废墟瓷砖制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.pristine_ruin_tile_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_panel_stairs": {
+    "source": "Stairs made from Lab Panel.",
+    "translation": "用研究所白色面板制成的楼梯。"
+  },
+  "howto.singulo.lab_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_panel_slab": {
+    "source": "A half-height Lab Panel. Two make a full block.",
+    "translation": "半格高的研究所白色面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.lab_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_panel_wall": {
+    "source": "A Lab Panel wall that connects like a fence.",
+    "translation": "研究所白色面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.lab_panel_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_tile_stairs": {
+    "source": "Stairs made from Lab Floor Tile.",
+    "translation": "用研究所地砖制成的楼梯。"
+  },
+  "howto.singulo.lab_tile_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_tile_slab": {
+    "source": "A half-height Lab Floor Tile. Two make a full block.",
+    "translation": "半格高的研究所地砖。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.lab_tile_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.lab_tile_wall": {
+    "source": "A Lab Floor Tile wall that connects like a fence.",
+    "translation": "研究所地砖制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "howto.singulo.lab_tile_wall": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "item.singulo.android_fishing_upgrade": {
+    "source": "Fishing Upgrade",
+    "translation": "钓鱼升级"
+  },
+  "item.singulo.android_farming_upgrade": {
+    "source": "Farming Upgrade",
+    "translation": "农业升级"
+  },
+  "tooltip.singulo.android_fishing_upgrade": {
+    "source": "Fishes in an area of water. Takes Luck of the Sea and Lure",
+    "translation": "在范围内的水中钓鱼。可附上海之眷顾和饵钓"
+  },
+  "tooltip.singulo.android_farming_upgrade": {
+    "source": "Tills soil, plants seeds and gives bone meal",
+    "translation": "翻土、种下种子或树苗并施骨粉"
+  },
+  "gui.singulo.recipe_encoder.kind.plant": {
+    "source": "Farm",
+    "translation": "耕种"
+  },
+  "gui.singulo.recipe_encoder.kind.fish": {
+    "source": "Fish",
+    "translation": "钓鱼"
+  },
+  "tooltip.singulo.procedure_card.plant": {
+    "source": "Plant %s (%s)",
+    "translation": "耕种：种下 %s（%s）"
+  },
+  "tooltip.singulo.procedure_card.fish": {
+    "source": "Fish until %s (%s)",
+    "translation": "钓鱼：直到收集到 %s（%s）"
+  },
+  "gui.singulo.work_console.error.no_fisher": {
+    "source": "%s needs fishing, but no chosen android has a Fishing Upgrade",
+    "translation": "%s 的步骤包含钓鱼，但所选仿生人都没有钓鱼升级"
+  },
+  "gui.singulo.work_console.error.no_farmer": {
+    "source": "%s needs farming, but no chosen android has a Farming Upgrade",
+    "translation": "%s 的步骤包含耕种，但所选仿生人都没有农业升级"
+  },
+  "gui.singulo.work_console.needs_fisher": {
+    "source": "This order includes fishing, so only androids with a Fishing Upgrade can be chosen",
+    "translation": "此订单包含钓鱼工序，只能选择装有钓鱼升级的仿生人"
+  },
+  "gui.singulo.work_console.needs_farmer": {
+    "source": "This order includes farming, so only androids with a Farming Upgrade can be chosen",
+    "translation": "此订单包含耕种工序，只能选择装有农业升级的仿生人"
+  },
+  "gui.singulo.work_console.activity.fish": {
+    "source": "Fishing",
+    "translation": "钓鱼中"
+  },
+  "gui.singulo.work_console.activity.plant": {
+    "source": "Farming",
+    "translation": "耕种中"
+  },
+  "desc.singulo.android_fishing_upgrade": {
+    "source": "Lets a guard android do fishing steps on procedure cards (fishing in the water of an area). Takes Luck of the Sea and Lure.",
+    "translation": "装在护卫仿生人的工具槽后，可执行步骤卡的钓鱼（在范围内的水中钓鱼）。可附上海之眷顾和饵钓。"
+  },
+  "summary.singulo.android_fishing_upgrade": {
+    "source": "Lets an android fish in an area of water.",
+    "translation": "让仿生人在范围内的水中钓鱼。"
+  },
+  "howto.singulo.android_fishing_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制作：精密组装台（阶段2）"
+  },
+  "desc.singulo.android_farming_upgrade": {
+    "source": "Lets a guard android do farming steps on procedure cards: tilling soil and planting seeds, or giving bone meal to growing crops.",
+    "translation": "装在护卫仿生人的工具槽后，可执行步骤卡的耕种：翻土并种下种子或树苗，或给正在生长的作物施骨粉。"
+  },
+  "summary.singulo.android_farming_upgrade": {
+    "source": "Lets an android till soil and plant seeds.",
+    "translation": "让仿生人翻土并种下种子。"
+  },
+  "howto.singulo.android_farming_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制作：精密组装台（阶段2）"
+  },
+  "block.singulo.white_glass_panel_stairs": {
+    "source": "White Glass Panel Stairs",
+    "translation": "白色玻璃面板楼梯"
+  },
+  "block.singulo.black_reinforced_glass_stairs": {
+    "source": "Black Reinforced Glass Stairs",
+    "translation": "黑色强化玻璃楼梯"
+  },
+  "desc.singulo.white_glass_panel_stairs": {
+    "source": "Stairs made from White Glass Panel.",
+    "translation": "用白色玻璃面板制成的楼梯。"
+  },
+  "howto.singulo.white_glass_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_glass_stairs": {
+    "source": "Stairs made from Black Reinforced Glass.",
+    "translation": "用黑色强化玻璃制成的楼梯。"
+  },
+  "howto.singulo.black_reinforced_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "block.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Patterned Android Barrier Glass Stairs",
+    "translation": "花纹仿生人阻隔玻璃楼梯"
+  },
+  "block.singulo.android_barrier_glass_stairs": {
+    "source": "Android Barrier Glass Stairs",
+    "translation": "仿生人阻隔玻璃楼梯"
+  },
+  "block.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Patterned Android Gate Glass Stairs",
+    "translation": "花纹仿生人透过玻璃楼梯"
+  },
+  "block.singulo.android_gate_glass_stairs": {
+    "source": "Android Gate Glass Stairs",
+    "translation": "仿生人透过玻璃楼梯"
+  },
+  "block.singulo.black_reinforced_light_panel": {
+    "source": "Glowing Black Reinforced Panel",
+    "translation": "发光黑色强化面板"
+  },
+  "desc.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Stairs made from Patterned Android Barrier Glass.",
+    "translation": "用花纹仿生人阻隔玻璃制成的楼梯。"
+  },
+  "desc.singulo.android_barrier_glass_stairs": {
+    "source": "Stairs made from Android Barrier Glass.",
+    "translation": "用仿生人阻隔玻璃制成的楼梯。"
+  },
+  "desc.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Stairs made from Patterned Android Gate Glass.",
+    "translation": "用花纹仿生人透过玻璃制成的楼梯。"
+  },
+  "desc.singulo.android_gate_glass_stairs": {
+    "source": "Stairs made from Android Gate Glass.",
+    "translation": "用仿生人透过玻璃制成的楼梯。"
+  },
+  "desc.singulo.black_reinforced_light_panel": {
+    "source": "A Black Reinforced Panel that glows brightly (light 15). As blast-resistant as obsidian; needs an iron pickaxe or better.",
+    "translation": "明亮发光的黑色强化面板（亮度 15）。与黑曜石一样耐爆炸，需要铁镐或更好的镐。"
+  },
+  "howto.singulo.android_barrier_glass_patterned_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
+  },
+  "howto.singulo.android_barrier_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
+  },
+  "howto.singulo.android_gate_glass_patterned_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
+  },
+  "howto.singulo.android_gate_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
+  },
+  "howto.singulo.black_reinforced_light_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "summary.singulo.black_reinforced_light_panel": {
+    "source": "A brightly glowing, blast-resistant black panel.",
+    "translation": "明亮发光、耐爆炸的黑色面板。"
+  },
+  "uses.singulo.android_barrier_glass_patterned": {
+    "source": "Used in: Patterned Android Barrier Glass Stairs",
+    "translation": "用于：花纹仿生人阻隔玻璃楼梯"
+  },
+  "uses.singulo.android_gate_glass_patterned": {
+    "source": "Used in: Patterned Android Gate Glass Stairs",
+    "translation": "用于：花纹仿生人透过玻璃楼梯"
+  },
+  "item.singulo.android_cat_tail": {
+    "source": "Cat Tail",
+    "translation": "猫尾巴"
+  },
+  "desc.singulo.android_cat_tail": {
+    "source": "A cat tail that sways behind the waist, with a lighter tip. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "在腰后轻轻摇摆的猫尾巴，尖端颜色较浅。装在装饰页的腰部槽中。与染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_cat_tail": {
+    "source": "A swaying cat tail for an android.",
+    "translation": "在仿生人腰后摇摆的猫尾巴。"
+  },
+  "howto.singulo.android_cat_tail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
   }
 }
