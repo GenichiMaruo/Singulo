@@ -44,6 +44,13 @@ final class GlowDepth {
             .withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.QUADS)
             .withColorTargetState(new ColorTargetState(Optional.empty(), ColorTargetState.WRITE_NONE))
             .withDepthStencilState(DepthStencilState.DEFAULT).withCull(false).build();
+    private static final RenderPipeline GLAZED_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Singulo.id("pipeline/glazed"))
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F).withShaderDefine("PER_FACE_LIGHTING").withSampler("Sampler1")
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).withCull(true).build();
+    private static final java.util.function.Function<Identifier, RenderType> GLAZED = net.minecraft.util.Util.memoize(texture ->
+            RenderType.create("singulo_glazed", RenderSetup.builder(GLAZED_PIPELINE).withTexture("Sampler0", texture)
+                    .useLightmap().useOverlay().sortOnUpload().createRenderSetup()));
     private static final RenderPipeline COLOR_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
             .withLocation(Singulo.id("pipeline/glow_sorted")).withSampler("Sampler1")
             .withShaderDefine("ALPHA_CUTOUT",0.1F).withShaderDefine("PER_FACE_LIGHTING")
@@ -300,7 +307,7 @@ final class GlowDepth {
      * 手前の光（羽根）は上に重なり、奥の光は透けて見える。光と一緒に並べ替えると、長い面と小さな面の前後が視点で入れ替わってちらつく。
      */
     static VertexConsumer glazed(MultiBufferSource buffers, Identifier texture) {
-        RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(texture);
+        RenderType type = GLAZED.apply(texture);
         if (!isActive() || GravitationalLensing.shaderPackInUse()) {
             return buffers.getBuffer(type);
         }
@@ -316,7 +323,7 @@ final class GlowDepth {
     }
 
     static void registerShaders(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(DEPTH_PIPELINE);event.registerPipeline(COLOR_PIPELINE);
+        event.registerPipeline(DEPTH_PIPELINE);event.registerPipeline(COLOR_PIPELINE);event.registerPipeline(GLAZED_PIPELINE);
         event.registerPipeline(FLUID_COLOR_PIPELINE);event.registerPipeline(FLUID_DEPTH_PIPELINE);
     }
 
