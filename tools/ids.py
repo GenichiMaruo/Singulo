@@ -451,6 +451,7 @@ MOD = {
     # 研究所のスライドドアに似せた、作れるドア（絵とモデルは lab_blocks.py）
     'ホワイトスライドドア': ('white_sliding_door', 'White Sliding Door', 'lab'),
     '黒色強化パネル': ('black_reinforced_panel', 'Black Reinforced Panel', 'deco'),
+    '発光黒色強化パネル': ('black_reinforced_light_panel', 'Glowing Black Reinforced Panel', 'deco'),
     'ホワイトガラスパネル': ('white_glass_panel', 'White Glass Panel', 'deco_glass'),
     '四芒星ホワイトガラスパネル': ('white_star_glass_panel', 'Starred White Glass Panel', 'deco_glass'),
     '黒色強化ガラス': ('black_reinforced_glass', 'Black Reinforced Glass', 'deco_glass'),

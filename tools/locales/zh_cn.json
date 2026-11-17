@@ -11544,8 +11544,8 @@
     "translation": "用于：四芒星黑色强化玻璃、黑色强化玻璃楼梯"
   },
   "uses.singulo.black_reinforced_panel": {
-    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall",
-    "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙"
+    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall, Glowing Black Reinforced Panel",
+    "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙、发光黑色强化面板"
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
@@ -15279,6 +15279,10 @@
     "source": "Android Gate Glass Stairs",
     "translation": "仿生人透过玻璃楼梯"
   },
+  "block.singulo.black_reinforced_light_panel": {
+    "source": "Glowing Black Reinforced Panel",
+    "translation": "发光黑色强化面板"
+  },
   "desc.singulo.android_barrier_glass_patterned_stairs": {
     "source": "Stairs made from Patterned Android Barrier Glass.",
     "translation": "用花纹仿生人阻隔玻璃制成的楼梯。"
@@ -15295,6 +15299,10 @@
     "source": "Stairs made from Android Gate Glass.",
     "translation": "用仿生人透过玻璃制成的楼梯。"
   },
+  "desc.singulo.black_reinforced_light_panel": {
+    "source": "A Black Reinforced Panel that glows brightly (light 15). As blast-resistant as obsidian; needs an iron pickaxe or better.",
+    "translation": "明亮发光的黑色强化面板（亮度 15）。与黑曜石一样耐爆炸，需要铁镐或更好的镐。"
+  },
   "howto.singulo.android_barrier_glass_patterned_stairs": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制作：工作台（阶段2）"
@@ -15310,6 +15318,14 @@
   "howto.singulo.android_gate_glass_stairs": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制作：工作台（阶段2）"
+  },
+  "howto.singulo.black_reinforced_light_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "summary.singulo.black_reinforced_light_panel": {
+    "source": "A brightly glowing, blast-resistant black panel.",
+    "translation": "明亮发光、耐爆炸的黑色面板。"
   },
   "uses.singulo.android_barrier_glass_patterned": {
     "source": "Used in: Patterned Android Barrier Glass Stairs",

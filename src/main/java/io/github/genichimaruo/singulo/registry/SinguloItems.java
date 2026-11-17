@@ -522,6 +522,7 @@ public final class SinguloItems {
         block(SinguloBlocks.BISMUTH_CRYSTAL_BLOCK, 2);
         block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
         block(SinguloBlocks.BLACK_REINFORCED_PANEL, 1);
+        block(SinguloBlocks.BLACK_REINFORCED_LIGHT_PANEL, 1);
         block(SinguloBlocks.WHITE_GLASS_PANEL, 1);
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);

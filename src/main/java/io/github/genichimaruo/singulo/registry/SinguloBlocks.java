@@ -349,6 +349,10 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> BLACK_REINFORCED_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.NETHERITE_BLOCK));
+    /** 発光黒色強化パネル（0.20.0。黒色強化パネルと同じ硬さで、明るさ15）。 */
+    public static final DeferredBlock<Block> BLACK_REINFORCED_LIGHT_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_light_panel",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 15));
 
     /** 透けるパネル（ホワイトパネルと黒色強化パネルの系統と、四芒星の模様入り）。音はそれぞれのパネルと同じ。 */
     public static final DeferredBlock<TransparentBlock> WHITE_GLASS_PANEL = joinedGlass("white_glass_panel", MapColor.SNOW, 3.0F, 9.0F,

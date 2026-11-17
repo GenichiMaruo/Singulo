@@ -3963,7 +3963,8 @@ TAB_GROUPS = [
     ('中間素材', None),
     ('白い建材', [
         'white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel',
-        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_glass', 'black_star_glass',
+        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_light_panel', 'black_reinforced_glass',
+        'black_star_glass',
         'bismuth_crystal_block', 'glowing_bismuth_crystal',
         'android_barrier_glass', 'android_barrier_glass_patterned', 'android_gate_glass',
         'android_gate_glass_patterned',

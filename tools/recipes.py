@@ -1088,3 +1088,9 @@ for _name, _shape in _glass_shaped.items():
     assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
     SHAPED[_name] = _shape
     RECIPES[_name]['shape'] = _shape
+
+# 0.20.0 発光黒色強化パネル: パネルの輪の中心にグロウストーン（一覧の番号がずれないよう、最後に足す）
+R('発光黒色強化パネル', 1, '作業台', {'黒色強化パネル': 8, 'グロウストーンダスト': 1}, out=8, cat='part')
+_shape = (('LLL', 'LYL', 'LLL'), {'L': '黒色強化パネル', 'Y': 'グロウストーンダスト'})
+SHAPED['発光黒色強化パネル'] = _shape
+RECIPES['発光黒色強化パネル']['shape'] = _shape

@@ -256,6 +256,24 @@ def white_light_panel():
     return im
 
 
+def black_reinforced_light_panel():
+    """発光黒色強化パネル（0.20.0）: 黒色強化パネルの枠と四隅の鋲の中に、中心ほど明るい白い光の面。"""
+    im, d = new((30, 32, 38, 255))
+    d.rectangle([0, 0, S - 1, S - 1], outline=(12, 12, 16, 255))
+    d.line([(1, 1), (14, 1)], fill=(64, 66, 76, 255))
+    d.line([(1, 1), (1, 14)], fill=(64, 66, 76, 255))
+    d.line([(1, 14), (14, 14)], fill=(20, 20, 24, 255))
+    d.line([(14, 1), (14, 14)], fill=(20, 20, 24, 255))
+    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+        d.point((x, y), fill=(120, 124, 136, 255))
+    d.rectangle([3, 3, 12, 12], outline=(14, 14, 18, 255))
+    for y in range(4, 12):
+        for x in range(4, 12):
+            k = max(abs(x - 7.5), abs(y - 7.5)) / 4.0
+            d.point((x, y), fill=rgba(mix((255, 255, 255), (196, 222, 244), k * k)))
+    return im
+
+
 def black_reinforced_panel():
     """黒色強化パネル: 黒い装甲板に、角から角への補強の筋と四隅の鋲。"""
     base = (30, 32, 38)
@@ -404,7 +422,7 @@ def bismuth_crystal(glow=False):
 
 
 DECO_ART = {'white_panel': white_panel, 'white_light_panel': white_light_panel,
-            'black_reinforced_panel': black_reinforced_panel,
+            'black_reinforced_panel': black_reinforced_panel, 'black_reinforced_light_panel': black_reinforced_light_panel,
             'bismuth_crystal_block': bismuth_crystal, 'glowing_bismuth_crystal': lambda: bismuth_crystal(True)}
 
 
