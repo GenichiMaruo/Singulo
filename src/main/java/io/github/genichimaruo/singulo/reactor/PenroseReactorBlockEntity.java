@@ -68,7 +68,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  *   <li>危険: 引力帯（半径 blackHolePullRadius）と潮汐帯（半径 tidalDamageRadius、防具を無視）</li>
  * </ul>
  */
-public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source {
     public enum State { UNFORMED, DORMANT, IGNITING, RUNNING }
 
     /** SHEDDING: 回収運転で、育ちすぎた炉心からジェットで質量を放出している（番号で同期するので後ろに足す）。 */
@@ -1191,6 +1192,27 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     public State state() {
         return state;
+    }
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        io.github.genichimaruo.singulo.machine.MachineReport.State s = switch (state) {
+            case UNFORMED -> io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN;
+            case DORMANT -> io.github.genichimaruo.singulo.machine.MachineReport.State.OFF;
+            case IGNITING -> io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+            case RUNNING -> mode() == Mode.DANGER ? io.github.genichimaruo.singulo.machine.MachineReport.State.WARN
+                    : mode() == Mode.STANDBY ? io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE : io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+        };
+        Component label = switch (state) {
+            case IGNITING -> Component.translatable("gui.singulo.reactor.state.igniting",
+                    (int) Math.min(100, ignitionStored * 100 / Math.max(1, ignitionEnergy())),
+                    ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : ignitionTicks / 20);
+            case RUNNING -> Component.translatable("gui.singulo.reactor.mode." + mode().name().toLowerCase(java.util.Locale.ROOT));
+            default -> Component.translatable("gui.singulo.reactor.state." + state.name().toLowerCase(java.util.Locale.ROOT));
+        };
+        return new io.github.genichimaruo.singulo.machine.MachineReport(s, label, List.of(), 0, 0, buffer, BUFFER_CAPACITY, 0,
+                (int) Math.min(Integer.MAX_VALUE, lastOutput), ItemStack.EMPTY, 0, List.of(), 0);
     }
 
     public double mass() {

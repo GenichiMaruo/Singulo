@@ -29,7 +29,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * ΔT が低温源の「維持できる温度差」を超えると、超えた分に比例した速さで低温源が溶けて劣化する。
  */
 public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        GeneratorInfo {
+        GeneratorInfo, MachineReport.Source {
     /** 維持できる温度差を 1 K 超えたまま、低温源が1段階劣化するまでの tick 数。100 K 超過なら約1分。 */
     static final double MELT_THRESHOLD = 120_000;
     static final int SCAN_INTERVAL = 10;
@@ -54,6 +54,20 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
 
     public SinguloEnergyStorage energy() {
         return energy;
+    }
+
+    /** 装置の様子の報告（0.21.0。画面のヘッダーと同じ）。 */
+    @Override
+    public MachineReport report() {
+        boolean noSource = hot <= 0 || cold <= 0;
+        boolean melting = deltaT() > tolerance && coldPos != null;
+        MachineReport.State state = noSource || melting ? MachineReport.State.WARN
+                : rate > 0 ? MachineReport.State.RUN : MachineReport.State.IDLE;
+        var label = noSource ? net.minecraft.network.chat.Component.translatable("gui.singulo.thermo.none")
+                : melting ? net.minecraft.network.chat.Component.translatable("gui.singulo.thermo.melting", tolerance)
+                : net.minecraft.network.chat.Component.translatable(rate > 0 ? "gui.singulo.status.running" : "gui.singulo.status.idle");
+        return new MachineReport(state, label, java.util.List.of(), 0, 0, energy.getEnergyStored(), energy.getMaxEnergyStored(), 0,
+                (int) Math.round(rate), net.minecraft.world.item.ItemStack.EMPTY, 0, java.util.List.of(), 0);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ThermoelectricGeneratorBlockEntity be) {

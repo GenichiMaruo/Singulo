@@ -38,6 +38,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 /** Finite storage and a reserved-work spindle, with no runtime chunk loading. */
 public final class CosmicChamberBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source,
         io.github.genichimaruo.singulo.multiblock.PortAccess, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     public static final int RESERVOIR=0, ACCUMULATOR=1, SPINDLE=2;
     public static final int FLUID_CAPACITY=16_000_000;
@@ -122,6 +123,24 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             if(player.containerMenu instanceof CosmicMenu menu&&menu.ownedBy(this))player.closeContainer();
     }
     public int status(){return status;}
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。蓄電器の出し入れは、作る・使う電力に入れない。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        boolean active = switch (kind()) {
+            case RESERVOIR -> tank.getFluidAmount() > 0;
+            case ACCUMULATOR -> stored >= 1_000_000;
+            default -> core;
+        };
+        io.github.genichimaruo.singulo.machine.MachineReport.State s = switch (status) {
+            case 0 -> active ? io.github.genichimaruo.singulo.machine.MachineReport.State.RUN : io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE;
+            case 2 -> io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE;
+            default -> io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN;
+        };
+        int using = kind() == ACCUMULATOR ? 0 : (int) Math.min(Integer.MAX_VALUE, lastIn * 1_000_000L);
+        return new io.github.genichimaruo.singulo.machine.MachineReport(s, Component.translatable("gui.singulo.cosmic.state." + status), java.util.List.of(), progress, duration,
+                stored, capacity(), using, 0, ItemStack.EMPTY, 0, java.util.List.of(), 0);
+    }
     public boolean core(){return core;}
     public int progress(){return progress;}
     public int duration(){return duration;}

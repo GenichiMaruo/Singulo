@@ -177,6 +177,17 @@ dependencies {
     if (providers.gradleProperty('withMekanism').isPresent()) {
         localRuntime "mekanism:Mekanism:${mekanism_version}"
     }
+    // Jade・WTHIT（見ている装置の様子を画面の上に出す。0.21.0）も任意の連携。本体の jar の API でコンパイルし、
+    // -PwithJade・-PwithWthit を付けたときだけ、開発中の起動に入れる
+    compileOnly("maven.modrinth:jade:${jade_version}") { transitive = false }
+    compileOnly("maven.modrinth:wthit:${wthit_version}") { transitive = false }
+    if (providers.gradleProperty('withJade').isPresent()) {
+        localRuntime("maven.modrinth:jade:${jade_version}") { transitive = false }
+    }
+    if (providers.gradleProperty('withWthit').isPresent()) {
+        localRuntime("maven.modrinth:wthit:${wthit_version}") { transitive = false }
+        localRuntime("maven.modrinth:badpackets:${badpackets_version}") { transitive = false }
+    }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

@@ -67,6 +67,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * （全体を一度に読まない）。保存するのは段階・進み具合・素材・完成品・電力で、読み込み直すと続きから進む。
  */
 public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source,
         MultiblockPortBlockEntity.Outputs, DeviceMenu.Host {
     public static final String STATION = "accretion_jet_forge";
     public static final int IDLE = 0, PRIME = 1, IGNITE = 2, FOCUS = 3, IRRADIATE = 4, FINISH = 5, COOL = 6;
@@ -208,6 +209,51 @@ public class JetForgeBlockEntity extends BlockEntity implements AbstractMachineB
 
     public int phase() {
         return phase;
+    }
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        long stored = buffer, capacity = energy.capacity();
+        int using = (int) Math.min(Integer.MAX_VALUE, Math.round(intake));
+        if (!formed && hold != UNLOADED) {
+            return io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN, forgeText("not_formed"), stored, capacity);
+        }
+        String reason = switch (hold) {
+            case NO_POWER -> "forge.no_power";
+            case OUTPUT_FULL -> "forge.output_full";
+            case NO_CORE -> "forge.no_core";
+            case UNLOADED -> "forge.unloaded";
+            case HELD -> "forge.held";
+            default -> null;
+        };
+        io.github.genichimaruo.singulo.machine.MachineReport.State stopped = switch (hold) {
+            case NO_POWER -> io.github.genichimaruo.singulo.machine.MachineReport.State.NO_POWER;
+            case OUTPUT_FULL -> io.github.genichimaruo.singulo.machine.MachineReport.State.FULL;
+            case HELD -> io.github.genichimaruo.singulo.machine.MachineReport.State.OFF;
+            default -> io.github.genichimaruo.singulo.machine.MachineReport.State.WARN;
+        };
+        if (bh == BH_IGNITING) {
+            int pct = ignitionCharged ? 100 : (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy()));
+            int secs = ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : Math.max(0, ignitionLeft) / 20;
+            return new io.github.genichimaruo.singulo.machine.MachineReport(io.github.genichimaruo.singulo.machine.MachineReport.State.RUN, forgeText("forge.igniting", pct, secs), List.of(), 0, 0, stored, capacity, using, 0,
+                    ItemStack.EMPTY, 0, List.of(), 0);
+        }
+        if (phase == IDLE) {
+            return reason != null ? io.github.genichimaruo.singulo.machine.MachineReport.simple(stopped, forgeText(reason), stored, capacity)
+                    : io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE, forgeText("forge.idle"), stored, capacity);
+        }
+        net.minecraft.network.chat.Component running = forgeText("forge.running", forgeText("forge.phase." + phase),
+                elapsed() / 20, totalTicks() / 20);
+        return reason != null
+                ? new io.github.genichimaruo.singulo.machine.MachineReport(stopped, forgeText(reason), List.of(running), elapsed(), totalTicks(), stored, capacity, 0, 0,
+                ItemStack.EMPTY, 0, List.of(), 0)
+                : new io.github.genichimaruo.singulo.machine.MachineReport(io.github.genichimaruo.singulo.machine.MachineReport.State.RUN, running, List.of(), elapsed(), totalTicks(), stored, capacity, using, 0,
+                ItemStack.EMPTY, 0, List.of(), 0);
+    }
+
+    private static net.minecraft.network.chat.Component forgeText(String key, Object... args) {
+        return net.minecraft.network.chat.Component.translatable("gui.singulo.device." + key, args);
     }
 
     public int phaseTicks() {

@@ -41,7 +41,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
  */
 public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder {
+        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder, MachineReport.Source {
     public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED, OFF }
 
     /**
@@ -816,6 +816,58 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     public Status status() {
         return status;
+    }
+
+    /** 装置の様子の報告（0.21.0。画面のヘッダーと同じ状態と理由）。 */
+    @Override
+    public MachineReport report() {
+        MachineReport.State state;
+        Component label;
+        List<Component> details = List.of();
+        switch (status) {
+            case RUNNING -> {
+                state = MachineReport.State.RUN;
+                label = Component.translatable("gui.singulo.status.running");
+            }
+            case IDLE -> {
+                MachineDiagnosis.Result why = null;
+                if (level != null && mode == 0) {
+                    List<FluidStack> fluids = new ArrayList<>();
+                    for (FluidTank tank : tanks) {
+                        fluids.add(tank.getFluid());
+                    }
+                    why = MachineDiagnosis.idle(level, type, inputStacks(), fluids, structureSize(),
+                            type.selectsRecipe() ? RecipeSelection.byIndex(level, type, selectedIndex()) : null);
+                }
+                if (why == null || why.kind() == MachineDiagnosis.Kind.EMPTY) {
+                    state = MachineReport.State.IDLE;
+                    label = Component.translatable("gui.singulo.status.idle");
+                } else {
+                    state = MachineReport.State.WARN;
+                    label = Component.translatable("gui.singulo.reason.label." + why.kind().name().toLowerCase());
+                    details = why.lines();
+                }
+            }
+            case NO_POWER -> {
+                state = MachineReport.State.NO_POWER;
+                label = Component.translatable("gui.singulo.status.no_power");
+            }
+            case OUTPUT_FULL -> {
+                state = MachineReport.State.FULL;
+                label = Component.translatable("gui.singulo.status.output_full");
+            }
+            case NOT_FORMED -> {
+                state = MachineReport.State.BROKEN;
+                label = Component.translatable("gui.singulo.status.not_formed");
+            }
+            default -> {
+                state = MachineReport.State.OFF;
+                label = Component.translatable("gui.singulo.status.off");
+            }
+        }
+        ItemStack loaded = magazine.loaded();
+        return new MachineReport(state, label, details, progress, maxProgress, energy.getEnergyStored(), energy.getMaxEnergyStored(),
+                status == Status.RUNNING && current != null ? usage : 0, 0, loaded.copyWithCount(1), magazine.fill(), List.of(), 0);
     }
 
     /** レシピの照合に使うスロット（入力 → 触媒）の中身。 */
