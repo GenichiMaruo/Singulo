@@ -37,6 +37,8 @@ import org.joml.Vector3f;
  * 同じガラスの階段に接するガラス（ホワイトガラスパネル・黒色強化ガラス）の面は、階段に隠れずに見える所だけを、その形に沿った枠の絵で描く
  * （0.20.0。{@link GlassJoin}）。面を 1/4 ずつに分け、階段の面がない 1/4 だけ描く。絵は tools/building_variants.py の
  * glass_join_textures（見える 1/4 の組ごとの <ガラス>_join_<bits>）。
+ * 0.21.0: 階段・ハーフブロックの面も同じ。同じガラスの階段・ハーフブロックが一部を覆う面は、自分の形があって覆われていない 1/4 だけを描く
+ * （階段の側面にハーフブロックが当たるときなど）。
  */
 final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     /** 向きごとの、見える 1/4 の組（bits: 1 左上・2 右上・4 左下・8 右下、UV で見て）。0 はふつうに描く。 */
@@ -56,8 +58,17 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     static void wrap(ModelEvent.ModifyBakingResult event) {
         for (Block glass : new Block[] {SinguloBlocks.WHITE_GLASS_PANEL.get(), SinguloBlocks.BLACK_REINFORCED_GLASS.get(),
                 SinguloBlocks.ANDROID_GATE_GLASS_PATTERNED.get(), SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED.get()}) {
-            for (BlockState state : glass.getStateDefinition().getPossibleStates()) {
-                event.getModels().computeIfPresent(BlockModelShaper.stateToModelLocation(state), (k, model) -> new GlassJoinModel(model, glass));
+            // 元のガラスと、その階段・ハーフブロック（0.21.0。形どうしが接する面も、隠れていない所だけ描く）
+            List<Block> blocks = new ArrayList<>(List.of(glass));
+            for (var variant : SinguloBlocks.VARIANTS.values()) {
+                if (GlassJoin.shapedOf(variant.get().defaultBlockState(), glass)) {
+                    blocks.add(variant.get());
+                }
+            }
+            for (Block block : blocks) {
+                for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+                    event.getModels().computeIfPresent(BlockModelShaper.stateToModelLocation(state), (k, model) -> new GlassJoinModel(model, glass));
+                }
             }
         }
     }
@@ -67,28 +78,36 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
         int[] open = null;
         for (Direction d : Direction.values()) {
             BlockState n = level.getBlockState(pos.relative(d));
-            if (n.getBlock() instanceof GlassJoin.Stairs stairs && stairs.base() == glass) {
-                int covered = covered(n, d);
-                if (covered != 0 && covered != 15) {
-                    if (open == null) {
-                        open = new int[6];
-                    }
-                    open[d.ordinal()] = 15 & ~covered;
+            if (!GlassJoin.shapedOf(n, glass) && !(n.is(glass) && state.getBlock() != glass)) {
+                continue;
+            }
+            // この面にある 1/4（ブロックなら全部、階段・ハーフブロックなら形のある所）のうち、隣に覆われていない所
+            int own = state.is(glass) ? 15 : quarters(state, d, true);
+            int covered = n.is(glass) ? 15 : quarters(n, d, false);
+            int visible = own & ~covered;
+            if ((own & covered) != 0 && visible != 0) {
+                if (open == null) {
+                    open = new int[6];
                 }
+                open[d.ordinal()] = visible;
             }
         }
         return open == null ? data : data.derive().with(OPEN, open).build();
     }
 
-    /** 向き d の隣の階段 stairs が、この面の 1/4 のどれを覆っているか（bits）。 */
-    private static int covered(BlockState stairs, Direction d) {
-        List<AABB> boxes = stairs.getShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO).toAabbs();
+    /**
+     * 向き d の面の 1/4 のうち、shape（階段・ハーフブロック）の 1/8 の箱がある所（bits）。self なら自分の面の側の層、
+     * そうでなければ向き d の隣にあるものとして、この面に接する層を見る。
+     */
+    private static int quarters(BlockState shape, Direction d, boolean self) {
+        List<AABB> boxes = shape.getShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO).toAabbs();
         int bits = 0;
         for (int[] cell : cells(d)) {
-            // 隣の階段の、この面に接する層の 1/8 の箱の中心（隣のブロックの中の座標）
+            // この面に接する層の 1/8 の箱の中心（そのブロックの中の座標）
             double[] c = {cell[0] / 16.0 + 0.25, cell[1] / 16.0 + 0.25, cell[2] / 16.0 + 0.25};
             int axis = d.getAxis().ordinal();
-            c[axis] = d.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0.25 : 0.75;
+            boolean positive = d.getAxisDirection() == Direction.AxisDirection.POSITIVE;
+            c[axis] = positive == self ? 0.75 : 0.25;
             for (AABB box : boxes) {
                 if (box.contains(c[0], c[1], c[2])) {
                     bits |= quarter(d, cell);

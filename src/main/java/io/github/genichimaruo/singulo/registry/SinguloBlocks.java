@@ -732,7 +732,12 @@ public final class SinguloBlocks {
                     : base instanceof io.github.genichimaruo.singulo.block.GlassJoin.Glass
                     ? new io.github.genichimaruo.singulo.block.GlassJoin.Stairs(() -> base, properties)
                     : new net.minecraft.world.level.block.StairBlock(base.defaultBlockState(), properties);
-            case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
+            // ガラスのハーフブロック（0.21.0）も、元のガラスや同じガラスの階段・ハーフブロックとの境目を描かない
+            case "slab" -> base instanceof io.github.genichimaruo.singulo.android.AndroidGlassBlock
+                    ? new io.github.genichimaruo.singulo.android.AndroidGlassSlab(() -> base, properties)
+                    : base instanceof io.github.genichimaruo.singulo.block.GlassJoin.Glass
+                    ? new io.github.genichimaruo.singulo.block.GlassJoin.Slab(() -> base, properties)
+                    : new net.minecraft.world.level.block.SlabBlock(properties);
             case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
             default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());
         };

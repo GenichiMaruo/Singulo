@@ -1100,3 +1100,13 @@ R('猫のしっぽ', 1, '作業台', {'羊毛': 2, '糸': 1}, cat='tool', note='
 _shape = (('  W', ' W ', 'S  '), {'W': '羊毛', 'S': '糸'})
 SHAPED['猫のしっぽ'] = _shape
 RECIPES['猫のしっぽ']['shape'] = _shape
+
+# 0.21.0 ガラスのハーフブロック（模様のないガラス4種。一覧の番号がずれないよう、最後に足す）
+from building_variants import GLASS_SLAB_BASES as _GLASS_SLAB_BASES, GLASS_SLAB_SHAPES as _GLASS_SLAB_SHAPES
+_glass_shaped = {}
+_variant_recipes(R, _glass_shaped, lambda base: RECIPES[base]['stage'], _GLASS_SLAB_BASES, _GLASS_SLAB_SHAPES)
+for _name, _shape in _glass_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape

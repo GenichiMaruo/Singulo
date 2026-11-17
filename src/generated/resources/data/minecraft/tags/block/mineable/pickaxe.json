@@ -261,6 +261,10 @@
     "singulo:android_gate_glass_stairs",
     "singulo:android_gate_glass_patterned_stairs",
     "singulo:android_barrier_glass_stairs",
-    "singulo:android_barrier_glass_patterned_stairs"
+    "singulo:android_barrier_glass_patterned_stairs",
+    "singulo:white_glass_panel_slab",
+    "singulo:black_reinforced_glass_slab",
+    "singulo:android_gate_glass_slab",
+    "singulo:android_barrier_glass_slab"
   ]
 }

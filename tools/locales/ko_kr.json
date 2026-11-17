@@ -11484,16 +11484,16 @@
     "translation": "사용처: 강화 백팩 업그레이드"
   },
   "uses.singulo.android_barrier_glass": {
-    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs",
-    "translation": "사용처: 무늬 안드로이드 차단 유리, 안드로이드 차단 유리 계단"
+    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs, Android Barrier Glass Slab",
+    "translation": "사용처: 무늬 안드로이드 차단 유리, 안드로이드 차단 유리 계단, 안드로이드 차단 유리 반 블록"
   },
   "uses.singulo.android_gas_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
     "translation": "사용처: 가스·액체 업그레이드"
   },
   "uses.singulo.android_gate_glass": {
-    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs",
-    "translation": "사용처: 무늬 안드로이드 투과 유리, 안드로이드 투과 유리 계단"
+    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs, Android Gate Glass Slab",
+    "translation": "사용처: 무늬 안드로이드 투과 유리, 안드로이드 투과 유리 계단, 안드로이드 투과 유리 반 블록"
   },
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
@@ -11540,8 +11540,8 @@
     "translation": "사용처: 니호늄, 비스무트 결정 블록"
   },
   "uses.singulo.black_reinforced_glass": {
-    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs",
-    "translation": "사용처: 사방별 검은 강화 유리, 검은 강화 유리 계단"
+    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs, Black Reinforced Glass Slab",
+    "translation": "사용처: 사방별 검은 강화 유리, 검은 강화 유리 계단, 검은 강화 유리 반 블록"
   },
   "uses.singulo.black_reinforced_panel": {
     "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall, Glowing Black Reinforced Panel",
@@ -12144,8 +12144,8 @@
     "translation": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 26개"
   },
   "uses.singulo.white_glass_panel": {
-    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs",
-    "translation": "사용처: 사방별 흰색 유리 패널, 흰색 유리 패널 계단"
+    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs, White Glass Panel Slab",
+    "translation": "사용처: 사방별 흰색 유리 패널, 흰색 유리 패널 계단, 흰색 유리 패널 반 블록"
   },
   "uses.singulo.white_panel": {
     "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
@@ -15566,5 +15566,53 @@
   "summary.singulo.desk_monitor": {
     "source": "A factory monitor that shows how nearby machines are doing.",
     "translation": "주변 장치의 상태를 알 수 있는 공장 모니터."
+  },
+  "block.singulo.white_glass_panel_slab": {
+    "source": "White Glass Panel Slab",
+    "translation": "흰색 유리 패널 반 블록"
+  },
+  "block.singulo.black_reinforced_glass_slab": {
+    "source": "Black Reinforced Glass Slab",
+    "translation": "검은 강화 유리 반 블록"
+  },
+  "block.singulo.android_gate_glass_slab": {
+    "source": "Android Gate Glass Slab",
+    "translation": "안드로이드 투과 유리 반 블록"
+  },
+  "block.singulo.android_barrier_glass_slab": {
+    "source": "Android Barrier Glass Slab",
+    "translation": "안드로이드 차단 유리 반 블록"
+  },
+  "desc.singulo.white_glass_panel_slab": {
+    "source": "A half-height White Glass Panel. Two make a full block.",
+    "translation": "높이가 절반인 흰색 유리 패널입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.white_glass_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.black_reinforced_glass_slab": {
+    "source": "A half-height Black Reinforced Glass. Two make a full block.",
+    "translation": "높이가 절반인 검은 강화 유리입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.black_reinforced_glass_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "desc.singulo.android_gate_glass_slab": {
+    "source": "A half-height Android Gate Glass. Two make a full block.",
+    "translation": "높이가 절반인 안드로이드 투과 유리입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.android_gate_glass_slab": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "desc.singulo.android_barrier_glass_slab": {
+    "source": "A half-height Android Barrier Glass. Two make a full block.",
+    "translation": "높이가 절반인 안드로이드 차단 유리입니다. 두 개를 겹치면 한 블록이 됩니다."
+  },
+  "howto.singulo.android_barrier_glass_slab": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
   }
 }

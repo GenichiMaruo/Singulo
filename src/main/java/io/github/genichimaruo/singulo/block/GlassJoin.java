@@ -22,7 +22,46 @@ public final class GlassJoin {
         return Block.isFaceFull(stairs.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO), toward);
     }
 
-    /** 透けるガラス（ホワイトガラスパネル・黒色強化ガラス）。同じガラスの階段の、埋まった面との間も描かない。 */
+    private static final java.util.Map<BlockState, Integer> OCTANTS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * 階段を 2×2×2 の区画に分けたとき、ガラスで埋まっている区画（0.21.0。水に浸かった階段の水を、空いている区画だけに描くため）。
+     * 区画 (x, y, z)（それぞれ 0 か 1）が埋まっていれば、ビット x + 2y + 4z が立つ。
+     */
+    public static int filledOctants(BlockState stairs) {
+        return OCTANTS.computeIfAbsent(stairs, s -> {
+            var boxes = s.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).toAabbs();
+            int bits = 0;
+            for (int i = 0; i < 8; i++) {
+                double x = (i & 1) * 0.5 + 0.25, y = (i >> 1 & 1) * 0.5 + 0.25, z = (i >> 2 & 1) * 0.5 + 0.25;
+                for (var box : boxes) {
+                    if (box.contains(x, y, z)) {
+                        bits |= 1 << i;
+                        break;
+                    }
+                }
+            }
+            return bits;
+        });
+    }
+
+    /** 元のガラスの形を変えたもの（階段・ハーフブロック）。 */
+    public interface Shaped {
+        Block base();
+    }
+
+    /** s が base のガラスの階段・ハーフブロックか。 */
+    public static boolean shapedOf(BlockState s, Block base) {
+        return s.getBlock() instanceof Shaped shaped && shaped.base() == base;
+    }
+
+    /** self の direction 側の面が、隣の adjacent の形ですき間なく覆われているか（覆われていれば描かない）。 */
+    public static boolean covered(BlockState self, BlockState adjacent, Direction direction) {
+        return net.minecraft.world.phys.shapes.Shapes.blockOccudes(self.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO),
+                adjacent.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO), direction);
+    }
+
+    /** 透けるガラス（ホワイトガラスパネル・黒色強化ガラス）。同じガラスの階段・ハーフブロックの、埋まった面との間も描かない。 */
     public static class Glass extends TransparentBlock {
         public Glass(Properties properties) {
             super(properties);
@@ -30,15 +69,15 @@ public final class GlassJoin {
 
         @Override
         protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
-            if (adjacent.getBlock() instanceof Stairs stairs && stairs.base() == this) {
+            if (shapedOf(adjacent, this)) {
                 return fullFace(adjacent, direction.getOpposite());
             }
             return super.skipRendering(state, adjacent, direction);
         }
     }
 
-    /** ガラスの階段。元のガラスとの間と、同じガラスの階段の埋まった面との間を描かない。 */
-    public static class Stairs extends StairBlock {
+    /** ガラスの階段。元のガラスとの間と、同じガラスの階段・ハーフブロックに覆われた面を描かない。 */
+    public static class Stairs extends StairBlock implements Shaped {
         private final Supplier<Block> base;
 
         public Stairs(Supplier<Block> base, Properties properties) {
@@ -46,6 +85,7 @@ public final class GlassJoin {
             this.base = base;
         }
 
+        @Override
         public Block base() {
             return base.get();
         }
@@ -56,8 +96,35 @@ public final class GlassJoin {
             if (adjacent.is(glass)) {
                 return true;
             }
-            if (adjacent.getBlock() instanceof Stairs stairs && stairs.base() == glass) {
-                return fullFace(adjacent, direction.getOpposite());
+            if (shapedOf(adjacent, glass)) {
+                return covered(state, adjacent, direction);
+            }
+            return super.skipRendering(state, adjacent, direction);
+        }
+    }
+
+    /** ガラスのハーフブロック（0.21.0）。元のガラスとの間と、同じガラスの階段・ハーフブロックに覆われた面を描かない。 */
+    public static class Slab extends net.minecraft.world.level.block.SlabBlock implements Shaped {
+        private final Supplier<Block> base;
+
+        public Slab(Supplier<Block> base, Properties properties) {
+            super(properties);
+            this.base = base;
+        }
+
+        @Override
+        public Block base() {
+            return base.get();
+        }
+
+        @Override
+        protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
+            Block glass = base.get();
+            if (adjacent.is(glass)) {
+                return true;
+            }
+            if (shapedOf(adjacent, glass)) {
+                return covered(state, adjacent, direction);
             }
             return super.skipRendering(state, adjacent, direction);
         }

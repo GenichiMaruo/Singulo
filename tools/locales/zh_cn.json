@@ -11484,16 +11484,16 @@
     "translation": "用于：强化背包升级"
   },
   "uses.singulo.android_barrier_glass": {
-    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs",
-    "translation": "用于：花纹仿生人阻隔玻璃、仿生人阻隔玻璃楼梯"
+    "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs, Android Barrier Glass Slab",
+    "translation": "用于：花纹仿生人阻隔玻璃、仿生人阻隔玻璃楼梯、仿生人阻隔玻璃台阶"
   },
   "uses.singulo.android_gas_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
     "translation": "用于：气体与液体升级"
   },
   "uses.singulo.android_gate_glass": {
-    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs",
-    "translation": "用于：花纹仿生人透过玻璃、仿生人透过玻璃楼梯"
+    "source": "Used in: Patterned Android Gate Glass, Android Gate Glass Stairs, Android Gate Glass Slab",
+    "translation": "用于：花纹仿生人透过玻璃、仿生人透过玻璃楼梯、仿生人透过玻璃台阶"
   },
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
@@ -11540,8 +11540,8 @@
     "translation": "用于：鿭、铋晶体块"
   },
   "uses.singulo.black_reinforced_glass": {
-    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs",
-    "translation": "用于：四芒星黑色强化玻璃、黑色强化玻璃楼梯"
+    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs, Black Reinforced Glass Slab",
+    "translation": "用于：四芒星黑色强化玻璃、黑色强化玻璃楼梯、黑色强化玻璃台阶"
   },
   "uses.singulo.black_reinforced_panel": {
     "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall, Glowing Black Reinforced Panel",
@@ -12144,8 +12144,8 @@
     "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 26 个"
   },
   "uses.singulo.white_glass_panel": {
-    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs",
-    "translation": "用于：四芒星白色玻璃面板、白色玻璃面板楼梯"
+    "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs, White Glass Panel Slab",
+    "translation": "用于：四芒星白色玻璃面板、白色玻璃面板楼梯、白色玻璃面板台阶"
   },
   "uses.singulo.white_panel": {
     "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block, White Panel Stairs and 2 more",
@@ -15566,5 +15566,53 @@
   "summary.singulo.desk_monitor": {
     "source": "A factory monitor that shows how nearby machines are doing.",
     "translation": "能查看周围装置状况的工厂监视器。"
+  },
+  "block.singulo.white_glass_panel_slab": {
+    "source": "White Glass Panel Slab",
+    "translation": "白色玻璃面板台阶"
+  },
+  "block.singulo.black_reinforced_glass_slab": {
+    "source": "Black Reinforced Glass Slab",
+    "translation": "黑色强化玻璃台阶"
+  },
+  "block.singulo.android_gate_glass_slab": {
+    "source": "Android Gate Glass Slab",
+    "translation": "仿生人透过玻璃台阶"
+  },
+  "block.singulo.android_barrier_glass_slab": {
+    "source": "Android Barrier Glass Slab",
+    "translation": "仿生人阻隔玻璃台阶"
+  },
+  "desc.singulo.white_glass_panel_slab": {
+    "source": "A half-height White Glass Panel. Two make a full block.",
+    "translation": "半格高的白色玻璃面板。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.white_glass_panel_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.black_reinforced_glass_slab": {
+    "source": "A half-height Black Reinforced Glass. Two make a full block.",
+    "translation": "半格高的黑色强化玻璃。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.black_reinforced_glass_slab": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制作：工作台（阶段1）"
+  },
+  "desc.singulo.android_gate_glass_slab": {
+    "source": "A half-height Android Gate Glass. Two make a full block.",
+    "translation": "半格高的仿生人透过玻璃。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.android_gate_glass_slab": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
+  },
+  "desc.singulo.android_barrier_glass_slab": {
+    "source": "A half-height Android Barrier Glass. Two make a full block.",
+    "translation": "半格高的仿生人阻隔玻璃。两个叠在一起就是一整块。"
+  },
+  "howto.singulo.android_barrier_glass_slab": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
   }
 }

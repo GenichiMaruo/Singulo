@@ -41,12 +41,17 @@ GLASS_BASES = (
     ('模様入りアンドロイド遮断ガラス', 'android_barrier_glass_patterned', 'android_barrier_glass_patterned', 'Patterned Android Barrier Glass'),
 )
 GLASS_SHAPES = tuple(s for s in SHAPES if s[0] == 'stairs')
+# 0.21.0 ガラスのハーフブロック（模様のないガラス4種。レシピは recipes.py の最後で足す）
+GLASS_SLAB_BASES = tuple(b for b in GLASS_BASES
+                         if b[1] in ('white_glass_panel', 'black_reinforced_glass', 'android_gate_glass', 'android_barrier_glass'))
+GLASS_SLAB_SHAPES = tuple(s for s in SHAPES if s[0] == 'slab')
 # 石切台で元の建材1個からできる数
 STONECUT = {'stairs': 1, 'slab': 2, 'wall': 1}
 
 # 変種の ID → (元の ID, 形)
 VARIANTS = {f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in BASES for shape, *_ in SHAPES}
 VARIANTS.update({f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in GLASS_BASES for shape, *_ in GLASS_SHAPES})
+VARIANTS.update({f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in GLASS_SLAB_BASES for shape, *_ in GLASS_SLAB_SHAPES})
 # 半透明で描く変種（ガラス）
 GLASS_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base in {b for _, b, _, _ in GLASS_BASES}}
 # 遺構の建材（ニュートリノの探知で遺構と見なす）
@@ -56,7 +61,8 @@ IRON_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base.startswith(('pri
 
 IDS = {}
 DESC = {}
-for _ja, _base, _prefix, _en, _shapes in [b + (SHAPES,) for b in BASES] + [b + (GLASS_SHAPES,) for b in GLASS_BASES]:
+for _ja, _base, _prefix, _en, _shapes in ([b + (SHAPES,) for b in BASES] + [b + (GLASS_SHAPES,) for b in GLASS_BASES]
+                                         + [b + (GLASS_SLAB_SHAPES,) for b in GLASS_SLAB_BASES]):
     for _shape, _sja, _sen, *_ in _shapes:
         _name = f'{_ja}の{_sja}'
         IDS[_name] = (f'{_prefix}_{_shape}', f'{_en} {_sen}', 'variant')
@@ -175,14 +181,16 @@ def glass_join_textures(textures):
             glass_face_texture(mask, style).save(textures / f'{base}_join_{bits}.png')
 
 
-def glass_stairs_model(tex, tops, name=None, base=None, textures=None):
+def glass_stairs_model(tex, tops, name=None, base=None, textures=None, cells=None):
     """透けるガラスの階段: 形を 1/8 の箱に分け、箱どうしが接する内側の面は描かない。
 
     バニラの階段（下の板と上の段の2つの箱）のままだと、下の板の天面のうち上の段に隠れた所と、上の段の底面がガラス越しに見え、
     ブロックの途中に枠の線が出る。見える面ごとに、その形に沿って枠を描いた絵（textures の下に name_<向き><位置>.png）を作って貼り、
     踏み板・蹴上げ・側面の L 字のどれにも枠が回るようにする。絵は形と一緒に回す（状態の uvlock を使わない）。
+    cells を渡すと、その 1/8 の箱の集まり（ハーフブロック）で作る。
     """
-    cells = {(x, 0, z) for x in (0, 1) for z in (0, 1)} | {(x, 1, z) for x, z in tops}
+    if cells is None:
+        cells = {(x, 0, z) for x in (0, 1) for z in (0, 1)} | {(x, 1, z) for x, z in tops}
     elements = []
     planes = {}                    # (向き, 面の位置) → UV の画素
     for (x, y, z) in sorted(cells):
@@ -234,6 +242,15 @@ def models(write_json, assets):
                 write_json(mb / f'{variant}{suffix}.json', model)
             # ガラスは面ごとの枠の絵を形と一緒に回す（uvlock だと絵が世界に固定され、枠が形からずれる）
             write_json(bs / f'{variant}.json', {'variants': stairs_variants(m, uvlock=variant not in GLASS_VARIANTS)})
+            write_json(mi / f'{variant}.json', {'parent': m})
+        elif shape == 'slab' and variant in GLASS_VARIANTS:
+            # ガラスのハーフブロック: 階段と同じく、見える面の形に沿った枠の絵。2つ重ねると元のガラス
+            tb = assets / 'textures' / 'block'
+            for suffix, y in (('', 0), ('_top', 1)):
+                cells = {(x, y, z) for x in (0, 1) for z in (0, 1)}
+                write_json(mb / f'{variant}{suffix}.json', glass_stairs_model(tex, (), f'{variant}{suffix}', base, tb, cells))
+            write_json(bs / f'{variant}.json', {'variants': {
+                'type=bottom': {'model': m}, 'type=top': {'model': f'{m}_top'}, 'type=double': {'model': f'{MODID}:block/{base}'}}})
             write_json(mi / f'{variant}.json', {'parent': m})
         elif shape == 'slab':
             write_json(mb / f'{variant}.json', {'parent': 'minecraft:block/slab', 'textures': {'bottom': tex, 'top': tex, 'side': tex}})

@@ -207,7 +207,11 @@ public final class GeneratedContent {
             new BlockVariant("android_gate_glass_stairs", "android_gate_glass", "stairs", 2),
             new BlockVariant("android_gate_glass_patterned_stairs", "android_gate_glass_patterned", "stairs", 2),
             new BlockVariant("android_barrier_glass_stairs", "android_barrier_glass", "stairs", 2),
-            new BlockVariant("android_barrier_glass_patterned_stairs", "android_barrier_glass_patterned", "stairs", 2)
+            new BlockVariant("android_barrier_glass_patterned_stairs", "android_barrier_glass_patterned", "stairs", 2),
+            new BlockVariant("white_glass_panel_slab", "white_glass_panel", "slab", 1),
+            new BlockVariant("black_reinforced_glass_slab", "black_reinforced_glass", "slab", 1),
+            new BlockVariant("android_gate_glass_slab", "android_gate_glass", "slab", 2),
+            new BlockVariant("android_barrier_glass_slab", "android_barrier_glass", "slab", 2)
     );
 
     /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */
@@ -537,6 +541,7 @@ public final class GeneratedContent {
             "white_light_panel",
             "white_glass_panel",
             "white_glass_panel_stairs",
+            "white_glass_panel_slab",
             "white_star_glass_panel",
             "white_sliding_door",
             "black_reinforced_panel",
@@ -546,15 +551,18 @@ public final class GeneratedContent {
             "black_reinforced_light_panel",
             "black_reinforced_glass",
             "black_reinforced_glass_stairs",
+            "black_reinforced_glass_slab",
             "black_star_glass",
             "bismuth_crystal_block",
             "glowing_bismuth_crystal",
             "android_barrier_glass",
             "android_barrier_glass_stairs",
+            "android_barrier_glass_slab",
             "android_barrier_glass_patterned",
             "android_barrier_glass_patterned_stairs",
             "android_gate_glass",
             "android_gate_glass_stairs",
+            "android_gate_glass_slab",
             "android_gate_glass_patterned",
             "android_gate_glass_patterned_stairs",
             "ruin_panel",
@@ -944,6 +952,10 @@ public final class GeneratedContent {
             Map.entry("android_gate_glass_stairs", 2),
             Map.entry("android_gate_glass_patterned_stairs", 2),
             Map.entry("android_barrier_glass_stairs", 2),
-            Map.entry("android_barrier_glass_patterned_stairs", 2)
+            Map.entry("android_barrier_glass_patterned_stairs", 2),
+            Map.entry("white_glass_panel_slab", 1),
+            Map.entry("black_reinforced_glass_slab", 1),
+            Map.entry("android_gate_glass_slab", 2),
+            Map.entry("android_barrier_glass_slab", 2)
     );
 }
