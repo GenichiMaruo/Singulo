@@ -14228,8 +14228,8 @@
     "translation": "안경·외알 안경·귀걸이"
   },
   "gui.singulo.android.decor.4.hint": {
-    "source": "Waist ribbon, apron or brooch",
-    "translation": "허리 리본·앞치마·브로치"
+    "source": "Waist ribbon, apron, brooch or cat tail",
+    "translation": "허리 리본·앞치마·브로치·고양이 꼬리"
   },
   "tooltip.singulo.android_accessory.3": {
     "source": "Worn on an android's face (decoration page)",
@@ -15334,5 +15334,21 @@
   "uses.singulo.android_gate_glass_patterned": {
     "source": "Used in: Patterned Android Gate Glass Stairs",
     "translation": "사용처: 무늬 안드로이드 투과 유리 계단"
+  },
+  "item.singulo.android_cat_tail": {
+    "source": "Cat Tail",
+    "translation": "고양이 꼬리"
+  },
+  "desc.singulo.android_cat_tail": {
+    "source": "A cat tail that sways behind the waist, with a lighter tip. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "허리 뒤에서 살랑살랑 흔들리는 고양이 꼬리. 끝부분만 색이 밝습니다. 장식 페이지의 허리 칸에 답니다. 염료와 함께 제작대에서 염색할 수 있습니다."
+  },
+  "summary.singulo.android_cat_tail": {
+    "source": "A swaying cat tail for an android.",
+    "translation": "안드로이드 허리에서 흔들리는 고양이 꼬리."
+  },
+  "howto.singulo.android_cat_tail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   }
 }

@@ -167,6 +167,7 @@ MOD = {
     'モノクル': ('android_monocle', 'Monocle', 'tool'),
     '妖精の羽': ('android_fairy_wings', 'Fairy Wings', 'tool'),
     'エプロン': ('android_apron', 'Apron', 'tool'),
+    '猫のしっぽ': ('android_cat_tail', 'Cat Tail', 'tool'),
     'ランタン': ('android_lantern', 'Lantern', 'tool'),
     'ほうき': ('android_broom', 'Broom', 'tool'),
     'ネクタイ': ('android_necktie', 'Necktie', 'tool'),

@@ -202,11 +202,16 @@ public final class SinguloItems {
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_DIAMOND_BROOCH = ITEMS.register(
             "android_diamond_brooch", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "diamond_brooch", 0xE0B850));
+    /** 猫のしっぽ（0.20.0。腰の後ろで揺れる。猫耳カチューシャと同じ色）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAT_TAIL = ITEMS.register(
+            "android_cat_tail", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.WAIST, "cat_tail", 0x3A3440));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
             ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA,
             ANDROID_CAT_EARS, ANDROID_WITCH_HAT, ANDROID_STRAW_HAT, ANDROID_PONYTAIL, ANDROID_TWIN_TAILS, ANDROID_MONOCLE, ANDROID_FAIRY_WINGS, ANDROID_APRON, ANDROID_LANTERN, ANDROID_BROOM,
-            ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH);
+            ANDROID_NECKTIE, ANDROID_DIAMOND_NECKLACE, ANDROID_DIAMOND_EARRINGS, ANDROID_DIAMOND_TIARA, ANDROID_DIAMOND_BROOCH,
+            ANDROID_CAT_TAIL);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));

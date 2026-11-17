@@ -1310,7 +1310,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
 
     /**
      * 装飾: 頭（リボン・髪飾り・ベレー帽・ヘッドドレス・猫耳・魔女の帽子・麦わら帽子・付け毛）、顔（メガネ・モノクル）、
-     * 首/背中（マント・マフラー・妖精の羽）、腰（腰リボン・エプロン）、手（本・花束・ティーカップ・傘・ランタン・ほうき）。
+     * 首/背中（マント・マフラー・妖精の羽）、腰（腰リボン・エプロン・猫のしっぽ）、手（本・花束・ティーカップ・傘・ランタン・ほうき）。
      * 染めた色で描く。手に持つ物は、待機している間だけ。大きさは体のピクセル（1/16）で決める。
      */
     final class Accessories extends RenderLayer<RuinAndroid, AndroidModel> {
@@ -1670,6 +1670,26 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     getParentModel().toSkirtBack(pose);
                     b(pose, vc, light, -1.25F, 0.2F, 0.35F, -0.3F, 5.6F, 0.7F, c);
                     b(pose, vc, light, 0.3F, 0.2F, 0.35F, 1.25F, 5.0F, 0.7F, c);
+                }
+                case "cat_tail" -> {
+                    // 猫のしっぽ（0.20.0）: 腰の後ろから、太さ2ピクセル・長さ2ピクセルの節を7つつなぐ。はじめは後ろ下へ垂れ、
+                    // 節ごとに上へ曲がって先が立つ。節ごとに時間をずらして左右へ振るので、根元から先へ波が伝わって揺れる
+                    // （歩くと大きく）。箱は伸び縮みさせず、模様は長さに合わせて貼る（体の1ピクセルに絵の1ドット。筋は長さの向き）。
+                    // 節の継ぎ目は、曲がりの外側にすき間が出ないよう、半ピクセルだけ前の節へ食い込ませる。先の節は明るい色
+                    int tip = mix(c, 0xFFFFFF, 0.55F);
+                    float[] bend = {-32, 12, 16, 20, 20, 16, 12};
+                    VertexConsumer st = strands(buffers);
+                    pose.pushPose();
+                    pose.translate(0, -1.5F * P, 2 * P);
+                    for (int i = 0; i < bend.length; i++) {
+                        float sway = (5 + 9 * walk) * Mth.sin(age * 0.13F - i * 0.75F);
+                        float lift = i == 0 ? 0 : 3 * Mth.sin(age * 0.07F - i * 0.5F);
+                        pose.mulPose(Axis.XP.rotationDegrees(bend[i] + lift));
+                        pose.mulPose(Axis.YP.rotationDegrees(i == 0 ? sway * 0.5F : sway));
+                        bz(pose, st, light, -1, -1, i == 0 ? 0 : -0.5F, 1, 1, 2, i == bend.length - 1 ? tip : c);
+                        pose.translate(0, 0, 2 * P);
+                    }
+                    pose.popPose();
                 }
                 // ---- 手（左手の先。前腕を前へ水平に出すので、上は -z、前は +y）
                 case "book" -> {

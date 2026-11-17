@@ -1328,7 +1328,9 @@ ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'andr
                  # 0.18.0
                  'android_cat_ears', 'android_witch_hat', 'android_straw_hat', 'android_ponytail', 'android_twin_tails',
                  'android_monocle', 'android_fairy_wings', 'android_apron', 'android_lantern', 'android_broom',
-                 'android_necktie', 'android_diamond_necklace', 'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch')
+                 'android_necktie', 'android_diamond_necklace', 'android_diamond_earrings', 'android_diamond_tiara', 'android_diamond_brooch',
+                 # 0.20.0
+                 'android_cat_tail')
 
 
 # 2枚の層を合わせた外形で、上下中央に寄せる装飾
@@ -1818,6 +1820,29 @@ def accessory_icons(Image):
     d.load()[11, 2] = (255, 255, 255, 160)
     d.load()[13, 2] = (255, 255, 255, 160)
     out['android_diamond_brooch'] = (b, d)
+    # 猫のしっぽ（0.20.0。絵の並びで模様が決まるので、最後に足す）: J の字の形。上からまっすぐ下り、下で左へ巻いて先が少し上がる（E: 縁 W: 光 S: 陰）
+    b, d = new(), new()
+    tail = {
+        1: '.........EEEE...',
+        2: '.........EWSE...',
+        3: '.........EWSE...',
+        4: '.........EWSE...',
+        5: '.........EWSE...',
+        6: '.........EWSE...',
+        7: '.........EWSE...',
+        8: '..EEE....EWSE...',
+        9: '..EWSE...EWSE...',
+        10: '..EWSE..EWWSE...',
+        11: '..EWWSEEWWSE....',
+        12: '...EWWWWWSE.....',
+        13: '....ESSSSE......',
+        14: '.....EEEE.......',
+    }
+    for y, row in tail.items():
+        for x, ch in enumerate(row):
+            if ch in tone:
+                b.load()[x, y] = tone[ch]
+    out['android_cat_tail'] = (b, d)
     return out
 
 

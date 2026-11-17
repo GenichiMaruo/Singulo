@@ -418,6 +418,7 @@ public final class GeneratedContent {
             "android_teacup",
             "android_umbrella",
             "android_cat_ears",
+            "android_cat_tail",
             "android_witch_hat",
             "android_straw_hat",
             "android_ponytail",

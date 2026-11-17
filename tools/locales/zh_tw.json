@@ -14228,8 +14228,8 @@
     "translation": "眼鏡、單片眼鏡、耳環"
   },
   "gui.singulo.android.decor.4.hint": {
-    "source": "Waist ribbon, apron or brooch",
-    "translation": "腰部緞帶、圍裙、胸針"
+    "source": "Waist ribbon, apron, brooch or cat tail",
+    "translation": "腰部緞帶、圍裙、胸針、貓尾巴"
   },
   "tooltip.singulo.android_accessory.3": {
     "source": "Worn on an android's face (decoration page)",
@@ -15334,5 +15334,21 @@
   "uses.singulo.android_gate_glass_patterned": {
     "source": "Used in: Patterned Android Gate Glass Stairs",
     "translation": "用於：花紋仿生人透過玻璃樓梯"
+  },
+  "item.singulo.android_cat_tail": {
+    "source": "Cat Tail",
+    "translation": "貓尾巴"
+  },
+  "desc.singulo.android_cat_tail": {
+    "source": "A cat tail that sways behind the waist, with a lighter tip. Goes in the waist slot of the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "在腰後輕輕搖擺的貓尾巴，尖端顏色較淺。裝在裝飾頁的腰部槽中。與染料一起在工作台上可以染色。"
+  },
+  "summary.singulo.android_cat_tail": {
+    "source": "A swaying cat tail for an android.",
+    "translation": "在仿生人腰後搖擺的貓尾巴。"
+  },
+  "howto.singulo.android_cat_tail": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
   }
 }

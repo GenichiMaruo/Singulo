@@ -2320,7 +2320,7 @@ public final class AndroidGameTests {
                 {"android_cape", "android_scarf", "android_fairy_wings", "android_necktie", "android_diamond_necklace"},
                 {"android_book", "android_bouquet", "android_teacup", "android_umbrella", "android_broom", "android_lantern"},
                 {"android_glasses", "android_monocle", "android_diamond_earrings"},
-                {"android_waist_ribbon", "android_apron", "android_diamond_brooch"}};
+                {"android_waist_ribbon", "android_apron", "android_diamond_brooch", "android_cat_tail"}};
         long listed = java.util.Arrays.stream(wear).mapToLong(p -> p.length).sum();
         long registered = net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
                 .filter(i -> i instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem).count();
