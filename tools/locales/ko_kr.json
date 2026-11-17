@@ -40,8 +40,8 @@
     "translation": "공장 기술을 기지로"
   },
   "advancement.singulo.android_memory.description": {
-    "source": "Obtain any ordinary android design memory from a ruin fabricator",
-    "translation": "유적 프린터에서 일반형 설계 메모리를 하나 획득하세요"
+    "source": "Obtain a Compact Crystal Memory for any ordinary android from a ruin fabricator",
+    "translation": "폐허 안드로이드 출력대에서 일반형 소형 크리스털 메모리를 하나 획득하세요"
   },
   "advancement.singulo.android_memory.title": {
     "source": "A Little Blueprint",
@@ -56,8 +56,8 @@
     "translation": "처음 뵙겠습니다"
   },
   "advancement.singulo.android_prototypes.description": {
-    "source": "Hold both Alma and Nox design memories together (two Overseer victories guarantee both)",
-    "translation": "알마와 녹스의 설계 메모리를 함께 소지하세요 (감독관을 두 번 쓰러뜨리면 모두 획득)"
+    "source": "Hold the Compact Crystal Memories for Alma (Axe) and Nox (Bit) together (two Overseer victories guarantee both)",
+    "translation": "알마(도끼형)와 녹스(비트형)의 소형 크리스털 메모리를 함께 소지하세요 (파운드리를 두 번 쓰러뜨리면 모두 획득)"
   },
   "advancement.singulo.android_prototypes.title": {
     "source": "Two Possibilities",
@@ -80,8 +80,8 @@
     "translation": "제작법을 전하다"
   },
   "advancement.singulo.android_routes.description": {
-    "source": "Obtain an Area Card; combine it with location cards to plan routes",
-    "translation": "범위 카드를 획득하고 위치 카드와 함께 경로를 정하세요"
+    "source": "Obtain an Area Card and use it with Work Location Cards to plan routes",
+    "translation": "범위 카드를 획득하고 작업 위치 카드와 함께 경로를 정하세요"
   },
   "advancement.singulo.android_routes.title": {
     "source": "Plan the Way",
@@ -153,7 +153,7 @@
   },
   "advancement.singulo.awakened_foundry.description": {
     "source": "Defeat the Awakened Foundry Overseer",
-    "translation": "각성한 파운드리 감독관을 쓰러뜨리세요"
+    "translation": "각성한 파운드리를 쓰러뜨리세요"
   },
   "advancement.singulo.awakened_foundry.title": {
     "source": "A Will Rebooted",
@@ -305,7 +305,7 @@
   },
   "advancement.singulo.foundry.description": {
     "source": "Be a surviving challenger in the arena when the Foundry Overseer falls",
-    "translation": "총괄 AI 파운드리 감독관이 쓰러질 때 생존한 도전자로 전투 구역에 있으세요"
+    "translation": "총괄 AI \"파운드리\"가 쓰러질 때 도전자로서 전투 구역에서 살아남으세요"
   },
   "advancement.singulo.foundry.title": {
     "source": "The Last Directive",
@@ -456,8 +456,8 @@
     "translation": "자이로스코프"
   },
   "advancement.singulo.records.description": {
-    "source": "Decode every ancient record",
-    "translation": "모든 고대 기록을 해독하세요"
+    "source": "Use Decoded Records to read every ancient record",
+    "translation": "디코딩된 기록을 사용해 모든 고대 기록을 읽으세요"
   },
   "advancement.singulo.records.title": {
     "source": "Record of the Fall",
@@ -3884,8 +3884,8 @@
     "translation": "아래 순찰 경로(작업 위치 카드)의 장소를 차례로 돌며 근처의 적과 싸웁니다. 싸움이 시작되면 손이 빈 동료를 부르고, 적의 무리나 보스를 발견하면 스테이션에서 레드스톤 신호를 내고 주인에게 알립니다."
   },
   "gui.singulo.android_station.no_design": {
-    "source": "No design memory",
-    "translation": "설계 메모리 없음"
+    "source": "No Compact Crystal Memory",
+    "translation": "소형 크리스털 메모리 없음"
   },
   "gui.singulo.android_station.patrol.dwell": {
     "source": "Pause %ss",
@@ -3996,8 +3996,8 @@
     "translation": "근처에 스테이션을 잃은 안드로이드가 있습니다"
   },
   "gui.singulo.android_station.status.2": {
-    "source": "Not enough power (40000 FE to print)",
-    "translation": "전력이 부족합니다(출력에 40000 FE)"
+    "source": "Not enough power (%s FE needed to print)",
+    "translation": "전력 부족 (출력에 %s FE 필요)"
   },
   "gui.singulo.android_station.status.3": {
     "source": "Printing",
@@ -6540,8 +6540,8 @@
     "translation": "안드로이드"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
-    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다(1회 40,000 FE). 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 유적의 안드로이드와 경비 드론을 비롯한 적대적 몹을 노립니다. 보스는 공격하지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감)·순찰(정한 장소를 돎). 따라가는 중에는 \"따라가기만\"과 \"호위하기\"(근처의 적과 싸움) 중에서 고릅니다.\n- 허가증: 보호막 허가증에 한 명 이상 등록한 뒤 스테이션에 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있습니다. 호위는 그 밖의 서바이벌·모험 모드 플레이어를 침입자로 여기며 서로 피해를 줄 수 있습니다. 주인과 등록한 사람 중 누구를 따라갈지도 고를 수 있습니다.\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다. (커서를 올리면 현재 체력과 충전이 나옵니다.) \"불러오기\"를 Shift+클릭하면 근처(64블록 이내)에서 조작할 수 있는 스테이션의 안드로이드를 모두 불러옵니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다.\n- 일상: 할 일이 없으면 호위는 스테이션 근처에서 쉽니다. 계단, 반 블록, 의자에 앉고(밤에는 낮잠), 화분과 작물에 손을 대고, 바닥을 쓸고, 한동안 떨어져 있던 아이템을 근처 상자에 넣고, 동료와 수다를 떨고, 비가 오면 지붕 아래로 피하고(우산을 들고 있으면 그대로), 노을이나 밤하늘을 바라봅니다.."
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top. Most android types cost 40,000 FE per print. A Factory Print Unit halves the printing cost for all types. If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky.",
+    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다. 대부분의 기종은 한 대를 출력하는 데 40,000 FE가 필요합니다. 공장식 인쇄 유닛을 장착하면 모든 기종의 출력 전력 소모가 절반으로 줄어듭니다. 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 유적의 안드로이드와 경비 드론을 비롯한 적대적 몹을 노립니다. 보스는 공격하지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감)·순찰(정한 장소를 돎). 따라가는 중에는 \"따라가기만\"과 \"호위하기\"(근처의 적과 싸움) 중에서 고릅니다.\n- 허가증: 보호막 허가증에 한 명 이상 등록한 뒤 스테이션에 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있습니다. 호위는 그 밖의 서바이벌·모험 모드 플레이어를 침입자로 여기며 서로 피해를 줄 수 있습니다. 주인과 등록한 사람 중 누구를 따라갈지도 고를 수 있습니다.\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다. (커서를 올리면 현재 체력과 충전이 나옵니다.) \"불러오기\"를 Shift+클릭하면 근처(64블록 이내)에서 조작할 수 있는 스테이션의 안드로이드를 모두 불러옵니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다.\n- 일상: 할 일이 없으면 호위는 스테이션 근처에서 쉽니다. 계단, 반 블록, 의자에 앉고(밤에는 낮잠), 화분과 작물에 손을 대고, 바닥을 쓸고, 한동안 떨어져 있던 아이템을 근처 상자에 넣고, 동료와 수다를 떨고, 비가 오면 지붕 아래로 피하고(우산을 들고 있으면 그대로), 노을이나 밤하늘을 바라봅니다."
   },
   "guide.singulo.androids.build.title": {
     "source": "Your own androids",
@@ -6936,8 +6936,8 @@
     "translation": "에르고구의 큰뱀"
   },
   "guide.singulo.ruins.list.body": {
-    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The overseer AI Foundry waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
-    "translation": "- 지표 관측소: 평원·사막 등 지상에 서 있는 유일한 지상 유적. 하얀 경비 드론. 관측 로그·제어 장치(7일 후 재생).\n- 연구동: 얕은 지하(Y −20~4 부근). 경비기와, 안쪽 기록 보관실의 메아리 파수꾼. 냉각 원자 트랩·양자 데이터 조각(7일).\n- 봉쇄 배양 시설: 깊은 지하(Y −46~−30 부근). 극저온 코어와 강한 경비기, 안쪽 격리조실의 중력 잔재. 시간 결정 씨앗·배양 데이터(14일).\n- 지하 안드로이드 연구소: 중간 깊이의 지하(바닥 약 Y −38~−26). 봉쇄 배양 시설과 나란한 갈림길로, 연구동에서 나침반을 조정하면 함께 찾을 수 있습니다(나침반은 지표까지 뚫린 주 수직갱을 가리킵니다). 방 배치는 매번 바뀝니다. 안쪽 AI 중추에 총괄 AI \"파운드리\". 정밀 액추에이터・안드로이드 키트(7일).\n- 최종 실험 시설: 가장 깊은 지하(Y −56~−46 부근)의 중력 이상 지점. 지평선 감시자가 지킵니다. 특이점 씨앗·이상 샘플(14일).\n- 가라앉은 노심 구획: 최종 실험 시설보다 더 깊은 지하(Y −60~−54 부근)의 멈춘 두 번째 반응로. 최종 실험 시설을 공략한 뒤 탐색 나침반을 조정하면 찾을 수 있습니다. 에르고구의 거대 뱀. 특이 물질·제트 응축물·호킹 응축물(14일)."
+    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation Logs and Degraded Control Units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Degraded Cold Atom Traps and Quantum Data Fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Degraded Time Crystal Seeds and Culture Data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The Foundry Overseer waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity anomaly deep underground (around Y −56 to −46). The Horizon Warden guards it. Degraded Anomaly Samples (regrow in 14 days). Each cache holds a Dormant Singularity Seed the first time you open it.\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
+    "translation": "- 지표 관측소: 평원·사막 등 지상에 서 있는 유일한 지상 유적. 하얀 경비 드론. 관측 로그·열화된 제어 장치(7일 후 재생).\n- 연구동: 얕은 지하(Y −20~4 부근). 경비기와, 안쪽 기록 보관실의 메아리 파수꾼. 열화된 냉각 원자 트랩·양자 데이터 조각(7일).\n- 봉쇄 배양 시설: 깊은 지하(Y −46~−30 부근). 극저온 코어와 강한 경비기, 안쪽 격리조실의 중력 잔재. 열화된 시간 결정 씨앗·배양 데이터(14일).\n- 지하 안드로이드 연구소: 중간 깊이의 지하(바닥 약 Y −38~−26). 봉쇄 배양 시설과 나란한 갈림길로, 연구동에서 나침반을 조정하면 함께 찾을 수 있습니다(나침반은 지표까지 뚫린 주 수직갱을 가리킵니다). 방 배치는 매번 바뀝니다. 안쪽 AI 중추에 총괄 AI \"파운드리\". 정밀 액추에이터・안드로이드 키트(7일).\n- 최종 실험 시설: 깊은 지하(Y −56~−46 부근)의 중력 이상 지점. 지평선 감시자가 지킵니다. 열화된 이상 샘플은 14일 후 재생됩니다. 휴면 특이점 씨앗은 각 보관고를 처음 열 때 한 번만 얻을 수 있습니다.\n- 가라앉은 노심 구획: 최종 실험 시설보다 더 깊은 지하(Y −60~−54 부근)의 멈춘 두 번째 반응로. 최종 실험 시설을 공략한 뒤 탐색 나침반을 조정하면 찾을 수 있습니다. 에르고구의 거대 뱀. 특이 물질·제트 응축물·호킹 응축물(14일)."
   },
   "guide.singulo.ruins.list.title": {
     "source": "The six ruins",
@@ -6952,8 +6952,8 @@
     "translation": "탐사 계획"
   },
   "guide.singulo.ruins.records.body": {
-    "source": "Ruin caches sometimes hold crystal memories. Decode them with power in the Archive Terminal to read the records of the old civilization (they are added to the Ancient Records chapter of this handbook). Collect them all to learn why the civilization fell.",
-    "translation": "폐허 보관고에서 가끔 크리스털 메모리가 나옵니다. 기록 보관 단말기에서 전력을 써서 해독하면 고대 문명의 기록을 읽을 수 있습니다(핸드북의 '고대 문명의 기록' 장에 추가됩니다). 모두 모으면 문명이 멸망한 이유를 알 수 있습니다."
+    "source": "Ruin caches sometimes hold Crystal Memories. Decode one in a powered Archive Terminal, then use the Decoded Record to add an entry to the Ancient Records chapter of this handbook. Read them all to learn why the civilization fell.",
+    "translation": "유적 보관고에서 가끔 크리스털 메모리가 나옵니다. 전원을 공급한 기록 보관 단말기에서 메모리 하나를 해독한 뒤, 얻은 ‘디코딩된 기록’을 사용하면 핸드북의 ‘고대 기록’ 장에 기록 한 편이 추가됩니다. 모두 읽으면 문명이 멸망한 이유를 알 수 있습니다."
   },
   "guide.singulo.ruins.records.title": {
     "source": "Crystal memories",
@@ -6972,8 +6972,8 @@
     "translation": "1단계: 시작"
   },
   "guide.singulo.stage1.flow.body": {
-    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
-    "translation": "이 단계에서 할 일(위에서부터 차례로):\n1. 강철·세라믹·기초 회로·기초 프레임을 만듭니다(\"첫 재료\" 참고).\n2. 열전 발전기를 2〜4대 놓고 구리 도선으로 장치에 잇습니다. 마그마 블록＋푸른 얼음이면 녹지 않고 오래갑니다.\n3. 소성로·압축기(강철판)·기록 보관 단말기를 갖춥니다. 탐험가의 나침반과 홀로그램 투영기도 만들어 둡니다.\n4. 탐험가의 나침반으로 지표 관측소를 찾아, 보관고에서 열화된 제어 장치과 관측 로그를 가져옵니다.\n5. 기록 보관 단말기로 제어 장치을 복원하고, 극저온 냉각탑 부품을 만들어 홀로그램 투영기를 보며 조립합니다.\n6. 냉각탑에서 \"초전도 코일\"을 만들면 2단계입니다.\n막히기 쉬운 곳:\n・저온 쪽 블록이 녹음: 용암이나, 모닥불＋물·눈·얼음은 금방 녹습니다. \"녹지 않는 조합\" 페이지를 보세요.\n・냉각탑이 완성되지 않음: 가운데 줄은 열교환 코어, 꼭대기는 통풍 격자입니다. 홀로그램 투영기를 제어기에 쓰면 모자란 곳이 보입니다.\n・전력 부족: 기본 설정에서 높이 7인 냉각탑이 액체 질소를 연속 생산할 때는 약 1,786 FE/t가 필요합니다. 전력이 부족하면 진행도를 유지하고 기다리므로, 장치를 번갈아 돌리면서 발전과 축전을 늘리세요."
+    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Observation Post and bring back Degraded Control Units and Observation Logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
+    "translation": "이 단계에서 할 일(위에서부터 차례로):\n1. 강철·세라믹·기초 회로·기초 프레임을 만듭니다(\"첫 재료\" 참고).\n2. 열전 발전기를 2〜4대 놓고 구리 도선으로 장치에 잇습니다. 마그마 블록＋푸른 얼음이면 녹지 않고 오래갑니다.\n3. 소성로·압축기(강철판)·기록 보관 단말기를 갖춥니다. 탐험가의 나침반과 홀로그램 투영기도 만들어 둡니다.\n4. 탐험가의 나침반으로 지표 관측소를 찾아, 보관고에서 열화된 제어 장치와 관측 로그를 가져옵니다.\n5. 기록 보관 단말기로 제어 장치를 복원하고, 극저온 냉각탑 부품을 만들어 홀로그램 투영기를 보며 조립합니다.\n6. 냉각탑에서 \"초전도 코일\"을 만들면 2단계입니다.\n막히기 쉬운 곳:\n・저온 쪽 블록이 녹음: 용암이나, 모닥불＋물·눈·얼음은 금방 녹습니다. \"녹지 않는 조합\" 페이지를 보세요.\n・냉각탑이 완성되지 않음: 가운데 줄은 열교환 코어, 꼭대기는 통풍 격자입니다. 홀로그램 투영기를 제어기에 쓰면 모자란 곳이 보입니다.\n・전력 부족: 기본 설정에서 높이 7인 냉각탑이 액체 질소를 연속 생산할 때는 약 1,786 FE/t가 필요합니다. 전력이 부족하면 진행도를 유지하고 기다리므로, 장치를 번갈아 돌리면서 발전과 축전을 늘리세요."
   },
   "guide.singulo.stage1.flow.title": {
     "source": "Stage 1 at a glance",
@@ -7024,8 +7024,8 @@
     "translation": "입자 가속기 및 뮤온 촉매"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n3. 뮤온 촉매 핵융합로(4 kFE/t)를 만들고, 뮤온 촉매와 물로 전력을 늘립니다. 새 촉매 1개로 10분(쓰던 것은 남은 수명의 절반만큼) 움직입니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 냉각 원자 트랩을 모읍니다(안쪽의 메아리 파수꾼을 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・냉각탑이 느림: 액체 질소는 1 mB에 250 FE가 듭니다. 핵융합로가 생길 때까지는 열전 발전기를 늘립니다(전력이 부족하면 진행도를 유지하고 기다리므로 평균 생산 속도가 낮아집니다).\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Observation Post's cache and find the Research Building. Collect Quantum Data Fragments and Degraded Cold Atom Traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n3. 뮤온 촉매 핵융합로(4 kFE/t)를 만들고, 뮤온 촉매와 물로 전력을 늘립니다. 새 촉매 1개로 10분(쓰던 것은 남은 수명의 절반만큼) 움직입니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 열화된 냉각 원자 트랩을 모읍니다(안쪽의 메아리 파수꾼을 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・냉각탑이 느림: 액체 질소는 1 mB에 250 FE가 듭니다. 핵융합로가 생길 때까지는 열전 발전기를 늘립니다(전력이 부족하면 진행도를 유지하고 기다리므로 평균 생산 속도가 낮아집니다).\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
@@ -7052,8 +7052,8 @@
     "translation": "3단계: 양자"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다(3단계 장치는 뮤온 촉매를 1개씩 씁니다. 레이저 냉각기에는 연구동의 메아리 파수꾼이 떨어뜨리는 파수꾼 투영 핵도 필요합니다).\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재을 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 씨앗, 배양 데이터, 축퇴 핵(중력 잔재가 떨어뜨림)이 갖춰지면 4단계의 시간 결정 배양기로 넘어갑니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect Degraded Time Crystal Seeds and Culture Data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. Use the Degenerate Nucleus dropped by the Gravity Remnant to build the stage 4 Time Crystal Incubator. Restore the Degraded Time Crystal Seeds there.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다(3단계 장치는 뮤온 촉매를 1개씩 씁니다. 레이저 냉각기에는 연구동의 메아리 파수꾼이 떨어뜨리는 파수꾼 투영 핵도 필요합니다).\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 열화된 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재를 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 중력 잔재가 떨어뜨린 축퇴 핵으로 4단계 시간 결정 배양기를 만들고, 그 안에서 열화된 시간 결정 씨앗을 복원합니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -7088,8 +7088,8 @@
     "translation": "압축 체인"
   },
   "guide.singulo.stage4.flow.body": {
-    "source": "What to do:\n1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity does not drop; facilities and running machines compete for crystals, so two incubators help).\n2. Make exotic matter and axion condensate in the C-Cavity.\n3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5 MFE/t).\n4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singularity seed).\n5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes at the Seal Console to get the Dormant Singularity Seed.\n6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\nCommon sticking points:\n- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add incubators.\n- Can't find the Final Lab: it is the deepest ruin (around Y -56 to -46). The Gravitational Wave Detector shows its rough direction and distance.",
-    "translation": "이 단계에서 할 일:\n1. 시간 결정 배양기로 시간 결정 촉매를 키웁니다(요구 전력의 80% 이상이면 순도가 떨어지지 않습니다. 설비용과 운전용이 서로 다투므로 2대 있으면 편합니다).\n2. 카시미르 공동으로 특이 물질과 액시온 응축물를 만듭니다.\n3. 압축기의 질량 모드로 압축 블록을 만들고, 축퇴 열로(5 MFE/t)로 발전합니다.\n4. 축퇴 압축로로 축퇴 물질 껍질을 7개 만듭니다(노 껍질용 6개, 특이점 씨앗용 1개).\n5. 봉쇄 배양 시설의 보관고에서 나침반을 조정해 최종 실험 시설을 찾습니다. 봉인 콘솔에서 깨어나는 지평선 감시자을 쓰러뜨려 \"휴면 특이점 씨앗\"을 얻습니다.\n6. 씨앗을 얻으면 5단계입니다. 특이점 캡슐화기로 깨우고 P 반응로에 넣습니다.\n막히기 쉬운 곳:\n・시간 결정이 모자람: 시간 결정 모듈(설비용)과 촉매(운전용) 양쪽에 씁니다. 배양기를 늘리세요.\n・최종 실험 시설을 못 찾음: 가장 깊은 지하(Y−56〜−46쯤)에 있습니다. 중력파 검출기로 대략의 방향과 거리를 알 수 있습니다."
+    "source": "What to do:\n1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity does not drop; facilities and running machines compete for crystals, so two incubators help).\n2. Make exotic matter and axion condensate in the C-Cavity.\n3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5 MFE/t).\n4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singularity seed).\n5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes at the Seal Console to get the Dormant Singularity Seed.\n6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\nCommon sticking points:\n- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add incubators.\n- Can't find the Final Lab: look deep underground (around Y -56 to -46). The Gravitational Wave Detector shows its rough direction and distance.",
+    "translation": "이 단계에서 할 일:\n1. 시간 결정 배양기로 시간 결정 촉매를 키웁니다(요구 전력의 80% 이상이면 순도가 떨어지지 않습니다. 설비용과 운전용이 서로 다투므로 2대 있으면 편합니다).\n2. 카시미르 공동으로 특이 물질과 액시온 응축물를 만듭니다.\n3. 압축기의 질량 모드로 압축 블록을 만들고, 축퇴 열로(5 MFE/t)로 발전합니다.\n4. 축퇴 압축로로 축퇴 물질 껍질을 7개 만듭니다(노 껍질용 6개, 특이점 씨앗용 1개).\n5. 봉쇄 배양 시설의 보관고에서 나침반을 조정해 최종 실험 시설을 찾습니다. 봉인 콘솔에서 깨어나는 지평선 감시자를 쓰러뜨려 \"휴면 특이점 씨앗\"을 얻습니다.\n6. 씨앗을 얻으면 5단계입니다. 특이점 캡슐화기로 깨우고 P 반응로에 넣습니다.\n막히기 쉬운 곳:\n・시간 결정이 모자람: 시간 결정 모듈(설비용)과 촉매(운전용) 양쪽에 씁니다. 배양기를 늘리세요.\n・최종 실험 시설을 못 찾음: 깊은 지하(Y−56〜−46쯤)를 찾아보세요. 중력파 검출기로 대략의 방향과 거리를 알 수 있습니다."
   },
   "guide.singulo.stage4.flow.title": {
     "source": "Stage 4 at a glance",
@@ -12508,16 +12508,16 @@
     "translation": "빈 포장 상자"
   },
   "gui.singulo.drone_port.arrived": {
-    "source": "Arrived crates (unpacked into the row below)",
-    "translation": "도착한 상자(아래 수령 칸으로 풀어 넣음)"
+    "source": "Arrived crates unpack into the cargo slots on the right.",
+    "translation": "도착한 상자에서 꺼낸 화물은 오른쪽 화물 칸으로 들어갑니다."
   },
   "gui.singulo.drone_port.receive": {
     "source": "Received items",
     "translation": "수령"
   },
   "gui.singulo.drone_port.locked": {
-    "source": "Only the owner can use this",
-    "translation": "소유자만 사용할 수 있습니다"
+    "source": "The owner can use this port. Teammates can use it when team sharing is enabled.",
+    "translation": "소유자만 이 포트를 사용할 수 있습니다. 팀 공유를 켜면 소유자의 팀원도 사용할 수 있습니다."
   },
   "tooltip.singulo.drone_crate.range": {
     "source": "Range: %s blocks",
@@ -12732,8 +12732,8 @@
     "translation": "자동 %s개"
   },
   "gui.singulo.drone_port.auto.hint": {
-    "source": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
-    "translation": "자동 발송: 화물이 이 수(가득은 9칸 모두)만큼 쌓이면 등록한 목적지로 보낸다. 화물이 더 늘지 않고 2초 지나면 보낸다. 클릭으로 전환"
+    "source": "Click to change modes. At the selected item count, cargo must stay unchanged for 2 seconds. Full sends on the next check when all 9 cargo slots hold full stacks.",
+    "translation": "클릭하여 모드를 바꿉니다. 화물이 설정한 개수에 도달하면 2초 동안 변동이 없어야 합니다. 가득 모드에서는 화물 9칸이 모두 최대 수량까지 차면 다음 확인 때 발송합니다."
   },
   "gui.singulo.drone_port.auto.register": {
     "source": "Set",
@@ -13879,6 +13879,10 @@
     "source": "Send tank (filled into a capsule when sent)",
     "translation": "발송 탱크(발송할 때 캡슐에 담김)"
   },
+  "gui.singulo.fluid_drone_port.arrived": {
+    "source": "Arrived capsules empty into the receive tank on the right.",
+    "translation": "도착한 캡슐의 유체는 오른쪽 수신 탱크로 들어갑니다."
+  },
   "gui.singulo.fluid_drone_port.receive_tank": {
     "source": "Receive tank (arrived capsules empty into it)",
     "translation": "수신 탱크(도착한 캡슐이 여기로 비워짐)"
@@ -13890,6 +13894,10 @@
   "gui.singulo.fluid_drone_port.auto.amount": {
     "source": "Auto: %s B",
     "translation": "자동 %s양동이"
+  },
+  "gui.singulo.fluid_drone_port.auto.hint": {
+    "source": "Click to change modes. At the selected bucket count, the send tank must stay unchanged for 2 seconds. Full sends on the next check when the send tank is full.",
+    "translation": "클릭하여 모드를 바꿉니다. 발송 탱크가 설정한 양동이 수에 도달하면 액체량이 2초 동안 변하지 않아야 합니다. 가득 모드에서는 발송 탱크가 가득 차면 다음 확인 때 발송합니다."
   },
   "gui.singulo.fluid_drone_port.status.6": {
     "source": "No empty fluid capsule",

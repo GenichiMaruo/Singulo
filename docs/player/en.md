@@ -107,11 +107,11 @@ Structure parts also require the controller's stage. Particle Accelerator tubes 
 
 | Ruin | Important salvage and purpose |
 | --- | --- |
-| Observation Post | Observation Logs and degraded Control Units; the entry to superconducting and muon technology |
-| Research Building | Quantum Data Fragments and degraded Cold Atom Traps for quantum technology |
-| Culture Facility | Culture Data and degraded Time Crystal Seeds for temporal technology and exotic matter |
+| Observation Post | Observation Logs and Degraded Control Units for superconducting and muon technology |
+| Research Building | Quantum Data Fragments and Degraded Cold Atom Traps for quantum technology |
+| Culture Facility | Culture Data and Degraded Time Crystal Seeds for temporal technology and exotic matter |
 | Underground Android Laboratory | Tune the compass at the Research Building to find the main shaft. The Foundry Overseer guards a cache with Precision Actuators and Android Kits |
-| Final Lab | Anomaly Samples and the initial Dormant Singularity Seed, guarded by the Horizon Warden |
+| Final Lab | The Horizon Warden guards the cache. Degraded Anomaly Samples replenish. A Dormant Singularity Seed appears only the first time each cache is opened |
 | Sunken Reactor Sector | A dead second reactor: exotic matter, Jet Condensate and H-Condensate, guarded by the Ergosphere Leviathan |
 
 Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground, the Final Lab deeper still, and the Sunken Reactor Sector below it (around Y −60 to −54). The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts, Research Buildings and Underground Android Laboratories, or fourteen for Culture Facilities, Final Labs and Sunken Reactor Sectors.
@@ -134,7 +134,7 @@ The Underground Android Laboratory also has two prototypes. Foundry summons the 
 
 Androids run on charge and run out after about ten big moves. They return to a nearby fabricator, unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging.
 
-**Your own androids:** make an **Android Assembly Station** and android kits in the stage 2 Precision Assembler. Put a compact crystal memory (never used up) and kits (one per print) in the station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last.
+**Your own androids:** make an **Android Assembly Station** and android kits in the stage 2 Precision Assembler. Put a compact crystal memory (never used up) and kits (one per print) in the station and supply power, and it prints one guard android on top. Most android types cost 40,000 FE per print. A Factory Print Unit halves the printing cost for all types. If it falls, the station prints it again while kits last.
 
 - Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.
 - Modes: Guard (by the station), Wander (within 16 blocks), Follow (accompanies the selected player) and Patrol (walks a set route). Below its return health it goes back to the station and repairs and recharges in 5 s.

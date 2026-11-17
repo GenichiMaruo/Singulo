@@ -40,8 +40,8 @@
     "translation": "將工廠技術帶回家"
   },
   "advancement.singulo.android_memory.description": {
-    "source": "Obtain any ordinary android design memory from a ruin fabricator",
-    "translation": "從遺跡列印台取得任意一種普通型號的設計記憶體"
+    "source": "Obtain a Compact Crystal Memory for any ordinary android from a ruin fabricator",
+    "translation": "從廢墟仿生人列印台取得任一普通型號的小型水晶記憶體"
   },
   "advancement.singulo.android_memory.title": {
     "source": "A Little Blueprint",
@@ -56,8 +56,8 @@
     "translation": "初次見面"
   },
   "advancement.singulo.android_prototypes.description": {
-    "source": "Hold both Alma and Nox design memories together (two Overseer victories guarantee both)",
-    "translation": "同時持有阿爾瑪與諾克斯的設計記憶體（擊敗監督者兩次即可集齊）"
+    "source": "Hold the Compact Crystal Memories for Alma (Axe) and Nox (Bit) together (two Overseer victories guarantee both)",
+    "translation": "同時持有阿爾瑪（斧型）與諾克斯（浮游砲型）的小型水晶記憶體（擊敗鑄造廠兩次即可集齊）"
   },
   "advancement.singulo.android_prototypes.title": {
     "source": "Two Possibilities",
@@ -80,8 +80,8 @@
     "translation": "傳授配方"
   },
   "advancement.singulo.android_routes.description": {
-    "source": "Obtain an Area Card; combine it with location cards to plan routes",
-    "translation": "取得區域卡，配合位置卡規劃路徑"
+    "source": "Obtain an Area Card and use it with Work Location Cards to plan routes",
+    "translation": "取得範圍卡，配合作業位置卡規劃路線"
   },
   "advancement.singulo.android_routes.title": {
     "source": "Plan the Way",
@@ -153,7 +153,7 @@
   },
   "advancement.singulo.awakened_foundry.description": {
     "source": "Defeat the Awakened Foundry Overseer",
-    "translation": "擊敗覺醒的鑄造監督者"
+    "translation": "擊敗覺醒的鑄造廠"
   },
   "advancement.singulo.awakened_foundry.title": {
     "source": "A Will Rebooted",
@@ -305,7 +305,7 @@
   },
   "advancement.singulo.foundry.description": {
     "source": "Be a surviving challenger in the arena when the Foundry Overseer falls",
-    "translation": "統括AI鑄造監督者被擊敗時，作為存活的挑戰者留在戰鬥區域內"
+    "translation": "在統籌 AI「鑄造廠」被擊敗時，身為挑戰者在場內存活"
   },
   "advancement.singulo.foundry.title": {
     "source": "The Last Directive",
@@ -456,8 +456,8 @@
     "translation": "陀螺儀"
   },
   "advancement.singulo.records.description": {
-    "source": "Decode every ancient record",
-    "translation": "解讀所有古文明的記錄"
+    "source": "Use Decoded Records to read every ancient record",
+    "translation": "使用解碼記錄，讀完所有古文明記錄"
   },
   "advancement.singulo.records.title": {
     "source": "Record of the Fall",
@@ -3884,8 +3884,8 @@
     "translation": "按順序巡視下方巡邏路線（作業位置卡）的地點，與附近的敵人戰鬥。開始戰鬥時會呼叫空閒的同伴，發現敵人群體或首領時，組裝站會發出紅石訊號並通知主人。"
   },
   "gui.singulo.android_station.no_design": {
-    "source": "No design memory",
-    "translation": "沒有設計記憶體"
+    "source": "No Compact Crystal Memory",
+    "translation": "未放入小型水晶記憶體"
   },
   "gui.singulo.android_station.patrol.dwell": {
     "source": "Pause %ss",
@@ -3996,8 +3996,8 @@
     "translation": "附近有失去組裝站的仿生人"
   },
   "gui.singulo.android_station.status.2": {
-    "source": "Not enough power (40000 FE to print)",
-    "translation": "電力不足（列印需要 40000 FE）"
+    "source": "Not enough power (%s FE needed to print)",
+    "translation": "電力不足（列印需要 %s FE）"
   },
   "gui.singulo.android_station.status.3": {
     "source": "Printing",
@@ -6540,8 +6540,8 @@
     "translation": "仿生人"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
-    "translation": "在仿生人組裝站放入小型水晶記憶體（決定型號，不會消耗）和仿生人套件（每次列印一個）並供電，它就會在上方列印一個護衛仿生人（每次 40,000 FE）。被擊倒後，只要還有套件就會重新列印。放置組裝站的人就是主人。\n- 護衛攻擊敵對生物，包括遺蹟的仿生人和警備無人機。它們不會攻擊首領。\n- 行動方式：迎擊（在組裝站旁等待）、徘徊（在 16 格內四處走動）、跟隨（跟著主人）、巡邏（巡視設定的地點）。跟隨時可以選擇「只跟隨」或「護衛」（與附近的敵人戰鬥）。\n- 許可證：在護盾通行證上登記至少一名玩家後，將其放入組裝站。此時只有主人和已登記的人能打開組裝站和仿生人的介面。護衛會將其他生存或冒險模式玩家視為入侵者，雙方都能傷到對方。也可以選擇跟隨主人還是某位已登記的人。\n- 返回生命：低於此值時，仿生人會回去維修並充電。按「召回」可立即讓它回去。（把游標移到上面會顯示目前生命和充電）。Shift+點擊「召回」可召回附近（64 格以內）你能操作的組裝站的所有仿生人。\n- 名字：在組裝站或仿生人介面中點擊名字即可改名（↺ 按鈕恢復暱稱）。\n- 比較器：組裝站會根據仿生人的生命輸出訊號（0〜15）。\n- 組裝站被破壞後，仿生人會留在原地。在新的組裝站放入相同型號的記憶體並按「連結」即可重新連接。\n- 日常生活：無事可做時，護衛會在組裝站附近休息。坐在樓梯、半磚或椅子上（夜裡會打盹），把手放在盆栽和作物上方，掃地，把掉在地上一段時間的物品收進附近的箱子，和同伴聊天，下雨時躲到屋簷下（拿著傘就留在外面），眺望夕陽或夜空。"
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top. Most android types cost 40,000 FE per print. A Factory Print Unit halves the printing cost for all types. If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky.",
+    "translation": "在仿生人組裝站放入小型水晶記憶體（決定型號，不會消耗）和仿生人套件（每次列印一個）並供電，它就會在上方列印一個護衛仿生人。大多數型號每次列印消耗 40,000 FE。安裝工廠式列印單元後，所有型號的列印耗電量都會減半。被擊倒後，只要還有套件就會重新列印。放置組裝站的人就是主人。\n- 護衛攻擊敵對生物，包括遺蹟的仿生人和警備無人機。它們不會攻擊首領。\n- 行動方式：迎擊（在組裝站旁等待）、徘徊（在 16 格內四處走動）、跟隨（跟著主人）、巡邏（巡視設定的地點）。跟隨時可以選擇「只跟隨」或「護衛」（與附近的敵人戰鬥）。\n- 許可證：在護盾通行證上登記至少一名玩家後，將其放入組裝站。此時只有主人和已登記的人能打開組裝站和仿生人的介面。護衛會將其他生存或冒險模式玩家視為入侵者，雙方都能傷到對方。也可以選擇跟隨主人還是某位已登記的人。\n- 返回生命：低於此值時，仿生人會回去維修並充電。按「召回」可立即讓它回去。（把游標移到上面會顯示目前生命和充電）。Shift+點擊「召回」可召回附近（64 格以內）你能操作的組裝站的所有仿生人。\n- 名字：在組裝站或仿生人介面中點擊名字即可改名（↺ 按鈕恢復暱稱）。\n- 比較器：組裝站會根據仿生人的生命輸出訊號（0〜15）。\n- 組裝站被破壞後，仿生人會留在原地。在新的組裝站放入相同型號的記憶體並按「連結」即可重新連接。\n- 日常生活：無事可做時，護衛會在組裝站附近休息。坐在樓梯、半磚或椅子上（夜裡會打盹），把手放在盆栽和作物上方，掃地，把掉在地上一段時間的物品收進附近的箱子，和同伴聊天，下雨時躲到屋簷下（拿著傘就留在外面），眺望夕陽或夜空。"
   },
   "guide.singulo.androids.build.title": {
     "source": "Your own androids",
@@ -6936,8 +6936,8 @@
     "translation": "能層大蛇"
   },
   "guide.singulo.ruins.list.body": {
-    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The overseer AI Foundry waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
-    "translation": "- 地表觀測站：平原、沙漠等地表上唯一建在地面的遺蹟。白色警衛無人機。觀測日誌、控制單元（7 天再生）。\n- 研究棟：淺層地下（約 Y −20〜4）。警衛機，以及深處檔案室的回聲守衛。冷原子陷阱、量子資料片段（7 天）。\n- 封閉培養設施：深層地下（約 Y −46〜−30）。低溫核心、更強的警衛機，以及深處隔離槽室的重力殘渣。時間晶種、培養資料（14 天）。\n- 地下仿生人研究所：中等深度的地下（地板約 Y −38〜−26）。與封閉培養設施並列的分支，在研究樓調校羅盤後就能一起搜尋（羅盤指向貫通到地表的主豎井）。房間的排列每次都不同。深處的 AI 中樞裡是統籌 AI「鑄造廠」。精密致動器・仿生人套件（7 天）。\n- 最終實驗室：最深處地下（約 Y −56〜−46）的重力異常點。由視界守衛看守。奇點種子、異常樣本（14 天）。\n- 沉沒的爐心區：比最終實驗室更深的地下（約 Y −60〜−54），停止運轉的第二座反應爐。攻略最終實驗室後調整探索羅盤即可尋找。能層巨蛇。奇異物質、噴流凝聚體、霍金凝聚體（14 天）。"
+    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation Logs and Degraded Control Units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Degraded Cold Atom Traps and Quantum Data Fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Degraded Time Crystal Seeds and Culture Data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The Foundry Overseer waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity anomaly deep underground (around Y −56 to −46). The Horizon Warden guards it. Degraded Anomaly Samples (regrow in 14 days). Each cache holds a Dormant Singularity Seed the first time you open it.\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
+    "translation": "- 地表觀測站：平原、沙漠等地表上唯一建在地面的遺蹟。白色警衛無人機。觀測日誌、退化的控制單元（7 天再生）。\n- 研究棟：淺層地下（約 Y −20〜4）。警衛機，以及深處檔案室的回聲守衛。退化冷原子陷阱、量子資料片段（7 天）。\n- 封閉培養設施：深層地下（約 Y −46〜−30）。低溫核心、更強的警衛機，以及深處隔離槽室的重力殘渣。退化的時間晶種、培養資料（14 天）。\n- 地下仿生人研究所：中等深度的地下（地板約 Y −38〜−26）。與封閉培養設施並列的分支，在研究樓調校羅盤後就能一起搜尋（羅盤指向貫通到地表的主豎井）。房間的排列每次都不同。深處的 AI 中樞裡是統籌 AI「鑄造廠」。精密致動器・仿生人套件（7 天）。\n- 最終實驗室：地下深處（約 Y −56〜−46）的重力異常點。由視界守衛看守。退化的異常樣本（14 天再生）。每個保管庫只有首次開啟時才有一顆休眠奇點種子。\n- 沉沒的爐心區：比最終實驗室更深的地下（約 Y −60〜−54），停止運轉的第二座反應爐。攻略最終實驗室後調整探索羅盤即可尋找。能層巨蛇。奇異物質、噴流凝聚體、霍金凝聚體（14 天）。"
   },
   "guide.singulo.ruins.list.title": {
     "source": "The six ruins",
@@ -6952,8 +6952,8 @@
     "translation": "規劃探索"
   },
   "guide.singulo.ruins.records.body": {
-    "source": "Ruin caches sometimes hold crystal memories. Decode them with power in the Archive Terminal to read the records of the old civilization (they are added to the Ancient Records chapter of this handbook). Collect them all to learn why the civilization fell.",
-    "translation": "廢墟保管庫中有時會出現水晶記憶體。在檔案終端消耗電力解讀後，即可閱讀舊文明的記錄（會加入手冊的「舊文明的記錄」章節）。全部集齊，就能知道文明滅亡的原因。"
+    "source": "Ruin caches sometimes hold Crystal Memories. Decode one in a powered Archive Terminal, then use the Decoded Record to add an entry to the Ancient Records chapter of this handbook. Read them all to learn why the civilization fell.",
+    "translation": "遺蹟保管庫中有時會出現水晶記憶體。在通電的檔案終端解讀一個，再使用得到的「解碼記錄」，即可在手冊的「舊文明的記錄」一章中新增一則記錄。讀完所有記錄，就能知道文明滅亡的原因。"
   },
   "guide.singulo.ruins.records.title": {
     "source": "Crystal memories",
@@ -6972,7 +6972,7 @@
     "translation": "第一階段：啟動"
   },
   "guide.singulo.stage1.flow.body": {
-    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
+    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Observation Post and bring back Degraded Control Units and Observation Logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
     "translation": "這一階段要做的事（依序）：\n1. 製作鋼、陶瓷、基礎電路和基礎框架（見「最初的材料」）。\n2. 放置 2〜4 台熱電發電機，用銅導線連到裝置。岩漿塊＋藍冰不會融化，能長久使用。\n3. 備齊燒製爐、壓縮機（鋼板）和檔案終端。探索羅盤和全像投影器也先做好。\n4. 用探索羅盤找到地表觀測站，從保管庫帶回退化的控制單元和觀測日誌。\n5. 在檔案終端修復控制單元，製作低溫冷卻塔的零件，對照全像投影器組裝。\n6. 冷卻塔能做出「超導線圈」後，就進入第 2 階段。\n容易卡住的地方：\n・低溫側的方塊融化：岩漿，或營火配水、雪、冰，很快就會融化。請看「不會融化的組合」一頁。\n・冷卻塔組不起來：中心一列是熱交換核心，頂部是通風格柵。把全像投影器用在控制器上，就能看出缺了哪裡。\n・電力不足：預設設定下，高度為 7 的冷卻塔連續製造液態氮時約需 1,786 FE/t。供電不足時會保留進度並等待，因此可以讓裝置交替運轉，並增加發電與儲電。"
   },
   "guide.singulo.stage1.flow.title": {
@@ -7024,8 +7024,8 @@
     "translation": "粒子加速器與緲子催化劑"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（供電不足時保留進度並等待，因此平均產量會降低）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Observation Post's cache and find the Research Building. Collect Quantum Data Fragments and Degraded Cold Atom Traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和退化冷原子陷阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（供電不足時保留進度並等待，因此平均產量會降低）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
@@ -7052,8 +7052,8 @@
     "translation": "第三階段：量子"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "這一階段要做的事：\n1. 製作量子糾纏合成器和雷射冷卻器（第 3 階段的裝置各消耗 1 個緲子催化劑；雷射冷卻器還需要研究棟的回聲守衛掉落的守衛投影核心）。\n2. 用量子熱機發電（玻色凝聚態催化劑下 200 kFE/t；做出來之前可用緲子催化劑以 25% 試運轉）。\n3. 用雷射冷卻器製作玻色凝聚態催化劑（第 3 級）和光學晶格基板。\n4. 儘早放置深海壓力收集器，儲存高壓晶體（之後外殼和鐵砧需要約 30 個）。\n5. 在研究棟的保管庫調整探索羅盤，尋找封閉培養設施。收集時間晶體種子和培養資料（打倒深處的重力殘渣後保管庫會打開）。同樣的調整也能找到地下仿生人研究所。\n6. 備齊時間晶體種子、培養資料和簡併核（重力殘渣掉落）後，進入第 4 階段的時間晶體培育槽。\n容易卡住的地方：\n・封閉培養設施很難：有極低溫區域和強力警備機。備好防具和回復，帶上護衛仿生人。\n・被重力殘渣拋起：摔落很痛，重力靴或衝擊發電面板會有幫助。"
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect Degraded Time Crystal Seeds and Culture Data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. Use the Degenerate Nucleus dropped by the Gravity Remnant to build the stage 4 Time Crystal Incubator. Restore the Degraded Time Crystal Seeds there.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "這一階段要做的事：\n1. 製作量子糾纏合成器和雷射冷卻器（第 3 階段的裝置各消耗 1 個緲子催化劑；雷射冷卻器還需要研究棟的回聲守衛掉落的守衛投影核心）。\n2. 用量子熱機發電（玻色凝聚態催化劑下 200 kFE/t；做出來之前可用緲子催化劑以 25% 試運轉）。\n3. 用雷射冷卻器製作玻色凝聚態催化劑（第 3 級）和光學晶格基板。\n4. 儘早放置深海壓力收集器，儲存高壓晶體（之後外殼和鐵砧需要約 30 個）。\n5. 在研究棟的保管庫調整探索羅盤，尋找封閉培養設施。收集退化的時間晶種和培養資料（打倒深處的重力殘渣後保管庫會打開）。同樣的調整也能找到地下仿生人研究所。\n6. 用重力殘渣掉落的簡併核製作第 4 階段的時間晶體培育槽，在槽中修復退化的時間晶種。\n容易卡住的地方：\n・封閉培養設施很難：有極低溫區域和強力警備機。備好防具和回復，帶上護衛仿生人。\n・被重力殘渣拋起：摔落很痛，重力靴或衝擊發電面板會有幫助。"
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -7088,8 +7088,8 @@
     "translation": "壓縮鏈"
   },
   "guide.singulo.stage4.flow.body": {
-    "source": "What to do:\n1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity does not drop; facilities and running machines compete for crystals, so two incubators help).\n2. Make exotic matter and axion condensate in the C-Cavity.\n3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5 MFE/t).\n4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singularity seed).\n5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes at the Seal Console to get the Dormant Singularity Seed.\n6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\nCommon sticking points:\n- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add incubators.\n- Can't find the Final Lab: it is the deepest ruin (around Y -56 to -46). The Gravitational Wave Detector shows its rough direction and distance.",
-    "translation": "這一階段要做的事：\n1. 用時間晶體培育槽培育時間晶體催化劑（電力達到要求的 80% 以上時純度不會下降。設施用和運轉用會互相爭搶，有 2 台比較輕鬆）。\n2. 用卡西米爾腔製作奇異物質和軸子凝聚體。\n3. 用壓縮機的質量模式製作壓縮塊，用簡併熱爐（5 MFE/t）發電。\n4. 用簡併壓縮爐製作 7 個簡併物質殼（爐殼用 6 個、奇點種子用 1 個）。\n5. 在封閉培養設施的保管庫調整探索羅盤，尋找最終實驗室。打倒在封印控制台醒來的視界守衛，取得「休眠奇點種子」。\n6. 拿到種子就進入第 5 階段：在奇點封裝器中喚醒它，放進 P 反應爐。\n容易卡住的地方：\n・時間晶體不夠：既用於時間晶體模組（設施用），也用於催化劑（運轉用）。增加培育槽。\n・找不到最終實驗室：它在最深的地下（約 Y−56〜−46）。重力波探測器能顯示大致方向和距離。"
+    "source": "What to do:\n1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity does not drop; facilities and running machines compete for crystals, so two incubators help).\n2. Make exotic matter and axion condensate in the C-Cavity.\n3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5 MFE/t).\n4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singularity seed).\n5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes at the Seal Console to get the Dormant Singularity Seed.\n6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\nCommon sticking points:\n- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add incubators.\n- Can't find the Final Lab: look deep underground (around Y -56 to -46). The Gravitational Wave Detector shows its rough direction and distance.",
+    "translation": "這一階段要做的事：\n1. 用時間晶體培育槽培育時間晶體催化劑（電力達到要求的 80% 以上時純度不會下降。設施用和運轉用會互相爭搶，有 2 台比較輕鬆）。\n2. 用卡西米爾腔製作奇異物質和軸子凝聚體。\n3. 用壓縮機的質量模式製作壓縮塊，用簡併熱爐（5 MFE/t）發電。\n4. 用簡併壓縮爐製作 7 個簡併物質殼（爐殼用 6 個、奇點種子用 1 個）。\n5. 在封閉培養設施的保管庫調整探索羅盤，尋找最終實驗室。打倒在封印控制台醒來的視界守衛，取得「休眠奇點種子」。\n6. 拿到種子就進入第 5 階段：在奇點封裝器中喚醒它，放進 P 反應爐。\n容易卡住的地方：\n・時間晶體不夠：既用於時間晶體模組（設施用），也用於催化劑（運轉用）。增加培育槽。\n・找不到最終實驗室：在地下深處尋找（約 Y−56〜−46）。重力波探測器能顯示大致方向和距離。"
   },
   "guide.singulo.stage4.flow.title": {
     "source": "Stage 4 at a glance",
@@ -12508,16 +12508,16 @@
     "translation": "空的包裝箱"
   },
   "gui.singulo.drone_port.arrived": {
-    "source": "Arrived crates (unpacked into the row below)",
-    "translation": "送達的箱子（拆開放入下方的接收欄）"
+    "source": "Arrived crates unpack into the cargo slots on the right.",
+    "translation": "送達的貨箱會拆箱，貨物進入右側的貨物欄。"
   },
   "gui.singulo.drone_port.receive": {
     "source": "Received items",
     "translation": "接收"
   },
   "gui.singulo.drone_port.locked": {
-    "source": "Only the owner can use this",
-    "translation": "只有擁有者可以使用"
+    "source": "The owner can use this port. Teammates can use it when team sharing is enabled.",
+    "translation": "只有擁有者可操作此起降港。開啟隊伍共享後，擁有者的隊友也可操作。"
   },
   "tooltip.singulo.drone_crate.range": {
     "source": "Range: %s blocks",
@@ -12732,8 +12732,8 @@
     "translation": "自動 %s 個"
   },
   "gui.singulo.drone_port.auto.hint": {
-    "source": "Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change",
-    "translation": "自動發送：貨物達到此數量（裝滿指 9 欄全滿）時，發送到登記的目的地。貨物停止增加 2 秒後發送。點擊切換"
+    "source": "Click to change modes. At the selected item count, cargo must stay unchanged for 2 seconds. Full sends on the next check when all 9 cargo slots hold full stacks.",
+    "translation": "點擊切換模式。貨物達到設定數量後須保持 2 秒不變。裝滿模式下，9 個貨物欄位全部堆滿後會在下次檢查時發送。"
   },
   "gui.singulo.drone_port.auto.register": {
     "source": "Set",
@@ -13879,6 +13879,10 @@
     "source": "Send tank (filled into a capsule when sent)",
     "translation": "發送罐（發送時裝進膠囊）"
   },
+  "gui.singulo.fluid_drone_port.arrived": {
+    "source": "Arrived capsules empty into the receive tank on the right.",
+    "translation": "送達的膠囊會將流體注入右側的接收罐。"
+  },
   "gui.singulo.fluid_drone_port.receive_tank": {
     "source": "Receive tank (arrived capsules empty into it)",
     "translation": "接收罐（送達的膠囊注入這裡）"
@@ -13890,6 +13894,10 @@
   "gui.singulo.fluid_drone_port.auto.amount": {
     "source": "Auto: %s B",
     "translation": "自動 %s 桶"
+  },
+  "gui.singulo.fluid_drone_port.auto.hint": {
+    "source": "Click to change modes. At the selected bucket count, the send tank must stay unchanged for 2 seconds. Full sends on the next check when the send tank is full.",
+    "translation": "點擊切換模式。發送罐達到設定的桶數後，液量須保持 2 秒不變。裝滿模式下，發送罐裝滿後會在下次檢查時發送。"
   },
   "gui.singulo.fluid_drone_port.status.6": {
     "source": "No empty fluid capsule",

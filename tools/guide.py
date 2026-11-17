@@ -92,8 +92,8 @@ CHAPTERS = [
          'ith blue ice last without melting.\n'
          "3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Pr"
          'ojector too.\n'
-         '4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observat'
-         'ion logs from its cache.\n'
+         '4. Use the compass to find the Observation Post and bring back Degraded Control Units and Observation Logs '
+         'from its cache.\n'
          '5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it followi'
          'ng the Holo Projector.\n'
          '6. Once the tower makes a Superconducting Coil, you are in stage 2.\n'
@@ -173,7 +173,7 @@ CHAPTERS = [
          '2. 粒子加速器でミュオン束を作り、触媒反応器でミュオン触媒（ティア2）を作る。\n'
          '3. ミュオン触媒核融合炉（4 kFE/t）を作り、ミュオン触媒と水で電力を増やす。新品の触媒1個で10分動く（使いかけは残寿命の半分）。\n'
          '4. 冷却塔を高さ10以上にし、圧縮機で深層岩を砕いて出るヘリウムを液化する。\n'
-         '5. 地表観測拠点の保管庫で探索コンパスを調整し、研究棟を探す。量子データ片と冷却原子トラップを集める（奥の残響の番人を倒すと保管庫が開く）。\n'
+         '5. 地表観測拠点の保管庫で探索コンパスを調整し、研究棟を探す。量子データ片と劣化した冷却原子トラップを集める（奥の残響の番人を倒すと保管庫が開く）。\n'
          '6. 量子演算モジュールと液体ヘリウムがそろえば段階3。\n'
          '今のうちに: アンドロイド組立ステーションで護衛を作れる（アンドロイドの章）。隕石クレーター（隕鉄・星屑）と氷山（青氷）も探しておく。\n'
          'つまずきやすい所:\n'
@@ -187,8 +187,8 @@ CHAPTERS = [
          '3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n'
          '4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the C'
          'ompressor.\n'
-         "5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect"
-         ' quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n'
+         "5. Tune the Explorer's Compass at the Observation Post's cache and find the Research Building. Collect "
+         'Quantum Data Fragments and Degraded Cold Atom Traps (beat the Echo Sentinel at the back to open the cache).\n'
          '6. With a Quantum Computing Module and liquid helium, you are in stage 3.\n'
          'While you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor '
          'craters (meteoric iron, stardust) and icebergs (blue ice) too.\n'
@@ -261,8 +261,8 @@ CHAPTERS = [
          '2. 量子熱機関で発電する（BE凝縮触媒で 200 kFE/t。作るまではミュオン触媒で25%の仮運転）。\n'
          '3. レーザー冷却器でBE凝縮触媒（ティア3）と光格子基板を作る。\n'
          '4. 深海圧力収集器を早めに置き、高圧結晶を貯めておく（あとで殻とアンビルに約30個）。\n'
-         '5. 研究棟の保管庫で探索コンパスを調整し、封鎖培養施設を探す。時間結晶の種と培養データを集める（奥の重力の澱を倒すと保管庫が開く）。同じ調整で地下アンドロイド研究所も探せる。\n'
-         '6. 時間結晶の種・培養データ・縮退核（重力の澱が落とす）がそろったら、段階4の時間結晶育成槽へ進む。\n'
+         '5. 研究棟の保管庫で探索コンパスを調整し、封鎖培養施設を探す。劣化した時間結晶の種と培養データを集める（奥の重力の澱を倒すと保管庫が開く）。同じ調整で地下アンドロイド研究所も探せる。\n'
+         '6. 重力の澱が落とす縮退核を使って段階4の時間結晶育成槽を作り、そこで劣化した時間結晶の種を復元する。\n'
          'つまずきやすい所:\n'
          '・封鎖培養施設がつらい: 極低温区画と強い警備機がいる。防具と回復をそろえ、護衛のアンドロイドを連れていく。\n'
          '・重力の澱に浮かされる: 落下が痛いので、重力ブーツや衝撃発電パネルが助けになる。',
@@ -275,11 +275,11 @@ CHAPTERS = [
          '3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n'
          '4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about'
          ' 30 later).\n'
-         "5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds"
-         ' and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Und'
-         'erground Android Laboratory.\n'
-         '6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time '
-         'Crystal Incubator of stage 4.\n'
+         "5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect Degraded Time Crystal Seeds "
+         'and Culture Data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the '
+         'Underground Android Laboratory.\n'
+         '6. Use the Degenerate Nucleus dropped by the Gravity Remnant to build the stage 4 Time Crystal Incubator. '
+         'Restore the Degraded Time Crystal Seeds there.\n'
          'Common sticking points:\n'
          '- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing an'
          'd your guard androids.\n'
@@ -319,7 +319,7 @@ CHAPTERS = [
          '6. 種を手に入れたら段階5。特異点封入台で目覚めさせ、Pリアクターに入れる。\n'
          'つまずきやすい所:\n'
          '・時間結晶が足りない: 時間結晶モジュール（設備用）と触媒（運転用）の両方に使う。育成槽を増やす。\n'
-         '・最終実験施設が見つからない: いちばん深い地下（Y−56〜−46あたり）。重力波検出器でおおよその方角と距離が分かる。',
+         '・最終実験施設が見つからない: 地下深く（Y−56〜−46あたり）を探す。重力波検出器でおおよその方角と距離が分かる。',
          'Stage 4 at a glance',
          'What to do:\n'
          '1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity '
@@ -335,8 +335,8 @@ CHAPTERS = [
          'Common sticking points:\n'
          '- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add i'
          'ncubators.\n'
-         "- Can't find the Final Lab: it is the deepest ruin (around Y -56 to -46). The Gravitational Wave Detector show"
-         's its rough direction and distance.'),
+         "- Can't find the Final Lab: look deep underground (around Y -56 to -46). The Gravitational Wave Detector "
+         'shows its rough direction and distance.'),
         ('compression', '圧縮の連鎖',
          '圧縮機の質量モードで質量値のある素材を「質量」に変え、圧縮ブロックLv1→Lv2→Lv3 と固めます。'
          '3種類以上の元ブロックから作った Lv1 は「混成」になり、8個で Lv2 にできます。金属だけを固めた金属圧縮ブロックもあります。\n'
@@ -595,26 +595,27 @@ CHAPTERS = [
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
         ('list', '6つの遺構',
-         '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
-         '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
-         '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
+         '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・劣化した制御ユニット（7日で再生）。\n'
+         '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。劣化した冷却原子トラップ・量子データ片（7日）。\n'
+         '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。劣化した時間結晶の種・培養データ（14日）。\n'
          '・地下アンドロイド研究所: 中くらいの深さの地下（床は Y−38〜−26あたり）。封鎖培養施設と並ぶ分かれ道で、研究棟でコンパスを調整すると一緒に探せる'
          '（コンパスは地表まで突き抜けた主立坑を指す）。部屋の並びは毎回変わる。奥のAI中枢に統括AI「ファウンドリ」。精密アクチュエーター・アンドロイドキット（7日）。\n'
-         '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。\n'
+         '・最終実験施設: 地下深く（Y−56〜−46あたり）にある重力異常点。守護機ホライズン・ウォーデン。劣化したアノマリー・サンプル（14日で再生）。休眠した特異点の種は各保管庫の初回のみ。\n'
          '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
          '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
          'The six ruins',
          '- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White '
-         'security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow '
+         'security drones. Observation Logs and Degraded Control Units (regrow in 7 days).\n- Research Building: shallow '
          'underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the '
-         'back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground '
+         'back. Degraded Cold Atom Traps and Quantum Data Fragments (7 days).\n- Culture Facility: deep underground '
          '(around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the '
-         'containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: '
+         'containment room at the back. Degraded Time Crystal Seeds and Culture Data (14 days).\n- Underground Android Laboratory: '
          'mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building '
          'lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. '
-         'The overseer AI Foundry waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity '
-         'anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds '
-         'and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the '
+         'The Foundry Overseer waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity '
+         'anomaly deep underground (around Y −56 to −46). The Horizon Warden guards it. Degraded Anomaly Samples '
+         '(regrow in 14 days). Each cache holds a Dormant Singularity Seed the first time you open it.\n'
+         '- Sunken Reactor Sector: a dead second reactor even deeper than the '
          'Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. '
          'The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).'),
         ('bosses', '遺構の番人',
@@ -778,12 +779,12 @@ CHAPTERS = [
          'Sealed containers',
          'Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item for that tier (Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket). Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.'),
         ('records', 'クリスタルメモリ',
-         '遺構の保管庫からときどき「クリスタルメモリ」が出ます。アーカイブ端末で電力を使って解読すると、旧文明の記録が読めます'
-         '（ハンドブックの「旧文明の記録」の章に追加されます）。全部集めると、文明が滅んだ理由が分かります。',
+         '遺構の保管庫からときどき「クリスタルメモリ」が出ます。アーカイブ端末で電力を使って解読し、できた「解読した記録」を手に持って使うと、'
+         'ハンドブックの「旧文明の記録」の章に記録が1つ追加されます。全部読むと、文明が滅んだ理由が分かります。',
          'Crystal memories',
-         'Ruin caches sometimes hold crystal memories. Decode them with power in the Archive Terminal to read '
-         'the records of the old civilization (they are added to the Ancient Records chapter of this '
-         'handbook). Collect them all to learn why the civilization fell.'),
+         'Ruin caches sometimes hold Crystal Memories. Decode one in a powered Archive Terminal, then use the '
+         'Decoded Record to add an entry to the Ancient Records chapter of this handbook. Read them all to learn '
+         'why the civilization fell.'),
         ('gathering', 'その場所でしか採れない素材',
          '・隕石クレーター（平原・砂漠・森などの地表）: 差し渡し10ブロックほどの浅いすり鉢の中心に、半分埋まった隕石があります。'
          '隕鉄塊（鉄以上のツルハシ）から隕鉄の原石、黒い溶融殻に育つ星屑の結晶から星屑が採れます。星屑の結晶は、クレーターに最初からある殻にだけ、少しずつ育ち直します。'
@@ -839,7 +840,8 @@ CHAPTERS = [
          'while charging: your chance to strike.'),
         ('build', '自分のアンドロイド',
          'アンドロイド組立ステーションに小型クリスタルメモリ（型を決める。減らない）とアンドロイドキット（印刷ごとに1つ）を入れ、電力を送ると、'
-         '上に護衛のアンドロイドを1体印刷します（1回 40,000 FE）。倒されたら、キットがあれば印刷し直します。置いた人が持ち主です。\n'
+         '上に護衛のアンドロイドを1体印刷します。印刷に使う電力は基本40,000 FEで、型によって変わります。工場式印刷ユニットを取り付けると半分になります。'
+         '倒されたら、キットがあれば印刷し直します。置いた人が持ち主です。\n'
          '・護衛は敵対モブや遺構のアンドロイド、警備ドローンを狙います。ボスは対象外です。\n'
          '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）・巡回（決めた場所を回る）。'
          '追従中に戦うかは「ついていくだけ」と「護衛する」で選べます。\n'
@@ -854,7 +856,8 @@ CHAPTERS = [
          '・暮らし: 手が空いた護衛は、ステーションのそばで、階段・ハーフブロック・椅子に座る（夜は昼寝）、植木鉢や作物に手をかざす、床を掃く、しばらく落ちたままの物をそばのチェストへしまう、仲間とおしゃべりする、雨なら屋根の下へ（傘を持っていればそのまま）、夕焼けや夜空を眺める、など。',
          'Your own androids',
          'Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, '
-         'and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
+         'and it prints one guard android on top. Most android types cost 40,000 FE per print. A Factory Print Unit halves the printing cost for all types. '
+         'If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
          '- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n'
          '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). '
          'While following, choose "Just follow" or "Escort" (fights nearby enemies).\n'
@@ -866,7 +869,7 @@ CHAPTERS = [
          '- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n'
          '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
          '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n'
-         '- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..'),
+         '- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky.'),
         ('first', 'はじめての作業注文',
          '作業の自動化を、いちばん少ない手順で試す例（パンを作らせる）:\n'
          '1. ステーションで護衛を1体印刷する。\n'

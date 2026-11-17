@@ -61,10 +61,12 @@ def recipes(R, shaped):
 
 UI = {
     'gui.singulo.fluid_drone_port.crates': ('空の液体カプセル', 'Empty fluid capsules'),
+    'gui.singulo.fluid_drone_port.arrived': ('届いたカプセルの液体は、右の受け取りタンクに入ります。', 'Arrived capsules empty into the receive tank on the right.'),
     'gui.singulo.fluid_drone_port.send_tank': ('送るタンク（発送でカプセルに詰める）', 'Send tank (filled into a capsule when sent)'),
     'gui.singulo.fluid_drone_port.receive_tank': ('受け取りのタンク（届いたカプセルから注ぐ）', 'Receive tank (arrived capsules empty into it)'),
     'gui.singulo.fluid_drone_port.amount': ('%s / %s mB', '%s / %s mB'),
     'gui.singulo.fluid_drone_port.auto.amount': ('自動 %sB', 'Auto: %s B'),
+    'gui.singulo.fluid_drone_port.auto.hint': ('クリックで切り替え。バケツ数を選ぶと、送るタンクに指定量以上あり、液体の量が2秒間変わらなければ発送します。「満杯」では、送るタンクが満杯になると、次の判定で発送します。', 'Click to change modes. At the selected bucket count, the send tank must stay unchanged for 2 seconds. Full sends on the next check when the send tank is full.'),
     'gui.singulo.fluid_drone_port.status.6': ('空の液体カプセルがありません', 'No empty fluid capsule'),
     'gui.singulo.fluid_drone_port.status.7': ('射程外です（上の段階の液体カプセルが要る）', 'Out of range (needs a higher-tier capsule)'),
     'gui.singulo.fluid_drone_port.status.9': ('送る液体がありません', 'No fluid to send'),

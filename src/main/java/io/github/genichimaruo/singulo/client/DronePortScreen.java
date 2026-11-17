@@ -439,7 +439,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         // 着荷箱から受け取りの欄へ開梱する向きの矢印（どちらの枠からも離して、真ん中の段に）
         Panel.icon(g, x + DronePortMenu.ARROW_X, y + DronePortMenu.ARRIVED_Y + 18 + 4, Panel.Icon.OUT, skin.dim());
         area(DronePortMenu.ARRIVED_X - 1, DronePortMenu.ARRIVED_Y - 1, 18, 3 * 18,
-                List.of(Component.translatable("gui.singulo.drone_port.arrived")));
+                List.of(Component.translatable(menu.fluid() ? "gui.singulo.fluid_drone_port.arrived" : "gui.singulo.drone_port.arrived")));
         if (menu.fluid()) {
             drawTank(g, DronePortMenu.CARGO_X, DronePortMenu.CARGO_Y, DronePortBlockEntity.D_SEND_FLUID, DronePortBlockEntity.D_SEND_AMOUNT,
                     io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.SEND_CAPACITY, "gui.singulo.fluid_drone_port.send_tank");
@@ -597,7 +597,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         int target = menu.autoTarget();
         Component name = target >= 0 ? Component.translatable("gui.singulo.drone_port.auto.target", partnerName(target))
                 : Component.translatable("gui.singulo.drone_port.auto.none");
-        area(a[0] - leftPos, a[1] - topPos, a[2], a[3], List.of(Component.translatable("gui.singulo.drone_port.auto.hint"),
+        Component hint = Component.translatable(menu.fluid() ? "gui.singulo.fluid_drone_port.auto.hint" : "gui.singulo.drone_port.auto.hint");
+        area(a[0] - leftPos, a[1] - topPos, a[2], a[3], List.of(hint,
                 name.copy().withStyle(st -> st.withColor(target >= 0 ? 0xFF000000 | DroneStationScreen.ACCENT : 0xFF8A949E))));
         int[] r = registerRect();
         boolean canRegister = menu.selected() >= 0;

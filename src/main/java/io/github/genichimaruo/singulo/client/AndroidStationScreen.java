@@ -9,6 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import java.util.List;
+import java.util.Locale;
 import net.minecraft.world.inventory.Slot;
 
 /**
@@ -96,9 +97,13 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     @Override
     protected Component statusText() {
         int status = menu.value(AndroidStationBlockEntity.D_STATUS);
-        return status == AndroidStationBlockEntity.S_WAITING
-                ? Component.translatable("gui.singulo.android_station.status.waiting", (menu.value(AndroidStationBlockEntity.D_DELAY) + 19) / 20)
-                : Component.translatable("gui.singulo.android_station.status." + status);
+        return switch (status) {
+            case AndroidStationBlockEntity.S_WAITING -> Component.translatable("gui.singulo.android_station.status.waiting",
+                    (menu.value(AndroidStationBlockEntity.D_DELAY) + 19) / 20);
+            case AndroidStationBlockEntity.S_NO_ENERGY -> Component.translatable("gui.singulo.android_station.status.2",
+                    String.format(Locale.ROOT, "%,d", menu.value(AndroidStationBlockEntity.D_PRINT_FE)));
+            default -> Component.translatable("gui.singulo.android_station.status." + status);
+        };
     }
 
     @Override
