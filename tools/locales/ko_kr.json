@@ -3556,8 +3556,8 @@
     "translation": "백팩 안"
   },
   "gui.singulo.android.pack.builtin": {
-    "source": "Built-in",
-    "translation": "내장"
+    "source": "Built-in backpack (no upgrade needed)",
+    "translation": "백팩 내장(업그레이드 불필요)"
   },
   "gui.singulo.android.pack.none": {
     "source": "No backpack",
@@ -3748,8 +3748,8 @@
     "translation": "근처 상자에 맡기러 갑니다"
   },
   "gui.singulo.android.stash.hint": {
-    "source": "Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box or supply port)",
-    "translation": "소지품과 백팩 안의 물건을 근처 상자(상자·통·셜커 상자·자재구)에 맡기러 갑니다"
+    "source": "Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box, supply port or work console)",
+    "translation": "소지품과 백팩 안의 물건을 근처 상자(상자·통·셜커 상자·자재구·작업 지령대)에 맡기러 갑니다"
   },
   "gui.singulo.android.stash.none": {
     "source": "No box nearby to put things in (within 12 blocks)",
@@ -4574,10 +4574,6 @@
   "gui.singulo.genesis.bar.surge_held": {
     "source": "Holding the surge  Instability %s",
     "translation": "폭주를 억누르는 중  불안정도 %s"
-  },
-  "gui.singulo.genesis.bar.synth": {
-    "source": "%s %s  Ready: %s",
-    "translation": "%s %s  완성: %s개"
   },
   "gui.singulo.genesis.birth_1": {
     "source": "The light falls into a single point...",
@@ -11520,8 +11516,8 @@
     "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 55 more",
-    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 55개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 56 more",
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 56개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
@@ -11608,8 +11604,8 @@
     "translation": "사용처: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 19 more",
-    "translation": "사용처: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 19개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 20 more",
+    "translation": "사용처: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 20개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -11800,8 +11796,8 @@
     "translation": "사용처: 냉매 카트리지, 액체 헬륨 카트리지"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 29 more",
-    "translation": "사용처: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 29개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 30 more",
+    "translation": "사용처: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 30개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11976,8 +11972,8 @@
     "translation": "사용처: 온전한 폐허 타일, 온전한 폐허 기둥, 온전한 폐허 도광판, 온전한 폐허 패널 계단, 온전한 폐허 패널 반 블록 외 1개"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 21 more",
-    "translation": "사용처: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 21개"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 22 more",
+    "translation": "사용처: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 22개"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -12064,12 +12060,12 @@
     "translation": "사용처: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
-    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 99개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 100 more",
+    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 100개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 82 more",
-    "translation": "사용처: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 82개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 84 more",
+    "translation": "사용처: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 84개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 4 more",
@@ -12140,8 +12136,8 @@
     "translation": "사용처: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 26 more",
-    "translation": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 26개"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 28 more",
+    "translation": "사용처: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 28개"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs, White Glass Panel Slab",
@@ -15614,5 +15610,141 @@
   "howto.singulo.android_barrier_glass_slab": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "item.singulo.portable_android_printer": {
+    "source": "Portable Android Printer",
+    "translation": "휴대용 안드로이드 프린터"
+  },
+  "gui.singulo.portable_printer.ready": {
+    "source": "Ready",
+    "translation": "인쇄 가능"
+  },
+  "gui.singulo.portable_printer.no_memory": {
+    "source": "No compact crystal memory",
+    "translation": "소형 크리스털 메모리가 없다"
+  },
+  "gui.singulo.portable_printer.no_kit": {
+    "source": "No android kit",
+    "translation": "안드로이드 키트가 없다"
+  },
+  "gui.singulo.portable_printer.no_energy": {
+    "source": "Not enough power",
+    "translation": "전력이 부족하다"
+  },
+  "gui.singulo.portable_printer.no_space": {
+    "source": "No room to set it down (needs a clear 1x2 space)",
+    "translation": "놓을 땅이 없다(1×2블록의 빈 공간)"
+  },
+  "gui.singulo.portable_printer.print": {
+    "source": "Print",
+    "translation": "인쇄"
+  },
+  "gui.singulo.portable_printer.print.tip": {
+    "source": "Set it down in front of you and print an android",
+    "translation": "눈앞의 땅에 놓고 열어 안드로이드를 인쇄한다"
+  },
+  "gui.singulo.portable_printer.memory": {
+    "source": "Compact crystal memory (sets the type, kept)",
+    "translation": "소형 크리스털 메모리(형을 정한다. 줄지 않는다)"
+  },
+  "gui.singulo.portable_printer.kit": {
+    "source": "Android kits (one per print, up to 16)",
+    "translation": "안드로이드 키트(인쇄마다 1개. 16개까지)"
+  },
+  "gui.singulo.portable_printer.prints": {
+    "source": "%s more prints (%s FE each)",
+    "translation": "앞으로 %s체 인쇄할 수 있다(1체 %s FE)"
+  },
+  "gui.singulo.portable_printer.charge_hint": {
+    "source": "Charge it in the charging slot of a power storage",
+    "translation": "축전 장치의 충전 칸에서 충전한다"
+  },
+  "tooltip.singulo.portable_printer.kind": {
+    "source": "%s (kits: %s)",
+    "translation": "%s (키트 %s)"
+  },
+  "entity.singulo.portable_printer": {
+    "source": "Portable Android Printer",
+    "translation": "휴대용 안드로이드 프린터"
+  },
+  "desc.singulo.portable_android_printer": {
+    "source": "A briefcase printer. Put in a memory and android kits, then right-click the ground to print an android there. The android follows you.",
+    "translation": "가방형 프린터입니다. 메모리와 안드로이드 키트를 넣고 땅을 우클릭하면 그 자리에서 열려 안드로이드를 1체 인쇄합니다. 인쇄한 안드로이드는 따라다닙니다."
+  },
+  "summary.singulo.portable_android_printer": {
+    "source": "A briefcase printer that prints androids on the go.",
+    "translation": "밖에서도 안드로이드를 한 체씩 인쇄하는 가방형 프린터."
+  },
+  "howto.singulo.portable_android_printer": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립대(2단계)"
+  },
+  "gui.singulo.portable_printer.repair": {
+    "source": "Self-repair kits (given to the printed android, and refilled nearby while you carry it)",
+    "translation": "자기 수리 키트(인쇄한 안드로이드에게 주고, 들고 다니는 동안 근처에서 보충한다)"
+  },
+  "tooltip.singulo.portable_printer.repair": {
+    "source": "Self-repair kits: %s",
+    "translation": "자기 수리 키트 %s"
+  },
+  "gui.singulo.portable_printer.plate": {
+    "source": "Android armor plate (fitted to the printed android)",
+    "translation": "안드로이드용 장갑판(인쇄한 안드로이드에게 장착한다)"
+  },
+  "item.singulo.portable_android_printer_2": {
+    "source": "Portable Android Printer Mk2",
+    "translation": "휴대용 안드로이드 프린터 Mk2"
+  },
+  "gui.singulo.portable_printer.next": {
+    "source": "Next: %s",
+    "translation": "다음 인쇄: %s"
+  },
+  "gui.singulo.portable_printer.select": {
+    "source": "Print this set next",
+    "translation": "이 조를 다음에 인쇄한다"
+  },
+  "uses.singulo.portable_android_printer": {
+    "source": "Used in: Portable Android Printer Mk2",
+    "translation": "사용처: 휴대용 안드로이드 프린터 Mk2"
+  },
+  "desc.singulo.portable_android_printer_2": {
+    "source": "An improved Portable Android Printer. It holds three sets of memory and kits, and each print uses the next set. Choose the next set on its screen.",
+    "translation": "휴대용 안드로이드 프린터의 개량형입니다. 메모리와 키트를 3조 실을 수 있고, 인쇄할 때마다 다음 조로 1체씩 인쇄합니다. 다음에 인쇄할 조는 화면에서 고를 수 있습니다."
+  },
+  "summary.singulo.portable_android_printer_2": {
+    "source": "An improved portable printer that prints three types in turn.",
+    "translation": "다른 형 3체를 차례로 인쇄할 수 있는 휴대용 프린터 개량형."
+  },
+  "howto.singulo.portable_android_printer_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립대(3단계)"
+  },
+  "gui.singulo.android.collect.on": {
+    "source": "Picks up dropped items: on",
+    "translation": "떨어진 물건 줍기: 켬"
+  },
+  "gui.singulo.android.collect.off": {
+    "source": "Picks up dropped items: off",
+    "translation": "떨어진 물건 줍기: 끔"
+  },
+  "gui.singulo.android.collect.hint": {
+    "source": "Picks up items lying nearby, such as drops from defeated enemies. Items thrown by players are left alone",
+    "translation": "근처에 떨어진 물건(쓰러뜨린 적의 드롭 등)을 줍는다. 플레이어가 던진 물건은 줍지 않는다"
+  },
+  "gui.singulo.android.store.0": {
+    "source": "Store pickups: chests first",
+    "translation": "주운 물건 보관처: 상자 우선"
+  },
+  "gui.singulo.android.store.1": {
+    "source": "Store pickups: work console and supply ports first",
+    "translation": "주운 물건 보관처: 작업 지령대·자재구 우선"
+  },
+  "gui.singulo.android.store.2": {
+    "source": "Store pickups: keep them",
+    "translation": "주운 물건 보관처: 보관하지 않음"
+  },
+  "gui.singulo.android.store.hint": {
+    "source": "After picking up, the android stores its items nearby (or in the other kind of storage). Click to switch",
+    "translation": "다 주우면 근처 보관처에 소지품을 맡기러 간다(없으면 다른 쪽에). 누르면 바꾼다"
   }
 }
