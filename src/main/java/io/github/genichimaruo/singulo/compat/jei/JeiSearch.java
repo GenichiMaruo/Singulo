@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.compat.jei;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import mezz.jei.api.runtime.IJeiRuntime;
 
 /** JEI の検索欄の文字の読み書き（作業指令台の注文タブの検索欄と連携するため）。JEI を入れているときだけ呼ぶ。 */

@@ -67,8 +67,8 @@ final class MachineSounds {
         put(0.7F, "quantum_heat_engine", "quantum_heat_engine_running");
         put(0.5F, "smes_cell", "smes_cell_running");
         put(0.5F, "cosmic_muon_collector", "muon_collector_running");
-        put(0.6F, "worldline_anchor_small", "worldline_anchor_running");
-        put(0.8F, "worldline_anchor_advanced", "advanced_worldline_anchor_running");
+        put(0.6F, "worldline_anchor", "worldline_anchor_running");
+        put(0.8F, "advanced_worldline_anchor", "advanced_worldline_anchor_running");
         put(0.7F, "inertial_stabilizer", "inertial_stabilizer_running");
         put(1.0F, "degenerate_furnace_controller", "degenerate_furnace_running");
         put(1.0F, "shield_tower_core", "shield_tower_running");

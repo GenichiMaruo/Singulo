@@ -203,7 +203,8 @@ public class DroneStationBlockEntity extends io.github.genichimaruo.singulo.comp
     public boolean mayOperate(Player player) {
         List<UUID> members = io.github.genichimaruo.singulo.item.ShieldPermitItem.members(items.getStackInSlot(SLOT_PERMIT)).stream()
                 .map(io.github.genichimaruo.singulo.item.ShieldPermitItem.Member::id).toList();
-        return members.isEmpty() || owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID());
+        return members.isEmpty() || owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID())
+                || io.github.genichimaruo.singulo.item.TeamSharing.sameTeam(level, owner, player);     // 持ち主と同じチームの人も
     }
 
     /** 枠ごとの待機位置（ステーションの上。2機目と3機目は左右の少し高い所）。 */

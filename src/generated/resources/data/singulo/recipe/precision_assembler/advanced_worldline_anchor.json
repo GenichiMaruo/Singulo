@@ -1,0 +1,33 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 240,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:nihonium_frame",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:quantum_computing_module",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:exotic_matter",
+      "count": 2
+    },
+    {
+      "ingredient": "#c:plates/steel",
+      "count": 4
+    },
+    {
+      "ingredient": "#c:ender_pearls",
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:advanced_worldline_anchor",
+    "count": 1
+  }
+}

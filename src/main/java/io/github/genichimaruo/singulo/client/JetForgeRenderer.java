@@ -549,8 +549,8 @@ public class JetForgeRenderer extends SnapshotBlockRenderer<JetForgeBlockEntity>
         // 閃光: リングの内側を白く埋め、外へ少しにじむ（最初の 8 tick）
         float flash = Math.max(0, 1 - age / 8F);
         if (flash > 0) {
-            disc(f, glow, c, n, 0, R + 0.4F, 48, WHITE, (int) (255 * flash * power), (int) (180 * flash * power), 0);
-            disc(f, glow, c, n, R + 0.4F, R + 1.6F + 2.4F * (1 - flash), 48, 0xCFEFFF, (int) (170 * flash * power), 0, 0);
+            disc(f, glow, c, n, 0, R + 0.4F, 48, WHITE, FxSettings.flash((int) (255 * flash * power)), FxSettings.flash((int) (180 * flash * power)), 0);
+            disc(f, glow, c, n, R + 0.4F, R + 1.6F + 2.4F * (1 - flash), 48, 0xCFEFFF, FxSettings.flash((int) (170 * flash * power)), 0, 0);
         }
         // 衝撃の輪: 白い速い輪と、遅れて広がる水色の輪
         for (int k = 0; k < 2; k++) {
@@ -926,8 +926,8 @@ public class JetForgeRenderer extends SnapshotBlockRenderer<JetForgeBlockEntity>
     /** ブラックホールができた瞬間: まぶしい光が縮み、3つの面に衝撃波の輪が広がる（k は 0〜1）。 */
     private void drawFormationFlash(Frame f, VertexConsumer glow, float k) {
         Vec3 c = f.origin();
-        billboard(f, glow, c, 0.5F + 4.5F * (1 - k), 0xFFFFFF, (int) (255 * (1 - k)));
-        billboard(f, glow, c, 1.5F + 7F * (1 - k), 0x9ED8FF, (int) (150 * (1 - k)));
+        billboard(f, glow, c, 0.5F + 4.5F * (1 - k), 0xFFFFFF, FxSettings.flash((int) (255 * (1 - k))));
+        billboard(f, glow, c, 1.5F + 7F * (1 - k), 0x9ED8FF, FxSettings.flash((int) (150 * (1 - k))));
         Vec3[] b = basis(f.axis());
         float r = 0.8F + 9F * JetForgeTimeline.ease(k);
         int a = (int) (220 * (1 - k));
@@ -1152,8 +1152,8 @@ public class JetForgeRenderer extends SnapshotBlockRenderer<JetForgeBlockEntity>
         Vec3 target = f.origin().add(f.axis().scale(TARGET_S));
         // 閃光の球（すぐに膨らんで消える）
         float k = Math.min(1, t / 10F);
-        billboard(f, glow, target, 2 + 14 * k, WHITE, (int) (255 * (1 - k) * (1 - k)));
-        billboard(f, glow, target, 1 + 5 * k, 0xCFE8FF, (int) (255 * (1 - k)));
+        billboard(f, glow, target, 2 + 14 * k, WHITE, FxSettings.flash((int) (255 * (1 - k) * (1 - k))));
+        billboard(f, glow, target, 1 + 5 * k, 0xCFE8FF, FxSettings.flash((int) (255 * (1 - k))));
         // 衝撃波: 軸に直交する輪と、水平な輪が広がる
         float w = Math.min(1, t / 26F);
         float r = 0.8F + 17 * JetForgeTimeline.ease(w);

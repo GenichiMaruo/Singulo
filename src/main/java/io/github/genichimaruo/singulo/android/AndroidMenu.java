@@ -125,7 +125,7 @@ public class AndroidMenu extends AbstractContainerMenu {
         addSlot(new PageSlot(items, RuinAndroid.SLOT_MINING, MINING_X, MINING_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return !working() && RuinAndroid.isMiningUpgrade(stack);
+                return !working() && toolFits(stack, RuinAndroid.SLOT_FELLING);
             }
         });
         for (int i = 0; i < RuinAndroid.CARRY_SLOTS; i++) {
@@ -142,7 +142,7 @@ public class AndroidMenu extends AbstractContainerMenu {
         addSlot(new PageSlot(items, RuinAndroid.SLOT_FELLING, FELLING_X, MINING_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return !working() && RuinAndroid.isFellingUpgrade(stack);
+                return !working() && toolFits(stack, RuinAndroid.SLOT_MINING);
             }
         });
         addSlot(new PageSlot(items, RuinAndroid.SLOT_TANK, TANK_X, BACKPACK_Y, PAGE_GEAR, 1) {
@@ -332,6 +332,15 @@ public class AndroidMenu extends AbstractContainerMenu {
         return false;
     }
 
+    /** 道具の枠に入るか: 道具のアップグレードで、もう一方の枠（other）に同じ種類の道具がない。 */
+    private boolean toolFits(ItemStack stack, int other) {
+        if (!RuinAndroid.isToolUpgrade(stack)) {
+            return false;
+        }
+        ItemStack there = items.getItem(other);
+        return there.isEmpty() || there.getItem() != stack.getItem();
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);
@@ -345,7 +354,8 @@ public class AndroidMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, own, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!(RuinAndroid.isFellingUpgrade(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_FELLING, RuinAndroid.SLOT_FELLING + 1, false))
+        } else if (!(RuinAndroid.isToolUpgrade(stack) && (moveItemStackTo(stack, RuinAndroid.SLOT_MINING, RuinAndroid.SLOT_MINING + 1, false)
+                        || moveItemStackTo(stack, RuinAndroid.SLOT_FELLING, RuinAndroid.SLOT_FELLING + 1, false)))
                 && !(RuinAndroid.isTankUpgrade(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_TANK, RuinAndroid.SLOT_TANK + 1, false))
                 && !(stack.getItem() instanceof AndroidAccessoryItem acc
                         && moveItemStackTo(stack, RuinAndroid.SLOT_DECOR + acc.part(), RuinAndroid.SLOT_DECOR + acc.part() + 1, false))

@@ -271,7 +271,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
                 } else {
                     float flash = Math.max(0, 1 - (core.birthTicks() - GenesisCoreBlockEntity.BIRTH_BANG) / 40F);
                     if (flash > 0) {
-                        g.fill(cx - VIEW / 2, cy - VIEW / 2, cx + VIEW / 2, cy + VIEW / 2, ((int) (flash * 230) << 24) | 0xFFFFFF);
+                        g.fill(cx - VIEW / 2, cy - VIEW / 2, cx + VIEW / 2, cy + VIEW / 2, (FxSettings.flash((int) (flash * 230)) << 24) | 0xFFFFFF);
                     }
                     galaxy(g, cx, cy, 6 + 30 * Math.min(1, k * 1.4F), t, core.galaxySeed());
                 }

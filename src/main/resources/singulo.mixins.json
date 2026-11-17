@@ -7,6 +7,7 @@
     "ProjectileAccessor",
     "PocketAttachmentMigrationMixin",
     "DaylightDetectorBlockMixin",
+    "HealOrHarmMobEffectMixin",
     "RayleighLightEngineMixin",
     "RayleighWeatherMixin",
     "RayleighSunBurnMixin",

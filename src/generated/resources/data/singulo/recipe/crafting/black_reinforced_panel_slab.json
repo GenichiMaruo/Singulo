@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": "singulo:black_reinforced_panel"
+  },
+  "result": {
+    "id": "singulo:black_reinforced_panel_slab",
+    "count": 6
+  }
+}

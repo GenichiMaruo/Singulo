@@ -105,6 +105,16 @@ public class SinguloJeiPlugin implements IModPlugin {
                         SinguloBlocks.TIDAL_SPINDLE.get()),TIDAL_SPINDLE));
     }
 
+    /**
+     * レシピの材料ではなく、装置の枠に入れたり装置に使ったりする物。作り方のレシピがあっても、説明のページを出す
+     * （JEI の「使い道」がレシピしか出さないので、説明がないと使い方が分からない）。
+     */
+    static final java.util.Set<String> MACHINE_USES = java.util.Set.of(
+            "singularity_seed", "mass_pellet", "jet_collector", "hawking_collector", "ergosphere_ring",
+            "helium_cartridge", "coolant_cartridge", "empty_coolant_cartridge", "collapsar_parallel_cassette",
+            "wormhole_seam_upgrade", "shield_permit", "monopole_upgrade", "overclock_chip",
+            "capacity_upgrade_1", "capacity_upgrade_2", "capacity_upgrade_3");
+
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         RECIPE_IDS.clear();
@@ -155,7 +165,7 @@ public class SinguloJeiPlugin implements IModPlugin {
             }
             String howto = "howto.singulo." + id.getPath();
             String desc = "desc.singulo." + id.getPath();
-            if (I18n.exists(desc) && (!I18n.exists(howto) || !made.contains(item)
+            if (I18n.exists(desc) && (!I18n.exists(howto) || !made.contains(item) || MACHINE_USES.contains(id.getPath())
                     || I18n.get(howto).startsWith(I18n.get("jei.singulo.found_prefix")))) {
                 List<Component> lines = new ArrayList<>();
                 lines.add(Component.translatable(desc));

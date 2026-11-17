@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "singulo:white_glass_panel",
+  "result": {
+    "id": "singulo:white_glass_panel_stairs",
+    "count": 1
+  }
+}

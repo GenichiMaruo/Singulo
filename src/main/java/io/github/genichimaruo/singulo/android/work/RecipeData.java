@@ -240,6 +240,16 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         return has(ProcedureStep.FELL);
     }
 
+    /** 釣りの手順があるか（釣りアップグレードを積んだアンドロイドだけができる）。 */
+    public boolean needsFishing() {
+        return has(ProcedureStep.FISH);
+    }
+
+    /** 畑づくりの手順があるか（農業アップグレードを積んだアンドロイドだけができる）。 */
+    public boolean needsFarming() {
+        return has(ProcedureStep.PLANT);
+    }
+
     private boolean has(int kind) {
         for (ProcedureStep s : steps) {
             if (s.kind() == kind) {
@@ -375,8 +385,9 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         if (procedure()) {
             // 手順カード: 投入する物
             for (ProcedureStep s : steps) {
-                if ((s.kind() == ProcedureStep.INSERT || s.kind() == ProcedureStep.BREED) && !s.item().isEmpty()) {
-                    ItemCount.add(out, FluidSamples.key(s.item()), FluidSamples.amount(s.item()));     // 入れる物（流体も）、繁殖のえさ
+                if ((s.kind() == ProcedureStep.INSERT || s.kind() == ProcedureStep.BREED || s.kind() == ProcedureStep.PLANT)
+                        && !s.item().isEmpty()) {
+                    ItemCount.add(out, FluidSamples.key(s.item()), FluidSamples.amount(s.item()));     // 入れる物（流体も）、繁殖のえさ、植える種・骨粉
                 } else if (s.kind() == ProcedureStep.MILK) {
                     // 搾乳: 取る牛乳の数だけ、空のバケツを持っていく
                     int n = s.item().isEmpty() ? outputCount() : s.item().getCount();

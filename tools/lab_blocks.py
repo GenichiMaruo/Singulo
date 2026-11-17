@@ -263,7 +263,7 @@ def console_front(on):
     return im
 
 
-def reactor_core(on):
+def lab_reactor_core(on):
     """炉心: 鋼の格子の奥に光る芯。止まっていると暗い青、動いていると明るい水色。"""
     im, d = new(rgba(STEEL_DARK))
     glow = CYAN if on else (40, 70, 90)
@@ -600,7 +600,7 @@ def textures(tb, save_plain):
         front = console_front(on)
         save(front, tb / f'reactor_console_front_{tag}.png')
         save_plain(glow_layer(front, CONSOLE_SCREEN), tb / f'reactor_console_front_{tag}_glow.png')
-        save(reactor_core(on), tb / f'reactor_core_{tag}.png')
+        save(lab_reactor_core(on), tb / f'lab_reactor_core_{tag}.png')
         save(power_conduit(on), tb / f'power_conduit_{tag}.png')
     save(pressure_hull(), tb / 'pressure_hull.png')
     save(welded_hatch(), tb / 'welded_hatch.png')
@@ -724,7 +724,7 @@ def models(write_json, assets):
     write_json(mi / 'lab_glass.json', {'parent': f'{MODID}:block/lab_glass'})
     write_json(bs / 'lab_glass.json', {'variants': {'': {'model': f'{MODID}:block/lab_glass'}}})
     # 電力で変わるもの（施設灯・非常灯・炉心）: powered=true / false
-    for iid, lit_when in (('facility_light', True), ('emergency_light', False), ('reactor_core', True), ('power_conduit', True)):
+    for iid, lit_when in (('facility_light', True), ('emergency_light', False), ('lab_reactor_core', True), ('power_conduit', True)):
         for on in (False, True):
             tag = 'on' if on else 'off'
             write_json(mb / f'{iid}_{tag}.json', _cube(f'{iid}_{tag}', emissive=on))
@@ -738,13 +738,13 @@ def models(write_json, assets):
         write_json(mb / f'reactor_console_{tag}.json', _orientable(f'reactor_console_front_{tag}', glow=f'reactor_console_front_{tag}_glow'))
         write_json(mb / f'server_rack_{tag}.json', _orientable(f'server_rack_front_{tag}', side='lab_frame', top='lab_frame',
                                                                glow='server_rack_front_on_glow' if on else None))
-    write_json(bs / 'reactor_console.json', {'variants': {
+    write_json(bs / 'lab_reactor_console.json', {'variants': {
         f'facing={f},powered={p}': _rot(f'reactor_console_{"on" if p == "true" else "off"}', y)
         for f, y in FACING_Y.items() for p in ('false', 'true')}})
     write_json(bs / 'server_rack.json', {'variants': {
         f'facing={f},powered={p}': _rot(f'server_rack_{"on" if p == "true" else "off"}', y)
         for f, y in FACING_Y.items() for p in ('false', 'true')}})
-    write_json(mi / 'reactor_console.json', {'parent': f'{MODID}:block/reactor_console_off'})
+    write_json(mi / 'lab_reactor_console.json', {'parent': f'{MODID}:block/reactor_console_off'})
     write_json(mi / 'server_rack.json', {'parent': f'{MODID}:block/server_rack_on'})
     write_json(mb / 'lab_terminal.json', _orientable('lab_terminal_front', glow='lab_terminal_front_glow'))
     write_json(bs / 'lab_terminal.json', {'variants': {f'facing={f}': _rot('lab_terminal', y) for f, y in FACING_Y.items()}})
@@ -787,7 +787,8 @@ def models(write_json, assets):
         'children': {'solid': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:solid', 'textures': t, 'elements': held_solid},
                      'glass': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t,
                                'elements': held_glass}},
-        'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass)})
+        # 細長いので、持ち物欄では上下いっぱいに見せる
+        'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass, gui_fill=16)})
     decor_models(write_json, mb, mi, bs)
     # 居室灯（レッドストーンで点く）
     for tag, on in (('off', False), ('on', True)):
@@ -898,7 +899,7 @@ def compress_halves(lower, upper, suffix=True):
     return out
 
 
-def held_display(elements):
+def held_display(elements, gui_fill=None):
     """小さく偏った模型を、手・額・地面・持ち物欄で真ん中に見せる（バニラの block/block の向きのまま）。
 
     バニラの変形は模型の箱（16x16x16）の中心を基準にするので、下に寄った小物は一人称で画面の外へ沈む。
@@ -929,7 +930,15 @@ def held_display(elements):
         return {'rotation': r, 'translation': [round(t[i] + off[i], 3) for i in range(3)], 'scale': [round(s, 4)] * 3}
     tp = view([75, 45, 0], 0.375, (0, 2.5, 0))
     fp = view([0, 45, 0], 0.40)
-    return {'gui': view([30, 225, 0], 0.625, k=min(grow, 1.25)), 'ground': view([0, 0, 0], 0.25, (0, 3, 0)),
+    gui_rot = [30, 225, 0]
+    if gui_fill:
+        # 持ち物欄の向きで見た模型の縦横を測り、長い方が gui_fill ピクセル（16 で欄いっぱい）になる大きさにする
+        corners = [rot([(hi[i] if (n >> i) & 1 else lo[i]) - 8 - c[i] for i in range(3)], gui_rot) for n in range(8)]
+        extent = max(max(p[a] for p in corners) - min(p[a] for p in corners) for a in (0, 1))
+        gui = view(gui_rot, gui_fill / extent, k=1)
+    else:
+        gui = view(gui_rot, 0.625, k=min(grow, 1.25))
+    return {'gui': gui, 'ground': view([0, 0, 0], 0.25, (0, 3, 0)),
             'fixed': view([0, 0, 0], 0.5), 'thirdperson_righthand': tp, 'thirdperson_lefthand': tp,
             'firstperson_righthand': fp, 'firstperson_lefthand': view([0, 225, 0], 0.40)}
 
@@ -1036,7 +1045,7 @@ def loot(write_json, data):
             'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:{iid}'}],
             'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{iid}',
                             'properties': {'half': 'lower'}}, {'condition': 'minecraft:survives_explosion'}]}]})
-    for iid in ('bulkhead', 'reactor_console', 'lab_rayleigh_panel'):      # 天井のレイリー散乱パネルは回収できない
+    for iid in ('bulkhead', 'lab_reactor_console', 'lab_rayleigh_panel'):      # 天井のレイリー散乱パネルは回収できない
         write_json(data / 'loot_table' / 'blocks' / f'{iid}.json', {'type': 'minecraft:block', 'pools': []})
     write_json(data / 'loot_table' / 'blocks' / 'android_capsule.json', {'type': 'minecraft:block', 'pools': [{
         'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:android_capsule'}],

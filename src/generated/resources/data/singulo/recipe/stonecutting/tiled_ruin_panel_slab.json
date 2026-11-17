@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "singulo:tiled_ruin_panel",
+  "result": {
+    "id": "singulo:tiled_ruin_panel_slab",
+    "count": 2
+  }
+}

@@ -81,7 +81,7 @@ public final class MekanismQioGameTests {
         var absolute = helper.absolutePos(position);
         helper.assertTrue(!MekanismQio.publicAccess(helper.getLevel(), absolute),
                 "Missing security capability must fail closed");
-        var block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+        var block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(
                 net.minecraft.resources.Identifier.parse("mekanism:qio_dashboard"));
         helper.setBlock(position, block);
         var security = mekanism.api.security.IBlockSecurityUtils.INSTANCE.securityCapability(helper.getLevel(), absolute);

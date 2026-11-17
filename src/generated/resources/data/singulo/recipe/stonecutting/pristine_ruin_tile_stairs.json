@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "singulo:pristine_ruin_tiles",
+  "result": {
+    "id": "singulo:pristine_ruin_tile_stairs",
+    "count": 1
+  }
+}

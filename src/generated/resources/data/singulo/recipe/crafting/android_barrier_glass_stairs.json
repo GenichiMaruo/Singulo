@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": "singulo:android_barrier_glass"
+  },
+  "result": {
+    "id": "singulo:android_barrier_glass_stairs",
+    "count": 4
+  }
+}

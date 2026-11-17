@@ -993,6 +993,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private boolean selectable(CompoundTag a) {
         return !a.getBooleanOr("busy", false) && (plan == null || !plan.getBooleanOr("mining", false) || a.getBooleanOr("miner", false))
                 && (plan == null || !plan.getBooleanOr("felling", false) || a.getBooleanOr("feller", false))
+                && (plan == null || !plan.getBooleanOr("fishing", false) || a.getBooleanOr("fisher", false))
+                && (plan == null || !plan.getBooleanOr("farming", false) || a.getBooleanOr("farmer", false))
                 && (plan == null || !plan.getBooleanOr("fluids", false) || a.getBooleanOr("tank", false))
                 && (plan == null || !plan.getBooleanOr("chemicals", false) || a.getBooleanOr("chem_tank", false));
     }
@@ -1519,11 +1521,14 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 CompoundTag a = androids.get(idx);
                 if (!a.getBooleanOr("busy", false) && !selectable(a)) {
                     boolean axe = plan != null && plan.getBooleanOr("felling", false) && !a.getBooleanOr("feller", false);
+                    boolean rod = plan != null && plan.getBooleanOr("fishing", false) && !a.getBooleanOr("fisher", false);
+                    boolean hoe = plan != null && plan.getBooleanOr("farming", false) && !a.getBooleanOr("farmer", false);
                     boolean tank = plan != null && plan.getBooleanOr("fluids", false) && !a.getBooleanOr("tank", false);
                     boolean chem = plan != null && plan.getBooleanOr("chemicals", false) && !a.getBooleanOr("chem_tank", false);
                     g.setTooltipForNextFrame(font, font.split(Component.translatable(chem ? "gui.singulo.work_console.needs_chem_tank"
                             : tank ? "gui.singulo.work_console.needs_tank"
-                            : axe ? "gui.singulo.work_console.needs_feller" : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
+                            : axe ? "gui.singulo.work_console.needs_feller" : rod ? "gui.singulo.work_console.needs_fisher"
+                            : hoe ? "gui.singulo.work_console.needs_farmer" : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
                     return;
                 }
             }

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": "singulo:ruin_panel"
+  },
+  "result": {
+    "id": "singulo:ruin_panel_slab",
+    "count": 6
+  }
+}

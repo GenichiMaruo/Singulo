@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "GFG",
-    "GBG",
-    "FD "
+    "FBF",
+    "GWG",
+    "FFF"
   ],
   "key": {
     "B": "singulo:blueprint_lab_furniture",
     "G": "#c:glass_blocks/colorless",
     "F": "singulo:lab_frame",
-    "D": "#singulo:ceramic_flux"
+    "W": "singulo:white_ceramic_composite"
   },
   "result": {
     "id": "singulo:android_capsule",

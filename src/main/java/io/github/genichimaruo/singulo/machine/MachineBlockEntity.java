@@ -1347,11 +1347,11 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         energy.restoreEnergy(tag.getIntOr("energy", 0));
         progress = tag.getIntOr("progress", 0);
         mode = tag.getIntOr("mode", 0);
-        selectedRecipe = tag.contains("selected_recipe") ? Identifier.tryParse(tag.getStringOr("selected_recipe", "")) : null;
+        selectedRecipe = tag.contains("selected_recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(Identifier.tryParse(tag.getStringOr("selected_recipe", ""))) : null;
         selectedIndex = -2;
         mass = tag.getDoubleOr("mass", 0.0D);
         metalMass = tag.getDoubleOr("metal_mass", 0.0D);
-        resumeRecipe = tag.contains("recipe") ? Identifier.tryParse(tag.getStringOr("recipe", "")) : null;
+        resumeRecipe = tag.contains("recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(Identifier.tryParse(tag.getStringOr("recipe", ""))) : null;
         // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
         inputsChangedAt = tag.getLongOr("inputs_changed_at", 0L);
         dirty = true;

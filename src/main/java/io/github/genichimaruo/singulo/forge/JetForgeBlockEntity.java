@@ -1445,7 +1445,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
                     charged.add(s);
                 }
             }
-            recipeId = tag.contains("recipe") ? Identifier.tryParse(tag.getStringOr("recipe", "")) : null;
+            recipeId = tag.contains("recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(Identifier.tryParse(tag.getStringOr("recipe", ""))) : null;
             ignitionStored = tag.getLongOr("ignition_stored", 0L);
             ignitionLeft = tag.getIntOr("ignition_left", 0);
             bhMass = tag.contains("bh_mass") ? tag.getDoubleOr("bh_mass", 0.0D) : CORE_MASS;

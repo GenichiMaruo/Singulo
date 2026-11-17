@@ -189,6 +189,8 @@ public final class WorkConsoleView {
             at.putInt("accent", a.accent());
             at.putBoolean("miner", a.canMine());
             at.putBoolean("feller", a.canFell());
+            at.putBoolean("fisher", a.canFish());
+            at.putBoolean("farmer", a.canFarm());
             at.putBoolean("tank", a.hasTank());
             at.putBoolean("chem_tank", a.hasChemTank());
             as.add(at);
@@ -228,11 +230,13 @@ public final class WorkConsoleView {
         t.putBoolean("loop", plan.loop);
         t.putBoolean("limited", plan.limited);
         long crafts = 0;
-        boolean mining = false, felling = false, fluids = FluidSamples.is(plan.target), chems = ChemicalSamples.is(plan.target);
+        boolean mining = false, felling = false, fishing = false, farming = false, fluids = FluidSamples.is(plan.target), chems = ChemicalSamples.is(plan.target);
         for (WorkPlanner.Step s : plan.steps) {
             crafts += s.crafts();
             mining |= s.entry().recipe().needsMining();
             felling |= s.entry().recipe().needsFelling();
+            fishing |= s.entry().recipe().needsFishing();
+            farming |= s.entry().recipe().needsFarming();
             fluids |= s.entry().recipe().outputs().stream().anyMatch(FluidSamples::is)
                     || s.entry().recipe().inputs().stream().anyMatch(i -> FluidSamples.is(i.item));
             chems |= s.entry().recipe().outputs().stream().anyMatch(ChemicalSamples::is)
@@ -241,6 +245,8 @@ public final class WorkConsoleView {
         t.putBoolean("fluids", fluids);              // 液体を運ぶ工程がある: 液体のタンクを積んだアンドロイドだけ選べる
         t.putBoolean("chemicals", chems);            // 化学物質（Mekanism）を運ぶ工程がある: 化学物質のタンクを積んだアンドロイドだけ
         t.putBoolean("mining", mining);
+        t.putBoolean("fishing", fishing);             // 釣り・畑づくりの工程がある: その道具を積んだアンドロイドだけ選べる
+        t.putBoolean("farming", farming);
         t.putBoolean("felling", felling);              // 採掘の工程がある: 採掘アップグレードを積んだアンドロイドだけ選べる
         t.putInt("steps", plan.steps.size());
         t.putLong("crafts", crafts);

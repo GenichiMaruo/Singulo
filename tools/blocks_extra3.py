@@ -35,7 +35,7 @@ def _crack(d, pts, dark, light):
 
 
 def _star(d, fill, outline, center=(7.5, 7.5), r=6.5, inner=1.6):
-    """四芒星（上下左右に尖り、間がくぼんだ星）。"""
+    """四芒星（上下左右に尖り、間がくぼんだ星）。小さな印用（遺構保管庫など）。"""
     cx, cy = center
     pts = []
     for k in range(8):
@@ -43,6 +43,45 @@ def _star(d, fill, outline, center=(7.5, 7.5), r=6.5, inner=1.6):
         rr = r if k % 2 == 0 else inner
         pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr))
     d.polygon(pts, fill=fill, outline=outline)
+
+
+def _star_symmetric(d, fill, outline, center=(7.5, 7.5), r=7.4, inner=3.4):
+    """四芒星のガラスの模様（中心について対称）。
+
+    多角形の塗りは画素の境目の丸め方で左右・上下がずれるので、画素の中心が星の中かどうかで1画素ずつ決める
+    （中心が画素の境目なら、中心について対称になる）。縁は、上下左右のどれかが外の画素。
+    光線は付け根を太くして先へ細らせ、宝石の面のように中心線で明暗を分ける。明るい側は、時計回りに隣の光線の側
+    （右の光線は下側、下は左側、左は上側、上は右側）にそろえるので、きらめく風車のように見え、中心について対称のまま。
+    """
+    cx, cy = center
+    q = inner / math.sqrt(2)
+
+    def tri(p, a, b, c):
+        def side(p1, p2, p3):
+            return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+        d1, d2, d3 = side(p, a, b), side(p, b, c), side(p, c, a)
+        return not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0))
+
+    def inside(x, y):
+        u, v = abs(x - cx), abs(y - cy)
+        return tri((u, v), (0, 0), (r, 0), (q, q)) or tri((u, v), (0, 0), (q, q), (0, r))
+
+    def blend(a, b, t):
+        """色だけを寄せる（透け具合は fill のまま）。"""
+        return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3)) + (fill[3],)
+
+    light, dark = blend(fill, (255, 255, 255, 255), 0.8), blend(fill, outline, 0.6)
+    cells = {(x, y) for x in range(S) for y in range(S) if inside(x, y)}
+    for x, y in sorted(cells):
+        if any((x + dx, y + dy) not in cells for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            d.point((x, y), fill=outline)
+            continue
+        dx, dy = x - cx, y - cy
+        if abs(dx) >= abs(dy):                     # 左右の光線
+            bright = dy > 0 if dx > 0 else dy < 0
+        else:                                      # 上下の光線
+            bright = dx < 0 if dy > 0 else dx > 0
+        d.point((x, y), fill=light if bright else dark)
 
 
 # ---------------------------------------------------------------- 遺構（ひび・ガラス）
@@ -180,8 +219,8 @@ def white_glass_panel(star=False):
     for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
         d.point((x, y), fill=(176, 184, 194, 255))
     if star:
-        _star(d, (255, 255, 255, 150), (196, 214, 232, 235))
-        d.point([(7, 7), (8, 8)], fill=(255, 255, 255, 255))
+        _star_symmetric(d, (255, 255, 255, 110), (196, 214, 232, 190))
+        d.point([(7, 7), (8, 7), (7, 8), (8, 8)], fill=(255, 255, 255, 210))   # 中心の光
     else:
         d.line([(4, 10), (9, 5)], fill=(255, 255, 255, 120))
     return im
@@ -194,8 +233,8 @@ def black_reinforced_glass(star=False):
     for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
         d.point((x, y), fill=(120, 124, 136, 255))
     if star:
-        _star(d, (60, 56, 92, 170), (170, 176, 210, 240))
-        d.point([(7, 7), (8, 8)], fill=(220, 224, 255, 255))
+        _star_symmetric(d, (40, 38, 62, 140), (112, 116, 148, 200))
+        d.point([(7, 7), (8, 7), (7, 8), (8, 8)], fill=(160, 166, 200, 220))   # 中心の光
     else:
         d.line([(3, 3), (12, 12)], fill=(70, 74, 88, 170))
         d.line([(12, 3), (3, 12)], fill=(70, 74, 88, 170))
@@ -438,7 +477,7 @@ def textures(tb, save, weather, write_json):
     save(weather(cracked_ruin_panel(), 13), tb / 'cracked_ruin_panel.png')
     save(intact_ruin_glass(), tb / 'intact_ruin_glass.png')
     save(reinforced_ruin_glass(), tb / 'reinforced_ruin_glass.png')
-    save(broken_ruin_glass(), tb / 'ruin_glass.png')
+    save(broken_ruin_glass(), tb / 'broken_ruin_glass.png')
     save(white_glass_panel(), tb / 'white_glass_panel.png')
     save(white_glass_panel(star=True), tb / 'white_star_glass_panel.png')
     save(black_reinforced_glass(), tb / 'black_reinforced_glass.png')

@@ -46,7 +46,7 @@ Minecraft 1.21.1は0.9.0以降NeoForgeのみ。Forge版の最終版は0.8.1。1.
 
 `curseforge`環境の`CURSEFORGE_PROJECT_ID`（SecretまたはVariable）と`CURSEFORGE_TOKEN`（Secret）を使う。トークンをファイルへ記載しない。
 
-版番号は`X.Y.Z`形式。`auto`では0.x.yをBeta、1.0.0以降をReleaseとする。手動で`beta`・`release`・`alpha`も指定できる。
+版番号は`X.Y.Z`形式。公開候補は`X.Y.Z-rcN`（Nは1以上。例: `1.0.0-rc1`）で、タグは`v1.0.0-rc1`、変更履歴は`changelog-1.0.0-rc1.md`。`auto`では0.x.yと`-rcN`をBeta、1.0.0以降の正式版をReleaseとする。手動で`beta`・`release`・`alpha`も指定できる。
 
 1.20.1の公開は[そのブランチのワークフロー](https://github.com/GenichiMaruo/Singulo/blob/1.20.1/.github/workflows/publish-curseforge.yml)に従う。1.21.1の実行ID・タグ・JARを転用しない。
 
@@ -78,7 +78,7 @@ Modrinth distribution is supported alongside CurseForge. GitHub Releases still c
 - The project must first be approved and publicly readable. The workflow stops while it is under review.
 - Run **Publish Modrinth** manually from this Minecraft branch, using the same successful PR validation `verified_run_id` and immutable `release_tag` as CurseForge. On 1.20.1, use the F or N tag for the corresponding loader and dispatch once for each loader.
 - Existing provenance, exact source-tree, GameTest and GUI checks promote the tested CI JAR without rebuilding. Tags and versions are not changed. CurseForge publication does not automatically trigger Modrinth.
-- Versions use `<mod_version>-<minecraft><F|N>`; both sides are required, JEI and Mekanism are optional. `release_type=auto` selects Beta for 0.x and Release for 1.0.0 and later, or select a channel explicitly.
+- Versions use `<mod_version>-<minecraft><F|N>`; both sides are required, JEI and Mekanism are optional. `release_type=auto` selects Beta for 0.x and release candidates (`X.Y.Z-rcN`, e.g. `1.0.0-rc1`) and Release for stable 1.0.0 and later, or select a channel explicitly.
 - All Modrinth publications are serialized across branches. An existing version with exactly matching filename, SHA-512, Minecraft version, loader and channel is skipped. Any collision stops for manual inspection. The already uploaded 0.14.1 files must not be duplicated.
 - A failed/uncertain upload is never automatically retried. Inspect Modrinth and the `modrinth-receipt-*` workflow artifact before rerunning; the receipt records whether a POST began. Do not overwrite existing files. Publication does not create or alter GitHub Releases or submit the project for moderation.
 - Run `python3 -m unittest discover -s tools -p test_publish_modrinth.py` to check upload safety without uploading.

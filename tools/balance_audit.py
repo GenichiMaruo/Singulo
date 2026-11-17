@@ -122,8 +122,8 @@ class Model:
         self.routes['singulo:wormhole_mouth']['fe_per_tick']=10000
         self.targets=[k for k,m in self.meta.items() if m['category'] in {'machine','generator','multiblock','storage','romance'}]
         # Include other functional blocks that are classed as tools/parts/cables in the catalogue.
-        extras=['smes_cell','worldline_anchor_small','low_gravity_panel','high_gravity_panel','zero_gravity_block','rayleigh_panel',
-                'multiblock_port','wormhole_port','jet_collector','hawking_collector','extraction_port','reactor_mass_alarm']
+        extras=['smes_cell','worldline_anchor','low_gravity_panel','high_gravity_panel','zero_gravity_block','rayleigh_panel',
+                'multiblock_port','wormhole_port','jet_collector','hawking_collector','reactor_extraction_port','reactor_mass_alarm']
         self.targets += [f'singulo:{v[0]}' for n,v in ids.MOD.items() if v[2] in {'machine','gravity'} and f'singulo:{v[0]}' in self.meta]
         self.targets=sorted(set(self.targets+[f'singulo:{x}' for x in extras if f'singulo:{x}' in self.meta]),key=lambda x:(self.meta[x]['stage'],x))
 

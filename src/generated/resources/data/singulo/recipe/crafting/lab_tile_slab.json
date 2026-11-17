@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": "singulo:lab_tiles"
+  },
+  "result": {
+    "id": "singulo:lab_tile_slab",
+    "count": 6
+  }
+}

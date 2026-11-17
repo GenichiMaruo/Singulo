@@ -25,7 +25,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "singulo:record_fragment",
+          "name": "singulo:crystal_memory",
           "weight": 1
         }
       ]

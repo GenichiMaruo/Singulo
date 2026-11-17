@@ -292,6 +292,21 @@ final class GlowDepth {
         return true;
     }
 
+    /** 光を描き終えてから描く、半透明の固体（最後の記録者の翼の骨）。 */
+    private static final MultiBufferSource.BufferSource GLAZED_SOURCE = MultiBufferSource.immediate(new ByteBufferBuilder(1 << 16));
+
+    /**
+     * 少し透ける固体の入れ物（外向きの面だけ・陰影つき）。光の色と深度を書き終えたあとで描くので、光との前後は深度で決まる:
+     * 手前の光（羽根）は上に重なり、奥の光は透けて見える。光と一緒に並べ替えると、長い面と小さな面の前後が視点で入れ替わってちらつく。
+     */
+    static VertexConsumer glazed(MultiBufferSource buffers, Identifier texture) {
+        RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(texture);
+        if (!isActive() || GravitationalLensing.shaderPackInUse()) {
+            return buffers.getBuffer(type);
+        }
+        return route(buffers, GLAZED_SOURCE, type);
+    }
+
     /** 光の入れ物。白い絵の光だけまとめて描く（模様のある絵は透ける所まで深度に書いてしまうので、これまでどおり）。 */
     static VertexConsumer of(MultiBufferSource buffers, Identifier texture) {
         if (!isActive() || !FxDraw.WHITE.equals(texture) || GravitationalLensing.shaderPackInUse()) {
@@ -321,6 +336,7 @@ final class GlowDepth {
                 FLUID_SOURCE.endBatch(FLUID_DEPTH);
                 COLOR_SOURCE.endBatch();
                 SOURCE.endBatch();
+                GLAZED_SOURCE.endBatch();
             } finally { modelView.popMatrix(); }
             if (anyPending()) {
                 RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();

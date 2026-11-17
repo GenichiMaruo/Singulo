@@ -8,7 +8,7 @@
   "key": {
     "K": "singulo:ceramic_substrate",
     "B": "singulo:basic_circuit",
-    "H": "singulo:heat_exchange_core",
+    "H": "singulo:cooling_tower_heat_exchange_core",
     "F": "singulo:basic_frame"
   },
   "result": {
