@@ -187,27 +187,39 @@ def memory_icon(crystal=ORANGE, mark=CYAN):
 
 
 def kit_icon():
-    """ドローンキット: 白い陶磁のケースに、橙の線と黒い留め具。ふたにドローンの印（4つのローターと胴）。"""
-    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    white, shade, edge = (238, 240, 244), (200, 206, 216), (120, 126, 140)
-    dark = (52, 56, 70)
-    for y in range(4, 14):
-        for x in range(1, 15):
-            c = shade if y >= 11 else white
-            if x in (1, 14) or y in (4, 13):
-                c = edge
-            px[x, y] = c + (255,)
-    for x in range(2, 14):
-        px[x, 10] = ORANGE + (255,)
-    for x in (6, 7, 8, 9):
-        px[x, 3] = dark + (255,)
-    for (x, y) in ((5, 5), (10, 5), (5, 8), (10, 8)):
-        px[x, y] = (90, 96, 110, 255)
-    for (x, y) in ((6, 6), (7, 6), (8, 6), (9, 6), (6, 7), (7, 7), (8, 7), (9, 7)):
-        px[x, y] = (110, 120, 136, 255)
-    px[7, 6] = ORANGE + (255,)
-    return im
+    """ドローンキット（0.21.0 で描き直した）: アンドロイドキットと同じ黒い取っ手の白い箱。暗い窓に、上から見たドローン
+    （白い胴と橙の灯、灰色の腕、胴のすぐ斜めの4つのローター。淡い円盤に白い羽の線）。箱の下に橙の線。
+    輪郭を含めて14×14に収め、上下左右の真ん中に置く。"""
+    white, shade, dark = (238, 240, 244), (200, 206, 216), (52, 56, 70)
+    window, edge = (54, 66, 92), (150, 156, 170)
+    blur, light = (186, 194, 208), (222, 228, 236)
+
+    def f(d):
+        d.rectangle([6, 2, 9, 2], fill=rgba(dark))                         # 取っ手
+        d.point((6, 3), fill=rgba(dark))
+        d.point((9, 3), fill=rgba(dark))
+        d.rectangle([2, 4, 13, 13], fill=rgba(white))                      # 箱
+        d.line([(2, 13), (13, 13)], fill=rgba(shade))
+        d.rectangle([3, 5, 12, 10], fill=rgba(window))                     # 窓
+        d.line([(4, 12), (11, 12)], fill=rgba(ORANGE))
+        for x, top in ((4, True), (9, True), (4, False), (9, False)):    # ローター（円盤と、外側の段の羽）
+            y = 5 if top else 9
+            d.rectangle([x, y, x + 2, y + 1], fill=rgba(blur))
+            yb = y if top else y + 1
+            d.line([(x, yb), (x + 2, yb)], fill=rgba(light))
+        d.rectangle([7, 7, 8, 8], fill=rgba(white))                        # 胴
+        d.point((8, 7), fill=rgba(ORANGE))
+        for p in ((6, 7), (9, 7), (6, 8), (9, 8)):                         # 腕
+            d.point(p, fill=rgba(edge))
+    im = art16.outlined(f, **art16.SOFT_EDGE)
+    for x in (7, 8):                                                       # 取っ手の穴（輪郭で埋まる）を抜く
+        im.putpixel((x, 3), (0, 0, 0, 0))
+    box = im.getbbox()
+    w, h = box[2] - box[0], box[3] - box[1]
+    assert w <= 14 and h <= 14, (w, h)
+    out = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    out.paste(im.crop(box), ((16 - w) // 2, (16 - h) // 2))
+    return out
 
 
 def phase_icon():

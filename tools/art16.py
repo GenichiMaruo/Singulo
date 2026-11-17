@@ -2395,15 +2395,33 @@ def overclock_chip():
 
 
 def gravity_boots():
-    """重力ブーツ: 白い装甲のブーツ。かかとに青く光る重力素子。"""
-    im, d = new()
-    d.polygon([(4, 2), (9, 2), (9, 10), (14, 11), (14, 14), (3, 14), (3, 9)], fill=(230, 234, 240, 255),
-              outline=(120, 126, 140, 255))
-    d.line([(4, 12), (13, 12)], fill=(70, 74, 84, 255))
-    d.line([(4, 6), (8, 6)], fill=(110, 205, 238, 255))
-    d.rectangle([3, 10, 5, 13], fill=(110, 205, 238, 255))
-    d.point((4, 11), fill=(255, 255, 255, 255))
-    return im
+    """重力ブーツ（0.21.0 で描き直した）: バニラのブーツと同じく、白い装甲のブーツを左右に2足（つま先は外へ）。
+    すねに水色の発光の帯、黒い靴底。2足の間は透明に抜き、内側の縁は陰の色。輪郭を含めて14×14以内で、上下左右の真ん中に置く。"""
+    armor, armor_sh, sole, blue = (232, 236, 242), (192, 200, 214), (58, 62, 76), (110, 205, 238)
+    top = 5
+
+    def f(d):
+        for side in (0, 1):
+            sx = 4 if side == 0 else 9                                     # すねの左端
+            fx0, fx1 = (2, 6) if side == 0 else (9, 13)                    # 足の左右
+            inner = 6 if side == 0 else 9
+            d.rectangle([sx, top, sx + 2, 10], fill=rgba(armor))          # すね
+            d.rectangle([fx0, 10, fx1, 11], fill=rgba(armor))             # 足
+            d.line([(fx0, 12), (fx1, 12)], fill=rgba(sole))               # 靴底
+            d.line([(inner, top), (inner, 11)], fill=rgba(armor_sh))      # 内側の陰
+            d.line([(fx0, 11), (fx1, 11)], fill=rgba(armor_sh))
+            d.line([(sx, top + 1), (sx + 2, top + 1)], fill=rgba(blue))   # すねの帯
+            d.point((sx, top + 2), fill=(255, 255, 255, 255))
+    im = outlined(f, **SOFT_EDGE)
+    for x in (7, 8):                                                       # 2足の間（輪郭で埋まる）を抜く
+        for y in range(16):
+            im.putpixel((x, y), (0, 0, 0, 0))
+    box = im.getbbox()
+    w, h = box[2] - box[0], box[3] - box[1]
+    assert w <= 14 and h <= 14, (w, h)
+    out = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    out.paste(im.crop(box), ((16 - w) // 2, (16 - h) // 2))
+    return out
 
 
 def catalyst_stabilizer():
@@ -2495,18 +2513,21 @@ def sealed_container_inner():
 
 
 def gravity_boots_layer():
-    """重力ブーツを履いたときの絵（防具の1枚目、64×32）。ブーツは脚の下半分に描かれる。"""
+    """重力ブーツを履いたときの絵（防具の1枚目、64×32）。0.21.0: アイテムの絵（白い装甲・すねの水色の帯・黒い靴底）に合わせ、
+    高さはバニラの革のブーツと同じ（脚の側面の下6段 v=26〜31 と、足の裏の面）。"""
     from PIL import Image
     im = Image.new('RGBA', (64, 32), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    # 脚の展開図（u=0〜16, v=16〜32）。下側（足首から下）だけ塗る
-    d.rectangle([0, 22, 15, 31], fill=(230, 234, 240, 255))
-    d.rectangle([4, 16, 11, 19], fill=(230, 234, 240, 255))
-    d.line([(0, 22), (15, 22)], fill=(120, 126, 140, 255))
-    d.line([(0, 28), (15, 28)], fill=(70, 74, 84, 255))
-    for x in (1, 5, 9, 13):
-        d.point((x, 25), fill=(110, 205, 238, 255))
-    d.line([(0, 30), (15, 30)], fill=(110, 205, 238, 255))
+    armor, armor_sh, sole, blue = (232, 236, 242), (192, 200, 214), (58, 62, 76), (110, 205, 238)
+    # 脚の展開図: 側面は v=20〜31（右 u0〜3・前 u4〜7・左 u8〜11・後ろ u12〜15）、足の裏は u8〜11, v16〜19
+    d.rectangle([0, 26, 15, 31], fill=rgba(armor))
+    d.line([(0, 26), (15, 26)], fill=rgba(armor_sh))        # 履き口
+    d.line([(0, 27), (15, 27)], fill=rgba(blue))            # すねの帯
+    d.line([(0, 30), (15, 30)], fill=rgba(armor_sh))        # 足の陰
+    d.line([(0, 31), (15, 31)], fill=rgba(sole))            # 靴底
+    d.rectangle([12, 28, 15, 29], fill=rgba(armor_sh))      # 後ろは陰
+    d.point((4, 28), fill=(255, 255, 255, 255))             # 前の光
+    d.rectangle([8, 16, 11, 19], fill=rgba(sole))           # 足の裏
     return im
 
 
