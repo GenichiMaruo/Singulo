@@ -1714,6 +1714,12 @@ final class AndroidWorkGoal extends Goal {
         BlockState crop = ((net.minecraft.world.item.BlockItem) seed.getItem()).getBlock().defaultBlockState();
         BlockPos ground = target.below();
         if (!crop.canSurvive(level, target) && tillable(level.getBlockState(ground))) {
+            // The planted cell and the ground changed by tilling are separate protection targets.
+            if (!mayBreak(level, c, ground)) {
+                android.setStall(RuinAndroid.STALL_PROTECTED);
+                mineSkip.add(target);
+                return;
+            }
             level.setBlock(ground, net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState(), 11);
             level.playSound(null, ground, SoundEvents.HOE_TILL, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
         }
@@ -1740,6 +1746,10 @@ final class AndroidWorkGoal extends Goal {
             return false;
         }
         net.minecraft.world.level.block.Block b = bi.getBlock();
+        // Direct setBlock cannot preserve containers or multi-block placement semantics.
+        if (!plantBlock(b)) {
+            return false;
+        }
         BlockState crop = b.defaultBlockState();
         if (crop.canSurvive(level, p)) {
             return !(b instanceof net.minecraft.world.level.block.CropBlock || b instanceof net.minecraft.world.level.block.StemBlock)
@@ -1747,6 +1757,21 @@ final class AndroidWorkGoal extends Goal {
         }
         return (b instanceof net.minecraft.world.level.block.CropBlock || b instanceof net.minecraft.world.level.block.StemBlock)
                 && tillable(level.getBlockState(p.below()));
+    }
+
+    /** Single-cell crops safe to place using their default state. */
+    private static boolean plantBlock(net.minecraft.world.level.block.Block block) {
+        return !block.defaultBlockState().hasBlockEntity() && (
+                block instanceof net.minecraft.world.level.block.CropBlock
+                || block instanceof net.minecraft.world.level.block.StemBlock
+                || block instanceof net.minecraft.world.level.block.SaplingBlock
+                || block instanceof net.minecraft.world.level.block.NetherWartBlock
+                || block instanceof net.minecraft.world.level.block.SweetBerryBushBlock
+                || block instanceof net.minecraft.world.level.block.MushroomBlock
+                || block instanceof net.minecraft.world.level.block.SugarCaneBlock
+                || block instanceof net.minecraft.world.level.block.CactusBlock
+                || block instanceof net.minecraft.world.level.block.CocoaBlock
+                || block instanceof net.minecraft.world.level.block.BambooSaplingBlock);
     }
 
     /** 骨粉を与えて育つ作物・苗木（芝や花には与えない）。 */
