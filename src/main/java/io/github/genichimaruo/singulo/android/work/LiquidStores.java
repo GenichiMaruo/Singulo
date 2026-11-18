@@ -75,7 +75,20 @@ public final class LiquidStores {
     }
 
     /** An extractable material and the supply point that can actually drain it. */
-    record Supply(BlockPos point, ItemCount material, LiquidStores store) {}
+    record Supply(BlockPos key, BlockPos point, ItemCount material, LiquidStores store) {}
+
+    static long fillAt(Level level, BlockPos point, ItemStack sample, long amount, BiConsumer<BlockPos, Long> deposited) {
+        long[] moved = {0};
+        adjacent(level, point, (key, store) -> {
+            if (moved[0] == amount) return;
+            long accepted = store.fill(sample, amount - moved[0], false);
+            if (accepted > 0) {
+                moved[0] += accepted;
+                deposited.accept(key, accepted);
+            }
+        });
+        return moved[0];
+    }
 
     static Map<BlockPos, List<Supply>> supplies(Level level, List<BlockPos> points) {
         Map<BlockPos, List<Supply>> tanks = new LinkedHashMap<>();
@@ -90,7 +103,7 @@ public final class LiquidStores {
                     List<Supply> faces = tanks.computeIfAbsent(key, ignored -> new ArrayList<>());
                     // Two faces can expose the same tank with different drain permissions.
                     // For each fluid use its most accessible face; ties keep the first point.
-                    Supply candidate = new Supply(point, item, store);
+                    Supply candidate = new Supply(key, point, item, store);
                     int i = 0;
                     while (i < faces.size() && !faces.get(i).material.matches(item.item)) i++;
                     if (i == faces.size()) faces.add(candidate);

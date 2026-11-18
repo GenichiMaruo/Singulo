@@ -3714,6 +3714,7 @@
   "tooltip.singulo.procedure_card.mine": "採掘: %s がそろうまで（%s）",
   "tooltip.singulo.procedure_card.plant": "畑づくり: %s を植える（%s）",
   "tooltip.singulo.procedure_card.product": "できる物",
+  "tooltip.singulo.procedure_card.record_again": "元の次元の作業位置カードを使い、この手順を記録し直してください",
   "tooltip.singulo.procedure_card.shear": "毛刈り: %s がそろうまで（%s）",
   "tooltip.singulo.procedure_card.use": "操作: %s（%s）",
   "tooltip.singulo.recipe_card.empty": "まだ記録していない（作業指令台の「記録」で記録する）",

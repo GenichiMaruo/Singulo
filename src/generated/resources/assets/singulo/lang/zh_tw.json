@@ -3714,6 +3714,7 @@
   "tooltip.singulo.procedure_card.mine": "採掘：直到收集到 %s（%s）",
   "tooltip.singulo.procedure_card.plant": "耕種：種下 %s（%s）",
   "tooltip.singulo.procedure_card.product": "產物",
+  "tooltip.singulo.procedure_card.record_again": "請使用原維度的工作位置卡重新記錄這些步驟",
   "tooltip.singulo.procedure_card.shear": "剪毛：直到收集到 %s（%s）",
   "tooltip.singulo.procedure_card.use": "操作：%s（%s）",
   "tooltip.singulo.recipe_card.empty": "尚未記錄（在作業指令台的「記錄」中記錄）",

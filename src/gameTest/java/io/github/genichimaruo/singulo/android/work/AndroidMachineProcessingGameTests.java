@@ -319,6 +319,132 @@ public final class AndroidMachineProcessingGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "empty")
+    public static void androidRefuelsFurnaceWithRecordedLavaBucketAndRecoversContainer(GameTestHelper h) throws ReflectiveOperationException {
+        var console = console(h);
+        var level = h.getLevel();
+        h.setBlock(AT, Blocks.FURNACE);
+        AbstractFurnaceBlockEntity furnace = h.getBlockEntity(AT);
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var menu = (WorkConsoleMenu) console.createMenu(1, player.getInventory(), player);
+        console.setProcess(List.of(new ItemStack(Items.RAW_IRON)), List.of(new ItemStack(Items.IRON_INGOT)));
+        menu.setCarried(new ItemStack(Items.LAVA_BUCKET));
+        menu.clicked(WorkConsoleMenu.SLOT_FUEL, 0, net.minecraft.world.inventory.ClickType.PICKUP, player);
+        menu.clickMenuButton(player, WorkConsoleMenu.BUTTON_ENCODE);
+        var card = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), level.registryAccess());
+        h.assertTrue(card != null && card.fuel().is(Items.LAVA_BUCKET) && menu.getCarried().is(Items.LAVA_BUCKET),
+                "Fuel slot consumed or changed the sample bucket");
+        var legacy = card.save(level.registryAccess());
+        var lava = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000);
+        legacy.put("fuel", FluidSamples.of(lava).save(level.registryAccess()));
+        h.assertTrue(RecipeData.load(legacy, level.registryAccess()).fuel().is(Items.LAVA_BUCKET),
+                "Could not read the fuel on an older recipe card");
+        var work = setup(h, console, card);
+        work.worker().addToCarry(new ItemStack(Items.RAW_IRON));
+        work.worker().addToCarry(new ItemStack(Items.LAVA_BUCKET));
+        work.visit();
+        work.visit();
+        h.assertTrue(furnace.getItem(1).is(Items.LAVA_BUCKET), "Android did not refuel the furnace");
+        for (int tick = 0; tick <= 200; tick++) {
+            AbstractFurnaceBlockEntity.serverTick(level, furnace.getBlockPos(), furnace.getBlockState(), furnace);
+        }
+        work.visit();
+        h.assertTrue(furnace.getItem(1).isEmpty() && work.worker().inventory().countItem(Items.BUCKET) == 1
+                && work.worker().inventory().countItem(Items.IRON_INGOT) == 1, "Lost the product or the empty fuel bucket");
+        // A new order can find a cold furnace with a bucket left by a previous run.
+        h.setBlock(AT, Blocks.AIR);
+        h.setBlock(AT, Blocks.FURNACE);
+        furnace = h.getBlockEntity(AT);
+        menu.setCarried(new ItemStack(Items.COAL));
+        menu.clicked(WorkConsoleMenu.SLOT_FUEL, 0, net.minecraft.world.inventory.ClickType.PICKUP, player);
+        menu.clickMenuButton(player, WorkConsoleMenu.BUTTON_ENCODE);
+        var coal = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), level.registryAccess());
+        furnace.setItem(0, new ItemStack(Items.RAW_IRON));
+        furnace.setItem(1, new ItemStack(Items.COAL));
+        h.assertFalse(MachineWatch.outOfFuel(level, furnace.getBlockPos(), coal), "Fresh coal counted as an empty fuel slot");
+        furnace.setItem(1, new ItemStack(Items.BUCKET));
+        h.assertTrue(MachineWatch.outOfFuel(level, furnace.getBlockPos(), coal), "Parked order missed an old fuel bucket");
+        furnace.setItem(0, ItemStack.EMPTY);
+        furnace.setItem(2, new ItemStack(Items.BUCKET));
+        var next = setup(h, console, coal);
+        next.worker().addToCarry(new ItemStack(Items.COAL));
+        next.worker().addToCarry(new ItemStack(Items.RAW_IRON));
+        next.visit();
+        h.assertTrue(furnace.getItem(1).isEmpty() && furnace.getItem(2).is(Items.BUCKET)
+                && next.worker().inventory().countItem(Items.BUCKET) == 1, "Picked up the wrong bucket");
+        furnace.setItem(2, ItemStack.EMPTY);
+        next.visit();
+        for (int tick = 0; tick <= 200; tick++) {
+            AbstractFurnaceBlockEntity.serverTick(level, furnace.getBlockPos(), furnace.getBlockState(), furnace);
+        }
+        next.visit();
+        h.assertTrue(next.worker().inventory().countItem(Items.IRON_INGOT) == 1 && next.worker().inventory().countItem(Items.COAL) == 0,
+                "Coal did not resume smelting after the old bucket was removed");
+        console.setProcess(List.of(new ItemStack(Items.WET_SPONGE)), List.of(new ItemStack(Items.SPONGE)));
+        h.assertTrue(console.encode(), "Could not record sponge drying");
+        var sponge = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), level.registryAccess());
+        var drying = setup(h, console, sponge);
+        drying.worker().addToCarry(new ItemStack(Items.WET_SPONGE));
+        // The preceding coal is still burning, so a bucket left in the fuel slot receives the water.
+        furnace.setItem(1, new ItemStack(Items.BUCKET));
+        drying.visit();
+        drying.visit();
+        h.assertTrue(furnace.getItem(1).is(Items.BUCKET), "Removed the sponge's bucket before it filled");
+        for (int tick = 0; tick <= 200; tick++) {
+            AbstractFurnaceBlockEntity.serverTick(level, furnace.getBlockPos(), furnace.getBlockState(), furnace);
+        }
+        drying.visit();
+        h.assertTrue(drying.worker().inventory().countItem(Items.SPONGE) == 1 && drying.worker().inventory().countItem(Items.WATER_BUCKET) == 1,
+                "Did not collect the dried sponge and its water");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void procedureCoordinatesRequireTheirRecordedDimension(GameTestHelper h) throws ReflectiveOperationException {
+        var level = h.getLevel();
+        var nether = level.getServer().getLevel(net.minecraft.world.level.Level.NETHER);
+        var console = console(h);
+        var pos = h.absolutePos(AT);
+        var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
+        WorkLocationCardItem.record(location, level, pos, Blocks.LEVER);
+        console.setMode(WorkConsoleBlockEntity.MODE_PROCEDURE);
+        while (console.modeData().get(1) != ProcedureStep.USE) console.cycleStepKind(false);
+        console.encoder().setItem(WorkConsoleBlockEntity.LOC_A, location);
+        console.encoder().setItem(WorkConsoleBlockEntity.CARD, new ItemStack(SinguloItems.PROCEDURE_CARD.get()));
+        console.encoder().setItem(WorkConsoleBlockEntity.RESULT, new ItemStack(Items.LEVER));
+        h.assertTrue(console.addStep() == null && console.encode(), "Cannot record the lever procedure");
+        var registries = level.registryAccess();
+        var recorded = console.encoder().getItem(WorkConsoleBlockEntity.CARD);
+        var carried = ItemStack.parse(registries, recorded.save(registries)).orElseThrow();
+        var block = SinguloBlocks.ANDROID_RECIPE_RACK.get();
+        h.setBlock(AT, block);
+        RecipeRackBlockEntity rack = h.getBlockEntity(AT);
+        rack.items().setStackInSlot(1, carried);
+        var entries = new java.util.ArrayList<RecipeRackBlockEntity.Entry>();
+        rack.entries(level, entries);
+        h.assertTrue(entries.size() == 1 && entries.getFirst().location().equals(pos), "Original rack lost the procedure");
+        entries.clear();
+        rack.entries(nether, entries);
+        h.assertTrue(entries.isEmpty(), "Nether rack offered an Overworld lever");
+
+        // Cards and in-progress orders from older saves have coordinates but no dimension.
+        var oldTag = RecipeData.read(carried, registries).save(registries);
+        oldTag.getList("steps", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0).remove("dimension");
+        var oldRecipe = RecipeData.load(oldTag, registries);
+        oldRecipe.write(carried, registries);
+        rack.entries(level, entries);
+        h.assertTrue(entries.isEmpty(), "Rack guessed a dimension for an old card");
+        var work = setup(h, console, oldRecipe);
+        var order = new WorkOrder(work.job().orderId(), oldRecipe.output(), 1, null);
+        console.orders().add(order);
+        var procedure = work.goal().getClass().getDeclaredMethod("procedure", ServerLevel.class, WorkConsoleBlockEntity.class,
+                WorkJob.class, WorkJob.Batch.class);
+        procedure.setAccessible(true);
+        procedure.invoke(work.goal(), level, console, work.job(), work.batch());
+        h.assertTrue(console.order(order.id) == null, "Restored order proceeded at an unbound position");
+        h.succeed();
+    }
+
     private static Processing setup(GameTestHelper h, WorkConsoleBlockEntity c, RecipeData card) throws ReflectiveOperationException {
         return setup(h, c, card, AT);
     }

@@ -328,7 +328,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             if ((grid || counted) && (type == ClickType.PICKUP || type == ClickType.QUICK_MOVE)) {
                 ItemStack carried = getCarried();
                 int count = counted && button == 0 ? carried.getCount() : 1;
-                ItemStack fluid = counted ? FluidSamples.fromContainer(carried) : ItemStack.EMPTY;
+                ItemStack fluid = counted && slotId != SLOT_FUEL ? FluidSamples.fromContainer(carried) : ItemStack.EMPTY;
                 encoder.setItem(encoderIndex(slotId), carried.isEmpty() ? ItemStack.EMPTY
                         : FluidSamples.liquid(fluid) ? fluid : carried.copyWithCount(count));
                 if (!player.level().isClientSide && player.level().getBlockEntity(pos) instanceof WorkConsoleBlockEntity c) {
@@ -347,7 +347,9 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             return false;
         }
         if (id == BUTTON_ENCODE) {
-            c.encode();
+            if (!c.encode() && c.mode() == WorkConsoleBlockEntity.MODE_PROCEDURE && !c.procedureLocationsValid()) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("tooltip.singulo.procedure_card.record_again"), true);
+            }
             return true;
         }
         if (id == BUTTON_CLEAR) {

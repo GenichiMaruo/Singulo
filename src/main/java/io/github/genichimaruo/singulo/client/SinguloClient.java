@@ -37,6 +37,7 @@ public final class SinguloClient {
         modBus.addListener(GravitationalLensing::registerShaders);
         modBus.addListener(JetForgeRenderTypes::registerShaders);
         modBus.addListener(GlowDepth::registerShaders);
+        modBus.addListener(WeaponTransparency::registerShaders);
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(StaffTipTracker::wrapModel);
@@ -51,6 +52,7 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GlowDepth::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGHEST, AndroidWeaponLight::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
@@ -87,6 +89,7 @@ public final class SinguloClient {
     }
 
     static void clearWorldState() {
+        WeaponTransparency.clear();
         ShapeCache.clear();
         HologramRenderer.clear();
         NeutrinoOverlay.clear();

@@ -118,7 +118,19 @@ public final class MachineWatch {
         }
         BlockState state = level.getBlockState(at);
         boolean lit = state.hasProperty(AbstractFurnaceBlock.LIT) && state.getValue(AbstractFurnaceBlock.LIT);
-        return !lit && f.getItem(1).isEmpty() && !f.getItem(0).isEmpty();
+        return !lit && (f.getItem(1).isEmpty() || removableFuelContainer(f, r)) && !f.getItem(0).isEmpty();
+    }
+
+    public static boolean removableFuelContainer(AbstractFurnaceBlockEntity furnace, RecipeData recipe) {
+        ItemStack stack = furnace.getItem(1);
+        if (stack.is(net.minecraft.world.item.Items.BUCKET)) {
+            // A lit furnace fills this bucket when it finishes drying the sponge.
+            return !furnace.getItem(0).is(net.minecraft.world.item.Items.WET_SPONGE)
+                    || !furnace.getBlockState().getOptionalValue(AbstractFurnaceBlock.LIT).orElse(false);
+        }
+        // Both vanilla bucket types may remain in the fuel slot when a different card takes over.
+        return stack.is(net.minecraft.world.item.Items.WATER_BUCKET) || !stack.isEmpty() && recipe.fuel().hasCraftingRemainingItem()
+                && ItemStack.isSameItemSameComponents(stack, recipe.fuel().getCraftingRemainingItem());
     }
 
     @javax.annotation.Nullable
@@ -196,7 +208,7 @@ public final class MachineWatch {
         return null;
     }
 
-    /** 自動時は製品ごとの出口を調べる。かまどの燃料欄は取り出さない。 */
+    /** 自動時は製品ごとの出口を調べる。かまどは下から製品と使用済みの燃料容器を取り出す。 */
     public static List<Direction> outputFaces(Level level, BlockPos at, RecipeData r) {
         if (!r.outputAuto()) return List.of(r.outputFace(level.getBlockState(at)));
         return level.getBlockEntity(at) instanceof AbstractFurnaceBlockEntity ? List.of(Direction.DOWN) : OUT_ORDER;

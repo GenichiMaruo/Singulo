@@ -86,11 +86,13 @@ public final class WorkOrder {
     /** 受け渡し場所 point に予約した物。 */
     public static final class Holding {
         public final BlockPos point;
+        @Nullable public final BlockPos store;
         public final ItemStack item;
         public long count;
 
-        Holding(BlockPos point, ItemStack item, long count) {
+        Holding(BlockPos point, @Nullable BlockPos store, ItemStack item, long count) {
             this.point = point.immutable();
+            this.store = store == null ? null : store.immutable();
             this.item = item.copyWithCount(1);
             this.count = count;
         }
@@ -98,26 +100,40 @@ public final class WorkOrder {
 
     /** 予約を足す。 */
     public void hold(BlockPos point, ItemStack item, long count) {
+        hold(point, null, item, count);
+    }
+
+    void hold(BlockPos point, @Nullable BlockPos store, ItemStack item, long count) {
         if (count <= 0 || item.isEmpty()) {
             return;
         }
         for (Holding h : held) {
-            if (h.point.equals(point) && ItemStack.isSameItemSameComponents(h.item, item)) {
+            if (h.point.equals(point) && java.util.Objects.equals(h.store, store) && ItemStack.isSameItemSameComponents(h.item, item)) {
                 h.count += count;
                 return;
             }
         }
-        held.add(new Holding(point, item, count));
+        held.add(new Holding(point, store, item, count));
     }
 
     /** 予約を使う（取り出した分）。 */
     public void release(BlockPos point, ItemStack item, long count) {
+        consume(point, null, true, item, count);
+    }
+
+    long consume(BlockPos point, @Nullable BlockPos store, boolean anyStore, ItemStack item, long count) {
+        long left = count;
         for (Holding h : held) {
-            if (h.point.equals(point) && ItemStack.isSameItemSameComponents(h.item, item)) {
-                h.count = Math.max(0, h.count - count);
+            if (left == 0) break;
+            if (h.point.equals(point) && (anyStore || java.util.Objects.equals(store, h.store))
+                    && ItemStack.isSameItemSameComponents(h.item, item)) {
+                long used = Math.min(h.count, left);
+                h.count -= used;
+                left -= used;
             }
         }
         held.removeIf(h -> h.count <= 0);
+        return count - left;
     }
 
     /** 受け渡し場所 point に予約した、この物の数（point が null なら全部の場所の合計）。 */
@@ -338,6 +354,7 @@ public final class WorkOrder {
         for (Holding h : held) {
             CompoundTag ht = new CompoundTag();
             ht.put("point", NbtUtils.writeBlockPos(h.point));
+            if (h.store != null) ht.put("store", NbtUtils.writeBlockPos(h.store));
             ht.put("item", h.item.save(registries));
             ht.putLong("count", h.count);
             hs.add(ht);
@@ -396,7 +413,7 @@ public final class WorkOrder {
         for (Tag tag : t.getList("held", Tag.TAG_COMPOUND)) {
             CompoundTag ht = (CompoundTag) tag;
             ItemStack item = ItemStack.parseOptional(registries, ht.getCompound("item"));
-            NbtUtils.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, item, ht.getLong("count")));
+            NbtUtils.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, NbtUtils.readBlockPos(ht, "store").orElse(null), item, ht.getLong("count")));
         }
         for (Tag w : t.getList("workers", Tag.TAG_INT_ARRAY)) {
             o.workers.add(NbtUtils.loadUUID(w));

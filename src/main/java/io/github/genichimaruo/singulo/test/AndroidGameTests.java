@@ -2045,7 +2045,7 @@ public final class AndroidGameTests {
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
                 helper.absolutePos(from), helper.absolutePos(to), ItemStack.EMPTY);
         ItemStack card = new ItemStack(item("procedure_card"));
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
                 .write(card, level.registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);   // 場所のカードがない行
@@ -2155,7 +2155,8 @@ public final class AndroidGameTests {
     /** 手順カード1枚（steps、できる物 output）を、場所のカードのない行に並べる。 */
     private static void procedureCard(GameTestHelper helper, List<io.github.genichimaruo.singulo.android.work.ProcedureStep> steps, ItemStack output) {
         ItemStack card = new ItemStack(item("procedure_card"));
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(steps, output).write(card, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(steps.stream().map(s -> s.recordedIn(helper.getLevel())).toList(), output)
+                .write(card, helper.getLevel().registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
     }
@@ -2446,7 +2447,7 @@ public final class AndroidGameTests {
         ItemStack card = new ItemStack(item("recipe_card"));
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.EXTRACT, helper.absolutePos(TABLE), null, water);
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), water).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), water).write(card, level.registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
         var plan = console.plan(io.github.genichimaruo.singulo.android.work.FluidSamples.key(water), 1500);
@@ -2536,7 +2537,7 @@ public final class AndroidGameTests {
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
                 helper.absolutePos(new BlockPos(0, 1, 5)), helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY);
         ItemStack card = new ItemStack(item("procedure_card"));
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
                 .write(card, level.registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);

@@ -322,6 +322,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private boolean outputOn;
     private int nextJobId = 1;
     private boolean restoredLeases;
+    private boolean restoreSupplyClaims;
+    private boolean migrateSupplyClaims;
     /** 最後の知らせ（画面に出す。取り消しの理由など）。 */
     @Nullable
     private Component message;
@@ -448,17 +450,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 素材置き場の中身の合計（物ごとに、それがある資材口の取り出しの優先度も覚える）。 */
     public List<ItemCount> stock() {
         List<ItemCount> out = new ArrayList<>();
-        Set<BlockPos> stores = new HashSet<>();
         List<BlockPos> points = supplyPoints();
-        for (BlockPos p : points) {
-            List<IItemHandler> here = new ArrayList<>();
-            here.addAll(storagesAt(p, stores));
-            for (IItemHandler h : here) {
-                for (int i = 0; i < h.getSlots(); i++) {
-                    ItemStack s = h.getStackInSlot(i);
-                    if (io.github.genichimaruo.singulo.wormhole.UnstableMouthItem.expired(s, level)) continue;
-                    ItemCount.addRanked(out, s, s.getCount(), s.isEmpty() ? 0 : priority(p, s, true));
-                }
+        for (var source : ItemSupplyStores.sources(this, points)) {
+            IItemHandler h = source.handler();
+            for (int i = 0; i < h.getSlots(); i++) {
+                ItemStack s = h.getStackInSlot(i);
+                if (s.isEmpty() || io.github.genichimaruo.singulo.wormhole.UnstableMouthItem.expired(s, level)) continue;
+                ItemCount.addRanked(out, s, s.getCount(), priority(source.point(), s, true));
             }
         }
         for (var sources : LiquidStores.supplies(level, points).values()) {
@@ -473,13 +471,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     private List<ItemCount> available(List<ItemCount> stock) {
+        syncSupplyClaims();
+        var foreign = foreignClaims(null, stock);
+        var owned = new java.util.HashMap<WorkPlanner.Key, Long>();
+        for (var order : orders) if (order.escrowRequest == null)
+            for (var h : order.held) owned.merge(WorkPlanner.Key.of(h.item), h.count, Long::sum);
         List<ItemCount> out = new ArrayList<>();
         for (ItemCount actual : stock) {
             ItemCount c = new ItemCount(actual.item, actual.count);
             c.takePriority = actual.takePriority;
-            for (WorkOrder o : orders) {
-                if (o.escrowRequest == null) c.count -= o.outstanding(c.item);
-            }
+            var key = WorkPlanner.Key.of(c.item);
+            c.count -= foreign.getOrDefault(key, 0L);
+            if (WormholeOrders.pattern(c.item)) {
+                for (var o : orders) if (o.escrowRequest == null) c.count -= o.outstanding(c.item);
+            } else c.count -= owned.getOrDefault(key, 0L);
             c.count = Math.max(0, c.count);
             out.add(c);
         }
@@ -811,9 +816,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             plan = workshop.plan();
             tankWorker = workshop.tankWorker();
         } else {
+            syncSupplyClaims();
+            var foreign = foreignClaims(List.of(source), stock);
             List<ItemCount> scoped = new ArrayList<>();
             for (ItemCount actual : stock) {
-                long available = actual.count;
+                long available = actual.count - foreign.getOrDefault(WorkPlanner.Key.of(actual.item), 0L);
                 for (WorkOrder other : orders) available -= other.held(source, actual.item);
                 if (available > 0 && !actual.matches(target)) scoped.add(new ItemCount(actual.item, available));
             }
@@ -894,12 +901,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             var data = AndroidEscrowData.get((ServerLevel) level);
             data.bind(data.find(escrowRequest), order.id, chosen.get(0).getUUID());
         }
-        if (tankWorker != null) tankWorker.retainTanksForWork();
-        reserve(order, plan);
+        // A real bucket travels as an item. An item-only order never needs to unload the owner's tanks.
+        boolean retainIdleTanks = tankWorker == null && source == null && escrowRequest == null
+                && chosen.stream().anyMatch(a -> a.workConsole() == null && !a.tanksEmpty())
+                && !FluidSamples.liquid(target) && order.steps.stream().noneMatch(s -> usesTanks(s.recipe));
+        if (!reserveItems(order, plan.fromStock).isEmpty() && escrowRequest == null) {
+            discardClaims(order);
+            return Component.translatable("gui.singulo.work_console.error.missing");
+        }
         orders.add(order);
         for (RuinAndroid a : chosen) {
             order.workers.add(a.getUUID());
             if (order(a.workOrder()) == null || !worldPosition.equals(a.workConsole())) {
+                if (a == tankWorker || retainIdleTanks && a.workConsole() == null && !a.tanksEmpty()) a.retainTanksForWork();
                 a.assignWork(worldPosition, order.id);     // 今の注文の作業中なら、それを続けてから（手が空いたら）こちらへ
                 if (escrowRequest != null) a.bindEscrow(escrowRequest, player.getUUID());
             }
@@ -1086,6 +1100,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return;
         }
         finishExternalOrder(o, reason == null ? AndroidOrders.State.CANCELLED : AndroidOrders.State.FAILED, reason);
+        discardClaims(o);
         orders.remove(o);
         leases.removeIf(l -> l.job.orderId() == id);
         message = reason != null ? reason : Component.translatable("gui.singulo.work_console.cancelled", o.target.getHoverName());
@@ -1263,6 +1278,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         return Math.min(inputLimit, tankLimit(a, fluids, chems));
+    }
+
+    private static boolean usesTanks(RecipeData recipe) {
+        return recipe.inputs().stream().anyMatch(in -> FluidSamples.liquid(in.item))
+                || recipe.outputs().stream().anyMatch(FluidSamples::liquid)
+                || recipe.steps().stream().anyMatch(step -> FluidSamples.liquid(step.item()));
     }
 
     private static long tankLimit(RuinAndroid a, List<ItemCount> fluids, List<ItemCount> chems) {
@@ -1880,18 +1901,29 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所の隣のストレージ。アンドロイド作業台なら、その預かり箱（作った物があふれたときに入れた所）。 */
     public List<IItemHandler> storagesAt(BlockPos point, Set<BlockPos> seen) {
         List<IItemHandler> out = new ArrayList<>();
+        visitItemStoresAt(point, (key, handler) -> {
+            if (seen.add(key)) out.add(handler);
+        });
+        return out;
+    }
+
+    void visitItemStoresAt(BlockPos point, java.util.function.BiConsumer<BlockPos, IItemHandler> visit) {
         if (endpointLinks.containsKey(point)) {
             var e = workEndpoint(point);
-            if (e != null && seen.add(point) && e.supplyItems() != null) out.add(e.supplyItems());
-            return out;
+            IItemHandler handler = e == null ? null : e.supplyItems();
+            if (handler != null) {
+                BlockPos key = handler instanceof io.github.genichimaruo.singulo.api.android.AndroidSharedStorage shared
+                        ? SupplyPortBlockEntity.sharedSeenKey(shared.sharedStorageKey()) : point;
+                visit.accept(key, handler);
+            }
+            return;
         }
-        if (!level.isLoaded(point)) return out;
+        if (!level.isLoaded(point)) return;
         if (level.getBlockEntity(point) instanceof AndroidWorkbenchBlockEntity bench) {
-            out.add(bench.buffer());
-            return out;
+            visit.accept(point, bench.buffer());
+            return;
         }
-        SupplyPortBlockEntity.collect(level, point, seen, out);
-        return out;
+        SupplyPortBlockEntity.visitItemStores(level, point, visit);
     }
 
     /** 受け渡し場所 point の隣の、流体の入れ物（タンクなど）。 */
@@ -1962,7 +1994,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                             break;
                         }
                         if (h.point.equals(p) && need.matches(h.item)) {
-                            long take = Math.min(need.count, h.count - ItemCount.get(here, h.item));
+                            long take = Math.min(need.count, o.held(p, h.item) - ItemCount.get(here, h.item));
                             if (take > 0) {
                                 need.count -= take;
                                 ItemCount.add(here, h.item, take);
@@ -2003,12 +2035,76 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return route;
     }
 
-    /**
-     * 注文のときに、使う在庫を受け渡し場所ごとに予約する（その時そこにあって、ほかの注文が予約していない物だけ）。
-     * 同じストレージ（2つの場所に挟まれた箱など）は、先に数えた場所の物として扱う。
-     */
-    private void reserve(WorkOrder order, WorkPlanner.Plan plan) {
-        reserveItems(order, plan.fromStock);
+    private java.util.Map<WorkPlanner.Key, Long> foreignClaims(@Nullable List<BlockPos> points, List<ItemCount> stock) {
+        if (stock.isEmpty() || !(level instanceof ServerLevel server) || !SupplyReservations.get(server).hasForeign(server, worldPosition))
+            return java.util.Map.of();
+        return supplies(points == null ? supplyPoints() : points, stock).foreignClaims(worldPosition);
+    }
+
+    private WorkshopSupplies supplies(List<BlockPos> points, List<ItemCount> need) {
+        return new WorkshopSupplies(this, points, need.stream().anyMatch(c -> !FluidSamples.liquid(c.item)),
+                need.stream().anyMatch(c -> FluidSamples.liquid(c.item)));
+    }
+
+    private void holdSupply(WorkOrder order, BlockPos point, BlockPos key, ItemStack item, long amount) {
+        if (amount <= 0) return;
+        order.hold(point, key, item, amount);
+        ServerLevel server = (ServerLevel)level;
+        SupplyReservations.get(server).change(server, worldPosition, point, key, item, amount);
+    }
+
+    private void releaseSupply(WorkOrder order, BlockPos point, BlockPos key, ItemStack item, long amount) {
+        long bound = order.consume(point, key, false, item, amount);
+        ServerLevel server = (ServerLevel)level;
+        if (bound > 0) SupplyReservations.get(server).change(server, worldPosition, point, key, item, -bound);
+        if (bound < amount) order.consume(point, null, false, item, amount - bound);
+    }
+
+    private void releaseReplacedSupply(WorkOrder order, BlockPos point, ItemStack item, long amount) {
+        for (var h : new ArrayList<>(order.held)) {
+            if (!point.equals(h.point) || !ItemStack.isSameItemSameComponents(h.item, item)) continue;
+            long used = Math.min(amount, h.count);
+            if (h.store == null) order.consume(point, null, false, item, used);
+            else releaseSupply(order, point, h.store, item, used);
+            amount -= used;
+            if (amount == 0) break;
+        }
+    }
+
+    private void discardClaims(WorkOrder order) {
+        if (!(level instanceof ServerLevel server)) return;
+        for (var h : order.held) if (h.store != null)
+            SupplyReservations.get(server).change(server, worldPosition, h.point, h.store, h.item, -h.count);
+    }
+
+    private void syncSupplyClaims() {
+        if (!restoreSupplyClaims || !(level instanceof ServerLevel server)) return;
+        restoreSupplyClaims = false;
+        var claims = SupplyReservations.get(server);
+        claims.clear(server, worldPosition);
+        for (var o : orders) for (var h : o.held) if (h.store != null)
+            claims.change(server, worldPosition, h.point, h.store, h.item, h.count);
+        migrateLegacyClaims();
+    }
+
+    private void migrateLegacyClaims() {
+        // An old save may load the console before its supply chunk becomes accessible.
+        migrateSupplyClaims = false;
+        var byPoint = new java.util.HashMap<BlockPos, WorkshopSupplies>();
+        for (var o : orders) {
+            if (o.escrowRequest != null) continue;
+            for (var h : new ArrayList<>(o.held)) {
+                if (h.store != null) continue;
+                var wanted = new ItemCount(h.item, h.count);
+                var found = byPoint.computeIfAbsent(h.point, point -> new WorkshopSupplies(this, List.of(point), true, true));
+                long left = claimAt(o, wanted, h.count, found, h.point);
+                migrateSupplyClaims |= left > 0;
+                if (left < h.count) {
+                    o.consume(h.point, null, false, h.item, h.count - left);
+                    setChanged();
+                }
+            }
+        }
     }
 
     /** need を、受け渡し場所の在庫（ほかの注文の予約を除く）から予約する。予約しきれなかった物を返す。 */
@@ -2027,64 +2123,35 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             return missing;
         }
-        List<ItemCount> short_ = new ArrayList<>();
-        Set<BlockPos> seen = new HashSet<>();
+        if (need.isEmpty()) return List.of();
+        syncSupplyClaims();
         List<BlockPos> points = order.materialSource == null ? supplyPoints()
                 : validMaterialSource(order) ? List.of(order.materialSource) : List.of();
-        List<List<IItemHandler>> stores = new ArrayList<>();
-        for (BlockPos p : points) {
-            stores.add(storagesAt(p, seen));
-        }
-        var liquids = need.stream().anyMatch(c -> FluidSamples.liquid(c.item))
-                ? LiquidStores.supplies(level, points) : java.util.Map.<BlockPos, List<LiquidStores.Supply>>of();
+        var supplies = supplies(points, need);
+        List<ItemCount> missing = new ArrayList<>();
         for (ItemCount c : need) {
             long left = c.count;
-            if (c.alt != null) {
-                // 同じ種類の別の物も使う: 受け渡し場所ごとに、合う物そのものを予約する（優先の登録の高い場所から）
-                for (int i : takeOrder(points, c.item)) {
-                    if (left <= 0) {
-                        break;
-                    }
-                    // 触媒は寿命の短いものから
-                    List<ItemCount> found = itemsAt(stores.get(i), c);
-                    found.sort(java.util.Comparator.comparingInt(have -> ItemCount.lifeOrder(have.item)));
-                    for (ItemCount have : found) {
-                        long here = have.count;
-                        for (WorkOrder other : orders) {
-                            if (other.escrowRequest == null) here -= other.held(points.get(i), have.item);
-                        }
-                        long take = Math.min(left, Math.max(0, here));
-                        order.hold(points.get(i), have.item, take);
-                        left -= take;
-                        if (left <= 0) {
-                            break;
-                        }
-                    }
-                }
-                if (left > 0) {
-                    short_.add(new ItemCount(c.item, left, c.alt));
-                }
-                continue;
+            for (int index : takeOrder(points, c.item)) {
+                left = claimAt(order, c, left, supplies, points.get(index));
+                if (left == 0) break;
             }
-            for (int i : takeOrder(points, c.item)) {
-                if (left <= 0) {
-                    break;
-                }
-                long here = FluidSamples.liquid(c.item)
-                        ? LiquidStores.available(liquids.getOrDefault(points.get(i), List.of()), c.item)
-                        : countItems(c.item, stores.get(i));
-                for (WorkOrder other : orders) {
-                    if (other.escrowRequest == null) here -= other.held(points.get(i), c.item);
-                }
-                long take = Math.min(left, Math.max(0, here));
-                order.hold(points.get(i), c.item, take);
-                left -= take;
-            }
-            if (left > 0) {
-                ItemCount.add(short_, c.item, left);
-            }
+            if (left > 0) missing.add(new ItemCount(c.item, left, c.alt));
         }
-        return short_;
+        return missing;
+    }
+
+    private long claimAt(WorkOrder order, ItemCount need, long left, WorkshopSupplies supplies, BlockPos point) {
+        var candidates = supplies.matching(point, need);
+        if (need.alt != null) candidates = candidates.stream()
+                .sorted(java.util.Comparator.comparingInt(s -> ItemCount.lifeOrder(s.stock().item))).toList();
+        for (var source : candidates) {
+            if (!need.matches(source.stock().item)) continue;
+            long take = Math.min(left, supplies.free(source));
+            holdSupply(order, point, source.material().store(), source.stock().item, take);
+            left -= take;
+            if (left == 0) break;
+        }
+        return left;
     }
 
     /** ストレージにある、need に合う物（物ごとの数）。 */
@@ -2126,14 +2193,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     public BlockPos fuelPoint(ItemStack fuel, BlockPos from) {
         BlockPos best = null;
         int bestPriority = -1;
-        Set<BlockPos> seen = new HashSet<>();
-        for (BlockPos p : supplyPoints()) {
-            if (loose(p, fuel, storagesAt(p, seen)) <= 0) {
-                continue;
-            }
-            int priority = priority(p, fuel, true);
-            if (priority > bestPriority || priority == bestPriority && p.distSqr(from) < best.distSqr(from)) {
-                best = p;
+        var points = supplyPoints();
+        syncSupplyClaims();
+        var stock = new WorkshopSupplies(this, points, true, false);
+        for (BlockPos point : points) {
+            if (stock.at(point).stream().noneMatch(source -> source.stock().matches(fuel) && stock.free(source) > 0)) continue;
+            int priority = priority(point, fuel, true);
+            if (best == null || priority > bestPriority || priority == bestPriority && point.distSqr(from) < best.distSqr(from)) {
+                best = point;
                 bestPriority = priority;
             }
         }
@@ -2143,20 +2210,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** Pick an obtainable tool with its real components, including restored and partially used tools. */
     public ItemStack toolSupply(RecipeData.Tool tool, ItemStack sample) {
         ItemStack best = ItemStack.EMPTY;
-        Set<BlockPos> seen = new HashSet<>();
-        for (BlockPos point : supplyPoints()) {
-            var candidates = new java.util.HashMap<WorkPlanner.Key, ItemCount>();
-            for (IItemHandler h : storagesAt(point, seen)) for (int i = 0; i < h.getSlots(); i++) {
-                ItemStack stack = h.getStackInSlot(i);
-                if (!tool.accepts(sample, stack)) continue;
-                int take = h.extractItem(i, stack.getCount(), true).getCount();
-                if (take > 0) candidates.computeIfAbsent(WorkPlanner.Key.of(stack), k -> new ItemCount(stack, 0)).count += take;
-            }
-            for (var candidate : candidates.values()) {
-                for (WorkOrder o : orders) candidate.count -= o.held(point, candidate.item);
-                if (candidate.count > 0 && (best.isEmpty() || UsesHelper.remaining(candidate.item) < UsesHelper.remaining(best)))
-                    best = candidate.item;
-            }
+        var points = supplyPoints();
+        syncSupplyClaims();
+        var stock = new WorkshopSupplies(this, points, true, false);
+        for (var point : points) for (var source : stock.at(point)) {
+            ItemStack candidate = source.stock().item;
+            if (tool.accepts(sample, candidate) && stock.free(source) > 0
+                    && (best.isEmpty() || UsesHelper.remaining(candidate) < UsesHelper.remaining(best)))
+                best = candidate;
         }
         if (!best.isEmpty()) return best;
         for (var entry : recipes()) {
@@ -2166,40 +2227,27 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return sample;
     }
 
-    /** 受け渡し場所 point にある、どの注文も予約していない item の数。 */
-    private long loose(BlockPos point, ItemStack item, List<IItemHandler> stores) {
-        long here = 0;
-        for (IItemHandler h : stores) {
-            for (int s = 0; s < h.getSlots(); s++) {
-                if (ItemStack.isSameItemSameComponents(h.getStackInSlot(s), item)) {
-                    here += h.extractItem(s, h.getStackInSlot(s).getCount(), true).getCount();
-                }
-            }
-        }
-        for (WorkOrder o : orders) {
-            here -= o.held(point, item);
-        }
-        return Math.max(0, here);
-    }
-
-    /** 受け渡し場所 point から、予約されていない燃料を最大 count 個、持ち物へ取る。取った数。 */
+    /** Take only fuel that is free in the particular inventory being drained. */
     public int takeFuel(RuinAndroid a, BlockPos point, ItemStack fuel, int count) {
-        List<IItemHandler> stores = storagesAt(point, new HashSet<>());
-        int want = (int) Math.min(count, loose(point, fuel, stores));
+        syncSupplyClaims();
+        a.compactCarry();
+        int room = 0;
+        for (int slot : a.carrySlots()) {
+            ItemStack stack = a.inventory().getItem(slot);
+            if (stack.isEmpty()) room += fuel.getMaxStackSize();
+            else if (ItemStack.isSameItemSameComponents(stack, fuel)) room += Math.max(0, stack.getMaxStackSize() - stack.getCount());
+        }
+        count = Math.min(room, count);
+        if (count <= 0) return 0;
+        var stock = new WorkshopSupplies(this, List.of(point), true, false);
         int took = 0;
-        for (IItemHandler h : stores) {
-            for (int s = 0; s < h.getSlots() && took < want; s++) {
-                if (!ItemStack.isSameItemSameComponents(h.getStackInSlot(s), fuel)) {
-                    continue;
-                }
-                ItemStack got = h.extractItem(s, want - took, false);
-                ItemStack rest = a.addToCarry(got);
-                took += got.getCount() - rest.getCount();
-                if (!rest.isEmpty()) {
-                    ItemHandlerHelper.insertItemStacked(h, rest, false);        // 持ち物がいっぱい: 戻す
-                    return took;
-                }
-            }
+        for (var source : stock.at(point)) {
+            if (!source.stock().matches(fuel)) continue;
+            int want = (int)Math.min(count - took, stock.free(source));
+            if (want <= 0) continue;
+            long moved = source.take(a, want);
+            took += (int)moved;
+            if (moved < want || took == count) break;
         }
         return took;
     }
@@ -2484,24 +2532,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             if (remaining > 0) return false;
         }
-        List<IItemHandler> stores = escrow == null ? storagesAt(pickup.point(), new HashSet<>())
-                : List.of(AndroidEscrowData.get((ServerLevel) level).inputHandler(escrow));
-        boolean needsLiquid = pickup.items().stream().anyMatch(c -> FluidSamples.liquid(c.item));
-        LiquidStores liquids = !needsLiquid ? null : escrow == null ? LiquidStores.at(level, pickup.point())
-                : LiquidStores.of(AndroidEscrowData.get((ServerLevel) level).fluidHandler(escrow, false));
-        List<LiquidStores.Supply> sources = List.of();
-        if (liquids != null && escrow == null && pickup.items().stream().anyMatch(c -> liquids.hasMultipleSources(c.item))) {
-            // Only points one or two blocks away can share a tank with this pickup.
-            List<BlockPos> nearby = new ArrayList<>();
-            if (worldPosition.distManhattan(pickup.point()) <= 2) nearby.add(worldPosition);
-            for (BlockPos p : links) {
-                if (p.distManhattan(pickup.point()) <= 2 && level.isLoaded(p)
-                        && level.getBlockEntity(p) instanceof SupplyPortBlockEntity port && worldPosition.equals(port.console())) {
-                    nearby.add(p);
-                }
-            }
-            sources = LiquidStores.supplies(level, nearby).getOrDefault(pickup.point(), List.of());
-        }
+        if (!pickupTanksFit(a, pickup.items())) return false;
+        if (escrow == null) return fetchShared(a, restricted, pickup);
+        var data = AndroidEscrowData.get((ServerLevel)level);
+        List<IItemHandler> stores = List.of(data.inputHandler(escrow));
+        LiquidStores liquids = LiquidStores.of(data.fluidHandler(escrow, false));
         for (ItemCount need : pickup.items()) {
             long have = FluidSamples.liquid(need.item) ? liquids.amount(need.item) : countItems(need.item, stores);
             if (have < need.count) {
@@ -2525,10 +2560,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (FluidSamples.liquid(need.item)) {
                 // 液体・化学物質: 入れ物から抜いて、タンクへ（入りきる分だけ抜く）
                 long room = Math.min(need.count, a.fillLiquid(need.item, need.count, true));
-                // Prefer the stores assigned to this point so an adjacent point keeps its reservations.
-                // Older orders may have reserved another accessible face of the same tank.
-                long got = LiquidStores.available(sources, need.item) >= room
-                        ? LiquidStores.take(sources, need.item, room) : liquids.drain(need.item, room, false);
+                long got = liquids.drain(need.item, room, false);
                 long in = a.fillLiquid(need.item, got, false);
                 if (in < got) {
                     liquids.fill(need.item, got - in, false);         // 入りきらなかった分は戻す（ふつうは起きない）
@@ -2569,6 +2601,91 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return true;
     }
 
+    private static boolean pickupTanksFit(RuinAndroid worker, List<ItemCount> need) {
+        if (need.stream().noneMatch(c -> FluidSamples.liquid(c.item))) return true;
+        int fluidCap = worker.fluidCapacity(), chemCap = worker.chemCapacity();
+        long emptyFluids = RuinAndroid.TANKS - worker.tankFluids().size();
+        long emptyChems = chemCap == 0 ? 0 : worker.chemSpace("") / chemCap;
+        long newFluids = 0, newChems = 0;
+        for (var item : need) {
+            if (!FluidSamples.liquid(item.item)) continue;
+            boolean chemical = ChemicalSamples.is(item.item);
+            int capacity = chemical ? chemCap : fluidCap;
+            long room = worker.liquidSpace(item.item);
+            if (capacity <= 0 || room < item.count) return false;
+            long matchingRoom = room - (chemical ? emptyChems : emptyFluids) * capacity;
+            long newTanks = (Math.max(0, item.count - matchingRoom) + capacity - 1) / capacity;
+            if (chemical) newChems += newTanks;
+            else newFluids += newTanks;
+        }
+        return newChems <= emptyChems && newFluids <= emptyFluids;
+    }
+
+    private record Draw(WorkshopSupplies.Source source, long count, boolean replacement) {}
+
+    private boolean fetchShared(RuinAndroid worker, @Nullable WorkOrder order, Pickup pickup) {
+        syncSupplyClaims();
+        var supplies = supplies(List.of(pickup.point()), pickup.items());
+        var draws = new ArrayList<Draw>();
+        var remaining = new java.util.HashMap<WorkshopSupplies.Material, Long>();
+        if (order != null) for (var h : order.held) {
+            if (h.store != null && h.point.equals(pickup.point()))
+                remaining.merge(new WorkshopSupplies.Material(h.store, WorkPlanner.Key.of(h.item)), h.count, Long::sum);
+        }
+        for (var need : pickup.items()) {
+            long left = need.count;
+            var available = supplies.matching(pickup.point(), need);
+            var planned = new java.util.IdentityHashMap<WorkshopSupplies.Source, Long>();
+            for (var source : available) {
+                long mine = remaining.getOrDefault(source.material(), 0L);
+                long bound = Math.min(left, Math.min(source.stock().count, mine));
+                if (bound == 0) continue;
+                draws.add(new Draw(source, bound, false));
+                planned.put(source, bound);
+                remaining.put(source.material(), mine - bound);
+                left -= bound;
+                if (left == 0) break;
+            }
+            // A player can move the materials to another chest at the same pickup point. Use only free
+            // replacement stock and retire the original reservation after the worker actually takes it.
+            long replacement = order == null ? left : Math.min(left, order.held(pickup.point(), need.item) - (need.count - left));
+            for (var source : available) {
+                if (replacement <= 0) break;
+                long space = source.stock().count - planned.getOrDefault(source, 0L);
+                long free = Math.min(replacement, Math.min(space, supplies.free(source)));
+                if (free <= 0) continue;
+                draws.add(new Draw(source, free, true));
+                replacement -= free;
+                left -= free;
+            }
+            if (left > 0) {
+                if (order != null) {
+                    order.shortage.removeIf(c -> c.matches(need.item));
+                    order.shortage.add(new ItemCount(need.item, left));
+                }
+                return false;
+            }
+        }
+        for (var draw : draws) {
+            var source = draw.source;
+            long moved = source.take(worker, draw.count);
+            if (order != null) {
+                if (draw.replacement) releaseReplacedSupply(order, pickup.point(), source.stock().item, moved);
+                else releaseSupply(order, pickup.point(), source.material().store(), source.stock().item, moved);
+            }
+            if (moved < draw.count) {
+                setChanged();
+                return false;
+            }
+        }
+        if (order != null) {
+            order.shortage.clear();
+            if (order.status == WorkOrder.WAIT_ITEMS) order.status = WorkOrder.RUNNING;
+        }
+        setChanged();
+        return true;
+    }
+
     /**
      * アンドロイド作業台の預かり箱へ、作った物を count 個入れた（持ち物に入りきらなかった）: この注文の素材置き場の物として予約する。
      * あとの工程や納品では、ほかの受け渡し場所と同じように、ここへ取りに来る。
@@ -2576,7 +2693,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     public void holdBuffered(WorkJob job, BlockPos bench, ItemStack item, long count) {
         WorkOrder o = order(job.orderId());
         if (o != null && count > 0) {
-            o.hold(bench, item, count);
+            holdSupply(o, bench, bench, item, count);
             setChanged();
         }
     }
@@ -2585,7 +2702,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     public void releaseBuffered(WorkJob job, BlockPos bench, ItemStack item, long count) {
         WorkOrder o = order(job.orderId());
         if (o != null && count > 0) {
-            o.release(bench, item, count);
+            releaseSupply(o, bench, bench, item, count);
             setChanged();
         }
     }
@@ -2631,7 +2748,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             setChanged(); return allReturned;
         }
-        List<IItemHandler> stores = storagesAt(point, new HashSet<>());
+        syncSupplyClaims();
+        var stores = ItemSupplyStores.sources(this, List.of(point));
         boolean all = true;
         boolean kept = false;
         for (int slot : a.carrySlots()) {
@@ -2644,30 +2762,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 continue;
             }
             ItemStack rest = s.copy();
-            for (IItemHandler h : stores) {
-                rest = ItemHandlerHelper.insertItemStacked(h, rest, false);
-                if (rest.isEmpty()) {
-                    break;
-                }
-            }
-            if (o != null) {
-                o.hold(point, s, s.getCount() - rest.getCount());              // この注文が戻した物は、この注文が使ってよい
+            for (var store : stores) {
+                int before = rest.getCount();
+                rest = ItemHandlerHelper.insertItemStacked(store.handler(), rest, false);
+                if (o != null) holdSupply(o, point, store.key(), s, before - rest.getCount());
+                if (rest.isEmpty()) break;
             }
             a.inventory().setItem(slot, rest);
             all &= rest.isEmpty();
         }
         // タンクの液体・化学物質も、隣の入れ物へ戻す
-        LiquidStores liquids = LiquidStores.at(level, point);
         for (var e : a.liquids()) {
             long returning = e.getValue() - (a.usesPersonalTanks() ? a.personalLiquid(e.getKey()) : 0);
             if (returning <= 0) continue;
-            long moved = liquids.fill(e.getKey(), returning, false);
-            if (moved > 0) {
-                a.drainLiquid(e.getKey(), moved, false);
-                if (o != null) {
-                    o.hold(point, e.getKey(), moved);
-                }
-            }
+            long moved = LiquidStores.fillAt(level, point, e.getKey(), returning, (store, amount) -> {
+                if (o != null) holdSupply(o, point, store, e.getKey(), amount);
+            });
+            if (moved > 0) a.drainLiquid(e.getKey(), moved, false);
             all &= moved >= returning;
         }
         if (!all && o != null) {
@@ -2923,6 +3034,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private void finishIfDone(WorkOrder o) {
         if (o.finished()) {
             finishExternalOrder(o, AndroidOrders.State.COMPLETED, null);
+            discardClaims(o);
             orders.remove(o);
             if (o.orderer != null && level instanceof ServerLevel server) {
                 io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), o.orderer, "android_order_complete");
@@ -3131,7 +3243,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (result.isEmpty() || level == null) {
             return false;
         }
-        if (mode == MODE_PROCEDURE && procSteps.isEmpty()) {
+        if (mode == MODE_PROCEDURE && (procSteps.isEmpty() || !procedureLocationsValid())) {
             return false;
         }
         ItemStack card = encoder.getItem(CARD);
@@ -3200,6 +3312,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     public List<ProcedureStep> procSteps() {
         return procSteps;
+    }
+
+    boolean procedureLocationsValid() {
+        return level != null && procSteps.stream().allMatch(s -> s.isIn(level));
     }
 
     /** 次に足す手順の種類を切り替える（投入 → 取り出し → 採掘）。 */
@@ -3347,7 +3463,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (ProcedureStep.usesArea(stepKind)) {
             ItemStack b = encoder.getItem(LOC_B);
             BlockPos pb = WorkLocationCardItem.pos(b);
-            if (pb != null && WorkLocationCardItem.sameDimension(b, level)) {
+            if (pb != null) {
+                if (!WorkLocationCardItem.sameDimension(b, level)) {
+                    return Component.translatable("gui.singulo.recipe_encoder.step.no_place");
+                }
                 if (Math.abs(pb.getX() - pos.getX()) >= MINE_SPAN || Math.abs(pb.getY() - pos.getY()) >= MINE_SPAN
                         || Math.abs(pb.getZ() - pos.getZ()) >= MINE_SPAN) {
                     return Component.translatable("gui.singulo.recipe_encoder.step.too_big", MINE_SPAN);
@@ -3356,7 +3475,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         int option = ProcedureStep.hasOption(stepKind) ? stepOption : ProcedureStep.defaultOption(stepKind);
-        procSteps.add(new ProcedureStep(stepKind, pos, corner, stepKind == ProcedureStep.USE ? ItemStack.EMPTY : item, option));
+        procSteps.add(new ProcedureStep(stepKind, pos, corner, stepKind == ProcedureStep.USE ? ItemStack.EMPTY : item, option).recordedIn(level));
         setChanged();
         return null;
     }
@@ -3383,6 +3502,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     // ------------------------------------------------------------------ 毎 tick
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, WorkConsoleBlockEntity be) {
+        be.syncSupplyClaims();
         be.eyes.tick(level, pos, state);
         long phase = Math.floorMod(pos.hashCode(), 20);
         if ((level.getGameTime() + phase) % 20 == 0) {
@@ -3394,6 +3514,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     private void tick(ServerLevel level) {
+        if (migrateSupplyClaims) migrateLegacyClaims();
         long now = level.getGameTime();
         if (restoredLeases) {
             for (WorkJob.Lease lease : leases) {
@@ -3507,6 +3628,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Override
     public void onBroken(Level level) {
         if (level instanceof ServerLevel server) {
+            SupplyReservations.get(server).clear(server, worldPosition);
             for (WorkOrder o : new ArrayList<>(orders)) if (o.escrowRequest != null) cancel(o.id, null);
             for (var e : AndroidEscrowData.get(server).entries())
                 if (e.consoleIdentity.equals(escrowConsoleIdentity) && e.state == AndroidEscrowData.State.RUNNING)
@@ -3626,6 +3748,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (Tag t : tag.getList("links", Tag.TAG_INT_ARRAY)) {
             NbtUtils.readBlockPos(wrap(t), "p").ifPresent(links::add);
         }
+        restoreSupplyClaims = true;
         orders.clear();
         for (Tag t : tag.getList("orders", Tag.TAG_COMPOUND)) {
             WorkOrder o = WorkOrder.load((CompoundTag) t, registries);
@@ -3688,7 +3811,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         for (int i = 0; i < ENCODER_SLOTS; i++) {
-            encoder.setItem(i, enc.get(i));
+            encoder.setItem(i, i == FUEL ? RecipeData.fuelItem(enc.get(i)) : enc.get(i));
         }
         encoderTools.addAll(RecipeData.readTools(tag.getIntArray("machine_tools")));
         encoderGuaranteedExtras = tag.getBoolean("guaranteed_extras");

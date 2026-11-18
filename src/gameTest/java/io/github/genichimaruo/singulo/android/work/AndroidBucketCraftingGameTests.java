@@ -55,7 +55,7 @@ public final class AndroidBucketCraftingGameTests {
         return worker;
     }
 
-    @GameTest(template = "empty", timeoutTicks = 1800)
+    @GameTest(template = "empty", timeoutTicks = 2400)
     public static void preloadedWorkerCraftsWithNoExternalStorage(GameTestHelper h) {
         var level = h.getLevel();
         var player = TestScope.player(h);
@@ -89,16 +89,34 @@ public final class AndroidBucketCraftingGameTests {
         var saved = worker.saveWorkState();
         worker.restoreWorkState(saved);
         var lava = new FluidStack(Fluids.LAVA, 1);
-        h.succeedWhen(() -> {
-            h.assertTrue(console.outbox().countItem(Items.MAGMA_BLOCK) == 1 && worker.workConsole() == null,
+        var water = new FluidStack(Fluids.WATER, 1);
+        h.startSequence().thenWaitUntil(() -> {
+            h.assertTrue(console.orders().isEmpty() && console.outbox().countItem(Items.MAGMA_BLOCK) == 1 && worker.workConsole() == null,
                     "Worker-only order did not deliver and return to idle: " + worker.state() + "/" + worker.stall());
             h.assertTrue(worker.tankAmount(lava) == 250 && other.tankAmount(lava) == 500,
                     "Craft changed the unspent tank balance or used another worker's lava");
             h.assertTrue(console.outbox().countItem(Items.BUCKET) == 0 && worker.inventory().countItem(Items.BUCKET) == 0,
                     "Tank-only order created a bucket");
+        }).thenExecute(() -> {
+            console.outbox().clearContent();
+            h.setBlock(CHEST, Blocks.CHEST);
+            ChestBlockEntity chest = h.getBlockEntity(CHEST);
+            chest.setItem(0, new ItemStack(Items.LAVA_BUCKET));
+            h.assertTrue(worker.fillTanks(lava.copyWithAmount(875), false) == 875
+                    && worker.fillTanks(water.copyWithAmount(375), false) == 375, "Failed to prepare two onboard balances");
+            h.assertTrue(console.start(player, target, 1, List.of(worker.getUUID()), null) == null, "Real-bucket order refused");
+        }).thenWaitUntil(() -> {
+            ChestBlockEntity chest = h.getBlockEntity(CHEST);
+            h.assertTrue(console.orders().isEmpty() && worker.workConsole() == null,
+                    "Real-bucket order did not finish without an external tank: " + worker.state() + "/" + worker.stall());
+            h.assertTrue(console.outbox().countItem(Items.MAGMA_BLOCK) + chest.countItem(Items.MAGMA_BLOCK) == 1
+                    && chest.countItem(Items.BUCKET) == 1 && chest.countItem(Items.LAVA_BUCKET) == 0,
+                    "Real-bucket order must consume its bucket and return one empty bucket");
+            h.assertTrue(worker.tankAmount(lava) == 1125 && worker.tankAmount(water) == 375,
+                    "Item-only order changed a preloaded tank");
             worker.discard();
             other.discard();
-        });
+        }).thenSucceed();
     }
 
     @GameTest(template = "empty", timeoutTicks = 1800)

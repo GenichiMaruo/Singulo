@@ -796,16 +796,20 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         var wantedItem = out == null ? ItemStack.EMPTY : WormholeOrders.collectSample(r.output(), want - collected, out);
+        var furnace = level.getBlockEntity(at) instanceof net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity f ? f : null;
+        int[] furnaceSlots = furnace == null ? null : furnace.getSlotsForFace(outFace);
         for (int i = 0; out != null && i < out.getSlots(); i++) {
             ItemStack s = out.getStackInSlot(i);
             if (s.isEmpty()) {
                 continue;
             }
             int take = 0;
-            boolean main = WormholeOrders.matches(wantedItem, s);
+            boolean fuelContainer = furnaceSlots != null && i < furnaceSlots.length && furnaceSlots[i] == 1;
+            if (fuelContainer && !MachineWatch.removableFuelContainer(furnace, r)) continue;
+            boolean main = (!fuelContainer || s.is(net.minecraft.world.item.Items.WATER_BUCKET)) && WormholeOrders.matches(wantedItem, s);
             if (main) {
                 take = (int) Math.min(s.getCount(), want - collected);     // ほかの人の分までは取らない
-            } else if (io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s) || r.returnedTool(s)) {
+            } else if (fuelContainer || io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s) || r.returnedTool(s)) {
                 // 使い切った触媒: 記録していなくても持ち帰る（出口に残すと、次にできた物の出口がふさがる）
                 take = s.getCount();
             } else {
@@ -877,11 +881,8 @@ final class AndroidWorkGoal extends Goal {
 
     /** 装置の燃料が切れて、止まっているか（かまどは火が消えて燃料の欄が空で、焼く物が残っている）。 */
     private boolean needsFuel(ServerLevel level, BlockPos machine, RecipeData r) {
-        if (level.getBlockEntity(machine) instanceof net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity f) {
-            BlockState s = level.getBlockState(machine);
-            boolean lit = s.hasProperty(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT)
-                    && s.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT);
-            return !lit && f.getItem(1).isEmpty() && !f.getItem(0).isEmpty();
+        if (level.getBlockEntity(machine) instanceof net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity) {
+            return MachineWatch.outOfFuel(level, machine, r);
         }
         // ほかの装置: 5秒進まず、横の面に燃料が入っていない
         net.neoforged.neoforge.items.IItemHandler side = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
@@ -987,6 +988,10 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         io.github.genichimaruo.singulo.android.work.ProcedureStep ps = r.steps().get(procIndex);
+        if (!ps.isIn(level)) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
         ItemStack what = ps.item().isEmpty() ? r.output() : ps.item();
         long want = Math.max(1, FluidSamples.amount(what)) * step.crafts();
         if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK) {

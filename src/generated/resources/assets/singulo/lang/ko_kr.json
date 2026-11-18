@@ -3714,6 +3714,7 @@
   "tooltip.singulo.procedure_card.mine": "채굴: %s 모일 때까지 (%s)",
   "tooltip.singulo.procedure_card.plant": "밭 일구기: %s 심기 (%s)",
   "tooltip.singulo.procedure_card.product": "만들어지는 것",
+  "tooltip.singulo.procedure_card.record_again": "원래 차원의 작업 위치 카드를 사용해 절차를 다시 기록하세요",
   "tooltip.singulo.procedure_card.shear": "털 깎기: %s 모일 때까지 (%s)",
   "tooltip.singulo.procedure_card.use": "조작: %s (%s)",
   "tooltip.singulo.recipe_card.empty": "아직 기록하지 않음(작업 지령대의 \"기록\"에서 기록)",

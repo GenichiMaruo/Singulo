@@ -1079,6 +1079,7 @@ UI_LANG = {
     'gui.singulo.recipe_encoder.step.no_item': ('物の欄に、入れる・取り出す物を置いてください', 'Place the item to insert or extract in the item slot'),
     'gui.singulo.recipe_encoder.step.too_big': ('採掘の範囲は1辺 %s ブロックまで', 'The mining area can be at most %s blocks on a side'),
     'tooltip.singulo.procedure_card.empty': ('まだ記録していない（作業指令台の「記録」の手順モードで記録する）', 'Blank: record steps in the procedure mode of a work console\'s Record tab'),
+    'tooltip.singulo.procedure_card.record_again': ('元の次元の作業位置カードを使い、この手順を記録し直してください', 'Record these steps again using Work Location Cards from the original dimension'),
     'tooltip.singulo.procedure_card.product': ('できる物', 'the product'),
     'tooltip.singulo.procedure_card.insert': ('投入: %s（%s）', 'Insert %s (%s)'),
     'tooltip.singulo.procedure_card.extract': ('取り出し: %s（%s）', 'Extract %s (%s)'),

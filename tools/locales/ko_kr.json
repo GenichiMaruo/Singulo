@@ -11375,6 +11375,10 @@
     "source": "the product",
     "translation": "만들어지는 것"
   },
+  "tooltip.singulo.procedure_card.record_again": {
+    "source": "Record these steps again using Work Location Cards from the original dimension",
+    "translation": "원래 차원의 작업 위치 카드를 사용해 절차를 다시 기록하세요"
+  },
   "tooltip.singulo.procedure_card.shear": {
     "source": "Shear until %s (%s)",
     "translation": "털 깎기: %s 모일 때까지 (%s)"

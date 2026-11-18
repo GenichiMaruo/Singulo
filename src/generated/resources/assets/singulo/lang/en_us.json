@@ -3714,6 +3714,7 @@
   "tooltip.singulo.procedure_card.mine": "Mine until %s (%s)",
   "tooltip.singulo.procedure_card.plant": "Plant %s (%s)",
   "tooltip.singulo.procedure_card.product": "the product",
+  "tooltip.singulo.procedure_card.record_again": "Record these steps again using Work Location Cards from the original dimension",
   "tooltip.singulo.procedure_card.shear": "Shear until %s (%s)",
   "tooltip.singulo.procedure_card.use": "Use: %s (%s)",
   "tooltip.singulo.recipe_card.empty": "Blank: record a recipe in a work console's Record tab",

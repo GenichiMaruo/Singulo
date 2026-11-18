@@ -282,6 +282,19 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         return new RecipeData(MODE_PROCESSING, grid, output, extras, List.of(), fuel.copy(), faces, List.of());
     }
 
+    /** Older consoles encoded a vanilla lava bucket in the fuel slot as its fluid contents. */
+    static ItemStack fuelItem(ItemStack stored) {
+        if (FluidSamples.is(stored)) {
+            var fluid = FluidSamples.fluid(stored);
+            var bucket = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA,
+                    net.neoforged.neoforge.fluids.FluidType.BUCKET_VOLUME);
+            if (fluid.getAmount() == bucket.getAmount() && net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(fluid, bucket)) {
+                return new ItemStack(net.minecraft.world.item.Items.LAVA_BUCKET);
+            }
+        }
+        return stored;
+    }
+
     /** 手順カードの記録。 */
     public static RecipeData procedure(List<ProcedureStep> steps, ItemStack output) {
         List<ItemStack> grid = new ArrayList<>();
@@ -441,7 +454,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             }
         }
         String mode = r.contains("mode") ? r.getString("mode") : MODE_CRAFTING;
-        ItemStack fuel = r.contains("fuel") ? ItemStack.parseOptional(registries, r.getCompound("fuel")) : ItemStack.EMPTY;
+        ItemStack fuel = r.contains("fuel") ? fuelItem(ItemStack.parseOptional(registries, r.getCompound("fuel"))) : ItemStack.EMPTY;
         int faces = r.contains("faces") ? r.getInt("faces") : DEFAULT_FACES;
         List<String> alts = new ArrayList<>();
         for (Tag t : r.getList("alts", Tag.TAG_STRING)) {

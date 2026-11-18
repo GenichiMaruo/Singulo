@@ -85,7 +85,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
                     continue;
                 }
                 if (data.procedure()) {
-                    if (!data.steps().isEmpty()) {
+                    if (!data.steps().isEmpty() && data.steps().stream().allMatch(s -> s.isIn(level))) {
                         BlockPos first = data.steps().get(0).pos();
                         // 一覧を読むだけで、遠くの手順の場所のチャンクを読み込まない
                         out.add(new Entry(data, first, level.isLoaded(first) ? level.getBlockState(first).getBlock()

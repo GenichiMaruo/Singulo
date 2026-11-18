@@ -11375,6 +11375,10 @@
     "source": "the product",
     "translation": "产物"
   },
+  "tooltip.singulo.procedure_card.record_again": {
+    "source": "Record these steps again using Work Location Cards from the original dimension",
+    "translation": "请使用原维度的工作位置卡重新记录这些步骤"
+  },
   "tooltip.singulo.procedure_card.shear": {
     "source": "Shear until %s (%s)",
     "translation": "剪毛：直到收集到 %s（%s）"
