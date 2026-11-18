@@ -13,6 +13,7 @@ import io.github.genichimaruo.singulo.wormhole.UnstableMouthItem;
 import io.github.genichimaruo.singulo.wormhole.WormholeData;
 import io.github.genichimaruo.singulo.wormhole.WormholeGeneratorBlockEntity;
 import io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity;
+import io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity;
 import io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentMap;
@@ -213,11 +214,11 @@ public final class Stage5WormholeGameTests {
             be.setData(new WormholeData(pair, 0, true));
             be.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 4), false);
         }
-        // 口から近い順: (2..5,1,1) と (2..5,1,2) の8個、いちばん遠いのは (6,1,1)
+        // The closest two ports tie on distance; the ninth lies beyond the active-port limit.
         java.util.List<BlockPos> ports = new java.util.ArrayList<>();
         for (int x = 2; x <= 5; x++) {
             ports.add(new BlockPos(x, 1, 1));
-            ports.add(new BlockPos(x, 1, 2));
+            ports.add(x == 2 ? mouthA.above() : new BlockPos(x, 1, 2));
         }
         BlockPos far = new BlockPos(6, 1, 1);
         ports.add(far);
@@ -228,7 +229,8 @@ public final class Stage5WormholeGameTests {
             WormholeMouthBlockEntity a = helper.getBlockEntity(mouthA);
             helper.assertTrue(a.portLimit() == 8 && a.rankedPorts().size() == 9, "ポートの数え方が違う: " + a.rankedPorts().size());
             for (BlockPos p : ports) {
-                io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity port = helper.getBlockEntity(p);
+                WormholePortBlockEntity port = helper.getBlockEntity(p);
+                helper.assertTrue(a.rankOf(port) == a.rankedPorts().indexOf(port) + 1, "Rank disagrees with the distance-sorted list");
                 boolean lit = helper.getBlockState(p).getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT);
                 if (p.equals(far)) {
                     helper.assertFalse(port.active() || lit, "上限を超えたポートが働いている");
@@ -236,7 +238,21 @@ public final class Stage5WormholeGameTests {
                     helper.assertTrue(port.active() && lit, "近いポートが働かない（光らない）: " + p);
                 }
             }
-            helper.succeed();
+            BlockPos tiePos = ports.get(0);
+            WormholePortBlockEntity original = helper.getBlockEntity(tiePos), tied = helper.getBlockEntity(ports.get(1));
+            int expected = original.getBlockPos().asLong() < tied.getBlockPos().asLong() ? 1 : 2;
+            helper.assertTrue(a.rankOf(original) == expected && a.rankOf(tied) == 3 - expected, "Equal-distance ports lost their position tie-break");
+            WormholeMouthBlockEntity detached = new WormholeMouthBlockEntity(a.getBlockPos(), a.getBlockState());
+            helper.assertTrue(detached.rankOf(original) == 0, "A mouth outside a level assigned a rank");
+            helper.setBlock(tiePos, Blocks.AIR);
+            helper.setBlock(tiePos, SinguloBlocks.WORMHOLE_PORT.get());
+            WormholePortBlockEntity replacement = helper.getBlockEntity(tiePos);
+            helper.assertTrue(a.rankOf(original) == expected && a.rankOf(replacement) == 0, "Rank changed within the cached tick");
+            helper.runAfterDelay(1, () -> {
+                helper.assertTrue(a.rankOf(original) == 0 && a.rankOf(replacement) == expected && a.portActive(replacement),
+                        "The next tick did not assign the original rank to the replacement");
+                helper.succeed();
+            });
         });
     }
 

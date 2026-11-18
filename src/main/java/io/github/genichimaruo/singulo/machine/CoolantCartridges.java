@@ -95,7 +95,7 @@ public final class CoolantCartridges {
         @Override
         public int getTankCapacity(int tank) {
             FluidStack in = contents(container);
-            return in == null ? AMOUNT : in.getAmount();
+            return in == null ? Math.max(AMOUNT, HELIUM_AMOUNT) : in.getAmount();
         }
 
         @Override

@@ -241,6 +241,13 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return -1;
     }
 
+    /** 0.6.0 までの保存では、1体目の UUID のキーが android だった。 */
+    @Nullable
+    static UUID savedUnit(CompoundTag tag, int slot) {
+        String key = slot == 0 && tag.hasUUID("android") ? "android" : "android" + slot;
+        return tag.hasUUID(key) ? tag.getUUID(key) : null;
+    }
+
     /** 転送アップグレードを積んでいるか。 */
     public boolean hasTransfer() {
         return isTransferUpgrade(items.getStackInSlot(SLOT_UPGRADE));
@@ -925,7 +932,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         items.deserializeNBT(registries, inv);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         for (int i = 0; i < MAX_UNITS; i++) {
-            androids[i] = tag.hasUUID("android" + i) ? tag.getUUID("android" + i) : null;
+            androids[i] = savedUnit(tag, i);
             delays[i] = tag.getInt("delay" + i);
             names[i] = tag.getString("name" + i);
             signals[i] = tag.getInt("signal" + i);
@@ -937,10 +944,6 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                     kept[i].setItem(s, list.get(s));
                 }
             }
-        }
-        // 0.6.0 までの保存（1体だけ）は、1つ目の枠に入れる
-        if (tag.hasUUID("android")) {
-            androids[0] = tag.getUUID("android");
         }
         if (tag.contains("name")) {
             names[0] = tag.getString("name");

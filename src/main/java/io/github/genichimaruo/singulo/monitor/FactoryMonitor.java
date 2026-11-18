@@ -1,9 +1,9 @@
 package io.github.genichimaruo.singulo.monitor;
 
+import com.google.common.collect.MinMaxPriorityQueue;
 import io.github.genichimaruo.singulo.drone.DroneStationBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineReport;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -29,6 +29,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
  */
 public final class FactoryMonitor {
     public static final int BASE_RANGE = 16, RACK_RANGE = 8, MAX_RACKS = 4, RACK_REACH = 2, MAX_STALLED = 64;
+    public static final int MAX_DRONE_DETAILS = 256;
     /** 画面を開いていられる、モニターからの距離（ブロック）。 */
     public static final double USE_DISTANCE = 8;
 
@@ -50,16 +51,23 @@ public final class FactoryMonitor {
                 ByteBufCodecs.VAR_INT, Drones::trouble, ComponentSerialization.TRUSTED_STREAM_CODEC, Drones::problem, Drones::new);
     }
 
+    /** 範囲内の全ステーションの合計。表示する個別明細の上限によらない。 */
+    public record DroneTotals(int stations, int flying, int idle, int trouble) {
+        static final StreamCodec<RegistryFriendlyByteBuf, DroneTotals> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, DroneTotals::stations, ByteBufCodecs.VAR_INT, DroneTotals::flying,
+                ByteBufCodecs.VAR_INT, DroneTotals::idle, ByteBufCodecs.VAR_INT, DroneTotals::trouble, DroneTotals::new);
+    }
+
     /** まとめ（モニターの画面に送る）。 */
     public record Snapshot(BlockPos monitor, int range, int racks, int machines, int running, long produce, long consume, long stored,
-                           long capacity, List<Stalled> stalled, List<Drones> drones) {
+                           long capacity, List<Stalled> stalled, DroneTotals droneTotals, List<Drones> drones) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Snapshot> CODEC = new StreamCodec<>() {
             @Override
             public Snapshot decode(RegistryFriendlyByteBuf buf) {
                 return new Snapshot(BlockPos.STREAM_CODEC.decode(buf), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
                         buf.readVarLong(), buf.readVarLong(), buf.readVarLong(), buf.readVarLong(),
                         Stalled.CODEC.apply(ByteBufCodecs.list(MAX_STALLED)).decode(buf),
-                        Drones.CODEC.apply(ByteBufCodecs.list(256)).decode(buf));
+                        DroneTotals.CODEC.decode(buf), Drones.CODEC.apply(ByteBufCodecs.list(MAX_DRONE_DETAILS)).decode(buf));
             }
 
             @Override
@@ -74,7 +82,8 @@ public final class FactoryMonitor {
                 buf.writeVarLong(s.stored());
                 buf.writeVarLong(s.capacity());
                 Stalled.CODEC.apply(ByteBufCodecs.list(MAX_STALLED)).encode(buf, s.stalled());
-                Drones.CODEC.apply(ByteBufCodecs.list(256)).encode(buf, s.drones());
+                DroneTotals.CODEC.encode(buf, s.droneTotals());
+                Drones.CODEC.apply(ByteBufCodecs.list(MAX_DRONE_DETAILS)).encode(buf, s.drones());
             }
         };
     }
@@ -96,8 +105,12 @@ public final class FactoryMonitor {
         int range = BASE_RANGE + racks * RACK_RANGE;
         int machines = 0, running = 0;
         long produce = 0, consume = 0, stored = 0, capacity = 0;
-        List<Stalled> stalled = new ArrayList<>();
-        List<Drones> drones = new ArrayList<>();
+        Comparator<BlockPos> near = Comparator.comparingDouble((BlockPos p) -> p.distSqr(monitor)).thenComparing(BlockPos::compareTo);
+        Comparator<Stalled> stalledOrder = Comparator.comparing(Stalled::pos, near);
+        Comparator<Drones> droneOrder = Comparator.comparing(Drones::pos, near);
+        var stalled = MinMaxPriorityQueue.orderedBy(stalledOrder).maximumSize(MAX_STALLED).create();
+        var drones = MinMaxPriorityQueue.orderedBy(droneOrder).maximumSize(MAX_DRONE_DETAILS).create();
+        int stations = 0, flying = 0, idle = 0, trouble = 0;
         for (int cx = (monitor.getX() - range) >> 4; cx <= (monitor.getX() + range) >> 4; cx++) {
             for (int cz = (monitor.getZ() - range) >> 4; cz <= (monitor.getZ() + range) >> 4; cz++) {
                 LevelChunk chunk = level.getChunkSource().getChunkNow(cx, cz);
@@ -111,7 +124,15 @@ public final class FactoryMonitor {
                         continue;
                     }
                     if (be instanceof DroneStationBlockEntity station) {
-                        drones.add(drones(station));
+                        Drones detail = drones(station);
+                        drones.add(detail);
+                        stations++;
+                        flying += detail.flying();
+                        idle += detail.idle();
+                        trouble += detail.trouble();
+                        machines++;
+                        stored += station.energy().getEnergyStored();
+                        capacity += station.energy().getMaxEnergyStored();
                         continue;
                     }
                     MachineReport r = report(level, be);
@@ -131,13 +152,9 @@ public final class FactoryMonitor {
                 }
             }
         }
-        Comparator<BlockPos> near = Comparator.comparingDouble(p -> p.distSqr(monitor));
-        stalled.sort((a, b) -> near.compare(a.pos(), b.pos()));
-        if (stalled.size() > MAX_STALLED) {
-            stalled = new ArrayList<>(stalled.subList(0, MAX_STALLED));
-        }
-        drones.sort((a, b) -> near.compare(a.pos(), b.pos()));
-        return new Snapshot(monitor.immutable(), range, racks, machines, running, produce, consume, stored, capacity, stalled, drones);
+        return new Snapshot(monitor.immutable(), range, racks, machines, running, produce, consume, stored, capacity,
+                stalled.stream().sorted(stalledOrder).toList(), new DroneTotals(stations, flying, idle, trouble),
+                drones.stream().sorted(droneOrder).toList());
     }
 
     /**

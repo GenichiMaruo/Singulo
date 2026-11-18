@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.test;
 
+import io.github.genichimaruo.singulo.drone.DroneStationBlockEntity;
 import io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineReport;
@@ -26,6 +27,49 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class FactoryMonitorGameTests {
     private static final BlockPos MONITOR = new BlockPos(1, 1, 1);
+
+    @GameTest(template = "empty")
+    public static void monitorSendsNearestStationsAndCountsAllTheirEnergy(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos monitor = new BlockPos(0, 1, 0);
+        h.setBlock(monitor, SinguloBlocks.DESK_MONITOR.get());
+        BlockPos at = h.absolutePos(monitor);
+        var before = FactoryMonitor.scan(level, at);
+        var sites = new java.util.ArrayList<BlockPos>();
+        for (int i = 0; i < 256; i++) {
+            sites.add(new BlockPos(1 + i % 7, 1 + i / 49, i / 7 % 7));
+        }
+        BlockPos farthest = new BlockPos(7, 7, 7);
+        sites.add(farthest);
+        try {
+            for (BlockPos pos : sites) {
+                h.setBlock(pos, SinguloBlocks.DRONE_STATION.get());
+                DroneStationBlockEntity station = h.getBlockEntity(pos);
+                station.energy().setEnergy(100_000);
+            }
+            var snapshot = FactoryMonitor.scan(level, at);
+            var buf = new RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), level.registryAccess());
+            try {
+                FactoryMonitor.Snapshot.CODEC.encode(buf, snapshot);
+                var received = FactoryMonitor.Snapshot.CODEC.decode(buf);
+                h.assertTrue(received.stored() - before.stored() == 100_000L * sites.size()
+                                && received.capacity() - before.capacity() == (long) DroneStationBlockEntity.CAPACITY * sites.size(),
+                        "Station energy or capacity missing from the totals");
+                h.assertTrue(received.droneTotals().stations() - before.droneTotals().stations() == sites.size()
+                                && received.droneTotals().trouble() - before.droneTotals().trouble() == sites.size(),
+                        "Station or trouble totals were truncated");
+                h.assertTrue(received.drones().size() == FactoryMonitor.MAX_DRONE_DETAILS
+                                && received.drones().stream().noneMatch(d -> d.pos().equals(h.absolutePos(farthest)))
+                                && received.drones().stream().anyMatch(d -> d.pos().equals(h.absolutePos(sites.getFirst()))),
+                        "Monitor did not keep the nearest stations");
+            } finally {
+                buf.release();
+            }
+        } finally {
+            for (BlockPos pos : sites) h.setBlock(pos, Blocks.AIR);
+        }
+        h.succeed();
+    }
 
     @GameTest(template = "large", timeoutTicks = 160)
     public static void monitorTracksBrokenAndRepairedGenesisEngine(GameTestHelper h) {

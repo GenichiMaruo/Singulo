@@ -1,11 +1,16 @@
 package io.github.genichimaruo.singulo.android;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.world.item.ItemStack;
 
 import io.github.genichimaruo.singulo.ruin.RuinGuards;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -13,6 +18,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -32,7 +39,10 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -297,7 +307,11 @@ public abstract class RuinAndroid extends Monster {
     static final int REPAIR_COOLDOWN = 60;
 
     @Nullable
-    private BlockPos home;
+    private GlobalPos homeAddress;
+    /** 次元のない旧セーブのリンクを、読み込み済みのステーションで次に照合する tick。 */
+    private int legacyHomeCheckAt = -1;
+    @Nullable
+    private List<CompletableFuture<LegacyHomeRead>> legacyHomeReads;
     /** 護衛（プレイヤーの組立ステーションで印刷された）か。護衛は敵対モブだけを狙い、プレイヤーには傷つけられない。 */
     private boolean guard;
     @Nullable
@@ -1838,11 +1852,14 @@ public abstract class RuinAndroid extends Monster {
         return net.minecraft.world.InteractionResult.sidedSuccess(level().isClientSide);
     }
 
-    /** 倒れたら、持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）をその場に落とす。 */
+    /** 護衛の預かり物は装備として扱う。戦利品を無効にしても、転送や持ち物の回収はできる。 */
     @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
-        super.dropCustomDeathLoot(level, source, recentlyHit);
-        releaseInventory(level);
+    protected void dropEquipment() {
+        super.dropEquipment();
+        if (level() instanceof ServerLevel level
+                && (guard || shouldDropLoot() && level.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
+            releaseInventory(level);
+        }
     }
 
     /**
@@ -1854,8 +1871,10 @@ public abstract class RuinAndroid extends Monster {
             if (!recoverEscrowCargo()) return;
             clearWork();
         }
-        AndroidStationBlockEntity station = home != null
-                && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
+        AndroidStationBlockEntity station = homeStation(level);
+        if (station != null && !station.hasTransfer()) {
+            station = null;
+        }
         boolean sent = false;
         if (station != null && (workConsole != null || !tanksEmpty())) {
             station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());
@@ -1945,8 +1964,9 @@ public abstract class RuinAndroid extends Monster {
             n = n.substring(0, 32);
         }
         setCustomName(n.isEmpty() ? null : net.minecraft.network.chat.Component.literal(n));
-        if (home != null && level() instanceof ServerLevel level && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
-            station.rememberName(getUUID(), n);
+        if (legacyHomeCheckAt < 0 && level() instanceof ServerLevel level) {
+            AndroidStationBlockEntity station = homeStation(level);
+            if (station != null) station.rememberName(getUUID(), n);
         }
     }
 
@@ -1977,13 +1997,12 @@ public abstract class RuinAndroid extends Monster {
     void loseStation() {
         if (guard) {
             setHome(null);
-            clearRestriction();
         }
     }
 
     /** ステーションを失った護衛か（新しいステーションでリンクし直せる）。 */
     public boolean orphan() {
-        return guard && home == null;
+        return guard && homeAddress == null;
     }
 
     boolean canReceivePortableRepairs(java.util.UUID printerOwner) {
@@ -2199,6 +2218,7 @@ public abstract class RuinAndroid extends Monster {
     public void configure(int mode, int retreatPercent) {
         this.mode = Mth.clamp(mode, MODE_GUARD, MODE_PATROL);
         this.retreatPercent = Mth.clamp(retreatPercent, 0, 90);
+        BlockPos home = home();
         if (home != null) {
             if (this.mode == MODE_WANDER) {
                 restrictTo(home, WANDER_RADIUS);
@@ -2300,6 +2320,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 切り替えた設定を、ステーションに伝える（読み込まれていれば）。 */
     private void pushEscort() {
+        BlockPos home = home();
         if (escortPending && home != null && level().isLoaded(home)
                 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
             station.setEscort(escort);
@@ -2374,6 +2395,7 @@ public abstract class RuinAndroid extends Monster {
                 return p.position();
             }
         }
+        BlockPos home = home();
         return home == null ? null : Vec3.atBottomCenterOf(home.above());
     }
 
@@ -2599,16 +2621,131 @@ public abstract class RuinAndroid extends Monster {
         return super.finalizeSpawn(level, difficulty, reason, data);
     }
 
+    /** この次元で移動・充電に使える座標。別次元にいる間も元のステーションとのリンクは残す。 */
     @Nullable
     public BlockPos home() {
-        return home;
+        return legacyHomeCheckAt < 0 && homeAddress != null && homeAddress.dimension().equals(level().dimension()) ? homeAddress.pos() : null;
     }
 
     public void setHome(@Nullable BlockPos home) {
-        this.home = home;
+        setHomeAddress(home == null ? null : GlobalPos.of(level().dimension(), home.immutable()));
+    }
+
+    private void setHomeAddress(@Nullable GlobalPos address) {
+        legacyHomeCheckAt = -1;
+        legacyHomeReads = null;
+        homeAddress = address;
+        BlockPos home = home();
         if (home != null) {
             restrictTo(home, HOME_RADIUS);
+        } else {
+            clearRestriction();
         }
+    }
+
+    private void loadHome(CompoundTag tag) {
+        BlockPos pos = NbtUtils.readBlockPos(tag, "home").orElse(null);
+        if (pos == null) {
+            setHome(null);
+            return;
+        }
+        if (tag.contains("home_dimension")) {
+            ResourceLocation dimension = ResourceLocation.tryParse(tag.getString("home_dimension"));
+            if (dimension != null) {
+                setHomeAddress(GlobalPos.of(ResourceKey.create(Registries.DIMENSION, dimension), pos));
+                return;
+            }
+        }
+        setHome(pos);
+        if (guard) {
+            legacyHomeCheckAt = 0;
+            clearRestriction();
+        }
+    }
+
+    private boolean resolveLoadedLegacyHome(ServerLevel current) {
+        BlockPos pos = homeAddress.pos();
+        if (current.isLoaded(pos) && recognizeLegacyStation(current, pos)) return true;
+        for (ServerLevel other : current.getServer().getAllLevels()) {
+            if (other != current && other.isLoaded(pos) && recognizeLegacyStation(other, pos)) return true;
+        }
+        return false;
+    }
+
+    private record LegacyHomeRead(ServerLevel level, boolean registered, boolean failed) {}
+
+    /** 旧保存の座標を各次元で一度照合する。通常 tick はディスクを待たず、読み取り中もリンクを保留する。 */
+    private void resolveLegacyHome(ServerLevel current, boolean waitForDisk) {
+        BlockPos pos = homeAddress.pos();
+        if (legacyHomeReads == null) {
+            if (resolveLoadedLegacyHome(current)) return;
+            legacyHomeReads = new ArrayList<>();
+            UUID id = getUUID();
+            ChunkPos chunk = new ChunkPos(pos);
+            for (ServerLevel level : current.getServer().getAllLevels()) {
+                if (level.isOutsideBuildHeight(pos) || level.isLoaded(pos)) continue;
+                legacyHomeReads.add(level.getChunkSource().chunkMap.read(chunk)
+                        .thenApply(saved -> new LegacyHomeRead(level, saved.isPresent() && savedStationManages(saved.get(), pos, id), false))
+                        .exceptionally(failure -> {
+                            io.github.genichimaruo.singulo.Singulo.LOGGER.warn("Could not read legacy android station at {} in {}", pos, level.dimension(), failure);
+                            return new LegacyHomeRead(level, false, true);
+                        }));
+            }
+        }
+        if (!waitForDisk && legacyHomeReads.stream().anyMatch(read -> !read.isDone())) return;
+        // 読み取り中にロードされたチャンクの、現在の組立ステーションを優先する。
+        if (resolveLoadedLegacyHome(current)) return;
+        boolean unreadable = false;
+        for (var read : legacyHomeReads) {
+            LegacyHomeRead result = waitForDisk ? read.join() : read.getNow(null);
+            if (result.level().isLoaded(pos)) continue;
+            if (result.registered()) {
+                setHomeAddress(GlobalPos.of(result.level().dimension(), pos));
+                configure(mode, retreatPercent);
+                return;
+            }
+            unreadable |= result.failed();
+        }
+        if (unreadable) {
+            // I/O エラーを撤去と見なさない。同じ読み取りを繰り返さず、ロードされたときだけ再照合する。
+            legacyHomeCheckAt = tickCount + 200 + Math.floorMod(getId(), 20);
+        } else {
+            loseStation();
+        }
+    }
+
+    private static boolean savedStationManages(CompoundTag chunk, BlockPos pos, UUID id) {
+        for (var tag : chunk.getList("block_entities", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            if (tag instanceof CompoundTag be && "singulo:android_station".equals(be.getString("id")) && pos.equals(BlockEntity.getPosFromTag(be))) {
+                for (int slot = 0; slot < AndroidStationBlockEntity.MAX_UNITS; slot++) {
+                    if (id.equals(AndroidStationBlockEntity.savedUnit(be, slot))) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean recognizeLegacyStation(ServerLevel level, BlockPos pos) {
+        if (registeredStation(level, pos) == null) return false;
+        setHomeAddress(GlobalPos.of(level.dimension(), pos));
+        configure(mode, retreatPercent);
+        return true;
+    }
+
+    @Nullable
+    private AndroidStationBlockEntity registeredStation(ServerLevel level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.manages(getUUID()) ? station : null;
+    }
+
+    @Nullable
+    private AndroidStationBlockEntity homeStation(ServerLevel current) {
+        if (!guard || homeAddress == null) return null;
+        if (legacyHomeCheckAt >= 0) {
+            resolveLegacyHome(current, true);
+            if (homeAddress == null || legacyHomeCheckAt >= 0) return null;
+        }
+        ServerLevel level = current.getServer().getLevel(homeAddress.dimension());
+        return level == null ? null : registeredStation(level, homeAddress.pos());
     }
 
     /** クライアント: 今の動きを始めてからの時間（tick、小数）。 */
@@ -2678,6 +2815,9 @@ public abstract class RuinAndroid extends Monster {
 
     @Override
     public void tick() {
+        if (legacyHomeCheckAt >= 0 && tickCount >= legacyHomeCheckAt && level() instanceof ServerLevel current) {
+            resolveLegacyHome(current, false);
+        }
         super.tick();
         if (level().isClientSide) {
             tickThrusters();
@@ -2696,7 +2836,8 @@ public abstract class RuinAndroid extends Monster {
                     playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.4F, 2.0F - p / (float) PRINT_TICKS);
                 }
             } else {
-                if (home != null && level().getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+                AndroidStationBlockEntity station = homeStation((ServerLevel) level());
+                if (station != null) {
                     station.onAndroidDismantled(getUUID());
                 }
                 discard();
@@ -2720,16 +2861,20 @@ public abstract class RuinAndroid extends Monster {
             setCharge(charge() - REGEN_COST);
             heal(1);
         }
-        if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
-            if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
-                pushEscort();
-                // 体力をステーションへ知らせる（コンパレーターの出力。どこにいても最後の値が残る）
-                station.reportHealth(getUUID(), getHealth() / getMaxHealth());
-                // 自己修理キットが1つでも減っていたら、ステーションのストックから補充する
-                station.refill(this);
-            } else {
-                // ステーションが壊された（同じ場所に置き直されたものは、このアンドロイドを知らない）: 身寄りのないアンドロイドになる
-                loseStation();
+        BlockPos home = home();
+        if (guard && legacyHomeCheckAt < 0 && homeAddress != null && tickCount % 20 == 0) {
+            ServerLevel origin = ((ServerLevel) level()).getServer().getLevel(homeAddress.dimension());
+            if (origin != null && origin.isLoaded(homeAddress.pos())) {
+                AndroidStationBlockEntity station = registeredStation(origin, homeAddress.pos());
+                if (station == null) {
+                    // 元のステーションが壊された。同じ座標に置き直したステーションはこの UUID を知らない。
+                    loseStation();
+                    home = null;
+                } else if (home != null) {
+                    pushEscort();
+                    station.reportHealth(getUUID(), getHealth() / getMaxHealth());
+                    station.refill(this);
+                }
             }
         }
         if (guard && printed() && active() && getHealth() < getMaxHealth() * retreatPercent / 100F
@@ -3111,10 +3256,11 @@ public abstract class RuinAndroid extends Monster {
     /** 護衛が倒れたら、ステーションに知らせる（キットがあれば印刷し直す）。護衛は経験値を落とさない。 */
     @Override
     public void die(DamageSource source) {
+        boolean wasDead = dead;
         super.die(source);
-        if (guard && home != null && level() instanceof ServerLevel level
-                && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
-            station.onAndroidDied(getUUID());
+        if (!wasDead && dead && level() instanceof ServerLevel level) {
+            AndroidStationBlockEntity station = homeStation(level);
+            if (station != null) station.onAndroidDied(getUUID());
         }
     }
 
@@ -3125,6 +3271,7 @@ public abstract class RuinAndroid extends Monster {
             life.dropHeld();
         }
         super.remove(reason);
+        BlockPos home = home();
         if (!guard && home != null && reason.shouldDestroy() && level() instanceof ServerLevel level && level.isLoaded(home)
                 && level.getBlockEntity(home) instanceof AndroidFabricatorBlockEntity fabricator) {
             fabricator.forget(getUUID(), reason == RemovalReason.KILLED);
@@ -3208,8 +3355,9 @@ public abstract class RuinAndroid extends Monster {
         tag.putBoolean("facility_spawned", facilitySpawned);
         tag.putInt("charge", charge());
         tag.putInt("print", entityData.get(PRINT));
-        if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+        if (homeAddress != null) {
+            tag.put("home", NbtUtils.writeBlockPos(homeAddress.pos()));
+            if (legacyHomeCheckAt < 0) tag.putString("home_dimension", homeAddress.dimension().location().toString());
         }
         if (factoryMade) {
             tag.putBoolean("factory_made", true);
@@ -3279,8 +3427,8 @@ public abstract class RuinAndroid extends Monster {
         if (tag.contains("print")) {
             entityData.set(PRINT, Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS));
         }
-        NbtUtils.readBlockPos(tag, "home").ifPresent(this::setHome);
         guard = tag.getBoolean("guard");
+        loadHome(tag);
         dismantling = tag.getBoolean("dismantling");
         factoryMade = tag.getBoolean("factory_made");
         prototype = tag.getBoolean("prototype");
@@ -3362,6 +3510,7 @@ public abstract class RuinAndroid extends Monster {
             if (mode == MODE_PATROL && level() instanceof ServerLevel pl && patrol.tick(pl)) {
                 return;                            // 巡回路を回っている（巡回しないとき（夜だけ・巡回路なし）は、ステーションのそばで待つ）
             }
+            BlockPos home = home();
             if (mode == MODE_FOLLOW) {
                 Player p = ownerPlayer();
                 if (p == null) {
@@ -3462,16 +3611,16 @@ public abstract class RuinAndroid extends Monster {
 
     /** 同じステーションの護衛で、迎撃モードで手が空いて待っている仲間（自分も含む）。 */
     private java.util.List<RuinAndroid> idlePeers(ServerLevel level) {
-        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        Vec3 dock = Vec3.atBottomCenterOf(homeAddress.pos().above());
         return level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(16),
-                a -> a.isAlive() && a.guard && home.equals(a.home) && a.mode == MODE_GUARD && a.printed() && a.active()
+                a -> a.isAlive() && a.guard && homeAddress.equals(a.homeAddress) && a.mode == MODE_GUARD && a.printed() && a.active()
                         && a.getTarget() == null && !a.isWorking() && a.state() == STATE_IDLE);
     }
 
     /** ステーションの上で待つ番: 今上にいる仲間がいればその仲間（入れ替わらないように）、いなければ UUID の一番小さい仲間。 */
     @Nullable
     private RuinAndroid dockKeeper(ServerLevel level) {
-        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        Vec3 dock = Vec3.atBottomCenterOf(homeAddress.pos().above());
         RuinAndroid best = null;
         for (RuinAndroid a : idlePeers(level)) {
             boolean on = a.position().subtract(dock).horizontalDistanceSqr() < 0.8 * 0.8 && Math.abs(a.getY() - dock.y) < 1;
@@ -3488,9 +3637,9 @@ public abstract class RuinAndroid extends Monster {
     /** ステーションの上を使いたい仲間（充電・修理に戻ってくる、上で充電・印刷中）。いなければ null。 */
     @Nullable
     private RuinAndroid dockNeeder(ServerLevel level) {
-        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        Vec3 dock = Vec3.atBottomCenterOf(homeAddress.pos().above());
         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(32),
-                a -> a != this && a.isAlive() && a.guard && home.equals(a.home))) {
+                a -> a != this && a.isAlive() && a.guard && homeAddress.equals(a.homeAddress))) {
             int s = a.state();
             if (!a.printed() || s == STATE_LOW_POWER || s == STATE_RETREAT || s == STATE_CHARGING) {
                 return a;
@@ -3535,6 +3684,7 @@ public abstract class RuinAndroid extends Monster {
             if (!printed() || !(level() instanceof ServerLevel level)) {
                 return;
             }
+            BlockPos home = home();
             if (state() == STATE_LOW_POWER) {
                 // 充電器を持った持ち主のほうがステーションより近いか、ステーションが遠すぎれば、持ち主のそばで充電する
                 // （追従中は遠くの持ち主へも、ほかのときは近くにいれば）
@@ -3599,7 +3749,7 @@ public abstract class RuinAndroid extends Monster {
                     // 「ありがとう」: 譲ってくれた仲間がそばにいれば、そちらを向いて返す
                     if (guard) {
                         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(4),
-                                a -> a != RuinAndroid.this && a.isAlive() && a.guard && h.equals(a.home) && a.yielding)) {
+                                a -> a != RuinAndroid.this && a.isAlive() && a.guard && h.equals(a.home()) && a.yielding)) {
                             chirp(level, a, 1.3F);
                             break;
                         }

@@ -155,12 +155,7 @@ public final class FactoryMonitorScreen extends Screen {
 
         // ドローン
         int dy = y + DRONE_Y;
-        int flying = 0, idle = 0, trouble = 0;
-        for (FactoryMonitor.Drones d : s.drones()) {
-            flying += d.flying();
-            idle += d.idle();
-            trouble += d.trouble();
-        }
+        var totals = s.droneTotals();
         // 1行の記号: ステーションの絵のあとに ⌂ステーション → 運搬 ○ 待機 ⚠ 困っている（説明はツールチップ）
         Panel.inset(g, skin, x + 7, dy, W - 14, DRONE_H, skin.fill());
         g.pose().pushPose();
@@ -169,11 +164,11 @@ public final class FactoryMonitorScreen extends Screen {
         g.renderItem(new net.minecraft.world.item.ItemStack(io.github.genichimaruo.singulo.registry.SinguloBlocks.DRONE_STATION.get()), 0, 0);
         g.pose().popPose();
         int tx = x + 26, ty = dy + (DRONE_H - 8) / 2;
-        if (s.drones().isEmpty()) {
+        if (totals.stations() == 0) {
             g.drawString(font, Component.translatable("gui.singulo.monitor.no_drones"), tx, ty, skin.dim(), false);
         } else {
-            String[] marks = {"⌂ " + s.drones().size(), "→ " + flying, "○ " + idle, "⚠ " + trouble};
-            int[] colors = {skin.text(), flying > 0 ? GuiSkin.OK : skin.dim(), skin.dim(), trouble > 0 ? GuiSkin.WARN : skin.dim()};
+            String[] marks = {"⌂ " + totals.stations(), "→ " + totals.flying(), "○ " + totals.idle(), "⚠ " + totals.trouble()};
+            int[] colors = {skin.text(), totals.flying() > 0 ? GuiSkin.OK : skin.dim(), skin.dim(), totals.trouble() > 0 ? GuiSkin.WARN : skin.dim()};
             for (int i = 0; i < marks.length; i++) {
                 g.drawString(font, marks[i], tx, ty, colors[i], false);
                 tx += font.width(marks[i]) + 14;
@@ -181,7 +176,7 @@ public final class FactoryMonitorScreen extends Screen {
         }
         if (!s.drones().isEmpty() && Panel.inside(mouseX, mouseY, x + 7, dy, W - 14, DRONE_H)) {
             List<Component> lines = new ArrayList<>();
-            lines.add(Component.translatable("gui.singulo.monitor.drones", s.drones().size(), flying, idle, trouble));
+            lines.add(Component.translatable("gui.singulo.monitor.drones", totals.stations(), totals.flying(), totals.idle(), totals.trouble()));
             for (FactoryMonitor.Drones d : s.drones()) {
                 Component line = Component.translatable("gui.singulo.monitor.station", where(s.monitor(), d.pos()), d.flying(), d.idle());
                 lines.add(d.problem().getString().isEmpty() ? line

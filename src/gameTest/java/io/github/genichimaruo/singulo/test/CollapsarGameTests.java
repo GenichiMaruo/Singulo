@@ -347,6 +347,18 @@ public final class CollapsarGameTests {
             discardDrone(here, back);
             netA.remove(back);
 
+            DroneNetwork.Flight refused = netA.create(station, 0, owner, h.absolutePos(portA), a.getBlockPos());
+            netA.advance(refused, DroneNetwork.DELIVER, here.getGameTime());
+            refused.crate = crate.copy();
+            refused.relayDim = Level.NETHER;
+            refused.relayTo = portB;
+            netB.putPort(portB, owner, "fluid replacement", true);
+            h.assertTrue(DroneWormhole.cross(here, netA, refused, null) && netA.flight(refused.id) == refused
+                            && h.absolutePos(portA).equals(refused.target()) && ItemStack.matches(crate, refused.crate)
+                            && !netA.isAway(station, 0),
+                    "A replacement fluid port accepted the item shipment or the returned crate was lost");
+            netA.remove(refused);
+
             // 口を壊す: 行きの便は発送元のポートへ戻る
             DroneNetwork.Flight going = netA.create(station, 0, owner, h.absolutePos(portA), a.getBlockPos());
             netA.advance(going, DroneNetwork.DELIVER, here.getGameTime());
@@ -386,29 +398,45 @@ public final class CollapsarGameTests {
         // 向こうの口は、読み込まれていない遠くの場所に「置かれている」ことにする（網に場所だけ載せる）
         BlockPos far = new BlockPos(Math.floorMod(base.getX(), 4096) + 200_000, 64, Math.floorMod(base.getZ(), 4096) + 200_000);
         BlockPos farPort = far.offset(6, 0, 0);
+        BlockPos otherGate = far.east(128), otherPort = otherGate.east(6);
+        long otherPair = here.random.nextLong();
         var scope = io.github.genichimaruo.singulo.test.harness.TestScope.of(h);
         var wormholes = io.github.genichimaruo.singulo.wormhole.WormholeNetwork.get(here.getServer());
         wormholes.register(pair, net.minecraft.core.GlobalPos.of(Level.NETHER, far));
+        wormholes.register(otherPair, net.minecraft.core.GlobalPos.of(Level.NETHER, otherGate));
         DroneNetwork netA = DroneNetwork.get(here), netB = DroneNetwork.get(nether);
         netB.putPort(farPort, owner, "far", false);
+        netB.putPort(otherPort, owner, "other", false);
         BlockPos station = h.absolutePos(new BlockPos(1, 1, 6));
         scope.defer(() -> {
             wormholes.unregister(pair, net.minecraft.core.GlobalPos.of(Level.NETHER, far));
+            wormholes.unregister(otherPair, net.minecraft.core.GlobalPos.of(Level.NETHER, otherGate));
             netB.removePort(farPort);
+            netB.removePort(otherPort);
             DroneNetwork.Flight left = flightOf(netA, station);
             if (left != null) {
                 netA.remove(left);
             }
         });
         WormholeMouthBlockEntity a = openMouth(here, h.absolutePos(new BlockPos(10, 1, 2)), pair);
+        WormholeMouthBlockEntity second = openMouth(here, h.absolutePos(new BlockPos(9, 1, 3)), otherPair);
         h.setBlock(new BlockPos(10, 1, 4), SinguloBlocks.WORMHOLE_DRONE_BEACON.get());
         h.runAtTickTime(5, () -> {
             WormholeMouthBlockEntity.serverTick(here, a.getBlockPos(), a.getBlockState(), a);
+            WormholeMouthBlockEntity.serverTick(here, second.getBlockPos(), second.getBlockState(), second);
             h.assertFalse(nether.isLoaded(far), "Fixture expects the far mouth to be unloaded");
             h.assertTrue(a.partner() == null && a.droneGate(), "An unloaded far mouth should still accept drones");
-            var routes = DroneWormhole.routes(here, owner, h.absolutePos(new BlockPos(2, 1, 2)), false);
-            h.assertTrue(routes.size() == 1 && routes.get(0).to().equals(farPort) && routes.get(0).mouthThere().equals(far),
-                    "Far port missing while its mouth is unloaded: " + routes);
+            BlockPos source = h.absolutePos(new BlockPos(2, 1, 2));
+            var routes = DroneWormhole.routes(here, owner, source, false);
+            h.assertTrue(routes.size() == 2, "Expected routes to two sleeping destinations: " + routes);
+            for (var listed : routes) {
+                var direct = DroneWormhole.route(here, owner, source, Level.NETHER, listed.to(), false);
+                h.assertTrue(listed.equals(direct) && listed.mouthThere().equals(listed.to().equals(farPort) ? far : otherGate),
+                        "Single-target and menu lookups must choose the same shortest gate: " + listed + " vs " + direct);
+            }
+            h.assertTrue(DroneWormhole.route(here, owner, source, Level.NETHER, farPort, true) == null
+                            && DroneWormhole.route(here, UUID.randomUUID(), source, Level.NETHER, farPort, false) == null,
+                    "Single-target lookup accepted a mismatched port type or owner");
             DroneNetwork.Flight out = netA.create(station, 0, owner, h.absolutePos(new BlockPos(2, 1, 2)), a.getBlockPos());
             netA.advance(out, DroneNetwork.DELIVER, here.getGameTime());
             out.relayDim = Level.NETHER;

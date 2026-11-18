@@ -160,6 +160,8 @@ public final class FluidPipeNetwork {
     private final Map<RouteKey, Path> paths = new HashMap<>();
     /** この周期に使った容量（分かれ目・区間ごと）。 */
     private final Map<Object, Long> used = new IdentityHashMap<>();
+    /** 飽和した経路が初めて見つかった時点で、残量のある区間でつながっていたグループ。 */
+    @Nullable private Map<Node, Node> openComponents;
     private final Map<SampleKey, Sample> samples = new HashMap<>();
     /** 今、流れ・詰まりを見せているパイプ。 */
     private final Set<BlockPos> lit = new HashSet<>();
@@ -234,7 +236,7 @@ public final class FluidPipeNetwork {
         return perTick >= Long.MAX_VALUE / INTERVAL ? Long.MAX_VALUE : perTick * INTERVAL;
     }
 
-    private static void build(Level level, FluidPipeBlockEntity start) {
+    static void build(Level level, FluidPipeBlockEntity start) {
         Map<BlockPos, FluidPipeBlockEntity> pipes = new HashMap<>();
         Map<BlockPos, Long> capacities = new HashMap<>();
         Map<BlockPos, List<BlockPos>> adjacent = new HashMap<>();
@@ -351,8 +353,9 @@ public final class FluidPipeNetwork {
 
     // ------------------------------------------------------------------ 受け渡し
 
-    private void transfer() {
+    void transfer() {
         used.clear();
+        openComponents = null;
         List<Port> ports = new ArrayList<>();
         List<Endpoint> sources = new ArrayList<>();
         for (Endpoint e : endpoints) {
@@ -442,6 +445,7 @@ public final class FluidPipeNetwork {
             if (receiver.pos().equals(giver.pos())) {
                 continue;
             }
+            if (!canReach(giver.endpoint.node, receiver.endpoint.node)) continue;
             Path path = path(giver.endpoint.node, receiver.endpoint.node);
             long room = Math.min(left, available(path));
             if (room <= 0) {
@@ -481,8 +485,9 @@ public final class FluidPipeNetwork {
         List<Port> takers = new ArrayList<>(ports);
         rotate(takers);
         for (Port taker : takers) {
+            if (!PipeFluidFilter.accepts(taker.handler, fluid) || !canReach(source.node, taker.endpoint.node)) continue;
             Path path = path(source.node, taker.endpoint.node);
-            if (!PipeFluidFilter.accepts(taker.handler, fluid) || available(path) < fluid.getAmount()
+            if (available(path) < fluid.getAmount()
                     || taker.handler.fill(fluid, FluidAction.SIMULATE) < fluid.getAmount()) {
                 continue;
             }
@@ -506,27 +511,49 @@ public final class FluidPipeNetwork {
 
     // ------------------------------------------------------------------ 容量
 
-    private long remaining(Object key, long capacity, @Nullable Map<Object, Long> extra) {
-        if (capacity == Long.MAX_VALUE) {
-            return Long.MAX_VALUE;
-        }
-        long u = used.getOrDefault(key, 0L) + (extra == null ? 0 : extra.getOrDefault(key, 0L));
-        return Math.max(0, capacity - u);
+    private long remaining(Object key, long capacity) {
+        return capacity == Long.MAX_VALUE ? capacity : Math.max(0, capacity - used.getOrDefault(key, 0L));
+    }
+
+    private boolean canReach(Node from, Node to) {
+        return remaining(from, from.capacity) > 0 && remaining(to, to.capacity) > 0
+                && (openComponents == null || openComponents.get(from) == openComponents.get(to));
     }
 
     private long available(Path path) {
-        return available(path, null);
-    }
-
-    private long available(Path path, @Nullable Map<Object, Long> extra) {
         long a = Long.MAX_VALUE;
         for (Node n : path.nodes) {
-            a = Math.min(a, remaining(n, n.capacity, extra));
+            a = Math.min(a, remaining(n, n.capacity));
+            if (a == 0) break;
         }
         for (Segment s : path.segments) {
-            a = Math.min(a, remaining(s, s.capacity, extra));
+            if (a == 0) break;
+            a = Math.min(a, remaining(s, s.capacity));
         }
+        if (a == 0 && openComponents == null) openComponents = findOpenComponents();
         return a;
+    }
+
+    /** 周期内に分断されたグループは再接続しない。同じグループの経路の残量は引き続き個別に確かめる。 */
+    private Map<Node, Node> findOpenComponents() {
+        Map<Node, Node> found = new IdentityHashMap<>();
+        var queue = new ArrayDeque<Node>();
+        for (Node root : nodes.values()) {
+            if (remaining(root, root.capacity) == 0 || found.containsKey(root)) continue;
+            found.put(root, root);
+            queue.add(root);
+            while (!queue.isEmpty()) {
+                Node node = queue.remove();
+                for (Segment edge : node.edges) {
+                    Node next = edge.other(node);
+                    if (remaining(edge, edge.capacity) > 0 && remaining(next, next.capacity) > 0
+                            && found.putIfAbsent(next, root) == null) {
+                        queue.add(next);
+                    }
+                }
+            }
+        }
+        return found;
     }
 
     private void account(Path path, long amount) {

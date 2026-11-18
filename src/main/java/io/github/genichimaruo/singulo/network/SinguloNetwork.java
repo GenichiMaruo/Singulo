@@ -14,7 +14,7 @@ public final class SinguloNetwork {
         r.playToServer(GlassesHeightPayload.TYPE, GlassesHeightPayload.STREAM_CODEC, GlassesHeightPayload::handle);
         r.playToClient(RecordsPayload.TYPE, RecordsPayload.STREAM_CODEC, RecordsPayload::handle);
         r.playToClient(GalaxyPayload.TYPE, GalaxyPayload.STREAM_CODEC, GalaxyPayload::handle);
-        r.playToClient(MonitorPayload.TYPE, MonitorPayload.STREAM_CODEC, MonitorPayload::handle);
+        r.versioned("2").playToClient(MonitorPayload.TYPE, MonitorPayload.STREAM_CODEC, MonitorPayload::handle);
         r.playToServer(MonitorRequestPayload.TYPE, MonitorRequestPayload.STREAM_CODEC, MonitorRequestPayload::handle);
         r.playToClient(EndingPayload.TYPE, EndingPayload.STREAM_CODEC, EndingPayload::handle);
         r.playToClient(ScanPayload.TYPE, ScanPayload.STREAM_CODEC, ScanPayload::handle);
