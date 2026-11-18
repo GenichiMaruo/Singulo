@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -217,10 +218,16 @@ public final class PrototypeGameTests {
     /** 半減後の速い射撃でも、突進直後の光線を相手の無敵時間で無駄にしない。実際の戦闘Goalで検査する。 */
     @GameTest(template = HUGE, batch = BATCH + "_cadence", timeoutTicks = 160)
     public static void enragedBitLungeLeavesRoomForNextBeam(GameTestHelper helper) {
-        helper.setBlock(new BlockPos(7, 1, 3), Blocks.STONE); // AIを動かすと重力も戻るので、射撃位置に足場を置く
+        for (BlockPos floor : BlockPos.betweenClosed(6, 1, 2, 8, 1, 11)) {
+            helper.setBlock(floor, Blocks.STONE);
+        }
         BitAndroid bit = bit(helper);
         bit.setHealth(bit.getMaxHealth() / 4); // 自然回復しても6基の速射状態を保つ
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
+        // 3発目を突進にする間合いを保ち、戦闘 Goal に照準・発射・命中判定を任せる。
+        bit.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        bit.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
+        target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         target.setNoGravity(true);
         bit.setTarget(target);
         bit.setNoAi(false);
@@ -244,7 +251,8 @@ public final class PrototypeGameTests {
         });
         helper.succeedWhen(() -> {
             helper.assertTrue(checked[0], "突進後の光線を検査できない: slash=" + slashStarted[0] + " hit=" + slashHit[0]
-                    + " bits=" + bit.deployed() + " targetHealth=" + target.getHealth());
+                    + " bits=" + bit.deployed() + " targetHealth=" + target.getHealth() + " distance=" + bit.distanceTo(target)
+                    + " hasTarget=" + (bit.getTarget() == target));
             bit.discard(); target.discard();
         });
     }
