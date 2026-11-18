@@ -9,6 +9,7 @@ from fractions import Fraction as F
 from pathlib import Path
 import argparse, json, math, zipfile
 import ids, recipes
+from vanilla_catalog import ITEM_NAMES as VANILLA_ITEM_NAMES, TAG_MEMBERS
 
 ROOT = Path(__file__).resolve().parent.parent
 def vanilla_jar():
@@ -38,6 +39,7 @@ for n,v in ids.VANILLA.items():
 
 
 def itemid(name):
+    if name in VANILLA_ITEM_NAMES:return name
     if name in ids.VANILLA and not ids.VANILLA[name].startswith('#'):return ids.VANILLA[name]
     return ids.OUTPUT_ALIASES.get(name,'singulo:'+ids.MOD.get(name,(name,))[0])
 
@@ -51,14 +53,20 @@ class Model:
             for n in z.namelist():
                 if n.startswith('data/minecraft/tags/item/') and n.endswith('.json'):
                     self.tags['minecraft:'+n.split('/tags/item/')[1][:-5]]=json.loads(z.read(n))['values']
-        for p in (ROOT/'src/generated/resources/data').glob('*/tags/item/**/*.json'):
-            ns=p.relative_to(ROOT/'src/generated/resources/data').parts[0]
-            self.tags[ns+':'+str(p).split('/tags/item/')[1][:-5]]=json.loads(p.read_text())['values']
+        data=ROOT/'src/generated/resources/data'
+        for p in data.glob('*/tags/item/**/*.json'):
+            ns=p.relative_to(data).parts[0]
+            tag=p.relative_to(data/ns/'tags/item').with_suffix('').as_posix()
+            self.tags[ns+':'+tag]=json.loads(p.read_bytes())['values']
+        # Common NeoForge tags such as wooden chests and dyes live outside the vanilla resource JAR.
+        for tag, members in TAG_MEMBERS.items():
+            self.tags.setdefault(tag,members)
         self.all=list(runtime['recipes'])
-        for p in sorted((ROOT/'src/generated/resources/data/singulo/recipe').rglob('*.json')):
-            r=json.loads(p.read_text())
+        recipe_root=data/'singulo/recipe'
+        for p in sorted(recipe_root.rglob('*.json')):
+            r=json.loads(p.read_bytes())
             if r['type'].startswith('minecraft:') or r['type']=='singulo:smes_upgrade':
-                row=self.parse(r,'singulo:'+str(p.relative_to(ROOT/'src/generated/resources/data/singulo/recipe'))[:-5])
+                row=self.parse(r,'singulo:'+p.relative_to(recipe_root).with_suffix('').as_posix())
                 if row:self.all.append(row)
         self.all += [row for name,r in self.vanilla.items() if (row:=self.parse(r,'minecraft:'+name))]
         byout=defaultdict(list)
@@ -86,6 +94,9 @@ class Model:
                 'blast_furnace':'blast_furnace','furnace':'furnace','bucket':'bucket','clock':'clock','compass':'compass',
                 'lightning_rod':'lightning_rod','ender_eye':'ender_eye','blaze_powder':'blaze_powder','paper':'paper',
                 'book':'book','crafting_table':'crafting_table','iron_nugget':'iron_nugget','gold_nugget':'gold_nugget','iron_block':'iron_block','copper_block':'copper_block'}
+        wanted.update(black_dye='black_dye',blue_dye='blue_dye',green_dye='green_dye',
+                      red_dye='red_dye_from_poppy',white_dye='white_dye',
+                      netherite_ingot='netherite_ingot',netherite_scrap='netherite_scrap')
         for out,rid in wanted.items():
             rows=[r for r in self.all if r['id']=='minecraft:'+rid]
             if rows:self.routes['minecraft:'+out]=rows[0]
@@ -99,11 +110,18 @@ class Model:
         for key,parts in runtime['structures'].items():
             kind,size=key.split('/'); iid='analysis:'+key
             self.routes[iid]=self.synthetic(iid,parts)
+            # The cosmic machines have a craftable controller with the same ID as their structure.
+            controller='singulo:'+kind
+            if controller in parts and controller in self.meta:
+                meta=self.meta[controller]
+                self.meta[iid]={**meta,'name':meta['name']+'（完成構造）','category':'multiblock'}
         # Virtual complete machines use the real Java blueprint, not the controller alone.
         self.struct_keys={'cryogenic_cooling_tower':'cooling_tower/7','particle_accelerator':'particle_accelerator/8',
             'degenerate_compactor':'degenerate_compactor/5','casimir_cavity':'casimir_cavity/5','degenerate_furnace':'degenerate_furnace/7',
             'penrose_reactor':'penrose_reactor/13','event_horizon_shield':'event_horizon_shield/9',
             'tipler_cylinder':'tipler_cylinder/9','wormhole_generator':'wormhole_generator/5'}
+        if 'accretion_jet_forge/16' in runtime['structures']:
+            self.struct_keys['accretion_jet_forge']='accretion_jet_forge/16'
         for iid,key in self.struct_keys.items():self.routes['singulo:'+iid]=self.routes['analysis:'+key]
         # An upgrade must replace the occupied footprint. Count added blocks, not a second tower.
         a=Counter(runtime['structures']['cooling_tower/10']);a.subtract(runtime['structures']['cooling_tower/7'])

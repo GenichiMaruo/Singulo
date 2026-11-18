@@ -60,8 +60,17 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
         boolean crafting = recipe instanceof RecipeHolder<?> h && h.value() instanceof CraftingRecipe;
         if (!crafting) {
             List<ItemStack> inputs = new ArrayList<>(), outputs = new ArrayList<>();
-            for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.INPUT)) {
-                sample(view).ifPresent(inputs::add);
+            if (recipe instanceof MachineRecipe machine && machine.fitsAssemblyBoard()) {
+                for (int i = 0; i < machine.ingredients().size(); i++) {
+                    inputs.add(slots.findSlotByName(MachineRecipeCategory.ingredientName(i))
+                            .flatMap(WorkConsoleTransferHandler::sample).orElse(ItemStack.EMPTY));
+                }
+                if (machine.restore().isPresent()) inputs.add(slots.findSlotByName("restore")
+                        .flatMap(WorkConsoleTransferHandler::sample).orElse(ItemStack.EMPTY));
+            } else {
+                for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.INPUT)) {
+                    sample(view).ifPresent(inputs::add);
+                }
             }
             for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.OUTPUT)) {
                 sample(view).ifPresent(outputs::add);

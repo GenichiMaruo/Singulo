@@ -12,15 +12,20 @@ from guide import CHAPTERS
 MODID = 'singulo'
 
 
+def recipe_uses(recipes, restored_items):
+    used_in = {}
+    for rname, r in recipes.items():
+        for inp in r['inputs']:
+            used_in.setdefault(inp, []).append(rname)
+    for name, restored in restored_items.items():
+        used_in.setdefault(restored, []).append(name)
+    return used_in
+
+
 def descriptions(ctx, ja, en):
     """ctx: MOD, RECIPES, EXPLORE, RESTORED, STATIONS, warn"""
     MOD, RECIPES = ctx['MOD'], ctx['RECIPES']
-    used_in = {}
-    for rname, r in RECIPES.items():
-        for inp in r['inputs']:
-            used_in.setdefault(inp, []).append(rname)
-    for name, restored in ctx['RESTORED'].items():
-        used_in.setdefault(restored, []).append(name)
+    used_in = recipe_uses(RECIPES, ctx['RESTORED'])
 
     def en_name(n):
         return MOD[n][1] if n in MOD else n

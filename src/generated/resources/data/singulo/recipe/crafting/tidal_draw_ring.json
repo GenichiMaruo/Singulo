@@ -3,7 +3,7 @@
   "category": "misc",
   "pattern": [
     "PCP",
-    "C C",
+    "CFC",
     "PCP"
   ],
   "key": {
@@ -12,6 +12,9 @@
     },
     "C": {
       "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:cosmic_frame"
     }
   },
   "result": {

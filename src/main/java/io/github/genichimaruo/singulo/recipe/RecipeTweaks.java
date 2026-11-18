@@ -241,7 +241,7 @@ public final class RecipeTweaks {
             return r;
         }
         return new MachineRecipe(r.station(), r.stage(), time, r.energy(), List.copyOf(items), List.copyOf(fluids), r.mass(),
-                r.restore(), result, r.fluidResults(), r.minSize(), r.priority(), r.byproduct());
+                r.restore(), result, r.fluidResults(), r.minSize(), r.priority(), r.byproduct(), r.shape());
     }
 
     /** 液体の材料は装置のタンク（{@link MachineType#TANK_CAPACITY}）1つに収まる量まで（超えると加工が始まらない）。 */

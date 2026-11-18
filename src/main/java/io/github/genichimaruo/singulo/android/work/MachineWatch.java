@@ -135,6 +135,14 @@ public final class MachineWatch {
 
     @javax.annotation.Nullable
     public static RecipeData.Tool missingTool(Level level, BlockPos at, RecipeData r) {
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var assembly = AndroidAssembly.find(level, r);
+            if (assembly != null) for (var tool : assembly.tools()) {
+                if (tool.crafts(r.grid().get(tool.slot()), assembly.loadedTool(table, tool)) == 0) return tool;
+            }
+            return null;
+        }
         if (!r.tools().isEmpty() && controller(level, at) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine) {
             var loaded = machine.inputStacks();
             for (var tool : r.tools()) {
@@ -146,6 +154,14 @@ public final class MachineWatch {
 
     public static long toolCraftLimit(Level level, BlockPos at, RecipeData r) {
         long crafts = Long.MAX_VALUE;
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var assembly = AndroidAssembly.find(level, r);
+            if (assembly != null) for (var tool : assembly.tools()) {
+                crafts = Math.min(crafts, tool.crafts(r.grid().get(tool.slot()), assembly.loadedTool(table, tool)));
+            }
+            return Math.max(1, crafts);
+        }
         if (!r.tools().isEmpty() && controller(level, at) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine) {
             var loaded = machine.inputStacks();
             for (var tool : r.tools()) {
@@ -179,6 +195,12 @@ public final class MachineWatch {
 
     /** 取り出す面のどれかから、物か流体を出し入れできるか。 */
     public static boolean handlesOutput(Level level, BlockPos at, RecipeData r) {
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var facing = table.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING);
+            return outputFaces(level, at, r).stream().anyMatch(d -> table.itemSides().canExtract(
+                    io.github.genichimaruo.singulo.machine.SideConfig.faceOf(facing, d)));
+        }
         for (Direction d : outputFaces(level, at, r)) {
             if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
@@ -221,6 +243,7 @@ public final class MachineWatch {
 
     /** 素材を入れる面のどれかから、物か流体を出し入れできるか（装置として使えるか）。 */
     public static boolean handlesInput(Level level, BlockPos at, RecipeData r) {
+        if (AndroidAssembly.table(level, at) != null) return AndroidAssembly.find(level, r) != null;
         for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
             if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
@@ -281,6 +304,7 @@ public final class MachineWatch {
      * 装置は、中身に関わらず、その面の欄に置けるかで見る。ほかの装置は {@link #refuses}（欄が埋まっているだけなら受け付ける扱い）。
      */
     public static ItemStack refusedInput(Level level, BlockPos at, RecipeData r) {
+        if (AndroidAssembly.table(level, at) != null) return AndroidAssembly.find(level, r) == null ? r.output() : ItemStack.EMPTY;
         for (ItemCount need : r.inputs()) {
             if (FluidSamples.liquid(need.item)) {
                 continue;
@@ -309,6 +333,12 @@ public final class MachineWatch {
      */
     public static long held(Level level, BlockPos at, RecipeData r) {
         long n = 0;
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var board = table.assemblyGrid();
+            for (int i = 0; i < board.getSlots(); i++) n += board.getStackInSlot(i).getCount();
+            return n;
+        }
         for (ItemCount need : r.inputs()) {
             for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
                 long here = 0;

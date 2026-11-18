@@ -23,7 +23,20 @@
       },
       "tier": 3,
       "uses": 750
+    },
+    {
+      "ingredient": {
+        "item": "singulo:casimir_cavity_frame"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "     ",
+    " ADA ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:casimir_cavity_wall",

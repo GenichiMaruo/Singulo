@@ -6,10 +6,13 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineType;
+import io.github.genichimaruo.singulo.machine.SideConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
+import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
@@ -17,6 +20,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -45,6 +50,36 @@ public final class MachineResultGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void laserCoolerSharesHeliumBetweenInputTanks(GameTestHelper h) {
+        var machine = place(h, MachineType.LASER_COOLER, 1);
+        var helium = SinguloFluids.get("liquid_helium");
+        machine.tankSides(0).set(SideConfig.Face.TOP, SideConfig.INPUT, false);
+        machine.tankSides(1).set(SideConfig.Face.TOP, SideConfig.NONE, false);
+        machine.fluidsFor(Direction.UP).fill(new FluidStack(helium, 4), FluidAction.EXECUTE);
+        machine.tankSides(0).set(SideConfig.Face.TOP, SideConfig.NONE, false);
+        machine.tankSides(1).set(SideConfig.Face.TOP, SideConfig.INPUT, false);
+        var second = machine.fluidsFor(Direction.UP);
+        second.fill(new FluidStack(helium, 5), FluidAction.EXECUTE);
+        machine.items().setStackInSlot(0, stack("stardust", 1));
+        machine.items().setStackInSlot(1, new ItemStack(Items.QUARTZ));
+        machine.items().setStackInSlot(2, stack("cold_atom_trap", 1));
+        machine.energy().setEnergy(machine.energy().getMaxEnergyStored());
+        tick(h, machine);
+        var tanks = machine.automationFluids();
+        h.assertTrue(machine.report().progress() == 0 && tanks.getFluidInTank(0).getAmount() == 4
+                && tanks.getFluidInTank(1).getAmount() == 5, "A short batch used helium");
+        second.fill(new FluidStack(helium, 2), FluidAction.EXECUTE);
+        for (int i = 0; i < 205; i++) {
+            machine.energy().setEnergy(machine.energy().getMaxEnergyStored());
+            tick(h, machine);
+        }
+        h.assertTrue(ItemStack.matches(machine.items().getStackInSlot(machine.type().outputSlot()), stack("cold_atoms", 2))
+                && tanks.getFluidInTank(0).isEmpty() && tanks.getFluidInTank(1).getAmount() == 1,
+                "The cooler did not spend exactly 10 mB across both tanks");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void assemblerUpgradesLoadedPrinterWithoutLosingContents(GameTestHelper h) {
         var machine = place(h, MachineType.PRECISION_ASSEMBLER, 1);
         ItemStack mk1 = stack("portable_android_printer", 1);
@@ -54,12 +89,10 @@ public final class MachineResultGameTests {
         mk1.set(DataComponents.CUSTOM_NAME, Component.literal("Field printer"));
         mk1.set(SinguloComponents.ENERGY.get(), 240_000); // surplus charge after changing a gunner memory
         List<ItemStack> inputs = List.of(stack("quantum_computing_module", 1), stack("entangled_element", 2),
-                mk1, stack("superconducting_coil", 2), stack("white_ceramic_composite", 4));
-        for (int i = 0; i < inputs.size(); i++) {
-            h.assertTrue(machine.automationItems().insertItem(i, inputs.get(i), false).isEmpty(), "Assembler rejected an input");
-        }
+                mk1, stack("superconducting_coil", 2), stack("white_ceramic_composite", 4), stack("steel_plate", 2));
+        io.github.genichimaruo.singulo.test.harness.AssemblyFixture.place(h, machine, "portable_android_printer_2",
+                inputs.stream().map(ItemStack::copy).toArray(ItemStack[]::new));
         ItemStack mk2 = stack("portable_android_printer_2", 1);
-        machine.selectFor(mk2, inputs);
         int out = machine.type().outputSlot();
         for (int i = 0; i < 500 && machine.items().getStackInSlot(out).isEmpty(); i++) {
             machine.energy().setEnergy(machine.energy().getMaxEnergyStored());
@@ -72,8 +105,8 @@ public final class MachineResultGameTests {
         for (int i = 0; i < slots.size(); i++) {
             h.assertTrue(ItemStack.matches(slots.get(i), i < set.size() ? set.get(i) : ItemStack.EMPTY), "Wrong contents in slot " + i);
         }
-        for (int i = 0; i < inputs.size(); i++) {
-            h.assertTrue(machine.items().getStackInSlot(i).isEmpty(), "Upgrade left an ingredient behind");
+        for (int i = 0; i < machine.assemblyGrid().getSlots(); i++) {
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(i).isEmpty(), "Upgrade left an ingredient behind");
         }
         h.succeed();
     }

@@ -9,7 +9,7 @@
       "ingredient": {
         "item": "singulo:white_ceramic_composite"
       },
-      "count": 4
+      "count": 2
     },
     {
       "ingredient": {
@@ -33,8 +33,15 @@
       "ingredient": {
         "tag": "c:plates/steel"
       },
-      "count": 2
+      "count": 4
     }
+  ],
+  "shape": [
+    " EAE ",
+    " BDB ",
+    " CDC ",
+    " EAE ",
+    "     "
   ],
   "result": {
     "id": "singulo:portable_android_printer",

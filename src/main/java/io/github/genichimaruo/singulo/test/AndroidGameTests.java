@@ -1716,7 +1716,7 @@ public final class AndroidGameTests {
     }
 
     /**
-     * 触媒を使う装置の失活触媒: 記録していなくても持ち帰る。精密組立台は出口が1つなので、残すと次のモジュールが出られない
+     * 触媒を使う装置の失活触媒: 記録していなくても、精密組立台の専用排出枠から持ち帰る。
      * （時間結晶触媒2個からモジュール3個。1個目は2個目の途中で、2個目は3個目で使い切る）。
      */
     @GameTest(template = EMPTY, timeoutTicks = 3000)
@@ -1750,12 +1750,8 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, item("time_crystal_module")) == 3, "失活触媒で出口がふさがり、モジュールが3つ届かない: "
                     + delivered(helper, item("time_crystal_module")));
-            // 最後の1個は、最後のモジュールを取り出したあとに出口へ出るので、次の作業で持ち帰る
-            int left = 0;
-            for (int k = 0; k < m.type().outputSlots(); k++) {
-                ItemStack o = m.items().getStackInSlot(m.type().outputSlot() + k);
-                left += o.is(item("spent_time_crystal_catalyst")) ? o.getCount() : 0;
-            }
+            ItemStack shells = m.items().getStackInSlot(m.type().spentCatalystSlot());
+            int left = shells.is(item("spent_time_crystal_catalyst")) ? shells.getCount() : 0;
             for (ItemStack waiting : m.magazine().contents()) {
                 left += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
             }

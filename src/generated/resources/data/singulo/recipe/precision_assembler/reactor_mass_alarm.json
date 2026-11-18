@@ -22,7 +22,26 @@
         "item": "singulo:basic_circuit"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:note_block"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:redstone_lamp"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " BCB ",
+    " BAB ",
+    " DED ",
+    "     "
   ],
   "result": {
     "id": "singulo:reactor_mass_alarm",

@@ -28,7 +28,26 @@
         "tag": "c:plates/steel"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_circuit"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:black_dye"
+      },
+      "count": 4
     }
+  ],
+  "shape": [
+    "     ",
+    "FADAF",
+    "BCECB",
+    "FADAF",
+    "     "
   ],
   "result": {
     "id": "singulo:metric_drive",

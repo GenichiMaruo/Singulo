@@ -250,8 +250,13 @@ public final class AndroidEscrowOrderGameTests {
     public static void restoredEscrowMachineJobCannotTouchMachine(GameTestHelper h) throws Exception {
         var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
         furnace.setItem(2,new ItemStack(Items.IRON_INGOT,2));
-        var accepted=offer(h,c,id,1);h.assertTrue(accepted.acceptedNow(),"Plain crafting rejected");
-        var a=worker(h,c,accepted.receipt().orderId());var job=c.requestJob(a);var route=c.planPickup(job,a.blockPosition());
+        // Other simultaneous tests also spawn unowned workers inside the console's 64-block search radius.
+        var a=h.getLevel().getEntitiesOfClass(RuinAndroid.class,new net.minecraft.world.phys.AABB(h.absolutePos(new BlockPos(2,1,2))),
+                entity->c.owner().equals(entity.owner())).getFirst();
+        var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.OAK_PLANKS,4),4,
+                List.of(new ItemStack(Items.OAK_LOG)),a.getUUID());
+        h.assertTrue(accepted.acceptedNow(),"Plain crafting rejected");
+        var job=c.requestJob(a);var route=c.planPickup(job,a.blockPosition());
         h.assertTrue(route!=null && c.fetchAt(a,job,route.getFirst()),"Private fetch failed");
         var machine=c.recipes().stream().filter(e->e.recipe().processing()).findFirst().orElseThrow();
         var step=new WorkJob.Batch(0,2,machine.location(),machine.recipe());

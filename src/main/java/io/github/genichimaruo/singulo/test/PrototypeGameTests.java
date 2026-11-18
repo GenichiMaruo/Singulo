@@ -12,7 +12,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -225,15 +224,18 @@ public final class PrototypeGameTests {
         bit.setHealth(bit.getMaxHealth() / 4); // 自然回復しても6基の速射状態を保つ
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         // 3発目を突進にする間合いを保ち、戦闘 Goal に照準・発射・命中判定を任せる。
-        bit.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
-        bit.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
-        target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
+        Vec3 firingPosition = bit.position();
+        Vec3 targetPosition = target.position();
         target.setNoGravity(true);
         bit.setTarget(target);
         bit.setNoAi(false);
         float[] previous = {target.getHealth()};
         boolean[] slashStarted = {false}, slashHit = {false}, checked = {false};
         helper.onEachTick(() -> {
+            bit.setPos(firingPosition);
+            bit.setDeltaMovement(Vec3.ZERO);
+            target.setPos(targetPosition);
+            target.setDeltaMovement(Vec3.ZERO);
             float lost = previous[0] - target.getHealth();
             if (bit.slashBit() >= 0) {
                 helper.assertTrue(bit.deployed() == BitAndroid.BITS_OUT_ENRAGED, "突進時に6基を展開していない");

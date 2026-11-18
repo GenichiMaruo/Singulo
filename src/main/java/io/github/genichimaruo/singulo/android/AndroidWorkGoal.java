@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.android;
 
 import io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity;
+import io.github.genichimaruo.singulo.android.work.AndroidAssembly;
 import io.github.genichimaruo.singulo.android.work.BucketCrafting;
 import io.github.genichimaruo.singulo.android.work.FluidSamples;
 import io.github.genichimaruo.singulo.android.work.ItemCount;
@@ -640,6 +641,13 @@ final class AndroidWorkGoal extends Goal {
         craftTimer = 0;
         RecipeData r = step.recipe();
         BlockPos at = step.location();
+        var table = AndroidAssembly.table(level, at);
+        var assembly = table == null ? null : AndroidAssembly.find(level, r);
+        // A saved partial bulk insertion predates the board. Its deposited materials are recoverable in the table.
+        if (table != null && processingPaid && processingPending != null) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
         if (!io.github.genichimaruo.singulo.android.work.MachineWatch.handlesInput(level, at, r)
                 || !io.github.genichimaruo.singulo.android.work.MachineWatch.handlesOutput(level, at, r)) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
@@ -649,7 +657,7 @@ final class AndroidWorkGoal extends Goal {
         fuelMissing = false;
         tripSupply = r.fuel();
         var missingTool = MachineWatch.missingTool(level, at, r);
-        if (missingTool != null && MachineWatch.outputFace(level, at, r) == null) {
+        if (missingTool != null && (assembly == null || assembly.canPlace(table)) && MachineWatch.outputFace(level, at, r) == null) {
             var sample = r.grid().get(missingTool.slot());
             ItemStack carry = ItemStack.EMPTY;
             for (int slot : android.carrySlots()) {
@@ -660,18 +668,22 @@ final class AndroidWorkGoal extends Goal {
                 }
             }
             tripSupply = carry.isEmpty() ? c.toolSupply(missingTool, sample) : carry.copyWithCount(1);
-            Direction face = MachineWatch.inputFace(level, at, r, tripSupply);
-            if (face != null) {
-                var input = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, face);
-                if (!carry.isEmpty() && input != null) {
-                    insertFromCarry(input, tripSupply, 1);
-                    return;
+            Direction face = assembly == null ? MachineWatch.inputFace(level, at, r, tripSupply) : null;
+            if (face != null || assembly != null) {
+                if (!carry.isEmpty()) {
+                    if (assembly != null) {
+                        if (assembly.supplyTool(table, missingTool, android, tripSupply)) return;
+                    } else {
+                        var input = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, face);
+                        if (input != null && insertFromCarry(input, tripSupply, 1) > 0) return;
+                    }
+                } else {
+                    fuelWant = 1;
+                    fuelTrip = c.fuelPoint(tripSupply, android.blockPosition());
+                    travel = 0;
+                    if (fuelTrip != null) return;
+                    fuelMissing = true;
                 }
-                fuelWant = 1;
-                fuelTrip = c.fuelPoint(tripSupply, android.blockPosition());
-                travel = 0;
-                if (fuelTrip != null) return;
-                fuelMissing = true;
             }
         }
         if (!fuelMissing && !r.fuel().isEmpty() && needsFuel(level, at, r)) {
@@ -690,7 +702,7 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         // 作るものを選べる装置（精密組立台など）: 材料の一部が別のレシピと同じでも、記録したレシピの物を作らせる
-        if (inserted < step.crafts() && job.type() != WorkJob.Type.COLLECT) {
+        if (table == null && inserted < step.crafts() && job.type() != WorkJob.Type.COLLECT) {
             var controller = MachineWatch.controller(level, at);
             if (controller instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine) {
                 machine.selectFor(r.output(), r.grid());
@@ -702,11 +714,22 @@ final class AndroidWorkGoal extends Goal {
         }
         boolean progress = false;
         while (missingTool == null && inserted < step.crafts()) {
+            if (table != null && inserted * r.outputCount() > collected) break; // The table holds one board at a time.
             if (!processingPaid && android.charge() < CRAFT_COST) {
                 android.spend(CRAFT_COST);
                 break;
             }
-            boolean complete = insertOnce(level, at, r);
+            boolean complete;
+            if (assembly != null) {
+                complete = assembly.place(table, r, android);
+                processingMoved = complete;
+                if (complete) {
+                    android.spend(CRAFT_COST);
+                    processingPending = null;
+                }
+            } else {
+                complete = insertOnce(level, at, r);
+            }
             progress |= processingMoved;
             if (!complete) {
                 if (!processingMoved && !io.github.genichimaruo.singulo.android.work.MachineWatch.refusedInput(level, at, r).isEmpty()) {
@@ -725,8 +748,9 @@ final class AndroidWorkGoal extends Goal {
         }
         long want = job.type() == WorkJob.Type.COLLECT ? job.amount() : step.crafts() * r.outputCount();
         List<ItemStack> liquidOutputs = r.outputs().stream().filter(FluidSamples::liquid).toList();
+        long collectLimit = table != null && job.type() != WorkJob.Type.COLLECT ? Math.min(want, inserted * r.outputCount()) : want;
         for (Direction face : MachineWatch.outputFaces(level, at, r)) {
-            progress |= collectFromFace(level, at, face, r, liquidOutputs, want);
+            progress |= collectFromFace(level, at, face, r, liquidOutputs, collectLimit);
         }
         if (inserted >= step.crafts() && collected < want) {
             // 入れ終えて、できるのを待っている: 長くかかりそうで、ほかにできる作業があれば、待たずにそちらへ
@@ -755,7 +779,8 @@ final class AndroidWorkGoal extends Goal {
                 && eta <= 0 && !r.inputs().isEmpty()
                 && io.github.genichimaruo.singulo.android.work.MachineWatch.held(level, at, r) == 0) {
             // 入れた素材を使い切ったのに、できた物が足りない（確率で出る物）: 足りない分の回数を足して、集まるまで作り直す
-            endShort(c, job, want - collected);
+            if (table == null) endShort(c, job, want - collected);
+            else fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE); // A guaranteed assembly output went missing. Never charge its inputs twice.
             return;
         } else if (stalled >= STALL_TICKS) {
             fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
@@ -796,6 +821,7 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         var wantedItem = out == null ? ItemStack.EMPTY : WormholeOrders.collectSample(r.output(), want - collected, out);
+        var assembly = AndroidAssembly.table(level, at) == null ? null : AndroidAssembly.find(level, r);
         var furnace = level.getBlockEntity(at) instanceof net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity f ? f : null;
         int[] furnaceSlots = furnace == null ? null : furnace.getSlotsForFace(outFace);
         for (int i = 0; out != null && i < out.getSlots(); i++) {
@@ -809,7 +835,8 @@ final class AndroidWorkGoal extends Goal {
             boolean main = (!fuelContainer || s.is(net.minecraft.world.item.Items.WATER_BUCKET)) && WormholeOrders.matches(wantedItem, s);
             if (main) {
                 take = (int) Math.min(s.getCount(), want - collected);     // ほかの人の分までは取らない
-            } else if (fuelContainer || io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s) || r.returnedTool(s)) {
+            } else if (fuelContainer || io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s) || r.returnedTool(s)
+                    || assembly != null && assembly.returnedCatalyst(r, s)) {
                 // 使い切った触媒: 記録していなくても持ち帰る（出口に残すと、次にできた物の出口がふさがる）
                 take = s.getCount();
             } else {

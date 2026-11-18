@@ -34,7 +34,20 @@
         "item": "singulo:white_ceramic_composite"
       },
       "count": 4
+    },
+    {
+      "ingredient": {
+        "tag": "c:plates/steel"
+      },
+      "count": 2
     }
+  ],
+  "shape": [
+    " EFE ",
+    " CBC ",
+    " DAD ",
+    " EFE ",
+    "     "
   ],
   "result": {
     "id": "singulo:portable_android_printer_2",

@@ -3,7 +3,7 @@
   "category": "misc",
   "pattern": [
     "KDK",
-    "OFO",
+    "OTO",
     " B "
   ],
   "key": {
@@ -16,8 +16,8 @@
     "O": {
       "item": "singulo:superconducting_coil"
     },
-    "F": {
-      "item": "singulo:basic_frame"
+    "T": {
+      "item": "singulo:accelerator_tube"
     },
     "B": {
       "item": "singulo:basic_circuit"

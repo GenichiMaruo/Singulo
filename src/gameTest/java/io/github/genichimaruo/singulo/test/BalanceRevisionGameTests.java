@@ -267,12 +267,14 @@ public final class BalanceRevisionGameTests {
     public static void reconstructedPartsAndPrimordialSeedKeepTheirUnlockInputs(GameTestHelper h) {
         var coreRecipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER).stream()
                 .filter(r -> r.id().equals(Singulo.id("precision_assembler/sentinel_core_reconstructed"))).findFirst().orElseThrow().value();
-        var parts = new java.util.ArrayList<ItemStack>(java.util.List.of(item("quantum_computing_module"),
-                item("optical_lattice_substrate").copyWithCount(2), item("meteoric_iron_ingot").copyWithCount(2)));
+        var parts = new java.util.ArrayList<ItemStack>();
+        for (var input : coreRecipe.ingredients()) {
+            if (input.uses() == 0) parts.add(input.ingredient().getItems()[0].copyWithCount(input.count()));
+        }
         h.assertTrue(coreRecipe.plan(parts) == null, "Reconstruction bypassed its BE unlock");
         parts.add(item("muon_catalyst"));
         h.assertTrue(coreRecipe.plan(parts) == null, "Muon catalyst bypassed its BE unlock");
-        parts.set(3, item("bose_condensate_catalyst"));
+        parts.set(parts.size() - 1, item("bose_condensate_catalyst"));
         h.assertTrue(coreRecipe.plan(parts) != null, "Reconstruction remains blocked after BE unlock");
         var seedRecipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.SINGULARITY_ENCAPSULATOR).stream()
                 .filter(r -> r.id().equals(Singulo.id("singularity_encapsulator/primordial_seed"))).findFirst().orElseThrow().value();

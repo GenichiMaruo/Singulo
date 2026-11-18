@@ -2,7 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PWP"
+    "PWP",
+    " F "
   ],
   "key": {
     "P": {
@@ -10,6 +11,9 @@
     },
     "W": {
       "item": "singulo:white_ceramic_composite"
+    },
+    "F": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

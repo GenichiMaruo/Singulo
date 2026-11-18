@@ -3,15 +3,15 @@
   "category": "misc",
   "pattern": [
     " G ",
-    "GPG",
+    "GFG",
     " G "
   ],
   "key": {
     "G": {
       "tag": "c:glass_blocks/colorless"
     },
-    "P": {
-      "tag": "c:plates/steel"
+    "F": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

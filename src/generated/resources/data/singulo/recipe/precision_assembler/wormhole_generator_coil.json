@@ -23,7 +23,20 @@
       },
       "tier": 4,
       "uses": 1125
+    },
+    {
+      "ingredient": {
+        "item": "singulo:wormhole_generator_shell"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  A  ",
+    " BDB ",
+    "  A  ",
+    "     "
   ],
   "result": {
     "id": "singulo:wormhole_generator_coil",

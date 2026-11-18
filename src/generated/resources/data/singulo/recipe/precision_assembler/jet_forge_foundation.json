@@ -21,6 +21,12 @@
       "ingredient": {
         "item": "singulo:nihonium_plate"
       },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:jet_forge_truss"
+      },
       "count": 1
     },
     {
@@ -30,6 +36,13 @@
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " BDB ",
+    " ACA ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_foundation",

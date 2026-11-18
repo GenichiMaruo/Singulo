@@ -11,6 +11,7 @@ import io.github.genichimaruo.singulo.recipe.RecipeTweaks;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
+import io.github.genichimaruo.singulo.test.harness.AndroidProcessingFixture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public final class AndroidMachineCycleGameTests {
             for (var recipe : recipes) {
                 machine.loadWithComponents(empty, level.registryAccess());
                 try {
-                    cycle(level, console, machine, recipe);
+                    cycle(h, console, machine, recipe);
                     checked++;
                 } catch (RuntimeException failure) {
                     failures.add(recipe.id() + " " + failure.getMessage());
@@ -71,7 +72,8 @@ public final class AndroidMachineCycleGameTests {
         h.succeed();
     }
 
-    private static void cycle(ServerLevel level, WorkConsoleBlockEntity console, MachineBlockEntity machine, RecipeHolder<MachineRecipe> holder) {
+    private static void cycle(GameTestHelper h, WorkConsoleBlockEntity console, MachineBlockEntity machine, RecipeHolder<MachineRecipe> holder) {
+        var level = h.getLevel();
         var recipe = holder.value();
         var pos = machine.getBlockPos();
         if (recipe.energy() > machine.type().energyCapacity()) {
@@ -84,13 +86,18 @@ public final class AndroidMachineCycleGameTests {
         console.setMachineProcess(recipe, List.of());
         if (!console.encode()) throw new IllegalStateException("could not record");
         var card = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), level.registryAccess());
-        machine.selectFor(card.output(), card.grid());
-        for (var tool : card.tools()) {
-            var stack = card.grid().get(tool.slot());
-            int life = UsesHelper.remaining(stack);
-            insert(level, pos, card, stack, (tool.uses() + life - 1) / life);
+        AndroidProcessingFixture assembly = null;
+        if (machine.type() == MachineType.PRECISION_ASSEMBLER) {
+            assembly = AndroidProcessingFixture.prepareAssembly(h, console, machine, card, recipe);
+        } else {
+            machine.selectFor(card.output(), card.grid());
+            for (var tool : card.tools()) {
+                var stack = card.grid().get(tool.slot());
+                int life = UsesHelper.remaining(stack);
+                insert(level, pos, card, stack, (tool.uses() + life - 1) / life);
+            }
+            for (var in : card.inputs()) insert(level, pos, card, in.item, Math.toIntExact(in.count));
         }
-        for (var in : card.inputs()) insert(level, pos, card, in.item, Math.toIntExact(in.count));
 
         var sync = machine.syncData();
         var power = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos, Direction.UP);
@@ -110,6 +117,18 @@ public final class AndroidMachineCycleGameTests {
         String ran = machine.saveWithoutMetadata(level.registryAccess()).getString("recipe");
         if (!finished || !holder.id().toString().equals(ran)) {
             throw new IllegalStateException("active=" + ran + ", status=" + machine.status() + ", size=" + machine.structureSize());
+        }
+        if (assembly != null) {
+            assembly.visit();
+            for (var product : card.outputs()) {
+                int count = 0;
+                for (int slot : assembly.worker().carrySlots()) {
+                    var carried = assembly.worker().inventory().getItem(slot);
+                    if (ItemStack.isSameItemSameComponents(product, carried)) count += carried.getCount();
+                }
+                if (count != product.getCount()) throw new IllegalStateException("worker collected " + count + " of " + product);
+            }
+            return;
         }
         for (var product : card.outputs()) {
             var expected = FluidSamples.amount(product);

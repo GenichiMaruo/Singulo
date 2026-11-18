@@ -2,9 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "C",
-    "H",
-    "C"
+    " H ",
+    "CFC"
   ],
   "key": {
     "C": {
@@ -12,6 +11,9 @@
     },
     "H": {
       "item": "singulo:horizon_bus"
+    },
+    "F": {
+      "item": "singulo:cosmic_frame"
     }
   },
   "result": {

@@ -6668,8 +6668,8 @@
     "translation": "作为装置钥匙的催化剂"
   },
   "guide.singulo.catalysts.slots.body": {
-    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
-    "translation": "使用催化剂的装置有只能放入催化剂的专用槽位（界面中带催化剂标记的格子），可以叠放最多 16 个相同的催化剂作为备用。\n装置会把其中一个装填进去使用，槽位下方的计量条显示剩余量。用尽后会送出失活催化剂（机器送到输出槽，催化装置送到左侧的出口），并立刻从备用中装填下一个，因此不会停机。\n放入用过一部分的同种催化剂时，剩余寿命会并入装填中的那个，空壳会作为失活催化剂送出。放入不同种类时，装填中的会被退回出口并替换。备用为空时点击槽位，可以取出装填中的催化剂。\n在催化反应器中，失活催化剂约 25% 可回收为低一级催化剂的材料。"
+    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe gauge below the slot shows the remaining life of the loaded catalyst. When it runs out, the machine loads the next catalyst from the reserve. Collect spent catalysts from the Spent slot on the Precision Assembler, the output slot on other processing machines, or the left exit on catalyst devices. The Precision Assembler waits if its spent catalyst will not fit.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
+    "translation": "使用催化剂的装置有只能放入催化剂的专用槽位（界面中带催化剂标记的格子），可以叠放最多 16 个相同的催化剂作为备用。\n槽位下方的计量条会显示已装填催化剂的剩余寿命。用尽后，装置会从备用催化剂中装填下一个。失活催化剂可从精密组装台的“失活催化剂”槽、其他加工机器的输出槽或催化装置左侧的出口取出。若放不下本次产生的失活催化剂，精密组装台会等待槽位腾出空间。\n放入用过一部分的同种催化剂时，剩余寿命会并入装填中的那个，空壳会作为失活催化剂送出。放入不同种类时，装填中的会被退回出口并替换。备用为空时点击槽位，可以取出装填中的催化剂。\n在催化反应器中，失活催化剂约 25% 可回收为低一级催化剂的材料。"
   },
   "guide.singulo.catalysts.slots.title": {
     "source": "Catalyst slots and recycling",
@@ -11480,16 +11480,16 @@
     "translation": "用于：粒子加速器"
   },
   "uses.singulo.accelerator_tube": {
-    "source": "Used in: Particle Accelerator",
-    "translation": "用于：粒子加速器"
+    "source": "Used in: Accelerator Controller, Particle Accelerator",
+    "translation": "用于：加速器控制器、粒子加速器"
   },
   "uses.singulo.advanced_android_workbench": {
     "source": "Used in: Quantum Android Workbench",
     "translation": "用于：量子仿生人工作台"
   },
   "uses.singulo.android_backpack_upgrade": {
-    "source": "Used in: Reinforced Backpack Upgrade",
-    "translation": "用于：强化背包升级"
+    "source": "Used in: Reinforced Backpack Upgrade, Autonomous Probe Station",
+    "translation": "用于：强化背包升级、自动探测站"
   },
   "uses.singulo.android_barrier_glass": {
     "source": "Used in: Patterned Android Barrier Glass, Android Barrier Glass Stairs, Android Barrier Glass Slab",
@@ -11528,16 +11528,16 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 56 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 56 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 57 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 57 个"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
-    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 29 个"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 38 more",
+    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 38 个"
   },
   "uses.singulo.empty_black_hole_vessel": {
-    "source": "Used in: Micro Black Hole Vessel",
-    "translation": "用于：微型黑洞容器"
+    "source": "Used in: Micro Black Hole Vessel, Gravitational Containment Tank",
+    "translation": "用于：微型黑洞容器、引力约束罐"
   },
   "uses.singulo.bismuth_crystal_block": {
     "source": "Used in: Glowing Bismuth Crystal",
@@ -11556,8 +11556,8 @@
     "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙、发光黑色强化面板"
   },
   "uses.singulo.blank_data_card": {
-    "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
-    "translation": "用于：数据卡（观测日志）、数据卡（量子数据片段）、数据卡（培养数据）"
+    "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data), Shield Permit",
+    "translation": "用于：数据卡（观测日志）、数据卡（量子数据片段）、数据卡（培养数据）、护盾通行证"
   },
   "uses.singulo.blueprint_lab_building": {
     "source": "Used in: Lab Panel, Lined Lab Panel, Lab Floor Tiles, Lab Frame, Lab Glass and 1 more",
@@ -11596,8 +11596,8 @@
     "translation": "用于：卡西米尔腔"
   },
   "uses.singulo.casimir_cavity_frame": {
-    "source": "Used in: C-Cavity",
-    "translation": "用于：卡西米尔腔"
+    "source": "Used in: Mirror Plate, C-Cavity Controller, C-Cavity Vacuum Pump, C-Cavity Vessel Wall, C-Cavity Magnetic Shield and 2 more",
+    "translation": "用于：镜板、卡西米尔腔控制器、C型腔真空泵、C型腔容器壁、C型腔磁屏蔽 等 2 个"
   },
   "uses.singulo.casimir_cavity_pump": {
     "source": "Used in: C-Cavity",
@@ -11624,8 +11624,8 @@
     "translation": "用于：冷原子"
   },
   "uses.singulo.cold_atoms": {
-    "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Quantum Key",
-    "translation": "用于：玻色凝聚态催化剂、相位同步板、量子锁钥匙"
+    "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Gravity Field Stabilizer, Reactor Stabilizer Coil, Quantum Key",
+    "translation": "用于：玻色凝聚态催化剂、相位同步板、重力场稳定器、炉心稳定线圈、量子锁钥匙"
   },
   "uses.singulo.collapsar_billet": {
     "source": "Used in: Collapsar Ingot, Tidal Filament",
@@ -11664,8 +11664,8 @@
     "translation": "用于：缪子催化核聚变炉、量子计算模块、SMES 模块"
   },
   "uses.singulo.cooling_tower_base": {
-    "source": "Used in: Cryogenic Cooling Tower",
-    "translation": "用于：低温冷却塔"
+    "source": "Used in: Cooling Tower Casing, Cooling Tower Glass, Heat Exchange Core, Cooling Tower Coolant Band, Cooling Tower Rim and 3 more",
+    "translation": "用于：冷却塔外壳、冷却塔玻璃、热交换核心、冷却塔冷却带、冷却塔边缘 等 3 个"
   },
   "uses.singulo.cooling_tower_casing": {
     "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
@@ -11720,8 +11720,8 @@
     "translation": "用于：简并压缩炉"
   },
   "uses.singulo.degenerate_compactor_frame": {
-    "source": "Used in: Degenerate Compactor",
-    "translation": "用于：简并压缩炉"
+    "source": "Used in: Degenerate Compactor Controller, Degenerate Compactor Armor Plate, Degenerate Compactor Ram, Degenerate Compactor Anvil, Degenerate Compactor Cooling Vent and 2 more",
+    "translation": "用于：简并压缩炉控制器、简并压缩炉装甲板、简并压缩炉压头、简并压缩炉砧座、简并压缩炉冷却通风口 等 2 个"
   },
   "uses.singulo.degenerate_compactor_plate": {
     "source": "Used in: Degenerate Compactor",
@@ -11748,8 +11748,8 @@
     "translation": "用于：简并热炉"
   },
   "uses.singulo.degenerate_furnace_frame": {
-    "source": "Used in: Degenerate Furnace",
-    "translation": "用于：简并热炉"
+    "source": "Used in: Degenerate Furnace Shell, Degenerate Furnace Piston, Degenerate Furnace Radiator Fin, Degenerate Furnace Heat Exchange Tube, Degenerate Furnace Window and 2 more",
+    "translation": "用于：简并热炉壳、简并热炉活塞、简并热炉散热片、简并热炉换热管、简并热炉窗 等 2 个"
   },
   "uses.singulo.degenerate_furnace_piston": {
     "source": "Used in: Degenerate Furnace",
@@ -11888,8 +11888,8 @@
     "translation": "用于：吸积喷流锻造炉"
   },
   "uses.singulo.jet_forge_foundation": {
-    "source": "Used in: Accretion Jet Forge",
-    "translation": "用于：吸积喷流锻造炉"
+    "source": "Used in: Jet Forge Core, Accretion Jet Forge",
+    "translation": "用于：喷流锻造炉控制核、吸积喷流锻造炉"
   },
   "uses.singulo.jet_forge_heat_sink": {
     "source": "Used in: Accretion Jet Forge",
@@ -11900,8 +11900,8 @@
     "translation": "用于：吸积喷流锻造炉"
   },
   "uses.singulo.jet_forge_truss": {
-    "source": "Used in: Accretion Jet Forge",
-    "translation": "用于：吸积喷流锻造炉"
+    "source": "Used in: Jet Forge Foundation, Jet Forge Confinement Coil, Jet Forge Collimator Ring, Jet Forge Heat Sink, Jet Forge Levitator and 2 more",
+    "translation": "用于：喷流锻造炉基座、喷流锻造炉约束线圈、喷流锻造炉聚束环、喷流锻造炉吸热板、喷流锻造炉悬浮器 等 2 个"
   },
   "uses.singulo.lab_frame": {
     "source": "Used in: Power Conduit, Body Capsule",
@@ -11948,8 +11948,8 @@
     "translation": "用于：鿭锭"
   },
   "uses.singulo.nihonium_frame": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 15 more",
-    "translation": "用途：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、简并热炉控制器、自动探测站 等 15 项"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 16 more",
+    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、简并热炉控制器、自动探测站 等 16 个"
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
@@ -11996,8 +11996,8 @@
     "translation": "用于：陨铁锭"
   },
   "uses.singulo.reactor_shell": {
-    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 2 more",
-    "translation": "用于：提取端口、炉心稳定线圈、炉心质量警报器、彭罗斯反应堆、奇点封装器 等 2 个"
+    "source": "Used in: Gyro Drive, Extraction Port, Core Controller, Reactor Stabilizer Coil, Reactor Mass Alarm and 4 more",
+    "translation": "用于：陀螺驱动装置、提取端口、炉心控制器、炉心稳定线圈、炉心质量警报器 等 4 个"
   },
   "uses.singulo.reactor_stabilizer": {
     "source": "Used in: P-Reactor, Accretion Jet Forge",
@@ -12052,8 +12052,8 @@
     "translation": "用于：事件视界护盾塔"
   },
   "uses.singulo.shield_tower_plinth": {
-    "source": "Used in: Event Horizon Shield Tower",
-    "translation": "用于：事件视界护盾塔"
+    "source": "Used in: Shield Tower Core, Shield Tower Power Coil, Shield Tower Body, Shield Tower Waveguide, Shield Tower Emitter Crown and 1 more",
+    "translation": "用于：盾塔核心、盾塔电力线圈、盾塔塔身、盾塔波导、盾塔发射冠 等 1 个"
   },
   "uses.singulo.shield_tower_waveguide": {
     "source": "Used in: Event Horizon Shield Tower",
@@ -12072,8 +12072,8 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 100 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 100 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 99 个"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 84 more",
@@ -12108,8 +12108,8 @@
     "translation": "用于：蒂普勒圆柱"
   },
   "uses.singulo.tipler_frame": {
-    "source": "Used in: T-Cylinder",
-    "translation": "用于：蒂普勒圆柱"
+    "source": "Used in: T-Core, T-Cylinder Housing, T-Cylinder Bearing, T-Cylinder Window, T-Cylinder Time Crystal Holder and 1 more",
+    "translation": "用于：蒂普勒核心、蒂普勒圆柱外壳、蒂普勒圆柱轴承、蒂普勒圆柱观察窗、蒂普勒圆柱时间晶体支架 等 1 个"
   },
   "uses.singulo.tipler_holder": {
     "source": "Used in: T-Cylinder",
@@ -12124,8 +12124,8 @@
     "translation": "用于：蒂普勒圆柱"
   },
   "uses.singulo.topological_wire": {
-    "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Magnetic Confinement Ring, Shield Tower Power Coil and 3 more",
-    "translation": "用于：环形线圈、视界总线、陀螺驱动装置、磁约束环、盾塔电力线圈 等 3 个"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Toroidal Magnetic Coil, Horizon Bus, Magnetic Confinement Ring and 4 more",
+    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、环形线圈、视界总线、磁约束环 等 4 个"
   },
   "uses.singulo.toroidal_magnetic_coil": {
     "source": "Used in: SMES Module",
@@ -12148,8 +12148,8 @@
     "translation": "用于：重力场稳定器、虫洞生成器聚焦器、虫洞入口外壳"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 28 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 28 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 29 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 29 个"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel, White Glass Panel Stairs, White Glass Panel Slab",
@@ -12172,8 +12172,8 @@
     "translation": "用于：虫洞生成器"
   },
   "uses.singulo.wormhole_generator_shell": {
-    "source": "Used in: Wormhole Generator Port, Wormhole Generator",
-    "translation": "用于：虫洞生成器端口、虫洞生成器"
+    "source": "Used in: Wormhole Generator Core, Wormhole Generator Field Coil, Wormhole Generator Focuser, Wormhole Generator Window, Wormhole Generator Port and 1 more",
+    "translation": "用于：虫洞生成器核心、虫洞生成器磁场线圈、虫洞生成器聚焦器、虫洞生成器窗口、虫洞生成器端口 等 1 个"
   },
   "uses.singulo.wormhole_generator_window": {
     "source": "Used in: Wormhole Generator",
@@ -13668,8 +13668,8 @@
     "translation": "用途：潮汐纺丝机、虫洞缝合升级、坍缩星并行加工盒、坍缩星内衬、视界仓库 等 1 项"
   },
   "uses.singulo.cosmic_frame": {
-    "source": "Used in: Nuclear Pasta Laminate, Suspension Strut, Spool Cradle",
-    "translation": "用途：核面食层板、悬吊支柱、线轴支座"
+    "source": "Used in: Suspension Reservoir, Nuclear Pasta Laminate, Suspension Crown, Suspension Strut, Pasta Conductor and 2 more",
+    "translation": "用于：重力悬吊储罐、核面食层板、悬吊冠、悬吊支柱、核面食导体 等 2 个"
   },
   "uses.singulo.horizon_bus": {
     "source": "Used in: Nuclear Pasta Accumulator, Pasta Conductor",
@@ -13956,8 +13956,8 @@
     "translation": "制造地：工作台（第 2 阶段）"
   },
   "uses.singulo.vacuum_jacketed_pipe": {
-    "source": "Used in: Superfluid Conduit",
-    "translation": "用于：超流体导管"
+    "source": "Used in: Jet Forge Heat Sink, Superfluid Conduit",
+    "translation": "用于：喷流锻造炉吸热板、超流体导管"
   },
   "desc.singulo.superfluid_conduit": {
     "source": "A clear stage 4 conduit that moves fluid as a frictionless superfluid: 512,000 mB per tick.",
@@ -15766,5 +15766,41 @@
   "gui.singulo.android.store.hint": {
     "source": "The android deposits only items it picks up. If the preferred storage is unavailable, it tries the other kind. Click to switch.",
     "translation": "只自动存放捡到的物品。如果首选存放处不可用，就尝试另一种。点击切换。"
+  },
+  "gui.singulo.assembly.board_hint": {
+    "source": "Place one part per cell as shown in the diagram. Put catalysts in the amber slot. The book on the right shows the diagrams. Androids assemble the same patterns on this grid.",
+    "translation": "按组装图在每格放一个材料，催化剂放入琥珀色槽。点击右侧的书本按钮可查看组装图。仿生人也会在组装盘上按图放置材料。"
+  },
+  "gui.singulo.assembly.diagrams": {
+    "source": "Assembly diagrams",
+    "translation": "组装图"
+  },
+  "gui.singulo.assembly.diagrams_hint": {
+    "source": "Hover over a product to see its diagram. Click it to keep the diagram on this button.",
+    "translation": "将鼠标悬停在产品上可查看组装图。点击产品即可将该图固定在此按钮上。"
+  },
+  "gui.singulo.assembly.preview": {
+    "source": "Assembly preview · Collect after processing",
+    "translation": "组装结果预览。加工完成后即可取出。"
+  },
+  "gui.singulo.reason.label.misplaced": {
+    "source": "Check pattern",
+    "translation": "检查摆放位置"
+  },
+  "uses.singulo.genesis_frame": {
+    "source": "Used in: Genesis Core, Genesis Pylon",
+    "translation": "用于：创世炉核心、创世炉支柱"
+  },
+  "uses.singulo.pasta_laminate": {
+    "source": "Used in: Nuclear Pasta Accumulator",
+    "translation": "用于：核面食层叠储能库"
+  },
+  "uses.singulo.superconducting_cable": {
+    "source": "Used in: Inertial Control Gauntlet",
+    "translation": "用于：惯性控制手套"
+  },
+  "uses.singulo.tidal_draw_ring": {
+    "source": "Used in: Tidal Spindle",
+    "translation": "用于：潮汐纺丝机"
   }
 }

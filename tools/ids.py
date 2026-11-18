@@ -617,6 +617,13 @@ ALIAS_RECIPE_IDS = {
     '鍾乳石（潮汐紡糸）': 'pointed_dripstone_from_tidal_spindle',
 }
 
+# 通常版と同じ部品を2回分まとめて組む精密組立レシピ。
+PAIRED_ASSEMBLY_PARTS = ('縮退圧縮炉フレーム', 'C空洞フレーム', '縮退熱炉フレーム', '鏡面プレート')
+for _part in PAIRED_ASSEMBLY_PARTS:
+    _variant = f'{_part}（2回分）'
+    OUTPUT_ALIASES[_variant] = 'singulo:' + MOD[_part][0]
+    ALIAS_RECIPE_IDS[_variant] = MOD[_part][0] + '_pair'
+
 # 成果物と一緒に出る副産物: レシピ名 → (副産物, 個数)
 BYPRODUCTS = {
     '銅インゴット（精錬）': ('ビスマスインゴット', 1),
@@ -799,6 +806,9 @@ SPENT = {
 }
 # 失活品でも材料にできる組み合わせ（成果物, 材料の触媒）。材料はタグ singulo:<触媒ID>s で受ける
 ACCEPTS_SPENT = {('BE凝縮触媒', 'ミュオン触媒')}
+
+# レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）。
+CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
 
 # マルチブロックの大きさの下限（冷却塔の高さなど）があるレシピ
 MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ': 10, 'ニホニウム': 16}

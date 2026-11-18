@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
@@ -43,8 +44,23 @@ import net.neoforged.neoforge.fluids.FluidStack;
  */
 public record MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
                             List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
-                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
+                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct,
+                            List<String> shape)
         implements Recipe<MachineRecipe.Input> {
+
+    public static final int ASSEMBLY_CELLS = 21;
+    public static final int BOARD_EMPTY = -1, BOARD_RESTORE = -2;
+
+    public MachineRecipe {
+        shape = List.copyOf(shape);
+    }
+
+    public MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
+                         List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
+                         ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct) {
+        this(station, stage, time, energy, ingredients, fluidIngredients, mass, restore, result, fluidResults,
+                minSize, priority, byproduct, List.of());
+    }
 
     /**
      * アイテム材料。tier &gt; 0 は触媒の寿命で払う材料で、ingredient（そのティアの触媒）のほか、上位の触媒でも払える。
@@ -129,7 +145,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
      */
     public record Plan(int[] consume, int[] uses, int restoreSlot, double speed) {}
 
-    public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+    public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.<MachineRecipe>mapCodec(i -> i.group(
             Codec.STRING.fieldOf("station").forGetter(MachineRecipe::station),
             Codec.INT.optionalFieldOf("stage", 1).forGetter(MachineRecipe::stage),
             Codec.INT.fieldOf("time").forGetter(MachineRecipe::time),
@@ -142,8 +158,9 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             FluidStack.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
             Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
             Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority),
-            ItemStack.CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(MachineRecipe::byproduct)
-    ).apply(i, MachineRecipe::new));
+            ItemStack.CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(MachineRecipe::byproduct),
+            Codec.STRING.listOf().optionalFieldOf("shape", List.of()).forGetter(MachineRecipe::shape)
+    ).apply(i, MachineRecipe::new)).validate(MachineRecipe::validateAssemblyShape);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, r) -> {
@@ -160,6 +177,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 buf.writeVarInt(r.minSize);
                 buf.writeVarInt(r.priority);
                 ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, r.byproduct);
+                buf.writeCollection(r.shape, (b, row) -> b.writeUtf(row, 5));
             },
             buf -> new MachineRecipe(
                     buf.readUtf(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
@@ -171,7 +189,139 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                     FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
                     buf.readVarInt(),
                     buf.readVarInt(),
-                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf)));
+                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), buf.readList(b -> b.readUtf(5))));
+
+    public boolean hasAssemblyShape() {
+        return !shape.isEmpty();
+    }
+
+    public boolean assemblyCatalyst(ItemInput input) {
+        if (hasAssemblyShape()) return input.uses() > 0;
+        return input.tier() > 0 || java.util.Arrays.stream(input.ingredient().getItems())
+                .anyMatch(stack -> CatalystHelper.tierOf(stack) > 0);
+    }
+
+    /** Can this recipe be laid out once on the assembly board and its single catalyst slot? */
+    public boolean fitsAssemblyBoard() {
+        if (!station.equals("precision_assembler") || mass.isPresent() || !fluidIngredients.isEmpty() || !fluidResults.isEmpty()) return false;
+        if (hasAssemblyShape()) return true;
+        long cells = restore.isPresent() ? 1 : 0;
+        boolean catalyst = false;
+        for (ItemInput input : ingredients) {
+            if (assemblyCatalyst(input)) {
+                if (catalyst || input.uses() <= 0 && input.count() != 1) return false;
+                catalyst = true;
+            } else {
+                cells += input.uses() > 0 ? 1 : input.count();
+            }
+        }
+        return cells <= ASSEMBLY_CELLS;
+    }
+
+    /** For shapeless datapacks, lay out one unit per cell in ingredient order, followed by the restoration item. */
+    public int boardIngredientIndex(int cell) {
+        if (cell < 0 || cell >= ASSEMBLY_CELLS) return BOARD_EMPTY;
+        if (hasAssemblyShape()) return assemblyIngredientIndex(cell);
+        for (int i = 0; i < ingredients.size(); i++) {
+            ItemInput input = ingredients.get(i);
+            if (assemblyCatalyst(input)) continue;
+            int count = input.uses() > 0 ? 1 : input.count();
+            if (cell < count) return i;
+            cell -= count;
+        }
+        return cell == 0 && restore.isPresent() ? BOARD_RESTORE : BOARD_EMPTY;
+    }
+
+    /** Convert a board slot to a row-major five-by-five square, skipping the four corners. */
+    public static int assemblySquare(int gridSlot) {
+        if (gridSlot < 0 || gridSlot >= ASSEMBLY_CELLS) return -1;
+        return gridSlot + (gridSlot < 3 ? 1 : gridSlot < 18 ? 2 : 3);
+    }
+
+    public int assemblyIngredientIndex(int gridSlot) {
+        int square = assemblySquare(gridSlot);
+        if (!hasAssemblyShape() || square < 0) return -1;
+        char symbol = shape.get(square / 5).charAt(square % 5);
+        return symbol == ' ' ? -1 : symbol - 'A';
+    }
+
+    @Nullable
+    public ItemInput assemblyInput(int gridSlot) {
+        int index = assemblyIngredientIndex(gridSlot);
+        return index < 0 ? null : ingredients.get(index);
+    }
+
+    private DataResult<MachineRecipe> validateAssemblyShape() {
+        if (!hasAssemblyShape()) return DataResult.success(this);
+        if (!station.equals("precision_assembler") || restore.isPresent() || mass.isPresent())
+            return DataResult.error(() -> "shape requires a precision assembler recipe without restore or mass");
+        if (shape.size() != 5 || shape.stream().anyMatch(row -> row.length() != 5))
+            return DataResult.error(() -> "shape must have five rows of five characters");
+        int[] counts = new int[ingredients.size()];
+        for (int y = 0; y < 5; y++) for (int x = 0; x < 5; x++) {
+            char cell = shape.get(y).charAt(x);
+            if (cell == ' ') continue;
+            if ((x == 0 || x == 4) && (y == 0 || y == 4))
+                return DataResult.error(() -> "The four corners of an assembly shape must be empty");
+            int index = cell - 'A';
+            if (cell < 'A' || cell > 'Z' || index >= counts.length)
+                return DataResult.error(() -> "Unknown assembly ingredient symbol: " + cell);
+            counts[index]++;
+        }
+        int catalysts = 0;
+        for (int i = 0; i < counts.length; i++) {
+            ItemInput input = ingredients.get(i);
+            if (input.uses > 0) catalysts++;
+            if (counts[i] != (input.uses > 0 ? 0 : input.count))
+                return DataResult.error(() -> "Assembly cell counts must match the consumed ingredients");
+        }
+        if (catalysts > 1) return DataResult.error(() -> "The assembly board has one catalyst slot");
+        return DataResult.success(this);
+    }
+
+    /** The 21 physical assembly cells in row order, followed by the active catalyst. */
+    @Nullable
+    public Plan assemblyPlan(List<ItemStack> boardWithCatalyst) {
+        if (boardWithCatalyst.size() != ASSEMBLY_CELLS + 1) return null;
+        if (!hasAssemblyShape()) {
+            Plan shapeless = plan(boardWithCatalyst);
+            if (shapeless == null) return null;
+            for (int i = 0; i < ASSEMBLY_CELLS; i++) {
+                ItemStack stack = boardWithCatalyst.get(i);
+                if (stack.getCount() > 1 || !stack.isEmpty() && shapeless.consume[i] == 0 && shapeless.uses[i] == 0) return null;
+            }
+            return shapeless;
+        }
+        if (!matchesAssemblyMaterials(boardWithCatalyst)) return null;
+        double speed = 1;
+        int cost = 0;
+        ItemStack catalyst = boardWithCatalyst.get(ASSEMBLY_CELLS);
+        for (ItemInput input : ingredients) {
+            if (input.uses <= 0) continue;
+            cost = input.usesFrom(catalyst);
+            if (cost == 0) return null;
+            if (input.tier > 0) speed = CatalystHelper.higherSpeed(CatalystHelper.tierOf(catalyst) - input.tier);
+        }
+        int[] consume = new int[boardWithCatalyst.size()], uses = new int[boardWithCatalyst.size()];
+        for (int i = 0; i < ASSEMBLY_CELLS; i++) if (!boardWithCatalyst.get(i).isEmpty()) consume[i] = 1;
+        uses[ASSEMBLY_CELLS] = cost;
+        return new Plan(consume, uses, -1, speed);
+    }
+
+    /** Check the physical diagram independently of the separately loaded catalyst. */
+    public boolean matchesAssemblyMaterials(List<ItemStack> board) {
+        if (!hasAssemblyShape() || board.size() < ASSEMBLY_CELLS) return false;
+        for (int i = 0; i < ASSEMBLY_CELLS; i++) {
+            ItemInput part = assemblyInput(i);
+            ItemStack stack = board.get(i);
+            if (part == null ? !stack.isEmpty() : stack.getCount() != 1 || !part.ingredient.test(stack)) return false;
+        }
+        return true;
+    }
+
+    public boolean canRestoreFrom(ItemStack stack) {
+        return restore.isPresent() && restore.get().test(stack) && UsesHelper.canRestore(stack);
+    }
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
@@ -188,7 +338,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
         if (restore.isPresent()) {
             for (int i = 0; i < n; i++) {
                 ItemStack s = slots.get(i);
-                if (!claimed[i] && restore.get().test(s) && UsesHelper.canRestore(s)) {
+                if (!claimed[i] && canRestoreFrom(s)) {
                     restoreSlot = i;
                     claimed[i] = true;
                     consume[i] = 1;

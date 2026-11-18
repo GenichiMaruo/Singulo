@@ -21,27 +21,43 @@ public final class MachineRecipeTransfer {
     public static Plan plan(MachineMenu menu, MachineRecipe recipe, boolean maxTransfer) {
         if (!menu.type().id().equals(recipe.station()) || recipe.mass().isPresent()) return null;
         List<Integer> slots = new ArrayList<>();
-        for (int i = 0; i < menu.type().inputSlots(); i++) slots.add(i);
+        List<Need> needs = new ArrayList<>();
+        boolean board = menu.type() == MachineType.PRECISION_ASSEMBLER;
+        if (board) {
+            if (!recipe.fitsAssemblyBoard()) return null;
+            for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                int slot = menu.assemblySlot(cell);
+                slots.add(slot);
+                int index = recipe.boardIngredientIndex(cell);
+                if (index == MachineRecipe.BOARD_RESTORE) {
+                    needs.add(new Need(slot, 1, true, recipe::canRestoreFrom));
+                } else if (index >= 0) {
+                    var part = recipe.ingredients().get(index);
+                    needs.add(new Need(slot, 1, part.uses() > 0, part.uses() > 0
+                            ? stack -> part.usesFrom(stack.copyWithCount(1)) > 0 : part.ingredient()::test));
+                }
+            }
+        } else {
+            for (int i = 0; i < menu.type().inputSlots(); i++) slots.add(i);
+        }
         // The catalyst reserve is only rewritten when the recipe needs a catalyst that is not already there,
         // so reserves stocked for later recipes stay in the machine.
-        List<Need> needs = new ArrayList<>();
         int input = 0;
         boolean catalystUsed = false;
         for (MachineRecipe.ItemInput ingredient : recipe.ingredients()) {
-            boolean catalyst = menu.type().hasCatalystSlot()
+            if (board && !recipe.assemblyCatalyst(ingredient)) continue;
+            boolean catalyst = board || menu.type().hasCatalystSlot()
                     && Arrays.stream(ingredient.ingredient().getItems()).anyMatch(s -> CatalystHelper.tierOf(s) > 0);
             int target;
             if (catalyst) {
                 if (catalystUsed) return null;
                 catalystUsed = true;
                 target = menu.type().catalystSlot();
-                if (ingredient.uses() > 0 && ingredient.usesFrom(menu.loadedCatalyst()) > 0) {
-                    continue;
-                }
                 // A stocked reserve that can pay by uses already serves every batch. Whole-item catalysts are planned
                 // per batch; allocate() keeps at least the stocked reserve in the slot.
                 ItemStack reserve = menu.getSlot(target).getItem();
-                if (ingredient.uses() > 0 && !reserve.isEmpty() && ingredient.usesFrom(reserve.copyWithCount(1)) > 0) {
+                if (ingredient.uses() > 0 && (ingredient.usesFrom(CatalystMagazine.pooled(menu.loadedCatalyst(), reserve)) > 0
+                        || ingredient.usesFrom(reserve.copyWithCount(1)) > 0)) {
                     continue;
                 }
                 slots.add(target);
@@ -53,9 +69,9 @@ public final class MachineRecipeTransfer {
             needs.add(new Need(target, ingredient.uses() > 0 ? 1 : Math.max(1, ingredient.count()), ingredient.uses() > 0, stack -> ingredient.uses() > 0
                     ? ingredient.usesFrom(stack.copyWithCount(1)) > 0 : ingredient.ingredient().test(stack)));
         }
-        if (recipe.restore().isPresent()) {
+        if (!board && recipe.restore().isPresent()) {
             if (input >= menu.type().inputSlots()) return null;
-            needs.add(new Need(input, 1, true, recipe.restore().get()::test));
+            needs.add(new Need(input, 1, true, recipe::canRestoreFrom));
         }
         if (needs.isEmpty()) return null; // Fluid-only recipes have no items to transfer.
         Plan best = null;
@@ -63,8 +79,9 @@ public final class MachineRecipeTransfer {
         int[] budget = {8192};
         List<ItemStack> pool = new ArrayList<>();
         for (int slot : slots) pool.add(menu.getSlot(slot).getItem().copy());
-        for (int i = 0; i < 36; i++) pool.add(menu.getSlot(menu.type().itemSlots() + i).getItem().copy());
-        for (int batches = 1; batches <= (maxTransfer ? 64 : 1) && budget[0] > 0; batches++) {
+        for (int i = 0; i < 36; i++) pool.add(menu.getSlot(menu.playerSlotStart() + i).getItem().copy());
+        int batchLimit = maxTransfer && !board ? 64 : 1;
+        for (int batches = 1; batches <= batchLimit && budget[0] > 0; batches++) {
             Plan next = allocate(menu, slots, needs, 0, batches, pool, new int[pool.size()], new ItemStack[slots.size()], budget);
             // A small count can fail where a larger one fits (moving a whole stack frees inventory space),
             // but once a count fits, a larger count that fails means the materials or the slot ran out.
@@ -100,7 +117,8 @@ public final class MachineRecipeTransfer {
         List<ItemStack> tried = new ArrayList<>();
         for (int candidate = 0; candidate < pool.size(); candidate++) {
             ItemStack sample = pool.get(candidate);
-            if (sample.getCount() - used[candidate] <= 0 || !need.matches().test(sample) || !target.mayPlace(sample)) continue;
+            if (sample.getCount() - used[candidate] <= 0 || !need.matches().test(sample)) continue;
+            if (!target.mayPlace(sample)) continue;
             if (tried.stream().anyMatch(s -> ItemStack.isSameItemSameComponents(s, sample))) continue;
             tried.add(sample);
             long requested = (long) need.count() * (need.reusable() ? 1 : batches);
@@ -151,7 +169,7 @@ public final class MachineRecipeTransfer {
 
     public static void apply(MachineMenu menu, Plan plan) {
         for (int i = 0; i < plan.slots().size(); i++) menu.getSlot(plan.slots().get(i)).set(plan.items().get(i));
-        for (int i = 0; i < 36; i++) menu.getSlot(menu.type().itemSlots() + i).set(plan.inventory().get(i));
+        for (int i = 0; i < 36; i++) menu.getSlot(menu.playerSlotStart() + i).set(plan.inventory().get(i));
         menu.broadcastChanges();
     }
 }

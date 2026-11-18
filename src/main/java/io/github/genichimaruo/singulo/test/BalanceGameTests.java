@@ -17,6 +17,7 @@ import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import io.github.genichimaruo.singulo.ruin.HorizonWarden;
 import io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity;
 import io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity;
+import io.github.genichimaruo.singulo.test.harness.AssemblyFixture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.items.IItemHandler;
 
 /** 0.3.1 の調整（時間結晶モジュール・満充電の待機・アンカーの上限・設定の当てはめ）の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -50,25 +50,19 @@ public final class BalanceGameTests {
         return m;
     }
 
-    /** 搬入（ホッパーやパイプと同じ口）から入れる。入り切らなければ失敗。 */
-    private static void insert(GameTestHelper helper, IItemHandler handler, ItemStack stack) {
-        ItemStack rest = stack;
-        for (int i = 0; i < handler.getSlots() && !rest.isEmpty(); i++) {
-            rest = handler.insertItem(i, rest, false);
-        }
-        helper.assertTrue(rest.isEmpty(), "搬入で入らない: " + stack);
+    private static void placeTimeCrystalModule(GameTestHelper helper, MachineBlockEntity machine) {
+        AssemblyFixture.place(helper, machine, "time_crystal_module", new ItemStack(item("optical_lattice_substrate")),
+                new ItemStack(item("steel_plate"), 2));
     }
 
     // ------------------------------------------------------------------ 時間結晶モジュール（複数の時間結晶を要る設備）
 
     @GameTest(template = EMPTY, timeoutTicks = 400)
-    public static void coreControllerFromModulesByNormalInsertion(GameTestHelper helper) {
+    public static void coreControllerFromModulesOnAssemblyBoard(GameTestHelper helper) {
         MachineBlockEntity m = assembler(helper, new BlockPos(2, 1, 2));
-        IItemHandler auto = m.automationItems();
-        insert(helper, auto, new ItemStack(item("nihonium_frame")));
-        insert(helper, auto, new ItemStack(item("quantum_computing_module"), 2));
-        insert(helper, auto, new ItemStack(item("time_crystal_module"), 4));
-        insert(helper, auto, new ItemStack(item("gravity_field_stabilizer"), 2));
+        AssemblyFixture.place(helper, m, "reactor_core_controller", new ItemStack(item("nihonium_frame")),
+                new ItemStack(item("quantum_computing_module"), 2), new ItemStack(item("time_crystal_module"), 4),
+                new ItemStack(item("gravity_field_stabilizer"), 2), new ItemStack(item("reactor_shell")));
         helper.succeedWhen(() -> helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).is(item("reactor_core_controller")),
                 "時間結晶モジュール4個を普通に入れて炉心制御装置ができない"));
     }
@@ -82,8 +76,7 @@ public final class BalanceGameTests {
         ItemStack worn = new ItemStack(item("time_crystal_catalyst"));
         worn.set(SinguloComponents.USES.get(), new UsesData(max / 2, max, 0));      // 残り半分（22.5分）
         for (MachineBlockEntity m : List.of(fresh, weak)) {
-            m.items().insertItem(0, new ItemStack(item("optical_lattice_substrate")), false);
-            m.items().insertItem(1, new ItemStack(item("steel_plate"), 2), false);
+            placeTimeCrystalModule(helper, m);
         }
         helper.assertTrue(fresh.items().insertItem(fresh.type().catalystSlot(), good, false).isEmpty(), "触媒枠に入らない");
         helper.assertTrue(weak.items().insertItem(weak.type().catalystSlot(), worn, false).isEmpty(), "触媒枠に入らない");
@@ -314,27 +307,18 @@ public final class BalanceGameTests {
     public static void timeCrystalModulesContinueIntoTheNextCatalyst(GameTestHelper helper) {
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
         int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
-        m.items().insertItem(0, new ItemStack(item("optical_lattice_substrate"), 2), false);
-        m.items().insertItem(1, new ItemStack(item("steel_plate"), 4), false);
+        placeTimeCrystalModule(helper, m);
         helper.assertTrue(m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("time_crystal_catalyst"), 2), false).isEmpty(),
                 "時間結晶触媒2個を予備に積めない");
-        helper.succeedWhen(() -> {
-            int made = 0;
-            int spent = 0;
-            for (int k = 0; k < m.type().outputSlots(); k++) {
-                ItemStack out = m.items().getStackInSlot(m.type().outputSlot() + k);
-                made += out.is(item("time_crystal_module")) ? out.getCount() : 0;
-                spent += out.is(item("spent_time_crystal_catalyst")) ? out.getCount() : 0;
-            }
-            // 出力スロットがモジュールでふさがっていれば、失活触媒は装置の中で出口が空くのを待つ
-            for (ItemStack waiting : m.magazine().contents()) {
-                spent += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
-            }
-            helper.assertTrue(made == 8, "残りと次の触媒を合わせて、続けて作れない: " + made);
-            helper.assertTrue(spent == 1, "使い切った1個目が失活触媒として出ない: " + spent);
+        helper.startSequence().thenWaitUntil(() -> helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).getCount() == 4,
+                "1回目の時間結晶モジュールが完成しない")).thenExecute(() -> placeTimeCrystalModule(helper, m)).thenWaitUntil(() -> {
+            ItemStack modules = m.items().getStackInSlot(m.type().outputSlot());
+            ItemStack shell = m.items().getStackInSlot(m.type().spentCatalystSlot());
+            helper.assertTrue(modules.is(item("time_crystal_module")) && modules.getCount() == 8, "残りと次の触媒を合わせて、続けて作れない");
+            helper.assertTrue(shell.is(item("spent_time_crystal_catalyst")) && shell.getCount() == 1, "使い切った1個目が失活触媒の枠に出ない");
             helper.assertTrue(UsesHelper.remaining(m.catalyst()) == 2 * max - 72_000,
                     "2個目の触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
-        });
+        }).thenSucceed();
     }
 
     /** 触媒を寿命で使うレシピは上位の触媒でも払える（1段ごとに使用回数−20%・速さ+25%）。下位の触媒では払えず、両方あれば下位で払う。 */
@@ -360,10 +344,9 @@ public final class BalanceGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void machineKeyCatalystIsPaidFromTheSlot(GameTestHelper helper) {
         MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
-        m.items().insertItem(0, new ItemStack(item("basic_frame")), false);
-        m.items().insertItem(1, new ItemStack(item("quantum_computing_module")), false);
-        m.items().insertItem(2, new ItemStack(item("superconducting_coil"), 4), false);
-        m.items().insertItem(3, new ItemStack(item("steel_plate"), 4), false);
+        AssemblyFixture.place(helper, m, "quantum_heat_engine", new ItemStack(item("basic_frame")),
+                new ItemStack(item("quantum_computing_module")), new ItemStack(item("superconducting_coil"), 4),
+                new ItemStack(item("steel_plate"), 4));
         int max = UsesHelper.get(new ItemStack(item("bose_condensate_catalyst"))).max();
         helper.assertTrue(m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("bose_condensate_catalyst")), false).isEmpty(),
                 "BE凝縮触媒を触媒スロットに入れられない");
@@ -381,7 +364,9 @@ public final class BalanceGameTests {
     /** 予備が新品で埋まっていても、搬入した使いかけの触媒を受け取る: 装填中のものを満タンにして予備へ重ね、使いかけの残りを先に使う。 */
     @GameTest(template = EMPTY)
     public static void automationMergesPartlyUsedCatalyst(GameTestHelper helper) {
-        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.LASER_COOLER).get());
+        MachineBlockEntity m = helper.getBlockEntity(pos);
         int slot = m.type().catalystSlot();
         int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
         ItemStack worn = new ItemStack(item("time_crystal_catalyst"));

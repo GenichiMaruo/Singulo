@@ -4,7 +4,7 @@
   "pattern": [
     "GQG",
     "RNR",
-    "MQM"
+    "MFM"
   ],
   "key": {
     "G": {
@@ -21,6 +21,9 @@
     },
     "M": {
       "item": "singulo:time_crystal_module"
+    },
+    "F": {
+      "item": "singulo:jet_forge_foundation"
     }
   },
   "result": {

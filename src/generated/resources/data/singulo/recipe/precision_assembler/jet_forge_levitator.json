@@ -22,7 +22,20 @@
         "item": "singulo:entangled_element"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:jet_forge_truss"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  C  ",
+    " BDB ",
+    "  A  ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_levitator",

@@ -4,7 +4,7 @@
   "pattern": [
     "PGP",
     "GCG",
-    "PGP"
+    "PFP"
   ],
   "key": {
     "P": {
@@ -15,6 +15,9 @@
     },
     "C": {
       "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
     }
   },
   "result": {

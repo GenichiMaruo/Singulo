@@ -53,14 +53,16 @@ final class MachineTransferHandler implements IRecipeTransferHandler<MachineMenu
         if (menu.type() != type || id == null || recipe.mass().isPresent()
                 || (recipe.ingredients().isEmpty() && recipe.restore().isEmpty())) return helper.createInternalError();
         // The server selects the recipe before moving items; one the machine cannot select would silently do nothing
-        if (menu.type().selectsRecipe() && io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(player.level(), menu.type(), id) < 0) {
+        if (menu.type().selectsRecipe()
+                && io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(player.level(), menu.type(), id) < 0) {
             return helper.createInternalError();
         }
-        if (MachineRecipeTransfer.plan(menu, recipe, maxTransfer) == null) {
+        boolean bulk = maxTransfer && menu.type() != MachineType.PRECISION_ASSEMBLER;
+        if (MachineRecipeTransfer.plan(menu, recipe, bulk) == null) {
             return helper.createUserErrorWithTooltip(Component.translatable("jei.tooltip.error.recipe.transfer.missing")
                     .append(" / ").append(Component.translatable("jei.tooltip.error.recipe.transfer.inventory.full")));
         }
-        if (doTransfer) PacketDistributor.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, maxTransfer));
+        if (doTransfer) PacketDistributor.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, bulk));
         return null;
     }
 }

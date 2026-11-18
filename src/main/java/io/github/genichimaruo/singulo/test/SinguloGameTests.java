@@ -95,13 +95,13 @@ public final class SinguloGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void assemblerMakesQuantumModule(GameTestHelper helper) {
         MachineBlockEntity assembler = machine(helper, MachineType.PRECISION_ASSEMBLER);
-        assembler.items().setStackInSlot(0, new ItemStack(item("entangled_element"), 5));
-        assembler.items().setStackInSlot(5, new ItemStack(item("basic_circuit")));
-        assembler.items().setStackInSlot(4, new ItemStack(item("coolant_cartridge")));
+        var entangled = new ItemStack(item("entangled_element"), 5);
+        io.github.genichimaruo.singulo.test.harness.AssemblyFixture.place(helper, assembler, "quantum_computing_module", entangled,
+                new ItemStack(item("basic_circuit")), new ItemStack(item("coolant_cartridge")));
         helper.succeedWhen(() -> {
             helper.assertTrue(assembler.items().getStackInSlot(assembler.type().outputSlot()).is(item("quantum_computing_module")),
                     "量子演算モジュールが出ない");
-            helper.assertTrue(assembler.items().getStackInSlot(0).getCount() == 1, "量子もつれ素子を4個だけ使うはず");
+            helper.assertTrue(entangled.getCount() == 1, "量子もつれ素子を4個だけ使うはず");
         });
     }
 

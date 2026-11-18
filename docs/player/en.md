@@ -17,7 +17,7 @@ Superconductivity, particle accelerators, the Casimir effect and Hawking radiati
 - **Minecraft 1.21.1**, with a compatible **NeoForge 21.1.256 or later** build for that Minecraft version. Minecraft runs on Java 21.
 - Put the Singulo JAR in `mods/`. Multiplayer needs the mod on both the client and server.
 - JEI is optional. Its integration shows machine recipes and multiblock construction information.
-- With a machine screen open, JEI's + button moves one recipe's item ingredients from your inventory. Shift-click transfers as many sets as fit. Catalysts go into their dedicated slot; the Precision Assembler and Singularity Encapsulator also select that recipe. Supply fluids and compressor mass separately.
+- JEI’s + button transfers ingredients from your inventory. On a Precision Assembler it lays out one set of parts and supplies the separate catalyst slot. On other processing machines, Shift-click transfers as many sets as fit. Supply fluids and compressor mass separately.
 - Singulo supplies energy cables and Fluid Pipes for liquids and gases, so no other mod is needed. Compatible transport mods can provide item pipes.
 
 For building from source, see the [development instructions in the README](../../README.md#開発するには).
@@ -254,7 +254,7 @@ Restored parts and original records exhausted during processing become item outp
 
 The Precision Assembler normally stores 100,000 FE and accepts up to 4,000,000 FE per reception. Install one Capacity Upgrade Mk1, Mk2 or Mk3 in the dedicated slot on the right rail for 1,000,000, 4,000,000 or 40,000,000 FE. Craft Mk1 on a crafting table using stage 2 materials. Make Mk2 and Mk3 in the assembler using the previous tier as an ingredient. The separate slot supports speed upgrades at the same time, and intake limits stay unchanged. Removing or replacing an upgrade preserves surplus charge, including charge from older versions, and blocks further reception until the buffer falls below capacity. Recipes whose per-tick cost exceeds the normal buffer, such as the Mk3 sensitivity module, require a capacity upgrade; JEI shows this requirement.
 
-Without a chosen recipe, the Precision Assembler starts crafting when the kinds of items inside exactly match a recipe. A mix that could also be part of another recipe starts only after items have stopped going in for 3 seconds. Choose a recipe with the button below the output slot to craft only that one; the choice is saved, and other items may be present. Androids select their recorded recipe before inserting materials. The Singularity Encapsulator works the same way.
+To assemble by hand, place one item per cell following the pattern. Hover over a product in the assembler’s recipe list to see the pattern, or look it up in JEI. The board has 21 cells in a 5×5 square with the four corners removed. Put the catalyst in its dedicated slot. Once the layout is complete and the machine has enough power, it processes the parts and places the product in the output slot. JEI’s + button lays out one batch from your inventory. Androids use their processing cards to place parts on the same board. Spent catalysts go to their own output slot. Pipes and hoppers can extract products and spent catalysts. The Singularity Encapsulator still accepts a selected recipe or matches its inputs, waiting three seconds if another recipe might still be loading.
 
 ## Facility blueprints
 

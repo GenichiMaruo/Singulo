@@ -1,6 +1,9 @@
 package io.github.genichimaruo.singulo.compat.jei;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.client.AssemblySelectorReview;
+import io.github.genichimaruo.singulo.client.MachineScreen;
+import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import java.nio.file.Files;
@@ -19,6 +22,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class JeiReviewHarness {
@@ -26,6 +30,9 @@ public final class JeiReviewHarness {
     private static int ticks, language, frames;
     private static ReviewScreen screen;
     private static int transferPhase, transferTicks;
+    private static final List<String> ASSEMBLIES = List.of("android_work_console", "android_station",
+            "android_tank_upgrade", "wormhole_generator_core", "casimir_cavity_frame");
+    private static int assembly;
     private static volatile boolean transferVerified;
     private static MachineRecipe transferRecipe;
     private static net.minecraft.resources.ResourceLocation transferId;
@@ -34,7 +41,13 @@ public final class JeiReviewHarness {
     @SubscribeEvent
     public static void rendered(RenderFrameEvent.Post event) {
         if (Minecraft.getInstance().screen == screen) frames++;
+        AssemblySelectorReview.rendered();
         io.github.genichimaruo.singulo.client.CapacityUpgradeReview.rendered();
+    }
+
+    @SubscribeEvent
+    public static void tooltip(RenderTooltipEvent.Color event) {
+        AssemblySelectorReview.tooltip(event);
     }
 
     @SubscribeEvent
@@ -71,19 +84,26 @@ public final class JeiReviewHarness {
     @SuppressWarnings("removal")
     private static void checkTransfer(Minecraft mc) throws Exception {
         if (transferPhase == 1) {
-            transferRecipe = SinguloJeiPlugin.RECIPE_IDS.keySet().stream()
-                    .filter(r -> r.station().equals("precision_assembler") && !r.ingredients().isEmpty()
-                            && r.ingredients().stream().allMatch(i -> i.uses() == 0 && i.tier() == 0)
-                            && r.restore().isEmpty() && r.mass().isEmpty() && r.fluidIngredients().isEmpty())
-                    .min(java.util.Comparator.comparingInt(r -> r.ingredients().size())).orElseThrow();
-            transferId = SinguloJeiPlugin.RECIPE_IDS.get(transferRecipe);
+            transferId = Singulo.id("precision_assembler/" + ASSEMBLIES.get(assembly));
+            AssemblySelectorReview.expect(transferId);
+            transferRecipe = SinguloJeiPlugin.RECIPE_IDS.entrySet().stream().filter(e -> e.getValue().equals(transferId))
+                    .findFirst().orElseThrow().getKey();
+            mc.getLanguageManager().setSelected("ja_jp");
+            mc.getLanguageManager().onResourceManagerReload(mc.getResourceManager());
+            transferTicks = 0;
+            transferVerified = false;
             var playerId = mc.player.getUUID();
             mc.getSingleplayerServer().execute(() -> {
                 var player = mc.getSingleplayerServer().getPlayerList().getPlayer(playerId);
                 player.getInventory().clearContent();
                 for (int i = 0; i < transferRecipe.ingredients().size(); i++) {
                     var ingredient = transferRecipe.ingredients().get(i);
-                    player.getInventory().setItem(i, ingredient.ingredient().getItems()[0].copyWithCount(ingredient.count()));
+                    var stack = ingredient.ingredient().getItems()[0].copyWithCount(ingredient.count());
+                    if (ingredient.uses() > 0) {
+                        if (ingredient.usesFrom(stack) != 750) throw new IllegalStateException("Expected one 750-use cavity frame batch");
+                        stack = UsesHelper.consume(stack, UsesHelper.remaining(stack) - 750);
+                    }
+                    player.getInventory().setItem(i, stack);
                 }
                 player.teleportTo(1.5, 80, 1.5);
                 for (var floor : net.minecraft.core.BlockPos.betweenClosed(-2, 79, -2, 3, 79, 3))
@@ -91,8 +111,12 @@ public final class JeiReviewHarness {
                 player.serverLevel().setBlockAndUpdate(STATION, io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES
                         .get(MachineType.PRECISION_ASSEMBLER).get().defaultBlockState());
                 var machine = (io.github.genichimaruo.singulo.machine.MachineBlockEntity) player.serverLevel().getBlockEntity(STATION);
+                machine.magazine().load(new net.minecraft.nbt.CompoundTag(), player.registryAccess());
                 for (int i = 0; i < machine.items().getSlots(); i++)
                     machine.items().setStackInSlot(i, net.minecraft.world.item.ItemStack.EMPTY);
+                for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
+                    machine.assemblyGrid().setStackInSlot(i, net.minecraft.world.item.ItemStack.EMPTY);
+                machine.energy().setEnergy(0);
                 machine.openMenu(player);
             });
             transferPhase = 2;
@@ -112,25 +136,54 @@ public final class JeiReviewHarness {
             mc.getSingleplayerServer().execute(() -> {
                 var player = mc.getSingleplayerServer().getPlayerList().getPlayer(playerId);
                 var machine = (io.github.genichimaruo.singulo.machine.MachineBlockEntity) player.serverLevel().getBlockEntity(STATION);
-                if (!transferId.equals(machine.selectedRecipe())) throw new IllegalStateException("JEI transfer did not select server recipe");
-                for (int i = 0; i < transferRecipe.ingredients().size(); i++) {
-                    var ingredient = transferRecipe.ingredients().get(i);
-                    var stack = machine.items().getStackInSlot(i);
-                    if (!ingredient.ingredient().test(stack) || stack.getCount() != ingredient.count())
-                        throw new IllegalStateException("JEI packet did not transfer exact ingredient counts");
+                for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++) {
+                    var ingredient = transferRecipe.assemblyInput(i);
+                    var stack = machine.assemblyGrid().getStackInSlot(i);
+                    if (ingredient == null ? !stack.isEmpty() : stack.getCount() != 1 || !ingredient.ingredient().test(stack))
+                        throw new IllegalStateException("JEI packet placed the wrong stack at cell " + i);
+                }
+                if (ASSEMBLIES.get(assembly).equals("casimir_cavity_frame")) {
+                    var catalyst = machine.magazine().loaded();
+                    if (!net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(catalyst.getItem()).equals(Singulo.id("bose_condensate_catalyst"))
+                            || UsesHelper.remaining(catalyst) != 750 || !machine.items().getStackInSlot(machine.type().catalystSlot()).isEmpty())
+                        throw new IllegalStateException("JEI transfer lost, duplicated or refreshed the catalyst");
                 }
                 for (int i = 0; i < 36; i++) if (!player.getInventory().getItem(i).isEmpty())
                     throw new IllegalStateException("JEI transfer duplicated fixture ingredients");
                 transferVerified = true;
             });
             transferPhase = 4;
-        } else if (transferPhase == 4 && transferVerified) {
+        } else if (transferPhase == 4 && transferVerified && AssemblySelectorReview.previewReady()) {
             Singulo.LOGGER.info("SINGULO_JEI_TRANSFER_COMPLETE {}", transferId);
-            io.github.genichimaruo.singulo.client.PopupInputReview.verify(
-                    (io.github.genichimaruo.singulo.client.MachineScreen) mc.screen, JeiSearch.runtime);
+            Path output = Path.of(System.getProperty("singulo.jeiReviewOutput"));
+            try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+                image.writeToFile(output.resolve("assembly-" + ASSEMBLIES.get(assembly) + ".png"));
+                AssemblySelectorReview.verifyGhost(image, (MachineScreen) mc.screen);
+            }
+            AssemblySelectorReview.openAndHover((MachineScreen) mc.screen);
             transferPhase = 5;
-        } else if (transferPhase == 5 && io.github.genichimaruo.singulo.client.CapacityUpgradeReview.tick(mc)) {
+        } else if (transferPhase == 5 && AssemblySelectorReview.captureSelector(mc, ASSEMBLIES.get(assembly), transferRecipe,
+                Path.of(System.getProperty("singulo.jeiReviewOutput")))) {
+            if (++assembly < ASSEMBLIES.size()) {
+                mc.player.closeContainer();
+                transferPhase = 1;
+                return;
+            }
+            AssemblySelectorReview.awaitSpent((MachineScreen) mc.screen);
+            var server = mc.getSingleplayerServer();
+            var playerId = mc.player.getUUID();
+            server.execute(() -> {
+                var player = server.getPlayerList().getPlayer(playerId);
+                var machine = (io.github.genichimaruo.singulo.machine.MachineBlockEntity) player.serverLevel().getBlockEntity(STATION);
+                machine.energy().setEnergy(machine.type().energyCapacity());
+            });
             transferPhase = 6;
+        } else if (transferPhase == 6 && AssemblySelectorReview.captureSpent(mc, transferRecipe,
+                Path.of(System.getProperty("singulo.jeiReviewOutput")))) {
+            io.github.genichimaruo.singulo.client.PopupInputReview.verify((MachineScreen) mc.screen, JeiSearch.runtime);
+            transferPhase = 7;
+        } else if (transferPhase == 7 && io.github.genichimaruo.singulo.client.CapacityUpgradeReview.tick(mc)) {
+            transferPhase = 8;
             mc.setScreen(null);
             mc.stop();
         }
@@ -182,7 +235,7 @@ public final class JeiReviewHarness {
                 var rect = ((IRecipeSlotDrawable) slots.get(i)).getRect();
                 var a = new net.minecraft.client.renderer.Rect2i(rect.getX() - 1, rect.getY() - 1, 18, 18);
                 if (a.getX() < 0 || a.getY() < 0 || a.getX() + a.getWidth() > category.getWidth()
-                        || a.getY() + a.getHeight() > 50) throw new IllegalStateException("JEI slot outside recipe area");
+                        || a.getY() + a.getHeight() > category.getHeight()) throw new IllegalStateException("JEI slot outside recipe area");
                 for (int j = 0; j < i; j++) {
                     var other = ((IRecipeSlotDrawable) slots.get(j)).getRect();
                     var b = new net.minecraft.client.renderer.Rect2i(other.getX() - 1, other.getY() - 1, 18, 18);
@@ -198,7 +251,8 @@ public final class JeiReviewHarness {
             graphics.fill(0, 0, width, height, 0xFFE8E8E8);
             for (int i = 0; i < layouts.size(); i++) {
                 var layout = layouts.get(i);
-                int x = (width - layout.getRect().getWidth()) / 2, y = 25 + i * 90;
+                int x = width * (1 + 2 * (i % 2)) / 4 - layout.getRect().getWidth() / 2;
+                int y = 25 + i / 2 * (height / 2);
                 graphics.drawString(font, layout.getRecipeCategory().getTitle(), x, y - 12, 0xFF202020, false);
                 layout.setPosition(x, y);
                 layout.drawRecipe(graphics, -1, -1);

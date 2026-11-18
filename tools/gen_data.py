@@ -24,11 +24,14 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'tools'))
 
 from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAMES, RUIN_REGEN_DAYS,  # noqa: E402
-                     REPAIR_WEAR, MAX_REPAIRS, ASSEMBLER_MAX_KINDS, WORKBENCH_MAX_ITEMS)
+                     REPAIR_WEAR, MAX_REPAIRS, WORKBENCH_MAX_ITEMS, CONTROLLER_PARTS, PART_FRAMES)
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
 import androids  # noqa: E402
 import drones  # noqa: E402
+from assembly_shapes import assembly_rows, board_materials, boards_overlap  # noqa: E402
+from vanilla_catalog import ITEM_NAMES as VANILLA_ITEM_NAMES  # noqa: E402
+from ids import CATALYST_TIERS  # noqa: E402
 from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, ALIAS_RECIPE_IDS, BYPRODUCTS, INGREDIENT_TAGS, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
@@ -72,8 +75,6 @@ from logistics_content import PIPES, CAPSULES, CUSTOM  # noqa: E402
 from food_content import CUSTOM_BLOCKS as _FOOD_CUSTOM  # noqa: E402
 CUSTOM = CUSTOM | _FOOD_CUSTOM
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
-# レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
-CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
 
 
 def stage_of(name):
@@ -112,6 +113,8 @@ def max_uses(name):
 
 def resolve(name):
     """材料名 → レシピJSONの材料表現。"""
+    if name in VANILLA_ITEM_NAMES:
+        return 'item', name
     if name in VANILLA_FLUIDS:
         return ('fluid', VANILLA_FLUIDS[name])
     if name in FLUIDS:
@@ -173,7 +176,7 @@ def item_inputs(inputs, recipe_name):
 
 # ---------------------------------------------------------------- レシピ
 
-def recipe_files():
+def recipe_files(*, write=True):
     out = {}  # 相対パス → json
     skipped = []
 
@@ -281,6 +284,8 @@ def recipe_files():
                 'energy': r['fe'],
                 'ingredients': items,
             }
+            if STATIONS[station] == 'precision_assembler':
+                obj['shape'] = assembly_rows(rid, items, r.get('assembly_diagram'))
             if fluids:
                 obj['fluid_ingredients'] = fluids
             if name in MIN_SIZE:
@@ -334,8 +339,9 @@ def recipe_files():
             obj['fluid_ingredients'] = fluids
         add(f'{station}/restore_{MOD[src][0]}', obj)
 
-    for path, obj in out.items():
-        write_json(DATA / 'recipe' / f'{path}.json', obj)
+    if write:
+        for path, obj in out.items():
+            write_json(DATA / 'recipe' / f'{path}.json', obj)
     return out, skipped
 
 
@@ -562,6 +568,10 @@ UI_LANG = {
     'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使うこと',
                                                     'Hold a Neutrino Scanner in your other hand, or use it on an observatory'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
+    'gui.singulo.assembly.board_hint': ('組立図に合わせて材料を1マスに1個ずつ置き、触媒は琥珀色の枠に入れます。右の本のボタンで組立図を確認できます。アンドロイドもこの盤面に同じ配置で材料を置きます。', 'Place one part per cell as shown in the diagram. Put catalysts in the amber slot. The book on the right shows the diagrams. Androids assemble the same patterns on this grid.'),
+    'gui.singulo.assembly.diagrams': ('組立図', 'Assembly diagrams'),
+    'gui.singulo.assembly.diagrams_hint': ('製品にカーソルを合わせると組立図を確認できます。クリックすると、その図をこのボタンからもう一度確認できます。', 'Hover over a product to see its diagram. Click it to keep the diagram on this button.'),
+    'gui.singulo.assembly.preview': ('組立結果の見本です。加工が終わると取り出せます。', 'Assembly preview · Collect after processing'),
     'gui.singulo.slot.catalyst': ('触媒', 'Catalyst'),
     'gui.singulo.slot.fuel': ('燃料', 'Fuel'),
     'gui.singulo.slot.permit': ('許可証', 'Permit'),
@@ -645,6 +655,7 @@ UI_LANG = {
     'gui.singulo.make_free.off': ('材料なしのレシピは作らない', 'Skips recipes without ingredients'),
     'gui.singulo.status.off': ('停止', 'Off'),
     'gui.singulo.reason.label.no_match': ('作れない材料', 'No recipe'),
+    'gui.singulo.reason.label.misplaced': ('配置を確認', 'Check pattern'),
     'gui.singulo.reason.label.missing': ('材料不足', 'Missing input'),
     'gui.singulo.reason.label.too_small': ('大きさ不足', 'Too small'),
     'gui.singulo.reason.empty': ('材料を入れると動きます', 'Put in materials to start'),
@@ -4257,6 +4268,8 @@ SUMMARY_LIMIT = 40
 def validate():
     """recipes.py の整合性を調べ、問題の一覧を返す。"""
     errs = []
+    assembly_boards = {}
+    frame_by_output = {mid(part): frame for part, frame in PART_FRAMES.items()}
     # 説明欄にふだん出す文は短く、括弧で付け足さない（くわしくは Shift で全文を出す）
     from descriptions import DESC as _DESC, SUMMARY as _SUMMARY
     _paren = re.compile(r'（[^）]*）|\([^)]*\)')
@@ -4267,6 +4280,18 @@ def validate():
         if _paren.search(ja) or _paren.search(en):
             errs.append(f'要約に括弧がある: {n}')
     for n, r in RECIPES.items():
+        parts = CONTROLLER_PARTS.get(n)
+        if parts and not any(r['inputs'].get(part, 0) >= 1 for part in parts):
+            errs.append(f'{n}には設備の構成部品が最低1個必要です（{"、".join(parts)}）。')
+        frame = frame_by_output.get(OUTPUT_ALIASES[n]) if n in OUTPUT_ALIASES else PART_FRAMES.get(n)
+        if frame:
+            if 'shape' in r:
+                rows, key = r['shape']
+                framed = any(key[ch] == frame for row in rows for ch in row if ch != ' ')
+            else:
+                framed = r['inputs'].get(frame, 0) >= 1
+            if not framed:
+                errs.append(f'{n}には「{frame}」が最低1個必要です。')
         for i in r['inputs']:
             if i in RECIPES and RECIPES[i]['stage'] > r['stage']:
                 errs.append(f'段階逆転: {n}(段階{r["stage"]}) ← {i}(段階{RECIPES[i]["stage"]})')
@@ -4278,8 +4303,19 @@ def validate():
                 errs.append(f'製作場所が後の段階: {n}(段階{r["stage"]}) @ {st}(段階{RECIPES[st]["stage"]})')
         if r['station'] == '作業台' and sum(r['inputs'].values()) > WORKBENCH_MAX_ITEMS:
             errs.append(f'作業台の枠を超える: {n}（{sum(r["inputs"].values())}個）')
-        if r['station'] == '精密組立台' and len([k for k in r['inputs'] if k not in CATALYST_TIERS]) > ASSEMBLER_MAX_KINDS:
-            errs.append(f'精密組立台の入力枠を超える: {n}（{len(r["inputs"])}種類）')
+        if r['station'] == '精密組立台':
+            rid = ALIAS_RECIPE_IDS[n] if n in ALIAS_RECIPE_IDS else MOD[n][0]
+            items, _, _ = item_inputs(r['inputs'], n)
+            try:
+                rows = assembly_rows(rid, items, r.get('assembly_diagram'))
+            except (KeyError, ValueError) as e:
+                errs.append(f'{n}: {e}')
+                continue
+            board = board_materials(rows, items)
+            for other, previous in assembly_boards.items():
+                if boards_overlap(board, previous):
+                    errs.append(f'精密組立台の「{n}」と「{other}」は同じ配置、または組みかけで成立する配置です。')
+            assembly_boards[n] = board
 
     # レシピの循環
     done, stack = set(), set()

@@ -43,6 +43,13 @@
       "uses": 36000
     }
   ],
+  "shape": [
+    "  B  ",
+    " CEC ",
+    " DAD ",
+    " CEC ",
+    "     "
+  ],
   "result": {
     "id": "singulo:void_collector",
     "count": 1

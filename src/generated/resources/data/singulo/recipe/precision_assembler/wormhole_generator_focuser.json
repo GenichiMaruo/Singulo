@@ -9,7 +9,7 @@
       "ingredient": {
         "item": "singulo:optical_lattice_substrate"
       },
-      "count": 2
+      "count": 3
     },
     {
       "ingredient": {
@@ -28,7 +28,20 @@
         "item": "singulo:void_dust"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:wormhole_generator_shell"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " DAD ",
+    " BCB ",
+    " AEA ",
+    "     "
   ],
   "result": {
     "id": "singulo:wormhole_generator_focuser",

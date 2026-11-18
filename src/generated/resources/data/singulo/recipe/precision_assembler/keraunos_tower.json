@@ -49,6 +49,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "  C  ",
+    " DBD ",
+    "DBABD",
+    " FBF ",
+    "  E  "
+  ],
   "result": {
     "id": "singulo:keraunos_tower",
     "count": 1

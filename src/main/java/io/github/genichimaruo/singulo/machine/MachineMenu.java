@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,7 +28,8 @@ public class MachineMenu extends AbstractContainerMenu {
     public final MachineLayout layout;
 
     public MachineMenu(int containerId, Inventory inventory, MachineBlockEntity machine) {
-        this(containerId, inventory, machine.type(), machine.getBlockPos(), machine.items(), machine.syncData(), machine);
+        this(containerId, inventory, machine.type(), machine.getBlockPos(), machine.items(),
+                machine.type() == MachineType.PRECISION_ASSEMBLER ? machine.assemblyGrid() : null, machine.syncData(), machine);
     }
 
     public static MachineMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
@@ -35,11 +37,11 @@ public class MachineMenu extends AbstractContainerMenu {
         MachineType type = MachineType.values()[buf.readVarInt()];
         int synced = MachineBlockEntity.syncedCount(type);
         return new MachineMenu(containerId, inventory, type, pos, new ItemStackHandler(type.itemSlots()),
-                SyncedInts.client(synced), null);
+                type == MachineType.PRECISION_ASSEMBLER ? new ItemStackHandler(MachineRecipe.ASSEMBLY_CELLS) : null, SyncedInts.client(synced), null);
     }
 
     private MachineMenu(int containerId, Inventory inventory, MachineType type, BlockPos pos, IItemHandler handler,
-                        SyncedInts data, @Nullable MachineBlockEntity machine) {
+                        @Nullable IItemHandler assemblyGrid, SyncedInts data, @Nullable MachineBlockEntity machine) {
         super(SinguloMenus.MACHINE.get(), containerId);
         this.type = type;
         this.pos = pos;
@@ -88,19 +90,50 @@ public class MachineMenu extends AbstractContainerMenu {
             @Override
             public int getMaxStackSize() { return 1; }
         });
+        if (assemblyGrid != null) {
+            addSlot(new NotifyingItemSlot(handler, type.spentCatalystSlot(), layout.spentX, layout.spentY) {
+                @Override
+                public boolean mayPlace(ItemStack stack) { return false; }
+            });
+            for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                addSlot(new NotifyingItemSlot(assemblyGrid, cell, MachineLayout.assemblyX(cell), MachineLayout.assemblyY(cell)) {
+                    @Override
+                    public boolean mayPlace(ItemStack stack) {
+                        return !MachineBlockEntity.isCatalyst(stack) && super.mayPlace(stack);
+                    }
+
+                    @Override
+                    public int getMaxStackSize() { return 1; }
+
+                    @Override
+                    public int getMaxStackSize(ItemStack stack) { return 1; }
+                });
+            }
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inventory, col + row * 9 + 9, layout.inventoryX + col * 18, GuiFrame.inventoryY(MachineLayout.HEIGHT) + row * 18));
+                addSlot(new Slot(inventory, col + row * 9 + 9, layout.inventoryX + col * 18, GuiFrame.inventoryY(layout.height) + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inventory, col, layout.inventoryX + col * 18, GuiFrame.hotbarY(MachineLayout.HEIGHT)));
+            addSlot(new Slot(inventory, col, layout.inventoryX + col * 18, GuiFrame.hotbarY(layout.height)));
         }
         addDataSlots(data);
     }
 
     public MachineType type() {
         return type;
+    }
+
+    public int assemblySlot(int cell) {
+        if (type != MachineType.PRECISION_ASSEMBLER || cell < 0 || cell >= MachineRecipe.ASSEMBLY_CELLS) {
+            throw new IndexOutOfBoundsException("No assembly cell " + cell);
+        }
+        return type.itemSlots() + cell;
+    }
+
+    public int playerSlotStart() {
+        return type.itemSlots() + (type == MachineType.PRECISION_ASSEMBLER ? MachineRecipe.ASSEMBLY_CELLS : 0);
     }
 
     /**
@@ -143,10 +176,13 @@ public class MachineMenu extends AbstractContainerMenu {
             case BUTTON_CYCLE_MODE -> machine.cycleMode();
             case BUTTON_POWER -> machine.togglePower();
             case BUTTON_MAKE_FREE -> machine.toggleMakeFree();
-            case BUTTON_CLEAR_SELECTION -> machine.selectRecipe(-1);
+            case BUTTON_CLEAR_SELECTION -> {
+                if (!type.selectsRecipe()) return false;
+                machine.selectRecipe(-1);
+            }
             case BUTTON_EJECT_CATALYST -> machine.ejectLoaded(player);
             default -> {
-                if (id < BUTTON_SELECT) {
+                if (id < BUTTON_SELECT || !type.selectsRecipe()) {
                     return false;
                 }
                 machine.selectRecipe(id - BUTTON_SELECT);
@@ -163,7 +199,9 @@ public class MachineMenu extends AbstractContainerMenu {
         }
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
-        int machineSlots = type.itemSlots();
+        int machineSlots = playerSlotStart();
+        int inputStart = type == MachineType.PRECISION_ASSEMBLER ? assemblySlot(0) : 0;
+        int inputEnd = type == MachineType.PRECISION_ASSEMBLER ? machineSlots : type.inputSlots();
         int upgradeIndex = type.upgradeSlot();
         int catalystIndex = type.catalystSlot();
         if (index < machineSlots) {
@@ -173,7 +211,7 @@ public class MachineMenu extends AbstractContainerMenu {
         } else if (CapacityUpgrades.tier(stack) > 0) {
             // 容量の専用枠が空いていれば装着し、埋まっていれば材料の欄へ（Mk1・Mk2 は上の段階の材料にもなる）
             if (!moveItemStackTo(stack, type.capacitySlot(), type.capacitySlot() + 1, false)
-                    && !moveItemStackTo(stack, 0, type.inputSlots(), false)) {
+                    && !moveItemStackTo(stack, inputStart, inputEnd, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (MachineBlockEntity.isUpgrade(stack)) {
@@ -187,11 +225,11 @@ public class MachineMenu extends AbstractContainerMenu {
         } else if (io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack)) {
             // A single template per shift-click, rather than filling every input with originals.
             boolean moved = false;
-            for (int i = 0; i < type.inputSlots() && !moved; i++) {
+            for (int i = inputStart; i < inputEnd && !moved; i++) {
                 moved = moveItemStackTo(stack, i, i + 1, false);
             }
             if (!moved) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, 0, type.inputSlots(), false)) {
+        } else if (!moveItemStackTo(stack, inputStart, inputEnd, false)) {
             return ItemStack.EMPTY;
         }
         if (stack.isEmpty()) {

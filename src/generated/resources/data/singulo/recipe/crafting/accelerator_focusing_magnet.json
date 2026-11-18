@@ -2,6 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
+    " F ",
     "POP",
     " M "
   ],
@@ -14,6 +15,9 @@
     },
     "M": {
       "item": "singulo:meteoric_iron_ingot"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
     }
   },
   "result": {
