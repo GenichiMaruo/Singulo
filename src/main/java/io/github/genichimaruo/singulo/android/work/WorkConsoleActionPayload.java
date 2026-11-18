@@ -158,7 +158,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
             switch (a.getString("type")) {
                 case PLAN -> {
                     if (!item.isEmpty()) {
-                        plan = WorkConsoleView.plan(console, console.plan(item, count, a.getBoolean("fresh")), reg);
+                        plan = WorkConsoleView.plan(console, console.preview(player, item, count, a.getBoolean("fresh")), reg);
                     }
                 }
                 case START -> {
@@ -205,7 +205,21 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     return;
                 }
                 case PROCESS -> {
-                    menu.setProcess(player, items(a.getList("inputs", Tag.TAG_COMPOUND), reg), items(a.getList("outputs", Tag.TAG_COMPOUND), reg));
+                    var inputs = items(a.getList("inputs", Tag.TAG_COMPOUND), reg);
+                    if (a.contains("machine_recipe")) {
+                        var id = net.minecraft.resources.ResourceLocation.tryParse(a.getString("machine_recipe"));
+                        if (id != null) player.level().getRecipeManager().byKey(id).ifPresent(holder -> {
+                            if (holder.value() instanceof io.github.genichimaruo.singulo.recipe.MachineRecipe machine) {
+                                var recipe = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjust(id, machine);
+                                if (recipe != null) {
+                                    console.setMachineProcess(recipe, inputs);
+                                    menu.broadcastChanges();
+                                }
+                            }
+                        });
+                    } else {
+                        menu.setProcess(player, inputs, items(a.getList("outputs", Tag.TAG_COMPOUND), reg));
+                    }
                     return;
                 }
                 default -> {

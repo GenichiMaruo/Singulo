@@ -1072,6 +1072,7 @@ CHAPTERS = [
          '・操作: レバー（オン・オフ・切り替え）、ボタン、ドアなどを使う。仕掛けを動かす合図に。\n'
          '・液体・ガス: 資材口や指令台の隣のタンクも素材置き場になる。加工モードや手順の見本の欄を、バケツなどの入れ物でクリックするか JEI の「+」で、流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB '
          'ずつ）。タンクアップグレードを積んだアンドロイドが、流体を装置へ運ぶ。流体を作る注文は、素材置き場のタンクへ入れる。\n'
+         '・作業台で空のバケツが戻るレシピには、中身入りのバケツを記録する。実物が足りなければ、アンドロイドはバケツ1個につき対応する液体をタンクから1,000 mB使う。実物を使った分だけ空のバケツが戻る。\n'
          '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる（置いた数ずつか、欄の下のボタンで「満タン」にすると装置に入るだけ。どちらも入りきらない分は持ってこ'
          'ない。空なら取りに行かない）。素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
          '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ち'
@@ -1089,6 +1090,8 @@ CHAPTERS = [
          "cessing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scr"
          'oll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that m'
          'ake a fluid fill the stockpile tanks.\n'
+         '- For a crafting table recipe that returns an empty bucket, record the filled bucket. For each filled bucket missing from stock, '
+         'the android can use 1,000 mB of the matching fluid from a tank. Each physical bucket used returns one empty bucket.\n'
          '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch t'
          'hat fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button '
          'below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile ha'

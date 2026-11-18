@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.world.item.ItemStack;
+import io.github.genichimaruo.singulo.android.work.ItemCount;
 
 import io.github.genichimaruo.singulo.ruin.RuinGuards;
 import java.util.EnumSet;
@@ -426,6 +427,31 @@ public abstract class RuinAndroid extends Monster {
      * 持ち主が入れておいた物なので、作業では使わず（空いている場所だけ使う）、資材置き場へも戻さない。
      */
     private int personal;
+    private final List<ItemCount> personalLiquids = new ArrayList<>();
+
+    /** An ordinary order using this worker's preloaded tanks keeps the balance on the worker. */
+    public void retainTanksForWork() {
+        personalLiquids.clear();
+        for (var held : liquids()) personalLiquids.add(new ItemCount(held.getKey(), held.getValue()));
+    }
+
+    public boolean usesPersonalTanks() {
+        return !personalLiquids.isEmpty();
+    }
+
+    public long personalLiquid(ItemStack sample) {
+        return Math.min(liquidAmount(sample), ItemCount.get(personalLiquids,
+                io.github.genichimaruo.singulo.android.work.FluidSamples.key(sample)));
+    }
+
+    public void consumeWorkLiquid(ItemStack sample, long amount) {
+        long used = drainLiquid(sample, amount, false);
+        if (personalLiquids.isEmpty()) return;
+        ItemStack key = io.github.genichimaruo.singulo.android.work.FluidSamples.key(sample);
+        for (ItemCount held : personalLiquids) {
+            if (held.matches(key)) held.count = Math.max(0, held.count - used);
+        }
+    }
     private int repairCooldown;
     /** ステーションが遠すぎて戻れなかったとき、しばらく戻ろうとしない（tick）。 */
     private int retreatCooldown;
@@ -750,14 +776,14 @@ public abstract class RuinAndroid extends Monster {
 
     /** タンクの中身すべて（流体と化学物質の、量1の見本 → 量）。 */
     public java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> liquids() {
-        java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> out = new java.util.ArrayList<>();
+        List<ItemCount> amounts = new ArrayList<>();
         for (var f : tankFluids()) {
-            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.FluidSamples.of(f.copyWithAmount(1)), (long) f.getAmount()));
+            ItemCount.add(amounts, io.github.genichimaruo.singulo.android.work.FluidSamples.of(f.copyWithAmount(1)), f.getAmount());
         }
         for (var e : chemicals().entrySet()) {
-            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(e.getKey(), 1), e.getValue()));
+            ItemCount.add(amounts, io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(e.getKey(), 1), e.getValue());
         }
-        return out;
+        return amounts.stream().map(c -> java.util.Map.entry(c.item, c.count)).toList();
     }
 
     /** タンクが空か（タンクアップグレードを外せるか）。化学物質のタンクも見る。 */
@@ -1175,6 +1201,11 @@ public abstract class RuinAndroid extends Monster {
     public CompoundTag saveWorkState() {
         CompoundTag t = workGoal.saveWork();
         t.putInt("personal", personal);
+        if (usesPersonalTanks()) {
+            var balances = new net.minecraft.nbt.ListTag();
+            for (ItemCount held : personalLiquids) balances.add(held.save(registryAccess()));
+            t.put("personal_liquids", balances);
+        }
         if (escrowRequest != null) t.putUUID("escrow_request",escrowRequest);
         if (escrowOwner != null) t.putUUID("escrow_owner",escrowOwner);
         if (escrowDimension != null) t.putString("escrow_dimension",escrowDimension);
@@ -1212,6 +1243,11 @@ public abstract class RuinAndroid extends Monster {
         if (t.hasUUID("escrow_owner")) escrowOwner=t.getUUID("escrow_owner");
         if (t.contains("escrow_dimension")) escrowDimension=t.getString("escrow_dimension");
         personal = t.getInt("personal");
+        personalLiquids.clear();
+        for (var element : t.getList("personal_liquids", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            var held = ItemCount.load((CompoundTag) element, registryAccess());
+            if (io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(held.item) && held.count >= 0) personalLiquids.add(held);
+        }
         workGoal.loadWork(t);
         var fluids = t.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < TANKS; i++) {
@@ -1232,6 +1268,7 @@ public abstract class RuinAndroid extends Monster {
         this.workOrder = -1;
         this.workJob = null;
         this.personal = 0;
+        personalLiquids.clear();
         entityData.set(WORKING, false);
         entityData.set(ACTIVITY, ACT_NONE);
         if (state() == STATE_CRAFTING || state() == STATE_MINING) {
@@ -1728,7 +1765,7 @@ public abstract class RuinAndroid extends Monster {
                 return false;
             }
         }
-        return tanksEmpty();
+        return tanksEmpty() || usesPersonalTanks() && liquids().stream().allMatch(e -> e.getValue() <= personalLiquid(e.getKey()));
     }
 
     /** 持ち物に入れる（同じ物に重ねてから、空きへ）。入りきらなかった分を返す。 */

@@ -1191,6 +1191,7 @@ UI_LANG = {
     'gui.singulo.work_console.error.wrong_face': ('%s のレシピの装置が、入れる面（%3$s）から %2$s を受け付けない（レシピカードの「入」の面を確かめて）', 'The machine for %s does not take %s through its %s face (check the "In" face on the recipe card)'),
     'gui.singulo.work_console.cancelled.wrong_face': ('%s の注文を取り消した（装置が、入れる面（%s）から素材を受け付けない）', 'Cancelled the order for %s (the machine does not take materials through its %s face)'),
     'gui.singulo.work_console.fuel_ordered': ('燃料（%s）が素材置き場にないので、%s 個作る注文を出した', 'Out of fuel (%s), so an order to make %s was placed'),
+    'gui.singulo.work_console.tool_ordered': ('装置に補給する %s が足りないので、%s 個作る注文を出した', 'Ordered %2$s × %1$s to replenish the machine'),
     'gui.singulo.work_console.detail.machine': ('（%s 装置で加工中）', ' (%s in a machine)'),
     'gui.singulo.work_console.detail.machine_eta': ('（%s 装置で加工中・あと約 %s 秒）', ' (%s in a machine, about %ss left)'),
     'gui.singulo.work_console.worker.elsewhere': ('ほかの注文の作業中', 'On another order'),

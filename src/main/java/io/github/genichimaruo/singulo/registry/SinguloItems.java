@@ -333,7 +333,7 @@ public final class SinguloItems {
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
-    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテム、隠しボスの報酬、ボスのスポーンエッグ（コマンドでだけ渡す）。 */
+    /** 射撃型とボスのスポーンエッグ、隠し報酬の射撃型メモリと残光の翼は、クリエイティブタブと JEI の一覧から隠す。 */
     public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
             "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg", "ergosphere_leviathan_spawn_egg",
             "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");

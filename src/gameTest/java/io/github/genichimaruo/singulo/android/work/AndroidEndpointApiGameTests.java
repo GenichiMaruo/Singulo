@@ -178,6 +178,32 @@ public final class AndroidEndpointApiGameTests {
         h.assertTrue(accepted.state()==State.RUNNING,"Single crafting rejected: "+accepted.reason());
         h.assertTrue(c.orders().getFirst().held.stream().allMatch(v->v.point.equals(e.getBlockPos())),"Reservation escaped source"); h.succeed();
     }
+
+    @GameTest(template="empty")
+    public static void itemOnlySourceDoesNotUseSharedLava(GameTestHelper h) {
+        var console = setup(h, false);
+        var endpoint = endpoint(h, console.owner());
+        link(h, console);
+        var grid = net.minecraft.core.NonNullList.withSize(9, ItemStack.EMPTY);
+        grid.set(0, new ItemStack(Items.LAVA_BUCKET));
+        grid.set(1, new ItemStack(Items.OBSIDIAN));
+        var target = new ItemStack(Items.CRYING_OBSIDIAN);
+        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        rack.items().setStackInSlot(3, recipeCard(h, grid, target));
+        h.setBlock(SUPPLY.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
+        io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity tank = h.getBlockEntity(SUPPLY.east());
+        tank.receiveTank().setFluid(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000));
+        endpoint.supply.setStackInSlot(0, new ItemStack(Items.OBSIDIAN));
+        var denied = AndroidOrders.submitFromEndpoint(h.getLevel(), console.getBlockPos(), console.owner(), UUID.randomUUID(),
+                target, 1, List.of(), null, endpoint.getBlockPos());
+        h.assertTrue(denied.state() == State.REJECTED && console.orders().isEmpty(), "Restricted source used shared lava");
+        endpoint.supply.setStackInSlot(1, new ItemStack(Items.LAVA_BUCKET));
+        var accepted = AndroidOrders.submitFromEndpoint(h.getLevel(), console.getBlockPos(), console.owner(), UUID.randomUUID(),
+                target, 1, List.of(), null, endpoint.getBlockPos());
+        h.assertTrue(accepted.state() == State.RUNNING && console.orders().getFirst().steps.getFirst().recipe.tankBuckets() == 0
+                && tank.receiveTank().getFluidAmount() == 1000, "Restricted source did not reserve its physical bucket");
+        h.succeed();
+    }
     @GameTest(template="empty")
     public static void restrictedSourcePersistsAndIsPartOfRequestFingerprint(GameTestHelper h) {
         var c=setup(h,false); var e=endpoint(h,c.owner()); e.supply.setStackInSlot(0,new ItemStack(Items.OAK_LOG,8)); link(h,c);

@@ -5,17 +5,25 @@ import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.android.work.ChemicalSamples;
 import io.github.genichimaruo.singulo.android.work.Chemicals;
+import io.github.genichimaruo.singulo.android.work.FluidSamples;
 import io.github.genichimaruo.singulo.android.work.ItemCount;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
+import io.github.genichimaruo.singulo.android.work.WorkJob;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -33,6 +41,47 @@ public final class MekanismGameTests {
 
     private static ItemStack item(String id) {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
+    }
+
+    @GameTest(template = EMPTY)
+    public static void externalFluidTankSuppliesAndroid(GameTestHelper h) {
+        BlockPos tankPos = new BlockPos(2, 2, 2);
+        BlockPos absolute = h.absolutePos(tankPos);
+        var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
+        h.assertTrue(tank != Blocks.AIR, "Mekanism fluid tank missing");
+        h.setBlock(tankPos, tank);
+        h.getLevel().getBlockEntity(absolute).applyComponentsFromItemStack(new ItemStack(tank));
+        h.runAfterDelay(5, () -> {
+            var lava = new FluidStack(Fluids.LAVA, 2000);
+            int inserted = 0;
+            for (Direction face : Direction.values()) {
+                var handler = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, absolute, face);
+                if (handler != null) inserted += handler.fill(lava.copyWithAmount(2000 - inserted), FluidAction.EXECUTE);
+                if (inserted == 2000) break;
+            }
+            h.assertTrue(inserted == 2000, "Mekanism did not accept the initial lava");
+            for (Direction face : Direction.values()) {
+                var handler = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, absolute, face);
+                if (handler == null || handler.drain(lava, FluidAction.SIMULATE).getAmount() != 2000) continue;
+                BlockPos consolePos = absolute.relative(face);
+                h.getLevel().setBlockAndUpdate(consolePos, SinguloBlocks.ANDROID_WORK_CONSOLE.get().defaultBlockState());
+                var console = (WorkConsoleBlockEntity) h.getLevel().getBlockEntity(consolePos);
+                var sample = FluidSamples.of(lava.copyWithAmount(1));
+                h.assertTrue(ItemCount.get(console.stock(), sample) == 2000, "Console missed adjacent Mekanism fluid storage");
+                var android = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
+                android.inventory().setItem(RuinAndroid.SLOT_TANK, item("android_tank_upgrade"));
+                var pickup = new WorkConsoleBlockEntity.Pickup(consolePos, java.util.List.of(new ItemCount(sample, 1000)));
+                h.assertTrue(console.fetchAt(android, WorkJob.simple(WorkJob.Type.CRAFT, 1), pickup), "Fluid pickup failed");
+                h.assertTrue(android.liquidAmount(sample) == 1000 && ItemCount.get(console.stock(), sample) == 1000
+                                && handler.drain(lava, FluidAction.SIMULATE).getAmount() == 1000,
+                        "1000 mB pickup did not conserve lava");
+                h.setBlock(tankPos, Blocks.AIR);
+                h.assertTrue(ItemCount.get(console.stock(), sample) == 0, "Removed tank is still visible");
+                h.succeed();
+                return;
+            }
+            h.fail("No drainable face on Mekanism fluid tank");
+        });
     }
 
     /**

@@ -730,7 +730,24 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * 材料の一部が別のレシピと同じでも、アンドロイドの決めたレシピ通りの物ができる。
      */
     public void selectFor(net.minecraft.world.item.ItemStack output, List<net.minecraft.world.item.ItemStack> inputs) {
-        if (!type.selectsRecipe() || level == null || output.isEmpty()) {
+        if (level == null || output.isEmpty()) {
+            return;
+        }
+        if (type.massMode()) {
+            int target = 0;
+            var mass = massRecipes(level, type);
+            for (int i = 0; i < mass.size(); i++) {
+                if (ItemStack.isSameItem(mass.get(i).value().result(), output)) {
+                    target = i + 1;
+                    break;
+                }
+            }
+            if (target != mode) {
+                mode = target;
+                markDirty();
+            }
+        }
+        if (!type.selectsRecipe()) {
             return;
         }
         RecipeHolder<MachineRecipe> best = null;
@@ -831,6 +848,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return status;
     }
 
+    public int remainingTicks() {
+        return current == null ? -1 : Math.max(1, maxProgress - progress);
+    }
+
     /** 装置の様子の報告（0.21.0。画面のヘッダーと同じ状態と理由）。 */
     @Override
     public MachineReport report() {
@@ -884,7 +905,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** レシピの照合に使うスロット（入力 → 触媒）の中身。 */
-    private List<ItemStack> inputStacks() {
+    public List<ItemStack> inputStacks() {
         List<ItemStack> list = new ArrayList<>(type.recipeSlots());
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
@@ -1581,8 +1602,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** 入力タンクに入れる。同じ液体の入ったタンクを先に、なければ空のタンクへ。mask は入れてよいタンクのビット。 */
     private int fillInputs(FluidStack resource, IFluidHandler.FluidAction action, int mask) {
+        // The tower also consumes nitrogen from its product tanks. Keep its single feed tank available for lava, water or helium.
+        boolean coolant = towerCoolant(resource);
+        int first = coolant ? type.fluidInputs() : 0;
+        int end = coolant ? tanks.length : type.fluidInputs();
         for (int pass = 0; pass < 2; pass++) {
-            for (int i = 0; i < type.fluidInputs(); i++) {
+            for (int i = first; i < end; i++) {
                 if ((mask & (1 << i)) == 0) {
                     continue;
                 }
@@ -1595,6 +1620,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
         }
         return 0;
+    }
+
+    private boolean towerCoolant(FluidStack resource) {
+        return type == MachineType.CRYOGENIC_COOLING_TOWER
+                && resource.getFluid() == io.github.genichimaruo.singulo.registry.SinguloFluids.get("liquid_nitrogen");
     }
 
     /** パイプから入れてよい液体か: すでに入力タンクに入っているか、この装置のレシピが使うもの。 */
@@ -1642,7 +1672,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public boolean isFluidValid(int tank, FluidStack stack) {
-            return tank < type.fluidInputs();
+            return towerCoolant(stack) ? tank >= type.fluidInputs() && tank < tanks.length : tank < type.fluidInputs();
         }
 
         @Override

@@ -124,7 +124,7 @@ public final class WorkOrder {
     public long held(@Nullable BlockPos point, ItemStack item) {
         long n = 0;
         for (Holding h : held) {
-            if ((point == null || h.point.equals(point)) && ItemStack.isSameItemSameComponents(h.item, item)) {
+            if ((point == null || h.point.equals(point)) && WormholeOrders.matches(item, h.item)) {
                 n += h.count;
             }
         }
@@ -145,6 +145,7 @@ public final class WorkOrder {
          * できたら、指令台が取り出しの作業を出す。
          */
         public long parked, parkedOut;
+        ItemStack awaitingTool = ItemStack.EMPTY;
         /** 取り出しに行ってよい（できた・素材を使い切った・出口がいっぱい・燃料切れ・長く変化がない）。毎秒調べる。保存しない。 */
         public boolean collectReady;
         /** 加工の残り時間の見込み（tick。分からなければ -1）と、装置の様子が最後に変わった時刻・その様子。保存しない。 */
@@ -181,19 +182,31 @@ public final class WorkOrder {
         return o;
     }
 
+    private record Producers(ItemStack output, List<Integer> steps) {}
+
     /** 工程の前後関係（素材を作る工程が終わってから、その素材を使う工程を始める）。 */
     private void link() {
+        var producers = new java.util.HashMap<WorkPlanner.Key, Producers>();
         for (int i = 0; i < steps.size(); i++) {
             StepState s = steps.get(i);
             s.after.clear();
-            List<ItemCount> inputs = s.recipe.inputs();
-            for (int j = 0; j < i; j++) {
-                for (ItemCount in : inputs) {
-                    if (ItemStack.isSameItemSameComponents(in.item, steps.get(j).recipe.output())) {
-                        s.after.add(j);
-                        break;
+            var dependencies = new java.util.BitSet();
+            for (ItemCount in : s.recipe.inputs()) {
+                if (in.alt == null) {
+                    var matches = producers.get(WorkPlanner.Key.of(in.item));
+                    if (matches != null) matches.steps().forEach(dependencies::set);
+                } else {
+                    for (var previous : producers.values()) {
+                        if (in.matches(previous.output())) previous.steps().forEach(dependencies::set);
                     }
                 }
+            }
+            dependencies.stream().forEach(s.after::add);
+            var outputs = s.recipe.guaranteedExtras() ? s.recipe.outputs() : List.of(s.recipe.output());
+            for (ItemStack product : outputs) {
+                ItemStack output = FluidSamples.key(product);
+                var key = WorkPlanner.Key.of(output);
+                producers.computeIfAbsent(key, ignored -> new Producers(output, new ArrayList<>())).steps().add(i);
             }
         }
     }
@@ -296,6 +309,7 @@ public final class WorkOrder {
             st.putString("block", BuiltInRegistries.BLOCK.getKey(s.block).toString());
             st.putLong("total", s.total);
             st.putLong("done", s.done);
+            if (!s.awaitingTool.isEmpty()) st.put("awaiting_tool", s.awaitingTool.save(registries));
             if (s.parked > 0) {
                 st.putLong("parked", s.parked);
                 st.putLong("parked_out", s.parkedOut);
@@ -359,6 +373,7 @@ public final class WorkOrder {
             StepState s = new StepState(r, NbtUtils.readBlockPos(st, "location").orElse(BlockPos.ZERO),
                     bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(bid), st.getLong("total"));
             s.done = st.getLong("done");
+            s.awaitingTool = ItemStack.parseOptional(registries, st.getCompound("awaiting_tool"));
             s.parked = Math.max(0, st.getLong("parked"));
             s.parkedOut = Math.max(0, st.getLong("parked_out"));
             o.steps.add(s);

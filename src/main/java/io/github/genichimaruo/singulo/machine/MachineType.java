@@ -26,7 +26,7 @@ public enum MachineType {
     /** 型の残響の欠片（1個だけ入れる）の振動をスカルクに転写して、欠片を複製する。 */
     ECHO_RESONATOR("echo_resonator", 3, 4, 1, 0, 0, false),
     /** マルチブロック（3×3×3）。縮退物質殻・炉殻ブロック・ホライズン・バスを作る。圧縮熱を液体窒素で除く。 */
-    DEGENERATE_COMPACTOR("degenerate_compactor", 4, 3, 1, 1, 0, false),
+    DEGENERATE_COMPACTOR("degenerate_compactor", 4, 4, 1, 1, 0, false),
     /** マルチブロック（5×5×5）。アクシオン凝縮体（出力タンク）とエキゾチック物質を作る。 */
     CASIMIR_CAVITY("casimir_cavity", 4, 6, 1, 1, 1, false),
     /** 時間結晶触媒を育てる。電力が要求の80%を割った時間の割合だけ純度（寿命）が下がる。 */
@@ -150,6 +150,7 @@ public enum MachineType {
         return switch (this) {
             case PARTICLE_ACCELERATOR -> new int[]{0, 2};
             case CATALYTIC_REACTOR -> new int[]{5, 1};
+            case DEGENERATE_COMPACTOR -> new int[]{3, 1};
             default -> new int[]{inputSlots, outputSlots};
         };
     }

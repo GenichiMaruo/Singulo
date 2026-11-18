@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.compat.jei;
 
 import io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleMenu;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,12 +66,14 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
             for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.OUTPUT)) {
                 sample(view).ifPresent(outputs::add);
             }
-            if (inputs.isEmpty() || outputs.isEmpty()) {
-                return helper.createInternalError();   // 物のないレシピ（液体だけなど）は扱えない: ボタンを出さない
+            var machineId = recipe instanceof MachineRecipe machine ? SinguloJeiPlugin.RECIPE_IDS.get(machine) : null;
+            if (outputs.isEmpty() || inputs.isEmpty() && machineId == null) {
+                return helper.createInternalError();
             }
             if (doTransfer) {
-                PacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId,
-                        WorkConsoleActionPayload.process(inputs, outputs, player.level().registryAccess())));
+                var action = WorkConsoleActionPayload.process(inputs, outputs, player.level().registryAccess());
+                if (machineId != null) action.putString("machine_recipe", machineId.toString());
+                PacketDistributor.sendToServer(new WorkConsoleActionPayload(menu.containerId, action));
                 if (Minecraft.getInstance().screen instanceof io.github.genichimaruo.singulo.client.WorkConsoleScreen screen) {
                     screen.showRecordTab();
                 }

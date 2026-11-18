@@ -73,5 +73,15 @@ public final class AndroidRecipeApiGameTests {
         recipe.outputs().get(0).sample().setCount(60);
         h.assertTrue(AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(0).outputs().get(0).count() == 2,
                 "Snapshot mutation changed source");
+        var pattern = h.getLevel().getRecipeManager().byKey(io.github.genichimaruo.singulo.Singulo.id(
+                "archive_terminal/data_card_observation_log")).orElseThrow();
+        c.setMachineProcess((io.github.genichimaruo.singulo.recipe.MachineRecipe) pattern.value(), List.of());
+        c.encoder().setItem(WorkConsoleBlockEntity.CARD, card.copy());
+        h.assertTrue(c.encode(), "Cannot record an archive card");
+        rack.items().setStackInSlot(2, c.encoder().getItem(WorkConsoleBlockEntity.CARD).copy());
+        var archive = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(1);
+        var log = registry.get(io.github.genichimaruo.singulo.Singulo.id("observation_log"));
+        h.assertTrue(archive.materials().stream().anyMatch(material -> material.sample().is(log) && material.count() == 1),
+                "Missing reusable original from the recipe snapshot");
         h.succeed();
     }}

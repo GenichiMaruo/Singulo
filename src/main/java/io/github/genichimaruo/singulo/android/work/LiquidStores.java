@@ -1,10 +1,14 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -40,25 +44,84 @@ public final class LiquidStores {
     public static LiquidStores at(Level level, BlockPos point, Set<BlockPos> seen) {
         LiquidStores out = new LiquidStores();
         out.storage = true;
-        // The addon contract exposes item handlers only, never neighboring fluid/chemical stores.
-        if (level.isLoaded(point) && level.getBlockEntity(point) instanceof io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint)
-            return out;
-        Set<BlockPos> chemSeen = new HashSet<>(seen);
-        SupplyPortBlockEntity.collectFluids(level, point, seen, out.fluids);
-        if (Chemicals.present()) {
-            for (Direction d : Direction.values()) {
-                BlockPos p = point.relative(d);
-                if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
-                    continue;
-                }
-                Chemicals.Store s = anySide(level, p);
-                if (s != null && chemSeen.add(p)) {
-                    out.chemicals.add(s);
-                    seen.add(p);
-                }
+        Set<IFluidHandler> handlers = Collections.newSetFromMap(new IdentityHashMap<>());
+        adjacent(level, point, (pos, store) -> {
+            if (seen.add(pos)) {
+                for (IFluidHandler fluid : store.fluids) if (handlers.add(fluid)) out.fluids.add(fluid);
+                out.chemicals.addAll(store.chemicals);
             }
-        }
+        });
         return out;
+    }
+
+    private static void adjacent(Level level, BlockPos point, BiConsumer<BlockPos, LiquidStores> visit) {
+        // Addon supply endpoints opt in to items only. Don't probe an unloaded point or neighbor.
+        if (!level.isLoaded(point) || level.getBlockEntity(point) instanceof io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint) return;
+        for (Direction d : Direction.values()) {
+            BlockPos pos = point.relative(d);
+            if (!level.isLoaded(pos)) continue;
+            var be = level.getBlockEntity(pos);
+            if (be instanceof WorkLinkedBlockEntity || be instanceof WorkConsoleBlockEntity) continue;
+            IFluidHandler fluids = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, d.getOpposite());
+            Chemicals.Store chemicals = Chemicals.present() ? anySide(level, pos) : null;
+            boolean hasFluid = fluids != null && fluids.getTanks() > 0;
+            if (!hasFluid && chemicals == null) continue;
+            LiquidStores store = new LiquidStores();
+            store.storage = true;
+            if (hasFluid) store.fluids.add(fluids);
+            if (chemicals != null) store.chemicals.add(chemicals);
+            visit.accept(pos, store);
+        }
+    }
+
+    /** An extractable material and the supply point that can actually drain it. */
+    record Supply(BlockPos point, ItemCount material, LiquidStores store) {}
+
+    static Map<BlockPos, List<Supply>> supplies(Level level, List<BlockPos> points) {
+        Map<BlockPos, List<Supply>> tanks = new LinkedHashMap<>();
+        Map<IFluidHandler, BlockPos> shared = new IdentityHashMap<>();
+        for (BlockPos point : points) {
+            adjacent(level, point, (pos, store) -> {
+                List<ItemCount> available = new ArrayList<>();
+                store.addTo(available);
+                for (ItemCount item : available) {
+                    BlockPos key = FluidSamples.is(item.item)
+                            ? shared.computeIfAbsent(store.fluids.getFirst(), handler -> pos) : pos;
+                    List<Supply> faces = tanks.computeIfAbsent(key, ignored -> new ArrayList<>());
+                    // Two faces can expose the same tank with different drain permissions.
+                    // For each fluid use its most accessible face; ties keep the first point.
+                    Supply candidate = new Supply(point, item, store);
+                    int i = 0;
+                    while (i < faces.size() && !faces.get(i).material.matches(item.item)) i++;
+                    if (i == faces.size()) faces.add(candidate);
+                    else if (faces.get(i).material.count < item.count) faces.set(i, candidate);
+                }
+            });
+        }
+        Map<BlockPos, List<Supply>> byPoint = new LinkedHashMap<>();
+        for (var faces : tanks.values()) {
+            for (Supply supply : faces) byPoint.computeIfAbsent(supply.point, ignored -> new ArrayList<>()).add(supply);
+        }
+        return byPoint;
+    }
+
+    static long available(List<Supply> supplies, ItemStack sample) {
+        long amount = 0;
+        for (Supply supply : supplies) if (supply.material.matches(sample)) amount += supply.material.count;
+        return amount;
+    }
+
+    static long take(List<Supply> supplies, ItemStack sample, long amount) {
+        long taken = 0;
+        for (Supply supply : supplies) {
+            if (taken >= amount) break;
+            if (supply.material.matches(sample)) taken += supply.store.drain(sample, amount - taken, false);
+        }
+        return taken;
+    }
+
+    boolean hasMultipleSources(ItemStack sample) {
+        return ChemicalSamples.is(sample) ? chemicals.size() > 1 : FluidSamples.is(sample) && fluids.size() > 1;
     }
 
     /**

@@ -66,6 +66,12 @@ public final class AndroidOrders {
                         io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item), false,
                         io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(input.item)));
             }
+            // A reusable tool is part of the recipe even while it stays installed in the machine.
+            for (var tool : recipe.tools()) {
+                var sample = recipe.grid().get(tool.slot());
+                materials.add(new AndroidRecipe.Material(sample, 1, List.of(sample), "",
+                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(sample), false, false));
+            }
             if (!recipe.fuel().isEmpty()) {
                 var fuel = recipe.fuel();
                 materials.add(new AndroidRecipe.Material(

@@ -2,7 +2,10 @@ package io.github.genichimaruo.singulo.android.work;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidType;
 
 /**
  * 注文の計算。完成品を count 個そろえるのに、素材置き場の在庫をどれだけ使い、どのレシピを何回作るかを決める。
@@ -18,9 +21,9 @@ public final class WorkPlanner {
     // 実行と画面で、合計や進み具合の割合を計算してもあふれないよう、余裕を残す
     private static final long MAX_AMOUNT = Long.MAX_VALUE / (MAX_VISITS * 1024L);
 
-    private record Key(net.minecraft.world.item.Item item, net.minecraft.core.component.DataComponentMap components) {
+    record Key(net.minecraft.world.item.Item item, net.minecraft.core.component.DataComponentMap components) {
         static Key of(ItemStack item) {
-            ItemStack key = FluidSamples.key(item);
+            ItemStack key = FluidSamples.liquid(item) ? FluidSamples.key(item) : item;
             return new Key(key.getItem(), key.getComponents());
         }
     }
@@ -28,11 +31,28 @@ public final class WorkPlanner {
     private static final class Context {
         final java.util.Map<Key, RecipeRackBlockEntity.Entry> recipes = new java.util.HashMap<>();
         final List<ItemCount> stock, surplus = new ArrayList<>();
+        final Level level;
         int visits;
-        Context(List<RecipeRackBlockEntity.Entry> entries, List<ItemCount> stock) {
+        Context(List<RecipeRackBlockEntity.Entry> entries, List<ItemCount> stock, @Nullable Level level) {
             this.stock = stock;
+            this.level = level;
+            if (level != null) for (var c : stock) {
+                if (io.github.genichimaruo.singulo.wormhole.UnstableMouthItem.expired(c.item, level)) c.count = 0;
+            }
             for (var entry : entries) {
                 recipes.putIfAbsent(Key.of(entry.recipe().outputKey()), entry);
+            }
+            // Explicit main products take precedence over co-products from other cards.
+            for (var entry : entries) {
+                var recipe = entry.recipe();
+                if (!recipe.processing()) continue;
+                for (int i = 0; i < recipe.extras().size(); i++) {
+                    var extra = recipe.extras().get(i);
+                    if (extra.isEmpty()) continue;
+                    int index = i;
+                    recipes.computeIfAbsent(Key.of(extra), key -> new RecipeRackBlockEntity.Entry(
+                            recipe.orderExtra(index), entry.location(), entry.block()));
+                }
             }
         }
     }
@@ -48,6 +68,8 @@ public final class WorkPlanner {
         public final List<Step> steps = new ArrayList<>();
         /** 素材置き場から使う物（中間素材の在庫も含む）。 */
         public final List<ItemCount> fromStock = new ArrayList<>();
+        /** Preloaded fluids reserved on the one worker chosen for this plan. */
+        public final List<ItemCount> fromWorker = new ArrayList<>();
         /** 足りない物（在庫もレシピもない）。 */
         public final List<ItemCount> missing = new ArrayList<>();
         /** ループするレシピがあった。 */
@@ -74,6 +96,9 @@ public final class WorkPlanner {
             for (ItemCount c : fromStock) {
                 ItemCount.add(out, c.item, c.count);
             }
+            for (ItemCount c : fromWorker) {
+                ItemCount.add(out, c.item, c.count);
+            }
             for (ItemCount c : missing) {
                 ItemCount.add(out, c.item, c.count);
             }
@@ -85,8 +110,12 @@ public final class WorkPlanner {
      * 計算する。stock は使える在庫（ほかの注文が予約した分を引いたもの）で、この中で書き換える（写しを渡す）。
      */
     public static Plan plan(ItemStack target, long count, List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock) {
+        return plan(target, count, recipes, stock, null);
+    }
+
+    public static Plan plan(ItemStack target, long count, List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock, @Nullable Level level) {
         Plan plan = new Plan(target, count);
-        need(plan, target, count, null, new Context(recipes, stock), new ArrayList<>());
+        need(plan, target, count, null, new Context(recipes, stock, level), new ArrayList<>());
         return plan;
     }
 
@@ -127,26 +156,122 @@ public final class WorkPlanner {
         int per = recipe.recipe().outputCount();
         long crafts = 1 + (amount - 1) / per;
         path.add(key);
-        for (ItemCount in : recipe.recipe().inputs()) {
-            if (in.count < 0 || in.count > MAX_AMOUNT / crafts) {
-                plan.limited = true;
-                break;
+        long remaining = amount;
+        for (BucketRun run : bucketRuns(recipe, crafts, context)) {
+            for (ItemCount in : run.entry().recipe().inputs()) {
+                if (in.count < 0 || in.count > MAX_AMOUNT / run.crafts()) {
+                    plan.limited = true;
+                    break;
+                }
+                need(plan, in.item, in.count * run.crafts(), in.alt, context, path);
             }
-            need(plan, in.item, in.count * crafts, in.alt, context, path);
+            if (plan.steps.size() >= MAX_STEPS) {
+                plan.limited = true;
+            }
             if (plan.limited) {
                 break;
             }
+            long needed = Math.min(remaining, run.crafts() * per);
+            plan.steps.add(new Step(run.entry(), run.crafts(), needed));
+            remaining -= needed;
         }
         path.remove(path.size() - 1);
         if (plan.limited) {
             return;
         }
-        if (plan.steps.size() >= MAX_STEPS) {
-            plan.limited = true;
-            return;
-        }
-        plan.steps.add(new Step(recipe, crafts, amount));
         ItemCount.add(context.surplus, item, crafts * per - amount);
+        // A registered machine cycle yields all its co-products from the same inputs.
+        if (recipe.recipe().guaranteedExtras()) {
+            for (ItemStack extra : recipe.recipe().extras()) {
+                long units = FluidSamples.amount(extra);
+                if (units > MAX_AMOUNT / crafts) {
+                    plan.limited = true;
+                    return;
+                }
+                ItemCount.add(context.surplus, FluidSamples.key(extra), units * crafts);
+            }
+        }
+    }
+
+    private record BucketSupply(int slots, long physical) {}
+    private record BucketRun(RecipeRackBlockEntity.Entry entry, long crafts) {}
+
+    /** Physical buckets first. Split only where an ingredient changes source, even on very large orders. */
+    private static List<BucketRun> bucketRuns(RecipeRackBlockEntity.Entry entry, long crafts, Context context) {
+        RecipeData recipe = entry.recipe();
+        int eligible = context.level == null ? 0 : BucketCrafting.eligible(context.level, recipe);
+        if (eligible == 0) {
+            return List.of(new BucketRun(entry, crafts));
+        }
+        // Overlapping bucket alternatives share one balance. Previewing it must not consume the actual stock.
+        List<ItemCount> budget = new ArrayList<>();
+        for (var source : List.of(context.stock, context.surplus)) {
+            for (ItemCount held : source) {
+                if (held.count > 0 && held.alt == null) {
+                    var copy = new ItemCount(held.item, held.count);
+                    copy.takePriority = held.takePriority;
+                    budget.add(copy);
+                }
+            }
+        }
+        List<BucketSupply> supplies = new ArrayList<>();
+        while (eligible != 0) {
+            int first = Integer.numberOfTrailingZeros(eligible);
+            ItemStack bucket = recipe.grid().get(first);
+            var alt = recipe.alt(first);
+            int slots = 0;
+            for (int i = first; i < 9; i++) {
+                if ((eligible & (1 << i)) != 0 && ItemStack.isSameItemSameComponents(bucket, recipe.grid().get(i))
+                        && alt == recipe.alt(i)) {
+                    slots |= 1 << i;
+                }
+            }
+            eligible &= ~slots;
+            long wanted = Integer.bitCount(slots) * crafts;
+            long lacking = alt == null ? take(budget, null, bucket, wanted) : takeRanked(budget, null, bucket, wanted, alt);
+            if (lacking == 0) {
+                continue;
+            }
+            ItemStack sample = FluidSamples.key(BucketCrafting.fluid(bucket));
+            long needMb = lacking * FluidType.BUCKET_VOLUME;
+            long mb = needMb - take(budget, null, sample, needMb);
+            boolean canMakeFluid = context.recipes.containsKey(Key.of(sample));
+            if (mb == 0 && !canMakeFluid) {
+                continue;
+            }
+            if (!canMakeFluid && context.recipes.containsKey(Key.of(bucket))) {
+                lacking = mb / FluidType.BUCKET_VOLUME;
+            }
+            supplies.add(new BucketSupply(slots, wanted - lacking));
+        }
+        if (supplies.isEmpty()) {
+            return List.of(new BucketRun(entry, crafts));
+        }
+        List<BucketRun> runs = new ArrayList<>();
+        for (long done = 0; done < crafts;) {
+            long repeat = crafts - done;
+            int mask = 0;
+            for (BucketSupply supply : supplies) {
+                int slots = supply.slots();
+                int per = Integer.bitCount(slots);
+                long left = supply.physical() - done * per;
+                if (left >= per) {
+                    repeat = Math.min(repeat, left / per);
+                } else {
+                    if (left > 0) {
+                        repeat = 1;
+                        for (int i = 0; i < left; i++) {
+                            slots &= slots - 1;
+                        }
+                    }
+                    mask |= slots;
+                }
+            }
+            var resolved = mask == 0 ? entry : new RecipeRackBlockEntity.Entry(recipe.withTankBuckets(mask), entry.location(), entry.block());
+            runs.add(new BucketRun(resolved, repeat));
+            done += repeat;
+        }
+        return runs;
     }
 
     /** stock のうち alt に合う物を、取り出しの優先度の高い順（同じなら、触媒は寿命の短い順、ほかは見本と同じ物から）に取る。 */
@@ -176,8 +301,17 @@ public final class WorkPlanner {
     }
 
     /** stock のうち item と同じ物を取る。 */
-    private static long take(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved,
+    static long take(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved,
                              ItemStack item, long amount) {
+        if (WormholeOrders.pattern(item)) {
+            // Take whole physical pairs first. Distinct orphans do not make a usable link.
+            long pairs = take(stock, reserved, item, amount - amount % 2, true);
+            return pairs + take(stock, reserved, item, amount % 2, false);
+        }
+        return take(stock, reserved, item, amount, false);
+    }
+
+    private static long take(List<ItemCount> stock, @Nullable List<ItemCount> reserved, ItemStack item, long amount, boolean pairs) {
         for (ItemCount c : stock) {
             if (amount <= 0) {
                 break;
@@ -185,10 +319,11 @@ public final class WorkPlanner {
             if (c.count <= 0 || c.alt != null) {
                 continue;
             }
-            if (!c.matches(item)) {
+            if (!WormholeOrders.matches(item, c.item) || reserved != null && WormholeOrders.pattern(c.item)) {
                 continue;
             }
             long take = Math.min(c.count, amount);
+            if (pairs) take -= take % 2;
             c.count -= take;
             amount -= take;
             if (reserved != null) {

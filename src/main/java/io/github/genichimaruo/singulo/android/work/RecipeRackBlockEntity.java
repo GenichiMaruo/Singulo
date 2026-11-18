@@ -92,7 +92,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
                                 : net.minecraft.world.level.block.Blocks.AIR));
                     }
                 } else if (here) {
-                    out.add(new Entry(data, pos, WorkLocationCardItem.block(loc)));
+                    out.add(new Entry(WormholeOrders.recipe(level, pos, data), pos, WorkLocationCardItem.block(loc)));
                 }
             }
         }
