@@ -5,5 +5,5 @@
     "L": { "item": "minecraft:lava_bucket" },
     "O": { "item": "minecraft:obsidian" }
   },
-  "result": { "id": "minecraft:crying_obsidian" }
+  "result": { "item": "minecraft:crying_obsidian" }
 }
