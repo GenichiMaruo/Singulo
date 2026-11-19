@@ -1,7 +1,6 @@
 package io.github.genichimaruo.singulo.block;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
-import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +15,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.TransparentBlock;
+import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -28,12 +27,13 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /** Two distinct glass slabs sharing a position. The original slab items are used for placement and drops. */
-public final class MixedGlassSlab extends TransparentBlock {
+public final class MixedGlassSlab extends GlassBlock {
     public static final BooleanProperty BLACK_ON_TOP = BooleanProperty.create("black_on_top");
     public static final int BOTTOM_HIT = 1, TOP_HIT = 2;
 
     public interface ExplosionHits {
         int singulo$glassHits(BlockPos pos);
+        void singulo$addLootDecay(LootParams.Builder loot);
     }
 
     public MixedGlassSlab(Properties properties) {
@@ -59,25 +59,25 @@ public final class MixedGlassSlab extends TransparentBlock {
         return half(state, top);
     }
 
-    @Override public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+    @Override public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
         return new ItemStack(selected(state, pos, target).getBlock());
     }
 
-    @Override protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        return selected(state, pos, player.pick(player.blockInteractionRange(), 1, false)).getDestroyProgress(player, level, pos);
+    @Override public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+        return selected(state, pos, player.pick(player.getAttributeValue(net.minecraftforge.common.ForgeMod.BLOCK_REACH.get()), 1, false)).getDestroyProgress(player, level, pos);
     }
 
     @Override public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
         BlockState surface = entity instanceof Player player
-                ? selected(state, pos, player.pick(player.blockInteractionRange(), 1, false)) : half(state, true);
+                ? selected(state, pos, player.pick(player.getAttributeValue(net.minecraftforge.common.ForgeMod.BLOCK_REACH.get()), 1, false)) : half(state, true);
         return surface.getSoundType(level, pos, entity);
     }
 
     @Override public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion) {
-        return half(state, topAt(pos, explosion.center().y)).getExplosionResistance(level, pos, explosion);
+        return half(state, topAt(pos, explosion.getPosition().y)).getExplosionResistance(level, pos, explosion);
     }
 
-    @Override protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
+    @Override public boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
         return (direction == Direction.DOWN || hidesHalf(state, true, adjacent, direction))
                 && (direction == Direction.UP || hidesHalf(state, false, adjacent, direction));
     }
@@ -89,24 +89,30 @@ public final class MixedGlassSlab extends TransparentBlock {
         return neighbour != null && GlassJoin.covered(slab, neighbour, direction);
     }
 
-    @Override protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion,
-                                           BiConsumer<ItemStack, BlockPos> drops) {
-        if (explosion.getBlockInteraction() == Explosion.BlockInteraction.TRIGGER_BLOCK) return;
-        int hits = ((ExplosionHits) explosion).singulo$glassHits(pos);
-        if (hits != TOP_HIT && hits != BOTTOM_HIT) {
-            super.onExplosionHit(state, level, pos, explosion, drops);
+    private static int hits(Explosion explosion, BlockPos pos) {
+        return explosion instanceof ExplosionHits hit ? hit.singulo$glassHits(pos) : 0;
+    }
+
+    @Override public boolean canDropFromExplosion(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion) {
+        int hit = hits(explosion, pos);
+        // Partial hits generate loot for the destroyed half, not the whole composite.
+        return hit != TOP_HIT && hit != BOTTOM_HIT && super.canDropFromExplosion(state, level, pos, explosion);
+    }
+
+    @Override public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
+        int hit = hits(explosion, pos);
+        if (hit != TOP_HIT && hit != BOTTOM_HIT) {
+            super.onBlockExploded(state, level, pos, explosion);
             return;
         }
-        BlockState broken = half(state, hits == TOP_HIT);
+        BlockState broken = half(state, hit == TOP_HIT);
         if (level instanceof ServerLevel server && broken.canDropFromExplosion(level, pos, explosion)) {
             var loot = new LootParams.Builder(server).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                    .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
-                    .withOptionalParameter(LootContextParams.THIS_ENTITY, explosion.getDirectSourceEntity());
-            if (explosion.getBlockInteraction() == Explosion.BlockInteraction.DESTROY_WITH_DECAY)
-                loot.withParameter(LootContextParams.EXPLOSION_RADIUS, explosion.radius());
+                    .withParameter(LootContextParams.TOOL, ItemStack.EMPTY);
+            if (explosion instanceof ExplosionHits data) data.singulo$addLootDecay(loot);
             broken.spawnAfterBreak(server, pos, ItemStack.EMPTY, explosion.getIndirectSourceEntity() instanceof Player);
-            broken.getDrops(loot).forEach(stack -> drops.accept(stack, pos));
+            broken.getDrops(loot).forEach(stack -> Block.popResource(level, pos, stack));
         }
-        level.setBlockAndUpdate(pos, half(state, hits == BOTTOM_HIT));
+        level.setBlockAndUpdate(pos, half(state, hit == BOTTOM_HIT));
     }
 }

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -27,7 +27,7 @@ public class AndroidGlassSlab extends GlassJoin.Slab {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         boolean blocks = AndroidGlassStairs.android(context) != gate();
         return blocks ? super.getCollisionShape(state, level, pos, context) : Shapes.empty();
     }
@@ -35,8 +35,8 @@ public class AndroidGlassSlab extends GlassJoin.Slab {
     /** 道探し: 通れる側には空いた所。ぶつかる側は、ふつうのハーフブロックと同じ。 */
     @Nullable
     @Override
-    public PathType getBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob) {
+    public BlockPathTypes getBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob) {
         boolean blocks = (mob instanceof RuinAndroid) != gate();
-        return blocks ? super.getBlockPathType(state, level, pos, mob) : PathType.OPEN;
+        return blocks ? super.getBlockPathType(state, level, pos, mob) : BlockPathTypes.OPEN;
     }
 }

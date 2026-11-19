@@ -75,13 +75,13 @@ public final class GlassJoin {
     }
 
     /** 透けるガラス（ホワイトガラスパネル・黒色強化ガラス）。同じガラスの階段・ハーフブロックの、埋まった面との間も描かない。 */
-    public static class Glass extends TransparentBlock {
+    public static class Glass extends net.minecraft.world.level.block.GlassBlock {
         public Glass(Properties properties) {
             super(properties);
         }
 
         @Override
-        protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
+        public boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
             BlockState part = matchingPart(adjacent, this);
             if (part != null) return fullFace(part, direction.getOpposite());
             return super.skipRendering(state, adjacent, direction);
@@ -129,7 +129,7 @@ public final class GlassJoin {
         }
 
         @Override
-        protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
+        public boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
             Block glass = base.get();
             if (adjacent.is(glass)) {
                 return true;
@@ -148,7 +148,7 @@ public final class GlassJoin {
             return super.canBeReplaced(existing, context);
         }
 
-        @Override protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+        @Override public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
             // Vanilla checks the held item against "this", and the hit against the existing slab's shape.
             return Block.byItem(context.getItemInHand().getItem()) instanceof PairSlab held && held.fits(state, context);
         }

@@ -22,6 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Explosion.class)
 abstract class MixedGlassExplosionMixin implements MixedGlassSlab.ExplosionHits {
     @Shadow @Final private Level level;
+    @Shadow @Final private float radius;
+    @Shadow @Final private Explosion.BlockInteraction blockInteraction;
     @Shadow public abstract List<BlockPos> getToBlow();
     @Unique private int singulo$sampleHalf;
     @Unique private Map<BlockPos, Integer> singulo$glassDamage;
@@ -48,6 +50,11 @@ abstract class MixedGlassExplosionMixin implements MixedGlassSlab.ExplosionHits 
             singulo$glassDamage.merge(pos, singulo$sampleHalf, (a, b) -> a | b);
         }
         return hit;
+    }
+
+    @Override public void singulo$addLootDecay(net.minecraft.world.level.storage.loot.LootParams.Builder loot) {
+        if (blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY)
+            loot.withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.EXPLOSION_RADIUS, radius);
     }
 
     @Override public int singulo$glassHits(BlockPos pos) {

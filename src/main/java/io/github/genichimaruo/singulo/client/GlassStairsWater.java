@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 
 /**
  * 水に浸かったガラスの階段の水（0.21.0）。水はふつうの階段と同じに描き（バニラの描き方のまま）、透けるガラスの段の中には
@@ -47,7 +47,7 @@ public final class GlassStairsWater {
         }
 
         void emit(VertexConsumer out) {
-            out.addVertex(x, y, z).setColor(r, g, b, a).setUv(u, v).setUv2(l0, l1).setNormal(nx, ny, nz);
+            out.vertex(x, y, z).color(r, g, b, a).uv(u, v).uv2(l0, l1).normal(nx, ny, nz).endVertex();
         }
     }
 
@@ -66,17 +66,17 @@ public final class GlassStairsWater {
         }
 
         @Override
-        public VertexConsumer addVertex(float x, float y, float z) {
+        public VertexConsumer vertex(double x, double y, double z) {
             flush();
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.x = (float) x;
+            this.y = (float) y;
+            this.z = (float) z;
             open = true;
             return this;
         }
 
         @Override
-        public VertexConsumer setColor(int r, int g, int b, int a) {
+        public VertexConsumer color(int r, int g, int b, int a) {
             this.r = r;
             this.g = g;
             this.b = b;
@@ -85,31 +85,37 @@ public final class GlassStairsWater {
         }
 
         @Override
-        public VertexConsumer setUv(float u, float v) {
+        public VertexConsumer uv(float u, float v) {
             this.u = u;
             this.v = v;
             return this;
         }
 
         @Override
-        public VertexConsumer setUv1(int u, int v) {
+        public VertexConsumer overlayCoords(int u, int v) {
             return this;
         }
 
         @Override
-        public VertexConsumer setUv2(int u, int v) {
+        public VertexConsumer uv2(int u, int v) {
             l0 = u;
             l1 = v;
             return this;
         }
 
         @Override
-        public VertexConsumer setNormal(float x, float y, float z) {
+        public VertexConsumer normal(float x, float y, float z) {
             nx = x;
             ny = y;
             nz = z;
             return this;
         }
+
+        @Override public void endVertex() { flush(); }
+
+        @Override public void defaultColor(int r, int g, int b, int a) { color(r, g, b, a); }
+
+        @Override public void unsetDefaultColor() { color(255, 255, 255, 255); }
 
         List<V> done() {
             flush();
@@ -295,8 +301,8 @@ public final class GlassStairsWater {
             float u = n.getAxis() == Direction.Axis.X ? z : x;
             float w = n.getAxis() == Direction.Axis.Y ? z : 1 - y;
             float shade = level.getShade(n, true);
-            buffer.addVertex(ox + x, oy + y, oz + z).setColor(r * shade, g * shade, b * shade, 1F)
-                    .setUv(sprite.getU(u), sprite.getV(w)).setLight(light).setNormal(n.getStepX(), n.getStepY(), n.getStepZ());
+            buffer.vertex(ox + x, oy + y, oz + z).color(r * shade, g * shade, b * shade, 1F)
+                    .uv(sprite.getU(u * 16), sprite.getV(w * 16)).uv2(light).normal(n.getStepX(), n.getStepY(), n.getStepZ()).endVertex();
         }
     }
 }
