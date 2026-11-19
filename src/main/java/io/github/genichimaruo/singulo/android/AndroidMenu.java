@@ -63,7 +63,7 @@ public class AndroidMenu extends AbstractContainerMenu {
     }
 
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
-            D_STALL = 8, D_COLLECT = 9, D_STORE = 10, COUNT = 11;
+            D_STALL = 8, D_COLLECT = 9, D_STORE = 10, D_FLUID = 11, D_CHEMICAL = 13, COUNT = 15;
     public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1, BUTTON_WORK = 2, BUTTON_SORT = 3, BUTTON_STASH = 4;
     /** 落ちている物を拾う（オン／オフ）・拾った物の預け先を切り替える（0.21.0）。 */
     public static final int BUTTON_COLLECT = 5, BUTTON_STORE = 6;
@@ -93,6 +93,8 @@ public class AndroidMenu extends AbstractContainerMenu {
             case D_STALL -> android.stall();
             case D_COLLECT -> android.collects() ? 1 : 0;
             case D_STORE -> android.storeMode();
+            case D_FLUID, D_FLUID + 1 -> android.storedFluid(i - D_FLUID);
+            case D_CHEMICAL, D_CHEMICAL + 1 -> android.storedChemical(i - D_CHEMICAL);
             default -> 0;
         }));
     }

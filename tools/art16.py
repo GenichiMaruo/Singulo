@@ -2340,6 +2340,7 @@ ITEM_ART = {
     'temporal_key': lambda: seal_key(3),
     'singularity_key': lambda: seal_key(4),
     'overclock_chip': lambda: overclock_chip(),
+    'assembly_stock_upgrade': lambda: assembly_stock_upgrade(),
     'capacity_upgrade_1': lambda: capacity_upgrade(1),
     'capacity_upgrade_2': lambda: capacity_upgrade(2),
     'capacity_upgrade_3': lambda: capacity_upgrade(3),
@@ -2366,6 +2367,18 @@ def seal_key(tier):
     for k in range(tier):
         d.point((13 - k * 2, 10), fill=(120, 126, 140, 255))
     d.point((2, 6), fill=(255, 255, 255, 255))
+    return im
+
+
+def assembly_stock_upgrade():
+    """Four copper storage drawers in a steel cartridge."""
+    im, d = new()
+    d.rectangle([2, 2, 13, 13], fill=(47, 55, 66), outline=(159, 178, 190))
+    for x in (4, 8):
+        for y in (4, 8):
+            d.rectangle([x, y, x + 2, y + 2], fill=(160, 95, 53))
+            d.line([x, y, x + 2, y], fill=(250, 193, 114))
+    d.line([5, 14, 10, 14], fill=(183, 151, 87))
     return im
 
 

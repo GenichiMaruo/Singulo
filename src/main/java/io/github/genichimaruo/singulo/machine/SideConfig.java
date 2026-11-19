@@ -28,9 +28,11 @@ public final class SideConfig {
                                net.neoforged.neoforge.items.IItemHandler dest) {
         net.minecraft.world.item.ItemStack stack = items.getStackInSlot(slot);
         if (stack.isEmpty()) return;
-        net.minecraft.world.item.ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
-        if (rest.getCount() != stack.getCount()) {
-            items.setStackInSlot(slot, rest);
+        int offered = Math.min(stack.getCount(), stack.getMaxStackSize());
+        var rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copyWithCount(offered), false);
+        int moved = offered - rest.getCount();
+        if (moved > 0) {
+            items.setStackInSlot(slot, stack.copyWithCount(stack.getCount() - moved));
         }
     }
 

@@ -69,8 +69,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public record ItemInput(Ingredient ingredient, int count, int uses, int tier) {
         public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(ItemInput::ingredient),
-                Codec.INT.optionalFieldOf("count", 1).forGetter(ItemInput::count),
-                Codec.INT.optionalFieldOf("uses", 0).forGetter(ItemInput::uses),
+                RecipeNumbers.POSITIVE.optionalFieldOf("count", 1).forGetter(ItemInput::count),
+                RecipeNumbers.NONNEGATIVE.optionalFieldOf("uses", 0).forGetter(ItemInput::uses),
                 Codec.INT.optionalFieldOf("tier", 0).forGetter(ItemInput::tier)
         ).apply(i, ItemInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = StreamCodec.composite(
@@ -103,7 +103,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public record FluidInput(Fluid fluid, int amount) {
         public static final Codec<FluidInput> CODEC = RecordCodecBuilder.create(i -> i.group(
                 net.minecraft.core.registries.BuiltInRegistries.FLUID.byNameCodec().fieldOf("fluid").forGetter(FluidInput::fluid),
-                Codec.INT.fieldOf("amount").forGetter(FluidInput::amount)
+                RecipeNumbers.POSITIVE.fieldOf("amount").forGetter(FluidInput::amount)
         ).apply(i, FluidInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, FluidInput> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.registry(Registries.FLUID), FluidInput::fluid,
@@ -117,7 +117,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     public record MassInput(double amount, boolean metalOnly) {
         public static final Codec<MassInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.DOUBLE.fieldOf("amount").forGetter(MassInput::amount),
+                Codec.DOUBLE.validate(m -> Double.isFinite(m) && m > 0 ? DataResult.success(m)
+                        : DataResult.error(() -> "Mass must be positive and finite")).fieldOf("amount").forGetter(MassInput::amount),
                 Codec.BOOL.optionalFieldOf("metal_only", false).forGetter(MassInput::metalOnly)
         ).apply(i, MassInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, MassInput> STREAM_CODEC = StreamCodec.composite(
@@ -148,17 +149,17 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.<MachineRecipe>mapCodec(i -> i.group(
             Codec.STRING.fieldOf("station").forGetter(MachineRecipe::station),
             Codec.INT.optionalFieldOf("stage", 1).forGetter(MachineRecipe::stage),
-            Codec.INT.fieldOf("time").forGetter(MachineRecipe::time),
-            Codec.INT.optionalFieldOf("energy", 0).forGetter(MachineRecipe::energy),
+            RecipeNumbers.POSITIVE.fieldOf("time").forGetter(MachineRecipe::time),
+            RecipeNumbers.NONNEGATIVE.optionalFieldOf("energy", 0).forGetter(MachineRecipe::energy),
             ItemInput.CODEC.listOf().optionalFieldOf("ingredients", List.of()).forGetter(MachineRecipe::ingredients),
             FluidInput.CODEC.listOf().optionalFieldOf("fluid_ingredients", List.of()).forGetter(MachineRecipe::fluidIngredients),
             MassInput.CODEC.optionalFieldOf("mass").forGetter(MachineRecipe::mass),
             Ingredient.CODEC_NONEMPTY.optionalFieldOf("restore").forGetter(MachineRecipe::restore),
-            ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MachineRecipe::result),
-            FluidStack.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
+            RecipeNumbers.STACK.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MachineRecipe::result),
+            RecipeNumbers.FLUID.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
             Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
             Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority),
-            ItemStack.CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(MachineRecipe::byproduct),
+            RecipeNumbers.STACK.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(MachineRecipe::byproduct),
             Codec.STRING.listOf().optionalFieldOf("shape", List.of()).forGetter(MachineRecipe::shape)
     ).apply(i, MachineRecipe::new)).validate(MachineRecipe::validateAssemblyShape);
 

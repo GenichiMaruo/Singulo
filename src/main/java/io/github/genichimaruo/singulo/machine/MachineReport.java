@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.machine;
 
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -36,6 +37,13 @@ import net.minecraft.world.level.block.state.BlockState;
 public record MachineReport(State state, Component label, List<Component> details, int progress, int maxProgress,
                             long energy, long capacity, int consume, int produce, ItemStack catalyst, float catalystFill,
                             List<ItemStack> missing, int blocking) {
+    public MachineReport {
+        details = List.copyOf(details);
+        catalyst = catalyst.copy();
+        missing = missing.stream().map(ItemStack::copy).toList();
+    }
+    @Override public ItemStack catalyst() { return catalyst.copy(); }
+    @Override public List<ItemStack> missing() { return missing.stream().map(ItemStack::copy).toList(); }
     /** 状態（画面の状態の記号 Panel.Status と同じ並び）。 */
     public enum State {
         RUN(ChatFormatting.GREEN), IDLE(ChatFormatting.GRAY), WARN(ChatFormatting.YELLOW), NO_POWER(ChatFormatting.GOLD),
@@ -56,6 +64,8 @@ public record MachineReport(State state, Component label, List<Component> detail
     /** 報告を出せるブロックエンティティ。 */
     public interface Source {
         MachineReport report();
+        /** Estimated processing ticks for android pickup. Zero means idle, -1 means unknown. */
+        default int remainingTicks() { return -1; }
     }
 
     /** 足りない部品を一覧に出す種類の数（多いときは「ほか」とまとめる）。 */
@@ -90,7 +100,8 @@ public record MachineReport(State state, Component label, List<Component> detail
         }
         BlockEntity be = level.getBlockEntity(at);
         MachineReport report = null;
-        if (be instanceof Source source) {
+        var source = MachineReports.source(be);
+        if (source != null) {
             report = source.report();
         } else {
             var storage = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, at, null);
@@ -148,7 +159,8 @@ public record MachineReport(State state, Component label, List<Component> detail
      * 報告を頼む値打ちのあるブロックか（見るたびにサーバーへ頼むので、装置とマルチブロックの部品・コントローラーだけに絞る）。
      */
     public static boolean reports(BlockState state, @Nullable BlockEntity be) {
-        return be instanceof Source || state.getBlock() instanceof io.github.genichimaruo.singulo.multiblock.MultiblockPart
+        return MachineReports.source(be) != null
+                || state.getBlock() instanceof io.github.genichimaruo.singulo.multiblock.MultiblockPart
                 || io.github.genichimaruo.singulo.multiblock.Blueprints.kindOf(state.getBlock()) != null;
     }
 
@@ -162,7 +174,7 @@ public record MachineReport(State state, Component label, List<Component> detail
             out.add(Component.literal("  ").append(d.copy().withStyle(ChatFormatting.GRAY)));
         }
         if (maxProgress > 0 && (progress > 0 || state == State.RUN)) {
-            out.add(Component.translatable("report.singulo.progress", Math.min(100, progress * 100 / maxProgress)));
+            out.add(Component.translatable("report.singulo.progress", Math.min(100, (long) progress * 100 / maxProgress)));
         }
         if (withEnergy && capacity > 0) {
             Component line = Component.translatable("report.singulo.energy", io.github.genichimaruo.singulo.energy.EnergyText.of(energy),

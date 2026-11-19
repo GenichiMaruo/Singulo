@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.pipe;
 
+import io.github.genichimaruo.singulo.data.ConfigMigration;
+
 import io.github.genichimaruo.singulo.android.work.SurveyGlassesItem;
 import io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity;
 import java.util.ArrayDeque;
@@ -165,6 +167,7 @@ public final class FluidPipeNetwork {
     private final Map<SampleKey, Sample> samples = new HashMap<>();
     /** 今、流れ・詰まりを見せているパイプ。 */
     private final Set<BlockPos> lit = new HashSet<>();
+    private final long configRevision = ConfigMigration.revision();
     private boolean valid = true;
     private int rotation;
     /** この見た目の間隔で、出せる液体があったか・実際に動いたか（詰まりの表示）。 */
@@ -334,6 +337,10 @@ public final class FluidPipeNetwork {
         // 受け渡しで水源を汲むとつなぎ替えが起きることがあるので、写しで回す
         for (FluidPipeNetwork network : List.copyOf(ACTIVE)) {
             if (!network.valid || network.level.getServer() != event.getServer()) {
+                continue;
+            }
+            if (network.configRevision != ConfigMigration.revision()) {
+                network.invalidate();
                 continue;
             }
             long now = network.level.getGameTime();

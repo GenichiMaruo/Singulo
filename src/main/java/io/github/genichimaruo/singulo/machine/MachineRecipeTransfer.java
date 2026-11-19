@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /** Shared client preview/server validation. Planning only touches copies; commit is atomic. */
@@ -81,7 +80,7 @@ public final class MachineRecipeTransfer {
         // One search budget for every batch count, so a max transfer costs at most a few thousand steps per packet
         int[] budget = {8192};
         List<ItemStack> pool = new ArrayList<>();
-        for (int slot : slots) pool.add(menu.getSlot(slot).getItem().copy());
+        for (int slot : slots) pool.add(menu.transferStack(slot));
         for (int i = 0; i < 36; i++) pool.add(menu.getSlot(menu.playerSlotStart() + i).getItem().copy());
         List<Integer> sources = new ArrayList<>();
         if (board) {
@@ -93,7 +92,7 @@ public final class MachineRecipeTransfer {
         for (int i = 0; i < remainingSources; i++) if (!pool.get(i).isEmpty()) sources.add(i);
 
         int stocked = board && !maxTransfer ? stockedAssemblySets(menu, needs, pool) : 0;
-        int batchLimit = maxTransfer ? batchLimit(menu, needs, pool, sources) : stocked + 1;
+        int batchLimit = maxTransfer ? batchLimit(menu, needs, pool, sources) : (int) Math.min(Integer.MAX_VALUE, (long) stocked + 1);
         // A full inventory may fit one set or a whole stack but no intermediate count.
         for (int batches = batchLimit; batches >= Math.max(1, stocked) && budget[0] > 0; batches--) {
             Plan plan = allocate(menu, slots, needs, 0, batches, pool, sources, new int[pool.size()], new ItemStack[slots.size()], budget);
@@ -104,11 +103,12 @@ public final class MachineRecipeTransfer {
 
     /** Bound the search by item stack limits and the available stock shared by repeated cells in a diagram. */
     private static int batchLimit(MachineMenu menu, List<Need> needs, List<ItemStack> pool, List<Integer> sources) {
-        int limit = menu.type() == MachineType.PRECISION_ASSEMBLER ? Item.ABSOLUTE_MAX_STACK_SIZE : 64;
-        var demand = new HashMap<BitSet, Integer>();
+        int limit = Integer.MAX_VALUE;
+        var demand = new HashMap<BitSet, Long>();
         for (Need need : needs) {
             BitSet matches = new BitSet(pool.size());
-            int available = 0, capacity = 0;
+            long available = 0;
+            int capacity = 0;
             for (int i : sources) {
                 ItemStack sample = pool.get(i);
                 if (!need.matches().test(sample) || !menu.getSlot(need.slot()).mayPlace(sample)) continue;
@@ -118,8 +118,8 @@ public final class MachineRecipeTransfer {
             }
             if (Math.min(available, capacity) < need.count()) return 0;
             if (need.reusable()) continue;
-            int perBatch = demand.merge(matches, need.count(), Integer::sum);
-            limit = Math.min(limit, Math.min(capacity / need.count(), available / perBatch));
+            long perBatch = demand.merge(matches, (long) need.count(), Long::sum);
+            limit = (int) Math.min(limit, Math.min(capacity / need.count(), available / perBatch));
         }
         return demand.isEmpty() ? 1 : limit;
     }
@@ -129,7 +129,7 @@ public final class MachineRecipeTransfer {
         int sets = Integer.MAX_VALUE, matched = 0;
         for (Need need : needs) {
             if (need.slot() < menu.type().itemSlots()) continue;
-            ItemStack stack = menu.getSlot(need.slot()).getItem();
+            ItemStack stack = pool.get(need.slot() - menu.assemblySlot(0));
             if (stack.isEmpty() || !need.matches().test(stack)) return 0;
             matched++;
             if (!need.reusable()) sets = Math.min(sets, stack.getCount());
@@ -161,7 +161,7 @@ public final class MachineRecipeTransfer {
                     int cell = need.slot() - menu.assemblySlot(0);
                     ItemStack left = leftovers.get(cell), target = items.get(cell);
                     if (!ItemStack.isSameItemSameComponents(left, target)) continue;
-                    int keep = Math.min(left.getCount(), menu.stackLimit(need.slot(), target) - target.getCount());
+                    int keep = Math.clamp(menu.stackLimit(need.slot(), target) - target.getCount(), 0, left.getCount());
                     target.grow(keep);
                     left.shrink(keep);
                 }
@@ -237,7 +237,7 @@ public final class MachineRecipeTransfer {
     }
 
     public static void apply(MachineMenu menu, Plan plan) {
-        for (int i = 0; i < plan.slots().size(); i++) menu.getSlot(plan.slots().get(i)).set(plan.items().get(i));
+        for (int i = 0; i < plan.slots().size(); i++) menu.setTransferStack(plan.slots().get(i), plan.items().get(i));
         for (int i = 0; i < 36; i++) menu.getSlot(menu.playerSlotStart() + i).set(plan.inventory().get(i));
         menu.broadcastChanges();
     }

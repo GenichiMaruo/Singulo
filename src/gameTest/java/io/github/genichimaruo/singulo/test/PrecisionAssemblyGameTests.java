@@ -5,7 +5,9 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineDiagnosis;
+import io.github.genichimaruo.singulo.machine.MachineMenu;
 import io.github.genichimaruo.singulo.machine.MachineRecipeIndex;
+import io.github.genichimaruo.singulo.machine.MachineRecipeTransfer;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
@@ -71,6 +73,39 @@ public final class PrecisionAssemblyGameTests {
                 "Incorrect assembled product for " + recipe.result());
         for (int slot = 0; slot < MachineRecipe.ASSEMBLY_CELLS; slot++)
             h.assertTrue(machine.assemblyGrid().getStackInSlot(slot).isEmpty(), "Board retained a part at " + slot);
+    }
+
+    @GameTest(template = "empty", batch = "precision_assembly")
+    public static void expandedBoardTransfersAndConsumesOnePartPerCell(GameTestHelper h) {
+        var machine = assembler(h);
+        var recipe = recipe(h, "android_work_console");
+        var inventory = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL).getInventory();
+        var menu = new MachineMenu(1, inventory, machine);
+        var upgrade = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("assembly_stock_upgrade"));
+        machine.items().setStackInSlot(TYPE.assemblyUpgradeSlot(), new ItemStack(upgrade));
+        int slot = 0;
+        for (var ingredient : recipe.ingredients()) {
+            var part = ingredient.ingredient().getItems()[0];
+            for (int i = 0; i < 4 * ingredient.count(); i++) inventory.setItem(slot++, part.copyWithCount(64));
+        }
+        var plan = MachineRecipeTransfer.plan(menu, recipe, true);
+        h.assertTrue(plan != null, "Could not plan 256 complete sets");
+        MachineRecipeTransfer.apply(menu, plan);
+        h.assertTrue(inventory.isEmpty(), "JEI left parts in inventory");
+        var repeat = MachineRecipeTransfer.plan(menu, recipe, false);
+        h.assertTrue(repeat != null, "A fully stocked layout stopped matching");
+        MachineRecipeTransfer.apply(menu, repeat);
+        for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++) {
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(i).getCount() == (recipe.assemblyInput(i) == null ? 0 : 256),
+                    "Incorrect JEI bulk quantity at cell " + i);
+        }
+        machine.energy().setEnergy(machine.energy().getMaxEnergyStored());
+        tick(h, machine, recipe.time());
+        h.assertTrue(ItemStack.matches(recipe.result(), machine.items().getStackInSlot(TYPE.outputSlot())), "Expanded board did not craft");
+        for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(i).getCount() == (recipe.assemblyInput(i) == null ? 0 : 255),
+                    "Craft did not consume one part at cell " + i);
+        h.succeed();
     }
 
     @GameTest(template = "empty", batch = "precision_assembly")

@@ -6,7 +6,10 @@
 |---|---|
 | 遊び方 | [日本語](player/ja.md) · [English](player/en.md) · [简体中文](player/zh-cn.md) · [繁體中文](player/zh-tw.md) · [한국어](player/ko-kr.md) |
 | 実際の材料・製作場所 | [生成されたレシピ一覧](recipes/README.md)。実効値はサーバー設定・データパックでも変わる |
+| 機械性能・電力・ボスの難易度を変更する | [設定例・範囲・大量加工の仕組み](development/pack-balance.md) |
+| Modパックのレシピを調整する | [材料・液体量・出来高・組立配置の変更とサンプル](development/recipe-packs.md) |
 | コードを変更する | [開発ガイド](development/README.md) → [テスト手順](development/testing.md) |
+| アドオンを作る | [環境設定・公開API・Javaコード例](development/addon-api.md) |
 | 0.13.0の変更・根拠・検証 | [0.13.0資料の目次](0.13.0/README.md)。最新版は[バランス調整](0.13.0/balance-adjustment.md) |
 | 残る課題と対応済み項目 | [issue.md](../issue.md) |
 | 支援者の登録 | [支援者名簿](development/supporters.md) |

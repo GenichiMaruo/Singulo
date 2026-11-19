@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.drone;
 
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.machine.SideConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import javax.annotation.Nullable;
@@ -32,13 +34,13 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     /** 自動発送のしきい値（AUTO_THRESHOLDS の番号ごと、mB）: しない・1バケツ・16・32バケツ・満杯（カプセル1つぶん）。 */
     private static final int[] AUTO_FLUID = {0, 1_000, 16_000, 32_000, SEND_CAPACITY};
 
-    private final FluidTank send = new FluidTank(SEND_CAPACITY) {
+    private final FluidTank send = new ConfiguredFluidTank(FluidCapsuleItem::capacityMb, f -> true) {
         @Override
         protected void onContentsChanged() {
             cargoChanged();
         }
     };
-    private final FluidTank receive = new FluidTank(RECEIVE_CAPACITY) {
+    private final FluidTank receive = new ConfiguredFluidTank(FluidDronePortBlockEntity::receiveCapacity, f -> true) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -50,8 +52,13 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     }
 
     /** 自動発送のしきい値（mB）。 */
+    public static int receiveCapacity() {
+        return (int) Math.min(Integer.MAX_VALUE, 2L * FluidCapsuleItem.capacityMb());
+    }
+
     public static int autoThreshold(int mode) {
-        return AUTO_FLUID[Math.floorMod(mode, AUTO_FLUID.length)];
+        int index = Math.floorMod(mode, AUTO_FLUID.length);
+        return index == AUTO_FLUID.length - 1 ? FluidCapsuleItem.capacityMb() : Math.min(AUTO_FLUID[index], FluidCapsuleItem.capacityMb());
     }
 
     public FluidTank sendTank() {
@@ -84,7 +91,7 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
 
     @Override
     protected ItemStack packCargo(ItemStack crate) {
-        FluidStack fluid = send.drain(FluidCapsuleItem.CAPACITY, IFluidHandler.FluidAction.EXECUTE);
+        FluidStack fluid = send.drain(FluidCapsuleItem.capacityMb(), IFluidHandler.FluidAction.EXECUTE);
         return FluidCapsuleItem.pack(crate, fluid);
     }
 
@@ -180,7 +187,7 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
 
         @Override
         public int getTankCapacity(int tank) {
-            return tank == 0 ? SEND_CAPACITY : RECEIVE_CAPACITY;
+            return tank == 0 ? send.getCapacity() : receive.getCapacity();
         }
 
         @Override
@@ -231,8 +238,8 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
         var empty = net.neoforged.neoforge.fluids.SimpleFluidContent.EMPTY;
         FluidStack s = input.getOrDefault(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_SEND_FLUID.get(), empty).copy();
         FluidStack r = input.getOrDefault(io.github.genichimaruo.singulo.registry.SinguloComponents.PORT_RECEIVE_FLUID.get(), empty).copy();
-        send.setFluid(s.isEmpty() ? FluidStack.EMPTY : s.copyWithAmount(Math.min(SEND_CAPACITY, s.getAmount())));
-        receive.setFluid(r.isEmpty() ? FluidStack.EMPTY : r.copyWithAmount(Math.min(RECEIVE_CAPACITY, r.getAmount())));
+        send.setFluid(s);
+        receive.setFluid(r);
     }
 
     @Override

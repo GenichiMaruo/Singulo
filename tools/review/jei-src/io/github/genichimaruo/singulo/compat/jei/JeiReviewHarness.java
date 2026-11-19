@@ -33,7 +33,7 @@ public final class JeiReviewHarness {
     private static final List<String> ASSEMBLIES = List.of("android_tank_upgrade", "android_work_console",
             "android_station", "wormhole_generator_core", "casimir_cavity_frame");
     private static int assembly;
-    private static int transferSets;
+    private static int transferSets, previousUpgradeLimit;
     private static volatile boolean transferVerified;
     private static MachineRecipe transferRecipe;
     private static net.minecraft.resources.ResourceLocation transferId;
@@ -86,7 +86,11 @@ public final class JeiReviewHarness {
     private static void checkTransfer(Minecraft mc) throws Exception {
         if (transferPhase == 1) {
             transferId = Singulo.id("precision_assembler/" + ASSEMBLIES.get(assembly));
-            transferSets = ASSEMBLIES.get(assembly).equals("android_tank_upgrade") ? 8 : 1;
+            transferSets = switch (ASSEMBLIES.get(assembly)) {
+                case "android_tank_upgrade" -> 8;
+                case "android_work_console" -> 256;
+                default -> 1;
+            };
             AssemblySelectorReview.expect(transferId, transferSets);
             transferRecipe = SinguloJeiPlugin.RECIPE_IDS.entrySet().stream().filter(e -> e.getValue().equals(transferId))
                     .findFirst().orElseThrow().getKey();
@@ -98,6 +102,7 @@ public final class JeiReviewHarness {
             mc.getSingleplayerServer().execute(() -> {
                 var player = mc.getSingleplayerServer().getPlayerList().getPlayer(playerId);
                 player.getInventory().clearContent();
+                int nextSlot = 0;
                 for (int i = 0; i < transferRecipe.ingredients().size(); i++) {
                     var ingredient = transferRecipe.ingredients().get(i);
                     var stack = ingredient.ingredient().getItems()[0].copyWithCount(ingredient.count() * transferSets);
@@ -105,7 +110,10 @@ public final class JeiReviewHarness {
                         if (ingredient.usesFrom(stack) != 750) throw new IllegalStateException("Expected one 750-use cavity frame batch");
                         stack = UsesHelper.consume(stack, UsesHelper.remaining(stack) - 750);
                     }
-                    player.getInventory().setItem(i, stack);
+                    while (!stack.isEmpty()) {
+                        if (nextSlot >= 36) throw new IllegalStateException("JEI fixture exceeds the player inventory");
+                        player.getInventory().setItem(nextSlot++, stack.split(stack.getMaxStackSize()));
+                    }
                 }
                 player.teleportTo(1.5, 80, 1.5);
                 for (var floor : net.minecraft.core.BlockPos.betweenClosed(-2, 79, -2, 3, 79, 3))
@@ -116,6 +124,8 @@ public final class JeiReviewHarness {
                 machine.magazine().load(new net.minecraft.nbt.CompoundTag(), player.registryAccess());
                 for (int i = 0; i < machine.items().getSlots(); i++)
                     machine.items().setStackInSlot(i, net.minecraft.world.item.ItemStack.EMPTY);
+                if (transferSets == 256) machine.items().setStackInSlot(machine.type().assemblyUpgradeSlot(),
+                        new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("assembly_stock_upgrade"))));
                 for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
                     machine.assemblyGrid().setStackInSlot(i, net.minecraft.world.item.ItemStack.EMPTY);
                 machine.energy().setEnergy(0);
@@ -163,6 +173,36 @@ public final class JeiReviewHarness {
                 image.writeToFile(output.resolve("assembly-" + ASSEMBLIES.get(assembly) + ".png"));
                 AssemblySelectorReview.verifyGhost(image, (MachineScreen) mc.screen);
             }
+            if (transferSets == 256) {
+                mc.getSingleplayerServer().execute(() -> {
+                    var station = (io.github.genichimaruo.singulo.machine.MachineBlockEntity) mc.getSingleplayerServer().overworld().getBlockEntity(STATION);
+                    var limit = io.github.genichimaruo.singulo.generated.ServerConfig.STOCK_UPGRADE_LIMIT;
+                    previousUpgradeLimit = limit.get();
+                    limit.set(Integer.MAX_VALUE);
+                    int upgrade = station.type().assemblyUpgradeSlot();
+                    var installed = station.items().getStackInSlot(upgrade);
+                    station.items().insertItem(upgrade, installed.copyWithCount(Integer.MAX_VALUE - installed.getCount()), false);
+                    for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                        var stack = station.assemblyGrid().getStackInSlot(cell);
+                        if (!stack.isEmpty()) station.assemblyGrid().insertItem(cell, stack.copyWithCount(Integer.MAX_VALUE - stack.getCount()), false);
+                    }
+                });
+                transferTicks = 0;
+                transferPhase = 9;
+            } else {
+                AssemblySelectorReview.openAndHover((MachineScreen) mc.screen);
+                transferPhase = 5;
+            }
+        } else if (transferPhase == 9 && mc.player.containerMenu instanceof io.github.genichimaruo.singulo.machine.MachineMenu menu) {
+            var stocked = menu.slots.stream().filter(s -> menu.assemblyExcess(s) > 0).toList();
+            if (menu.transferStack(menu.type().assemblyUpgradeSlot()).getCount() != Integer.MAX_VALUE
+                    || stocked.size() < 2 || stocked.stream().anyMatch(s -> (long) s.getItem().getCount() + menu.assemblyExcess(s) != Integer.MAX_VALUE)
+                    || ++transferTicks < 4) return;
+            try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+                image.writeToFile(Path.of(System.getProperty("singulo.jeiReviewOutput"), "assembly-extreme-stock.png"));
+            }
+            mc.getSingleplayerServer().execute(() -> io.github.genichimaruo.singulo.generated.ServerConfig.STOCK_UPGRADE_LIMIT.set(previousUpgradeLimit));
+            Singulo.LOGGER.info("SINGULO_EXTREME_STOCK_COMPLETE {}", Integer.MAX_VALUE);
             AssemblySelectorReview.openAndHover((MachineScreen) mc.screen);
             transferPhase = 5;
         } else if (transferPhase == 5 && AssemblySelectorReview.captureSelector(mc, ASSEMBLIES.get(assembly), transferRecipe,
@@ -201,6 +241,7 @@ public final class JeiReviewHarness {
             add(MachineType.COMPRESSOR, true);
             add(MachineType.PELTIER_COOLER, false);
             add(MachineType.PRECISION_ASSEMBLER, false);
+            add(MachineType.KILN, false);
             int verified = 0;
             for (MachineType type : MachineType.values()) {
                 var runtime = JeiSearch.runtime;
@@ -222,6 +263,13 @@ public final class JeiReviewHarness {
             var recipe = SinguloJeiPlugin.RECIPE_IDS.keySet().stream()
                     .filter(r -> r.station().equals(type.id()) && r.mass().isPresent() == mass)
                     .max(java.util.Comparator.comparingInt(r -> r.ingredients().size())).orElseThrow();
+            if (type == MachineType.KILN) {
+                var base = recipe.ingredients().getFirst();
+                var input = new MachineRecipe.ItemInput(base.ingredient(), Integer.MAX_VALUE, 0, 0);
+                recipe = new MachineRecipe(type.id(), 1, Integer.MAX_VALUE, Integer.MAX_VALUE, List.of(input),
+                        List.of(), java.util.Optional.empty(), java.util.Optional.empty(), recipe.result().copyWithCount(Integer.MAX_VALUE),
+                        List.of(), 0, 0, net.minecraft.world.item.ItemStack.EMPTY);
+            }
             var category = runtime.getRecipeManager().getRecipeCategory(SinguloJeiPlugin.TYPES.get(type));
             var layout = runtime.getRecipeManager().createRecipeLayoutDrawable(category, recipe,
                     runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup()).orElseThrow();
@@ -255,7 +303,7 @@ public final class JeiReviewHarness {
             for (int i = 0; i < layouts.size(); i++) {
                 var layout = layouts.get(i);
                 int x = width * (1 + 2 * (i % 2)) / 4 - layout.getRect().getWidth() / 2;
-                int y = 25 + i / 2 * (height / 2);
+                int y = 25 + i / 2 * (height / 3);
                 graphics.drawString(font, layout.getRecipeCategory().getTitle(), x, y - 12, 0xFF202020, false);
                 layout.setPosition(x, y);
                 layout.drawRecipe(graphics, -1, -1);

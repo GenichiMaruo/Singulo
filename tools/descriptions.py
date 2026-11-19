@@ -5,6 +5,8 @@ gen_data.py がレシピから自動で足すので、ここには書かない�
 """
 
 DESC = {
+    '組立盤拡張アップグレード': ('精密組立台の右下に装着すると、各マスに同じ材料を複数スタック置ける。重ねられない道具は1個まで。すべての材料枠が64個以下になると取り外せる。',
+        'Install in the bottom-right slot of the Precision Assembler to stock multiple stacks of the same part in each cell. Unstackable tools occupy one cell each. Remove the upgrade once every cell holds 64 items or fewer.'),
     '容量アップグレード（Mk1）': ('加工装置の容量専用枠に1個装着すると、蓄電容量が最低1,000,000 FEになる。速度アップグレードと併用でき、受電上限は変えない。取り外し時の余剰電力は保持し、容量内に減るまで受電しない。',
                                   'Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.'),
     '容量アップグレード（Mk2）': ('Mk1から作る容量アップグレード。加工装置の蓄電容量が最低4,000,000 FEになる。専用枠に1個だけ装着し、受電上限は変えない。',
@@ -448,8 +450,8 @@ DESC = {
     '量子錠の鍵': ('量子錠の封印コンテナを開け閉めする鍵。1回で使い切る。', 'Opens or seals a quantum-lock container. Used up each time.'),
     '時間錠の鍵': ('時間錠の封印コンテナを開け閉めする鍵。1回で使い切る。', 'Opens or seals a temporal-lock container. Used up each time.'),
     '特異点錠の鍵': ('特異点錠の封印コンテナを開け閉めする鍵。1回で使い切る。', 'Opens or seals a singularity-lock container. Used up each time.'),
-    'オーバークロック・チップ': ('装置のアップグレード枠に挿すと処理速度×3、そのかわり電力×4（全体では1.33倍）。単極子とは同時に使えない。',
-                       "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole."),
+    'オーバークロック・チップ': ('装置のアップグレード枠に挿して加工速度と消費電力を調整する。単極子と同じ枠を使う。',
+                       "Install in the machine upgrade slot to change speed and power use. Shares a slot with the monopole."),
     '重力ブーツ': ('落下ダメージを受けない。空中で壁に向かってジャンプすると、壁を蹴って跳べる（着地までに3回）。',
               'No fall damage. Jump while touching a wall in mid-air to kick off it (three times before landing).'),
     '触媒安定化剤': ('もう片方の手に触媒を持って使うと、その触媒の残りの寿命が2倍になる。1つの触媒に1回まで。',
@@ -682,6 +684,7 @@ DESC.update(_BLUEPRINT_DESC)
 
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)
 SUMMARY = {
+    '組立盤拡張アップグレード': ('組立盤の各マスに置ける材料の数を増やす。', 'Increases the material capacity of each assembly cell.'),
     '鋼鉄インゴット': ('丈夫な構造用金属。', 'A sturdy structural metal.'),
     '亜鉛インゴット': ('亜鉛の地金。', 'An ingot of zinc.'),
     'ビスマスインゴット': ('表面が虹色に輝く金属。', 'A metal with an iridescent surface.'),
@@ -890,8 +893,8 @@ SUMMARY = {
         'A sealed container opened with a Temporal Key.'),
     '封印コンテナ（特異点錠）': ('特異点錠の鍵で開く封印コンテナ。',
         'A sealed container opened with a Singularity Key.'),
-    'オーバークロック・チップ': ('装置の処理を3倍速くする。電力は4倍になる。',
-        'Triples a machine’s speed for four times the power.'),
+    'オーバークロック・チップ': ('加工速度と毎tickの消費電力を変える。',
+        'Changes processing speed and power use per tick.'),
     '重力ブーツ': ('落下ダメージを受けず、空中で壁を蹴って跳べる。',
         'No fall damage, and you can wall-jump in mid-air.'),
     '触媒安定化剤': ('触媒の残りの寿命を2倍にする。',

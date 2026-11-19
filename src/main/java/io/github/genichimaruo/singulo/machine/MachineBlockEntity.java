@@ -57,7 +57,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     private final MachineType type;
     private final ItemStackHandler items;
-    @Nullable private final ItemStackHandler assemblyGrid;
+    @Nullable private final AssemblyGrid assemblyGrid;
     private final java.util.BitSet assemblyReturns = new java.util.BitSet(0);
     /** Bulk inputs from older assemblers, returned to a player on opening the machine. */
     private final List<ItemStack> legacyAssemblyInputs = new ArrayList<>();
@@ -75,6 +75,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private int maxProgress;
     /** Paid growth duration while the final product waits for a compatible output slot. */
     private int completedDuration;
+    private int batchRemaining;
     private int usage;
     private Status status = Status.IDLE;
     /** 0 = 通常加工、1以上 = 質量レシピ（massRecipes の番号+1）。 */
@@ -126,7 +127,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
 
             @Override
+            public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                if (slot == type.assemblyUpgradeSlot() && assemblyGrid != null && assemblyGrid.locksUpgrade()) return ItemStack.EMPTY;
+                return super.extractItem(slot, amount, simulate);
+            }
+
+            @Override
             protected int getStackLimit(int slot, ItemStack stack) {
+                if (slot == type.assemblyUpgradeSlot()) return AssemblyGrid.upgradeLimit();
+                if (slot < type.inputSlots() + type.outputSlots()) return MachineStock.limit(stack, slot < type.inputSlots());
                 if (slot == type.catalystSlot()) {
                     return Math.min(CatalystMagazine.SUPPLY_LIMIT, super.getStackLimit(slot, stack));
                 }
@@ -135,11 +144,23 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
             @Override
             public int getSlotLimit(int slot) {
+                if (slot < type.inputSlots() + type.outputSlots()) return MachineStock.limit(64);
+                if (slot == type.assemblyUpgradeSlot()) return AssemblyGrid.upgradeLimit();
                 return slot == type.upgradeSlot() || slot == type.capacitySlot() ? 1
                         : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
             }
         };
-        this.assemblyGrid = type == MachineType.PRECISION_ASSEMBLER ? new ItemStackHandler(MachineRecipe.ASSEMBLY_CELLS) {
+        this.assemblyGrid = type == MachineType.PRECISION_ASSEMBLER ? new AssemblyGrid() {
+            @Override
+            public int getSlotLimit(int slot) {
+                return AssemblyGrid.limit(64, items.getStackInSlot(type.assemblyUpgradeSlot()));
+            }
+
+            @Override
+            protected int getStackLimit(int slot, ItemStack stack) {
+                return AssemblyGrid.limit(stack, items.getStackInSlot(type.assemblyUpgradeSlot()));
+            }
+
             @Override
             protected void onContentsChanged(int slot) {
                 assemblyReturns.clear(slot);
@@ -153,7 +174,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         } : null;
         this.tanks = new FluidTank[type.tanks()];
         for (int i = 0; i < tanks.length; i++) {
-            tanks[i] = new FluidTank(MachineType.TANK_CAPACITY) {
+            tanks[i] = new FluidTank(MachineType.tankCapacity()) {
+                @Override
+                public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
+                    return getSpace() <= 0 ? 0 : super.fill(resource, action);
+                }
+
                 @Override
                 protected void onContentsChanged() {
                     markDirty();
@@ -185,6 +211,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void refreshEnergyCapacity() {
+        energy.setReceiveLimit(type.energyReceiveLimit());
         energy.resizeCapacity(Math.max(type.energyCapacity(), CapacityUpgrades.capacity(
                 CapacityUpgrades.tier(items.getStackInSlot(type.capacitySlot())))));
     }
@@ -243,6 +270,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     public boolean slotAccepts(int slot, ItemStack stack) {
         if (pendingReturns.get(slot)) return false;
         if (slot == type.spentCatalystSlot()) return UsesHelper.isSpentCatalyst(stack);
+        if (slot == type.assemblyUpgradeSlot()) return AssemblyGrid.isUpgrade(stack);
         if (slot == type.capacitySlot()) return CapacityUpgrades.tier(stack) > 0;
         if (slot == type.upgradeSlot()) {
             return isUpgrade(stack);
@@ -579,6 +607,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private Status process(Level level, BlockPos pos, MachineRecipe recipe) {
+        if (batchRemaining > 0) {
+            finishBatch(level, recipe, 256);
+            return Status.RUNNING;
+        }
         if (progress < maxProgress) {
             if (!canOutput(recipe)) {
                 timeCarry = 0;
@@ -588,13 +620,13 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             timeCarry += TimeFields.speed(level, pos);
             int steps = (int) timeCarry;
             if (steps == 0) return Status.RUNNING;
-            int done = affordableSteps(steps);
+            int done = Math.min(maxProgress - progress, affordableSteps(steps));
             if (!energy.consume(usage * done) && !(runsUnderpowered(recipe) && drawPartial())) {
                 timeCarry = 0;
                 return Status.NO_POWER;
             }
             timeCarry -= steps;
-            progress = Math.min(maxProgress, progress + done);
+            progress += done;
         }
         if (progress >= maxProgress) {
             if (!craft(level, recipe)) {
@@ -603,11 +635,72 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 timeCarry = 0;
                 return Status.OUTPUT_FULL;
             }
+            // Each additional operation pays a complete cycle from the buffer and goes through the
+            // same item, fluid, catalyst, byproduct and output checks as the first operation.
+            batchRemaining = ServerConfig.MACHINE_BATCH_LIMIT.get() - 1;
+            if (batchRemaining > 0) finishBatch(level, recipe, 255);
             progress = 0;
             completedDuration = 0;
             dirty = true;
         }
         return Status.RUNNING;
+    }
+
+    private void finishBatch(Level level, MachineRecipe recipe, int tickBudget) {
+        long cost = (long) usage * maxProgress;
+        if (cost > 0) batchRemaining = (int) Math.min(batchRemaining, energy.getEnergyStored() / cost);
+        if (batchRemaining == 0 || bulkItems(recipe, batchRemaining, cost)) {
+            batchRemaining = 0;
+        } else {
+            int count = Math.min(batchRemaining, tickBudget);
+            for (int i = 0; i < count; i++) {
+                if (!craft(level, recipe)) {
+                    batchRemaining = 0;
+                    break;
+                }
+                energy.consume((int) cost);
+                batchRemaining--;
+            }
+        }
+        setChanged();
+    }
+
+    /** Complete an ordinary item recipe in slot-sized groups, independent of the number of items. */
+    private boolean bulkItems(MachineRecipe r, int remaining, long cost) {
+        if (getClass() != MachineBlockEntity.class || r.result().isEmpty() || type.outputSlots() != 1
+                || r.result().getMaxStackSize() <= 1 || !r.byproduct().isEmpty() || r.restore().isPresent()
+                || r.mass().isPresent() || !r.fluidIngredients().isEmpty() || !r.fluidResults().isEmpty()
+                || r.ingredients().stream().anyMatch(in -> in.uses() != 0 || type.hasCatalystSlot() && r.assemblyCatalyst(in))) return false;
+        var inventory = assemblyGrid == null ? items : assemblyGrid;
+        crafting = true;
+        try {
+            while (remaining > 0) {
+                var inputs = currentInputs(r);
+                var plan = inputPlan(r, inputs, assemblyGrid != null);
+                if (plan == null) break;
+                if (type.hasCatalystSlot() && plan.consume()[inputs.size() - 1] != 0) break;
+                ItemStack result = previewResult(r, inputs, plan);
+                ItemStack stored = items.getStackInSlot(type.outputSlot());
+                if (!stored.isEmpty() && !ItemStack.isSameItemSameComponents(stored, result)) break;
+                int copies = Math.min(remaining, (MachineStock.limit(result, false) - stored.getCount()) / result.getCount());
+                for (int i = 0; i < inputs.size(); i++) {
+                    if (plan.consume()[i] > 0) copies = Math.min(copies, inputs.get(i).getCount() / plan.consume()[i]);
+                }
+                if (copies <= 0) break;
+                for (int i = 0; i < inputs.size(); i++) {
+                    if (plan.consume()[i] == 0) continue;
+                    int slot = assemblyGrid == null ? type.recipeSlot(i) : i;
+                    ItemStack stack = inventory.getStackInSlot(slot);
+                    inventory.setStackInSlot(slot, stack.copyWithCount(stack.getCount() - plan.consume()[i] * copies));
+                }
+                insertOutput(result.copyWithCount(result.getCount() * copies), false);
+                energy.consume((int) (cost * copies));
+                remaining -= copies;
+            }
+        } finally {
+            crafting = false;
+        }
+        return true;
     }
 
     /** 電力が足りないとき、ある分だけ使う。要求の80%未満なら不純な tick として数える。何もなければ false。 */
@@ -672,6 +765,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
         resumeRecipe = null;
         if (found == null || !found.id().equals(previous)) {
+            batchRemaining = 0;
             progress = 0;
             completedDuration = 0;
             underpoweredTicks = 0;
@@ -686,21 +780,21 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 speed *= 2;
             }
             if (hasOverclock()) {
-                speed *= 3;
+                speed *= ServerConfig.OVERCLOCK_SPEED_MULTIPLIER.get();
             }
             // 上位の触媒で払うレシピは速く進む
             MachineRecipe.Plan plan = inputPlan(found.value(), inputs, manual);
             if (plan != null) {
                 speed *= plan.speed();
             }
-            maxProgress = completedDuration > 0 ? completedDuration : Math.max(1, (int) Math.round(found.value().time() / speed));
+            maxProgress = completedDuration > 0 ? completedDuration : Math.clamp(Math.round(found.value().time() / speed), 1, Integer.MAX_VALUE);
             if (fixedEnergyPerCraft(found.value())) {
                 // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ
                 usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
                         * found.value().time() / (double) maxProgress);
             } else {
                 usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
-                        / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
+                        / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? ServerConfig.OVERCLOCK_POWER_MULTIPLIER.get() : 1.0));
             }
         }
     }
@@ -830,6 +924,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         Object snapshot = MachineRecipeIndex.snapshot(level);
         if (recipeSnapshot != snapshot) {
             recipeSnapshot = snapshot;
+            for (FluidTank tank : tanks) tank.setCapacity(MachineType.tankCapacity());
+            refreshEnergyCapacity();
             selectedIndex = -2;
             markDirty();
         }
@@ -882,7 +978,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return status;
     }
 
-    public int remainingTicks() {
+    @Override public int remainingTicks() {
         return current == null ? -1 : Math.max(1, maxProgress - progress);
     }
 
@@ -1082,12 +1178,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             int left = want.getCount();
             for (int i = 0; i < slots.length && left > 0 && !want.isEmpty(); i++) {
                 if (slots[i].isEmpty()) {
-                    int limit = Math.min(want.getMaxStackSize(), items.getSlotLimit(type.outputSlot() + i));
+                    int limit = MachineStock.limit(want, false);
                     slots[i] = want.copyWithCount(Math.min(left, limit));
                     left -= slots[i].getCount();
                 } else if (ItemStack.isSameItemSameComponents(slots[i], want)
                         || unknownPurity && want == result && ItemStack.isSameItem(slots[i], result)) {
-                    int move = Math.min(left, Math.min(slots[i].getMaxStackSize(), items.getSlotLimit(type.outputSlot() + i)) - slots[i].getCount());
+                    int move = Math.min(left, MachineStock.limit(slots[i], false) - slots[i].getCount());
                     if (move > 0) {
                         slots[i].grow(move);
                         left -= move;
@@ -1205,7 +1301,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 }
             }
             if (plan.consume()[i] > 0) {
-                materialSlots.extractItem(slot, plan.consume()[i], false);
+                ItemStack stock = materialSlots.getStackInSlot(slot);
+                materialSlots.setStackInSlot(slot, stock.copyWithCount(stock.getCount() - plan.consume()[i]));
             }
         }
         r.mass().ifPresent(m -> {
@@ -1261,7 +1358,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     public static int syncedCount(MachineType type) {
-        return assemblyPreviewIndex(type) + (type == MachineType.PRECISION_ASSEMBLER ? 1 : 0);
+        return assemblyPreviewIndex(type) + (type.massMode() ? 4 : type == MachineType.PRECISION_ASSEMBLER ? 1 : 0);
     }
 
     /** Synced after the existing side settings. Zero is an empty board preview. */
@@ -1296,8 +1393,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_USAGE -> current == null ? 0 : usage;
             case D_STATUS -> status.ordinal();
             case D_MODE -> mode;
-            case D_MASS -> massTargetIsMetal() ? (int) Math.round(metalMass * 100) : (int) Math.round(mass * 100);
-            case D_MASS_TARGET -> massTarget();
+            case D_MASS -> Math.clamp(Math.round((massTargetIsMetal() ? metalMass : mass) * 100), 0, Integer.MAX_VALUE);
+            case D_MASS_TARGET -> Math.clamp(Math.round(massTarget() * 100), 0, Integer.MAX_VALUE);
             case D_STRUCTURE -> structureSize();
             case D_LINING -> liningCount();
             case D_SELECTED -> selectedIndex() + 1;
@@ -1307,6 +1404,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_LOADED_USES -> magazine.loaded().isEmpty() ? 0 : io.github.genichimaruo.singulo.item.UsesHelper.remaining(magazine.loaded());
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
+                int tail = index - assemblyPreviewIndex(type);
+                if (type.massMode() && tail >= 0) {
+                    double value = tail < 2 ? (massTargetIsMetal() ? metalMass : mass) : massTarget();
+                    yield SyncedInts.doubleWord(value, tail % 2);
+                }
                 if (index == assemblyPreviewIndex(type)) yield assemblyPreview();
                 if (index >= sidesIndex(type)) {
                     yield sides(index - sidesIndex(type)).packed();
@@ -1340,12 +1442,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return r != null && r.value().mass().map(MachineRecipe.MassInput::metalOnly).orElse(false);
     }
 
-    private int massTarget() {
+    private double massTarget() {
         if (level == null) {
             return 0;
         }
         RecipeHolder<MachineRecipe> r = selectedMassRecipe(level);
-        return r == null ? 0 : r.value().mass().map(m -> (int) Math.round(m.amount() * 100)).orElse(0);
+        return r == null ? 0 : r.value().mass().map(MachineRecipe.MassInput::amount).orElse(0.0);
     }
 
     @Override
@@ -1380,12 +1482,38 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         });
     }
 
+    boolean packStockOnBreak() {
+        for (int i = 0; i < items.getSlots(); i++) {
+            ItemStack stack = items.getStackInSlot(i);
+            if (stack.getCount() > stack.getMaxStackSize()) return true;
+        }
+        if (assemblyGrid == null) return false;
+        for (int i = 0; i < assemblyGrid.getSlots(); i++) {
+            ItemStack stack = assemblyGrid.getStackInSlot(i);
+            if (stack.getCount() > 4 * stack.getMaxStackSize()) return true;
+        }
+        return false;
+    }
+
     public void dropContents(Level level, BlockPos pos) {
+        // One movable machine instead of potentially millions of loose item entities.
+        if (packStockOnBreak()) {
+            if (!level.isClientSide) {
+                ItemStack packed = new ItemStack(getBlockState().getBlock());
+                net.minecraft.world.item.BlockItem.setBlockEntityData(packed, getType(), saveCustomOnly(level.registryAccess()));
+                packed.set(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
+                Block.popResource(level, pos, packed);
+            }
+            return;
+        }
         for (int i = 0; i < items.getSlots(); i++) {
             Block.popResource(level, pos, items.getStackInSlot(i));
         }
         if (assemblyGrid != null) {
-            for (int i = 0; i < assemblyGrid.getSlots(); i++) Block.popResource(level, pos, assemblyGrid.getStackInSlot(i));
+            for (int i = 0; i < assemblyGrid.getSlots(); i++) {
+                ItemStack parts = assemblyGrid.getStackInSlot(i).copy();
+                while (!parts.isEmpty()) Block.popResource(level, pos, parts.split(parts.getMaxStackSize()));
+            }
             for (ItemStack old : legacyAssemblyInputs) Block.popResource(level, pos, old);
         }
         for (ItemStack s : magazine.contents()) {
@@ -1407,7 +1535,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (level.isClientSide || ServerConfig.SPEC.isLoaded() && !ServerConfig.HYDROGEN_LEAK_EXPLOSION.get()) {
             return;
         }
-        int hydrogen = 0;
+        long hydrogen = 0;
         for (FluidTank tank : tanks) {
             if (tank.getFluid().is(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"))) {
                 hydrogen += tank.getFluidAmount();
@@ -1436,7 +1564,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("inputs_changed_at", inputsChangedAt);
-        tag.put("items", items.serializeNBT(registries));
+        tag.put("items", MachineStock.save(items, registries));
         tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
         if (assemblyGrid != null) {
             tag.put("assembly_grid", assemblyGrid.serializeNBT(registries));
@@ -1461,6 +1589,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         tag.put("tanks", tankList);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putInt("progress", progress);
+        if (batchRemaining > 0) tag.putInt("batch_remaining", batchRemaining);
         if (completedDuration > 0) tag.putInt("completed_duration", completedDuration);
         tag.putInt("underpowered_ticks", underpoweredTicks);
         tag.putInt("mode", mode);
@@ -1501,8 +1630,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         super.loadAdditional(tag, registries);
         magazine.load(tag.getCompound("magazine"), registries);
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
-        ItemStackHandler loaded = new ItemStackHandler();
-        loaded.deserializeNBT(registries, tag.getCompound("items"));
+        ItemStackHandler loaded = MachineStock.read(tag.getCompound("items"), registries);
         int[] layout = tag.getIntArray("slot_layout");
         if (layout.length != 2) {
             layout = type.legacyLayout();
@@ -1537,11 +1665,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 ItemStack rest = items.insertItem(type.spentCatalystSlot(), items.getStackInSlot(type.outputSlot()), false);
                 items.setStackInSlot(type.outputSlot(), rest);
             }
-            ItemStackHandler savedGrid = new ItemStackHandler(0);
-            if (tag.contains("assembly_grid")) savedGrid.deserializeNBT(registries, tag.getCompound("assembly_grid"));
-            for (int i = 0; i < assemblyGrid.getSlots(); i++) {
-                assemblyGrid.setStackInSlot(i, i < savedGrid.getSlots() ? savedGrid.getStackInSlot(i) : ItemStack.EMPTY);
-            }
+            assemblyGrid.deserializeNBT(registries, tag.getCompound("assembly_grid"));
             assemblyReturns.clear();
             for (int slot : tag.getIntArray("assembly_returns")) {
                 if (slot >= 0 && slot < assemblyGrid.getSlots() && !assemblyGrid.getStackInSlot(slot).isEmpty()) assemblyReturns.set(slot);
@@ -1581,6 +1705,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         refreshEnergyCapacity();
         energy.restoreEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
+        batchRemaining = Math.max(0, tag.getInt("batch_remaining"));
         completedDuration = Math.clamp(tag.getInt("completed_duration"), 0, Math.max(0, progress));
         underpoweredTicks = Math.max(0, tag.getInt("underpowered_ticks"));
         mode = type.massMode() ? tag.getInt("mode") : 0;

@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.client;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.item.UsesData;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
@@ -353,7 +355,7 @@ public final class SinguloClient {
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
         // 電力の数: Shift を押している間は正確な値
-        io.github.genichimaruo.singulo.energy.EnergyText.detail = net.minecraft.client.gui.screens.Screen::hasShiftDown;
+        EnergyText.detail = net.minecraft.client.gui.screens.Screen::hasShiftDown;
         // 作業位置カード: 記録済みなら絵を切り替える
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
@@ -405,7 +407,27 @@ public final class SinguloClient {
         boolean hasUses = net.minecraft.client.resources.language.I18n.exists("uses.singulo." + id.getPath());
         boolean detailed = net.minecraft.client.gui.screens.Screen.hasShiftDown();
         java.util.List<Component> tip = event.getToolTip();
-        tip.add(Component.translatable(hasSummary && !detailed ? summary : key).withStyle(ChatFormatting.GRAY));
+        tip.add((hasSummary && !detailed ? Component.translatable(summary) : itemDescription(event.getItemStack().getItem(), key))
+                .withStyle(ChatFormatting.GRAY));
+        if (ServerConfig.SPEC.isLoaded()) {
+            Component limits = switch (id.getPath()) {
+                case "android_tank_upgrade", "android_gas_tank_upgrade", "android_dual_tank_upgrade" ->
+                        Component.translatable("tooltip.singulo.tank_room", EnergyText.of((long) (id.getPath().equals("android_dual_tank_upgrade")
+                                ? ServerConfig.ANDROID_DUAL_TANK_CAPACITY : ServerConfig.ANDROID_TANK_CAPACITY).get()));
+                case "packing_crate", "battery_packing_crate", "large_battery_packing_crate" ->
+                        Component.translatable("tooltip.singulo.cargo_slots", ServerConfig.CARGO_STACKS_PER_FLIGHT.get());
+                case "assembly_stock_upgrade" -> Component.translatable("tooltip.singulo.stock_limits",
+                        ServerConfig.STOCK_UPGRADE_LIMIT.get(),
+                        EnergyText.of(ServerConfig.EXTRA_STACKS_PER_UPGRADE.get().longValue()));
+                case "overclock_chip" -> Component.translatable("tooltip.singulo.overclock_rates",
+                        EnergyText.of(ServerConfig.OVERCLOCK_SPEED_MULTIPLIER.get()),
+                        EnergyText.of(ServerConfig.OVERCLOCK_POWER_MULTIPLIER.get()));
+                case "collapsar_parallel_cassette" -> Component.translatable("tooltip.singulo.parallel_limit",
+                        EnergyText.of(ServerConfig.PARALLEL_BATCH_LIMIT.get().longValue()));
+                default -> null;
+            };
+            if (limits != null) tip.add(limits.copy().withStyle(ChatFormatting.AQUA));
+        }
         if (detailed) {
             for (String k : new String[]{"howto", "uses"}) {
                 String full = k + ".singulo." + id.getPath();
@@ -416,6 +438,19 @@ public final class SinguloClient {
         } else if (hasSummary || hasHowto || hasUses) {
             tip.add(Component.translatable("tooltip.singulo.more").withStyle(ChatFormatting.DARK_GRAY));
         }
+    }
+
+    public static net.minecraft.network.chat.MutableComponent itemDescription(net.minecraft.world.item.Item item, String key) {
+        var description = Component.translatable(key);
+        boolean configurable = item instanceof io.github.genichimaruo.singulo.drone.DroneCrateItem
+                || item instanceof net.minecraft.world.item.BlockItem block
+                && (block.getBlock() instanceof io.github.genichimaruo.singulo.cable.CableBlock
+                    || block.getBlock() instanceof io.github.genichimaruo.singulo.pipe.FluidPipeBlock)
+                || switch (net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item).getPath()) {
+                    case "android_tank_upgrade", "android_gas_tank_upgrade", "android_dual_tank_upgrade" -> true;
+                    default -> false;
+                };
+        return configurable ? Component.translatable("tooltip.singulo.default_description", description) : description;
     }
 
     /** 画面端で幅が狭くなる場合も、全文から一度だけ折り返す。 */

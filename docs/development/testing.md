@@ -7,7 +7,7 @@
 
 ## 全体の検証
 
-Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 901件、Mekanismを入れる専用GameTest 5件、検証ツールの単体テスト154件。GUIは通常22画面と5言語×50画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
+Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 922件、Mekanismを入れる専用GameTest 5件、検証ツールの単体テスト154件。GUIは通常22画面と5言語×50画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
 
 ```sh
 python3 -m unittest discover -s tools -p 'test_*.py'
@@ -68,7 +68,7 @@ JEIの配置・素材転送だけを確認する場合は、`prepare_gui.py`と�
 bash ./gradlew --no-configuration-cache -I tools/review/jei.gradle runClient
 ```
 
-圧縮機（通常・質量）・ペルチェ冷却器・精密組立台を5言語で描画し、枠の重なりと範囲を検査する。`build/jei-review/screenshots/`に画像を保存する。登録済みJEIハンドラから素材転送パケットを送り、精密組立台の通常転送でワームホール生成器コアの材料が1回分、Shift転送でタンクアップグレードの材料が8回分、それぞれ正しいマスに入ることを確認する。成功ログは`SINGULO_JEI_LAYOUT_COMPLETE`（5言語）と`SINGULO_JEI_TRANSFER_COMPLETE`。さらに、移動したレシピ選択・入出力設定ポップアップ越しにJEIの矢印を操作できないこと、閉じると操作が戻ること、面設定の初期表示で正面を選べて回転後は裏面も選べることを検査する（`SINGULO_POPUP_INPUT_COMPLETE`）。検証後は通常の`build`を実行し、検証コードを製品JARから除外する。
+圧縮機（通常・質量）・ペルチェ冷却器・精密組立台を5言語で描画し、枠の重なりと範囲を検査する。`build/jei-review/screenshots/`に画像を保存する。登録済みJEIハンドラから素材転送パケットを送り、精密組立台の通常転送でワームホール生成器コアの材料が1回分、Shift転送でタンクアップグレードの材料が8回分、それぞれ正しいマスに入ることを確認する。組立盤拡張アップグレードの装着時には、作業コンソール256回分を一括配置し、各マスの合計数がサーバーと画面で一致することも確認する。極端な設定の焼成炉では21億個の材料・製品を枠内に描画し、実機の精密組立台でも21億個を同期して撮影する（`SINGULO_EXTREME_STOCK_COMPLETE`）。成功ログは`SINGULO_JEI_LAYOUT_COMPLETE`（5言語）と`SINGULO_JEI_TRANSFER_COMPLETE`。さらに、移動したレシピ選択・入出力設定ポップアップ越しにJEIの矢印を操作できないこと、閉じると操作が戻ること、面設定の初期表示で正面を選べて回転後は裏面も選べることを検査する（`SINGULO_POPUP_INPUT_COMPLETE`）。検証後は通常の`build`を実行し、検証コードを製品JARから除外する。
 
 精密組立台のクライアント検査では、無給電で完成見本が出ることと、組立台のレシピ一覧で製品にカーソルを合わせると配置図が出ることも確認する。`screenshots/assembly-selector-ja_jp-*.png`に日本語の配置図を保存し、材料アイコンが表示された位置を全21マスで照合する。残り寿命750のBE凝縮触媒を使うケースでは、給電後の完成品4個と失活触媒1個がそれぞれ専用枠に入った画面を`screenshots/assembly-spent-catalyst.png`に保存する。
 

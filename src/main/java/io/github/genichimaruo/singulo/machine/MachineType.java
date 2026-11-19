@@ -39,6 +39,11 @@ public enum MachineType {
     public static final int ENERGY_CAPACITY = 20_000;
     public static final int TANK_CAPACITY = 8_000;
 
+    public static int tankCapacity() {
+        return io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded()
+                ? io.github.genichimaruo.singulo.generated.ServerConfig.MACHINE_TANK_CAPACITY.get() : TANK_CAPACITY;
+    }
+
     private final String id;
     private final int stage;
     private final int inputSlots;
@@ -98,10 +103,12 @@ public enum MachineType {
     }
 
     public int itemSlots() {
-        return capacitySlot() + (this == PRECISION_ASSEMBLER ? 2 : 1);
+        return capacitySlot() + (this == PRECISION_ASSEMBLER ? 3 : 1);
     }
 
     public int spentCatalystSlot() { return this == PRECISION_ASSEMBLER ? capacitySlot() + 1 : -1; }
+
+    public int assemblyUpgradeSlot() { return this == PRECISION_ASSEMBLER ? capacitySlot() + 2 : -1; }
 
     /** Appended after all legacy slots so old inventories keep their slot indices. */
     public int capacitySlot() { return upgradeSlot() + 1; }
@@ -166,6 +173,10 @@ public enum MachineType {
 
     /** 装置の基本容量。容量アップグレードは別枠で増設する。 */
     public int energyCapacity() {
+        return CapacityUpgrades.scaledCapacity(baseCapacity());
+    }
+
+    private int baseCapacity() {
         return switch (stage) {
             case 1 -> ENERGY_CAPACITY;
             case 2 -> 100_000;
@@ -177,6 +188,6 @@ public enum MachineType {
 
     /** Reception is independent of buffer upgrades; assembling late-game parts needs high throughput. */
     public int energyReceiveLimit() {
-        return this == PRECISION_ASSEMBLER ? 4_000_000 : energyCapacity() / 10;
+        return CapacityUpgrades.scaledCapacity(this == PRECISION_ASSEMBLER ? 4_000_000 : baseCapacity() / 10);
     }
 }

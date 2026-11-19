@@ -232,6 +232,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             return false;
         }
         double fill = energy.getMaxEnergyStored() <= 0 ? 0 : (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
+        if (io.github.genichimaruo.singulo.generated.ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() == 0) return true;
         if (standby ? fill < STANDBY_RESUME : fill >= STANDBY_FULL) {
             standby = !standby;
         }
@@ -381,7 +382,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         tag.put("catalyst", slot.serializeNBT(registries));
         tag.put("magazine", magazine.save(registries));
         tag.put("spent", spent.serializeNBT(registries));
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.putDouble("wear", wear);
         tag.putBoolean("enabled", enabled);
     }
@@ -392,7 +393,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         slot.deserializeNBT(registries, tag.getCompound("catalyst"));
         magazine.load(tag.getCompound("magazine"), registries);
         spent.deserializeNBT(registries, tag.getCompound("spent"));
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         wear = tag.getDouble("wear");
         enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
     }

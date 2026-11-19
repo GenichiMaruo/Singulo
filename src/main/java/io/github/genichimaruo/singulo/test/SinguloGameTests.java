@@ -373,7 +373,8 @@ public final class SinguloGameTests {
             cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 1), IFluidHandler.FluidAction.EXECUTE);
         });
         helper.runAtTickTime(12, () -> {
-            helper.assertTrue(cell.energy().getEnergyStored() == 18, "The completed second gas pair did not generate power");
+            int expected = (int) Math.floor(4 * io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity.fePerMb());
+            helper.assertTrue(cell.energy().getEnergyStored() == expected, "Gas pairs did not conserve fractional FE across ticks");
             helper.assertTrue(cell.hydrogen().isEmpty() && cell.oxygen().isEmpty(), "Complete gas pairs were not consumed exactly");
             helper.succeed();
         });

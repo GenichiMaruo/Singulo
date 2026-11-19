@@ -63,7 +63,7 @@ UI = {
  'jei.singulo.mb.suspension_reservoir':('7×9×7。八角の冠から流体を吊る。容量 16,000,000 mB。','7×9×7. Suspends fluid from an octagonal crown. Capacity: 16,000,000 mB.'),
  'jei.singulo.mb.pasta_accumulator':('7×9×7。容量 8 TFE、入出力は各 2 GFE/t。','7×9×7. Capacity: 8 TFE. Input and output: 2 GFE/t each.'),
  'jei.singulo.mb.tidal_spindle':('7×8×15。起動は特異点の種 + 10 GFE。加工は 20 MFE/t。','7×8×15. Start: Singularity Seed + 10 GFE. Processing: 20 MFE/t.'),
- 'gui.singulo.device.forge.cassette':('コラプサー並列カセットを入れると、同じレシピを最大 4 バッチ同時に加工する','Holds a Collapsar Parallel Cassette, which processes up to four batches of the same recipe together'),
+ 'gui.singulo.device.forge.cassette':('コラプサー並列カセットを入れると、同じレシピを複数回分同時に加工する','Holds a Collapsar Parallel Cassette, which processes multiple batches of the same recipe together'),
  'gui.singulo.device.forge.batch':('同時加工: %s バッチ。材料・冷却材・電力は数量分を消費する','Parallel processing: %s batches. Materials, coolant and power scale with the batch count'),
  'gui.singulo.cosmic.state.0':('構造完成','Structure complete'),
  'gui.singulo.cosmic.state.1':('構造が未完成','Structure incomplete'),
@@ -116,12 +116,12 @@ CHAPTER = ('cosmic','singulo:nuclear_pasta','拘束と縫合','Confinement and S
  ('links','縫合と並列照射',
   '潮汐繊維とコラプサー材でワームホール縫合拡張を作り、既存の口の両端に右クリックで取り付けます。両端が開いていると、口の上の四角い開口部を歩いて通れます（向こうの口は、ネザーポータルと同じく入ったときに読み込まれます）。物流はそのまま使えます。\n'
   'ネザーポータルと同じく、入った位置のまま向こうの開口部の同じ位置に出ます。待ち時間はなく、体の向きと勢いは口の向きに合わせて回ります。前から入れば向こうの前へ出ます。出た開口部からいったん出るまでは、もう一度は飛びません。その位置がふさがっている・危ない・足の下4ブロック以内に床がないときは、向こうの口の前の安全な足場に出ます。それもなければ移動しません。乗り物に乗っている場合も移動しません。飛び道具（矢・投げた物など）も、開口部へ飛び込むと向こうの口から同じように飛び出します。\n'
-  'コラプサー並列カセットを鍛造炉の画面の右の枠に入れるか、手に持って鍛造炉のどこかを右クリックして取り付けると、同じレシピを最大 4 バッチ同時に加工します。開始時に数量を固定し、材料・冷却材・電力を数量分使います。すでに進行中の処理は取り付けても変わりません。\n'
+  'コラプサー並列カセットを鍛造炉の画面の右の枠に入れるか、手に持って鍛造炉のどこかを右クリックして取り付けると、同じレシピを複数回分同時に加工します。開始時に数量を固定し、材料・冷却材・電力を数量分使います。すでに進行中の処理は取り付けても変わりません。\n'
   '測量メガネを掛けると、近くの流体パイプに転送方向の矢印が見えます。見ている配管の転送量・種類・停止状態も表示します。矢印は実際の端点間転送を結ぶ代表経路を示し、分岐や環状配管の全経路を表すものではありません。パイプ自体は流体を蓄えません。',
   'Seams and parallel irradiation',
   'Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\n'
   'Like a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel. Projectiles such as arrows and thrown items that fly into the opening come out of the far mouth the same way.\n'
-  'Put a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\n'
+  'Put a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process multiple batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\n'
   'Wear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.'),
 ])
 
@@ -139,7 +139,7 @@ DESC = {
  '潮汐紡糸機':('7×8×15 の設備。特異点の種と 10 GFE で核を形成し、潮汐力で素材を伸ばして繊維を巻く。加工には 20 MFE/t と液体ヘリウムが必要。羊毛から糸、鉄から鎖、革からファントムの皮膜なども引き伸ばして作れる。停止・未ロード中は予約内容を保持する。','A 7×8×15 facility. Form its core with a Singularity Seed and 10 GFE, then stretch matter into wound filament using tidal forces. Processing needs 20 MFE/t and liquid helium. It can also stretch wool into string, iron into chains, leather into phantom membranes and more. Reserved work survives stops and unloaded chunks.'),
  '潮汐繊維':('ブラックホールの潮汐力で引き伸ばした発光繊維。コラプサー材とともに、通行用のワームホールを縫い開く。','Luminous filament stretched by black-hole tidal forces. Combined with Collapsar material, it stitches open a traversable wormhole.'),
  'ワームホール縫合拡張':('既存のワームホールの口へ右クリックして取り付ける。両端が拡張済みで開いていると、上の四角い開口部を歩いて通れる。ネザーポータルと同じく、向こうの開口部の同じ位置に出る。物流は維持され、危ない出口へは移動しない。','Use on an existing wormhole mouth to install. When both upgraded ends are open, walk through the square opening above it and come out at the same spot in the far opening, like a Nether portal. Logistics remain available, and you never land somewhere unsafe.'),
- 'コラプサー並列カセット':('鍛造炉の画面の右の枠に入れるか、手に持って鍛造炉を右クリックして取り付け、同じレシピを最大 4 バッチ同時に加工する。開始時に数量を固定し、材料・冷却材・電力を数量分使う。','Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.'),
+ 'コラプサー並列カセット':('鍛造炉の画面の右の枠に入れるか、手に持って鍛造炉を右クリックして取り付け、同じレシピを複数回分同時に加工する。開始時に数量を固定し、材料・冷却材・電力を数量分使う。','Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process multiple batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.'),
 }
 
 SUMMARY = {
@@ -156,7 +156,7 @@ SUMMARY = {
  '潮汐紡糸機':('潮汐力で素材を伸ばし、光る糸を巻く。','Stretches matter with tidal forces and winds luminous thread.'),
  '潮汐繊維':('通行用ワームホールを縫う光る繊維。','Luminous filament for stitching traversable wormholes.'),
  'ワームホール縫合拡張':('両端の口を拡張し、歩いて通行する。','Upgrade both mouths to walk between them.'),
- 'コラプサー並列カセット':('Jet Forge を最大 4 バッチへ拡張する。','Process up to four Jet Forge batches together.'),
+ 'コラプサー並列カセット':('鍛造炉で同じレシピを複数回分まとめて加工する。','Processes several batches of the same Jet Forge recipe together.'),
 }
 
 def models(ctx):

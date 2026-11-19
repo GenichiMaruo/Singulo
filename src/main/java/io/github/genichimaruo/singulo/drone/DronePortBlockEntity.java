@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.drone;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.data.PackBalance;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
@@ -86,7 +89,19 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     public static final int[] AUTO_THRESHOLDS = {0, 1, 64, 256, AUTO_FULL};
     static final int AUTO_SETTLE = 40;
 
-    private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
+    private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged) {
+        @Override public int getMaxEnergyStored() {
+            return Math.max(CAPACITY, Math.max(DroneCrateItem.capacity(1),
+                    Math.max(DroneCrateItem.capacity(2), DroneCrateItem.capacity(3))));
+        }
+
+        @Override public int receiveEnergy(int amount, boolean simulate) {
+            // Reserve enough integer headroom to refund a staged flight on cancellation.
+            resizeCapacity(getMaxEnergyStored());
+            int refundableRoom = Integer.MAX_VALUE - stagedCost - getEnergyStored();
+            return super.receiveEnergy(Math.min(amount, refundableRoom), simulate);
+        }
+    };
     private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -208,8 +223,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     /** 荷物を空き箱1つ（crate）に詰めて、梱包済みの箱を返す（荷物はここで取り出す）。 */
     protected ItemStack packCargo(ItemStack crate) {
         List<ItemStack> cargo = new ArrayList<>();
-        for (int i = 0; i < CARGO; i++) {
-            cargo.add(items.getStackInSlot(SLOT_CARGO + i).copy());
+        int limit = PackBalance.value(ServerConfig.CARGO_STACKS_PER_FLIGHT);
+        for (int i = 0; i < CARGO && cargo.size() < limit; i++) {
+            ItemStack stack = items.getStackInSlot(SLOT_CARGO + i);
+            if (stack.isEmpty()) continue;
+            cargo.add(stack.copy());
             items.setStackInSlot(SLOT_CARGO + i, ItemStack.EMPTY);
         }
         return DroneCrateItem.pack(crate, cargo);
@@ -270,14 +288,18 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (threshold == 0) {
             return false;
         }
-        int total = 0;
-        boolean full = true;
+        int limit = PackBalance.value(ServerConfig.CARGO_STACKS_PER_FLIGHT);
+        int total = 0, fullStacks = 0;
         for (int i = 0; i < CARGO; i++) {
-            ItemStack s = items.getStackInSlot(SLOT_CARGO + i);
-            total += s.getCount();
-            full &= !s.isEmpty() && s.getCount() >= s.getMaxStackSize();
+            ItemStack stack = items.getStackInSlot(SLOT_CARGO + i);
+            if (stack.isEmpty()) continue;
+            total += stack.getCount();
+            if (threshold == AUTO_FULL) {
+                if (stack.getCount() < stack.getMaxStackSize()) return false;
+                if (++fullStacks == limit) return true;
+            }
         }
-        return threshold == AUTO_FULL ? full : total >= threshold;
+        return threshold != AUTO_FULL && total >= threshold;
     }
 
     /** GUI に送る液体の値（物のポートは 0）。 */
@@ -487,7 +509,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (tier == 0) {
             return S_NO_CRATE;
         }
-        if (route.distance() > DroneCrateItem.range(tier)) {
+        if (!DroneCrateItem.canReach(tier, route.distance())) {
             return S_OUT_OF_RANGE;
         }
         if (energy.getEnergyStored() < DroneCrateItem.cost(route.distance())) {
@@ -516,7 +538,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return S_NO_CRATE;
         }
         double distance = DroneWormhole.distance(server, worldPosition, to);
-        if (distance > DroneCrateItem.range(tier)) {
+        if (!DroneCrateItem.canReach(tier, distance)) {
             return S_OUT_OF_RANGE;
         }
         if (energy.getEnergyStored() < DroneCrateItem.cost(distance)) {
@@ -566,8 +588,10 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return false;
         }
         int cost = DroneCrateItem.cost(distance);
+        ItemStack box = items.getStackInSlot(SLOT_CRATES);
+        if (!acceptsCrate(box) || !DroneCrateItem.canReach(DroneCrateItem.tier(box), distance)
+                || !hasCargo() || !energy.consume(cost)) return false;
         ItemStack crate = items.extractItem(SLOT_CRATES, 1, false);
-        energy.consume(cost);
         staged = packCargo(crate);
         stagedTo = to;
         stagedDim = dim;

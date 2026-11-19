@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.monitor;
 
 import com.google.common.collect.MinMaxPriorityQueue;
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import io.github.genichimaruo.singulo.drone.DroneStationBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineReport;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
@@ -163,7 +164,8 @@ public final class FactoryMonitor {
      */
     @javax.annotation.Nullable
     private static MachineReport report(ServerLevel level, BlockEntity be) {
-        if (be instanceof MachineReport.Source source) {
+        var source = MachineReports.source(be);
+        if (source != null) {
             return source.report();
         }
         var block = be.getBlockState().getBlock();

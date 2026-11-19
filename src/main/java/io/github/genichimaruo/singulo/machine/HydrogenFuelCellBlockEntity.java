@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.machine;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
@@ -92,7 +95,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     }
 
     private FluidTank tank(int capacity, String fluid) {
-        return new FluidTank(capacity, f -> f.getFluid().isSame(SinguloFluids.get(fluid))) {
+        return new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(capacity), f -> f.getFluid().isSame(SinguloFluids.get(fluid))) {
             @Override
             protected void onContentsChanged() {
                 setChanged();
@@ -128,12 +131,12 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
 
     private void tick(Level level, BlockPos pos, BlockState state) {
         rate = 0;
+        double output = energy.prepareGeneration(ServerConfig.SPEC.isLoaded() ? ServerConfig.FUEL_CELL_OUTPUT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : MAX_OUTPUT);
         double fill = (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
         if (standby ? fill < 0.75 : fill >= 0.98) {
             standby = !standby;
         }
         double perMb = fePerMb();
-        double output = MAX_OUTPUT * (ServerConfig.SPEC.isLoaded() ? ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : 1.0);
         if (!standby && perMb > 0) {
             // 出力に見合う水素を使う（水素2 mB に酸素1 mB）。足りない分だけ出力を下げる
             double want = output / perMb;
@@ -143,17 +146,14 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
             double use = Math.min(want, available);
             if (use > 0) {
                 carry -= use;
-                int whole = 0;
-                while (carry < 0) {
-                    carry += 2;
-                    whole += 2;
-                }
+                int whole = 2 * (int) Math.ceil(Math.max(0.0, -carry) / 2);
+                carry += whole;
                 if (whole > 0) {
                     hydrogen.drain(whole, IFluidHandler.FluidAction.EXECUTE);
                     oxygen.drain(whole / 2, IFluidHandler.FluidAction.EXECUTE);
                 }
                 rate = use * perMb;
-                energy.generate((int) Math.floor(rate));
+                energy.generateRate(rate);
             }
         }
         for (Direction dir : Direction.values()) {
@@ -162,7 +162,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
             }
             IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
+                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), energy.exportLimit()), false);
                 if (sent > 0) {
                     energy.consume(sent);
                 }
@@ -185,14 +185,14 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
         Component status = standby ? Component.translatable("message.singulo.fuel_cell.standby")
                 : Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(rate));
         player.displayClientMessage(Component.translatable("message.singulo.fuel_cell.status",
-                hydrogen.getFluidAmount(), HYDROGEN_TANK, oxygen.getFluidAmount(), OXYGEN_TANK,
+                hydrogen.getFluidAmount(), hydrogen.getCapacity(), oxygen.getFluidAmount(), oxygen.getCapacity(),
                 energy.getEnergyStored(), energy.getMaxEnergyStored(), status), true);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.put("hydrogen", hydrogen.writeToNBT(registries, new CompoundTag()));
         tag.put("oxygen", oxygen.writeToNBT(registries, new CompoundTag()));
         tag.putDouble("carry", carry);
@@ -201,7 +201,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         hydrogen.readFromNBT(registries, tag.getCompound("hydrogen"));
         oxygen.readFromNBT(registries, tag.getCompound("oxygen"));
         carry = tag.getDouble("carry");

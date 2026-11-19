@@ -3,12 +3,15 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
-import io.github.genichimaruo.singulo.android.work.ChemicalSamples;
 import io.github.genichimaruo.singulo.android.work.Chemicals;
 import io.github.genichimaruo.singulo.android.work.FluidSamples;
 import io.github.genichimaruo.singulo.android.work.ItemCount;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
 import io.github.genichimaruo.singulo.android.work.WorkJob;
+import io.github.genichimaruo.singulo.api.android.AndroidChemicalStorage;
+import io.github.genichimaruo.singulo.api.android.AndroidRecipe;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import net.minecraft.core.BlockPos;
@@ -107,7 +110,7 @@ public final class MekanismGameTests {
             long put = store.insert("mekanism:hydrogen", 5000, false);
             helper.assertTrue(put == 5000, "ケミカルタンクに水素が入らない: " + put);
             WorkConsoleBlockEntity console = helper.getBlockEntity(consolePos);
-            ItemStack hydrogen = ChemicalSamples.of("mekanism:hydrogen", 1);
+            ItemStack hydrogen = AndroidRecipe.chemicalSample("mekanism:hydrogen", 1);
             helper.assertTrue(ItemCount.get(console.stock(), hydrogen) == 5000, "素材置き場の在庫に水素が数えられない");
             // 指令台はタンクの下（入れるだけの面）にあるが、出せる面（前）から取り出せる
             var stores = io.github.genichimaruo.singulo.android.work.LiquidStores.at(helper.getLevel(), helper.absolutePos(consolePos));
@@ -138,6 +141,33 @@ public final class MekanismGameTests {
             a.drainLiquid(hydrogen, 62000, false);
             a.inventory().setItem(RuinAndroid.SLOT_TANK, item("android_dual_tank_upgrade"));
             helper.assertTrue(a.chemCapacity() == 16000 && a.fluidCapacity() == 16000, "ガス・液体アップグレードで、各 16,000 mB にならない");
+            // A second console can only reach this same tank through the addon's chemical endpoint.
+            BlockPos remote = new BlockPos(4, 1, 3), port = remote.north(2);
+            helper.setBlock(remote, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+            WorkConsoleBlockEntity other = helper.getBlockEntity(remote);
+            other.setOwner(java.util.UUID.randomUUID());
+            String id = AndroidRecipe.chemicalId(hydrogen);
+            var output = java.util.Arrays.stream(Direction.values()).map(face -> Chemicals.store(helper.getLevel(),
+                    helper.absolutePos(tankPos), face)).filter(s -> s != null && s.extract(id, 1, true) == 1).findFirst().orElseThrow();
+            helper.setBlock(port, Blocks.CHEST);
+            class ChemicalPort extends net.minecraft.world.level.block.entity.ChestBlockEntity implements AndroidWorkEndpoint {
+                final java.util.UUID identity = java.util.UUID.randomUUID();
+                ChemicalPort() { super(helper.absolutePos(port), Blocks.CHEST.defaultBlockState()); }
+                public java.util.UUID endpointId() { return identity; }
+                public java.util.UUID endpointOwner() { return other.owner(); }
+                public net.neoforged.neoforge.items.IItemHandler supplyItems() { return null; }
+                public net.neoforged.neoforge.items.IItemHandler deliveryItems() { return null; }
+                public AndroidChemicalStorage supplyChemicals() { return output; }
+                public AndroidChemicalStorage deliveryChemicals() { return store; }
+            }
+            var endpoint = new ChemicalPort();
+            helper.getLevel().setBlockEntity(endpoint);
+            helper.assertTrue(AndroidWorkEndpoints.link(helper.getLevel(), other.getBlockPos(), other.owner(), endpoint.getBlockPos())
+                    == AndroidWorkEndpoints.Result.LINKED && ItemCount.get(other.stock(), hydrogen) == 6000,
+                    "A chemical-only endpoint could not expose the Mekanism tank");
+            var pickup = new WorkConsoleBlockEntity.Pickup(endpoint.getBlockPos(), java.util.List.of(new ItemCount(hydrogen, 1000)));
+            helper.assertTrue(other.fetchAt(a, WorkJob.simple(WorkJob.Type.CRAFT, 1), pickup) && a.liquidAmount(hydrogen) == 1000
+                    && stores.amount(hydrogen) == 5000, "Chemical endpoint pickup did not conserve hydrogen");
             a.discard();
             helper.succeed();
         });

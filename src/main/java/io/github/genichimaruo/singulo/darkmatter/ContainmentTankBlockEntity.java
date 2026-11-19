@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.darkmatter;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
@@ -28,7 +31,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     public static final int FE_PER_TICK = 500;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(CAPACITY, ContainmentTankBlockEntity::isDarkMatter) {
+    private final FluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(CAPACITY), ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -84,7 +87,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     public void openMenu(ServerPlayer player) {
         io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.CONTAINMENT_TANK, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.AMOUNT -> amount();
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CAPACITY -> CAPACITY;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CAPACITY -> tank.getCapacity();
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY -> energy.getEnergyStored();
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY_MAX -> energy.getMaxEnergyStored();
@@ -106,7 +109,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
         int amount = input.getOrDefault(SinguloComponents.DARK_MATTER.get(), 0);
-        tank.setFluid(amount > 0 ? darkMatter(Math.min(CAPACITY, amount)) : FluidStack.EMPTY);
+        tank.setFluid(amount > 0 ? darkMatter(amount) : FluidStack.EMPTY);
     }
 
     @Override

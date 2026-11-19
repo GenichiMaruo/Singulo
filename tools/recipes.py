@@ -1156,6 +1156,9 @@ for _part in PAIRED_ASSEMBLY_PARTS:
     R(f'{_part}（2回分）', _r['stage'], _r['station'], {m: q * 2 for m, q in _r['inputs'].items()},
       out=_r['out'] * 2, t=_r['t'] * 2, fe=_r['fe'], cat=_r['cat'])
 
+R('組立盤拡張アップグレード', 2, '作業台', {'鋼板': 4, 'チェスト': 4, '基礎回路': 1}, cat='upgrade')
+RECIPES['組立盤拡張アップグレード']['shape'] = (('SCS', 'CBC', 'SCS'), {'S': '鋼板', 'C': 'チェスト', 'B': '基礎回路'})
+
 # Apply saved boards after all content modules and optional recipes are registered.
 from assembly_shapes import load_edits
 load_edits(RECIPES)

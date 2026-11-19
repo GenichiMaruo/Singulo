@@ -2552,8 +2552,8 @@
     "translation": "광격자에 원자를 배열한 기판."
   },
   "desc.singulo.overclock_chip": {
-    "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
-    "translation": "기계의 업그레이드 슬롯에 넣으면 속도 ×3, 대신 tick당 전력 ×4. 자기 홀극과 함께 쓸 수 없습니다."
+    "source": "Install in the machine upgrade slot to change speed and power use. Shares a slot with the monopole.",
+    "translation": "기계의 업그레이드 칸에 넣어 속도와 소비 전력을 조정합니다. 자기 홀극과 같은 칸을 사용합니다."
   },
   "desc.singulo.paper_stack": {
     "source": "Papers left piled on a desk.",
@@ -11392,8 +11392,8 @@
     "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 57 more",
-    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 57개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 58 more",
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 58개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 38 more",
@@ -11936,8 +11936,8 @@
     "translation": "사용처: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
-    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 99개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 100 more",
+    "translation": "사용처: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 100개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 84 more",
@@ -13188,8 +13188,8 @@
     "translation": "특이점 자물쇠 열쇠로 여는 봉인 컨테이너."
   },
   "summary.singulo.overclock_chip": {
-    "source": "Triples a machine’s speed for four times the power.",
-    "translation": "장치 처리 속도를 3배로 올린다. 전력은 4배."
+    "source": "Changes processing speed and power use per tick.",
+    "translation": "가공 속도와 틱당 소비 전력을 변경합니다."
   },
   "summary.singulo.gravity_boots": {
     "source": "No fall damage, and you can wall-jump in mid-air.",
@@ -13256,8 +13256,8 @@
     "translation": "조석 방사기"
   },
   "desc.singulo.collapsar_parallel_cassette": {
-    "source": "Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.",
-    "translation": "단조로 화면 오른쪽 칸에 넣거나, 손에 들고 단조로를 우클릭해 설치하면 같은 레시피를 최대 4배치 동시에 가공합니다. 시작할 때 수량을 고정하며 재료·냉각재·전력은 배치 수만큼 사용합니다."
+    "source": "Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process multiple batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.",
+    "translation": "단조로 화면 오른쪽 칸에 넣거나, 손에 들고 단조로를 우클릭해 설치하면 같은 레시피를 여러 배치 동시에 가공합니다. 시작할 때 수량을 고정하며 재료·냉각재·전력은 배치 수만큼 사용합니다."
   },
   "desc.singulo.cosmic_frame": {
     "source": "A heavy braced frame used for the bases and beams of cosmic containment facilities.",
@@ -13356,8 +13356,8 @@
     "translation": "구속과 봉합"
   },
   "guide.singulo.cosmic.links.body": {
-    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\nLike a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel. Projectiles such as arrows and thrown items that fly into the opening come out of the far mouth the same way.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
-    "translation": "조석 섬유와 콜랍사 재료로 웜홀 봉합 업그레이드를 만들어 기존 입구 양쪽에 각각 우클릭해 설치합니다. 양쪽이 열려 있으면 입구 위의 사각 개구부를 걸어서 통과할 수 있습니다(네더 차원문처럼 들어갈 때 반대쪽 입구를 로드합니다). 기존 물류도 그대로 쓸 수 있습니다.\n네더 차원문처럼 반대쪽 개구부의 같은 위치로 나오며, 기다리는 시간은 없습니다. 바라보는 방향과 움직임은 입구의 방향에 맞춰 돌아가므로, 앞에서 들어가면 반대쪽의 앞으로 나옵니다. 도착한 개구부에서 벗어나기 전에는 다시 이동하지 않습니다. 그 위치가 막혀 있거나 위험하거나 발밑 4블록 안에 바닥이 없으면 반대쪽 입구 앞의 안전한 발판으로 나오고, 그것도 없으면 이동하지 않습니다. 무언가를 타고 있으면 이동하지 않습니다. 화살이나 던진 물건 같은 투사체도 개구부로 날아들면 같은 방식으로 반대쪽 입구에서 날아 나옵니다.\n콜랍사 병렬 카세트를 단조로 화면 오른쪽 칸에 넣거나, 손에 들고 단조로의 아무 부품이나 우클릭해 설치하면 같은 레시피를 최대 4배치 동시에 가공합니다. 시작할 때 수량을 고정하고 재료·냉각재·전력을 배치 수만큼 씁니다. 이미 시작한 가공은 설치해도 바뀌지 않습니다.\n측량 안경을 쓰면 가까운 유체 배관의 전송 화살표와, 바라보는 배관의 양·유체·막힘 상태를 볼 수 있습니다. 화살표는 실제 끝점 간 전송의 대표 연결 경로 하나를 표시하며, 분기나 순환 배관의 모든 경로를 뜻하지는 않습니다. 배관 자체는 유체를 저장하지 않습니다."
+    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\nLike a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel. Projectiles such as arrows and thrown items that fly into the opening come out of the far mouth the same way.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process multiple batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
+    "translation": "조석 섬유와 콜랍사 재료로 웜홀 봉합 업그레이드를 만들어 기존 입구 양쪽에 각각 우클릭해 설치합니다. 양쪽이 열려 있으면 입구 위의 사각 개구부를 걸어서 통과할 수 있습니다(네더 차원문처럼 들어갈 때 반대쪽 입구를 로드합니다). 기존 물류도 그대로 쓸 수 있습니다.\n네더 차원문처럼 반대쪽 개구부의 같은 위치로 나오며, 기다리는 시간은 없습니다. 바라보는 방향과 움직임은 입구의 방향에 맞춰 돌아가므로, 앞에서 들어가면 반대쪽의 앞으로 나옵니다. 도착한 개구부에서 벗어나기 전에는 다시 이동하지 않습니다. 그 위치가 막혀 있거나 위험하거나 발밑 4블록 안에 바닥이 없으면 반대쪽 입구 앞의 안전한 발판으로 나오고, 그것도 없으면 이동하지 않습니다. 무언가를 타고 있으면 이동하지 않습니다. 화살이나 던진 물건 같은 투사체도 개구부로 날아들면 같은 방식으로 반대쪽 입구에서 날아 나옵니다.\n콜랍사 병렬 카세트를 단조로 화면 오른쪽 칸에 넣거나, 손에 들고 단조로의 아무 부품이나 우클릭해 설치하면 같은 레시피를 여러 배치 동시에 가공합니다. 시작할 때 수량을 고정하고 재료·냉각재·전력을 배치 수만큼 씁니다. 이미 시작한 가공은 설치해도 바뀌지 않습니다.\n측량 안경을 쓰면 가까운 유체 배관의 전송 화살표와, 바라보는 배관의 양·유체·막힘 상태를 볼 수 있습니다. 화살표는 실제 끝점 간 전송의 대표 연결 경로 하나를 표시하며, 분기나 순환 배관의 모든 경로를 뜻하지는 않습니다. 배관 자체는 유체를 저장하지 않습니다."
   },
   "guide.singulo.cosmic.links.title": {
     "source": "Seams and parallel irradiation",
@@ -13460,8 +13460,8 @@
     "translation": "조석 방사기"
   },
   "summary.singulo.collapsar_parallel_cassette": {
-    "source": "Process up to four Jet Forge batches together.",
-    "translation": "Jet Forge를 최대 4배치 병렬 가공으로 확장합니다."
+    "source": "Processes several batches of the same Jet Forge recipe together.",
+    "translation": "단조로에서 같은 레시피를 여러 배치 동시에 가공합니다."
   },
   "summary.singulo.cosmic_frame": {
     "source": "A frame for facility bases and beams.",
@@ -13680,8 +13680,8 @@
     "translation": "클릭하여 변경"
   },
   "gui.singulo.device.forge.cassette": {
-    "source": "Holds a Collapsar Parallel Cassette, which processes up to four batches of the same recipe together",
-    "translation": "콜랍사 병렬 카세트를 넣으면 같은 레시피를 최대 4배치 동시에 가공합니다"
+    "source": "Holds a Collapsar Parallel Cassette, which processes multiple batches of the same recipe together",
+    "translation": "콜랍사 병렬 카세트를 넣으면 같은 레시피를 여러 배치 동시에 가공합니다"
   },
   "block.singulo.vacuum_jacketed_pipe": {
     "source": "Vacuum-Jacketed Pipe",
@@ -15592,8 +15592,8 @@
     "translation": "주운 물건만 자동으로 맡깁니다. 우선 보관처를 이용할 수 없으면 다른 종류의 보관처를 찾습니다. 눌러서 전환합니다."
   },
   "gui.singulo.assembly.board_hint": {
-    "source": "Follow the diagram. Each cell holds a stack and supplies one part per craft. Put the catalyst in the amber slot. Open the book on the right to see the patterns.",
-    "translation": "도면에 맞춰 재료를 놓으세요. 한 칸에 한 묶음까지 놓을 수 있고 조립할 때마다 각 칸에서 하나씩 소모합니다. 촉매는 호박색 칸에 넣으세요. 오른쪽 책 버튼을 누르면 도면을 볼 수 있습니다."
+    "source": "Open the book on the right for the pattern. Each occupied cell supplies one part per craft. Put the catalyst in the amber slot.",
+    "translation": "오른쪽 책을 열어 배치도를 확인하세요. 조립할 때마다 재료가 놓인 칸에서 하나씩 소모합니다. 촉매는 호박색 슬롯에 넣으세요."
   },
   "gui.singulo.assembly.diagrams": {
     "source": "Assembly diagrams",
@@ -15734,5 +15734,53 @@
   "guide.singulo.caption.stage1.steel": {
     "source": "Totals for four steel ingots. Five electrolysis cycles supply two kiln batches.",
     "translation": "강철 주괴 4개 기준입니다. 전해조를 다섯 번 돌리면 소성로를 두 번 돌릴 산소가 나옵니다."
+  },
+  "desc.singulo.assembly_stock_upgrade": {
+    "source": "Install in the bottom-right slot of the Precision Assembler to stock multiple stacks of the same part in each cell. Unstackable tools occupy one cell each. Remove the upgrade once every cell holds 64 items or fewer.",
+    "translation": "정밀 조립기 오른쪽 아래에 장착하면 한 칸에 같은 재료를 여러 묶음 넣을 수 있습니다. 겹칠 수 없는 도구는 한 칸에 하나씩 넣습니다. 모든 칸에 64개 이하가 남으면 뺄 수 있습니다."
+  },
+  "gui.singulo.assembly.upgrade_locked": {
+    "source": "Reduce every material cell to 64 items or fewer to remove the upgrade.",
+    "translation": "각 재료 칸에 64개 이하만 남기면 업그레이드를 뺄 수 있습니다."
+  },
+  "howto.singulo.assembly_stock_upgrade": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "item.singulo.assembly_stock_upgrade": {
+    "source": "Assembly Stock Upgrade",
+    "translation": "조립판 용량 확장 업그레이드"
+  },
+  "summary.singulo.assembly_stock_upgrade": {
+    "source": "Increases the material capacity of each assembly cell.",
+    "translation": "조립판 한 칸에 넣을 수 있는 재료 수를 늘립니다."
+  },
+  "tooltip.singulo.cable_rate": {
+    "source": "Up to %s FE/t, %s%% loss per block",
+    "translation": "최대 %s FE/t, 블록당 손실 %s%%"
+  },
+  "tooltip.singulo.cargo_slots": {
+    "source": "Cargo slots per flight: %s",
+    "translation": "운송당 화물 슬롯 %s개"
+  },
+  "tooltip.singulo.default_description": {
+    "source": "With default settings: %s",
+    "translation": "기본 설정 기준: %s"
+  },
+  "tooltip.singulo.overclock_rates": {
+    "source": "Speed ×%s, power per tick ×%s",
+    "translation": "속도 ×%s, 틱당 전력 ×%s"
+  },
+  "tooltip.singulo.parallel_limit": {
+    "source": "Up to %s batches per run",
+    "translation": "동시 가공 최대 %s배치"
+  },
+  "tooltip.singulo.stock_limits": {
+    "source": "Fits %s upgrades, +%s stacks per upgrade",
+    "translation": "최대 %s개 장착, 개당 +%s묶음"
+  },
+  "tooltip.singulo.tank_room": {
+    "source": "Capacity per tank: %s mB",
+    "translation": "탱크당 용량 %s mB"
   }
 }

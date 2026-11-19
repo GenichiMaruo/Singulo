@@ -22,7 +22,7 @@ public final class AssemblySelectorReview {
     private static ResourceLocation expected;
     private static int expectedSets;
     private static Popup selector;
-    private static int previewFrames, tooltipFrames, diagramX, diagramY;
+    private static int previewFrames, tooltipFrames, hoverTicks, diagramX, diagramY;
     private static boolean awaitingSpent;
     private static int spentFrames;
 
@@ -55,8 +55,10 @@ public final class AssemblySelectorReview {
             throw new IllegalStateException("An unpowered board produced a real output or advanced: " + expected);
         for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++) {
             var input = recipe.value().assemblyInput(i);
-            var stack = menu.getSlot(menu.assemblySlot(i)).getItem();
-            if (input == null ? !stack.isEmpty() : stack.getCount() != expectedSets || !input.ingredient().test(stack)) {
+            var slot = menu.getSlot(menu.assemblySlot(i));
+            var stack = slot.getItem();
+            if (stack.getCount() > stack.getMaxStackSize()) throw new IllegalStateException("Oversized network stack at cell " + i);
+            if (input == null ? !stack.isEmpty() : stack.getCount() + menu.assemblyExcess(slot) != expectedSets || !input.ingredient().test(stack)) {
                 previewFrames = 0;
                 return;
             }
@@ -66,7 +68,6 @@ public final class AssemblySelectorReview {
 
     public static boolean previewReady() { return previewFrames >= 3; }
 
-    @SuppressWarnings("unchecked")
     public static void openAndHover(MachineScreen screen) throws Exception {
         var layout = new MachineLayout(screen.getMenu().type());
         int x = screen.getGuiLeft() + layout.selectX + 8, y = screen.getGuiTop() + layout.selectY + 8;
@@ -75,18 +76,28 @@ public final class AssemblySelectorReview {
         field.setAccessible(true);
         selector = (Popup) field.get(screen);
         if (!selector.open) throw new IllegalStateException("Standard recipe selector did not open");
+        tooltipFrames = hoverTicks = 0;
+        hoverExpected(screen);
+    }
+
+    // A slot update or a window mouse event can move the target after the popup opens.
+    @SuppressWarnings("unchecked")
+    private static void hoverExpected(MachineScreen screen) throws Exception {
         var entries = (List<RecipeHolder<MachineRecipe>>) read(screen, "selectorEntries");
         int index = 0;
         while (index < entries.size() && (entries.get(index) == null || !entries.get(index).id().equals(expected))) index++;
         if (index == entries.size()) throw new IllegalStateException("Recipe absent from standard selector: " + expected);
         int columns = (int) read(screen, "selectColumns"), visibleRows = (int) read(screen, "selectRows");
         int firstRow = Math.min(index / columns, Math.max(0, (entries.size() + columns - 1) / columns - visibleRows));
-        for (int row = 0; row < firstRow; row++) screen.mouseScrolled(selector.x + 4, selector.bodyY() + 4, 0, -1);
+        var scroll = MachineScreen.class.getDeclaredField("selectorScroll");
+        scroll.setAccessible(true);
+        int delta = firstRow - scroll.getInt(screen);
+        for (int row = 0; row < Math.abs(delta); row++)
+            screen.mouseScrolled(selector.x + 4, selector.bodyY() + 4, 0, -Integer.signum(delta));
         var cellPos = MachineScreen.class.getDeclaredMethod("cellPos", int.class);
         cellPos.setAccessible(true);
         int[] pos = (int[]) cellPos.invoke(screen, index - firstRow * columns);
         moveMouse(screen, pos[0] + 9.5, pos[1] + 9.5);
-        tooltipFrames = 0;
     }
 
     private static void moveMouse(MachineScreen screen, double x, double y) throws ReflectiveOperationException {
@@ -131,7 +142,16 @@ public final class AssemblySelectorReview {
     }
 
     public static boolean captureSelector(Minecraft mc, String name, MachineRecipe recipe, Path output) throws Exception {
-        if (tooltipFrames < 3) return false;
+        if (tooltipFrames < 3) {
+            hoverExpected((MachineScreen) mc.screen);
+            if (++hoverTicks >= 200) {
+                try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+                    image.writeToFile(output.resolve("selector-hover-failed.png"));
+                }
+                throw new IllegalStateException("Selector tooltip did not display the recipe " + expected);
+            }
+            return false;
+        }
         var screen = (MachineScreen) mc.screen;
         if (!mc.getLanguageManager().getSelected().equals("ja_jp")) throw new IllegalStateException("Expected Japanese selector");
         try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {

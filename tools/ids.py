@@ -114,6 +114,7 @@ MOD = {
     '精密組立台': ('precision_assembler', 'Precision Assembler', 'machine'),
     'ワールドライン・アンカー（小）': ('worldline_anchor', 'Worldline Anchor (Small)', 'machine'),
     '単極子アップグレード': ('monopole_upgrade', 'Monopole Upgrade', 'item'),
+    '組立盤拡張アップグレード': ('assembly_stock_upgrade', 'Assembly Stock Upgrade', 'item'),
     '容量アップグレード（Mk1）': ('capacity_upgrade_1', 'Capacity Upgrade Mk1', 'item'),
     '容量アップグレード（Mk2）': ('capacity_upgrade_2', 'Capacity Upgrade Mk2', 'item'),
     '容量アップグレード（Mk3）': ('capacity_upgrade_3', 'Capacity Upgrade Mk3', 'item'),

@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.compat.jei;
 
+import io.github.genichimaruo.singulo.forge.JetForgeBlockEntity;
+
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesData;
 import io.github.genichimaruo.singulo.item.UsesHelper;
@@ -163,10 +165,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
 
     /** 設定の倍率をかけた、レシピ1回に要る電力。 */
     private int demand(MachineRecipe r) {
-        int demand = r.energy();
-        if (io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded())
-            demand = (int) Math.min(Integer.MAX_VALUE, Math.ceil(demand * io.github.genichimaruo.singulo.generated.ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()));
-        return demand;
+        return io.github.genichimaruo.singulo.recipe.RecipeNumbers.energy(r.energy());
     }
 
     /** 装置の電力容量を超えるので、電力容量アップグレードが要るか。 */
@@ -187,9 +186,10 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
     static String ingredientName(int index) { return "ingredient_" + index; }
 
     private IRecipeSlotBuilder ingredient(IRecipeLayoutBuilder builder, MachineRecipe.ItemInput in, int count, int x, int y) {
-        List<ItemStack> stacks = Arrays.stream(in.ingredient().getItems()).map(s -> shown(s, in, count)).toList();
+        List<ItemStack> stacks = Arrays.stream(in.ingredient().getItems()).map(s -> shown(s, in, count > 99 ? 1 : count)).toList();
         IRecipeSlotBuilder slotBuilder = builder.addSlot(RecipeIngredientRole.INPUT, x, y).setBackground(slot, -1, -1)
                 .addIngredients(VanillaTypes.ITEM_STACK, stacks);
+        counted(slotBuilder, count);
         if (in.uses() > 0) {
             boolean catalyst = !stacks.isEmpty() && UsesItem.isCatalyst(stacks.get(0));
             slotBuilder.addRichTooltipCallback((view, tooltip) -> {
@@ -201,6 +201,25 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
             });
         }
         return slotBuilder;
+    }
+
+    private static void counted(IRecipeSlotBuilder builder, int count) {
+        if (count <= 99) return;
+        builder.setOverlay(new IDrawable() {
+            @Override public int getWidth() { return 16; }
+            @Override public int getHeight() { return 16; }
+            @Override public void draw(GuiGraphics graphics, int x, int y) {
+                io.github.genichimaruo.singulo.client.StockCount.draw(graphics, x, y, count);
+            }
+        }, 0, 0);
+        builder.addRichTooltipCallback((view, tooltip) ->
+                tooltip.add(Component.literal(String.format(java.util.Locale.ROOT, "× %,d", count))));
+    }
+
+    private void output(IRecipeLayoutBuilder builder, int x, int y, ItemStack stack) {
+        var target = builder.addSlot(RecipeIngredientRole.OUTPUT, x, y).setBackground(slot, -1, -1)
+                .addItemStack(stack.getCount() > 99 ? stack.copyWithCount(1) : stack);
+        counted(target, stack.getCount());
     }
 
     @Override
@@ -250,7 +269,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
             fluidIndex++;
         }
         if (!r.result().isEmpty()) {
-            builder.addSlot(RecipeIngredientRole.OUTPUT, outputX, outputY).setBackground(slot, -1, -1).addItemStack(r.result());
+            output(builder, outputX, outputY, r.result());
         }
         if (needsUpgrade(r)) {
             int shownDemand = demand(r);
@@ -265,7 +284,7 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
                     io.github.genichimaruo.singulo.client.MachineScreen.capacityReason(shownDemand)));
         }
         if (!r.byproduct().isEmpty()) {
-            builder.addSlot(RecipeIngredientRole.OUTPUT, outputX, outputY + 18).setBackground(slot, -1, -1).addItemStack(r.byproduct());
+            output(builder, outputX, outputY + 18, r.byproduct());
         }
         int oy = arrowY;
         for (FluidStack f : r.fluidResults()) {
@@ -306,9 +325,11 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
             g.fill(tx + tw, ty + 2, tx + tw + 1, ty + RAIL_TAB, 0x40000000);
         }
         r.mass().ifPresent(m -> g.drawString(font, Component.translatable(m.metalOnly() ? "jei.singulo.metal_mass" : "jei.singulo.mass",
-                String.format("%.0f", m.amount())), itemX, arrowY + 22, 0xFF3C4650, false));
-        Component info = Component.translatable("jei.singulo.time_energy", String.format("%.1f", r.time() / 20.0),
-                io.github.genichimaruo.singulo.energy.EnergyText.of(r.energy()));
+                io.github.genichimaruo.singulo.energy.EnergyText.shortForm(m.amount())), itemX, arrowY + 22, 0xFF3C4650, false));
+        long ticks = JetForgeBlockEntity.STATION.equals(r.station()) ? JetForgeBlockEntity.recipeTicks(r.time()) : r.time();
+        Component info = Component.translatable("jei.singulo.time_energy", ticks < 20_000 ? String.format(java.util.Locale.ROOT, "%.1f", ticks / 20.0)
+                : io.github.genichimaruo.singulo.energy.EnergyText.shortForm(ticks / 20.0),
+                io.github.genichimaruo.singulo.energy.EnergyText.shortForm(demand(r)));
         Component stage = Component.translatable("gui.singulo.handbook.stage", r.stage());
         int infoWidth = width - font.width(stage) - 7;
         float scale = Math.min(1F, infoWidth / (float) Math.max(1, font.width(info)));

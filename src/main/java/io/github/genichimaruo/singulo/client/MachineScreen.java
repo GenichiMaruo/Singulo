@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -327,6 +328,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     @Override
     protected boolean railUsed(int row) {
         return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP && type() == MachineType.PRECISION_ASSEMBLER
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS && hasSides();
     }
@@ -334,6 +336,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     @Override
     protected boolean railConnected(int row) {
         return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP && type() == MachineType.PRECISION_ASSEMBLER
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION || sides.open;
     }
 
@@ -343,7 +346,10 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             Panel.sidesIcon(g, x, y);
             return;
         }
-        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION) {
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP) {
+            Slot slot = menu.getSlot(type().assemblyUpgradeSlot());
+            drawSpecialSlot(g, leftPos + slot.x, topPos + slot.y, 0, type().assemblyUpgradeSlot(), "assembly_stock_upgrade");
+        } else if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION) {
             drawSpecialSlot(g, leftPos + layout().capacityX, topPos + layout().capacityY, 0, type().capacitySlot(), "capacity_upgrade_1");
         } else {
             drawSpecialSlot(g, leftPos + layout().upgradeX, topPos + layout().upgradeY, 0, type().upgradeSlot(), "monopole_upgrade");
@@ -362,12 +368,37 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
 
     @Override
     protected Component railTooltip(int row) {
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP) {
+            Slot slot = menu.getSlot(type().assemblyUpgradeSlot());
+            if (!slot.hasItem()) return Component.translatable("item.singulo.assembly_stock_upgrade");
+            return slot.mayPickup(minecraft.player) ? null : Component.translatable("gui.singulo.assembly.upgrade_locked");
+        }
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
             return Component.translatable("gui.singulo.sides.button");
         }
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION)
             return menu.getSlot(type().capacitySlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.capacity_upgrade") : null;
         return menu.getSlot(type().upgradeSlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.upgrade") : null;
+    }
+
+    @Override
+    protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
+        var lines = new java.util.ArrayList<>(super.getTooltipFromContainerItem(stack));
+        int extra = hoveredSlot == null ? 0 : menu.assemblyExcess(hoveredSlot);
+        if (extra > 0) lines.add(Component.literal(String.format(java.util.Locale.ROOT, "× %,d", (long) stack.getCount() + extra)));
+        return lines;
+    }
+
+    @Override
+    protected void renderSlotContents(GuiGraphics graphics, ItemStack stack, Slot slot, @javax.annotation.Nullable String count) {
+        int extra = stack.isEmpty() ? 0 : menu.assemblyExcess(slot);
+        int total = (int) Math.min(Integer.MAX_VALUE, (long) stack.getCount() + extra);
+        if (extra == 0 || total < 100) {
+            super.renderSlotContents(graphics, stack, slot, extra > 0 ? Integer.toString(total) : count);
+            return;
+        }
+        super.renderSlotContents(graphics, stack, slot, "");
+        StockCount.draw(graphics, slot.x, slot.y, total);
     }
 
     /** 自動排出の全体スイッチの位置（板の右上）。 */
@@ -604,11 +635,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             boolean hover = Panel.inside(mouseX, mouseY, bx, by, MODE_SIZE, MODE_SIZE);
             Panel.button(g, skin, bx - 1, by - 1, MODE_SIZE + 2, MODE_SIZE + 2, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
             g.renderItem(modeIcon(), bx, by);
-            int target = menu.value(MachineBlockEntity.D_MASS_TARGET);
+            double target = menu.massValue(true);
             if (target > 0) {
                 int mx = x + l.massBarX;
                 Panel.well(g, skin, mx, by + 5, l.massBarWidth, 6);
-                double f = (double) menu.value(MachineBlockEntity.D_MASS) / target;
+                double f = menu.massValue(false) / target;
                 int filled = (int) Math.round(l.massBarWidth * Math.min(1, f));
                 g.fill(mx, by + 5, mx + filled, by + 11, Panel.GLOW);
                 Panel.glass(g, mx, by + 5, filled, 6);
@@ -695,7 +726,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             return inputs;
         }
         for (int i = 0; i < type().recipeSlots(); i++) {
-            inputs.add(menu.getSlot(type().recipeSlot(i)).getItem());
+            inputs.add(menu.transferStack(type().recipeSlot(i)));
         }
         return inputs;
     }
@@ -1009,7 +1040,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         if (fluidId > 0) {
             Fluid fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
-            double fraction = (double) amount / MachineType.TANK_CAPACITY;
+            double fraction = (double) amount / MachineType.tankCapacity();
             FluidGauge.draw(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT, fraction, fluid);
             int filled = (int) Math.round(MachineLayout.BAR_HEIGHT * Math.min(1, fraction));
             Panel.glass(g, x, y + MachineLayout.BAR_HEIGHT - filled, MachineLayout.TANK_WIDTH, filled);
@@ -1122,7 +1153,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
                 int amount = menu.value(MachineBlockEntity.D_TANKS + i * 2 + 1);
                 Fluid fluid = fluidId > 0 ? BuiltInRegistries.FLUID.byId(fluidId - 1) : null;
                 Component name = fluid == null ? Component.translatable("gui.singulo.empty_tank") : fluid.getFluidType().getDescription();
-                Component contents = Component.translatable("gui.singulo.fluid", name, amount, MachineType.TANK_CAPACITY);
+                Component contents = Component.translatable("gui.singulo.fluid", name, amount, MachineType.tankCapacity());
                 if (type() == MachineType.ELECTROLYZER && i >= type().fluidInputs() && fluid != null && fluid.isSame(SinguloFluids.get("oxygen"))) {
                     Panel.tooltip(g, font, List.of(contents, Component.translatable("gui.singulo.electrolyzer.oxygen_hint")), 200, mouseX, mouseY);
                 } else {
@@ -1138,11 +1169,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             lines.add(mode > 0 && mode <= list.size()
                     ? Component.translatable("gui.singulo.mode.mass", list.get(mode - 1).value().result().getHoverName())
                     : Component.translatable("gui.singulo.mode.normal"));
-            int target = menu.value(MachineBlockEntity.D_MASS_TARGET);
+            double target = menu.massValue(true);
             if (target > 0) {
                 lines.add(Component.translatable("gui.singulo.mass_buffer",
-                        String.format("%.2f", menu.value(MachineBlockEntity.D_MASS) / 100.0),
-                        String.format("%.0f", target / 100.0)));
+                        io.github.genichimaruo.singulo.energy.EnergyText.of(menu.massValue(false)),
+                        io.github.genichimaruo.singulo.energy.EnergyText.of(target)));
             }
             lines.add(Component.translatable("gui.singulo.mode.hint").withStyle(s -> s.withColor(0xFF8A949E)));
             g.renderComponentTooltip(font, lines, mouseX, mouseY);

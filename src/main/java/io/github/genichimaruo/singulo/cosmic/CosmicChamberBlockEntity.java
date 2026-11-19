@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.cosmic;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
@@ -68,7 +71,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             return slot==3 ? stack : super.insertItem(slot,stack,simulate);
         }
     };
-    private final FluidTank tank = new FluidTank(FLUID_CAPACITY) {
+    private final FluidTank tank = new ConfiguredFluidTank(this::tankCapacity, f -> true) {
         @Override protected void onContentsChanged() { setChanged(); }
     };
     private final Energy input=new Energy(true,false), output=new Energy(false,true), both=new Energy(true,true);
@@ -144,10 +147,11 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     public boolean core(){return core;}
     public int progress(){return progress;}
     public int duration(){return duration;}
+    @Override public int remainingTicks() { return duration > 0 ? Math.max(1, duration - progress) : -1; }
     public int lastIn(){return lastIn;}
     public int lastOut(){return lastOut;}
     public ItemStack reserved(){return reserved;}
-    public int tankCapacity(){return kind()==RESERVOIR?FLUID_CAPACITY:16_000;}
+    public int tankCapacity(){return PackBalance.dedicatedTank(kind()==RESERVOIR?FLUID_CAPACITY:16_000);}
     public LongEnergyStorage energyFor(Direction side){return side==null?both:kind()==ACCUMULATOR&&side==back().getOpposite()?output:input;}
     public IFluidHandler fluidFor(Direction side){return side==null?fluidBoth:kind()==RESERVOIR&&side==back().getOpposite()?fluidOutput:fluidInput;}
     public IItemHandler automation(){return automation;}
@@ -254,10 +258,10 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             }
             long coolant=0;
             for(var in:r.fluidIngredients()){if(!in.matches(tank.getFluid()))valid=false;coolant+=in.amount();}
-            if(!valid || coolant>tank.getFluidAmount() || coolant<0 || stored<r.energy() || !fits(r.result()))continue;
+            if(!valid || coolant>tank.getFluidAmount() || coolant<0 || stored<io.github.genichimaruo.singulo.recipe.RecipeNumbers.energy(r.energy()) || !fits(r.result()))continue;
             for(int i=0;i<2;i++)items.extractItem(i,take[i],false);
             tank.drain((int)coolant,IFluidHandler.FluidAction.EXECUTE);
-            reserved=r.result().copy();progress=0;duration=Math.max(1,r.time());cost=Math.max(0,r.energy());setChanged();return;
+            reserved=r.result().copy();progress=0;duration=Math.max(1,r.time());cost=io.github.genichimaruo.singulo.recipe.RecipeNumbers.energy(r.energy());setChanged();return;
         }
     }
     private boolean fits(ItemStack product){ItemStack out=items.getStackInSlot(3);return !product.isEmpty() && product.getCount()<=product.getMaxStackSize() && (out.isEmpty() || ItemStack.isSameItemSameComponents(out,product) && out.getCount()+product.getCount()<=out.getMaxStackSize());}
@@ -365,7 +369,6 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         if(tag.contains("items")){checked=false;}                 // 保存データから読み込んだ: 最初の判定では演出しない
         if(tag.contains("items"))items.deserializeNBT(registries,tag.getCompound("items"));
         stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(registries,tag.getCompound("tank"));
-        if(tank.getFluidAmount()>tankCapacity())tank.setFluid(tank.getFluid().copyWithAmount(tankCapacity()));
         duration=Math.max(0,tag.getInt("duration"));progress=Math.max(0,Math.min(duration,tag.getInt("progress")));cost=Math.max(0,tag.getInt("cost"));core=tag.getBoolean("core");
         status=tag.getInt("status");lastIn=tag.getInt("in");lastOut=tag.getInt("out");
         int[] ports=tag.getIntArray("ports");

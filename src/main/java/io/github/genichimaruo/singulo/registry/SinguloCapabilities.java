@@ -1,9 +1,11 @@
 package io.github.genichimaruo.singulo.registry;
 
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import io.github.genichimaruo.singulo.cable.CableBlockEntity;
 import io.github.genichimaruo.singulo.item.GravityGauntletItem;
 import io.github.genichimaruo.singulo.machine.CatalystDeviceBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
+import io.github.genichimaruo.singulo.machine.MachineReport;
 import io.github.genichimaruo.singulo.multiblock.PortBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -13,6 +15,10 @@ public final class SinguloCapabilities {
     private SinguloCapabilities() {}
 
     public static void register(RegisterCapabilitiesEvent event) {
+        for (var type : SinguloBlockEntities.REGISTER.getEntries()) {
+            event.registerBlockEntity(MachineReports.CAPABILITY, type.get(),
+                    (be, context) -> be instanceof MachineReport.Source source ? source : null);
+        }
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),
                 (be,side)->be.kind()==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.RESERVOIR?null:be.energyFor(side));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),

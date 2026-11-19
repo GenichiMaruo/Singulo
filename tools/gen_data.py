@@ -348,6 +348,13 @@ def recipe_files(*, write=True):
 # ---------------------------------------------------------------- 翻訳
 
 UI_LANG = {
+    'tooltip.singulo.cable_rate': ('転送上限 %s FE/t・1ブロックの損失 %s%%', 'Up to %s FE/t, %s%% loss per block'),
+    'tooltip.singulo.tank_room': ('1室あたり %s mB', 'Capacity per tank: %s mB'),
+    'tooltip.singulo.cargo_slots': ('1便の積載枠 %s', 'Cargo slots per flight: %s'),
+    'tooltip.singulo.default_description': ('標準設定での説明：%s', 'With default settings: %s'),
+    'tooltip.singulo.parallel_limit': ('同時加工の上限 %s回', 'Up to %s batches per run'),
+    'tooltip.singulo.overclock_rates': ('加工速度 ×%s\u3000消費電力 ×%s', 'Speed ×%s, power per tick ×%s'),
+    'tooltip.singulo.stock_limits': ('装着上限 %s個\u30001個あたり +%sスタック', 'Fits %s upgrades, +%s stacks per upgrade'),
     # key: (ja, en)
     'itemGroup.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.stage': ('段階%s: %s', 'Stage %s: %s'),
@@ -577,7 +584,7 @@ UI_LANG = {
     'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使うこと',
                                                     'Hold a Neutrino Scanner in your other hand, or use it on an observatory'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
-    'gui.singulo.assembly.board_hint': ('配置図に合わせて材料を置きます。各マスには1スタックまで置け、組み立てるたびに1個ずつ使います。触媒は琥珀色の枠に入れます。配置図は右の本のボタンで確認できます。', 'Follow the diagram. Each cell holds a stack and supplies one part per craft. Put the catalyst in the amber slot. Open the book on the right to see the patterns.'),
+    'gui.singulo.assembly.board_hint': ('右の本で配置図を確認し、材料を並べます。各マスから1回につき1個ずつ使います。触媒は琥珀色の枠に入れます。', 'Open the book on the right for the pattern. Each occupied cell supplies one part per craft. Put the catalyst in the amber slot.'),
     'gui.singulo.assembly.diagrams': ('組立図', 'Assembly diagrams'),
     'gui.singulo.assembly.diagrams_hint': ('製品にカーソルを合わせると組立図を確認できます。クリックすると、その図をこのボタンからもう一度確認できます。', 'Hover over a product to see its diagram. Click it to keep the diagram on this button.'),
     'gui.singulo.assembly.preview': ('組立結果の見本です。加工が終わると取り出せます。', 'Assembly preview · Collect after processing'),
@@ -626,6 +633,7 @@ UI_LANG = {
     'gui.singulo.reactor.slot.4': ('エルゴスフィア・リング', 'Ergosphere ring'),
     'gui.singulo.reactor.slot.5': ('副産物', 'By-products'),
     'gui.singulo.slot.upgrade': ('アップグレード枠（単極子・オーバークロック）', 'Upgrade slot (monopole or overclock)'),
+    'gui.singulo.assembly.upgrade_locked': ('すべての材料枠を64個以下にすると取り外せます。', 'Reduce every material cell to 64 items or fewer to remove the upgrade.'),
     'gui.singulo.slot.capacity_upgrade': ('容量アップグレード専用枠（Mk1〜Mk3）', 'Capacity upgrade slot (Mk1–Mk3)'),
     'gui.singulo.reason.capacity_upgrade': ('1 tick に %s FE 必要です。容量アップグレードMk%s以上を専用枠に装着してください',
                                             'Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot'),
@@ -3881,7 +3889,7 @@ TAB_GROUPS = [
     ]),
     ('機械のアップグレード', [
         'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2',
-        'capacity_upgrade_3',
+        'capacity_upgrade_3', 'assembly_stock_upgrade',
     ]),
     # コントローラー（核）ごとに、その部材と専用の品を続けて置く
     ('マルチブロック', [

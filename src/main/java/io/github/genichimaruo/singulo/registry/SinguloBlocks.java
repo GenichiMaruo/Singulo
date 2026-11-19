@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.registry;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
@@ -582,14 +585,18 @@ public final class SinguloBlocks {
 
     // ---- ケーブル
     public static final DeferredBlock<CableBlock> COPPER_WIRE = BLOCKS.register("copper_wire",
-            () -> new CableBlock(cableProperties(SoundType.COPPER), 2_000, 0.001, io.github.genichimaruo.singulo.cable.CableProfile.COPPER));
+            () -> new CableBlock(cableProperties(SoundType.COPPER), () -> PackBalance.value(ServerConfig.COPPER_CABLE_RATE), () -> PackBalance.value(ServerConfig.COPPER_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.COPPER));
     public static final DeferredBlock<CableBlock> SUPERCONDUCTING_CABLE = BLOCKS.register("superconducting_cable",
-            () -> new CableBlock(cableProperties(SoundType.METAL), 1_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
+            () -> new CableBlock(cableProperties(SoundType.METAL), () -> PackBalance.value(ServerConfig.SUPERCONDUCTING_CABLE_RATE), () -> PackBalance.value(ServerConfig.SUPERCONDUCTING_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
     public static final DeferredBlock<CableBlock> TOPOLOGICAL_WIRE = BLOCKS.register("topological_wire",
-            () -> new CableBlock(cableProperties(SoundType.METAL), 100_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
+            () -> new CableBlock(cableProperties(SoundType.METAL), () -> PackBalance.value(ServerConfig.TOPOLOGICAL_CABLE_RATE), () -> PackBalance.value(ServerConfig.TOPOLOGICAL_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
     /** 上限なし。mod の装置どうしは int（約 2.1 GFE/t）を超えて受け渡す（ほかの mod の装置へは1台あたり int まで）。 */
     public static final DeferredBlock<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
-            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
+            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), () -> PackBalance.value(ServerConfig.HORIZON_CABLE_RATE), () -> PackBalance.value(ServerConfig.HORIZON_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
 
     /** 置いたカバーの枠（あとからケーブル・パイプを入れられる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.cable.CoverFrameBlock> COVER_FRAME = BLOCKS.register("cover_frame",
@@ -597,18 +604,21 @@ public final class SinguloBlocks {
 
     // ---- 液体パイプ
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
-            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), 2_000,
+            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), () -> PackBalance.value(ServerConfig.COPPER_PIPE_RATE),
                     io.github.genichimaruo.singulo.pipe.PipeProfile.COPPER));
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> VACUUM_JACKETED_PIPE = BLOCKS.register(
             "vacuum_jacketed_pipe", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.METAL),
-                    32_000, io.github.genichimaruo.singulo.pipe.PipeProfile.VACUUM));
+                    () -> PackBalance.value(ServerConfig.VACUUM_PIPE_RATE),
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.VACUUM));
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> SUPERFLUID_CONDUIT = BLOCKS.register(
             "superfluid_conduit", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.GLASS),
-                    512_000, io.github.genichimaruo.singulo.pipe.PipeProfile.SUPERFLUID));
+                    () -> PackBalance.value(ServerConfig.SUPERFLUID_PIPE_RATE),
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.SUPERFLUID));
     /** 上限なし（1つの口の1回の受け渡しは int まで）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> HORIZON_DUCT = BLOCKS.register(
             "horizon_duct", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.NETHERITE_BLOCK),
-                    Long.MAX_VALUE, io.github.genichimaruo.singulo.pipe.PipeProfile.HORIZON));
+                    () -> PackBalance.value(ServerConfig.HORIZON_PIPE_RATE),
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.HORIZON));
 
     private static DeferredBlock<Block> ruinLamp(String id) {
         return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)

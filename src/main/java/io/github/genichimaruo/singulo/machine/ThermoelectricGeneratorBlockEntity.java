@@ -36,7 +36,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     static final int PUSH_PER_TICK = 2_000;
 
     public static final int D_HOT = 0, D_COLD = 1, D_RATE_X100 = 2, D_ENERGY = 3, D_CAPACITY = 4, D_TOLERANCE = 5,
-            D_MELTING = 6, D_FLUID = 7, COUNT = 8;
+            D_MELTING = 6, D_FLUID = 7, D_RATE_WHOLE = 8, D_RATE = 9, COUNT = 11;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(20_000, 0, PUSH_PER_TICK, this::setChanged);
     private int hot;
@@ -45,7 +45,6 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     @Nullable
     private BlockPos coldPos;
     private double rate;
-    private double fraction;
     private double meltProgress;
 
     public ThermoelectricGeneratorBlockEntity(BlockPos pos, BlockState state) {
@@ -80,10 +79,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         }
         boolean active = rate > 0;
         if (active) {
-            fraction += rate;
-            int whole = (int) fraction;
-            fraction -= whole;
-            energy.generate(whole);
+            energy.generateRate(rate);
             melt(level);
         }
         pushEnergy(level, pos);
@@ -119,7 +115,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         tolerance = bestTolerance;
         coldPos = bestColdPos;
         int delta = deltaT();
-        rate = delta > 0 ? delta * ServerConfig.THERMOELECTRIC_COEFFICIENT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : 0;
+        rate = energy.prepareGeneration(delta * ServerConfig.THERMOELECTRIC_COEFFICIENT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get());
     }
 
     private int deltaT() {
@@ -155,7 +151,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
             }
             IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
+                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), energy.exportLimit()), false);
                 if (sent > 0) {
                     energy.consume(sent);
                 }
@@ -170,7 +166,9 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         return SyncedInts.server(COUNT, i -> switch (i) {
             case D_HOT -> hot;
             case D_COLD -> cold;
-            case D_RATE_X100 -> (int) Math.round(rate * 100);
+            case D_RATE_X100 -> Math.clamp(Math.round(rate * 100), 0, Integer.MAX_VALUE);
+            case D_RATE_WHOLE -> (int) rate;
+            case D_RATE, D_RATE + 1 -> SyncedInts.doubleWord(rate, i - D_RATE);
             case D_ENERGY -> energy.getEnergyStored();
             case D_CAPACITY -> energy.getMaxEnergyStored();
             case D_TOLERANCE -> tolerance;
@@ -198,14 +196,14 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.putDouble("melt", meltProgress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         meltProgress = tag.getDouble("melt");
     }
 }

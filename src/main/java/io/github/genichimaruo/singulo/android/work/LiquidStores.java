@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import io.github.genichimaruo.singulo.api.android.AndroidChemicalStorage;
+import io.github.genichimaruo.singulo.api.android.AndroidSharedStorage;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,7 +26,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
  */
 public final class LiquidStores {
     private final List<IFluidHandler> fluids = new ArrayList<>();
-    private final List<Chemicals.Store> chemicals = new ArrayList<>();
+    private final List<AndroidChemicalStorage> chemicals = new ArrayList<>();
     /**
      * 素材置き場として数えるか（{@link #at}）。そのときは、抜ける量だけを数える（装置の入れるだけのタンクのように、中身は見えても
      * 抜けない物を在庫にしない）。装置の面（{@link #machine}）は、まだ残っている素材も数えたいので、見えている量のまま。
@@ -37,6 +40,16 @@ public final class LiquidStores {
         LiquidStores out = new LiquidStores();
         out.storage = true;
         out.fluids.add(handler);
+        return out;
+    }
+
+    static LiquidStores endpoint(AndroidWorkEndpoint endpoint, boolean delivery) {
+        LiquidStores out = new LiquidStores();
+        out.storage = true;
+        IFluidHandler fluid = delivery ? endpoint.deliveryFluids() : endpoint.supplyFluids();
+        AndroidChemicalStorage chemical = delivery ? endpoint.deliveryChemicals() : endpoint.supplyChemicals();
+        if (fluid != null) out.fluids.add(fluid);
+        if (chemical != null) out.chemicals.add(chemical);
         return out;
     }
 
@@ -55,7 +68,7 @@ public final class LiquidStores {
     }
 
     private static void adjacent(Level level, BlockPos point, BiConsumer<BlockPos, LiquidStores> visit) {
-        // Addon supply endpoints opt in to items only. Don't probe an unloaded point or neighbor.
+        // Linked endpoints are resolved by the console, including ownership and placed identity.
         if (!level.isLoaded(point) || level.getBlockEntity(point) instanceof io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint) return;
         for (Direction d : Direction.values()) {
             BlockPos pos = point.relative(d);
@@ -77,29 +90,49 @@ public final class LiquidStores {
     /** An extractable material and the supply point that can actually drain it. */
     record Supply(BlockPos key, BlockPos point, ItemCount material, LiquidStores store) {}
 
-    static long fillAt(Level level, BlockPos point, ItemStack sample, long amount, BiConsumer<BlockPos, Long> deposited) {
+    private static void visitSupply(WorkConsoleBlockEntity console, BlockPos point, BiConsumer<BlockPos, LiquidStores> visit) {
+        if (console.hasEndpointLink(point)) {
+            var endpoint = console.workEndpoint(point);
+            if (endpoint != null) visit.accept(point, endpoint(endpoint, false));
+        } else adjacent(console.getLevel(), point, visit);
+    }
+
+    private BlockPos storageKey(ItemStack sample, BlockPos pos) {
+        Object handler = ChemicalSamples.is(sample) ? chemicals.getFirst() : fluids.getFirst();
+        return handler instanceof AndroidSharedStorage shared ? SupplyPortBlockEntity.sharedSeenKey(shared.sharedStorageKey()) : pos;
+    }
+
+    static boolean canFillAt(WorkConsoleBlockEntity console, BlockPos point, ItemStack sample) {
+        boolean[] fits = {false};
+        visitSupply(console, point, (pos, store) -> {
+            if (!fits[0]) fits[0] = store.fill(sample, 1, true) > 0;
+        });
+        return fits[0];
+    }
+
+    static long fillAt(WorkConsoleBlockEntity console, BlockPos point, ItemStack sample, long amount, BiConsumer<BlockPos, Long> deposited) {
         long[] moved = {0};
-        adjacent(level, point, (key, store) -> {
+        visitSupply(console, point, (pos, store) -> {
             if (moved[0] == amount) return;
             long accepted = store.fill(sample, amount - moved[0], false);
             if (accepted > 0) {
                 moved[0] += accepted;
-                deposited.accept(key, accepted);
+                deposited.accept(store.storageKey(sample, pos), accepted);
             }
         });
         return moved[0];
     }
 
-    static Map<BlockPos, List<Supply>> supplies(Level level, List<BlockPos> points) {
+    static Map<BlockPos, List<Supply>> supplies(WorkConsoleBlockEntity console, List<BlockPos> points) {
         Map<BlockPos, List<Supply>> tanks = new LinkedHashMap<>();
-        Map<IFluidHandler, BlockPos> shared = new IdentityHashMap<>();
+        Map<Object, BlockPos> shared = new IdentityHashMap<>();
         for (BlockPos point : points) {
-            adjacent(level, point, (pos, store) -> {
+            visitSupply(console, point, (pos, store) -> {
                 List<ItemCount> available = new ArrayList<>();
                 store.addTo(available);
                 for (ItemCount item : available) {
-                    BlockPos key = FluidSamples.is(item.item)
-                            ? shared.computeIfAbsent(store.fluids.getFirst(), handler -> pos) : pos;
+                    Object handler = FluidSamples.is(item.item) ? store.fluids.getFirst() : store.chemicals.getFirst();
+                    BlockPos key = shared.computeIfAbsent(handler, h -> store.storageKey(item.item, pos));
                     List<Supply> faces = tanks.computeIfAbsent(key, ignored -> new ArrayList<>());
                     // Two faces can expose the same tank with different drain permissions.
                     // For each fluid use its most accessible face; ties keep the first point.
@@ -216,7 +249,7 @@ public final class LiquidStores {
         if (ChemicalSamples.is(sample)) {
             String id = ChemicalSamples.id(sample);
             long n = 0;
-            for (Chemicals.Store s : chemicals) {
+            for (AndroidChemicalStorage s : chemicals) {
                 n += s.amount(id);
             }
             return n;
@@ -270,7 +303,7 @@ public final class LiquidStores {
         long got = 0;
         if (ChemicalSamples.is(sample)) {
             String id = ChemicalSamples.id(sample);
-            for (Chemicals.Store s : chemicals) {
+            for (AndroidChemicalStorage s : chemicals) {
                 if (got >= amount) {
                     break;
                 }
@@ -294,7 +327,7 @@ public final class LiquidStores {
         long put = 0;
         if (ChemicalSamples.is(sample)) {
             String id = ChemicalSamples.id(sample);
-            for (Chemicals.Store s : chemicals) {
+            for (AndroidChemicalStorage s : chemicals) {
                 if (put >= amount) {
                     break;
                 }
@@ -320,7 +353,7 @@ public final class LiquidStores {
                 ItemCount.add(out, FluidSamples.of(f.type().copyWithAmount(1)), f.amount());
             }
         }
-        for (Chemicals.Store s : chemicals) {
+        for (AndroidChemicalStorage s : chemicals) {
             for (Map.Entry<String, Long> e : s.contents().entrySet()) {
                 ItemCount.add(out, ChemicalSamples.of(e.getKey(), 1), e.getValue());
             }

@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.test;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.api.item.CatalystItem;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineType;
@@ -26,7 +27,44 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
+@net.neoforged.fml.common.EventBusSubscriber(modid="singulo")
 public final class AssemblerPowerGameTests {
+    private static final net.minecraft.resources.ResourceLocation ADDON_CATALYST =
+            net.minecraft.resources.ResourceLocation.parse("addon_fixture:muon_catalyst");
+    private static final net.minecraft.resources.ResourceLocation ADDON_SPENT =
+            net.minecraft.resources.ResourceLocation.parse("addon_fixture:tarnished_crystal");
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerAddonItems(net.neoforged.neoforge.registries.RegisterEvent event) {
+        event.register(net.minecraft.core.registries.Registries.ITEM, helper -> {
+            var shell = new CatalystItem.Spent(new net.minecraft.world.item.Item.Properties());
+            helper.register(ADDON_SPENT, shell);
+            helper.register(ADDON_CATALYST, new CatalystItem(new net.minecraft.world.item.Item.Properties(), 4, 12000, () -> shell));
+        });
+    }
+
+    @GameTest(template = "empty", batch = "assembler_power")
+    public static void addonCatalystPaysTierCostAndReturnsItsOwnShell(GameTestHelper h) {
+        var machine = assembler(h);
+        var recipe = recipe(h, "casimir_cavity_frame");
+        fillBoard(machine, recipe);
+        var tool = recipe.ingredients().stream().filter(in -> in.uses() > 0).findFirst().orElseThrow();
+        var fresh = new ItemStack(BuiltInRegistries.ITEM.get(ADDON_CATALYST));
+        int pay = tool.usesFrom(fresh);
+        h.assertTrue(io.github.genichimaruo.singulo.item.CatalystHelper.tierOf(fresh) == 4 && pay > 0, "Addon tier was inferred from its item path");
+        var lastUse = UsesHelper.consume(fresh, UsesHelper.remaining(fresh) - pay);
+        h.assertTrue(lastUse.getMaxStackSize() == 1 && fresh.getMaxStackSize() == 16, "Addon catalyst wear did not affect stacking");
+        machine.items().setStackInSlot(machine.type().catalystSlot(), lastUse);
+        machine.energy().setEnergy(machine.type().energyCapacity());
+        var registries = h.getLevel().registryAccess();
+        machine.loadWithComponents(machine.saveWithoutMetadata(registries), registries);
+        tick(h, machine, recipe.time());
+        var shell = machine.automationItems().extractItem(machine.type().spentCatalystSlot(), 64, false);
+        h.assertTrue(ItemStack.matches(machine.items().getStackInSlot(machine.type().outputSlot()), recipe.result())
+                && shell.is(BuiltInRegistries.ITEM.get(ADDON_SPENT)) && shell.getCount() == 1 && UsesHelper.isSpentCatalyst(shell),
+                "Assembling with an addon catalyst lost its product or custom shell");
+        h.succeed();
+    }
     private static MachineBlockEntity assembler(GameTestHelper h) {
         var pos = new BlockPos(1, 1, 1);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());

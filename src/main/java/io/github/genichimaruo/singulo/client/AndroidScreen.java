@@ -387,13 +387,13 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
                         int cap = RuinAndroid.chemCapacity(tankUpgrade());
                         lines.add(id.isEmpty() ? Component.translatable("gui.singulo.android.chem.empty", i + 1)
                                 : Component.translatable("gui.singulo.android.chem", i + 1, io.github.genichimaruo.singulo.android.work.Chemicals.name(id),
-                                        Math.round(android.chemFill(i) * cap), cap));
+                                        menu.value(AndroidMenu.D_CHEMICAL + i), cap));
                     } else {
                         net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
                         int cap = RuinAndroid.fluidCapacity(tankUpgrade());
                         lines.add(fluid == null ? Component.translatable("gui.singulo.android.tank.empty", i + 1)
                                 : Component.translatable("gui.singulo.android.tank", i + 1,
-                                        new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), Math.round(android.tankFill(i) * cap), cap));
+                                        new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), menu.value(AndroidMenu.D_FLUID + i), cap));
                     }
                     lines.add(Component.translatable(menu.working() ? "gui.singulo.android.tank.locked"
                             : row.chem() ? "gui.singulo.android.chem.hint" : "gui.singulo.android.tank.hint").withStyle(net.minecraft.ChatFormatting.GRAY));

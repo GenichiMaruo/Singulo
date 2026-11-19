@@ -1,19 +1,28 @@
 package io.github.genichimaruo.singulo.test;
 
 import com.mojang.authlib.GameProfile;
+import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineMenu;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -21,6 +30,100 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
 public final class AssemblyMenuGameTests {
+    private static ItemStack craftStockUpgrade(GameTestHelper h) {
+        var steel = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("steel_plate")));
+        var circuit = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("basic_circuit")));
+        var chest = new ItemStack(Items.CHEST);
+        var input = CraftingInput.of(3, 3, List.of(steel, chest, steel, chest, circuit, chest, steel, chest, steel));
+        var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel()).orElseThrow();
+        return recipe.value().assemble(input, h.getLevel().registryAccess());
+    }
+
+    @GameTest(template = "empty")
+    public static void expandedAssemblyStockSurvivesClicksReloadRemovalAndBreaking(GameTestHelper h) {
+        var pos = new BlockPos(1, 1, 1);
+        h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
+        MachineBlockEntity machine = h.getBlockEntity(pos);
+        var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "StockTester"));
+        var menu = new MachineMenu(1, player.getInventory(), machine);
+        int upgradeSlot = menu.type().assemblyUpgradeSlot(), inventory = menu.playerSlotStart(), first = menu.assemblySlot(0);
+        var upgrade = BuiltInRegistries.ITEM.get(Singulo.id("assembly_stock_upgrade"));
+        menu.getSlot(inventory).set(craftStockUpgrade(h));
+        menu.clicked(inventory, 0, ClickType.QUICK_MOVE, player);
+        h.assertTrue(menu.getSlot(upgradeSlot).getItem().is(upgrade) && menu.stackLimit(first, new ItemStack(Items.BUCKET)) == 64
+                && menu.stackLimit(first, new ItemStack(Items.IRON_PICKAXE)) == 1, "Unexpected expanded stack limits");
+        ItemStack part = new ItemStack(Items.IRON_INGOT, 64);
+        part.set(DataComponents.CUSTOM_NAME, Component.literal("Stock"));
+        var grid = machine.assemblyGrid();
+        for (int cell = 0; cell < 2; cell++) {
+            menu.setCarried(part.copy());
+            menu.clicked(menu.assemblySlot(cell), 0, ClickType.PICKUP, player);
+        }
+        menu.setCarried(part.copy());
+        menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(0, 0), ClickType.QUICK_CRAFT, player);
+        for (int cell = 0; cell < 2; cell++)
+            menu.clicked(menu.assemblySlot(cell), AbstractContainerMenu.getQuickcraftMask(1, 0), ClickType.QUICK_CRAFT, player);
+        menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(2, 0), ClickType.QUICK_CRAFT, player);
+        h.assertTrue(menu.getCarried().isEmpty() && grid.getStackInSlot(0).getCount() == 96 && grid.getStackInSlot(1).getCount() == 96,
+                "Dragging a stack across two full ordinary stacks lost its share");
+        for (int i = 0; i < 2; i++) {
+            menu.getSlot(inventory).set(part.copy());
+            menu.clicked(inventory, 0, ClickType.QUICK_MOVE, player);
+        }
+        menu.setCarried(part.copy());
+        menu.clicked(first, 0, ClickType.PICKUP, player);
+        h.assertTrue(grid.getStackInSlot(0).getCount() == 256 && menu.getCarried().getCount() == 32
+                && menu.getSlot(first).getItem().getCount() == 64 && menu.assemblyExcess(menu.getSlot(first)) == 192,
+                "Filling a cell failed to cap it at 256 with a legal visible stack");
+        menu.clicked(first, 1, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().getCount() == 32, "A full cell accepted another part");
+        menu.clicked(inventory, 0, ClickType.PICKUP, player);
+        player.getInventory().setItem(0, new ItemStack(Items.DIRT));
+        menu.clicked(first, 0, ClickType.SWAP, player);
+        h.assertTrue(grid.getStackInSlot(0).getCount() == 256 && player.getInventory().getItem(0).is(Items.DIRT),
+                "Number-key swap replaced a stocked cell with another material");
+        menu.clicked(first, 1, ClickType.SWAP, player);
+        h.assertTrue(ItemStack.matches(player.getInventory().getItem(1), part) && grid.getStackInSlot(0).getCount() == 192,
+                "Empty hotbar slot received the wrong quantity");
+        menu.clicked(upgradeSlot, 0, ClickType.PICKUP, player);
+        menu.clicked(upgradeSlot, 0, ClickType.QUICK_MOVE, player);
+        menu.clicked(upgradeSlot, 2, ClickType.SWAP, player);
+        menu.clicked(upgradeSlot, 1, ClickType.THROW, player);
+        h.assertTrue(menu.getCarried().isEmpty() && menu.getSlot(upgradeSlot).getItem().is(upgrade)
+                && menu.quickMoveStack(player, upgradeSlot).isEmpty()
+                && machine.items().extractItem(upgradeSlot, 1, false).isEmpty(), "A stocked board allowed its upgrade to be removed");
+        var registry = h.getLevel().registryAccess();
+        var saved = machine.saveWithoutMetadata(registry);
+        grid.setStackInSlot(0, ItemStack.EMPTY);
+        machine.loadWithComponents(saved, registry);
+        h.assertTrue(ItemStack.matches(grid.getStackInSlot(0), part.copyWithCount(192)) && grid.getStackInSlot(1).getCount() == 96,
+                "Reload lost stocked parts or their components");
+        menu.clicked(menu.assemblySlot(1), 0, ClickType.QUICK_MOVE, player);
+        h.assertTrue(grid.getStackInSlot(1).isEmpty() && player.getInventory().countItem(Items.IRON_INGOT) == 192,
+                "Shift-extraction failed to split the entire cell across normal inventory stacks");
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            h.assertTrue(stack.getCount() <= stack.getMaxStackSize(), "Oversized player inventory stack");
+        }
+        grid.extractItem(0, 64, false);
+        grid.extractItem(0, 63, false);
+        h.assertTrue(grid.getStackInSlot(0).getCount() == 65 && !menu.getSlot(upgradeSlot).mayPickup(player),
+                "Upgrade became removable at 65");
+        grid.extractItem(0, 1, false);
+        menu.clicked(upgradeSlot, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().is(upgrade) && !menu.getSlot(upgradeSlot).hasItem()
+                && !grid.insertItem(0, part.copy(), false).isEmpty(), "Could not uninstall at 64 or still accepted more parts");
+        menu.clicked(upgradeSlot, 0, ClickType.PICKUP, player);
+        for (int i = 0; i < 2; i++) grid.insertItem(0, part.copy(), false);
+        var absolute = machine.getBlockPos();
+        h.getLevel().destroyBlock(absolute, false);
+        var drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(absolute).inflate(1)).stream().map(ItemEntity::getItem)
+                .filter(s -> ItemStack.isSameItemSameComponents(s, part)).toList();
+        h.assertTrue(drops.stream().mapToInt(ItemStack::getCount).sum() == 192 && drops.stream().allMatch(s -> s.getCount() <= 64),
+                "Breaking the assembler lost parts or dropped oversized stacks");
+        h.succeed();
+    }
+
     @GameTest(template = "empty")
     public static void clicksDragShiftAndCloseConservePhysicalAssemblyParts(GameTestHelper h) {
         BlockPos pos = new BlockPos(1, 1, 1);

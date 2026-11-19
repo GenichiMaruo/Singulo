@@ -171,7 +171,7 @@ public final class CosmicChamberRenderer implements BlockEntityRenderer<CosmicCh
     private void reservoir(CosmicChamberBlockEntity be, Visual v, PoseStack pose, MultiBufferSource buffers, int light,
                            float time, float dt, boolean near) {
         FluidStack fluid = be.tank().getFluid();
-        float target = fluid.getAmount() / (float) CosmicChamberBlockEntity.FLUID_CAPACITY;
+        float target = Math.min(1F, fluid.getAmount() / (float) be.tankCapacity());
         float before = v.fill;
         v.fill = approach(before, target, dt, 2.5F);
         if (before >= 0 && dt > 0) {

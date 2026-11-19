@@ -235,6 +235,11 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         return mass / 1000.0 * coef / 20.0;
     }
 
+    private static long addProduction(long stored, long rate, int count, long capacity) {
+        if (count <= 0) return stored;
+        return rate > (capacity - stored) / count ? capacity : stored + rate * count;
+    }
+
     static long energyPerPellet() {
         return ServerConfig.SPEC.isLoaded() ? ServerConfig.PENROSE_ENERGY_PER_PELLET.get() : 20_000_000_000L;
     }
@@ -435,7 +440,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         ignitionBandwidth = receivedThisTick;
         ignitionPeak = Math.max(ignitionPeak, receivedThisTick);
         receivedThisTick = 0;
-        ignitionReachable = ignitionStored + ignitionBandwidth * Math.max(0, ignitionTicks);
+        ignitionReachable = addProduction(ignitionStored, ignitionBandwidth, Math.max(0, ignitionTicks), Long.MAX_VALUE);
         if (ignitionElapsed == 1) {
             // 点火の音（鳴り終わる瞬間に炉心ができる）
             Vec3 core = coreCenter();
@@ -482,7 +487,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     private void run(ServerLevel level) {
         double eta = efficiency(spin);
-        long perPellet = Math.round(energyPerPellet() * eta);
+        long perPellet = Math.round(energyPerPellet() * eta * (ServerConfig.SPEC.isLoaded() ? ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : 1.0));
         double max = eddingtonPerTick();
         double wanted = perPellet <= 0 ? 0 : (double) (BUFFER_CAPACITY - buffer) / perPellet;
         // 投入間隔を決めていればその間隔で（エディントン限界まで）、自動なら蓄電の減った分だけ
@@ -496,7 +501,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         int taken = whole <= 0 ? 0 : items.extractItem(SLOT_FUEL, whole, false).getCount();
         pelletCarry = taken < whole ? 0 : pelletCarry - whole;
         if (taken > 0) {
-            buffer = Math.min(BUFFER_CAPACITY, buffer + taken * perPellet);
+            buffer = addProduction(buffer, perPellet, taken, BUFFER_CAPACITY);
             // ペレットでは上限を超えない（すでに超えていれば減らしもしない）
             mass = Math.max(mass, Math.min(MAX_MASS, mass + taken * PELLET_MASS * GROWTH_FRACTION));
             level.blockEvent(worldPosition, getBlockState().getBlock(), EVENT_PELLETS, Math.min(taken, 12));
@@ -1206,7 +1211,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         };
         Component label = switch (state) {
             case IGNITING -> Component.translatable("gui.singulo.reactor.state.igniting",
-                    (int) Math.min(100, ignitionStored * 100 / Math.max(1, ignitionEnergy())),
+                    (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy())),
                     ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : ignitionTicks / 20);
             case RUNNING -> Component.translatable("gui.singulo.reactor.mode." + mode().name().toLowerCase(java.util.Locale.ROOT));
             default -> Component.translatable("gui.singulo.reactor.state." + state.name().toLowerCase(java.util.Locale.ROOT));
@@ -1353,7 +1358,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             case D_OUT_LO -> (int) (lastOutput & 0xFFFFFFFFL);
             case D_OUT_HI -> (int) (lastOutput >>> 32);
             case D_BUFFER_MFE -> (int) (buffer / 1_000_000L);
-            case D_IGNITION_PCT -> (int) Math.min(100, ignitionStored * 100 / Math.max(1, ignitionEnergy()));
+            case D_IGNITION_PCT -> (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy()));
             case D_IGNITION_SECS -> ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : ignitionTicks / 20;
             case D_TARGET -> spinTarget;
             case D_MODE -> mode().ordinal();

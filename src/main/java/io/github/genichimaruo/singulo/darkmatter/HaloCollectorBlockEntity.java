@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.darkmatter;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
@@ -32,7 +35,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     public static final int BUFFER = 4000;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(BUFFER, ContainmentTankBlockEntity::isDarkMatter) {
+    private final FluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(BUFFER), ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -52,7 +55,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
 
         @Override
         public int getTankCapacity(int t) {
-            return BUFFER;
+            return tank.getCapacity();
         }
 
         @Override
@@ -151,7 +154,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
             return switch (i) {
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.RATE -> rate;
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.AMOUNT -> tank.getFluidAmount();
-                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.BUFFER -> BUFFER;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.BUFFER -> tank.getCapacity();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.ENERGY -> energy.getEnergyStored();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.ENERGY_MAX -> energy.getMaxEnergyStored();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.CORE -> core == null ? 0 : 1;

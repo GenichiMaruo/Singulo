@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.test;
 
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineReport;
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
@@ -21,7 +22,45 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
  */
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
+@net.neoforged.fml.common.EventBusSubscriber(modid="singulo")
 public final class MachineReportGameTests {
+    private static final class AddonMachine extends net.minecraft.world.level.block.entity.ChestBlockEntity {
+        AddonMachine(BlockPos pos) { super(pos, Blocks.CHEST.defaultBlockState()); }
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerMachineReport(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(MachineReports.CAPABILITY, net.minecraft.world.level.block.entity.BlockEntityType.CHEST,
+                (chest, ignored) -> chest instanceof AddonMachine ? new MachineReport.Source() {
+                    public MachineReport report() {
+                        return new MachineReport(MachineReport.State.NO_POWER, net.minecraft.network.chat.Component.literal("Cooling"),
+                                java.util.List.of(), 5, 20, 7, 80, 0, 0, chest.getItem(0), 1, java.util.List.of(), 0);
+                    }
+                    public int remainingTicks() { return 15; }
+                } : null);
+    }
+
+    @GameTest(template = "empty")
+    public static void addonCapabilityFeedsTheMonitorOverlayAndAndroidTimer(GameTestHelper h) {
+        var at = new BlockPos(2, 1, 2);
+        h.setBlock(at, Blocks.CHEST);
+        var level = h.getLevel();
+        var pos = h.absolutePos(at);
+        var be = new AddonMachine(pos);
+        level.setBlockEntity(be);
+        be.setItem(0, new ItemStack(Items.AMETHYST_SHARD, 2));
+        var report = MachineReports.read(level, pos).orElseThrow();
+        report.catalyst().shrink(1);
+        h.assertTrue(report.catalyst().getCount() == 2 && be.getItem(0).getCount() == 2, "Reading a report changed its source");
+        h.assertTrue(MachineReport.reports(be.getBlockState(), be) && MachineReport.of(level, pos).energy() == 7
+                && io.github.genichimaruo.singulo.android.work.MachineWatch.eta(level, pos) == 15, "Addon diagnostics did not reach the HUD or scheduler");
+        var monitor = io.github.genichimaruo.singulo.monitor.FactoryMonitor.scan(level, pos);
+        h.assertTrue(monitor.stalled().stream().anyMatch(s -> s.pos().equals(pos) && s.reason().getString().equals("Cooling")),
+                "Addon machine was omitted from the factory monitor");
+        var far = pos.offset(40000, 0, 40000);
+        h.assertTrue(!level.isLoaded(far) && MachineReports.read(level, far).isEmpty() && !level.isLoaded(far), "Report read loaded a chunk");
+        h.succeed();
+    }
     private static String key(net.minecraft.network.chat.Component c) {
         return c.getContents() instanceof TranslatableContents t ? t.getKey() : c.getString();
     }
@@ -35,6 +74,7 @@ public final class MachineReportGameTests {
         MachineBlockEntity kiln = h.getBlockEntity(kilnAt);
         kiln.items().setStackInSlot(MachineType.KILN.recipeSlot(0), new ItemStack(Items.DIRT));
         h.assertTrue(MachineReport.reports(kiln.getBlockState(), kiln), "A kiln does not report");
+        h.assertTrue(level.getCapability(MachineReports.CAPABILITY, kiln.getBlockPos()) == kiln, "Singulo machine did not expose the public capability");
         h.assertFalse(MachineReport.reports(Blocks.STONE.defaultBlockState(), null), "Stone reports");
 
         // 組み上がっていない縮退圧縮炉: コントローラーだけで、ほかの部品がみな足りない

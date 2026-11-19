@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -84,18 +85,13 @@ public final class MachineWatch {
      */
     public static int eta(Level level, BlockPos at) {
         var machine = controller(level, at);
-        if (machine instanceof io.github.genichimaruo.singulo.forge.JetForgeBlockEntity forge
-                && forge.phase() != io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IDLE) {
-            return Math.max(1, forge.totalTicks() - forge.elapsed());
-        }
-        if (machine instanceof io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity chamber && chamber.duration() > 0) {
-            return Math.max(1, chamber.duration() - chamber.progress());
-        }
-        if (machine instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity standard) {
-            return standard.remainingTicks();
-        }
         if (machine instanceof io.github.genichimaruo.singulo.machine.CosmicMuonCollectorBlockEntity collector) {
             return collector.remainingTicks();
+        }
+        var source = MachineReports.source(machine);
+        if (source != null) {
+            int remaining = source.remainingTicks();
+            if (remaining >= 0) return remaining;
         }
         if (machine instanceof AbstractFurnaceBlockEntity f) {
             ItemStack cooking = f.getItem(0);

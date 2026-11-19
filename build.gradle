@@ -34,6 +34,16 @@ sourceSets {
     }
 }
 sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java')
+tasks.named('processGameTestResources') {
+    from('docs/examples/recipe-pack') { into 'fixtures/recipe-pack' }
+}
+tasks.register('recipePackExample', Zip) {
+    from('docs/examples/recipe-pack')
+    archiveFileName = 'Singulo-recipe-pack-example.zip'
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
 configurations {
     gameTestImplementation.extendsFrom implementation
     gameTestCompileOnly.extendsFrom compileOnly

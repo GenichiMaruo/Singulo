@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.gravity;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -54,7 +55,7 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
 
         @Override
         public int getMaxEnergyStored() {
-            return (int) CAPACITY;
+            return (int) Math.min(Integer.MAX_VALUE, Math.max(stored, capacity()));
         }
 
         @Override
@@ -83,7 +84,12 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
 
     @Override
     protected long capacity() {
-        return CAPACITY;
+        return Math.max(CAPACITY, Math.round(20 * perBlock()));
+    }
+
+    private static double perBlock() {
+        return ServerConfig.SPEC.isLoaded()
+                ? ServerConfig.IMPACT_ENERGY_PER_BLOCK.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : ENERGY_PER_BLOCK;
     }
 
     public IEnergyStorage output() {
@@ -104,7 +110,7 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
             outputTick = now;
             outputUsed = 0;
         }
-        return Math.max(0, Math.min(surplus(), PUSH_PER_TICK - outputUsed));
+        return Math.max(0, Math.min(surplus(), Math.max(PUSH_PER_TICK, Math.round(perBlock())) - outputUsed));
     }
 
     private void spend(long amount) {
@@ -140,7 +146,7 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
         if (fallDistance < MIN_FALL) {
             return 0;
         }
-        long gain = Math.min(CAPACITY - stored, Math.round(fallDistance * ENERGY_PER_BLOCK));
+        long gain = Math.min(capacity() - stored, Math.round(fallDistance * perBlock()));
         if (gain > 0) {
             stored += gain;
             setChanged();

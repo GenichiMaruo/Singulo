@@ -1,6 +1,6 @@
 # 0.21.0: 装置の様子・工場モニター・銀河のやりこみ
 
-[変更履歴](../curseforge/changelog-0.21.0.md)・[大規模施設の負荷測定](server-scaling.md)・[アンドロイドの製作と全504品目の取得経路](android-production.md)
+[変更履歴](../curseforge/changelog-0.21.0.md)・[大規模施設の負荷測定](server-scaling.md)・[アンドロイドの製作と全504品目の取得経路](android-production.md)・[AE2向け作業場API](android-workshop-api.md)
 
 ## 装置の様子の報告（machine/MachineReport）
 

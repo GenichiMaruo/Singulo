@@ -136,7 +136,9 @@ def icon(name):
         im = id_icon(OUTPUT_ALIASES[name])
     elif name in VANILLA:
         v = VANILLA[name]
-        if v.startswith('#'):
+        if v == '#c:chests/wooden':
+            im = icon('minecraft:chest')
+        elif v.startswith('#'):
             path = TAG_ICONS.get(v[1:])
             im = vanilla_texture(path) if path else None
         else:

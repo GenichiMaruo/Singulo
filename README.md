@@ -42,6 +42,8 @@ Forge support for Minecraft 1.21.1 ended with 0.8.1; from 0.9.0 on, 1.21.1 is Ne
 - [遊び方・開発資料の入口](docs/README.md)
 - [日本語](docs/player/ja.md) · [English](docs/player/en.md) · [简体中文](docs/player/zh-cn.md) · [繁體中文](docs/player/zh-tw.md) · [한국어](docs/player/ko-kr.md)
 - [画像付きレシピ](docs/recipes/README.md)
+- [Modパック向けの機械性能・電力・ボス難易度の設定](docs/development/pack-balance.md)
+- [Modパック向けのレシピ調整とサンプル](docs/development/recipe-packs.md)
 - [0.17.0の変更と検証](docs/0.17.0/README.md) · [過去の版の資料](docs/README.md) · [課題](issue.md)
 
 ## 作者を支援する
@@ -58,3 +60,5 @@ bash ./gradlew runClient
 ```
 
 生成元・実装時の条件は[開発ガイド](docs/development/README.md)、短い再検証と全体検査は[テスト手順](docs/development/testing.md)、配布は[公開手順](docs/development/releasing.md)を参照してください。
+
+独自の触媒・機械やアンドロイドの連携端末を追加する方法は、[アドオン開発ガイド](docs/development/addon-api.md)にまとめています。

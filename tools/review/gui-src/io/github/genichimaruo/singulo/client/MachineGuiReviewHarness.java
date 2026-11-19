@@ -137,7 +137,7 @@ public final class MachineGuiReviewHarness {
                 items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("bismuth_ingot"))));
             }
             var ctor = MachineMenu.class.getDeclaredConstructor(int.class, net.minecraft.world.entity.player.Inventory.class,
-                    MachineType.class, BlockPos.class, IItemHandler.class, SyncedInts.class, MachineBlockEntity.class);
+                    MachineType.class, BlockPos.class, ItemStackHandler.class, ItemStackHandler.class, SyncedInts.class, MachineBlockEntity.class);
             ctor.setAccessible(true);
             BlockPos reviewPos = SIDES ? mc.player.blockPosition().above(3) : BlockPos.ZERO;
             if (SIDES) {
@@ -147,7 +147,7 @@ public final class MachineGuiReviewHarness {
                 value(data, MachineBlockEntity.sidesIndex(type), new io.github.genichimaruo.singulo.machine.SideConfig().packed());
             }
             MachineMenu menu = ctor.newInstance(0, mc.player.getInventory(), type, reviewPos,
-                    items, data, null);
+                    items, type == MachineType.PRECISION_ASSEMBLER ? new ItemStackHandler(io.github.genichimaruo.singulo.recipe.MachineRecipe.ASSEMBLY_CELLS) : null, data, null);
             Component title = Component.translatable((type.isMultiblock() ? io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTROLLERS
                     : io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES).get(type).get().getDescriptionId());
             // Multiblock menu titles use the machine name, not the controller item name.

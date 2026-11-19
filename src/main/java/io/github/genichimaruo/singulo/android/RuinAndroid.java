@@ -1,4 +1,7 @@
 package io.github.genichimaruo.singulo.android;
+
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
@@ -475,6 +478,7 @@ public abstract class RuinAndroid extends Monster {
             setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
             if (!level().isClientSide) {
                 net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
+                int previousBatteries = batteries();
                 entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
                 entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
                 syncTanks();
@@ -484,7 +488,7 @@ public abstract class RuinAndroid extends Monster {
                         entityData.set(DECOR[i], d.copy());
                     }
                 }
-                if (charge() > maxCharge()) {
+                if (previousBatteries > batteries() && charge() > maxCharge()) {
                     setCharge(maxCharge());
                 }
             }
@@ -600,7 +604,8 @@ public abstract class RuinAndroid extends Monster {
      * 積んだアップグレードの、液体のタンク1つの大きさ: タンク 32,000、ガス・液体 16,000（化学物質と分けるので半分）、ほかは 0。
      */
     public static int fluidCapacity(net.minecraft.world.item.ItemStack upgrade) {
-        return isItem(upgrade, "android_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+        return isItem(upgrade, "android_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_TANK_CAPACITY)
+                : isItem(upgrade, "android_dual_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_DUAL_TANK_CAPACITY) : 0;
     }
 
     /** 化学物質（Mekanism）のタンク1つの大きさ: ガスタンク 32,000、ガス・液体 16,000。Mekanism がなければ 0（使えない）。 */
@@ -608,7 +613,8 @@ public abstract class RuinAndroid extends Monster {
         if (!io.github.genichimaruo.singulo.android.work.Chemicals.present()) {
             return 0;
         }
-        return isItem(upgrade, "android_gas_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+        return isItem(upgrade, "android_gas_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_TANK_CAPACITY)
+                : isItem(upgrade, "android_dual_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_DUAL_TANK_CAPACITY) : 0;
     }
 
     public int fluidCapacity() {
@@ -665,7 +671,7 @@ public abstract class RuinAndroid extends Monster {
         long n = 0;
         for (int i = 0; cap > 0 && i < TANKS; i++) {
             if (chemIds[i].isEmpty() || chemIds[i].equals(id)) {
-                n += cap - chemAmounts[i];
+                n += Math.max(0, cap - chemAmounts[i]);
             }
         }
         return n;
@@ -745,7 +751,7 @@ public abstract class RuinAndroid extends Monster {
         if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
             return chemAmount(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
         }
-        return tankAmount(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+        return totalTankAmount(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
     }
 
     /** 見本の流体・化学物質を、あとどれだけ入れられるか。 */
@@ -753,7 +759,7 @@ public abstract class RuinAndroid extends Monster {
         if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
             return chemSpace(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
         }
-        return tankSpace(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+        return totalTankSpace(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
     }
 
     /** 見本の流体・化学物質を amount 入れる。入った量。 */
@@ -762,7 +768,7 @@ public abstract class RuinAndroid extends Monster {
             return fillChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
         }
         var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
-        return f.isEmpty() ? 0 : fillTanks(f.copyWithAmount((int) Math.min(Integer.MAX_VALUE, amount)), simulate);
+        return fillTanks(f, amount, simulate);
     }
 
     /** 見本の流体・化学物質を最大 amount 出す。出た量。 */
@@ -771,7 +777,7 @@ public abstract class RuinAndroid extends Monster {
             return drainChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
         }
         var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
-        return f.isEmpty() ? 0 : drainTanks(f, (int) Math.min(Integer.MAX_VALUE, amount), simulate).getAmount();
+        return drainTankAmount(f, amount, simulate);
     }
 
     /** タンクの中身すべて（流体と化学物質の、量1の見本 → 量）。 */
@@ -814,7 +820,11 @@ public abstract class RuinAndroid extends Monster {
 
     /** この流体が、タンクにいくつあるか（mB）。 */
     public int tankAmount(net.neoforged.neoforge.fluids.FluidStack like) {
-        int n = 0;
+        return (int) Math.min(Integer.MAX_VALUE, totalTankAmount(like));
+    }
+
+    private long totalTankAmount(net.neoforged.neoforge.fluids.FluidStack like) {
+        long n = 0;
         for (var t : tanks) {
             if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), like)) {
                 n += t.getFluidAmount();
@@ -825,13 +835,17 @@ public abstract class RuinAndroid extends Monster {
 
     /** あと、この流体をどれだけ入れられるか（同じ流体のタンクの空きと、空のタンク）。 */
     public int tankSpace(net.neoforged.neoforge.fluids.FluidStack like) {
+        return (int) Math.min(Integer.MAX_VALUE, totalTankSpace(like));
+    }
+
+    private long totalTankSpace(net.neoforged.neoforge.fluids.FluidStack like) {
         if (!hasTank()) {
             return 0;
         }
-        int n = 0;
+        long n = 0;
         for (var t : tanks) {
             if (t.isEmpty() || net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), like)) {
-                n += t.getSpace();
+                n += Math.max(0, t.getSpace());
             }
         }
         return n;
@@ -839,12 +853,16 @@ public abstract class RuinAndroid extends Monster {
 
     /** タンクに入れる（同じ流体のタンクから、そのあと空のタンク）。入った量。 */
     public int fillTanks(net.neoforged.neoforge.fluids.FluidStack fluid, boolean simulate) {
-        if (!hasTank() || fluid.isEmpty()) {
+        return (int) fillTanks(fluid, fluid.getAmount(), simulate);
+    }
+
+    private long fillTanks(net.neoforged.neoforge.fluids.FluidStack fluid, long amount, boolean simulate) {
+        if (!hasTank() || fluid.isEmpty() || amount <= 0) {
             return 0;
         }
         var action = simulate ? net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
                 : net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
-        int left = fluid.getAmount();
+        long left = amount;
         int[] planned = new int[TANKS];
         for (int pass = 0; pass < 2 && left > 0; pass++) {
             for (int i = 0; i < TANKS && left > 0; i++) {
@@ -855,7 +873,7 @@ public abstract class RuinAndroid extends Monster {
                     continue;
                 }
                 int room = t.getCapacity() - t.getFluidAmount() - planned[i];
-                int put = Math.min(room, left);
+                int put = (int) Math.min(room, left);
                 if (put <= 0) {
                     continue;
                 }
@@ -870,24 +888,30 @@ public abstract class RuinAndroid extends Monster {
         if (!simulate) {
             syncTanks();
         }
-        return fluid.getAmount() - left;
+        return amount - left;
     }
 
     /** タンクから出す（この流体を最大 amount）。出した流体。 */
     public net.neoforged.neoforge.fluids.FluidStack drainTanks(net.neoforged.neoforge.fluids.FluidStack like, int amount, boolean simulate) {
+        int got = (int) drainTankAmount(like, amount, simulate);
+        return got == 0 ? net.neoforged.neoforge.fluids.FluidStack.EMPTY : like.copyWithAmount(got);
+    }
+
+    private long drainTankAmount(net.neoforged.neoforge.fluids.FluidStack like, long amount, boolean simulate) {
+        if (like.isEmpty() || amount <= 0) return 0;
         var action = simulate ? net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
                 : net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
-        int got = 0;
+        long got = 0;
         for (var t : tanks) {
             if (got >= amount || !net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), like)) {
                 continue;
             }
-            got += t.drain(amount - got, action).getAmount();
+            got += t.drain((int) Math.min(Integer.MAX_VALUE, amount - got), action).getAmount();
         }
         if (!simulate && got > 0) {
             syncTanks();
         }
-        return got <= 0 ? net.neoforged.neoforge.fluids.FluidStack.EMPTY : like.copyWithAmount(got);
+        return got;
     }
 
     /**
@@ -911,7 +935,7 @@ public abstract class RuinAndroid extends Monster {
         var contained = handler.drain(Integer.MAX_VALUE, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
         boolean filled = false, emptied = false;
         if (!contained.isEmpty() && (tank.isEmpty() || net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(tank.getFluid(), contained))) {
-            var got = handler.drain(Math.min(tank.getSpace(), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
+            var got = handler.drain(Math.min(Math.max(0, tank.getSpace()), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
             if (!got.isEmpty()) {
                 tank.fill(got, exec);
                 emptied = true;
@@ -958,7 +982,7 @@ public abstract class RuinAndroid extends Monster {
         var inside = io.github.genichimaruo.singulo.android.work.Chemicals.contained(one);
         boolean moved = false;
         if (inside != null && (chemIds[i].isEmpty() || chemIds[i].equals(inside.getKey()))) {
-            long got = store.extract(inside.getKey(), Math.min(cap - chemAmounts[i], inside.getValue()), false);
+            long got = store.extract(inside.getKey(), Math.min(Math.max(0, cap - chemAmounts[i]), inside.getValue()), false);
             if (got > 0) {
                 chemIds[i] = inside.getKey();
                 chemAmounts[i] += got;
@@ -1027,11 +1051,11 @@ public abstract class RuinAndroid extends Monster {
             if (on) {
                 var f = tanks[i].getFluid();
                 v = f.isEmpty() ? 0 : (net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(f.getFluid()) + 1) << 8
-                        | Math.max(1, f.getAmount() * 100 / cap);
+                        | Math.clamp(f.getAmount() * 100L / cap, 1, 100);
             }
             entityData.set(i == 0 ? TANK_A : TANK_B, v);
             entityData.set(CHEM[i], chemCap <= 0 ? "-"
-                    : chemIds[i] + ";" + (chemIds[i].isEmpty() ? 0 : Math.max(1, chemAmounts[i] * 100 / chemCap)));
+                    : chemIds[i] + ";" + (chemIds[i].isEmpty() ? 0 : Math.clamp(Math.min(chemCap, chemAmounts[i]) * 100 / chemCap, 1, 100)));
         }
     }
 
@@ -1055,6 +1079,10 @@ public abstract class RuinAndroid extends Monster {
         int sep = v.indexOf(';');
         return sep < 0 ? "" : v.substring(0, sep);
     }
+
+    int storedFluid(int room) { return tanks[room].getFluidAmount(); }
+
+    int storedChemical(int room) { return (int) Math.min(Integer.MAX_VALUE, chemAmounts[room]); }
 
     /** 液体のタンク1つの大きさ（クライアント。画面の数字のため）。 */
     public int clientFluidCapacity() {
@@ -1109,7 +1137,8 @@ public abstract class RuinAndroid extends Monster {
 
     /** 充電の満タン（バッテリーアップグレード1個につき +50%。内蔵のバッテリーも同じだけ）。 */
     public int maxCharge() {
-        return CHARGE_MAX * (2 + batteries() + builtInBatteries()) / 2;
+        return (int) Math.min(Integer.MAX_VALUE, (long) PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY)
+                * (2 + batteries() + builtInBatteries()) / 2);
     }
 
     /** 護衛が敵を探す範囲（ステーションか持ち主から。型によって広い）。 */
@@ -2050,7 +2079,7 @@ public abstract class RuinAndroid extends Monster {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(STATE, STATE_IDLE);
-        builder.define(CHARGE, CHARGE_MAX);
+        builder.define(CHARGE, PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY));
         builder.define(PRINT, PRINT_TICKS);
         builder.define(CHARGER_LINK, -1);
         builder.define(GUARD, false);
@@ -2555,7 +2584,11 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public float chargeFraction() {
-        return charge() / (float) maxCharge();
+        return Math.min(1, charge() / (float) maxCharge());
+    }
+
+    private void addCharge(long amount) {
+        if (amount > 0 && charge() < maxCharge()) setCharge((int) Math.min(maxCharge(), charge() + amount));
     }
 
     protected void setCharge(int charge) {
@@ -2573,7 +2606,7 @@ public abstract class RuinAndroid extends Monster {
             }
             return false;
         }
-        setCharge(charge() - cost);
+        entityData.set(CHARGE, charge() - cost);
         if (charge() <= 0) {
             powerDown();
         }
@@ -2895,7 +2928,7 @@ public abstract class RuinAndroid extends Monster {
         if (printed() && state() != STATE_LOW_POWER && getHealth() < getMaxHealth() && tickCount % REGEN_INTERVAL == 0
                 && charge() > maxCharge() * REGEN_MIN_CHARGE + REGEN_COST) {
             // 減った体力は、充電を少しずつ使いながら、ゆっくり直る（充電が少ないときは、充電を残すために直さない）
-            setCharge(charge() - REGEN_COST);
+            entityData.set(CHARGE, charge() - REGEN_COST);
             heal(1);
         }
         BlockPos home = home();
@@ -3458,9 +3491,6 @@ public abstract class RuinAndroid extends Monster {
         super.readAdditionalSaveData(tag);
         facilitySpawned = tag.getBoolean("facility_spawned");
 
-        if (tag.contains("charge")) {
-            setCharge(tag.getInt("charge"));
-        }
         if (tag.contains("print")) {
             entityData.set(PRINT, Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS));
         }
@@ -3503,7 +3533,7 @@ public abstract class RuinAndroid extends Monster {
         if (tag.hasUUID("escrow_owner")) escrowOwner=tag.getUUID("escrow_owner");
         if (tag.contains("escrow_dimension")) escrowDimension=tag.getString("escrow_dimension");
         if (tag.contains("charge")) {
-            setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す
+            entityData.set(CHARGE, Math.max(0, tag.getInt("charge")));
         }
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         if (guard) {
@@ -3764,7 +3794,8 @@ public abstract class RuinAndroid extends Monster {
                 double range = state() == STATE_RETREAT ? 96 : DOCK_RANGE;
                 // ステーションの上でほかのアンドロイドが充電中なら、そばで待って、どいたら交代で乗る（待つ間は座り込まない）
                 boolean taken = guard && h != null && dockTaken(level, h);
-                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
+                if (dock == null || PackBalance.value(ServerConfig.DOCK_CHARGE_PER_TICK) == 0 && state() == STATE_LOW_POWER
+                        || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
                     if (isInWater()) {
                         chargeFromWater(level);                   // 水の中: 陸へ上がるか、水面で充電する
                         return;
@@ -3826,17 +3857,22 @@ public abstract class RuinAndroid extends Monster {
                         s = STATE_SOLAR;
                     }
                 }
-                int rate = s == STATE_CHARGING ? RATE_DOCK : s == STATE_SOLAR ? RATE_SOLAR : RATE_REST;
+                int rate = PackBalance.value(s == STATE_CHARGING ? ServerConfig.DOCK_CHARGE_PER_TICK
+                        : s == STATE_SOLAR ? ServerConfig.SOLAR_CHARGE_PER_TICK : ServerConfig.REST_CHARGE_PER_TICK);
                 if (s == STATE_CHARGING && guard && stateTicks % 10 == 0 && home != null
                         && level.getBlockEntity(home) instanceof AndroidStationBlockEntity dock) {
                     dock.refill(RuinAndroid.this);
+                }
+                if (s == STATE_CHARGING && rate == 0 && charge() < maxCharge() && (!guard || getHealth() >= getMaxHealth())) {
+                    setState(STATE_LOW_POWER);
+                    return;
                 }
                 if (s == STATE_CHARGING && guard && !(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity)) {
                     // ステーションがなくなった（壊された・持ち場を外れた）: その場で自分で充電する（ステーションの上で止まったままにしない）
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
                     return;
                 }
-                if (s == STATE_CHARGING && guard) {
+                if (s == STATE_CHARGING && guard && (rate > 0 || getHealth() < getMaxHealth())) {
                     // 護衛はステーションの電力で充電し、体力も直す（電力が足りなければ待つ）
                     if (!(level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
                             && station.drawCharge(AndroidStationBlockEntity.FE_PER_CHARGE_TICK))) {
@@ -3846,7 +3882,7 @@ public abstract class RuinAndroid extends Monster {
                         heal(1);                     // 工場式印刷ユニットがあれば2倍速く直す
                     }
                 }
-                setCharge(charge() + rate);
+                addCharge(rate);
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, s == STATE_SOLAR ? 2.2 : 0.2, 0), 2, 0.3);
                 }
@@ -3983,8 +4019,11 @@ public abstract class RuinAndroid extends Monster {
             }
             if (d < 4) {
                 net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
-                int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
-                setCharge(charge() + RATE_DOCK * got / CHARGER_FE_PER_TICK);
+                int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
+                if (rate > 0 && charge() < maxCharge()) {
+                    int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
+                    addCharge((long) rate * got / CHARGER_FE_PER_TICK);
+                }
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, 1.0, 0), 2, 0.25);
                 }
@@ -3997,7 +4036,7 @@ public abstract class RuinAndroid extends Monster {
 
         /** 昼で、空が見えていて、雨でないか（ソーラーで充電できるか）。 */
         private boolean sunlit(ServerLevel level) {
-            return level.isDay() && !level.isRaining() && level.canSeeSky(blockPosition().above());
+            return PackBalance.value(ServerConfig.SOLAR_CHARGE_PER_TICK) > 0 && level.isDay() && !level.isRaining() && level.canSeeSky(blockPosition().above());
         }
     }
 }

@@ -31,10 +31,14 @@ import net.neoforged.neoforge.capabilities.Capabilities;
  * 経路のいちばん細いところで量が決まる（電線と同じ）。パイプ自体は tick しない。
  */
 public class FluidPipeBlock extends BaseEntityBlock {
-    private final long capacity;
+    private final java.util.function.LongSupplier capacity;
     private final PipeProfile profile;
 
     public FluidPipeBlock(Properties properties, long capacity, PipeProfile profile) {
+        this(properties, () -> capacity, profile);
+    }
+
+    public FluidPipeBlock(Properties properties, java.util.function.LongSupplier capacity, PipeProfile profile) {
         super(properties);
         this.capacity = capacity;
         this.profile = profile;
@@ -48,7 +52,7 @@ public class FluidPipeBlock extends BaseEntityBlock {
 
     /** 1 tick に運べる量（mB）。Long.MAX_VALUE は上限なし。 */
     public long capacity() {
-        return capacity;
+        return capacity.getAsLong();
     }
 
     public PipeProfile profile() {
@@ -58,9 +62,9 @@ public class FluidPipeBlock extends BaseEntityBlock {
     @Override
     public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
                                 java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
-        lines.add((capacity == Long.MAX_VALUE
+        lines.add((capacity() == Long.MAX_VALUE
                 ? net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.unlimited")
-                : net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.capacity", String.format("%,d", capacity)))
+                : net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.capacity", String.format("%,d", capacity())))
                 .withStyle(net.minecraft.ChatFormatting.AQUA));
         super.appendHoverText(stack, context, lines, flag);
     }

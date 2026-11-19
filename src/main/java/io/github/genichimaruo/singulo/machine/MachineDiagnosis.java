@@ -78,7 +78,7 @@ public final class MachineDiagnosis {
             }
             int total = r.ingredients().size() + r.fluidIngredients().size();
             int matched = 0;
-            int requiredParts = 0;
+            long requiredParts = 0;
             for (MachineRecipe.ItemInput in : r.ingredients()) {
                 if (in.uses() == 0) requiredParts += in.count();
                 if (board && in.uses() > 0 ? in.usesFrom(inputs.get(MachineRecipe.ASSEMBLY_CELLS)) > 0
@@ -141,8 +141,8 @@ public final class MachineDiagnosis {
                 }
                 continue;
             }
-            int have = inputs.stream().filter(s -> !s.isEmpty() && in.ingredient().test(s))
-                    .mapToInt(s -> board ? 1 : s.getCount()).sum();
+            long have = inputs.stream().filter(s -> !s.isEmpty() && in.ingredient().test(s))
+                    .mapToLong(s -> board ? 1 : s.getCount()).sum();
             if (have < in.count()) {
                 lines.add(Component.translatable("gui.singulo.reason.need_item", name, in.count() - have));
             }

@@ -196,8 +196,8 @@ public class LastArchivist extends RuinBoss {
         this.xpReward = 5000;
         this.noPhysics = true;
         setNoGravity(true);
-        setEffectiveHealth((ServerConfig.SPEC.isLoaded() ? ServerConfig.ARCHIVIST_HEALTH.get() : HEALTH)
-                * (BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR));
+        setEffectiveHealth(BossScaling.baseHealth((ServerConfig.SPEC.isLoaded() ? ServerConfig.ARCHIVIST_HEALTH.get() : HEALTH)
+                * (BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR)));
     }
 
     public static AttributeSupplier.Builder createAttributes() {

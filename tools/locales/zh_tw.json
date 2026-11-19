@@ -2552,8 +2552,8 @@
     "translation": "將原子排列在光晶格中的基板。"
   },
   "desc.singulo.overclock_chip": {
-    "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
-    "translation": "放入機器的升級槽：速度 ×3，但每 tick 耗電 ×4。不能與單極子同時使用。"
+    "source": "Install in the machine upgrade slot to change speed and power use. Shares a slot with the monopole.",
+    "translation": "裝入機器升級槽即可調整速度和耗電量，與磁單極子共用一個槽。"
   },
   "desc.singulo.paper_stack": {
     "source": "Papers left piled on a desk.",
@@ -11392,8 +11392,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 57 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 57 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 58 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 58 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 38 more",
@@ -11936,8 +11936,8 @@
     "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 99 more",
-    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 99 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 100 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 100 個"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 84 more",
@@ -13188,8 +13188,8 @@
     "translation": "用奇點鎖鑰匙打開的封印容器。"
   },
   "summary.singulo.overclock_chip": {
-    "source": "Triples a machine’s speed for four times the power.",
-    "translation": "讓裝置處理速度變為 3 倍，耗電變為 4 倍。"
+    "source": "Changes processing speed and power use per tick.",
+    "translation": "改變加工速度和每刻耗電量。"
   },
   "summary.singulo.gravity_boots": {
     "source": "No fall damage, and you can wall-jump in mid-air.",
@@ -13256,8 +13256,8 @@
     "translation": "潮汐紡絲機"
   },
   "desc.singulo.collapsar_parallel_cassette": {
-    "source": "Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.",
-    "translation": "放入鍛造爐介面右側的槽，或手持按右鍵點擊鍛造爐安裝，同一配方最多同時加工 4 批。批數在開始時鎖定，材料、冷卻劑和電力按批數消耗。"
+    "source": "Put it in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process multiple batches of the same recipe together. The count is locked at the start; materials, coolant and power scale with it.",
+    "translation": "放入鍛造爐介面右側的槽，或手持按右鍵點擊鍛造爐安裝，同一配方可同時加工多批。批數在開始時鎖定，材料、冷卻劑和電力按批數消耗。"
   },
   "desc.singulo.cosmic_frame": {
     "source": "A heavy braced frame used for the bases and beams of cosmic containment facilities.",
@@ -13356,8 +13356,8 @@
     "translation": "拘束與縫合"
   },
   "guide.singulo.cosmic.links.body": {
-    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\nLike a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel. Projectiles such as arrows and thrown items that fly into the opening come out of the far mouth the same way.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process up to four batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
-    "translation": "用潮汐纖維和塌縮星材料製作蟲洞縫合升級，對現有口的兩端分別按右鍵安裝。兩端均開啟時，可走過口上方的方形開口（與地獄傳送門一樣，進入時會載入另一端的口）。原有物流仍可使用。\n與地獄傳送門一樣，會從另一端開口的相同位置出來，沒有等待時間。朝向和動量會隨口的朝向旋轉，從正面進入就從另一端的正面出來。離開到達的開口之前不會再次傳送。該位置被堵住、有危險或腳下 4 格內沒有地面時，會改為出現在另一端口前方的安全落腳點；若也沒有則不會傳送。騎乘時不會傳送。箭、投擲物等投射物飛入開口時，也會以同樣方式從另一端的口飛出。\n把塌縮星並行加工匣放入鍛造爐介面右側的槽，或手持按右鍵點擊鍛造爐的任意部件來安裝，可同時加工同一配方最多 4 批。開始時鎖定數量，材料、冷卻劑、電力按批數消耗。安裝不會改變已經開始的加工。\n戴上測量眼鏡，可在附近流體配管上看到轉移方向箭頭，並查看注視配管的量、流體和阻塞狀態。箭頭顯示實際端點間轉移的一條代表性連通路徑，並非分支或環路的所有路徑。配管本身不儲存流體。"
+    "source": "Make a Wormhole Seam Upgrade from Tidal Filament and Collapsar material, then use one on each existing mouth. When both ends are open, walk through the square opening above a mouth (the far mouth loads as you enter, like a Nether portal). Existing logistics remain available.\nLike a Nether portal, you come out at the same spot in the far opening, with no wait. Your facing and momentum turn to match the far mouth, so entering from the front leaves from its front. You will not be sent back until you step out of the opening you arrived in. If that spot is blocked, dangerous, or has no floor within 4 blocks below, you land on safe footing in front of the far mouth instead, or stay put if there is none. Riders do not travel. Projectiles such as arrows and thrown items that fly into the opening come out of the far mouth the same way.\nPut a Collapsar Parallel Cassette in the right-hand slot of the Jet Forge screen, or use it on any part of the forge, to process multiple batches of the same recipe together. The count is locked at the start, and materials, coolant and power scale with it. Installing a cassette does not change a run already in progress.\nWear Survey Glasses to see transfer arrows on nearby fluid pipes, plus the amount, fluid and blocked state of the pipe you look at. Arrows show one representative connected route for actual endpoint transfers, rather than every path through branches or loops. Pipes do not store fluid.",
+    "translation": "用潮汐纖維和塌縮星材料製作蟲洞縫合升級，對現有口的兩端分別按右鍵安裝。兩端均開啟時，可走過口上方的方形開口（與地獄傳送門一樣，進入時會載入另一端的口）。原有物流仍可使用。\n與地獄傳送門一樣，會從另一端開口的相同位置出來，沒有等待時間。朝向和動量會隨口的朝向旋轉，從正面進入就從另一端的正面出來。離開到達的開口之前不會再次傳送。該位置被堵住、有危險或腳下 4 格內沒有地面時，會改為出現在另一端口前方的安全落腳點；若也沒有則不會傳送。騎乘時不會傳送。箭、投擲物等投射物飛入開口時，也會以同樣方式從另一端的口飛出。\n把塌縮星並行加工匣放入鍛造爐介面右側的槽，或手持按右鍵點擊鍛造爐的任意部件來安裝，可同時加工同一配方的多個批次。開始時鎖定數量，材料、冷卻劑、電力按批數消耗。安裝不會改變已經開始的加工。\n戴上測量眼鏡，可在附近流體配管上看到轉移方向箭頭，並查看注視配管的量、流體和阻塞狀態。箭頭顯示實際端點間轉移的一條代表性連通路徑，並非分支或環路的所有路徑。配管本身不儲存流體。"
   },
   "guide.singulo.cosmic.links.title": {
     "source": "Seams and parallel irradiation",
@@ -13460,8 +13460,8 @@
     "translation": "潮汐紡絲機"
   },
   "summary.singulo.collapsar_parallel_cassette": {
-    "source": "Process up to four Jet Forge batches together.",
-    "translation": "將 Jet Forge 擴展為最多 4 批並行加工。"
+    "source": "Processes several batches of the same Jet Forge recipe together.",
+    "translation": "在鍛造爐中同時加工同一配方的多個批次。"
   },
   "summary.singulo.cosmic_frame": {
     "source": "A frame for facility bases and beams.",
@@ -13680,8 +13680,8 @@
     "translation": "點擊切換"
   },
   "gui.singulo.device.forge.cassette": {
-    "source": "Holds a Collapsar Parallel Cassette, which processes up to four batches of the same recipe together",
-    "translation": "放入塌縮星並行加工匣後，同一配方最多同時加工 4 批"
+    "source": "Holds a Collapsar Parallel Cassette, which processes multiple batches of the same recipe together",
+    "translation": "放入塌縮星並行加工匣後，同一配方可同時加工多批"
   },
   "block.singulo.vacuum_jacketed_pipe": {
     "source": "Vacuum-Jacketed Pipe",
@@ -15592,8 +15592,8 @@
     "translation": "只會自動存放撿到的物品。如果優先的存放處無法使用，就嘗試另一種。點擊切換。"
   },
   "gui.singulo.assembly.board_hint": {
-    "source": "Follow the diagram. Each cell holds a stack and supplies one part per craft. Put the catalyst in the amber slot. Open the book on the right to see the patterns.",
-    "translation": "依圖擺放材料。每格可放一組，每次組裝從每格消耗一個。觸媒放入琥珀色槽。點選右側的書本按鈕可查看組裝圖。"
+    "source": "Open the book on the right for the pattern. Each occupied cell supplies one part per craft. Put the catalyst in the amber slot.",
+    "translation": "打開右側的書本查看配置圖。每次組裝從每個放有材料的格子消耗一個。催化劑放入琥珀色槽。"
   },
   "gui.singulo.assembly.diagrams": {
     "source": "Assembly diagrams",
@@ -15734,5 +15734,53 @@
   "guide.singulo.caption.stage1.steel": {
     "source": "Totals for four steel ingots. Five electrolysis cycles supply two kiln batches.",
     "translation": "圖中是煉出4個鋼錠的總量。電解5次的氧氣夠燒製爐用2次。"
+  },
+  "desc.singulo.assembly_stock_upgrade": {
+    "source": "Install in the bottom-right slot of the Precision Assembler to stock multiple stacks of the same part in each cell. Unstackable tools occupy one cell each. Remove the upgrade once every cell holds 64 items or fewer.",
+    "translation": "裝在精密組裝台右下方，每格就能放多組相同材料。不可堆疊的工具每格只能放一件。每格數量都不超過64時可以取下升級。"
+  },
+  "gui.singulo.assembly.upgrade_locked": {
+    "source": "Reduce every material cell to 64 items or fewer to remove the upgrade.",
+    "translation": "請將每個材料格中的物品減至64個或更少，再取下升級。"
+  },
+  "howto.singulo.assembly_stock_upgrade": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製作：工作台（階段2）"
+  },
+  "item.singulo.assembly_stock_upgrade": {
+    "source": "Assembly Stock Upgrade",
+    "translation": "組裝盤擴容升級"
+  },
+  "summary.singulo.assembly_stock_upgrade": {
+    "source": "Increases the material capacity of each assembly cell.",
+    "translation": "增加每個組裝格可容納的材料數量。"
+  },
+  "tooltip.singulo.cable_rate": {
+    "source": "Up to %s FE/t, %s%% loss per block",
+    "translation": "上限 %s FE/t，每格損耗 %s%%"
+  },
+  "tooltip.singulo.cargo_slots": {
+    "source": "Cargo slots per flight: %s",
+    "translation": "每次運輸貨位數 %s"
+  },
+  "tooltip.singulo.default_description": {
+    "source": "With default settings: %s",
+    "translation": "預設設定下：%s"
+  },
+  "tooltip.singulo.overclock_rates": {
+    "source": "Speed ×%s, power per tick ×%s",
+    "translation": "速度 ×%s，每刻耗電 ×%s"
+  },
+  "tooltip.singulo.parallel_limit": {
+    "source": "Up to %s batches per run",
+    "translation": "每次最多加工 %s 批"
+  },
+  "tooltip.singulo.stock_limits": {
+    "source": "Fits %s upgrades, +%s stacks per upgrade",
+    "translation": "最多安裝 %s 個，每個增加 %s 組"
+  },
+  "tooltip.singulo.tank_room": {
+    "source": "Capacity per tank: %s mB",
+    "translation": "每個儲槽容量 %s mB"
   }
 }

@@ -19,8 +19,14 @@ public final class ConfigMigration {
     /** 今の設定ファイルの版。 */
     public static final int CURRENT = 1;
 
+    private static volatile long revision;
+
+    public static long revision() { return revision; }
+
     public static void onConfig(ModConfigEvent event) {
-        if (event.getConfig().getSpec() != ServerConfig.SPEC || ServerConfig.SETTINGS_VERSION.get() >= CURRENT) {
+        if (event.getConfig().getSpec() != ServerConfig.SPEC) return;
+        revision++;
+        if (ServerConfig.SETTINGS_VERSION.get() >= CURRENT) {
             return;
         }
         migrate(ServerConfig.DEGENERATE_FURNACE_OUTPUT, 20_000_000, "degenerateFurnaceOutput");

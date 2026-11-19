@@ -1,5 +1,10 @@
 package io.github.genichimaruo.singulo.cable;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+
+import io.github.genichimaruo.singulo.data.ConfigMigration;
+
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import java.util.*;
 import javax.annotation.Nullable;
@@ -16,7 +21,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * Topology/path searches happen only after invalidation or the first request for an endpoint pair.
  */
 public final class EnergyNetwork {
-    static final double MIN_EFFICIENCY = 0.5;
     private static final java.util.concurrent.atomic.AtomicLong GENERATIONS = new java.util.concurrent.atomic.AtomicLong();
     private final long generation = GENERATIONS.incrementAndGet();
     private static final Set<EnergyNetwork> ACTIVE = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -116,6 +120,7 @@ public final class EnergyNetwork {
     private final Map<Node, List<Endpoint>> targetOrder = new IdentityHashMap<>();
     private final Map<SampleKey, Sample> samples = new HashMap<>();
     private final Set<BlockPos> lit = new HashSet<>();
+    private final long configRevision = ConfigMigration.revision();
     private boolean valid = true;
     private long tick = -1, windowStart = -1, nextVisual;
     private State state = new State();
@@ -202,7 +207,7 @@ public final class EnergyNetwork {
         cables.values().forEach(be -> be.network = network);
     }
 
-    boolean isValid() { return valid; }
+    boolean isValid() { return valid && configRevision == ConfigMigration.revision(); }
     void invalidate() {
         if (!valid) return;
         valid = false;
@@ -387,21 +392,30 @@ public final class EnergyNetwork {
         if (order == 0) order = Long.compare(caller.pos.asLong(),other.endpoint.pos.asLong());
         return order != 0 ? order : Integer.compare(caller.side.ordinal(),other.endpoint.side.ordinal());
     }
+    // Preserve individual FE above the exact integer range of double on lossless paths.
+    private static long delivered(long budget, double efficiency) {
+        return efficiency == 1 ? budget : Math.min(budget, (long) (budget * efficiency));
+    }
+
+    private static long chargeFor(long received, double efficiency) {
+        return efficiency == 1 ? received : Math.max(received, (long) Math.ceil(received / efficiency));
+    }
+
     private long transfer(State s, Endpoint source, IEnergyStorage supplier, Endpoint target, IEnergyStorage receiver,
                           Path path, long offer, boolean simulate, boolean offered) {
         long budget = Math.min(offer,available(s,path));
-        if (budget <= 0) return 0;
-        long wanted = Math.min(receiverLeft(s,target,receiver),(long)(budget*path.efficiency));
+        if (budget <= 0 || path.efficiency <= 0) return 0;
+        long wanted = Math.min(receiverLeft(s,target,receiver),delivered(budget, path.efficiency));
         long received = LongEnergyStorage.receive(receiver,wanted,true);
-        long paid = Math.min(budget,(long)Math.ceil(received/path.efficiency));
+        long paid = Math.min(budget,chargeFor(received, path.efficiency));
         if (paid <= 0) return 0;
         if (!simulate) {
             if (!offered) {
                 paid = extract(supplier,paid,false);
-                received = Math.min(received,(long)(paid*path.efficiency));
+                received = Math.min(received,delivered(paid, path.efficiency));
             }
             received = LongEnergyStorage.receive(receiver,received,false);
-            if (offered) paid = Math.min(paid,(long)Math.ceil(received/path.efficiency));
+            if (offered) paid = Math.min(paid,chargeFor(received, path.efficiency));
         }
         account(s,path,source,target,paid,received);
         if (!simulate && paid > 0) {
@@ -447,7 +461,7 @@ public final class EnergyNetwork {
                 es.add(edge); length += edge.length(); loss += edge.loss;
                 at = edge.other(at); ns.add(at); loss += at.loss;
             }
-            return new Path(List.copyOf(ns),List.copyOf(es),length,Math.max(MIN_EFFICIENCY,1-loss));
+            return new Path(List.copyOf(ns),List.copyOf(es),length,Math.max(PackBalance.value(ServerConfig.MINIMUM_CABLE_EFFICIENCY),1-loss));
         });
     }
 

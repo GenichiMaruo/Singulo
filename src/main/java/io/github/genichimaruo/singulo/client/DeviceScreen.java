@@ -290,7 +290,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             }
             return new State(Panel.Status.IDLE, GuiSkin.IDLE, tr("forge.idle"), List.of());
         }
-        Component running = tr("forge.running", tr("forge.phase." + phase), v(DeviceMenu.Forge.ELAPSED) / 20, v(DeviceMenu.Forge.TOTAL) / 20);
+        Component running = tr("forge.running", tr("forge.phase." + phase), forgeElapsed(phase) / 20, forgeStart(7) / 20);
         return reason != null ? new State(Panel.Status.WARN, GuiSkin.WARN, reason, List.of(running))
                 : new State(Panel.Status.RUN, GuiSkin.OK, running, List.of());
     }
@@ -304,12 +304,22 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                 && v(DeviceMenu.Forge.FORMED) != 0;
     }
 
+    private long forgeStart(int phase) {
+        long ticks = 0;
+        for (int p = 1; p < phase; p++) ticks += v(DeviceMenu.Forge.FIRST_DURATION + p - 1);
+        return ticks;
+    }
+
+    private long forgeElapsed(int phase) {
+        return phase == 0 ? 0 : forgeStart(phase) + v(DeviceMenu.Forge.PHASE_TICK);
+    }
+
     private void drawForge(GuiGraphics g, float t, int mouseX, int mouseY) {
         int phase = v(DeviceMenu.Forge.PHASE);
         int hold = v(DeviceMenu.Forge.HOLD);
         boolean stalled = hold != F_OK;
-        int total = Math.max(1, v(DeviceMenu.Forge.TOTAL));
-        float k = v(DeviceMenu.Forge.ELAPSED) / (float) total;
+        long total = Math.max(1, forgeStart(7));
+        float k = forgeElapsed(phase) / (float) total;
         boolean core = v(DeviceMenu.Forge.CORE) != 0;
         boolean igniting = v(DeviceMenu.Forge.BH) == io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.BH_IGNITING;
         int ay = 46;
@@ -325,8 +335,13 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         int batch = Math.max(1, v(DeviceMenu.Forge.BATCH));
         // 並列カセットが効いているときだけ、照射室の上に受け口の数を灯す
         if (batch > 1) {
-            for (int i = 0; i < 4; i++) {
-                g.fill(cx(131 + i * 5), cy(25), cx(134 + i * 5), cy(29), i < batch ? 0xFFBFE6FF : 0xFF2A3048);
+            if (batch > 4) {
+                String quantity = "×" + io.github.genichimaruo.singulo.energy.EnergyText.shortForm(batch);
+                g.drawString(font, quantity, cx(152) - font.width(quantity), cy(23), 0xFFBFE6FF, false);
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    g.fill(cx(131 + i * 5), cy(25), cx(134 + i * 5), cy(29), i < batch ? 0xFFBFE6FF : 0xFF2A3048);
+                }
             }
             hint(129, 23, 24, 8, tr("forge.batch", batch));
         }
@@ -342,10 +357,9 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         g.fill(cx(bh - 5), cy(ay - 14), cx(bh - 4), cy(ay + 15), coil);
         g.fill(cx(bh + 5), cy(ay - 14), cx(bh + 6), cy(ay + 15), coil);
         // 収束リング（入ったものは明るい）
-        int focusStart = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS
-                + io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS;
-        int lit = phase == 3 ? Math.min(3, 1 + 3 * (v(DeviceMenu.Forge.ELAPSED) - focusStart)
-                / io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS) : phase == 4 || phase == 5 ? 3 : 0;
+        int focusDuration = Math.max(1, v(DeviceMenu.Forge.FIRST_DURATION + 2));
+        int lit = phase == 3 ? (int) Math.min(3, 1 + 3L * v(DeviceMenu.Forge.PHASE_TICK) / focusDuration)
+                : phase == 4 || phase == 5 ? 3 : 0;
         for (int i = 0; i < 3; i++) {
             int c = i < lit ? 0xFFA8E4FF : 0xFF2A3448;
             g.fill(cx(rings[i]), cy(ay - ringH[i]), cx(rings[i] + 2), cy(ay - 2), c);
@@ -388,15 +402,8 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
         // 進み具合（段階の区切りの目盛りつき）
         bar(g, cx(32), cy(74), 122, 4, k, 0xFF7E90FF, 0xFFFFFFFF);
-        int irr = total - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS
-                - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS
-                - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FINISH_TICKS - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.COOL_TICKS;
-        int acc = 0;
-        for (int d : new int[]{io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS,
-                io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS,
-                irr, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FINISH_TICKS}) {
-            acc += d;
-            int x = 32 + Math.round(122F * acc / total);
+        for (int p = 2; p <= 6; p++) {
+            int x = 32 + Math.round(122F * forgeStart(p) / total);
             g.fill(cx(x), cy(73), cx(x + 1), cy(79), 0x80FFFFFF);
         }
         hint(31, 72, 124, 8, forgeState().text());
@@ -421,21 +428,29 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
         // 冷媒（完成品の下）と電力（右のゲージ）
         int coolant = v(DeviceMenu.Forge.COOLANT);
-        int tank = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.TANK_CAPACITY;
+        int tank = io.github.genichimaruo.singulo.data.PackBalance.dedicatedTank(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.TANK_CAPACITY);
         bar(g, cx(158), cy(58), 20, 4, coolant / (float) tank, 0xFF4A8CC8, 0xFFBFE6FF);
         hint(157, 56, 22, 8, tr("forge.coolant", coolant, tank));
         long buf = v(DeviceMenu.Forge.BUFFER_MFE) * 1_000_000L;
         long cap = Math.max(1, v(DeviceMenu.Forge.CAPACITY_MFE)) * 1_000_000L;
         long intake = v(DeviceMenu.Forge.INTAKE_MFE) * 1_000_000L;
-        long demand = v(DeviceMenu.Forge.DEMAND_MFE) * 1_000_000L;
+        long fullDemand = v(DeviceMenu.Forge.IRRADIATE_FE);
+        long demand = switch (phase) {
+            case 0, 4 -> fullDemand;
+            case 2 -> fullDemand / 4;
+            case 3 -> fullDemand / 2;
+            default -> 0;
+        };
         Component powerLine = tr("forge.power", EnergyText.of(buf), EnergyText.of(cap), EnergyText.of(intake));
         // 1回の加工の電力のめやす: 照射の電力 × (照射の tick + 点火と収束の分)
-        Component demandLine = tr("forge.demand", EnergyText.of(demand), EnergyText.of(demand * (irr + 65L)));
+        long runEnergy = fullDemand / 4 * v(DeviceMenu.Forge.FIRST_DURATION + 1)
+                + fullDemand / 2 * focusDuration + fullDemand * v(DeviceMenu.Forge.FIRST_DURATION + 3);
+        Component demandLine = tr("forge.demand", EnergyText.of(demand), EnergyText.of(runEnergy));
         Panel.gauge(g, skin, cx(BAR_X), cy(BAR_Y), BAR_W, BAR_H, buf / (double) cap, Panel.GLOW);
         hint(BAR_X - 1, BAR_Y - 1, BAR_W + 2, BAR_H + 2, powerLine, demandLine);
         value(g, 104, 88, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(intake) + "/t", hold == F_NO_POWER ? GuiSkin.WARN : skin.text(),
                 powerLine, demandLine);
-        value(g, 104, 88 + STAT_PITCH, Panel.Icon.DROP, 0xFF7FB8E8, coolant + " mB", skin.text(), tr("forge.coolant", coolant, tank));
+        value(g, 104, 88 + STAT_PITCH, Panel.Icon.DROP, 0xFF7FB8E8, EnergyText.shortForm(coolant) + " mB", skin.text(), tr("forge.coolant", coolant, tank));
         // 点火のボタン（ブラックホールがなく、コアが入っているときだけ押せる）
         boolean can = canIgnite();
         boolean hover = can && Panel.inside(mouseX, mouseY, cx(IGNITE_X), cy(IGNITE_Y), IGNITE_W, IGNITE_H);

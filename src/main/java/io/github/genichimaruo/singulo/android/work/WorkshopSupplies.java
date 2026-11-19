@@ -62,7 +62,7 @@ final class WorkshopSupplies {
             }
             stacks.forEach((key, stock) -> add(new Source(new Material(store.key(), key), store.point(), stock, store.handler(), null)));
         }
-        if (liquids) for (var supplies : LiquidStores.supplies(level, points).values()) for (var store : supplies) {
+        if (liquids) for (var supplies : LiquidStores.supplies(console, points).values()) for (var store : supplies) {
             var material = new Material(store.key(), WorkPlanner.Key.of(store.material().item));
             add(new Source(material, store.point(), store.material(), null, store.store()));
         }

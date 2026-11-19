@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.cable;
 
+import io.github.genichimaruo.singulo.energy.EnergyText;
+
 import com.mojang.serialization.MapCodec;
 import java.util.EnumMap;
 import java.util.Map;
@@ -42,11 +44,15 @@ public class CableBlock extends BaseEntityBlock {
         CONNECTIONS.put(Direction.DOWN, BlockStateProperties.DOWN);
     }
 
-    private final long capacity;
-    private final double lossPerBlock;
+    private final java.util.function.LongSupplier capacity;
+    private final java.util.function.DoubleSupplier lossPerBlock;
     private final CableProfile profile;
 
     public CableBlock(Properties properties, long capacity, double lossPerBlock, CableProfile profile) {
+        this(properties, () -> capacity, () -> lossPerBlock, profile);
+    }
+
+    public CableBlock(Properties properties, java.util.function.LongSupplier capacity, java.util.function.DoubleSupplier lossPerBlock, CableProfile profile) {
         super(properties);
         this.capacity = capacity;
         this.lossPerBlock = lossPerBlock;
@@ -85,11 +91,19 @@ public class CableBlock extends BaseEntityBlock {
 
     /** 1 tick に運べる量。Long.MAX_VALUE は上限なし。 */
     public long capacity() {
-        return capacity;
+        return capacity.getAsLong();
+    }
+
+    @Override
+    public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+                                java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
+        lines.add(net.minecraft.network.chat.Component.translatable("tooltip.singulo.cable_rate",
+                EnergyText.of(capacity()), EnergyText.of(lossPerBlock() * 100)).withStyle(net.minecraft.ChatFormatting.AQUA));
+        super.appendHoverText(stack, context, lines, flag);
     }
 
     public double lossPerBlock() {
-        return lossPerBlock;
+        return lossPerBlock.getAsDouble();
     }
 
     @Override

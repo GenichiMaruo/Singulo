@@ -67,7 +67,8 @@ public final class AndroidRecipeApiGameTests {
         var snapshot = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID());
         h.assertTrue(snapshot.recipes().size() == 1, "Linked recipe missing");
         var recipe = snapshot.recipes().get(0);
-        h.assertTrue(recipe.outputs().size() == 2 && recipe.outputs().get(0).count() == 2, "Output counts lost");
+        h.assertTrue(recipe.outputs().size() == 2 && recipe.outputs().get(0).count() == 2
+                && recipe.outputs().get(0).guaranteed() && !recipe.outputs().get(1).guaranteed(), "Output counts or guarantees lost");
         h.assertTrue(recipe.materials().size() == 2 && recipe.materials().get(0).count() == 2
                 && recipe.materials().get(1).fuel() && recipe.materials().get(1).count() == 3, "Material/fuel semantics lost");
         recipe.outputs().get(0).sample().setCount(60);
@@ -81,7 +82,8 @@ public final class AndroidRecipeApiGameTests {
         rack.items().setStackInSlot(2, c.encoder().getItem(WorkConsoleBlockEntity.CARD).copy());
         var archive = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(1);
         var log = registry.get(io.github.genichimaruo.singulo.Singulo.id("observation_log"));
-        h.assertTrue(archive.materials().stream().anyMatch(material -> material.sample().is(log) && material.count() == 1),
+        h.assertTrue(archive.materials().stream().anyMatch(material -> material.sample().is(log) && material.count() == 1
+                        && material.toolUsesPerCraft() > 0),
                 "Missing reusable original from the recipe snapshot");
         h.succeed();
     }}
