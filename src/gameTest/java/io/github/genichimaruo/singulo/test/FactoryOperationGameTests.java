@@ -37,7 +37,7 @@ public final class FactoryOperationGameTests {
     @GameTest(template = "empty")
     public static void fuelCellConsumesOnlyWhatFitsInBuffer(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
-        HydrogenFuelCellBlockEntity cell = h.getBlockEntity(AT);
+        HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         int old = ServerConfig.FUEL_CELL_OUTPUT.get();
         try {
             ServerConfig.FUEL_CELL_OUTPUT.set(48_000);
@@ -57,7 +57,7 @@ public final class FactoryOperationGameTests {
     @GameTest(template = "empty")
     public static void automatedCapsulePourDebitsTheUsedStack(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.FLUID_DRONE_PORT.get());
-        FluidDronePortBlockEntity port = h.getBlockEntity(AT);
+        FluidDronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var tank = port.sendTank();
         tank.fill(new FluidStack(Fluids.LAVA, tank.getCapacity() - 200), FluidAction.EXECUTE);
         var empty = new ItemStack(SinguloItems.FLUID_CAPSULE.get());
@@ -84,9 +84,9 @@ public final class FactoryOperationGameTests {
         h.setBlock(AT.above(), SinguloBlocks.HYDROGEN_FUEL_CELL.get());
         h.setBlock(AT.above(2), SinguloBlocks.SMES_CELL.get().defaultBlockState()
                 .setValue(AbstractMachineBlock.FACING, Direction.SOUTH));
-        HydrogenFuelCellBlockEntity cell = h.getBlockEntity(AT.above());
-        SmesCellBlockEntity machine = h.getBlockEntity(AT.above(2));
-        FluidDronePortBlockEntity source = h.getBlockEntity(AT.north()), sink = h.getBlockEntity(AT.east());
+        HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.above());
+        SmesCellBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.above(2));
+        FluidDronePortBlockEntity source = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.north()), sink = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.east());
         source.receiveTank().fill(new FluidStack(Fluids.WATER, 1_000), FluidAction.EXECUTE);
         cell.energy().setEnergy(200);
         HydrogenFuelCellBlockEntity.serverTick(h.getLevel(), cell.getBlockPos(), cell.getBlockState(), cell);
@@ -132,11 +132,11 @@ public final class FactoryOperationGameTests {
         h.setBlock(AT, SinguloBlocks.CORE_CONTROLLER.get());
         h.setBlock(AT.east(), SinguloBlocks.SMES_CELL.get().defaultBlockState()
                 .setValue(AbstractMachineBlock.FACING, Direction.EAST));
-        PenroseReactorBlockEntity reactor = h.getBlockEntity(AT);
-        SmesCellBlockEntity sink = h.getBlockEntity(AT.east());
+        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
+        SmesCellBlockEntity sink = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.east());
         var registry = h.getLevel().registryAccess();
         long limit = ServerConfig.PENROSE_MAX_OUTPUT.get();
-        var saved = reactor.saveWithoutMetadata(registry);
+        var saved = reactor.saveWithoutMetadata();
         saved.putLong("buffer", limit * 3);
         reactor.loadWithComponents(saved, registry);
         var output = (LongEnergyStorage) reactor.energy();
@@ -159,7 +159,7 @@ public final class FactoryOperationGameTests {
     public static void surveyReceivesFullHorizonDuctRate(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.HORIZON_DUCT.get());
         h.setBlock(AT.east(), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
-        FluidPipeBlockEntity pipe = h.getBlockEntity(AT);
+        FluidPipeBlockEntity pipe = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var inlet = pipe.inlet(Direction.WEST);
         var water = new FluidStack(Fluids.WATER, Integer.MAX_VALUE);
         // One ten-tick sampling window at the rate of two full int-sized outputs per tick.

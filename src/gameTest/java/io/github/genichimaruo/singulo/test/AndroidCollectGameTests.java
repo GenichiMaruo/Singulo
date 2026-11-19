@@ -68,7 +68,7 @@ public final class AndroidCollectGameTests {
         drop(h, new BlockPos(4, 1, 2), new ItemStack(Items.ROTTEN_FLESH, 5));
         drop(h, new BlockPos(2, 1, 4), new ItemStack(Items.BONE, 3));
         h.runAfterDelay(WAIT, () -> {
-            ChestBlockEntity chest = h.getBlockEntity(new BlockPos(6, 1, 6));
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(6, 1, 6));
             int flesh = 0, bone = 0;
             for (int i = 0; i < chest.getContainerSize(); i++) {
                 ItemStack s = chest.getItem(i);
@@ -99,7 +99,7 @@ public final class AndroidCollectGameTests {
         drop(h, start, new ItemStack(Items.STONE, 10));
         BlockPos box = new BlockPos(5, 1, 4);
         h.setBlock(box, Blocks.CHEST);
-        ChestBlockEntity chest = h.getBlockEntity(box);
+        ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, box);
         for (int slot = 0; slot < chest.getContainerSize(); slot++) chest.setItem(slot, new ItemStack(Items.STONE, 64));
         chest.setItem(0, new ItemStack(Items.ROTTEN_FLESH, 63));
         RuinAndroid reloaded = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
@@ -173,7 +173,7 @@ public final class AndroidCollectGameTests {
             }
             h.assertTrue(carried == 5, "The android did not keep its pickups: " + carried);
             h.assertTrue(thrown.isAlive(), "The thrown item is gone");
-            ChestBlockEntity chest = h.getBlockEntity(new BlockPos(6, 1, 6));
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(6, 1, 6));
             h.assertTrue(chest.isEmpty(), "Items were stored although storing is off");
             a.discard();
             h.succeed();

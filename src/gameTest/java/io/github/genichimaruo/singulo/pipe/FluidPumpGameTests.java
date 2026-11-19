@@ -35,19 +35,19 @@ public final class FluidPumpGameTests {
 
     private static FluidPumpBlockEntity pump(GameTestHelper h) {
         h.setBlock(PUMP, SinguloBlocks.FLUID_PUMP.get());
-        return h.getBlockEntity(PUMP);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, PUMP);
     }
 
     private static FluidDronePortBlockEntity port(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, SinguloBlocks.FLUID_DRONE_PORT.get());
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
     }
 
     private static FluidStack lava(int amount) { return new FluidStack(Fluids.LAVA, amount); }
 
     private static SmesCellBlockEntity cell(GameTestHelper h, BlockPos at, Direction front) {
         h.setBlock(at, SinguloBlocks.SMES_CELL.get().defaultBlockState().setValue(AbstractMachineBlock.FACING, front));
-        return h.getBlockEntity(at);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
     }
 
     private static final class TankChest extends ChestBlockEntity {
@@ -160,7 +160,7 @@ public final class FluidPumpGameTests {
 
             // At zero whole FE, the remaining 0.1 FE credit alone must survive harvesting.
             var pos = pump.getBlockPos();
-            var drop = Block.getDrops(pump.getBlockState(), h.getLevel(), pos, pump).getFirst();
+            var drop = Block.getDrops(pump.getBlockState(), h.getLevel(), pos, pump).get(0);
             h.setBlock(PUMP, net.minecraft.world.level.block.Blocks.AIR);
             var restored = pump(h);
             net.minecraft.world.item.BlockItem.updateCustomBlockEntityTag(h.getLevel(), null, pos, drop);
@@ -198,7 +198,7 @@ public final class FluidPumpGameTests {
         h.assertTrue(drops.size() == 1, "Missing pump drop");
         h.setBlock(PUMP, net.minecraft.world.level.block.Blocks.AIR);
         var restored = pump(h);
-        net.minecraft.world.item.BlockItem.updateCustomBlockEntityTag(h.getLevel(), null, pos, drops.getFirst());
+        net.minecraft.world.item.BlockItem.updateCustomBlockEntityTag(h.getLevel(), null, pos, drops.get(0));
         h.assertTrue(restored.outlet(Direction.EAST) == null, "Harvest lost face settings");
         var sink = port(h, PUMP.west()).sendTank();
         h.assertTrue(restored.energy().receiveEnergy(500, false) == 121 && sink.getFluidAmount() == 4300,
@@ -263,7 +263,7 @@ public final class FluidPumpGameTests {
             BlockPos pos = bus.relative(side);
             h.setBlock(pos, SinguloBlocks.SMES_MODULE.get().defaultBlockState()
                     .setValue(AbstractMachineBlock.FACING, side.getOpposite()));
-            SmesCellBlockEntity module = h.getBlockEntity(pos);
+            SmesCellBlockEntity module = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             modules.add(module);
         }
         Runnable supply = () -> {
@@ -339,7 +339,7 @@ public final class FluidPumpGameTests {
         var pump = pump(h);
         var source = port(h, PUMP.north()).receiveTank();
         h.setBlock(PUMP.above(), SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
-        ThermoelectricGeneratorBlockEntity generator = h.getBlockEntity(PUMP.above());
+        ThermoelectricGeneratorBlockEntity generator = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, PUMP.above());
         var machine = cell(h, PUMP.above(2), Direction.SOUTH);
         int capacity = machine.energy().getMaxEnergyStored();
         machine.energy().setEnergy(capacity - 50);
@@ -375,7 +375,7 @@ public final class FluidPumpGameTests {
                 "The second pull did not use the tick's cumulative price");
 
         var registries = h.getLevel().registryAccess();
-        pump.loadWithComponents(pump.saveWithoutMetadata(registries), registries);
+        pump.load(pump.saveWithoutMetadata());
         h.assertTrue(pump.energy().receiveEnergy(1000, true) == 2 && sink.isEmpty()
                 && pump.energy().receiveEnergy(2, false) == 2 && sink.getFluidAmount() == 500 && source.isEmpty(),
                 "A reload, simulation or second power source charged another activation fee");
@@ -407,16 +407,16 @@ public final class FluidPumpGameTests {
     @GameTest(template = "empty")
     public static void legacyChargeIsSpentOnceAndNeverRefilled(GameTestHelper h) {
         var pump = pump(h);
-        var tag = pump.saveWithoutMetadata(h.getLevel().registryAccess());
+        var tag = pump.saveWithoutMetadata();
         tag.putInt("energy", 100);
-        pump.loadWithComponents(tag, h.getLevel().registryAccess());
+        pump.load(tag);
         h.assertTrue(pump.energy().receiveEnergy(500, false) == 0 && pump.energy().getMaxEnergyStored() == 0,
                 "Migration opened a charge buffer");
         var source = port(h, PUMP.north()).receiveTank();
         var sink = port(h, PUMP.east()).sendTank();
         source.fill(lava(1000), FluidAction.EXECUTE);
         FluidPumpBlockEntity.tick(h.getLevel(), pump.getBlockPos(), pump.getBlockState(), pump);
-        h.assertTrue(sink.getFluidAmount() == 1 && !pump.saveWithoutMetadata(h.getLevel().registryAccess()).contains("energy"),
+        h.assertTrue(sink.getFluidAmount() == 1 && !pump.saveWithoutMetadata().contains("energy"),
                 "Legacy FE did not retire after paying for fluid");
         h.assertTrue(pump.energy().receiveEnergy(1000, false) == 5 && sink.getFluidAmount() == 1000
                 && pump.energy().receiveEnergy(1000, false) == 0, "Fresh offers created a new reserve");

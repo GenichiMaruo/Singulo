@@ -30,7 +30,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.BlastingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -50,7 +49,7 @@ public final class AndroidMachineProcessingGameTests {
 
     private static WorkConsoleBlockEntity console(GameTestHelper h) {
         h.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity c = h.getBlockEntity(CONSOLE);
+        WorkConsoleBlockEntity c = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
         c.encoder().setItem(WorkConsoleBlockEntity.CARD, item("recipe_card"));
         return c;
     }
@@ -59,18 +58,18 @@ public final class AndroidMachineProcessingGameTests {
     public static void upgradedCompactorPreservesThreeSlotSaves(GameTestHelper h) {
         var type = MachineType.DEGENERATE_COMPACTOR;
         h.setBlock(AT, SinguloBlocks.CONTROLLERS.get(type).get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var reg = h.getLevel().registryAccess();
         var legacy = new net.minecraftforge.items.ItemStackHandler(6);
         var items = List.of(item("degenerate_matter_shell"), item("steel_plate").copyWithCount(6),
                 item("superconducting_coil").copyWithCount(3), item("reactor_shell").copyWithCount(24),
                 item("overclock_chip"), io.github.genichimaruo.singulo.machine.CapacityUpgrades.item(2));
         for (int i = 0; i < items.size(); i++) legacy.setStackInSlot(i, items.get(i));
-        var saved = machine.saveWithoutMetadata(reg);
+        var saved = machine.saveWithoutMetadata();
         saved.put("items", legacy.serializeNBT(reg));
         saved.putIntArray("slot_layout", new int[]{3, 1});
         for (int version = 0; version < 2; version++) {
-            machine.loadWithComponents(saved, reg);
+            machine.load(saved);
             h.assertTrue(machine.items().getStackInSlot(3).isEmpty(), "The new input slot took an old output");
             for (int i = 0; i < items.size(); i++) {
                 h.assertTrue(ItemStack.matches(items.get(i), machine.items().getStackInSlot(i < 3 ? i : i + 1)),
@@ -86,8 +85,8 @@ public final class AndroidMachineProcessingGameTests {
         var c = console(h);
         var type = MachineType.SINGULARITY_ENCAPSULATOR;
         h.setBlock(AT, SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
-        var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), type).stream().map(RecipeHolder::value)
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
+        var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), type).stream()
                 .filter(r -> r.result().is(item("singularity_core").getItem())).findFirst().orElseThrow();
         c.setMachineProcess(recipe, List.of());
         h.assertTrue(c.encode(), "Cannot record singularity_core");
@@ -126,7 +125,7 @@ public final class AndroidMachineProcessingGameTests {
         var level = h.getLevel();
         var console = console(h);
         var recipes = RecipeTweaks.adjustAll(level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()));
-        var checked = new HashSet<RecipeHolder<MachineRecipe>>();
+        var checked = new HashSet<MachineRecipe>();
         for (MachineType type : MachineType.values()) {
             Block block = type.isMultiblock() ? SinguloBlocks.CONTROLLERS.get(type).get() : SinguloBlocks.MACHINES.get(type).get();
             h.setBlock(AT, block);
@@ -143,12 +142,12 @@ public final class AndroidMachineProcessingGameTests {
     }
 
     private static void checkStation(GameTestHelper h, WorkConsoleBlockEntity c, BlockPos at, String station,
-                                     List<RecipeHolder<MachineRecipe>> recipes, HashSet<RecipeHolder<MachineRecipe>> checked) {
+                                     List<MachineRecipe> recipes, HashSet<MachineRecipe> checked) {
         var level = h.getLevel();
         var pos = h.absolutePos(at);
         int before = checked.size();
         var be = level.getBlockEntity(pos);
-        var empty = be.saveWithoutMetadata(level.registryAccess());
+        var empty = be.saveWithoutMetadata();
         for (var holder : recipes) {
             var recipe = holder.value();
             if (!recipe.station().equals(station)) continue;
@@ -157,7 +156,7 @@ public final class AndroidMachineProcessingGameTests {
             h.assertTrue(c.encode(), "Cannot record " + holder.id());
             var card = RecipeData.read(c.encoder().getItem(WorkConsoleBlockEntity.CARD), level.registryAccess());
             h.assertTrue(card != null && card.processing(), "Unreadable processing card " + holder.id());
-            be.loadWithComponents(empty, level.registryAccess());
+            be.load(empty);
             if (be instanceof MachineBlockEntity machine) machine.selectFor(card.output(), card.grid());
             h.assertTrue(card.tools().size() == recipe.ingredients().stream().filter(in -> in.uses() > 0).count(),
                     holder.id() + " lost a reusable tool");
@@ -205,7 +204,7 @@ public final class AndroidMachineProcessingGameTests {
     }
 
     private static void insert(GameTestHelper h, BlockPos pos, RecipeData card, ItemStack sample, int count,
-                               RecipeHolder<MachineRecipe> recipe) {
+                               MachineRecipe recipe) {
         var level = h.getLevel();
         Direction face = MachineWatch.inputFace(level, pos, card, sample);
         h.assertTrue(face != null, recipe.id() + " rejected " + sample);
@@ -223,7 +222,7 @@ public final class AndroidMachineProcessingGameTests {
         var at = new BlockPos(15, 1, 16);
         Blueprints.layout(Blueprints.Kind.TIDAL_SPINDLE, h.absolutePos(at), Direction.NORTH, 7)
                 .forEach((pos, state) -> h.getLevel().setBlockAndUpdate(pos, state));
-        CosmicChamberBlockEntity spindle = h.getBlockEntity(at);
+        CosmicChamberBlockEntity spindle = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
         spindle.items().setStackInSlot(2, item("singularity_seed"));
         h.onEachTick(() -> spindle.energyFor(null).receiveLong(Long.MAX_VALUE, false));
         runSpecialCycles(h, at, "tidal_spindle", 6, () -> spindle.items().getStackInSlot(3));
@@ -234,7 +233,7 @@ public final class AndroidMachineProcessingGameTests {
         var at = new BlockPos(15, 1, 16);
         Blueprints.layout(Blueprints.Kind.JET_FORGE, h.absolutePos(at), Direction.NORTH, JetForgeLayout.H)
                 .forEach((pos, state) -> h.getLevel().setBlockAndUpdate(pos, state));
-        JetForgeBlockEntity forge = h.getBlockEntity(at);
+        JetForgeBlockEntity forge = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
         forge.forceBlackHole();
         h.onEachTick(() -> forge.energy().receiveLong(Long.MAX_VALUE, false));
         runSpecialCycles(h, at, JetForgeBlockEntity.STATION, 2, () -> forge.items().getStackInSlot(JetForgeBlockEntity.SLOT_OUT));
@@ -292,8 +291,8 @@ public final class AndroidMachineProcessingGameTests {
                     ? Blocks.BLAST_FURNACE : Blocks.FURNACE;
             h.setBlock(AT, Blocks.AIR);
             h.setBlock(AT, block);
-            AbstractFurnaceBlockEntity furnace = h.getBlockEntity(AT);
-            var input = recipe.getIngredients().getFirst().getItems()[0].copyWithCount(1);
+            AbstractFurnaceBlockEntity furnace = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
+            var input = recipe.getIngredients().get(0).getItems()[0].copyWithCount(1);
             var output = recipe.getResultItem(level.registryAccess());
             c.setProcess(List.of(input), List.of(output));
             h.assertTrue(c.encode(), "Could not record " + holder.id());
@@ -319,7 +318,7 @@ public final class AndroidMachineProcessingGameTests {
         var console = console(h);
         var level = h.getLevel();
         h.setBlock(AT, Blocks.FURNACE);
-        AbstractFurnaceBlockEntity furnace = h.getBlockEntity(AT);
+        AbstractFurnaceBlockEntity furnace = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
         var menu = (WorkConsoleMenu) console.createMenu(1, player.getInventory(), player);
         console.setProcess(List.of(new ItemStack(Items.RAW_IRON)), List.of(new ItemStack(Items.IRON_INGOT)));
@@ -349,7 +348,7 @@ public final class AndroidMachineProcessingGameTests {
         // A new order can find a cold furnace with a bucket left by a previous run.
         h.setBlock(AT, Blocks.AIR);
         h.setBlock(AT, Blocks.FURNACE);
-        furnace = h.getBlockEntity(AT);
+        furnace = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         menu.setCarried(new ItemStack(Items.COAL));
         menu.clicked(WorkConsoleMenu.SLOT_FUEL, 0, net.minecraft.world.inventory.ClickType.PICKUP, player);
         menu.clickMenuButton(player, WorkConsoleMenu.BUTTON_ENCODE);
@@ -413,11 +412,11 @@ public final class AndroidMachineProcessingGameTests {
         var carried = ItemStack.parse(registries, recorded.save(registries)).orElseThrow();
         var block = SinguloBlocks.ANDROID_RECIPE_RACK.get();
         h.setBlock(AT, block);
-        RecipeRackBlockEntity rack = h.getBlockEntity(AT);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         rack.items().setStackInSlot(1, carried);
         var entries = new java.util.ArrayList<RecipeRackBlockEntity.Entry>();
         rack.entries(level, entries);
-        h.assertTrue(entries.size() == 1 && entries.getFirst().location().equals(pos), "Original rack lost the procedure");
+        h.assertTrue(entries.size() == 1 && entries.get(0).location().equals(pos), "Original rack lost the procedure");
         entries.clear();
         rack.entries(nether, entries);
         h.assertTrue(entries.isEmpty(), "Nether rack offered an Overworld lever");
@@ -457,10 +456,10 @@ public final class AndroidMachineProcessingGameTests {
         h.setBlock(rackAt, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(CONSOLE.east(), Blocks.CHEST);
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var recipe = MachineBlockEntity.stationRecipes(level, machine.type()).stream()
                 .filter(r -> r.id().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
-        RecipeRackBlockEntity rack = h.getBlockEntity(rackAt);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, rackAt);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, console.getBlockPos(), console.getBlockState().getBlock());
         rack.useItem(player, location, net.minecraft.world.InteractionHand.MAIN_HAND);
@@ -471,7 +470,7 @@ public final class AndroidMachineProcessingGameTests {
         var encoded = console.encoder().getItem(WorkConsoleBlockEntity.CARD).copy();
         rack.items().setStackInSlot(1, encoded);
         var data = RecipeData.read(encoded, level.registryAccess());
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = h.getBlockEntity(CONSOLE.east());
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE.east());
         int slot = 0;
         for (var in : data.inputs()) chest.setItem(slot++, in.item.copyWithCount(Math.toIntExact(2 * in.count)));
         var worker = SinguloEntities.BLADE_ANDROID.get().create(level);
@@ -500,7 +499,7 @@ public final class AndroidMachineProcessingGameTests {
             throws ReflectiveOperationException {
         var console = console(h);
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), machine.type()).stream()
                 .filter(r -> r.id().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
         console.setMachineProcess(recipe, List.of());
@@ -535,7 +534,7 @@ public final class AndroidMachineProcessingGameTests {
     public static void preBoardAndroidPartialInsertionCannotDebitTheSameAssemblyAgain(GameTestHelper h) throws ReflectiveOperationException {
         var console = console(h);
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity table = h.getBlockEntity(AT);
+        MachineBlockEntity table = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), table.type()).stream()
                 .filter(r -> r.id().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
         console.setMachineProcess(recipe, List.of());
@@ -576,16 +575,16 @@ public final class AndroidMachineProcessingGameTests {
         h.setBlock(rackAt, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(CONSOLE.east(), net.minecraft.world.level.block.Blocks.CHEST);
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         h.onEachTick(() -> machine.energy().setEnergy(machine.energy().getMaxEnergyStored()));
-        RecipeRackBlockEntity rack = h.getBlockEntity(rackAt);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, rackAt);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, h.absolutePos(CONSOLE), c.getBlockState().getBlock());
         rack.useItem(player, location, net.minecraft.world.InteractionHand.MAIN_HAND);
         WorkLocationCardItem.record(location, level, h.absolutePos(AT), machine.getBlockState().getBlock());
         rack.items().setStackInSlot(0, location);
         int column = 1;
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = h.getBlockEntity(CONSOLE.east());
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE.east());
         int stock = 0;
         for (String id : List.of("data_card_culture_data", "restore_culture_data")) {
             var recipe = MachineBlockEntity.stationRecipes(level, MachineType.ARCHIVE_TERMINAL).stream()
@@ -626,11 +625,11 @@ public final class AndroidMachineProcessingGameTests {
         Blueprints.layout(Blueprints.Kind.COOLING_TOWER, h.absolutePos(AT), Direction.SOUTH, 7)
                 .forEach((p, s) -> h.getLevel().setBlockAndUpdate(p, s));
         var c = console(h);
-        MachineBlockEntity tower = h.getBlockEntity(AT);
+        MachineBlockEntity tower = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         tower.toggleMakeFree();
         for (var result : List.of(Items.OBSIDIAN, Items.PACKED_ICE)) {
             var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.CRYOGENIC_COOLING_TOWER).stream()
-                    .map(RecipeHolder::value).filter(r -> r.result().is(result)).findFirst().orElseThrow();
+                    .filter(r -> r.result().is(result)).findFirst().orElseThrow();
             c.setMachineProcess(recipe, List.of());
             h.assertTrue(c.encode(), "Could not record tower recipe");
             var card = RecipeData.read(c.encoder().getItem(WorkConsoleBlockEntity.CARD), h.getLevel().registryAccess());
@@ -655,8 +654,8 @@ public final class AndroidMachineProcessingGameTests {
     public static void androidCollectsBothElectrolysisProductsOnSeparateFaces(GameTestHelper h) throws ReflectiveOperationException {
         var c = console(h);
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
-        var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.ELECTROLYZER).getFirst().value();
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
+        var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.ELECTROLYZER).get(0).value();
         c.setMachineProcess(recipe, List.of());
         h.assertTrue(c.encode(), "Cannot encode electrolysis");
         var card = RecipeData.read(c.encoder().getItem(WorkConsoleBlockEntity.CARD), h.getLevel().registryAccess());
@@ -683,7 +682,7 @@ public final class AndroidMachineProcessingGameTests {
     public static void androidPrintsRequestedFoodFromOverlappingIngredients(GameTestHelper h) throws ReflectiveOperationException {
         var c = console(h);
         h.setBlock(AT, SinguloBlocks.FOOD_PRINTER.get());
-        FoodPrinterBlockEntity printer = h.getBlockEntity(AT);
+        FoodPrinterBlockEntity printer = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         printer.select(PrintedFood.NUTRIENT_BAR.ordinal());
         for (int i = 0; i < 2; i++) printer.items().setStackInSlot(FoodPrinterBlockEntity.CARTRIDGE + i, new ItemStack(SinguloItems.FOOD_CARTRIDGE.get()));
         var inputs = List.of(new ItemStack(Items.COOKED_BEEF), new ItemStack(Items.WHEAT, 3));

@@ -417,7 +417,7 @@ public final class DroneGameTests {
         h.runAtTickTime(100, () -> {
             h.assertTrue(a.send(), "Could not send: " + a.status());
             h.setBlock(toPos, SinguloBlocks.FLUID_DRONE_PORT.get());
-            DronePortBlockEntity replacement = h.getBlockEntity(toPos);
+            DronePortBlockEntity replacement = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, toPos);
             replacement.setOwner(owner(h));
         });
         h.runAtTickTime(110, () -> {
@@ -818,7 +818,7 @@ public final class DroneGameTests {
                 step[0] = 1;
             }
             if (step[0] == 1) {
-                CargoDrone drone = drones.getFirst();
+                CargoDrone drone = drones.get(0);
                 h.assertTrue(drone.dismantling() && drone.printTicks() < CargoDrone.PRINT_TICKS, "Waiting for dismantling to progress");
                 var saved = drone.saveWithoutId(new net.minecraft.nbt.CompoundTag());
                 var reloaded = io.github.genichimaruo.singulo.registry.SinguloEntities.CARGO_DRONE.get().create(h.getLevel());

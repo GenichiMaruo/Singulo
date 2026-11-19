@@ -61,7 +61,7 @@ public final class MixedGlassSlabGameTests {
 
     @GameTest(template = "empty")
     public static void bothColoursStackFromEitherSideAndDropSeparately(GameTestHelper h) {
-        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        var player = h.makeMockSurvivalPlayer();
         var pos = h.absolutePos(AT);
         for (boolean blackOnTop : new boolean[]{false, true}) {
             var expected = mixed(blackOnTop);

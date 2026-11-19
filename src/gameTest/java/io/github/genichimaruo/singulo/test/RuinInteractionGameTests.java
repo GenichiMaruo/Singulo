@@ -63,7 +63,7 @@ public final class RuinInteractionGameTests {
 
     private static RuinCacheBlockEntity vault(GameTestHelper helper, String ruin) {
         helper.setBlock(VAULT, SinguloBlocks.RUIN_CACHE.get());
-        var cache = (RuinCacheBlockEntity) helper.getBlockEntity(VAULT);
+        var cache = (RuinCacheBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, VAULT);
         cache.setRuin(ruin);
         return cache;
     }
@@ -72,7 +72,7 @@ public final class RuinInteractionGameTests {
     public static void anchorRequiresConfirmationFromTheSamePlayer(GameTestHelper helper) {
         helper.setBlock(DEVICE, SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED.get());
         TestScope.of(helper).defer(() -> helper.setBlock(DEVICE, Blocks.AIR));
-        var anchor = (AdvancedWorldlineAnchorBlockEntity) helper.getBlockEntity(DEVICE);
+        var anchor = (AdvancedWorldlineAnchorBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, DEVICE);
         var first = survivor(helper, "AnchorFirst");
         var second = survivor(helper, "AnchorSecond");
         ItemStack firstCore = stack("singularity_core");
@@ -97,7 +97,7 @@ public final class RuinInteractionGameTests {
             var cache = vault(helper, "research_building");
             cache.setSealed(true);
             helper.setBlock(DEVICE, SinguloBlocks.GUARDIAN_CORE.get());
-            var core = (GuardianCoreBlockEntity) helper.getBlockEntity(DEVICE);
+            var core = (GuardianCoreBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, DEVICE);
             helper.assertTrue(core.awaken(level) == null, "The automatic guardian spawned on Peaceful");
             ItemStack awakening = stack("awakening_echo_core");
             use(helper, DEVICE, player, awakening);
@@ -106,7 +106,7 @@ public final class RuinInteractionGameTests {
 
             cache.setRuin("final_lab");
             helper.setBlock(DEVICE, SinguloBlocks.SEAL_CONSOLE.get());
-            var console = (SealConsoleBlockEntity) helper.getBlockEntity(DEVICE);
+            var console = (SealConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, DEVICE);
             helper.assertTrue(console.activate(level, player) == null, "The warden spawned on Peaceful");
             for (var item : new ItemStack[]{stack("awakening_record_core"), stack("terminus_record")}) {
                 use(helper, DEVICE, player, item);
@@ -125,7 +125,7 @@ public final class RuinInteractionGameTests {
         var level = helper.getLevel();
         var cache = vault(helper, "observation_post");
         helper.setBlock(DEVICE, SinguloBlocks.PROBE_STATION.get());
-        var probe = (ProbeStationBlockEntity) helper.getBlockEntity(DEVICE);
+        var probe = (ProbeStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, DEVICE);
         var player = TestScope.player(helper);
         RuinDiscovery.record(player, cache.ruin(), cache.getBlockPos());
         probe.registerFrom(player);

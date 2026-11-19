@@ -29,7 +29,6 @@ import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.io.IOException;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -134,14 +133,14 @@ public final class ExtremeBalanceGameTests {
             ServerConfig.SHIPMENT_BASE_FE.set(Integer.MAX_VALUE);
             var at = new BlockPos(1, 1, 1);
             h.setBlock(at, SinguloBlocks.DRONE_PORT.get());
-            DronePortBlockEntity sender = h.getBlockEntity(at);
+            DronePortBlockEntity sender = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
             sender.energy().restoreEnergy(Integer.MAX_VALUE);
             sender.items().setStackInSlot(DronePortBlockEntity.SLOT_CRATES, item("packing_crate", 1));
             int cargo = DronePortBlockEntity.SLOT_CARGO;
             sender.items().setStackInSlot(cargo + 2, new ItemStack(Items.IRON_INGOT, 7));
             sender.items().setStackInSlot(cargo + 7, new ItemStack(Items.GOLD_INGOT, 11));
             sender.stageForTest(sender.getBlockPos().east(4), 0);
-            h.assertTrue(DroneCrateItem.contents(sender.staged()).getFirst().getCount() == 7
+            h.assertTrue(DroneCrateItem.contents(sender.staged()).get(0).getCount() == 7
                     && sender.items().getStackInSlot(cargo + 7).getCount() == 11, "Shipment exceeded configured occupied slots");
             h.assertTrue(sender.energy().getEnergyStored() == 0 && sender.energy().receiveEnergy(1, false) == 0
                     && sender.cancel() && sender.energy().getEnergyStored() == Integer.MAX_VALUE, "Full-price refund overflowed");
@@ -149,7 +148,7 @@ public final class ExtremeBalanceGameTests {
             var water = new FluidStack(Fluids.WATER, Integer.MAX_VALUE);
             ItemStack capsule = FluidCapsuleItem.pack(item("fluid_capsule", 1), water);
             h.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.FLUID_DRONE_PORT.get());
-            FluidDronePortBlockEntity port = h.getBlockEntity(new BlockPos(2, 1, 2));
+            FluidDronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(2, 1, 2));
             h.assertTrue(port.receiveTank().fill(water, IFluidHandler.FluidAction.EXECUTE) == Integer.MAX_VALUE, "Port capacity wrapped");
             ServerConfig.FLUID_CAPSULE_CAPACITY.set(25);
             FluidCapsuleItem.setFluid(capsule, water.copyWithAmount(Integer.MAX_VALUE - 1));
@@ -175,21 +174,21 @@ public final class ExtremeBalanceGameTests {
             ServerConfig.DEDICATED_TANK_MULTIPLIER.set(2.0);
             var pos = new BlockPos(2, 1, 2);
             h.setBlock(pos, SinguloBlocks.JET_FORGE_CORE.get());
-            JetForgeBlockEntity forge = h.getBlockEntity(pos);
+            JetForgeBlockEntity forge = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             var helium = new FluidStack(io.github.genichimaruo.singulo.registry.SinguloFluids.get("liquid_helium"), 32000);
             h.assertTrue(forge.duration(JetForgeBlockEntity.PRIME) == 30 && JetForgeBlockEntity.recipeTicks(50) == 235
                     && forge.coolant().fill(helium, IFluidHandler.FluidAction.EXECUTE) == 32000, "Configured forge preview or tank differs");
             forge.forcePhase(JetForgeBlockEntity.FOCUS, 17);
-            var saved = forge.saveWithoutMetadata(h.getLevel().registryAccess());
+            var saved = forge.saveWithoutMetadata();
             saved.putDouble("phase_time_multiplier", 0.5);
             ServerConfig.DEDICATED_TANK_MULTIPLIER.set(0.01);
             ServerConfig.FORGE_PHASE_TIME_MULTIPLIER.set(1e9);
-            forge.loadWithComponents(saved, h.getLevel().registryAccess());
+            forge.load(saved);
             h.assertTrue(forge.duration(JetForgeBlockEntity.FOCUS) == 45 && forge.phaseTicks() == 17
                     && forge.coolant().getTankCapacity(0) == 160 && forge.tank().getFluidAmount() == 32000
                     && forge.coolant().fill(helium, IFluidHandler.FluidAction.EXECUTE) == 0, "Active forge retimed or coolant disappeared");
             saved.remove("phase_time_multiplier");
-            forge.loadWithComponents(saved, h.getLevel().registryAccess());
+            forge.load(saved);
             h.assertTrue(forge.duration(JetForgeBlockEntity.FOCUS) == 90, "Legacy job inherited a new phase duration");
             h.succeed();
         } finally {
@@ -211,25 +210,25 @@ public final class ExtremeBalanceGameTests {
             ServerConfig.EXTRA_STACKS_PER_UPGRADE.set(Integer.MAX_VALUE);
             ServerConfig.STOCK_UPGRADE_LIMIT.set(Integer.MAX_VALUE);
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-            MachineBlockEntity machine = h.getBlockEntity(pos);
+            MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             int slot = machine.type().assemblyUpgradeSlot();
             h.assertTrue(machine.items().insertItem(slot, item("assembly_stock_upgrade", Integer.MAX_VALUE), false).isEmpty(), "Upgrade count limit not applied");
             var grid = machine.assemblyGrid();
             h.assertTrue(grid.insertItem(0, new ItemStack(Items.IRON_INGOT, Integer.MAX_VALUE), false).isEmpty()
                     && grid.insertItem(0, new ItemStack(Items.IRON_INGOT), false).getCount() == 1, "Extreme cell capacity overflowed");
-            var save = machine.saveWithoutMetadata(h.getLevel().registryAccess());
+            var save = machine.saveWithoutMetadata();
             ServerConfig.EXTRA_STACKS_PER_UPGRADE.set(0);
             ServerConfig.STOCK_UPGRADE_LIMIT.set(1);
-            machine.loadWithComponents(save, h.getLevel().registryAccess());
+            machine.load(save);
             h.assertTrue(grid.getStackInSlot(0).getCount() == Integer.MAX_VALUE && machine.items().extractItem(slot, 1, false).isEmpty(),
                     "Lowering the limit altered saved stock or unlocked the upgrade");
             var worldPos = machine.getBlockPos();
             h.getLevel().destroyBlock(worldPos, true);
             var drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(worldPos).inflate(1));
-            h.assertTrue(drops.size() == 1 && drops.getFirst().getItem().has(DataComponents.BLOCK_ENTITY_DATA), "Huge board did not drop exactly one packed machine");
+            h.assertTrue(drops.size() == 1 && drops.get(0).getItem().has(DataComponents.BLOCK_ENTITY_DATA), "Huge board did not drop exactly one packed machine");
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-            MachineBlockEntity restored = h.getBlockEntity(pos);
-            restored.loadWithComponents(drops.getFirst().getItem().get(DataComponents.BLOCK_ENTITY_DATA).copyTag(), h.getLevel().registryAccess());
+            MachineBlockEntity restored = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
+            restored.load(drops.get(0).getItem().get(DataComponents.BLOCK_ENTITY_DATA).copyTag());
             h.assertTrue(restored.assemblyGrid().getStackInSlot(0).getCount() == Integer.MAX_VALUE
                     && restored.items().getStackInSlot(slot).getCount() == Integer.MAX_VALUE, "Packed machine lost items");
             h.succeed();
@@ -252,7 +251,7 @@ public final class ExtremeBalanceGameTests {
             ServerConfig.MACHINE_BUFFER_MULTIPLIER.set(1e9);
             var pos = new BlockPos(1, 1, 1);
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-            MachineBlockEntity m = h.getBlockEntity(pos);
+            MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             m.items().setStackInSlot(0, item("zinc_dust", 32));
             m.items().setStackInSlot(m.type().upgradeSlot(), item("overclock_chip", 1));
             m.selectFor(item("zinc_ingot", 1), List.of(item("zinc_dust", 1)));
@@ -297,7 +296,7 @@ public final class ExtremeBalanceGameTests {
             manager.replaceRecipes(List.of(holder));
             var pos = new BlockPos(2, 1, 2);
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-            MachineBlockEntity m = h.getBlockEntity(pos);
+            MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             var io = m.automationItems();
             int out = m.type().outputSlot();
             h.assertTrue(io.insertItem(0, item("zinc_dust", 1_000_007), false).isEmpty(), "Bulk input rejected");
@@ -306,9 +305,9 @@ public final class ExtremeBalanceGameTests {
             MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             h.assertTrue(io.getStackInSlot(0).getCount() == 7 && io.getStackInSlot(out).getCount() == Integer.MAX_VALUE
                     && m.automationFluids().getFluidInTank(0).getAmount() == 147_483_647, "Bulk craft lost or created material");
-            var saved = m.saveWithoutMetadata(h.getLevel().registryAccess());
+            var saved = m.saveWithoutMetadata();
             ServerConfig.MACHINE_SLOT_STACKS.set(1);
-            m.loadWithComponents(saved, h.getLevel().registryAccess());
+            m.load(saved);
             h.assertTrue(io.extractItem(out, Integer.MAX_VALUE, false).getCount() == 64
                     && io.getStackInSlot(out).getCount() == Integer.MAX_VALUE - 64, "Stock lost across save/downgrade or oversized player stack produced");
             ServerConfig.MACHINE_SLOT_STACKS.set(Integer.MAX_VALUE);
@@ -327,7 +326,7 @@ public final class ExtremeBalanceGameTests {
             m.items().setStackInSlot(0, item("zinc_dust", 600));
             for (int i = 0; i < 2; i++) MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             h.assertTrue(io.getStackInSlot(out).getCount() == 256, "Stateful batch exceeded tick budget");
-            m.loadWithComponents(m.saveWithoutMetadata(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+            m.load(m.saveWithoutMetadata());
             MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             h.assertTrue(io.getStackInSlot(out).getCount() == 512, "Stateful batch failed to resume after save");
             MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
@@ -348,7 +347,7 @@ public final class ExtremeBalanceGameTests {
             ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.set(1e9);
             var pos = new BlockPos(1, 1, 1);
             h.setBlock(pos, SinguloBlocks.MUON_FUSION_REACTOR.get());
-            MuonFusionReactorBlockEntity reactor = h.getBlockEntity(pos);
+            MuonFusionReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             reactor.items().setStackInSlot(0, item("muon_catalyst", 1));
             reactor.tank().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
             MuonFusionReactorBlockEntity.serverTick(h.getLevel(), reactor.getBlockPos(), reactor.getBlockState(), reactor);
@@ -359,7 +358,7 @@ public final class ExtremeBalanceGameTests {
             MuonFusionReactorBlockEntity.serverTick(h.getLevel(), reactor.getBlockPos(), reactor.getBlockState(), reactor);
             h.assertTrue(reactor.slotsData().getDouble(GeneratorSlotsMenu.D_RATE) == 0.25 && reactor.energy().getEnergyStored() == 0,
                     "Fractional rate rounded prematurely");
-            reactor.loadWithComponents(reactor.saveWithoutMetadata(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+            reactor.load(reactor.saveWithoutMetadata());
             for (int i = 0; i < 3; i++) MuonFusionReactorBlockEntity.serverTick(h.getLevel(), reactor.getBlockPos(), reactor.getBlockState(), reactor);
             h.assertTrue(reactor.energy().getEnergyStored() == 1, "Fractional generation lost on save");
             var ops = h.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);

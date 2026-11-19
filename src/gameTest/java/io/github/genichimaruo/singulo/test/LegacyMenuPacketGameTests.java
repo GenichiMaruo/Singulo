@@ -40,7 +40,7 @@ public final class LegacyMenuPacketGameTests {
     public static void legacyMenuPacketValidatesActiveMenu(GameTestHelper h) {
         var at = new BlockPos(2, 1, 2);
         h.setBlock(at, SinguloBlocks.RGB_DYE_STATION.get());
-        RgbDyeStationBlockEntity station = (RgbDyeStationBlockEntity) h.getBlockEntity(at);
+        RgbDyeStationBlockEntity station = (RgbDyeStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
         var player = TestScope.player(h);
         var menu = new RgbDyeStationMenu(73, player.getInventory(), h.absolutePos(at), station.items(), station.data());
         player.containerMenu = menu;

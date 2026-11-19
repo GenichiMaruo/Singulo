@@ -37,20 +37,20 @@ public final class AndroidEscrowOrderGameTests {
         helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
         helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
-            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = (io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity) helper.getBlockEntity(p);
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = (io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, p);
             b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         ItemStack table = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
                 net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = (io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity) helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = (io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, RACK);
         java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -59,7 +59,7 @@ public final class AndroidEscrowOrderGameTests {
         rack.items().setStackInSlot(0, table);
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
-        return (WorkConsoleBlockEntity) helper.getBlockEntity(CONSOLE);
+        return (WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONSOLE);
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
@@ -141,7 +141,7 @@ public final class AndroidEscrowOrderGameTests {
         var a=worker(h,c,accepted.receipt().orderId());var job=c.requestJob(a);var route=c.planPickup(job,a.blockPosition());
         h.assertTrue(c.fetchAt(a,job,route.get(0)),"No material fetch");
         h.setBlock(CONSOLE,net.minecraft.world.level.block.Blocks.AIR);h.setBlock(CONSOLE,SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity replacement=(WorkConsoleBlockEntity) h.getBlockEntity(CONSOLE); replacement.setOwner(owner);
+        WorkConsoleBlockEntity replacement=(WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE); replacement.setOwner(owner);
         h.assertTrue(!replacement.escrowConsoleIdentity().equals(c.escrowConsoleIdentity()),"Replacement inherited identity");
         h.assertTrue(a.recoverEscrowCargo(),"Removed console stranded cargo");
         h.assertTrue(count(AndroidEscrows.snapshot(h.getLevel(),owner,id).materials(),Items.OAK_LOG)==1 && replacement.orders().isEmpty(),"Replacement stole old custody"); h.succeed();
@@ -173,7 +173,7 @@ public final class AndroidEscrowOrderGameTests {
     @GameTest(template="empty",timeoutTicks=2400)
     public static void actualWorkerCraftsPrivateChainInOneRequest(GameTestHelper h) {
         var c=setup(h,true);var id=UUID.randomUUID();
-        net.minecraft.world.level.block.entity.ChestBlockEntity shared=(net.minecraft.world.level.block.entity.ChestBlockEntity) h.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity shared=(net.minecraft.world.level.block.entity.ChestBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
         var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),8,
                 List.of(new ItemStack(Items.OAK_LOG,1)),null);
         h.assertTrue(accepted.acceptedNow(),"Chain request rejected: "+accepted.receipt().reason());
@@ -191,11 +191,11 @@ public final class AndroidEscrowOrderGameTests {
     private static net.minecraft.world.level.block.entity.FurnaceBlockEntity furnaceRecipe(GameTestHelper h) {
         BlockPos furnacePos=new BlockPos(5,1,3);
         h.setBlock(furnacePos,net.minecraft.world.level.block.Blocks.FURNACE);
-        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace=(net.minecraft.world.level.block.entity.FurnaceBlockEntity) h.getBlockEntity(furnacePos);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace=(net.minecraft.world.level.block.entity.FurnaceBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, furnacePos);
         furnace.setItem(1,new ItemStack(Items.COAL,8));
         ItemStack card=new ItemStack(item("work_location_card"));
         WorkLocationCardItem.record(card,h.getLevel(),h.absolutePos(furnacePos),net.minecraft.world.level.block.Blocks.FURNACE);
-        RecipeRackBlockEntity rack=(RecipeRackBlockEntity) h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack=(RecipeRackBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         rack.items().setStackInSlot(RecipeRackBlockEntity.COLS,card);
         ItemStack recipe=new ItemStack(item("recipe_card"));
         java.util.List<ItemStack> grid=new java.util.ArrayList<>(java.util.Collections.nCopies(9,ItemStack.EMPTY));
@@ -235,7 +235,7 @@ public final class AndroidEscrowOrderGameTests {
     @GameTest(template="empty")
     public static void machineEscrowRejectsProcessingHiddenInsideCraftingChain(GameTestHelper h) {
         var c=setup(h,false);var id=UUID.randomUUID();var furnace=furnaceRecipe(h);
-        RecipeRackBlockEntity rack=(RecipeRackBlockEntity) h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack=(RecipeRackBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         var grid=new java.util.ArrayList<>(java.util.Collections.nCopies(9,ItemStack.EMPTY));
         grid.set(0,new ItemStack(Items.IRON_INGOT));
         rack.items().setStackInSlot(3,recipeCard(h,grid,new ItemStack(Items.IRON_NUGGET,9)));

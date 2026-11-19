@@ -27,9 +27,9 @@ public final class AndroidItemSupplyGameTests {
         h.setBlock(pos.below(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         h.setBlock(pos.above(), SinguloBlocks.ANDROID_SUPPLY_PORT.get());
         h.setBlock(pos, SinguloBlocks.MACHINES.get(type).get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(pos.below());
-        SupplyPortBlockEntity port = h.getBlockEntity(pos.above());
-        MachineBlockEntity machine = h.getBlockEntity(pos);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos.below());
+        SupplyPortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos.above());
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         port.setConsole(console.getBlockPos());
         console.addLink(port.getBlockPos());
         var ingot = new ItemStack(Items.COPPER_INGOT);
@@ -56,14 +56,14 @@ public final class AndroidItemSupplyGameTests {
         h.getLevel().addFreshEntity(worker);
         TestScope.of(h).defer(worker::discard);
         h.assertTrue(console.start(player, ingot, 6, List.of(worker.getUUID()), null) == null, "Stock delivery was refused");
-        var order = console.orders().getFirst();
+        var order = console.orders().get(0);
         h.assertTrue(order.held(console.getBlockPos(), ingot) == 0 && order.held(port.getBlockPos(), ingot) == 6,
                 "The six ingots must be reserved at the output port");
         var job = console.requestJob(worker);
         var route = console.planPickup(job, stand);
-        h.assertTrue(route != null && route.size() == 1 && route.getFirst().point().equals(port.getBlockPos())
-                && ItemCount.get(route.getFirst().items(), ingot) == 6, "Worker was not sent to the output port for six ingots");
-        h.assertTrue(console.fetchAt(worker, job, route.getFirst()) && worker.inventory().countItem(Items.COPPER_INGOT) == 6
+        h.assertTrue(route != null && route.size() == 1 && route.get(0).point().equals(port.getBlockPos())
+                && ItemCount.get(route.get(0).items(), ingot) == 6, "Worker was not sent to the output port for six ingots");
+        h.assertTrue(console.fetchAt(worker, job, route.get(0)) && worker.inventory().countItem(Items.COPPER_INGOT) == 6
                 && machine.items().getStackInSlot(slot).isEmpty() && order.held(null, ingot) == 0,
                 "Pickup did not move the physical ingots and clear their reservation");
         h.succeed();

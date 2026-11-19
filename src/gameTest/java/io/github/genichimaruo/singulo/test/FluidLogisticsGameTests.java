@@ -262,7 +262,7 @@ public final class FluidLogisticsGameTests {
     private static void poweredPump(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction intake) {
         h.setBlock(pos, SinguloBlocks.FLUID_PUMP.get().defaultBlockState()
                 .setValue(io.github.genichimaruo.singulo.pipe.FluidPumpBlock.INTAKE, intake));
-        io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity pump = h.getBlockEntity(pos);
+        io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity pump = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         h.onEachTick(() -> pump.energy().receiveEnergy(Integer.MAX_VALUE, false));
     }
 

@@ -71,7 +71,7 @@ public final class MachineReportGameTests {
         // 焼成炉に土: 作れない材料で待っている
         BlockPos kilnAt = new BlockPos(1, 1, 1);
         h.setBlock(kilnAt, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = h.getBlockEntity(kilnAt);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, kilnAt);
         kiln.items().setStackInSlot(MachineType.KILN.recipeSlot(0), new ItemStack(Items.DIRT));
         h.assertTrue(MachineReport.reports(kiln.getBlockState(), kiln), "A kiln does not report");
         h.assertTrue(level.getCapability(MachineReports.CAPABILITY, kiln.getBlockPos()) == kiln, "Singulo machine did not expose the public capability");

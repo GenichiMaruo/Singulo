@@ -37,11 +37,11 @@ public final class TeamSharingGameTests {
         var mate = TestScope.player(helper);
 
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
-        AndroidStationBlockEntity station = (AndroidStationBlockEntity) helper.getBlockEntity(STATION);
+        AndroidStationBlockEntity station = (AndroidStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, STATION);
         station.setOwner(owner);
         station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, permitFor(UUID.randomUUID()));    // ほかの人だけ登録
         helper.setBlock(PORT, SinguloBlocks.DRONE_PORT.get());
-        DronePortBlockEntity port = (DronePortBlockEntity) helper.getBlockEntity(PORT);
+        DronePortBlockEntity port = (DronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, PORT);
         port.setOwner(owner);
         helper.assertFalse(station.mayOperate(mate), "Unlisted player used a permit-restricted station");
         helper.assertFalse(port.mayOperate(mate), "Stranger used the owner's drone port");

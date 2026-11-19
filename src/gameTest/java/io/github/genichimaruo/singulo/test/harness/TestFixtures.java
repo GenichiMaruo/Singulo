@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 public final class TestFixtures {
     @SuppressWarnings("unchecked")
     public static <T extends net.minecraft.world.level.block.entity.BlockEntity> T blockEntity(net.minecraft.gametest.framework.GameTestHelper helper, BlockPos pos) {
-        return (T)helper.getBlockEntity(pos);
+        return (T)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
     }
     private static final java.util.List<FixtureScope> FIXTURES = new java.util.ArrayList<>();
     private static boolean fixtureTracking;

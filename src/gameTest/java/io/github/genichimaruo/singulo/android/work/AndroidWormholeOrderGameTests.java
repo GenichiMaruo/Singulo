@@ -56,10 +56,10 @@ public final class AndroidWormholeOrderGameTests {
         h.setBlock(consolePos.west(), Blocks.CHEST);
         h.setBlock(stabilizerPos, SinguloBlocks.WORMHOLE_STABILIZER.get());
         h.setBlock(rackPos, SinguloBlocks.ANDROID_RECIPE_RACK.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(consolePos);
-        RecipeRackBlockEntity rack = h.getBlockEntity(rackPos);
-        WormholeStabilizerBlockEntity stabilizer = h.getBlockEntity(stabilizerPos);
-        ChestBlockEntity chest = h.getBlockEntity(consolePos.west());
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, consolePos);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, rackPos);
+        WormholeStabilizerBlockEntity stabilizer = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, stabilizerPos);
+        ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, consolePos.west());
         rack.setConsole(console.getBlockPos());
         console.addLink(rack.getBlockPos());
         chest.setItem(0, item("exotic_matter", 8));
@@ -90,7 +90,7 @@ public final class AndroidWormholeOrderGameTests {
                 List.of(new ItemCount(expired, 2)), level);
         h.assertTrue(expiredPlan.ok() && expiredPlan.fromStock.isEmpty() && expiredPlan.steps.size() == 1, "Expired mouths were reserved");
         var named = unrelated.copy();
-        named.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Other"));
+        named.setHoverName(net.minecraft.network.chat.Component.literal("Other"));
         h.assertTrue(!WormholeOrders.matches(target, named) && !new ItemCount(target, 1).matches(unrelated),
                 "Non-link components or exact physical inventory identity were ignored");
         var split = new WorkOrder(42, target, 4, null);

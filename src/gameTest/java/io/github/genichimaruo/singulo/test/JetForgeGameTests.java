@@ -55,7 +55,7 @@ public final class JetForgeGameTests {
 
     private static JetForgeBlockEntity build(GameTestHelper helper) {
         TestBuild.build(helper, Blueprints.Kind.JET_FORGE, CONTROLLER, BACK, SIZE);
-        return (JetForgeBlockEntity) helper.getBlockEntity(CONTROLLER);
+        return (JetForgeBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONTROLLER);
     }
 
     /** 形の (x, y, z) のワールドの位置。 */
@@ -406,7 +406,7 @@ public final class JetForgeGameTests {
             helper.assertTrue(helper.getLevel().getBlockState(center).is(SinguloBlocks.ROGUE_BLACK_HOLE.get()), "組み直しで消えた");
         });
         helper.runAtTickTime(60, () -> {
-            JetForgeBlockEntity again = (JetForgeBlockEntity) helper.getBlockEntity(CONTROLLER);
+            JetForgeBlockEntity again = (JetForgeBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONTROLLER);
             helper.assertTrue(again.formed() && again.hasCore(), "組み直しても取り込まない");
             helper.assertTrue(helper.getLevel().getBlockState(center).isAir(), "取り込んだのに野良が残っている");
             helper.succeed();

@@ -35,9 +35,9 @@ public final class MachineFluidEjectionGameTests {
         var level = h.getLevel();
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
         h.setBlock(AT.east(), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
-        MachineBlockEntity machine = h.getBlockEntity(AT);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         machine.automationFluids().fill(new FluidStack(Fluids.WATER, 500), FluidAction.EXECUTE);
-        var saved = machine.saveWithoutMetadata(level.registryAccess());
+        var saved = machine.saveWithoutMetadata();
         var tanks = saved.getList("tanks", Tag.TAG_COMPOUND);
         for (int i = 1; i <= 2; i++) {
             var tank = new FluidTank(Integer.MAX_VALUE);
@@ -47,7 +47,7 @@ public final class MachineFluidEjectionGameTests {
         h.startSequence().thenWaitUntil(() -> h.assertTrue(level.getGameTime() % 5 != 0, "Wait between old ejection ticks"))
                 .thenExecute(() -> {
                     for (boolean port : new boolean[]{false, true}) {
-                        machine.loadWithComponents(saved, level.registryAccess());
+                        machine.load(saved);
                         var fluids = machine.automationFluids();
                         h.assertTrue(fluids.getFluidInTank(1).getAmount() == Integer.MAX_VALUE
                                 && fluids.getFluidInTank(2).getAmount() == Integer.MAX_VALUE, "Missing test fluid");
@@ -69,9 +69,9 @@ public final class MachineFluidEjectionGameTests {
         h.setBlock(AT.east(), SinguloBlocks.CONTAINMENT_TANK.get().defaultBlockState().setValue(AbstractMachineBlock.FACING, Direction.EAST));
         h.setBlock(AT.east(2), SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(AT.east(3), SinguloBlocks.FLUID_DRONE_PORT.get());
-        HaloCollectorBlockEntity collector = h.getBlockEntity(AT);
-        ContainmentTankBlockEntity tank = h.getBlockEntity(AT.east());
-        FluidDronePortBlockEntity drone = h.getBlockEntity(AT.east(2)), next = h.getBlockEntity(AT.east(3));
+        HaloCollectorBlockEntity collector = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
+        ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.east());
+        FluidDronePortBlockEntity drone = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.east(2)), next = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.east(3));
         var player = TestScope.player(h);
         try {
             player.setPos(tank.getBlockPos().getCenter());

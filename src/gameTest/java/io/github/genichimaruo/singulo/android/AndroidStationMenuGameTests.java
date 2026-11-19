@@ -23,7 +23,7 @@ public final class AndroidStationMenuGameTests {
     public static void stationMenuShowsCurrentPrintCost(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.ANDROID_STATION.get());
-        var station = (AndroidStationBlockEntity) helper.getBlockEntity(pos);
+        var station = (AndroidStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         var player = TestScope.player(helper);
         var server = station.createMenu(1, player.getInventory(), player);
         var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());

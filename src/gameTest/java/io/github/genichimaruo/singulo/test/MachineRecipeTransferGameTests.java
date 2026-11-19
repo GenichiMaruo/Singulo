@@ -26,8 +26,8 @@ public final class MachineRecipeTransferGameTests {
 
     private static MachineMenu menu(GameTestHelper h, MachineType type) {
         h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
-        return new MachineMenu(1, h.makeMockPlayer(GameType.SURVIVAL).getInventory(), machine);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(1, 1, 1));
+        return new MachineMenu(1, h.makeMockSurvivalPlayer().getInventory(), machine);
     }
 
     private static MachineRecipe recipe(MachineRecipe.ItemInput... inputs) {
@@ -244,7 +244,7 @@ public final class MachineRecipeTransferGameTests {
             var buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
             buf.writeBlockPos(menu.pos());
             buf.writeVarInt(menu.type().ordinal());
-            var client = MachineMenu.client(2, h.makeMockPlayer(GameType.SURVIVAL).getInventory(), buf);
+            var client = MachineMenu.client(2, h.makeMockSurvivalPlayer().getInventory(), buf);
             var server = machine.syncData();
             for (int slot = 0; slot < server.getCount(); slot++) client.setData(slot, server.get(slot));
             int estimated = io.github.genichimaruo.singulo.item.UsesHelper.remaining(client.loadedCatalyst());
@@ -294,7 +294,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void capacityUpgradeShiftClickFallsBackToInputs(GameTestHelper h) {
         var menu = menu(h, MachineType.PRECISION_ASSEMBLER);
-        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        var player = h.makeMockSurvivalPlayer();
         int inventory = menu.playerSlotStart();
         menu.getSlot(inventory).set(CapacityUpgrades.item(1));
         menu.quickMoveStack(player, inventory);
@@ -383,7 +383,7 @@ public final class MachineRecipeTransferGameTests {
         var menu = fullInventoryAssembly(h);
         int inventory = menu.playerSlotStart();
         var named = new ItemStack(Items.IRON_INGOT);
-        named.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Sample"));
+        named.setHoverName(net.minecraft.network.chat.Component.literal("Sample"));
         menu.getSlot(inventory).set(named.copy());
         menu.getSlot(inventory + 1).set(new ItemStack(Items.IRON_INGOT, 64));
         var plan = MachineRecipeTransfer.plan(menu, singleIronAssembly(), true);

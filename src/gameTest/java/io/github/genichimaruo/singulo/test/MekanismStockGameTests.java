@@ -38,7 +38,7 @@ public final class MekanismStockGameTests {
         var level = h.getLevel();
         var separator = place(h, CONSOLE.above(), "electrolytic_separator");
         h.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(CONSOLE);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
         h.runAfterDelay(5, () -> {
             int filled = 0, energy = 0;
             for (var face : Direction.values()) {
@@ -78,13 +78,13 @@ public final class MekanismStockGameTests {
         var creative = place(h, CONSOLE.east(), "creative_chemical_tank");
         var basic = place(h, CONSOLE.west(), "basic_chemical_tank");
         h.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(CONSOLE);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
         h.runAfterDelay(5, () -> {
             String id = "mekanism:hydrogen";
             // Empty creative tanks void external input. Set the type by manually inserting hydrogen.
             var handler = (mekanism.api.chemical.IMekanismChemicalHandler) level.getBlockEntity(creative);
             var chemical = mekanism.api.MekanismAPI.CHEMICAL_REGISTRY.getHolder(ResourceLocation.parse(id)).orElseThrow();
-            handler.getChemicalTanks(null).getFirst().insert(new mekanism.api.chemical.ChemicalStack(chemical, 1_000),
+            handler.getChemicalTanks(null).get(0).insert(new mekanism.api.chemical.ChemicalStack(chemical, 1_000),
                     mekanism.api.Action.EXECUTE, mekanism.api.AutomationType.MANUAL);
             var input = Chemicals.store(level, basic, Direction.UP);
             h.assertTrue(input != null && input.insert(id, 1_000, false) == 1_000, "Ordinary tank did not accept hydrogen");

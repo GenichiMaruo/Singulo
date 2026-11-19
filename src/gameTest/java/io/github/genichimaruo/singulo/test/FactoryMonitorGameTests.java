@@ -44,7 +44,7 @@ public final class FactoryMonitorGameTests {
         try {
             for (BlockPos pos : sites) {
                 h.setBlock(pos, SinguloBlocks.DRONE_STATION.get());
-                DroneStationBlockEntity station = h.getBlockEntity(pos);
+                DroneStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
                 station.energy().setEnergy(100_000);
             }
             var snapshot = FactoryMonitor.scan(level, at);
@@ -60,7 +60,7 @@ public final class FactoryMonitorGameTests {
                         "Station or trouble totals were truncated");
                 h.assertTrue(received.drones().size() == FactoryMonitor.MAX_DRONE_DETAILS
                                 && received.drones().stream().noneMatch(d -> d.pos().equals(h.absolutePos(farthest)))
-                                && received.drones().stream().anyMatch(d -> d.pos().equals(h.absolutePos(sites.getFirst()))),
+                                && received.drones().stream().anyMatch(d -> d.pos().equals(h.absolutePos(sites.get(0)))),
                         "Monitor did not keep the nearest stations");
             } finally {
                 buf.release();
@@ -76,7 +76,7 @@ public final class FactoryMonitorGameTests {
         BlockPos corePos = new BlockPos(4, 1, 4);
         TestBuild.build(h, Blueprints.Kind.GENESIS_ENGINE, corePos, Direction.NORTH, 7);
         h.setBlock(MONITOR, SinguloBlocks.DESK_MONITOR.get());
-        GenesisCoreBlockEntity core = h.getBlockEntity(corePos);
+        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, corePos);
         var player = TestScope.player(h);
         BlockPos pylon = corePos.offset(GenesisCoreBlockEntity.PYLONS[0]);
         h.startSequence()
@@ -111,7 +111,7 @@ public final class FactoryMonitorGameTests {
         h.setBlock(MONITOR.east(2), SinguloBlocks.SERVER_RACK.get());
         BlockPos kilnAt = new BlockPos(5, 1, 5);
         h.setBlock(kilnAt, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = h.getBlockEntity(kilnAt);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, kilnAt);
         kiln.items().setStackInSlot(MachineType.KILN.recipeSlot(0), new ItemStack(Items.DIRT));
         BlockPos stationAt = new BlockPos(5, 1, 1);
         h.setBlock(stationAt, SinguloBlocks.DRONE_STATION.get());

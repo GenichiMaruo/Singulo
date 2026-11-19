@@ -51,11 +51,11 @@ public final class AndroidCatalogGameTests {
         h.setBlock(at.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(rackPos, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(machinePos, machineBlock);
-        WorkConsoleBlockEntity console = h.getBlockEntity(at);
-        RecipeRackBlockEntity rack = h.getBlockEntity(rackPos);
-        ChestBlockEntity chest = h.getBlockEntity(at.west());
-        FluidDronePortBlockEntity tank = h.getBlockEntity(at.east());
-        MachineBlockEntity machine = h.getBlockEntity(machinePos);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, rackPos);
+        ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at.west());
+        FluidDronePortBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, at.east());
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, machinePos);
         chest.setItem(0, new ItemStack(Items.RAW_COPPER, 8));
         tank.receiveTank().fill(new FluidStack(Fluids.WATER, 250),
                 FluidAction.EXECUTE);
@@ -104,7 +104,7 @@ public final class AndroidCatalogGameTests {
     @GameTest(template = "empty")
     public static void androidRecordsPlansAndCraftsEverySinguloTableRecipe(GameTestHelper h) throws Exception {
         h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(new BlockPos(1, 1, 1));
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(1, 1, 1));
         BlockPos benchPos = new BlockPos(3, 1, 1);
         h.setBlock(benchPos, Blocks.CRAFTING_TABLE);
         BlockPos bench = h.absolutePos(benchPos);

@@ -10,7 +10,6 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -43,7 +42,7 @@ public final class AssemblyMenuGameTests {
     public static void expandedAssemblyStockSurvivesClicksReloadRemovalAndBreaking(GameTestHelper h) {
         var pos = new BlockPos(1, 1, 1);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity machine = h.getBlockEntity(pos);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "StockTester"));
         var menu = new MachineMenu(1, player.getInventory(), machine);
         int upgradeSlot = menu.type().assemblyUpgradeSlot(), inventory = menu.playerSlotStart(), first = menu.assemblySlot(0);
@@ -53,7 +52,7 @@ public final class AssemblyMenuGameTests {
         h.assertTrue(menu.getSlot(upgradeSlot).getItem().is(upgrade) && menu.stackLimit(first, new ItemStack(Items.BUCKET)) == 64
                 && menu.stackLimit(first, new ItemStack(Items.IRON_PICKAXE)) == 1, "Unexpected expanded stack limits");
         ItemStack part = new ItemStack(Items.IRON_INGOT, 64);
-        part.set(DataComponents.CUSTOM_NAME, Component.literal("Stock"));
+        part.setHoverName(Component.literal("Stock"));
         var grid = machine.assemblyGrid();
         for (int cell = 0; cell < 2; cell++) {
             menu.setCarried(part.copy());
@@ -93,7 +92,7 @@ public final class AssemblyMenuGameTests {
                 && menu.quickMoveStack(player, upgradeSlot).isEmpty()
                 && machine.items().extractItem(upgradeSlot, 1, false).isEmpty(), "A stocked board allowed its upgrade to be removed");
         var registry = h.getLevel().registryAccess();
-        var saved = machine.saveWithoutMetadata(registry);
+        var saved = machine.saveWithoutMetadata();
         grid.setStackInSlot(0, ItemStack.EMPTY);
         machine.loadWithComponents(saved, registry);
         h.assertTrue(ItemStack.matches(grid.getStackInSlot(0), part.copyWithCount(192)) && grid.getStackInSlot(1).getCount() == 96,
@@ -128,7 +127,7 @@ public final class AssemblyMenuGameTests {
     public static void clicksDragShiftAndCloseConservePhysicalAssemblyParts(GameTestHelper h) {
         BlockPos pos = new BlockPos(1, 1, 1);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity machine = h.getBlockEntity(pos);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "AssemblyTester"));
         var menu = new MachineMenu(1, player.getInventory(), machine);
         int inventory = menu.playerSlotStart();

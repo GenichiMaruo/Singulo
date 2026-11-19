@@ -33,7 +33,7 @@ public final class FluidPipeScalingGameTests {
         for (int i = 0; i < 2; i++) {
             BlockPos pos = start.east(i).north();
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-            MachineBlockEntity source = h.getBlockEntity(pos);
+            MachineBlockEntity source = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
             source.forceOutputTankForTest(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 10_000));
         }
         BlockPos nitrogenSink = start.east(4).north();
@@ -41,16 +41,16 @@ public final class FluidPipeScalingGameTests {
         BlockPos waterSink = start.east(3).north();
         h.setBlock(waterSink, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
 
-        FluidPipeBlockEntity first = h.getBlockEntity(start);
+        FluidPipeBlockEntity first = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, start);
         FluidPipeNetwork.build(h.getLevel(), first);
         for (int i = 0; i < 2; i++) {
-            FluidPipeBlockEntity pipe = h.getBlockEntity(start.east(i));
+            FluidPipeBlockEntity pipe = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, start.east(i));
             pipe.inlet(net.minecraft.core.Direction.NORTH).fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 10_000), IFluidHandler.FluidAction.EXECUTE);
         }
-        FluidPipeBlockEntity local = h.getBlockEntity(start.east(5));
+        FluidPipeBlockEntity local = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, start.east(5));
         local.inlet(net.minecraft.core.Direction.SOUTH).fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
-        CryogenicTurbineBlockEntity turbine = h.getBlockEntity(nitrogenSink);
-        MachineBlockEntity electrolyzer = h.getBlockEntity(waterSink);
+        CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, nitrogenSink);
+        MachineBlockEntity electrolyzer = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, waterSink);
         h.assertTrue(turbine.tank().getFluidInTank(0).getAmount() == 10_000, "Nitrogen exceeded or missed the copper pipe's budget");
         FluidStack water = electrolyzer.automationFluids().getFluidInTank(0);
         h.assertTrue(water.getFluid() == Fluids.WATER && water.getAmount() == 1000, "Local water route was skipped after trunk saturation");
@@ -80,15 +80,15 @@ public final class FluidPipeScalingGameTests {
                 blocks.add(pipe);
                 if (i < bank) {
                     h.setBlock(device, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-                    sources.add(h.getBlockEntity(device));
+                    sources.add(io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, device));
                 } else {
                     h.setBlock(device, SinguloBlocks.CRYOGENIC_TURBINE.get());
-                    CryogenicTurbineBlockEntity turbine = h.getBlockEntity(device);
+                    CryogenicTurbineBlockEntity turbine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, device);
                     sinks.add(turbine.tank());
                 }
                 blocks.add(device);
             }
-            FluidPipeBlockEntity first = h.getBlockEntity(base);
+            FluidPipeBlockEntity first = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, base);
             FluidPipeNetwork.build(h.getLevel(), first);
             FluidPipeNetwork network = FluidPipeNetwork.of(first);
             int charge = 10_000;

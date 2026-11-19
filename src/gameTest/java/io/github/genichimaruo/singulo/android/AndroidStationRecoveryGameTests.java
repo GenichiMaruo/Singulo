@@ -108,7 +108,7 @@ public final class AndroidStationRecoveryGameTests {
             legacy.remove("home_dimension");
             helper.setBlock(STATION, Blocks.AIR);
             helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
-            AndroidStationBlockEntity replacement = helper.getBlockEntity(STATION);
+            AndroidStationBlockEntity replacement = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, STATION);
             helper.assertTrue(old.isRemoved() && old.getBlockPos().equals(replacement.getBlockPos()), "元のステーションが同じ座標で交換されなかった");
             replacement.setOwner(guard.owner());
             replacement.items().setStackInSlot(AndroidStationBlockEntity.SLOT_MEMORY, item(AndroidKind.BLADE.memoryId(), 1));
@@ -116,7 +116,7 @@ public final class AndroidStationRecoveryGameTests {
             helper.assertTrue(!guard.orphan() && !replacement.manages(guard.getUUID()), "確認前にリンクが確定した");
         }).thenWaitUntil(() -> {
             var guard = guards[0];
-            AndroidStationBlockEntity replacement = helper.getBlockEntity(STATION);
+            AndroidStationBlockEntity replacement = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, STATION);
             helper.assertTrue(guard.orphan(), "撤去済みの旧ステーションにリンクしたまま");
             replacement.press(AndroidStationBlockEntity.BUTTON_LINK);
             helper.assertTrue(replacement.manages(guard.getUUID()) && replacement.getBlockPos().equals(guard.home()), "生きている護衛を再リンクできない");
@@ -126,7 +126,7 @@ public final class AndroidStationRecoveryGameTests {
 
     private static AndroidStationBlockEntity station(GameTestHelper helper) {
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
-        AndroidStationBlockEntity station = helper.getBlockEntity(STATION);
+        AndroidStationBlockEntity station = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, STATION);
         station.setOwner(UUID.randomUUID());
         station.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
         station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_MEMORY, item(AndroidKind.BLADE.memoryId(), 1));
@@ -139,7 +139,7 @@ public final class AndroidStationRecoveryGameTests {
         var guards = helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(station.getBlockPos()).inflate(8),
                 guard -> guard.isAlive() && station.manages(guard.getUUID()));
         helper.assertTrue(guards.size() == 1, "ステーションに護衛が1体いない");
-        var guard = guards.getFirst();
+        var guard = guards.get(0);
         guard.setNoAi(true);
         guard.setNoGravity(true);
         helper.assertTrue(guard.printed(), "護衛の印刷中");

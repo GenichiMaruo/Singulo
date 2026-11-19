@@ -6,7 +6,6 @@ import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import io.github.genichimaruo.singulo.test.harness.TestScope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -51,7 +50,7 @@ public final class CreativeFluidTrashGameTests {
     @GameTest(template = "empty")
     public static void trashItemDisposesFluidInContainerFillingSlots(GameTestHelper h) {
         var stack = new ItemStack(SinguloBlocks.CREATIVE_FLUID_TRASH.get());
-        stack.set(DataComponents.CUSTOM_NAME, Component.literal("Test bin"));
+        stack.setHoverName(Component.literal("Test bin"));
         var source = new FluidTank(64_000);
         source.fill(new FluidStack(Fluids.WATER, 54_321), FluidAction.EXECUTE);
         var simulated = FluidUtil.tryFillContainer(stack, source, Integer.MAX_VALUE, null, false);
@@ -67,7 +66,7 @@ public final class CreativeFluidTrashGameTests {
     @GameTest(template = "empty")
     public static void trashPlacementPreservesTankAndReturnsEmptyBucket(GameTestHelper h) {
         h.setBlock(CENTER, SinguloBlocks.FLUID_DRONE_PORT.get());
-        FluidDronePortBlockEntity port = h.getBlockEntity(CENTER);
+        FluidDronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CENTER);
         port.receiveTank().fill(new FluidStack(Fluids.LAVA, 5432), FluidAction.EXECUTE);
         var player = TestScope.player(h);
         player.setGameMode(GameType.SURVIVAL);
@@ -91,10 +90,10 @@ public final class CreativeFluidTrashGameTests {
     @GameTest(template = "empty", timeoutTicks = 100)
     public static void pumpAndPipeDisposeIntoCreativeTrash(GameTestHelper h) {
         h.setBlock(CENTER.north(), SinguloBlocks.FLUID_DRONE_PORT.get());
-        FluidDronePortBlockEntity source = h.getBlockEntity(CENTER.north());
+        FluidDronePortBlockEntity source = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CENTER.north());
         source.receiveTank().fill(new FluidStack(Fluids.LAVA, 23_456), FluidAction.EXECUTE);
         h.setBlock(CENTER, SinguloBlocks.FLUID_PUMP.get());
-        FluidPumpBlockEntity pump = h.getBlockEntity(CENTER);
+        FluidPumpBlockEntity pump = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CENTER);
         int[] spent = {0};
         h.setBlock(CENTER.east(), SinguloBlocks.FLUID_PIPE.get());
         h.setBlock(CENTER.east(2), SinguloBlocks.CREATIVE_FLUID_TRASH.get());

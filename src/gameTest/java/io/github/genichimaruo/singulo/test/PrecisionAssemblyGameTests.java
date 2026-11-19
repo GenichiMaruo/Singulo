@@ -38,7 +38,7 @@ public final class PrecisionAssemblyGameTests {
     private static MachineBlockEntity assembler(GameTestHelper h) {
         BlockPos pos = new BlockPos(2, 1, 2);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(TYPE).get());
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
     }
 
     /** Read the diagram independently of the machine's cell-index conversion. */
@@ -206,7 +206,7 @@ public final class PrecisionAssemblyGameTests {
         tick(h, machine, 7);
         h.assertTrue(machine.report().progress() == 7 && machine.energy().getEnergyStored() < before, "Board did not spend FE");
         var registry = h.getLevel().registryAccess();
-        var saved = machine.saveWithoutMetadata(registry);
+        var saved = machine.saveWithoutMetadata();
         machine.assemblyGrid().extractItem(9, 1, false);
         machine.loadWithComponents(saved, registry);
         for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
@@ -257,7 +257,7 @@ public final class PrecisionAssemblyGameTests {
             for (var stack : board) if (!stack.isEmpty()) stack.setCount(stack.getMaxStackSize());
             board.set(MachineRecipe.ASSEMBLY_CELLS, ItemStack.EMPTY);
             var diagnosis = MachineDiagnosis.idle(h.getLevel(), TYPE, board, List.of(), -1);
-            h.assertTrue(diagnosis.kind() == MachineDiagnosis.Kind.MISSING && diagnosis.lines().getFirst().equals(
+            h.assertTrue(diagnosis.kind() == MachineDiagnosis.Kind.MISSING && diagnosis.lines().get(0).equals(
                     net.minecraft.network.chat.Component.translatable("gui.singulo.reason.making", intended.result().getHoverName())),
                     "Missing catalyst was attributed to the wrong diagram for " + id + ": " + diagnosis.lines());
         }

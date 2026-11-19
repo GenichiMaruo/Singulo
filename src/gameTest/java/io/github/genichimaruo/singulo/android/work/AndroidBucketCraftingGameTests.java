@@ -62,8 +62,8 @@ public final class AndroidBucketCraftingGameTests {
         h.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         h.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(TABLE, Blocks.CRAFTING_TABLE);
-        WorkConsoleBlockEntity console = h.getBlockEntity(CONSOLE);
-        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, h.absolutePos(CONSOLE), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         rack.useItem(player, location, InteractionHand.MAIN_HAND);
@@ -82,7 +82,7 @@ public final class AndroidBucketCraftingGameTests {
         worker.fillTanks(new FluidStack(Fluids.LAVA, 750), false);
         h.assertTrue(console.preview(player, target, 1, false).ok(), "Console preview did not see an available worker's tank");
         h.assertTrue(console.start(player, target, 1, ids, null) == null, "Order refused the preloaded tank");
-        var order = console.orders().getFirst();
+        var order = console.orders().get(0);
         h.assertTrue(order.workers.size() == 1 && order.workers.contains(worker.getUUID()) && order.held.isEmpty(),
                 "The tank must stay with its assigned worker");
         h.assertTrue(console.start(player, target, 1, ids, null) != null, "Busy worker's fluid was reserved twice");
@@ -100,13 +100,13 @@ public final class AndroidBucketCraftingGameTests {
         }).thenExecute(() -> {
             console.outbox().clearContent();
             h.setBlock(CHEST, Blocks.CHEST);
-            ChestBlockEntity chest = h.getBlockEntity(CHEST);
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
             chest.setItem(0, new ItemStack(Items.LAVA_BUCKET));
             h.assertTrue(worker.fillTanks(lava.copyWithAmount(875), false) == 875
                     && worker.fillTanks(water.copyWithAmount(375), false) == 375, "Failed to prepare two onboard balances");
             h.assertTrue(console.start(player, target, 1, List.of(worker.getUUID()), null) == null, "Real-bucket order refused");
         }).thenWaitUntil(() -> {
-            ChestBlockEntity chest = h.getBlockEntity(CHEST);
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
             h.assertTrue(console.orders().isEmpty() && worker.workConsole() == null,
                     "Real-bucket order did not finish without an external tank: " + worker.state() + "/" + worker.stall());
             h.assertTrue(console.outbox().countItem(Items.MAGMA_BLOCK) + chest.countItem(Items.MAGMA_BLOCK) == 1
@@ -128,10 +128,10 @@ public final class AndroidBucketCraftingGameTests {
         h.setBlock(TANK, SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(TABLE, Blocks.CRAFTING_TABLE);
-        WorkConsoleBlockEntity console = h.getBlockEntity(CONSOLE);
-        ChestBlockEntity chest = h.getBlockEntity(CHEST);
-        FluidDronePortBlockEntity tank = h.getBlockEntity(TANK);
-        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
+        ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
+        FluidDronePortBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, TANK);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, h.absolutePos(CONSOLE), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         rack.useItem(player, location, InteractionHand.MAIN_HAND);
@@ -160,8 +160,8 @@ public final class AndroidBucketCraftingGameTests {
         level.addFreshEntity(worker);
         var error = console.start(player, recipe.output(), 3, List.of(worker.getUUID()), null);
         h.assertTrue(error == null, "Ordinary order rejected: " + error);
-        var saved = console.saveWithoutMetadata(level.registryAccess());
-        console.loadWithComponents(saved, level.registryAccess());
+        var saved = console.saveWithoutMetadata();
+        console.load(saved);
         h.succeedWhen(() -> {
             // The console automatically empties its outbox into the adjacent chest.
             h.assertTrue(console.outbox().countItem(Items.CRYING_OBSIDIAN) + chest.countItem(Items.CRYING_OBSIDIAN) == 3,
@@ -211,8 +211,8 @@ public final class AndroidBucketCraftingGameTests {
                 && !worker.carryEmpty(), "Shared cargo must remain distinct from retained fluid of the same type");
         h.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         h.setBlock(TANK, SinguloBlocks.FLUID_DRONE_PORT.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(CONSOLE);
-        FluidDronePortBlockEntity tank = h.getBlockEntity(TANK);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
+        FluidDronePortBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, TANK);
         h.assertTrue(console.depositAt(worker, null, h.absolutePos(CONSOLE)) && worker.carryEmpty()
                 && tank.sendTank().getFluidAmount() == 500 && worker.tankAmount(lava) == capacity,
                 "Return moved fluid belonging to the worker");
@@ -241,7 +241,7 @@ public final class AndroidBucketCraftingGameTests {
         h.setBlock(TABLE, Blocks.CRAFTING_TABLE);
         h.assertTrue(!(boolean) craft.invoke(goal, level, null, null, at, recipe)
                 && worker.tankAmount(fluid) == 999, "Partial tank consumed on failure");
-        worker.fillTanks(fluid.copyWithAmount(1), false);
+        worker.fillTanks(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, 1), false);
         h.assertTrue(!(boolean) craft.invoke(goal, level, null, null, at, recipe)
                         && worker.tankAmount(fluid) == 1000 && worker.inventory().getItem(slots[0]).getCount() == 2,
                 "Blocked output consumed a material");

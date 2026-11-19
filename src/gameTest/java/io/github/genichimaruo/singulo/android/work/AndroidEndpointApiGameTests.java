@@ -54,20 +54,20 @@ public final class AndroidEndpointApiGameTests {
         helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
         helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
         var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
-            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = (io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity) helper.getBlockEntity(p);
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = (io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, p);
             b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         ItemStack table = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
                 net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = (io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity) helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = (io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, RACK);
         java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
@@ -76,7 +76,7 @@ public final class AndroidEndpointApiGameTests {
         rack.items().setStackInSlot(0, table);
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
-        return (WorkConsoleBlockEntity) helper.getBlockEntity(CONSOLE);
+        return (WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONSOLE);
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
@@ -125,13 +125,13 @@ public final class AndroidEndpointApiGameTests {
         link(h, console);
         var source = new BlockPos(5, 1, 3);
         h.setBlock(source, Blocks.BARREL);
-        net.minecraft.world.level.block.entity.BarrelBlockEntity barrel = h.getBlockEntity(source);
+        net.minecraft.world.level.block.entity.BarrelBlockEntity barrel = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, source);
         var target = new ItemStack(Items.AMETHYST_SHARD, 3);
         barrel.setItem(0, target.copy());
         var take = new ProcedureStep(ProcedureStep.EXTRACT, barrel.getBlockPos(), null, target).recordedIn(h.getLevel());
         var card = new ItemStack(item("recipe_card"));
         RecipeData.procedure(List.of(take), target).write(card, h.getLevel().registryAccess());
-        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         rack.items().setStackInSlot(3, card);
         var id = UUID.randomUUID();
         var receipt = AndroidOrders.submit(h.getLevel(), console.getBlockPos(), console.owner(), id, target, 3, List.of(), endpoint.getBlockPos());
@@ -158,7 +158,7 @@ public final class AndroidEndpointApiGameTests {
         var machinePos = new BlockPos(5, 1, 3);
         var block = SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.ELECTROLYZER).get();
         h.setBlock(machinePos, block);
-        io.github.genichimaruo.singulo.machine.MachineBlockEntity machine = h.getBlockEntity(machinePos);
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, machinePos);
         machine.energy().setEnergy(10000);
         var location = new ItemStack(item("work_location_card"));
         WorkLocationCardItem.record(location, level, machine.getBlockPos(), block);
@@ -166,7 +166,7 @@ public final class AndroidEndpointApiGameTests {
         var hydrogen = FluidSamples.of(new FluidStack(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"), 200));
         var card = new ItemStack(item("recipe_card"));
         RecipeData.processing(List.of(water), hydrogen, List.of(), ItemStack.EMPTY).write(card, level.registryAccess());
-        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         rack.items().setStackInSlot(RecipeRackBlockEntity.COLS, location);
         rack.items().setStackInSlot(RecipeRackBlockEntity.COLS + 1, card);
         var id = UUID.randomUUID();
@@ -267,10 +267,10 @@ public final class AndroidEndpointApiGameTests {
                 == AndroidWorkEndpoints.Result.REJECTED, "A different multipart face granted access");
         h.assertTrue(AndroidWorkEndpoints.link(h.getLevel(), c.getBlockPos(), c.owner(), e.getBlockPos(), Direction.UP)
                 == AndroidWorkEndpoints.Result.LINKED, "Face-specific capability was not linked");
-        var saved = c.saveWithoutMetadata(h.getLevel().registryAccess());
+        var saved = c.saveWithoutMetadata();
         h.assertTrue(saved.getList("work_endpoints_v1", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0).getString("face").equals("up"),
                 "Missing endpoint face in saved link");
-        c.loadWithComponents(saved, h.getLevel().registryAccess());
+        c.load(saved);
         h.assertTrue(c.workEndpoint(e.getBlockPos()) == e, "Sided endpoint did not survive reload");
         h.assertTrue(AndroidWorkEndpoints.link(h.getLevel(),c.getBlockPos(),UUID.randomUUID(),e.getBlockPos())==AndroidWorkEndpoints.Result.REJECTED,"Foreign actor linked");
         e.owner=UUID.randomUUID();
@@ -316,7 +316,7 @@ public final class AndroidEndpointApiGameTests {
     }
     @GameTest(template="empty",timeoutTicks=2400)
     public static void actualEndpointCraftWaitsForSpaceAndDeliversExactlyOnce(GameTestHelper h) {
-        var c=setup(h,true); ChestBlockEntity shared=(ChestBlockEntity) h.getBlockEntity(CHEST); shared.clearContent();
+        var c=setup(h,true); ChestBlockEntity shared=(ChestBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST); shared.clearContent();
         var e=endpoint(h,c.owner()); e.supply.setStackInSlot(0,new ItemStack(Items.OAK_LOG,32));
         e.delivery.setStackInSlot(0,new ItemStack(Items.STICK,60)); link(h,c);
         var id=UUID.randomUUID(); var first=submit(h,c,id);
@@ -355,10 +355,10 @@ public final class AndroidEndpointApiGameTests {
         grid.set(0, new ItemStack(Items.LAVA_BUCKET));
         grid.set(1, new ItemStack(Items.OBSIDIAN));
         var target = new ItemStack(Items.CRYING_OBSIDIAN);
-        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         rack.items().setStackInSlot(3, recipeCard(h, grid, target));
         h.setBlock(SUPPLY.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
-        io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity tank = h.getBlockEntity(SUPPLY.east());
+        io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, SUPPLY.east());
         tank.receiveTank().setFluid(new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000));
         endpoint.supply.setStackInSlot(0, new ItemStack(Items.OBSIDIAN));
         var denied = AndroidOrders.submitFromEndpoint(h.getLevel(), console.getBlockPos(), console.owner(), UUID.randomUUID(),

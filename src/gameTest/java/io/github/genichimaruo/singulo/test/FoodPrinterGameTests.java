@@ -63,7 +63,7 @@ public final class FoodPrinterGameTests {
     @GameTest(template = "empty", timeoutTicks = 100)
     public static void foodPrinterTurnsIngredientsIntoPaste(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.FOOD_PRINTER.get());
-        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) h.getBlockEntity(AT);
+        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var items = printer.items();
         printer.togglePower();
         h.assertTrue(FoodPaste.kindOf(new ItemStack(Items.COOKED_BEEF)) == FoodPaste.PROTEIN, "Beef is not protein");
@@ -111,7 +111,7 @@ public final class FoodPrinterGameTests {
     @GameTest(template = "empty", timeoutTicks = 900)
     public static void foodPrinterPrintsWithPasteAndPower(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.FOOD_PRINTER.get());
-        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) h.getBlockEntity(AT);
+        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var items = printer.items();
         PrintedFood steak = PrintedFood.PRINTED_STEAK;
         items.setStackInSlot(FoodPrinterBlockEntity.CARTRIDGE + FoodPaste.PROTEIN, cartridge(FoodPaste.PROTEIN, 2 * steak.cost(FoodPaste.PROTEIN)));
@@ -151,7 +151,7 @@ public final class FoodPrinterGameTests {
     @GameTest(template = "empty", timeoutTicks = 200)
     public static void foodPrinterRefillsWhatIsShort(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.FOOD_PRINTER.get());
-        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) h.getBlockEntity(AT);
+        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var items = printer.items();
         printer.togglePower();
         PrintedFood cake = PrintedFood.HONEYCOMB_CAKE;
@@ -194,7 +194,7 @@ public final class FoodPrinterGameTests {
     @GameTest(template = "empty", timeoutTicks = 40)
     public static void foodPrinterAutomationAndBreakingKeepPaste(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.FOOD_PRINTER.get());
-        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) h.getBlockEntity(AT);
+        FoodPrinterBlockEntity printer = (FoodPrinterBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var automation = printer.automation();
         h.assertTrue(automation.insertItem(FoodPrinterBlockEntity.CARTRIDGE + FoodPaste.SWEET, cartridge(FoodPaste.SWEET, 20), false).isEmpty(),
                 "Automation could not insert a cartridge");
@@ -206,7 +206,7 @@ public final class FoodPrinterGameTests {
         // 隣の作業指令台は、取り出せる印刷した食品だけを在庫に数える（取り出せないカートリッジ・食材は数えない）
         printer.items().setStackInSlot(FoodPrinterBlockEntity.INGREDIENT + FoodPaste.SWEET, new ItemStack(Items.APPLE, 5));
         h.setBlock(AT.west(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) h.getBlockEntity(AT.west());
+        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT.west());
         var stock = console.stock();
         h.assertTrue(stock.size() == 1 && stock.get(0).item.is(PrintedFood.FRUIT_GEL_CUBE.item()) && stock.get(0).count == 3,
                 "Work console counted items it cannot take out: " + stock.stream().map(c -> c.item + " x" + c.count).toList());

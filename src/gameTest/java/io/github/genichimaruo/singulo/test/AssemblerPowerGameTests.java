@@ -57,7 +57,7 @@ public final class AssemblerPowerGameTests {
         machine.items().setStackInSlot(machine.type().catalystSlot(), lastUse);
         machine.energy().setEnergy(machine.type().energyCapacity());
         var registries = h.getLevel().registryAccess();
-        machine.loadWithComponents(machine.saveWithoutMetadata(registries), registries);
+        machine.load(machine.saveWithoutMetadata());
         tick(h, machine, recipe.time());
         var shell = machine.automationItems().extractItem(machine.type().spentCatalystSlot(), 64, false);
         h.assertTrue(ItemStack.matches(machine.items().getStackInSlot(machine.type().outputSlot()), recipe.result())
@@ -143,7 +143,7 @@ public final class AssemblerPowerGameTests {
                 && UsesHelper.remaining(machine.magazine().loaded()) == cost,
                 "Full spent output consumed energy or catalyst lifespan");
         var registry = h.getLevel().registryAccess();
-        machine.loadWithComponents(machine.saveWithoutMetadata(registry), registry);
+        machine.loadWithComponents(machine.saveWithoutMetadata(), registry);
         h.assertTrue(ItemStack.matches(machine.automationItems().extractItem(spentSlot, 1, false), shell), "Spent shell could not be extracted");
         tick(h, machine, recipe.time());
         h.assertTrue(ItemStack.matches(machine.items().getStackInSlot(machine.type().outputSlot()), recipe.result())
@@ -156,7 +156,7 @@ public final class AssemblerPowerGameTests {
     public static void assemblerRecoversLegacyInputsAndDropsAllRemainingContents(GameTestHelper h) {
         var machine = assembler(h);
         var registry = h.getLevel().registryAccess();
-        var legacy = machine.saveWithoutMetadata(registry);
+        var legacy = machine.saveWithoutMetadata();
         legacy.remove("slot_layout");
         legacy.remove("assembly_grid");
         legacy.putInt("energy", machine.type().energyCapacity());
@@ -192,7 +192,7 @@ public final class AssemblerPowerGameTests {
         inventory.setItem(0, new ItemStack(Items.DIAMOND, 63));
         machine.createMenu(1, inventory, player);
         h.assertTrue(inventory.getItem(0).getCount() == 64, "Opening did not recover the one legacy item that fit");
-        machine.loadWithComponents(machine.saveWithoutMetadata(registry), registry);
+        machine.loadWithComponents(machine.saveWithoutMetadata(), registry);
         inventory.setItem(1, ItemStack.EMPTY);
         machine.createMenu(2, inventory, player);
         machine.createMenu(3, inventory, player);

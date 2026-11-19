@@ -85,7 +85,7 @@ public final class CapacityUpgradeGameTests {
         old.setStackInSlot(0, new ItemStack(Items.IRON_INGOT, 7));
         tag.put("items", old.serializeNBT(h.getLevel().registryAccess()));
         tag.putIntArray("slot_layout", new int[]{6, 1});
-        restored.loadWithComponents(tag, h.getLevel().registryAccess());
+        restored.load(tag);
         restored.recoverLegacyAssemblyInputs(player);
         h.assertTrue(restored.hasOverclock() && player.getInventory().countItem(Items.IRON_INGOT) == 7
                 && restored.items().getStackInSlot(machine.type().outputSlot()).isEmpty()

@@ -24,7 +24,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class AndroidLiquidSupplyGameTests {
     private static SupplyPortBlockEntity supply(GameTestHelper h, BlockPos pos, WorkConsoleBlockEntity console) {
         h.setBlock(pos, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
-        SupplyPortBlockEntity port = h.getBlockEntity(pos);
+        SupplyPortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         port.setConsole(console.getBlockPos());
         console.addLink(port.getBlockPos());
         return port;
@@ -32,7 +32,7 @@ public final class AndroidLiquidSupplyGameTests {
 
     private static MachineBlockEntity tank(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity machine = h.getBlockEntity(pos);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         machine.forceOutputTankForTest(new FluidStack(Fluids.LAVA, 1000));
         return machine;
     }
@@ -41,7 +41,7 @@ public final class AndroidLiquidSupplyGameTests {
     public static void sharedTankFacesAndReservations(GameTestHelper h) {
         BlockPos shared = new BlockPos(1, 2, 1), other = new BlockPos(4, 2, 1);
         h.setBlock(shared.below(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(shared.below());
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, shared.below());
         var secondPoint = supply(h, shared.above(), console);
         var thirdPoint = supply(h, other.below(), console);
         var sharedTank = tank(h, shared);

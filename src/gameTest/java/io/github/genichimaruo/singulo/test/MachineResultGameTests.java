@@ -13,7 +13,6 @@ import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -35,13 +34,13 @@ public final class MachineResultGameTests {
     private static MachineBlockEntity place(GameTestHelper h, MachineType type, int x) {
         BlockPos pos = new BlockPos(x, 1, 1);
         h.setBlock(pos, SinguloBlocks.MACHINES.get(type).get());
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
     }
 
     private static MachineBlockEntity reload(GameTestHelper h, MachineBlockEntity original, int x) {
         var registries = h.getLevel().registryAccess();
         var restored = place(h, original.type(), x);
-        restored.loadWithComponents(original.saveWithoutMetadata(registries), registries);
+        restored.load(original.saveWithoutMetadata());
         return restored;
     }
 
@@ -86,7 +85,7 @@ public final class MachineResultGameTests {
         List<ItemStack> set = List.of(stack("android_memory_blade", 1), stack("android_kit", 2),
                 stack("android_repair_kit", 10), stack("android_armor_plate", 1));
         PortableAndroidPrinterItem.setContents(mk1, set);
-        mk1.set(DataComponents.CUSTOM_NAME, Component.literal("Field printer"));
+        mk1.setHoverName(Component.literal("Field printer"));
         mk1.set(SinguloComponents.ENERGY.get(), 240_000); // surplus charge after changing a gunner memory
         List<ItemStack> inputs = List.of(stack("quantum_computing_module", 1), stack("entangled_element", 2),
                 mk1, stack("superconducting_coil", 2), stack("white_ceramic_composite", 4), stack("steel_plate", 2));

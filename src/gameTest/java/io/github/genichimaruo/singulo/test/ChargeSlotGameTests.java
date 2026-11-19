@@ -45,7 +45,7 @@ public final class ChargeSlotGameTests {
 
     private static SmesCellBlockEntity module(GameTestHelper h, BlockPos pos, Direction facing) {
         h.setBlock(pos, SinguloBlocks.SMES_MODULE.get().defaultBlockState().setValue(AbstractMachineBlock.FACING, facing));
-        return h.getBlockEntity(pos);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
     }
 
     @GameTest(template = "empty")
@@ -74,7 +74,7 @@ public final class ChargeSlotGameTests {
     @GameTest(template = "empty", timeoutTicks = 60)
     public static void smesChargesItemsInItsChargeSlots(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.SMES_CELL.get());
-        SmesCellBlockEntity smes = (SmesCellBlockEntity) h.getBlockEntity(AT);
+        SmesCellBlockEntity smes = (SmesCellBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         smes.energy().setEnergy(1_000_000);
         var slots = smes.chargeSlots();
         var automation = smes.chargeAutomation();

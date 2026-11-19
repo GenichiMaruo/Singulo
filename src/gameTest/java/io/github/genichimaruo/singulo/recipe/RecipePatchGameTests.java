@@ -84,14 +84,14 @@ public final class RecipePatchGameTests {
             manager.load(pack(base), pack(example));
             var steel = manager.machine(STEEL);
             h.assertTrue(steel.time() == 60 && steel.energy() == 60 && steel.result().getCount() == 3
-                    && steel.fluidIngredients().getFirst().amount() == 125 && steel.ingredients().getFirst().count() == 2,
+                    && steel.fluidIngredients().get(0).amount() == 125 && steel.ingredients().get(0).count() == 2,
                     "Example patch lost a field or did not reach the machine recipe");
             h.assertTrue(manager.machine(FRAME).shape().equals(List.of("     ", "  B  ", " ADA ", "  A  ", "     ")),
                     "Precision assembly row override failed");
             var crafting = (ShapedRecipe) manager.byKey(UPGRADE).orElseThrow().value();
             h.assertTrue(crafting.getIngredients().get(4).test(Items.DIAMOND.getDefaultInstance()), "Vanilla crafting key was not patched");
             manager.load(pack(base));
-            h.assertTrue(manager.machine(STEEL).fluidIngredients().getFirst().amount() == 250 && manager.machine(STEEL).result().getCount() == 2,
+            h.assertTrue(manager.machine(STEEL).fluidIngredients().get(0).amount() == 250 && manager.machine(STEEL).result().getCount() == 2,
                     "Removing the example pack did not restore the original on reload");
             var message = new AtomicReference<Component>();
             var server = h.getLevel().getServer();
@@ -102,7 +102,7 @@ public final class RecipePatchGameTests {
                 public boolean shouldInformAdmins() { return false; }
             });
             server.getCommands().getDispatcher().execute("singulo recipe show " + STEEL, source);
-            var file = message.get().getSiblings().getFirst();
+            var file = message.get().getSiblings().get(0);
             var copy = file.getStyle().getClickEvent();
             h.assertTrue(file.getString().equals("data/singulo/recipe/" + STEEL.getPath() + ".json")
                     && copy != null && copy.getAction() == ClickEvent.Action.COPY_TO_CLIPBOARD
@@ -146,7 +146,7 @@ public final class RecipePatchGameTests {
                 h.assertTrue(pack != null && pack.getPackSource().shouldAddAutomatically() && pack.getDefaultPosition() == Pack.Position.TOP
                         && !pack.isRequired(), "Modpack recipes must be enabled by default and overridable per world");
                 repository.setSelected(List.of(id));
-                manager.load(pack(base), repository.openAllSelected().getFirst());
+                manager.load(pack(base), repository.openAllSelected().get(0));
                 h.assertTrue(manager.machine(STEEL).time() == 30, "Config pack did not apply to the underlying recipe");
             }
             repository.setSelected(List.of());
@@ -177,7 +177,7 @@ public final class RecipePatchGameTests {
             manager.load(pack(base), pack(lower), pack(upper));
             var steel = manager.machine(STEEL);
             h.assertTrue(steel.time() == 15 && steel.energy() == 30 && steel.fluidIngredients().isEmpty()
-                    && steel.ingredients().getFirst().ingredient().test(Items.DIAMOND.getDefaultInstance()), "Patch priority, removal or ingredient replacement failed");
+                    && steel.ingredients().get(0).ingredient().test(Items.DIAMOND.getDefaultInstance()), "Patch priority, removal or ingredient replacement failed");
             // A normal higher-priority file replaces both the recipe and the earlier patch.
             Files.writeString(path(upper, STEEL), original.toString());
             manager.load(pack(base), pack(lower), pack(upper));

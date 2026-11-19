@@ -36,7 +36,7 @@ public final class DyeStationGameTests {
     @GameTest(template = "empty", timeoutTicks = 60)
     public static void dyeStationTurnsDyesIntoInkAndDyes(GameTestHelper h) {
         h.setBlock(AT, SinguloBlocks.RGB_DYE_STATION.get());
-        RgbDyeStationBlockEntity station = (RgbDyeStationBlockEntity) h.getBlockEntity(AT);
+        RgbDyeStationBlockEntity station = (RgbDyeStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
         var items = station.items();
         h.assertFalse(RgbDyeStationBlockEntity.accepts(RgbDyeStationBlockEntity.RED, new ItemStack(Items.BLUE_DYE)), "Red slot accepted blue dye");
         h.assertFalse(RgbDyeStationBlockEntity.accepts(RgbDyeStationBlockEntity.TARGET, new ItemStack(Items.STONE)), "Target accepted stone");

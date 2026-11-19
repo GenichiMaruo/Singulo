@@ -56,7 +56,7 @@ public final class GalaxyTraitsGameTests {
         for (BlockPos p : GenesisCoreBlockEntity.PYLONS) {
             h.setBlock(CORE.offset(p), SinguloBlocks.SIMPLE.get("genesis_pylon").get());
         }
-        GenesisCoreBlockEntity core = h.getBlockEntity(CORE);
+        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CORE);
         ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);   // 仮のプレイヤーはクリエイティブで、素材が減らない
         h.runAfterDelay(60, () -> {
@@ -84,7 +84,7 @@ public final class GalaxyTraitsGameTests {
             ItemStack seed = new ItemStack(GenesisCoreBlockEntity.primordialSeed(), 2);
             h.assertTrue(core.useItem(player, seed) && seed.getCount() == 1, "A finished engine refuses another seed");
             h.assertTrue(core.stage() == GenesisCoreBlockEntity.KINDLING && core.galaxyTraits() == 0, "The next galaxy did not restart");
-            CompoundTag tag = core.saveWithoutMetadata(h.getLevel().registryAccess());
+            CompoundTag tag = core.saveWithoutMetadata();
             h.assertTrue(tag.getBoolean("reborn"), "The engine does not remember that it was reborn");
             h.succeed();
         });

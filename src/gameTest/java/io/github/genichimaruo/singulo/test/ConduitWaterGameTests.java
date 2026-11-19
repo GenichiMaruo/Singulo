@@ -46,7 +46,7 @@ public final class ConduitWaterGameTests {
     @GameTest(template = "empty")
     public static void everyConduitKeepsWaterThroughBucketsAndRemoval(GameTestHelper h) {
         var level = h.getLevel();
-        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        var player = h.makeMockSurvivalPlayer();
         var at = new BlockPos(3, 2, 3);
         var pos = h.absolutePos(at);
         for (Block block : List.of(SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(),
@@ -73,13 +73,13 @@ public final class ConduitWaterGameTests {
     @GameTest(template = "empty", timeoutTicks = 100)
     public static void underwaterCablePowersPumpAndPipeCarriesOnlyLava(GameTestHelper h) {
         BlockPos pump = new BlockPos(4, 2, 4);
-        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        var player = h.makeMockSurvivalPlayer();
         h.setBlock(pump, SinguloBlocks.FLUID_PUMP.get());
         h.setBlock(pump.north(), SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(pump.east(3), SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(pump.west(3), SinguloBlocks.SMES_MODULE.get().defaultBlockState().setValue(AbstractMachineBlock.FACING, Direction.EAST));
-        SmesCellBlockEntity battery = h.getBlockEntity(pump.west(3));
-        FluidDronePortBlockEntity source = h.getBlockEntity(pump.north()), sink = h.getBlockEntity(pump.east(3));
+        SmesCellBlockEntity battery = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pump.west(3));
+        FluidDronePortBlockEntity source = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pump.north()), sink = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pump.east(3));
         var lava = new FluidStack(Fluids.LAVA, 1000);
         source.receiveTank().fill(lava, FluidAction.EXECUTE);
         placeUnderwater(h, pump.west(2), SinguloBlocks.HORIZON_BUS.get(), player);

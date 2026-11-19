@@ -185,7 +185,7 @@ public final class BalanceRevisionGameTests {
         var from = new BlockPos(2, 1, 2);
         var to = new BlockPos(5, 1, 2);
         h.setBlock(from, SinguloBlocks.SMES_CELL.get());
-        SmesCellBlockEntity cell = h.getBlockEntity(from);
+        SmesCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, from);
         var charging = item("neutrino_scanner");
         var charged = item("neutrino_scanner");
         io.github.genichimaruo.singulo.item.NeutrinoScannerItem.energy(charging).receiveEnergy(175, false);
@@ -215,7 +215,7 @@ public final class BalanceRevisionGameTests {
         var target = h.absolutePos(to);
         var place = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
         ((BlockItem) module.getItem()).place(new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, place)));
-        SmesCellBlockEntity restored = h.getBlockEntity(to);
+        SmesCellBlockEntity restored = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, to);
         h.assertTrue(restored.energy().getEnergyStored() == 1_000_000, "Packed cell lost stored energy");
         h.assertTrue(ItemStack.matches(charging, restored.chargeSlots().getStackInSlot(SmesCellBlockEntity.CHARGE_IN))
                         && ItemStack.matches(charged, restored.chargeSlots().getStackInSlot(SmesCellBlockEntity.CHARGE_OUT)),

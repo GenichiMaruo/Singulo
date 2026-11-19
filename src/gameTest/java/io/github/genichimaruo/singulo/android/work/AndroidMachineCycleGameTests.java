@@ -21,7 +21,6 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Blocks;
 import io.github.genichimaruo.singulo.compat.Capabilities;
 import net.minecraftforge.gametest.GameTestHolder;
@@ -37,7 +36,7 @@ public final class AndroidMachineCycleGameTests {
         var pos = h.absolutePos(new BlockPos(5, 2, 10));
         var consolePos = new BlockPos(2, 1, 1);
         h.setBlock(consolePos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = h.getBlockEntity(consolePos);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, consolePos);
         console.encoder().setItem(WorkConsoleBlockEntity.CARD, new ItemStack(SinguloItems.RECIPE_CARD.get()));
         var all = RecipeTweaks.adjustAll(level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()));
         var failures = new ArrayList<String>();
@@ -54,9 +53,9 @@ public final class AndroidMachineCycleGameTests {
             }
             structure.forEach(level::setBlockAndUpdate);
             var machine = (MachineBlockEntity) level.getBlockEntity(pos);
-            var empty = machine.saveWithoutMetadata(level.registryAccess());
+            var empty = machine.saveWithoutMetadata();
             for (var recipe : recipes) {
-                machine.loadWithComponents(empty, level.registryAccess());
+                machine.load(empty);
                 try {
                     cycle(h, console, machine, recipe);
                     checked++;
@@ -64,7 +63,7 @@ public final class AndroidMachineCycleGameTests {
                     failures.add(recipe.id() + " " + failure.getMessage());
                 }
             }
-            machine.loadWithComponents(empty, level.registryAccess());
+            machine.load(empty);
             for (var part : structure.keySet()) level.setBlockAndUpdate(part, Blocks.AIR.defaultBlockState());
         }
         h.assertTrue(failures.isEmpty(), checked + " cycles passed. Failed: " + String.join(", ", failures));
@@ -72,7 +71,7 @@ public final class AndroidMachineCycleGameTests {
         h.succeed();
     }
 
-    private static void cycle(GameTestHelper h, WorkConsoleBlockEntity console, MachineBlockEntity machine, RecipeHolder<MachineRecipe> holder) {
+    private static void cycle(GameTestHelper h, WorkConsoleBlockEntity console, MachineBlockEntity machine, MachineRecipe holder) {
         var level = h.getLevel();
         var recipe = holder.value();
         var pos = machine.getBlockPos();
@@ -114,7 +113,7 @@ public final class AndroidMachineCycleGameTests {
             if (tick > 12 && machine.status() != MachineBlockEntity.Status.RUNNING
                     && machine.status() != MachineBlockEntity.Status.NO_POWER) break;
         }
-        String ran = machine.saveWithoutMetadata(level.registryAccess()).getString("recipe");
+        String ran = machine.saveWithoutMetadata().getString("recipe");
         if (!finished || !holder.id().toString().equals(ran)) {
             throw new IllegalStateException("active=" + ran + ", status=" + machine.status() + ", size=" + machine.structureSize());
         }
