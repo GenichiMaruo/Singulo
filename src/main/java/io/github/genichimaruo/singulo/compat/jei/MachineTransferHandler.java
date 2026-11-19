@@ -57,12 +57,11 @@ final class MachineTransferHandler implements IRecipeTransferHandler<MachineMenu
                 && io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(player.level(), menu.type(), id) < 0) {
             return helper.createInternalError();
         }
-        boolean bulk = maxTransfer && menu.type() != MachineType.PRECISION_ASSEMBLER;
-        if (MachineRecipeTransfer.plan(menu, recipe, bulk) == null) {
+        if (MachineRecipeTransfer.plan(menu, recipe, maxTransfer) == null) {
             return helper.createUserErrorWithTooltip(Component.translatable("jei.tooltip.error.recipe.transfer.missing")
                     .append(" / ").append(Component.translatable("jei.tooltip.error.recipe.transfer.inventory.full")));
         }
-        if (doTransfer) PacketDistributor.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, bulk));
+        if (doTransfer) PacketDistributor.sendToServer(new MachineRecipeTransferPayload(menu.containerId, id, maxTransfer));
         return null;
     }
 }

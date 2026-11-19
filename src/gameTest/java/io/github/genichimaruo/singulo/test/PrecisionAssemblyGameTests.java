@@ -142,7 +142,11 @@ public final class PrecisionAssemblyGameTests {
         board.set(0, ItemStack.EMPTY);
         java.util.Collections.swap(board, glass, bucket);
         board.set(glass, board.get(glass).copyWithCount(2));
-        h.assertTrue(recipe.assemblyPlan(board) == null && legacy.assemblyPlan(board) == null, "Overfilled board cell was accepted");
+        h.assertTrue(recipe.assemblyPlan(board).consume()[glass] == 1 && legacy.assemblyPlan(board).consume()[glass] == 1,
+                "Stacked glass did not pay one part per occupied cell");
+        board.set(6, ItemStack.EMPTY);
+        h.assertTrue(recipe.assemblyPlan(board) == null && legacy.assemblyPlan(board) == null,
+                "Extra glass in one cell substituted for a missing cell");
         h.succeed();
     }
 
@@ -151,8 +155,10 @@ public final class PrecisionAssemblyGameTests {
         var machine = assembler(h);
         var recipe = recipe(h, "android_tank_upgrade");
         var board = parts(h, recipe);
+        for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
+            if (!board.get(i).isEmpty()) board.get(i).setCount(i == 4 ? 3 : 2);
         loadBoard(machine, board);
-        var glass = machine.assemblyGrid().extractItem(4, 1, false);
+        var glass = machine.assemblyGrid().extractItem(4, 3, false);
         h.assertTrue(!glass.isEmpty(), "Tank diagram has no glass in its upper left");
         var refused = machine.automationItems().insertItem(0, glass.copy(), false);
         h.assertTrue(ItemStack.matches(refused, glass), "Automation accepted a board part");
@@ -171,7 +177,25 @@ public final class PrecisionAssemblyGameTests {
         for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
             h.assertTrue(ItemStack.matches(machine.assemblyGrid().getStackInSlot(i), board.get(i)), "Lost manual cell on load: " + i);
         tick(h, machine, recipe.time() - 7);
-        assertProduct(h, machine, recipe);
+        var product = machine.items().getStackInSlot(TYPE.outputSlot());
+        h.assertTrue(ItemStack.matches(product, recipe.result()), "First product missing");
+        var full = product.copyWithCount(product.getMaxStackSize());
+        machine.items().setStackInSlot(TYPE.outputSlot(), full.copy());
+        int energy = machine.energy().getEnergyStored();
+        tick(h, machine, recipe.time());
+        h.assertTrue(machine.energy().getEnergyStored() == energy
+                        && ItemStack.matches(machine.items().extractItem(TYPE.outputSlot(), full.getCount(), false), full),
+                "A full output spent energy or changed its contents");
+        for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(i).getCount() == Math.max(0, board.get(i).getCount() - 1),
+                    "First craft consumed the wrong number of parts at " + i);
+        tick(h, machine, recipe.time());
+        h.assertTrue(ItemStack.matches(machine.items().extractItem(TYPE.outputSlot(), 64, false), recipe.result()), "Second product missing");
+        tick(h, machine, recipe.time());
+        h.assertTrue(machine.items().getStackInSlot(TYPE.outputSlot()).isEmpty() && machine.report().progress() == 0,
+                "Incomplete third batch started");
+        for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(i).getCount() == (i == 4 ? 1 : 0), "Incorrect surplus at " + i);
         h.succeed();
     }
 
@@ -195,6 +219,7 @@ public final class PrecisionAssemblyGameTests {
         for (var id : List.of("degenerate_furnace_frame", "degenerate_compactor_frame", "casimir_cavity_mirror_plate_pair")) {
             var intended = recipe(h, id);
             var board = parts(h, intended);
+            for (var stack : board) if (!stack.isEmpty()) stack.setCount(stack.getMaxStackSize());
             board.set(MachineRecipe.ASSEMBLY_CELLS, ItemStack.EMPTY);
             var diagnosis = MachineDiagnosis.idle(h.getLevel(), TYPE, board, List.of(), -1);
             h.assertTrue(diagnosis.kind() == MachineDiagnosis.Kind.MISSING && diagnosis.lines().getFirst().equals(

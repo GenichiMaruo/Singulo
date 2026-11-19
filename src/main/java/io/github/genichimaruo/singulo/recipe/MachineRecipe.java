@@ -284,11 +284,11 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public Plan assemblyPlan(List<ItemStack> boardWithCatalyst) {
         if (boardWithCatalyst.size() != ASSEMBLY_CELLS + 1) return null;
         if (!hasAssemblyShape()) {
-            Plan shapeless = plan(boardWithCatalyst);
+            Plan shapeless = unorderedAssemblyPlan(boardWithCatalyst);
             if (shapeless == null) return null;
             for (int i = 0; i < ASSEMBLY_CELLS; i++) {
                 ItemStack stack = boardWithCatalyst.get(i);
-                if (stack.getCount() > 1 || !stack.isEmpty() && shapeless.consume[i] == 0 && shapeless.uses[i] == 0) return null;
+                if (!stack.isEmpty() && shapeless.consume[i] == 0 && shapeless.uses[i] == 0) return null;
             }
             return shapeless;
         }
@@ -314,7 +314,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
         for (int i = 0; i < ASSEMBLY_CELLS; i++) {
             ItemInput part = assemblyInput(i);
             ItemStack stack = board.get(i);
-            if (part == null ? !stack.isEmpty() : stack.getCount() != 1 || !part.ingredient.test(stack)) return false;
+            if (part == null ? !stack.isEmpty() : stack.isEmpty() || !part.ingredient.test(stack)) return false;
         }
         return true;
     }
@@ -326,13 +326,25 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
     public Plan plan(List<ItemStack> slots) {
+        return plan(slots, false);
+    }
+
+    /** Each occupied material cell supplies one part per craft, even when it holds a stack. */
+    @Nullable
+    public Plan unorderedAssemblyPlan(List<ItemStack> slots) {
+        return plan(slots, true);
+    }
+
+    @Nullable
+    private Plan plan(List<ItemStack> slots, boolean assemblyBoard) {
         int n = slots.size();
         int[] left = new int[n];
         int[] consume = new int[n];
         int[] uses = new int[n];
         boolean[] claimed = new boolean[n];
         for (int i = 0; i < n; i++) {
-            left[i] = slots.get(i).getCount();
+            int count = slots.get(i).getCount();
+            left[i] = assemblyBoard && i < ASSEMBLY_CELLS ? Math.min(1, count) : count;
         }
         int restoreSlot = -1;
         if (restore.isPresent()) {

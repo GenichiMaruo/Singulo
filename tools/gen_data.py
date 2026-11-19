@@ -577,7 +577,7 @@ UI_LANG = {
     'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使うこと',
                                                     'Hold a Neutrino Scanner in your other hand, or use it on an observatory'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
-    'gui.singulo.assembly.board_hint': ('組立図に合わせて材料を1マスに1個ずつ置き、触媒は琥珀色の枠に入れます。右の本のボタンで組立図を確認できます。アンドロイドもこの盤面に同じ配置で材料を置きます。', 'Place one part per cell as shown in the diagram. Put catalysts in the amber slot. The book on the right shows the diagrams. Androids assemble the same patterns on this grid.'),
+    'gui.singulo.assembly.board_hint': ('配置図に合わせて材料を置きます。各マスには1スタックまで置け、組み立てるたびに1個ずつ使います。触媒は琥珀色の枠に入れます。配置図は右の本のボタンで確認できます。', 'Follow the diagram. Each cell holds a stack and supplies one part per craft. Put the catalyst in the amber slot. Open the book on the right to see the patterns.'),
     'gui.singulo.assembly.diagrams': ('組立図', 'Assembly diagrams'),
     'gui.singulo.assembly.diagrams_hint': ('製品にカーソルを合わせると組立図を確認できます。クリックすると、その図をこのボタンからもう一度確認できます。', 'Hover over a product to see its diagram. Click it to keep the diagram on this button.'),
     'gui.singulo.assembly.preview': ('組立結果の見本です。加工が終わると取り出せます。', 'Assembly preview · Collect after processing'),

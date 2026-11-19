@@ -122,10 +122,10 @@ CHAPTERS = [
          'Start by projecting an eight-block ring and supplying it with hydrogen. Put focusing magnets at the corners and use them for at least a quarter of the ring.\n'
          'If it stalls, check that the controller touches the ring, power is available and the output has space.'),
         ('others', '精密組立台で配置を確かめる',
-         '組立盤は角のない5×5で、一マスに一個ずつ置きます。JEIで製品のレシピを開くと、自動配置で手持ちの材料を移せます。\n'
+         '組立盤は四隅を除いた5×5です。配置図どおりに材料を重ねると、各マスから1個ずつ使って繰り返し組み立てます。JEIの「＋」で1回分、Shift＋クリックで置ける回数分を並べられます。\n'
          '触媒を使うレシピでは、触媒を専用の枠に入れ、残り寿命と、製品・失活触媒の両方の出力欄を確認してください。',
          'Checking the assembly board',
-         'The board is a 5×5 grid without corners. Place one item in each occupied square, or open the product recipe in JEI to transfer materials from your inventory.\n'
+         'The 5×5 board has no corner cells. Stack parts in the pattern to repeat a craft. In JEI, click + to lay out one set, or Shift-click + for as many sets as fit.\n'
          'For catalytic recipes, use the dedicated catalyst slot. Check its remaining life and leave room for both the product and the spent catalyst.'),
     ]),
     ('stage3', 'singulo:quantum_computing_module', '段階3 量子', 'Stage 3: Quantum', [

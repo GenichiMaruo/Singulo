@@ -6916,8 +6916,8 @@
     "translation": "第 2 阶段的流程"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "The board is a 5×5 grid without corners. Place one item in each occupied square, or open the product recipe in JEI to transfer materials from your inventory.\nFor catalytic recipes, use the dedicated catalyst slot. Check its remaining life and leave room for both the product and the spent catalyst.",
-    "translation": "组装盘是去掉四角的5×5方格，每个所需格放一个物品。也可以在JEI中打开产品配方，从背包自动放置材料。\n需要催化剂时请使用专用槽。检查剩余寿命，并为产品和失活催化剂分别留出输出空间。"
+    "source": "The 5×5 board has no corner cells. Stack parts in the pattern to repeat a craft. In JEI, click + to lay out one set, or Shift-click + for as many sets as fit.\nFor catalytic recipes, use the dedicated catalyst slot. Check its remaining life and leave room for both the product and the spent catalyst.",
+    "translation": "组装盘为去掉四角的5×5方格。按图堆叠材料即可连续组装，每次每格消耗一个。点击JEI的「＋」放置一份材料，按住Shift点击可放置尽可能多份。\n需要催化剂时请使用专用槽。检查剩余寿命，并为产品和失活催化剂分别留出输出空间。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Checking the assembly board",
@@ -15592,8 +15592,8 @@
     "translation": "只自动存放捡到的物品。如果首选存放处不可用，就尝试另一种。点击切换。"
   },
   "gui.singulo.assembly.board_hint": {
-    "source": "Place one part per cell as shown in the diagram. Put catalysts in the amber slot. The book on the right shows the diagrams. Androids assemble the same patterns on this grid.",
-    "translation": "按组装图在每格放一个材料，催化剂放入琥珀色槽。点击右侧的书本按钮可查看组装图。仿生人也会在组装盘上按图放置材料。"
+    "source": "Follow the diagram. Each cell holds a stack and supplies one part per craft. Put the catalyst in the amber slot. Open the book on the right to see the patterns.",
+    "translation": "按图摆放材料。每格可放一组，每次组装从每格消耗一个。催化剂放入琥珀色槽。点击右侧的书本按钮可查看组装图。"
   },
   "gui.singulo.assembly.diagrams": {
     "source": "Assembly diagrams",

@@ -29,22 +29,25 @@ public final class AssemblyMenuGameTests {
         var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "AssemblyTester"));
         var menu = new MachineMenu(1, player.getInventory(), machine);
         int inventory = menu.playerSlotStart();
-        menu.getSlot(inventory).set(new ItemStack(Items.IRON_INGOT, 12));
+        menu.getSlot(inventory).set(new ItemStack(Items.IRON_INGOT, 64));
         menu.clicked(inventory, 0, ClickType.PICKUP, player);
         menu.clicked(menu.assemblySlot(0), 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().isEmpty() && menu.getSlot(menu.assemblySlot(0)).getItem().getCount() == 64,
+                "Left click did not place the whole stack");
+        menu.clicked(menu.assemblySlot(0), 1, ClickType.PICKUP, player);
         menu.clicked(menu.assemblySlot(1), 1, ClickType.PICKUP, player);
         menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(0, 0), ClickType.QUICK_CRAFT, player);
         for (int cell = 2; cell <= 3; cell++) {
             menu.clicked(menu.assemblySlot(cell), AbstractContainerMenu.getQuickcraftMask(1, 0), ClickType.QUICK_CRAFT, player);
         }
         menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(2, 0), ClickType.QUICK_CRAFT, player);
-        for (int cell = 0; cell < 4; cell++) {
-            h.assertTrue(machine.assemblyGrid().getStackInSlot(cell).getCount() == 1, "Left/right click or drag overfilled a cell");
-        }
+        int[] counts = {32, 1, 15, 15};
+        for (int cell = 0; cell < counts.length; cell++)
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(cell).getCount() == counts[cell], "Incorrect click or drag count at " + cell);
         int output = menu.type().outputSlot(), spent = menu.type().spentCatalystSlot();
         menu.clicked(output, 0, ClickType.PICKUP, player);
         menu.clicked(spent, 0, ClickType.PICKUP, player);
-        h.assertTrue(menu.getCarried().getCount() == 8 && !menu.getSlot(output).hasItem() && !menu.getSlot(spent).hasItem(),
+        h.assertTrue(menu.getCarried().getCount() == 1 && !menu.getSlot(output).hasItem() && !menu.getSlot(spent).hasItem(),
                 "An output slot accepted a manual ingredient");
         h.assertTrue(menu.type().inputSlots() == 0 && !menu.clickMenuButton(player, MachineMenu.BUTTON_SELECT),
                 "The assembler exposed a bulk input or accepted an automatic recipe selection");
@@ -73,12 +76,18 @@ public final class AssemblyMenuGameTests {
         for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
             ItemStack part = reopened.getSlot(reopened.assemblySlot(cell)).getItem();
             if (part.isEmpty()) continue;
-            h.assertTrue(part.is(Items.IRON_INGOT) && part.getCount() == 1, "Reopened board has an invalid stack");
-            placed++;
+            h.assertTrue(part.is(Items.IRON_INGOT), "Reopened board has an unexpected ingredient");
+            placed += part.getCount();
         }
-        h.assertTrue(placed == 11 && !reopened.getSlot(reopened.assemblySlot(19)).hasItem()
-                        && player.getInventory().countItem(Items.IRON_INGOT) == 1 && menu.getCarried().isEmpty(),
+        h.assertTrue(placed == 49 && player.getInventory().countItem(Items.IRON_INGOT) == 15
+                        && !reopened.getSlot(reopened.assemblySlot(19)).hasItem() && menu.getCarried().isEmpty(),
                 "Shift-click or cancelled drag lost or duplicated parts");
+        int empty = reopened.assemblySlot(20);
+        reopened.setCarried(new ItemStack(Items.BUCKET, 16));
+        reopened.clicked(empty, 0, ClickType.PICKUP, player);
+        var extra = machine.assemblyGrid().insertItem(20, new ItemStack(Items.BUCKET), false);
+        h.assertTrue(extra.getCount() == 1 && reopened.getSlot(empty).getItem().getCount() == 16
+                        && reopened.stackLimit(empty, new ItemStack(Items.IRON_PICKAXE)) == 1, "Cell ignored the item's own stack limit");
         h.succeed();
     }
 }

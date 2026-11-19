@@ -101,12 +101,6 @@ public class MachineMenu extends AbstractContainerMenu {
                     public boolean mayPlace(ItemStack stack) {
                         return !MachineBlockEntity.isCatalyst(stack) && super.mayPlace(stack);
                     }
-
-                    @Override
-                    public int getMaxStackSize() { return 1; }
-
-                    @Override
-                    public int getMaxStackSize(ItemStack stack) { return 1; }
                 });
             }
         }

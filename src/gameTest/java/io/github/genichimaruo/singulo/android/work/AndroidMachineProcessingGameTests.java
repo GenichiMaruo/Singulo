@@ -512,12 +512,13 @@ public final class AndroidMachineProcessingGameTests {
         var inputs = card.inputs();
         for (var in : inputs) work.worker().addToCarry(in.item.copyWithCount(Math.toIntExact(in.count)));
         int charge = work.worker().charge();
-        machine.assemblyGrid().setStackInSlot(0, new ItemStack(Items.DIAMOND));
+        var stocked = new ItemStack(Items.BUCKET, 16);
+        machine.assemblyGrid().setStackInSlot(9, stocked.copy());
         work.visit();
-        h.assertTrue(machine.assemblyGrid().getStackInSlot(0).is(Items.DIAMOND) && work.worker().charge() == charge,
+        h.assertTrue(ItemStack.matches(machine.assemblyGrid().getStackInSlot(9), stocked) && work.worker().charge() == charge,
                 "The worker replaced a player's incomplete board or charged for it");
         for (var in : inputs) h.assertTrue(work.worker().inventory().countItem(in.item.getItem()) == in.count, "The busy board took " + in.item);
-        machine.assemblyGrid().extractItem(0, 1, false);
+        machine.assemblyGrid().extractItem(9, 16, false);
         var missing = inputs.getLast().item;
         work.worker().inventory().removeItemType(missing.getItem(), 1);
         work.visit();

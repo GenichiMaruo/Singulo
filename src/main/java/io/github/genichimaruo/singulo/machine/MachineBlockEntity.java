@@ -150,11 +150,6 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             public boolean isItemValid(int slot, ItemStack stack) {
                 return !assemblyReturns.get(slot) && !isCatalyst(stack);
             }
-
-            @Override
-            public int getSlotLimit(int slot) {
-                return 1;
-            }
         } : null;
         this.tanks = new FluidTank[type.tanks()];
         for (int i = 0; i < tanks.length; i++) {

@@ -68,7 +68,7 @@ public final class MachineDiagnosis {
         MachineRecipe best = selected == null ? null : selected.value();
         double bestScore = 0;
         boolean bestAligned = false;
-        int boardCount = board ? inputs.subList(0, MachineRecipe.ASSEMBLY_CELLS).stream().mapToInt(ItemStack::getCount).sum() : 0;
+        long boardCount = board ? materials.stream().filter(s -> !s.isEmpty()).count() : 0;
         MachineRecipe misplaced = null;
         int nearest = -1;
         for (RecipeHolder<MachineRecipe> holder : MachineBlockEntity.stationRecipes(level, type)) {
@@ -97,7 +97,7 @@ public final class MachineDiagnosis {
                     && (r.minSize() <= 0 || r.minSize() <= structureSize)) {
                 // A valid diagram can briefly be visible before the running/no-power status reaches the screen.
                 if (r.assemblyPlan(inputs) != null) return new Result(Kind.EMPTY, List.of());
-                var unordered = r.plan(inputs);
+                var unordered = r.unorderedAssemblyPlan(inputs);
                 if (unordered != null && unordered.consume()[MachineRecipe.ASSEMBLY_CELLS] == 0) {
                     int correct = 0;
                     for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
@@ -141,7 +141,8 @@ public final class MachineDiagnosis {
                 }
                 continue;
             }
-            int have = inputs.stream().filter(s -> in.ingredient().test(s)).mapToInt(ItemStack::getCount).sum();
+            int have = inputs.stream().filter(s -> !s.isEmpty() && in.ingredient().test(s))
+                    .mapToInt(s -> board ? 1 : s.getCount()).sum();
             if (have < in.count()) {
                 lines.add(Component.translatable("gui.singulo.reason.need_item", name, in.count() - have));
             }

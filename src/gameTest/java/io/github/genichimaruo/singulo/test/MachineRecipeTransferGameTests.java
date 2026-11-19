@@ -4,7 +4,6 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
-import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
@@ -14,6 +13,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -27,7 +27,7 @@ public final class MachineRecipeTransferGameTests {
     private static MachineMenu menu(GameTestHelper h, MachineType type) {
         h.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(type).get());
         MachineBlockEntity machine = h.getBlockEntity(new BlockPos(1, 1, 1));
-        return new MachineMenu(1, TestScope.player(h).getInventory(), machine);
+        return new MachineMenu(1, h.makeMockPlayer(GameType.SURVIVAL).getInventory(), machine);
     }
 
     private static MachineRecipe recipe(MachineRecipe.ItemInput... inputs) {
@@ -48,13 +48,13 @@ public final class MachineRecipeTransferGameTests {
         int inventory = menu.playerSlotStart();
         for (int i = 0; i < recipe.ingredients().size(); i++) {
             var input = recipe.ingredients().get(i);
-            menu.getSlot(inventory + i).set(input.ingredient().getItems()[0].copyWithCount(input.count() * 2));
+            menu.getSlot(inventory + i).set(input.ingredient().getItems()[0].copyWithCount(input.count() * 3));
         }
         menu.getSlot(menu.type().outputSlot()).set(new ItemStack(Items.GOLD_INGOT, 12));
         var spent = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("spent_muon_catalyst")), 3);
         menu.getSlot(menu.type().spentCatalystSlot()).set(spent.copy());
         menu.getSlot(menu.assemblySlot(0)).set(new ItemStack(Items.DIRT));
-        var plan = MachineRecipeTransfer.plan(menu, recipe, true);
+        var plan = MachineRecipeTransfer.plan(menu, recipe, false);
         h.assertTrue(plan != null && menu.getSlot(menu.assemblySlot(0)).getItem().is(Items.DIRT), "Preview changed the board");
         MachineRecipeTransfer.apply(menu, plan);
         for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
@@ -70,8 +70,32 @@ public final class MachineRecipeTransferGameTests {
                 && ItemStack.matches(spent, menu.getSlot(menu.type().spentCatalystSlot()).getItem()),
                 "Transfer disturbed an output or lost a displaced part");
         for (int i = 0; i < recipe.ingredients().size(); i++)
-            h.assertTrue(menu.getSlot(inventory + i).getItem().getCount() == recipe.ingredients().get(i).count(),
-                    "Shift-transfer consumed more than one set");
+            h.assertTrue(menu.getSlot(inventory + i).getItem().getCount() == recipe.ingredients().get(i).count() * 2,
+                    "Ordinary transfer took more than one set");
+        var more = MachineRecipeTransfer.plan(menu, recipe, false);
+        h.assertTrue(more != null, "Could not add a second set");
+        MachineRecipeTransfer.apply(menu, more);
+        for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++)
+            if (recipe.assemblyInput(cell) != null) h.assertTrue(machine.assemblyGrid().getStackInSlot(cell).getCount() == 2,
+                    "A second click did not top up cell " + cell);
+        var bulk = MachineRecipeTransfer.plan(menu, recipe, true);
+        h.assertTrue(bulk != null, "Could not bulk transfer");
+        MachineRecipeTransfer.apply(menu, bulk);
+        for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++)
+            h.assertTrue(machine.assemblyGrid().getStackInSlot(cell).getCount() == (recipe.assemblyInput(cell) == null ? 0 : 3),
+                    "Shift-transfer did not fill three complete sets at " + cell);
+        for (int i = inventory; i < inventory + 36; i++) {
+            var remaining = menu.getSlot(i).getItem();
+            h.assertTrue(recipe.ingredients().stream().noneMatch(in -> in.ingredient().test(remaining)),
+                    "Transferred parts remained in inventory: " + remaining);
+        }
+        var glass = machine.assemblyGrid().getStackInSlot(4).copyWithCount(10);
+        h.assertTrue(machine.assemblyGrid().insertItem(4, glass, false).isEmpty(), "Could not stock spare glass");
+        var stocked = MachineRecipeTransfer.plan(menu, recipe, false);
+        h.assertTrue(stocked != null, "Transfer rejected a complete stocked board");
+        MachineRecipeTransfer.apply(menu, stocked);
+        h.assertTrue(machine.assemblyGrid().getStackInSlot(4).getCount() == 13 && machine.assemblyGrid().getStackInSlot(6).getCount() == 3,
+                "Clicking a complete diagram removed spare materials from its cells");
         h.succeed();
     }
 
@@ -220,7 +244,7 @@ public final class MachineRecipeTransferGameTests {
             var buf = new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), h.getLevel().registryAccess());
             buf.writeBlockPos(menu.pos());
             buf.writeVarInt(menu.type().ordinal());
-            var client = MachineMenu.client(2, TestScope.player(h).getInventory(), buf);
+            var client = MachineMenu.client(2, h.makeMockPlayer(GameType.SURVIVAL).getInventory(), buf);
             var server = machine.syncData();
             for (int slot = 0; slot < server.getCount(); slot++) client.setData(slot, server.get(slot));
             int estimated = io.github.genichimaruo.singulo.item.UsesHelper.remaining(client.loadedCatalyst());
@@ -270,7 +294,7 @@ public final class MachineRecipeTransferGameTests {
     @GameTest(template = "empty", batch = "jei_transfer")
     public static void capacityUpgradeShiftClickFallsBackToInputs(GameTestHelper h) {
         var menu = menu(h, MachineType.PRECISION_ASSEMBLER);
-        var player = TestScope.player(h);
+        var player = h.makeMockPlayer(GameType.SURVIVAL);
         int inventory = menu.playerSlotStart();
         menu.getSlot(inventory).set(CapacityUpgrades.item(1));
         menu.quickMoveStack(player, inventory);
@@ -322,6 +346,54 @@ public final class MachineRecipeTransferGameTests {
         MachineRecipeTransfer.apply(menu, plan);
         h.assertTrue(menu.getSlot(0).getItem().getCount() == 64 && menu.getSlot(inventory).getItem().is(Items.DIRT)
                 && menu.getSlot(inventory).getItem().getCount() == 3, "Full inventory max transfer lost displaced items");
+        h.succeed();
+    }
+
+    private static MachineMenu fullInventoryAssembly(GameTestHelper h) {
+        var menu = menu(h, MachineType.PRECISION_ASSEMBLER);
+        for (int i = 0; i < 36; i++) menu.getSlot(menu.playerSlotStart() + i).set(new ItemStack(Items.COBBLESTONE, 64));
+        menu.getSlot(menu.assemblySlot(1)).set(new ItemStack(Items.DIRT, 3));
+        return menu;
+    }
+
+    private static MachineRecipe singleIronAssembly() {
+        return new MachineRecipe("precision_assembler", 2, 20, 10, List.of(iron(1)), List.of(), Optional.empty(),
+                Optional.empty(), new ItemStack(Items.DIAMOND), List.of(), 0, 0, ItemStack.EMPTY);
+    }
+
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void assemblyTransferCanEmptyTheSmallerIngredientStack(GameTestHelper h) {
+        var menu = fullInventoryAssembly(h);
+        int inventory = menu.playerSlotStart();
+        menu.getSlot(inventory).set(new ItemStack(Items.IRON_INGOT, 64));
+        menu.getSlot(inventory + 1).set(new ItemStack(Items.IRON_INGOT));
+        var plan = MachineRecipeTransfer.plan(menu, singleIronAssembly(), false);
+        h.assertTrue(plan != null, "A single iron ingot could free space for the displaced stack");
+        MachineRecipeTransfer.apply(menu, plan);
+        h.assertTrue(menu.getSlot(menu.assemblySlot(0)).getItem().getCount() == 1
+                        && menu.getSlot(menu.assemblySlot(1)).getItem().isEmpty()
+                        && ItemStack.matches(menu.getSlot(inventory).getItem(), new ItemStack(Items.IRON_INGOT, 64))
+                        && ItemStack.matches(menu.getSlot(inventory + 1).getItem(), new ItemStack(Items.DIRT, 3)),
+                "Single transfer lost or moved the wrong stack");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "jei_transfer")
+    public static void assemblyMaxTransferCanSkipAnIntermediateCountThatDoesNotFit(GameTestHelper h) {
+        var menu = fullInventoryAssembly(h);
+        int inventory = menu.playerSlotStart();
+        var named = new ItemStack(Items.IRON_INGOT);
+        named.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Sample"));
+        menu.getSlot(inventory).set(named.copy());
+        menu.getSlot(inventory + 1).set(new ItemStack(Items.IRON_INGOT, 64));
+        var plan = MachineRecipeTransfer.plan(menu, singleIronAssembly(), true);
+        h.assertTrue(plan != null, "Could not transfer a full ingredient stack");
+        MachineRecipeTransfer.apply(menu, plan);
+        h.assertTrue(ItemStack.matches(menu.getSlot(menu.assemblySlot(0)).getItem(), new ItemStack(Items.IRON_INGOT, 64))
+                        && menu.getSlot(menu.assemblySlot(1)).getItem().isEmpty()
+                        && ItemStack.matches(menu.getSlot(inventory).getItem(), named)
+                        && ItemStack.matches(menu.getSlot(inventory + 1).getItem(), new ItemStack(Items.DIRT, 3)),
+                "Max transfer settled for one named ingot even though a full stack fits");
         h.succeed();
     }
 

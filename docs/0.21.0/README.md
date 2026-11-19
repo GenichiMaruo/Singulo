@@ -85,11 +85,11 @@
 
 ## 精密組立台の手組み（recipe/MachineRecipe・machine/MachineBlockEntity）
 
-- 組立盤は5×5から四隅を除いた21マス（`assembly_grid` に保存）。触媒は盤の外の専用枠（マガジン）、使い終わった触媒は専用の出力枠。外の面からは材料を入れられず、製品と使い終わった触媒だけを取り出せる。
-- レシピの `shape` は5文字×5行で、文字は `ingredients` の番号（A, B, ...）、空白は何も置かないマス。四隅は空けておく。`shape` を持てるのは、復元品も質量もない精密組立台のレシピだけ。`shape` のない（データパックの）レシピは、材料の順に1マス1個で並べた形として扱う。
+- 組立盤は5×5から四隅を除いた21マス（`assembly_grid` に保存）。各マスには素材の通常のスタック上限まで置け、1回の組み立てに各マスから1個ずつ使う。触媒は盤の外の専用枠（マガジン）、使い終わった触媒は専用の出力枠。外の面からは材料を入れられず、製品と使い終わった触媒だけを取り出せる。
+- レシピの `shape` は5文字×5行で、文字は `ingredients` の番号（A, B, ...）、空白は何も置かないマス。四隅は空けておく。`shape` を持てるのは、復元品も質量もない精密組立台のレシピだけ。`shape` のない（データパックの）レシピは、配置順を問わず、材料の必要個数と同じ数のマスを使う。
 - 配置の元は `tools/assembly_shapes.py`、エディターで保存した配置と材料は `tools/assembly_edits/`（[編集手順](../development/README.md#精密組立台のレシピを編集する)）。どの配置図もちょうど1つの製品に当たることを GameTest `everyInstalledAssemblyDiagramMatchesExactlyOneProduct` で、構造部品のレシピがその設備のフレームを使うことを `tools/test_multiblock_recipes.py` で確かめる。
 - 2回分のレシピ（`*_pair`）: 縮退圧縮炉・C空洞・縮退熱炉のフレームと鏡面プレート。右上と左下に1組ずつ置き、触媒は1個。
-- JEI の＋ボタンは1回分を盤に並べ、押し出した部品は持ち物へ戻す（`MachineRecipeTransfer`）。アンドロイドは加工カードの個数を1回分の配置に直して置く（`android/work/AndroidAssembly`）。盤が使用中か材料が足りないときは、材料を手元に残す。
+- JEI の＋ボタンは1回分、Shift＋クリックは入る回数分を盤に並べ、押し出した部品は持ち物へ戻す（`MachineRecipeTransfer`）。アンドロイドは加工カードの個数を1回分の配置に直して置く（`android/work/AndroidAssembly`）。盤が使用中か材料が足りないときは、材料を手元に残す。
 - 以前の保存（`slot_layout` がない）: 加工の進み具合は捨て、10枠の材料は画面を開いた人の持ち物へ入るだけ戻す。残りは次に開いたときに戻すか、壊したときに落とす。触媒とオーバークロックチップは同じ枠に残る。GameTest `assemblerRecoversLegacyInputsAndDropsAllRemainingContents`。
 - 待機の理由: 配置が違うときは「配置を確認」（`misplaced`）。触媒だけが足りない盤は、できる製品の名前を出す。
 

@@ -20,13 +20,15 @@ import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 /** Capture the normal container and selector, observing where Minecraft actually paints the tooltip. */
 public final class AssemblySelectorReview {
     private static ResourceLocation expected;
+    private static int expectedSets;
     private static Popup selector;
     private static int previewFrames, tooltipFrames, diagramX, diagramY;
     private static boolean awaitingSpent;
     private static int spentFrames;
 
-    public static void expect(ResourceLocation recipe) {
+    public static void expect(ResourceLocation recipe, int sets) {
         expected = recipe;
+        expectedSets = sets;
         selector = null;
         previewFrames = tooltipFrames = 0;
     }
@@ -54,7 +56,7 @@ public final class AssemblySelectorReview {
         for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++) {
             var input = recipe.value().assemblyInput(i);
             var stack = menu.getSlot(menu.assemblySlot(i)).getItem();
-            if (input == null ? !stack.isEmpty() : stack.getCount() != 1 || !input.ingredient().test(stack)) {
+            if (input == null ? !stack.isEmpty() : stack.getCount() != expectedSets || !input.ingredient().test(stack)) {
                 previewFrames = 0;
                 return;
             }

@@ -30,9 +30,10 @@ public final class JeiReviewHarness {
     private static int ticks, language, frames;
     private static ReviewScreen screen;
     private static int transferPhase, transferTicks;
-    private static final List<String> ASSEMBLIES = List.of("android_work_console", "android_station",
-            "android_tank_upgrade", "wormhole_generator_core", "casimir_cavity_frame");
+    private static final List<String> ASSEMBLIES = List.of("android_tank_upgrade", "android_work_console",
+            "android_station", "wormhole_generator_core", "casimir_cavity_frame");
     private static int assembly;
+    private static int transferSets;
     private static volatile boolean transferVerified;
     private static MachineRecipe transferRecipe;
     private static net.minecraft.resources.ResourceLocation transferId;
@@ -85,7 +86,8 @@ public final class JeiReviewHarness {
     private static void checkTransfer(Minecraft mc) throws Exception {
         if (transferPhase == 1) {
             transferId = Singulo.id("precision_assembler/" + ASSEMBLIES.get(assembly));
-            AssemblySelectorReview.expect(transferId);
+            transferSets = ASSEMBLIES.get(assembly).equals("android_tank_upgrade") ? 8 : 1;
+            AssemblySelectorReview.expect(transferId, transferSets);
             transferRecipe = SinguloJeiPlugin.RECIPE_IDS.entrySet().stream().filter(e -> e.getValue().equals(transferId))
                     .findFirst().orElseThrow().getKey();
             mc.getLanguageManager().setSelected("ja_jp");
@@ -98,7 +100,7 @@ public final class JeiReviewHarness {
                 player.getInventory().clearContent();
                 for (int i = 0; i < transferRecipe.ingredients().size(); i++) {
                     var ingredient = transferRecipe.ingredients().get(i);
-                    var stack = ingredient.ingredient().getItems()[0].copyWithCount(ingredient.count());
+                    var stack = ingredient.ingredient().getItems()[0].copyWithCount(ingredient.count() * transferSets);
                     if (ingredient.uses() > 0) {
                         if (ingredient.usesFrom(stack) != 750) throw new IllegalStateException("Expected one 750-use cavity frame batch");
                         stack = UsesHelper.consume(stack, UsesHelper.remaining(stack) - 750);
@@ -127,8 +129,9 @@ public final class JeiReviewHarness {
             var handler = runtime.getRecipeTransferManager().getRecipeTransferHandler(menu, category).orElseThrow();
             var layout = runtime.getRecipeManager().createRecipeLayoutDrawable(category, transferRecipe,
                     runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup()).orElseThrow();
-            if (handler.transferRecipe(menu, transferRecipe, layout.getRecipeSlotsView(), mc.player, false, false) != null
-                    || handler.transferRecipe(menu, transferRecipe, layout.getRecipeSlotsView(), mc.player, false, true) != null)
+            boolean bulk = transferSets > 1;
+            if (handler.transferRecipe(menu, transferRecipe, layout.getRecipeSlotsView(), mc.player, bulk, false) != null
+                    || handler.transferRecipe(menu, transferRecipe, layout.getRecipeSlotsView(), mc.player, bulk, true) != null)
                 throw new IllegalStateException("JEI registered transfer handler rejected fixture");
             transferPhase = 3;
         } else if (transferPhase == 3 && ++transferTicks > 10) {
@@ -139,7 +142,7 @@ public final class JeiReviewHarness {
                 for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++) {
                     var ingredient = transferRecipe.assemblyInput(i);
                     var stack = machine.assemblyGrid().getStackInSlot(i);
-                    if (ingredient == null ? !stack.isEmpty() : stack.getCount() != 1 || !ingredient.ingredient().test(stack))
+                    if (ingredient == null ? !stack.isEmpty() : stack.getCount() != transferSets || !ingredient.ingredient().test(stack))
                         throw new IllegalStateException("JEI packet placed the wrong stack at cell " + i);
                 }
                 if (ASSEMBLIES.get(assembly).equals("casimir_cavity_frame")) {
@@ -154,7 +157,7 @@ public final class JeiReviewHarness {
             });
             transferPhase = 4;
         } else if (transferPhase == 4 && transferVerified && AssemblySelectorReview.previewReady()) {
-            Singulo.LOGGER.info("SINGULO_JEI_TRANSFER_COMPLETE {}", transferId);
+            Singulo.LOGGER.info("SINGULO_JEI_TRANSFER_COMPLETE {} ({} sets)", transferId, transferSets);
             Path output = Path.of(System.getProperty("singulo.jeiReviewOutput"));
             try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
                 image.writeToFile(output.resolve("assembly-" + ASSEMBLIES.get(assembly) + ".png"));
