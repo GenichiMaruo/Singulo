@@ -10,10 +10,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
+
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -62,6 +62,7 @@ public record MachineReport(State state, Component label, List<Component> detail
     }
 
     /** 報告を出せるブロックエンティティ。 */
+    @net.minecraftforge.common.capabilities.AutoRegisterCapability
     public interface Source {
         MachineReport report();
         /** Estimated processing ticks for android pickup. Zero means idle, -1 means unknown. */
@@ -213,14 +214,13 @@ public record MachineReport(State state, Component label, List<Component> detail
     // ------------------------------------------------------------------ 送る
 
     public CompoundTag save(HolderLookup.Provider registries) {
-        var ops = registries.createSerializationContext(NbtOps.INSTANCE);
         CompoundTag t = new CompoundTag();
         t.putByte("state", (byte) state.ordinal());
-        t.put("label", ComponentSerialization.CODEC.encodeStart(ops, label).getOrThrow());
+        t.putString("label", Component.Serializer.toJson(label));
         ListTag d = new ListTag();
         for (Component c : details) {
             CompoundTag line = new CompoundTag();           // 文字だけの行と飾りのある行で NBT の型が違うので、包んで並べる
-            line.put("c", ComponentSerialization.CODEC.encodeStart(ops, c).getOrThrow());
+            line.putString("c", Component.Serializer.toJson(c));
             d.add(line);
         }
         t.put("details", d);
@@ -231,7 +231,7 @@ public record MachineReport(State state, Component label, List<Component> detail
         t.putInt("consume", consume);
         t.putInt("produce", produce);
         if (!catalyst.isEmpty()) {
-            t.put("catalyst", catalyst.save(registries));
+            t.put("catalyst", catalyst.save(new CompoundTag()));
             t.putFloat("fill", catalystFill);
         }
         ListTag m = new ListTag();
@@ -247,22 +247,29 @@ public record MachineReport(State state, Component label, List<Component> detail
     }
 
     @Nullable
+    private static Component readComponent(String json) {
+        try {
+            Component value = Component.Serializer.fromJson(json);
+            return value != null ? value : Component.empty();
+        } catch (com.google.gson.JsonParseException ignored) {
+            return Component.empty();
+        }
+    }
     public static MachineReport load(CompoundTag t, HolderLookup.Provider registries) {
         if (!t.contains("state")) {
             return null;
         }
-        var ops = registries.createSerializationContext(NbtOps.INSTANCE);
         State state = State.values()[Math.floorMod(t.getByte("state"), State.values().length)];
-        Component label = ComponentSerialization.CODEC.parse(ops, t.get("label")).result().orElse(Component.empty());
+        Component label = readComponent(t.getString("label"));
         List<Component> details = new ArrayList<>();
         for (Tag e : t.getList("details", Tag.TAG_COMPOUND)) {
-            ComponentSerialization.CODEC.parse(ops, ((CompoundTag) e).get("c")).result().ifPresent(details::add);
+            details.add(readComponent(((CompoundTag) e).getString("c")));
         }
-        ItemStack catalyst = t.contains("catalyst") ? ItemStack.parseOptional(registries, t.getCompound("catalyst")) : ItemStack.EMPTY;
+        ItemStack catalyst = t.contains("catalyst") ? ItemStack.of(t.getCompound("catalyst")) : ItemStack.EMPTY;
         List<ItemStack> missing = new ArrayList<>();
         for (Tag e : t.getList("missing", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) e;
-            var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse(c.getString("id")));
+            var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(c.getString("id")));
             missing.add(new ItemStack(item, c.getInt("count")));
         }
         return new MachineReport(state, label, details, t.getInt("progress"), t.getInt("max"), t.getLong("energy"), t.getLong("capacity"),
