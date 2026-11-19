@@ -66,7 +66,7 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(ArsenalNotice::onLogout);
         MinecraftForge.EVENT_BUS.addListener(ArsenalNotice::onClientTick);
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
-            ClientGalaxies.set(java.util.List.of(), false);
+            ClientGalaxies.set(java.util.List.of(), java.util.List.of(), false);
             ClientRecords.set(java.util.List.of());
             clearWorldState();
         });
@@ -461,44 +461,11 @@ public final class SinguloClient {
         }
     }
 
-    private static void registerExtensions(RegisterClientExtensionsEvent event) {
-        event.registerBlock(new FluidPumpParticles(), io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PUMP.get());
-        // 液体カプセル: 立体の殻の中に、詰めた液体を描く
-        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
-            @Override
-            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return FluidCapsuleRenderer.get();
-            }
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CAPSULE.get(), io.github.genichimaruo.singulo.registry.SinguloItems.BATTERY_FLUID_CAPSULE.get(),
-                io.github.genichimaruo.singulo.registry.SinguloItems.LARGE_BATTERY_FLUID_CAPSULE.get());
-        // 傘を手に持つ間は、腕を上げて柄を握る構えにする（ほかの人から見て、手で持って見えるように）
-        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
-            @Override
-            public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,
-                                                                              net.minecraft.world.InteractionHand hand,
-                                                                              net.minecraft.world.item.ItemStack stack) {
-                return UmbrellaArmPose.UMBRELLA.getValue();
-            }
-        }, io.github.genichimaruo.singulo.registry.SinguloItems.ANDROID_UMBRELLA.get());
-        for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
-            int color = entry.def().color();
-            event.registerFluidType(new IClientFluidTypeExtensions() {
-                @Override
-                public ResourceLocation getStillTexture() {
-                    return STILL;
-                }
-
-                @Override
-                public ResourceLocation getFlowingTexture() {
-                    return FLOWING;
-                }
-
-                @Override
-                public int getTintColor() {
-                    return color;
-                }
-            }, entry.type().get());
-        }
+    public static IClientFluidTypeExtensions fluidExtensions(int color) {
+        return new IClientFluidTypeExtensions() {
+            public ResourceLocation getStillTexture() { return STILL; }
+            public ResourceLocation getFlowingTexture() { return FLOWING; }
+            public int getTintColor() { return color; }
+        };
     }
-
 }

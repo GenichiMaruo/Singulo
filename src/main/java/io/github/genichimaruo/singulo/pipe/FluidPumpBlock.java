@@ -35,6 +35,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class FluidPumpBlock extends BaseEntityBlock {
+    @Override
+    public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientBlockExtensions> consumer) {
+        consumer.accept(new io.github.genichimaruo.singulo.client.FluidPumpParticles());
+    }
+
     public static final DirectionProperty INTAKE = BlockStateProperties.FACING;
     private static final Map<Direction, VoxelShape> SHAPES = new EnumMap<>(Direction.class);
 

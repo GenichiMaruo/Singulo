@@ -7,12 +7,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.client.extensions.common.IClientBlockExtensions;
+import net.minecraftforge.client.extensions.common.IClientBlockExtensions;
 
-final class FluidPumpParticles implements IClientBlockExtensions {
+public final class FluidPumpParticles implements IClientBlockExtensions {
     @Override
     public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine engine) {
-        if (!(level instanceof ClientLevel client) || !state.shouldSpawnTerrainParticles()) return true;
+        if (!(level instanceof ClientLevel client)) return true;
         var boxes = state.getShape(level, pos).toAabbs();
         // Use vanilla's quarter-block spacing once across the whole pump.
         for (double x = 0.125; x < 1; x += 0.25) {

@@ -59,7 +59,9 @@ final class GalaxyDraw {
         // 染料の色: 種で選んだ色の代わりに（乱数の並びは変えないので、ほかの形は種のまま）
         net.minecraft.world.item.DyeColor dye = io.github.genichimaruo.singulo.genesis.GalaxyTraits.dye(traits);
         if (dye != null) {
-            armRgb = FxDraw.lerpRgb(dye.getTextureDiffuseColor() & 0xFFFFFF, 0xFFFFFF, 0.35F);
+            float[] rgb = dye.getTextureDiffuseColors();
+            int tint = Math.round(rgb[0] * 255) << 16 | Math.round(rgb[1] * 255) << 8 | Math.round(rgb[2] * 255);
+            armRgb = FxDraw.lerpRgb(tint, 0xFFFFFF, 0.35F);
         }
         int form = io.github.genichimaruo.singulo.genesis.GalaxyTraits.form(traits);
         // 不規則な銀河の、星の生まれる塊（中心からの位置と広がり）

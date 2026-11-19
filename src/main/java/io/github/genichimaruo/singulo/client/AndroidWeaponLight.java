@@ -1,13 +1,13 @@
 package io.github.genichimaruo.singulo.client;
 
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.LinkedHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 
 /** Translucent weapon surfaces, drawn after opaque entities and block entities. */
 public final class AndroidWeaponLight extends RenderType {
@@ -27,11 +27,11 @@ public final class AndroidWeaponLight extends RenderType {
     private static boolean drawingTerrain;
 
     private static MultiBufferSource.BufferSource weaponBuffers() {
-        var layers = new LinkedHashMap<RenderType, ByteBufferBuilder>();
+        var layers = new LinkedHashMap<RenderType, BufferBuilder>();
         // Finish the textured surface and white core before blending the wider colored glow.
         for (RenderType type : java.util.List.of(LAYER_BLADE, LAYER_CORE, LAYER_GLOW))
-            layers.put(type, new ByteBufferBuilder(1536));
-        return MultiBufferSource.immediateWithBuffers(layers, new ByteBufferBuilder(256));
+            layers.put(type, new BufferBuilder(1536));
+        return MultiBufferSource.immediateWithBuffers(layers, new BufferBuilder(256));
     }
 
     private static RenderType material(String name, boolean textured, boolean layered) {
