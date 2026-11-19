@@ -42,7 +42,7 @@ public final class MachineFluidEjectionGameTests {
         for (int i = 1; i <= 2; i++) {
             var tank = new FluidTank(Integer.MAX_VALUE);
             tank.fill(new FluidStack(i == 1 ? Fluids.WATER : Fluids.LAVA, Integer.MAX_VALUE), FluidAction.EXECUTE);
-            tanks.set(i, tank.writeToNBT(level.registryAccess(), new CompoundTag()));
+            tanks.set(i, tank.writeToNBT(new CompoundTag()));
         }
         h.startSequence().thenWaitUntil(() -> h.assertTrue(level.getGameTime() % 5 != 0, "Wait between old ejection ticks"))
                 .thenExecute(() -> {

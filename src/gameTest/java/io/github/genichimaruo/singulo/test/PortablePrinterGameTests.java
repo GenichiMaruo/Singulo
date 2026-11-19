@@ -106,7 +106,7 @@ public final class PortablePrinterGameTests {
         items.set(PortableAndroidPrinterItem.slot(1, PortableAndroidPrinterItem.SLOT_MEMORY), item("android_memory_whip", 1));
         items.set(PortableAndroidPrinterItem.slot(1, PortableAndroidPrinterItem.SLOT_KIT), item("android_kit", 2));
         PortableAndroidPrinterItem.setContents(printer, items);
-        printer.set(io.github.genichimaruo.singulo.registry.SinguloComponents.PRINTER_NEXT.get(), 1);   // 2つ目の組を選ぶ
+        io.github.genichimaruo.singulo.registry.SinguloComponents.set(printer, io.github.genichimaruo.singulo.registry.SinguloComponents.PRINTER_NEXT.get(), 1);   // 2つ目の組を選ぶ
         h.assertTrue(PortableAndroidPrinterItem.readyUnit(printer) == 1, "The chosen set is not printed next");
         h.setBlock(new BlockPos(3, 0, 3), net.minecraft.world.level.block.Blocks.STONE);
         BlockPos stand = h.absolutePos(new BlockPos(0, 1, 0));

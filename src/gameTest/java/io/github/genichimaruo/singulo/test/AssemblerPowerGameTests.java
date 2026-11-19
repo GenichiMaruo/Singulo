@@ -27,7 +27,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
-@net.neoforged.fml.common.EventBusSubscriber(modid="singulo")
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid="singulo")
 public final class AssemblerPowerGameTests {
     private static final net.minecraft.resources.ResourceLocation ADDON_CATALYST =
             net.minecraft.resources.ResourceLocation.parse("addon_fixture:muon_catalyst");
@@ -35,7 +35,7 @@ public final class AssemblerPowerGameTests {
             net.minecraft.resources.ResourceLocation.parse("addon_fixture:tarnished_crystal");
 
     @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void registerAddonItems(net.neoforged.neoforge.registries.RegisterEvent event) {
+    public static void registerAddonItems(net.minecraftforge.registries.RegisterEvent event) {
         event.register(net.minecraft.core.registries.Registries.ITEM, helper -> {
             var shell = new CatalystItem.Spent(new net.minecraft.world.item.Item.Properties());
             helper.register(ADDON_SPENT, shell);
@@ -143,7 +143,7 @@ public final class AssemblerPowerGameTests {
                 && UsesHelper.remaining(machine.magazine().loaded()) == cost,
                 "Full spent output consumed energy or catalyst lifespan");
         var registry = h.getLevel().registryAccess();
-        machine.loadWithComponents(machine.saveWithoutMetadata(), registry);
+        machine.load(machine.saveWithoutMetadata());
         h.assertTrue(ItemStack.matches(machine.automationItems().extractItem(spentSlot, 1, false), shell), "Spent shell could not be extracted");
         tick(h, machine, recipe.time());
         h.assertTrue(ItemStack.matches(machine.items().getStackInSlot(machine.type().outputSlot()), recipe.result())
@@ -168,8 +168,8 @@ public final class AssemblerPowerGameTests {
             var part = oldRecipe.ingredients().get(i);
             old.setStackInSlot(i, part.ingredient().getItems()[0].copyWithCount(part.count()));
         }
-        legacy.put("items", old.serializeNBT(registry));
-        machine.loadWithComponents(legacy, registry);
+        legacy.put("items", old.serializeNBT());
+        machine.load(legacy);
         tick(h, machine, 2);
         h.assertTrue(machine.status() == MachineBlockEntity.Status.IDLE && machine.report().progress() == 0
                 && machine.energy().getEnergyStored() == machine.type().energyCapacity(), "A complete legacy bulk recipe still ran");
@@ -181,8 +181,8 @@ public final class AssemblerPowerGameTests {
         var catalyst = new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst")));
         old.setStackInSlot(7, catalyst.copy());
         old.setStackInSlot(8, new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("overclock_chip"))));
-        legacy.put("items", old.serializeNBT(registry));
-        machine.loadWithComponents(legacy, registry);
+        legacy.put("items", old.serializeNBT());
+        machine.load(legacy);
         h.assertTrue(machine.report().progress() == 0 && machine.items().getStackInSlot(machine.type().outputSlot()).getCount() == 3
                 && ItemStack.matches(machine.items().getStackInSlot(machine.type().catalystSlot()), catalyst) && machine.hasOverclock(),
                 "Legacy progress survived or a physical slot shifted");
@@ -192,7 +192,7 @@ public final class AssemblerPowerGameTests {
         inventory.setItem(0, new ItemStack(Items.DIAMOND, 63));
         machine.createMenu(1, inventory, player);
         h.assertTrue(inventory.getItem(0).getCount() == 64, "Opening did not recover the one legacy item that fit");
-        machine.loadWithComponents(machine.saveWithoutMetadata(), registry);
+        machine.load(machine.saveWithoutMetadata());
         inventory.setItem(1, ItemStack.EMPTY);
         machine.createMenu(2, inventory, player);
         machine.createMenu(3, inventory, player);

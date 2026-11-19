@@ -138,7 +138,7 @@ public final class FactoryOperationGameTests {
         long limit = ServerConfig.PENROSE_MAX_OUTPUT.get();
         var saved = reactor.saveWithoutMetadata();
         saved.putLong("buffer", limit * 3);
-        reactor.loadWithComponents(saved, registry);
+        reactor.load(saved);
         var output = (LongEnergyStorage) reactor.energy();
         h.assertTrue(output.extractLong(100, false) == 0, "An inactive reactor allowed extraction");
         reactor.forceCore(500, 0);
@@ -169,12 +169,12 @@ public final class FactoryOperationGameTests {
         var registry = h.getLevel().registryAccess();
         var display = new FluidPipeBlockEntity(pipe.getBlockPos(), pipe.getBlockState());
         h.startSequence().thenWaitUntil(() -> {
-            display.loadWithComponents(pipe.getUpdateTag(registry), registry);
+            display.load(pipe.getUpdateTag());
             h.assertTrue(display.flowRate() == 2L * Integer.MAX_VALUE, "Survey flow was truncated at the single-transfer limit");
         }).thenExecute(() -> {
-            for (int i = 0; i < 20; i++) inlet.fill(water.copyWithAmount(2_000_000_000), FluidAction.EXECUTE);
+            for (int i = 0; i < 20; i++) inlet.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(water, 2_000_000_000), FluidAction.EXECUTE);
         }).thenWaitUntil(() -> {
-            display.loadWithComponents(pipe.getUpdateTag(registry), registry);
+            display.load(pipe.getUpdateTag());
             h.assertTrue(display.flowRate() == 4_000_000_000L, "Survey kept the previous rate in the same display bucket");
         }).thenSucceed();
     }

@@ -33,10 +33,9 @@ import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
-@net.neoforged.fml.common.EventBusSubscriber(modid="singulo")
 public final class AndroidEndpointApiGameTests {
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void registerEndpointFace(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) {
+    private static void registerEndpointFace() {
+        var event = new io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent();
         event.registerBlockEntity(AndroidWorkEndpoint.CAPABILITY, net.minecraft.world.level.block.entity.BlockEntityType.CHEST,
                 (chest, face) -> face == Direction.UP && chest instanceof Endpoint endpoint ? endpoint : null);
     }
@@ -108,6 +107,7 @@ public final class AndroidEndpointApiGameTests {
     }
     private static Endpoint endpoint(GameTestHelper h, UUID owner) {
         h.setBlock(ENDPOINT, Blocks.CHEST);
+        registerEndpointFace();
         var e=new Endpoint(h.absolutePos(ENDPOINT), owner);
         h.getLevel().setBlockEntity(e); return e;
     }
@@ -187,7 +187,7 @@ public final class AndroidEndpointApiGameTests {
             h.assertTrue(status.state() == State.COMPLETED, "Order pending: " + worker.stall() + ", received " + status.delivered());
             h.assertTrue(partial[0] && status.delivered() == 200 && endpoint.inputTank.getFluidAmount() == 50
                     && endpoint.outputTank.getFluidAmount() == 75
-                    && FluidStack.isSameFluidSameComponents(endpoint.outputTank.getFluid(), FluidSamples.fluid(hydrogen)),
+                    && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(endpoint.outputTank.getFluid(), FluidSamples.fluid(hydrogen)),
                     "Fluid type or mB balance changed");
             worker.discard();
         });

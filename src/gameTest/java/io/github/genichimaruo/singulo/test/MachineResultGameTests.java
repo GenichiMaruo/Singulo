@@ -86,7 +86,7 @@ public final class MachineResultGameTests {
                 stack("android_repair_kit", 10), stack("android_armor_plate", 1));
         PortableAndroidPrinterItem.setContents(mk1, set);
         mk1.setHoverName(Component.literal("Field printer"));
-        mk1.set(SinguloComponents.ENERGY.get(), 240_000); // surplus charge after changing a gunner memory
+        SinguloComponents.set(mk1, SinguloComponents.ENERGY.get(), 240_000); // surplus charge after changing a gunner memory
         List<ItemStack> inputs = List.of(stack("quantum_computing_module", 1), stack("entangled_element", 2),
                 mk1, stack("superconducting_coil", 2), stack("white_ceramic_composite", 4), stack("steel_plate", 2));
         io.github.genichimaruo.singulo.test.harness.AssemblyFixture.place(h, machine, "portable_android_printer_2",
@@ -99,7 +99,7 @@ public final class MachineResultGameTests {
         }
         ItemStack upgraded = machine.automationItems().extractItem(out, 1, false);
         h.assertTrue(upgraded.is(mk2.getItem()) && upgraded.getHoverName().equals(mk1.getHoverName())
-                && upgraded.getOrDefault(SinguloComponents.ENERGY.get(), 0) == 240_000, "Upgrade lost printer name or stored FE");
+                && SinguloComponents.getOrDefault(upgraded, SinguloComponents.ENERGY.get(), 0) == 240_000, "Upgrade lost printer name or stored FE");
         var slots = PortableAndroidPrinterItem.contents(upgraded);
         for (int i = 0; i < slots.size(); i++) {
             h.assertTrue(ItemStack.matches(slots.get(i), i < set.size() ? set.get(i) : ItemStack.EMPTY), "Wrong contents in slot " + i);
@@ -174,7 +174,7 @@ public final class MachineResultGameTests {
             tick(h, compressor);
         }
         var result = compressor.items().getStackInSlot(out);
-        h.assertTrue(result.is(stack("compressed_block_1", 1).getItem()) && result.getOrDefault(SinguloComponents.MIXED_SOURCE.get(), false),
+        h.assertTrue(result.is(stack("compressed_block_1", 1).getItem()) && SinguloComponents.getOrDefault(result, SinguloComponents.MIXED_SOURCE.get(), false),
                 "Reload discarded previously absorbed material types");
         h.succeed();
     }

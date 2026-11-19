@@ -29,7 +29,6 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
-@net.neoforged.fml.common.EventBusSubscriber(modid = "singulo")
 public final class FluidPumpGameTests {
     private static final BlockPos PUMP = new BlockPos(3, 2, 3);
 
@@ -58,16 +57,16 @@ public final class FluidPumpGameTests {
         }
     }
 
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void registerTestTank(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) {
+    private static void registerTestTank() {
+        var event = new io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent();
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntityType.CHEST,
                 (chest, face) -> chest instanceof TankChest test ? test.tank : null);
     }
 
     private static void attach(GameTestHelper h, BlockPos at, FluidTank tank) {
         h.setBlock(at, Blocks.CHEST);
+        registerTestTank();
         h.getLevel().setBlockEntity(new TankChest(h.absolutePos(at), tank));
-        h.getLevel().invalidateCapabilities(h.absolutePos(at));
     }
 
     @GameTest(template = "empty")
@@ -110,7 +109,7 @@ public final class FluidPumpGameTests {
         var tank = port(h, PUMP.east()).sendTank();
         var pump = pump(h);
         source.fill(lava(110_000), FluidAction.EXECUTE);
-        double oldCost = ServerConfig.PUMP_FE_PER_MB.getAsDouble();
+        double oldCost = ServerConfig.PUMP_FE_PER_MB.get();
         try {
             ServerConfig.PUMP_FE_PER_MB.set(3.0);
             h.assertTrue(pump.energy().getMaxEnergyStored() == 0 && pump.energy().receiveEnergy(150_002, true) == 150_000
@@ -143,7 +142,7 @@ public final class FluidPumpGameTests {
 
     @GameTest(template = "empty")
     public static void fractionalPumpCostSurvivesPickupAndSmallTransfers(GameTestHelper h) {
-        double oldPrice = ServerConfig.PUMP_FE_PER_MB.getAsDouble();
+        double oldPrice = ServerConfig.PUMP_FE_PER_MB.get();
         try {
             ServerConfig.PUMP_FE_PER_MB.set(0.1);
             var source = port(h, PUMP.north()).receiveTank();
@@ -182,7 +181,7 @@ public final class FluidPumpGameTests {
         source.fill(lava(5000), FluidAction.EXECUTE);
         var changesMind = new FluidTank(5000) {
             @Override public int fill(FluidStack offered, FluidAction action) {
-                return super.fill(action.execute() ? offered.copyWithAmount(Math.min(700, offered.getAmount())) : offered, action);
+                return super.fill(action.execute() ? io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(offered, Math.min(700, offered.getAmount())) : offered, action);
             }
         };
         attach(h, PUMP.east(), changesMind);
@@ -308,7 +307,7 @@ public final class FluidPumpGameTests {
             int charged = pump.energy().receiveEnergy(35_000, false);
             int now = target.getFluidAmount();
             int delivered = now - previous[0];
-            long expected = delivered > 0 ? 100 + Math.ceilDiv((delivered - 1L) * 9_999_900L, 2_099_999_999L) : 0;
+            long expected = delivered > 0 ? 100 + io.github.genichimaruo.singulo.compat.Legacy.ceilDiv((delivered - 1L) * 9_999_900L, 2_099_999_999L) : 0;
             h.assertTrue(delivered <= 10_000 && now + source.getFluidAmount() == 31_789
                     && charged == expected, "Pipe capacity or accounting mismatch");
             previous[0] = now;

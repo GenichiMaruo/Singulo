@@ -401,7 +401,7 @@ public final class MachineRecipeTransferGameTests {
     public static void jeiRepairsOnlyAnExhaustedObservationLog(GameTestHelper h) {
         var menu = menu(h, MachineType.ARCHIVE_TERMINAL);
         var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), menu.type()).stream()
-                .filter(r -> r.id().equals(Singulo.id("archive_terminal/restore_observation_log"))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().equals(Singulo.id("archive_terminal/restore_observation_log"))).findFirst().orElseThrow();
         int inventory = menu.playerSlotStart();
         for (var part : recipe.ingredients()) menu.getSlot(inventory++).set(part.ingredient().getItems()[0].copyWithCount(part.count()));
         ItemStack fresh = recipe.restore().orElseThrow().getItems()[0].copy();

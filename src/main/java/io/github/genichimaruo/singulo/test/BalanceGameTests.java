@@ -376,7 +376,7 @@ public final class BalanceGameTests {
     public static void automationMergesPartlyUsedCatalyst(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.LASER_COOLER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         int slot = m.type().catalystSlot();
         int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
         ItemStack worn = new ItemStack(item("time_crystal_catalyst"));

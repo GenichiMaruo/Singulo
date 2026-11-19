@@ -51,12 +51,12 @@ public final class WormholeFluidPipeGameTests {
         FluidDronePortBlockEntity receiver = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, REMOTE.above());
         h.runAfterDelay(30, () -> {
             h.assertTrue(electrolyzer.automationFluids().getFluidInTank(0).isEmpty(), "Electrolyzer accepted piped hydrogen");
-            h.assertTrue(FluidStack.matches(hydrogen, receiver.sendTank().getFluid()), "Hydrogen failed to reach the drone port");
+            h.assertTrue(io.github.genichimaruo.singulo.compat.Legacy.sameFluid(hydrogen, receiver.sendTank().getFluid()), "Hydrogen failed to reach the drone port");
             IFluidHandler normal = io.github.genichimaruo.singulo.compat.Capabilities.get(h.getLevel(), Capabilities.FluidHandler.BLOCK, h.absolutePos(LOCAL), null);
             h.assertTrue(normal.fill(hydrogen, FluidAction.SIMULATE) == 1000, "Normal fill simulation was filtered");
             h.assertTrue(electrolyzer.automationFluids().getFluidInTank(0).isEmpty(), "Simulation changed the electrolyzer");
             h.assertTrue(normal.fill(hydrogen, FluidAction.EXECUTE) == 1000
-                    && FluidStack.matches(hydrogen, electrolyzer.automationFluids().getFluidInTank(0)),
+                    && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(hydrogen, electrolyzer.automationFluids().getFluidInTank(0)),
                     "Normal fill no longer reaches the first available tank");
             h.succeed();
         });
@@ -73,7 +73,7 @@ public final class WormholeFluidPipeGameTests {
         FluidStack nitrogen = new FluidStack(SinguloFluids.get("liquid_nitrogen"), 2000);
         turbine.tank().fill(nitrogen, FluidAction.EXECUTE);
         h.runAfterDelay(30, () -> {
-            h.assertTrue(receiver.sendTank().isEmpty() && FluidStack.matches(nitrogen, turbine.tank().getFluidInTank(0)),
+            h.assertTrue(receiver.sendTank().isEmpty() && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(nitrogen, turbine.tank().getFluidInTank(0)),
                     "Pipe removed fuel from the remote turbine");
             IFluidHandler normal = io.github.genichimaruo.singulo.compat.Capabilities.get(h.getLevel(), Capabilities.FluidHandler.BLOCK, h.absolutePos(LOCAL), null);
             h.assertTrue(normal.drain(2000, FluidAction.SIMULATE).getAmount() == 1000, "Wrong simulated mouth bandwidth");

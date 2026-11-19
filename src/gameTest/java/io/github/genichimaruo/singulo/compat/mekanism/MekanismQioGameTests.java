@@ -87,7 +87,7 @@ public final class MekanismQioGameTests {
         int firstId = ids.id(frequency);
         int otherId = ids.id(other);
         var registries = helper.getLevel().registryAccess();
-        var restored = MekanismQio.FrequencyIds.load(ids.save(new net.minecraft.nbt.CompoundTag(), registries), registries);
+        var restored = MekanismQio.FrequencyIds.load(ids.save(new net.minecraft.nbt.CompoundTag()));
         helper.assertTrue(otherId != firstId && restored.id(other) == otherId && restored.id((IQIOFrequency)frequency(new AtomicLong(0))) == firstId,
                 "Frequency identities changed with reload or lookup order");
         helper.succeed();

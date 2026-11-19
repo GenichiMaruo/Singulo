@@ -19,7 +19,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingInput;
+import io.github.genichimaruo.singulo.compat.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.util.FakePlayer;
@@ -94,7 +94,7 @@ public final class AssemblyMenuGameTests {
         var registry = h.getLevel().registryAccess();
         var saved = machine.saveWithoutMetadata();
         grid.setStackInSlot(0, ItemStack.EMPTY);
-        machine.loadWithComponents(saved, registry);
+        machine.load(saved);
         h.assertTrue(ItemStack.matches(grid.getStackInSlot(0), part.copyWithCount(192)) && grid.getStackInSlot(1).getCount() == 96,
                 "Reload lost stocked parts or their components");
         menu.clicked(menu.assemblySlot(1), 0, ClickType.QUICK_MOVE, player);

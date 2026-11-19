@@ -18,7 +18,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.ModList;
@@ -32,7 +32,7 @@ public final class PrecisionAssemblyGameTests {
 
     private static MachineRecipe recipe(GameTestHelper h, String path) {
         return MachineRecipeIndex.station(h.getLevel(), TYPE).stream()
-                .filter(r -> r.id().equals(Singulo.id("precision_assembler/" + path))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().equals(Singulo.id("precision_assembler/" + path))).findFirst().orElseThrow();
     }
 
     private static MachineBlockEntity assembler(GameTestHelper h) {
@@ -79,7 +79,7 @@ public final class PrecisionAssemblyGameTests {
     public static void expandedBoardTransfersAndConsumesOnePartPerCell(GameTestHelper h) {
         var machine = assembler(h);
         var recipe = recipe(h, "android_work_console");
-        var inventory = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL).getInventory();
+        var inventory = h.makeMockSurvivalPlayer().getInventory();
         var menu = new MachineMenu(1, inventory, machine);
         var upgrade = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("assembly_stock_upgrade"));
         machine.items().setStackInSlot(TYPE.assemblyUpgradeSlot(), new ItemStack(upgrade));
@@ -114,17 +114,17 @@ public final class PrecisionAssemblyGameTests {
                 .filter(r -> r.id().getNamespace().equals(Singulo.MODID)).toList();
         h.assertTrue(all.size() == (ModList.get().isLoaded("mekanism") ? 141 : 139), "Unexpected number of bundled diagrams");
         for (var holder : all) {
-            var recipe = holder.value();
-            h.assertTrue(recipe.hasAssemblyShape(), "Missing diagram: " + holder.id());
+            var recipe = holder;
+            h.assertTrue(recipe.hasAssemblyShape(), "Missing diagram: " + holder.getId());
             var board = parts(h, recipe);
             var plan = recipe.assemblyPlan(board);
-            h.assertTrue(plan != null, "The registered ingredients do not match " + holder.id());
+            h.assertTrue(plan != null, "The registered ingredients do not match " + holder.getId());
             for (int slot = 0; slot < MachineRecipe.ASSEMBLY_CELLS; slot++)
-                h.assertTrue(plan.consume()[slot] == (board.get(slot).isEmpty() ? 0 : 1), "Wrong consumption for " + holder.id());
+                h.assertTrue(plan.consume()[slot] == (board.get(slot).isEmpty() ? 0 : 1), "Wrong consumption for " + holder.getId());
             for (var other : all) if (other != holder) {
-                h.assertTrue(other.value().assemblyPlan(board) == null, "Same board made both " + holder.id() + " and " + other.id());
+                h.assertTrue(other.value().assemblyPlan(board) == null, "Same board made both " + holder.getId() + " and " + other.id());
                 h.assertTrue(!canAssembleWhilePlacing(other.value(), recipe),
-                        "Placing " + holder.id() + " can start " + other.id() + " before the board is complete");
+                        "Placing " + holder.getId() + " can start " + other.id() + " before the board is complete");
             }
         }
         h.succeed();
@@ -146,10 +146,10 @@ public final class PrecisionAssemblyGameTests {
         var recipe = recipe(h, "android_tank_upgrade");
         var registry = h.getLevel().registryAccess();
         var board = parts(h, recipe);
-        var buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registry);
+        var buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
-            MachineRecipe.STREAM_CODEC.encode(buf, recipe);
-            var decoded = MachineRecipe.STREAM_CODEC.decode(buf);
+            new MachineRecipe.Serializer().toNetwork(buf, recipe);
+            var decoded = new MachineRecipe.Serializer().fromNetwork(recipe.getId(), buf);
             h.assertTrue(recipe.shape().equals(decoded.shape()) && decoded.assemblyPlan(board) != null, "Client lost the assembly shape");
         } finally {
             buf.release();
@@ -208,7 +208,7 @@ public final class PrecisionAssemblyGameTests {
         var registry = h.getLevel().registryAccess();
         var saved = machine.saveWithoutMetadata();
         machine.assemblyGrid().extractItem(9, 1, false);
-        machine.loadWithComponents(saved, registry);
+        machine.load(saved);
         for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++)
             h.assertTrue(ItemStack.matches(machine.assemblyGrid().getStackInSlot(i), board.get(i)), "Lost manual cell on load: " + i);
         tick(h, machine, recipe.time() - 7);

@@ -1,6 +1,8 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.android.RuinAndroid;
+import io.github.genichimaruo.singulo.api.android.AndroidEscrows;
+import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
@@ -63,6 +65,7 @@ public final class AndroidBucketCraftingGameTests {
         h.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(TABLE, Blocks.CRAFTING_TABLE);
         WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CONSOLE);
+        console.setOwner(player.getUUID());
         RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, RACK);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, h.absolutePos(CONSOLE), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -75,6 +78,28 @@ public final class AndroidBucketCraftingGameTests {
         var card = new ItemStack(SinguloItems.RECIPE_CARD.get());
         new RecipeData(grid, target).write(card, level.registryAccess());
         rack.items().setStackInSlot(1, card);
+        var original = AndroidOrders.recipes(level, console.getBlockPos(), player.getUUID()).recipes().get(0);
+        h.assertTrue(original.materials().get(0).sample().is(Items.LAVA_BUCKET), "Original API lost its bucket input");
+        var fluidVariants = AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), player.getUUID()).recipes();
+        h.assertTrue(fluidVariants.size() == 1, "Missing validated fluid recipe");
+        var variant = fluidVariants.get(0);
+        var material = variant.materials().get(0);
+        h.assertTrue(material.liquid() && material.count() == 1000
+                && AndroidEscrows.fluidOf(material.sample()).getFluid().isSame(Fluids.LAVA)
+                && variant.outputs().size() == 1 && variant.outputs().get(0).sample().is(Items.MAGMA_BLOCK),
+                "Fluid recipe changed units, product, or promised a phantom bucket");
+        h.assertTrue(AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), java.util.UUID.randomUUID()).state()
+                == AndroidOrders.SnapshotState.REJECTED, "Non-owner read fluid recipes");
+        var overridingCard = new ItemStack(SinguloItems.RECIPE_CARD.get());
+        var competingGrid = NonNullList.withSize(9, ItemStack.EMPTY);
+        competingGrid.set(4, new ItemStack(Items.MAGMA_CREAM));
+        new RecipeData(competingGrid, target).write(overridingCard, level.registryAccess());
+        rack.items().setStackInSlot(1, overridingCard);
+        rack.items().setStackInSlot(2, card);
+        h.assertTrue(AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), player.getUUID()).recipes().isEmpty(),
+                "Fluid snapshot exposed a card which the planner never selects");
+        rack.items().setStackInSlot(1, card);
+        rack.items().setStackInSlot(2, ItemStack.EMPTY);
         var worker = tankWorker(h, player.getUUID(), 500);
         var other = tankWorker(h, player.getUUID(), 500);
         var ids = List.of(other.getUUID(), worker.getUUID());
@@ -102,8 +127,8 @@ public final class AndroidBucketCraftingGameTests {
             h.setBlock(CHEST, Blocks.CHEST);
             ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
             chest.setItem(0, new ItemStack(Items.LAVA_BUCKET));
-            h.assertTrue(worker.fillTanks(lava.copyWithAmount(875), false) == 875
-                    && worker.fillTanks(water.copyWithAmount(375), false) == 375, "Failed to prepare two onboard balances");
+            h.assertTrue(worker.fillTanks(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(lava, 875), false) == 875
+                    && worker.fillTanks(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(water, 375), false) == 375, "Failed to prepare two onboard balances");
             h.assertTrue(console.start(player, target, 1, List.of(worker.getUUID()), null) == null, "Real-bucket order refused");
         }).thenWaitUntil(() -> {
             ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
@@ -201,7 +226,7 @@ public final class AndroidBucketCraftingGameTests {
         var lava = new FluidStack(Fluids.LAVA, 1);
         var sample = FluidSamples.of(lava);
         int capacity = worker.fluidCapacity();
-        worker.fillTanks(lava.copyWithAmount(capacity + 999), false);
+        worker.fillTanks(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(lava, capacity + 999), false);
         worker.retainTanksForWork();
         h.assertTrue(worker.tankFluids().size() == 2 && worker.personalLiquid(sample) == capacity + 1000L
                 && worker.carryEmpty(), "Two tanks lost or double-counted their preloaded balance");

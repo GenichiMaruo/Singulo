@@ -73,7 +73,7 @@ public final class AndroidMachineCycleGameTests {
 
     private static void cycle(GameTestHelper h, WorkConsoleBlockEntity console, MachineBlockEntity machine, MachineRecipe holder) {
         var level = h.getLevel();
-        var recipe = holder.value();
+        var recipe = holder;
         var pos = machine.getBlockPos();
         if (recipe.energy() > machine.type().energyCapacity()) {
             int tier = CapacityUpgrades.requiredTier(recipe.energy());
@@ -114,7 +114,7 @@ public final class AndroidMachineCycleGameTests {
                     && machine.status() != MachineBlockEntity.Status.NO_POWER) break;
         }
         String ran = machine.saveWithoutMetadata().getString("recipe");
-        if (!finished || !holder.id().toString().equals(ran)) {
+        if (!finished || !holder.getId().toString().equals(ran)) {
             throw new IllegalStateException("active=" + ran + ", status=" + machine.status() + ", size=" + machine.structureSize());
         }
         if (assembly != null) {

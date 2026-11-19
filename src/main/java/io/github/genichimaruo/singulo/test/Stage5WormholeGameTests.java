@@ -235,7 +235,7 @@ public final class Stage5WormholeGameTests {
             WormholeMouthBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, mouthA);
             helper.assertTrue(a.portLimit() == 8 && a.rankedPorts().size() == 9, "ポートの数え方が違う: " + a.rankedPorts().size());
             for (BlockPos p : ports) {
-                WormholePortBlockEntity port = helper.getBlockEntity(p);
+                WormholePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, p);
                 helper.assertTrue(a.rankOf(port) == a.rankedPorts().indexOf(port) + 1, "Rank disagrees with the distance-sorted list");
                 boolean lit = helper.getBlockState(p).getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT);
                 if (p.equals(far)) {
@@ -245,14 +245,14 @@ public final class Stage5WormholeGameTests {
                 }
             }
             BlockPos tiePos = ports.get(0);
-            WormholePortBlockEntity original = helper.getBlockEntity(tiePos), tied = helper.getBlockEntity(ports.get(1));
+            WormholePortBlockEntity original = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, tiePos), tied = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, ports.get(1));
             int expected = original.getBlockPos().asLong() < tied.getBlockPos().asLong() ? 1 : 2;
             helper.assertTrue(a.rankOf(original) == expected && a.rankOf(tied) == 3 - expected, "Equal-distance ports lost their position tie-break");
             WormholeMouthBlockEntity detached = new WormholeMouthBlockEntity(a.getBlockPos(), a.getBlockState());
             helper.assertTrue(detached.rankOf(original) == 0, "A mouth outside a level assigned a rank");
             helper.setBlock(tiePos, Blocks.AIR);
             helper.setBlock(tiePos, SinguloBlocks.WORMHOLE_PORT.get());
-            WormholePortBlockEntity replacement = helper.getBlockEntity(tiePos);
+            WormholePortBlockEntity replacement = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, tiePos);
             helper.assertTrue(a.rankOf(original) == expected && a.rankOf(replacement) == 0, "Rank changed within the cached tick");
             helper.runAfterDelay(1, () -> {
                 helper.assertTrue(a.rankOf(original) == 0 && a.rankOf(replacement) == expected && a.portActive(replacement),

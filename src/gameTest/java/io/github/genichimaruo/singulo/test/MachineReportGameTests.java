@@ -22,14 +22,13 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
  */
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
-@net.neoforged.fml.common.EventBusSubscriber(modid="singulo")
 public final class MachineReportGameTests {
     private static final class AddonMachine extends net.minecraft.world.level.block.entity.ChestBlockEntity {
         AddonMachine(BlockPos pos) { super(pos, Blocks.CHEST.defaultBlockState()); }
     }
 
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void registerMachineReport(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) {
+    private static void registerMachineReport() {
+        var event = new io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent();
         event.registerBlockEntity(MachineReports.CAPABILITY, net.minecraft.world.level.block.entity.BlockEntityType.CHEST,
                 (chest, ignored) -> chest instanceof AddonMachine ? new MachineReport.Source() {
                     public MachineReport report() {
@@ -46,6 +45,7 @@ public final class MachineReportGameTests {
         h.setBlock(at, Blocks.CHEST);
         var level = h.getLevel();
         var pos = h.absolutePos(at);
+        registerMachineReport();
         var be = new AddonMachine(pos);
         level.setBlockEntity(be);
         be.setItem(0, new ItemStack(Items.AMETHYST_SHARD, 2));
@@ -74,7 +74,7 @@ public final class MachineReportGameTests {
         MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, kilnAt);
         kiln.items().setStackInSlot(MachineType.KILN.recipeSlot(0), new ItemStack(Items.DIRT));
         h.assertTrue(MachineReport.reports(kiln.getBlockState(), kiln), "A kiln does not report");
-        h.assertTrue(level.getCapability(MachineReports.CAPABILITY, kiln.getBlockPos()) == kiln, "Singulo machine did not expose the public capability");
+        h.assertTrue(kiln.getCapability(MachineReports.CAPABILITY).orElse(null) == kiln, "Singulo machine did not expose the public capability");
         h.assertFalse(MachineReport.reports(Blocks.STONE.defaultBlockState(), null), "Stone reports");
 
         // 組み上がっていない縮退圧縮炉: コントローラーだけで、ほかの部品がみな足りない

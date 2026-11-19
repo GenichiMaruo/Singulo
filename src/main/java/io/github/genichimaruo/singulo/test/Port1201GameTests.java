@@ -124,7 +124,7 @@ public final class Port1201GameTests {
         io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
-            GalaxyPayload galaxies = new GalaxyPayload(List.of(0L, Long.MIN_VALUE, Long.MAX_VALUE), true);
+            GalaxyPayload galaxies = new GalaxyPayload(List.of(0L, Long.MIN_VALUE, Long.MAX_VALUE), List.of(0, 1, 2), true);
             GalaxyPayload.encode(galaxies, buffer);
             helper.assertTrue(galaxies.equals(GalaxyPayload.decode(buffer)), "Galaxy packet changed seeds or fresh flag");
             EndingPayload ending = new EndingPayload(true);

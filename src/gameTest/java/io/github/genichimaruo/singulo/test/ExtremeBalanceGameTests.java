@@ -151,7 +151,7 @@ public final class ExtremeBalanceGameTests {
             FluidDronePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(2, 1, 2));
             h.assertTrue(port.receiveTank().fill(water, IFluidHandler.FluidAction.EXECUTE) == Integer.MAX_VALUE, "Port capacity wrapped");
             ServerConfig.FLUID_CAPSULE_CAPACITY.set(25);
-            FluidCapsuleItem.setFluid(capsule, water.copyWithAmount(Integer.MAX_VALUE - 1));
+            FluidCapsuleItem.setFluid(capsule, io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(water, Integer.MAX_VALUE - 1));
             h.assertTrue(FluidCapsuleItem.fluid(capsule).getAmount() == Integer.MAX_VALUE - 1
                     && port.receiveTank().fill(water, IFluidHandler.FluidAction.EXECUTE) == 0
                     && port.receiveTank().getFluidAmount() == Integer.MAX_VALUE && FluidDronePortBlockEntity.autoThreshold(1) == 25,
@@ -225,10 +225,10 @@ public final class ExtremeBalanceGameTests {
             var worldPos = machine.getBlockPos();
             h.getLevel().destroyBlock(worldPos, true);
             var drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(worldPos).inflate(1));
-            h.assertTrue(drops.size() == 1 && drops.get(0).getItem().has(DataComponents.BLOCK_ENTITY_DATA), "Huge board did not drop exactly one packed machine");
+            h.assertTrue(drops.size() == 1 && (drops.get(0).getTagElement("BlockEntityTag") != null), "Huge board did not drop exactly one packed machine");
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
             MachineBlockEntity restored = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
-            restored.load(drops.get(0).getItem().get(DataComponents.BLOCK_ENTITY_DATA).copyTag());
+            restored.load(drops.get(0).getTagElement("BlockEntityTag").copy());
             h.assertTrue(restored.assemblyGrid().getStackInSlot(0).getCount() == Integer.MAX_VALUE
                     && restored.items().getStackInSlot(slot).getCount() == Integer.MAX_VALUE, "Packed machine lost items");
             h.succeed();
@@ -301,7 +301,7 @@ public final class ExtremeBalanceGameTests {
             int out = m.type().outputSlot();
             h.assertTrue(io.insertItem(0, item("zinc_dust", 1_000_007), false).isEmpty(), "Bulk input rejected");
             h.assertTrue(m.automationFluids().fill(new FluidStack(Fluids.WATER, Integer.MAX_VALUE), IFluidHandler.FluidAction.EXECUTE) == Integer.MAX_VALUE, "Tank capacity truncated");
-            m.pasteSelectedRecipe(holder.id());
+            m.pasteSelectedRecipe(holder.getId());
             MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             h.assertTrue(io.getStackInSlot(0).getCount() == 7 && io.getStackInSlot(out).getCount() == Integer.MAX_VALUE
                     && m.automationFluids().getFluidInTank(0).getAmount() == 147_483_647, "Bulk craft lost or created material");
@@ -314,14 +314,14 @@ public final class ExtremeBalanceGameTests {
             raw.remove("fluid_ingredients");
             raw.getAsJsonArray("ingredients").get(0).getAsJsonObject().addProperty("count", 1);
             raw.getAsJsonObject("result").addProperty("count", 1);
-            manager.replaceRecipes(List.of(new net.minecraft.world.item.crafting.RecipeHolder<>(holder.id(), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow())));
+            manager.replaceRecipes(List.of(new net.minecraft.world.item.crafting.RecipeHolder<>(holder.getId(), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow())));
             m.items().setStackInSlot(out, ItemStack.EMPTY);
             m.items().setStackInSlot(0, item("zinc_dust", Integer.MAX_VALUE));
             MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             h.assertTrue(io.getStackInSlot(out).getCount() == Integer.MAX_VALUE && io.getStackInSlot(0).isEmpty(), "Max-count batch did not finish in one tick");
             raw.addProperty("time", 2);
             raw.add("fluid_ingredients", JsonParser.parseString("[{\"fluid\":\"minecraft:water\",\"amount\":1}]"));
-            manager.replaceRecipes(List.of(new net.minecraft.world.item.crafting.RecipeHolder<>(holder.id(), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow())));
+            manager.replaceRecipes(List.of(new net.minecraft.world.item.crafting.RecipeHolder<>(holder.getId(), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow())));
             m.items().setStackInSlot(out, ItemStack.EMPTY);
             m.items().setStackInSlot(0, item("zinc_dust", 600));
             for (int i = 0; i < 2; i++) MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);

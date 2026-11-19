@@ -163,7 +163,7 @@ public final class AndroidCollectGameTests {
         BlockPos far = h.absolutePos(new BlockPos(7, 1, 0));
         player.teleportTo(far.getX() + 0.5, far.getY(), far.getZ() + 0.5);
         ItemEntity thrown = drop(h, new BlockPos(2, 1, 4), new ItemStack(Items.DIAMOND));
-        thrown.setThrower(player);
+        thrown.setThrower(player.getUUID());
         h.runAfterDelay(WAIT, () -> {
             int carried = 0;
             for (int i = 0; i < a.inventory().getContainerSize(); i++) {

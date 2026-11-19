@@ -41,11 +41,11 @@ public final class BlueprintGameTests {
                     .toList();
             helper.assertTrue(!recipes.isEmpty(), "Missing controller recipe for " + kind.id());
             for (var holder : recipes) {
-                var recipe = holder.value();
+                var recipe = holder;
                 boolean required = recipe instanceof MachineRecipe machine
                         ? machine.ingredients().stream().anyMatch(i -> i.count() >= 1 && i.uses() == 0 && requiresPart(i.ingredient(), parts))
                         : recipe.getIngredients().stream().anyMatch(i -> requiresPart(i, parts));
-                helper.assertTrue(required, holder.id() + " can be made without a structural part of " + kind.id());
+                helper.assertTrue(required, holder.getId() + " can be made without a structural part of " + kind.id());
             }
         }
         helper.succeed();

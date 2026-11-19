@@ -36,7 +36,7 @@ record HandbookVisual(ItemStack icon, List<String> links, List<Row> rows, @Nulla
     }
 
     private static ItemStack item(String id) {
-        return BuiltInRegistries.ITEM.get(ResourceLocation.parse(id)).getDefaultInstance();
+        return BuiltInRegistries.ITEM.get(new ResourceLocation(id)).getDefaultInstance();
     }
 
     private static List<Token> tokens(JsonObject row, String key) {
@@ -46,7 +46,7 @@ record HandbookVisual(ItemStack icon, List<String> links, List<Row> rows, @Nulla
                 JsonObject obj = element.getAsJsonObject();
                 String amount = obj.get("amount").getAsString();
                 if (obj.has("fluid")) {
-                    Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(obj.get("fluid").getAsString()));
+                    Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(obj.get("fluid").getAsString()));
                     result.add(new Token(ItemStack.EMPTY, fluid, amount));
                 } else {
                     result.add(new Token(item(obj.get("item").getAsString()), null, amount));

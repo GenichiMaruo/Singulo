@@ -58,7 +58,7 @@ public final class ConduitWaterGameTests {
             var wet = h.getBlockState(at);
             var water = (SimpleWaterloggedBlock) block;
             h.assertTrue(!wet.propagatesSkylightDown(level, pos) && wet.getLightBlock(level, pos) == 1, "Incorrect underwater lighting");
-            h.assertTrue(water.pickupBlock(player, level, pos, wet).is(Items.WATER_BUCKET)
+            h.assertTrue(water.pickupBlock(level, pos, wet).is(Items.WATER_BUCKET)
                     && h.getBlockState(at).is(block) && h.getBlockState(at).getFluidState().isEmpty(), "Bucket did not drain only the water");
             h.assertTrue(water.placeLiquid(level, pos, h.getBlockState(at), Fluids.WATER.getSource(false)), "Water bucket did not refill the block");
             h.setBlock(at.east(), Blocks.STONE);
@@ -90,7 +90,7 @@ public final class ConduitWaterGameTests {
             h.assertTrue(sink.sendTank().isEmpty() && source.receiveTank().getFluidAmount() == 1000, "Submerged pipes extracted fluid with no power");
             battery.energy().setEnergy(5000);
             h.succeedWhen(() -> {
-                h.assertTrue(FluidStack.matches(sink.sendTank().getFluid(), lava) && source.receiveTank().isEmpty(),
+                h.assertTrue(io.github.genichimaruo.singulo.compat.Legacy.sameFluid(sink.sendTank().getFluid(), lava) && source.receiveTank().isEmpty(),
                         "The underwater line did not deliver exactly one bucket of lava");
                 for (var at : List.of(pump.west(2), pump.west(), pump.east(), pump.east(2))) {
                     h.assertTrue(h.getBlockState(at).getFluidState().isSourceOfType(Fluids.WATER), "Transport consumed the surrounding water");

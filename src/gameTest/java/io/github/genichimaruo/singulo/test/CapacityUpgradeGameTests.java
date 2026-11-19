@@ -83,7 +83,7 @@ public final class CapacityUpgradeGameTests {
         old.setStackInSlot(8, overclock.copy());
         old.setStackInSlot(7, new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst"))));
         old.setStackInSlot(0, new ItemStack(Items.IRON_INGOT, 7));
-        tag.put("items", old.serializeNBT(h.getLevel().registryAccess()));
+        tag.put("items", old.serializeNBT());
         tag.putIntArray("slot_layout", new int[]{6, 1});
         restored.load(tag);
         restored.recoverLegacyAssemblyInputs(player);
@@ -101,9 +101,9 @@ public final class CapacityUpgradeGameTests {
             var holder = RecipeSelection.selectable(h.getLevel(), MachineType.PRECISION_ASSEMBLER).stream()
                     .filter(r -> r.value().result().is(CapacityUpgrades.item(wantedTier).getItem())).findFirst().orElseThrow();
             int previous = tier - 1;
-            h.assertTrue(holder.value().ingredients().stream().anyMatch(i -> i.count() == 1
+            h.assertTrue(holder.ingredients().stream().anyMatch(i -> i.count() == 1
                     && i.ingredient().test(CapacityUpgrades.item(previous))), "Upgrade skips or omits previous tier");
-            h.assertTrue(holder.value().energy() <= MachineType.PRECISION_ASSEMBLER.energyCapacity(),
+            h.assertTrue(holder.energy() <= MachineType.PRECISION_ASSEMBLER.energyCapacity(),
                     "Capacity upgrade cannot be crafted before it is installed");
         }
         h.succeed();

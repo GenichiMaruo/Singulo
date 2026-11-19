@@ -53,7 +53,7 @@ public final class RecipePatchGameTests {
                 apply(prepare(resources, profiler), resources, profiler);
             }
         }
-        MachineRecipe machine(ResourceLocation id) { return (MachineRecipe) byKey(id).orElseThrow().value(); }
+        MachineRecipe machine(ResourceLocation id) { return (MachineRecipe) byKey(id).orElseThrow(); }
     }
 
     private static Path path(Path pack, ResourceLocation id) throws IOException {
@@ -88,7 +88,7 @@ public final class RecipePatchGameTests {
                     "Example patch lost a field or did not reach the machine recipe");
             h.assertTrue(manager.machine(FRAME).shape().equals(List.of("     ", "  B  ", " ADA ", "  A  ", "     ")),
                     "Precision assembly row override failed");
-            var crafting = (ShapedRecipe) manager.byKey(UPGRADE).orElseThrow().value();
+            var crafting = (ShapedRecipe) manager.byKey(UPGRADE).orElseThrow();
             h.assertTrue(crafting.getIngredients().get(4).test(Items.DIAMOND.getDefaultInstance()), "Vanilla crafting key was not patched");
             manager.load(pack(base));
             h.assertTrue(manager.machine(STEEL).fluidIngredients().get(0).amount() == 250 && manager.machine(STEEL).result().getCount() == 2,

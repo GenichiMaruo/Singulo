@@ -76,7 +76,7 @@ public final class AndroidRecipeApiGameTests {
                 "Snapshot mutation changed source");
         var pattern = h.getLevel().getRecipeManager().byKey(io.github.genichimaruo.singulo.Singulo.id(
                 "archive_terminal/data_card_observation_log")).orElseThrow();
-        c.setMachineProcess((io.github.genichimaruo.singulo.recipe.MachineRecipe) pattern.value(), List.of());
+        c.setMachineProcess((io.github.genichimaruo.singulo.recipe.MachineRecipe) pattern, List.of());
         c.encoder().setItem(WorkConsoleBlockEntity.CARD, card.copy());
         h.assertTrue(c.encode(), "Cannot record an archive card");
         rack.items().setStackInSlot(2, c.encoder().getItem(WorkConsoleBlockEntity.CARD).copy());

@@ -51,7 +51,7 @@ public final class MekanismGameTests {
         var tankPos = new BlockPos(3, 3, 3);
         var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
         h.setBlock(tankPos, tank);
-        h.getBlockEntity(tankPos).applyComponentsFromItemStack(new ItemStack(tank));
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, tankPos).applyComponentsFromItemStack(new ItemStack(tank));
         var outlet = tankPos.below();
         h.setBlock(outlet, SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(outlet.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
@@ -62,7 +62,7 @@ public final class MekanismGameTests {
             h.runAfterDelay(20, () -> {
                 h.assertTrue(top.getFluidInTank(0).getAmount() == 8000, "Tank was already ejecting with a receiver directly below");
                 h.setBlock(outlet, SinguloBlocks.FLUID_PIPE.get());
-                var receiver = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) h.getBlockEntity(outlet.east());
+                var receiver = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, outlet.east());
                 h.runAfterDelay(20, () -> {
                     h.assertTrue(top.getFluidInTank(0).getAmount() == 8000 && receiver.sendTank().isEmpty(),
                             "A pipe extracted lava from a passive Mekanism tank");
@@ -77,16 +77,16 @@ public final class MekanismGameTests {
         var tankAt = new BlockPos(3, 3, 3);
         var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
         h.setBlock(tankAt, tank);
-        h.getBlockEntity(tankAt).applyComponentsFromItemStack(new ItemStack(tank));
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, tankAt).applyComponentsFromItemStack(new ItemStack(tank));
         h.runAfterDelay(5, () -> {
             var absolute = h.absolutePos(tankAt);
             var above = io.github.genichimaruo.singulo.compat.Capabilities.get(h.getLevel(), Capabilities.FluidHandler.BLOCK, absolute, Direction.UP);
             h.assertTrue(above != null && above.fill(new FluidStack(Fluids.LAVA, 8000), FluidAction.EXECUTE) == 8000, "Tank did not accept lava");
             h.setBlock(tankAt.below(), SinguloBlocks.FLUID_PUMP.get().defaultBlockState()
                     .setValue(io.github.genichimaruo.singulo.pipe.FluidPumpBlock.INTAKE, Direction.UP));
-            var pump = (io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity) h.getBlockEntity(tankAt.below());
+            var pump = (io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, tankAt.below());
             h.setBlock(tankAt.below().east(), SinguloBlocks.FLUID_DRONE_PORT.get());
-            var target = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) h.getBlockEntity(tankAt.below().east());
+            var target = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, tankAt.below().east());
             h.assertTrue(pump.energy().receiveEnergy(125, false) == 125, "Wrong pump energy debit");
             h.succeedWhen(() -> h.assertTrue(target.sendTank().getFluidAmount() == 5251 && above.getFluidInTank(0).getAmount() == 2749
                     && pump.energy().getEnergyStored() == 0, "Passive Mekanism tank did not deliver the powered volume"));
@@ -106,7 +106,7 @@ public final class MekanismGameTests {
             int inserted = 0;
             for (Direction face : Direction.values()) {
                 var handler = io.github.genichimaruo.singulo.compat.Capabilities.get(h.getLevel(), Capabilities.FluidHandler.BLOCK, absolute, face);
-                if (handler != null) inserted += handler.fill(lava.copyWithAmount(2000 - inserted), FluidAction.EXECUTE);
+                if (handler != null) inserted += handler.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(lava, 2000 - inserted), FluidAction.EXECUTE);
                 if (inserted == 2000) break;
             }
             h.assertTrue(inserted == 2000, "Mekanism did not accept the initial lava");
@@ -116,7 +116,7 @@ public final class MekanismGameTests {
                 BlockPos consolePos = absolute.relative(face);
                 h.getLevel().setBlockAndUpdate(consolePos, SinguloBlocks.ANDROID_WORK_CONSOLE.get().defaultBlockState());
                 var console = (WorkConsoleBlockEntity) h.getLevel().getBlockEntity(consolePos);
-                var sample = FluidSamples.of(lava.copyWithAmount(1));
+                var sample = FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(lava, 1));
                 h.assertTrue(ItemCount.get(console.stock(), sample) == 2000, "Console missed adjacent Mekanism fluid storage");
                 var android = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
                 android.inventory().setItem(RuinAndroid.SLOT_TANK, item("android_tank_upgrade"));
@@ -157,7 +157,7 @@ public final class MekanismGameTests {
                     "化学物質の挿入シミュレーションがタンクを変えた");
             long put = store.insert("mekanism:hydrogen", 5000, false);
             helper.assertTrue(put == 5000, "ケミカルタンクに水素が入らない: " + put);
-            WorkConsoleBlockEntity console = helper.getBlockEntity(consolePos);
+            WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, consolePos);
             ItemStack hydrogen = AndroidRecipe.chemicalSample("mekanism:hydrogen", 1);
             helper.assertTrue(ItemCount.get(console.stock(), hydrogen) == 5000, "素材置き場の在庫に水素が数えられない");
             // 指令台はタンクの下（入れるだけの面）にあるが、出せる面（前）から取り出せる
@@ -192,7 +192,7 @@ public final class MekanismGameTests {
             // A second console can only reach this same tank through the addon's chemical endpoint.
             BlockPos remote = new BlockPos(4, 1, 3), port = remote.north(2);
             helper.setBlock(remote, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-            WorkConsoleBlockEntity other = helper.getBlockEntity(remote);
+            WorkConsoleBlockEntity other = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, remote);
             other.setOwner(java.util.UUID.randomUUID());
             String id = AndroidRecipe.chemicalId(hydrogen);
             var output = java.util.Arrays.stream(Direction.values()).map(face -> Chemicals.store(helper.getLevel(),

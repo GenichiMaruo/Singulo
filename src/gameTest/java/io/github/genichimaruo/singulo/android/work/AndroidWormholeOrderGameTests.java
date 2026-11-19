@@ -66,14 +66,14 @@ public final class AndroidWormholeOrderGameTests {
         chest.setItem(1, item("wormhole_mouth_casing", 4));
         var old = UnstableMouthItem.createPair(level)[0];
         var oldSealed = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
-        oldSealed.set(SinguloComponents.WORMHOLE.get(), old.get(SinguloComponents.WORMHOLE.get()));
+        SinguloComponents.set(oldSealed, SinguloComponents.WORMHOLE.get(), SinguloComponents.get(old, SinguloComponents.WORMHOLE.get()));
         record(h, rack, 0, generator, RecipeData.processing(List.of(), old.copy(), List.of(), ItemStack.EMPTY));
         record(h, rack, 1, stabilizer.getBlockPos(), RecipeData.processing(
                 List.of(old.copy(), item("exotic_matter", 2), item("wormhole_mouth_casing", 1)), oldSealed, List.of(), ItemStack.EMPTY));
 
         var target = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
         var unrelated = oldSealed.copy();
-        unrelated.set(SinguloComponents.WORMHOLE.get(), UnstableMouthItem.createPair(level)[0].get(SinguloComponents.WORMHOLE.get()));
+        SinguloComponents.set(unrelated, SinguloComponents.WORMHOLE.get(), SinguloComponents.get(UnstableMouthItem.createPair(level)[0], SinguloComponents.WORMHOLE.get()));
         var orphanPlan = WorkPlanner.plan(target, 2, List.of(), List.of(new ItemCount(oldSealed, 1), new ItemCount(unrelated, 1)));
         h.assertTrue(!orphanPlan.ok(), "Two unmatched orphans fulfilled a pair request");
         h.assertTrue(!WormholeOrders.matches(oldSealed, unrelated), "A request for a specific pair matched another one");
@@ -85,7 +85,7 @@ public final class AndroidWormholeOrderGameTests {
                 List.of(new ItemCount(oldSealed, 1), new ItemCount(unrelated, 2)), level);
         h.assertTrue(!specific.ok() && specific.steps.isEmpty(), "An exact pair request generated a different pair");
         var expired = old.copy();
-        expired.set(SinguloComponents.WORMHOLE.get(), new WormholeData(5, level.getGameTime() - UnstableMouthItem.LIFETIME));
+        SinguloComponents.set(expired, SinguloComponents.WORMHOLE.get(), new WormholeData(5, level.getGameTime() - UnstableMouthItem.LIFETIME));
         var expiredPlan = WorkPlanner.plan(item("unstable_wormhole_mouth", 1), 2, console.recipes(),
                 List.of(new ItemCount(expired, 2)), level);
         h.assertTrue(expiredPlan.ok() && expiredPlan.fromStock.isEmpty() && expiredPlan.steps.size() == 1, "Expired mouths were reserved");
@@ -136,8 +136,8 @@ public final class AndroidWormholeOrderGameTests {
                 for (int slot = 0; slot < container.getContainerSize(); slot++) {
                     var stack = container.getItem(slot);
                     if (!stack.is(target.getItem())) continue;
-                    var data = stack.get(SinguloComponents.WORMHOLE.get());
-                    h.assertTrue(data != null && !data.equals(old.get(SinguloComponents.WORMHOLE.get())) && !data.placed(),
+                    var data = SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get());
+                    h.assertTrue(data != null && !data.equals(SinguloComponents.get(old, SinguloComponents.WORMHOLE.get())) && !data.placed(),
                             "Received the card sample or a mouth without its generated identity");
                     pairs.merge(data, stack.getCount(), Integer::sum);
                 }

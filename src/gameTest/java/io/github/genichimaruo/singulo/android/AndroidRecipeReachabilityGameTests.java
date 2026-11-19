@@ -68,12 +68,12 @@ public final class AndroidRecipeReachabilityGameTests {
         stations.put("tidal_spindle", SinguloBlocks.TIDAL_SPINDLE.get());
         Set<Facility> facilities = new HashSet<>();
         for (var holder : level.getRecipeManager().getRecipes()) {
-            if (!holder.id().getNamespace().equals(Singulo.MODID)) continue;
-            var recipe = holder.value();
+            if (!holder.getId().getNamespace().equals(Singulo.MODID)) continue;
+            var recipe = holder;
             List<Set<Object>> inputs = new ArrayList<>();
             Set<Object> products = new HashSet<>();
             if (recipe instanceof MachineRecipe base) {
-                var machine = RecipeTweaks.adjust(holder.id(), base);
+                var machine = RecipeTweaks.adjust(holder.getId(), base);
                 if (machine == null) continue;
                 var block = Objects.requireNonNull(stations.get(machine.station()), machine.station());
                 var kind = Blueprints.kindOf(block);
@@ -94,15 +94,15 @@ public final class AndroidRecipeReachabilityGameTests {
                 machine.fluidResults().forEach(fluid -> products.add(fluid.getFluid()));
             } else {
                 h.assertTrue(recipe instanceof CraftingRecipe || recipe instanceof AbstractCookingRecipe || recipe instanceof StonecutterRecipe,
-                        "Unmodeled Singulo recipe type " + holder.id());
+                        "Unmodeled Singulo recipe type " + holder.getId());
                 for (var ingredient : recipe.getIngredients()) {
                     if (ingredient != Ingredient.EMPTY) inputs.add(choices(ingredient));
                 }
                 var result = recipe.getResultItem(level.registryAccess());
                 if (!result.isEmpty()) products.add(result.getItem());
             }
-            h.assertTrue(!products.isEmpty(), "Recipe has no product " + holder.id());
-            routes.add(new Route(holder.id().toString(), inputs, products));
+            h.assertTrue(!products.isEmpty(), "Recipe has no product " + holder.getId());
+            routes.add(new Route(holder.getId().toString(), inputs, products));
         }
         h.assertTrue(!routes.isEmpty(), "No Singulo recipes were loaded");
         // These products come from dedicated world/machine operations rather than recipe-manager entries.

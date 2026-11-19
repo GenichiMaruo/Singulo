@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetDataPacket;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
@@ -26,7 +26,7 @@ public final class AndroidStationMenuGameTests {
         var station = (AndroidStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         var player = TestScope.player(helper);
         var server = station.createMenu(1, player.getInventory(), player);
-        var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
+        var buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
             buffer.writeBlockPos(station.getBlockPos());
             var client = AndroidStationMenu.client(1, player.getInventory(), buffer);

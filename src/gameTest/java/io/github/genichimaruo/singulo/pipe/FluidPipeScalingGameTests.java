@@ -104,7 +104,7 @@ public final class FluidPipeScalingGameTests {
                 for (var source : sources) {
                     var pipe = (FluidPipeBlockEntity) h.getLevel().getBlockEntity(source.getBlockPos().west());
                     int sent = pipe.inlet(net.minecraft.core.Direction.EAST).fill(nitrogen, IFluidHandler.FluidAction.EXECUTE);
-                    if (sent > 0) source.ejectFluids().drain(nitrogen.copyWithAmount(sent), IFluidHandler.FluidAction.EXECUTE);
+                    if (sent > 0) source.ejectFluids().drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(nitrogen, sent), IFluidHandler.FluidAction.EXECUTE);
                 }
                 long nanos = System.nanoTime() - start;
                 if (i == -warmups) firstNanos = nanos;

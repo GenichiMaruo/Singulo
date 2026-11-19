@@ -13,7 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -48,10 +48,10 @@ public final class FactoryMonitorGameTests {
                 station.energy().setEnergy(100_000);
             }
             var snapshot = FactoryMonitor.scan(level, at);
-            var buf = new RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), level.registryAccess());
+            var buf = new FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
             try {
-                FactoryMonitor.Snapshot.CODEC.encode(buf, snapshot);
-                var received = FactoryMonitor.Snapshot.CODEC.decode(buf);
+                FactoryMonitor.Snapshot.encode(snapshot, buf);
+                var received = FactoryMonitor.Snapshot.decode(buf);
                 h.assertTrue(received.stored() - before.stored() == 100_000L * sites.size()
                                 && received.capacity() - before.capacity() == (long) DroneStationBlockEntity.CAPACITY * sites.size(),
                         "Station energy or capacity missing from the totals");
@@ -135,9 +135,9 @@ public final class FactoryMonitorGameTests {
             h.assertTrue(s.drones().stream().anyMatch(d -> d.pos().equals(h.absolutePos(stationAt)) && d.trouble() >= 1
                     && !d.problem().getString().isEmpty()), "A station without memory is not in trouble: " + s.drones());
             // 送っても同じ
-            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), level.registryAccess());
-            FactoryMonitor.Snapshot.CODEC.encode(buf, s);
-            FactoryMonitor.Snapshot back = FactoryMonitor.Snapshot.CODEC.decode(buf);
+            FriendlyByteBuf buf = new FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+            FactoryMonitor.Snapshot.encode(s, buf);
+            FactoryMonitor.Snapshot back = FactoryMonitor.Snapshot.decode(buf);
             h.assertTrue(back.range() == s.range() && back.stalled().size() == s.stalled().size()
                     && back.stalled().get(0).reason().getString().equals(s.stalled().get(0).reason().getString())
                     && back.drones().size() == s.drones().size() && back.produce() == s.produce(), "The snapshot changes when sent");

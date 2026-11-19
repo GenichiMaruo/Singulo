@@ -80,8 +80,7 @@ public final class SharedSupplyReservationGameTests {
 
         var level = h.getLevel();
         var saved = a.console.saveWithoutMetadata();
-        var restored = SupplyReservations.load(SupplyReservations.get(level).save(new CompoundTag(), level.registryAccess()),
-                level.registryAccess());
+        var restored = SupplyReservations.load(SupplyReservations.get(level).save(new CompoundTag()));
         h.assertTrue(restored.foreign(level, b.console.getBlockPos(), h.absolutePos(chestPos), iron) == 1,
                 "A reservation disappeared from the world ledger on reload");
         // Upgrade an existing order saved before individual storage identities were recorded.

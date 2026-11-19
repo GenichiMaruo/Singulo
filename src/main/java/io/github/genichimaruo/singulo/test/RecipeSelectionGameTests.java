@@ -30,7 +30,7 @@ public final class RecipeSelectionGameTests {
 
     private static MachineBlockEntity machine(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, SinguloBlocks.MACHINES.get(TYPE).get());
-        MachineBlockEntity machine = h.getBlockEntity(pos);
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         h.onEachTick(() -> machine.energy().setEnergy(machine.energy().getMaxEnergyStored()));
         return machine;
     }
@@ -70,7 +70,7 @@ public final class RecipeSelectionGameTests {
             load(source, recipe(h, AMBIGUOUS).value());
             var registry = h.getLevel().registryAccess();
             var restored = new MachineBlockEntity(source.getBlockPos(), source.getBlockState());
-            restored.loadWithComponents(source.saveWithoutMetadata(registry), registry);
+            restored.load(source.saveWithoutMetadata());
             restored.setLevel(h.getLevel());
             restored.onLoad();
             run(h, restored, 1);
@@ -85,17 +85,17 @@ public final class RecipeSelectionGameTests {
         var fixed = machine(h, new BlockPos(4, 1, 1));
         var holder = recipe(h, AMBIGUOUS);
         h.assertTrue(RecipeSelection.ambiguous(h.getLevel(), TYPE, holder), "Record core must also be a partial genesis core");
-        load(automatic, holder.value());
-        load(fixed, holder.value());
+        load(automatic, holder);
+        load(fixed, holder);
         fixed.selectRecipe(index(h, AMBIGUOUS));
         h.runAtTickTime(RecipeSelection.SETTLE_TICKS / 2, () -> {
             h.assertTrue(automatic.status() == MachineBlockEntity.Status.IDLE && fixed.status() == MachineBlockEntity.Status.RUNNING,
                     "Only the selected machine should start during input settling");
         });
         h.runAtTickTime(RecipeSelection.SETTLE_TICKS + 3, () -> {
-            run(h, automatic, holder.value().time());
-            run(h, fixed, holder.value().time());
-            h.assertTrue(ItemStack.matches(output(automatic), holder.value().result()) && ItemStack.matches(output(fixed), holder.value().result()),
+            run(h, automatic, holder.time());
+            run(h, fixed, holder.time());
+            h.assertTrue(ItemStack.matches(output(automatic), holder.result()) && ItemStack.matches(output(fixed), holder.result()),
                     "Automatic or fixed selection failed to finish the record core");
             h.succeed();
         });
@@ -128,7 +128,7 @@ public final class RecipeSelectionGameTests {
         h.assertTrue(id.toString().equals(tag.getString("selected_recipe")), "Selection was not saved");
         machine.selectRecipe(-1);
         h.assertTrue(machine.selectedRecipe() == null, "Selection was not cleared");
-        machine.loadWithComponents(tag, h.getLevel().registryAccess());
+        machine.load(tag);
         h.assertTrue(id.equals(machine.selectedRecipe()), "Selection did not survive reload");
         h.succeed();
     }
@@ -139,7 +139,7 @@ public final class RecipeSelectionGameTests {
         var original = List.copyOf(manager.getRecipes());
         var holder = recipe(h, AMBIGUOUS);
         var machine = machine(h, new BlockPos(1, 1, 1));
-        load(machine, holder.value());
+        load(machine, holder);
         run(h, machine, 1);
         h.assertTrue(RecipeSelection.ambiguous(h.getLevel(), TYPE, holder) && machine.status() == MachineBlockEntity.Status.IDLE,
                 "Fixture did not wait for a potentially larger recipe");

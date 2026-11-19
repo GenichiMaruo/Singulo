@@ -35,7 +35,7 @@ public final class GlassStairsWaterGameTests {
         // 水は入る
         BlockPos at = new BlockPos(1, 1, 1);
         h.setBlock(at, north);
-        h.assertTrue(((StairBlock) block).canPlaceLiquid(null, h.getLevel(), h.absolutePos(at), h.getBlockState(at), Fluids.WATER),
+        h.assertTrue(((StairBlock) block).canPlaceLiquid(h.getLevel(), h.absolutePos(at), h.getBlockState(at), Fluids.WATER),
                 "Glass stairs refuse water");
         h.setBlock(at, north.setValue(StairBlock.WATERLOGGED, true));
         h.assertTrue(h.getLevel().getFluidState(h.absolutePos(at)).is(Fluids.WATER), "Waterlogged glass stairs hold no water");

@@ -383,7 +383,7 @@ public final class BugFix0111GameTests {
     @GameTest(template = EMPTY)
     public static void androidChoosesItsRecipe(GameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
-        MachineBlockEntity m = helper.getBlockEntity(new BlockPos(1, 1, 1));
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, new BlockPos(1, 1, 1));
         m.selectFor(item("artificial_star_core"), List.of(item("jet_condensate"), item("compressed_metal_block_2"), item("stardust")));
         helper.assertTrue(m.selectedRecipe() != null && m.selectedRecipe().getPath().equals("singularity_encapsulator/artificial_star_core"),
                 "アンドロイドのレシピが指定されない: " + m.selectedRecipe());

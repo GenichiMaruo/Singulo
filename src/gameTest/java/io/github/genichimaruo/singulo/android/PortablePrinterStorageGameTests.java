@@ -29,7 +29,7 @@ public final class PortablePrinterStorageGameTests {
     @GameTest(template = "empty")
     public static void printerKeepsSurplusAfterChangingMemory(GameTestHelper h) {
         ItemStack printer = new ItemStack(SinguloItems.PORTABLE_ANDROID_PRINTER.get());
-        IEnergyStorage storage = printer.getCapability(Capabilities.EnergyStorage.ITEM);
+        IEnergyStorage storage = printer.getCapability(Capabilities.EnergyStorage.ITEM).orElse(null);
         PortableAndroidPrinterItem.setContents(printer, List.of(item("android_memory_gunner", 1)));
         h.assertTrue(storage != null && storage.receiveEnergy(Integer.MAX_VALUE, false) == 240_000, "Gunner charge capacity");
         PortableAndroidPrinterItem.setContents(printer, List.of(item("android_memory_blade", 1)));

@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.android;
 
+import io.github.genichimaruo.singulo.compat.CraftingInput;
 import io.github.genichimaruo.singulo.android.work.*;
 import io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
@@ -65,7 +66,7 @@ public final class AndroidCatalogGameTests {
         WorkLocationCardItem.record(location, level, machine.getBlockPos(), machineBlock);
         rack.items().setStackInSlot(0, location);
         var holder = level.getRecipeManager().byKey(Singulo.id("catalytic_reactor/copper_ingot_refined")).orElseThrow();
-        var refining = (MachineRecipe) holder.value();
+        var refining = (MachineRecipe) holder;
         console.setMachineProcess(refining, List.of());
         console.encoder().setItem(WorkConsoleBlockEntity.CARD, new ItemStack(SinguloItems.RECIPE_CARD.get()));
         h.assertTrue(console.encode(), "Cannot record copper refining");
@@ -121,29 +122,29 @@ public final class AndroidCatalogGameTests {
         var craftedItems = new HashSet<Item>();
         List<String> problems = new ArrayList<>();
         for (var holder : level.getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING)) {
-            if (!holder.id().getNamespace().equals(Singulo.MODID)) continue;
-            var recipe = holder.value();
+            if (!holder.getId().getNamespace().equals(Singulo.MODID)) continue;
+            var recipe = holder;
             var grid = NonNullList.withSize(9, ItemStack.EMPTY);
             int width = recipe instanceof ShapedRecipe shaped ? shaped.getWidth() : 3;
             var ingredients = recipe.getIngredients();
             for (int i = 0; i < ingredients.size(); i++) {
                 Ingredient ingredient = ingredients.get(i);
                 if (ingredient.isEmpty()) continue;
-                h.assertTrue(ingredient.getItems().length > 0, "Empty ingredient in " + holder.id());
+                h.assertTrue(ingredient.getItems().length > 0, "Empty ingredient in " + holder.getId());
                 grid.set(i / width * 3 + i % width, ingredient.getItems()[0].copyWithCount(1));
             }
             var input = CraftingInput.of(3, 3, grid);
             var expected = recipe.assemble(input, level.registryAccess());
-            h.assertTrue(recipe.matches(input, level) && !expected.isEmpty(), "Unusable sample grid for " + holder.id());
+            h.assertTrue(recipe.matches(input, level) && !expected.isEmpty(), "Unusable sample grid for " + holder.getId());
             console.setGrid(grid);
             console.encoder().setItem(WorkConsoleBlockEntity.CARD, new ItemStack(SinguloItems.RECIPE_CARD.get()));
             if (!console.encode()) {
-                problems.add(holder.id() + " failed to encode");
+                problems.add(holder.getId() + " failed to encode");
                 continue;
             }
             RecipeData card = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), level.registryAccess());
             if (card == null || !ItemStack.matches(expected, card.output())) {
-                problems.add(holder.id() + " recorded " + (card == null ? "no result" : card.output()) + " instead of " + expected);
+                problems.add(holder.getId() + " recorded " + (card == null ? "no result" : card.output()) + " instead of " + expected);
                 continue;
             }
             var stock = new ArrayList<ItemCount>();
@@ -151,12 +152,12 @@ public final class AndroidCatalogGameTests {
             for (var stack : grid) {
                 if (stack.isEmpty()) continue;
                 ItemCount.add(stock, stack, 1);
-                h.assertTrue(worker.addToCarry(stack.copy()).isEmpty(), "Sample did not fit: " + holder.id());
+                h.assertTrue(worker.addToCarry(stack.copy()).isEmpty(), "Sample did not fit: " + holder.getId());
             }
             var entry = new RecipeRackBlockEntity.Entry(card, bench, Blocks.CRAFTING_TABLE);
             var plan = WorkPlanner.plan(expected, expected.getCount(), List.of(entry), stock);
             if (!plan.ok() || !(boolean) craft.invoke(goal, level, console, job, bench, card)) {
-                problems.add(holder.id() + " could not plan or craft");
+                problems.add(holder.getId() + " could not plan or craft");
                 continue;
             }
             var products = new ArrayList<ItemCount>();
@@ -166,13 +167,13 @@ public final class AndroidCatalogGameTests {
                 var stack = worker.inventory().getItem(slot);
                 ItemCount.add(products, stack, -stack.getCount());
             }
-            if (products.stream().anyMatch(product -> product.count != 0)) problems.add(holder.id() + " wrong products or remainders");
+            if (products.stream().anyMatch(product -> product.count != 0)) problems.add(holder.getId() + " wrong products or remainders");
             checked++;
             craftedItems.add(expected.getItem());
         }
         for (var stone : level.getRecipeManager().getAllRecipesFor(RecipeType.STONECUTTING)) {
-            if (stone.id().getNamespace().equals(Singulo.MODID) && !craftedItems.contains(
-                    stone.value().getResultItem(level.registryAccess()).getItem())) problems.add(stone.id() + " has no workbench route");
+            if (stone.getId().getNamespace().equals(Singulo.MODID) && !craftedItems.contains(
+                    stone.getResultItem(level.registryAccess()).getItem())) problems.add(stone.getId() + " has no workbench route");
         }
         Singulo.LOGGER.info("Android workbench catalogue: {} recipes crafted", checked);
         h.assertTrue(checked > 0 && problems.isEmpty(), "Android workbench catalogue: " + problems);

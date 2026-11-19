@@ -241,7 +241,7 @@ public final class AndroidGameTests {
             helper.assertTrue(first.workConsole() == null && first.chemAmount("mekanism:oxygen") == 725, "待機中の護衛のタンクを復元できない");
             first.kill();
             var registries = helper.getLevel().registryAccess();
-            s.loadWithComponents(s.saveWithFullMetadata(registries), registries);
+            s.load(s.saveWithFullMetadata());
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(STATION)).inflate(8), e -> e.getItem().is(item("android_repair_kit"))).isEmpty(),
                     "転送アップグレードがあるのに持ち物が落ちた");
@@ -2250,7 +2250,7 @@ public final class AndroidGameTests {
         ItemStack card = new ItemStack(item("procedure_card"));
         io.github.genichimaruo.singulo.android.work.RecipeData.procedure(steps.stream().map(s -> s.recordedIn(helper.getLevel())).toList(), output)
                 .write(card, helper.getLevel().registryAccess());
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
     }
 
@@ -2376,7 +2376,7 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void androidTillsSowsAndFertilizes(GameTestHelper helper) {
         var console = workshop(helper, 0);
-        net.minecraft.world.level.block.entity.ChestBlockEntity chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) helper.getBlockEntity(CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CHEST);
         chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.WHEAT_SEEDS, 2));
         chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.BONE_MEAL, 32));
         for (int x = 0; x < 2; x++) {
@@ -2565,7 +2565,7 @@ public final class AndroidGameTests {
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.EXTRACT, helper.absolutePos(TABLE), null, water);
         io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), water).write(card, level.registryAccess());
-        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
         var plan = console.plan(io.github.genichimaruo.singulo.android.work.FluidSamples.key(water), 1500);
         helper.assertTrue(plan.ok(), "流体の計画を作れない");
