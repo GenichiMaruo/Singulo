@@ -16,12 +16,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
 /**
  * 液体パイプ1本。液体は溜めない（中身がないので、壊しても液体は失われない）。受け渡しは {@link FluidPipeNetwork} がまとめて行う。
  * <p>
  * 見た目のための流れ（状態・入ってきた面・出ていった面・量・液体）だけを持つ。ネットワークが {@link FluidPipeNetwork#DISPLAY} tick ごとに
- * 決め、変わったときだけクライアントへ送る（量は桁の段階が変わったときだけ）。描くのは FluidPipeRenderer と測量メガネ。
+ * 決め、変わったときだけクライアントへ送る（量は桁の段階が変わったときと、測量メガネで見ているときに更新）。描くのは FluidPipeRenderer と測量メガネ。
  */
 public class FluidPipeBlockEntity extends BlockEntity implements io.github.genichimaruo.singulo.cable.ConduitCover.Holder {
     /** 状態: 流れていない・流れている・詰まっている（出せる液体があるのに受け手がない。測量メガネをかけた人が近いときだけ）。 */
@@ -33,7 +35,8 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         return List.copyOf(CLIENT);
     }
 
-    private int visualState, inMask, outMask, visualAmount;
+    private int visualState, inMask, outMask;
+    private long visualAmount, lastSentAmount;
     private boolean mixed;
     private FluidStack visualFluid = FluidStack.EMPTY;
 
@@ -42,6 +45,32 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
 
     public FluidPipeBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.FLUID_PIPE.get(), pos, state);
+    }
+
+    boolean injectionPoint;
+
+    public IFluidHandler inlet(@Nullable Direction face) {
+        return new Inlet(face);
+    }
+
+    final class Inlet extends EmptyFluidHandler {
+        @Nullable private final Direction face;
+
+        Inlet(@Nullable Direction face) { this.face = face; }
+        @Override public int getTankCapacity(int tank) { return tank == 0 ? Integer.MAX_VALUE : 0; }
+        @Override public boolean isFluidValid(int tank, FluidStack fluid) { return tank == 0 && !fluid.isEmpty(); }
+        @Override public int fill(FluidStack fluid, FluidAction action) { return route(fluid, action, null); }
+
+        int route(FluidStack fluid, FluidAction action, @Nullable FluidPumpBlockEntity.Outlet pump) {
+            if (level == null || level.isClientSide || isRemoved() || fluid.isEmpty()
+                    || !level.isLoaded(worldPosition) || level.getBlockEntity(worldPosition) != FluidPipeBlockEntity.this) return 0;
+            if (!injectionPoint) {
+                injectionPoint = true;
+                if (network != null && !network.hasNode(worldPosition)) invalidateNetwork();
+            }
+            if (network == null) FluidPipeNetwork.build(level, FluidPipeBlockEntity.this);
+            return network == null ? 0 : network.route(worldPosition, face, fluid, action, pump);
+        }
     }
 
     public int visualState() {
@@ -56,8 +85,13 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         return outMask;
     }
 
-    /** 流れている量（mB/t、見た目の間隔の平均）。 */
+    /** Kept for callers using the original int-sized display. */
     public int visualAmount() {
+        return (int) Math.min(Integer.MAX_VALUE, visualAmount);
+    }
+
+    /** 流れている量（mB/t、見た目の間隔の平均）。 */
+    public long flowRate() {
         return visualAmount;
     }
 
@@ -85,14 +119,15 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
     }
 
     /** 量の段階（2倍ごと）。これが変わったときだけ送り直す。 */
-    private static int bucket(int amount) {
-        return amount <= 0 ? -1 : 31 - Integer.numberOfLeadingZeros(amount);
+    private static int bucket(long amount) {
+        return amount <= 0 ? -1 : 63 - Long.numberOfLeadingZeros(amount);
     }
 
     /** ネットワークが見せる流れを決める。変わったときだけ送る。 */
-    void show(int state, int in, int out, int amount, FluidStack fluid, boolean mixed) {
+    void show(int state, int in, int out, long amount, FluidStack fluid, boolean mixed) {
         boolean changed = visualState != state || inMask != in || outMask != out || this.mixed != mixed
                 || bucket(visualAmount) != bucket(amount) || !io.github.genichimaruo.singulo.compat.Legacy.sameFluid(visualFluid, fluid);
+        visualAmount = amount;
         if (!changed) {
             return;
         }
@@ -102,6 +137,15 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         visualAmount = amount;
         visualFluid = fluid.isEmpty() ? FluidStack.EMPTY : io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid,1);
         this.mixed = mixed;
+        syncVisual();
+    }
+
+    void syncSurveyRate() {
+        if (lastSentAmount != visualAmount) syncVisual();
+    }
+
+    private void syncVisual() {
+        lastSentAmount = visualAmount;
         if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
@@ -113,7 +157,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         tag.putInt("state", visualState);
         tag.putInt("in", inMask);
         tag.putInt("out", outMask);
-        tag.putInt("amount", visualAmount);
+        tag.putLong("amount", visualAmount);
         tag.putBoolean("mixed", mixed);
         if (!visualFluid.isEmpty()) {
             tag.put("fluid", visualFluid.writeToNBT(new CompoundTag()));
@@ -134,7 +178,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         visualState = tag.getInt("state");
         inMask = tag.getInt("in");
         outMask = tag.getInt("out");
-        visualAmount = tag.getInt("amount");
+        visualAmount = tag.getLong("amount");
         mixed = tag.getBoolean("mixed");
         visualFluid = tag.contains("fluid") ? FluidStack.loadFluidStackFromNBT(tag.getCompound("fluid")) : FluidStack.EMPTY;
         loadCover(tag);
@@ -188,7 +232,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         }
         boolean pipe = level.getBlockEntity(from) instanceof FluidPipeBlockEntity;
         if (pipe ? FluidPipeNetwork.of((FluidPipeBlockEntity) level.getBlockEntity(from)) != network
-                : FluidPipeNetwork.mayBeEndpoint(level, from) != network.hasEndpoint(from)) {
+                : FluidPipeNetwork.mayBeEndpoint(level, from, FluidPipeNetwork.direction(from, worldPosition)) != network.hasEndpoint(from)) {
             network.invalidate();
         }
     }

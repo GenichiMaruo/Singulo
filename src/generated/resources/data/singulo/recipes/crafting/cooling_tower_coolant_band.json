@@ -3,6 +3,7 @@
   "category": "misc",
   "pattern": [
     "CAC",
+    " F ",
     " P "
   ],
   "key": {
@@ -14,6 +15,9 @@
     },
     "P": {
       "tag": "forge:plates/steel"
+    },
+    "F": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

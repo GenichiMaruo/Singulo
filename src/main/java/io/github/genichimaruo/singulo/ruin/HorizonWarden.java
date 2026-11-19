@@ -208,6 +208,7 @@ public class HorizonWarden extends Monster {
     public HorizonWarden(EntityType<? extends HorizonWarden> type, Level level) {
         super(type, level);
         this.xpReward = 1500;
+        if (!level.isClientSide) applySpawnHealth(false);
         setPersistenceRequired();
     }
 
@@ -264,8 +265,8 @@ public class HorizonWarden extends Monster {
      * NeoForge のイベントで受け手の側から掛ける。
      */
     public static void onIncomingDamage(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
-        if (event.getSource().getEntity() instanceof HorizonWarden w && w.awakened() && !(event.getEntity() instanceof HorizonWarden)) {
-            event.setAmount((float) (event.getAmount() * awakenedDamageMultiplier()));
+        if (event.getSource().getEntity() instanceof HorizonWarden w && !(event.getEntity() instanceof HorizonWarden)) {
+            event.setAmount(BossScaling.attack(event.getAmount(), w.awakened() ? awakenedDamageMultiplier() : 1));
         }
     }
 
@@ -517,9 +518,7 @@ public class HorizonWarden extends Monster {
         this.home = home;
         this.console = console;
         entityData.set(AWAKENED, awakened);
-        double health = (ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : HEALTH)
-                * io.github.genichimaruo.singulo.data.Difficulty.wardenHealth() * (awakened ? awakenedHealthMultiplier() : 1.0)
-                * (BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR);
+        applySpawnHealth(awakened);
         if (!BossScaling.hardMode()) {
             getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(16 * NORMAL_DAMAGE_FACTOR);
         }
@@ -529,12 +528,17 @@ public class HorizonWarden extends Monster {
             bossBar.setColor(BossEvent.BossBarColor.PURPLE);
             xpReward = 4500;
         }
-        // 最大体力はゲームの決まりで 1024 までなので、それを超える分は受けるダメージを減らして同じ硬さにする
+        restrictTo(home, ARENA_RADIUS);
+    }
+
+    private void applySpawnHealth(boolean awakened) {
+        double health = BossScaling.baseHealth((ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : HEALTH)
+                * io.github.genichimaruo.singulo.data.Difficulty.wardenHealth() * (awakened ? awakenedHealthMultiplier() : 1.0)
+                * healthFactor());
         double max = Math.min(health, MAX_HEALTH_CAP);
         damageScale = (float) (max / health);
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
         setHealth((float) max);
-        restrictTo(home, ARENA_RADIUS);
     }
 
     /** ボスバーの名前を変える（2人以上で挑んでいれば人数を添える）。 */
@@ -555,7 +559,7 @@ public class HorizonWarden extends Monster {
             return;
         }
         float fraction = getHealth() / getMaxHealth();
-        double effective = effectiveMaxHealth() * BossScaling.healthFactor(n) / BossScaling.healthFactor(participants);
+        double effective = Math.min(1.0e18, effectiveMaxHealth() * BossScaling.healthFactor(n) / BossScaling.healthFactor(participants));
         double max = Math.min(effective, MAX_HEALTH_CAP);
         damageScale = (float) (max / effective);
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);

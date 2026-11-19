@@ -5,6 +5,8 @@ gen_data.py がレシピから自動で足すので、ここには書かない�
 """
 
 DESC = {
+    '組立盤拡張アップグレード': ('精密組立台の右下に装着すると、各マスに同じ材料を複数スタック置ける。重ねられない道具は1個まで。すべての材料枠が64個以下になると取り外せる。',
+        'Install in the bottom-right slot of the Precision Assembler to stock multiple stacks of the same part in each cell. Unstackable tools occupy one cell each. Remove the upgrade once every cell holds 64 items or fewer.'),
     '容量アップグレード（Mk1）': ('加工装置の容量専用枠に1個装着すると、蓄電容量が最低1,000,000 FEになる。速度アップグレードと併用でき、受電上限は変えない。取り外し時の余剰電力は保持し、容量内に減るまで受電しない。',
                                   'Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.'),
     '容量アップグレード（Mk2）': ('Mk1から作る容量アップグレード。加工装置の蓄電容量が最低4,000,000 FEになる。専用枠に1個だけ装着し、受電上限は変えない。',
@@ -69,6 +71,8 @@ DESC = {
               'Right-click to point at the nearest ruin of the chosen kind. Sneak-use to change the kind.'),
     '隕石コンパス': ('右クリックすると、まだ掘り出されていない隕石の核のうち、いちばん近いものの方を指す。指していた核が掘り出されると針が回り出す。',
                'Right-click to point at the nearest meteorite core not yet mined. Once that core is mined, the needle spins again.'),
+    'クリエイティブ用液体ゴミ箱': ('全方向から流し込んだ液体を捨てる。装置の容器充填スロットでも使える。',
+                       'Voids fluid piped into any face or poured from a container. Also works in fluid container filling slots.'),
     'クリエイティブ電源': ('クリエイティブ専用。電力が尽きない電源。隣の装置やケーブルへ受け取れるだけ送る。',
                  'Creative only. Endless power pushed into every neighbour.'),
     '無限の触媒': ('クリエイティブ専用の減らない触媒。右クリックでティアを変える。',
@@ -83,8 +87,8 @@ DESC = {
     '酸素': ('電解槽の副産物。焼成炉に送ると炉温が上がる。', 'By-product of electrolysis. Boosts the kiln.'),
     '銅導線': ('段階1の電線。つないだ装置どうしで電力を分け合う。距離が長いと少し損失がある。',
              'Tier 1 power cable. Loses a little energy over distance.'),
-    '液体パイプ': ('液体とガスを装置やタンクへ運ぶパイプ。置くだけでつながり、出口の液体を使う装置へ送る。隣の水源や溶岩源からも汲む。',
-              'Carries any fluid or gas between machines and tanks. It connects on its own and sends outputs to the machines that use them. It also draws from adjacent water and lava sources.'),
+    '液体パイプ': ('装置が送り出した液体やガスを、1 tick に 2,000 mB まで運ぶ。',
+              'Carries fluids and gases pushed into it, up to 2,000 mB per tick.'),
     '白紙データカード': ('アーカイブ端末で記録を書き写す空のカード。', 'An empty card for copying records in the Archive Terminal.'),
     'データカード（観測ログ）': ('観測ログを書き写したカード。レシピで使える。', 'A copy of an observation log, usable in recipes.'),
     '圧縮ブロックLv1': ('質量モードの圧縮機で9単位の質量を固めたブロック。上位の圧縮ブロックと燃料の元。',
@@ -280,7 +284,7 @@ DESC = {
                 'A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.'),
     '覚醒の渦核': ('渦の断章に、ジェット凝縮体とH凝縮体で回転を与え直した核。沈んだ炉心区画の封印核で使うと、覚醒したエルゴ球の大蛇が現れる。体力2.5倍・攻撃1.5倍で、速く泳ぎ、突進を続けて放ち、渦の吐息で相手を追う。',
               'A Chapter of the Vortex spun up again with jet condensate and H-Condensate. Use it on the guardian core of a Sunken Reactor Sector to call the Awakened Ergosphere Leviathan: 2.5× health, 1.5× damage, faster swimming, chained dives and a breath that tracks you.'),
-    '残響の断章': ('覚醒した残響の番人がほどけたあとに残る、記録の一節。何かの頁の一部らしい。ほかの断章と束ねると、何かが読めそうだ。',
+    '残響の断章': ('覚醒した残響の番人がほどけたあとに残る、記録の一節。何かのページの一部らしい。ほかの断章と束ねると、何かが読めそうだ。',
               'A passage of records left behind when the Awakened Echo Sentinel unravels. It looks like part of a page. Bound with other chapters, it might be readable.'),
     '重力の断章': ('覚醒した重力の澱がつぶれたあとに残る、記録の一節。重さの記憶が刻まれている。ほかの断章と束ねると、何かが読めそうだ。',
               'A passage of records left in the collapse of the Awakened Gravity Remnant, etched with a memory of weight. Bound with other chapters, it might be readable.'),
@@ -288,7 +292,7 @@ DESC = {
                "A passage of records found in the Awakened Horizon Warden's wreck, naming what the warden was guarding. Bound with other chapters, it might be readable."),
     '渦の断章': ('エルゴ球の大蛇が渦の底へ沈んだあとに浮かぶ、記録の一節。二基目の炉の運転記録の続き。覚醒の渦核の材料にもなる。',
              "A passage of records that surfaces after the Ergosphere Leviathan sinks: the rest of the second reactor's log. Also used for the Awakened Ergosphere Core."),
-    '終焉の記録': ('4つの断章を特異点の力で束ね直した、最後の頁。最終実験施設の封印コンソールで使うと、時間の場で眠っていた何かが目を覚ます。やめて部屋を離れると記録は戻る。',
+    '終焉の記録': ('4つの断章を特異点の力で束ね直した、最後のページ。最終実験施設の封印コンソールで使うと、時間の場で眠っていた何かが目を覚ます。やめて部屋を離れると記録は戻る。',
               'The four chapters bound back together with singularity power: the last page. Use it on the Seal Console of the Final Lab to wake what slept in the time field. Leave and the record is returned.'),
     '残光の翼': ('最後の記録者の光から生まれた、結晶の羽根の翼。胴に着けると滑空でき、滑空中にスニークすると羽ばたいて加速する。落下ダメージを受けない。',
               "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage."),
@@ -448,8 +452,8 @@ DESC = {
     '量子錠の鍵': ('量子錠の封印コンテナを開け閉めする鍵。1回で使い切る。', 'Opens or seals a quantum-lock container. Used up each time.'),
     '時間錠の鍵': ('時間錠の封印コンテナを開け閉めする鍵。1回で使い切る。', 'Opens or seals a temporal-lock container. Used up each time.'),
     '特異点錠の鍵': ('特異点錠の封印コンテナを開け閉めする鍵。1回で使い切る。', 'Opens or seals a singularity-lock container. Used up each time.'),
-    'オーバークロック・チップ': ('装置のアップグレード枠に挿すと処理速度×3、そのかわり電力×4（全体では1.33倍）。単極子とは同時に使えない。',
-                       "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole."),
+    'オーバークロック・チップ': ('装置のアップグレード枠に挿して加工速度と消費電力を調整する。単極子と同じ枠を使う。',
+                       "Install in the machine upgrade slot to change speed and power use. Shares a slot with the monopole."),
     '重力ブーツ': ('落下ダメージを受けない。空中で壁に向かってジャンプすると、壁を蹴って跳べる（着地までに3回）。',
               'No fall damage. Jump while touching a wall in mid-air to kick off it (three times before landing).'),
     '触媒安定化剤': ('もう片方の手に触媒を持って使うと、その触媒の残りの寿命が2倍になる。1つの触媒に1回まで。',
@@ -632,7 +636,8 @@ DESC = {
     '炉心': ('中央動力炉の炉心。電力が戻ると水色に強く光る。', 'The central reactor core. It glows bright cyan once power returns.'),
     'サーバーラック': ('研究所のサーバー。電力があると灯が瞬く。', 'A laboratory server. Its lights blink while powered.'),
     '記録端末': ('研究所に残された端末。右クリックで、残された記録を読める。', 'A terminal left in the laboratory. Use it to read the records left behind.'),
-    '机のモニター': ('研究所の机に置かれた小さなモニター。画面だけがほのかに光る。', 'A small monitor from a laboratory desk. Only its screen glows faintly.'),
+    '机のモニター': ('研究所の机に置かれた小さなモニター。使うと工場モニターが開き、まわり（16ブロック）の装置の発電・消費・蓄電、止まっている装置とその理由、ドローンの様子が分かる。そばにサーバーラックを置くと、1台ごとに範囲が8ブロック広がる（4台まで）。',
+                'A small monitor from a laboratory desk. Use it to open the factory monitor: power generated, used and stored by machines within 16 blocks, stalled machines and why, and how drones are doing. Each Server Rack placed beside it widens the range by 8 blocks (up to 4).'),
     'コーヒーメーカー': ('研究所の給湯室のコーヒーメーカー。カカオ豆を入れると3杯分のコーヒーを淹れ、ガラス瓶でくめる。研究所のものは、はじめから淹れてある。', 'The laboratory break-room coffee maker. Add cocoa beans to brew three cups, then fill glass bottles from the pot. The ones in the laboratory already have coffee in them.'),
     '自動販売機': ('研究所の飲み物の自動販売機（2ブロックの高さ）。エメラルドを持って正面の列のボタンを押すと、缶ソーダ（1）・スポーツドリンク（1）・エナジードリンク（2）が買える。研究所のものは、施設の電力が戻ると動き出す。', 'A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.'),
     '書類の山': ('机に積まれたままの書類。', 'Papers left piled on a desk.'),
@@ -681,6 +686,7 @@ DESC.update(_BLUEPRINT_DESC)
 
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)
 SUMMARY = {
+    '組立盤拡張アップグレード': ('組立盤の各マスに置ける材料の数を増やす。', 'Increases the material capacity of each assembly cell.'),
     '鋼鉄インゴット': ('丈夫な構造用金属。', 'A sturdy structural metal.'),
     '亜鉛インゴット': ('亜鉛の地金。', 'An ingot of zinc.'),
     'ビスマスインゴット': ('表面が虹色に輝く金属。', 'A metal with an iridescent surface.'),
@@ -693,7 +699,7 @@ SUMMARY = {
         'The core of a meteorite. Mine it for raw meteoric iron and stardust.'),
     '衝撃発電パネル': ('落ちた高さで電力をため、重力パネルへ配る。落下ダメージを受けない。',
         'Stores power from how far you fall and feeds gravity panels. No fall damage.'),
-    '終焉の記録': ('最終実験施設の封印コンソールで使う、最後の頁。',
+    '終焉の記録': ('最終実験施設の封印コンソールで使う、最後のページ。',
         'The last page, used on the Seal Console of the Final Lab.'),
     'ワームホールの口': ('対の口とつながる。エキゾチック物質で開いたまま保つ。',
         'Links to its twin. Kept open with exotic matter.'),
@@ -875,6 +881,8 @@ SUMMARY = {
         'Holds ruin loot that refills after some days.'),
     '発光ホワイトパネル': ('明るく光る白いパネル。',
         'A brightly glowing white panel.'),
+    '机のモニター': ('まわりの装置の様子が分かる工場モニター。',
+        'A factory monitor that shows how nearby machines are doing.'),
     '発光黒色強化パネル': ('明るく光る、爆発に強い黒いパネル。',
         'A brightly glowing, blast-resistant black panel.'),
     'ホワイトスライドドア': ('右クリックで開き、自分で閉まる白い引き戸。',
@@ -887,8 +895,8 @@ SUMMARY = {
         'A sealed container opened with a Temporal Key.'),
     '封印コンテナ（特異点錠）': ('特異点錠の鍵で開く封印コンテナ。',
         'A sealed container opened with a Singularity Key.'),
-    'オーバークロック・チップ': ('装置の処理を3倍速くする。電力は4倍になる。',
-        'Triples a machine’s speed for four times the power.'),
+    'オーバークロック・チップ': ('加工速度と毎tickの消費電力を変える。',
+        'Changes processing speed and power use per tick.'),
     '重力ブーツ': ('落下ダメージを受けず、空中で壁を蹴って跳べる。',
         'No fall damage, and you can wall-jump in mid-air.'),
     '触媒安定化剤': ('触媒の残りの寿命を2倍にする。',
@@ -1033,3 +1041,16 @@ SUMMARY.update(_COVER_SUMMARY)
 # 0.20.0 建材の階段・ハーフブロック・塀
 from building_variants import DESC as _VARIANT_DESC
 DESC.update(_VARIANT_DESC)
+# 0.21.0 携帯型アンドロイド印刷機
+DESC['携帯型アンドロイド印刷機'] = (
+    'カバン型の印刷機。メモリとアンドロイドキットを入れて地面を右クリックすると、その場で開いてアンドロイドを1体印刷する。'
+    '印刷したアンドロイドはついて歩く。',
+    'A briefcase printer. Put in a memory and android kits, then right-click the ground to print an android there. '
+    'The android follows you.')
+SUMMARY['携帯型アンドロイド印刷機'] = ('外出先でアンドロイドを1体ずつ印刷する、カバン型の印刷機。', 'A briefcase printer that prints androids on the go.')
+DESC['携帯型アンドロイド印刷機（Mk2）'] = (
+    '携帯型アンドロイド印刷機の改良型。メモリとキットの組を3つ積め、印刷するたびに次の組で1体ずつ印刷する。次に印刷する組は画面で選べる。',
+    'An improved Portable Android Printer. It holds three sets of memory and kits, and each print uses the next set. '
+    'Choose the next set on its screen.')
+SUMMARY['携帯型アンドロイド印刷機（Mk2）'] = ('型の違う3体を順に印刷できる、携帯型アンドロイド印刷機の改良型。',
+                                         'An improved portable printer that prints three types in turn.')

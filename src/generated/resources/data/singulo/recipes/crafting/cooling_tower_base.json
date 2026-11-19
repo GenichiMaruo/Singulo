@@ -2,8 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "WP",
-    "PW"
+    " W ",
+    "PFP",
+    " W "
   ],
   "key": {
     "W": {
@@ -11,6 +12,9 @@
     },
     "P": {
       "tag": "forge:plates/steel"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
     }
   },
   "result": {

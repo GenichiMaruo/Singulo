@@ -408,6 +408,10 @@ public class DroneStationBlockEntity extends BlockEntity implements AbstractMach
             if (drones[i] != null) {
                 Entity e = level.getEntity(drones[i]);
                 if (e instanceof CargoDrone d && d.isAlive()) {
+                    // 古い保存では解体の指示がステーション側にだけ残っている。
+                    if (stopped[i] && !d.dismantling()) {
+                        d.resumeDismantle();
+                    }
                     statuses[i] = d.dismantling() ? S_DISMANTLING : d.printed() ? S_IDLE : S_PRINTING;
                     missing[i] = 0;
                 } else if (++missing[i] > LOST_TICKS && level.isPositionEntityTicking(BlockPos.containing(hover(worldPosition, i)))) {

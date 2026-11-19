@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.recipe;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.data.Difficulty;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
@@ -40,6 +42,18 @@ public final class RecipeTweaks {
     private static final Map<MachineRecipe, MachineRecipe> CACHE = new IdentityHashMap<>();
     private static final MachineRecipe DISABLED = new MachineRecipe("", 0, 1, 0, List.of(), List.of(), java.util.Optional.empty(),
             java.util.Optional.empty(), ItemStack.EMPTY, List.of(), 0, 0, ItemStack.EMPTY);
+    private static final List<ForgeConfigSpec.DoubleValue> TIME = List.of(
+            ServerConfig.STAGE1_TIME_MULTIPLIER,
+            ServerConfig.STAGE2_TIME_MULTIPLIER,
+            ServerConfig.STAGE3_TIME_MULTIPLIER,
+            ServerConfig.STAGE4_TIME_MULTIPLIER,
+            ServerConfig.STAGE5_TIME_MULTIPLIER);
+    private static final List<ForgeConfigSpec.DoubleValue> ENERGY = List.of(
+            ServerConfig.STAGE1_ENERGY_MULTIPLIER,
+            ServerConfig.STAGE2_ENERGY_MULTIPLIER,
+            ServerConfig.STAGE3_ENERGY_MULTIPLIER,
+            ServerConfig.STAGE4_ENERGY_MULTIPLIER,
+            ServerConfig.STAGE5_ENERGY_MULTIPLIER);
     private static String stamp = "";
     private static long stampCheckedAt;
     private static long revision;
@@ -54,7 +68,7 @@ public final class RecipeTweaks {
         MachineRecipe cached = CACHE.get(recipe);
         if (cached == null) {
             MachineRecipe made = compute(id, recipe);
-            cached = made == null ? DISABLED : made;
+            cached = made == null ? DISABLED : scaleStage(made);
             if (CACHE.size() > 4096) {
                 CACHE.clear();
             }
@@ -107,12 +121,27 @@ public final class RecipeTweaks {
                 + '|' + ServerConfig.REACTOR_PLATES_PER_SHELL.get() + '|' + ServerConfig.SCULK_PER_SHARD.get()
                 + '|' + ServerConfig.LIFETIME_MULTIPLIER.get() + '|' + ServerConfig.MUON_LIFETIME_MINUTES.get()
                 + '|' + ServerConfig.BOSE_LIFETIME_MINUTES.get() + '|' + ServerConfig.TIME_CRYSTAL_LIFETIME_MINUTES.get()
-                + '|' + ServerConfig.SINGULARITY_LIFETIME_MINUTES.get();
+                + '|' + ServerConfig.SINGULARITY_LIFETIME_MINUTES.get() + '|' + ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
+                + '|' + ServerConfig.MACHINE_BUFFER_MULTIPLIER.get() + '|' + ServerConfig.OVERCLOCK_SPEED_MULTIPLIER.get()
+                + '|' + ServerConfig.OVERCLOCK_POWER_MULTIPLIER.get() + '|' + MachineType.tankCapacity();
+        for (int i = 0; i < TIME.size(); i++) {
+            s += "|" + TIME.get(i).get() + "|" + ENERGY.get(i).get();
+        }
         if (!s.equals(stamp)) {
             stamp = s;
             CACHE.clear();
             revision++;
         }
+    }
+
+    private static MachineRecipe scaleStage(MachineRecipe r) {
+        int index = r.stage() - 1;
+        if (index < 0 || index >= TIME.size()) return r;
+        int time = PackBalance.scaled(r.time(), TIME.get(index).get());
+        int energy = (int) Math.ceil(r.energy() * ENERGY.get(index).get());
+        if (time == r.time() && energy == r.energy()) return r;
+        return new MachineRecipe(r.station(), r.stage(), time, energy, r.ingredients(), r.fluidIngredients(), r.mass(),
+                r.restore(), r.result(), r.fluidResults(), r.minSize(), r.priority(), r.byproduct(), r.shape());
     }
 
     /** 設定値。既定値のままなら JSON の値 jsonValue を使う。 */
@@ -159,7 +188,7 @@ public final class RecipeTweaks {
                 Predicate<Ingredient> jet = accepts(item("jet_condensate"));
                 setCount(items, jet, Math.max(1, configured(ServerConfig.ARTIFICIAL_STAR_CORE_JET_CONDENSATE, countOf(items, jet))));
             }
-            case "time_crystal_incubator/time_crystal_catalyst" -> time = Math.max(20, configured(ServerConfig.TIME_CRYSTAL_GROWTH_TICKS, time));
+            case "time_crystal_incubator/time_crystal_catalyst" -> time = Math.max(1, configured(ServerConfig.TIME_CRYSTAL_GROWTH_TICKS, time));
             case "degenerate_compactor/degenerate_matter_shell" -> {
                 Predicate<Ingredient> rock = accepts(item("compressed_block_3"));
                 Predicate<Ingredient> metal = accepts(item("compressed_metal_block_2"));
@@ -196,7 +225,7 @@ public final class RecipeTweaks {
                             MachineRecipe.ItemInput in = items.get(i);
                             if (in.uses() == 0 && in.ingredient().getItems().length > 0
                                     && BuiltInRegistries.ITEM.getKey(in.ingredient().getItems()[0].getItem()).getPath().startsWith("spent_")) {
-                                int n = Math.max(1, (int) Math.round(in.count() * def / ratio));
+                                int n = io.github.genichimaruo.singulo.compat.Legacy.clamp(Math.round(in.count() * def / ratio), 1, Integer.MAX_VALUE);
                                 items.set(i, new MachineRecipe.ItemInput(in.ingredient(), n, 0));
                             }
                         }
@@ -241,12 +270,12 @@ public final class RecipeTweaks {
             return r;
         }
         return new MachineRecipe(r.station(), r.stage(), time, r.energy(), List.copyOf(items), List.copyOf(fluids), r.mass(),
-                r.restore(), result, r.fluidResults(), r.minSize(), r.priority(), r.byproduct());
+                r.restore(), result, r.fluidResults(), r.minSize(), r.priority(), r.byproduct(), r.shape());
     }
 
     /** 液体の材料は装置のタンク（{@link MachineType#TANK_CAPACITY}）1つに収まる量まで（超えると加工が始まらない）。 */
     private static int fitTank(int amount) {
-        return Math.min(amount, MachineType.TANK_CAPACITY);
+        return Math.min(amount, MachineType.tankCapacity());
     }
 
     private static int countOf(List<MachineRecipe.ItemInput> items, Predicate<Ingredient> which) {

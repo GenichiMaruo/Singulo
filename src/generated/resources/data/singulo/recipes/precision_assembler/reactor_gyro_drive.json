@@ -7,15 +7,9 @@
   "ingredients": [
     {
       "ingredient": {
-        "item": "singulo:topological_wire"
-      },
-      "count": 2
-    },
-    {
-      "ingredient": {
         "item": "singulo:nihonium_plate"
       },
-      "count": 1
+      "count": 2
     },
     {
       "ingredient": {
@@ -33,6 +27,12 @@
       "ingredient": {
         "item": "singulo:entangled_element"
       },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:reactor_shell"
+      },
       "count": 1
     },
     {
@@ -42,6 +42,13 @@
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    " BAD ",
+    " CEC ",
+    " DAB ",
+    "     "
   ],
   "result": {
     "id": "singulo:reactor_gyro_drive",

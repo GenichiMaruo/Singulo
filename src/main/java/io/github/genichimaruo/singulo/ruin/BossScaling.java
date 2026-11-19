@@ -21,6 +21,31 @@ import net.minecraft.world.phys.Vec3;
 public final class BossScaling {
     private BossScaling() {}
 
+    public static double baseHealth(double value) {
+        return io.github.genichimaruo.singulo.compat.Legacy.clamp(value * (ServerConfig.SPEC.isLoaded() ? ServerConfig.BOSS_HEALTH_MULTIPLIER.get() : 1.0), 1.0, 1.0e18);
+    }
+
+    static float attack(float amount, double awakened) {
+        double factor = ServerConfig.SPEC.isLoaded() ? ServerConfig.BOSS_DAMAGE_MULTIPLIER.get() : 1.0;
+        return (float) Math.min(Float.MAX_VALUE, amount * awakened * factor);
+    }
+
+    /** Preserve post-mitigation damage smaller than the precision of the vanilla health bar. */
+    public static void onDamage(net.minecraftforge.event.entity.living.LivingDamageEvent event) {
+        var entity = event.getEntity();
+        if (!(entity instanceof RuinBoss || entity instanceof HorizonWarden) || entity.getAbsorptionAmount() > 0) return;
+        float incoming = event.getAmount(), health = entity.getHealth();
+        if (!(incoming > 0 && health > 0)) return;
+        var data = entity.getPersistentData();
+        String key = "singulo_health_remainder";
+        if (incoming >= Math.ulp(health) && !data.contains(key)) return;
+        double total = incoming + data.getDouble(key);
+        float applied = health - (health - (float) Math.max(0.0, total));
+        event.setAmount(applied);
+        if (applied >= health || total == applied) data.remove(key);
+        else data.putDouble(key, total - applied);
+    }
+
     public static double healthPerPlayer() {
         return ServerConfig.SPEC.isLoaded() ? ServerConfig.BOSS_HEALTH_PER_PLAYER.get() : 0.5;
     }

@@ -131,6 +131,28 @@ public final class DroneWormholeGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void replacedRemotePortRejectsArrivingItemCrate(GameTestHelper h) {
+        var level = h.getLevel();
+        var net = DroneNetwork.get(level);
+        BlockPos relative = new BlockPos(3, 1, 3), target = h.absolutePos(relative);
+        h.setBlock(relative, SinguloBlocks.FLUID_DRONE_PORT.get());
+        DronePortBlockEntity replacement = h.getBlockEntity(relative);
+        var gate = target.east(2);
+        var visitor = net.create(target.north(2), 0, null, gate, target);
+        TestScope.of(h).defer(() -> net.remove(visitor));
+        visitor.homeDim = Level.NETHER;
+        visitor.homeGate = gate;
+        visitor.homeFrom = target.west(2);
+        visitor.stage = DroneNetwork.DELIVER;
+        visitor.crate = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.IRON_INGOT, 12)));
+        ItemStack cargo = visitor.crate.copy();
+        h.assertFalse(replacement.dock(visitor), "A fluid port started unloading an item shipment");
+        h.assertTrue(visitor.stage == DroneNetwork.RETURN && gate.equals(visitor.target()) && ItemStack.matches(cargo, visitor.crate),
+                "The arriving visitor did not turn back with its intact crate");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void returningThroughMouthDeliversFailedCargoToSource(GameTestHelper h) {
         var level = h.getLevel();
         var homeLevel = level.getServer().getLevel(Level.NETHER);

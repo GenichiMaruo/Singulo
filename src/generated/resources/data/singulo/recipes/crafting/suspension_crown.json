@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PCP",
-    " G ",
-    "PCP"
+    "PGP",
+    "CFC",
+    "P P"
   ],
   "key": {
     "P": {
@@ -15,6 +15,9 @@
     },
     "G": {
       "item": "singulo:zero_gravity_block"
+    },
+    "F": {
+      "item": "singulo:cosmic_frame"
     }
   },
   "result": {

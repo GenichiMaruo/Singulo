@@ -23,6 +23,12 @@ public final class SinguloEntities {
             () -> EntityType.Builder.of(io.github.genichimaruo.singulo.drone.CargoDrone::new, MobCategory.MISC)
                     .sized(0.75F, 1.0F).clientTrackingRange(10).updateInterval(2).fireImmune().build(Singulo.id("cargo_drone").toString()));
 
+    /** 地面に置いた携帯型アンドロイド印刷機（開いて印刷し、閉じて持ち物へ戻る）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.PortablePrinterEntity>> PORTABLE_PRINTER = REGISTER.register(
+            "portable_printer", () -> EntityType.Builder.<io.github.genichimaruo.singulo.android.PortablePrinterEntity>of(
+                    io.github.genichimaruo.singulo.android.PortablePrinterEntity::new, MobCategory.MISC)
+                    .sized(0.875F, 0.25F).clientTrackingRange(8).fireImmune().build(Singulo.id("portable_printer").toString()));
+
     public static final Supplier<EntityType<HorizonWarden>> HORIZON_WARDEN = REGISTER.register("horizon_warden",
             () -> EntityType.Builder.of(HorizonWarden::new, MobCategory.MONSTER)
                     .sized(1.4F, 3.2F).clientTrackingRange(10).fireImmune().build(Singulo.id("horizon_warden").toString()));

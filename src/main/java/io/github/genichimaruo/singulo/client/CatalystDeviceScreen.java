@@ -193,9 +193,9 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
                 row(g, Panel.Icon.INFO, skin.dim(), String.valueOf(extra), Component.translatable("gui.singulo.device.exotic", extra));
             }
             case INERTIAL_STABILIZER -> row(g, Panel.Icon.RANGE, skin.dim(), String.valueOf(v), Component.translatable("gui.singulo.device.radius_blocks", v));
-            case QUANTUM_HEAT_ENGINE -> row(g, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(v) + " FE/t", Component.translatable("gui.singulo.device.output", EnergyText.of(v)));
+            case QUANTUM_HEAT_ENGINE -> row(g, Panel.Icon.BOLT, Panel.GLOW, EnergyText.shortForm(v) + " FE/t", Component.translatable("gui.singulo.device.output", EnergyText.of(v)));
             case DEGENERATE_FURNACE -> {
-                row(g, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(v) + " FE/t", Component.translatable("gui.singulo.device.output", EnergyText.of(v)));
+                row(g, Panel.Icon.BOLT, Panel.GLOW, EnergyText.shortForm(v) + " FE/t", Component.translatable("gui.singulo.device.output", EnergyText.of(v)));
                 row(g, Panel.Icon.INFO, skin.dim(), String.valueOf(extra), Component.translatable("gui.singulo.device.fuel", extra));
             }
             case PROBE_STATION -> {
@@ -205,7 +205,7 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
         }
         int usage = value(CatalystDeviceBlockEntity.D_USAGE);
         if (usage > 0) {
-            row(g, Panel.Icon.BOLT, GuiSkin.WARN, EnergyText.of(usage) + " FE/t",
+            row(g, Panel.Icon.BOLT, GuiSkin.WARN, EnergyText.shortForm(usage) + " FE/t",
                     Component.translatable("gui.singulo.device.usage", EnergyText.of(usage)));
         }
         rowY = statsTop(rows.size());

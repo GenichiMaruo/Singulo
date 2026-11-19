@@ -31,6 +31,20 @@ public class MachineBlock extends AbstractMachineBlock {
         return type;
     }
 
+    @Override
+    public java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder params) {
+        var drops = super.getDrops(state, params);
+        if (params.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY)
+                instanceof MachineBlockEntity machine && machine.packStockOnBreak()) {
+            return drops.stream().filter(stack -> !stack.is(asItem())).toList();
+        }
+        return drops;
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     @Nullable
     @Override

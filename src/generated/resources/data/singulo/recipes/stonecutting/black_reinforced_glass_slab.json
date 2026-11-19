@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:black_reinforced_glass"
+  },
+  "result": "singulo:black_reinforced_glass_slab",
+  "count": 2
+}

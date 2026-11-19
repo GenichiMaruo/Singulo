@@ -29,7 +29,20 @@
       },
       "tier": 3,
       "uses": 750
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_furnace_frame"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  C  ",
+    " AEA ",
+    " B B ",
+    "     "
   ],
   "result": {
     "id": "singulo:degenerate_furnace_piston",

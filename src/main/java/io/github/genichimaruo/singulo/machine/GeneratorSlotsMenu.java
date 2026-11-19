@@ -19,7 +19,7 @@ public class GeneratorSlotsMenu extends AbstractContainerMenu {
     public static final int KIND_TURBINE = 0, KIND_FUSION = 1;
     /** 同期する値: 高温源の温度（K）・出力（×100）・蓄電・蓄電の上限・液体・液体の上限・種類ごとの値（効率% / 触媒の残り‰）・待機中か。 */
     public static final int D_HOT = 0, D_RATE_X100 = 1, D_ENERGY = 2, D_CAPACITY = 3, D_FLUID = 4, D_FLUID_CAP = 5, D_EXTRA = 6,
-            D_STANDBY = 7, COUNT = 8;
+            D_STANDBY = 7, D_RATE_WHOLE = 8, D_RATE = 9, COUNT = 11;
     public static final int WIDTH = 176, HEIGHT = 166;
     public static final int IN_X = 134, IN_Y = 21, OUT_X = 134, OUT_Y = 51;
     public static final int INV_Y = 84;
@@ -59,6 +59,11 @@ public class GeneratorSlotsMenu extends AbstractContainerMenu {
 
     public int kind() {
         return kind;
+    }
+
+    public double rate() {
+        double exact = data.getDouble(GeneratorSlotsMenu.D_RATE);
+        return exact != 0 ? exact : data.getInt(GeneratorSlotsMenu.D_RATE_X100) / 100.0;
     }
 
     public int value(int index) {

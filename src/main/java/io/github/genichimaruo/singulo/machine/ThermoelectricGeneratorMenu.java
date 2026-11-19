@@ -25,6 +25,11 @@ public class ThermoelectricGeneratorMenu extends AbstractContainerMenu {
                 SyncedInts.client(ThermoelectricGeneratorBlockEntity.COUNT));
     }
 
+    public double rate() {
+        double exact = data.getDouble(ThermoelectricGeneratorBlockEntity.D_RATE);
+        return exact != 0 ? exact : data.getInt(ThermoelectricGeneratorBlockEntity.D_RATE_X100) / 100.0;
+    }
+
     public int value(int index) {
         return data.getInt(index);
     }

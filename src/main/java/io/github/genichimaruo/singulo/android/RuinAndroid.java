@@ -1,11 +1,20 @@
 package io.github.genichimaruo.singulo.android;
+
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.world.item.ItemStack;
+import io.github.genichimaruo.singulo.android.work.ItemCount;
 
 import io.github.genichimaruo.singulo.ruin.RuinGuards;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -13,6 +22,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -32,7 +43,10 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -297,7 +311,11 @@ public abstract class RuinAndroid extends Monster {
     static final int REPAIR_COOLDOWN = 60;
 
     @Nullable
-    private BlockPos home;
+    private GlobalPos homeAddress;
+    /** 次元のない旧セーブのリンクを、読み込み済みのステーションで次に照合する tick。 */
+    private int legacyHomeCheckAt = -1;
+    @Nullable
+    private List<CompletableFuture<LegacyHomeRead>> legacyHomeReads;
     /** 護衛（プレイヤーの組立ステーションで印刷された）か。護衛は敵対モブだけを狙い、プレイヤーには傷つけられない。 */
     private boolean guard;
     @Nullable
@@ -314,9 +332,16 @@ public abstract class RuinAndroid extends Monster {
     /** 追従する人（許可証に登録された人から選ぶ。null は持ち主）。 */
     @Nullable
     private java.util.UUID leader;
-    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(INVENTORY_SIZE);
+    private final AndroidCargoInventory inventory = new AndroidCargoInventory();
     /** 作業（自動化）に割り当ててよいか（アンドロイドの画面で切り替える）。 */
     private boolean workEnabled = true;
+    /** 床に落ちている物を拾うか（0.21.0。アンドロイドの画面で切り替える）。 */
+    private boolean collect = true;
+    /** 拾った物の預け先（{@link #STORE_CHEST} チェスト類を優先・{@link #STORE_WORK} 作業指令台と資材口を優先・{@link #STORE_OFF} 預けない）。 */
+    private int store = STORE_CHEST;
+    /** 拾った物を持っているか（預けに行くきっかけ）と、最後に拾った時刻。 */
+    private boolean collected;
+    private int lastCollect;
     /** 割り当てられた作業の、作業指令台と注文（なければ null と -1）。 */
     @Nullable
     private BlockPos workConsole;
@@ -405,6 +430,31 @@ public abstract class RuinAndroid extends Monster {
      * 持ち主が入れておいた物なので、作業では使わず（空いている場所だけ使う）、資材置き場へも戻さない。
      */
     private int personal;
+    private final List<ItemCount> personalLiquids = new ArrayList<>();
+
+    /** An ordinary order using this worker's preloaded tanks keeps the balance on the worker. */
+    public void retainTanksForWork() {
+        personalLiquids.clear();
+        for (var held : liquids()) personalLiquids.add(new ItemCount(held.getKey(), held.getValue()));
+    }
+
+    public boolean usesPersonalTanks() {
+        return !personalLiquids.isEmpty();
+    }
+
+    public long personalLiquid(ItemStack sample) {
+        return Math.min(liquidAmount(sample), ItemCount.get(personalLiquids,
+                io.github.genichimaruo.singulo.android.work.FluidSamples.key(sample)));
+    }
+
+    public void consumeWorkLiquid(ItemStack sample, long amount) {
+        long used = drainLiquid(sample, amount, false);
+        if (personalLiquids.isEmpty()) return;
+        ItemStack key = io.github.genichimaruo.singulo.android.work.FluidSamples.key(sample);
+        for (ItemCount held : personalLiquids) {
+            if (held.matches(key)) held.count = Math.max(0, held.count - used);
+        }
+    }
     private int repairCooldown;
     /** ステーションが遠すぎて戻れなかったとき、しばらく戻ろうとしない（tick）。 */
     private int retreatCooldown;
@@ -428,6 +478,7 @@ public abstract class RuinAndroid extends Monster {
             setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
             if (!level().isClientSide) {
                 net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
+                int previousBatteries = batteries();
                 entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
                 entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
                 syncTanks();
@@ -437,7 +488,7 @@ public abstract class RuinAndroid extends Monster {
                         entityData.set(DECOR[i], d.copy());
                     }
                 }
-                if (charge() > maxCharge()) {
+                if (previousBatteries > batteries() && charge() > maxCharge()) {
                     setCharge(maxCharge());
                 }
             }
@@ -553,7 +604,8 @@ public abstract class RuinAndroid extends Monster {
      * 積んだアップグレードの、液体のタンク1つの大きさ: タンク 32,000、ガス・液体 16,000（化学物質と分けるので半分）、ほかは 0。
      */
     public static int fluidCapacity(net.minecraft.world.item.ItemStack upgrade) {
-        return isItem(upgrade, "android_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+        return isItem(upgrade, "android_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_TANK_CAPACITY)
+                : isItem(upgrade, "android_dual_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_DUAL_TANK_CAPACITY) : 0;
     }
 
     /** 化学物質（Mekanism）のタンク1つの大きさ: ガスタンク 32,000、ガス・液体 16,000。Mekanism がなければ 0（使えない）。 */
@@ -561,7 +613,8 @@ public abstract class RuinAndroid extends Monster {
         if (!io.github.genichimaruo.singulo.android.work.Chemicals.present()) {
             return 0;
         }
-        return isItem(upgrade, "android_gas_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+        return isItem(upgrade, "android_gas_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_TANK_CAPACITY)
+                : isItem(upgrade, "android_dual_tank_upgrade") ? PackBalance.value(ServerConfig.ANDROID_DUAL_TANK_CAPACITY) : 0;
     }
 
     public int fluidCapacity() {
@@ -618,7 +671,7 @@ public abstract class RuinAndroid extends Monster {
         long n = 0;
         for (int i = 0; cap > 0 && i < TANKS; i++) {
             if (chemIds[i].isEmpty() || chemIds[i].equals(id)) {
-                n += cap - chemAmounts[i];
+                n += Math.max(0, cap - chemAmounts[i]);
             }
         }
         return n;
@@ -698,7 +751,7 @@ public abstract class RuinAndroid extends Monster {
         if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
             return chemAmount(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
         }
-        return tankAmount(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+        return totalTankAmount(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
     }
 
     /** 見本の流体・化学物質を、あとどれだけ入れられるか。 */
@@ -706,7 +759,7 @@ public abstract class RuinAndroid extends Monster {
         if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
             return chemSpace(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
         }
-        return tankSpace(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+        return totalTankSpace(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
     }
 
     /** 見本の流体・化学物質を amount 入れる。入った量。 */
@@ -715,7 +768,7 @@ public abstract class RuinAndroid extends Monster {
             return fillChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
         }
         var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
-        return f.isEmpty() ? 0 : fillTanks(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, (int) Math.min(Integer.MAX_VALUE, amount)), simulate);
+        return fillTanks(f, amount, simulate);
     }
 
     /** 見本の流体・化学物質を最大 amount 出す。出た量。 */
@@ -724,19 +777,19 @@ public abstract class RuinAndroid extends Monster {
             return drainChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
         }
         var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
-        return f.isEmpty() ? 0 : drainTanks(f, (int) Math.min(Integer.MAX_VALUE, amount), simulate).getAmount();
+        return drainTankAmount(f, amount, simulate);
     }
 
     /** タンクの中身すべて（流体と化学物質の、量1の見本 → 量）。 */
     public java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> liquids() {
-        java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> out = new java.util.ArrayList<>();
+        List<ItemCount> amounts = new ArrayList<>();
         for (var f : tankFluids()) {
-            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, 1)), (long) f.getAmount()));
+            ItemCount.add(amounts, io.github.genichimaruo.singulo.android.work.FluidSamples.of(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(f, 1)), f.getAmount());
         }
         for (var e : chemicals().entrySet()) {
-            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(e.getKey(), 1), e.getValue()));
+            ItemCount.add(amounts, io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(e.getKey(), 1), e.getValue());
         }
-        return out;
+        return amounts.stream().map(c -> java.util.Map.entry(c.item, c.count)).toList();
     }
 
     /** タンクが空か（タンクアップグレードを外せるか）。化学物質のタンクも見る。 */
@@ -767,7 +820,11 @@ public abstract class RuinAndroid extends Monster {
 
     /** この流体が、タンクにいくつあるか（mB）。 */
     public int tankAmount(net.minecraftforge.fluids.FluidStack like) {
-        int n = 0;
+        return (int) Math.min(Integer.MAX_VALUE, totalTankAmount(like));
+    }
+
+    private long totalTankAmount(net.minecraftforge.fluids.FluidStack like) {
+        long n = 0;
         for (var t : tanks) {
             if (io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
                 n += t.getFluidAmount();
@@ -778,13 +835,17 @@ public abstract class RuinAndroid extends Monster {
 
     /** あと、この流体をどれだけ入れられるか（同じ流体のタンクの空きと、空のタンク）。 */
     public int tankSpace(net.minecraftforge.fluids.FluidStack like) {
+        return (int) Math.min(Integer.MAX_VALUE, totalTankSpace(like));
+    }
+
+    private long totalTankSpace(net.minecraftforge.fluids.FluidStack like) {
         if (!hasTank()) {
             return 0;
         }
-        int n = 0;
+        long n = 0;
         for (var t : tanks) {
-            if (t.isEmpty() || io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
-                n += t.getSpace();
+            if (t.isEmpty() || net.minecraftforge.fluids.io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
+                n += Math.max(0, t.getSpace());
             }
         }
         return n;
@@ -792,12 +853,16 @@ public abstract class RuinAndroid extends Monster {
 
     /** タンクに入れる（同じ流体のタンクから、そのあと空のタンク）。入った量。 */
     public int fillTanks(net.minecraftforge.fluids.FluidStack fluid, boolean simulate) {
-        if (!hasTank() || fluid.isEmpty()) {
+        return (int) fillTanks(fluid, fluid.getAmount(), simulate);
+    }
+
+    private long fillTanks(net.minecraftforge.fluids.FluidStack fluid, long amount, boolean simulate) {
+        if (!hasTank() || fluid.isEmpty() || amount <= 0) {
             return 0;
         }
         var action = simulate ? net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
                 : net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
-        int left = fluid.getAmount();
+        long left = amount;
         int[] planned = new int[TANKS];
         for (int pass = 0; pass < 2 && left > 0; pass++) {
             for (int i = 0; i < TANKS && left > 0; i++) {
@@ -808,7 +873,7 @@ public abstract class RuinAndroid extends Monster {
                     continue;
                 }
                 int room = t.getCapacity() - t.getFluidAmount() - planned[i];
-                int put = Math.min(room, left);
+                int put = (int) Math.min(room, left);
                 if (put <= 0) {
                     continue;
                 }
@@ -823,24 +888,30 @@ public abstract class RuinAndroid extends Monster {
         if (!simulate) {
             syncTanks();
         }
-        return fluid.getAmount() - left;
+        return amount - left;
     }
 
     /** タンクから出す（この流体を最大 amount）。出した流体。 */
     public net.minecraftforge.fluids.FluidStack drainTanks(net.minecraftforge.fluids.FluidStack like, int amount, boolean simulate) {
+        int got = (int) drainTankAmount(like, amount, simulate);
+        return got == 0 ? net.minecraftforge.fluids.FluidStack.EMPTY : io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(like, got);
+    }
+
+    private long drainTankAmount(net.minecraftforge.fluids.FluidStack like, long amount, boolean simulate) {
+        if (like.isEmpty() || amount <= 0) return 0;
         var action = simulate ? net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
                 : net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
-        int got = 0;
+        long got = 0;
         for (var t : tanks) {
             if (got >= amount || !io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
                 continue;
             }
-            got += t.drain(amount - got, action).getAmount();
+            got += t.drain((int) Math.min(Integer.MAX_VALUE, amount - got), action).getAmount();
         }
         if (!simulate && got > 0) {
             syncTanks();
         }
-        return got <= 0 ? net.minecraftforge.fluids.FluidStack.EMPTY : io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(like, got);
+        return got;
     }
 
     /**
@@ -863,8 +934,8 @@ public abstract class RuinAndroid extends Monster {
         var exec = net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
         var contained = handler.drain(Integer.MAX_VALUE, net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
         boolean filled = false, emptied = false;
-        if (!contained.isEmpty() && (tank.isEmpty() || io.github.genichimaruo.singulo.compat.Legacy.sameFluid(tank.getFluid(), contained))) {
-            var got = handler.drain(Math.min(tank.getSpace(), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
+        if (!contained.isEmpty() && (tank.isEmpty() || net.minecraftforge.fluids.io.github.genichimaruo.singulo.compat.Legacy.sameFluid(tank.getFluid(), contained))) {
+            var got = handler.drain(Math.min(Math.max(0, tank.getSpace()), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
             if (!got.isEmpty()) {
                 tank.fill(got, exec);
                 emptied = true;
@@ -911,7 +982,7 @@ public abstract class RuinAndroid extends Monster {
         var inside = io.github.genichimaruo.singulo.android.work.Chemicals.contained(one);
         boolean moved = false;
         if (inside != null && (chemIds[i].isEmpty() || chemIds[i].equals(inside.getKey()))) {
-            long got = store.extract(inside.getKey(), Math.min(cap - chemAmounts[i], inside.getValue()), false);
+            long got = store.extract(inside.getKey(), Math.min(Math.max(0, cap - chemAmounts[i]), inside.getValue()), false);
             if (got > 0) {
                 chemIds[i] = inside.getKey();
                 chemAmounts[i] += got;
@@ -980,11 +1051,11 @@ public abstract class RuinAndroid extends Monster {
             if (on) {
                 var f = tanks[i].getFluid();
                 v = f.isEmpty() ? 0 : (net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(f.getFluid()) + 1) << 8
-                        | Math.max(1, f.getAmount() * 100 / cap);
+                        | io.github.genichimaruo.singulo.compat.Legacy.clamp(f.getAmount() * 100L / cap, 1, 100);
             }
             entityData.set(i == 0 ? TANK_A : TANK_B, v);
             entityData.set(CHEM[i], chemCap <= 0 ? "-"
-                    : chemIds[i] + ";" + (chemIds[i].isEmpty() ? 0 : Math.max(1, chemAmounts[i] * 100 / chemCap)));
+                    : chemIds[i] + ";" + (chemIds[i].isEmpty() ? 0 : io.github.genichimaruo.singulo.compat.Legacy.clamp(Math.min(chemCap, chemAmounts[i]) * 100 / chemCap, 1, 100)));
         }
     }
 
@@ -1008,6 +1079,10 @@ public abstract class RuinAndroid extends Monster {
         int sep = v.indexOf(';');
         return sep < 0 ? "" : v.substring(0, sep);
     }
+
+    int storedFluid(int room) { return tanks[room].getFluidAmount(); }
+
+    int storedChemical(int room) { return (int) Math.min(Integer.MAX_VALUE, chemAmounts[room]); }
 
     /** 液体のタンク1つの大きさ（クライアント。画面の数字のため）。 */
     public int clientFluidCapacity() {
@@ -1062,7 +1137,8 @@ public abstract class RuinAndroid extends Monster {
 
     /** 充電の満タン（バッテリーアップグレード1個につき +50%。内蔵のバッテリーも同じだけ）。 */
     public int maxCharge() {
-        return CHARGE_MAX * (2 + batteries() + builtInBatteries()) / 2;
+        return (int) Math.min(Integer.MAX_VALUE, (long) PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY)
+                * (2 + batteries() + builtInBatteries()) / 2);
     }
 
     /** 護衛が敵を探す範囲（ステーションか持ち主から。型によって広い）。 */
@@ -1104,6 +1180,27 @@ public abstract class RuinAndroid extends Monster {
         this.workEnabled = enabled;
     }
 
+    public boolean collects() {
+        return collect;
+    }
+
+    public void setCollect(boolean collect) {
+        this.collect = collect;
+    }
+
+    public int storeMode() {
+        return store;
+    }
+
+    /** 預け先を次へ（チェスト優先 → 作業優先 → 預けない）。 */
+    public void cycleStoreMode() {
+        store = (store + 1) % 3;
+        if (stashPickupsOnly) {
+            stashTarget = null;
+        }
+        collected = hasPickups();
+    }
+
     /** 作業指令台の注文を割り当てる（作業中は戦わず、持ち物を取り出せない）。 */
     public void assignWork(BlockPos console, int order) {
         if (escrowRequest != null && (!console.equals(workConsole) || order != workOrder)) return;
@@ -1133,6 +1230,11 @@ public abstract class RuinAndroid extends Monster {
     public CompoundTag saveWorkState() {
         CompoundTag t = workGoal.saveWork();
         t.putInt("personal", personal);
+        if (usesPersonalTanks()) {
+            var balances = new net.minecraft.nbt.ListTag();
+            for (ItemCount held : personalLiquids) balances.add(held.save(registryAccess()));
+            t.put("personal_liquids", balances);
+        }
         if (escrowRequest != null) t.putUUID("escrow_request",escrowRequest);
         if (escrowOwner != null) t.putUUID("escrow_owner",escrowOwner);
         if (escrowDimension != null) t.putString("escrow_dimension",escrowDimension);
@@ -1170,6 +1272,11 @@ public abstract class RuinAndroid extends Monster {
         if (t.hasUUID("escrow_owner")) escrowOwner=t.getUUID("escrow_owner");
         if (t.contains("escrow_dimension")) escrowDimension=t.getString("escrow_dimension");
         personal = t.getInt("personal");
+        personalLiquids.clear();
+        for (var element : t.getList("personal_liquids", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            var held = ItemCount.load((CompoundTag) element, registryAccess());
+            if (io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(held.item) && held.count >= 0) personalLiquids.add(held);
+        }
         workGoal.loadWork(t);
         var fluids = t.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < TANKS; i++) {
@@ -1190,6 +1297,7 @@ public abstract class RuinAndroid extends Monster {
         this.workOrder = -1;
         this.workJob = null;
         this.personal = 0;
+        personalLiquids.clear();
         entityData.set(WORKING, false);
         entityData.set(ACTIVITY, ACT_NONE);
         if (state() == STATE_CRAFTING || state() == STATE_MINING) {
@@ -1251,33 +1359,251 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         int[] slots = allCarrySlots();
-        java.util.List<net.minecraft.world.item.ItemStack> items = new java.util.ArrayList<>();
+        compactCarry(slots);
+        record Cargo(ItemStack stack, int pickups) {}
+        java.util.List<Cargo> items = new java.util.ArrayList<>();
         for (int slot : slots) {
-            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
-            if (s.isEmpty()) {
-                continue;
-            }
-            s = s.copy();
-            for (net.minecraft.world.item.ItemStack have : items) {
-                if (s.isEmpty()) {
-                    break;
-                }
-                if (net.minecraft.world.item.ItemStack.isSameItemSameTags(have, s) && have.getCount() < have.getMaxStackSize()) {
-                    int n = Math.min(s.getCount(), have.getMaxStackSize() - have.getCount());
-                    have.grow(n);
-                    s.shrink(n);
-                }
-            }
-            if (!s.isEmpty()) {
-                items.add(s);
+            ItemStack stack = inventory.getItem(slot);
+            if (!stack.isEmpty()) {
+                items.add(new Cargo(stack, inventory.pickups(slot)));
             }
         }
-        items.sort(java.util.Comparator.comparing((net.minecraft.world.item.ItemStack s) -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem()).toString())
-                .thenComparing(s -> s.getHoverName().getString()));
+        items.sort(java.util.Comparator.comparing((Cargo c) -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(c.stack().getItem()).toString())
+                .thenComparing(c -> c.stack().getHoverName().getString()));
         for (int i = 0; i < slots.length; i++) {
-            inventory.setItem(slots[i], i < items.size() ? items.get(i) : net.minecraft.world.item.ItemStack.EMPTY);
+            if (i < items.size()) {
+                Cargo cargo = items.get(i);
+                inventory.setItem(slots[i], cargo.stack());
+                inventory.setPickups(slots[i], cargo.pickups());
+            } else {
+                inventory.setItem(slots[i], ItemStack.EMPTY);
+            }
         }
         return true;
+    }
+
+    /** 拾った物の預け先: チェスト類を優先・作業指令台と資材口を優先・預けない。 */
+    public static final int STORE_CHEST = 0, STORE_WORK = 1, STORE_OFF = 2;
+    /** 落ちている物を拾いに行く範囲（ブロック）と、最後に拾ってから預けに行くまで（tick）。 */
+    static final double COLLECT_RANGE = 8;
+    static final int STORE_AFTER = 60;
+    /** 1つの物を拾いに行く時間の上限（tick）と、たどり着けなかった物をあきらめておく時間（tick）。 */
+    static final int COLLECT_GIVE_UP = 200, COLLECT_IGNORE = 600;
+    /** たどり着けなかった物（ItemEntity の UUID → あきらめるのをやめる時刻）。 */
+    private final java.util.Map<java.util.UUID, Integer> ignoredItems = new java.util.HashMap<>();
+
+    /** 拾ってよい物か: 置かれてすぐでない・プレイヤーが投げた物でない・持ち物かバックパックに入る。 */
+    private boolean collectable(net.minecraft.world.entity.item.ItemEntity e) {
+        if (!e.isAlive() || e.hasPickUpDelay() || e.getItem().isEmpty() || e.getOwner() instanceof Player) {
+            return false;
+        }
+        Integer until = ignoredItems.get(e.getUUID());
+        if (until != null) {
+            if (tickCount < until) {
+                return false;
+            }
+            ignoredItems.remove(e.getUUID());
+        }
+        return canCarry(e.getItem());
+    }
+
+    /** 持ち物とバックパックに、この物が少しでも入るか。 */
+    private boolean canCarry(net.minecraft.world.item.ItemStack stack) {
+        for (int slot : allCarrySlots()) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (s.isEmpty() || net.minecraft.world.item.ItemStack.isSameItemSameTags(s, stack) && s.getCount() < s.getMaxStackSize()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 持ち物とバックパックへ入れる（同じ物に重ね、残りを空いた枠へ。入りきらなかった分を返す）。 */
+    private net.minecraft.world.item.ItemStack carry(net.minecraft.world.item.ItemStack stack) {
+        net.minecraft.world.item.ItemStack rest = stack.copy();
+        int[] slots = allCarrySlots();
+        for (int slot : slots) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (!rest.isEmpty() && !s.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameTags(s, rest)) {
+                int n = Math.min(rest.getCount(), s.getMaxStackSize() - s.getCount());
+                inventory.growCargo(slot, n, n);
+                rest.shrink(n);
+            }
+        }
+        for (int slot : slots) {
+            if (!rest.isEmpty() && inventory.getItem(slot).isEmpty()) {
+                inventory.setItem(slot, rest);
+                inventory.setPickups(slot, rest.getCount());
+                rest = net.minecraft.world.item.ItemStack.EMPTY;
+            }
+        }
+        inventory.setChanged();
+        return rest;
+    }
+
+    /** 護衛として手が空いているか（戦い・作業・預けに行く途中・戻る・充電でない）。 */
+    private boolean idleGuard() {
+        return guard && printed() && active() && getTarget() == null && !isWorking() && stashTarget == null
+                && state() != STATE_RETREAT && !charging(state());
+    }
+
+    /** 落ちている物を拾いに行く（設定でオンのとき）。拾い終えて少したったら、預け先へ預けに行く（{@link #maybeStore}）。 */
+    private final class CollectGoal extends net.minecraft.world.entity.ai.goal.Goal {
+        @Nullable
+        private net.minecraft.world.entity.item.ItemEntity item;
+        /** 今の物を拾いに行ってからの時間（たどり着けなければ、あきらめる）。 */
+        private int ticks;
+        /**
+         * 落ちている物を探すまでの待ち（canUse の呼ばれた回数）。canUse は 2 tick に1回、それもエンティティの番号で決まる偶数・奇数の
+         * tick にしか呼ばれないので、tickCount で間引くと、番号によっては一度も探さない。
+         */
+        private int scanWait;
+
+        CollectGoal() {
+            setFlags(java.util.EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            if (!collect || !idleGuard() || --scanWait > 0) {
+                return false;
+            }
+            scanWait = 5;                                   // 約10 tick ごとに探す
+            item = null;
+            double best = Double.MAX_VALUE;
+            for (var e : level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, getBoundingBox().inflate(COLLECT_RANGE),
+                    RuinAndroid.this::collectable)) {
+                double d = e.distanceToSqr(RuinAndroid.this);
+                if (d < best) {
+                    best = d;
+                    item = e;
+                }
+            }
+            ticks = 0;
+            return item != null;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return collect && item != null && collectable(item) && idleGuard() && ticks < COLLECT_GIVE_UP
+                    && item.distanceToSqr(RuinAndroid.this) < (COLLECT_RANGE + 4) * (COLLECT_RANGE + 4);
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void stop() {
+            if (item != null && ticks >= COLLECT_GIVE_UP) {
+                ignoredItems.put(item.getUUID(), tickCount + COLLECT_IGNORE);   // たどり着けない物は、しばらくあきらめる
+                ignoredItems.values().removeIf(t -> t < tickCount);
+            }
+            item = null;
+            getNavigation().stop();
+        }
+
+        @Override
+        public void tick() {
+            if (item == null) {
+                return;
+            }
+            ticks++;
+            getLookControl().setLookAt(item);
+            if (item.distanceToSqr(RuinAndroid.this) > 1.6 * 1.6) {
+                if (tickCount % 10 == 0 || getNavigation().isDone()) {
+                    getNavigation().moveTo(item, 1.0);
+                }
+                return;
+            }
+            net.minecraft.world.item.ItemStack stack = item.getItem();
+            int before = stack.getCount();
+            net.minecraft.world.item.ItemStack rest = carry(stack);
+            if (rest.getCount() < before) {
+                take(item, before - rest.getCount());
+                playSound(net.minecraft.sounds.SoundEvents.ITEM_PICKUP, 0.3F, 1.4F);
+                collected = true;
+                lastCollect = tickCount;
+            }
+            if (rest.isEmpty()) {
+                item.discard();
+            } else {
+                item.setItem(rest);
+            }
+            item = null;
+        }
+    }
+
+    /** 拾った物を持っていて、近くにもう拾う物がない（か持ち物がいっぱい）なら、預け先へ預けに行く（1秒ごと）。 */
+    private void maybeStore() {
+        if (!collected || store == STORE_OFF || !idleGuard() || tickCount % 20 != 0) {
+            return;
+        }
+        boolean full = true;
+        for (int slot : allCarrySlots()) {
+            full &= !inventory.getItem(slot).isEmpty();
+        }
+        if (!full && tickCount - lastCollect < STORE_AFTER) {
+            return;
+        }
+        collected = false;                          // 預け先がなければ、次に拾うまで探さない
+        if (!hasPickups()) {
+            return;
+        }
+        BlockPos depot = findDepot(store == STORE_WORK);
+        if (depot != null) {
+            stashTarget = depot;
+            stashPickupsOnly = true;
+            stashTicks = STASH_TICKS;
+        }
+    }
+
+    private boolean hasPickups() {
+        for (int slot : allCarrySlots()) {
+            if (inventory.pickups(slot) > 0) return true;
+        }
+        return false;
+    }
+
+    /** 預け先の種類: 0 預けられない、1 チェスト類、2 作業指令台・資材口。 */
+    private int depotKind(BlockPos p) {
+        var be = level().getBlockEntity(p);
+        if (be == null) {
+            return 0;
+        }
+        if (be instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity
+                || be instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) {
+            return 2;
+        }
+        // まだ開けていない戦利品の箱（遺構・村など）には入れない
+        if (be instanceof net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity r && r.getLootTable() != null) {
+            return 0;
+        }
+        boolean box = be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity
+                || be instanceof net.minecraft.world.level.block.entity.BarrelBlockEntity
+                || be instanceof net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+        if (!box) {
+            // ほかの MOD の箱: ブロックの名前に箱らしい言葉があるもの
+            String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).getPath();
+            box = path.contains("chest") || path.contains("barrel") || path.contains("crate");
+        }
+        return box ? 1 : 0;
+    }
+
+    /** 預け先（work なら作業指令台と資材口を優先、でなければチェスト類を優先。なければもう一方）。なければ null。 */
+    @Nullable
+    private BlockPos findDepot(boolean work) {
+        BlockPos[] best = new BlockPos[3];
+        for (BlockPos p : BlockPos.betweenClosed(blockPosition().offset(-STASH_RANGE, -STASH_HEIGHT, -STASH_RANGE),
+                blockPosition().offset(STASH_RANGE, STASH_HEIGHT, STASH_RANGE))) {
+            int kind = depotKind(p);
+            if (kind > 0 && (best[kind] == null || p.distSqr(blockPosition()) < best[kind].distSqr(blockPosition())) && accepts(p, true)) {
+                best[kind] = p.immutable();
+            }
+        }
+        int first = work ? 2 : 1, second = work ? 1 : 2;
+        return best[first] != null ? best[first] : best[second];
     }
 
     /** 預けに行く箱を探す範囲（横・上下、ブロック）と、たどり着くまで待つ時間（tick）。 */
@@ -1286,6 +1612,7 @@ public abstract class RuinAndroid extends Monster {
     @Nullable
     private BlockPos stashTarget;
     private int stashTicks;
+    private boolean stashPickupsOnly;
 
     /**
      * 持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口など、入れられる所）へ預けに行く。
@@ -1314,32 +1641,22 @@ public abstract class RuinAndroid extends Monster {
             return net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.none");
         }
         stashTarget = best;
+        stashPickupsOnly = false;
         stashTicks = STASH_TICKS;
         return null;
     }
 
-    /** 預ける箱にしてよい所か（入れ物のブロックで、物を入れられる）。かまどなどの装置には入れない。 */
+    /** 預ける箱にしてよい所か（入れ物のブロック・作業指令台・資材口で、物を入れられる）。かまどなどの装置には入れない。 */
     private boolean stashable(BlockPos p) {
-        var be = level().getBlockEntity(p);
-        if (be == null) {
-            return false;
-        }
-        boolean box = be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity
-                || be instanceof net.minecraft.world.level.block.entity.BarrelBlockEntity
-                || be instanceof net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity
-                || be instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity;
-        if (!box) {
-            // ほかの MOD の箱: ブロックの名前に箱らしい言葉があるもの
-            String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).getPath();
-            box = path.contains("chest") || path.contains("barrel") || path.contains("crate");
-        }
-        if (!box) {
-            return false;
-        }
+        return depotKind(p) > 0 && accepts(p, false);
+    }
+
+    /** 持ち物の何かを、そこへ入れられるか。 */
+    private boolean accepts(BlockPos p, boolean pickupsOnly) {
         for (var handler : stashStorages(p)) {
             for (int slot : allCarrySlots()) {
-                var cargo = inventory.getItem(slot);
-                if (!cargo.isEmpty() && net.minecraftforge.items.ItemHandlerHelper.insertItemStacked(handler, cargo.copy(), true).getCount() < cargo.getCount()) {
+                var cargo = stashOffer(slot, pickupsOnly);
+                if (!cargo.isEmpty() && net.minecraftforge.items.ItemHandlerHelper.insertItemStacked(handler, cargo, true).getCount() < cargo.getCount()) {
                     return true;
                 }
             }
@@ -1347,10 +1664,17 @@ public abstract class RuinAndroid extends Monster {
         return false;
     }
 
+    private ItemStack stashOffer(int slot, boolean pickupsOnly) {
+        ItemStack stack = inventory.getItem(slot);
+        return pickupsOnly ? stack.copyWithCount(inventory.pickups(slot)) : stack.copy();
+    }
+
     private java.util.List<net.minecraftforge.items.IItemHandler> stashStorages(BlockPos pos) {
         java.util.List<net.minecraftforge.items.IItemHandler> out = new java.util.ArrayList<>();
         if (level().getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity port) {
             port.storages(level(), new java.util.HashSet<>(), out);
+        } else if (level().getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console) {
+            out.addAll(console.storages());               // 指令台の隣と、リンクした資材口の倉庫
         } else {
             var handler = io.github.genichimaruo.singulo.compat.Capabilities.get(level(), net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER, pos, null);
             if (handler != null) out.add(handler);
@@ -1382,6 +1706,7 @@ public abstract class RuinAndroid extends Monster {
         @Override
         public void stop() {
             stashTarget = null;
+            stashPickupsOnly = false;
             getNavigation().stop();
         }
 
@@ -1403,12 +1728,14 @@ public abstract class RuinAndroid extends Monster {
             var handlers = stashStorages(at);
             if (!handlers.isEmpty()) {
                 for (int slot : allCarrySlots()) {
-                    net.minecraft.world.item.ItemStack rest = inventory.getItem(slot).copy();
+                    ItemStack rest = stashOffer(slot, stashPickupsOnly);
+                    int offered = rest.getCount();
                     for (var handler : handlers) {
                         if (rest.isEmpty()) break;
                         rest = net.minecraftforge.items.ItemHandlerHelper.insertItemStacked(handler, rest, false);
                     }
-                    inventory.setItem(slot, rest);
+                    int stored = offered - rest.getCount();
+                    if (stored > 0) inventory.removeItem(slot, stored);
                 }
                 playSound(net.minecraft.sounds.SoundEvents.CHEST_CLOSE, 0.5F, 1.3F);
                 gesture(GESTURE_NOD, null);
@@ -1467,7 +1794,7 @@ public abstract class RuinAndroid extends Monster {
                 return false;
             }
         }
-        return tanksEmpty();
+        return tanksEmpty() || usesPersonalTanks() && liquids().stream().allMatch(e -> e.getValue() <= personalLiquid(e.getKey()));
     }
 
     /** 持ち物に入れる（同じ物に重ねてから、空きへ）。入りきらなかった分を返す。 */
@@ -1523,7 +1850,10 @@ public abstract class RuinAndroid extends Monster {
      * 作業の計画は、同じ物は同じスタックにまとまるとして枠を数えるので、まとめないと、できた物が入りきらなくなる。
      */
     public void compactCarry() {
-        int[] slots = carrySlots();
+        compactCarry(carrySlots());
+    }
+
+    private void compactCarry(int[] slots) {
         boolean changed = false;
         for (int i = 0; i < slots.length; i++) {
             net.minecraft.world.item.ItemStack into = inventory.getItem(slots[i]);
@@ -1534,8 +1864,11 @@ public abstract class RuinAndroid extends Monster {
                 net.minecraft.world.item.ItemStack from = inventory.getItem(slots[j]);
                 if (!from.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameTags(into, from)) {
                     int move = Math.min(from.getCount(), into.getMaxStackSize() - into.getCount());
-                    into.grow(move);
+                    int fromPickups = inventory.pickups(slots[j]);
+                    int movedPickups = Math.min(move, fromPickups);
+                    inventory.growCargo(slots[i], move, movedPickups);
                     from.shrink(move);
+                    inventory.setPickups(slots[j], fromPickups - movedPickups);
                     changed = true;
                 }
             }
@@ -1585,7 +1918,7 @@ public abstract class RuinAndroid extends Monster {
         return net.minecraft.world.InteractionResult.sidedSuccess(level().isClientSide);
     }
 
-    /** 倒れたら、持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）をその場に落とす。 */
+    /** 護衛の預かり物は装備として扱う。戦利品を無効にしても、転送や持ち物の回収はできる。 */
     @Override
     protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
@@ -1601,11 +1934,13 @@ public abstract class RuinAndroid extends Monster {
             if (!recoverEscrowCargo()) return;
             clearWork();
         }
-        AndroidStationBlockEntity station = home != null
-                && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
+        AndroidStationBlockEntity station = homeStation(level);
+        if (station != null && !station.hasTransfer()) {
+            station = null;
+        }
         boolean sent = false;
-        if (station != null && workConsole != null) {
-            station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());    // 印刷し直したアンドロイドが、同じ注文の作業を続ける
+        if (station != null && (workConsole != null || !tanksEmpty())) {
+            station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());
         }
         if (station == null && workConsole != null && level.isLoaded(workConsole)
                 && level.getBlockEntity(workConsole) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity c) {
@@ -1692,8 +2027,9 @@ public abstract class RuinAndroid extends Monster {
             n = n.substring(0, 32);
         }
         setCustomName(n.isEmpty() ? null : net.minecraft.network.chat.Component.literal(n));
-        if (home != null && level() instanceof ServerLevel level && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
-            station.rememberName(getUUID(), n);
+        if (legacyHomeCheckAt < 0 && level() instanceof ServerLevel level) {
+            AndroidStationBlockEntity station = homeStation(level);
+            if (station != null) station.rememberName(getUUID(), n);
         }
     }
 
@@ -1724,13 +2060,16 @@ public abstract class RuinAndroid extends Monster {
     void loseStation() {
         if (guard) {
             setHome(null);
-            clearRestriction();
         }
     }
 
     /** ステーションを失った護衛か（新しいステーションでリンクし直せる）。 */
     public boolean orphan() {
-        return guard && home == null;
+        return guard && homeAddress == null;
+    }
+
+    boolean canReceivePortableRepairs(java.util.UUID printerOwner) {
+        return isAlive() && !dismantling && orphan() && printerOwner.equals(owner);
     }
 
     @Override
@@ -1942,6 +2281,7 @@ public abstract class RuinAndroid extends Monster {
     public void configure(int mode, int retreatPercent) {
         this.mode = Mth.clamp(mode, MODE_GUARD, MODE_PATROL);
         this.retreatPercent = Mth.clamp(retreatPercent, 0, 90);
+        BlockPos home = home();
         if (home != null) {
             if (this.mode == MODE_WANDER) {
                 restrictTo(home, WANDER_RADIUS);
@@ -2043,6 +2383,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 切り替えた設定を、ステーションに伝える（読み込まれていれば）。 */
     private void pushEscort() {
+        BlockPos home = home();
         if (escortPending && home != null && level().isLoaded(home)
                 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
             station.setEscort(escort);
@@ -2117,6 +2458,7 @@ public abstract class RuinAndroid extends Monster {
                 return p.position();
             }
         }
+        BlockPos home = home();
         return home == null ? null : Vec3.atBottomCenterOf(home.above());
     }
 
@@ -2239,7 +2581,11 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public float chargeFraction() {
-        return charge() / (float) maxCharge();
+        return Math.min(1, charge() / (float) maxCharge());
+    }
+
+    private void addCharge(long amount) {
+        if (amount > 0 && charge() < maxCharge()) setCharge((int) Math.min(maxCharge(), charge() + amount));
     }
 
     protected void setCharge(int charge) {
@@ -2257,7 +2603,7 @@ public abstract class RuinAndroid extends Monster {
             }
             return false;
         }
-        setCharge(charge() - cost);
+        entityData.set(CHARGE, charge() - cost);
         if (charge() <= 0) {
             powerDown();
         }
@@ -2342,16 +2688,131 @@ public abstract class RuinAndroid extends Monster {
         return super.finalizeSpawn(level, difficulty, reason, data, spawnTag);
     }
 
+    /** この次元で移動・充電に使える座標。別次元にいる間も元のステーションとのリンクは残す。 */
     @Nullable
     public BlockPos home() {
-        return home;
+        return legacyHomeCheckAt < 0 && homeAddress != null && homeAddress.dimension().equals(level().dimension()) ? homeAddress.pos() : null;
     }
 
     public void setHome(@Nullable BlockPos home) {
-        this.home = home;
+        setHomeAddress(home == null ? null : GlobalPos.of(level().dimension(), home.immutable()));
+    }
+
+    private void setHomeAddress(@Nullable GlobalPos address) {
+        legacyHomeCheckAt = -1;
+        legacyHomeReads = null;
+        homeAddress = address;
+        BlockPos home = home();
         if (home != null) {
             restrictTo(home, HOME_RADIUS);
+        } else {
+            clearRestriction();
         }
+    }
+
+    private void loadHome(CompoundTag tag) {
+        BlockPos pos = NbtUtils.readBlockPos(tag, "home").orElse(null);
+        if (pos == null) {
+            setHome(null);
+            return;
+        }
+        if (tag.contains("home_dimension")) {
+            ResourceLocation dimension = ResourceLocation.tryParse(tag.getString("home_dimension"));
+            if (dimension != null) {
+                setHomeAddress(GlobalPos.of(ResourceKey.create(Registries.DIMENSION, dimension), pos));
+                return;
+            }
+        }
+        setHome(pos);
+        if (guard) {
+            legacyHomeCheckAt = 0;
+            clearRestriction();
+        }
+    }
+
+    private boolean resolveLoadedLegacyHome(ServerLevel current) {
+        BlockPos pos = homeAddress.pos();
+        if (current.isLoaded(pos) && recognizeLegacyStation(current, pos)) return true;
+        for (ServerLevel other : current.getServer().getAllLevels()) {
+            if (other != current && other.isLoaded(pos) && recognizeLegacyStation(other, pos)) return true;
+        }
+        return false;
+    }
+
+    private record LegacyHomeRead(ServerLevel level, boolean registered, boolean failed) {}
+
+    /** 旧保存の座標を各次元で一度照合する。通常 tick はディスクを待たず、読み取り中もリンクを保留する。 */
+    private void resolveLegacyHome(ServerLevel current, boolean waitForDisk) {
+        BlockPos pos = homeAddress.pos();
+        if (legacyHomeReads == null) {
+            if (resolveLoadedLegacyHome(current)) return;
+            legacyHomeReads = new ArrayList<>();
+            UUID id = getUUID();
+            ChunkPos chunk = new ChunkPos(pos);
+            for (ServerLevel level : current.getServer().getAllLevels()) {
+                if (level.isOutsideBuildHeight(pos) || level.isLoaded(pos)) continue;
+                legacyHomeReads.add(level.getChunkSource().chunkMap.read(chunk)
+                        .thenApply(saved -> new LegacyHomeRead(level, saved.isPresent() && savedStationManages(saved.get(), pos, id), false))
+                        .exceptionally(failure -> {
+                            io.github.genichimaruo.singulo.Singulo.LOGGER.warn("Could not read legacy android station at {} in {}", pos, level.dimension(), failure);
+                            return new LegacyHomeRead(level, false, true);
+                        }));
+            }
+        }
+        if (!waitForDisk && legacyHomeReads.stream().anyMatch(read -> !read.isDone())) return;
+        // 読み取り中にロードされたチャンクの、現在の組立ステーションを優先する。
+        if (resolveLoadedLegacyHome(current)) return;
+        boolean unreadable = false;
+        for (var read : legacyHomeReads) {
+            LegacyHomeRead result = waitForDisk ? read.join() : read.getNow(null);
+            if (result.level().isLoaded(pos)) continue;
+            if (result.registered()) {
+                setHomeAddress(GlobalPos.of(result.level().dimension(), pos));
+                configure(mode, retreatPercent);
+                return;
+            }
+            unreadable |= result.failed();
+        }
+        if (unreadable) {
+            // I/O エラーを撤去と見なさない。同じ読み取りを繰り返さず、ロードされたときだけ再照合する。
+            legacyHomeCheckAt = tickCount + 200 + Math.floorMod(getId(), 20);
+        } else {
+            loseStation();
+        }
+    }
+
+    private static boolean savedStationManages(CompoundTag chunk, BlockPos pos, UUID id) {
+        for (var tag : chunk.getList("block_entities", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            if (tag instanceof CompoundTag be && "singulo:android_station".equals(be.getString("id")) && pos.equals(BlockEntity.getPosFromTag(be))) {
+                for (int slot = 0; slot < AndroidStationBlockEntity.MAX_UNITS; slot++) {
+                    if (id.equals(AndroidStationBlockEntity.savedUnit(be, slot))) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean recognizeLegacyStation(ServerLevel level, BlockPos pos) {
+        if (registeredStation(level, pos) == null) return false;
+        setHomeAddress(GlobalPos.of(level.dimension(), pos));
+        configure(mode, retreatPercent);
+        return true;
+    }
+
+    @Nullable
+    private AndroidStationBlockEntity registeredStation(ServerLevel level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.manages(getUUID()) ? station : null;
+    }
+
+    @Nullable
+    private AndroidStationBlockEntity homeStation(ServerLevel current) {
+        if (!guard || homeAddress == null) return null;
+        if (legacyHomeCheckAt >= 0) {
+            resolveLegacyHome(current, true);
+            if (homeAddress == null || legacyHomeCheckAt >= 0) return null;
+        }
+        ServerLevel level = current.getServer().getLevel(homeAddress.dimension());
+        return level == null ? null : registeredStation(level, homeAddress.pos());
     }
 
     /** クライアント: 今の動きを始めてからの時間（tick、小数）。 */
@@ -2391,6 +2852,7 @@ public abstract class RuinAndroid extends Monster {
         registerCombat();
         life = new AndroidLife(this);
         goalSelector.addGoal(3, new StashGoal());
+        goalSelector.addGoal(3, new CollectGoal());
         goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new io.github.genichimaruo.singulo.compat.LegacyConstructors.StrollGoal(this, 0.7) {
@@ -2420,6 +2882,9 @@ public abstract class RuinAndroid extends Monster {
 
     @Override
     public void tick() {
+        if (legacyHomeCheckAt >= 0 && tickCount >= legacyHomeCheckAt && level() instanceof ServerLevel current) {
+            resolveLegacyHome(current, false);
+        }
         super.tick();
         if (level().isClientSide) {
             tickThrusters();
@@ -2438,7 +2903,8 @@ public abstract class RuinAndroid extends Monster {
                     playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.4F, 2.0F - p / (float) PRINT_TICKS);
                 }
             } else {
-                if (home != null && level().getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+                AndroidStationBlockEntity station = homeStation((ServerLevel) level());
+                if (station != null) {
                     station.onAndroidDismantled(getUUID());
                 }
                 discard();
@@ -2459,19 +2925,23 @@ public abstract class RuinAndroid extends Monster {
         if (printed() && state() != STATE_LOW_POWER && getHealth() < getMaxHealth() && tickCount % REGEN_INTERVAL == 0
                 && charge() > maxCharge() * REGEN_MIN_CHARGE + REGEN_COST) {
             // 減った体力は、充電を少しずつ使いながら、ゆっくり直る（充電が少ないときは、充電を残すために直さない）
-            setCharge(charge() - REGEN_COST);
+            entityData.set(CHARGE, charge() - REGEN_COST);
             heal(1);
         }
-        if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
-            if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
-                pushEscort();
-                // 体力をステーションへ知らせる（コンパレーターの出力。どこにいても最後の値が残る）
-                station.reportHealth(getUUID(), getHealth() / getMaxHealth());
-                // 自己修理キットが1つでも減っていたら、ステーションのストックから補充する
-                station.refill(this);
-            } else {
-                // ステーションが壊された（同じ場所に置き直されたものは、このアンドロイドを知らない）: 身寄りのないアンドロイドになる
-                loseStation();
+        BlockPos home = home();
+        if (guard && legacyHomeCheckAt < 0 && homeAddress != null && tickCount % 20 == 0) {
+            ServerLevel origin = ((ServerLevel) level()).getServer().getLevel(homeAddress.dimension());
+            if (origin != null && origin.isLoaded(homeAddress.pos())) {
+                AndroidStationBlockEntity station = registeredStation(origin, homeAddress.pos());
+                if (station == null) {
+                    // 元のステーションが壊された。同じ座標に置き直したステーションはこの UUID を知らない。
+                    loseStation();
+                    home = null;
+                } else if (home != null) {
+                    pushEscort();
+                    station.reportHealth(getUUID(), getHealth() / getMaxHealth());
+                    station.refill(this);
+                }
             }
         }
         if (guard && printed() && active() && getHealth() < getMaxHealth() * retreatPercent / 100F
@@ -2564,6 +3034,7 @@ public abstract class RuinAndroid extends Monster {
         if (!printed()) {
             getNavigation().stop();
         }
+        maybeStore();                                   // 拾った物を預けに行く（設定の預け先へ）
     }
 
     // ------------------------------------------------------------------ 無重力の中を飛ぶ
@@ -2793,7 +3264,7 @@ public abstract class RuinAndroid extends Monster {
         for (int i = 0; i < 96 && p.getY() < level().getMaxBuildHeight(); i++) {
             p.move(net.minecraft.core.Direction.UP);
             if (!level().getFluidState(p).is(net.minecraft.tags.FluidTags.WATER)) {
-                return level().getBlockState(p).getCollisionShape(level(), p).isEmpty();
+                return !AndroidPathing.blocks(level(), p, this);         // 透過ガラスのふたは抜けられる
             }
         }
         return false;
@@ -2813,8 +3284,7 @@ public abstract class RuinAndroid extends Monster {
                 || level().getFluidState(new BlockPos(x, y, z)).is(net.minecraft.tags.FluidTags.WATER)) {
             return true;
         }
-        BlockPos below = new BlockPos(x, y - 1, z);
-        return !level().getBlockState(below).getCollisionShape(level(), below).isEmpty();
+        return AndroidPathing.blocks(level(), new BlockPos(x, y - 1, z), this);   // 透過ガラスは床にならない
     }
 
     @Override
@@ -2858,10 +3328,11 @@ public abstract class RuinAndroid extends Monster {
     /** 護衛が倒れたら、ステーションに知らせる（キットがあれば印刷し直す）。護衛は経験値を落とさない。 */
     @Override
     public void die(DamageSource source) {
+        boolean wasDead = dead;
         super.die(source);
-        if (guard && home != null && level() instanceof ServerLevel level
-                && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
-            station.onAndroidDied(getUUID());
+        if (!wasDead && dead && level() instanceof ServerLevel level) {
+            AndroidStationBlockEntity station = homeStation(level);
+            if (station != null) station.onAndroidDied(getUUID());
         }
     }
 
@@ -2872,6 +3343,7 @@ public abstract class RuinAndroid extends Monster {
             life.dropHeld();
         }
         super.remove(reason);
+        BlockPos home = home();
         if (!guard && home != null && reason.shouldDestroy() && level() instanceof ServerLevel level && level.isLoaded(home)
                 && level.getBlockEntity(home) instanceof AndroidFabricatorBlockEntity fabricator) {
             fabricator.forget(getUUID(), reason == RemovalReason.KILLED);
@@ -2955,8 +3427,9 @@ public abstract class RuinAndroid extends Monster {
         tag.putBoolean("facility_spawned", facilitySpawned);
         tag.putInt("charge", charge());
         tag.putInt("print", entityData.get(PRINT));
-        if (home != null) {
-            tag.put("home", NbtUtils.writeBlockPos(home));
+        if (homeAddress != null) {
+            tag.put("home", NbtUtils.writeBlockPos(homeAddress.pos()));
+            if (legacyHomeCheckAt < 0) tag.putString("home_dimension", homeAddress.dimension().location().toString());
         }
         if (factoryMade) {
             tag.putBoolean("factory_made", true);
@@ -2968,6 +3441,7 @@ public abstract class RuinAndroid extends Monster {
             items.set(i, inventory.getItem(i));
         }
         tag.put("items", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), items));
+        if (hasPickups()) tag.putIntArray("pickups", inventory.savePickups());
         net.minecraft.nbt.ListTag tl = new net.minecraft.nbt.ListTag();
         for (var t : tanks) {
             tl.add(t.writeToNBT(new CompoundTag()));
@@ -2975,6 +3449,8 @@ public abstract class RuinAndroid extends Monster {
         tag.put("tanks", tl);
         tag.put("chem_tanks", saveChems());
         tag.putBoolean("work", workEnabled);
+        tag.putBoolean("collect", collect);
+        tag.putInt("store", store);
         if (escrowRequest != null) {
             tag.putUUID("escrow_request",escrowRequest);
             tag.putInt("work_personal",personal);
@@ -3017,14 +3493,12 @@ public abstract class RuinAndroid extends Monster {
         super.readAdditionalSaveData(tag);
         facilitySpawned = tag.getBoolean("facility_spawned");
 
-        if (tag.contains("charge")) {
-            setCharge(tag.getInt("charge"));
-        }
         if (tag.contains("print")) {
             entityData.set(PRINT, Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS));
         }
         io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "home").ifPresent(this::setHome);
         guard = tag.getBoolean("guard");
+        loadHome(tag);
         dismantling = tag.getBoolean("dismantling");
         factoryMade = tag.getBoolean("factory_made");
         prototype = tag.getBoolean("prototype");
@@ -3033,6 +3507,9 @@ public abstract class RuinAndroid extends Monster {
         }
         entityData.set(GUARD, guard);
         loadInventory(tag);
+        inventory.loadPickups(tag.getIntArray("pickups"));
+        collected = hasPickups();
+        lastCollect = tickCount;
         net.minecraft.nbt.ListTag tl = tag.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < TANKS; i++) {
             tanks[i].setFluid(net.minecraftforge.fluids.FluidStack.EMPTY);
@@ -3043,6 +3520,8 @@ public abstract class RuinAndroid extends Monster {
         loadChems(tag.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
         workEnabled = !tag.contains("work") || tag.getBoolean("work");
+        collect = !tag.contains("collect") || tag.getBoolean("collect");
+        store = tag.contains("store") ? Math.floorMod(tag.getInt("store"), 3) : STORE_CHEST;
         io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
             assignWork(p, tag.getInt("work_order"));
             personal = tag.getInt("work_personal");          // 作業を始めたときの持ち主の物の場所（読み込み直しても変えない）
@@ -3057,7 +3536,7 @@ public abstract class RuinAndroid extends Monster {
         if (tag.hasUUID("escrow_owner")) escrowOwner=tag.getUUID("escrow_owner");
         if (tag.contains("escrow_dimension")) escrowDimension=tag.getString("escrow_dimension");
         if (tag.contains("charge")) {
-            setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す
+            entityData.set(CHARGE, Math.max(0, tag.getInt("charge")));
         }
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         if (guard) {
@@ -3101,6 +3580,7 @@ public abstract class RuinAndroid extends Monster {
             if (mode == MODE_PATROL && level() instanceof ServerLevel pl && patrol.tick(pl)) {
                 return;                            // 巡回路を回っている（巡回しないとき（夜だけ・巡回路なし）は、ステーションのそばで待つ）
             }
+            BlockPos home = home();
             if (mode == MODE_FOLLOW) {
                 Player p = ownerPlayer();
                 if (p == null) {
@@ -3201,16 +3681,16 @@ public abstract class RuinAndroid extends Monster {
 
     /** 同じステーションの護衛で、迎撃モードで手が空いて待っている仲間（自分も含む）。 */
     private java.util.List<RuinAndroid> idlePeers(ServerLevel level) {
-        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        Vec3 dock = Vec3.atBottomCenterOf(homeAddress.pos().above());
         return level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(16),
-                a -> a.isAlive() && a.guard && home.equals(a.home) && a.mode == MODE_GUARD && a.printed() && a.active()
+                a -> a.isAlive() && a.guard && homeAddress.equals(a.homeAddress) && a.mode == MODE_GUARD && a.printed() && a.active()
                         && a.getTarget() == null && !a.isWorking() && a.state() == STATE_IDLE);
     }
 
     /** ステーションの上で待つ番: 今上にいる仲間がいればその仲間（入れ替わらないように）、いなければ UUID の一番小さい仲間。 */
     @Nullable
     private RuinAndroid dockKeeper(ServerLevel level) {
-        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        Vec3 dock = Vec3.atBottomCenterOf(homeAddress.pos().above());
         RuinAndroid best = null;
         for (RuinAndroid a : idlePeers(level)) {
             boolean on = a.position().subtract(dock).horizontalDistanceSqr() < 0.8 * 0.8 && Math.abs(a.getY() - dock.y) < 1;
@@ -3227,9 +3707,9 @@ public abstract class RuinAndroid extends Monster {
     /** ステーションの上を使いたい仲間（充電・修理に戻ってくる、上で充電・印刷中）。いなければ null。 */
     @Nullable
     private RuinAndroid dockNeeder(ServerLevel level) {
-        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        Vec3 dock = Vec3.atBottomCenterOf(homeAddress.pos().above());
         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(32),
-                a -> a != this && a.isAlive() && a.guard && home.equals(a.home))) {
+                a -> a != this && a.isAlive() && a.guard && homeAddress.equals(a.homeAddress))) {
             int s = a.state();
             if (!a.printed() || s == STATE_LOW_POWER || s == STATE_RETREAT || s == STATE_CHARGING) {
                 return a;
@@ -3274,6 +3754,7 @@ public abstract class RuinAndroid extends Monster {
             if (!printed() || !(level() instanceof ServerLevel level)) {
                 return;
             }
+            BlockPos home = home();
             if (state() == STATE_LOW_POWER) {
                 // 充電器を持った持ち主のほうがステーションより近いか、ステーションが遠すぎれば、持ち主のそばで充電する
                 // （追従中は遠くの持ち主へも、ほかのときは近くにいれば）
@@ -3316,7 +3797,8 @@ public abstract class RuinAndroid extends Monster {
                 double range = state() == STATE_RETREAT ? 96 : DOCK_RANGE;
                 // ステーションの上でほかのアンドロイドが充電中なら、そばで待って、どいたら交代で乗る（待つ間は座り込まない）
                 boolean taken = guard && h != null && dockTaken(level, h);
-                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
+                if (dock == null || PackBalance.value(ServerConfig.DOCK_CHARGE_PER_TICK) == 0 && state() == STATE_LOW_POWER
+                        || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
                     if (isInWater()) {
                         chargeFromWater(level);                   // 水の中: 陸へ上がるか、水面で充電する
                         return;
@@ -3338,7 +3820,7 @@ public abstract class RuinAndroid extends Monster {
                     // 「ありがとう」: 譲ってくれた仲間がそばにいれば、そちらを向いて返す
                     if (guard) {
                         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(4),
-                                a -> a != RuinAndroid.this && a.isAlive() && a.guard && h.equals(a.home) && a.yielding)) {
+                                a -> a != RuinAndroid.this && a.isAlive() && a.guard && h.equals(a.home()) && a.yielding)) {
                             chirp(level, a, 1.3F);
                             break;
                         }
@@ -3378,17 +3860,22 @@ public abstract class RuinAndroid extends Monster {
                         s = STATE_SOLAR;
                     }
                 }
-                int rate = s == STATE_CHARGING ? RATE_DOCK : s == STATE_SOLAR ? RATE_SOLAR : RATE_REST;
+                int rate = PackBalance.value(s == STATE_CHARGING ? ServerConfig.DOCK_CHARGE_PER_TICK
+                        : s == STATE_SOLAR ? ServerConfig.SOLAR_CHARGE_PER_TICK : ServerConfig.REST_CHARGE_PER_TICK);
                 if (s == STATE_CHARGING && guard && stateTicks % 10 == 0 && home != null
                         && level.getBlockEntity(home) instanceof AndroidStationBlockEntity dock) {
                     dock.refill(RuinAndroid.this);
+                }
+                if (s == STATE_CHARGING && rate == 0 && charge() < maxCharge() && (!guard || getHealth() >= getMaxHealth())) {
+                    setState(STATE_LOW_POWER);
+                    return;
                 }
                 if (s == STATE_CHARGING && guard && !(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity)) {
                     // ステーションがなくなった（壊された・持ち場を外れた）: その場で自分で充電する（ステーションの上で止まったままにしない）
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
                     return;
                 }
-                if (s == STATE_CHARGING && guard) {
+                if (s == STATE_CHARGING && guard && (rate > 0 || getHealth() < getMaxHealth())) {
                     // 護衛はステーションの電力で充電し、体力も直す（電力が足りなければ待つ）
                     if (!(level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
                             && station.drawCharge(AndroidStationBlockEntity.FE_PER_CHARGE_TICK))) {
@@ -3398,7 +3885,7 @@ public abstract class RuinAndroid extends Monster {
                         heal(1);                     // 工場式印刷ユニットがあれば2倍速く直す
                     }
                 }
-                setCharge(charge() + rate);
+                addCharge(rate);
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, s == STATE_SOLAR ? 2.2 : 0.2, 0), 2, 0.3);
                 }
@@ -3495,9 +3982,9 @@ public abstract class RuinAndroid extends Monster {
 
         private boolean standable(ServerLevel level, BlockPos p) {
             BlockPos below = p.below();
-            return level.getFluidState(p).isEmpty() && level.getBlockState(p).getCollisionShape(level, p).isEmpty()
-                    && level.getBlockState(p.above()).getCollisionShape(level, p.above()).isEmpty() && level.getFluidState(below).isEmpty()
-                    && !level.getBlockState(below).getCollisionShape(level, below).isEmpty();
+            return level.getFluidState(p).isEmpty() && !AndroidPathing.blocks(level, p, RuinAndroid.this)
+                    && !AndroidPathing.blocks(level, p.above(), RuinAndroid.this) && level.getFluidState(below).isEmpty()
+                    && AndroidPathing.blocks(level, below, RuinAndroid.this);
         }
 
         /** ステーションの上で、ほかのアンドロイドが充電・印刷されているか。 */
@@ -3535,8 +4022,11 @@ public abstract class RuinAndroid extends Monster {
             }
             if (d < 4) {
                 net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
-                int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
-                setCharge(charge() + RATE_DOCK * got / CHARGER_FE_PER_TICK);
+                int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
+                if (rate > 0 && charge() < maxCharge()) {
+                    int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
+                    addCharge((long) rate * got / CHARGER_FE_PER_TICK);
+                }
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, 1.0, 0), 2, 0.25);
                 }
@@ -3549,7 +4039,7 @@ public abstract class RuinAndroid extends Monster {
 
         /** 昼で、空が見えていて、雨でないか（ソーラーで充電できるか）。 */
         private boolean sunlit(ServerLevel level) {
-            return level.isDay() && !level.isRaining() && level.canSeeSky(blockPosition().above());
+            return PackBalance.value(ServerConfig.SOLAR_CHARGE_PER_TICK) > 0 && level.isDay() && !level.isRaining() && level.canSeeSky(blockPosition().above());
         }
     }
 }

@@ -2,19 +2,28 @@ package io.github.genichimaruo.singulo.compat.mekanism;
 
 import io.github.genichimaruo.singulo.android.work.QioStores;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.inventory.qio.IQIOComponent;
 import mekanism.api.inventory.qio.IQIOFrequency;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.items.IItemHandler;
 
 /**
@@ -34,7 +43,34 @@ public final class MekanismQio implements QioStores.Access {
      * 周波数が消えたら忘れる。
      */
     private static final java.util.Map<IQIOFrequency, java.lang.ref.WeakReference<Handler>> HANDLERS = new java.util.WeakHashMap<>();
-    private static final java.util.concurrent.atomic.AtomicInteger IDS = new java.util.concurrent.atomic.AtomicInteger();
+    /** Stable IDs for physical stock claims, including after a server restart or a dashboard unloading. */
+    static final class FrequencyIds extends SavedData {
+        private static final Factory<FrequencyIds> FACTORY = new Factory<>(FrequencyIds::new, FrequencyIds::load, null);
+        private final Map<String, Integer> ids = new LinkedHashMap<>();
+
+        int id(IQIOFrequency frequency) {
+            String key = frequency.getSecurity().name() + ":" + frequency.getOwner() + ":" + frequency.getName();
+            return ids.computeIfAbsent(key, ignored -> {
+                setDirty();
+                return ids.size() + 1;
+            });
+        }
+
+        @Override
+        public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+            var names = new ListTag();
+            ids.keySet().forEach(name -> names.add(StringTag.valueOf(name)));
+            tag.put("frequencies", names);
+            return tag;
+        }
+
+        static FrequencyIds load(CompoundTag tag, HolderLookup.Provider registries) {
+            var result = new FrequencyIds();
+            var names = tag.getList("frequencies", Tag.TAG_STRING);
+            for (int i = 0; i < names.size(); i++) result.ids.put(names.getString(i), i + 1);
+            return result;
+        }
+    }
 
     @Override
     public int id(IItemHandler handler) {
@@ -82,7 +118,7 @@ public final class MekanismQio implements QioStores.Access {
     static IItemHandler handler(Level level, IQIOFrequency frequency) {
         var reference = HANDLERS.get(frequency);
         Handler handler = reference == null ? null : reference.get();
-        if (handler == null) {
+        if (handler == null || handler.frequency != frequency) {
             handler = new Handler(level, frequency);
             HANDLERS.put(frequency, new java.lang.ref.WeakReference<>(handler));
         }
@@ -102,7 +138,7 @@ public final class MekanismQio implements QioStores.Access {
 
     /** QIO の周波数を、種類ごとの枠の入れ物として見せる。 */
     private static final class Handler implements IItemHandler {
-        private final int id = IDS.incrementAndGet();
+        private final int id;
         private Level level;
         private final IQIOFrequency frequency;
         private List<ItemStack> types;
@@ -111,6 +147,10 @@ public final class MekanismQio implements QioStores.Access {
         Handler(Level level, IQIOFrequency frequency) {
             this.level = level;
             this.frequency = frequency;
+            id = level instanceof ServerLevel server
+                    ? server.getServer().overworld().getDataStorage().computeIfAbsent(FrequencyIds.FACTORY,
+                            "singulo_android_qio_frequencies").id(frequency)
+                    : System.identityHashCode(frequency);
         }
 
         private List<ItemStack> types() {

@@ -3,7 +3,8 @@
   "category": "misc",
   "pattern": [
     "KBK",
-    "HFH"
+    "HFH",
+    " T "
   ],
   "key": {
     "K": {
@@ -17,6 +18,9 @@
     },
     "F": {
       "item": "singulo:basic_frame"
+    },
+    "T": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

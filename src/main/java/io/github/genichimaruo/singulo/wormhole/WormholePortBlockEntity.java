@@ -1,9 +1,12 @@
 package io.github.genichimaruo.singulo.wormhole;
 
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import io.github.genichimaruo.singulo.pipe.PipeFluidFilter;
+import io.github.genichimaruo.singulo.pipe.PipeInputOnly;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +46,8 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     private final IEnergyStorage energy = new Energy();
     private final IItemHandler items = new Items();
-    private final IFluidHandler fluids = new Fluids();
+    private final IFluidHandler fluids = new Fluids(false);
+    private final IFluidHandler pipeFluids = new Fluids(true);
     /** ポート番号。向こう側の同じ番号のポートとつながる。 */
     private int channel;
     private long cacheTick = -1;
@@ -54,6 +58,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     private List<IEnergyStorage> energyTargets = List.of();
     private List<IItemHandler> itemTargets = List.of();
     private List<IFluidHandler> fluidTargets = List.of();
+    private Set<IFluidHandler> pipeInputOnly = Set.of();
 
     public WormholePortBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.WORMHOLE_PORT.get(), pos, state);
@@ -69,6 +74,11 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     public IFluidHandler fluids() {
         return fluids;
+    }
+
+    /** 液体パイプ用。向こう側の装置にパイプを直接つないだときと同じ投入・排出制限を使う。 */
+    public IFluidHandler pipeFluids() {
+        return pipeFluids;
     }
 
     public int channel() {
@@ -120,6 +130,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         List<IEnergyStorage> e = new ArrayList<>();
         List<IItemHandler> it = new ArrayList<>();
         List<IFluidHandler> f = new ArrayList<>();
+        Set<IFluidHandler> inputOnly = new HashSet<>();
         WormholeMouthBlockEntity remote = active ? cachedMouth.partner() : null;
         if (remote != null && remote.getLevel() instanceof ServerLevel other) {
             Set<WormholePortBlockEntity> ports = LOADED.get(other);
@@ -136,7 +147,10 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                         }
                         add(e, other, Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
                         add(it, other, Capabilities.ItemHandler.BLOCK, n, dir.getOpposite());
-                        add(f, other, Capabilities.FluidHandler.BLOCK, n, dir.getOpposite());
+                        IFluidHandler fluid = add(f, other, Capabilities.FluidHandler.BLOCK, n, dir.getOpposite());
+                        if (fluid != null && be instanceof PipeInputOnly) {
+                            inputOnly.add(fluid);
+                        }
                     }
                 }
             }
@@ -144,13 +158,16 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         energyTargets = e;
         itemTargets = it;
         fluidTargets = f;
+        pipeInputOnly = inputOnly;
     }
 
-    private static <T> void add(List<T> list, Level level, net.minecraftforge.common.capabilities.Capability<T> cap, BlockPos pos, Direction side) {
+    @Nullable
+    private static <T> T add(List<T> list, Level level, net.minecraftforge.common.capabilities.Capability<T> cap, BlockPos pos, Direction side) {
         T t = Capabilities.get(level, cap, pos, side);
         if (t != null && !list.contains(t)) {
             list.add(t);
         }
+        return t;
     }
 
     /** 働いている（上限の数に入っている）ときだけ、手前の口。 */
@@ -447,12 +464,18 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     // ------------------------------------------------------------------ 液体
 
-    private final class Fluids implements IFluidHandler, io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+    private final class Fluids implements IFluidHandler, PipeFluidFilter {
+        private final boolean fromPipe;
+
+        Fluids(boolean fromPipe) {
+            this.fromPipe = fromPipe;
+        }
+
         @Override
         public boolean pipeAccepts(FluidStack fluid) {
             refresh();
             for (IFluidHandler h : fluidTargets) {
-                if (!(h instanceof io.github.genichimaruo.singulo.pipe.PipeFluidFilter filter) || filter.pipeAccepts(fluid)) {
+                if (PipeFluidFilter.accepts(h, fluid)) {
                     return true;
                 }
             }
@@ -521,7 +544,9 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                     if (filled >= budget) {
                         break;
                     }
-                    filled += h.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, budget - filled), action);
+                    if (!fromPipe || PipeFluidFilter.accepts(h, resource)) {
+                        filled += h.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, budget - filled), action);
+                    }
                 }
             } finally {
                 busy = false;
@@ -546,7 +571,9 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                     if (drained >= budget) {
                         break;
                     }
-                    drained += h.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, budget - drained), action).getAmount();
+                    if (!fromPipe || !pipeInputOnly.contains(h)) {
+                        drained += h.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, budget - drained), action).getAmount();
+                    }
                 }
             } finally {
                 busy = false;
@@ -561,6 +588,9 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         public FluidStack drain(int maxDrain, FluidAction action) {
             refresh();
             for (IFluidHandler h : fluidTargets) {
+                if (fromPipe && pipeInputOnly.contains(h)) {
+                    continue;
+                }
                 FluidStack peek = h.drain(maxDrain, FluidAction.SIMULATE);
                 if (!peek.isEmpty()) {
                     return drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(peek, maxDrain), action);

@@ -37,6 +37,13 @@
       "uses": 54000
     }
   ],
+  "shape": [
+    "  C  ",
+    " BDB ",
+    " DAD ",
+    " BDB ",
+    "     "
+  ],
   "result": {
     "id": "singulo:halo_collector",
     "count": 1

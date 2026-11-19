@@ -29,7 +29,8 @@ import net.minecraftforge.items.ItemStackHandler;
  * 毎tick、触媒のティアと残量から効き方と必要電力を決め、触媒を1 tick ぶん（×消費倍率）減らす。
  * 必要電力が足りないと不完全反応で減りが速くなり、まったくなければ止まる。使い切ると失活触媒が残る。
  */
-public abstract class CatalystDeviceBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public abstract class CatalystDeviceBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+        MachineReport.Source {
     /**
      * STANDBY: 発電機の蓄電がいっぱいなので待機中（燃料・触媒を使わない）。LIMITED: 持ち主のアンカーが上限に達している。
      * 番号で同期するので、新しい値は後ろに足す。
@@ -156,6 +157,41 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     public abstract Kind kind();
 
+    /** 装置の様子の報告（0.21.0。画面のヘッダーと同じ状態と言葉）。発電機は作っている電力、ほかは使っている電力を出す。 */
+    @Override
+    public MachineReport report() {
+        MachineReport.State state = switch (status) {
+            case RUNNING -> MachineReport.State.RUN;
+            case NO_POWER -> MachineReport.State.NO_POWER;
+            case NOT_FORMED -> MachineReport.State.BROKEN;
+            case OFF -> MachineReport.State.OFF;
+            case STANDBY, WAITING -> MachineReport.State.IDLE;
+            case OUTPUT_FULL -> MachineReport.State.FULL;
+            default -> MachineReport.State.WARN;
+        };
+        Component label = switch (status) {
+            case NO_CATALYST -> Component.translatable("gui.singulo.catalyst.none");
+            case UNUSABLE -> Component.translatable("gui.singulo.catalyst.unusable");
+            case NO_POWER -> Component.translatable("gui.singulo.status.no_power");
+            case NOT_FORMED -> Component.translatable("gui.singulo.status.not_formed");
+            case NO_FUEL -> Component.translatable("gui.singulo.device.no_fuel");
+            case NO_TARGET -> Component.translatable("gui.singulo.probe.no_target");
+            case OFF -> Component.translatable("gui.singulo.status.off");
+            case STANDBY -> Component.translatable("gui.singulo.device.standby");
+            case LIMITED -> Component.translatable("gui.singulo.anchor.limited", WorldlineAnchorBlockEntity.anchorLimit());
+            case UNDERPOWERED -> Component.translatable("gui.singulo.catalyst.underpowered");
+            case WAITING -> Component.translatable("gui.singulo.probe.waiting");
+            case OUTPUT_FULL -> Component.translatable("gui.singulo.status.output_full");
+            case NEEDS_UPGRADE -> Component.translatable("gui.singulo.probe.upgrade");
+            case RUNNING -> Component.translatable("gui.singulo.status.running");
+        };
+        boolean running = status == Status.RUNNING || status == Status.UNDERPOWERED;
+        int produce = isGenerator() && running ? Math.max(0, displayValue()) : 0;
+        int consume = isGenerator() ? 0 : lastUsage;
+        return new MachineReport(state, label, java.util.List.of(), 0, 0, energy.getEnergyStored(), energy.getMaxEnergyStored(), consume,
+                produce, magazine.loaded().copyWithCount(1), magazine.fill(), java.util.List.of(), 0);
+    }
+
     /** 装置のティア（触媒のティア制約に使う）。 */
     protected abstract int machineTier();
 
@@ -196,6 +232,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             return false;
         }
         double fill = energy.getMaxEnergyStored() <= 0 ? 0 : (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
+        if (io.github.genichimaruo.singulo.generated.ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() == 0) return true;
         if (standby ? fill < STANDBY_RESUME : fill >= STANDBY_FULL) {
             standby = !standby;
         }
@@ -278,19 +315,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     /** 発電機用: 隣のブロックへ電力を押し出す。 */
     protected void pushEnergy(Level level, int perTick) {
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                return;
-            }
-            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK,
-                    worldPosition.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), perTick), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, worldPosition, perTick);
     }
 
     /** ブロックが壊されたとき。予備の触媒・装填中の触媒・出口の失活触媒を落とす。 */
@@ -345,7 +370,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         tag.put("catalyst", slot.serializeNBT());
         tag.put("magazine", magazine.save());
         tag.put("spent", spent.serializeNBT());
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.putDouble("wear", wear);
         tag.putBoolean("enabled", enabled);
     }
@@ -356,7 +381,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         slot.deserializeNBT(tag.getCompound("catalyst"));
         magazine.load(tag.getCompound("magazine"));
         spent.deserializeNBT(tag.getCompound("spent"));
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         wear = tag.getDouble("wear");
         enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
     }

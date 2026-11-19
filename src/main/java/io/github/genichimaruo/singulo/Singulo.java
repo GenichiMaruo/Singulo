@@ -8,6 +8,7 @@ import io.github.genichimaruo.singulo.item.MetricDriveItem;
 import io.github.genichimaruo.singulo.machine.InertialStabilizerBlockEntity;
 import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
 import io.github.genichimaruo.singulo.machine.WorldlineAnchorBlockEntity;
+import io.github.genichimaruo.singulo.recipe.ModpackRecipePacks;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloCapabilities;
@@ -59,6 +60,9 @@ public final class Singulo {
         SinguloRecipes.SERIALIZERS.register(modBus);
         SinguloCreativeTab.REGISTER.register(modBus);
 
+        modBus.addListener(ModpackRecipePacks::register);
+        java.util.Objects.requireNonNull(io.github.genichimaruo.singulo.ruin.PrototypeMemories.RECEIVED);
+        io.github.genichimaruo.singulo.ruin.AncientRecords.REGISTER.register(modBus);
         modBus.addListener(SinguloEntities::registerAttributes);
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent e) -> e.enqueueWork(() -> {
             SinguloCapabilities.register(new io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent());
@@ -99,6 +103,7 @@ public final class Singulo {
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.pipe.FluidPipeNetwork::onLevelUnload);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
+        MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST, io.github.genichimaruo.singulo.ruin.BossScaling::onDamage);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);
         if (RuinSelfCheck.enabled()) {

@@ -37,6 +37,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "     ",
+    " DBD ",
+    " CAC ",
+    " D D ",
+    "     "
+  ],
   "result": {
     "id": "singulo:advanced_android_workbench",
     "count": 1

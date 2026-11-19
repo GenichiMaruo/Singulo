@@ -37,6 +37,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "  C  ",
+    " BCB ",
+    "CEAEC",
+    " BCB ",
+    "  C  "
+  ],
   "result": {
     "id": "singulo:muon_fusion_reactor",
     "count": 1

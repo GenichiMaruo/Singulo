@@ -9,7 +9,7 @@
       "ingredient": {
         "item": "mekanism:basic_chemical_tank"
       },
-      "count": 1
+      "count": 2
     },
     {
       "ingredient": {
@@ -29,6 +29,13 @@
       },
       "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    " ADA ",
+    " C C ",
+    "     "
   ],
   "result": {
     "id": "singulo:android_gas_tank_upgrade",

@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import net.minecraft.core.HolderLookup;
-
+import com.google.common.math.LongMath;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -43,7 +43,7 @@ public final class ItemCount {
         }
         for (ItemCount c : list) {
             if (c.alt == null && c.matches(stack)) {
-                c.count += count;
+                c.count = LongMath.saturatedAdd(c.count, count);
                 return;
             }
         }
@@ -58,7 +58,7 @@ public final class ItemCount {
         String key = key(alt);
         for (ItemCount c : list) {
             if (c.alt != null && key.equals(key(c.alt)) && ItemStack.isSameItemSameTags(c.item, stack)) {
-                c.count += count;
+                c.count = LongMath.saturatedAdd(c.count, count);
                 return;
             }
         }

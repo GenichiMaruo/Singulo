@@ -24,6 +24,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " A A ",
+    " CBC ",
+    "     ",
+    "     "
+  ],
   "result": {
     "id": "singulo:neutrino_scanner_module_2",
     "count": 1

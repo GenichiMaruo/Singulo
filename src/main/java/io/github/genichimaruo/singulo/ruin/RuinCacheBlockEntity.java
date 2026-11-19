@@ -155,7 +155,6 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
         if (first) {
             loot.addAll(roll(level, "ruins/" + ruin + "_first", worldPosition));
         }
-        double mult = ServerConfig.SPEC.isLoaded() ? ServerConfig.LOOT_COUNT_MULTIPLIER.get() : 1.0;
         List<Integer> free = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
             if (items.get(i).isEmpty()) {
@@ -165,7 +164,7 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
         java.util.Collections.shuffle(free, new java.util.Random(level.random.nextLong()));
         int next = 0;
         for (ItemStack stack : loot) {
-            int count = Math.max(1, (int) Math.round(stack.getCount() * mult));
+            int count = stack.getCount();
             while (count > 0 && next < free.size()) {
                 int n = Math.min(count, stack.getMaxStackSize());
                 items.set(free.get(next++), stack.copyWithCount(n));
@@ -186,7 +185,12 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(at))
                 .create(LootContextParamSets.CHEST);
-        return table.getRandomItems(params);
+        List<ItemStack> loot = table.getRandomItems(params);
+        double mult = ServerConfig.SPEC.isLoaded() ? ServerConfig.LOOT_COUNT_MULTIPLIER.get() : 1.0;
+        for (ItemStack stack : loot) {
+            stack.setCount(Math.max(1, (int) Math.round(stack.getCount() * mult)));
+        }
+        return loot;
     }
 
     @Override

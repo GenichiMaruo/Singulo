@@ -49,6 +49,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "  E  ",
+    " CFC ",
+    " BAB ",
+    " CDC ",
+    "     "
+  ],
   "result": {
     "id": "singulo:echo_resonator",
     "count": 1

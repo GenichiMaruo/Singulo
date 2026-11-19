@@ -1,0 +1,7 @@
+{
+  "singulo:patch": {
+    "time": 60,
+    "fluid_ingredients": { "0": { "amount": 125 } },
+    "result": { "count": 3 }
+  }
+}

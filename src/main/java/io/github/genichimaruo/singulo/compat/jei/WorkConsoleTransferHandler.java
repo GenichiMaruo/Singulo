@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.compat.jei;
 
 import io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleMenu;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,18 +60,29 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
         boolean crafting = recipe instanceof CraftingRecipe;
         if (!crafting) {
             List<ItemStack> inputs = new ArrayList<>(), outputs = new ArrayList<>();
-            for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.INPUT)) {
-                sample(view).ifPresent(inputs::add);
+            if (recipe instanceof MachineRecipe machine && machine.fitsAssemblyBoard()) {
+                for (int i = 0; i < machine.ingredients().size(); i++) {
+                    inputs.add(slots.findSlotByName(MachineRecipeCategory.ingredientName(i))
+                            .flatMap(WorkConsoleTransferHandler::sample).orElse(ItemStack.EMPTY));
+                }
+                if (machine.restore().isPresent()) inputs.add(slots.findSlotByName("restore")
+                        .flatMap(WorkConsoleTransferHandler::sample).orElse(ItemStack.EMPTY));
+            } else {
+                for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.INPUT)) {
+                    sample(view).ifPresent(inputs::add);
+                }
             }
             for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.OUTPUT)) {
                 sample(view).ifPresent(outputs::add);
             }
-            if (inputs.isEmpty() || outputs.isEmpty()) {
-                return helper.createInternalError();   // 物のないレシピ（液体だけなど）は扱えない: ボタンを出さない
+            var machineId = recipe instanceof MachineRecipe machine ? SinguloJeiPlugin.RECIPE_IDS.get(machine) : null;
+            if (outputs.isEmpty() || inputs.isEmpty() && machineId == null) {
+                return helper.createInternalError();
             }
             if (doTransfer) {
-                SinguloNetwork.sendToServer(new WorkConsoleActionPayload(menu.containerId,
-                        WorkConsoleActionPayload.process(inputs, outputs, player.level().registryAccess())));
+                var action = WorkConsoleActionPayload.process(inputs, outputs, player.level().registryAccess());
+                if (machineId != null) action.putString("machine_recipe", machineId.toString());
+                SinguloNetwork.sendToServer(new WorkConsoleActionPayload(menu.containerId, action));
                 if (Minecraft.getInstance().screen instanceof io.github.genichimaruo.singulo.client.WorkConsoleScreen screen) {
                     screen.showRecordTab();
                 }

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>精密組立台レシピエディター · Singulo</title>
+<style>
+:root{color-scheme:light;--ink:#182821;--muted:#54665e;--line:#cdd5ce;--green:#21513d;--paper:#f7f8f4;--mint:#daedcf}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 "Barlow","Yu Gothic UI",Meiryo,sans-serif}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid #308663;outline-offset:2px}
+header{display:flex;align-items:center;gap:20px;padding:14px clamp(16px,4vw,60px);background:#1c3229;color:white}
+header strong{font:700 23px/1.3 "Barlow",sans-serif;letter-spacing:-.04em}header span{border-left:1px solid #688074;padding-left:20px}
+.layout{display:grid;grid-template-columns:minmax(200px,260px) minmax(0,1fr);max-width:1120px;margin:0 auto;min-height:calc(100vh - 58px)}
+aside{padding:26px 16px 20px;border-right:1px solid var(--line);background:#eef1ea}
+.search{width:100%;border:1px solid #aebcb1;border-radius:6px;background:white;padding:9px 11px}
+#recipes{display:grid;align-content:start;gap:3px;margin-top:12px;max-height:calc(100vh - 160px);overflow:auto}
+.recipe,.part{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:6px;padding:7px 8px}
+.recipe:hover,.part:hover{background:#e5ebe3}.recipe[aria-current=true],.part[aria-pressed=true]{background:var(--mint);border-color:#79a481;color:#163c29}
+.pixel{image-rendering:pixelated;object-fit:contain}.recipe .pixel{width:24px;height:24px}
+.sprite{display:block;flex:none;background-image:url('/vanilla-icons.png');background-repeat:no-repeat}
+.material-id{display:block;overflow-wrap:anywhere;color:var(--muted);font-size:12px}
+main{padding:clamp(18px,2.5vw,32px);min-width:0}.heading{display:flex;gap:15px;align-items:center;margin-bottom:18px}
+.heading>img{width:52px;height:52px}.heading h1{font-size:clamp(19px,2.4vw,28px);margin:0;line-height:1.3}.meta,.hint{color:var(--muted);font-size:13px}.meta{margin-top:5px}
+.editor{display:grid;grid-template-columns:minmax(230px,1.05fr) minmax(200px,1fr);border:1px solid var(--line);border-radius:10px;background:white;overflow:hidden}
+.boardPane,.materials{padding:clamp(14px,2vw,26px)}.boardPane{background:#edf1ea;border-right:1px solid var(--line)}
+h2{font-size:15px;margin:0 0 12px}.board{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;max-width:280px;margin:12px auto}
+.cell{aspect-ratio:1;display:grid;place-items:center;border:1px solid #a5b4a8;border-radius:4px;background:#d8dfd7;padding:3px;min-width:0}
+.cell.center{border:2px solid #7c957e}.cell:hover{background:#c6d8bf;border-color:var(--green)}.cell .pixel{width:82%;height:82%;pointer-events:none}
+.mirror{display:flex;align-items:center;gap:6px}.mirror input{accent-color:var(--green);width:17px;height:17px}.hint{margin:9px 0 0}
+.part{background:#f6f7f4;margin-bottom:4px}.part .pixel{width:28px;height:28px}.part .count{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.action{background:white;border:1px solid #b6c2b8;border-radius:6px;padding:7px 12px}.action:hover:enabled{background:#ecf1ea}
+.primary{background:var(--green);color:white;border-color:var(--green);font-weight:600}.primary:hover:enabled{background:#193e2f}
+#add{margin-top:10px}#chooser{margin:8px 0}#candidates{max-height:170px;overflow:auto;margin-top:5px}
+.tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.footer{display:flex;gap:12px;align-items:center;justify-content:flex-end;margin-top:18px}
+#status{margin-right:auto;font-size:14px;white-space:pre-line}#status.error{color:#922e25}#eraser[aria-pressed=true]{background:var(--mint);border-color:#79a481}
+@media(max-width:760px){.layout{grid-template-columns:minmax(155px,27%) 1fr}.editor{grid-template-columns:1fr}.boardPane{border-right:0;border-bottom:1px solid var(--line)}main{padding:16px}}
+@media(max-width:520px){.layout{display:block}aside{padding:12px;border-right:0}#recipes{max-height:105px}.heading{margin:12px 0}.footer{flex-wrap:wrap}}
+</style>
+<header><strong>Singulo</strong><span>精密組立台レシピエディター</span></header>
+<div class="layout">
+  <aside><input class="search" id="search" type="search" placeholder="レシピ名・IDで検索" aria-label="レシピ検索"><div id="recipes" aria-label="レシピ一覧"></div></aside>
+  <main>
+    <div class="heading"><img class="pixel" id="product" alt=""><div><h1 id="name">読み込み中…</h1><div class="meta" id="meta"></div></div></div>
+    <div class="editor">
+      <section class="boardPane"><h2>組立盤</h2><div class="board" id="board" aria-label="組立盤"></div>
+        <label class="mirror"><input type="checkbox" id="mirror">左右を同時に配置</label>
+        <p class="hint">素材を選び、マスをクリックして配置。右クリックで取り除きます。</p>
+        <div class="tools"><button class="action" id="eraser">消しゴム</button><button class="action" id="undo">元に戻す</button></div>
+      </section>
+      <section class="materials"><h2>使用する素材</h2><div id="parts"></div>
+        <button class="action" id="add" aria-expanded="false">＋ 素材を追加</button>
+        <div id="chooser" hidden><input class="search" id="findPart" type="search" placeholder="日本語名・アイテムIDで検索" aria-label="追加する素材"><div id="candidates"></div></div>
+        <p class="hint" id="catalysts"></p>
+      </section>
+    </div>
+    <div class="footer"><span id="status" role="status" aria-live="polite"></span><button class="action" id="revert">変更を破棄</button><button class="action primary" id="save">保存</button></div>
+  </main>
+</div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+let catalog, current, board = [], parts = [], selected = '', history = [], saving = false;
+let vanillaIndex, materialLimit;
+const materialLabel = name => catalog.vanillaNames[name] || name;
+function icon(name) {
+  const index = vanillaIndex.get(catalog.materialIds[name]);
+  if (index !== undefined) {
+    const columns = 32, rows = Math.ceil(vanillaIndex.size / columns);
+    const sprite = document.createElement('span');
+    sprite.className = 'pixel sprite'; sprite.setAttribute('aria-hidden', 'true');
+    sprite.style.backgroundSize = (columns * 100) + '% ' + (rows * 100) + '%';
+    sprite.style.backgroundPosition = (index % columns * 100 / (columns-1)) + '% ' + (Math.floor(index/columns) * 100 / (rows-1)) + '%';
+    return sprite;
+  }
+  const img = document.createElement('img');
+  img.src = catalog.icons[name]; img.alt = ''; img.className = 'pixel'; return img;
+}
+function button(label, click, className) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = className; b.textContent = label; b.onclick = click; return b;
+}
+function dirty() { return current && board.some((m,i) => m !== current.board[i]); }
+function status(text, error=false) { $('status').textContent = text; $('status').classList.toggle('error', error); }
+function showRecipes() {
+  const query = $('search').value.trim().toLowerCase();
+  const matches = catalog.recipes.filter(r => (r.name + ' ' + r.id).toLowerCase().includes(query));
+  $('recipes').replaceChildren(...matches.map(r => {
+    const b = button(r.name, () => choose(r), 'recipe');
+    b.prepend(icon(r.name)); b.setAttribute('aria-current', String(r === current)); return b;
+  }));
+  if (!matches.length) $('recipes').textContent = '該当するレシピがありません。';
+}
+function choose(recipe) {
+  if (saving || (recipe === current) || (dirty() && !confirm('未保存の変更を破棄してレシピを切り替えますか？'))) return;
+  current = recipe; $('name').textContent = recipe.name; $('product').src = catalog.icons[recipe.name];
+  $('meta').textContent = '段階 ' + recipe.stage + '　·　' + recipe.time + ' 秒　·　' + recipe.energy + ' FE/t';
+  $('catalysts').textContent = recipe.catalysts.length ? '専用枠　' + recipe.catalysts.join('、') : '';
+  reset(); showRecipes();
+  const list = $('recipes'), active = list.querySelector('[aria-current=true]');
+  if (active) list.scrollTop += active.getBoundingClientRect().top - list.getBoundingClientRect().top - list.clientHeight / 2 + active.offsetHeight / 2;
+}
+function reset() {
+  board = [...current.board]; parts = [...current.parts]; selected = parts[0] || ''; history = [];
+  closeChooser(); draw(); status('');
+}
+function paint(index, material) {
+  const next = [...board], x = index % 5;
+  next[index] = material;
+  if ($('mirror').checked) next[index - x + 4 - x] = material;
+  if (next.every((m,i) => m === board[i])) return;
+  history.push(board); board = next; draw(); status(dirty() ? '未保存の変更' : '');
+}
+function undo() {
+  if (!history.length || saving) return;
+  board = history.pop(); draw(); status(dirty() ? '未保存の変更' : '');
+}
+function draw() {
+  const cells = board.map((m,i) => {
+    if ([0,4,20,24].includes(i)) return document.createElement('span');
+    const b = button('', () => { paint(i, selected); $('cell'+i).focus(); }, 'cell' + (i === 12 ? ' center' : ''));
+    b.id = 'cell'+i; b.title = (Math.floor(i/5)+1) + '行 ' + (i%5+1) + '列　' + (m ? materialLabel(m) + ' ' + catalog.materialIds[m] : '空き');
+    b.setAttribute('aria-label', b.title); if (m) b.append(icon(m));
+    b.oncontextmenu = e => { e.preventDefault(); paint(i, ''); };
+    b.onkeydown = e => { if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); paint(i, ''); $('cell'+i).focus(); } };
+    return b;
+  });
+  $('board').replaceChildren(...cells);
+  $('parts').replaceChildren(...parts.map(m => {
+    const b = button(materialLabel(m), () => { selected = m; draw(); }, 'part'); b.prepend(icon(m));
+    b.title = catalog.materialIds[m];
+    const count = document.createElement('span'); count.className = 'count'; count.textContent = '×' + board.filter(x => x === m).length;
+    b.append(count); b.setAttribute('aria-pressed', String(selected === m)); return b;
+  }));
+  $('eraser').setAttribute('aria-pressed', String(!selected)); $('undo').disabled = !history.length;
+  $('revert').disabled = !dirty(); $('save').disabled = !dirty() || saving;
+}
+function closeChooser() { $('chooser').hidden = true; $('add').setAttribute('aria-expanded','false'); }
+function listMaterials() {
+  const q = $('findPart').value.trim().normalize('NFKC').toLowerCase();
+  const matches = catalog.materials.filter(m => {
+    const id = catalog.materialIds[m];
+    const search = [m, id, catalog.vanillaNames[id] || ''].join(' ').normalize('NFKC').toLowerCase();
+    return !parts.includes(m) && search.includes(q) && (!catalog.optional[m] || catalog.optional[m] === current.mod);
+  });
+  $('candidates').replaceChildren(...matches.slice(0,materialLimit).map(m => {
+    const b = button('', () => { parts.push(m); selected = m; closeChooser(); draw(); }, 'part');
+    const label = document.createElement('span'); label.textContent = materialLabel(m);
+    const id = document.createElement('small'); id.className = 'material-id'; id.textContent = catalog.materialIds[m];
+    label.append(id); b.append(icon(m), label); return b;
+  }));
+  if (matches.length > materialLimit) {
+    $('candidates').append(button('さらに表示', () => { materialLimit += 60; listMaterials(); }, 'action'));
+  }
+  if (!matches.length) $('candidates').textContent = '該当する素材がありません。';
+}
+async function save() {
+  if (!dirty() || saving) return;
+  saving = true; document.querySelector('.layout').inert = true; status('保存中…');
+  try {
+    const res = await fetch('/save', {method:'POST', headers:{'Content-Type':'application/json','X-Editor-Token':'__SESSION_TOKEN__'},
+      body:JSON.stringify({id:current.id, revision:current.revision, board})});
+    const data = await res.json(); if (!res.ok) throw Error(data.error || '保存できませんでした。');
+    Object.assign(current, data); reset(); status('レシピと組立図を保存しました。');
+  } catch (e) { status(e.message, true); }
+  finally { saving = false; document.querySelector('.layout').inert = false; draw(); }
+}
+$('search').oninput = showRecipes; $('undo').onclick = undo; $('save').onclick = save;
+$('eraser').onclick = () => { selected = ''; draw(); };
+$('revert').onclick = () => { if (confirm('未保存の変更をすべて破棄しますか？')) reset(); };
+$('add').onclick = () => {
+  if (!$('chooser').hidden) return closeChooser();
+  $('chooser').hidden = false; $('add').setAttribute('aria-expanded','true'); $('findPart').value = ''; searchMaterials(); $('findPart').focus();
+};
+function searchMaterials() { materialLimit = 60; listMaterials(); $('candidates').scrollTop = 0; }
+$('findPart').oninput = searchMaterials;
+window.addEventListener('beforeunload', e => { if (dirty()) { e.preventDefault(); e.returnValue = ''; } });
+document.addEventListener('keydown', e => {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  if (e.key.toLowerCase() === 's') { e.preventDefault(); save(); }
+  if (e.key.toLowerCase() === 'z' && e.target.tagName !== 'INPUT') { e.preventDefault(); undo(); }
+});
+fetch('/catalog').then(r => r.json()).then(data => {
+  catalog = data;
+  vanillaIndex = new Map(Object.keys(data.vanillaNames).sort().map((id,i) => [id,i]));
+  choose(data.recipes.find(r => r.id === 'inertial_control_gauntlet') || data.recipes[0]);
+}).catch(e => status('レシピを読み込めませんでした。' + e.message, true));
+</script>
+</html>

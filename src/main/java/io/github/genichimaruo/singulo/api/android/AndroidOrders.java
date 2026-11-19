@@ -15,7 +15,8 @@ import net.minecraft.world.item.ItemStack;
  * port, NOT insertion into a caller's network. Cancellation may leave produced/delivered items;
  * carried materials follow normal Singulo recovery. Persist request IDs until terminal acknowledgement.
  * Never reuse an acknowledged ID or automatically resubmit UNKNOWN/UNAVAILABLE (a replaced console
- * loses its local receipts). Fresh item crafting only. Empty workers selects eligible workers.
+ * loses its local receipts). submit runs normal workshop recipes, including processing and procedure cards.
+ * For fluids and chemicals pass a sample and the requested amount in mB. Empty workers selects eligible workers.
  */
 public final class AndroidOrders {
     private AndroidOrders() { }
@@ -47,17 +48,40 @@ public final class AndroidOrders {
         public RecipeSnapshot { Objects.requireNonNull(state); recipes = List.copyOf(recipes); }
     }
     public static RecipeSnapshot recipes(ServerLevel level, BlockPos pos, UUID actor) {
+        return recipes(level, pos, actor, false);
+    }
+    /** Ordinary item-output crafting recipes using all eligible fluid-bucket substitutions.
+     * Quantities of substituted fluids are in mB. No virtual bucket or other byproduct is promised.
+     * Only the same first card per main product that the workshop planner can choose is considered.
+     * This is additive to {@link #recipes}; use the latter for the physical-bucket variants.
+     */
+    public static RecipeSnapshot fluidCraftingRecipes(ServerLevel level, BlockPos pos, UUID actor) {
+        return recipes(level, pos, actor, true);
+    }
+    private static RecipeSnapshot recipes(ServerLevel level, BlockPos pos, UUID actor, boolean fluidCrafting) {
         Objects.requireNonNull(actor);
         var c = console(level, pos);
         if (c == null) return new RecipeSnapshot(SnapshotState.UNAVAILABLE, List.of());
         if (!actor.equals(c.owner())) return new RecipeSnapshot(SnapshotState.REJECTED, List.of());
         var out = new java.util.ArrayList<AndroidRecipe>();
-        for (var entry : c.recipes()) {
+        var entries = c.recipes();
+        if (fluidCrafting) entries = io.github.genichimaruo.singulo.android.work.WorkPlanner.preferredMainRecipes(entries);
+        for (var entry : entries) {
             var recipe = entry.recipe();
-            var products = recipe.outputs().stream().map(s -> new AndroidRecipe.Product(
+            if (fluidCrafting) {
+                recipe = io.github.genichimaruo.singulo.android.work.BucketCrafting.fluidVariant(level, recipe);
+                if (recipe == null || recipe.inputs().stream().anyMatch(input ->
+                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item)
+                                || io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(input.item)
+                                || input.alt != null && java.util.Arrays.stream(input.alt.getItems()).anyMatch(item ->
+                                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(item)
+                                                || io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(item)))) continue;
+            }
+            var products = new java.util.ArrayList<AndroidRecipe.Product>();
+            for (var s : fluidCrafting ? List.of(recipe.output()) : recipe.outputs()) products.add(new AndroidRecipe.Product(
                     io.github.genichimaruo.singulo.android.work.FluidSamples.key(s),
                     io.github.genichimaruo.singulo.android.work.FluidSamples.amount(s),
-                    io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(s))).toList();
+                    io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(s), products.isEmpty() || recipe.guaranteedExtras()));
             var materials = new java.util.ArrayList<AndroidRecipe.Material>();
             for (var input : recipe.inputs()) {
                 materials.add(new AndroidRecipe.Material(input.item, input.count,
@@ -65,6 +89,12 @@ public final class AndroidOrders {
                         input.alt == null ? "" : io.github.genichimaruo.singulo.android.work.ItemCount.key(input.alt),
                         io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item), false,
                         io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(input.item)));
+            }
+            // A reusable tool is part of the recipe even while it stays installed in the machine.
+            for (var tool : recipe.tools()) {
+                var sample = recipe.grid().get(tool.slot());
+                materials.add(new AndroidRecipe.Material(sample, 1, List.of(sample), "",
+                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(sample), false, false, tool.uses(), tool.tier()));
             }
             if (!recipe.fuel().isEmpty()) {
                 var fuel = recipe.fuel();
@@ -81,9 +111,12 @@ public final class AndroidOrders {
     public static Receipt result(UUID id, State state, String reason) {
         return new Receipt(Objects.requireNonNull(id), state, -1, 0, 0, reason);
     }
-    @Nullable private static WorkConsoleBlockEntity console(ServerLevel level, BlockPos pos) {
+    static void requireServerThread(ServerLevel level) {
+        if (!level.getServer().isSameThread()) throw new IllegalStateException("Android workshop API requires the server thread");
+    }
+    @Nullable static WorkConsoleBlockEntity console(ServerLevel level, BlockPos pos) {
         Objects.requireNonNull(level); Objects.requireNonNull(pos);
-        if (!level.getServer().isSameThread()) throw new IllegalStateException("AndroidOrders requires the server thread");
+        requireServerThread(level);
         return level.isLoaded(pos) && level.getBlockEntity(pos) instanceof WorkConsoleBlockEntity c && !c.isRemoved() ? c : null;
     }
     public static Receipt submit(ServerLevel level, BlockPos pos, UUID actor, UUID requestId,

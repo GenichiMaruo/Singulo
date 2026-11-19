@@ -30,6 +30,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    " C C ",
+    " BAB ",
+    " CDC ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_reinforced_backpack_upgrade",
     "count": 1

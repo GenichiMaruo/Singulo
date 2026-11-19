@@ -16,12 +16,25 @@ public record AndroidRecipe(String mode, BlockPos location, List<Product> output
         Objects.requireNonNull(mode); location = location.immutable();
         outputs = List.copyOf(outputs); materials = List.copyOf(materials);
     }
-    public record Product(ItemStack sample, long count, boolean liquid) {
+    /** Build a chemical target for AndroidOrders.submit, or decode its ID from a recipe sample. */
+    public static ItemStack chemicalSample(String id, long amount) {
+        return io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(id, amount);
+    }
+    public static String chemicalId(ItemStack sample) {
+        return io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample);
+    }
+    public record Product(ItemStack sample, long count, boolean liquid, boolean guaranteed) {
+        public Product(ItemStack sample, long count, boolean liquid) { this(sample, count, liquid, true); }
         public Product { sample = sample.copyWithCount(1); }
         @Override public ItemStack sample() { return sample.copy(); }
     }
     public record Material(ItemStack sample, long count, List<ItemStack> alternatives,
-                           String ingredientJson, boolean catalyst, boolean fuel, boolean liquid) {
+                           String ingredientJson, boolean catalyst, boolean fuel, boolean liquid,
+                           int toolUsesPerCraft, int minimumCatalystTier) {
+        public Material(ItemStack sample, long count, List<ItemStack> alternatives, String ingredientJson,
+                        boolean catalyst, boolean fuel, boolean liquid) {
+            this(sample, count, alternatives, ingredientJson, catalyst, fuel, liquid, 0, 0);
+        }
         public Material {
             sample = sample.copyWithCount(1);
             alternatives = alternatives.stream().map(ItemStack::copy).toList();

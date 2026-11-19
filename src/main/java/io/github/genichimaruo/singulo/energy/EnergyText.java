@@ -10,7 +10,7 @@ import java.util.function.BooleanSupplier;
 public final class EnergyText {
     /** 正確な値を出すか。クライアントの起動時に「Shift を押しているか」を入れる。サーバーでは常に縮める。 */
     public static BooleanSupplier detail = () -> false;
-    private static final String[] UNITS = {"K", "M", "G", "T", "P"};
+    private static final String[] UNITS = {"K", "M", "G", "T", "P", "E"};
 
     private EnergyText() {}
 
@@ -22,7 +22,9 @@ public final class EnergyText {
         if (!detail.getAsBoolean()) {
             return shortForm(fe);
         }
-        return fe == Math.rint(fe) ? String.format(Locale.ROOT, "%,d", (long) fe) : String.format(Locale.ROOT, "%,.1f", fe);
+        if (!Double.isFinite(fe) || Math.abs(fe) >= 1e21) return shortForm(fe);
+        if (fe == Math.rint(fe)) return String.format(Locale.ROOT, "%,.0f", fe);
+        return java.math.BigDecimal.valueOf(fe).stripTrailingZeros().toPlainString();
     }
 
     /** ツールチップに添える「Shift: 正確な値」（暗い文字）。 */
@@ -38,6 +40,8 @@ public final class EnergyText {
     /** 3桁に縮める（999 → 999、12345 → 12.3K、4500000 → 4.5M）。 */
     public static String shortForm(double fe) {
         double a = Math.abs(fe);
+        if (!Double.isFinite(fe)) return "—";
+        if (a >= 999.5e18 || a > 0 && a < 0.05) return String.format(Locale.ROOT, "%.2e", fe);
         if (a < 1000) {
             return fe == Math.rint(fe) ? String.valueOf((long) fe) : String.format(Locale.ROOT, "%.1f", fe);
         }

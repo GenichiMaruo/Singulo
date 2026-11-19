@@ -1,7 +1,7 @@
 package io.github.genichimaruo.singulo.api.android;
 
 /**
- * Optional marker for an addon {@code IItemHandler} that exposes a storage shared by several blocks (for example
+ * Optional marker for an addon item, fluid or chemical handler that exposes a storage shared by several blocks (for example
  * a whole AE2 ME network seen through any of its interfaces), 0.19.0.
  *
  * <p>When Supply Ports and Work Consoles collect neighbouring storages, handlers with the same

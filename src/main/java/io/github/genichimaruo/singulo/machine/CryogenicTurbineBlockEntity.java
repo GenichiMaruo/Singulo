@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.machine;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.data.ThermalData;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
@@ -7,7 +10,6 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,8 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import io.github.genichimaruo.singulo.compat.Capabilities;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +47,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     static final int TANK = 32_000;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(200_000, 0, PUSH_PER_TICK, this::setChanged);
-    private final FluidTank tank = new FluidTank(TANK, f -> f.getFluid().isSame(SinguloFluids.get("liquid_nitrogen"))) {
+    private final FluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(TANK), f -> f.getFluid().isSame(SinguloFluids.get("liquid_nitrogen"))) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -98,7 +98,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         }
     };
     private int hot;
-    private double rate;
+    private double rate, coolantCredit;
     private boolean standby;
     /** 0.10.0 より前（発電機だったころ）に置かれたタービン。最初に画面を開いた人に、蓄電装置に変わったことを一度だけ知らせる。 */
     private boolean legacyNotice;
@@ -148,7 +148,9 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         if (level.getGameTime() % 10 == 0) {
             hot = 0;
             for (Direction dir : Direction.values()) {
-                ThermalData.Hot h = ThermalData.INSTANCE.hot(level.getBlockState(pos.relative(dir)));
+                BlockPos neighbor = pos.relative(dir);
+                if (!level.isLoaded(neighbor)) continue;
+                ThermalData.Hot h = ThermalData.INSTANCE.hot(level.getBlockState(neighbor));
                 if (h != null) {
                     hot = Math.max(hot, h.temperature());
                 }
@@ -163,31 +165,26 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
             items.insertItem(1, new ItemStack(CoolantCartridges.empty()), false);
         }
         rate = 0;
+        double output = energy.prepareGeneration(ServerConfig.CRYO_TURBINE_OUTPUT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get());
         // 蓄電がいっぱいなら待機（窒素を捨てない）。75%を割ったら再開する
         double fill = (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
         if (standby ? fill < 0.75 : fill >= 0.98) {
             standby = !standby;
         }
         double perMb = fePerMb();
-        if (!standby && perMb > 0 && tank.getFluidAmount() > 0) {
+        if (output > 0 && !standby && perMb > 0 && (tank.getFluidAmount() > 0 || coolantCredit > 0)) {
             // 出力の上限まで、液体窒素を使う（1 mB 単位）
-            int use = (int) Math.min(tank.getFluidAmount(), Math.max(1, Math.floor(ServerConfig.CRYO_TURBINE_OUTPUT.get() / perMb)));
-            tank.drain(use, IFluidHandler.FluidAction.EXECUTE);
-            rate = use * perMb;
-            energy.generate((int) rate);
-        }
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                break;
+            double target = Math.min(output, energy.getMaxEnergyStored() - energy.getEnergyStored());
+            double needed = target - coolantCredit;
+            if (needed > 0) {
+                int use = (int) Math.min(tank.getFluidAmount(), Math.max(1, Math.floor(needed / perMb)));
+                coolantCredit += tank.drain(use, IFluidHandler.FluidAction.EXECUTE).getAmount() * perMb;
             }
-            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
+            rate = Math.min(target, coolantCredit);
+            coolantCredit -= rate;
+            energy.generateRate(rate);
         }
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         boolean active = rate > 0;
         if (state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
@@ -198,7 +195,9 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     public SyncedInts slotsData() {
         return SyncedInts.server(GeneratorSlotsMenu.COUNT, i -> switch (i) {
             case GeneratorSlotsMenu.D_HOT -> hot;
-            case GeneratorSlotsMenu.D_RATE_X100 -> (int) Math.round(rate * 100);
+            case GeneratorSlotsMenu.D_RATE_X100 -> io.github.genichimaruo.singulo.compat.Legacy.clamp(Math.round(rate * 100), 0, Integer.MAX_VALUE);
+            case GeneratorSlotsMenu.D_RATE_WHOLE -> (int) rate;
+            case GeneratorSlotsMenu.D_RATE, GeneratorSlotsMenu.D_RATE + 1 -> SyncedInts.doubleWord(rate, i - GeneratorSlotsMenu.D_RATE);
             case GeneratorSlotsMenu.D_ENERGY -> energy.getEnergyStored();
             case GeneratorSlotsMenu.D_CAPACITY -> energy.getMaxEnergyStored();
             case GeneratorSlotsMenu.D_FLUID -> tank.getFluidAmount();
@@ -248,7 +247,8 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
+        tag.putDouble("coolant_credit", coolantCredit);
         tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.put("items", items.serializeNBT());
         if (legacyNotice) {
@@ -264,7 +264,8 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
+        coolantCredit = Math.max(0, tag.getDouble("coolant_credit"));
         tank.readFromNBT(tag.getCompound("tank"));
         if (tag.contains("items")) {
             items.deserializeNBT(tag.getCompound("items"));

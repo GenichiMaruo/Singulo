@@ -31,11 +31,30 @@
     },
     {
       "ingredient": {
+        "item": "singulo:topological_wire"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_compactor_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
         "item": "singulo:bose_condensate_catalyst"
       },
       "tier": 3,
       "uses": 36000
     }
+  ],
+  "shape": [
+    "     ",
+    " CBC ",
+    " DAD ",
+    " CEC ",
+    "  F  "
   ],
   "result": {
     "id": "singulo:degenerate_compactor_controller",

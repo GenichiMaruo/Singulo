@@ -23,7 +23,20 @@
       },
       "tier": 4,
       "uses": 1125
+    },
+    {
+      "ingredient": {
+        "item": "singulo:nihonium_frame"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " AAA ",
+    " BDB ",
+    "     ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_plinth",

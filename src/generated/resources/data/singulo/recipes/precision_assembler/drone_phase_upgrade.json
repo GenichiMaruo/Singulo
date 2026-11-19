@@ -30,6 +30,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " DBD ",
+    " A A ",
+    "     "
+  ],
   "result": {
     "id": "singulo:drone_phase_upgrade",
     "count": 1

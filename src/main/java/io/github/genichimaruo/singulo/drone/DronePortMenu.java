@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.drone;
 
 import io.github.genichimaruo.singulo.machine.GuiFrame;
+import io.github.genichimaruo.singulo.machine.NotifyingItemSlot;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import java.util.ArrayList;
@@ -212,7 +213,7 @@ public class DronePortMenu extends AbstractContainerMenu {
     }
 
     /** ポートのスロット（荷物のページでだけ出す。着荷箱と受け取りへは入れられない）。 */
-    private final class PageSlot extends SlotItemHandler {
+    private final class PageSlot extends NotifyingItemSlot {
         private final boolean input;
 
         PageSlot(IItemHandler items, int index, int x, int y, boolean input) {

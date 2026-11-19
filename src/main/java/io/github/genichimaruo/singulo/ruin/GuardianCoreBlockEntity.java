@@ -269,7 +269,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     /** 番人を起こす（保管庫が封鎖されていて、まだ起きていないときだけ）。起こしたらそれを返す。 */
     @Nullable
     public RuinBoss awaken(ServerLevel level) {
-        if (activeBoss(level) != null) {
+        if (!RuinGuards.canSummon(level, null) || activeBoss(level) != null) {
             return null;
         }
         RuinCacheBlockEntity vault = vault(level);
@@ -293,6 +293,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
      */
     @Nullable
     public RuinBoss awakenAwakened(ServerLevel level, @Nullable ServerPlayer player, net.minecraft.world.item.ItemStack core) {
+        if (!RuinGuards.canSummon(level, player)) return null;
         if (activeBoss(level) != null) {
             tell(player, "gui.singulo.guardian.active");
             return null;
@@ -341,7 +342,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
             f.setConveyors(conveyorPos);
         }
         b.startEmerging();
-        level.addFreshEntity(b);
+        if (!level.addFreshEntity(b)) return null;
         boss = b.getUUID();
         setChanged();
         level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("guardian_core.awaken"), SoundSource.HOSTILE, 2.0F,

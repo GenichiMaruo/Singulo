@@ -22,7 +22,20 @@
         "item": "singulo:entangled_element"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:hopper"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  D  ",
+    " BAB ",
+    "  C  ",
+    "     "
   ],
   "result": {
     "id": "singulo:reactor_extraction_port",

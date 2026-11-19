@@ -12,6 +12,7 @@ public final class MachineLayout {
     public static final int TOP = 22;
     public static final int BAR_HEIGHT = 60;
     public static final int ENERGY_X = 8;
+    public static final int ASSEMBLY_X = 24, ASSEMBLY_Y = 23;
     public static final int TANK_WIDTH = 12;
     public static final int TANK_STEP = 16;
     public static final int ARROW_WIDTH = 22;
@@ -19,7 +20,7 @@ public final class MachineLayout {
     private static final int ROW_Y = 44;
     private static final int TWO_ROWS_Y = 35;
 
-    public final int width;
+    public final int width, height, energyY;
     /** プレイヤーのインベントリの左端。 */
     public final int inventoryX;
     public final int[] fluidInX;
@@ -41,6 +42,7 @@ public final class MachineLayout {
     /** 触媒スロット（触媒を使う装置だけ）。進捗矢印の下。 */
     public final int catalystX;
     public final int catalystY;
+    public final int spentX, spentY;
     /** 単極子アップグレードのスロット（右レールの強化の段）。 */
     public final int upgradeX;
     public final int upgradeY;
@@ -48,6 +50,7 @@ public final class MachineLayout {
     public final int capacityY;
 
     public MachineLayout(MachineType type) {
+        boolean assembly = type == MachineType.PRECISION_ASSEMBLER;
         int n = type.inputSlots();
         int cols = n <= 2 ? n : n <= 4 ? 2 : 3;
         int outs = type.outputSlots();
@@ -80,7 +83,8 @@ public final class MachineLayout {
             x += TANK_STEP;
         }
 
-        width = GuiFrame.width(x + 4);
+        width = assembly ? 176 : GuiFrame.width(x + 4);
+        height = assembly ? 212 : HEIGHT;
         // タンクも含めた中身の左端と右端を、電力バーの右端から枠の右の余白までの真ん中に置く
         int left = fluidIn.length > 0 ? fluidIn[0] : n > 0 ? slotsStart : arrow;
         int right = fluidOut.length > 0 ? fluidOut[fluidOut.length - 1] + TANK_WIDTH
@@ -90,8 +94,10 @@ public final class MachineLayout {
         fluidOutX = shifted(fluidOut, shift);
         inputX = shifted(inX, shift);
         inputY = inY;
-        arrowX = arrow + shift;
-        outputX = output + shift;
+        if (assembly) rowY = ASSEMBLY_Y + 2 * 18;
+        energyY = assembly ? rowY + 8 - BAR_HEIGHT / 2 : TOP;
+        arrowX = assembly ? 118 : arrow + shift;
+        outputX = assembly ? 152 : output + shift;
         outputY = new int[outs];
         for (int i = 0; i < outs; i++) {
             outputY[i] = outs == 1 ? rowY : TWO_ROWS_Y + 18 * i;
@@ -102,15 +108,25 @@ public final class MachineLayout {
         // 質量のバーはモードのボタンの右から出力スロットの右端まで（右の出力タンクにかからない）
         massBarX = modeX + 20;
         massBarWidth = Math.max(8, outputX + 16 - massBarX);
-        selectX = select + shift;
-        selectY = rowY;
+        selectX = assembly ? outputX : select + shift;
+        selectY = assembly ? ASSEMBLY_Y : rowY;
         catalystX = arrowX + 3;
-        catalystY = arrowY + 22;
+        catalystY = assembly ? rowY + 30 : arrowY + 22;
+        spentX = assembly ? outputX : -1;
+        spentY = assembly ? catalystY : -1;
         inventoryX = GuiFrame.inventoryX(width);
         upgradeX = GuiFrame.railSlotX(width);
         upgradeY = GuiFrame.railSlotY(GuiFrame.RAIL_UPGRADE);
         capacityX = GuiFrame.railSlotX(width);
         capacityY = GuiFrame.railSlotY(GuiFrame.RAIL_AUTOMATION);
+    }
+
+    public static int assemblyX(int cell) {
+        return ASSEMBLY_X + io.github.genichimaruo.singulo.recipe.MachineRecipe.assemblySquare(cell) % 5 * 18;
+    }
+
+    public static int assemblyY(int cell) {
+        return ASSEMBLY_Y + io.github.genichimaruo.singulo.recipe.MachineRecipe.assemblySquare(cell) / 5 * 18;
     }
 
     private static int[] shifted(int[] xs, int shift) {

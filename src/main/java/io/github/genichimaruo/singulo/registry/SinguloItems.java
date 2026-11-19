@@ -100,6 +100,12 @@ public final class SinguloItems {
     /** アンドロイド用の無線充電器。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+    /** 携帯型アンドロイド印刷機（0.21.0。外出先でアンドロイドを1体ずつ印刷する、カバン型の印刷機）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem> PORTABLE_ANDROID_PRINTER = ITEMS.register(
+            "portable_android_printer", () -> new io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem(new Item.Properties(), 1));
+    /** 携帯型アンドロイド印刷機（Mk2）: 3組（型の違う3体）を積み、印刷するたびに次の組で1体ずつ印刷する。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem> PORTABLE_ANDROID_PRINTER_2 = ITEMS.register(
+            "portable_android_printer_2", () -> new io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem(new Item.Properties(), 3));
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
             "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
@@ -329,7 +335,10 @@ public final class SinguloItems {
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<RegistryObject<? extends Item>> TAB_ORDER = new ArrayList<>();
-    /** クリエイティブタブにも JEI にも出さない: 射撃型の開発用アイテム、隠しボスの報酬、ボスのスポーンエッグ（コマンドでだけ渡す）。 */
+    /** 射撃型とボスのスポーンエッグ、隠し報酬の射撃型メモリと残光の翼は、クリエイティブタブと JEI の一覧から隠す。 */
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
+            "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg", "ergosphere_leviathan_spawn_egg",
+            "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");
     /** 段階に関係なく、名前を紫（エピック）にするアイテム（とても珍しい物）。 */
 
     static {
@@ -363,6 +372,7 @@ public final class SinguloItems {
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
         block(SinguloBlocks.FLUID_PIPE, 1);
+        block(SinguloBlocks.FLUID_PUMP, 1);
         TAB_ORDER.add(COVER_FRAME);
         block(SinguloBlocks.MULTIBLOCK_PORT, 2);
         block(SinguloBlocks.COOLING_TOWER_BASE, 2);
@@ -437,6 +447,8 @@ public final class SinguloItems {
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
         block(SinguloBlocks.QUANTUM_ANDROID_WORKBENCH, 4);
         TAB_ORDER.add(ANDROID_CHARGER);
+        TAB_ORDER.add(PORTABLE_ANDROID_PRINTER);
+        TAB_ORDER.add(PORTABLE_ANDROID_PRINTER_2);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
@@ -589,6 +601,8 @@ public final class SinguloItems {
         TAB_ORDER.add(SEALED_RECORD);
         // クリエイティブ専用（並びの最後）
         block(SinguloBlocks.CREATIVE_ENERGY_SOURCE, 6);
+        TAB_ORDER.add(ITEMS.register("creative_fluid_trash", () -> new io.github.genichimaruo.singulo.item.CreativeFluidTrashItem(
+                SinguloBlocks.CREATIVE_FLUID_TRASH.get(), new Item.Properties().rarity(Rarity.EPIC))));
         TAB_ORDER.add(CREATIVE_CATALYST);
         TAB_ORDER.add(BUILDER_WAND);
         // ボスのスポーンエッグはタブにも JEI にも出さない（/give でだけ渡す。HIDDEN を参照）

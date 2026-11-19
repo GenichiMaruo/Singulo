@@ -9,11 +9,17 @@
       "ingredient": {
         "tag": "forge:glass/colorless"
       },
-      "count": 2
+      "count": 3
     },
     {
       "ingredient": {
         "tag": "forge:plates/steel"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:wormhole_generator_shell"
       },
       "count": 1
     },
@@ -24,6 +30,13 @@
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    "  A  ",
+    " ACA ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:wormhole_generator_window",

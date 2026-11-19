@@ -2,9 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "W",
-    "P",
-    "W"
+    "WFW",
+    " P "
   ],
   "key": {
     "W": {
@@ -12,6 +11,9 @@
     },
     "P": {
       "tag": "forge:plates/steel"
+    },
+    "F": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

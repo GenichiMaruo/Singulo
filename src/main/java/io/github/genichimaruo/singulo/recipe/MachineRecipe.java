@@ -2,12 +2,15 @@ package io.github.genichimaruo.singulo.recipe;
 
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
+import io.github.genichimaruo.singulo.registry.SinguloComponents;
+import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
@@ -34,8 +37,23 @@ import net.minecraftforge.fluids.FluidStack;
  */
 public record MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
                             List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
-                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
+                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct,
+                            List<String> shape)
         implements Recipe<MachineRecipe.Input> {
+
+    public static final int ASSEMBLY_CELLS = 21;
+    public static final int BOARD_EMPTY = -1, BOARD_RESTORE = -2;
+
+    public MachineRecipe {
+        shape = List.copyOf(shape);
+    }
+
+    public MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
+                         List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
+                         ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct) {
+        this(station, stage, time, energy, ingredients, fluidIngredients, mass, restore, result, fluidResults,
+                minSize, priority, byproduct, List.of());
+    }
 
     /**
      * アイテム材料。tier &gt; 0 は触媒の寿命で払う材料で、ingredient（そのティアの触媒）のほか、上位の触媒でも払える。
@@ -96,19 +114,31 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
     public Plan plan(List<ItemStack> slots) {
+        return plan(slots, false);
+    }
+
+    /** Each occupied material cell supplies one part per craft, even when it holds a stack. */
+    @Nullable
+    public Plan unorderedAssemblyPlan(List<ItemStack> slots) {
+        return plan(slots, true);
+    }
+
+    @Nullable
+    private Plan plan(List<ItemStack> slots, boolean assemblyBoard) {
         int n = slots.size();
         int[] left = new int[n];
         int[] consume = new int[n];
         int[] uses = new int[n];
         boolean[] claimed = new boolean[n];
         for (int i = 0; i < n; i++) {
-            left[i] = slots.get(i).getCount();
+            int count = slots.get(i).getCount();
+            left[i] = assemblyBoard && i < ASSEMBLY_CELLS ? Math.min(1, count) : count;
         }
         int restoreSlot = -1;
         if (restore.isPresent()) {
             for (int i = 0; i < n; i++) {
                 ItemStack s = slots.get(i);
-                if (!claimed[i] && restore.get().test(s) && UsesHelper.canRestore(s)) {
+                if (!claimed[i] && canRestoreFrom(s)) {
                     restoreSlot = i;
                     claimed[i] = true;
                     consume[i] = 1;
@@ -176,7 +206,22 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     @Override
     public ItemStack assemble(Input input, net.minecraft.core.RegistryAccess registries) {
-        return result.copy();
+        return assemble(input.items(), plan(input.items()));
+    }
+
+    public ItemStack assemble(List<ItemStack> inputs, @Nullable Plan plan) {
+        ItemStack out = result.copy();
+        if (plan != null && out.is(SinguloItems.PORTABLE_ANDROID_PRINTER_2.get()) && out.getCount() == 1) {
+            for (int i = 0; i < inputs.size(); i++) {
+                ItemStack input = inputs.get(i);
+                if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
+                    // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
+                    out.copyFrom(input, DataComponents.CONTAINER, SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME);
+                    break;
+                }
+            }
+        }
+        return out;
     }
 
     @Override

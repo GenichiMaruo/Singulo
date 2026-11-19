@@ -2,6 +2,7 @@
 
 レシピの種類ごとに、ゲームの画面に近い形で描く:
 - 作業台: 3×3 の枠（形のあるレシピはその並び、不定形は左上から詰める）→ 完成品
+- 精密組立台: レシピJSONの21マスの配置 → 完成品。触媒は専用枠に表示する
 - 装置: 材料（アイテムと液体のタンク）→ 装置の正面の絵・時間・電力 → 完成品
 - かまど・溶鉱炉: 材料 → 炉 → 完成品
 - マルチブロック組み立て: 部品と個数の表 → 形の名前
@@ -9,13 +10,16 @@
 """
 import io
 import os
+import json
 import zipfile
 from fractions import Fraction as F
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
+from functools import cache
+import vanilla_catalog
 
-from ids import MOD, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG
+from ids import MOD, ALIAS_RECIPE_IDS, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'src' / 'generated' / 'resources' / 'assets' / 'singulo'
@@ -120,12 +124,21 @@ def placeholder(label):
     return im
 
 
+@cache
+def vanilla_sheet():
+    with Image.open(vanilla_catalog.DIRECTORY / 'icons.png') as sheet:
+        return sheet.convert('RGBA')
+
+
 def icon(name):
     """材料・成果物の名前 → 16×16 の絵。"""
     if name in _cache:
         return _cache[name]
     im = None
-    if name in VANILLA_FLUIDS or (name in MOD and MOD[name][2] == 'fluid'):
+    if name in vanilla_catalog.ICON_INDEX:
+        row, col = divmod(vanilla_catalog.ICON_INDEX[name], 32)
+        im = vanilla_sheet().crop((col * 16, row * 16, col * 16 + 16, row * 16 + 16))
+    elif name in VANILLA_FLUIDS or (name in MOD and MOD[name][2] == 'fluid'):
         key = VANILLA_FLUIDS.get(name) or MOD[name][0]
         im = fluid_icon(FLUID_COLORS.get(key, 0x88AACC))
     elif name in MASS_INPUTS:
@@ -136,7 +149,9 @@ def icon(name):
         im = id_icon(OUTPUT_ALIASES[name])
     elif name in VANILLA:
         v = VANILLA[name]
-        if v.startswith('#'):
+        if v == '#c:chests/wooden':
+            im = icon('minecraft:chest')
+        elif v.startswith('#'):
             path = TAG_ICONS.get(v[1:])
             im = vanilla_texture(path) if path else None
         else:
@@ -279,10 +294,66 @@ def output_cell(img, x, y, name, r):
         slot(img, x, y, name, r['out'])
 
 
+def render_assembly(name, r, sub, recipe=None):
+    # Read the same five rows and ingredient indices that the server and JEI use.
+    rid = ALIAS_RECIPE_IDS[name] if name in ALIAS_RECIPE_IDS else MOD[name][0]
+    path = ROOT / 'src/generated/resources/data/singulo/recipes/precision_assembler' / f'{rid}.json'
+    if recipe is None:
+        recipe = json.loads(path.read_text(encoding='utf-8'))
+    names = [(n, q) for n, q in r['inputs'].items() if not is_fluid(n) and n not in MASS_INPUTS]
+    materials = {}
+    catalyst = None
+    for i, ((material, count), ingredient) in enumerate(zip(names, recipe['ingredients'], strict=True)):
+        if ingredient.get('uses'):
+            catalyst = (material, count)
+        else:
+            label = vanilla_catalog.ITEM_NAMES.get(material, material)
+            materials[chr(ord('A') + i)] = (material, f'{label} ×{count}')
+
+    right = PAD * 3 + SLOT * 5
+    legend_y = TOP + SLOT + PAD * 2
+    label_x = right + 50
+    text_right = label_x + max((F_TEXT.getlength(label) for _, label in materials.values()), default=0)
+    if catalyst:
+        text_right = max(text_right, right + SLOT + 10 + F_TEXT.getlength(catalyst[0]))
+    catalyst_y = legend_y + 26 * len(materials) + 6
+    height = max(TOP + SLOT * 5, catalyst_y + SLOT if catalyst else catalyst_y)
+    img = panel(int(max(right + 278, text_right) + PAD), height + PAD)
+    header(img, name, sub + ' · 手動組立')
+    d = ImageDraw.Draw(img)
+    for row, cells in enumerate(recipe['shape']):
+        for col, symbol in enumerate(cells):
+            if row in (0, 4) and col in (0, 4):
+                continue
+            x, y = PAD + SLOT * col, TOP + SLOT * row
+            slot(img, x, y, materials[symbol][0] if symbol != ' ' else None)
+            if symbol != ' ':
+                d.text((x + 4, y + 3), symbol, font=F_SMALL, anchor='lt', fill='white', stroke_width=1, stroke_fill=TEXT)
+    arrow(img, right, TOP, 48)
+    output_cell(img, right + 62, TOP, name, r)
+    d.text((right + 134, TOP + SLOT // 2), f'{r["t"]}秒 · {r["fe"]:,} FE/t', font=F_SMALL, fill=TEXT, anchor='lm')
+
+    for i, (symbol, (material, label)) in enumerate(materials.items()):
+        y = legend_y + i * 26
+        d.text((right, y + 12), symbol, font=F_TEXT, fill=TEXT, anchor='lm')
+        img.alpha_composite(icon(material).resize((24, 24), Image.NEAREST), (right + 19, y))
+        d.text((label_x, y + 12), label, font=F_TEXT, fill=TEXT, anchor='lm')
+    if catalyst:
+        material, count = catalyst
+        slot(img, right, catalyst_y, material)
+        x = right + SLOT + 10
+        d.text((x, catalyst_y + 2), '触媒枠', font=F_SMALL, fill=TEXT)
+        d.text((x, catalyst_y + 20), material, font=F_TEXT, fill=TEXT)
+        d.text((x, catalyst_y + 42), f'寿命 {count_label(count)}個分', font=F_SMALL, fill=TEXT)
+    return img
+
+
 def render(name, r):
     station = r['station']
     sub = f'段階{r["stage"]} · {station}'
     inputs = list(r['inputs'].items())
+    if station == '精密組立台':
+        return render_assembly(name, r, sub)
     if station == '作業台':
         w = PAD * 2 + SLOT * 3 + 90 + SLOT
         img = panel(max(w, 420), TOP + SLOT * 3 + PAD + 24)

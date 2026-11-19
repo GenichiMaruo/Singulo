@@ -1,6 +1,9 @@
 package io.github.genichimaruo.singulo.pipe;
 
+import io.github.genichimaruo.singulo.data.ConfigMigration;
+
 import io.github.genichimaruo.singulo.android.work.SurveyGlassesItem;
+import io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,26 +19,25 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BucketPickup;
-import net.minecraft.world.level.block.state.BlockState;
+import io.github.genichimaruo.singulo.multiblock.PortBlockEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import io.github.genichimaruo.singulo.compat.Capabilities;
 import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 /**
- * つながった液体パイプのひとまとまり。液体は溜めず、周期ごとに口どうしで直接受け渡す。パイプ自体は tick しない。
+ * つながった液体パイプのひとまとまり。液体は溜めず、搬入時に受け手へ直接届ける。パイプ自体は tick しない。
  * <p>
  * 電線（{@code EnergyNetwork}）と同じく、分かれ目のないパイプの並び（区間）は1つの制約にまとめる。毎周期の仕事は口と分かれ目の数で
  * 決まり、パイプの長さには効かない（つなぎ直したときに1回たどるだけ）。口から口への経路（分かれ目の数で最短）は初めて使うときに
  * 求めて覚え、運べる量は経路のいちばん細い区間・分かれ目の残りで決まる。同じ区間を通る受け渡しはその容量を分け合う。
  * <p>
- * 液体ごとに、出すだけの口 → 受けるだけの口 → 出し入れできる口（タンク）の順に配る。タンクからは受けるだけの口へしか
- * 出さないので、タンクどうしで行き来し続けない。どの面が出し入れできるかは装置の capability（面の設定）が決める。
+ * 各機械が押し込んだ液体だけを、受け入れ可能な面へ届ける。
  * <p>
  * 流れの見た目（パイプの中の液体と向き）は {@link #DISPLAY} tick ごとに、実際に流れた経路だけを広げて決め、変わったパイプにだけ送る。
  */
@@ -44,9 +46,6 @@ public final class FluidPipeNetwork {
     static final int INTERVAL = 5;
     /** 見た目をまとめて送る間隔（tick。INTERVAL の倍数）。 */
     static final int DISPLAY = 10;
-    /** 見積もりに使う量（mB）。 */
-    private static final int PROBE = FluidType.BUCKET_VOLUME;
-
     private static final Set<FluidPipeNetwork> ACTIVE = Collections.newSetFromMap(new IdentityHashMap<>());
     /** まだネットワークに入っていないパイプ。読み込みやつなぎ替えのたびに作り直さず、次の tick にまとめて作る。 */
     private static final Set<FluidPipeBlockEntity> PENDING = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -97,13 +96,6 @@ public final class FluidPipeNetwork {
     }
 
     private record Endpoint(BlockPos pos, Direction side, Node node) {}
-
-    /** この周期で見えている口。 */
-    private record Port(Endpoint endpoint, IFluidHandler handler, boolean drainable) {
-        BlockPos pos() {
-            return endpoint.pos;
-        }
-    }
 
     private record Path(List<Node> nodes, List<Segment> segments) {}
 
@@ -159,11 +151,15 @@ public final class FluidPipeNetwork {
     private final Map<RouteKey, Path> paths = new HashMap<>();
     /** この周期に使った容量（分かれ目・区間ごと）。 */
     private final Map<Object, Long> used = new IdentityHashMap<>();
+    /** 飽和した経路が初めて見つかった時点で、残量のある区間でつながっていたグループ。 */
+    @Nullable private Map<Node, Node> openComponents;
     private final Map<SampleKey, Sample> samples = new HashMap<>();
     /** 今、流れ・詰まりを見せているパイプ。 */
     private final Set<BlockPos> lit = new HashSet<>();
+    private final long configRevision = ConfigMigration.revision();
     private boolean valid = true;
-    private int rotation;
+    private long capacityCycle = Long.MIN_VALUE;
+    private boolean routing;
     /** この見た目の間隔で、出せる液体があったか・実際に動いたか（詰まりの表示）。 */
     private boolean offered, moved;
 
@@ -194,19 +190,11 @@ public final class FluidPipeNetwork {
         PENDING.remove(pipe);
     }
 
-    /**
-     * 液体パイプの先に口が置かれうるか。ブロックエンティティは面の設定で capability が変わるので今なくても含める。
-     * 大釜のようにブロックエンティティなしで液体を扱うブロックと、水源も含む。capability は周期ごとに取り直す。
-     */
-    static boolean mayBeEndpoint(Level level, BlockPos pos) {
-        return level.getBlockEntity(pos) != null || isSource(level.getBlockState(pos))
-                || Capabilities.get(level, Capabilities.FluidHandler.BLOCK, pos, null) != null;
+    static boolean mayBeEndpoint(Level level, BlockPos pos, @Nullable Direction face) {
+        return level.getBlockEntity(pos) != null || io.github.genichimaruo.singulo.compat.Capabilities.get(level, Capabilities.FluidHandler.BLOCK, pos, face) != null;
     }
 
-    /** 汲める水源か（水・溶岩の源。流れている水や、水没していないブロックは含まない）。 */
-    static boolean isSource(BlockState state) {
-        return state.getFluidState().isSource() && state.getBlock() instanceof BucketPickup;
-    }
+    boolean hasNode(BlockPos pos) { return nodes.containsKey(pos); }
 
     boolean hasEndpoint(BlockPos pos) {
         return endpointPositions.contains(pos);
@@ -233,7 +221,7 @@ public final class FluidPipeNetwork {
         return perTick >= Long.MAX_VALUE / INTERVAL ? Long.MAX_VALUE : perTick * INTERVAL;
     }
 
-    private static void build(Level level, FluidPipeBlockEntity start) {
+    static void build(Level level, FluidPipeBlockEntity start) {
         Map<BlockPos, FluidPipeBlockEntity> pipes = new HashMap<>();
         Map<BlockPos, Long> capacities = new HashMap<>();
         Map<BlockPos, List<BlockPos>> adjacent = new HashMap<>();
@@ -264,7 +252,7 @@ public final class FluidPipeNetwork {
                     if (seen.add(next)) {
                         queue.add(next);
                     }
-                } else if (mayBeEndpoint(level, next)) {
+                } else if (mayBeEndpoint(level, next, d.getOpposite())) {
                     devices.computeIfAbsent(pos, p -> new ArrayList<>()).add(Map.entry(next, d.getOpposite()));
                 }
             }
@@ -272,7 +260,7 @@ public final class FluidPipeNetwork {
         // 分かれ目: 隣のパイプが2本でないもの、口に面したもの
         Map<BlockPos, Node> nodes = new HashMap<>();
         for (BlockPos pos : pipes.keySet()) {
-            if (adjacent.get(pos).size() != 2 || devices.containsKey(pos)) {
+            if (adjacent.get(pos).size() != 2 || devices.containsKey(pos) || pipes.get(pos).injectionPoint) {
                 nodes.put(pos, new Node(pos, capacities.get(pos)));
             }
         }
@@ -329,17 +317,29 @@ public final class FluidPipeNetwork {
                 PENDING.remove(pipe);
             }
         }
-        // 受け渡しで水源を汲むとつなぎ替えが起きることがあるので、写しで回す
         for (FluidPipeNetwork network : List.copyOf(ACTIVE)) {
             if (!network.valid || network.level.getServer() != event.getServer()) {
                 continue;
             }
-            long now = network.level.getGameTime();
-            if (now % INTERVAL == 0) {
-                network.transfer();
+            if (network.configRevision != ConfigMigration.revision()) {
+                network.invalidate();
+                continue;
             }
+            long now = network.level.getGameTime();
             if (now % DISPLAY == 0 && network.valid) {
                 network.publish();
+            }
+        }
+        // Only the inspected pipe needs exact same-bucket updates for the numerical HUD.
+        if (!ACTIVE.isEmpty()) {
+            for (var player : event.getServer().getPlayerList().getPlayers()) {
+                var level = player.serverLevel();
+                if (level.getGameTime() % DISPLAY != 0 || !SurveyGlassesItem.wearing(player)) continue;
+                if (player.pick(player.blockInteractionRange(), 1, false) instanceof BlockHitResult hit
+                        && hit.getType() == HitResult.Type.BLOCK && level.isLoaded(hit.getBlockPos())
+                        && level.getBlockEntity(hit.getBlockPos()) instanceof FluidPipeBlockEntity pipe) {
+                    pipe.syncSurveyRate();
+                }
             }
         }
     }
@@ -351,182 +351,124 @@ public final class FluidPipeNetwork {
 
     // ------------------------------------------------------------------ 受け渡し
 
-    private void transfer() {
-        used.clear();
-        List<Port> ports = new ArrayList<>();
-        List<Endpoint> sources = new ArrayList<>();
-        for (Endpoint e : endpoints) {
-            if (!level.isLoaded(e.pos)) {
-                continue;
-            }
-            IFluidHandler handler = Capabilities.get(level, Capabilities.FluidHandler.BLOCK, e.pos, e.side);
-            if (handler != null) {
-                ports.add(new Port(e, handler, !(level.getBlockEntity(e.pos) instanceof PipeInputOnly)));
-            } else if (isSource(level.getBlockState(e.pos))) {
-                sources.add(e);
-            }
-        }
-        if (ports.isEmpty()) {
-            return;
-        }
-        rotation++;
-        List<FluidStack> fluids = offeredFluids(ports);
-        offered |= !fluids.isEmpty() || !sources.isEmpty();
-        for (FluidStack fluid : fluids) {
-            moveFluid(fluid, ports);
-        }
-        for (Endpoint source : sources) {
-            pump(source, ports);
-        }
-    }
-
-    /** 口が出せる液体の種類（重複なし）。 */
-    private static List<FluidStack> offeredFluids(List<Port> ports) {
-        List<FluidStack> out = new ArrayList<>();
-        for (Port port : ports) {
-            if (!port.drainable) {
-                continue;
-            }
-            for (int t = 0; t < port.handler.getTanks(); t++) {
-                FluidStack inside = port.handler.getFluidInTank(t);
-                if (!inside.isEmpty() && out.stream().noneMatch(f -> io.github.genichimaruo.singulo.compat.Legacy.sameFluid(f, inside))
-                        && !port.handler.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(inside,PROBE), FluidAction.SIMULATE).isEmpty()) {
-                    out.add(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(inside,1));
+    int route(BlockPos inlet, @Nullable Direction face, FluidStack fluid, FluidAction action,
+              @Nullable FluidPumpBlockEntity.Outlet pump) {
+        if (routing || !valid || fluid.isEmpty() || endpoints.isEmpty()) return 0;
+        Node origin = nodes.get(inlet);
+        if (origin == null) return 0;
+        long cycle = level.getGameTime() / INTERVAL;
+        beginCycle(cycle);
+        BlockPos source = face == null ? null : inlet.relative(face);
+        BlockPos owner = source == null || !level.isLoaded(source) ? source : ownerOf(level, source);
+        BlockPos intake = pump == null ? null : pump.sourceOwner();
+        int remaining = fluid.getAmount();
+        Map<Object, Long> reserved = pump != null ? pump.pipeReservations() : action.simulate() ? new IdentityHashMap<>() : Map.of();
+        Set<BlockPos> counted = action.simulate() ? new HashSet<>() : Set.of();
+        routing = true;
+        try {
+            offered |= action.execute();
+            int index = Math.floorMod(cycle, endpoints.size());
+            for (int n = 0; n < endpoints.size() && valid && remaining > 0; n++) {
+                Endpoint e = endpoints.get(index);
+                if (++index == endpoints.size()) index = 0;
+                if (!level.isLoaded(e.pos) || !canReach(origin, e.node) || e.pos.equals(source)) continue;
+                BlockPos receiver = ownerOf(level, e.pos);
+                if (receiver.equals(owner) || receiver.equals(intake) || counted.contains(receiver)) continue;
+                IFluidHandler target = io.github.genichimaruo.singulo.compat.Capabilities.get(level, Capabilities.FluidHandler.BLOCK, e.pos, e.side);
+                if (target == null) continue;
+                if (level.getBlockEntity(e.pos) instanceof WormholePortBlockEntity wormhole) target = wormhole.pipeFluids();
+                if (!PipeFluidFilter.accepts(target, fluid)) continue;
+                int want = Math.min(remaining, target.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, remaining), FluidAction.SIMULATE));
+                if (want <= 0 || !valid) continue;
+                Path path = path(origin, e.node);
+                int room = (int) Math.min(want, available(path, reserved));
+                if (room <= 0) continue;
+                if (action.simulate()) {
+                    // Multiple faces of a tank (including its multiblock ports) share storage.
+                    if (pump != null) room = pump.sendTo(receiver, target, fluid, room);
+                    if (room <= 0) continue;
+                    remaining -= room;
+                    if (pump != null || remaining > 0) reserve(reserved, path, room);
+                    if (remaining == 0) break;
+                    counted.add(receiver);
+                    continue;
+                }
+                int sent = pump == null ? target.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, room), FluidAction.EXECUTE)
+                        : pump.sendTo(receiver, target, fluid, room);
+                if (sent > 0) {
+                    account(path, sent);
+                    sample(path, source, e.pos, fluid, sent);
+                    remaining -= sent;
                 }
             }
-        }
-        return out;
-    }
-
-    private void moveFluid(FluidStack fluid, List<Port> ports) {
-        FluidStack probe = io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid,PROBE);
-        List<Port> pureGivers = new ArrayList<>();
-        List<Port> stores = new ArrayList<>();
-        List<Port> takers = new ArrayList<>();
-        for (Port port : ports) {
-            boolean gives = port.drainable && !port.handler.drain(probe, FluidAction.SIMULATE).isEmpty();
-            boolean takes = accepts(port.handler, fluid) && port.handler.fill(probe, FluidAction.SIMULATE) > 0;
-            if (gives && takes && port.handler instanceof PipeSplitTanks) {
-                pureGivers.add(port);                      // 送るタンクと受け取りのタンクが別: 出す口でも受ける口でもある
-                takers.add(port);
-            } else if (gives && takes) {
-                stores.add(port);
-            } else if (gives) {
-                pureGivers.add(port);
-            } else if (takes) {
-                takers.add(port);
-            }
-        }
-        rotate(takers);
-        rotate(stores);
-        for (Port giver : pureGivers) {
-            long left = push(giver, fluid, Integer.MAX_VALUE, takers);
-            push(giver, fluid, left, stores);
-        }
-        for (Port giver : stores) {
-            push(giver, fluid, Integer.MAX_VALUE, takers);
+            return fluid.getAmount() - remaining;
+        } finally {
+            routing = false;
         }
     }
 
-    /** giver から receivers へ順に、最大 budget を移す（経路の容量の残りまで）。返り値は移しきれなかった量。 */
-    private long push(Port giver, FluidStack fluid, long budget, List<Port> receivers) {
-        long left = budget;
-        for (Port receiver : receivers) {
-            if (left <= 0) {
-                break;
-            }
-            if (receiver.pos().equals(giver.pos())) {
-                continue;
-            }
-            Path path = path(giver.endpoint.node, receiver.endpoint.node);
-            long room = Math.min(left, available(path));
-            if (room <= 0) {
-                continue;
-            }
-            int want = receiver.handler.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid,(int) Math.min(Integer.MAX_VALUE, room)), FluidAction.SIMULATE);
-            if (want <= 0) {
-                continue;
-            }
-            FluidStack taken = giver.handler.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid,want), FluidAction.EXECUTE);
-            if (taken.isEmpty()) {
-                break;
-            }
-            int filled = receiver.handler.fill(taken, FluidAction.EXECUTE);
-            if (filled > 0) {
-                account(path, filled);
-                sample(path, giver.pos(), receiver.pos(), taken, filled);
-            }
-            left -= filled;
-            if (filled < taken.getAmount()) {
-                // 見積もりより入らなかった分は元へ戻す（消さない）
-                giver.handler.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(taken,taken.getAmount() - filled), FluidAction.EXECUTE);
-            }
-        }
-        return left;
+    static BlockPos ownerOf(Level level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof PortBlockEntity port && port.controllerPos() != null
+                ? port.controllerPos() : pos;
     }
 
-    /** 隣の水源を汲む。受け手と経路に源1個ぶんの空きがあるときだけ（余った分を捨てないように）。 */
-    private void pump(Endpoint source, List<Port> ports) {
-        BlockState state = level.getBlockState(source.pos);
-        if (!isSource(state)) {
-            return;
-        }
-        FluidStack fluid = new FluidStack(state.getFluidState().getType(), FluidType.BUCKET_VOLUME);
-        // 別の面やマルチブロックの別ポートでも、同じタンクの空きを公開することがある。
-        // capability から共有先は判別できないので、1つの口へ1バケツ全部が入るときだけ汲む。
-        List<Port> takers = new ArrayList<>(ports);
-        rotate(takers);
-        for (Port taker : takers) {
-            Path path = path(source.node, taker.endpoint.node);
-            if (!accepts(taker.handler, fluid) || available(path) < fluid.getAmount()
-                    || taker.handler.fill(fluid, FluidAction.SIMULATE) < fluid.getAmount()) {
-                continue;
-            }
-            if (((BucketPickup) state.getBlock()).pickupBlock(level, source.pos, state).isEmpty()) {
-                return;
-            }
-            int filled = taker.handler.fill(fluid, FluidAction.EXECUTE);
-            if (filled > 0) {
-                account(path, filled);
-                sample(path, source.pos, taker.pos(), fluid, filled);
-            }
-            return;
+    private void beginCycle(long cycle) {
+        if (capacityCycle != cycle) {
+            resetCapacity();
+            capacityCycle = cycle;
         }
     }
 
-    private static boolean accepts(IFluidHandler handler, FluidStack fluid) {
-        return !(handler instanceof PipeFluidFilter filter) || filter.pipeAccepts(fluid);
-    }
-
-    private void rotate(List<Port> list) {
-        if (list.size() > 1) {
-            Collections.rotate(list, rotation % list.size());
-        }
+    void resetCapacity() {
+        used.clear();
+        openComponents = null;
     }
 
     // ------------------------------------------------------------------ 容量
 
-    private long remaining(Object key, long capacity, @Nullable Map<Object, Long> extra) {
-        if (capacity == Long.MAX_VALUE) {
-            return Long.MAX_VALUE;
-        }
-        long u = used.getOrDefault(key, 0L) + (extra == null ? 0 : extra.getOrDefault(key, 0L));
-        return Math.max(0, capacity - u);
+    private long remaining(Object key, long capacity) {
+        return capacity == Long.MAX_VALUE ? capacity : Math.max(0, capacity - used.getOrDefault(key, 0L));
     }
 
-    private long available(Path path) {
-        return available(path, null);
+    private boolean canReach(Node from, Node to) {
+        return remaining(from, from.capacity) > 0 && remaining(to, to.capacity) > 0
+                && (openComponents == null || openComponents.get(from) == openComponents.get(to));
     }
 
-    private long available(Path path, @Nullable Map<Object, Long> extra) {
+    private long available(Path path, Map<Object, Long> reserved) {
         long a = Long.MAX_VALUE;
         for (Node n : path.nodes) {
-            a = Math.min(a, remaining(n, n.capacity, extra));
+            a = Math.min(a, remaining(n, n.capacity) - reserved.getOrDefault(n, 0L));
+            if (a == 0) break;
         }
         for (Segment s : path.segments) {
-            a = Math.min(a, remaining(s, s.capacity, extra));
+            if (a == 0) break;
+            a = Math.min(a, remaining(s, s.capacity) - reserved.getOrDefault(s, 0L));
         }
+        if (a == 0 && reserved.isEmpty() && openComponents == null) openComponents = findOpenComponents();
         return a;
+    }
+
+    /** 周期内に分断されたグループは再接続しない。同じグループの経路の残量は引き続き個別に確かめる。 */
+    private Map<Node, Node> findOpenComponents() {
+        Map<Node, Node> found = new IdentityHashMap<>();
+        var queue = new ArrayDeque<Node>();
+        for (Node root : nodes.values()) {
+            if (remaining(root, root.capacity) == 0 || found.containsKey(root)) continue;
+            found.put(root, root);
+            queue.add(root);
+            while (!queue.isEmpty()) {
+                Node node = queue.remove();
+                for (Segment edge : node.edges) {
+                    Node next = edge.other(node);
+                    if (remaining(edge, edge.capacity) > 0 && remaining(next, next.capacity) > 0
+                            && found.putIfAbsent(next, root) == null) {
+                        queue.add(next);
+                    }
+                }
+            }
+        }
+        return found;
     }
 
     private void account(Path path, long amount) {
@@ -622,7 +564,7 @@ public final class FluidPipeNetwork {
                 f.sample.add(s);
                 BlockPos previous = i == 0 ? key.from : neighbor(path.segments.get(i - 1), node);
                 BlockPos next = i == path.segments.size() ? key.to : neighbor(path.segments.get(i), node);
-                f.in |= bit(direction(node.pos, previous));
+                if (previous != null) f.in |= bit(direction(node.pos, previous));
                 f.out |= bit(direction(node.pos, next));
                 if (i < path.segments.size()) {
                     Segment edge = path.segments.get(i);
@@ -676,7 +618,7 @@ public final class FluidPipeNetwork {
         if (be == null || be.isRemoved() || !level.isLoaded(pos)) {
             return;
         }
-        int perTick = (int) Math.min(Integer.MAX_VALUE, s.amount / DISPLAY);
+        long perTick = s.amount / DISPLAY;
         be.show(state, in, out, s.amount > 0 ? Math.max(1, perTick) : 0, s.fluid, s.mixed);
         current.add(pos);
     }
@@ -690,7 +632,7 @@ public final class FluidPipeNetwork {
     }
 
     @Nullable
-    private static Direction direction(BlockPos from, BlockPos to) {
+    static Direction direction(BlockPos from, BlockPos to) {
         return Direction.fromDelta(to.getX() - from.getX(), to.getY() - from.getY(), to.getZ() - from.getZ());
     }
 

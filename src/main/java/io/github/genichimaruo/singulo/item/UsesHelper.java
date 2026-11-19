@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.item;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.api.item.CatalystItem;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
@@ -32,7 +33,7 @@ public final class UsesHelper {
         }
         if (stack.getItem() instanceof UsesItem uses) {
             if (uses.isCatalyst()) {
-                return Math.max(1, (int) Math.round(catalystMinutes(uses) * 1200 * catalystLifetimeMultiplier()));
+                return (int) io.github.genichimaruo.singulo.compat.Legacy.clamp(Math.round(catalystMinutes(uses) * 1200 * catalystLifetimeMultiplier()), 1L, Integer.MAX_VALUE);
             }
             return Math.max(1, (int) Math.round(uses.defaultMax() * usesMultiplier()));
         }
@@ -75,11 +76,13 @@ public final class UsesHelper {
         if (stack.isEmpty()) {
             return false;
         }
+        if (stack.getItem() instanceof CatalystItem.Spent) return true;
         var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         return Singulo.MODID.equals(id.getNamespace()) && GeneratedContent.SPENT_FORM.containsValue(id.getPath());
     }
 
     private static ItemStack exhausted(ItemStack stack, UsesData data) {
+        if (stack.getItem() instanceof CatalystItem addon) return new ItemStack(addon.spentItem());
         if (!(stack.getItem() instanceof UsesItem uses)) {
             return ItemStack.EMPTY;
         }
@@ -154,7 +157,7 @@ public final class UsesHelper {
     }
 
     static double catalystMinutes(UsesItem item) {
-        if (!configLoaded()) {
+        if (item instanceof CatalystItem || !configLoaded()) {
             return item.defaultMax() / 1200.0;
         }
         return switch (BuiltInRegistries.ITEM.getKey(item).getPath()) {

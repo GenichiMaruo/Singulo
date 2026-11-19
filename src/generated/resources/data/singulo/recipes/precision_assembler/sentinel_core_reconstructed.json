@@ -25,11 +25,24 @@
     },
     {
       "ingredient": {
+        "item": "minecraft:blue_ice"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
         "item": "singulo:bose_condensate_catalyst"
       },
       "tier": 3,
       "uses": 3000
     }
+  ],
+  "shape": [
+    "     ",
+    " BDB ",
+    " CAC ",
+    "  D  ",
+    "     "
   ],
   "result": {
     "id": "singulo:sentinel_core",

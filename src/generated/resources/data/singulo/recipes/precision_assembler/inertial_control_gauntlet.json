@@ -28,7 +28,20 @@
         "tag": "forge:slime_balls"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_cable"
+      },
+      "count": 2
     }
+  ],
+  "shape": [
+    "     ",
+    " AAA ",
+    " BCB ",
+    " DED ",
+    "  E  "
   ],
   "result": {
     "id": "singulo:inertial_control_gauntlet",

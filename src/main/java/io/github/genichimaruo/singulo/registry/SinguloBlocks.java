@@ -1,6 +1,10 @@
 package io.github.genichimaruo.singulo.registry;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.block.MixedGlassSlab;
 import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.generated.GeneratedContent.BlockDef;
@@ -285,6 +289,10 @@ public final class SinguloBlocks {
             BLOCKS.register("wormhole_port", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.WORMHOLE_PORT, io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::new,
                     io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::serverTick));
+    public static final RegistryObject<io.github.genichimaruo.singulo.pipe.CreativeFluidTrashBlock> CREATIVE_FLUID_TRASH =
+            BLOCKS.register("creative_fluid_trash", () -> new io.github.genichimaruo.singulo.pipe.CreativeFluidTrashBlock(
+                    machineProperties().strength(-1.0F, 3_600_000.0F).noLootTable()));
+
     /** クリエイティブ電源（クリエイティブ専用）。 */
     public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity>> CREATIVE_ENERGY_SOURCE =
             BLOCKS.register("creative_energy_source", () -> new SimpleMachineBlock<>(machineProperties().strength(-1.0F, 3_600_000.0F),
@@ -367,6 +375,12 @@ public final class SinguloBlocks {
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
     public static final RegistryObject<GlassBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+
+    public static final RegistryObject<MixedGlassSlab> MIXED_GLASS_SLAB = BLOCKS.register(
+            "mixed_glass_slab", () -> new MixedGlassSlab(
+                    glassProperties(MapColor.SNOW, 3.0F, 9.0F, SoundType.METAL).mapColor(
+                            state -> state.getValue(MixedGlassSlab.BLACK_ON_TOP)
+                                    ? MapColor.COLOR_BLACK : MapColor.SNOW)));
 
     /** アンドロイド用のガラス（遮断: アンドロイドだけ通れない、透過: アンドロイドだけ通れる。無地は隣とつながる）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS = BLOCKS.register(
@@ -534,8 +548,9 @@ public final class SinguloBlocks {
             () -> new io.github.genichimaruo.singulo.ruin.lab.AndroidCapsuleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).sound(SoundType.GLASS).noOcclusion()));
     /** 研究所の小物（机のモニター・コーヒーメーカー・書類の山・ごみ箱・自販機）。 */
-    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> DESK_MONITOR = BLOCKS.register("desk_monitor",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14), null, null));
+    /** 机のモニター（0.21.0 から、使うと工場モニターを開く）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.monitor.FactoryMonitorBlock> DESK_MONITOR = BLOCKS.register("desk_monitor",
+            () -> new io.github.genichimaruo.singulo.monitor.FactoryMonitorBlock(decor(SoundType.METAL).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14)));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
             () -> new io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock(decor(SoundType.METAL)));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> PAPER_STACK = BLOCKS.register("paper_stack",
@@ -585,33 +600,43 @@ public final class SinguloBlocks {
 
     // ---- ケーブル
     public static final RegistryObject<CableBlock> COPPER_WIRE = BLOCKS.register("copper_wire",
-            () -> new CableBlock(cableProperties(SoundType.COPPER), 2_000, 0.001, io.github.genichimaruo.singulo.cable.CableProfile.COPPER));
+            () -> new CableBlock(cableProperties(SoundType.COPPER), () -> PackBalance.value(ServerConfig.COPPER_CABLE_RATE), () -> PackBalance.value(ServerConfig.COPPER_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.COPPER));
     public static final RegistryObject<CableBlock> SUPERCONDUCTING_CABLE = BLOCKS.register("superconducting_cable",
-            () -> new CableBlock(cableProperties(SoundType.METAL), 1_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
+            () -> new CableBlock(cableProperties(SoundType.METAL), () -> PackBalance.value(ServerConfig.SUPERCONDUCTING_CABLE_RATE), () -> PackBalance.value(ServerConfig.SUPERCONDUCTING_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
     public static final RegistryObject<CableBlock> TOPOLOGICAL_WIRE = BLOCKS.register("topological_wire",
-            () -> new CableBlock(cableProperties(SoundType.METAL), 100_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
+            () -> new CableBlock(cableProperties(SoundType.METAL), () -> PackBalance.value(ServerConfig.TOPOLOGICAL_CABLE_RATE), () -> PackBalance.value(ServerConfig.TOPOLOGICAL_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
     /** 上限なし。mod の装置どうしは int（約 2.1 GFE/t）を超えて受け渡す（ほかの mod の装置へは1台あたり int まで）。 */
     public static final RegistryObject<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
-            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
+            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), () -> PackBalance.value(ServerConfig.HORIZON_CABLE_RATE), () -> PackBalance.value(ServerConfig.HORIZON_CABLE_LOSS),
+                    io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
 
     /** 置いたカバーの枠（あとからケーブル・パイプを入れられる）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.cable.CoverFrameBlock> COVER_FRAME = BLOCKS.register("cover_frame",
             () -> new io.github.genichimaruo.singulo.cable.CoverFrameBlock(cableProperties(SoundType.CHAIN)));
 
     // ---- 液体パイプ
+    public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPumpBlock> FLUID_PUMP =
+            BLOCKS.register("fluid_pump", () -> new io.github.genichimaruo.singulo.pipe.FluidPumpBlock(machineProperties().noOcclusion()));
+
     public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
-            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), 2_000,
+            () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), () -> PackBalance.value(ServerConfig.COPPER_PIPE_RATE),
                     io.github.genichimaruo.singulo.pipe.PipeProfile.COPPER));
     public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> VACUUM_JACKETED_PIPE = BLOCKS.register(
             "vacuum_jacketed_pipe", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.METAL),
-                    32_000, io.github.genichimaruo.singulo.pipe.PipeProfile.VACUUM));
+                    () -> PackBalance.value(ServerConfig.VACUUM_PIPE_RATE),
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.VACUUM));
     public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> SUPERFLUID_CONDUIT = BLOCKS.register(
             "superfluid_conduit", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.GLASS),
-                    512_000, io.github.genichimaruo.singulo.pipe.PipeProfile.SUPERFLUID));
+                    () -> PackBalance.value(ServerConfig.SUPERFLUID_PIPE_RATE),
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.SUPERFLUID));
     /** 上限なし（1つの口の1回の受け渡しは int まで）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> HORIZON_DUCT = BLOCKS.register(
             "horizon_duct", () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.NETHERITE_BLOCK),
-                    Long.MAX_VALUE, io.github.genichimaruo.singulo.pipe.PipeProfile.HORIZON));
+                    () -> PackBalance.value(ServerConfig.HORIZON_PIPE_RATE),
+                    io.github.genichimaruo.singulo.pipe.PipeProfile.HORIZON));
 
     private static RegistryObject<Block> ruinLamp(String id) {
         return simpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)
@@ -735,7 +760,12 @@ public final class SinguloBlocks {
                     : base instanceof io.github.genichimaruo.singulo.block.GlassJoin.Glass
                     ? new io.github.genichimaruo.singulo.block.GlassJoin.Stairs(() -> base, properties)
                     : new net.minecraft.world.level.block.StairBlock(base.defaultBlockState(), properties);
-            case "slab" -> new net.minecraft.world.level.block.SlabBlock(properties);
+            // ガラスのハーフブロック（0.21.0）も、元のガラスや同じガラスの階段・ハーフブロックとの境目を描かない
+            case "slab" -> base instanceof io.github.genichimaruo.singulo.android.AndroidGlassBlock
+                    ? new io.github.genichimaruo.singulo.android.AndroidGlassSlab(() -> base, properties)
+                    : base == WHITE_GLASS_PANEL.get() || base == BLACK_REINFORCED_GLASS.get()
+                    ? new io.github.genichimaruo.singulo.block.GlassJoin.PairSlab(() -> base, properties)
+                    : new net.minecraft.world.level.block.SlabBlock(properties);
             case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
             default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());
         };

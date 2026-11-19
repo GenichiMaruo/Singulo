@@ -9,7 +9,7 @@
       "ingredient": {
         "item": "singulo:exotic_matter"
       },
-      "count": 2
+      "count": 4
     },
     {
       "ingredient": {
@@ -22,7 +22,20 @@
         "item": "singulo:entangled_element"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:shield_tower_plinth"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " BDB ",
+    " ACA ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_crown",
