@@ -8,6 +8,7 @@
 from advancements import ADVANCEMENTS, HIDDEN_ADVANCEMENTS, validate_advancements
 from descriptions import DESC, SUMMARY
 from guide import CHAPTERS
+from guide_visuals import ACTION_TITLES, CAPTIONS, visuals_for
 
 MODID = 'singulo'
 
@@ -69,6 +70,10 @@ def descriptions(ctx, ja, en):
 
 def guide(ctx, ja, en):
     chapters = []
+    for page, (jt, et) in ACTION_TITLES.items():
+        ja[f'guide.singulo.action.{page}'], en[f'guide.singulo.action.{page}'] = jt, et
+    for page, (jt, et) in CAPTIONS.items():
+        ja[f'guide.singulo.caption.{page}'], en[f'guide.singulo.caption.{page}'] = jt, et
     for cid, icon, ja_title, en_title, pages in CHAPTERS:
         ja[f'guide.{MODID}.{cid}'] = ja_title
         en[f'guide.{MODID}.{cid}'] = en_title
@@ -79,7 +84,7 @@ def guide(ctx, ja, en):
             en[key + '.title'], en[key + '.body'] = et, eb
             ids.append(f'{cid}.{pid}')
         chapters.append({'id': cid, 'icon': icon, 'pages': ids})
-    ctx['write_json'](ctx['ASSETS'] / 'guide' / 'chapters.json', {'chapters': chapters})
+    ctx['write_json'](ctx['ASSETS'] / 'guide' / 'chapters.json', {'chapters': chapters, 'visuals': visuals_for(CHAPTERS)})
 
 
 def advancements(ctx, ja, en):

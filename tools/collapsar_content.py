@@ -62,15 +62,11 @@ CHAPTER = ('collapsar', 'singulo:collapsar_ingot', 'コラプサーの使い道'
      'The bar below shows the count and speed, and chat lists how many spots there are. Port positions are not marked, since swapping them would remove the port.\n'
      'In the controller screen, hover the structure size to see the lining count and speed.'),
     ('vault', '事象の地平線倉庫',
-     '事象の地平線倉庫は、1種類の物を中の小さなブラックホールに、事実上無制限（約922京個）までしまうブロックです。中身が増えるほどブラックホールが大きくなり（1兆個でいっぱいに見える）、しまった物がその周りを回ります。4面の台に個数が、四隅の柱に埋まり具合の光が出ます。\n'
-     '物を持って使うと手の物を入れ、すばやくもう一度使うと持ち物の同じ物を全部入れます。素手で使うと1スタック、素手でスニークして使うと1個取り出します。'
-     'ホッパー・パイプ・アンドロイド・ドローンの発着ポートからは、1つの欄の入れ物として出し入れできます。入りきらない分は受け取りません。\n'
-     '壊すと中身ごとアイテムになり、置き直すと戻ります。中身の入った倉庫や梱包済みの箱は、倉庫に入れられません。コンパレーターは埋まり具合を出します。',
+     '倉庫に入れたい物を持って使うと預けられます。続けてもう一度使うと、持ち物にある同じ物をまとめて預けられます。\n'
+     '取り出すときは素手で使うと1スタック、スニークして使うと1個です。入出力にはホッパーやパイプも使えます。',
      'Event Horizon Vault',
-     'The Event Horizon Vault stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. The hole grows as it fills (it looks full at a trillion), the stored item orbits it, the plates on all four sides show the count, and light on the corner pillars shows how full it is.\n'
-     'Use an item on it to insert what you hold; use it again quickly to insert every matching item in your inventory. Use it empty-handed to take a stack, or sneak to take one. '
-     'Hoppers, pipes, androids and drone ports see it as a single slot. It never accepts more than fits.\n'
-     'Breaking it keeps the contents in the item, restored when placed. Filled vaults and packed crates cannot go inside a vault. A comparator reads how full it is.'),
+     'Use the vault while holding an item to deposit it. Use it again quickly to deposit all matching items in your inventory.\n'
+     'Use an empty hand to withdraw a stack, or sneak-use it to withdraw one. Hoppers and pipes can transfer items too.'),
     ('wormhole', 'ワームホール便',
      'ワームホールの両方の口のそば（4ブロック以内）にワームホール航路標識を置くと、ドローンがその口を通って別の次元のポートへ荷物を送れます。'
      '発着ポートの行き先の一覧に、口の先の次元の同じ持ち主のポートが紫の印つきで並びます。道のりは、こちらのポートから口まで＋向こうの口からポートまでで、射程と電力もこの道のりで決まります。\n'

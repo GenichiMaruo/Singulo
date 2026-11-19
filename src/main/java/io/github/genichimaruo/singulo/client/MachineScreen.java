@@ -5,6 +5,7 @@ import io.github.genichimaruo.singulo.machine.MachineLayout;
 import io.github.genichimaruo.singulo.machine.MachineMenu;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
+import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -1119,11 +1120,14 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             if (Panel.inside(mouseX, mouseY, x + tx, y + MachineLayout.TOP, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT)) {
                 int fluidId = menu.value(MachineBlockEntity.D_TANKS + i * 2);
                 int amount = menu.value(MachineBlockEntity.D_TANKS + i * 2 + 1);
-                Component name = fluidId > 0
-                        ? BuiltInRegistries.FLUID.byId(fluidId - 1).getFluidType().getDescription()
-                        : Component.translatable("gui.singulo.empty_tank");
-                g.renderTooltip(font, Component.translatable("gui.singulo.fluid", name, amount, MachineType.TANK_CAPACITY),
-                        mouseX, mouseY);
+                Fluid fluid = fluidId > 0 ? BuiltInRegistries.FLUID.byId(fluidId - 1) : null;
+                Component name = fluid == null ? Component.translatable("gui.singulo.empty_tank") : fluid.getFluidType().getDescription();
+                Component contents = Component.translatable("gui.singulo.fluid", name, amount, MachineType.TANK_CAPACITY);
+                if (type() == MachineType.ELECTROLYZER && i >= type().fluidInputs() && fluid != null && fluid.isSame(SinguloFluids.get("oxygen"))) {
+                    Panel.tooltip(g, font, List.of(contents, Component.translatable("gui.singulo.electrolyzer.oxygen_hint")), 200, mouseX, mouseY);
+                } else {
+                    g.renderTooltip(font, contents, mouseX, mouseY);
+                }
                 return;
             }
         }

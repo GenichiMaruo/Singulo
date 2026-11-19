@@ -6,8 +6,7 @@
       "pages": [
         "intro.welcome",
         "intro.howto",
-        "intro.basics",
-        "intro.vanilla"
+        "intro.basics"
       ]
     },
     {
@@ -18,7 +17,8 @@
         "stage1.materials",
         "stage1.power",
         "stage1.thermal_pairs",
-        "stage1.machines"
+        "stage1.machines",
+        "stage1.steel"
       ]
     },
     {
@@ -36,8 +36,7 @@
       "icon": "singulo:quantum_computing_module",
       "pages": [
         "stage3.flow",
-        "stage3.quantum",
-        "stage3.tools"
+        "stage3.quantum"
       ]
     },
     {
@@ -57,17 +56,14 @@
         "stage5.flow",
         "stage5.reactor",
         "stage5.ignite",
-        "stage5.byproducts",
-        "stage5.endgame"
+        "stage5.byproducts"
       ]
     },
     {
       "id": "multiblocks",
       "icon": "singulo:holo_projector",
       "pages": [
-        "multiblocks.projector",
-        "multiblocks.list",
-        "multiblocks.parts"
+        "multiblocks.projector"
       ]
     },
     {
@@ -75,14 +71,13 @@
       "icon": "singulo:muon_catalyst",
       "pages": [
         "catalysts.tiers",
-        "catalysts.keys",
         "catalysts.slots",
         "catalysts.time"
       ]
     },
     {
       "id": "power",
-      "icon": "singulo:superconducting_cable",
+      "icon": "singulo:copper_wire",
       "pages": [
         "power.cables",
         "power.sides",
@@ -93,38 +88,26 @@
     },
     {
       "id": "ruins",
-      "icon": "singulo:ruin_cache",
+      "icon": "singulo:explorer_compass",
       "pages": [
         "ruins.list",
-        "ruins.bosses",
-        "ruins.foundry",
-        "ruins.leviathan",
-        "ruins.lab",
-        "ruins.plan",
         "ruins.compass",
-        "ruins.sealed",
-        "ruins.records",
-        "ruins.gathering"
+        "ruins.records"
       ]
     },
     {
       "id": "androids",
       "icon": "singulo:android_station",
       "pages": [
-        "androids.ruin",
         "androids.build",
         "androids.first",
         "androids.patrol",
         "androids.routes",
         "androids.care",
-        "androids.upgrades",
-        "androids.gear",
         "androids.work",
         "androids.process",
         "androids.farm",
-        "androids.trouble",
-        "androids.decor",
-        "androids.glass"
+        "androids.trouble"
       ]
     },
     {
@@ -132,13 +115,11 @@
       "icon": "singulo:drone_station",
       "pages": [
         "drones.start",
-        "drones.kinds",
         "drones.send",
         "drones.range",
         "drones.more",
         "drones.route",
-        "drones.auto",
-        "drones.android"
+        "drones.auto"
       ]
     },
     {
@@ -181,7 +162,6 @@
       "id": "factory_expansion",
       "icon": "singulo:smes_module",
       "pages": [
-        "factory_expansion.upgrades",
         "factory_expansion.probes",
         "factory_expansion.limits"
       ]
@@ -197,7 +177,7 @@
     },
     {
       "id": "fluids",
-      "icon": "singulo:vacuum_jacketed_pipe",
+      "icon": "singulo:fluid_pipe",
       "pages": [
         "fluids.pipes",
         "fluids.drone"
@@ -216,8 +196,7 @@
       "id": "food",
       "icon": "singulo:nutrient_bar",
       "pages": [
-        "food.printer",
-        "food.foods"
+        "food.printer"
       ]
     },
     {
@@ -227,5 +206,765 @@
         "cover.cover"
       ]
     }
-  ]
+  ],
+  "visuals": {
+    "intro.welcome": {
+      "icon": "singulo:handbook",
+      "links": [
+        "stage1.flow",
+        "stage2.flow",
+        "stage3.flow",
+        "stage4.flow",
+        "stage5.flow",
+        "ruins.list",
+        "power.sides",
+        "multiblocks.projector"
+      ]
+    },
+    "intro.howto": {
+      "icon": "minecraft:book"
+    },
+    "intro.basics": {
+      "icon": "singulo:copper_wire"
+    },
+    "stage1.flow": {
+      "icon": "singulo:thermoelectric_generator",
+      "links": [
+        "stage1.materials",
+        "stage1.power",
+        "stage1.machines",
+        "ruins.list",
+        "stage1.steel",
+        "stage2.tower"
+      ]
+    },
+    "stage1.materials": {
+      "icon": "singulo:steel_ingot",
+      "rows": [
+        {
+          "title": "block.minecraft.crafting_table",
+          "inputs": [
+            {
+              "item": "minecraft:iron_ingot",
+              "amount": "1"
+            },
+            {
+              "item": "minecraft:coal",
+              "amount": "2"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "singulo:steel_blend",
+              "amount": "1"
+            }
+          ]
+        },
+        {
+          "title": "block.minecraft.blast_furnace",
+          "inputs": [
+            {
+              "item": "singulo:steel_blend",
+              "amount": "1"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "singulo:steel_ingot",
+              "amount": "1"
+            }
+          ]
+        }
+      ],
+      "action": "guide.singulo.action.stage1.materials"
+    },
+    "stage1.power": {
+      "icon": "singulo:thermoelectric_generator",
+      "rows": [
+        {
+          "title": "block.singulo.thermoelectric_generator",
+          "inputs": [
+            {
+              "item": "minecraft:magma_block",
+              "amount": ""
+            },
+            {
+              "item": "singulo:thermoelectric_generator",
+              "amount": ""
+            },
+            {
+              "item": "minecraft:blue_ice",
+              "amount": ""
+            }
+          ],
+          "reading": "≈76 FE/t"
+        }
+      ],
+      "action": "guide.singulo.action.stage1.power"
+    },
+    "stage1.thermal_pairs": {
+      "icon": "minecraft:blue_ice",
+      "rows": [
+        {
+          "title": "block.minecraft.magma_block",
+          "inputs": [
+            {
+              "item": "minecraft:magma_block",
+              "amount": ""
+            },
+            {
+              "item": "minecraft:blue_ice",
+              "amount": ""
+            }
+          ],
+          "reading": "≈76 FE/t"
+        },
+        {
+          "title": "guide.singulo.visual.active_kiln",
+          "inputs": [
+            {
+              "item": "singulo:kiln",
+              "amount": ""
+            },
+            {
+              "item": "minecraft:blue_ice",
+              "amount": ""
+            }
+          ],
+          "reading": "≈66 FE/t"
+        },
+        {
+          "title": "block.minecraft.campfire",
+          "inputs": [
+            {
+              "item": "minecraft:campfire",
+              "amount": ""
+            },
+            {
+              "item": "minecraft:blue_ice",
+              "amount": ""
+            }
+          ],
+          "reading": "≈56 FE/t"
+        },
+        {
+          "title": "block.minecraft.campfire",
+          "inputs": [
+            {
+              "item": "minecraft:campfire",
+              "amount": ""
+            },
+            {
+              "item": "minecraft:packed_ice",
+              "amount": ""
+            }
+          ],
+          "reading": "≈55 FE/t"
+        }
+      ],
+      "caption": "guide.singulo.caption.stage1.thermal_pairs"
+    },
+    "stage1.machines": {
+      "icon": "singulo:compressor",
+      "rows": [
+        {
+          "title": "block.singulo.peltier_cooler",
+          "inputs": [
+            {
+              "fluid": "minecraft:water",
+              "amount": "1,000 mB"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "minecraft:ice",
+              "amount": "1"
+            }
+          ]
+        },
+        {
+          "title": "block.singulo.compressor",
+          "inputs": [
+            {
+              "item": "minecraft:ice",
+              "amount": "4"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "minecraft:packed_ice",
+              "amount": "1"
+            }
+          ]
+        },
+        {
+          "title": "block.singulo.compressor",
+          "inputs": [
+            {
+              "item": "minecraft:packed_ice",
+              "amount": "4"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "minecraft:blue_ice",
+              "amount": "1"
+            }
+          ]
+        }
+      ],
+      "action": "guide.singulo.action.stage1.machines"
+    },
+    "stage1.steel": {
+      "icon": "singulo:kiln",
+      "rows": [
+        {
+          "title": "block.singulo.electrolyzer",
+          "inputs": [
+            {
+              "fluid": "minecraft:water",
+              "amount": "1,000 mB"
+            }
+          ],
+          "outputs": [
+            {
+              "fluid": "singulo:oxygen",
+              "amount": "500 mB"
+            },
+            {
+              "fluid": "singulo:hydrogen",
+              "amount": "1,000 mB"
+            }
+          ]
+        },
+        {
+          "title": "guide.singulo.visual.oxygen_steel",
+          "inputs": [
+            {
+              "item": "minecraft:iron_ingot",
+              "amount": "4"
+            },
+            {
+              "item": "minecraft:coal",
+              "amount": "2"
+            },
+            {
+              "fluid": "singulo:oxygen",
+              "amount": "500 mB"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "singulo:steel_ingot",
+              "amount": "4"
+            }
+          ]
+        },
+        {
+          "title": "guide.singulo.visual.blend_steel",
+          "inputs": [
+            {
+              "item": "minecraft:iron_ingot",
+              "amount": "4"
+            },
+            {
+              "item": "minecraft:coal",
+              "amount": "8"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "singulo:steel_ingot",
+              "amount": "4"
+            }
+          ]
+        }
+      ],
+      "caption": "guide.singulo.caption.stage1.steel"
+    },
+    "stage2.flow": {
+      "icon": "singulo:superconducting_coil",
+      "stage": 2,
+      "links": [
+        "stage2.others",
+        "stage2.accelerator",
+        "stage2.tower",
+        "ruins.compass"
+      ]
+    },
+    "stage2.tower": {
+      "icon": "singulo:cooling_tower_controller",
+      "discoveries": [
+        "archive",
+        "ruin_observation",
+        "tower",
+        "coil",
+        "item/cooling_tower_controller"
+      ],
+      "action": "guide.singulo.action.stage2.tower",
+      "blueprint": "cooling_tower"
+    },
+    "stage2.accelerator": {
+      "icon": "singulo:accelerator_controller",
+      "stage": 2,
+      "rows": [
+        {
+          "title": "block.singulo.accelerator_controller",
+          "inputs": [
+            {
+              "fluid": "singulo:hydrogen",
+              "amount": "50 mB"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "singulo:muon_bundle",
+              "amount": "1"
+            }
+          ]
+        }
+      ],
+      "action": "guide.singulo.action.stage2.accelerator",
+      "blueprint": "particle_accelerator"
+    },
+    "stage2.others": {
+      "icon": "singulo:precision_assembler",
+      "stage": 2,
+      "action": "guide.singulo.action.stage2.others"
+    },
+    "stage3.flow": {
+      "icon": "singulo:quantum_computing_module",
+      "stage": 3,
+      "links": [
+        "stage3.quantum",
+        "catalysts.slots",
+        "ruins.compass"
+      ]
+    },
+    "stage3.quantum": {
+      "icon": "singulo:laser_cooler",
+      "stage": 3,
+      "rows": [
+        {
+          "title": "block.singulo.quantum_heat_engine",
+          "inputs": [
+            {
+              "item": "singulo:muon_catalyst",
+              "amount": ""
+            }
+          ],
+          "reading": "50 kFE/t"
+        },
+        {
+          "title": "block.singulo.quantum_heat_engine",
+          "inputs": [
+            {
+              "item": "singulo:bose_condensate_catalyst",
+              "amount": ""
+            }
+          ],
+          "reading": "200 kFE/t"
+        }
+      ],
+      "action": "guide.singulo.action.stage3.quantum"
+    },
+    "stage4.flow": {
+      "icon": "singulo:time_crystal_catalyst",
+      "stage": 4,
+      "links": [
+        "stage4.time",
+        "stage4.power",
+        "stage4.compression",
+        "ruins.compass"
+      ]
+    },
+    "stage4.compression": {
+      "icon": "singulo:degenerate_compactor_controller",
+      "stage": 4,
+      "action": "guide.singulo.action.stage4.compression",
+      "blueprint": "degenerate_compactor"
+    },
+    "stage4.time": {
+      "icon": "singulo:time_crystal_incubator",
+      "stage": 4,
+      "action": "guide.singulo.action.stage4.time"
+    },
+    "stage4.power": {
+      "icon": "singulo:degenerate_furnace_controller",
+      "stage": 4,
+      "action": "guide.singulo.action.stage4.power",
+      "blueprint": "degenerate_furnace"
+    },
+    "stage5.flow": {
+      "icon": "singulo:singularity_core",
+      "stage": 5,
+      "links": [
+        "stage5.reactor",
+        "stage5.ignite",
+        "stage5.byproducts",
+        "genesis.build"
+      ]
+    },
+    "stage5.reactor": {
+      "icon": "singulo:reactor_core_controller",
+      "stage": 5,
+      "blueprint": "penrose_reactor"
+    },
+    "stage5.ignite": {
+      "icon": "singulo:singularity_seed",
+      "stage": 5,
+      "action": "guide.singulo.action.stage5.ignite"
+    },
+    "stage5.byproducts": {
+      "icon": "singulo:hawking_condensate",
+      "stage": 5,
+      "discoveries": [
+        "ignite",
+        "hawking",
+        "core"
+      ],
+      "action": "guide.singulo.action.stage5.byproducts"
+    },
+    "multiblocks.projector": {
+      "icon": "singulo:holo_projector"
+    },
+    "catalysts.tiers": {
+      "icon": "singulo:muon_catalyst",
+      "stage": 2
+    },
+    "catalysts.slots": {
+      "icon": "singulo:spent_muon_catalyst",
+      "stage": 2
+    },
+    "catalysts.time": {
+      "icon": "singulo:time_crystal_module",
+      "stage": 4
+    },
+    "power.cables": {
+      "icon": "singulo:copper_wire"
+    },
+    "power.sides": {
+      "icon": "singulo:multiblock_port"
+    },
+    "power.relocation": {
+      "icon": "singulo:relocation_wrench"
+    },
+    "power.wormhole": {
+      "icon": "singulo:wormhole_port",
+      "stage": 5
+    },
+    "power.capacity": {
+      "icon": "singulo:capacity_upgrade_1",
+      "stage": 2
+    },
+    "ruins.list": {
+      "icon": "singulo:explorer_compass",
+      "action": "guide.singulo.action.ruins.list"
+    },
+    "ruins.compass": {
+      "icon": "singulo:explorer_compass",
+      "discoveries": [
+        "ruin_observation",
+        "ruin_research",
+        "ruin_culture",
+        "ruin_final",
+        "item/explorer_compass"
+      ],
+      "action": "guide.singulo.action.ruins.compass"
+    },
+    "ruins.records": {
+      "icon": "singulo:crystal_memory",
+      "discoveries": [
+        "archive",
+        "records",
+        "item/crystal_memory"
+      ]
+    },
+    "androids.build": {
+      "icon": "singulo:android_station",
+      "discoveries": [
+        "android_station",
+        "android_memory",
+        "android_printed",
+        "android_work",
+        "item/android_station"
+      ]
+    },
+    "androids.first": {
+      "icon": "singulo:android_work_console",
+      "discoveries": [
+        "android_printed",
+        "android_work",
+        "android_rack",
+        "android_delivery",
+        "item/android_work_console"
+      ],
+      "rows": [
+        {
+          "title": "block.minecraft.crafting_table",
+          "inputs": [
+            {
+              "item": "minecraft:wheat",
+              "amount": "3"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "minecraft:bread",
+              "amount": "1"
+            }
+          ]
+        }
+      ]
+    },
+    "androids.patrol": {
+      "icon": "singulo:android_armor_plate",
+      "discoveries": [
+        "android_printed",
+        "android_routes",
+        "android_work"
+      ]
+    },
+    "androids.routes": {
+      "icon": "singulo:survey_glasses",
+      "discoveries": [
+        "android_printed",
+        "android_work",
+        "android_rack",
+        "android_delivery",
+        "item/android_work_console"
+      ]
+    },
+    "androids.care": {
+      "icon": "singulo:android_repair_kit",
+      "discoveries": [
+        "android_printed",
+        "android_charger",
+        "android_work"
+      ]
+    },
+    "androids.work": {
+      "icon": "singulo:android_recipe_rack",
+      "discoveries": [
+        "android_printed",
+        "android_work",
+        "android_rack",
+        "android_delivery",
+        "item/android_work_console"
+      ]
+    },
+    "androids.process": {
+      "icon": "singulo:android_mining_upgrade",
+      "discoveries": [
+        "android_printed",
+        "android_work",
+        "android_rack",
+        "android_delivery",
+        "item/android_work_console"
+      ]
+    },
+    "androids.farm": {
+      "icon": "singulo:android_farming_upgrade",
+      "discoveries": [
+        "android_printed",
+        "android_work",
+        "android_rack",
+        "android_delivery",
+        "item/android_work_console"
+      ]
+    },
+    "androids.trouble": {
+      "icon": "singulo:android_supply_port",
+      "discoveries": [
+        "android_printed",
+        "android_work",
+        "android_rack",
+        "android_delivery",
+        "item/android_work_console"
+      ]
+    },
+    "drones.start": {
+      "icon": "singulo:drone_station",
+      "stage": 2
+    },
+    "drones.send": {
+      "icon": "singulo:packing_crate",
+      "stage": 2
+    },
+    "drones.range": {
+      "icon": "singulo:drone_station",
+      "stage": 2
+    },
+    "drones.more": {
+      "icon": "singulo:drone_port",
+      "stage": 2
+    },
+    "drones.route": {
+      "icon": "singulo:drone_phase_upgrade",
+      "stage": 2
+    },
+    "drones.auto": {
+      "icon": "singulo:drone_port",
+      "stage": 2
+    },
+    "romance.shield": {
+      "icon": "singulo:shield_tower_core",
+      "stage": 5,
+      "blueprint": "event_horizon_shield"
+    },
+    "romance.tipler": {
+      "icon": "singulo:tipler_core",
+      "stage": 5,
+      "blueprint": "tipler_cylinder"
+    },
+    "romance.gear": {
+      "icon": "singulo:inertial_control_gauntlet",
+      "stage": 5
+    },
+    "romance.darkmatter": {
+      "icon": "singulo:gravitational_containment_tank",
+      "stage": 5
+    },
+    "genesis.build": {
+      "icon": "singulo:genesis_frame",
+      "discoveries": [
+        "genesis_formed",
+        "genesis_birth",
+        "item/genesis_core"
+      ],
+      "blueprint": "genesis_engine"
+    },
+    "genesis.birth": {
+      "icon": "singulo:genesis_core",
+      "discoveries": [
+        "genesis_formed",
+        "genesis_birth"
+      ]
+    },
+    "genesis.synth": {
+      "icon": "singulo:singularity_core",
+      "discoveries": [
+        "genesis_birth"
+      ]
+    },
+    "genesis.galaxies": {
+      "icon": "singulo:genesis_pylon",
+      "discoveries": [
+        "genesis_birth"
+      ]
+    },
+    "jet_forge.build": {
+      "icon": "singulo:jet_forge_core",
+      "discoveries": [
+        "jet_forge",
+        "collapsar",
+        "item/jet_forge_core"
+      ],
+      "blueprint": "accretion_jet_forge"
+    },
+    "jet_forge.run": {
+      "icon": "singulo:jet_forge_confinement_coil",
+      "discoveries": [
+        "jet_forge",
+        "collapsar",
+        "item/jet_forge_core"
+      ]
+    },
+    "jet_forge.ingot": {
+      "icon": "singulo:collapsar_ingot",
+      "discoveries": [
+        "jet_forge",
+        "collapsar",
+        "item/jet_forge_core"
+      ],
+      "rows": [
+        {
+          "title": "block.singulo.jet_forge_core",
+          "inputs": [
+            {
+              "item": "singulo:collapsar_billet",
+              "amount": "1"
+            },
+            {
+              "item": "singulo:mass_pellet",
+              "amount": "16"
+            },
+            {
+              "fluid": "singulo:liquid_helium",
+              "amount": "1,000 mB"
+            }
+          ],
+          "outputs": [
+            {
+              "item": "singulo:collapsar_ingot",
+              "amount": "1"
+            }
+          ]
+        }
+      ]
+    },
+    "hazards.list": {
+      "icon": "minecraft:tnt"
+    },
+    "factory_expansion.probes": {
+      "icon": "singulo:probe_station",
+      "stage": 4,
+      "discoveries": [
+        "probe",
+        "item/probe_station"
+      ]
+    },
+    "factory_expansion.limits": {
+      "icon": "singulo:mass_pellet",
+      "stage": 5
+    },
+    "cosmic.storage": {
+      "icon": "singulo:pasta_accumulator",
+      "stage": 5
+    },
+    "cosmic.production": {
+      "icon": "singulo:tidal_spindle",
+      "stage": 5,
+      "blueprint": "tidal_spindle"
+    },
+    "cosmic.links": {
+      "icon": "singulo:wormhole_seam_upgrade",
+      "stage": 5
+    },
+    "fluids.pipes": {
+      "icon": "singulo:fluid_pipe"
+    },
+    "fluids.drone": {
+      "icon": "singulo:fluid_canister",
+      "stage": 2
+    },
+    "collapsar.lining": {
+      "icon": "singulo:collapsar_lining",
+      "discoveries": [
+        "collapsar",
+        "item/collapsar_ingot"
+      ]
+    },
+    "collapsar.vault": {
+      "icon": "singulo:collapsar_ingot",
+      "discoveries": [
+        "collapsar",
+        "item/collapsar_ingot"
+      ]
+    },
+    "collapsar.wormhole": {
+      "icon": "singulo:wormhole_port",
+      "discoveries": [
+        "collapsar",
+        "item/collapsar_ingot"
+      ]
+    },
+    "food.printer": {
+      "icon": "singulo:food_printer",
+      "stage": 2
+    },
+    "cover.cover": {
+      "icon": "singulo:cover_frame"
+    }
+  }
 }

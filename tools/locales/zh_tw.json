@@ -4884,8 +4884,8 @@
     "translation": "收集 %s mB/秒 · 內部 %s mB"
   },
   "gui.singulo.handbook.done_count": {
-    "source": "Completed %s / %s",
-    "translation": "已完成 %1$s / %2$s"
+    "source": "Goals completed: %s",
+    "translation": "已達成目標：%s"
   },
   "gui.singulo.handbook.locked": {
     "source": "???",
@@ -6544,12 +6544,12 @@
     "translation": "仿生人"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top. Most android types cost 40,000 FE per print. A Factory Print Unit halves the printing cost for all types. If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: register at least one player on a Shield Permit and put it in the station. Only the owner and registered players can then open the station and android screens. Guards treat other Survival and Adventure players as intruders, and both sides can hurt each other. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky.",
-    "translation": "在仿生人組裝站放入小型水晶記憶體（決定型號，不會消耗）和仿生人套件（每次列印一個）並供電，它就會在上方列印一個護衛仿生人。大多數型號每次列印消耗 40,000 FE。安裝工廠式列印單元後，所有型號的列印耗電量都會減半。被擊倒後，只要還有套件就會重新列印。放置組裝站的人就是主人。\n- 護衛攻擊敵對生物，包括遺蹟的仿生人和警備無人機。它們不會攻擊首領。\n- 行動方式：迎擊（在組裝站旁等待）、徘徊（在 16 格內四處走動）、跟隨（跟著主人）、巡邏（巡視設定的地點）。跟隨時可以選擇「只跟隨」或「護衛」（與附近的敵人戰鬥）。\n- 許可證：在護盾通行證上登記至少一名玩家後，將其放入組裝站。此時只有主人和已登記的人能打開組裝站和仿生人的介面。護衛會將其他生存或冒險模式玩家視為入侵者，雙方都能傷到對方。也可以選擇跟隨主人還是某位已登記的人。\n- 返回生命：低於此值時，仿生人會回去維修並充電。按「召回」可立即讓它回去。（把游標移到上面會顯示目前生命和充電）。Shift+點擊「召回」可召回附近（64 格以內）你能操作的組裝站的所有仿生人。\n- 名字：在組裝站或仿生人介面中點擊名字即可改名（↺ 按鈕恢復暱稱）。\n- 比較器：組裝站會根據仿生人的生命輸出訊號（0〜15）。\n- 組裝站被破壞後，仿生人會留在原地。在新的組裝站放入相同型號的記憶體並按「連結」即可重新連接。\n- 日常生活：無事可做時，護衛會在組裝站附近休息。坐在樓梯、半磚或椅子上（夜裡會打盹），把手放在盆栽和作物上方，掃地，把掉在地上一段時間的物品收進附近的箱子，和同伴聊天，下雨時躲到屋簷下（拿著傘就留在外面），眺望夕陽或夜空。"
+    "source": "Place your Compact Crystal Memory and a kit in their station slots, then connect power. Each print uses one kit. You can reuse the memory.\nOpen the station to recall your android or set the health threshold for returning to recharge and repair.",
+    "translation": "把手上的小型水晶記憶體和套件放入組裝站的專用槽並接電。每次消耗一個套件，記憶體可重複使用。\n在組裝站介面可召回仿生人，也可設定返回充電維修的生命值門檻。"
   },
   "guide.singulo.androids.build.title": {
-    "source": "Your own androids",
-    "translation": "自己的仿生人"
+    "source": "Using your station",
+    "translation": "使用組裝站"
   },
   "guide.singulo.androids.care.body": {
     "source": "- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). With the station far away and no charger, it uses solar power or sits down. When it has nothing to do and is within 24 blocks of its station, it goes back on its own to top up whenever its charge is not full.\n- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on the chest and left shoulder.\n- Kits in the station's refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android's inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.",
@@ -6558,14 +6558,6 @@
   "guide.singulo.androids.care.title": {
     "source": "Charging, repair and gear",
     "translation": "充電、修理與裝備"
-  },
-  "guide.singulo.androids.decor.body": {
-    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret, headdress or glasses\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
-    "translation": "在仿生人介面中用名字左邊的按鈕切換頁面，第 3 頁是「裝飾」頁。可在頭部、背部/腰部、手部的欄位裝上裝飾。不影響戰鬥和作業。全部在工作台製作，可與染料一起在工作台染色（與皮革盔甲相同）。\n・頭部：緞帶、髮飾、貝雷帽、頭飾、眼鏡\n・背部/腰部：披風、圍巾、腰部緞帶（披風和圍巾的末端行走時會飄動）\n・手部：文庫本、花束、茶杯、傘（僅在待機時拿著。戰鬥、作業、充電時會收起）"
-  },
-  "guide.singulo.androids.decor.title": {
-    "source": "Android decorations",
-    "translation": "仿生人的裝飾"
   },
   "guide.singulo.androids.farm.body": {
     "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Farm (tills soil and plants seeds, or gives bone meal to growing crops; needs a Farming Upgrade), Fish (fishes in an area of water; needs a Fishing Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- For a crafting table recipe that returns an empty bucket, record the filled bucket. For each filled bucket missing from stock, the android can use 1,000 mB of the matching fluid from a tank. Each physical bucket used returns one empty bucket.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
@@ -6583,25 +6575,9 @@
     "source": "Your first work order",
     "translation": "第一次作業訂單"
   },
-  "guide.singulo.androids.gear.body": {
-    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Fishing Upgrade: lets the android fish. Takes Luck of the Sea and Lure.\n- Farming Upgrade: lets the android farm (till soil and plant seeds, or give bone meal).\n- Mining, Felling, Fishing and Farming Upgrades fit either of the two tool slots (one of each kind).\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
-    "translation": "- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外加上背包的格子。共 3 個等級：背包 12 格、強化背包 18 格、大型背包 24 格，每級都用低一級的背包製作。背包裡有物品時無法取下，但可以直接換成裝得下這些物品的更大背包。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 伐木升級：使仿生人能進行伐木作業（相當於鑽石斧）。可附上效率、幸運和絲綢之觸。\n- 釣魚升級：使仿生人能進行釣魚作業。可附上海洋的祝福和魚餌。\n- 農業升級：使仿生人能進行耕種作業（翻土並種下種子或樹苗、施骨粉）。\n- 採掘、伐木、釣魚和農業升級可以裝在兩個工具欄中的任意一個（同種工具只能裝一個）。\n- 儲罐升級：2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。腰部會出現儲罐。儲罐裡還有東西時無法取下。用桶等點擊介面中的儲罐可以取放，按住 Shift 點擊旁邊的 × 會倒掉內容物。\n- 氣體儲罐升級・氣體與液體升級（僅在安裝了 Mekanism 時）：可搬運 Mekanism 化學品（氣體、灌注物、顏料、漿液）的儲罐。氣體儲罐可裝 2 種化學品（各 32,000 mB），氣體與液體可裝液體和化學品各 2 種（各 16,000 mB）。腰部會出現氣瓶。用化學品儲罐等點擊介面中的儲罐可以取放。作業時，資材口旁的化學品儲罐會成為資材存放處，仿生人會把化學品運到裝置。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。\n- 整理・存放：背包欄右上角的按鈕可以整理攜帶物品和背包內的物品，或讓仿生人走去把它們放進附近的箱子（12 格以內的箱子、木桶、界伏盒、資材口）。"
-  },
-  "guide.singulo.androids.gear.title": {
-    "source": "Android upgrades",
-    "translation": "仿生人的升級"
-  },
-  "guide.singulo.androids.glass.body": {
-    "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
-    "translation": "- 仿生人阻隔玻璃（琥珀色）：只有仿生人無法通過，玩家和其他生物可以直接穿過。適合放在基地出入口。\n- 仿生人透過玻璃（水色）：只有仿生人可以通過，對其他一切都是實心玻璃。適合作為護衛的專用通道。\n仿生人在規劃路線時也會考慮這些玻璃：阻隔玻璃視為阻擋，透過玻璃視為通路。素面款與相同的玻璃相鄰時會無縫相連，四塊素面款可以做成花紋款。"
-  },
-  "guide.singulo.androids.glass.title": {
-    "source": "Android glass",
-    "translation": "仿生人用玻璃"
-  },
   "guide.singulo.androids.patrol.body": {
-    "source": "Set the station's mode to Patrol and the androids walk a set route and keep watch.\n- Route: choosing Patrol shows eight slots. Put Work Location Cards in them and the androids visit those places from left to right, standing on top of each to look around. Choose whether they go back to the first point (Loop) or return the same way (Back & forth), whether they patrol only at night, and how long they stop at each point. Two androids start from opposite sides.\n- Fights: they fight enemies nearby and carry on from where they left off. When a fight starts, idle androids of the same station come to help (and go back afterwards).\n- Alarm: when they spot a group of enemies (5 or more) or a boss, the station gives a redstone signal for 5 seconds and the owner is told (at most once a minute).\n- Log: defeated enemies and alarms are kept on the Log page of the android screen, newest first (16 entries). Come back after a while and the android tells you what happened while you were away.",
-    "translation": "把組裝站的行動方式設為「巡邏」後，仿生人會按順序巡視設定的地點並警戒。\n・巡邏路線：選擇「巡邏」後會出現 8 個欄位，放入作業位置卡後，會從左到右依次巡視這些地點，站在卡片記錄的地點上方環顧四周。可以選擇到達最後後回到第一個地點（循環）還是沿原路返回（往返）、是否只在夜間巡邏，以及在每個地點停留的時間。兩個仿生人會從相反的方向開始巡視。\n・戰鬥：與附近的敵人戰鬥，解決後從離開的地方繼續。開始戰鬥時會呼叫同一組裝站空閒的同伴（解決後回到原來的崗位）。\n・警報：發現敵人群體（5 個以上）或首領時，組裝站會發出 5 秒紅石訊號並通知主人（每分鐘最多 1 次）。\n・記錄：擊倒的敵人和警報會按從新到舊的順序記在仿生人介面的「記錄」頁（16 條）。隔一段時間再走近時，它會告訴你不在時發生的事。"
+    "source": "Select Patrol at the station. Put Work Location Cards in the patrol slots from left to right in the order you want them visited.\nChoose a loop or a return trip. If a stop is skipped, check the recorded position and the walking route to it.",
+    "translation": "在組裝站選擇巡邏，把工作位置卡按巡邏順序從左至右放入槽中。\n可選擇循環或往返。若沒有經過某處，檢查卡上記錄的位置和可通行的路線。"
   },
   "guide.singulo.androids.patrol.title": {
     "source": "Patrol",
@@ -6623,14 +6599,6 @@
     "source": "Routes and Survey Glasses",
     "translation": "路徑與測量眼鏡"
   },
-  "guide.singulo.androids.ruin.body": {
-    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and, half the time, a compact crystal memory of that design appears on the fabricator. Either way, the fabricator then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
-    "translation": "每座遺蹟的牆邊都有廢墟仿生人列印台。生存模式的玩家靠近時，它會在台面上從腳開始逐層列印出 2〜3 個對應型號（光刃型、鞭型或光劍型）的仿生人並讓其出動。全部擊敗後，台面上有一半的機率出現該型號的小型水晶記憶體。無論是否出現，列印台隨後都會休息一天。\n- 光刃型「露米娜」：蹲下、刀刃發亮後，會留下殘影衝來斬擊。單膝跪地手按地面時，腳下會出現預告圈並升起光柱（離開圈）。近身時會張開刀刃迴旋斬。\n- 鞭型「薇爾娜」：可達約 6 格的鞭擊，以及纏住並把你拉近的纏繞。在頭頂甩鞭後，會抽打地面放出一道直線衝擊波（跳起即可躲開）。\n- 光劍型「索蕾伊」：踏步突刺、揮動時劍刃伸長的橫斬，以及飛行的新月斬擊波。受擊時會在正面展開光盾（正面幾乎打不進去），繼續攻擊會被反擊。請從側面或背後進攻。\n地下仿生人研究所裡有列印台不會出現的試作機（由統籌 AI 呼叫）。\n- 斧型「阿爾瑪」：又硬又重。把斧頭往右拉之後是大範圍橫掃；舉過頭頂後會砸向地面，向前方放出一道直線衝擊波（跳起來就不會被打中）；壓低身體後會撲過來，落地時攻擊周圍。\n- 浮游砲型「諾克絲」：讓背上的浮游砲浮起來，從遠處用光線射擊（體力低於一半時增至 6 台）。她會試圖拉開距離，靠近時會用短劍連擊兩次再向後跳開。躲到牆後光線就打不到。\n仿生人依靠電量行動，大招用 10 次左右就會耗盡，眼睛的光會熄滅。它們會回到附近的列印台，或在白天露天處展開太陽能板，夜晚或室內則坐下充電（列印台 5 秒、太陽能 10 秒、坐下 14 秒）。充電時不會攻擊，正是進攻的時機。\n位元尖端出現光刃後，位元本身會衝向預先瞄準的位置。準備動作時向側面閃避；牆壁能擋住光束與突進。"
-  },
-  "guide.singulo.androids.ruin.title": {
-    "source": "Ruin androids",
-    "translation": "遺蹟的仿生人"
-  },
   "guide.singulo.androids.trouble.body": {
     "source": "When an android is stuck, you can see why in these places:\n- The status page of the android screen: the reason appears in red in the speech bubble.\n- Order details in the Work Console: it appears next to the assigned android's name.\n- With Survey Glasses on, a barrier icon floats over a stuck android's head.\nReasons and fixes:\n- The station is out of power: add generation or check the cable to the station.\n- Can't reach the destination: check that steps, doors or water don't cut the path, and that a route rule (no-go zone) doesn't block it.\n- Not enough materials in the stockpile: add materials to the chests beside the supply port or the console. Intermediate materials are crafted if there is a recipe.\n- A protected block: a shield or another mod's protection stops it. Check that the person who placed the order may break it.\n- Nothing to work on in the area: check the Work Location Card area. Waiting for crops to grow does not count as stuck (clock icon).\n- Storage is full: empty the delivery port or stockpile chests.\nWhen an order is cancelled, the console shows why (unreachable, recipe doesn't match, no progress for a long time, or the wrong input face).",
     "translation": "仿生人停下來時，可以在以下地方確認原因。\n・仿生人介面的狀態頁：對話氣泡中會用紅字顯示原因。\n・作業指令台的訂單詳情：顯示在負責的仿生人名字旁邊。\n・戴上測量眼鏡後，停下的仿生人頭上會出現禁止通行的標誌。\n原因與解決方法：\n・組裝站電力不足：增加發電，或檢查連到組裝站的線纜。\n・無法到達目的地：檢查道路是否被台階、門或水阻斷，以及路線規則（禁入區域）是否擋住了路。\n・資材存放處的材料不足：往資材口或指令台旁邊的箱子裡補充材料。中間材料只要有配方就會自己製作。\n・受保護的方塊：因護盾或其他模組的保護而無法破壞。確認下訂單的人是否有破壞的權限。\n・作業範圍內沒有對象：重新檢查作業位置卡的範圍。等待作物生長時不算停下（時鐘標誌）。\n・存放處已滿：清空交付口或資材存放處的箱子。\n訂單被取消時，指令台會顯示原因（無法到達、配方不符、長時間沒有進展、投入面不對）。"
@@ -6638,14 +6606,6 @@
   "guide.singulo.androids.trouble.title": {
     "source": "When an android stops",
     "translation": "停下來的時候"
-  },
-  "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.",
-    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 工廠式列印單元：裝在組裝站套件旁邊的槽中，列印所需的時間和電力減半，在組裝站上的修理速度變為 2 倍。用地下仿生人研究所中取得的精密致動器製作。"
-  },
-  "guide.singulo.androids.upgrades.title": {
-    "source": "Station upgrades",
-    "translation": "組裝站的升級"
   },
   "guide.singulo.androids.work.body": {
     "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n- Supply port priorities: right-click a supply port to register up to 8 items, each with a priority (1 goes first) for taking, returning or both. Registered items are taken from and returned to the highest-priority port first (the next one when it is full). Sneak-right-click shows the linked console.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
@@ -6658,14 +6618,6 @@
   "guide.singulo.catalysts": {
     "source": "Catalysts",
     "translation": "催化劑"
-  },
-  "guide.singulo.catalysts.keys.body": {
-    "source": "Higher-stage machines use one fresh catalyst of the previous stage when you build them (put it in the Precision Assembler's catalyst slot; a higher-tier catalyst uses less).\n- Stage 3 machines (Entanglement Synthesizer, Laser Cooler, Quantum Heat Engine and more): muon catalyst\n- Stage 4 machines (Time Crystal Incubator, Autonomous Probe Station, Void Collector, multiblock controllers and more): BE condensate catalyst\n- Stage 5 machines: time crystal catalyst (mostly as Time Crystal Modules)\nThe machines that make the next tier's catalyst also need a guardian's spoils: the Laser Cooler (BE condensate) needs a Sentinel Projection Core from the Echo Sentinel, the Time Crystal Incubator (time crystal) needs a Degenerate Nucleus from the Gravity Remnant, and the Singularity Core starts from the Dormant Singularity Seed.",
-    "translation": "更高階段的裝置在製作時，會消耗上一階段的催化劑新品 1 個的壽命（放進精密組裝台的催化劑槽；更高級的催化劑消耗更少）。\n- 第 3 階段的裝置（量子糾纏合成器、雷射冷卻器、量子熱機等）：緲子催化劑\n- 第 4 階段的裝置（時間晶體培育槽、自動探測站、虛空收集器、多方塊結構的控制器等）：玻色凝聚態催化劑\n- 第 5 階段的裝置：時間晶體催化劑（多以時間晶體模組的形式）\n製作下一級催化劑的裝置還需要守衛的戰利品：雷射冷卻器（玻色凝聚態）需要回聲守衛的守衛投影核心，時間晶體培育槽（時間晶體）需要重力殘渣的簡併核，奇點核心則從休眠奇點種子開始。"
-  },
-  "guide.singulo.catalysts.keys.title": {
-    "source": "Catalysts as machine keys",
-    "translation": "作為裝置鑰匙的催化劑"
   },
   "guide.singulo.catalysts.slots.body": {
     "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe gauge below the slot shows the remaining life of the loaded catalyst. When it runs out, the machine loads the next catalyst from the reserve. Collect spent catalysts from the Spent slot on the Precision Assembler, the output slot on other processing machines, or the left exit on catalyst devices. The Precision Assembler waits if its spent catalyst will not fit.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
@@ -6696,16 +6648,16 @@
     "translation": "創世爐"
   },
   "guide.singulo.genesis.birth.body": {
-    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes of active progress (it pauses while the feed is stopped or power runs short, so expect a little longer). Now and then a surge alarm sounds: stop the feed while it lasts (the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Upkeep still drains the buffer and events still happen while stopped. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nUse the core empty-handed to open its screen: stage, progress, instability and input.",
-    "translation": "1. 種火：注入 1.5 TFE（每 tick 最多 1 GFE）。彭羅斯反應爐全力運轉約需一分多鐘。\n2. 穩定化：維持 100 MFE/t，實際推進約 4 分鐘（停止投料或電力不足時不會推進，所以實際會稍久一些）。期間會不時響起「失控徵兆」警報，警報持續時請停止投料（空手對核心使用開啟介面並按下開關，或對核心給予紅石訊號）。若持續投料，不穩定度會急遽上升，到達 100% 時即將誕生的宇宙會崩塌，進度倒退。停止投料期間，儲能仍會被維持電力消耗，事件也照樣發生。也要留意重力外洩、記錄的殘響與引力之波。在護盾範圍內，失控與事件會減弱；在蒂普勒圓柱的加速場內，進度會加快。\n3. 誕生：光墜向一點，宇宙隨之誕生。誕生的銀河會升上主世界的夜空。\n空手對核心使用會開啟介面，可查看階段、進度、不穩定度與受電。"
+    "source": "When the alarm sounds, pause the feed with the core’s switch or a redstone signal. Resume once the alarm clears.\nUpkeep still draws power while paused. Check stored energy as well as progress.",
+    "translation": "警報響起時，用核心介面的開關或紅石訊號暫停輸入。警報解除後再恢復。\n暫停時仍會消耗維持電力，請分別留意進度與儲能。"
   },
   "guide.singulo.genesis.birth.title": {
-    "source": "Birth of a universe",
-    "translation": "宇宙的誕生"
+    "source": "Power during stabilization",
+    "translation": "穩定期間的供電"
   },
   "guide.singulo.genesis.build.body": {
-    "source": "The old civilization fell trying to turn all mass into energy. The Genesis Engine does the reverse.\n- Eight Genesis Frames level with the core: three blocks out on each axis, and two-and-two on each diagonal.\n- Three Genesis Pylons stacked on each of the four diagonal frames (twelve in all).\nThe core chimes when formed. Use a Primordial Seed on it to begin. Power enters from any side.",
-    "translation": "舊文明試圖將「所有質量化為能量」而走向滅亡。創世爐正好相反，是以能量孕育宇宙的爐。\n- 在核心周圍同一高度放置 8 個創世爐框架：十字方向距核心 3 格處 4 個，斜向 2 格 × 2 格處 4 個。\n- 在 4 個斜向框架上各疊 3 層創世爐支柱（共 12 根）。\n成形時核心會發出聲響。對核心使用原初之種即可開始（需要漩渦斷章）。電力可從任何一面輸入。"
+    "source": "Place the frames level with the core and stack pylons on the diagonal frames. Compare their heights in the layer view.\nOnce the structure forms, use the core with an empty hand to check power and progress.",
+    "translation": "框架與核心放在同一層，柱子堆疊在對角線上的框架上。可用分層圖核對高度。\n結構成形後，空手使用核心可查看受電和進度。"
   },
   "guide.singulo.genesis.build.title": {
     "source": "Building the Genesis Engine",
@@ -6724,8 +6676,8 @@
     "translation": "危險"
   },
   "guide.singulo.hazards.list.body": {
-    "source": "- The reactor's tidal zone (radius 4) deals damage that ignores armour.\n- A broken hydrogen container causes a small explosion near fire.\n- A large particle accelerator may occasionally leak a strangelet, which turns one nearby block per second into strange matter (it stops at radius 8 or 512 blocks and does not spread inside a shield). Contain and collect it with a Magnetic Bottle.",
-    "translation": "- 反應爐的潮汐區（半徑 4）造成的傷害會無視護甲。\n- 氫氣容器損壞時，若靠近火源會發生小型爆炸。\n- 大規模運轉的粒子加速器偶爾會洩漏奇異子，每秒把附近 1 個方塊轉化為奇異夸克物質方塊（到半徑 8 或 512 個方塊為止，不會擴散進護盾內）。可用磁瓶將其封存並回收。"
+    "source": "Keep hydrogen lines and containers away from open flames. Leave space around new machinery and watch the controller for warnings during the first run.",
+    "translation": "氫氣管線和容器要遠離火源。初次試機時，給設備四周留出空間，留意控制介面的警報。"
   },
   "guide.singulo.hazards.list.title": {
     "source": "Hazards",
@@ -6736,32 +6688,24 @@
     "translation": "入門"
   },
   "guide.singulo.intro.basics.body": {
-    "source": "Power (FE) travels through Singulo cables, and fluids and gases through Fluid Pipes. Pipes connect on their own, send machine outputs to the machines and tanks that use them, and draw from adjacent water and lava sources. A machine's Sides settings decide which faces take part. You can also right-click machines with a Fluid Canister (1,000 mB) to carry fluids by hand. Items use per-side settings and hoppers.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
-    "translation": "電力（FE）透過 Singulo 內建的線纜傳輸，液體和氣體透過流體管道傳輸。管道放置後自動連接，把機器的產物送往需要它的機器和儲罐，也會從相鄰的水源和熔岩源抽取。機器的「面」設定決定哪些面參與輸送。也可以拿著流體罐（1,000 mB）右鍵機器手動搬運。物品透過各個面的設定和漏斗等傳輸。\n從第 2 階段開始會用到催化劑：有壽命的消耗品，放在專用的催化劑槽中。等級比裝置高一級時速度較快；低一級時速度較慢且消耗較快；低兩級則無法使用。\n古代廢墟中保存著無法製作的記錄與零件。及早開始尋找地表觀測站吧。"
+    "source": "Connect the generator and machine with copper wire. Use fluid pipes for liquids and gases.\nIf nothing moves, check Sides on both machines. Set the sending face to output and the receiving face to input.",
+    "translation": "用銅導線連接發電機和加工設備，液體與氣體則用流體管道輸送。\n若沒有流動，在兩端的面設定中確認發送面允許輸出，接收面允許輸入。"
   },
   "guide.singulo.intro.basics.title": {
-    "source": "Power, catalysts and ruins",
-    "translation": "電力、催化劑與廢墟"
+    "source": "Wiring and piping",
+    "translation": "初次接線與配管"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it). Type in the search box above the chapter list to find matching pages.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
-    "translation": "- 選擇左側的章節，右側會顯示頁面。用下方的箭頭翻頁。\n- 「進度」章節會顯示已達成與下一個目標（與進度畫面〔L 鍵〕的 Singulo 分頁相同）。\n- 將滑鼠移到物品上可查看說明；按住 Shift 可查看製作方式與用途。\n- 把游標移到 Singulo 的物品上並按 H 鍵，會打開介紹該物品的頁面（手持時也可以）。在章節列表上方的搜尋框輸入文字，可以查找相關頁面。\n- 對多方塊結構的控制器使用全像投影器，正確的形狀會以半透明方式浮現。\n進度按工業、探索與機器人分支展示；連線用於引導，不是額外的解鎖條件。"
+    "source": "Pick a chapter and then an icon. The top-right button opens its contents. Hover over a diagram to identify a material.\nHover over an item and press H to look it up in the pages available to you. You can also search for a machine or an operation.",
+    "translation": "先選章節，再點圖示。右上角可開啟目錄。將游標移到圖中的材料上可查看名稱。\n指向物品按 H 可從已開放的頁面查找說明，也可以搜尋機器或操作名稱。"
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",
     "translation": "本手冊的使用方式"
   },
-  "guide.singulo.intro.vanilla.body": {
-    "source": "Machines can make these vanilla materials, so you can skip some hunting and travel.\n- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, 4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust (instead of coal). Iron and gold tools and armor to nuggets (about two thirds of the ingots).\n- Kiln (stage 1): unfired phosphor (zinc dust + copper + gunpowder) to 4 glowstone dust.\n- Peltier Cooler (stage 1): water to ice.\n- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian. Cryo-milling turns a bone into 6 bone meal, a blaze rod into 4 powder and wool into 4 string.\n- Catalytic Reactor (stage 2): sand + water to nether quartz.\n- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.",
-    "translation": "這些原版材料可以用裝置製作，省去一些狩獵和遠行。\n・壓縮機（第 1 階段）：鵝卵石→礫石→沙，砂岩→沙×2。雪塊×4→冰，冰×4→冰塊，冰塊×4→藍冰。方解石→石灰粉（代替骨粉），木炭×3→碳粉×2（代替煤炭）。鐵和金的工具、盔甲→粒（約為錠的三分之二）。\n・燒製爐（第 1 階段）：未燒製螢光體（鋅粉＋銅＋火藥）→螢石粉×4。\n・珀耳帖冷卻器（第 1 階段）：水→冰。\n・極低溫冷卻塔（第 2 階段）：水＋液態氮→冰塊，熔岩＋液態氮→黑曜石。冷凍粉碎：骨頭→骨粉×6，烈焰桿→烈焰粉×4，羊毛→線×4。\n・催化反應器（第 2 階段）：沙＋水→地獄石英。\n・量子糾纏合成器（第 3 階段）：量子糾纏元件＋史萊姆球→終界珍珠。\n・粒子加速器（第 3 階段）：鉍錠＋碳粉→金錠。\n・簡併壓縮爐（第 4 階段）：煤炭方塊×8→鑽石。\n・時間晶體培育槽（第 4 階段）：原木→煤炭，鵝卵石→青苔鵝卵石，銅方塊→氧化銅方塊。"
-  },
-  "guide.singulo.intro.vanilla.title": {
-    "source": "Vanilla materials from machines",
-    "translation": "用裝置製作的原版材料"
-  },
   "guide.singulo.intro.welcome.body": {
-    "source": "Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, build up cryogenic, quantum and temporal technology stage by stage, and finally generate power from a spinning black hole (the P-Reactor).\nThere are five stages. Each has a goal machine and a key material that opens the next stage. Read from \"Stage 1\" on the left to know what to build next.",
-    "translation": "Singulo 是一個「從質量中提取能量」的科技模組。從熱電發電起步，逐步累積低溫、量子與時間技術，最後以旋轉的黑洞（彭羅斯反應爐）發電。\n共有五個階段。每個階段都有目標裝置，以及通往下一階段的關鍵材料。從左側的「第 1 階段」開始依序閱讀，就能知道接下來該建造什麼。"
+    "source": "Try turning a difference in temperature into power. When a machine gives you trouble, open this book. More topics appear as you gain experience.",
+    "translation": "先試試利用溫差發電。機器停止運轉時，可以翻開這本書。隨著進展，會有更多條目可讀。"
   },
   "guide.singulo.intro.welcome.title": {
     "source": "Welcome to Singulo",
@@ -6772,8 +6716,8 @@
     "translation": "吸積噴流鍛造爐"
   },
   "guide.singulo.jet_forge.build.body": {
-    "source": "The P-Reactor makes power and the Genesis Engine makes matter; the Accretion Jet Forge reworks existing materials with huge amounts of power. It is a long facility, 44 long, 16 high and 15 deep, supported by the Holo Projector and the builder wand.\n- Exhaust side (left end): a heat-sink cup that catches the opposite jet.\n- Core: a vertical accretion disk and black hole float between two Confinement Coils (radius-7 rings). The eight 45° points of the coils are Reactor Stabilizer Coils, the same part as the P-Reactor. A chamfered plinth lies under the core, and the controller is set into the middle of its front edge.\n- Collimators: three rings of radius 5, 4 and 3 squeeze the jet into a thin white beam.\n- Irradiation chamber: the material floats in the middle of a square frame, with the Levitator above and the Collector below. A heat-sink plate behind it stops the beam.\nKeep the beam path along the axis and the space around the core clear. Any foundation block can be swapped for a multiblock port.",
-    "translation": "彭羅斯反應爐產生電力，創世爐產生物質；吸積噴流鍛造爐則是用巨大的電力重新鍛造現有材料的設施。它是長 44、高 16、深 15 的橫向長形設施，支援全像投影器與建造者魔杖。\n- 排熱側（左端）：吸熱板的杯體，承接另一側的噴流。\n- 爐心：直立的吸積盤與黑洞懸浮在兩個約束線圈（半徑 7 的環）之間。約束線圈斜 45° 的 8 處是與彭羅斯反應爐相同的爐心穩定線圈。爐心下方是切角的台座，控制核嵌在台座前緣的中央。\n- 聚束環：半徑為 5、4、3 的三個環把噴流收束成細而白的光束。\n- 照射室：材料懸浮在方形框架的中央，上方是懸浮器，下方是回收口。後方的吸熱板擋住光束。\n請保持沿軸線的光束路徑與爐心周圍的空間淨空。任何基座都可以換成多方塊輸入輸出埠。"
+    "source": "Project the structure from its controller to position the base and rings. Keep the beam path and the space around the core clear.\nFor material and coolant transfer, replace foundation blocks with multiblock ports.",
+    "translation": "用控制器的投影定位底座與圓環，留出光束路徑和爐心周圍的空間。\n可用輸入輸出端口替換底座的基礎方塊來輸送材料與冷媒。"
   },
   "guide.singulo.jet_forge.build.title": {
     "source": "Building the forge",
@@ -6788,8 +6732,8 @@
     "translation": "塌縮星錠"
   },
   "guide.singulo.jet_forge.run.body": {
-    "source": "First form the core black hole. As with the P-Reactor, insert a Singularity Seed (or a Singularity Core) into the controller, press Ignite on its screen and pour in 25 GFE within the ignition window (10 s by default): light flows from the eight Reactor Stabilizer Coils into the seed, a ball of light swells and collapses into a black hole (the seed is used up; if time runs out, the seed stays). The black hole pulls in its surroundings and swallows anything that touches the horizon. If the controller is broken, it stays bound in the core as a rogue black hole and is taken back in when you rebuild.\nWhen the materials (1 Collapsar Billet and 16 Mass Pellets) and coolant (1,000 mB of liquid helium) are present, the output has room and one tick of power is stored, the forge takes all the materials and begins.\n1. Warning: beacons spin, a force field closes around the chamber and the material rises.\n2. Ignition and focusing: the disk brightens, jets erupt from both poles and are squeezed tighter as each ring engages.\n3. Irradiation: 250 MFE/t for 60 s (about 300 GFE). The material glows red, cracks and throws off shards and rings of light.\n4. Finish and cooling: after a flash and a shockwave, the cooled ingot descends into the Collector.\nBesides piping it in, you can put liquid helium in Liquid Helium Cartridges (filled from empty coolant cartridges in a cooling tower) or fluid canisters and place them in the material slots; they are poured in and the empties go to the bottom-right slot. Drones can carry them too.\nInput is at most 1 GFE per tick, with a buffer of four times that. If power runs short, the structure breaks, part of the facility is unloaded or the output is full, it pauses where it is (no materials or progress are lost). A redstone signal on the controller stops new runs from starting. Anything in the path of the jets and beam takes heavy damage that ignores armour (the irradiating beam is lethal). The flash and screen shake can be reduced in the client config.",
-    "translation": "首先在爐心形成黑洞。與彭羅斯反應爐相同，向控制核放入奇點種子（也可以用奇點核心），在介面上按下「點火」，並在點火時限（預設 10 秒）內注入 25 GFE：光從 8 個爐心穩定線圈流入種子，光球膨脹後塌縮成一點，形成黑洞（種子會被消耗；逾時則種子保留）。黑洞會吸引周圍的東西，吞噬觸及視界的一切。即使控制核被破壞，黑洞也會被束縛在爐心，成為遊蕩黑洞留下，重新建造後會被吸收。\n當材料（塌縮星坯料 1 個、質量顆粒 16 個）與冷卻劑（液態氦 1,000 mB）齊備、成品有空位且儲存了 1 tick 的電力時，鍛造爐會先取出全部材料再開始。\n1. 預警：警示燈旋轉，照射室周圍展開力場，材料浮起。\n2. 點火與收束：吸積盤變亮，噴流從兩極噴出，每個環接入時都會收得更緊。\n3. 照射：60 秒內 250 MFE/t（約 300 GFE）。材料發紅、出現裂紋，並迸出碎片與光環。\n4. 收尾與冷卻：閃光與衝擊波之後，冷卻的錠降入回收口。\n液態氦除了用管線輸入外，也可以裝入液態氦冷媒罐（在冷卻塔中填充空冷媒罐）或流體罐，放進材料欄即可注入（空容器會放到右下的欄位）。無人機也能運送。\n每 tick 最多輸入 1 GFE，儲存上限為其 4 倍。電力不足、結構損壞、設施部分未載入或成品已滿時，會原地暫停等待（不會遺失材料或進度）。向控制核輸入紅石訊號後，不會開始下一次加工。進入噴流與光束的路徑會受到無視護甲的巨大傷害（照射中的光束是致命的）。閃光與畫面晃動可以在用戶端設定中減弱。"
+    "source": "Check the required power on the controller before ignition. A forging batch needs materials, coolant and a free product slot.\nIf power runs short, check stored energy and the delivery route before restoring the supply.",
+    "translation": "點火前在控制介面確認所需電力。鍛造需要材料、冷媒和空的成品槽。\n中途缺電時，先檢查儲能和輸電路線再恢復供電。"
   },
   "guide.singulo.jet_forge.run.title": {
     "source": "How forging works",
@@ -6799,17 +6743,9 @@
     "source": "Multiblocks",
     "translation": "多方塊結構"
   },
-  "guide.singulo.multiblocks.list.body": {
-    "source": "- Cryogenic Cooling Tower (5×5, 7–15 high): cooling_tower\n- Particle Accelerator (ring 8–32 wide): particle_accelerator\n- Degenerate Compactor (5×5×5): degenerate_compactor\n- C-Cavity (5×5×5): casimir_cavity\n- Degenerate Furnace (5×5×7): degenerate_furnace\n- P-Reactor (13×13×13): penrose_reactor\n- Event Horizon Shield Tower (5×5, 9 high): event_horizon_shield\n- T-Cylinder (5×5×9): tipler_cylinder\n- Wormhole Generator (5×5×5 sphere): wormhole_generator",
-    "translation": "- 低溫冷卻塔（5×5，高 7–15）：cooling_tower\n- 粒子加速器（環邊長 8–32）：particle_accelerator\n- 簡併壓縮爐（5×5×5）：degenerate_compactor\n- 卡西米爾腔（5×5×5）：casimir_cavity\n- 簡併熱爐（5×5×7）：degenerate_furnace\n- 彭羅斯反應爐（13×13×13）：penrose_reactor\n- 事件視界護盾塔（5×5，高 9）：event_horizon_shield\n- 蒂普勒圓柱（5×5×9）：tipler_cylinder\n- 蟲洞產生器（5×5×5 球體）：wormhole_generator"
-  },
-  "guide.singulo.multiblocks.list.title": {
-    "source": "Multiblock list",
-    "translation": "多方塊結構列表"
-  },
   "guide.singulo.multiblocks.projector.body": {
-    "source": "1. Place the controller (its front faces you and the structure extends behind it).\n2. Right-click the controller with the Holo Projector. The correct shape is projected, and the required and missing counts appear in chat.\n3. Place the shown blocks in the cyan boxes and remove the blocks in the red ones. When everything is in place the projection disappears, light runs along the seams and the machine starts.\n4. For machines with a choice of size (the cooling tower and the accelerator), sneak-use the projector to switch sizes.\nIn creative mode, /singulo build <name> [size] builds it in one go.",
-    "translation": "1. 放置控制器（正面朝向自己，結構往其後方延伸）。\n2. 用全像投影器右鍵控制器，正確的形狀會投影出來，所需數量與缺少的數量會顯示在聊天欄。\n3. 在青色框中放入所示方塊，移除紅色框中的方塊。全部就位後投影消失，接縫處閃過光芒，裝置啟動。\n4. 可選尺寸的裝置（冷卻塔、加速器）潛行使用投影器即可切換尺寸。\n創造模式下可用 /singulo build <名稱> [尺寸] 一次建成。"
+    "source": "Place the controller and use a Holo Projector on it. Fill cyan outlines with the indicated blocks and clear red outlines. Chat shows the required and missing quantities.\nFor a variable-size machine, sneak-use the projector to change the size of the preview.",
+    "translation": "放好控制器，對其使用全像投影器。淺藍框內放入範例方塊，紅框處留空。聊天欄會顯示需求量和缺少量。\n支援多種尺寸的設備，可潛行使用投影器切換預覽大小。"
   },
   "guide.singulo.multiblocks.projector.title": {
     "source": "Using the Holo Projector",
@@ -6820,24 +6756,24 @@
     "translation": "電力與物流"
   },
   "guide.singulo.power.cables.body": {
-    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. Transfers sharing a cable share its per-tick capacity.\nSources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.",
-    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。每條路徑的傳輸量由該路徑中容量最低的線纜決定，不受其他分支的限制。經過同一線纜的多次傳輸共用每刻容量。\n依線纜路徑到受電裝置的距離，優先使用較近的電源，不足部分由較遠的電源補充。距離相同時依固定座標順序處理。近處電源已空或其路徑容量不足時，也會由其他電源補足。切斷線纜後，該線路的發光會立即消失。"
+    "source": "Wire the generator to the machine. Machines on the same cable share its transfer capacity each tick.\nIf a machine stalls while the battery is charged, follow the line from the source and check for low-capacity sections.",
+    "translation": "用銅導線連接發電機與設備。共用一段線纜的設備也共享其每刻的輸電能力。\n電池有電而機器停轉時，從電源沿線檢查容量較小的區段。"
   },
   "guide.singulo.power.cables.title": {
     "source": "Cables",
     "translation": "電纜"
   },
   "guide.singulo.power.relocation.body": {
-    "source": "Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\nFor multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.\nSneak-use the wrench in the air to switch to cable and pipe removal. Use it on a cable or fluid pipe to collect one, or sneak-use it to collect up to 64 connected pieces of the same kind. Left-click to break one instantly.",
-    "translation": "用3個鋼錠、2個銅錠與1個基礎電路製作移設扳手。潛行使用可回收加工裝置、一般發電機、SMES及觸媒裝置，並在重新放置時恢復物品、流體、電力、進度與面設定。背包已滿時會掉落1個已打包的裝置。\n多方塊結構只回收控制器，周圍部件留在原處；移設後需重新組裝。彭羅斯反應爐、蟲洞裝置及仿生人設施等不在支援範圍內。\n對空潛行右鍵可切換到拆除線纜和管道模式。右鍵一根線纜或流體管道可回收一根，潛行右鍵可回收相連的同種線纜或管道，最多 64 根。左鍵可立即破壞。"
+    "source": "Sneak-use a Relocation Wrench on a supported machine to pack its contents and side settings with it. Move the surrounding multiblock parts separately.\nSneak-use the wrench in the air to switch to cable and pipe removal.",
+    "translation": "用移設扳手潛行右擊支援的機器，可連同內容物與面設定一起收起。多方塊結構的外圍部件需另行搬運。\n在空中潛行使用扳手可切換至線纜與管道拆除模式。"
   },
   "guide.singulo.power.relocation.title": {
     "source": "Relocation Wrench",
     "translation": "移設扳手"
   },
   "guide.singulo.power.sides.body": {
-    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. The master auto-eject switch defaults off; turn it on to push through output-capable faces with auto-eject enabled. Hover a face to see its adjacent block. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
-    "translation": "使用一般加工機器畫面中的「面設定」按鈕，可將每個面設為停用／輸入／輸出／輸入輸出，並可開啟自動排出。多方塊結構使用指定的輸入輸出埠；彭羅斯反應爐使用提取埠。輸出兩種氣體的裝置（如電解槽）可為每種氣體分別設定輸出面。電源按鈕可讓裝置停止；能只靠電力製造產物的裝置有開關，可跳過這些配方。 自動排出的總開關預設關閉；開啟後，會從允許自動排出的輸出面向相鄰方塊搬出。將滑鼠停在一個面上可查看相鄰方塊的名稱。"
+    "source": "Open Sides and set the sending face to output and the receiving face to input. Hover over a face to identify its neighbour.\nFor automatic transfer, enable auto-eject on the output face and on the machine. An electrolyzer can send each gas through a different face.",
+    "translation": "在面設定中把發送面設為輸出、接收面設為輸入。指向某一面可查看相鄰方塊。\n自動輸送需要同時開啟輸出面和整台設備的自動排出。電解槽可為每種氣體分別選擇輸出面。"
   },
   "guide.singulo.power.sides.title": {
     "source": "Side configuration",
@@ -6888,104 +6824,48 @@
     "translation": "蒂普勒圓柱"
   },
   "guide.singulo.ruins": {
-    "source": "Ruins",
-    "translation": "廢墟"
-  },
-  "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility, Underground Android Laboratory, Final Lab and Sunken Reactor Sector stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakened Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
-    "translation": "研究棟、封閉培養設施、地下仿生人研究所、最終實驗室和沉沒的爐心區的保管庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間後，守衛仍會停留 3 分鐘（讓倒下的人回來取裝備），之後若無人返回才會復原。開啟伺服器設定 bossHardMode 後，守衛會變得更強。擊敗後的掉落物會出現在地板上的守衛封印核心（視界守衛為封印控制台）上方，經驗則由房間內的挑戰者平分並直接獲得（經驗修補依然有效）。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封閉培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。重力井在拉扯之後會蓄力（有光和聲音預兆），把附近的對手彈飛，然後漂移到房間的其他位置。掉落簡併核。\n- 視界守衛（最終實驗室）：觸碰中央的封印控制台即可喚醒。最後形態在你腳下展開的奇點會先預警 1 秒再開始牽引，請立刻離開。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。"
-  },
-  "guide.singulo.ruins.bosses.title": {
-    "source": "Ruin guardians",
-    "translation": "廢墟的守衛"
+    "source": "Field Notes",
+    "translation": "野外手記"
   },
   "guide.singulo.ruins.compass.body": {
-    "source": "At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Tuning at the Research Building also unlocks the Underground Android Laboratory. Select it to find the main shaft at the surface.",
-    "translation": "羅盤起初只能搜尋地表觀測站。潛行右鍵你已攻略的廢墟的廢墟保管庫，即可調校以搜尋下一處：研究棟，然後是封閉培養設施，再是最終實驗室，最後是沉沒的爐心區。在研究棟調校後也能搜尋地下仿生人研究所。選中研究所時，指針指向通往地表的主豎井。"
+    "source": "Take the compass back to a cache you have personally opened and sneak-use it on the cache.\nAfter tuning, sneak-use the compass in the air to switch targets. Use it again to take a new bearing.",
+    "translation": "帶指南針回到自己打開過的儲藏箱，潛行並對箱子使用指南針。\n調校後，在空中潛行使用可切換目標。選好後再次使用以確定方向。"
   },
   "guide.singulo.ruins.compass.title": {
-    "source": "Tuning the Explorer Compass",
-    "translation": "調校探索羅盤"
-  },
-  "guide.singulo.ruins.foundry.body": {
-    "source": "- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press (step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each challenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "- 統籌 AI「鑄造廠」（地下仿生人研究所的 AI 中樞）：漂浮在中樞中央的機械大腦，自己不會移動，而是用設施的設備戰鬥。牆邊的 4 條生產線運轉期間，攻擊很難奏效（每條 2 成），請先打壞它們。生產線還會不時送出量產型仿生人。地上出現紅色標記是機械臂（標記會追一會兒，停下後才降下來；被抓住會被丟出去），陰影圓圈是沖壓機（馬上離開），地上的扇形標記是焊接雷射（貼地的光線會轉過來，跳過去）。地上的輸送帶會把人運走，框上的燈變紅後會反轉方向。體力低於一半時會呼叫 2 台試作機（斧型、浮游砲型），機械臂變成 2 條。掉落精密致動器，並為每位挑戰者掉落一個試作機的小型水晶記憶體（優先掉落尚未擁有的型號）。用覺醒製造核再戰時，進入全力狀態會重新列印被破壞的生產線。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
-  },
-  "guide.singulo.ruins.foundry.title": {
-    "source": "The Foundry and awakened guardians",
-    "translation": "統括AI與覺醒的守衛"
-  },
-  "guide.singulo.ruins.gathering.body": {
-    "source": "- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. Clusters slowly regrow, but only on crust still in its crater. Each meteorite has one meteorite core at its heart; mine it for raw meteoric iron and stardust together. The Meteor Compass points to the nearest core not yet mined.\n- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.",
-    "translation": "- 隕石坑（平原、沙漠、森林等地表生態域）：直徑約 10 格的淺碗狀坑，中心有半埋的隕石。用鐵鎬或更好的鎬開採隕鐵塊得到粗隕鐵，從黑色熔殼上長出的星塵晶簇得到星塵。星塵晶簇會慢慢重新長出，但只限於原本就在隕石坑裡的熔殼。每塊隕石的中心埋著一個隕石核心，開採後可同時得到粗隕鐵和星塵。隕石羅盤會指向最近的尚未開採的核心。\n- 閃電熔岩：閃電擊中沙子會把沙子變成閃電熔岩塊。把避雷針立在沙子上，每逢雷雨就會在避雷針下方形成。有了第 3 階段的克勞諾斯放電塔，可以隨時用電力向避雷針發射人工閃電。\n- 高壓晶體（第 3 階段）：把深海壓力收集器放在上方有 16 格以上海水的海底，會被水壓慢慢壓成（越深越快）。\n- 虛空之塵（第 4~5 階段）：把虛空收集器放在終界正下方直到虛空都空無一物的地方即可收集。"
-  },
-  "guide.singulo.ruins.gathering.title": {
-    "source": "Materials found in one place",
-    "translation": "只能在特定地點獲得的素材"
-  },
-  "guide.singulo.ruins.lab.body": {
-    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- A supply shaft always runs from a dedicated cargo lift room, with hoists, rails, conveyors and storage, to the surface. Both the main and supply shafts are generated. It is welded shut just above the room and one block below the surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes a shortcut to the surface.\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- Once power is back, the vending machines sell drinks for emeralds (press the column you want: soda for Speed, sports drink for Regeneration, energy drink for Haste). The break-room coffee makers brew with cocoa beans; fill glass bottles from the pot (Haste, and it keeps you awake).\n- The room layout changes every time: research labs, archives, server rooms, dormitories, private rooms lined up along a hall, a medical bay, a cafeteria with a kitchen and more, guarded by security machines and fabricators. The sliding doors of the private rooms and kitchen open with a right-click and close by themselves after a while (the lab doors cannot be crafted, but the similar White Sliding Door is made at a Crafting Table). Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
-    "translation": "舊文明的仿生人研究所。統籌 AI「鑄造廠」失控後，職員停掉了中央動力爐，從主豎井逃了出去。人已離開的現在，仿生人們仍遵從「維持設施」這最後的命令，持續修繕著設施。\n- 入口是殘留在地表的白色小建築（原本的接待處與電梯廳）。順著梯子和鷹架，沿曾經的電梯井——崩塌的主豎井下去。房間與走廊被厚度為 2 格的耐壓殼包覆，在擊敗統籌 AI 之前無法破壞（之後也比黑曜石更硬）。\n- 專用貨運升降室設有吊機、軌道、輸送帶與貨物堆放區，搬運豎井必定從其天花板通往地表。主豎井與搬運豎井都會生成。房間上方與地表下一格被焊死的艙蓋封住，擊敗統籌 AI 後可以用鑽石鎬挖開。豎井沒有損壞，架上梯子就能成為通往地表的捷徑。\n- 主電源已斷，這是一座只有紅色緊急照明燈亮著的昏暗設施。右鍵中央動力爐的控制台即可啟動動力爐，設施燈會亮起，AI 中樞的隔離門打開。而沉睡的統籌 AI 也會醒來。\n- 恢復供電後，自動販賣機會開始用綠寶石販售飲料（按下想要的那一列：汽水提升移動速度，運動飲料帶來生命恢復，能量飲料提升挖掘速度）。茶水間的咖啡機用可可豆沖泡，可以用玻璃瓶盛取（提升挖掘速度並提神）。\n- 房間的排列每次都不同：研究室、資料室、伺服器室、員工宿舍、研究員單間排成一列的單間區、醫務室、附廚房的食堂等，由警衛機和列印台把守。單間與廚房的滑動門右鍵點擊即可打開，過一會兒會自動關閉（研究所的門無法合成，但相似的白色滑動門可以在工作台製作）。物資箱裡還留著研究所的部件和資料。\n- 右鍵記錄終端可以閱讀留下的記錄。收集起來，就能知道失控的來龍去脈。"
-  },
-  "guide.singulo.ruins.lab.title": {
-    "source": "Underground Android Laboratory",
-    "translation": "地下仿生人研究所"
-  },
-  "guide.singulo.ruins.leviathan.body": {
-    "source": "- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).",
-    "translation": "- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。衝撞掠過地面後，牠會在地面附近停留片刻，正是反擊的好機會。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也會受到全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞後停下的地方，會在牠飛離時留下奇點。掉落漩渦斷章。\n  任何形態：牠高高升起並蜷起身體時，會砸向中心，兩道衝擊波沿地面擴散（波到來時跳起）。地面出現光線時，要在空間裂開前離開線上（共三次，每次改變方向）。骨骼與龍形態還會打開爐心之渦，把整個房間往裡拉（靠近爐心會受傷，要逆著引力向外跑）。\n  爐心再點火：骨骼與龍形態會纏繞爐心蓄力，向整個房間釋放衝擊。出現預兆時，躲到封鎖柱後面（柱上的強化廢墟玻璃也能擋住衝擊）。"
-  },
-  "guide.singulo.ruins.leviathan.title": {
-    "source": "The Ergosphere Leviathan",
-    "translation": "能層大蛇"
+    "source": "When the needle points back",
+    "translation": "指針總是指回原處時"
   },
   "guide.singulo.ruins.list.body": {
-    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation Logs and Degraded Control Units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Degraded Cold Atom Traps and Quantum Data Fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Degraded Time Crystal Seeds and Culture Data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The Foundry Overseer waits in the AI core. Precision actuators and android kits (7 days).\n- Final Lab: a gravity anomaly deep underground (around Y −56 to −46). The Horizon Warden guards it. Degraded Anomaly Samples (regrow in 14 days). Each cache holds a Dormant Singularity Seed the first time you open it.\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
-    "translation": "- 地表觀測站：平原、沙漠等地表上唯一建在地面的遺蹟。白色警衛無人機。觀測日誌、退化的控制單元（7 天再生）。\n- 研究棟：淺層地下（約 Y −20〜4）。警衛機，以及深處檔案室的回聲守衛。退化冷原子陷阱、量子資料片段（7 天）。\n- 封閉培養設施：深層地下（約 Y −46〜−30）。低溫核心、更強的警衛機，以及深處隔離槽室的重力殘渣。退化的時間晶種、培養資料（14 天）。\n- 地下仿生人研究所：中等深度的地下（地板約 Y −38〜−26）。與封閉培養設施並列的分支，在研究樓調校羅盤後就能一起搜尋（羅盤指向貫通到地表的主豎井）。房間的排列每次都不同。深處的 AI 中樞裡是統籌 AI「鑄造廠」。精密致動器・仿生人套件（7 天）。\n- 最終實驗室：地下深處（約 Y −56〜−46）的重力異常點。由視界守衛看守。退化的異常樣本（14 天再生）。每個保管庫只有首次開啟時才有一顆休眠奇點種子。\n- 沉沒的爐心區：比最終實驗室更深的地下（約 Y −60〜−54），停止運轉的第二座反應爐。攻略最終實驗室後調整探索羅盤即可尋找。能層巨蛇。奇異物質、噴流凝聚體、霍金凝聚體（14 天）。"
+    "source": "Hold an Explorer’s Compass and use it in the air to locate its target. When the needle brings you close, stop and look around.",
+    "translation": "手持探索羅盤對空使用，搜尋目前目標。順著指針走近後，停下來看看四周。"
   },
   "guide.singulo.ruins.list.title": {
-    "source": "The six ruins",
-    "translation": "六處廢墟"
-  },
-  "guide.singulo.ruins.plan.body": {
-    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.\nUnused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.\nRestored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.",
-    "translation": "後期階段的目的地會一下子增多；提前收集可以讓工廠不停工。\n- 第 2 階段期間：隕石坑（隕鐵、星塵），冰山或冰刺（浮冰和藍冰）。\n- 第 3 階段期間：研究棟。儘早放置深海壓力收集器，囤積高壓晶體（外殼和砧約需 30 個）。雷雨天在沙子上放避雷針。\n- 第 4 階段之前：封閉培養設施、遠古城市（幽匿塊和回聲碎片；回聲共鳴器可以一直複製一片）、終界虛空（虛空收集器）、凋零怪（地獄之星；點火後可用人造星核代替）。\n- 原始記錄可以修復：新品加三次修復約為 2.7 倍的使用次數。重刷遺跡之前先修復。\n未使用的觀測日誌、量子資料片段、培養資料及復原部件，在狀態相同時最多可堆疊64個。裝置的每個輸入槽只接受1個，Shift點擊也只投入1個。使用中的物品不可堆疊。\n加工中耗盡使用次數的復原部件和原始記錄會作為物品輸出，並保留使用及修復資料。輸出槽被占用時，它們會在原輸入槽等待，仍可由漏斗或物品管線取出。開啟自動輸出後可將其送入相鄰容器。為修復而放入的部件不會自動輸出。"
-  },
-  "guide.singulo.ruins.plan.title": {
-    "source": "Planning expeditions",
-    "translation": "規劃探索"
+    "source": "Following the needle",
+    "translation": "循針而行"
   },
   "guide.singulo.ruins.records.body": {
-    "source": "Ruin caches sometimes hold Crystal Memories. Decode one in a powered Archive Terminal, then use the Decoded Record to add an entry to the Ancient Records chapter of this handbook. Read them all to learn why the civilization fell.",
-    "translation": "遺蹟保管庫中有時會出現水晶記憶體。在通電的檔案終端解讀一個，再使用得到的「解碼記錄」，即可在手冊的「舊文明的記錄」一章中新增一則記錄。讀完所有記錄，就能知道文明滅亡的原因。"
+    "source": "If you find a record you cannot read, try it in a powered Archive Terminal. Use the decoded record in your hand to keep a copy in this book.",
+    "translation": "遇到看不懂的記錄，可以放入通電的檔案終端。手持已解讀的記錄並使用，就能在本書中重讀。"
   },
   "guide.singulo.ruins.records.title": {
-    "source": "Crystal memories",
-    "translation": "水晶記憶體"
-  },
-  "guide.singulo.ruins.sealed.body": {
-    "source": "Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item for that tier (Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket). Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.",
-    "translation": "每座廢墟都藏著一個封印容器，只能用下一階段的鑰匙打開：磁力鎖、量子鎖、時間鎖，最後是奇點鎖。鑰匙在精密組裝台製造，每次使用都會消耗。裡面有材料、彩色燈，有時還有該等級的稀有道具：超頻晶片、重力靴、催化劑穩定劑或次元口袋。強行破壞封印中的容器會連同內容物一起失去。你也可以自己製作容器，潛行時使用鑰匙即可封印。"
-  },
-  "guide.singulo.ruins.sealed.title": {
-    "source": "Sealed containers",
-    "translation": "封印容器"
+    "source": "Reading a recovered record",
+    "translation": "閱讀帶回的記錄"
   },
   "guide.singulo.stage1": {
     "source": "Stage 1: Startup",
     "translation": "第一階段：啟動"
   },
   "guide.singulo.stage1.flow.body": {
-    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Observation Post and bring back Degraded Control Units and Observation Logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
-    "translation": "這一階段要做的事（依序）：\n1. 製作鋼、陶瓷、基礎電路和基礎框架（見「最初的材料」）。\n2. 放置 2〜4 台熱電發電機，用銅導線連到裝置。岩漿塊＋藍冰不會融化，能長久使用。\n3. 備齊燒製爐、壓縮機（鋼板）和檔案終端。探索羅盤和全像投影器也先做好。\n4. 用探索羅盤找到地表觀測站，從保管庫帶回退化的控制單元和觀測日誌。\n5. 在檔案終端修復控制單元，製作低溫冷卻塔的零件，對照全像投影器組裝。\n6. 冷卻塔能做出「超導線圈」後，就進入第 2 階段。\n容易卡住的地方：\n・低溫側的方塊融化：岩漿，或營火配水、雪、冰，很快就會融化。請看「不會融化的組合」一頁。\n・冷卻塔組不起來：中心一列是熱交換核心，頂部是通風格柵。把全像投影器用在控制器上，就能看出缺了哪裡。\n・電力不足：預設設定下，高度為 7 的冷卻塔連續製造液態氮時約需 1,786 FE/t。供電不足時會保留進度並等待，因此可以讓裝置交替運轉，並增加發電與儲電。"
+    "source": "Start with steel and basic circuits. Wire a thermoelectric generator to a kiln or compressor. If a part has no manufacturing recipe, take an Explorer’s Compass outside.\nOxygen steelmaking helps when building a cooling tower. A height-7 tower draws about 1,786 FE/t during continuous nitrogen production. It keeps its progress when power runs short.",
+    "translation": "先製作鋼和基礎電路，用銅導線把熱電發電機接到燒製爐或壓縮機。如果某個部件沒有製造配方，帶上探索羅盤出門看看。\n建造冷卻塔時可用氧氣煉鋼。7格高的塔連續生產液氮約需1,786 FE/t，供電不足時會保留加工進度。"
   },
   "guide.singulo.stage1.flow.title": {
     "source": "Stage 1 at a glance",
     "translation": "第 1 階段的流程"
   },
   "guide.singulo.stage1.machines.body": {
-    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster. With oxygen it works as a basic oxygen furnace: 2 iron and 1 coal make 2 steel.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Hydrogen Fuel Cell: makes power from hydrogen and oxygen, returning 60% of the power the Electrolyzer put in (up to 240 FE/t).\n- Peltier Cooler: freezes water with power. Compress the ice into packed and blue ice.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
-    "translation": "- 燒製爐：燒製陶瓷基板等，也能更快地煉鋼。放入氧氣後，就成為用 2 個鐵和 1 個煤製作 2 個鋼的純氧轉爐。\n- 壓縮機：製作鋼板。質量模式下會把有質量值的材料變成「質量」，壓成壓縮塊或質量顆粒。\n- 電解槽：將水分解為氫氣與氧氣。氫氣可以用流體罐裝走，運到第 2 階段的粒子加速器。\n- 氫燃料電池：用氫和氧發電（取回電解槽灌入電力的 6 成的儲能，最大 240 FE/t）。\n- 珀耳帖冷卻器：用電力使水結冰。冰可以用壓縮機壓成冰塊、藍冰。\n- 檔案終端：把遺蹟的記錄抄寫到資料卡上，修復退化的零件，也能解讀水晶記憶體。"
+    "source": "Use the kiln for firing and the compressor for pressing plates. Try one batch first and check the power buffer and output slot.\nWhen splitting water, leave room in both electrolyzer output tanks. To collect the gases separately, choose an output face for each.",
+    "translation": "燒製爐用於燒製，壓縮機可壓製板材。先放入一批材料，檢查電量和輸出槽。\n電解水時，兩個輸出槽都要有空位。要分開收集氣體，可在面設定中分別指定出口。"
   },
   "guide.singulo.stage1.machines.title": {
     "source": "Stage 1 machines",
@@ -7008,8 +6888,8 @@
     "translation": "最初的電力"
   },
   "guide.singulo.stage1.thermal_pairs.body": {
-    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nStage 2 liquid nitrogen costs about 25,000 FE per 100 mB. A height-7 tower draws about 1,786 FE/t while working. It retains progress while waiting for enough power. Start with 2–4 generators and one machine at a time, add generation and storage, then build a fusion reactor; full-speed power is not a prerequisite.",
-    "translation": "冷方塊可以一直使用而不融化的組合（每台發電機的輸出）：\n- 岩漿塊＋藍冰：約 76 FE/t\n- 運轉中的燒製爐＋藍冰：約 66 FE/t\n- 營火＋藍冰：約 56 FE/t\n- 營火＋浮冰：約 55 FE/t\n熔岩太熱，即使藍冰也會在約 40 秒內變成浮冰並繼續融化；營火搭配水、雪或冰，不到 1 分鐘就會融化。\n第 2 階段每 100 mB 液態氮約需 25,000 FE。高度為 7 的冷卻塔工作時約需 1,786 FE/t，電力不足時會保留進度等待。初期可先用 2–4 台發電機交替運轉裝置，再擴大發電和儲能，逐步建造核融合反應爐，不必一開始就滿足全速供電。"
+    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nStage 2 liquid nitrogen costs about 25,000 FE per 100 mB. A height-7 tower draws about 1,786 FE/t while working. It retains progress while waiting for enough power. Start with 2–4 generators and one machine at a time. Add generation and storage as needed.",
+    "translation": "冷方塊可以一直使用而不融化的組合（每台發電機的輸出）：\n- 岩漿塊＋藍冰：約 76 FE/t\n- 運轉中的燒製爐＋藍冰：約 66 FE/t\n- 營火＋藍冰：約 56 FE/t\n- 營火＋浮冰：約 55 FE/t\n熔岩太熱，即使藍冰也會在約 40 秒內變成浮冰並繼續融化；營火搭配水、雪或冰，不到 1 分鐘就會融化。\n第 2 階段每 100 mB 液態氮約需 25,000 FE。高度為 7 的冷卻塔工作時約需 1,786 FE/t，電力不足時會保留進度等待。初期可先用 2–4 台發電機交替運轉裝置，再擴大發電和儲能，不必一開始就滿足全速供電。"
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -7020,28 +6900,28 @@
     "translation": "第二階段：低溫"
   },
   "guide.singulo.stage2.accelerator.body": {
-    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
-    "translation": "用加速管與聚焦磁鐵組成方形環（邊長 8–32），並讓控制器緊貼著環放置。四個角落必須是聚焦磁鐵，且磁鐵至少佔環的四分之一。它以氫製造緲子束，極少數情況下會產生磁單極子。\n催化反應器以緲子束製作緲子催化劑（2 級）。把宇宙射線緲子收集器放在高處，無需電力也能慢慢收集緲子束。\n邊長 16 以上時，在輸入槽放入鋅錠和鉍錠，原子核就會融合成新元素鉨。鋅由壓縮機粉碎凝灰岩取得，鉍是催化反應器精煉粗銅時的副產物。2 個鉨製成一個錠，用壓縮機壓成板，再在精密組裝台製作鉨框架。它是第 4、5 階段進階裝置的基礎。放入鉍和碳粉時，鉍原子核的質子會被剝離而變成金（不限環的大小）。"
+    "source": "Start by projecting an eight-block ring and supplying it with hydrogen. Put focusing magnets at the corners and use them for at least a quarter of the ring.\nIf it stalls, check that the controller touches the ring, power is available and the output has space.",
+    "translation": "先投影並搭建邊長8格的環，接入氫氣。四角須放聚焦磁鐵，磁鐵至少占環的四分之一。\n若未啟動，檢查控制器是否緊貼環體、供電是否充足以及輸出是否有空位。"
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",
     "translation": "粒子加速器與緲子催化劑"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Observation Post's cache and find the Research Building. Collect Quantum Data Fragments and Degraded Cold Atom Traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和退化冷原子陷阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（供電不足時保留進度並等待，因此平均產量會降低）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
+    "source": "Check what your cooling tower’s products can make. Layout matters in the Precision Assembler. Open the recipe for your intended product and compare it with the board.\nIf fluid processing stalls, check the fluid type, free tank space and tower height.",
+    "translation": "看看冷卻塔的產物可以用來做什麼。精密組裝台講究擺放位置，打開目標物品的配方，與盤面逐格對照。\n流體加工未啟動時，檢查流體種類、儲槽餘量和塔高。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
     "translation": "第 2 階段的流程"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
-    "translation": "- 精密組裝台：第 3 階段以後幾乎所有零件與裝置都在這裡製作。\n- 緲子催化核融合爐：用緲子催化劑和水發電（4 kFE/t）。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半），之後變為失活的催化劑（可在催化反應器中變回緲子束）。也可以用桶右鍵加水。\n- 低溫渦輪機：取回儲存在液態氮中的電力（在熔岩旁 9 成，最大 4.5 kFE/t）。這是用來儲存和運送電力的裝置，不會增加電力。把冷媒罐放進入口，就會倒出液態氮並送出空罐。\n- SMES 電池：儲存大量電力。\n- 世界線錨（小型）：放入催化劑後持續載入周圍的區塊。\n- 單極子升級模組：以磁單極子製作，插入裝置的單極子槽後速度 ×2、電力效率 +50%。"
+    "source": "The board is a 5×5 grid without corners. Place one item in each occupied square, or open the product recipe in JEI to transfer materials from your inventory.\nFor catalytic recipes, use the dedicated catalyst slot. Check its remaining life and leave room for both the product and the spent catalyst.",
+    "translation": "組裝盤是去掉四角的5×5方格，每個所需格放一個物品。也可在JEI中開啟產品配方，從背包自動放置材料。\n需要催化劑時請使用專用槽。檢查剩餘壽命，並為產品和失活催化劑分別留出輸出空間。"
   },
   "guide.singulo.stage2.others.title": {
-    "source": "Other stage 2 devices",
-    "translation": "其他第 2 階段設備"
+    "source": "Checking the assembly board",
+    "translation": "檢查精密組裝台的配置"
   },
   "guide.singulo.stage2.tower.body": {
     "source": "Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores and the top is closed with a vent grate. The controller goes in the middle of the front face, second layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Taller towers work faster but draw more power per tick (liquid nitrogen costs 250 FE per mB at any height; recipes with inputs run before nitrogen).\nRight-click the controller with an empty coolant cartridge to fill it with liquid nitrogen (processing it in the tower works too). Right-click a machine with a filled cartridge to pour it in, so no pipes are needed.",
@@ -7056,8 +6936,8 @@
     "translation": "第三階段：量子"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect Degraded Time Crystal Seeds and Culture Data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. Use the Degenerate Nucleus dropped by the Gravity Remnant to build the stage 4 Time Crystal Incubator. Restore the Degraded Time Crystal Seeds there.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "這一階段要做的事：\n1. 製作量子糾纏合成器和雷射冷卻器（第 3 階段的裝置各消耗 1 個緲子催化劑；雷射冷卻器還需要研究棟的回聲守衛掉落的守衛投影核心）。\n2. 用量子熱機發電（玻色凝聚態催化劑下 200 kFE/t；做出來之前可用緲子催化劑以 25% 試運轉）。\n3. 用雷射冷卻器製作玻色凝聚態催化劑（第 3 級）和光學晶格基板。\n4. 儘早放置深海壓力收集器，儲存高壓晶體（之後外殼和鐵砧需要約 30 個）。\n5. 在研究棟的保管庫調整探索羅盤，尋找封閉培養設施。收集退化的時間晶種和培養資料（打倒深處的重力殘渣後保管庫會打開）。同樣的調整也能找到地下仿生人研究所。\n6. 用重力殘渣掉落的簡併核製作第 4 階段的時間晶體培育槽，在槽中修復退化的時間晶種。\n容易卡住的地方：\n・封閉培養設施很難：有極低溫區域和強力警備機。備好防具和回復，帶上護衛仿生人。\n・被重力殘渣拋起：摔落很痛，重力靴或衝擊發電面板會有幫助。"
+    "source": "Quantum processing uses both power and coolant. Run one machine through a full batch before expanding.\nIf a recovered record or part has no obvious use, revisit the Archive Terminal and your Explorer’s Compass.",
+    "translation": "量子加工同時消耗電力和冷媒。擴建設備前，先讓一台機器完整運轉一次。\n帶回的記錄或零件用途不明時，再看看檔案終端和探索羅盤。"
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -7070,14 +6950,6 @@
   "guide.singulo.stage3.quantum.title": {
     "source": "Quantum machines",
     "translation": "量子機器"
-  },
-  "guide.singulo.stage3.tools.body": {
-    "source": "- Inertial Control Gauntlet: hold right-click to levitate or pull small mobs. It runs on power; sneak-right-click a block that holds power to charge it.\n- Inertial Stabilizer: stops explosions from breaking blocks within a radius of 16.\n- Gravitational Wave Detector: shows the rough direction and distance band of the Final Lab (gravity anomaly).\n- Neutrino Scanner: shows the outlines of ruins and ores through terrain for 10 seconds. At first it shows up to iron and redstone; sensitivity modules (Mk2: gold, diamond, emerald; Mk3: ancient debris) reveal deeper ores. It also works on the observatory.",
-    "translation": "- 慣性控制手套：長按右鍵讓小型生物懸浮或將其拉近。消耗電力；潛行右鍵帶電的方塊即可充電。\n- 慣性穩定器：半徑 16 內的爆炸不會破壞方塊。\n- 重力波探測器：顯示最終實驗室（重力異常點）的大致方向與距離範圍。\n- 微中子掃描器：在 10 秒內透過地形顯示遺蹟與礦石的輪廓。起初只能顯示到鐵與紅石；使用靈敏度模組（Mk2：金、鑽石、綠寶石；Mk3：遠古遺骸）後，更深層的礦石也會顯示。也可用於觀測站。"
-  },
-  "guide.singulo.stage3.tools.title": {
-    "source": "Tools and exploration",
-    "translation": "工具與探索"
   },
   "guide.singulo.stage4": {
     "source": "Stage 4: Temporal",
@@ -7092,16 +6964,16 @@
     "translation": "壓縮鏈"
   },
   "guide.singulo.stage4.flow.body": {
-    "source": "What to do:\n1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity does not drop; facilities and running machines compete for crystals, so two incubators help).\n2. Make exotic matter and axion condensate in the C-Cavity.\n3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5 MFE/t).\n4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singularity seed).\n5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes at the Seal Console to get the Dormant Singularity Seed.\n6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\nCommon sticking points:\n- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add incubators.\n- Can't find the Final Lab: look deep underground (around Y -56 to -46). The Gravitational Wave Detector shows its rough direction and distance.",
-    "translation": "這一階段要做的事：\n1. 用時間晶體培育槽培育時間晶體催化劑（電力達到要求的 80% 以上時純度不會下降。設施用和運轉用會互相爭搶，有 2 台比較輕鬆）。\n2. 用卡西米爾腔製作奇異物質和軸子凝聚體。\n3. 用壓縮機的質量模式製作壓縮塊，用簡併熱爐（5 MFE/t）發電。\n4. 用簡併壓縮爐製作 7 個簡併物質殼（爐殼用 6 個、奇點種子用 1 個）。\n5. 在封閉培養設施的保管庫調整探索羅盤，尋找最終實驗室。打倒在封印控制台醒來的視界守衛，取得「休眠奇點種子」。\n6. 拿到種子就進入第 5 階段：在奇點封裝器中喚醒它，放進 P 反應爐。\n容易卡住的地方：\n・時間晶體不夠：既用於時間晶體模組（設施用），也用於催化劑（運轉用）。增加培育槽。\n・找不到最終實驗室：在地下深處尋找（約 Y−56〜−46）。重力波探測器能顯示大致方向和距離。"
+    "source": "If purity falls in the incubator, check the incoming power as well as stored energy. Aim for at least 80% of the requested rate.\nUse the Holo Projector on a large machine’s controller and check the structure from the bottom up.",
+    "translation": "培育槽純度下降時，除了儲能量，也要檢查即時供電，目標是達到需求的80%以上。\n對大型設備的控制器使用全像投影器，從底層逐層核對。"
   },
   "guide.singulo.stage4.flow.title": {
     "source": "Stage 4 at a glance",
     "translation": "第 4 階段的流程"
   },
   "guide.singulo.stage4.power.body": {
-    "source": "- Degenerate Furnace (5×5×7): crushes compressed blocks Lv2 for 5 MFE/t. It uses a time crystal catalyst (a BE condensate catalyst runs it at 25%, 1.25 MFE/t, as a stopgap). Power leaves through its I/O ports automatically; while its storage is full it waits without using fuel or catalyst.\n- Shells: one degenerate matter shell makes 24 reactor shell blocks. Ignition needs 6 shells for the plating plus 1 for the singularity seed. Gathering rock and metal in bulk helps.\n- Probe Station: sends probes to discovered Observation Posts and brings back half the loot.\n- Topological wire and SMES modules carry and store large amounts of power.",
-    "translation": "- 簡併熱爐（5×5×7）：壓碎壓縮塊 Lv2 產生 5 MFE/t。使用時間晶體催化劑（玻色凝聚態催化劑也能以 25%、1.25 MFE/t 暫時運轉）。電力會自動從輸入輸出埠送出；儲能已滿時待機，不消耗燃料與催化劑。\n- 簡併物質殼與反應爐外殼：1 個簡併物質殼可製作 24 塊反應爐外殼。點火前需要 6 個用於外殼，另加 1 個用於奇點種子。最好成批收集岩石與金屬。\n- 自動探測站：向已發現的地表觀測站派出探測器，帶回一半數量的回收物。\n- 拓撲導線與 SMES 模組用於傳輸與儲存大量電力。"
+    "source": "The Degenerate Furnace waits when its energy buffer is full. If it looks idle, check the power connection at its multiblock port.\nPrepare compressed fuel in the Compressor’s mass mode and check the furnace catalyst slot.",
+    "translation": "簡併熱爐的儲能滿後會待機。若看似停機，先檢查輸入輸出端口是否接上用電設備。\n可用壓縮機的質量模式製備壓縮燃料，也請檢查爐內的催化劑槽。"
   },
   "guide.singulo.stage4.power.title": {
     "source": "Big power and automation",
@@ -7127,17 +6999,9 @@
     "source": "By-products and the Singularity Core",
     "translation": "副產物與奇點核心"
   },
-  "guide.singulo.stage5.endgame.body": {
-    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakened Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
-    "translation": "有了奇點核心與充足的電力，就能運轉後期裝置：護盾、蒂普勒圓柱與蟲洞。有了人造星核，就不必再尋找地獄之星。\n想要真正的戰鬥，就在奇點封裝器中製作覺醒記錄核，並在最終實驗室的封印控制台上使用：覺醒的視界守衛擁有 2.5 倍生命和 1.5 倍傷害。擊敗它可獲得超頻晶片等獎勵，可反覆挑戰。\n研究棟和封閉培養設施的守衛也能再戰：在它們的守衛封印核心上使用覺醒回聲核或覺醒重力核即可。\n攻略最終實驗室後，調校探索羅盤去尋找沉沒的爐心區：能層巨蛇棲息在停止的第二座反應爐中。\n據說覺醒的守衛倒下時會掉落記錄的斷章。集齊所有斷章後，能讀到什麼呢？"
-  },
-  "guide.singulo.stage5.endgame.title": {
-    "source": "Beyond",
-    "translation": "更遠的前方"
-  },
   "guide.singulo.stage5.flow.body": {
-    "source": "What to do:\n1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the Core Controller.\n2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t on average).\n3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Singularity Core).\n4. Switch to generation mode and feed mass pellets automatically.\n5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the final goal, the Genesis Engine.\nCommon sticking points:\n- Ignition fails: a power route is limited by its lowest-capacity cable. Check the incoming rate and the estimate on the screen and fix the wiring.\n- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destroyed. Take care when working nearby.",
-    "translation": "這一階段要做的事：\n1. 備齊爐殼方塊等 P 反應爐零件，把全像投影器用在爐心控制器上，看著形狀組裝。\n2. 為了點火，用 SMES 和視界匯流排佈線，讓 50 GFE 能在 10 秒內送到（平均約 250 MFE/t）。\n3. 放入奇點種子並點火。一開始用回收運轉收集 H 凝聚體（第一個奇點核心需要 6 個）。\n4. 切換到發電運轉，自動送入質量顆粒。\n5. 用奇點核心驅動奇點技術（護盾、蒂普勒圓柱、蟲洞），朝最終目標「創世爐」前進。\n容易卡住的地方：\n・點火失敗：送電路徑的上限由該路徑中容量最低的線纜決定。看介面上的受電速度和預計能否送達來修正佈線。\n・被吸進爐裡：環的內側是無法逃脫的強引力，碰到黑色球體的東西一定會消失。在附近作業時要小心。"
+    "source": "For a short, high-power operation, check two things: stored energy and how much the cables can deliver in time.\nBefore your first start, check the incoming power and time limit on the controller.",
+    "translation": "短時間內需要大量電力時，分別檢查儲能容量以及線路能否及時送達所需電量。\n首次啟動前，在控制器上確認輸入功率與時限。"
   },
   "guide.singulo.stage5.flow.title": {
     "source": "Stage 5 at a glance",
@@ -12287,29 +12151,21 @@
     "source": "Factory Expansion",
     "translation": "工廠擴建"
   },
-  "guide.singulo.factory_expansion.upgrades.title": {
-    "source": "Production and storage after unlocking",
-    "translation": "解鎖後的生產與儲能"
-  },
-  "guide.singulo.factory_expansion.upgrades.body": {
-    "source": "After producing a BE catalyst, reconstruct projection cores with quantum modules, optical lattices, meteoric iron and catalyst life. Once you have time catalysts, degenerate nuclei can also be reconstructed. The first research and culture bosses are still required, but factory expansion no longer requires repeated fights.\nThirty minutes of catalyst life makes four Time Crystal Modules. Large SMES units need this part. A shaped upgrade uses an old SMES Cell at the centre and preserves its stored energy. Existing cables can also be upgraded from copper to superconducting, topological and horizon wiring.",
-    "translation": "製成BE催化劑後，可用量子運算模組、光學晶格基板、隕鐵及催化劑壽命重構投影核心。擁有時間催化劑後，也能重構簡併核。首次研究樓和培養設施首領戰仍不可省略，但擴建工廠不再需要反覆討伐。\n30分鐘催化劑壽命可製成4個時間晶體模組。大型SMES需要此部件。定形升級配方將舊SMES 電池置於中央，並保留其中儲存的電能。舊電纜也可從銅導線依序升級為超導電纜、拓撲導線和視界匯流排。"
-  },
   "guide.singulo.factory_expansion.probes.title": {
-    "source": "Probes and the final unlock",
-    "translation": "探測器與最終解鎖"
+    "source": "When a probe is idle",
+    "translation": "探測器待機時"
   },
   "guide.singulo.factory_expansion.probes.body": {
-    "source": "With a same-tier catalyst, a probe visits one ruin in five minutes and returns half the manual loot. Destinations are visited in turn. Waiting for regeneration or output space consumes no power or catalyst. Overflow cargo is saved and must be unloaded before another mission.\nA loaded Singularity Core also permits research-building collection; time catalysts only permit observation posts. Culture facilities, final labs, sunken reactors and android facilities remain manual.\nA Primordial Seed also requires one use of a restored anomaly sample from the final lab. Sunken loot alone can no longer bypass the final lab.",
-    "translation": "使用同級催化劑時，探測器每5分鐘造訪一處遺構，帶回手動回收量的一半。各地點依序造訪，等待再生或輸出空間時不消耗電力及催化劑。放不下的貨物會保存，卸貨前不執行下一任務。\n裝入奇點核心作為催化劑後，也能回收研究樓；時間催化劑僅支援觀測站。培養設施、最終實驗設施、水下爐心及安卓設施仍須手動探索。\n原初之種還需要最終實驗設施復原異常樣本的1次使用次數。僅靠水下戰利品無法再跳過最終實驗設施。"
+    "source": "Probes visit registered destinations in order. Check the time since the last visit and leave room in the output for the collection. A waiting probe uses neither power nor catalyst.",
+    "translation": "探測器依序造訪已登記地點。檢查上次造訪後是否已過足夠時間，並為回收物留出輸出空間。待機時不消耗電力和催化劑。"
   },
   "guide.singulo.factory_expansion.limits.title": {
     "source": "Mass, output and ignition",
     "translation": "質量、輸出與點火"
   },
   "guide.singulo.factory_expansion.limits.body": {
-    "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
-    "translation": "金屬壓縮Lv2的質量為81。鐵塊或銅塊每個質量為3，因此Lv1需3塊，Lv2需27塊，相當於243個錠。可用銅代替鐵。熱電偶與熱交換核心的用途有限，無須一開始大量囤積。\nP反應爐須在10秒內接收50 GFE才能點火。每個SMES 模組容量為2 GFE，至少需要25個滿足總容量。單個輸出上限為100 MFE/t，須至少3個並聯，總傳輸速率達到250 MFE/t以上。\n點火後初始質量500、自旋0時，維持燃料供給的持續發電量約為28.6 MFE/t。2.1 GFE/t是傳輸上限，並非初始發電量。先發展質量、自旋與儲能，再為創世爐供電。"
+    "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate.",
+    "translation": "金屬壓縮Lv2的質量為81。鐵塊或銅塊每個質量為3，因此Lv1需3塊，Lv2需27塊，相當於243個錠。可用銅代替鐵。熱電偶與熱交換核心的用途有限，無須一開始大量囤積。\nP反應爐須在10秒內接收50 GFE才能點火。每個SMES 模組容量為2 GFE，至少需要25個滿足總容量。單個輸出上限為100 MFE/t，須至少3個並聯，總傳輸速率達到250 MFE/t以上。\n點火後初始質量500、自旋0時，維持燃料供給的持續發電量約為28.6 MFE/t。2.1 GFE/t是傳輸上限，並非初始發電量。"
   },
   "desc.singulo.capacity_upgrade_1": {
     "source": "Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.",
@@ -12620,8 +12476,8 @@
     "translation": "準備無人機"
   },
   "guide.singulo.drones.start.body": {
-    "source": "Defeat a whole wave of security drones from a ruin Guard Dock and, now and then, a Drone Crystal Memory appears on the dock (40% at an Observation Post). At stage 2, make a Drone Station on a crafting table and Drone Kits at a Precision Assembler. Put the memory (not used up) and kits (one per print) in the station and give it power: it prints a cargo drone on top (20,000 FE). Each Production Upgrade adds one more, up to 3 with two. Drones wait in the air above the station.\nDrones are not hurt by players or mobs. Breaking the station turns its waiting drones back into kits.",
-    "translation": "把遺跡警衛無人機塢放出的一波警衛無人機全部擊敗後，有時塢上方會出現無人機水晶記憶體（地表觀測站為 40%）。到第 2 階段後，在工作台製作無人機站，在精密組裝台製作無人機套件。把記憶體（不會消耗）和套件（每次列印用 1 個）放入無人機站並供電，它就會在上方列印一架運輸無人機（20,000 FE）。每張生產升級增加 1 架，2 張最多 3 架。無人機在站的上空待命。\n無人機不會受到玩家或生物的傷害。破壞無人機站時，待命中的無人機會變回套件。"
+    "source": "Power the station and place your memory and kit in their slots. Provide a Drone Port at both the sending and receiving ends.",
+    "translation": "給工作站接電，把已有的記憶體和套件放入專用槽。發送端和接收端都要設置無人機起降端口。"
   },
   "guide.singulo.drones.send.title": {
     "source": "Sending cargo",
@@ -12827,14 +12683,6 @@
     "source": "Accepts empty crates",
     "translation": "可放入空箱"
   },
-  "guide.singulo.drones.android.title": {
-    "source": "Working with androids",
-    "translation": "與仿生人協作"
-  },
-  "guide.singulo.drones.android.body": {
-    "source": "Place a Drone Port beside an Android Supply Port and allow cargo output on that face to use arrivals as materials. Outbound cargo and sealed crates are not counted as available stock. Beside a Delivery Port, allow cargo input to accept finished products and use auto-send to ship them to another base. Full cargo slots leave products waiting in the Delivery Port.\nThe empty-crate tab controls reserve-crate input/output and auto-eject separately. Defaults remain input-only with auto-eject off. Androids and pipes can collect crates through an output face. On a return-shipment port, disable empty-crate input and allow cargo input on the receiving face to accept empty crates as cargo rather than reserves. Supply transport crates through another face and configure auto-send.",
-    "translation": "將無人機起降港放在仿生人資材口旁，並允許該面的貨物輸出，仿生人即可使用到貨材料。待發貨物和未拆封箱不會計入可用庫存。將起降港放在交付口旁並允許貨物輸入，即可接收成品，再用自動發貨運往其他基地。貨物槽滿時，成品留在交付口等待。\n空箱分頁可單獨設定備用箱的輸入、輸出與自動排出，預設僅輸入且不自動排出。仿生人和管道可從輸出面回收空箱。返程起降港的接收面應停用空箱輸入並啟用貨物輸入，使空箱作為貨物而非備用箱進入。從另一面補充運輸用箱，並設定自動發貨。"
-  },
   "gui.singulo.drone_port.auto.is_target": {
     "source": "Auto-send destination",
     "translation": "自動發送的目的地"
@@ -12894,14 +12742,6 @@
   "desc.singulo.drone_memory_gravity": {
     "source": "The design of a cargo drone that floats on an anti-gravity field. Put it in a Drone Station to print drones whose four bits carry crates on tractor beams (1.25× the rotor type’s speed). It is not used up. Rarely dropped by guard docks in the Culture Facility and the Underground Android Laboratory.",
     "translation": "記錄了依靠反重力場漂浮的運輸無人機設計的記憶體。放入無人機站後，會列印由四個浮游砲以牽引光束運送箱子的反重力型無人機（旋翼型速度的 1.25 倍）。不會消耗。封閉培養設施和地下仿生人研究所的警衛無人機塢偶爾會掉落。"
-  },
-  "guide.singulo.drones.kinds.title": {
-    "source": "Drone types",
-    "translation": "無人機的類型"
-  },
-  "guide.singulo.drones.kinds.body": {
-    "source": "The memory’s type decides the type of drone the station prints. Higher types only drop from guard docks in higher facilities.\n- Rotor (any facility): flies on four rotors at the standard speed.\n- Jet (Research Building and higher): flies on twin jets, the fastest type (1.6× the rotor type). It banks into turns.\n- Anti-gravity (Culture Facility and Underground Android Laboratory; rare): floats on an anti-gravity field (1.25×). Four bits hold the crate on tractor beams.\nSwapping the memory does not change drones already printed. To switch types, dismantle the drones and print them again.",
-    "translation": "記憶體的類型決定無人機站列印的無人機類型。較高級的類型只會從較高級設施的警衛無人機塢掉落。\n- 旋翼型（任何設施）：靠四個旋翼飛行，標準速度。\n- 噴射型（研究棟及更高級設施）：靠雙噴射引擎飛行，最快的類型（旋翼型的 1.6 倍）。轉彎時會傾斜機身。\n- 反重力型（封閉培養設施和地下仿生人研究所，稀有）：靠反重力場漂浮（1.25 倍）。四個浮游砲以牽引光束吊住箱子。\n更換記憶體不會改變已列印的無人機。想換類型時，請拆解無人機後重新列印。"
   },
   "gui.singulo.drone_station.row.0": {
     "source": "No memory",
@@ -13382,14 +13222,6 @@
   "summary.singulo.zinc_ingot": {
     "source": "An ingot of zinc.",
     "translation": "鋅的金屬錠。"
-  },
-  "guide.singulo.multiblocks.parts.title": {
-    "source": "Parts and stages",
-    "translation": "構成方塊與階段"
-  },
-  "guide.singulo.multiblocks.parts.body": {
-    "source": "Structure parts also need you to reach the controller’s stage, and each uses a little of a key material.\n- Particle Accelerator tubes: Superconducting Wire (one per two tubes).\n- Degenerate Compactor, C-Cavity and Degenerate Furnace parts: a little lifetime of a BE Condensate Catalyst in the Precision Assembler’s catalyst slot.\n- P-Reactor, Shield Tower, T-Cylinder, Wormhole Generator and Genesis Engine parts: a little lifetime of a Time Crystal Catalyst (a few, such as Reactor Shell, use a Time Crystal Module).\nEach craft uses 1/48 of the catalyst’s lifetime and the rest stays in the catalyst. Parts already placed keep working.",
-    "translation": "構成方塊也必須推進到與控制器相同的階段才能製作，每種都會少量消耗關鍵材料。\n- 粒子加速器的加速管：超導線材（每 2 根用 1 個）。\n- 簡併壓縮爐、卡西米尔腔、簡併熱爐的零件：精密組裝台催化劑槽中玻色凝聚態催化劑的少量壽命。\n- 彭羅斯反應爐、事件視界護盾塔、蒂普勒圓柱、蟲洞生成器、創世爐的零件：時間晶體催化劑的少量壽命（反應爐外殼等少數零件使用時間晶體模組）。\n每次製作消耗催化劑壽命的 1/48，其餘仍留在催化劑中。已放置的構成方塊可繼續使用。"
   },
   "guide.singulo.power.capacity.title": {
     "source": "Capacity upgrades",
@@ -14052,8 +13884,8 @@
     "translation": "管道的階段"
   },
   "guide.singulo.fluids.pipes.body": {
-    "source": "Fluid pipes come in four tiers. Higher tiers are thicker and carry more per tick.\n- Fluid Pipe (stage 1): 2,000 mB. A copper pipe with glass windows.\n- Vacuum-Jacketed Pipe (stage 2): 32,000 mB. A white insulated jacket with frost-blue fittings.\n- Superfluid Conduit (stage 4): 512,000 mB. A clear tube held by gold rings.\n- Horizon Duct (stage 5): no limit. A thick black main with gold fittings.\nPipes of different tiers connect to each other. The amount moved is set by the narrowest part of the route from one port to another, and flows that share a stretch share its capacity. While fluid flows, you can see it and its direction through the windows and clear tubes.\nPipes hold no fluid, and long networks stay light: unbranched runs are handled as a single stretch.",
-    "translation": "流體管道有 4 個階段，階段越高越粗，每 tick 輸送得越多。\n- 流體管道（階段1）：2,000 mB。帶玻璃窗的銅管。\n- 真空絕熱管道（階段2）：32,000 mB。白色絕熱外筒與霜藍色接頭。\n- 超流體導管（階段4）：512,000 mB。由金環箍住的透明管。\n- 視界管道（階段5）：沒有上限。粗黑的主管道與金色接頭。\n不同階段的管道也能相連。輸送量由從一個端口到另一個端口路線上最細的部分決定，經過同一段的流動會分享該段的容量。液體流動時，可以透過窗口和透明管看到液體及其流向。\n管道不儲存液體，連得再長也不容易變卡：沒有分支的一段會被當作一個整體處理。"
+    "source": "Join the source and receiver with fluid pipes and check the side settings at both ends. Pipes can also draw from an adjacent water or lava source.\nBranches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.",
+    "translation": "用流體管道連接發送端和接收端，並檢查兩端的面設定。管道也能從相鄰的水源或熔岩源取液。\n分支共用的管段也會共享流量。輸送緩慢時，檢查沿途是否有細管。"
   },
   "guide.singulo.fluids.drone.title": {
     "source": "Sending fluids by drone",
@@ -14164,8 +13996,8 @@
     "translation": "視界倉庫"
   },
   "guide.singulo.collapsar.vault.body": {
-    "source": "The Event Horizon Vault stores a practically unlimited amount (about 9.2 quintillion) of one item inside a small black hole. The hole grows as it fills (it looks full at a trillion), the stored item orbits it, the plates on all four sides show the count, and light on the corner pillars shows how full it is.\nUse an item on it to insert what you hold; use it again quickly to insert every matching item in your inventory. Use it empty-handed to take a stack, or sneak to take one. Hoppers, pipes, androids and drone ports see it as a single slot. It never accepts more than fits.\nBreaking it keeps the contents in the item, restored when placed. Filled vaults and packed crates cannot go inside a vault. A comparator reads how full it is.",
-    "translation": "視界倉庫能在內部的小黑洞中儲存幾乎無限量（約 922 京個）的同一種物品。內容越多黑洞越大（1 兆個時看起來已滿），儲存的物品會繞著它轉，四面的台上顯示數量，四角的柱子以光顯示填滿程度。\n拿著物品使用會存入手中的物品，快速再使用一次會存入物品欄中所有相同的物品。空手使用取出一組，空手潛行使用取出 1 個。漏斗、管道、仿生人和無人機起降港把它視為一個格子的容器來存取。裝不下的部分不會接收。\n破壞後內容物會留在物品中，重新放置後恢復。裝有內容物的倉庫和已打包的箱子不能放進倉庫。比較器會輸出填滿程度。"
+    "source": "Use the vault while holding an item to deposit it. Use it again quickly to deposit all matching items in your inventory.\nUse an empty hand to withdraw a stack, or sneak-use it to withdraw one. Hoppers and pipes can transfer items too.",
+    "translation": "手持物品使用倉庫即可存入。緊接著再次使用可存入背包內全部同類物品。\n空手使用取出一組，空手潛行使用取出一個。也可用漏斗或管道輸送。"
   },
   "guide.singulo.collapsar.wormhole.title": {
     "source": "Wormhole delivery",
@@ -14663,17 +14495,9 @@
     "source": "Printed Food",
     "translation": "列印食品"
   },
-  "guide.singulo.food.foods.title": {
-    "source": "Space food",
-    "translation": "太空食品"
-  },
   "guide.singulo.food.printer.title": {
     "source": "Food Printer",
     "translation": "食品列印機"
-  },
-  "guide.singulo.food.foods.body": {
-    "source": "Nutrient Bar: 4 carbohydrate, 2 protein. Quick to eat (6 hunger).\nLayered Steak: 8 protein. Printed down to the sear marks and marbling (9 hunger).\nSpiral Pasta: 6 carbohydrate, 2 protein. Pasta with tomato sauce. Haste for 1 minute (8 hunger).\nHoneycomb Cake: 4 sweet, 3 carbohydrate. A cake topped with honey hexagons. Speed for 1 minute (7 hunger).\nFruit Gel Cube: 4 sweet. Four layers of jelly. Edible when full, with 5 seconds of Regeneration (3 hunger).",
-    "translation": "營養棒：碳水化合物4、蛋白質2。可以很快吃完（飢餓值6）。\n層疊牛排：蛋白質8。連烤痕和油花都列印出來的牛排（飢餓值9）。\n螺旋義大利麵：碳水化合物6、蛋白質2。配番茄醬的義大利麵。急迫1分鐘（飢餓值8）。\n蜂巢蛋糕：甜味4、碳水化合物3。頂上鋪著六角形蜂蜜的蛋糕。迅捷1分鐘（飢餓值7）。\n水果果凍塊：甜味4。四層顏色的果凍。飽食時也能吃，獲得5秒生命恢復（飢餓值3）。"
   },
   "guide.singulo.food.printer.body": {
     "source": "The Food Printer turns ingredients into paste and prints space food layer by layer. It runs on power (20 FE per tick).\nThe left of the screen has a row each for protein, carbohydrate and sweet, from the top. A Food Cartridge in the right slot of a row holds up to 64 of that paste. Stock the left slot of each row with that kind of ingredient: meat, fish and eggs for protein; grains and vegetables for carbohydrate; fruit, sugar and honeycomb for sweet. The cartridges are refilled while they have room, the kind the chosen food is short of first, then the lowest. Ingredients that do not fit wait in their slot. One ingredient gives as much paste as the food it restores (wheat and eggs give 2, sugar and cocoa beans 1, honeycomb 3).\nPick the food with the button above the output (right-click returns to automatic). The printer keeps printing it while there is paste and room in the output. On automatic it prints any food the paste allows, the food already in the output first. To stop, switch it off at the top right (it keeps turning ingredients into paste). Inside the glass chamber, the nozzle runs back and forth and builds the food up from the bottom layer. The windows on the back glow with how much paste each cartridge holds.\nHoppers can put in ingredients and cartridges and take out printed food. Breaking it drops its items, and cartridges keep their paste.",
@@ -15476,8 +15300,8 @@
     "translation": "選擇與增加星系"
   },
   "guide.singulo.genesis.galaxies.body": {
-    "source": "Before birth (from before the seed until stabilizing ends), using materials on the core changes the galaxy to be born (one item each).\n- Dye: the color of the arms\n- Blaze Rod: barred spiral (arms from the ends of a bar across the center)\n- Slime Ball: elliptical (a swollen cloud of stars without arms)\n- Eye of Ender: ring (a small core and a bright ring)\n- Magma Cream: irregular (several star-forming clumps)\n- Nether Star: grand (1.5 times larger in the night sky)\nWith nothing used it is a spiral as before, with its color left to chance. Hover over the window on the screen to see the current choice.\nUse another Primordial Seed on an engine that has given birth to kindle it again for the next galaxy (the registered item and finished items stay). Up to eight galaxies line the night sky; beyond that the oldest fade away.",
-    "translation": "在誕生之前（從使用種子之前直到穩定化結束），對核心使用材料會改變將要誕生的星系（每次消耗1個）。\n・染料：旋臂的顏色\n・烈焰棒：棒旋星系（旋臂從橫貫中心的棒兩端伸出）\n・史萊姆球：橢圓星系（沒有旋臂、鼓起的星團）\n・終界之眼：環狀星系（小小的核心與明亮的環）\n・岩漿球：不規則星系（若干個孕育恆星的團塊）\n・地獄之星：巨大星系（在夜空中為1.5倍大）\n如果什麼都不使用，就是和以前一樣的漩渦星系，顏色隨種子而定。將游標移到介面的視窗上，即可查看目前的性質。\n對已經孕育出宇宙的創世爐再次使用原初之種，即可從火種重新開始，孕育下一個星系（登記的產物與已完成的物品保持不變）。夜空中最多排列8個星系，超過後最舊的星系會逐漸消失。"
+    "source": "When preparing another core, try using a material on it before stabilization finishes. Each use takes one item. Hover over the preview in the core screen to check its current settings.",
+    "translation": "準備下一枚核心時，可以在穩定完成前手持材料對其使用。每次消耗一個物品。把游標移到核心介面的預覽窗上可查看目前設定。"
   },
   "gui.singulo.monitor.title": {
     "source": "Factory Monitor",
@@ -15802,5 +15626,113 @@
   "uses.singulo.tidal_draw_ring": {
     "source": "Used in: Tidal Spindle",
     "translation": "用於：潮汐紡絲機"
+  },
+  "gui.singulo.electrolyzer.oxygen_hint": {
+    "source": "Feed oxygen into a Kiln to make steel with less coal.",
+    "translation": "將氧氣送入燒製爐，煉鋼時就能節省煤炭。"
+  },
+  "gui.singulo.handbook.contents": {
+    "source": "Chapter contents",
+    "translation": "本章目錄"
+  },
+  "gui.singulo.handbook.details": {
+    "source": "Read full text",
+    "translation": "閱讀全文"
+  },
+  "gui.singulo.handbook.overview": {
+    "source": "Back to overview",
+    "translation": "返回概覽"
+  },
+  "guide.singulo.action.ruins.compass": {
+    "source": "Tune your compass",
+    "translation": "調校指南針"
+  },
+  "guide.singulo.action.ruins.list": {
+    "source": "Try the Explorer’s Compass",
+    "translation": "試用探索羅盤"
+  },
+  "guide.singulo.action.stage1.machines": {
+    "source": "Build your first processing machines",
+    "translation": "建造第一批加工設備"
+  },
+  "guide.singulo.action.stage1.materials": {
+    "source": "Craft steel, ceramic and circuits",
+    "translation": "製作鋼、陶瓷和電路"
+  },
+  "guide.singulo.action.stage1.power": {
+    "source": "Generate thermoelectric power",
+    "translation": "用熱電發電機發電"
+  },
+  "guide.singulo.action.stage2.accelerator": {
+    "source": "Make catalysts from muon bundles",
+    "translation": "用緲子束製作催化劑"
+  },
+  "guide.singulo.action.stage2.others": {
+    "source": "Build a Precision Assembler",
+    "translation": "製作精密組裝台"
+  },
+  "guide.singulo.action.stage2.tower": {
+    "source": "Build a cooling tower and produce coolant",
+    "translation": "建造冷卻塔並生產冷媒"
+  },
+  "guide.singulo.action.stage3.quantum": {
+    "source": "Build quantum machines and power",
+    "translation": "建造量子加工與發電設備"
+  },
+  "guide.singulo.action.stage4.compression": {
+    "source": "Press degenerate matter shells",
+    "translation": "壓製簡併物質殼"
+  },
+  "guide.singulo.action.stage4.power": {
+    "source": "Generate power in a Degenerate Furnace",
+    "translation": "用簡併熱爐發電"
+  },
+  "guide.singulo.action.stage4.time": {
+    "source": "Grow time crystal catalysts",
+    "translation": "培育時間晶體催化劑"
+  },
+  "guide.singulo.action.stage5.byproducts": {
+    "source": "Turn reactor byproducts into a core",
+    "translation": "用反應爐副產物製作核心"
+  },
+  "guide.singulo.action.stage5.ignite": {
+    "source": "Store energy and ignite the core",
+    "translation": "儲存電力並點燃爐心"
+  },
+  "guide.singulo.stage1.steel.body": {
+    "source": "Four steel ingots cost eight coal via Steel Blend or two with oxygen.\nSplit a bucket of water and send the 500 mB of oxygen to the kiln. Store the remaining 1,000 mB of hydrogen in a separate tank.",
+    "translation": "用鋼混合物製作4個鋼錠需要8個煤炭，用氧煉鋼只需2個。\n電解一桶水，將500 mB氧氣送入燒製爐，把另外的1,000 mB氫氣存入另一個儲槽。"
+  },
+  "guide.singulo.stage1.steel.title": {
+    "source": "Make steel for the cooling tower",
+    "translation": "為冷卻塔煉鋼"
+  },
+  "guide.singulo.visual.active_kiln": {
+    "source": "Running Kiln",
+    "translation": "運轉中的燒製爐"
+  },
+  "guide.singulo.visual.blend_steel": {
+    "source": "Craft and smelt Steel Blend",
+    "translation": "合成並冶煉鋼混合物"
+  },
+  "guide.singulo.visual.layer": {
+    "source": "Layer %s of %s",
+    "translation": "由下而上第 %s 層，共 %s 層"
+  },
+  "guide.singulo.visual.oxygen_steel": {
+    "source": "Oxygen steelmaking in the Kiln",
+    "translation": "在燒製爐中用氧煉鋼"
+  },
+  "guide.singulo.visual.start": {
+    "source": "Choose what you are working on.",
+    "translation": "選擇你正在做的事。"
+  },
+  "guide.singulo.caption.stage1.thermal_pairs": {
+    "source": "Output per generator. Place the heat source and coolant on opposite sides.",
+    "translation": "圖中是每台發電機的估計功率。將熱源與冷卻材料放在發電機的相對兩側。"
+  },
+  "guide.singulo.caption.stage1.steel": {
+    "source": "Totals for four steel ingots. Five electrolysis cycles supply two kiln batches.",
+    "translation": "圖中是煉出4個鋼錠的總量。電解5次的氧氣夠燒製爐用2次。"
   }
 }

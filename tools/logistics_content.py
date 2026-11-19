@@ -80,25 +80,13 @@ UI = {
     'gui.singulo.pipe.flow': ('配管: %s mB/t', 'Pipe: %s mB/t'),
 }
 
-CHAPTER = ('fluids', 'singulo:vacuum_jacketed_pipe', '液体の輸送', 'Moving Fluids', [
+CHAPTER = ('fluids', 'singulo:fluid_pipe', '液体の輸送', 'Moving Fluids', [
     ('pipes', 'パイプの段階',
-     '液体パイプは4段階あり、段階が上がるほど太く、たくさん運べます（1 tick あたり）。\n'
-     '- 液体パイプ（段階1）: 2,000 mB。銅の管にガラスの窓。\n'
-     '- 真空断熱パイプ（段階2）: 32,000 mB。白い断熱の外筒と霜の青の継ぎ手。\n'
-     '- 超流動導管（段階4）: 512,000 mB。透明な管を金の輪が締める。\n'
-     '- ホライズン・ダクト（段階5）: 上限なし。黒い太管に金の継ぎ手。\n'
-     '段階の違うパイプどうしもつながります。運べる量は、口から口までの道のいちばん細いところで決まり、同じ区間を通る流れはその量を分け合います。'
-     '液体が流れている間は、窓や透明な管から中の液体と流れの向きが見えます。\n'
-     'パイプは液体を溜めず、どれだけ長くつないでも重くなりにくい作りです（分かれ目のない並びを1つにまとめて扱います）。',
+     '送りたい装置と受け取りたい装置を液体パイプでつなぎ、両端の面設定を確認します。隣の水源や溶岩源からも汲めます。\n'
+     '分岐しても、同じ区間を通る液体は流量を分け合います。流れが遅いときは、途中で細い管を通っていないか確かめてください。',
      'Pipe tiers',
-     'Fluid pipes come in four tiers. Higher tiers are thicker and carry more per tick.\n'
-     '- Fluid Pipe (stage 1): 2,000 mB. A copper pipe with glass windows.\n'
-     '- Vacuum-Jacketed Pipe (stage 2): 32,000 mB. A white insulated jacket with frost-blue fittings.\n'
-     '- Superfluid Conduit (stage 4): 512,000 mB. A clear tube held by gold rings.\n'
-     '- Horizon Duct (stage 5): no limit. A thick black main with gold fittings.\n'
-     'Pipes of different tiers connect to each other. The amount moved is set by the narrowest part of the route from one port to another, and flows that share a stretch share its capacity. '
-     'While fluid flows, you can see it and its direction through the windows and clear tubes.\n'
-     'Pipes hold no fluid, and long networks stay light: unbranched runs are handled as a single stretch.'),
+     'Join the source and receiver with fluid pipes and check the side settings at both ends. Pipes can also draw from an adjacent water or lava source.\n'
+     'Branches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.'),
     ('drone', '液体をドローンで送る',
      '液体ドローン発着ポートは、物の発着ポートと同じドローンとステーションで、液体を送ります。行き先に並ぶのは、同じ持ち主の液体のポートだけです。\n'
      '左上に空の液体カプセルを入れ、送るタンク（左）に液体をためて「発送」を押すと、タンクの液体（1種類、64,000 mB まで）をカプセルに詰めて送ります。'
