@@ -25,7 +25,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import io.github.genichimaruo.singulo.compat.Capabilities;
 import net.minecraftforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -335,7 +335,7 @@ public final class FluidPipeNetwork {
             for (var player : event.getServer().getPlayerList().getPlayers()) {
                 var level = player.serverLevel();
                 if (level.getGameTime() % DISPLAY != 0 || !SurveyGlassesItem.wearing(player)) continue;
-                if (player.pick(player.blockInteractionRange(), 1, false) instanceof BlockHitResult hit
+                if (player.pick(player.getAttributeValue(net.minecraftforge.common.ForgeMod.BLOCK_REACH.get()), 1, false) instanceof BlockHitResult hit
                         && hit.getType() == HitResult.Type.BLOCK && level.isLoaded(hit.getBlockPos())
                         && level.getBlockEntity(hit.getBlockPos()) instanceof FluidPipeBlockEntity pipe) {
                     pipe.syncSurveyRate();

@@ -45,7 +45,7 @@ public class AndroidChargerItem extends Item {
     public static ItemStack find(Player player) {
         int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
         if (rate == 0) return ItemStack.EMPTY;
-        long minEnergy = Math.ceilDiv((long) RuinAndroid.CHARGER_FE_PER_TICK, rate);
+        long minEnergy = io.github.genichimaruo.singulo.compat.Legacy.ceilDiv((long) RuinAndroid.CHARGER_FE_PER_TICK, rate);
         for (ItemStack s : player.getInventory().items) {
             if (s.getItem() instanceof AndroidChargerItem && energy(s).getEnergyStored() >= minEnergy) {
                 return s;
@@ -105,7 +105,7 @@ public class AndroidChargerItem extends Item {
             tooltip.add(io.github.genichimaruo.singulo.energy.EnergyText.hint());
         }
         int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
-        long perCharge = rate == 0 ? Long.MAX_VALUE : Math.ceilDiv((long) PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY), rate)
+        long perCharge = rate == 0 ? Long.MAX_VALUE : io.github.genichimaruo.singulo.compat.Legacy.ceilDiv((long) PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY), rate)
                 * RuinAndroid.CHARGER_FE_PER_TICK;
         tooltip.add(Component.translatable("tooltip.singulo.android_charger.charges", stored / perCharge).withStyle(ChatFormatting.AQUA));
     }

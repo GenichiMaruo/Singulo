@@ -2940,11 +2940,11 @@ final class AndroidWorkGoal extends Goal {
         if (match.isEmpty()) {
             return false;
         }
-        ItemStack result = match.get().value().assemble(input, level.registryAccess());
+        ItemStack result = match.get().assemble(input, level.registryAccess());
         if (!ItemStack.matches(result, recipe.output())) {
             return false;
         }
-        var remaining = match.get().value().getRemainingItems(input);
+        var remaining = match.get().getRemainingItems(input);
         if (recipe.tankBuckets() == 0) {
             return commitCraft(level, c, job, at, used, result, remaining);
         }

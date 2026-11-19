@@ -202,7 +202,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) {
                     if (a.contains("machine_recipe")) {
                         var id = net.minecraft.resources.ResourceLocation.tryParse(a.getString("machine_recipe"));
                         if (id != null) player.level().getRecipeManager().byKey(id).ifPresent(holder -> {
-                            if (holder.value() instanceof io.github.genichimaruo.singulo.recipe.MachineRecipe machine) {
+                            if (holder instanceof io.github.genichimaruo.singulo.recipe.MachineRecipe machine) {
                                 var recipe = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjust(id, machine);
                                 if (recipe != null) {
                                     console.setMachineProcess(recipe, inputs);

@@ -28,7 +28,7 @@ public final class ConfigMigration {
             migrate(ServerConfig.SHELL_METAL_CORES, 2, "shellMetalCores");
             migrate(ServerConfig.REACTOR_PLATES_PER_SHELL, 12, "reactorPlatesPerShell");
         }
-        double pumpCost = ServerConfig.PUMP_FE_PER_MB.getAsDouble();
+        double pumpCost = ServerConfig.PUMP_FE_PER_MB.get();
         if ((version < 2 && pumpCost == 1.0) || (version == 2 && pumpCost == 0.75)
                 || (version == 3 && pumpCost == 0.1)) {
             ServerConfig.PUMP_FE_PER_MB.set(ServerConfig.PUMP_FE_PER_MB.getDefault());

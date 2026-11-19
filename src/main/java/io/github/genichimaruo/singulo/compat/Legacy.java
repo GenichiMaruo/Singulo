@@ -28,5 +28,9 @@ public final class Legacy {
     public static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
+    public static long ceilDiv(long x, long y) {
+        long quotient = Math.floorDiv(x, y);
+        return quotient + (x % y == 0 ? 0 : 1);
+    }
     private Legacy() {}
 }

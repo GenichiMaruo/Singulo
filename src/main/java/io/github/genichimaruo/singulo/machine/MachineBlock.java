@@ -41,10 +41,6 @@ public class MachineBlock extends AbstractMachineBlock {
         return drops;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

@@ -45,7 +45,6 @@ public final class MekanismQio implements QioStores.Access {
     private static final java.util.Map<IQIOFrequency, java.lang.ref.WeakReference<Handler>> HANDLERS = new java.util.WeakHashMap<>();
     /** Stable IDs for physical stock claims, including after a server restart or a dashboard unloading. */
     static final class FrequencyIds extends SavedData {
-        private static final Factory<FrequencyIds> FACTORY = new Factory<>(FrequencyIds::new, FrequencyIds::load, null);
         private final Map<String, Integer> ids = new LinkedHashMap<>();
 
         int id(IQIOFrequency frequency) {
@@ -57,14 +56,14 @@ public final class MekanismQio implements QioStores.Access {
         }
 
         @Override
-        public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        public CompoundTag save(CompoundTag tag) {
             var names = new ListTag();
             ids.keySet().forEach(name -> names.add(StringTag.valueOf(name)));
             tag.put("frequencies", names);
             return tag;
         }
 
-        static FrequencyIds load(CompoundTag tag, HolderLookup.Provider registries) {
+        static FrequencyIds load(CompoundTag tag) {
             var result = new FrequencyIds();
             var names = tag.getList("frequencies", Tag.TAG_STRING);
             for (int i = 0; i < names.size(); i++) result.ids.put(names.getString(i), i + 1);
@@ -148,7 +147,7 @@ public final class MekanismQio implements QioStores.Access {
             this.level = level;
             this.frequency = frequency;
             id = level instanceof ServerLevel server
-                    ? server.getServer().overworld().getDataStorage().computeIfAbsent(FrequencyIds.FACTORY,
+                    ? server.getServer().overworld().getDataStorage().computeIfAbsent(FrequencyIds::load, FrequencyIds::new,
                             "singulo_android_qio_frequencies").id(frequency)
                     : System.identityHashCode(frequency);
         }

@@ -33,7 +33,7 @@ public class ProcedureCardItem extends RecipeCardItem {
         if (data.steps().stream().anyMatch(s -> s.dimension() == null)) {
             tooltip.add(Component.translatable("tooltip.singulo.procedure_card.record_again").withStyle(ChatFormatting.YELLOW));
         } else if (!data.steps().isEmpty()) {
-            tooltip.add(Component.literal(data.steps().getFirst().dimension().toString()).withStyle(ChatFormatting.DARK_AQUA));
+            tooltip.add(Component.literal(data.steps().get(0).dimension().toString()).withStyle(ChatFormatting.DARK_AQUA));
         }
         int n = 1;
         for (ProcedureStep s : data.steps()) {

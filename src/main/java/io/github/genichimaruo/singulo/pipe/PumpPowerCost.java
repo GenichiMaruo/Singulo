@@ -34,7 +34,7 @@ record PumpPowerCost(int activationFe, int includedMb, long numerator, long deno
     int charge(long amount) {
         if (amount == 0) return 0;
         long due = (amount - includedMb) * numerator - credit;
-        return activationFe + (int) Math.max(0L, Math.ceilDiv(due, denominator));
+        return activationFe + (int) Math.max(0L, io.github.genichimaruo.singulo.compat.Legacy.ceilDiv(due, denominator));
     }
 
     int remainingCredit(long amount, int charged) {

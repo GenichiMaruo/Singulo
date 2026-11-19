@@ -156,6 +156,7 @@ public class MachineMenu extends AbstractContainerMenu {
     /** Vanilla moves one legal stack. The reserve is synchronized as a full 32-bit quantity. */
     private class StockSlot extends SlotItemHandler {
         private final ItemStackHandler grid;
+        private final int cell;
         private final SyncedInts excess;
 
         private final boolean board;
@@ -164,6 +165,7 @@ public class MachineMenu extends AbstractContainerMenu {
             super(grid, cell, x, y);
             this.board = board;
             this.grid = grid;
+            this.cell = cell;
             excess = machine == null ? SyncedInts.client(1) : SyncedInts.server(1, ignored -> {
                 ItemStack stack = grid.getStackInSlot(cell);
                 return Math.max(0, stack.getCount() - stack.getMaxStackSize());
@@ -172,36 +174,37 @@ public class MachineMenu extends AbstractContainerMenu {
         }
 
         @Override
-        public ItemStack getItem() { return MachineStock.visible(grid.getStackInSlot(index)); }
+        public ItemStack getItem() { return MachineStock.visible(grid.getStackInSlot(cell)); }
 
         @Override
         public int getMaxStackSize(ItemStack stack) {
-            return !board && index < type.inputSlots() && io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack) ? 1 : stack.getMaxStackSize();
+            return !board && cell < type.inputSlots() && io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack) ? 1 : stack.getMaxStackSize();
         }
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return (board ? !MachineBlockEntity.isCatalyst(stack) : index < type.inputSlots()) && super.mayPlace(stack);
+            return (board ? !MachineBlockEntity.isCatalyst(stack) : cell < type.inputSlots()) && super.mayPlace(stack);
         }
 
         void setTotal(ItemStack stack) {
-            grid.setStackInSlot(index, machine == null ? MachineStock.visible(stack) : stack);
+            grid.setStackInSlot(cell, machine == null ? MachineStock.visible(stack) : stack);
         }
 
         @Override
         public void setChanged() {
             // Vanilla also edits ordinary stacks in place.
-            grid.setStackInSlot(index, grid.getStackInSlot(index));
+            grid.setStackInSlot(cell, grid.getStackInSlot(cell));
         }
 
         @Override
-        public void setByPlayer(ItemStack replacement, ItemStack previous) {
+        public void setByPlayer(ItemStack replacement) {
+            ItemStack previous = getItem();
             int reserved = excess.getInt(0);
             if (machine != null && reserved > 0) {
                 ItemStack part = replacement.isEmpty() ? previous : replacement;
                 setTotal(part.copyWithCount((int) Math.min(Integer.MAX_VALUE, (long) reserved + replacement.getCount())));
             } else {
-                super.setByPlayer(replacement, previous);
+                super.setByPlayer(replacement);
             }
         }
 
@@ -211,7 +214,7 @@ public class MachineMenu extends AbstractContainerMenu {
             ItemStack visible = getItem();
             if (!visible.isEmpty() && !ItemStack.isSameItemSameTags(visible, stack)) return stack;
             int count = io.github.genichimaruo.singulo.compat.Legacy.clamp((long) visible.getCount() + excess.getInt(0), 0, Integer.MAX_VALUE);
-            int added = Math.min(Math.min(stack.getCount(), increment), stackLimit(board ? assemblySlot(index) : index, stack) - count);
+            int added = Math.min(Math.min(stack.getCount(), increment), stackLimit(board ? assemblySlot(cell) : cell, stack) - count);
             if (added > 0) {
                 setTotal(stack.copyWithCount(count + added));
                 stack.shrink(added);

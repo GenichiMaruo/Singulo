@@ -56,7 +56,7 @@ final class AndroidPathing {
             return stairs.gate() ? BlockPathTypes.OPEN : BlockPathTypes.BLOCKED;
         }
         if (block instanceof AndroidGlassSlab slab) {
-            return slab.gate() ? PathType.OPEN : PathType.BLOCKED;
+            return slab.gate() ? BlockPathTypes.OPEN : BlockPathTypes.BLOCKED;
         }
         return null;
     }

@@ -322,7 +322,7 @@ public final class WorkOrder {
         ListTag list = new ListTag();
         for (StepState s : steps) {
             CompoundTag st = new CompoundTag();
-            st.put("recipe", s.recipe.save(new CompoundTag()));
+            st.put("recipe", s.recipe.save(registries));
             st.put("location", NbtUtils.writeBlockPos(s.location));
             st.putString("block", BuiltInRegistries.BLOCK.getKey(s.block).toString());
             st.putLong("total", s.total);
@@ -349,7 +349,7 @@ public final class WorkOrder {
         t.putBoolean("notify", notify);
         ListTag pr = new ListTag();
         for (ItemCount c : pendingReserve) {
-            pr.add(c.save(new CompoundTag()));
+            pr.add(c.save(registries));
         }
         t.put("pending_reserve", pr);
         ListTag hs = new ListTag();
@@ -427,7 +427,7 @@ public final class WorkOrder {
     static ListTag saveCounts(List<ItemCount> list, HolderLookup.Provider registries) {
         ListTag out = new ListTag();
         for (ItemCount c : list) {
-            out.add(c.save(new CompoundTag()));
+            out.add(c.save(registries));
         }
         return out;
     }

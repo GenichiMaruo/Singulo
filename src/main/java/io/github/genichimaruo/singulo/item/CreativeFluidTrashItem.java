@@ -16,7 +16,7 @@ public final class CreativeFluidTrashItem extends SinguloBlockItem {
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         // Placing the bin against a tank must not let the tank fill the held bin and void its contents.
-        if (context.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, context.getClickedPos(), context.getClickedFace()) != null) {
+        if (Capabilities.get(context.getLevel(), Capabilities.FluidHandler.BLOCK, context.getClickedPos(), context.getClickedFace()) != null) {
             return useOn(context);
         }
         return InteractionResult.PASS;

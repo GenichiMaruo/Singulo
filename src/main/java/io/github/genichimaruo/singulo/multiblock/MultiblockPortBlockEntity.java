@@ -142,7 +142,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
             if (offer.isEmpty()) continue;
             int moved = dest.fill(offer, IFluidHandler.FluidAction.EXECUTE);
             if (moved > 0) {
-                source.drain(offer.copyWithAmount(moved), IFluidHandler.FluidAction.EXECUTE);
+                source.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(offer, moved), IFluidHandler.FluidAction.EXECUTE);
             }
         }
     }

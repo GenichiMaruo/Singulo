@@ -43,13 +43,13 @@ abstract class AssemblyGrid extends ItemStackHandler {
     }
 
     @Override
-    public CompoundTag serializeNBT(HolderLookup.Provider registries) {
-        return MachineStock.save(this, registries);
+    public CompoundTag serializeNBT() {
+        return MachineStock.save(this);
     }
 
     @Override
-    public void deserializeNBT(HolderLookup.Provider registries, CompoundTag tag) {
-        var saved = MachineStock.read(tag, registries);
+    public void deserializeNBT(CompoundTag tag) {
+        var saved = MachineStock.read(tag);
         for (int i = 0; i < getSlots(); i++) setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
     }
 }

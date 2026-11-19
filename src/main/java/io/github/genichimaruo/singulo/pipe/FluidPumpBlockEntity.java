@@ -107,7 +107,7 @@ public final class FluidPumpBlockEntity extends BlockEntity implements DeviceMen
         if (handler == null && face == intake()) {
             var state = server.getBlockState(pos);
             if (state.getFluidState().isSource() && state.getBlock() instanceof BucketPickup pickup)
-                return new BucketPickupHandlerWrapper(null, pickup, server, pos);
+                return new BucketPickupHandlerWrapper(pickup, server, pos);
         }
         return handler;
     }

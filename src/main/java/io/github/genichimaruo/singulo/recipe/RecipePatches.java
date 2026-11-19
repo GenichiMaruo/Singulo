@@ -77,7 +77,8 @@ public final class RecipePatches {
             }
             // This full recipe was freshly parsed. Complete replacements hide everything below them.
             var result = json.getAsJsonObject();
-            for (Layer patch : patches.reversed()) {
+            for (int i = patches.size() - 1; i >= 0; i--) {
+                Layer patch = patches.get(i);
                 try {
                     merge(result, patch.changes(), "");
                 } catch (IllegalArgumentException ex) {
@@ -87,7 +88,7 @@ public final class RecipePatches {
             return result;
         }
         throw new IllegalArgumentException("no lower-priority base recipe for patch in "
-                + (patches.isEmpty() ? "resource stack" : patches.getFirst().pack()));
+                + (patches.isEmpty() ? "resource stack" : patches.get(0).pack()));
     }
 
     private static JsonElement merge(JsonElement base, JsonElement change, String path) {

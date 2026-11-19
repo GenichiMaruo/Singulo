@@ -251,6 +251,15 @@ mixin {
     config 'singulo.mixins.json'
 }
 dependencies {
+    // Both 1.20.1 loaders use the Forge namespace and need the nested runtime for the ray mixins.
+    compileOnly 'io.github.llamalad7:mixinextras-common:0.5.4'
+    implementation 'io.github.llamalad7:mixinextras-forge:0.5.4'
+    jarJar('io.github.llamalad7:mixinextras-forge:0.5.4') {
+        version {
+            strictly '[0.5.4,0.6)'
+            prefer '0.5.4'
+        }
+    }
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

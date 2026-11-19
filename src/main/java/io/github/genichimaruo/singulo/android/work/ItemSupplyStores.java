@@ -27,7 +27,7 @@ final class ItemSupplyStores {
         }
         List<Source> out = new ArrayList<>();
         for (List<Source> faces : byStore.values()) {
-            Source first = faces.getFirst();
+            Source first = faces.get(0);
             // QIO frequencies and AndroidSharedStorage explicitly present one complete network view.
             if (faces.size() == 1 || first.key().getX() <= Integer.MIN_VALUE + 1) out.add(first);
             else collectFaces(console, faces, out);
@@ -44,7 +44,7 @@ final class ItemSupplyStores {
     }
 
     private static void collectFaces(WorkConsoleBlockEntity console, List<Source> faces, List<Source> out) {
-        BlockPos key = faces.getFirst().key();
+        BlockPos key = faces.get(0).key();
         var level = console.getLevel();
         var block = level.isLoaded(key) ? level.getBlockEntity(key) : null;
         Map<Object, Slots> winners = new LinkedHashMap<>();

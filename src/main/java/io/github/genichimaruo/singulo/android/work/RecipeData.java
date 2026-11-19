@@ -290,7 +290,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             var fluid = FluidSamples.fluid(stored);
             var bucket = new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA,
                     net.minecraftforge.fluids.FluidType.BUCKET_VOLUME);
-            if (fluid.getAmount() == bucket.getAmount() && net.minecraftforge.fluids.FluidStack.isSameFluidSameComponents(fluid, bucket)) {
+            if (fluid.getAmount() == bucket.getAmount() && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(fluid, bucket)) {
                 return new ItemStack(net.minecraft.world.item.Items.LAVA_BUCKET);
             }
         }
@@ -409,7 +409,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         if (!steps.isEmpty()) {
             ListTag st = new ListTag();
             for (ProcedureStep s : steps) {
-                st.add(s.save(new CompoundTag()));
+                st.add(s.save(registries));
             }
             r.put("steps", st);
         }

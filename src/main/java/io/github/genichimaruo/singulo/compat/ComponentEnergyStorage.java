@@ -5,7 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /** Forge energy exposed by a rechargeable, NBT-backed tool. */
-public final class ComponentEnergyStorage implements IEnergyStorage {
+public class ComponentEnergyStorage implements IEnergyStorage {
     private final ItemStack stack;
     private final SinguloComponents.Key<Integer> key;
     private final int capacity;

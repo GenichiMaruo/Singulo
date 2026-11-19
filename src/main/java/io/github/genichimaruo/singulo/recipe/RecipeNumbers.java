@@ -21,8 +21,8 @@ public final class RecipeNumbers {
                 } catch (ArithmeticException | NumberFormatException ignored) {}
                 return DataResult.error(() -> "Expected a whole number from 0 to 2147483647, got " + number);
             })));
-    static final Codec<Integer> POSITIVE = NONNEGATIVE.validate(n -> n > 0 ? DataResult.success(n)
-            : DataResult.error(() -> "Expected a positive quantity"));
+    static final Codec<Integer> POSITIVE = NONNEGATIVE.flatXmap(n -> n > 0 ? DataResult.success(n)
+            : DataResult.error(() -> "Expected a positive quantity"), DataResult::success);
 
     // Recipe quantities are independent of the item inventory's stack limit.
     static final Codec<ItemStack> STACK = RecordCodecBuilder.create(i -> i.group(

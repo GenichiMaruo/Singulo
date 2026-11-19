@@ -62,7 +62,6 @@ public final class Singulo {
 
         modBus.addListener(ModpackRecipePacks::register);
         java.util.Objects.requireNonNull(io.github.genichimaruo.singulo.ruin.PrototypeMemories.RECEIVED);
-        io.github.genichimaruo.singulo.ruin.AncientRecords.REGISTER.register(modBus);
         modBus.addListener(SinguloEntities::registerAttributes);
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent e) -> e.enqueueWork(() -> {
             SinguloCapabilities.register(new io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent());
