@@ -457,6 +457,10 @@ public final class GuiReviewHarness {
         ServerPlayer player = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
         var level = player.serverLevel();
         player.setGameMode(GameType.CREATIVE);
+        // Creative mode alone does not unlock discovery-gated Handbook pages.
+        player.getInventory().setItem(30, item("android_station"));
+        player.getInventory().setItem(31, item("android_work_console"));
+        player.getInventory().setChanged();
         player.teleportTo(2.5, 80, 2.5);
         for (BlockPos p : BlockPos.betweenClosed(-2, 79, -2, 8, 79, 5)) {
             level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
