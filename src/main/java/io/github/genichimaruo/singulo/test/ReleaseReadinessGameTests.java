@@ -53,7 +53,7 @@ public final class ReleaseReadinessGameTests {
         android.assignWork(helper.absolutePos(at), 1); // 注文1は完了して一覧から消えている
         android.addToCarry(new ItemStack(Items.DIRT)); // 作業で出た余り。私物にはしない
         var harvest = RecipeData.procedure(List.of(new ProcedureStep(ProcedureStep.HARVEST,
-                helper.absolutePos(new BlockPos(4, 1, 4)), null, new ItemStack(Items.WHEAT))), new ItemStack(Items.WHEAT));
+                helper.absolutePos(new BlockPos(4, 1, 4)), null, new ItemStack(Items.WHEAT)).recordedIn(helper.getLevel())), new ItemStack(Items.WHEAT));
         var order = new WorkOrder(2, new ItemStack(Items.WHEAT), 1, null);
         order.workers.add(android.getUUID());
         var constructor = WorkOrder.StepState.class.getDeclaredConstructor(RecipeData.class, BlockPos.class, net.minecraft.world.level.block.Block.class, long.class);

@@ -1,0 +1,1 @@
+{"singulo:machine":{"entrypoints":{"common":"io.github.genichimaruo.singulo.compat.wthit.SinguloWthitPlugin$Common","client":"io.github.genichimaruo.singulo.compat.wthit.SinguloWthitPlugin$Client"},"side":"*","required":[]}}

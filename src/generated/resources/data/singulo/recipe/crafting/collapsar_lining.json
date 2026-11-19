@@ -4,7 +4,7 @@
   "pattern": [
     "NPN",
     "PCP",
-    "NPN"
+    "NFN"
   ],
   "key": {
     "N": {
@@ -15,6 +15,9 @@
     },
     "C": {
       "item": "singulo:collapsar_ingot"
+    },
+    "F": {
+      "item": "singulo:nihonium_frame"
     }
   },
   "result": {

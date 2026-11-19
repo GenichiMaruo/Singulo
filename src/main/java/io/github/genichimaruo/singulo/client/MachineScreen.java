@@ -5,13 +5,18 @@ import io.github.genichimaruo.singulo.machine.MachineLayout;
 import io.github.genichimaruo.singulo.machine.MachineMenu;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
+import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -21,7 +26,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     private static final int MODE_SIZE = 16;
 
     public MachineScreen(MachineMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, menu.layout.width, MachineLayout.HEIGHT);
+        super(menu, inventory, title, menu.layout.width, menu.layout.height);
     }
 
     private MachineLayout layout() {
@@ -61,10 +66,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         if (idleReason != null && reasonTimer++ % 5 != 0) {
             return;
         }
-        List<ItemStack> inputs = new ArrayList<>();
-        for (int i = 0; i < type().recipeSlots(); i++) {
-            inputs.add(menu.getSlot(type().recipeSlot(i)).getItem());
-        }
+        List<ItemStack> inputs = recipeInputs();
         List<net.neoforged.neoforge.fluids.FluidStack> tanks = new ArrayList<>();
         for (int i = 0; i < type().tanks(); i++) {
             int fluidId = menu.value(MachineBlockEntity.D_TANKS + i * 2);
@@ -326,6 +328,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     @Override
     protected boolean railUsed(int row) {
         return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP && type() == MachineType.PRECISION_ASSEMBLER
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS && hasSides();
     }
@@ -333,6 +336,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     @Override
     protected boolean railConnected(int row) {
         return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP && type() == MachineType.PRECISION_ASSEMBLER
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION || sides.open;
     }
 
@@ -342,7 +346,10 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             Panel.sidesIcon(g, x, y);
             return;
         }
-        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION) {
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP) {
+            Slot slot = menu.getSlot(type().assemblyUpgradeSlot());
+            drawSpecialSlot(g, leftPos + slot.x, topPos + slot.y, 0, type().assemblyUpgradeSlot(), "assembly_stock_upgrade");
+        } else if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION) {
             drawSpecialSlot(g, leftPos + layout().capacityX, topPos + layout().capacityY, 0, type().capacitySlot(), "capacity_upgrade_1");
         } else {
             drawSpecialSlot(g, leftPos + layout().upgradeX, topPos + layout().upgradeY, 0, type().upgradeSlot(), "monopole_upgrade");
@@ -361,12 +368,37 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
 
     @Override
     protected Component railTooltip(int row) {
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP) {
+            Slot slot = menu.getSlot(type().assemblyUpgradeSlot());
+            if (!slot.hasItem()) return Component.translatable("item.singulo.assembly_stock_upgrade");
+            return slot.mayPickup(minecraft.player) ? null : Component.translatable("gui.singulo.assembly.upgrade_locked");
+        }
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
             return Component.translatable("gui.singulo.sides.button");
         }
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION)
             return menu.getSlot(type().capacitySlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.capacity_upgrade") : null;
         return menu.getSlot(type().upgradeSlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.upgrade") : null;
+    }
+
+    @Override
+    protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
+        var lines = new java.util.ArrayList<>(super.getTooltipFromContainerItem(stack));
+        int extra = hoveredSlot == null ? 0 : menu.assemblyExcess(hoveredSlot);
+        if (extra > 0) lines.add(Component.literal(String.format(java.util.Locale.ROOT, "× %,d", (long) stack.getCount() + extra)));
+        return lines;
+    }
+
+    @Override
+    protected void renderSlotContents(GuiGraphics graphics, ItemStack stack, Slot slot, @javax.annotation.Nullable String count) {
+        int extra = stack.isEmpty() ? 0 : menu.assemblyExcess(slot);
+        int total = (int) Math.min(Integer.MAX_VALUE, (long) stack.getCount() + extra);
+        if (extra == 0 || total < 100) {
+            super.renderSlotContents(graphics, stack, slot, extra > 0 ? Integer.toString(total) : count);
+            return;
+        }
+        super.renderSlotContents(graphics, stack, slot, "");
+        StockCount.draw(graphics, slot.x, slot.y, total);
     }
 
     /** 自動排出の全体スイッチの位置（板の右上）。 */
@@ -559,7 +591,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
 
         int energy = menu.value(MachineBlockEntity.D_ENERGY);
         int capacity = Math.max(1, menu.value(MachineBlockEntity.D_CAPACITY));
-        Panel.gauge(g, skin, x + MachineLayout.ENERGY_X, y + MachineLayout.TOP, 8, MachineLayout.BAR_HEIGHT,
+        Panel.gauge(g, skin, x + MachineLayout.ENERGY_X, y + l.energyY, 8, MachineLayout.BAR_HEIGHT,
                 (double) energy / capacity, Panel.GLOW);
 
         for (int i = 0; i < l.fluidInX.length; i++) {
@@ -571,9 +603,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         for (int i = 0; i < type().inputSlots(); i++) {
             Panel.slot(g, skin, x + l.inputX[i], y + l.inputY[i]);
         }
+        if (type() == MachineType.PRECISION_ASSEMBLER) {
+            for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                Panel.slot(g, skin, x + MachineLayout.assemblyX(cell), y + MachineLayout.assemblyY(cell));
+            }
+            drawSpecialSlot(g, x + l.spentX, y + l.spentY, 0, type().spentCatalystSlot(), "spent_time_crystal_catalyst");
+        }
         for (int i = 0; i < type().outputSlots(); i++) {
             Panel.slot(g, skin, x + l.outputX, y + l.outputY[i]);
         }
+        ItemStack preview = assemblyPreview();
+        if (!preview.isEmpty()) drawGhost(g, x + l.outputX, y + l.outputY[0], preview);
         if (type().hasCatalystSlot()) {
             boolean empty = menu.getSlot(menuIndexOf(type().catalystSlot())).getItem().isEmpty();
             int loaded = menu.value(MachineBlockEntity.D_LOADED_ITEM);
@@ -595,17 +635,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             boolean hover = Panel.inside(mouseX, mouseY, bx, by, MODE_SIZE, MODE_SIZE);
             Panel.button(g, skin, bx - 1, by - 1, MODE_SIZE + 2, MODE_SIZE + 2, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
             g.renderItem(modeIcon(), bx, by);
-            int target = menu.value(MachineBlockEntity.D_MASS_TARGET);
+            double target = menu.massValue(true);
             if (target > 0) {
                 int mx = x + l.massBarX;
                 Panel.well(g, skin, mx, by + 5, l.massBarWidth, 6);
-                double f = (double) menu.value(MachineBlockEntity.D_MASS) / target;
+                double f = menu.massValue(false) / target;
                 int filled = (int) Math.round(l.massBarWidth * Math.min(1, f));
                 g.fill(mx, by + 5, mx + filled, by + 11, Panel.GLOW);
                 Panel.glass(g, mx, by + 5, filled, 6);
             }
         }
-        if (type().selectsRecipe()) {
+        if (hasRecipeList()) {
             drawSelectButton(g, mouseX, mouseY);
         }
     }
@@ -614,8 +654,16 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
 
     /** 作るものを選ぶ窓。 */
     private final Popup selector = new Popup("machine.select");
+    @javax.annotation.Nullable private RecipeHolder<MachineRecipe> pinnedDiagram;
+    private List<RecipeHolder<MachineRecipe>> pinnedCatalog = List.of();
+
+    private boolean hasRecipeList() { return type() == MachineType.PRECISION_ASSEMBLER || type().selectsRecipe(); }
     /** 選ぶ画面の、上から隠れている行の数。 */
     private int selectorScroll;
+    private List<RecipeHolder<MachineRecipe>> selectorSource = List.of();
+    private List<ItemStack> selectorInputs = List.of();
+    private List<RecipeHolder<MachineRecipe>> sortedEntries = java.util.Collections.singletonList(null);
+    private final java.util.Map<net.minecraft.resources.ResourceLocation, Integer> selectorScores = new java.util.HashMap<>();
     /** 作るものボタン（出力スロットの右）。 */
     private int[] selectPos() {
         return new int[]{leftPos + layout().selectX, topPos + layout().selectY, 16, 16};
@@ -644,14 +692,41 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     @javax.annotation.Nullable
     private RecipeHolder<MachineRecipe> selectedHolder() {
         var level = Minecraft.getInstance().level;
+        if (type() == MachineType.PRECISION_ASSEMBLER) {
+            if (pinnedDiagram == null || level == null) return null;
+            var catalog = io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(level, type());
+            if (pinnedCatalog != catalog) {
+                var id = pinnedDiagram.id();
+                pinnedDiagram = catalog.stream().filter(recipe -> recipe.id().equals(id)).findFirst().orElse(null);
+                pinnedCatalog = catalog;
+            }
+            return pinnedDiagram;
+        }
         return level == null ? null : io.github.genichimaruo.singulo.machine.RecipeSelection.byIndex(level, type(),
                 menu.value(MachineBlockEntity.D_SELECTED) - 1);
     }
 
+    private ItemStack assemblyPreview() {
+        if (type() != MachineType.PRECISION_ASSEMBLER || menu.getSlot(type().outputSlot()).hasItem()) return ItemStack.EMPTY;
+        var level = Minecraft.getInstance().level;
+        int index = menu.value(MachineBlockEntity.assemblyPreviewIndex(type())) - 1;
+        if (index < 0 || level == null) return ItemStack.EMPTY;
+        var recipe = io.github.genichimaruo.singulo.machine.RecipeSelection.byIndex(level, type(), index);
+        return recipe == null ? ItemStack.EMPTY : recipe.value().result();
+    }
+
     private List<ItemStack> recipeInputs() {
         List<ItemStack> inputs = new ArrayList<>();
+        if (type() == MachineType.PRECISION_ASSEMBLER) {
+            for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                inputs.add(menu.getSlot(menu.assemblySlot(cell)).getItem());
+            }
+            inputs.add(io.github.genichimaruo.singulo.machine.CatalystMagazine.pooled(
+                    menu.loadedCatalyst(), menu.getSlot(type().catalystSlot()).getItem()));
+            return inputs;
+        }
         for (int i = 0; i < type().recipeSlots(); i++) {
-            inputs.add(menu.getSlot(type().recipeSlot(i)).getItem());
+            inputs.add(menu.transferStack(type().recipeSlot(i)));
         }
         return inputs;
     }
@@ -664,6 +739,8 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         Panel.slot(g, skin, p[0], p[1]);
         if (selected != null) {
             g.renderItem(selected.value().result(), p[0], p[1]);
+        } else if (type() == MachineType.PRECISION_ASSEMBLER) {
+            g.renderItem(Items.BOOK.getDefaultInstance(), p[0], p[1]);
         } else {
             Panel.autoIcon(g, p[0] + 4, p[1] + 3, 0xFFB8C2CC);
         }
@@ -671,27 +748,28 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
 
     /** 選ぶ画面の並び: 先頭は「自動」（null）、続いて入っている材料で作れるもの → 材料の一部が入っているもの → そのほか。 */
     private List<RecipeHolder<MachineRecipe>> selectorEntries() {
-        List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        out.add(null);
         var level = Minecraft.getInstance().level;
-        if (level == null) {
-            return out;
-        }
+        if (level == null) return java.util.Collections.singletonList(null);
         List<ItemStack> inputs = recipeInputs();
-        List<RecipeHolder<MachineRecipe>> all = new ArrayList<>(io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(level, type()));
-        java.util.Map<net.minecraft.resources.ResourceLocation, Integer> score = new java.util.HashMap<>();
+        var recipes = io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(level, type());
+        if (selectorSource == recipes && ItemStack.listMatches(selectorInputs, inputs)) return sortedEntries;
+        selectorSource = recipes;
+        selectorInputs = inputs.stream().map(ItemStack::copy).toList();
+        selectorScores.clear();
+        List<RecipeHolder<MachineRecipe>> all = new ArrayList<>(recipes);
         for (RecipeHolder<MachineRecipe> h : all) {
-            score.put(h.id(), matchScore(h.value(), inputs));
+            selectorScores.put(h.id(), matchScore(h.value(), inputs));
         }
-        all.sort(java.util.Comparator.comparingInt((RecipeHolder<MachineRecipe> h) -> -score.get(h.id()))
+        all.sort(java.util.Comparator.comparingInt((RecipeHolder<MachineRecipe> h) -> -selectorScores.get(h.id()))
                 .thenComparingInt(h -> h.value().stage()).thenComparing(h -> h.id().toString()));
-        out.addAll(all);
-        return out;
+        if (type() != MachineType.PRECISION_ASSEMBLER) all.add(0, null);
+        sortedEntries = all;
+        return sortedEntries;
     }
 
     /** 2000 = 今の材料で作れる、それ未満は入っている材料の種類の数（多いほど上）。 */
-    private static int matchScore(MachineRecipe r, List<ItemStack> inputs) {
-        if (r.plan(inputs) != null) {
+    private int matchScore(MachineRecipe r, List<ItemStack> inputs) {
+        if ((type() == MachineType.PRECISION_ASSEMBLER ? r.assemblyPlan(inputs) : r.plan(inputs)) != null) {
             return 2000;
         }
         int matched = 0;
@@ -775,7 +853,6 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             }
         }
         RecipeHolder<MachineRecipe> selected = selectedHolder();
-        List<ItemStack> inputs = recipeInputs();
         int hovered = entryAt(mouseX, mouseY, entries.size());
         for (int v = 0; v < cols * visibleRows; v++) {
             int index = selectorScroll * cols + v;
@@ -785,7 +862,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             RecipeHolder<MachineRecipe> h = entries.get(index);
             int[] c = cellPos(v);
             boolean isSelected = h == null ? selected == null : selected != null && selected.id().equals(h.id());
-            boolean ready = h != null && h.value().plan(inputs) != null;
+            boolean ready = h != null && selectorScores.get(h.id()) == 2000;
             Panel.slot(g, skin, c[0] + 1, c[1] + 1);
             int ring = isSelected ? skin.accent() : index == hovered ? Panel.GLOW : ready ? GuiSkin.OK : 0;
             if (ring != 0) {
@@ -799,13 +876,59 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             }
         }
         if (hovered >= 0) {
-            Panel.tooltip(g, font, selectorTooltip(entries.get(hovered)), 230, mouseX, mouseY);
+            RecipeHolder<MachineRecipe> entry = entries.get(hovered);
+            drawRecipeTooltip(g, entry, mouseX, mouseY);
         } else if (canMore && Panel.inside(mouseX, mouseY, more[0], more[1], more[2], more[3])) {
             g.renderTooltip(font, Component.translatable("gui.singulo.select.rows_more"), mouseX, mouseY);
         } else if (canLess && Panel.inside(mouseX, mouseY, less[0], less[1], less[2], less[3])) {
             g.renderTooltip(font, Component.translatable("gui.singulo.select.rows_less"), mouseX, mouseY);
         }
         g.pose().popPose();
+    }
+
+    private void drawRecipeTooltip(GuiGraphics g, @javax.annotation.Nullable RecipeHolder<MachineRecipe> entry, int mouseX, int mouseY) {
+        List<Component> lines = selectorTooltip(entry);
+        if (entry != null && entry.value().fitsAssemblyBoard()) {
+            g.renderTooltip(font, lines, java.util.Optional.of(new AssemblyPreview(entry.value(), skin)),
+                    entry.value().result(), mouseX, mouseY);
+        } else {
+            Panel.tooltip(g, font, lines, 230, mouseX, mouseY);
+        }
+    }
+
+    record AssemblyPreview(MachineRecipe recipe, GuiSkin skin) implements TooltipComponent, ClientTooltipComponent {
+        @Override
+        public int getHeight() { return 72; }
+
+        @Override
+        public int getWidth(Font font) { return 88; }
+
+        @Override
+        public void renderImage(Font font, int x, int y, GuiGraphics g) {
+            g.pose().pushPose();
+            g.pose().translate(x + 1, y + 1, 0);
+            g.pose().scale(.75F, .75F, 1);
+            for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                int square = MachineRecipe.assemblySquare(cell);
+                int cx = square % 5 * 18, cy = square / 5 * 18;
+                Panel.slot(g, skin, cx, cy);
+                int index = recipe.boardIngredientIndex(cell);
+                if (index >= 0) drawIngredient(g, recipe.ingredients().get(index).ingredient(), cx, cy);
+                else if (index == MachineRecipe.BOARD_RESTORE) drawIngredient(g, recipe.restore().orElseThrow(), cx, cy);
+            }
+            for (var part : recipe.ingredients()) {
+                if (!recipe.assemblyCatalyst(part)) continue;
+                g.renderOutline(94, 34, 20, 20, Panel.AMBER);
+                Panel.slot(g, skin, 96, 36);
+                drawIngredient(g, part.ingredient(), 96, 36);
+            }
+            g.pose().popPose();
+        }
+
+        private static void drawIngredient(GuiGraphics g, net.minecraft.world.item.crafting.Ingredient ingredient, int x, int y) {
+            ItemStack[] choices = ingredient.getItems();
+            if (choices.length > 0) g.renderItem(choices[0], x, y);
+        }
     }
 
     private List<Component> selectorTooltip(@javax.annotation.Nullable RecipeHolder<MachineRecipe> h) {
@@ -856,6 +979,12 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             return false;
         }
         RecipeHolder<MachineRecipe> h = entries.get(index);
+        if (type() == MachineType.PRECISION_ASSEMBLER) {
+            pinnedDiagram = h;
+            pinnedCatalog = selectorSource;
+            selector.open = false;
+            return true;
+        }
         var level = Minecraft.getInstance().level;
         int id = h == null || level == null ? -1 : io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(level, type(), h.id());
         minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id < 0 ? MachineMenu.BUTTON_CLEAR_SELECTION
@@ -911,7 +1040,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         if (fluidId > 0) {
             Fluid fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
-            double fraction = (double) amount / MachineType.TANK_CAPACITY;
+            double fraction = (double) amount / MachineType.tankCapacity();
             FluidGauge.draw(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT, fraction, fluid);
             int filled = (int) Math.round(MachineLayout.BAR_HEIGHT * Math.min(1, fraction));
             Panel.glass(g, x, y + MachineLayout.BAR_HEIGHT - filled, MachineLayout.TANK_WIDTH, filled);
@@ -957,8 +1086,14 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             return;
         }
         int[] sp = selectPos();
-        if (type().selectsRecipe() && Panel.inside(mouseX, mouseY, sp[0], sp[1], sp[2], sp[3])) {
+        if (hasRecipeList() && Panel.inside(mouseX, mouseY, sp[0], sp[1], sp[2], sp[3])) {
             RecipeHolder<MachineRecipe> selected = selectedHolder();
+            if (type() == MachineType.PRECISION_ASSEMBLER) {
+                if (selected != null) drawRecipeTooltip(g, selected, mouseX, mouseY);
+                else Panel.tooltip(g, font, List.of(Component.translatable("gui.singulo.assembly.diagrams"),
+                                Component.translatable("gui.singulo.assembly.diagrams_hint")), 220, mouseX, mouseY);
+                return;
+            }
             List<Component> lines = new ArrayList<>();
             lines.add(selected == null ? Component.translatable("gui.singulo.select.auto")
                     : Component.translatable("gui.singulo.select.fixed", selected.value().result().getHoverName()));
@@ -967,6 +1102,21 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             lines.add(Component.translatable("gui.singulo.select.button_hint").withStyle(s -> s.withColor(0xFF8A949E)));
             Panel.tooltip(g, font, lines, 220, mouseX, mouseY);
             return;
+        }
+        if (type() == MachineType.PRECISION_ASSEMBLER) {
+            if (Panel.inside(mouseX, mouseY, x + l.outputX, y + l.outputY[0], 16, 16)) {
+                ItemStack preview = assemblyPreview();
+                if (!preview.isEmpty()) {
+                    Panel.tooltip(g, font, List.of(preview.getHoverName(), Component.translatable("gui.singulo.assembly.preview")),
+                            220, mouseX, mouseY);
+                    return;
+                }
+            }
+            if (Panel.inside(mouseX, mouseY, x + l.spentX, y + l.spentY, 16, 16)
+                    && !menu.getSlot(type().spentCatalystSlot()).hasItem()) {
+                g.renderTooltip(font, Component.translatable("gui.singulo.catalyst.spent_slot"), mouseX, mouseY);
+                return;
+            }
         }
         int[] fp = freePos();
         if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3])) {
@@ -986,7 +1136,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
                 return;
             }
         }
-        if (Panel.inside(mouseX, mouseY, x + MachineLayout.ENERGY_X, y + MachineLayout.TOP, 8, MachineLayout.BAR_HEIGHT)) {
+        if (Panel.inside(mouseX, mouseY, x + MachineLayout.ENERGY_X, y + l.energyY, 8, MachineLayout.BAR_HEIGHT)) {
             int usage = menu.value(MachineBlockEntity.D_USAGE);
             List<Component> lines = new ArrayList<>(Panel.energyLines(menu.value(MachineBlockEntity.D_ENERGY),
                     menu.value(MachineBlockEntity.D_CAPACITY)));
@@ -1001,11 +1151,14 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             if (Panel.inside(mouseX, mouseY, x + tx, y + MachineLayout.TOP, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT)) {
                 int fluidId = menu.value(MachineBlockEntity.D_TANKS + i * 2);
                 int amount = menu.value(MachineBlockEntity.D_TANKS + i * 2 + 1);
-                Component name = fluidId > 0
-                        ? BuiltInRegistries.FLUID.byId(fluidId - 1).getFluidType().getDescription()
-                        : Component.translatable("gui.singulo.empty_tank");
-                g.renderTooltip(font, Component.translatable("gui.singulo.fluid", name, amount, MachineType.TANK_CAPACITY),
-                        mouseX, mouseY);
+                Fluid fluid = fluidId > 0 ? BuiltInRegistries.FLUID.byId(fluidId - 1) : null;
+                Component name = fluid == null ? Component.translatable("gui.singulo.empty_tank") : fluid.getFluidType().getDescription();
+                Component contents = Component.translatable("gui.singulo.fluid", name, amount, MachineType.tankCapacity());
+                if (type() == MachineType.ELECTROLYZER && i >= type().fluidInputs() && fluid != null && fluid.isSame(SinguloFluids.get("oxygen"))) {
+                    Panel.tooltip(g, font, List.of(contents, Component.translatable("gui.singulo.electrolyzer.oxygen_hint")), 200, mouseX, mouseY);
+                } else {
+                    g.renderTooltip(font, contents, mouseX, mouseY);
+                }
                 return;
             }
         }
@@ -1016,11 +1169,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             lines.add(mode > 0 && mode <= list.size()
                     ? Component.translatable("gui.singulo.mode.mass", list.get(mode - 1).value().result().getHoverName())
                     : Component.translatable("gui.singulo.mode.normal"));
-            int target = menu.value(MachineBlockEntity.D_MASS_TARGET);
+            double target = menu.massValue(true);
             if (target > 0) {
                 lines.add(Component.translatable("gui.singulo.mass_buffer",
-                        String.format("%.2f", menu.value(MachineBlockEntity.D_MASS) / 100.0),
-                        String.format("%.0f", target / 100.0)));
+                        io.github.genichimaruo.singulo.energy.EnergyText.of(menu.massValue(false)),
+                        io.github.genichimaruo.singulo.energy.EnergyText.of(target)));
             }
             lines.add(Component.translatable("gui.singulo.mode.hint").withStyle(s -> s.withColor(0xFF8A949E)));
             g.renderComponentTooltip(font, lines, mouseX, mouseY);
@@ -1034,12 +1187,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         }
         Panel.slot(g, skin, sx, sy);
         if (menu.getSlot(menuIndexOf(slotIndex)).getItem().isEmpty()) {
-            g.pose().pushPose();
-            g.renderItem(new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), sx, sy);
-            g.pose().translate(0, 0, 200);
-            g.fill(sx, sy, sx + 16, sy + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
-            g.pose().popPose();
+            drawGhost(g, sx, sy, new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))));
         }
+    }
+
+    private void drawGhost(GuiGraphics g, int sx, int sy, ItemStack stack) {
+        g.pose().pushPose();
+        g.renderItem(stack, sx, sy);
+        if (stack.getCount() > 1) g.renderItemDecorations(font, stack, sx, sy);
+        g.pose().translate(0, 0, 225);
+        g.fill(sx, sy, sx + 16, sy + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
+        g.pose().popPose();
     }
 
     /** 装置のスロット番号から、メニュー上の番号へ（入力・出力・触媒・アップグレードの順に並んでいる）。 */
@@ -1078,10 +1236,10 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_MAKE_FREE);
             return true;
         }
-        if (type().selectsRecipe()) {
+        if (hasRecipeList()) {
             int[] sp = selectPos();
             if (Panel.inside(mouseX, mouseY, sp[0], sp[1], sp[2], sp[3])) {
-                if (button == 1 && minecraft != null && minecraft.gameMode != null) {
+                if (button == 1 && type().selectsRecipe() && minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_CLEAR_SELECTION);
                 } else {
                     selector.open = !selector.open;

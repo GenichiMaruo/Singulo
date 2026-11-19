@@ -1,7 +1,10 @@
 package io.github.genichimaruo.singulo.cable;
 
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
+
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -9,12 +12,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -24,11 +33,28 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 枠付きで入る（{@link ConduitCover}）。選ぶ形は1ブロックいっぱい、当たり判定はケーブルの枠と同じ中空の箱、光を通し隣を隠さない。
  * ほかのブロックで右クリックすると、ふつうに隣へ置ける（スニークすれば、ケーブルも隣へ置ける）。
  */
-public class CoverFrameBlock extends Block {
+public class CoverFrameBlock extends Block implements SimpleWaterloggedBlock {
     public static final MapCodec<CoverFrameBlock> CODEC = simpleCodec(CoverFrameBlock::new);
 
     public CoverFrameBlock(Properties properties) {
         super(properties);
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(WATERLOGGED);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
+    }
+
+    @Override
+    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighbor, LevelAccessor level, BlockPos pos, BlockPos other) {
+        if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        return super.updateShape(state, dir, neighbor, level, pos, other);
     }
 
     @Override
@@ -44,7 +70,7 @@ public class CoverFrameBlock extends Block {
         }
         if (!level.isClientSide) {
             // 枠の場所に置いたとして、つながりを決める
-            BlockPlaceContext ctx = BlockPlaceContext.at(new BlockPlaceContext(player, hand, stack, hit), pos, hit.getDirection());
+            BlockPlaceContext ctx = new DirectionalPlaceContext(level, pos, hit.getDirection(), stack, hit.getDirection());
             BlockState conduit = item.getBlock().getStateForPlacement(ctx);
             if (conduit == null) {
                 return ItemInteractionResult.FAIL;
@@ -56,6 +82,11 @@ public class CoverFrameBlock extends Block {
             stack.consume(1, player);
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    protected FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -75,12 +106,12 @@ public class CoverFrameBlock extends Block {
 
     @Override
     protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
-        return true;
+        return !state.getValue(WATERLOGGED);
     }
 
     @Override
     protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return 0;
+        return state.getValue(WATERLOGGED) ? 1 : 0;
     }
 
     @Override

@@ -24,6 +24,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    " ACA ",
+    "  B  ",
+    " A A ",
+    "     "
+  ],
   "result": {
     "id": "singulo:quantum_computing_module",
     "count": 1

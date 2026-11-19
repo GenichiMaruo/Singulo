@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "singulo:block/creative_fluid_trash_side",
+    "top": "singulo:block/creative_fluid_trash_grate",
+    "bottom": "singulo:block/creative_fluid_trash_grate"
+  }
+}

@@ -30,6 +30,13 @@
       "count": 4
     }
   ],
+  "shape": [
+    "  B  ",
+    " DCD ",
+    " CAC ",
+    " DCD ",
+    "     "
+  ],
   "result": {
     "id": "singulo:wormhole_stabilizer",
     "count": 1

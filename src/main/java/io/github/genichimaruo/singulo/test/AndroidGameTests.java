@@ -193,6 +193,7 @@ public final class AndroidGameTests {
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 2);
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_UPGRADE, new ItemStack(item("android_transfer_upgrade")));
+        var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000);
         boolean[] transferred = {false};
         helper.onEachTick(() -> {
             List<RuinAndroid> current = androids(helper);
@@ -205,7 +206,18 @@ public final class AndroidGameTests {
             RuinAndroid first = current.get(0);
             transferred[0] = true;
             first.inventory().setItem(RuinAndroid.SLOT_REPAIR, new ItemStack(item("android_repair_kit"), 5));
+            first.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_dual_tank_upgrade")));
+            helper.assertTrue(first.fillTanks(water, false) == 1000, "護衛のタンクに水が入らない");
+            // Mekanism を外したワールドでも、以前に積んだ化学物質は保存される。
+            CompoundTag saved = first.saveWithoutId(new CompoundTag());
+            CompoundTag chemical = saved.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(1);
+            chemical.putString("id", "mekanism:oxygen");
+            chemical.putLong("amount", 725);
+            first.load(saved);
+            helper.assertTrue(first.workConsole() == null && first.chemAmount("mekanism:oxygen") == 725, "待機中の護衛のタンクを復元できない");
             first.kill();
+            var registries = helper.getLevel().registryAccess();
+            s.loadWithComponents(s.saveWithFullMetadata(registries), registries);
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(STATION)).inflate(8), e -> e.getItem().is(item("android_repair_kit"))).isEmpty(),
                     "転送アップグレードがあるのに持ち物が落ちた");
@@ -216,9 +228,14 @@ public final class AndroidGameTests {
             List<RuinAndroid> list = androids(helper).stream()
                     .filter(a -> a.isAlive() && helper.absolutePos(STATION).equals(a.home())).toList();
             helper.assertTrue(list.size() == 1, "印刷し直されない: " + list.size());
-            ItemStack kits = list.get(0).inventory().getItem(RuinAndroid.SLOT_REPAIR);
+            RuinAndroid next = list.get(0);
+            ItemStack kits = next.inventory().getItem(RuinAndroid.SLOT_REPAIR);
             helper.assertTrue(kits.getCount() == 5, "持ち物が次の護衛に渡らない: " + kits);
-            list.get(0).discard();
+            helper.assertTrue(next.workConsole() == null && next.inventory().getItem(RuinAndroid.SLOT_TANK).is(item("android_dual_tank_upgrade")),
+                    "次の待機中の護衛にタンクが渡らない");
+            helper.assertTrue(next.tankAmount(water) == 1000 && next.chemAmount("mekanism:oxygen") == 725,
+                    "ステーションの再読込後に流体か化学物質を失った");
+            next.discard();
         });
     }
 
@@ -1699,7 +1716,7 @@ public final class AndroidGameTests {
     }
 
     /**
-     * 触媒を使う装置の失活触媒: 記録していなくても持ち帰る。精密組立台は出口が1つなので、残すと次のモジュールが出られない
+     * 触媒を使う装置の失活触媒: 記録していなくても、精密組立台の専用排出枠から持ち帰る。
      * （時間結晶触媒2個からモジュール3個。1個目は2個目の途中で、2個目は3個目で使い切る）。
      */
     @GameTest(template = EMPTY, timeoutTicks = 3000)
@@ -1733,12 +1750,8 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, item("time_crystal_module")) == 3, "失活触媒で出口がふさがり、モジュールが3つ届かない: "
                     + delivered(helper, item("time_crystal_module")));
-            // 最後の1個は、最後のモジュールを取り出したあとに出口へ出るので、次の作業で持ち帰る
-            int left = 0;
-            for (int k = 0; k < m.type().outputSlots(); k++) {
-                ItemStack o = m.items().getStackInSlot(m.type().outputSlot() + k);
-                left += o.is(item("spent_time_crystal_catalyst")) ? o.getCount() : 0;
-            }
+            ItemStack shells = m.items().getStackInSlot(m.type().spentCatalystSlot());
+            int left = shells.is(item("spent_time_crystal_catalyst")) ? shells.getCount() : 0;
             for (ItemStack waiting : m.magazine().contents()) {
                 left += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
             }
@@ -2028,7 +2041,7 @@ public final class AndroidGameTests {
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
                 helper.absolutePos(from), helper.absolutePos(to), ItemStack.EMPTY);
         ItemStack card = new ItemStack(item("procedure_card"));
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
                 .write(card, level.registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);   // 場所のカードがない行
@@ -2138,7 +2151,8 @@ public final class AndroidGameTests {
     /** 手順カード1枚（steps、できる物 output）を、場所のカードのない行に並べる。 */
     private static void procedureCard(GameTestHelper helper, List<io.github.genichimaruo.singulo.android.work.ProcedureStep> steps, ItemStack output) {
         ItemStack card = new ItemStack(item("procedure_card"));
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(steps, output).write(card, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(steps.stream().map(s -> s.recordedIn(helper.getLevel())).toList(), output)
+                .write(card, helper.getLevel().registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
     }
@@ -2429,7 +2443,7 @@ public final class AndroidGameTests {
         ItemStack card = new ItemStack(item("recipe_card"));
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.EXTRACT, helper.absolutePos(TABLE), null, water);
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), water).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), water).write(card, level.registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
         var plan = console.plan(io.github.genichimaruo.singulo.android.work.FluidSamples.key(water), 1500);
@@ -2519,7 +2533,7 @@ public final class AndroidGameTests {
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
                 helper.absolutePos(new BlockPos(0, 1, 5)), helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY);
         ItemStack card = new ItemStack(item("procedure_card"));
-        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step.recordedIn(level)), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
                 .write(card, level.registryAccess());
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);

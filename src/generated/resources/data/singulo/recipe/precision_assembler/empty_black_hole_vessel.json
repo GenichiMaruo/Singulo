@@ -22,7 +22,20 @@
         "item": "singulo:optical_lattice_substrate"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "c:glass_blocks/colorless"
+      },
+      "count": 3
     }
+  ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " DBD ",
+    " ADA ",
+    "     "
   ],
   "result": {
     "id": "singulo:empty_black_hole_vessel",

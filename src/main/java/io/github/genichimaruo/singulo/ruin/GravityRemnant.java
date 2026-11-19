@@ -77,7 +77,9 @@ public class GravityRemnant extends RuinBoss {
 
     /** いまの設定での体力。 */
     public static float health() {
-        return BossScaling.hardMode() ? HEALTH : HEALTH_NORMAL;
+        var config = io.github.genichimaruo.singulo.generated.ServerConfig.REMNANT_HEALTH;
+        double base = io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded() ? config.get() : HEALTH;
+        return (float) BossScaling.baseHealth(base * (BossScaling.hardMode() ? 1.0 : (double) HEALTH_NORMAL / HEALTH));
     }
     /** 重力井戸（体力半分から）。 */
     public static final double WELL_RADIUS = 9;
@@ -116,9 +118,9 @@ public class GravityRemnant extends RuinBoss {
         super(type, level, BossEvent.BossBarColor.PURPLE);
         this.xpReward = 800;
         setNoGravity(true);
-        if (!level.isClientSide && !BossScaling.hardMode()) {
+        if (!level.isClientSide) {
             // 読み込むときは、このあと保存した体力で上書きされる
-            setEffectiveHealth(HEALTH_NORMAL);
+            setEffectiveHealth(health());
         }
     }
 

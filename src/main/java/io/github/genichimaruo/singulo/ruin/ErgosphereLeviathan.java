@@ -218,7 +218,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         this.noCulling = true;
         setNoGravity(true);
         orbitAngle = random.nextDouble() * Math.PI * 2;
-        setEffectiveHealth(configuredHealth());
+        setEffectiveHealth(BossScaling.baseHealth(configuredHealth()));
     }
 
     public static AttributeSupplier.Builder createAttributes() {

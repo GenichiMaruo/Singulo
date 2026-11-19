@@ -30,6 +30,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    "  D  ",
+    " ABA ",
+    "  C  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_transfer_upgrade",
     "count": 1

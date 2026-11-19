@@ -321,7 +321,7 @@ final class AndroidLife extends Goal {
             top = 0.5;
         }
         Direction front = seatFront(state);
-        double shift = state.getBlock() instanceof StairBlock ? 0.3 : 0;
+        double shift = state.getBlock() instanceof StairBlock || state.getBlock() instanceof SlabBlock ? 0.3 : 0;
         return new Vec3(pos.getX() + 0.5 + front.getStepX() * shift, pos.getY() + top, pos.getZ() + 0.5 + front.getStepZ() * shift);
     }
 

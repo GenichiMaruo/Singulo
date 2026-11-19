@@ -30,6 +30,13 @@
       "count": 4
     }
   ],
+  "shape": [
+    "     ",
+    " ABA ",
+    " DCD ",
+    " D D ",
+    "     "
+  ],
   "result": {
     "id": "singulo:neutrino_scanner",
     "count": 1

@@ -23,7 +23,20 @@
       },
       "tier": 3,
       "uses": 750
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_compactor_frame"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " ADA ",
+    "     ",
+    "     "
   ],
   "result": {
     "id": "singulo:degenerate_compactor_vent",

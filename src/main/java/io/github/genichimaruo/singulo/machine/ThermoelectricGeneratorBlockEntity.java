@@ -4,6 +4,7 @@ import io.github.genichimaruo.singulo.data.ThermalData;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,8 +21,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 熱電発電機（ゼーベック効果）。隣の最も熱いブロックと最も冷たいブロックの温度差 ΔT から
@@ -29,14 +28,14 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * ΔT が低温源の「維持できる温度差」を超えると、超えた分に比例した速さで低温源が溶けて劣化する。
  */
 public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        GeneratorInfo {
+        GeneratorInfo, MachineReport.Source {
     /** 維持できる温度差を 1 K 超えたまま、低温源が1段階劣化するまでの tick 数。100 K 超過なら約1分。 */
     static final double MELT_THRESHOLD = 120_000;
     static final int SCAN_INTERVAL = 10;
     static final int PUSH_PER_TICK = 2_000;
 
     public static final int D_HOT = 0, D_COLD = 1, D_RATE_X100 = 2, D_ENERGY = 3, D_CAPACITY = 4, D_TOLERANCE = 5,
-            D_MELTING = 6, D_FLUID = 7, COUNT = 8;
+            D_MELTING = 6, D_FLUID = 7, D_RATE_WHOLE = 8, D_RATE = 9, COUNT = 11;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(20_000, 0, PUSH_PER_TICK, this::setChanged);
     private int hot;
@@ -45,7 +44,6 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     @Nullable
     private BlockPos coldPos;
     private double rate;
-    private double fraction;
     private double meltProgress;
 
     public ThermoelectricGeneratorBlockEntity(BlockPos pos, BlockState state) {
@@ -54,6 +52,20 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
 
     public SinguloEnergyStorage energy() {
         return energy;
+    }
+
+    /** 装置の様子の報告（0.21.0。画面のヘッダーと同じ）。 */
+    @Override
+    public MachineReport report() {
+        boolean noSource = hot <= 0 || cold <= 0;
+        boolean melting = deltaT() > tolerance && coldPos != null;
+        MachineReport.State state = noSource || melting ? MachineReport.State.WARN
+                : rate > 0 ? MachineReport.State.RUN : MachineReport.State.IDLE;
+        var label = noSource ? net.minecraft.network.chat.Component.translatable("gui.singulo.thermo.none")
+                : melting ? net.minecraft.network.chat.Component.translatable("gui.singulo.thermo.melting", tolerance)
+                : net.minecraft.network.chat.Component.translatable(rate > 0 ? "gui.singulo.status.running" : "gui.singulo.status.idle");
+        return new MachineReport(state, label, java.util.List.of(), 0, 0, energy.getEnergyStored(), energy.getMaxEnergyStored(), 0,
+                (int) Math.round(rate), net.minecraft.world.item.ItemStack.EMPTY, 0, java.util.List.of(), 0);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ThermoelectricGeneratorBlockEntity be) {
@@ -66,13 +78,10 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         }
         boolean active = rate > 0;
         if (active) {
-            fraction += rate;
-            int whole = (int) fraction;
-            fraction -= whole;
-            energy.generate(whole);
+            energy.generateRate(rate);
             melt(level);
         }
-        pushEnergy(level, pos);
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         if (state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
         }
@@ -85,6 +94,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         BlockPos bestColdPos = null;
         for (Direction dir : Direction.values()) {
             BlockPos p = pos.relative(dir);
+            if (!level.isLoaded(p)) continue;
             BlockState s = level.getBlockState(p);
             ThermalData.Hot h = ThermalData.INSTANCE.hot(s);
             if (h != null && h.temperature() > bestHot) {
@@ -105,7 +115,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         tolerance = bestTolerance;
         coldPos = bestColdPos;
         int delta = deltaT();
-        rate = delta > 0 ? delta * ServerConfig.THERMOELECTRIC_COEFFICIENT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : 0;
+        rate = energy.prepareGeneration(delta * ServerConfig.THERMOELECTRIC_COEFFICIENT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get());
     }
 
     private int deltaT() {
@@ -114,7 +124,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
 
     private void melt(Level level) {
         int excess = deltaT() - tolerance;
-        if (coldPos == null || excess <= 0) {
+        if (coldPos == null || excess <= 0 || !level.isLoaded(coldPos)) {
             return;
         }
         // ネザーでは氷系が速く溶ける
@@ -134,21 +144,6 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         scan(level, worldPosition);
     }
 
-    private void pushEnergy(Level level, BlockPos pos) {
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                return;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
-    }
-
     // ------------------------------------------------------------------ GUI・保存
 
     @Override
@@ -156,7 +151,9 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         return SyncedInts.server(COUNT, i -> switch (i) {
             case D_HOT -> hot;
             case D_COLD -> cold;
-            case D_RATE_X100 -> (int) Math.round(rate * 100);
+            case D_RATE_X100 -> Math.clamp(Math.round(rate * 100), 0, Integer.MAX_VALUE);
+            case D_RATE_WHOLE -> (int) rate;
+            case D_RATE, D_RATE + 1 -> SyncedInts.doubleWord(rate, i - D_RATE);
             case D_ENERGY -> energy.getEnergyStored();
             case D_CAPACITY -> energy.getMaxEnergyStored();
             case D_TOLERANCE -> tolerance;
@@ -184,14 +181,14 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.putDouble("melt", meltProgress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         meltProgress = tag.getDouble("melt");
     }
 }

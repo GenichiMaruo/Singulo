@@ -69,7 +69,7 @@ public final class DroneBlocks {
             if (!(level.getBlockEntity(pos) instanceof FluidDronePortBlockEntity port) || port.receiveTank().isEmpty()) {
                 return 0;
             }
-            return 1 + Math.round(14F * port.receiveTank().getFluidAmount() / FluidDronePortBlockEntity.RECEIVE_CAPACITY);
+            return Math.min(15, 1 + Math.round(14F * port.receiveTank().getFluidAmount() / port.receiveTank().getCapacity()));
         }
     }
 

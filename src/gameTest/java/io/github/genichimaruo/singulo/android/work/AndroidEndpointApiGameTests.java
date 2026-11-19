@@ -2,8 +2,13 @@ package io.github.genichimaruo.singulo.android.work;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
 import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoints;
+import io.github.genichimaruo.singulo.api.android.AndroidWorkshops;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import io.github.genichimaruo.singulo.api.android.AndroidOrders.State;
@@ -14,6 +19,7 @@ import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.gametest.framework.GameTest;
@@ -27,7 +33,13 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
+@net.neoforged.fml.common.EventBusSubscriber(modid="singulo")
 public final class AndroidEndpointApiGameTests {
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerEndpointFace(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(AndroidWorkEndpoint.CAPABILITY, net.minecraft.world.level.block.entity.BlockEntityType.CHEST,
+                (chest, face) -> face == Direction.UP && chest instanceof Endpoint endpoint ? endpoint : null);
+    }
     private static final BlockPos CONSOLE=new BlockPos(0,1,0), SUPPLY=new BlockPos(1,1,0), CHEST=new BlockPos(1,1,1),
             DELIVERY=new BlockPos(3,1,0), RACK=new BlockPos(4,1,0), TABLE=new BlockPos(4,1,3);
     private static Item item(String name) { return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("singulo",name)); }
@@ -85,11 +97,14 @@ public final class AndroidEndpointApiGameTests {
             }
         };
         final ItemStackHandler delivery = new ItemStackHandler(1);
+        FluidTank inputTank, outputTank;
         Endpoint(BlockPos pos, UUID owner) { super(pos, Blocks.CHEST.defaultBlockState()); this.owner=owner; }
         public UUID endpointId() { return identity; }
         public UUID endpointOwner() { return owner; }
         public IItemHandler supplyItems() { return supply; }
         public IItemHandler deliveryItems() { return delivery; }
+        public IFluidHandler supplyFluids() { return inputTank; }
+        public IFluidHandler deliveryFluids() { return outputTank; }
     }
     private static Endpoint endpoint(GameTestHelper h, UUID owner) {
         h.setBlock(ENDPOINT, Blocks.CHEST);
@@ -102,9 +117,161 @@ public final class AndroidEndpointApiGameTests {
     private static AndroidOrders.Receipt submit(GameTestHelper h, WorkConsoleBlockEntity c, UUID id) {
         return AndroidOrders.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),8,List.of(),h.absolutePos(ENDPOINT));
     }
+
+    @GameTest(template="empty", timeoutTicks=1800)
+    public static void workshopOrderRunsAProcedureWithoutPatternInputs(GameTestHelper h) {
+        var console = setup(h, true);
+        var endpoint = endpoint(h, console.owner());
+        link(h, console);
+        var source = new BlockPos(5, 1, 3);
+        h.setBlock(source, Blocks.BARREL);
+        net.minecraft.world.level.block.entity.BarrelBlockEntity barrel = h.getBlockEntity(source);
+        var target = new ItemStack(Items.AMETHYST_SHARD, 3);
+        barrel.setItem(0, target.copy());
+        var take = new ProcedureStep(ProcedureStep.EXTRACT, barrel.getBlockPos(), null, target).recordedIn(h.getLevel());
+        var card = new ItemStack(item("recipe_card"));
+        RecipeData.procedure(List.of(take), target).write(card, h.getLevel().registryAccess());
+        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        rack.items().setStackInSlot(3, card);
+        var id = UUID.randomUUID();
+        var receipt = AndroidOrders.submit(h.getLevel(), console.getBlockPos(), console.owner(), id, target, 3, List.of(), endpoint.getBlockPos());
+        h.assertTrue(receipt.state() == State.RUNNING, "Zero-input procedure rejected: " + receipt.reason());
+        h.succeedWhen(() -> {
+            var status = AndroidOrders.status(h.getLevel(), console.getBlockPos(), console.owner(), id);
+            h.assertTrue(status.state() == State.COMPLETED && status.delivered() == 3, "Procedure did not deliver");
+            h.assertTrue(barrel.getItem(0).isEmpty() && ItemStack.matches(target, endpoint.delivery.getStackInSlot(0)),
+                    "Delivered amount did not match the items taken by the procedure");
+        });
+    }
+
+    @GameTest(template="empty",timeoutTicks=1800)
+    public static void workshopOrderElectrolyzesEndpointWaterAndDeliversMeasuredGas(GameTestHelper h) {
+        var console = setup(h, true);
+        var level = h.getLevel();
+        var endpoint = endpoint(h, console.owner());
+        endpoint.inputTank = new FluidTank(1000);
+        endpoint.outputTank = new FluidTank(125);
+        endpoint.inputTank.fill(new FluidStack(Fluids.WATER, 250), IFluidHandler.FluidAction.EXECUTE);
+        link(h, console);
+        var worker = console.candidates(level.getServer().getPlayerList().getPlayer(console.owner())).getFirst();
+        worker.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
+        var machinePos = new BlockPos(5, 1, 3);
+        var block = SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.ELECTROLYZER).get();
+        h.setBlock(machinePos, block);
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity machine = h.getBlockEntity(machinePos);
+        machine.energy().setEnergy(10000);
+        var location = new ItemStack(item("work_location_card"));
+        WorkLocationCardItem.record(location, level, machine.getBlockPos(), block);
+        var water = FluidSamples.of(new FluidStack(Fluids.WATER, 200));
+        var hydrogen = FluidSamples.of(new FluidStack(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"), 200));
+        var card = new ItemStack(item("recipe_card"));
+        RecipeData.processing(List.of(water), hydrogen, List.of(), ItemStack.EMPTY).write(card, level.registryAccess());
+        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        rack.items().setStackInSlot(RecipeRackBlockEntity.COLS, location);
+        rack.items().setStackInSlot(RecipeRackBlockEntity.COLS + 1, card);
+        var id = UUID.randomUUID();
+        var plan = AndroidWorkshops.preview(level, console.getBlockPos(), console.owner(), hydrogen, 200, List.of(worker.getUUID()));
+        h.assertTrue(plan.state() == AndroidWorkshops.PlanState.MATERIALS_READY && plan.fromStock().size() == 1
+                && plan.fromStock().getFirst().amount() == 200 && FluidSamples.amount(plan.fromStock().getFirst().sample()) == 1
+                && endpoint.inputTank.getFluidAmount() == 250, "Preview did not preserve mB units or changed the input tank");
+        var receipt = AndroidOrders.submit(level, console.getBlockPos(), console.owner(), id, hydrogen, 200, List.of(worker.getUUID()), endpoint.getBlockPos());
+        h.assertTrue(receipt.state() == State.RUNNING, "Fluid processing order rejected: " + receipt.reason());
+        boolean[] partial = {false};
+        h.succeedWhen(() -> {
+            var status = AndroidOrders.status(level, console.getBlockPos(), console.owner(), id);
+            if (!partial[0] && endpoint.outputTank.getFluidAmount() == 125) {
+                h.assertTrue(status.state() == State.RUNNING && status.delivered() == 125, "Partial fluid delivery completed early");
+                endpoint.outputTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
+                partial[0] = true;
+            }
+            h.assertTrue(status.state() == State.COMPLETED, "Order pending: " + worker.stall() + ", received " + status.delivered());
+            h.assertTrue(partial[0] && status.delivered() == 200 && endpoint.inputTank.getFluidAmount() == 50
+                    && endpoint.outputTank.getFluidAmount() == 75
+                    && FluidStack.isSameFluidSameComponents(endpoint.outputTank.getFluid(), FluidSamples.fluid(hydrogen)),
+                    "Fluid type or mB balance changed");
+            worker.discard();
+        });
+    }
+
+    @GameTest(template="empty")
+    public static void addonWorkshopDiscoveryAndPreviewRespectOwnershipAndReservations(GameTestHelper h) {
+        var c = setup(h, false);
+        var level = h.getLevel();
+        var pos = c.getBlockPos();
+        var port = h.absolutePos(SUPPLY);
+        var owner = c.owner();
+        var other = UUID.randomUUID();
+        var card = new ItemStack(item("work_location_card"));
+        h.assertTrue(AndroidWorkshops.isLocationCard(card) && AndroidWorkshops.readLocationCard(card).isEmpty(), "Blank card has a target");
+        WorkLocationCardItem.record(card, level, port, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
+        var globalPos = AndroidWorkshops.readLocationCard(card).orElseThrow();
+        h.assertTrue(globalPos.pos().equals(port) && globalPos.dimension().equals(level.dimension()), "Card lost its dimension or position");
+        h.assertTrue(AndroidWorkshops.resolve(level, port, owner).orElseThrow().equals(new AndroidWorkshops.Connection(pos, AndroidWorkshops.Role.SUPPLY))
+                && AndroidWorkshops.resolve(level, pos, owner).orElseThrow().role() == AndroidWorkshops.Role.CONSOLE
+                && AndroidWorkshops.resolve(level, port, other).isEmpty(), "Incorrect workshop ownership or port role");
+        var sticks = new ItemStack(Items.STICK);
+        var plan = AndroidWorkshops.preview(level, pos, owner, sticks, 8, List.of());
+        h.assertTrue(plan.state() == AndroidWorkshops.PlanState.MATERIALS_READY && plan.steps().size() == 2
+                && plan.fromStock().size() == 1 && plan.fromStock().getFirst().amount() == 1
+                && c.orders().isEmpty() && AndroidOrders.snapshot(level, pos, owner).receipts().isEmpty(), "Preview reserved materials or created an order");
+        var logs = AndroidWorkshops.stock(level, pos, owner).available().getFirst();
+        logs.sample().shrink(1);
+        h.assertTrue(logs.sample().is(Items.OAK_LOG) && logs.amount() == 32, "Mutable stock snapshot");
+        h.assertTrue(AndroidOrders.submit(level, pos, owner, UUID.randomUUID(), sticks, 8, List.of(), null).state() == State.RUNNING
+                && AndroidWorkshops.stock(level, pos, owner).available().getFirst().amount() == 31, "Reserved logs still available");
+        var missing = AndroidWorkshops.preview(level, pos, owner, new ItemStack(Items.DIAMOND), 5, List.of());
+        h.assertTrue(missing.state() == AndroidWorkshops.PlanState.MISSING_MATERIALS && missing.missing().getFirst().amount() == 5
+                && AndroidWorkshops.preview(level, pos, owner, sticks, 0, List.of()).state() == AndroidWorkshops.PlanState.INVALID_REQUEST,
+                "Missing or invalid request reported as ready");
+        h.assertTrue(AndroidWorkshops.preview(level, pos, other, sticks, 8, List.of()).state() == AndroidWorkshops.PlanState.REJECTED
+                && AndroidWorkshops.stock(level, pos, other).available().isEmpty(), "Foreign caller learned workshop stock");
+        c.removeLink(port);
+        h.assertTrue(AndroidWorkshops.resolve(level, port, owner).isEmpty(), "One-sided link resolved");
+        var unloaded = pos.offset(40000, 0, 40000);
+        h.assertTrue(!level.isLoaded(unloaded) && AndroidWorkshops.resolve(level, unloaded, owner).isEmpty()
+                && AndroidWorkshops.stock(level, unloaded, owner).state() == AndroidOrders.SnapshotState.UNAVAILABLE
+                && !level.isLoaded(unloaded), "Discovery loaded a distant chunk");
+        h.succeed();
+    }
+
+    @GameTest(template="empty")
+    public static void fluidNetworkEndpointsShareStockAndRejectReplacements(GameTestHelper h) {
+        var console = setup(h, false);
+        class NetworkTank extends FluidTank implements io.github.genichimaruo.singulo.api.android.AndroidSharedStorage {
+            NetworkTank() { super(1000); setFluid(new FluidStack(Fluids.WATER, 700)); }
+            public long sharedStorageKey() { return 32L; }
+        }
+        var first = endpoint(h, console.owner());
+        first.inputTank = new NetworkTank();
+        link(h, console);
+        var pos = ENDPOINT.south();
+        h.setBlock(pos, Blocks.CHEST);
+        var second = new Endpoint(h.absolutePos(pos), console.owner());
+        h.getLevel().setBlockEntity(second);
+        second.inputTank = new NetworkTank();
+        AndroidWorkEndpoints.link(h.getLevel(), console.getBlockPos(), console.owner(), second.getBlockPos());
+        var water = FluidSamples.of(new FluidStack(Fluids.WATER, 1));
+        h.assertTrue(ItemCount.get(console.stock(), water) == 700, "Two views of one ME fluid network doubled its stock");
+        first.owner = UUID.randomUUID();
+        h.assertTrue(ItemCount.get(console.stock(), water) == 700, "A revoked link hid the remaining authorized view");
+        var replacement = new Endpoint(second.getBlockPos(), console.owner());
+        replacement.inputTank = new NetworkTank();
+        h.getLevel().setBlockEntity(replacement);
+        h.assertTrue(ItemCount.get(console.stock(), water) == 0, "A replacement endpoint inherited access to the fluid supply");
+        h.succeed();
+    }
     @GameTest(template="empty")
     public static void endpointLinksRequireOwnerRangeAndLoadedConsole(GameTestHelper h) {
         var c=setup(h,false); var e=endpoint(h,c.owner());
+        h.assertTrue(AndroidWorkEndpoints.link(h.getLevel(), c.getBlockPos(), c.owner(), e.getBlockPos(), Direction.DOWN)
+                == AndroidWorkEndpoints.Result.REJECTED, "A different multipart face granted access");
+        h.assertTrue(AndroidWorkEndpoints.link(h.getLevel(), c.getBlockPos(), c.owner(), e.getBlockPos(), Direction.UP)
+                == AndroidWorkEndpoints.Result.LINKED, "Face-specific capability was not linked");
+        var saved = c.saveWithoutMetadata(h.getLevel().registryAccess());
+        h.assertTrue(saved.getList("work_endpoints_v1", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0).getString("face").equals("up"),
+                "Missing endpoint face in saved link");
+        c.loadWithComponents(saved, h.getLevel().registryAccess());
+        h.assertTrue(c.workEndpoint(e.getBlockPos()) == e, "Sided endpoint did not survive reload");
         h.assertTrue(AndroidWorkEndpoints.link(h.getLevel(),c.getBlockPos(),UUID.randomUUID(),e.getBlockPos())==AndroidWorkEndpoints.Result.REJECTED,"Foreign actor linked");
         e.owner=UUID.randomUUID();
         h.assertTrue(link(h,c)==AndroidWorkEndpoints.Result.REJECTED,"Foreign endpoint linked");
@@ -177,6 +344,32 @@ public final class AndroidEndpointApiGameTests {
         var accepted=AndroidOrders.submitFromEndpoint(h.getLevel(),c.getBlockPos(),c.owner(),UUID.randomUUID(),new ItemStack(Items.OAK_PLANKS),4,List.of(),null,e.getBlockPos());
         h.assertTrue(accepted.state()==State.RUNNING,"Single crafting rejected: "+accepted.reason());
         h.assertTrue(c.orders().getFirst().held.stream().allMatch(v->v.point.equals(e.getBlockPos())),"Reservation escaped source"); h.succeed();
+    }
+
+    @GameTest(template="empty")
+    public static void itemOnlySourceDoesNotUseSharedLava(GameTestHelper h) {
+        var console = setup(h, false);
+        var endpoint = endpoint(h, console.owner());
+        link(h, console);
+        var grid = net.minecraft.core.NonNullList.withSize(9, ItemStack.EMPTY);
+        grid.set(0, new ItemStack(Items.LAVA_BUCKET));
+        grid.set(1, new ItemStack(Items.OBSIDIAN));
+        var target = new ItemStack(Items.CRYING_OBSIDIAN);
+        RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
+        rack.items().setStackInSlot(3, recipeCard(h, grid, target));
+        h.setBlock(SUPPLY.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
+        io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity tank = h.getBlockEntity(SUPPLY.east());
+        tank.receiveTank().setFluid(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000));
+        endpoint.supply.setStackInSlot(0, new ItemStack(Items.OBSIDIAN));
+        var denied = AndroidOrders.submitFromEndpoint(h.getLevel(), console.getBlockPos(), console.owner(), UUID.randomUUID(),
+                target, 1, List.of(), null, endpoint.getBlockPos());
+        h.assertTrue(denied.state() == State.REJECTED && console.orders().isEmpty(), "Restricted source used shared lava");
+        endpoint.supply.setStackInSlot(1, new ItemStack(Items.LAVA_BUCKET));
+        var accepted = AndroidOrders.submitFromEndpoint(h.getLevel(), console.getBlockPos(), console.owner(), UUID.randomUUID(),
+                target, 1, List.of(), null, endpoint.getBlockPos());
+        h.assertTrue(accepted.state() == State.RUNNING && console.orders().getFirst().steps.getFirst().recipe.tankBuckets() == 0
+                && tank.receiveTank().getFluidAmount() == 1000, "Restricted source did not reserve its physical bucket");
+        h.succeed();
     }
     @GameTest(template="empty")
     public static void restrictedSourcePersistsAndIsPartOfRequestFingerprint(GameTestHelper h) {

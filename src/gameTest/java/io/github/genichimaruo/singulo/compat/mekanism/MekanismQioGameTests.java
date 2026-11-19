@@ -18,13 +18,16 @@ public final class MekanismQioGameTests {
     private MekanismQioGameTests() {}
 
     @SuppressWarnings("unchecked")
-    private static Object frequency(AtomicLong count) {
+    private static Object frequency(AtomicLong count, String name, java.util.UUID owner) {
         return (IQIOFrequency) Proxy.newProxyInstance(IQIOFrequency.class.getClassLoader(),
                 new Class<?>[] { IQIOFrequency.class }, (proxy, method, args) -> {
                     return switch (method.getName()) {
                         case "hashCode" -> System.identityHashCode(proxy);
                         case "equals" -> proxy == args[0];
                         case "toString" -> "test QIO frequency";
+                        case "getName" -> name;
+                        case "getOwner" -> owner;
+                        case "getSecurity" -> mekanism.api.security.SecurityMode.PUBLIC;
                         case "forAllStored" -> {
                             if (count.get() > 0) ((ObjLongConsumer<ItemStack>) args[0]).accept(new ItemStack(Items.STONE), count.get());
                             yield null;
@@ -42,6 +45,10 @@ public final class MekanismQioGameTests {
                         default -> throw new UnsupportedOperationException(method.getName());
                     };
                 });
+    }
+
+    private static Object frequency(AtomicLong count) {
+        return frequency(count, "warehouse", null);
     }
 
     @GameTest(template = "empty")
@@ -64,7 +71,7 @@ public final class MekanismQioGameTests {
 
     @GameTest(template = "empty")
     public static void weakHandlerCache(GameTestHelper helper) throws ReflectiveOperationException {
-        var frequency = (IQIOFrequency) frequency(new AtomicLong(1));
+        var frequency = (IQIOFrequency)frequency(new AtomicLong(1));
         var first = MekanismQio.handler(helper.getLevel(), frequency);
         helper.assertTrue(first == MekanismQio.handler(helper.getLevel(), frequency), "Live handlers must retain identity");
         var field = MekanismQio.class.getDeclaredField("HANDLERS");
@@ -72,7 +79,17 @@ public final class MekanismQioGameTests {
         Object value = ((java.util.Map<?, ?>) field.get(null)).get(frequency);
         helper.assertTrue(value instanceof java.lang.ref.WeakReference<?>, "Cache must not strongly retain a world through its handler");
         ((java.lang.ref.WeakReference<?>) value).clear();
-        helper.assertTrue(first != MekanismQio.handler(helper.getLevel(), frequency), "Cleared weak values must be recreated");
+        var recreated = MekanismQio.handler(helper.getLevel(), frequency);
+        var access = new MekanismQio();
+        helper.assertTrue(first != recreated && access.id(first) == access.id(recreated), "Recreated handler lost its reservation identity");
+        var ids = new MekanismQio.FrequencyIds();
+        var other = (IQIOFrequency)frequency(new AtomicLong(0), "warehouse", new java.util.UUID(0, 42));
+        int firstId = ids.id(frequency);
+        int otherId = ids.id(other);
+        var registries = helper.getLevel().registryAccess();
+        var restored = MekanismQio.FrequencyIds.load(ids.save(new net.minecraft.nbt.CompoundTag(), registries), registries);
+        helper.assertTrue(otherId != firstId && restored.id(other) == otherId && restored.id((IQIOFrequency)frequency(new AtomicLong(0))) == firstId,
+                "Frequency identities changed with reload or lookup order");
         helper.succeed();
     }
     @GameTest(template = "empty")

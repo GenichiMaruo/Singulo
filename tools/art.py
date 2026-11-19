@@ -778,14 +778,6 @@ def item_tablet(glow):
     return outlined(f)
 
 
-def item_pellet(color):
-    def f(d):
-        d.ellipse([9, 9, 22, 22], fill=rgba(color))
-        d.ellipse([11, 11, 16, 15], fill=rgba(lighten(color, 0.3)))
-        d.arc([9, 9, 22, 22], 30, 150, fill=rgba(darken(color, 0.3)))
-    return outlined(f)
-
-
 def item_tracks(color):
     def f(d):
         for k, (a, r) in enumerate(((0.3, 13), (1.4, 12), (2.6, 14), (3.9, 11), (5.1, 13))):
@@ -856,7 +848,8 @@ COPPER = (214, 130, 80)
 STEEL = (170, 176, 186)
 
 ITEM_ART = {
-    'steel_blend': lambda: item_pellet((90, 90, 100)),
+    # 0.21.0: 16×16 の絵をそのまま2倍にする（質量ペレットと見分ける形）
+    'steel_blend': lambda: __import__('art16').steel_blend().resize((S, S), Image.NEAREST),
     'steel_ingot': lambda: item_ingot(STEEL),
     'unfired_ceramic': lambda: item_plate((190, 178, 164)),
     'white_ceramic_composite': lambda: item_plate((236, 238, 240)),
@@ -871,7 +864,7 @@ ITEM_ART = {
     'data_card_observation_log': lambda: item_card(T1),
     'data_card_quantum_fragment': lambda: item_card(T3),
     'data_card_culture_data': lambda: item_card(T4),
-    'mass_pellet': lambda: item_pellet((80, 84, 96)),
+    'mass_pellet': lambda: __import__('art16').mass_pellet().resize((S, S), Image.NEAREST),
     'superconducting_coil': lambda: item_coil(COPPER, (200, 230, 250)),
     'superconducting_wire': lambda: item_spool((150, 210, 240)),
     'muon_bundle': lambda: item_tracks(T2),

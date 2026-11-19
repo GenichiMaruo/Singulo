@@ -36,6 +36,13 @@
       "count": 4
     }
   ],
+  "shape": [
+    "  B  ",
+    " EDE ",
+    "DCACD",
+    " EDE ",
+    "     "
+  ],
   "result": {
     "id": "singulo:advanced_worldline_anchor",
     "count": 1

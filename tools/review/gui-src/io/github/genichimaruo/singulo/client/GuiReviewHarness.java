@@ -245,6 +245,25 @@ public final class GuiReviewHarness {
             }
             case 25 -> {
                 capture(mc, "android-log-en-854x480");
+                var server = mc.getSingleplayerServer();
+                var id = mc.player.getUUID();
+                server.execute(() -> {
+                    var player = server.getPlayerList().getPlayer(id);
+                    // Add discovery equipment after every Android screenshot; its inventory
+                    // must be empty for the pixel checks in those captures.
+                    player.getInventory().setItem(30, item("android_station"));
+                    player.getInventory().setItem(31, item("android_work_console"));
+                    player.getInventory().setChanged();
+                });
+                ready = 0;
+                phase = 30;
+            }
+            case 30 -> {
+                if (!mc.player.getInventory().getItem(30).is(item("android_station").getItem())
+                        || !mc.player.getInventory().getItem(31).is(item("android_work_console").getItem())) {
+                    if (ready >= 300) throw new IllegalStateException("Handbook discovery equipment did not sync");
+                    return;
+                }
                 if (!HandbookScreen.lookup(item("android_backpack_upgrade"))) {
                     throw new IllegalStateException("Handbook item lookup did not open");
                 }
@@ -275,6 +294,11 @@ public final class GuiReviewHarness {
                 if (((List<?>) field(mc.screen, "results")).isEmpty()) {
                     throw new IllegalStateException("Handbook did not find the backpack page");
                 }
+                box.setValue("singulo:android_backpack_upgrade");
+                if (((List<?>) field(mc.screen, "results")).isEmpty()) {
+                    throw new IllegalStateException("Handbook did not find the backpack page by item ID");
+                }
+                box.setValue(item("android_backpack_upgrade").getHoverName().getString());
                 box.setFocused(true);
                 mc.screen.setFocused(box);
                 mc.screen.keyPressed(262, 0, 0);
@@ -284,6 +308,23 @@ public final class GuiReviewHarness {
                 capture(mc, "handbook-search-en-1280x800");
                 Singulo.LOGGER.info("SINGULO_HANDBOOK_SEARCH_COMPLETE");
                 Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
+                // The machine screenshot runner reuses this player and verifies empty slots too.
+                var server = mc.getSingleplayerServer();
+                var id = mc.player.getUUID();
+                server.execute(() -> {
+                    var player = server.getPlayerList().getPlayer(id);
+                    player.getInventory().setItem(30, net.minecraft.world.item.ItemStack.EMPTY);
+                    player.getInventory().setItem(31, net.minecraft.world.item.ItemStack.EMPTY);
+                    player.getInventory().setChanged();
+                });
+                ready = 0;
+                phase = 31;
+            }
+            case 31 -> {
+                if (!mc.player.getInventory().getItem(30).isEmpty() || !mc.player.getInventory().getItem(31).isEmpty()) {
+                    if (ready >= 300) throw new IllegalStateException("Handbook discovery equipment was not cleared");
+                    return;
+                }
                 phase = 29;
                 if (Boolean.getBoolean("singulo.machineGuiReview")) MachineGuiReviewHarness.start(mc);
                 else mc.stop();

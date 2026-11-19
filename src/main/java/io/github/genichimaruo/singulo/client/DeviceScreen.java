@@ -4,6 +4,7 @@ import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.machine.DeviceMenu;
 import io.github.genichimaruo.singulo.machine.DeviceMenu.Kind;
 import java.util.List;
+import net.minecraft.core.Direction;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -110,6 +111,11 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                         List.of(Component.translatable("gui.singulo.detector.band." + v(DeviceMenu.Detector.BAND))));
             }
             case JET_FORGE -> forgeState();
+            case FLUID_PUMP -> {
+                boolean active = v(DeviceMenu.Pump.ACTIVE) != 0;
+                yield new State(active ? Panel.Status.RUN : Panel.Status.IDLE, active ? GuiSkin.OK : GuiSkin.IDLE,
+                        Component.translatable("gui.singulo.status." + (active ? "running" : "idle")), List.of());
+            }
         };
     }
 
@@ -197,16 +203,51 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             case WORMHOLE_GENERATOR -> drawGenerator(g, t);
             case WORMHOLE_MOUTH -> drawMouth(g, t, mouseX, mouseY);
             case WORMHOLE_PORT -> drawPort(g, t, mouseX, mouseY);
-            case CONTAINMENT_TANK -> drawTank(g, t);
+            case CONTAINMENT_TANK -> drawTank(g, t, mouseX, mouseY);
             case HALO_COLLECTOR -> drawHalo(g, t);
             case MUON_COLLECTOR -> drawMuon(g, t);
             case DETECTOR -> drawDetector(g, t, mouseX, mouseY);
             case JET_FORGE -> drawForge(g, t, mouseX, mouseY);
+            case FLUID_PUMP -> drawPump(g, mouseX, mouseY);
         }
         if (hasEnergyBar()) {
             int[] e = energy();
             Panel.gauge(g, skin, cx(BAR_X), cy(BAR_Y), BAR_W, BAR_H, e[0] / (double) Math.max(1, e[1]), Panel.GLOW);
         }
+    }
+
+    private static final Direction[] PUMP_FACES = {Direction.NORTH, Direction.UP, Direction.SOUTH,
+            Direction.WEST, Direction.DOWN, Direction.EAST};
+    private static int pumpX(int i) { return 7 + i % 3 * 57; }
+    private static int pumpY(int i) { return 22 + i / 3 * 29; }
+
+    private void drawPump(GuiGraphics g, int mx, int my) {
+        for (int i = 0; i < PUMP_FACES.length; i++) {
+            var face = PUMP_FACES[i];
+            int bit = face.get3DDataValue(), x = pumpX(i), y = pumpY(i);
+            boolean intake = bit == v(DeviceMenu.Pump.INTAKE);
+            boolean enabled = (v(DeviceMenu.Pump.CLOSED) & (1 << bit)) == 0;
+            boolean hover = Panel.inside(mx, my, cx(x), cy(y), 54, 26);
+            Component direction = switch (face) {
+                case UP -> Component.translatable("gui.singulo.sides.face.top");
+                case DOWN -> Component.translatable("gui.singulo.sides.face.bottom");
+                default -> Component.translatable("direction.singulo." + face.getName());
+            };
+            Component role = Component.translatable("gui.singulo.sides.mode." + (intake ? 1 : enabled ? 2 : 0));
+            Panel.button(g, skin, cx(x), cy(y), 54, 26, intake ? Panel.Press.DISABLED : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+            g.fill(cx(x + 2), cy(y + 3), cx(x + 4), cy(y + 23), intake ? 0xFFEA965E : enabled ? CYAN : skin.dim());
+            AndroidStationScreen.fitCentered(g, font, direction, cx(x + 5), cy(y + 4), 46, skin.text());
+            AndroidStationScreen.fitCentered(g, font, role, cx(x + 5), cy(y + 15), 46, intake || enabled ? skin.text() : skin.dim());
+            hint(x, y, 54, 26, tr(intake ? "pump.intake" : "pump.toggle"));
+        }
+        drawPumpRate(g, 8, DeviceMenu.Pump.FLOW, Panel.Icon.DROP, CYAN, " mB/t");
+        drawPumpRate(g, 102, DeviceMenu.Pump.POWER, Panel.Icon.BOLT, Panel.GLOW, " FE/t");
+    }
+
+    private void drawPumpRate(GuiGraphics g, int x, int first, Panel.Icon icon, int color, String unit) {
+        long rate = Integer.toUnsignedLong(v(first)) | ((long) v(first + 1) << 32);
+        value(g, x, 89, icon, color, EnergyText.shortForm(rate) + unit, skin.text(),
+                Component.literal(String.format(java.util.Locale.ROOT, "%,d", rate) + unit));
     }
 
     // ------------------------------------------------------------------ 絵の部品
@@ -290,7 +331,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             }
             return new State(Panel.Status.IDLE, GuiSkin.IDLE, tr("forge.idle"), List.of());
         }
-        Component running = tr("forge.running", tr("forge.phase." + phase), v(DeviceMenu.Forge.ELAPSED) / 20, v(DeviceMenu.Forge.TOTAL) / 20);
+        Component running = tr("forge.running", tr("forge.phase." + phase), forgeElapsed(phase) / 20, forgeStart(7) / 20);
         return reason != null ? new State(Panel.Status.WARN, GuiSkin.WARN, reason, List.of(running))
                 : new State(Panel.Status.RUN, GuiSkin.OK, running, List.of());
     }
@@ -304,12 +345,22 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                 && v(DeviceMenu.Forge.FORMED) != 0;
     }
 
+    private long forgeStart(int phase) {
+        long ticks = 0;
+        for (int p = 1; p < phase; p++) ticks += v(DeviceMenu.Forge.FIRST_DURATION + p - 1);
+        return ticks;
+    }
+
+    private long forgeElapsed(int phase) {
+        return phase == 0 ? 0 : forgeStart(phase) + v(DeviceMenu.Forge.PHASE_TICK);
+    }
+
     private void drawForge(GuiGraphics g, float t, int mouseX, int mouseY) {
         int phase = v(DeviceMenu.Forge.PHASE);
         int hold = v(DeviceMenu.Forge.HOLD);
         boolean stalled = hold != F_OK;
-        int total = Math.max(1, v(DeviceMenu.Forge.TOTAL));
-        float k = v(DeviceMenu.Forge.ELAPSED) / (float) total;
+        long total = Math.max(1, forgeStart(7));
+        float k = forgeElapsed(phase) / (float) total;
         boolean core = v(DeviceMenu.Forge.CORE) != 0;
         boolean igniting = v(DeviceMenu.Forge.BH) == io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.BH_IGNITING;
         int ay = 46;
@@ -325,8 +376,13 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         int batch = Math.max(1, v(DeviceMenu.Forge.BATCH));
         // 並列カセットが効いているときだけ、照射室の上に受け口の数を灯す
         if (batch > 1) {
-            for (int i = 0; i < 4; i++) {
-                g.fill(cx(131 + i * 5), cy(25), cx(134 + i * 5), cy(29), i < batch ? 0xFFBFE6FF : 0xFF2A3048);
+            if (batch > 4) {
+                String quantity = "×" + io.github.genichimaruo.singulo.energy.EnergyText.shortForm(batch);
+                g.drawString(font, quantity, cx(152) - font.width(quantity), cy(23), 0xFFBFE6FF, false);
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    g.fill(cx(131 + i * 5), cy(25), cx(134 + i * 5), cy(29), i < batch ? 0xFFBFE6FF : 0xFF2A3048);
+                }
             }
             hint(129, 23, 24, 8, tr("forge.batch", batch));
         }
@@ -342,10 +398,9 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         g.fill(cx(bh - 5), cy(ay - 14), cx(bh - 4), cy(ay + 15), coil);
         g.fill(cx(bh + 5), cy(ay - 14), cx(bh + 6), cy(ay + 15), coil);
         // 収束リング（入ったものは明るい）
-        int focusStart = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS
-                + io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS;
-        int lit = phase == 3 ? Math.min(3, 1 + 3 * (v(DeviceMenu.Forge.ELAPSED) - focusStart)
-                / io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS) : phase == 4 || phase == 5 ? 3 : 0;
+        int focusDuration = Math.max(1, v(DeviceMenu.Forge.FIRST_DURATION + 2));
+        int lit = phase == 3 ? (int) Math.min(3, 1 + 3L * v(DeviceMenu.Forge.PHASE_TICK) / focusDuration)
+                : phase == 4 || phase == 5 ? 3 : 0;
         for (int i = 0; i < 3; i++) {
             int c = i < lit ? 0xFFA8E4FF : 0xFF2A3448;
             g.fill(cx(rings[i]), cy(ay - ringH[i]), cx(rings[i] + 2), cy(ay - 2), c);
@@ -388,15 +443,8 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
         // 進み具合（段階の区切りの目盛りつき）
         bar(g, cx(32), cy(74), 122, 4, k, 0xFF7E90FF, 0xFFFFFFFF);
-        int irr = total - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS
-                - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS
-                - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FINISH_TICKS - io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.COOL_TICKS;
-        int acc = 0;
-        for (int d : new int[]{io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.PRIME_TICKS,
-                io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.IGNITE_TICKS, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FOCUS_TICKS,
-                irr, io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.FINISH_TICKS}) {
-            acc += d;
-            int x = 32 + Math.round(122F * acc / total);
+        for (int p = 2; p <= 6; p++) {
+            int x = 32 + Math.round(122F * forgeStart(p) / total);
             g.fill(cx(x), cy(73), cx(x + 1), cy(79), 0x80FFFFFF);
         }
         hint(31, 72, 124, 8, forgeState().text());
@@ -421,21 +469,29 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
         // 冷媒（完成品の下）と電力（右のゲージ）
         int coolant = v(DeviceMenu.Forge.COOLANT);
-        int tank = io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.TANK_CAPACITY;
+        int tank = io.github.genichimaruo.singulo.data.PackBalance.dedicatedTank(io.github.genichimaruo.singulo.forge.JetForgeBlockEntity.TANK_CAPACITY);
         bar(g, cx(158), cy(58), 20, 4, coolant / (float) tank, 0xFF4A8CC8, 0xFFBFE6FF);
         hint(157, 56, 22, 8, tr("forge.coolant", coolant, tank));
         long buf = v(DeviceMenu.Forge.BUFFER_MFE) * 1_000_000L;
         long cap = Math.max(1, v(DeviceMenu.Forge.CAPACITY_MFE)) * 1_000_000L;
         long intake = v(DeviceMenu.Forge.INTAKE_MFE) * 1_000_000L;
-        long demand = v(DeviceMenu.Forge.DEMAND_MFE) * 1_000_000L;
+        long fullDemand = v(DeviceMenu.Forge.IRRADIATE_FE);
+        long demand = switch (phase) {
+            case 0, 4 -> fullDemand;
+            case 2 -> fullDemand / 4;
+            case 3 -> fullDemand / 2;
+            default -> 0;
+        };
         Component powerLine = tr("forge.power", EnergyText.of(buf), EnergyText.of(cap), EnergyText.of(intake));
         // 1回の加工の電力のめやす: 照射の電力 × (照射の tick + 点火と収束の分)
-        Component demandLine = tr("forge.demand", EnergyText.of(demand), EnergyText.of(demand * (irr + 65L)));
+        long runEnergy = fullDemand / 4 * v(DeviceMenu.Forge.FIRST_DURATION + 1)
+                + fullDemand / 2 * focusDuration + fullDemand * v(DeviceMenu.Forge.FIRST_DURATION + 3);
+        Component demandLine = tr("forge.demand", EnergyText.of(demand), EnergyText.of(runEnergy));
         Panel.gauge(g, skin, cx(BAR_X), cy(BAR_Y), BAR_W, BAR_H, buf / (double) cap, Panel.GLOW);
         hint(BAR_X - 1, BAR_Y - 1, BAR_W + 2, BAR_H + 2, powerLine, demandLine);
         value(g, 104, 88, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(intake) + "/t", hold == F_NO_POWER ? GuiSkin.WARN : skin.text(),
                 powerLine, demandLine);
-        value(g, 104, 88 + STAT_PITCH, Panel.Icon.DROP, 0xFF7FB8E8, coolant + " mB", skin.text(), tr("forge.coolant", coolant, tank));
+        value(g, 104, 88 + STAT_PITCH, Panel.Icon.DROP, 0xFF7FB8E8, EnergyText.shortForm(coolant) + " mB", skin.text(), tr("forge.coolant", coolant, tank));
         // 点火のボタン（ブラックホールがなく、コアが入っているときだけ押せる）
         boolean can = canIgnite();
         boolean hover = can && Panel.inside(mouseX, mouseY, cx(IGNITE_X), cy(IGNITE_Y), IGNITE_W, IGNITE_H);
@@ -633,7 +689,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ 重力閉じ込めタンク
 
-    private void drawTank(GuiGraphics g, float t) {
+    private void drawTank(GuiGraphics g, float t, int mouseX, int mouseY) {
         int amount = v(DeviceMenu.Tank.AMOUNT);
         int cap = Math.max(1, v(DeviceMenu.Tank.CAPACITY));
         // 大きな縦のタンク: ゆっくり渦を巻くダークマター
@@ -659,12 +715,19 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                     : 0xFF9A5050);
         }
         hint(18, 18, tw + 4, th + 4, tr("tank.label"), Component.literal(String.format("%,d / %,d mB", amount, cap)));
-        int y = statsTop(2);
+        int y = statsTop(3);
         value(g, 76, y, Panel.Icon.DROP, DARK_MATTER, EnergyText.shortForm(amount) + " / " + EnergyText.shortForm(cap) + " mB", skin.text(),
                 tr("tank.label"), Component.literal(String.format("%,d / %,d mB", amount, cap)));
         value(g, 76, y + STAT_PITCH, Panel.Icon.BOLT, GuiSkin.WARN,
                 EnergyText.of(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.FE_PER_TICK) + " FE/t", skin.text(),
                 tr("tank.upkeep", EnergyText.of(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.FE_PER_TICK)));
+        boolean enabled = v(DeviceMenu.Tank.EJECT) != 0;
+        Component label = Component.translatable("gui.singulo.sides.master_" + (enabled ? "on" : "off"));
+        int by = y + STAT_PITCH * 2;
+        boolean hover = Panel.inside(mouseX, mouseY, cx(76), cy(by), 92, 16);
+        Panel.button(g, skin, cx(76), cy(by), 92, 16, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        AndroidStationScreen.fitCentered(g, font, label, cx(79), cy(by + 4), 86, enabled ? GuiSkin.OK : skin.text());
+        hint(76, by, 92, 16, label, Component.translatable("gui.singulo.sides.face.front"));
     }
 
     // ------------------------------------------------------------------ ハロー捕集器
@@ -783,7 +846,15 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
         if (minecraft != null && minecraft.gameMode != null) {
             int id = -1;
-            if (kind == Kind.WORMHOLE_MOUTH) {
+            if (kind == Kind.CONTAINMENT_TANK && button == 0
+                    && Panel.inside(mouseX, mouseY, cx(76), cy(statsTop(3) + STAT_PITCH * 2), 92, 16)) {
+                id = DeviceMenu.Tank.BUTTON_EJECT;
+            } else if (kind == Kind.FLUID_PUMP && button == 0) {
+                for (int i = 0; i < PUMP_FACES.length; i++) {
+                    int side = PUMP_FACES[i].get3DDataValue();
+                    if (side != v(DeviceMenu.Pump.INTAKE) && Panel.inside(mouseX, mouseY, cx(pumpX(i)), cy(pumpY(i)), 54, 26)) id = side;
+                }
+            } else if (kind == Kind.WORMHOLE_MOUTH) {
                 if (Panel.inside(mouseX, mouseY, cx(MOUTH_MINUS_X), cy(MOUTH_BTN_Y), BTN, BTN)) {
                     id = DeviceMenu.Mouth.BUTTON_SMALLER;
                 } else if (Panel.inside(mouseX, mouseY, cx(MOUTH_PLUS_X), cy(MOUTH_BTN_Y), BTN, BTN)) {

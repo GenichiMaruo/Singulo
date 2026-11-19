@@ -3,7 +3,7 @@
   "category": "misc",
   "pattern": [
     "CQC",
-    "SFS",
+    "SRS",
     "CIC"
   ],
   "key": {
@@ -16,8 +16,8 @@
     "S": {
       "item": "singulo:collapsar_ingot"
     },
-    "F": {
-      "item": "singulo:nihonium_frame"
+    "R": {
+      "item": "singulo:tidal_draw_ring"
     },
     "I": {
       "item": "singulo:exotic_matter"

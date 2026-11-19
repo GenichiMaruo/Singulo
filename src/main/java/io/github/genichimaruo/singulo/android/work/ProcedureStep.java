@@ -4,7 +4,9 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 /**
  * 手順カードの1手順。数は1回分（何回分かまとめて作るときは、その回数を掛ける）。
@@ -23,7 +25,7 @@ import net.minecraft.world.item.ItemStack;
  * </ul>
  * 範囲の手順は、pos だけなら1か所、corner があれば2点で囲った範囲。
  */
-public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, ItemStack item, int option) {
+public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, ItemStack item, int option, @Nullable ResourceLocation dimension) {
     /** 番号は保存されるので、新しい手順は最後に足す。 */
     public static final int INSERT = 0, EXTRACT = 1, MINE = 2, HARVEST = 3, FELL = 4, BREED = 5, SHEAR = 6, MILK = 7, CULL = 8, USE = 9,
             PLANT = 10, FISH = 11, KINDS = 12;
@@ -36,6 +38,18 @@ public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, I
 
     public ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, ItemStack item) {
         this(kind, pos, corner, item, defaultOption(kind));
+    }
+
+    public ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, ItemStack item, int option) {
+        this(kind, pos, corner, item, option, null);
+    }
+
+    public ProcedureStep recordedIn(Level level) {
+        return new ProcedureStep(kind, pos, corner, item, option, level.dimension().location());
+    }
+
+    public boolean isIn(Level level) {
+        return level.dimension().location().equals(dimension);
     }
 
     public static int defaultOption(int kind) {
@@ -61,6 +75,7 @@ public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, I
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag t = new CompoundTag();
         t.putInt("kind", kind);
+        if (dimension != null) t.putString("dimension", dimension.toString());
         t.putLong("pos", pos.asLong());
         if (corner != null) {
             t.putLong("corner", corner.asLong());
@@ -77,7 +92,8 @@ public record ProcedureStep(int kind, BlockPos pos, @Nullable BlockPos corner, I
         return new ProcedureStep(kind, BlockPos.of(t.getLong("pos")),
                 t.contains("corner") ? BlockPos.of(t.getLong("corner")) : null,
                 t.contains("item") ? ItemStack.parseOptional(registries, t.getCompound("item")) : ItemStack.EMPTY,
-                t.contains("option") ? t.getInt("option") : defaultOption(kind));
+                t.contains("option") ? t.getInt("option") : defaultOption(kind),
+                t.contains("dimension") ? ResourceLocation.tryParse(t.getString("dimension")) : null);
     }
 
     /** 範囲（1か所なら、そのブロックだけ）。 */

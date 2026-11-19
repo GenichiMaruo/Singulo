@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.drone;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.data.PackBalance;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
@@ -29,7 +32,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -87,7 +89,19 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     public static final int[] AUTO_THRESHOLDS = {0, 1, 64, 256, AUTO_FULL};
     static final int AUTO_SETTLE = 40;
 
-    private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
+    private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged) {
+        @Override public int getMaxEnergyStored() {
+            return Math.max(CAPACITY, Math.max(DroneCrateItem.capacity(1),
+                    Math.max(DroneCrateItem.capacity(2), DroneCrateItem.capacity(3))));
+        }
+
+        @Override public int receiveEnergy(int amount, boolean simulate) {
+            // Reserve enough integer headroom to refund a staged flight on cancellation.
+            resizeCapacity(getMaxEnergyStored());
+            int refundableRoom = Integer.MAX_VALUE - stagedCost - getEnergyStored();
+            return super.receiveEnergy(Math.min(amount, refundableRoom), simulate);
+        }
+    };
     private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -209,8 +223,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     /** 荷物を空き箱1つ（crate）に詰めて、梱包済みの箱を返す（荷物はここで取り出す）。 */
     protected ItemStack packCargo(ItemStack crate) {
         List<ItemStack> cargo = new ArrayList<>();
-        for (int i = 0; i < CARGO; i++) {
-            cargo.add(items.getStackInSlot(SLOT_CARGO + i).copy());
+        int limit = PackBalance.value(ServerConfig.CARGO_STACKS_PER_FLIGHT);
+        for (int i = 0; i < CARGO && cargo.size() < limit; i++) {
+            ItemStack stack = items.getStackInSlot(SLOT_CARGO + i);
+            if (stack.isEmpty()) continue;
+            cargo.add(stack.copy());
             items.setStackInSlot(SLOT_CARGO + i, ItemStack.EMPTY);
         }
         return DroneCrateItem.pack(crate, cargo);
@@ -271,20 +288,26 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (threshold == 0) {
             return false;
         }
-        int total = 0;
-        boolean full = true;
+        int limit = PackBalance.value(ServerConfig.CARGO_STACKS_PER_FLIGHT);
+        int total = 0, fullStacks = 0;
         for (int i = 0; i < CARGO; i++) {
-            ItemStack s = items.getStackInSlot(SLOT_CARGO + i);
-            total += s.getCount();
-            full &= !s.isEmpty() && s.getCount() >= s.getMaxStackSize();
+            ItemStack stack = items.getStackInSlot(SLOT_CARGO + i);
+            if (stack.isEmpty()) continue;
+            total += stack.getCount();
+            if (threshold == AUTO_FULL) {
+                if (stack.getCount() < stack.getMaxStackSize()) return false;
+                if (++fullStacks == limit) return true;
+            }
         }
-        return threshold == AUTO_FULL ? full : total >= threshold;
+        return threshold != AUTO_FULL && total >= threshold;
     }
 
     /** GUI に送る液体の値（物のポートは 0）。 */
     protected int fluidData(int index) {
         return 0;
     }
+
+    protected boolean hasFluidToEject() { return false; }
 
     /** 自動排出の面ごとに、物のほかに押し出すもの（液体のポートは受け取りのタンクの液体）。 */
     protected void ejectExtra(ServerLevel level, Direction dir) {}
@@ -488,7 +511,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (tier == 0) {
             return S_NO_CRATE;
         }
-        if (route.distance() > DroneCrateItem.range(tier)) {
+        if (!DroneCrateItem.canReach(tier, route.distance())) {
             return S_OUT_OF_RANGE;
         }
         if (energy.getEnergyStored() < DroneCrateItem.cost(route.distance())) {
@@ -506,8 +529,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return S_IDLE;
         }
         DroneNetwork.Port target = to == null ? null : DroneNetwork.get(server).port(to);
-        if (target == null || !java.util.Objects.equals(target.owner(), owner) || to.equals(worldPosition)
-                || target.fluid() != fluidPort()) {
+        if (target == null || !target.accepts(owner, fluidPort()) || to.equals(worldPosition)) {
             return S_NO_DESTINATION;
         }
         if (!hasCargo()) {
@@ -518,7 +540,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return S_NO_CRATE;
         }
         double distance = DroneWormhole.distance(server, worldPosition, to);
-        if (distance > DroneCrateItem.range(tier)) {
+        if (!DroneCrateItem.canReach(tier, distance)) {
             return S_OUT_OF_RANGE;
         }
         if (energy.getEnergyStored() < DroneCrateItem.cost(distance)) {
@@ -568,8 +590,10 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return false;
         }
         int cost = DroneCrateItem.cost(distance);
+        ItemStack box = items.getStackInSlot(SLOT_CRATES);
+        if (!acceptsCrate(box) || !DroneCrateItem.canReach(DroneCrateItem.tier(box), distance)
+                || !hasCargo() || !energy.consume(cost)) return false;
         ItemStack crate = items.extractItem(SLOT_CRATES, 1, false);
-        energy.consume(cost);
         staged = packCargo(crate);
         stagedTo = to;
         stagedDim = dim;
@@ -696,8 +720,11 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
      * ほかの便の受け渡し中や、着荷箱の欄に空きがないときは false（ドローンは真上で待つ）。
      */
     public boolean dock(DroneNetwork.Flight f) {
+        if (level instanceof ServerLevel server && rejectIncompatibleDelivery(server, f)) {
+            return false;
+        }
         if (anim != ANIM_NONE) {
-            return animFlight == f.id;
+            return handling(f);
         }
         if (f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.from) && flightId == f.id && !staged.isEmpty()) {
             begin(ANIM_LOAD, f, staged);
@@ -754,8 +781,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (now % 5 == 0) {
             unpack();
         }
-        if (now % 10 == 0 && (sides.ejectEnabled() || crateSides.ejectEnabled())) {
-            autoEject(level);
+        boolean itemTick = now % 10 == 0;
+        if ((itemTick && (sides.ejectEnabled() || crateSides.ejectEnabled())) || (sides.ejectEnabled() && hasFluidToEject())) {
+            autoEject(level, itemTick);
         }
         if (now % 20 == 0) {
             tickAuto(now);
@@ -899,18 +927,20 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     }
 
     /** 自動排出: 「出力」を含み自動排出がオンの面の隣へ、受け取りの欄と、着荷箱の欄に残った空の箱を押し出す。 */
-    private void autoEject(ServerLevel level) {
+    private void autoEject(ServerLevel level, boolean itemTick) {
         Direction facing = facing();
         for (SideConfig.Face f : SideConfig.Face.values()) {
             boolean cargo = sides.ejectEnabled() && sides.eject(f) && sides.canExtract(f);
-            boolean crates = crateSides.ejectEnabled() && crateSides.eject(f) && crateSides.canExtract(f);
+            boolean crates = itemTick && crateSides.ejectEnabled() && crateSides.eject(f) && crateSides.canExtract(f);
             if (!cargo && !crates) {
                 continue;
             }
             Direction dir = SideConfig.directionOf(facing, f);
+            if (!level.isLoaded(worldPosition.relative(dir))) continue;
             if (cargo) {
                 ejectExtra(level, dir);
             }
+            if (!itemTick) continue;
             IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                     worldPosition.relative(dir), dir.getOpposite());
             if (dest == null) {
@@ -980,7 +1010,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
 
     /** その便の受け渡しをこのポートで今しているか。 */
     public boolean handling(DroneNetwork.Flight f) {
-        return anim != ANIM_NONE && animFlight == f.id;
+        return animFlight == f.id && (anim == ANIM_LOAD && f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.from)
+                || anim == ANIM_UNLOAD && f.stage == DroneNetwork.DELIVER && worldPosition.equals(f.to));
     }
 
     private void tickAnim(ServerLevel level, DroneNetwork net, long now) {
@@ -989,8 +1020,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         }
         long t = now - animStart;
         DroneNetwork.Flight f = net.flight(animFlight);
-        if (f == null && !handed) {
-            anim = ANIM_NONE;                           // 便がなくなった（取り消し）: 扉を閉じる
+        if (f == null || !handling(f) || !handed && anim == ANIM_UNLOAD && rejectIncompatibleDelivery(level, f)) {
+            anim = ANIM_NONE;                           // 取り消し・返送が始まった便の段階を後から書き換えない
             changedVisible();
             return;
         }
@@ -1021,9 +1052,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (t >= ANIM_TICKS) {
             int next = anim == ANIM_LOAD ? DroneNetwork.DELIVER : DroneNetwork.RETURN;
             anim = ANIM_NONE;
-            if (f != null) {
-                net.advance(f, next, now);
-            }
+            net.advance(f, next, now);
             if (next == DroneNetwork.RETURN) {
                 level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone_port.arrive"), SoundSource.BLOCKS, 0.8F, 1.0F);
             }
@@ -1037,7 +1066,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             return;
         }
         DroneNetwork.Flight f = flightId == 0 ? null : net.flight(flightId);
-        if (stagedDim == null && stagedTo != null && net.port(stagedTo) == null && anim != ANIM_LOAD) {
+        DroneNetwork.Port target = stagedDim == null && stagedTo != null ? net.port(stagedTo) : null;
+        if (stagedDim == null && stagedTo != null && anim != ANIM_LOAD && (target == null || !target.accepts(owner, fluidPort()))) {
             // 行き先のポートが壊された: 積む前なら取り消して荷物と電力を戻す。入りきらなければ、ドローンを帰して箱をここに
             // 置いておく（取消を押せば、空けたあとで戻せる。積んで、ない行き先へ飛ばすことはしない）
             if (!cancel()) {
@@ -1099,6 +1129,7 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             if (f.stage != DroneNetwork.DELIVER || !worldPosition.equals(f.to) || !f.arrived(now)) {
                 continue;
             }
+            if (rejectIncompatibleDelivery(level, f)) continue;
             if (level.isPositionEntityTicking(worldPosition.above()) && CargoDrone.materialize(level, net, f)) {
                 continue;
             }
@@ -1110,6 +1141,34 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             f.crate = ItemStack.EMPTY;
             net.advance(f, DroneNetwork.RETURN, now);
         }
+    }
+
+    /** Recheck the receiving port when the shipment arrives; it may have been replaced in transit. */
+    private boolean rejectIncompatibleDelivery(ServerLevel level, DroneNetwork.Flight f) {
+        if (f.stage == DroneNetwork.DELIVER && worldPosition.equals(f.to)
+                && !f.crate.isEmpty() && (fluidPort() != DroneCrateItem.isFluid(f.crate) || !java.util.Objects.equals(owner, f.owner))) {
+            unavailablePort(level, DroneNetwork.get(level), f, worldPosition);
+            return true;
+        }
+        return false;
+    }
+
+    /** Return an undeliverable crate, or drop it intact here if its sending port is also gone. */
+    static void unavailablePort(ServerLevel level, DroneNetwork net, DroneNetwork.Flight f, BlockPos at) {
+        long now = level.getGameTime();
+        if (f.away()) {
+            goHome(net, f, now);
+            return;
+        }
+        DroneNetwork.Port source = net.port(f.from);
+        if (f.stage == DroneNetwork.DELIVER && !f.crate.isEmpty() && !f.from.equals(at)
+                && source != null && source.accepts(f.owner, DroneCrateItem.isFluid(f.crate))) {
+            DroneWormhole.turnBack(net, f, now);
+            return;
+        }
+        Block.popResource(level, at, f.crate);
+        f.crate = ItemStack.EMPTY;
+        goHome(net, f, now);
     }
 
     /** 着荷箱を受け取りの欄へ開梱する（入る分だけ）。空になった箱は空き箱の欄へ移す。 */
@@ -1206,30 +1265,20 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
             long now = server.getGameTime();
             // 受け渡しのあとなら、その便は次の段階へ（積んだ箱は便に、降ろした箱は上で落とした）。前なら箱は元の側に残っている
             DroneNetwork.Flight moving = anim == ANIM_NONE ? null : net.flight(animFlight);
-            if (moving != null && handed) {
+            if (moving != null && handed && handling(moving)) {
                 net.advance(moving, anim == ANIM_LOAD ? DroneNetwork.DELIVER : DroneNetwork.RETURN, now);
             }
             anim = ANIM_NONE;
             for (DroneNetwork.Flight f : net.flights()) {
+                // The drone already holds the crate while the sending hatch finishes closing.
+                if (f.stage == DroneNetwork.PICKUP && worldPosition.equals(f.to) && !f.crate.isEmpty()) {
+                    net.advance(f, DroneNetwork.DELIVER, now);
+                }
                 if (f.stage == DroneNetwork.PICKUP && (worldPosition.equals(f.from) || worldPosition.equals(f.to))) {
                     // ここで積む便も、ここへ届けるために取りに行く便も帰す（発送元の箱は、発送元が取り消して荷物を戻す）
                     goHome(net, f, now);
                 } else if (f.stage == DroneNetwork.DELIVER && worldPosition.equals(f.to)) {
-                    if (f.away()) {
-                        goHome(net, f, now);
-                    } else if (net.port(f.from) != null && !f.from.equals(worldPosition)) {
-                        BlockPos back = f.from;          // 発送元へ戻す
-                        f.from = f.to;
-                        f.to = back;
-                        if (f.virtual) {
-                            net.redirectVirtual(f, Vec3.atCenterOf(f.from), now);
-                        }
-                        net.changed();
-                    } else {
-                        Block.popResource(level, worldPosition, f.crate);   // 戻す先もない: 梱包済みの箱のまま、ここに落とす
-                        f.crate = ItemStack.EMPTY;
-                        goHome(net, f, now);
-                    }
+                    unavailablePort(server, net, f, worldPosition);
                 }
             }
         }

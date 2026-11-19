@@ -36,6 +36,14 @@ public final class TestScope implements GameTestListener {
         return player;
     }
 
+    public void ownBlockEntity(GameTestHelper helper, net.minecraft.world.level.block.entity.BlockEntity entity) {
+        var level = helper.getLevel();
+        var pos = entity.getBlockPos();
+        defer(() -> {
+            if (level.getBlockEntity(pos) == entity) level.removeBlock(pos, false);
+        });
+    }
+
     public void close() {
         if (closed) return;
         closed = true;

@@ -22,7 +22,20 @@
         "item": "minecraft:phantom_membrane"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:dusts/redstone"
+      },
+      "count": 2
     }
+  ],
+  "shape": [
+    "     ",
+    " CAC ",
+    " DBD ",
+    " AAA ",
+    "     "
   ],
   "result": {
     "id": "singulo:low_gravity_panel",

@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.drone;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.data.PackBalance;
+
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -30,6 +33,10 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 public class FluidCapsuleItem extends DroneCrateItem {
     public static final int CAPACITY = 64_000;
 
+    public static int capacityMb() {
+        return PackBalance.value(ServerConfig.FLUID_CAPSULE_CAPACITY);
+    }
+
     public FluidCapsuleItem(int tier, Properties properties) {
         super(tier, properties);
     }
@@ -42,7 +49,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
     /** 空のカプセル1個に液体を詰めたもの。 */
     public static ItemStack pack(ItemStack capsule, FluidStack fluid) {
         ItemStack out = capsule.copyWithCount(1);
-        setFluid(out, fluid);
+        setFluid(out, fluid.copyWithAmount(Math.min(capacityMb(), fluid.getAmount())));
         return out;
     }
 
@@ -53,7 +60,9 @@ public class FluidCapsuleItem extends DroneCrateItem {
             stack.set(DataComponents.MAX_STACK_SIZE, stack.getItem().components().get(DataComponents.MAX_STACK_SIZE));
             return;
         }
-        stack.set(SinguloComponents.CAPSULE_FLUID.get(), SimpleFluidContent.copyOf(fluid.copyWithAmount(Math.min(CAPACITY, fluid.getAmount()))));
+        FluidStack old = fluid(stack);
+        int limit = FluidStack.isSameFluidSameComponents(fluid, old) ? Math.max(capacityMb(), old.getAmount()) : capacityMb();
+        stack.set(SinguloComponents.CAPSULE_FLUID.get(), SimpleFluidContent.copyOf(fluid.copyWithAmount(Math.min(limit, fluid.getAmount()))));
         stack.set(DataComponents.MAX_STACK_SIZE, 1);
     }
 
@@ -85,7 +94,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
         if (!level.isClientSide) {
             int filled = target.fill(inside, IFluidHandler.FluidAction.EXECUTE);
             if (filled > 0) {
-                ItemStack next = stack.copyWithCount(1);
+                ItemStack next = context.getPlayer() == null ? stack : stack.copyWithCount(1);
                 setFluid(next, inside.copyWithAmount(inside.getAmount() - filled));
                 if (context.getPlayer() != null) {
                     context.getPlayer().setItemInHand(context.getHand(), next);
@@ -98,13 +107,13 @@ public class FluidCapsuleItem extends DroneCrateItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
-        lines.add(Component.translatable("tooltip.singulo.drone_crate.range", range(tier(stack))).withStyle(ChatFormatting.AQUA));
+        lines.add(rangeTooltip(tier(stack)));
         FluidStack inside = fluid(stack);
         if (inside.isEmpty()) {
-            lines.add(Component.translatable("tooltip.singulo.fluid_capsule.empty", CAPACITY).withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("tooltip.singulo.fluid_capsule.empty", capacityMb()).withStyle(ChatFormatting.GRAY));
             return;
         }
-        lines.add(Component.translatable("tooltip.singulo.fluid_capsule.contents", inside.getHoverName(), inside.getAmount(), CAPACITY)
+        lines.add(Component.translatable("tooltip.singulo.fluid_capsule.contents", inside.getHoverName(), inside.getAmount(), capacityMb())
                 .withStyle(ChatFormatting.GRAY));
         lines.add(Component.translatable("tooltip.singulo.fluid_capsule.pour").withStyle(ChatFormatting.DARK_GRAY));
     }

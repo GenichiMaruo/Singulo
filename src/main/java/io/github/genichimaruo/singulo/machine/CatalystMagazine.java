@@ -58,14 +58,15 @@ public final class CatalystMagazine {
      * （1回に装填中のものの残りより多く使うレシピでも、使い切ったあとは次の触媒から続けて使える）。
      */
     public ItemStack pooled(IItemHandlerModifiable supply, int slot) {
-        ItemStack first = current(supply, slot);
-        if (loaded.isEmpty() || first.getItem() instanceof CreativeCatalystItem) {
-            return first;
-        }
-        ItemStack s = supply.getStackInSlot(slot);
+        return pooled(loaded, supply.getStackInSlot(slot));
+    }
+
+    public static ItemStack pooled(ItemStack loaded, ItemStack reserve) {
+        if (loaded.isEmpty()) return reserve.copyWithCount(1);
+        if (loaded.getItem() instanceof CreativeCatalystItem) return loaded;
         long total = UsesHelper.remaining(loaded);
-        if (!s.isEmpty() && sameKind(loaded, s)) {
-            total += (long) UsesHelper.remaining(s) * s.getCount();
+        if (!reserve.isEmpty() && sameKind(loaded, reserve)) {
+            total += (long) UsesHelper.remaining(reserve) * reserve.getCount();
         }
         ItemStack view = loaded.copy();
         int all = (int) Math.min(Integer.MAX_VALUE, total);
@@ -230,7 +231,23 @@ public final class CatalystMagazine {
         changed.run();
     }
 
-    private void flush(UnaryOperator<ItemStack> exit) {
+    /** Shells created by this payment, including any same-kind reserves used after the loaded catalyst. */
+    public ItemStack spentBy(int payment, IItemHandlerModifiable supply, int slot) {
+        if (payment <= 0) return ItemStack.EMPTY;
+        ItemStack first = current(supply, slot);
+        if (first.isEmpty() || first.getItem() instanceof CreativeCatalystItem) return ItemStack.EMPTY;
+        int remaining = UsesHelper.remaining(first);
+        if (remaining <= 0 || payment < remaining) return ItemStack.EMPTY;
+        int count = 1;
+        ItemStack reserve = supply.getStackInSlot(slot);
+        if (sameKind(first, reserve) && UsesHelper.remaining(reserve) > 0) {
+            int available = reserve.getCount() - (loaded.isEmpty() ? 1 : 0);
+            count += Math.min(available, (payment - remaining) / UsesHelper.remaining(reserve));
+        }
+        return UsesHelper.consume(first, remaining).copyWithCount(count);
+    }
+
+    void flush(UnaryOperator<ItemStack> exit) {
         boolean moved = false;
         for (int i = 0; i < returns.size(); i++) {
             ItemStack rest = exit.apply(returns.get(i));

@@ -1,0 +1,30 @@
+// Export the recipe editor's versioned catalogue from a disposable GameTest world.
+allprojects {
+    afterEvaluate {
+        if (!plugins.hasPlugin('net.neoforged.moddev')) return
+        sourceSets.main.java.srcDir(file('tools/review/vanilla-catalog-src'))
+        def review = file('build/vanilla-item-catalog/client')
+        def prepare = tasks.register('prepareVanillaCatalog') {
+            doLast {
+                def world = file('build/gametest/world')
+                if (!new File(world, 'level.dat').isFile()) throw new GradleException('Run runGameTestServer first')
+                if (!new File(review, 'saves/Review/level.dat').isFile()) {
+                    copy { from world; into new File(review, 'saves/Review') }
+                }
+                new File(review, 'options.txt').text = 'lang:ja_jp\nguiScale:1\nrenderDistance:2\npauseOnLostFocus:false\n'
+            }
+        }
+        tasks.named('runClient').configure { dependsOn prepare }
+        neoForge.runs.client {
+            gameDirectory = review
+            systemProperty 'singulo.catalogOutput', file('tools/vanilla_1_21_1').absolutePath
+            systemProperty 'singulo.catalogRecipes', file('src/generated/resources/data/singulo/recipe').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1024'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

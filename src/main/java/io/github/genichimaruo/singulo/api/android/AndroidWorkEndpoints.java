@@ -3,6 +3,8 @@ package io.github.genichimaruo.singulo.api.android;
 import java.util.Objects;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerLevel;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
 
@@ -11,8 +13,12 @@ public final class AndroidWorkEndpoints {
     private AndroidWorkEndpoints() { }
     public enum Result { LINKED, UNLINKED, REJECTED, UNAVAILABLE, BUSY }
     public static Result link(ServerLevel level, BlockPos console, UUID actor, BlockPos endpoint) {
+        return link(level, console, actor, endpoint, null);
+    }
+    /** Select one face at this position, for example an interface mounted on a cable bus. */
+    public static Result link(ServerLevel level, BlockPos console, UUID actor, BlockPos endpoint, @Nullable Direction face) {
         var c = console(level, console, actor, endpoint);
-        return c == null ? Result.UNAVAILABLE : c.linkExternalEndpoint(actor, endpoint);
+        return c == null ? Result.UNAVAILABLE : c.linkExternalEndpoint(actor, endpoint, face);
     }
     public static Result unlink(ServerLevel level, BlockPos console, UUID actor, BlockPos endpoint) {
         var c = console(level, console, actor, endpoint);

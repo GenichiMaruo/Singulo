@@ -1,9 +1,6 @@
 package io.github.genichimaruo.singulo.pipe;
 
-/**
- * 入れるタンクと出すタンクが別になっている口（液体のドローン発着ポートの送るタンクと受け取りのタンクなど）。
- * 同じ液体を出し入れできても「タンク」とは見なさず、出す口と受ける口の両方として扱う（ほかのタンクとも受け渡しする）。
- * 出した液体が同じ口に戻ることはない（同じ口どうしでは受け渡さない）。
- */
+/** Legacy marker for ports with independent input and output tanks. Machines now initiate fluid ejection. */
+@Deprecated
 public interface PipeSplitTanks {
 }

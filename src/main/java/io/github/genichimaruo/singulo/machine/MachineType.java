@@ -11,7 +11,7 @@ public enum MachineType {
     ELECTROLYZER("electrolyzer", 1, 0, 0, 1, 2, false),
     ARCHIVE_TERMINAL("archive_terminal", 1, 4, 1, 0, 0, false),
     /** 段階3以降の装置・部品・道具を組み立てる。材料は種類と個数だけで指定する（入力6枠）。 */
-    PRECISION_ASSEMBLER("precision_assembler", 2, 6, 1, 0, 0, false),
+    PRECISION_ASSEMBLER("precision_assembler", 2, 0, 1, 0, 0, false),
     /** 2つめの出力枠に、粗銅の精錬で出るビスマスなどの副産物が出る。 */
     CATALYTIC_REACTOR("catalytic_reactor", 2, 5, 2, 1, 0, false),
     /** マルチブロック。入力タンクはヘリウム用、出力タンクは液体窒素と液体ヘリウム。 */
@@ -26,7 +26,7 @@ public enum MachineType {
     /** 型の残響の欠片（1個だけ入れる）の振動をスカルクに転写して、欠片を複製する。 */
     ECHO_RESONATOR("echo_resonator", 3, 4, 1, 0, 0, false),
     /** マルチブロック（3×3×3）。縮退物質殻・炉殻ブロック・ホライズン・バスを作る。圧縮熱を液体窒素で除く。 */
-    DEGENERATE_COMPACTOR("degenerate_compactor", 4, 3, 1, 1, 0, false),
+    DEGENERATE_COMPACTOR("degenerate_compactor", 4, 4, 1, 1, 0, false),
     /** マルチブロック（5×5×5）。アクシオン凝縮体（出力タンク）とエキゾチック物質を作る。 */
     CASIMIR_CAVITY("casimir_cavity", 4, 6, 1, 1, 1, false),
     /** 時間結晶触媒を育てる。電力が要求の80%を割った時間の割合だけ純度（寿命）が下がる。 */
@@ -38,6 +38,11 @@ public enum MachineType {
 
     public static final int ENERGY_CAPACITY = 20_000;
     public static final int TANK_CAPACITY = 8_000;
+
+    public static int tankCapacity() {
+        return io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded()
+                ? io.github.genichimaruo.singulo.generated.ServerConfig.MACHINE_TANK_CAPACITY.get() : TANK_CAPACITY;
+    }
 
     private final String id;
     private final int stage;
@@ -98,8 +103,12 @@ public enum MachineType {
     }
 
     public int itemSlots() {
-        return capacitySlot() + 1;
+        return capacitySlot() + (this == PRECISION_ASSEMBLER ? 3 : 1);
     }
+
+    public int spentCatalystSlot() { return this == PRECISION_ASSEMBLER ? capacitySlot() + 1 : -1; }
+
+    public int assemblyUpgradeSlot() { return this == PRECISION_ASSEMBLER ? capacitySlot() + 2 : -1; }
 
     /** Appended after all legacy slots so old inventories keep their slot indices. */
     public int capacitySlot() { return upgradeSlot() + 1; }
@@ -134,7 +143,7 @@ public enum MachineType {
      * 入れている途中が、別のレシピの材料と同じになることがある装置。
      */
     public boolean selectsRecipe() {
-        return this == PRECISION_ASSEMBLER || this == SINGULARITY_ENCAPSULATOR;
+        return this == SINGULARITY_ENCAPSULATOR;
     }
 
     /** 任意のブロックを質量として溜め、圧縮ブロックや質量ペレットにするモードを持つか。 */
@@ -148,8 +157,10 @@ public enum MachineType {
      */
     public int[] legacyLayout() {
         return switch (this) {
+            case PRECISION_ASSEMBLER -> new int[]{6, 1};
             case PARTICLE_ACCELERATOR -> new int[]{0, 2};
             case CATALYTIC_REACTOR -> new int[]{5, 1};
+            case DEGENERATE_COMPACTOR -> new int[]{3, 1};
             default -> new int[]{inputSlots, outputSlots};
         };
     }
@@ -162,6 +173,10 @@ public enum MachineType {
 
     /** 装置の基本容量。容量アップグレードは別枠で増設する。 */
     public int energyCapacity() {
+        return CapacityUpgrades.scaledCapacity(baseCapacity());
+    }
+
+    private int baseCapacity() {
         return switch (stage) {
             case 1 -> ENERGY_CAPACITY;
             case 2 -> 100_000;
@@ -173,6 +188,6 @@ public enum MachineType {
 
     /** Reception is independent of buffer upgrades; assembling late-game parts needs high throughput. */
     public int energyReceiveLimit() {
-        return this == PRECISION_ASSEMBLER ? 4_000_000 : energyCapacity() / 10;
+        return CapacityUpgrades.scaledCapacity(this == PRECISION_ASSEMBLER ? 4_000_000 : baseCapacity() / 10);
     }
 }

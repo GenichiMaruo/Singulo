@@ -400,14 +400,15 @@ public final class DroneGameTests {
     public static void brokenDestinationCancelsStagedShipment(GameTestHelper h) {
         DronePortBlockEntity a = port(h, new BlockPos(1, 1, 1));
         BlockPos toPos = new BlockPos(6, 1, 1);
-        DronePortBlockEntity b = port(h, toPos);
+        port(h, toPos);
         a.select(h.absolutePos(toPos));
         load(a, 1, new ItemStack(Items.IRON_INGOT, 9));
         station(h, new BlockPos(4, 1, 5), 1);
         h.runAtTickTime(100, () -> {
             h.assertTrue(a.send(), "Could not send: " + a.status());
-            b.onBroken(h.getLevel());
-            h.setBlock(toPos, net.minecraft.world.level.block.Blocks.AIR);
+            h.setBlock(toPos, SinguloBlocks.FLUID_DRONE_PORT.get());
+            DronePortBlockEntity replacement = h.getBlockEntity(toPos);
+            replacement.setOwner(owner(h));
         });
         h.runAtTickTime(110, () -> {
             h.assertTrue(a.staged().isEmpty(), "Shipment to a broken port is still staged");
@@ -479,7 +480,7 @@ public final class DroneGameTests {
         ServerLevel level = h.getLevel();
         DroneNetwork net = DroneNetwork.get(level);
         BlockPos station = h.absolutePos(STATION);
-        DroneNetwork.Flight f = net.create(station, 0, null, h.absolutePos(FROM), h.absolutePos(TO));
+        DroneNetwork.Flight f = net.create(station, 0, owner(h), h.absolutePos(FROM), h.absolutePos(TO));
         f.crate = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.EMERALD, 12)));
         f.stage = DroneNetwork.DELIVER;
         net.virtualize(f, Vec3.atCenterOf(h.absolutePos(FROM)), level.getGameTime() - 1000);
@@ -499,7 +500,7 @@ public final class DroneGameTests {
         ServerLevel level = h.getLevel();
         DroneNetwork net = DroneNetwork.get(level);
         BlockPos from = h.absolutePos(new BlockPos(1, 1, 1)), to = h.absolutePos(new BlockPos(6, 1, 1));
-        DroneNetwork.Flight f = net.create(h.absolutePos(new BlockPos(3, 1, 5)), 0, null, from, to);
+        DroneNetwork.Flight f = net.create(h.absolutePos(new BlockPos(3, 1, 5)), 0, owner(h), from, to);
         f.stage = DroneNetwork.DELIVER;
         f.crate = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.REDSTONE, 30)));
         h.destroyBlock(new BlockPos(6, 1, 1));
@@ -514,6 +515,31 @@ public final class DroneGameTests {
         net.remove(f);
         drops.forEach(ItemEntity::discard);
         h.succeed();
+    }
+
+    @GameTest(template = "large", batch = BATCH, timeoutTicks = 650)
+    public static void removingDestinationDuringPickupReturnsLoadedCrate(GameTestHelper h) {
+        DronePortBlockEntity source = port(h, FROM);
+        port(h, TO);
+        station(h, FROM.east(), 1);
+        load(source, 1, new ItemStack(Items.DIAMOND, 13));
+        source.select(h.absolutePos(TO));
+        boolean[] removed = {false};
+        h.runAtTickTime(120, () -> h.assertTrue(source.send(), "Could not dispatch the shipment"));
+        h.succeedWhen(() -> {
+            var flight = DroneNetwork.get(h.getLevel()).flightOf(h.absolutePos(FROM.east()), 0);
+            if (!removed[0]) {
+                h.assertTrue(flight != null && flight.stage == DroneNetwork.PICKUP && !flight.crate.isEmpty(),
+                        "Waiting for the drone to take the crate while its hatch is still open");
+                h.assertTrue(source.staged().isEmpty(), "Source still holds the first crate");
+                h.destroyBlock(TO);
+                removed[0] = true;
+            }
+            h.assertTrue(count(source, DronePortBlockEntity.SLOT_RECEIVE, DronePortBlockEntity.RECEIVE, Items.DIAMOND) == 13,
+                    "The loaded shipment did not come back to the source intact");
+            h.assertTrue(flight == null || flight.crate.isEmpty(), "The returned shipment still exists in transit");
+            ours(h, FROM.east()).forEach(CargoDrone::discard);
+        });
     }
 
     /** 着荷の欄が受け取りきれないときは、残りを箱の中に残す（地面に落とさない）。 */
@@ -782,10 +808,23 @@ public final class DroneGameTests {
                 step[0] = 1;
             }
             if (step[0] == 1) {
+                CargoDrone drone = drones.getFirst();
+                h.assertTrue(drone.dismantling() && drone.printTicks() < CargoDrone.PRINT_TICKS, "Waiting for dismantling to progress");
+                var saved = drone.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+                var reloaded = io.github.genichimaruo.singulo.registry.SinguloEntities.CARGO_DRONE.get().create(h.getLevel());
+                reloaded.load(saved);
+                h.assertTrue(reloaded.dismantling() && reloaded.printTicks() == drone.printTicks(), "Lost dismantling progress on reload");
+                saved.remove("dismantling"); // 古い保存では、ステーションの停止指示から解体を再開する。
+                reloaded.load(saved);
+                drone.discard();
+                h.getLevel().addFreshEntity(reloaded);
+                step[0] = 2;
+            }
+            if (step[0] == 2) {
                 h.assertTrue(drones.isEmpty() && station.status(0) == DroneStationBlockEntity.S_STOPPED, "Not dismantled yet");
                 h.assertTrue(station.items().getStackInSlot(DroneStationBlockEntity.SLOT_KIT).getCount() == 2, "Kit not returned");
                 station.press(DroneStationBlockEntity.BUTTON_RESUME);
-                step[0] = 2;
+                step[0] = 3;
             }
             h.assertTrue(drones.size() == 1 && station.items().getStackInSlot(DroneStationBlockEntity.SLOT_KIT).getCount() == 1,
                     "Not printed again");
@@ -809,7 +848,12 @@ public final class DroneGameTests {
         load(a, 1, new ItemStack(Items.REDSTONE, 32));
         h.runAtTickTime(160, () -> {
             h.assertTrue(a.staged().isEmpty(), "Sent below the threshold");
-            a.items().setStackInSlot(DronePortBlockEntity.SLOT_CARGO + 1, new ItemStack(Items.REDSTONE, 32));
+            var player = TestScope.player(h);
+            player.getInventory().setItem(9, new ItemStack(Items.REDSTONE, 32));
+            var menu = a.createMenu(1, player.getInventory(), player);
+            menu.quickMoveStack(player, DronePortBlockEntity.SLOTS);
+            h.assertTrue(a.items().getStackInSlot(DronePortBlockEntity.SLOT_CARGO).getCount() == 64
+                    && player.getInventory().getItem(9).isEmpty(), "Shift-click did not merge the existing cargo stack");
         });
         h.runAtTickTime(185, () -> h.assertTrue(a.staged().isEmpty(), "Sent before the cargo settled"));
         h.runAtTickTime(240, () -> {

@@ -260,6 +260,8 @@ public final class SinguloBlockEntities {
             REGISTER.register("genesis_core", () -> build(io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity::new,
                     SinguloBlocks.GENESIS_CORE.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity>> FLUID_PUMP =
+            REGISTER.register("fluid_pump", () -> build(io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity::new, SinguloBlocks.FLUID_PUMP.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity>> FLUID_PIPE = REGISTER.register("fluid_pipe",
             () -> build(io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity::new, SinguloBlocks.FLUID_PIPE.get(),
                     SinguloBlocks.VACUUM_JACKETED_PIPE.get(), SinguloBlocks.SUPERFLUID_CONDUIT.get(), SinguloBlocks.HORIZON_DUCT.get()));

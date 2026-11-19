@@ -28,7 +28,7 @@ public final class Structures {
     public static int findRing(Level level, BlockPos controller) {
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             BlockPos start = controller.relative(dir);
-            if (isRingBlock(level.getBlockState(start))) {
+            if (level.isLoaded(start) && isRingBlock(level.getBlockState(start))) {
                 int side = ringFrom(level, start);
                 if (side > 0) {
                     return side;
@@ -43,7 +43,7 @@ public final class Structures {
     public static Direction ringDirection(Level level, BlockPos controller) {
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             BlockPos start = controller.relative(dir);
-            if (isRingBlock(level.getBlockState(start)) && ringFrom(level, start) > 0) {
+            if (level.isLoaded(start) && isRingBlock(level.getBlockState(start)) && ringFrom(level, start) > 0) {
                 return dir;
             }
         }
@@ -55,7 +55,7 @@ public final class Structures {
         List<BlockPos> out = new ArrayList<>();
         for (Direction side : new Direction[]{toRing.getClockWise(), toRing.getCounterClockWise()}) {
             BlockPos p = controller.relative(side);
-            if (role(level.getBlockState(p)) == MultiblockPart.Role.MULTIBLOCK_PORT) {
+            if (level.isLoaded(p) && role(level.getBlockState(p)) == MultiblockPart.Role.MULTIBLOCK_PORT) {
                 out.add(p.immutable());
             }
         }
@@ -174,6 +174,11 @@ public final class Structures {
     /** 形成できたリアクター。center は炉心の中心、ports は抽出ポート、alarms は炉心質量警報器。 */
     public record Reactor(BlockPos center, List<BlockPos> ports, List<BlockPos> alarms) {}
 
+    public static boolean reactorAreaLoaded(Level level, BlockPos controller) {
+        int x = controller.getX(), z = controller.getZ();
+        return level.hasChunksAt(x - REACTOR_RADIUS, z - REACTOR_RADIUS, x + REACTOR_RADIUS, z + REACTOR_RADIUS);
+    }
+
     /**
      * Pリアクター: 13×13×13 のジャイロスコープ型。炉心の中心を通る直交3平面（XY・YZ・XZ）に、半径6の円環を
      * 隙間なくつなげて作る（各48ブロック）。3本が交わる軸の6点はジャイロ駆動部、各円環の斜め45°の点（計12）は抽出ポート、
@@ -181,6 +186,7 @@ public final class Structures {
      */
     @Nullable
     public static Reactor findReactor(Level level, BlockPos controller) {
+        if (!reactorAreaLoaded(level, controller)) return null;
         BlockPos c = controller.above(CONTROLLER_BELOW_CENTER);
         for (BlockPos p : BlockPos.betweenClosed(c.offset(-1, -1, -1), c.offset(1, 1, 1))) {
             BlockState s = level.getBlockState(p);

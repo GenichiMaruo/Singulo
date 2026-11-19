@@ -36,6 +36,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    " BEB ",
+    " BAB ",
+    " CDC ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_work_console",
     "count": 1

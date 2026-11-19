@@ -28,7 +28,20 @@
         "item": "singulo:time_crystal_module"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:tipler_frame"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "  D  ",
+    " CCC ",
+    "CBABC",
+    " CCC ",
+    "  E  "
   ],
   "result": {
     "id": "singulo:tipler_core",

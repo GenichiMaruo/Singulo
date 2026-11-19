@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.drone;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.data.PackBalance;
+
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -26,7 +29,6 @@ public class DroneCrateItem extends Item {
     /** 発送の電力 = BASE_FE + 直線距離 × FE_PER_BLOCK。 */
     public static final int BASE_FE = 2_000, FE_PER_BLOCK = 50;
     /** 段階ごとのバッテリー容量（射程を決める）。 */
-    private static final int[] CAPACITY = {0, 10_000, 40_000, 160_000};
 
     private final int tier;
 
@@ -41,7 +43,12 @@ public class DroneCrateItem extends Item {
     }
 
     public static int capacity(int tier) {
-        return CAPACITY[Math.max(0, Math.min(3, tier))];
+        return switch (tier) {
+            case 1 -> PackBalance.value(ServerConfig.CRATE_TIER1_CAPACITY);
+            case 2 -> PackBalance.value(ServerConfig.CRATE_TIER2_CAPACITY);
+            case 3 -> PackBalance.value(ServerConfig.CRATE_TIER3_CAPACITY);
+            default -> 0;
+        };
     }
 
     /** 液体カプセルか（液体のポートで使う箱）。 */
@@ -59,12 +66,30 @@ public class DroneCrateItem extends Item {
 
     /** その段階の箱で届く距離（ブロック）。 */
     public static int range(int tier) {
-        return tier <= 0 ? 0 : (capacity(tier) - BASE_FE) / FE_PER_BLOCK;
+        int budget = capacity(tier) - PackBalance.value(ServerConfig.SHIPMENT_BASE_FE);
+        if (tier <= 0 || budget < 0) return 0;
+        int rate = PackBalance.value(ServerConfig.SHIPMENT_FE_PER_BLOCK);
+        return rate == 0 ? Integer.MAX_VALUE : budget / rate;
+    }
+
+    protected static Component rangeTooltip(int tier) {
+        Object blocks = PackBalance.value(ServerConfig.SHIPMENT_FE_PER_BLOCK) == 0 && canReach(tier, 0)
+                ? "∞" : io.github.genichimaruo.singulo.energy.EnergyText.of((long) range(tier));
+        return Component.translatable("tooltip.singulo.drone_crate.range", blocks).withStyle(ChatFormatting.AQUA);
     }
 
     /** その距離を送る電力。 */
     public static int cost(double distance) {
-        return BASE_FE + (int) Math.ceil(distance * FE_PER_BLOCK);
+        return (int) shipmentCost(distance);
+    }
+
+    private static double shipmentCost(double distance) {
+        return PackBalance.value(ServerConfig.SHIPMENT_BASE_FE)
+                + Math.ceil(distance * PackBalance.value(ServerConfig.SHIPMENT_FE_PER_BLOCK));
+    }
+
+    public static boolean canReach(int tier, double distance) {
+        return tier > 0 && distance >= 0 && shipmentCost(distance) <= capacity(tier);
     }
 
     /** 中身の入った（梱包済みの）箱か。液体カプセルは液体が入っていれば梱包済み。 */
@@ -145,7 +170,7 @@ public class DroneCrateItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
-        lines.add(Component.translatable("tooltip.singulo.drone_crate.range", range(tier)).withStyle(ChatFormatting.AQUA));
+        lines.add(rangeTooltip(tier));
         if (!packed(stack)) {
             return;
         }

@@ -19,11 +19,24 @@
     },
     {
       "ingredient": {
+        "item": "singulo:tipler_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
         "item": "singulo:time_crystal_catalyst"
       },
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    " A A ",
+    " BCB ",
+    " A A ",
+    "     "
   ],
   "result": {
     "id": "singulo:tipler_bearing",

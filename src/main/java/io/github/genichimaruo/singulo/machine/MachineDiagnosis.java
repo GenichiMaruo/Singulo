@@ -21,7 +21,7 @@ public final class MachineDiagnosis {
      * TOO_SMALL = 大きさが足りない、AMBIGUOUS = 材料はあるが、ほかのレシピの途中と同じなので自動では作らない、
      * EXTRA = 材料はあるが、使わない物も入っているので自動では作らない（作るものを選べる装置だけ）。
      */
-    public enum Kind { EMPTY, NO_MATCH, MISSING, TOO_SMALL, AMBIGUOUS, EXTRA }
+    public enum Kind { EMPTY, NO_MATCH, MISSING, TOO_SMALL, AMBIGUOUS, EXTRA, MISPLACED }
 
     public record Result(Kind kind, List<Component> lines) {}
 
@@ -38,14 +38,16 @@ public final class MachineDiagnosis {
     /** @param selected 指定した作るもの（{@link RecipeSelection}）。null なら自動 */
     public static Result idle(Level level, MachineType type, List<ItemStack> inputs, List<FluidStack> tanks, int structureSize,
                               @javax.annotation.Nullable RecipeHolder<MachineRecipe> selected) {
-        boolean anything = inputs.stream().anyMatch(s -> !s.isEmpty());
+        boolean board = type == MachineType.PRECISION_ASSEMBLER && inputs.size() == MachineRecipe.ASSEMBLY_CELLS + 1;
+        var materials = board ? inputs.subList(0, MachineRecipe.ASSEMBLY_CELLS) : inputs;
+        boolean anything = materials.stream().anyMatch(s -> !s.isEmpty());
         for (int i = 0; i < type.fluidInputs() && i < tanks.size(); i++) {
             anything |= !tanks.get(i).isEmpty();
         }
         if (!anything) {
             return new Result(Kind.EMPTY, List.of(Component.translatable("gui.singulo.reason.empty")));
         }
-        if (type.selectsRecipe() && selected == null) {
+        if (type.selectsRecipe() && selected == null && !board) {
             // 自動: 材料は揃っているのに、選び方の決まりで止めているものがあれば、それを理由にする
             for (RecipeHolder<MachineRecipe> holder : RecipeSelection.selectable(level, type)) {
                 MachineRecipe.Plan plan = holder.value().plan(inputs);
@@ -65,29 +67,60 @@ public final class MachineDiagnosis {
         }
         MachineRecipe best = selected == null ? null : selected.value();
         double bestScore = 0;
+        boolean bestAligned = false;
+        long boardCount = board ? materials.stream().filter(s -> !s.isEmpty()).count() : 0;
+        MachineRecipe misplaced = null;
+        int nearest = -1;
         for (RecipeHolder<MachineRecipe> holder : MachineBlockEntity.stationRecipes(level, type)) {
             MachineRecipe r = holder.value();
-            if (r.isMassRecipe() || MachineBlockEntity.isFree(r) || selected != null) {
+            if (r.isMassRecipe() || MachineBlockEntity.isFree(r) || selected != null || board && !r.fitsAssemblyBoard()) {
                 continue;
             }
             int total = r.ingredients().size() + r.fluidIngredients().size();
             int matched = 0;
+            long requiredParts = 0;
             for (MachineRecipe.ItemInput in : r.ingredients()) {
-                if (inputs.stream().anyMatch(s -> !s.isEmpty() && in.ingredient().test(s))) {
+                if (in.uses() == 0) requiredParts += in.count();
+                if (board && in.uses() > 0 ? in.usesFrom(inputs.get(MachineRecipe.ASSEMBLY_CELLS)) > 0
+                        : inputs.stream().anyMatch(s -> !s.isEmpty() && in.ingredient().test(s))) {
                     matched++;
                 }
             }
+            boolean fluidsReady = true;
             for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
-                if (tanks.stream().anyMatch(t -> !t.isEmpty() && in.matches(t.copyWithAmount(Integer.MAX_VALUE)))) {
-                    matched++;
+                long have = availableFluid(tanks, in);
+                if (have > 0) matched++;
+                if (have < in.amount()) fluidsReady = false;
+            }
+            boolean aligned = board && requiredParts == boardCount && r.matchesAssemblyMaterials(inputs);
+            if (board && r.hasAssemblyShape() && fluidsReady && matched == total && requiredParts == boardCount
+                    && (r.minSize() <= 0 || r.minSize() <= structureSize)) {
+                // A valid diagram can briefly be visible before the running/no-power status reaches the screen.
+                if (r.assemblyPlan(inputs) != null) return new Result(Kind.EMPTY, List.of());
+                var unordered = r.unorderedAssemblyPlan(inputs);
+                if (unordered != null && unordered.consume()[MachineRecipe.ASSEMBLY_CELLS] == 0) {
+                    int correct = 0;
+                    for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
+                        var part = r.assemblyInput(cell);
+                        if (part != null && part.ingredient().test(inputs.get(cell))) correct++;
+                    }
+                    if (correct > nearest) {
+                        nearest = correct;
+                        misplaced = r;
+                    }
                 }
             }
             // 揃っている割合（同じなら材料の多い方）。材料が1つも合わないレシピは候補にしない
             double score = total == 0 ? 0 : matched / (double) total + matched * 1e-3;
-            if (matched > 0 && score > bestScore) {
+            if ((aligned && !bestAligned) || (aligned == bestAligned && matched > 0 && score > bestScore)) {
                 best = r;
                 bestScore = score;
+                bestAligned = aligned;
             }
+        }
+        if (misplaced != null && !bestAligned) {
+            return new Result(Kind.MISPLACED, List.of(Component.translatable("gui.singulo.reason.making", misplaced.result().getHoverName()),
+                    Component.translatable("gui.singulo.assembly.board_hint")));
         }
         if (best == null) {
             return new Result(Kind.NO_MATCH, List.of(Component.translatable("gui.singulo.reason.no_match")));
@@ -108,14 +141,14 @@ public final class MachineDiagnosis {
                 }
                 continue;
             }
-            int have = inputs.stream().filter(s -> in.ingredient().test(s)).mapToInt(ItemStack::getCount).sum();
+            long have = inputs.stream().filter(s -> !s.isEmpty() && in.ingredient().test(s))
+                    .mapToLong(s -> board ? 1 : s.getCount()).sum();
             if (have < in.count()) {
                 lines.add(Component.translatable("gui.singulo.reason.need_item", name, in.count() - have));
             }
         }
         for (MachineRecipe.FluidInput in : best.fluidIngredients()) {
-            int have = tanks.stream().filter(t -> !t.isEmpty() && in.matches(t.copyWithAmount(Integer.MAX_VALUE)))
-                    .mapToInt(FluidStack::getAmount).max().orElse(0);
+            long have = availableFluid(tanks, in);
             if (have < in.amount()) {
                 lines.add(Component.translatable("gui.singulo.reason.need_fluid", in.fluid().getFluidType().getDescription(),
                         in.amount() - have, in.amount()));
@@ -132,5 +165,10 @@ public final class MachineDiagnosis {
             lines.add(Component.translatable("gui.singulo.reason.arrange"));
         }
         return new Result(kind, lines);
+    }
+
+    private static long availableFluid(List<FluidStack> tanks, MachineRecipe.FluidInput in) {
+        return tanks.stream().filter(t -> !t.isEmpty() && t.getFluid().isSame(in.fluid()))
+                .mapToLong(FluidStack::getAmount).sum();
     }
 }

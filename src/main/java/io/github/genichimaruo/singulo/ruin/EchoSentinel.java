@@ -84,7 +84,9 @@ public class EchoSentinel extends RuinBoss {
 
     /** いまの設定での体力。 */
     public static float health() {
-        return BossScaling.hardMode() ? HEALTH : HEALTH_NORMAL;
+        var config = io.github.genichimaruo.singulo.generated.ServerConfig.SENTINEL_HEALTH;
+        double base = io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded() ? config.get() : HEALTH;
+        return (float) BossScaling.baseHealth(base * (BossScaling.hardMode() ? 1.0 : (double) HEALTH_NORMAL / HEALTH));
     }
     static final int BOLT_INTERVAL = 36;
     /** 通常の強さで、激昂する前の光弾の間（前半も手を緩めない）。 */
@@ -146,9 +148,9 @@ public class EchoSentinel extends RuinBoss {
         this.xpReward = 500;
         setNoGravity(true);
         orbitAngle = random.nextDouble() * Math.PI * 2;
-        if (!level.isClientSide && !BossScaling.hardMode()) {
+        if (!level.isClientSide) {
             // 読み込むときは、このあと保存した体力で上書きされる
-            setEffectiveHealth(HEALTH_NORMAL);
+            setEffectiveHealth(health());
         }
     }
 
@@ -199,8 +201,7 @@ public class EchoSentinel extends RuinBoss {
     /** 分身にする（体力1、ボスバーなし、しばらくで消える）。 */
     public void makeMinion() {
         entityData.set(MINION, true);
-        getAttribute(Attributes.MAX_HEALTH).setBaseValue(1);
-        setHealth(1);
+        setEffectiveHealth(1);
         xpReward = 0;
         bossBar.setVisible(false);
     }

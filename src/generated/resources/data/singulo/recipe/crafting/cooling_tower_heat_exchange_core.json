@@ -4,7 +4,7 @@
   "pattern": [
     " P ",
     "CAC",
-    " P "
+    " F "
   ],
   "key": {
     "P": {
@@ -15,6 +15,9 @@
     },
     "A": {
       "item": "minecraft:blue_ice"
+    },
+    "F": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

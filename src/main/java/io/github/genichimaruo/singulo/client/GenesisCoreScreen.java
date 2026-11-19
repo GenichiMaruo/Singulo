@@ -46,7 +46,7 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
 
     private int stage() {
         GenesisCoreBlockEntity core = core();
-        return core == null ? GenesisCoreBlockEntity.UNFORMED : core.stage();
+        return core == null ? GenesisCoreBlockEntity.UNFORMED : core.statusStage();
     }
 
     private float time(float partialTick) {
@@ -138,6 +138,19 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
             }
             lines.add(Component.translatable("gui.singulo.genesis.screen.template_tip_1"));
             lines.add(Component.translatable("gui.singulo.genesis.screen.template_tip_2").withStyle(st -> st.withColor(0xFF8A949E)));
+            Panel.tooltip(g, font, lines, 200, mouseX, mouseY);
+            return;
+        }
+        // 窓: 生まれる（生まれた）銀河の性質。生まれる前は、素材で変えられることも（0.21.0）
+        GenesisCoreBlockEntity core = core();
+        if (core != null && core.stage() >= GenesisCoreBlockEntity.CRADLE
+                && Panel.inside(mouseX, mouseY, leftPos + OX + VIEW_X, topPos + VIEW_Y, VIEW, VIEW)) {
+            List<Component> lines = new ArrayList<>();
+            boolean unborn = core.stage() <= GenesisCoreBlockEntity.STABILIZING;
+            lines.add(Component.translatable(unborn ? "gui.singulo.genesis.screen.galaxy_next" : "gui.singulo.genesis.screen.galaxy",
+                    io.github.genichimaruo.singulo.genesis.GalaxyTraits.describe(core.galaxyTraits())));
+            lines.add(Component.translatable(unborn ? "gui.singulo.genesis.screen.galaxy_tip" : "gui.singulo.genesis.screen.galaxy_again")
+                    .withStyle(st -> st.withColor(0xFF8A949E)));
             Panel.tooltip(g, font, lines, 200, mouseX, mouseY);
             return;
         }
@@ -273,12 +286,12 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
                     if (flash > 0) {
                         g.fill(cx - VIEW / 2, cy - VIEW / 2, cx + VIEW / 2, cy + VIEW / 2, (FxSettings.flash((int) (flash * 230)) << 24) | 0xFFFFFF);
                     }
-                    galaxy(g, cx, cy, 6 + 30 * Math.min(1, k * 1.4F), t, core.galaxySeed());
+                    galaxy(g, cx, cy, 6 + 30 * Math.min(1, k * 1.4F), t, core.galaxySeed(), core.galaxyTraits());
                 }
             }
             case GenesisCoreBlockEntity.COMPLETE -> {
                 dust(g, cx, cy, t, 0x50, 30);
-                galaxy(g, cx, cy, 36, t, core.galaxySeed());
+                galaxy(g, cx, cy, 36, t, core.galaxySeed(), core.galaxyTraits());
             }
             default -> { }
         }
@@ -311,22 +324,21 @@ public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
         }
     }
 
-    /** 生まれた銀河（種で形と色が決まり、ゆっくり回る）。 */
-    private static void galaxy(GuiGraphics g, int cx, int cy, float radius, float t, long seed) {
-        java.util.Random rng = new java.util.Random(seed);
-        float hue = rng.nextFloat();
-        int arms = 2 + rng.nextInt(3);
-        float twist = 3 + rng.nextFloat() * 3;
-        int core = Mth.hsvToRgb(hue, 0.25F, 1) | 0xFF000000;
-        int edge = Mth.hsvToRgb((hue + 0.55F) % 1, 0.7F, 1) | 0xFF000000;
-        for (int i = 0; i < 360; i++) {
-            int arm = i % arms;
-            float u = (float) Math.sqrt(rng.nextFloat());
-            float r = radius * u;
-            float a = arm * Mth.TWO_PI / arms + u * twist + t * 0.008F + (rng.nextFloat() - 0.5F) * (0.9F - 0.5F * u);
-            plot(g, cx + Mth.cos(a) * r, cy + Mth.sin(a) * r * 0.62F, lerp(core, edge, u), 0.3F + 0.7F * (1 - u * 0.8F));
+    /**
+     * 生まれた銀河（夜空・核の上と同じ形と色。0.21.0 で、素材で決めた形・腕の色も見えるように、夜空の星の並びから描く）。
+     * 星を半分に間引き、少し斜めから見た円盤として、ゆっくり回す。
+     */
+    private static void galaxy(GuiGraphics g, int cx, int cy, float radius, float t, long seed, int traits) {
+        GalaxyDraw.Shape shape = GalaxyDraw.shape(seed, traits);
+        GalaxyDraw.Star[] stars = shape.stars();
+        for (int i = 0; i < stars.length; i += 2) {
+            GalaxyDraw.Star s = stars[i];
+            float a = s.angle() + t * 0.008F * (1.6F - s.r());
+            float px = cx + Mth.cos(a) * s.r() * radius;
+            float py = cy + (Mth.sin(a) * s.r() * 0.62F + s.y()) * radius;
+            plot(g, px, py, s.rgb() | 0xFF000000, 0.35F + 0.65F * (1 - Math.min(1, s.r()) * 0.8F));
         }
-        glow(g, cx, cy, 3.5F, core, 1);
+        glow(g, cx, cy, 3.5F, shape.coreRgb() | 0xFF000000, 1);
     }
 
     /** 丸い光（中心ほど明るい）。 */

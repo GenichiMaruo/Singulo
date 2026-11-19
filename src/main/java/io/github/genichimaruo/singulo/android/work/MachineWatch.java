@@ -1,11 +1,14 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -28,11 +31,21 @@ public final class MachineWatch {
             net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.EAST,
             net.minecraft.core.Direction.DOWN};
     /** 取り出す面が自動のとき、試す順（下・横・上）。 */
-    private static final net.minecraft.core.Direction[] OUT_ORDER = {net.minecraft.core.Direction.DOWN, net.minecraft.core.Direction.NORTH,
-            net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.EAST,
-            net.minecraft.core.Direction.UP};
+    private static final List<Direction> OUT_ORDER = List.of(Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST,
+            Direction.EAST, Direction.UP);
 
     private MachineWatch() {}
+
+    /** The controller behind a linked multiblock port owns the recipe selection and timing. */
+    @javax.annotation.Nullable
+    public static BlockEntity controller(Level level, BlockPos at) {
+        var machine = level.getBlockEntity(at);
+        if (machine instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity port) {
+            var pos = port.controllerPos();
+            return pos != null && level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
+        }
+        return machine;
+    }
 
     /**
      * 毎秒: 工程 s の装置を見て、取り出しに行ってよいか・残り時間の見込みを決める。fuelInStock: 記録した燃料が素材置き場にある
@@ -54,23 +67,33 @@ public final class MachineWatch {
         long have = outFace == null ? 0 : FluidSamples.liquid(r.output()) ? LiquidStores.machine(level, at, outFace).amount(r.output())
                 : output(out, r.output());
         long held = held(level, at, r);
-        long sig = have * 1_000_003L + held;
+        s.eta = eta(level, at);
+        long sig = (have * 1_000_003L + held) * 31 + s.eta;
         if (sig != s.watchSig) {
             s.watchSig = sig;
             s.watchChanged = now;
         }
-        s.eta = eta(level, at);
         long quiet = now - s.watchChanged;
         boolean noFuel = outOfFuel(level, at, r);
         s.collectReady = have >= s.parkedOut || outputFull(out, r.output()) || noFuel && fuelInStock
-                || held == 0 && quiet >= SETTLE_TICKS || quiet >= QUIET_TICKS && !(noFuel && !fuelInStock);
+                || held == 0 && s.eta <= 0 && !r.inputs().isEmpty() && quiet >= SETTLE_TICKS
+                || quiet >= QUIET_TICKS && !(noFuel && !fuelInStock);
     }
 
     /**
      * 加工の残り時間の見込み（tick。分からなければ -1）。かまどは、焼く物の数と今の進み具合から（燃料が切れていれば -1）。
      */
     public static int eta(Level level, BlockPos at) {
-        if (level.getBlockEntity(at) instanceof AbstractFurnaceBlockEntity f) {
+        var machine = controller(level, at);
+        if (machine instanceof io.github.genichimaruo.singulo.machine.CosmicMuonCollectorBlockEntity collector) {
+            return collector.remainingTicks();
+        }
+        var source = MachineReports.source(machine);
+        if (source != null) {
+            int remaining = source.remainingTicks();
+            if (remaining >= 0) return remaining;
+        }
+        if (machine instanceof AbstractFurnaceBlockEntity f) {
             ItemStack cooking = f.getItem(0);
             if (cooking.isEmpty()) {
                 return 0;
@@ -91,7 +114,58 @@ public final class MachineWatch {
         }
         BlockState state = level.getBlockState(at);
         boolean lit = state.hasProperty(AbstractFurnaceBlock.LIT) && state.getValue(AbstractFurnaceBlock.LIT);
-        return !lit && f.getItem(1).isEmpty() && !f.getItem(0).isEmpty();
+        return !lit && (f.getItem(1).isEmpty() || removableFuelContainer(f, r)) && !f.getItem(0).isEmpty();
+    }
+
+    public static boolean removableFuelContainer(AbstractFurnaceBlockEntity furnace, RecipeData recipe) {
+        ItemStack stack = furnace.getItem(1);
+        if (stack.is(net.minecraft.world.item.Items.BUCKET)) {
+            // A lit furnace fills this bucket when it finishes drying the sponge.
+            return !furnace.getItem(0).is(net.minecraft.world.item.Items.WET_SPONGE)
+                    || !furnace.getBlockState().getOptionalValue(AbstractFurnaceBlock.LIT).orElse(false);
+        }
+        // Both vanilla bucket types may remain in the fuel slot when a different card takes over.
+        return stack.is(net.minecraft.world.item.Items.WATER_BUCKET) || !stack.isEmpty() && recipe.fuel().hasCraftingRemainingItem()
+                && ItemStack.isSameItemSameComponents(stack, recipe.fuel().getCraftingRemainingItem());
+    }
+
+    @javax.annotation.Nullable
+    public static RecipeData.Tool missingTool(Level level, BlockPos at, RecipeData r) {
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var assembly = AndroidAssembly.find(level, r);
+            if (assembly != null) for (var tool : assembly.tools()) {
+                if (tool.crafts(r.grid().get(tool.slot()), assembly.loadedTool(table, tool)) == 0) return tool;
+            }
+            return null;
+        }
+        if (!r.tools().isEmpty() && controller(level, at) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine) {
+            var loaded = machine.inputStacks();
+            for (var tool : r.tools()) {
+                if (loaded.stream().noneMatch(stack -> tool.crafts(r.grid().get(tool.slot()), stack) > 0)) return tool;
+            }
+        }
+        return null;
+    }
+
+    public static long toolCraftLimit(Level level, BlockPos at, RecipeData r) {
+        long crafts = Long.MAX_VALUE;
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var assembly = AndroidAssembly.find(level, r);
+            if (assembly != null) for (var tool : assembly.tools()) {
+                crafts = Math.min(crafts, tool.crafts(r.grid().get(tool.slot()), assembly.loadedTool(table, tool)));
+            }
+            return Math.max(1, crafts);
+        }
+        if (!r.tools().isEmpty() && controller(level, at) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine) {
+            var loaded = machine.inputStacks();
+            for (var tool : r.tools()) {
+                long available = loaded.stream().mapToLong(stack -> tool.crafts(r.grid().get(tool.slot()), stack)).max().orElse(0);
+                crafts = Math.min(crafts, available);
+            }
+        }
+        return Math.max(1, crafts);
     }
 
     /**
@@ -117,7 +191,13 @@ public final class MachineWatch {
 
     /** 取り出す面のどれかから、物か流体を出し入れできるか。 */
     public static boolean handlesOutput(Level level, BlockPos at, RecipeData r) {
-        for (net.minecraft.core.Direction d : r.outputAuto() ? OUT_ORDER : new net.minecraft.core.Direction[] {r.outputFace(level.getBlockState(at))}) {
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var facing = table.getBlockState().getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING);
+            return outputFaces(level, at, r).stream().anyMatch(d -> table.itemSides().canExtract(
+                    io.github.genichimaruo.singulo.machine.SideConfig.faceOf(facing, d)));
+        }
+        for (Direction d : outputFaces(level, at, r)) {
             if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
@@ -127,45 +207,29 @@ public final class MachineWatch {
 
     /**
      * できた物を今取り出す面: 記録した面か、自動なら、かまどの仲間は下（横は燃料の欄なので）、ほかの装置は下・横・上の順に、
-     * 主な物か副産物を今取り出せる最初の面（まだ何もできていなければ null）。
+     * 主な物を今取り出せる最初の面（まだできていなければ null）。
      */
     @javax.annotation.Nullable
     public static net.minecraft.core.Direction outputFace(Level level, BlockPos at, RecipeData r) {
-        if (!r.outputAuto()) {
-            return r.outputFace(level.getBlockState(at));
-        }
-        if (level.getBlockEntity(at) instanceof AbstractFurnaceBlockEntity) {
-            return net.minecraft.core.Direction.DOWN;
-        }
-        for (net.minecraft.core.Direction d : OUT_ORDER) {
-            IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, at, d);
-            for (int i = 0; h != null && i < h.getSlots(); i++) {
-                ItemStack s = h.getStackInSlot(i);
-                if (!s.isEmpty() && producedBy(r, s) && !h.extractItem(i, 1, true).isEmpty()) {
+        for (Direction d : outputFaces(level, at, r)) {
+            if (FluidSamples.liquid(r.output())) {
+                if (LiquidStores.machine(level, at, d).drain(r.output(), 1, true) > 0) {
                     return d;
                 }
+                continue;
             }
-            LiquidStores liquids = LiquidStores.machine(level, at, d);
-            for (ItemStack o : r.outputs()) {
-                if (FluidSamples.liquid(o) && liquids.drain(o, 1, true) > 0) {
-                    return d;
-                }
+            IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, at, d);
+            if (output(h, r.output()) > 0) {
+                return d;
             }
         }
         return null;
     }
 
-    /** レシピで出てくる物（主な物か副産物。触媒を使う装置から出る失活触媒も）か。 */
-    private static boolean producedBy(RecipeData r, ItemStack s) {
-        if (io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s)) {
-            return true;
-        }
-        for (ItemStack o : r.outputs()) {
-            if (ItemStack.isSameItemSameComponents(o, s)) {
-                return true;
-            }
-        }
-        return false;
+    /** 自動時は製品ごとの出口を調べる。かまどは下から製品と使用済みの燃料容器を取り出す。 */
+    public static List<Direction> outputFaces(Level level, BlockPos at, RecipeData r) {
+        if (!r.outputAuto()) return List.of(r.outputFace(level.getBlockState(at)));
+        return level.getBlockEntity(at) instanceof AbstractFurnaceBlockEntity ? List.of(Direction.DOWN) : OUT_ORDER;
     }
 
     /** 素材を入れるときに試す面（記録した面か、自動なら上・横・下の順）。 */
@@ -175,6 +239,7 @@ public final class MachineWatch {
 
     /** 素材を入れる面のどれかから、物か流体を出し入れできるか（装置として使えるか）。 */
     public static boolean handlesInput(Level level, BlockPos at, RecipeData r) {
+        if (AndroidAssembly.table(level, at) != null) return AndroidAssembly.find(level, r) != null;
         for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
             if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
@@ -235,6 +300,7 @@ public final class MachineWatch {
      * 装置は、中身に関わらず、その面の欄に置けるかで見る。ほかの装置は {@link #refuses}（欄が埋まっているだけなら受け付ける扱い）。
      */
     public static ItemStack refusedInput(Level level, BlockPos at, RecipeData r) {
+        if (AndroidAssembly.table(level, at) != null) return AndroidAssembly.find(level, r) == null ? r.output() : ItemStack.EMPTY;
         for (ItemCount need : r.inputs()) {
             if (FluidSamples.liquid(need.item)) {
                 continue;
@@ -245,7 +311,9 @@ public final class MachineWatch {
                     ok |= placeable(wc, face, need.item);
                 } else {
                     IItemHandler in = level.getCapability(Capabilities.ItemHandler.BLOCK, at, face);
-                    ok |= in != null && !refuses(in, need.item);
+                    ok |= in != null && (!refuses(in, need.item)
+                            || need.item.getItem() instanceof io.github.genichimaruo.singulo.wormhole.UnstableMouthItem
+                            && WormholeOrders.pattern(need.item) && controller(level, at) instanceof io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity);
                 }
             }
             if (!ok) {
@@ -261,6 +329,12 @@ public final class MachineWatch {
      */
     public static long held(Level level, BlockPos at, RecipeData r) {
         long n = 0;
+        var table = AndroidAssembly.table(level, at);
+        if (table != null) {
+            var board = table.assemblyGrid();
+            for (int i = 0; i < board.getSlots(); i++) n += board.getStackInSlot(i).getCount();
+            return n;
+        }
         for (ItemCount need : r.inputs()) {
             for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
                 long here = 0;
@@ -285,7 +359,7 @@ public final class MachineWatch {
     private static long output(IItemHandler out, ItemStack main) {
         long n = 0;
         for (int i = 0; out != null && i < out.getSlots(); i++) {
-            if (ItemStack.isSameItemSameComponents(out.getStackInSlot(i), main) && !out.extractItem(i, 1, true).isEmpty()) {
+            if (WormholeOrders.matches(main, out.getStackInSlot(i)) && !out.extractItem(i, 1, true).isEmpty()) {
                 n += out.getStackInSlot(i).getCount();
             }
         }
@@ -296,7 +370,7 @@ public final class MachineWatch {
     private static boolean outputFull(IItemHandler out, ItemStack main) {
         for (int i = 0; out != null && i < out.getSlots(); i++) {
             ItemStack s = out.getStackInSlot(i);
-            if (ItemStack.isSameItemSameComponents(s, main) && s.getCount() >= Math.min(s.getMaxStackSize(), out.getSlotLimit(i))) {
+            if (WormholeOrders.matches(main, s) && s.getCount() >= Math.min(s.getMaxStackSize(), out.getSlotLimit(i))) {
                 return true;
             }
         }
@@ -309,7 +383,7 @@ public final class MachineWatch {
         for (int i = 0; i < h.getSlots(); i++) {
             ItemStack s = h.getStackInSlot(i);
             for (ItemCount in : inputs) {
-                if (!s.isEmpty() && !FluidSamples.liquid(in.item) && in.matches(s)) {
+                if (!s.isEmpty() && !FluidSamples.liquid(in.item) && WormholeOrders.matchesInput(in, s)) {
                     n += s.getCount();
                     break;
                 }

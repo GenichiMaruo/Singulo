@@ -22,7 +22,32 @@
         "tag": "c:plates/steel"
       },
       "count": 4
+    },
+    {
+      "ingredient": {
+        "tag": "c:ingots/copper"
+      },
+      "count": 6
+    },
+    {
+      "ingredient": {
+        "item": "singulo:vacuum_jacketed_pipe"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:jet_forge_truss"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "DCECD",
+    "DBABD",
+    "DCECD",
+    "  F  "
   ],
   "result": {
     "id": "singulo:jet_forge_heat_sink",

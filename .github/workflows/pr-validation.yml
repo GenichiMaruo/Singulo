@@ -230,7 +230,6 @@ jobs:
         run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism
       - name: Require completed nonempty integration tests
         run: |
-          grep -E 'All 4 required tests passed' build/gametest/logs/latest.log
           python3 tools/check_gametests.py --namespaces singulo_mekanism
       - name: Save integration logs
         if: always()

@@ -1,11 +1,13 @@
 package io.github.genichimaruo.singulo.machine;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -22,8 +24,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -49,7 +49,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     static final int PUSH_PER_TICK = 20_000;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(400_000, 0, PUSH_PER_TICK, this::setChanged);
-    private final FluidTank tank = new FluidTank(MachineType.TANK_CAPACITY, f -> f.getFluid().isSame(Fluids.WATER)) {
+    private final FluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(MachineType.TANK_CAPACITY), f -> f.getFluid().isSame(Fluids.WATER)) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -147,7 +147,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     /** 触媒1個が炉の中で燃える長さ（tick）。残りの使用回数を {@link #USES_PER_TICK} で割った分（端数は切り上げ）。 */
     public static int burnTicks(ItemStack catalyst) {
         int remaining = io.github.genichimaruo.singulo.item.UsesHelper.remaining(catalyst);
-        return Math.max(1, (remaining + USES_PER_TICK - 1) / USES_PER_TICK);
+        return Math.max(1, (int) (((long) remaining + USES_PER_TICK - 1) / USES_PER_TICK));
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MuonFusionReactorBlockEntity be) {
@@ -156,39 +156,29 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
 
     private void tick(Level level, BlockPos pos, BlockState state) {
         rate = 0;
+        double output = energy.prepareGeneration(ServerConfig.FUSION_REACTOR_OUTPUT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get());
         double fill = (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
         if (standby ? fill < 0.75 : fill >= 0.98) {
             standby = !standby;
         }
-        if (!standby && burn <= 0 && items.getStackInSlot(0).is(catalyst()) && tank.getFluidAmount() >= 1
+        if (output > 0 && !standby && burn <= 0 && items.getStackInSlot(0).is(catalyst()) && tank.getFluidAmount() >= 1
                 && items.insertItem(1, new ItemStack(spent()), true).isEmpty()) {
             // 新しい触媒を炉へ入れる（失活したら出口へ出すので、出口が空いているときだけ）。残りの使用回数の分だけ燃える
             ItemStack fuel = items.extractItem(0, 1, false);
             burn = burnTicks(fuel);
             burnTotal = burn;
         }
-        if (!standby && burn > 0 && tank.getFluidAmount() >= 1) {
+        if (output > 0 && !standby && burn > 0 && tank.getFluidAmount() >= 1) {
             if (burn % WATER_INTERVAL == 0) {
                 tank.drain(1, IFluidHandler.FluidAction.EXECUTE);
             }
-            rate = ServerConfig.FUSION_REACTOR_OUTPUT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get();
-            energy.generate((int) rate);
+            rate = output;
+            energy.generateRate(rate);
             if (--burn == 0) {
                 items.insertItem(1, new ItemStack(spent()), false);     // 触媒が失活した
             }
         }
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                break;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         boolean active = rate > 0;
         if (state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
@@ -198,7 +188,9 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     @Override
     public SyncedInts slotsData() {
         return SyncedInts.server(GeneratorSlotsMenu.COUNT, i -> switch (i) {
-            case GeneratorSlotsMenu.D_RATE_X100 -> (int) Math.round(rate * 100);
+            case GeneratorSlotsMenu.D_RATE_X100 -> Math.clamp(Math.round(rate * 100), 0, Integer.MAX_VALUE);
+            case GeneratorSlotsMenu.D_RATE_WHOLE -> (int) rate;
+            case GeneratorSlotsMenu.D_RATE, GeneratorSlotsMenu.D_RATE + 1 -> SyncedInts.doubleWord(rate, i - GeneratorSlotsMenu.D_RATE);
             case GeneratorSlotsMenu.D_ENERGY -> energy.getEnergyStored();
             case GeneratorSlotsMenu.D_CAPACITY -> energy.getMaxEnergyStored();
             case GeneratorSlotsMenu.D_FLUID -> tank.getFluidAmount();
@@ -237,7 +229,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
         tag.put("items", items.serializeNBT(registries));
         tag.putInt("burn", burn);
@@ -247,7 +239,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         tank.readFromNBT(registries, tag.getCompound("tank"));
         if (tag.contains("items")) {
             items.deserializeNBT(registries, tag.getCompound("items"));

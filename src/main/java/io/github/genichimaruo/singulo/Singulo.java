@@ -8,6 +8,7 @@ import io.github.genichimaruo.singulo.item.MetricDriveItem;
 import io.github.genichimaruo.singulo.machine.InertialStabilizerBlockEntity;
 import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
 import io.github.genichimaruo.singulo.machine.WorldlineAnchorBlockEntity;
+import io.github.genichimaruo.singulo.recipe.ModpackRecipePacks;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloCapabilities;
@@ -57,6 +58,7 @@ public final class Singulo {
         SinguloCreativeTab.REGISTER.register(modBus);
 
         modBus.addListener(SinguloCapabilities::register);
+        modBus.addListener(ModpackRecipePacks::register);
         modBus.addListener(io.github.genichimaruo.singulo.network.SinguloNetwork::register);
         java.util.Objects.requireNonNull(io.github.genichimaruo.singulo.ruin.PrototypeMemories.RECEIVED);  // 記録の登録先へ加える
         io.github.genichimaruo.singulo.ruin.AncientRecords.REGISTER.register(modBus);
@@ -95,6 +97,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.pipe.FluidPipeNetwork::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.genichimaruo.singulo.ruin.BossScaling::onDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);
         if (RuinSelfCheck.enabled()) {

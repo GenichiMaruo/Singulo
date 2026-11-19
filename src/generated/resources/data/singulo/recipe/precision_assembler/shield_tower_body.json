@@ -9,7 +9,7 @@
       "ingredient": {
         "tag": "c:plates/steel"
       },
-      "count": 6
+      "count": 5
     },
     {
       "ingredient": {
@@ -22,7 +22,20 @@
         "item": "singulo:time_crystal_module"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:shield_tower_plinth"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " BDB ",
+    " AAA ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_body",

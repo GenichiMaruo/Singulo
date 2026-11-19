@@ -30,6 +30,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "  D  ",
+    " CAC ",
+    "BA AB",
+    " CAC ",
+    "     "
+  ],
   "result": {
     "id": "singulo:magnetic_bottle",
     "count": 1

@@ -30,6 +30,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " ABA ",
+    " DCD ",
+    " ABA ",
+    "     "
+  ],
   "result": {
     "id": "singulo:wormhole_mouth_casing",
     "count": 1

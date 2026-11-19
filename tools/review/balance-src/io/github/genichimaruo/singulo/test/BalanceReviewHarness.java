@@ -4,6 +4,8 @@ import com.google.gson.GsonBuilder;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
+import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.nio.file.*;
 import java.util.*;
 import net.minecraft.core.BlockPos;
@@ -11,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestServer;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -27,7 +30,17 @@ public final class BalanceReviewHarness {
         if (output == null || !(event.getServer() instanceof GameTestServer)) return;
         var level = event.getServer().overworld();
         var recipes = new ArrayList<Object>();
-        for (var type : MachineType.values()) for (var holder : MachineBlockEntity.stationRecipes(level, type)) {
+        var effective = new ArrayList<RecipeHolder<MachineRecipe>>();
+        var standardStations = new HashSet<String>();
+        for (var type : MachineType.values()) {
+            standardStations.add(type.id());
+            effective.addAll(MachineBlockEntity.stationRecipes(level, type));
+        }
+        // The jet forge and tidal spindle read their recipes directly from the manager.
+        for (var holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+            if (!standardStations.contains(holder.value().station())) effective.add(holder);
+        }
+        for (var holder : effective) {
             var r = holder.value(); var row = new LinkedHashMap<String, Object>();
             row.put("id", holder.id().toString()); row.put("station",r.station()); row.put("stage",r.stage());
             row.put("ticks",r.time()); row.put("fe_per_tick",r.energy()); row.put("min_size",r.minSize());

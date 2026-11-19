@@ -28,7 +28,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 外殻の代わりに置いた搬入出ポート（マルチブロック搬入出ポートか、ワームホール生成器ポート）から電力を入れ、できた口を押し出す。
  */
 public class WormholeGeneratorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
-        AbstractMachineBlock.BreakListener, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
+        AbstractMachineBlock.BreakListener, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source {
     /** 毎tick必要な電力の既定値（設定 wormholeGeneratorPower）。 */
     public static final int DEFAULT_REQUIRED_PER_TICK = 100_000_000;
 
@@ -122,6 +123,31 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
 
     public boolean formed() {
         return formed;
+    }
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        var e = energy();
+        boolean done = false;
+        for (int i = 0; i < output.getSlots(); i++) {
+            done |= !output.getStackInSlot(i).isEmpty();
+        }
+        if (!formed) {
+            return io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN, Component.translatable("gui.singulo.device.not_formed"),
+                    e.getEnergyStored(), e.getMaxEnergyStored());
+        }
+        if (done) {
+            return io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.RUN, Component.translatable("gui.singulo.device.generator.done"),
+                    e.getEnergyStored(), e.getMaxEnergyStored());
+        }
+        if (progress > 0) {
+            return new io.github.genichimaruo.singulo.machine.MachineReport(io.github.genichimaruo.singulo.machine.MachineReport.State.RUN, Component.translatable("gui.singulo.device.generator.working", progress / 20, 10),
+                    java.util.List.of(), 0, 0, e.getEnergyStored(), e.getMaxEnergyStored(), requiredPerTick(), 0, ItemStack.EMPTY, 0,
+                    java.util.List.of(), 0);
+        }
+        return io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE, Component.translatable("gui.singulo.device.generator.idle"),
+                e.getEnergyStored(), e.getMaxEnergyStored());
     }
 
     /** マルチブロック搬入出ポート（外殻の代わりに置いたもの）。電力を入れ、できた口を押し出す。 */

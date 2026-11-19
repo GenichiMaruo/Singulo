@@ -2,19 +2,22 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PGP",
-    " W ",
-    "PGP"
+    "PWP",
+    "GFG",
+    "P P"
   ],
   "key": {
     "P": {
       "tag": "c:plates/steel"
     },
+    "W": {
+      "item": "singulo:superconducting_wire"
+    },
     "G": {
       "tag": "c:glass_blocks/colorless"
     },
-    "W": {
-      "item": "singulo:superconducting_wire"
+    "F": {
+      "item": "singulo:basic_frame"
     }
   },
   "result": {
