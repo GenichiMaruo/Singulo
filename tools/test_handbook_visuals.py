@@ -47,7 +47,7 @@ class HandbookVisualTests(unittest.TestCase):
         langs = [read(path) for path in (ASSETS / 'lang').glob('*.json')]
         for page, info in visuals.items():
             with self.subTest(page=page):
-                items = [info['icon']]
+                items = [info['icon'], *info.get('search_items', [])]
                 keys = [info[k] for k in ('action', 'caption') if k in info]
                 for row in info.get('rows', []):
                     keys.append(row['title'])

@@ -48,6 +48,16 @@ public final class AndroidOrders {
         public RecipeSnapshot { Objects.requireNonNull(state); recipes = List.copyOf(recipes); }
     }
     public static RecipeSnapshot recipes(ServerLevel level, BlockPos pos, UUID actor) {
+        return recipes(level, pos, actor, false);
+    }
+    /** Ordinary item-output crafting recipes using all eligible fluid-bucket substitutions.
+     * Quantities of substituted fluids are in mB. No virtual bucket or other byproduct is promised.
+     * This is additive to {@link #recipes}; use the latter for the physical-bucket variants.
+     */
+    public static RecipeSnapshot fluidCraftingRecipes(ServerLevel level, BlockPos pos, UUID actor) {
+        return recipes(level, pos, actor, true);
+    }
+    private static RecipeSnapshot recipes(ServerLevel level, BlockPos pos, UUID actor, boolean fluidCrafting) {
         Objects.requireNonNull(actor);
         var c = console(level, pos);
         if (c == null) return new RecipeSnapshot(SnapshotState.UNAVAILABLE, List.of());
@@ -55,8 +65,17 @@ public final class AndroidOrders {
         var out = new java.util.ArrayList<AndroidRecipe>();
         for (var entry : c.recipes()) {
             var recipe = entry.recipe();
+            if (fluidCrafting) {
+                recipe = io.github.genichimaruo.singulo.android.work.BucketCrafting.fluidVariant(level, recipe);
+                if (recipe == null || recipe.inputs().stream().anyMatch(input ->
+                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(input.item)
+                                || io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(input.item)
+                                || input.alt != null && java.util.Arrays.stream(input.alt.getItems()).anyMatch(item ->
+                                        io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(item)
+                                                || io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(item)))) continue;
+            }
             var products = new java.util.ArrayList<AndroidRecipe.Product>();
-            for (var s : recipe.outputs()) products.add(new AndroidRecipe.Product(
+            for (var s : fluidCrafting ? List.of(recipe.output()) : recipe.outputs()) products.add(new AndroidRecipe.Product(
                     io.github.genichimaruo.singulo.android.work.FluidSamples.key(s),
                     io.github.genichimaruo.singulo.android.work.FluidSamples.amount(s),
                     io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(s), products.isEmpty() || recipe.guaranteedExtras()));

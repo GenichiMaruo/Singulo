@@ -275,6 +275,11 @@ public final class GuiReviewHarness {
                 if (((List<?>) field(mc.screen, "results")).isEmpty()) {
                     throw new IllegalStateException("Handbook did not find the backpack page");
                 }
+                box.setValue("singulo:android_backpack_upgrade");
+                if (((List<?>) field(mc.screen, "results")).isEmpty()) {
+                    throw new IllegalStateException("Handbook did not find the backpack page by item ID");
+                }
+                box.setValue(item("android_backpack_upgrade").getHoverName().getString());
                 box.setFocused(true);
                 mc.screen.setFocused(box);
                 mc.screen.keyPressed(262, 0, 0);

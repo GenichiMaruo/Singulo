@@ -10,6 +10,8 @@ Singulo 0.21.0 の `io.github.genichimaruo.singulo.api.android` を使うと、�
 
 ## 注文する
 
+- `AndroidOrders.fluidCraftingRecipes(level, console, owner)` は、現在の作業台レシピで空バケツが返る箇所のみを液体材料に置き換えた代替レシピを返す。液体量はmBで、仮想の空バケツは出力に含めない。通常のバケツを使うパターンは従来どおり `AndroidOrders.recipes` から取得できる。代替レシピの実行は、タンクを備えたアンドロイドを使い、`AndroidEscrows.submit` に流体サンプルを材料として渡す。機械加工や流体を主製品とするレシピはこの経路の対象外とする。
+
 - `AndroidOrders.recipes` から読み込まれたレシピを取得する。各材料には代替候補・燃料・触媒の情報、再利用する道具には1回当たりの消耗量と必要な触媒Tierがある。副産物をパターンの確定出力に数える際には `Product.guaranteed()` を確認する。
 - `AndroidOrders.submit(level, console, owner, requestId, target, count, workers, endpoint)` で完成品を指定する。流体の種類は `AndroidEscrows.fluidSample(fluidStack)`、化学物質は `AndroidRecipe.chemicalSample(id, 1)` で指定し、要求量を `count` にmB単位で渡す。端末の座標を指定すると、そこに実際に入った量が納品数になる。満杯や一時切断では残りを保持して待つ。
 - 同じ依頼を再試行するときは同じUUIDを使う。`AndroidOrders.status` で納品数と完了を照会し、結果を保存してから `acknowledge` する。1回当たりに依頼できる量は `AndroidOrders.snapshot(...).maxRequestCount()` から取得できる。

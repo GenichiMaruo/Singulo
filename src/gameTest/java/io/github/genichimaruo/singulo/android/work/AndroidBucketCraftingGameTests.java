@@ -1,6 +1,8 @@
 package io.github.genichimaruo.singulo.android.work;
 
 import io.github.genichimaruo.singulo.android.RuinAndroid;
+import io.github.genichimaruo.singulo.api.android.AndroidEscrows;
+import io.github.genichimaruo.singulo.api.android.AndroidOrders;
 import io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
@@ -63,6 +65,7 @@ public final class AndroidBucketCraftingGameTests {
         h.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         h.setBlock(TABLE, Blocks.CRAFTING_TABLE);
         WorkConsoleBlockEntity console = h.getBlockEntity(CONSOLE);
+        console.setOwner(player.getUUID());
         RecipeRackBlockEntity rack = h.getBlockEntity(RACK);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, h.absolutePos(CONSOLE), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -75,6 +78,18 @@ public final class AndroidBucketCraftingGameTests {
         var card = new ItemStack(SinguloItems.RECIPE_CARD.get());
         new RecipeData(grid, target).write(card, level.registryAccess());
         rack.items().setStackInSlot(1, card);
+        var original = AndroidOrders.recipes(level, console.getBlockPos(), player.getUUID()).recipes().getFirst();
+        h.assertTrue(original.materials().getFirst().sample().is(Items.LAVA_BUCKET), "Original API lost its bucket input");
+        var fluidVariants = AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), player.getUUID()).recipes();
+        h.assertTrue(fluidVariants.size() == 1, "Missing validated fluid recipe");
+        var variant = fluidVariants.getFirst();
+        var material = variant.materials().getFirst();
+        h.assertTrue(material.liquid() && material.count() == 1000
+                && AndroidEscrows.fluidOf(material.sample()).getFluid().isSame(Fluids.LAVA)
+                && variant.outputs().size() == 1 && variant.outputs().getFirst().sample().is(Items.MAGMA_BLOCK),
+                "Fluid recipe changed units, product, or promised a phantom bucket");
+        h.assertTrue(AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), java.util.UUID.randomUUID()).state()
+                == AndroidOrders.SnapshotState.REJECTED, "Non-owner read fluid recipes");
         var worker = tankWorker(h, player.getUUID(), 500);
         var other = tankWorker(h, player.getUUID(), 500);
         var ids = List.of(other.getUUID(), worker.getUUID());
