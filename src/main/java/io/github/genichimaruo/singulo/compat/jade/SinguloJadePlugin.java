@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -28,7 +29,7 @@ public final class SinguloJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        registration.registerBlockDataProvider(Server.INSTANCE, Block.class);
+        registration.registerBlockDataProvider(Server.INSTANCE, BlockEntity.class);
     }
 
     @Override
@@ -36,21 +37,19 @@ public final class SinguloJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(Client.INSTANCE, Block.class);
     }
 
-    /** サーバー: 報告を作って送る。装置かマルチブロックの部品のときだけ頼まれる。 */
+    /** Jade 11 requests block data only for blocks with a block entity. */
     enum Server implements IServerDataProvider<BlockAccessor> {
         INSTANCE;
 
         @Override
         public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+            if (!MachineReport.reports(accessor.getBlockState(), accessor.getBlockEntity())) {
+                return;
+            }
             MachineReport report = MachineReport.of(accessor.getLevel(), accessor.getPosition());
             if (report != null) {
                 data.put(KEY, report.save(accessor.getLevel().registryAccess()));
             }
-        }
-
-        @Override
-        public boolean shouldRequestData(BlockAccessor accessor) {
-            return MachineReport.reports(accessor.getBlockState(), accessor.getBlockEntity());
         }
 
         @Override

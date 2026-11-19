@@ -160,6 +160,16 @@ repositories { maven { url = "https://modmaven.dev/"; content { includeGroup "me
 
 dependencies {
     modCompileOnly('maven.modrinth:embeddium:UTbfe5d1') { transitive = false }
+    // These 1.20.1 releases support both legacy loaders; never require or bundle them.
+    modCompileOnly('maven.modrinth:jade:xJQHCmWJ') { transitive = false }
+    modCompileOnly('maven.modrinth:wthit:hCPaSf8E') { transitive = false }
+    if (providers.gradleProperty('withJade').isPresent()) {
+        modRuntimeOnly('maven.modrinth:jade:xJQHCmWJ') { transitive = false }
+    }
+    if (providers.gradleProperty('withWthit').isPresent()) {
+        modRuntimeOnly('maven.modrinth:wthit:hCPaSf8E') { transitive = false }
+        modRuntimeOnly('maven.modrinth:badpackets:aXZqpNgH') { transitive = false }
+    }
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
     if (providers.gradleProperty("withMekanism").isPresent()) { modRuntimeOnly "mekanism:Mekanism:${mekanism_version}" }
     // JEI は任意の連携。API だけでコンパイルし、開発中の起動では本体も入れる
