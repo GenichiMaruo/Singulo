@@ -4,6 +4,9 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity;
 import io.github.genichimaruo.singulo.cosmic.CosmicLayouts;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity;
+import io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity;
+import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,7 +85,7 @@ public final class CosmicChamberGameTests {
         CosmicChamberBlockEntity replacement=io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,C);
         h.assertTrue(replacement!=null&&replacement!=be&&replacement.items().getStackInSlot(0).getCount()==7,"Mined inventory did not survive immediate replacement");
         boolean accepted=old.stillValid(viewer);
-        // This is the same validity gate and ClickType that the server packet handler uses.
+        // This is the same validity gate and ContainerInput that the server packet handler uses.
         if(accepted)old.clicked(0,0,net.minecraft.world.inventory.ContainerInput.QUICK_MOVE,viewer);
         int extracted=0;for(int i=0;i<viewer.getInventory().getContainerSize();i++)if(viewer.getInventory().getItem(i).is(item("collapsar_billet",1).getItem()))extracted+=viewer.getInventory().getItem(i).getCount();
         h.assertTrue(extracted+replacement.items().getStackInSlot(0).getCount()==7,"Stale menu duplicated mined inventory: player="+extracted+", replacement="+replacement.items().getStackInSlot(0).getCount());
@@ -139,6 +142,30 @@ public final class CosmicChamberGameTests {
         h.assertTrue(copy!=null&&copy.stored()==12_345_678_901L&&copy.core()&&copy.progress()==123&&copy.reserved().getCount()==4&&copy.items().getStackInSlot(0).getCount()==7&&copy.tank().getFluidAmount()==1234,"Packed work did not survive placement");
         h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(be.getBlockPos()).inflate(1)).isEmpty(),"Packing also dropped loose contents");h.succeed();
     }
+    @GameTest(template = "forge")
+    public static void reservoirAndOutputPortUseAvailableCapacityEachTick(GameTestHelper h) {
+        var reservoir = build(h, Blueprints.Kind.SUSPENSION_RESERVOIR);
+        var level = h.getLevel();
+        h.setBlock(C.south(), SinguloBlocks.FLUID_DRONE_PORT.get());
+        h.setBlock(C.east().south(), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        h.setBlock(C.west().south(), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        FluidDronePortBlockEntity sink = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, C.south());
+        MultiblockPortBlockEntity input = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, C.west()), output = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, C.east());
+        h.startSequence().thenWaitUntil(() -> h.assertTrue(level.getGameTime() % 5 != 0
+                        && (level.getGameTime() + output.getBlockPos().asLong()) % 8 != 0, "Wait between old output intervals"))
+                .thenExecute(() -> {
+                    int stored = reservoir.fluidFor(null).fill(new FluidStack(Fluids.WATER, 16_000_000), FluidAction.EXECUTE);
+                    h.assertTrue(stored == 16_000_000, "Reservoir did not fill");
+                    CosmicChamberBlockEntity.serverTick(level, reservoir.getBlockPos(), reservoir.getBlockState(), reservoir);
+                    h.assertTrue(sink.sendTank().getFluidAmount() == 64_000 && reservoir.tank().getFluidAmount() == stored - 64_000,
+                            "Controller did not fill its neighbour in one tick");
+                    MultiblockPortBlockEntity.serverTick(level, input.getBlockPos(), input.getBlockState(), input);
+                    h.assertTrue(reservoir.tank().getFluidAmount() == stored - 64_000, "Input port ejected stored fluid");
+                    MultiblockPortBlockEntity.serverTick(level, output.getBlockPos(), output.getBlockState(), output);
+                    h.assertTrue(reservoir.tank().isEmpty(), "Output port throttled the remaining 15,936,000 mB");
+                }).thenSucceed();
+    }
+
     @GameTest(template="forge")
     public static void cosmicReservoirSimulatesAndRejectsMixing(GameTestHelper h){
         var be=build(h,Blueprints.Kind.SUSPENSION_RESERVOIR);var in=be.fluidFor(Direction.NORTH);var out=be.fluidFor(Direction.SOUTH);

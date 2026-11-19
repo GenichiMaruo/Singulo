@@ -1,9 +1,11 @@
 package io.github.genichimaruo.singulo.registry;
 
+import io.github.genichimaruo.singulo.api.machine.MachineReports;
 import io.github.genichimaruo.singulo.cable.CableBlockEntity;
 import io.github.genichimaruo.singulo.item.GravityGauntletItem;
 import io.github.genichimaruo.singulo.machine.CatalystDeviceBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
+import io.github.genichimaruo.singulo.machine.MachineReport;
 import io.github.genichimaruo.singulo.multiblock.PortBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -13,6 +15,10 @@ public final class SinguloCapabilities {
     private SinguloCapabilities() {}
 
     public static void register(RegisterCapabilitiesEvent event) {
+        for (var type : SinguloBlockEntities.REGISTER.getEntries()) {
+            event.registerBlockEntity(MachineReports.CAPABILITY, type.get(),
+                    (be, context) -> be instanceof MachineReport.Source source ? source : null);
+        }
         event.registerBlockEntity(Capabilities.Energy.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),
                 (be,side)->be.kind()==io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity.RESERVOIR?null:be.energyFor(side));
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),
@@ -83,6 +89,13 @@ public final class SinguloCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, SinguloBlockEntities.FOOD_PRINTER.get(), (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.Item.BLOCK, SinguloBlockEntities.FOOD_PRINTER.get(), (be, side) -> be.transferItems());
         event.registerBlockEntity(Capabilities.Item.BLOCK, SinguloBlockEntities.HORIZON_VAULT.get(), (be, side) -> be.transferItems());
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, be, side) ->
+                io.github.genichimaruo.singulo.pipe.CreativeFluidTrashBlock.SINK, SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        event.registerItem(Capabilities.Fluid.ITEM, (stack, context) ->
+                io.github.genichimaruo.singulo.pipe.CreativeFluidTrashBlock.SINK, SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, SinguloBlockEntities.FLUID_PIPE.get(), (be, side) -> be.inlet(side));
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, SinguloBlockEntities.FLUID_PUMP.get(), (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, SinguloBlockEntities.FLUID_PUMP.get(), (be, side) -> be.outlet(side));
         event.registerBlockEntity(Capabilities.Energy.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.Item.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(), (be, side) -> be.transferItemsFor(side));
@@ -148,6 +161,9 @@ public final class SinguloCapabilities {
         event.registerBlockEntity(Capabilities.Item.BLOCK, SinguloBlockEntities.SMES_MODULE.get(), (be, side) -> be.transferItems());
         event.registerItem(Capabilities.Energy.ITEM, (stack, ctx) -> new io.github.genichimaruo.singulo.energy.SinguloItemEnergy(ctx, io.github.genichimaruo.singulo.android.AndroidChargerItem.CAPACITY),
                 SinguloItems.ANDROID_CHARGER.get());
+        event.registerItem(Capabilities.Energy.ITEM,
+                (stack, ctx) -> io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.transferEnergy(ctx),
+                SinguloItems.PORTABLE_ANDROID_PRINTER.get(), SinguloItems.PORTABLE_ANDROID_PRINTER_2.get());
         event.registerItem(Capabilities.Energy.ITEM, (stack, ctx) -> new io.github.genichimaruo.singulo.energy.SinguloItemEnergy(ctx, ((GravityGauntletItem) stack.getItem()).capacity()),
                 SinguloItems.INERTIAL_CONTROL_GAUNTLET.get(), SinguloItems.GRAVITON_MANIPULATOR.get());
         event.registerItem(Capabilities.Energy.ITEM,

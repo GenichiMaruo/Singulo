@@ -54,7 +54,8 @@ final class ConnectedGlassModel extends GlassModelBase {
         for (Block glass : new Block[] {SinguloBlocks.ANDROID_GATE_GLASS.get(), SinguloBlocks.ANDROID_BARRIER_GLASS.get()}) {
             String name = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(glass).getPath();
             Block stairs = SinguloBlocks.VARIANTS.get(name + "_stairs").get();
-            for (Block block : new Block[] {glass, stairs}) {
+            Block slab = SinguloBlocks.VARIANTS.get(name + "_slab").get();
+            for (Block block : new Block[] {glass, stairs, slab}) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     event.getBakingResult().blockStateModels().computeIfPresent(state,
                             (k, m) -> new ConnectedGlassModel(m, glass, name));
@@ -68,7 +69,7 @@ final class ConnectedGlassModel extends GlassModelBase {
         if (s.is(glass)) {
             return 0xFF;
         }
-        if (!(s.getBlock() instanceof GlassJoin.Stairs stairs) || stairs.base() != glass) {
+        if (!GlassJoin.shapedOf(s, glass)) {
             return 0;
         }
         List<AABB> boxes = s.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).toAabbs();

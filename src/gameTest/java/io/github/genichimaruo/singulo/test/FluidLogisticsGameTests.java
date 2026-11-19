@@ -115,6 +115,7 @@ public final class FluidLogisticsGameTests {
             for (int x = 2; x <= 5; x++) {
                 pipe(h, new BlockPos(x, 1, z), lane == 0 && x == 4 ? SinguloBlocks.FLUID_PIPE.get() : SinguloBlocks.VACUUM_JACKETED_PIPE.get());
             }
+            from[lane].setEjectEnabled(0, true);
             from[lane].receiveTank().fill(new FluidStack(Fluids.WATER, 64_000), IFluidHandler.FluidAction.EXECUTE);
         }
         int[] last = {0, 0};
@@ -132,6 +133,30 @@ public final class FluidLogisticsGameTests {
             h.assertTrue(biggest[0] <= 10_000, "A copper pipe let " + biggest[0] + " mB through in one tick");
             h.assertTrue(biggest[1] == 64_000, "Vacuum-jacketed pipes moved only " + biggest[1] + " mB at once");
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void pipeFillSimulatesSharedCapacityWithoutMovingFluid(GameTestHelper h) {
+        BlockPos inlet = new BlockPos(3, 2, 3);
+        pipe(h, inlet, SinguloBlocks.FLUID_PIPE.get());
+        var a = fluidPort(h, inlet.east()).sendTank();
+        var b = fluidPort(h, inlet.west()).sendTank();
+        for (BlockPos bend : List.of(inlet.above(), inlet.above().east())) pipe(h, bend, SinguloBlocks.FLUID_PIPE.get());
+        a.fill(new FluidStack(Fluids.WATER, 60_000), IFluidHandler.FluidAction.EXECUTE);
+        b.fill(new FluidStack(Fluids.WATER, 61_000), IFluidHandler.FluidAction.EXECUTE);
+        var handler = io.github.genichimaruo.singulo.compat.FluidResourceView.find(h.getLevel(),
+                h.absolutePos(inlet), net.minecraft.core.Direction.NORTH);
+        var offer = new FluidStack(Fluids.WATER, 15_000);
+        h.assertTrue(handler != null && handler.fill(offer, IFluidHandler.FluidAction.SIMULATE) == 7_000,
+                "Pipe must count two independent receivers and count a shared tank only once");
+        h.assertTrue(a.getFluidAmount() == 60_000 && b.getFluidAmount() == 61_000, "Simulation changed a tank");
+        b.drain(10_000, IFluidHandler.FluidAction.EXECUTE);
+        h.assertTrue(handler.fill(offer, IFluidHandler.FluidAction.SIMULATE) == 10_000
+                && handler.fill(offer, IFluidHandler.FluidAction.EXECUTE) == 10_000, "Simulated and actual bottleneck budgets differ");
+        h.assertTrue(a.getFluidAmount() + b.getFluidAmount() == 121_000 && offer.getAmount() == 15_000
+                && handler.fill(offer, IFluidHandler.FluidAction.EXECUTE) == 0
+                && handler.drain(1000, IFluidHandler.FluidAction.EXECUTE).isEmpty(), "A full transfer cycle created fluid or exposed a drain");
+        h.succeed();
     }
 
     @GameTest(template = "empty")
@@ -189,16 +214,24 @@ public final class FluidLogisticsGameTests {
         h.succeed();
     }
 
+    private static void poweredPump(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction intake) {
+        h.setBlock(pos, SinguloBlocks.FLUID_PUMP.get().defaultBlockState()
+                .setValue(io.github.genichimaruo.singulo.pipe.FluidPumpBlock.INTAKE, intake));
+        io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity pump = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
+        h.onEachTick(() -> pump.energy().receiveEnergy(Integer.MAX_VALUE, false));
+    }
+
     /** 同じ送信タンクの2面に接続しても、500 mB の空きを1,000 mB と数えて水源を消費しない。 */
     @GameTest(template = "empty", timeoutTicks = 80)
     public static void sourcePumpCountsSharedTankRoomOnlyOnce(GameTestHelper h) {
-        BlockPos at = new BlockPos(3, 1, 3), water = new BlockPos(1, 1, 2);
+        BlockPos at = new BlockPos(3, 1, 3), water = new BlockPos(1, 2, 2);
         FluidDronePortBlockEntity port = fluidPort(h, at);
         port.sendTank().fill(new FluidStack(Fluids.WATER, 63_500), IFluidHandler.FluidAction.EXECUTE);
         for (BlockPos p : List.of(new BlockPos(2, 1, 2), new BlockPos(2, 1, 3), new BlockPos(3, 1, 2))) {
             pipe(h, p, SinguloBlocks.FLUID_PIPE.get());
         }
         // 水が周囲へ広がらないように、水没したブロックから汲む。
+        poweredPump(h, water.below(), net.minecraft.core.Direction.UP);
         h.setBlock(water, net.minecraft.world.level.block.Blocks.OAK_SLAB.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, true));
         h.runAfterDelay(20, () -> {
@@ -215,7 +248,7 @@ public final class FluidLogisticsGameTests {
 
     @GameTest(template = "forge", timeoutTicks = 80)
     public static void sourcePumpDoesNotSumDifferentReservoirPortWrappers(GameTestHelper h) {
-        BlockPos at = new BlockPos(15, 1, 16), water = at.south(2);
+        BlockPos at = new BlockPos(15, 1, 16), water = at.south(2).above();
         TestBuild.build(h, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SUSPENSION_RESERVOIR,
                 at, net.minecraft.core.Direction.NORTH, 7);
         io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity reservoir = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h,at);
@@ -225,6 +258,7 @@ public final class FluidLogisticsGameTests {
         for (BlockPos p : List.of(at.west().south(), at.south(), at.east().south())) {
             pipe(h, p, SinguloBlocks.FLUID_PIPE.get());
         }
+        poweredPump(h, water.below(), net.minecraft.core.Direction.UP);
         h.setBlock(water, net.minecraft.world.level.block.Blocks.OAK_SLAB.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, true));
         h.runAfterDelay(20, () -> {

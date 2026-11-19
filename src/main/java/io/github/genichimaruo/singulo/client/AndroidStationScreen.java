@@ -9,6 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import java.util.List;
+import java.util.Locale;
 import net.minecraft.world.inventory.Slot;
 
 /**
@@ -53,10 +54,15 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     /** 設計メモリの型の色（なければ光刃型の色）。 */
     private int accent() {
         int kind = menu.value(AndroidStationBlockEntity.D_KIND);
-        if (kind < 0 || kind >= AndroidKind.values().length) {
+        return accentOf(kind < 0 || kind >= AndroidKind.values().length ? null : AndroidKind.values()[kind]);
+    }
+
+    /** 型の光の色（画面のアンドロイドの配色）。型がなければ光刃型の色。 */
+    static int accentOf(@org.jspecify.annotations.Nullable AndroidKind kind) {
+        if (kind == null) {
             return io.github.genichimaruo.singulo.android.BladeAndroid.ACCENT;
         }
-        return switch (AndroidKind.values()[kind]) {
+        return switch (kind) {
             case BLADE -> io.github.genichimaruo.singulo.android.BladeAndroid.ACCENT;
             case WHIP -> io.github.genichimaruo.singulo.android.WhipAndroid.ACCENT;
             case SABER -> io.github.genichimaruo.singulo.android.SaberAndroid.ACCENT;
@@ -91,9 +97,13 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     @Override
     protected Component statusText() {
         int status = menu.value(AndroidStationBlockEntity.D_STATUS);
-        return status == AndroidStationBlockEntity.S_WAITING
-                ? Component.translatable("gui.singulo.android_station.status.waiting", (menu.value(AndroidStationBlockEntity.D_DELAY) + 19) / 20)
-                : Component.translatable("gui.singulo.android_station.status." + status);
+        return switch (status) {
+            case AndroidStationBlockEntity.S_WAITING -> Component.translatable("gui.singulo.android_station.status.waiting",
+                    (menu.value(AndroidStationBlockEntity.D_DELAY) + 19) / 20);
+            case AndroidStationBlockEntity.S_NO_ENERGY -> Component.translatable("gui.singulo.android_station.status.2",
+                    String.format(Locale.ROOT, "%,d", menu.value(AndroidStationBlockEntity.D_PRINT_FE)));
+            default -> Component.translatable("gui.singulo.android_station.status." + status);
+        };
     }
 
     @Override

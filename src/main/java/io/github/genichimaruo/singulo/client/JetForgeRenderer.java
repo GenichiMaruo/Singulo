@@ -985,7 +985,7 @@ public class JetForgeRenderer extends SnapshotBlockRenderer<JetForgeBlockEntity>
 
     private void drawMaterial(JetForgeBlockEntity be, Frame f, JetForgeTimeline tl, PoseStack pose, MultiBufferSource buffers,
                               VertexConsumer glow, Direction back, BlockPos pos, Vec3 corner, float partialTick) {
-        int count = be.batchSize();
+        int count = Math.min(8, be.batchSize());
         Vec3[] plane = basis(f.axis());
         if (count > 1) {
             // 並列カセットの受け台: 素材を抱える輪が照射室の中でゆっくり回る

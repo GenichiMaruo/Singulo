@@ -18,6 +18,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " ABA ",
+    "BC CB",
+    " ABA ",
+    "     "
+  ],
   "result": {
     "id": "singulo:wormhole_seam_upgrade",
     "count": 1

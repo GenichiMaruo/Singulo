@@ -23,8 +23,9 @@ public final class CatalystPersistenceGameTests {
         original.items().setStackInSlot(slot, catalyst.copyWithCount(3));
         original.magazine().tick(original.items(), slot, s -> s);
         original.magazine().consume(max + 17, original.items(), slot);
-        for (int i = 0; i < original.type().outputSlots(); i++)
-            original.items().setStackInSlot(original.type().outputSlot() + i, new ItemStack(Items.COBBLESTONE, 64));
+        int spentSlot = original.type().spentCatalystSlot();
+        var shell = UsesHelper.consume(catalyst, max);
+        original.items().setStackInSlot(spentSlot, shell.copyWithCount(shell.getMaxStackSize()));
         var tag = original.saveWithoutMetadata(h.getLevel().registryAccess());
         var next = new BlockPos(5, 1, 1);
         h.setBlock(next, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
@@ -35,17 +36,12 @@ public final class CatalystPersistenceGameTests {
                 "Reload lost active life, reserve count or pending shell");
         MachineBlockEntity.serverTick(h.getLevel(), restored.getBlockPos(), restored.getBlockState(), restored);
         h.assertTrue(restored.magazine().hasReturns(), "Full outputs discarded a pending shell");
-        for (int i = 0; i < restored.type().outputSlots(); i++)
-            restored.items().setStackInSlot(restored.type().outputSlot() + i, ItemStack.EMPTY);
+        h.assertTrue(restored.items().getStackInSlot(restored.type().outputSlot()).isEmpty(), "Spent return leaked into the product slot");
+        restored.items().setStackInSlot(spentSlot, ItemStack.EMPTY);
         for (int i = 0; i < 3; i++)
             MachineBlockEntity.serverTick(h.getLevel(), restored.getBlockPos(), restored.getBlockState(), restored);
-        var spent = BuiltInRegistries.ITEM.getValue(io.github.genichimaruo.singulo.Singulo.id("spent_muon_catalyst"));
-        int returned = 0;
-        for (int i = 0; i < restored.type().outputSlots(); i++) {
-            var stack = restored.items().getStackInSlot(restored.type().outputSlot() + i);
-            if (stack.is(spent)) returned += stack.getCount();
-        }
-        h.assertTrue(returned == 1 && !restored.magazine().hasReturns(), "Unblocked output lost or duplicated the saved shell");
+        h.assertTrue(ItemStack.matches(restored.items().getStackInSlot(spentSlot), shell) && !restored.magazine().hasReturns(),
+                "Unblocked output lost or duplicated the saved shell");
         h.succeed();
     }
 }

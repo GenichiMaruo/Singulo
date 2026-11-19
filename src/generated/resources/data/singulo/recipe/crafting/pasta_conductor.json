@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "C",
-    "H",
-    "C"
+    " H ",
+    "CFC"
   ],
   "key": {
     "C": "singulo:superconducting_coil",
-    "H": "singulo:horizon_bus"
+    "H": "singulo:horizon_bus",
+    "F": "singulo:cosmic_frame"
   },
   "result": {
     "id": "singulo:pasta_conductor",

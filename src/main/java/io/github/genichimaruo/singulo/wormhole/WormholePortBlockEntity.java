@@ -1,9 +1,12 @@
 package io.github.genichimaruo.singulo.wormhole;
 
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import io.github.genichimaruo.singulo.pipe.PipeFluidFilter;
+import io.github.genichimaruo.singulo.pipe.PipeInputOnly;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +46,8 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
 
     private final Energy energy = new Energy();
     private final Items items = new Items();
-    private final Fluids fluids = new Fluids();
+    private final Fluids fluids = new Fluids(false);
+    private final Fluids pipeFluids = new Fluids(true);
     /** ポート番号。向こう側の同じ番号のポートとつながる。 */
     private int channel;
     private long cacheTick = -1;
@@ -54,6 +58,7 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
     private List<net.neoforged.neoforge.transfer.energy.EnergyHandler> energyTargets = List.of();
     private List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>> itemTargets = List.of();
     private List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>> fluidTargets = List.of();
+    private Set<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>> pipeInputOnly = Set.of();
 
     public WormholePortBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.WORMHOLE_PORT.get(), pos, state);
@@ -69,6 +74,11 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
 
     public Fluids fluids() {
         return fluids;
+    }
+
+    /** 液体パイプ用。向こう側の装置にパイプを直接つないだときと同じ投入・排出制限を使う。 */
+    public Fluids pipeFluids() {
+        return pipeFluids;
     }
 
     public int channel() {
@@ -120,6 +130,7 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
         List<net.neoforged.neoforge.transfer.energy.EnergyHandler> e = new ArrayList<>();
         List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>> it = new ArrayList<>();
         List<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>> f = new ArrayList<>();
+        Set<net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>> inputOnly = new HashSet<>();
         WormholeMouthBlockEntity remote = active ? cachedMouth.partner() : null;
         if (remote != null && remote.getLevel() instanceof ServerLevel other) {
             Set<WormholePortBlockEntity> ports = LOADED.get(other);
@@ -136,7 +147,10 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
                         }
                         add(e, other, Capabilities.Energy.BLOCK, n, dir.getOpposite());
                         add(it, other, Capabilities.Item.BLOCK, n, dir.getOpposite());
-                        add(f, other, Capabilities.Fluid.BLOCK, n, dir.getOpposite());
+                        var fluid = add(f, other, Capabilities.Fluid.BLOCK, n, dir.getOpposite());
+                        if (fluid != null && be instanceof PipeInputOnly) {
+                            inputOnly.add(fluid);
+                        }
                     }
                 }
             }
@@ -144,13 +158,16 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
         energyTargets = e;
         itemTargets = it;
         fluidTargets = f;
+        pipeInputOnly = inputOnly;
     }
 
-    private static <T> void add(List<T> list, Level level, BlockCapability<T, Direction> cap, BlockPos pos, Direction side) {
+    @Nullable
+    private static <T> T add(List<T> list, Level level, BlockCapability<T, Direction> cap, BlockPos pos, Direction side) {
         T t = level.getCapability(cap, pos, side);
         if (t != null && !list.contains(t)) {
             list.add(t);
         }
+        return t;
     }
 
     /** 働いている（上限の数に入っている）ときだけ、手前の口。 */
@@ -303,10 +320,12 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
     public final class Fluids implements IFluidHandler,
             net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>,
             io.github.genichimaruo.singulo.pipe.PipeFluidFilter {
+        private final boolean fromPipe;
+        Fluids(boolean fromPipe) { this.fromPipe = fromPipe; }
         private final IFluidHandler legacy = new io.github.genichimaruo.singulo.compat.FluidResourceView(this);
         public boolean pipeAccepts(FluidStack fluid) {
             refresh();
-            for (var h : fluidTargets) if (!(h instanceof io.github.genichimaruo.singulo.pipe.PipeFluidFilter filter) || filter.pipeAccepts(fluid)) return true;
+            for (var h : fluidTargets) if (PipeFluidFilter.accepts(h, fluid)) return true;
             return false;
         }
         private record Slot(net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler, int local) {}
@@ -336,10 +355,12 @@ public class WormholePortBlockEntity extends io.github.genichimaruo.singulo.comp
             busy = true;
             try {
                 if (selected != null) {
+                    if (fromPipe && (insert ? !PipeFluidFilter.accepts(selected.handler, fluid.toStack(1)) : pipeInputOnly.contains(selected.handler))) return 0;
                     moved = insert ? selected.handler.insert(selected.local, fluid, limit, tx) : selected.handler.extract(selected.local, fluid, limit, tx);
                 } else {
                     for (var h : fluidTargets) {
                         if (moved >= limit) break;
+                        if (fromPipe && (insert ? !PipeFluidFilter.accepts(h, fluid.toStack(1)) : pipeInputOnly.contains(h))) continue;
                         moved += insert ? h.insert(fluid, limit - moved, tx) : h.extract(fluid, limit - moved, tx);
                     }
                 }

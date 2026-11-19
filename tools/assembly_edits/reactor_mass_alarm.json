@@ -1,0 +1,16 @@
+{
+  "rows": [
+    ".....",
+    ".BCB.",
+    ".BAB.",
+    ".DED.",
+    "....."
+  ],
+  "key": {
+    "A": "炉殻ブロック",
+    "B": "レッドストーン",
+    "C": "基礎回路",
+    "D": "minecraft:note_block",
+    "E": "minecraft:redstone_lamp"
+  }
+}

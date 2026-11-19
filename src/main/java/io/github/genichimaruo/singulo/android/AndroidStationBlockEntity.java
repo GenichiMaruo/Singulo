@@ -64,7 +64,7 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
     /** GUI に送る値。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_MODE = 2, D_RETREAT = 3, D_STATUS = 4, D_HP = 5, D_CHARGE = 6,
             D_KIND = 7, D_DELAY = 8, D_ESCORT = 9, D_LEADER = 10,
-            D_SELECTED = 11, D_UNITS = 12, D_PATROL = 13, D_DWELL = 14, COUNT = 15;
+            D_SELECTED = 11, D_UNITS = 12, D_PATROL = 13, D_DWELL = 14, D_PRINT_FE = 15, COUNT = 16;
     /** D_PATROL のビット: 往復する、夜だけ巡回する、警報中。 */
     public static final int PATROL_BACK_AND_FORTH = 1, PATROL_NIGHT = 2, PATROL_ALARM = 4;
     /** 画面に出すモードの番号: 追従（ついていくだけ）。 */
@@ -172,6 +172,7 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
         case D_LEADER -> leaderIndex();
         case D_PATROL -> (backAndForth ? PATROL_BACK_AND_FORTH : 0) | (nightOnly ? PATROL_NIGHT : 0) | (alarming() ? PATROL_ALARM : 0);
         case D_DWELL -> DWELL_SECONDS[dwell];
+        case D_PRINT_FE -> printFe();
         default -> 0;
     });
 
@@ -240,6 +241,13 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
         return -1;
     }
 
+    /** 0.6.0 までの保存では、1体目の UUID のキーが android だった。 */
+    @Nullable
+    static UUID savedUnit(CompoundTag tag, int slot) {
+        String key = slot == 0 && tag.read("android", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? "android" : "android" + slot;
+        return tag.read(key, net.minecraft.core.UUIDUtil.CODEC).orElse(null);
+    }
+
     /** 転送アップグレードを積んでいるか。 */
     public boolean hasTransfer() {
         return isTransferUpgrade(items.getStackInSlot(SLOT_UPGRADE));
@@ -272,7 +280,7 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
     private final int[] keptOrder = new int[MAX_UNITS];
     private final CompoundTag[] keptWork = new CompoundTag[MAX_UNITS];
 
-    /** 倒れたアンドロイドの作業を預かる。 */
+    /** 倒れたアンドロイドの作業とタンクの中身を預かる。待機中は指令台がない。 */
     public void keepWork(UUID id, @Nullable BlockPos console, int order, CompoundTag state) {
         int unit = unitOf(id);
         if (unit >= 0) {
@@ -707,10 +715,10 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
         a.setCharge(a.maxCharge());
         if (keptConsole[unit] != null) {
             a.assignWork(keptConsole[unit], keptOrder[unit]);
-            if (keptWork[unit] != null) {
-                a.restoreWorkState(keptWork[unit]);
-            }
             keptConsole[unit] = null;
+        }
+        if (keptWork[unit] != null) {
+            a.restoreWorkState(keptWork[unit]);
             keptWork[unit] = null;
         }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
@@ -880,9 +888,9 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
             if (keptConsole[i] != null) {
                 tag.put("kept_console" + i, io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(keptConsole[i]));
                 tag.putInt("kept_order" + i, keptOrder[i]);
-                if (keptWork[i] != null) {
-                    tag.put("kept_work" + i, keptWork[i]);
-                }
+            }
+            if (keptWork[i] != null) {
+                tag.put("kept_work" + i, keptWork[i]);
             }
         }
         tag.putInt("mode", mode);
@@ -924,7 +932,7 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
         io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(items, registries, inv);
         owner = tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         for (int i = 0; i < MAX_UNITS; i++) {
-            androids[i] = tag.read("android" + i, net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("android" + i, net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
+            androids[i] = savedUnit(tag, i);
             delays[i] = tag.getIntOr("delay" + i, 0);
             names[i] = tag.getStringOr("name" + i, "");
             signals[i] = tag.getIntOr("signal" + i, 0);
@@ -936,10 +944,6 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
                     kept[i].setItem(s, list.get(s));
                 }
             }
-        }
-        // 0.6.0 までの保存（1体だけ）は、1つ目の枠に入れる
-        if (tag.read("android", net.minecraft.core.UUIDUtil.CODEC).isPresent()) {
-            androids[0] = tag.read("android", net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
         }
         if (tag.contains("name")) {
             names[0] = tag.getStringOr("name", "");

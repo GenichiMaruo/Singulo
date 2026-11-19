@@ -3,13 +3,15 @@
   "category": "misc",
   "pattern": [
     "KBK",
-    "HFH"
+    "HFH",
+    " T "
   ],
   "key": {
     "K": "singulo:ceramic_substrate",
     "B": "singulo:basic_circuit",
     "H": "singulo:cooling_tower_heat_exchange_core",
-    "F": "singulo:basic_frame"
+    "F": "singulo:basic_frame",
+    "T": "singulo:cooling_tower_base"
   },
   "result": {
     "id": "singulo:cooling_tower_controller",

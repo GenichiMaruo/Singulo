@@ -24,11 +24,14 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'tools'))
 
 from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAMES, RUIN_REGEN_DAYS,  # noqa: E402
-                     REPAIR_WEAR, MAX_REPAIRS, ASSEMBLER_MAX_KINDS, WORKBENCH_MAX_ITEMS)
+                     REPAIR_WEAR, MAX_REPAIRS, WORKBENCH_MAX_ITEMS, CONTROLLER_PARTS, PART_FRAMES)
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
 import androids  # noqa: E402
 import drones  # noqa: E402
+from assembly_shapes import assembly_rows, board_materials, boards_overlap  # noqa: E402
+from vanilla_catalog import ITEM_NAMES as VANILLA_ITEM_NAMES  # noqa: E402
+from ids import CATALYST_TIERS  # noqa: E402
 from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, ALIAS_RECIPE_IDS, BYPRODUCTS, INGREDIENT_TAGS, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
@@ -105,8 +108,6 @@ from logistics_content import PIPES, CAPSULES, CUSTOM  # noqa: E402
 from food_content import CUSTOM_BLOCKS as _FOOD_CUSTOM  # noqa: E402
 CUSTOM = CUSTOM | _FOOD_CUSTOM
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
-# レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
-CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
 
 
 def stage_of(name):
@@ -120,7 +121,7 @@ def stage_of(name):
         if name == spent:
             return stage_of(cat)
     # レシピのないもの（封印コンテナからしか出ないものは、そのコンテナの鍵の段階）
-    return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
+    return {'クリエイティブ用液体ゴミ箱': 6, '酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
@@ -145,6 +146,8 @@ def max_uses(name):
 
 def resolve(name):
     """材料名 → レシピJSONの材料表現。"""
+    if name in VANILLA_ITEM_NAMES:
+        return 'item', name
     if name in VANILLA_FLUIDS:
         return ('fluid', VANILLA_FLUIDS[name])
     if name in FLUIDS:
@@ -206,7 +209,7 @@ def item_inputs(inputs, recipe_name):
 
 # ---------------------------------------------------------------- レシピ
 
-def recipe_files():
+def recipe_files(*, write=True):
     out = {}  # 相対パス → json
     skipped = []
 
@@ -314,6 +317,8 @@ def recipe_files():
                 'energy': r['fe'],
                 'ingredients': items,
             }
+            if STATIONS[station] == 'precision_assembler':
+                obj['shape'] = assembly_rows(rid, items, r.get('assembly_diagram'))
             if fluids:
                 obj['fluid_ingredients'] = fluids
             if name in MIN_SIZE:
@@ -367,14 +372,22 @@ def recipe_files():
             obj['fluid_ingredients'] = fluids
         add(f'{station}/restore_{MOD[src][0]}', obj)
 
-    for path, obj in out.items():
-        write_json(DATA / 'recipe' / f'{path}.json', obj)
+    if write:
+        for path, obj in out.items():
+            write_json(DATA / 'recipe' / f'{path}.json', obj)
     return out, skipped
 
 
 # ---------------------------------------------------------------- 翻訳
 
 UI_LANG = {
+    'tooltip.singulo.cable_rate': ('転送上限 %s FE/t・1ブロックの損失 %s%%', 'Up to %s FE/t, %s%% loss per block'),
+    'tooltip.singulo.tank_room': ('1室あたり %s mB', 'Capacity per tank: %s mB'),
+    'tooltip.singulo.cargo_slots': ('1便の積載枠 %s', 'Cargo slots per flight: %s'),
+    'tooltip.singulo.default_description': ('標準設定での説明：%s', 'With default settings: %s'),
+    'tooltip.singulo.parallel_limit': ('同時加工の上限 %s回', 'Up to %s batches per run'),
+    'tooltip.singulo.overclock_rates': ('加工速度 ×%s\u3000消費電力 ×%s', 'Speed ×%s, power per tick ×%s'),
+    'tooltip.singulo.stock_limits': ('装着上限 %s個\u30001個あたり +%sスタック', 'Fits %s upgrades, +%s stacks per upgrade'),
     # key: (ja, en)
     'itemGroup.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.stage': ('段階%s: %s', 'Stage %s: %s'),
@@ -393,6 +406,7 @@ UI_LANG = {
     'gui.singulo.energy': ('%s / %s FE', '%s / %s FE'),
     'gui.singulo.energy_rate': ('%s FE/t', '%s FE/t'),
     'gui.singulo.empty_tank': ('空', 'Empty'),
+    'gui.singulo.electrolyzer.oxygen_hint': ('焼成炉に送ると、少ない石炭で鋼鉄を作れます。', 'Feed oxygen into a Kiln to make steel with less coal.'),
     'gui.singulo.fluid': ('%s: %s / %s mB', '%s: %s / %s mB'),
     'gui.singulo.mass_buffer': ('質量 %s / %s', 'Mass %s / %s'),
     'gui.singulo.mode.normal': ('通常加工', 'Normal processing'),
@@ -529,16 +543,24 @@ UI_LANG = {
     'command.singulo.build.unknown': ('不明なマルチブロック: %s', 'Unknown multiblock: %s'),
     'command.singulo.build.size': ('その大きさは指定できない: %s', 'Invalid size: %s'),
     'command.singulo.build.done': ('%s を組み立てた（%s ブロック）', 'Built %s with %s blocks'),
-    'gui.singulo.handbook.title': ('Singulo ハンドブック', 'Singulo Handbook'),
+    'gui.singulo.handbook.title': ('Singuloハンドブック', 'Singulo Handbook'),
     'gui.singulo.handbook.progress': ('進み具合', 'Progress'),
     'gui.singulo.handbook.records': ('旧文明の記録', 'Ancient Records'),
     'gui.singulo.handbook.page': ('%s / %s', '%s / %s'),
     'gui.singulo.handbook.search': ('ページを検索', 'Search pages'),
     'gui.singulo.handbook.search.none': ('見つからない', 'No matches'),
+    'gui.singulo.handbook.contents': ('この章の目次', 'Chapter contents'),
+    'gui.singulo.handbook.details': ('全文を読む', 'Read full text'),
+    'gui.singulo.handbook.overview': ('概要に戻る', 'Back to overview'),
+    'guide.singulo.visual.oxygen_steel': ('焼成炉で酸素製鋼', 'Oxygen steelmaking in the Kiln'),
+    'guide.singulo.visual.blend_steel': ('鋼の素を作って焼く', 'Craft and smelt Steel Blend'),
+    'guide.singulo.visual.active_kiln': ('稼働中の焼成炉', 'Running Kiln'),
+    'guide.singulo.visual.start': ('取り組んでいる作業を選んでください。', 'Choose what you are working on.'),
+    'guide.singulo.visual.layer': ('下から %s / %s 段目', 'Layer %s of %s'),
     'gui.singulo.handbook.stage': ('段階%s', 'Stage %s'),
     'gui.singulo.handbook.next': ('次の目標', 'Next goals'),
     'gui.singulo.handbook.read_flow': ('→ 段階%sの流れ（やることの順番）を読む', '→ Read the stage %s overview (what to do, in order)'),
-    'gui.singulo.handbook.done_count': ('達成 %s / %s', 'Completed %s / %s'),
+    'gui.singulo.handbook.done_count': ('達成した目標 %s 件', 'Goals completed: %s'),
     'gui.singulo.handbook.locked': ('？？？', '???'),
     'gui.singulo.handbook.no_records': ('まだ解読した記録がない。遺構でクリスタルメモリを探し、アーカイブ端末で解読しよう。',
                                         'No records decoded yet. Find crystal memories in ruins and decode them in the Archive Terminal.'),
@@ -595,6 +617,10 @@ UI_LANG = {
     'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使うこと',
                                                     'Hold a Neutrino Scanner in your other hand, or use it on an observatory'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
+    'gui.singulo.assembly.board_hint': ('右の本で配置図を確認し、材料を並べます。各マスから1回につき1個ずつ使います。触媒は琥珀色の枠に入れます。', 'Open the book on the right for the pattern. Each occupied cell supplies one part per craft. Put the catalyst in the amber slot.'),
+    'gui.singulo.assembly.diagrams': ('組立図', 'Assembly diagrams'),
+    'gui.singulo.assembly.diagrams_hint': ('製品にカーソルを合わせると組立図を確認できます。クリックすると、その図をこのボタンからもう一度確認できます。', 'Hover over a product to see its diagram. Click it to keep the diagram on this button.'),
+    'gui.singulo.assembly.preview': ('組立結果の見本です。加工が終わると取り出せます。', 'Assembly preview · Collect after processing'),
     'gui.singulo.slot.catalyst': ('触媒', 'Catalyst'),
     'gui.singulo.slot.fuel': ('燃料', 'Fuel'),
     'gui.singulo.slot.permit': ('許可証', 'Permit'),
@@ -640,6 +666,7 @@ UI_LANG = {
     'gui.singulo.reactor.slot.4': ('エルゴスフィア・リング', 'Ergosphere ring'),
     'gui.singulo.reactor.slot.5': ('副産物', 'By-products'),
     'gui.singulo.slot.upgrade': ('アップグレード枠（単極子・オーバークロック）', 'Upgrade slot (monopole or overclock)'),
+    'gui.singulo.assembly.upgrade_locked': ('すべての材料枠を64個以下にすると取り外せます。', 'Reduce every material cell to 64 items or fewer to remove the upgrade.'),
     'gui.singulo.slot.capacity_upgrade': ('容量アップグレード専用枠（Mk1〜Mk3）', 'Capacity upgrade slot (Mk1–Mk3)'),
     'gui.singulo.reason.capacity_upgrade': ('1 tick に %s FE 必要です。容量アップグレードMk%s以上を専用枠に装着してください',
                                             'Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot'),
@@ -678,6 +705,7 @@ UI_LANG = {
     'gui.singulo.make_free.off': ('材料なしのレシピは作らない', 'Skips recipes without ingredients'),
     'gui.singulo.status.off': ('停止', 'Off'),
     'gui.singulo.reason.label.no_match': ('作れない材料', 'No recipe'),
+    'gui.singulo.reason.label.misplaced': ('配置を確認', 'Check pattern'),
     'gui.singulo.reason.label.missing': ('材料不足', 'Missing input'),
     'gui.singulo.reason.label.too_small': ('大きさ不足', 'Too small'),
     'gui.singulo.reason.empty': ('材料を入れると動きます', 'Put in materials to start'),
@@ -819,7 +847,7 @@ UI_LANG = {
     'jei.singulo.mb.particle_accelerator': ('■ 形: 一辺8〜32の正方形の環\n■ 速さ: 一辺÷8 倍\n■ 副産物: 磁気単極子\n■ 危険: 大きな環で電力が減るとストレンジレットが出る', '■ Shape: square ring, side 8–32\n■ Speed: side ÷ 8\n■ By-product: magnetic monopoles\n■ Danger: strangelets when a large ring runs low on power'),
     'jei.singulo.mb.degenerate_compactor': ('■ 形: 5×5×5 の閉じたプレス\n■ 起動: 電力をつなぐ', '■ Shape: closed 5×5×5 press\n■ Start: connect power'),
     'jei.singulo.mb.casimir_cavity': ('■ 形: 5×5×5 の真空容器\n■ 起動: 電力と触媒', '■ Shape: 5×5×5 vacuum vessel\n■ Start: power and a catalyst'),
-    'jei.singulo.mb.degenerate_furnace': ('■ 形: 5×5×7 の閉じた炉\n■ 起動: 時間結晶触媒と燃料\n■ 燃料: 圧縮ブロック Lv2\n■ 出力: 既定 5 MFE/t（BE凝縮触媒は25%）', '■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 5 MFE/t by default (25% on BE catalysts)'),
+    'jei.singulo.mb.degenerate_furnace': ('■ 形: 5×5×7 の閉じた炉\n■ 起動: 時間結晶触媒と燃料\n■ 燃料: 圧縮ブロックLv2\n■ 出力: 既定 5 MFE/t（BE凝縮触媒は25%）', '■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 5 MFE/t by default (25% on BE catalysts)'),
     'jei.singulo.mb.penrose_reactor': ('■ 形: 交わる3本のリング　13×13×13\n■ 点火: 種を入れ、50 GFE を注ぐ\n■ 燃料: 質量ペレット\n■ 最大出力: 約 2.1 GFE/t', '■ Shape: three crossing rings, 13×13×13\n■ Ignite: insert a seed and pour in 50 GFE\n■ Fuel: mass pellets\n■ Max output: about 2.1 GFE/t'),
     'jei.singulo.mb.event_horizon_shield': ('■ 形: 基壇から尖塔へすぼまる塔　高さ9\n■ 起動: 時間結晶触媒かシンギュラリティ・コアと電力\n■ 効果: 半径32を守る', '■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32'),
     'jei.singulo.mb.tipler_cylinder': ('■ 形: 5×5×9 の格納筒\n■ 起動: 時間結晶触媒・燃料・電力\n■ 燃料: エキゾチック物質\n■ 効果: 半径16が2倍速', '■ Shape: 5×5×9 housing\n■ Start: time crystal catalyst, fuel and power\n■ Fuel: exotic matter\n■ Effect: ×2 speed within 16'),
@@ -828,7 +856,7 @@ UI_LANG = {
                                            '■ Shape: exhaust cup, core, three collimators and chamber in a line, 44×16×15\n■ Start: ignite a Singularity Seed with 25 GFE\n■ Materials: Collapsar Billet, 16 Mass Pellets, 1,000 mB liquid helium\n■ Power: 250 MFE/t for the 60 s irradiation'),
     'jei.singulo.mb.genesis_engine': ('■ 形: 核を八角形に囲む枠8個と、柱4本×3段　7×4×7\n■ 起動: 原初の種を核に使ってから、電力を注ぐ\n■ 完成後: 画面に登録した物を、電力から生み出す', '■ Shape: 8 frames in an octagon around the core and 4 pylons 3 high, 7×4×7\n■ Start: use a Primordial Seed on the core, then pour in power\n■ Once complete: makes the item chosen on its screen from power'),
     'message.singulo.multiblock.not_formed': ('%s はまだ完成していない', '%s is not complete yet'),
-    'message.singulo.welcome': ('Singulo ハンドブックを受け取った。右クリックで開ける', 'You received the Singulo Handbook. Right-click to open it'),
+    'message.singulo.welcome': ('Singuloハンドブックを受け取った。右クリックで開ける', 'You received the Singulo Handbook. Right-click to open it'),
     'gauntlet.singulo.area.cone': ('範囲: 前方の円錐', 'Area: forward cone'),
     'key.singulo.toggle_area': ('重力操作の範囲を切り替え', 'Toggle gravity tool area'),
     'key.singulo.handbook_lookup': ('ハンドブックで調べる', 'Look up in Handbook'),
@@ -1113,6 +1141,7 @@ UI_LANG = {
     'gui.singulo.recipe_encoder.step.no_item': ('物の欄に、入れる・取り出す物を置いてください', 'Place the item to insert or extract in the item slot'),
     'gui.singulo.recipe_encoder.step.too_big': ('採掘の範囲は1辺 %s ブロックまで', 'The mining area can be at most %s blocks on a side'),
     'tooltip.singulo.procedure_card.empty': ('まだ記録していない（作業指令台の「記録」の手順モードで記録する）', 'Blank: record steps in the procedure mode of a work console\'s Record tab'),
+    'tooltip.singulo.procedure_card.record_again': ('元の次元の作業位置カードを使い、この手順を記録し直してください', 'Record these steps again using Work Location Cards from the original dimension'),
     'tooltip.singulo.procedure_card.product': ('できる物', 'the product'),
     'tooltip.singulo.procedure_card.insert': ('投入: %s（%s）', 'Insert %s (%s)'),
     'tooltip.singulo.procedure_card.extract': ('取り出し: %s（%s）', 'Extract %s (%s)'),
@@ -1175,7 +1204,7 @@ UI_LANG = {
     'gui.singulo.work_console.notify.missing.more': ('%sの注文が、素材を待って止まっている（%sがあと%s個足りない。ほか%s種）', 'The order for %s is stuck waiting for materials (%s: %s more needed, and %s other kinds)'),
     'gui.singulo.work_console.stock': ('在庫: %s', 'In stock: %s'),
     'gui.singulo.work_console.craftable': ('作れる', 'Craftable'),
-    'gui.singulo.android.pack.builtin': ('内蔵', 'Built-in'),
+    'gui.singulo.android.pack.builtin': ('バックパック内蔵（アップグレード不要）', 'Built-in backpack (no upgrade needed)'),
     'gui.singulo.work_console.search.hint': ('検索', 'Search'),
     'gui.singulo.work_console.no_match': ('検索に合う物がない', 'Nothing matches the search'),
     'gui.singulo.work_console.search.help': ('名前で絞り込む。@ で始めると mod で絞り込む（例: @singulo）。空白で区切ると、すべてに合う物だけ。右クリックで消す',
@@ -1225,6 +1254,7 @@ UI_LANG = {
     'gui.singulo.work_console.error.wrong_face': ('%s のレシピの装置が、入れる面（%3$s）から %2$s を受け付けない（レシピカードの「入」の面を確かめて）', 'The machine for %s does not take %s through its %s face (check the "In" face on the recipe card)'),
     'gui.singulo.work_console.cancelled.wrong_face': ('%s の注文を取り消した（装置が、入れる面（%s）から素材を受け付けない）', 'Cancelled the order for %s (the machine does not take materials through its %s face)'),
     'gui.singulo.work_console.fuel_ordered': ('燃料（%s）が素材置き場にないので、%s 個作る注文を出した', 'Out of fuel (%s), so an order to make %s was placed'),
+    'gui.singulo.work_console.tool_ordered': ('装置に補給する %s が足りないので、%s 個作る注文を出した', 'Ordered %2$s × %1$s to replenish the machine'),
     'gui.singulo.work_console.detail.machine': ('（%s 装置で加工中）', ' (%s in a machine)'),
     'gui.singulo.work_console.detail.machine_eta': ('（%s 装置で加工中・あと約 %s 秒）', ' (%s in a machine, about %ss left)'),
     'gui.singulo.work_console.worker.elsewhere': ('ほかの注文の作業中', 'On another order'),
@@ -1324,7 +1354,7 @@ UI_LANG = {
     'gui.singulo.generator_slots.standby': ('蓄電がいっぱい: 待機中', 'Storage full: standing by'),
     'gui.singulo.android.work.hint': ('作業（自動化）に割り当ててよいか。オフにすると、作業の候補に出ない。', 'Whether this android may be given work (automation). When off, it is never offered for work.'),
     'gui.singulo.android.sort.hint': ('持ち物とバックパックの中を並べ替える（同じ物はまとめる）', 'Sort the carried items and backpack contents (stacks the same items together)'),
-    'gui.singulo.android.stash.hint': ('持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口）へ預けに行く', 'Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box or supply port)'),
+    'gui.singulo.android.stash.hint': ('持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口・作業指令台）へ預けに行く', 'Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box, supply port or work console)'),
     'gui.singulo.android.stash.working': ('作業中はできない', 'Not while working'),
     'gui.singulo.android.stash.empty': ('預ける物がない', 'Nothing to put away'),
     'gui.singulo.android.stash.none': ('近くに預けられる箱がない（12ブロック以内）', 'No box nearby to put things in (within 12 blocks)'),
@@ -1341,10 +1371,10 @@ UI_LANG = {
     'gui.singulo.android.plate': ('装甲', 'Plate'),
     'message.singulo.android_charger.charged': ('無線充電器に %1$s FE 充電した（%2$s / %3$s FE）', 'Charged %1$s FE into the wireless charger (%2$s / %3$s FE)'),
     'tooltip.singulo.android_charger.charges': ('アンドロイドの満充電 %s 回分', 'Full android charges: %s'),
-    'gui.singulo.android_station.no_design': ('設計メモリなし', 'No design memory'),
+    'gui.singulo.android_station.no_design': ('小型クリスタルメモリなし', 'No Compact Crystal Memory'),
     'gui.singulo.android_station.status.0': ('小型クリスタルメモリを入れてください', 'Insert a compact crystal memory'),
     'gui.singulo.android_station.status.1': ('アンドロイドキットがありません', 'No android kit'),
-    'gui.singulo.android_station.status.2': ('電力が足りません（印刷に 40000 FE）', 'Not enough power (40000 FE to print)'),
+    'gui.singulo.android_station.status.2': ('電力が足りません（印刷に %s FE 必要）', 'Not enough power (%s FE needed to print)'),
     'gui.singulo.android_station.status.3': ('印刷中', 'Printing'),
     'gui.singulo.android_station.status.4': ('稼働中', 'Active'),
     'gui.singulo.android_station.status.5': ('ステーションへ戻っています', 'Returning to the station'),
@@ -1389,9 +1419,9 @@ UI_LANG = {
     'gui.singulo.drone_port.cancel': ('取消', 'Cancel'),
     'gui.singulo.drone_port.no_targets': ('ほかの発着ポートがありません', 'No other drone ports'),
     'gui.singulo.drone_port.crates': ('空の梱包箱', 'Empty packing crates'),
-    'gui.singulo.drone_port.arrived': ('届いた箱（下の受け取りの欄へ開梱する）', 'Arrived crates (unpacked into the row below)'),
+    'gui.singulo.drone_port.arrived': ('届いた箱の中身は、右の受け取り欄に入ります。', 'Arrived crates unpack into the cargo slots on the right.'),
     'gui.singulo.drone_port.receive': ('受け取り', 'Received items'),
-    'gui.singulo.drone_port.locked': ('持ち主しか使えません', 'Only the owner can use this'),
+    'gui.singulo.drone_port.locked': ('このポートは持ち主が使えます。チーム共有が有効な場合は、持ち主と同じチームの人も使えます。', 'The owner can use this port. Teammates can use it when team sharing is enabled.'),
     'gui.singulo.drone_port.status.10': ('近くに呼べるドローンがいません', 'No drone serves this port'),
     'gui.singulo.drone_port.tab.0': ('荷物と受け取り', 'Cargo and received items'),
     'gui.singulo.drone_port.tab.1': ('行き先と発送', 'Destination and sending'),
@@ -1402,7 +1432,7 @@ UI_LANG = {
     'gui.singulo.drone_port.auto.off': ('自動 オフ', 'Auto: off'),
     'gui.singulo.drone_port.auto.full': ('自動 満杯', 'Auto: full'),
     'gui.singulo.drone_port.auto.count': ('自動 %s個', 'Auto: %s'),
-    'gui.singulo.drone_port.auto.hint': ('自動発送: 荷物がこの数（満杯は9欄すべて）たまったら、登録した行き先へ送る。荷物が増えなくなってから2秒待つ。クリックで切り替え', 'Auto-send: when the cargo reaches this amount (full means all 9 slots), send it to the set destination, after it stops growing for 2 seconds. Click to change'),
+    'gui.singulo.drone_port.auto.hint': ('クリックで切り替え。個数を選ぶと、荷物が指定数以上あり、荷物の欄が2秒間変わらなければ発送します。「満杯」では、荷物の9欄すべてが最大まで埋まると、次の判定で発送します。', 'Click to change modes. At the selected item count, cargo must stay unchanged for 2 seconds. Full sends on the next check when all 9 cargo slots hold full stacks.'),
     'gui.singulo.drone_port.auto.register': ('登録', 'Set'),
     'gui.singulo.drone_port.auto.register.hint': ('一覧で選んでいる行き先を、自動発送の行き先にする', 'Use the destination selected in the list for auto-send'),
     'gui.singulo.drone_port.auto.target': ('→ %s', '→ %s'),
@@ -1548,9 +1578,10 @@ UI_LANG = {
     'gui.singulo.guardian.awakened_rematch.ergosphere_leviathan': ('覚醒核が共鳴する。覚醒したエルゴ球の大蛇が、渦を裂いて現れた',
                                                                    'The core resonates. The Awakened Ergosphere Leviathan tears through the vortex'),
     'gui.singulo.archivist.emerge_1': ('……誰かが、記録を読んだのか。', '...Someone has read the records.'),
-    'gui.singulo.archivist.emerge_2': ('ならば、最後の頁を見せよう。', 'Then let me show you the last page.'),
+    'gui.singulo.archivist.emerge_2': ('ならば、最後のページを見せよう。', 'Then let me show you the last page.'),
     'gui.singulo.archivist.phase_2': ('覚えているか。記録はすべて、ここにある。', 'Do you remember? Every record is here.'),
     'gui.singulo.archivist.phase_3': ('光も記録も、いつかはこの暗がりに沈む。', 'Light and records alike sink into this dark in the end.'),
+    'block.singulo.mixed_glass_slab': ('白黒ガラスの重ねハーフブロック', 'Stacked White and Black Glass Slabs'),
     'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
     'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
     'item.singulo.afterglow_wings.tip_2': ('滑空中にスニーク: 羽ばたいて前へ加速する', 'Sneak while gliding: beat the wings to surge forward'),
@@ -1581,6 +1612,7 @@ UI_LANG = {
                                                'The awakened guardian is defeated. Fine fragments spill out'),
     'gui.singulo.boss.party': ('%s ［挑戦者 %s人］', '%s [%s challengers]'),
     'gui.singulo.guardian.active': ('番人はすでに目覚めている', 'The guardian is already awake'),
+    'gui.singulo.guardian.peaceful': ('ピースフルでは遺構のボスを呼び出せません', 'Ruin bosses cannot be summoned on Peaceful difficulty'),
     'gui.singulo.guardian.no_vault': ('番人に守られた保管庫が近くにない', 'No guarded vault nearby'),
     'gui.singulo.guardian.wrong_core': ('これは、この遺構の番人の覚醒核ではない', "This is not the awakening core for this ruin's guardian"),
     'gui.singulo.guardian.awakened.gravity_remnant': ('封じ込め槽が砕けた。重力の澱が這い出してきた',
@@ -1665,7 +1697,6 @@ UI_LANG = {
     'gui.singulo.genesis.bar.stabilizing': ('安定化 %s　不安定度 %s', 'Stabilization %s  Instability %s'),
     'gui.singulo.genesis.bar.surge': ('⚠ 暴走中！投入を止めろ　不安定度 %s', '⚠ Surging: stop the feed!  Instability %s'),
     'gui.singulo.genesis.bar.surge_held': ('暴走を抑え込んでいる　不安定度 %s', 'Holding the surge  Instability %s'),
-    'gui.singulo.genesis.bar.synth': ('%s を生成中 %s　完成品 %s個', '%s %s  Ready: %s'),
     'gui.singulo.genesis.bar.paused': ('［投入停止中］ %s', '[Feed stopped] %s'),
     'gui.singulo.genesis.phase.0': ('未形成', 'Not formed'),
     'gui.singulo.genesis.phase.1': ('揺籃', 'Cradle'),
@@ -1711,7 +1742,7 @@ UI_LANG = {
                               'And now the energy has become mass again, then stars, then a galaxy.'),
     'ending.singulo.line.5': ('夜空を見上げてほしい。あの光は、あなたが生んだ宇宙だ。',
                               'Look up at the night sky. That light is the universe you made.'),
-    'ending.singulo.archivist': ('――記録者の声がする。「最後の頁の、その先を。読ませてくれて、ありがとう」',
+    'ending.singulo.archivist': ('――記録者の声がする。「最後のページの、その先を。読ませてくれて、ありがとう」',
                                  '— The Archivist\'s voice: "Beyond the last page. Thank you for letting me read it."'),
     'ending.singulo.thanks': ('Thank you for playing', 'Thank you for playing'),
     'ending.singulo.credit': ('Singulo', 'Singulo'),
@@ -1730,6 +1761,8 @@ def lang_files():
     UI_LANG.update(_COVER_UI)
     from decor_content import UI as _DECOR_UI
     UI_LANG.update(_DECOR_UI)
+    from factory_content import UI as _FACTORY_UI
+    UI_LANG.update(_FACTORY_UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
@@ -2100,6 +2133,10 @@ def textures():
     # 遺構のアンドロイド（128×64。tools/androids.py）
     androids.textures(te, save)
     drones.entity_textures(te, save)
+    # 地面に置いた携帯型アンドロイド印刷機（tools/portable_printer.py）
+    import portable_printer
+    save(portable_printer.entity_texture(), te / 'portable_printer.png')
+    save(portable_printer.entity_texture(portable_printer.MK2), te / 'portable_printer_2.png')
     for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
@@ -2370,6 +2407,12 @@ def art_textures():
         art16.save(art16.cable_end(iid, core), tb / f'{iid}_end.png')
     # アンドロイドの設計メモリ・キット・無線充電器（tools/androids.py）
     androids.item_textures(ti, art16.save)
+    # 携帯型アンドロイド印刷機（tools/portable_printer.py）
+    import portable_printer
+    art16.save(portable_printer.icon(), ti / 'portable_android_printer.png')
+    art16.save(portable_printer.icon(portable_printer.MK2), ti / 'portable_android_printer_2.png')
+    art16.save(portable_printer.bed_sheet(), tb / 'portable_printer_bed.png')        # 印刷面（ステーションの上面と同じ動き）
+    write_json(tb / 'portable_printer_bed.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
     androids.glass_textures(tb, art16.save)
     # ドローン輸送の装置の上面・昇降口・梱包箱・メモリ・キット（tools/drones.py）
     drones.textures(tb, ti, art16.save, write_json)
@@ -3480,24 +3523,27 @@ def tags():
         if tag == 'bypasses_armor':
             values.insert(1, f'{MODID}:jet_beam')
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
-    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
+    from building_variants import MIXED_SLAB
+    mixed_slab = f'{MODID}:{MIXED_SLAB}'
+    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]})
+                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)] + [mixed_slab]})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
-    copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
+    copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter', 'minecraft:block_entity_data'],
                        # 液体のドローン発着ポート: 2つのタンクの中身をアイテムへ写す（置き直すと戻る）
                        'fluid_drone_port': [f'{MODID}:port_send_fluid', f'{MODID}:port_receive_fluid'],
                        # 事象の地平線倉庫: しまっている物と個数
                        'horizon_vault': [f'{MODID}:vault_item', f'{MODID}:vault_count'],
+                       'fluid_pump': ['minecraft:block_entity_data'],
                        'zero_gravity_controller': ['minecraft:block_entity_data'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
     for n, (iid, _, kind) in MOD.items():
-        if kind in BLOCK_KINDS and iid not in ITEMLESS_BLOCKS:
+        if kind in BLOCK_KINDS and iid not in ITEMLESS_BLOCKS and iid != 'creative_fluid_trash':
             entry = {'type': 'minecraft:item', 'name': mid(n)}
             if iid in copy_components:
                 entry['functions'] = [{'function': 'minecraft:copy_components', 'source': 'block_entity',
@@ -3870,7 +3916,7 @@ TAB_GROUPS = [
     ]),
     ('配線と配管', [
         'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
-        'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct',
+        'fluid_pump', 'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct',
         'cover_frame',
     ]),
     ('加工機', [
@@ -3881,7 +3927,7 @@ TAB_GROUPS = [
     ]),
     ('機械のアップグレード', [
         'monopole_upgrade', 'overclock_chip', 'capacity_upgrade_1', 'capacity_upgrade_2',
-        'capacity_upgrade_3',
+        'capacity_upgrade_3', 'assembly_stock_upgrade',
     ]),
     # コントローラー（核）ごとに、その部材と専用の品を続けて置く
     ('マルチブロック', [
@@ -3929,7 +3975,7 @@ TAB_GROUPS = [
         'wormhole_port', 'wormhole_seam_upgrade',
     ]),
     ('アンドロイド', [
-        'android_station', 'android_kit', 'android_repair_kit', 'android_charger',
+        'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'portable_android_printer', 'portable_android_printer_2',
         'android_armor_plate', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
         'android_memory_axe', 'android_memory_bit', 'android_memory_gunner',
         'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',
@@ -4045,7 +4091,7 @@ TAB_GROUPS = [
         'terminus_record', 'archivist_halo',
     ]),
     ('クリエイティブ専用', [
-        'creative_energy_source', 'creative_catalyst', 'builder_wand',
+        'creative_energy_source', 'creative_fluid_trash', 'creative_catalyst', 'builder_wand',
     ]),
     ('スポーンエッグ', [
         'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
@@ -4277,6 +4323,8 @@ SUMMARY_LIMIT = 40
 def validate():
     """recipes.py の整合性を調べ、問題の一覧を返す。"""
     errs = []
+    assembly_boards = {}
+    frame_by_output = {mid(part): frame for part, frame in PART_FRAMES.items()}
     # 説明欄にふだん出す文は短く、括弧で付け足さない（くわしくは Shift で全文を出す）
     from descriptions import DESC as _DESC, SUMMARY as _SUMMARY
     _paren = re.compile(r'（[^）]*）|\([^)]*\)')
@@ -4287,6 +4335,18 @@ def validate():
         if _paren.search(ja) or _paren.search(en):
             errs.append(f'要約に括弧がある: {n}')
     for n, r in RECIPES.items():
+        parts = CONTROLLER_PARTS.get(n)
+        if parts and not any(r['inputs'].get(part, 0) >= 1 for part in parts):
+            errs.append(f'{n}には設備の構成部品が最低1個必要です（{"、".join(parts)}）。')
+        frame = frame_by_output.get(OUTPUT_ALIASES[n]) if n in OUTPUT_ALIASES else PART_FRAMES.get(n)
+        if frame:
+            if 'shape' in r:
+                rows, key = r['shape']
+                framed = any(key[ch] == frame for row in rows for ch in row if ch != ' ')
+            else:
+                framed = r['inputs'].get(frame, 0) >= 1
+            if not framed:
+                errs.append(f'{n}には「{frame}」が最低1個必要です。')
         for i in r['inputs']:
             if i in RECIPES and RECIPES[i]['stage'] > r['stage']:
                 errs.append(f'段階逆転: {n}(段階{r["stage"]}) ← {i}(段階{RECIPES[i]["stage"]})')
@@ -4298,8 +4358,19 @@ def validate():
                 errs.append(f'製作場所が後の段階: {n}(段階{r["stage"]}) @ {st}(段階{RECIPES[st]["stage"]})')
         if r['station'] == '作業台' and sum(r['inputs'].values()) > WORKBENCH_MAX_ITEMS:
             errs.append(f'作業台の枠を超える: {n}（{sum(r["inputs"].values())}個）')
-        if r['station'] == '精密組立台' and len([k for k in r['inputs'] if k not in CATALYST_TIERS]) > ASSEMBLER_MAX_KINDS:
-            errs.append(f'精密組立台の入力枠を超える: {n}（{len(r["inputs"])}種類）')
+        if r['station'] == '精密組立台':
+            rid = ALIAS_RECIPE_IDS[n] if n in ALIAS_RECIPE_IDS else MOD[n][0]
+            items, _, _ = item_inputs(r['inputs'], n)
+            try:
+                rows = assembly_rows(rid, items, r.get('assembly_diagram'))
+            except (KeyError, ValueError) as e:
+                errs.append(f'{n}: {e}')
+                continue
+            board = board_materials(rows, items)
+            for other, previous in assembly_boards.items():
+                if boards_overlap(board, previous):
+                    errs.append(f'精密組立台の「{n}」と「{other}」は同じ配置、または組みかけで成立する配置です。')
+            assembly_boards[n] = board
 
     # レシピの循環
     done, stack = set(), set()

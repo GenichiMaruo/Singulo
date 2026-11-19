@@ -3,11 +3,13 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.ItemCharging;
 import io.github.genichimaruo.singulo.item.NeutrinoScannerItem;
+import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.SmesCellBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import net.minecraft.core.BlockPos;
 import io.github.genichimaruo.singulo.test.harness.GameTest;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -18,6 +20,52 @@ import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class ChargeSlotGameTests {
     private static final BlockPos AT = new BlockPos(2, 1, 2);
+
+    @GameTest(template = "empty")
+    public static void smesSharesItsInputRateAcrossSources(GameTestHelper h) {
+        int rate = SmesCellBlockEntity.Module.MODULE_RATE;
+        SmesCellBlockEntity west = module(h, AT.west(), Direction.EAST);
+        SmesCellBlockEntity target = module(h, AT, Direction.NORTH);
+        SmesCellBlockEntity east = module(h, AT.east(), Direction.WEST);
+        west.energy().setEnergy(rate * 4);
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(target.energy().getEnergyStored() > 0, "No energy from first source"))
+                .thenExecute(() -> {
+                    h.assertTrue(target.energy().getEnergyStored() == rate, "Single source did not fill one tick's budget");
+                    east.energy().setEnergy(rate * 4);
+                })
+                .thenIdle(1)
+                .thenExecute(() -> {
+                    h.assertTrue(target.energy().getEnergyStored() == 2 * rate, "Two sources exceeded the input rate");
+                    h.assertTrue(west.energy().getEnergyStored() + east.energy().getEnergyStored() == 6 * rate,
+                            "Sources lost more than the target received");
+                })
+                .thenSucceed();
+    }
+
+    private static SmesCellBlockEntity module(GameTestHelper h, BlockPos pos, Direction facing) {
+        h.setBlock(pos, SinguloBlocks.SMES_MODULE.get().defaultBlockState().setValue(AbstractMachineBlock.FACING, facing));
+        return io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
+    }
+
+    @GameTest(template = "empty")
+    public static void smesSharesItsOutputAcrossPullPushAndCharging(GameTestHelper h) {
+        int rate = SmesCellBlockEntity.Module.MODULE_RATE;
+        SmesCellBlockEntity source = module(h, AT, Direction.EAST);
+        SmesCellBlockEntity sink = module(h, AT.east(), Direction.NORTH);
+        source.energy().setEnergy(2 * rate);
+        var scanner = new ItemStack(SinguloItems.NEUTRINO_SCANNER.get());
+        source.chargeSlots().setStackInSlot(SmesCellBlockEntity.CHARGE_IN, scanner);
+        var front = source.energyFor(Direction.EAST);
+        h.assertTrue(io.github.genichimaruo.singulo.energy.EnergyResourceView.of(front).extractEnergy(rate, true) == rate, "Could not simulate extraction");
+        h.assertTrue(io.github.genichimaruo.singulo.energy.EnergyResourceView.of(source.energyFor(null)).extractEnergy(rate / 2, false) == rate / 2, "Could not pull from storage");
+        SmesCellBlockEntity.serverTick(h.getLevel(), source.getBlockPos(), source.getBlockState(), source);
+        h.assertTrue(sink.energy().getEnergyStored() == rate / 2 && source.energy().getEnergyStored() == rate,
+                "Automatic output did not respect the preceding external pull");
+        h.assertTrue(io.github.genichimaruo.singulo.energy.EnergyResourceView.of(front).extractEnergy(rate, false) == 0 && ItemCharging.fraction(scanner) == 0,
+                "Externally extracting or charging bypassed the output rate");
+        h.succeed();
+    }
 
     /**
      * SMES の充電の枠: 入れる枠の物を蓄えた電力で充電し、満タンになったら出てくる枠へ移す。使った分だけ蓄電が減る。

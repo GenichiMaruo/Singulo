@@ -20,7 +20,18 @@
     {
       "ingredient": "singulo:gravity_field_stabilizer",
       "count": 2
+    },
+    {
+      "ingredient": "singulo:reactor_shell",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " CDC ",
+    " BAB ",
+    " CDC ",
+    "  E  "
   ],
   "result": {
     "id": "singulo:reactor_core_controller",

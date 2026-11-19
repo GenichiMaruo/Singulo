@@ -16,7 +16,18 @@
     {
       "ingredient": "singulo:void_dust",
       "count": 4
+    },
+    {
+      "ingredient": "singulo:cold_atoms",
+      "count": 2
     }
+  ],
+  "shape": [
+    "     ",
+    " CAC ",
+    "DBABD",
+    " CAC ",
+    "     "
   ],
   "result": {
     "id": "singulo:gravity_field_stabilizer",

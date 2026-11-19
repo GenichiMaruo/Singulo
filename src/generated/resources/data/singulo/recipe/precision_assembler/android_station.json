@@ -26,6 +26,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " EDE ",
+    " BAB ",
+    " CDC ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_station",
     "count": 1

@@ -14,6 +14,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " AAA ",
+    "BA AB",
+    " AAA ",
+    "     "
+  ],
   "result": {
     "id": "singulo:toroidal_magnetic_coil",
     "count": 1

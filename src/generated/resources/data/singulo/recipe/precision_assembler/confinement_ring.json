@@ -18,6 +18,13 @@
       "count": 2
     }
   ],
+  "shape": [
+    "     ",
+    " ABA ",
+    " C C ",
+    " ABA ",
+    "     "
+  ],
   "result": {
     "id": "singulo:confinement_ring",
     "count": 1

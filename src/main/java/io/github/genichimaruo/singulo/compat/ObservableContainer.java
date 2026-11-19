@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
-public final class ObservableContainer extends SimpleContainer {
+public class ObservableContainer extends SimpleContainer {
     private final List<Consumer<Container>> listeners = new ArrayList<>();
     public ObservableContainer(int size) { super(size); }
     public void addListener(Consumer<Container> listener) { listeners.add(listener); }

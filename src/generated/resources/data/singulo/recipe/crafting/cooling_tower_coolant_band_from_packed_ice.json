@@ -3,12 +3,14 @@
   "category": "misc",
   "pattern": [
     "CAC",
-    "APA"
+    "AFA",
+    " P "
   ],
   "key": {
     "C": "#c:ingots/copper",
     "A": "minecraft:packed_ice",
-    "P": "#c:plates/steel"
+    "P": "#c:plates/steel",
+    "F": "singulo:cooling_tower_base"
   },
   "result": {
     "id": "singulo:cooling_tower_coolant_band",

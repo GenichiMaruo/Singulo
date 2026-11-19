@@ -12,9 +12,9 @@ Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.pr
 
 | 内容 | 編集する場所 |
 |---|---|
-| レシピ・配置・材料 | `tools/recipes.py`。登録名・別名・タグは`tools/ids.py` |
+| レシピ・配置・材料 | `tools/recipes.py`。精密組立台の基本配置は`tools/assembly_shapes.py`、エディターで保存した配置と材料は`tools/assembly_edits/`、登録名・別名・タグは`tools/ids.py` |
 | 設定の既定値 | `tools/config_spec.py` |
-| ハンドブック・説明文 | `tools/guide.py`、`tools/descriptions.py`。宇宙設備・液体輸送・コラプサー材の章と説明は `tools/cosmic_content.py`、`tools/logistics_content.py`、`tools/collapsar_content.py` |
+| ハンドブック・説明文 | `tools/guide.py`、`tools/descriptions.py`。ページの図（マルチブロックの段・レシピの図・進む道）は `tools/guide_visuals.py`。宇宙設備・液体輸送・コラプサー材の章と説明は `tools/cosmic_content.py`、`tools/logistics_content.py`、`tools/collapsar_content.py` |
 | 翻訳 | 英日原稿と`tools/locales/`。`source`も一致させる |
 | 実際の加工補正 | `src/main/java/.../recipe/RecipeTweaks.java`。ティア・寿命・設定補正を含む |
 | 機械の枠と能力 | `machine/`、`multiblock/`、`reactor/`などの実装 |
@@ -30,6 +30,20 @@ python3 tools/check_models.py
 ```
 
 生成前にレシピの段階・循環・設定・枠数を検証する。不要な画像エンコード差分や構造物NBTの再圧縮だけの差分まで混ぜない。アイテムIDや既存NBTの意味を理由なく変えない。
+
+## 精密組立台のレシピを編集する
+
+Windowsでは [assembly_editor.bat](../../tools/assembly_editor.bat) をダブルクリックすると、既定のブラウザーで編集画面が開く。プロジェクトのデータ生成と同じ `uv` を使う。ターミナルからは `uv run --no-project --python 3.12 --with pillow tools/assembly_editor.py` で起動できる。
+
+1. 左の一覧で製品を選ぶ。「＋ 素材を追加」では、既存レシピで未使用のバニラ素材も日本語名やIDで検索できる（例：オウムガイの殻、`minecraft:nautilus_shell`）。`minecraft:` の候補はそのアイテムを指定し、`#` の候補はタグ内の互換素材も受け付ける。素材を選んで盤面をクリックすると、置いたマス数が必要個数になる。
+2. 「左右を同時に配置」をオンにすると、反対側にも同じ素材が入る。右クリックか消しゴムで取り除ける。「元に戻す」は直前の配置に戻る。
+3. 「保存」で編集元、ゲーム用のレシピJSON、説明書の組立図が更新される。専用枠の触媒とその消費量は元のレシピを引き継ぐ。JARに反映するには `gradlew.bat build` を実行する。編集ツールを終了するには起動したターミナルで Ctrl+C を押す。
+
+マルチブロックの制御装置には、その設備を建てる部品を最低1個置く。例えば縮退圧縮炉なら、フレームの代わりに同じ炉の装甲板を使う配置も保存できる。最後の構成部品を外して保存すると、使える部品の一覧が表示される。
+
+装甲板・コイル・窓などの部品レシピには、その設備のフレームを1回の製作につき最低1個置く。例えばC空洞の観察窓はC空洞フレーム、冷却塔ガラスは冷却塔基部を使う。共用の炉心安定化コイルは炉殻ブロック、搬入出ポートは基礎フレームを使う。編集時に必要な枠を外すと、保存時にその素材名が表示される。
+
+バニラの名前・アイコン・素材タグは `tools/vanilla_1_21_1/` に同梱している。カタログを更新するときは、通常のGameTest実行後に `gradlew.bat -I tools/review/vanilla-catalog.gradle runClient` で開発用ワールドから再出力する。
 
 ## 実装上の重要な条件
 

@@ -120,8 +120,8 @@ public class FoundryOverseer extends RuinBoss {
         super(type, level, BossEvent.BossBarColor.YELLOW);
         this.xpReward = 600;
         setNoGravity(true);
-        if (!level.isClientSide() && !BossScaling.hardMode()) {
-            setEffectiveHealth(HEALTH_NORMAL);
+        if (!level.isClientSide()) {
+            setEffectiveHealth(health());
         }
     }
 
@@ -136,7 +136,9 @@ public class FoundryOverseer extends RuinBoss {
     }
 
     public static float health() {
-        return BossScaling.hardMode() ? HEALTH : HEALTH_NORMAL;
+        var config = io.github.genichimaruo.singulo.generated.ServerConfig.OVERSEER_HEALTH;
+        double base = io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded() ? config.get() : HEALTH;
+        return (float) BossScaling.baseHealth(base * (BossScaling.hardMode() ? 1.0 : (double) HEALTH_NORMAL / HEALTH));
     }
 
     @Override

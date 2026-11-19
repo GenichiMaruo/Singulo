@@ -54,21 +54,24 @@ final class SkyGalaxyRenderer {
         var buffers = new SnapshotBlockRenderer.Capture();
         RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.eyes(FxDraw.WHITE);
         VertexConsumer vc = buffers.getBuffer(type);
-        for (long seed : seeds) {
+        for (int i = 0; i < seeds.size(); i++) {
+            long seed = seeds.get(i);
+            int traits = ClientGalaxies.traits(i);
             Random rnd = new Random(seed ^ 0x51D3A1L);
             // 真夜中に頭の上あたりへ来る向き（星の球の -Y のまわり）
             Vec3 dir = new Vec3((rnd.nextFloat() - 0.5) * 1.3, -1, (rnd.nextFloat() - 0.5) * 1.1).normalize();
             float appear = ClientGalaxies.appear(seed);
-            float radius = dist * (0.16F + rnd.nextFloat() * 0.06F) * (0.5F + 0.5F * appear);
-            GalaxyDraw.Shape shape = GalaxyDraw.shape(seed);
+            float radius = dist * (0.16F + rnd.nextFloat() * 0.06F) * (0.5F + 0.5F * appear)
+                    * (io.github.genichimaruo.singulo.genesis.GalaxyTraits.grand(traits) ? 1.5F : 1F);   // ネザースターの大きな銀河
+            GalaxyDraw.Shape shape = GalaxyDraw.shape(seed, traits);
             // 円盤はこちらを向き、種ごとに傾く
             Quaternionf tilt = new Quaternionf().rotationTo(0, 1, 0, (float) -dir.x, (float) -dir.y, (float) -dir.z)
                     .rotateX(shape.tilt() * Mth.DEG_TO_RAD).rotateY(rnd.nextFloat() * Mth.TWO_PI);
             float bright = night * appear;
             pose.pushPose();
             pose.translate(dir.x * dist, dir.y * dist, dir.z * dist);
-            GalaxyDraw.glow(pose, vc, localCam, tilt, seed, radius, bright * 0.8F, 0, true);
-            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, radius, time * 0.0004F, bright, time, 0, true);
+            GalaxyDraw.glow(pose, vc, localCam, tilt, seed, traits, radius, bright * 0.8F, 0, true);
+            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, traits, radius, time * 0.0004F, bright, time, 0, true);
             pose.popPose();
         }
         event.getRenderState().setRenderData(KEY,buffers.finish());

@@ -1,16 +1,20 @@
 package io.github.genichimaruo.singulo.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
+import io.github.genichimaruo.singulo.registry.SinguloComponents;
+import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -42,8 +46,15 @@ import net.neoforged.neoforge.fluids.FluidStackTemplate;
  */
 public record MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
                             List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
-                            Optional<ItemStackTemplate> resultTemplate, List<FluidStackTemplate> fluidResultTemplates, int minSize, int priority, Optional<ItemStackTemplate> byproductTemplate)
+                            Optional<ItemStackTemplate> resultTemplate, List<FluidStackTemplate> fluidResultTemplates, int minSize, int priority, Optional<ItemStackTemplate> byproductTemplate, List<String> shape)
         implements Recipe<MachineRecipe.Input> {
+
+    public static final int ASSEMBLY_CELLS = 21;
+    public static final int BOARD_EMPTY = -1, BOARD_RESTORE = -2;
+
+    public MachineRecipe {
+        shape = List.copyOf(shape);
+    }
 
     /** Keep recipe loading independent of item component initialization. */
     public ItemStack result() { return resultTemplate.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY); }
@@ -55,7 +66,14 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                          List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
                          ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct) {
         this(station, stage, time, energy, ingredients, fluidIngredients, mass, restore,
-             template(result), fluidResults.stream().map(FluidStackTemplate::fromNonEmptyStack).toList(), minSize, priority, template(byproduct));
+             result, fluidResults, minSize, priority, byproduct, List.of());
+    }
+
+    public MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
+                         List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
+                         ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct, List<String> shape) {
+        this(station, stage, time, energy, ingredients, fluidIngredients, mass, restore,
+             template(result), fluidResults.stream().map(FluidStackTemplate::fromNonEmptyStack).toList(), minSize, priority, template(byproduct), shape);
     }
     private static Optional<ItemStackTemplate> template(ItemStack stack) {
         return stack.isEmpty() ? Optional.empty() : Optional.of(ItemStackTemplate.fromNonEmptyStack(stack));
@@ -68,8 +86,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public record ItemInput(Ingredient ingredient, int count, int uses, int tier) {
         public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Ingredient.CODEC.fieldOf("ingredient").forGetter(ItemInput::ingredient),
-                Codec.INT.optionalFieldOf("count", 1).forGetter(ItemInput::count),
-                Codec.INT.optionalFieldOf("uses", 0).forGetter(ItemInput::uses),
+                RecipeNumbers.POSITIVE.optionalFieldOf("count", 1).forGetter(ItemInput::count),
+                RecipeNumbers.NONNEGATIVE.optionalFieldOf("uses", 0).forGetter(ItemInput::uses),
                 Codec.INT.optionalFieldOf("tier", 0).forGetter(ItemInput::tier)
         ).apply(i, ItemInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = StreamCodec.composite(
@@ -102,7 +120,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public record FluidInput(Fluid fluid, int amount) {
         public static final Codec<FluidInput> CODEC = RecordCodecBuilder.create(i -> i.group(
                 net.minecraft.core.registries.BuiltInRegistries.FLUID.byNameCodec().fieldOf("fluid").forGetter(FluidInput::fluid),
-                Codec.INT.fieldOf("amount").forGetter(FluidInput::amount)
+                RecipeNumbers.POSITIVE.fieldOf("amount").forGetter(FluidInput::amount)
         ).apply(i, FluidInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, FluidInput> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.registry(Registries.FLUID), FluidInput::fluid,
@@ -116,7 +134,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     public record MassInput(double amount, boolean metalOnly) {
         public static final Codec<MassInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.DOUBLE.fieldOf("amount").forGetter(MassInput::amount),
+                Codec.DOUBLE.validate(m -> Double.isFinite(m) && m > 0 ? DataResult.success(m)
+                        : DataResult.error(() -> "Mass must be positive and finite")).fieldOf("amount").forGetter(MassInput::amount),
                 Codec.BOOL.optionalFieldOf("metal_only", false).forGetter(MassInput::metalOnly)
         ).apply(i, MassInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, MassInput> STREAM_CODEC = StreamCodec.composite(
@@ -144,21 +163,22 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
      */
     public record Plan(int[] consume, int[] uses, int restoreSlot, double speed) {}
 
-    public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+    public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.<MachineRecipe>mapCodec(i -> i.group(
             Codec.STRING.fieldOf("station").forGetter(MachineRecipe::station),
             Codec.INT.optionalFieldOf("stage", 1).forGetter(MachineRecipe::stage),
-            Codec.INT.fieldOf("time").forGetter(MachineRecipe::time),
-            Codec.INT.optionalFieldOf("energy", 0).forGetter(MachineRecipe::energy),
+            RecipeNumbers.POSITIVE.fieldOf("time").forGetter(MachineRecipe::time),
+            RecipeNumbers.NONNEGATIVE.optionalFieldOf("energy", 0).forGetter(MachineRecipe::energy),
             ItemInput.CODEC.listOf().optionalFieldOf("ingredients", List.of()).forGetter(MachineRecipe::ingredients),
             FluidInput.CODEC.listOf().optionalFieldOf("fluid_ingredients", List.of()).forGetter(MachineRecipe::fluidIngredients),
             MassInput.CODEC.optionalFieldOf("mass").forGetter(MachineRecipe::mass),
             Ingredient.CODEC.optionalFieldOf("restore").forGetter(MachineRecipe::restore),
-            ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(MachineRecipe::resultTemplate),
-            FluidStackTemplate.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResultTemplates),
+            RecipeNumbers.STACK.optionalFieldOf("result").forGetter(MachineRecipe::resultTemplate),
+            RecipeNumbers.FLUID.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResultTemplates),
             Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
             Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority),
-            ItemStackTemplate.CODEC.optionalFieldOf("byproduct").forGetter(MachineRecipe::byproductTemplate)
-    ).apply(i, MachineRecipe::new));
+            RecipeNumbers.STACK.optionalFieldOf("byproduct").forGetter(MachineRecipe::byproductTemplate),
+            Codec.STRING.listOf().optionalFieldOf("shape", List.of()).forGetter(MachineRecipe::shape)
+    ).apply(i, MachineRecipe::new)).validate(MachineRecipe::validateAssemblyShape);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, r) -> {
@@ -175,6 +195,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 buf.writeVarInt(r.minSize);
                 buf.writeVarInt(r.priority);
                 ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).encode(buf, r.byproductTemplate);
+                buf.writeCollection(r.shape, (b, row) -> b.writeUtf(row, 5));
             },
             buf -> new MachineRecipe(
                     buf.readUtf(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
@@ -186,24 +207,168 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                     FluidStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
                     buf.readVarInt(),
                     buf.readVarInt(),
-                    ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buf)));
+                    ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buf), buf.readList(b -> b.readUtf(5))));
+
+    public boolean hasAssemblyShape() {
+        return !shape.isEmpty();
+    }
+
+    public boolean assemblyCatalyst(ItemInput input) {
+        if (hasAssemblyShape()) return input.uses() > 0;
+        return input.tier() > 0 || java.util.Arrays.stream(input.ingredient().items().map(ItemStack::new).toArray(ItemStack[]::new))
+                .anyMatch(stack -> CatalystHelper.tierOf(stack) > 0);
+    }
+
+    /** Can this recipe be laid out once on the assembly board and its single catalyst slot? */
+    public boolean fitsAssemblyBoard() {
+        if (!station.equals("precision_assembler") || mass.isPresent() || !fluidIngredients.isEmpty() || !fluidResultTemplates.isEmpty()) return false;
+        if (hasAssemblyShape()) return true;
+        long cells = restore.isPresent() ? 1 : 0;
+        boolean catalyst = false;
+        for (ItemInput input : ingredients) {
+            if (assemblyCatalyst(input)) {
+                if (catalyst || input.uses() <= 0 && input.count() != 1) return false;
+                catalyst = true;
+            } else {
+                cells += input.uses() > 0 ? 1 : input.count();
+            }
+        }
+        return cells <= ASSEMBLY_CELLS;
+    }
+
+    /** For shapeless datapacks, lay out one unit per cell in ingredient order, followed by the restoration item. */
+    public int boardIngredientIndex(int cell) {
+        if (cell < 0 || cell >= ASSEMBLY_CELLS) return BOARD_EMPTY;
+        if (hasAssemblyShape()) return assemblyIngredientIndex(cell);
+        for (int i = 0; i < ingredients.size(); i++) {
+            ItemInput input = ingredients.get(i);
+            if (assemblyCatalyst(input)) continue;
+            int count = input.uses() > 0 ? 1 : input.count();
+            if (cell < count) return i;
+            cell -= count;
+        }
+        return cell == 0 && restore.isPresent() ? BOARD_RESTORE : BOARD_EMPTY;
+    }
+
+    /** Convert a board slot to a row-major five-by-five square, skipping the four corners. */
+    public static int assemblySquare(int gridSlot) {
+        if (gridSlot < 0 || gridSlot >= ASSEMBLY_CELLS) return -1;
+        return gridSlot + (gridSlot < 3 ? 1 : gridSlot < 18 ? 2 : 3);
+    }
+
+    public int assemblyIngredientIndex(int gridSlot) {
+        int square = assemblySquare(gridSlot);
+        if (!hasAssemblyShape() || square < 0) return -1;
+        char symbol = shape.get(square / 5).charAt(square % 5);
+        return symbol == ' ' ? -1 : symbol - 'A';
+    }
+
+    @Nullable
+    public ItemInput assemblyInput(int gridSlot) {
+        int index = assemblyIngredientIndex(gridSlot);
+        return index < 0 ? null : ingredients.get(index);
+    }
+
+    private DataResult<MachineRecipe> validateAssemblyShape() {
+        if (!hasAssemblyShape()) return DataResult.success(this);
+        if (!station.equals("precision_assembler") || restore.isPresent() || mass.isPresent())
+            return DataResult.error(() -> "shape requires a precision assembler recipe without restore or mass");
+        if (shape.size() != 5 || shape.stream().anyMatch(row -> row.length() != 5))
+            return DataResult.error(() -> "shape must have five rows of five characters");
+        int[] counts = new int[ingredients.size()];
+        for (int y = 0; y < 5; y++) for (int x = 0; x < 5; x++) {
+            char cell = shape.get(y).charAt(x);
+            if (cell == ' ') continue;
+            if ((x == 0 || x == 4) && (y == 0 || y == 4))
+                return DataResult.error(() -> "The four corners of an assembly shape must be empty");
+            int index = cell - 'A';
+            if (cell < 'A' || cell > 'Z' || index >= counts.length)
+                return DataResult.error(() -> "Unknown assembly ingredient symbol: " + cell);
+            counts[index]++;
+        }
+        int catalysts = 0;
+        for (int i = 0; i < counts.length; i++) {
+            ItemInput input = ingredients.get(i);
+            if (input.uses > 0) catalysts++;
+            if (counts[i] != (input.uses > 0 ? 0 : input.count))
+                return DataResult.error(() -> "Assembly cell counts must match the consumed ingredients");
+        }
+        if (catalysts > 1) return DataResult.error(() -> "The assembly board has one catalyst slot");
+        return DataResult.success(this);
+    }
+
+    /** The 21 physical assembly cells in row order, followed by the active catalyst. */
+    @Nullable
+    public Plan assemblyPlan(List<ItemStack> boardWithCatalyst) {
+        if (boardWithCatalyst.size() != ASSEMBLY_CELLS + 1) return null;
+        if (!hasAssemblyShape()) {
+            Plan shapeless = unorderedAssemblyPlan(boardWithCatalyst);
+            if (shapeless == null) return null;
+            for (int i = 0; i < ASSEMBLY_CELLS; i++) {
+                ItemStack stack = boardWithCatalyst.get(i);
+                if (!stack.isEmpty() && shapeless.consume[i] == 0 && shapeless.uses[i] == 0) return null;
+            }
+            return shapeless;
+        }
+        if (!matchesAssemblyMaterials(boardWithCatalyst)) return null;
+        double speed = 1;
+        int cost = 0;
+        ItemStack catalyst = boardWithCatalyst.get(ASSEMBLY_CELLS);
+        for (ItemInput input : ingredients) {
+            if (input.uses <= 0) continue;
+            cost = input.usesFrom(catalyst);
+            if (cost == 0) return null;
+            if (input.tier > 0) speed = CatalystHelper.higherSpeed(CatalystHelper.tierOf(catalyst) - input.tier);
+        }
+        int[] consume = new int[boardWithCatalyst.size()], uses = new int[boardWithCatalyst.size()];
+        for (int i = 0; i < ASSEMBLY_CELLS; i++) if (!boardWithCatalyst.get(i).isEmpty()) consume[i] = 1;
+        uses[ASSEMBLY_CELLS] = cost;
+        return new Plan(consume, uses, -1, speed);
+    }
+
+    /** Check the physical diagram independently of the separately loaded catalyst. */
+    public boolean matchesAssemblyMaterials(List<ItemStack> board) {
+        if (!hasAssemblyShape() || board.size() < ASSEMBLY_CELLS) return false;
+        for (int i = 0; i < ASSEMBLY_CELLS; i++) {
+            ItemInput part = assemblyInput(i);
+            ItemStack stack = board.get(i);
+            if (part == null ? !stack.isEmpty() : stack.isEmpty() || !part.ingredient.test(stack)) return false;
+        }
+        return true;
+    }
+
+    public boolean canRestoreFrom(ItemStack stack) {
+        return restore.isPresent() && restore.get().test(stack) && UsesHelper.canRestore(stack);
+    }
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
     public Plan plan(List<ItemStack> slots) {
+        return plan(slots, false);
+    }
+
+    /** Each occupied material cell supplies one part per craft, even when it holds a stack. */
+    @Nullable
+    public Plan unorderedAssemblyPlan(List<ItemStack> slots) {
+        return plan(slots, true);
+    }
+
+    @Nullable
+    private Plan plan(List<ItemStack> slots, boolean assemblyBoard) {
         int n = slots.size();
         int[] left = new int[n];
         int[] consume = new int[n];
         int[] uses = new int[n];
         boolean[] claimed = new boolean[n];
         for (int i = 0; i < n; i++) {
-            left[i] = slots.get(i).getCount();
+            int count = slots.get(i).getCount();
+            left[i] = assemblyBoard && i < ASSEMBLY_CELLS ? Math.min(1, count) : count;
         }
         int restoreSlot = -1;
         if (restore.isPresent()) {
             for (int i = 0; i < n; i++) {
                 ItemStack s = slots.get(i);
-                if (!claimed[i] && restore.get().test(s) && UsesHelper.canRestore(s)) {
+                if (!claimed[i] && canRestoreFrom(s)) {
                     restoreSlot = i;
                     claimed[i] = true;
                     consume[i] = 1;
@@ -270,7 +435,22 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     public ItemStack assemble(Input input, HolderLookup.Provider registries) {
-        return result();
+        return assemble(input.items(), plan(input.items()));
+    }
+
+    public ItemStack assemble(List<ItemStack> inputs, @Nullable Plan plan) {
+        ItemStack out = result();
+        if (plan != null && out.is(SinguloItems.PORTABLE_ANDROID_PRINTER_2.get()) && out.getCount() == 1) {
+            for (int i = 0; i < inputs.size(); i++) {
+                ItemStack input = inputs.get(i);
+                if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
+                    // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
+                    out.copyFrom(input, DataComponents.CONTAINER, SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME);
+                    break;
+                }
+            }
+        }
+        return out;
     }
 
     public boolean canCraftInDimensions(int width, int height) {

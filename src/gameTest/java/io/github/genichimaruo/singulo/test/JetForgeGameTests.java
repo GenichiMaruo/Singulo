@@ -494,13 +494,15 @@ public final class JetForgeGameTests {
     @GameTest(template = EMPTY)
     public static void heliumCartridgeIsAFluidContainer(GameTestHelper helper) {
         var helium = SinguloFluids.get("liquid_helium");
-        var empty = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("empty_coolant_cartridge")));
-        helper.assertTrue(empty.fill(new FluidStack(helium, 200), IFluidHandler.FluidAction.EXECUTE) == 0, "200 mBで詰まった");
-        helper.assertTrue(empty.fill(new FluidStack(helium, 1000), IFluidHandler.FluidAction.EXECUTE) == 250, "250 mB詰まらない");
-        helper.assertTrue(empty.getContainer().is(item("helium_cartridge")), "液体ヘリウム・カートリッジにならない");
-        var full = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("helium_cartridge")));
-        FluidStack out = full.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-        helper.assertTrue(out.getAmount() == 250 && out.getFluid().isSame(helium) && full.getContainer().is(item("empty_coolant_cartridge")),
+        ItemStack cartridge = new ItemStack(item("empty_coolant_cartridge"));
+        var handler = io.github.genichimaruo.singulo.compat.FluidResourceView.of(net.neoforged.neoforge.transfer.access.ItemAccess.forStack(cartridge).getCapability(Capabilities.Fluid.ITEM));
+        helper.assertTrue(handler != null, "空のカートリッジに液体の口がない");
+        helper.assertTrue(handler.fill(new FluidStack(helium, 200), IFluidHandler.FluidAction.EXECUTE) == 0, "200 mBで詰まった");
+        helper.assertTrue(handler.fill(new FluidStack(helium, handler.getTankCapacity(0)), IFluidHandler.FluidAction.EXECUTE) == 250,
+                "空の容器が報告する容量ではヘリウムを充填できない");
+        helper.assertTrue(cartridge.is(item("helium_cartridge")), "液体ヘリウム・カートリッジにならない");
+        FluidStack out = handler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+        helper.assertTrue(out.getAmount() == 250 && out.getFluid().isSame(helium) && cartridge.is(item("empty_coolant_cartridge")),
                 "空けられない: " + out.getAmount());
         helper.succeed();
     }

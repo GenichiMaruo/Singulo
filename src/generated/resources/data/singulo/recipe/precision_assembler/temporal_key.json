@@ -18,6 +18,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    "  A  ",
+    " BCB ",
+    "     ",
+    "     "
+  ],
   "result": {
     "id": "singulo:temporal_key",
     "count": 1

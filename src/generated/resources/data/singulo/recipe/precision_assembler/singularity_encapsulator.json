@@ -30,6 +30,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "  C  ",
+    " BFB ",
+    " DAD ",
+    " BEB ",
+    "     "
+  ],
   "result": {
     "id": "singulo:singularity_encapsulator",
     "count": 1

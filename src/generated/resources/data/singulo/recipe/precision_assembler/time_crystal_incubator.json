@@ -35,6 +35,13 @@
       "uses": 36000
     }
   ],
+  "shape": [
+    " B B ",
+    " CEC ",
+    " DAD ",
+    " BFB ",
+    "     "
+  ],
   "result": {
     "id": "singulo:time_crystal_incubator",
     "count": 1

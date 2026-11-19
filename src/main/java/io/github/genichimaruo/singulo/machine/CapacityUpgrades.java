@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,11 +34,15 @@ public final class CapacityUpgrades {
         return new ItemStack(items()[tier]);
     }
 
-    public static int capacity(int tier) { return CAPACITIES[tier]; }
+    public static int capacity(int tier) { return scaledCapacity(CAPACITIES[tier]); }
+
+    static int scaledCapacity(int base) {
+        return (int) (base * (ServerConfig.SPEC.isLoaded() ? ServerConfig.MACHINE_BUFFER_MULTIPLIER.get() : 1.0));
+    }
 
     /** The smallest tier whose buffer holds {@code demand}, or 0 when even Mk3 is too small. */
     public static int requiredTier(int demand) {
-        for (int tier = 1; tier <= 3; tier++) if (CAPACITIES[tier] >= demand) return tier;
+        for (int tier = 1; tier <= 3; tier++) if (capacity(tier) >= demand) return tier;
         return 0;
     }
 }

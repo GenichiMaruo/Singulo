@@ -3,14 +3,14 @@
   "category": "misc",
   "pattern": [
     "KDK",
-    "OFO",
+    "OTO",
     " B "
   ],
   "key": {
     "K": "singulo:ceramic_substrate",
     "D": "#c:gems/diamond",
     "O": "singulo:superconducting_coil",
-    "F": "singulo:basic_frame",
+    "T": "singulo:accelerator_tube",
     "B": "singulo:basic_circuit"
   },
   "result": {

@@ -24,6 +24,10 @@
     {
       "ingredient": "singulo:time_crystal_module",
       "count": 2
+    },
+    {
+      "ingredient": "singulo:genesis_frame",
+      "count": 1
     }
   ],
   "result": {

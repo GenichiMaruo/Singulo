@@ -15,8 +15,19 @@
     },
     {
       "ingredient": "singulo:topological_wire",
-      "count": 2
+      "count": 3
+    },
+    {
+      "ingredient": "singulo:jet_forge_truss",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  C  ",
+    " BAB ",
+    " CDC ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_confinement_coil",

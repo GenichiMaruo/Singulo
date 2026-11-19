@@ -145,6 +145,16 @@ public class WorkLocationCardItem extends io.github.genichimaruo.singulo.compat.
         return stack.getItem() instanceof WorkLocationCardItem;
     }
 
+    /** Decode the dimension and position together without opening the recorded world. */
+    public static java.util.Optional<net.minecraft.core.GlobalPos> recordedLocation(ItemStack card) {
+        CompoundTag t = isCard(card) ? data(card) : null;
+        if (t == null || !(t.get("pos") instanceof net.minecraft.nbt.LongTag)) return java.util.Optional.empty();
+        var id = Identifier.tryParse(t.getStringOr("dim", ""));
+        if (id == null || id.getPath().isEmpty()) return java.util.Optional.empty();
+        var dimension = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, id);
+        return java.util.Optional.of(net.minecraft.core.GlobalPos.of(dimension, BlockPos.of(t.getLongOr("pos", 0L))));
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         BlockPos pos = pos(stack);

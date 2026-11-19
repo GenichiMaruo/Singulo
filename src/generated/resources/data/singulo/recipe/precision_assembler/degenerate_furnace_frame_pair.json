@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "#c:plates/steel",
+      "count": 6
+    },
+    {
+      "ingredient": "#c:obsidians",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:bose_condensate_catalyst",
+      "tier": 3,
+      "uses": 1500
+    },
+    {
+      "ingredient": "singulo:basic_frame",
+      "count": 2
+    }
+  ],
+  "shape": [
+    "   A ",
+    "  ADA",
+    " A B ",
+    "ADA  ",
+    " B   "
+  ],
+  "result": {
+    "id": "singulo:degenerate_furnace_frame",
+    "count": 8
+  }
+}

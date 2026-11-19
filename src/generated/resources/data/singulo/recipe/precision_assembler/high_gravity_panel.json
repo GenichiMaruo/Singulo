@@ -16,7 +16,18 @@
     {
       "ingredient": "#c:obsidians",
       "count": 2
+    },
+    {
+      "ingredient": "#c:dusts/redstone",
+      "count": 2
     }
+  ],
+  "shape": [
+    "     ",
+    " AAA ",
+    " DBD ",
+    " CAC ",
+    "     "
   ],
   "result": {
     "id": "singulo:high_gravity_panel",

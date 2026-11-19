@@ -1,6 +1,12 @@
 package io.github.genichimaruo.singulo.cable;
 
 import io.github.genichimaruo.singulo.energy.LongEnergyHandler;
+import io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity;
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+
+import io.github.genichimaruo.singulo.data.ConfigMigration;
+
 import java.util.*;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
@@ -19,7 +25,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * Topology/path searches happen only after invalidation or the first request for an endpoint pair.
  */
 public final class EnergyNetwork {
-    static final double MIN_EFFICIENCY = 0.5;
     private static final java.util.concurrent.atomic.AtomicLong GENERATIONS = new java.util.concurrent.atomic.AtomicLong();
     private final long generation = GENERATIONS.incrementAndGet();
     private static final Set<EnergyNetwork> ACTIVE = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -119,6 +124,7 @@ public final class EnergyNetwork {
     private final Map<Node, List<Endpoint>> targetOrder = new IdentityHashMap<>();
     private final Map<SampleKey, Sample> samples = new HashMap<>();
     private final Set<BlockPos> lit = new HashSet<>();
+    private final long configRevision = ConfigMigration.revision();
     private boolean valid = true;
     private long tick = -1, windowStart = -1, nextVisual;
     private State state = new State();
@@ -205,7 +211,7 @@ public final class EnergyNetwork {
         cables.values().forEach(be -> be.network = network);
     }
 
-    boolean isValid() { return valid; }
+    boolean isValid() { return valid && configRevision == ConfigMigration.revision(); }
     void invalidate() {
         if (!valid) return;
         valid = false;
@@ -364,9 +370,15 @@ public final class EnergyNetwork {
             return List.copyOf(ordered);
         });
         Map<Endpoint,EnergyHandler> caps = new HashMap<>();
+        List<Endpoint> pumps = null;
         for (Endpoint target : targets) {
             if (target.pos.equals(caller.pos)) continue;
             EnergyHandler receiver = caps.computeIfAbsent(target,this::capability);
+            if (receiver instanceof FluidPumpBlockEntity.PowerInput) {
+                if (pumps == null) pumps = new ArrayList<>();
+                pumps.add(target);
+                continue;
+            }
             if (receiver == null || receiverLeft(s,target,receiver,transaction) <= 0) continue;
             List<Candidate> candidates = preferences.computeIfAbsent(target,t -> {
                 List<Candidate> choices = new ArrayList<>();
@@ -394,6 +406,13 @@ public final class EnergyNetwork {
                         sourceLeft(s,candidate.endpoint,supplier,0,transaction),transaction,false);
             }
         }
+        // Pumps spend only what this source still offers after ordinary consumers have been served.
+        if (pumps != null) for (Endpoint target : pumps) {
+            if (callerLeft <= 0) break;
+            long paid = supplyPump(s, caller, target, caps.get(target), path(node, target.node), callerLeft, transaction);
+            callerLeft -= paid;
+            callerPaid += paid;
+        }
         return callerPaid;
     }
 
@@ -402,13 +421,37 @@ public final class EnergyNetwork {
         if (order == 0) order = Long.compare(caller.pos.asLong(),other.endpoint.pos.asLong());
         return order != 0 ? order : Integer.compare(caller.side.ordinal(),other.endpoint.side.ordinal());
     }
+    // Preserve individual FE above the exact integer range of double on lossless paths.
+    private static long delivered(long budget, double efficiency) {
+        return efficiency == 1 ? budget : Math.min(budget, (long) (budget * efficiency));
+    }
+
+    private static long chargeFor(long received, double efficiency) {
+        return efficiency == 1 ? received : Math.max(received, (long) Math.ceil(received / efficiency));
+    }
+
+    private long supplyPump(State s, Endpoint source, Endpoint target, EnergyHandler pump, Path path,
+                            long offer, TransactionContext tx) {
+        long budget = Math.min(offer, available(s, path));
+        if (budget <= 0 || path.efficiency <= 0) return 0;
+        int request = (int) Math.min(Integer.MAX_VALUE, delivered(budget, path.efficiency));
+        if (request <= 0) return 0;
+        try (var transfer = Transaction.open(tx)) {
+            int received = pump.insert(request, transfer);
+            if (received <= 0 || received > request) return 0;
+            long paid = Math.min(budget, chargeFor(received, path.efficiency));
+            transfer.commit();
+            return recordTransfer(s, source, target, path, paid, received);
+        }
+    }
+
     private long transfer(State s, Endpoint source, EnergyHandler supplier, Endpoint target, EnergyHandler receiver,
                           Path path, long offer, TransactionContext transaction, boolean offered) {
         long budget = Math.min(offer,available(s,path));
-        if (budget <= 0) return 0;
-        long wanted = Math.min(receiverLeft(s,target,receiver,transaction),(long)(budget*path.efficiency));
+        if (budget <= 0 || path.efficiency <= 0) return 0;
+        long wanted = Math.min(receiverLeft(s,target,receiver,transaction),delivered(budget, path.efficiency));
         long received = probeInsert(receiver,wanted,transaction);
-        long paid = Math.min(budget,(long)Math.ceil(received/path.efficiency));
+        long paid = Math.min(budget,chargeFor(received, path.efficiency));
         if (paid <= 0) return 0;
         // A transfer is atomic even when a third-party handler rejects a previously simulated amount.
         try (var transfer = Transaction.open(transaction)) {
@@ -416,6 +459,11 @@ public final class EnergyNetwork {
             if (LongEnergyHandler.insert(receiver,received,transfer) != received) return 0;
             transfer.commit();
         }
+        return recordTransfer(s, source, target, path, paid, received);
+    }
+
+    private long recordTransfer(State s, Endpoint source, Endpoint target, Path path, long paid, long received) {
+        if (paid <= 0) return 0;
         account(s,path,source,target,paid,received);
         Sample sample = samples.computeIfAbsent(new SampleKey(path,source.pos,target),k -> new Sample());
         sample.amount += paid;
@@ -473,7 +521,7 @@ public final class EnergyNetwork {
                 es.add(edge); length += edge.length(); loss += edge.loss;
                 at = edge.other(at); ns.add(at); loss += at.loss;
             }
-            return new Path(List.copyOf(ns),List.copyOf(es),length,Math.max(MIN_EFFICIENCY,1-loss));
+            return new Path(List.copyOf(ns),List.copyOf(es),length,Math.max(PackBalance.value(ServerConfig.MINIMUM_CABLE_EFFICIENCY),1-loss));
         });
     }
 

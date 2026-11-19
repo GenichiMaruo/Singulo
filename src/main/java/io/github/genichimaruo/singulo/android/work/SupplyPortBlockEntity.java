@@ -239,6 +239,13 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
     }
 
     static void collect(Level level, BlockPos from, Set<BlockPos> seen, List<IItemHandler> out) {
+        visitItemStores(level, from, (key, handler) -> {
+            if (seen.add(key)) out.add(handler);
+        });
+    }
+
+    /** Report each accessible face with the identity of its backing inventory. */
+    static void visitItemStores(Level level, BlockPos from, java.util.function.BiConsumer<BlockPos, IItemHandler> visit) {
         var owner = level.isLoaded(from) ? level.getBlockEntity(from) : null;
         AdjacentItemStores cache = owner instanceof WorkConsoleBlockEntity console ? console.adjacentItems
                 : owner instanceof WorkLinkedBlockEntity linked ? linked.adjacentItems : null;
@@ -257,19 +264,12 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                 // 同じ周波数のダッシュボードは同じ入れ物なので、もう集めていれば数えない（何枚つないでも1回）
                 // 印は周波数ごと（指令台と資材口など、場所をまたいで集めても数えるのは1回）
                 IItemHandler qio = QioStores.dashboard(level, p, d);
-                if (qio != null && seen.add(QioStores.seenKey(qio))) {
-                    out.add(qio);
-                }
-                continue;
-            }
-            if (h == null) {
+                if (qio != null) visit.accept(QioStores.seenKey(qio), qio);
                 continue;
             }
             // 何か所からでも同じ中身が見える入れ物（AE2 の ME ネットワークなど）は、印で1回だけ数える（QIO の周波数と同じ）
             if (ExtractableItems.source(h) instanceof io.github.genichimaruo.singulo.api.android.AndroidSharedStorage shared) {
-                if (seen.add(sharedSeenKey(shared.sharedStorageKey()))) {
-                    out.add(h);
-                }
+                visit.accept(sharedSeenKey(shared.sharedStorageKey()), h);
                 continue;
             }
             BlockPos key = p;
@@ -279,9 +279,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                 BlockPos other = p.relative(ChestBlock.getConnectedDirection(s));
                 key = other.asLong() < p.asLong() ? other : p;
             }
-            if (seen.add(key)) {
-                out.add(h);
-            }
+            visit.accept(key, h);
         }
     }
 

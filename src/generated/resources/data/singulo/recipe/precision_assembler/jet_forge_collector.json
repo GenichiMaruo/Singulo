@@ -21,7 +21,18 @@
       "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
+    },
+    {
+      "ingredient": "singulo:jet_forge_truss",
+      "count": 1
     }
+  ],
+  "shape": [
+    "  B  ",
+    "  A  ",
+    "  E  ",
+    "  C  ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_collector",

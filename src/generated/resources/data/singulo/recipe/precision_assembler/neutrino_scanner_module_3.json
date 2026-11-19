@@ -18,6 +18,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    "  B  ",
+    "  A  ",
+    "  C  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:neutrino_scanner_module_3",
     "count": 1

@@ -1,7 +1,13 @@
 package io.github.genichimaruo.singulo.darkmatter;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import io.github.genichimaruo.singulo.machine.DeviceMenu;
+import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
@@ -28,7 +34,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     public static final int FE_PER_TICK = 500;
     static final int INTERVAL = 20;
 
-    private final TransactionalFluidTank tank = new TransactionalFluidTank(CAPACITY, ContainmentTankBlockEntity::isDarkMatter) {
+    private final TransactionalFluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(CAPACITY), ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -36,6 +42,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     };
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(100_000, 20_000, 0, this::setChanged);
     private boolean contained = true;
+    private boolean autoEject;
 
     public ContainmentTankBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.CONTAINMENT_TANK.get(), pos, state);
@@ -67,6 +74,11 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ContainmentTankBlockEntity be) {
+        if (be.autoEject && !be.tank.isEmpty()) {
+            var front = state.getValue(AbstractMachineBlock.FACING);
+            BlockPos target = pos.relative(front);
+            if (level.isLoaded(target)) MultiblockPortBlockEntity.pushFluids(level, target, front.getOpposite(), be.tank);
+        }
         if (level.getGameTime() % INTERVAL != 0) {
             return;
         }
@@ -82,14 +94,23 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
 
     @Override
     public void openMenu(ServerPlayer player) {
-        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.CONTAINMENT_TANK, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.AMOUNT -> amount();
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CAPACITY -> CAPACITY;
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY -> energy.getEnergyStored();
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY_MAX -> energy.getMaxEnergyStored();
+        DeviceMenu.open(player, this, DeviceMenu.Kind.CONTAINMENT_TANK, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
+            case DeviceMenu.Tank.AMOUNT -> amount();
+            case DeviceMenu.Tank.CAPACITY -> tank.getCapacity();
+            case DeviceMenu.Tank.EJECT -> autoEject ? 1 : 0;
+            case DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
+            case DeviceMenu.Tank.ENERGY -> energy.getEnergyStored();
+            case DeviceMenu.Tank.ENERGY_MAX -> energy.getMaxEnergyStored();
             default -> 0;
-        }, (p, id) -> false);
+        }, this::onButton);
+    }
+
+    public boolean onButton(ServerPlayer player, int id) {
+        if (id != DeviceMenu.Tank.BUTTON_EJECT || isRemoved() || level != player.level()
+                || level.getBlockEntity(worldPosition) != this || !Blueprints.withinMenuReach(player, worldPosition)) return false;
+        autoEject = !autoEject;
+        setChanged();
+        return true;
     }
 
     // ------------------------------------------------------------------ アイテムとの受け渡し（タンクごと運ぶ）
@@ -97,6 +118,11 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (autoEject) {
+            var settings = new CompoundTag();
+            settings.putBoolean("autoEject", true);
+                components.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(getType(), settings));
+        }
         if (amount() > 0) {
             components.set(SinguloComponents.DARK_MATTER.get(), amount());
         }
@@ -106,7 +132,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
         int amount = input.getOrDefault(SinguloComponents.DARK_MATTER.get(), 0);
-        tank.setFluid(amount > 0 ? darkMatter(Math.min(CAPACITY, amount)) : FluidStack.EMPTY);
+        tank.setFluid(amount > 0 ? darkMatter(amount) : FluidStack.EMPTY);
     }
 
     @Override
@@ -117,6 +143,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        tag.putBoolean("autoEject", autoEject);
         tag.put("tank", io.github.genichimaruo.singulo.compat.NbtCompat.writeTank(tank, registries, new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
     }
@@ -124,6 +151,7 @@ public class ContainmentTankBlockEntity extends io.github.genichimaruo.singulo.c
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        autoEject = tag.getBooleanOr("autoEject", false);
         io.github.genichimaruo.singulo.compat.NbtCompat.readTank(tank, registries, tag.getCompoundOrEmpty("tank"));
         energy.setEnergy(tag.getIntOr("energy", 0));
     }

@@ -7,7 +7,7 @@
   "ingredients": [
     {
       "ingredient": "#c:plates/steel",
-      "count": 6
+      "count": 5
     },
     {
       "ingredient": "singulo:optical_lattice_substrate",
@@ -16,7 +16,18 @@
     {
       "ingredient": "singulo:time_crystal_module",
       "count": 1
+    },
+    {
+      "ingredient": "singulo:shield_tower_plinth",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " BDB ",
+    " AAA ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_body",

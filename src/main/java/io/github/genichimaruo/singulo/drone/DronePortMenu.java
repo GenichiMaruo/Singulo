@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.drone;
 
 import io.github.genichimaruo.singulo.machine.GuiFrame;
+import io.github.genichimaruo.singulo.machine.NotifyingItemSlot;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 /**
  * ドローン発着ポートの画面。右レールのタブ（面の設定の下の3段）で3つのページを切り替える（タブはクライアントだけの状態）。
@@ -212,7 +212,7 @@ public class DronePortMenu extends AbstractContainerMenu {
     }
 
     /** ポートのスロット（荷物のページでだけ出す。着荷箱と受け取りへは入れられない）。 */
-    private final class PageSlot extends SlotItemHandler {
+    private final class PageSlot extends NotifyingItemSlot {
         private final boolean input;
 
         PageSlot(IItemHandler items, int index, int x, int y, boolean input) {

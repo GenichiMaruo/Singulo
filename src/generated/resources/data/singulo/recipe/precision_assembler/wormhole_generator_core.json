@@ -23,8 +23,19 @@
     },
     {
       "ingredient": "singulo:optical_lattice_substrate",
-      "count": 8
+      "count": 6
+    },
+    {
+      "ingredient": "singulo:wormhole_generator_shell",
+      "count": 2
     }
+  ],
+  "shape": [
+    " ECE ",
+    "ECDCE",
+    "CBABC",
+    "ECDCE",
+    " FCF "
   ],
   "result": {
     "id": "singulo:wormhole_generator_core",

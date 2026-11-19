@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.reactor;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.energy.NeighborEnergyOutput;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
@@ -14,9 +15,9 @@ import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,7 +47,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -68,7 +68,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  *   <li>危険: 引力帯（半径 blackHolePullRadius）と潮汐帯（半径 tidalDamageRadius、防具を無視）</li>
  * </ul>
  */
-public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source {
     public enum State { UNFORMED, DORMANT, IGNITING, RUNNING }
 
     /** SHEDDING: 回収運転で、育ちすぎた炉心からジェットで質量を放出している（番号で同期するので後ろに足す）。 */
@@ -198,6 +199,8 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     private int hawkingTimer;
     private int ergoTimer;
     private long lastOutput;
+    private long outputTick = Long.MIN_VALUE;
+    private boolean pushingEnergy;
     private long nextCheck;
     @Nullable
     private BlockPos center;
@@ -234,6 +237,11 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         return mass / 1000.0 * coef / 20.0;
     }
 
+    private static long addProduction(long stored, long rate, int count, long capacity) {
+        if (count <= 0) return stored;
+        return rate > (capacity - stored) / count ? capacity : stored + rate * count;
+    }
+
     static long energyPerPellet() {
         return ServerConfig.SPEC.isLoaded() ? ServerConfig.PENROSE_ENERGY_PER_PELLET.get() : 20_000_000_000L;
     }
@@ -268,6 +276,17 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
     }
 
     private void tick(ServerLevel level) {
+        resetOutputIfNewTick();
+        // Incomplete chunk data cannot tell us whether the player dismantled the structure.
+        if (!Structures.reactorAreaLoaded(level, worldPosition)) {
+            nextCheck = 0;
+            firstCheck = true;
+            formed = false;
+            TimeFields.remove(level, worldPosition);
+            var running = RUNNING.get(level);
+            if (running != null) running.remove(this);
+            return;
+        }
         if (collapseStart >= 0) {
             tickCollapse(level);
             return;
@@ -277,7 +296,6 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             checkStructure(level);
         }
-        lastOutput = 0;
         if (!formed) {
             if (state == State.IGNITING) {
                 abortIgnition(level);                     // 点火の途中で形が崩れた
@@ -434,7 +452,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         ignitionBandwidth = receivedThisTick;
         ignitionPeak = Math.max(ignitionPeak, receivedThisTick);
         receivedThisTick = 0;
-        ignitionReachable = ignitionStored + ignitionBandwidth * Math.max(0, ignitionTicks);
+        ignitionReachable = addProduction(ignitionStored, ignitionBandwidth, Math.max(0, ignitionTicks), Long.MAX_VALUE);
         if (ignitionElapsed == 1) {
             // 点火の音（鳴り終わる瞬間に炉心ができる）
             Vec3 core = coreCenter();
@@ -481,7 +499,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
     private void run(ServerLevel level) {
         double eta = efficiency(spin);
-        long perPellet = Math.round(energyPerPellet() * eta);
+        long perPellet = Math.round(energyPerPellet() * eta * (ServerConfig.SPEC.isLoaded() ? ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : 1.0));
         double max = eddingtonPerTick();
         double wanted = perPellet <= 0 ? 0 : (double) (BUFFER_CAPACITY - buffer) / perPellet;
         // 投入間隔を決めていればその間隔で（エディントン限界まで）、自動なら蓄電の減った分だけ
@@ -495,7 +513,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         int taken = whole <= 0 ? 0 : items.extractItem(SLOT_FUEL, whole, false).getCount();
         pelletCarry = taken < whole ? 0 : pelletCarry - whole;
         if (taken > 0) {
-            buffer = Math.min(BUFFER_CAPACITY, buffer + taken * perPellet);
+            buffer = addProduction(buffer, perPellet, taken, BUFFER_CAPACITY);
             // ペレットでは上限を超えない（すでに超えていれば減らしもしない）
             mass = Math.max(mass, Math.min(MAX_MASS, mass + taken * PELLET_MASS * GROWTH_FRACTION));
             level.blockEvent(worldPosition, getBlockState().getBlock(), EVENT_PELLETS, Math.min(taken, 12));
@@ -719,6 +737,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         BlockPos.MutableBlockPos q = new BlockPos.MutableBlockPos();
         for (BlockPos o : DEVOUR_OFFSETS) {
             q.setWithOffset(at, o);
+            if (!level.isLoaded(q)) continue;
             BlockState s = level.getBlockState(q);
             if (!EventHorizonTargets.edibleBlock(level, q, s, true) || ShieldTowerBlockEntity.shielded(level, Vec3.atCenterOf(q), 4)) {
                 continue;
@@ -923,7 +942,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         // まわりの物も巻き込む（壊せない物と、入れ物などのブロックエンティティは残す）
         int r = COLLAPSE_RADIUS;
         for (BlockPos p : BlockPos.betweenClosed(c.offset(-r, -r, -r), c.offset(r, r, r))) {
-            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)
+            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition) || !level.isLoaded(p)
                     || !EventHorizonTargets.edibleBlock(level, p, level.getBlockState(p), false)) {
                 continue;
             }
@@ -957,6 +976,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
         applyHazards(level);
         while (collapseDone < n - 1 && collapseDelay(collapseDone, n) <= t) {
             BlockPos p = collapseBlocks.get(collapseDone);
+            if (!level.isLoaded(p)) return;
             if (!level.getBlockState(p).isAir()) {
                 level.setBlock(p, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
@@ -1091,30 +1111,40 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
     /** 炉心制御装置と抽出ポートの隣（リアクターの部品以外）へ電力を押し出す。1 tick の合計は penroseMaxOutput まで。 */
     private void pushEnergy(ServerLevel level) {
-        if (buffer <= 0) {
-            return;
-        }
-        long budget = Math.min(buffer, maxOutput());
-        List<BlockPos> sources = new ArrayList<>(ports);
-        sources.add(worldPosition);
-        for (BlockPos src : sources) {
-            for (Direction dir : Direction.values()) {
-                if (budget <= 0) {
-                    break;
-                }
-                BlockPos n = src.relative(dir);
-                if (n.equals(worldPosition) || Structures.isReactorPart(level.getBlockState(n))) {
-                    continue;
-                }
-                var target = level.getCapability(Capabilities.Energy.BLOCK, n, dir.getOpposite());
-                if (target != null) {
-                    // ケーブルなど mod の口へは int を超えて渡す
-                    long sent = io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(energyPort, target, budget);
-                    budget -= sent;
-                    lastOutput += sent;
-                }
+        if (remainingOutput() <= 0) return;
+        // A cable can also see a second port of this reactor while accepting our offer.
+        pushingEnergy = true;
+        try {
+            var output = new NeighborEnergyOutput(level, this::remainingOutput, this::debitOutput);
+            Predicate<BlockPos> external = pos -> !pos.equals(worldPosition) && !Structures.isReactorPart(level.getBlockState(pos));
+            for (BlockPos port : ports) {
+                if (remainingOutput() <= 0) break;
+                if (level.isLoaded(port)) output.pushFrom(port, external);
             }
+            output.pushFrom(worldPosition, external);
+            output.sendSurplusToPumps();
+        } finally {
+            pushingEnergy = false;
         }
+    }
+
+    private void resetOutputIfNewTick() {
+        long now = level == null ? 0 : level.getGameTime();
+        if (outputTick != now) {
+            outputTick = now;
+            lastOutput = 0;
+        }
+    }
+
+    private long remainingOutput() {
+        resetOutputIfNewTick();
+        return Math.max(0, Math.min(buffer, maxOutput() - lastOutput));
+    }
+
+    private void debitOutput(long sent) {
+        buffer -= sent;
+        lastOutput += sent;
+        setChanged();
     }
 
     private void broadcast(ServerLevel level, String key, Object... args) {
@@ -1216,6 +1246,27 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
     public State state() {
         return state;
+    }
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        io.github.genichimaruo.singulo.machine.MachineReport.State s = switch (state) {
+            case UNFORMED -> io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN;
+            case DORMANT -> io.github.genichimaruo.singulo.machine.MachineReport.State.OFF;
+            case IGNITING -> io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+            case RUNNING -> mode() == Mode.DANGER ? io.github.genichimaruo.singulo.machine.MachineReport.State.WARN
+                    : mode() == Mode.STANDBY ? io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE : io.github.genichimaruo.singulo.machine.MachineReport.State.RUN;
+        };
+        Component label = switch (state) {
+            case IGNITING -> Component.translatable("gui.singulo.reactor.state.igniting",
+                    (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy())),
+                    ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : ignitionTicks / 20);
+            case RUNNING -> Component.translatable("gui.singulo.reactor.mode." + mode().name().toLowerCase(java.util.Locale.ROOT));
+            default -> Component.translatable("gui.singulo.reactor.state." + state.name().toLowerCase(java.util.Locale.ROOT));
+        };
+        return new io.github.genichimaruo.singulo.machine.MachineReport(s, label, List.of(), 0, 0, buffer, BUFFER_CAPACITY, 0,
+                (int) Math.min(Integer.MAX_VALUE, lastOutput), ItemStack.EMPTY, 0, List.of(), 0);
     }
 
     public double mass() {
@@ -1321,7 +1372,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
             case D_OUT_LO -> (int) (lastOutput & 0xFFFFFFFFL);
             case D_OUT_HI -> (int) (lastOutput >>> 32);
             case D_BUFFER_MFE -> (int) (buffer / 1_000_000L);
-            case D_IGNITION_PCT -> (int) Math.min(100, ignitionStored * 100 / Math.max(1, ignitionEnergy()));
+            case D_IGNITION_PCT -> (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy()));
             case D_IGNITION_SECS -> ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : ignitionTicks / 20;
             case D_TARGET -> spinTarget;
             case D_MODE -> mode().ordinal();

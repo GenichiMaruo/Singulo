@@ -6,6 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -172,6 +173,7 @@ public class WormholeMouthBlockEntity extends io.github.genichimaruo.singulo.com
     private long fluidLeft;
     /** この口を使うポート（口に近い順）と、それを数えた tick。 */
     private List<WormholePortBlockEntity> ranked = List.of();
+    private final Map<WormholePortBlockEntity, Integer> ranks = new IdentityHashMap<>();
     private long rankTick = -1;
 
     public WormholeMouthBlockEntity(BlockPos pos, BlockState state) {
@@ -288,13 +290,18 @@ public class WormholeMouthBlockEntity extends io.github.genichimaruo.singulo.com
             list.sort(java.util.Comparator.comparingDouble((WormholePortBlockEntity p) -> p.getBlockPos().distSqr(worldPosition))
                     .thenComparingLong(p -> p.getBlockPos().asLong()));
             ranked = list;
+            ranks.clear();
+            for (int i = 0; i < list.size(); i++) {
+                ranks.put(list.get(i), i + 1);
+            }
         }
         return ranked;
     }
 
     /** ポートの順位（1 から。この口を使っていなければ 0）。 */
     public int rankOf(WormholePortBlockEntity port) {
-        return rankedPorts().indexOf(port) + 1;
+        rankedPorts();
+        return ranks.getOrDefault(port, 0);
     }
 
     /** ポートが働けるか（口に近い順で、上限の数に入っている）。 */

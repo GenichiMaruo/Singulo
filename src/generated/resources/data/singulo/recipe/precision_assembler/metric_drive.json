@@ -20,7 +20,22 @@
     {
       "ingredient": "#c:plates/steel",
       "count": 2
+    },
+    {
+      "ingredient": "singulo:basic_circuit",
+      "count": 1
+    },
+    {
+      "ingredient": "minecraft:black_dye",
+      "count": 4
     }
+  ],
+  "shape": [
+    "     ",
+    "FADAF",
+    "BCECB",
+    "FADAF",
+    "     "
   ],
   "result": {
     "id": "singulo:metric_drive",

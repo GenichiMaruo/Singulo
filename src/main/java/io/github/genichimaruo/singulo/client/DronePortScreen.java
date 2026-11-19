@@ -439,12 +439,12 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         // 着荷箱から受け取りの欄へ開梱する向きの矢印（どちらの枠からも離して、真ん中の段に）
         Panel.icon(g, x + DronePortMenu.ARROW_X, y + DronePortMenu.ARRIVED_Y + 18 + 4, Panel.Icon.OUT, skin.dim());
         area(DronePortMenu.ARRIVED_X - 1, DronePortMenu.ARRIVED_Y - 1, 18, 3 * 18,
-                List.of(Component.translatable("gui.singulo.drone_port.arrived")));
+                List.of(Component.translatable(menu.fluid() ? "gui.singulo.fluid_drone_port.arrived" : "gui.singulo.drone_port.arrived")));
         if (menu.fluid()) {
             drawTank(g, DronePortMenu.CARGO_X, DronePortMenu.CARGO_Y, DronePortBlockEntity.D_SEND_FLUID, DronePortBlockEntity.D_SEND_AMOUNT,
-                    io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.SEND_CAPACITY, "gui.singulo.fluid_drone_port.send_tank");
+                    io.github.genichimaruo.singulo.drone.FluidCapsuleItem.capacityMb(), "gui.singulo.fluid_drone_port.send_tank");
             drawTank(g, DronePortMenu.RECEIVE_X, DronePortMenu.RECEIVE_Y, DronePortBlockEntity.D_RECV_FLUID, DronePortBlockEntity.D_RECV_AMOUNT,
-                    io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.RECEIVE_CAPACITY, "gui.singulo.fluid_drone_port.receive_tank");
+                    io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.receiveCapacity(), "gui.singulo.fluid_drone_port.receive_tank");
         } else {
             area(DronePortMenu.RECEIVE_X - 1, DronePortMenu.RECEIVE_Y - 1, 3 * 18, 3 * 18,
                     List.of(Component.translatable("gui.singulo.drone_port.receive")));
@@ -467,7 +467,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         tip.add(Component.translatable(key));
         if (fluidId > 0 && amount > 0) {
             var fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
-            double fraction = (double) amount / capacity;
+            double fraction = Math.min(1.0, (double) amount / capacity);
             FluidGauge.draw(g, x + 1, y + 1, w - 2, h - 2, fraction, fluid);
             int filled = (int) Math.round((h - 2) * Math.min(1, fraction));
             Panel.glass(g, x + 1, y + 1 + h - 2 - filled, w - 2, filled);
@@ -491,7 +491,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                     DronePortMenu.LIST_W - 4, skin.dim());
             return;
         }
-        int range = DroneCrateItem.range(crateTier());
+        int tier = crateTier();
         int textW = DronePortMenu.LIST_W - (targets.size() > DronePortMenu.ROWS ? 5 : 2);
         for (int row = 0; row < DronePortMenu.ROWS && scroll + row < targets.size(); row++) {
             int i = scroll + row;
@@ -508,7 +508,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
             int d = i < menu.distances().size() ? menu.distances().get(i) : distance(to);
             boolean remote = i < menu.dims().size() && !menu.dims().get(i).isEmpty();
             String dist = d + "m";
-            boolean reach = range > 0 && d <= range;
+            boolean reach = DroneCrateItem.canReach(tier, d);
             int dw = font.width(dist);
             boolean auto = i == menu.autoTarget();
             int nx = x + 3;
@@ -535,7 +535,7 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
                 tip.add(Component.translatable("gui.singulo.drone_port.auto.is_target").withStyle(st -> st.withColor(0xFF000000 | DroneStationScreen.ACCENT)));
             }
             if (!reach) {
-                tip.add(Component.translatable(range == 0 ? "gui.singulo.drone_port.status.6" : "gui.singulo.drone_port.status.7")
+                tip.add(Component.translatable(tier == 0 ? "gui.singulo.drone_port.status.6" : "gui.singulo.drone_port.status.7")
                         .withStyle(st -> st.withColor(GuiSkin.BAD)));
             }
             area(DronePortMenu.LIST_X, DronePortMenu.LIST_Y + row * DronePortMenu.ROW_H, textW, DronePortMenu.ROW_H, tip);
@@ -589,7 +589,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         Component label = threshold == 0 ? Component.translatable("gui.singulo.drone_port.auto.off")
                 : threshold == DronePortBlockEntity.AUTO_FULL ? Component.translatable("gui.singulo.drone_port.auto.full")
                 : menu.fluid() ? Component.translatable("gui.singulo.fluid_drone_port.auto.amount",
-                        io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.autoThreshold(mode) / 1000)
+                        java.math.BigDecimal.valueOf(io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity.autoThreshold(mode), 3)
+                                .stripTrailingZeros().toPlainString())
                 : Component.translatable("gui.singulo.drone_port.auto.count", threshold);
         int[] a = autoRect();
         boolean ah = free && Panel.inside(mouseX, mouseY, a[0], a[1], a[2], a[3]);
@@ -597,7 +598,8 @@ public class DronePortScreen extends FramedScreen<DronePortMenu> {
         int target = menu.autoTarget();
         Component name = target >= 0 ? Component.translatable("gui.singulo.drone_port.auto.target", partnerName(target))
                 : Component.translatable("gui.singulo.drone_port.auto.none");
-        area(a[0] - leftPos, a[1] - topPos, a[2], a[3], List.of(Component.translatable("gui.singulo.drone_port.auto.hint"),
+        Component hint = Component.translatable(menu.fluid() ? "gui.singulo.fluid_drone_port.auto.hint" : "gui.singulo.drone_port.auto.hint");
+        area(a[0] - leftPos, a[1] - topPos, a[2], a[3], List.of(hint,
                 name.copy().withStyle(st -> st.withColor(target >= 0 ? 0xFF000000 | DroneStationScreen.ACCENT : 0xFF8A949E))));
         int[] r = registerRect();
         boolean canRegister = menu.selected() >= 0;

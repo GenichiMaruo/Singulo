@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "CBC",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "#c:chests/wooden",
+    "B": "singulo:basic_circuit"
+  },
+  "result": {
+    "id": "singulo:assembly_stock_upgrade",
+    "count": 1
+  }
+}

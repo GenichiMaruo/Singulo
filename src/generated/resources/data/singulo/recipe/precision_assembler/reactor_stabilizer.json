@@ -16,7 +16,26 @@
     {
       "ingredient": "singulo:entangled_element",
       "count": 1
+    },
+    {
+      "ingredient": "#c:nuggets/gold",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:white_ceramic_composite",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:cold_atoms",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " DCD ",
+    " BAB ",
+    " EFE ",
+    "     "
   ],
   "result": {
     "id": "singulo:reactor_stabilizer",

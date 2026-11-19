@@ -4,6 +4,8 @@
   "package": "io.github.genichimaruo.singulo.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "RecipePatchMixin",
+    "MixedGlassExplosionMixin",
     "ProjectileAccessor",
     "PocketAttachmentMigrationMixin",
     "DaylightDetectorBlockMixin",
@@ -19,6 +21,8 @@
     "defaultRequire": 1
   },
   "client": [
+    "AndroidWeaponTerrainMixin",
+    "AndroidWeaponTerrainTargetMixin",
     "RayleighLightTextureMixin",
     "PonderLightingMixin",
     "RayleighRenderLightMixin",
@@ -35,6 +39,7 @@
     "DistantHorizonsLightmapMixin",
     "StaffHandProjectionMixin",
     "StaffHandItemMixin",
-    "StaffItemLayerMixin"
+    "StaffItemLayerMixin",
+    "GlassStairsWaterMixin"
   ]
 }

@@ -275,6 +275,10 @@ final class GlowDepth {
     /** ワールドの中で光を描いている間だけ true（手に持った物や画面の絵は対象にしない）。 */
     private static boolean active;
 
+    static boolean inWorld() {
+        return isActive();
+    }
+
     private GlowDepth() {}
     private static int extractionDepth;
     static void beginExtract() { extractionDepth++; }
@@ -282,7 +286,7 @@ final class GlowDepth {
     private static boolean isActive() { return active || extractionDepth > 0; }
     private record Route(MultiBufferSource.BufferSource source, RenderType actual) {}
     private static final java.util.Map<RenderType,Route> ROUTES = new java.util.IdentityHashMap<>();
-    private static VertexConsumer route(MultiBufferSource buffers, MultiBufferSource.BufferSource source, RenderType actual) {
+    static VertexConsumer route(MultiBufferSource buffers, MultiBufferSource.BufferSource source, RenderType actual) {
         if (extractionDepth == 0) return source.getBuffer(actual);
         for (var e : ROUTES.entrySet()) if (e.getValue().source == source && e.getValue().actual == actual) return buffers.getBuffer(e.getKey());
         RenderType marker=RenderType.create("singulo_deferred_"+ROUTES.size(),RenderSetup.builder(actual.pipeline()).createRenderSetup());
@@ -292,6 +296,7 @@ final class GlowDepth {
     static boolean submitDeferred(SnapshotBlockRenderer.Batch batch, PoseStack pose) {
         Route route=ROUTES.get(batch.type());
         if(route==null)return false;
+        AndroidWeaponLight.noteDeferred(route.source);
         VertexConsumer output=route.source.getBuffer(route.actual);
         var transform=pose.last();
         for(var v:batch.vertices()) output.addVertex(transform,v.x(),v.y(),v.z()).setColor(v.color()).setUv(v.u(),v.v())
@@ -339,6 +344,7 @@ final class GlowDepth {
             modelView.pushMatrix();
             try {
                 modelView.set(event.getModelViewMatrix());
+                AndroidWeaponLight.afterBlockEntities(event.getModelViewMatrix());
                 FLUID_SOURCE.endBatch(FLUID_COLOR);
                 FLUID_SOURCE.endBatch(FLUID_DEPTH);
                 COLOR_SOURCE.endBatch();

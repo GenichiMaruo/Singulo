@@ -2,14 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PCP",
-    " G ",
-    "PCP"
+    "PGP",
+    "CFC",
+    "P P"
   ],
   "key": {
     "P": "singulo:nihonium_plate",
     "C": "singulo:superconducting_coil",
-    "G": "singulo:zero_gravity_block"
+    "G": "singulo:zero_gravity_block",
+    "F": "singulo:cosmic_frame"
   },
   "result": {
     "id": "singulo:suspension_crown",

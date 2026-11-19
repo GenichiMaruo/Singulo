@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "LPL",
+    "IRI"
+  ],
+  "key": {
+    "C": "#c:ingots/copper",
+    "L": "singulo:fluid_pipe",
+    "P": "minecraft:piston",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone"
+  },
+  "result": {
+    "id": "singulo:fluid_pump",
+    "count": 1
+  }
+}

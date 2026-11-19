@@ -15,8 +15,19 @@
     },
     {
       "ingredient": "#c:plates/steel",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:blank_data_card",
       "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  A  ",
+    " CDC ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_permit",

@@ -18,10 +18,21 @@
       "count": 1
     },
     {
+      "ingredient": "singulo:genesis_frame",
+      "count": 1
+    },
+    {
       "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "  C  ",
+    "  B  ",
+    " ADA ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:genesis_pylon",

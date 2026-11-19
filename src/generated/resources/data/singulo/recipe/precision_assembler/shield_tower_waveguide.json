@@ -17,7 +17,18 @@
       "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
+    },
+    {
+      "ingredient": "singulo:shield_tower_plinth",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " ADA ",
+    "     ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_waveguide",

@@ -1,0 +1,44 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 240,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:portable_android_printer",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:quantum_computing_module",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:entangled_element",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:superconducting_coil",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:white_ceramic_composite",
+      "count": 4
+    },
+    {
+      "ingredient": "#c:plates/steel",
+      "count": 2
+    }
+  ],
+  "shape": [
+    " EFE ",
+    " CBC ",
+    " DAD ",
+    " EFE ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:portable_android_printer_2",
+    "count": 1
+  }
+}

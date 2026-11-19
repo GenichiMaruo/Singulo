@@ -4,12 +4,13 @@
   "pattern": [
     "PGP",
     "GCG",
-    "PGP"
+    "PFP"
   ],
   "key": {
     "P": "singulo:nihonium_plate",
     "G": "#c:glass_blocks/colorless",
-    "C": "singulo:superconducting_coil"
+    "C": "singulo:superconducting_coil",
+    "F": "singulo:basic_frame"
   },
   "result": {
     "id": "singulo:cosmic_frame",

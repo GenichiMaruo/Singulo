@@ -38,11 +38,10 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
     private final int rate;
     private final EnergyHandler input = new Side(true);
     private final EnergyHandler output = new Side(false);
-    /** この tick に受け取った量と、直前の tick に受け取った量・送り出した量（画面用）。 */
-    private int inThisTick;
-    private int lastIn;
-    private int lastOut;
-    private int externallyExtracted;
+    /** 入出力の上限は、隣の装置の処理順によらずワールドの同じ tick 全体で共有する。 */
+    private long transferTick = Long.MIN_VALUE;
+    private int inThisTick, outThisTick;
+    private int lastIn, lastOut;
     private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler charge = new io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler(2) {
         @Override
         public int getSlotLimit(int slot) {
@@ -99,8 +98,34 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
     protected SmesCellBlockEntity(net.minecraft.world.level.block.entity.BlockEntityType<?> type, BlockPos pos,
                                   BlockState state, int capacity, int rate) {
         super(type, pos, state);
-        this.energy = new SinguloEnergyStorage(capacity, rate, rate, this::setChanged);
         this.rate = rate;
+        this.energy = new SinguloEnergyStorage(capacity, rate, rate, this::setChanged) {
+            @Override public int insert(int amount, TransactionContext tx) {
+                if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
+                updateTransferTick();
+                int got = super.insert(Math.min(amount, Math.max(0, rate - inThisTick)), tx);
+                if (got > 0) { flowJournal.updateSnapshots(tx); inThisTick += got; }
+                return got;
+            }
+
+            @Override public int extract(int amount, TransactionContext tx) {
+                if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
+                updateTransferTick();
+                int got = super.extract(Math.min(amount, Math.max(0, rate - outThisTick)), tx);
+                if (got > 0) { flowJournal.updateSnapshots(tx); outThisTick += got; }
+                return got;
+            }
+        };
+    }
+
+    private void updateTransferTick() {
+        long now = level == null ? 0 : level.getGameTime();
+        if (transferTick == now) return;
+        lastIn = transferTick == now - 1 ? inThisTick : 0;
+        lastOut = transferTick == now - 1 ? outThisTick : 0;
+        transferTick = now;
+        inThisTick = 0;
+        outThisTick = 0;
     }
 
     /** SMESモジュール（段階4）。2 GFE を蓄え、100 MFE/t で出し入れする。 */
@@ -144,36 +169,26 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SmesCellBlockEntity be) {
         Direction front = state.getValue(AbstractMachineBlock.FACING);
-        boolean active = be.externallyExtracted > 0;
-        be.lastIn = be.inThisTick;
-        be.inThisTick = 0;
-        be.lastOut = be.externallyExtracted;
-        be.externallyExtracted = 0;
-        if (be.energy.getEnergyStored() > 0) {
-            EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(front), front.getOpposite());
+        be.updateTransferTick();
+        int available = Math.min(be.energy.getEnergyStored(), be.rate - be.outThisTick);
+        BlockPos neighbor = pos.relative(front);
+        if (available > 0 && level.isLoaded(neighbor)) {
+            EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, neighbor, front.getOpposite());
             if (target != null) {
-                int sent = 0;
                 try (var tx = Transaction.openRoot()) {
-                    int accepted = target.insert(Math.min(be.energy.getEnergyStored(), be.rate), tx);
-                    if (be.energy.extract(accepted, tx) == accepted) {
-                        tx.commit();
-                        sent = accepted;
-                    }
-                }
-                if (sent > 0) {
-                    be.lastOut += sent;
-                    active = true;
+                    int accepted = target.insert(available, tx);
+                    if (accepted >= 0 && accepted <= available && be.energy.extract(accepted, tx) == accepted) tx.commit();
                 }
             }
         }
         // 充電の枠の物を充電する（出し入れの速さのうち、正面から出した残りまで）
         long used = io.github.genichimaruo.singulo.energy.ItemCharging.tick(be.charge, CHARGE_IN, CHARGE_OUT,
-                Math.min(be.energy.getEnergyStored(), Math.max(0, be.rate - be.lastOut)));
+                Math.min(be.energy.getEnergyStored(), be.rate - be.outThisTick));
         if (used > 0) {
             be.energy.consume((int) used);
-            be.lastOut += (int) used;
-            active = true;
+            be.outThisTick += (int) used;
         }
+        boolean active = be.lastOut > 0 || be.outThisTick > 0;
         if (state.getValue(AbstractMachineBlock.LIT) != active && level.getGameTime() % 10 == 0) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
         }
@@ -220,9 +235,9 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     /** 受け取り専用・出力専用の口。 */
     private final SnapshotJournal<int[]> flowJournal = new SnapshotJournal<>() {
-        @Override protected int[] createSnapshot() { return new int[]{inThisTick, externallyExtracted}; }
+        @Override protected int[] createSnapshot() { return new int[]{inThisTick, outThisTick}; }
         @Override protected void revertToSnapshot(int[] state) {
-            inThisTick = state[0]; externallyExtracted = state[1];
+            inThisTick = state[0]; outThisTick = state[1];
         }
     };
     private final class Side implements IEnergyStorage, EnergyHandler {
@@ -231,16 +246,12 @@ public class SmesCellBlockEntity extends io.github.genichimaruo.singulo.compat.L
         @Override public int insert(int amount, TransactionContext tx) {
             if (amount < 0) throw new IllegalArgumentException("Negative energy insertion");
             if (!receive) return 0;
-            int got = energy.insert(amount, tx);
-            if (got > 0) { flowJournal.updateSnapshots(tx); inThisTick += got; }
-            return got;
+            return energy.insert(amount, tx);
         }
         @Override public int extract(int amount, TransactionContext tx) {
             if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
             if (receive) return 0;
-            int sent = energy.extract(amount, tx);
-            if (sent > 0) { flowJournal.updateSnapshots(tx); externallyExtracted += sent; }
-            return sent;
+            return energy.extract(amount, tx);
         }
         @Override public long getAmountAsLong() { return energy.getAmountAsLong(); }
         @Override public long getCapacityAsLong() { return energy.getCapacityAsLong(); }

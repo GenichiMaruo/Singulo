@@ -28,7 +28,22 @@
     {
       "ingredient": "singulo:degenerate_nucleus",
       "count": 1
+    },
+    {
+      "ingredient": "#c:obsidians",
+      "count": 3
+    },
+    {
+      "ingredient": "minecraft:gold_nugget",
+      "count": 2
     }
+  ],
+  "shape": [
+    "     ",
+    " BDB ",
+    "GCAEG",
+    " BFB ",
+    " HGH "
   ],
   "result": {
     "id": "singulo:graviton_manipulator",

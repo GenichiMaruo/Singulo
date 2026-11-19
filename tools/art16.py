@@ -1615,8 +1615,31 @@ def tablet(glow):
                                d.rectangle([3, 2, 12, 13], outline=(236, 238, 240, 255))))
 
 
-def pellet(c):
-    return outlined(lambda d: (d.ellipse([4, 4, 11, 11], fill=rgba(c)), d.ellipse([5, 5, 7, 7], fill=rgba(lighten(c, 0.35)))))
+def steel_blend():
+    """鋼の素（0.21.0。質量ペレットと見分けるため玉から変えた）: 銀灰色の粉の小山（左右対称）に、石炭の黒い粒が混ざる。"""
+    iron, coal = (150, 152, 160), (40, 40, 46)
+
+    def f(d):
+        d.polygon([(2, 12), (5, 8), (7, 6), (8, 6), (10, 8), (13, 12), (8, 13), (7, 13)], fill=rgba(iron))
+        d.polygon([(5, 8), (7, 6), (8, 6), (6, 9), (4, 10)], fill=rgba(lighten(iron, 0.3)))
+        d.polygon([(10, 8), (13, 12), (11, 12)], fill=rgba(darken(iron, 0.2)))
+        for x, y in ((5, 11), (8, 9), (10, 11), (7, 12), (11, 10), (6, 10), (9, 7)):
+            d.point((x, y), fill=rgba(coal))
+        d.point((7, 7), fill=(230, 232, 238, 255))
+    return vcenter(outlined(f, **SOFT_EDGE))
+
+
+def mass_pellet():
+    """質量ペレット（0.21.0。鋼の素と見分けるため玉から変えた）: 濃い黒の玉を、空間のゆがみの菫色の輪が斜めに巡る（輪の奥側は玉に隠れる）。"""
+    dense, glow = (52, 50, 70), (170, 120, 255)
+
+    def f(d):
+        d.ellipse([1, 6, 14, 12], outline=rgba(darken(glow, 0.35)))
+        d.ellipse([4, 3, 11, 10], fill=rgba(dense))
+        d.ellipse([5, 4, 8, 6], fill=rgba(lighten(dense, 0.25)))
+        d.arc([1, 6, 14, 12], 20, 160, fill=rgba(glow))
+        d.point((5, 5), fill=rgba(lighten(glow, 0.5)))
+    return vcenter(outlined(f))
 
 
 # ---------------------------------------------------------------- 隕石・雷・深海・虚空の素材と、中間素材
@@ -2198,7 +2221,7 @@ ITEM_ART = {
     'sports_drink': lambda: drink_can((240, 244, 248), (60, 120, 220), (240, 244, 248)),
     'energy_drink': lambda: drink_can((250, 206, 40), (40, 40, 44), (250, 206, 40)),
     'coffee': lambda: coffee_bottle(),
-    'steel_blend': lambda: pellet((92, 92, 104)),
+    'steel_blend': steel_blend,
     'steel_ingot': lambda: vcenter(ingot(STEEL)),
     'unfired_ceramic': lambda: plate((190, 178, 164)),
     'white_ceramic_composite': lambda: plate((236, 238, 240)),
@@ -2243,7 +2266,7 @@ ITEM_ART = {
     'data_card_observation_log': lambda: card(T1),
     'data_card_quantum_fragment': lambda: card(T3),
     'data_card_culture_data': lambda: card(T4),
-    'mass_pellet': lambda: pellet((82, 86, 98)),
+    'mass_pellet': mass_pellet,
     'superconducting_coil': lambda: coil(COPPER, (200, 230, 250)),
     'superconducting_wire': lambda: spool((150, 210, 240)),
     'muon_bundle': lambda: tracks(T2),
@@ -2317,6 +2340,7 @@ ITEM_ART = {
     'temporal_key': lambda: seal_key(3),
     'singularity_key': lambda: seal_key(4),
     'overclock_chip': lambda: overclock_chip(),
+    'assembly_stock_upgrade': lambda: assembly_stock_upgrade(),
     'capacity_upgrade_1': lambda: capacity_upgrade(1),
     'capacity_upgrade_2': lambda: capacity_upgrade(2),
     'capacity_upgrade_3': lambda: capacity_upgrade(3),
@@ -2346,6 +2370,18 @@ def seal_key(tier):
     return im
 
 
+def assembly_stock_upgrade():
+    """Four copper storage drawers in a steel cartridge."""
+    im, d = new()
+    d.rectangle([2, 2, 13, 13], fill=(47, 55, 66), outline=(159, 178, 190))
+    for x in (4, 8):
+        for y in (4, 8):
+            d.rectangle([x, y, x + 2, y + 2], fill=(160, 95, 53))
+            d.line([x, y, x + 2, y], fill=(250, 193, 114))
+    d.line([5, 14, 10, 14], fill=(183, 151, 87))
+    return im
+
+
 def capacity_upgrade(tier):
     """A capacitor cartridge with one, two or three illuminated charge cells."""
     im, d = new()
@@ -2372,15 +2408,33 @@ def overclock_chip():
 
 
 def gravity_boots():
-    """重力ブーツ: 白い装甲のブーツ。かかとに青く光る重力素子。"""
-    im, d = new()
-    d.polygon([(4, 2), (9, 2), (9, 10), (14, 11), (14, 14), (3, 14), (3, 9)], fill=(230, 234, 240, 255),
-              outline=(120, 126, 140, 255))
-    d.line([(4, 12), (13, 12)], fill=(70, 74, 84, 255))
-    d.line([(4, 6), (8, 6)], fill=(110, 205, 238, 255))
-    d.rectangle([3, 10, 5, 13], fill=(110, 205, 238, 255))
-    d.point((4, 11), fill=(255, 255, 255, 255))
-    return im
+    """重力ブーツ（0.21.0 で描き直した）: バニラのブーツと同じく、白い装甲のブーツを左右に2足（つま先は外へ）。
+    すねに水色の発光の帯、黒い靴底。2足の間は透明に抜き、内側の縁は陰の色。輪郭を含めて14×14以内で、上下左右の真ん中に置く。"""
+    armor, armor_sh, sole, blue = (232, 236, 242), (192, 200, 214), (58, 62, 76), (110, 205, 238)
+    top = 5
+
+    def f(d):
+        for side in (0, 1):
+            sx = 4 if side == 0 else 9                                     # すねの左端
+            fx0, fx1 = (2, 6) if side == 0 else (9, 13)                    # 足の左右
+            inner = 6 if side == 0 else 9
+            d.rectangle([sx, top, sx + 2, 10], fill=rgba(armor))          # すね
+            d.rectangle([fx0, 10, fx1, 11], fill=rgba(armor))             # 足
+            d.line([(fx0, 12), (fx1, 12)], fill=rgba(sole))               # 靴底
+            d.line([(inner, top), (inner, 11)], fill=rgba(armor_sh))      # 内側の陰
+            d.line([(fx0, 11), (fx1, 11)], fill=rgba(armor_sh))
+            d.line([(sx, top + 1), (sx + 2, top + 1)], fill=rgba(blue))   # すねの帯
+            d.point((sx, top + 2), fill=(255, 255, 255, 255))
+    im = outlined(f, **SOFT_EDGE)
+    for x in (7, 8):                                                       # 2足の間（輪郭で埋まる）を抜く
+        for y in range(16):
+            im.putpixel((x, y), (0, 0, 0, 0))
+    box = im.getbbox()
+    w, h = box[2] - box[0], box[3] - box[1]
+    assert w <= 14 and h <= 14, (w, h)
+    out = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    out.paste(im.crop(box), ((16 - w) // 2, (16 - h) // 2))
+    return out
 
 
 def catalyst_stabilizer():
@@ -2472,18 +2526,21 @@ def sealed_container_inner():
 
 
 def gravity_boots_layer():
-    """重力ブーツを履いたときの絵（防具の1枚目、64×32）。ブーツは脚の下半分に描かれる。"""
+    """重力ブーツを履いたときの絵（防具の1枚目、64×32）。0.21.0: アイテムの絵（白い装甲・すねの水色の帯・黒い靴底）に合わせ、
+    高さはバニラの革のブーツと同じ（脚の側面の下6段 v=26〜31 と、足の裏の面）。"""
     from PIL import Image
     im = Image.new('RGBA', (64, 32), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    # 脚の展開図（u=0〜16, v=16〜32）。下側（足首から下）だけ塗る
-    d.rectangle([0, 22, 15, 31], fill=(230, 234, 240, 255))
-    d.rectangle([4, 16, 11, 19], fill=(230, 234, 240, 255))
-    d.line([(0, 22), (15, 22)], fill=(120, 126, 140, 255))
-    d.line([(0, 28), (15, 28)], fill=(70, 74, 84, 255))
-    for x in (1, 5, 9, 13):
-        d.point((x, 25), fill=(110, 205, 238, 255))
-    d.line([(0, 30), (15, 30)], fill=(110, 205, 238, 255))
+    armor, armor_sh, sole, blue = (232, 236, 242), (192, 200, 214), (58, 62, 76), (110, 205, 238)
+    # 脚の展開図: 側面は v=20〜31（右 u0〜3・前 u4〜7・左 u8〜11・後ろ u12〜15）、足の裏は u8〜11, v16〜19
+    d.rectangle([0, 26, 15, 31], fill=rgba(armor))
+    d.line([(0, 26), (15, 26)], fill=rgba(armor_sh))        # 履き口
+    d.line([(0, 27), (15, 27)], fill=rgba(blue))            # すねの帯
+    d.line([(0, 30), (15, 30)], fill=rgba(armor_sh))        # 足の陰
+    d.line([(0, 31), (15, 31)], fill=rgba(sole))            # 靴底
+    d.rectangle([12, 28, 15, 29], fill=rgba(armor_sh))      # 後ろは陰
+    d.point((4, 28), fill=(255, 255, 255, 255))             # 前の光
+    d.rectangle([8, 16, 11, 19], fill=rgba(sole))           # 足の裏
     return im
 
 

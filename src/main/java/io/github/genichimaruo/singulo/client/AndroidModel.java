@@ -1401,8 +1401,8 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
         legR.y += 11.5F * k;
         legL.xRot = -1.5F * k;
         legR.xRot = -1.5F * k;
-        legL.yRot = 0.08F * k;
-        legR.yRot = -0.08F * k;
+        legL.yRot = -0.025F * k;
+        legR.yRot = 0.025F * k;
         shinL.xRot = 1.45F * k + Mth.sin(age * 0.05F) * 0.05F * k;      // 足をすこしぶらぶら
         shinR.xRot = 1.45F * k - Mth.sin(age * 0.05F) * 0.05F * k;
         torso.xRot -= 0.05F * k;

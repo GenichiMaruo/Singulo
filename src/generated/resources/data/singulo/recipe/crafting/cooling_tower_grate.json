@@ -2,11 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "IPI"
+    "IPI",
+    " F "
   ],
   "key": {
     "I": "#c:ingots/iron",
-    "P": "#c:plates/steel"
+    "P": "#c:plates/steel",
+    "F": "singulo:cooling_tower_base"
   },
   "result": {
     "id": "singulo:cooling_tower_grate",

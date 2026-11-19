@@ -12,7 +12,8 @@
               "function": "minecraft:copy_components",
               "source": "block_entity",
               "include": [
-                "singulo:dark_matter"
+                "singulo:dark_matter",
+                "minecraft:block_entity_data"
               ]
             }
           ]

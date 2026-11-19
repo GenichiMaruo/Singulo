@@ -14,10 +14,21 @@
       "count": 2
     },
     {
+      "ingredient": "singulo:degenerate_furnace_frame",
+      "count": 1
+    },
+    {
       "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 750
     }
+  ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " ACA ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:degenerate_furnace_fin",

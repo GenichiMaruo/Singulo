@@ -27,6 +27,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "  B  ",
+    " DCD ",
+    " CAC ",
+    " DCD ",
+    "     "
+  ],
   "result": {
     "id": "singulo:quantum_heat_engine",
     "count": 1

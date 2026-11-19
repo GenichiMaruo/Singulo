@@ -1,12 +1,11 @@
 package io.github.genichimaruo.singulo.gravity;
 
-import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.energy.NeighborEnergyOutput;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
@@ -68,7 +67,12 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
 
     @Override
     protected long capacity() {
-        return CAPACITY;
+        return Math.max(CAPACITY, Math.round(20 * perBlock()));
+    }
+
+    private static double perBlock() {
+        return ServerConfig.SPEC.isLoaded()
+                ? ServerConfig.IMPACT_ENERGY_PER_BLOCK.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : ENERGY_PER_BLOCK;
     }
 
     public io.github.genichimaruo.singulo.energy.LongEnergyHandler output() {
@@ -89,7 +93,7 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
             outputTick = now;
             outputUsed = 0;
         }
-        return Math.max(0, Math.min(surplus(), PUSH_PER_TICK - outputUsed));
+        return Math.max(0, Math.min(surplus(), Math.max(PUSH_PER_TICK, Math.round(perBlock())) - outputUsed));
     }
 
     private void spend(long amount) {
@@ -101,20 +105,10 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
 
     @Override
     protected void afterDistribute(Level level) {
-        for (Direction dir : Direction.values()) {
-            long room = outputLeft();
-            if (room <= 0) {
-                return;
-            }
-            BlockPos n = worldPosition.relative(dir);
-            if (!level.isLoaded(n) || level.getBlockEntity(n) instanceof GravityReceiverBlockEntity) {
-                continue;
-            }
-            var target = level.getCapability(Capabilities.Energy.BLOCK, n, dir.getOpposite());
-            if (target != null) {
-                io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(output, target, room);
-            }
-        }
+        if (outputLeft() <= 0) return;
+        var output = new NeighborEnergyOutput(level, this::outputLeft, this::spend);
+        output.pushFrom(worldPosition, pos -> !(level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity));
+        output.sendSurplusToPumps();
     }
 
     /** 落ちてきた（fallDistance ブロック）。ためた量を返す。 */
@@ -122,7 +116,7 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
         if (fallDistance < MIN_FALL) {
             return 0;
         }
-        long gain = Math.min(CAPACITY - stored, Math.round(fallDistance * ENERGY_PER_BLOCK));
+        long gain = Math.min(capacity() - stored, Math.round(fallDistance * perBlock()));
         if (gain > 0) {
             stored += gain;
             setChanged();

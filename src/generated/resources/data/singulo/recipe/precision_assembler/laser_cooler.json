@@ -35,6 +35,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    " E E ",
+    " BFB ",
+    " DAD ",
+    " ECE ",
+    "     "
+  ],
   "result": {
     "id": "singulo:laser_cooler",
     "count": 1

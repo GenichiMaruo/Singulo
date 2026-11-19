@@ -64,7 +64,7 @@ public final class CapacityUpgradeGameTests {
         var machine = machine(h);
         var player = TestScope.player(h);
         var menu = new MachineMenu(1, player.getInventory(), machine);
-        int inventory = machine.type().itemSlots();
+        int inventory = menu.playerSlotStart();
         var overclock = new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("overclock_chip")));
         machine.items().setStackInSlot(machine.type().upgradeSlot(), overclock.copy());
         menu.getSlot(inventory).set(CapacityUpgrades.item(2).copyWithCount(3));
@@ -78,14 +78,17 @@ public final class CapacityUpgradeGameTests {
         h.assertTrue(restored.hasOverclock() && restored.energy().getMaxEnergyStored() == 4_000_000
                 && CapacityUpgrades.tier(restored.items().getStackInSlot(restored.type().capacitySlot())) == 2,
                 "Reload changed separate upgrade slots");
-        // Old inventory lacks only the appended capacity slot; speed/catalyst indices stay intact.
-        var old = new net.neoforged.neoforge.items.ItemStackHandler(machine.type().capacitySlot());
-        old.setStackInSlot(machine.type().upgradeSlot(), overclock.copy());
-        old.setStackInSlot(machine.type().catalystSlot(), new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst"))));
+        // Six bulk inputs, output, catalyst and speed upgrade in a save from before capacity upgrades.
+        var old = new net.neoforged.neoforge.items.ItemStackHandler(9);
+        old.setStackInSlot(8, overclock.copy());
+        old.setStackInSlot(7, new ItemStack(BuiltInRegistries.ITEM.getValue(Singulo.id("muon_catalyst"))));
         old.setStackInSlot(0, new ItemStack(Items.IRON_INGOT, 7));
         tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(old,h.getLevel().registryAccess()));
+        tag.putIntArray("slot_layout", new int[]{6, 1});
         io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored,tag, h.getLevel().registryAccess());
-        h.assertTrue(restored.hasOverclock() && restored.items().getStackInSlot(0).getCount() == 7
+        restored.recoverLegacyAssemblyInputs(player);
+        h.assertTrue(restored.hasOverclock() && player.getInventory().countItem(Items.IRON_INGOT) == 7
+                && restored.items().getStackInSlot(machine.type().outputSlot()).isEmpty()
                 && restored.items().getStackInSlot(restored.type().catalystSlot()).getCount() == 1
                 && restored.items().getStackInSlot(restored.type().capacitySlot()).isEmpty(), "Old inventory migration shifted or duplicated slots");
         h.succeed();
@@ -111,18 +114,20 @@ public final class CapacityUpgradeGameTests {
         var machine = machine(h);
         int index = RecipeSelection.indexOf(h.getLevel(), machine.type(), Singulo.id("precision_assembler/neutrino_scanner_module_3"));
         var recipe = RecipeSelection.byIndex(h.getLevel(), machine.type(), index).value();
-        for (int i = 0; i < recipe.ingredients().size(); i++) {
-            var input = recipe.ingredients().get(i);
-            machine.items().setStackInSlot(i, new ItemStack(input.ingredient().items().findFirst().orElseThrow(), input.count()));
+        for (int i = 0; i < machine.assemblyGrid().getSlots(); i++) {
+            var input = recipe.assemblyInput(i);
+            if (input != null) machine.assemblyGrid().setStackInSlot(i, input.ingredient().items().findFirst().map(ItemStack::new).orElseThrow().copyWithCount(1));
         }
-        machine.selectRecipe(index);
         machine.energy().receiveEnergy(Integer.MAX_VALUE, false);
         MachineBlockEntity.serverTick(h.getLevel(), machine.getBlockPos(), machine.getBlockState(), machine);
         h.assertTrue(machine.status() == MachineBlockEntity.Status.NO_POWER && machine.energy().getEnergyStored() == 100_000
                 && machine.items().getStackInSlot(machine.type().outputSlot()).isEmpty(), "Undersized buffer bypassed recipe energy demand: status="+machine.status()+", energy="+machine.energy().getEnergyStored()+", capacity="+machine.energy().getMaxEnergyStored()+", selected="+machine.selectedRecipe()+", recipeEnergy="+recipe.energy()+", speed="+TimeFields.speed(h.getLevel(),machine.getBlockPos()));
-        for (int i = 0; i < recipe.ingredients().size(); i++)
-            h.assertTrue(machine.items().getStackInSlot(i).getCount() == recipe.ingredients().get(i).count(),
-                    "Insufficient capacity consumed materials");
+        for (int i = 0; i < machine.assemblyGrid().getSlots(); i++) {
+            var input = recipe.assemblyInput(i);
+            ItemStack placed = machine.assemblyGrid().getStackInSlot(i);
+            h.assertTrue(input == null ? placed.isEmpty() : placed.getCount() == 1 && input.ingredient().test(placed),
+                    "Insufficient capacity consumed or displaced a material at " + i);
+        }
         h.succeed();
     }
 

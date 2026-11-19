@@ -20,7 +20,18 @@
     {
       "ingredient": "singulo:meteoric_iron_ingot",
       "count": 2
+    },
+    {
+      "ingredient": "singulo:jet_forge_truss",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " DBD ",
+    " AEA ",
+    "  C  ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_collimator",
