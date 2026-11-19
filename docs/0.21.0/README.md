@@ -82,3 +82,21 @@
 - 預け先の種類: チェスト類（チェスト・樽・シュルカーボックス・ほかの MOD の chest/barrel/crate。まだ開けていない戦利品の箱は除く）と、作業（資材口と作業指令台。指令台は隣と、リンクした資材口の倉庫へ入れる）。設定でどちらを優先するか（なければもう一方）、または預けないかを選ぶ。範囲は「近くの箱へ預ける」と同じ（横12・上下4）。
 - 設定はアンドロイドごとに保存（`collect`・`store`。以前のアンドロイドは、拾う・チェスト優先）。装備のページの、並べ替え・預けるボタンの下に2つのボタン（拾う: 磁石、押し込みでオン。預け先: 箱・指令台の画面・赤い斜線の箱）。説明はツールチップ。
 - GameTest `androidsCollectDropsAndStoreThemInAChest`・`androidsKeepPickupsWhenStoringIsOffAndSkipThrownItems`・`androidAutoStashKeepsEditedCargoAfterReload`。
+
+## 精密組立台の手組み（recipe/MachineRecipe・machine/MachineBlockEntity）
+
+- 組立盤は5×5から四隅を除いた21マス（`assembly_grid` に保存）。触媒は盤の外の専用枠（マガジン）、使い終わった触媒は専用の出力枠。外の面からは材料を入れられず、製品と使い終わった触媒だけを取り出せる。
+- レシピの `shape` は5文字×5行で、文字は `ingredients` の番号（A, B, ...）、空白は何も置かないマス。四隅は空けておく。`shape` を持てるのは、復元品も質量もない精密組立台のレシピだけ。`shape` のない（データパックの）レシピは、材料の順に1マス1個で並べた形として扱う。
+- 配置の元は `tools/assembly_shapes.py`、エディターで保存した配置と材料は `tools/assembly_edits/`（[編集手順](../development/README.md#精密組立台のレシピを編集する)）。どの配置図もちょうど1つの製品に当たることを GameTest `everyInstalledAssemblyDiagramMatchesExactlyOneProduct` で、構造部品のレシピがその設備のフレームを使うことを `tools/test_multiblock_recipes.py` で確かめる。
+- 2回分のレシピ（`*_pair`）: 縮退圧縮炉・C空洞・縮退熱炉のフレームと鏡面プレート。右上と左下に1組ずつ置き、触媒は1個。
+- JEI の＋ボタンは1回分を盤に並べ、押し出した部品は持ち物へ戻す（`MachineRecipeTransfer`）。アンドロイドは加工カードの個数を1回分の配置に直して置く（`android/work/AndroidAssembly`）。盤が使用中か材料が足りないときは、材料を手元に残す。
+- 以前の保存（`slot_layout` がない）: 加工の進み具合は捨て、10枠の材料は画面を開いた人の持ち物へ入るだけ戻す。残りは次に開いたときに戻すか、壊したときに落とす。触媒とオーバークロックチップは同じ枠に残る。GameTest `assemblerRecoversLegacyInputsAndDropsAllRemainingContents`。
+- 待機の理由: 配置が違うときは「配置を確認」（`misplaced`）。触媒だけが足りない盤は、できる製品の名前を出す。
+
+## ハンドブックの図（client/HandbookVisual・client/HandbookBlueprint）
+
+- ページごとの図は `tools/guide_visuals.py` で決め、`guide/chapters.json` の `visuals` に書き出す。代表アイコン（`TOPIC_ICONS`。全ページ必須）、行き先（`ROUTES`）、操作の見出し（`ACTION_TITLES`）、レシピの図（`DIAGRAMS`）、説明（`CAPTIONS`）、構造（`BLUEPRINTS`。ホロ投影機と同じ設計図ID）。
+- 構造の図は既定の大きさの設計図を上から見た段ごとの図で、コントローラーの段から開き、＋−で段を移る。段ごとにブロックと個数の一覧を出す。
+- 見せる範囲: 章とページは段階（`CHAPTER_STAGES`・`PAGE_STAGES`）と発見（`CHAPTER_DISCOVERIES`・`PAGE_DISCOVERIES`。進捗、または `item/` で持ち物や見ているブロック）で開く。行き先は見えるページだけ出す。「次の目標」は、未達成のうちは序盤の技術目標（`STARTER_GOALS`）だけを出す。
+- 電解槽の酸素の出力タンクには、焼成炉で使うと石炭が減るという案内を出す。
+- `tools/test_handbook_visuals.py`: 発見の条件が実在の進捗を指し、伏せたページが最初の本に出ないこと。全ページのアイコン・行き先・図が解決できること。鋼鉄の比較の図が加工機と作業台のレシピに合うこと。

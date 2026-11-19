@@ -14,7 +14,7 @@ Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.pr
 |---|---|
 | レシピ・配置・材料 | `tools/recipes.py`。精密組立台の基本配置は`tools/assembly_shapes.py`、エディターで保存した配置と材料は`tools/assembly_edits/`、登録名・別名・タグは`tools/ids.py` |
 | 設定の既定値 | `tools/config_spec.py` |
-| ハンドブック・説明文 | `tools/guide.py`、`tools/descriptions.py`。宇宙設備・液体輸送・コラプサー材の章と説明は `tools/cosmic_content.py`、`tools/logistics_content.py`、`tools/collapsar_content.py` |
+| ハンドブック・説明文 | `tools/guide.py`、`tools/descriptions.py`。ページの図（マルチブロックの段・レシピの図・進む道）は `tools/guide_visuals.py`。宇宙設備・液体輸送・コラプサー材の章と説明は `tools/cosmic_content.py`、`tools/logistics_content.py`、`tools/collapsar_content.py` |
 | 翻訳 | 英日原稿と`tools/locales/`。`source`も一致させる |
 | 実際の加工補正 | `src/main/java/.../recipe/RecipeTweaks.java`。ティア・寿命・設定補正を含む |
 | 機械の枠と能力 | `machine/`、`multiblock/`、`reactor/`などの実装 |
