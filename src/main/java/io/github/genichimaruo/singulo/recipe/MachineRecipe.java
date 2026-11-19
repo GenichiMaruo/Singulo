@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.recipe;
 
+import com.mojang.serialization.DataResult;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
@@ -10,7 +11,6 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
@@ -112,6 +112,138 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     public record Plan(int[] consume, int[] uses, int restoreSlot, double speed) {}
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
+    public boolean hasAssemblyShape() {
+        return !shape.isEmpty();
+    }
+
+    public boolean assemblyCatalyst(ItemInput input) {
+        if (hasAssemblyShape()) return input.uses() > 0;
+        return input.tier() > 0 || java.util.Arrays.stream(input.ingredient().getItems())
+                .anyMatch(stack -> CatalystHelper.tierOf(stack) > 0);
+    }
+
+    /** Can this recipe be laid out once on the assembly board and its single catalyst slot? */
+    public boolean fitsAssemblyBoard() {
+        if (!station.equals("precision_assembler") || mass.isPresent() || !fluidIngredients.isEmpty() || !fluidResults.isEmpty()) return false;
+        if (hasAssemblyShape()) return true;
+        long cells = restore.isPresent() ? 1 : 0;
+        boolean catalyst = false;
+        for (ItemInput input : ingredients) {
+            if (assemblyCatalyst(input)) {
+                if (catalyst || input.uses() <= 0 && input.count() != 1) return false;
+                catalyst = true;
+            } else {
+                cells += input.uses() > 0 ? 1 : input.count();
+            }
+        }
+        return cells <= ASSEMBLY_CELLS;
+    }
+
+    /** For shapeless datapacks, lay out one unit per cell in ingredient order, followed by the restoration item. */
+    public int boardIngredientIndex(int cell) {
+        if (cell < 0 || cell >= ASSEMBLY_CELLS) return BOARD_EMPTY;
+        if (hasAssemblyShape()) return assemblyIngredientIndex(cell);
+        for (int i = 0; i < ingredients.size(); i++) {
+            ItemInput input = ingredients.get(i);
+            if (assemblyCatalyst(input)) continue;
+            int count = input.uses() > 0 ? 1 : input.count();
+            if (cell < count) return i;
+            cell -= count;
+        }
+        return cell == 0 && restore.isPresent() ? BOARD_RESTORE : BOARD_EMPTY;
+    }
+
+    /** Convert a board slot to a row-major five-by-five square, skipping the four corners. */
+    public static int assemblySquare(int gridSlot) {
+        if (gridSlot < 0 || gridSlot >= ASSEMBLY_CELLS) return -1;
+        return gridSlot + (gridSlot < 3 ? 1 : gridSlot < 18 ? 2 : 3);
+    }
+
+    public int assemblyIngredientIndex(int gridSlot) {
+        int square = assemblySquare(gridSlot);
+        if (!hasAssemblyShape() || square < 0) return -1;
+        char symbol = shape.get(square / 5).charAt(square % 5);
+        return symbol == ' ' ? -1 : symbol - 'A';
+    }
+
+    @Nullable
+    public ItemInput assemblyInput(int gridSlot) {
+        int index = assemblyIngredientIndex(gridSlot);
+        return index < 0 ? null : ingredients.get(index);
+    }
+
+    private DataResult<MachineRecipe> validateAssemblyShape() {
+        if (!hasAssemblyShape()) return DataResult.success(this);
+        if (!station.equals("precision_assembler") || restore.isPresent() || mass.isPresent())
+            return DataResult.error(() -> "shape requires a precision assembler recipe without restore or mass");
+        if (shape.size() != 5 || shape.stream().anyMatch(row -> row.length() != 5))
+            return DataResult.error(() -> "shape must have five rows of five characters");
+        int[] counts = new int[ingredients.size()];
+        for (int y = 0; y < 5; y++) for (int x = 0; x < 5; x++) {
+            char cell = shape.get(y).charAt(x);
+            if (cell == ' ') continue;
+            if ((x == 0 || x == 4) && (y == 0 || y == 4))
+                return DataResult.error(() -> "The four corners of an assembly shape must be empty");
+            int index = cell - 'A';
+            if (cell < 'A' || cell > 'Z' || index >= counts.length)
+                return DataResult.error(() -> "Unknown assembly ingredient symbol: " + cell);
+            counts[index]++;
+        }
+        int catalysts = 0;
+        for (int i = 0; i < counts.length; i++) {
+            ItemInput input = ingredients.get(i);
+            if (input.uses > 0) catalysts++;
+            if (counts[i] != (input.uses > 0 ? 0 : input.count))
+                return DataResult.error(() -> "Assembly cell counts must match the consumed ingredients");
+        }
+        if (catalysts > 1) return DataResult.error(() -> "The assembly board has one catalyst slot");
+        return DataResult.success(this);
+    }
+
+    /** The 21 physical assembly cells in row order, followed by the active catalyst. */
+    @Nullable
+    public Plan assemblyPlan(List<ItemStack> boardWithCatalyst) {
+        if (boardWithCatalyst.size() != ASSEMBLY_CELLS + 1) return null;
+        if (!hasAssemblyShape()) {
+            Plan shapeless = unorderedAssemblyPlan(boardWithCatalyst);
+            if (shapeless == null) return null;
+            for (int i = 0; i < ASSEMBLY_CELLS; i++) {
+                ItemStack stack = boardWithCatalyst.get(i);
+                if (!stack.isEmpty() && shapeless.consume[i] == 0 && shapeless.uses[i] == 0) return null;
+            }
+            return shapeless;
+        }
+        if (!matchesAssemblyMaterials(boardWithCatalyst)) return null;
+        double speed = 1;
+        int cost = 0;
+        ItemStack catalyst = boardWithCatalyst.get(ASSEMBLY_CELLS);
+        for (ItemInput input : ingredients) {
+            if (input.uses <= 0) continue;
+            cost = input.usesFrom(catalyst);
+            if (cost == 0) return null;
+            if (input.tier > 0) speed = CatalystHelper.higherSpeed(CatalystHelper.tierOf(catalyst) - input.tier);
+        }
+        int[] consume = new int[boardWithCatalyst.size()], uses = new int[boardWithCatalyst.size()];
+        for (int i = 0; i < ASSEMBLY_CELLS; i++) if (!boardWithCatalyst.get(i).isEmpty()) consume[i] = 1;
+        uses[ASSEMBLY_CELLS] = cost;
+        return new Plan(consume, uses, -1, speed);
+    }
+
+    /** Check the physical diagram independently of the separately loaded catalyst. */
+    public boolean matchesAssemblyMaterials(List<ItemStack> board) {
+        if (!hasAssemblyShape() || board.size() < ASSEMBLY_CELLS) return false;
+        for (int i = 0; i < ASSEMBLY_CELLS; i++) {
+            ItemInput part = assemblyInput(i);
+            ItemStack stack = board.get(i);
+            if (part == null ? !stack.isEmpty() : stack.isEmpty() || !part.ingredient.test(stack)) return false;
+        }
+        return true;
+    }
+
+    public boolean canRestoreFrom(ItemStack stack) {
+        return restore.isPresent() && restore.get().test(stack) && UsesHelper.canRestore(stack);
+    }
+
     @Nullable
     public Plan plan(List<ItemStack> slots) {
         return plan(slots, false);
@@ -216,7 +348,11 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 ItemStack input = inputs.get(i);
                 if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
                     // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
-                    out.copyFrom(input, DataComponents.CONTAINER, SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME);
+                    var contents = io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.contents(input);
+                    io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.setContents(out, contents);
+                    int energy = SinguloComponents.getOrDefault(input, SinguloComponents.ENERGY.get(), 0);
+                    if (energy > 0) SinguloComponents.set(out, SinguloComponents.ENERGY.get(), energy);
+                    if (input.hasCustomHoverName()) out.setHoverName(input.getHoverName());
                     break;
                 }
             }
@@ -315,32 +451,49 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                     for (var entry : c.entrySet()) result.getOrCreateTag().put(entry.getKey(), com.mojang.serialization.JsonOps.INSTANCE.convertTo(net.minecraft.nbt.NbtOps.INSTANCE, entry.getValue()));
                 }
             }
+            var shape = new java.util.ArrayList<String>();
+            if (json.has("shape")) for (var row : json.getAsJsonArray("shape")) shape.add(row.getAsString());
             var recipe = new MachineRecipe(json.get("station").getAsString(), integer(json,"stage",1), integer(json,"time",1), integer(json,"energy",0), ingredients, fluids, mass,
-                    json.has("restore") ? Optional.of(Ingredient.fromJson(json.get("restore"))) : Optional.empty(), result, outputs, integer(json,"min_size",0), integer(json,"priority",0), json.has("byproduct") ? readOutput(json.getAsJsonObject("byproduct")) : ItemStack.EMPTY);
-            return recipe.withId(id);
+                    json.has("restore") ? Optional.of(Ingredient.fromJson(json.get("restore"))) : Optional.empty(), result, outputs, integer(json,"min_size",0), integer(json,"priority",0), json.has("byproduct") ? readOutput(json.getAsJsonObject("byproduct")) : ItemStack.EMPTY, shape);
+            return recipe.validateAssemblyShape().getOrThrow(false, error -> { throw new IllegalArgumentException(error); }).withId(id);
         }
         private static ItemStack readOutput(com.google.gson.JsonObject json) {
             return new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(
                     json.get(json.has("id") ? "id" : "item").getAsString())), integer(json, "count", 1));
         }
         private static int integer(com.google.gson.JsonObject o, String key, int fallback) { return o.has(key) ? o.get(key).getAsInt() : fallback; }
+        private static ItemStack readQuantity(FriendlyByteBuf buffer) {
+            ItemStack stack = buffer.readItem();
+            if (stack.isEmpty()) return stack;
+            int count = buffer.readVarInt();
+            if (count <= 0) throw new IllegalArgumentException("Invalid machine recipe quantity");
+            stack.setCount(count);
+            return stack;
+        }
+
+        private static void writeQuantity(FriendlyByteBuf buffer, ItemStack stack) {
+            buffer.writeItem(stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(1));
+            if (!stack.isEmpty()) buffer.writeVarInt(stack.getCount());
+        }
+
         public MachineRecipe fromNetwork(net.minecraft.resources.ResourceLocation id, FriendlyByteBuf buf) {
             var ingredients = buf.readList(b -> new ItemInput(Ingredient.fromNetwork(b), b.readVarInt(), b.readVarInt(), b.readVarInt()));
             var fluids = buf.readList(b -> new FluidInput(net.minecraft.core.registries.BuiltInRegistries.FLUID.byId(b.readVarInt()), b.readVarInt()));
             Optional<MassInput> mass = buf.readBoolean() ? Optional.of(new MassInput(buf.readDouble(),buf.readBoolean())) : Optional.empty();
             Optional<Ingredient> restore = buf.readBoolean() ? Optional.of(Ingredient.fromNetwork(buf)) : Optional.empty();
-            ItemStack result = buf.readItem();
+            ItemStack result = readQuantity(buf);
             var outputs = buf.readList(FluidStack::readFromPacket);
-            var recipe = new MachineRecipe(buf.readUtf(),buf.readVarInt(),buf.readVarInt(),buf.readVarInt(),ingredients,fluids,mass,restore,result,outputs,buf.readVarInt(),buf.readVarInt(),buf.readItem());
-            return recipe.withId(id);
+            var recipe = new MachineRecipe(buf.readUtf(),buf.readVarInt(),buf.readVarInt(),buf.readVarInt(),ingredients,fluids,mass,restore,result,outputs,buf.readVarInt(),buf.readVarInt(),readQuantity(buf),buf.readList(b -> b.readUtf(5)));
+            return recipe.validateAssemblyShape().getOrThrow(false, error -> { throw new IllegalArgumentException(error); }).withId(id);
         }
         public void toNetwork(FriendlyByteBuf buf, MachineRecipe r) {
             buf.writeCollection(r.ingredients(), (b,v) -> { v.ingredient().toNetwork(b); b.writeVarInt(v.count()); b.writeVarInt(v.uses()); b.writeVarInt(v.tier()); });
             buf.writeCollection(r.fluidIngredients(), (b,v) -> { b.writeVarInt(net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(v.fluid())); b.writeVarInt(v.amount()); });
             buf.writeBoolean(r.mass().isPresent()); r.mass().ifPresent(v -> { buf.writeDouble(v.amount()); buf.writeBoolean(v.metalOnly()); });
             buf.writeBoolean(r.restore().isPresent()); r.restore().ifPresent(v -> v.toNetwork(buf));
-            buf.writeItem(r.result()); buf.writeCollection(r.fluidResults(), (b,v) -> v.writeToPacket(b));
-            buf.writeUtf(r.station()); buf.writeVarInt(r.stage()); buf.writeVarInt(r.time()); buf.writeVarInt(r.energy()); buf.writeVarInt(r.minSize()); buf.writeVarInt(r.priority()); buf.writeItem(r.byproduct());
+            writeQuantity(buf, r.result()); buf.writeCollection(r.fluidResults(), (b,v) -> v.writeToPacket(b));
+            buf.writeUtf(r.station()); buf.writeVarInt(r.stage()); buf.writeVarInt(r.time()); buf.writeVarInt(r.energy()); buf.writeVarInt(r.minSize()); buf.writeVarInt(r.priority()); writeQuantity(buf, r.byproduct());
+            buf.writeCollection(r.shape(), (b, row) -> b.writeUtf(row, 5));
         }
     }
 }

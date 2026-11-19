@@ -844,7 +844,7 @@ public abstract class RuinAndroid extends Monster {
         }
         long n = 0;
         for (var t : tanks) {
-            if (t.isEmpty() || net.minecraftforge.fluids.io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
+            if (t.isEmpty() || io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
                 n += Math.max(0, t.getSpace());
             }
         }
@@ -934,7 +934,7 @@ public abstract class RuinAndroid extends Monster {
         var exec = net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
         var contained = handler.drain(Integer.MAX_VALUE, net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
         boolean filled = false, emptied = false;
-        if (!contained.isEmpty() && (tank.isEmpty() || net.minecraftforge.fluids.io.github.genichimaruo.singulo.compat.Legacy.sameFluid(tank.getFluid(), contained))) {
+        if (!contained.isEmpty() && (tank.isEmpty() || io.github.genichimaruo.singulo.compat.Legacy.sameFluid(tank.getFluid(), contained))) {
             var got = handler.drain(Math.min(Math.max(0, tank.getSpace()), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
             if (!got.isEmpty()) {
                 tank.fill(got, exec);
@@ -1232,7 +1232,7 @@ public abstract class RuinAndroid extends Monster {
         t.putInt("personal", personal);
         if (usesPersonalTanks()) {
             var balances = new net.minecraft.nbt.ListTag();
-            for (ItemCount held : personalLiquids) balances.add(held.save(registryAccess()));
+            for (ItemCount held : personalLiquids) balances.add(held.save(level().registryAccess()));
             t.put("personal_liquids", balances);
         }
         if (escrowRequest != null) t.putUUID("escrow_request",escrowRequest);
@@ -1274,7 +1274,7 @@ public abstract class RuinAndroid extends Monster {
         personal = t.getInt("personal");
         personalLiquids.clear();
         for (var element : t.getList("personal_liquids", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-            var held = ItemCount.load((CompoundTag) element, registryAccess());
+            var held = ItemCount.load((CompoundTag) element, level().registryAccess());
             if (io.github.genichimaruo.singulo.android.work.FluidSamples.liquid(held.item) && held.count >= 0) personalLiquids.add(held);
         }
         workGoal.loadWork(t);
@@ -1577,7 +1577,7 @@ public abstract class RuinAndroid extends Monster {
             return 2;
         }
         // まだ開けていない戦利品の箱（遺構・村など）には入れない
-        if (be instanceof net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity r && r.getLootTable() != null) {
+        if (be instanceof net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity r && r.saveWithoutMetadata().contains("LootTable", net.minecraft.nbt.Tag.TAG_STRING)) {
             return 0;
         }
         boolean box = be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity
@@ -2711,7 +2711,7 @@ public abstract class RuinAndroid extends Monster {
     }
 
     private void loadHome(CompoundTag tag) {
-        BlockPos pos = NbtUtils.readBlockPos(tag, "home").orElse(null);
+        BlockPos pos = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "home").orElse(null);
         if (pos == null) {
             setHome(null);
             return;

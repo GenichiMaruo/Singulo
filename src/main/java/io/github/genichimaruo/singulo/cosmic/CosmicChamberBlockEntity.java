@@ -370,11 +370,11 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         tag.putInt("progress",progress);tag.putInt("duration",duration);tag.putInt("cost",cost);tag.putBoolean("core",core);tag.putInt("status",status);
         tag.putInt("in",lastIn);tag.putInt("out",lastOut);tag.putIntArray("ports",portModes);if(!reserved.isEmpty())tag.put("reserved",reserved.save(new CompoundTag()));
     }
-    @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider registries){
-        super.loadAdditional(tag,registries);
+    @Override public void load(CompoundTag tag){
+        super.load(tag);
         if(tag.contains("items")){checked=false;}                 // 保存データから読み込んだ: 最初の判定では演出しない
-        if(tag.contains("items"))items.deserializeNBT(registries,tag.getCompound("items"));
-        stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(registries,tag.getCompound("tank"));
+        if(tag.contains("items"))items.deserializeNBT(tag.getCompound("items"));
+        stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(tag.getCompound("tank"));
         duration=Math.max(0,tag.getInt("duration"));progress=Math.max(0,Math.min(duration,tag.getInt("progress")));cost=Math.max(0,tag.getInt("cost"));core=tag.getBoolean("core");
         status=tag.getInt("status");lastIn=tag.getInt("in");lastOut=tag.getInt("out");
         int[] ports=tag.getIntArray("ports");

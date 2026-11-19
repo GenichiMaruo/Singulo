@@ -99,7 +99,7 @@ public final class LiquidStores {
     }
 
     private BlockPos storageKey(ItemStack sample, BlockPos pos) {
-        Object handler = ChemicalSamples.is(sample) ? chemicals.getFirst() : fluids.getFirst();
+        Object handler = ChemicalSamples.is(sample) ? chemicals.get(0) : fluids.get(0);
         return handler instanceof AndroidSharedStorage shared ? SupplyPortBlockEntity.sharedSeenKey(shared.sharedStorageKey()) : pos;
     }
 
@@ -132,7 +132,7 @@ public final class LiquidStores {
                 List<ItemCount> available = new ArrayList<>();
                 store.addTo(available);
                 for (ItemCount item : available) {
-                    Object handler = FluidSamples.is(item.item) ? store.fluids.getFirst() : store.chemicals.getFirst();
+                    Object handler = FluidSamples.is(item.item) ? store.fluids.get(0) : store.chemicals.get(0);
                     BlockPos key = shared.computeIfAbsent(handler, h -> store.storageKey(item.item, pos));
                     List<Supply> faces = tanks.computeIfAbsent(key, ignored -> new ArrayList<>());
                     // Two faces can expose the same tank with different drain permissions.

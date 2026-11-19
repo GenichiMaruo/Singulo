@@ -14,7 +14,6 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
 /** Translate the counts on a processing card into one physical placement by the worker at the table. */
@@ -36,7 +35,7 @@ public final class AndroidAssembly {
     }
 
     // Orders keep the same card for repeated visits. A datapack/config reload replaces the station list.
-    private record Cached(List<RecipeHolder<MachineRecipe>> recipes, @Nullable AndroidAssembly assembly) {}
+    private record Cached(List<MachineRecipe> recipes, @Nullable AndroidAssembly assembly) {}
     private static final Map<RecipeData, Cached> CACHE = new WeakHashMap<>();
 
     @Nullable

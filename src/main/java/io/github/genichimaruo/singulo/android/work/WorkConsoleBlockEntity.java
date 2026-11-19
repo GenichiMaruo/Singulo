@@ -1555,7 +1555,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 var chosen = new ArrayList<ItemCount>();
                 WorkPlanner.take(carriedList(a), chosen, o.target, left);
                 if (chosen.isEmpty()) return null;
-                var pair = chosen.getFirst();
+                var pair = chosen.get(0);
                 o.deliverInProgress += pair.count;
                 return lease(new WorkJob(WorkJob.Type.DELIVER, o.id, nextJobId++, pair.count, List.of(pair), List.of(), true), a);
             }

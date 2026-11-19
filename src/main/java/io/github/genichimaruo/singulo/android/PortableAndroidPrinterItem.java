@@ -9,7 +9,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,19 +23,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.energy.ComponentEnergyStorage;
+import io.github.genichimaruo.singulo.compat.ComponentEnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * 携帯型アンドロイド印刷機（0.21.0）。手で持てるカバン型の印刷機で、外出先でアンドロイドを1体ずつ印刷する。
  * <ul>
  * <li>組: 小型クリスタルメモリ（型を決める。減らない）・アンドロイドキット（印刷ごとに1つ）・自己修理キットのストック（1スタック）・
- *     アンドロイド用装甲板の4枠。Mk1 は1組、Mk2 は3組（{@link #units}）。中身はアイテムの中に持つ（{@link DataComponents#CONTAINER}）</li>
+ *     アンドロイド用装甲板の4枠。Mk1 は1組、Mk2 は3組（{@link #units}）。中身はアイテムの中に持つ（item NBT）</li>
  * <li>印刷: 地面に置くたびに、そろっている次の組（Mk2 は組を順に回る。{@link SinguloComponents#PRINTER_NEXT}）で1体印刷する</li>
  * <li>アンドロイド用装甲板: 印刷したアンドロイドに積む（胸当てとして装備する）</li>
  * <li>自己修理キット: 印刷したアンドロイドに持たせ（アンドロイドの枠に入るだけ）、持ち歩いている間は、近くの自分の身寄りのないアンドロイドのキットが減っていれば補充する</li>
@@ -116,12 +114,15 @@ public class PortableAndroidPrinterItem extends Item {
 
     public static NonNullList<ItemStack> contents(ItemStack stack) {
         NonNullList<ItemStack> out = NonNullList.withSize(Math.max(PER_UNIT, slots(stack)), ItemStack.EMPTY);
-        stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(out);
+        var stored = stack.getTagElement("SinguloPrinter");
+        if (stored != null) net.minecraft.world.ContainerHelper.loadAllItems(stored, out);
         return out;
     }
 
     public static void setContents(ItemStack stack, List<ItemStack> items) {
-        stack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
+        var copy = NonNullList.withSize(Math.max(PER_UNIT, slots(stack)), ItemStack.EMPTY);
+        for (int i = 0; i < Math.min(copy.size(), items.size()); i++) copy.set(i, items.get(i).copy());
+        stack.addTagElement("SinguloPrinter", net.minecraft.world.ContainerHelper.saveAllItems(new net.minecraft.nbt.CompoundTag(), copy));
     }
 
     @Nullable
@@ -172,7 +173,7 @@ public class PortableAndroidPrinterItem extends Item {
     /** 次に印刷する組（そろっている組を、前に印刷した組の次から順に探す）。なければ -1。 */
     public static int readyUnit(ItemStack stack) {
         int n = units(stack);
-        int next = Math.floorMod(stack.getOrDefault(SinguloComponents.PRINTER_NEXT.get(), 0), Math.max(1, n));
+        int next = Math.floorMod(SinguloComponents.getOrDefault(stack, SinguloComponents.PRINTER_NEXT.get(), 0), Math.max(1, n));
         for (int i = 0; i < n; i++) {
             int u = (next + i) % n;
             if (problem(stack, u) == null) {
@@ -304,7 +305,7 @@ public class PortableAndroidPrinterItem extends Item {
 
     public static void openMenu(ServerPlayer player, InteractionHand hand) {
         Component title = player.getItemInHand(hand).getHoverName();
-        player.openMenu(new SimpleMenuProvider((id, inv, p) -> new PortablePrinterMenu(id, inv, hand), title), buf -> buf.writeEnum(hand));
+        net.minecraftforge.network.NetworkHooks.openScreen(player, new SimpleMenuProvider((id, inv, p) -> new PortablePrinterMenu(id, inv, hand), title), buf -> buf.writeEnum(hand));
     }
 
     /** 置ける所か: 足もとが固く、カバンの広さ（1×1）とアンドロイドの背丈（2段）が空いている。 */
@@ -359,13 +360,13 @@ public class PortableAndroidPrinterItem extends Item {
         List<ItemStack> items = new ArrayList<>(contents(stack));
         items.get(slot(unit, SLOT_KIT)).shrink(1);
         setContents(stack, items);
-        stack.set(SinguloComponents.PRINTER_NEXT.get(), (unit + 1) % units(stack));
+        SinguloComponents.set(stack, SinguloComponents.PRINTER_NEXT.get(), (unit + 1) % units(stack));
         ItemStack carried = stack.copy();
         player.setItemInHand(hand, ItemStack.EMPTY);
         Vec3 c = Vec3.atBottomCenterOf(at);
         PortablePrinterEntity e = new PortablePrinterEntity(level, c, player.getYRot() + 180, carried, player.getUUID(), kind, unit);
         level.addFreshEntity(e);
-        level.playSound(null, at, SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS, 0.8F, 1.2F);
+        level.playSound(null, at, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.PLAYERS, 0.8F, 1.2F);
         return true;
     }
 
@@ -387,7 +388,7 @@ public class PortableAndroidPrinterItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         int stored = energy(stack).getEnergyStored();
         tooltip.add(Component.translatable("tooltip.singulo.energy", EnergyText.of(stored), EnergyText.of(capacity(stack)))
                 .withStyle(ChatFormatting.GRAY));

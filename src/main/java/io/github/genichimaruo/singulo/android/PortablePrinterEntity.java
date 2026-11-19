@@ -3,7 +3,6 @@ package io.github.genichimaruo.singulo.android;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -84,9 +83,9 @@ public class PortablePrinterEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(AGE, 0);
-        builder.define(ITEM, ItemStack.EMPTY);
+    protected void defineSynchedData() {
+        entityData.define(AGE, 0);
+        entityData.define(ITEM, ItemStack.EMPTY);
     }
 
     /** 置いてからの時間（tick）。描画の開き具合はここから決まる。 */
@@ -220,8 +219,7 @@ public class PortablePrinterEntity extends Entity {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        HolderLookup.Provider registries = registryAccess();
-        setPrinter(ItemStack.parseOptional(registries, tag.getCompound("printer")));
+        setPrinter(ItemStack.of(tag.getCompound("printer")));
         unit = tag.getInt("unit");
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         android = tag.hasUUID("android") ? tag.getUUID("android") : null;
@@ -237,7 +235,7 @@ public class PortablePrinterEntity extends Entity {
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
         if (!printer.isEmpty()) {
-            tag.put("printer", printer.save(registryAccess()));
+            tag.put("printer", printer.save(new CompoundTag()));
         }
         if (owner != null) {
             tag.putUUID("owner", owner);
@@ -250,5 +248,9 @@ public class PortablePrinterEntity extends Entity {
         }
         tag.putInt("age", age());
         tag.putInt("unit", unit);
+    }
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getAddEntityPacket() {
+        return net.minecraftforge.network.NetworkHooks.getEntitySpawningPacket(this);
     }
 }

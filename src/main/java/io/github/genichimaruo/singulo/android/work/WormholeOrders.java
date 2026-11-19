@@ -20,20 +20,20 @@ public final class WormholeOrders {
     }
 
     public static boolean pattern(ItemStack stack) {
-        return mouth(stack) && !stack.has(SinguloComponents.WORMHOLE.get());
+        return mouth(stack) && SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get()) == null;
     }
 
     private static ItemStack sample(ItemStack stack) {
-        var data = stack.get(SinguloComponents.WORMHOLE.get());
+        var data = SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get());
         if (!mouth(stack) || data == null || data.placed()) return stack;
         var copy = stack.copy();
-        copy.remove(SinguloComponents.WORMHOLE.get());
+        SinguloComponents.remove(copy, SinguloComponents.WORMHOLE.get());
         return copy;
     }
 
     public static boolean matches(ItemStack wanted, ItemStack actual) {
         if (ItemStack.isSameItemSameTags(wanted, actual)) return true;
-        return wanted.is(actual.getItem()) && pattern(wanted) && actual.has(SinguloComponents.WORMHOLE.get())
+        return wanted.is(actual.getItem()) && pattern(wanted) && (SinguloComponents.get(actual, SinguloComponents.WORMHOLE.get()) != null)
                 && ItemStack.isSameItemSameTags(wanted, sample(actual));
     }
 
@@ -46,14 +46,14 @@ public final class WormholeOrders {
         var waiting = new java.util.HashSet<io.github.genichimaruo.singulo.wormhole.WormholeData>();
         for (int i = 0; i < machine.getSlots(); i++) {
             var stack = machine.getStackInSlot(i);
-            if (mouth(stack) && stack.has(SinguloComponents.WORMHOLE.get())) waiting.add(stack.get(SinguloComponents.WORMHOLE.get()));
+            if (mouth(stack) && (SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get()) != null)) waiting.add(SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get()));
         }
         var seen = new java.util.HashSet<io.github.genichimaruo.singulo.wormhole.WormholeData>();
         var first = ItemStack.EMPTY;
         var paired = ItemStack.EMPTY;
         for (int i : worker.carrySlots()) {
             var stack = worker.inventory().getItem(i);
-            var link = stack.get(SinguloComponents.WORMHOLE.get());
+            var link = SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get());
             if (link == null || !matches(wanted, stack) || UnstableMouthItem.expired(stack, worker.level())) continue;
             if (waiting.contains(link)) return stack;
             if (first.isEmpty()) first = stack;
@@ -79,7 +79,7 @@ public final class WormholeOrders {
         var singles = new java.util.HashSet<WorkPlanner.Key>();
         for (int slot = 0; slot < out.getSlots(); slot++) {
             var stack = out.getStackInSlot(slot);
-            if (!matches(wanted, stack) || !stack.has(SinguloComponents.WORMHOLE.get())) continue;
+            if (!matches(wanted, stack) || SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get()) == null) continue;
             var possible = out.extractItem(slot, 2, true);
             if (!possible.isEmpty() && (possible.getCount() >= 2 || !singles.add(WorkPlanner.Key.of(possible)))) return possible;
         }

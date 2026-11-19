@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.pipe;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.EnumMap;
 import java.util.Map;
@@ -9,6 +8,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import java.util.List;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -61,13 +65,12 @@ public final class FluidPumpBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any().setValue(INTAKE, Direction.NORTH));
     }
 
-    @Override protected MapCodec<FluidPumpBlock> codec() { return simpleCodec(FluidPumpBlock::new); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) { b.add(INTAKE); }
     @Override public BlockState getStateForPlacement(BlockPlaceContext ctx) { return defaultBlockState().setValue(INTAKE, ctx.getClickedFace().getOpposite()); }
-    @Override protected BlockState rotate(BlockState s, Rotation r) { return s.setValue(INTAKE, r.rotate(s.getValue(INTAKE))); }
-    @Override protected BlockState mirror(BlockState s, Mirror m) { return rotate(s, m.getRotation(s.getValue(INTAKE))); }
-    @Override protected RenderShape getRenderShape(BlockState s) { return RenderShape.MODEL; }
-    @Override protected VoxelShape getShape(BlockState s, BlockGetter level, BlockPos pos, CollisionContext ctx) { return SHAPES.get(s.getValue(INTAKE)); }
+    @Override public BlockState rotate(BlockState s, Rotation r) { return s.setValue(INTAKE, r.rotate(s.getValue(INTAKE))); }
+    @Override public BlockState mirror(BlockState s, Mirror m) { return rotate(s, m.getRotation(s.getValue(INTAKE))); }
+    @Override public RenderShape getRenderShape(BlockState s) { return RenderShape.MODEL; }
+    @Override public VoxelShape getShape(BlockState s, BlockGetter level, BlockPos pos, CollisionContext ctx) { return SHAPES.get(s.getValue(INTAKE)); }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new FluidPumpBlockEntity(pos, state); }
 
     @Override @Nullable
@@ -76,8 +79,15 @@ public final class FluidPumpBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (player instanceof ServerPlayer sp && level.getBlockEntity(pos) instanceof FluidPumpBlockEntity pump) pump.open(sp);
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+    @Override public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        List<ItemStack> drops = super.getDrops(state, params);
+        if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof FluidPumpBlockEntity pump) {
+            for (ItemStack stack : drops) if (stack.is(asItem())) pump.copyContentsToItem(stack);
+        }
+        return drops;
     }
 }

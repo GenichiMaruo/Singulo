@@ -3,7 +3,6 @@ package io.github.genichimaruo.singulo.android.work;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -25,7 +24,7 @@ final class SupplyReservations extends SavedData {
 
     static SupplyReservations get(ServerLevel level) {
         return level.getServer().overworld().getDataStorage().computeIfAbsent(
-                new Factory<>(SupplyReservations::new, SupplyReservations::load, null), "singulo_android_supply_claims");
+                SupplyReservations::load, SupplyReservations::new, "singulo_android_supply_claims");
     }
 
     private static Store store(ServerLevel level, BlockPos pos) {
@@ -97,10 +96,10 @@ final class SupplyReservations extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag tag) {
         ListTag entries = new ListTag();
         owners.forEach((owner, claims) -> claims.forEach((key, item) -> {
-            var entry = item.save(registries);
+            var entry = item.save();
             entry.putString("dimension", owner.dimension);
             entry.put("console", NbtUtils.writeBlockPos(owner.pos));
             entry.put("point", NbtUtils.writeBlockPos(key.point.pos));
@@ -112,16 +111,16 @@ final class SupplyReservations extends SavedData {
         return tag;
     }
 
-    static SupplyReservations load(CompoundTag tag, HolderLookup.Provider registries) {
+    static SupplyReservations load(CompoundTag tag) {
         var data = new SupplyReservations();
         for (Tag t : tag.getList("claims", Tag.TAG_COMPOUND)) {
             CompoundTag entry = (CompoundTag)t;
-            ItemCount item = ItemCount.load(entry, registries);
-            var pos = NbtUtils.readBlockPos(entry, "console");
-            var store = NbtUtils.readBlockPos(entry, "store");
+            ItemCount item = ItemCount.load(entry);
+            var pos = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(entry, "console");
+            var store = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(entry, "store");
             if (item.count > 0 && !item.item.isEmpty() && pos.isPresent() && store.isPresent()) {
                 String dimension = entry.getString("dimension");
-                var point = NbtUtils.readBlockPos(entry, "point").orElse(pos.get());
+                var point = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(entry, "point").orElse(pos.get());
                 data.change(new Owner(dimension, pos.get()), new Owner(dimension, point),
                         new Store(entry.getString("store_dimension"), store.get()), item.item, item.count);
             }

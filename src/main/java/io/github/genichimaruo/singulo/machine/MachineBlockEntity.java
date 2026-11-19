@@ -1514,8 +1514,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (packStockOnBreak()) {
             if (!level.isClientSide) {
                 ItemStack packed = new ItemStack(getBlockState().getBlock());
-                net.minecraft.world.item.BlockItem.setBlockEntityData(packed, getType(), saveCustomOnly(level.registryAccess()));
-                packed.set(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
+                net.minecraft.world.item.BlockItem.setBlockEntityData(packed, getType(), saveWithoutMetadata());
                 Block.popResource(level, pos, packed);
             }
             return;
@@ -1585,7 +1584,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             tag.putIntArray("assembly_returns", assemblyReturns.stream().toArray());
             if (!legacyAssemblyInputs.isEmpty()) {
                 ListTag old = new ListTag();
-                for (ItemStack stack : legacyAssemblyInputs) old.add(stack.save(registries));
+                for (ItemStack stack : legacyAssemblyInputs) old.add(stack.save(new CompoundTag()));
                 tag.put("legacy_assembly_inputs", old);
             }
         }
@@ -1668,7 +1667,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (assemblyGrid != null) {
             legacyAssemblyInputs.clear();
             for (Tag entry : tag.getList("legacy_assembly_inputs", Tag.TAG_COMPOUND)) {
-                ItemStack stack = ItemStack.parseOptional(registries, (CompoundTag) entry);
+                ItemStack stack = ItemStack.of((CompoundTag) entry);
                 if (!stack.isEmpty()) legacyAssemblyInputs.add(stack);
             }
             for (int i = 0; i < Math.min(loaded.getSlots(), layout[0]); i++) {

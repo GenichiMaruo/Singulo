@@ -3,8 +3,7 @@ package io.github.genichimaruo.singulo.android;
 import io.github.genichimaruo.singulo.machine.GuiFrame;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -17,7 +16,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemContainerContents;
 
 /**
  * 携帯型アンドロイド印刷機の画面（0.21.0）。組ごとに1行（メモリ・キット、少しあけて自己修理キットのストックと装甲板）。
@@ -39,7 +37,8 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
     private final int units;
     private final SimpleContainer contents;
     private final ContainerData data;
-    private ItemContainerContents shownContents;
+    private net.minecraft.nbt.CompoundTag shownContents;
+    private boolean refreshing;
 
     public PortablePrinterMenu(int id, Inventory inventory, InteractionHand hand) {
         super(SinguloMenus.PORTABLE_PRINTER.get(), id);
@@ -60,7 +59,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
                 return switch (index) {
                     case D_ENERGY -> PortableAndroidPrinterItem.energy(s).getEnergyStored();
                     case D_CAPACITY -> PortableAndroidPrinterItem.capacity(s);
-                    default -> Math.floorMod(s.getOrDefault(SinguloComponents.PRINTER_NEXT.get(), 0), units);
+                    default -> Math.floorMod(SinguloComponents.getOrDefault(s, SinguloComponents.PRINTER_NEXT.get(), 0), units);
                 };
             }
 
@@ -139,7 +138,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public static PortablePrinterMenu client(int id, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static PortablePrinterMenu client(int id, Inventory inventory, FriendlyByteBuf buf) {
         return new PortablePrinterMenu(id, inventory, buf.readEnum(InteractionHand.class));
     }
 
@@ -176,18 +175,25 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
     }
 
     private void refreshContents() {
-        ItemContainerContents stored = openedPrinter.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        if (shownContents != stored) {
-            stored.copyInto(contents.getItems());
-            shownContents = stored;
+        var stored = openedPrinter.getTagElement("SinguloPrinter");
+        if (java.util.Objects.equals(shownContents, stored)) return;
+        var source = PortableAndroidPrinterItem.contents(openedPrinter);
+        refreshing = true;
+        try {
+            for (int i = 0; i < contents.getContainerSize(); i++) contents.setItem(i, source.get(i));
+            shownContents = stored == null ? null : stored.copy();
+        } finally {
+            refreshing = false;
         }
     }
 
     private void save() {
-        if (!printer().isEmpty()) {
-            shownContents = ItemContainerContents.fromItems(contents.getItems());
-            openedPrinter.set(DataComponents.CONTAINER, shownContents);
-        }
+        if (refreshing || printer().isEmpty()) return;
+        var items = new java.util.ArrayList<ItemStack>();
+        for (int i = 0; i < contents.getContainerSize(); i++) items.add(contents.getItem(i));
+        PortableAndroidPrinterItem.setContents(openedPrinter, items);
+        var stored = openedPrinter.getTagElement("SinguloPrinter");
+        shownContents = stored == null ? null : stored.copy();
     }
 
     @Override
@@ -226,7 +232,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
             return false;
         }
         if (id >= BUTTON_SELECT && id < BUTTON_SELECT + units) {
-            printer.set(SinguloComponents.PRINTER_NEXT.get(), id - BUTTON_SELECT);
+            SinguloComponents.set(printer, SinguloComponents.PRINTER_NEXT.get(), id - BUTTON_SELECT);
             return true;
         }
         if (id != BUTTON_PRINT) {

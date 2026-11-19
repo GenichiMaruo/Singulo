@@ -68,8 +68,12 @@ public class FluidCapsuleItem extends DroneCrateItem {
         }
         FluidStack old = fluid(stack);
         int limit = io.github.genichimaruo.singulo.compat.Legacy.sameFluid(fluid, old) ? Math.max(capacityMb(), old.getAmount()) : capacityMb();
-        stack.set(SinguloComponents.CAPSULE_FLUID.get(), SimpleFluidContent.copyOf(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, Math.min(limit, fluid.getAmount()))));
-        stack.set(DataComponents.MAX_STACK_SIZE, 1);
+        SinguloComponents.set(stack, SinguloComponents.CAPSULE_FLUID.get(), io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, Math.min(limit, fluid.getAmount())));
+    }
+
+    @Override
+    public int getMaxStackSize(ItemStack stack) {
+        return fluid(stack).isEmpty() ? super.getMaxStackSize(stack) : 1;
     }
 
     /** 梱包済みのカプセルの中身は、手に持って開けられない（タンクなどに使って注ぐ）。 */
