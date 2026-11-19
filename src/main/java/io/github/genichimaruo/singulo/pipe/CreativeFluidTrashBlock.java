@@ -7,13 +7,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.templates.VoidFluidHandler;
 
-public final class CreativeFluidTrashBlock extends Block {
+public final class CreativeFluidTrashBlock extends Block implements EntityBlock {
     public CreativeFluidTrashBlock(Properties properties) {
         super(properties);
     }
@@ -29,5 +31,15 @@ public final class CreativeFluidTrashBlock extends Block {
         }
         return FluidUtil.interactWithFluidHandler(player, hand, VoidFluidHandler.INSTANCE)
                 ? InteractionResult.CONSUME : InteractionResult.PASS;
+    }
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new Sink(pos, state);
+    }
+
+    public static final class Sink extends BlockEntity {
+        public Sink(BlockPos pos, BlockState state) {
+            super(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CREATIVE_FLUID_TRASH.get(), pos, state);
+        }
     }
 }

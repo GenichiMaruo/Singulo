@@ -77,8 +77,8 @@ public final class RecipePatches {
             }
             // This full recipe was freshly parsed. Complete replacements hide everything below them.
             var result = json.getAsJsonObject();
-            for (int i = patches.size() - 1; i >= 0; i--) {
-                Layer patch = patches.get(i);
+            for (int patchIndex = patches.size() - 1; patchIndex >= 0; patchIndex--) {
+                Layer patch = patches.get(patchIndex);
                 try {
                     merge(result, patch.changes(), "");
                 } catch (IllegalArgumentException ex) {

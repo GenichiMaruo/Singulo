@@ -389,16 +389,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return lines;
     }
 
-    @Override
-    protected void renderSlotContents(GuiGraphics graphics, ItemStack stack, Slot slot, @javax.annotation.Nullable String count) {
+    /** Render machine stock totals at the vanilla slot-decoration call in 1.20.1. */
+    public void renderAssemblyCount(GuiGraphics graphics, net.minecraft.client.gui.Font font, ItemStack stack,
+                                    Slot slot, int x, int y, @javax.annotation.Nullable String count) {
         int extra = stack.isEmpty() ? 0 : menu.assemblyExcess(slot);
         int total = (int) Math.min(Integer.MAX_VALUE, (long) stack.getCount() + extra);
         if (extra == 0 || total < 100) {
-            super.renderSlotContents(graphics, stack, slot, extra > 0 ? Integer.toString(total) : count);
-            return;
+            graphics.renderItemDecorations(font, stack, x, y, extra > 0 ? Integer.toString(total) : count);
+        } else {
+            graphics.renderItemDecorations(font, stack, x, y, "");
+            StockCount.draw(graphics, x, y, total);
         }
-        super.renderSlotContents(graphics, stack, slot, "");
-        StockCount.draw(graphics, slot.x, slot.y, total);
     }
 
     /** 自動排出の全体スイッチの位置（板の右上）。 */
@@ -752,7 +753,7 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         if (level == null) return java.util.Collections.singletonList(null);
         List<ItemStack> inputs = recipeInputs();
         var recipes = io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(level, type());
-        if (selectorSource == recipes && ItemStack.listMatches(selectorInputs, inputs)) return sortedEntries;
+        if (selectorSource == recipes && selectorInputs.size() == inputs.size() && java.util.stream.IntStream.range(0, inputs.size()).allMatch(i -> ItemStack.matches(selectorInputs.get(i), inputs.get(i)))) return sortedEntries;
         selectorSource = recipes;
         selectorInputs = inputs.stream().map(ItemStack::copy).toList();
         selectorScores.clear();

@@ -100,7 +100,7 @@ public class CableBlock extends BaseEntityBlock implements SimpleWaterloggedBloc
     }
 
     @Override
-    public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level context,
+    public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.BlockGetter context,
                                 java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
         lines.add(net.minecraft.network.chat.Component.translatable("tooltip.singulo.cable_rate",
                 EnergyText.of(capacity()), EnergyText.of(lossPerBlock() * 100)).withStyle(net.minecraft.ChatFormatting.AQUA));

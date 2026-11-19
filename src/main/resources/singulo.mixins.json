@@ -27,6 +27,7 @@
     "defaultRequire": 1
   },
   "client": [
+    "LegacyStockCountMixin",
     "AndroidWeaponTerrainMixin",
     "RayleighLightTextureMixin",
     "RayleighGameRendererMixin",
