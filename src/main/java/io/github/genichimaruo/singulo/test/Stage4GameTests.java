@@ -117,7 +117,7 @@ public final class Stage4GameTests {
         BlockPos controllerPos = new BlockPos(3, 2, 1);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.CASIMIR_CAVITY, controllerPos, Direction.SOUTH, 5);
         MachineBlockEntity m = helper.getBlockEntity(controllerPos);
-        keepPowered(helper, m);
+
         return m;
     }
 
@@ -130,6 +130,34 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(3, new ItemStack(item("optical_lattice_substrate"), 4));
         m.items().setStackInSlot(4, new ItemStack(item("data_card_culture_data")));
         m.items().setStackInSlot(5, new ItemStack(item("time_crystal_catalyst")));
+        var sync = m.syncData();
+        int[] seen = {0, 0, 0, 0, 0, 0}; // dilation, acceleration, previous progress, resets, power draw, unticking chunk
+        StringBuilder checkpoints = new StringBuilder();
+        helper.onEachTick(() -> {
+            int progress = sync.get(MachineBlockEntity.D_PROGRESS);
+            int speed = io.github.genichimaruo.singulo.machine.TimeFields.state(helper.getLevel(), m.getBlockPos());
+            if (speed < 0) seen[0]++;
+            if (speed > 0) seen[1]++;
+            if (progress < seen[2]) seen[3]++;
+            seen[2] = progress;
+            if (m.energy().getEnergyStored() < m.energy().getMaxEnergyStored()) seen[4]++;
+            if (!helper.getLevel().shouldTickBlocksAt(m.getBlockPos())) seen[5]++;
+            m.energy().setEnergy(m.energy().getMaxEnergyStored());
+            long tick = helper.getTick();
+            if (tick == 40 || tick == 200 || tick % 400 == 0 || tick == 2999) {
+                String recipe = m.saveWithoutMetadata(helper.getLevel().registryAccess()).getString("recipe");
+                checkpoints.append(String.format(java.util.Locale.ROOT,
+                        " tick=%d size=%d status=%s recipe=%s progress=%d/%d axion=%d out=%s used=%d;",
+                        tick, m.structureSize(), m.status(), recipe, progress, sync.get(MachineBlockEntity.D_MAX_PROGRESS),
+                        drainable(m.automationFluids(), "axion_condensate"),
+                        m.items().getStackInSlot(m.type().outputSlot()), UsesHelper.get(m.items().getStackInSlot(5)).used()));
+            }
+            // Only log on deadline; successful fixtures finish before this tick.
+            if (tick == 2999) {
+                Singulo.LOGGER.warn("Casimir timeout trace: worldTick={} pos={} dilation={} acceleration={} resets={} powerDrawTicks={} chunkInactive={} samples={}",
+                        helper.getLevel().getGameTime(), m.getBlockPos(), seen[0], seen[1], seen[3], seen[4], seen[5], checkpoints);
+            }
+        });
         helper.succeedWhen(() -> {
             helper.assertTrue(m.structureSize() == 5, "5×5×5 として形成されない");
             ItemStack out = m.items().getStackInSlot(m.type().outputSlot());
@@ -143,6 +171,7 @@ public final class Stage4GameTests {
     @GameTest(template = EMPTY, timeoutTicks = 100)
     public static void cavityNeedsVacuumBetweenMirrors(GameTestHelper helper) {
         MachineBlockEntity m = buildCavity(helper);
+        keepPowered(helper, m);
         helper.setBlock(new BlockPos(3, 3, 3), Blocks.STONE);   // 鏡面の間に物を置くと真空でなくなる
         helper.runAtTickTime(50, () -> {
             helper.assertTrue(m.structureSize() == 0, "鏡面の間がふさがっているのに形成された");
