@@ -7,6 +7,7 @@ import io.github.genichimaruo.singulo.multiblock.MultiblockPart;
 import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
+import io.github.genichimaruo.singulo.test.harness.TestScope;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,13 +36,6 @@ public final class ReactorGameTests {
     private static final String HUGE = "huge";
     private static final String BATCH = "reactor";
 
-    /** 点火したリアクターは、テストが終わっても動き続け、時間膨張の場が近くの別のテストに届く。組の終わりに止める。 */
-    @net.minecraft.gametest.framework.AfterBatch(batch = BATCH)
-    public static void stopReactors(net.minecraft.server.level.ServerLevel level) {
-        for (BlockPos pos : PenroseReactorBlockEntity.runningPositions(level)) {
-            level.removeBlock(pos, false);
-        }
-    }
     private static final BlockPos CENTER = new BlockPos(7, 7, 7);
     private static final BlockPos CONTROLLER = CENTER.below(Structures.CONTROLLER_BELOW_CENTER);
     /** テストで抽出ポートにする炉殻の位置（リングの最初の炉殻）。 */
@@ -65,7 +59,11 @@ public final class ReactorGameTests {
         }
         helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
-        return helper.getBlockEntity(CONTROLLER);
+        PenroseReactorBlockEntity reactor = helper.getBlockEntity(CONTROLLER);
+        // Dilation extends beyond the template. Stop each owned controller on every test
+        // outcome, including separately batched tests and controllers rebuilt after collapse.
+        TestScope.of(helper).ownBlockEntity(helper, reactor);
+        return reactor;
     }
 
     @GameTest(template = "empty", batch = BATCH)

@@ -134,7 +134,7 @@ public final class Stage4GameTests {
         int[] seen = {0, 0, 0, 0, 0, 0}; // dilation, acceleration, previous progress, resets, power draw, unticking chunk
         StringBuilder checkpoints = new StringBuilder();
         helper.onEachTick(() -> {
-            int progress = sync.get(MachineBlockEntity.D_PROGRESS);
+            int progress = sync.getInt(MachineBlockEntity.D_PROGRESS);
             int speed = io.github.genichimaruo.singulo.machine.TimeFields.state(helper.getLevel(), m.getBlockPos());
             if (speed < 0) seen[0]++;
             if (speed > 0) seen[1]++;
@@ -148,7 +148,7 @@ public final class Stage4GameTests {
                 String recipe = m.saveWithoutMetadata(helper.getLevel().registryAccess()).getString("recipe");
                 checkpoints.append(String.format(java.util.Locale.ROOT,
                         " tick=%d size=%d status=%s recipe=%s progress=%d/%d axion=%d out=%s used=%d;",
-                        tick, m.structureSize(), m.status(), recipe, progress, sync.get(MachineBlockEntity.D_MAX_PROGRESS),
+                        tick, m.structureSize(), m.status(), recipe, progress, sync.getInt(MachineBlockEntity.D_MAX_PROGRESS),
                         drainable(m.automationFluids(), "axion_condensate"),
                         m.items().getStackInSlot(m.type().outputSlot()), UsesHelper.get(m.items().getStackInSlot(5)).used()));
             }

@@ -9,12 +9,14 @@ import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity;
 import io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity;
 import io.github.genichimaruo.singulo.machine.SmesCellBlockEntity;
+import io.github.genichimaruo.singulo.machine.TimeFields;
 import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.pipe.FluidPipeBlockEntity;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
+import io.github.genichimaruo.singulo.test.harness.TestScope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -134,7 +136,11 @@ public final class FactoryOperationGameTests {
                 .setValue(AbstractMachineBlock.FACING, Direction.EAST));
         PenroseReactorBlockEntity reactor = h.getBlockEntity(AT);
         SmesCellBlockEntity sink = h.getBlockEntity(AT.east());
-        var registry = h.getLevel().registryAccess();
+        var scope = TestScope.of(h);
+        scope.ownBlockEntity(h, reactor);
+        var level = h.getLevel();
+        BlockPos fieldProbe = reactor.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER);
+        var registry = level.registryAccess();
         long limit = ServerConfig.PENROSE_MAX_OUTPUT.get();
         var saved = reactor.saveWithoutMetadata(registry);
         saved.putLong("buffer", limit * 3);
@@ -151,6 +157,12 @@ public final class FactoryOperationGameTests {
                 && reactor.buffer() == 2 * limit, "Push and pull did not share the same tick budget");
         h.runAfterDelay(1, () -> {
             h.assertTrue(output.extractLong(100, true) == 100, "Next tick's budget did not reset");
+            h.assertTrue(TimeFields.state(level, fieldProbe) == (TimeFields.dilationEnabled() ? -1 : 0),
+                    "Forced reactor did not provide its configured time field");
+            scope.close();
+            h.assertTrue(TimeFields.state(level, fieldProbe) == 0
+                            && !PenroseReactorBlockEntity.runningPositions(level).contains(reactor.getBlockPos()),
+                    "The fixture leaked its reactor time field into the next GameTest");
             h.succeed();
         });
     }
