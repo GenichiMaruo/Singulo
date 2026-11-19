@@ -12,6 +12,7 @@ from pathlib import Path
 MODID = 'singulo'
 
 IDS = {
+    '電動液体ポンプ': ('fluid_pump', 'Electric Fluid Pump', 'machine'),
     '真空断熱パイプ': ('vacuum_jacketed_pipe', 'Vacuum-Jacketed Pipe', 'machine'),
     '超流動導管': ('superfluid_conduit', 'Superfluid Conduit', 'machine'),
     'ホライズン・ダクト': ('horizon_duct', 'Horizon Duct', 'machine'),
@@ -60,6 +61,8 @@ def recipes(R, shaped):
 
 
 UI = {
+    'gui.singulo.device.pump.intake': ('設置時に接していた面から吸入します', 'Draws through the face attached during placement'),
+    'gui.singulo.device.pump.toggle': ('クリックでこの面の搬出を切り替えます', 'Click to toggle output on this face'),
     'gui.singulo.fluid_drone_port.crates': ('空の液体カプセル', 'Empty fluid capsules'),
     'gui.singulo.fluid_drone_port.arrived': ('届いたカプセルの液体は、右の受け取りタンクに入ります。', 'Arrived capsules empty into the receive tank on the right.'),
     'gui.singulo.fluid_drone_port.send_tank': ('送るタンク（発送でカプセルに詰める）', 'Send tank (filled into a capsule when sent)'),
@@ -82,28 +85,30 @@ UI = {
 
 CHAPTER = ('fluids', 'singulo:fluid_pipe', '液体の輸送', 'Moving Fluids', [
     ('pipes', 'パイプの段階',
-     '送りたい装置と受け取りたい装置を液体パイプでつなぎ、両端の面設定を確認します。隣の水源や溶岩源からも汲めます。\n'
+     '装置を液体パイプでつなぎ、送り側の出力面で自動排出をオンにします。自動排出のないタンクや水源・溶岩源から汲むには、電動液体ポンプの吸入口を向けて電力を供給します。\n'
      '分岐しても、同じ区間を通る液体は流量を分け合います。流れが遅いときは、途中で細い管を通っていないか確かめてください。',
      'Pipe tiers',
-     'Join the source and receiver with fluid pipes and check the side settings at both ends. Pipes can also draw from an adjacent water or lava source.\n'
+     'Connect the machines with fluid pipes and enable auto-eject on the sending face. For passive tanks, water or lava sources, point the Electric Fluid Pump intake at the source and supply power.\n'
      'Branches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.'),
     ('drone', '液体をドローンで送る',
      '液体ドローン発着ポートは、物の発着ポートと同じドローンとステーションで、液体を送ります。行き先に並ぶのは、同じ持ち主の液体のポートだけです。\n'
      '左上に空の液体カプセルを入れ、送るタンク（左）に液体をためて「発送」を押すと、タンクの液体（1種類、64,000 mB まで）をカプセルに詰めて送ります。'
      '届いたカプセルは受け取りのタンク（右、128,000 mB）へ注がれ、空になったカプセルは空き箱の欄へ戻ります。受け取りのタンクがいっぱいなら、カプセルは着荷箱の欄で待ちます。\n'
-     'パイプは面の設定に従います。「入力」の面から送るタンクへ入れ、「出力」の面から受け取りのタンクを取り出します。自動排出をオンにすると、受け取った液体を隣のタンクや装置へ押し出します。バケツでも出し入れできます。\n'
+     '「入力」の面から発送用のタンクへ注げます。「出力」の面で自動排出をオンにすると、届いた液体をパイプや隣のタンクへ送ります。バケツでも出し入れできます。\n'
      '射程と電力は梱包箱と同じです（液体カプセル160・バッテリー付き760・大容量3,160ブロック）。自動発送のしきい値は、バケツの数（1・16・32・満杯）です。',
      'Sending fluids by drone',
      'The Fluid Drone Port sends fluids with the same drones and stations as the item port. Only fluid ports with the same owner appear as destinations.\n'
      'Put empty fluid capsules top left, fill the send tank (left) and press Send. The port fills a capsule from the tank (one fluid, up to 64,000 mB) and sends it. '
      'Arrived capsules empty into the receive tank (right, 128,000 mB), and empty capsules return to the crate slot. If the receive tank is full, the capsule waits in the arrival slots.\n'
-     'Pipes follow the Sides settings: input faces fill the send tank and output faces drain the receive tank. With auto-eject on, received fluid is pushed into the neighbouring tank or machine. Buckets also work.\n'
+     'Input faces fill the send tank. Enable auto-eject on an output face to send received fluid into a pipe or adjacent tank. Buckets also work.\n'
      'Range and power are the same as packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks). Auto-send thresholds count buckets (1, 16, 32 or full).'),
 ])
 
 DESC = {
-    '液体パイプ': ('液体とガスを運ぶ段階1のパイプ。1 tick に 2,000 mB。置くだけでつながり、出口の液体を使う装置へ送る。隣の水源や溶岩源からも汲む。',
-               'A stage 1 pipe for fluids and gases: 2,000 mB per tick. Connects on its own, sends outputs to the machines that use them and draws from adjacent water and lava sources.'),
+    '電動液体ポンプ': ('銅色の吸入口をタンクに向け、好きな面から給電する。送液するときだけ電力を使う。Singuloの電線ではほかの装置への給電が優先される。右クリックで搬出面を選べる。',
+                    'Attach the copper intake to a tank. Supply FE on any face. The pump draws power only as it delivers fluid. On Singulo cables, other devices receive power first. Right-click to choose output faces.'),
+    '液体パイプ': ('装置が送り出した液体やガスを、1 tick に 2,000 mB まで運ぶ。',
+               'Carries fluids and gases pushed into it, up to 2,000 mB per tick.'),
     '真空断熱パイプ': ('真空の断熱層で包んだ段階2のパイプ。1 tick に 32,000 mB。ほかの段階のパイプともつながる。',
                 'A stage 2 pipe wrapped in a vacuum insulation jacket: 32,000 mB per tick. Connects to pipes of any tier.'),
     '超流動導管': ('粘りのない超流動で運ぶ段階4の透明な導管。1 tick に 512,000 mB。',
@@ -119,6 +124,7 @@ DESC = {
 }
 
 SUMMARY = {
+    '電動液体ポンプ': ('電力を使って、取り付けたタンクから液体を送り出す。', 'Uses power to pump fluid from the attached tank.'),
     '液体パイプ': ('液体とガスを運ぶパイプ。', 'A pipe that carries fluids and gases.'),
     '真空断熱パイプ': ('液体パイプの16倍運ぶパイプ。', 'Carries 16 times as much as a Fluid Pipe.'),
     '超流動導管': ('大量の液体を運ぶ透明な導管。', 'A clear conduit for very large flows.'),
@@ -435,7 +441,7 @@ UI.update(_collapsar.UI)
 DESC.update(_collapsar.DESC)
 SUMMARY.update(_collapsar.SUMMARY)
 # 一般の装置のモデル・正面の絵を作らないブロック（パイプと、ここで書くブロック）
-CUSTOM = set(PIPES) | _collapsar.CUSTOM_BLOCKS
+CUSTOM = set(PIPES) | _collapsar.CUSTOM_BLOCKS | {'fluid_pump', 'creative_fluid_trash'}
 CHAPTERS = [CHAPTER, _collapsar.CHAPTER]
 
 _pipe_recipes = recipes
@@ -447,6 +453,40 @@ def recipes(R, shaped):  # noqa: F811
     _collapsar.recipes(R, shaped)
 
 
+def creative_fluid_trash_model(ctx):
+    """Native 16 px creative casing with a drain grate and a droplet on each side."""
+    import art16
+    from PIL import ImageDraw
+
+    assets, write = ctx['ASSETS'], ctx['write_json']
+    name = 'creative_fluid_trash'
+    texture = f'singulo:block/{name}'
+    folder = assets / 'textures/block'
+    side = art16.creative_casing()
+    pen = ImageDraw.Draw(side)
+    pen.rectangle((2, 2, 13, 13), fill='#2f2548', outline='#6e567c')
+    pen.polygon([(7, 3), (10, 7), (10, 8), (9, 9), (6, 9), (5, 8), (5, 7)], fill='#50cbe3')
+    pen.line((6, 7, 7, 5), fill='#bbf2fc')
+    pen.line([(4, 10), (4, 12), (11, 12), (11, 10)], fill='#b39bc7')
+    side.save(folder / f'{name}_side.png')
+    top = art16.creative_casing()
+    pen = ImageDraw.Draw(top)
+    pen.rectangle((2, 2, 13, 13), fill='#120e21', outline='#867592')
+    for x in (4, 7, 10):
+        pen.rectangle((x, 3, x + 1, 12), fill='#55475f')
+        pen.line((x, 3, x, 11), fill='#a99ab6')
+    top.save(folder / f'{name}_grate.png')
+    model = f'singulo:block/{name}'
+    write(assets / f'models/block/{name}.json', {
+        'parent': 'minecraft:block/cube_bottom_top',
+        'textures': {'side': texture + '_side', 'top': texture + '_grate', 'bottom': texture + '_grate'}})
+    write(assets / f'models/item/{name}.json', {'parent': model})
+    write(assets / f'blockstates/{name}.json', {'variants': {'': {'model': model}}})
+
+
 def models(ctx):  # noqa: F811
     _pipe_models(ctx)
+    creative_fluid_trash_model(ctx)
     _collapsar.models(ctx)
+    from fluid_pump_model import generate
+    generate(ctx)

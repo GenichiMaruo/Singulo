@@ -8,7 +8,6 @@ import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -25,8 +24,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -181,18 +178,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
                 items.insertItem(1, new ItemStack(spent()), false);     // 触媒が失活した
             }
         }
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                break;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), energy.exportLimit()), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         boolean active = rate > 0;
         if (state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);

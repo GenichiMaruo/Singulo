@@ -57,6 +57,8 @@ bossDamageMultiplier = 1.25
 |---|---|---|
 | `[transport]` | `copperCableRate` / `superconductingCableRate` / `topologicalCableRate` / `horizonCableRate` | 2,000 / 1,000,000 / 100,000,000 / 9,223,372,036,854,775,807 FE/t |
 | `[transport]` | 同じ接頭語の `CableLoss`（例 `copperCableLoss`） / `minimumCableEfficiency` | 1ブロックあたりの損失率は銅が0.001、ほかは0。経路全体で残る電力の割合の下限は0.5。各値は0～1 |
+| `[transport]` | `pumpStartFe` / `pumpFeAtHighFlow` | 1 mB/t と 21億 mB/t の消費電力。既定は 100 FE/t と 10,000,000 FE/t。搬出した tick だけ、2点を直線で結んだ料金を FE 単位で切り上げる。21億 mB/t を超えても同じ傾きで増え、後者を前者以下にすると定額になる |
+| `[transport]` | `pumpFePerMb` | 既定の 0 で上記の流量別料金を使う。正の値を指定すると従来の固定単価（FE/mB、最小 0.001、0.001 刻み）を使い、1 FE 未満の前払い分を次回に繰り越す |
 | `[transport]` | `copperPipeRate` / `vacuumPipeRate` / `superfluidPipeRate` / `horizonPipeRate` | 2,000 / 32,000 / 512,000 / 9,223,372,036,854,775,807 mB/t。パイプ・ケーブルとも転送上限は1以上 |
 | `[stages]` | `stage1TimeMultiplier` ～ `stage5TimeMultiplier` / `stage1EnergyMultiplier` ～ `stage5EnergyMultiplier` | すべて1.0。レシピの `stage` に応じて時間と電力を独立に変更。時間は0.000001～10億倍、電力は0～10億倍 |
 | `[android]` | `androidTankCapacity` / `androidDualTankCapacity` | 通常32,000、複合16,000。各室の最大量。液体とMekanismの化学物質に共通 |
@@ -67,6 +69,10 @@ bossDamageMultiplier = 1.25
 | `[drone]` | `shipmentBaseFe` / `shipmentFePerBlock` | 1便あたり固定2,000 FE＋距離1ブロックにつき50 FE。距離分は切り上げ。距離単価を0にすると固定料金で発送 |
 | `[drone]` | `crateTier1Capacity` / `crateTier2Capacity` / `crateTier3Capacity` | 箱・液体カプセルの電池は10,000 / 40,000 / 160,000 FE。送料が電池容量以内なら発送可能 |
 | `[drone]` | `cargoStacksPerFlight` / `fluidCapsuleCapacity` | アイテムは発送欄9枠のうち1～9枠（既定9）、液体は既定64,000 mB。受取タンクはカプセル2個分、整数上限まで |
+
+機械は毎 tick、各出力タンクから接続先が受け取れる量を自動排出します。配管を通す場合は、経路の輸送容量が適用されます。
+
+ポンプの蓄電容量は 0 FE で、Singulo の電線と、複数の面から送電する発電機では、他の装置を優先してからポンプに余剰電力を渡します。同じポンプが同じ tick に送った量は、給電元や搬出面をまたいで合算します。既定では 1,000 mB を1 tickで送ると 105 FE、1 mB ずつ別々の tick に送ると毎回 100 FE です。水源・溶岩源を汲むときは、一度に1,000 mBを受け取れる搬出先と、バケツ1杯分の給電が必要です。旧版のポンプに残っていたFEは、次の送液から順に使い切ります。
 
 たとえばレシピJSONで `"stage": 2` を指定した全レシピを時間半分・電力毎tick 1.5倍にするには、次の2行を編集します。既定の焼成炉レシピ `singulo:kiln/bismuth_crystal_block` は100 tick・40 FE/tです。ほかの倍率が1なら50 tick・60 FE/t、1回の合計は3,000 FEになります。データパックが別の名前空間で追加した `singulo:machine` レシピにも適用されます。加工時間は最も近い整数、電力は切り上げで、段階別倍率の適用後に共通電力倍率と機械・チップの補正がかかります。
 
@@ -86,7 +92,7 @@ stage2EnergyMultiplier = 1.5
 
 熱・燃料・触媒を使う発電機では1 FE未満の発電端数を次のtickへ繰り越し、ワールドにも保存します。たとえば既定の水素燃料電池で9.6 FEの反応を2回行うと、19 FEが蓄電されます。
 
-通常のFE機器の蓄電・受電・毎tickの消費は整数上限までです。超える値は上限で止まります。高電力レシピを動かすときは、要求FE/tと同時に蓄電容量・受電速度も確認してください。Pリアクターのペレット当たりのエネルギーと送電上限は `penroseEnergyPerPellet`、`penroseMaxOutput` で個別に設定できます。衝撃発電の落下1ブロック当たりの電力は `impactEnergyPerBlock`、水素燃料電池の最大出力は `fuelCellOutput` です。ほかに `fusionReactorOutput`、`quantumEngineOutput`、`degenerateFurnaceOutput`、`cryoTurbineOutput` などがあります。
+通常のFE機器の蓄電・受電・毎tickの消費は整数上限までです。超える値は上限で止まります。高電力レシピを動かすときは、要求FE/tと同時に蓄電容量・受電速度も確認してください。Pリアクターのペレット当たりのエネルギーと送電上限は `penroseEnergyPerPellet`、`penroseMaxOutput` で個別に設定できます。送電上限は炉心と全抽出ポートで共有し、自動送電と外部からの取り出しを同じ tick に合算します。衝撃発電の落下1ブロック当たりの電力は `impactEnergyPerBlock`、水素燃料電池の最大出力は `fuelCellOutput` です。ほかに `fusionReactorOutput`、`quantumEngineOutput`、`degenerateFurnaceOutput`、`cryoTurbineOutput` などがあります。
 
 容量を下げても既存在庫は保持されます。容量を超えた枠は取り出してから補充してください。組立盤に65個以上のマスがある間は拡張を取り外せません。大量の材料を入れた機械を壊すと、ばらまく代わりに中身を保持した機械1個がドロップします。画面の `2.15G` は約21.5億個を示し、スロットにカーソルを置くと正確な個数が読めます。
 

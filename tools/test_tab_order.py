@@ -56,7 +56,7 @@ class CreativeTabOrderTests(unittest.TestCase):
         devices = self.span('発電と蓄電', '配線と配管', '加工機', '機械のアップグレード', 'マルチブロック',
                             '重力と宇宙の設備', 'ワームホール')
         machines = {i for i, kind in self.kinds.items() if kind in ('machine', 'gravity', 'genesis')}
-        machines -= {'creative_energy_source', 'food_printer', 'rgb_dye_station'}
+        machines -= set(self.groups['クリエイティブ専用']) | {'food_printer', 'rgb_dye_station'}
         machines -= {i for i in machines if 'android' in i or 'drone' in i or i == 'horizon_vault'}
         self.assertTrue(machines <= set(devices), machines - set(devices))
         self.assertLess(max(self.order.index(i) for i in devices), self.order.index('steel_ingot'))

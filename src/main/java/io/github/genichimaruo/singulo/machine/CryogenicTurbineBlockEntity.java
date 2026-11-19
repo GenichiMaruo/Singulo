@@ -22,8 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.minecraft.world.item.ItemStack;
@@ -151,7 +149,9 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         if (level.getGameTime() % 10 == 0) {
             hot = 0;
             for (Direction dir : Direction.values()) {
-                ThermalData.Hot h = ThermalData.INSTANCE.hot(level.getBlockState(pos.relative(dir)));
+                BlockPos neighbor = pos.relative(dir);
+                if (!level.isLoaded(neighbor)) continue;
+                ThermalData.Hot h = ThermalData.INSTANCE.hot(level.getBlockState(neighbor));
                 if (h != null) {
                     hot = Math.max(hot, h.temperature());
                 }
@@ -185,18 +185,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
             coolantCredit -= rate;
             energy.generateRate(rate);
         }
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                break;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), energy.exportLimit()), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         boolean active = rate > 0;
         if (state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);

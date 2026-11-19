@@ -4,7 +4,6 @@ import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,8 +19,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
@@ -315,19 +312,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     /** 発電機用: 隣のブロックへ電力を押し出す。 */
     protected void pushEnergy(Level level, int perTick) {
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                return;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK,
-                    worldPosition.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), perTick), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, worldPosition, perTick);
     }
 
     /** ブロックが壊されたとき。予備の触媒・装填中の触媒・出口の失活触媒を落とす。 */

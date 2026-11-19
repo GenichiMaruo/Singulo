@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.client;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.block.GlassJoin;
+import io.github.genichimaruo.singulo.block.MixedGlassSlab;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +42,33 @@ import org.joml.Vector3f;
  * （階段の側面にハーフブロックが当たるときなど）。
  */
 final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
-    /** 向きごとの、見える 1/4 の組（bits: 1 左上・2 右上・4 左下・8 右下、UV で見て）。0 はふつうに描く。 */
+    /** Per face: zero uses the original geometry, otherwise 1 + two four-bit visible material masks. */
     private static final ModelProperty<int[]> OPEN = new ModelProperty<>();
     private static final FaceBakery BAKERY = new FaceBakery();
+    private static final Map<BlockState, int[]> FACE_MASKS = new ConcurrentHashMap<>();
 
-    private final Block glass;
-    private final String name;
+    private record Layer(Block glass, BlockState shape, String texture) {
+        Layer(Block glass, BlockState shape) { this(glass, shape, BuiltInRegistries.BLOCK.getKey(glass).getPath()); }
+
+        int own(Direction face) { return shape.is(glass) ? 15 : quarters(shape, face, true); }
+
+        int clipped(BlockState neighbour, Direction face) {
+            BlockState part = GlassJoin.matchingPart(neighbour, glass);
+            if (part == null) return -1;
+            int own = own(face);
+            int covered = part.is(glass) ? 15 : quarters(part, face, false);
+            return (own & covered) == 0 ? -1 : own & ~covered;
+        }
+    }
+
+    private final Layer first;
+    @Nullable private final Layer second;
     private final Map<Integer, List<BakedQuad>> quads = new ConcurrentHashMap<>();
 
-    private GlassJoinModel(BakedModel original, Block glass) {
+    private GlassJoinModel(BakedModel original, Layer first, @Nullable Layer second) {
         super(original);
-        this.glass = glass;
-        this.name = BuiltInRegistries.BLOCK.getKey(glass).getPath();
+        this.first = first;
+        this.second = second;
     }
 
     static void wrap(ModelEvent.ModifyBakingResult event) {
@@ -67,9 +83,15 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
             }
             for (Block block : blocks) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-                    event.getModels().computeIfPresent(BlockModelShaper.stateToModelLocation(state), (k, model) -> new GlassJoinModel(model, glass));
+                    event.getModels().computeIfPresent(BlockModelShaper.stateToModelLocation(state), (k, model) -> new GlassJoinModel(model, new Layer(glass, state), null));
                 }
             }
+        }
+        for (BlockState state : SinguloBlocks.MIXED_GLASS_SLAB.get().getStateDefinition().getPossibleStates()) {
+            BlockState lower = MixedGlassSlab.half(state, false), upper = MixedGlassSlab.half(state, true);
+            Layer bottom = new Layer(((GlassJoin.Shaped) lower.getBlock()).base(), lower);
+            Layer top = new Layer(((GlassJoin.Shaped) upper.getBlock()).base(), upper);
+            event.getModels().computeIfPresent(BlockModelShaper.stateToModelLocation(state), (k, model) -> new GlassJoinModel(model, bottom, top));
         }
     }
 
@@ -78,19 +100,13 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
         int[] open = null;
         for (Direction d : Direction.values()) {
             BlockState n = level.getBlockState(pos.relative(d));
-            if (!GlassJoin.shapedOf(n, glass) && !(n.is(glass) && state.getBlock() != glass)) {
-                continue;
-            }
-            // この面にある 1/4（ブロックなら全部、階段・ハーフブロックなら形のある所）のうち、隣に覆われていない所
-            int own = state.is(glass) ? 15 : quarters(state, d, true);
-            int covered = n.is(glass) ? 15 : quarters(n, d, false);
-            int visible = own & ~covered;
-            if ((own & covered) != 0 && visible != 0) {
-                if (open == null) {
-                    open = new int[6];
-                }
-                open[d.ordinal()] = visible;
-            }
+            int a = first.clipped(n, d);
+            int b = second == null ? -1 : second.clipped(n, d);
+            if (a < 0 && b < 0) continue;
+            if (open == null) open = new int[6];
+            if (a < 0) a = first.own(d);
+            if (b < 0) b = second == null ? 0 : second.own(d);
+            open[d.ordinal()] = 1 + a + (b << 4);
         }
         return open == null ? data : data.derive().with(OPEN, open).build();
     }
@@ -100,6 +116,18 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
      * そうでなければ向き d の隣にあるものとして、この面に接する層を見る。
      */
     private static int quarters(BlockState shape, Direction d, boolean self) {
+        int[] masks = FACE_MASKS.computeIfAbsent(shape, s -> {
+            int[] result = new int[12];
+            for (Direction face : Direction.values()) {
+                result[face.ordinal() * 2] = computeQuarters(s, face, false);
+                result[face.ordinal() * 2 + 1] = computeQuarters(s, face, true);
+            }
+            return result;
+        });
+        return masks[d.ordinal() * 2 + (self ? 1 : 0)];
+    }
+
+    private static int computeQuarters(BlockState shape, Direction d, boolean self) {
         List<AABB> boxes = shape.getShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO).toAabbs();
         int bits = 0;
         for (int[] cell : cells(d)) {
@@ -163,15 +191,20 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
         if (side == null || open == null || open[side.ordinal()] == 0 || plain.isEmpty()) {
             return plain;
         }
-        int bits = open[side.ordinal()];
-        return quads.computeIfAbsent(side.ordinal() * 16 + bits, k -> bake(side, bits));
+        int bits = open[side.ordinal()] - 1;
+        if (bits == 0) return List.of();
+        return quads.computeIfAbsent(side.ordinal() * 256 + bits, k -> {
+            List<BakedQuad> out = new ArrayList<>(4);
+            if ((bits & 15) != 0) bake(side, bits & 15, first.texture(), out);
+            if (second != null && (bits >>> 4) != 0) bake(side, bits >>> 4, second.texture(), out);
+            return List.copyOf(out);
+        });
     }
 
     /** 見える 1/4 だけの面（その組の枠の絵）。 */
-    private List<BakedQuad> bake(Direction side, int bits) {
+    private void bake(Direction side, int bits, String name, List<BakedQuad> out) {
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
                 .apply(Singulo.id("block/" + name + "_join_" + bits));
-        List<BakedQuad> out = new ArrayList<>(4);
         for (int[] cell : cells(side)) {
             if ((bits & quarter(side, cell)) == 0) {
                 continue;
@@ -180,6 +213,5 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
             out.add(BAKERY.bakeQuad(new Vector3f(cell[0], cell[1], cell[2]), new Vector3f(cell[0] + 8, cell[1] + 8, cell[2] + 8), face,
                     sprite, side, BlockModelRotation.X0_Y0, null, true));
         }
-        return out;
     }
 }

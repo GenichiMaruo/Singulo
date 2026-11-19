@@ -167,8 +167,9 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
         Direction front = state.getValue(AbstractMachineBlock.FACING);
         be.updateTransferTick();
         int available = Math.min(be.energy.getEnergyStored(), be.rate - be.outThisTick);
-        if (available > 0) {
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(front), front.getOpposite());
+        BlockPos neighbor = pos.relative(front);
+        if (available > 0 && level.isLoaded(neighbor)) {
+            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, neighbor, front.getOpposite());
             if (target != null && target.canReceive()) {
                 int sent = target.receiveEnergy(available, false);
                 if (sent > 0) {

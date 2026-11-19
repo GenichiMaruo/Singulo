@@ -95,6 +95,13 @@ public final class SinguloCapabilities {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.FOOD_PRINTER.get(), (be, side) -> be.automation());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.HORIZON_VAULT.get(),
                 (be, side) -> be.items());
+        event.registerBlock(Capabilities.FluidHandler.BLOCK, (level, pos, state, be, side) ->
+                net.neoforged.neoforge.fluids.capability.templates.VoidFluidHandler.INSTANCE, SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, context) ->
+                new io.github.genichimaruo.singulo.item.CreativeFluidTrashItem.Handler(stack), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.FLUID_PIPE.get(), (be, side) -> be.inlet(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.FLUID_PUMP.get(), (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.FLUID_PUMP.get(), (be, side) -> be.outlet(side));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.FLUID_DRONE_PORT.get(),

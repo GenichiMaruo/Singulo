@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import com.google.common.math.LongMath;
 import io.github.genichimaruo.singulo.api.android.AndroidChemicalStorage;
 import io.github.genichimaruo.singulo.api.android.AndroidSharedStorage;
 import io.github.genichimaruo.singulo.api.android.AndroidWorkEndpoint;
@@ -153,7 +154,7 @@ public final class LiquidStores {
 
     static long available(List<Supply> supplies, ItemStack sample) {
         long amount = 0;
-        for (Supply supply : supplies) if (supply.material.matches(sample)) amount += supply.material.count;
+        for (Supply supply : supplies) if (supply.material.matches(sample)) amount = LongMath.saturatedAdd(amount, supply.material.count);
         return amount;
     }
 
@@ -172,12 +173,12 @@ public final class LiquidStores {
 
     /**
      * 素材置き場の化学物質の入れ物（Mekanism のケミカルタンクなど）を、面を問わず1つの入れ物として扱う。Mekanism の装置は面ごとに
-     * 入れる・出すの設定があるので（ケミカルタンクの既定は、前だけが出口）、数えるのは最初に見つかった面で（同じ中身を何度も数えない）、
-     * 出し入れはできる面を順に試す。数えるのは、どこかの面から取り出せる量だけ（入れるだけの欄の中身を在庫にしない）。
+     * 入れる・出すの設定があり、面によって見えるタンクも異なる。化学物質ごとに各面から抜ける量の最大値を取り、
+     * 同じタンクを複数の面から見ても二重に数えない。
      */
     @javax.annotation.Nullable
     private static Chemicals.Store anySide(Level level, BlockPos p) {
-        java.util.List<Chemicals.Store> sides = new ArrayList<>();
+        List<Chemicals.Store> sides = new ArrayList<>();
         for (Direction d : Direction.values()) {
             Chemicals.Store s = Chemicals.store(level, p, d);
             if (s != null) {
@@ -190,22 +191,16 @@ public final class LiquidStores {
         return new Chemicals.Store() {
             @Override
             public long amount(String id) {
-                long seen = sides.get(0).amount(id);
-                return seen <= 0 ? 0 : extract(id, seen, true);
+                return extract(id, Long.MAX_VALUE, true);
             }
 
             @Override
             public long insert(String id, long amount, boolean simulate) {
                 long put = 0;
-                for (Chemicals.Store s : sides) {
-                    if (put >= amount) {
-                        break;
-                    }
-                    long n = s.insert(id, amount - put, simulate);
-                    put += n;
-                    if (simulate && n > 0) {
-                        break;                         // 試すだけ: 同じ入れ物を別の面から二重に数えない
-                    }
+                for (var side : sides) {
+                    if (put >= amount) break;
+                    put = simulate ? Math.max(put, side.insert(id, amount, true))
+                            : put + side.insert(id, amount - put, false);
                 }
                 return put;
             }
@@ -213,27 +208,25 @@ public final class LiquidStores {
             @Override
             public long extract(String id, long amount, boolean simulate) {
                 long got = 0;
-                for (Chemicals.Store s : sides) {
-                    if (got >= amount) {
-                        break;
-                    }
-                    long n = s.extract(id, amount - got, simulate);
-                    got += n;
-                    if (simulate && n > 0) {
-                        break;
-                    }
+                for (var side : sides) {
+                    if (got >= amount) break;
+                    got = simulate ? Math.max(got, side.extract(id, amount, true))
+                            : got + side.extract(id, amount - got, false);
                 }
                 return got;
             }
 
             @Override
             public Map<String, Long> contents() {
-                Map<String, Long> out = new java.util.LinkedHashMap<>();
-                for (Map.Entry<String, Long> e : sides.get(0).contents().entrySet()) {
-                    long n = extract(e.getKey(), e.getValue(), true);
-                    if (n > 0) {
-                        out.put(e.getKey(), n);
-                    }
+                Map<String, Long> out = new LinkedHashMap<>();
+                for (var side : sides) {
+                    side.contents().forEach((id, seen) -> {
+                        long best = out.getOrDefault(id, 0L);
+                        if (seen > best) {
+                            long accessible = side.extract(id, seen, true);
+                            if (accessible > best) out.put(id, accessible);
+                        }
+                    });
                 }
                 return out;
             }
@@ -250,7 +243,7 @@ public final class LiquidStores {
             String id = ChemicalSamples.id(sample);
             long n = 0;
             for (AndroidChemicalStorage s : chemicals) {
-                n += s.amount(id);
+                n = LongMath.saturatedAdd(n, s.amount(id));
             }
             return n;
         }
@@ -259,7 +252,7 @@ public final class LiquidStores {
         for (IFluidHandler h : fluids) {
             for (FluidAmount f : contents(h)) {
                 if (FluidStack.isSameFluidSameComponents(f.type(), like)) {
-                    n += f.amount();
+                    n = LongMath.saturatedAdd(n, f.amount());
                 }
             }
         }

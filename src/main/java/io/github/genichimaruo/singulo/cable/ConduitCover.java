@@ -271,7 +271,9 @@ public final class ConduitCover {
             return false;
         }
         level.setBlock(pos, state.setValue(PROPERTY, State.NONE), Block.UPDATE_CLIENTS);      // 枠を落とさないよう、先に外す
-        level.setBlock(pos, io.github.genichimaruo.singulo.registry.SinguloBlocks.COVER_FRAME.get().defaultBlockState(), Block.UPDATE_ALL);
+        BlockState frame = io.github.genichimaruo.singulo.registry.SinguloBlocks.COVER_FRAME.get().defaultBlockState()
+                .setValue(BlockStateProperties.WATERLOGGED, state.getValue(BlockStateProperties.WATERLOGGED));
+        level.setBlock(pos, frame, Block.UPDATE_ALL);
         return true;
     }
 

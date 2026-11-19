@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.energy;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.energy.EnergyStorage;
 
 /** 変更通知と直接の出し入れができる電力の入れ物。 */
@@ -95,6 +97,13 @@ public class SinguloEnergyStorage extends EnergyStorage {
     }
 
     public void setReceiveLimit(int limit) { maxReceive = limit; }
+
+    public void pushToNeighbors(Level level, BlockPos pos, int maxPerFace) {
+        if (energy <= 0 || maxPerFace <= 0) return;
+        var output = new NeighborEnergyOutput(level, () -> Math.min(energy, maxPerFace), sent -> consume((int) sent));
+        output.pushFrom(pos, neighbor -> true);
+        output.sendSurplusToPumps();
+    }
 
     public int exportLimit() { return maxExtract; }
 

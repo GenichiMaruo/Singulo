@@ -371,6 +371,7 @@ public final class SinguloItems {
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
         block(SinguloBlocks.FLUID_PIPE, 1);
+        block(SinguloBlocks.FLUID_PUMP, 1);
         TAB_ORDER.add(COVER_FRAME);
         block(SinguloBlocks.MULTIBLOCK_PORT, 2);
         block(SinguloBlocks.COOLING_TOWER_BASE, 2);
@@ -599,6 +600,8 @@ public final class SinguloItems {
         TAB_ORDER.add(SEALED_RECORD);
         // クリエイティブ専用（並びの最後）
         block(SinguloBlocks.CREATIVE_ENERGY_SOURCE, 6);
+        TAB_ORDER.add(ITEMS.register("creative_fluid_trash", () -> new io.github.genichimaruo.singulo.item.CreativeFluidTrashItem(
+                SinguloBlocks.CREATIVE_FLUID_TRASH.get(), new Item.Properties().rarity(Rarity.EPIC))));
         TAB_ORDER.add(CREATIVE_CATALYST);
         TAB_ORDER.add(BUILDER_WAND);
         // ボスのスポーンエッグはタブにも JEI にも出さない（/give でだけ渡す。HIDDEN を参照）

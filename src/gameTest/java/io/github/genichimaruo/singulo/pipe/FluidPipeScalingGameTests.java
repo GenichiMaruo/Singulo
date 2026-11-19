@@ -40,10 +40,15 @@ public final class FluidPipeScalingGameTests {
         h.setBlock(nitrogenSink, SinguloBlocks.CRYOGENIC_TURBINE.get());
         BlockPos waterSink = start.east(3).north();
         h.setBlock(waterSink, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        h.setBlock(start.east(5).south(), Blocks.WATER);
+
         FluidPipeBlockEntity first = h.getBlockEntity(start);
         FluidPipeNetwork.build(h.getLevel(), first);
-        FluidPipeNetwork.of(first).transfer();
+        for (int i = 0; i < 2; i++) {
+            FluidPipeBlockEntity pipe = h.getBlockEntity(start.east(i));
+            pipe.inlet(net.minecraft.core.Direction.NORTH).fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 10_000), IFluidHandler.FluidAction.EXECUTE);
+        }
+        FluidPipeBlockEntity local = h.getBlockEntity(start.east(5));
+        local.inlet(net.minecraft.core.Direction.SOUTH).fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
         CryogenicTurbineBlockEntity turbine = h.getBlockEntity(nitrogenSink);
         MachineBlockEntity electrolyzer = h.getBlockEntity(waterSink);
         h.assertTrue(turbine.tank().getFluidInTank(0).getAmount() == 10_000, "Nitrogen exceeded or missed the copper pipe's budget");
@@ -95,7 +100,12 @@ public final class FluidPipeScalingGameTests {
                 for (var source : sources) source.forceOutputTankForTest(nitrogen.copy());
                 for (var sink : sinks) sink.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
                 long start = System.nanoTime();
-                network.transfer();
+                network.resetCapacity();
+                for (var source : sources) {
+                    var pipe = (FluidPipeBlockEntity) h.getLevel().getBlockEntity(source.getBlockPos().west());
+                    int sent = pipe.inlet(net.minecraft.core.Direction.EAST).fill(nitrogen, IFluidHandler.FluidAction.EXECUTE);
+                    if (sent > 0) source.ejectFluids().drain(nitrogen.copyWithAmount(sent), IFluidHandler.FluidAction.EXECUTE);
+                }
                 long nanos = System.nanoTime() - start;
                 if (i == -warmups) firstNanos = nanos;
                 if (i >= 0) times[i] = nanos;

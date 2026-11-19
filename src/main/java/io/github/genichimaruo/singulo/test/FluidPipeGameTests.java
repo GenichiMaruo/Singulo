@@ -193,6 +193,17 @@ public final class FluidPipeGameTests {
                     h.getLevel().setBlockAndUpdate(pipe, SinguloBlocks.FLUID_PIPE.get().defaultBlockState());
                 })
                 .thenWaitUntil(() -> h.assertTrue(amount(tower.automationFluids(), nitrogen) == 0, "塔の窒素が出ていかない"))
+                .thenExecute(() -> {
+                    h.getLevel().removeBlock(pipe, false);
+                    h.setBlock(controller.north(), SinguloBlocks.FLUID_PIPE.get());
+                    h.setBlock(controller.north(2), SinguloBlocks.FLUID_DRONE_PORT.get());
+                    tower.forceOutputTankForTest(new FluidStack(nitrogen, 700));
+                })
+                .thenWaitUntil(() -> {
+                    var receiver = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) h.getBlockEntity(controller.north(2));
+                    h.assertTrue(receiver.sendTank().getFluidAmount() == 700 && amount(tower.automationFluids(), nitrogen) == 0,
+                            "A pipe attached directly to the formed controller did not receive its output");
+                })
                 .thenSucceed();
     }
 
@@ -249,12 +260,13 @@ public final class FluidPipeGameTests {
         });
     }
 
-    /** タンクどうしでは行き来しない。受け手がいればタンクから送る。 */
+    /** 保管タンクは既定では保持し、明示的に自動排出したタンクだけが正面へ送る。 */
     @GameTest(template = EMPTY, timeoutTicks = 80)
     public static void storesDoNotSloshBetweenEachOther(GameTestHelper h) {
         BlockPos a = new BlockPos(1, 1, 1);
         BlockPos b = new BlockPos(5, 1, 1);
-        h.setBlock(a, SinguloBlocks.CONTAINMENT_TANK.get());
+        h.setBlock(a, SinguloBlocks.CONTAINMENT_TANK.get().defaultBlockState()
+                .setValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING, Direction.EAST));
         h.setBlock(b, SinguloBlocks.CONTAINMENT_TANK.get());
         ContainmentTankBlockEntity ta = h.getBlockEntity(a);
         ContainmentTankBlockEntity tb = h.getBlockEntity(b);
@@ -265,21 +277,28 @@ public final class FluidPipeGameTests {
         pipes(h, a.east(), b.west());
         h.runAfterDelay(50, () -> {
             h.assertTrue(ta.amount() == 3_000 && tb.amount() == 1_000, "タンクどうしで液体が動いた: " + ta.amount() + " / " + tb.amount());
-            h.succeed();
+            var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+            try {
+                player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(a.above())));
+                h.assertTrue(ta.onButton(player, io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.BUTTON_EJECT), "Tank did not enable auto-eject");
+            } finally {
+                player.discard();
+            }
+            h.succeedWhen(() -> h.assertTrue(ta.amount() == 0 && tb.amount() == 4_000, "Enabled tank failed to eject through its front"));
         });
     }
 
-    /** 隣の水源から汲む。受け手が満ちたら汲まず、水源を減らさない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
-    public static void pipeDrawsWaterSourceOnlyWhileThereIsRoom(GameTestHelper h) {
+    @GameTest(template = EMPTY)
+    public static void pipeLeavesAdjacentWaterSourceInPlace(GameTestHelper h) {
         BlockPos water = new BlockPos(1, 1, 1);
         BlockPos taker = new BlockPos(5, 1, 1);
         h.setBlock(water, Blocks.WATER);
         MachineBlockEntity machine = machine(h, taker, MachineType.ELECTROLYZER);
         pipes(h, water.east(), taker.west());
-        h.succeedWhen(() -> {
-            h.assertTrue(amount(machine.automationFluids(), Fluids.WATER) == 1_000, "水源から汲めていない");
-            h.assertBlockNotPresent(Blocks.WATER, water);
+        h.runAfterDelay(30, () -> {
+            h.assertBlockPresent(Blocks.WATER, water);
+            h.assertTrue(amount(machine.automationFluids(), Fluids.WATER) == 0, "A passive pipe pumped water");
+            h.succeed();
         });
     }
 
@@ -312,6 +331,23 @@ public final class FluidPipeGameTests {
             h.assertTrue(amount(taker.automationFluids(), Fluids.WATER) == 0, "切れたパイプを液体が通った");
             h.setBlock(middle, SinguloBlocks.FLUID_PIPE.get());
             h.succeedWhen(() -> h.assertTrue(amount(taker.automationFluids(), Fluids.WATER) == 500, "つなぎ直しても流れない"));
+        });
+    }
+
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void machineSwitchControlsPipeFlow(GameTestHelper h) {
+        BlockPos a = new BlockPos(1, 1, 1), b = a.east(4);
+        MachineBlockEntity giver = machine(h, a, MachineType.ELECTROLYZER);
+        MachineBlockEntity taker = machine(h, b, MachineType.ELECTROLYZER);
+        int output = 1 + MachineType.ELECTROLYZER.fluidInputs();
+        giver.setEjectEnabled(output, false);
+        giver.forceOutputTankForTest(new FluidStack(Fluids.WATER, 600));
+        pipes(h, a.east(), b.west());
+        h.runAfterDelay(25, () -> {
+            h.assertTrue(amount(giver.automationFluids(), Fluids.WATER) == 600, "Pipe bypassed disabled machine auto-eject");
+            h.assertTrue(amount(taker.automationFluids(), Fluids.WATER) == 0, "Receiver gained fluid with ejection off");
+            giver.setEjectEnabled(output, true);
+            h.succeedWhen(() -> h.assertTrue(amount(taker.automationFluids(), Fluids.WATER) == 600, "Enabling ejection did not deliver the fluid"));
         });
     }
 

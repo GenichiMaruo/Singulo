@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import com.google.common.math.LongMath;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +72,7 @@ final class WorkshopSupplies {
     private void add(Source source) {
         byPoint.computeIfAbsent(source.point, k -> new ArrayList<>()).add(source);
         byItem.computeIfAbsent(new AtPoint(source.point, source.material.item), k -> new ArrayList<>()).add(source);
-        counts.merge(source.material, source.stock.count, Long::sum);
+        counts.merge(source.material, source.stock.count, LongMath::saturatedAdd);
     }
 
     List<Source> at(BlockPos point) {
@@ -95,7 +96,7 @@ final class WorkshopSupplies {
         for (var sources : byPoint.values()) for (var source : sources) {
             if (!seen.add(source.material)) continue;
             long foreign = claims.foreign(level, console, source.material.store, source.stock.item);
-            if (foreign > 0) reserved.merge(source.material.item, Math.min(counts.get(source.material), foreign), Long::sum);
+            if (foreign > 0) reserved.merge(source.material.item, Math.min(counts.get(source.material), foreign), LongMath::saturatedAdd);
         }
         return reserved;
     }

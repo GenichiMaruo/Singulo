@@ -50,6 +50,7 @@ MOD = {
     'ビスマス結晶ブロック': ('bismuth_crystal_block', 'Bismuth Crystal Block', 'deco'),
     '発光ビスマス結晶': ('glowing_bismuth_crystal', 'Glowing Bismuth Crystal', 'deco'),
     # クリエイティブ専用（レシピなし）
+    'クリエイティブ用液体ゴミ箱': ('creative_fluid_trash', 'Creative Fluid Trash Can', 'machine'),
     'クリエイティブ電源': ('creative_energy_source', 'Creative Energy Source', 'machine'),
     '無限の触媒': ('creative_catalyst', 'Infinite Catalyst', 'tool'),
     '組み立ての杖': ('builder_wand', 'Builder\'s Wand', 'tool'),

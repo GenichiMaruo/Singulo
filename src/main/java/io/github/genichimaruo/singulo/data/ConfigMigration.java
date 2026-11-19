@@ -5,19 +5,12 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-/**
- * サーバー設定ファイルの移行。0.3.0 の設定ファイルには、当時の既定値（縮退熱炉 20 MFE/t・殻の金属の核2個・炉殻12枚）が
- * 書き込まれているので、新しい既定値に変えても既存のワールドには効かない。
- * <p>
- * settingsVersion がこの版より古いファイルだけを一度だけ見て、値が<b>0.3.0 の既定値とまったく同じ</b>項目を新しい既定値へ
- * 書き換える。それ以外の値（自分で変えた値）は残す。書き換えたら settingsVersion を上げて保存するので、そのあとに
- * 改めて旧既定と同じ値を書いても、もう書き換えない。
- */
+/** 既存のサーバー設定を一度だけ移行する。前の既定値と異なる設定は維持する。 */
 public final class ConfigMigration {
     private ConfigMigration() {}
 
     /** 今の設定ファイルの版。 */
-    public static final int CURRENT = 1;
+    public static final int CURRENT = 4;
 
     private static volatile long revision;
 
@@ -26,12 +19,20 @@ public final class ConfigMigration {
     public static void onConfig(ModConfigEvent event) {
         if (event.getConfig().getSpec() != ServerConfig.SPEC) return;
         revision++;
-        if (ServerConfig.SETTINGS_VERSION.get() >= CURRENT) {
+        int version = ServerConfig.SETTINGS_VERSION.get();
+        if (version >= CURRENT) {
             return;
         }
-        migrate(ServerConfig.DEGENERATE_FURNACE_OUTPUT, 20_000_000, "degenerateFurnaceOutput");
-        migrate(ServerConfig.SHELL_METAL_CORES, 2, "shellMetalCores");
-        migrate(ServerConfig.REACTOR_PLATES_PER_SHELL, 12, "reactorPlatesPerShell");
+        if (version < 1) {
+            migrate(ServerConfig.DEGENERATE_FURNACE_OUTPUT, 20_000_000, "degenerateFurnaceOutput");
+            migrate(ServerConfig.SHELL_METAL_CORES, 2, "shellMetalCores");
+            migrate(ServerConfig.REACTOR_PLATES_PER_SHELL, 12, "reactorPlatesPerShell");
+        }
+        double pumpCost = ServerConfig.PUMP_FE_PER_MB.getAsDouble();
+        if ((version < 2 && pumpCost == 1.0) || (version == 2 && pumpCost == 0.75)
+                || (version == 3 && pumpCost == 0.1)) {
+            ServerConfig.PUMP_FE_PER_MB.set(ServerConfig.PUMP_FE_PER_MB.getDefault());
+        }
         ServerConfig.SETTINGS_VERSION.set(CURRENT);
         try {
             ServerConfig.SPEC.save();

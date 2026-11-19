@@ -659,6 +659,10 @@
     "source": "Archive Terminal",
     "translation": "기록 보관 단말기"
   },
+  "block.singulo.mixed_glass_slab": {
+    "source": "Stacked White and Black Glass Slabs",
+    "translation": "겹친 흰색 및 검은색 유리 반 블록"
+  },
   "block.singulo.arena_hologram": {
     "source": "Hologram Floor",
     "translation": "홀로그램 바닥"
@@ -1996,8 +2000,8 @@
     "translation": "티어 1 전선. 연결된 장치끼리 전력을 나눕니다. 거리가 멀면 약간 손실됩니다."
   },
   "desc.singulo.fluid_pipe": {
-    "source": "A stage 1 pipe for fluids and gases: 2,000 mB per tick. Connects on its own, sends outputs to the machines that use them and draws from adjacent water and lava sources.",
-    "translation": "액체와 기체를 운반하는 1단계 파이프: 틱당 2,000 mB. 설치하면 자동으로 연결되며 출력물을 필요한 장치로 보내고, 인접한 물과 용암 근원에서도 끌어옵니다."
+    "source": "Carries fluids and gases pushed into it, up to 2,000 mB per tick.",
+    "translation": "기계가 내보낸 액체와 기체를 틱당 최대 2,000 mB까지 운반합니다."
   },
   "desc.singulo.reactor_core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
@@ -13772,8 +13776,8 @@
     "translation": "운반량 제한 없음"
   },
   "uses.singulo.fluid_pipe": {
-    "source": "Used in: Vacuum-Jacketed Pipe, Fluid Drone Port",
-    "translation": "사용처: 진공 단열 파이프, 유체 드론 포트"
+    "source": "Used in: Vacuum-Jacketed Pipe, Fluid Drone Port, Electric Fluid Pump",
+    "translation": "사용처: 진공 단열 파이프, 유체 드론 포트, 전동 유체 펌프"
   },
   "desc.singulo.vacuum_jacketed_pipe": {
     "source": "A stage 2 pipe wrapped in a vacuum insulation jacket: 32,000 mB per tick. Connects to pipes of any tier.",
@@ -13884,16 +13888,16 @@
     "translation": "파이프 단계"
   },
   "guide.singulo.fluids.pipes.body": {
-    "source": "Join the source and receiver with fluid pipes and check the side settings at both ends. Pipes can also draw from an adjacent water or lava source.\nBranches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.",
-    "translation": "보내는 기계와 받는 기계를 유체 파이프로 연결한 뒤 양쪽 면 설정을 확인하세요. 인접한 물이나 용암 원천에서도 유체를 끌어올 수 있습니다.\n같은 구간을 지나는 분기는 유량을 나눠 씁니다. 느리다면 도중에 가는 파이프가 있는지 살펴보세요."
+    "source": "Connect the machines with fluid pipes and enable auto-eject on the sending face. For passive tanks, water or lava sources, point the Electric Fluid Pump intake at the source and supply power.\nBranches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.",
+    "translation": "기계를 유체 파이프로 연결하고 보내는 쪽의 출력 면에서 자동 배출을 켜세요. 자동 배출이 없는 탱크나 물·용암 원천에서는 전동 유체 펌프의 흡입구를 원천 쪽으로 향하게 하고 전력을 공급하세요.\n같은 구간을 지나는 분기는 유량을 나눠 씁니다. 느리다면 도중에 가는 파이프가 있는지 살펴보세요."
   },
   "guide.singulo.fluids.drone.title": {
     "source": "Sending fluids by drone",
     "translation": "드론으로 유체 보내기"
   },
   "guide.singulo.fluids.drone.body": {
-    "source": "The Fluid Drone Port sends fluids with the same drones and stations as the item port. Only fluid ports with the same owner appear as destinations.\nPut empty fluid capsules top left, fill the send tank (left) and press Send. The port fills a capsule from the tank (one fluid, up to 64,000 mB) and sends it. Arrived capsules empty into the receive tank (right, 128,000 mB), and empty capsules return to the crate slot. If the receive tank is full, the capsule waits in the arrival slots.\nPipes follow the Sides settings: input faces fill the send tank and output faces drain the receive tank. With auto-eject on, received fluid is pushed into the neighbouring tank or machine. Buckets also work.\nRange and power are the same as packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks). Auto-send thresholds count buckets (1, 16, 32 or full).",
-    "translation": "유체 드론 포트는 물건용 드론 포트와 같은 드론과 스테이션으로 유체를 보냅니다. 목적지에는 같은 소유자의 유체 포트만 표시됩니다.\n왼쪽 위에 빈 유체 캡슐을 넣고, 발송 탱크(왼쪽)에 유체를 채운 뒤 「발송」을 누르면 탱크의 유체(한 종류, 최대 64,000 mB)를 캡슐에 담아 보냅니다. 도착한 캡슐은 수신 탱크(오른쪽, 128,000 mB)로 비워지고, 빈 캡슐은 빈 상자 칸으로 돌아갑니다. 수신 탱크가 가득 차면 캡슐은 도착 칸에서 기다립니다.\n파이프는 면 설정을 따릅니다. 「입력」 면으로 발송 탱크를 채우고, 「출력」 면으로 수신 탱크를 뽑아냅니다. 자동 배출을 켜면 받은 유체를 옆의 탱크나 장치로 밀어냅니다. 양동이로도 넣고 뺄 수 있습니다.\n사거리와 전력은 포장 상자와 같습니다(유체 캡슐 160, 배터리 760, 대용량 3,160블록). 자동 발송 기준은 양동이 수(1, 16, 32 또는 가득)입니다."
+    "source": "The Fluid Drone Port sends fluids with the same drones and stations as the item port. Only fluid ports with the same owner appear as destinations.\nPut empty fluid capsules top left, fill the send tank (left) and press Send. The port fills a capsule from the tank (one fluid, up to 64,000 mB) and sends it. Arrived capsules empty into the receive tank (right, 128,000 mB), and empty capsules return to the crate slot. If the receive tank is full, the capsule waits in the arrival slots.\nInput faces fill the send tank. Enable auto-eject on an output face to send received fluid into a pipe or adjacent tank. Buckets also work.\nRange and power are the same as packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks). Auto-send thresholds count buckets (1, 16, 32 or full).",
+    "translation": "유체 드론 포트는 물건용 드론 포트와 같은 드론과 스테이션으로 유체를 보냅니다. 목적지에는 같은 소유자의 유체 포트만 표시됩니다.\n왼쪽 위에 빈 유체 캡슐을 넣고, 발송 탱크(왼쪽)에 유체를 채운 뒤 「발송」을 누르면 탱크의 유체(한 종류, 최대 64,000 mB)를 캡슐에 담아 보냅니다. 도착한 캡슐은 수신 탱크(오른쪽, 128,000 mB)로 비워지고, 빈 캡슐은 빈 상자 칸으로 돌아갑니다. 수신 탱크가 가득 차면 캡슐은 도착 칸에서 기다립니다.\n입력 면으로 발송 탱크를 채울 수 있습니다. 출력 면에서 자동 배출을 켜면 받은 유체를 파이프나 인접 탱크로 보냅니다. 양동이도 사용할 수 있습니다.\n사거리와 전력은 포장 상자와 같습니다(유체 캡슐 160, 배터리 760, 대용량 3,160블록). 자동 발송 기준은 양동이 수(1, 16, 32 또는 가득)입니다."
   },
   "tooltip.singulo.fluid_drone_port.send": {
     "source": "Send tank: %s %s mB",
@@ -15782,5 +15786,37 @@
   "tooltip.singulo.tank_room": {
     "source": "Capacity per tank: %s mB",
     "translation": "탱크당 용량 %s mB"
+  },
+  "block.singulo.fluid_pump": {
+    "source": "Electric Fluid Pump",
+    "translation": "전동 유체 펌프"
+  },
+  "desc.singulo.fluid_pump": {
+    "source": "Attach the copper intake to a tank. Supply FE on any face. The pump draws power only as it delivers fluid. On Singulo cables, other devices receive power first. Right-click to choose output faces.",
+    "translation": "구리색 흡입구를 탱크에 대고 아무 면에서나 전력을 공급하세요. 펌프는 유체를 보낼 때만 전력을 사용합니다. Singulo 전선에서는 다른 장치에 먼저 전력을 공급합니다. 우클릭으로 출력 면을 선택하세요."
+  },
+  "gui.singulo.device.pump.intake": {
+    "source": "Draws through the face attached during placement",
+    "translation": "설치할 때 붙인 면에서 유체를 끌어옵니다"
+  },
+  "gui.singulo.device.pump.toggle": {
+    "source": "Click to toggle output on this face",
+    "translation": "클릭하여 이 면의 출력 상태 전환"
+  },
+  "howto.singulo.fluid_pump": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "summary.singulo.fluid_pump": {
+    "source": "Uses power to pump fluid from the attached tank.",
+    "translation": "전력을 사용해 연결된 탱크에서 유체를 끌어옵니다."
+  },
+  "block.singulo.creative_fluid_trash": {
+    "source": "Creative Fluid Trash Can",
+    "translation": "크리에이티브 유체 쓰레기통"
+  },
+  "desc.singulo.creative_fluid_trash": {
+    "source": "Voids fluid piped into any face or poured from a container. Also works in fluid container filling slots.",
+    "translation": "어느 면으로 보내거나 용기로 부은 유체든 폐기합니다. 기계의 유체 용기 충전 슬롯에도 사용할 수 있습니다."
   }
 }

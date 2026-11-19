@@ -15,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
@@ -143,13 +142,17 @@ public class FluidDronePortBlockEntity extends DronePortBlockEntity {
     }
 
     @Override
+    protected boolean hasFluidToEject() { return !receive.isEmpty(); }
+
+    @Override
     protected void ejectExtra(ServerLevel level, Direction dir) {
         if (receive.isEmpty()) {
             return;
         }
         IFluidHandler dest = level.getCapability(Capabilities.FluidHandler.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
-        if (dest != null) {
-            FluidUtil.tryFluidTransfer(dest, receive, Integer.MAX_VALUE, true);
+        if (dest != null && io.github.genichimaruo.singulo.pipe.PipeFluidFilter.accepts(dest, receive.getFluid())) {
+            int moved = dest.fill(receive.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
+            if (moved > 0) receive.drain(moved, IFluidHandler.FluidAction.EXECUTE);
         }
     }
 

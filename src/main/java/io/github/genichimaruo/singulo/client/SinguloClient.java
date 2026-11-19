@@ -463,6 +463,7 @@ public final class SinguloClient {
     }
 
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
+        event.registerBlock(new FluidPumpParticles(), io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PUMP.get());
         // 液体カプセル: 立体の殻の中に、詰めた液体を描く
         event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
             @Override

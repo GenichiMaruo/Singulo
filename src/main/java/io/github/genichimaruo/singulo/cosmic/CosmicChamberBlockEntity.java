@@ -11,6 +11,7 @@ import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.ArrayList;
+import io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -196,6 +197,11 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         be.linkPorts(formed);
         if(formed) {
             if(be.kind()==ACCUMULATOR){be.pushPower();be.chargeItems();}
+            else if (be.kind() == RESERVOIR && !be.tank.isEmpty()) {
+                Direction front = be.back().getOpposite();
+                BlockPos target = pos.relative(front);
+                if (level.isLoaded(target)) MultiblockPortBlockEntity.pushFluids(level, target, front.getOpposite(), be.tank);
+            }
             else if(be.kind()==SPINDLE)be.process((ServerLevel)level);
         }
         // 稼働灯と音: 構造が完成していて、中身があるあいだ点く

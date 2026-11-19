@@ -88,7 +88,7 @@ def stage_of(name):
         if name == spent:
             return stage_of(cat)
     # レシピのないもの（封印コンテナからしか出ないものは、そのコンテナの鍵の段階）
-    return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
+    return {'クリエイティブ用液体ゴミ箱': 6, '酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
@@ -1547,6 +1547,7 @@ UI_LANG = {
     'gui.singulo.archivist.emerge_2': ('ならば、最後のページを見せよう。', 'Then let me show you the last page.'),
     'gui.singulo.archivist.phase_2': ('覚えているか。記録はすべて、ここにある。', 'Do you remember? Every record is here.'),
     'gui.singulo.archivist.phase_3': ('光も記録も、いつかはこの暗がりに沈む。', 'Light and records alike sink into this dark in the end.'),
+    'block.singulo.mixed_glass_slab': ('白黒ガラスの重ねハーフブロック', 'Stacked White and Black Glass Slabs'),
     'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
     'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
     'item.singulo.afterglow_wings.tip_2': ('滑空中にスニーク: 羽ばたいて前へ加速する', 'Sneak while gliding: beat the wings to surge forward'),
@@ -3488,24 +3489,27 @@ def tags():
         if tag == 'bypasses_armor':
             values.insert(1, f'{MODID}:jet_beam')
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
-    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
+    from building_variants import MIXED_SLAB
+    mixed_slab = f'{MODID}:{MIXED_SLAB}'
+    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]})
+                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)] + [mixed_slab]})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
-    copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
+    copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter', 'minecraft:block_entity_data'],
                        # 液体のドローン発着ポート: 2つのタンクの中身をアイテムへ写す（置き直すと戻る）
                        'fluid_drone_port': [f'{MODID}:port_send_fluid', f'{MODID}:port_receive_fluid'],
                        # 事象の地平線倉庫: しまっている物と個数
                        'horizon_vault': [f'{MODID}:vault_item', f'{MODID}:vault_count'],
+                       'fluid_pump': ['minecraft:block_entity_data'],
                        'zero_gravity_controller': ['minecraft:block_entity_data'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
     for n, (iid, _, kind) in MOD.items():
-        if kind in BLOCK_KINDS and iid not in ITEMLESS_BLOCKS:
+        if kind in BLOCK_KINDS and iid not in ITEMLESS_BLOCKS and iid != 'creative_fluid_trash':
             entry = {'type': 'minecraft:item', 'name': mid(n)}
             if iid in copy_components:
                 entry['functions'] = [{'function': 'minecraft:copy_components', 'source': 'block_entity',
@@ -3878,7 +3882,7 @@ TAB_GROUPS = [
     ]),
     ('配線と配管', [
         'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus',
-        'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct',
+        'fluid_pump', 'fluid_pipe', 'vacuum_jacketed_pipe', 'superfluid_conduit', 'horizon_duct',
         'cover_frame',
     ]),
     ('加工機', [
@@ -4053,7 +4057,7 @@ TAB_GROUPS = [
         'terminus_record', 'archivist_halo',
     ]),
     ('クリエイティブ専用', [
-        'creative_energy_source', 'creative_catalyst', 'builder_wand',
+        'creative_energy_source', 'creative_fluid_trash', 'creative_catalyst', 'builder_wand',
     ]),
     ('スポーンエッグ', [
         'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',

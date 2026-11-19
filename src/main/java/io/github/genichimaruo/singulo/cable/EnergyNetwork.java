@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.cable;
 
+import io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity;
 import io.github.genichimaruo.singulo.data.PackBalance;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 
@@ -354,9 +355,15 @@ public final class EnergyNetwork {
             return List.copyOf(ordered);
         });
         Map<Endpoint,IEnergyStorage> caps = new HashMap<>();
+        List<Endpoint> pumps = null;
         for (Endpoint target : targets) {
             if (target.pos.equals(caller.pos)) continue;
             IEnergyStorage receiver = caps.computeIfAbsent(target,this::capability);
+            if (receiver instanceof FluidPumpBlockEntity.PowerInput) {
+                if (pumps == null) pumps = new ArrayList<>();
+                pumps.add(target);
+                continue;
+            }
             if (receiver == null || !receiver.canReceive() || receiverLeft(s,target,receiver) <= 0) continue;
             List<Candidate> candidates = preferences.computeIfAbsent(target,t -> {
                 List<Candidate> choices = new ArrayList<>();
@@ -384,6 +391,13 @@ public final class EnergyNetwork {
                         sourceLeft(s,candidate.endpoint,supplier,0),simulate,false);
             }
         }
+        // Pumps spend only what this source still offers after ordinary consumers have been served.
+        if (pumps != null) for (Endpoint target : pumps) {
+            if (callerLeft <= 0) break;
+            long paid = supplyPump(s, caller, target, caps.get(target), path(node, target.node), callerLeft, simulate);
+            callerLeft -= paid;
+            callerPaid += paid;
+        }
         return callerPaid;
     }
 
@@ -399,6 +413,18 @@ public final class EnergyNetwork {
 
     private static long chargeFor(long received, double efficiency) {
         return efficiency == 1 ? received : Math.max(received, (long) Math.ceil(received / efficiency));
+    }
+
+    private long supplyPump(State s, Endpoint source, Endpoint target, IEnergyStorage pump, Path path,
+                            long offer, boolean simulate) {
+        long budget = Math.min(offer, available(s, path));
+        if (budget <= 0 || path.efficiency <= 0) return 0;
+        // A simulated cable offer can reach the same pump by more than one path.
+        long reserved = simulate ? s.received.getOrDefault(target.pos, 0L) - state.received.getOrDefault(target.pos, 0L) : 0;
+        long available = Math.min(Integer.MAX_VALUE, delivered(budget, path.efficiency));
+        int request = (int) Math.min(Integer.MAX_VALUE, reserved + available);
+        long received = Math.max(0, pump.receiveEnergy(request, simulate) - reserved);
+        return recordTransfer(s, source, target, path, Math.min(budget, chargeFor(received, path.efficiency)), received, simulate);
     }
 
     private long transfer(State s, Endpoint source, IEnergyStorage supplier, Endpoint target, IEnergyStorage receiver,
@@ -417,8 +443,13 @@ public final class EnergyNetwork {
             received = LongEnergyStorage.receive(receiver,received,false);
             if (offered) paid = Math.min(paid,chargeFor(received, path.efficiency));
         }
+        return recordTransfer(s, source, target, path, paid, received, simulate);
+    }
+
+    private long recordTransfer(State s, Endpoint source, Endpoint target, Path path, long paid, long received, boolean simulate) {
+        if (paid <= 0) return 0;
         account(s,path,source,target,paid,received);
-        if (!simulate && paid > 0) {
+        if (!simulate) {
             Sample sample = samples.computeIfAbsent(new SampleKey(path,source.pos,target),k -> new Sample());
             sample.amount += paid;
             if (windowStart < 0) windowStart = level.getGameTime();

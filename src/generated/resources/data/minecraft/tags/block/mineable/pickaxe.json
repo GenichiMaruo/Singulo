@@ -4,6 +4,7 @@
     "singulo:peltier_cooler",
     "singulo:bismuth_crystal_block",
     "singulo:glowing_bismuth_crystal",
+    "singulo:creative_fluid_trash",
     "singulo:creative_energy_source",
     "singulo:copper_wire",
     "singulo:fluid_pipe",
@@ -217,6 +218,7 @@
     "singulo:pasta_conductor",
     "singulo:tidal_draw_ring",
     "singulo:tidal_spindle_cradle",
+    "singulo:fluid_pump",
     "singulo:vacuum_jacketed_pipe",
     "singulo:superfluid_conduit",
     "singulo:horizon_duct",
@@ -265,6 +267,7 @@
     "singulo:white_glass_panel_slab",
     "singulo:black_reinforced_glass_slab",
     "singulo:android_gate_glass_slab",
-    "singulo:android_barrier_glass_slab"
+    "singulo:android_barrier_glass_slab",
+    "singulo:mixed_glass_slab"
   ]
 }

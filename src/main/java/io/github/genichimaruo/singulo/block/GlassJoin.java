@@ -1,13 +1,17 @@
 package io.github.genichimaruo.singulo.block;
 
+import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.SlabType;
 
 /**
  * 同じガラスどうしの境目を描かない（0.20.0）。バニラのガラスは同じブロックとの間の面だけを消すので、ガラスとその階段の間にも
@@ -55,6 +59,15 @@ public final class GlassJoin {
         return s.getBlock() instanceof Shaped shaped && shaped.base() == base;
     }
 
+    /** Shape occupied by the requested glass material at this position. */
+    @Nullable public static BlockState matchingPart(BlockState state, Block glass) {
+        if (state.is(glass) || shapedOf(state, glass)) return state;
+        if (!(state.getBlock() instanceof MixedGlassSlab)) return null;
+        boolean black = glass == SinguloBlocks.BLACK_REINFORCED_GLASS.get();
+        if (!black && glass != SinguloBlocks.WHITE_GLASS_PANEL.get()) return null;
+        return MixedGlassSlab.half(state, state.getValue(MixedGlassSlab.BLACK_ON_TOP) == black);
+    }
+
     /** self の direction 側の面が、隣の adjacent の形ですき間なく覆われているか（覆われていれば描かない）。 */
     public static boolean covered(BlockState self, BlockState adjacent, Direction direction) {
         return net.minecraft.world.phys.shapes.Shapes.blockOccudes(self.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO),
@@ -69,9 +82,8 @@ public final class GlassJoin {
 
         @Override
         protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
-            if (shapedOf(adjacent, this)) {
-                return fullFace(adjacent, direction.getOpposite());
-            }
+            BlockState part = matchingPart(adjacent, this);
+            if (part != null) return fullFace(part, direction.getOpposite());
             return super.skipRendering(state, adjacent, direction);
         }
     }
@@ -96,9 +108,8 @@ public final class GlassJoin {
             if (adjacent.is(glass)) {
                 return true;
             }
-            if (shapedOf(adjacent, glass)) {
-                return covered(state, adjacent, direction);
-            }
+            BlockState part = matchingPart(adjacent, glass);
+            if (part != null) return covered(state, part, direction);
             return super.skipRendering(state, adjacent, direction);
         }
     }
@@ -123,10 +134,33 @@ public final class GlassJoin {
             if (adjacent.is(glass)) {
                 return true;
             }
-            if (shapedOf(adjacent, glass)) {
-                return covered(state, adjacent, direction);
-            }
+            BlockState part = matchingPart(adjacent, glass);
+            if (part != null) return covered(state, part, direction);
             return super.skipRendering(state, adjacent, direction);
+        }
+    }
+
+    /** White panel and black reinforced glass share vanilla slab placement rules. */
+    public static final class PairSlab extends Slab {
+        public PairSlab(Supplier<Block> base, Properties properties) { super(base, properties); }
+
+        private boolean fits(BlockState existing, BlockPlaceContext context) {
+            return super.canBeReplaced(existing, context);
+        }
+
+        @Override protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+            // Vanilla checks the held item against "this", and the hit against the existing slab's shape.
+            return Block.byItem(context.getItemInHand().getItem()) instanceof PairSlab held && held.fits(state, context);
+        }
+
+        @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
+            BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
+            if (existing.getBlock() instanceof PairSlab other && other != this && existing.getValue(TYPE) != SlabType.DOUBLE) {
+                Block top = existing.getValue(TYPE) == SlabType.TOP ? other.base() : base();
+                return SinguloBlocks.MIXED_GLASS_SLAB.get().defaultBlockState()
+                        .setValue(MixedGlassSlab.BLACK_ON_TOP, top == SinguloBlocks.BLACK_REINFORCED_GLASS.get());
+            }
+            return super.getStateForPlacement(context);
         }
     }
 }

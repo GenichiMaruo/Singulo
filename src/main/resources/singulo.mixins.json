@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "RecipePatchMixin",
+    "MixedGlassExplosionMixin",
     "ProjectileAccessor",
     "DaylightDetectorBlockMixin",
     "HealOrHarmMobEffectMixin",

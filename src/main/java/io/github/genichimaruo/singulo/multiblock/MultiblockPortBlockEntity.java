@@ -21,9 +21,8 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
  * 隣が同じ構造物の部品やほかのポートなら押し出さない（行ったり来たりしないように）。
  */
 public class MultiblockPortBlockEntity extends PortBlockEntity {
-    /** アイテムと液体を押し出す間隔（tick）。電力は毎 tick。 */
+    /** アイテムを押し出す間隔（tick）。液体と電力は毎 tick。 */
     static final int ITEM_INTERVAL = 8;
-    static final int FLUID_PER_PUSH = 4_000;
 
     public MultiblockPortBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.MULTIBLOCK_PORT.get(), pos, state);
@@ -60,9 +59,10 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         }
         IEnergyStorage energy = port.delegate(Capabilities.EnergyStorage.BLOCK);
         boolean slow = (level.getGameTime() + pos.asLong()) % ITEM_INTERVAL == 0;
-        Outputs outputs = slow && level.getBlockEntity(controller) instanceof Outputs o ? o : null;
-        IItemHandler items = outputs == null ? null : outputs.ejectItems(pos);
+        Outputs outputs = level.getBlockEntity(controller) instanceof Outputs o ? o : null;
+        IItemHandler items = slow && outputs != null ? outputs.ejectItems(pos) : null;
         IFluidHandler fluids = outputs == null ? null : outputs.ejectFluids(pos);
+        if (fluids != null && !hasStoredFluid(fluids)) fluids = null;
         if ((energy == null || !energy.canExtract()) && items == null && fluids == null) {
             return;
         }
@@ -123,18 +123,27 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         }
     }
 
-    private static void pushFluids(Level level, BlockPos target, Direction from, IFluidHandler source) {
+    private static boolean hasStoredFluid(IFluidHandler source) {
+        for (int tank = 0; tank < source.getTanks(); tank++) {
+            if (!source.getFluidInTank(tank).isEmpty()) return true;
+        }
+        return false;
+    }
+
+    public static void pushFluids(Level level, BlockPos target, Direction from, IFluidHandler source) {
         IFluidHandler dest = level.getCapability(Capabilities.FluidHandler.BLOCK, target, from);
         if (dest == null) {
             return;
         }
-        FluidStack offer = source.drain(FLUID_PER_PUSH, IFluidHandler.FluidAction.SIMULATE);
-        if (offer.isEmpty()) {
-            return;
-        }
-        int moved = dest.fill(offer, IFluidHandler.FluidAction.EXECUTE);
-        if (moved > 0) {
-            source.drain(offer.copyWithAmount(moved), IFluidHandler.FluidAction.EXECUTE);
+        for (int tank = 0; tank < source.getTanks(); tank++) {
+            FluidStack fluid = source.getFluidInTank(tank);
+            if (fluid.isEmpty() || !io.github.genichimaruo.singulo.pipe.PipeFluidFilter.accepts(dest, fluid)) continue;
+            FluidStack offer = source.drain(fluid.copyWithAmount(Integer.MAX_VALUE), IFluidHandler.FluidAction.SIMULATE);
+            if (offer.isEmpty()) continue;
+            int moved = dest.fill(offer, IFluidHandler.FluidAction.EXECUTE);
+            if (moved > 0) {
+                source.drain(offer.copyWithAmount(moved), IFluidHandler.FluidAction.EXECUTE);
+            }
         }
     }
 }

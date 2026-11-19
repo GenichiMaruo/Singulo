@@ -223,9 +223,40 @@ def glass_stairs_model(tex, tops, name=None, base=None, textures=None, cells=Non
                                                  'scale': [0.375, 0.375, 0.375]}}}
 
 
+MIXED_SLAB = 'mixed_glass_slab'
+GLASS_PAIR = ('white_glass_panel', 'black_reinforced_glass')
+
+
+def mixed_slab_models(write_json, assets):
+    states = {}
+    for black_on_top in (False, True):
+        lower, upper = GLASS_PAIR if black_on_top else reversed(GLASS_PAIR)
+        name = f'{MIXED_SLAB}_{"black" if black_on_top else "white"}_top'
+        states[f'black_on_top={str(black_on_top).lower()}'] = {'model': f'{MODID}:block/{name}'}
+        textures = {'particle': f'{MODID}:block/{upper}'}
+        elements = []
+        for top, base in ((False, lower), (True, upper)):
+            f, t = [0, 8 if top else 0, 0], [16, 16 if top else 8, 16]
+            slab = base + ('_slab_top' if top else '_slab')
+            faces = {}
+            for face in _FACES:
+                if face == ('down' if top else 'up'):
+                    continue
+                plane = 16 if face in ('south', 'east', 'up') else 0
+                key = ('upper_' if top else 'lower_') + face
+                textures[key] = f'{MODID}:block/{slab}_{face}{plane}'
+                faces[face] = {'texture': '#' + key, 'uv': _face_uv(face, f, t), 'cullface': face}
+            elements.append({'from': f, 'to': t, 'faces': faces})
+        write_json(assets / 'models' / 'block' / f'{name}.json', {
+            'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent',
+            'textures': textures, 'elements': elements})
+    write_json(assets / 'blockstates' / f'{MIXED_SLAB}.json', {'variants': states})
+
+
 def models(write_json, assets):
     """ブロックの状態・モデル・アイテムのモデル（バニラの階段・ハーフブロック・塀の形に、元の建材の絵を貼る）。"""
     bs, mb, mi = assets / 'blockstates', assets / 'models' / 'block', assets / 'models' / 'item'
+    mixed_slab_models(write_json, assets)
     (assets / 'textures' / 'block').mkdir(parents=True, exist_ok=True)
     glass_join_textures(assets / 'textures' / 'block')     # ガラスの階段に接するガラスの面
     for variant, (base, shape) in VARIANTS.items():
@@ -306,6 +337,11 @@ def wall_multipart(m):
 
 def loot(write_json, data):
     """ハーフブロックは2つ重ねたものを壊すと2個（バニラと同じ）。階段・塀は1個。"""
+    write_json(data / 'loot_table' / 'blocks' / f'{MIXED_SLAB}.json', {
+        'type': 'minecraft:block',
+        'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:{base}_slab',
+                                            'functions': [{'function': 'minecraft:explosion_decay'}]}]}
+                  for base in GLASS_PAIR]})
     for variant, (_base, shape) in VARIANTS.items():
         entry = {'type': 'minecraft:item', 'name': f'{MODID}:{variant}'}
         if shape == 'slab':

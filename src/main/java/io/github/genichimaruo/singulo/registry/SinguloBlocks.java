@@ -4,6 +4,7 @@ import io.github.genichimaruo.singulo.data.PackBalance;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.block.MixedGlassSlab;
 import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.generated.GeneratedContent.BlockDef;
@@ -284,6 +285,10 @@ public final class SinguloBlocks {
             BLOCKS.register("wormhole_port", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.WORMHOLE_PORT, io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::new,
                     io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::serverTick));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.CreativeFluidTrashBlock> CREATIVE_FLUID_TRASH =
+            BLOCKS.register("creative_fluid_trash", () -> new io.github.genichimaruo.singulo.pipe.CreativeFluidTrashBlock(
+                    machineProperties().strength(-1.0F, 3_600_000.0F).noLootTable()));
+
     /** クリエイティブ電源（クリエイティブ専用）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity>> CREATIVE_ENERGY_SOURCE =
             BLOCKS.register("creative_energy_source", () -> new SimpleMachineBlock<>(machineProperties().strength(-1.0F, 3_600_000.0F),
@@ -366,6 +371,12 @@ public final class SinguloBlocks {
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
     public static final DeferredBlock<TransparentBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+
+    public static final DeferredBlock<MixedGlassSlab> MIXED_GLASS_SLAB = BLOCKS.register(
+            "mixed_glass_slab", () -> new MixedGlassSlab(
+                    glassProperties(MapColor.SNOW, 3.0F, 9.0F, SoundType.METAL).mapColor(
+                            state -> state.getValue(MixedGlassSlab.BLACK_ON_TOP)
+                                    ? MapColor.COLOR_BLACK : MapColor.SNOW)));
 
     /** アンドロイド用のガラス（遮断: アンドロイドだけ通れない、透過: アンドロイドだけ通れる。無地は隣とつながる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS = BLOCKS.register(
@@ -603,6 +614,9 @@ public final class SinguloBlocks {
             () -> new io.github.genichimaruo.singulo.cable.CoverFrameBlock(cableProperties(SoundType.CHAIN)));
 
     // ---- 液体パイプ
+    public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPumpBlock> FLUID_PUMP =
+            BLOCKS.register("fluid_pump", () -> new io.github.genichimaruo.singulo.pipe.FluidPumpBlock(machineProperties().noOcclusion()));
+
     public static final DeferredBlock<io.github.genichimaruo.singulo.pipe.FluidPipeBlock> FLUID_PIPE = BLOCKS.register("fluid_pipe",
             () -> new io.github.genichimaruo.singulo.pipe.FluidPipeBlock(cableProperties(SoundType.COPPER), () -> PackBalance.value(ServerConfig.COPPER_PIPE_RATE),
                     io.github.genichimaruo.singulo.pipe.PipeProfile.COPPER));
@@ -745,8 +759,8 @@ public final class SinguloBlocks {
             // ガラスのハーフブロック（0.21.0）も、元のガラスや同じガラスの階段・ハーフブロックとの境目を描かない
             case "slab" -> base instanceof io.github.genichimaruo.singulo.android.AndroidGlassBlock
                     ? new io.github.genichimaruo.singulo.android.AndroidGlassSlab(() -> base, properties)
-                    : base instanceof io.github.genichimaruo.singulo.block.GlassJoin.Glass
-                    ? new io.github.genichimaruo.singulo.block.GlassJoin.Slab(() -> base, properties)
+                    : base == WHITE_GLASS_PANEL.get() || base == BLACK_REINFORCED_GLASS.get()
+                    ? new io.github.genichimaruo.singulo.block.GlassJoin.PairSlab(() -> base, properties)
                     : new net.minecraft.world.level.block.SlabBlock(properties);
             case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
             default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());

@@ -307,6 +307,8 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         return 0;
     }
 
+    protected boolean hasFluidToEject() { return false; }
+
     /** 自動排出の面ごとに、物のほかに押し出すもの（液体のポートは受け取りのタンクの液体）。 */
     protected void ejectExtra(ServerLevel level, Direction dir) {}
 
@@ -779,8 +781,9 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
         if (now % 5 == 0) {
             unpack();
         }
-        if (now % 10 == 0 && (sides.ejectEnabled() || crateSides.ejectEnabled())) {
-            autoEject(level);
+        boolean itemTick = now % 10 == 0;
+        if ((itemTick && (sides.ejectEnabled() || crateSides.ejectEnabled())) || (sides.ejectEnabled() && hasFluidToEject())) {
+            autoEject(level, itemTick);
         }
         if (now % 20 == 0) {
             tickAuto(now);
@@ -924,18 +927,20 @@ public class DronePortBlockEntity extends BlockEntity implements AbstractMachine
     }
 
     /** 自動排出: 「出力」を含み自動排出がオンの面の隣へ、受け取りの欄と、着荷箱の欄に残った空の箱を押し出す。 */
-    private void autoEject(ServerLevel level) {
+    private void autoEject(ServerLevel level, boolean itemTick) {
         Direction facing = facing();
         for (SideConfig.Face f : SideConfig.Face.values()) {
             boolean cargo = sides.ejectEnabled() && sides.eject(f) && sides.canExtract(f);
-            boolean crates = crateSides.ejectEnabled() && crateSides.eject(f) && crateSides.canExtract(f);
+            boolean crates = itemTick && crateSides.ejectEnabled() && crateSides.eject(f) && crateSides.canExtract(f);
             if (!cargo && !crates) {
                 continue;
             }
             Direction dir = SideConfig.directionOf(facing, f);
+            if (!level.isLoaded(worldPosition.relative(dir))) continue;
             if (cargo) {
                 ejectExtra(level, dir);
             }
+            if (!itemTick) continue;
             IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                     worldPosition.relative(dir), dir.getOpposite());
             if (dest == null) {

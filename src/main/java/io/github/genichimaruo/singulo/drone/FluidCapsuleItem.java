@@ -94,7 +94,7 @@ public class FluidCapsuleItem extends DroneCrateItem {
         if (!level.isClientSide) {
             int filled = target.fill(inside, IFluidHandler.FluidAction.EXECUTE);
             if (filled > 0) {
-                ItemStack next = stack.copyWithCount(1);
+                ItemStack next = context.getPlayer() == null ? stack : stack.copyWithCount(1);
                 setFluid(next, inside.copyWithAmount(inside.getAmount() - filled));
                 if (context.getPlayer() != null) {
                     context.getPlayer().setItemInHand(context.getHand(), next);

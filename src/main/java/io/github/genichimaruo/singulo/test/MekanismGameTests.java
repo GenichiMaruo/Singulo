@@ -47,6 +47,53 @@ public final class MekanismGameTests {
     }
 
     @GameTest(template = EMPTY)
+    public static void pipeLeavesPassiveMekanismTankUntouched(GameTestHelper h) {
+        var tankPos = new BlockPos(3, 3, 3);
+        var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
+        h.setBlock(tankPos, tank);
+        h.getBlockEntity(tankPos).applyComponentsFromItemStack(new ItemStack(tank));
+        var outlet = tankPos.below();
+        h.setBlock(outlet, SinguloBlocks.FLUID_DRONE_PORT.get());
+        h.setBlock(outlet.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
+        h.runAfterDelay(5, () -> {
+            var top = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(tankPos), Direction.UP);
+            h.assertTrue(top != null && top.fill(new FluidStack(Fluids.LAVA, 8000), FluidAction.EXECUTE) == 8000,
+                    "Mekanism tank did not accept the test lava");
+            h.runAfterDelay(20, () -> {
+                h.assertTrue(top.getFluidInTank(0).getAmount() == 8000, "Tank was already ejecting with a receiver directly below");
+                h.setBlock(outlet, SinguloBlocks.FLUID_PIPE.get());
+                var receiver = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) h.getBlockEntity(outlet.east());
+                h.runAfterDelay(20, () -> {
+                    h.assertTrue(top.getFluidInTank(0).getAmount() == 8000 && receiver.sendTank().isEmpty(),
+                            "A pipe extracted lava from a passive Mekanism tank");
+                    h.succeed();
+                });
+            });
+        });
+    }
+
+    @GameTest(template = EMPTY)
+    public static void poweredPumpDrainsPassiveMekanismTank(GameTestHelper h) {
+        var tankAt = new BlockPos(3, 3, 3);
+        var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
+        h.setBlock(tankAt, tank);
+        h.getBlockEntity(tankAt).applyComponentsFromItemStack(new ItemStack(tank));
+        h.runAfterDelay(5, () -> {
+            var absolute = h.absolutePos(tankAt);
+            var above = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, absolute, Direction.UP);
+            h.assertTrue(above != null && above.fill(new FluidStack(Fluids.LAVA, 8000), FluidAction.EXECUTE) == 8000, "Tank did not accept lava");
+            h.setBlock(tankAt.below(), SinguloBlocks.FLUID_PUMP.get().defaultBlockState()
+                    .setValue(io.github.genichimaruo.singulo.pipe.FluidPumpBlock.INTAKE, Direction.UP));
+            var pump = (io.github.genichimaruo.singulo.pipe.FluidPumpBlockEntity) h.getBlockEntity(tankAt.below());
+            h.setBlock(tankAt.below().east(), SinguloBlocks.FLUID_DRONE_PORT.get());
+            var target = (io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity) h.getBlockEntity(tankAt.below().east());
+            h.assertTrue(pump.energy().receiveEnergy(125, false) == 125, "Wrong pump energy debit");
+            h.succeedWhen(() -> h.assertTrue(target.sendTank().getFluidAmount() == 5251 && above.getFluidInTank(0).getAmount() == 2749
+                    && pump.energy().getEnergyStored() == 0, "Passive Mekanism tank did not deliver the powered volume"));
+        });
+    }
+
+    @GameTest(template = EMPTY)
     public static void externalFluidTankSuppliesAndroid(GameTestHelper h) {
         BlockPos tankPos = new BlockPos(2, 2, 2);
         BlockPos absolute = h.absolutePos(tankPos);

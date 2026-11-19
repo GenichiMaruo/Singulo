@@ -70,6 +70,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private final SinguloEnergyStorage energy;
     private final IItemHandler automationItems;
     private final IFluidHandler automationFluids;
+    @Nullable private final IFluidHandler fluidOutput;
 
     private int progress;
     private int maxProgress;
@@ -190,6 +191,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         this.energy = new SinguloEnergyStorage(capacity, type.energyReceiveLimit(), 0, this::setChanged);
         this.automationItems = new AutomationItems();
         this.automationFluids = new AutomationFluids();
+        this.fluidOutput = type.fluidOutputs() > 0 ? new SidedFluids(0, -1) : null;
         this.tankSides = createTankSides(type);
     }
 
@@ -296,11 +298,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      */
     private final SideConfig[] tankSides;
 
-    /** はじめは、どの面からでも入力タンクへ入れられ、出力タンクから出せる（自動排出なし）。 */
+    /** はじめは、どの面からでも入力タンクへ入れられ、出力タンクの液体を送り出す。 */
     private static SideConfig[] createTankSides(MachineType type) {
         SideConfig[] out = new SideConfig[type.tanks()];
         for (int i = 0; i < out.length; i++) {
             out[i] = new SideConfig();
+            out[i].setEjectEnabled(i >= type.fluidInputs());
             int mode = i < type.fluidInputs() ? SideConfig.INPUT : SideConfig.OUTPUT;
             for (SideConfig.Face f : SideConfig.Face.values()) {
                 out[i].set(f, mode, i >= type.fluidInputs());
@@ -398,8 +401,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     @Override
-    public IFluidHandler ejectFluids() {
-        return type.fluidOutputs() > 0 ? new SidedFluids(0, -1) : null;
+    @Nullable public IFluidHandler ejectFluids() {
+        return fluidOutput;
     }
 
     /** 面ごとの設定に従うアイテムの入れ物（side が null なら制限なし）。無効の面は null。 */
@@ -447,11 +450,25 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (!s.hasProperty(AbstractMachineBlock.FACING)) {
             return;
         }
+        boolean configured = usesSideConfig();
+        if (!configured && (type.fluidOutputs() == 0 || structureSize() <= 0)) return;
+        boolean ejectItems = configured && level.getGameTime() % 10 == 0 && itemSides.ejectEnabled() && type.hasOutput();
+        boolean ejectFluid = false;
+        for (int i = type.fluidInputs(); i < tanks.length; i++) {
+            if (!tanks[i].isEmpty() && (!configured || tankSides[i].ejectEnabled())) {
+                ejectFluid = true;
+                break;
+            }
+        }
+        if (!ejectItems && !ejectFluid) return;
         net.minecraft.core.Direction facing = s.getValue(AbstractMachineBlock.FACING);
         for (SideConfig.Face f : SideConfig.Face.values()) {
             net.minecraft.core.Direction dir = SideConfig.directionOf(facing, f);
             BlockPos target = worldPosition.relative(dir);
-            if (itemSides.ejectEnabled() && itemSides.eject(f) && itemSides.canExtract(f) && type.hasOutput()) {
+            if (!level.isLoaded(target)) continue;
+            if (!configured && level.getBlockEntity(target) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity port
+                    && worldPosition.equals(port.controllerPos())) continue;
+            if (ejectItems && itemSides.eject(f) && itemSides.canExtract(f)) {
                 IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                         target, dir.getOpposite());
                 if (dest != null) {
@@ -465,19 +482,17 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                     }
                 }
             }
-            if (type.fluidOutputs() > 0) {
-                IFluidHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+            IFluidHandler dest = null;
+            for (int i = type.fluidInputs(); i < tanks.length; i++) {
+                SideConfig c = tankSides[i];
+                if (tanks[i].isEmpty() || configured && (!c.ejectEnabled() || !c.eject(f) || !c.canExtract(f))) continue;
+                if (dest == null) dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
                         target, dir.getOpposite());
-                if (dest != null) {
-                    for (int i = type.fluidInputs(); i < tanks.length; i++) {
-                        SideConfig c = tankSides[i];
-                        if (c.ejectEnabled() && c.eject(f) && c.canExtract(f) && !tanks[i].isEmpty()) {
-                            int moved = dest.fill(tanks[i].getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
-                            if (moved > 0) {
-                                tanks[i].drain(moved, IFluidHandler.FluidAction.EXECUTE);
-                            }
-                        }
-                    }
+                if (dest == null) break;
+                FluidStack offer = tanks[i].getFluid();
+                if (io.github.genichimaruo.singulo.pipe.PipeFluidFilter.accepts(dest, offer)) {
+                    int moved = dest.fill(offer.copy(), IFluidHandler.FluidAction.EXECUTE);
+                    if (moved > 0) tanks[i].drain(moved, IFluidHandler.FluidAction.EXECUTE);
                 }
             }
         }
@@ -570,9 +585,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             // 失活触媒・外した使いかけは出力スロットへ。予備との合流・入れ替え・装填もここで
             magazine.tick(items, type.catalystSlot(), this::returnCatalyst);
         }
-        if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
-            autoEject(level);
-        }
+        autoEject(level);
         boolean active = false;
         if (!enabled) {
             usage = 0;

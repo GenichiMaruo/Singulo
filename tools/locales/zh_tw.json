@@ -659,6 +659,10 @@
     "source": "Archive Terminal",
     "translation": "檔案終端"
   },
+  "block.singulo.mixed_glass_slab": {
+    "source": "Stacked White and Black Glass Slabs",
+    "translation": "黑白玻璃雙層半磚"
+  },
   "block.singulo.arena_hologram": {
     "source": "Hologram Floor",
     "translation": "全像地板"
@@ -1996,8 +2000,8 @@
     "translation": "1 級電線。距離越長，損失的能量越多一點。"
   },
   "desc.singulo.fluid_pipe": {
-    "source": "A stage 1 pipe for fluids and gases: 2,000 mB per tick. Connects on its own, sends outputs to the machines that use them and draws from adjacent water and lava sources.",
-    "translation": "輸送液體和氣體的階段1管道：每 tick 2,000 mB。放置後自動連接，把產物送往需要它的機器，也會從相鄰的水源和熔岩源抽取。"
+    "source": "Carries fluids and gases pushed into it, up to 2,000 mB per tick.",
+    "translation": "輸送機器排入的流體和氣體，每 tick 最多 2,000 mB。"
   },
   "desc.singulo.reactor_core_controller": {
     "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
@@ -13772,8 +13776,8 @@
     "translation": "輸送量沒有上限"
   },
   "uses.singulo.fluid_pipe": {
-    "source": "Used in: Vacuum-Jacketed Pipe, Fluid Drone Port",
-    "translation": "用於：真空絕熱管道、流體無人機起降港"
+    "source": "Used in: Vacuum-Jacketed Pipe, Fluid Drone Port, Electric Fluid Pump",
+    "translation": "用於：真空絕熱管道、流體無人機起降港、電動流體泵"
   },
   "desc.singulo.vacuum_jacketed_pipe": {
     "source": "A stage 2 pipe wrapped in a vacuum insulation jacket: 32,000 mB per tick. Connects to pipes of any tier.",
@@ -13884,16 +13888,16 @@
     "translation": "管道的階段"
   },
   "guide.singulo.fluids.pipes.body": {
-    "source": "Join the source and receiver with fluid pipes and check the side settings at both ends. Pipes can also draw from an adjacent water or lava source.\nBranches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.",
-    "translation": "用流體管道連接發送端和接收端，並檢查兩端的面設定。管道也能從相鄰的水源或熔岩源取液。\n分支共用的管段也會共享流量。輸送緩慢時，檢查沿途是否有細管。"
+    "source": "Connect the machines with fluid pipes and enable auto-eject on the sending face. For passive tanks, water or lava sources, point the Electric Fluid Pump intake at the source and supply power.\nBranches sharing a pipe also share its flow capacity. If delivery is slow, check for a narrow section along the route.",
+    "translation": "用流體管道連接機器，並在發送端的輸出面開啟自動輸出。從沒有自動輸出功能的儲槽、水源或熔岩源抽取時，將電動流體泵的入口對準流體來源並供電。\n分支共用的管段也會共享流量。輸送緩慢時，檢查沿途是否有細管。"
   },
   "guide.singulo.fluids.drone.title": {
     "source": "Sending fluids by drone",
     "translation": "用無人機運送液體"
   },
   "guide.singulo.fluids.drone.body": {
-    "source": "The Fluid Drone Port sends fluids with the same drones and stations as the item port. Only fluid ports with the same owner appear as destinations.\nPut empty fluid capsules top left, fill the send tank (left) and press Send. The port fills a capsule from the tank (one fluid, up to 64,000 mB) and sends it. Arrived capsules empty into the receive tank (right, 128,000 mB), and empty capsules return to the crate slot. If the receive tank is full, the capsule waits in the arrival slots.\nPipes follow the Sides settings: input faces fill the send tank and output faces drain the receive tank. With auto-eject on, received fluid is pushed into the neighbouring tank or machine. Buckets also work.\nRange and power are the same as packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks). Auto-send thresholds count buckets (1, 16, 32 or full).",
-    "translation": "流體無人機起降港使用與物品起降港相同的無人機和無人機站來發送液體。目的地中只會列出同一擁有者的流體起降港。\n把空的流體膠囊放進左上方，向發送罐（左）注入液體後按下「發送」，起降港會把罐中的液體（一種，最多 64,000 mB）裝進膠囊送出。送達的膠囊會注入接收罐（右，128,000 mB），空膠囊回到空箱欄。接收罐滿了時，膠囊會在到貨欄中等待。\n管道遵循面設定：從「輸入」面注入發送罐，從「輸出」面抽出接收罐。開啟自動排出後，收到的液體會被推入相鄰的儲罐或機器。也可以用桶存取。\n航程和電力與包裝箱相同（流體膠囊 160、附電池 760、大容量 3,160 格）。自動發送的閾值以桶計（1、16、32 或滿）。"
+    "source": "The Fluid Drone Port sends fluids with the same drones and stations as the item port. Only fluid ports with the same owner appear as destinations.\nPut empty fluid capsules top left, fill the send tank (left) and press Send. The port fills a capsule from the tank (one fluid, up to 64,000 mB) and sends it. Arrived capsules empty into the receive tank (right, 128,000 mB), and empty capsules return to the crate slot. If the receive tank is full, the capsule waits in the arrival slots.\nInput faces fill the send tank. Enable auto-eject on an output face to send received fluid into a pipe or adjacent tank. Buckets also work.\nRange and power are the same as packing crates (Fluid Capsule 160, Battery 760, Large Battery 3,160 blocks). Auto-send thresholds count buckets (1, 16, 32 or full).",
+    "translation": "流體無人機起降港使用與物品起降港相同的無人機和無人機站來發送液體。目的地中只會列出同一擁有者的流體起降港。\n把空的流體膠囊放進左上方，向發送罐（左）注入液體後按下「發送」，起降港會把罐中的液體（一種，最多 64,000 mB）裝進膠囊送出。送達的膠囊會注入接收罐（右，128,000 mB），空膠囊回到空箱欄。接收罐滿了時，膠囊會在到貨欄中等待。\n輸入面可向發送儲槽注入流體。在輸出面開啟自動輸出，即可將收到的流體送入管道或相鄰儲槽。也可用桶子存取。\n航程和電力與包裝箱相同（流體膠囊 160、附電池 760、大容量 3,160 格）。自動發送的閾值以桶計（1、16、32 或滿）。"
   },
   "tooltip.singulo.fluid_drone_port.send": {
     "source": "Send tank: %s %s mB",
@@ -15782,5 +15786,37 @@
   "tooltip.singulo.tank_room": {
     "source": "Capacity per tank: %s mB",
     "translation": "每個儲槽容量 %s mB"
+  },
+  "block.singulo.fluid_pump": {
+    "source": "Electric Fluid Pump",
+    "translation": "電動流體泵"
+  },
+  "desc.singulo.fluid_pump": {
+    "source": "Attach the copper intake to a tank. Supply FE on any face. The pump draws power only as it delivers fluid. On Singulo cables, other devices receive power first. Right-click to choose output faces.",
+    "translation": "將銅色吸入口朝向儲槽，可從任意面供電。泵浦只在輸送流體時耗電。Singulo 電纜會優先為其他裝置供電。右鍵選擇輸出面。"
+  },
+  "gui.singulo.device.pump.intake": {
+    "source": "Draws through the face attached during placement",
+    "translation": "從放置時貼住的面抽取流體"
+  },
+  "gui.singulo.device.pump.toggle": {
+    "source": "Click to toggle output on this face",
+    "translation": "點擊切換此面的輸出狀態"
+  },
+  "howto.singulo.fluid_pump": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作：工作台（階段1）"
+  },
+  "summary.singulo.fluid_pump": {
+    "source": "Uses power to pump fluid from the attached tank.",
+    "translation": "消耗電力，從連接的儲槽中泵出流體。"
+  },
+  "block.singulo.creative_fluid_trash": {
+    "source": "Creative Fluid Trash Can",
+    "translation": "創造模式流體垃圾桶"
+  },
+  "desc.singulo.creative_fluid_trash": {
+    "source": "Voids fluid piped into any face or poured from a container. Also works in fluid container filling slots.",
+    "translation": "可丟棄從任意一面輸入或用容器倒入的流體，也可放進設備的流體容器填充槽。"
   }
 }

@@ -65,8 +65,10 @@ public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMa
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CreativeEnergyBlockEntity be) {
         for (Direction dir : Direction.values()) {
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive() && !(level.getBlockEntity(pos.relative(dir)) instanceof CreativeEnergyBlockEntity)) {
+            BlockPos neighbor = pos.relative(dir);
+            if (!level.isLoaded(neighbor)) continue;
+            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, neighbor, dir.getOpposite());
+            if (target != null && target.canReceive() && !(level.getBlockEntity(neighbor) instanceof CreativeEnergyBlockEntity)) {
                 io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, Long.MAX_VALUE / 4, false);
             }
         }

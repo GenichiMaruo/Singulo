@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.reactor;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.energy.NeighborEnergyOutput;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
@@ -14,9 +15,9 @@ import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,7 +47,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -199,6 +199,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     private int hawkingTimer;
     private int ergoTimer;
     private long lastOutput;
+    private long outputTick = Long.MIN_VALUE;
+    private boolean pushingEnergy;
     private long nextCheck;
     @Nullable
     private BlockPos center;
@@ -274,6 +276,17 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     private void tick(ServerLevel level) {
+        resetOutputIfNewTick();
+        // Incomplete chunk data cannot tell us whether the player dismantled the structure.
+        if (!Structures.reactorAreaLoaded(level, worldPosition)) {
+            nextCheck = 0;
+            firstCheck = true;
+            formed = false;
+            TimeFields.remove(level, worldPosition);
+            var running = RUNNING.get(level);
+            if (running != null) running.remove(this);
+            return;
+        }
         if (collapseStart >= 0) {
             tickCollapse(level);
             return;
@@ -283,7 +296,6 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             checkStructure(level);
         }
-        lastOutput = 0;
         if (!formed) {
             if (state == State.IGNITING) {
                 abortIgnition(level);                     // 点火の途中で形が崩れた
@@ -725,6 +737,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         BlockPos.MutableBlockPos q = new BlockPos.MutableBlockPos();
         for (BlockPos o : DEVOUR_OFFSETS) {
             q.setWithOffset(at, o);
+            if (!level.isLoaded(q)) continue;
             BlockState s = level.getBlockState(q);
             if (!EventHorizonTargets.edibleBlock(level, q, s, true) || ShieldTowerBlockEntity.shielded(level, Vec3.atCenterOf(q), 4)) {
                 continue;
@@ -929,7 +942,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         // まわりの物も巻き込む（壊せない物と、入れ物などのブロックエンティティは残す）
         int r = COLLAPSE_RADIUS;
         for (BlockPos p : BlockPos.betweenClosed(c.offset(-r, -r, -r), c.offset(r, r, r))) {
-            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)
+            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition) || !level.isLoaded(p)
                     || !EventHorizonTargets.edibleBlock(level, p, level.getBlockState(p), false)) {
                 continue;
             }
@@ -963,6 +976,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         applyHazards(level);
         while (collapseDone < n - 1 && collapseDelay(collapseDone, n) <= t) {
             BlockPos p = collapseBlocks.get(collapseDone);
+            if (!level.isLoaded(p)) return;
             if (!level.getBlockState(p).isAir()) {
                 level.setBlock(p, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
@@ -1097,31 +1111,40 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 炉心制御装置と抽出ポートの隣（リアクターの部品以外）へ電力を押し出す。1 tick の合計は penroseMaxOutput まで。 */
     private void pushEnergy(ServerLevel level) {
-        if (buffer <= 0) {
-            return;
-        }
-        long budget = Math.min(buffer, maxOutput());
-        List<BlockPos> sources = new ArrayList<>(ports);
-        sources.add(worldPosition);
-        for (BlockPos src : sources) {
-            for (Direction dir : Direction.values()) {
-                if (budget <= 0) {
-                    break;
-                }
-                BlockPos n = src.relative(dir);
-                if (n.equals(worldPosition) || Structures.isReactorPart(level.getBlockState(n))) {
-                    continue;
-                }
-                IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
-                if (target != null && target.canReceive()) {
-                    // ケーブルなど mod の口へは int を超えて渡す
-                    long sent = io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, budget, false);
-                    budget -= sent;
-                    buffer -= sent;
-                    lastOutput += sent;
-                }
+        if (remainingOutput() <= 0 || !energyPort.canExtract()) return;
+        // A cable can also see a second port of this reactor while accepting our offer.
+        pushingEnergy = true;
+        try {
+            var output = new NeighborEnergyOutput(level, this::remainingOutput, this::debitOutput);
+            Predicate<BlockPos> external = pos -> !pos.equals(worldPosition) && !Structures.isReactorPart(level.getBlockState(pos));
+            for (BlockPos port : ports) {
+                if (remainingOutput() <= 0) break;
+                if (level.isLoaded(port)) output.pushFrom(port, external);
             }
+            output.pushFrom(worldPosition, external);
+            output.sendSurplusToPumps();
+        } finally {
+            pushingEnergy = false;
         }
+    }
+
+    private void resetOutputIfNewTick() {
+        long now = level == null ? 0 : level.getGameTime();
+        if (outputTick != now) {
+            outputTick = now;
+            lastOutput = 0;
+        }
+    }
+
+    private long remainingOutput() {
+        resetOutputIfNewTick();
+        return Math.max(0, Math.min(buffer, maxOutput() - lastOutput));
+    }
+
+    private void debitOutput(long sent) {
+        buffer -= sent;
+        lastOutput += sent;
+        setChanged();
     }
 
     private void broadcast(ServerLevel level, String key, Object... args) {
@@ -1259,7 +1282,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     private final class EnergyPort implements io.github.genichimaruo.singulo.energy.LongEnergyStorage {
         @Override
         public long receiveLong(long amount, boolean simulate) {
-            if (state != State.IGNITING) {
+            if (amount <= 0 || !canReceive()) {
                 return 0;
             }
             long take = Math.min(amount, Math.max(0, ignitionEnergy() - ignitionStored));
@@ -1277,10 +1300,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
         @Override
         public long extractLong(long amount, boolean simulate) {
-            long take = Math.min(amount, buffer);
-            if (!simulate) {
-                buffer -= take;
-            }
+            if (amount <= 0 || !canExtract()) return 0;
+            long take = Math.min(amount, remainingOutput());
+            if (take > 0 && !simulate) debitOutput(take);
             return take;
         }
 
@@ -1301,7 +1323,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
         @Override
         public boolean canExtract() {
-            return state == State.RUNNING;
+            return state == State.RUNNING && !pushingEnergy;
         }
 
         @Override

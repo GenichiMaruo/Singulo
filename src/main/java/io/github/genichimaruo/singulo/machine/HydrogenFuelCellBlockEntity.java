@@ -8,7 +8,6 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -17,8 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -139,7 +136,8 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
         double perMb = fePerMb();
         if (!standby && perMb > 0) {
             // 出力に見合う水素を使う（水素2 mB に酸素1 mB）。足りない分だけ出力を下げる
-            double want = output / perMb;
+            double headroom = energy.getMaxEnergyStored() - energy.getEnergyStored();
+            double want = Math.min(output, headroom) / perMb;
             // Only whole 2H:1O pairs can be withdrawn. An odd last mB must stay in the tank,
             // rather than being credited as a second mB that drain() never supplied.
             double available = Math.min(hydrogen.getFluidAmount() / 2, oxygen.getFluidAmount()) * 2.0 + carry;
@@ -156,18 +154,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
                 energy.generateRate(rate);
             }
         }
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                break;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), energy.exportLimit()), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         boolean active = rate > 0;
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);

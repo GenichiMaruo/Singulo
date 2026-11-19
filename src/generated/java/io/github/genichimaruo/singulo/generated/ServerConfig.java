@@ -7,6 +7,9 @@ public final class ServerConfig {
     private ServerConfig() {}
 
     // ---- ServerConfig ----
+    public static final ModConfigSpec.IntValue PUMP_START_FE;
+    public static final ModConfigSpec.IntValue PUMP_FE_AT_HIGH_FLOW;
+    public static final ModConfigSpec.DoubleValue PUMP_FE_PER_MB;
     public static final ModConfigSpec.DoubleValue MINIMUM_CABLE_EFFICIENCY;
     public static final ModConfigSpec.LongValue COPPER_CABLE_RATE;
     public static final ModConfigSpec.DoubleValue COPPER_CABLE_LOSS;
@@ -156,6 +159,9 @@ public final class ServerConfig {
     public static final ModConfigSpec SPEC;
 
     static {
+        ModConfigSpec.IntValue PUMP_START_FE_;
+        ModConfigSpec.IntValue PUMP_FE_AT_HIGH_FLOW_;
+        ModConfigSpec.DoubleValue PUMP_FE_PER_MB_;
         ModConfigSpec.DoubleValue MINIMUM_CABLE_EFFICIENCY_;
         ModConfigSpec.LongValue COPPER_CABLE_RATE_;
         ModConfigSpec.DoubleValue COPPER_CABLE_LOSS_;
@@ -304,6 +310,12 @@ public final class ServerConfig {
         ModConfigSpec.BooleanValue SHARE_WITH_TEAM_;
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
         b.push("transport");
+        b.comment("電動液体ポンプが1 tickの最初の1 mBを搬出する電力（FE）", "範囲: 1〜2,147,483,647（整数）");
+        PUMP_START_FE_ = b.defineInRange("pumpStartFe", 100, 1, 2147483647);
+        b.comment("21億 mB/tでのポンプ電力（FE/t）。開始電力から直線補間し、それ以上の流量にも同じ傾きを使う。開始電力以下にすると定額", "範囲: 1〜2,147,483,647（整数）");
+        PUMP_FE_AT_HIGH_FLOW_ = b.defineInRange("pumpFeAtHighFlow", 10000000, 1, 2147483647);
+        b.comment("0で流量に応じた電力。正の値で旧方式の固定単価（FE/mB、最小0.001、0.001刻み）を指定する", "範囲: 0.0〜2,147,483,647");
+        PUMP_FE_PER_MB_ = b.defineInRange("pumpFePerMb", 0.0, 0.0, 2147483647.0);
         b.comment("経路全体で残る電力の割合の下限。0で損失100%を許容", "範囲: 0.0〜1.0");
         MINIMUM_CABLE_EFFICIENCY_ = b.defineInRange("minimumCableEfficiency", 0.5, 0.0, 1.0);
         b.comment("ケーブルの転送上限（FE/t）", "範囲: 1〜9,223,372,036,854,775,807");
@@ -408,7 +420,7 @@ public final class ServerConfig {
         b.push("general");
         b.comment("難易度の倍率を個別の値の上に掛ける。casual: スター不要・触媒寿命×2・遺構の再生×0.5・ウォーデンHP×0.5・殻の圧縮量×0.5。expert: スター×2・触媒寿命×0.75・修復2回まで・殻の圧縮量×1.5・点火エネルギー×2。standard と custom は個別の値のまま", "範囲: \"casual\" / \"standard\" / \"expert\" / \"custom\"");
         PRESET_ = b.defineInList("preset", "standard", java.util.Arrays.asList("casual", "standard", "expert", "custom"));
-        b.comment("設定ファイルの版（移行の印。手で変えない）。0.3.0 のファイルを読んだとき、旧既定値のまま残っている縮退熱炉の出力・殻の金属の核・炉殻の数だけを新しい既定値に直し、1にする。自分で変えた値は残る", "範囲: 0〜100（整数）");
+        b.comment("設定ファイルの移行版。1で旧設備、2～4で液体ポンプの旧既定値を更新する。個別に調整した値は引き継ぐ", "範囲: 0〜100（整数）");
         SETTINGS_VERSION_ = b.defineInRange("settingsVersion", 0, 0, 100);
         b.pop();
         b.push("netherStar");
@@ -631,6 +643,9 @@ public final class ServerConfig {
         b.comment("持ち主と同じバニラのチーム（/team）の人も、アンドロイド・ドローン・作業指令台を使える（許可証で人を絞っていても、チームの人は登録しなくてよい）。ドローン発着ポートは持ち主とチームの人だけ", "範囲: true / false");
         SHARE_WITH_TEAM_ = b.define("shareWithTeam", true);
         b.pop();
+        PUMP_START_FE = PUMP_START_FE_;
+        PUMP_FE_AT_HIGH_FLOW = PUMP_FE_AT_HIGH_FLOW_;
+        PUMP_FE_PER_MB = PUMP_FE_PER_MB_;
         MINIMUM_CABLE_EFFICIENCY = MINIMUM_CABLE_EFFICIENCY_;
         COPPER_CABLE_RATE = COPPER_CABLE_RATE_;
         COPPER_CABLE_LOSS = COPPER_CABLE_LOSS_;

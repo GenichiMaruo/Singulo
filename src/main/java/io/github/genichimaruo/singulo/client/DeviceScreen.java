@@ -4,6 +4,7 @@ import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.machine.DeviceMenu;
 import io.github.genichimaruo.singulo.machine.DeviceMenu.Kind;
 import java.util.List;
+import net.minecraft.core.Direction;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -110,6 +111,11 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                         List.of(Component.translatable("gui.singulo.detector.band." + v(DeviceMenu.Detector.BAND))));
             }
             case JET_FORGE -> forgeState();
+            case FLUID_PUMP -> {
+                boolean active = v(DeviceMenu.Pump.ACTIVE) != 0;
+                yield new State(active ? Panel.Status.RUN : Panel.Status.IDLE, active ? GuiSkin.OK : GuiSkin.IDLE,
+                        Component.translatable("gui.singulo.status." + (active ? "running" : "idle")), List.of());
+            }
         };
     }
 
@@ -197,16 +203,51 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
             case WORMHOLE_GENERATOR -> drawGenerator(g, t);
             case WORMHOLE_MOUTH -> drawMouth(g, t, mouseX, mouseY);
             case WORMHOLE_PORT -> drawPort(g, t, mouseX, mouseY);
-            case CONTAINMENT_TANK -> drawTank(g, t);
+            case CONTAINMENT_TANK -> drawTank(g, t, mouseX, mouseY);
             case HALO_COLLECTOR -> drawHalo(g, t);
             case MUON_COLLECTOR -> drawMuon(g, t);
             case DETECTOR -> drawDetector(g, t, mouseX, mouseY);
             case JET_FORGE -> drawForge(g, t, mouseX, mouseY);
+            case FLUID_PUMP -> drawPump(g, mouseX, mouseY);
         }
         if (hasEnergyBar()) {
             int[] e = energy();
             Panel.gauge(g, skin, cx(BAR_X), cy(BAR_Y), BAR_W, BAR_H, e[0] / (double) Math.max(1, e[1]), Panel.GLOW);
         }
+    }
+
+    private static final Direction[] PUMP_FACES = {Direction.NORTH, Direction.UP, Direction.SOUTH,
+            Direction.WEST, Direction.DOWN, Direction.EAST};
+    private static int pumpX(int i) { return 7 + i % 3 * 57; }
+    private static int pumpY(int i) { return 22 + i / 3 * 29; }
+
+    private void drawPump(GuiGraphics g, int mx, int my) {
+        for (int i = 0; i < PUMP_FACES.length; i++) {
+            var face = PUMP_FACES[i];
+            int bit = face.get3DDataValue(), x = pumpX(i), y = pumpY(i);
+            boolean intake = bit == v(DeviceMenu.Pump.INTAKE);
+            boolean enabled = (v(DeviceMenu.Pump.CLOSED) & (1 << bit)) == 0;
+            boolean hover = Panel.inside(mx, my, cx(x), cy(y), 54, 26);
+            Component direction = switch (face) {
+                case UP -> Component.translatable("gui.singulo.sides.face.top");
+                case DOWN -> Component.translatable("gui.singulo.sides.face.bottom");
+                default -> Component.translatable("direction.singulo." + face.getName());
+            };
+            Component role = Component.translatable("gui.singulo.sides.mode." + (intake ? 1 : enabled ? 2 : 0));
+            Panel.button(g, skin, cx(x), cy(y), 54, 26, intake ? Panel.Press.DISABLED : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+            g.fill(cx(x + 2), cy(y + 3), cx(x + 4), cy(y + 23), intake ? 0xFFEA965E : enabled ? CYAN : skin.dim());
+            AndroidStationScreen.fitCentered(g, font, direction, cx(x + 5), cy(y + 4), 46, skin.text());
+            AndroidStationScreen.fitCentered(g, font, role, cx(x + 5), cy(y + 15), 46, intake || enabled ? skin.text() : skin.dim());
+            hint(x, y, 54, 26, tr(intake ? "pump.intake" : "pump.toggle"));
+        }
+        drawPumpRate(g, 8, DeviceMenu.Pump.FLOW, Panel.Icon.DROP, CYAN, " mB/t");
+        drawPumpRate(g, 102, DeviceMenu.Pump.POWER, Panel.Icon.BOLT, Panel.GLOW, " FE/t");
+    }
+
+    private void drawPumpRate(GuiGraphics g, int x, int first, Panel.Icon icon, int color, String unit) {
+        long rate = Integer.toUnsignedLong(v(first)) | ((long) v(first + 1) << 32);
+        value(g, x, 89, icon, color, EnergyText.shortForm(rate) + unit, skin.text(),
+                Component.literal(String.format(java.util.Locale.ROOT, "%,d", rate) + unit));
     }
 
     // ------------------------------------------------------------------ 絵の部品
@@ -648,7 +689,7 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ 重力閉じ込めタンク
 
-    private void drawTank(GuiGraphics g, float t) {
+    private void drawTank(GuiGraphics g, float t, int mouseX, int mouseY) {
         int amount = v(DeviceMenu.Tank.AMOUNT);
         int cap = Math.max(1, v(DeviceMenu.Tank.CAPACITY));
         // 大きな縦のタンク: ゆっくり渦を巻くダークマター
@@ -674,12 +715,19 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
                     : 0xFF9A5050);
         }
         hint(18, 18, tw + 4, th + 4, tr("tank.label"), Component.literal(String.format("%,d / %,d mB", amount, cap)));
-        int y = statsTop(2);
+        int y = statsTop(3);
         value(g, 76, y, Panel.Icon.DROP, DARK_MATTER, EnergyText.shortForm(amount) + " / " + EnergyText.shortForm(cap) + " mB", skin.text(),
                 tr("tank.label"), Component.literal(String.format("%,d / %,d mB", amount, cap)));
         value(g, 76, y + STAT_PITCH, Panel.Icon.BOLT, GuiSkin.WARN,
                 EnergyText.of(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.FE_PER_TICK) + " FE/t", skin.text(),
                 tr("tank.upkeep", EnergyText.of(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.FE_PER_TICK)));
+        boolean enabled = v(DeviceMenu.Tank.EJECT) != 0;
+        Component label = Component.translatable("gui.singulo.sides.master_" + (enabled ? "on" : "off"));
+        int by = y + STAT_PITCH * 2;
+        boolean hover = Panel.inside(mouseX, mouseY, cx(76), cy(by), 92, 16);
+        Panel.button(g, skin, cx(76), cy(by), 92, 16, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        AndroidStationScreen.fitCentered(g, font, label, cx(79), cy(by + 4), 86, enabled ? GuiSkin.OK : skin.text());
+        hint(76, by, 92, 16, label, Component.translatable("gui.singulo.sides.face.front"));
     }
 
     // ------------------------------------------------------------------ ハロー捕集器
@@ -798,7 +846,15 @@ public class DeviceScreen extends FramedScreen<DeviceMenu> {
         }
         if (minecraft != null && minecraft.gameMode != null) {
             int id = -1;
-            if (kind == Kind.WORMHOLE_MOUTH) {
+            if (kind == Kind.CONTAINMENT_TANK && button == 0
+                    && Panel.inside(mouseX, mouseY, cx(76), cy(statsTop(3) + STAT_PITCH * 2), 92, 16)) {
+                id = DeviceMenu.Tank.BUTTON_EJECT;
+            } else if (kind == Kind.FLUID_PUMP && button == 0) {
+                for (int i = 0; i < PUMP_FACES.length; i++) {
+                    int side = PUMP_FACES[i].get3DDataValue();
+                    if (side != v(DeviceMenu.Pump.INTAKE) && Panel.inside(mouseX, mouseY, cx(pumpX(i)), cy(pumpY(i)), 54, 26)) id = side;
+                }
+            } else if (kind == Kind.WORMHOLE_MOUTH) {
                 if (Panel.inside(mouseX, mouseY, cx(MOUTH_MINUS_X), cy(MOUTH_BTN_Y), BTN, BTN)) {
                     id = DeviceMenu.Mouth.BUTTON_SMALLER;
                 } else if (Panel.inside(mouseX, mouseY, cx(MOUTH_PLUS_X), cy(MOUTH_BTN_Y), BTN, BTN)) {

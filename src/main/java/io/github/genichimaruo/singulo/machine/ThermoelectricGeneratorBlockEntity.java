@@ -4,6 +4,7 @@ import io.github.genichimaruo.singulo.data.ThermalData;
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,8 +21,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 熱電発電機（ゼーベック効果）。隣の最も熱いブロックと最も冷たいブロックの温度差 ΔT から
@@ -82,7 +81,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
             energy.generateRate(rate);
             melt(level);
         }
-        pushEnergy(level, pos);
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         if (state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
         }
@@ -95,6 +94,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
         BlockPos bestColdPos = null;
         for (Direction dir : Direction.values()) {
             BlockPos p = pos.relative(dir);
+            if (!level.isLoaded(p)) continue;
             BlockState s = level.getBlockState(p);
             ThermalData.Hot h = ThermalData.INSTANCE.hot(s);
             if (h != null && h.temperature() > bestHot) {
@@ -124,7 +124,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
 
     private void melt(Level level) {
         int excess = deltaT() - tolerance;
-        if (coldPos == null || excess <= 0) {
+        if (coldPos == null || excess <= 0 || !level.isLoaded(coldPos)) {
             return;
         }
         // ネザーでは氷系が速く溶ける
@@ -142,21 +142,6 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
             level.setBlock(coldPos, next.defaultBlockState(), Block.UPDATE_ALL);
         }
         scan(level, worldPosition);
-    }
-
-    private void pushEnergy(Level level, BlockPos pos) {
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                return;
-            }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), energy.exportLimit()), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
     }
 
     // ------------------------------------------------------------------ GUI・保存
