@@ -29,18 +29,16 @@ public final class WorkPlanner {
     }
 
     private static final class Context {
-        final java.util.Map<Key, RecipeRackBlockEntity.Entry> recipes = new java.util.HashMap<>();
+        final java.util.Map<Key, RecipeRackBlockEntity.Entry> recipes;
         final List<ItemCount> stock, surplus = new ArrayList<>();
         final Level level;
         int visits;
         Context(List<RecipeRackBlockEntity.Entry> entries, List<ItemCount> stock, @Nullable Level level) {
             this.stock = stock;
             this.level = level;
+            this.recipes = mainRecipes(entries);
             if (level != null) for (var c : stock) {
                 if (io.github.genichimaruo.singulo.wormhole.UnstableMouthItem.expired(c.item, level)) c.count = 0;
-            }
-            for (var entry : entries) {
-                recipes.putIfAbsent(Key.of(entry.recipe().outputKey()), entry);
             }
             // Explicit main products take precedence over co-products from other cards.
             for (var entry : entries) {
@@ -58,6 +56,17 @@ public final class WorkPlanner {
     }
 
     private WorkPlanner() {}
+
+    private static java.util.Map<Key, RecipeRackBlockEntity.Entry> mainRecipes(List<RecipeRackBlockEntity.Entry> entries) {
+        var selected = new java.util.LinkedHashMap<Key, RecipeRackBlockEntity.Entry>();
+        for (var entry : entries) selected.putIfAbsent(Key.of(entry.recipe().outputKey()), entry);
+        return selected;
+    }
+
+    /** The same one-card-per-main-product preference used to plan an order. */
+    public static List<RecipeRackBlockEntity.Entry> preferredMainRecipes(List<RecipeRackBlockEntity.Entry> entries) {
+        return List.copyOf(mainRecipes(entries).values());
+    }
 
     /** 1つの工程: レシピを crafts 回作る（needed は要る数。作る数との差が余り）。 */
     public record Step(RecipeRackBlockEntity.Entry entry, long crafts, long needed) {}

@@ -52,6 +52,7 @@ public final class AndroidOrders {
     }
     /** Ordinary item-output crafting recipes using all eligible fluid-bucket substitutions.
      * Quantities of substituted fluids are in mB. No virtual bucket or other byproduct is promised.
+     * Only the same first card per main product that the workshop planner can choose is considered.
      * This is additive to {@link #recipes}; use the latter for the physical-bucket variants.
      */
     public static RecipeSnapshot fluidCraftingRecipes(ServerLevel level, BlockPos pos, UUID actor) {
@@ -63,7 +64,9 @@ public final class AndroidOrders {
         if (c == null) return new RecipeSnapshot(SnapshotState.UNAVAILABLE, List.of());
         if (!actor.equals(c.owner())) return new RecipeSnapshot(SnapshotState.REJECTED, List.of());
         var out = new java.util.ArrayList<AndroidRecipe>();
-        for (var entry : c.recipes()) {
+        var entries = c.recipes();
+        if (fluidCrafting) entries = io.github.genichimaruo.singulo.android.work.WorkPlanner.preferredMainRecipes(entries);
+        for (var entry : entries) {
             var recipe = entry.recipe();
             if (fluidCrafting) {
                 recipe = io.github.genichimaruo.singulo.android.work.BucketCrafting.fluidVariant(level, recipe);

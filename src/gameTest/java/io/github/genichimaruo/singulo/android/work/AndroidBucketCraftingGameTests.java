@@ -90,6 +90,16 @@ public final class AndroidBucketCraftingGameTests {
                 "Fluid recipe changed units, product, or promised a phantom bucket");
         h.assertTrue(AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), java.util.UUID.randomUUID()).state()
                 == AndroidOrders.SnapshotState.REJECTED, "Non-owner read fluid recipes");
+        var overridingCard = new ItemStack(SinguloItems.RECIPE_CARD.get());
+        var competingGrid = NonNullList.withSize(9, ItemStack.EMPTY);
+        competingGrid.set(4, new ItemStack(Items.MAGMA_CREAM));
+        new RecipeData(competingGrid, target).write(overridingCard, level.registryAccess());
+        rack.items().setStackInSlot(1, overridingCard);
+        rack.items().setStackInSlot(2, card);
+        h.assertTrue(AndroidOrders.fluidCraftingRecipes(level, console.getBlockPos(), player.getUUID()).recipes().isEmpty(),
+                "Fluid snapshot exposed a card which the planner never selects");
+        rack.items().setStackInSlot(1, card);
+        rack.items().setStackInSlot(2, ItemStack.EMPTY);
         var worker = tankWorker(h, player.getUUID(), 500);
         var other = tankWorker(h, player.getUUID(), 500);
         var ids = List.of(other.getUUID(), worker.getUUID());
