@@ -185,7 +185,12 @@ public final class MachineGuiReviewHarness {
             for (var slot : menu.slots) {
                 if (slot.x == menu.layout.upgradeX && slot.y == menu.layout.upgradeY) continue;   // 右レールの強化の段
                 if (slot.x == menu.layout.capacityX && slot.y == menu.layout.capacityY) continue;
-                if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > MachineLayout.HEIGHT - 4)
+                if (type == MachineType.PRECISION_ASSEMBLER && slot == menu.getSlot(type.assemblyUpgradeSlot())) {
+                    if (slot.x != menu.layout.upgradeX || slot.y != GuiFrame.railSlotY(GuiFrame.RAIL_HELP))
+                        throw new IllegalStateException("Precision assembler upgrade slot outside its rail row");
+                    continue;
+                }
+                if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > menu.layout.height - 4)
                     throw new IllegalStateException("Slot outside panel: " + type + " " + slot.x + "," + slot.y);
             }
         } else if (extra == 8) {
