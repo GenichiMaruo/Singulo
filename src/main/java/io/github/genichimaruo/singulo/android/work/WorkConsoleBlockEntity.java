@@ -3177,10 +3177,12 @@ public class WorkConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
         for (var in : recipe.ingredients()) {
             ItemStack shown = slot < displayed.size() ? displayed.get(slot) : ItemStack.EMPTY;
             slot++;
-            var alternatives = in.ingredient().items().map(ItemStack::new).toArray(ItemStack[]::new);
-            if (alternatives.length == 0) return;
-            ItemStack actual = java.util.Arrays.stream(alternatives).filter(s -> ItemStack.isSameItem(s, shown))
-                    .findFirst().orElse(alternatives[0]);
+            if (level == null) return;
+            ItemStack actual = !shown.isEmpty() && in.ingredient().test(shown)
+                    ? shown : in.ingredient().display().resolveForStacks(
+                            net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(level)).stream()
+                            .filter(in.ingredient()).findFirst().orElse(ItemStack.EMPTY);
+            if (actual.isEmpty()) return;
             inputs.add(actual.copyWithCount(Math.max(1, in.count())));
         }
         ItemStack result = recipe.result();

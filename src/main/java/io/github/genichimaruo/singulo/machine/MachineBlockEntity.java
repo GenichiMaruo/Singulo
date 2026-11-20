@@ -2023,7 +2023,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             insert = itemSides.canInsert(face);
             extract = itemSides.canExtract(face);
         }
-        final boolean allowInsert = insert, allowExtract = extract;
+        final boolean allowInsert = insert && assemblyGrid == null, allowExtract = extract;
         return new io.github.genichimaruo.singulo.compat.ItemTransferView(items,
                 (slot, resource) -> allowInsert && (slot < type.inputSlots() || slot == type.catalystSlot()) && slotAccepts(slot, resource.toStack()),
                 (slot, resource) -> allowExtract && ((slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || pendingReturns.get(slot))) {

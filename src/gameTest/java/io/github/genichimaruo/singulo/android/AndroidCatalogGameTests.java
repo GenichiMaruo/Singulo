@@ -124,8 +124,10 @@ public final class AndroidCatalogGameTests {
             if (!holder.id().identifier().getNamespace().equals(Singulo.MODID)) continue;
             var recipe = holder.value();
             var grid = NonNullList.withSize(9, ItemStack.EMPTY);
-            int width = recipe instanceof ShapedRecipe shaped ? shaped.getWidth() : 3;
-            var ingredients = recipe instanceof ShapedRecipe shape ? shape.getIngredients() : recipe.placementInfo().ingredients().stream().map(java.util.Optional::of).toList();
+            var layout = recipe instanceof io.github.genichimaruo.singulo.recipe.SmesUpgradeRecipe upgrade
+                    ? upgrade.shapedRecipe() : recipe;
+            int width = layout instanceof ShapedRecipe shaped ? shaped.getWidth() : 3;
+            var ingredients = layout instanceof ShapedRecipe shape ? shape.getIngredients() : recipe.placementInfo().ingredients().stream().map(java.util.Optional::of).toList();
             for (int i = 0; i < ingredients.size(); i++) {
                 Ingredient ingredient = ingredients.get(i).orElse(null);
                 if (ingredient == null) continue;

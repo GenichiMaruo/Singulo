@@ -171,7 +171,7 @@ public final class RecipePatchGameTests {
                     {"singulo:patch":{"time":50,"energy":30,"fluid_ingredients":null}}
                     """);
             Files.writeString(path(upper, STEEL), """
-                    {"singulo:patch":{"time":15,"ingredients":{"0":{"ingredient":{"tag":null,"item":"minecraft:diamond"}}}}}
+                    {"singulo:patch":{"time":15,"ingredients":{"0":{"ingredient":"minecraft:diamond"}}}}
                     """);
             var manager = new Manager(h.getLevel().registryAccess());
             manager.load(pack(base), pack(lower), pack(upper));

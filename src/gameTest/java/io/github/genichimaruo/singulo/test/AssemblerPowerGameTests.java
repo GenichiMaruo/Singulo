@@ -37,9 +37,9 @@ public final class AssemblerPowerGameTests {
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerAddonItems(net.neoforged.neoforge.registries.RegisterEvent event) {
         event.register(net.minecraft.core.registries.Registries.ITEM, helper -> {
-            var shell = new CatalystItem.Spent(new net.minecraft.world.item.Item.Properties());
+            var shell = new CatalystItem.Spent(new net.minecraft.world.item.Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, ADDON_SPENT)));
             helper.register(ADDON_SPENT, shell);
-            helper.register(ADDON_CATALYST, new CatalystItem(new net.minecraft.world.item.Item.Properties(), 4, 12000, () -> shell));
+            helper.register(ADDON_CATALYST, new CatalystItem(new net.minecraft.world.item.Item.Properties().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, ADDON_CATALYST)), 4, 12000, () -> shell));
         });
     }
 

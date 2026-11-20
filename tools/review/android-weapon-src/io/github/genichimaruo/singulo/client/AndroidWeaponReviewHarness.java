@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import net.minecraft.client.GraphicsStatus;
+import net.minecraft.client.GraphicsPreset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.core.BlockPos;
@@ -34,13 +34,13 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class AndroidWeaponReviewHarness {
     private static final String OUTPUT = System.getProperty("singulo.androidWeaponOutput");
-    private static final List<GraphicsStatus> MODES = Arrays.stream(System.getProperty("singulo.androidWeaponGraphics", "fancy,fabulous").split(","))
-            .map(s -> GraphicsStatus.valueOf(s.trim().toUpperCase(Locale.ROOT))).distinct().toList();
+    private static final List<GraphicsPreset> MODES = Arrays.stream(System.getProperty("singulo.androidWeaponGraphics", "fancy,fabulous").split(","))
+            .map(s -> GraphicsPreset.valueOf(s.trim().toUpperCase(Locale.ROOT))).distinct().toList();
     private static final AABB SCENE_BOUNDS = new AABB(-8, 178, -8, 9, 187, 8);
     private static final List<Scene> SCENES = List.of(Scene.values());
     private static final int FRAMES_PER_MODE = SCENES.size() * 2;
     private static int frame, settled, elapsed;
-    private static boolean requested, captured;
+    private static boolean requested, captured, capturing;
     private static volatile boolean ready;
 
     private enum Scene {
@@ -60,13 +60,13 @@ public final class AndroidWeaponReviewHarness {
                 case CLEAR -> Blocks.AIR.defaultBlockState();
                 case OPAQUE_FRONT -> Blocks.GRAY_CONCRETE.defaultBlockState();
                 case RED_BACK, RED_FRONT -> Blocks.RED_STAINED_GLASS.defaultBlockState();
-                case STAIRS_BACK, STAIRS_FRONT -> BuiltInRegistries.BLOCK.get(Singulo.id("android_gate_glass_stairs"))
+                case STAIRS_BACK, STAIRS_FRONT -> BuiltInRegistries.BLOCK.getValue(Singulo.id("android_gate_glass_stairs"))
                         .defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
             };
         }
     }
 
-    private static GraphicsStatus mode() { return MODES.get(frame / FRAMES_PER_MODE); }
+    private static GraphicsPreset mode() { return MODES.get(frame / FRAMES_PER_MODE); }
     private static Scene scene() { return SCENES.get(frame % FRAMES_PER_MODE / 2); }
     private static boolean withSubjects() { return frame % 2 == 0; }
 
@@ -82,8 +82,8 @@ public final class AndroidWeaponReviewHarness {
     }
 
     private static void spawn(ServerLevel level, EntityType<? extends RuinAndroid> type, double x) {
-        var android = type.create(level);
-        android.moveTo(x, 180, 0.5, 0, 0);
+        var android = type.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+        android.snapTo(x, 180, 0.5, 0, 0);
         android.setNoAi(true);
         android.setPersistenceRequired();
         android.setSilent(true);
@@ -96,11 +96,11 @@ public final class AndroidWeaponReviewHarness {
         var level = server.overworld();
         var player = server.getPlayerList().getPlayer(mc.player.getUUID());
         if (frame == 0) {
-            level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, server);
-            level.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, server);
-            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
-            level.setDayTime(6000);
-            level.setWeatherParameters(100000, 0, false, false);
+            level.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+            level.getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
+            level.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
+            server.clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 6000);
+            server.setWeatherParameters(100000, 0, false, false);
             var gray = Blocks.GRAY_CONCRETE.defaultBlockState();
             for (var p : BlockPos.betweenClosed(-4, 179, -7, 4, 179, 4)) level.setBlockAndUpdate(p, gray);
             for (var p : BlockPos.betweenClosed(-5, 180, 4, 5, 185, 4)) level.setBlockAndUpdate(p, gray);
@@ -116,7 +116,7 @@ public final class AndroidWeaponReviewHarness {
             for (var p : BlockPos.betweenClosed(-3, 180, z, 3, 182, z)) level.setBlockAndUpdate(p, block);
         }
         player.setGameMode(GameType.SPECTATOR);
-        player.teleportTo(level, 0.5, 181.02 - player.getEyeHeight(), -5, 0, 0);
+        player.teleportTo(level, 0.5, 181.02 - player.getEyeHeight(), -5, java.util.Set.of(), 0, 0, false);
         ready = true;
     }
 
@@ -127,7 +127,7 @@ public final class AndroidWeaponReviewHarness {
         if (++elapsed > 7200) throw new AssertionError("Android weapon review timed out at frame " + frame);
         if (mc.player == null || mc.level == null || mc.getOverlay() != null || mc.getSingleplayerServer() == null) return;
         if (captured) {
-            captured = ready = requested = false;
+            capturing = captured = ready = requested = false;
             settled = 0;
             if (++frame == FRAMES_PER_MODE * MODES.size()) {
                 for (var mode : MODES) AndroidWeaponReviewChecks.verify(Path.of(OUTPUT), mode.name().toLowerCase(Locale.ROOT));
@@ -139,7 +139,7 @@ public final class AndroidWeaponReviewHarness {
         if (!requested) {
             requested = true;
             if (frame % FRAMES_PER_MODE == 0) {
-                mc.options.graphicsMode().set(mode());
+                mc.options.applyGraphicsPreset(mode());
                 mc.options.fov().set(40);
                 mc.levelRenderer.allChanged();
             }
@@ -161,20 +161,25 @@ public final class AndroidWeaponReviewHarness {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void render(RenderLevelStageEvent event) throws Exception {
-        if (!ready || captured || event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+    public static void render(RenderLevelStageEvent.AfterLevel event) throws Exception {
+        if (!ready || capturing) return;
         if (settled < (frame % FRAMES_PER_MODE == 0 ? 80 : 25)) return;
         var mc = Minecraft.getInstance();
-        if (mc.options.graphicsMode().get() != mode()
-                || (mc.levelRenderer.getTranslucentTarget() != null) != (mode() == GraphicsStatus.FABULOUS)) {
+        if (mc.options.graphicsPreset().get() != mode()
+                || (mc.levelRenderer.getTranslucentTarget() != null) != (mode() == GraphicsPreset.FABULOUS)) {
             throw new AssertionError("Requested graphics pipeline is unavailable: " + mode());
         }
         Path dir = Path.of(OUTPUT);
         Files.createDirectories(dir);
         String name = mode().name().toLowerCase(Locale.ROOT) + "-" + scene().name + (withSubjects() ? "-subjects.png" : "-empty.png");
-        try (var shot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
-            shot.writeToFile(dir.resolve(name));
-        }
-        captured = true;
+        capturing = true;
+        Screenshot.takeScreenshot(mc.getMainRenderTarget(), shot -> {
+            try (shot) {
+                shot.writeToFile(dir.resolve(name));
+                mc.execute(() -> captured = true);
+            } catch (java.io.IOException error) {
+                mc.execute(() -> { throw new java.io.UncheckedIOException(error); });
+            }
+        });
     }
 }

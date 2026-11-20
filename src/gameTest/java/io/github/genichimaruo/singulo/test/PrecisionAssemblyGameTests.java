@@ -32,7 +32,7 @@ public final class PrecisionAssemblyGameTests {
 
     private static MachineRecipe recipe(GameTestHelper h, String path) {
         return MachineRecipeIndex.station(h.getLevel(), TYPE).stream()
-                .filter(r -> r.id().equals(Singulo.id("precision_assembler/" + path))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().identifier().equals(Singulo.id("precision_assembler/" + path))).findFirst().orElseThrow().value();
     }
 
     private static MachineBlockEntity assembler(GameTestHelper h) {

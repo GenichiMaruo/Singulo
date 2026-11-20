@@ -57,9 +57,13 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     /** Keep recipe loading independent of item component initialization. */
-    public ItemStack result() { return resultTemplate.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY); }
+    // Validate the components as a player-sized stack, then restore the machine quantity.
+    private static ItemStack createMachineStack(ItemStackTemplate template) {
+        return template.withCount(1).create().copyWithCount(template.count());
+    }
+    public ItemStack result() { return resultTemplate.map(MachineRecipe::createMachineStack).orElse(ItemStack.EMPTY); }
     public List<FluidStack> fluidResults() { return fluidResultTemplates.stream().map(FluidStackTemplate::create).toList(); }
-    public ItemStack byproduct() { return byproductTemplate.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY); }
+    public ItemStack byproduct() { return byproductTemplate.map(MachineRecipe::createMachineStack).orElse(ItemStack.EMPTY); }
 
     /** Compatibility constructor for runtime callers and tests with already initialized stacks. */
     public MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,

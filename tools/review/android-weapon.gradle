@@ -5,7 +5,7 @@ allprojects {
         def reviewDir = file('build/android-weapon-review')
         sourceSets.main.java.srcDir(file('tools/review/android-weapon-src'))
         if (providers.gradleProperty('withSodium').isPresent()) {
-            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+            dependencies.add('localRuntime', 'maven.modrinth:sodium:zg4YQ9EL') { transitive = false }
         }
         neoForge.runs.client {
             gameDirectory = reviewDir
@@ -22,7 +22,7 @@ allprojects {
             doFirst {
                 def world = new File(reviewDir, 'saves/Review')
                 if (!new File(world, 'level.dat').isFile()) {
-                    def metadata = file('build/gametest/world/level.dat')
+                    def metadata = file('build/gametest/gametestserver/gametestworld/level.dat')
                     if (!metadata.isFile()) throw new GradleException('Run GameTests first to produce ' + metadata)
                     project.copy { from metadata; into world }
                 }

@@ -115,7 +115,7 @@ public final class AndroidMachineCycleGameTests {
                     && machine.status() != MachineBlockEntity.Status.NO_POWER) break;
         }
         String ran = machine.saveWithoutMetadata(level.registryAccess()).getStringOr("recipe", "");
-        if (!finished || !holder.id().toString().equals(ran)) {
+        if (!finished || !holder.id().identifier().toString().equals(ran)) {
             throw new IllegalStateException("active=" + ran + ", status=" + machine.status() + ", size=" + machine.structureSize());
         }
         if (assembly != null) {

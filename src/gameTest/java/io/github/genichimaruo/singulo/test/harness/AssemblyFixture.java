@@ -14,7 +14,7 @@ public final class AssemblyFixture {
     public static void place(GameTestHelper h, MachineBlockEntity machine, String recipePath, ItemStack... materials) {
         var id = Singulo.id("precision_assembler/" + recipePath);
         var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), machine.type()).stream()
-                .filter(entry -> entry.id().equals(id)).findFirst().orElseThrow().value();
+                .filter(entry -> entry.id().identifier().equals(id)).findFirst().orElseThrow().value();
         for (int cell = 0; cell < MachineRecipe.ASSEMBLY_CELLS; cell++) {
             h.assertTrue(machine.assemblyGrid().getStackInSlot(cell).isEmpty(), "Assembly cell already occupied: " + cell);
             var part = recipe.assemblyInput(cell);

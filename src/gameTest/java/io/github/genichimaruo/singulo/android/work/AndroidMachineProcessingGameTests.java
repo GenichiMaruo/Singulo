@@ -459,7 +459,7 @@ public final class AndroidMachineProcessingGameTests {
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
         MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, AT);
         var recipe = MachineBlockEntity.stationRecipes(level, machine.type()).stream()
-                .filter(r -> r.id().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().identifier().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
         RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, rackAt);
         var location = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
         WorkLocationCardItem.record(location, level, console.getBlockPos(), console.getBlockState().getBlock());
@@ -502,7 +502,7 @@ public final class AndroidMachineProcessingGameTests {
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
         MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, AT);
         var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), machine.type()).stream()
-                .filter(r -> r.id().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().identifier().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
         console.setMachineProcess(recipe, List.of());
         h.assertTrue(console.encode(), "Could not encode the original card");
         var encoded = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), h.getLevel().registryAccess());
@@ -537,7 +537,7 @@ public final class AndroidMachineProcessingGameTests {
         h.setBlock(AT, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
         MachineBlockEntity table = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, AT);
         var recipe = MachineBlockEntity.stationRecipes(h.getLevel(), table.type()).stream()
-                .filter(r -> r.id().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
+                .filter(r -> r.id().identifier().equals(Singulo.id("precision_assembler/android_tank_upgrade"))).findFirst().orElseThrow().value();
         console.setMachineProcess(recipe, List.of());
         h.assertTrue(console.encode(), "Could not record the original processing card");
         var registries = h.getLevel().registryAccess();
