@@ -20,7 +20,7 @@ import net.minecraft.util.GsonHelper;
  * The vanilla recipe manager still handles conditions, decoding, registration and client sync. */
 public final class RecipePatches {
     private static final String MARKER = "singulo:patch";
-    private static final FileToIdConverter FILES = FileToIdConverter.json("recipe");
+    private static final FileToIdConverter FILES = FileToIdConverter.json("recipes");
 
     private RecipePatches() {}
 

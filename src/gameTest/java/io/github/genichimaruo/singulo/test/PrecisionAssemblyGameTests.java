@@ -154,11 +154,9 @@ public final class PrecisionAssemblyGameTests {
         } finally {
             buf.release();
         }
-        var ops = registry.createSerializationContext(JsonOps.INSTANCE);
-        var codec = MachineRecipe.CODEC.codec();
-        var json = codec.encodeStart(ops, recipe).getOrThrow().getAsJsonObject();
+        var json = io.github.genichimaruo.singulo.recipe.RecipePatches.read(h.getLevel().getServer().getResourceManager(), recipe.getId());
         json.remove("shape");
-        var legacy = codec.parse(ops, json).getOrThrow();
+        var legacy = new MachineRecipe.Serializer().fromJson(recipe.getId(), json);
         h.assertTrue(!legacy.hasAssemblyShape() && legacy.assemblyPlan(board) != null, "Legacy recipe failed to load");
         int glass = 4, bucket = 9;
         java.util.Collections.swap(board, glass, bucket);

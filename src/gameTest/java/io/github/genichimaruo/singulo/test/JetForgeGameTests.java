@@ -481,7 +481,7 @@ public final class JetForgeGameTests {
     @GameTest(template = EMPTY)
     public static void heliumCartridgeIsAFluidContainer(GameTestHelper helper) {
         var helium = SinguloFluids.get("liquid_helium");
-        var handler = new ItemStack(item("empty_coolant_cartridge")).getCapability(Capabilities.FluidHandler.ITEM);
+        var handler = new ItemStack(item("empty_coolant_cartridge")).getCapability(Capabilities.FluidHandler.ITEM).orElse(null);
         helper.assertTrue(handler != null, "空のカートリッジに液体の口がない");
         helper.assertTrue(handler.fill(new FluidStack(helium, 200), IFluidHandler.FluidAction.EXECUTE) == 0, "200 mBで詰まった");
         helper.assertTrue(handler.fill(new FluidStack(helium, handler.getTankCapacity(0)), IFluidHandler.FluidAction.EXECUTE) == 250,

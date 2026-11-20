@@ -41,7 +41,7 @@ public final class FactoryLoadGameTests {
             });
             h.runAtTickTime((long)(i + 1) * phaseTicks, () -> {
                 if (benchmark) {
-                    long[] times = level.getServer().getTickTimesNanos().clone();
+                    long[] times = level.getServer().tickTimes.clone();
                     Arrays.sort(times);
                     Singulo.LOGGER.info("SMES factory: {} cells, server tick p50 {} ms, p95 {} ms",
                             count, times[49] / 1e6, times[94] / 1e6);

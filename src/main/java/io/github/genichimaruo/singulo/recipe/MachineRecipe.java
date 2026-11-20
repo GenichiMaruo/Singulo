@@ -461,7 +461,17 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             return new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(
                     json.get(json.has("id") ? "id" : "item").getAsString())), integer(json, "count", 1));
         }
-        private static int integer(com.google.gson.JsonObject o, String key, int fallback) { return o.has(key) ? o.get(key).getAsInt() : fallback; }
+        private static int integer(com.google.gson.JsonObject json, String key, int fallback) {
+            if (!json.has(key)) return fallback;
+            var value = json.get(key);
+            if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isNumber())
+                throw new com.google.gson.JsonSyntaxException("Expected integer for " + key);
+            try {
+                return new java.math.BigDecimal(value.getAsString()).intValueExact();
+            } catch (ArithmeticException | NumberFormatException ex) {
+                throw new com.google.gson.JsonSyntaxException("Invalid integer for " + key + ": " + value, ex);
+            }
+        }
         private static ItemStack readQuantity(FriendlyByteBuf buffer) {
             ItemStack stack = buffer.readItem();
             if (stack.isEmpty()) return stack;

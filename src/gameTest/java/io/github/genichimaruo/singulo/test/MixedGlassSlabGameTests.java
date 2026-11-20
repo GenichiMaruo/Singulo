@@ -47,7 +47,7 @@ public final class MixedGlassSlabGameTests {
     }
 
     private static BlockHitResult hit(BlockPos pos, Direction face, double y) {
-        Vec3 center = pos.getBottomCenter().add(0, y, 0);
+        Vec3 center = Vec3.atBottomCenterOf(pos).add(0, y, 0);
         return new BlockHitResult(face.getAxis().isHorizontal() ? center.relative(face, 0.5) : center, face, pos, false);
     }
 
@@ -123,11 +123,8 @@ public final class MixedGlassSlabGameTests {
                 return at.equals(pos) || at.equals(start) ? super.getBlockExplosionResistance(explosion, level, at, state, fluid)
                         : Optional.of(Float.MAX_VALUE);
             }
-            @Override public boolean shouldDamageEntity(Explosion explosion, Entity entity) { return false; }
-            @Override public float getKnockbackMultiplier(Entity entity) { return 0; }
         };
-        var explosion = new Explosion(h.getLevel(), null, null, calculator, origin.x, origin.y, origin.z, power, false, mode,
-                ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
+        var explosion = new Explosion(h.getLevel(), null, null, calculator, origin.x, origin.y, origin.z, power, false, mode);
         explosion.explode();
         explosion.finalizeExplosion(false);
         return explosion;
@@ -176,7 +173,7 @@ public final class MixedGlassSlabGameTests {
     public static void strongBlastCanBreakBothAndTriggerOnlyBlastLeavesBoth(GameTestHelper h) {
         var state = mixed(true);
         h.setBlock(BLAST_AT, state);
-        blast(h, new Vec3(0.5, 0.25, 0.5), 6, Explosion.BlockInteraction.TRIGGER_BLOCK);
+        blast(h, new Vec3(0.5, 0.25, 0.5), 6, Explosion.BlockInteraction.KEEP);
         h.assertTrue(h.getBlockState(BLAST_AT) == state, "Trigger-only explosion broke the glass");
         checkDrops(h, 0, 0);
         var blast = blast(h, new Vec3(0.5, 0.5, 0.5), 650, Explosion.BlockInteraction.DESTROY);

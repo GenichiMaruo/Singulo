@@ -51,7 +51,6 @@ public final class MekanismGameTests {
         var tankPos = new BlockPos(3, 3, 3);
         var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
         h.setBlock(tankPos, tank);
-        io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, tankPos).applyComponentsFromItemStack(new ItemStack(tank));
         var outlet = tankPos.below();
         h.setBlock(outlet, SinguloBlocks.FLUID_DRONE_PORT.get());
         h.setBlock(outlet.east(), SinguloBlocks.FLUID_DRONE_PORT.get());
@@ -77,7 +76,6 @@ public final class MekanismGameTests {
         var tankAt = new BlockPos(3, 3, 3);
         var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
         h.setBlock(tankAt, tank);
-        io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, tankAt).applyComponentsFromItemStack(new ItemStack(tank));
         h.runAfterDelay(5, () -> {
             var absolute = h.absolutePos(tankAt);
             var above = io.github.genichimaruo.singulo.compat.Capabilities.get(h.getLevel(), Capabilities.FluidHandler.BLOCK, absolute, Direction.UP);
@@ -100,7 +98,6 @@ public final class MekanismGameTests {
         var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
         h.assertTrue(tank != Blocks.AIR, "Mekanism fluid tank missing");
         h.setBlock(tankPos, tank);
-        h.getLevel().getBlockEntity(absolute).applyComponentsFromItemStack(new ItemStack(tank));
         h.runAfterDelay(5, () -> {
             var lava = new FluidStack(Fluids.LAVA, 2000);
             int inserted = 0;

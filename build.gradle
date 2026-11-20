@@ -42,6 +42,11 @@ sourceSets {
         runtimeClasspath += sourceSets.main.output
     }
 }
+tasks.named('processGameTestResources', ProcessResources) {
+    from('docs/examples/recipe-pack') {
+        into 'fixtures/recipe-pack'
+    }
+}
 sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java')
 configurations {
     gameTestImplementation.extendsFrom implementation

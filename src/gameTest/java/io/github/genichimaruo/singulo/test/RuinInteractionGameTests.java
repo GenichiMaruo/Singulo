@@ -21,7 +21,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -40,11 +39,10 @@ public final class RuinInteractionGameTests {
 
     private static ServerPlayer survivor(GameTestHelper helper, String name) {
         var level = helper.getLevel();
-        var cookie = CommonListenerCookie.createInitial(new GameProfile(UUID.randomUUID(), name), false);
-        var player = new ServerPlayer(level.getServer(), level, cookie.gameProfile(), cookie.clientInformation());
+        var player = new ServerPlayer(level.getServer(), level, new GameProfile(UUID.randomUUID(), name));
         var connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
-        level.getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
+        level.getServer().getPlayerList().placeNewPlayer(connection, player);
         TestScope.ownPlayer(helper, player);
         player.setGameMode(GameType.SURVIVAL);
         return player;
@@ -57,7 +55,7 @@ public final class RuinInteractionGameTests {
     private static void use(GameTestHelper helper, BlockPos pos, ServerPlayer player, ItemStack held) {
         BlockPos abs = helper.absolutePos(pos);
         player.setItemInHand(InteractionHand.MAIN_HAND, held);
-        helper.getBlockState(pos).useItemOn(held, helper.getLevel(), player, InteractionHand.MAIN_HAND,
+        player.gameMode.useItemOn(player, helper.getLevel(), held, InteractionHand.MAIN_HAND,
                 new BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false));
     }
 

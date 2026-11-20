@@ -18,7 +18,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
@@ -30,7 +29,7 @@ import net.minecraft.util.profiling.InactiveProfiler;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.neoforged.neoforge.common.conditions.ICondition;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
@@ -44,8 +43,7 @@ public final class RecipePatchGameTests {
     /** Exercise the normal preparation mixin and registry-aware recipe codecs on an isolated manager. */
     private static final class Manager extends RecipeManager {
         Manager(HolderLookup.Provider registries) {
-            super(registries);
-            injectContext(ICondition.IContext.EMPTY, registries);
+            super(ICondition.IContext.EMPTY);
         }
         void load(PackResources... packs) {
             try (var resources = new MultiPackResourceManager(PackType.SERVER_DATA, List.of(packs))) {
@@ -57,13 +55,13 @@ public final class RecipePatchGameTests {
     }
 
     private static Path path(Path pack, ResourceLocation id) throws IOException {
-        var file = pack.resolve("data").resolve(id.getNamespace()).resolve("recipe").resolve(id.getPath() + ".json");
+        var file = pack.resolve("data").resolve(id.getNamespace()).resolve("recipes").resolve(id.getPath() + ".json");
         Files.createDirectories(file.getParent());
         return file;
     }
     private static PackResources pack(Path path) {
         String name = path.getFileName().toString();
-        return new PathPackResources(new PackLocationInfo(name, Component.literal(name), PackSource.DEFAULT, Optional.empty()), path);
+        return new PathPackResources(name, path, false);
     }
 
     @GameTest(template = "empty")
@@ -75,7 +73,7 @@ public final class RecipePatchGameTests {
             var serverResources = h.getLevel().getServer().getResourceManager();
             for (var id : List.of(STEEL, FRAME, UPGRADE)) {
                 Files.writeString(path(base, id), RecipePatches.read(serverResources, id).toString());
-                String file = "/fixtures/recipe-pack/data/singulo/recipe/" + id.getPath() + ".json";
+                String file = "/fixtures/recipe-pack/data/singulo/recipes/" + id.getPath() + ".json";
                 try (var input = RecipePatchGameTests.class.getResourceAsStream(file)) {
                     Files.copy(java.util.Objects.requireNonNull(input, file), path(example, id));
                 }

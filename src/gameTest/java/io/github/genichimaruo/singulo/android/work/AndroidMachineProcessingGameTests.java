@@ -330,7 +330,7 @@ public final class AndroidMachineProcessingGameTests {
                 "Fuel slot consumed or changed the sample bucket");
         var legacy = card.save(level.registryAccess());
         var lava = new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000);
-        legacy.put("fuel", FluidSamples.of(lava).save(level.registryAccess()));
+        legacy.put("fuel", FluidSamples.of(lava).save(new net.minecraft.nbt.CompoundTag()));
         h.assertTrue(RecipeData.load(legacy, level.registryAccess()).fuel().is(Items.LAVA_BUCKET),
                 "Could not read the fuel on an older recipe card");
         var work = setup(h, console, card);
@@ -409,7 +409,7 @@ public final class AndroidMachineProcessingGameTests {
         h.assertTrue(console.addStep() == null && console.encode(), "Cannot record the lever procedure");
         var registries = level.registryAccess();
         var recorded = console.encoder().getItem(WorkConsoleBlockEntity.CARD);
-        var carried = ItemStack.parse(registries, recorded.save(registries)).orElseThrow();
+        var carried = ItemStack.of(recorded.save(new net.minecraft.nbt.CompoundTag()));
         var block = SinguloBlocks.ANDROID_RECIPE_RACK.get();
         h.setBlock(AT, block);
         RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, AT);
@@ -506,7 +506,9 @@ public final class AndroidMachineProcessingGameTests {
         h.assertTrue(console.encode(), "Could not encode the original card");
         var encoded = RecipeData.read(console.encoder().getItem(WorkConsoleBlockEntity.CARD), h.getLevel().registryAccess());
         // A hand-recorded or pre-board card has no machine recipe id or cell coordinates.
-        var card = RecipeData.processing(encoded.grid().reversed(), encoded.output(), List.of(), ItemStack.EMPTY);
+        var reversed = new java.util.ArrayList<>(encoded.grid());
+        java.util.Collections.reverse(reversed);
+        var card = RecipeData.processing(reversed, encoded.output(), List.of(), ItemStack.EMPTY);
         var work = setup(h, console, card);
         var inputs = card.inputs();
         for (var in : inputs) work.worker().addToCarry(in.item.copyWithCount(Math.toIntExact(in.count)));
@@ -518,7 +520,7 @@ public final class AndroidMachineProcessingGameTests {
                 "The worker replaced a player's incomplete board or charged for it");
         for (var in : inputs) h.assertTrue(work.worker().inventory().countItem(in.item.getItem()) == in.count, "The busy board took " + in.item);
         machine.assemblyGrid().extractItem(9, 16, false);
-        var missing = inputs.getLast().item;
+        var missing = inputs.get(inputs.size() - 1).item;
         work.worker().inventory().removeItemType(missing.getItem(), 1);
         work.visit();
         h.assertTrue(machine.assemblyInputs().stream().allMatch(ItemStack::isEmpty) && work.worker().charge() == charge,

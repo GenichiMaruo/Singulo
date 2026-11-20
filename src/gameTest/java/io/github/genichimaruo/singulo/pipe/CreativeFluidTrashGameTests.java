@@ -57,7 +57,7 @@ public final class CreativeFluidTrashGameTests {
         h.assertTrue(simulated.isSuccess() && source.getFluidAmount() == 54_321, "Simulation consumed fluid");
         var filled = FluidUtil.tryFillContainer(stack, source, Integer.MAX_VALUE, null, true);
         h.assertTrue(filled.isSuccess() && ItemStack.matches(stack, filled.getResult()) && source.isEmpty(), "Lost item or left fluid behind");
-        var handler = filled.getResult().getCapability(Capabilities.FluidHandler.ITEM);
+        var handler = filled.getResult().getCapability(Capabilities.FluidHandler.ITEM).orElse(null);
         h.assertTrue(handler != null && handler.getFluidInTank(0).isEmpty()
                 && handler.drain(Integer.MAX_VALUE, FluidAction.EXECUTE).isEmpty(), "Item retained discarded water");
         h.succeed();

@@ -37,9 +37,8 @@ public final class AndroidStationMenuGameTests {
                 @Override
                 public void dataChanged(AbstractContainerMenu menu, int slot, int value) {
                     buffer.clear();
-                    var codec = ClientboundContainerSetDataPacket.STREAM_CODEC;
-                    codec.encode(buffer, new ClientboundContainerSetDataPacket(menu.containerId, slot, value));
-                    var packet = codec.decode(buffer);
+                    new ClientboundContainerSetDataPacket(menu.containerId, slot, value).write(buffer);
+                    var packet = new ClientboundContainerSetDataPacket(buffer);
                     client.setData(packet.getId(), packet.getValue());
                 }
             });

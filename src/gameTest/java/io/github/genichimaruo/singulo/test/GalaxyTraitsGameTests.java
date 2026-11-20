@@ -45,7 +45,7 @@ public final class GalaxyTraitsGameTests {
         GenesisGalaxies old = (GenesisGalaxies) load.invoke(null, legacy, h.getLevel().registryAccess());
         h.assertTrue(old.seeds().equals(java.util.List.of(11L, 22L)) && old.traits().equals(java.util.List.of(0, 0)),
                 "Old galaxies do not load as plain spirals: " + old.traits());
-        CompoundTag saved = old.save(new CompoundTag(), h.getLevel().registryAccess());
+        CompoundTag saved = old.save(new CompoundTag());
         h.assertTrue(saved.getIntArray("traits").length == 2, "Traits are not saved");
 
         // 炉を組む

@@ -37,7 +37,7 @@ public final class BlueprintGameTests {
                 }
             }
             var recipes = level.getRecipeManager().getRecipes().stream()
-                    .filter(r -> r.id().getNamespace().equals(Singulo.MODID) && r.value().getResultItem(level.registryAccess()).is(controller))
+                    .filter(r -> r.getId().getNamespace().equals(Singulo.MODID) && r.getResultItem(level.registryAccess()).is(controller))
                     .toList();
             helper.assertTrue(!recipes.isEmpty(), "Missing controller recipe for " + kind.id());
             for (var holder : recipes) {

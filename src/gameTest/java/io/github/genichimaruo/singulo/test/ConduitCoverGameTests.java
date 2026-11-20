@@ -159,7 +159,7 @@ public final class ConduitCoverGameTests {
                 "Empty frame could not be waterlogged");
         ItemStack pipe = new ItemStack(SinguloBlocks.FLUID_PIPE.get());
         player.setItemInHand(InteractionHand.MAIN_HAND, pipe);
-        h.getBlockState(AT).useItemOn(pipe, level, player, InteractionHand.MAIN_HAND, hit);
+        h.getBlockState(AT).use(level, player, InteractionHand.MAIN_HAND, hit);
         h.assertTrue(h.getBlockState(AT).is(SinguloBlocks.FLUID_PIPE.get()) && h.getBlockState(AT).getFluidState().isSource(),
                 "Fitting a pipe took water from the clicked face instead of the frame");
         h.assertTrue(ConduitCover.leaveFrame(level, pos) && h.getBlockState(AT).is(SinguloBlocks.COVER_FRAME.get())

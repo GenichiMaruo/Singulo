@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTestHolder;
@@ -61,8 +60,18 @@ public final class AndroidStationRecoveryGameTests {
             var nether = helper.getLevel().getServer().getLevel(Level.NETHER);
             BlockPos destination = station.getBlockPos().atY(190);
             nether.getChunkAt(destination);
-            var traveller = (RuinAndroid) guard.changeDimension(new DimensionTransition(nether, Vec3.atCenterOf(destination),
-                    Vec3.ZERO, 0, 0, DimensionTransition.DO_NOTHING));
+            var traveller = (RuinAndroid) guard.changeDimension(nether, new net.minecraftforge.common.util.ITeleporter() {
+                @Override public net.minecraft.world.entity.Entity placeEntity(net.minecraft.world.entity.Entity entity,
+                        net.minecraft.server.level.ServerLevel source, net.minecraft.server.level.ServerLevel target,
+                        float yaw, java.util.function.Function<Boolean, net.minecraft.world.entity.Entity> reposition) {
+                    var moved = reposition.apply(false);
+                    if (moved != null) {
+                        Vec3 pos = Vec3.atCenterOf(destination);
+                        moved.moveTo(pos.x, pos.y, pos.z, 0, 0);
+                    }
+                    return moved;
+                }
+            });
             helper.assertTrue(traveller != null && traveller.level() == nether, "護衛がネザーに到着しない");
             try {
                 CompoundTag saved = traveller.saveWithoutId(new CompoundTag());
@@ -74,7 +83,7 @@ public final class AndroidStationRecoveryGameTests {
                 traveller.load(pending);
                 traveller.setNoAi(true);
                 CompoundTag unresolved = traveller.saveWithoutId(new CompoundTag());
-                helper.assertTrue(!unresolved.contains("home_dimension") && NbtUtils.readBlockPos(unresolved, "home").orElseThrow().equals(unavailable),
+                helper.assertTrue(!unresolved.contains("home_dimension") && io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(unresolved, "home").orElseThrow().equals(unavailable),
                         "ステーション未確認の旧リンクが失われたか、移動先の次元に確定された");
                 traveller.load(unresolved);
                 helper.assertTrue(!traveller.orphan() && traveller.home() == null, "再読込で保留中のリンクが失われた");

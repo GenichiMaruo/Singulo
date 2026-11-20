@@ -35,7 +35,7 @@ public final class AssemblyMenuGameTests {
         var chest = new ItemStack(Items.CHEST);
         var input = CraftingInput.of(3, 3, List.of(steel, chest, steel, chest, circuit, chest, steel, chest, steel));
         var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel()).orElseThrow();
-        return recipe.value().assemble(input, h.getLevel().registryAccess());
+        return recipe.assemble(input, h.getLevel().registryAccess());
     }
 
     @GameTest(template = "empty")

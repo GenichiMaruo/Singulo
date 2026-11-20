@@ -225,10 +225,10 @@ public final class ExtremeBalanceGameTests {
             var worldPos = machine.getBlockPos();
             h.getLevel().destroyBlock(worldPos, true);
             var drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(worldPos).inflate(1));
-            h.assertTrue(drops.size() == 1 && (drops.get(0).getTagElement("BlockEntityTag") != null), "Huge board did not drop exactly one packed machine");
+            h.assertTrue(drops.size() == 1 && (drops.get(0).getItem().getTagElement("BlockEntityTag") != null), "Huge board did not drop exactly one packed machine");
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
             MachineBlockEntity restored = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
-            restored.load(drops.get(0).getTagElement("BlockEntityTag").copy());
+            restored.load(drops.get(0).getItem().getTagElement("BlockEntityTag").copy());
             h.assertTrue(restored.assemblyGrid().getStackInSlot(0).getCount() == Integer.MAX_VALUE
                     && restored.items().getStackInSlot(slot).getCount() == Integer.MAX_VALUE, "Packed machine lost items");
             h.succeed();
@@ -285,14 +285,13 @@ public final class ExtremeBalanceGameTests {
             ServerConfig.MACHINE_SLOT_STACKS.set(Integer.MAX_VALUE);
             ServerConfig.MACHINE_TANK_CAPACITY.set(Integer.MAX_VALUE);
             ServerConfig.MACHINE_BATCH_LIMIT.set(Integer.MAX_VALUE);
-            var ops = h.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
             var raw = RecipePatches.read(h.getLevel().getServer().getResourceManager(), Singulo.id("kiln/zinc_ingot"));
             raw.addProperty("energy", 0);
             raw.addProperty("time", 1);
             raw.getAsJsonArray("ingredients").get(0).getAsJsonObject().addProperty("count", 1_000_000);
             raw.getAsJsonObject("result").addProperty("count", Integer.MAX_VALUE);
             raw.add("fluid_ingredients", JsonParser.parseString("[{\"fluid\":\"minecraft:water\",\"amount\":2000000000}]"));
-            var holder = new net.minecraft.world.item.crafting.RecipeHolder<>(Singulo.id("extreme_kiln"), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow());
+            var holder = new MachineRecipe.Serializer().fromJson(Singulo.id("extreme_kiln"), raw);
             manager.replaceRecipes(List.of(holder));
             var pos = new BlockPos(2, 1, 2);
             h.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
@@ -314,14 +313,14 @@ public final class ExtremeBalanceGameTests {
             raw.remove("fluid_ingredients");
             raw.getAsJsonArray("ingredients").get(0).getAsJsonObject().addProperty("count", 1);
             raw.getAsJsonObject("result").addProperty("count", 1);
-            manager.replaceRecipes(List.of(new net.minecraft.world.item.crafting.RecipeHolder<>(holder.getId(), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow())));
+            manager.replaceRecipes(List.of(new MachineRecipe.Serializer().fromJson(holder.getId(), raw)));
             m.items().setStackInSlot(out, ItemStack.EMPTY);
             m.items().setStackInSlot(0, item("zinc_dust", Integer.MAX_VALUE));
             MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
             h.assertTrue(io.getStackInSlot(out).getCount() == Integer.MAX_VALUE && io.getStackInSlot(0).isEmpty(), "Max-count batch did not finish in one tick");
             raw.addProperty("time", 2);
             raw.add("fluid_ingredients", JsonParser.parseString("[{\"fluid\":\"minecraft:water\",\"amount\":1}]"));
-            manager.replaceRecipes(List.of(new net.minecraft.world.item.crafting.RecipeHolder<>(holder.getId(), MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow())));
+            manager.replaceRecipes(List.of(new MachineRecipe.Serializer().fromJson(holder.getId(), raw)));
             m.items().setStackInSlot(out, ItemStack.EMPTY);
             m.items().setStackInSlot(0, item("zinc_dust", 600));
             for (int i = 0; i < 2; i++) MachineBlockEntity.serverTick(h.getLevel(), m.getBlockPos(), m.getBlockState(), m);
@@ -361,13 +360,17 @@ public final class ExtremeBalanceGameTests {
             reactor.load(reactor.saveWithoutMetadata());
             for (int i = 0; i < 3; i++) MuonFusionReactorBlockEntity.serverTick(h.getLevel(), reactor.getBlockPos(), reactor.getBlockState(), reactor);
             h.assertTrue(reactor.energy().getEnergyStored() == 1, "Fractional generation lost on save");
-            var ops = h.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
             JsonObject raw = RecipePatches.read(h.getLevel().getServer().getResourceManager(), Singulo.id("kiln/zinc_ingot"));
             raw.addProperty("time", Integer.MAX_VALUE);
             raw.addProperty("energy", Integer.MAX_VALUE);
-            h.assertTrue(MachineRecipe.CODEC.codec().parse(ops, raw).getOrThrow().time() == Integer.MAX_VALUE, "Large recipe did not decode");
+            h.assertTrue(new MachineRecipe.Serializer().fromJson(Singulo.id("extreme_number"), raw).time() == Integer.MAX_VALUE, "Large recipe did not decode");
             raw.add("energy", JsonParser.parseString("4294967297"));
-            h.assertTrue(MachineRecipe.CODEC.codec().parse(ops, raw).error().isPresent(), "Out-of-range recipe cost wrapped to 1");
+            try {
+                new MachineRecipe.Serializer().fromJson(Singulo.id("extreme_number"), raw);
+                h.fail("Out-of-range recipe cost wrapped to 1");
+            } catch (com.google.gson.JsonSyntaxException expected) {
+                // The legacy JSON serializer must reject overflow before converting to int.
+            }
             h.assertTrue(EnergyText.shortForm(Long.MAX_VALUE).equals("9.22E") && EnergyText.shortForm(Integer.MAX_VALUE).equals("2.15G")
                     && EnergyText.shortForm(0.000001).length() < 10, "Numeric labels grew beyond their display width");
             h.succeed();
