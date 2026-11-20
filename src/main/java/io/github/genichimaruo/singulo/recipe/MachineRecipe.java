@@ -349,7 +349,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
                     // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
                     var contents = io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.contents(input);
-                    io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.setContents(out, contents);
+                    if (contents.stream().anyMatch(stack -> !stack.isEmpty()))
+                        io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.setContents(out, contents);
                     int energy = SinguloComponents.getOrDefault(input, SinguloComponents.ENERGY.get(), 0);
                     if (energy > 0) SinguloComponents.set(out, SinguloComponents.ENERGY.get(), energy);
                     if (input.hasCustomHoverName()) out.setHoverName(input.getHoverName());
