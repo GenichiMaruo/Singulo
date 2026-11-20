@@ -180,7 +180,15 @@ public final class AndroidEscrowOrderGameTests {
         h.assertTrue(c.orders().size()==1 && c.orders().get(0).steps.size()==2,"One order with two steps expected");
         h.succeedWhen(()->{
             var snap=AndroidEscrows.snapshot(h.getLevel(),c.owner(),id);
-            h.assertTrue(snap.phase()==AndroidEscrows.Phase.COMPLETED && !snap.workerPending(),"Not completed: "+snap.phase());
+            if (snap.phase()!=AndroidEscrows.Phase.COMPLETED || snap.workerPending()) {
+                var orders=c.orders().stream().map(o->"status="+o.status+" shortage="+o.shortage
+                        +" steps="+o.steps.stream().map(s->s.recipe.output()+":"+s.done+"/"+s.total+" active="+s.inProgress).toList()).toList();
+                var workers=h.getLevel().getEntitiesOfClass(RuinAndroid.class,new net.minecraft.world.phys.AABB(c.getBlockPos()).inflate(16))
+                        .stream().map(a->a.position()+" console="+a.workConsole()+" carry="
+                                +java.util.Arrays.stream(a.carrySlots()).mapToObj(a.inventory()::getItem).filter(x->!x.isEmpty()).toList()).toList();
+                h.fail("Not completed: "+snap.phase()+" pending="+snap.workerPending()+" materials="+snap.materials()
+                        +" products="+snap.products()+" "+orders+" "+workers);
+            }
             h.assertTrue(count(snap.products(),Items.STICK)==8,"Sticks: "+snap.products());
             h.assertTrue(snap.materials().stream().allMatch(ItemStack::isEmpty),
                     "The whole log was used through the chain: "+snap.materials());
