@@ -38,6 +38,11 @@ sourceSets {
         }
         java.include(selected.isEmpty() ? ['**/*GameTests.java'] : selected.collect { "**/${it}.java" })
         java.include('**/test/TestBuild.java', '**/test/harness/**')
+        // Forge scans annotated classes before checking their namespace, so do not
+        // load fixtures referencing an optional mod when it is absent.
+        if (!providers.gradleProperty("withMekanism").isPresent()) {
+            java.exclude("**/MekanismGameTests.java", "**/MekanismStockGameTests.java", "**/MekanismQioGameTests.java")
+        }
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }

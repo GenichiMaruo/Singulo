@@ -49,7 +49,7 @@ public final class MekanismGameTests {
     @GameTest(template = EMPTY)
     public static void pipeLeavesPassiveMekanismTankUntouched(GameTestHelper h) {
         var tankPos = new BlockPos(3, 3, 3);
-        var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
+        var tank = BuiltInRegistries.BLOCK.get(new ResourceLocation("mekanism:basic_fluid_tank"));
         h.setBlock(tankPos, tank);
         var outlet = tankPos.below();
         h.setBlock(outlet, SinguloBlocks.FLUID_DRONE_PORT.get());
@@ -74,7 +74,7 @@ public final class MekanismGameTests {
     @GameTest(template = EMPTY)
     public static void poweredPumpDrainsPassiveMekanismTank(GameTestHelper h) {
         var tankAt = new BlockPos(3, 3, 3);
-        var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
+        var tank = BuiltInRegistries.BLOCK.get(new ResourceLocation("mekanism:basic_fluid_tank"));
         h.setBlock(tankAt, tank);
         h.runAfterDelay(5, () -> {
             var absolute = h.absolutePos(tankAt);
@@ -95,7 +95,7 @@ public final class MekanismGameTests {
     public static void externalFluidTankSuppliesAndroid(GameTestHelper h) {
         BlockPos tankPos = new BlockPos(2, 2, 2);
         BlockPos absolute = h.absolutePos(tankPos);
-        var tank = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:basic_fluid_tank"));
+        var tank = BuiltInRegistries.BLOCK.get(new ResourceLocation("mekanism:basic_fluid_tank"));
         h.assertTrue(tank != Blocks.AIR, "Mekanism fluid tank missing");
         h.setBlock(tankPos, tank);
         h.runAfterDelay(5, () -> {

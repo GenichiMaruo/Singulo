@@ -43,7 +43,7 @@ public final class AndroidBucketCraftingGameTests {
 
     private static void equipTank(RuinAndroid worker) {
         worker.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath("singulo", "android_tank_upgrade"))));
+                new ResourceLocation("singulo", "android_tank_upgrade"))));
     }
 
     private static RuinAndroid tankWorker(GameTestHelper h, java.util.UUID owner, int amount) {

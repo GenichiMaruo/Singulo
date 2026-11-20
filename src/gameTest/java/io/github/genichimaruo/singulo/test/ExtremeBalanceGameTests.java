@@ -49,7 +49,7 @@ public final class ExtremeBalanceGameTests {
     public static void externalRecipeUsesItsOwnStageAndKeepsJsonValues(GameTestHelper h) {
         var time = ServerConfig.STAGE2_TIME_MULTIPLIER.get();
         var power = ServerConfig.STAGE2_ENERGY_MULTIPLIER.get();
-        var id = ResourceLocation.fromNamespaceAndPath("example_pack", "steel");
+        var id = new ResourceLocation("example_pack", "steel");
         var raw = new MachineRecipe("kiln", 2, 100, 120, List.of(), List.of(), Optional.empty(), Optional.empty(),
                 new ItemStack(Items.IRON_INGOT), List.of(), 0, 0, ItemStack.EMPTY);
         try {

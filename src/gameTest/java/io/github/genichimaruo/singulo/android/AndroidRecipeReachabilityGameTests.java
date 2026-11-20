@@ -50,9 +50,9 @@ public final class AndroidRecipeReachabilityGameTests {
                 iron_pickaxe iron_shovel iron_sword iron_trapdoor lapis_lazuli leather lightning_rod moss_block nether_star netherite_ingot
                 note_block oak_log oak_planks obsidian orange_dye packed_ice paper phantom_membrane piston purple_dye quartz raw_copper red_dye
                 redstone redstone_lamp sand sandstone sculk sculk_sensor slime_ball snow_block stick stone string torch tuff wheat white_dye white_wool""";
-        for (String id : vanilla.split("\\s+")) known.add(BuiltInRegistries.ITEM.getOptional(ResourceLocation.withDefaultNamespace(id)).orElseThrow());
+        for (String id : vanilla.split("\\s+")) known.add(BuiltInRegistries.ITEM.getOptional(new ResourceLocation("minecraft", id)).orElseThrow());
         for (String id : List.of("alloy_infused", "basic_control_circuit", "basic_chemical_tank", "ingot_osmium"))
-            BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath("mekanism", id)).ifPresent(known::add);
+            BuiltInRegistries.ITEM.getOptional(new ResourceLocation("mekanism", id)).ifPresent(known::add);
         known.addAll(List.of(Fluids.WATER, Fluids.LAVA));
         explorationLoot(level, known);
         // Lightning, boss chapter awards and memory recovery are implemented in world/entity code.
@@ -188,7 +188,7 @@ public final class AndroidRecipeReachabilityGameTests {
         if (!value.isJsonObject()) return;
         var object = value.getAsJsonObject();
         if (object.has("type") && object.get("type").isJsonPrimitive() && object.get("type").getAsString().equals("minecraft:item"))
-            BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(object.get("name").getAsString())).ifPresent(known::add);
+            BuiltInRegistries.ITEM.getOptional(new ResourceLocation(object.get("name").getAsString())).ifPresent(known::add);
         object.asMap().values().forEach(child -> lootItems(child, known));
     }
 }

@@ -26,7 +26,7 @@ public final class MekanismStockGameTests {
     private static final BlockPos CONSOLE = new BlockPos(3, 2, 3);
 
     private static BlockPos place(GameTestHelper h, BlockPos at, String name) {
-        var block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("mekanism:" + name));
+        var block = BuiltInRegistries.BLOCK.get(new ResourceLocation("mekanism:" + name));
         h.setBlock(at, block);
         var pos = h.absolutePos(at);
         return pos;

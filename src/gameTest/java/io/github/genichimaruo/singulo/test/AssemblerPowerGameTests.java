@@ -30,9 +30,9 @@ import net.minecraftforge.items.ItemStackHandler;
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid="singulo")
 public final class AssemblerPowerGameTests {
     private static final net.minecraft.resources.ResourceLocation ADDON_CATALYST =
-            net.minecraft.resources.ResourceLocation.parse("addon_fixture:muon_catalyst");
+            new net.minecraft.resources.ResourceLocation("addon_fixture:muon_catalyst");
     private static final net.minecraft.resources.ResourceLocation ADDON_SPENT =
-            net.minecraft.resources.ResourceLocation.parse("addon_fixture:tarnished_crystal");
+            new net.minecraft.resources.ResourceLocation("addon_fixture:tarnished_crystal");
 
     @net.minecraftforge.eventbus.api.SubscribeEvent
     public static void registerAddonItems(net.minecraftforge.registries.RegisterEvent event) {
