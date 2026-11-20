@@ -81,9 +81,15 @@ public final class MekanismStockGameTests {
         h.runAfterDelay(5, () -> {
             String id = "mekanism:hydrogen";
             // Empty creative tanks void external input. Set the type by manually inserting hydrogen.
-            var handler = (mekanism.api.chemical.IMekanismChemicalHandler<mekanism.api.chemical.gas.Gas, mekanism.api.chemical.gas.GasStack, mekanism.api.chemical.gas.IGasTank>) level.getBlockEntity(creative);
+            var creativeTank = level.getBlockEntity(creative);
+            mekanism.api.chemical.gas.IGasTank gasTank;
+            try {
+                gasTank = (mekanism.api.chemical.gas.IGasTank) creativeTank.getClass().getMethod("getGasTank").invoke(creativeTank);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("Cannot obtain the legacy Mekanism gas tank", e);
+            }
             var chemical = mekanism.api.MekanismAPI.gasRegistry().getValue(new ResourceLocation(id));
-            handler.getChemicalTanks(null).get(0).insert(new mekanism.api.chemical.gas.GasStack(chemical, 1_000),
+            gasTank.insert(new mekanism.api.chemical.gas.GasStack(chemical, 1_000),
                     mekanism.api.Action.EXECUTE, mekanism.api.AutomationType.MANUAL);
             var input = Chemicals.store(level, basic, Direction.UP);
             h.assertTrue(input != null && input.insert(id, 1_000, false) == 1_000, "Ordinary tank did not accept hydrogen");
