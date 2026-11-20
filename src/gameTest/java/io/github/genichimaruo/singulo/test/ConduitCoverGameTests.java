@@ -154,6 +154,16 @@ public final class ConduitCoverGameTests {
         boolean frameDropped = drops.stream().anyMatch(e -> e.getItem().is(SinguloItems.COVER_FRAME.get()));
         drops.forEach(net.minecraft.world.entity.Entity::discard);
         h.assertFalse(frameDropped, "Leaving the frame also dropped a frame");
+        var water = (net.minecraft.world.level.block.SimpleWaterloggedBlock) h.getBlockState(AT).getBlock();
+        h.assertTrue(water.placeLiquid(level, pos, h.getBlockState(AT), net.minecraft.world.level.material.Fluids.WATER.getSource(false)),
+                "Empty frame could not be waterlogged");
+        ItemStack pipe = new ItemStack(SinguloBlocks.FLUID_PIPE.get());
+        player.setItemInHand(InteractionHand.MAIN_HAND, pipe);
+        h.getBlockState(AT).use(level, player, InteractionHand.MAIN_HAND, hit);
+        h.assertTrue(h.getBlockState(AT).is(SinguloBlocks.FLUID_PIPE.get()) && h.getBlockState(AT).getFluidState().isSource(),
+                "Fitting a pipe took water from the clicked face instead of the frame");
+        h.assertTrue(ConduitCover.leaveFrame(level, pos) && h.getBlockState(AT).is(SinguloBlocks.COVER_FRAME.get())
+                && h.getBlockState(AT).getFluidState().isSource(), "Removing the pipe drained the frame");
         h.succeed();
     }
 

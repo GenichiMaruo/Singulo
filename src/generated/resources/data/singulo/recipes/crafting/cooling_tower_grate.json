@@ -2,7 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "IPI"
+    "IPI",
+    " F "
   ],
   "key": {
     "I": {
@@ -10,6 +11,9 @@
     },
     "P": {
       "tag": "forge:plates/steel"
+    },
+    "F": {
+      "item": "singulo:cooling_tower_base"
     }
   },
   "result": {

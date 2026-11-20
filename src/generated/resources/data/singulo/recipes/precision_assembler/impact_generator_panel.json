@@ -13,7 +13,7 @@
     },
     {
       "ingredient": {
-        "tag": "forge:slime_balls"
+        "tag": "forge:slimeballs"
       },
       "count": 4
     },
@@ -29,6 +29,13 @@
       },
       "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    " CAC ",
+    " BDB ",
+    "     "
   ],
   "result": {
     "id": "singulo:impact_generator_panel",

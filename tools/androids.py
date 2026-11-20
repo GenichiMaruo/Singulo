@@ -802,30 +802,41 @@ def memory_icon(accent, Image):
 
 
 def kit_icon(Image):
-    """アンドロイドキット: 白い陶磁のケースに、黒い留め具と水色の線。ふたに人型の印。"""
-    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    white, shade, edge = (238, 240, 244), (200, 206, 216), (120, 126, 140)
-    dark = (52, 56, 70)
-    glow = (120, 225, 255)
-    for y in range(3, 14):
-        for x in range(1, 15):
-            c = shade if y >= 11 else white
-            if x in (1, 14) or y in (3, 13):
-                c = edge
-            px[x, y] = c + (255,)
-    for x in range(2, 14):
-        px[x, 10] = glow + (255,)
-    for x in (6, 7, 8, 9):
-        px[x, 2] = dark + (255,)
-    px[6, 3] = dark + (255,)
-    px[9, 3] = dark + (255,)
-    # 人型の印（頭と体）
-    for (x, y) in ((7, 5), (8, 5), (7, 6), (8, 6), (6, 7), (7, 7), (8, 7), (9, 7), (7, 8), (8, 8)):
-        px[x, y] = (90, 150, 190, 255)
-    px[3, 5] = glow + (255,)
-    px[12, 5] = glow + (255,)
-    return im
+    """アンドロイドキット（0.21.0 で描き直した）: 黒い取っ手のついた白い箱。窓には、組み上がる前のアンドロイドの顔
+    （前髪とひと房のある白い髪、上が濃い青で下が水色の目、頬の赤み、両脇の髪、水色の髪留め）。箱の下に水色の線。
+    輪郭を含めて14×14に収め、上下左右の真ん中に置く。"""
+    from art16 import outlined, rgba, SOFT_EDGE
+    white, shade, dark = (238, 240, 244), (200, 206, 216), (52, 56, 70)
+    window, glow = (54, 66, 92), (120, 225, 255)
+    hair, hair2 = (232, 236, 244), (196, 204, 220)
+    skin, blush = (252, 226, 214), (246, 178, 184)
+    eye, eye_d = (80, 180, 240), (40, 120, 200)
+
+    def f(d):
+        def px(pts, c):
+            for p in pts:
+                d.point(p, fill=rgba(c))
+        # 取っ手と箱、顔の窓
+        d.rectangle([6, 2, 9, 2], fill=rgba(dark))
+        px([(6, 3), (9, 3)], dark)
+        d.rectangle([2, 4, 13, 13], fill=rgba(white))
+        d.line([(2, 13), (13, 13)], fill=rgba(shade))
+        d.rectangle([3, 5, 12, 10], fill=rgba(window))
+        # 顔（x 4〜11、y 5〜10）
+        d.rectangle([5, 5, 10, 5], fill=rgba(hair))
+        d.rectangle([4, 6, 11, 6], fill=rgba(hair))
+        px([(4, 6), (11, 6)], hair2)
+        d.rectangle([5, 7, 10, 9], fill=rgba(skin))
+        px([(7, 7)], hair)
+        for x in (6, 9):
+            px([(x, 7)], eye_d)
+            px([(x, 8)], eye)
+        px([(5, 9), (10, 9)], blush)
+        d.rectangle([4, 7, 4, 10], fill=rgba(hair2))
+        d.rectangle([11, 7, 11, 10], fill=rgba(hair2))
+        px([(10, 5)], glow)
+        d.line([(4, 12), (11, 12)], fill=rgba(glow))
+    return _kit_finish(Image, outlined(f, **SOFT_EDGE))
 
 
 def charger_icon(Image):
@@ -847,43 +858,64 @@ def charger_icon(Image):
 
 
 def repair_icon(Image):
-    """自己修理キット: 白い小箱に、ピンクの十字と小さなハート。"""
-    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    for y in range(4, 14):
-        for x in range(2, 14):
-            c = (238, 240, 244) if y < 11 else (206, 212, 222)
-            if x in (2, 13) or y in (4, 13):
-                c = (130, 136, 150)
-            px[x, y] = c + (255,)
-    for x in range(5, 11):
-        px[x, 3] = (130, 136, 150, 255)
-    px[5, 2] = px[10, 2] = (130, 136, 150, 255)
-    for x in range(6, 10):
-        px[x, 2] = (130, 136, 150, 255)
-    for (x, y) in ((7, 6), (8, 6), (7, 7), (8, 7), (5, 8), (6, 8), (7, 8), (8, 8), (9, 8), (10, 8), (7, 9), (8, 9), (7, 10), (8, 10)):
-        px[x, y] = (240, 90, 130, 255)
-    px[11, 5] = (255, 160, 190, 255)
-    return im
+    """自己修理キット（0.21.0 で描き直した）: アンドロイドキットと同じ黒い取っ手の白い箱に、桃色の十字と、箱の下の桃色の線。
+    輪郭を含めて14×14に収め、上下左右の真ん中に置く。"""
+    from art16 import outlined, rgba, SOFT_EDGE
+    white, shade, dark = (238, 240, 244), (200, 206, 216), (52, 56, 70)
+    pink, pink_hi = (240, 90, 130), (255, 170, 196)
+
+    def f(d):
+        d.rectangle([6, 2, 9, 2], fill=rgba(dark))
+        d.point((6, 3), fill=rgba(dark))
+        d.point((9, 3), fill=rgba(dark))
+        d.rectangle([2, 4, 13, 13], fill=rgba(white))
+        d.line([(2, 13), (13, 13)], fill=rgba(shade))
+        d.rectangle([7, 5, 8, 10], fill=rgba(pink))
+        d.rectangle([5, 7, 10, 8], fill=rgba(pink))
+        d.point((7, 5), fill=rgba(pink_hi))
+        d.line([(4, 12), (11, 12)], fill=rgba(pink))
+    return _kit_finish(Image, outlined(f, **SOFT_EDGE))
+
+
+def _kit_finish(Image, im):
+    """取っ手の穴（輪郭で埋まる）を抜き、14×14以内か確かめて真ん中に置く（キットの絵で共通）。"""
+    for x in (7, 8):
+        im.putpixel((x, 3), (0, 0, 0, 0))
+    box = im.getbbox()
+    w, h = box[2] - box[0], box[3] - box[1]
+    assert w <= 14 and h <= 14, (w, h)
+    out = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    out.paste(im.crop(box), ((16 - w) // 2, (16 - h) // 2))
+    return out
 
 
 def plate_icon(Image):
-    """アンドロイド用装甲板: 白い陶磁の胸当て。縁は銀、中央に水色の発光ライン。"""
-    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    rows = [(4, 11), (2, 13), (2, 13), (2, 13), (3, 12), (3, 12), (3, 12), (4, 11), (4, 11), (5, 10), (6, 9)]
-    for i, (a, b) in enumerate(rows):
-        y = 3 + i
-        for x in range(a, b + 1):
-            edge = x in (a, b) or i in (0, len(rows) - 1)
-            c = (150, 156, 170) if edge else (236, 238, 242) if x < 8 else (210, 214, 224)
-            px[x, y] = c + (255,)
-    for x in (6, 9):
-        px[x, 3] = (0, 0, 0, 0)
-    for y in range(6, 12):
-        px[7, y] = (120, 225, 255, 255)
-        px[8, y] = (90, 190, 230, 255)
-    return im
+    """アンドロイド用装甲板（0.21.0 で描き直した）: これまでと同じ形の白い陶磁の胸当て（上が広く、首の左右に切り欠き、下がすぼまる）。
+    左が明るく右が陰。真ん中に水色の発光ライン（明・陰の2列）。輪郭を含めて14×14に収め、上下左右の真ん中に置く。"""
+    from art16 import outlined, rgba, SOFT_EDGE
+    rows = [(4, 11), (2, 13), (2, 13), (2, 13), (3, 12), (3, 12), (3, 12), (4, 11), (4, 11), (5, 10), (6, 9), (7, 8)]
+    left, right = (238, 240, 244), (210, 214, 224)
+
+    def f(d):
+        for i, (x0, x1) in enumerate(rows):
+            y = 2 + i
+            d.line([(x0, y), (7, y)], fill=rgba(left))
+            d.line([(8, y), (x1, y)], fill=rgba(right))
+        d.line([(7, 5), (7, 11)], fill=rgba((120, 225, 255)))
+        d.line([(8, 5), (8, 11)], fill=rgba((90, 190, 230)))
+        d.point((3, 4), fill=(255, 255, 255, 255))
+        d.point((4, 3), fill=(255, 255, 255, 255))
+        d.point((6, 2), fill=(0, 0, 0, 0))   # 首の左右の切り欠き（輪郭を付ける前にも抜く）
+        d.point((9, 2), fill=(0, 0, 0, 0))
+    im = outlined(f, **SOFT_EDGE)
+    for x in (6, 9):                     # 首の左右の切り欠き
+        im.putpixel((x, 2), (0, 0, 0, 0))
+    box = im.getbbox()
+    w, h = box[2] - box[0], box[3] - box[1]
+    assert w <= 14 and h <= 14, (w, h)
+    out = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    out.paste(im.crop(box), ((16 - w) // 2, (16 - h) // 2))
+    return out
 
 
 def upgrade_icon(Image):

@@ -61,7 +61,7 @@ public final class FluidCapsuleRenderer extends BlockEntityWithoutLevelRenderer 
             VertexConsumer inside = FluidLook.insideBuffer(buffers);
             FluidLook.Look look = FluidLook.look(fluid);
             boolean gas = fluid.getFluid().getFluidType().isLighterThanAir();
-            float fill = Mth.clamp(fluid.getAmount() / (float) FluidCapsuleItem.CAPACITY, 0.08F, 1);
+            float fill = Mth.clamp(fluid.getAmount() / (float) FluidCapsuleItem.capacityMb(), 0.08F, 1);
             float time = mc.level == null ? 0 : (mc.level.getGameTime() % 24000 + mc.getFrameTime()) / 20F;
             float wobble = fill < 0.98F ? Mth.sin(time * 2.4F) * 0.12F / 16 : 0;
             float top = gas ? Y1 : Math.min(Y1, Y0 + (Y1 - Y0) * fill + wobble);

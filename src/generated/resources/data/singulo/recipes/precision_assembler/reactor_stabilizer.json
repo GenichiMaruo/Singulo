@@ -22,7 +22,32 @@
         "item": "singulo:entangled_element"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:nuggets/gold"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:white_ceramic_composite"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:cold_atoms"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " DCD ",
+    " BAB ",
+    " EFE ",
+    "     "
   ],
   "result": {
     "id": "singulo:reactor_stabilizer",

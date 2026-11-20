@@ -1,7 +1,13 @@
 package io.github.genichimaruo.singulo.darkmatter;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
+import io.github.genichimaruo.singulo.machine.DeviceMenu;
+import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
@@ -28,7 +34,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     public static final int FE_PER_TICK = 500;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(CAPACITY, ContainmentTankBlockEntity::isDarkMatter) {
+    private final FluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(CAPACITY), ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -36,6 +42,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     };
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(100_000, 20_000, 0, this::setChanged);
     private boolean contained = true;
+    private boolean autoEject;
 
     public ContainmentTankBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.CONTAINMENT_TANK.get(), pos, state);
@@ -67,6 +74,11 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ContainmentTankBlockEntity be) {
+        if (be.autoEject && !be.tank.isEmpty()) {
+            var front = state.getValue(AbstractMachineBlock.FACING);
+            BlockPos target = pos.relative(front);
+            if (level.isLoaded(target)) MultiblockPortBlockEntity.pushFluids(level, target, front.getOpposite(), be.tank);
+        }
         if (level.getGameTime() % INTERVAL != 0) {
             return;
         }
@@ -82,14 +94,23 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
 
     @Override
     public void openMenu(ServerPlayer player) {
-        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.CONTAINMENT_TANK, new net.minecraftforge.items.ItemStackHandler(0), i -> switch (i) {
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.AMOUNT -> amount();
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CAPACITY -> CAPACITY;
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY -> energy.getEnergyStored();
-            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY_MAX -> energy.getMaxEnergyStored();
+        DeviceMenu.open(player, this, DeviceMenu.Kind.CONTAINMENT_TANK, new net.minecraftforge.items.ItemStackHandler(0), i -> switch (i) {
+            case DeviceMenu.Tank.AMOUNT -> amount();
+            case DeviceMenu.Tank.CAPACITY -> tank.getCapacity();
+            case DeviceMenu.Tank.EJECT -> autoEject ? 1 : 0;
+            case DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
+            case DeviceMenu.Tank.ENERGY -> energy.getEnergyStored();
+            case DeviceMenu.Tank.ENERGY_MAX -> energy.getMaxEnergyStored();
             default -> 0;
-        }, (p, id) -> false);
+        }, this::onButton);
+    }
+
+    public boolean onButton(ServerPlayer player, int id) {
+        if (id != DeviceMenu.Tank.BUTTON_EJECT || isRemoved() || level != player.level()
+                || level.getBlockEntity(worldPosition) != this || !Blueprints.withinMenuReach(player, worldPosition)) return false;
+        autoEject = !autoEject;
+        setChanged();
+        return true;
     }
 
     // ------------------------------------------------------------------ アイテムとの受け渡し（タンクごと運ぶ）
@@ -117,6 +138,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
+        tag.putBoolean("autoEject", autoEject);
         tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
     }
@@ -124,6 +146,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
+        autoEject = tag.getBoolean("autoEject");
         tank.readFromNBT(tag.getCompound("tank"));
         energy.setEnergy(tag.getInt("energy"));
     }

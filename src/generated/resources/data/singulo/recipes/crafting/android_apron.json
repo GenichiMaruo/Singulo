@@ -8,7 +8,7 @@
   ],
   "key": {
     "S": {
-      "tag": "forge:strings"
+      "tag": "forge:string"
     },
     "W": {
       "tag": "minecraft:wool"

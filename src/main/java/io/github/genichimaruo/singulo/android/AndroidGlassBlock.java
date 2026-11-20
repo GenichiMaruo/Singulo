@@ -75,7 +75,7 @@ public class AndroidGlassBlock extends HalfTransparentBlock {
     /** 同じガラスの階段の、すき間なく埋まった面との間も描かない（0.20.0）。 */
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
-        if (adjacent.getBlock() instanceof AndroidGlassStairs stairs && stairs.base() == this) {
+        if (io.github.genichimaruo.singulo.block.GlassJoin.shapedOf(adjacent, this)) {
             return io.github.genichimaruo.singulo.block.GlassJoin.fullFace(adjacent, direction.getOpposite());
         }
         return super.skipRendering(state, adjacent, direction);

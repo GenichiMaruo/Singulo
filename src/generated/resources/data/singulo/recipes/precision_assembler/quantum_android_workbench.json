@@ -37,6 +37,13 @@
       "uses": 36000
     }
   ],
+  "shape": [
+    "     ",
+    " BCB ",
+    " DAD ",
+    "     ",
+    "     "
+  ],
   "result": {
     "id": "singulo:quantum_android_workbench",
     "count": 1

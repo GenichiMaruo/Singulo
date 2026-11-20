@@ -30,6 +30,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    "  D  ",
+    " BAB ",
+    "  C  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:zero_gravity_controller",
     "count": 1

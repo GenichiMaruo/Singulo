@@ -134,7 +134,7 @@ public final class MachineGuiReviewHarness {
                 items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("bismuth_ingot"))));
             }
             var ctor = MachineMenu.class.getDeclaredConstructor(int.class, net.minecraft.world.entity.player.Inventory.class,
-                    MachineType.class, BlockPos.class, IItemHandler.class, SyncedInts.class, MachineBlockEntity.class);
+                    MachineType.class, BlockPos.class, ItemStackHandler.class, ItemStackHandler.class, SyncedInts.class, MachineBlockEntity.class);
             ctor.setAccessible(true);
             BlockPos reviewPos = SIDES ? mc.player.blockPosition().above(3) : BlockPos.ZERO;
             if (SIDES) {
@@ -144,7 +144,7 @@ public final class MachineGuiReviewHarness {
                 value(data, MachineBlockEntity.sidesIndex(type), new io.github.genichimaruo.singulo.machine.SideConfig().packed());
             }
             MachineMenu menu = ctor.newInstance(0, mc.player.getInventory(), type, reviewPos,
-                    items, data, null);
+                    items, type == MachineType.PRECISION_ASSEMBLER ? new ItemStackHandler(io.github.genichimaruo.singulo.recipe.MachineRecipe.ASSEMBLY_CELLS) : null, data, null);
             Component title = Component.translatable((type.isMultiblock() ? io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTROLLERS
                     : io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES).get(type).get().getDescriptionId());
             // Multiblock menu titles use the machine name, not the controller item name.
@@ -185,7 +185,12 @@ public final class MachineGuiReviewHarness {
             for (var slot : menu.slots) {
                 if (slot.x == menu.layout.upgradeX && slot.y == menu.layout.upgradeY) continue;   // 右レールの強化の段
                 if (slot.x == menu.layout.capacityX && slot.y == menu.layout.capacityY) continue;
-                if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > MachineLayout.HEIGHT - 4)
+                if (type == MachineType.PRECISION_ASSEMBLER && slot == menu.getSlot(type.assemblyUpgradeSlot())) {
+                    if (slot.x != menu.layout.upgradeX || slot.y != GuiFrame.railSlotY(GuiFrame.RAIL_HELP))
+                        throw new IllegalStateException("Precision assembler upgrade slot outside its rail row");
+                    continue;
+                }
+                if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > menu.layout.height - 4)
                     throw new IllegalStateException("Slot outside panel: " + type + " " + slot.x + "," + slot.y);
             }
         } else if (extra == 8) {

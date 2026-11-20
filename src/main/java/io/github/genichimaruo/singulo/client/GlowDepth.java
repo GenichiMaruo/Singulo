@@ -286,6 +286,10 @@ final class GlowDepth extends RenderType {
     /** ワールドの中で光を描いている間だけ true（手に持った物や画面の絵は対象にしない）。 */
     private static boolean active;
 
+    static boolean inWorld() {
+        return active;
+    }
+
     private GlowDepth(String name, VertexFormat format, VertexFormat.Mode mode, int size, boolean crumbling, boolean sort,
                       Runnable setup, Runnable clear) {
         super(name, format, mode, size, crumbling, sort, setup, clear);
@@ -332,6 +336,7 @@ final class GlowDepth extends RenderType {
             jetModelView.set(RenderSystem.getModelViewMatrix());
             // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
             net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
+            AndroidWeaponLight.afterBlockEntities();
             // 管の中の液体: 色を遠い順に重ねてから、深度を書く
             FLUID_SOURCE.endBatch(FLUID_COLOR);
             FLUID_SOURCE.endBatch(FLUID_DEPTH);

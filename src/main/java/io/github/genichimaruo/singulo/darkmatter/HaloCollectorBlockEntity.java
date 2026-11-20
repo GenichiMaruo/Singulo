@@ -1,12 +1,14 @@
 package io.github.genichimaruo.singulo.darkmatter;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +26,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
  * 暗黒物質（WIMP）を集める。量は炉心質量100ごとに毎秒1 mB（質量5000で毎秒50 mB）、電力は FE_PER_TICK。
  * <p>
  * ダークマターは重力以外ほとんど相互作用しないので、捕集器の小さなタンクからは毎秒2%ずつ漏れる。
- * 毎秒、隣の液体の入れ物（重力閉じ込めタンクや、炉心制御装置・抽出ポート）へ押し出す。
+ * 毎 tick、隣の液体の入れ物（重力閉じ込めタンクや、炉心制御装置・抽出ポート）へ押し出す。
  */
 public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int RANGE = 16;
@@ -32,7 +34,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     public static final int BUFFER = 4000;
     static final int INTERVAL = 20;
 
-    private final FluidTank tank = new FluidTank(BUFFER, ContainmentTankBlockEntity::isDarkMatter) {
+    private final FluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(BUFFER), ContainmentTankBlockEntity::isDarkMatter) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -52,7 +54,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
 
         @Override
         public int getTankCapacity(int t) {
-            return BUFFER;
+            return tank.getCapacity();
         }
 
         @Override
@@ -105,13 +107,11 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, HaloCollectorBlockEntity be) {
-        if (level.getGameTime() % INTERVAL != 0) {
-            return;
-        }
-        be.tick(level, pos, state);
+        if (level.getGameTime() % INTERVAL == 0) be.collect(level, pos, state);
+        if (!be.tank.isEmpty()) be.pushOut(level, pos);
     }
 
-    private void tick(Level level, BlockPos pos, BlockState state) {
+    private void collect(Level level, BlockPos pos, BlockState state) {
         if (tank.getFluidAmount() > 0) {
             tank.drain(Math.max(1, tank.getFluidAmount() / 50), IFluidHandler.FluidAction.EXECUTE);
         }
@@ -122,7 +122,6 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
             io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, pos, 16, "dark_matter");
             tank.fill(ContainmentTankBlockEntity.darkMatter(rate), IFluidHandler.FluidAction.EXECUTE);
         }
-        pushOut(level, pos);
         boolean lit = rate > 0;
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != lit) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, lit), Block.UPDATE_ALL);
@@ -134,8 +133,9 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
             if (tank.isEmpty()) {
                 return;
             }
-            IFluidHandler target = Capabilities.get(level, Capabilities.FluidHandler.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null) {
+            if (!level.isLoaded(pos.relative(dir))) continue;
+            IFluidHandler target = io.github.genichimaruo.singulo.compat.Capabilities.get(level, Capabilities.FluidHandler.BLOCK, pos.relative(dir), dir.getOpposite());
+            if (target != null && io.github.genichimaruo.singulo.pipe.PipeFluidFilter.accepts(target, tank.getFluid())) {
                 int moved = target.fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
                 if (moved > 0) {
                     tank.drain(moved, IFluidHandler.FluidAction.EXECUTE);
@@ -151,7 +151,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
             return switch (i) {
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.RATE -> rate;
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.AMOUNT -> tank.getFluidAmount();
-                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.BUFFER -> BUFFER;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.BUFFER -> tank.getCapacity();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.ENERGY -> energy.getEnergyStored();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.ENERGY_MAX -> energy.getMaxEnergyStored();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.CORE -> core == null ? 0 : 1;

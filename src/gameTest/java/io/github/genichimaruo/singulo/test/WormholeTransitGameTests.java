@@ -21,7 +21,7 @@ public final class WormholeTransitGameTests {
     private static final BlockPos A=new BlockPos(5,1,5),B=new BlockPos(20,1,5);
     private static WormholeMouthBlockEntity mouth(GameTestHelper h,BlockPos p,long pair,boolean upgrade){
         h.setBlock(p,SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,Direction.SOUTH));
-        WormholeMouthBlockEntity be=(WormholeMouthBlockEntity)h.getBlockEntity(p);be.setData(new WormholeData(pair,0));
+        WormholeMouthBlockEntity be=(WormholeMouthBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, p);be.setData(new WormholeData(pair,0));
         var tag=be.saveWithoutMetadata();tag.putBoolean("traversable",upgrade);tag.putInt("grace",6000);tag.putInt("size",1);be.load(tag);return be;
     }
     private static void floor(GameTestHelper h){
@@ -99,7 +99,7 @@ public final class WormholeTransitGameTests {
         var a=mouth(h,A,pair,true);
         // 向こうの口は東向き（こちらは南向き）: 南の前から北へ入ると、東の前へ東向きに出る
         h.setBlock(B,SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,Direction.EAST));
-        WormholeMouthBlockEntity b=(WormholeMouthBlockEntity)h.getBlockEntity(B);b.setData(new WormholeData(pair,0));
+        WormholeMouthBlockEntity b=(WormholeMouthBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, B);b.setData(new WormholeData(pair,0));
         var tag=b.saveWithoutMetadata();tag.putBoolean("traversable",true);tag.putInt("grace",6000);tag.putInt("size",1);b.load(tag);
         // 両方の口の開口部を空け、床（口の高さ）を敷く
         for(BlockPos m:new BlockPos[]{A,B})for(int dx=-3;dx<=3;dx++)for(int dz=-3;dz<=3;dz++){
@@ -133,7 +133,7 @@ public final class WormholeTransitGameTests {
         long pair=h.getLevel().random.nextLong();
         var a=mouth(h,A,pair,true);
         h.setBlock(B,SinguloBlocks.WORMHOLE_MOUTH.get().defaultBlockState().setValue(AbstractMachineBlock.FACING,Direction.EAST));
-        WormholeMouthBlockEntity b=(WormholeMouthBlockEntity)h.getBlockEntity(B);b.setData(new WormholeData(pair,0));
+        WormholeMouthBlockEntity b=(WormholeMouthBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, B);b.setData(new WormholeData(pair,0));
         var tag=b.saveWithoutMetadata();tag.putBoolean("traversable",true);tag.putInt("grace",6000);tag.putInt("size",1);b.load(tag);
         for(BlockPos m:new BlockPos[]{A,B})for(int dx=-3;dx<=3;dx++)for(int dz=-3;dz<=3;dz++)for(int y=1;y<=4;y++)h.setBlock(m.offset(dx,y,dz),Blocks.AIR);
         var arrow=new net.minecraft.world.entity.projectile.Arrow(net.minecraft.world.entity.EntityType.ARROW,h.getLevel());

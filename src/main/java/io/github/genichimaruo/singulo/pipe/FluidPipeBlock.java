@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.pipe;
 
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
+
 import io.github.genichimaruo.singulo.cable.CableBlock;
 import io.github.genichimaruo.singulo.cable.CableProfile;
 import io.github.genichimaruo.singulo.cable.ConduitCover;
@@ -13,27 +15,34 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import io.github.genichimaruo.singulo.compat.Capabilities;
 
 /**
- * 液体パイプ（4段階）。隣のパイプ（段階を問わない）と、液体を扱うブロックと、水源に自動で接続する。
+ * 液体パイプ（4段階）。隣のパイプ（段階を問わない）と液体を扱うブロックに自動で接続する。
  * 運ぶ液体やガスの種類を問わない。どの面から出し入れするかは、つないだ装置の面の設定で決まる。
  * <p>
  * capacity は1 tick に運べる量（mB）。分かれ目のない区間は {@link FluidPipeNetwork} が1つにまとめ、
  * 経路のいちばん細いところで量が決まる（電線と同じ）。パイプ自体は tick しない。
  */
-public class FluidPipeBlock extends BaseEntityBlock {
-    private final long capacity;
+public class FluidPipeBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
+    private final java.util.function.LongSupplier capacity;
     private final PipeProfile profile;
 
     public FluidPipeBlock(Properties properties, long capacity, PipeProfile profile) {
+        this(properties, () -> capacity, profile);
+    }
+
+    public FluidPipeBlock(Properties properties, java.util.function.LongSupplier capacity, PipeProfile profile) {
         super(properties);
         this.capacity = capacity;
         this.profile = profile;
@@ -41,13 +50,13 @@ public class FluidPipeBlock extends BaseEntityBlock {
         for (BooleanProperty p : CableBlock.CONNECTIONS.values()) {
             state = state.setValue(p, false);
         }
-        registerDefaultState(state.setValue(CableBlock.STRAIGHT, CableProfile.Straight.NONE)
+        registerDefaultState(state.setValue(WATERLOGGED, false).setValue(CableBlock.STRAIGHT, CableProfile.Straight.NONE)
                 .setValue(ConduitCover.PROPERTY, ConduitCover.State.NONE));
     }
 
     /** 1 tick に運べる量（mB）。Long.MAX_VALUE は上限なし。 */
     public long capacity() {
-        return capacity;
+        return capacity.getAsLong();
     }
 
     public PipeProfile profile() {
@@ -57,9 +66,9 @@ public class FluidPipeBlock extends BaseEntityBlock {
     @Override
     public void appendHoverText(net.minecraft.world.item.ItemStack stack, @Nullable BlockGetter context,
                                 java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
-        lines.add((capacity == Long.MAX_VALUE
+        lines.add((capacity() == Long.MAX_VALUE
                 ? net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.unlimited")
-                : net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.capacity", String.format("%,d", capacity)))
+                : net.minecraft.network.chat.Component.translatable("tooltip.singulo.fluid_pipe.capacity", String.format("%,d", capacity())))
                 .withStyle(net.minecraft.ChatFormatting.AQUA));
         super.appendHoverText(stack, context, lines, flag);
     }
@@ -68,12 +77,17 @@ public class FluidPipeBlock extends BaseEntityBlock {
     @Override
     public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         CableBlock.CONNECTIONS.values().forEach(builder::add);
-        builder.add(CableBlock.STRAIGHT, ConduitCover.PROPERTY);
+        builder.add(CableBlock.STRAIGHT, ConduitCover.PROPERTY, WATERLOGGED);
     }
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -143,12 +157,12 @@ public class FluidPipeBlock extends BaseEntityBlock {
     /** 枠だけ・カバーなしは光を通し、隣に陰を落とさない（ガラスのように）。ブロック入りはふつうのブロックと同じ。 */
     @Override
     public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
-        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state, level, pos);
+        return !state.getValue(WATERLOGGED) && (ConduitCover.passesLight(state) || super.propagatesSkylightDown(state, level, pos));
     }
 
     @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return ConduitCover.passesLight(state) ? 0 : super.getLightBlock(state, level, pos);
+        return ConduitCover.passesLight(state) && !state.getValue(WATERLOGGED) ? 0 : super.getLightBlock(state, level, pos);
     }
 
     @Override
@@ -166,12 +180,14 @@ public class FluidPipeBlock extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return connections(defaultBlockState(), context.getLevel(), context.getClickedPos());
+        BlockState state = defaultBlockState().setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
+        return connections(state, context.getLevel(), context.getClickedPos());
     }
 
     @Override
     public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
                                      BlockPos pos, BlockPos neighborPos) {
+        if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         if (level.getBlockEntity(pos) instanceof FluidPipeBlockEntity pipe) {
             pipe.neighborChanged(neighborPos);
         }
@@ -207,8 +223,8 @@ public class FluidPipeBlock extends BaseEntityBlock {
             return false;
         }
         BlockState state = level.getBlockState(other);
-        return state.getBlock() instanceof FluidPipeBlock || FluidPipeNetwork.isSource(state)
-                || Capabilities.get(level, Capabilities.FluidHandler.BLOCK, other, dir.getOpposite()) != null;
+        return state.getBlock() instanceof FluidPipeBlock
+                || io.github.genichimaruo.singulo.compat.Capabilities.get(level, Capabilities.FluidHandler.BLOCK, other, dir.getOpposite()) != null;
     }
 
     @Nullable

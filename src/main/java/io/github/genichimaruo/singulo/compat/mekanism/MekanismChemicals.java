@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.compat.mekanism;
 
+import com.google.common.math.LongMath;
 import io.github.genichimaruo.singulo.android.work.Chemicals;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

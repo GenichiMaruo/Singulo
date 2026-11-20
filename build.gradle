@@ -38,8 +38,18 @@ sourceSets {
         }
         java.include(selected.isEmpty() ? ['**/*GameTests.java'] : selected.collect { "**/${it}.java" })
         java.include('**/test/TestBuild.java', '**/test/harness/**')
+        // Forge scans annotated classes before checking their namespace, so do not
+        // load fixtures referencing an optional mod when it is absent.
+        if (!providers.gradleProperty("withMekanism").isPresent()) {
+            java.exclude("**/MekanismGameTests.java", "**/MekanismStockGameTests.java", "**/MekanismQioGameTests.java")
+        }
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
+    }
+}
+tasks.named('processGameTestResources', ProcessResources) {
+    from('docs/examples/recipe-pack') {
+        into 'fixtures/recipe-pack'
     }
 }
 sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java')
@@ -160,6 +170,16 @@ repositories { maven { url = "https://modmaven.dev/"; content { includeGroup "me
 
 dependencies {
     modCompileOnly('maven.modrinth:embeddium:UTbfe5d1') { transitive = false }
+    // These 1.20.1 releases support both legacy loaders; never require or bundle them.
+    modCompileOnly('maven.modrinth:jade:xJQHCmWJ') { transitive = false }
+    modCompileOnly('maven.modrinth:wthit:hCPaSf8E') { transitive = false }
+    if (providers.gradleProperty('withJade').isPresent()) {
+        modRuntimeOnly('maven.modrinth:jade:xJQHCmWJ') { transitive = false }
+    }
+    if (providers.gradleProperty('withWthit').isPresent()) {
+        modRuntimeOnly('maven.modrinth:wthit:hCPaSf8E') { transitive = false }
+        modRuntimeOnly('maven.modrinth:badpackets:aXZqpNgH') { transitive = false }
+    }
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
     if (providers.gradleProperty("withMekanism").isPresent()) { modRuntimeOnly "mekanism:Mekanism:${mekanism_version}" }
     // JEI は任意の連携。API だけでコンパイルし、開発中の起動では本体も入れる
@@ -241,6 +261,15 @@ mixin {
     config 'singulo.mixins.json'
 }
 dependencies {
+    // Both 1.20.1 loaders use the Forge namespace and need the nested runtime for the ray mixins.
+    compileOnly 'io.github.llamalad7:mixinextras-common:0.5.4'
+    implementation 'io.github.llamalad7:mixinextras-forge:0.5.4'
+    jarJar('io.github.llamalad7:mixinextras-forge:0.5.4') {
+        version {
+            strictly '[0.5.4,0.6)'
+            prefer '0.5.4'
+        }
+    }
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

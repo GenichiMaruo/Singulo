@@ -43,6 +43,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "     ",
+    " CEC ",
+    " DAD ",
+    "  B  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:gravitational_wave_detector",
     "count": 1

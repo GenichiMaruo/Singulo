@@ -9,11 +9,17 @@
       "ingredient": {
         "tag": "forge:plates/steel"
       },
-      "count": 3
+      "count": 2
     },
     {
       "ingredient": {
         "tag": "forge:obsidian"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
       },
       "count": 1
     },
@@ -24,6 +30,13 @@
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " ACA ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:tipler_frame",

@@ -26,6 +26,14 @@ public final class SyncedInts implements ContainerData {
         return new SyncedInts(count, null);
     }
 
+    public static int doubleWord(double value, int word) {
+        return (int) (Double.doubleToLongBits(value) >>> (32 * word));
+    }
+
+    public double getDouble(int first) {
+        return Double.longBitsToDouble(Integer.toUnsignedLong(getInt(first)) | ((long) getInt(first + 1) << 32));
+    }
+
     /** 組み立て済みの値。 */
     public int getInt(int index) {
         return getter != null ? getter.applyAsInt(index) : client[index];

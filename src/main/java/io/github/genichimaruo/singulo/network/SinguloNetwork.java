@@ -10,8 +10,14 @@ import net.minecraftforge.network.simple.SimpleChannel;
 /** Versioned Forge 1.20.1 channel; handlers execute on the game thread. */
 public final class SinguloNetwork {
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(Singulo.id("main"),
-            () -> "7", "7"::equals, "7"::equals);
+            () -> "8", "8"::equals, "8"::equals);
     public static void register() {
+        CHANNEL.messageBuilder(MonitorPayload.class, 13, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(MonitorPayload::encode).decoder(MonitorPayload::decode)
+                .consumerMainThread((p,c) -> MonitorPayload.handle(p,c.get())).add();
+        CHANNEL.messageBuilder(MonitorRequestPayload.class, 14, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(MonitorRequestPayload::encode).decoder(MonitorRequestPayload::decode)
+                .consumerMainThread((p,c) -> MonitorRequestPayload.handle(p,c.get())).add();
         CHANNEL.messageBuilder(LegacyMenuButtonPayload.class, 12, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(LegacyMenuButtonPayload::encode).decoder(LegacyMenuButtonPayload::decode)
                 .consumerMainThread((p, c) -> LegacyMenuButtonPayload.handle(p, c.get())).add();

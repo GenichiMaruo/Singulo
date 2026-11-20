@@ -98,8 +98,13 @@ public class HoloProjectorItem extends SinguloItem {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    /** 必要なブロックと足りない数をチャットに出す。 */
-    public static void report(Level level, Player player, Blueprints.Kind kind, BlockPos pos, Direction back, int size) {
+    /**
+     * 設計図と今のワールドの比べ: ブロックごとの [必要, 足りない] と、空けておく所をふさぐブロックの数（0.21.0 で、チャットの報告と
+     * 装置の様子の報告 {@link io.github.genichimaruo.singulo.machine.MachineReport} が使うように分けた）。
+     */
+    public record Shortfall(Map<Block, int[]> counts, int blocking) {}
+
+    public static Shortfall shortfall(Level level, Blueprints.Kind kind, BlockPos pos, Direction back, int size) {
         Map<Block, int[]> counts = new LinkedHashMap<>();   // [必要, 足りない]
         int blocking = 0;
         var shape = io.github.genichimaruo.singulo.multiblock.Shapes.spec(kind, size);
@@ -120,6 +125,14 @@ public class HoloProjectorItem extends SinguloItem {
                 c[1]++;
             }
         }
+        return new Shortfall(counts, blocking);
+    }
+
+    /** 必要なブロックと足りない数をチャットに出す。 */
+    public static void report(Level level, Player player, Blueprints.Kind kind, BlockPos pos, Direction back, int size) {
+        Shortfall found = shortfall(level, kind, pos, back, size);
+        Map<Block, int[]> counts = found.counts();
+        int blocking = found.blocking();
         player.displayClientMessage(Component.translatable("holo.singulo.header",
                 Component.translatable("multiblock.singulo." + kind.id()), size).withStyle(ChatFormatting.AQUA), false);
         int missing = 0;

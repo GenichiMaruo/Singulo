@@ -36,6 +36,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "  E  ",
+    " ADA ",
+    " BCB ",
+    " ADA ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_kit",
     "count": 1

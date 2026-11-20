@@ -55,7 +55,7 @@ public final class JetForgeGameTests {
 
     private static JetForgeBlockEntity build(GameTestHelper helper) {
         TestBuild.build(helper, Blueprints.Kind.JET_FORGE, CONTROLLER, BACK, SIZE);
-        return (JetForgeBlockEntity) helper.getBlockEntity(CONTROLLER);
+        return (JetForgeBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONTROLLER);
     }
 
     /** 形の (x, y, z) のワールドの位置。 */
@@ -406,7 +406,7 @@ public final class JetForgeGameTests {
             helper.assertTrue(helper.getLevel().getBlockState(center).is(SinguloBlocks.ROGUE_BLACK_HOLE.get()), "組み直しで消えた");
         });
         helper.runAtTickTime(60, () -> {
-            JetForgeBlockEntity again = (JetForgeBlockEntity) helper.getBlockEntity(CONTROLLER);
+            JetForgeBlockEntity again = (JetForgeBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONTROLLER);
             helper.assertTrue(again.formed() && again.hasCore(), "組み直しても取り込まない");
             helper.assertTrue(helper.getLevel().getBlockState(center).isAir(), "取り込んだのに野良が残っている");
             helper.succeed();
@@ -481,13 +481,14 @@ public final class JetForgeGameTests {
     @GameTest(template = EMPTY)
     public static void heliumCartridgeIsAFluidContainer(GameTestHelper helper) {
         var helium = SinguloFluids.get("liquid_helium");
-        var empty = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("empty_coolant_cartridge")));
-        helper.assertTrue(empty.fill(new FluidStack(helium, 200), IFluidHandler.FluidAction.EXECUTE) == 0, "200 mBで詰まった");
-        helper.assertTrue(empty.fill(new FluidStack(helium, 1000), IFluidHandler.FluidAction.EXECUTE) == 250, "250 mB詰まらない");
-        helper.assertTrue(empty.getContainer().is(item("helium_cartridge")), "液体ヘリウム・カートリッジにならない");
-        var full = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("helium_cartridge")));
-        FluidStack out = full.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-        helper.assertTrue(out.getAmount() == 250 && out.getFluid().isSame(helium) && full.getContainer().is(item("empty_coolant_cartridge")),
+        var handler = new ItemStack(item("empty_coolant_cartridge")).getCapability(Capabilities.FluidHandler.ITEM).orElse(null);
+        helper.assertTrue(handler != null, "空のカートリッジに液体の口がない");
+        helper.assertTrue(handler.fill(new FluidStack(helium, 200), IFluidHandler.FluidAction.EXECUTE) == 0, "200 mBで詰まった");
+        helper.assertTrue(handler.fill(new FluidStack(helium, handler.getTankCapacity(0)), IFluidHandler.FluidAction.EXECUTE) == 250,
+                "空の容器が報告する容量ではヘリウムを充填できない");
+        helper.assertTrue(handler.getContainer().is(item("helium_cartridge")), "液体ヘリウム・カートリッジにならない");
+        FluidStack out = handler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+        helper.assertTrue(out.getAmount() == 250 && out.getFluid().isSame(helium) && handler.getContainer().is(item("empty_coolant_cartridge")),
                 "空けられない: " + out.getAmount());
         helper.succeed();
     }

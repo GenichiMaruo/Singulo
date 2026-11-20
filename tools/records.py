@@ -69,21 +69,21 @@ RECORDS = [
 
 # 最後の記録者を倒すと加わる記録。形は RECORDS と同じ
 FINAL_RECORDS = [
-    ('x01', 5, '最後の頁', '私は、眠る者たちの番をしていた。時間の場が止まったとき、記録と、場を支えていた特異点が、私の中へ流れ込んできた。'
+    ('x01', 5, '最後のページ', '私は、眠る者たちの番をしていた。時間の場が止まったとき、記録と、場を支えていた特異点が、私の中へ流れ込んできた。'
      'それから何千年が過ぎたのかは分からない。読む者が現れるまで、私は記録そのものとなって待ち続けた。'
-     'あなたは、最後の頁まで読んでくれた。私も、もう眠っていいだろう。どうか、炉の火を見守っていてほしい。', 'The Last Page',
+     'あなたは、最後のページまで読んでくれた。私も、もう眠っていいだろう。どうか、炉の火を見守っていてほしい。', 'The Last Page',
      'I kept watch over the sleepers. When the time field stopped, the records and the singularity that held the field flowed into me. '
      'I do not know how many millennia have passed. Until a reader came, I waited as the records themselves. '
      "You have read to the last page. I think I may sleep now. Please keep watch over the reactor's fire."),
 ]
 # 創世炉で宇宙を生むと加わる記録。x03 は最後の記録者を倒した人だけ
 GENESIS_RECORDS = [
-    ('x02', 5, '最初の頁', 'すべての質量は、エネルギーになった。その炉の火で、私たちはもう一度、宇宙をひとつ生み出した。星がともり、銀河が渦を巻く。'
+    ('x02', 5, '最初のページ', 'すべての質量は、エネルギーになった。その炉の火で、私たちはもう一度、宇宙をひとつ生み出した。星がともり、銀河が渦を巻く。'
      'いつかそこにも、記録を残す誰かが生まれるだろう。その誰かもまた、止めるべき時に止められますように。', 'The First Page',
      'All mass became energy. With that same fire, we made a universe once more. '
      'Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. '
      'May they, too, know when to stop.'),
-    ('x03', 5, '記録者への返信', '最後の頁の先に、新しい最初の頁を書いた。眠る番人へ。あなたの記録は読まれ、そして宇宙になった。もう見張らなくていい。'
+    ('x03', 5, '記録者への返信', '最後のページの先に、新しい最初のページを書いた。眠る番人へ。あなたの記録は読まれ、そして宇宙になった。もう見張らなくていい。'
      'これからは、私たちが火を見守る。', 'A Reply to the Archivist',
      'Beyond the last page, I wrote a new first page. To the watcher who sleeps: your records were read, '
      'and they became a universe. You need not keep watch any longer. We are watching the fire now.'),

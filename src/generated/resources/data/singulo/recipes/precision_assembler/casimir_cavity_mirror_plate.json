@@ -25,11 +25,24 @@
     },
     {
       "ingredient": {
+        "item": "singulo:casimir_cavity_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
         "item": "singulo:bose_condensate_catalyst"
       },
       "tier": 3,
       "uses": 750
     }
+  ],
+  "shape": [
+    "     ",
+    " BAB ",
+    "  C  ",
+    "  D  ",
+    "     "
   ],
   "result": {
     "id": "singulo:casimir_cavity_mirror_plate",

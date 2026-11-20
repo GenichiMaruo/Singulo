@@ -1,0 +1,45 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 6
+    },
+    {
+      "ingredient": {
+        "tag": "forge:gems/quartz"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "tier": 3,
+      "uses": 1500
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 2
+    }
+  ],
+  "shape": [
+    "   A ",
+    "  ADA",
+    " A B ",
+    "ADA  ",
+    " B   "
+  ],
+  "result": {
+    "id": "singulo:casimir_cavity_frame",
+    "count": 8
+  }
+}

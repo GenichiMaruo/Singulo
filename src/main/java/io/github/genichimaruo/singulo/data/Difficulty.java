@@ -61,7 +61,7 @@ public final class Difficulty {
     public static int stars(int base) {
         return switch (preset()) {
             case CASUAL -> 0;
-            case EXPERT -> base * 2;
+            case EXPERT -> (int) Math.min(Integer.MAX_VALUE, (long) base * 2);
             default -> base;
         };
     }
@@ -73,6 +73,6 @@ public final class Difficulty {
             case EXPERT -> 1.5;
             default -> 1.0;
         };
-        return base <= 0 ? 0 : Math.max(1, (int) Math.round(base * f));
+        return base <= 0 ? 0 : io.github.genichimaruo.singulo.compat.Legacy.clamp(Math.round(base * f), 1, Integer.MAX_VALUE);
     }
 }

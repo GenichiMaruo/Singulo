@@ -24,10 +24,15 @@ public class AndroidGlassStairs extends GlassJoin.Stairs {
     }
 
     boolean gate() {
-        return base() instanceof AndroidGlassBlock glass && glass.gate();
+        return gate(base());
     }
 
-    private static boolean android(CollisionContext context) {
+    /** base が透過ガラスか（遮断ガラスなら false）。 */
+    static boolean gate(Block base) {
+        return base instanceof AndroidGlassBlock glass && glass.gate();
+    }
+
+    static boolean android(CollisionContext context) {
         return context instanceof EntityCollisionContext e && e.getEntity() instanceof RuinAndroid;
     }
 

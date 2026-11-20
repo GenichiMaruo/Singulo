@@ -24,6 +24,13 @@
       "count": 8
     }
   ],
+  "shape": [
+    "  C  ",
+    " CBC ",
+    "CBABC",
+    " CBC ",
+    "  C  "
+  ],
   "result": {
     "id": "singulo:ergosphere_ring",
     "count": 1

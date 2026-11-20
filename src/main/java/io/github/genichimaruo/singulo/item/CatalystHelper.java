@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.item;
 
+import io.github.genichimaruo.singulo.api.item.CatalystItem;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +25,7 @@ public final class CatalystHelper {
 
     /** 触媒のティア（段階と同じ）。触媒でなければ 0。 */
     public static int tierOf(ItemStack stack) {
+        if (stack.getItem() instanceof CatalystItem addon) return addon.stage();
         if (!(stack.getItem() instanceof UsesItem uses) || !uses.isCatalyst()) {
             return 0;
         }

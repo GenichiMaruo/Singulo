@@ -41,17 +41,23 @@ public final class WorkConsoleView {
         // 注文できる物: レシピの完成品（作れる）と、在庫
         List<ItemCount> stock = c.available();
         List<ItemCount> entries = new ArrayList<>();
-        List<ItemStack> craftable = new ArrayList<>();
+        var craftable = new java.util.HashSet<WorkPlanner.Key>();
+        var availableCounts = new java.util.HashMap<WorkPlanner.Key, Long>();
+        for (ItemCount item : stock) availableCounts.put(WorkPlanner.Key.of(item.item), item.count);
         for (RecipeRackBlockEntity.Entry e : c.recipes()) {
-            ItemStack out = e.recipe().outputKey();
-            if (craftable.stream().noneMatch(s -> ItemStack.isSameItemSameTags(s, out))) {
-                craftable.add(out.copyWithCount(1));
-                entries.add(new ItemCount(out, ItemCount.get(stock, out)));
+            var recipe = e.recipe();
+            for (ItemStack out : recipe.processing() ? recipe.outputs() : List.of(recipe.output())) {
+                var key = WorkPlanner.Key.of(out);
+                if (craftable.add(key)) {
+                    long count = WormholeOrders.pattern(out) ? WormholeOrders.inStock(c.getLevel(), stock, out, Long.MAX_VALUE)
+                            : availableCounts.getOrDefault(key, 0L);
+                    entries.add(new ItemCount(FluidSamples.key(out), count));
+                }
             }
         }
         List<ItemCount> rest = new ArrayList<>();
         for (ItemCount s : stock) {
-            if (s.count > 0 && craftable.stream().noneMatch(x -> ItemStack.isSameItemSameTags(x, s.item))) {
+            if (s.count > 0 && !craftable.contains(WorkPlanner.Key.of(s.item))) {
                 rest.add(s);
             }
         }
@@ -256,7 +262,7 @@ public final class WorkConsoleView {
         ListTag ms = new ListTag();
         for (ItemCount m : plan.materials()) {
             CompoundTag mt = m.save(reg);
-            mt.putLong("have", ItemCount.get(stock, m.item));
+            mt.putLong("have", ItemCount.get(stock, m.item) + ItemCount.get(plan.fromWorker, m.item));
             mt.putLong("missing", ItemCount.get(plan.missing, m.item));
             ms.add(mt);
         }

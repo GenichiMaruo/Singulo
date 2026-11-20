@@ -1,12 +1,13 @@
 package io.github.genichimaruo.singulo.machine;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.energy.SinguloEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,8 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import io.github.genichimaruo.singulo.compat.Capabilities;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
@@ -92,7 +91,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     }
 
     private FluidTank tank(int capacity, String fluid) {
-        return new FluidTank(capacity, f -> f.getFluid().isSame(SinguloFluids.get(fluid))) {
+        return new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(capacity), f -> f.getFluid().isSame(SinguloFluids.get(fluid))) {
             @Override
             protected void onContentsChanged() {
                 setChanged();
@@ -128,46 +127,33 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
 
     private void tick(Level level, BlockPos pos, BlockState state) {
         rate = 0;
+        double output = energy.prepareGeneration(ServerConfig.SPEC.isLoaded() ? ServerConfig.FUEL_CELL_OUTPUT.get() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : MAX_OUTPUT);
         double fill = (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
         if (standby ? fill < 0.75 : fill >= 0.98) {
             standby = !standby;
         }
         double perMb = fePerMb();
-        double output = MAX_OUTPUT * (ServerConfig.SPEC.isLoaded() ? ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get() : 1.0);
         if (!standby && perMb > 0) {
             // 出力に見合う水素を使う（水素2 mB に酸素1 mB）。足りない分だけ出力を下げる
-            double want = output / perMb;
+            double headroom = energy.getMaxEnergyStored() - energy.getEnergyStored();
+            double want = Math.min(output, headroom) / perMb;
             // Only whole 2H:1O pairs can be withdrawn. An odd last mB must stay in the tank,
             // rather than being credited as a second mB that drain() never supplied.
             double available = Math.min(hydrogen.getFluidAmount() / 2, oxygen.getFluidAmount()) * 2.0 + carry;
             double use = Math.min(want, available);
             if (use > 0) {
                 carry -= use;
-                int whole = 0;
-                while (carry < 0) {
-                    carry += 2;
-                    whole += 2;
-                }
+                int whole = 2 * (int) Math.ceil(Math.max(0.0, -carry) / 2);
+                carry += whole;
                 if (whole > 0) {
                     hydrogen.drain(whole, IFluidHandler.FluidAction.EXECUTE);
                     oxygen.drain(whole / 2, IFluidHandler.FluidAction.EXECUTE);
                 }
                 rate = use * perMb;
-                energy.generate((int) Math.floor(rate));
+                energy.generateRate(rate);
             }
         }
-        for (Direction dir : Direction.values()) {
-            if (energy.getEnergyStored() <= 0) {
-                break;
-            }
-            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && target.canReceive()) {
-                int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
-                if (sent > 0) {
-                    energy.consume(sent);
-                }
-            }
-        }
+        energy.pushToNeighbors(level, pos, energy.exportLimit());
         boolean active = rate > 0;
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
@@ -185,14 +171,14 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
         Component status = standby ? Component.translatable("message.singulo.fuel_cell.standby")
                 : Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(rate));
         player.displayClientMessage(Component.translatable("message.singulo.fuel_cell.status",
-                hydrogen.getFluidAmount(), HYDROGEN_TANK, oxygen.getFluidAmount(), OXYGEN_TANK,
+                hydrogen.getFluidAmount(), hydrogen.getCapacity(), oxygen.getFluidAmount(), oxygen.getCapacity(),
                 energy.getEnergyStored(), energy.getMaxEnergyStored(), status), true);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putInt("energy", energy.getEnergyStored());
+        energy.saveGeneration(tag);
         tag.put("hydrogen", hydrogen.writeToNBT(new CompoundTag()));
         tag.put("oxygen", oxygen.writeToNBT(new CompoundTag()));
         tag.putDouble("carry", carry);
@@ -201,7 +187,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        energy.setEnergy(tag.getInt("energy"));
+        energy.loadGeneration(tag);
         hydrogen.readFromNBT(tag.getCompound("hydrogen"));
         oxygen.readFromNBT(tag.getCompound("oxygen"));
         carry = tag.getDouble("carry");

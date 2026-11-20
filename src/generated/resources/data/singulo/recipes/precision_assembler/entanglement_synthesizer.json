@@ -43,6 +43,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "  D  ",
+    " EBE ",
+    " CAC ",
+    " EBE ",
+    "     "
+  ],
   "result": {
     "id": "singulo:entanglement_synthesizer",
     "count": 1

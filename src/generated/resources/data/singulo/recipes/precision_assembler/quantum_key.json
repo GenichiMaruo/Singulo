@@ -24,6 +24,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    " A A ",
+    " BCB ",
+    "     ",
+    "     "
+  ],
   "result": {
     "id": "singulo:quantum_key",
     "count": 1

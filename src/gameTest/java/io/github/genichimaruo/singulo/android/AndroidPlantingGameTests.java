@@ -35,7 +35,7 @@ public final class AndroidPlantingGameTests {
         level.setBlock(ground, Blocks.DIRT.defaultBlockState(), 3);
         level.setBlock(target, Blocks.AIR.defaultBlockState(), 3);
         h.setBlock(new BlockPos(4, 1, 4), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = (WorkConsoleBlockEntity) h.getBlockEntity(new BlockPos(4, 1, 4));
+        WorkConsoleBlockEntity console = (WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, new BlockPos(4, 1, 4));
         var android = SinguloEntities.BLADE_ANDROID.get().create(level);
         android.makeGuard(null, ground, RuinAndroid.MODE_GUARD, 30);
         android.setCharge(100);

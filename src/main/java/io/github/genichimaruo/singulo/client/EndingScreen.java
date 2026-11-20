@@ -25,6 +25,8 @@ public class EndingScreen extends Screen {
     private final List<Component> lines = new ArrayList<>();
     private final List<SupporterCredits.Entry> supporters;
     private final long seed;
+    /** その銀河の性質（GalaxyTraits）。 */
+    private final int traits;
     private final float[][] field;
     private int ticks;
     private int supporterStart;
@@ -47,6 +49,7 @@ public class EndingScreen extends Screen {
         }
         long latest = ClientGalaxies.latest();
         this.seed = latest != 0 ? latest : 0x5EEDL;
+        this.traits = latest != 0 ? ClientGalaxies.latestTraits() : 0;
         Random rnd = new Random(seed);
         field = new float[160][];
         for (int i = 0; i < field.length; i++) {
@@ -253,7 +256,7 @@ public class EndingScreen extends Screen {
         float fadeForText = 1 - 0.55F * Mth.clamp((t - thanksAt()) / 60F, 0, 1);
         float spin = t * 0.004F;
         float cos = Mth.cos(0.35F);
-        GalaxyDraw.Shape shape = GalaxyDraw.shape(seed);
+        GalaxyDraw.Shape shape = GalaxyDraw.shape(seed, traits);
         // 中心のふくらみ（同心の四角を重ねて、ぼんやりと）
         for (int k = 6; k >= 1; k--) {
             float r = radius * 0.05F * k;

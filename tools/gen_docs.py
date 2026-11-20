@@ -8,19 +8,25 @@
 from advancements import ADVANCEMENTS, HIDDEN_ADVANCEMENTS, validate_advancements
 from descriptions import DESC, SUMMARY
 from guide import CHAPTERS
+from guide_visuals import ACTION_TITLES, CAPTIONS, visuals_for
 
 MODID = 'singulo'
+
+
+def recipe_uses(recipes, restored_items):
+    used_in = {}
+    for rname, r in recipes.items():
+        for inp in r['inputs']:
+            used_in.setdefault(inp, []).append(rname)
+    for name, restored in restored_items.items():
+        used_in.setdefault(restored, []).append(name)
+    return used_in
 
 
 def descriptions(ctx, ja, en):
     """ctx: MOD, RECIPES, EXPLORE, RESTORED, STATIONS, warn"""
     MOD, RECIPES = ctx['MOD'], ctx['RECIPES']
-    used_in = {}
-    for rname, r in RECIPES.items():
-        for inp in r['inputs']:
-            used_in.setdefault(inp, []).append(rname)
-    for name, restored in ctx['RESTORED'].items():
-        used_in.setdefault(restored, []).append(name)
+    used_in = recipe_uses(RECIPES, ctx['RESTORED'])
 
     def en_name(n):
         return MOD[n][1] if n in MOD else n
@@ -64,6 +70,10 @@ def descriptions(ctx, ja, en):
 
 def guide(ctx, ja, en):
     chapters = []
+    for page, (jt, et) in ACTION_TITLES.items():
+        ja[f'guide.singulo.action.{page}'], en[f'guide.singulo.action.{page}'] = jt, et
+    for page, (jt, et) in CAPTIONS.items():
+        ja[f'guide.singulo.caption.{page}'], en[f'guide.singulo.caption.{page}'] = jt, et
     for cid, icon, ja_title, en_title, pages in CHAPTERS:
         ja[f'guide.{MODID}.{cid}'] = ja_title
         en[f'guide.{MODID}.{cid}'] = en_title
@@ -74,7 +84,7 @@ def guide(ctx, ja, en):
             en[key + '.title'], en[key + '.body'] = et, eb
             ids.append(f'{cid}.{pid}')
         chapters.append({'id': cid, 'icon': icon, 'pages': ids})
-    ctx['write_json'](ctx['ASSETS'] / 'guide' / 'chapters.json', {'chapters': chapters})
+    ctx['write_json'](ctx['ASSETS'] / 'guide' / 'chapters.json', {'chapters': chapters, 'visuals': visuals_for(CHAPTERS)})
 
 
 def advancements(ctx, ja, en):

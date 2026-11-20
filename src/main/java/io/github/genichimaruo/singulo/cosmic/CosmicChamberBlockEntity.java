@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.cosmic;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
@@ -8,6 +11,7 @@ import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.ArrayList;
+import io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,6 +41,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 /** Finite storage and a reserved-work spindle, with no runtime chunk loading. */
 public final class CosmicChamberBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, MenuProvider,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source,
         io.github.genichimaruo.singulo.multiblock.PortAccess, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     public static final int RESERVOIR=0, ACCUMULATOR=1, SPINDLE=2;
     public static final int FLUID_CAPACITY=16_000_000;
@@ -66,7 +71,7 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             return slot==3 ? stack : super.insertItem(slot,stack,simulate);
         }
     };
-    private final FluidTank tank = new FluidTank(FLUID_CAPACITY) {
+    private final FluidTank tank = new ConfiguredFluidTank(this::tankCapacity, f -> true) {
         @Override protected void onContentsChanged() { setChanged(); }
     };
     private final Energy input=new Energy(true,false), output=new Energy(false,true), both=new Energy(true,true);
@@ -122,13 +127,32 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             if(player.containerMenu instanceof CosmicMenu menu&&menu.ownedBy(this))player.closeContainer();
     }
     public int status(){return status;}
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。蓄電器の出し入れは、作る・使う電力に入れない。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        boolean active = switch (kind()) {
+            case RESERVOIR -> tank.getFluidAmount() > 0;
+            case ACCUMULATOR -> stored >= 1_000_000;
+            default -> core;
+        };
+        io.github.genichimaruo.singulo.machine.MachineReport.State s = switch (status) {
+            case 0 -> active ? io.github.genichimaruo.singulo.machine.MachineReport.State.RUN : io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE;
+            case 2 -> io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE;
+            default -> io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN;
+        };
+        int using = kind() == ACCUMULATOR ? 0 : (int) Math.min(Integer.MAX_VALUE, lastIn * 1_000_000L);
+        return new io.github.genichimaruo.singulo.machine.MachineReport(s, Component.translatable("gui.singulo.cosmic.state." + status), java.util.List.of(), progress, duration,
+                stored, capacity(), using, 0, ItemStack.EMPTY, 0, java.util.List.of(), 0);
+    }
     public boolean core(){return core;}
     public int progress(){return progress;}
     public int duration(){return duration;}
+    @Override public int remainingTicks() { return duration > 0 ? Math.max(1, duration - progress) : -1; }
     public int lastIn(){return lastIn;}
     public int lastOut(){return lastOut;}
     public ItemStack reserved(){return reserved;}
-    public int tankCapacity(){return kind()==RESERVOIR?FLUID_CAPACITY:16_000;}
+    public int tankCapacity(){return PackBalance.dedicatedTank(kind()==RESERVOIR?FLUID_CAPACITY:16_000);}
     public LongEnergyStorage energyFor(Direction side){return side==null?both:kind()==ACCUMULATOR&&side==back().getOpposite()?output:input;}
     public IFluidHandler fluidFor(Direction side){return side==null?fluidBoth:kind()==RESERVOIR&&side==back().getOpposite()?fluidOutput:fluidInput;}
     public IItemHandler automation(){return automation;}
@@ -173,6 +197,11 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
         be.linkPorts(formed);
         if(formed) {
             if(be.kind()==ACCUMULATOR){be.pushPower();be.chargeItems();}
+            else if (be.kind() == RESERVOIR && !be.tank.isEmpty()) {
+                Direction front = be.back().getOpposite();
+                BlockPos target = pos.relative(front);
+                if (level.isLoaded(target)) MultiblockPortBlockEntity.pushFluids(level, target, front.getOpposite(), be.tank);
+            }
             else if(be.kind()==SPINDLE)be.process((ServerLevel)level);
         }
         // 稼働灯と音: 構造が完成していて、中身があるあいだ点く
@@ -235,10 +264,10 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
             }
             long coolant=0;
             for(var in:r.fluidIngredients()){if(!in.matches(tank.getFluid()))valid=false;coolant+=in.amount();}
-            if(!valid || coolant>tank.getFluidAmount() || coolant<0 || stored<r.energy() || !fits(r.result()))continue;
+            if(!valid || coolant>tank.getFluidAmount() || coolant<0 || stored<io.github.genichimaruo.singulo.recipe.RecipeNumbers.energy(r.energy()) || !fits(r.result()))continue;
             for(int i=0;i<2;i++)items.extractItem(i,take[i],false);
             tank.drain((int)coolant,IFluidHandler.FluidAction.EXECUTE);
-            reserved=r.result().copy();progress=0;duration=Math.max(1,r.time());cost=Math.max(0,r.energy());setChanged();return;
+            reserved=r.result().copy();progress=0;duration=Math.max(1,r.time());cost=io.github.genichimaruo.singulo.recipe.RecipeNumbers.energy(r.energy());setChanged();return;
         }
     }
     private boolean fits(ItemStack product){ItemStack out=items.getStackInSlot(3);return !product.isEmpty() && product.getCount()<=product.getMaxStackSize() && (out.isEmpty() || ItemStack.isSameItemSameTags(out,product) && out.getCount()+product.getCount()<=out.getMaxStackSize());}
@@ -343,10 +372,9 @@ public final class CosmicChamberBlockEntity extends BlockEntity implements Abstr
     }
     @Override public void load(CompoundTag tag){
         super.load(tag);
-        if(tag.contains("items")){checked=false;}
+        if(tag.contains("items")){checked=false;}                 // 保存データから読み込んだ: 最初の判定では演出しない
         if(tag.contains("items"))items.deserializeNBT(tag.getCompound("items"));
         stored=Math.max(0,Math.min(capacity(),tag.getLong("stored")));tank.readFromNBT(tag.getCompound("tank"));
-        if(tank.getFluidAmount()>tankCapacity())tank.setFluid(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(tank.getFluid(),tankCapacity()));
         duration=Math.max(0,tag.getInt("duration"));progress=Math.max(0,Math.min(duration,tag.getInt("progress")));cost=Math.max(0,tag.getInt("cost"));core=tag.getBoolean("core");
         status=tag.getInt("status");lastIn=tag.getInt("in");lastOut=tag.getInt("out");
         int[] ports=tag.getIntArray("ports");

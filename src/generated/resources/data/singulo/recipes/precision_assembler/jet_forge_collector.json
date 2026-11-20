@@ -29,7 +29,20 @@
       },
       "tier": 4,
       "uses": 1125
+    },
+    {
+      "ingredient": {
+        "item": "singulo:jet_forge_truss"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "  B  ",
+    "  A  ",
+    "  E  ",
+    "  C  ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_collector",

@@ -224,21 +224,36 @@ public final class PrototypeGameTests {
     /** 半減後の速い射撃でも、突進直後の光線を相手の無敵時間で無駄にしない。実際の戦闘Goalで検査する。 */
     @GameTest(template = HUGE, batch = BATCH + "_cadence", timeoutTicks = 160)
     public static void enragedBitLungeLeavesRoomForNextBeam(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
+        for (BlockPos floor : BlockPos.betweenClosed(6, 1, 2, 8, 1, 11)) {
+            helper.setBlock(floor, Blocks.STONE);
+        }
         BitAndroid bit = bit(helper);
-        bit.setHealth(bit.getMaxHealth() / 2);
+        bit.setHealth(bit.getMaxHealth() / 4); // 自然回復しても6基の速射状態を保つ
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
+        // 3発目を突進にする間合いを保ち、戦闘 Goal に照準・発射・命中判定を任せる。
+        Vec3 firingPosition = bit.position();
+        Vec3 targetPosition = target.position();
         target.setNoGravity(true);
         // Keep the timing target inside the cleared arena after beam knockback.
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         bit.setTarget(target);
         bit.setNoAi(false);
         float[] previous = {target.getHealth()};
-        boolean[] slashHit = {false}, checked = {false};
+        boolean[] slashStarted = {false}, slashHit = {false}, checked = {false};
         helper.onEachTick(() -> {
+            bit.setPos(firingPosition);
+            bit.setDeltaMovement(Vec3.ZERO);
+            target.setPos(targetPosition);
+            target.setDeltaMovement(Vec3.ZERO);
             float lost = previous[0] - target.getHealth();
-            if (Math.abs(lost - BitAndroid.SLASH_DAMAGE) < 0.01F) slashHit[0] = true;
-            if (slashHit[0] && bit.shotFlash() == BitAndroid.FLASH - 1) {
+            if (bit.slashBit() >= 0) {
+                helper.assertTrue(bit.deployed() == BitAndroid.BITS_OUT_ENRAGED, "突進時に6基を展開していない");
+                slashStarted[0] = true;
+                if (Math.abs(lost - BitAndroid.SLASH_DAMAGE) < 0.01F) slashHit[0] = true;
+            }
+            if (slashStarted[0] && bit.shotFlash() == BitAndroid.FLASH - 1) {
+                helper.assertTrue(slashHit[0], "最初の突進で的に斬撃ダメージが入らない");
+                helper.assertTrue(bit.deployed() == BitAndroid.BITS_OUT_ENRAGED, "突進直後の光線が6基の速射でない");
                 helper.assertTrue(Math.abs(lost - BitAndroid.BIT_DAMAGE) < 0.01F,
                         "突進後の光線が無敵時間に消えた: lost=" + lost + " slashTime=" + bit.slashTime(0));
                 checked[0] = true;
@@ -246,7 +261,9 @@ public final class PrototypeGameTests {
             previous[0] = target.getHealth();
         });
         helper.succeedWhen(() -> {
-            helper.assertTrue(checked[0], "突進命中後の光線を検査できない: slashHit=" + slashHit[0] + " target=" + target.position() + " health=" + target.getHealth() + " bit=" + bit.position() + " charge=" + bit.charge() + " tick=" + bit.tickCount + " state=" + bit.state() + " targetMatches=" + (bit.getTarget() == target) + " sight=" + bit.hasLineOfSight(target) + " shot=" + bit.shotBit());
+            helper.assertTrue(checked[0], "突進後の光線を検査できない: slash=" + slashStarted[0] + " hit=" + slashHit[0]
+                    + " bits=" + bit.deployed() + " targetHealth=" + target.getHealth() + " distance=" + bit.distanceTo(target)
+                    + " hasTarget=" + (bit.getTarget() == target));
             bit.discard(); target.discard();
         });
     }

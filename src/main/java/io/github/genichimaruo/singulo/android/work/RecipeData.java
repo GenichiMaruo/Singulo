@@ -27,10 +27,77 @@ import net.minecraft.world.item.ItemStack;
  * 手順カードも同じ記録を使う（{@link ProcedureCardItem}）。
  */
 public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps, ItemStack fuel,
-                         int faces, List<String> alts) {
+                         int faces, List<String> alts, int tankBuckets, List<Tool> tools, boolean guaranteedExtras) {
     public static final String MODE_CRAFTING = "crafting", MODE_PROCESSING = "processing", MODE_PROCEDURE = "procedure";
     public static final int MAX_STEPS = 8;
     private static final String KEY = "android_recipe";
+
+    /** The machine keeps this tool in its slot and pays uses from its remaining life. */
+    public record Tool(int slot, int uses, int tier) {
+        public boolean accepts(ItemStack sample, ItemStack stack) {
+            if (stack.isEmpty()) return false;
+            int have = io.github.genichimaruo.singulo.item.CatalystHelper.tierOf(stack);
+            if (tier > 0) return have >= tier && io.github.genichimaruo.singulo.item.UsesHelper.remaining(stack) > 0;
+            return ItemStack.isSameItem(sample, stack) && io.github.genichimaruo.singulo.item.UsesHelper.remaining(stack) >= uses;
+        }
+
+        public long crafts(ItemStack sample, ItemStack stack) {
+            if (!accepts(sample, stack)) return 0;
+            int pay = tier > 0 ? io.github.genichimaruo.singulo.item.CatalystHelper.higherUses(uses,
+                    io.github.genichimaruo.singulo.item.CatalystHelper.tierOf(stack) - tier) : uses;
+            return io.github.genichimaruo.singulo.item.UsesHelper.remaining(stack) / Math.max(1, pay);
+        }
+    }
+
+    static int[] saveTools(List<Tool> tools) {
+        return tools.stream().flatMapToInt(t -> java.util.stream.IntStream.of(t.slot, t.uses, t.tier)).toArray();
+    }
+
+    public boolean returnedTool(ItemStack stack) {
+        if (tools.isEmpty()) return false;
+        // The magazine ejects its previous catalyst, including its remaining life, when the recipe needs another kind.
+        if (io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(stack)
+                && tools.stream().anyMatch(tool -> tool.tier > 0)
+                && !ItemStack.isSameItem(stack, output)
+                && extras.stream().noneMatch(extra -> ItemStack.isSameItem(stack, extra))) return true;
+        for (Tool tool : tools) {
+            ItemStack original = grid.get(tool.slot);
+            if (ItemStack.isSameItem(original, stack) && io.github.genichimaruo.singulo.item.UsesHelper.remaining(stack) == 0) return true;
+            var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(original.getItem());
+            String worn = io.github.genichimaruo.singulo.generated.GeneratedContent.WORN_FORM.get(id.getPath());
+            if (worn != null && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(worn)))) return true;
+        }
+        return false;
+    }
+
+    static List<Tool> readTools(int[] values) {
+        List<Tool> tools = new ArrayList<>();
+        for (int i = 0; i + 2 < values.length && tools.size() < 9; i += 3) {
+            if (values[i] >= 0 && values[i] < 9 && values[i + 1] > 0 && values[i + 2] >= 0) {
+                tools.add(new Tool(values[i], values[i + 1], values[i + 2]));
+            }
+        }
+        return List.copyOf(tools);
+    }
+
+    public RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps,
+                      ItemStack fuel, int faces, List<String> alts, int tankBuckets, List<Tool> tools) {
+        this(mode, grid, output, extras, steps, fuel, faces, alts, tankBuckets, tools, false);
+    }
+
+    public RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps,
+                      ItemStack fuel, int faces, List<String> alts, int tankBuckets) {
+        this(mode, grid, output, extras, steps, fuel, faces, alts, tankBuckets, List.of());
+    }
+
+    public RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps,
+                      ItemStack fuel, int faces, List<String> alts) {
+        this(mode, grid, output, extras, steps, fuel, faces, alts, 0);
+    }
+
+    RecipeData withTankBuckets(int mask) {
+        return new RecipeData(mode, grid, output, extras, steps, fuel, faces, alts, mask, tools, guaranteedExtras);
+    }
 
     /** 作業台モードのレシピ。 */
     public RecipeData(List<ItemStack> grid, ItemStack output) {
@@ -217,6 +284,19 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         return new RecipeData(MODE_PROCESSING, grid, output, extras, List.of(), fuel.copy(), faces, List.of());
     }
 
+    /** Older consoles encoded a vanilla lava bucket in the fuel slot as its fluid contents. */
+    static ItemStack fuelItem(ItemStack stored) {
+        if (FluidSamples.is(stored)) {
+            var fluid = FluidSamples.fluid(stored);
+            var bucket = new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA,
+                    net.minecraftforge.fluids.FluidType.BUCKET_VOLUME);
+            if (fluid.getAmount() == bucket.getAmount() && io.github.genichimaruo.singulo.compat.Legacy.sameFluid(fluid, bucket)) {
+                return new ItemStack(net.minecraft.world.item.Items.LAVA_BUCKET);
+            }
+        }
+        return stored;
+    }
+
     /** 手順カードの記録。 */
     public static RecipeData procedure(List<ProcedureStep> steps, ItemStack output) {
         List<ItemStack> grid = new ArrayList<>();
@@ -285,6 +365,13 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         return out;
     }
 
+    /** Count a processing co-product toward the order and return the original main product to stock. */
+    RecipeData orderExtra(int index) {
+        var remaining = new ArrayList<>(extras);
+        ItemStack target = remaining.set(index, output);
+        return new RecipeData(mode, grid, target, remaining, steps, fuel, faces, alts, tankBuckets, tools, guaranteedExtras);
+    }
+
     /** カードの記録（空のカードなら null）。 */
     @Nullable
     public static RecipeData read(ItemStack card, HolderLookup.Provider registries) {
@@ -330,6 +417,11 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             r.put("fuel", fuel.save(new CompoundTag()));
         }
         r.putInt("faces", faces);
+        if (!tools.isEmpty()) r.putIntArray("machine_tools", saveTools(tools));
+        if (guaranteedExtras) r.putBoolean("guaranteed_extras", true);
+        if (tankBuckets != 0) {
+            r.putInt("tank_buckets", tankBuckets);
+        }
         if (variants()) {
             ListTag al = new ListTag();
             for (String a : alts) {
@@ -363,13 +455,16 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             }
         }
         String mode = r.contains("mode") ? r.getString("mode") : MODE_CRAFTING;
-        ItemStack fuel = r.contains("fuel") ? ItemStack.of(r.getCompound("fuel")) : ItemStack.EMPTY;
+        ItemStack fuel = r.contains("fuel") ? fuelItem(ItemStack.of(r.getCompound("fuel"))) : ItemStack.EMPTY;
         int faces = r.contains("faces") ? r.getInt("faces") : DEFAULT_FACES;
         List<String> alts = new ArrayList<>();
         for (Tag t : r.getList("alts", Tag.TAG_STRING)) {
             alts.add(t.getAsString());
         }
-        return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces, alts);
+        return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces, alts,
+                MODE_CRAFTING.equals(mode) ? r.getInt("tank_buckets") & 511 : 0,
+                MODE_PROCESSING.equals(mode) ? readTools(r.getIntArray("machine_tools")) : List.of(),
+                MODE_PROCESSING.equals(mode) && r.getBoolean("guaranteed_extras"));
     }
 
     /** 記録を消す（新しいカードと同じに戻すので、未記録のカードとまた重なる）。 */
@@ -402,6 +497,15 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             ItemStack s = grid.get(i);
             if (s.isEmpty()) {
                 continue;
+            }
+            int slot = i;
+            if (!tools.isEmpty() && tools.stream().anyMatch(t -> t.slot == slot)) continue;
+            if ((tankBuckets & (1 << i)) != 0) {
+                ItemStack sample = BucketCrafting.fluid(s);
+                if (!sample.isEmpty()) {
+                    ItemCount.add(out, FluidSamples.key(sample), FluidSamples.amount(sample));
+                    continue;
+                }
             }
             net.minecraft.world.item.crafting.Ingredient alt = processing() ? null : alt(i);
             if (alt != null) {

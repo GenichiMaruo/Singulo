@@ -1,18 +1,26 @@
 package io.github.genichimaruo.singulo.command;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.recipe.RecipePatches;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,6 +35,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
  * コントローラが手前、形が奥に伸びる（ホロ投影機と同じ向き）。権限レベル2（オペレーター）が要る。
  */
 public final class SinguloCommands {
+    private static final Gson PRETTY_JSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private SinguloCommands() {}
 
     public static void register(RegisterCommandsEvent event) {
@@ -35,6 +44,11 @@ public final class SinguloCommands {
 
     static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("singulo")
+                .then(Commands.literal("recipe").requires(s -> s.hasPermission(2))
+                        .then(Commands.literal("show")
+                                .then(Commands.argument("id", ResourceLocationArgument.id())
+                                        .suggests((c, b) -> SharedSuggestionProvider.suggestResource(c.getSource().getRecipeManager().getRecipeIds(), b))
+                                        .executes(SinguloCommands::showRecipe))))
                 .then(Commands.literal("build").requires(s -> s.hasPermission(2))
                         .then(Commands.argument("multiblock", StringArgumentType.word())
                                 .suggests((c, b) -> SharedSuggestionProvider.suggest(
@@ -57,6 +71,21 @@ public final class SinguloCommands {
                                 .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
                                         .executes(c -> ruin(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument
                                                 .getLoadedBlockPos(c, "pos")))))));
+    }
+
+    private static int showRecipe(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var id = ResourceLocationArgument.getId(context, "id");
+        var source = context.getSource();
+        String path = "data/" + id.getNamespace() + "/recipes/" + id.getPath() + ".json";
+        try {
+            String json = PRETTY_JSON.toJson(RecipePatches.read(source.getServer().getResourceManager(), id));
+            var file = Component.literal(path).withStyle(style -> style.withUnderlined(true)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, json)));
+            source.sendSuccess(() -> Component.empty().append(file).append("\n" + json), false);
+        } catch (IOException | IllegalArgumentException | JsonParseException ex) {
+            throw new SimpleCommandExceptionType(Component.literal(path + " — " + ex.getMessage())).create();
+        }
+        return 1;
     }
 
     /** 建てられる遺構。 */

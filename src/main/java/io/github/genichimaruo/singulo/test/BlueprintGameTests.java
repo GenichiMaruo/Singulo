@@ -3,10 +3,16 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.command.SinguloCommands;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -18,6 +24,37 @@ public final class BlueprintGameTests {
     private static final String HUGE = "huge";
 
     private BlueprintGameTests() {}
+
+    @GameTest(template = "empty")
+    public static void controllerRecipesConsumePartOfTheirOwnBlueprint(GameTestHelper helper) {
+        var level = helper.getLevel();
+        for (var kind : Blueprints.Kind.values()) {
+            Item controller = Blueprints.controllerBlock(kind).asItem();
+            Set<Item> parts = new HashSet<>();
+            for (var state : Blueprints.layout(kind, BlockPos.ZERO, Direction.NORTH, kind.defaultSize()).values()) {
+                if (!state.isAir() && state.getBlock().asItem() != controller) {
+                    parts.add(state.getBlock().asItem());
+                }
+            }
+            var recipes = level.getRecipeManager().getRecipes().stream()
+                    .filter(r -> r.getId().getNamespace().equals(Singulo.MODID) && r.getResultItem(level.registryAccess()).is(controller))
+                    .toList();
+            helper.assertTrue(!recipes.isEmpty(), "Missing controller recipe for " + kind.id());
+            for (var holder : recipes) {
+                var recipe = holder;
+                boolean required = recipe instanceof MachineRecipe machine
+                        ? machine.ingredients().stream().anyMatch(i -> i.count() >= 1 && i.uses() == 0 && requiresPart(i.ingredient(), parts))
+                        : recipe.getIngredients().stream().anyMatch(i -> requiresPart(i, parts));
+                helper.assertTrue(required, holder.getId() + " can be made without a structural part of " + kind.id());
+            }
+        }
+        helper.succeed();
+    }
+
+    private static boolean requiresPart(Ingredient ingredient, Set<Item> parts) {
+        var choices = ingredient.getItems();
+        return choices.length > 0 && Arrays.stream(choices).allMatch(s -> !s.isEmpty() && parts.contains(s.getItem()));
+    }
 
     private static void check(GameTestHelper helper, Blueprints.Kind kind, int size, BlockPos rel, Direction back, int expect) {
         Level level = helper.getLevel();

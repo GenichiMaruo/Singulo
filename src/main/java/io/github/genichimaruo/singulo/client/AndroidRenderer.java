@@ -164,6 +164,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         if (model.blade != null) {
             model.blade.visible = false;
         }
+        buffers = AndroidWeaponLight.worldBuffers(buffers);
         float print = android.printProgress(partialTick);
         if (print < 1) {
             float plane = pose.last().pose().m31() + print * (android.getBbHeight() + 0.1F);
@@ -184,8 +185,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             float k = Mth.clamp((gun.shotFlash() - partialTick) / GunnerAndroid.FLASH, 0, 1);
             Vec3 base = android.getPosition(partialTick);
             Vec3 a = muzzle(android, gun.shotFrom().subtract(base)), b = gun.shotAt().subtract(base);
-            FxDraw.beam(pose.last(), buffers.getBuffer(GlowCore.TYPE), a, b, 0.02F + 0.02F * k, 0xFFFFFF, (int) (230 * k));
-            FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.lightning()), a, b, 0.05F + 0.06F * k, variant.accent, (int) (150 * k));
+            FxDraw.beam(pose.last(), buffers.getBuffer(AndroidWeaponLight.CORE), a, b, 0.02F + 0.02F * k, 0xFFFFFF, (int) (230 * k));
+            FxDraw.beam(pose.last(), buffers.getBuffer(AndroidWeaponLight.GLOW), a, b, 0.05F + 0.06F * k, variant.accent, (int) (150 * k));
             VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
             pose.pushPose();
             pose.translate(a.x, a.y, a.z);
@@ -259,48 +260,6 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         net.minecraft.client.Minecraft.getInstance().getItemRenderer().renderStatic(icon, net.minecraft.world.item.ItemDisplayContext.FIXED,
                 light, OverlayTexture.NO_OVERLAY, pose, buffers, android.level(), android.getId());
         pose.popPose();
-    }
-
-    /**
-     * 透きとおって光る刃の描き方: entityTranslucentEmissive と同じだが、奥行きも書く。書かないと、あとから描かれるブロックの
-     * 絵（チェストなど）が、手前にある刃の上に描かれてしまう。
-     */
-    private static final class DepthGlow extends RenderType {
-        static final java.util.function.Function<ResourceLocation, RenderType> TYPE = net.minecraft.Util.memoize(texture -> create(
-                "singulo_translucent_emissive_depth", com.mojang.blaze3d.vertex.DefaultVertexFormat.NEW_ENTITY,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, true, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                        .setTextureState(new TextureStateShard(texture, false, false))
-                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                        .setCullState(NO_CULL)
-                        .setWriteMaskState(COLOR_DEPTH_WRITE)
-                        .setOverlayState(OVERLAY)
-                        .createCompositeState(false)));
-
-        private DepthGlow(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
-    }
-
-    /**
-     * 光の刃の芯（白い芯）の描き方: RenderType.lightning と同じだが、別の描き先にする。
-     * lightning は描く前に面を遠い順に並べ替えるので、芯と外側の光を同じ描き先に入れると、芯より先に外側の面が描かれて
-     * 奥行きを書き、中の芯が隠れることがある（見る角度で芯が消える）。芯をこの描き先で先に描き終えてから、外側を描く。
-     */
-    private static final class GlowCore extends RenderType {
-        static final RenderType TYPE = create("singulo_glow_core", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
-                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
-                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                        .setWriteMaskState(COLOR_DEPTH_WRITE)
-                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
-                        .setOutputState(WEATHER_TARGET)
-                        .createCompositeState(false));
-
-        private GlowCore(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
-                         boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, format, mode, size, crumbling, sort, setup, clear);
-        }
     }
 
     /**
@@ -442,8 +401,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     float k = 1 - t / 8;
                     Vec3 base = android.getPosition(partialTick);
                     Vec3 a = muzzle(android, gun.railFrom().subtract(base)), b = gun.railTo().subtract(base);
-                    FxDraw.beam(pose.last(), buffers.getBuffer(GlowCore.TYPE), a, b, 0.07F + 0.12F * k, 0xFFFFFF, (int) (250 * k));
-                    FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.lightning()), a, b, 0.2F + 0.5F * k, accent, (int) (170 * k));
+                    FxDraw.beam(pose.last(), buffers.getBuffer(AndroidWeaponLight.CORE), a, b, 0.07F + 0.12F * k, 0xFFFFFF, (int) (250 * k));
+                    FxDraw.beam(pose.last(), buffers.getBuffer(AndroidWeaponLight.GLOW), a, b, 0.2F + 0.5F * k, accent, (int) (170 * k));
                     glow = GlowDepth.of(buffers, FxDraw.WHITE);
                     for (Vec3 at : new Vec3[]{a, b}) {
                         pose.pushPose();
@@ -749,7 +708,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
         // 光の刃の白い芯を、別の描き先で先に描き終える（外側の光と同じ描き先だと、並べ替えで芯が隠れることがある）
         float blade = Mth.clamp(bit.slashTime(partialTick) / BitAndroid.SLASH_WINDUP, 0, 1);
-        VertexConsumer core = buffers.getBuffer(GlowCore.TYPE);
+        VertexConsumer core = buffers.getBuffer(AndroidWeaponLight.CORE);
         for (int i = 0; i < n; i++) {
             if (bit.bladeOut(i, partialTick)) {
                 pose.pushPose();
@@ -760,7 +719,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.popPose();
             }
         }
-        VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+        VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
         for (int i = 0; i < total; i++) {
             pose.pushPose();
             pose.translate(at[i].x, at[i].y, at[i].z);
@@ -2196,7 +2155,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
             }
             // 光は足し合わせで描く（深度を書かないので、交差した板どうしが隠し合ってちらつかない）
-            drawWhip(hand, ctrl, end, side, wave, tension, age, buffers.getBuffer(RenderType.lightning()),
+            drawWhip(hand, ctrl, end, side, wave, tension, age, buffers.getBuffer(AndroidWeaponLight.GLOW),
                     android.active() || RuinAndroid.charging(state) ? 1F : 0.4F);
         }
 
@@ -2216,7 +2175,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             Vec3 end = new Vec3(hand.x, floor, hand.z).add(back.scale(1.15)).add(side.scale(0.25 + sway));
             Vec3 ctrl = new Vec3(hand.x, 1.501 - 0.15 / SCALE, hand.z).add(side.scale(sway));
             PoseStack.Pose last = pose.last();
-            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer vc = buffers.getBuffer(AndroidWeaponLight.GLOW);
             int n = 20;
             Vec3 prev = hand;
             for (int i = 1; i <= n; i++) {
@@ -2254,7 +2213,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
             float front = (float) Math.min(WhipAndroid.WAVE_RANGE, 1.2 + (t - 1) * WhipAndroid.WAVE_SPEED);
             float fade = 1 - Mth.clamp((t - 10) / 4, 0, 1);
-            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer vc = buffers.getBuffer(AndroidWeaponLight.GLOW);
             PoseStack.Pose id = new PoseStack().last();
             Vec3 a = origin.add(fwd.scale(1.0)).add(0, 0.05, 0);
             Vec3 b = origin.add(fwd.scale(front)).add(0, 0.05, 0);
@@ -2313,8 +2272,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             int a = (int) Math.min(255, 140 * glow);
             int c = (int) (230 * Math.min(1, glow));
             // 芯を別の描き先で先に描いてから、外側を描く（同じ描き先だと、並べ替えで芯が隠れることがある）
-            glowBox(pose, buffers.getBuffer(GlowCore.TYPE), -core, 0, -core, core, l + 0.08F / SCALE, core, 0xFFFFFF, c);
-            glowBox(pose, buffers.getBuffer(RenderType.lightning()), -outer, 0, -outer, outer, l, outer, variant.accent, a);
+            glowBox(pose, buffers.getBuffer(AndroidWeaponLight.CORE), -core, 0, -core, core, l + 0.08F / SCALE, core, 0xFFFFFF, c);
+            glowBox(pose, buffers.getBuffer(AndroidWeaponLight.GLOW), -outer, 0, -outer, outer, l, outer, variant.accent, a);
             pose.popPose();
         }
     }
@@ -2351,7 +2310,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, body, -0.04F, -0.5F, -0.04F, 0.04F, -0.42F, 0.04F, light, 0x8C94A2, 255);    // 石突き
             FxDraw.box(pose, body, -0.045F, 0.78F, -0.07F, 0.045F, 1.06F, 0.07F, light, 0x6E7684, 255);   // 斧頭の芯
             FxDraw.box(pose, body, -0.035F, 1.06F, -0.035F, 0.035F, 1.14F, 0.035F, light, 0x8C94A2, 255); // 先の飾り
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
             // 刃: 三日月の輪郭を細かく区切り、両面の板と刃先の白い帯・縁を、互いに重ならない面だけで描く
             // （光は奥行きも書くので、同じ平面に面が重なるとちらつく）
             PoseStack.Pose p = pose.last();
@@ -2421,9 +2380,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, body, -0.07F, 0.06F, -0.018F, 0.07F, 0.09F, 0.018F, light, 0x8C94B8, 255);
             float outer = 0.03F * glow;
             // 白い芯を別の描き先で先に描き終える（外側と同じ描き先だと、並べ替えで外側が先に奥行きを書き、芯が隠れる）
-            glowBox(pose, buffers.getBuffer(GlowCore.TYPE), -0.01F, 0.095F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF,
+            glowBox(pose, buffers.getBuffer(AndroidWeaponLight.CORE), -0.01F, 0.095F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF,
                     (int) (230 * Math.min(1, glow)));
-            glowBox(pose, buffers.getBuffer(RenderType.lightning()), -outer, 0.09F, -0.008F - outer * 0.4F, outer, 0.09F + len,
+            glowBox(pose, buffers.getBuffer(AndroidWeaponLight.GLOW), -outer, 0.09F, -0.008F - outer * 0.4F, outer, 0.09F + len,
                     0.008F + outer * 0.4F, variant.accent, (int) Math.min(255, 150 * glow));
             pose.popPose();
         }
@@ -2780,7 +2739,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.popPose();
             }
             // 次にぼんやりした光
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
             for (Halo h : HALOS) {
                 if (at[h.anchor] != null) {
                     push(pose, at[h.anchor]);
@@ -2820,7 +2779,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.popPose();
             }
             // 最後に白い芯
-            VertexConsumer core = buffers.getBuffer(GlowCore.TYPE);
+            VertexConsumer core = buffers.getBuffer(AndroidWeaponLight.CORE);
             if (at[CORE] != null) {
                 push(pose, at[CORE]);
                 glowBox(pose, core, 1.6F, -0.12F, -0.12F, 8.0F, 0.12F, 0.12F, 0xFFFFFF, (int) (160 * glow));
@@ -2889,7 +2848,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 // エネルギーの窓（下から満ちる）
                 glowBox(pose, shine, -0.75F, 2.4F - 1.5F * fill, -0.2F, -0.55F, 2.4F, 0.2F, mix(accent, 0xFFFFFF, 0.6F * filled), 255);
             }
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
             glowBox(pose, fx, 3.65F, -1.05F, -0.65F, 4.15F, 0.2F, 0.65F, variant.accent, (int) (90 * wave * glow));
             glowBox(pose, fx, 4.55F, -0.75F - 0.3F * flash, -0.35F - 0.3F * flash, 4.95F + 0.6F * flash, -0.1F + 0.3F * flash,
                     0.35F + 0.3F * flash, variant.accent, (int) Math.min(255, 140 * glow + 110 * flash));
@@ -2975,7 +2934,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 bitBody(pose, solid, light);
                 pose.popPose();
             }
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
             for (int i = out; i < BitAndroid.BITS; i++) {
                 stowed(pose, i, k);
                 glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent,
@@ -3016,13 +2975,13 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.pushPose();
             m.toBlade(pose);
             m.blade.visible = true;
-            LegacyRender.part(m.blade, pose, buffers.getBuffer(DepthGlow.TYPE.apply(variant.texture)), FxDraw.FULL_BRIGHT,
+            LegacyRender.part(m.blade, pose, buffers.getBuffer(AndroidWeaponLight.BLADE), FxDraw.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, argb((int) (255 * k), 0xFFFFFF));
             m.blade.visible = false;
             // 刃のまわりの、ほのかな光（刃より少しだけ大きい、薄い光の箱を2重に。刃の明るさに合わせて息づく）
             m.blade.translateAndRotate(pose);
             float p = 1 / 16F;
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
             glowBox(pose, fx, -0.9F * p, -0.4F * p, -1.4F * p, 0.9F * p, 14.9F * p, 1.4F * p, variant.accent, (int) (38 * k));
             glowBox(pose, fx, -1.5F * p, -0.8F * p, -2.0F * p, 1.5F * p, 15.3F * p, 2.0F * p, variant.accent, (int) (16 * k));
             pose.popPose();

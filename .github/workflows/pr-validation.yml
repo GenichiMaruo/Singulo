@@ -95,11 +95,13 @@ jobs:
         run: |
           python3 tools/review/prepare_jei.py --loader "$LOADER"
           xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 420s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/jei.gradle runClient
-          test "$(find build/$LOADER/jei-review/screenshots -name '*.png' | wc -l)" -eq 21
+          test "$(find build/$LOADER/jei-review/screenshots -name '*.png' | wc -l)" -eq 33
           test "$(grep -c 'SINGULO_JEI_LAYOUT_COMPLETE' build/$LOADER/jei-review/logs/latest.log)" -eq 5
           test "$(grep -c 'SINGULO_CAPACITY_GUI_COMPLETE' build/$LOADER/jei-review/logs/latest.log)" -eq 15
           grep -q 'SINGULO_JEI_ALL_LAYOUTS_COMPLETE [1-9]' build/$LOADER/jei-review/logs/latest.log
-          grep -q 'SINGULO_JEI_TRANSFER_COMPLETE' build/$LOADER/jei-review/logs/latest.log
+          test "$(grep -c 'SINGULO_JEI_TRANSFER_COMPLETE' build/$LOADER/jei-review/logs/latest.log)" -eq 5
+          test "$(grep -c 'SINGULO_ASSEMBLY_SELECTOR_COMPLETE' build/$LOADER/jei-review/logs/latest.log)" -eq 5
+          grep -q 'SINGULO_ASSEMBLY_SPENT_COMPLETE' build/$LOADER/jei-review/logs/latest.log
           grep -q 'SINGULO_POPUP_INPUT_COMPLETE' build/$LOADER/jei-review/logs/latest.log
           grep -q 'SINGULO_DRONE_MODELS_COMPLETE 3' build/$LOADER/jei-review/logs/latest.log
       - name: Verify Create Ponder previews with Embeddium, Oculus and Alexs Caves
@@ -148,6 +150,47 @@ jobs:
             build/${{ matrix.loader }}/ponder-review/screenshots/
             build/${{ matrix.loader }}/lensing-review/screenshots/
             build/${{ matrix.loader }}/lensing-review/logs/
+
+  android-weapon-rendering:
+    strategy:
+      fail-fast: false
+      matrix:
+        loader: [forge, neoforge]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LOADER: ${{ matrix.loader }}
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      ALSOFT_DRIVERS: 'null'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: |
+            17.0.21
+            21
+          cache: gradle
+      - name: Prepare a tested disposable client world
+        run: bash ./gradlew -Ploader="$LOADER" --no-daemon --max-workers=2 -PtestClasses=AndroidBucketCraftingGameTests runGameTestServer
+      - name: Check Android weapons in both Fancy and Fabulous
+        run: |
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 420s bash ./gradlew -Ploader="$LOADER" --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/android-weapon.gradle -PweaponGraphics=fancy,fabulous runClient
+          review="build/$LOADER/android-weapon-review"
+          grep -q 'SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24' "$review/logs/latest.log"
+          test "$(find "$review/screenshots" -name 'fancy-*.png' | wc -l)" -eq 12
+          test "$(find "$review/screenshots" -name 'fabulous-*.png' | wc -l)" -eq 12
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: android-weapon-rendering-${{ github.sha }}-${{ matrix.loader }}-${{ github.run_attempt }}
+          path: |
+            build/${{ matrix.loader }}/android-weapon-review/screenshots/
+            build/${{ matrix.loader }}/android-weapon-review/logs/
+            build/${{ matrix.loader }}/gametest/logs/
 
   optional-mekanism:
     runs-on: ubuntu-latest
@@ -239,7 +282,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: '1'
           ALSOFT_DRIVERS: 'null'
         run: |
-          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithEmbeddium
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 420s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithEmbeddium
           grep -q 'SINGULO_REJOIN_COMPLETE 5' build/$LOADER/rayleigh-review/logs/latest.log
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()

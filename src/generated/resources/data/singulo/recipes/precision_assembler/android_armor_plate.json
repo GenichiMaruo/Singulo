@@ -24,6 +24,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    " ABA ",
+    "ABCBA",
+    " ABA ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_armor_plate",
     "count": 1

@@ -244,7 +244,7 @@ public abstract class RuinBoss extends Monster {
     /** 体力を factor 倍にする（今の体力の割合は保つ。最大体力の上限を超える分は受けるダメージで表す）。 */
     private void rescaleHealth(double factor) {
         float fraction = getHealth() / getMaxHealth();
-        double effective = effectiveMaxHealth() * factor;
+        double effective = Math.min(1.0e18, effectiveMaxHealth() * factor);
         double max = Math.min(effective, MAX_HEALTH_CAP);
         damageScale = (float) (max / effective);
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
@@ -310,8 +310,8 @@ public abstract class RuinBoss extends Monster {
      * NeoForge のイベントで受け手の側から掛ける。
      */
     public static void onIncomingDamage(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
-        if (event.getSource().getEntity() instanceof RuinBoss b && b.awakened() && !RuinGuards.isGuard(event.getEntity())) {
-            event.setAmount((float) (event.getAmount() * awakenedDamageMultiplier()));
+        if (event.getSource().getEntity() instanceof RuinBoss b && !RuinGuards.isGuard(event.getEntity())) {
+            event.setAmount(BossScaling.attack(event.getAmount(), b.awakened() ? awakenedDamageMultiplier() : 1));
         }
     }
 
@@ -368,6 +368,7 @@ public abstract class RuinBoss extends Monster {
      * 生まれたときに呼ぶ。覚醒するときは、この硬さに倍率を掛ける。
      */
     protected void setEffectiveHealth(double health) {
+        health = io.github.genichimaruo.singulo.compat.Legacy.clamp(health, 1.0, 1.0e18);
         double max = Math.min(health, MAX_HEALTH_CAP);
         damageScale = (float) (max / health);
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);

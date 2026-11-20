@@ -30,6 +30,11 @@ public class ProcedureCardItem extends RecipeCardItem {
         }
         tooltip.add(Component.translatable("tooltip.singulo.recipe_card.output", data.output().getHoverName(), data.outputCount())
                 .withStyle(ChatFormatting.AQUA));
+        if (data.steps().stream().anyMatch(s -> s.dimension() == null)) {
+            tooltip.add(Component.translatable("tooltip.singulo.procedure_card.record_again").withStyle(ChatFormatting.YELLOW));
+        } else if (!data.steps().isEmpty()) {
+            tooltip.add(Component.literal(data.steps().get(0).dimension().toString()).withStyle(ChatFormatting.DARK_AQUA));
+        }
         int n = 1;
         for (ProcedureStep s : data.steps()) {
             tooltip.add(Component.literal(" " + n++ + ". ").append(describe(s)).withStyle(ChatFormatting.GRAY));

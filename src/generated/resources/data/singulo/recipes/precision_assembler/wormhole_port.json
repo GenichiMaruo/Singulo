@@ -22,7 +22,20 @@
         "tag": "forge:plates/steel"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:hopper"
+      },
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  D  ",
+    " CBC ",
+    "  A  ",
+    "     "
   ],
   "result": {
     "id": "singulo:wormhole_port",

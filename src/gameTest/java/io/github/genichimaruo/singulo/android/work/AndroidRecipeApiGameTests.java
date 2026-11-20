@@ -21,7 +21,7 @@ public final class AndroidRecipeApiGameTests {
     public static void recipeAccessRequiresOwnerAndAvailableConsole(GameTestHelper h) {
         var p = new BlockPos(1,1,1);
         h.setBlock(p, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity c = (WorkConsoleBlockEntity) h.getBlockEntity(p);
+        WorkConsoleBlockEntity c = (WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, p);
         UUID owner = TestScope.player(h).getUUID(); c.setOwner(owner);
         var ok = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), owner);
         h.assertTrue(ok.state() == AndroidOrders.SnapshotState.AVAILABLE && ok.recipes().isEmpty(), "Empty owned console unavailable");
@@ -52,8 +52,8 @@ public final class AndroidRecipeApiGameTests {
         h.setBlock(cp, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         h.setBlock(rp, SinguloBlocks.ANDROID_RECIPE_RACK.get());
         var player = TestScope.player(h);
-        WorkConsoleBlockEntity c = (WorkConsoleBlockEntity) h.getBlockEntity(cp); c.setOwner(player.getUUID());
-        RecipeRackBlockEntity rack = (RecipeRackBlockEntity) h.getBlockEntity(rp);
+        WorkConsoleBlockEntity c = (WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, cp); c.setOwner(player.getUUID());
+        RecipeRackBlockEntity rack = (RecipeRackBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, rp);
         var registry = net.minecraft.core.registries.BuiltInRegistries.ITEM;
         var link = new ItemStack(registry.get(new net.minecraft.resources.ResourceLocation("singulo", "work_location_card")));
         WorkLocationCardItem.record(link, h.getLevel(), c.getBlockPos(), SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -67,11 +67,23 @@ public final class AndroidRecipeApiGameTests {
         var snapshot = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID());
         h.assertTrue(snapshot.recipes().size() == 1, "Linked recipe missing");
         var recipe = snapshot.recipes().get(0);
-        h.assertTrue(recipe.outputs().size() == 2 && recipe.outputs().get(0).count() == 2, "Output counts lost");
+        h.assertTrue(recipe.outputs().size() == 2 && recipe.outputs().get(0).count() == 2
+                && recipe.outputs().get(0).guaranteed() && !recipe.outputs().get(1).guaranteed(), "Output counts or guarantees lost");
         h.assertTrue(recipe.materials().size() == 2 && recipe.materials().get(0).count() == 2
                 && recipe.materials().get(1).fuel() && recipe.materials().get(1).count() == 3, "Material/fuel semantics lost");
         recipe.outputs().get(0).sample().setCount(60);
         h.assertTrue(AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(0).outputs().get(0).count() == 2,
                 "Snapshot mutation changed source");
+        var pattern = h.getLevel().getRecipeManager().byKey(io.github.genichimaruo.singulo.Singulo.id(
+                "archive_terminal/data_card_observation_log")).orElseThrow();
+        c.setMachineProcess((io.github.genichimaruo.singulo.recipe.MachineRecipe) pattern, List.of());
+        c.encoder().setItem(WorkConsoleBlockEntity.CARD, card.copy());
+        h.assertTrue(c.encode(), "Cannot record an archive card");
+        rack.items().setStackInSlot(2, c.encoder().getItem(WorkConsoleBlockEntity.CARD).copy());
+        var archive = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(1);
+        var log = registry.get(io.github.genichimaruo.singulo.Singulo.id("observation_log"));
+        h.assertTrue(archive.materials().stream().anyMatch(material -> material.sample().is(log) && material.count() == 1
+                        && material.toolUsesPerCraft() > 0),
+                "Missing reusable original from the recipe snapshot");
         h.succeed();
     }}

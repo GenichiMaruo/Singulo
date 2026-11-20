@@ -4,6 +4,9 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity;
 import io.github.genichimaruo.singulo.cosmic.CosmicLayouts;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
+import io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity;
+import io.github.genichimaruo.singulo.drone.FluidDronePortBlockEntity;
+import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +28,7 @@ public final class CosmicChamberGameTests {
     private static final BlockPos C=new BlockPos(15,1,16);
     private static CosmicChamberBlockEntity build(GameTestHelper h,Blueprints.Kind kind){
         TestBuild.build(h,kind,C,Direction.NORTH,7);
-        CosmicChamberBlockEntity be=(CosmicChamberBlockEntity)h.getBlockEntity(C);
+        CosmicChamberBlockEntity be=(CosmicChamberBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C);
         h.assertTrue(be.ready(),"Authored blueprint must form");return be;
     }
     private static ItemStack item(String id,int count){return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)),count);}
@@ -42,15 +45,15 @@ public final class CosmicChamberGameTests {
         h.setBlock(C.west().above(),io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PIPE.get());
         BlockPos producer=C.west().above(2);
         h.setBlock(producer,io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.ELECTROLYZER).get());
-        io.github.genichimaruo.singulo.machine.MachineBlockEntity source=(io.github.genichimaruo.singulo.machine.MachineBlockEntity)h.getBlockEntity(producer);
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity source=(io.github.genichimaruo.singulo.machine.MachineBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, producer);
         source.forceOutputTankForTest(new FluidStack(SinguloFluids.get("liquid_helium"),500));
         h.setBlock(C.south(),Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING,Direction.NORTH));
         h.setBlock(C.east().south(),Blocks.HOPPER);
-        net.minecraft.world.level.block.entity.HopperBlockEntity input=(net.minecraft.world.level.block.entity.HopperBlockEntity)h.getBlockEntity(C.south());input.setItem(0,item("collapsar_billet",1));input.setItem(1,item("exotic_matter",1));
+        net.minecraft.world.level.block.entity.HopperBlockEntity input=(net.minecraft.world.level.block.entity.HopperBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C.south());input.setItem(0,item("collapsar_billet",1));input.setItem(1,item("exotic_matter",1));
         h.assertTrue(be.ready(),"Separate normal cable, fluid pipe and item hoppers break the spindle structure");
         h.runAtTickTime(50,()->h.assertTrue(be.stored()>0&&!be.reserved().isEmpty()&&be.tank().isEmpty()&&input.isEmpty(),"Ordinary cable/pipe/hopper did not supply and reserve resources"));
         h.succeedWhen(()->{
-            net.minecraft.world.level.block.entity.HopperBlockEntity output=(net.minecraft.world.level.block.entity.HopperBlockEntity)h.getBlockEntity(C.east().south());int count=0;
+            net.minecraft.world.level.block.entity.HopperBlockEntity output=(net.minecraft.world.level.block.entity.HopperBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C.east().south());int count=0;
             for(int i=0;i<output.getContainerSize();i++)if(output.getItem(i).is(item("tidal_filament",1).getItem()))count+=output.getItem(i).getCount();
             h.assertTrue(count==4&&be.reserved().isEmpty(),"Four filaments did not exit through a normal hopper");
             h.assertTrue(input.isEmpty()&&source.automationFluids().drain(500,FluidAction.SIMULATE).isEmpty(),"Ingredients or coolant were not consumed exactly once");
@@ -79,7 +82,7 @@ public final class CosmicChamberGameTests {
         breaker.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,packed);
         var hit=new net.minecraft.world.phys.BlockHitResult(at,Direction.UP,be.getBlockPos(),false);
         ((net.minecraft.world.item.BlockItem)packed.getItem()).place(new net.minecraft.world.item.context.BlockPlaceContext(new net.minecraft.world.item.context.UseOnContext(breaker,net.minecraft.world.InteractionHand.MAIN_HAND,hit)));
-        CosmicChamberBlockEntity replacement=(CosmicChamberBlockEntity)h.getBlockEntity(C);
+        CosmicChamberBlockEntity replacement=(CosmicChamberBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C);
         h.assertTrue(replacement!=null&&replacement!=be&&replacement.items().getStackInSlot(0).getCount()==7,"Mined inventory did not survive immediate replacement");
         boolean accepted=old.stillValid(viewer);
         // This is the same validity gate and ClickType that the server packet handler uses.
@@ -135,10 +138,34 @@ public final class CosmicChamberGameTests {
         ItemStack packed=ItemStack.EMPTY;for(int i=0;i<player.getInventory().getContainerSize();i++){var s=player.getInventory().getItem(i);if(s.is(be.getBlockState().getBlock().asItem()))packed=s;}
         h.assertTrue(!packed.isEmpty(),"Packed controller missing");player.setShiftKeyDown(false);player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,packed);
         ((net.minecraft.world.item.BlockItem)packed.getItem()).place(new net.minecraft.world.item.context.BlockPlaceContext(new net.minecraft.world.item.context.UseOnContext(player,net.minecraft.world.InteractionHand.MAIN_HAND,hit)));
-        CosmicChamberBlockEntity copy=(CosmicChamberBlockEntity)h.getBlockEntity(C);
+        CosmicChamberBlockEntity copy=(CosmicChamberBlockEntity)io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C);
         h.assertTrue(copy!=null&&copy.stored()==12_345_678_901L&&copy.core()&&copy.progress()==123&&copy.reserved().getCount()==4&&copy.items().getStackInSlot(0).getCount()==7&&copy.tank().getFluidAmount()==1234,"Packed work did not survive placement");
         h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(be.getBlockPos()).inflate(1)).isEmpty(),"Packing also dropped loose contents");h.succeed();
     }
+    @GameTest(template = "forge")
+    public static void reservoirAndOutputPortUseAvailableCapacityEachTick(GameTestHelper h) {
+        var reservoir = build(h, Blueprints.Kind.SUSPENSION_RESERVOIR);
+        var level = h.getLevel();
+        h.setBlock(C.south(), SinguloBlocks.FLUID_DRONE_PORT.get());
+        h.setBlock(C.east().south(), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        h.setBlock(C.west().south(), SinguloBlocks.CREATIVE_FLUID_TRASH.get());
+        FluidDronePortBlockEntity sink = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C.south());
+        MultiblockPortBlockEntity input = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C.west()), output = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, C.east());
+        h.startSequence().thenWaitUntil(() -> h.assertTrue(level.getGameTime() % 5 != 0
+                        && (level.getGameTime() + output.getBlockPos().asLong()) % 8 != 0, "Wait between old output intervals"))
+                .thenExecute(() -> {
+                    int stored = reservoir.fluidFor(null).fill(new FluidStack(Fluids.WATER, 16_000_000), FluidAction.EXECUTE);
+                    h.assertTrue(stored == 16_000_000, "Reservoir did not fill");
+                    CosmicChamberBlockEntity.serverTick(level, reservoir.getBlockPos(), reservoir.getBlockState(), reservoir);
+                    h.assertTrue(sink.sendTank().getFluidAmount() == 64_000 && reservoir.tank().getFluidAmount() == stored - 64_000,
+                            "Controller did not fill its neighbour in one tick");
+                    MultiblockPortBlockEntity.serverTick(level, input.getBlockPos(), input.getBlockState(), input);
+                    h.assertTrue(reservoir.tank().getFluidAmount() == stored - 64_000, "Input port ejected stored fluid");
+                    MultiblockPortBlockEntity.serverTick(level, output.getBlockPos(), output.getBlockState(), output);
+                    h.assertTrue(reservoir.tank().isEmpty(), "Output port throttled the remaining 15,936,000 mB");
+                }).thenSucceed();
+    }
+
     @GameTest(template="forge")
     public static void cosmicReservoirSimulatesAndRejectsMixing(GameTestHelper h){
         var be=build(h,Blueprints.Kind.SUSPENSION_RESERVOIR);var in=be.fluidFor(Direction.NORTH);var out=be.fluidFor(Direction.SOUTH);

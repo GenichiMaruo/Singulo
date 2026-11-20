@@ -13,9 +13,9 @@
     },
     {
       "ingredient": {
-        "tag": "forge:plates/steel"
+        "item": "singulo:nihonium_frame"
       },
-      "count": 6
+      "count": 1
     },
     {
       "ingredient": {

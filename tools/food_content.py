@@ -103,18 +103,6 @@ CHAPTER = ('food', 'singulo:nutrient_bar', '印刷された食品', 'Printed Foo
      'On automatic it prints any food the paste allows, the food already in the output first. To stop, switch it off at the top right (it keeps turning ingredients into paste). '
      'Inside the glass chamber, the nozzle runs back and forth and builds the food up from the bottom layer. The windows on the back glow with how much paste each cartridge holds.\n'
      'Hoppers can put in ingredients and cartridges and take out printed food. Breaking it drops its items, and cartridges keep their paste.'),
-    ('foods', '宇宙食',
-     '栄養バー: 炭水化物4・タンパク質2。すぐに食べられる（満腹度6）。\n'
-     '積層ステーキ: タンパク質8。焼き目と脂の筋まで印刷したステーキ（満腹度9）。\n'
-     'らせんパスタ: 炭水化物6・タンパク質2。トマトソースのパスタ。採掘速度上昇（1分）（満腹度8）。\n'
-     'ハニカムケーキ: 甘味4・炭水化物3。ハチミツの六角形のケーキ。移動速度上昇（1分）（満腹度7）。\n'
-     'フルーツゼリーキューブ: 甘味4。4色の層のゼリー。満腹でも食べられ、再生（5秒）（満腹度3）。',
-     'Space food',
-     'Nutrient Bar: 4 carbohydrate, 2 protein. Quick to eat (6 hunger).\n'
-     'Layered Steak: 8 protein. Printed down to the sear marks and marbling (9 hunger).\n'
-     'Spiral Pasta: 6 carbohydrate, 2 protein. Pasta with tomato sauce. Haste for 1 minute (8 hunger).\n'
-     'Honeycomb Cake: 4 sweet, 3 carbohydrate. A cake topped with honey hexagons. Speed for 1 minute (7 hunger).\n'
-     'Fruit Gel Cube: 4 sweet. Four layers of jelly. Edible when full, with 5 seconds of Regeneration (3 hunger).'),
 ])
 
 DESC = {

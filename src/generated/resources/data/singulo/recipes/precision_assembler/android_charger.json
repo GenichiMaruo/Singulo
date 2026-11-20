@@ -30,6 +30,13 @@
       "count": 4
     }
   ],
+  "shape": [
+    "     ",
+    " DAD ",
+    " BCB ",
+    " DAD ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_charger",
     "count": 1

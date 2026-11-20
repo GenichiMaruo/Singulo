@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.drone;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,16 @@ public class DroneNetwork extends SavedData {
     public static final double SPEED = 0.6;
 
     /** 発着ポート（持ち主・名前・液体用か）。物のポートと液体のポートは、それぞれ同じ種類のポートだけを行き先にする。 */
-    public record Port(@Nullable UUID owner, String name, boolean fluid) {}
+    public record Port(@Nullable UUID owner, String name, boolean fluid) {
+        boolean accepts(@Nullable UUID sender, boolean liquid) {
+            return fluid == liquid && java.util.Objects.equals(owner, sender);
+        }
+    }
 
     /** 便の段階: ポートへ荷物を取りに行く、荷物を届ける、ステーションへ帰る。 */
     public static final int PICKUP = 0, DELIVER = 1, RETURN = 2;
+
+    private record StationSlot(BlockPos station, int unit) {}
 
     /** 1便の記録。 */
     public static final class Flight {
@@ -43,6 +50,9 @@ public class DroneNetwork extends SavedData {
         @Nullable
         public BlockPos station;
         public final int unit;
+        // Keep the original index key for removal after a station is dismantled.
+        @Nullable
+        private final StationSlot originalSlot;
         /** 今この便を飛んでいるドローンの実体（読み込まれ直すたびに新しくなる）。 */
         @Nullable
         public UUID drone;
@@ -89,7 +99,8 @@ public class DroneNetwork extends SavedData {
 
         Flight(long id, @Nullable BlockPos station, int unit) {
             this.id = id;
-            this.station = station;
+            this.station = station == null ? null : station.immutable();
+            this.originalSlot = this.station == null ? null : new StationSlot(this.station, unit);
             this.unit = unit;
         }
 
@@ -130,6 +141,8 @@ public class DroneNetwork extends SavedData {
 
     private final Map<Long, Port> ports = new LinkedHashMap<>();
     private final Map<Long, Flight> flights = new LinkedHashMap<>();
+    // Local and visiting flights can have matching coordinates. Check their current home dimension at lookup.
+    private final Map<StationSlot, List<Flight>> flightsBySlot = new HashMap<>();
     /**
      * ワームホールをくぐって別の次元へ出ている、この次元のステーションの枠（枠の鍵 → 行った先の次元）。便の記録は行った先の網が持つ。
      * ステーションはこの印で、枠のドローンが飛んでいる（印刷し直さない）と分かる。帰ってくると消える。
@@ -156,8 +169,8 @@ public class DroneNetwork extends SavedData {
     /** home の次元の station の unit から、この次元へ来ている便（なければ null）。 */
     @Nullable
     public Flight visitor(ResourceKey<net.minecraft.world.level.Level> home, BlockPos station, int unit) {
-        for (Flight f : flights.values()) {
-            if (home.equals(f.homeDim) && f.unit == unit && station.equals(f.station)) {
+        for (Flight f : flightsBySlot.getOrDefault(new StationSlot(station, unit), List.of())) {
+            if (home.equals(f.homeDim) && station.equals(f.station)) {
                 return f;
             }
         }
@@ -183,19 +196,13 @@ public class DroneNetwork extends SavedData {
         f.crate = src.crate;
         f.phase = src.phase;
         f.kind = src.kind;
-        flights.put(f.id, f);
-        forgetIndex();
+        register(f);
         setDirty();
         return f;
     }
-    /**
-     * 便を探す手間を減らす控え（便を足す・消すたびに作り直す）: 便の一覧の写しと、ステーションの枠ごとの便。
-     * ステーションが壊されて便の station が null になっても、控えから引いたあとで確かめるので、取り違えない。
-     */
+    /** 便の一覧の写し。便の追加・削除まで使い回す。 */
     @Nullable
     private List<Flight> flightList;
-    @Nullable
-    private Map<Long, Flight> byUnit;
     /**
      * 1 tick ごとに作り直す控え（便の行き先・段階は tick の途中でも変わるので、その tick の間だけ使う）: ポートごとの便
      * （そこで積む・そこへ届ける）と、持ち主ごとの帰りかけの便。ポートやステーションが毎 tick すべての便を回さずに済む。
@@ -259,10 +266,10 @@ public class DroneNetwork extends SavedData {
     /** owner の発着ポートのうち、物か液体か（fluid）が同じもの（from 自身を除く。近い順）。 */
     public List<BlockPos> portsOf(@Nullable UUID owner, BlockPos from, boolean fluid) {
         List<BlockPos> out = new ArrayList<>();
+        long origin = from.asLong();
         for (var e : ports.entrySet()) {
-            BlockPos p = BlockPos.of(e.getKey());
-            if (!p.equals(from) && e.getValue().fluid() == fluid && java.util.Objects.equals(owner, e.getValue().owner())) {
-                out.add(p);
+            if (e.getKey() != origin && e.getValue().accepts(owner, fluid)) {
+                out.add(BlockPos.of(e.getKey()));
             }
         }
         out.sort(java.util.Comparator.comparingDouble(p -> p.distSqr(from)));
@@ -277,8 +284,7 @@ public class DroneNetwork extends SavedData {
         f.from = from;
         f.to = to;
         f.stage = PICKUP;
-        flights.put(f.id, f);
-        forgetIndex();
+        register(f);
         setDirty();
         return f;
     }
@@ -291,17 +297,12 @@ public class DroneNetwork extends SavedData {
     /** そのステーションの枠が飛んでいる便（なければ null）。 */
     @Nullable
     public Flight flightOf(BlockPos station, int unit) {
-        if (byUnit == null) {
-            Map<Long, Flight> index = new java.util.HashMap<>();
-            for (Flight f : flights.values()) {
-                if (f.station != null && !f.away()) {
-                    index.put(unitKey(f.station, f.unit), f);
-                }
-            }
-            byUnit = index;
+        var matches = flightsBySlot.getOrDefault(new StationSlot(station, unit), List.of());
+        for (int i = matches.size() - 1; i >= 0; i--) {
+            Flight f = matches.get(i);
+            if (!f.away() && station.equals(f.station)) return f;
         }
-        Flight f = byUnit.get(unitKey(station, unit));
-        return f != null && !f.away() && f.unit == unit && station.equals(f.station) ? f : null;
+        return null;
     }
 
     private static long unitKey(BlockPos station, int unit) {
@@ -318,9 +319,24 @@ public class DroneNetwork extends SavedData {
 
     private void forgetIndex() {
         flightList = null;
-        byUnit = null;
         byPort = null;
         returningByOwner = null;
+    }
+
+    private void register(Flight f) {
+        Flight previous = flights.put(f.id, f);
+        if (previous != null) unindex(previous);
+        if (f.originalSlot != null) {
+            flightsBySlot.computeIfAbsent(f.originalSlot, key -> new ArrayList<>(1)).add(f);
+        }
+        forgetIndex();
+    }
+
+    private void unindex(Flight f) {
+        if (f.originalSlot == null) return;
+        var matches = flightsBySlot.get(f.originalSlot);
+        matches.remove(f);
+        if (matches.isEmpty()) flightsBySlot.remove(f.originalSlot);
     }
 
     /** port で積む・port へ届ける便（その tick の控え。使う側で段階と場所を確かめること）。 */
@@ -383,7 +399,8 @@ public class DroneNetwork extends SavedData {
     }
 
     public void remove(Flight f) {
-        if (flights.remove(f.id) != null) {
+        if (flights.remove(f.id, f)) {
+            unindex(f);
             forgetIndex();
             setDirty();
         }
@@ -568,8 +585,7 @@ public class DroneNetwork extends SavedData {
                 f.homeFrom = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(c, "home_from").orElse(null);
                 f.homeDim = loc == null || f.homeGate == null ? null : ResourceKey.create(Registries.DIMENSION, loc);
             }
-            net.flights.put(f.id, f);
-            net.forgetIndex();
+            net.register(f);
         }
         for (Tag t : tag.getList("away", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;

@@ -17,7 +17,8 @@ class UnifiedReleaseTests(unittest.TestCase):
         self.source = Path(self.tmp.name)
         (self.source / 'gradle.properties').write_text('mod_version=0.8.1\nminecraft_version=1.20.1\nmod_name=Singulo\n')
         jobs = ['build-and-gametest (forge)', 'build-and-gametest (neoforge)',
-                'optional-mekanism', 'renderer-lighting']
+                'optional-mekanism', 'renderer-lighting',
+                'android-weapon-rendering (forge)', 'android-weapon-rendering (neoforge)']
         self.responses = {
             'actions/runs/1': {'conclusion': 'success', 'status': 'completed',
                               'event': 'pull_request', 'path': '.github/workflows/pr-validation.yml',
@@ -75,10 +76,19 @@ class UnifiedReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'Expected exactly one'):
             self.inspect('forge')
 
-    def test_failure_in_either_loader_blocks_release(self):
-        self.responses['actions/runs/1/jobs?per_page=100']['jobs'][-1]['conclusion'] = 'failure'
-        with self.assertRaisesRegex(RuntimeError, 'All required'):
-            self.inspect('forge')
+    def test_any_failing_or_missing_validation_job_blocks_release(self):
+        jobs = self.responses['actions/runs/1/jobs?per_page=100']['jobs']
+        original = copy.deepcopy(jobs)
+        for index, entry in enumerate(original):
+            for defect in ('failed', 'missing'):
+                with self.subTest(job=entry['name'], defect=defect):
+                    jobs[:] = copy.deepcopy(original)
+                    if defect == 'failed':
+                        jobs[index]['conclusion'] = 'failure'
+                    else:
+                        jobs.pop(index)
+                    with self.assertRaisesRegex(RuntimeError, 'All required'):
+                        self.inspect('forge')
 
     def test_unreviewed_tree_blocks_release(self):
         self.responses[f'git/commits/{self.sha}']['tree']['sha'] = 'c' * 40

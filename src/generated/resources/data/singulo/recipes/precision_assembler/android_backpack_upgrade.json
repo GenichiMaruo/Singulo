@@ -30,6 +30,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    " B B ",
+    " CAC ",
+    "  D  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:android_backpack_upgrade",
     "count": 1

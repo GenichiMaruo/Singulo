@@ -31,6 +31,10 @@ public class SinguloItem extends Item {
     }
 
     public static void addStageLine(List<Component> tooltip, int stage) {
+        if (stage == 6) {
+            tooltip.add(Component.translatable("tooltip.singulo.creative_only").withStyle(ChatFormatting.DARK_PURPLE));
+            return;
+        }
         tooltip.add(Component.translatable("tooltip.singulo.stage", stage,
                 Component.translatable("stage.singulo." + stage)).withStyle(ChatFormatting.AQUA));
     }

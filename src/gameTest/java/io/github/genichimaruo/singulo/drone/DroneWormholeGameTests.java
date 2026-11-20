@@ -46,7 +46,7 @@ public final class DroneWormholeGameTests {
     public static void localStationCannotClaimOrDetachVisitingDrone(GameTestHelper h) {
         BlockPos relative = new BlockPos(2, 1, 2), stationPos = h.absolutePos(relative);
         h.setBlock(relative, SinguloBlocks.DRONE_STATION.get());
-        DroneStationBlockEntity station = (DroneStationBlockEntity) h.getBlockEntity(relative);
+        DroneStationBlockEntity station = (DroneStationBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, relative);
         var net = DroneNetwork.get(h.getLevel());
         var visitor = net.create(stationPos, 0, null, stationPos, stationPos);
         TestScope.of(h).defer(() -> net.remove(visitor));
@@ -111,7 +111,7 @@ public final class DroneWormholeGameTests {
     public static void breakingRemotePortReturnsCargoWithoutDroppingIt(GameTestHelper h) {
         BlockPos relative = new BlockPos(3, 1, 3), target = h.absolutePos(relative);
         h.setBlock(relative, SinguloBlocks.DRONE_PORT.get());
-        DronePortBlockEntity port = (DronePortBlockEntity) h.getBlockEntity(relative);
+        DronePortBlockEntity port = (DronePortBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, relative);
         var net = DroneNetwork.get(h.getLevel());
         BlockPos gate = h.absolutePos(new BlockPos(5, 1, 5));
         var visitor = net.create(h.absolutePos(new BlockPos(1, 1, 1)), 0, null, gate, target);
@@ -127,6 +127,28 @@ public final class DroneWormholeGameTests {
         h.assertTrue(net.flight(visitor.id) == visitor && visitor.stage == DroneNetwork.RETURN
                         && gate.equals(visitor.target()) && ItemStack.matches(cargo, visitor.crate),
                 "Breaking the remote port dropped or lost its inbound cargo");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void replacedRemotePortRejectsArrivingItemCrate(GameTestHelper h) {
+        var level = h.getLevel();
+        var net = DroneNetwork.get(level);
+        BlockPos relative = new BlockPos(3, 1, 3), target = h.absolutePos(relative);
+        h.setBlock(relative, SinguloBlocks.FLUID_DRONE_PORT.get());
+        DronePortBlockEntity replacement = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, relative);
+        var gate = target.east(2);
+        var visitor = net.create(target.north(2), 0, null, gate, target);
+        TestScope.of(h).defer(() -> net.remove(visitor));
+        visitor.homeDim = Level.NETHER;
+        visitor.homeGate = gate;
+        visitor.homeFrom = target.west(2);
+        visitor.stage = DroneNetwork.DELIVER;
+        visitor.crate = DroneCrateItem.pack(new ItemStack(SinguloItems.PACKING_CRATE.get()), List.of(new ItemStack(Items.IRON_INGOT, 12)));
+        ItemStack cargo = visitor.crate.copy();
+        h.assertFalse(replacement.dock(visitor), "A fluid port started unloading an item shipment");
+        h.assertTrue(visitor.stage == DroneNetwork.RETURN && gate.equals(visitor.target()) && ItemStack.matches(cargo, visitor.crate),
+                "The arriving visitor did not turn back with its intact crate");
         h.succeed();
     }
 

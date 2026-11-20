@@ -9,7 +9,7 @@
       "item": "minecraft:paper"
     },
     "S": {
-      "tag": "forge:strings"
+      "tag": "forge:string"
     }
   },
   "result": {

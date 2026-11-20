@@ -16,5 +16,21 @@ public final class Legacy {
         return java.util.UUID.nameUUIDFromBytes(id.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
     public static boolean sameFluid(net.minecraftforge.fluids.FluidStack a, net.minecraftforge.fluids.FluidStack b) { return a.isFluidEqual(b); }
+    public static int clamp(long value, int min, int max) {
+        return (int) Math.max(min, Math.min(max, value));
+    }
+    public static long clamp(long value, long min, long max) {
+        return Math.max(min, Math.min(max, value));
+    }
+    public static float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
+    }
+    public static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+    public static long ceilDiv(long x, long y) {
+        long quotient = Math.floorDiv(x, y);
+        return quotient + (x % y == 0 ? 0 : 1);
+    }
     private Legacy() {}
 }

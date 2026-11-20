@@ -22,7 +22,20 @@
         "tag": "forge:obsidian"
       },
       "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:dusts/redstone"
+      },
+      "count": 2
     }
+  ],
+  "shape": [
+    "     ",
+    " AAA ",
+    " DBD ",
+    " CAC ",
+    "     "
   ],
   "result": {
     "id": "singulo:high_gravity_panel",

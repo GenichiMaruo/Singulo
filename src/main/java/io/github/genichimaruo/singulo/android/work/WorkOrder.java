@@ -88,11 +88,13 @@ public final class WorkOrder {
     /** 受け渡し場所 point に予約した物。 */
     public static final class Holding {
         public final BlockPos point;
+        @Nullable public final BlockPos store;
         public final ItemStack item;
         public long count;
 
-        Holding(BlockPos point, ItemStack item, long count) {
+        Holding(BlockPos point, @Nullable BlockPos store, ItemStack item, long count) {
             this.point = point.immutable();
+            this.store = store == null ? null : store.immutable();
             this.item = item.copyWithCount(1);
             this.count = count;
         }
@@ -100,33 +102,47 @@ public final class WorkOrder {
 
     /** 予約を足す。 */
     public void hold(BlockPos point, ItemStack item, long count) {
+        hold(point, null, item, count);
+    }
+
+    void hold(BlockPos point, @Nullable BlockPos store, ItemStack item, long count) {
         if (count <= 0 || item.isEmpty()) {
             return;
         }
         for (Holding h : held) {
-            if (h.point.equals(point) && ItemStack.isSameItemSameTags(h.item, item)) {
+            if (h.point.equals(point) && java.util.Objects.equals(h.store, store) && ItemStack.isSameItemSameTags(h.item, item)) {
                 h.count += count;
                 return;
             }
         }
-        held.add(new Holding(point, item, count));
+        held.add(new Holding(point, store, item, count));
     }
 
     /** 予約を使う（取り出した分）。 */
     public void release(BlockPos point, ItemStack item, long count) {
+        consume(point, null, true, item, count);
+    }
+
+    long consume(BlockPos point, @Nullable BlockPos store, boolean anyStore, ItemStack item, long count) {
+        long left = count;
         for (Holding h : held) {
-            if (h.point.equals(point) && ItemStack.isSameItemSameTags(h.item, item)) {
-                h.count = Math.max(0, h.count - count);
+            if (left == 0) break;
+            if (h.point.equals(point) && (anyStore || java.util.Objects.equals(store, h.store))
+                    && ItemStack.isSameItemSameTags(h.item, item)) {
+                long used = Math.min(h.count, left);
+                h.count -= used;
+                left -= used;
             }
         }
         held.removeIf(h -> h.count <= 0);
+        return count - left;
     }
 
     /** 受け渡し場所 point に予約した、この物の数（point が null なら全部の場所の合計）。 */
     public long held(@Nullable BlockPos point, ItemStack item) {
         long n = 0;
         for (Holding h : held) {
-            if ((point == null || h.point.equals(point)) && ItemStack.isSameItemSameTags(h.item, item)) {
+            if ((point == null || h.point.equals(point)) && WormholeOrders.matches(item, h.item)) {
                 n += h.count;
             }
         }
@@ -147,6 +163,7 @@ public final class WorkOrder {
          * できたら、指令台が取り出しの作業を出す。
          */
         public long parked, parkedOut;
+        ItemStack awaitingTool = ItemStack.EMPTY;
         /** 取り出しに行ってよい（できた・素材を使い切った・出口がいっぱい・燃料切れ・長く変化がない）。毎秒調べる。保存しない。 */
         public boolean collectReady;
         /** 加工の残り時間の見込み（tick。分からなければ -1）と、装置の様子が最後に変わった時刻・その様子。保存しない。 */
@@ -183,19 +200,31 @@ public final class WorkOrder {
         return o;
     }
 
+    private record Producers(ItemStack output, List<Integer> steps) {}
+
     /** 工程の前後関係（素材を作る工程が終わってから、その素材を使う工程を始める）。 */
     private void link() {
+        var producers = new java.util.HashMap<WorkPlanner.Key, Producers>();
         for (int i = 0; i < steps.size(); i++) {
             StepState s = steps.get(i);
             s.after.clear();
-            List<ItemCount> inputs = s.recipe.inputs();
-            for (int j = 0; j < i; j++) {
-                for (ItemCount in : inputs) {
-                    if (ItemStack.isSameItemSameTags(in.item, steps.get(j).recipe.output())) {
-                        s.after.add(j);
-                        break;
+            var dependencies = new java.util.BitSet();
+            for (ItemCount in : s.recipe.inputs()) {
+                if (in.alt == null) {
+                    var matches = producers.get(WorkPlanner.Key.of(in.item));
+                    if (matches != null) matches.steps().forEach(dependencies::set);
+                } else {
+                    for (var previous : producers.values()) {
+                        if (in.matches(previous.output())) previous.steps().forEach(dependencies::set);
                     }
                 }
+            }
+            dependencies.stream().forEach(s.after::add);
+            var outputs = s.recipe.guaranteedExtras() ? s.recipe.outputs() : List.of(s.recipe.output());
+            for (ItemStack product : outputs) {
+                ItemStack output = FluidSamples.key(product);
+                var key = WorkPlanner.Key.of(output);
+                producers.computeIfAbsent(key, ignored -> new Producers(output, new ArrayList<>())).steps().add(i);
             }
         }
     }
@@ -298,6 +327,7 @@ public final class WorkOrder {
             st.putString("block", BuiltInRegistries.BLOCK.getKey(s.block).toString());
             st.putLong("total", s.total);
             st.putLong("done", s.done);
+            if (!s.awaitingTool.isEmpty()) st.put("awaiting_tool", s.awaitingTool.save(new CompoundTag()));
             if (s.parked > 0) {
                 st.putLong("parked", s.parked);
                 st.putLong("parked_out", s.parkedOut);
@@ -326,6 +356,7 @@ public final class WorkOrder {
         for (Holding h : held) {
             CompoundTag ht = new CompoundTag();
             ht.put("point", NbtUtils.writeBlockPos(h.point));
+            if (h.store != null) ht.put("store", NbtUtils.writeBlockPos(h.store));
             ht.put("item", h.item.save(new CompoundTag()));
             ht.putLong("count", h.count);
             hs.add(ht);
@@ -361,6 +392,7 @@ public final class WorkOrder {
             StepState s = new StepState(r, io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(st, "location").orElse(BlockPos.ZERO),
                     bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(bid), st.getLong("total"));
             s.done = st.getLong("done");
+            s.awaitingTool = ItemStack.of(st.getCompound("awaiting_tool"));
             s.parked = Math.max(0, st.getLong("parked"));
             s.parkedOut = Math.max(0, st.getLong("parked_out"));
             o.steps.add(s);
@@ -383,7 +415,7 @@ public final class WorkOrder {
         for (Tag tag : t.getList("held", Tag.TAG_COMPOUND)) {
             CompoundTag ht = (CompoundTag) tag;
             ItemStack item = ItemStack.of(ht.getCompound("item"));
-            io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, item, ht.getLong("count")));
+            io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(ht, "point").ifPresent(p -> o.hold(p, io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(ht, "store").orElse(null), item, ht.getLong("count")));
         }
         for (Tag w : t.getList("workers", Tag.TAG_INT_ARRAY)) {
             o.workers.add(NbtUtils.loadUUID(w));

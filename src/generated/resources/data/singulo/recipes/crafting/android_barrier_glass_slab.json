@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:android_barrier_glass"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "singulo:android_barrier_glass_slab"
+  }
+}
