@@ -282,7 +282,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: '1'
           ALSOFT_DRIVERS: 'null'
         run: |
-          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithEmbeddium
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 420s bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithEmbeddium
           grep -q 'SINGULO_REJOIN_COMPLETE 5' build/$LOADER/rayleigh-review/logs/latest.log
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()

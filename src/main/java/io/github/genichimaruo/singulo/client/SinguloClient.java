@@ -31,6 +31,8 @@ public final class SinguloClient {
 
     public SinguloClient(IEventBus modBus) {
         LegacyClientConfig.register(modBus);
+        modBus.addListener((net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent event) ->
+                event.register(MachineScreen.AssemblyPreview.class, preview -> preview));
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
         modBus.addListener(SinguloClient::registerBlockColors);
