@@ -22,6 +22,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class JeiReviewHarness {
@@ -42,7 +43,13 @@ public final class JeiReviewHarness {
     @SubscribeEvent
     public static void rendered(ScreenEvent.Render.Post event) {
         if (Minecraft.getInstance().screen == screen || Minecraft.getInstance().screen == modelScreen) frames++;
+        AssemblySelectorReview.rendered();
         io.github.genichimaruo.singulo.client.CapacityUpgradeReview.rendered();
+    }
+
+    @SubscribeEvent
+    public static void tooltip(RenderTooltipEvent.Color event) {
+        AssemblySelectorReview.tooltip(event);
     }
 
     @SubscribeEvent
@@ -116,7 +123,7 @@ public final class JeiReviewHarness {
                 player.serverLevel().setBlockAndUpdate(STATION, io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES
                         .get(MachineType.PRECISION_ASSEMBLER).get().defaultBlockState());
                 var machine = (io.github.genichimaruo.singulo.machine.MachineBlockEntity) player.serverLevel().getBlockEntity(STATION);
-                machine.magazine().load(new net.minecraft.nbt.CompoundTag(), player.registryAccess());
+                machine.magazine().load(new net.minecraft.nbt.CompoundTag());
                 for (int i = 0; i < machine.items().getSlots(); i++)
                     machine.items().setStackInSlot(i, net.minecraft.world.item.ItemStack.EMPTY);
                 if (transferSets == 256) machine.items().setStackInSlot(machine.type().assemblyUpgradeSlot(),
@@ -216,14 +223,20 @@ public final class JeiReviewHarness {
                 machine.energy().setEnergy(machine.type().energyCapacity());
             });
             transferPhase = 6;
+        } else if (transferPhase == 6 && AssemblySelectorReview.captureSpent(mc, transferRecipe,
+                Path.of(System.getProperty("singulo.jeiReviewOutput")))) {
+            io.github.genichimaruo.singulo.client.PopupInputReview.verify((MachineScreen) mc.screen, JeiSearch.runtime);
+            transferPhase = 7;
+        } else if (transferPhase == 7 && io.github.genichimaruo.singulo.client.CapacityUpgradeReview.tick(mc)) {
+            transferPhase = 8;
             modelScreen = new io.github.genichimaruo.singulo.client.DroneModelReview();
             mc.setScreen(modelScreen); frames = 0;
-        } else if (transferPhase == 6 && frames >= 3) {
+        } else if (transferPhase == 8 && frames >= 3) {
             try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
                 image.writeToFile(Path.of(System.getProperty("singulo.jeiReviewOutput")).resolve("drone-models.png"));
             }
             Singulo.LOGGER.info("SINGULO_DRONE_MODELS_COMPLETE 3");
-            transferPhase = 7;
+            transferPhase = 10;
             mc.setScreen(null);
             mc.stop();
         }

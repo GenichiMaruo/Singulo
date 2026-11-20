@@ -14,8 +14,7 @@ import net.minecraft.client.Screenshot;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 
 /** Capture the normal container and selector, observing where Minecraft actually paints the tooltip. */
 public final class AssemblySelectorReview {
@@ -54,7 +53,7 @@ public final class AssemblySelectorReview {
                 || menu.getSlot(menu.type().outputSlot()).hasItem())
             throw new IllegalStateException("An unpowered board produced a real output or advanced: " + expected);
         for (int i = 0; i < MachineRecipe.ASSEMBLY_CELLS; i++) {
-            var input = recipe.value().assemblyInput(i);
+            var input = recipe.assemblyInput(i);
             var slot = menu.getSlot(menu.assemblySlot(i));
             var stack = slot.getItem();
             if (stack.getCount() > stack.getMaxStackSize()) throw new IllegalStateException("Oversized network stack at cell " + i);
@@ -83,7 +82,7 @@ public final class AssemblySelectorReview {
     // A slot update or a window mouse event can move the target after the popup opens.
     @SuppressWarnings("unchecked")
     private static void hoverExpected(MachineScreen screen) throws Exception {
-        var entries = (List<RecipeHolder<MachineRecipe>>) read(screen, "selectorEntries");
+        var entries = (List<MachineRecipe>) read(screen, "selectorEntries");
         int index = 0;
         while (index < entries.size() && (entries.get(index) == null || !entries.get(index).id().equals(expected))) index++;
         if (index == entries.size()) throw new IllegalStateException("Recipe absent from standard selector: " + expected);
@@ -93,7 +92,7 @@ public final class AssemblySelectorReview {
         scroll.setAccessible(true);
         int delta = firstRow - scroll.getInt(screen);
         for (int row = 0; row < Math.abs(delta); row++)
-            screen.mouseScrolled(selector.x + 4, selector.bodyY() + 4, 0, -Integer.signum(delta));
+            screen.mouseScrolled(selector.x + 4, selector.bodyY() + 4, -Integer.signum(delta));
         var cellPos = MachineScreen.class.getDeclaredMethod("cellPos", int.class);
         cellPos.setAccessible(true);
         int[] pos = (int[]) cellPos.invoke(screen, index - firstRow * columns);
@@ -129,8 +128,8 @@ public final class AssemblySelectorReview {
             if (component instanceof MachineScreen.AssemblyPreview diagram) {
                 var menu = screen.getMenu();
                 var holder = RecipeSelection.byIndex(mc.level, menu.type(), menu.value(MachineBlockEntity.assemblyPreviewIndex(menu.type())) - 1);
-                if (holder != null && holder.id().equals(expected) && ItemStack.matches(holder.value().result(), diagram.recipe().result())
-                        && holder.value().shape().equals(diagram.recipe().shape())) {
+                if (holder != null && holder.id().equals(expected) && ItemStack.matches(holder.result(), diagram.recipe().result())
+                        && holder.shape().equals(diagram.recipe().shape())) {
                     diagramX = event.getX();
                     diagramY = y;
                     tooltipFrames++;
