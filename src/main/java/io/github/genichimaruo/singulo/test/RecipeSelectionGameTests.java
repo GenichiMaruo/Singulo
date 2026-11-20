@@ -125,7 +125,7 @@ public final class RecipeSelectionGameTests {
         var machine = machine(h, new BlockPos(1, 1, 1));
         machine.selectRecipe(index(h, UNIQUE));
         var tag = machine.saveWithoutMetadata(h.getLevel().registryAccess());
-        var id = recipe(h, UNIQUE).id();
+        var id = recipe(h, UNIQUE).id().identifier();
         h.assertTrue(id.toString().equals(tag.getStringOr("selected_recipe", "")), "Selection was not saved");
         machine.selectRecipe(-1);
         h.assertTrue(machine.selectedRecipe() == null, "Selection was not cleared");
@@ -169,7 +169,7 @@ public final class RecipeSelectionGameTests {
         try {
             io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, List.of(selected));
             h.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == 1, "Selected recipe kept its obsolete GUI index");
-            h.assertTrue(selected.id().equals(machine.selectedRecipe()), "Reload changed the selected recipe ID");
+            h.assertTrue(selected.id().identifier().equals(machine.selectedRecipe()), "Reload changed the selected recipe ID");
         } finally {
             io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original);
         }

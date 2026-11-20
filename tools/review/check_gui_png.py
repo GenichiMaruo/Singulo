@@ -68,8 +68,10 @@ if metrics_path.exists():
             panel_width = int(panel_width)
             width, height, channels, pixels = rgba(root / f"machine-{locale}-{index:02d}.png", max_row=120)
             assert (width, height) == (854, 480)
-            # Machine frames are 184 tall; the status chip is 19 wide, right edge 19 px from the frame edge.
-            left, top = (width - panel_width * 2) // 2, (height - 184 * 2) // 2
+            # MachineLayout uses a taller panel for the precision assembler's assembly grid.
+            panel_height = 212 if name == 'precision_assembler' else 184
+            # The status chip is 19 wide, with its right edge 19 px from the frame edge.
+            left, top = (width - panel_width * 2) // 2, (height - panel_height * 2) // 2
             x0, x1 = left + (panel_width - 38) * 2, left + (panel_width - 19) * 2
             colors = [tuple(pixels[y][x * channels:x * channels + 3])
                       for y in range(top + 8, top + 30) for x in range(x0, x1)]

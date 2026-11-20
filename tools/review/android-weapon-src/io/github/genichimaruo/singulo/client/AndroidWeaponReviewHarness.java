@@ -42,6 +42,7 @@ public final class AndroidWeaponReviewHarness {
     private static int frame, settled, elapsed;
     private static boolean requested, captured, capturing;
     private static volatile boolean ready;
+    private static Boolean activeTransparency;
 
     private enum Scene {
         CLEAR("clear", 0), STAIRS_BACK("stairs-back", 2), STAIRS_FRONT("stairs-front", -2),
@@ -139,7 +140,8 @@ public final class AndroidWeaponReviewHarness {
         if (!requested) {
             requested = true;
             if (frame % FRAMES_PER_MODE == 0) {
-                mc.options.applyGraphicsPreset(mode());
+                mc.options.graphicsPreset().set(mode());
+                mc.options.improvedTransparency().set(mode() == GraphicsPreset.FABULOUS);
                 mc.options.fov().set(40);
                 mc.levelRenderer.allChanged();
             }
@@ -160,13 +162,18 @@ public final class AndroidWeaponReviewHarness {
         if (visible.size() == (withSubjects() ? 2 : 0)) settled++;
     }
 
+    @SubscribeEvent
+    public static void observe(RenderLevelStageEvent.AfterTranslucentFeatures event) {
+        // The 26.1 framegraph releases the translucency attachment before AfterLevel.
+        if (OUTPUT != null) activeTransparency = Minecraft.getInstance().levelRenderer.getTranslucentTarget() != null;
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void render(RenderLevelStageEvent.AfterLevel event) throws Exception {
         if (!ready || capturing) return;
         if (settled < (frame % FRAMES_PER_MODE == 0 ? 80 : 25)) return;
         var mc = Minecraft.getInstance();
-        if (mc.options.graphicsPreset().get() != mode()
-                || (mc.levelRenderer.getTranslucentTarget() != null) != (mode() == GraphicsPreset.FABULOUS)) {
+        if (!java.util.Objects.equals(activeTransparency, mode() == GraphicsPreset.FABULOUS)) {
             throw new AssertionError("Requested graphics pipeline is unavailable: " + mode());
         }
         Path dir = Path.of(OUTPUT);

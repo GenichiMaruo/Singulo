@@ -494,15 +494,22 @@ public final class JetForgeGameTests {
     @GameTest(template = EMPTY)
     public static void heliumCartridgeIsAFluidContainer(GameTestHelper helper) {
         var helium = SinguloFluids.get("liquid_helium");
-        ItemStack cartridge = new ItemStack(item("empty_coolant_cartridge"));
-        var handler = io.github.genichimaruo.singulo.compat.FluidResourceView.of(net.neoforged.neoforge.transfer.access.ItemAccess.forStack(cartridge).getCapability(Capabilities.Fluid.ITEM));
+        var slot = new net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler(1);
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            var empty = net.neoforged.neoforge.transfer.item.ItemResource.of(new ItemStack(item("empty_coolant_cartridge")));
+            helper.assertTrue(slot.insert(0, empty, 1, tx) == 1, "Cannot seed cartridge slot");
+            tx.commit();
+        }
+        var access = net.neoforged.neoforge.transfer.access.ItemAccess.forHandlerIndexStrict(slot, 0);
+        var nativeHandler = access.getCapability(Capabilities.Fluid.ITEM);
+        var handler = io.github.genichimaruo.singulo.compat.FluidResourceView.of(nativeHandler);
         helper.assertTrue(handler != null, "空のカートリッジに液体の口がない");
         helper.assertTrue(handler.fill(new FluidStack(helium, 200), IFluidHandler.FluidAction.EXECUTE) == 0, "200 mBで詰まった");
-        helper.assertTrue(handler.fill(new FluidStack(helium, handler.getTankCapacity(0)), IFluidHandler.FluidAction.EXECUTE) == 250,
+        helper.assertTrue(handler.fill(new FluidStack(helium, nativeHandler.getCapacityAsInt(0, net.neoforged.neoforge.transfer.fluid.FluidResource.of(helium))), IFluidHandler.FluidAction.EXECUTE) == 250,
                 "空の容器が報告する容量ではヘリウムを充填できない");
-        helper.assertTrue(cartridge.is(item("helium_cartridge")), "液体ヘリウム・カートリッジにならない");
+        helper.assertTrue(access.getResource().toStack(1).is(item("helium_cartridge")), "液体ヘリウム・カートリッジにならない");
         FluidStack out = handler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-        helper.assertTrue(out.getAmount() == 250 && out.getFluid().isSame(helium) && cartridge.is(item("empty_coolant_cartridge")),
+        helper.assertTrue(out.getAmount() == 250 && out.getFluid().isSame(helium) && access.getResource().toStack(1).is(item("empty_coolant_cartridge")),
                 "空けられない: " + out.getAmount());
         helper.succeed();
     }

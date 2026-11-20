@@ -1111,7 +1111,7 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
     /** 炉心制御装置と抽出ポートの隣（リアクターの部品以外）へ電力を押し出す。1 tick の合計は penroseMaxOutput まで。 */
     private void pushEnergy(ServerLevel level) {
-        if (remainingOutput() <= 0) return;
+        if (remainingOutput() <= 0 || !energyPort.canExtract()) return;
         // A cable can also see a second port of this reactor while accepting our offer.
         pushingEnergy = true;
         try {
@@ -1306,8 +1306,8 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
 
     /** 点火中は点火エネルギーを受け取り、稼働中は蓄電から取り出せる。 */
     private final class EnergyPort extends net.neoforged.neoforge.transfer.transaction.SnapshotJournal<long[]> implements io.github.genichimaruo.singulo.energy.LongEnergyHandler {
-        @Override protected long[] createSnapshot(){return new long[]{buffer,ignitionStored,receivedThisTick};}
-        @Override protected void revertToSnapshot(long[] s){buffer=s[0];ignitionStored=s[1];receivedThisTick=s[2];}
+        @Override protected long[] createSnapshot(){return new long[]{buffer,ignitionStored,receivedThisTick,lastOutput,outputTick};}
+        @Override protected void revertToSnapshot(long[] s){buffer=s[0];ignitionStored=s[1];receivedThisTick=s[2];lastOutput=s[3];outputTick=s[4];}
         @Override protected void onRootCommit(long[] s){setChanged();}
         @Override public long insertLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
             if(amount<0)throw new IllegalArgumentException("Negative energy insertion");if(state!=State.IGNITING)return 0;
@@ -1315,12 +1315,19 @@ public class PenroseReactorBlockEntity extends io.github.genichimaruo.singulo.co
             if(take>0){updateSnapshots(tx);ignitionStored+=take;receivedThisTick+=take;}return take;
         }
         @Override public long extractLong(long amount,net.neoforged.neoforge.transfer.transaction.TransactionContext tx){
-            if(amount<0)throw new IllegalArgumentException("Negative energy extraction");if(state!=State.RUNNING)return 0;
-            long take=Math.min(amount,buffer);if(take>0){updateSnapshots(tx);buffer-=take;}return take;
+            if (amount < 0) throw new IllegalArgumentException("Negative energy extraction");
+            if (!canExtract() || amount == 0) return 0;
+            long take = Math.min(amount, remainingOutput());
+            if (take > 0) {
+                updateSnapshots(tx);
+                buffer -= take;
+                lastOutput += take;
+            }
+            return take;
         }
         @Override public long getAmountAsLong(){return buffer;}
         @Override public long getCapacityAsLong(){return Math.max(buffer,Integer.MAX_VALUE);}
-        @Override public boolean canExtract(){return state==State.RUNNING;}
+        @Override public boolean canExtract(){return state==State.RUNNING && !pushingEnergy;}
         @Override public boolean canReceive(){return state==State.IGNITING;}
     }
 

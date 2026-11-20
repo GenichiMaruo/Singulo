@@ -134,7 +134,13 @@ public final class FactoryOperationGameTests {
                 .setValue(AbstractMachineBlock.FACING, Direction.EAST));
         PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, AT);
         SmesCellBlockEntity sink = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, AT.east());
-        var registry = h.getLevel().registryAccess();
+        var scope = io.github.genichimaruo.singulo.test.harness.TestScope.of(h);
+        var level = h.getLevel();
+        BlockPos fieldProbe = reactor.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER);
+        scope.defer(() -> {
+            if (level.getBlockEntity(reactor.getBlockPos()) == reactor) level.removeBlock(reactor.getBlockPos(), false);
+        });
+        var registry = level.registryAccess();
         long limit = ServerConfig.PENROSE_MAX_OUTPUT.get();
         var saved = reactor.saveWithoutMetadata(registry);
         saved.putLong("buffer", limit * 3);
@@ -151,6 +157,13 @@ public final class FactoryOperationGameTests {
                 && reactor.buffer() == 2 * limit, "Push and pull did not share the same tick budget");
         h.runAfterDelay(1, () -> {
             h.assertTrue(output.extractLong(100, true) == 100, "Next tick's budget did not reset");
+            h.assertTrue(io.github.genichimaruo.singulo.machine.TimeFields.state(level, fieldProbe)
+                            == (io.github.genichimaruo.singulo.machine.TimeFields.dilationEnabled() ? -1 : 0),
+                    "Forced reactor did not provide its configured time field");
+            scope.close();
+            h.assertTrue(io.github.genichimaruo.singulo.machine.TimeFields.state(level, fieldProbe) == 0
+                            && !PenroseReactorBlockEntity.runningPositions(level).contains(reactor.getBlockPos()),
+                    "The fixture leaked its reactor time field into the next GameTest");
             h.succeed();
         });
     }

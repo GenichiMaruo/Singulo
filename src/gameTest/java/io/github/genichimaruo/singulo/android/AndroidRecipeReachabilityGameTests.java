@@ -79,7 +79,7 @@ public final class AndroidRecipeReachabilityGameTests {
                 var kind = Blueprints.kindOf(block);
                 inputs.add(Set.of(kind == null ? block.asItem() : facility(kind, machine.minSize(), facilities)));
                 for (var input : machine.ingredients()) {
-                    if (input.uses() <= 0) inputs.add(choices(input.ingredient()));
+                    if (input.uses() <= 0) inputs.add(choices(input.ingredient(), level));
                     else {
                         Set<Object> tools = new HashSet<>();
                         for (Item item : BuiltInRegistries.ITEM) if (input.usesFrom(item.getDefaultInstance()) > 0) tools.add(item);
@@ -87,7 +87,7 @@ public final class AndroidRecipeReachabilityGameTests {
                     }
                 }
                 for (var input : machine.fluidIngredients()) inputs.add(Set.of(input.fluid()));
-                machine.restore().ifPresent(target -> inputs.add(choices(target)));
+                machine.restore().ifPresent(target -> inputs.add(choices(target, level)));
                 machine.mass().ifPresent(m -> inputs.add(Set.of(m.metalOnly() ? Items.IRON_BLOCK : Items.COBBLESTONE)));
                 if (!machine.result().isEmpty()) products.add(machine.result().getItem());
                 if (!machine.byproduct().isEmpty()) products.add(machine.byproduct().getItem());
@@ -96,7 +96,7 @@ public final class AndroidRecipeReachabilityGameTests {
                 h.assertTrue(recipe instanceof CraftingRecipe || recipe instanceof AbstractCookingRecipe || recipe instanceof StonecutterRecipe,
                         "Unmodeled Singulo recipe type " + holder.id());
                 for (var ingredient : recipe.placementInfo().ingredients()) {
-                    inputs.add(choices(ingredient));
+                    inputs.add(choices(ingredient, level));
                 }
                 var result = io.github.genichimaruo.singulo.test.harness.TestRecipe.result(recipe, level);
                 if (!result.isEmpty()) products.add(result.getItem());
@@ -121,7 +121,7 @@ public final class AndroidRecipeReachabilityGameTests {
         for (var food : PrintedFood.values()) {
             List<Set<Object>> needs = new ArrayList<>(List.of(Set.of(item("food_printer")), Set.of(item("food_cartridge"))));
             for (int i = 0; i < FoodPaste.KINDS; i++) {
-                if (food.cost(i) > 0) needs.add(choices(Ingredient.of(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ITEM).getOrThrow(FoodPaste.TAGS[i]))));
+                if (food.cost(i) > 0) needs.add(choices(Ingredient.of(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ITEM).getOrThrow(FoodPaste.TAGS[i])), level));
             }
             routes.add(new Route("print " + food.id(), needs, Set.of(item(food.id()))));
         }
@@ -145,9 +145,9 @@ public final class AndroidRecipeReachabilityGameTests {
         h.succeed();
     }
 
-    private static Set<Object> choices(Ingredient ingredient) {
+    private static Set<Object> choices(Ingredient ingredient, ServerLevel level) {
         Set<Object> items = new HashSet<>();
-        for (ItemStack choice : ingredient.items().map(net.minecraft.world.item.ItemStack::new).toArray(net.minecraft.world.item.ItemStack[]::new)) if (!choice.isEmpty() && ingredient.test(choice)) items.add(choice.getItem());
+        for (ItemStack choice : ingredient.display().resolveForStacks(net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(level))) if (!choice.isEmpty() && ingredient.test(choice)) items.add(choice.getItem());
         return items;
     }
 
