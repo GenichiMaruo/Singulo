@@ -1,13 +1,10 @@
 // Run after GameTests: gradlew --no-configuration-cache -I tools/review/android-weapon.gradle runClient
 allprojects {
     afterEvaluate {
-        if (!plugins.hasPlugin('net.neoforged.moddev')) return
-        def reviewDir = file('build/android-weapon-review')
+        if (!plugins.hasPlugin('net.neoforged.moddev.legacyforge')) return
+        def reviewDir = layout.buildDirectory.dir('android-weapon-review').get().asFile
         sourceSets.main.java.srcDir(file('tools/review/android-weapon-src'))
-        if (providers.gradleProperty('withSodium').isPresent()) {
-            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
-        }
-        neoForge.runs.client {
+        legacyForge.runs.client {
             gameDirectory = reviewDir
             systemProperty 'singulo.androidWeaponOutput', new File(reviewDir, 'screenshots').absolutePath
             systemProperty 'singulo.androidWeaponGraphics', providers.gradleProperty('weaponGraphics').getOrElse('fancy,fabulous')
@@ -22,7 +19,7 @@ allprojects {
             doFirst {
                 def world = new File(reviewDir, 'saves/Review')
                 if (!new File(world, 'level.dat').isFile()) {
-                    def metadata = file('build/gametest/world/level.dat')
+                    def metadata = layout.buildDirectory.file('gametest/world/level.dat').get().asFile
                     if (!metadata.isFile()) throw new GradleException('Run GameTests first to produce ' + metadata)
                     project.copy { from metadata; into world }
                 }

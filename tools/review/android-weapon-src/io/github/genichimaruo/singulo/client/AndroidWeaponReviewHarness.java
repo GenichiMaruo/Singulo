@@ -26,9 +26,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 
 /** A real blade and dagger on either side of glass, photographed with a matching empty scene. */
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
@@ -121,7 +121,8 @@ public final class AndroidWeaponReviewHarness {
     }
 
     @SubscribeEvent
-    public static void tick(ClientTickEvent.Post event) throws Exception {
+    public static void tick(TickEvent.ClientTickEvent event) throws Exception {
+        if (event.phase != TickEvent.Phase.END) return;
         if (OUTPUT == null) return;
         var mc = Minecraft.getInstance();
         if (++elapsed > 7200) throw new AssertionError("Android weapon review timed out at frame " + frame);
@@ -173,7 +174,7 @@ public final class AndroidWeaponReviewHarness {
         Files.createDirectories(dir);
         String name = mode().name().toLowerCase(Locale.ROOT) + "-" + scene().name + (withSubjects() ? "-subjects.png" : "-empty.png");
         try (var shot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
-            shot.writeToFile(dir.resolve(name));
+            shot.writeToFile(dir.resolve(name).toFile());
         }
         captured = true;
     }
