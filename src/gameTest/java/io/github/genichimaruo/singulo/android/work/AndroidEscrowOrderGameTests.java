@@ -170,8 +170,10 @@ public final class AndroidEscrowOrderGameTests {
         });
     }
     /** Logs -> planks -> sticks in one private request: intermediates stay in that request's custody, never shared stock. */
-    @GameTest(template="empty",timeoutTicks=2400)
+    @GameTest(template="empty",timeoutTicks=2400,batch="android_private_chain")
     public static void actualWorkerCraftsPrivateChainInOneRequest(GameTestHelper h) {
+        // Keep this real navigation test independent of adjacent fixtures and their players.
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var c=setup(h,true);var id=UUID.randomUUID();
         net.minecraft.world.level.block.entity.ChestBlockEntity shared=(net.minecraft.world.level.block.entity.ChestBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, CHEST);
         var accepted=AndroidEscrows.submit(h.getLevel(),c.getBlockPos(),c.owner(),id,new ItemStack(Items.STICK),8,
