@@ -29,7 +29,7 @@ jobs:
           umask 077
           stage="$RUNNER_TEMP/singulo-021-modrinth-preflight"
           mkdir "$stage"
-          readonly cdn='https://edge.forgecdn.net/files/9709'
+          readonly cdn='https://mediafilez.forgecdn.net/files/9709'
           download() {
             curl --fail --silent --show-error --proto '=https' --max-time 35 \
               --max-filesize 134217728 --output "$stage/$2" "$cdn/$1/$2"
