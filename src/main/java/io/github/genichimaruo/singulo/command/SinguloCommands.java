@@ -76,7 +76,7 @@ public final class SinguloCommands {
     private static int showRecipe(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var id = ResourceLocationArgument.getId(context, "id");
         var source = context.getSource();
-        String path = "data/" + id.getNamespace() + "/recipe/" + id.getPath() + ".json";
+        String path = "data/" + id.getNamespace() + "/recipes/" + id.getPath() + ".json";
         try {
             String json = PRETTY_JSON.toJson(RecipePatches.read(source.getServer().getResourceManager(), id));
             var file = Component.literal(path).withStyle(style -> style.withUnderlined(true)

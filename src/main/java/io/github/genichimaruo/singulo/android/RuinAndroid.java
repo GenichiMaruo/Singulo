@@ -2076,7 +2076,7 @@ public abstract class RuinAndroid extends Monster {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(STATE, STATE_IDLE);
-        entityData.define(CHARGE, CHARGE_MAX);
+        entityData.define(CHARGE, PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY));
         entityData.define(PRINT, PRINT_TICKS);
         entityData.define(CHARGER_LINK, -1);
         entityData.define(GUARD, false);

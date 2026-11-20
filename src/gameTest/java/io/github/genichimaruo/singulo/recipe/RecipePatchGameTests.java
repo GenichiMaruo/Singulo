@@ -102,7 +102,7 @@ public final class RecipePatchGameTests {
             server.getCommands().getDispatcher().execute("singulo recipe show " + STEEL, source);
             var file = message.get().getSiblings().get(0);
             var copy = file.getStyle().getClickEvent();
-            h.assertTrue(file.getString().equals("data/singulo/recipe/" + STEEL.getPath() + ".json")
+            h.assertTrue(file.getString().equals("data/singulo/recipes/" + STEEL.getPath() + ".json")
                     && copy != null && copy.getAction() == ClickEvent.Action.COPY_TO_CLIPBOARD
                     && com.google.gson.JsonParser.parseString(copy.getValue()).equals(RecipePatches.read(serverResources, STEEL)),
                     "Recipe inspection did not provide the path and copyable source");
@@ -121,7 +121,7 @@ public final class RecipePatchGameTests {
             repository.reload();
             h.assertTrue(repository.getAvailableIds().isEmpty() && !Files.exists(folder), "Empty instances should have no additional data pack");
             Path example = folder.resolve("example");
-            String file = "data/singulo/recipe/" + STEEL.getPath() + ".json";
+            String file = "data/singulo/recipes/" + STEEL.getPath() + ".json";
             Files.writeString(path(example, STEEL), "{\"singulo:patch\":{\"time\":30}}");
             try (var meta = RecipePatchGameTests.class.getResourceAsStream("/fixtures/recipe-pack/pack.mcmeta")) {
                 Files.copy(java.util.Objects.requireNonNull(meta), example.resolve("pack.mcmeta"));
@@ -181,10 +181,10 @@ public final class RecipePatchGameTests {
             manager.load(pack(base), pack(lower), pack(upper));
             h.assertTrue(manager.machine(STEEL).time() == 80 && !manager.machine(STEEL).fluidIngredients().isEmpty(), "A lower patch overrode a full replacement");
             Files.writeString(path(upper, STEEL), """
-                    {"singulo:patch":{"neoforge:conditions":[{"type":"neoforge:false"}]}}
+                    {"singulo:patch":{"conditions":[{"type":"forge:false"}]}}
                     """);
             manager.load(pack(base), pack(upper));
-            h.assertTrue(manager.byKey(STEEL).isEmpty(), "A disabled recipe bypassed NeoForge conditions");
+            h.assertTrue(manager.byKey(STEEL).isEmpty(), "A disabled recipe bypassed Forge recipe conditions");
             Files.writeString(path(upper, STEEL), """
                     {"singulo:patch":{"ingredients":{"99":{"count":3}}}}
                     """);

@@ -386,9 +386,10 @@ public class MachineMenu extends AbstractContainerMenu {
             ItemStack single = stack.copyWithCount(1);
             boolean moved = false;
             for (int i = inputStart; i < inputEnd && !moved; i++) {
-                moved = moveItemStackTo(stack, i, i + 1, false);
+                moved = moveItemStackTo(single, i, i + 1, false);
             }
             if (!moved) return ItemStack.EMPTY;
+            stack.shrink(1);
         } else if (!moveToInputs(stack, inputStart, inputEnd)) {
             return ItemStack.EMPTY;
         }

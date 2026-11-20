@@ -170,10 +170,10 @@ public final class AndroidRecipeReachabilityGameTests {
         var naturalBlocks = Set.of("meteorite_core", "meteorite_crust", "meteoric_iron_chunk", "stardust_cluster",
                 "factory_conveyor", "guardian_core", "lab_door", "lab_reactor_core", "lab_terminal", "pressure_hull",
                 "ruin_android_fabricator", "ruin_cache", "ruin_guard_dock", "sealed_record");
-        var resources = level.getServer().getResourceManager().listResources("loot_table", id ->
+        var resources = level.getServer().getResourceManager().listResources("loot_tables", id ->
                 id.getNamespace().equals(Singulo.MODID) && id.getPath().endsWith(".json"));
         for (var entry : resources.entrySet()) {
-            String path = entry.getKey().getPath().substring("loot_table/".length()).replace(".json", "");
+            String path = entry.getKey().getPath().substring("loot_tables/".length()).replace(".json", "");
             if (!(path.startsWith("ruins/") || path.startsWith("entities/") || path.startsWith("sealed/")
                     || path.startsWith("chests/") && !path.endsWith("lab_test_hut")
                     || path.startsWith("blocks/") && naturalBlocks.contains(path.substring("blocks/".length())))) continue;
