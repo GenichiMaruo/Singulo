@@ -4,11 +4,11 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-manifest = json.loads((ROOT / 'docs/0.20.0/recipe-parity-1.20.1.json').read_text())
+manifest = json.loads((ROOT / 'docs/0.21.0/recipe-parity-1.20.1.json').read_text(encoding="utf8"))
 root = ROOT / 'src/generated/resources/data/singulo/recipes'
 actual = {}
 for path in root.rglob('*.json'):
-    data = json.dumps(json.loads(path.read_text()), sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()
+    data = json.dumps(json.loads(path.read_text(encoding="utf8")), sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()
     actual[path.relative_to(root).as_posix()] = hashlib.sha256(data).hexdigest()
 if actual != manifest['recipes']:
     differing = sorted(key for key in actual.keys() | manifest['recipes'].keys() if actual.get(key) != manifest['recipes'].get(key))

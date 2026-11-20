@@ -64,7 +64,7 @@ class HandbookVisualTests(unittest.TestCase):
                         self.assertTrue(all(key in lang for lang in langs), key)
 
     def test_steel_comparison_matches_machine_and_crafting_recipes(self):
-        recipes = GENERATED / 'data/singulo/recipe'
+        recipes = GENERATED / 'data/singulo/recipes'
         electro = read(recipes / 'electrolyzer/hydrogen.json')
         kiln = read(recipes / 'kiln/steel_ingot_from_oxygen.json')
         blend = read(recipes / 'crafting/steel_blend.json')
@@ -82,15 +82,15 @@ class HandbookVisualTests(unittest.TestCase):
         oxidant, = kiln['fluid_ingredients']
         batches, remainder = divmod(gases[oxidant['fluid']], oxidant['amount'])
         self.assertEqual(remainder, 0)
-        representatives = {'c:ingots/iron': 'minecraft:iron_ingot', 'singulo:carbon': 'minecraft:coal'}
+        representatives = {'forge:ingots/iron': 'minecraft:iron_ingot', 'singulo:carbon': 'minecraft:coal'}
         ingredients = {representatives[i['ingredient']['tag']]: i['count'] * batches for i in kiln['ingredients']}
         ingredients[oxidant['fluid']] = gases[oxidant['fluid']]
         self.assertEqual(amounts(oxygen['inputs']), ingredients)
         product = {kiln['result']['id']: kiln['result']['count'] * batches}
         self.assertEqual(amounts(oxygen['outputs']), product)
         self.assertEqual(amounts(ordinary['outputs']), product)
-        self.assertEqual(blast['ingredient']['item'], blend['result']['id'])
-        batches, remainder = divmod(product[blast['result']['id']], blast['result']['count'] * blend['result']['count'])
+        self.assertEqual(blast['ingredient']['item'], blend['result']['item'])
+        batches, remainder = divmod(product[blast['result']['item']], blast['result']['count'] * blend['result']['count'])
         self.assertEqual(remainder, 0)
         materials = Counter(representatives[t['tag']] for t in blend['ingredients'])
         self.assertEqual(amounts(ordinary['inputs']), {k: v * batches for k, v in materials.items()})

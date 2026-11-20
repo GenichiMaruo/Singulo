@@ -31,6 +31,13 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
     /** 画面に送る値: 電力・容量・次に印刷する組。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_NEXT = 2, COUNT = 3;
 
+    // Some legacy mappings reuse the synthetic parameter names in Slot's bytecode.
+    private static class PrinterSlot extends Slot {
+        PrinterSlot(net.minecraft.world.Container container, int index, int x, int y) {
+            super(container, index, x, y);
+        }
+    }
+
     private final Player player;
     private final InteractionHand hand;
     private final ItemStack openedPrinter;
@@ -73,7 +80,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
         };
         for (int u = 0; u < units; u++) {
             int y = rowY(u);
-            addSlot(new Slot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_MEMORY), MEMORY_X, y) {
+            addSlot(new PrinterSlot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_MEMORY), MEMORY_X, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return AndroidStationBlockEntity.memoryKind(stack) != null;
@@ -84,7 +91,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
                     return 1;
                 }
             });
-            addSlot(new Slot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_KIT), KIT_X, y) {
+            addSlot(new PrinterSlot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_KIT), KIT_X, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return AndroidStationBlockEntity.isKit(stack);
@@ -95,13 +102,13 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
                     return PortableAndroidPrinterItem.MAX_KITS;
                 }
             });
-            addSlot(new Slot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_REPAIR), REPAIR_X, y) {
+            addSlot(new PrinterSlot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_REPAIR), REPAIR_X, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return RuinAndroid.isRepairKit(stack);
                 }
             });
-            addSlot(new Slot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_PLATE), PLATE_X, y) {
+            addSlot(new PrinterSlot(contents, PortableAndroidPrinterItem.slot(u, PortableAndroidPrinterItem.SLOT_PLATE), PLATE_X, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return RuinAndroid.isArmorPlate(stack);
@@ -123,7 +130,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
         }
         for (int col = 0; col < 9; col++) {
             boolean held = col == locked;
-            addSlot(new Slot(inventory, col, invX + col * 18, hotbarY) {
+            addSlot(new PrinterSlot(inventory, col, invX + col * 18, hotbarY) {
                 @Override
                 public boolean mayPickup(Player p) {
                     return !held;

@@ -8,9 +8,10 @@ class MultiblockPartRecipeTests(unittest.TestCase):
     def test_every_recipe_for_a_structural_part_consumes_its_frame(self):
         frames = {gen.mid(part): gen.mid(frame) for part, frame in gen.PART_FRAMES.items()}
         found = set()
-        for path in (gen.DATA / 'recipe').rglob('*.json'):
+        for path in (gen.DATA / 'recipes').rglob('*.json'):
             recipe = json.loads(path.read_bytes())
-            product = recipe.get('result', {}).get('id')
+            output = recipe.get('result', {})
+            product = (output.get('id') or output.get('item')) if isinstance(output, dict) else output
             if product not in frames:
                 continue
             with self.subTest(recipe=path.stem):

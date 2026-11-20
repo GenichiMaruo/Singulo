@@ -34,7 +34,7 @@ class AssemblyEditorTests(unittest.TestCase):
         self.assertTrue(ITEM_NAMES.keys() <= set(ids.values()))
         self.assertNotIn('minecraft:air', self.editor.palette)
         self.assertNotIn('minecraft:water', self.editor.palette)
-        self.assertEqual(ids['鉄インゴット'], '#c:ingots/iron')
+        self.assertEqual(ids['鉄インゴット'], '#forge:ingots/iron')
         self.assertEqual(ids['minecraft:iron_ingot'], 'minecraft:iron_ingot')
         rid = 'inertial_control_gauntlet'
         before = self.editor.entries[rid]
