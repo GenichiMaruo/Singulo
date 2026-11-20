@@ -64,7 +64,7 @@ class WorkflowSafetyTests(unittest.TestCase):
     def test_validation_jobs_have_bounded_runtime_and_cancel_obsolete_runs(self):
         text = (WORKFLOWS / 'pr-validation.yml').read_text()
         limits = [int(x) for x in re.findall(r'^    timeout-minutes: (\d+)\s*$', text, re.M)]
-        self.assertEqual(len(limits), 3)
+        self.assertEqual(len(limits), 4)
         self.assertTrue(all(1 <= x <= 35 for x in limits))
         self.assertIn('  cancel-in-progress: true\n', text)
 
