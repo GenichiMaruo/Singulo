@@ -23,6 +23,13 @@
       "uses": 4500
     }
   ],
+  "shape": [
+    "     ",
+    "  C  ",
+    " BAB ",
+    "     ",
+    "     "
+  ],
   "result": {
     "id": "singulo:degenerate_nucleus",
     "count": 1

@@ -66,7 +66,11 @@ public final class PortGameTests {
                 try { test.method().invoke(null, context); }
                 catch (ReflectiveOperationException e) {
                     Throwable cause = e.getCause() == null ? e : e.getCause();
-                    if (cause instanceof RuntimeException runtime) throw runtime;
+                    if (cause instanceof net.minecraft.gametest.framework.GameTestException failure) throw failure;
+                    if (cause instanceof RuntimeException runtime) {
+                        io.github.genichimaruo.singulo.Singulo.LOGGER.error("GameTest {} crashed", test.id(), runtime);
+                        throw new RuntimeException(test.id() + ": " + runtime, runtime);
+                    }
                     if (cause instanceof AssertionError assertion) throw new RuntimeException(assertion.getMessage(), assertion);
                     if (cause instanceof Error error) throw error;
                     throw new RuntimeException("GameTest failed: " + test.id() + ": " + cause.getMessage(), cause);

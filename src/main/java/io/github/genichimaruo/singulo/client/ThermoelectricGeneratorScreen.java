@@ -44,7 +44,7 @@ public class ThermoelectricGeneratorScreen extends FramedScreen<ThermoelectricGe
         if (noSource() || melting()) {
             return Panel.Status.WARN;
         }
-        return value(ThermoelectricGeneratorBlockEntity.D_RATE_X100) > 0 ? Panel.Status.RUN : Panel.Status.IDLE;
+        return menu.rate() > 0 ? Panel.Status.RUN : Panel.Status.IDLE;
     }
 
     @Override
@@ -97,8 +97,8 @@ public class ThermoelectricGeneratorScreen extends FramedScreen<ThermoelectricGe
                 none ? List.of(Component.translatable("gui.singulo.thermo.none"))
                         : List.of(Component.translatable("gui.singulo.thermo.cold", cold),
                         Component.translatable("gui.singulo.thermo.delta", Math.max(0, hot - cold))));
-        double rate = value(ThermoelectricGeneratorBlockEntity.D_RATE_X100) / 100.0;
-        stat(g, STAT_X, y + 22, Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(rate) + " FE/t", skin.text(),
+        double rate = menu.rate();
+        stat(g, STAT_X, y + 22, Panel.Icon.BOLT, Panel.GLOW, EnergyText.shortForm(rate) + " FE/t", skin.text(),
                 List.of(Component.translatable("gui.singulo.energy_rate", EnergyText.of(rate))));
         if (coolant >= 0) {
             stat(g, STAT_X, y + 33, Panel.Icon.DROP, 0xFF5AA9E6, coolant + " mB", skin.text(),

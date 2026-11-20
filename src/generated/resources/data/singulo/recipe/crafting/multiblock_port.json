@@ -4,12 +4,13 @@
   "pattern": [
     "I I",
     "CBC",
-    "I I"
+    "IFI"
   ],
   "key": {
     "I": "#c:ingots/iron",
     "C": "#c:ingots/copper",
-    "B": "singulo:basic_circuit"
+    "B": "singulo:basic_circuit",
+    "F": "singulo:basic_frame"
   },
   "result": {
     "id": "singulo:multiblock_port",

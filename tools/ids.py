@@ -50,6 +50,7 @@ MOD = {
     'ビスマス結晶ブロック': ('bismuth_crystal_block', 'Bismuth Crystal Block', 'deco'),
     '発光ビスマス結晶': ('glowing_bismuth_crystal', 'Glowing Bismuth Crystal', 'deco'),
     # クリエイティブ専用（レシピなし）
+    'クリエイティブ用液体ゴミ箱': ('creative_fluid_trash', 'Creative Fluid Trash Can', 'machine'),
     'クリエイティブ電源': ('creative_energy_source', 'Creative Energy Source', 'machine'),
     '無限の触媒': ('creative_catalyst', 'Infinite Catalyst', 'tool'),
     '組み立ての杖': ('builder_wand', 'Builder\'s Wand', 'tool'),
@@ -114,6 +115,7 @@ MOD = {
     '精密組立台': ('precision_assembler', 'Precision Assembler', 'machine'),
     'ワールドライン・アンカー（小）': ('worldline_anchor', 'Worldline Anchor (Small)', 'machine'),
     '単極子アップグレード': ('monopole_upgrade', 'Monopole Upgrade', 'item'),
+    '組立盤拡張アップグレード': ('assembly_stock_upgrade', 'Assembly Stock Upgrade', 'item'),
     '容量アップグレード（Mk1）': ('capacity_upgrade_1', 'Capacity Upgrade Mk1', 'item'),
     '容量アップグレード（Mk2）': ('capacity_upgrade_2', 'Capacity Upgrade Mk2', 'item'),
     '容量アップグレード（Mk3）': ('capacity_upgrade_3', 'Capacity Upgrade Mk3', 'item'),
@@ -138,6 +140,8 @@ MOD = {
     'アンドロイドキット': ('android_kit', 'Android Kit', 'item'),
     'アンドロイド組立ステーション': ('android_station', 'Android Assembly Station', 'machine'),
     'アンドロイド用無線充電器': ('android_charger', 'Android Wireless Charger', 'tool'),
+    '携帯型アンドロイド印刷機': ('portable_android_printer', 'Portable Android Printer', 'tool'),
+    '携帯型アンドロイド印刷機（Mk2）': ('portable_android_printer_2', 'Portable Android Printer Mk2', 'tool'),
     '自己修理キット': ('android_repair_kit', 'Self-Repair Kit', 'item'),
     '転送アップグレード': ('android_transfer_upgrade', 'Transfer Upgrade', 'item'),
     'アンドロイド用装甲板': ('android_armor_plate', 'Android Armor Plate', 'tool'),
@@ -615,6 +619,13 @@ ALIAS_RECIPE_IDS = {
     '鍾乳石（潮汐紡糸）': 'pointed_dripstone_from_tidal_spindle',
 }
 
+# 通常版と同じ部品を2回分まとめて組む精密組立レシピ。
+PAIRED_ASSEMBLY_PARTS = ('縮退圧縮炉フレーム', 'C空洞フレーム', '縮退熱炉フレーム', '鏡面プレート')
+for _part in PAIRED_ASSEMBLY_PARTS:
+    _variant = f'{_part}（2回分）'
+    OUTPUT_ALIASES[_variant] = 'singulo:' + MOD[_part][0]
+    ALIAS_RECIPE_IDS[_variant] = MOD[_part][0] + '_pair'
+
 # 成果物と一緒に出る副産物: レシピ名 → (副産物, 個数)
 BYPRODUCTS = {
     '銅インゴット（精錬）': ('ビスマスインゴット', 1),
@@ -797,6 +808,9 @@ SPENT = {
 }
 # 失活品でも材料にできる組み合わせ（成果物, 材料の触媒）。材料はタグ singulo:<触媒ID>s で受ける
 ACCEPTS_SPENT = {('BE凝縮触媒', 'ミュオン触媒')}
+
+# レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）。
+CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
 
 # マルチブロックの大きさの下限（冷却塔の高さなど）があるレシピ
 MIN_SIZE = {'液体ヘリウム': 10, '液体ヘリウム・カートリッジ': 10, 'ニホニウム': 16}

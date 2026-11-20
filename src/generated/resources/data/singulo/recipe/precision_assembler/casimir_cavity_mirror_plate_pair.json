@@ -1,0 +1,41 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "#c:plates/steel",
+      "count": 2
+    },
+    {
+      "ingredient": "#c:gems/quartz",
+      "count": 4
+    },
+    {
+      "ingredient": "#c:glass_blocks/colorless",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:bose_condensate_catalyst",
+      "tier": 3,
+      "uses": 1500
+    },
+    {
+      "ingredient": "singulo:casimir_cavity_frame",
+      "count": 2
+    }
+  ],
+  "shape": [
+    "   A ",
+    "  BCB",
+    " A E ",
+    "BCB  ",
+    " E   "
+  ],
+  "result": {
+    "id": "singulo:casimir_cavity_mirror_plate",
+    "count": 2
+  }
+}

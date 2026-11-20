@@ -17,7 +17,7 @@ Superconductivity, particle accelerators, the Casimir effect and Hawking radiati
 - **Minecraft 1.21.1**, with a compatible **NeoForge 21.1.256 or later** build for that Minecraft version. Minecraft runs on Java 21.
 - Put the Singulo JAR in `mods/`. Multiplayer needs the mod on both the client and server.
 - JEI is optional. Its integration shows machine recipes and multiblock construction information.
-- With a machine screen open, JEI's + button moves one recipe's item ingredients from your inventory. Shift-click transfers as many sets as fit. Catalysts go into their dedicated slot; the Precision Assembler and Singularity Encapsulator also select that recipe. Supply fluids and compressor mass separately.
+- JEI’s + button transfers ingredients from your inventory. On a Precision Assembler it lays out one set of parts and supplies the separate catalyst slot. On other processing machines, Shift-click transfers as many sets as fit. Supply fluids and compressor mass separately.
 - Singulo supplies energy cables and Fluid Pipes for liquids and gases, so no other mod is needed. Compatible transport mods can provide item pipes.
 
 For building from source, see the [development instructions in the README](../../README.md#開発するには).
@@ -107,11 +107,11 @@ Structure parts also require the controller's stage. Particle Accelerator tubes 
 
 | Ruin | Important salvage and purpose |
 | --- | --- |
-| Observation Post | Observation Logs and degraded Control Units; the entry to superconducting and muon technology |
-| Research Building | Quantum Data Fragments and degraded Cold Atom Traps for quantum technology |
-| Culture Facility | Culture Data and degraded Time Crystal Seeds for temporal technology and exotic matter |
+| Observation Post | Observation Logs and Degraded Control Units for superconducting and muon technology |
+| Research Building | Quantum Data Fragments and Degraded Cold Atom Traps for quantum technology |
+| Culture Facility | Culture Data and Degraded Time Crystal Seeds for temporal technology and exotic matter |
 | Underground Android Laboratory | Tune the compass at the Research Building to find the main shaft. The Foundry Overseer guards a cache with Precision Actuators and Android Kits |
-| Final Lab | Anomaly Samples and the initial Dormant Singularity Seed, guarded by the Horizon Warden |
+| Final Lab | The Horizon Warden guards the cache. Degraded Anomaly Samples replenish. A Dormant Singularity Seed appears only the first time each cache is opened |
 | Sunken Reactor Sector | A dead second reactor: exotic matter, Jet Condensate and H-Condensate, guarded by the Ergosphere Leviathan |
 
 Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground, the Final Lab deeper still, and the Sunken Reactor Sector below it (around Y −60 to −54). The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts, Research Buildings and Underground Android Laboratories, or fourteen for Culture Facilities, Final Labs and Sunken Reactor Sectors.
@@ -134,7 +134,7 @@ The Underground Android Laboratory also has two prototypes. Foundry summons the 
 
 Androids run on charge and run out after about ten big moves. They return to a nearby fabricator, unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging.
 
-**Your own androids:** make an **Android Assembly Station** and android kits in the stage 2 Precision Assembler. Put a compact crystal memory (never used up) and kits (one per print) in the station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last.
+**Your own androids:** make an **Android Assembly Station** and android kits in the stage 2 Precision Assembler. Put a compact crystal memory (never used up) and kits (one per print) in the station and supply power, and it prints one guard android on top. Most android types cost 40,000 FE per print. A Factory Print Unit halves the printing cost for all types. If it falls, the station prints it again while kits last.
 
 - Guards target hostile mobs, including ruin androids and security drones. They ignore bosses.
 - Modes: Guard (by the station), Wander (within 16 blocks), Follow (accompanies the selected player) and Patrol (walks a set route). Below its return health it goes back to the station and repairs and recharges in 5 s.
@@ -254,7 +254,7 @@ Restored parts and original records exhausted during processing become item outp
 
 The Precision Assembler normally stores 100,000 FE and accepts up to 4,000,000 FE per reception. Install one Capacity Upgrade Mk1, Mk2 or Mk3 in the dedicated slot on the right rail for 1,000,000, 4,000,000 or 40,000,000 FE. Craft Mk1 on a crafting table using stage 2 materials. Make Mk2 and Mk3 in the assembler using the previous tier as an ingredient. The separate slot supports speed upgrades at the same time, and intake limits stay unchanged. Removing or replacing an upgrade preserves surplus charge, including charge from older versions, and blocks further reception until the buffer falls below capacity. Recipes whose per-tick cost exceeds the normal buffer, such as the Mk3 sensitivity module, require a capacity upgrade; JEI shows this requirement.
 
-Without a chosen recipe, the Precision Assembler starts crafting when the kinds of items inside exactly match a recipe. A mix that could also be part of another recipe starts only after items have stopped going in for 3 seconds. Choose a recipe with the button below the output slot to craft only that one; the choice is saved, and other items may be present. Androids select their recorded recipe before inserting materials. The Singularity Encapsulator works the same way.
+To assemble by hand, follow the pattern with up to one stack per cell. Each craft uses one item from each occupied cell. Hover over a product in the assembler’s recipe list to see the pattern, or look it up in JEI. The board has 21 cells in a 5×5 square with the four corners removed. Put the catalyst in its dedicated slot. Once the layout is complete and the machine has enough power, it processes the parts and places the product in the output slot. Click JEI’s + button to lay out one batch, or Shift-click it for as many batches as fit. Androids use their processing cards to place parts on the same board. Spent catalysts go to their own output slot. Pipes and hoppers can extract products and spent catalysts. The Singularity Encapsulator still accepts a selected recipe or matches its inputs, waiting three seconds if another recipe might still be loading.
 
 ## Facility blueprints
 

@@ -2,14 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PGP",
-    " W ",
-    "PGP"
+    "PWP",
+    "GFG",
+    "P P"
   ],
   "key": {
     "P": "#c:plates/steel",
+    "W": "singulo:superconducting_wire",
     "G": "#c:glass_blocks/colorless",
-    "W": "singulo:superconducting_wire"
+    "F": "singulo:basic_frame"
   },
   "result": {
     "id": "singulo:accelerator_tube",

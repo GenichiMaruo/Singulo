@@ -18,6 +18,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    "  C  ",
+    "  A  ",
+    "  B  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:sealed_container_3",
     "count": 1

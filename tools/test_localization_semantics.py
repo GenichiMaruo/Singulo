@@ -42,25 +42,21 @@ class LocalizationSemanticsTests(unittest.TestCase):
                 self.assertRegex(shown, r'10\s*(?:s\b|秒|초)')
                 self.assertRegex(shown, r'25\s*MFE/t')
 
-    def test_guardian_pages_describe_their_own_encounter(self):
-        names = {
-            'en_us': ('Foundry Overseer', 'Ergosphere Leviathan'),
-            'ja_jp': ('統括AI', 'エルゴ球の大蛇'),
-            'zh_cn': ('统筹 AI', '能层巨蛇'),
-            'zh_tw': ('統籌 AI', '能層巨蛇'),
-            'ko_kr': ('총괄 AI', '에르고구의 거대 뱀'),
-        }
-        for locale, (foundry, leviathan) in names.items():
-            with self.subTest(locale=locale):
-                catalog = json.loads((LANG / f'{locale}.json').read_text(encoding='utf-8'))
-                f = catalog['guide.singulo.ruins.foundry.body']
-                l = catalog['guide.singulo.ruins.leviathan.body']
-                self.assertIn(foundry, f.splitlines()[0])
-                self.assertNotIn(leviathan, f)
-                self.assertIn(leviathan, l.splitlines()[0])
-                self.assertNotIn(foundry, l)
-                self.assertEqual(len(f.splitlines()), 2)
-                self.assertEqual(len(l.splitlines()), 6)
+    def test_handbook_hints_leave_encounters_unnamed(self):
+        encounters = ('foundry_overseer', 'ergosphere_leviathan', 'horizon_warden',
+                      'echo_sentinel', 'gravity_remnant')
+        for path in LANG.glob('*.json'):
+            catalog = json.loads(path.read_text(encoding='utf-8'))
+            names = {text for key, text in catalog.items() if key.startswith('ruin.singulo.')}
+            names.update(catalog['entity.singulo.' + entity] for entity in encounters)
+            for key, text in catalog.items():
+                if not key.startswith('guide.singulo.'):
+                    continue
+                with self.subTest(locale=path.stem, key=key):
+                    for name in names:
+                        self.assertNotIn(name.casefold(), text.casefold())
+                    if not key.startswith('guide.singulo.androids'):
+                        self.assertNotIn(catalog['guide.singulo.androids'].casefold(), text.casefold())
 
 if __name__ == '__main__':
     unittest.main()

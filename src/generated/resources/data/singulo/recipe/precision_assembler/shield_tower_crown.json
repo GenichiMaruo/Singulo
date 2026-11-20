@@ -7,7 +7,7 @@
   "ingredients": [
     {
       "ingredient": "singulo:exotic_matter",
-      "count": 2
+      "count": 4
     },
     {
       "ingredient": "singulo:optical_lattice_substrate",
@@ -16,7 +16,18 @@
     {
       "ingredient": "singulo:entangled_element",
       "count": 2
+    },
+    {
+      "ingredient": "singulo:shield_tower_plinth",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " ACA ",
+    " BDB ",
+    " ACA ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_crown",

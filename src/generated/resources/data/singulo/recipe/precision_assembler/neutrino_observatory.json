@@ -27,6 +27,13 @@
       "uses": 24000
     }
   ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " DAD ",
+    "  C  ",
+    "     "
+  ],
   "result": {
     "id": "singulo:neutrino_observatory",
     "count": 1

@@ -168,7 +168,7 @@ public class SinguloJeiPlugin implements IModPlugin {
             if (I18n.exists(desc) && (!I18n.exists(howto) || !made.contains(item) || MACHINE_USES.contains(id.getPath())
                     || I18n.get(howto).startsWith(I18n.get("jei.singulo.found_prefix")))) {
                 List<Component> lines = new ArrayList<>();
-                lines.add(Component.translatable(desc));
+                lines.add(io.github.genichimaruo.singulo.client.SinguloClient.itemDescription(item, desc));
                 if (I18n.exists(howto)) {
                     lines.add(Component.translatable(howto));
                 }

@@ -19,7 +19,7 @@ public final class Chemicals {
     private Chemicals() {}
 
     /** 化学物質の入れ物（ブロックのある面）。 */
-    public interface Store {
+    public interface Store extends io.github.genichimaruo.singulo.api.android.AndroidChemicalStorage {
         /** この化学物質の量。 */
         long amount(String id);
 

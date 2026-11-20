@@ -15,8 +15,19 @@
     },
     {
       "ingredient": "singulo:basic_circuit",
+      "count": 2
+    },
+    {
+      "ingredient": "minecraft:hopper",
       "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "  D  ",
+    " CAC ",
+    "  B  ",
+    "     "
   ],
   "result": {
     "id": "singulo:wormhole_generator_port",

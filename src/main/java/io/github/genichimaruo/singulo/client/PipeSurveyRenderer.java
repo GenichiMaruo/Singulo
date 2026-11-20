@@ -131,7 +131,7 @@ final class PipeSurveyRenderer {
         boolean flowing = pipe.fresh() && pipe.visualState() == 1;
         boolean stopped = pipe.fresh() && pipe.visualState() == 2;
         Component text = !pipe.fresh() ? Component.translatable("gui.singulo.pipe.stale")
-                : flowing ? Component.translatable("gui.singulo.pipe.flow", pipe.visualAmount())
+                : flowing ? Component.translatable("gui.singulo.pipe.flow", pipe.flowRate())
                 : Component.translatable("gui.singulo.pipe." + (stopped ? "blocked" : "idle"));
         Component detail = flowing ? (pipe.mixed() ? Component.translatable("gui.singulo.pipe.mixed") : pipe.visualFluid().getHoverName()) : null;
         var g = event.getGuiGraphics();

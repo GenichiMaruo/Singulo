@@ -20,7 +20,18 @@
     {
       "ingredient": "singulo:time_crystal_module",
       "count": 1
+    },
+    {
+      "ingredient": "singulo:tipler_frame",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " CAC ",
+    " BDB ",
+    "  E  ",
+    "     "
   ],
   "result": {
     "id": "singulo:tipler_holder",

@@ -10,7 +10,7 @@
     "P": "singulo:nuclear_pasta",
     "H": "singulo:horizon_bus",
     "C": "singulo:superconducting_coil",
-    "F": "singulo:nihonium_frame",
+    "F": "singulo:pasta_laminate",
     "S": "singulo:degenerate_matter_shell"
   },
   "result": {

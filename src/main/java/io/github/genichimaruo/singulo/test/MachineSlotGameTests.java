@@ -40,7 +40,7 @@ public final class MachineSlotGameTests {
         MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,pos);
         MachineType t = m.type();
         ItemStack catalyst = new ItemStack(item("time_crystal_catalyst"));
-        helper.assertTrue(!m.items().insertItem(0, catalyst.copy(), true).isEmpty(), "触媒が普通の入力スロットに入る");
+        helper.assertTrue(!m.assemblyGrid().insertItem(0, catalyst.copy(), true).isEmpty(), "触媒が組立用のマスに入る");
         helper.assertTrue(m.items().insertItem(t.catalystSlot(), catalyst.copy(), true).isEmpty(), "触媒スロットに触媒が入らない");
         helper.assertTrue(!m.items().insertItem(t.catalystSlot(), new ItemStack(Items.IRON_INGOT), true).isEmpty(),
                 "触媒スロットに触媒以外が入る");
@@ -48,9 +48,8 @@ public final class MachineSlotGameTests {
                 "アップグレード枠に2個入る");
         helper.assertTrue(!m.items().insertItem(t.upgradeSlot(), new ItemStack(Items.IRON_INGOT), true).isEmpty(),
                 "アップグレード枠にほかの物が入る");
-        // 搬入（ホッパーなど）からも触媒スロットへ入れられる
         IItemHandler auto = m.automationItems();
-        helper.assertTrue(auto.insertItem(t.catalystSlot(), catalyst.copy(), false).isEmpty(), "搬入で触媒スロットに入らない");
+        helper.assertTrue(ItemStack.matches(auto.insertItem(t.catalystSlot(), catalyst.copy(), false), catalyst), "搬入で触媒スロットに入ってしまう");
         helper.assertTrue(auto.extractItem(t.catalystSlot(), 1, true).isEmpty(), "触媒スロットから搬出できてしまう");
         helper.succeed();
     }

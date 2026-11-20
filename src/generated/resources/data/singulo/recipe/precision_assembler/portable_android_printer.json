@@ -1,0 +1,40 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 2,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:white_ceramic_composite",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:ceramic_substrate",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:superconducting_coil",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:basic_circuit",
+      "count": 2
+    },
+    {
+      "ingredient": "#c:plates/steel",
+      "count": 4
+    }
+  ],
+  "shape": [
+    " EAE ",
+    " BDB ",
+    " CDC ",
+    " EAE ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:portable_android_printer",
+    "count": 1
+  }
+}

@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.forge;
 
+import io.github.genichimaruo.singulo.data.PackBalance;
+import io.github.genichimaruo.singulo.data.ConfiguredFluidTank;
+
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.energy.LongEnergyStorage;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
@@ -67,6 +70,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * （全体を一度に読まない）。保存するのは段階・進み具合・素材・完成品・電力で、読み込み直すと続きから進む。
  */
 public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+        io.github.genichimaruo.singulo.machine.MachineReport.Source,
         MultiblockPortBlockEntity.Outputs, DeviceMenu.Host {
     public static final String STATION = "accretion_jet_forge";
     public static final int IDLE = 0, PRIME = 1, IGNITE = 2, FOCUS = 3, IRRADIATE = 4, FINISH = 5, COOL = 6;
@@ -140,7 +144,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             }
         }
     };
-    private final TransactionalFluidTank tank = new TransactionalFluidTank(TANK_CAPACITY, s -> isCoolant(s)) {
+    private final TransactionalFluidTank tank = new ConfiguredFluidTank(() -> PackBalance.dedicatedTank(TANK_CAPACITY), s -> isCoolant(s)) {
         @Override
         protected void onContentsChanged() {
             setChanged();
@@ -165,6 +169,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
     /** 取り出した素材（仕上げの前に制御核が壊されたら返す）。 */
     private final List<ItemStack> charged = new ArrayList<>();
     private int energyPerTick;
+    private double phaseTimeMultiplier = 1.0;
     private int irradiateTicks = 1200;
     /** Locked when a run begins; upgrade changes cannot alter reserved output. */
     private int batchSize = 1;
@@ -172,6 +177,10 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     public int batchSize() { return batchSize; }
     public boolean parallelUpgrade() { return parallelUpgrade; }
+
+    private int parallelLimit() {
+        return parallelUpgrade ? (ServerConfig.SPEC.isLoaded() ? ServerConfig.PARALLEL_BATCH_LIMIT.get() : 4) : 1;
+    }
     @Nullable
     private Identifier recipeId;
 
@@ -206,8 +215,58 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     // ------------------------------------------------------------------ 読み取り（描画・画面・テスト）
 
+    @Override public int remainingTicks() { return phase() == IDLE ? -1 : Math.clamp(exactTotalTicks() - exactElapsed(), 1, Integer.MAX_VALUE); }
+
     public int phase() {
         return phase;
+    }
+
+    /** 装置の様子（Jade・WTHIT・工場モニター）。画面のヘッダーと同じ分け方。 */
+    @Override
+    public io.github.genichimaruo.singulo.machine.MachineReport report() {
+        long stored = buffer, capacity = energy.capacity();
+        int using = (int) Math.min(Integer.MAX_VALUE, Math.round(intake));
+        if (!formed && hold != UNLOADED) {
+            return io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.BROKEN, forgeText("not_formed"), stored, capacity);
+        }
+        String reason = switch (hold) {
+            case NO_POWER -> "forge.no_power";
+            case OUTPUT_FULL -> "forge.output_full";
+            case NO_CORE -> "forge.no_core";
+            case UNLOADED -> "forge.unloaded";
+            case HELD -> "forge.held";
+            default -> null;
+        };
+        io.github.genichimaruo.singulo.machine.MachineReport.State stopped = switch (hold) {
+            case NO_POWER -> io.github.genichimaruo.singulo.machine.MachineReport.State.NO_POWER;
+            case OUTPUT_FULL -> io.github.genichimaruo.singulo.machine.MachineReport.State.FULL;
+            case HELD -> io.github.genichimaruo.singulo.machine.MachineReport.State.OFF;
+            default -> io.github.genichimaruo.singulo.machine.MachineReport.State.WARN;
+        };
+        if (bh == BH_IGNITING) {
+            int pct = ignitionCharged ? 100 : (int) Math.min(100, 100.0 * ignitionStored / Math.max(1, ignitionEnergy()));
+            int secs = ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : Math.max(0, ignitionLeft) / 20;
+            return new io.github.genichimaruo.singulo.machine.MachineReport(io.github.genichimaruo.singulo.machine.MachineReport.State.RUN, forgeText("forge.igniting", pct, secs), List.of(), 0, 0, stored, capacity, using, 0,
+                    ItemStack.EMPTY, 0, List.of(), 0);
+        }
+        if (phase == IDLE) {
+            return reason != null ? io.github.genichimaruo.singulo.machine.MachineReport.simple(stopped, forgeText(reason), stored, capacity)
+                    : io.github.genichimaruo.singulo.machine.MachineReport.simple(io.github.genichimaruo.singulo.machine.MachineReport.State.IDLE, forgeText("forge.idle"), stored, capacity);
+        }
+        long passed = exactElapsed(), total = exactTotalTicks();
+        int reportTotal = (int) Math.min(Integer.MAX_VALUE, total);
+        int reportProgress = total > Integer.MAX_VALUE ? (int) (passed * (double) reportTotal / total) : (int) passed;
+        net.minecraft.network.chat.Component running = forgeText("forge.running", forgeText("forge.phase." + phase),
+                passed / 20, total / 20);
+        return reason != null
+                ? new io.github.genichimaruo.singulo.machine.MachineReport(stopped, forgeText(reason), List.of(running), reportProgress, reportTotal, stored, capacity, 0, 0,
+                ItemStack.EMPTY, 0, List.of(), 0)
+                : new io.github.genichimaruo.singulo.machine.MachineReport(io.github.genichimaruo.singulo.machine.MachineReport.State.RUN, running, List.of(), reportProgress, reportTotal, stored, capacity, using, 0,
+                ItemStack.EMPTY, 0, List.of(), 0);
+    }
+
+    private static net.minecraft.network.chat.Component forgeText(String key, Object... args) {
+        return net.minecraft.network.chat.Component.translatable("gui.singulo.device." + key, args);
     }
 
     public int phaseTicks() {
@@ -308,25 +367,47 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     /** 段階の長さ（tick）。 */
     public int duration(int p) {
-        return switch (p) {
+        if (p == IRRADIATE) return irradiateTicks;
+        return fixedDuration(p, phase == IDLE ? PackBalance.value(ServerConfig.FORGE_PHASE_TIME_MULTIPLIER) : phaseTimeMultiplier);
+    }
+
+    private static int fixedDuration(int p, double multiplier) {
+        int base = switch (p) {
             case PRIME -> PRIME_TICKS;
             case IGNITE -> IGNITE_TICKS;
             case FOCUS -> FOCUS_TICKS;
-            case IRRADIATE -> irradiateTicks;
             case FINISH -> FINISH_TICKS;
             case COOL -> COOL_TICKS;
             default -> 0;
         };
+        return base == 0 ? 0 : PackBalance.scaled(base, multiplier);
     }
 
     /** 1回の加工の長さ（tick）。 */
     public int totalTicks() {
-        return PRIME_TICKS + IGNITE_TICKS + FOCUS_TICKS + irradiateTicks + FINISH_TICKS + COOL_TICKS;
+        return (int) Math.min(Integer.MAX_VALUE, exactTotalTicks());
+    }
+
+    public static long recipeTicks(int irradiation) {
+        double multiplier = PackBalance.value(ServerConfig.FORGE_PHASE_TIME_MULTIPLIER);
+        long total = irradiation;
+        for (int p = PRIME; p <= COOL; p++) total += fixedDuration(p, multiplier);
+        return total;
+    }
+
+    private long exactTotalTicks() {
+        long total = 0;
+        for (int p = PRIME; p <= COOL; p++) total += duration(p);
+        return total;
     }
 
     /** 始めてからの経過（tick）。 */
     public int elapsed() {
-        int t = phaseTicks;
+        return (int) Math.min(Integer.MAX_VALUE, exactElapsed());
+    }
+
+    private long exactElapsed() {
+        long t = phaseTicks;
         for (int p = PRIME; p < phase; p++) {
             t += duration(p);
         }
@@ -345,7 +426,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     /** 1回の加工に使う電力の合計（FE）。 */
     public long energyPerRun() {
-        return demand(IGNITE) * IGNITE_TICKS + demand(FOCUS) * FOCUS_TICKS + demand(IRRADIATE) * (long) irradiateTicks;
+        return demand(IGNITE) * duration(IGNITE) + demand(FOCUS) * duration(FOCUS) + demand(IRRADIATE) * (long) irradiateTicks;
     }
 
     @Nullable
@@ -387,7 +468,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
                 out.add(h);
             }
         }
-        return out;
+        return io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
     }
 
     /** どれかの鍛造のレシピの材料か。 */
@@ -789,11 +870,14 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
     private void tryStart(ServerLevel level) {
         for (RecipeHolder<MachineRecipe> h : recipes()) {
             MachineRecipe r = h.value();
-            int batch = parallelUpgrade ? 4 : 1;
+            if (r.result().isEmpty()) continue;
+            int unitCost = io.github.genichimaruo.singulo.recipe.RecipeNumbers.energy(r.energy());
+            int outputSpace = Math.min(items.getSlotLimit(SLOT_OUT), r.result().getMaxStackSize()) - items.getStackInSlot(SLOT_OUT).getCount();
+            int batch = Math.min(parallelLimit(), outputSpace / r.result().getCount());
             int[] take = null;
             ItemStack product = ItemStack.EMPTY;
             for (; batch >= 1; batch--) {
-                long demand = (long) r.energy() * batch;
+                long demand = (long) unitCost * batch;
                 long count = (long) r.result().getCount() * batch;
                 if (demand < 0 || demand > Integer.MAX_VALUE || count < 1 || count > r.result().getMaxStackSize()) continue;
                 take = plan(r, batch);
@@ -824,7 +908,8 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             working = first;
             result = product;
             batchSize = batch;
-            energyPerTick = Math.multiplyExact(r.energy(), batch);
+            energyPerTick = Math.multiplyExact(unitCost, batch);
+            phaseTimeMultiplier = PackBalance.value(ServerConfig.FORGE_PHASE_TIME_MULTIPLIER);
             irradiateTicks = Math.max(1, r.time());
             recipeId = h.id().identifier();
             phase = PRIME;
@@ -942,11 +1027,11 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
     /** 段階の途中の合図の音。 */
     private void events(ServerLevel level) {
-        if (phase == PRIME && phaseTicks % 20 == 0 && phaseTicks < PRIME_TICKS) {
+        if (phase == PRIME && phaseTicks % 20 == 0 && phaseTicks < duration(PRIME)) {
             SinguloSounds.playAt(level, worldPosition, "jet_forge.warning", 2.5F, 1.0F);
         }
-        if (phase == FOCUS && (phaseTicks == 1 || phaseTicks == FOCUS_TICKS / 3 || phaseTicks == FOCUS_TICKS * 2 / 3)) {
-            SinguloSounds.playAt(level, worldPosition, "jet_forge.focus", 2.5F, 0.85F + 0.15F * (phaseTicks * 3 / FOCUS_TICKS));
+        if (phase == FOCUS && (phaseTicks == 1 || phaseTicks == duration(FOCUS) / 3 || phaseTicks == duration(FOCUS) * 2L / 3)) {
+            SinguloSounds.playAt(level, worldPosition, "jet_forge.focus", 2.5F, 0.85F + 0.15F * (phaseTicks * 3L / duration(FOCUS)));
         }
         if (phase == IRRADIATE && phaseTicks % 40 == 0) {
             SinguloSounds.playAt(level, worldPosition, "jet_forge.pulse", 2.0F, 0.9F + 0.2F * phaseTicks / irradiateTicks);
@@ -1050,8 +1135,10 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
             case DeviceMenu.Forge.IGNITION_SECS -> bh != BH_IGNITING ? 0 : ignitionCharged
                     ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : Math.max(0, ignitionLeft) / 20;
             case DeviceMenu.Forge.IGNITION_GFE -> (int) Math.min(Integer.MAX_VALUE, ignitionEnergy() / 1_000_000_000L);
-            case DeviceMenu.Forge.BATCH -> phase == IDLE ? (parallelUpgrade ? 4 : 1) : batchSize;
-            default -> 0;
+            case DeviceMenu.Forge.PHASE_TICK -> phaseTicks;
+            case DeviceMenu.Forge.IRRADIATE_FE -> energyPerTick;
+            case DeviceMenu.Forge.BATCH -> phase == IDLE ? parallelLimit() : batchSize;
+            default -> duration(i - DeviceMenu.Forge.FIRST_DURATION + PRIME);
         }, this);
     }
 
@@ -1253,7 +1340,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
 
         @Override
         public int getTankCapacity(int t) {
-            return TANK_CAPACITY;
+            return tank.getCapacity();
         }
 
         @Override
@@ -1413,6 +1500,7 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
         tag.putInt("phase_ticks", phaseTicks);
         tag.putInt("hold", hold);
         tag.putInt("energy_per_tick", energyPerTick);
+        tag.putDouble("phase_time_multiplier", phaseTimeMultiplier);
         tag.putInt("irradiate_ticks", irradiateTicks);
         tag.putInt("bh", bh);
         tag.putInt("ignition_elapsed", ignitionElapsed);
@@ -1453,10 +1541,11 @@ public class JetForgeBlockEntity extends io.github.genichimaruo.singulo.compat.L
         }
         phase = tag.getIntOr("phase", 0);
         parallelUpgrade = tag.getBooleanOr("parallel_upgrade", false);
-        batchSize = tag.contains("batch_size") ? Math.max(1, Math.min(4, tag.getIntOr("batch_size", 0))) : 1;
+        batchSize = tag.contains("batch_size") ? Math.max(1, tag.getIntOr("batch_size", 0)) : 1;
         phaseTicks = tag.getIntOr("phase_ticks", 0);
         hold = tag.getIntOr("hold", 0);
         energyPerTick = tag.getIntOr("energy_per_tick", 0);
+        phaseTimeMultiplier = tag.contains("phase_time_multiplier") ? tag.getDoubleOr("phase_time_multiplier", 0.0) : 1.0;
         irradiateTicks = tag.contains("irradiate_ticks") ? Math.max(1, tag.getIntOr("irradiate_ticks", 0)) : 1200;
         working = tag.contains("working") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("working")) : ItemStack.EMPTY;
         result = tag.contains("result") ? io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, tag.getCompoundOrEmpty("result")) : ItemStack.EMPTY;

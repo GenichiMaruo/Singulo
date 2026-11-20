@@ -7,12 +7,20 @@ import io.github.genichimaruo.singulo.machine.*;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.RuinDiscovery;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.*;
 import io.github.genichimaruo.singulo.test.harness.*;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
@@ -141,19 +149,24 @@ public final class BalanceRevisionGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "empty")
-    public static void smesUpgradePreservesChargeWithoutReturningTheConsumedCell(GameTestHelper h) {
+    private static CraftingInput smesUpgradeInput(ItemStack cell) {
         var stacks = net.minecraft.core.NonNullList.withSize(9, ItemStack.EMPTY);
         stacks.set(0, item("entangled_element")); stacks.set(2, item("entangled_element"));
         stacks.set(1, item("toroidal_magnetic_coil"));
         stacks.set(3, item("coolant_cartridge")); stacks.set(5, item("coolant_cartridge"));
-        stacks.set(4, item("smes_cell")); stacks.set(7, item("time_crystal_module"));
+        stacks.set(4, cell); stacks.set(7, item("time_crystal_module"));
+        return CraftingInput.of(3, 3, stacks);
+    }
+
+    @GameTest(template = "empty")
+    public static void smesUpgradePreservesChargeWithoutReturningTheConsumedCell(GameTestHelper h) {
+        var cell = item("smes_cell");
         var data = new net.minecraft.nbt.CompoundTag(); data.putInt("energy", 7_500_000);
-        stacks.get(4).set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(
+        cell.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(
                 io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SMES_CELL.get(), data));
         var recipe = h.getLevel().recipeAccess().recipeMap().byType(net.minecraft.world.item.crafting.RecipeType.CRAFTING)
                 .stream().filter(r -> r.id().identifier().equals(Singulo.id("crafting/smes_module_from_cell"))).findFirst().orElseThrow().value();
-        var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, stacks);
+        var input = smesUpgradeInput(cell);
         h.assertTrue(recipe instanceof io.github.genichimaruo.singulo.recipe.SmesUpgradeRecipe && recipe.matches(input, h.getLevel()),
                 "Upgrade was not decoded as a shaped charge-preserving recipe");
         var result = recipe.assemble(input);
@@ -162,8 +175,52 @@ public final class BalanceRevisionGameTests {
                 "Upgrade lost or multiplied stored charge");
         h.assertTrue(net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(result.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).type()).equals(Singulo.id("smes_module")), "Old block entity type was copied into a module");
         h.assertTrue(recipe.getRemainingItems(input).stream().noneMatch(s -> s.is(item("smes_cell").getItem())), "Consumed cell was returned");
-        h.assertTrue(stacks.get(4).get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId().getInt("energy").orElseThrow() == 7_500_000,
+        h.assertTrue(cell.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId().getInt("energy").orElseThrow() == 7_500_000,
                 "Recipe preview mutated the source item");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void upgradingPackedSmesRetainsBothChargingSlots(GameTestHelper h) {
+        var level = h.getLevel();
+        var from = new BlockPos(2, 1, 2);
+        var to = new BlockPos(5, 1, 2);
+        h.setBlock(from, SinguloBlocks.SMES_CELL.get());
+        SmesCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, from);
+        var charging = item("neutrino_scanner");
+        var charged = item("neutrino_scanner");
+        io.github.genichimaruo.singulo.item.NeutrinoScannerItem.energy(charging).receiveEnergy(175, false);
+        io.github.genichimaruo.singulo.item.NeutrinoScannerItem.energy(charged).receiveEnergy(Integer.MAX_VALUE, false);
+        cell.chargeSlots().setStackInSlot(SmesCellBlockEntity.CHARGE_IN, charging);
+        cell.chargeSlots().setStackInSlot(SmesCellBlockEntity.CHARGE_OUT, charged);
+        cell.energy().setEnergy(1_000_000);
+
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var wrench = item("relocation_wrench");
+        player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
+        player.setShiftKeyDown(true);
+        var pos = h.absolutePos(from);
+        var hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+        wrench.getItem().onItemUseFirst(wrench, new UseOnContext(player, InteractionHand.MAIN_HAND, hit));
+        var packed = player.getInventory().getNonEquipmentItems().stream().filter(s -> s.is(SinguloBlocks.SMES_CELL.get().asItem()))
+                .findFirst().orElseThrow();
+        var input = smesUpgradeInput(packed);
+        var recipe = level.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, level).orElseThrow().value();
+        var module = recipe.assemble(input);
+        h.assertTrue(module.is(SinguloBlocks.SMES_MODULE.get().asItem()) && module.getMaxStackSize() == 1,
+                "Expected one packed SMES module");
+        h.assertTrue(recipe.getRemainingItems(input).stream().allMatch(ItemStack::isEmpty), "Upgrade also returned the contents");
+        player.setShiftKeyDown(false);
+        player.setItemInHand(InteractionHand.MAIN_HAND, module);
+        var target = h.absolutePos(to);
+        var place = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
+        ((BlockItem) module.getItem()).place(new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, place)));
+        SmesCellBlockEntity restored = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, to);
+        h.assertTrue(restored.energy().getEnergyStored() == 1_000_000, "Packed cell lost stored energy");
+        h.assertTrue(ItemStack.matches(charging, restored.chargeSlots().getStackInSlot(SmesCellBlockEntity.CHARGE_IN))
+                        && ItemStack.matches(charged, restored.chargeSlots().getStackInSlot(SmesCellBlockEntity.CHARGE_OUT)),
+                "Charging slot items or their individual charges changed during upgrade");
         h.succeed();
     }
 
@@ -211,12 +268,14 @@ public final class BalanceRevisionGameTests {
     public static void reconstructedPartsAndPrimordialSeedKeepTheirUnlockInputs(GameTestHelper h) {
         var coreRecipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER).stream()
                 .filter(r -> r.id().identifier().equals(Singulo.id("precision_assembler/sentinel_core_reconstructed"))).findFirst().orElseThrow().value();
-        var parts = new java.util.ArrayList<ItemStack>(java.util.List.of(item("quantum_computing_module"),
-                item("optical_lattice_substrate").copyWithCount(2), item("meteoric_iron_ingot").copyWithCount(2)));
+        var parts = new java.util.ArrayList<ItemStack>();
+        for (var input : coreRecipe.ingredients()) {
+            if (input.uses() == 0) parts.add(input.ingredient().items().map(net.minecraft.world.item.ItemStack::new).toArray(net.minecraft.world.item.ItemStack[]::new)[0].copyWithCount(input.count()));
+        }
         h.assertTrue(coreRecipe.plan(parts) == null, "Reconstruction bypassed its BE unlock");
         parts.add(item("muon_catalyst"));
         h.assertTrue(coreRecipe.plan(parts) == null, "Muon catalyst bypassed its BE unlock");
-        parts.set(3, item("bose_condensate_catalyst"));
+        parts.set(parts.size() - 1, item("bose_condensate_catalyst"));
         h.assertTrue(coreRecipe.plan(parts) != null, "Reconstruction remains blocked after BE unlock");
         var seedRecipe = MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.SINGULARITY_ENCAPSULATOR).stream()
                 .filter(r -> r.id().identifier().equals(Singulo.id("singularity_encapsulator/primordial_seed"))).findFirst().orElseThrow().value();

@@ -4,14 +4,15 @@
   "pattern": [
     "GQG",
     "RNR",
-    "MQM"
+    "MFM"
   ],
   "key": {
     "G": "singulo:gravity_field_stabilizer",
     "Q": "singulo:quantum_computing_module",
     "R": "singulo:confinement_ring",
     "N": "singulo:nihonium_frame",
-    "M": "singulo:time_crystal_module"
+    "M": "singulo:time_crystal_module",
+    "F": "singulo:jet_forge_foundation"
   },
   "result": {
     "id": "singulo:jet_forge_core",

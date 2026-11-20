@@ -363,13 +363,13 @@ public final class BugFix0111GameTests {
         });
     }
 
-    /** アンドロイドが精密組立台に入れるときは、アンドロイドの作りたいレシピが指定される（材料の一部が別のレシピと同じでも）。 */
+    /** まとめて材料を受ける特異点封入台では、アンドロイドが注文の製品を指定する。 */
     @GameTest(template = EMPTY)
     public static void androidChoosesItsRecipe(GameTestHelper helper) {
-        helper.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
+        helper.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
         MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper,new BlockPos(1, 1, 1));
-        m.selectFor(item("tipler_bearing"), List.of(item("steel_plate"), item("superconducting_coil")));
-        helper.assertTrue(m.selectedRecipe() != null && m.selectedRecipe().getPath().equals("precision_assembler/tipler_bearing"),
+        m.selectFor(item("artificial_star_core"), List.of(item("jet_condensate"), item("compressed_metal_block_2"), item("stardust")));
+        helper.assertTrue(m.selectedRecipe() != null && m.selectedRecipe().getPath().equals("singularity_encapsulator/artificial_star_core"),
                 "アンドロイドのレシピが指定されない: " + m.selectedRecipe());
         helper.succeed();
     }

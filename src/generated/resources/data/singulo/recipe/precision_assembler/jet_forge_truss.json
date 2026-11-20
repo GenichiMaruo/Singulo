@@ -14,10 +14,21 @@
       "count": 1
     },
     {
+      "ingredient": "singulo:basic_frame",
+      "count": 1
+    },
+    {
       "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " ACA ",
+    "  A  ",
+    "     "
   ],
   "result": {
     "id": "singulo:jet_forge_truss",

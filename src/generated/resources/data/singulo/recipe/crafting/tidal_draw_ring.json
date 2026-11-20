@@ -3,12 +3,13 @@
   "category": "misc",
   "pattern": [
     "PCP",
-    "C C",
+    "CFC",
     "PCP"
   ],
   "key": {
     "P": "singulo:nihonium_plate",
-    "C": "singulo:superconducting_coil"
+    "C": "singulo:superconducting_coil",
+    "F": "singulo:cosmic_frame"
   },
   "result": {
     "id": "singulo:tidal_draw_ring",

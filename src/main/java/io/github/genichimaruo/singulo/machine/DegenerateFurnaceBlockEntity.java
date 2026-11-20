@@ -127,12 +127,11 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
                         0.9F + level.getRandom().nextFloat() * 0.2F);
             }
             burn--;
-            output = (int) Math.min(Integer.MAX_VALUE, Math.round(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()
+            output = energy.generateRate(energy.prepareGeneration(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()
                     * CatalystHelper.generatorOutput(MACHINE_TIER, catalyst(), effect)
                     * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get()));
-            energy.generate(output);
         }
-        pushEnergy(level, PUSH_PER_TICK);
+        pushEnergy(level, energy.exportLimit());
     }
 
     @Override

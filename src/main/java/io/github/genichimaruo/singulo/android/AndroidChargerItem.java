@@ -1,5 +1,8 @@
 package io.github.genichimaruo.singulo.android;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.data.PackBalance;
+
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -40,13 +43,16 @@ public class AndroidChargerItem extends io.github.genichimaruo.singulo.compat.Le
 
     /** プレイヤーの持ち物の中で、電力の残っている充電器（なければ空）。 */
     public static ItemStack find(Player player) {
+        int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
+        if (rate == 0) return ItemStack.EMPTY;
+        long minEnergy = Math.ceilDiv((long) RuinAndroid.CHARGER_FE_PER_TICK, rate);
         for (ItemStack s : player.getInventory().getNonEquipmentItems()) {
-            if (s.getItem() instanceof AndroidChargerItem && energy(s).getEnergyStored() > 0) {
+            if (s.getItem() instanceof AndroidChargerItem && energy(s).getEnergyStored() >= minEnergy) {
                 return s;
             }
         }
         ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof AndroidChargerItem && energy(off).getEnergyStored() > 0) {
+        if (off.getItem() instanceof AndroidChargerItem && energy(off).getEnergyStored() >= minEnergy) {
             return off;
         }
         return ItemStack.EMPTY;
@@ -97,6 +103,9 @@ public class AndroidChargerItem extends io.github.genichimaruo.singulo.compat.Le
         if (io.github.genichimaruo.singulo.energy.EnergyText.abbreviated(CAPACITY)) {
             tooltip.add(io.github.genichimaruo.singulo.energy.EnergyText.hint());
         }
-        tooltip.add(Component.translatable("tooltip.singulo.android_charger.charges", stored / PER_ANDROID).withStyle(ChatFormatting.AQUA));
+        int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
+        long perCharge = rate == 0 ? Long.MAX_VALUE : Math.ceilDiv((long) PackBalance.value(ServerConfig.ANDROID_BATTERY_CAPACITY), rate)
+                * RuinAndroid.CHARGER_FE_PER_TICK;
+        tooltip.add(Component.translatable("tooltip.singulo.android_charger.charges", stored / perCharge).withStyle(ChatFormatting.AQUA));
     }
 }

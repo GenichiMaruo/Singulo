@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.client;
 
+import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.energy.EnergyText;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.item.UsesData;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
@@ -27,6 +29,8 @@ public final class SinguloClient {
 
     public SinguloClient(IEventBus modBus) {
         modBus.addListener(SinguloClient::registerScreens);
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent event) ->
+                event.register(MachineScreen.AssemblyPreview.class, preview -> preview));
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
         modBus.addListener(SinguloClient::registerBlockColors);
@@ -41,6 +45,8 @@ public final class SinguloClient {
         modBus.addListener(JetForgeRenderTypes::registerPipelines);
         modBus.addListener(EffectRenderTypes::register);
         modBus.addListener(GlowDepth::registerShaders);
+        modBus.addListener(WeaponTransparency::registerShaders);
+        modBus.addListener(AndroidWeaponLight::register);
         modBus.addListener(JetForgeRenderer::registerModels);
         modBus.addListener(FluidCapsuleRenderer::registerModels);
         modBus.addListener(CoverModel::wrap);
@@ -70,7 +76,7 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(ArsenalNotice::onClientTick);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
             ClientRecipes.clear();
-            ClientGalaxies.set(java.util.List.of(), false);
+            ClientGalaxies.set(java.util.List.of(), java.util.List.of(), false);
             ClientRecords.set(java.util.List.of());
             clearWorldState();
         });
@@ -94,6 +100,7 @@ public final class SinguloClient {
     }
 
     static void clearWorldState() {
+        WeaponTransparency.clear();
         ShapeCache.clear();
         HologramRenderer.clear();
         NeutrinoOverlay.clear();
@@ -158,6 +165,7 @@ public final class SinguloClient {
                 SlidingDoorRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.CARGO_DRONE.get(), CargoDroneRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.PORTABLE_PRINTER.get(), PortablePrinterRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DRONE_PORT.get(),
                 DronePortRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FLUID_DRONE_PORT.get(),
@@ -247,6 +255,7 @@ public final class SinguloClient {
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityDroneRenderer.LAYER, SecurityDroneRenderer::createLayer);
         event.registerLayerDefinition(CargoDroneRenderer.LAYER, CargoDroneRenderer::createLayer);
+        event.registerLayerDefinition(PortablePrinterRenderer.LAYER, PortablePrinterRenderer::createLayer);
         event.registerLayerDefinition(CargoDroneRenderer.JET_LAYER, CargoDroneRenderer::createJetLayer);
         event.registerLayerDefinition(CargoDroneRenderer.GRAVITY_LAYER, CargoDroneRenderer::createGravityLayer);
         event.registerLayerDefinition(AndroidModel.BLADE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BLADE));
@@ -260,6 +269,7 @@ public final class SinguloClient {
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(SinguloMenus.COSMIC.get(), CosmicScreen::new);
+        event.register(SinguloMenus.PORTABLE_PRINTER.get(), PortablePrinterScreen::new);
         event.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
         event.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
         event.register(SinguloMenus.GENERATOR_SLOTS.get(), GeneratorSlotsScreen::new);
@@ -346,7 +356,27 @@ public final class SinguloClient {
         boolean hasUses = net.minecraft.client.resources.language.I18n.exists("uses.singulo." + id.getPath());
         boolean detailed = net.minecraft.client.Minecraft.getInstance().hasShiftDown();
         java.util.List<Component> tip = event.getToolTip();
-        tip.add(Component.translatable(hasSummary && !detailed ? summary : key).withStyle(ChatFormatting.GRAY));
+        tip.add((hasSummary && !detailed ? Component.translatable(summary) : itemDescription(event.getItemStack().getItem(), key))
+                .withStyle(ChatFormatting.GRAY));
+        if (ServerConfig.SPEC.isLoaded()) {
+            Component limits = switch (id.getPath()) {
+                case "android_tank_upgrade", "android_gas_tank_upgrade", "android_dual_tank_upgrade" ->
+                        Component.translatable("tooltip.singulo.tank_room", EnergyText.of((long) (id.getPath().equals("android_dual_tank_upgrade")
+                                ? ServerConfig.ANDROID_DUAL_TANK_CAPACITY : ServerConfig.ANDROID_TANK_CAPACITY).get()));
+                case "packing_crate", "battery_packing_crate", "large_battery_packing_crate" ->
+                        Component.translatable("tooltip.singulo.cargo_slots", ServerConfig.CARGO_STACKS_PER_FLIGHT.get());
+                case "assembly_stock_upgrade" -> Component.translatable("tooltip.singulo.stock_limits",
+                        ServerConfig.STOCK_UPGRADE_LIMIT.get(),
+                        EnergyText.of(ServerConfig.EXTRA_STACKS_PER_UPGRADE.get().longValue()));
+                case "overclock_chip" -> Component.translatable("tooltip.singulo.overclock_rates",
+                        EnergyText.of(ServerConfig.OVERCLOCK_SPEED_MULTIPLIER.get()),
+                        EnergyText.of(ServerConfig.OVERCLOCK_POWER_MULTIPLIER.get()));
+                case "collapsar_parallel_cassette" -> Component.translatable("tooltip.singulo.parallel_limit",
+                        EnergyText.of(ServerConfig.PARALLEL_BATCH_LIMIT.get().longValue()));
+                default -> null;
+            };
+            if (limits != null) tip.add(limits.copy().withStyle(ChatFormatting.AQUA));
+        }
         if (detailed) {
             for (String k : new String[]{"howto", "uses"}) {
                 String full = k + ".singulo." + id.getPath();
@@ -359,6 +389,19 @@ public final class SinguloClient {
         }
     }
 
+    public static net.minecraft.network.chat.MutableComponent itemDescription(net.minecraft.world.item.Item item, String key) {
+        var description = Component.translatable(key);
+        boolean configurable = item instanceof io.github.genichimaruo.singulo.drone.DroneCrateItem
+                || item instanceof net.minecraft.world.item.BlockItem block
+                && (block.getBlock() instanceof io.github.genichimaruo.singulo.cable.CableBlock
+                    || block.getBlock() instanceof io.github.genichimaruo.singulo.pipe.FluidPipeBlock)
+                || switch (net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item).getPath()) {
+                    case "android_tank_upgrade", "android_gas_tank_upgrade", "android_dual_tank_upgrade" -> true;
+                    default -> false;
+                };
+        return configurable ? Component.translatable("tooltip.singulo.default_description", description) : description;
+    }
+
     /** 画面端で幅が狭くなる場合も、全文から一度だけ折り返す。 */
     private static void sizeTooltip(net.neoforged.neoforge.client.event.RenderTooltipEvent.GatherComponents event) {
         var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
@@ -369,6 +412,7 @@ public final class SinguloClient {
     }
 
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
+        event.registerBlock(new FluidPumpParticles(), io.github.genichimaruo.singulo.registry.SinguloBlocks.FLUID_PUMP.get());
         // 液体カプセル: 立体の殻の中に、詰めた液体を描く
         event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
             @Override

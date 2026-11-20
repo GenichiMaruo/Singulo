@@ -14,10 +14,21 @@
       "count": 2
     },
     {
+      "ingredient": "singulo:shield_tower_plinth",
+      "count": 1
+    },
+    {
       "ingredient": "singulo:time_crystal_catalyst",
       "tier": 4,
       "uses": 1125
     }
+  ],
+  "shape": [
+    "     ",
+    "  A  ",
+    " BCB ",
+    "  A  ",
+    "     "
   ],
   "result": {
     "id": "singulo:shield_tower_coil",

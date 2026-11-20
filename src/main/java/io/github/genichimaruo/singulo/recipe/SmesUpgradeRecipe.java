@@ -8,13 +8,14 @@ import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
-/** A normal shaped upgrade that transfers only the single consumed cell's stored energy. */
+/** A shaped upgrade that carries the consumed cell's energy and charging inventory into the module. */
 public final class SmesUpgradeRecipe extends NormalCraftingRecipe {
     private final ShapedRecipe delegate;
     private SmesUpgradeRecipe(ShapedRecipe recipe) {
@@ -36,9 +37,14 @@ public final class SmesUpgradeRecipe extends NormalCraftingRecipe {
         if (cell.isEmpty()) return ItemStack.EMPTY;
         var data = cell.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null) {
+            var source = data.copyTagWithoutId();
             var tag = new CompoundTag();
-            tag.putInt("energy", Math.clamp(data.copyTagWithoutId().getIntOr("energy", 0), 0, SmesCellBlockEntity.CAPACITY));
-            result.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(SinguloBlockEntities.SMES_MODULE.get(), tag));
+            tag.putInt("energy", Math.clamp(source.getIntOr("energy", 0), 0, SmesCellBlockEntity.CAPACITY));
+            if (source.contains("charge")) {
+            tag.put("charge", source.getCompoundOrEmpty("charge"));
+            result.set(DataComponents.MAX_STACK_SIZE, 1);
+        }
+        result.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(SinguloBlockEntities.SMES_MODULE.get(), tag));
         }
         return result;
     }

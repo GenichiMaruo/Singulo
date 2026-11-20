@@ -53,6 +53,10 @@ public class CosmicMuonCollectorBlockEntity extends io.github.genichimaruo.singu
         return output;
     }
 
+    public int remainingTicks() {
+        return rate <= 0 ? -1 : (int) Math.ceil(Math.max(0, 1 - progress) * TICKS_PER_BUNDLE_AT_MAX / rate);
+    }
+
     /** 高さと空の見え方から、最大に対する収集の割合（0〜1）。 */
     public static double rateAt(Level level, BlockPos pos) {
         if (!level.canSeeSky(pos.above())) {

@@ -4,12 +4,13 @@
   "pattern": [
     "NPN",
     "PCP",
-    "NPN"
+    "NFN"
   ],
   "key": {
     "N": "singulo:nihonium_plate",
     "P": "#c:plates/steel",
-    "C": "singulo:collapsar_ingot"
+    "C": "singulo:collapsar_ingot",
+    "F": "singulo:nihonium_frame"
   },
   "result": {
     "id": "singulo:collapsar_lining",

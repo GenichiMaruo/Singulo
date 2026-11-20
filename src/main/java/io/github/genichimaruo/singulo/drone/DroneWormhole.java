@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -43,18 +44,9 @@ public final class DroneWormhole {
     public static List<Route> routes(ServerLevel level, @Nullable UUID owner, BlockPos from, boolean fluid) {
         Map<String, Route> best = new LinkedHashMap<>();
         for (WormholeMouthBlockEntity here : WormholeMouthBlockEntity.loaded(level)) {
-            if (here.isRemoved() || !here.droneGate()) {
-                continue;
-            }
-            // 向こうの口は読み込まれていなくてもよい（ほかの次元は、プレイヤーがいなければふつう読み込まれていない）。
-            // 読み込まれていれば標識を確かめ、いなければ、くぐるときに読み込ませて確かめる
-            net.minecraft.core.GlobalPos far = here.partnerPos();
+            GlobalPos far = remoteGate(level, here);
             ServerLevel other = far == null ? null : level.getServer().getLevel(far.dimension());
-            if (other == null || other.dimension().equals(level.dimension())) {
-                continue;
-            }
-            WormholeMouthBlockEntity there = here.partner();
-            if (there != null && !there.droneGate()) {
+            if (other == null) {
                 continue;
             }
             BlockPos mouthThere = far.pos();
@@ -76,15 +68,32 @@ public final class DroneWormhole {
         return out;
     }
 
+    @Nullable
+    private static GlobalPos remoteGate(ServerLevel level, WormholeMouthBlockEntity here) {
+        GlobalPos far = here.partnerPos();
+        if (far == null || far.dimension().equals(level.dimension()) || here.isRemoved() || !here.droneGate()) return null;
+        // A sleeping partner is checked when the drone crosses. Looking up the route must not wake it.
+        WormholeMouthBlockEntity there = here.partner();
+        return there == null || there.droneGate() ? far : null;
+    }
+
     /** dim の to への、いちばん近い道（なければ null）。 */
     @Nullable
     public static Route route(ServerLevel level, @Nullable UUID owner, BlockPos from, ResourceKey<Level> dim, BlockPos to, boolean fluid) {
-        for (Route r : routes(level, owner, from, fluid)) {
-            if (r.dim().equals(dim) && r.to().equals(to)) {
-                return r;
+        ServerLevel other = level.getServer().getLevel(dim);
+        if (other == null || other == level) return null;
+        DroneNetwork.Port port = DroneNetwork.get(other).port(to);
+        if (port == null || !port.accepts(owner, fluid)) return null;
+        Route best = null;
+        for (WormholeMouthBlockEntity here : WormholeMouthBlockEntity.loaded(level)) {
+            GlobalPos far = remoteGate(level, here);
+            if (far == null || !far.dimension().equals(dim) || far.pos().equals(to)) continue;
+            int distance = (int) Math.ceil(Math.sqrt(from.distSqr(here.getBlockPos())) + Math.sqrt(far.pos().distSqr(to)));
+            if (best == null || distance < best.distance()) {
+                best = new Route(to.immutable(), dim, here.getBlockPos().immutable(), far.pos().immutable(), distance, port.name());
             }
         }
-        return null;
+        return best;
     }
 
     // ------------------------------------------------------------------ 同じ次元の近道
@@ -191,7 +200,8 @@ public final class DroneWormhole {
                 return true;
             }
             DroneNetwork far = DroneNetwork.get(other);
-            if (far.port(f.relayTo) == null) {
+            DroneNetwork.Port target = far.port(f.relayTo);
+            if (target == null || !target.accepts(f.owner, DroneCrateItem.isFluid(f.crate))) {
                 turnBack(net, f, now);
                 return true;
             }

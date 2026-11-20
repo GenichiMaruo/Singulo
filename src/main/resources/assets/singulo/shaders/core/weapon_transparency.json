@@ -1,0 +1,11 @@
+{
+    "vertex": "singulo:weapon_transparency",
+    "fragment": "singulo:weapon_transparency",
+    "samplers": [
+        { "name": "WeaponColor" },
+        { "name": "WeaponDepth" },
+        { "name": "TerrainColor" },
+        { "name": "TerrainDepth" }
+    ],
+    "uniforms": []
+}

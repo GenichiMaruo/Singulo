@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.compat.mekanism;
 
+import com.google.common.math.LongMath;
 import io.github.genichimaruo.singulo.android.work.Chemicals;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,7 +54,7 @@ public final class MekanismChemicals implements Chemicals.Access {
                 for (int t = 0; c != null && t < h.getChemicalTanks(); t++) {
                     ChemicalStack s = h.getChemicalInTank(t);
                     if (!s.isEmpty() && s.getChemical() == c) {
-                        n += s.getAmount();
+                        n = LongMath.saturatedAdd(n, s.getAmount());
                     }
                 }
                 return n;
@@ -84,7 +85,7 @@ public final class MekanismChemicals implements Chemicals.Access {
                 for (int t = 0; t < h.getChemicalTanks(); t++) {
                     ChemicalStack s = h.getChemicalInTank(t);
                     if (!s.isEmpty()) {
-                        out.merge(id(s.getChemical()), s.getAmount(), Long::sum);
+                        out.merge(id(s.getChemical()), s.getAmount(), LongMath::saturatedAdd);
                     }
                 }
                 return out;

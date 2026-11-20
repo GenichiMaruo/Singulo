@@ -4,12 +4,13 @@
   "pattern": [
     " P ",
     "CAC",
-    " P "
+    " F "
   ],
   "key": {
     "P": "#c:plates/steel",
     "C": "#c:ingots/copper",
-    "A": "minecraft:blue_ice"
+    "A": "minecraft:blue_ice",
+    "F": "singulo:cooling_tower_base"
   },
   "result": {
     "id": "singulo:cooling_tower_heat_exchange_core",

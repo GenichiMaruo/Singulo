@@ -30,10 +30,25 @@
       "count": 1
     },
     {
+      "ingredient": "#c:ender_pearls",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:android_backpack_upgrade",
+      "count": 1
+    },
+    {
       "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 36000
     }
+  ],
+  "shape": [
+    "  E  ",
+    " DFD ",
+    "GCACG",
+    " DBD ",
+    "  H  "
   ],
   "result": {
     "id": "singulo:probe_station",

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +13,10 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-/** 創世炉が生んだ銀河（ワールドに保存）。オーバーワールドの夜空に昇る。 */
+/**
+ * 創世炉が生んだ銀河（ワールドに保存）。オーバーワールドの夜空に昇る。銀河ごとに種と性質（{@link GalaxyTraits}。0.21.0）を持つ。
+ * 性質は種と同じ並びの別の配列に保存する（それまでの版の保存には性質がないので、みな 0 = 渦巻・色は種まかせとして読む）。
+ */
 public class GenesisGalaxies extends SavedData {
     private static final net.minecraft.world.level.saveddata.SavedDataType<GenesisGalaxies> TYPE =
         io.github.genichimaruo.singulo.compat.LegacySavedDataTypes.create("singulo_galaxies", GenesisGalaxies::new, GenesisGalaxies::load, GenesisGalaxies::save);
@@ -22,6 +26,7 @@ public class GenesisGalaxies extends SavedData {
     public static final int MAX = 8;
 
     private final List<Long> seeds = new ArrayList<>();
+    private final List<Integer> traits = new ArrayList<>();
 
     public static GenesisGalaxies get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(
@@ -32,36 +37,50 @@ public class GenesisGalaxies extends SavedData {
         return List.copyOf(seeds);
     }
 
+    public List<Integer> traits() {
+        return List.copyOf(traits);
+    }
+
     /** 銀河を加え、全員に知らせる（新しい銀河は夜空にゆっくり現れる）。 */
-    public static void add(MinecraftServer server, long seed) {
+    public static void add(MinecraftServer server, long seed, int galaxyTraits) {
         GenesisGalaxies data = get(server);
         if (!data.seeds.contains(seed)) {
             data.seeds.add(seed);
+            data.traits.add(galaxyTraits);
             while (data.seeds.size() > MAX) {
                 data.seeds.remove(0);
+                data.traits.remove(0);
             }
             data.setDirty();
         }
-        PacketDistributor.sendToAllPlayers(new GalaxyPayload(data.seeds(), true));
+        PacketDistributor.sendToAllPlayers(data.payload(true));
+    }
+
+    private GalaxyPayload payload(boolean fresh) {
+        return new GalaxyPayload(seeds(), traits(), fresh);
     }
 
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && player.level().getServer() != null
                 && player.connection != null && player.connection.hasChannel(GalaxyPayload.TYPE)) {
-            PacketDistributor.sendToPlayer(player, new GalaxyPayload(get(player.level().getServer()).seeds(), false));
+            PacketDistributor.sendToPlayer(player, get(player.level().getServer()).payload(false));
         }
     }
 
     private static GenesisGalaxies load(CompoundTag tag, HolderLookup.Provider registries) {
         GenesisGalaxies data = new GenesisGalaxies();
-        for (long s : tag.getLongArray("seeds").orElseGet(() -> new long[0])) {
-            data.seeds.add(s);
+        long[] s = tag.getLongArray("seeds").orElseGet(() -> new long[0]);
+        int[] t = tag.getIntArray("traits").orElseGet(() -> new int[0]);
+        for (int i = 0; i < s.length; i++) {
+            data.seeds.add(s[i]);
+            data.traits.add(i < t.length ? t[i] : 0);
         }
         return data;
     }
 
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         tag.put("seeds", new LongArrayTag(seeds.stream().mapToLong(Long::longValue).toArray()));
+        tag.put("traits", new IntArrayTag(traits.stream().mapToInt(Integer::intValue).toArray()));
         return tag;
     }
 }

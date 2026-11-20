@@ -2,13 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
+    " F ",
     "POP",
     " M "
   ],
   "key": {
     "P": "#c:plates/steel",
     "O": "singulo:superconducting_coil",
-    "M": "singulo:meteoric_iron_ingot"
+    "M": "singulo:meteoric_iron_ingot",
+    "F": "singulo:basic_frame"
   },
   "result": {
     "id": "singulo:accelerator_focusing_magnet",

@@ -67,11 +67,23 @@ public final class AndroidRecipeApiGameTests {
         var snapshot = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID());
         h.assertTrue(snapshot.recipes().size() == 1, "Linked recipe missing");
         var recipe = snapshot.recipes().get(0);
-        h.assertTrue(recipe.outputs().size() == 2 && recipe.outputs().get(0).count() == 2, "Output counts lost");
+        h.assertTrue(recipe.outputs().size() == 2 && recipe.outputs().get(0).count() == 2
+                && recipe.outputs().get(0).guaranteed() && !recipe.outputs().get(1).guaranteed(), "Output counts or guarantees lost");
         h.assertTrue(recipe.materials().size() == 2 && recipe.materials().get(0).count() == 2
                 && recipe.materials().get(1).fuel() && recipe.materials().get(1).count() == 3, "Material/fuel semantics lost");
         recipe.outputs().get(0).sample().setCount(60);
         h.assertTrue(AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(0).outputs().get(0).count() == 2,
                 "Snapshot mutation changed source");
+        var pattern = h.getLevel().recipeAccess().byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, io.github.genichimaruo.singulo.Singulo.id(
+                "archive_terminal/data_card_observation_log"))).orElseThrow();
+        c.setMachineProcess((io.github.genichimaruo.singulo.recipe.MachineRecipe) pattern.value(), List.of());
+        c.encoder().setItem(WorkConsoleBlockEntity.CARD, card.copy());
+        h.assertTrue(c.encode(), "Cannot record an archive card");
+        rack.items().setStackInSlot(2, c.encoder().getItem(WorkConsoleBlockEntity.CARD).copy());
+        var archive = AndroidOrders.recipes(h.getLevel(), c.getBlockPos(), player.getUUID()).recipes().get(1);
+        var log = registry.getValue(io.github.genichimaruo.singulo.Singulo.id("observation_log"));
+        h.assertTrue(archive.materials().stream().anyMatch(material -> material.sample().is(log) && material.count() == 1
+                        && material.toolUsesPerCraft() > 0),
+                "Missing reusable original from the recipe snapshot");
         h.succeed();
     }}

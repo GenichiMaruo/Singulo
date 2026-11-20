@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB"
+  ],
+  "key": {
+    "B": "singulo:android_gate_glass"
+  },
+  "result": {
+    "id": "singulo:android_gate_glass_slab",
+    "count": 6
+  }
+}

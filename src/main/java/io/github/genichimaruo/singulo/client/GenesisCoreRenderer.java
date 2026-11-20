@@ -33,6 +33,17 @@ import org.joml.Vector3f;
 public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockEntity> {
     static final int PALE = 0xFFF2D8, GOLD = 0xFFD27A, BLUE = 0x8FD0FF, VIOLET = 0xB48CFF, RED = 0xFF3A2A, AQUA = 0x7FFFF0;
     private static final float Y = (float) GenesisCoreBlockEntity.LENS_Y;
+    /**
+     * 空間の歪みが及ぶ球の半径の上限（ブロック）。宇宙は柱の上端（核から4ブロック）のすぐ上にあり、柱の上の角まで約2.45ブロック。
+     * これより広げると、歪みが柱と枠を飲み込んで見える。
+     */
+    private static final float LENS_REGION = 2.4F;
+
+    /** 宇宙のまわりの歪み。大きさは柱に届かないところまでに抑える。 */
+    private static void lens(Vec3 at, float radius, float strength) {
+        float r = Math.min(radius, LENS_REGION / 1.2F);
+        GravitationalLensing.add(at, r, strength, Math.min(LENS_REGION, r * 2.5F));
+    }
     /** 柱の先（核の中心から）。 */
     private static final Vec3[] TOPS = {new Vec3(2, 4.05, 2), new Vec3(-2, 4.05, 2), new Vec3(2, 4.05, -2), new Vec3(-2, 4.05, -2)};
 
@@ -96,7 +107,7 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
             }
             FxDraw.gyroRings(pose, vc, 0.8F + 1.4F * c, 0.04F + 0.03F * c, time * (1 + 3 * c), GOLD, 110 + (int) (90 * c));
         });
-        GravitationalLensing.add(be.lens(), 0.6F + 1.2F * c, 0.12F + 0.25F * c);
+        lens(be.lens(), 0.6F + 1.2F * c, 0.12F + 0.25F * c);
     }
 
     private void stabilizing(GenesisCoreBlockEntity be, PoseStack pose, MultiBufferSource buffers, Quaternionf camera, float time) {
@@ -122,10 +133,10 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
         // 外の光の殻と、中で渦を巻く生まれかけの宇宙
         FxDraw.billboard(pose, vc, camera, 5.0F + 1.5F * p, tone, (int) (60 * calm));
         Quaternionf tilt = new Quaternionf().rotationX(0.35F).rotateY(time * 0.002F);
-        GalaxyDraw.glow(pose, vc, camera, tilt, seed, 1.0F + 1.3F * p, 0.6F * calm, 0.5F - 0.4F * p, false);
+        GalaxyDraw.glow(pose, vc, camera, tilt, seed, be.galaxyTraits(), 1.0F + 1.3F * p, 0.6F * calm, 0.5F - 0.4F * p, false);
         Vector3f right = camera.transform(new Vector3f(1, 0, 0));
         Vector3f up = camera.transform(new Vector3f(0, 1, 0));
-        GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, 1.0F + 1.3F * p, time * (raging ? 0.09F : 0.03F),
+        GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, be.galaxyTraits(), 1.0F + 1.3F * p, time * (raging ? 0.09F : 0.03F),
                 0.55F + 0.45F * p * calm, time, 0.5F - 0.4F * p, false);
         FxDraw.billboard(pose, vc, camera, 0.8F, 0xFFFFFF, 220);
         FxDraw.gyroRings(pose, vc, 2.7F, 0.05F, time * (raging ? 4 : 1), tone, (int) (120 * calm));
@@ -155,7 +166,7 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
                 });
             }
         }
-        GravitationalLensing.add(be.lens(), 2.0F + 1.0F * p, 0.3F + 0.2F * p + 0.3F * ins);
+        lens(be.lens(), 1.2F + 0.6F * p, 0.3F + 0.2F * p + 0.3F * ins);
     }
 
     /** 誕生の演出（サーバーの GenesisCoreBlockEntity#tickBirth と同じ時刻で）。 */
@@ -175,8 +186,9 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
             pose.pushPose();
             pose.translate(0, Y, 0);
             Quaternionf tilt = new Quaternionf().rotationX(0.35F);
-            GalaxyDraw.glow(pose, vc, camera, tilt, protoSeed, 2.3F * shrink, 0.8F, k, false);
-            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, protoSeed, 2.3F * shrink, time * 0.03F + k * k * k * 30, 1F, time, k, false);
+            GalaxyDraw.glow(pose, vc, camera, tilt, protoSeed, be.galaxyTraits(), 2.3F * shrink, 0.8F, k, false);
+            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, protoSeed, be.galaxyTraits(), 2.3F * shrink, time * 0.03F + k * k * k * 30, 1F,
+                    time, k, false);
             FxDraw.billboard(pose, vc, camera, 1.0F + 2.0F * k, 0xFFFFFF, 255);
             for (int i = 0; i < 28; i++) {
                 float f = (time * 0.025F + i * 0.618F) % 1F;
@@ -190,13 +202,13 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
                 pose.popPose();
             }
             pose.popPose();
-            GravitationalLensing.add(lens, 1 + 3 * (1 - k), 0.5F + 0.5F * k);
+            lens(lens, 1 + 3 * (1 - k), 0.5F + 0.5F * k);
             return;
         }
         if (t < GenesisCoreBlockEntity.BIRTH_BANG) {
             // 静寂: 何も見えない一点（空間だけがゆがむ）
             at(pose, Y, () -> FxDraw.billboard(pose, vc, camera, 0.12F, 0xFFFFFF, 255));
-            GravitationalLensing.add(lens, 1.4F, 1.0F);
+            lens(lens, 1.4F, 1.0F);
             return;
         }
         float b = t - GenesisCoreBlockEntity.BIRTH_BANG;
@@ -231,11 +243,11 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
         float finalRadius = radius;
         float finalBright = bright;
         at(pose, Y + finalRise, () -> {
-            GalaxyDraw.glow(pose, vc, camera, tilt, seed, finalRadius, finalBright, heat, false);
-            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, finalRadius, spin, finalBright, time, heat, false);
+            GalaxyDraw.glow(pose, vc, camera, tilt, seed, be.galaxyTraits(), finalRadius, finalBright, heat, false);
+            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, be.galaxyTraits(), finalRadius, spin, finalBright, time, heat, false);
         });
         if (b < span) {
-            GravitationalLensing.add(lens, 1 + radius * 0.4F, 0.4F * (1 - g));
+            lens(lens, 1 + radius * 0.4F, 0.4F * (1 - g));
         }
         // 空へ送り出したあと、核の上に小さな銀河が灯る
         if (t > 480) {
@@ -295,10 +307,10 @@ public class GenesisCoreRenderer extends SnapshotBlockRenderer<GenesisCoreBlockE
         Quaternionf tilt = new Quaternionf().rotationX(0.3F);
         float radius = 2.4F * (0.6F + 0.4F * k);
         at(pose, Y, () -> {
-            GalaxyDraw.glow(pose, vc, camera, tilt, seed, radius, 0.8F * k, 0, false);
-            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, radius, time * 0.004F, 0.95F * k, time, 0, false);
+            GalaxyDraw.glow(pose, vc, camera, tilt, seed, be.galaxyTraits(), radius, 0.8F * k, 0, false);
+            GalaxyDraw.draw(pose.last(), vc, right, up, tilt, seed, be.galaxyTraits(), radius, time * 0.004F, 0.95F * k, time, 0, false);
         });
-        GravitationalLensing.add(be.lens(), 1.2F, 0.18F * k);
+        lens(be.lens(), 1.2F, 0.18F * k);
     }
 
     /** 柱の先から宇宙へ注ぐ光。flow が 0 でなければ、光の粒がその速さで流れ込む。 */

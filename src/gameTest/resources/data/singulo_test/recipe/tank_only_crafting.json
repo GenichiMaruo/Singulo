@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": ["minecraft:lava_bucket"],
+  "result": { "id": "minecraft:magma_block" }
+}

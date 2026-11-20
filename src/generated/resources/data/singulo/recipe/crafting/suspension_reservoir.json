@@ -10,7 +10,7 @@
     "C": "singulo:superconducting_coil",
     "Q": "singulo:entangled_element",
     "G": "singulo:zero_gravity_block",
-    "F": "singulo:nihonium_frame"
+    "F": "singulo:cosmic_frame"
   },
   "result": {
     "id": "singulo:suspension_reservoir",

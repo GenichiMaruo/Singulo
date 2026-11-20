@@ -32,7 +32,7 @@ public class TransactionalFluidTank extends FluidTank implements ResourceHandler
     @Override public FluidResource getResource(int index) { checkIndex(index); return FluidResource.of(fluid); }
     @Override public long getAmountAsLong(int index) { checkIndex(index); return fluid.getAmount(); }
     @Override public long getCapacityAsLong(int index, FluidResource resource) {
-        checkIndex(index); return resource.isEmpty() || isValid(index, resource) ? capacity : 0;
+        checkIndex(index); return resource.isEmpty() || isValid(index, resource) ? getCapacity() : 0;
     }
     @Override public boolean isValid(int index, FluidResource resource) {
         checkIndex(index); return !resource.isEmpty() && isFluidValid(resource.toStack(1));
@@ -40,7 +40,7 @@ public class TransactionalFluidTank extends FluidTank implements ResourceHandler
     @Override public int insert(int index, FluidResource resource, int amount, TransactionContext tx) {
         checkIndex(index); TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         if (!isValid(index, resource) || (!fluid.isEmpty() && !resource.matches(fluid))) return 0;
-        int accepted = Math.min(amount, Math.max(0, capacity - fluid.getAmount()));
+        int accepted = Math.min(amount, Math.max(0, getCapacity() - fluid.getAmount()));
         if (accepted > 0) {
             journal.updateSnapshots(tx);
             fluid = resource.toStack(fluid.getAmount() + accepted);

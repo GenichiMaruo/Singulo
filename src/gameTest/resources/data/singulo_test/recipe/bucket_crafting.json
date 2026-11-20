@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["LO"],
+  "key": {
+    "L": "minecraft:lava_bucket",
+    "O": "minecraft:obsidian"
+  },
+  "result": { "id": "minecraft:crying_obsidian" }
+}

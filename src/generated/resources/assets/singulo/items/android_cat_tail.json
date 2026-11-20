@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "singulo:item/android_cat_tail"
+    "model": "singulo:item/android_cat_tail",
+    "tints": [
+      {
+        "type": "singulo:dynamic",
+        "kind": "accessory"
+      }
+    ]
   }
 }

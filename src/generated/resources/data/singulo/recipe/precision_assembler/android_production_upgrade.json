@@ -20,7 +20,18 @@
     {
       "ingredient": "singulo:superconducting_coil",
       "count": 2
+    },
+    {
+      "ingredient": "#c:dusts/redstone",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " AEA ",
+    " BCB ",
+    " D D ",
+    "     "
   ],
   "result": {
     "id": "singulo:android_production_upgrade",

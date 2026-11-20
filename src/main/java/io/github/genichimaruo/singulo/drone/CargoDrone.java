@@ -21,7 +21,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -285,10 +284,14 @@ public class CargoDrone extends Mob {
         return entityData.get(DISMANTLE);
     }
 
+    void resumeDismantle() {
+        entityData.set(DISMANTLE, true);
+    }
+
     /** 解体を始める（ステーションの GUI から。待機中だけ）。 */
     public void startDismantle() {
         if (printed() && !dismantling()) {
-            entityData.set(DISMANTLE, true);
+            resumeDismantle();
             entityData.set(PRINT, PRINT_TICKS + RETRACT_TICKS);
             playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("drone.dismantle"), 0.8F, 1.0F);
         }
@@ -496,20 +499,7 @@ public class CargoDrone extends Mob {
             f.docked = docked && f.stage == DroneNetwork.DELIVER;
         } else if (targetLoaded) {
             // ポートがない（置き換えられた）: 取りに行く途中なら帰り、届ける途中なら発送元へ戻す
-            if (f.away()) {
-                net.advance(f, DroneNetwork.RETURN, level.getGameTime());
-            } else if (f.stage == DroneNetwork.PICKUP || net.port(f.from) == null || f.from.equals(target)) {
-                if (!f.crate.isEmpty()) {
-                    Block.popResource(level, target, f.crate);
-                    f.crate = ItemStack.EMPTY;
-                }
-                net.advance(f, DroneNetwork.RETURN, level.getGameTime());
-            } else {
-                BlockPos back = f.from;
-                f.from = f.to;
-                f.to = back;
-                net.changed();
-            }
+            DronePortBlockEntity.unavailablePort(level, net, f, target);
         }
     }
 
@@ -683,6 +673,7 @@ public class CargoDrone extends Mob {
         }
         tag.putInt("unit", unit);
         tag.putInt("print", entityData.get(PRINT));
+        tag.putBoolean("dismantling", dismantling());
         tag.putLong("flight", flightId);
         tag.putBoolean("phase", phase);
         tag.putInt("kind", entityData.get(KIND));
@@ -700,6 +691,7 @@ public class CargoDrone extends Mob {
         station = io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(tag, "station").orElse(null);
         unit = Mth.clamp(tag.getIntOr("unit", 0), 0, DroneStationBlockEntity.MAX_UNITS - 1);
         entityData.set(PRINT, tag.contains("print") ? Mth.clamp(tag.getIntOr("print", 0), 0, PRINT_TICKS + RETRACT_TICKS) : PRINT_TICKS + RETRACT_TICKS);
+        entityData.set(DISMANTLE, tag.getBooleanOr("dismantling", false));
         flightId = tag.getLongOr("flight", 0L);
         phase = tag.getBooleanOr("phase", false);
         entityData.set(KIND, DroneKind.byId(tag.getIntOr("kind", 0)).ordinal());

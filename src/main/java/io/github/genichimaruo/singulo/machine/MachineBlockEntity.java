@@ -16,6 +16,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -41,7 +42,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
  */
 public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
-        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder {
+        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs, SideConfig.Holder, MachineReport.Source {
     public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED, OFF }
 
     /**
@@ -56,6 +57,11 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     private final MachineType type;
     private final io.github.genichimaruo.singulo.compat.TransactionalItemStackHandler items;
+    @Nullable private final AssemblyGrid assemblyGrid;
+    private final java.util.BitSet assemblyReturns = new java.util.BitSet(0);
+    /** Bulk inputs from older assemblers, returned to a player on opening the machine. */
+    private final List<ItemStack> legacyAssemblyInputs = new ArrayList<>();
+    private int assemblyPreview = -2;
     /** Exhausted recipe tools waiting for space in the normal output slots. */
     private final java.util.BitSet pendingReturns = new java.util.BitSet();
     /** 触媒の装填（触媒スロットのある装置だけ使う）。触媒スロットは予備の置き場で、使う1個は中に装填する。 */
@@ -64,9 +70,13 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     private final SinguloEnergyStorage energy;
     private final IItemHandler automationItems;
     private final io.github.genichimaruo.singulo.compat.TankFluidAccess automationFluids;
+    @Nullable private final IFluidHandler fluidOutput;
 
     private int progress;
     private int maxProgress;
+    /** Paid growth duration while the final product waits for a compatible output slot. */
+    private int completedDuration;
+    private int batchRemaining;
     private int usage;
     private Status status = Status.IDLE;
     /** 0 = 通常加工、1以上 = 質量レシピ（massRecipes の番号+1）。 */
@@ -83,7 +93,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     /** 時間の場（TimeFields）で進む tick の端数。 */
     private double timeCarry;
     /** 質量バッファに入れた元ブロックの種類（混成ボーナス用）。 */
-    private final java.util.Set<net.minecraft.world.item.Item> massSources = new java.util.HashSet<>();
+    private final java.util.Set<Identifier> massSources = new java.util.HashSet<>();
     /** 電源スイッチ。切ると処理を止める（進み具合はそのまま残す）。 */
     private boolean enabled = true;
     /** 材料のいらないレシピ（電力だけで作るもの）も作るか。 */
@@ -130,7 +140,15 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             }
 
             @Override
+            public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                if (slot == type.assemblyUpgradeSlot() && assemblyGrid != null && assemblyGrid.locksUpgrade()) return ItemStack.EMPTY;
+                return super.extractItem(slot, amount, simulate);
+            }
+
+            @Override
             protected int getStackLimit(int slot, ItemStack stack) {
+                if (slot == type.assemblyUpgradeSlot()) return AssemblyGrid.upgradeLimit();
+                if (slot < type.inputSlots() + type.outputSlots()) return MachineStock.limit(stack, slot < type.inputSlots());
                 if (slot == type.catalystSlot()) {
                     return Math.min(CatalystMagazine.SUPPLY_LIMIT, super.getStackLimit(slot, stack));
                 }
@@ -139,13 +157,42 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
             @Override
             public int getSlotLimit(int slot) {
+                if (slot < type.inputSlots() + type.outputSlots()) return MachineStock.limit(64);
+                if (slot == type.assemblyUpgradeSlot()) return AssemblyGrid.upgradeLimit();
                 return slot == type.upgradeSlot() || slot == type.capacitySlot() ? 1
                         : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
             }
         };
+        this.assemblyGrid = type == MachineType.PRECISION_ASSEMBLER ? new AssemblyGrid() {
+            @Override
+            public int getSlotLimit(int slot) {
+                return AssemblyGrid.limit(64, items.getStackInSlot(type.assemblyUpgradeSlot()));
+            }
+
+            @Override
+            protected int getStackLimit(int slot, ItemStack stack) {
+                return AssemblyGrid.limit(stack, items.getStackInSlot(type.assemblyUpgradeSlot()));
+            }
+
+            @Override
+            protected void onContentsChanged(int slot) {
+                assemblyReturns.clear(slot);
+                markDirty();
+            }
+
+            @Override
+            public boolean isItemValid(int slot, ItemStack stack) {
+                return !assemblyReturns.get(slot) && !isCatalyst(stack);
+            }
+        } : null;
         this.tanks = new TransactionalFluidTank[type.tanks()];
         for (int i = 0; i < tanks.length; i++) {
-            tanks[i] = new TransactionalFluidTank(MachineType.TANK_CAPACITY) {
+            tanks[i] = new TransactionalFluidTank(MachineType.tankCapacity()) {
+                @Override
+                public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
+                    return getSpace() <= 0 ? 0 : super.fill(resource, action);
+                }
+
                 @Override
                 protected void onContentsChanged() {
                     markDirty();
@@ -156,6 +203,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         this.energy = new SinguloEnergyStorage(capacity, type.energyReceiveLimit(), 0, this::setChanged);
         this.automationItems = new AutomationItems();
         this.automationFluids = new AutomationFluids();
+        this.fluidOutput = type.fluidOutputs() > 0 ? new SidedFluids(0, -1) : null;
         this.tankSides = createTankSides(type);
     }
 
@@ -167,11 +215,17 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         return items;
     }
 
+    /** The physical board used by players and androids. No external item capability exposes its cells. */
+    public ItemStackHandler assemblyGrid() {
+        return java.util.Objects.requireNonNull(assemblyGrid, "Machine has no assembly board");
+    }
+
     public SinguloEnergyStorage energy() {
         return energy;
     }
 
     private void refreshEnergyCapacity() {
+        energy.setReceiveLimit(type.energyReceiveLimit());
         energy.resizeCapacity(Math.max(type.energyCapacity(), CapacityUpgrades.capacity(
                 CapacityUpgrades.tier(items.getStackInSlot(type.capacitySlot())))));
     }
@@ -229,6 +283,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
     public boolean slotAccepts(int slot, ItemStack stack) {
         if (pendingReturns.get(slot)) return false;
+        if (slot == type.spentCatalystSlot()) return UsesHelper.isSpentCatalyst(stack);
+        if (slot == type.assemblyUpgradeSlot()) return AssemblyGrid.isUpgrade(stack);
         if (slot == type.capacitySlot()) return CapacityUpgrades.tier(stack) > 0;
         if (slot == type.upgradeSlot()) {
             return isUpgrade(stack);
@@ -254,11 +310,12 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
      */
     private final SideConfig[] tankSides;
 
-    /** はじめは、どの面からでも入力タンクへ入れられ、出力タンクから出せる（自動排出なし）。 */
+    /** はじめは、どの面からでも入力タンクへ入れられ、出力タンクの液体を送り出す。 */
     private static SideConfig[] createTankSides(MachineType type) {
         SideConfig[] out = new SideConfig[type.tanks()];
         for (int i = 0; i < out.length; i++) {
             out[i] = new SideConfig();
+            out[i].setEjectEnabled(i >= type.fluidInputs());
             int mode = i < type.fluidInputs() ? SideConfig.INPUT : SideConfig.OUTPUT;
             for (SideConfig.Face f : SideConfig.Face.values()) {
                 out[i].set(f, mode, i >= type.fluidInputs());
@@ -356,8 +413,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     @Override
-    public IFluidHandler ejectFluids() {
-        return type.fluidOutputs() > 0 ? new SidedFluids(0, -1) : null;
+    @Nullable public IFluidHandler ejectFluids() {
+        return fluidOutput;
     }
 
     /** 面ごとの設定に従うアイテムの入れ物（side が null なら制限なし）。無効の面は null。 */
@@ -404,11 +461,25 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         if (!s.hasProperty(AbstractMachineBlock.FACING)) {
             return;
         }
+        boolean configured = usesSideConfig();
+        if (!configured && (type.fluidOutputs() == 0 || structureSize() <= 0)) return;
+        boolean ejectItems = configured && level.getGameTime() % 10 == 0 && itemSides.ejectEnabled() && type.hasOutput();
+        boolean ejectFluid = false;
+        for (int i = type.fluidInputs(); i < tanks.length; i++) {
+            if (!tanks[i].isEmpty() && (!configured || tankSides[i].ejectEnabled())) {
+                ejectFluid = true;
+                break;
+            }
+        }
+        if (!ejectItems && !ejectFluid) return;
         net.minecraft.core.Direction facing = s.getValue(AbstractMachineBlock.FACING);
         for (SideConfig.Face f : SideConfig.Face.values()) {
             net.minecraft.core.Direction dir = SideConfig.directionOf(facing, f);
             BlockPos target = worldPosition.relative(dir);
-            if (itemSides.ejectEnabled() && itemSides.eject(f) && itemSides.canExtract(f) && type.hasOutput()) {
+            if (!level.isLoaded(target)) continue;
+            if (!configured && level.getBlockEntity(target) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity port
+                    && worldPosition.equals(port.controllerPos())) continue;
+            if (ejectItems && itemSides.eject(f) && itemSides.canExtract(f)) {
                 IItemHandler dest = io.github.genichimaruo.singulo.compat.ItemResourceView.find(level,
                         target, dir.getOpposite());
                 if (dest != null) {
@@ -416,23 +487,22 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                     for (int i = 0; i < type.outputSlots(); i++) {
                         ejectItem(dest, type.outputSlot() + i);
                     }
+                    if (type.spentCatalystSlot() >= 0) ejectItem(dest, type.spentCatalystSlot());
                     for (int slot = pendingReturns.nextSetBit(0); slot >= 0; slot = pendingReturns.nextSetBit(slot + 1)) {
                         ejectItem(dest, slot);
                     }
                 }
             }
-            if (type.fluidOutputs() > 0) {
-                IFluidHandler dest = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, target, dir.getOpposite());
-                if (dest != null) {
-                    for (int i = type.fluidInputs(); i < tanks.length; i++) {
-                        SideConfig c = tankSides[i];
-                        if (c.ejectEnabled() && c.eject(f) && c.canExtract(f) && !tanks[i].isEmpty()) {
-                            int moved = dest.fill(tanks[i].getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
-                            if (moved > 0) {
-                                tanks[i].drain(moved, IFluidHandler.FluidAction.EXECUTE);
-                            }
-                        }
-                    }
+            IFluidHandler dest = null;
+            for (int i = type.fluidInputs(); i < tanks.length; i++) {
+                SideConfig c = tankSides[i];
+                if (tanks[i].isEmpty() || configured && (!c.ejectEnabled() || !c.eject(f) || !c.canExtract(f))) continue;
+                if (dest == null) dest = io.github.genichimaruo.singulo.compat.FluidResourceView.find(level, target, dir.getOpposite());
+                if (dest == null) break;
+                FluidStack offer = tanks[i].getFluid();
+                if (io.github.genichimaruo.singulo.pipe.PipeFluidFilter.accepts(dest, offer)) {
+                    int moved = dest.fill(offer.copy(), IFluidHandler.FluidAction.EXECUTE);
+                    if (moved > 0) tanks[i].drain(moved, IFluidHandler.FluidAction.EXECUTE);
                 }
             }
         }
@@ -444,18 +514,24 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     /** Keep a blocked return visible in its original slot; never discard or consume it again. */
     private void flushReturns() {
-        for (int slot = pendingReturns.nextSetBit(0); slot >= 0; slot = pendingReturns.nextSetBit(slot + 1)) {
-            ItemStack stack = items.getStackInSlot(slot);
+        flushReturns(items, pendingReturns);
+        if (assemblyGrid != null) flushReturns(assemblyGrid, assemblyReturns);
+    }
+
+    private void flushReturns(ItemStackHandler inventory, java.util.BitSet returns) {
+        for (int slot = returns.nextSetBit(0); slot >= 0; slot = returns.nextSetBit(slot + 1)) {
+            ItemStack stack = inventory.getStackInSlot(slot);
             ItemStack rest = insertOutput(stack.copy(), false);
             if (rest.getCount() != stack.getCount() || stack.isEmpty()) {
-                items.setStackInSlot(slot, rest);
-                if (!rest.isEmpty()) pendingReturns.set(slot);
+                inventory.setStackInSlot(slot, rest);
+                if (!rest.isEmpty()) returns.set(slot);
             }
         }
     }
 
     protected void markDirty() {
         dirty = true;
+        assemblyPreview = -2;
         setChanged();
     }
 
@@ -517,17 +593,16 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         flushReturns();
         if (type.hasCatalystSlot()) {
             // 失活触媒・外した使いかけは出力スロットへ。予備との合流・入れ替え・装填もここで
-            magazine.tick(items, type.catalystSlot(), s -> insertOutput(s, false));
+            magazine.tick(items, type.catalystSlot(), this::returnCatalyst);
         }
-        if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
-            autoEject(level);
-        }
+        autoEject(level);
         boolean active = false;
         if (!enabled) {
             usage = 0;
             status = Status.OFF;
         } else if (!canOperate(level)) {
             progress = 0;
+            completedDuration = 0;
             usage = 0;
             current = null;
             dirty = true;
@@ -545,37 +620,110 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 usage = 0;
                 status = Status.IDLE;
             } else {
-                MachineRecipe recipe = current.value();
-                // 時間の場の中では1 tick に進む量が変わる（加速なら2 tick ぶん進み、電力も2倍使う）
-                timeCarry += TimeFields.speed(level, pos);
-                int steps = (int) timeCarry;
-                // 蓄電容量で1回に払える分だけ進む（加速の場でも、容量アップグレードが1 tick 分に足りていれば止まらない）
-                int done = affordableSteps(steps);
-                if (!canOutput(recipe)) {
-                    status = Status.OUTPUT_FULL;
-                    timeCarry = 0;
-                } else if (steps == 0) {
-                    active = true;
-                    status = Status.RUNNING;
-                } else if (energy.consume(usage * done) || runsUnderpowered(recipe) && drawPartial()) {
-                    timeCarry -= steps;
-                    active = true;
-                    status = Status.RUNNING;
-                    progress += done;
-                    if (progress >= maxProgress) {
-                        progress = 0;
-                        craft(level, recipe);
-                        dirty = true;
-                    }
-                } else {
-                    timeCarry = 0;
-                    status = Status.NO_POWER;
-                }
+                status = process(level, pos, current.value());
+                active = status == Status.RUNNING;
             }
         }
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != active) {
             level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, active), Block.UPDATE_ALL);
         }
+    }
+
+    private Status process(Level level, BlockPos pos, MachineRecipe recipe) {
+        if (batchRemaining > 0) {
+            finishBatch(level, recipe, 256);
+            return Status.RUNNING;
+        }
+        if (progress < maxProgress) {
+            if (!canOutput(recipe)) {
+                timeCarry = 0;
+                return Status.OUTPUT_FULL;
+            }
+            // 時間の場で変わる進行量のうち、蓄電容量で1回に払える分だけ進める。
+            timeCarry += TimeFields.speed(level, pos);
+            int steps = (int) timeCarry;
+            if (steps == 0) return Status.RUNNING;
+            int done = Math.min(maxProgress - progress, affordableSteps(steps));
+            if (!energy.consume(usage * done) && !(runsUnderpowered(recipe) && drawPartial())) {
+                timeCarry = 0;
+                return Status.NO_POWER;
+            }
+            timeCarry -= steps;
+            progress += done;
+        }
+        if (progress >= maxProgress) {
+            if (!craft(level, recipe)) {
+                // 完成時の純度が違って重ならない場合、進捗と材料を保ち、電力を再請求せずに待つ。
+                completedDuration = maxProgress;
+                timeCarry = 0;
+                return Status.OUTPUT_FULL;
+            }
+            // Each additional operation pays a complete cycle from the buffer and goes through the
+            // same item, fluid, catalyst, byproduct and output checks as the first operation.
+            batchRemaining = ServerConfig.MACHINE_BATCH_LIMIT.get() - 1;
+            if (batchRemaining > 0) finishBatch(level, recipe, 255);
+            progress = 0;
+            completedDuration = 0;
+            dirty = true;
+        }
+        return Status.RUNNING;
+    }
+
+    private void finishBatch(Level level, MachineRecipe recipe, int tickBudget) {
+        long cost = (long) usage * maxProgress;
+        if (cost > 0) batchRemaining = (int) Math.min(batchRemaining, energy.getEnergyStored() / cost);
+        if (batchRemaining == 0 || bulkItems(recipe, batchRemaining, cost)) {
+            batchRemaining = 0;
+        } else {
+            int count = Math.min(batchRemaining, tickBudget);
+            for (int i = 0; i < count; i++) {
+                if (!craft(level, recipe)) {
+                    batchRemaining = 0;
+                    break;
+                }
+                energy.consume((int) cost);
+                batchRemaining--;
+            }
+        }
+        setChanged();
+    }
+
+    /** Complete an ordinary item recipe in slot-sized groups, independent of the number of items. */
+    private boolean bulkItems(MachineRecipe r, int remaining, long cost) {
+        if (getClass() != MachineBlockEntity.class || r.result().isEmpty() || type.outputSlots() != 1
+                || r.result().getMaxStackSize() <= 1 || !r.byproduct().isEmpty() || r.restore().isPresent()
+                || r.mass().isPresent() || !r.fluidIngredients().isEmpty() || !r.fluidResults().isEmpty()
+                || r.ingredients().stream().anyMatch(in -> in.uses() != 0 || type.hasCatalystSlot() && r.assemblyCatalyst(in))) return false;
+        var inventory = assemblyGrid == null ? items : assemblyGrid;
+        crafting = true;
+        try {
+            while (remaining > 0) {
+                var inputs = currentInputs(r);
+                var plan = inputPlan(r, inputs, assemblyGrid != null);
+                if (plan == null) break;
+                if (type.hasCatalystSlot() && plan.consume()[inputs.size() - 1] != 0) break;
+                ItemStack result = previewResult(r, inputs, plan);
+                ItemStack stored = items.getStackInSlot(type.outputSlot());
+                if (!stored.isEmpty() && !ItemStack.isSameItemSameComponents(stored, result)) break;
+                int copies = Math.min(remaining, (MachineStock.limit(result, false) - stored.getCount()) / result.getCount());
+                for (int i = 0; i < inputs.size(); i++) {
+                    if (plan.consume()[i] > 0) copies = Math.min(copies, inputs.get(i).getCount() / plan.consume()[i]);
+                }
+                if (copies <= 0) break;
+                for (int i = 0; i < inputs.size(); i++) {
+                    if (plan.consume()[i] == 0) continue;
+                    int slot = assemblyGrid == null ? type.recipeSlot(i) : i;
+                    ItemStack stack = inventory.getStackInSlot(slot);
+                    inventory.setStackInSlot(slot, stack.copyWithCount(stack.getCount() - plan.consume()[i] * copies));
+                }
+                insertOutput(result.copyWithCount(result.getCount() * copies), false);
+                energy.consume((int) (cost * copies));
+                remaining -= copies;
+            }
+        } finally {
+            crafting = false;
+        }
+        return true;
     }
 
     /** 電力が足りないとき、ある分だけ使う。要求の80%未満なら不純な tick として数える。何もなければ false。 */
@@ -622,42 +770,27 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     private void refreshRecipe(Level level) {
         waitingSettle = false;
+        Identifier previous = current != null ? current.id().identifier() : resumeRecipe;
         RecipeHolder<MachineRecipe> found = null;
-        List<ItemStack> inputs = inputStacks();
+        boolean manual = assemblyGrid != null;
+        List<ItemStack> inputs;
         if (mode > 0) {
+            inputs = inputsExceptMassSlot();
             RecipeHolder<MachineRecipe> selected = selectedMassRecipe(level);
-            if (selected != null && massAvailable(selected.value()) && selected.value().plan(inputsExceptMassSlot()) != null
+            if (selected != null && massAvailable(selected.value()) && selected.value().plan(inputs) != null
                     && fluidsAvailable(selected.value())) {
                 found = selected;
             }
         } else {
-            RecipeHolder<MachineRecipe> blocked = null;
             hasFree = false;
-            for (RecipeHolder<MachineRecipe> holder : stationRecipes(level)) {
-                MachineRecipe r = holder.value();
-                boolean free = isFree(r);
-                hasFree |= free;
-                if (r.isMassRecipe() || !sizeAllows(r) || r.plan(inputs) == null || !fluidsAvailable(r)
-                        || free && !makeFree || found != null || !selectionAllows(level, holder, inputs)) {
-                    continue;
-                }
-                if (canOutput(r)) {
-                    found = holder;
-                    continue;
-                }
-                if (blocked == null) {
-                    blocked = holder;
-                }
-            }
-            // どれも出力が詰まっているだけなら、それを選んで「出力がいっぱい」と表示する
-            if (found == null) {
-                found = blocked;
-            }
+            inputs = manual ? assemblyInputs() : inputStacks();
+            found = findRecipe(level, inputs, manual);
         }
-        Identifier previous = current != null ? current.id().identifier() : resumeRecipe;
         resumeRecipe = null;
         if (found == null || !found.id().identifier().equals(previous)) {
+            batchRemaining = 0;
             progress = 0;
+            completedDuration = 0;
             underpoweredTicks = 0;
         }
         current = found;
@@ -670,38 +803,58 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 speed *= 2;
             }
             if (hasOverclock()) {
-                speed *= 3;
+                speed *= ServerConfig.OVERCLOCK_SPEED_MULTIPLIER.get();
             }
             // 上位の触媒で払うレシピは速く進む
-            MachineRecipe.Plan plan = found.value().plan(found.value().isMassRecipe() ? inputsExceptMassSlot() : inputs);
+            MachineRecipe.Plan plan = inputPlan(found.value(), inputs, manual);
             if (plan != null) {
                 speed *= plan.speed();
             }
-            maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
+            maxProgress = completedDuration > 0 ? completedDuration : Math.clamp(Math.round(found.value().time() / speed), 1, Integer.MAX_VALUE);
             if (fixedEnergyPerCraft(found.value())) {
                 // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ
                 usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
                         * found.value().time() / (double) maxProgress);
             } else {
                 usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
-                        / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
+                        / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? ServerConfig.OVERCLOCK_POWER_MULTIPLIER.get() : 1.0));
             }
         }
+    }
+
+    @Nullable
+    private RecipeHolder<MachineRecipe> findRecipe(Level level, List<ItemStack> inputs, boolean manual) {
+        RecipeHolder<MachineRecipe> found = null, blocked = null;
+        for (RecipeHolder<MachineRecipe> holder : stationRecipes(level)) {
+            MachineRecipe r = holder.value();
+            boolean free = isFree(r);
+            hasFree |= free;
+            if (found != null || r.isMassRecipe() || !sizeAllows(r) || free && !makeFree || !fluidsAvailable(r)) continue;
+            MachineRecipe.Plan plan = inputPlan(r, inputs, manual);
+            // The board specifies a complete recipe. The selected product and hopper settling delay are for bulk inputs.
+            if (plan == null || !manual && !selectionAllows(level, holder, inputs, plan)) continue;
+            if (canOutput(r, inputs, plan)) found = holder;
+            else if (blocked == null) blocked = holder;
+        }
+        return found != null ? found : blocked;
+    }
+
+    private static MachineRecipe.@Nullable Plan inputPlan(MachineRecipe recipe, List<ItemStack> inputs, boolean manual) {
+        return manual ? recipe.assemblyPlan(inputs) : recipe.plan(inputs);
     }
 
     /**
      * 作るものを選べる装置で、このレシピを作ってよいか（{@link RecipeSelection}）。指定があればそのレシピだけ、
      * なければ入っている物をすべて使い、ほかのレシピの途中になりえないものだけ。
      */
-    private boolean selectionAllows(Level level, RecipeHolder<MachineRecipe> holder, List<ItemStack> inputs) {
+    private boolean selectionAllows(Level level, RecipeHolder<MachineRecipe> holder, List<ItemStack> inputs, MachineRecipe.Plan plan) {
         if (!type.selectsRecipe()) {
             return true;
         }
         if (selectedRecipe != null) {
             return holder.id().identifier().equals(selectedRecipe);
         }
-        MachineRecipe.Plan plan = holder.value().plan(inputs);
-        if (plan == null || !RecipeSelection.usesEveryInput(type, inputs, plan)) {
+        if (!RecipeSelection.usesEveryInput(type, inputs, plan)) {
             return false;
         }
         if (!RecipeSelection.ambiguous(level, type, holder)) {
@@ -727,7 +880,24 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
      * 材料の一部が別のレシピと同じでも、アンドロイドの決めたレシピ通りの物ができる。
      */
     public void selectFor(net.minecraft.world.item.ItemStack output, List<net.minecraft.world.item.ItemStack> inputs) {
-        if (!type.selectsRecipe() || level == null || output.isEmpty()) {
+        if (level == null || output.isEmpty()) {
+            return;
+        }
+        if (type.massMode()) {
+            int target = 0;
+            var mass = massRecipes(level, type);
+            for (int i = 0; i < mass.size(); i++) {
+                if (ItemStack.isSameItem(mass.get(i).value().result(), output)) {
+                    target = i + 1;
+                    break;
+                }
+            }
+            if (target != mode) {
+                mode = target;
+                markDirty();
+            }
+        }
+        if (!type.selectsRecipe()) {
             return;
         }
         RecipeHolder<MachineRecipe> best = null;
@@ -776,6 +946,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         Object snapshot = MachineRecipeIndex.snapshot(level);
         if (recipeSnapshot != snapshot) {
             recipeSnapshot = snapshot;
+            for (var tank : tanks) tank.setCapacity(MachineType.tankCapacity());
+            refreshEnergyCapacity();
             selectedIndex = -2;
             markDirty();
         }
@@ -828,8 +1000,65 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         return status;
     }
 
+    @Override public int remainingTicks() {
+        return current == null ? -1 : Math.max(1, maxProgress - progress);
+    }
+
+    /** 装置の様子の報告（0.21.0。画面のヘッダーと同じ状態と理由）。 */
+    @Override
+    public MachineReport report() {
+        MachineReport.State state;
+        Component label;
+        List<Component> details = List.of();
+        switch (status) {
+            case RUNNING -> {
+                state = MachineReport.State.RUN;
+                label = Component.translatable("gui.singulo.status.running");
+            }
+            case IDLE -> {
+                MachineDiagnosis.Result why = null;
+                if (level != null && mode == 0) {
+                    List<FluidStack> fluids = new ArrayList<>();
+                    for (var tank : tanks) {
+                        fluids.add(tank.getFluid());
+                    }
+                    boolean board = assemblyGrid != null;
+                    why = MachineDiagnosis.idle(level, type, board ? assemblyInputs() : inputStacks(), fluids, structureSize(),
+                            !board && type.selectsRecipe() ? RecipeSelection.byIndex(level, type, selectedIndex()) : null);
+                }
+                if (why == null || why.kind() == MachineDiagnosis.Kind.EMPTY) {
+                    state = MachineReport.State.IDLE;
+                    label = Component.translatable("gui.singulo.status.idle");
+                } else {
+                    state = MachineReport.State.WARN;
+                    label = Component.translatable("gui.singulo.reason.label." + why.kind().name().toLowerCase());
+                    details = why.lines();
+                }
+            }
+            case NO_POWER -> {
+                state = MachineReport.State.NO_POWER;
+                label = Component.translatable("gui.singulo.status.no_power");
+            }
+            case OUTPUT_FULL -> {
+                state = MachineReport.State.FULL;
+                label = Component.translatable("gui.singulo.status.output_full");
+            }
+            case NOT_FORMED -> {
+                state = MachineReport.State.BROKEN;
+                label = Component.translatable("gui.singulo.status.not_formed");
+            }
+            default -> {
+                state = MachineReport.State.OFF;
+                label = Component.translatable("gui.singulo.status.off");
+            }
+        }
+        ItemStack loaded = magazine.loaded();
+        return new MachineReport(state, label, details, progress, maxProgress, energy.getEnergyStored(), energy.getMaxEnergyStored(),
+                status == Status.RUNNING && current != null ? usage : 0, 0, loaded.copyWithCount(1), magazine.fill(), List.of(), 0);
+    }
+
     /** レシピの照合に使うスロット（入力 → 触媒）の中身。 */
-    private List<ItemStack> inputStacks() {
+    public List<ItemStack> inputStacks() {
         List<ItemStack> list = new ArrayList<>(type.recipeSlots());
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
@@ -840,6 +1069,29 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             }
         }
         return list;
+    }
+
+    private boolean hasAssemblyInputs() {
+        if (assemblyGrid == null) return false;
+        for (int i = 0; i < assemblyGrid.getSlots(); i++) {
+            if (!assemblyReturns.get(i) && !assemblyGrid.getStackInSlot(i).isEmpty()) return true;
+        }
+        return false;
+    }
+
+    /** Read-only view of board cells followed by the loaded and reserve catalyst balance. */
+    public List<ItemStack> assemblyInputs() {
+        List<ItemStack> inputs = new ArrayList<>(assemblyGrid.getSlots() + 1);
+        for (int i = 0; i < assemblyGrid.getSlots(); i++) {
+            inputs.add(assemblyReturns.get(i) ? ItemStack.EMPTY : assemblyGrid.getStackInSlot(i));
+        }
+        inputs.add(magazine.pooled(items, type.catalystSlot()));
+        return inputs;
+    }
+
+    private List<ItemStack> currentInputs(MachineRecipe recipe) {
+        if (assemblyGrid != null) return assemblyInputs();
+        return recipe.isMassRecipe() ? inputsExceptMassSlot() : inputStacks();
     }
 
     /** 質量モードでは入力スロット0を質量の投入口に使うので、材料の照合から外す。 */
@@ -855,24 +1107,29 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         return r.mass().map(m -> (m.metalOnly() ? metalMass : mass) >= m.amount() - 1e-6).orElse(true);
     }
 
-    /** 液体材料は入力タンクを先に、足りなければ出力タンク（自分で作った液体窒素など）から取る。 */
-    @Nullable
-    private TransactionalFluidTank tankFor(MachineRecipe.FluidInput in) {
-        for (TransactionalFluidTank tank : tanks) {
-            if (in.matches(tank.getFluid())) {
-                return tank;
+    /** Reserve the entire payment before draining anything. Input tanks precede product tanks. */
+    private boolean payRecipeFluids(MachineRecipe r, IFluidHandler.FluidAction action) {
+        if (r.fluidIngredients().isEmpty()) return true;
+        int[] drains = new int[tanks.length];
+        for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
+            int needed = in.amount();
+            for (int i = 0; i < tanks.length && needed > 0; i++) {
+                FluidStack stored = tanks[i].getFluid();
+                if (stored.isEmpty() || !stored.getFluid().isSame(in.fluid())) continue;
+                int take = Math.min(needed, stored.getAmount() - drains[i]);
+                drains[i] += take;
+                needed -= take;
             }
+            if (needed > 0) return false;
         }
-        return null;
+        if (action.execute()) {
+            for (int i = 0; i < tanks.length; i++) if (drains[i] > 0) tanks[i].drain(drains[i], action);
+        }
+        return true;
     }
 
     private boolean fluidsAvailable(MachineRecipe r) {
-        for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
-            if (tankFor(in) == null) {
-                return false;
-            }
-        }
-        return true;
+        return payRecipeFluids(r, IFluidHandler.FluidAction.SIMULATE);
     }
 
     private void absorbMass(Level level) {
@@ -899,31 +1156,34 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 metalMass += m;
             } else {
                 mass += m;
-                massSources.add(taken.getItem());
+                massSources.add(BuiltInRegistries.ITEM.getKey(taken.getItem()));
             }
             markDirty();
         }
     }
 
-    private ItemStack previewResult(MachineRecipe r, MachineRecipe.Plan plan) {
+    private ItemStack previewResult(MachineRecipe r, List<ItemStack> inputs, MachineRecipe.Plan plan) {
         if (plan.restoreSlot() >= 0) {
-            return UsesHelper.restore(items.getStackInSlot(type.recipeSlot(plan.restoreSlot())), r.result());
+            return UsesHelper.restore(inputs.get(plan.restoreSlot()), r.result());
         }
-        ItemStack out = r.result().copy();
+        ItemStack out = r.assemble(inputs, plan);
         markMixed(r, out);
         return out;
     }
 
     private boolean canOutput(MachineRecipe r) {
+        if (r.result().isEmpty() && assemblyGrid == null) return assignFluidOutputs(r.fluidResults(), true);
+        List<ItemStack> inputs = currentInputs(r);
+        return canOutput(r, inputs, inputPlan(r, inputs, assemblyGrid != null));
+    }
+
+    private boolean canOutput(MachineRecipe r, List<ItemStack> inputs, MachineRecipe.@Nullable Plan plan) {
+        if (plan == null || !canReturnSpent(plan)) return false;
         if (!r.result().isEmpty()) {
             if (!type.hasOutput()) {
                 return false;
             }
-            MachineRecipe.Plan plan = r.plan(r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks());
-            if (plan == null) {
-                return false;
-            }
-            if (!fitsOutputs(previewResult(r, plan), r.byproduct())) {
+            if (!fitsOutputs(previewResult(r, inputs, plan), r.byproduct(), runsUnderpowered(r))) {
                 return false;
             }
         }
@@ -931,7 +1191,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     /** 成果物と副産物が、両方とも出力スロットに入り切るか（同じスロットを取り合う分も数える）。 */
-    private boolean fitsOutputs(ItemStack result, ItemStack byproduct) {
+    private boolean fitsOutputs(ItemStack result, ItemStack byproduct, boolean unknownPurity) {
         ItemStack[] slots = new ItemStack[type.outputSlots()];
         for (int i = 0; i < slots.length; i++) {
             slots[i] = items.getStackInSlot(type.outputSlot() + i).copy();
@@ -940,10 +1200,12 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             int left = want.getCount();
             for (int i = 0; i < slots.length && left > 0 && !want.isEmpty(); i++) {
                 if (slots[i].isEmpty()) {
-                    slots[i] = want.copyWithCount(Math.min(left, want.getMaxStackSize()));
+                    int limit = MachineStock.limit(want, false);
+                    slots[i] = want.copyWithCount(Math.min(left, limit));
                     left -= slots[i].getCount();
-                } else if (ItemStack.isSameItemSameComponents(slots[i], want)) {
-                    int move = Math.min(left, Math.min(slots[i].getMaxStackSize(), items.getSlotLimit(type.outputSlot() + i)) - slots[i].getCount());
+                } else if (ItemStack.isSameItemSameComponents(slots[i], want)
+                        || unknownPurity && want == result && ItemStack.isSameItem(slots[i], result)) {
+                    int move = Math.min(left, MachineStock.limit(slots[i], false) - slots[i].getCount());
                     if (move > 0) {
                         slots[i].grow(move);
                         left -= move;
@@ -964,6 +1226,18 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             rest = items.insertItem(type.outputSlot() + i, rest, simulate);
         }
         return rest;
+    }
+
+    private ItemStack returnCatalyst(ItemStack stack) {
+        if (type.spentCatalystSlot() >= 0 && UsesHelper.isSpentCatalyst(stack))
+            return items.insertItem(type.spentCatalystSlot(), stack, false);
+        return insertOutput(stack, false);
+    }
+
+    private boolean canReturnSpent(MachineRecipe.Plan plan) {
+        if (assemblyGrid == null) return true;
+        ItemStack spent = magazine.spentBy(plan.uses()[MachineRecipe.ASSEMBLY_CELLS], items, type.catalystSlot());
+        return spent.isEmpty() || items.insertItem(type.spentCatalystSlot(), spent, true).isEmpty();
     }
 
     /** 液体の成果物を出力タンクに入れる。同じ液体のタンクを優先し、なければ空のタンクへ。 */
@@ -993,36 +1267,44 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         return true;
     }
 
-    private void craft(Level level, MachineRecipe r) {
+    private boolean craft(Level level, MachineRecipe r) {
         crafting = true;
         try {
-            craftNow(level, r);
+            return craftNow(level, r);
         } finally {
             crafting = false;
         }
     }
 
-    private void craftNow(Level level, MachineRecipe r) {
-        MachineRecipe.Plan plan = r.plan(r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks());
-        if (plan == null || !massAvailable(r) || !fluidsAvailable(r)) {
-            return;
+    private boolean craftNow(Level level, MachineRecipe r) {
+        List<ItemStack> inputs = currentInputs(r);
+        MachineRecipe.Plan plan = inputPlan(r, inputs, assemblyGrid != null);
+        if (plan == null || !massAvailable(r)) {
+            return false;
         }
-        ItemStack out = previewResult(r, plan);
+        ItemStack out = previewResult(r, inputs, plan);
         if (!out.isEmpty()) {
             out = adjustResult(r, out, 1.0 - Math.min(1.0, underpoweredTicks / (double) Math.max(1, maxProgress)));
+        }
+        if (!fitsOutputs(out, r.byproduct(), false) || !canReturnSpent(plan) || !assignFluidOutputs(r.fluidResults(), true)
+                || !payRecipeFluids(r, IFluidHandler.FluidAction.EXECUTE)) {
+            return false;
         }
         underpoweredTicks = 0;
         if (r.isMassRecipe()) {
             massSources.clear();
         }
-        for (int i = 0; i < type.recipeSlots(); i++) {
-            int slot = type.recipeSlot(i);
-            if (slot == type.catalystSlot()) {
+        ItemStackHandler materialSlots = assemblyGrid != null ? assemblyGrid : items;
+        java.util.BitSet returns = assemblyGrid != null ? assemblyReturns : pendingReturns;
+        for (int i = 0; i < inputs.size(); i++) {
+            if (type.hasCatalystSlot() && i == inputs.size() - 1) {
+                int slot = type.catalystSlot();
                 if (plan.uses()[i] > 0) {
                     if (magazine.loaded().isEmpty()) {
-                        magazine.tick(items, slot, s -> insertOutput(s, false));
+                        magazine.tick(items, slot, this::returnCatalyst);
                     }
                     magazine.consume(plan.uses()[i], items, slot);
+                    if (assemblyGrid != null) magazine.flush(this::returnCatalyst);
                 }
                 for (int k = 0; k < plan.consume()[i]; k++) {
                     // 触媒そのものを材料として使う: 装填中のものから（なければ予備から）
@@ -1032,21 +1314,17 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
                 }
                 continue;
             }
+            int slot = assemblyGrid != null ? i : type.recipeSlot(i);
             if (plan.uses()[i] > 0) {
-                ItemStack used = UsesHelper.consume(items.getStackInSlot(slot), plan.uses()[i]);
-                items.setStackInSlot(slot, used);
+                ItemStack used = UsesHelper.consume(materialSlots.getStackInSlot(slot), plan.uses()[i]);
+                materialSlots.setStackInSlot(slot, used);
                 if (!used.isEmpty() && UsesHelper.remaining(used) == 0) {
-                    pendingReturns.set(slot);
+                    returns.set(slot);
                 }
             }
             if (plan.consume()[i] > 0) {
-                items.extractItem(slot, plan.consume()[i], false);
-            }
-        }
-        for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
-            TransactionalFluidTank tank = tankFor(in);
-            if (tank != null) {
-                tank.drain(in.amount(), IFluidHandler.FluidAction.EXECUTE);
+                ItemStack stock = materialSlots.getStackInSlot(slot);
+                materialSlots.setStackInSlot(slot, stock.copyWithCount(stock.getCount() - plan.consume()[i]));
             }
         }
         r.mass().ifPresent(m -> {
@@ -1065,6 +1343,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         flushReturns();
         assignFluidOutputs(r.fluidResults(), false);
         onCrafted(level, r);
+        return true;
     }
 
     /**
@@ -1101,7 +1380,22 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     }
 
     public static int syncedCount(MachineType type) {
+        return assemblyPreviewIndex(type) + (type.massMode() ? 4 : type == MachineType.PRECISION_ASSEMBLER ? 1 : 0);
+    }
+
+    /** Synced after the existing side settings. Zero is an empty board preview. */
+    public static int assemblyPreviewIndex(MachineType type) {
         return sidesIndex(type) + 1 + type.tanks();
+    }
+
+    private int assemblyPreview() {
+        if (assemblyPreview == -2 && level != null) {
+            RecipeHolder<MachineRecipe> match = null;
+            if (!dirty) match = current;
+            else if (hasAssemblyInputs()) match = findRecipe(level, assemblyInputs(), true);
+            assemblyPreview = match == null ? -1 : RecipeSelection.indexOf(level, type, match.id().identifier());
+        }
+        return Math.max(0, assemblyPreview + 1);
     }
 
     public static int sidesIndex(MachineType type) {
@@ -1121,8 +1415,8 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             case D_USAGE -> current == null ? 0 : usage;
             case D_STATUS -> status.ordinal();
             case D_MODE -> mode;
-            case D_MASS -> massTargetIsMetal() ? (int) Math.round(metalMass * 100) : (int) Math.round(mass * 100);
-            case D_MASS_TARGET -> massTarget();
+            case D_MASS -> Math.clamp(Math.round((massTargetIsMetal() ? metalMass : mass) * 100), 0, Integer.MAX_VALUE);
+            case D_MASS_TARGET -> Math.clamp(Math.round(massTarget() * 100), 0, Integer.MAX_VALUE);
             case D_STRUCTURE -> structureSize();
             case D_LINING -> liningCount();
             case D_SELECTED -> selectedIndex() + 1;
@@ -1132,6 +1426,12 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             case D_LOADED_USES -> magazine.loaded().isEmpty() ? 0 : io.github.genichimaruo.singulo.item.UsesHelper.remaining(magazine.loaded());
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
+                int tail = index - assemblyPreviewIndex(type);
+                if (type.massMode() && tail >= 0) {
+                    double value = tail < 2 ? (massTargetIsMetal() ? metalMass : mass) : massTarget();
+                    yield SyncedInts.doubleWord(value, tail % 2);
+                }
+                if (index == assemblyPreviewIndex(type)) yield assemblyPreview();
                 if (index >= sidesIndex(type)) {
                     yield sides(index - sidesIndex(type)).packed();
                 }
@@ -1164,12 +1464,12 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         return r != null && r.value().mass().map(MachineRecipe.MassInput::metalOnly).orElse(false);
     }
 
-    private int massTarget() {
+    private double massTarget() {
         if (level == null) {
             return 0;
         }
         RecipeHolder<MachineRecipe> r = selectedMassRecipe(level);
-        return r == null ? 0 : r.value().mass().map(m -> (int) Math.round(m.amount() * 100)).orElse(0);
+        return r == null ? 0 : r.value().mass().map(MachineRecipe.MassInput::amount).orElse(0.0);
     }
 
     @Override
@@ -1179,7 +1479,21 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        recoverLegacyAssemblyInputs(player);
         return new MachineMenu(containerId, inventory, this);
+    }
+
+    public void recoverLegacyAssemblyInputs(Player player) {
+        if (legacyAssemblyInputs.isEmpty() || player.level().isClientSide()) return;
+        var inventory = new net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper(player.getInventory());
+        for (var it = legacyAssemblyInputs.listIterator(); it.hasNext();) {
+            ItemStack stack = it.next();
+            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(inventory, stack, false);
+            if (rest.getCount() == stack.getCount()) continue;
+            if (rest.isEmpty()) it.remove();
+            else it.set(rest);
+            setChanged();
+        }
     }
 
     @Override
@@ -1190,9 +1504,39 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         });
     }
 
+    boolean packStockOnBreak() {
+        for (int i = 0; i < items.getSlots(); i++) {
+            ItemStack stack = items.getStackInSlot(i);
+            if (stack.getCount() > stack.getMaxStackSize()) return true;
+        }
+        if (assemblyGrid == null) return false;
+        for (int i = 0; i < assemblyGrid.getSlots(); i++) {
+            ItemStack stack = assemblyGrid.getStackInSlot(i);
+            if (stack.getCount() > 4 * stack.getMaxStackSize()) return true;
+        }
+        return false;
+    }
+
     public void dropContents(Level level, BlockPos pos) {
+        // One movable machine instead of potentially millions of loose item entities.
+        if (packStockOnBreak()) {
+            if (!level.isClientSide()) {
+                ItemStack packed = new ItemStack(getBlockState().getBlock());
+                packed.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(getType(), saveCustomOnly(level.registryAccess())));
+                packed.set(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
+                Block.popResource(level, pos, packed);
+            }
+            return;
+        }
         for (int i = 0; i < items.getSlots(); i++) {
             Block.popResource(level, pos, items.getStackInSlot(i));
+        }
+        if (assemblyGrid != null) {
+            for (int i = 0; i < assemblyGrid.getSlots(); i++) {
+                ItemStack parts = assemblyGrid.getStackInSlot(i).copy();
+                while (!parts.isEmpty()) Block.popResource(level, pos, parts.split(parts.getMaxStackSize()));
+            }
+            for (ItemStack old : legacyAssemblyInputs) Block.popResource(level, pos, old);
         }
         for (ItemStack s : magazine.contents()) {
             Block.popResource(level, pos, s);
@@ -1213,7 +1557,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         if (level.isClientSide() || ServerConfig.SPEC.isLoaded() && !ServerConfig.HYDROGEN_LEAK_EXPLOSION.get()) {
             return;
         }
-        int hydrogen = 0;
+        long hydrogen = 0;
         for (TransactionalFluidTank tank : tanks) {
             if (tank.getFluid().is(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"))) {
                 hydrogen += tank.getFluidAmount();
@@ -1242,8 +1586,17 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("inputs_changed_at", inputsChangedAt);
-        tag.put("items", io.github.genichimaruo.singulo.compat.NbtCompat.serialize(items, registries));
+        tag.put("items", MachineStock.save(items, registries));
         tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
+        if (assemblyGrid != null) {
+            tag.put("assembly_grid", assemblyGrid.serializeNBT(registries));
+            tag.putIntArray("assembly_returns", assemblyReturns.stream().toArray());
+            if (!legacyAssemblyInputs.isEmpty()) {
+                ListTag old = new ListTag();
+                for (ItemStack stack : legacyAssemblyInputs) old.add(io.github.genichimaruo.singulo.compat.NbtCompat.save(stack, registries));
+                tag.put("legacy_assembly_inputs", old);
+            }
+        }
         tag.put("magazine", magazine.save(registries));
         tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
         tag.putInt("item_sides", itemSides.packed());
@@ -1258,14 +1611,23 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         tag.put("tanks", tankList);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putInt("progress", progress);
+        if (batchRemaining > 0) tag.putInt("batch_remaining", batchRemaining);
+        if (completedDuration > 0) tag.putInt("completed_duration", completedDuration);
+        tag.putInt("underpowered_ticks", underpoweredTicks);
         tag.putInt("mode", mode);
         if (selectedRecipe != null) {
             tag.putString("selected_recipe", selectedRecipe.toString());
         }
         tag.putDouble("mass", mass);
         tag.putDouble("metal_mass", metalMass);
-        if (current != null) {
-            tag.putString("recipe", current.id().identifier().toString());
+        if (!massSources.isEmpty()) {
+            ListTag sources = new ListTag();
+            massSources.stream().sorted().forEach(id -> sources.add(StringTag.valueOf(id.toString())));
+            tag.put("mass_sources", sources);
+        }
+        Identifier recipe = current == null ? resumeRecipe : current.id().identifier();
+        if (recipe != null) {
+            tag.putString("recipe", recipe.toString());
         }
     }
 
@@ -1290,8 +1652,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         super.loadAdditional(tag, registries);
         magazine.load(tag.getCompoundOrEmpty("magazine"), registries);
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
-        ItemStackHandler loaded = new ItemStackHandler();
-        io.github.genichimaruo.singulo.compat.NbtCompat.deserialize(loaded, registries, tag.getCompoundOrEmpty("items"));
+        ItemStackHandler loaded = MachineStock.read(tag.getCompoundOrEmpty("items"), registries);
         int[] layout = tag.getIntArray("slot_layout").orElseGet(() -> new int[0]);
         if (layout.length != 2) {
             layout = type.legacyLayout();
@@ -1310,6 +1671,26 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             int from = savedSlot(slot, layout[0], layout[1]);
             if (from >= 0 && savedReturns.get(from) && !items.getStackInSlot(slot).isEmpty()) {
                 pendingReturns.set(slot);
+            }
+        }
+        if (assemblyGrid != null) {
+            legacyAssemblyInputs.clear();
+            for (Tag entry : tag.getListOrEmpty("legacy_assembly_inputs")) {
+                ItemStack stack = io.github.genichimaruo.singulo.compat.NbtCompat.parseOptional(registries, (CompoundTag) entry);
+                if (!stack.isEmpty()) legacyAssemblyInputs.add(stack);
+            }
+            for (int i = 0; i < Math.min(loaded.getSlots(), layout[0]); i++) {
+                ItemStack stack = loaded.getStackInSlot(i);
+                if (!stack.isEmpty()) legacyAssemblyInputs.add(stack);
+            }
+            if (layout[0] > 0 && UsesHelper.isSpentCatalyst(items.getStackInSlot(type.outputSlot()))) {
+                ItemStack rest = items.insertItem(type.spentCatalystSlot(), items.getStackInSlot(type.outputSlot()), false);
+                items.setStackInSlot(type.outputSlot(), rest);
+            }
+            assemblyGrid.deserializeNBT(registries, tag.getCompoundOrEmpty("assembly_grid"));
+            assemblyReturns.clear();
+            for (int slot : tag.getIntArray("assembly_returns").orElseGet(() -> new int[0])) {
+                if (slot >= 0 && slot < assemblyGrid.getSlots() && !assemblyGrid.getStackInSlot(slot).isEmpty()) assemblyReturns.set(slot);
             }
         }
         if (tag.contains("item_sides")) {
@@ -1346,12 +1727,26 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
         refreshEnergyCapacity();
         energy.restoreEnergy(tag.getIntOr("energy", 0));
         progress = tag.getIntOr("progress", 0);
-        mode = tag.getIntOr("mode", 0);
-        selectedRecipe = tag.contains("selected_recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(Identifier.tryParse(tag.getStringOr("selected_recipe", ""))) : null;
+        batchRemaining = Math.max(0, tag.getIntOr("batch_remaining", 0));
+        completedDuration = Math.clamp(tag.getIntOr("completed_duration", 0), 0, Math.max(0, progress));
+        underpoweredTicks = Math.max(0, tag.getIntOr("underpowered_ticks", 0));
+        mode = type.massMode() ? tag.getIntOr("mode", 0) : 0;
+        selectedRecipe = type.selectsRecipe() && tag.contains("selected_recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(Identifier.tryParse(tag.getStringOr("selected_recipe", ""))) : null;
         selectedIndex = -2;
         mass = tag.getDoubleOr("mass", 0.0D);
         metalMass = tag.getDoubleOr("metal_mass", 0.0D);
+        massSources.clear();
+        for (Tag entry : tag.getListOrEmpty("mass_sources")) {
+            Identifier source = entry instanceof net.minecraft.nbt.StringTag name ? Identifier.tryParse(name.value()) : null;
+            if (source != null) massSources.add(source);
+        }
+        current = null;
         resumeRecipe = tag.contains("recipe") ? io.github.genichimaruo.singulo.registry.LegacyIds.recipe(Identifier.tryParse(tag.getStringOr("recipe", ""))) : null;
+        if (assemblyGrid != null && layout[0] > 0 && !tag.getBooleanOr("assembly_active", false)) {
+            // A paid bulk cycle cannot be resumed against different materials in the manual board.
+            resumeRecipe = null;
+            progress = completedDuration = underpoweredTicks = 0;
+        }
         // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
         inputsChangedAt = tag.getLongOr("inputs_changed_at", 0L);
         dirty = true;
@@ -1373,6 +1768,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (assemblyGrid != null) return stack;
             if (slot == type.catalystSlot()) {
                 // 予備の新品に重ならない使いかけの触媒は、装填中のものと合わせて受け取る
                 ItemStack rest = items.insertItem(slot, stack, simulate);
@@ -1383,7 +1779,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return (slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || pendingReturns.get(slot)
+            return (slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || slot == type.spentCatalystSlot() || pendingReturns.get(slot)
                     ? items.extractItem(slot, amount, simulate) : ItemStack.EMPTY;
         }
 
@@ -1394,7 +1790,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return (slot < type.inputSlots() || slot == type.catalystSlot()) && slotAccepts(slot, stack);
+            return assemblyGrid == null && (slot < type.inputSlots() || slot == type.catalystSlot()) && slotAccepts(slot, stack);
         }
     }
 
@@ -1504,8 +1900,12 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
     /** 入力タンクに入れる。同じ液体の入ったタンクを先に、なければ空のタンクへ。mask は入れてよいタンクのビット。 */
     private int fillInputs(FluidStack resource, IFluidHandler.FluidAction action, int mask) {
+        // The tower also consumes nitrogen from its product tanks. Keep its single feed tank available for lava, water or helium.
+        boolean coolant = towerCoolant(resource);
+        int first = coolant ? type.fluidInputs() : 0;
+        int end = coolant ? tanks.length : type.fluidInputs();
         for (int pass = 0; pass < 2; pass++) {
-            for (int i = 0; i < type.fluidInputs(); i++) {
+            for (int i = first; i < end; i++) {
                 if ((mask & (1 << i)) == 0) {
                     continue;
                 }
@@ -1518,6 +1918,11 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             }
         }
         return 0;
+    }
+
+    private boolean towerCoolant(FluidStack resource) {
+        return type == MachineType.CRYOGENIC_COOLING_TOWER
+                && resource.getFluid() == io.github.genichimaruo.singulo.registry.SinguloFluids.get("liquid_nitrogen");
     }
 
     /** パイプから入れてよい液体か: すでに入力タンクに入っているか、この装置のレシピが使うもの。 */
@@ -1568,7 +1973,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
 
         @Override
         public boolean isFluidValid(int tank, FluidStack stack) {
-            return tank < type.fluidInputs();
+            return towerCoolant(stack) ? tank >= type.fluidInputs() && tank < tanks.length : tank < type.fluidInputs();
         }
 
         @Override
@@ -1618,7 +2023,7 @@ public class MachineBlockEntity extends io.github.genichimaruo.singulo.compat.Le
             insert = itemSides.canInsert(face);
             extract = itemSides.canExtract(face);
         }
-        final boolean allowInsert = insert, allowExtract = extract;
+        final boolean allowInsert = insert && assemblyGrid == null, allowExtract = extract;
         return new io.github.genichimaruo.singulo.compat.ItemTransferView(items,
                 (slot, resource) -> allowInsert && (slot < type.inputSlots() || slot == type.catalystSlot()) && slotAccepts(slot, resource.toStack()),
                 (slot, resource) -> allowExtract && ((slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || pendingReturns.get(slot))) {

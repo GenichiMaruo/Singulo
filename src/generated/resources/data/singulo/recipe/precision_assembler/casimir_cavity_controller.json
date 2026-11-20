@@ -26,10 +26,25 @@
       "count": 2
     },
     {
+      "ingredient": "singulo:topological_wire",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:casimir_cavity_frame",
+      "count": 1
+    },
+    {
       "ingredient": "singulo:bose_condensate_catalyst",
       "tier": 3,
       "uses": 36000
     }
+  ],
+  "shape": [
+    "     ",
+    " CBC ",
+    " EAE ",
+    " DFD ",
+    "  G  "
   ],
   "result": {
     "id": "singulo:casimir_cavity_controller",

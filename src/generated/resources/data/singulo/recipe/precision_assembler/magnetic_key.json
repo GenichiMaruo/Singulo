@@ -18,6 +18,13 @@
       "count": 1
     }
   ],
+  "shape": [
+    "     ",
+    "     ",
+    " ABC ",
+    "     ",
+    "     "
+  ],
   "result": {
     "id": "singulo:magnetic_key",
     "count": 1

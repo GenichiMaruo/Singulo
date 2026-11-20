@@ -29,7 +29,8 @@ public class DeviceMenu extends AbstractContainerMenu {
         HALO_COLLECTOR(0, Halo.COUNT, false),
         MUON_COLLECTOR(1, Muon.COUNT, false),
         DETECTOR(0, Detector.COUNT, false),
-        JET_FORGE(7, Forge.COUNT, true);
+        JET_FORGE(7, Forge.COUNT, true),
+        FLUID_PUMP(0, Pump.COUNT, false);
 
         public final int slots;
         public final int data;
@@ -64,8 +65,13 @@ public class DeviceMenu extends AbstractContainerMenu {
         public static final int MAX_CHANNEL = (1 << BITS) - 1;
     }
 
+    public static final class Pump {
+        public static final int INTAKE = 0, CLOSED = 1, ACTIVE = 2, FLOW = 3, POWER = 5, COUNT = 7;
+    }
+
     public static final class Tank {
-        public static final int AMOUNT = 0, CAPACITY = 1, CONTAINED = 2, ENERGY = 3, ENERGY_MAX = 4, COUNT = 5;
+        public static final int AMOUNT = 0, CAPACITY = 1, CONTAINED = 2, ENERGY = 3, ENERGY_MAX = 4, EJECT = 5, COUNT = 6;
+        public static final int BUTTON_EJECT = 0;
     }
 
     public static final class Halo {
@@ -85,7 +91,7 @@ public class DeviceMenu extends AbstractContainerMenu {
     public static final class Forge {
         public static final int PHASE = 0, ELAPSED = 1, TOTAL = 2, HOLD = 3, FORMED = 4, CORE = 5, COOLANT = 6, BUFFER_MFE = 7,
                 CAPACITY_MFE = 8, INTAKE_MFE = 9, DEMAND_MFE = 10, BH = 11, SEED = 12, IGNITION_PCT = 13, IGNITION_SECS = 14,
-                IGNITION_GFE = 15, BATCH = 16, COUNT = 17;
+                IGNITION_GFE = 15, BATCH = 16, PHASE_TICK = 17, IRRADIATE_FE = 18, FIRST_DURATION = 19, COUNT = FIRST_DURATION + 6;
         /** 画面のボタン: 点火。 */
         public static final int BUTTON_IGNITE = 0;
         /** スロット: 種・材料3つ・完成品・空の容器（JetForgeBlockEntity と同じ並び）。 */

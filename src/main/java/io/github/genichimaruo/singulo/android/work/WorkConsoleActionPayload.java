@@ -158,7 +158,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
             switch (a.getStringOr("type", "")) {
                 case PLAN -> {
                     if (!item.isEmpty()) {
-                        plan = WorkConsoleView.plan(console, console.plan(item, count, a.getBooleanOr("fresh", false)), reg);
+                        plan = WorkConsoleView.plan(console, console.preview(player, item, count, a.getBooleanOr("fresh", false)), reg);
                     }
                 }
                 case START -> {
@@ -205,7 +205,21 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     return;
                 }
                 case PROCESS -> {
-                    menu.setProcess(player, items(a.getListOrEmpty("inputs"), reg), items(a.getListOrEmpty("outputs"), reg));
+                    var inputs = items(a.getListOrEmpty("inputs"), reg);
+                    if (a.contains("machine_recipe")) {
+                        var id = net.minecraft.resources.Identifier.tryParse(a.getStringOr("machine_recipe", ""));
+                        if (id != null) player.level().recipeAccess().byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id)).ifPresent(holder -> {
+                            if (holder.value() instanceof io.github.genichimaruo.singulo.recipe.MachineRecipe machine) {
+                                var recipe = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjust(id, machine);
+                                if (recipe != null) {
+                                    console.setMachineProcess(recipe, inputs);
+                                    menu.broadcastChanges();
+                                }
+                            }
+                        });
+                    } else {
+                        menu.setProcess(player, inputs, items(a.getListOrEmpty("outputs"), reg));
+                    }
                     return;
                 }
                 default -> {

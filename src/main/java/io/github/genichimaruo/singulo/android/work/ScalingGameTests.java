@@ -107,7 +107,7 @@ public final class ScalingGameTests {
         ItemStack card = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.PROCEDURE_CARD.get());
         BlockPos remote = h.absolutePos(new BlockPos(20000, 1, 20000));
         h.assertFalse(level.isLoaded(remote), "Remote fixture was already loaded");
-        RecipeData.procedure(List.of(new ProcedureStep(ProcedureStep.MINE, remote, remote, ItemStack.EMPTY)), named(1))
+        RecipeData.procedure(List.of(new ProcedureStep(ProcedureStep.MINE, remote, remote, ItemStack.EMPTY).recordedIn(level)), named(1))
                 .write(card, level.registryAccess());
         rack.items().setStackInSlot(1, card);
         var first = new ArrayList<RecipeRackBlockEntity.Entry>();
@@ -116,7 +116,7 @@ public final class ScalingGameTests {
         rack.entries(level, second);
         h.assertFalse(level.isLoaded(remote), "Opening a recipe catalogue synchronously loaded a remote chunk");
         h.assertTrue(first.getFirst().recipe() == second.getFirst().recipe(), "Unchanged cards were decoded again");
-        RecipeData.procedure(List.of(new ProcedureStep(ProcedureStep.MINE, remote, remote, ItemStack.EMPTY)), named(2))
+        RecipeData.procedure(List.of(new ProcedureStep(ProcedureStep.MINE, remote, remote, ItemStack.EMPTY).recordedIn(level)), named(2))
                 .write(card, level.registryAccess());
         second.clear(); rack.entries(level, second);
         h.assertTrue(ItemStack.isSameItemSameComponents(second.getFirst().recipe().output(), named(2)), "In-place edit stayed cached");

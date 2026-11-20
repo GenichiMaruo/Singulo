@@ -36,8 +36,10 @@ public class CreativeEnergyBlockEntity extends io.github.genichimaruo.singulo.co
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CreativeEnergyBlockEntity be) {
         for (Direction dir : Direction.values()) {
-            net.neoforged.neoforge.transfer.energy.EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (target != null && !(level.getBlockEntity(pos.relative(dir)) instanceof CreativeEnergyBlockEntity)) {
+            BlockPos neighbor = pos.relative(dir);
+            if (!level.isLoaded(neighbor)) continue;
+            net.neoforged.neoforge.transfer.energy.EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, neighbor, dir.getOpposite());
+            if (target != null && !(level.getBlockEntity(neighbor) instanceof CreativeEnergyBlockEntity)) {
                 io.github.genichimaruo.singulo.energy.EnergyTransfers.moveLong(be.infinite, target, Long.MAX_VALUE / 4);
             }
         }

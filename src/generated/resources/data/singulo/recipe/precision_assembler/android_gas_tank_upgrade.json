@@ -13,7 +13,7 @@
   "ingredients": [
     {
       "ingredient": "mekanism:basic_chemical_tank",
-      "count": 1
+      "count": 2
     },
     {
       "ingredient": "#c:ingots/osmium",
@@ -27,6 +27,13 @@
       "ingredient": "singulo:basic_circuit",
       "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    " ADA ",
+    " C C ",
+    "     "
   ],
   "result": {
     "id": "singulo:android_gas_tank_upgrade",

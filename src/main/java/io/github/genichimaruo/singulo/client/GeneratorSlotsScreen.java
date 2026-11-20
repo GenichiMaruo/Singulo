@@ -39,7 +39,7 @@ public class GeneratorSlotsScreen extends FramedScreen<GeneratorSlotsMenu> {
         if (menu.value(GeneratorSlotsMenu.D_STANDBY) != 0) {
             return Panel.Status.IDLE;
         }
-        return menu.value(GeneratorSlotsMenu.D_RATE_X100) > 0 ? Panel.Status.RUN : Panel.Status.IDLE;
+        return menu.rate() > 0 ? Panel.Status.RUN : Panel.Status.IDLE;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class GeneratorSlotsScreen extends FramedScreen<GeneratorSlotsMenu> {
     private void drawStats(GuiGraphicsExtractor g) {
         int fluid = menu.value(GeneratorSlotsMenu.D_FLUID);
         int cap = Math.max(1, menu.value(GeneratorSlotsMenu.D_FLUID_CAP));
-        double rate = menu.value(GeneratorSlotsMenu.D_RATE_X100) / 100.0;
+        double rate = menu.rate();
         int y = statsTop(turbine() ? 4 : 3);
         if (turbine()) {
             int hot = menu.value(GeneratorSlotsMenu.D_HOT);
@@ -121,7 +121,7 @@ public class GeneratorSlotsScreen extends FramedScreen<GeneratorSlotsMenu> {
                     List.of(Component.translatable("gui.singulo.generator_slots.water", fluid, cap)));
         }
         // タービンは3行の下、核融合炉は2行の下
-        stat(g, STAT_X, y + (turbine() ? 33 : 22), Panel.Icon.BOLT, Panel.GLOW, EnergyText.of(rate) + " FE/t", skin.text(),
+        stat(g, STAT_X, y + (turbine() ? 33 : 22), Panel.Icon.BOLT, Panel.GLOW, EnergyText.shortForm(rate) + " FE/t", skin.text(),
                 List.of(Component.translatable("gui.singulo.energy_rate", EnergyText.of(rate))));
     }
 }

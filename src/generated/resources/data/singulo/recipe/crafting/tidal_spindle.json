@@ -3,14 +3,14 @@
   "category": "misc",
   "pattern": [
     "CQC",
-    "SFS",
+    "SRS",
     "CIC"
   ],
   "key": {
     "C": "singulo:superconducting_coil",
     "Q": "singulo:gravity_field_stabilizer",
     "S": "singulo:collapsar_ingot",
-    "F": "singulo:nihonium_frame",
+    "R": "singulo:tidal_draw_ring",
     "I": "singulo:exotic_matter"
   },
   "result": {

@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "W",
-    "P",
-    "W"
+    "WFW",
+    " P "
   ],
   "key": {
     "W": "singulo:white_ceramic_composite",
-    "P": "#c:plates/steel"
+    "P": "#c:plates/steel",
+    "F": "singulo:cooling_tower_base"
   },
   "result": {
     "id": "singulo:cooling_tower_casing",

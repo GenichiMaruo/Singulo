@@ -2,183 +2,177 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.test.harness.GameTestHolder;
 import io.github.genichimaruo.singulo.test.harness.PrefixGameTestTemplate;
 
+import com.mojang.authlib.GameProfile;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
+import io.github.genichimaruo.singulo.machine.MachineMenu;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.machine.RecipeSelection;
+import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import io.github.genichimaruo.singulo.test.harness.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.neoforged.neoforge.common.util.FakePlayer;
 
-/**
- * 精密組立台の作るものの指定（{@link RecipeSelection}）。材料を入れている途中で、その一部だけでできる別のものが
- * 作られないこと。
- */
+/** Automatic bulk recipe selection is supported by the singularity encapsulator. */
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class RecipeSelectionGameTests {
-    private static final String EMPTY = "empty";
+    private static final MachineType TYPE = MachineType.SINGULARITY_ENCAPSULATOR;
+    // Its condensate, exotic matter and computing module are also part of the genesis core recipe.
+    private static final String AMBIGUOUS = "awakening_record_core";
+    private static final String UNIQUE = "awakening_echo_core";
 
-    private RecipeSelectionGameTests() {}
-
-    private static Item item(String id) {
-        return BuiltInRegistries.ITEM.getValue(Singulo.id(id));
+    private static MachineBlockEntity machine(GameTestHelper h, BlockPos pos) {
+        h.setBlock(pos, SinguloBlocks.MACHINES.get(TYPE).get());
+        MachineBlockEntity machine = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, pos);
+        h.onEachTick(() -> machine.energy().setEnergy(machine.energy().getMaxEnergyStored()));
+        return machine;
     }
 
-    private static MachineBlockEntity assembler(GameTestHelper helper, BlockPos pos) {
-        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(helper, pos);
-        helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
-        return m;
+    private static int index(GameTestHelper h, String name) {
+        int index = RecipeSelection.indexOf(h.getLevel(), TYPE, Singulo.id(TYPE.id() + "/" + name));
+        h.assertTrue(index >= 0, "Missing encapsulator recipe " + name);
+        return index;
     }
 
-    private static int indexOf(GameTestHelper helper, String path) {
-        int i = RecipeSelection.indexOf(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, Singulo.id("precision_assembler/" + path));
-        helper.assertTrue(i >= 0, "レシピがない: " + path);
-        return i;
+    private static RecipeHolder<MachineRecipe> recipe(GameTestHelper h, String name) {
+        return RecipeSelection.byIndex(h.getLevel(), TYPE, index(h, name));
     }
 
-    private static ItemStack output(MachineBlockEntity m) {
-        return m.items().getStackInSlot(m.type().outputSlot());
+    private static void load(MachineBlockEntity machine, MachineRecipe recipe) {
+        for (int i = 0; i < recipe.ingredients().size(); i++) {
+            var part = recipe.ingredients().get(i);
+            machine.items().setStackInSlot(i, part.ingredient().items().map(net.minecraft.world.item.ItemStack::new).toArray(net.minecraft.world.item.ItemStack[]::new)[0].copyWithCount(part.count()));
+        }
     }
 
-    /** Chunk loading must not bypass the automatic input settling period. */
-    @GameTest(template = EMPTY, timeoutTicks = 120)
-    public static void restoredInputsWaitBeforeCrafting(GameTestHelper helper) {
-        BlockPos pos = new BlockPos(1, 1, 1);
-        MachineBlockEntity source = assembler(helper, pos);
-        helper.runAtTickTime(70, () -> {
-            var level = helper.getLevel();
-            source.items().setStackInSlot(0, new ItemStack(item("superconducting_coil"), 16));
-            source.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
-            var tag = source.saveWithoutMetadata(level.registryAccess());
-            var absolute = helper.absolutePos(pos);
-            var state = level.getBlockState(absolute);
-            MachineBlockEntity restored = new MachineBlockEntity(absolute, state);
-            io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, tag, level.registryAccess());
-            restored.setLevel(level);
+    private static void run(GameTestHelper h, MachineBlockEntity machine, int ticks) {
+        for (int i = 0; i < ticks; i++) {
+            machine.energy().setEnergy(machine.energy().getMaxEnergyStored());
+            MachineBlockEntity.serverTick(h.getLevel(), machine.getBlockPos(), machine.getBlockState(), machine);
+        }
+    }
+
+    private static ItemStack output(MachineBlockEntity machine) {
+        return machine.items().getStackInSlot(TYPE.outputSlot());
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 120)
+    public static void restoredInputsWaitBeforeCrafting(GameTestHelper h) {
+        var source = machine(h, new BlockPos(1, 1, 1));
+        h.runAtTickTime(70, () -> {
+            load(source, recipe(h, AMBIGUOUS).value());
+            var registry = h.getLevel().registryAccess();
+            var restored = new MachineBlockEntity(source.getBlockPos(), source.getBlockState());
+            io.github.genichimaruo.singulo.test.harness.TestNbt.load(restored, source.saveWithoutMetadata(registry), registry);
+            restored.setLevel(h.getLevel());
             restored.onLoad();
-            restored.energy().setEnergy(restored.energy().getMaxEnergyStored());
-            MachineBlockEntity.serverTick(level, absolute, state, restored);
-            helper.assertTrue(restored.status() == MachineBlockEntity.Status.IDLE,
-                    "Reload bypassed the input settling period: " + restored.status());
-            helper.succeed();
+            run(h, restored, 1);
+            h.assertTrue(restored.status() == MachineBlockEntity.Status.IDLE, "Reload bypassed the input settling period");
+            h.succeed();
         });
     }
 
-    /** トポロジカル導線と鋼板だけ（トロイダル磁気コイルの材料）は、ほかの設備の途中でもあるので、入れ終わって少し待ってから自動で作る。指定すればすぐ作る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 400)
-    public static void partialLoadWaitsBeforeCraftingAmbiguousRecipe(GameTestHelper helper) {
-        MachineBlockEntity auto = assembler(helper, new BlockPos(1, 1, 1));
-        MachineBlockEntity fixed = assembler(helper, new BlockPos(4, 1, 1));
-        for (MachineBlockEntity m : new MachineBlockEntity[]{auto, fixed}) {
-            m.items().setStackInSlot(0, new ItemStack(item("topological_wire"), 16));
-            m.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
-        }
-        helper.assertTrue(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER,
-                RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "toroidal_magnetic_coil"))),
-                "トロイダル磁気コイルがほかのレシピの途中と判定されない");
-        fixed.selectRecipe(indexOf(helper, "toroidal_magnetic_coil"));
-        // 入れている途中（入れるのが止まって SETTLE_TICKS 経つまで）は、自動では作り始めない
-        helper.runAtTickTime(RecipeSelection.SETTLE_TICKS / 2, () -> {
-            helper.assertTrue(auto.status() == MachineBlockEntity.Status.IDLE, "入れている途中で自動が動き出した: " + auto.status());
+    @GameTest(template = "empty", timeoutTicks = 120)
+    public static void partialLoadWaitsBeforeCraftingAmbiguousRecipe(GameTestHelper h) {
+        var automatic = machine(h, new BlockPos(1, 1, 1));
+        var fixed = machine(h, new BlockPos(4, 1, 1));
+        var holder = recipe(h, AMBIGUOUS);
+        h.assertTrue(RecipeSelection.ambiguous(h.getLevel(), TYPE, holder), "Record core must also be a partial genesis core");
+        load(automatic, holder.value());
+        load(fixed, holder.value());
+        fixed.selectRecipe(index(h, AMBIGUOUS));
+        h.runAtTickTime(RecipeSelection.SETTLE_TICKS / 2, () -> {
+            h.assertTrue(automatic.status() == MachineBlockEntity.Status.IDLE && fixed.status() == MachineBlockEntity.Status.RUNNING,
+                    "Only the selected machine should start during input settling");
         });
-        // 入れ終わって止まっていれば、自動でも作る（0.11.0 では、いつまでも始まらなかった）
-        helper.runAtTickTime(RecipeSelection.SETTLE_TICKS + 260, () -> {  // トロイダル磁気コイルは10秒
-            helper.assertTrue(output(auto).is(item("toroidal_magnetic_coil")), "入れ終わっても自動で作られない: " + output(auto));
-            helper.assertTrue(output(fixed).is(item("toroidal_magnetic_coil")), "指定したのに作られない: " + output(fixed));
-            helper.succeed();
+        h.runAtTickTime(RecipeSelection.SETTLE_TICKS + 3, () -> {
+            run(h, automatic, holder.value().time());
+            run(h, fixed, holder.value().time());
+            h.assertTrue(ItemStack.matches(output(automatic), holder.value().result()) && ItemStack.matches(output(fixed), holder.value().result()),
+                    "Automatic or fixed selection failed to finish the record core");
+            h.succeed();
         });
     }
 
-    /** 自動: ほかのレシピの途中になりえない組み合わせはそのまま作る。使わない物が混ざっていたら作らない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 400)
-    public static void autoNeedsExactInputs(GameTestHelper helper) {
-        MachineBlockEntity exact = assembler(helper, new BlockPos(1, 1, 1));
-        MachineBlockEntity extra = assembler(helper, new BlockPos(4, 1, 1));
-        MachineBlockEntity fixed = assembler(helper, new BlockPos(7, 1, 1));
-        for (MachineBlockEntity m : new MachineBlockEntity[]{exact, extra, fixed}) {
-            m.items().setStackInSlot(0, new ItemStack(item("entangled_element"), 4));
-            m.items().setStackInSlot(1, new ItemStack(item("basic_circuit")));
-            m.items().setStackInSlot(2, new ItemStack(item("coolant_cartridge")));
-        }
+    @GameTest(template = "empty")
+    public static void autoNeedsExactInputs(GameTestHelper h) {
+        var exact = machine(h, new BlockPos(1, 1, 1));
+        var extra = machine(h, new BlockPos(3, 1, 1));
+        var fixed = machine(h, new BlockPos(5, 1, 1));
+        var recipe = recipe(h, UNIQUE).value();
+        for (var machine : List.of(exact, extra, fixed)) load(machine, recipe);
         extra.items().setStackInSlot(3, new ItemStack(Items.DIRT));
         fixed.items().setStackInSlot(3, new ItemStack(Items.DIRT));
-        fixed.selectRecipe(indexOf(helper, "quantum_computing_module"));
-        helper.runAtTickTime(300, () -> {
-            helper.assertTrue(output(exact).is(item("quantum_computing_module")), "ぴったりの材料で作られない");
-            helper.assertTrue(output(extra).isEmpty(), "使わない物が混ざっているのに自動で作られた");
-            helper.assertTrue(output(fixed).is(item("quantum_computing_module")), "指定すると余分な物があっても作られるはず");
-            helper.assertTrue(fixed.items().getStackInSlot(3).is(Items.DIRT), "余分な物が消えた");
-            helper.succeed();
-        });
+        fixed.selectRecipe(index(h, UNIQUE));
+        for (var machine : List.of(exact, extra, fixed)) run(h, machine, recipe.time() + 1);
+        h.assertTrue(ItemStack.matches(output(exact), recipe.result()), "Exact inputs did not craft automatically");
+        h.assertTrue(output(extra).isEmpty(), "Automatic selection accepted unrelated inputs");
+        h.assertTrue(ItemStack.matches(output(fixed), recipe.result()) && fixed.items().getStackInSlot(3).is(Items.DIRT),
+                "Fixed selection did not preserve the extra input");
+        h.succeed();
     }
 
-    /** 指定は保存され、指定を外すと自動に戻る。 */
-    @GameTest(template = EMPTY)
-    public static void selectionIsSavedAndCleared(GameTestHelper helper) {
-        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
-        m.selectRecipe(indexOf(helper, "tipler_bearing"));
-        var tag = m.saveWithoutMetadata(helper.getLevel().registryAccess());
-        helper.assertTrue("singulo:precision_assembler/tipler_bearing".equals(tag.getStringOr("selected_recipe", "")), "指定が保存されない");
-        m.selectRecipe(-1);
-        helper.assertTrue(m.selectedRecipe() == null, "指定が外れない");
-        io.github.genichimaruo.singulo.test.harness.TestNbt.load(m, tag, helper.getLevel().registryAccess());
-        helper.assertTrue(m.selectedRecipe() != null, "指定が読み込まれない");
-        helper.succeed();
+    @GameTest(template = "empty")
+    public static void selectionIsSavedAndCleared(GameTestHelper h) {
+        var machine = machine(h, new BlockPos(1, 1, 1));
+        machine.selectRecipe(index(h, UNIQUE));
+        var tag = machine.saveWithoutMetadata(h.getLevel().registryAccess());
+        var id = recipe(h, UNIQUE).id().identifier();
+        h.assertTrue(id.toString().equals(tag.getStringOr("selected_recipe", "")), "Selection was not saved");
+        machine.selectRecipe(-1);
+        h.assertTrue(machine.selectedRecipe() == null, "Selection was not cleared");
+        io.github.genichimaruo.singulo.test.harness.TestNbt.load(machine, tag, h.getLevel().registryAccess());
+        h.assertTrue(id.equals(machine.selectedRecipe()), "Selection did not survive reload");
+        h.succeed();
     }
-    /** /reload replaces recipes in the same RecipeManager, rather than replacing the manager itself. */
-    @GameTest(template = EMPTY, batch = "recipe_reload")
-    public static void ambiguityCacheFollowsRecipeReload(GameTestHelper helper) {
-        var manager = helper.getLevel().recipeAccess();
-        var original = java.util.List.copyOf(manager.getRecipes());
-        var toroid = RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "toroidal_magnetic_coil"));
-        helper.assertTrue(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, toroid),
-                "Fixture recipe must initially be ambiguous");
-        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
-        m.items().setStackInSlot(0, new ItemStack(item("topological_wire"), 16));
-        m.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
-        m.energy().setEnergy(m.energy().getMaxEnergyStored());
-        MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
-        helper.assertTrue(m.status() == MachineBlockEntity.Status.IDLE, "Ambiguous fixture should be idle");
+
+    @GameTest(template = "empty", batch = "recipe_reload")
+    public static void ambiguityCacheFollowsRecipeReload(GameTestHelper h) {
+        var manager = h.getLevel().recipeAccess();
+        var original = List.copyOf(manager.getRecipes());
+        var holder = recipe(h, AMBIGUOUS);
+        var machine = machine(h, new BlockPos(1, 1, 1));
+        load(machine, holder.value());
+        run(h, machine, 1);
+        h.assertTrue(RecipeSelection.ambiguous(h.getLevel(), TYPE, holder) && machine.status() == MachineBlockEntity.Status.IDLE,
+                "Fixture did not wait for a potentially larger recipe");
         try {
-            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, java.util.List.of(toroid));
-            helper.assertFalse(RecipeSelection.ambiguous(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, toroid),
-                    "Removed recipes still prevent automatic crafting after reload");
-            MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
-            helper.assertTrue(m.status() == MachineBlockEntity.Status.RUNNING,
-                    "Unchanged inputs do not resume after recipe reload removes ambiguity");
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, List.of(holder));
+            h.assertFalse(RecipeSelection.ambiguous(h.getLevel(), TYPE, holder), "Removed recipe still causes ambiguity");
+            run(h, machine, 1);
+            h.assertTrue(machine.status() == MachineBlockEntity.Status.RUNNING, "Unchanged inputs did not resume after reload");
         } finally {
             io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original);
         }
-        helper.succeed();
+        h.succeed();
     }
 
-    @GameTest(template = EMPTY, batch = "recipe_reload")
-    public static void selectedIndexFollowsRecipeReload(GameTestHelper helper) {
-        var manager = helper.getLevel().recipeAccess();
-        var original = java.util.List.copyOf(manager.getRecipes());
-        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
-        int before = indexOf(helper, "quantum_computing_module");
-        var selected = RecipeSelection.byIndex(helper.getLevel(), m.type(), before);
-        m.selectRecipe(before);
-        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
-        var menu = new io.github.genichimaruo.singulo.machine.MachineMenu(1, player.getInventory(), m);
-        helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == before + 1, "Initial choice not synchronized");
+    @GameTest(template = "empty", batch = "recipe_reload")
+    public static void selectedIndexFollowsRecipeReload(GameTestHelper h) {
+        var manager = h.getLevel().recipeAccess();
+        var original = List.copyOf(manager.getRecipes());
+        var machine = machine(h, new BlockPos(1, 1, 1));
+        var selected = recipe(h, UNIQUE);
+        int before = index(h, UNIQUE);
+        machine.selectRecipe(before);
+        var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "SelectionTester"));
+        var menu = new MachineMenu(1, player.getInventory(), machine);
+        h.assertTrue(before > 0 && menu.value(MachineBlockEntity.D_SELECTED) == before + 1, "Initial choice not synchronized");
         try {
-            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, java.util.List.of(selected));
-            helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == 1,
-                    "Selected recipe keeps its obsolete GUI index after reload");
-            helper.assertTrue(m.selectedRecipe().equals(selected.id().identifier()), "Reload changed the selected recipe ID");
+            io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, List.of(selected));
+            h.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == 1, "Selected recipe kept its obsolete GUI index");
+            h.assertTrue(selected.id().identifier().equals(machine.selectedRecipe()), "Reload changed the selected recipe ID");
         } finally {
             io.github.genichimaruo.singulo.test.harness.RecipeReload.replace(manager, original);
-            player.discard();
         }
-        helper.succeed();
+        h.succeed();
     }
 }

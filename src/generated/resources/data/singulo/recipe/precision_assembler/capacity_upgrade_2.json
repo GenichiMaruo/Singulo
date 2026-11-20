@@ -18,6 +18,13 @@
       "count": 4
     }
   ],
+  "shape": [
+    "     ",
+    " C C ",
+    " BAB ",
+    " C C ",
+    "     "
+  ],
   "result": {
     "id": "singulo:capacity_upgrade_2",
     "count": 1

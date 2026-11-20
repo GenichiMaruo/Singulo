@@ -24,7 +24,18 @@
     {
       "ingredient": "singulo:superconducting_coil",
       "count": 2
+    },
+    {
+      "ingredient": "singulo:empty_black_hole_vessel",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    " DCD ",
+    "EBABE",
+    " DFD ",
+    "     "
   ],
   "result": {
     "id": "singulo:gravitational_containment_tank",

@@ -24,7 +24,18 @@
     {
       "ingredient": "singulo:optical_lattice_substrate",
       "count": 4
+    },
+    {
+      "ingredient": "singulo:shield_tower_plinth",
+      "count": 1
     }
+  ],
+  "shape": [
+    "     ",
+    "CEDEC",
+    "CBABC",
+    "CEDEC",
+    "  F  "
   ],
   "result": {
     "id": "singulo:shield_tower_core",

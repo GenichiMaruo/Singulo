@@ -1,5 +1,9 @@
 package io.github.genichimaruo.singulo.cable;
 
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
+
+import io.github.genichimaruo.singulo.energy.EnergyText;
+
 import com.mojang.serialization.MapCodec;
 import java.util.EnumMap;
 import java.util.Map;
@@ -13,11 +17,14 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -28,7 +35,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
  * capacity は1 tick に運べる量、lossPerBlock は1ブロックごとの損失の割合。
  * 実際に電力が通っている道だけが光る（{@link CableBlockEntity} が通った面と量をクライアントへ送り、描画で光らせる）。
  */
-public class CableBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock {
+public class CableBlock extends BaseEntityBlock implements io.github.genichimaruo.singulo.compat.RemovalAwareBlock, io.github.genichimaruo.singulo.compat.BlockTooltip, SimpleWaterloggedBlock {
     public static final Map<Direction, BooleanProperty> CONNECTIONS = new EnumMap<>(Direction.class);
     public static final net.minecraft.world.level.block.state.properties.EnumProperty<CableProfile.Straight> STRAIGHT =
             net.minecraft.world.level.block.state.properties.EnumProperty.create("straight", CableProfile.Straight.class);
@@ -42,11 +49,15 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
         CONNECTIONS.put(Direction.DOWN, BlockStateProperties.DOWN);
     }
 
-    private final long capacity;
-    private final double lossPerBlock;
+    private final java.util.function.LongSupplier capacity;
+    private final java.util.function.DoubleSupplier lossPerBlock;
     private final CableProfile profile;
 
     public CableBlock(Properties properties, long capacity, double lossPerBlock, CableProfile profile) {
+        this(properties, () -> capacity, () -> lossPerBlock, profile);
+    }
+
+    public CableBlock(Properties properties, java.util.function.LongSupplier capacity, java.util.function.DoubleSupplier lossPerBlock, CableProfile profile) {
         super(properties);
         this.capacity = capacity;
         this.lossPerBlock = lossPerBlock;
@@ -55,7 +66,8 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
         for (BooleanProperty p : CONNECTIONS.values()) {
             state = state.setValue(p, false);
         }
-        registerDefaultState(state.setValue(STRAIGHT, CableProfile.Straight.NONE).setValue(ConduitCover.PROPERTY, ConduitCover.State.NONE));
+        registerDefaultState(state.setValue(WATERLOGGED, false).setValue(STRAIGHT, CableProfile.Straight.NONE)
+                .setValue(ConduitCover.PROPERTY, ConduitCover.State.NONE));
     }
 
     public CableProfile profile() {
@@ -85,11 +97,18 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
 
     /** 1 tick に運べる量。Long.MAX_VALUE は上限なし。 */
     public long capacity() {
-        return capacity;
+        return capacity.getAsLong();
+    }
+
+    @Override
+    public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+                                java.util.List<net.minecraft.network.chat.Component> lines, net.minecraft.world.item.TooltipFlag flag) {
+        lines.add(net.minecraft.network.chat.Component.translatable("tooltip.singulo.cable_rate",
+                EnergyText.of(capacity()), EnergyText.of(lossPerBlock() * 100)).withStyle(net.minecraft.ChatFormatting.AQUA));
     }
 
     public double lossPerBlock() {
-        return lossPerBlock;
+        return lossPerBlock.getAsDouble();
     }
 
     @Override
@@ -100,12 +119,17 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         CONNECTIONS.values().forEach(builder::add);
-        builder.add(STRAIGHT, ConduitCover.PROPERTY);
+        builder.add(STRAIGHT, ConduitCover.PROPERTY, WATERLOGGED);
     }
 
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    protected FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -176,12 +200,12 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
     /** 枠だけ・カバーなしは光を通し、隣に陰を落とさない（ガラスのように）。ブロック入りはふつうのブロックと同じ。 */
     @Override
     protected boolean propagatesSkylightDown(BlockState state) {
-        return ConduitCover.passesLight(state) || super.propagatesSkylightDown(state);
+        return !state.getValue(WATERLOGGED) && (ConduitCover.passesLight(state) || super.propagatesSkylightDown(state));
     }
 
     @Override
     protected int getLightDampening(BlockState state) {
-        return ConduitCover.passesLight(state) ? 0 : super.getLightDampening(state);
+        return ConduitCover.passesLight(state) && !state.getValue(WATERLOGGED) ? 0 : super.getLightDampening(state);
     }
 
     @Override
@@ -192,7 +216,7 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        BlockState state = defaultBlockState();
+        BlockState state = defaultBlockState().setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
         for (Direction dir : Direction.values()) {
             state = state.setValue(CONNECTIONS.get(dir), connects(context.getLevel(), context.getClickedPos(), dir));
         }
@@ -201,6 +225,7 @@ public class CableBlock extends BaseEntityBlock implements io.github.genichimaru
 
     @Override
     protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
+        if (state.getValue(WATERLOGGED)) ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
             cable.invalidateForNeighbor(neighborPos);
         }
