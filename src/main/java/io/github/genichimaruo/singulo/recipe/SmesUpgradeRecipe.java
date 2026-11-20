@@ -39,6 +39,7 @@ public final class SmesUpgradeRecipe extends ShapedRecipe {
             if (source.contains("charge", net.minecraft.nbt.Tag.TAG_COMPOUND)) tag.put("charge", source.getCompound("charge"));
             tag.putString("id", "singulo:smes_module");
             result.addTagElement("BlockEntityTag", tag);
+            if (cell.getTag().getBoolean("singulo:packed_device")) result.getOrCreateTag().putBoolean("singulo:packed_device", true);
         }
         return result;
     }

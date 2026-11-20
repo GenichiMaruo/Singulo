@@ -27,7 +27,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 @GameTestHolder("singulo")
 @PrefixGameTestTemplate(false)
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid="singulo")
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid="singulo", bus=net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD)
 public final class AssemblerPowerGameTests {
     private static final net.minecraft.resources.ResourceLocation ADDON_CATALYST =
             new net.minecraft.resources.ResourceLocation("addon_fixture:muon_catalyst");

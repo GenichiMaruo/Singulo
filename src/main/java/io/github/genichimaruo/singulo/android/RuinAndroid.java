@@ -1922,7 +1922,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
-        releaseInventory((ServerLevel) level());
+        if (!guard) releaseInventory((ServerLevel) level());
     }
 
     /**
@@ -3331,6 +3331,8 @@ public abstract class RuinAndroid extends Monster {
         boolean wasDead = dead;
         super.die(source);
         if (!wasDead && dead && level() instanceof ServerLevel level) {
+            // Forge skips dropCustomDeathLoot entirely when doMobLoot is disabled.
+            if (guard) releaseInventory(level);
             AndroidStationBlockEntity station = homeStation(level);
             if (station != null) station.onAndroidDied(getUUID());
         }

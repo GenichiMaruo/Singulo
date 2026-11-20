@@ -40,9 +40,9 @@ public final class GalaxyTraitsGameTests {
         // 以前の保存（種だけ）は性質 0 として読む
         CompoundTag legacy = new CompoundTag();
         legacy.put("seeds", new LongArrayTag(new long[] {11L, 22L}));
-        var load = GenesisGalaxies.class.getDeclaredMethod("load", CompoundTag.class, net.minecraft.core.HolderLookup.Provider.class);
+        var load = GenesisGalaxies.class.getDeclaredMethod("load", CompoundTag.class);
         load.setAccessible(true);
-        GenesisGalaxies old = (GenesisGalaxies) load.invoke(null, legacy, h.getLevel().registryAccess());
+        GenesisGalaxies old = (GenesisGalaxies) load.invoke(null, legacy);
         h.assertTrue(old.seeds().equals(java.util.List.of(11L, 22L)) && old.traits().equals(java.util.List.of(0, 0)),
                 "Old galaxies do not load as plain spirals: " + old.traits());
         CompoundTag saved = old.save(new CompoundTag());
