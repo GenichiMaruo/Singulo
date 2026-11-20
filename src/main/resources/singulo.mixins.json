@@ -23,6 +23,7 @@
   "client": [
     "AndroidWeaponTerrainMixin",
     "AndroidWeaponTerrainTargetMixin",
+    "SodiumAndroidWeaponTerrainTargetMixin",
     "RayleighLightTextureMixin",
     "PonderLightingMixin",
     "RayleighRenderLightMixin",

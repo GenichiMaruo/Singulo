@@ -210,6 +210,14 @@ jobs:
         run: |
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithSodium
           grep -q 'SINGULO_REJOIN_COMPLETE 5' build/rayleigh-review/logs/latest.log
+      - name: Verify weapon layers through glass with Sodium
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/android-weapon.gradle runClient -PwithSodium -PweaponReviewDirectory=android-weapon-review-sodium
+          grep -q 'SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24' build/android-weapon-review-sodium/logs/latest.log
+          test "$(ls build/android-weapon-review-sodium/screenshots/*.png | wc -l)" -eq 24
       - name: Record unsupported optional integration scope
         run: |
           echo 'Create/Ponder is not supported on 26.1.2: no verified official dependency. No Ponder pass is claimed.' >> "$GITHUB_STEP_SUMMARY"
@@ -232,6 +240,8 @@ jobs:
           path: |
             build/rayleigh-review/logs/
             build/rayleigh-review/screenshots/
+            build/android-weapon-review-sodium/logs/
+            build/android-weapon-review-sodium/screenshots/
             build/ponder-review/logs/
             build/ponder-review/screenshots/
             build/cosmic-review/logs/
