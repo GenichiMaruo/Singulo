@@ -10,7 +10,7 @@
       "item": "minecraft:book"
     },
     "S": {
-      "tag": "forge:strings"
+      "tag": "forge:string"
     }
   },
   "result": {

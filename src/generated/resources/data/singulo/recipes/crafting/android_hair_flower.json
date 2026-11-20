@@ -10,7 +10,7 @@
       "tag": "minecraft:small_flowers"
     },
     "S": {
-      "tag": "forge:strings"
+      "tag": "forge:string"
     }
   },
   "result": {

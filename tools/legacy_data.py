@@ -22,6 +22,7 @@ def convert(path: Path, obj):
             value = value.replace('forge:leathers', 'forge:leather')
             value = value.replace('forge:gravels', 'forge:gravel').replace('forge:netherracks', 'forge:netherrack').replace('forge:obsidians', 'forge:obsidian').replace('forge:sandstone/blocks', 'forge:sandstone')
             value = value.replace('forge:cobblestones', 'forge:cobblestone').replace('forge:stones', 'forge:stone').replace('forge:sands', 'forge:sand')
+            value = value.replace('forge:strings', 'forge:string').replace('forge:slime_balls', 'forge:slimeballs')
             return value
         if not isinstance(value, dict): return value
         value = {k: visit(v) for k, v in value.items()}
