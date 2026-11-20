@@ -399,6 +399,48 @@ public final class FluidPumpGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void worldSourceCommitNotifiesNeighborsAndClaimsOnlyOnce(GameTestHelper h) {
+        var first = pump(h);
+        var firstTank = port(h, PUMP.east()).sendTank();
+        BlockPos liquid = PUMP.north();
+        BlockPos secondPos = liquid.west();
+        h.setBlock(secondPos, SinguloBlocks.FLUID_PUMP.get().defaultBlockState()
+                .setValue(FluidPumpBlock.INTAKE, Direction.EAST));
+        FluidPumpBlockEntity second = io.github.genichimaruo.singulo.test.harness.TestBlocks.get(h, secondPos);
+        var secondTank = port(h, secondPos.west()).sendTank();
+
+        h.setBlock(liquid, Blocks.WATER);
+        h.setBlock(liquid.above(), Blocks.LILY_PAD);
+        h.assertTrue(h.getBlockState(liquid.above()).is(Blocks.LILY_PAD), "Missing supported lily pad fixture");
+
+        h.assertTrue(first.energy().receiveEnergy(105, true) == 105, "Water source probe rejected");
+        h.assertTrue(h.getBlockState(liquid).is(Blocks.WATER) && h.getBlockState(liquid.above()).is(Blocks.LILY_PAD)
+                && firstTank.isEmpty(), "Root simulation changed water, its neighbor or the destination");
+
+        try (var outer = Transaction.openRoot()) {
+            try (var abort = Transaction.open(outer)) {
+                h.assertTrue(first.energy().insert(105, abort) == 105, "Nested probe did not reserve water");
+                h.assertTrue(h.getBlockState(liquid).is(Blocks.WATER) && h.getBlockState(liquid.above()).is(Blocks.LILY_PAD),
+                        "Speculative draw wrote the world");
+                h.assertTrue(second.energy().insert(105, abort) == 0 && secondTank.isEmpty(),
+                        "Another pump claimed a pending source");
+            }
+            h.assertTrue(firstTank.isEmpty() && second.energy().insert(105, outer) == 105,
+                    "Nested abort did not release the source reservation");
+            // Abort the outer transaction too.
+        }
+        h.assertTrue(firstTank.isEmpty() && secondTank.isEmpty() && h.getBlockState(liquid).is(Blocks.WATER)
+                && h.getBlockState(liquid.above()).is(Blocks.LILY_PAD),
+                "Root abort changed the rendered world or tank");
+
+        h.assertTrue(first.energy().receiveEnergy(105, false) == 105 && firstTank.getFluidAmount() == 1000
+                && secondTank.isEmpty() && h.getBlockState(liquid).isAir(),
+                "Root commit did not transfer exactly one source");
+        h.assertTrue(!h.getBlockState(liquid.above()).is(Blocks.LILY_PAD), "Committed pickup omitted neighbor updates");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void legacyChargeIsSpentOnceAndNeverRefilled(GameTestHelper h) {
         var pump = pump(h);
         var tag = pump.saveWithoutMetadata(h.getLevel().registryAccess());

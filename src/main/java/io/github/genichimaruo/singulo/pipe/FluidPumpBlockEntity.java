@@ -11,16 +11,14 @@ import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import io.github.genichimaruo.singulo.compat.FluidResourceView;
 import io.github.genichimaruo.singulo.compat.LegacyBlockEntity;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import io.github.genichimaruo.singulo.machine.DeviceMenu;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,10 +31,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.BucketPickup;
-import net.neoforged.neoforge.fluids.capability.wrappers.BucketPickupHandlerWrapper;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -116,27 +111,43 @@ public final class FluidPumpBlockEntity extends LegacyBlockEntity implements Dev
         int remaining() { return (int) Math.min(Integer.MAX_VALUE, limit - moved); }
     }
 
-    /** A known vanilla source/contained water block is reversible without invoking an arbitrary mod's pickup hook. */
-    private record WorldSource(ServerLevel level, BlockPos pos, BlockState state, BlockState replacement, FluidResource fluid) {
-        void take(TransactionContext tx) {
-            var journal = new SnapshotJournal<BlockState>() {
-                @Override protected BlockState createSnapshot() { return level.getBlockState(pos); }
-                @Override protected void revertToSnapshot(BlockState before) { level.setBlock(pos, before, 0); }
-                @Override protected void onRootCommit(BlockState before) {
-                    if (!level.isLoaded(pos) || level.getBlockState(pos) != replacement) return;
-                    level.setBlock(pos, before, 0);
-                    level.setBlockAndUpdate(pos, replacement);
+    private record WorldPosition(ServerLevel level, BlockPos pos) {}
+    // Two pumps in the same transaction must not take one source twice. This map
+    // stays populated only until abort or commit; it does not persist across ticks.
+    private static final Map<WorldPosition, SnapshotJournal<Boolean>> WORLD_CLAIMS = new ConcurrentHashMap<>();
+
+    private record WorldSource(WorldPosition key, BlockState state, BlockState replacement, FluidResource fluid) {
+        boolean take(TransactionContext tx) {
+            ServerLevel level = key.level;
+            BlockPos pos = key.pos;
+            if (!level.isLoaded(pos) || level.getBlockState(pos) != state) return false;
+            var claim = new SnapshotJournal<Boolean>() {
+                @Override protected Boolean createSnapshot() { return false; }
+                @Override protected void revertToSnapshot(Boolean before) { WORLD_CLAIMS.remove(key, this); }
+                @Override protected void onRootCommit(Boolean before) {
+                    if (WORLD_CLAIMS.get(key) != this) return;
+                    try {
+                        // Don't write to a changed or unloaded block; on ordinary server
+                        // ticks no world mutation can interleave with the synchronous transfer.
+                        if (level.isLoaded(pos) && level.getBlockState(pos) == state) {
+                            level.setBlockAndUpdate(pos, replacement);
+                        }
+                    } finally {
+                        WORLD_CLAIMS.remove(key, this);
+                    }
                 }
             };
-            journal.updateSnapshots(tx);
-            level.setBlock(pos, replacement, 0);
+            // No speculative writes: even setBlock(flags=0) can notify shapes or schedule ticks.
+            claim.updateSnapshots(tx);
+            return WORLD_CLAIMS.putIfAbsent(key, claim) == null;
         }
     }
 
     private @Nullable WorldSource worldSource() {
         if (!(level instanceof ServerLevel server)) return null;
         BlockPos pos = worldPosition.relative(intake());
-        if (!server.isLoaded(pos) || server.getBlockEntity(pos) != null) return null;
+        WorldPosition key = new WorldPosition(server, pos);
+        if (WORLD_CLAIMS.containsKey(key) || !server.isLoaded(pos) || server.getBlockEntity(pos) != null) return null;
         BlockState state = server.getBlockState(pos);
         var fluid = state.getFluidState();
         if (!fluid.isSource()) return null;
@@ -145,7 +156,7 @@ public final class FluidPumpBlockEntity extends LegacyBlockEntity implements Dev
         else if (state.getBlock() instanceof SimpleWaterloggedBlock && state.hasProperty(BlockStateProperties.WATERLOGGED))
             replacement = state.setValue(BlockStateProperties.WATERLOGGED, false);
         else return null;
-        return new WorldSource(server, pos, state, replacement, FluidResource.of(fluid.getType()));
+        return new WorldSource(key, state, replacement, FluidResource.of(fluid.getType()));
     }
     private PumpPowerCost price() {
         return PumpPowerCost.current(level.getGameTime() == lastDelivery ? tickCredit : -1, prepaidMilliFe);
@@ -237,7 +248,7 @@ public final class FluidPumpBlockEntity extends LegacyBlockEntity implements Dev
             var world = worldSource();
             if (world == null || !world.fluid.equals(fluid) || limit < net.neoforged.neoforge.fluids.FluidType.BUCKET_VOLUME) return 0;
             journal.updateSnapshots(tx);
-            world.take(tx);
+            if (!world.take(tx)) return 0;
             pending = fluid.toStack(net.neoforged.neoforge.fluids.FluidType.BUCKET_VOLUME);
         }
         if (!fluid.equals(FluidResource.of(pending))) return 0;
