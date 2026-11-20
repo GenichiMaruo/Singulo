@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 
-record HandbookVisual(ItemStack icon, List<String> links, List<Row> rows, @Nullable Blueprints.Kind blueprint,
+record HandbookVisual(ItemStack icon, List<String> links, List<ItemStack> searchItems, List<Row> rows, @Nullable Blueprints.Kind blueprint,
                       @Nullable Component action, @Nullable Component caption) {
     static HandbookVisual read(JsonObject json) {
         List<String> links = new ArrayList<>();
@@ -22,6 +22,10 @@ record HandbookVisual(ItemStack icon, List<String> links, List<Row> rows, @Nulla
             json.getAsJsonArray("links").forEach(link -> links.add(link.getAsString()));
         }
         List<Row> rows = new ArrayList<>();
+        List<ItemStack> searchItems = new ArrayList<>();
+        if (json.has("search_items")) {
+            json.getAsJsonArray("search_items").forEach(entry -> searchItems.add(item(entry.getAsString())));
+        }
         if (json.has("rows")) {
             for (JsonElement element : json.getAsJsonArray("rows")) {
                 JsonObject row = element.getAsJsonObject();
@@ -29,7 +33,7 @@ record HandbookVisual(ItemStack icon, List<String> links, List<Row> rows, @Nulla
                         tokens(row, "outputs"), row.has("reading") ? row.get("reading").getAsString() : ""));
             }
         }
-        return new HandbookVisual(item(json.get("icon").getAsString()), links, rows,
+        return new HandbookVisual(item(json.get("icon").getAsString()), links, List.copyOf(searchItems), rows,
                 json.has("blueprint") ? Blueprints.Kind.byId(json.get("blueprint").getAsString()) : null,
                 json.has("action") ? Component.translatable(json.get("action").getAsString()) : null,
                 json.has("caption") ? Component.translatable(json.get("caption").getAsString()) : null);

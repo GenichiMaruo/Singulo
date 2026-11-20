@@ -260,5 +260,8 @@ def visuals_for(chapters):
             info['caption'] = f'guide.singulo.caption.{page}'
         if page in BLUEPRINTS:
             info['blueprint'] = BLUEPRINTS[page]
+        if page == 'androids.work':
+            info['search_items'] = [item(id)['item'] for id in (
+                'android_backpack_upgrade', 'android_reinforced_backpack_upgrade', 'android_large_backpack_upgrade')]
         visuals[page] = info
     return visuals

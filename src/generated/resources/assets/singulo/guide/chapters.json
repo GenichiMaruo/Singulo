@@ -751,6 +751,11 @@
         "android_rack",
         "android_delivery",
         "item/android_work_console"
+      ],
+      "search_items": [
+        "singulo:android_backpack_upgrade",
+        "singulo:android_reinforced_backpack_upgrade",
+        "singulo:android_large_backpack_upgrade"
       ]
     },
     "androids.process": {

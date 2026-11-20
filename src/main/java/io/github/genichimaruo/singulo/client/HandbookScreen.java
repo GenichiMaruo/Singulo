@@ -231,6 +231,9 @@ public class HandbookScreen extends Screen {
     private int matchScore(Page pg, String query) {
         int score = pg.title.getString().toLowerCase(java.util.Locale.ROOT).contains(query) ? 100 : 0;
         if (pg.visual != null && pg.visual.icon().getHoverName().getString().equalsIgnoreCase(query)) score += 50;
+        if (pg.visual != null && pg.visual.searchItems().stream().anyMatch(item ->
+                item.getHoverName().getString().equalsIgnoreCase(query)
+                        || BuiltInRegistries.ITEM.getKey(item.getItem()).toString().equals(query))) score += 50;
         for (Line line : pg.lines) {
             String body = line.text.getString().toLowerCase(java.util.Locale.ROOT);
             for (int i = body.indexOf(query); i >= 0; i = body.indexOf(query, i + query.length())) score++;
