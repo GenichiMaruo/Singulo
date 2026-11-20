@@ -1,0 +1,74 @@
+name: Singulo 0.21.0 Modrinth dry preflight (one-off)
+
+on:
+  push:
+    branches: [ops/singulo-021-modrinth-dry-preflight]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modrinth-GenichiMaruo/Singulo
+  cancel-in-progress: false
+
+jobs:
+  dry-preflight:
+    if: github.repository == 'GenichiMaruo/Singulo' && github.ref == 'refs/heads/ops/singulo-021-modrinth-dry-preflight' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: modrinth
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Stage the four exact anonymous CurseForge CDN binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          stage="$RUNNER_TEMP/singulo-021-modrinth-preflight"
+          mkdir "$stage"
+          readonly cdn='https://edge.forgecdn.net/files/9709'
+          download() {
+            curl --fail --silent --show-error --proto '=https' --max-time 35 \
+              --max-filesize 134217728 --output "$stage/$2" "$cdn/$1/$2"
+          }
+          download 614 Singulo-0.21.0-1.21.1N.jar
+          download 620 Singulo-0.21.0-1.20.1F.jar
+          download 627 Singulo-0.21.0-1.20.1N.jar
+          download 632 Singulo-0.21.0-26.1.2N.jar
+
+          cp docs/curseforge/changelog-0.21.0.md "$stage/changelog.md"
+          cd "$stage"
+          sha256sum --check --strict <<'CHECKSUMS'
+          5a53444c912b20f2c2620d2914c05a6afcd9de3f60d49684fe7c14f261bb2bd8  Singulo-0.21.0-1.21.1N.jar
+          0d3217445e430811e8adcfca85bdd2509b31b1eb87ed3b5bf1d74220f99e9aa0  Singulo-0.21.0-1.20.1F.jar
+          a67c8e86f5f6d02c64b75356ecb9e3c0da047754bbf533521d22248a6ae88403  Singulo-0.21.0-1.20.1N.jar
+          1e15e62d8713c06700625b6675d3491368260cf78ae1ec564282a518660c5d12  Singulo-0.21.0-26.1.2N.jar
+          c11861bf04d52cad7ac0b96ba1f10cdccaa16821dba7739e12725fadb359f837  changelog.md
+          CHECKSUMS
+
+      - name: Test the reviewed code offline
+        run: python3 -m unittest discover -s tools -p 'test_publish_modrinth*.py'
+
+      - name: Read authenticated Modrinth inventory (no upload)
+        env:
+          MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          stage="$RUNNER_TEMP/singulo-021-modrinth-preflight"
+          python3 tools/publish_modrinth_021_once.py \
+            --artifact-dir "$stage" --changelog "$stage/changelog.md" \
+            --receipt "$stage/dry-preflight-receipt.jsonl"
+
+      - name: Archive only the dry-run receipt
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: singulo-021-modrinth-dry-preflight
+          path: ${{ runner.temp }}/singulo-021-modrinth-preflight/dry-preflight-receipt.jsonl
+          if-no-files-found: error
+          retention-days: 1
