@@ -40,7 +40,7 @@ public final class AndroidWeaponReviewHarness {
     private static final List<Scene> SCENES = List.of(Scene.values());
     private static final int FRAMES_PER_MODE = SCENES.size() * 2;
     private static int frame, settled, elapsed;
-    private static boolean requested, captured;
+    private static boolean requested, captured, complete;
     private static volatile boolean ready;
 
     private enum Scene {
@@ -123,7 +123,7 @@ public final class AndroidWeaponReviewHarness {
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) throws Exception {
         if (event.phase != TickEvent.Phase.END) return;
-        if (OUTPUT == null) return;
+        if (OUTPUT == null || complete) return;
         var mc = Minecraft.getInstance();
         if (++elapsed > 7200) throw new AssertionError("Android weapon review timed out at frame " + frame);
         if (mc.player == null || mc.level == null || mc.getOverlay() != null || mc.getSingleplayerServer() == null) return;
@@ -133,6 +133,7 @@ public final class AndroidWeaponReviewHarness {
             if (++frame == FRAMES_PER_MODE * MODES.size()) {
                 for (var mode : MODES) AndroidWeaponReviewChecks.verify(Path.of(OUTPUT), mode.name().toLowerCase(Locale.ROOT));
                 Singulo.LOGGER.info("SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE {}", frame);
+                complete = true;
                 mc.stop();
                 return;
             }
