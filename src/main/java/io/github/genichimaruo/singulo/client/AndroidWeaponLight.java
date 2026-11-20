@@ -12,6 +12,8 @@ import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.RenderPipelines;
 import com.mojang.blaze3d.pipeline.*;
 import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.blaze3d.platform.DestFactor;
+import com.mojang.blaze3d.platform.SourceFactor;
 import io.github.genichimaruo.singulo.Singulo;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import org.jspecify.annotations.Nullable;
@@ -23,10 +25,20 @@ public final class AndroidWeaponLight {
             ? Minecraft.getInstance().levelRenderer.getItemEntityTarget() : WeaponTransparency.weaponTarget());
     private static final RenderPipeline BLADE_PIPELINE = blade(false);
     private static final RenderPipeline LAYER_BLADE_PIPELINE = blade(true);
+    private static final RenderPipeline FABULOUS_GLOW_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+            .withLocation(Singulo.id("pipeline/fabulous_weapon_glow"))
+            .withVertexShader("core/rendertype_lightning")
+            .withFragmentShader(Singulo.id("core/fabulous_weapon_glow"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+            .withColorTargetState(new ColorTargetState(new BlendFunction(
+                    SourceFactor.ONE, DestFactor.ONE, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA)))
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withCull(false).build();
 
     static void register(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(BLADE_PIPELINE);
         event.registerPipeline(LAYER_BLADE_PIPELINE);
+        event.registerPipeline(FABULOUS_GLOW_PIPELINE);
     }
 
     private static RenderPipeline blade(boolean depthWrite) {
@@ -42,6 +54,8 @@ public final class AndroidWeaponLight {
     private static final RenderType LAYER_BLADE = material("blade", true, true);
     private static final RenderType LAYER_CORE = material("core", false, true);
     private static final RenderType LAYER_GLOW = material("glow", false, true);
+    private static final RenderType FABULOUS_GLOW = RenderType.create("singulo_fabulous_weapon_glow",
+            RenderSetup.builder(FABULOUS_GLOW_PIPELINE).setOutputTarget(LAYER).sortOnUpload().bufferSize(1536).createRenderSetup());
     private static final MultiBufferSource.BufferSource BATCH = weaponBuffers();
     private static boolean queued;
     private static boolean drawingTerrain;
@@ -50,7 +64,7 @@ public final class AndroidWeaponLight {
     private static MultiBufferSource.BufferSource weaponBuffers() {
         var layers = new LinkedHashMap<RenderType, ByteBufferBuilder>();
         // Finish the textured surface and white core before blending the wider colored glow.
-        for (RenderType type : java.util.List.of(LAYER_BLADE, LAYER_CORE, LAYER_GLOW))
+        for (RenderType type : java.util.List.of(LAYER_BLADE, LAYER_CORE, LAYER_GLOW, FABULOUS_GLOW))
             layers.put(type, new ByteBufferBuilder(1536));
         return MultiBufferSource.immediateWithBuffers(layers, new ByteBufferBuilder(256));
     }
@@ -70,7 +84,7 @@ public final class AndroidWeaponLight {
             RenderType layer;
             if (type == BLADE) layer = LAYER_BLADE;
             else if (type == CORE) layer = LAYER_CORE;
-            else if (type == GLOW) layer = LAYER_GLOW;
+            else if (type == GLOW) layer = Minecraft.useShaderTransparency() ? FABULOUS_GLOW : LAYER_GLOW;
             else return original.getBuffer(type);
             return GlowDepth.route(original, BATCH, layer);
         };

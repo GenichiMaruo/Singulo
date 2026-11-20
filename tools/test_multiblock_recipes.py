@@ -14,7 +14,7 @@ class MultiblockPartRecipeTests(unittest.TestCase):
             if product not in frames:
                 continue
             with self.subTest(recipe=path.stem):
-                frame = {'item': frames[product]}
+                frame = frames[product]
                 if 'pattern' in recipe:
                     required = any(recipe['key'][ch] == frame for row in recipe['pattern'] for ch in row if ch != ' ')
                 else:

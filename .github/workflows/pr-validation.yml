@@ -46,6 +46,14 @@ jobs:
           bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=200
       - name: Require all NeoForge GameTests
         run: python3 tools/check_release_2612.py --loader neoforge --build-dir build
+      - name: Verify weapon layers through glass in Fancy and Fabulous
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/android-weapon.gradle runClient
+          grep -q 'SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24' build/android-weapon-review/logs/latest.log
+          test "$(ls build/android-weapon-review/screenshots/*.png | wc -l)" -eq 24
       - name: Prepare disposable GUI review world
         run: python3 tools/review/prepare_gui.py
       - name: Run real client GUI smoke
@@ -139,6 +147,8 @@ jobs:
             build/outline-review/logs/
             build/outline-review/screenshots/
             build/gametest/logs/
+            build/android-weapon-review/logs/
+            build/android-weapon-review/screenshots/
             build/reports/
             build/gui-review/screenshots/
             build/gui-review/logs/

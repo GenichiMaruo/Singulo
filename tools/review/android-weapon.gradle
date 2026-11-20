@@ -2,7 +2,7 @@
 allprojects {
     afterEvaluate {
         if (!plugins.hasPlugin('net.neoforged.moddev')) return
-        def reviewDir = file('build/android-weapon-review')
+        def reviewDir = layout.buildDirectory.dir(providers.gradleProperty('weaponReviewDirectory').getOrElse('android-weapon-review')).get().asFile
         sourceSets.main.java.srcDir(file('tools/review/android-weapon-src'))
         if (providers.gradleProperty('withSodium').isPresent()) {
             dependencies.add('localRuntime', 'maven.modrinth:sodium:zg4YQ9EL') { transitive = false }
