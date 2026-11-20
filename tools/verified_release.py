@@ -67,7 +67,8 @@ def inspect(repo, run_id, tag, source, loader):
         raise RuntimeError("Source must be a successful PR or 1.20.1 branch validation in this repository")
     jobs = api(repo, f"actions/runs/{run_id}/jobs?per_page=100")["jobs"]
     expected_jobs = {'build-and-gametest (forge)', 'build-and-gametest (neoforge)',
-                     'optional-mekanism', 'renderer-lighting'}
+                     'optional-mekanism', 'renderer-lighting',
+                     'android-weapon-rendering (forge)', 'android-weapon-rendering (neoforge)'}
     if len(jobs) != len(expected_jobs) or {j["name"] for j in jobs} != expected_jobs or any(j["conclusion"] != "success" for j in jobs):
         raise RuntimeError("All required validation jobs must have succeeded")
     ref = api(repo, f"git/ref/tags/{tag}")["object"]
