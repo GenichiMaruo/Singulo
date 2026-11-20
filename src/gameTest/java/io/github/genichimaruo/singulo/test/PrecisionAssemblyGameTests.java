@@ -142,7 +142,7 @@ public final class PrecisionAssemblyGameTests {
     }
 
     @GameTest(template = "empty", batch = "precision_assembly")
-    public static void assemblyShapeSurvivesNetworkAndLegacyJsonRemainsShapeless(GameTestHelper h) {
+    public static void assemblyShapeSurvivesNetworkAndLegacyJsonRemainsShapeless(GameTestHelper h) throws java.io.IOException {
         var recipe = recipe(h, "android_tank_upgrade");
         var registry = h.getLevel().registryAccess();
         var board = parts(h, recipe);
