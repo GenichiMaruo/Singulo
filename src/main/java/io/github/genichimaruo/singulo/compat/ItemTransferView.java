@@ -30,7 +30,7 @@ public class ItemTransferView implements ResourceHandler<ItemResource> {
     @Override public ItemResource getResource(int index) { return storage.getResource(slot(index)); }
     @Override public long getAmountAsLong(int index) { return storage.getAmountAsLong(slot(index)); }
     @Override public long getCapacityAsLong(int index, ItemResource resource) { return storage.getCapacityAsLong(slot(index), resource); }
-    @Override public boolean isValid(int index, ItemResource resource) { return storage.isValid(slot(index), resource); }
+    @Override public boolean isValid(int index, ItemResource resource) { int mapped = slot(index); return !resource.isEmpty() && insert.test(index, resource) && storage.isValid(mapped, resource); }
     @Override public int insert(int index, ItemResource resource, int amount, TransactionContext tx) {
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         int mapped = slot(index);

@@ -21,10 +21,15 @@ allprojects {
         tasks.named('runClient').configure {
             doFirst {
                 def world = new File(reviewDir, 'saves/Review')
-                if (!new File(world, 'level.dat').isFile()) {
-                    def metadata = file('build/gametest/gametestserver/gametestworld/level.dat')
+                def seed = file('build/gametest/gametestserver/gametestworld')
+                if (!new File(world, 'data/minecraft/world_gen_settings.dat').isFile()) {
+                    def metadata = new File(seed, 'data/minecraft/world_gen_settings.dat')
                     if (!metadata.isFile()) throw new GradleException('Run GameTests first to produce ' + metadata)
-                    project.copy { from metadata; into world }
+                    project.copy {
+                        from seed
+                        include 'level.dat', 'data/minecraft/world_gen_settings.dat'
+                        into world
+                    }
                 }
                 new File(reviewDir, 'options.txt').setText('''tutorialStep:none
 lang:en_us

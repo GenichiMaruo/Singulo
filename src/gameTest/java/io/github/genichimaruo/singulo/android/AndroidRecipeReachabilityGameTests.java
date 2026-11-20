@@ -42,7 +42,7 @@ public final class AndroidRecipeReachabilityGameTests {
         // Survival supplies, including witnesses for vanilla/commons tags. Creative-only items cannot seed a route.
         String vanilla = """
                 amethyst_shard black_dye blast_furnace blaze_powder blaze_rod blue_dye blue_ice bone bone_meal book bucket calcite
-                chain charcoal chest clay_ball clock coal coal_block cobblestone compass copper_block copper_ingot crafting_table
+                iron_chain charcoal chest clay_ball clock coal coal_block cobblestone compass copper_block copper_ingot crafting_table
                 dandelion deepslate diamond diamond_axe diamond_hoe diamond_pickaxe echo_shard egg ender_eye ender_pearl fishing_rod
                 flint glass glass_bottle glass_pane glowstone_dust gold_ingot gold_nugget golden_axe golden_boots golden_chestplate
                 golden_helmet golden_hoe golden_leggings golden_pickaxe golden_shovel golden_sword gravel green_dye gunpowder honeycomb
