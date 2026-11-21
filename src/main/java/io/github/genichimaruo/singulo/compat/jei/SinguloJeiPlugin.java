@@ -153,7 +153,7 @@ public class SinguloJeiPlugin implements IModPlugin {
         java.util.Set<Item> made = new java.util.HashSet<>();
         for (RecipeHolder<?> h : Minecraft.getInstance().level.getRecipeManager().getRecipes()) {
             ItemStack result = h.value().getResultItem(registries);
-            if (!result.isEmpty()) {
+            if (result != null && !result.isEmpty()) {
                 made.add(result.getItem());
             }
         }
