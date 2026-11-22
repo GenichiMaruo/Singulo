@@ -1659,6 +1659,10 @@
     "source": "A compact crystal memory holding the design of the Gunner Android. Light keeps flowing through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "사격형 안드로이드의 설계를 기록한 소형 크리스털 메모리. 결정 속을 빛이 계속 흐르고 있다. 안드로이드 조립 스테이션에 넣으면 그 형을 인쇄할 수 있다 (줄어들지 않음)."
   },
+  "desc.singulo.android_memory_katana": {
+    "source": "A compact crystal memory holding the design of the Katana Android. Now and then a crimson slash cuts through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "카타나형 안드로이드의 설계를 기록한 소형 크리스털 메모리. 결정 속을 이따금 붉은 참격선이 스쳐 지나간다. 안드로이드 조립 스테이션에 넣으면 그 형을 인쇄할 수 있다 (줄어들지 않음)."
+  },
   "desc.singulo.android_memory_saber": {
     "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "광검형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
@@ -3267,6 +3271,10 @@
     "source": "Gunner Android \"Ciel\"",
     "translation": "사격형 안드로이드 \"시엘\""
   },
+  "entity.singulo.katana_android": {
+    "source": "Katana Android \"Rouge\"",
+    "translation": "카타나형 안드로이드 \"루주\""
+  },
   "entity.singulo.horizon_bolt": {
     "source": "Horizon Bolt",
     "translation": "호라이즌 볼트"
@@ -3546,6 +3554,10 @@
   "gui.singulo.android.nickname.gunner": {
     "source": "Ciel",
     "translation": "시엘"
+  },
+  "gui.singulo.android.nickname.katana": {
+    "source": "Rouge",
+    "translation": "루주"
   },
   "gui.singulo.android.nickname.saber": {
     "source": "Soleil",
@@ -8451,6 +8463,10 @@
     "source": "Compact Crystal Memory (Gunner)",
     "translation": "소형 크리스털 메모리(사격형)"
   },
+  "item.singulo.android_memory_katana": {
+    "source": "Compact Crystal Memory (Katana)",
+    "translation": "소형 크리스털 메모리(카타나형)"
+  },
   "item.singulo.android_memory_saber": {
     "source": "Compact Crystal Memory (Saber)",
     "translation": "소형 크리스털 메모리(광검형)"
@@ -8802,6 +8818,10 @@
   "item.singulo.gunner_android_spawn_egg": {
     "source": "Gunner Android Spawn Egg",
     "translation": "사격형 안드로이드 생성 알"
+  },
+  "item.singulo.katana_android_spawn_egg": {
+    "source": "Katana Android Spawn Egg",
+    "translation": "카타나형 안드로이드 생성 알"
   },
   "item.singulo.handbook": {
     "source": "Singulo Handbook",
@@ -10898,6 +10918,10 @@
   "summary.singulo.android_memory_gunner": {
     "source": "The design for printing Gunner Androids.",
     "translation": "사격형 안드로이드를 출력할 수 있는 설계."
+  },
+  "summary.singulo.android_memory_katana": {
+    "source": "The design for printing Katana Androids.",
+    "translation": "카타나형 안드로이드를 출력할 수 있는 설계."
   },
   "summary.singulo.android_production_upgrade": {
     "source": "Lets an Android Assembly Station look after up to two androids.",

@@ -1659,6 +1659,10 @@
     "source": "A compact crystal memory holding the design of the Gunner Android. Light keeps flowing through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "记录了射击型仿生人设计的小型水晶存储器。光芒在晶体中不停流动。放入仿生人组装站即可打印该型号（不会消耗）。"
   },
+  "desc.singulo.android_memory_katana": {
+    "source": "A compact crystal memory holding the design of the Katana Android. Now and then a crimson slash cuts through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "记录了刀型仿生人设计的小型水晶存储器。晶体中不时有一道赤红的斩痕划过。放入仿生人组装站即可打印该型号（不会消耗）。"
+  },
   "desc.singulo.android_memory_saber": {
     "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "记录了光剑型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
@@ -3267,6 +3271,10 @@
     "source": "Gunner Android \"Ciel\"",
     "translation": "射击型仿生人“希艾尔”"
   },
+  "entity.singulo.katana_android": {
+    "source": "Katana Android \"Rouge\"",
+    "translation": "刀型仿生人“露姬”"
+  },
   "entity.singulo.horizon_bolt": {
     "source": "Horizon Bolt",
     "translation": "视界光弹"
@@ -3546,6 +3554,10 @@
   "gui.singulo.android.nickname.gunner": {
     "source": "Ciel",
     "translation": "希艾尔"
+  },
+  "gui.singulo.android.nickname.katana": {
+    "source": "Rouge",
+    "translation": "露姬"
   },
   "gui.singulo.android.nickname.saber": {
     "source": "Soleil",
@@ -8451,6 +8463,10 @@
     "source": "Compact Crystal Memory (Gunner)",
     "translation": "小型水晶存储器（射击型）"
   },
+  "item.singulo.android_memory_katana": {
+    "source": "Compact Crystal Memory (Katana)",
+    "translation": "小型水晶存储器（刀型）"
+  },
   "item.singulo.android_memory_saber": {
     "source": "Compact Crystal Memory (Saber)",
     "translation": "小型水晶存储器（光剑型）"
@@ -8802,6 +8818,10 @@
   "item.singulo.gunner_android_spawn_egg": {
     "source": "Gunner Android Spawn Egg",
     "translation": "射击型仿生人刷怪蛋"
+  },
+  "item.singulo.katana_android_spawn_egg": {
+    "source": "Katana Android Spawn Egg",
+    "translation": "刀型仿生人刷怪蛋"
   },
   "item.singulo.handbook": {
     "source": "Singulo Handbook",
@@ -10898,6 +10918,10 @@
   "summary.singulo.android_memory_gunner": {
     "source": "The design for printing Gunner Androids.",
     "translation": "可打印射击型仿生人的设计。"
+  },
+  "summary.singulo.android_memory_katana": {
+    "source": "The design for printing Katana Androids.",
+    "translation": "可打印刀型仿生人的设计。"
   },
   "summary.singulo.android_production_upgrade": {
     "source": "Lets an Android Assembly Station look after up to two androids.",

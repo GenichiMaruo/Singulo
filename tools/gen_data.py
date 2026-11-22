@@ -930,6 +930,7 @@ UI_LANG = {
     'gui.singulo.android.nickname.axe': ('アルマ', 'Alma'),
     'gui.singulo.android.nickname.bit': ('ノクス', 'Nox'),
     'gui.singulo.android.nickname.gunner': ('シエル', 'Ciel'),
+    'gui.singulo.android.nickname.katana': ('ルージュ', 'Rouge'),
     'gui.singulo.android.rename': ('クリックで名前を変える', 'Click to rename'),
     'gui.singulo.android.dismantle': ('解体する（2回押す）', 'Dismantle (press twice)'),
     'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
@@ -1487,6 +1488,7 @@ UI_LANG = {
     'entity.singulo.axe_android': ('斧型アンドロイド「アルマ」', 'Axe Android "Alma"'),
     'entity.singulo.bit_android': ('ビット型アンドロイド「ノクス」', 'Bit Android "Nox"'),
     'entity.singulo.gunner_android': ('射撃型アンドロイド「シエル」', 'Gunner Android "Ciel"'),
+    'entity.singulo.katana_android': ('刀型アンドロイド「ルージュ」', 'Katana Android "Rouge"'),
     'entity.singulo.android_crescent': ('斬撃波', 'Crescent Slash'),
     'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
@@ -1619,6 +1621,7 @@ UI_LANG = {
     'item.singulo.axe_android_spawn_egg': ('斧型アンドロイドのスポーンエッグ', 'Axe Android Spawn Egg'),
     'item.singulo.bit_android_spawn_egg': ('ビット型アンドロイドのスポーンエッグ', 'Bit Android Spawn Egg'),
     'item.singulo.gunner_android_spawn_egg': ('射撃型アンドロイドのスポーンエッグ', 'Gunner Android Spawn Egg'),
+    'item.singulo.katana_android_spawn_egg': ('刀型アンドロイドのスポーンエッグ', 'Katana Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -2103,7 +2106,7 @@ def textures():
     import portable_printer
     save(portable_printer.entity_texture(), te / 'portable_printer.png')
     save(portable_printer.entity_texture(portable_printer.MK2), te / 'portable_printer_2.png')
-    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android'):
+    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android', 'katana_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
@@ -3951,7 +3954,7 @@ TAB_GROUPS = [
     ('アンドロイド', [
         'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'portable_android_printer', 'portable_android_printer_2',
         'android_armor_plate', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
-        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner',
+        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner', 'android_memory_katana',
         'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',
         'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench',
         'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
@@ -4069,7 +4072,7 @@ TAB_GROUPS = [
     ]),
     ('スポーンエッグ', [
         'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
-        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'security_drone_spawn_egg',
+        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'katana_android_spawn_egg', 'security_drone_spawn_egg',
         # ボスのスポーンエッグはタブに出さない（/give でだけ渡す。Java の SinguloItems.HIDDEN）
     ]),
 ]

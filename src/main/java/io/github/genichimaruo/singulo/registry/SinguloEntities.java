@@ -111,6 +111,10 @@ public final class SinguloEntities {
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.GunnerAndroid>> GUNNER_ANDROID = REGISTER.register(
             "gunner_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.GunnerAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(Singulo.id("gunner_android").toString()));
+    /** 刀型アンドロイド「ルージュ」（まだクリエイティブでだけ出す）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.KatanaAndroid>> KATANA_ANDROID = REGISTER.register(
+            "katana_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.KatanaAndroid::new, MobCategory.MONSTER)
+                    .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(Singulo.id("katana_android").toString()));
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.SaberAndroid>> SABER_ANDROID = REGISTER.register(
             "saber_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.SaberAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(Singulo.id("saber_android").toString()));
@@ -132,6 +136,7 @@ public final class SinguloEntities {
         event.put(AXE_ANDROID.get(), io.github.genichimaruo.singulo.android.AxeAndroid.createAttributes().build());
         event.put(BIT_ANDROID.get(), io.github.genichimaruo.singulo.android.BitAndroid.createAttributes().build());
         event.put(GUNNER_ANDROID.get(), io.github.genichimaruo.singulo.android.GunnerAndroid.createAttributes().build());
+        event.put(KATANA_ANDROID.get(), io.github.genichimaruo.singulo.android.KatanaAndroid.createAttributes().build());
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(CARGO_DRONE.get(), io.github.genichimaruo.singulo.drone.CargoDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());

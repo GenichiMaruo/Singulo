@@ -8,10 +8,12 @@ import io.github.genichimaruo.singulo.android.AxeAndroid;
 import io.github.genichimaruo.singulo.android.BitAndroid;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.GunnerAndroid;
+import io.github.genichimaruo.singulo.android.KatanaAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.android.SaberAndroid;
 import io.github.genichimaruo.singulo.android.WhipAndroid;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -42,7 +44,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         SABER("saber_android", SaberAndroid.ACCENT, AndroidModel.SABER_LAYER, false),
         AXE("axe_android", AxeAndroid.ACCENT, AndroidModel.AXE_LAYER, false),
         BIT("bit_android", BitAndroid.ACCENT, AndroidModel.BIT_LAYER, true),
-        GUNNER("gunner_android", GunnerAndroid.ACCENT, AndroidModel.GUNNER_LAYER, false);
+        GUNNER("gunner_android", GunnerAndroid.ACCENT, AndroidModel.GUNNER_LAYER, false),
+        KATANA("katana_android", KatanaAndroid.ACCENT, AndroidModel.KATANA_LAYER, false);
 
         final ResourceLocation texture;
         final ResourceLocation glow;
@@ -91,6 +94,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Dagger(this));
         addLayer(new StowedBits(this));
         addLayer(new Gun(this));
+        addLayer(new Katana(this));
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
@@ -528,6 +532,29 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     slashTrail(android, partialTick, pose, glow, t - 6, 2, 1.2F, 0.55F);
                 }
             }
+            case KatanaAndroid.STATE_CUT -> katanaTrail(android, partialTick, pose, glow, t - 1.5F, 2.5F, 1.85F, 52, 115, -60);
+            case KatanaAndroid.STATE_RETURN_CUT -> katanaTrail(android, partialTick, pose, glow, t, 3, 1.8F, 38, -60, 115);
+            case KatanaAndroid.STATE_STEP -> {
+                if (t < 4) {
+                    renderAfterimages(android, partialTick, pose, buffers, 0.7F * (1 - t / 4));
+                    glow = GlowDepth.of(buffers, FxDraw.WHITE);
+                }
+                katanaTrail(android, partialTick, pose, glow, t - 3, 2, 1.75F, 6, 115, -60);
+            }
+            case KatanaAndroid.STATE_IAI_STANCE -> {
+                if (android instanceof KatanaAndroid katana) {
+                    iaiGather(katana, partialTick, pose, glow, camera, t, age);
+                }
+            }
+            case KatanaAndroid.STATE_IAI_FLASH, KatanaAndroid.STATE_IAI_ZANSHIN, KatanaAndroid.STATE_IAI_VICTORY -> {
+                if (android instanceof KatanaAndroid katana) {
+                    // 勝利に分岐しても、最後の相手を倒した斬線は斬撃の時刻から消え切るまで描く。
+                    if (state != KatanaAndroid.STATE_IAI_VICTORY || t < 10) {
+                        float slashTime = state == KatanaAndroid.STATE_IAI_VICTORY ? KatanaAndroid.IAI_RELEASE + t : t;
+                        iaiCut(katana, partialTick, pose, buffers, camera, state, slashTime, age);
+                    }
+                }
+            }
             case RuinAndroid.STATE_LOW_POWER -> {
                 // 頭の上で、橙の小さな光が点滅する（充電切れ）
                 if ((int) (age / 6) % 2 == 0) {
@@ -609,6 +636,154 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.6F * amount, variant.accent, (int) (180 * fade));
         FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.18F * amount, 0xFFFFFF, (int) (235 * fade));
         pose.popPose();
+    }
+
+    // ------------------------------------------------------------------ 刀型の技の見た目
+
+    /**
+     * 刀の軌跡: 細く鋭い三日月（光剣の軌跡より細く、芯が白い）。刃先は start 度から end 度へ走る（正面から測って、正が右）。
+     * tilt は軌跡の面の傾き（正で右側が上がる。袈裟斬りは右上から左下へ走るので正、左上からの斬り下ろしは負）。
+     */
+    private void katanaTrail(RuinAndroid android, float partialTick, PoseStack pose, VertexConsumer glow, float t, float fast,
+                             float radius, float tilt, float start, float end) {
+        if (t < 0) {
+            return;
+        }
+        float u = 1 - (1 - Mth.clamp(t / fast, 0, 1)) * (1 - Mth.clamp(t / fast, 0, 1));
+        float fade = 1 - Mth.clamp((t - fast) / 4, 0, 1);
+        if (fade <= 0) {
+            return;
+        }
+        float head = Mth.lerp(u, start, end);
+        float tail = end > start ? Math.max(start, head - 140) : Math.min(start, head + 140);
+        pose.pushPose();
+        bodySpace(android, partialTick, pose);
+        pose.translate(0, 1.05, 0);
+        pose.mulPose(Axis.ZP.rotationDegrees(tilt));
+        float from = Math.min(tail, head), to = Math.max(tail, head);
+        FxDraw.crescent(pose.last(), glow, from, to, radius, 0.42F, variant.accent, (int) (190 * fade));
+        FxDraw.crescent(pose.last(), glow, from, to, radius + 0.02F, 0.1F, 0xFFFFFF, (int) (240 * fade));
+        pose.popPose();
+    }
+
+    /**
+     * 居合の構えの足元の輪と立ちのぼる光の粒。柄と鞘の光は刀の描画層で実物に合わせる。
+     */
+    private void iaiGather(KatanaAndroid katana, float partialTick, PoseStack pose, VertexConsumer glow, Quaternionf camera, float t, float age) {
+        float k = katana.surge(partialTick);
+        if (k <= 0) {
+            return;
+        }
+        boolean locked = t >= KatanaAndroid.IAI_STANCE - KatanaAndroid.IAI_LOCK;
+        int accent = variant.accent;
+        pose.pushPose();
+        bodySpace(katana, partialTick, pose);
+        // 足元の輪（向きを固めると締まって明るく）
+        pose.pushPose();
+        pose.translate(0, 0.03, 0);
+        float r = locked ? Mth.lerp(ease((t - (KatanaAndroid.IAI_STANCE - KatanaAndroid.IAI_LOCK)) / 4), 1.1F, 0.7F) : 0.5F + 0.6F * k;
+        FxDraw.ring(pose.last(), glow, r - 0.05F, r, accent, (int) ((locked ? 230 : 150) * k), (int) (40 * k));
+        FxDraw.ring(pose.last(), glow, r * 0.55F, r * 0.55F + 0.025F, 0xFFFFFF, (int) (120 * k), (int) (30 * k));
+        pose.popPose();
+        // 立ちのぼる光の粒（個体ごとにずらして、同じ所から続けて出ない）
+        for (int i = 0; i < 10; i++) {
+            float seed = i * 2.399F + katana.getId() * 0.37F;
+            float phase = ((age * 0.045F) + i / 10F) % 1F;
+            float a = Mth.sin(Mth.PI * phase) * k;
+            if (a <= 0.02F) {
+                continue;
+            }
+            float rad = 0.35F + 0.3F * Mth.sin(seed * 3.1F) * Mth.sin(seed * 3.1F);
+            pose.pushPose();
+            pose.translate(Mth.cos(seed) * rad, 0.1F + phase * 1.6F, Mth.sin(seed) * rad);
+            FxDraw.billboard(pose, glow, camera, 0.05F + 0.04F * a, i % 3 == 0 ? 0xFFFFFF : accent, (int) (220 * a));
+            pose.popPose();
+        }
+        pose.popPose();
+    }
+
+    /**
+     * 紅一閃: 駆け抜けた通り道に、まっすぐな一本の斬線が走り（白い芯と紅の外側）、通り道にそって紅の残像が並ぶ。
+     * 残心の間、斬線は宙に薄く残って脈打ち、遅れて斬撃が走る瞬間に太く閃いて、斜めに交わる短い斬線を散らしながら消える。
+     */
+    private void iaiCut(KatanaAndroid katana, float partialTick, PoseStack pose, MultiBufferSource buffers, Quaternionf camera,
+                        int state, float t, float age) {
+        Vec3 base = katana.getPosition(partialTick);
+        Vec3 a = katana.pathFrom().subtract(base).add(0, 0.95, 0);
+        Vec3 b = katana.pathTo().subtract(base).add(0, 0.95, 0);
+        if (a.distanceToSqr(b) < 1e-4) {
+            return;
+        }
+        int accent = variant.accent;
+        boolean flash = state == KatanaAndroid.STATE_IAI_FLASH;
+        int release = KatanaAndroid.IAI_RELEASE;
+        // 振り抜いた刀の輪郭が残るよう、本体に近い残像から早めに薄くする。
+        float ghost = flash ? 1 - 0.65F * ease((t - 1) / 4) : 0.35F * (1 - ease(t / 3));
+        if (ghost > 0) {
+            Vec3 run = a.subtract(0, 0.95, 0);
+            for (int i = 1; i <= 3; i++) {
+                float s = i / 4F;
+                Vec3 at = run.scale(s);                    // 今の位置（原点）から、通り道の始めへ向かって
+                if (at.lengthSqr() < 0.04) {
+                    continue;
+                }
+                pose.pushPose();
+                pose.translate(at.x, at.y, at.z);
+                modelSpace(katana, partialTick, pose);
+                int alpha = (int) (ghost * (86 - 14 * i));
+                model.renderToBuffer(pose, GlowDepth.of(buffers, variant.texture), FxDraw.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                        argb(alpha, mix(accent, 0xFFFFFF, 0.15F)));
+                pose.popPose();
+            }
+        }
+        // 駆け抜けで伸びきり、残心で薄く宙に残り、遅れて斬撃が走ると閃いて消える。
+        float grow = flash ? Mth.clamp(t / KatanaAndroid.IAI_DASH, 0, 1) : 1;
+        float hang = flash ? 0.7F : t < release ? Mth.lerp(ease(t / 5), 0.7F, 0.18F + 0.04F * Mth.sin(age * 0.8F)) : 0;
+        float burst = !flash && t >= release ? 1 - Mth.clamp((t - release) / 10, 0, 1) : 0;
+        // 二刀の斬線: 通り道にそって、上下から細長く交わる2本（始めで上下に開き、終わりで入れ替わる）
+        Vec3 end = a.lerp(b, grow);
+        Vec3 lift = new Vec3(0, 0.2, 0);
+        float width = 0.012F + 0.018F * hang + 0.035F * burst;
+        int coreAlpha = (int) Math.min(255, 250 * Math.max(hang, burst));
+        int outerAlpha = (int) Math.min(255, 160 * Math.max(hang, burst));
+        if (coreAlpha <= 4 && outerAlpha <= 4 && burst <= 0) {
+            return;
+        }
+        Vec3 tilt = lift.scale(1 - 2 * grow);
+        VertexConsumer core = buffers.getBuffer(AndroidWeaponLight.CORE);
+        FxDraw.beam(pose.last(), core, a.add(lift), end.add(tilt), width, 0xFFFFFF, coreAlpha);
+        FxDraw.beam(pose.last(), core, a.subtract(lift), end.subtract(tilt), width, 0xFFFFFF, coreAlpha);
+        VertexConsumer outer = buffers.getBuffer(AndroidWeaponLight.GLOW);
+        float outerWidth = 0.038F + 0.075F * hang + 0.18F * burst;
+        FxDraw.beam(pose.last(), outer, a.add(lift), end.add(tilt), outerWidth, accent, outerAlpha);
+        FxDraw.beam(pose.last(), outer, a.subtract(lift), end.subtract(tilt), outerWidth, accent, outerAlpha);
+        if (burst > 0) {
+            // 斜めに交わる短い斬線（通り道にそって、少しずつ時間をずらして閃く）
+            Vec3 dir = b.subtract(a).normalize();
+            Vec3 side = new Vec3(-dir.z, 0, dir.x);
+            int n = Math.max(2, (int) (a.distanceTo(b) / 1.6));
+            for (int i = 0; i < n; i++) {
+                float s = (i + 0.5F) / n;
+                float local = Mth.clamp(burst * 1.4F - (1 - s) * 0.4F, 0, 1);
+                if (local <= 0) {
+                    continue;
+                }
+                Vec3 c = a.lerp(b, s);
+                float len = 0.55F * (0.6F + 0.4F * local);
+                // 二刀の斬撃なので、どこも X 字に交わる
+                for (Vec3 off : new Vec3[]{side.scale(len * 0.7).add(0, len, 0), side.scale(-len * 0.7).add(0, len, 0)}) {
+                    FxDraw.beam(pose.last(), outer, c.subtract(off), c.add(off), 0.07F * local + 0.02F, accent, (int) (200 * local));
+                    FxDraw.beam(pose.last(), outer, c.subtract(off.scale(0.8)), c.add(off.scale(0.8)), 0.025F, 0xFFFFFF, (int) (230 * local));
+                }
+            }
+            VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
+            for (Vec3 at : new Vec3[]{a, b}) {
+                pose.pushPose();
+                pose.translate(at.x, at.y, at.z);
+                FxDraw.billboard(pose, glow, camera, 0.3F + 0.7F * burst, accent, (int) (200 * burst));
+                pose.popPose();
+            }
+        }
     }
 
     /** 斧の叩きつけの衝撃波: 体の前へまっすぐ、床を走る光の帯と、先で立ち上がる光の板、走った跡の割れ目の光。 */
@@ -853,11 +1028,38 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                             0xFF000000 | level << 16 | level << 8 | level);
                 }
             }
+            if (android instanceof KatanaAndroid katana) {
+                // 紅一閃: 体の継ぎ目に光の筋が、胸の芯から手足の先へ段ごとに浮き出て、心臓の鼓動のように脈打つ。
+                // 遅れて斬撃が走ると、外側の段から光が引いていく。
+                float k = katana.surge(partialTick);
+                if (k > 0) {
+                    float beat = Mth.sin(ageInTicks * 0.55F);
+                    float pulse = 0.72F + 0.28F * beat * beat;
+                    for (int i = 0; i < KATANA_SURGE.length; i++) {
+                        float stage = Mth.clamp(k * KATANA_SURGE.length - i, 0, 1);
+                        if (stage <= 0) {
+                            continue;
+                        }
+                        int level = (int) (255 * Math.min(1, stage * pulse));
+                        getParentModel().renderToBuffer(pose, buffers.getBuffer(RenderType.eyes(KATANA_SURGE[i])), 0xF00000,
+                                OverlayTexture.NO_OVERLAY, 0xFF000000 | level << 16 | level << 8 | level);
+                    }
+                }
+            }
         }
     }
 
     /** 射撃型がレールガンを溜めている間だけ重ねる、髪の光。 */
     private static final ResourceLocation GUNNER_CHARGE = Singulo.id("textures/entity/gunner_android_charge.png");
+    /**
+     * 刀型の紅一閃の間だけ重ねる、体の継ぎ目の光の筋（胸の芯から、胴・腕と腿・手足の先へ、3段に分けて浮き出る）。
+     * 段ごとの絵は tools/androids.py の katana_surge。
+     */
+    private static final ResourceLocation[] KATANA_SURGE = {
+            Singulo.id("textures/entity/katana_android_surge_0.png"),
+            Singulo.id("textures/entity/katana_android_surge_1.png"),
+            Singulo.id("textures/entity/katana_android_surge_2.png"),
+    };
 
     /**
      * ソーラー充電: 空へ掲げた左手の上に、3枚の羽根のソーラーパネルが広がる（両脇の2枚が、たたまれた状態から開く）。
@@ -1392,6 +1594,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 case SABER -> 0xE2E6EE;
                 case AXE -> 0xBA6646;
                 case GUNNER -> 0xCCE4F6;
+                case KATANA -> 0x28222A;
                 case BIT -> 0x323A62;
             };
         }
@@ -2960,6 +3163,265 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.scale(k * 0.8F, k * 0.8F, k * 0.8F);
         }
     }
+
+    /**
+     * 刀型の2本の刀と鞘。
+     * <ul>
+     * <li>腰の刀（ふだん使いの打刀）: 左の腰に、鯉口を前上がりに、鐺を後ろ下へ差す（黒漆に銀の金具）。抜いている間は右手に。
+     *     刀身は素の鋼に、白く冴えた刃文。</li>
+     * <li>背中の紅い刀（紅一閃の刀）: 左肩の上から右の腰へ斜めに背負う（朱の漆に金の金具と、背の側の紅の光の線）。
+     *     紅一閃で引き抜き、勝利時は刀礼を取ってから納める。刀身は暗い鋼に紅く光る刃文で、光が満ちるほど強く光る。</li>
+     * </ul>
+     */
+    final class Katana extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final int LACQUER = 0x1A161C, LACQUER_HI = 0x2C2630, CRIMSON = 0x9C1A2E, GOLD = 0xB89650, DARK_GOLD = 0x6E5A38;
+        private static final int SHU = 0x7A1424, SHU_HI = 0x9A2032, SILVER = 0xA8AEB8, IRON = 0x3A3840;
+        private static final int WRAP = 0x221C24, SILK = 0x5E5866;
+        private static final float UCHI_SAYA = 0.92F, BENI_SAYA = 1.06F;
+        // 朱鞘の金具と金具の間に見える漆面（鯉口から鐺へ、始点と終点の組）。
+        private static final float[] BENI_PANELS = {0.035F, 0.11F, 0.15F, 0.40F, 0.42F, 0.68F, 0.70F, BENI_SAYA - 0.06F};
+        private static final float INLAY_HALF_WIDTH = 0.009F;
+
+        Katana(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            AndroidModel m = getParentModel();
+            if (m.katanaGrip == null || m.katanaGripL == null || !android.printed() || !(android instanceof KatanaAndroid katana)) {
+                return;
+            }
+            int state = android.state();
+            float glow = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F : 0.85F + 0.1F * Mth.sin(age * 0.2F);
+            float surge = katana.surge(partialTick);
+            float time = katana.stateTime(partialTick);
+            KatanaCareKit.render(m, pose, buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE)), light, katana, partialTick);
+            float insertion = KatanaMotion.interruptedBladeTime(katana, partialTick);
+            renderSword(pose, buffers, light, false, katana.bladeInHand(partialTick),
+                    insertion >= 0 ? KatanaAndroid.STATE_MAINTENANCE : state, insertion >= 0 ? insertion : time, glow, surge * 0.5F);
+            if (KatanaMotion.clothInHand(katana, partialTick)) {
+                float exit = katana.maintenanceExitProgress(partialTick);
+                float clothTime = exit >= 0 ? katana.maintenanceExitTime(partialTick) : time;
+                float unfold = KatanaMotion.clothUnfold(clothTime) * (1 - KatanaMotion.ease(exit, 0, 0.8F));
+                pose.pushPose();
+                m.toKatanaHand(pose, true);
+                // 握った折り目から布の白い面を籠手の手前へ広げ、刃と布が触れている所を見せる。
+                pose.translate(0, 0, -0.62F * unfold / 16F);
+                pose.mulPose(Axis.YP.rotation(Mth.PI * unfold));
+                pose.scale((1 + 1.25F * unfold) / 16F, (1 + 0.95F * unfold) / 16F, (1 + 0.35F * unfold) / 16F);
+                KatanaCareKit.cloth(pose, buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE)), light);
+                pose.popPose();
+            }
+            float finisher = katana.iaiVictoryTime(partialTick);
+            if (finisher >= 0) {
+                float heat = 1 - 0.35F * ease(finisher / KatanaAndroid.IAI_VICTORY_SEAT);
+                renderSword(pose, buffers, light, true, false, KatanaAndroid.STATE_IAI_VICTORY, finisher, glow, heat);
+                return;
+            }
+            float salute = katana.victoryTime(partialTick);
+            if (salute >= 0) {
+                // 戦闘に戻っても、半抜きの紅刀は左手と同じ時計で鞘へ戻る。
+                float exposed = KatanaMotion.exposure(KatanaAndroid.STATE_VICTORY, salute, true, false);
+                renderSword(pose, buffers, light, true, false, KatanaAndroid.STATE_VICTORY, salute, glow, exposed);
+            } else {
+                renderSword(pose, buffers, light, true, katana.greatBladeInHand(partialTick), state, time, glow, surge);
+            }
+        }
+
+        private void renderSword(PoseStack pose, MultiBufferSource buffers, int light, boolean crimson, boolean inHand,
+                                 int state, float time, float glow, float surge) {
+            AndroidModel model = getParentModel();
+            float exposed = KatanaMotion.exposure(state, time, crimson, inHand);
+            float travel = KatanaMotion.stroke(crimson) * exposed;
+            float hand = KatanaMotion.handBlend(state, time, crimson, inHand);
+            pose.pushPose();
+            model.toKatanaMouth(pose, crimson);
+            pose.scale(1 / SCALE, 1 / SCALE, 1 / SCALE);
+            scabbard(pose, buffers, light, crimson, state, time);
+            if (hand == 0) {
+                pose.translate(0, -travel, KatanaMotion.curveOffset(exposed));
+                katana(pose, buffers, light, crimson, travel, glow, surge, state, time);
+            }
+            pose.popPose();
+            if (hand == 0) {
+                return;
+            }
+
+            pose.pushPose();
+            model.toKatanaHand(pose, crimson);
+            pose.scale(1 / SCALE, 1 / SCALE, 1 / SCALE);
+            pose.translate(0, AndroidModel.KATANA_GRIP_TO_GUARD, 0);
+            katana(pose, buffers, light, crimson, travel, glow, surge, state, time);
+            pose.popPose();
+        }
+
+        /** 鞘（+Y が鐺の向き。原点が鯉口）。beni なら背中の紅い刀の朱鞘（金の金具と、背の側の光の線）、そうでなければ腰の黒鞘（銀の金具）。 */
+        private void scabbard(PoseStack pose, MultiBufferSource buffers, int light, boolean beni, int state, float time) {
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            float saya = beni ? BENI_SAYA : UCHI_SAYA;
+            int lacquer = beni ? SHU : LACQUER, hi = beni ? SHU_HI : LACQUER_HI;
+            int metal = beni ? GOLD : SILVER, mouth = beni ? DARK_GOLD : IRON;
+            float hx = 0.03F, hz = beni ? 0.046F : 0.032F;
+            FxDraw.box(pose, body, -hx, 0.03F, -hz, hx, saya - 0.05F, hz, light, lacquer, 255, !beni);
+            FxDraw.box(pose, body, -hx - 0.004F, 0, -hz - 0.004F, hx + 0.004F, 0.035F, hz + 0.004F, light, mouth, 255);        // 鯉口
+            FxDraw.box(pose, body, -hx - 0.004F, saya - 0.06F, -hz - 0.004F, hx + 0.004F, saya, hz + 0.004F, light, metal, 255); // 鐺
+            float charge = switch (state) {
+                case KatanaAndroid.STATE_IAI_STANCE -> ease((time - 4) / (KatanaAndroid.IAI_STANCE - KatanaAndroid.IAI_LOCK - 4F));
+                case KatanaAndroid.STATE_IAI_FLASH -> 1;
+                default -> 0;
+            };
+            float front = Mth.lerp(charge, saya - 0.02F, 0.01F);
+            float power = !beni || charge == 0 ? 0 : state == KatanaAndroid.STATE_IAI_FLASH ? 1 - ease(time / 3) : 1;
+            scabbardBand(pose, body, light, hx + 0.006F, hz + 0.006F, 0.11F, 0.15F, beni ? LACQUER : CRIMSON, front, power);
+            scabbardBand(pose, body, light, hx + 0.002F, hz + 0.002F, 0.40F, 0.42F, hi, front, power);
+            scabbardBand(pose, body, light, hx + 0.002F, hz + 0.002F, 0.68F, 0.70F, hi, front, power);
+            // 下げ緒（栗形から垂れる紐。腰の刀は紅、背中の刀は黒）
+            FxDraw.box(pose, body, hx, 0.12F, -0.008F, hx + 0.012F, 0.3F, 0.008F, light, beni ? LACQUER : CRIMSON, 255);
+            if (beni) {
+                // 紅い筋は金具の間に見える漆面そのものに描く。溜めの光も同じ面の色で走らせる。
+                float brightness = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F : 1;
+                int red = mix(SHU, variant.accent, brightness);
+                int charged = mix(red, 0xFFAB97, power);
+                FxDraw.box(pose, body, -0.012F, saya - 0.01F, -0.012F, 0.012F, saya + 0.006F, 0.012F,
+                        FxDraw.FULL_BRIGHT, charged, 255);
+                scabbardInlay(pose.last(), buffers, body, light, hx, hz, front, red, charged);
+                int seat = switch (state) {
+                    case KatanaAndroid.STATE_IAI_ZANSHIN -> KatanaAndroid.IAI_SHEATHE_SEAT;
+                    case KatanaAndroid.STATE_IAI_VICTORY -> KatanaAndroid.IAI_VICTORY_SEAT;
+                    default -> -1;
+                };
+                if (seat >= 0 && time >= seat && time < seat + 5) {
+                    // 鍔の当たった場所から一度だけ紅の輪を放つ。
+                    float u = (time - seat) / 5;
+                    float radius = Mth.lerp(ease(u), 0.065F, 0.34F);
+                    VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
+                    FxDraw.ring(pose.last(), fx, radius - 0.027F * (1 - u), radius, variant.accent, (int) (240 * (1 - u)), 0);
+                    FxDraw.octahedron(pose.last(), fx, 0.13F * (1 - u), 0.045F * (1 - u), 0xFFF2CE, (int) (230 * (1 - u)));
+                }
+            }
+        }
+
+        private void scabbardBand(PoseStack pose, VertexConsumer body, int light, float hx, float hz, float y0, float y1,
+                                  int color, float front, float power) {
+            float lit = power * ease(((y0 + y1) * 0.5F - front) / 0.10F);
+            if (lit > 0) {
+                light = LightTexture.pack(Math.max(LightTexture.block(light), Math.round(15 * lit)), LightTexture.sky(light));
+                color = mix(color, 0xFFB195, lit);
+            }
+            FxDraw.box(pose, body, -hx, y0, -hz, hx, y1, hz, light, color, 255);
+        }
+
+        private void scabbardInlay(PoseStack.Pose pose, MultiBufferSource buffers, VertexConsumer body, int light,
+                                   float hx, float z, float front, int red, int charged) {
+            // 漆から細い発光部の縁へ色をなじませる。中央には面を置かず、発光部と辺だけを共有する。
+            float core = INLAY_HALF_WIDTH;
+            for (int i = 0; i < BENI_PANELS.length; i += 2) {
+                float y0 = BENI_PANELS[i], y1 = BENI_PANELS[i + 1];
+                inlayStrip(pose, body, -hx, -core, y0, y1, z, SHU, light, red, FxDraw.FULL_BRIGHT);
+                inlayStrip(pose, body, core, hx, y0, y1, z, red, FxDraw.FULL_BRIGHT, SHU, light);
+            }
+            // ビーコンの芯と同じ、不透明で陰影を受けない材質。溜めの色も同じ一枚の面の中で切り替える。
+            VertexConsumer emitter = buffers.getBuffer(RenderType.beaconBeam(FxDraw.WHITE, false));
+            for (int i = 0; i < BENI_PANELS.length; i += 2) {
+                float y0 = BENI_PANELS[i], y1 = BENI_PANELS[i + 1];
+                float split = Mth.clamp(front, y0, y1);
+                if (split > y0) inlayStrip(pose, emitter, -core, core, y0, split, z, red, FxDraw.FULL_BRIGHT, red, FxDraw.FULL_BRIGHT);
+                if (split < y1) inlayStrip(pose, emitter, -core, core, split, y1, z, charged, FxDraw.FULL_BRIGHT, charged, FxDraw.FULL_BRIGHT);
+            }
+        }
+
+        private void inlayStrip(PoseStack.Pose pose, VertexConsumer body, float x0, float x1, float y0, float y1, float z,
+                                int left, int leftLight, int right, int rightLight) {
+            FxDraw.vertex(body, pose, x0, y0, z, left, 255, leftLight, 0, 0, 1);
+            FxDraw.vertex(body, pose, x1, y0, z, right, 255, rightLight, 0, 0, 1);
+            FxDraw.vertex(body, pose, x1, y1, z, right, 255, rightLight, 0, 0, 1);
+            FxDraw.vertex(body, pose, x0, y1, z, left, 255, leftLight, 0, 0, 1);
+        }
+
+        /**
+         * 刀（+Y が刀身の向き、+Z が刃の向き。原点が鍔の上）。刀身と光は鯉口から出た長さだけ描く。
+         * beni なら背中の紅い刀（紅の柄巻に金の鍔、暗い鋼に紅く光る刃文）、そうでなければ腰の打刀（灰の柄巻に鉄の鍔、素の鋼に白い刃文）。
+         * surge（0〜1）で、刃文の光と刀身の紅のにじみが強まる。
+         */
+        private void katana(PoseStack pose, MultiBufferSource buffers, int light, boolean beni, float visibleLength, float glow, float surge,
+                            int state, float time) {
+            if (beni) {
+                float lock = switch (state) {
+                    case KatanaAndroid.STATE_IAI_STANCE -> ease((time - (KatanaAndroid.IAI_STANCE - KatanaAndroid.IAI_LOCK)) / 2);
+                    case KatanaAndroid.STATE_IAI_FLASH -> 1 - ease(time / 2);
+                    default -> 0;
+                };
+                if (lock > 0) {
+                    float pulse = lock * (0.85F + 0.15F * Mth.cos((time - KatanaAndroid.IAI_STANCE) * 1.5F));
+                    VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
+                    pose.pushPose();
+                    pose.translate(0, -0.27F, 0);
+                    FxDraw.octahedron(pose.last(), fx, 0.12F * pulse, 0.16F * pulse, variant.accent, (int) (160 * pulse));
+                    FxDraw.octahedron(pose.last(), fx, 0.045F * pulse, 0.12F * pulse, 0xFFF3C8, (int) (245 * pulse));
+                    pose.popPose();
+                }
+            }
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            float r = 0.021F;
+            FxDraw.box(pose, body, -r, -0.26F, -r, r, -0.03F, r, light, WRAP, 255);
+            for (int i = 0; i < 5; i++) {
+                float y = -0.24F + i * 0.045F;
+                FxDraw.box(pose, body, -r - 0.003F, y, -r - 0.003F, r + 0.003F, y + 0.018F, r + 0.003F, light, beni ? CRIMSON : SILK, 255);
+            }
+            FxDraw.box(pose, body, -r - 0.004F, -0.285F, -r - 0.004F, r + 0.004F, -0.255F, r + 0.004F, light, beni ? GOLD : SILVER, 255);   // 柄頭
+            FxDraw.box(pose, body, -0.055F, -0.03F, -0.06F, 0.055F, -0.005F, 0.06F, light, beni ? CRIMSON : LACQUER, 255);                  // 鍔
+            FxDraw.box(pose, body, -0.058F, -0.026F, -0.063F, 0.058F, -0.009F, 0.063F, light, beni ? DARK_GOLD : IRON, 255);
+            if (visibleLength == 0) {
+                return;
+            }
+            FxDraw.box(pose, body, -0.012F, -0.005F, -0.026F, 0.012F, Math.min(0.04F, visibleLength), 0.026F,
+                    light, beni ? GOLD : SILVER, 255); // はばき
+            if (visibleLength <= 0.04F) {
+                return;
+            }
+            float waveFront = switch (state) {
+                case KatanaAndroid.STATE_VICTORY -> Mth.lerp(ease((time - KatanaAndroid.VICTORY_RAISE) / 8), -0.25F, 0.85F);
+                case KatanaAndroid.STATE_IAI_FLASH -> Mth.lerp(ease(time / KatanaAndroid.IAI_FLASH), -0.25F, 1.25F);
+                case KatanaAndroid.STATE_IAI_ZANSHIN -> Mth.lerp(ease((time - 3) / 6), -0.25F, 1.25F);
+                case KatanaAndroid.STATE_IAI_VICTORY -> Mth.lerp(ease((time - 9) / 12), -0.25F, 1.25F);
+                default -> -1;
+            };
+            float heat = beni ? 0.6F * glow + surge : 0.45F * surge;
+            KatanaBlade.render(pose.last(), buffers, body, light, beni, visibleLength, surge, heat, waveFront);
+            boolean raised = state == KatanaAndroid.STATE_IAI_VICTORY;
+            float gleamTime = time - (raised ? 16 : 15);
+            if (beni && (raised || state == KatanaAndroid.STATE_VICTORY) && gleamTime > 0 && gleamTime < 7) {
+                // 半抜きでの一礼は鍔に近い刃、抜き身を掲げる刀礼は切っ先に光が届く瞬間に光らせる。
+                float gleam = Mth.sin(gleamTime * Mth.PI / 7);
+                pose.pushPose();
+                pose.translate(0, visibleLength * (raised ? 0.96F : 0.32F), raised ? -KatanaMotion.curveOffset(0.96F) : 0.034F);
+                FxDraw.octahedron(pose.last(), buffers.getBuffer(AndroidWeaponLight.GLOW), 0.045F * gleam,
+                        0.09F * gleam, 0xFFDF9D, (int) (210 * gleam));
+                pose.popPose();
+            }
+            if (beni && state == KatanaAndroid.STATE_IAI_FLASH && time > 1 && time < 3) {
+                // 抜けきった刀が横切る間だけ、棟から短い紅の残光を引く。刃先と同じ手首座標を使う。
+                float swing = Mth.sin((time - 1) * Mth.HALF_PI);
+                float span = 0.22F * swing;
+                float baseY = 0.28F * visibleLength, baseZ = -KatanaMotion.curveOffset(0.28F);
+                float tipZ = -KatanaMotion.curveOffset(1);
+                int bright = argb((int) (125 * swing), variant.accent), clear = argb(0, variant.accent);
+                PoseStack.Pose p = pose.last();
+                VertexConsumer fx = buffers.getBuffer(AndroidWeaponLight.GLOW);
+                fx.addVertex(p, 0, baseY, baseZ).setColor(bright);
+                fx.addVertex(p, 0, visibleLength, tipZ).setColor(bright);
+                fx.addVertex(p, 0, visibleLength - span * 0.4F, tipZ - span).setColor(clear);
+                fx.addVertex(p, 0, baseY, baseZ - span * 0.05F).setColor(clear);
+                fx.addVertex(p, 0, baseY, baseZ - span * 0.05F).setColor(clear);
+                fx.addVertex(p, 0, visibleLength - span * 0.4F, tipZ - span).setColor(clear);
+                fx.addVertex(p, 0, visibleLength, tipZ).setColor(bright);
+                fx.addVertex(p, 0, baseY, baseZ).setColor(bright);
+            }
+        }
+    }
+
 
     final class Blade extends RenderLayer<RuinAndroid, AndroidModel> {
         Blade(RenderLayerParent<RuinAndroid, AndroidModel> parent) {

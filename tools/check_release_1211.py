@@ -33,7 +33,7 @@ def validate(root, loader, name=None, source=None):
     with zipfile.ZipFile(path) as jar:
         names = jar.namelist()
         if len(names) != len(set(names)) or any('ReviewHarness' in n
-                or re.search(r'(?:GameTests(?:\$[^/]*)?|TestBuild)\.class$', n)
+                or re.search(r'(?:Review(?:Checks)?|GameTests|TestBuild)(?:\$[^/]*)?\.class$', n)
                 or '/test/harness/' in n or '/singulo/review/' in n for n in names):
             raise RuntimeError('Duplicate entries or development GUI code in production JAR')
         for n in names:

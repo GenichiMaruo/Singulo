@@ -90,6 +90,15 @@ VARIANTS = {
         'seed': 53,
         'inner': True,
     },
+    # 刀型「ルージュ」: 黒髪に紅のインナーカラーと、紅の光（背中の鞘に納めた刀）
+    'katana_android': {
+        'hair': ((44, 38, 46), (30, 26, 32), (18, 15, 20)),
+        'streak': ((214, 44, 66), (160, 26, 46)),
+        'accent': (255, 58, 84),
+        'iris': ((150, 20, 42), (255, 96, 112)),
+        'seed': 59,
+        'inner': True,
+    },
     # ビット型「ノクス」: 紺の髪に菫のひと房
     'bit_android': {
         'hair': ((50, 58, 98), (36, 42, 76), (24, 28, 54)),
@@ -131,6 +140,60 @@ def textures(te, save):
         save(base, te / f'{name}.png')
         save(glow, te / f'{name}_glow.png')
     save(gunner_charge(VARIANTS['gunner_android'], Image), te / 'gunner_android_charge.png')
+    for stage in range(len(KATANA_SURGE)):
+        save(katana_surge(VARIANTS['katana_android'], stage, Image), te / f'katana_android_surge_{stage}.png')
+
+
+# 刀型の紅一閃で、体の継ぎ目に浮き出る光の筋。胸の芯から外へ、3段に分けて浮き出る（段ごとに別の部品。重ならない）
+KATANA_SURGE = (
+    ('torso', 'chest', 'pelvis', 'neck'),
+    ('arm_l', 'arm_r', 'thigh_l', 'thigh_r', 'pad', 'skirt_front', 'skirt_back', 'skirt_side'),
+    ('forearm_l', 'gauntlet', 'shin_l', 'shin_r', 'skirt_tail', 'fin'),
+)
+
+
+def katana_surge(pal, stage, Image):
+    """刀型の紅一閃の間だけ重ねる、体の光の筋（stage 段目の部品だけ）。
+
+    部品の縦の面に、回路のような細い筋を1本ずつ: 途中で1ドット横へ折れ、端に明るい節がつく。上下の面には、縁を横切る短い筋。
+    """
+    rng = random.Random(pal['seed'] * 7 + stage)
+    im = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
+    r, g, b = pal['accent']
+    trace = (r, min(255, g + 40), min(255, b + 40))
+    node = (255, 214, 220)
+
+    def put(x, y, c):
+        im.putpixel((x, y), tuple(c) + (255,))
+
+    for name in KATANA_SURGE[stage]:
+        f = faces(*ANDROID_PARTS[name])
+        for k in ('front', 'back', 'side_a', 'side_b'):
+            x0, y0, x1, y1 = f[k]
+            w, h = x1 - x0, y1 - y0
+            if w <= 0 or h <= 1:
+                continue
+            col = x0 + (rng.randrange(1, w - 1) if w > 2 else rng.randrange(w))
+            turn = y0 + rng.randrange(1, h) if h > 2 else y1
+            side = rng.choice((-1, 1))
+            for y in range(y0, y1):
+                x = col
+                if y >= turn and x0 <= col + side < x1:
+                    x = col + side
+                    if y == turn:
+                        put(col, y, trace)       # 折れ目は2ドットでつなぐ
+                put(x, y, trace)
+            put(col, y0, node)
+            end = col + side if turn < y1 and x0 <= col + side < x1 else col
+            put(end, y1 - 1, node)
+        for k in ('up', 'down'):
+            x0, y0, x1, y1 = f[k]
+            if x1 - x0 >= 3 and y1 - y0 >= 2:
+                cy = y0 + (y1 - y0) // 2
+                for x in range(x0, x1):
+                    if (x - x0) % 3 != 2:
+                        put(x, cy, trace)
+    return im
 
 
 def gunner_charge(pal, Image):
@@ -662,7 +725,7 @@ def item_textures(ti, save):
     for name, pal in VARIANTS.items():
         kind = name.replace('_android', '')
         if kind in ANIMATED_MEMORIES:
-            sheet = animated_memory(pal['accent'], Image)
+            sheet = ANIMATED_MEMORIES[kind](pal['accent'], Image)
             save(sheet, ti / f'android_memory_{kind}.png')
             (ti / f'android_memory_{kind}.png.mcmeta').write_text(
                 json.dumps({'animation': {'frametime': 2, 'interpolate': False}}), encoding='utf-8')
@@ -715,8 +778,7 @@ def item_textures(ti, save):
     save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
 
 
-# 結晶の中を光が流れるアニメーションつきのメモリ（射撃型だけ）
-ANIMATED_MEMORIES = ('gunner',)
+# アニメーションつきのメモリ（隠し型だけ）: 型ごとのコマの描き方。表は下の関数の定義のあと
 MEMORY_FRAMES = 16
 
 
@@ -748,6 +810,62 @@ def animated_memory(accent, Image):
         px[11, 11] = tuple(int(c * lamp) for c in accent) + (255,)
         sheet.paste(im, (0, 16 * f))
     return sheet
+
+
+def katana_memory(accent, Image):
+    """刀型のアニメーションつきの小型クリスタルメモリ（縦に並べた16コマ）。
+
+    結晶を右上から左下へ、紅の斬線が一瞬で走り抜け、結晶が紅く明るんでから鎮まる。そのあと、斬線の跡から火の粉のような
+    光の粒が立ちのぼって消える。表示灯は鼓動のように2回ずつ明滅する。
+    """
+    base = memory_icon(accent, Image)
+    sheet = Image.new('RGBA', (16, 16 * MEMORY_FRAMES), (0, 0, 0, 0))
+    hot = tuple(min(255, c + 110) for c in accent)
+    # 斬線の点（右上から左下へ）
+    line = [(10, 2), (9, 3), (9, 4), (8, 5), (7, 6), (7, 7), (6, 8), (5, 9)]
+    embers = ((9, 0), (7, 3), (6, 6))                 # (x, 立ちのぼり始めるコマ)
+    for f in range(MEMORY_FRAMES):
+        im = base.copy()
+        px = im.load()
+        # 斬線: 0〜2コマで走り、3〜6コマで細く消える
+        if f <= 6:
+            reach = len(line) if f >= 2 else (f + 1) * len(line) // 3
+            fade = 1.0 if f <= 3 else 1 - (f - 3) / 4
+            for i, (x, y) in enumerate(line[:reach]):
+                r, g, b, a = px[x, y]
+                core = (255, 255, 255) if f <= 3 else hot
+                k = fade
+                px[x, y] = (int(r + (core[0] - r) * k), int(g + (core[1] - g) * k), int(b + (core[2] - b) * k), max(a, int(230 * k)))
+                for dx in (-1, 1):
+                    nx = x + dx
+                    if 5 <= nx <= 10:
+                        r2, g2, b2, a2 = px[nx, y]
+                        kk = 0.55 * k
+                        px[nx, y] = (int(r2 + (hot[0] - r2) * kk), int(g2 + (hot[1] - g2) * kk), int(b2 + (hot[2] - b2) * kk),
+                                     max(a2, int(200 * kk)))
+        # 結晶が紅く明るんでから鎮まる（2〜8コマ）
+        if 2 <= f <= 8:
+            k = (1 - abs(f - 4) / 4) * 0.45
+            for y in range(2, 10):
+                for x in range(5, 11):
+                    r, g, b, a = px[x, y]
+                    px[x, y] = (min(255, int(r + (hot[0] - r) * k)), min(255, int(g + (hot[1] - g) * k)),
+                                min(255, int(b + (hot[2] - b) * k)), min(255, a + int(60 * k)))
+        # 立ちのぼる光の粒（それぞれ5コマかけて、斬線の跡から上へ）
+        for x, start in embers:
+            age = f - 6 - start
+            if 0 <= age < 5:
+                y = 8 - age * 2 + (1 if x == 9 else 0)
+                if 2 <= y <= 9:
+                    px[x - (age // 3), y] = (255, 200, 170, 235) if age < 3 else hot + (200,)
+        # 表示灯: 鼓動のように2回ずつ明滅
+        lamp = 1.0 if f % 8 in (0, 2) else 0.4
+        px[11, 11] = tuple(int(c * lamp) for c in accent) + (255,)
+        sheet.paste(im, (0, 16 * f))
+    return sheet
+
+
+ANIMATED_MEMORIES = {'gunner': animated_memory, 'katana': katana_memory}
 
 
 def memory_icon(accent, Image):
