@@ -77,8 +77,8 @@ public class GunnerAndroid extends RuinAndroid {
     public static final double RAIL_RANGE = 32;
     /** レールガンの光線の太さ（当たり判定の半径）。 */
     public static final double RAIL_RADIUS = 0.55;
-    static final float SHOT_DAMAGE = 3F;
-    static final float RAIL_DAMAGE = 14;
+    static final float SHOT_DAMAGE = 4F;
+    static final float RAIL_DAMAGE = 20F;
     /** 光弾・光線の光が残る tick。 */
     public static final int FLASH = 4;
 
@@ -96,6 +96,9 @@ public class GunnerAndroid extends RuinAndroid {
     private static final EntityDataAccessor<Vector3f> RAIL_TO = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
     /** 構えている間の狙いの点（相手の体の中心）。描画で、銃身をここへぴったり向ける。 */
     private static final EntityDataAccessor<Vector3f> AIM = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.VECTOR3);
+    private int clientPistolState = STATE_IDLE;
+    private float clientHolsterFrom;
+    private float clientPistolAimFrom;
 
     public GunnerAndroid(EntityType<? extends GunnerAndroid> type, Level level) {
         super(type, level);
@@ -165,13 +168,51 @@ public class GunnerAndroid extends RuinAndroid {
         goalSelector.addGoal(2, new CombatGoal());
     }
 
-    static boolean combat(int s) {
+    public static boolean combat(int s) {
         return s >= STATE_SHOT && s <= STATE_HOP;
     }
 
     /** レールガンを組み上げている・構えている間（背中の格納箱は空）。 */
     public static boolean railOut(int s) {
         return s >= STATE_RAIL_ASSEMBLE && s <= STATE_RAIL_STOW;
+    }
+
+    /** The sidearm stays on the hip while the hands are occupied. The rail's last pieces return at tick 7. */
+    private static float holsterAt(int state, float t, float from) {
+        boolean hip = railOut(state) || state == STATE_CRAFTING || state == STATE_MINING || lifeState(state)
+                || state == STATE_LOW_POWER || charging(state) || state == STATE_SOLAR_FOLD;
+        if (state == STATE_RAIL_STOW && t >= 7) {
+            t -= 7;
+            from = 1;
+            hip = false;
+        }
+        float u = Mth.clamp(t / 5, 0, 1);
+        return Mth.lerp(u * u * (3 - 2 * u), from, hip ? 1 : 0);
+    }
+
+    public float pistolHolster(float partialTick) {
+        return holsterAt(state(), stateTime(partialTick), clientHolsterFrom);
+    }
+
+    private static float pistolAimAt(int state, float t, float from) {
+        boolean aiming = state == STATE_SHOT;
+        float u = Mth.clamp(t / (aiming ? 4 : 5), 0, 1);
+        return Mth.lerp(u * u * (3 - 2 * u), from, aiming ? 1 : 0);
+    }
+
+    public float pistolAim(float partialTick) {
+        return pistolAimAt(state(), stateTime(partialTick), clientPistolAimFrom);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        if (level().isClientSide && state() != clientPistolState) {
+            float elapsed = super.stateTime(0);
+            clientHolsterFrom = holsterAt(clientPistolState, elapsed, clientHolsterFrom);
+            clientPistolAimFrom = pistolAimAt(clientPistolState, elapsed, clientPistolAimFrom);
+            clientPistolState = state();
+        }
+        super.onSyncedDataUpdated(key);
     }
 
     private Vec3 fxOrigin() {
@@ -271,7 +312,13 @@ public class GunnerAndroid extends RuinAndroid {
         if (dir.lengthSqr() < 1e-4) {
             return;
         }
-        setFx(from, from.add(dir.normalize().scale(RAIL_RANGE)), RAIL_FROM, RAIL_TO);
+        setFx(from, railEnd(from, dir.normalize()), RAIL_FROM, RAIL_TO);
+    }
+
+    private Vec3 railEnd(Vec3 from, Vec3 direction) {
+        Vec3 end = from.add(direction.scale(RAIL_RANGE));
+        HitResult wall = level().clip(new ClipContext(from, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        return wall.getType() == HitResult.Type.MISS ? end : wall.getLocation();
     }
 
     /**
@@ -285,11 +332,7 @@ public class GunnerAndroid extends RuinAndroid {
             dir = Vec3.directionFromRotation(getXRot(), yBodyRot);
         }
         dir = dir.normalize();
-        Vec3 end = from.add(dir.scale(RAIL_RANGE));
-        HitResult wall = level.clip(new ClipContext(from, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-        if (wall.getType() != HitResult.Type.MISS) {
-            end = wall.getLocation();
-        }
+        Vec3 end = railEnd(from, dir);
         setFx(from, end, RAIL_FROM, RAIL_TO);
         Set<LivingEntity> hit = new HashSet<>();
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(from, end).inflate(RAIL_RADIUS), this::canHit)) {
@@ -364,6 +407,11 @@ public class GunnerAndroid extends RuinAndroid {
     public void tick() {
         super.tick();
         if (level() instanceof ServerLevel) {
+            int motion = gesture();
+            if (motion != GESTURE_NONE && (combat(state()) || (motion == GESTURE_RELOAD || motion == GESTURE_TWIRL)
+                    && (state() != STATE_IDLE || isWorking() || napping()))) {
+                gesture(GESTURE_NONE, null);
+            }
             if (shotFlash() > 0) {
                 entityData.set(SHOT_FLASH, shotFlash() - 1);
             }
@@ -378,20 +426,18 @@ public class GunnerAndroid extends RuinAndroid {
                     ammo = MAGAZINE;
                 }
             }
-            // 敵がいなくなって、弾が減っていれば、手が空いたときにリロードしておく
             LivingEntity foe = getTarget();
-            if (ammo < MAGAZINE && reloadTicks < 0 && state() == STATE_IDLE && active() && (foe == null || !foe.isAlive())
-                    && gesture() == GESTURE_NONE) {
-                startReload();
-            }
+            boolean freeHands = state() == STATE_IDLE && active() && !isWorking() && !napping() && !life.busy()
+                    && (foe == null || !foe.isAlive()) && gesture() == GESTURE_NONE;
             if (twirlWait > 0) {
                 twirlWait--;
-                LivingEntity target = getTarget();
-                if (state() == STATE_IDLE && active() && (target == null || !target.isAlive())) {
+                if (freeHands) {
                     twirlWait = 0;
                     gesture(GESTURE_TWIRL, null);
                     playSound(SoundEvents.ARMOR_EQUIP_IRON.value(), 0.6F, 1.8F);
                 }
+            } else if (freeHands && ammo < MAGAZINE && reloadTicks < 0) {
+                startReload();
             }
             // 作業中だけ、歩く速さを上げる
             var speed = getAttribute(Attributes.MOVEMENT_SPEED);
@@ -422,12 +468,12 @@ public class GunnerAndroid extends RuinAndroid {
         @Override
         public boolean canUse() {
             LivingEntity t = getTarget();
-            return active() && t != null && t.isAlive();
+            return active() && (combat(state()) || t != null && t.isAlive());
         }
 
         @Override
         public boolean canContinueToUse() {
-            return canUse() || combat(state()) && active();
+            return canUse();
         }
 
         @Override
@@ -458,15 +504,16 @@ public class GunnerAndroid extends RuinAndroid {
                 }
                 return;
             }
-            if (target == null || !target.isAlive()) {
-                if (railOut(s)) {
-                    setState(STATE_RAIL_STOW);
-                } else if (combat(s) && stateTicks > 20) {
+            // Finish moving parts, recoil and landing even if the shot killed the last target.
+            boolean hasTarget = target != null && target.isAlive();
+            if (!hasTarget && s != STATE_RAIL_ASSEMBLE && s != STATE_RAIL_FIRE && s != STATE_HOP) {
+                if (s == STATE_RAIL_CHARGE) {
+                    stowRail();
+                } else if (s == STATE_SHOT && shotFlash() == 0) {
                     setState(STATE_IDLE);
                 }
                 return;
             }
-            double dist = distanceTo(target);
             switch (s) {
                 case STATE_SHOT -> {
                     boolean aimed = hold(target);
@@ -487,12 +534,19 @@ public class GunnerAndroid extends RuinAndroid {
                     }
                 }
                 case STATE_RAIL_ASSEMBLE -> {
-                    hold(target);
+                    getNavigation().stop();
+                    if (hasTarget) {
+                        hold(target);
+                        aimRail(target);
+                    }
                     if (stateTicks % 4 == 0) {
                         sparks(level, muzzle(true), 2, 0.25);
                     }
                     if (stateTicks >= RAIL_ASSEMBLE) {
-                        aimRail(target);
+                        if (!hasTarget) {
+                            stowRail();
+                            return;
+                        }
                         setState(STATE_RAIL_CHARGE);
                         playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_charge"), 0.9F, 1.0F);
                     }
@@ -529,7 +583,7 @@ public class GunnerAndroid extends RuinAndroid {
                         nextBurst = Math.min(nextBurst, 6);
                     }
                 }
-                default -> approach(level, target, dist);
+                default -> approach(level, target, distanceTo(target));
             }
         }
 
@@ -582,6 +636,7 @@ public class GunnerAndroid extends RuinAndroid {
                 return;
             }
             if (nextRail <= 0 && dist >= 5 && dist < RAIL_RANGE * 0.8 && spend(COST_RAIL)) {
+                aimRail(target);
                 start(STATE_RAIL_ASSEMBLE, io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_assemble"), 1.0F);
                 return;
             }
@@ -592,6 +647,7 @@ public class GunnerAndroid extends RuinAndroid {
                 return;
             }
             if (nextBurst <= 0 && dist < SHOT_RANGE && reloadTicks < 0 && spend(COST_BURST)) {
+                aimAt(target.getBoundingBox().getCenter());
                 start(STATE_SHOT, SoundEvents.CROSSBOW_LOADING_END.value(), 1.6F);
             }
         }

@@ -65,8 +65,6 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     private final org.joml.Matrix4f base = new org.joml.Matrix4f();
     /** 銃を描いたときの、銃口の位置（体の原点から。光弾・光線をここから出す）と、それを描いた個体の番号。 */
     private Vec3 muzzle = Vec3.ZERO;
-    /** そのときの銃身の向き（体の原点の座標で、長さ 1）。 */
-    private Vec3 muzzleDir = Vec3.ZERO;
     private int muzzleOf = -1;
 
     /** 描いた銃の銃口の位置（体の原点から）。まだ描いていなければ fallback。 */
@@ -74,21 +72,11 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         return muzzleOf == android.getId() ? muzzle : fallback;
     }
 
-    /**
-     * 描いた銃口から、銃身の向きへ length 進んだ点（体の原点から）。予告の線を、描いた銃とぴったりそろえるため。
-     * まだ描いていなければ fallback。
-     */
-    private Vec3 alongBarrel(RuinAndroid android, double length, Vec3 fallback) {
-        return muzzleOf == android.getId() ? muzzle.add(muzzleDir.scale(length)) : fallback;
-    }
-
-    /** 今の変形での点 (x, y, z) を体の原点からの位置として、向き (dx, dy, dz) を銃身の向きとして覚える。 */
-    private void rememberMuzzle(PoseStack pose, RuinAndroid android, float x, float y, float z, float dx, float dy, float dz) {
+    /** Store the visible muzzle in entity-relative coordinates for the light and tracer. */
+    private void rememberMuzzle(PoseStack pose, RuinAndroid android, float x, float y, float z) {
         org.joml.Matrix4f toBody = new org.joml.Matrix4f(base).invert().mul(pose.last().pose());
         org.joml.Vector3f v = toBody.transformPosition(new org.joml.Vector3f(x, y, z));
-        org.joml.Vector3f d = toBody.transformDirection(new org.joml.Vector3f(dx, dy, dz)).normalize();
         muzzle = new Vec3(v.x, v.y, v.z);
-        muzzleDir = new Vec3(d.x, d.y, d.z);
         muzzleOf = android.getId();
     }
 
@@ -383,9 +371,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     Vec3 base = android.getPosition(partialTick);
                     int color = locked && ((int) (age * 0.8F)) % 2 == 0 ? 0xFFFFFF : accent;
                     VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
-                    // 線は描いた銃身の向きへ引く（銃が狙いへ向き終わる前でも、銃と線がずれない）
+                    // The warning has the same visible endpoint as the locked server shot.
                     Vec3 from = muzzle(android, gun.railFrom().subtract(base)), to = gun.railTo().subtract(base);
-                    FxDraw.beam(pose.last(), fx, from, alongBarrel(android, to.distanceTo(from), to),
+                    FxDraw.beam(pose.last(), fx, from, to,
                             0.025F + 0.04F * k, color, (int) (70 + 120 * k));
                     glow = GlowDepth.of(buffers, FxDraw.WHITE);
                     pose.pushPose();
@@ -2486,7 +2474,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
             AndroidModel m = getParentModel();
-            if (m.gunGrip == null || !android.printed()) {
+            if (m.gunGrip == null || !(android instanceof GunnerAndroid gun) || !android.printed()) {
                 return;
             }
             int state = android.state();
@@ -2494,8 +2482,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             boolean rail = GunnerAndroid.railOut(state);
             float glow = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F : 0.85F + 0.1F * Mth.sin(age * 0.2F);
             org.joml.Matrix4f back = stowedFrame(pose, m), hand = null;
-            if (!rail && android.weaponStowed()) {
-                // 物を作っている間: 小型銃は右の腰のホルスターに差す（銃口を下へ、握りを後ろへ）
+            float atHip = gun.pistolHolster(partialTick);
+            org.joml.Matrix4f holster = null;
+            if (atHip > 0) {
                 pose.pushPose();
                 m.toHips(pose);
                 pose.translate(-4.6F / 16, -1.2F / 16, 0.2F / 16);
@@ -2503,17 +2492,19 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 float s = PISTOL_SCALE / SCALE / 18;
                 pose.scale(s, s, s);
                 pose.translate(-0.6F, 0, 0);
-                pistol(pose, buffers, light, glow, age, 0, -1);
+                holster = new org.joml.Matrix4f(pose.last().pose());
+                if (atHip == 1) pistol(pose, buffers, light, glow, age, 0, -1);
                 pose.popPose();
-                railgun(pose, buffers, light, android, state, t, age, glow, back, null);
-                return;
+                if (!rail && atHip == 1) {
+                    railgun(pose, buffers, light, android, state, t, age, glow, back, null);
+                    return;
+                }
             }
             pose.pushPose();
             m.toBlade(pose);
             m.gunGrip.translateAndRotate(pose);
             float k = 1 / SCALE;
             pose.scale(k, k, k);
-            GunnerAndroid gun = android instanceof GunnerAndroid g ? g : null;
             Vec3 origin = android.getPosition(partialTick);
             // 射撃型の仕草（リロード・一回し）の効き（0〜1。構えていない間だけ。始めと終わりはなめらかに）
             int kind = android.gesture();
@@ -2522,45 +2513,29 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             if (state == RuinAndroid.STATE_IDLE && (reloading || kind == GunnerAndroid.GESTURE_TWIRL)) {
                 gesture = ease(Math.min(gestureTime / 5, (RuinAndroid.GESTURE_TICKS - gestureTime) / 5));
             }
-            if (rail) {
-                if (gun != null && state != GunnerAndroid.STATE_RAIL_ASSEMBLE) {
-                    // しまう間も、部品が背中へ戻り終わるまでは狙いの向きのまま（撃った向きから急に向きが変わらない）
-                    aimToward(pose, gun.railTo().subtract(origin), -0.045F, 60, switch (state) {
-                        case GunnerAndroid.STATE_RAIL_CHARGE -> ease(t / 6);
-                        case GunnerAndroid.STATE_RAIL_STOW -> 1 - ease((t - 7) / 3);
-                        default -> 1;
-                    });
-                }
-                // 銃の画素の座標へ（銃身の軸を z = -0.045、握りを手の中に）
-                float p = 1 / 16F;
-                pose.translate(0, 0, -0.045F);
-                pose.mulPose(TO_HAND);
-                pose.scale(p, p, p);
-                pose.translate(2.95F, 0, 0);
-                hand = new org.joml.Matrix4f(pose.last().pose());
-                rememberMuzzle(pose, android, 9.1F, 0, 0, 1, 0, 0);
-            } else {
+            if (atHip < 1) {
+                pose.pushPose();
                 pose.scale(PISTOL_SCALE, PISTOL_SCALE, PISTOL_SCALE);
-                if (gun != null && state == GunnerAndroid.STATE_SHOT) {
-                    // 撃った光が見えている間は、必ず銃身を狙いへぴったり向ける（構えの途中で撃っても射線とそろう）
-                    boolean firing = gun.shotFlash() > 0;
-                    aimToward(pose, gun.aim().subtract(origin), -0.025F, firing ? 70 : 35, firing ? 1 : ease(t / 4));
-                } else {
-                    // 構えていないとき: 腕の動き（作業・歩き）にかかわらず、銃口を足元の少し前の床へ向けて下げておく
+                boolean firing = state == GunnerAndroid.STATE_SHOT && gun.shotFlash() > 0;
+                float aiming = firing ? 1 : gun.pistolAim(partialTick);
+                if (aiming < 1) {
+                    // 射撃を終えたときだけ銃口を下ろす。持ち替えや待機の切り替わりでは同じ向きを保つ。
                     float yaw = Mth.rotLerp(partialTick, android.yBodyRotO, android.yBodyRot) * Mth.DEG_TO_RAD;
                     Vec3 fwd = new Vec3(-Mth.sin(yaw), 0, Mth.cos(yaw));
                     Vec3 right = new Vec3(-fwd.z, 0, fwd.x);
                     Vec3 rel = fwd.scale(0.45).add(right.scale(0.25));
-                    float lower = ease(t / 5);
                     if (gesture > 0) {
                         // 仕草の間: リロードは胸の前で少し上向きに、一回しは前へ向けて回したあと、銃口を真上へ立てる
                         Vec3 at = reloading ? new Vec3(0, 1.1, 0).add(fwd.scale(1.2)).subtract(right.scale(0.4))
                                 : new Vec3(0, 1.1, 0).add(fwd.scale(1.5)).add(right.scale(0.4)).lerp(
                                 new Vec3(0, 3.2, 0).add(fwd.scale(0.3)).add(right.scale(1.0)), ease((gestureTime - 13) / 5));
                         rel = rel.lerp(at, gesture);
-                        lower = Math.max(lower, gesture);
                     }
-                    aimToward(pose, rel, -0.025F, 90, lower);
+                    aimToward(pose, rel, -0.025F, 90, 1 - aiming);
+                }
+                if (aiming > 0) {
+                    // 発射光が見えている間は、その弾を撃った位置に向ける。
+                    aimToward(pose, (firing ? gun.shotAt() : gun.aim()).subtract(origin), -0.025F, firing ? 180 : 70, aiming);
                 }
                 // 銃の画素の座標へ（銃身の軸を z = -0.025、握りを手の中に）
                 float p = 1 / 18F;
@@ -2575,9 +2550,30 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.mulPose(Axis.ZP.rotation(-Mth.TWO_PI * 2 * spin));
                     pose.translate(-1.2F, -1.0F, 0);
                 }
-                float flash = gun == null ? 0 : Mth.clamp((gun.shotFlash() - partialTick) / GunnerAndroid.FLASH, 0, 1);
+                float flash = Mth.clamp((gun.shotFlash() - partialTick) / GunnerAndroid.FLASH, 0, 1);
+                if (atHip > 0) push(pose, pistolTransfer(pose.last().pose(), holster, atHip));
                 pistol(pose, buffers, light, glow, age, flash, reloading && gesture > 0 ? gestureTime : -1);
-                rememberMuzzle(pose, android, 4.7F, -PISTOL_AXIS, 0, 1, 0, 0);
+                if (!rail) rememberMuzzle(pose, android, 4.7F, -PISTOL_AXIS, 0);
+                if (atHip > 0) pose.popPose();
+                pose.popPose();
+            }
+            if (rail) {
+                if (state != GunnerAndroid.STATE_RAIL_ASSEMBLE || t > 8) {
+                    // しまう間も、部品が背中へ戻り終わるまでは狙いの向きのまま（撃った向きから急に向きが変わらない）
+                    aimToward(pose, gun.railTo().subtract(origin), -0.045F, 180, switch (state) {
+                        case GunnerAndroid.STATE_RAIL_ASSEMBLE -> ease((t - 8) / 8);
+                        case GunnerAndroid.STATE_RAIL_STOW -> 1 - ease((t - 7) / 3);
+                        default -> 1;
+                    });
+                }
+                // 銃の画素の座標へ（銃身の軸を z = -0.045、握りを手の中に）
+                float p = 1 / 16F;
+                pose.translate(0, 0, -0.045F);
+                pose.mulPose(TO_HAND);
+                pose.scale(p, p, p);
+                pose.translate(2.95F, 0, 0);
+                hand = new org.joml.Matrix4f(pose.last().pose());
+                rememberMuzzle(pose, android, 9.1F, 0, 0);
             }
             pose.popPose();
             railgun(pose, buffers, light, android, state, t, age, glow, back, hand);
@@ -2605,6 +2601,14 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.translate(0, 0, axisZ);
             pose.mulPose(q);
             pose.translate(0, 0, -axisZ);
+        }
+
+        /** Rigid transfer between two scaled model frames, including the frame right before seating. */
+        private static org.joml.Matrix4f pistolTransfer(org.joml.Matrix4f hand, org.joml.Matrix4f hip, float progress) {
+            var at = hand.getTranslation(new org.joml.Vector3f()).lerp(hip.getTranslation(new org.joml.Vector3f()), progress);
+            var rotation = hand.getUnnormalizedRotation(new Quaternionf()).slerp(hip.getUnnormalizedRotation(new Quaternionf()), progress);
+            var scale = hand.getScale(new org.joml.Vector3f()).lerp(hip.getScale(new org.joml.Vector3f()), progress);
+            return new org.joml.Matrix4f().translationRotateScale(at, rotation, scale);
         }
 
         /** 腰の後ろ（後ろ髪の下）に、銃口側（体の左）を少し上げて斜めに掛けたレールガンの、画素の座標の変形。 */
@@ -2658,7 +2662,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             radius += Math.max(0, CLEARANCE - radius) * arc;
             org.joml.Vector3f at = new org.joml.Vector3f(Mth.sin(angle) * radius, Mth.lerp(e, a.y, b.y) + 0.3F * arc, Mth.cos(angle) * radius);
             base.transformPosition(at);
-            Quaternionf q = from.getNormalizedRotation(new Quaternionf()).slerp(to.getNormalizedRotation(new Quaternionf()), e);
+            Quaternionf q = from.getUnnormalizedRotation(new Quaternionf()).slerp(to.getUnnormalizedRotation(new Quaternionf()), e);
             float s = Mth.lerp(e, from.getScale(new org.joml.Vector3f()).x, to.getScale(new org.joml.Vector3f()).x) * (1 - 0.3F * arc);
             return new org.joml.Matrix4f().translation(at).rotate(q).scale(s).translate(-c.x, -c.y, -c.z);
         }
@@ -2667,7 +2671,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         private static void push(PoseStack pose, org.joml.Matrix4f frame) {
             pose.pushPose();
             pose.last().pose().set(frame);
-            pose.last().normal().set(frame.getNormalizedRotation(new Quaternionf()));
+            pose.last().normal().set(frame.getUnnormalizedRotation(new Quaternionf()));
         }
 
         /**
@@ -2870,8 +2874,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         private static boolean cartridge(PoseStack pose, float reload, boolean spent) {
             float x = 0, y = CARTRIDGE_IN, z = 0, turn = 0, tilt = 0, size = 1;
             if (spent) {
-                float d = reload - GunnerAndroid.RELOAD_EJECT;
-                if (reload < 0 || d < 0 || d > 7) {
+                float d = Math.max(0, reload - GunnerAndroid.RELOAD_EJECT);
+                if (reload < 0 || d > 7) {
                     return false;
                 }
                 // 握りから抜けて、くるりと回りながら落ちていく

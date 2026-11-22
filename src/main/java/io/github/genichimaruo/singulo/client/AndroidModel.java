@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
+import io.github.genichimaruo.singulo.android.GunnerAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -654,7 +655,22 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
                 }
             }
         }
-        gestureOverlay(android, pt);
+        if (android instanceof GunnerAndroid gun && GunnerAndroid.railOut(state)) {
+            // Move both shoulders with the barrel when tracking a target above or below the gunner.
+            var ray = gun.railTo().subtract(gun.railFrom());
+            float aimWeight = switch (state) {
+                case GunnerAndroid.STATE_RAIL_ASSEMBLE -> ease((t - 8) / 8);
+                case GunnerAndroid.STATE_RAIL_STOW -> 1 - ease((t - 7) / 3);
+                default -> 1;
+            };
+            float pitch = (float) -Math.atan2(ray.y, ray.horizontalDistance());
+            float tilt = Mth.clamp(pitch, -0.85F, 0.85F) * aimWeight;
+            torso.xRot += tilt;
+            head.xRot -= tilt;
+        }
+        if (!(android instanceof GunnerAndroid && GunnerAndroid.combat(state))) {
+            gestureOverlay(android, pt);
+        }
         if (android.napping()) {
             // 昼寝: 頭を前へ垂らして、ゆっくり息をする
             float breath = Mth.sin(age * 0.06F);
