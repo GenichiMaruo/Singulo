@@ -10139,6 +10139,34 @@
     "source": "Float ring inflates",
     "translation": "泳圈鼓起"
   },
+  "subtitles.singulo.android.katana_draw": {
+    "source": "Katana drawn",
+    "translation": "拔刀出鞘"
+  },
+  "subtitles.singulo.android.katana_sheathe": {
+    "source": "Katana sheathed",
+    "translation": "收刀入鞘"
+  },
+  "subtitles.singulo.android.katana_swing": {
+    "source": "Katana swings",
+    "translation": "揮刀"
+  },
+  "subtitles.singulo.android.katana_step": {
+    "source": "Katana Android lunges",
+    "translation": "刀型仿生人踏步突進"
+  },
+  "subtitles.singulo.android.katana_iai_charge": {
+    "source": "Katana Android readies a draw",
+    "translation": "刀型仿生人擺出居合架勢"
+  },
+  "subtitles.singulo.android.katana_iai_flash": {
+    "source": "Twin blades flash",
+    "translation": "雙刀閃過"
+  },
+  "subtitles.singulo.android.katana_iai_release": {
+    "source": "Blade rings, slashes erupt",
+    "translation": "刀身鳴響，斬擊迸發"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "檔案終端讀取"

@@ -3092,6 +3092,14 @@ SOUNDS = {
     'android.railgun_charge': ('android/railgun_charge', 'レールガンがためる', 'Railgun charges', 32),
     'android.railgun_fire': ('android/railgun_fire', 'レールガンが放たれる', 'Railgun fires', 64),
     'android.ring_inflate': ('android/ring_inflate', '浮き輪がふくらむ', 'Float ring inflates', 16),
+    # 刀型（0.22.0）
+    'android.katana_draw': ('android/katana_draw', '刀が抜かれる', 'Katana drawn', 16),
+    'android.katana_sheathe': ('android/katana_sheathe', '刀が納められる', 'Katana sheathed', 16),
+    'android.katana_swing': ('android/katana_swing', '刀が振られる', 'Katana swings', 16),
+    'android.katana_step': ('android/katana_step', '刀型が踏み込む', 'Katana Android lunges', 24),
+    'android.katana_iai_charge': ('android/katana_iai_charge', '刀型が居合の構えを取る', 'Katana Android readies a draw', 32),
+    'android.katana_iai_flash': ('android/katana_iai_flash', '二刀が閃く', 'Twin blades flash', 48),
+    'android.katana_iai_release': ('android/katana_iai_release', '紅刀が響き、斬撃が走る', 'Blade rings, slashes erupt', 48),
     # 画面のボタンを押した音（バニラのボタンと同じく、字幕は出さない）
     'ui.click': ('ui/click', None, None, 16),
 }

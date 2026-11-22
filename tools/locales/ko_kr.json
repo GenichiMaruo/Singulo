@@ -10139,6 +10139,34 @@
     "source": "Float ring inflates",
     "translation": "튜브가 부풀어 오름"
   },
+  "subtitles.singulo.android.katana_draw": {
+    "source": "Katana drawn",
+    "translation": "칼을 뽑는다"
+  },
+  "subtitles.singulo.android.katana_sheathe": {
+    "source": "Katana sheathed",
+    "translation": "칼을 칼집에 넣는다"
+  },
+  "subtitles.singulo.android.katana_swing": {
+    "source": "Katana swings",
+    "translation": "칼을 휘두른다"
+  },
+  "subtitles.singulo.android.katana_step": {
+    "source": "Katana Android lunges",
+    "translation": "카타나형 안드로이드가 파고든다"
+  },
+  "subtitles.singulo.android.katana_iai_charge": {
+    "source": "Katana Android readies a draw",
+    "translation": "카타나형 안드로이드가 발도 자세를 취한다"
+  },
+  "subtitles.singulo.android.katana_iai_flash": {
+    "source": "Twin blades flash",
+    "translation": "쌍검이 번뜩인다"
+  },
+  "subtitles.singulo.android.katana_iai_release": {
+    "source": "Blade rings, slashes erupt",
+    "translation": "칼날이 울리고 참격이 터진다"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "기록 보관 단말기가 읽어 들인다"
