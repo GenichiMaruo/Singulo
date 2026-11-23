@@ -259,7 +259,7 @@ public final class RuinGameTests {
         io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         // 地下アンドロイド研究所は部屋の型紙を並べるので、LabGameTests で確かめる
         for (String ruin : List.of("observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor")) {
-            Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + ruin));
+            Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + ruin + (ruin.equals("final_lab") || ruin.equals("sunken_reactor") ? "_antechamber" : "")));
             helper.assertTrue(template.isPresent(), "構造物ファイルがない: " + ruin);
             List<StructureTemplate.StructureBlockInfo> caches = template.get().filterBlocks(BlockPos.ZERO,
                     new StructurePlaceSettings(), SinguloBlocks.RUIN_CACHE.get());
