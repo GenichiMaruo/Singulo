@@ -245,7 +245,11 @@ public final class KatanaGameTests {
 
     @GameTest(template = HUGE, batch = BATCH + "_iai_reach", timeoutTicks = 220)
     public static void katanaIaiHitsFromFourteenBlocks(GameTestHelper helper) {
-        floor(helper);
+        // This full-length dash deliberately extends to the edge of the arena.
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper, 2);
+        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 14, 0, 14)) {
+            helper.setBlock(p, Blocks.STONE);
+        }
         Zombie foe = dummy(helper, new BlockPos(10, 1, 12));
         KatanaAndroid k = stationaryFighter(helper, new BlockPos(1, 1, 1), foe);
         Vec3 start = k.position(), forward = new Vec3(0.6, 0, 0.8);
