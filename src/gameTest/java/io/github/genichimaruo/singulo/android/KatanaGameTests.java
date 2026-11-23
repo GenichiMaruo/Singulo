@@ -41,7 +41,7 @@ public final class KatanaGameTests {
         saved.putUUID("android0", rouge.getUUID());
         saved.putUUID("android1", gun.getUUID());
         saved.putInt("mode", RuinAndroid.MODE_FOLLOW);
-        station.loadWithComponents(saved, registry);
+        station.load(saved);
         rouge.makeGuard(owner, home, RuinAndroid.MODE_FOLLOW, 0);
         gun.makeGuard(owner, home, RuinAndroid.MODE_FOLLOW, 0);
         { var pos = Vec3.atBottomCenterOf(helper.absolutePos(at)); gun.moveTo(pos.x, pos.y, pos.z, 0, 0); }

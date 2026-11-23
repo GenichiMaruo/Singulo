@@ -12,7 +12,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -24,7 +27,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.block.Mirror;
 
 /**
  * 探索コンパス（段階1）。探す遺構を選んで右クリックすると、いちばん近いその遺構を探し、針がそちらを向く（距離も出る）。
@@ -161,7 +168,7 @@ public class ExplorerCompassItem extends SinguloItem {
         }
         // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す。前室のある遺構は入口の真上を指す
         BlockPos p = rid.equals(BRANCH) ? found.getFirst() : ENTRANCES.containsKey(rid)
-                ? entrance(server, found.getFirst(), holder.get().value(), ENTRANCES.get(rid))
+                ? entrance(server, found.getFirst(), holder.get().value(), rid)
                 : center(server, found.getFirst(), holder.get().value());
         stack.getOrCreateTag().put("LodestonePos", net.minecraft.nbt.NbtUtils.writeBlockPos(p));
         stack.getOrCreateTag().put("LodestoneDimension", net.minecraft.world.level.Level.RESOURCE_KEY_CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, level.dimension()).result().orElseThrow());
@@ -185,17 +192,30 @@ public class ExplorerCompassItem extends SinguloItem {
      * 見つかった遺構の入口の真上（地面の高さはそのまま）。構造物の始まりの型紙の位置と向きから、型紙の中の入口の位置を
      * 実際の位置に直す（読めなければ建物全体の中心）。
      */
-    static BlockPos entrance(ServerLevel server, BlockPos found, Structure structure, BlockPos inTemplate) {
+    static BlockPos entrance(ServerLevel server, BlockPos found, Structure structure, String ruinId) {
         net.minecraft.world.level.ChunkPos cp = new net.minecraft.world.level.ChunkPos(found);
         var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.ChunkStatus.STRUCTURE_STARTS)
                 .getStartForStructure(structure);
         if (start == null || !start.isValid() || start.getPieces().isEmpty()
-                || !(start.getPieces().get(0) instanceof net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece piece)) {
+                || !(start.getPieces().get(0) instanceof PoolElementStructurePiece piece)) {
             return center(server, found, structure);
         }
-        BlockPos at = piece.getPosition().offset(net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.transform(
-                inTemplate, net.minecraft.world.level.block.Mirror.NONE, piece.getRotation(), BlockPos.ZERO));
-        return new BlockPos(at.getX(), found.getY(), at.getZ());
+        return antechamberEntrance(server, piece, found, ruinId)
+                .orElseGet(() -> center(server, found, structure));
+    }
+
+    static Optional<BlockPos> antechamberEntrance(ServerLevel server, PoolElementStructurePiece piece, BlockPos found, String ruinId) {
+        // Jigsaw pieces persist their template ID, even when the active start pool changes.
+        // A legacy piece or a data pack's different piece has no 0.22 entrance to target.
+        boolean expanded = StructurePoolElement.CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, server.registryAccess()), piece.getElement())
+                .result().filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast)
+                .map(tag -> tag.getString("location").equals(Singulo.id("ruins/" + ruinId + "_antechamber").toString()))
+                .orElse(false);
+        if (!expanded || !ENTRANCES.containsKey(ruinId)) return Optional.empty();
+        BlockPos at = piece.getPosition().offset(StructureTemplate.transform(
+                ENTRANCES.get(ruinId), Mirror.NONE, piece.getRotation(), BlockPos.ZERO));
+        if (!piece.getBoundingBox().isInside(at)) return Optional.empty();
+        return Optional.of(new BlockPos(at.getX(), found.getY(), at.getZ()));
     }
 
     /**

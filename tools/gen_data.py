@@ -3831,7 +3831,7 @@ def ruins_data():
         write_json(DATA / 'worldgen' / 'template_pool' / 'ruins' / f'{rid}.json', {
             'fallback': 'minecraft:empty',
             'elements': [{'weight': 1, 'element': {
-                'element_type': 'minecraft:single_pool_element', 'location': f'{MODID}:ruins/{rid}',
+                'element_type': 'minecraft:single_pool_element', 'location': f'{MODID}:ruins/{ruins.template_name(rid)}',
                 'projection': 'rigid', 'processors': 'minecraft:empty'}}],
         })
         structure = {

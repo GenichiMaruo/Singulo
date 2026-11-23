@@ -106,13 +106,13 @@ public final class IntrusionAlarm {
     }
 
     private void finish(ServerLevel level, BlockPos core, BlockPos gate, Host host, boolean close) {
+        // Completion is persisted. Leave the alarm active and retry after the room's
+        // chunks load rather than marking a partial repair finished or forcing chunks in.
+        if (close && restoreHull(level, core, gate, dome) < 0) return;
         active = false;
         host.alarmChanged();
         setLights(level, core, false);
         host.dismissIntruderGuard(level);
-        if (close) {
-            restoreHull(level, core, gate, dome);
-        }
         if (close && PressureRoomSeal.setGate(level, gate, false) > 0) {
             level.playSound(null, gate, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 2.0F, 0.5F);
             for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(gate).inflate(MESSAGE_RADIUS))) {
@@ -126,7 +126,7 @@ public final class IntrusionAlarm {
 
     /**
      * ボス部屋の耐圧殻と耐圧ガラスを、遺構の型紙のとおりに作り直す（違っている所だけ）。型紙では隔壁が封印コンソール・
-     * 封印核の南にあるので、実際の隔壁の向きから回し方を決める。作り直した数を返す。
+     * 封印核の南にあるので、実際の隔壁の向きから回し方を決める。作り直した数を返す。必要なチャンクが未読み込みなら何も変えず -1 を返す。
      */
     static int restoreHull(ServerLevel level, BlockPos core, BlockPos gate, boolean dome) {
         String ruin = dome ? "final_lab" : "sunken_reactor";
@@ -138,12 +138,17 @@ public final class IntrusionAlarm {
                 rotation = r;
             }
         }
+        for (var entry : hull) {
+            BlockPos at = core.offset(net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.transform(
+                    entry.getKey(), net.minecraft.world.level.block.Mirror.NONE, rotation, BlockPos.ZERO));
+            if (!level.isLoaded(at)) return -1;
+        }
         int restored = 0;
         for (var entry : hull) {
             BlockPos at = core.offset(net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.transform(
                     entry.getKey(), net.minecraft.world.level.block.Mirror.NONE, rotation, BlockPos.ZERO));
             BlockState state = entry.getValue().rotate(level, at, rotation);
-            if (level.isLoaded(at) && !level.getBlockState(at).equals(state)) {
+            if (!level.getBlockState(at).equals(state)) {
                 level.setBlock(at, state, Block.UPDATE_ALL);
                 restored++;
             }
@@ -152,7 +157,7 @@ public final class IntrusionAlarm {
     }
 
     private static List<java.util.Map.Entry<BlockPos, BlockState>> hullOf(ServerLevel level, String ruin, boolean dome) {
-        var template = level.getStructureManager().get(io.github.genichimaruo.singulo.Singulo.id("ruins/" + ruin));
+        var template = level.getStructureManager().get(io.github.genichimaruo.singulo.Singulo.id("ruins/" + ruin + "_antechamber"));
         if (template.isEmpty()) {
             return List.of();
         }

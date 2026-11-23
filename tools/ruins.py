@@ -2208,12 +2208,20 @@ VARIETY = {
 }
 
 
+EXPANDED_TEMPLATES = {'final_lab', 'sunken_reactor'}
+
+
+def template_name(rid):
+    # Do not overwrite template IDs already stored in Jigsaw pieces in existing worlds.
+    return f'{rid}_antechamber' if rid in EXPANDED_TEMPLATES else rid
+
+
 def write_all(structure_dir):
     out = {}
     for rid, (make, _) in RUINS.items():
         b = make()
         weathered, pristine = VARIETY[rid]
         b.vary(seed=len(rid) * 7919, weathered=weathered, pristine=pristine)
-        nbt.write_gzip(structure_dir / f'{rid}.nbt', b.to_nbt())
+        nbt.write_gzip(structure_dir / f'{template_name(rid)}.nbt', b.to_nbt())
         out[rid] = b
     return out
