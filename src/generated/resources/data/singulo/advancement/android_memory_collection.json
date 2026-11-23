@@ -1,0 +1,90 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:android_memory_katana"
+    },
+    "title": {
+      "translate": "advancement.singulo.android_memory_collection.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.android_memory_collection.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "android_memory_axe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_axe"
+          }
+        ]
+      }
+    },
+    "android_memory_bit": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_bit"
+          }
+        ]
+      }
+    },
+    "android_memory_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_blade"
+          }
+        ]
+      }
+    },
+    "android_memory_gunner": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_gunner"
+          }
+        ]
+      }
+    },
+    "android_memory_katana": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_katana"
+          }
+        ]
+      }
+    },
+    "android_memory_saber": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_saber"
+          }
+        ]
+      }
+    },
+    "android_memory_whip": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_whip"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:android_memory"
+}

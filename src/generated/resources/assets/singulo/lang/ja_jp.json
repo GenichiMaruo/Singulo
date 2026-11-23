@@ -11,6 +11,8 @@
   "advancement.singulo.android_factory_print.title": "工場の技術を拠点へ",
   "advancement.singulo.android_memory.description": "遺構の印刷台から旧型アンドロイドの小型クリスタルメモリを1種類手に入れる",
   "advancement.singulo.android_memory.title": "小さな設計図",
+  "advancement.singulo.android_memory_collection.description": "すべての型のアンドロイドの設計メモリを手に入れる",
+  "advancement.singulo.android_memory_collection.title": "めぐりあう記憶",
   "advancement.singulo.android_printed.description": "自分の組立ステーションで護衛の印刷を完了する",
   "advancement.singulo.android_printed.title": "はじめまして",
   "advancement.singulo.android_prototypes.description": "アルマ（斧型）とノクス（ビット型）の小型クリスタルメモリを両方そろえて持つ（統括AIを2回倒せばそろう）",

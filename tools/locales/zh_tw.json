@@ -15870,5 +15870,13 @@
   "desc.singulo.creative_fluid_trash": {
     "source": "Voids fluid piped into any face or poured from a container. Also works in fluid container filling slots.",
     "translation": "可丟棄從任意一面輸入或用容器倒入的流體，也可放進設備的流體容器填充槽。"
+  },
+  "advancement.singulo.android_memory_collection.description": {
+    "source": "Collect the design memory for every android model",
+    "translation": "集齊所有型號仿生人的設計記憶體"
+  },
+  "advancement.singulo.android_memory_collection.title": {
+    "source": "Memories Reunited",
+    "translation": "記憶重聚"
   }
 }

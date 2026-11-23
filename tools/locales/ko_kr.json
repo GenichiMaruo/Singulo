@@ -15870,5 +15870,13 @@
   "desc.singulo.creative_fluid_trash": {
     "source": "Voids fluid piped into any face or poured from a container. Also works in fluid container filling slots.",
     "translation": "어느 면으로 보내거나 용기로 부은 유체든 폐기합니다. 기계의 유체 용기 충전 슬롯에도 사용할 수 있습니다."
+  },
+  "advancement.singulo.android_memory_collection.description": {
+    "source": "Collect the design memory for every android model",
+    "translation": "모든 기종의 안드로이드 설계 메모리를 수집하세요"
+  },
+  "advancement.singulo.android_memory_collection.title": {
+    "source": "Memories Reunited",
+    "translation": "다시 만난 기억"
   }
 }
