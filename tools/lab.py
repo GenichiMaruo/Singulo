@@ -1101,8 +1101,11 @@ def to_nbt(b):
     return out
 
 
-def write_all(data, write_json, placement, depth):
-    """型紙・構造物・置き方・バイオームを書く。placement=(間隔, 最小間隔, salt, バイオーム)、depth=(床の最小, 最大)。"""
+def write_all(data, write_json, placement, depth, wrap=lambda structure: structure):
+    """
+    型紙・構造物・置き方・バイオームを書く。placement=(間隔, 最小間隔, salt, バイオーム)、depth=(床の最小, 最大)。
+    wrap は構造物を包む関数（ほかの大きな地下構造物を避けて置く singulo:avoiding で包む）。
+    """
     folder = data / 'structures' / 'lab'
     folder.mkdir(parents=True, exist_ok=True)
     for old in folder.glob('*.nbt'):
@@ -1112,7 +1115,7 @@ def write_all(data, write_json, placement, depth):
     spacing, separation, salt, biomes = placement
     lo, hi = depth
     write_json(data / 'tags' / 'worldgen' / 'biome' / 'has_structure' / 'android_lab.json', {'values': biomes})
-    write_json(data / 'worldgen' / 'structure' / 'android_lab.json', {
+    write_json(data / 'worldgen' / 'structure' / 'android_lab.json', wrap({
         'type': f'{MODID}:android_lab',
         'biomes': f'#{MODID}:has_structure/android_lab',
         # 地下の飾り（ディープダークのスカルクの塊・スカルクヴェイン、鍾乳石など）のあとに置く。先に置くと、部屋の空洞に
@@ -1123,7 +1126,7 @@ def write_all(data, write_json, placement, depth):
         'terrain_adaptation': 'none',
         'floor_min': lo,
         'floor_max': hi,
-    })
+    }))
     write_json(data / 'worldgen' / 'structure_set' / 'android_lab.json', {
         'structures': [{'structure': f'{MODID}:android_lab', 'weight': 1}],
         # 探す位置はチャンクの真ん中（主立坑はそこに立つ。探索コンパスは主立坑を指す）

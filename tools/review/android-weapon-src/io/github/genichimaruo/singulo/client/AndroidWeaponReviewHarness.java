@@ -140,6 +140,7 @@ public final class AndroidWeaponReviewHarness {
         }
         if (!requested) {
             requested = true;
+            if (frame == 0) KatanaGripReview.verify(mc);
             if (frame % FRAMES_PER_MODE == 0) {
                 mc.options.graphicsMode().set(mode());
                 mc.options.fov().set(40);

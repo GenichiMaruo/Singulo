@@ -22,6 +22,16 @@ public class SealConsoleBlock extends BaseEntityBlock {
         super(properties);
     }
 
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        return level.isClientSide ? null : (world, pos, s, be) -> {
+            if (be instanceof SealConsoleBlockEntity console) {
+                console.serverTick((ServerLevel) world);
+            }
+        };
+    }
+
 
     @Override
     public RenderShape getRenderShape(BlockState state) {

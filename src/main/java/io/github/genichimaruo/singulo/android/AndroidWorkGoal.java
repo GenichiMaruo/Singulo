@@ -2460,6 +2460,7 @@ final class AndroidWorkGoal extends Goal {
         }
         BlockState state = level.getBlockState(pos);
         if (state.isAir() || !state.getFluidState().isEmpty() || state.getDestroySpeed(level, pos) < 0 || level.getBlockEntity(pos) != null
+                || io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock.isSealed(state)
                 || state.is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST)) {
             return false;                      // 芽生えたアメジストは壊さない（壊すと何も出ず、二度と育たない）
         }

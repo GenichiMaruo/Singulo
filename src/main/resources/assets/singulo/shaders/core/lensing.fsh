@@ -1,11 +1,12 @@
 #version 150
 
 // 重力レンズ。1回の描画で1つのレンズを、影響が及ぶ画面の範囲だけ描く（奥のレンズから順。GravitationalLensing.apply）。
-// 2種類のレンズを扱う:
+// レンズの種類:
 //  - ブラックホール（Sphere.w = k > 0）: シュバルツシルト時空の曲がり方で背景をずらす。光子球に近づくほど偏向角が
 //    発散するので、影（地平線の約2.6倍の黒い円）の縁のすぐ外では背景が強く押しつぶされ、周りの景色の平均の色
 //    （何周も回った光の重なり）になって細い光の輪（光子リング）として光る。アインシュタインリングは曲がり方から自然に出る。
 //  - 歪みだけ（Sphere.w = 0）: 点質量レンズの式 β = θ − θE²/θ で景色を少しずらすだけ（黒い中心も輪もなし）。
+//  - 重力の澱（Sphere.w < 0）: ワールドに描いた核の外縁から降着環まで、背景だけを内側へ引く。
 // Lens = (中心x, 中心y, 大きさ, 強さ)。座標は画面のUV（縦基準、横は Aspect 倍）。大きさはブラックホールなら影の半径、
 // 歪みだけならアインシュタイン半径。
 //
@@ -21,7 +22,7 @@ uniform sampler2D Sampler0;
 uniform sampler2D Sampler1;
 uniform vec4 Lens;
 // (中心までの奥行き, 手前の面までの奥行きの差（ブロック）, 歪みが及ぶ球の半径（UV）, k)
-// k は背景までの距離の比 D_ls / D_s（ブラックホール）。0 なら歪みだけのレンズ
+// k は背景までの距離の比 D_ls / D_s（ブラックホール）。0 は点質量レンズ、負は重力の澱。
 uniform vec4 Sphere;
 // 光の経路をたどって描く降着円盤（ブラックホールのレンズだけ）。座標はカメラから見たもの（ブロック、視線は −z）。
 // Disk = (ブラックホールの中心 xyz, 地平線の半径)。地平線の半径が 0 なら円盤なし（影と円盤はワールドに描いてある）
@@ -365,7 +366,40 @@ vec3 sampleScreen(vec2 p, mat2 J) {
     return sum * 0.25;
 }
 
+// 核に沿う帯だけを屈折させる。色は同じ側の少し外から取り、核を横切った機体を反対側へ写し込まない。
+vec3 remnantBand() {
+    vec2 delta = texCoord - Lens.xy;
+    float r = length(delta * vec2(Aspect, 1.0));
+    float u = (r - Lens.z) / (Sphere.z - Lens.z);
+    if (u <= 0.0 || u >= 1.0 || dist(texCoord) <= Sphere.x) discard;
+    // 内縁と外縁で位置も傾きも元に戻る。
+    float bell = 4.0 * u * (1.0 - u);
+    float shift = 0.30 * (Sphere.z - Lens.z) * Lens.w * bell * bell;
+    vec2 q = texCoord + delta * (shift / r);
+    ivec2 size = textureSize(Sampler0, 0);
+    vec2 pos = q * vec2(size) - 0.5;
+    ivec2 base = ivec2(floor(pos));
+    vec2 f = fract(pos);
+    vec3 original = texelFetch(Sampler0, ivec2(gl_FragCoord.xy), 0).rgb;
+    vec3 col = original;
+    // 補間する4画素それぞれで前後を判定する。細いローターや刀の縁も背景色に混ざらない。
+    for (int y = 0; y <= 1; ++y) {
+        for (int x = 0; x <= 1; ++x) {
+            ivec2 tap = base + ivec2(x, y);
+            if (any(lessThan(tap, ivec2(0))) || any(greaterThanEqual(tap, size))) continue;
+            if (dist((vec2(tap) + 0.5) / vec2(size)) <= Sphere.x) continue;
+            float weight = (x == 0 ? 1.0 - f.x : f.x) * (y == 0 ? 1.0 - f.y : f.y);
+            col += weight * (texelFetch(Sampler0, tap, 0).rgb - original);
+        }
+    }
+    return col;
+}
+
 void main() {
+    if (Sphere.w < 0.0) {
+        fragColor = vec4(remnantBand(), 1.0);
+        return;
+    }
     float ring = 0.0;
     float dark = 0.0;
     float far = 0.0;

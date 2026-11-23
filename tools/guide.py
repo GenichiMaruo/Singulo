@@ -324,6 +324,12 @@ CHAPTERS = [
          '読めない記録が手元にあれば、電力をつないだアーカイブ端末で調べてみましょう。解読した記録は手に持って使うと、この本で読み返せます。',
          'Reading a recovered record',
          'If you find a record you cannot read, try it in a powered Archive Terminal. Use the decoded record in your hand to keep a copy in this book.'),
+        ('antechamber', '閉ざされた隔壁の手前で',
+         'いちばん深い遺構では、ボス部屋の手前の隔壁が閉ざされていることがあります。分かれた区画の奥にある中継器を探し、すべて起動すると隔壁が開きます。\n'
+         '中継器の数は、起動したときに表示されます。開いた隔壁は閉じないので、再戦のときはまっすぐボス部屋へ向かえます。',
+         'Before the sealed bulkhead',
+         'In the deepest ruins, a bulkhead may seal the way to the boss room. Find the relay at the end of each wing and start them all to open it.\n'
+         'Starting a relay shows how many are running. The bulkhead stays open, so rematches can head straight for the boss room.'),
     ]),
     ('androids', 'singulo:android_station', 'アンドロイド', 'Androids', [
         ('build', 'ステーションを使い始める',

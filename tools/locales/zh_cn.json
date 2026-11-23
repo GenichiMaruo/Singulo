@@ -1107,6 +1107,10 @@
     "source": "Pressure Hull",
     "translation": "耐压壳"
   },
+  "block.singulo.pressure_glass": {
+    "source": "Pressure Glass",
+    "translation": "耐压玻璃"
+  },
   "block.singulo.pristine_ruin_light": {
     "source": "Pristine Ruin Light Strip",
     "translation": "无瑕废墟导光板"
@@ -1658,6 +1662,10 @@
   "desc.singulo.android_memory_gunner": {
     "source": "A compact crystal memory holding the design of the Gunner Android. Light keeps flowing through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "记录了射击型仿生人设计的小型水晶存储器。光芒在晶体中不停流动。放入仿生人组装站即可打印该型号（不会消耗）。"
+  },
+  "desc.singulo.android_memory_katana": {
+    "source": "A compact crystal memory holding the design of the Katana Android. Now and then a crimson slash cuts through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "记录了刀型仿生人设计的小型水晶存储器。晶体中不时有一道赤红的斩痕划过。放入仿生人组装站即可打印该型号（不会消耗）。"
   },
   "desc.singulo.android_memory_saber": {
     "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
@@ -2599,6 +2607,10 @@
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
     "translation": "包裹研究所房间和走廊的、厚度为 2 格的钢外壳。在统筹 AI 倒下之前处于封锁状态，无法破坏。之后也比黑曜石更硬。"
   },
+  "desc.singulo.pressure_glass": {
+    "source": "The thick viewing glass ringing the Final Lab dome and the Sunken Reactor Sector sphere. Sealed and unbreakable, like the pressure hull.",
+    "translation": "环绕最终实验室穹顶与沉没的炉心区球体的厚观测玻璃。与耐压壳一样处于封锁状态，无法破坏。"
+  },
   "desc.singulo.primordial_seed": {
     "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
     "translation": "依照漩涡断章中刻下的最初运行记录，将点火步骤逆向追溯而制成的种子。对创世炉核心使用，宇宙便开始诞生。"
@@ -3267,6 +3279,10 @@
     "source": "Gunner Android \"Ciel\"",
     "translation": "射击型仿生人“希艾尔”"
   },
+  "entity.singulo.katana_android": {
+    "source": "Katana Android \"Rouge\"",
+    "translation": "刀型仿生人“露姬”"
+  },
   "entity.singulo.horizon_bolt": {
     "source": "Horizon Bolt",
     "translation": "视界光弹"
@@ -3546,6 +3562,10 @@
   "gui.singulo.android.nickname.gunner": {
     "source": "Ciel",
     "translation": "希艾尔"
+  },
+  "gui.singulo.android.nickname.katana": {
+    "source": "Rouge",
+    "translation": "露姬"
   },
   "gui.singulo.android.nickname.saber": {
     "source": "Soleil",
@@ -8451,6 +8471,10 @@
     "source": "Compact Crystal Memory (Gunner)",
     "translation": "小型水晶存储器（射击型）"
   },
+  "item.singulo.android_memory_katana": {
+    "source": "Compact Crystal Memory (Katana)",
+    "translation": "小型水晶存储器（刀型）"
+  },
   "item.singulo.android_memory_saber": {
     "source": "Compact Crystal Memory (Saber)",
     "translation": "小型水晶存储器（光剑型）"
@@ -8802,6 +8826,10 @@
   "item.singulo.gunner_android_spawn_egg": {
     "source": "Gunner Android Spawn Egg",
     "translation": "射击型仿生人刷怪蛋"
+  },
+  "item.singulo.katana_android_spawn_egg": {
+    "source": "Katana Android Spawn Egg",
+    "translation": "刀型仿生人刷怪蛋"
   },
   "item.singulo.handbook": {
     "source": "Singulo Handbook",
@@ -10139,6 +10167,34 @@
     "source": "Float ring inflates",
     "translation": "游泳圈鼓起"
   },
+  "subtitles.singulo.android.katana_draw": {
+    "source": "Katana drawn",
+    "translation": "拔刀出鞘"
+  },
+  "subtitles.singulo.android.katana_sheathe": {
+    "source": "Katana sheathed",
+    "translation": "收刀入鞘"
+  },
+  "subtitles.singulo.android.katana_swing": {
+    "source": "Katana swings",
+    "translation": "挥刀"
+  },
+  "subtitles.singulo.android.katana_step": {
+    "source": "Katana Android lunges",
+    "translation": "刀型仿生人踏步突进"
+  },
+  "subtitles.singulo.android.katana_iai_charge": {
+    "source": "Katana Android readies a draw",
+    "translation": "刀型仿生人摆出居合架势"
+  },
+  "subtitles.singulo.android.katana_iai_flash": {
+    "source": "Twin blades flash",
+    "translation": "双刀闪过"
+  },
+  "subtitles.singulo.android.katana_iai_release": {
+    "source": "Blade rings, slashes erupt",
+    "translation": "刀身鸣响，斩击迸发"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "档案终端读取中"
@@ -10870,6 +10926,10 @@
   "summary.singulo.android_memory_gunner": {
     "source": "The design for printing Gunner Androids.",
     "translation": "可打印射击型仿生人的设计。"
+  },
+  "summary.singulo.android_memory_katana": {
+    "source": "The design for printing Katana Androids.",
+    "translation": "可打印刀型仿生人的设计。"
   },
   "summary.singulo.android_production_upgrade": {
     "source": "Lets an Android Assembly Station look after up to two androids.",
@@ -13126,6 +13186,10 @@
   "summary.singulo.pressure_hull": {
     "source": "The very hard steel shell around the laboratory.",
     "translation": "包覆研究所的极坚硬钢壳。"
+  },
+  "summary.singulo.pressure_glass": {
+    "source": "Unbreakable thick glass to watch a boss room through.",
+    "translation": "可从外部窥视首领房间的、无法破坏的厚玻璃。"
   },
   "summary.singulo.welded_hatch": {
     "source": "A welded steel lid over the laboratory shaft.",
@@ -15818,5 +15882,237 @@
   "desc.singulo.creative_fluid_trash": {
     "source": "Voids fluid piped into any face or poured from a container. Also works in fluid container filling slots.",
     "translation": "可丢弃从任意一面输入或用容器倒入的流体，也可放进设备的流体容器灌装槽。"
+  },
+  "advancement.singulo.android_memory_collection.description": {
+    "source": "Collect the design memory for every android model",
+    "translation": "集齐所有型号仿生人的设计存储器"
+  },
+  "advancement.singulo.android_memory_collection.title": {
+    "source": "Memories Reunited",
+    "translation": "记忆重聚"
+  },
+  "block.singulo.anomaly_emitter": {
+    "source": "Anomaly Field Emitter",
+    "translation": "异常场发生器"
+  },
+  "block.singulo.drag_brake": {
+    "source": "Drag Brake",
+    "translation": "制动器"
+  },
+  "block.singulo.frame_drag_floor": {
+    "source": "Frame-Drag Floor",
+    "translation": "回转流地板"
+  },
+  "block.singulo.ruin_relay": {
+    "source": "Ruin Relay",
+    "translation": "废墟中继器"
+  },
+  "desc.singulo.anomaly_emitter": {
+    "source": "A plate set into the floors of the Final Lab antechamber. It fills the space above it (5×7×5) with a field: lift raises you, heavy pulls you down faster and slows you, slow applies Slowness and Mining Fatigue, and fast grants Speed and Haste. Fields affect enemies too. Unbreakable.",
+    "translation": "嵌在最终实验室前厅地面上的板。在上方空间（5×7×5）展开力场：浮升场会把你托起，沉重场让你下坠更快并变得迟缓，迟缓场施加缓慢和挖掘疲劳，加速场给予迅捷和急迫。力场对敌人同样有效。无法破坏。"
+  },
+  "desc.singulo.drag_brake": {
+    "source": "A brake at the end of each section of the outer ring of the Sunken Reactor Sector. Pull it to stop the frame-drag floor of that section for good. Unbreakable.",
+    "translation": "位于沉没的炉心区外环回廊每个区段尽头的制动器。拉下后，该区段的回转流地板会永久停止。无法破坏。"
+  },
+  "desc.singulo.frame_drag_floor": {
+    "source": "Floor of the outer ring of the Sunken Reactor Sector. Spacetime dragged along by the spin of the dead reactor carries anything on it the way the arrows point, even while sneaking. Stops once the brake of its section is pulled. Unbreakable.",
+    "translation": "沉没的炉心区外环回廊的地板。被停摆反应堆的自转拖拽的时空，会把站在上面的东西沿箭头方向持续推走，潜行也无法停下。拉下所在区段的制动器后停止。无法破坏。"
+  },
+  "desc.singulo.ruin_relay": {
+    "source": "Relays deep in each wing of the antechambers of the Final Lab and the Sunken Reactor Sector. Touch one to start it (not while security drones or ruin androids remain nearby). Some are guarded by a sub-boss, one charges from items dropped into its vortex pit, and one drains the flooded wing when started. Starting every relay in the facility opens the bulkhead before the boss room; until then its guardian will not wake. Unbreakable.",
+    "translation": "位于最终实验室和沉没的炉心区前厅各区域深处的中继器。触碰即可启动（附近还有警卫无人机或废墟仿生人时无法启动）。有的由中头目守护，有的靠投入漩涡坑的物品充能，还有一个启动后会排干被淹区域的水。启动设施内所有中继器后，头目房间前的隔离门会打开；在此之前，守卫不会苏醒。无法破坏。"
+  },
+  "entity.singulo.containment_hauler": {
+    "source": "Containment Hauler",
+    "translation": "收容搬运机"
+  },
+  "entity.singulo.hull_repairer": {
+    "source": "Rogue Hull Repairer",
+    "translation": "失控的炉壳修理机"
+  },
+  "gui.singulo.brake.already": {
+    "source": "The flow in this section has already stopped",
+    "translation": "这个区段的流动已经停止了"
+  },
+  "gui.singulo.brake.engaged": {
+    "source": "Brake pulled. The flow in this section stops",
+    "translation": "拉下了制动器。这个区段的流动停止了"
+  },
+  "gui.singulo.relay.activated": {
+    "source": "Relay started (%s/%s)",
+    "translation": "中继器已启动（%s/%s）"
+  },
+  "gui.singulo.relay.already": {
+    "source": "This relay is already running (%s/%s)",
+    "translation": "这个中继器已经在运转（%s/%s）"
+  },
+  "gui.singulo.relay.awakened.containment_hauler": {
+    "source": "The hauler's legs strike the floor. It takes you for cargo in its way",
+    "translation": "搬运机的腿敲响了地板。它把进入机库的人当成了挡路的货物"
+  },
+  "gui.singulo.relay.awakened.hull_repairer": {
+    "source": "The hull repairer starts up. It sees you as a fragment to be fixed",
+    "translation": "炉壳修理机启动了。它把挑战者当成了需要修理的碎片"
+  },
+  "gui.singulo.relay.boss": {
+    "source": "This relay cannot be started until its guardian is defeated",
+    "translation": "击败守护者之前，无法启动这个中继器"
+  },
+  "gui.singulo.relay.defeated": {
+    "source": "The guardian is down. The relay can be started",
+    "translation": "守护者停下了。可以启动中继器了"
+  },
+  "gui.singulo.relay.drained": {
+    "source": "The drain valve opens. The coolant lines empty",
+    "translation": "排水阀打开了。冷却系统的水正在退去"
+  },
+  "gui.singulo.relay.extract": {
+    "source": "Extraction %s/%s. Drop things into the vortex pit to draw energy back out",
+    "translation": "抽取 %s/%s。把东西丢进漩涡坑，能量就会返回"
+  },
+  "gui.singulo.relay.guarded": {
+    "source": "Security nearby is still active. Defeat it first",
+    "translation": "附近的警卫仍在运作。先击败它们吧"
+  },
+  "gui.singulo.relay.locked": {
+    "source": "Antechamber relays are still offline (%s/%s). The guardian will not wake until every one is running",
+    "translation": "前厅的中继器仍未全部启动（%s/%s）。全部启动之前，守卫不会苏醒"
+  },
+  "gui.singulo.intrusion.alarm": {
+    "source": "Intrusion detected. The bulkhead is released: evacuate now. The purge-mode guardian carries no reward",
+    "translation": "检测到入侵。隔离门已开放：请立即撤离。排除模式的守卫不会掉落任何报酬"
+  },
+  "gui.singulo.intrusion.warning": {
+    "source": "ALERT: evacuate the chamber",
+    "translation": "警报：请撤离头目房间"
+  },
+  "gui.singulo.intrusion.cleared": {
+    "source": "Evacuation confirmed. The bulkhead seals and the alarm clears",
+    "translation": "已确认撤离。隔离门关闭，警报解除"
+  },
+  "entity.singulo.horizon_warden.intruder": {
+    "source": "Horizon Warden (Purge Mode)",
+    "translation": "排除模式的视界守卫"
+  },
+  "entity.singulo.ergosphere_leviathan.intruder": {
+    "source": "Ergosphere Leviathan (Purge Mode)",
+    "translation": "排除模式的能层巨蛇"
+  },
+  "gui.singulo.relay.open": {
+    "source": "Every relay is running. The bulkhead before the boss room opens",
+    "translation": "所有中继器都运转起来了。头目房间前的隔离门打开了"
+  },
+  "guide.singulo.ruins.antechamber.body": {
+    "source": "In the deepest ruins, a bulkhead may seal the way to the boss room. Find the relay at the end of each wing and start them all to open it.\nStarting a relay shows how many are running. The bulkhead stays open, so rematches can head straight for the boss room.",
+    "translation": "在最深处的遗迹中，通往头目房间的隔离门有时是关闭的。找到各个分区深处的中继器，全部启动后隔离门就会打开。\n启动中继器时会显示已运转的数量。打开的隔离门不会再关上，再战时可以直接前往头目房间。"
+  },
+  "guide.singulo.ruins.antechamber.title": {
+    "source": "Before the sealed bulkhead",
+    "translation": "封闭的隔离门前"
+  },
+  "lab.singulo.log.12": {
+    "source": "One day to ignition. All three gravity gradient trials passed. Time-field leakage is within tolerance, though staff in the east corridor say their clocks are running slow. If anything goes wrong, we shut down the three relays and seal the section behind the bulkhead. To open it again, every relay must be restarted.",
+    "translation": "距离点火还有一天。重力梯度试验三次全部合格。时间场的泄漏在容许范围内，但东侧回廊的职员抱怨\"时钟变慢了\"。万一出事，就关闭三台中继器，关上隔离门，把整个区域封起来。要重新打开，必须把所有中继器重新启动。"
+  },
+  "lab.singulo.log.12.title": {
+    "source": "Ignition Control Log",
+    "translation": "点火控制室运行日志"
+  },
+  "lab.singulo.log.13": {
+    "source": "Hauler Three's leg hydraulics will not bleed. It shoved aside the mechanic trying to stop it like a crate in its way. When it starts running, step aside; it cannot turn mid-charge. If it hits a wall, the vessel clamps come loose and it stalls for a while. Stop it then. When it stamps the floor, jump.",
+    "translation": "搬运三号的腿部液压怎么也泄不掉。想让它停下的整备员被它当成货物推开了。它冲起来的时候就往旁边躲，冲到一半它转不了弯。撞上墙壁的话，容器的固定就会松开，会有一阵子动不了。趁那时让它停下。它跺地板的时候就跳起来。"
+  },
+  "lab.singulo.log.13.title": {
+    "source": "Hauler Three Inspection",
+    "translation": "搬运三号 检查记录"
+  },
+  "lab.singulo.log.14": {
+    "source": "The hull will not stop spinning. Even the outer ring floor is being dragged along and the crew cannot keep their footing. Pull the brake in each section as you go. The coolant lines flooded on backflow. The drain valve is at the bottom of the pump room. Only those who can swim that far should go.",
+    "translation": "炉壳的自转停不下来。连外环的地板都被拖着走，作业员根本站不稳。一边走一边拉下每个区段的制动器。冷却系统因倒流被淹没了。排水阀在泵房底部。只让能游到那里的人去。"
+  },
+  "lab.singulo.log.14.title": {
+    "source": "Reactor Two Coolant Alarm",
+    "translation": "第二炉冷却系统警报"
+  },
+  "lab.singulo.log.15": {
+    "source": "We could not open the valve. The extraction tower gives back energy only for the weight of what it is fed, and we had too little to feed it to stop the reactor. If someone gets this far, open the valve and let the water out. We cannot go back up.",
+    "translation": "我们没能打开阀门。抽取塔只会按投入物的重量返还能量，而我们能投进去的东西，不够让反应堆停下来。如果有人来到这里，请打开阀门，把水排掉。我们已经回不到上面去了。"
+  },
+  "lab.singulo.log.15.title": {
+    "source": "Note in the Pump Room",
+    "translation": "泵房里的留言"
+  },
+  "summary.singulo.anomaly_emitter": {
+    "source": "Fills the space above with a gravity or time field.",
+    "translation": "在上方空间展开重力或时间的力场。"
+  },
+  "summary.singulo.drag_brake": {
+    "source": "Stops the frame-drag floor in its section.",
+    "translation": "让所在区段的回转流地板停下。"
+  },
+  "summary.singulo.frame_drag_floor": {
+    "source": "Keeps carrying whatever stands on it.",
+    "translation": "持续推走站在上面的东西。"
+  },
+  "summary.singulo.ruin_relay": {
+    "source": "Start them all to open the bulkhead before the boss room.",
+    "translation": "全部启动后，头目房间前的隔离门会打开。"
+  },
+  "block.singulo.control_cabinet": {
+    "source": "Control Cabinet",
+    "translation": "控制柜外壳"
+  },
+  "block.singulo.coolant_cladding": {
+    "source": "Coolant Cladding",
+    "translation": "冷却系统护板"
+  },
+  "block.singulo.dial_panel": {
+    "source": "Analog Meter Panel",
+    "translation": "指针仪表盘"
+  },
+  "block.singulo.mimic_panel": {
+    "source": "Mimic Diagram Panel",
+    "translation": "系统模拟显示盘"
+  },
+  "block.singulo.annunciator_panel": {
+    "source": "Annunciator Panel",
+    "translation": "集中报警盘"
+  },
+  "block.singulo.operator_desk": {
+    "source": "Operator Desk",
+    "translation": "运行操作台"
+  },
+  "block.singulo.operator_chair": {
+    "source": "Operator Chair",
+    "translation": "值班员座椅"
+  },
+  "desc.singulo.control_cabinet": {
+    "source": "A pale green steel cabinet with vents and a service door.",
+    "translation": "带通风口和检修门的浅绿色钢制控制柜。"
+  },
+  "desc.singulo.coolant_cladding": {
+    "source": "Teal steel cladding with reinforcing bands for cooling equipment.",
+    "translation": "用于冷却设备的蓝绿色钢板，带有加固箍带。"
+  },
+  "desc.singulo.dial_panel": {
+    "source": "A large analog meter visible from the operator desk.",
+    "translation": "坐在操作台前也能看清的大型指针仪表。"
+  },
+  "desc.singulo.mimic_panel": {
+    "source": "A mimic panel with colored lines showing pipes and pumps.",
+    "translation": "用彩色线条标出管线和泵的位置。"
+  },
+  "desc.singulo.annunciator_panel": {
+    "source": "A bank of labeled alarm windows for the plant systems.",
+    "translation": "集中显示各系统报警状态的带标识灯窗。"
+  },
+  "desc.singulo.operator_desk": {
+    "source": "A sloped desk with selector switches and small meters.",
+    "translation": "切换开关和小型仪表朝值班员倾斜的操作台。"
+  },
+  "desc.singulo.operator_chair": {
+    "source": "A dark green swivel chair for a control-room operator.",
+    "translation": "控制室值班员使用的深绿色转椅。"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "singulo:block/drag_brake_top",
+    "side": "singulo:block/drag_brake_side_engaged",
+    "bottom": "singulo:block/anomaly_emitter_bottom"
+  }
+}

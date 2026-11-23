@@ -66,6 +66,8 @@ public abstract class RuinBoss extends Monster {
     private final HurtWindows hurtWindows = new HurtWindows();
     /** 報酬に数える挑戦者の数。戦いが始まったとき（出現の演出が終わったとき）の人数で決まり、途中で合流しても増えない。0 ならまだ決まっていない。 */
     private int rewardParticipants;
+    /** 排除モード（中継器がそろう前にボス部屋へ入り込まれたとき現れる、報酬のない個体。{@link IntrusionAlarm}）。 */
+    private boolean intruderGuard;
     /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
     @Nullable
     private Component barName;
@@ -143,6 +145,32 @@ public abstract class RuinBoss extends Monster {
         applyAwakenedLook();
     }
 
+    /** 排除モードの個体か。 */
+    public boolean intruderGuard() {
+        return intruderGuard;
+    }
+
+    /**
+     * 排除モードにする（起こす前に呼ぶ）。体力が {@link IntrusionAlarm#HEALTH_MULTIPLIER} 倍になり、倒しても何も落とさず、
+     * 保管庫の封鎖も解けない。ボスバーは赤い警告の名前になる。
+     */
+    public void makeIntruderGuard() {
+        intruderGuard = true;
+        setEffectiveHealth(effectiveMaxHealth() * IntrusionAlarm.HEALTH_MULTIPLIER);
+        xpReward = 0;
+        applyIntruderLook();
+    }
+
+    private void applyIntruderLook() {
+        setBarName(Component.translatable(getType().getDescriptionId() + ".intruder"));
+        bossBar.setColor(BossEvent.BossBarColor.RED);
+    }
+
+    @Override
+    protected boolean shouldDropLoot() {
+        return !intruderGuard && super.shouldDropLoot();
+    }
+
     private void applyAwakenedLook() {
         if (!hasCustomName()) {
             setBarName(Component.translatable(getType().getDescriptionId() + ".awakened"));
@@ -206,6 +234,9 @@ public abstract class RuinBoss extends Monster {
 
     @Override
     protected void dropExperience() {
+        if (intruderGuard) {
+            return;
+        }
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
                 || lastHurtByPlayerTime > 0 && shouldDropExperience()
                 && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
@@ -508,7 +539,7 @@ public abstract class RuinBoss extends Monster {
     @Override
     public void die(DamageSource source) {
         super.die(source);
-        if (level() instanceof ServerLevel level && !isMinion()) {
+        if (level() instanceof ServerLevel level && !isMinion() && !intruderGuard) {
             String bossId = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
             for (Player participant : rewardPlayers(level)) {
                 if (participant instanceof ServerPlayer player) {
@@ -611,6 +642,7 @@ public abstract class RuinBoss extends Monster {
         super.addAdditionalSaveData(tag);
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
+        tag.putBoolean("intruder_guard", intruderGuard);
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("participants", participants);
         tag.putInt("reward_participants", rewardParticipants);
@@ -639,6 +671,11 @@ public abstract class RuinBoss extends Monster {
         if (awakened()) {
             xpReward = awakenedXp();
             applyAwakenedLook();
+        }
+        intruderGuard = tag.getBoolean("intruder_guard");
+        if (intruderGuard) {
+            xpReward = 0;
+            applyIntruderLook();
         }
     }
 }

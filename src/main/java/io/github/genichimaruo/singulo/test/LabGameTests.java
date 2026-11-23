@@ -573,15 +573,17 @@ public final class LabGameTests {
         helper.succeed();
     }
 
-    /** 記録端末は、番号ごとに題と本文の記録を持つ（番号は記録の数で回る）。 */
+    /** 記録端末は、番号ごとに題と本文の記録を持つ（研究所の番号は記録の数で回る。12〜15 は遺構の前室の記録）。 */
     @GameTest(template = EMPTY)
     public static void terminalsHoldRecords(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
-        for (int i = 0; i < LabTerminalBlock.LOGS + 2; i++) {
+            io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
+        int ruinEnd = LabTerminalBlock.LOGS + LabTerminalBlock.RUIN_LOGS;
+        for (int i = 0; i < ruinEnd + 2; i++) {
             var lines = LabTerminalBlock.lines(i);
             helper.assertTrue(lines.length == 2, "記録の行が2つでない");
             String key = ((net.minecraft.network.chat.contents.TranslatableContents) lines[1].getContents()).getKey();
-            helper.assertTrue(key.equals("lab.singulo.log." + (i % LabTerminalBlock.LOGS)), "記録の番号が違う: " + key);
+            int expected = i >= LabTerminalBlock.LOGS && i < ruinEnd ? i : i % LabTerminalBlock.LOGS;
+            helper.assertTrue(key.equals("lab.singulo.log." + expected), "記録の番号が違う: " + key);
         }
         helper.succeed();
     }

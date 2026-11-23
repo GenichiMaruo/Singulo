@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "singulo:block/operator_chair"
+    },
+    "facing=east": {
+      "model": "singulo:block/operator_chair",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "singulo:block/operator_chair",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "singulo:block/operator_chair",
+      "y": 270
+    }
+  }
+}

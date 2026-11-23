@@ -141,6 +141,17 @@ def pressure_hull():
     return im
 
 
+def pressure_glass():
+    """耐圧ガラス: 青みのある厚いガラス。縁は耐圧殻と同じ暗い鋼の枠で、角にリベット。左上に映り込みの筋。"""
+    im, d = new((150, 196, 222, 44))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((52, 56, 64)))
+    for x, y in ((1, 1), (14, 1), (1, 14), (14, 14)):
+        d.point((x, y), fill=rgba((92, 98, 110)))
+    d.line([(3, 7), (7, 3)], fill=(235, 248, 255, 120))
+    d.line([(3, 10), (10, 3)], fill=(235, 248, 255, 70))
+    return im
+
+
 def welded_hatch():
     """溶接された蓋: 鋼の板を十字の溶接のビードでつないだ蓋。ビードの両脇には焼けの色（青紫〜麦わら色）。"""
     im, d = new(rgba((86, 92, 102)))
@@ -603,6 +614,7 @@ def textures(tb, save_plain):
         save(lab_reactor_core(on), tb / f'lab_reactor_core_{tag}.png')
         save(power_conduit(on), tb / f'power_conduit_{tag}.png')
     save(pressure_hull(), tb / 'pressure_hull.png')
+    save(pressure_glass(), tb / 'pressure_glass.png')
     save(welded_hatch(), tb / 'welded_hatch.png')
     save(bulkhead(), tb / 'bulkhead.png')
     save(machine_side(), tb / 'lab_machine_side.png')
@@ -721,6 +733,10 @@ def models(write_json, assets):
     write_json(bs / 'bulkhead.json', {'variants': {'open=false': {'model': f'{MODID}:block/bulkhead'},
                                                    'open=true': {'model': f'{MODID}:block/bulkhead'}}})
     write_json(mb / 'lab_glass.json', _cube('lab_glass', translucent=True))
+    write_json(mb / 'pressure_glass.json', _cube('pressure_glass', translucent=True))
+    write_json(mi / 'pressure_glass.json', {'parent': f'{MODID}:block/pressure_glass'})
+    write_json(bs / 'pressure_glass.json', {'variants': {'sealed=true': {'model': f'{MODID}:block/pressure_glass'},
+                                                         'sealed=false': {'model': f'{MODID}:block/pressure_glass'}}})
     write_json(mi / 'lab_glass.json', {'parent': f'{MODID}:block/lab_glass'})
     write_json(bs / 'lab_glass.json', {'variants': {'': {'model': f'{MODID}:block/lab_glass'}}})
     # 電力で変わるもの（施設灯・非常灯・炉心）: powered=true / false

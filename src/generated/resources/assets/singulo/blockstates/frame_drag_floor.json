@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "singulo:block/frame_drag_floor"
+    },
+    "active=true,facing=north": {
+      "model": "singulo:block/frame_drag_floor_active"
+    },
+    "active=false,facing=east": {
+      "model": "singulo:block/frame_drag_floor",
+      "y": 90
+    },
+    "active=true,facing=east": {
+      "model": "singulo:block/frame_drag_floor_active",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "singulo:block/frame_drag_floor",
+      "y": 180
+    },
+    "active=true,facing=south": {
+      "model": "singulo:block/frame_drag_floor_active",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "singulo:block/frame_drag_floor",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "singulo:block/frame_drag_floor_active",
+      "y": 270
+    }
+  }
+}

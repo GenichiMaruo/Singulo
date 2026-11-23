@@ -19,7 +19,15 @@ for aid, parent, icon, frame, cond, stage, *_ in ADVANCEMENTS:
     adv = json.loads((DATA / f'{aid}.json').read_text())
     if adv.get('parent') != (f'singulo:{parent}' if parent else None):
         raise ValueError(f'{aid}: stale parent')
-    if set(adv['criteria']) != {'done'}:
+    if cond[0] == 'collect_items':
+        criteria = adv['criteria']
+        required = {p.stem for p in (ASSETS / 'models/item').glob('android_memory_*.json')}
+        if not required or set(criteria) != required or 'requirements' in adv:
+            raise ValueError(f'{aid}: expected one mandatory criterion per android memory')
+        for item, criterion in criteria.items():
+            if criterion != {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': [{'items': [f'singulo:{item}']}]}}:
+                raise ValueError(f'{aid}: invalid collection criterion for {item}')
+    elif set(adv['criteria']) != {'done'}:
         raise ValueError(f'{aid}: changed criterion key would invalidate existing progress')
     if adv['display']['hidden'] != (aid in HIDDEN_ADVANCEMENTS):
         raise ValueError(f'{aid}: handbook and advancement visibility differ')
