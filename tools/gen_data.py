@@ -3722,17 +3722,37 @@ def tags():
 
 
 RUIN_PLACEMENT = {
-    # 遺構ID: (間隔, 最小間隔, salt, バイオーム)。間隔はチャンク（同じ遺構どうしのおおよその距離）
-    'observation_post': (40, 16, 19370501, ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert',
+    # 遺構ID: (間隔, 最小間隔, salt, バイオーム)。間隔はチャンク（同じ遺構どうしのおおよその距離）。0.22.0 で約0.8倍に縮めた（数は約1.5倍）
+    'observation_post': (32, 12, 19370501, ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert',
                                             'minecraft:savanna', 'minecraft:savanna_plateau', 'minecraft:snowy_plains',
                                             'minecraft:meadow', 'minecraft:badlands']),
-    'research_building': (56, 20, 19370502, ['#minecraft:is_overworld']),
-    'culture_facility': (64, 24, 19370503, ['#minecraft:is_overworld']),
-    'final_lab': (96, 40, 19370504, ['#minecraft:is_overworld']),
-    'sunken_reactor': (112, 48, 19370505, ['#minecraft:is_overworld']),
-    'android_lab': (64, 24, 19370506, ['#minecraft:is_overworld']),
+    'research_building': (45, 16, 19370502, ['#minecraft:is_overworld']),
+    'culture_facility': (51, 19, 19370503, ['#minecraft:is_overworld']),
+    'final_lab': (77, 30, 19370504, ['#minecraft:is_overworld']),
+    'sunken_reactor': (90, 36, 19370505, ['#minecraft:is_overworld']),
+    'android_lab': (51, 19, 19370506, ['#minecraft:is_overworld']),
 }
 # 地下の遺構を埋める高さ（構造物の床の Y の範囲）。深い遺構ほど後の段階
+# 地下の遺構が避ける構造物の組（始まりのチャンクからの距離）。遺構どうしは、この順で前の（珍しい）遺構を後の遺構が避ける。
+# 要塞と廃坑は避けない（遺構はそれらより後の段階 top_layer_modification で置くので、重なっても遺構の側は欠けない）
+RUIN_AVOID_VANILLA = [('minecraft:ancient_cities', 12), ('minecraft:trial_chambers', 12)]
+RUIN_PRIORITY = ['sunken_reactor', 'final_lab', 'android_lab', 'culture_facility', 'research_building']
+RUIN_AVOID_RUINS = 10
+
+
+def ruin_avoid(rid):
+    """地下の遺構 rid が避ける構造物の組（singulo:avoiding の avoid）。"""
+    higher = RUIN_PRIORITY[:RUIN_PRIORITY.index(rid)]
+    return ([{'set': s, 'chunk_count': n} for s, n in RUIN_AVOID_VANILLA]
+            + [{'set': f'{MODID}:{other}', 'chunk_count': RUIN_AVOID_RUINS} for other in higher])
+
+
+def avoiding(structure, rid):
+    """地下の遺構の構造物を、ほかの大きな地下構造物を避けて置く構造物（singulo:avoiding）で包む。"""
+    outer = {k: v for k, v in structure.items() if k in ('biomes', 'step', 'spawn_overrides', 'terrain_adaptation')}
+    return {'type': f'{MODID}:avoiding', **outer, 'structure': structure, 'avoid': ruin_avoid(rid)}
+
+
 RUIN_DEPTH = {
     'research_building': (-20, 4),
     'culture_facility': (-46, -30),
@@ -3781,6 +3801,9 @@ BOSS_LOOT = {
     'gravity_remnant': [('縮退核', 3, 3), ('高圧結晶', 2, 4)],
     'ergosphere_leviathan': [('渦の断章', 1, 1), ('エキゾチック物質', 4, 6), ('H凝縮体', 2, 3)],
     'foundry_overseer': [('精密アクチュエーター', 3, 4), ('アンドロイドキット', 1, 2)],
+    # 前室の中ボス（搬送機は段階4、炉殻修理機は段階5の装備で挑む）
+    'containment_hauler': [('高圧結晶', 2, 3), ('クリスタルメモリ', 1, 2)],
+    'hull_repairer': [('エキゾチック物質', 1, 2), ('クリスタルメモリ', 1, 2)],
 }
 
 
@@ -3801,9 +3824,6 @@ def ruins_data():
     """遺構の構造物・配置・中身（loot table）。中身の数は recipes.py の EXPLORE（1回の遠征で拾える数）。"""
     ruins.write_all(DATA / 'structure' / 'ruins')
     for rid, (make, placement) in ruins.RUINS.items():
-    # 前室の中ボス（搬送機は段階4、炉殻修理機は段階5の装備で挑む）
-    'containment_hauler': [('高圧結晶', 2, 3), ('クリスタルメモリ', 1, 2)],
-    'hull_repairer': [('エキゾチック物質', 1, 2), ('クリスタルメモリ', 1, 2)],
         spacing, separation, salt, biomes = RUIN_PLACEMENT[rid]
         write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / f'{rid}.json', {'values': biomes})
         write_json(DATA / 'worldgen' / 'template_pool' / 'ruins' / f'{rid}.json', {
@@ -3815,7 +3835,9 @@ def ruins_data():
         structure = {
             'type': 'minecraft:jigsaw',
             'biomes': f'#{MODID}:has_structure/{rid}',
-            'step': 'surface_structures' if placement == 'surface' else 'underground_structures',
+            # 地下は、いちばん最後の段階で置く。バニラの地下構造物（廃坑・試練の間・要塞・古代都市）と重なっても遺構の側は欠けず、
+            # 繁茂した洞窟のツタ・ヒカリゴケなどの植物（vegetal_decoration）が部屋の中に生えていても、部屋の空気で消える
+            'step': 'surface_structures' if placement == 'surface' else 'top_layer_modification',
             'spawn_overrides': {},
             # 地下は周りを岩で包む（洞窟や水とつながって崩れないように）
             'terrain_adaptation': 'beard_thin' if placement == 'surface' else 'encapsulate',
@@ -3831,14 +3853,14 @@ def ruins_data():
             lo, hi = RUIN_DEPTH[rid]
             structure['start_height'] = {'type': 'minecraft:uniform',
                                          'min_inclusive': {'absolute': lo}, 'max_inclusive': {'absolute': hi}}
-        write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', structure)
+        write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', structure if placement == 'surface' else avoiding(structure, rid))
         write_json(DATA / 'worldgen' / 'structure_set' / f'{rid}.json', {
             'structures': [{'structure': f'{MODID}:{rid}', 'weight': 1}],
             'placement': {'type': 'minecraft:random_spread', 'spacing': spacing, 'separation': separation, 'salt': salt},
         })
     # 地下アンドロイド研究所: 部屋の型紙を Java（LabStructure）がランダムに並べる
     import lab
-    lab.write_all(DATA, write_json, RUIN_PLACEMENT['android_lab'], RUIN_DEPTH['android_lab'])
+    lab.write_all(DATA, write_json, RUIN_PLACEMENT['android_lab'], RUIN_DEPTH['android_lab'], lambda structure: avoiding(structure, 'android_lab'))
     lab.chest_loot(write_json, DATA, mid)
     write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'ruins.json',
                {'values': [f'{MODID}:{rid}' for rid in ruins.RUINS] + [f'{MODID}:android_lab']})
@@ -4218,6 +4240,7 @@ TAB_GROUPS = [
         'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'lab_reactor_core',
         'lab_reactor_console', 'server_rack', 'lab_terminal', 'android_capsule',
         'desk_monitor', 'paper_stack', 'trash_bin',
+        'control_cabinet', 'coolant_cladding', 'dial_panel', 'mimic_panel', 'annunciator_panel', 'operator_desk', 'operator_chair',
     ]),
     ('設計図', [
         'blueprint_ruin_panels', 'blueprint_pristine_ruin', 'blueprint_ruin_glass', 'blueprint_lighting',
@@ -4232,6 +4255,7 @@ TAB_GROUPS = [
     ('遺跡の装置と封印', [
         'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator', 'seal_console',
         'guardian_core', 'echo_projector', 'factory_line', 'factory_conveyor',
+        'ruin_relay', 'anomaly_emitter', 'frame_drag_floor', 'drag_brake',
         'sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key',
         'sealed_container_3', 'temporal_key', 'sealed_container_4', 'singularity_key',
     ]),
@@ -4240,7 +4264,6 @@ TAB_GROUPS = [
         'sentinel_core', 'degenerate_nucleus', 'precision_actuator',
         # 覚醒の核は、元のボスを倒す順（研究棟→封鎖培養施設→地下アンドロイド研究所→最終実験施設→沈んだ炉心区画）
         'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_record_core',
-        'control_cabinet', 'coolant_cladding', 'dial_panel', 'mimic_panel', 'annunciator_panel', 'operator_desk', 'operator_chair',
         'awakening_ergosphere_core',
         # 最後の記録者: 覚醒したボスの断章 → 束ねた終焉の記録（呼び出し）→ 光輪（戦利品）
         'echo_chapter', 'gravity_chapter', 'horizon_chapter', 'ergosphere_chapter',
@@ -4255,7 +4278,6 @@ TAB_GROUPS = [
         # ボスのスポーンエッグはタブに出さない（/give でだけ渡す。Java の SinguloItems.HIDDEN）
     ]),
 ]
-        'ruin_relay', 'anomaly_emitter', 'frame_drag_floor', 'drag_brake',
 
 
 def tab_order():
