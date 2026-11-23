@@ -28,10 +28,6 @@
     {
       "set": "minecraft:ancient_cities",
       "chunk_count": 12
-    },
-    {
-      "set": "minecraft:trial_chambers",
-      "chunk_count": 12
     }
   ]
 }

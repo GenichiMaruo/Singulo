@@ -30,10 +30,6 @@
       "chunk_count": 12
     },
     {
-      "set": "minecraft:trial_chambers",
-      "chunk_count": 12
-    },
-    {
       "set": "singulo:sunken_reactor",
       "chunk_count": 10
     }

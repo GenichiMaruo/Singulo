@@ -3737,7 +3737,7 @@ RUIN_PLACEMENT = {
 # 地下の遺構を埋める高さ（構造物の床の Y の範囲）。深い遺構ほど後の段階
 # 地下の遺構が避ける構造物の組（始まりのチャンクからの距離）。遺構どうしは、この順で前の（珍しい）遺構を後の遺構が避ける。
 # 要塞と廃坑は避けない（遺構はそれらより後の段階 top_layer_modification で置くので、重なっても遺構の側は欠けない）
-RUIN_AVOID_VANILLA = [('minecraft:ancient_cities', 12), ('minecraft:trial_chambers', 12)]
+RUIN_AVOID_VANILLA = [('minecraft:ancient_cities', 12)]
 RUIN_PRIORITY = ['sunken_reactor', 'final_lab', 'android_lab', 'culture_facility', 'research_building']
 RUIN_AVOID_RUINS = 10
 
