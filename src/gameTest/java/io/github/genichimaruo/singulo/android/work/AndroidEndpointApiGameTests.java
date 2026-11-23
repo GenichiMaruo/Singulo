@@ -79,6 +79,7 @@ public final class AndroidEndpointApiGameTests {
     }
 
     private static WorkConsoleBlockEntity setup(GameTestHelper h,boolean moving) {
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var c=workshop(h,32); c.setOwner(TestScope.player(h).getUUID());
         var a=SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
         a.makeGuard(c.owner(),h.absolutePos(new BlockPos(2,1,4)),RuinAndroid.MODE_GUARD,30);
@@ -138,7 +139,8 @@ public final class AndroidEndpointApiGameTests {
         h.assertTrue(receipt.state() == State.RUNNING, "Zero-input procedure rejected: " + receipt.reason());
         h.succeedWhen(() -> {
             var status = AndroidOrders.status(h.getLevel(), console.getBlockPos(), console.owner(), id);
-            h.assertTrue(status.state() == State.COMPLETED && status.delivered() == 3, "Procedure did not deliver");
+            h.assertTrue(status.state() == State.COMPLETED && status.delivered() == 3,
+                    "Procedure did not deliver: " + status.state() + " (" + status.reason() + "), delivered=" + status.delivered());
             h.assertTrue(barrel.getItem(0).isEmpty() && ItemStack.matches(target, endpoint.delivery.getStackInSlot(0)),
                     "Delivered amount did not match the items taken by the procedure");
         });

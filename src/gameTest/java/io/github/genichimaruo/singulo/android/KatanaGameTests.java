@@ -35,7 +35,6 @@ public final class KatanaGameTests {
         var home = helper.absolutePos(new BlockPos(7, 0, 7));
         helper.setBlock(new BlockPos(7, 0, 7), SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity station = (AndroidStationBlockEntity) helper.getBlockEntity(new BlockPos(7, 0, 7));
-        var registry = helper.getLevel().registryAccess();
         var saved = station.saveWithoutMetadata();
         saved.putUUID("owner", owner);
         saved.putUUID("android0", rouge.getUUID());
@@ -53,8 +52,8 @@ public final class KatanaGameTests {
     @GameTest(template = HUGE, batch = "paired_inspection", timeoutTicks = 750)
     public static void pairInspectsAndExchangesNods(GameTestHelper helper) {
         floor(helper);
-        var rouge = katana(helper, new BlockPos(7, 1, 7));
-        var gun = partner(helper, rouge, new BlockPos(10, 1, 7));
+        var rouge = katana(helper, new BlockPos(6, 1, 7));
+        var gun = partner(helper, rouge, new BlockPos(9, 1, 7));
         int ammo = gun.ammo();
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(rouge.state() == KatanaAndroid.STATE_MAINTENANCE
@@ -109,8 +108,13 @@ public final class KatanaGameTests {
     }
 
     private static void floor(GameTestHelper helper) {
-        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 14, 0, 14)) {
-            helper.setBlock(p, Blocks.STONE);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
+        // Prevent AI from acquiring hostiles in neighboring legacy GameTests.
+        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 14, 4, 14)) {
+            if (p.getX() == 0 || p.getX() == 14 || p.getZ() == 0 || p.getZ() == 14
+                    || p.getY() == 0 || p.getY() == 4) {
+                helper.setBlock(p, Blocks.STONE);
+            }
         }
     }
 
