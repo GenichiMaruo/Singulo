@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "channel=0,facing=north": {
+      "model": "singulo:block/mimic_panel"
+    },
+    "channel=0,facing=east": {
+      "model": "singulo:block/mimic_panel",
+      "y": 90
+    },
+    "channel=0,facing=south": {
+      "model": "singulo:block/mimic_panel",
+      "y": 180
+    },
+    "channel=0,facing=west": {
+      "model": "singulo:block/mimic_panel",
+      "y": 270
+    },
+    "channel=1,facing=north": {
+      "model": "singulo:block/mimic_panel_1"
+    },
+    "channel=1,facing=east": {
+      "model": "singulo:block/mimic_panel_1",
+      "y": 90
+    },
+    "channel=1,facing=south": {
+      "model": "singulo:block/mimic_panel_1",
+      "y": 180
+    },
+    "channel=1,facing=west": {
+      "model": "singulo:block/mimic_panel_1",
+      "y": 270
+    },
+    "channel=2,facing=north": {
+      "model": "singulo:block/mimic_panel_2"
+    },
+    "channel=2,facing=east": {
+      "model": "singulo:block/mimic_panel_2",
+      "y": 90
+    },
+    "channel=2,facing=south": {
+      "model": "singulo:block/mimic_panel_2",
+      "y": 180
+    },
+    "channel=2,facing=west": {
+      "model": "singulo:block/mimic_panel_2",
+      "y": 270
+    }
+  }
+}

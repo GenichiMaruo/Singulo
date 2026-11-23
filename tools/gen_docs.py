@@ -87,6 +87,11 @@ def guide(ctx, ja, en):
     ctx['write_json'](ctx['ASSETS'] / 'guide' / 'chapters.json', {'chapters': chapters, 'visuals': visuals_for(CHAPTERS)})
 
 
+def item_criterion(item):
+    item_id = item if ':' in item else f'{MODID}:{item}'
+    return {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': [{'items': item_id}]}}
+
+
 def advancements(ctx, ja, en):
     validate_advancements()
     out = []
@@ -102,22 +107,25 @@ def advancements(ctx, ja, en):
         if parent is None:
             display['background'] = f'{MODID}:textures/block/degenerate_furnace_frame.png'
         kind = cond[0]
-        if kind == 'tick':
-            crit = {'trigger': 'minecraft:tick'}
+        criteria = {}
+        if kind == 'collect_items':
+            # Individual criteria retain credit when a memory leaves the inventory.
+            criteria = {item: item_criterion(item) for item in cond[1:]}
+        elif kind == 'tick':
+            criteria['done'] = {'trigger': 'minecraft:tick'}
         elif kind == 'item':
-            item = cond[1] if ':' in cond[1] else f'{MODID}:{cond[1]}'
-            crit = {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': [{'items': item}]}}
+            criteria['done'] = item_criterion(cond[1])
         elif kind in ('any_item', 'all_items'):
             items = [item if ':' in item else f'{MODID}:{item}' for item in cond[1:]]
             predicates = [{'items': item} for item in items] if kind == 'all_items' else [{'items': items}]
-            crit = {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': predicates}}
+            criteria['done'] = {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': predicates}}
         elif kind == 'milestone':
-            crit = {'trigger': f'{MODID}:milestone', 'conditions': {'id': cond[1]}}
+            criteria['done'] = {'trigger': f'{MODID}:milestone', 'conditions': {'id': cond[1]}}
         elif kind == 'kill':
-            crit = {'trigger': 'minecraft:player_killed_entity', 'conditions': {'entity': {'type': cond[1]}}}
+            criteria['done'] = {'trigger': 'minecraft:player_killed_entity', 'conditions': {'entity': {'type': cond[1]}}}
         else:
             raise ValueError(cond)
-        adv = {'display': display, 'criteria': {'done': crit}}
+        adv = {'display': display, 'criteria': criteria}
         if parent is not None:
             adv['parent'] = f'{MODID}:{parent}'
         ctx['write_json'](ctx['DATA'] / 'advancement' / f'{aid}.json', adv)

@@ -18,7 +18,12 @@ public enum AndroidKind {
      * スポーンエッグと設計メモリはクリエイティブタブにも JEI にも出さない。
      * 珍しい分、バックパックを内蔵し（運べる欄が最初から多い）、充電の満タンが1.5倍。その代わり、印刷の電力が3倍かかる。
      */
-    GUNNER("gunner", SinguloEntities.GUNNER_ANDROID, Origin.HIDDEN, 3);
+    GUNNER("gunner", SinguloEntities.GUNNER_ANDROID, Origin.HIDDEN, 3),
+    /**
+     * 刀型（隠し型）。設計メモリは覚醒した残響の番人の隠し報酬。スポーンエッグと設計メモリは一覧に出さない。
+     * バックパックを内蔵し、充電の満タンが1.5倍。印刷の電力は3倍。
+     */
+    KATANA("katana", SinguloEntities.KATANA_ANDROID, Origin.HIDDEN, 3);
 
     /** どこで手に入る型か（遺構の印刷台・研究所の試作機・隠し）。 */
     public enum Origin { RUIN, PROTOTYPE, HIDDEN }
@@ -53,7 +58,7 @@ public enum AndroidKind {
         return type.get();
     }
 
-    /** 愛称（ルミナ・ヴェルナ・ソレイユ・アルマ・ノクス・シエル）の翻訳キー。 */
+    /** 愛称（ルミナ・ヴェルナ・ソレイユ・アルマ・ノクス・シエル・ルージュ）の翻訳キー。 */
     public String nicknameKey() {
         return "gui.singulo.android.nickname." + id;
     }

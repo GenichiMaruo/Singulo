@@ -22,7 +22,7 @@ sourceSets {
             throw new GradleException('testClasses expects comma-separated GameTests class names')
         }
         for (name in selected) {
-            if (name in ['MekanismGameTests', 'MekanismQioGameTests', 'MekanismStockGameTests']) throw new GradleException('Mekanism integration is not part of the 26.1.2 port')
+            if (name in ['MekanismGameTests', 'MekanismQioGameTests', 'MekanismStockGameTests', 'MekanismCardboardGameTests']) throw new GradleException('Mekanism integration is not part of the 26.1.2 port')
             if (fileTree('src/main/java').matching { include "**/${name}.java" }.isEmpty()
                     && fileTree('src/gameTest/java').matching { include "**/${name}.java" }.isEmpty()) {
                 throw new GradleException("Unknown GameTest class: ${name}")
@@ -31,7 +31,7 @@ sourceSets {
         java.include(selected.isEmpty() ? ['**/*GameTests.java'] : selected.collect { "**/${it}.java" })
         java.include('**/test/TestBuild.java', '**/test/harness/**')
         // 26.1.2 intentionally has no Mekanism integration; retain older-version fixtures on disk.
-        java.exclude('**/MekanismQioGameTests.java', '**/MekanismGameTests.java', '**/MekanismStockGameTests.java')
+        java.exclude('**/MekanismQioGameTests.java', '**/MekanismGameTests.java', '**/MekanismStockGameTests.java', '**/MekanismCardboardGameTests.java')
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
@@ -228,8 +228,8 @@ idea {
 def testSuiteInventoryDir = layout.buildDirectory.dir('generated/gameTest/resources')
 def generateTestSuiteInventory = tasks.register('generateTestSuiteInventory') {
     def selectedNames = providers.gradleProperty('testClasses').getOrElse('').split(',').findAll { !it.isBlank() }
-    def suites = files(fileTree('src/main/java') { include '**/*GameTests.java'; exclude '**/MekanismGameTests.java', '**/MekanismQioGameTests.java', '**/MekanismStockGameTests.java' },
-                       fileTree('src/gameTest/java') { include '**/*GameTests.java'; exclude '**/MekanismGameTests.java', '**/MekanismQioGameTests.java', '**/MekanismStockGameTests.java' })
+    def suites = files(fileTree('src/main/java') { include '**/*GameTests.java'; exclude '**/MekanismGameTests.java', '**/MekanismQioGameTests.java', '**/MekanismStockGameTests.java', '**/MekanismCardboardGameTests.java' },
+                       fileTree('src/gameTest/java') { include '**/*GameTests.java'; exclude '**/MekanismGameTests.java', '**/MekanismQioGameTests.java', '**/MekanismStockGameTests.java', '**/MekanismCardboardGameTests.java' })
     inputs.files(suites)
     inputs.property('selected', selectedNames)
     outputs.file(testSuiteInventoryDir.map { it.file('singulo-test-suites.list') })

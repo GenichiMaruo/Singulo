@@ -38,7 +38,7 @@ import net.minecraft.world.phys.AABB;
  *       覚醒した番人を起こす（{@link #awakenAwakened}）</li>
  * </ul>
  */
-public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
+public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements IntrusionAlarm.Host {
     /** 保管庫を探す広さ。 */
     public static final int VAULT_SEARCH_RADIUS = 16;
     /** 挑戦者に気づく広さ（核からの水平距離）と高さ。 */
@@ -54,6 +54,11 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     @Nullable
     private UUID boss;
     private boolean scanned;
+    /** 中継器がそろう前に入り込まれたときの警報（前室のある沈んだ炉心区画の封印核だけ）。 */
+    private final IntrusionAlarm alarm = new IntrusionAlarm(false);
+    /** 前室のあるボス部屋の封印核か（読み込んでから最初の tick で決める）。 */
+    @Nullable
+    private Boolean antechamber;
     /** 残響投影器の位置。 */
     private final List<BlockPos> projectors = new ArrayList<>();
     /** 封じ込め槽のブロック（位置と、元の形）。 */
@@ -163,6 +168,14 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     }
 
     private void tick(ServerLevel level) {
+        if (antechamber == null) {
+            RuinCacheBlockEntity vault = vault(level);
+            antechamber = PressureRoomSeal.pressureRoom(level, worldPosition, false) && vault != null
+                    && "sunken_reactor".equals(vault.ruin());
+        }
+        if (antechamber) {
+            alarm.tick(level, worldPosition, this);
+        }
         if (!scanned) {
             scan(level);
         }
@@ -262,6 +275,9 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         if (!RuinGuards.canSummon(level, null) || activeBoss(level) != null) {
             return null;
         }
+        if (RuinRelayBlockEntity.refuseWhileLocked(level, worldPosition, null)) {
+            return null;                              // 前室の中継器がそろうまで起きない（壁を掘って入っても戦えない）
+        }
         RuinCacheBlockEntity vault = vault(level);
         if (vault == null) {
             return null;
@@ -284,6 +300,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
     @Nullable
     public RuinBoss awakenAwakened(ServerLevel level, @Nullable ServerPlayer player, net.minecraft.world.item.ItemStack core) {
         if (!RuinGuards.canSummon(level, player)) return null;
+        if (RuinRelayBlockEntity.refuseWhileLocked(level, worldPosition, player)) return null;
         if (activeBoss(level) != null) {
             tell(player, "gui.singulo.guardian.active");
             return null;
@@ -309,6 +326,11 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
 
     @Nullable
     private RuinBoss spawn(ServerLevel level, RuinCacheBlockEntity vault, boolean awakened) {
+        return spawn(level, vault, awakened, false);
+    }
+
+    @Nullable
+    private RuinBoss spawn(ServerLevel level, RuinCacheBlockEntity vault, boolean awakened, boolean intruderGuard) {
         EntityType<? extends RuinBoss> type = bossFor(vault.ruin());
         RuinBoss b = type == null ? null : type.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (b == null) {
@@ -323,6 +345,9 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         b.awaken(worldPosition);
         if (awakened) {
             b.makeAwakened();
+        }
+        if (intruderGuard) {
+            b.makeIntruderGuard();
         }
         if (b instanceof EchoSentinel s) {
             s.setProjectors(projectors);
@@ -397,6 +422,39 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         }
     }
 
+    /** 排除モードの番人（報酬なし、体力 {@link IntrusionAlarm#HEALTH_MULTIPLIER} 倍）を起こす。 */
+    @Override
+    @Nullable
+    public RuinBoss spawnIntruderGuard(ServerLevel level) {
+        if (!RuinGuards.canSummon(level, null) || activeBoss(level) != null) {
+            return null;
+        }
+        RuinCacheBlockEntity vault = vault(level);
+        return vault == null ? null : spawn(level, vault, false, true);
+    }
+
+    @Override
+    public void dismissIntruderGuard(ServerLevel level) {
+        RuinBoss b = activeBoss(level);
+        if (b != null && !b.intruderGuard()) {
+            return;                                   // 中継器がそろってから起こした本来の番人はそのまま
+        }
+        if (b != null) {
+            b.discard();
+        }
+        boss = null;
+        setChanged();
+    }
+
+    @Override
+    public void alarmChanged() {
+        setChanged();
+    }
+
+    public IntrusionAlarm alarm() {
+        return alarm;
+    }
+
     void onBossDefeated(ServerLevel level) {
         EntityType<?> type = bossType(level);
         boss = null;
@@ -465,6 +523,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
             tag.store("boss", net.minecraft.core.UUIDUtil.CODEC, boss);
         }
         tag.putBoolean("scanned", scanned);
+        alarm.save(tag);
         ListTag props = new ListTag();
         for (BlockPos p : projectors) {
             props.add(io.github.genichimaruo.singulo.compat.NbtCompat.writeBlockPos(p));
@@ -518,6 +577,7 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         super.loadAdditional(tag, registries);
         boss = tag.read("boss", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("boss", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         scanned = tag.getBooleanOr("scanned", false);
+        alarm.load(tag);
         projectors.clear();
         for (Tag t : tag.getListOrEmpty("projectors")) {
             projectors.add(io.github.genichimaruo.singulo.compat.NbtCompat.readBlockPos(wrap(t), "p").orElse(BlockPos.ZERO));

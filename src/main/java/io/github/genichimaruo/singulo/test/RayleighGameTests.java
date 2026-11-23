@@ -53,7 +53,11 @@ public final class RayleighGameTests {
             helper.assertTrue(helper.getBlockState(inverted).getValue(DaylightDetectorBlock.POWER) == 0, "反転した日照センサーが0にならない");
             helper.setBlock(source, Blocks.AIR);
         });
-        helper.runAtTickTime(120, () -> {
+        helper.succeedWhen(() -> {
+            // The vanilla detector samples only every 20 world ticks. Wait for the
+            // sample and the live sky angle to describe the same update.
+            helper.assertTrue(helper.getTick() >= 120 && helper.getLevel().getGameTime() % 20L <= 1L,
+                    "Waiting for a daylight detector update after power loss");
             helper.assertFalse(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "電力が切れても点いたまま");
             helper.assertTrue(io.github.genichimaruo.singulo.ruin.lab.RayleighSky.light(helper.getLevel(), helper.absolutePos(sensor)) == 0,
                     "Artificial sunlight remains inside the sealed room after power removal");
@@ -61,7 +65,6 @@ public final class RayleighGameTests {
             helper.assertTrue(helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == expected,
                     "消えたあと、ふつうの日照センサーの値に戻らない: " + helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER)
                             + " (expected " + expected + ")");
-            helper.succeed();
         });
     }
 

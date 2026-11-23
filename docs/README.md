@@ -69,3 +69,8 @@
 ## 0.21.0（開発中）
 
 - [装置の様子・工場モニター・銀河のやりこみ](0.21.0/README.md)・[変更履歴](curseforge/changelog-0.21.0.md)
+
+
+## 0.22.0
+
+- [Release notes](curseforge/changelog-0.22.0.md)

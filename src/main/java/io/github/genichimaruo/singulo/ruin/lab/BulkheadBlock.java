@@ -17,15 +17,21 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BulkheadBlock extends Block {
     public static final BooleanProperty OPEN = BooleanProperty.create("open");
+    public static final BooleanProperty WIRED = BooleanProperty.create("wired");
+
+    @Override
+    public boolean canEntityDestroy(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.entity.Entity entity) {
+        return false;
+    }
 
     public BulkheadBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(OPEN, false));
+        registerDefaultState(stateDefinition.any().setValue(OPEN, false).setValue(WIRED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(OPEN);
+        builder.add(OPEN, WIRED);
     }
 
     @Override

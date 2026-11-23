@@ -3,6 +3,8 @@ package io.github.genichimaruo.singulo.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
+import io.github.genichimaruo.singulo.android.GunnerAndroid;
+import io.github.genichimaruo.singulo.android.KatanaAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -31,6 +33,7 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
     public static final ModelLayerLocation AXE_LAYER = new ModelLayerLocation(Singulo.id("axe_android"), "main");
     public static final ModelLayerLocation BIT_LAYER = new ModelLayerLocation(Singulo.id("bit_android"), "main");
     public static final ModelLayerLocation GUNNER_LAYER = new ModelLayerLocation(Singulo.id("gunner_android"), "main");
+    public static final ModelLayerLocation KATANA_LAYER = new ModelLayerLocation(Singulo.id("katana_android"), "main");
 
     final ModelPart root;
     final ModelPart hips;
@@ -66,6 +69,12 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
     final ModelPart daggerGrip;
     /** 射撃型の銃の握り（なければ null。箱は持たない）。+Y が銃身の向き、+Z が握りの下の向き。銃は描画で出す。 */
     final ModelPart gunGrip;
+    /** 刀型の刀の握り（なければ null。箱は持たない）。+Y が刀身の向き、+Z が刃の向き。刀は描画で出す。 */
+    final ModelPart katanaGrip;
+    /** 刀型の左手の握り（紅一閃で、背中の紅い刀を持つ）。 */
+    final ModelPart katanaGripL;
+    static final float KATANA_GRIP_TO_GUARD = 0.14F;
+    private final KatanaRig katanaRig;
     /** サイドテールと長い房のある側（+1 は体の左、-1 は右）。髪の揺れの向きに使う。 */
     final float hairSide;
     /** 装甲板を積んだときだけ見える、胸の銀の板と左肩の小さな肩当て（さりげなく）。 */
@@ -110,6 +119,9 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
         this.axeGrip = forearmR.hasChild("axe_grip") ? forearmR.getChild("axe_grip") : null;
         this.daggerGrip = forearmR.hasChild("dagger_grip") ? forearmR.getChild("dagger_grip") : null;
         this.gunGrip = forearmR.hasChild("gun_grip") ? forearmR.getChild("gun_grip") : null;
+        this.katanaGrip = forearmR.hasChild("katana_grip") ? forearmR.getChild("katana_grip") : null;
+        this.katanaGripL = forearmL.hasChild("katana_grip_l") ? forearmL.getChild("katana_grip_l") : null;
+        this.katanaRig = katanaGrip == null ? null : new KatanaRig(this, hips.getChild("hip_saya"), torso.getChild("back_saya"));
         this.hairSide = ponytail.getInitialPose().x() > 0 ? 1 : -1;
         this.armorChest = torso.getChild("armor_chest");
         this.armorPad = armL.getChild("armor_pad");
@@ -231,6 +243,16 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
             // 銃の握り（手の中。構えていないときは、銃口を足元へ向けて下げて持つ。人や前の物に向けない）
             forearmR.addOrReplaceChild("gun_grip", CubeListBuilder.create(), PartPose.offsetAndRotation(0, 4.4F, -0.2F, 0.15F, 0, 0));
         }
+        if (variant == AndroidRenderer.Variant.KATANA) {
+            // 刀の握り（手から前へ。刃は下向き）。右手は腰の刀、左手は紅一閃で背中の紅い刀。刀身と鞘は描画で出す
+            forearmR.addOrReplaceChild("katana_grip", CubeListBuilder.create(), PartPose.offsetAndRotation(0, 4.4F, 0, -Mth.HALF_PI, 0, 0));
+            armL.getChild("forearm_l").addOrReplaceChild("katana_grip_l", CubeListBuilder.create(),
+                    PartPose.offsetAndRotation(0, 4.4F, 0, -Mth.HALF_PI, 0, 0));
+            hips.addOrReplaceChild("hip_saya", CubeListBuilder.create(),
+                    PartPose.offsetAndRotation(4.55F, -3.35F, -1.1F, 73 * Mth.DEG_TO_RAD, 34 * Mth.DEG_TO_RAD, 0));
+            torso.addOrReplaceChild("back_saya", CubeListBuilder.create(),
+                    PartPose.offsetAndRotation(3.8F, -8.2F, 4.5F, 3 * Mth.DEG_TO_RAD, 0, 42 * Mth.DEG_TO_RAD));
+        }
         if (variant == AndroidRenderer.Variant.BIT) {
             // 短剣の握り（手から前へ）
             forearmR.addOrReplaceChild("dagger_grip", CubeListBuilder.create(), PartPose.offsetAndRotation(0, 4.4F, -0.2F, -Mth.HALF_PI, 0, 0));
@@ -337,6 +359,35 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
         pose.translate(0, 5 / 16F, 0);
     }
 
+    /** 左の前腕までの変形を pose に積む（刀型が左手に持つ、背中の紅い刀を描くため）。 */
+    void toLeftForearm(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+        armL.translateAndRotate(pose);
+        forearmL.translateAndRotate(pose);
+    }
+
+    /** 鯉口（+Yが鞘の奥）と、刀を引く手の柄の中心。鞘引きも腕の動きも同じ座標で描画する。 */
+    void toKatanaMouth(PoseStack pose, boolean crimson) {
+        if (crimson) {
+            toTorso(pose);
+        } else {
+            toHips(pose);
+        }
+        katanaRig.mouth(crimson).translateAndRotate(pose);
+    }
+
+    void toKatanaHand(PoseStack pose, boolean crimson) {
+        if (crimson) {
+            toLeftForearm(pose);
+            katanaGripL.translateAndRotate(pose);
+        } else {
+            toBlade(pose);
+            katanaGrip.translateAndRotate(pose);
+        }
+    }
+
     /** 柄の先（鞭の付け根）までの変形を pose に積む。 */
     void toWhip(PoseStack pose) {
         toBlade(pose);
@@ -389,13 +440,21 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
     private int poseKey(RuinAndroid android) {
         int flags = (!android.printed() ? 1 : 0) | (android.napping() ? 2 : 0) | (android.showsHeldDecor() ? 4 : 0)
                 | (android instanceof io.github.genichimaruo.singulo.android.BitAndroid bit && bit.deployed() > 0 ? 8 : 0)
-                | (axeGrip != null && axeOneHanded(android) ? 16 : 0);
-        return android.state() << 5 | flags;
+                | (axeGrip != null && axeOneHanded(android) ? 16 : 0)
+                | (android.state() == RuinAndroid.STATE_IDLE && android instanceof KatanaAndroid katana && katana.drawn() ? 32 : 0);
+        return android.state() << 6 | flags;
     }
 
     /** 区切り from から to へ移るときのつなぎの長さ（tick）。 */
     private static int blendTicks(int from, int to) {
-        int a = from >> 5, b = to >> 5;
+        int a = from >> 6, b = to >> 6;
+        if (a == KatanaAndroid.STATE_MAINTENANCE && b == KatanaAndroid.STATE_DRAW) {
+            return 3;               // 手入れの途中で接敵したら、腰に寄せていた上体から抜刀につなぐ
+        }
+        if (b == KatanaAndroid.STATE_DRAW || b == KatanaAndroid.STATE_SHEATHE
+                || a == KatanaAndroid.STATE_IAI_ZANSHIN && b == KatanaAndroid.STATE_IAI_VICTORY) {
+            return 0;               // 手が鯉口に届く時刻は抜納刀のキーフレームで決める
+        }
         // 構え → 本打ちは、構えの終わりの姿勢から本打ちが始まるよう作ってあるので、つながずに振り抜く
         if (b == a + 1 && (a == BladeAndroid.STATE_DASH_WINDUP || a == BladeAndroid.STATE_SPIN_WINDUP
                 || a == io.github.genichimaruo.singulo.android.WhipAndroid.STATE_LASH_WINDUP
@@ -405,6 +464,8 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
                 || a == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_CLEAVE_WINDUP
                 || a == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_SLAM_WINDUP
                 || a == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_LEAP_WINDUP
+                || a == io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_IAI_STANCE || a == io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_IAI_FLASH
+                || a == io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_CUT
                 || a == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_ASSEMBLE || a == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_CHARGE || a == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_FIRE)) {
             return 0;
         }
@@ -436,7 +497,9 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
                 || state == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_CHOP
                 || state == io.github.genichimaruo.singulo.android.BitAndroid.STATE_STAB
                 || state == io.github.genichimaruo.singulo.android.BitAndroid.STATE_BACKSTEP
-                || state == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_HOP;
+                || state == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_HOP
+                || state == io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_CUT || state == io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_RETURN_CUT
+                || state == io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_STEP;
     }
 
     /** 座る・休む・充電・作業など、落ち着いた行動。 */
@@ -482,6 +545,10 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
                 }
             }
         }
+        if (katanaRig != null && android instanceof KatanaAndroid katana) {
+            // 鯉口は補間後の胴に付いている。手を合わせてから、次の動きの開始姿勢を記録する。
+            katanaRig.update(katana, age - android.tickCount);
+        }
         float[] last = b.last != null ? b.last : new float[parts.length * 6];
         for (int i = 0; i < parts.length; i++) {
             ModelPart part = parts[i];
@@ -524,7 +591,7 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
         batteryR.visible = batteries >= 2;
         // 物を作っている間は、手の武器をしまう（両手を使う。射撃型の小型銃は腰に差す: 描画の側）
         boolean armed = !android.weaponStowed();
-        for (ModelPart grip : new ModelPart[]{whipHandle, hilt, axeGrip, daggerGrip, gunGrip}) {
+        for (ModelPart grip : new ModelPart[]{whipHandle, hilt, axeGrip, daggerGrip, gunGrip, katanaGrip, katanaGripL}) {
             if (grip != null) {
                 grip.visible = armed;
             }
@@ -622,6 +689,17 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_FIRE -> railFire(t, age);
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_STOW -> railHold(1 - ease((t - 7.5F) / 4.5F), age, 0);   // 部品が背中へ戻り終わってから腕を下ろす（銃が体に刺さらない）
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_HOP -> backstep(t);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_DRAW -> katanaDraw(t);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_SHEATHE -> katanaSheathe(t);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_CUT -> katanaCut(t);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_RETURN_CUT -> katanaReturnCut(t);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_STEP -> katanaStep(t);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_IAI_STANCE -> iaiStance(t, age);
+            case KatanaAndroid.STATE_IAI_FLASH -> iaiFlash(t, age);
+            case io.github.genichimaruo.singulo.android.KatanaAndroid.STATE_IAI_ZANSHIN -> zanshin(t, age);
+            case KatanaAndroid.STATE_IAI_VICTORY -> iaiVictory(t, age);
+            case KatanaAndroid.STATE_MAINTENANCE -> maintainKatana(t);
+            case KatanaAndroid.STATE_VICTORY -> victorySalute(t);
             default -> {
                 if (axeGrip != null && axeOneHanded(android)) {
                     // 片手持ち: 右手だけで柄を握り、斧を前上がりに担ぐ。左手は歩きに合わせて楽に振る
@@ -642,6 +720,9 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
                     forearmL.xRot = -0.1F;
                     head.zRot -= 0.04F;
                 }
+                if (katanaGrip != null && android instanceof io.github.genichimaruo.singulo.android.KatanaAndroid katana && katana.drawn() && !android.weaponStowed()) {
+                    katanaGuard(1);
+                }
                 if (hilt != null) {
                     // 剣を低く前へ向けて構える
                     armR.xRot -= 0.3F;
@@ -654,7 +735,23 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
                 }
             }
         }
-        gestureOverlay(android, pt);
+        if (android instanceof GunnerAndroid gun && GunnerAndroid.railOut(state)) {
+            // Move both shoulders with the barrel when tracking a target above or below the gunner.
+            var ray = gun.railTo().subtract(gun.railFrom());
+            float aimWeight = switch (state) {
+                case GunnerAndroid.STATE_RAIL_ASSEMBLE -> ease((t - 8) / 8);
+                case GunnerAndroid.STATE_RAIL_STOW -> 1 - ease((t - 7) / 3);
+                default -> 1;
+            };
+            float pitch = (float) -Math.atan2(ray.y, ray.horizontalDistance());
+            float tilt = Mth.clamp(pitch, -0.85F, 0.85F) * aimWeight;
+            torso.xRot += tilt;
+            head.xRot -= tilt;
+        }
+        if (state != KatanaAndroid.STATE_VICTORY && state != KatanaAndroid.STATE_IAI_VICTORY && state != KatanaAndroid.STATE_MAINTENANCE
+                && !(android instanceof GunnerAndroid && GunnerAndroid.combat(state))) {
+            gestureOverlay(android, pt);
+        }
         if (android.napping()) {
             // 昼寝: 頭を前へ垂らして、ゆっくり息をする
             float breath = Mth.sin(age * 0.06F);
@@ -697,12 +794,25 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
             head.zRot += 0.1F * k * Mth.sin(t * 0.3F);
         } else if (android.state() == RuinAndroid.STATE_IDLE) {
             // 射撃型の仕草は、構えていない間だけ（次の構えが始まったら、そちらを優先）
-            if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_RELOAD) {
+            if (g == GunnerAndroid.GESTURE_INSPECT && android instanceof GunnerAndroid) {
+                float inspecting = inspectionPose(t);
+                reload(11, inspecting);
+                head.zRot += 0.14F * magazineOut(t);
+                forearmL.xRot += 0.18F * magazineOut(t);
+            } else if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_RELOAD) {
                 reload(t, k);
             } else if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_TWIRL) {
                 twirl(t, k);
             }
         }
+    }
+
+    static float inspectionPose(float t) {
+        return ease((t - 6) / 9) * (1 - ease((t - 50) / 12));
+    }
+
+    static float magazineOut(float t) {
+        return ease((t - 17) / 9) * (1 - ease((t - 40) / 9));
     }
 
     /**
@@ -1597,5 +1707,317 @@ public class AndroidModel extends ExtractedEntityModel<RuinAndroid> {
         head.xRot += look * k;
         skirtFront.xRot -= 0.5F * k;
         skirtBack.xRot += 0.2F * k;
+    }
+
+    // ------------------------------------------------------------------ 刀型の動き
+
+    /** 箱を振り返って布を取り、目で布を追いながら打刀を拭く。手先は刀身と箱を基準に rig で合わせる。 */
+    private void maintainKatana(float t) {
+        float active = KatanaMotion.ease(t, 0, 10) * (1 - KatanaMotion.ease(t, KatanaAndroid.MAINTENANCE_STOW, KatanaAndroid.MAINTENANCE));
+        float free = KatanaMotion.handBlend(KatanaAndroid.STATE_MAINTENANCE, t, false, false);
+        float grip = KatanaMotion.ease(t, 8, KatanaAndroid.MAINTENANCE_DRAW)
+                * (1 - KatanaMotion.ease(t, KatanaAndroid.MAINTENANCE_SEAT, KatanaAndroid.MAINTENANCE_STOW));
+        float lookBack = active * (1 - KatanaMotion.clothUnfold(t));
+        reachHip(grip * (1 - free));
+        head.yRot = Mth.lerp(active, head.yRot, -0.58F * lookBack + (0.15F - 0.43F * KatanaMotion.wipePosition(t)) * free);
+        head.xRot = Mth.lerp(active, head.xRot, 0.12F + 0.27F * free);
+        head.zRot -= 0.07F * active;
+        torso.xRot += 0.10F * free;
+        legL.xRot -= 0.15F * active;
+        shinL.xRot += 0.15F * active;
+        ponytail.zRot -= 0.10F * lookBack * hairSide;
+    }
+
+    /** 刀を抜いて構える（k: 0〜1）: 右手で柄を握り、刀を体の右前へ低く向ける（下段寄りの中段）。左手は柄頭の側へ添える。 */
+    private void katanaGuard(float k) {
+        armR.xRot = Mth.lerp(k, armR.xRot, -0.55F);
+        armR.yRot = Mth.lerp(k, armR.yRot, -0.15F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.1F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.55F);
+        katanaGrip.xRot = Mth.lerp(k, katanaGrip.xRot, 0.04F);
+        katanaGrip.zRot = Mth.lerp(k, katanaGrip.zRot, 0.72F);
+        armL.xRot = Mth.lerp(k, armL.xRot, -0.75F);
+        armL.yRot = Mth.lerp(k, armL.yRot, 0.55F);
+        armL.zRot = Mth.lerp(k, armL.zRot, 0.15F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.8F);
+        legL.xRot = Mth.lerp(k * 0.5F, legL.xRot, -0.25F);
+        legR.xRot = Mth.lerp(k * 0.5F, legR.xRot, 0.2F);
+        hips.y += 0.4F * k;
+    }
+
+    /** 左腰へ身を寄せ、右肩を柄に近づける。柄を引く腕の角度は鞘引き後の位置で決める。 */
+    private void reachHip(float k) {
+        armL.xRot = Mth.lerp(k, armL.xRot, -0.35F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.55F);
+        torso.yRot -= 0.57F * k;
+        torso.xRot += 0.18F * k;
+        torso.zRot += 0.14F * k;
+        head.xRot -= 0.08F * k;
+        head.zRot -= 0.12F * k;
+    }
+
+    /** 抜刀: 右手で左の腰の柄を握り、鞘から引き抜きざまに右前へ払って（抜き付け）、前へ構える。 */
+    private void katanaDraw(float t) {
+        float free = KatanaMotion.handBlend(KatanaAndroid.STATE_DRAW, t, false, false);
+        reachHip(ease(t / 2) * (1 - free));
+        katanaGuard(free);
+        float swing = free * (1 - ease((t - 8) / (KatanaAndroid.DRAW - 8)));
+        armR.yRot += 0.65F * swing;
+        armR.zRot += 0.55F * swing;
+        ponytail.zRot -= 0.3F * swing * hairSide;
+    }
+
+    /** 納刀: 刀を体の前で左の腰へ回し、鯉口へ差し込んで手を離す。 */
+    private void katanaSheathe(float t) {
+        float free = KatanaMotion.handBlend(KatanaAndroid.STATE_SHEATHE, t, false, true);
+        float release = ease((t - KatanaAndroid.SHEATHE_SEAT) / (KatanaAndroid.SHEATHE - KatanaAndroid.SHEATHE_SEAT));
+        katanaGuard(free);
+        reachHip((1 - free) * (1 - release));
+    }
+
+    /** 袈裟斬り: 刀を右上へ振りかぶり、左下へ斜めに斬り下ろす。左足を踏み込む。 */
+    private void katanaCut(float t) {
+        float raise = ease(t / 2);
+        float u = easeOut((t - 1.5F) / 2.5F);
+        float k = 1 - ease((t - 5) / 3);
+        armR.xRot = Mth.lerp(k, armR.xRot, Mth.lerp(u, Mth.lerp(raise, -0.55F, -2.7F), -0.45F));
+        armR.yRot = Mth.lerp(k, armR.yRot, Mth.lerp(u, 0.35F, -0.85F));
+        armR.zRot = Mth.lerp(k, armR.zRot, Mth.lerp(u, 0.55F, -0.15F));
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, Mth.lerp(u, -0.7F, -0.15F));
+        armL.xRot = Mth.lerp(k, armL.xRot, Mth.lerp(u, -2.3F, -0.6F));
+        armL.yRot = Mth.lerp(k, armL.yRot, Mth.lerp(u, 0.25F, 0.7F));
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.6F);
+        torso.yRot += Mth.lerp(u, 0.35F, -0.45F) * k;
+        torso.xRot += 0.2F * u * k;
+        hips.y += 1.0F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.6F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 0.55F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.45F);
+        shinR.xRot = Mth.lerp(k, shinR.xRot, 0.3F);
+        ponytail.zRot -= 0.45F * u * k * hairSide;
+        skirtTail.zRot += 0.35F * u * k;
+    }
+
+    /** 返し斬り: 袈裟斬りで振り下ろした左下から、右上へ斬り上げる。 */
+    private void katanaReturnCut(float t) {
+        float u = easeOut(t / 3);
+        float k = 1 - ease((t - 4) / 4);
+        armR.xRot = Mth.lerp(k, armR.xRot, Mth.lerp(u, -0.45F, -2.35F));
+        armR.yRot = Mth.lerp(k, armR.yRot, Mth.lerp(u, -0.85F, 0.55F));
+        armR.zRot = Mth.lerp(k, armR.zRot, Mth.lerp(u, -0.15F, 0.6F));
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, Mth.lerp(u, -0.15F, -0.35F));
+        armL.xRot = Mth.lerp(k, armL.xRot, -0.5F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -0.55F);
+        torso.yRot += Mth.lerp(u, -0.45F, 0.4F) * k;
+        torso.xRot -= 0.12F * u * k;
+        hips.y += 0.8F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.5F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.4F);
+        ponytail.zRot += 0.45F * u * k * hairSide;
+        skirtTail.zRot -= 0.3F * u * k;
+    }
+
+    /** 踏み込み斬り: 低く前へ飛び込み（刀は後ろへ流す）、間合いに入ると横一文字に振り抜く。 */
+    private void katanaStep(float t) {
+        if (t < 3) {
+            float k = ease(t / 1.5F);
+            hips.y += 1.8F * k;
+            torso.xRot += 0.6F * k;
+            head.xRot -= 0.45F * k;
+            legL.xRot = -0.95F * k;
+            shinL.xRot = 0.6F * k;
+            legR.xRot = 0.85F * k;
+            shinR.xRot = 0.8F * k;
+            armR.xRot = Mth.lerp(k, armR.xRot, 1.1F);
+            armR.zRot = Mth.lerp(k, armR.zRot, 0.55F);
+            forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.2F);
+            armL.xRot = Mth.lerp(k, armL.xRot, -0.6F);
+            backHair.xRot += 0.7F * k;
+            ponytail.xRot += 0.9F * k;
+            skirtBack.xRot += 0.6F * k;
+            return;
+        }
+        slash(t - 3, 2, 1F);
+    }
+
+    /**
+     * 居合の構え（二刀）: 右手の刀を低く右後ろへ流し（脇構え）、左手は左肩の上の背中の紅い刀の柄を握って、深く腰を落として前へ身を沈める。
+     * 光が満ちるにつれて、髪とスカートが下から吹き上がるように浮き、体が小さく震える。
+     */
+    private void iaiStance(float t, float age) {
+        iaiCoil(ease(t / 6), Mth.clamp((t - 3) / (KatanaAndroid.IAI_STANCE - 3F), 0, 1), age);
+    }
+
+    private void iaiCoil(float k, float c, float age) {
+        float tremble = Mth.sin(age * 2.6F) * 0.018F * c;
+        wakigamae(k);
+        head.zRot += 0.06F * k;
+        hips.y += 2.6F * k;
+        torso.xRot += 0.42F * k + tremble;
+        torso.yRot += 0.3F * k;
+        head.xRot -= 0.4F * k;
+        head.yRot -= 0.25F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.95F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 1.15F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.6F);
+        shinR.xRot = Mth.lerp(k, shinR.xRot, 0.95F);
+        updraft(c, age);
+    }
+
+    /** 右手の刀を低く右後ろへ流す（脇構え。切っ先は後ろ下）。 */
+    private void wakigamae(float k) {
+        armR.xRot = Mth.lerp(k, armR.xRot, 0.75F);
+        armR.yRot = Mth.lerp(k, armR.yRot, 0.2F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.5F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.35F);
+    }
+
+    /** 体に光が満ちる間、髪とスカートが下から吹き上がるように浮いて揺れる（c: 0〜1）。 */
+    private void updraft(float c, float age) {
+        if (c <= 0) {
+            return;
+        }
+        float sway = Mth.sin(age * 0.5F) * 0.06F * c;
+        backHair.xRot += 0.45F * c + sway;
+        ponytail.xRot += 0.7F * c + sway;
+        ponytail.zRot -= 0.2F * c * hairSide;
+        sideLockL.xRot -= 0.35F * c;
+        sideLockR.xRot -= 0.35F * c;
+        sideLockL.zRot -= (0.2F * c + sway) * hairSide;
+        sideLockR.zRot += (0.2F * c - sway) * hairSide;
+        skirtFront.xRot -= 0.35F * c;
+        skirtBack.xRot += 0.35F * c;
+        skirtLeft.zRot -= 0.3F * c;
+        skirtRight.zRot += 0.3F * c;
+        skirtTail.xRot += 0.5F * c + sway;
+        ahoge.xRot -= 0.25F * c;
+    }
+
+    /**
+     * 駆け抜け（二刀）: 右手の刀を右後ろから左前へ横一文字に、左手で背中の紅い刀を抜きざまに左上から右下へ斬り下ろし、
+     * 二刀を体の前で交差させた姿勢のまま、深く前へ傾いて走り抜ける。髪とスカートは後ろへ流れる。
+     */
+    private void iaiFlash(float t, float age) {
+        float sweep = KatanaMotion.handBlend(KatanaAndroid.STATE_IAI_FLASH, t, true, true);
+        iaiCoil(1 - sweep, 1 - sweep, age);
+        iaiCross(sweep);
+    }
+
+    /** 駆け抜けの終点と残心の始点を同じ姿勢にする。赤と銀の切っ先は体の前で交差する。 */
+    private void iaiCross(float k) {
+        hips.y += 1.8F * k;
+        torso.xRot += 0.55F * k;
+        torso.yRot -= 0.2F * k;
+        head.xRot -= 0.45F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -1.05F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 0.55F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.95F);
+        shinR.xRot = Mth.lerp(k, shinR.xRot, 0.9F);
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.35F);
+        armR.yRot = Mth.lerp(k, armR.yRot, -1.2F);
+        armR.zRot = Mth.lerp(k, armR.zRot, -0.1F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.05F);
+        katanaGrip.xRot = Mth.lerp(k, katanaGrip.xRot, -0.13F);
+        katanaGrip.zRot = Mth.lerp(k, katanaGrip.zRot, 0.16F);
+        armL.xRot = Mth.lerp(k, armL.xRot, -0.95F);
+        armL.yRot = Mth.lerp(k, armL.yRot, 0.95F);
+        armL.zRot = Mth.lerp(k, armL.zRot, 0.35F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.1F);
+        katanaGripL.xRot = Mth.lerp(k, katanaGripL.xRot, 0.265F);
+        backHair.xRot += 0.95F * k;
+        ponytail.xRot += 1.2F * k;
+        sideLockL.xRot += 0.6F * k;
+        sideLockR.xRot += 0.6F * k;
+        skirtBack.xRot += 0.85F * k;
+        skirtTail.xRot += 0.95F * k;
+        skirtLeft.zRot -= 0.25F * k;
+        skirtRight.zRot += 0.25F * k;
+    }
+
+    /** 残心。遅れて斬撃が走るまで血振りの姿勢を保ち、勝敗が決まったところで納刀か刀礼へ移る。 */
+    private void zanshin(float t, float age) {
+        float flick = ease((t - 3) / 4);
+        float free = KatanaMotion.handBlend(KatanaAndroid.STATE_IAI_ZANSHIN, t, true, true);
+        float show = flick * free;
+        iaiCross(1 - flick);
+        katanaGuard(1 - free);
+        presentCrimson(show, 0, 0);
+        finishSlash(show, flick * (1 - ease((t - KatanaAndroid.IAI_RELEASE) / 6)), age);
+    }
+
+    private void finishSlash(float show, float wind, float age) {
+        // 足を止めた残心では刃先を静止させる。撃破結果の同期待ちでも、呼吸で刀がぶれない。
+        torso.xRot *= 1 - show;
+        armR.xRot = Mth.lerp(show, armR.xRot, 0.25F);
+        armR.zRot = Mth.lerp(show, armR.zRot, 0.65F);
+        forearmR.xRot = Mth.lerp(show, forearmR.xRot, -0.25F);
+        head.yRot += 0.22F * show;
+        head.xRot += 0.12F * wind;
+        updraft(0.35F * wind, age);
+    }
+
+    /** 血振りで張った左腕を引き寄せ、紅刀の切っ先を左肩の外で高く掲げる。 */
+    private void presentCrimson(float weight, float lift, float dip) {
+        armL.xRot = Mth.lerp(weight, armL.xRot, -0.55F - 0.14F * lift + 0.12F * dip);
+        armL.yRot = Mth.lerp(weight, armL.yRot, 0.08F - 0.46F * lift);
+        armL.zRot = Mth.lerp(weight, armL.zRot, -1.10F - 0.34F * lift + 0.12F * dip);
+        forearmL.xRot = Mth.lerp(weight, forearmL.xRot, -0.65F - 0.55F * lift);
+        katanaGripL.xRot = Mth.lerp(weight, katanaGripL.xRot, 0.50F - 0.15F * lift);
+        katanaGripL.zRot = Mth.lerp(weight, katanaGripL.zRot, -1.27F + 0.04F * lift + 0.60F * dip);
+    }
+
+    /** 左手だけの軌道。途中で右手が次の相手を斬るときも、鞘を合わせる直前まで同じ紅刀を握る。 */
+    void iaiVictoryBlade(float t) {
+        if (t >= KatanaAndroid.IAI_VICTORY_GUIDE) {
+            return; // 切っ先が鯉口に着いてからは鞘と腕の拘束だけで納める。
+        }
+        float dip = ease(t / 4) * (1 - ease((t - 4) / 7));
+        // 状態間の補間には前のフレームのIK適用済みの腕が残る。元の自由な腕を再現してから一度だけ鞘へ寄せる。
+        forearmL.yRot = 0;
+        forearmL.zRot = 0;
+        katanaGripL.yRot = 0;
+        presentCrimson(1, ease((t - 4) / 9), dip);
+    }
+
+    private void iaiVictory(float t, float age) {
+        float free = KatanaMotion.handBlend(KatanaAndroid.STATE_IAI_VICTORY, t, true, true);
+        katanaGuard(1 - free);
+        finishSlash(free, 1 - ease(t / 12), age);
+        float lift = ease((t - 4) / 9) * (1 - ease((t - KatanaAndroid.IAI_VICTORY_SEAT)
+                / (KatanaAndroid.IAI_VICTORY - KatanaAndroid.IAI_VICTORY_SEAT)));
+        float bow = ease((t - 13) / 5) * (1 - ease((t - KatanaAndroid.IAI_VICTORY_RETURN) / 6));
+        torso.yRot -= 0.20F * lift;
+        torso.xRot += 0.13F * bow;
+        head.xRot = Mth.lerp(bow, head.xRot, 0.27F);
+        head.yRot = Mth.lerp(lift, head.yRot, -0.14F);
+        armR.xRot = Mth.lerp(lift, armR.xRot, 0.12F);
+        armR.zRot = Mth.lerp(lift, armR.zRot, 0.39F);
+        katanaGrip.xRot = Mth.lerp(lift, katanaGrip.xRot, -0.28F);
+        katanaGrip.zRot = Mth.lerp(lift, katanaGrip.zRot, 1.06F);
+        legL.xRot = Mth.lerp(lift, legL.xRot, -0.22F);
+        legR.xRot = Mth.lerp(lift, legR.xRot, 0.16F);
+        ponytail.xRot -= 0.16F * bow;
+    }
+
+    /** 刀礼。右の打刀を脇に下げ、左肩に半分だけ抜いた紅刀を掲げて一礼する。 */
+    private void victorySalute(float t) {
+        katanaGuard(1);
+        float open = ease(t / KatanaAndroid.VICTORY_RAISE) * (1 - ease((t - KatanaAndroid.VICTORY_SEAT)
+                / (KatanaAndroid.VICTORY - KatanaAndroid.VICTORY_SEAT)));
+        float bow = ease((t - KatanaAndroid.VICTORY_RAISE) / 5) * (1 - ease((t - KatanaAndroid.VICTORY_RETURN) / 8));
+        torso.yRot -= 0.36F * open;
+        torso.xRot += 0.35F * bow;
+        head.yRot = Mth.lerp(open, head.yRot, 0.22F);
+        head.xRot = Mth.lerp(bow, head.xRot, 0.40F);
+        head.zRot *= 1 - open;
+        armR.xRot = Mth.lerp(open, armR.xRot, -0.26F);
+        armR.zRot = Mth.lerp(open, armR.zRot, 0.28F);
+        forearmR.xRot = Mth.lerp(open, forearmR.xRot, -0.32F);
+        katanaGrip.zRot = Mth.lerp(open, katanaGrip.zRot, 1.10F);
+        legL.xRot = Mth.lerp(open, legL.xRot, -0.15F);
+        legR.xRot = Mth.lerp(open, legR.xRot, 0.12F);
+        ponytail.xRot -= 0.22F * bow;
+        sideLockL.xRot -= 0.18F * bow;
+        sideLockR.xRot -= 0.18F * bow;
     }
 }

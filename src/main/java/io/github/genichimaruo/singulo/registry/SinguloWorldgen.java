@@ -19,6 +19,10 @@ public final class SinguloWorldgen {
     public static final DeferredHolder<StructurePieceType, StructurePieceType> METEOR_CRATER_PIECE =
             PIECES.register("meteor_crater", () -> MeteorCraterPiece::new);
 
+    /** 地下の遺構: 中の構造物（jigsaw）を、近くの古代都市・試練の間・ほかの遺構を避けて置く。 */
+    public static final DeferredHolder<StructureType<?>, StructureType<io.github.genichimaruo.singulo.ruin.AvoidingStructure>> AVOIDING =
+            STRUCTURE_TYPES.register("avoiding", () -> () -> io.github.genichimaruo.singulo.ruin.AvoidingStructure.CODEC);
+
     /** 地下アンドロイド研究所（部屋の型紙をランダムに並べる）と、その部品。 */
     public static final DeferredHolder<StructureType<?>, StructureType<io.github.genichimaruo.singulo.ruin.lab.LabStructure>> ANDROID_LAB =
             STRUCTURE_TYPES.register("android_lab", () -> () -> io.github.genichimaruo.singulo.ruin.lab.LabStructure.CODEC);
