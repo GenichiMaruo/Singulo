@@ -11,7 +11,7 @@ import zipfile
 from check_gametests import check, inventory, DEFAULT_NAMESPACES
 
 # 26.1.2 is NeoForge-only, without Mekanism integration.
-COUNTS = {'neoforge': 962}
+COUNTS = {'neoforge': 997}
 
 
 def validate(root, loader, name=None, source=None):

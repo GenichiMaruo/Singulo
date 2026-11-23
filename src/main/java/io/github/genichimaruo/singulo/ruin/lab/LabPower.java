@@ -42,7 +42,7 @@ public final class LabPower {
                 t = s.setValue(VendingMachineBlock.POWERED, true);          // 自販機が動き出す（エメラルドで買える）
             } else if (s.getBlock() instanceof RayleighPanelBlock panel && panel.lab()) {
                 t = s.setValue(RayleighPanelBlock.LIT, true);              // 天井に青空が映る
-            } else if (s.getBlock() instanceof BulkheadBlock) {
+            } else if (s.getBlock() instanceof BulkheadBlock && !s.getValue(BulkheadBlock.WIRED)) {
                 t = s.setValue(BulkheadBlock.OPEN, true);
             }
             if (t != s) {

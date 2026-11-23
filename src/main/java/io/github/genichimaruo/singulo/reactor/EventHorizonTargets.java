@@ -16,6 +16,7 @@ public final class EventHorizonTargets {
     public static boolean edibleBlock(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
                                       net.minecraft.world.level.block.state.BlockState state, boolean fluids) {
         return !state.isAir() && (fluids || state.getFluidState().isEmpty()) && state.getDestroySpeed(level, pos) >= 0
+                && !io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock.isSealed(state)
                 && level.getBlockEntity(pos) == null;
     }
 

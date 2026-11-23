@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "singulo:block/operator_desk"
+    },
+    "facing=east": {
+      "model": "singulo:block/operator_desk",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "singulo:block/operator_desk",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "singulo:block/operator_desk",
+      "y": 270
+    }
+  }
+}

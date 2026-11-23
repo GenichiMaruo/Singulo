@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
  * <p>
  * 隠しボス: 終焉の記録を手に持って使うと、最後の記録者が目覚める（{@link #activateArchivist}）。
  */
-public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity {
+public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compat.LegacyBlockEntity implements IntrusionAlarm.Host {
     public static final int VAULT_SEARCH_RADIUS = 12;
     public static final int MESSAGE_RADIUS = 32;
 
@@ -34,6 +34,8 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
     private UUID archivist;
     /** 重力異常点が縮み始めた・戻り始めたゲーム時刻（描画用。0 ならずっと今の状態）。 */
     private long anomalyChangedAt;
+    /** 中継器がそろう前に入り込まれたときの警報。 */
+    private final IntrusionAlarm alarm = new IntrusionAlarm(true);
 
     /** ボスが現れてから、重力異常点が縮んで消えるまでの tick。 */
     public static final int ANOMALY_SHRINK_TICKS = 40;
@@ -42,6 +44,54 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
 
     public SealConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.SEAL_CONSOLE.get(), pos, state);
+    }
+
+    void serverTick(ServerLevel level) {
+        alarm.tick(level, worldPosition, this);
+    }
+
+    public IntrusionAlarm alarm() {
+        return alarm;
+    }
+
+    /** 排除モードの守護機（報酬なし、体力 {@link IntrusionAlarm#HEALTH_MULTIPLIER} 倍）を起こす。 */
+    @Override
+    @Nullable
+    public HorizonWarden spawnIntruderGuard(ServerLevel level) {
+        if (!RuinGuards.canSummon(level, null) || activeWarden(level) != null || activeArchivist(level) != null) return null;
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level, net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
+        if (w == null) {
+            return null;
+        }
+        BlockPos spawn = worldPosition.above();
+        w.snapTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.awaken(worldPosition, worldPosition);
+        w.makeIntruderGuard();
+        w.startEmerging();
+        if (!level.addFreshEntity(w)) return null;
+        warden = w.getUUID();
+        anomalyChanged();
+        return w;
+    }
+
+    @Override
+    public void dismissIntruderGuard(ServerLevel level) {
+        HorizonWarden w = activeWarden(level);
+        if (w != null && !w.intruderGuard()) {
+            return;                                   // 中継器がそろってから起こした本来の守護機はそのまま
+        }
+        if (w != null) {
+            w.discard();
+        }
+        if (warden != null) {
+            warden = null;
+            anomalyChanged();
+        }
+    }
+
+    @Override
+    public void alarmChanged() {
+        setChanged();
     }
 
     /** 近くの、守護機に守られた保管庫。 */
@@ -73,6 +123,7 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
 
     private boolean canActivate(ServerLevel level, @Nullable ServerPlayer player) {
         if (!RuinGuards.canSummon(level, player)) return false;
+        if (RuinRelayBlockEntity.refuseWhileLocked(level, worldPosition, player)) return false;
         if (activeWarden(level) != null || activeArchivist(level) != null) {
             tell(player, "gui.singulo.console.active");
             return false;
@@ -276,6 +327,7 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
             tag.store("archivist", net.minecraft.core.UUIDUtil.CODEC, archivist);
         }
         tag.putLong("anomaly_changed", anomalyChangedAt);
+        alarm.save(tag);
     }
 
     @Override
@@ -284,5 +336,6 @@ public class SealConsoleBlockEntity extends io.github.genichimaruo.singulo.compa
         warden = tag.read("warden", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("warden", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         archivist = tag.read("archivist", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("archivist", net.minecraft.core.UUIDUtil.CODEC).orElseThrow() : null;
         anomalyChangedAt = tag.getLongOr("anomaly_changed", 0L);
+        alarm.load(tag);
     }
 }

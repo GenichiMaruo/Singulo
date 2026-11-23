@@ -54,6 +54,10 @@ public final class RuinSelfCheck {
                 Singulo.LOGGER.error("[ruin-check] {}: reactor console or guardian core has no facility box", ruin);
             } else {
                 ok++;
+                int plants = cavePlants(level, pos, holder.value());
+                if (plants > 0) {
+                    Singulo.LOGGER.warn("[ruin-check] {}: {} cave plants grow on the facility", ruin, plants);
+                }
                 Singulo.LOGGER.info("[ruin-check] {}: OK, located at {}, cache at {} ({} blocks from origin){}",
                         ruin, pos, cachePos, (int) Math.sqrt(cachePos.distSqr(BlockPos.ZERO)),
                         "final_lab".equals(ruin) ? ", vault sealed, seal console present"
@@ -62,6 +66,32 @@ public final class RuinSelfCheck {
         }
         Singulo.LOGGER.info("[ruin-check] {}/{} ruins generated with a cache", ok, RUINS.length);
         server.halt(false);
+    }
+
+    /** 遺構の範囲で、遺構のブロックに接して生えた洞窟の植物（ツタ・グロウベリー・ヒカリゴケ・胞子の花・垂れ根）の数。 */
+    private static int cavePlants(ServerLevel level, BlockPos found, Structure structure) {
+        var start = level.structureManager().getStructureWithPieceAt(found, structure);
+        var box = start.isValid() ? start.getBoundingBox() : null;
+        if (box == null) {
+            return 0;
+        }
+        int plants = 0;
+        for (BlockPos p : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+            var s = level.getBlockState(p);
+            if (!(s.is(net.minecraft.world.level.block.Blocks.CAVE_VINES) || s.is(net.minecraft.world.level.block.Blocks.CAVE_VINES_PLANT)
+                    || s.is(net.minecraft.world.level.block.Blocks.VINE) || s.is(net.minecraft.world.level.block.Blocks.GLOW_LICHEN)
+                    || s.is(net.minecraft.world.level.block.Blocks.SPORE_BLOSSOM) || s.is(net.minecraft.world.level.block.Blocks.HANGING_ROOTS))) {
+                continue;
+            }
+            for (net.minecraft.core.Direction d : net.minecraft.core.Direction.values()) {
+                if (net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(level.getBlockState(p.relative(d)).getBlock()).getNamespace()
+                        .equals(Singulo.MODID)) {
+                    plants++;
+                    break;
+                }
+            }
+        }
+        return plants;
     }
 
     /** 研究所: 動力炉の制御盤と封印核に、施設の範囲が書き込まれているか（主立坑から ±5 チャンク）。 */
@@ -110,7 +140,9 @@ public final class RuinSelfCheck {
     private static BlockPos findCache(ServerLevel level, BlockPos center, String ruin) {
         int cx = center.getX() >> 4;
         int cz = center.getZ() >> 4;
-        int r = "android_lab".equals(ruin) ? 5 : 3;      // 研究所は主立坑から最大4チャンクほど離れて広がる
+        // 研究所は主立坑から最大4チャンクほど離れて広がる。研究棟・培養施設は幅50ブロックほどで、向きによって保管庫が
+        // 見つかった位置から4チャンク近く離れる。前室のある最終実験施設・沈んだ炉心区画は100ブロックほどの広さ
+        int r = "final_lab".equals(ruin) || "sunken_reactor".equals(ruin) ? 7 : "observation_post".equals(ruin) ? 3 : 5;
         for (int dx = -r; dx <= r; dx++) {
             for (int dz = -r; dz <= r; dz++) {
                 LevelChunk chunk = level.getChunk(cx + dx, cz + dz);

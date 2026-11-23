@@ -17,3 +17,4 @@ Start with [docs/README.md](docs/README.md) and [docs/development/README.md](doc
 - [0.17.0 fluid logistics and Collapsar equipment](docs/0.17.0/README.md).
 - [0.18.0 android decorations](docs/0.18.0/README.md).
 - [0.21.0 machine status, factory monitor and galaxy traits](docs/0.21.0/README.md).
+- [0.22.0 katana android](docs/0.22.0/README.md).

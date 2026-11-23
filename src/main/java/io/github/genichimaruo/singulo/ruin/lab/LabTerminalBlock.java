@@ -26,6 +26,8 @@ public class LabTerminalBlock extends HorizontalDirectionalBlock {
     public static final MapCodec<LabTerminalBlock> CODEC = simpleCodec(LabTerminalBlock::new);
     /** 記録の数（lab.singulo.log.N）。 */
     public static final int LOGS = 12;
+    /** 遺構の前室の記録の数（lab.singulo.log.12〜15）。 */
+    public static final int RUIN_LOGS = 4;
     public static final IntegerProperty LOG = IntegerProperty.create("log", 0, 15);
 
     public LabTerminalBlock(Properties properties) {
@@ -50,7 +52,8 @@ public class LabTerminalBlock extends HorizontalDirectionalBlock {
 
     /** 記録の題と本文（チャット欄に出す）。 */
     public static Component[] lines(int log) {
-        int n = Math.floorMod(log, LOGS);
+        // 12〜15 は最終実験施設・沈んだ炉心区画の前室の端末（研究所の部屋には置かない）
+        int n = log >= LOGS && log < LOGS + RUIN_LOGS ? log : Math.floorMod(log, LOGS);
         return new Component[] {Component.translatable("lab.singulo.log." + n + ".title").withStyle(ChatFormatting.GOLD),
                 Component.translatable("lab.singulo.log." + n).withStyle(ChatFormatting.GRAY)};
     }

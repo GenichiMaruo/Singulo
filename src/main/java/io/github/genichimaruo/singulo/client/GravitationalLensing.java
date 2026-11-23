@@ -45,11 +45,10 @@ import org.joml.Vector4f;
  * lensingWithShaderPacks が false なら、シェーダーパック使用時は掛けない。
  */
 public final class GravitationalLensing {
-    /**
-     * region は歪みが及ぶ球の半径（ブロック）。この球を通る光だけが曲がり、球より手前のものは歪まない。
-     * horizon が false なら黒い中心とアインシュタインリングを出さない（景色を歪めるだけ。手に持った杖の先など）。
-     */
-    private record Source(Vec3 pos, float radius, float strength, float region, boolean horizon, Disk disk) {}
+    private enum LensType { BLACK_HOLE, DISTORTION, REMNANT }
+
+    /** region は歪みが及ぶ半径。REMNANT の radius はワールドに描いた黒い核の半径。 */
+    private record Source(Vec3 pos, float radius, float strength, float region, LensType type, Disk disk) {}
 
     /**
      * シェーダーで光の経路をたどって描く降着円盤。normal はワールドでの面の向き、beaming はドップラーで明るさが変わる幅。
@@ -102,7 +101,7 @@ public final class GravitationalLensing {
 
     /** region: 歪みが及ぶ球の半径（ブロック）。リアクターなら内側の空洞に収める。 */
     public static void add(Vec3 pos, float radius, float strength, float region) {
-        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true, null));
+        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), LensType.BLACK_HOLE, null));
     }
 
     /**
@@ -116,14 +115,21 @@ public final class GravitationalLensing {
         if (shader == null || !enabled() || shaderPackInUse()) {
             return false;
         }
-        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), true,
+        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), LensType.BLACK_HOLE,
                 new Disk(diskNormal.normalize(), inner, outer, beaming, brightness, swirl)));
         return true;
     }
 
     /** 景色を少し歪めるだけのレンズ（黒い中心・リングなし）。 */
     public static void addDistortion(Vec3 pos, float radius, float strength, float region) {
-        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), false, null));
+        SOURCES.add(new Source(pos, radius, strength, Math.max(region, radius * 1.2F), LensType.DISTORTION, null));
+    }
+
+    static void addRemnant(Vec3 pos, float core, float strength, float region) {
+        // 外部シェーダーの合成後は深度がない。手前の機体にも掛かる画面効果は避け、ワールドの核と降着環を使う。
+        if (!shaderPackInUse()) {
+            SOURCES.add(new Source(pos, core, strength, region, LensType.REMNANT, null));
+        }
     }
 
     /** 杖の先の球の見かけの半径に対する、歪みの大きさと範囲。 */
@@ -360,7 +366,7 @@ public final class GravitationalLensing {
             float[] lens;
             float[] sphere;
             float[] disk = NO_DISK;
-            if (s.horizon) {
+            if (s.type == LensType.BLACK_HOLE) {
                 float horizon = s.radius / EINSTEIN_PER_HORIZON;
                 float shadow = shadowRadius(horizon, s.region);
                 // 背景までの距離の比 D_ls / D_s。背景はカメラからブラックホールまでと同じくらい（球の中から見るなら
@@ -377,6 +383,9 @@ public final class GravitationalLensing {
                             nv.x, nv.y, nv.z, s.disk.inner, s.disk.outer, s.disk.beaming * s.strength, s.disk.brightness, s.disk.swirl};
                 }
                 lens = new float[]{x, y, Math.min(shadow * uvPerBlock, 0.5F), s.strength};
+            } else if (s.type == LensType.REMNANT) {
+                sphere = new float[]{v.w, s.radius, reach, -1};
+                lens = new float[]{x, y, r, s.strength};
             } else {
                 // 歪みだけ: 手前の面はアインシュタイン半径の 0.45 倍（従来どおり）
                 sphere = new float[]{v.w, s.radius * 0.4545F, reach, 0};

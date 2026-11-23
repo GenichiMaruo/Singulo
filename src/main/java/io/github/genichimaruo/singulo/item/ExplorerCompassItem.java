@@ -12,6 +12,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -24,7 +26,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.LodestoneTracker;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /**
  * 探索コンパス（段階1）。探す遺構を選んで右クリックすると、いちばん近いその遺構を探し、針がそちらを向く（距離も出る）。
@@ -157,14 +163,54 @@ public class ExplorerCompassItem extends SinguloItem {
                     Component.translatable("ruin.singulo." + rid)));
             return io.github.genichimaruo.singulo.compat.Interactions.fail(stack);
         }
-        // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す
-        BlockPos p = rid.equals(BRANCH) ? found.getFirst() : center(server, found.getFirst(), holder.get().value());
+        // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す。前室のある遺構は入口の真上を指す
+        BlockPos p = rid.equals(BRANCH) ? found.getFirst() : ENTRANCES.containsKey(rid)
+                ? entrance(server, found.getFirst(), holder.get().value(), rid)
+                : center(server, found.getFirst(), holder.get().value());
         stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), p)), false));
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(p.getX(), player.getBlockY(), p.getZ())));
         player.sendOverlayMessage(Component.translatable("compass.singulo.found",
                 Component.translatable("ruin.singulo." + rid), dist));
         level.playSound(null, player.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 1.0F);
         return io.github.genichimaruo.singulo.compat.Interactions.success(stack);
+    }
+
+    /**
+     * 前室のある遺構の入口（構造物の型紙の中の位置。tools/ruins.py の FL_ENTRANCE・SR_ENTRANCE と同じ）。
+     * 最終実験施設は西の連絡坑道の、岩に埋もれた端。沈んだ炉心区画は、崩れた昇降機の立坑の上の端。
+     */
+    static final java.util.Map<String, BlockPos> ENTRANCES = java.util.Map.of(
+            "final_lab", new BlockPos(0, 6, 65),
+            "sunken_reactor", new BlockPos(48, 35, 82));
+
+    /**
+     * 見つかった遺構の入口の真上（地面の高さはそのまま）。構造物の始まりの型紙の位置と向きから、型紙の中の入口の位置を
+     * 実際の位置に直す（読めなければ建物全体の中心）。
+     */
+    static BlockPos entrance(ServerLevel server, BlockPos found, Structure structure, String ruinId) {
+        net.minecraft.world.level.ChunkPos cp = net.minecraft.world.level.ChunkPos.containing(found);
+        var start = server.getChunk(cp.x(), cp.z(), net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
+                .getStartForStructure(structure);
+        if (start == null || !start.isValid() || start.getPieces().isEmpty()
+                || !(start.getPieces().getFirst() instanceof PoolElementStructurePiece piece)) {
+            return center(server, found, structure);
+        }
+        return antechamberEntrance(server, piece, found, ruinId)
+                .orElseGet(() -> center(server, found, structure));
+    }
+
+    static Optional<BlockPos> antechamberEntrance(ServerLevel server, PoolElementStructurePiece piece, BlockPos found, String ruinId) {
+        // Jigsaw pieces persist their template ID, even when the active start pool changes.
+        // A legacy piece or a data pack's different piece has no 0.22 entrance to target.
+        boolean expanded = StructurePoolElement.CODEC.encodeStart(server.registryAccess().createSerializationContext(NbtOps.INSTANCE), piece.getElement())
+                .result().filter(CompoundTag.class::isInstance).map(CompoundTag.class::cast)
+                .map(tag -> tag.getStringOr("location", "").equals(Singulo.id("ruins/" + ruinId + "_antechamber").toString()))
+                .orElse(false);
+        if (!expanded || !ENTRANCES.containsKey(ruinId)) return Optional.empty();
+        BlockPos at = piece.getPosition().offset(StructureTemplate.transform(
+                ENTRANCES.get(ruinId), Mirror.NONE, piece.getRotation(), BlockPos.ZERO));
+        if (!piece.getBoundingBox().isInside(at)) return Optional.empty();
+        return Optional.of(new BlockPos(at.getX(), found.getY(), at.getZ()));
     }
 
     /**
