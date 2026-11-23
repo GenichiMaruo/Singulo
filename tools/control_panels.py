@@ -129,9 +129,14 @@ def models(write, assets):
     deck = element([0, 11, 1], [16, 13, 15], 'cabinet')
     deck['rotation'] = {'origin':[8,12,8], 'axis':'x','angle':-22.5}
     deck['faces']['up'] = {'texture':'#switches','uv':[0,0,16,16]}
+    # Partition the chair's cross base so its top and bottom quads do not overlap.
+    chair_north_arm = element([6,0,2],[10,2,6],'steel')
+    chair_south_arm = element([6,0,10],[10,2,14],'steel')
+    del chair_north_arm['faces']['south']
+    del chair_south_arm['faces']['north']
     furniture = {
         'operator_desk':[element([1,0,3],[15,2,15],'steel'), element([1,2,4],[15,12,15],'cabinet'), deck],
-        'operator_chair':[element([2,0,6],[14,2,10],'steel'), element([6,0,2],[10,2,14],'steel'),
+        'operator_chair':[element([2,0,6],[14,2,10],'steel'), chair_north_arm, chair_south_arm,
                           element([6,2,6],[10,7,10],'steel'), element([2,7,2],[14,10,14],'cloth'),
                           element([3,10,12],[13,16,14],'cloth')]}
     for name in ('dial_panel', 'mimic_panel', 'annunciator_panel', *furniture):
