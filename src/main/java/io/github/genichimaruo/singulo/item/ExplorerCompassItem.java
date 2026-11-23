@@ -157,14 +157,41 @@ public class ExplorerCompassItem extends SinguloItem {
                     Component.translatable("ruin.singulo." + rid)), true);
             return InteractionResultHolder.fail(stack);
         }
-        // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す
-        BlockPos p = rid.equals(BRANCH) ? found.getFirst() : center(server, found.getFirst(), holder.get().value());
+        // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す。前室のある遺構は入口の真上を指す
+        BlockPos p = rid.equals(BRANCH) ? found.getFirst() : ENTRANCES.containsKey(rid)
+                ? entrance(server, found.getFirst(), holder.get().value(), ENTRANCES.get(rid))
+                : center(server, found.getFirst(), holder.get().value());
         stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), p)), false));
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(p.getX(), player.getBlockY(), p.getZ())));
         player.displayClientMessage(Component.translatable("compass.singulo.found",
                 Component.translatable("ruin.singulo." + rid), dist), true);
         level.playSound(null, player.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 1.0F);
         return InteractionResultHolder.success(stack);
+    }
+
+    /**
+     * 前室のある遺構の入口（構造物の型紙の中の位置。tools/ruins.py の FL_ENTRANCE・SR_ENTRANCE と同じ）。
+     * 最終実験施設は西の連絡坑道の、岩に埋もれた端。沈んだ炉心区画は、崩れた昇降機の立坑の上の端。
+     */
+    static final java.util.Map<String, BlockPos> ENTRANCES = java.util.Map.of(
+            "final_lab", new BlockPos(0, 6, 65),
+            "sunken_reactor", new BlockPos(48, 35, 82));
+
+    /**
+     * 見つかった遺構の入口の真上（地面の高さはそのまま）。構造物の始まりの型紙の位置と向きから、型紙の中の入口の位置を
+     * 実際の位置に直す（読めなければ建物全体の中心）。
+     */
+    static BlockPos entrance(ServerLevel server, BlockPos found, Structure structure, BlockPos inTemplate) {
+        net.minecraft.world.level.ChunkPos cp = new net.minecraft.world.level.ChunkPos(found);
+        var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
+                .getStartForStructure(structure);
+        if (start == null || !start.isValid() || start.getPieces().isEmpty()
+                || !(start.getPieces().getFirst() instanceof net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece piece)) {
+            return center(server, found, structure);
+        }
+        BlockPos at = piece.getPosition().offset(net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.transform(
+                inTemplate, net.minecraft.world.level.block.Mirror.NONE, piece.getRotation(), BlockPos.ZERO));
+        return new BlockPos(at.getX(), found.getY(), at.getZ());
     }
 
     /**

@@ -781,6 +781,29 @@ UI_LANG = {
     'lab.singulo.log.10.title': ('食堂の掲示', 'Cafeteria Notice'),
     'lab.singulo.log.10': ('今週の献立: 月 カレー／火 麺／水 定食……（下に走り書き）誰か、ロボットに私のプリンを片付けないように言って。三回目。', "This week's menu: Mon curry / Tue noodles / Wed set meal... (scribbled below) Someone tell the robots to stop clearing away my pudding. Third time."),
     'lab.singulo.log.11.title': ('搬出記録', 'Shipping Log'),
+    'lab.singulo.log.12.title': ('点火管制室 運転日誌', 'Ignition Control Log'),
+    'lab.singulo.log.12': ('点火まで残り一日。重力勾配の試験は三回とも合格。時間の場の漏れは許容範囲内だが、東の回廊の職員が「時計が遅れる」と訴えている。'
+                           '万一のときは三つの中継器を落とし、隔壁を閉じて区画ごと封じる。開け直すには、中継器をすべて起こし直すこと。',
+                           'One day to ignition. All three gravity gradient trials passed. Time-field leakage is within tolerance, though staff in the '
+                           'east corridor say their clocks are running slow. If anything goes wrong, we shut down the three relays and seal the section '
+                           'behind the bulkhead. To open it again, every relay must be restarted.'),
+    'lab.singulo.log.13.title': ('搬送三号 点検記録', 'Hauler Three Inspection'),
+    'lab.singulo.log.13': ('搬送三号の脚の油圧が抜けない。止めようとした整備士を荷と見なして押しのけた。走り出したら横へ逃げろ、まっすぐは追ってこない。'
+                           '壁にぶつかると容器の固定が外れて、しばらく動けなくなる。そのあいだに止めること。床を踏み鳴らしたら跳べ。',
+                           "Hauler Three's leg hydraulics will not bleed. It shoved aside the mechanic trying to stop it like a crate in its way. "
+                           'When it starts running, step aside; it cannot turn mid-charge. If it hits a wall, the vessel clamps come loose and it '
+                           'stalls for a while. Stop it then. When it stamps the floor, jump.'),
+    'lab.singulo.log.14.title': ('第二炉 冷却系統の警報', 'Reactor Two Coolant Alarm'),
+    'lab.singulo.log.14': ('炉殻の回転が止まらない。外周の床まで引きずられ、作業員が立っていられない。各区画の制動器を下ろしながら回れ。'
+                           '冷却系統は逆流で水没した。排水弁はポンプ室の底にある。潜れる者だけで行くこと。',
+                           'The hull will not stop spinning. Even the outer ring floor is being dragged along and the crew cannot keep their footing. '
+                           'Pull the brake in each section as you go. The coolant lines flooded on backflow. The drain valve is at the bottom of the '
+                           'pump room. Only those who can swim that far should go.'),
+    'lab.singulo.log.15.title': ('ポンプ室の書き置き', 'Note in the Pump Room'),
+    'lab.singulo.log.15': ('弁は開けられなかった。抽出塔は、落とした物の重さだけエネルギーを返す。炉を止めるには、呑ませる物が足りなかった。'
+                           '誰かがここまで来たなら、弁を開けて水を抜いてほしい。私たちは、もう上へは戻れない。',
+                           'We could not open the valve. The extraction tower gives back energy only for the weight of what it is fed, and we had too '
+                           'little to feed it to stop the reactor. If someone gets this far, open the valve and let the water out. We cannot go back up.'),
     'lab.singulo.log.11': ('最後の搬出。職員の退避を確認。主立坑の崩落は事故ではない。外へ出ようとした個体を止めるため、私たちが崩した。搬入搬出口は内側から溶接した。', 'Final shipment. Staff evacuation confirmed. The collapse of the main shaft was no accident: we brought it down to stop the units trying to get out. The loading dock was welded shut from the inside.'),
     'compass.singulo.target': ('探す遺構: %s', 'Target: %s'),
     'compass.singulo.found': ('%s は %s ブロック先', '%s is %s blocks away'),
@@ -1581,6 +1604,31 @@ UI_LANG = {
     'gui.singulo.boss.party': ('%s ［挑戦者 %s人］', '%s [%s challengers]'),
     'gui.singulo.guardian.active': ('番人はすでに目覚めている', 'The guardian is already awake'),
     'gui.singulo.guardian.peaceful': ('ピースフルでは遺構のボスを呼び出せません', 'Ruin bosses cannot be summoned on Peaceful difficulty'),
+    # 最終実験施設・沈んだ炉心区画の前室（中継器・制動器・中ボス）
+    'gui.singulo.relay.activated': ('中継器を起動した（%s/%s）', 'Relay started (%s/%s)'),
+    'gui.singulo.relay.already': ('この中継器は動いている（%s/%s）', 'This relay is already running (%s/%s)'),
+    'gui.singulo.relay.guarded': ('近くの警備がまだ動いている。倒してから起動しよう', 'Security nearby is still active. Defeat it first'),
+    'gui.singulo.relay.boss': ('守り手を倒すまで、この中継器は起動できない', 'This relay cannot be started until its guardian is defeated'),
+    'gui.singulo.relay.extract': ('抽出 %s/%s。渦の穴に物を落とすと、エネルギーが返ってくる', 'Extraction %s/%s. Drop things into the vortex pit to draw energy back out'),
+    'gui.singulo.relay.drained': ('排水弁が開いた。冷却系統の水が引いていく', 'The drain valve opens. The coolant lines empty'),
+    'gui.singulo.intrusion.alarm': ('侵入を検知した。隔壁を開放する。ただちに退避せよ。排除モードの番人は何も持っていない',
+                                    'Intrusion detected. The bulkhead is released: evacuate now. The purge-mode guardian carries no reward'),
+    'gui.singulo.intrusion.warning': ('警報: ボス部屋から退避せよ', 'ALERT: evacuate the chamber'),
+    'gui.singulo.intrusion.cleared': ('退避を確認した。隔壁を閉鎖し、警報を解除する', 'Evacuation confirmed. The bulkhead seals and the alarm clears'),
+    'entity.singulo.horizon_warden.intruder': ('排除モードのホライズン・ウォーデン', 'Horizon Warden (Purge Mode)'),
+    'entity.singulo.ergosphere_leviathan.intruder': ('排除モードのエルゴ球の大蛇', 'Ergosphere Leviathan (Purge Mode)'),
+    'gui.singulo.relay.open': ('すべての中継器が動き出した。ボス部屋の前の隔壁が開いた', 'Every relay is running. The bulkhead before the boss room opens'),
+    'gui.singulo.relay.locked': ('前室の中継器がまだ止まっている（%s/%s）。すべて起動するまで、番人は目覚めない',
+                                 'Antechamber relays are still offline (%s/%s). The guardian will not wake until every one is running'),
+    'gui.singulo.relay.defeated': ('守り手が止まった。中継器を起動できる', 'The guardian is down. The relay can be started'),
+    'gui.singulo.relay.awakened.containment_hauler': ('搬送機の脚が床を打った。格納庫に入った者を、運ぶ荷と見なしている',
+                                                      "The hauler's legs strike the floor. It takes you for cargo in its way"),
+    'gui.singulo.relay.awakened.hull_repairer': ('炉殻修理機が動き出した。挑戦者を、直すべき破片と見なしている',
+                                                 'The hull repairer starts up. It sees you as a fragment to be fixed'),
+    'gui.singulo.brake.engaged': ('制動器を下ろした。この区画の流れが止まった', 'Brake pulled. The flow in this section stops'),
+    'gui.singulo.brake.already': ('この区画の流れは、もう止まっている', 'The flow in this section has already stopped'),
+    'entity.singulo.containment_hauler': ('封じ込め搬送機', 'Containment Hauler'),
+    'entity.singulo.hull_repairer': ('暴走した炉殻修理機', 'Rogue Hull Repairer'),
     'gui.singulo.guardian.no_vault': ('番人に守られた保管庫が近くにない', 'No guarded vault nearby'),
     'gui.singulo.guardian.wrong_core': ('これは、この遺構の番人の覚醒核ではない', "This is not the awakening core for this ruin's guardian"),
     'gui.singulo.guardian.awakened.gravity_remnant': ('封じ込め槽が砕けた。重力の澱が這い出してきた',
@@ -1922,6 +1970,10 @@ def models():
     blocks_extra5.models(write_json, ASSETS)
     import blocks_extra6
     blocks_extra6.models(write_json, ASSETS)
+    import blocks_extra7
+    blocks_extra7.models(write_json, ASSETS)
+    import control_panels
+    control_panels.models(write_json, ASSETS)
     import lab_blocks
     lab_blocks.models(write_json, ASSETS)
     import genesis_assets
@@ -2097,6 +2149,7 @@ def textures():
     # 警備ドローン（32×32）: 白い胴、正面の帯とレンズを強さの色（1=水色、2=琥珀、3=赤）で光らせる
     te = ASSETS / 'textures' / 'entity'
     drone_textures(te, save)
+    hauler_textures(te, save)
     write_json(ASSETS / 'models' / 'item' / 'security_drone_spawn_egg.json',
                {'parent': 'minecraft:item/template_spawn_egg'})
     # 遺構のアンドロイド（128×64。tools/androids.py）
@@ -2402,6 +2455,10 @@ def art_textures():
     blocks_extra5.textures(tb, art16.save)
     import blocks_extra6
     blocks_extra6.textures(tb, art16.save)
+    import blocks_extra7
+    blocks_extra7.textures(tb, art16.save)
+    import control_panels
+    control_panels.textures(tb, art16.save)
     import lab_blocks
     lab_blocks.textures(tb, art16.save)
     import genesis_assets
@@ -2703,6 +2760,124 @@ def drone_textures(te, save):
         p = te / f'security_drone_{old}.png'
         if p.exists():
             p.unlink()
+
+
+# 封じ込め搬送機の部品とテクスチャの配置（ContainmentHaulerRenderer.createLayer と同じ。128×64）。名前: (u, v, 幅, 高さ, 奥行き, 素材)
+HAULER_PARTS = {
+    'chassis': (0, 0, 20, 8, 26, 'chassis'),
+    'cab': (0, 34, 12, 6, 6, 'cab'),
+    'lens': (40, 34, 8, 2, 1, 'lens'),
+    'jaw': (60, 34, 3, 3, 10, 'jaw'),
+    'core': (0, 46, 8, 10, 8, 'core'),
+    'post': (34, 48, 2, 12, 2, 'frame'),
+    'cap': (44, 48, 12, 2, 12, 'frame'),
+    'upper': (94, 0, 9, 3, 3, 'leg'),
+    'lower': (94, 8, 3, 16, 3, 'leg'),
+    'foot': (108, 8, 5, 2, 5, 'foot'),
+    'hip': (94, 30, 4, 4, 4, 'joint'),
+}
+
+
+def hauler_textures(te, save):
+    """
+    封じ込め搬送機: 黒鉄の車体（側面に黄と黒の警戒縞と光る線）、白い操縦室、鋼の脚と挟み具、
+    淡い金属の檻と、芯の光る封じ込め容器。光る線は別の白い画像（描くときに状態の色を掛ける）。
+    """
+    import random as _r
+    from PIL import Image
+    rng = _r.Random(23)
+    steel = (66, 70, 80)
+    steel_sh = (50, 53, 62)
+    pale = (214, 216, 222)
+    frame = (168, 172, 182)
+    leg = (86, 90, 100)
+    hazard = (226, 182, 52)
+    base = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
+    glow = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
+
+    def mix(c, k):
+        return tuple(max(0, min(255, int(x + k))) for x in c)
+
+    def fill(rect, col):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c = mix(col, rng.randint(-4, 4))
+                if x1 - x0 >= 3 and y1 - y0 >= 3:
+                    if y == y0 or x == x0:
+                        c = mix(c, 12)
+                    elif y == y1 - 1 or x == x1 - 1:
+                        c = mix(c, -16)
+                base.putpixel((x, y), c + (255,))
+
+    def lit(rect):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                glow.putpixel((x, y), (255, 255, 255, 255))
+
+    colors = {'chassis': steel, 'cab': pale, 'lens': (14, 16, 20), 'jaw': leg, 'core': (24, 44, 56), 'frame': frame,
+              'leg': leg, 'foot': (40, 42, 48), 'joint': (36, 38, 44)}
+    for name, (u, v, w, h, d, mat) in HAULER_PARTS.items():
+        f = cube_faces(u, v, w, h, d)
+        col = colors[mat]
+        for k, r in f.items():
+            fill(r, steel_sh if mat == 'chassis' and k == 'down' else col)
+        if name == 'chassis':
+            # 側面と正面・背面の下の帯に警戒縞、その上に光る線。上面には容器を留める金具の溝
+            for k in ('side_a', 'side_b', 'front', 'back'):
+                x0, y0, x1, y1 = f[k]
+                for y in range(y1 - 3, y1 - 1):
+                    for x in range(x0, x1):
+                        stripe = ((x + y) // 2) % 2 == 0
+                        base.putpixel((x, y), (hazard if stripe else (28, 28, 30)) + (255,))
+                lit((x0 + 1, y0 + 2, x1 - 1, y0 + 3))
+            x0, y0, x1, y1 = f['up']
+            for x in range(x0 + 2, x1 - 2):
+                base.putpixel((x, y0 + 6), mix(steel, -30) + (255,))
+                base.putpixel((x, y1 - 7), mix(steel, -30) + (255,))
+        elif name == 'cab':
+            # 正面の窓（暗いガラス）と、側面の識別番号の白線
+            x0, y0, x1, y1 = f['front']
+            for x in range(x0 + 1, x1 - 1):
+                base.putpixel((x, y0 + 1), (30, 40, 48, 255))
+            for k in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0 + 1, x1 - 1):
+                    base.putpixel((x, y0 + 2), mix(pale, -60) + (255,))
+        elif name == 'lens':
+            lit(f['front'])
+            lit(f['side_a'])
+            lit(f['side_b'])
+        elif name == 'jaw':
+            # 挟み具の先（内側の歯）
+            x0, y0, x1, y1 = f['front']
+            fill((x0, y0, x1, y1), (120, 124, 134))
+        elif name == 'core':
+            # 光る芯（3段ごとに暗い輪）
+            for k in ('side_a', 'side_b', 'front', 'back', 'up'):
+                x0, y0, x1, y1 = f[k]
+                for y in range(y0, y1):
+                    if k != 'up' and (y - y0) % 3 == 2:
+                        continue
+                    for x in range(x0, x1):
+                        glow.putpixel((x, y), (255, 255, 255, 255))
+        elif name == 'cap':
+            x0, y0, x1, y1 = f['up']
+            lit((x0 + 4, y0 + 4, x1 - 4, y1 - 4))
+        elif name == 'hip':
+            for k in ('side_a', 'side_b', 'front', 'back'):
+                x0, y0, x1, y1 = f[k]
+                lit((x0 + 1, y0 + 1, x1 - 1, y1 - 1))
+        elif name == 'lower':
+            # すねの補強の継ぎ目
+            for k in ('side_a', 'side_b', 'front', 'back'):
+                x0, y0, x1, y1 = f[k]
+                for x in range(x0, x1):
+                    base.putpixel((x, y0 + 5), mix(leg, -35) + (255,))
+                    base.putpixel((x, y0 + 11), mix(leg, -35) + (255,))
+    save(base, te / 'containment_hauler.png')
+    save(glow, te / 'containment_hauler_glow.png')
 
 
 def warden_textures(te, save):
@@ -3561,7 +3736,7 @@ RUIN_PLACEMENT = {
 RUIN_DEPTH = {
     'research_building': (-20, 4),
     'culture_facility': (-46, -30),
-    'final_lab': (-56, -46),
+    'final_lab': (-61, -51),      # 構造物の床は落とし穴の底。ドームの床はその5段上（-56〜-46）
     'sunken_reactor': (-60, -54),
     'android_lab': (-38, -26),
 }
@@ -3626,6 +3801,9 @@ def ruins_data():
     """遺構の構造物・配置・中身（loot table）。中身の数は recipes.py の EXPLORE（1回の遠征で拾える数）。"""
     ruins.write_all(DATA / 'structure' / 'ruins')
     for rid, (make, placement) in ruins.RUINS.items():
+    # 前室の中ボス（搬送機は段階4、炉殻修理機は段階5の装備で挑む）
+    'containment_hauler': [('高圧結晶', 2, 3), ('クリスタルメモリ', 1, 2)],
+    'hull_repairer': [('エキゾチック物質', 1, 2), ('クリスタルメモリ', 1, 2)],
         spacing, separation, salt, biomes = RUIN_PLACEMENT[rid]
         write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / f'{rid}.json', {'values': biomes})
         write_json(DATA / 'worldgen' / 'template_pool' / 'ruins' / f'{rid}.json', {
@@ -4035,7 +4213,7 @@ TAB_GROUPS = [
     ]),
     ('研究所の建材と調度品', [
         'lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame',
-        'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead',
+        'lab_glass', 'pressure_hull', 'pressure_glass', 'welded_hatch', 'bulkhead',
         'lab_door', 'facility_light', 'emergency_light', 'room_light',
         'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'lab_reactor_core',
         'lab_reactor_console', 'server_rack', 'lab_terminal', 'android_capsule',
@@ -4062,6 +4240,7 @@ TAB_GROUPS = [
         'sentinel_core', 'degenerate_nucleus', 'precision_actuator',
         # 覚醒の核は、元のボスを倒す順（研究棟→封鎖培養施設→地下アンドロイド研究所→最終実験施設→沈んだ炉心区画）
         'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_record_core',
+        'control_cabinet', 'coolant_cladding', 'dial_panel', 'mimic_panel', 'annunciator_panel', 'operator_desk', 'operator_chair',
         'awakening_ergosphere_core',
         # 最後の記録者: 覚醒したボスの断章 → 束ねた終焉の記録（呼び出し）→ 光輪（戦利品）
         'echo_chapter', 'gravity_chapter', 'horizon_chapter', 'ergosphere_chapter',
@@ -4076,6 +4255,7 @@ TAB_GROUPS = [
         # ボスのスポーンエッグはタブに出さない（/give でだけ渡す。Java の SinguloItems.HIDDEN）
     ]),
 ]
+        'ruin_relay', 'anomaly_emitter', 'frame_drag_floor', 'drag_brake',
 
 
 def tab_order():
@@ -4413,7 +4593,7 @@ def validate():
 SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'broken_ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
                               'android_barrier_glass_item', 'android_barrier_glass_edge', 'android_gate_glass_item',
                               'android_gate_glass_edge',
-                              'lab_glass', 'android_capsule_glass')   # 研究所のガラス・素体カプセルの筒
+                              'lab_glass', 'pressure_glass', 'android_capsule_glass')   # 研究所のガラス・素体カプセルの筒
 
 
 GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass', 'ruin_glass', 'deco_glass')}

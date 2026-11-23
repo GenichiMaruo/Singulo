@@ -1107,6 +1107,10 @@
     "source": "Pressure Hull",
     "translation": "耐壓殼"
   },
+  "block.singulo.pressure_glass": {
+    "source": "Pressure Glass",
+    "translation": "耐壓玻璃"
+  },
   "block.singulo.pristine_ruin_light": {
     "source": "Pristine Ruin Light Strip",
     "translation": "無瑕廢墟導光板"
@@ -2602,6 +2606,10 @@
   "desc.singulo.pressure_hull": {
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
     "translation": "包覆研究所房間與走廊的、厚度為 2 格的鋼外殼。在統籌 AI 倒下之前處於封鎖狀態，無法破壞。之後也比黑曜石更硬。"
+  },
+  "desc.singulo.pressure_glass": {
+    "source": "The thick viewing glass ringing the Final Lab dome and the Sunken Reactor Sector sphere. Sealed and unbreakable, like the pressure hull.",
+    "translation": "環繞最終實驗室穹頂與沉沒的爐心區球體的厚觀測玻璃。與耐壓殼一樣處於封鎖狀態，無法破壞。"
   },
   "desc.singulo.primordial_seed": {
     "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
@@ -13179,6 +13187,10 @@
     "source": "The very hard steel shell around the laboratory.",
     "translation": "包覆研究所的極堅硬鋼殼。"
   },
+  "summary.singulo.pressure_glass": {
+    "source": "Unbreakable thick glass to watch a boss room through.",
+    "translation": "可從外部窺視首領房間的、無法破壞的厚玻璃。"
+  },
   "summary.singulo.welded_hatch": {
     "source": "A welded steel lid over the laboratory shaft.",
     "translation": "封住研究所豎井的焊接鋼蓋。"
@@ -15878,5 +15890,229 @@
   "advancement.singulo.android_memory_collection.title": {
     "source": "Memories Reunited",
     "translation": "記憶重聚"
+  },
+  "block.singulo.anomaly_emitter": {
+    "source": "Anomaly Field Emitter",
+    "translation": "異常場發生器"
+  },
+  "block.singulo.drag_brake": {
+    "source": "Drag Brake",
+    "translation": "制動器"
+  },
+  "block.singulo.frame_drag_floor": {
+    "source": "Frame-Drag Floor",
+    "translation": "迴轉流地板"
+  },
+  "block.singulo.ruin_relay": {
+    "source": "Ruin Relay",
+    "translation": "廢墟中繼器"
+  },
+  "desc.singulo.anomaly_emitter": {
+    "source": "A plate set into the floors of the Final Lab antechamber. It fills the space above it (5×7×5) with a field: lift raises you, heavy pulls you down faster and slows you, slow applies Slowness and Mining Fatigue, and fast grants Speed and Haste. Fields affect enemies too. Unbreakable.",
+    "translation": "嵌在最終實驗室前廳地面上的板。在上方空間（5×7×5）展開力場：浮升場會把你托起，沉重場讓你下墜更快並變得遲緩，遲緩場施加緩慢和挖掘疲勞，加速場給予迅捷和急迫。力場對敵人同樣有效。無法破壞。"
+  },
+  "desc.singulo.drag_brake": {
+    "source": "A brake at the end of each section of the outer ring of the Sunken Reactor Sector. Pull it to stop the frame-drag floor of that section for good. Unbreakable.",
+    "translation": "位於沉沒的爐心區外環迴廊每個區段盡頭的制動器。拉下後，該區段的迴轉流地板會永久停止。無法破壞。"
+  },
+  "desc.singulo.frame_drag_floor": {
+    "source": "Floor of the outer ring of the Sunken Reactor Sector. Spacetime dragged along by the spin of the dead reactor carries anything on it the way the arrows point, even while sneaking. Stops once the brake of its section is pulled. Unbreakable.",
+    "translation": "沉沒的爐心區外環迴廊的地板。被停擺反應爐的自轉拖曳的時空，會把站在上面的東西沿箭頭方向持續推走，潛行也無法停下。拉下所在區段的制動器後停止。無法破壞。"
+  },
+  "desc.singulo.ruin_relay": {
+    "source": "Relays deep in each wing of the antechambers of the Final Lab and the Sunken Reactor Sector. Touch one to start it (not while security drones or ruin androids remain nearby). Some are guarded by a sub-boss, one charges from items dropped into its vortex pit, and one drains the flooded wing when started. Starting every relay in the facility opens the bulkhead before the boss room; until then its guardian will not wake. Unbreakable.",
+    "translation": "位於最終實驗室和沉沒的爐心區前廳各區域深處的中繼器。觸碰即可啟動（附近還有警衛無人機或廢墟仿生人時無法啟動）。有的由中頭目守護，有的靠投入漩渦坑的物品充能，還有一個啟動後會排乾被淹區域的水。啟動設施內所有中繼器後，頭目房間前的隔離門會打開；在此之前，守衛不會甦醒。無法破壞。"
+  },
+  "entity.singulo.containment_hauler": {
+    "source": "Containment Hauler",
+    "translation": "收容搬運機"
+  },
+  "entity.singulo.hull_repairer": {
+    "source": "Rogue Hull Repairer",
+    "translation": "失控的爐殼修理機"
+  },
+  "gui.singulo.brake.already": {
+    "source": "The flow in this section has already stopped",
+    "translation": "這個區段的流動已經停止了"
+  },
+  "gui.singulo.brake.engaged": {
+    "source": "Brake pulled. The flow in this section stops",
+    "translation": "拉下了制動器。這個區段的流動停止了"
+  },
+  "gui.singulo.relay.activated": {
+    "source": "Relay started (%s/%s)",
+    "translation": "中繼器已啟動（%s/%s）"
+  },
+  "gui.singulo.relay.already": {
+    "source": "This relay is already running (%s/%s)",
+    "translation": "這個中繼器已經在運轉（%s/%s）"
+  },
+  "gui.singulo.relay.awakened.containment_hauler": {
+    "source": "The hauler's legs strike the floor. It takes you for cargo in its way",
+    "translation": "搬運機的腿敲響了地板。它把進入機庫的人當成了擋路的貨物"
+  },
+  "gui.singulo.relay.awakened.hull_repairer": {
+    "source": "The hull repairer starts up. It sees you as a fragment to be fixed",
+    "translation": "爐殼修理機啟動了。它把挑戰者當成了需要修理的碎片"
+  },
+  "gui.singulo.relay.boss": {
+    "source": "This relay cannot be started until its guardian is defeated",
+    "translation": "擊敗守護者之前，無法啟動這個中繼器"
+  },
+  "gui.singulo.relay.defeated": {
+    "source": "The guardian is down. The relay can be started",
+    "translation": "守護者停下了。可以啟動中繼器了"
+  },
+  "gui.singulo.relay.drained": {
+    "source": "The drain valve opens. The coolant lines empty",
+    "translation": "排水閥打開了。冷卻系統的水正在退去"
+  },
+  "gui.singulo.relay.extract": {
+    "source": "Extraction %s/%s. Drop things into the vortex pit to draw energy back out",
+    "translation": "抽取 %s/%s。把東西丟進漩渦坑，能量就會返回"
+  },
+  "gui.singulo.relay.guarded": {
+    "source": "Security nearby is still active. Defeat it first",
+    "translation": "附近的警衛仍在運作。先擊敗它們吧"
+  },
+  "gui.singulo.relay.locked": {
+    "source": "Antechamber relays are still offline (%s/%s). The guardian will not wake until every one is running",
+    "translation": "前廳的中繼器仍未全部啟動（%s/%s）。全部啟動之前，守衛不會甦醒"
+  },
+  "gui.singulo.intrusion.alarm": {
+    "source": "Intrusion detected. The bulkhead is released: evacuate now. The purge-mode guardian carries no reward",
+    "translation": "偵測到入侵。隔離門已開放：請立即撤離。排除模式的守衛不會掉落任何報酬"
+  },
+  "gui.singulo.intrusion.warning": {
+    "source": "ALERT: evacuate the chamber",
+    "translation": "警報：請撤離頭目房間"
+  },
+  "gui.singulo.intrusion.cleared": {
+    "source": "Evacuation confirmed. The bulkhead seals and the alarm clears",
+    "translation": "已確認撤離。隔離門關閉，警報解除"
+  },
+  "entity.singulo.horizon_warden.intruder": {
+    "source": "Horizon Warden (Purge Mode)",
+    "translation": "排除模式的視界守衛"
+  },
+  "entity.singulo.ergosphere_leviathan.intruder": {
+    "source": "Ergosphere Leviathan (Purge Mode)",
+    "translation": "排除模式的能層巨蛇"
+  },
+  "gui.singulo.relay.open": {
+    "source": "Every relay is running. The bulkhead before the boss room opens",
+    "translation": "所有中繼器都運轉起來了。頭目房間前的隔離門打開了"
+  },
+  "guide.singulo.ruins.antechamber.body": {
+    "source": "In the deepest ruins, a bulkhead may seal the way to the boss room. Find the relay at the end of each wing and start them all to open it.\nStarting a relay shows how many are running. The bulkhead stays open, so rematches can head straight for the boss room.",
+    "translation": "在最深處的遺跡中，通往頭目房間的隔離門有時是關閉的。找到各個分區深處的中繼器，全部啟動後隔離門就會打開。\n啟動中繼器時會顯示已運轉的數量。打開的隔離門不會再關上，再戰時可以直接前往頭目房間。"
+  },
+  "guide.singulo.ruins.antechamber.title": {
+    "source": "Before the sealed bulkhead",
+    "translation": "封閉的隔離門前"
+  },
+  "lab.singulo.log.12": {
+    "source": "One day to ignition. All three gravity gradient trials passed. Time-field leakage is within tolerance, though staff in the east corridor say their clocks are running slow. If anything goes wrong, we shut down the three relays and seal the section behind the bulkhead. To open it again, every relay must be restarted.",
+    "translation": "距離點火還有一天。重力梯度試驗三次全部合格。時間場的洩漏在容許範圍內，但東側迴廊的職員抱怨「時鐘變慢了」。萬一出事，就關閉三台中繼器，關上隔離門，把整個區域封起來。要重新打開，必須把所有中繼器重新啟動。"
+  },
+  "lab.singulo.log.12.title": {
+    "source": "Ignition Control Log",
+    "translation": "點火控制室運行日誌"
+  },
+  "lab.singulo.log.13": {
+    "source": "Hauler Three's leg hydraulics will not bleed. It shoved aside the mechanic trying to stop it like a crate in its way. When it starts running, step aside; it cannot turn mid-charge. If it hits a wall, the vessel clamps come loose and it stalls for a while. Stop it then. When it stamps the floor, jump.",
+    "translation": "搬運三號的腿部液壓怎麼也洩不掉。想讓它停下的整備員被它當成貨物推開了。它衝起來的時候就往旁邊躲，衝到一半它轉不了彎。撞上牆壁的話，容器的固定就會鬆開，會有一陣子動不了。趁那時讓它停下。它跺地板的時候就跳起來。"
+  },
+  "lab.singulo.log.13.title": {
+    "source": "Hauler Three Inspection",
+    "translation": "搬運三號 檢查記錄"
+  },
+  "lab.singulo.log.14": {
+    "source": "The hull will not stop spinning. Even the outer ring floor is being dragged along and the crew cannot keep their footing. Pull the brake in each section as you go. The coolant lines flooded on backflow. The drain valve is at the bottom of the pump room. Only those who can swim that far should go.",
+    "translation": "爐殼的自轉停不下來。連外環的地板都被拖著走，作業員根本站不穩。一邊走一邊拉下每個區段的制動器。冷卻系統因倒流被淹沒了。排水閥在泵房底部。只讓能游到那裡的人去。"
+  },
+  "lab.singulo.log.14.title": {
+    "source": "Reactor Two Coolant Alarm",
+    "translation": "第二爐冷卻系統警報"
+  },
+  "lab.singulo.log.15": {
+    "source": "We could not open the valve. The extraction tower gives back energy only for the weight of what it is fed, and we had too little to feed it to stop the reactor. If someone gets this far, open the valve and let the water out. We cannot go back up.",
+    "translation": "我們沒能打開閥門。抽取塔只會按投入物的重量返還能量，而我們能投進去的東西，不夠讓反應爐停下來。如果有人來到這裡，請打開閥門，把水排掉。我們已經回不到上面去了。"
+  },
+  "lab.singulo.log.15.title": {
+    "source": "Note in the Pump Room",
+    "translation": "泵房裡的留言"
+  },
+  "summary.singulo.anomaly_emitter": {
+    "source": "Fills the space above with a gravity or time field.",
+    "translation": "在上方空間展開重力或時間的力場。"
+  },
+  "summary.singulo.drag_brake": {
+    "source": "Stops the frame-drag floor in its section.",
+    "translation": "讓所在區段的迴轉流地板停下。"
+  },
+  "summary.singulo.frame_drag_floor": {
+    "source": "Keeps carrying whatever stands on it.",
+    "translation": "持續推走站在上面的東西。"
+  },
+  "summary.singulo.ruin_relay": {
+    "source": "Start them all to open the bulkhead before the boss room.",
+    "translation": "全部啟動後，頭目房間前的隔離門會打開。"
+  },
+  "block.singulo.control_cabinet": {
+    "source": "Control Cabinet",
+    "translation": "控制櫃外殼"
+  },
+  "block.singulo.coolant_cladding": {
+    "source": "Coolant Cladding",
+    "translation": "冷卻系統護板"
+  },
+  "block.singulo.dial_panel": {
+    "source": "Analog Meter Panel",
+    "translation": "指針儀表盤"
+  },
+  "block.singulo.mimic_panel": {
+    "source": "Mimic Diagram Panel",
+    "translation": "系統模擬顯示盤"
+  },
+  "block.singulo.annunciator_panel": {
+    "source": "Annunciator Panel",
+    "translation": "集中警報盤"
+  },
+  "block.singulo.operator_desk": {
+    "source": "Operator Desk",
+    "translation": "運轉操作臺"
+  },
+  "block.singulo.operator_chair": {
+    "source": "Operator Chair",
+    "translation": "值班員座椅"
+  },
+  "desc.singulo.control_cabinet": {
+    "source": "A pale green steel cabinet with vents and a service door.",
+    "translation": "帶通風口和檢修門的淺綠色鋼製控制櫃。"
+  },
+  "desc.singulo.coolant_cladding": {
+    "source": "Teal steel cladding with reinforcing bands for cooling equipment.",
+    "translation": "用於冷卻設備的藍綠色鋼板，帶有加固箍帶。"
+  },
+  "desc.singulo.dial_panel": {
+    "source": "A large analog meter visible from the operator desk.",
+    "translation": "坐在操作臺前也能看清的大型指針儀表。"
+  },
+  "desc.singulo.mimic_panel": {
+    "source": "A mimic panel with colored lines showing pipes and pumps.",
+    "translation": "用彩色線條標出管線和泵的位置。"
+  },
+  "desc.singulo.annunciator_panel": {
+    "source": "A bank of labeled alarm windows for the plant systems.",
+    "translation": "集中顯示各系統警報狀態的標示燈窗。"
+  },
+  "desc.singulo.operator_desk": {
+    "source": "A sloped desk with selector switches and small meters.",
+    "translation": "切換開關和小型儀表朝值班員傾斜的操作臺。"
+  },
+  "desc.singulo.operator_chair": {
+    "source": "A dark green swivel chair for a control-room operator.",
+    "translation": "控制室值班員使用的深綠色轉椅。"
   }
 }

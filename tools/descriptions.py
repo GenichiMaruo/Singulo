@@ -627,6 +627,8 @@ DESC = {
                'Steel plates welded shut over the lab\'s supply shaft. Sealed until the lab\'s AI is defeated; after that it can be '
                'mined with a diamond pickaxe.'),
     '耐圧殻': ('研究所の部屋と廊下を包む、厚さ2の鋼の殻。統括AIが倒れるまでは封じられていて壊せない。そのあとも黒曜石より硬い。', 'The two-block-thick steel shell around the laboratory\'s rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.'),
+    '耐圧ガラス': ('最終実験施設のドームと沈んだ炉心区画の球を囲む、厚い観測窓のガラス。耐圧殻と同じく封じられていて壊せない。',
+              'The thick viewing glass ringing the Final Lab dome and the Sunken Reactor Sector sphere. Sealed and unbreakable, like the pressure hull.'),
     '缶ソーダ': ('研究所の自動販売機の、青い缶の炭酸飲料。飲むと2分間、足が速くなる。', "A blue can of soda from the laboratory's vending machine. Drinking it gives Speed for 2 minutes."),
     'スポーツドリンク': ('研究所の自動販売機の、白い缶の飲み物。飲むと15秒間、体力が回復していく。', "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds."),
     'エナジードリンク': ('研究所の自動販売機の、黄色い缶の飲み物。飲むと2分間、採掘がとても速くなる。', "A yellow can of energy drink from the laboratory's vending machine. Drinking it gives Haste II for 2 minutes."),
@@ -643,6 +645,13 @@ DESC = {
     'コーヒーメーカー': ('研究所の給湯室のコーヒーメーカー。カカオ豆を入れると3杯分のコーヒーを淹れ、ガラス瓶でくめる。研究所のものは、はじめから淹れてある。', 'The laboratory break-room coffee maker. Add cocoa beans to brew three cups, then fill glass bottles from the pot. The ones in the laboratory already have coffee in them.'),
     '自動販売機': ('研究所の飲み物の自動販売機（2ブロックの高さ）。エメラルドを持って正面の列のボタンを押すと、缶ソーダ（1）・スポーツドリンク（1）・エナジードリンク（2）が買える。研究所のものは、施設の電力が戻ると動き出す。', 'A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.'),
     '書類の山': ('机に積まれたままの書類。', 'Papers left piled on a desk.'),
+    '制御盤筐体': ('通気口と点検扉を備えた、淡緑色の鋼製キャビネット。', 'A pale green steel cabinet with vents and a service door.'),
+    '冷却系外装板': ('冷却設備を覆う、補強帯付きの青緑色の鋼板。', 'Teal steel cladding with reinforcing bands for cooling equipment.'),
+    '指針計器盤': ('運転席から針の位置を読み取るための大型計器。', 'A large analog meter visible from the operator desk.'),
+    '系統表示盤': ('配管のつながりとポンプの位置を色線で示す表示盤。', 'A mimic panel with colored lines showing pipes and pumps.'),
+    '集合警報盤': ('系統ごとの警報窓を一か所に集めた盤。', 'A bank of labeled alarm windows for the plant systems.'),
+    '運転操作卓': ('切替器と小型計器を運転員側に傾けた操作卓。', 'A sloped desk with selector switches and small meters.'),
+    '運転員用チェア': ('運転卓に向けて置く、濃緑色の背もたれ付き回転椅子。', 'A dark green swivel chair for a control-room operator.'),
     'ごみ箱': ('研究所のごみ箱。アンドロイドが毎日空にしている。', 'A laboratory trash bin. The androids empty it every day.'),
     '居室灯': ('研究所の個室の天井灯。レッドストーンの信号が入っている間だけ光る（天井のそばのレバーで点けたり消したりする）。施設の電力はいらない。照明の設計図から作れる。',
         'The ceiling light of a laboratory private room. It glows only while it gets a redstone signal (flip the lever beside it on the ceiling). Needs no facility power. Made from the Lighting Blueprint.'),
@@ -653,6 +662,25 @@ DESC = {
     '素体カプセル': ('白いアンドロイドの素体が眠る、ガラスのカプセル。', 'A glass capsule holding a dormant white android body.'),
     '残響投影器': ('残響の番人の姿を映す台座。残っている投影器が多いほど、番人に攻撃が通りにくい。素手でも壊せる。',
               'Projects the Echo Sentinel. The more projectors remain, the less damage the sentinel takes. Breaks by hand.'),
+    '遺構の中継器': ('最終実験施設と沈んだ炉心区画の前室の、各区画の奥にある中継器。触れると起動する（近くに警備ドローンや遺構のアンドロイドが残っていると起動できない）。'
+                '中ボスが守るもの、渦の穴へ落とした物でエネルギーをためるもの、起動すると浸水した区画の水を抜くものもある。'
+                '施設の中継器をすべて起動すると、ボス部屋の前の隔壁が開く。そろうまで、ボス部屋の番人は目覚めない。壊せない。',
+                'Relays deep in each wing of the antechambers of the Final Lab and the Sunken Reactor Sector. Touch one to start it '
+                '(not while security drones or ruin androids remain nearby). Some are guarded by a sub-boss, one charges from items dropped '
+                'into its vortex pit, and one drains the flooded wing when started. Starting every relay in the facility opens the bulkhead '
+                'before the boss room; until then its guardian will not wake. Unbreakable.'),
+    '異常場の発生器': ('最終実験施設の前室の床に埋まった板。上の空間（5×7×5）に場を張る。浮く場は持ち上げ、重い場は速く落として動きを鈍らせる。'
+                 '遅い場は鈍足と採掘速度低下、速い場は移動速度上昇と採掘速度上昇。敵にも効く。壊せない。',
+                 'A plate set into the floors of the Final Lab antechamber. It fills the space above it (5×7×5) with a field: lift raises you, '
+                 'heavy pulls you down faster and slows you, slow applies Slowness and Mining Fatigue, and fast grants Speed and Haste. '
+                 'Fields affect enemies too. Unbreakable.'),
+    '回転流の床': ('沈んだ炉心区画の外周回廊の床。止まった炉の回転に引きずられた時空が、上に乗ったものを矢の向きへ流し続ける（しゃがんでも止まらない）。'
+               '同じ区画の制動器を下ろすと止まる。壊せない。',
+               'Floor of the outer ring of the Sunken Reactor Sector. Spacetime dragged along by the spin of the dead reactor carries anything '
+               'on it the way the arrows point, even while sneaking. Stops once the brake of its section is pulled. Unbreakable.'),
+    '制動器': ('沈んだ炉心区画の外周回廊の、各区画の終わりにある制動器。触れて下ろすと、同じ区画の回転流の床が止まる。一度下ろすと戻らない。壊せない。',
+            'A brake at the end of each section of the outer ring of the Sunken Reactor Sector. Pull it to stop the frame-drag floor '
+            'of that section for good. Unbreakable.'),
     '失活したミュオン触媒': ('活性を失ったミュオン触媒。', 'A muon catalyst that has lost its activity.'),
     '失活したBE凝縮触媒': ('活性を失ったBE凝縮触媒。', 'A Bose condensate catalyst that has lost its activity.'),
     '失活した時間結晶触媒': ('活性を失った時間結晶触媒。', 'A time crystal catalyst that has lost its activity.'),
@@ -995,6 +1023,8 @@ SUMMARY = {
         'A welded steel lid over the laboratory shaft.'),
     '耐圧殻': ('研究所を包む、とても硬い鋼の殻。',
         'The very hard steel shell around the laboratory.'),
+    '耐圧ガラス': ('ボス部屋を外から覗ける、壊せない厚いガラス。',
+        'Unbreakable thick glass to watch a boss room through.'),
     'コーヒー': ('飲むと採掘が速くなり、眠気が覚める。',
         'Speeds up mining and wakes you up.'),
     '研究所のスライドドア': ('右クリックで開き、自分で閉まる研究所の引き戸。',
@@ -1007,6 +1037,14 @@ SUMMARY = {
         'A laboratory ceiling light switched by redstone.'),
     '残響投影器': ('残響の番人を映す台座。残っているほど番人が硬い。',
         'Projects the Echo Sentinel; more left means a tougher boss.'),
+    '遺構の中継器': ('すべて起動すると、ボス部屋の前の隔壁が開く。',
+        'Start them all to open the bulkhead before the boss room.'),
+    '異常場の発生器': ('上の空間に、重力や時間の場を張る。',
+        'Fills the space above with a gravity or time field.'),
+    '回転流の床': ('乗ったものを矢の向きへ流し続ける。',
+        'Keeps carrying whatever stands on it.'),
+    '制動器': ('同じ区画の回転流の床を止める。',
+        'Stops the frame-drag floor in its section.'),
     '高圧結晶': ('海底の水圧で押し固められた、硬い紫の結晶。',
         'A hard violet crystal pressed by deep-sea water.'),
     '液体ヘリウム・カートリッジ': ('液体ヘリウム250 mBを運べるカートリッジ。',

@@ -487,10 +487,46 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock> FACTORY_CONVEYOR = BLOCKS.register("factory_conveyor",
             () -> new io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
                     .strength(2.0F, 6.0F).sound(SoundType.METAL)));
+    // ---- 最終実験施設・沈んだ炉心区画の前室（どれも壊せない）
+    /** 遺構の中継器（施設の中継器をすべて起動すると、ボス部屋の前の隔壁が開く）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.RuinRelayBlock> RUIN_RELAY = BLOCKS.register("ruin_relay",
+            () -> new io.github.genichimaruo.singulo.ruin.RuinRelayBlock(unbreakable().noOcclusion()
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.RuinRelayBlock.ACTIVE) ? 13 : 5)));
+    /** 異常場の発生器（上の空間に重力・時間の場を張る）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlock> ANOMALY_EMITTER = BLOCKS.register("anomaly_emitter",
+            () -> new io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlock(unbreakable().lightLevel(s -> 8)));
+    /** 回転流の床（上に乗ったものを流す）と、その区画を止める制動器。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock> FRAME_DRAG_FLOOR = BLOCKS.register("frame_drag_floor",
+            () -> new io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock(unbreakable().lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock.ACTIVE) ? 4 : 0)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.DragBrakeBlock> DRAG_BRAKE = BLOCKS.register("drag_brake",
+            () -> new io.github.genichimaruo.singulo.ruin.DragBrakeBlock(unbreakable().lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.DragBrakeBlock.ENGAGED) ? 10 : 3)));
     // ---- 地下アンドロイド研究所（白い建材は硬く、鉄以上のツルハシで掘る）。建材・照明・調度品は、研究所で見つかる設計図から作れる
     public static final DeferredBlock<Block> LAB_PANEL = pristine("lab_panel", 0);
     public static final DeferredBlock<Block> LAB_PANEL_LINED = pristine("lab_panel_lined", 0);
     public static final DeferredBlock<Block> LAB_TILES = pristine("lab_tiles", 0);
+    public static final DeferredBlock<Block> CONTROL_CABINET = pristine("control_cabinet", 0);
+    public static final DeferredBlock<Block> COOLANT_CLADDING = pristine("coolant_cladding", 0);
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock> DIAL_PANEL =
+            instrumentPanel("dial_panel", 2);
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock> MIMIC_PANEL =
+            instrumentPanel("mimic_panel", 4);
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> ANNUNCIATOR_PANEL =
+            controlFitting("annunciator_panel", net.minecraft.world.phys.shapes.Shapes.block(), 4);
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> OPERATOR_DESK =
+            controlFitting("operator_desk", Block.box(0, 0, 0, 16, 14, 16), 1);
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> OPERATOR_CHAIR =
+            controlFitting("operator_chair", Block.box(2, 0, 2, 14, 9, 14), 0);
+
+    private static DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> controlFitting(
+            String id, net.minecraft.world.phys.shapes.VoxelShape shape, int light) {
+        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(
+                decor(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> light), shape, null, null));
+    }
+
+    private static DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock> instrumentPanel(String id, int light) {
+        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock(
+                decor(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> light)));
+    }
     public static final DeferredBlock<Block> LAB_FRAME = BLOCKS.registerSimpleBlock("lab_frame", BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GRAY).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK));
     public static final DeferredBlock<TransparentBlock> LAB_GLASS = glass("lab_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.GLASS);
@@ -520,6 +556,13 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> PRESSURE_HULL = BLOCKS.register("pressure_hull",
             () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
                     .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 耐圧ガラス（遺構のボス部屋の観測窓。封じられている間は壊せない。爆発では壊れない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureGlassBlock> PRESSURE_GLASS = BLOCKS.register("pressure_glass",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureGlassBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NONE)
+                    .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS).noOcclusion()
+                    .isValidSpawn((s, l, p, e) -> false).isRedstoneConductor((s, l, p) -> false)
+                    .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false)
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 溶接された蓋（搬入出の立坑をふさぐ。封じられている間は壊せない。封じが解けるとダイヤのツルハシで掘れる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> WELDED_HATCH = BLOCKS.register("welded_hatch",

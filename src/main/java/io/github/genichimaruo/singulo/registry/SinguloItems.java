@@ -560,9 +560,20 @@ public final class SinguloItems {
         block(SinguloBlocks.ECHO_PROJECTOR, 1);
         block(SinguloBlocks.FACTORY_LINE, 1);
         block(SinguloBlocks.FACTORY_CONVEYOR, 1);
+        block(SinguloBlocks.RUIN_RELAY, 1);
+        block(SinguloBlocks.ANOMALY_EMITTER, 1);
+        block(SinguloBlocks.FRAME_DRAG_FLOOR, 1);
+        block(SinguloBlocks.DRAG_BRAKE, 1);
         block(SinguloBlocks.LAB_PANEL, 1);
         block(SinguloBlocks.LAB_PANEL_LINED, 1);
         block(SinguloBlocks.LAB_TILES, 1);
+        block(SinguloBlocks.CONTROL_CABINET, 1);
+        block(SinguloBlocks.COOLANT_CLADDING, 1);
+        block(SinguloBlocks.DIAL_PANEL, 1);
+        block(SinguloBlocks.MIMIC_PANEL, 1);
+        block(SinguloBlocks.ANNUNCIATOR_PANEL, 1);
+        block(SinguloBlocks.OPERATOR_DESK, 1);
+        block(SinguloBlocks.OPERATOR_CHAIR, 1);
         block(SinguloBlocks.LAB_FRAME, 1);
         block(SinguloBlocks.LAB_GLASS, 1);
         block(SinguloBlocks.FACILITY_LIGHT, 1);
@@ -571,6 +582,7 @@ public final class SinguloItems {
         block(SinguloBlocks.REACTOR_CORE, 1);
         block(SinguloBlocks.POWER_CONDUIT, 1);
         block(SinguloBlocks.PRESSURE_HULL, 1);
+        block(SinguloBlocks.PRESSURE_GLASS, 1);
         block(SinguloBlocks.WELDED_HATCH, 1);
         block(SinguloBlocks.LAB_DOOR, 1);
         block(SinguloBlocks.BULKHEAD, 1);

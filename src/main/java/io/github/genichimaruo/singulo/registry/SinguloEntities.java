@@ -86,6 +86,13 @@ public final class SinguloEntities {
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.FoundryOverseer>> FOUNDRY_OVERSEER = REGISTER.register(
             "foundry_overseer", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.FoundryOverseer::new, MobCategory.MONSTER)
                     .sized(2.4F, 2.4F).clientTrackingRange(12).fireImmune().build(Singulo.id("foundry_overseer").toString()));
+    /** 前室の中ボス: 封じ込め搬送機（最終実験施設の格納庫）と、暴走した炉殻修理機（沈んだ炉心区画の整備場）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.ContainmentHauler>> CONTAINMENT_HAULER = REGISTER.register(
+            "containment_hauler", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.ContainmentHauler::new, MobCategory.MONSTER)
+                    .sized(2.2F, 1.9F).clientTrackingRange(10).fireImmune().build(Singulo.id("containment_hauler").toString()));
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.HullRepairer>> HULL_REPAIRER = REGISTER.register(
+            "hull_repairer", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.HullRepairer::new, MobCategory.MONSTER)
+                    .sized(1.6F, 1.4F).clientTrackingRange(10).fireImmune().build(Singulo.id("hull_repairer").toString()));
     /** 隠しボス（最終実験施設の封印コンソールで、終焉の記録を使うと目覚める）。 */
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.LastArchivist>> LAST_ARCHIVIST = REGISTER.register(
             "last_archivist", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.LastArchivist::new, MobCategory.MONSTER)
@@ -140,6 +147,8 @@ public final class SinguloEntities {
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(CARGO_DRONE.get(), io.github.genichimaruo.singulo.drone.CargoDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
+        event.put(CONTAINMENT_HAULER.get(), io.github.genichimaruo.singulo.ruin.ContainmentHauler.createAttributes().build());
+        event.put(HULL_REPAIRER.get(), io.github.genichimaruo.singulo.ruin.HullRepairer.createAttributes().build());
         event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());
         event.put(GRAVITY_REMNANT.get(), io.github.genichimaruo.singulo.ruin.GravityRemnant.createAttributes().build());
         event.put(ERGOSPHERE_LEVIATHAN.get(), io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan.createAttributes().build());

@@ -177,6 +177,8 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.CONTAINMENT_HAULER.get(), ContainmentHaulerRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.HULL_REPAIRER.get(), HullRepairerRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ECHO_SENTINEL.get(), EchoSentinelRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_REMNANT.get(), GravityRemnantRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
@@ -248,6 +250,7 @@ public final class SinguloClient {
 
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityDroneRenderer.LAYER, SecurityDroneRenderer::createLayer);
+        event.registerLayerDefinition(ContainmentHaulerRenderer.LAYER, ContainmentHaulerRenderer::createLayer);
         event.registerLayerDefinition(CargoDroneRenderer.LAYER, CargoDroneRenderer::createLayer);
         event.registerLayerDefinition(PortablePrinterRenderer.LAYER, PortablePrinterRenderer::createLayer);
         event.registerLayerDefinition(CargoDroneRenderer.JET_LAYER, CargoDroneRenderer::createJetLayer);

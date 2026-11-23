@@ -92,7 +92,8 @@
       "pages": [
         "ruins.list",
         "ruins.compass",
-        "ruins.records"
+        "ruins.records",
+        "ruins.antechamber"
       ]
     },
     {
@@ -679,6 +680,9 @@
         "records",
         "item/crystal_memory"
       ]
+    },
+    "ruins.antechamber": {
+      "icon": "singulo:ruin_relay"
     },
     "androids.build": {
       "icon": "singulo:android_station",
