@@ -25,7 +25,7 @@ for aid, parent, icon, frame, cond, stage, *_ in ADVANCEMENTS:
         if not required or set(criteria) != required or 'requirements' in adv:
             raise ValueError(f'{aid}: expected one mandatory criterion per android memory')
         for item, criterion in criteria.items():
-            if criterion != {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': [{'items': f'singulo:{item}'}]}}:
+            if criterion != {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': [{'items': [f'singulo:{item}']}]}}:
                 raise ValueError(f'{aid}: invalid collection criterion for {item}')
     elif set(adv['criteria']) != {'done'}:
         raise ValueError(f'{aid}: changed criterion key would invalidate existing progress')
