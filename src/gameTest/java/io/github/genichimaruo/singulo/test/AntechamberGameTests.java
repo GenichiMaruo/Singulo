@@ -369,7 +369,7 @@ public final class AntechamberGameTests {
     @GameTest(template = EMPTY, batch = "antechamber_intrusion", timeoutTicks = 400)
     public static void intrudersRaiseTheAlarmInsteadOfBeingTeleported(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        var template = level.getStructureManager().get(Singulo.id("ruins/final_lab")).orElseThrow();
+        var template = level.getStructureManager().get(Singulo.id("ruins/final_lab_antechamber")).orElseThrow();
         BlockPos origin = helper.absolutePos(BlockPos.ZERO).above(90);
         var settings = new StructurePlaceSettings().setIgnoreEntities(true);
         template.placeInWorld(level, origin, origin, settings, level.getRandom(), Block.UPDATE_CLIENTS);
@@ -472,7 +472,7 @@ public final class AntechamberGameTests {
                 "final_lab", Map.of("plain", 2, "guarded:containment_hauler", 1),
                 "sunken_reactor", Map.of("plain", 1, "drain", 1, "extract", 1, "guarded:hull_repairer", 1));
         for (var entry : expected.entrySet()) {
-            Optional<StructureTemplate> template = manager.get(Singulo.id("ruins/" + entry.getKey()));
+            Optional<StructureTemplate> template = manager.get(Singulo.id("ruins/" + entry.getKey() + "_antechamber"));
             helper.assertTrue(template.isPresent(), "構造物がない: " + entry.getKey());
             Map<String, Integer> modes = new HashMap<>();
             for (var info : template.get().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), SinguloBlocks.RUIN_RELAY.get())) {
