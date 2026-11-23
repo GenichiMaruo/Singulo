@@ -140,7 +140,7 @@ public final class GunnerGameTests {
             g.aimRail(first);
             int hit = g.fireRail(helper.getLevel());
             helper.assertTrue(hit == 2, "並んだ2体を貫かない: " + hit);
-            helper.assertTrue(first.getHealth() < 200 && second.getHealth() < 200, "線の上の相手に当たらない");
+            helper.assertTrue(first.getHealth() == 180 && second.getHealth() == 180, "貫通した2体にそれぞれ20ダメージが入らない");
             helper.assertTrue(aside.getHealth() == 200, "線から外れた相手に当たった");
             helper.succeed();
         });
@@ -158,10 +158,12 @@ public final class GunnerGameTests {
         }
         helper.runAtTickTime(10, () -> {
             g.aimRail(first);
+            Vec3 preview = g.railTo();
             int hit = g.fireRail(helper.getLevel());
             helper.assertTrue(hit == 1 && first.getHealth() < 200, "壁の手前の相手に当たらない: " + hit);
             helper.assertTrue(behind.getHealth() == 200, "壁の向こうの相手に当たった");
             helper.assertTrue(g.railTo().z < helper.absoluteVec(new Vec3(0, 0, 8.01)).z, "光線が壁で止まらない: " + g.railTo());
+            helper.assertTrue(preview.distanceTo(g.railTo()) < 0.001, "予告線と実際の着弾点が壁でずれた");
             helper.succeed();
         });
     }
@@ -207,10 +209,49 @@ public final class GunnerGameTests {
             helper.runAtTickTime(10 + GunnerAndroid.SHOT_TICKS[i] - GunnerAndroid.SHOT_TICKS[0], () -> {
                 helper.assertTrue(g.shoot(helper.getLevel(), target), "撃たない（" + (shot + 1) + "発目）");
                 health[shot + 1] = target.getHealth();
-                helper.assertTrue(health[shot + 1] < health[shot], (shot + 1) + "発目のダメージが入らない: " + health[shot] + " → " + health[shot + 1]);
+                helper.assertTrue(health[shot] - health[shot + 1] == 4, (shot + 1) + "発目のダメージが4でない: " + health[shot] + " → " + health[shot + 1]);
             });
         }
         helper.runAtTickTime(40, helper::succeed);
+    }
+
+    private static GunnerAndroid fighter(GameTestHelper helper, Zombie target) {
+        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 14, 0, 14)) helper.setBlock(p, Blocks.STONE);
+        GunnerAndroid gun = gunner(helper, new BlockPos(7, 1, 2));
+        gun.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        gun.setTarget(target);
+        gun.setNoAi(false);
+        return gun;
+    }
+
+    @GameTest(template = HUGE, batch = BATCH + "_assemble_cancel", timeoutTicks = 550)
+    public static void gunnerReturnsMovingPartsAfterLosingTarget(GameTestHelper helper) {
+        Zombie target = dummy(helper, new BlockPos(7, 1, 11));
+        GunnerAndroid gun = fighter(helper, target);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_ASSEMBLE, "組立待ち"))
+                .thenIdle(3).thenExecute(target::discard)
+                .thenIdle(6).thenExecute(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_ASSEMBLE,
+                        "移動中の部品が手元まで届く前に格納へ飛んだ"))
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_STOW, "中断後の格納待ち"))
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_IDLE, "格納後の待機待ち"))
+                .thenExecute(gun::discard).thenSucceed();
+    }
+
+    @GameTest(template = HUGE, batch = BATCH + "_rail_victory", timeoutTicks = 550)
+    public static void gunnerFinishesRecoilBeforeVictoryTwirl(GameTestHelper helper) {
+        Zombie target = dummy(helper, new BlockPos(7, 1, 11));
+        GunnerAndroid gun = fighter(helper, target);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_CHARGE, "充填待ち"))
+                .thenExecute(() -> target.setHealth(1))
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_FIRE && !target.isAlive(), "最後の敵に命中するのを待つ"))
+                .thenIdle(GunnerAndroid.RAIL_FIRE - 2)
+                .thenExecute(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_FIRE, "命中直後に発射の反動が途切れた"))
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_STOW, "反動が収まってから格納"))
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_IDLE
+                        && gun.gesture() == GunnerAndroid.GESTURE_TWIRL, "小型銃に持ち替えて一回す"))
+                .thenExecute(gun::discard).thenSucceed();
     }
 
     /** 小型銃: 見通しがあれば撃って当て、壁があれば撃たない。 */

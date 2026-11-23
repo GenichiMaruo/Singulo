@@ -322,6 +322,12 @@
       "stage": 2
     },
     {
+      "id": "android_memory_collection",
+      "parent": "android_memory",
+      "stage": 5,
+      "hidden": true
+    },
+    {
       "id": "android_charger",
       "parent": "android_printed",
       "stage": 2

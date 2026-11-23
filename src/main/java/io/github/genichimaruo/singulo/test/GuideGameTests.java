@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.test;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.android.AndroidKind;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.ruin.AncientRecords;
@@ -103,6 +104,28 @@ public final class GuideGameTests {
             inventory.setItem(2, blade);
             net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, inventory, blade);
             helper.assertTrue(done(player, "android_memory"), "旧型1種類で達成しない");
+            helper.succeed();
+        } finally {
+            helper.getLevel().getServer().getPlayerList().remove(player);
+        }
+    }
+
+    @GameTest(template = EMPTY)
+    public static void hiddenCollectionRemembersEachAndroidMemory(GameTestHelper helper) {
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        try {
+            var achievement = player.server.getAdvancements().getAdvancement(Singulo.id("android_memory_collection"));
+            helper.assertTrue(achievement.getDisplay().isHidden(), "全型の収集実績が隠されていない");
+            var progress = player.getAdvancements().getOrStartProgress(achievement);
+            var inventory = player.getInventory();
+            for (AndroidKind kind : AndroidKind.values()) {
+                helper.assertFalse(progress.isDone(), "未入手の型があるのに収集実績を達成した");
+                var memory = io.github.genichimaruo.singulo.ruin.PrototypeMemories.stack(kind);
+                inventory.setItem(0, memory);
+                net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, inventory, memory);
+                inventory.removeItemNoUpdate(0);
+            }
+            helper.assertTrue(progress.isDone(), "1種類ずつ順に入手しても全型の収集実績を達成できない");
             helper.succeed();
         } finally {
             helper.getLevel().getServer().getPlayerList().remove(player);

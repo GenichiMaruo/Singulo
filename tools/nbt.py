@@ -2,13 +2,17 @@
 """最小限のNBT書き出し（構造物ファイル用）。
 
 Python の値を型から推測して書く:
-    str → String, bool → Byte, int → Int, float → Double,
+    str → String, bool → Byte, int → Int, Float → Float（防具立ての姿勢など）, float → Double,
     dict → Compound, list[int] → List(Int), list[dict] → List(Compound), list[str] → List(String)
 """
 import gzip
 import struct
 
-END, BYTE, INT, DOUBLE, STRING, LIST, COMPOUND = 0, 1, 3, 6, 8, 9, 10
+END, BYTE, INT, FLOAT, DOUBLE, STRING, LIST, COMPOUND = 0, 1, 3, 5, 6, 8, 9, 10
+
+
+class Float(float):
+    """TAG_Float で書く小数（ふつうの float は TAG_Double）。"""
 
 
 def _name(s):
@@ -21,6 +25,8 @@ def _type_of(v):
         return BYTE
     if isinstance(v, int):
         return INT
+    if isinstance(v, Float):
+        return FLOAT
     if isinstance(v, float):
         return DOUBLE
     if isinstance(v, str):
@@ -38,6 +44,8 @@ def _payload(v):
         return struct.pack('>b', 1 if v else 0)
     if t == INT:
         return struct.pack('>i', v)
+    if t == FLOAT:
+        return struct.pack('>f', v)
     if t == DOUBLE:
         return struct.pack('>d', v)
     if t == STRING:

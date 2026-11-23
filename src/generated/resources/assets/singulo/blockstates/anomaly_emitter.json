@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "field=lift": {
+      "model": "singulo:block/anomaly_emitter_lift"
+    },
+    "field=heavy": {
+      "model": "singulo:block/anomaly_emitter_heavy"
+    },
+    "field=slow": {
+      "model": "singulo:block/anomaly_emitter_slow"
+    },
+    "field=fast": {
+      "model": "singulo:block/anomaly_emitter_fast"
+    }
+  }
+}

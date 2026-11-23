@@ -65,6 +65,8 @@ public final class SinguloSounds {
             "foundry.line_break", "foundry.enrage", "foundry.death",
             "android.power_down", "android.charge_start", "android.charged", "android.gunner_shot", "android.railgun_assemble", "android.railgun_charge",
             "android.railgun_fire", "android.ring_inflate", "ui.click",
+            "android.katana_draw", "android.katana_sheathe", "android.katana_swing", "android.katana_step",
+            "android.katana_iai_charge", "android.katana_iai_flash", "android.katana_iai_release",
             "ergosphere_leviathan.burst", "ergosphere_leviathan.rise", "ergosphere_leviathan.drone", "horizon_warden.drone", "echo_sentinel.drone", "gravity_remnant.drone", "foundry.drone", "last_archivist.drone", "black_hole.devour",
             "android.blade_cast", "android.tend", "android.sweep", "android.chatter", "android.thruster", "horizon_warden.bolt_hit", "last_archivist.floor_fade", "security_drone.sputter",
             "drone.rotor", "drone.jet", "drone.hover", "drone.print", "drone.print_start", "drone.printed", "drone.arm_retract", "drone.dismantle", "drone.phase", "drone_port.hatch_open", "drone_port.hatch_close", "drone_port.lift", "drone_port.clamp", "drone_port.pack", "drone_port.arrive",

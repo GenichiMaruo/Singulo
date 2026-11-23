@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.ruin;
 
+import io.github.genichimaruo.singulo.android.AndroidKind;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
@@ -64,9 +65,13 @@ public class EchoSentinel extends RuinBoss {
     private static final EntityDataAccessor<Integer> CIRCLE = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CIRCLE_FLASH = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Vector3f> CIRCLE_AT = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Boolean> ROUGE_MEMORY_AWARDED = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.BOOLEAN);
 
     public static final int EMERGE_TICKS = 100;
     public static final int DEATH_TICKS = 60;
+    public static final int ROUGE_SLASH_TICK = 38;
+    public static final int ROUGE_REVEAL_TICK = DEATH_TICKS * 9 / 10;
+    public static final float KATANA_MEMORY_CHANCE = 0.25F;
     public static final float HEALTH = 320;
     /** 残っている投影器の数（0〜4）ごとの、受けるダメージの倍率。 */
     public static final float[] PROJECTION_FACTOR = {1.0F, 0.65F, 0.4F, 0.22F, 0.1F};
@@ -142,6 +147,7 @@ public class EchoSentinel extends RuinBoss {
     private double orbitAngle;
     /** 覚醒した個体が投影器を映し直したか。 */
     private boolean reprojected;
+    private boolean rolledRougeMemory;
 
     public EchoSentinel(EntityType<? extends EchoSentinel> type, Level level) {
         super(type, level, BossEvent.BossBarColor.BLUE);
@@ -176,6 +182,7 @@ public class EchoSentinel extends RuinBoss {
         entityData.define(CIRCLE, 0);
         entityData.define(CIRCLE_FLASH, 0);
         entityData.define(CIRCLE_AT, new Vector3f());
+        entityData.define(ROUGE_MEMORY_AWARDED, false);
     }
 
     @Override
@@ -219,6 +226,19 @@ public class EchoSentinel extends RuinBoss {
     @Override
     protected String[][] awakenedRewards() {
         return new String[][] {{"overclock_chip", "1"}, {"sentinel_core", "2"}, {"crystal_memory", "2"}, {"echo_chapter", "1"}};
+    }
+
+    /** 覚醒戦の隠し報酬。抽選は撃破時に一度だけ行い、記録結晶が砕けるときにメモリが現れる。 */
+    @Override
+    protected void dropAwakenedBonus(ServerLevel level) {
+        if (dead && !rolledRougeMemory) {
+            rolledRougeMemory = true;
+            entityData.set(ROUGE_MEMORY_AWARDED, random.nextFloat() < KATANA_MEMORY_CHANCE);
+        }
+    }
+
+    public boolean rougeMemoryAwarded() {
+        return entityData.get(ROUGE_MEMORY_AWARDED);
     }
 
     /** 姿を映している投影器の位置（封印核が渡す）。 */
@@ -742,14 +762,16 @@ public class EchoSentinel extends RuinBoss {
         Vec3 c = position();
         float k = (float) t / DEATH_TICKS;
         double front = 2.4 * Math.min(1, k / 0.75);
-        if (t < DEATH_TICKS * 3 / 4) {
-            // ほどけていく境目から、光の粒が昇る
-            for (int i = 0; i < 3; i++) {
+        boolean reveal = rougeMemoryAwarded();
+        // 一閃を映す間は白い粒が残像の顔や胸を覆わないよう、手前で粒を引く。
+        int unravelEnd = reveal ? ROUGE_SLASH_TICK - 8 : DEATH_TICKS * 3 / 4;
+        if (t < unravelEnd && (!reveal || t % 3 == 0)) {
+            for (int i = 0; i < (reveal ? 1 : 3); i++) {
                 level.sendParticles(ParticleTypes.END_ROD, c.x + (random.nextDouble() - 0.5) * 0.8, c.y + front,
                         c.z + (random.nextDouble() - 0.5) * 0.8, 0, (random.nextDouble() - 0.5) * 0.1, 0.12, (random.nextDouble() - 0.5) * 0.1, 1);
             }
-            if (t % 3 == 0) {
-                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, c.x, c.y + front, c.z, 4, 0.4, 0.1, 0.4, 0.15);
+            if (t % (reveal ? 6 : 3) == 0) {
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, c.x, c.y + front, c.z, reveal ? 2 : 4, 0.4, 0.1, 0.4, 0.15);
             }
         }
         if (t == 2 || t == 20) {
@@ -762,13 +784,20 @@ public class EchoSentinel extends RuinBoss {
                 }
             }
         }
-        if (t == DEATH_TICKS * 9 / 10) {
+        if (t == ROUGE_SLASH_TICK && reveal) {
+            playSound(SinguloSounds.get("android.katana_iai_release"), 1.3F, 1.0F);
+        }
+        if (t == ROUGE_REVEAL_TICK) {
             // 記録結晶が砕け散る
             Vec3 core = c.add(0, 1.57, 0);
-            level.sendParticles(ParticleTypes.FLASH, core.x, core.y, core.z, 2, 0.1, 0.1, 0.1, 0);
-            level.sendParticles(ParticleTypes.END_ROD, core.x, core.y, core.z, 90, 0.1, 0.1, 0.1, 0.35);
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, core.x, core.y, core.z, 40, 0.2, 0.2, 0.2, 0.5);
+            level.sendParticles(ParticleTypes.FLASH, core.x, core.y, core.z, reveal ? 1 : 2, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(ParticleTypes.END_ROD, core.x, core.y, core.z, reveal ? 12 : 90, 0.1, 0.1, 0.1, 0.35);
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, core.x, core.y, core.z, reveal ? 8 : 40, 0.2, 0.2, 0.2, 0.5);
             level.playSound(null, blockPosition(), SinguloSounds.get("echo_sentinel.death_shatter"), SoundSource.HOSTILE, 2.5F, 1.0F);
+            if (reveal) {
+                var drop = BossLoot.drop(this, core, PrototypeMemories.stack(AndroidKind.KATANA));
+                if (drop != null) drop.setDeltaMovement(Vec3.ZERO);
+            }
         }
     }
 
@@ -793,6 +822,7 @@ public class EchoSentinel extends RuinBoss {
         tag.putBoolean("minion", isMinion());
         tag.putInt("life", life);
         tag.putBoolean("reprojected", reprojected);
+        if (rolledRougeMemory) tag.putBoolean("rougeMemoryAwarded", rougeMemoryAwarded());
         ListTag list = new ListTag();
         for (BlockPos p : projectors) {
             list.add(NbtUtils.writeBlockPos(p));
@@ -808,6 +838,8 @@ public class EchoSentinel extends RuinBoss {
         }
         life = tag.getInt("life");
         reprojected = tag.getBoolean("reprojected");
+        rolledRougeMemory = tag.contains("rougeMemoryAwarded", Tag.TAG_BYTE);
+        entityData.set(ROUGE_MEMORY_AWARDED, tag.getBoolean("rougeMemoryAwarded"));
         projectors.clear();
         for (Tag t : tag.getList("projectors", Tag.TAG_COMPOUND)) {
             CompoundTag c = new CompoundTag();

@@ -187,6 +187,10 @@ public final class SinguloBlockEntities {
 
     public static final Supplier<BlockEntityType<GuardDockBlockEntity>> GUARD_DOCK = REGISTER.register("ruin_guard_dock",
             () -> build(GuardDockBlockEntity::new, SinguloBlocks.RUIN_GUARD_DOCK.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.RuinRelayBlockEntity>> RUIN_RELAY = REGISTER.register("ruin_relay",
+            () -> build(io.github.genichimaruo.singulo.ruin.RuinRelayBlockEntity::new, SinguloBlocks.RUIN_RELAY.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlockEntity>> ANOMALY_EMITTER = REGISTER.register("anomaly_emitter",
+            () -> build(io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlockEntity::new, SinguloBlocks.ANOMALY_EMITTER.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidStationBlockEntity>> ANDROID_STATION =
             REGISTER.register("android_station", () -> build(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity::new,

@@ -30,7 +30,7 @@ final class FxDraw {
 
     private FxDraw() {}
 
-    private static void vertex(VertexConsumer vc, PoseStack.Pose last, float x, float y, float z, int rgb, int alpha,
+    static void vertex(VertexConsumer vc, PoseStack.Pose last, float x, float y, float z, int rgb, int alpha,
                                int light, float nx, float ny, float nz) {
         vc.vertex(last.pose(), x, y, z).color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).uv(0, 0)
                 .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(last.normal(), nx, ny, nz).endVertex();
@@ -297,12 +297,19 @@ final class FxDraw {
 
     static void box(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
                             int light, int rgb, int alpha) {
+        box(pose, vc, x0, y0, z0, x1, y1, z1, light, rgb, alpha, true);
+    }
+
+    static void box(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                    int light, int rgb, int alpha, boolean drawSouthFace) {
         PoseStack.Pose p = pose.last();
         // 下・上・北・南・西・東
         quad(vc, p, light, rgb, alpha, 0, -1, 0, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1);
         quad(vc, p, light, rgb, alpha, 0, 1, 0, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0);
         quad(vc, p, light, rgb, alpha, 0, 0, -1, x0, y1, z0, x1, y1, z0, x1, y0, z0, x0, y0, z0);
-        quad(vc, p, light, rgb, alpha, 0, 0, 1, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+        if (drawSouthFace) {
+            quad(vc, p, light, rgb, alpha, 0, 0, 1, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+        }
         quad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0);
         quad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, x1, y1, z1, x1, y0, z1, x1, y0, z0);
     }

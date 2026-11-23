@@ -1362,6 +1362,128 @@ def android_railgun_fire(d, seed):
     return reverb(mix(crack, shock, sub, rails, sweep, (thunder, 0.05)), 0.95, 0.3, 3000, 1.5)
 
 
+# ------------------------------------------------------------------- 刀型（ルージュ）
+# ざらつかないように: 雑音は白色雑音やパチパチ（crackle）を使わず、なめらかなピンク雑音を帯域で絞って使う。
+# 風切りの高さは 5 kHz ほどまでに抑え、仕上げに _smooth で高い所を丸める（小さく圧縮した音のファイルで、
+# 高い雑音がジャリジャリに崩れないように）。
+
+
+def _smooth(x, cutoff=6500):
+    """仕上げ: 高い所をなだらかに落とし、頭と終わりを短くフェードして、プツッという音を消す。"""
+    return fade(lowpass(np.asarray(x, dtype=float), cutoff, 4), 0.003, 0.04)
+
+
+def _soft_noise(dur, seed):
+    return lowpass(pink(dur, seed), 7000, 2)
+
+
+def _blade_ring(seed, f=2400, length=0.9):
+    """刀身が鳴る: 薄い鋼の固有振動を、なめらかな正弦波で重ねて細く長く残す（わずかにずらした音でうなりをつける）。"""
+    t = t_axis(length)
+    out = np.zeros_like(t)
+    for k, dk, g in ((1, 0.9, 1.0), (1.006, 0.85, 0.5), (1.47, 0.55, 0.5), (2.09, 0.4, 0.3), (2.76, 0.25, 0.15)):
+        out += np.sin(2 * np.pi * f * k * t + seed * k) * np.exp(-t / (length * dk / 4)) * g
+    attack = np.clip(t / 0.002, 0, 1)
+    return out * attack * 0.5
+
+
+def _scrape(dur, f0, f1, seed):
+    """鞘走り: 鋼が鯉口をこすって滑る、細くなめらかな音（高さがすべる）。"""
+    slide = bandpass(_soft_noise(dur, seed), glide(f0, f1, dur, 1.4), 3)
+    hiss = sine(glide(f0 * 0.8, f1 * 0.8, dur, 1.4)) * 0.05
+    return (slide + hiss) * env([(0, 0), (dur * 0.2, 0.5), (dur * 0.85, 1), (dur, 0)], dur)
+
+
+def _tsuba(seed):
+    """鍔が鯉口に当たる「チン」: 小さく硬い打音（短く丸めた金属の響き）と、澄んだ響き。"""
+    knock = clank(1900, 0.12, seed) * 0.12
+    return mix(lowpass(knock, 5000), _blade_ring(seed + 1, 3100, 0.5) * 0.6)
+
+
+def _slice(seed, f=1.0):
+    """刃が空気を裂く「ヒュッ」: 上がって下がる細い風切り（ピンク雑音の帯をすべらせる）。"""
+    d = 0.22
+    t = t_axis(d)
+    center = np.where(t < 0.08, 1200 + (4200 - 1200) * (t / 0.08) ** 0.7, 4200 * (2200 / 4200) ** ((t - 0.08) / (d - 0.08))) * f
+    cut = bandpass(_soft_noise(d, seed), center, 2.5) * env([(0, 0), (0.07, 1), (0.1, 0.8), (d, 0)], d)
+    body = bandpass(_soft_noise(d, seed + 1), 900 * f, 1.2) * env([(0, 0), (0.06, 0.5), (d, 0)], d) * 0.5
+    return cut + body
+
+
+@recipe('android/katana_draw', level=-18)
+def android_katana_draw(d, seed):
+    # 抜刀（10 tick）: 腰の鞘から 0.25 秒すべらせ、抜けきった瞬間に刀身が澄んで鳴る
+    slide = _scrape(0.26, 1400, 4200, seed + 1)
+    ring = _blade_ring(seed + 2, 2300, 1.0) * 0.5
+    swish = _slice(seed + 3, 0.9) * 0.4
+    return _smooth(reverb(mix(slide, (ring, 0.24), (swish, 0.22)), 0.4, 0.2, 5000, 0.6))
+
+
+@recipe('android/katana_sheathe', level=-19)
+def android_katana_sheathe(d, seed):
+    # 納刀（12 tick）: 刀身を鞘へゆっくりすべらせ、0.4 秒（SHEATHE_SEAT）で鍔が鳴る
+    slide = _scrape(0.38, 3800, 1400, seed) * 0.7
+    return _smooth(reverb(mix((slide, 0.02), (_tsuba(seed + 3), 0.4)), 0.35, 0.2, 5000, 0.5))
+
+
+@recipe('android/katana_swing', level=-19, variants=3)
+def android_katana_swing(d, seed):
+    r = rng(seed)
+    f = 0.9 + 0.2 * r.random()
+    return _smooth(mix(_slice(seed, f), (_blade_ring(seed + 5, 2600 * f, 0.35) * 0.06, 0.08)), 6000)
+
+
+@recipe('android/katana_step', level=-18)
+def android_katana_step(d, seed):
+    # 踏み込み斬り: 低く床を蹴って飛び込み、0.2 秒（4 tick）で横一文字に振り抜く
+    kick = lowpass(thump(70, 0.15, 0.0, seed), 2000) * 0.7
+    rush = bandpass(_soft_noise(0.22, seed + 1), glide(300, 1800, 0.22), 1.2) * env([(0, 0), (0.1, 1), (0.22, 0)], 0.22) * 0.8
+    return _smooth(mix(kick, rush, (_slice(seed + 2, 0.85) * 1.1, 0.18), (_blade_ring(seed + 3, 2500, 0.4) * 0.08, 0.25)), 6000)
+
+
+@recipe('android/katana_iai_charge', level=BOSS)
+def android_katana_iai_charge(d, seed):
+    # 紅一閃の構え（34 tick = 1.7 秒）: 鼓動がしだいに速まり、刀が細く鳴りはじめて、低いうなりが満ちていく。
+    # 向きを固める 1.3 秒（26 tick）で、すべてがすっと引いて、高い一音だけが残る（息をのむ間）
+    D = 1.7
+    t = t_axis(D)
+    grow = np.clip(t / 1.3, 0, 1) ** 1.4
+    times, s_, gap = [], 0.08, 0.5
+    while s_ < 1.28:
+        times.append(s_)
+        s_ += gap
+        gap = max(0.2, gap * 0.78)
+    beats = mix(*[(mix(thump(50, 0.22, 0.0, seed + i), (thump(44, 0.2, 0.0, seed + 50 + i) * 0.7, 0.13)) * (0.55 + 0.45 * i / len(times)), st)
+                  for i, st in enumerate(times)])
+    bow = chorus(sine(1320 * (1 + 0.004 * lfo(5, D))) * 0.12 + sine(1985, D) * 0.05 + sine(2645, D) * 0.025, 3, 0.003, 4, seed) * grow
+    drone = (sine(55 * (1 + 0.003 * lfo(0.7, D))) + 0.4 * sine(110, D) + 0.15 * sine(165, D)) * grow * 0.3
+    pull = fit(bandpass(_soft_noise(1.3, seed + 8), glide(3000, 400, 1.3), 1.5)[::-1], D) * np.clip(t / 1.3, 0, 1) * 0.4
+    hush = np.where(t < 1.3, 1.0, np.exp(-(t - 1.3) / 0.05))
+    body = mix(fit(beats, D), bow, drone, pull) * hush
+    return _smooth(reverb(mix(body, (_blade_ring(seed + 9, 3300, 0.6) * 0.5, 1.3)), 0.6, 0.25, 4500, 0.6))
+
+
+@recipe('android/katana_iai_flash', level=BIG)
+def android_katana_iai_flash(d, seed):
+    # 駆け抜け: 二本の刀が交わるように二度、空気を裂き（0.035 秒ずらす）、体が風を引きちぎって抜け、刀身が長く鳴る
+    rush = bandpass(_soft_noise(0.3, seed), glide(3500, 300, 0.3), 1.5) * env([(0, 0), (0.04, 1), (0.3, 0)], 0.3) * 0.8
+    cuts = mix(_slice(seed + 1, 1.1) * 1.1, (_slice(seed + 2, 0.95) * 1.0, 0.035))
+    ring = mix(_blade_ring(seed + 4, 2600, 1.6) * 0.4, (_blade_ring(seed + 5, 2950, 1.4) * 0.3, 0.035))
+    sub = sub_drop(0.6, 90, 35) * 0.5
+    return _smooth(reverb(mix(rush, (cuts, 0.02), (ring, 0.06), sub), 0.7, 0.3, 4500, 1.0))
+
+
+@recipe('android/katana_iai_release', level=BIG)
+def android_katana_iai_release(d, seed):
+    # 抜いた紅刀の刃鳴りに続いて斬撃と衝撃が走る。鍔鳴りは実際の納刀時に katana_sheathe で鳴らす。
+    r = rng(seed)
+    ring = _blade_ring(seed, 2550, 0.45) * 0.25
+    slices = mix(*[(_slice(seed + 10 + i, 1.1 - 0.06 * i) * (1 - 0.1 * i), 0.07 + 0.03 * i + 0.012 * r.random()) for i in range(5)])
+    shock = lowpass(boom(1.6, 42, seed + 1, 0.2), 1500) * 0.9
+    glow = chorus(sine(660, 1.2) * 0.1 + sine(990, 1.2) * 0.05, 3, 0.003, 3, seed) * perc(1.2, 0.05, 0.9)
+    return _smooth(reverb(mix(ring, slices, (shock, 0.08), (glow, 0.1)), 0.85, 0.3, 4000, 1.4))
+
+
 @recipe('android/ring_inflate')
 def android_ring_inflate(d, seed):
     pop = sine(glide(400, 900, 0.06)) * perc(0.06, 0.001, 0.03) * 0.5

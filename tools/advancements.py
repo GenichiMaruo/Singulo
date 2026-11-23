@@ -4,13 +4,17 @@ ADVANCEMENTS は (id, 親, アイコン, 枠, 条件, 段階, 日本語の題, �
 条件:
   ('tick',)                 入ったらすぐ（根）
   ('item', 'xxx')           singulo:xxx を手に入れる（minecraft: で始まればバニラ）
+  ('collect_items', ...)    種類ごとに入手を記録し、すべて集める（同時所持は不要）
   ('milestone', 'id')       Singulo の出来事（formed/<マルチブロック>, discover/<遺構>, ignite, wormhole_open, records_all など）
   ('kill', 'entity_id')     倒す
 枠: task / goal / challenge
 """
 
+from ids import MOD
+
 # 隠し進捗（達成するまで一覧に出ない）
-HIDDEN_ADVANCEMENTS = {'archivist'}
+HIDDEN_ADVANCEMENTS = {'archivist', 'android_memory_collection'}
+ANDROID_MEMORIES = sorted(item for item, _, _ in MOD.values() if item.startswith('android_memory_'))
 
 ADVANCEMENTS = [
     ('root', None, 'handbook', 'task', ('tick',), 1,
@@ -187,6 +191,9 @@ ADVANCEMENTS += [
      '小さな設計図', '遺構の印刷台から旧型アンドロイドの小型クリスタルメモリを1種類手に入れる', 'A Little Blueprint', 'Obtain a Compact Crystal Memory for any ordinary android from a ruin fabricator'),
     ('android_printed', 'android_memory', 'android_kit', 'goal', ('milestone', 'android_printed'), 2,
      'はじめまして', '自分の組立ステーションで護衛の印刷を完了する', 'Hello There', 'Finish printing a guard at your own assembly station'),
+    ('android_memory_collection', 'android_memory', 'android_memory_katana', 'challenge', ('collect_items', *ANDROID_MEMORIES), 5,
+     'めぐりあう記憶', 'すべての型のアンドロイドの設計メモリを手に入れる',
+     'Memories Reunited', 'Collect the design memory for every android model'),
     ('android_charger', 'android_printed', 'android_charger', 'task', ('item', 'android_charger'), 2,
      'そばで充電', 'アンドロイド用無線充電器を手に入れる', 'Charge Nearby', 'Obtain an Android Wireless Charger'),
     ('android_work', 'android_printed', 'android_work_console', 'goal', ('item', 'android_work_console'), 2,
@@ -226,7 +233,7 @@ def validate_advancements():
             if by_id[node][5] > stage:
                 raise ValueError(f'{aid}: parent has a later tier: {node}')
             node = by_id[node][1]
-        if frame not in ('task', 'goal', 'challenge') or cond[0] not in ('tick', 'item', 'any_item', 'all_items', 'milestone', 'kill'):
+        if frame not in ('task', 'goal', 'challenge') or cond[0] not in ('tick', 'item', 'any_item', 'all_items', 'collect_items', 'milestone', 'kill'):
             raise ValueError(f'{aid}: invalid frame or criterion')
 
 # 0.15.0: 降着ジェット鍛造炉（シンギュラリティ・コアのあと。ジェットで鍛えた最初のインゴット）
