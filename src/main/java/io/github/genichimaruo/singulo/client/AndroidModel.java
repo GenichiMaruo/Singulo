@@ -794,12 +794,25 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             head.zRot += 0.1F * k * Mth.sin(t * 0.3F);
         } else if (android.state() == RuinAndroid.STATE_IDLE) {
             // 射撃型の仕草は、構えていない間だけ（次の構えが始まったら、そちらを優先）
-            if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_RELOAD) {
+            if (g == GunnerAndroid.GESTURE_INSPECT && android instanceof GunnerAndroid) {
+                float inspecting = inspectionPose(t);
+                reload(11, inspecting);
+                head.zRot += 0.14F * magazineOut(t);
+                forearmL.xRot += 0.18F * magazineOut(t);
+            } else if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_RELOAD) {
                 reload(t, k);
             } else if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_TWIRL) {
                 twirl(t, k);
             }
         }
+    }
+
+    static float inspectionPose(float t) {
+        return ease((t - 6) / 9) * (1 - ease((t - 50) / 12));
+    }
+
+    static float magazineOut(float t) {
+        return ease((t - 17) / 9) * (1 - ease((t - 40) / 9));
     }
 
     /**

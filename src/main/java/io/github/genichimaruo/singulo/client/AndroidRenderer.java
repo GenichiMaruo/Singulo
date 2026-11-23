@@ -2696,7 +2696,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.scale(s, s, s);
                 pose.translate(-0.6F, 0, 0);
                 holster = new org.joml.Matrix4f(pose.last().pose());
-                if (atHip == 1) pistol(pose, buffers, light, glow, age, 0, -1);
+                if (atHip == 1) pistol(pose, buffers, light, glow, age, 0, -1, 0);
                 pose.popPose();
                 if (!rail && atHip == 1) {
                     railgun(pose, buffers, light, android, state, t, age, glow, back, null);
@@ -2712,10 +2712,12 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             // 射撃型の仕草（リロード・一回し）の効き（0〜1。構えていない間だけ。始めと終わりはなめらかに）
             int kind = android.gesture();
             boolean reloading = kind == GunnerAndroid.GESTURE_RELOAD;
+            boolean inspecting = kind == GunnerAndroid.GESTURE_INSPECT && state == RuinAndroid.STATE_IDLE;
             float gestureTime = android.gestureTime(partialTick), gesture = 0;
             if (state == RuinAndroid.STATE_IDLE && (reloading || kind == GunnerAndroid.GESTURE_TWIRL)) {
                 gesture = ease(Math.min(gestureTime / 5, (RuinAndroid.GESTURE_TICKS - gestureTime) / 5));
             }
+            if (inspecting) gesture = AndroidModel.inspectionPose(gestureTime);
             if (atHip < 1) {
                 pose.pushPose();
                 pose.scale(PISTOL_SCALE, PISTOL_SCALE, PISTOL_SCALE);
@@ -2729,7 +2731,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     Vec3 rel = fwd.scale(0.45).add(right.scale(0.25));
                     if (gesture > 0) {
                         // 仕草の間: リロードは胸の前で少し上向きに、一回しは前へ向けて回したあと、銃口を真上へ立てる
-                        Vec3 at = reloading ? new Vec3(0, 1.1, 0).add(fwd.scale(1.2)).subtract(right.scale(0.4))
+                        Vec3 at = reloading || inspecting ? new Vec3(0, 1.1, 0).add(fwd.scale(1.2)).subtract(right.scale(0.4))
                                 : new Vec3(0, 1.1, 0).add(fwd.scale(1.5)).add(right.scale(0.4)).lerp(
                                 new Vec3(0, 3.2, 0).add(fwd.scale(0.3)).add(right.scale(1.0)), ease((gestureTime - 13) / 5));
                         rel = rel.lerp(at, gesture);
@@ -2746,7 +2748,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.mulPose(TO_HAND);
                 pose.scale(p, p, p);
                 pose.translate(0, PISTOL_AXIS, 0);
-                if (gesture > 0 && !reloading) {
+                if (gesture > 0 && kind == GunnerAndroid.GESTURE_TWIRL) {
                     // 一回し: 用心金に掛けた指を軸に、銃を2回転させる
                     float spin = ease((gestureTime - 1) / 12);
                     pose.translate(1.2F, 1.0F, 0);
@@ -2755,7 +2757,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 float flash = Mth.clamp((gun.shotFlash() - partialTick) / GunnerAndroid.FLASH, 0, 1);
                 if (atHip > 0) push(pose, pistolTransfer(pose.last().pose(), holster, atHip));
-                pistol(pose, buffers, light, glow, age, flash, reloading && gesture > 0 ? gestureTime : -1);
+                pistol(pose, buffers, light, glow, age, flash, reloading && gesture > 0 ? gestureTime : -1,
+                        inspecting ? AndroidModel.magazineOut(gestureTime) : 0);
                 if (!rail) rememberMuzzle(pose, android, 4.7F, -PISTOL_AXIS, 0);
                 if (atHip > 0) pose.popPose();
                 pose.popPose();
@@ -3006,7 +3009,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
          * 飛んできて押し込まれ、握りの窓が下から満ちて、満ちた瞬間に強く光る。
          * 面がぴったり重なるとちらつくので、つながる部品は少し食い込ませる。
          */
-        private void pistol(PoseStack pose, MultiBufferSource buffers, int light, float glow, float age, float flash, float reload) {
+        private void pistol(PoseStack pose, MultiBufferSource buffers, int light, float glow, float age, float flash, float reload, float inspection) {
             boolean reloading = reload >= 0;
             float fill = !reloading ? 1 : reload < GunnerAndroid.RELOAD_EJECT + 2 ? 1 - ease((reload - GunnerAndroid.RELOAD_EJECT) / 2)
                     : ease((reload - GunnerAndroid.RELOAD_INSERT - 1) / (GunnerAndroid.RELOAD_DONE - GunnerAndroid.RELOAD_INSERT - 1));
@@ -3027,7 +3030,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, body, 1.85F, 0.6F, -0.15F, 2.05F, 1.35F, 0.15F, light, DARK, 255);
             FxDraw.box(pose, body, 0.9F, 0.6F, -0.08F, 1.1F, 1.1F, 0.08F, light, LIGHT, 255);           // 引き金
             for (boolean spent : new boolean[]{false, true}) {
-                if (cartridge(pose, reload, spent)) {
+                if (cartridge(pose, reload, spent, inspection)) {
                     FxDraw.box(pose, body, -0.45F, 0, -0.28F, 0.25F, 1.9F, 0.28F, light, DARK, 255);         // カートリッジ
                     FxDraw.box(pose, body, -0.55F, 1.9F, -0.35F, 0.35F, 2.15F, 0.35F, light, LIGHT, 255);
                     pose.popPose();
@@ -3043,7 +3046,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             glowBox(pose, shine, 3.75F, -0.7F, -0.6F, 4.05F, -0.15F, -0.5F, band, 255);
             glowBox(pose, shine, 4.5F, -0.6F, -0.2F, 4.7F, -0.25F, 0.2F, hot, 255);              // 銃口
             for (boolean spent : new boolean[]{false, true}) {
-                if (cartridge(pose, reload, spent)) {
+                if (cartridge(pose, reload, spent, inspection)) {
                     // カートリッジの光る芯（空のカートリッジは消えている）
                     int core = spent ? mix(DARK, accent, 0.15F) : accent;
                     glowBox(pose, shine, -0.3F, 0.3F, 0.26F, 0.1F, 1.6F, 0.32F, core, 255);
@@ -3060,7 +3063,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             glowBox(pose, fx, 4.55F, -0.75F - 0.3F * flash, -0.35F - 0.3F * flash, 4.95F + 0.6F * flash, -0.1F + 0.3F * flash,
                     0.35F + 0.3F * flash, variant.accent, (int) Math.min(255, 140 * glow + 110 * flash));
             glowBox(pose, fx, -0.85F, 2.5F - 1.7F * fill, -0.3F, -0.6F, 2.5F, 0.3F, variant.accent, (int) (80 * glow * fill + 150 * filled));
-            if (reloading && reload < GunnerAndroid.RELOAD_INSERT + 1 && cartridge(pose, reload, false)) {
+            if (reloading && reload < GunnerAndroid.RELOAD_INSERT + 1 && cartridge(pose, reload, false, 0)) {
                 glowBox(pose, fx, -0.6F, -0.15F, -0.45F, 0.4F, 2.3F, 0.45F, variant.accent, (int) (130 * glow));   // 運ばれてくる新しいカートリッジ
                 pose.popPose();
             }
@@ -3074,7 +3077,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
          * spent: 抜け落ちる空のカートリッジ（リロードの始めだけ見える）。そうでなければ、握りに入っているカートリッジ
          * （リロード中は、左手の側から飛んできて、握りの下で向きをそろえ、下から押し込まれる）。
          */
-        private static boolean cartridge(PoseStack pose, float reload, boolean spent) {
+        private static boolean cartridge(PoseStack pose, float reload, boolean spent, float inspection) {
             float x = 0, y = CARTRIDGE_IN, z = 0, turn = 0, tilt = 0, size = 1;
             if (spent) {
                 float d = Math.max(0, reload - GunnerAndroid.RELOAD_EJECT);
@@ -3103,6 +3106,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
             }
             pose.pushPose();
+            pose.translate(0, 2.7F * inspection, 0.6F * inspection);
             pose.translate(x - 0.1F, y + 1, z);
             pose.mulPose(Axis.ZP.rotation(turn));
             pose.mulPose(Axis.XP.rotation(tilt));

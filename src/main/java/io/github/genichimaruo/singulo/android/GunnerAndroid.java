@@ -50,6 +50,43 @@ public class GunnerAndroid extends RuinAndroid {
 
     /** 仕草: 3連射のあとのリロード（エネルギーカートリッジの交換）と、相手を倒したあとの小型銃の一回し。 */
     public static final int GESTURE_RELOAD = 20, GESTURE_TWIRL = 21;
+    public static final int GESTURE_INSPECT = 22;
+    private KatanaAndroid crossPartner;
+    private int crossTargetId;
+    private int nextRail = 80;
+
+    boolean idleForInspection() {
+        return isAlive() && active() && !isNoAi() && state() == STATE_IDLE && getTarget() == null
+                && !isWorking() && !napping() && !life.busy() && onGround() && !isPassenger()
+                && getNavigation().isDone() && getDeltaMovement().horizontalDistanceSqr() < 0.0025;
+    }
+
+    boolean prepareCross(ServerLevel level, KatanaAndroid rouge, LivingEntity foe) {
+        if (crossPartner != null || !isAlive() || !active() || isNoAi() || getTarget() != foe
+                || !hasLineOfSight(foe) || blocked(level, muzzle(true), foe.getBoundingBox().getCenter())) return false;
+        Vec3 rail = foe.position().subtract(position()).multiply(1, 0, 1).normalize();
+        Vec3 dash = foe.position().subtract(rouge.position()).multiply(1, 0, 1).normalize();
+        if (Math.abs(rail.cross(dash).y) < 0.55) return false;
+        int s = state();
+        if (s == STATE_IDLE) {
+            double range = distanceTo(foe);
+            if (rouge.stateTicks > 2 || nextRail > 0 || reloadTicks >= 0 || range < 5 || range >= RAIL_RANGE * 0.8
+                    || isWorking() || !spend(COST_RAIL)) return false;
+            aimRail(foe);
+            setState(STATE_RAIL_ASSEMBLE);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_assemble"), 0.8F, 1);
+        } else if (s == STATE_RAIL_ASSEMBLE) {
+            if (RAIL_ASSEMBLE - stateTicks + RAIL_CHARGE - RAIL_LOCK > KatanaAndroid.IAI_STANCE - rouge.stateTicks) return false;
+        } else if (s != STATE_RAIL_CHARGE || RAIL_CHARGE - RAIL_LOCK - stateTicks > KatanaAndroid.IAI_STANCE - rouge.stateTicks) return false;
+        crossPartner = rouge;
+        crossTargetId = foe.getId();
+        return true;
+    }
+
+    boolean covering(KatanaAndroid rouge) {
+        return crossPartner == rouge && isAlive() && active() && rouge.isAlive() && level() == rouge.level()
+                && distanceToSqr(rouge) <= 32 * 32 && (state() == STATE_RAIL_ASSEMBLE || state() == STATE_RAIL_CHARGE);
+    }
     /**
      * リロード（エネルギーカートリッジの交換）の流れ: 空のカートリッジが握りの底から抜け落ち（RELOAD_EJECT から）、
      * 左手で新しいカートリッジを運んで、RELOAD_INSERT に押し込み、RELOAD_DONE に握りのエネルギーが満ちる（仕草の tick）。
@@ -337,8 +374,9 @@ public class GunnerAndroid extends RuinAndroid {
         Set<LivingEntity> hit = new HashSet<>();
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(from, end).inflate(RAIL_RADIUS), this::canHit)) {
             AABB box = e.getBoundingBox().inflate(RAIL_RADIUS);
-            if ((box.contains(from) || box.clip(from, end).isPresent()) && hit.add(e)
-                    && e.hurt(damageSources().mobAttack(this), RAIL_DAMAGE)) {
+            if (!(box.contains(from) || box.clip(from, end).isPresent()) || !hit.add(e)) continue;
+            if (crossPartner != null && e.getId() == crossTargetId) e.invulnerableTime = 0;
+            if (e.hurt(damageSources().mobAttack(this), RAIL_DAMAGE)) {
                 e.setDeltaMovement(e.getDeltaMovement().add(dir.x * 0.8, 0.25, dir.z * 0.8));
                 e.hurtMarked = true;
             }
@@ -407,7 +445,9 @@ public class GunnerAndroid extends RuinAndroid {
     public void tick() {
         super.tick();
         if (level() instanceof ServerLevel) {
+            if (state() != STATE_RAIL_ASSEMBLE && state() != STATE_RAIL_CHARGE) crossPartner = null;
             int motion = gesture();
+            if (motion == GESTURE_INSPECT && !idleForInspection()) gesture(GESTURE_NONE, null);
             if (motion != GESTURE_NONE && (combat(state()) || (motion == GESTURE_RELOAD || motion == GESTURE_TWIRL)
                     && (state() != STATE_IDLE || isWorking() || napping()))) {
                 gesture(GESTURE_NONE, null);
@@ -455,7 +495,6 @@ public class GunnerAndroid extends RuinAndroid {
 
     private final class CombatGoal extends Goal {
         private int nextBurst = 20;
-        private int nextRail = 80;
         private int hopCooldown;
         /** 今の連射で撃った数と、次に撃てる tick（撃てたら5 tick あける。障害物で撃てなければ、向けたまま毎 tick 試す）。 */
         private int shots;
@@ -560,10 +599,34 @@ public class GunnerAndroid extends RuinAndroid {
                     }
                     // コイルが灯る音と、狙いが固まる音は、ためる音（android.railgun_charge）に入っている
                     if (stateTicks >= RAIL_CHARGE) {
+                        if (crossPartner != null) {
+                            KatanaAndroid partner = crossPartner;
+                            int phase = partner.state();
+                            if (!covering(partner) || target.getId() != crossTargetId || partner.getTarget() != target || !partner.active()
+                                    || stateTicks > RAIL_CHARGE + 90
+                                    || phase < KatanaAndroid.STATE_IAI_STANCE || phase > KatanaAndroid.STATE_IAI_ZANSHIN) {
+                                stowRail();
+                                return;
+                            }
+                            if (phase != KatanaAndroid.STATE_IAI_ZANSHIN || partner.stateTicks < KatanaAndroid.IAI_SHEATHE_SEAT) return;
+                            Vec3 from = muzzle(true);
+                            AABB partnerBox = partner.getBoundingBox().inflate(RAIL_RADIUS);
+                            if (partnerBox.contains(from) || partnerBox.clip(from, railTo()).isPresent()) {
+                                stowRail();
+                                return;
+                            }
+                        }
                         // ためている間に相手が物陰へ隠れた: 撃たずに諦めて、しまう
                         if (hasLineOfSight(target) && !blocked(level, muzzle(true), target.getBoundingBox().getCenter())) {
                             setState(STATE_RAIL_FIRE);
                             fireRail(level);
+                            if (crossPartner != null) {
+                                Vec3 a = crossPartner.pathFrom(), b = crossPartner.pathTo();
+                                int steps = Mth.clamp((int) (a.distanceTo(b) * 2), 1, 32);
+                                for (int i = 0; i <= steps; i++) {
+                                    crossPartner.sparks(level, a.lerp(b, (double) i / steps).add(0, 0.9, 0), 1, 0.025);
+                                }
+                            }
                         } else {
                             stowRail();
                         }
@@ -654,6 +717,7 @@ public class GunnerAndroid extends RuinAndroid {
 
         /** レールガンをしまい、次に組み上げるまで間をあける。 */
         private void stowRail() {
+            crossPartner = null;
             setState(STATE_RAIL_STOW);
             playSound(SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 0.8F, 1.5F);
             nextRail = 160 + random.nextInt(80);

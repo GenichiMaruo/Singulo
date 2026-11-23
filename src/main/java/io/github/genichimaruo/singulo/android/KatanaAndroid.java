@@ -62,6 +62,16 @@ public class KatanaAndroid extends RuinAndroid {
     public static final int IAI_VICTORY_RETURN = 24, IAI_VICTORY_GUIDE = 30, IAI_VICTORY_SEAT = 39, IAI_VICTORY = 46;
     /** 待機中に背中の箱から布を取り、腰の打刀を拭いて両方を元に戻す。 */
     public static final int STATE_MAINTENANCE = 80;
+    private GunnerAndroid inspectionCiel;
+    private GunnerAndroid crossCiel;
+
+    private java.util.List<GunnerAndroid> nearbyGunners(ServerLevel level, int range) {
+        if (!isGuard() || owner() == null) return java.util.List.of();
+        var allies = level.getEntitiesOfClass(GunnerAndroid.class, getBoundingBox().inflate(range),
+                gun -> gun.isGuard() && owner().equals(gun.owner()) && distanceToSqr(gun) <= range * range && hasLineOfSight(gun));
+        allies.sort(java.util.Comparator.comparingDouble(gun -> distanceToSqr(gun)));
+        return allies;
+    }
     public static final int MAINTENANCE_CLOTH = 12, MAINTENANCE_DRAW = 18, MAINTENANCE_CLEAR = 26, MAINTENANCE_WIPE = 34;
     public static final int MAINTENANCE_RETURN = 62, MAINTENANCE_GUIDE = 68, MAINTENANCE_SEAT = 76, MAINTENANCE_STOW = 86, MAINTENANCE = 96;
 
@@ -477,8 +487,12 @@ public class KatanaAndroid extends RuinAndroid {
 
     private void tickMaintenance(ServerLevel level, boolean threat) {
         int s = state();
+        if (inspectionCiel != null && (s != STATE_MAINTENANCE || !inspectionCiel.idleForInspection()
+                || inspectionCiel.gesture() != GunnerAndroid.GESTURE_INSPECT || distanceToSqr(inspectionCiel) > 4 * 4)) {
+            endInspection(false);
+        }
         boolean free = (s == STATE_IDLE || s == STATE_MAINTENANCE) && !threat && !drawn() && isAlive() && !isNoAi()
-                && active() && !isWorking() && !napping() && gesture() == GESTURE_NONE && !life.busy()
+                && active() && !isWorking() && !napping() && (gesture() == GESTURE_NONE || inspectionCiel != null) && !life.busy()
                 && onGround() && !isPassenger() && !isInWater() && !isInLava() && hurtTime == 0
                 && getNavigation().isDone() && position().distanceToSqr(xo, yo, zo) < 0.0001;
         if (!free) {
@@ -492,15 +506,33 @@ public class KatanaAndroid extends RuinAndroid {
             nextMaintenance = tickCount + MAINTENANCE + 20 * (35 + random.nextInt(26));
             entityData.set(MAINTENANCE_START, level.getGameTime());
             setState(STATE_MAINTENANCE);
+            if (home() != null && home().closerToCenterThan(position(), 12)) {
+                for (var gun : nearbyGunners(level, 4)) {
+                    if (gun.gesture() != GESTURE_NONE || !gun.idleForInspection()) continue;
+                    inspectionCiel = gun;
+                    gesture(GunnerAndroid.GESTURE_INSPECT, null, MAINTENANCE + 3);
+                    gun.gesture(GunnerAndroid.GESTURE_INSPECT, this, MAINTENANCE + 3);
+                    break;
+                }
+            }
         }
     }
 
     private void endMaintenance(boolean threat) {
+        endInspection(!threat && stateTicks >= MAINTENANCE);
         // 抜き切った打刀で迎撃する場合だけ、手入れ中の刀をそのまま戦闘用に引き継ぐ。
         if (threat && active() && !isWorking() && stateTicks >= MAINTENANCE_CLEAR && stateTicks < MAINTENANCE_GUIDE) {
             setDrawn(true);
         }
         setState(STATE_IDLE);
+    }
+
+    private void endInspection(boolean completed) {
+        if (inspectionCiel == null) return;
+        var gun = inspectionCiel;
+        inspectionCiel = null;
+        if (gun.gesture() == GunnerAndroid.GESTURE_INSPECT) gun.gesture(completed ? GESTURE_NOD : GESTURE_NONE, completed ? this : null);
+        if (gesture() == GunnerAndroid.GESTURE_INSPECT) gesture(completed ? GESTURE_NOD : GESTURE_NONE, completed ? gun : null);
     }
 
     @Override
@@ -509,6 +541,7 @@ public class KatanaAndroid extends RuinAndroid {
         if (level() instanceof ServerLevel level) {
             int s = state();
             LivingEntity foe = getTarget();
+            if (s != STATE_IAI_STANCE) crossCiel = null;
             boolean threat = foe != null && foe.isAlive();
             if (victoryPending) {
                 if (threat || !isAlive() || !drawn() || !active() || isWorking() || (s != STATE_IDLE && !combat(s))) {
@@ -712,6 +745,16 @@ public class KatanaAndroid extends RuinAndroid {
                     }
                 }
                 case STATE_IAI_STANCE -> {
+                    if ((stateTicks == 1 || stateTicks % 5 == 0) && stateTicks < IAI_STANCE - IAI_LOCK
+                            && (crossCiel == null || !crossCiel.covering(KatanaAndroid.this))) {
+                        crossCiel = null;
+                        for (var gun : nearbyGunners(level, 24)) {
+                            if (gun.prepareCross(level, KatanaAndroid.this, target)) {
+                                crossCiel = gun;
+                                break;
+                            }
+                        }
+                    }
                     if (stateTicks < IAI_STANCE - IAI_LOCK) {
                         hold(target);
                     } else {
@@ -780,6 +823,7 @@ public class KatanaAndroid extends RuinAndroid {
         }
 
         private void finishIai(int nextState) {
+            crossCiel = null;
             nextIai = 220 + random.nextInt(80);
             nextMove = 16;
             setState(nextState);

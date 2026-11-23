@@ -29,6 +29,64 @@ public final class KatanaGameTests {
 
     private KatanaGameTests() {}
 
+    private static GunnerAndroid partner(GameTestHelper helper, KatanaAndroid rouge, BlockPos at) {
+        var gun = SinguloEntities.GUNNER_ANDROID.get().create(helper.getLevel());
+        var owner = java.util.UUID.randomUUID();
+        var home = helper.absolutePos(new BlockPos(7, 0, 7));
+        helper.setBlock(new BlockPos(7, 0, 7), SinguloBlocks.ANDROID_STATION.get());
+        AndroidStationBlockEntity station = helper.getBlockEntity(new BlockPos(7, 0, 7));
+        var registry = helper.getLevel().registryAccess();
+        var saved = station.saveWithoutMetadata(registry);
+        saved.putUUID("owner", owner);
+        saved.putUUID("android0", rouge.getUUID());
+        saved.putUUID("android1", gun.getUUID());
+        saved.putInt("mode", RuinAndroid.MODE_FOLLOW);
+        station.loadWithComponents(saved, registry);
+        rouge.makeGuard(owner, home, RuinAndroid.MODE_FOLLOW, 0);
+        gun.makeGuard(owner, home, RuinAndroid.MODE_FOLLOW, 0);
+        gun.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(at)), 0, 0);
+        helper.getLevel().addFreshEntity(gun);
+        rouge.setNoAi(false);
+        return gun;
+    }
+
+    @GameTest(template = HUGE, batch = "paired_inspection", timeoutTicks = 750)
+    public static void pairInspectsAndExchangesNods(GameTestHelper helper) {
+        floor(helper);
+        var rouge = katana(helper, new BlockPos(7, 1, 7));
+        var gun = partner(helper, rouge, new BlockPos(10, 1, 7));
+        int ammo = gun.ammo();
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(rouge.state() == KatanaAndroid.STATE_MAINTENANCE
+                        && gun.gesture() == GunnerAndroid.GESTURE_INSPECT, "隣で弾倉の点検を始めるのを待つ"))
+                .thenIdle(60)
+                .thenExecute(() -> helper.assertTrue(gun.gesture() == GunnerAndroid.GESTURE_INSPECT && gun.ammo() == ammo,
+                        "弾数を変えずに相手の手入れを待つ"))
+                .thenWaitUntil(() -> helper.assertTrue(rouge.gesture() == RuinAndroid.GESTURE_NOD
+                        && gun.gesture() == RuinAndroid.GESTURE_NOD, "片付けが終わった二人の会釈を待つ"))
+                .thenSucceed();
+    }
+
+    @GameTest(template = HUGE, batch = "cross_aim", timeoutTicks = 140)
+    public static void crossAimWaitsUntilRougeSheathes(GameTestHelper helper) {
+        floor(helper);
+        var rouge = katana(helper, new BlockPos(2, 1, 9));
+        var gun = partner(helper, rouge, new BlockPos(9, 1, 2));
+        var foe = dummy(helper, new BlockPos(9, 1, 9));
+        rouge.setTarget(foe);
+        gun.setTarget(foe);
+        rouge.setState(KatanaAndroid.STATE_IAI_STANCE);
+        gun.setState(GunnerAndroid.STATE_RAIL_ASSEMBLE);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(gun.covering(rouge), "同じ相手への交差照準を待つ"))
+                .thenWaitUntil(() -> helper.assertTrue(rouge.state() == KatanaAndroid.STATE_IAI_ZANSHIN
+                        && rouge.stateTicks == KatanaAndroid.IAI_SHEATHE_SEAT - 2, "残心の納刀を待つ"))
+                .thenExecute(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_CHARGE, "納刀前に発射した"))
+                .thenWaitUntil(() -> helper.assertTrue(gun.state() == GunnerAndroid.STATE_RAIL_FIRE, "納刀に合わせた貫通射撃を待つ"))
+                .thenExecute(() -> helper.assertTrue(foe.getHealth() <= 160, "二刀の斬撃と貫通射撃が両方当たらなかった"))
+                .thenSucceed();
+    }
+
     /** 動かない的（倒れにくいハスク）。 */
     private static Zombie dummy(GameTestHelper helper, BlockPos at) {
         Zombie z = helper.spawn(EntityType.HUSK, at);

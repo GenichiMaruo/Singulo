@@ -177,9 +177,13 @@ public abstract class RuinAndroid extends Monster {
 
     /** 仕草をする（look があれば、そのあいだそちらを向く）。 */
     public void gesture(int kind, @Nullable Entity look) {
+        gesture(kind, look, GESTURE_TICKS);
+    }
+
+    void gesture(int kind, @Nullable Entity look, int duration) {
         entityData.set(GESTURE, GESTURE_NONE);
         entityData.set(GESTURE, kind);
-        gestureTicks = kind == GESTURE_NONE ? 0 : GESTURE_TICKS;
+        gestureTicks = kind == GESTURE_NONE ? 0 : duration;
         gestureLook = look;
     }
 
