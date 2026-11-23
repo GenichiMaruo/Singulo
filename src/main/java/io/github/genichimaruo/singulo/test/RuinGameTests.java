@@ -249,7 +249,8 @@ public final class RuinGameTests {
     public static void ruinTemplatesHaveCacheAndGuards(GameTestHelper helper) {
         // 地下アンドロイド研究所は部屋の型紙を並べるので、LabGameTests で確かめる
         for (String ruin : List.of("observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor")) {
-            Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + ruin));
+            String templateName = ruin.equals("final_lab") || ruin.equals("sunken_reactor") ? ruin + "_antechamber" : ruin;
+            Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + templateName));
             helper.assertTrue(template.isPresent(), "構造物ファイルがない: " + ruin);
             List<StructureTemplate.StructureBlockInfo> caches = template.get().filterBlocks(BlockPos.ZERO,
                     new StructurePlaceSettings(), SinguloBlocks.RUIN_CACHE.get());

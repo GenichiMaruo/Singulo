@@ -189,6 +189,8 @@ public class HorizonWarden extends Monster {
     private final HurtWindows hurtWindows = new HurtWindows();
     /** 報酬に数える挑戦者の数。目覚めたときの人数で決まり、途中で合流しても増えない。0 ならまだ決まっていない。 */
     private int rewardParticipants;
+    /** 排除モード（中継器がそろう前にドームへ入り込まれたとき現れる、報酬のない個体。{@link IntrusionAlarm}）。 */
+    private boolean intruderGuard;
     /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
     @Nullable
     private Component barName;
@@ -400,6 +402,9 @@ public class HorizonWarden extends Monster {
 
     @Override
     protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
+        if (intruderGuard) {
+            return;
+        }
         if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
                 || lastHurtByPlayerTime > 0 && shouldDropExperience()
                 && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
@@ -529,6 +534,36 @@ public class HorizonWarden extends Monster {
             xpReward = 4500;
         }
         restrictTo(home, ARENA_RADIUS);
+    }
+
+    /** 排除モードの個体か。 */
+    public boolean intruderGuard() {
+        return intruderGuard;
+    }
+
+    /**
+     * 排除モードにする（起こしたあと、加える前に呼ぶ）。体力が {@link IntrusionAlarm#HEALTH_MULTIPLIER} 倍になり、倒しても
+     * 何も落とさず、保管庫の封鎖も解けない。ボスバーは赤い警告の名前になる。
+     */
+    public void makeIntruderGuard() {
+        intruderGuard = true;
+        double effective = Math.min(1.0e18, effectiveMaxHealth() * IntrusionAlarm.HEALTH_MULTIPLIER);
+        double max = Math.min(effective, MAX_HEALTH_CAP);
+        damageScale = (float) (max / effective);
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
+        setHealth((float) max);
+        xpReward = 0;
+        applyIntruderLook();
+    }
+
+    private void applyIntruderLook() {
+        setBarName(Component.translatable("entity.singulo.horizon_warden.intruder"));
+        bossBar.setColor(BossEvent.BossBarColor.RED);
+    }
+
+    @Override
+    protected boolean shouldDropLoot() {
+        return !intruderGuard && super.shouldDropLoot();
     }
 
     private void applySpawnHealth(boolean awakened) {
@@ -713,7 +748,7 @@ public class HorizonWarden extends Monster {
         }
         entityData.set(PHASE, phase);
         getAttribute(Attributes.ARMOR).setBaseValue(phase == 1 ? ARMOR_PHASE_1 : 0);
-        bossBar.setColor(phase == 1 ? (awakened() ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.WHITE)
+        bossBar.setColor(intruderGuard ? BossEvent.BossBarColor.RED : phase == 1 ? (awakened() ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.WHITE)
                 : phase == 2 ? BossEvent.BossBarColor.BLUE : BossEvent.BossBarColor.RED);
         if (phase == 2) {
             // 外装が剥がれ、破片が周りを回り始める
@@ -1308,7 +1343,9 @@ public class HorizonWarden extends Monster {
         entityData.set(BEAM_CHARGE, 0);
         entityData.set(LASER, 0);
         entityData.set(SWEEP, 0);
-        if (level() instanceof ServerLevel level) {
+        if (level() instanceof ServerLevel level && intruderGuard) {
+            playSound(SinguloSounds.get("horizon_warden.death"), 3.5F, 1.0F);   // 排除モード: 報酬も記録もなく、保管庫も開かない
+        } else if (level() instanceof ServerLevel level) {
             for (Player participant : rewardPlayers(level)) {
                 if (participant instanceof ServerPlayer player) {
                     io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(player, "defeat/horizon_warden");
@@ -1448,6 +1485,7 @@ public class HorizonWarden extends Monster {
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
+        tag.putBoolean("intruder_guard", intruderGuard);
         tag.putInt("participants", participants);
         tag.putInt("reward_participants", rewardParticipants);
         if (home != null) {
@@ -1484,6 +1522,11 @@ public class HorizonWarden extends Monster {
             setBarName(Component.translatable("entity.singulo.horizon_warden.awakened"));
             bossBar.setColor(phase() == 1 ? BossEvent.BossBarColor.PURPLE : phase() == 2 ? BossEvent.BossBarColor.BLUE
                     : BossEvent.BossBarColor.RED);
+        }
+        intruderGuard = tag.getBoolean("intruder_guard");
+        if (intruderGuard) {
+            xpReward = 0;
+            applyIntruderLook();
         }
     }
 }

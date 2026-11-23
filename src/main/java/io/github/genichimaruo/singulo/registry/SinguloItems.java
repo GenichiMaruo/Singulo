@@ -241,6 +241,9 @@ public final class SinguloItems {
     /** 射撃型のスポーンエッグ（まだクリエイティブでだけ。クリエイティブタブにも JEI にも出さない。/give で取る）。 */
     public static final DeferredItem<DeferredSpawnEggItem> GUNNER_ANDROID_SPAWN_EGG = ITEMS.register("gunner_android_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.GUNNER_ANDROID, 0xC8E2F6, 0x6EF0D2, new Item.Properties()));
+    /** 刀型のスポーンエッグ（射撃型と同じく、まだクリエイティブでだけ。一覧には出さない。/give で取る）。 */
+    public static final DeferredItem<DeferredSpawnEggItem> KATANA_ANDROID_SPAWN_EGG = ITEMS.register("katana_android_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.KATANA_ANDROID, 0x28222A, 0xFF3A54, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
@@ -333,12 +336,13 @@ public final class SinguloItems {
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
-    /** 射撃型とボスのスポーンエッグ、隠し報酬の射撃型メモリと残光の翼は、クリエイティブタブと JEI の一覧から隠す。 */
+    /** 射撃型・刀型とボスのスポーンエッグ、隠し型のメモリと残光の翼は、クリエイティブタブと JEI の一覧から隠す。 */
     public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
+            "katana_android_spawn_egg", "android_memory_katana",
             "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg", "ergosphere_leviathan_spawn_egg",
             "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");
     /** 段階に関係なく、名前を紫（エピック）にするアイテム（とても珍しい物）。 */
-    private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
+    private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner", "android_memory_katana");
 
     static {
         // 装置ブロック
@@ -556,9 +560,20 @@ public final class SinguloItems {
         block(SinguloBlocks.ECHO_PROJECTOR, 1);
         block(SinguloBlocks.FACTORY_LINE, 1);
         block(SinguloBlocks.FACTORY_CONVEYOR, 1);
+        block(SinguloBlocks.RUIN_RELAY, 1);
+        block(SinguloBlocks.ANOMALY_EMITTER, 1);
+        block(SinguloBlocks.FRAME_DRAG_FLOOR, 1);
+        block(SinguloBlocks.DRAG_BRAKE, 1);
         block(SinguloBlocks.LAB_PANEL, 1);
         block(SinguloBlocks.LAB_PANEL_LINED, 1);
         block(SinguloBlocks.LAB_TILES, 1);
+        block(SinguloBlocks.CONTROL_CABINET, 1);
+        block(SinguloBlocks.COOLANT_CLADDING, 1);
+        block(SinguloBlocks.DIAL_PANEL, 1);
+        block(SinguloBlocks.MIMIC_PANEL, 1);
+        block(SinguloBlocks.ANNUNCIATOR_PANEL, 1);
+        block(SinguloBlocks.OPERATOR_DESK, 1);
+        block(SinguloBlocks.OPERATOR_CHAIR, 1);
         block(SinguloBlocks.LAB_FRAME, 1);
         block(SinguloBlocks.LAB_GLASS, 1);
         block(SinguloBlocks.FACILITY_LIGHT, 1);
@@ -567,6 +582,7 @@ public final class SinguloItems {
         block(SinguloBlocks.REACTOR_CORE, 1);
         block(SinguloBlocks.POWER_CONDUIT, 1);
         block(SinguloBlocks.PRESSURE_HULL, 1);
+        block(SinguloBlocks.PRESSURE_GLASS, 1);
         block(SinguloBlocks.WELDED_HATCH, 1);
         block(SinguloBlocks.LAB_DOOR, 1);
         block(SinguloBlocks.BULKHEAD, 1);

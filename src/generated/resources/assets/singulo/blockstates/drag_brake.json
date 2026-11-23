@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "engaged=false": {
+      "model": "singulo:block/drag_brake"
+    },
+    "engaged=true": {
+      "model": "singulo:block/drag_brake_engaged"
+    }
+  }
+}

@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import io.github.genichimaruo.singulo.android.KatanaAndroid;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -14,6 +15,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
  * 残響の番人: 光の線でできた警備ホログラム（人の約1.3倍）。
@@ -61,6 +64,8 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         float t = e.tickCount + partialTick;
         float emerge = e.emergeProgress(partialTick);
         float death = e.isMinion() ? 0 : e.deathProgress(partialTick);
+        boolean reveal = death > 0 && e.rougeMemoryAwarded();
+        float slashTime = death * EchoSentinel.DEATH_TICKS - EchoSentinel.ROUGE_SLASH_TICK;
         int projectors = e.projectorCount();
         // 実体の濃さ: 投影器が4つ残っていると薄く、0で濃い
         float solid = 1 - projectors / 4F;
@@ -91,15 +96,23 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         float bodyYaw = Mth.rotLerp(partialTick, e.yBodyRotO, e.yBodyRot);
         pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
         if (alpha > 4 && floor < 2.4F) {
-            body(pose, vc, full, alpha, built, floor, t, e.strikeTicks(), e.isMinion(), death);
+            body(pose, vc, full, alpha, Math.min(255, alpha + 60), built, floor, t, e.strikeTicks(), e.isMinion(), death);
             if (e.awakened() && !e.isMinion() && built > 2.0F && floor < 1.6F) {
                 awakenedParts(pose, vc, alpha, t, e.strikeTicks() > 0);
             }
+        }
+        if (reveal && slashTime > -8 && slashTime < 11) {
+            // ほどけた部位だけを淡く映し直し、斬線が横切ったあとに残像を消す。
+            float ghost = Mth.clamp((slashTime + 8) / 6, 0, 1) * Mth.clamp(1 - slashTime / 11, 0, 1);
+            body(pose, vc, full, (int) (95 * ghost), (int) (145 * ghost), Math.min(built, floor - 0.002F), 0, t, 0, false, death);
         }
         if (death > 0) {
             crystalDeath(pose, vc, death, t);
         }
         pose.popPose();
+        if (reveal && slashTime > 0 && slashTime < 13) {
+            memorySlash(pose, vc, slashTime, bob);
+        }
 
         // 走査線（体を下から上へ流れる薄い輪）
         if (alpha > 4 && death == 0) {
@@ -138,6 +151,21 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         }
         renderCircle(e, partialTick, t, pose, vc);
         super.render(e, yaw, partialTick, pose, buffers, light);
+    }
+
+    /** 胸を斜めに切り抜ける一筋の紅。切っ先が先に走り、残った細い光が結晶の砕ける前に消える。 */
+    private static void memorySlash(PoseStack pose, VertexConsumer vc, float t, float bob) {
+        float reach = Mth.clamp(t / 4, 0, 1);
+        float length = 3.4F * (1 - (1 - reach) * (1 - reach));
+        float fade = Mth.clamp((13 - t) / 9, 0, 1);
+        Quaternionf plane = new Quaternionf(Minecraft.getInstance().gameRenderer.getMainCamera().rotation()).rotateZ(30 * Mth.DEG_TO_RAD);
+        Vector3f center = plane.transform(new Vector3f((length - 3.4F) / 2, 0, 0.38F));
+        pose.pushPose();
+        pose.translate(center.x(), 1.53F + bob + center.y(), center.z());
+        FxDraw.flare(pose, vc, plane, length, 0.26F * fade, 0, 0xD60937, (int) (150 * fade));
+        FxDraw.flare(pose, vc, plane, length, 0.13F * fade, 0, KatanaAndroid.ACCENT, (int) (245 * fade));
+        FxDraw.flare(pose, vc, plane, length * 0.80F, 0.032F * fade, 0, 0xFFEBE4, FxSettings.flash((int) (245 * fade)));
+        pose.popPose();
     }
 
     /**
@@ -262,7 +290,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
     }
 
     /** 体（足元が原点、+Z が前）。built より上と、floor より下は描かない。 */
-    private static void body(PoseStack pose, VertexConsumer vc, int light, int alpha, float built, float floor, float t, int strike,
+    private static void body(PoseStack pose, VertexConsumer vc, int light, int alpha, int eyeAlpha, float built, float floor, float t, int strike,
                              boolean minion, float death) {
         // 外套の裾: 下ほど細い段を重ねる（宙に浮いた下半身）
         for (int i = 0; i < 6; i++) {
@@ -292,7 +320,7 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         }
         // 兜（とがった額飾りつき）と目の帯
         part(pose, vc, light, -0.15F, 1.88F, -0.15F, 0.15F, 2.16F, 0.15F, built, floor, RGB, (int) (alpha * 0.85F));
-        part(pose, vc, light, -0.13F, 2.00F, 0.15F, 0.13F, 2.04F, 0.17F, built, floor, 0xFFFFFF, Math.min(255, alpha + 60));
+        part(pose, vc, light, -0.13F, 2.00F, 0.15F, 0.13F, 2.04F, 0.17F, built, floor, 0xFFFFFF, eyeAlpha);
         part(pose, vc, light, -0.03F, 2.16F, 0.05F, 0.03F, 2.32F, 0.11F, built, floor, DEEP, alpha);
         // 胸の記録結晶（倒されたときは crystalDeath が描く）
         if (built > 1.55F && death == 0) {

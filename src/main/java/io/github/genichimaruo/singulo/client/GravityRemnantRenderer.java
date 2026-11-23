@@ -46,7 +46,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         float t = e.tickCount + partialTick;
         float emerge = e.emergeProgress(partialTick);
         float death = e.deathProgress(partialTick);
-        // 核の大きさ: 出現の35%から膨らみ、倒されると脈打ってから一点へつぶれる
+        // 出現時に膨らみ、倒されると脈打ってから一点へつぶれる。
         float grow = emerge < 1 ? Mth.clamp((emerge - 0.1F) / 0.65F, 0, 1) : 1;
         float flipPulse = e.flipTicks() > 0 ? 0.15F * Mth.sin(t * 1.2F) : 0;
         float r = (0.72F + flipPulse + 0.03F * Mth.sin(t * 0.2F)) * grow * collapse(death, t);
@@ -54,28 +54,31 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         Quaternionf camera = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
         VertexConsumer glow = GlowDepth.of(buffers, FxDraw.WHITE);
 
-        Vec3 world = e.getPosition(partialTick).add(0, cy, 0);
-        if (death > 0 && death < FLASH_AT) {
-            // つぶれていくほど、ゆがみが強く広がる
-            float k = Mth.clamp((death - COLLAPSE_AT) / (FLASH_AT - COLLAPSE_AT), 0, 1);
-            GravitationalLensing.add(world, 1.8F + 2.5F * k, 0.6F + 0.6F * k);
-        } else if (r > 0.02F) {
-            GravitationalLensing.add(world, e.wellOpen() ? 3.2F : 1.6F * grow, e.wellOpen() ? 0.9F : 0.5F);
-        }
         pose.pushPose();
         pose.translate(0, cy, 0);
         if (r > 0.02F) {
+            Vec3 world = e.getPosition(partialTick).add(0, cy, 0);
+            boolean well = e.wellOpen();
+            GravitationalLensing.addRemnant(world, r, well ? 0.92F : 0.65F, r * (well ? 3.2F : 2.7F));
             FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
             // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
             glow = GlowDepth.of(buffers, FxDraw.WHITE);
             FxDraw.billboard(pose, glow, camera, r * 3.4F, RIM, (int) (150 * grow));
             FxDraw.billboard(pose, glow, camera, r * 2.3F, HOT, (int) (90 * grow));
-            // 傾いた降着の輪
+            // 核の縁はワールド内に描く。背景に模様が少ない場所でも、核の輪郭が読める。
+            pose.pushPose();
+            pose.mulPose(camera);
+            pose.mulPose(Axis.XP.rotationDegrees(90));
+            FxDraw.ring(pose.last(), glow, r, r * 1.08F, RIM, (int) (180 * grow), 0);
+            pose.popPose();
+            // 傾いた降着の輪の中を、明るい筋が周回する。
             pose.pushPose();
             pose.mulPose(Axis.ZP.rotationDegrees(22));
-            pose.mulPose(Axis.YP.rotationDegrees(t * 6));
+            pose.mulPose(Axis.XP.rotationDegrees(17));
+            pose.mulPose(Axis.YP.rotationDegrees(t * (well ? 5 : 3)));
             FxDraw.ring(pose.last(), glow, r * 1.25F, r * 2.0F, HOT, (int) (200 * grow), 0);
             FxDraw.ring(pose.last(), glow, r * 2.0F, r * 2.6F, RIM, (int) (110 * grow), 0);
+            FxDraw.crescent(pose.last(), glow, 12, 118, r * 1.75F, r * 0.11F, HOT, (int) (190 * grow));
             pose.popPose();
             FxDraw.gyroRings(pose, glow, r * 1.9F, 0.03F, t * 2, RIM, (int) (90 * grow));
             if (e.awakened() && death == 0) {

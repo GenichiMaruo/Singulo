@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "singulo:block/ruin_relay"
+    },
+    "active=true": {
+      "model": "singulo:block/ruin_relay_active"
+    }
+  }
+}

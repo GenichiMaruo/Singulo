@@ -91,6 +91,7 @@ public class StrangeletBlockEntity extends BlockEntity {
     static boolean canConvert(ServerLevel level, BlockPos p) {
         BlockState s = level.getBlockState(p);
         if (s.isAir() || !s.getFluidState().isEmpty() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null
+                || io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock.isSealed(s)
                 || s.is(SinguloBlocks.SIMPLE.get("strange_matter").get()) || s.is(SinguloBlocks.STRANGELET.get())) {
             return false;
         }

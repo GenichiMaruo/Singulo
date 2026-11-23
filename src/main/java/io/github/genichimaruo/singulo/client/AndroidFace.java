@@ -25,6 +25,7 @@ final class AndroidFace {
             case 0xFF6E40 -> new Colors(0x954B31, 0xBA6646, 0x703624, 0x96341E, 0xFF9060);   // アルマ（斧）
             case 0xB080FF -> new Colors(0x242A4C, 0x323A62, 0x181C36, 0x543EB0, 0xCCB0FF);   // ノクス（ビット）
             case 0x6EF0D2 -> new Colors(0xA8CAE8, 0xCCE4F6, 0x84A8D0, 0x1E768C, 0x78ECDE);   // シエル（射撃）
+            case 0xFF3A54 -> new Colors(0x1C181E, 0x28222A, 0x120F14, 0x96142A, 0xFF6070);   // ルージュ（刀）
             case 0xFFC45A -> new Colors(0xC0C6D4, 0xE2E6EE, 0xA0A6B6, 0xA86C1C, 0xFFD470);   // ソレイユ（光剣）
             default -> new Colors(0xD0D7E5, 0xEEF1F7, 0xB2BCD0, GuiSkin.mix(0xFF000000 | accent, 0xFF000000, 0.4F), accent);
         };

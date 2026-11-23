@@ -8,7 +8,7 @@ import zipfile
 from check_gametests import check, inventory, DEFAULT_NAMESPACES
 
 # 0.9.0 以降の 1.21.1 は NeoForge 版のみ（Forge 版は 0.8.1 まで）
-COUNTS = {'neoforge': 954}
+COUNTS = {'neoforge': 989}
 
 
 def validate(root, loader, name=None, source=None):
@@ -33,7 +33,7 @@ def validate(root, loader, name=None, source=None):
     with zipfile.ZipFile(path) as jar:
         names = jar.namelist()
         if len(names) != len(set(names)) or any('ReviewHarness' in n
-                or re.search(r'(?:GameTests(?:\$[^/]*)?|TestBuild)\.class$', n)
+                or re.search(r'(?:Review(?:Checks)?|GameTests|TestBuild)(?:\$[^/]*)?\.class$', n)
                 or '/test/harness/' in n or '/singulo/review/' in n for n in names):
             raise RuntimeError('Duplicate entries or development GUI code in production JAR')
         for n in names:

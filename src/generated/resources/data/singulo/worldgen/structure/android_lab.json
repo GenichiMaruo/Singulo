@@ -1,5 +1,5 @@
 {
-  "type": "singulo:android_lab",
+  "type": "singulo:avoiding",
   "biomes": "#singulo:has_structure/android_lab",
   "step": "fluid_springs",
   "spawn_overrides": {
@@ -9,6 +9,36 @@
     }
   },
   "terrain_adaptation": "none",
-  "floor_min": -38,
-  "floor_max": -26
+  "structure": {
+    "type": "singulo:android_lab",
+    "biomes": "#singulo:has_structure/android_lab",
+    "step": "fluid_springs",
+    "spawn_overrides": {
+      "monster": {
+        "bounding_box": "full",
+        "spawns": []
+      }
+    },
+    "terrain_adaptation": "none",
+    "floor_min": -38,
+    "floor_max": -26
+  },
+  "avoid": [
+    {
+      "set": "minecraft:ancient_cities",
+      "chunk_count": 12
+    },
+    {
+      "set": "minecraft:trial_chambers",
+      "chunk_count": 12
+    },
+    {
+      "set": "singulo:sunken_reactor",
+      "chunk_count": 10
+    },
+    {
+      "set": "singulo:final_lab",
+      "chunk_count": 10
+    }
+  ]
 }

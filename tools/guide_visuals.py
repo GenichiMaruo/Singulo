@@ -46,6 +46,7 @@ TOPIC_ICONS = {
     'ruins.list': 'explorer_compass',
     'ruins.compass': 'explorer_compass',
     'ruins.records': 'crystal_memory',
+    'ruins.antechamber': 'ruin_relay',
 
     'androids.build': 'android_station',
     'androids.first': 'android_work_console',
