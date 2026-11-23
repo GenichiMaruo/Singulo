@@ -490,16 +490,16 @@ public final class SinguloBlocks {
     // ---- 最終実験施設・沈んだ炉心区画の前室（どれも壊せない）
     /** 遺構の中継器（施設の中継器をすべて起動すると、ボス部屋の前の隔壁が開く）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.RuinRelayBlock> RUIN_RELAY = BLOCKS.register("ruin_relay",
-            () -> new io.github.genichimaruo.singulo.ruin.RuinRelayBlock(unbreakable().noOcclusion()
+            registryId -> new io.github.genichimaruo.singulo.ruin.RuinRelayBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).noOcclusion()
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.RuinRelayBlock.ACTIVE) ? 13 : 5)));
     /** 異常場の発生器（上の空間に重力・時間の場を張る）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlock> ANOMALY_EMITTER = BLOCKS.register("anomaly_emitter",
-            () -> new io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlock(unbreakable().lightLevel(s -> 8)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.AnomalyEmitterBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> 8)));
     /** 回転流の床（上に乗ったものを流す）と、その区画を止める制動器。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock> FRAME_DRAG_FLOOR = BLOCKS.register("frame_drag_floor",
-            () -> new io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock(unbreakable().lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock.ACTIVE) ? 4 : 0)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.FrameDragFloorBlock.ACTIVE) ? 4 : 0)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.DragBrakeBlock> DRAG_BRAKE = BLOCKS.register("drag_brake",
-            () -> new io.github.genichimaruo.singulo.ruin.DragBrakeBlock(unbreakable().lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.DragBrakeBlock.ENGAGED) ? 10 : 3)));
+            registryId -> new io.github.genichimaruo.singulo.ruin.DragBrakeBlock(unbreakable().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.DragBrakeBlock.ENGAGED) ? 10 : 3)));
     // ---- 地下アンドロイド研究所（白い建材は硬く、鉄以上のツルハシで掘る）。建材・照明・調度品は、研究所で見つかる設計図から作れる
     public static final DeferredBlock<Block> LAB_PANEL = pristine("lab_panel", 0);
     public static final DeferredBlock<Block> LAB_PANEL_LINED = pristine("lab_panel_lined", 0);
@@ -519,13 +519,13 @@ public final class SinguloBlocks {
 
     private static DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> controlFitting(
             String id, net.minecraft.world.phys.shapes.VoxelShape shape, int light) {
-        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(
-                decor(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> light), shape, null, null));
+        return BLOCKS.register(id, registryId -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(
+                decor(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).requiresCorrectToolForDrops().lightLevel(s -> light), shape, null, null));
     }
 
     private static DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock> instrumentPanel(String id, int light) {
-        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock(
-                decor(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> light)));
+        return BLOCKS.register(id, registryId -> new io.github.genichimaruo.singulo.ruin.lab.InstrumentPanelBlock(
+                decor(SoundType.METAL).setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).requiresCorrectToolForDrops().lightLevel(s -> light)));
     }
     public static final DeferredBlock<Block> LAB_FRAME = BLOCKS.registerSimpleBlock("lab_frame", () -> BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GRAY).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK));
@@ -559,7 +559,7 @@ public final class SinguloBlocks {
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 耐圧ガラス（遺構のボス部屋の観測窓。封じられている間は壊せない。爆発では壊れない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureGlassBlock> PRESSURE_GLASS = BLOCKS.register("pressure_glass",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureGlassBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NONE)
+            registryId -> new io.github.genichimaruo.singulo.ruin.lab.PressureGlassBlock(BlockBehaviour.Properties.of().setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, registryId)).mapColor(MapColor.NONE)
                     .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS).noOcclusion()
                     .isValidSpawn((s, l, p, e) -> false).isRedstoneConductor((s, l, p) -> false)
                     .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false)
