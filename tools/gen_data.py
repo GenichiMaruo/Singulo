@@ -3753,6 +3753,13 @@ def avoiding(structure, rid):
     return {'type': f'{MODID}:avoiding', **outer, 'structure': structure, 'avoid': ruin_avoid(rid)}
 
 
+def graded(structure):
+    """地上の遺構の構造物を、置いたあとに周りの地面をならす構造物（singulo:graded）で包む。
+    beard_thin だけでは、斜面で建物の四隅やすき間（型紙で何も置かないマス）に地面が残り、盛り土のように見える。"""
+    outer = {k: v for k, v in structure.items() if k in ('biomes', 'step', 'spawn_overrides', 'terrain_adaptation')}
+    return {'type': f'{MODID}:graded', **outer, 'structure': structure}
+
+
 RUIN_DEPTH = {
     'research_building': (-20, 4),
     'culture_facility': (-46, -30),
@@ -3853,7 +3860,7 @@ def ruins_data():
             lo, hi = RUIN_DEPTH[rid]
             structure['start_height'] = {'type': 'minecraft:uniform',
                                          'min_inclusive': {'absolute': lo}, 'max_inclusive': {'absolute': hi}}
-        write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', structure if placement == 'surface' else avoiding(structure, rid))
+        write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', graded(structure) if placement == 'surface' else avoiding(structure, rid))
         write_json(DATA / 'worldgen' / 'structure_set' / f'{rid}.json', {
             'structures': [{'structure': f'{MODID}:{rid}', 'weight': 1}],
             'placement': {'type': 'minecraft:random_spread', 'spacing': spacing, 'separation': separation, 'salt': salt},
