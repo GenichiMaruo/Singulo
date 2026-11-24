@@ -16114,5 +16114,37 @@
   "desc.singulo.operator_chair": {
     "source": "A dark green swivel chair for a control-room operator.",
     "translation": "제어실 운전원을 위한 짙은 녹색 회전의자."
+  },
+  "item.singulo.facility_reconstructor": {
+    "source": "Facility Reconstructor",
+    "translation": "시설 재건 장치"
+  },
+  "item.singulo.facility_reconstructor.complete": {
+    "source": "Facility rebuilt. This site cannot be rebuilt again.",
+    "translation": "시설을 재건했습니다. 이곳은 다시 재건할 수 없습니다."
+  },
+  "item.singulo.facility_reconstructor.failed": {
+    "source": "Reconstruction did not complete. Check the site and restore the world backup if necessary.",
+    "translation": "재건을 완료하지 못했습니다. 현장을 확인하고 필요하면 세계 백업을 복원하세요."
+  },
+  "item.singulo.facility_reconstructor.occupied": {
+    "source": "Another player is within the affected area. Ask them to leave before continuing.",
+    "translation": "범위 안에 다른 플레이어가 있습니다. 먼저 밖으로 나가 달라고 요청하세요."
+  },
+  "item.singulo.facility_reconstructor.disabled": {
+    "source": "Facility reconstruction is disabled in multiplayer.",
+    "translation": "멀티플레이에서는 시설 재건이 비활성화되어 있습니다."
+  },
+  "item.singulo.facility_reconstructor.permission": {
+    "source": "Only the single-player world owner or a server operator can rebuild a facility.",
+    "translation": "싱글 플레이 세계 소유자 또는 서버 관리자만 시설을 재건할 수 있습니다."
+  },
+  "item.singulo.facility_reconstructor.unavailable": {
+    "source": "Not an eligible cleared older facility, already rebuilt, or some target chunks are not loaded.",
+    "translation": "정복한 이전 시설이 아니거나, 이미 재건했거나, 대상 청크가 일부 로드되지 않았습니다."
+  },
+  "item.singulo.facility_reconstructor.warning": {
+    "source": "Warning: rebuilding %s overwrites terrain, blocks, builds and inventories from (%s, %s, %s) to (%s, %s, %s). Back up the world and move valuables first. This cannot be undone. Sneak and right-click this same core with this item again within 30 seconds to continue.",
+    "translation": "경고: %s 재건은 (%s, %s, %s)에서 (%s, %s, %s)까지의 지형, 블록, 건축물과 보관함을 덮어씁니다. 먼저 세계를 백업하고 귀중품을 옮기세요. 되돌릴 수 없습니다. 계속하려면 30초 안에 같은 아이템을 들고 같은 코어를 웅크린 채 우클릭하세요."
   }
 }

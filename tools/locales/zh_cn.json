@@ -16114,5 +16114,37 @@
   "desc.singulo.operator_chair": {
     "source": "A dark green swivel chair for a control-room operator.",
     "translation": "控制室值班员使用的深绿色转椅。"
+  },
+  "item.singulo.facility_reconstructor": {
+    "source": "Facility Reconstructor",
+    "translation": "设施重建设备"
+  },
+  "item.singulo.facility_reconstructor.complete": {
+    "source": "Facility rebuilt. This site cannot be rebuilt again.",
+    "translation": "设施已重建，此处无法再次重建。"
+  },
+  "item.singulo.facility_reconstructor.failed": {
+    "source": "Reconstruction did not complete. Check the site and restore the world backup if necessary.",
+    "translation": "重建未完成。请检查现场，必要时恢复世界备份。"
+  },
+  "item.singulo.facility_reconstructor.occupied": {
+    "source": "Another player is within the affected area. Ask them to leave before continuing.",
+    "translation": "范围内还有其他玩家。请让他们先离开。"
+  },
+  "item.singulo.facility_reconstructor.disabled": {
+    "source": "Facility reconstruction is disabled in multiplayer.",
+    "translation": "多人游戏中已禁用设施重建。"
+  },
+  "item.singulo.facility_reconstructor.permission": {
+    "source": "Only the single-player world owner or a server operator can rebuild a facility.",
+    "translation": "仅单人世界的所有者或服务器管理员可重建设施。"
+  },
+  "item.singulo.facility_reconstructor.unavailable": {
+    "source": "Not an eligible cleared older facility, already rebuilt, or some target chunks are not loaded.",
+    "translation": "这不是可重建的已通关旧设施，或此处已重建，或有目标区块未加载。"
+  },
+  "item.singulo.facility_reconstructor.warning": {
+    "source": "Warning: rebuilding %s overwrites terrain, blocks, builds and inventories from (%s, %s, %s) to (%s, %s, %s). Back up the world and move valuables first. This cannot be undone. Sneak and right-click this same core with this item again within 30 seconds to continue.",
+    "translation": "警告：重建 %s 会覆盖 (%s, %s, %s) 到 (%s, %s, %s) 范围内的地形、方块、建筑和容器。请先备份世界并转移贵重物品。此操作无法撤销。若要继续，请在 30 秒内用同一物品潜行右击同一个核心。"
   }
 }

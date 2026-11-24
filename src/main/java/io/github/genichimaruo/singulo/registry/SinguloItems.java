@@ -75,6 +75,8 @@ public final class SinguloItems {
             "neutrino_scanner", () -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().rarity(Rarity.RARE), 3));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
             "explorer_compass", () -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.FacilityReconstructorItem> FACILITY_RECONSTRUCTOR = ITEMS.register(
+            "facility_reconstructor", () -> new io.github.genichimaruo.singulo.item.FacilityReconstructorItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MeteorCompassItem> METEOR_COMPASS = ITEMS.register(
             "meteor_compass", () -> new io.github.genichimaruo.singulo.item.MeteorCompassItem(new Item.Properties(), 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
