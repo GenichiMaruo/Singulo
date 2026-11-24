@@ -33,6 +33,7 @@ MOD = {
     '設定カード': ('settings_card', 'Settings Card', 'tool'),
     '探索コンパス': ('explorer_compass', 'Explorer\'s Compass', 'tool'),
     '隕石コンパス': ('meteor_compass', 'Meteor Compass', 'tool'),
+    '施設再構築装置': ('facility_reconstructor', 'Facility Reconstructor', 'tool'),
     '液体キャニスター': ('fluid_canister', 'Fluid Canister', 'tool'),
     '石灰粉': ('limestone_powder', 'Limestone Powder', 'item'),
     '炭素粉': ('carbon_dust', 'Carbon Dust', 'item'),

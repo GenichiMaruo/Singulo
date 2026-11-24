@@ -548,7 +548,6 @@ UI_LANG = {
     'message.singulo.fuel_cell.standby': ('待機中（蓄電がいっぱい）', 'Standing by (storage full)'),
     'tooltip.singulo.fluid_canister.empty': ('空（%s mBまで入る）', 'Empty (holds %s mB)'),
     'tooltip.singulo.fluid_canister.amount': ('%s %s / %s mB', '%s %s / %s mB'),
-    'item.singulo.facility_reconstructor': ('施設再構築装置', 'Facility Reconstructor'),
     'item.singulo.facility_reconstructor.warning': ('警告：%s を再構築すると、(%s, %s, %s) ～ (%s, %s, %s) の地形・ブロック・建造物・収納が上書きされます。先にワールドをバックアップし、貴重品を移動してください。元に戻せません。続けるには30秒以内にこのアイテムで同じ起動ブロックをスニークしながら右クリックしてください。', 'Warning: rebuilding %s overwrites terrain, blocks, builds and inventories from (%s, %s, %s) to (%s, %s, %s). Back up the world and move valuables first. This cannot be undone. Sneak and right-click this same core with this item again within 30 seconds to continue.'),
     'item.singulo.facility_reconstructor.disabled': ('マルチプレイでは施設の再構築が無効になっています。', 'Facility reconstruction is disabled in multiplayer.'),
     'item.singulo.facility_reconstructor.permission': ('施設の再構築はシングルプレイのワールド所有者かサーバー管理者のみが実行できます。', 'Only the single-player world owner or a server operator can rebuild a facility.'),
@@ -4099,7 +4098,7 @@ def thermal():
 # 未分類の通常アイテムだけを中間素材に置く。装置・建材・道具の追加時は必ず分類し、スポーンエッグは末尾。
 TAB_GROUPS = [
     ('案内と設定', [
-        'handbook', 'holo_projector', 'explorer_compass', 'meteor_compass',
+        'handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'facility_reconstructor',
         'settings_card', 'relocation_wrench', 'decoded_record',
     ]),
     ('発電と蓄電', [

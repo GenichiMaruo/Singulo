@@ -222,6 +222,7 @@ public final class GeneratedContent {
             "holo_projector",
             "explorer_compass",
             "meteor_compass",
+            "facility_reconstructor",
             "settings_card",
             "relocation_wrench",
             "decoded_record",
