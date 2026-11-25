@@ -967,6 +967,8 @@ UI_LANG = {
     'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
     'gui.singulo.android_station.upgrade': ('強化', 'Upgrade'),
     'gui.singulo.android_station.stock': ('補充', 'Refill'),
+    'gui.singulo.android_station.weapon': ('武装（印刷したアンドロイドに積む）', 'Weapon (fitted to the printed android)'),
+    'gui.singulo.portable_printer.weapon': ('武装（印刷したアンドロイドに積む）', 'Weapon (fitted to the printed android)'),
     'gui.singulo.android.dismantle.confirm': ('もう一度押すと解体します', 'Press again to dismantle'),
     'gui.singulo.android_station.link': ('リンク', 'Link'),
     'gui.singulo.android_station.status.11': ('近くに身寄りのないアンドロイドがいます', 'An android without a station is nearby'),

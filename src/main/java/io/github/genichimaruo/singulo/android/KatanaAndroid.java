@@ -883,6 +883,11 @@ public class KatanaAndroid extends RuinAndroid {
             nextMove--;
             nextIai--;
             cutCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+                nextIai--;
+                cutCooldown--;
+            }
             boolean seen = hasLineOfSight(target);
             if (dist > 2.4 || !seen) {
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {

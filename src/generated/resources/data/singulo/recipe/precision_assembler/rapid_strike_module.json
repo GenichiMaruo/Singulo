@@ -1,0 +1,38 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_weapon_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    }
+  ],
+  "shape": [
+    "     ",
+    "     ",
+    " CAC ",
+    "  B  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:rapid_strike_module",
+    "count": 1
+  }
+}

@@ -16318,5 +16318,201 @@
   "tooltip.singulo.android_armor_plate_3": {
     "source": "Chestplate for a guard android (+12 armor, +6 toughness, +0.25 knockback resistance)",
     "translation": "호위 안드로이드의 흉갑(방어 +12, 방어 강도 +6, 밀치기 저항 +0.25)"
+  },
+  "gui.singulo.android.weapon": {
+    "source": "Weapon",
+    "translation": "무장"
+  },
+  "tooltip.singulo.android_weapon_module.slot": {
+    "source": "Fits a guard android's weapon module slot (one at a time)",
+    "translation": "호위 안드로이드의 무장 모듈 칸에 하나씩 장착"
+  },
+  "item.singulo.android_weapon_module": {
+    "source": "Output Amplifier",
+    "translation": "출력 증폭기"
+  },
+  "howto.singulo.android_weapon_module": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "tooltip.singulo.android_weapon_module": {
+    "source": "Weapon module: all moves +30%% damage (sword enchantments apply)",
+    "translation": "무장 모듈: 모든 기술 피해 +30%%(검 마법 부여 적용)"
+  },
+  "desc.singulo.android_weapon_module": {
+    "source": "Fitted to a guard android weapon module slot, raises the damage of all its moves by 30%. Takes sword enchantments (Sharpness, Smite, Bane of Arthropods, Fire Aspect, Knockback, Looting), which apply to all of its attacks.",
+    "translation": "호위 안드로이드의 무장 모듈 칸에 장착하면 모든 기술의 피해가 30% 오른다. 검 마법 부여(날카로움, 강타, 살충, 발화, 밀치기, 약탈)를 붙일 수 있으며, 안드로이드의 모든 공격에 적용된다."
+  },
+  "summary.singulo.android_weapon_module": {
+    "source": "Strengthens all of an android's moves and carries sword enchantments.",
+    "translation": "안드로이드의 모든 기술을 강화하고 검 마법 부여를 적용한다."
+  },
+  "item.singulo.android_weapon_module_2": {
+    "source": "Output Amplifier Mk2",
+    "translation": "출력 증폭기 Mk2"
+  },
+  "howto.singulo.android_weapon_module_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "tooltip.singulo.android_weapon_module_2": {
+    "source": "Weapon module: all moves +60%% damage (sword enchantments apply)",
+    "translation": "무장 모듈: 모든 기술 피해 +60%%(검 마법 부여 적용)"
+  },
+  "desc.singulo.android_weapon_module_2": {
+    "source": "An improved Output Amplifier. Raises the damage of all moves by 60%. Keeps the enchantments of the amplifier it was made from.",
+    "translation": "출력 증폭기의 개량형. 모든 기술의 피해가 60% 오른다. 재료로 쓴 출력 증폭기의 마법 부여를 이어받는다."
+  },
+  "summary.singulo.android_weapon_module_2": {
+    "source": "A stronger Output Amplifier that keeps its enchantments.",
+    "translation": "마법 부여를 이어받아 강화한 출력 증폭기."
+  },
+  "item.singulo.android_weapon_module_3": {
+    "source": "Output Amplifier Mk3",
+    "translation": "출력 증폭기 Mk3"
+  },
+  "howto.singulo.android_weapon_module_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "tooltip.singulo.android_weapon_module_3": {
+    "source": "Weapon module: all moves +100%% damage (sword enchantments apply)",
+    "translation": "무장 모듈: 모든 기술 피해 +100%%(검 마법 부여 적용)"
+  },
+  "desc.singulo.android_weapon_module_3": {
+    "source": "The top Output Amplifier, built around a collapsar core. Doubles the damage of all moves. Does not burn. Keeps the enchantments of the amplifier it was made from.",
+    "translation": "콜랩서 코어를 담은 최상위 출력 증폭기. 모든 기술의 피해가 2배가 된다. 불타지 않는다. 재료로 쓴 출력 증폭기의 마법 부여를 이어받는다."
+  },
+  "summary.singulo.android_weapon_module_3": {
+    "source": "The strongest Output Amplifier, with a collapsar core.",
+    "translation": "콜랩서 코어를 담은 가장 강한 출력 증폭기."
+  },
+  "item.singulo.heavy_strike_module": {
+    "source": "Heavy Strike Module",
+    "translation": "중격 모듈"
+  },
+  "howto.singulo.heavy_strike_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작: 정밀 조립기(4단계)"
+  },
+  "tooltip.singulo.heavy_strike_module": {
+    "source": "Weapon module: finishing moves x2.2 damage",
+    "translation": "무장 모듈: 필살기 피해 ×2.2"
+  },
+  "desc.singulo.heavy_strike_module": {
+    "source": "In the weapon module slot, finishing moves (such as the crimson flash, the railgun and heavenly thunder) deal 2.2x damage. Other moves stay as they are.",
+    "translation": "무장 모듈 칸에 장착하면 필살기(홍일섬, 레일건, 천뢰 등)가 2.2배 피해를 준다. 다른 기술의 위력은 그대로다."
+  },
+  "summary.singulo.heavy_strike_module": {
+    "source": "A weapon module that puts its power into finishing moves.",
+    "translation": "필살기에 힘을 모으는 무장 모듈."
+  },
+  "item.singulo.rapid_strike_module": {
+    "source": "Rapid Strike Module",
+    "translation": "연격 모듈"
+  },
+  "howto.singulo.rapid_strike_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작: 정밀 조립기(4단계)"
+  },
+  "tooltip.singulo.rapid_strike_module": {
+    "source": "Weapon module: wait between moves x0.75",
+    "translation": "무장 모듈: 기술 대기 시간 ×0.75"
+  },
+  "desc.singulo.rapid_strike_module": {
+    "source": "In the weapon module slot, cuts the wait between moves to three quarters. Each hit stays as strong.",
+    "translation": "무장 모듈 칸에 장착하면 기술 사이의 대기 시간이 4분의 3이 된다. 한 번의 위력은 그대로다."
+  },
+  "summary.singulo.rapid_strike_module": {
+    "source": "A weapon module that shortens the wait between moves.",
+    "translation": "기술 간격을 줄이는 무장 모듈."
+  },
+  "item.singulo.drain_module": {
+    "source": "Drain Module",
+    "translation": "흡수 모듈"
+  },
+  "howto.singulo.drain_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "tooltip.singulo.drain_module": {
+    "source": "Weapon module: heals a tenth of the damage dealt",
+    "translation": "무장 모듈: 준 피해의 1할만큼 체력 회복"
+  },
+  "desc.singulo.drain_module": {
+    "source": "In the weapon module slot, the android recovers health equal to a tenth of the damage it deals.",
+    "translation": "무장 모듈 칸에 장착하면 준 피해의 1할만큼 안드로이드의 체력이 회복된다."
+  },
+  "summary.singulo.drain_module": {
+    "source": "A weapon module that heals the android as it deals damage.",
+    "translation": "준 피해로 체력을 회복하는 무장 모듈."
+  },
+  "item.singulo.piercing_module": {
+    "source": "Piercing Module",
+    "translation": "관통 모듈"
+  },
+  "howto.singulo.piercing_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "tooltip.singulo.piercing_module": {
+    "source": "Weapon module: ignores 40%% of the target's armor",
+    "translation": "무장 모듈: 대상 방어구의 방호를 4할 무시"
+  },
+  "desc.singulo.piercing_module": {
+    "source": "In the weapon module slot, ignores 40% of the target armor protection.",
+    "translation": "무장 모듈 칸에 장착하면 대상 방어구의 방호를 4할 무시한다."
+  },
+  "summary.singulo.piercing_module": {
+    "source": "A weapon module that cuts through the target's armor.",
+    "translation": "대상의 방어구를 꿰뚫는 무장 모듈."
+  },
+  "item.singulo.frost_module": {
+    "source": "Frost Module",
+    "translation": "동결 모듈"
+  },
+  "howto.singulo.frost_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "tooltip.singulo.frost_module": {
+    "source": "Weapon module: slows targets hit for 2 seconds",
+    "translation": "무장 모듈: 맞힌 대상을 2초 동안 느리게 함"
+  },
+  "desc.singulo.frost_module": {
+    "source": "In the weapon module slot, slows anything hit for 2 seconds.",
+    "translation": "무장 모듈 칸에 장착하면 기술을 맞힌 대상을 2초 동안 느리게 한다."
+  },
+  "summary.singulo.frost_module": {
+    "source": "A weapon module that slows what it hits.",
+    "translation": "맞힌 대상을 느리게 하는 무장 모듈."
+  },
+  "item.singulo.warden_breaker_module": {
+    "source": "Warden Breaker Module",
+    "translation": "수호자 파괴 모듈"
+  },
+  "howto.singulo.warden_breaker_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작: 정밀 조립기(4단계)"
+  },
+  "tooltip.singulo.warden_breaker_module": {
+    "source": "Weapon module: the android fights bosses, with x1.8 damage to them",
+    "translation": "무장 모듈: 보스와 싸우게 되며, 보스에게 주는 피해 ×1.8"
+  },
+  "desc.singulo.warden_breaker_module": {
+    "source": "In the weapon module slot, a guard android joins fights against bosses (ruin guardians, the Horizon Warden and the like) and deals 1.8x damage to them. It also takes their hits. Guards without it stay out of boss fights.",
+    "translation": "무장 모듈 칸에 장착하면 호위 안드로이드가 보스(유적의 수호자, 지평선 감시자 등)와 싸우게 되고, 보스에게 1.8배 피해를 준다. 보스의 공격도 받게 된다. 장착하지 않은 호위는 보스와 싸우지 않는다."
+  },
+  "summary.singulo.warden_breaker_module": {
+    "source": "A weapon module that lets a guard join boss fights.",
+    "translation": "호위를 보스전에 참여시키는 무장 모듈."
+  },
+  "gui.singulo.android_station.weapon": {
+    "source": "Weapon (fitted to the printed android)",
+    "translation": "무장(출력한 안드로이드에 장착)"
+  },
+  "gui.singulo.portable_printer.weapon": {
+    "source": "Weapon (fitted to the printed android)",
+    "translation": "무장(출력한 안드로이드에 장착)"
   }
 }

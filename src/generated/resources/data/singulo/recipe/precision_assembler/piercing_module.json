@@ -1,0 +1,38 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_weapon_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:nihonium_ingot"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:plates/steel"
+      },
+      "count": 2
+    }
+  ],
+  "shape": [
+    "     ",
+    "  B  ",
+    " CAC ",
+    "  B  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:piercing_module",
+    "count": 1
+  }
+}

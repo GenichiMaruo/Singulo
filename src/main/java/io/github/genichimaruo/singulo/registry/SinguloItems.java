@@ -115,6 +115,34 @@ public final class SinguloItems {
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
             "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
+    /** 武装モジュール（0.23.0）: 出力増幅器 Mk1〜Mk3 と、6つの特化モジュール。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> ANDROID_WEAPON_MODULE = ITEMS.register(
+            "android_weapon_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.COMMON),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.AMP_1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> ANDROID_WEAPON_MODULE_2 = ITEMS.register(
+            "android_weapon_module_2", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.AMP_2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> ANDROID_WEAPON_MODULE_3 = ITEMS.register(
+            "android_weapon_module_3", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.EPIC).fireResistant(),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.AMP_3));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> HEAVY_STRIKE_MODULE = ITEMS.register(
+            "heavy_strike_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.HEAVY));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> RAPID_STRIKE_MODULE = ITEMS.register(
+            "rapid_strike_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.RAPID));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> DRAIN_MODULE = ITEMS.register(
+            "drain_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.DRAIN));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> PIERCING_MODULE = ITEMS.register(
+            "piercing_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.PIERCE));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> FROST_MODULE = ITEMS.register(
+            "frost_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.FROST));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> WARDEN_BREAKER_MODULE = ITEMS.register(
+            "warden_breaker_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.WARDEN));
     /** 装甲板の上位版（Mk2: ニホニウム、Mk3: コラプサー）。前の世代から作り、エンチャントを引き継ぐ。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE_2 = ITEMS.register(
             "android_armor_plate_2", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties().rarity(Rarity.RARE),
@@ -490,6 +518,15 @@ public final class SinguloItems {
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE_2);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE_3);
+        TAB_ORDER.add(ANDROID_WEAPON_MODULE);
+        TAB_ORDER.add(ANDROID_WEAPON_MODULE_2);
+        TAB_ORDER.add(ANDROID_WEAPON_MODULE_3);
+        TAB_ORDER.add(HEAVY_STRIKE_MODULE);
+        TAB_ORDER.add(RAPID_STRIKE_MODULE);
+        TAB_ORDER.add(DRAIN_MODULE);
+        TAB_ORDER.add(PIERCING_MODULE);
+        TAB_ORDER.add(FROST_MODULE);
+        TAB_ORDER.add(WARDEN_BREAKER_MODULE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
         TAB_ORDER.add(ANDROID_FISHING_UPGRADE);

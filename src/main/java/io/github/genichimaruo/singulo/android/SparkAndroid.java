@@ -687,6 +687,12 @@ public class SparkAndroid extends RuinAndroid {
             nextPalm--;
             nextField--;
             nextTenrai--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextArc--;
+                nextPalm--;
+                nextField--;
+                nextTenrai--;
+            }
             double dist = distanceTo(target);
             boolean seen = hasLineOfSight(target) && !blocked(level, fingertip(), target.getBoundingBox().getCenter());
             // 中距離（4〜7ブロック）を保つ

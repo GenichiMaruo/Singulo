@@ -27,7 +27,7 @@ import net.minecraft.world.item.component.ItemContainerContents;
 public class PortablePrinterMenu extends AbstractContainerMenu {
     public static final int WIDTH = 176, BASE_HEIGHT = 168, ROW = 20;
     /** 行の左の「次に印刷する組」の印（押せる）、枠の位置。 */
-    public static final int SELECT_X = 6, SELECT_W = 10, MEMORY_X = 20, KIT_X = 40, REPAIR_X = 64, PLATE_X = 84, SLOT_Y = 26;
+    public static final int SELECT_X = 6, SELECT_W = 10, MEMORY_X = 20, KIT_X = 40, REPAIR_X = 64, PLATE_X = 84, WEAPON_X = 104, SLOT_Y = 26;
     /** ボタンの番号: 印刷、組を選ぶ（BUTTON_SELECT + 組）。 */
     public static final int BUTTON_PRINT = 0, BUTTON_SELECT = 1;
     /** 画面に送る値: 電力・容量・次に印刷する組。 */
@@ -47,7 +47,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
         this.hand = hand;
         this.openedPrinter = player.getItemInHand(hand);
         this.units = Math.max(1, PortableAndroidPrinterItem.units(openedPrinter));
-        int slots = units * PortableAndroidPrinterItem.PER_UNIT;
+        int slots = units * (PortableAndroidPrinterItem.PER_UNIT + 1);
         this.contents = new SimpleContainer(slots);
         refreshContents();
         if (!player.level().isClientSide) {
@@ -106,6 +106,20 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return RuinAndroid.isArmorPlate(stack);
+                }
+
+                @Override
+                public int getMaxStackSize() {
+                    return 1;
+                }
+            });
+        }
+        // 武装モジュールの枠は、中身の並びのうしろ（組の枠のあと）。画面では各行の装甲板の右
+        for (int u = 0; u < units; u++) {
+            addSlot(new Slot(contents, PortableAndroidPrinterItem.weaponSlot(units, u), WEAPON_X, rowY(u)) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return RuinAndroid.isWeaponModule(stack);
                 }
 
                 @Override
@@ -275,7 +289,8 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
             }
         } else {
             // 入れられる枠へ、上の行から順に（同じ物が入っている枠には重ねる）
-            int kind = AndroidStationBlockEntity.memoryKind(stack) != null ? PortableAndroidPrinterItem.SLOT_MEMORY
+            boolean weapon = RuinAndroid.isWeaponModule(stack);
+            int kind = weapon ? 0 : AndroidStationBlockEntity.memoryKind(stack) != null ? PortableAndroidPrinterItem.SLOT_MEMORY
                     : AndroidStationBlockEntity.isKit(stack) ? PortableAndroidPrinterItem.SLOT_KIT
                     : RuinAndroid.isArmorPlate(stack) ? PortableAndroidPrinterItem.SLOT_PLATE
                     : RuinAndroid.isRepairKit(stack) ? PortableAndroidPrinterItem.SLOT_REPAIR : -1;
@@ -284,7 +299,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
             }
             boolean moved = false;
             for (int u = 0; u < units && !stack.isEmpty(); u++) {
-                int at = PortableAndroidPrinterItem.slot(u, kind);
+                int at = weapon ? PortableAndroidPrinterItem.weaponSlot(units, u) : PortableAndroidPrinterItem.slot(u, kind);
                 moved |= moveItemStackTo(stack, at, at + 1, false);
             }
             if (!moved) {

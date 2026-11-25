@@ -319,7 +319,9 @@ public abstract class RuinAndroid extends Monster {
     public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
     /** 装飾の枠（{@link AndroidAccessoryItem#HEAD} などの番号の順。顔と腰は 0.18.0 でうしろに足した）。 */
     public static final int SLOT_DECOR = SLOT_TANK + 1, DECOR_SLOTS = AndroidAccessoryItem.PARTS;
-    public static final int INVENTORY_SIZE = SLOT_DECOR + DECOR_SLOTS;
+    /** 武装モジュールの枠（0.23.0。持ち物のいちばんうしろ）。積んだモジュールは利き手の装備に写す。 */
+    public static final int SLOT_WEAPON = SLOT_DECOR + DECOR_SLOTS;
+    public static final int INVENTORY_SIZE = SLOT_WEAPON + 1;
     /** タンクアップグレードのタンクの数と、1つの容量（mB）。1つのタンクには1種類の流体。 */
     public static final int TANKS = 2, TANK_CAPACITY = 32000;
     /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
@@ -491,9 +493,12 @@ public abstract class RuinAndroid extends Monster {
         this.moveControl = new AndroidPathing.Move(this);   // 透過ガラスの中で跳ねない
         setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.WATER, 0);    // 水の中も自由に動ける
         setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
+        setDropChance(net.minecraft.world.entity.EquipmentSlot.MAINHAND, 0);
         // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
         inventory.addListener(c -> {
             setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
+            // 武装モジュールは利き手の装備として持つ（剣のエンチャントのドロップ増加などが、ふつうの仕組みで効く）
+            setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, inventory.getItem(SLOT_WEAPON).copy());
             if (!level().isClientSide) {
                 net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
                 int previousBatteries = batteries();
@@ -1909,6 +1914,23 @@ public abstract class RuinAndroid extends Monster {
         return stack.getItem() instanceof AndroidArmorPlateItem;
     }
 
+    public static boolean isWeaponModule(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidWeaponModuleItem;
+    }
+
+    /** 積んでいる武装モジュールの種類（なければ null）。 */
+    @Nullable
+    public AndroidWeaponModuleItem.Kind weaponModule() {
+        return getMainHandItem().getItem() instanceof AndroidWeaponModuleItem m ? m.kind() : null;
+    }
+
+    /**
+     * 連撃モジュール: 技の待ち時間を3 tick に1回、余分に1つ減らす（待ち時間 ×0.75）。型ごとの戦いの目標が、待ち時間を減らす所で呼ぶ。
+     */
+    protected boolean rapidCooldown() {
+        return tickCount % 3 == 0 && weaponModule() == AndroidWeaponModuleItem.Kind.RAPID;
+    }
+
     /** 自己修理キットを1つ使って、体力を半分直す。使えたら true。 */
     private boolean useRepairKit(ServerLevel level) {
         if (repairCooldown > 0 || !isRepairKit(inventory.getItem(SLOT_REPAIR))) {
@@ -2072,6 +2094,7 @@ public abstract class RuinAndroid extends Monster {
             releaseInventory(level);
         }
         setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.item.ItemStack.EMPTY);
+        setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.item.ItemStack.EMPTY);
         setTarget(null);
         getNavigation().stop();
         playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.power_down"), 0.9F, 1.4F);
@@ -2500,7 +2523,15 @@ public abstract class RuinAndroid extends Monster {
 
     /** この護衛が戦う相手か（敵対モブと、許可証に載っていない人。範囲は見ない）。 */
     boolean hostile(LivingEntity e) {
-        return hostileToGuards(e) || intruder(e);
+        return hostileToGuards(e) || intruder(e) || bossHunter() && isBoss(e);
+    }
+
+    /**
+     * 対番人モジュールを積んだ護衛か。積んだ護衛だけがボス（取り巻きも含む）と戦う: ボスを狙い、技を当て、ボスの攻撃も受ける。
+     * ボスの側はアンドロイドを狙わない（{@link #onChangeTarget}）。積んでいない護衛は、これまでどおりボスと互いに敵対しない。
+     */
+    public boolean bossHunter() {
+        return guard && weaponModule() == AndroidWeaponModuleItem.Kind.WARDEN;
     }
 
     /**
@@ -2514,7 +2545,7 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         if (guardSide) {
-            return hostileToGuards(e) || owner instanceof RuinAndroid a && a.intruder(e);
+            return hostileToGuards(e) || owner instanceof RuinAndroid a && (a.intruder(e) || a.bossHunter() && isBoss(e));
         }
         return !RuinGuards.isGuard(e) && !(owner != null && owner.isAlliedTo(e));
     }
@@ -2550,15 +2581,16 @@ public abstract class RuinAndroid extends Monster {
      * ゴーレムが狙ってしまうため）。
      */
     public static void onChangeTarget(net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent event) {
+        // ボスも、護衛のアンドロイドへは狙いを移さない（対番人モジュールで戦いに加わる護衛からも。ボスの技はプレイヤーを狙う前提）
         if (event.getNewAboutToBeSetTarget() instanceof RuinAndroid a && a.isGuard()
                 && (event.getEntity() instanceof net.minecraft.world.entity.animal.AbstractGolem
-                || event.getEntity() instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame())) {
+                || event.getEntity() instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame() || isBoss(event.getEntity()))) {
             event.setCanceled(true);
         }
     }
 
-    /** この作品のボス（番人・ウォーデンなど）。護衛のアンドロイドとは互いに敵対しない。 */
-    static boolean isBoss(@Nullable Entity e) {
+    /** この作品のボス（番人・ウォーデンなど）。護衛のアンドロイドとは互いに敵対しない（対番人モジュールを積んだ護衛だけは戦う）。 */
+    public static boolean isBoss(@Nullable Entity e) {
         return e instanceof io.github.genichimaruo.singulo.ruin.RuinBoss || e instanceof io.github.genichimaruo.singulo.ruin.HorizonWarden;
     }
 
@@ -3323,12 +3355,12 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         Entity by = source.getEntity();
-        if (guard ? by instanceof Player p && !intruder(p) || by instanceof RuinAndroid a && a.isGuard() || isBoss(by)
+        if (guard ? by instanceof Player p && !intruder(p) || by instanceof RuinAndroid a && a.isGuard() || isBoss(by) && !bossHunter()
                 || by instanceof net.minecraft.world.entity.animal.AbstractGolem : RuinGuards.isGuard(by)) {
             return false;
         }
         // ボスの叩きつけ・投げ飛ばしの落下も受けない（落下のダメージには、誰の技かが付かないので、近くにボスがいるかで見る）
-        if (guard && source.is(net.minecraft.tags.DamageTypeTags.IS_FALL)
+        if (guard && !bossHunter() && source.is(net.minecraft.tags.DamageTypeTags.IS_FALL)
                 && !level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(48), RuinAndroid::isBoss).isEmpty()) {
             return false;
         }

@@ -16318,5 +16318,201 @@
   "tooltip.singulo.android_armor_plate_3": {
     "source": "Chestplate for a guard android (+12 armor, +6 toughness, +0.25 knockback resistance)",
     "translation": "護衛仿生人的胸甲（護甲 +12，盔甲韌性 +6，擊退抗性 +0.25）"
+  },
+  "gui.singulo.android.weapon": {
+    "source": "Weapon",
+    "translation": "武裝"
+  },
+  "tooltip.singulo.android_weapon_module.slot": {
+    "source": "Fits a guard android's weapon module slot (one at a time)",
+    "translation": "放入護衛仿生人的武裝模組欄（一次一個）"
+  },
+  "item.singulo.android_weapon_module": {
+    "source": "Output Amplifier",
+    "translation": "輸出增幅器"
+  },
+  "howto.singulo.android_weapon_module": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製作：精密組裝台（階段2）"
+  },
+  "tooltip.singulo.android_weapon_module": {
+    "source": "Weapon module: all moves +30%% damage (sword enchantments apply)",
+    "translation": "武裝模組：所有招式傷害 +30%%（劍的附魔生效）"
+  },
+  "desc.singulo.android_weapon_module": {
+    "source": "Fitted to a guard android weapon module slot, raises the damage of all its moves by 30%. Takes sword enchantments (Sharpness, Smite, Bane of Arthropods, Fire Aspect, Knockback, Looting), which apply to all of its attacks.",
+    "translation": "放入護衛仿生人的武裝模組欄後，所有招式的傷害提高30%。可附上劍的附魔（鋒利、不死剋星、節肢剋星、燃燒、擊退、掠奪），對仿生人的全部攻擊生效。"
+  },
+  "summary.singulo.android_weapon_module": {
+    "source": "Strengthens all of an android's moves and carries sword enchantments.",
+    "translation": "強化仿生人所有招式，並使劍的附魔生效。"
+  },
+  "item.singulo.android_weapon_module_2": {
+    "source": "Output Amplifier Mk2",
+    "translation": "輸出增幅器（Mk2）"
+  },
+  "howto.singulo.android_weapon_module_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製作：精密組裝台（階段3）"
+  },
+  "tooltip.singulo.android_weapon_module_2": {
+    "source": "Weapon module: all moves +60%% damage (sword enchantments apply)",
+    "translation": "武裝模組：所有招式傷害 +60%%（劍的附魔生效）"
+  },
+  "desc.singulo.android_weapon_module_2": {
+    "source": "An improved Output Amplifier. Raises the damage of all moves by 60%. Keeps the enchantments of the amplifier it was made from.",
+    "translation": "輸出增幅器的改良型。所有招式的傷害提高60%。繼承作為材料的輸出增幅器的附魔。"
+  },
+  "summary.singulo.android_weapon_module_2": {
+    "source": "A stronger Output Amplifier that keeps its enchantments.",
+    "translation": "繼承附魔並強化的輸出增幅器。"
+  },
+  "item.singulo.android_weapon_module_3": {
+    "source": "Output Amplifier Mk3",
+    "translation": "輸出增幅器（Mk3）"
+  },
+  "howto.singulo.android_weapon_module_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製作：精密組裝台（階段5）"
+  },
+  "tooltip.singulo.android_weapon_module_3": {
+    "source": "Weapon module: all moves +100%% damage (sword enchantments apply)",
+    "translation": "武裝模組：所有招式傷害 +100%%（劍的附魔生效）"
+  },
+  "desc.singulo.android_weapon_module_3": {
+    "source": "The top Output Amplifier, built around a collapsar core. Doubles the damage of all moves. Does not burn. Keeps the enchantments of the amplifier it was made from.",
+    "translation": "以坍縮星為核心的最高級輸出增幅器。所有招式的傷害變為2倍。不會燃燒。繼承作為材料的輸出增幅器的附魔。"
+  },
+  "summary.singulo.android_weapon_module_3": {
+    "source": "The strongest Output Amplifier, with a collapsar core.",
+    "translation": "以坍縮星為核心、最強的輸出增幅器。"
+  },
+  "item.singulo.heavy_strike_module": {
+    "source": "Heavy Strike Module",
+    "translation": "重擊模組"
+  },
+  "howto.singulo.heavy_strike_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製作：精密組裝台（階段4）"
+  },
+  "tooltip.singulo.heavy_strike_module": {
+    "source": "Weapon module: finishing moves x2.2 damage",
+    "translation": "武裝模組：大招傷害 ×2.2"
+  },
+  "desc.singulo.heavy_strike_module": {
+    "source": "In the weapon module slot, finishing moves (such as the crimson flash, the railgun and heavenly thunder) deal 2.2x damage. Other moves stay as they are.",
+    "translation": "放入武裝模組欄後，大招（紅一閃、電磁砲、天雷等）造成2.2倍傷害。其他招式的威力不變。"
+  },
+  "summary.singulo.heavy_strike_module": {
+    "source": "A weapon module that puts its power into finishing moves.",
+    "translation": "將力量集中於大招的武裝模組。"
+  },
+  "item.singulo.rapid_strike_module": {
+    "source": "Rapid Strike Module",
+    "translation": "連擊模組"
+  },
+  "howto.singulo.rapid_strike_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製作：精密組裝台（階段4）"
+  },
+  "tooltip.singulo.rapid_strike_module": {
+    "source": "Weapon module: wait between moves x0.75",
+    "translation": "武裝模組：招式間隔 ×0.75"
+  },
+  "desc.singulo.rapid_strike_module": {
+    "source": "In the weapon module slot, cuts the wait between moves to three quarters. Each hit stays as strong.",
+    "translation": "放入武裝模組欄後，招式之間的等待時間縮短為四分之三。每次攻擊的威力不變。"
+  },
+  "summary.singulo.rapid_strike_module": {
+    "source": "A weapon module that shortens the wait between moves.",
+    "translation": "縮短招式間隔的武裝模組。"
+  },
+  "item.singulo.drain_module": {
+    "source": "Drain Module",
+    "translation": "吸收模組"
+  },
+  "howto.singulo.drain_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製作：精密組裝台（階段3）"
+  },
+  "tooltip.singulo.drain_module": {
+    "source": "Weapon module: heals a tenth of the damage dealt",
+    "translation": "武裝模組：回復造成傷害的一成生命值"
+  },
+  "desc.singulo.drain_module": {
+    "source": "In the weapon module slot, the android recovers health equal to a tenth of the damage it deals.",
+    "translation": "放入武裝模組欄後，仿生人會回復相當於所造成傷害一成的生命值。"
+  },
+  "summary.singulo.drain_module": {
+    "source": "A weapon module that heals the android as it deals damage.",
+    "translation": "以造成的傷害回復生命的武裝模組。"
+  },
+  "item.singulo.piercing_module": {
+    "source": "Piercing Module",
+    "translation": "貫通模組"
+  },
+  "howto.singulo.piercing_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製作：精密組裝台（階段3）"
+  },
+  "tooltip.singulo.piercing_module": {
+    "source": "Weapon module: ignores 40%% of the target's armor",
+    "translation": "武裝模組：無視目標護甲的四成防護"
+  },
+  "desc.singulo.piercing_module": {
+    "source": "In the weapon module slot, ignores 40% of the target armor protection.",
+    "translation": "放入武裝模組欄後，無視目標護甲四成的防護。"
+  },
+  "summary.singulo.piercing_module": {
+    "source": "A weapon module that cuts through the target's armor.",
+    "translation": "貫穿目標護甲的武裝模組。"
+  },
+  "item.singulo.frost_module": {
+    "source": "Frost Module",
+    "translation": "凍結模組"
+  },
+  "howto.singulo.frost_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製作：精密組裝台（階段3）"
+  },
+  "tooltip.singulo.frost_module": {
+    "source": "Weapon module: slows targets hit for 2 seconds",
+    "translation": "武裝模組：使命中的目標緩慢2秒"
+  },
+  "desc.singulo.frost_module": {
+    "source": "In the weapon module slot, slows anything hit for 2 seconds.",
+    "translation": "放入武裝模組欄後，命中的目標會緩慢2秒。"
+  },
+  "summary.singulo.frost_module": {
+    "source": "A weapon module that slows what it hits.",
+    "translation": "使命中目標減速的武裝模組。"
+  },
+  "item.singulo.warden_breaker_module": {
+    "source": "Warden Breaker Module",
+    "translation": "對守護者模組"
+  },
+  "howto.singulo.warden_breaker_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製作：精密組裝台（階段4）"
+  },
+  "tooltip.singulo.warden_breaker_module": {
+    "source": "Weapon module: the android fights bosses, with x1.8 damage to them",
+    "translation": "武裝模組：會與首領戰鬥，對首領傷害 ×1.8"
+  },
+  "desc.singulo.warden_breaker_module": {
+    "source": "In the weapon module slot, a guard android joins fights against bosses (ruin guardians, the Horizon Warden and the like) and deals 1.8x damage to them. It also takes their hits. Guards without it stay out of boss fights.",
+    "translation": "放入武裝模組欄後，護衛仿生人會與首領（遺跡守護者、視界守望者等）戰鬥，對首領造成1.8倍傷害。也會受到首領的攻擊。未裝備的護衛不會與首領戰鬥。"
+  },
+  "summary.singulo.warden_breaker_module": {
+    "source": "A weapon module that lets a guard join boss fights.",
+    "translation": "讓護衛加入首領戰的武裝模組。"
+  },
+  "gui.singulo.android_station.weapon": {
+    "source": "Weapon (fitted to the printed android)",
+    "translation": "武裝（裝配到列印出的仿生人）"
+  },
+  "gui.singulo.portable_printer.weapon": {
+    "source": "Weapon (fitted to the printed android)",
+    "translation": "武裝（裝配到列印出的仿生人）"
   }
 }

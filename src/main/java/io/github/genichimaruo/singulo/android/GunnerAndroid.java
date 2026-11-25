@@ -707,6 +707,11 @@ public class GunnerAndroid extends RuinAndroid {
             nextBurst--;
             nextRail--;
             hopCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextBurst--;
+                nextRail--;
+                hopCooldown--;
+            }
             // 銃口から相手まで、間に障害物がないか（目では見えていても、柵などで撃てないなら撃たずに、撃てる場所へ動く）
             boolean seen = hasLineOfSight(target) && !blocked(level, muzzle(false), target.getBoundingBox().getCenter());
             if (dist < 3.2 && hopCooldown <= 0 && onGround() && !floating() && spend(COST_HOP)) {

@@ -323,6 +323,10 @@ public class WhipAndroid extends RuinAndroid {
             getLookControl().setLookAt(target, 30, 30);
             nextMove--;
             crackCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+                crackCooldown--;
+            }
             boolean seen = hasLineOfSight(target);
             // 鞭の届く少し内側を保つ（近すぎれば下がる）
             if (dist > 5.0 || !seen) {

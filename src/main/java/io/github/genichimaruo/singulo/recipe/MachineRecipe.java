@@ -424,17 +424,53 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     public ItemStack assemble(List<ItemStack> inputs, @Nullable Plan plan) {
         ItemStack out = result.copy();
-        if (plan != null && out.is(SinguloItems.PORTABLE_ANDROID_PRINTER_2.get()) && out.getCount() == 1) {
+        Upgrade upgrade = plan == null || out.getCount() != 1 ? null : upgradeFor(out.getItem());
+        if (upgrade != null) {
             for (int i = 0; i < inputs.size(); i++) {
                 ItemStack input = inputs.get(i);
-                if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
-                    // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
-                    out.copyFrom(input, DataComponents.CONTAINER, SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME);
+                if (plan.consume()[i] == 1 && input.is(upgrade.from().get())) {
+                    // 前の世代の中身を引き継ぐ（印刷機の欄と電力、充電器の電力、装甲板のエンチャント・名前・修理の費用）
+                    for (var component : upgrade.components().get()) {
+                        out.copyFrom(input, component);
+                    }
+                    // 印刷機の武装モジュールの枠は組の数で番号が変わるので、写したあとで移す
+                    io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.moveWeaponsAfterUpgrade(out,
+                            io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.units(input));
                     break;
                 }
             }
         }
         return out;
+    }
+
+    /** 上位版を作るときに、材料の前の世代（from）から引き継ぐデータ。 */
+    private record Upgrade(java.util.function.Supplier<? extends net.minecraft.world.item.Item> from,
+                           java.util.function.Supplier<List<net.minecraft.core.component.DataComponentType<?>>> components) {}
+
+    private static final java.util.function.Supplier<List<net.minecraft.core.component.DataComponentType<?>>> ARMOR_DATA =
+            () -> List.of(DataComponents.ENCHANTMENTS, DataComponents.CUSTOM_NAME, DataComponents.REPAIR_COST);
+    private static final java.util.function.Supplier<List<net.minecraft.core.component.DataComponentType<?>>> CHARGER_DATA =
+            () -> List.of(SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME);
+
+    /** 上位版 → 引き継ぎ方（登録が済んでから初めて使うときに作る）。 */
+    @Nullable
+    private static java.util.Map<net.minecraft.world.item.Item, Upgrade> upgrades;
+
+    @Nullable
+    private static Upgrade upgradeFor(net.minecraft.world.item.Item item) {
+        if (upgrades == null) {
+            upgrades = java.util.Map.of(
+                    // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
+                    SinguloItems.PORTABLE_ANDROID_PRINTER_2.get(), new Upgrade(SinguloItems.PORTABLE_ANDROID_PRINTER,
+                            () -> List.of(DataComponents.CONTAINER, SinguloComponents.ENERGY.get(), DataComponents.CUSTOM_NAME)),
+                    SinguloItems.ANDROID_CHARGER_2.get(), new Upgrade(SinguloItems.ANDROID_CHARGER, CHARGER_DATA),
+                    SinguloItems.ANDROID_CHARGER_3.get(), new Upgrade(SinguloItems.ANDROID_CHARGER_2, CHARGER_DATA),
+                    SinguloItems.ANDROID_ARMOR_PLATE_2.get(), new Upgrade(SinguloItems.ANDROID_ARMOR_PLATE, ARMOR_DATA),
+                    SinguloItems.ANDROID_ARMOR_PLATE_3.get(), new Upgrade(SinguloItems.ANDROID_ARMOR_PLATE_2, ARMOR_DATA),
+                    SinguloItems.ANDROID_WEAPON_MODULE_2.get(), new Upgrade(SinguloItems.ANDROID_WEAPON_MODULE, ARMOR_DATA),
+                    SinguloItems.ANDROID_WEAPON_MODULE_3.get(), new Upgrade(SinguloItems.ANDROID_WEAPON_MODULE_2, ARMOR_DATA));
+        }
+        return upgrades.get(item);
     }
 
     @Override

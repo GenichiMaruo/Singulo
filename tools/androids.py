@@ -799,6 +799,8 @@ def item_textures(ti, save):
     save(plate_icon(Image), ti / 'android_armor_plate.png')
     save(plate_icon(Image, 2), ti / 'android_armor_plate_2.png')
     save(plate_icon(Image, 3), ti / 'android_armor_plate_3.png')
+    for iid in WEAPON_MODULES:
+        save(module_icon(Image, iid), ti / f'{iid}.png')
     save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
     save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
@@ -1088,6 +1090,49 @@ def charger_icon(Image, tier=1):
             d.rectangle([12, 6, 12, 12], fill=rgba(glow))
         d.point((7, 6), fill=rgba((255, 236, 140) if tier < 3 else hot))
     return art16.grain(art16.outlined(f), seed=110 + tier)
+
+
+# 武装モジュールの色と記号（0.23.0）。記号は 5×5 の点（'#' が光る所）
+WEAPON_MODULES = {
+    'android_weapon_module': ((120, 225, 255), 'amp', 1),
+    'android_weapon_module_2': ((180, 140, 255), 'amp', 2),
+    'android_weapon_module_3': ((255, 154, 74), 'amp', 3),
+    'heavy_strike_module': ((255, 90, 90), ('.###.', '.###.', '..#..', '..#..', '..#..'), 0),
+    'rapid_strike_module': ((124, 255, 138), ('#..#.', '.#..#', '..#..', '.#..#', '#..#.'), 0),
+    'drain_module': ((212, 92, 255), ('.#.#.', '#####', '#####', '.###.', '..#..'), 0),
+    'piercing_module': ((255, 210, 74), ('..#..', '.###.', '#.#.#', '..#..', '..#..'), 0),
+    'frost_module': ((159, 232, 255), ('#.#.#', '.###.', '##.##', '.###.', '#.#.#'), 0),
+    'warden_breaker_module': ((255, 255, 255), ('#.#.#', '#####', '#...#', '#####', '.....'), 0),
+}
+
+
+def module_icon(Image, iid):
+    """武装モジュール: 暗い基板の小さな箱に、白い枠と金の端子。真ん中に型の色で光る記号（出力増幅器は段の数だけ山形）。
+    Mk3 の出力増幅器はコラプサーの黒い枠。"""
+    import art16
+    glow, symbol, tier = WEAPON_MODULES[iid]
+    rgba = art16.rgba
+    frame = (70, 62, 74) if tier == 3 else (226, 230, 236)
+    body = (26, 22, 30) if tier == 3 else (40, 44, 56)
+
+    def f(d):
+        d.rectangle([3, 3, 12, 12], fill=rgba(frame))
+        d.rectangle([4, 4, 11, 11], fill=rgba(body))
+        for x in (4, 6, 9, 11):                               # 下の端子
+            d.point((x, 13), fill=rgba((214, 176, 80)))
+        d.line([(4, 3), (11, 3)], fill=rgba(art16.lighten(frame, 0.2)))
+        d.point((12, 4), fill=rgba(glow))                     # 表示灯
+        if symbol == 'amp':
+            for k in range(tier):                             # 段の数だけ山形
+                y = 9 - k * 2
+                d.line([(5, y + 1), (7, y - 1)], fill=rgba(glow))
+                d.line([(8, y - 1), (10, y + 1)], fill=rgba(glow))
+        else:
+            for j, row in enumerate(symbol):
+                for i, ch in enumerate(row):
+                    if ch == '#':
+                        d.point((5 + i, 5 + j), fill=rgba(glow))
+    return art16.grain(art16.outlined(f), seed=200 + len(iid))
 
 
 def repair_icon(Image):
